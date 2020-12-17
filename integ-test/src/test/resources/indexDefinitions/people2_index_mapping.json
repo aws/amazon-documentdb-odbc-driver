@@ -1,9 +1,0 @@
-{
-  "mappings": {
-    "properties": {
-      "firstname": {
-        "type": "keyword"
-      }
-    }
-  }
-}

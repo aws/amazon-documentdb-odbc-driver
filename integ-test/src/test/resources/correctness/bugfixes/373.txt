@@ -1,2 +1,0 @@
-SELECT Abs(dayOfWeek) FROM kibana_sample_data_flights GROUP BY abS(dayOfWeek)
-SELECT abs(dayOfWeek) FROM kibana_sample_data_flights GROUP BY ABS(dayOfWeek)
