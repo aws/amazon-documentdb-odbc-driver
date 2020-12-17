@@ -1,4 +1,0 @@
-SELECT FlightNum, Origin FROM kibana_sample_data_flights WHERE NULL IS NULL
-SELECT FlightNum, Origin FROM kibana_sample_data_flights WHERE NULL IS NOT NULL
-SELECT FlightNum, Origin FROM kibana_sample_data_flights WHERE NULL IS NULL AND NULL IS NULL
-SELECT FlightNum, Origin FROM kibana_sample_data_flights WHERE NULL IS NULL OR NULL IS NULL
