@@ -1,1 +1,0 @@
-SELECT timestamp FROM kibana_sample_data_flights GROUP BY timestamp
