@@ -7,7 +7,7 @@ $INSTALL_DIR = $args[4]
 Write-Host $args
 
 # Clone the AWS SDK CPP repo
-# $SDK_VER = "1.7.29"
+# $SDK_VER = "1.8.108"
 # -b "$SDK_VER" `
 git clone `
     --single-branch `
@@ -23,7 +23,7 @@ cmake $SRC_DIR `
     -A $WIN_ARCH `
     -D CMAKE_INSTALL_PREFIX=$INSTALL_DIR `
     -D CMAKE_BUILD_TYPE=$CONFIGURATION `
-    -D BUILD_ONLY="core" `
+    -D BUILD_ONLY="core;timestream-query;timestream-write" `
     -D ENABLE_UNITY_BUILD="ON" `
     -D CUSTOM_MEMORY_MANAGEMENT="OFF" `
     -D ENABLE_RTTI="OFF" `
