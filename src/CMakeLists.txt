@@ -98,12 +98,14 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 # Set path for AWS SDK
 set(aws-cpp-sdk-base "${CMAKE_CURRENT_SOURCE_DIR}/aws-sdk-cpp")
 set(aws-cpp-sdk-core_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/cmake/aws-cpp-sdk-core")
+set(aws-cpp-sdk-timestream-query_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/cmake/aws-cpp-sdk-timestream-query")
+set(aws-cpp-sdk-timestream-write_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/cmake/aws-cpp-sdk-timestream-write")
 set(aws-c-event-stream_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/aws-c-event-stream/cmake")
 set(aws-c-common_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/aws-c-common/cmake")
 set(aws-checksums_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/aws-checksums/cmake")
 
 if (WIN32)
-	find_package(AWSSDK REQUIRED core)
+    find_package(AWSSDK REQUIRED core timestream-query timestream-write)
 endif()
 
 # General compiler definitions
