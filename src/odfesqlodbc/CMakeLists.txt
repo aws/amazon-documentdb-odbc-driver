@@ -64,14 +64,14 @@ include_directories(
 # Platform specific library dependencies
 if(WIN32)
 	# Windows specifiec
-	target_link_libraries(odfesqlodbc wsock32 ws2_32 winmm user32 gdi32 legacy_stdio_definitions aws-cpp-sdk-core kernel32 advapi32 secur32 XOleHlp Wldap32 crypt32 Normaliz odbccp32 odbc32)
+	target_link_libraries(odfesqlodbc wsock32 ws2_32 winmm user32 gdi32 legacy_stdio_definitions aws-cpp-sdk-core aws-cpp-sdk-timestream-query aws-cpp-sdk-timestream-write kernel32 advapi32 secur32 XOleHlp Wldap32 crypt32 Normaliz odbccp32 odbc32)
 	target_link_libraries(odfesqlodbc debug msvcrtd)
 	target_link_libraries(odfesqlodbc optimized msvcrt)
 elseif(APPLE)
 	# Apple specific
-	target_link_libraries(odfesqlodbc iodbc iodbcinst aws-cpp-sdk-core)
+	target_link_libraries(odfesqlodbc iodbc iodbcinst aws-cpp-sdk-core aws-cpp-sdk-timestream-query aws-cpp-sdk-timestream-write)
 elseif(UNIX)
 	# Unix specific
 	include_directories(/usr/src/linux-headers-5.0.0-27/include)
-	target_link_libraries(odfesqlodbc aws-cpp-sdk-core odbc odbcinst)
+	target_link_libraries(odfesqlodbc aws-cpp-sdk-core aws-cpp-sdk-timestream-query aws-cpp-sdk-timestream-write odbc odbcinst)
 endif()
