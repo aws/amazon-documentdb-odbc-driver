@@ -1,6 +1,10 @@
 name: Open Distro for Elasticsearch ODBC Driver
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
 
 env:
   CI_OUTPUT_PATH: "sql-odbc/ci-output"
