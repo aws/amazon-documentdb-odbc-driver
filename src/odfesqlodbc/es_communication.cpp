@@ -40,8 +40,6 @@ static const std::string OPENDISTRO_SQL_PLUGIN_NAME = "opendistro_sql";
 static const std::string ALLOCATION_TAG = "AWS_SIGV4_AUTH";
 static const std::string SERVICE_NAME = "es";
 static const std::string ESODBC_PROFILE_NAME = "elasticsearchodbc";
-static const std::string ERROR_MSG_PREFIX =
-    "[Open Distro For Elasticsearch][SQL ODBC Driver][SQL Plugin] ";
 static const std::string JSON_SCHEMA =
     "{"  // This was generated from the example elasticsearch data
     "\"type\": \"object\","
@@ -173,23 +171,6 @@ std::shared_ptr< ErrorDetails > ESCommunication::ParseErrorResponse(
     }
 }
 
-void ESCommunication::SetErrorDetails(std::string reason, std::string message,
-                                      ConnErrorType error_type) {
-    // Prepare document and validate schema
-    auto error_details = std::make_shared< ErrorDetails >();
-    error_details->reason = reason;
-    error_details->details = message;
-    error_details->source_type = "Dummy type";
-    error_details->type = error_type;
-    m_error_details = error_details;
-}
-
-void ESCommunication::SetErrorDetails(ErrorDetails details) {
-    // Prepare document and validate schema
-    auto error_details = std::make_shared< ErrorDetails >(details);
-    m_error_details = error_details;
-}
-
 void ESCommunication::GetJsonSchema(ESResult& es_result) {
     // Prepare document and validate schema
     try {
@@ -210,41 +191,16 @@ ESCommunication::ESCommunication()
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wreorder"
 #endif  // __APPLE__
-    : m_status(ConnStatusType::CONNECTION_BAD),
-      m_error_type(ConnErrorType::CONN_ERROR_SUCCESS),
-      m_valid_connection_options(false),
-      m_is_retrieving(false),
-      m_error_message(""),
-      m_result_queue(2),
-      m_client_encoding(m_supported_client_encodings[0])
+    : m_is_retrieving(false),
+      m_result_queue(2)
 #ifdef __APPLE__
 #pragma clang diagnostic pop
 #endif  // __APPLE__
 {
-    LogMsg(ES_ALL, "Initializing Aws API.");
-    Aws::InitAPI(m_options);
 }
 
-ESCommunication::~ESCommunication() {
-    LogMsg(ES_ALL, "Shutting down Aws API.");
-    Aws::ShutdownAPI(m_options);
-}
-
-std::string ESCommunication::GetErrorMessage() {
-    // TODO #35 - Check if they expect NULL or "" when there is no error.
-    if (m_error_details) {
-        m_error_details->details = std::regex_replace(
-            m_error_details->details, std::regex("\\n"), "\\\\n");
-        return ERROR_MSG_PREFIX + m_error_details->reason + ": "
-               + m_error_details->details;
-    } else {
-        return ERROR_MSG_PREFIX
-               + "No error details available; check the driver logs.";
-    }
-}
-
-ConnErrorType ESCommunication::GetErrorType() {
-    return m_error_type;
+std::string ESCommunication::GetErrorPrefix() {
+    return "[Open Distro For Elasticsearch][SQL ODBC Driver][SQL Plugin] ";
 }
 
 bool ESCommunication::ConnectionOptions(runtime_options& rt_opts,
@@ -255,43 +211,6 @@ bool ESCommunication::ConnectionOptions(runtime_options& rt_opts,
     (void)(use_defaults);
     m_rt_opts = rt_opts;
     return CheckConnectionOptions();
-}
-
-bool ESCommunication::ConnectionOptions2() {
-    return true;
-}
-
-bool ESCommunication::ConnectDBStart() {
-    LogMsg(ES_ALL, "Starting DB connection.");
-    m_status = ConnStatusType::CONNECTION_BAD;
-    if (!m_valid_connection_options) {
-        // TODO: get error message from CheckConnectionOptions
-        m_error_message =
-            "Invalid connection options, unable to connect to DB.";
-        SetErrorDetails("Invalid connection options", m_error_message,
-                        ConnErrorType::CONN_ERROR_COMM_LINK_FAILURE);
-        LogMsg(ES_ERROR, m_error_message.c_str());
-        DropDBConnection();
-        return false;
-    }
-
-    m_status = ConnStatusType::CONNECTION_NEEDED;
-    if (!EstablishConnection()) {
-        m_error_message = "Failed to establish connection to DB.";
-        SetErrorDetails("Connection error", m_error_message,
-                        ConnErrorType::CONN_ERROR_COMM_LINK_FAILURE);
-        LogMsg(ES_ERROR, m_error_message.c_str());
-        DropDBConnection();
-        return false;
-    }
-
-    LogMsg(ES_DEBUG, "Connection established.");
-    m_status = ConnStatusType::CONNECTION_OK;
-    return true;
-}
-
-ConnStatusType ESCommunication::GetConnectionStatus() {
-    return m_status;
 }
 
 void ESCommunication::DropDBConnection() {
@@ -783,18 +702,6 @@ void ESCommunication::ConstructESResult(ESResult& result) {
     result.num_fields = (uint16_t)schema_array.size();
 }
 
-inline void ESCommunication::LogMsg(ESLogLevel level, const char* msg) {
-#if WIN32
-#pragma warning(push)
-#pragma warning(disable : 4551)
-#endif  // WIN32
-    // cppcheck outputs an erroneous missing argument error which breaks build.
-    // Disable for this function call
-    MYLOG(level, "%s\n", msg);
-#if WIN32
-#pragma warning(pop)
-#endif  // WIN32
-}
 
 ESResult* ESCommunication::PopResult() {
     ESResult* result = NULL;
@@ -802,24 +709,6 @@ ESResult* ESCommunication::PopResult() {
     }
 
     return result;
-}
-
-// TODO #36 - Send query to database to get encoding
-std::string ESCommunication::GetClientEncoding() {
-    return m_client_encoding;
-}
-
-// TODO #36 - Send query to database to set encoding
-bool ESCommunication::SetClientEncoding(std::string& encoding) {
-    if (std::find(m_supported_client_encodings.begin(),
-                  m_supported_client_encodings.end(), encoding)
-        != m_supported_client_encodings.end()) {
-        m_client_encoding = encoding;
-        return true;
-    }
-    LogMsg(ES_ERROR,
-           std::string("Failed to find encoding " + encoding).c_str());
-    return false;
 }
 
 std::string ESCommunication::GetServerVersion() {

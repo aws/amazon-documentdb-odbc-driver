@@ -26,7 +26,7 @@
 #include "xalibname.h"
 #endif /* _HANDLE_ENLIST_IN_DTC_ */
 
-#define AUTHMODE_CNT 3
+#define AUTHMODE_CNT 2
 #define LOGLEVEL_CNT 8
 extern HINSTANCE s_hModule;
 
@@ -41,9 +41,9 @@ int loglevels[LOGLEVEL_CNT] = {
     {IDS_LOGTYPE_ALL}};
 
 static const struct authmode authmodes[AUTHMODE_CNT] = {
-    {IDS_AUTHTYPE_NONE, AUTHTYPE_IAM},
-    {IDS_AUTHTYPE_BASIC, AUTHTYPE_BASIC},
-    {IDS_AUTHTYPE_IAM, AUTHTYPE_NONE}};
+    // A bit tricky map for the selection list dialog
+    {IDS_AUTHTYPE_BASIC, AUTHTYPE_IAM},
+    {IDS_AUTHTYPE_IAM, AUTHTYPE_BASIC}};
 
 const struct authmode *GetCurrentAuthMode(HWND hdlg) {
     unsigned int ams_cnt = 0;
@@ -75,14 +75,17 @@ void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
     if (strcmp(am->authtype_str, AUTHTYPE_BASIC) == 0) {
         EnableWindow(GetDlgItem(hdlg, IDC_USER), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_PASSWORD), TRUE);
-        EnableWindow(GetDlgItem(hdlg, IDC_REGION), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_TOKEN), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_REGION), TRUE);
     } else if (strcmp(am->authtype_str, AUTHTYPE_IAM) == 0) {
         EnableWindow(GetDlgItem(hdlg, IDC_USER), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_PASSWORD), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_TOKEN), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_REGION), TRUE);
     } else {
         EnableWindow(GetDlgItem(hdlg, IDC_USER), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_PASSWORD), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_TOKEN), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_REGION), FALSE);
     } 
 }
@@ -111,6 +114,7 @@ void SetDlgStuff(HWND hdlg, const ConnInfo *ci) {
                        ams[authtype_selection_idx].authtype_id, (WPARAM)0);
     SetDlgItemText(hdlg, IDC_USER, ci->username);
     SetDlgItemText(hdlg, IDC_PASSWORD, SAFE_NAME(ci->password));
+    SetDlgItemText(hdlg, IDC_TOKEN, ci->token);
     SetDlgItemText(hdlg, IDC_REGION, ci->region);
 }
 
@@ -129,6 +133,7 @@ void GetDlgStuff(HWND hdlg, ConnInfo *ci) {
     // Authentication
     GetDlgItemText(hdlg, IDC_USER, ci->username, sizeof(ci->username));
     GetNameField(hdlg, IDC_PASSWORD, &ci->password);
+    GetDlgItemText(hdlg, IDC_TOKEN, ci->token, sizeof(ci->token));
     GetDlgItemText(hdlg, IDC_REGION, ci->region, sizeof(ci->region));
     const struct authmode *am = GetCurrentAuthMode(hdlg);
     SetAuthenticationVisibility(hdlg, am);
