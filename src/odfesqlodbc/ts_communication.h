@@ -14,8 +14,8 @@
  *
  */
 
-#ifndef ES_COMMUNICATION
-#define ES_COMMUNICATION
+#ifndef TS_COMMUNICATION
+#define TS_COMMUNICATION
 
 // clang-format off
 #include <memory>
@@ -31,30 +31,22 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
 #endif // __APPLE__
-#include "rabbit.hpp"
+
 #ifdef __APPLE__
 #pragma clang diagnostic pop
 #endif // __APPLE__
-#include <map>
 #include <string>
-#include <aws/core/Aws.h>
-#include <aws/core/http/HttpRequest.h>
-#include <aws/core/http/HttpResponse.h>
-#include <aws/core/http/HttpClientFactory.h>
-#include <aws/core/http/HttpClient.h>
-#include <aws/core/client/ClientConfiguration.h>
+#include <aws/timestream-query/TimestreamQueryClient.h>
 // clang-format on
 
-class ESCommunication : public Communication {
+class TSCommunication : public Communication {
    public:
-    ESCommunication();
+    TSCommunication();
 
     // Create function for factory
     std::string GetErrorPrefix() override;
-
     bool ConnectionOptions(runtime_options& rt_opts, bool use_defaults,
-                           int expand_dbname,
-                           unsigned int option_count) override;
+                           int expand_dbname, unsigned int option_count) override;
     void DropDBConnection() override;
     int ExecDirect(const char* query, const char* fetch_size_) override;
     void SendCursorQueries(std::string cursor) override;
@@ -64,8 +56,7 @@ class ESCommunication : public Communication {
     std::shared_ptr< Aws::Http::HttpResponse > IssueRequest(
         const std::string& endpoint, const Aws::Http::HttpMethod request_type,
         const std::string& content_type, const std::string& query,
-        const std::string& fetch_size = "",
-        const std::string& cursor = "") override;
+        const std::string& fetch_size = "", const std::string& cursor = "") override;
     void AwsHttpResponseToString(
         std::shared_ptr< Aws::Http::HttpResponse > response,
         std::string& output) override;
@@ -75,21 +66,22 @@ class ESCommunication : public Communication {
         const std::string table_name) override;
 
    protected:
+    void InitializeConnection();
     bool CheckConnectionOptions() override;
     bool EstablishConnection() override;
+    //void ConstructESResult(ESResult& result);
+    //void GetJsonSchema(ESResult& es_result);
+    //void PrepareCursorResult(ESResult& es_result);
+    //std::shared_ptr< ErrorDetails > ParseErrorResponse(ESResult& es_result);
    private:
-    void InitializeConnection();
-    void ConstructESResult(ESResult& result);
-    void GetJsonSchema(ESResult& es_result);
-    void PrepareCursorResult(ESResult& es_result);
-    std::shared_ptr< ErrorDetails > ParseErrorResponse(ESResult& es_result);
-    bool IsSQLPluginInstalled(const std::string& plugin_response);
 
-    bool m_is_retrieving;
-    ESResultQueue m_result_queue;
+    //bool m_is_retrieving;
+    //ESResultQueue m_result_queue;
     runtime_options m_rt_opts;
-    std::string m_response_str;
-    std::shared_ptr< Aws::Http::HttpClient > m_http_client;
+
+    //std::string m_response_str;
+
+    std::shared_ptr< Aws::TimestreamQuery::TimestreamQueryClient > m_client;
 };
 
 #endif

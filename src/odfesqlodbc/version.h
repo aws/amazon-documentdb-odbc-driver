@@ -18,8 +18,8 @@
 #define __VERSION_H__
 
 /*
- *	BuildAll may pass ELASTICDRIVERVERSION, ELASTIC_RESOURCE_VERSION
- *	and ES_DRVFILE_VERSION via winbuild/elasticodbc.vcxproj.
+ *	BuildAll may pass DRIVERVERSION, RESOURCE_VERSION
+ *	and DRVFILE_VERSION via winbuild/elasticodbc.vcxproj.
  */
 #ifdef ES_ODBC_VERSION
 
@@ -34,5 +34,19 @@
 #endif
 
 #endif  // ES_ODBC_VERSION
+
+#ifdef TS_ODBC_VERSION
+
+#ifndef TIMESTREAMDRIVERVERSION
+#define TIMESTREAMDRIVERVERSION TS_ODBC_VERSION
+#endif
+#ifndef TIMESTREAM_RESOURCE_VERSION
+#define TIMESTREAM_RESOURCE_VERSION TIMESTREAMDRIVERVERSION
+#endif
+#ifndef TS_DRVFILE_VERSION
+#define TS_DRVFILE_VERSION TS_ODBC_DRVFILE_VERSION
+#endif
+
+#endif  // TS_ODBC_VERSION
 
 #endif
