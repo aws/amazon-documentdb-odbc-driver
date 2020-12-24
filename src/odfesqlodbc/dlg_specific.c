@@ -57,12 +57,13 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
         connect_string, nlen,
         "%s=%s;" INI_SERVER
         "=%s;"
-        "database=elasticsearch;" INI_PORT "=%s;" INI_USERNAME_ABBR
-        "=%s;" INI_PASSWORD_ABBR "=%s;" INI_AUTH_MODE "=%s;" INI_REGION
+        "database=timestream;" INI_PORT "=%s;" INI_USERNAME_ABBR
+        "=%s;" INI_PASSWORD_ABBR "=%s;" INI_TOKEN_ABBR "=%s;" INI_AUTH_MODE
+        "=%s;" INI_REGION
         "=%s;" INI_SSL_USE "=%d;" INI_SSL_HOST_VERIFY "=%d;" INI_LOG_LEVEL
         "=%d;" INI_LOG_OUTPUT "=%s;" INI_TIMEOUT "=%s;" INI_FETCH_SIZE "=%s;",
         got_dsn ? "DSN" : "DRIVER", got_dsn ? ci->dsn : ci->drivername,
-        ci->server, ci->port, ci->username, encoded_item, ci->authtype,
+        ci->server, ci->port, ci->username, encoded_item, ci->token, ci->authtype,
         ci->region, (int)ci->use_ssl, (int)ci->verify_server,
         (int)ci->drivers.loglevel, ci->drivers.output_dir,
         ci->response_timeout, ci->fetch_size);
@@ -121,7 +122,9 @@ BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
         MYLOG(ES_DEBUG, "key='%s' value='xxxxxxxx'\n", attribute);
         printed = TRUE;
 #endif
-    } else if (stricmp(attribute, INI_AUTH_MODE) == 0)
+    } else if (stricmp(attribute, INI_TOKEN) == 0 || stricmp(attribute, INI_TOKEN_ABBR) == 0)
+        STRCPY_FIXED(ci->token, value);
+    else if (stricmp(attribute, INI_AUTH_MODE) == 0)
         STRCPY_FIXED(ci->authtype, value);
     else if (stricmp(attribute, INI_REGION) == 0)
         STRCPY_FIXED(ci->region, value);
@@ -161,6 +164,7 @@ static void getCiDefaults(ConnInfo *ci) {
         free(ci->password.name);
     ci->password.name = NULL;
     strncpy(ci->username, DEFAULT_USERNAME, MEDIUM_REGISTRY_LEN);
+    strncpy(ci->token, DEFAULT_TOKEN, LARGE_REGISTRY_LEN);
     strncpy(ci->region, DEFAULT_REGION, MEDIUM_REGISTRY_LEN);
     ci->use_ssl = DEFAULT_USE_SSL;
     ci->verify_server = DEFAULT_VERIFY_SERVER;
@@ -258,6 +262,14 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
                                    sizeof(temp), ODBC_INI)
         > 0)
         ci->password = decode(temp);
+    if (SQLGetPrivateProfileString(DSN, INI_TOKEN, NULL_STRING, temp,
+                                   sizeof(temp), ODBC_INI)
+        > 0)
+        STRCPY_FIXED(ci->token, temp);
+    if (SQLGetPrivateProfileString(DSN, INI_TOKEN_ABBR, NULL_STRING, temp,
+                                   sizeof(temp), ODBC_INI)
+        > 0)
+        STRCPY_FIXED(ci->token, temp);
     if (SQLGetPrivateProfileString(DSN, INI_AUTH_MODE, NULL_STRING, temp,
                                    sizeof(temp), ODBC_INI)
         > 0)
@@ -318,6 +330,7 @@ void writeDSNinfo(const ConnInfo *ci) {
     SQLWritePrivateProfileString(DSN, INI_USERNAME, ci->username, ODBC_INI);
     encode(ci->password, encoded_item, sizeof(encoded_item));
     SQLWritePrivateProfileString(DSN, INI_PASSWORD, encoded_item, ODBC_INI);
+    SQLWritePrivateProfileString(DSN, INI_TOKEN, ci->token, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_AUTH_MODE, ci->authtype, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_REGION, ci->region, ODBC_INI);
     ITOA_FIXED(temp, ci->use_ssl);
@@ -469,6 +482,7 @@ void CC_conninfo_init(ConnInfo *conninfo, UInt4 option) {
         free(conninfo->password.name);
     conninfo->password.name = NULL;
     strncpy(conninfo->username, DEFAULT_USERNAME, MEDIUM_REGISTRY_LEN);
+    strncpy(conninfo->token, DEFAULT_TOKEN, LARGE_REGISTRY_LEN);
     strncpy(conninfo->region, DEFAULT_REGION, MEDIUM_REGISTRY_LEN);
     conninfo->use_ssl = DEFAULT_USE_SSL;
     conninfo->verify_server = DEFAULT_VERIFY_SERVER;
@@ -511,6 +525,7 @@ void CC_copy_conninfo(ConnInfo *ci, const ConnInfo *sci) {
     CORR_STRCPY(authtype);
     CORR_STRCPY(region);
     NAME_TO_NAME(ci->password, sci->password);
+    CORR_STRCPY(token);
     CORR_VALCPY(use_ssl);
     CORR_VALCPY(verify_server);
     CORR_STRCPY(port);
