@@ -56,8 +56,10 @@ extern "C" {
 #define INI_PORT "port"
 #define INI_USERNAME "user"    
 #define INI_USERNAME_ABBR "UID"        
-#define INI_PASSWORD "password"        
+#define INI_PASSWORD "password"   
 #define INI_PASSWORD_ABBR "PWD"  
+#define INI_TOKEN "token"
+#define INI_TOKEN_ABBR "TOKEN"
 #define INI_AUTH_MODE "auth"
 #define INI_REGION "region" 
 #define INI_SSL_USE "useSSL"  
@@ -76,7 +78,8 @@ extern "C" {
 #define DEFAULT_PORT ""
 #define DEFAULT_USERNAME ""
 #define DEFAULT_PASSWORD ""
-#define DEFAULT_DRIVERNAME "elasticsearchodbc"
+#define DEFAULT_TOKEN ""
+#define DEFAULT_DRIVERNAME "timestreamodbc"
 #define DEFAULT_DESC ""
 #define DEFAULT_DSN ""
 #define DEFAULT_REGION ""
@@ -136,7 +139,7 @@ extern "C" {
 #define DEFAULT_BOOLSASCHAR 0
 #define DEFAULT_UNIQUEINDEX 1 /* dont recognize */
 #define DEFAULT_LOGLEVEL ES_WARNING
-#define DEFAULT_USE_SSL 0
+#define DEFAULT_USE_SSL 1
 #define DEFAULT_TRUST_SELF_SIGNED 0
 #define DEFAULT_AUTH_MODE "NONE"
 #define DEFAULT_REGION ""

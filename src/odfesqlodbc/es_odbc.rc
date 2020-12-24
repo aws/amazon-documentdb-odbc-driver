@@ -62,33 +62,35 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Dialog
 //
 
-DLG_CONFIG DIALOGEX 65, 43, 275, 250
+DLG_CONFIG DIALOGEX 65, 43, 274, 258
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION "Elasticsearch ODBC Driver DSN Setup"
+CAPTION "Timestream ODBC Driver DSN Setup"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     LTEXT           "Data Source Name",IDC_DSNAMETEXT,23,7,77,12,NOT WS_GROUP
     EDITTEXT        IDC_DSNAME,108,6,120,12,ES_AUTOHSCROLL | WS_DISABLED
-    GROUPBOX        "Connection Settings",IDC_CONN_SETTINGS,7,28,261,56
-    LTEXT           "Host",IDC_STATIC,20,46,20,8,NOT WS_GROUP
-    EDITTEXT        IDC_SERVER,60,44,192,12,ES_AUTOHSCROLL
-    LTEXT           "&Port",IDC_STATIC,20,66,19,8
-    EDITTEXT        IDC_PORT,60,64,192,13,ES_AUTOHSCROLL
-    GROUPBOX        "Authentication Settings",IDC_AUTH_SETTINGS,7,93,260,92,BS_FLAT
+    GROUPBOX        "Connection Settings",IDC_CONN_SETTINGS,11,28,261,56,NOT WS_VISIBLE
+    LTEXT           "Host",IDC_STATIC,20,46,20,8,NOT WS_VISIBLE | NOT WS_GROUP
+    EDITTEXT        IDC_SERVER,60,44,192,12,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "&Port",IDC_STATIC,20,66,19,8,NOT WS_VISIBLE
+    EDITTEXT        IDC_PORT,60,64,192,13,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    GROUPBOX        "Authentication Settings",IDC_AUTH_SETTINGS,12,93,260,107,BS_FLAT
     LTEXT           "Auth",IDC_AUTH_STATIC,21,110,19,8
     COMBOBOX        IDC_AUTHTYPE,61,108,192,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "User",IDC_USERNAME_STATIC,20,129,19,8
     EDITTEXT        IDC_USER,61,127,191,12,ES_AUTOHSCROLL | WS_DISABLED
-    LTEXT           "Password",IDC_PASSWORD_STATIC,20,149,41,12
-    EDITTEXT        IDC_PASSWORD,61,147,191,12,ES_PASSWORD | ES_AUTOHSCROLL | WS_DISABLED
-    LTEXT           "Region",IDC_REGION_STATIC,20,170,28,8
-    EDITTEXT        IDC_REGION,61,168,191,12,ES_AUTOHSCROLL | WS_DISABLED
-    PUSHBUTTON      "Advanced Options",ID_ADVANCED_OPTIONS,21,195,111,15,WS_GROUP
-    PUSHBUTTON      "Logging Options",ID_LOG_OPTIONS,144,195,108,15,WS_GROUP
-    LTEXT           "V.N.N.N",IDC_DRIVER_VERSION,10,228,108,8
-    DEFPUSHBUTTON   "OK",IDOK,119,224,44,15,WS_GROUP
-    DEFPUSHBUTTON   "Test",IDOK2,167,224,44,15,WS_GROUP
-    PUSHBUTTON      "Cancel",IDCANCEL,215,224,44,15
+    LTEXT           "Password",IDC_PASSWORD_STATIC,20,148,41,12
+    EDITTEXT        IDC_PASSWORD,61,146,191,12,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "Region",IDC_REGION_STATIC,20,184,28,8
+    EDITTEXT        IDC_REGION,61,182,191,12,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "Advanced Options",ID_ADVANCED_OPTIONS,18,207,111,15,WS_GROUP
+    PUSHBUTTON      "Logging Options",ID_LOG_OPTIONS,141,207,108,15,WS_GROUP
+    LTEXT           "V.N.N.N",IDC_DRIVER_VERSION,11,246,108,8
+    DEFPUSHBUTTON   "OK",IDOK,119,239,44,15,WS_GROUP
+    DEFPUSHBUTTON   "Test",IDOK2,167,239,44,15,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,215,239,44,15
+    LTEXT           "Token",IDC_TOKEN_STATIC,20,166,41,12
+    EDITTEXT        IDC_TOKEN,61,164,191,12,ES_AUTOHSCROLL | WS_DISABLED
 END
 
 DLG_ADVANCED_OPTIONS DIALOGEX 0, 0, 157, 113
@@ -97,8 +99,8 @@ CAPTION "Advanced Options"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     GROUPBOX        "",IDC_STATIC,12,4,133,85
-    CONTROL         "SSL",IDC_USESSL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,12,10,11
-    LTEXT           "Enable SSL",IDC_SSL_STATIC,37,14,39,8
+    CONTROL         "SSL",IDC_USESSL,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,19,12,10,11
+    LTEXT           "Enable SSL",IDC_SSL_STATIC,37,14,39,8,NOT WS_VISIBLE
     CONTROL         "Host Verification",IDC_HOST_VER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,32,10,9
     LTEXT           "Hostname Verification",IDC_HOST_VER_STATIC,37,32,71,8
     LTEXT           "Response Timeout (s)",IDC_CONNTIMEOUT_STATIC,19,51,70,8
@@ -134,9 +136,10 @@ GUIDELINES DESIGNINFO
 BEGIN
     DLG_CONFIG, DIALOG
     BEGIN
-        RIGHTMARGIN, 270
+        LEFTMARGIN, 1
+        RIGHTMARGIN, 272
         TOPMARGIN, 1
-        BOTTOMMARGIN, 200
+        BOTTOMMARGIN, 254
     END
 
     DLG_ADVANCED_OPTIONS, DIALOG
@@ -164,8 +167,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION ES_DRVFILE_VERSION
- PRODUCTVERSION ES_DRVFILE_VERSION
+ FILEVERSION 0,0,0,0
+ PRODUCTVERSION 0,0,0,0
  FILEFLAGSMASK 0x3L
 #ifdef _DEBUG
  FILEFLAGS 0x9L
@@ -180,16 +183,16 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "Comments", "Elasticsearch ANSI ODBC driver"
+            VALUE "Comments", "Timestream ANSI ODBC driver"
             VALUE "CompanyName", "Amazon"
-            VALUE "FileDescription", "Elasticsearch ODBC Driver (English)"
-            VALUE "FileVersion", ES_ODBC_VERSION
+            VALUE "FileDescription", "Timestream ODBC Driver (English)"
+            VALUE "FileVersion", "0.0.0.0"
             VALUE "InternalName", "odfesqlodbc"
             VALUE "LegalCopyright", "Copyright"
-            VALUE "LegalTrademarks", "ODBC(TM) is a trademark of Microsoft Corporation.  Microsoft? is a registered trademark of Microsoft Corporation. Windows(TM) is a trademark of Microsoft Corporation."
+            VALUE "LegalTrademarks", "ODBC(TM) is a trademark of Microsoft Corporation.  Microsoft is a registered trademark of Microsoft Corporation. Windows(TM) is a trademark of Microsoft Corporation."
             VALUE "OriginalFilename", "odfesqlodbc.dll"
-            VALUE "ProductName", "Elasticsearch"
-            VALUE "ProductVersion", ES_ODBC_VERSION
+            VALUE "ProductName", "Timestream"
+            VALUE "ProductVersion", "0.0.0.0"
         END
     END
     BLOCK "VarFileInfo"

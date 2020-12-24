@@ -627,6 +627,7 @@ typedef struct {
     char authtype[MEDIUM_REGISTRY_LEN];
     char username[MEDIUM_REGISTRY_LEN];
     esNAME password;
+    char token[LARGE_REGISTRY_LEN];
     char region[MEDIUM_REGISTRY_LEN];
 
     // Encryption
