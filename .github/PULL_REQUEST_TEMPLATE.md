@@ -14,4 +14,6 @@
 ### Additional Reviewers
 @kylepbit
 @rayl-bitquill
+@yanw-bq
+@jerrytfleung
 <!-- Any additional reviewers -->
