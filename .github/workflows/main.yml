@@ -1,6 +1,6 @@
 name: Timestream ODBC Driver
 
-on: [push, pull_request]
+on: push
 
 env:
   CI_OUTPUT_PATH: "ci-output"
