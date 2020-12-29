@@ -1,11 +1,11 @@
 # The overall template of the release notes
 template: |
-  Open Distro for Elasticsearch Version $RESOLVED_VERSION
+  Timestream ODBC Version $RESOLVED_VERSION
   $CHANGES
 
 # Setting the formatting and sorting for the release notes body
 name-template: Version $RESOLVED_VERSION
-change-template: "* $TITLE ([#$NUMBER](https://github.com/opendistro-for-elasticsearch/sql/pull/$NUMBER))"
+change-template: "* $TITLE ([#$NUMBER](https://github.com/Bit-Quill/timestream-odbc/pull/$NUMBER))"
 sort-by: merged_at
 sort-direction: ascending
 replacers:
