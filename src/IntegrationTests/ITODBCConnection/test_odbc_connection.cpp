@@ -32,8 +32,8 @@
 
 // SQLConnect constants
 std::wstring wdsn_name = L"timestream";
-std::wstring user = L"AKIAXRHQJQPE4UYIKZO6";
-std::wstring pass = L"CMgAXQw7MFDKbGNJL0ztayA2pKVfsMq3PgLlGz3K";
+std::wstring user = L"<accesskey>";
+std::wstring pass = L"<secretkey>";
 std::wstring wrong = L"wrong";
 
 // SQLDriverConnect constants
