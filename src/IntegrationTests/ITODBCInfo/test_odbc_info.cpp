@@ -146,7 +146,7 @@ TEST_SQL_GET_INFO_STRING(SQLDriverODBCVer, SQL_DRIVER_ODBC_VER, L"03.51");
 
 std::wstring version =
     std::wstring_convert< std::codecvt_utf8_utf16< wchar_t >, wchar_t >{}
-        .from_bytes(ELASTICSEARCHDRIVERVERSION);
+        .from_bytes(TIMESTREAMDRIVERVERSION);
 TEST_SQL_GET_INFO_STRING(SQLDriverVer, SQL_DRIVER_VER, version);
 
 TEST_SQL_GET_INFO_UINT16(SQLGetDataExtensions, SQL_GETDATA_EXTENSIONS,

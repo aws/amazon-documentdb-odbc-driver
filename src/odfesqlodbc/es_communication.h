@@ -69,7 +69,7 @@ class ESCommunication : public Communication {
     void AwsHttpResponseToString(
         std::shared_ptr< Aws::Http::HttpResponse > response,
         std::string& output) override;
-    void SendCloseCursorRequest(const std::string& cursor);
+    void SendCloseCursorRequest(const std::string& cursor) override;
     void StopResultRetrieval() override;
     std::vector< std::string > GetColumnsWithSelectQuery(
         const std::string table_name) override;
