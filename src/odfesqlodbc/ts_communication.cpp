@@ -387,7 +387,7 @@ bool TSCommunication::EstablishConnection() {
         if (outcome.IsSuccess()) {
             return true;
         } else {
-            m_error_message = outcome.GetError().GetMessageA();
+            m_error_message = outcome.GetError().GetMessage();
             SetErrorDetails("Connection error", m_error_message,
                             ConnErrorType::CONN_ERROR_COMM_LINK_FAILURE);
         }
