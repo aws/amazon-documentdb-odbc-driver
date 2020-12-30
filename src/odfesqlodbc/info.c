@@ -218,7 +218,7 @@ RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
             break;
 
         case SQL_DRIVER_VER: /* ODBC 1.0 */
-            p = ELASTICSEARCHDRIVERVERSION;
+            p = TIMESTREAMDRIVERVERSION;
             break;
 
         case SQL_EXPRESSIONS_IN_ORDERBY: /* ODBC 1.0 */
