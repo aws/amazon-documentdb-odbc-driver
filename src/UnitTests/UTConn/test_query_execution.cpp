@@ -40,7 +40,7 @@ const int all_columns_flights_count = 25;
 const int some_columns_flights_count = 2;
 runtime_options valid_conn_opt_val = {
     {valid_host, valid_port, "1", "0"},
-    {"BASIC", valid_user, valid_pw, valid_region},
+    {"BASIC", valid_user, valid_pw, "", valid_region},
     {use_ssl, false, "", "", "", ""}};
 
 TEST(TestESExecDirect, ValidQuery) {
