@@ -114,9 +114,7 @@
 //)EOF";
 
 void TSCommunication::AwsHttpResponseToString(
-    std::shared_ptr< Aws::Http::HttpResponse > response, std::string& output) {
-    response;
-    output;
+    std::shared_ptr< Aws::Http::HttpResponse > /*response*/, std::string& /*output*/) {
     /*
     // This function has some unconventional stream operations because we need
     // performance over readability here. Equivalent code done in conventional
@@ -316,16 +314,9 @@ void TSCommunication::InitializeConnection() {
 }
 
 std::shared_ptr< Aws::Http::HttpResponse > TSCommunication::IssueRequest(
-    const std::string& endpoint, const Aws::Http::HttpMethod request_type,
-    const std::string& content_type, const std::string& query,
-    const std::string& fetch_size, const std::string& cursor) {
-    cursor;
-    fetch_size;
-    query;
-    content_type;
-    request_type;
-    endpoint;
-
+    const std::string& /*endpoint*/, const Aws::Http::HttpMethod /*request_type*/,
+    const std::string& /*content_type*/, const std::string& /*query*/,
+    const std::string& /*fetch_size*/, const std::string& /*cursor*/) {
     //// Generate http request
     //std::shared_ptr< Aws::Http::HttpRequest > request =
     //    Aws::Http::CreateHttpRequest(
@@ -406,7 +397,7 @@ bool TSCommunication::EstablishConnection() {
 }
 
 std::vector< std::string > TSCommunication::GetColumnsWithSelectQuery(
-    const std::string table_name) {
+    const std::string /*table_name*/) {
     //std::vector< std::string > list_of_column;
     //if (table_name.empty()) {
     //    m_error_type = ConnErrorType::CONN_ERROR_INVALID_NULL_PTR;
@@ -473,9 +464,7 @@ std::vector< std::string > TSCommunication::GetColumnsWithSelectQuery(
     return std::vector< std::string >{};
 }
 
-int TSCommunication::ExecDirect(const char* query, const char* fetch_size_) {
-    fetch_size_;
-    query;
+int TSCommunication::ExecDirect(const char* /*query*/, const char* /*fetch_size_*/) {
     //m_error_details.reset();
     //if (!query) {
     //    m_error_message = "Query is NULL";
@@ -570,7 +559,7 @@ int TSCommunication::ExecDirect(const char* query, const char* fetch_size_) {
     return 0;
 }
 
-void TSCommunication::SendCursorQueries(std::string cursor) {
+void TSCommunication::SendCursorQueries(std::string /*cursor*/) {
     //if (cursor.empty()) {
     //    return;
     //}
@@ -626,8 +615,7 @@ void TSCommunication::SendCursorQueries(std::string cursor) {
     //}
 }
 
-void TSCommunication::SendCloseCursorRequest(const std::string& cursor) {
-    cursor;
+void TSCommunication::SendCloseCursorRequest(const std::string& /*cursor*/) {
     /*std::shared_ptr< Aws::Http::HttpResponse > response =
         IssueRequest(SQL_ENDPOINT_CLOSE_CURSOR,
                      Aws::Http::HttpMethod::HTTP_POST, ctype, "", "", cursor);
