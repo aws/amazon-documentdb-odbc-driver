@@ -109,14 +109,14 @@ RETCODE SQL_API ESAPI_Connect(HDBC hdbc, const SQLCHAR *szDSN,
     CC_conninfo_init(ci, INIT_GLOBALS);
 
     make_string(szDSN, cbDSN, ci->dsn, sizeof(ci->dsn));
-    
+
     /* get the values for the DSN from the registry */
     getDSNinfo(ci, NULL);
-    
+
     logs_on_off(1, ci->drivers.loglevel, ci->drivers.loglevel);
     /* initialize es_version from connInfo.protocol    */
     CC_initialize_es_version(conn);
-    
+
     /*
      * override values from DSN info with UID and authStr(pwd) This only
      * occurs if the values are actually there.
@@ -131,7 +131,7 @@ RETCODE SQL_API ESAPI_Connect(HDBC hdbc, const SQLCHAR *szDSN,
             STR_TO_NAME(ci->password, tmpstr);
         free(tmpstr);
     }
-    
+
     MYLOG(ES_DEBUG, "conn = %p (DSN='%s', UID='%s', PWD='%s', TOKEN='%s')\n", conn, ci->dsn,
           ci->username, NAME_IS_VALID(ci->password) ? "xxxxx" : "", ci->token);
 
