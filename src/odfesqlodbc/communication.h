@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -37,15 +37,13 @@
 #include <map>
 #include <string>
 #include <aws/core/Aws.h>
-//#include <aws/core/http/HttpRequest.h>
-//#include <aws/core/http/HttpResponse.h>
-//#include <aws/core/http/HttpClientFactory.h>
-//#include <aws/core/http/HttpClient.h>
-//#include <aws/core/client/ClientConfiguration.h>
 // clang-format on
 
 class Communication {
    public:
+    static const inline std::vector< std::string > m_supported_client_encodings = {
+        "UTF8"};
+
     Communication();
     virtual ~Communication();
 
@@ -54,15 +52,14 @@ class Communication {
     virtual std::string GetErrorPrefix() = 0;
     virtual ConnErrorType GetErrorType();
 
-    virtual bool ConnectionOptions(runtime_options& rt_opts, bool use_defaults,
-                           int expand_dbname, unsigned int option_count) = 0;
+    virtual bool ConnectionOptions(runtime_options& rt_opts) = 0;
 
     virtual bool ConnectDBStart();
     ConnStatusType GetConnectionStatus();
     virtual void DropDBConnection() = 0;
     void LogMsg(ESLogLevel level, const char* msg);
-    virtual int ExecDirect(const char* query, const char* fetch_size_) = 0;
-    virtual void SendCursorQueries(std::string cursor) = 0;
+    virtual int ExecDirect(const char* query, const char* fetch_size) = 0;
+    virtual void SendCursorQueries(const std::string& cursor) = 0;
     virtual ESResult* PopResult() = 0;
     virtual std::string GetClientEncoding();
     virtual bool SetClientEncoding(std::string& encoding);
@@ -94,11 +91,10 @@ class Communication {
 
     //// TODO #35 - Go through and add error messages on exit conditions
     std::string m_error_message;
-    const std::vector< std::string > m_supported_client_encodings = {"UTF8"};
 
     ConnStatusType m_status;
     ConnErrorType m_error_type;
-    bool m_valid_connection_options;
+    bool m_is_valid_connection_options;
     std::shared_ptr< ErrorDetails > m_error_details;
     //bool m_is_retrieving;
     //ESResultQueue m_result_queue;

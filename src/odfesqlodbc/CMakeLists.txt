@@ -29,7 +29,6 @@ set(					SOURCE_FILES
 							odbcapiw.c				es_result_queue.cpp
 							communication.cpp
 							ts_communication.cpp
-							communication_factory.cpp
 	)
 if(WIN32)
 set(SOURCE_FILES ${SOURCE_FILES} dlg_wingui.c setup.c)
@@ -47,7 +46,6 @@ set(					HEADER_FILES
 							version.h				win_setup.h				es_result_queue.h
 							communication.h
 							ts_communication.h
-							communication_factory.h
 	)
 
 # Generate dll (SHARED)
