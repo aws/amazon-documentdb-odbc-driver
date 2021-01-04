@@ -47,13 +47,12 @@ runtime_options missing_opt_val = {{"", "", "1", "0"},
 TEST(TestESConnConnectionOptions, ValidParameters) {
     ESCommunication conn;
     EXPECT_EQ(true,
-              conn.ConnectionOptions(valid_opt_val, 1, 1, valid_option_count));
+              conn.ConnectionOptions(valid_opt_val));
 }
 
 TEST(TestESConnConnectionOptions, MissingParameters) {
     ESCommunication conn;
-    EXPECT_EQ(false, conn.ConnectionOptions(missing_opt_val, 1, 1,
-                                            missing_option_count));
+    EXPECT_EQ(false, conn.ConnectionOptions(missing_opt_val));
 }
 
 class TestESConnConnectDBStart : public testing::Test {
@@ -76,22 +75,20 @@ class TestESConnConnectDBStart : public testing::Test {
 };
 
 TEST_F(TestESConnConnectDBStart, ValidParameters) {
-    ASSERT_NE(false, m_conn.ConnectionOptions(valid_opt_val, 1, 1,
-                                              valid_option_count));
+    ASSERT_NE(false, m_conn.ConnectionOptions(valid_opt_val));
     EXPECT_EQ(true, m_conn.ConnectDBStart());
     EXPECT_EQ(CONNECTION_OK, m_conn.GetConnectionStatus());
 }
 
 TEST_F(TestESConnConnectDBStart, InvalidParameters) {
     ASSERT_TRUE(
-        m_conn.ConnectionOptions(invalid_opt_val, 1, 1, invalid_option_count));
+        m_conn.ConnectionOptions(invalid_opt_val));
     EXPECT_EQ(false, m_conn.ConnectDBStart());
     EXPECT_EQ(CONNECTION_BAD, m_conn.GetConnectionStatus());
 }
 
 TEST_F(TestESConnConnectDBStart, MissingParameters) {
-    ASSERT_NE(true, m_conn.ConnectionOptions(missing_opt_val, 1, 1,
-                                             missing_option_count));
+    ASSERT_NE(true, m_conn.ConnectionOptions(missing_opt_val));
     EXPECT_EQ(false, m_conn.ConnectDBStart());
     EXPECT_EQ(CONNECTION_BAD, m_conn.GetConnectionStatus());
 }
@@ -100,7 +97,7 @@ TEST(TestESConnDropDBConnection, InvalidParameters) {
     ESCommunication conn;
     ASSERT_EQ(CONNECTION_BAD, conn.GetConnectionStatus());
     ASSERT_TRUE(
-        conn.ConnectionOptions(invalid_opt_val, 1, 1, invalid_option_count));
+        conn.ConnectionOptions(invalid_opt_val));
     ASSERT_NE(true, conn.ConnectDBStart());
     ASSERT_EQ(CONNECTION_BAD, conn.GetConnectionStatus());
     conn.DropDBConnection();
@@ -110,8 +107,7 @@ TEST(TestESConnDropDBConnection, InvalidParameters) {
 TEST(TestESConnDropDBConnection, MissingParameters) {
     ESCommunication conn;
     ASSERT_EQ(CONNECTION_BAD, conn.GetConnectionStatus());
-    ASSERT_NE(true, conn.ConnectionOptions(missing_opt_val, 1, 1,
-                                           missing_option_count));
+    ASSERT_NE(true, conn.ConnectionOptions(missing_opt_val));
     ASSERT_NE(true, conn.ConnectDBStart());
     ASSERT_EQ(CONNECTION_BAD, conn.GetConnectionStatus());
     conn.DropDBConnection();
@@ -121,7 +117,7 @@ TEST(TestESConnDropDBConnection, MissingParameters) {
 TEST(TestESConnDropDBConnection, ValidParameters) {
     ESCommunication conn;
     ASSERT_NE(false,
-              conn.ConnectionOptions(valid_opt_val, 1, 1, valid_option_count));
+              conn.ConnectionOptions(valid_opt_val));
     ASSERT_NE(false, conn.ConnectDBStart());
     ASSERT_EQ(CONNECTION_OK, conn.GetConnectionStatus());
     conn.DropDBConnection();

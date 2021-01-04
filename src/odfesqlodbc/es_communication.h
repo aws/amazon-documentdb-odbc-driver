@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -52,12 +52,10 @@ class ESCommunication : public Communication {
     // Create function for factory
     std::string GetErrorPrefix() override;
 
-    bool ConnectionOptions(runtime_options& rt_opts, bool use_defaults,
-                           int expand_dbname,
-                           unsigned int option_count) override;
+    bool ConnectionOptions(runtime_options& rt_opts) override;
     void DropDBConnection() override;
-    int ExecDirect(const char* query, const char* fetch_size_) override;
-    void SendCursorQueries(std::string cursor) override;
+    int ExecDirect(const char* query, const char* fetch_size) override;
+    void SendCursorQueries(const std::string& cursor) override;
     ESResult* PopResult() override;
     std::string GetServerVersion() override;
     std::string GetClusterName() override;

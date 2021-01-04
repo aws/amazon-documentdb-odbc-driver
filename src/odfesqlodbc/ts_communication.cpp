@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -207,7 +207,7 @@ TSCommunication::TSCommunication()
 #endif  // __APPLE__
     // : m_status(ConnStatusType::CONNECTION_BAD),
       // m_error_type(ConnErrorType::CONN_ERROR_SUCCESS),
-      // m_valid_connection_options(false)
+      // m_is_valid_connection_options(false)
       // m_is_retrieving(false),
      //  m_result_queue(2),
       // m_client_encoding(m_supported_client_encodings[0])
@@ -221,8 +221,7 @@ std::string TSCommunication::GetErrorPrefix() {
     return "[Timestream][SQL ODBC Driver][SQL Plugin] ";
 }
 
-bool TSCommunication::ConnectionOptions(runtime_options& rt_opts,
-                                        bool , int , unsigned int) {
+bool TSCommunication::ConnectionOptions(runtime_options& rt_opts) {
     LogMsg(ES_ALL, "Connection Options:");
     m_rt_opts = rt_opts;
     return CheckConnectionOptions();
@@ -264,13 +263,13 @@ bool TSCommunication::CheckConnectionOptions() {
 
     if (m_error_message != "") {
         LogMsg(ES_ERROR, m_error_message.c_str());
-        m_valid_connection_options = false;
+        m_is_valid_connection_options = false;
         return false;
     } else {
         LogMsg(ES_DEBUG, "Required connection option are valid.");
-        m_valid_connection_options = true;
+        m_is_valid_connection_options = true;
     }
-    return m_valid_connection_options;
+    return m_is_valid_connection_options;
 }
 
 void TSCommunication::InitializeConnection() {
@@ -559,7 +558,7 @@ int TSCommunication::ExecDirect(const char* /*query*/, const char* /*fetch_size_
     return 0;
 }
 
-void TSCommunication::SendCursorQueries(std::string /*cursor*/) {
+void TSCommunication::SendCursorQueries(const std::string& /*cursor*/) {
     //if (cursor.empty()) {
     //    return;
     //}
