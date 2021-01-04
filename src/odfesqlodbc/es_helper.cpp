@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -21,20 +21,15 @@
 #include <thread>
 
 #include "ts_communication.h"
-#include "es_communication.h"
-#include "communication_factory.h"
 
-void* ConnectDBParams(runtime_options& rt_opts, int expand_dbname,
-                        unsigned int option_count) {
-    // auto conn = CommunicationFactory::GetCommunication(
-    //     CommunicationFactory::CommunicationType::ElasticSearch);
-    auto conn = CommunicationFactory::GetCommunication(CommunicationFactory::CommunicationType::Timestream);
+void* ConnectDBParams(runtime_options& rt_opts) {
+    auto conn = new TSCommunication();
 
     if (!conn)
         return nullptr;
 
     // Set user defined connection options
-    if (!conn->ConnectionOptions(rt_opts, true, expand_dbname, option_count))
+    if (!conn->ConnectionOptions(rt_opts))
         return conn;
 
     // Connect to DB

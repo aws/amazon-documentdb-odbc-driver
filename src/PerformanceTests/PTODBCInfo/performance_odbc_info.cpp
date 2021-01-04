@@ -79,7 +79,7 @@ runtime_options rt_opts = []() {
 void GetVersionInfoString(std::string& version_info) {
     // Connect to DB
     ESCommunication es_comm;
-    es_comm.ConnectionOptions(rt_opts, false, 0, 0);
+    es_comm.ConnectionOptions(rt_opts);
     ASSERT_TRUE(es_comm.ConnectDBStart());
 
     // Issue request

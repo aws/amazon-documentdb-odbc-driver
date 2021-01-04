@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -25,8 +25,7 @@ std::string GetClientEncoding(void* conn);
 bool SetClientEncoding(void* conn, std::string& encoding);
 ESResult* ESGetResult(void* conn);
 void ESClearResult(ESResult* es_result);
-void* ConnectDBParams(runtime_options& rt_opts, int expand_dbname,
-                        unsigned int option_count);
+void* ConnectDBParams(runtime_options& rt_opts);
 std::string GetServerVersion(void* conn);
 std::string GetClusterName(void* conn);
 std::string GetErrorMsg(void* conn);

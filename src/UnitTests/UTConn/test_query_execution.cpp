@@ -45,7 +45,7 @@ runtime_options valid_conn_opt_val = {
 
 TEST(TestESExecDirect, ValidQuery) {
     ESCommunication conn;
-    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val, false, 0, 0));
+    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
     EXPECT_EQ(EXECUTION_SUCCESS,
         ESExecDirect(&conn, some_columns_flights_query.c_str(), fetch_size.c_str()));
@@ -53,7 +53,7 @@ TEST(TestESExecDirect, ValidQuery) {
 
 TEST(TestESExecDirect, MissingQuery) {
     ESCommunication conn;
-    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val, false, 0, 0));
+    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
     EXPECT_EQ(EXECUTION_ERROR, ESExecDirect(&conn, NULL, fetch_size.c_str()));
 }
@@ -67,7 +67,7 @@ TEST(TestESExecDirect, MissingConnection) {
 
 TEST(TestConnExecDirect, ValidQueryAllColumns) {
     ESCommunication conn;
-    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val, false, 0, 0));
+    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
 
     conn.ExecDirect(all_columns_flights_query.c_str(), fetch_size.c_str());
@@ -80,7 +80,7 @@ TEST(TestConnExecDirect, ValidQueryAllColumns) {
 
 TEST(TestConnExecDirect, ValidQuerySomeColumns) {
     ESCommunication conn;
-    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val, false, 0, 0));
+    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
 
     conn.ExecDirect(some_columns_flights_query.c_str(), fetch_size.c_str());
@@ -93,7 +93,7 @@ TEST(TestConnExecDirect, ValidQuerySomeColumns) {
 
 TEST(TestConnExecDirect, InvalidQuery) {
     ESCommunication conn;
-    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val, false, 0, 0));
+    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
 
     conn.ExecDirect(invalid_query.c_str(), fetch_size.c_str());
@@ -105,7 +105,7 @@ TEST(TestConnExecDirect, InvalidQuery) {
 
 TEST(TestConnPopResult, PopEmptyQueue) {
     ESCommunication conn;
-    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val, false, 0, 0));
+    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
 
     ESResult* result = conn.PopResult();
@@ -114,7 +114,7 @@ TEST(TestConnPopResult, PopEmptyQueue) {
 
 TEST(TestConnPopResult, PopTwoQueryResults) {
     ESCommunication conn;
-    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val, false, 0, 0));
+    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
 
     conn.ExecDirect(some_columns_flights_query.c_str(), fetch_size.c_str());
