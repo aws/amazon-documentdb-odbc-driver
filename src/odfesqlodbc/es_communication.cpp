@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -203,12 +203,7 @@ std::string ESCommunication::GetErrorPrefix() {
     return "[Open Distro For Elasticsearch][SQL ODBC Driver][SQL Plugin] ";
 }
 
-bool ESCommunication::ConnectionOptions(runtime_options& rt_opts,
-                                        bool use_defaults, int expand_dbname,
-                                        unsigned int option_count) {
-    (void)(expand_dbname);
-    (void)(option_count);
-    (void)(use_defaults);
+bool ESCommunication::ConnectionOptions(runtime_options& rt_opts) {
     m_rt_opts = rt_opts;
     return CheckConnectionOptions();
 }
@@ -250,13 +245,13 @@ bool ESCommunication::CheckConnectionOptions() {
 
     if (m_error_message != "") {
         LogMsg(ES_ERROR, m_error_message.c_str());
-        m_valid_connection_options = false;
+        m_is_valid_connection_options = false;
         return false;
     } else {
         LogMsg(ES_DEBUG, "Required connection option are valid.");
-        m_valid_connection_options = true;
+        m_is_valid_connection_options = true;
     }
-    return m_valid_connection_options;
+    return m_is_valid_connection_options;
 }
 
 void ESCommunication::InitializeConnection() {
@@ -508,7 +503,7 @@ std::vector< std::string > ESCommunication::GetColumnsWithSelectQuery(
     return list_of_column;
 }
 
-int ESCommunication::ExecDirect(const char* query, const char* fetch_size_) {
+int ESCommunication::ExecDirect(const char* query, const char* fetch_size) {
     m_error_details.reset();
     if (!query) {
         m_error_message = "Query is NULL";
@@ -526,14 +521,14 @@ int ESCommunication::ExecDirect(const char* query, const char* fetch_size_) {
 
     // Prepare statement
     std::string statement(query);
-    std::string fetch_size(fetch_size_);
+    std::string size(fetch_size);
     std::string msg = "Attempting to execute a query \"" + statement + "\"";
     LogMsg(ES_DEBUG, msg.c_str());
 
     // Issue request
     std::shared_ptr< Aws::Http::HttpResponse > response =
         IssueRequest(SQL_ENDPOINT_FORMAT_JDBC, Aws::Http::HttpMethod::HTTP_POST,
-                     ctype, statement, fetch_size);
+                     ctype, statement, size);
 
     // Validate response
     if (response == nullptr) {
@@ -602,17 +597,18 @@ int ESCommunication::ExecDirect(const char* query, const char* fetch_size_) {
     return 0;
 }
 
-void ESCommunication::SendCursorQueries(std::string cursor) {
+void ESCommunication::SendCursorQueries(const std::string& cursor) {
     if (cursor.empty()) {
         return;
     }
     m_is_retrieving = true;
 
     try {
-        while (!cursor.empty() && m_is_retrieving) {
+        auto cur = cursor;
+        while (!cur.empty() && m_is_retrieving) {
             std::shared_ptr< Aws::Http::HttpResponse > response = IssueRequest(
                 SQL_ENDPOINT_FORMAT_JDBC, Aws::Http::HttpMethod::HTTP_POST,
-                ctype, "", "", cursor);
+                ctype, "", "", cur);
             if (response == nullptr) {
                 m_error_message =
                     "Failed to receive response from cursor. "
@@ -628,11 +624,11 @@ void ESCommunication::SendCursorQueries(std::string cursor) {
             PrepareCursorResult(*result);
 
             if (result->es_result_doc.has("cursor")) {
-                cursor = result->es_result_doc["cursor"].as_string();
+                cur = result->es_result_doc["cursor"].as_string();
                 result->cursor = result->es_result_doc["cursor"].as_string();
             } else {
-                SendCloseCursorRequest(cursor);
-                cursor.clear();
+                SendCloseCursorRequest(cur);
+                cur.clear();
             }
 
             while (m_is_retrieving

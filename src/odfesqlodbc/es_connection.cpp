@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -112,7 +112,7 @@ int LIBES_connect(ConnectionClass *self) {
     rt_opts.crypt.verify_server = (self->connInfo.verify_server == 1);
     rt_opts.crypt.use_ssl = (self->connInfo.use_ssl == 1);
 
-    auto conn = ConnectDBParams(rt_opts, FALSE, OPTION_COUNT);
+    auto conn = ConnectDBParams(rt_opts);
     if (conn == nullptr) {
         std::string err = GetErrorMsg(conn);
         CC_set_error(self, CONN_OPENDB_ERROR,

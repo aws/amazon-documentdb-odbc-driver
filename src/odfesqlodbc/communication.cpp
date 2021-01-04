@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@
 
 Communication::Communication()
     : m_status(ConnStatusType::CONNECTION_BAD),
-      m_valid_connection_options(false),
+      m_is_valid_connection_options(false),
       m_client_encoding(m_supported_client_encodings[0]) {
-    LogMsg(ES_ALL, "Initializing Aws API.");
+    LogMsg(ES_ALL, "Initializing AWS API.");
     Aws::InitAPI(m_options);
 }
 
 Communication::~Communication() {
-    LogMsg(ES_ALL, "Shutting down Aws API.");
+    LogMsg(ES_ALL, "Shutting down AWS API.");
     Aws::ShutdownAPI(m_options);
 }
       
@@ -71,10 +71,10 @@ ConnStatusType Communication::GetConnectionStatus() {
 bool Communication::ConnectDBStart() {
     LogMsg(ES_ALL, "Starting DB connection.");
     m_status = ConnStatusType::CONNECTION_BAD;
-    if (!m_valid_connection_options) {
+    if (!m_is_valid_connection_options) {
         // TODO: get error message from CheckConnectionOptions
         m_error_message =
-            "Invalid connection options, unable to connect to DB.";
+            "Invalid connection options, unable to connect to Timestream.";
         SetErrorDetails("Invalid connection options", m_error_message,
                         ConnErrorType::CONN_ERROR_COMM_LINK_FAILURE);
         LogMsg(ES_ERROR, m_error_message.c_str());
