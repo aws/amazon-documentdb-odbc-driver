@@ -20,9 +20,6 @@
 #include "es_communication.h"
 // clang-format on
 
-const size_t valid_option_count = 4;
-const size_t invalid_option_count = 4;
-const size_t missing_option_count = 3;
 const std::string valid_host = (use_ssl ? "https://localhost" : "localhost");
 const std::string valid_port = "9200";
 const std::string valid_user = "admin";
