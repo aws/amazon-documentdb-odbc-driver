@@ -20,7 +20,6 @@
 // clang-format off
 #include <memory>
 #include <string>
-#include <aws/timestream-query/TimestreamQueryClient.h>
 #include "communication.h"
 #include "es_types.h"
 #include "es_result_queue.h"
@@ -35,6 +34,7 @@
 #pragma clang diagnostic pop
 #endif // __APPLE__
 // clang-format on
+#include <aws/timestream-query/TimestreamQueryClient.h>
 
 /**
  * AWS Timestream communication class
