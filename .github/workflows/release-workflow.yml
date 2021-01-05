@@ -16,7 +16,7 @@ jobs:
   build-mac:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: run-cppcheck
         run: |
           brew install cppcheck
@@ -29,7 +29,7 @@ jobs:
           aws-region: us-east-1
       - name: upload-cppcheck-results
         if: failure()
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: cppcheck-results
           path: cppcheck-results.log
@@ -62,13 +62,13 @@ jobs:
       # cp $(ls -d bin64/* | grep -v "\.") build
       - name: upload-build
         if: success()
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: mac64-build
           path: build-output
       - name: upload-installer
         if: success()
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: mac64-installer
           path: installer
@@ -82,7 +82,7 @@ jobs:
   build-windows32:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Get specific version CMake, v3.18.3
         uses: lukka/get-cmake@v3.18.3
       - name: add-msbuild-to-path
@@ -106,13 +106,13 @@ jobs:
           .\scripts\prepare_ci_output.ps1 $Env:ODBC_BIN_PATH $Env:ODBC_LIB_PATH $Env:ODBC_BUILD_PATH
       - name: upload-build
         if: always()
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: windows32-build
           path: ci-output/build
       - name: upload-installer
         if: always()
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: windows32-installer
           path: ci-output/installer
@@ -127,7 +127,7 @@ jobs:
   build-windows64:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Get specific version CMake, v3.18.3
         uses: lukka/get-cmake@v3.18.3
       - name: add-msbuild-to-path
@@ -151,13 +151,13 @@ jobs:
           .\scripts\prepare_ci_output.ps1 $Env:ODBC_BIN_PATH $Env:ODBC_LIB_PATH $Env:ODBC_BUILD_PATH
       - name: upload-build
         if: always()
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: windows64-build
           path: ci-output/build
       - name: upload-installer
         if: always()
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: windows64-installer
           path: ci-output/installer
