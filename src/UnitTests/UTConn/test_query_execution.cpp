@@ -17,7 +17,7 @@
 // clang-format off
 #include "pch.h"
 #include "unit_test_helper.h"
-#include "es_communication.h"
+#include "ts_communication.h"
 #include "es_helper.h"
 // clang-format on
 
@@ -44,21 +44,21 @@ runtime_options valid_conn_opt_val = {
     {use_ssl, false, "", "", "", ""}};
 
 TEST(TestESExecDirect, ValidQuery) {
-    ESCommunication conn;
+    TSCommunication conn;
     ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
     EXPECT_EQ(EXECUTION_SUCCESS,
         ESExecDirect(&conn, some_columns_flights_query.c_str(), fetch_size.c_str()));
 }
 
-TEST(TestESExecDirect, MissingQuery) {
-    ESCommunication conn;
+TEST(TestTSExecDirect, MissingQuery) {
+    TSCommunication conn;
     ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
     EXPECT_EQ(EXECUTION_ERROR, ESExecDirect(&conn, NULL, fetch_size.c_str()));
 }
 
-TEST(TestESExecDirect, MissingConnection) {
+TEST(TesTSExecDirect, MissingConnection) {
     EXPECT_EQ(EXECUTION_ERROR,
               ESExecDirect(NULL, query.c_str(), fetch_size.c_str()));
 }
@@ -66,7 +66,7 @@ TEST(TestESExecDirect, MissingConnection) {
 // Conn::ExecDirect
 
 TEST(TestConnExecDirect, ValidQueryAllColumns) {
-    ESCommunication conn;
+    TSCommunication conn;
     ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
 
@@ -79,7 +79,7 @@ TEST(TestConnExecDirect, ValidQueryAllColumns) {
 }
 
 TEST(TestConnExecDirect, ValidQuerySomeColumns) {
-    ESCommunication conn;
+    TSCommunication conn;
     ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
 
@@ -92,7 +92,7 @@ TEST(TestConnExecDirect, ValidQuerySomeColumns) {
 }
 
 TEST(TestConnExecDirect, InvalidQuery) {
-    ESCommunication conn;
+    TSCommunication conn;
     ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
 
@@ -104,7 +104,7 @@ TEST(TestConnExecDirect, InvalidQuery) {
 // Conn::PopResult
 
 TEST(TestConnPopResult, PopEmptyQueue) {
-    ESCommunication conn;
+    TSCommunication conn;
     ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
 
@@ -113,7 +113,7 @@ TEST(TestConnPopResult, PopEmptyQueue) {
 }
 
 TEST(TestConnPopResult, PopTwoQueryResults) {
-    ESCommunication conn;
+    TSCommunication conn;
     ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
 

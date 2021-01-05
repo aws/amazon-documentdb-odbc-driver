@@ -46,12 +46,7 @@
 #include "qresult.h"
 #include "statement.h"
 
-#define PROTOCOL3_OPTS_MAX 30
 #define ERROR_BUFF_SIZE 200
-#define OPTION_COUNT 4
-#if OPTION_COUNT > PROTOCOL3_OPTS_MAX
-#error("Option count (OPTION_COUNT) is greater than max option count allow (PROTOCOL3_OPTS_MAX).")
-#endif
 
 void CC_determine_locale_encoding(ConnectionClass *self);
 

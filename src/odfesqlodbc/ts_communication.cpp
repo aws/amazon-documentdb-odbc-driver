@@ -303,7 +303,7 @@ void TSCommunication::InitializeConnection() {
                                               m_rt_opts.auth.password,
                                               m_rt_opts.auth.token);
         m_client =
-            std::make_shared< Aws::TimestreamQuery::TimestreamQueryClient >(
+            std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(
                 credentials, config);
     } else if (m_rt_opts.auth.auth_type == AUTHTYPE_IAM) {
         /*m_client =
@@ -396,7 +396,7 @@ bool TSCommunication::EstablishConnection() {
 }
 
 std::vector< std::string > TSCommunication::GetColumnsWithSelectQuery(
-    const std::string /*table_name*/) {
+    const std::string& /*table_name*/) {
     //std::vector< std::string > list_of_column;
     //if (table_name.empty()) {
     //    m_error_type = ConnErrorType::CONN_ERROR_INVALID_NULL_PTR;

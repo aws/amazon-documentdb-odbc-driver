@@ -32,41 +32,6 @@ Communication::~Communication() {
     LogMsg(ES_ALL, "Shutting down AWS API.");
     Aws::ShutdownAPI(m_options);
 }
-      
-std::string Communication::GetErrorMessage() {
-    if (m_error_details) {
-        m_error_details->details = std::regex_replace(
-            m_error_details->details, std::regex("\\n"), "\\\\n");
-        return GetErrorPrefix() + m_error_details->reason + ": "
-               + m_error_details->details;
-    } else {
-        return GetErrorPrefix() + "No error details available; check the driver logs.";
-    }
-}
-
-ConnErrorType Communication::GetErrorType() {
-    return m_error_type;
-}
-
-void Communication::SetErrorDetails(std::string reason, std::string message, ConnErrorType error_type) {
-	// Prepare document and validate schema
-	auto error_details = std::make_shared< ErrorDetails >();
-	error_details->reason = reason;
-	error_details->details = message;
-	error_details->source_type = "Dummy type";
-	error_details->type = error_type;
-	m_error_details = error_details;
-}
-
-void Communication::SetErrorDetails(ErrorDetails details) {
-	// Prepare document and validate schema
-	auto error_details = std::make_shared< ErrorDetails >(details);
-	m_error_details = error_details;
-}
-
-ConnStatusType Communication::GetConnectionStatus() {
-    return m_status;
-}
 
 bool Communication::ConnectDBStart() {
     LogMsg(ES_ALL, "Starting DB connection.");
@@ -96,6 +61,41 @@ bool Communication::ConnectDBStart() {
     m_status = ConnStatusType::CONNECTION_OK;
     return true;
 }
+      
+std::string Communication::GetErrorMessage() {
+    if (m_error_details) {
+        m_error_details->details = std::regex_replace(
+            m_error_details->details, std::regex("\\n"), "\\\\n");
+        return GetErrorPrefix() + m_error_details->reason + ": "
+               + m_error_details->details;
+    } else {
+        return GetErrorPrefix() + "No error details available; check the driver logs.";
+    }
+}
+
+ConnErrorType Communication::GetErrorType() {
+    return m_error_type;
+}
+
+void Communication::SetErrorDetails(const std::string& reason, const std::string& message, ConnErrorType error_type) {
+	// Prepare document and validate schema
+	auto error_details = std::make_shared< ErrorDetails >();
+	error_details->reason = reason;
+	error_details->details = message;
+	error_details->source_type = "Dummy type";
+	error_details->type = error_type;
+	m_error_details = error_details;
+}
+
+void Communication::SetErrorDetails(ErrorDetails details) {
+	// Prepare document and validate schema
+	auto error_details = std::make_shared< ErrorDetails >(details);
+	m_error_details = error_details;
+}
+
+ConnStatusType Communication::GetConnectionStatus() {
+    return m_status;
+}
 
 void Communication::LogMsg(ESLogLevel level, const char* msg) {
 #if WIN32
@@ -114,7 +114,7 @@ std::string Communication::GetClientEncoding() {
     return m_client_encoding;
 }
 
-bool Communication::SetClientEncoding(std::string& encoding) {
+bool Communication::SetClientEncoding(const std::string& encoding) {
     if (std::find(m_supported_client_encodings.begin(),
                   m_supported_client_encodings.end(), encoding)
         != m_supported_client_encodings.end()) {
