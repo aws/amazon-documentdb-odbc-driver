@@ -1,7 +1,15 @@
 name: Timestream ODBC Driver
 
-on: push
-
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+    
 env:
   CI_OUTPUT_PATH: "ci-output"
   ODBC_LIB_PATH: "./build/odbc/lib"
@@ -13,14 +21,14 @@ jobs:
   build-mac:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: run-cppcheck
       run: |
         brew install cppcheck
         sh run_cppcheck.sh
     - name: upload-cppcheck-results
       if: failure()
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: cppcheck-results
         path: cppcheck-results.log
@@ -77,7 +85,7 @@ jobs:
   build-windows32:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Get specific version CMake, v3.18.3
       uses: lukka/get-cmake@v3.18.3
     - name: add-msbuild-to-path
@@ -119,7 +127,7 @@ jobs:
   build-windows64:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Get specific version CMake, v3.18.3
       uses: lukka/get-cmake@v3.18.3
     - name: add-msbuild-to-path
