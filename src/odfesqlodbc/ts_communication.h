@@ -62,7 +62,7 @@ class TSCommunication : public Communication {
     void SendCloseCursorRequest(const std::string& cursor) override;
     void StopResultRetrieval() override;
     std::vector< std::string > GetColumnsWithSelectQuery(
-        const std::string table_name) override;
+        const std::string& table_name) override;
 
    protected:
     void InitializeConnection();
@@ -80,7 +80,7 @@ class TSCommunication : public Communication {
 
     //std::string m_response_str;
 
-    std::shared_ptr< Aws::TimestreamQuery::TimestreamQueryClient > m_client;
+    std::unique_ptr<Aws::TimestreamQuery::TimestreamQueryClient> m_client;
 };
 
 #endif

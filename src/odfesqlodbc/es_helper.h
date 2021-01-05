@@ -31,7 +31,7 @@ std::string GetClusterName(void* conn);
 std::string GetErrorMsg(void* conn);
 ConnErrorType GetErrorType(void* conn);
 std::vector< std::string > GetColumnsWithSelectQuery(
-    void* conn, const std::string table_name);
+    void* conn, const std::string& table_name);
 
 // C Interface
 extern "C" {
