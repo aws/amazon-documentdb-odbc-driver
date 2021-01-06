@@ -21,8 +21,7 @@
 #include <memory>
 #include <string>
 #include "communication.h"
-#include "es_types.h"
-#include "es_result_queue.h"
+#include <aws/timestream-query/TimestreamQueryClient.h>
 
 //Keep rabbit at top otherwise it gives build error because of some variable names like max, min
 #ifdef __APPLE__
@@ -34,7 +33,7 @@
 #pragma clang diagnostic pop
 #endif // __APPLE__
 // clang-format on
-#include <aws/timestream-query/TimestreamQueryClient.h>
+
 
 /**
  * AWS Timestream communication class

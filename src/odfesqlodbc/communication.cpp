@@ -13,11 +13,12 @@
  * permissions and limitations under the License.
  *
  */
-
+#include <regex>
 #include "communication.h"
 // clang-format off
 #include "es_odbc.h"
 #include "mylog.h"
+
 // clang-format on
 
 Communication::Communication()
