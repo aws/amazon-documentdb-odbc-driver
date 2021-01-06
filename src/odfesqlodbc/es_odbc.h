@@ -25,6 +25,7 @@ void unused_vargs(int cnt, ...);
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#undef GetMessage
 #elif __APPLE__
 
 #elif __linux__
