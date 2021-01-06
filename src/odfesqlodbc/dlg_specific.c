@@ -168,10 +168,10 @@ static void getCiDefaults(ConnInfo *ci) {
     strncpy(ci->region, DEFAULT_REGION, MEDIUM_REGISTRY_LEN);
     ci->use_ssl = DEFAULT_USE_SSL;
     ci->verify_server = DEFAULT_VERIFY_SERVER;
-#ifdef WIN32
-    strcpy(ci->drivers.output_dir, "C:\\");
-#else
+#ifdef __APPLE__
     strcpy(ci->drivers.output_dir, "/tmp/");
+#else
+    strcpy(ci->drivers.output_dir, "C:\\");
 #endif
 }
 
