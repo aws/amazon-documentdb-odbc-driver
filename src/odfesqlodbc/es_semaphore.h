@@ -18,6 +18,7 @@
 
 #ifdef WIN32
   #include <windows.h>
+  #undef GetMessage
 #elif defined(__APPLE__)
   #include <dispatch/dispatch.h>
 #else 

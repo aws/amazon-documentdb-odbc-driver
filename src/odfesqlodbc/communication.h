@@ -19,9 +19,6 @@
 
 // clang-format off
 #include <memory>
-#include <queue>
-#include <future>
-#include <regex>
 #include "es_types.h"
 #include "es_result_queue.h"
 
