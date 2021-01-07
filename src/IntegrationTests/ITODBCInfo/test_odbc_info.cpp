@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -146,7 +146,7 @@ TEST_SQL_GET_INFO_STRING(SQLDriverODBCVer, SQL_DRIVER_ODBC_VER, L"03.51");
 
 std::wstring version =
     std::wstring_convert< std::codecvt_utf8_utf16< wchar_t >, wchar_t >{}
-        .from_bytes(ELASTICSEARCHDRIVERVERSION);
+        .from_bytes(TIMESTREAMDRIVERVERSION);
 TEST_SQL_GET_INFO_STRING(SQLDriverVer, SQL_DRIVER_VER, version);
 
 TEST_SQL_GET_INFO_UINT16(SQLGetDataExtensions, SQL_GETDATA_EXTENSIONS,

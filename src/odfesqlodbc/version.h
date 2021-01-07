@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,21 +18,35 @@
 #define __VERSION_H__
 
 /*
- *	BuildAll may pass ELASTICDRIVERVERSION, ELASTIC_RESOURCE_VERSION
- *	and ES_DRVFILE_VERSION via winbuild/elasticodbc.vcxproj.
+ *	BuildAll may pass DRIVERVERSION, RESOURCE_VERSION
+ *	and DRVFILE_VERSION via winbuild/elasticodbc.vcxproj.
  */
-#ifdef ES_ODBC_VERSION
+//#ifdef ES_ODBC_VERSION
+//
+//#ifndef ELASTICSEARCHDRIVERVERSION
+//#define ELASTICSEARCHDRIVERVERSION ES_ODBC_VERSION
+//#endif
+//#ifndef ELASTICSEARCH_RESOURCE_VERSION
+//#define ELASTICSEARCH_RESOURCE_VERSION ELASTICSEARCHDRIVERVERSION
+//#endif
+//#ifndef ES_DRVFILE_VERSION
+//#define ES_DRVFILE_VERSION ES_ODBC_DRVFILE_VERSION
+//#endif
+//
+//#endif  // ES_ODBC_VERSION
 
-#ifndef ELASTICSEARCHDRIVERVERSION
-#define ELASTICSEARCHDRIVERVERSION ES_ODBC_VERSION
+#ifdef TS_ODBC_VERSION
+
+#ifndef TIMESTREAMDRIVERVERSION
+#define TIMESTREAMDRIVERVERSION TS_ODBC_VERSION
 #endif
-#ifndef ELASTICSEARCH_RESOURCE_VERSION
-#define ELASTICSEARCH_RESOURCE_VERSION ELASTICSEARCHDRIVERVERSION
+#ifndef TIMESTREAM_RESOURCE_VERSION
+#define TIMESTREAM_RESOURCE_VERSION TIMESTREAMDRIVERVERSION
 #endif
-#ifndef ES_DRVFILE_VERSION
-#define ES_DRVFILE_VERSION ES_ODBC_DRVFILE_VERSION
+#ifndef TS_DRVFILE_VERSION
+#define TS_DRVFILE_VERSION TS_ODBC_DRVFILE_VERSION
 #endif
 
-#endif  // ES_ODBC_VERSION
+#endif  // TS_ODBC_VERSION
 
 #endif

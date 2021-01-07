@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -21,18 +21,17 @@
 
 #ifdef __cplusplus
 // C++ interface
-std::string ESGetClientEncoding(void* es_conn);
-bool ESSetClientEncoding(void* es_conn, std::string& encoding);
-ESResult* ESGetResult(void* es_conn);
+std::string GetClientEncoding(void* conn);
+bool SetClientEncoding(void* conn, std::string& encoding);
+ESResult* ESGetResult(void* conn);
 void ESClearResult(ESResult* es_result);
-void* ESConnectDBParams(runtime_options& rt_opts, int expand_dbname,
-                        unsigned int option_count);
-std::string GetServerVersion(void* es_conn);
-std::string GetClusterName(void* es_conn);
-std::string GetErrorMsg(void* es_conn);
-ConnErrorType GetErrorType(void* es_conn);
-std::vector< std::string > ESGetColumnsWithSelectQuery(
-    void* es_conn, const std::string table_name);
+void* ConnectDBParams(runtime_options& rt_opts);
+std::string GetServerVersion(void* conn);
+std::string GetClusterName(void* conn);
+std::string GetErrorMsg(void* conn);
+ConnErrorType GetErrorType(void* conn);
+std::vector< std::string > GetColumnsWithSelectQuery(
+    void* conn, const std::string& table_name);
 
 // C Interface
 extern "C" {
@@ -41,15 +40,13 @@ void XPlatformInitializeCriticalSection(void** critical_section_helper);
 void XPlatformEnterCriticalSection(void* critical_section_helper);
 void XPlatformLeaveCriticalSection(void* critical_section_helper);
 void XPlatformDeleteCriticalSection(void** critical_section_helper);
-ConnStatusType ESStatus(void* es_conn);
-int ESExecDirect(void* es_conn, const char* statement, const char* fetch_size);
-void ESSendCursorQueries(void* es_conn, const char* cursor);
-void ESDisconnect(void* es_conn);
-void ESStopRetrieval(void* es_conn);
+ConnStatusType Status(void* conn);
+int ESExecDirect(void* conn, const char* statement, const char* fetch_size);
+void SendCursorQueries(void* conn, const char* cursor);
+void Disconnect(void* conn);
+void StopRetrieval(void* conn);
 #ifdef __cplusplus
 }
 #endif
-
-void* InitializeESConn();
 
 #endif  // __ES_HELPER_H__

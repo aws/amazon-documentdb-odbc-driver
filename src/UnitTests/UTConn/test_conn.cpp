@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,12 +17,9 @@
 // clang-format off
 #include "pch.h"
 #include "unit_test_helper.h"
-#include "es_communication.h"
+#include "ts_communication.h"
 // clang-format on
 
-const size_t valid_option_count = 4;
-const size_t invalid_option_count = 4;
-const size_t missing_option_count = 3;
 const std::string valid_host = (use_ssl ? "https://localhost" : "localhost");
 const std::string valid_port = "9200";
 const std::string valid_user = "admin";
@@ -34,94 +31,84 @@ const std::string invalid_user = "amin";
 const std::string invalid_pw = "amin";
 const std::string invalid_region = "bad-region";
 runtime_options valid_opt_val = {{valid_host, valid_port, "1", "0"},
-                                 {"BASIC", valid_user, valid_pw, valid_region},
+                                 {"BASIC", valid_user, valid_pw, "", valid_region},
                                  {use_ssl, false, "", "", "", ""}};
 runtime_options invalid_opt_val = {
     {invalid_host, invalid_port, "1", "0"},
-    {"BASIC", invalid_user, invalid_pw, valid_region},
+    {"BASIC", invalid_user, invalid_pw, "", valid_region},
     {use_ssl, false, "", "", "", ""}};
 runtime_options missing_opt_val = {{"", "", "1", "0"},
-                                   {"BASIC", "", invalid_pw, valid_region},
+                                   {"BASIC", "", invalid_pw, "", valid_region},
                                    {use_ssl, false, "", "", "", ""}};
 
 TEST(TestESConnConnectionOptions, ValidParameters) {
-    ESCommunication conn;
+    TSCommunication conn;
     EXPECT_EQ(true,
-              conn.ConnectionOptions(valid_opt_val, 1, 1, valid_option_count));
+              conn.ConnectionOptions(valid_opt_val));
 }
 
 TEST(TestESConnConnectionOptions, MissingParameters) {
-    ESCommunication conn;
-    EXPECT_EQ(false, conn.ConnectionOptions(missing_opt_val, 1, 1,
-                                            missing_option_count));
+    TSCommunication conn;
+    EXPECT_EQ(false, conn.ConnectionOptions(missing_opt_val));
 }
 
-class TestESConnConnectDBStart : public testing::Test {
-   public:
-    TestESConnConnectDBStart() {
+class TestTSConnConnectDBStart : public testing::Test {
+   protected:
+    void SetUp() override {
     }
 
-    void SetUp() {
-    }
-
-    void TearDown() {
+    void TearDown() override {
         m_conn.DropDBConnection();
     }
 
-    ~TestESConnConnectDBStart() {
-        // cleanup any pending stuff, but no exceptions allowed
-    }
-
-    ESCommunication m_conn;
+   public:
+    TSCommunication m_conn;
 };
 
-TEST_F(TestESConnConnectDBStart, ValidParameters) {
-    ASSERT_NE(false, m_conn.ConnectionOptions(valid_opt_val, 1, 1,
-                                              valid_option_count));
+TEST_F(TestTSConnConnectDBStart, ValidParameters) {
+    ASSERT_NE(false, m_conn.ConnectionOptions(valid_opt_val));
     EXPECT_EQ(true, m_conn.ConnectDBStart());
     EXPECT_EQ(CONNECTION_OK, m_conn.GetConnectionStatus());
 }
 
-TEST_F(TestESConnConnectDBStart, InvalidParameters) {
+TEST_F(TestTSConnConnectDBStart, InvalidParameters) {
     ASSERT_TRUE(
-        m_conn.ConnectionOptions(invalid_opt_val, 1, 1, invalid_option_count));
+        m_conn.ConnectionOptions(invalid_opt_val));
     EXPECT_EQ(false, m_conn.ConnectDBStart());
     EXPECT_EQ(CONNECTION_BAD, m_conn.GetConnectionStatus());
 }
 
-TEST_F(TestESConnConnectDBStart, MissingParameters) {
-    ASSERT_NE(true, m_conn.ConnectionOptions(missing_opt_val, 1, 1,
-                                             missing_option_count));
+TEST_F(TestTSConnConnectDBStart, MissingParameters) {
+    ASSERT_NE(true, m_conn.ConnectionOptions(missing_opt_val));
     EXPECT_EQ(false, m_conn.ConnectDBStart());
     EXPECT_EQ(CONNECTION_BAD, m_conn.GetConnectionStatus());
 }
 
-TEST(TestESConnDropDBConnection, InvalidParameters) {
-    ESCommunication conn;
+TEST(TestTSConnDropDBConnection, InvalidParameters) {
+    TSCommunication conn;
     ASSERT_EQ(CONNECTION_BAD, conn.GetConnectionStatus());
     ASSERT_TRUE(
-        conn.ConnectionOptions(invalid_opt_val, 1, 1, invalid_option_count));
+        conn.ConnectionOptions(invalid_opt_val));
     ASSERT_NE(true, conn.ConnectDBStart());
     ASSERT_EQ(CONNECTION_BAD, conn.GetConnectionStatus());
     conn.DropDBConnection();
     EXPECT_EQ(CONNECTION_BAD, conn.GetConnectionStatus());
 }
 
-TEST(TestESConnDropDBConnection, MissingParameters) {
-    ESCommunication conn;
+TEST(TestTSConnDropDBConnection, MissingParameters) {
+    TSCommunication conn;
     ASSERT_EQ(CONNECTION_BAD, conn.GetConnectionStatus());
-    ASSERT_NE(true, conn.ConnectionOptions(missing_opt_val, 1, 1,
-                                           missing_option_count));
+    ASSERT_NE(true, conn.ConnectionOptions(missing_opt_val));
     ASSERT_NE(true, conn.ConnectDBStart());
     ASSERT_EQ(CONNECTION_BAD, conn.GetConnectionStatus());
     conn.DropDBConnection();
     EXPECT_EQ(CONNECTION_BAD, conn.GetConnectionStatus());
 }
 
-TEST(TestESConnDropDBConnection, ValidParameters) {
-    ESCommunication conn;
+TEST(TestTSConnDropDBConnection, ValidParameters) {
+    TSCommunication conn;
     ASSERT_NE(false,
-              conn.ConnectionOptions(valid_opt_val, 1, 1, valid_option_count));
+              conn.ConnectionOptions(valid_opt_val));
     ASSERT_NE(false, conn.ConnectDBStart());
     ASSERT_EQ(CONNECTION_OK, conn.GetConnectionStatus());
     conn.DropDBConnection();

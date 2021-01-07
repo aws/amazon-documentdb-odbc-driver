@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,21 +20,16 @@
 #include <mutex>
 #include <thread>
 
-#include "es_communication.h"
+#include "ts_communication.h"
 
-void* ESConnectDBParams(runtime_options& rt_opts, int expand_dbname,
-                        unsigned int option_count) {
-    // Initialize Connection
-    ESCommunication* conn = static_cast< ESCommunication* >(InitializeESConn());
+void* ConnectDBParams(runtime_options& rt_opts) {
+    auto conn = new TSCommunication();
+
     if (!conn)
-        return NULL;
+        return nullptr;
 
     // Set user defined connection options
-    if (!conn->ConnectionOptions(rt_opts, true, expand_dbname, option_count))
-        return conn;
-
-    // Set user derived connection options
-    if (!conn->ConnectionOptions2())
+    if (!conn->ConnectionOptions(rt_opts))
         return conn;
 
     // Connect to DB
@@ -46,81 +41,77 @@ void* ESConnectDBParams(runtime_options& rt_opts, int expand_dbname,
     return conn;
 }
 
-ConnStatusType ESStatus(void* es_conn) {
-    return es_conn
-               ? static_cast< ESCommunication* >(es_conn)->GetConnectionStatus()
+ConnStatusType Status(void* conn) {
+    return conn
+               ? static_cast< Communication* >(conn)->GetConnectionStatus()
                : ConnStatusType::CONNECTION_BAD;
 }
 
-std::string GetErrorMsg(void* es_conn) {
-    return es_conn ? static_cast< ESCommunication* >(es_conn)->GetErrorMessage()
+std::string GetErrorMsg(void* conn) {
+    return conn ? static_cast< Communication* >(conn)->GetErrorMessage()
                    : NULL;
 }
 
-ConnErrorType GetErrorType(void* es_conn) {
-    return es_conn ? static_cast< ESCommunication* >(es_conn)->GetErrorType()
+ConnErrorType GetErrorType(void* conn) {
+    return conn ? static_cast< Communication* >(conn)->GetErrorType()
                    : ConnErrorType::CONN_ERROR_SUCCESS;
 }
 
-std::string GetServerVersion(void* es_conn) {
-    return es_conn
-               ? static_cast< ESCommunication* >(es_conn)->GetServerVersion()
+std::string GetServerVersion(void* conn) {
+    return conn
+               ? static_cast< Communication* >(conn)->GetServerVersion()
                : "";
 }
 
-std::string GetClusterName(void* es_conn) {
-    return es_conn ? static_cast< ESCommunication* >(es_conn)->GetClusterName()
+std::string GetClusterName(void* conn) {
+    return conn ? static_cast< Communication* >(conn)->GetClusterName()
                    : "";
 }
 
-void* InitializeESConn() {
-    return new ESCommunication();
-}
-
-int ESExecDirect(void* es_conn, const char* statement, const char* fetch_size) {
-    return (es_conn && statement)
-               ? static_cast< ESCommunication* >(es_conn)->ExecDirect(
+int ESExecDirect(void* conn, const char* statement, const char* fetch_size) {
+    return (conn && statement)
+               ? static_cast< Communication* >(conn)->ExecDirect(
                    statement, fetch_size)
                : -1;
 }
 
-void ESSendCursorQueries(void* es_conn, const char* cursor) {
-    static_cast< ESCommunication* >(es_conn)->SendCursorQueries(cursor);
+void SendCursorQueries(void* conn, const char* cursor) {
+    static_cast< Communication* >(conn)->SendCursorQueries(cursor);
 }
 
-ESResult* ESGetResult(void* es_conn) {
-    return es_conn ? static_cast< ESCommunication* >(es_conn)->PopResult()
+ESResult* ESGetResult(void* conn) {
+    return conn ? static_cast< Communication* >(conn)->PopResult()
                    : NULL;
 }
 
-std::string ESGetClientEncoding(void* es_conn) {
-    return es_conn
-               ? static_cast< ESCommunication* >(es_conn)->GetClientEncoding()
+std::string GetClientEncoding(void* conn) {
+    return conn
+               ? static_cast< Communication* >(conn)->GetClientEncoding()
                : "";
 }
 
-bool ESSetClientEncoding(void* es_conn, std::string& encoding) {
-    return es_conn
-               ? static_cast< ESCommunication* >(es_conn)->SetClientEncoding(
+bool SetClientEncoding(void* conn, std::string& encoding) {
+    return conn
+               ? static_cast< Communication* >(conn)->SetClientEncoding(
                    encoding)
                : false;
 }
 
-void ESDisconnect(void* es_conn) {
-    delete static_cast< ESCommunication* >(es_conn);
+void Disconnect(void* conn) {
+    delete static_cast< Communication* >(conn);
 }
 
 void ESClearResult(ESResult* es_result) {
     delete es_result;
 }
 
-void ESStopRetrieval(void* es_conn) {
-    static_cast< ESCommunication* >(es_conn)->StopResultRetrieval();
+void StopRetrieval(void* conn) {
+    static_cast< Communication* >(conn)->StopResultRetrieval();
 }
 
-std::vector< std::string > ESGetColumnsWithSelectQuery(
-    void* es_conn, const std::string table_name) {
-    return static_cast< ESCommunication* >(es_conn)->GetColumnsWithSelectQuery(
+std::vector< std::string > GetColumnsWithSelectQuery(
+    void* conn, const std::string& table_name) {
+    return static_cast< Communication* >(conn)->GetColumnsWithSelectQuery(
         table_name);
 }
 
