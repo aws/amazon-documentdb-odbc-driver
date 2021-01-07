@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -113,7 +113,7 @@ INT_PTR CALLBACK dconn_FDriverConnectProc(HWND hdlg, UINT wMsg, WPARAM wParam,
             ci = (ConnInfo *)lParam;
 
             /* Change the caption for the setup dialog */
-            SetWindowText(hdlg, "Elasticsearch Connection");
+            SetWindowText(hdlg, "Timestream Connection");
 
             /* Hide the DSN and description fields */
             ShowWindow(GetDlgItem(hdlg, IDC_DSNAMETEXT), SW_HIDE);

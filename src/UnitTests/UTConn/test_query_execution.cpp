@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 // clang-format off
 #include "pch.h"
 #include "unit_test_helper.h"
-#include "es_communication.h"
+#include "ts_communication.h"
 #include "es_helper.h"
 // clang-format on
 
@@ -40,25 +40,25 @@ const int all_columns_flights_count = 25;
 const int some_columns_flights_count = 2;
 runtime_options valid_conn_opt_val = {
     {valid_host, valid_port, "1", "0"},
-    {"BASIC", valid_user, valid_pw, valid_region},
+    {"BASIC", valid_user, valid_pw, "", valid_region},
     {use_ssl, false, "", "", "", ""}};
 
 TEST(TestESExecDirect, ValidQuery) {
-    ESCommunication conn;
-    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val, false, 0, 0));
+    TSCommunication conn;
+    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
     EXPECT_EQ(EXECUTION_SUCCESS,
         ESExecDirect(&conn, some_columns_flights_query.c_str(), fetch_size.c_str()));
 }
 
-TEST(TestESExecDirect, MissingQuery) {
-    ESCommunication conn;
-    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val, false, 0, 0));
+TEST(TestTSExecDirect, MissingQuery) {
+    TSCommunication conn;
+    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
     EXPECT_EQ(EXECUTION_ERROR, ESExecDirect(&conn, NULL, fetch_size.c_str()));
 }
 
-TEST(TestESExecDirect, MissingConnection) {
+TEST(TesTSExecDirect, MissingConnection) {
     EXPECT_EQ(EXECUTION_ERROR,
               ESExecDirect(NULL, query.c_str(), fetch_size.c_str()));
 }
@@ -66,8 +66,8 @@ TEST(TestESExecDirect, MissingConnection) {
 // Conn::ExecDirect
 
 TEST(TestConnExecDirect, ValidQueryAllColumns) {
-    ESCommunication conn;
-    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val, false, 0, 0));
+    TSCommunication conn;
+    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
 
     conn.ExecDirect(all_columns_flights_query.c_str(), fetch_size.c_str());
@@ -79,8 +79,8 @@ TEST(TestConnExecDirect, ValidQueryAllColumns) {
 }
 
 TEST(TestConnExecDirect, ValidQuerySomeColumns) {
-    ESCommunication conn;
-    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val, false, 0, 0));
+    TSCommunication conn;
+    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
 
     conn.ExecDirect(some_columns_flights_query.c_str(), fetch_size.c_str());
@@ -92,8 +92,8 @@ TEST(TestConnExecDirect, ValidQuerySomeColumns) {
 }
 
 TEST(TestConnExecDirect, InvalidQuery) {
-    ESCommunication conn;
-    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val, false, 0, 0));
+    TSCommunication conn;
+    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
 
     conn.ExecDirect(invalid_query.c_str(), fetch_size.c_str());
@@ -104,8 +104,8 @@ TEST(TestConnExecDirect, InvalidQuery) {
 // Conn::PopResult
 
 TEST(TestConnPopResult, PopEmptyQueue) {
-    ESCommunication conn;
-    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val, false, 0, 0));
+    TSCommunication conn;
+    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
 
     ESResult* result = conn.PopResult();
@@ -113,8 +113,8 @@ TEST(TestConnPopResult, PopEmptyQueue) {
 }
 
 TEST(TestConnPopResult, PopTwoQueryResults) {
-    ESCommunication conn;
-    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val, false, 0, 0));
+    TSCommunication conn;
+    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     ASSERT_TRUE(conn.ConnectDBStart());
 
     conn.ExecDirect(some_columns_flights_query.c_str(), fetch_size.c_str());
