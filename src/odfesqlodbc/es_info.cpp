@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -841,7 +841,7 @@ ESAPI_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
         if (table_valid) {
             ConnectionClass *conn = SC_get_conn(stmt);
             list_of_columns =
-                ESGetColumnsWithSelectQuery(conn->esconn, table_name);
+                GetColumnsWithSelectQuery(conn->esconn, table_name);
         }
 
         // TODO #324 (SQL Plugin)- evaluate catalog & schema support

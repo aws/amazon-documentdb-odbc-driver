@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -269,6 +269,7 @@ typedef struct authentication_options {
     std::string auth_type;
     std::string username;
     std::string password;
+    std::string token;
     std::string region;
 } authentication_options;
 

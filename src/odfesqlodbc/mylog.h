@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ extern int qprintf(char *fmt, ...)
 
 const char *po_basename(const char *path);
 
-#define PREPEND_FMT "%10.10s[%s]%d: "
+#define PREPEND_FMT "%20.20s[%s]%d: "
 #define PREPEND_ITEMS , po_basename(__FILE__), __FUNCTION__, __LINE__
 #define QLOG_MARK "[QLOG]"
 

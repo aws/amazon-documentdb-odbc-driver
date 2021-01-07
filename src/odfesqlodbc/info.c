@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -218,7 +218,7 @@ RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
             break;
 
         case SQL_DRIVER_VER: /* ODBC 1.0 */
-            p = ELASTICSEARCHDRIVERVERSION;
+            p = TIMESTREAMDRIVERVERSION;
             break;
 
         case SQL_EXPRESSIONS_IN_ORDERBY: /* ODBC 1.0 */

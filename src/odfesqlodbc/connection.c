@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -132,8 +132,8 @@ RETCODE SQL_API ESAPI_Connect(HDBC hdbc, const SQLCHAR *szDSN,
         free(tmpstr);
     }
 
-    MYLOG(ES_DEBUG, "conn = %p (DSN='%s', UID='%s', PWD='%s')\n", conn, ci->dsn,
-          ci->username, NAME_IS_VALID(ci->password) ? "xxxxx" : "");
+    MYLOG(ES_DEBUG, "conn = %p (DSN='%s', UID='%s', PWD='%s', TOKEN='%s')\n", conn, ci->dsn,
+          ci->username, NAME_IS_VALID(ci->password) ? "xxxxx" : "", ci->token);
 
     if ((fchar = CC_connect(conn)) <= 0) {
         /* Error messages are filled in */
