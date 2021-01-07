@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -163,7 +163,7 @@ RETCODE SQL_API ESAPI_FreeStmt(HSTMT hstmt, SQLUSMALLINT fOption) {
     if (fOption == SQL_DROP) {
         ConnectionClass *conn = stmt->hdbc;
 
-        ESStopRetrieval(conn->esconn);
+        StopRetrieval(conn->esconn);
 
         /* Remove the statement from the connection's statement list */
         if (conn) {
@@ -201,7 +201,7 @@ RETCODE SQL_API ESAPI_FreeStmt(HSTMT hstmt, SQLUSMALLINT fOption) {
     } else if (fOption == SQL_UNBIND)
         SC_unbind_cols(stmt);
     else if (fOption == SQL_CLOSE) {
-        ESStopRetrieval(stmt->hdbc->esconn);
+        StopRetrieval(stmt->hdbc->esconn);
 
         /*
          * this should discard all the results, but leave the statement

@@ -1,5 +1,5 @@
 /*
- * Copyright <2019> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -46,12 +46,7 @@
 #include "qresult.h"
 #include "statement.h"
 
-#define PROTOCOL3_OPTS_MAX 30
 #define ERROR_BUFF_SIZE 200
-#define OPTION_COUNT 4
-#if OPTION_COUNT > PROTOCOL3_OPTS_MAX
-#error("Option count (OPTION_COUNT) is greater than max option count allow (PROTOCOL3_OPTS_MAX).")
-#endif
 
 void CC_determine_locale_encoding(ConnectionClass *self);
 
@@ -105,24 +100,25 @@ int LIBES_connect(ConnectionClass *self) {
     rt_opts.auth.auth_type.assign(self->connInfo.authtype);
     rt_opts.auth.username.assign(self->connInfo.username);
     rt_opts.auth.password.assign(SAFE_NAME(self->connInfo.password));
+    rt_opts.auth.token.assign(self->connInfo.token);
     rt_opts.auth.region.assign(self->connInfo.region);
 
     // Encryption
     rt_opts.crypt.verify_server = (self->connInfo.verify_server == 1);
     rt_opts.crypt.use_ssl = (self->connInfo.use_ssl == 1);
 
-    void *esconn = ESConnectDBParams(rt_opts, FALSE, OPTION_COUNT);
-    if (esconn == NULL) {
-        std::string err = GetErrorMsg(esconn);
+    auto conn = ConnectDBParams(rt_opts);
+    if (conn == nullptr) {
+        std::string err = GetErrorMsg(conn);
         CC_set_error(self, CONN_OPENDB_ERROR,
-                     (err.empty()) ? "ESConnectDBParams error" : err.c_str(),
+                     (err.empty()) ? "ConnectDBParams error" : err.c_str(),
                      "LIBES_connect");
         return 0;
     }
 
     // Check connection status
-    if (ESStatus(esconn) != CONNECTION_OK) {
-        std::string msg = GetErrorMsg(esconn);
+    if (Status(conn) != CONNECTION_OK) {
+        std::string msg = GetErrorMsg(conn);
         char error_message_out[ERROR_BUFF_SIZE] = "";
         if (!msg.empty())
             SPRINTF_FIXED(error_message_out, "Connection error: %s",
@@ -132,18 +128,18 @@ int LIBES_connect(ConnectionClass *self) {
                          "Connection error: No message available.");
         CC_set_error(self, CONN_OPENDB_ERROR, error_message_out,
                      "LIBES_connect");
-        ESDisconnect(esconn);
+        Disconnect(conn);
         return 0;
     }
 
     // Set server version
-    std::string server_version = GetServerVersion(esconn);
+    std::string server_version = GetServerVersion(conn);
     STRCPY_FIXED(self->es_version, server_version.c_str());
 
-    std::string cluster_name = GetClusterName(esconn);
+    std::string cluster_name = GetClusterName(conn);
     STRCPY_FIXED(self->cluster_name, cluster_name.c_str());
 
-    self->esconn = (void *)esconn;
+    self->esconn = (void *)conn;
     return 1;
 }
 
@@ -177,9 +173,9 @@ int CC_send_client_encoding(ConnectionClass *self, const char *encoding) {
 
     // Update client encoding
     std::string des_db_encoding(encoding);
-    std::string cur_db_encoding = ESGetClientEncoding(self->esconn);
+    std::string cur_db_encoding = GetClientEncoding(self->esconn);
     if (des_db_encoding != cur_db_encoding) {
-        if (!ESSetClientEncoding(self->esconn, des_db_encoding)) {
+        if (!SetClientEncoding(self->esconn, des_db_encoding)) {
             return SQL_ERROR;
         }
     }
@@ -202,5 +198,5 @@ void CC_initialize_es_version(ConnectionClass *self) {
 }
 
 void LIBES_disconnect(void *conn) {
-    ESDisconnect(conn);
+    Disconnect(conn);
 }
