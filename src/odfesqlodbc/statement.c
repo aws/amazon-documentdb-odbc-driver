@@ -161,12 +161,12 @@ RETCODE SQL_API ESAPI_FreeStmt(HSTMT hstmt, SQLUSMALLINT fOption) {
     SC_clear_error(stmt);
 
     if (fOption == SQL_DROP) {
-        ConnectionClass *conn = stmt->hdbc;
+        ConnectionClass *cc = stmt->hdbc;
 
-        StopRetrieval(conn->esconn);
+        StopRetrieval(cc->conn);
 
         /* Remove the statement from the connection's statement list */
-        if (conn) {
+        if (cc) {
             QResultClass *res;
 
             if (STMT_EXECUTING == stmt->status) {
@@ -175,13 +175,13 @@ RETCODE SQL_API ESAPI_FreeStmt(HSTMT hstmt, SQLUSMALLINT fOption) {
                              func);
                 return SQL_ERROR; /* stmt may be executing a transaction */
             }
-            if (conn->unnamed_prepared_stmt == stmt)
-                conn->unnamed_prepared_stmt = NULL;
+            if (cc->unnamed_prepared_stmt == stmt)
+                cc->unnamed_prepared_stmt = NULL;
 
             res = SC_get_Result(stmt);
             QR_Destructor(res);
             SC_init_Result(stmt);
-            if (!CC_remove_statement(conn, stmt)) {
+            if (!CC_remove_statement(cc, stmt)) {
                 SC_set_error(stmt, STMT_SEQUENCE_ERROR,
                              "Statement is currently executing a transaction.",
                              func);
@@ -201,7 +201,7 @@ RETCODE SQL_API ESAPI_FreeStmt(HSTMT hstmt, SQLUSMALLINT fOption) {
     } else if (fOption == SQL_UNBIND)
         SC_unbind_cols(stmt);
     else if (fOption == SQL_CLOSE) {
-        StopRetrieval(stmt->hdbc->esconn);
+        StopRetrieval(stmt->hdbc->conn);
 
         /*
          * this should discard all the results, but leave the statement
