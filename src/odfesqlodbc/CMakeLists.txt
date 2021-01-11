@@ -1,5 +1,5 @@
 #
-#   Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#   Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License").
 #   You may not use this file except in compliance with the License.
@@ -16,44 +16,92 @@
 project(odfesqlodbc)
 
 # Source files for odfesqlodbc
-set(					SOURCE_FILES 
-							bind.c					columninfo.c			connection.c 				convert.c
-							descriptor.c			dlg_specific.c			drvconn.c					options.c	
-							environ.c				execute.c				info.c						loadlib.c
-							misc.c					multibyte.c				mylog.c						tuple.c
-							parse.c					results.c				statement.c					odbcapi30.c	
-							qresult.c				odbcapi30w.c			es_api30.c					es_types.c					
-							es_utility.cpp	     	es_connection.cpp		es_odbc.c
-							es_driver_connect.cpp	es_helper.cpp			es_info.cpp					es_parse_result.cpp
-							es_semaphore.cpp		es_statement.cpp		win_unicode.c				odbcapi.c
-							odbcapiw.c				es_result_queue.cpp
-							communication.cpp
-							ts_communication.cpp
-	)
+set(C_SOURCE_FILES	bind.c
+					columninfo.c
+					connection.c
+					convert.c
+					descriptor.c
+					dlg_specific.c
+					drvconn.c
+					options.c
+					environ.c
+					execute.c
+					info.c
+					loadlib.c
+					misc.c
+					multibyte.c
+					mylog.c
+					tuple.c
+					parse.c
+					results.c
+					statement.c
+					odbcapi30.c
+					qresult.c
+					odbcapi30w.c
+					odbcapi.c
+					odbcapiw.c
+					win_unicode.c
+					es_api30.c
+					es_types.c
+					es_odbc.c)
+
+set(CPP_SOURCE_FILES	communication.cpp
+						es_connection.cpp
+						es_driver_connect.cpp
+						es_helper.cpp
+						es_info.cpp
+						es_parse_result.cpp
+						es_result_queue.cpp
+						es_semaphore.cpp
+						es_statement.cpp
+						es_utility.cpp
+						ts_communication.cpp)
+						
 if(WIN32)
-set(SOURCE_FILES ${SOURCE_FILES} dlg_wingui.c setup.c)
+set(C_SOURCE_FILES ${C_SOURCE_FILES} dlg_wingui.c setup.c)
 endif()
 
-set(					HEADER_FILES 
-							bind.h					catfunc.h				columninfo.h
-							convert.h				descriptor.h			dlg_specific.h		drvconn.h
-							environ.h				es_apifunc.h			es_parse_result.h
-							es_connection.h			es_driver_connect.h		es_helper.h			es_info.h			
-							es_statement.h 			es_types.h 				loadlib.h 		
-							misc.h					multibyte.h				mylog.h				es_utility.h
-							resource.h				statement.h				tuple.h				unicode_support.h
-							es_apifunc.h			es_odbc.h				es_semaphore.h		qresult.h
-							version.h				win_setup.h				es_result_queue.h
-							communication.h
-							ts_communication.h
-	)
+set(C_HEADER_FILES	bind.h
+					catfunc.h
+					columninfo.h
+					convert.h
+					descriptor.h
+					dlg_specific.h
+					drvconn.h
+					environ.h
+					loadlib.h
+					misc.h
+					multibyte.h
+					mylog.h	
+					resource.h
+					statement.h
+					tuple.h
+					unicode_support.h
+					qresult.h
+					win_setup.h)
+	
+set(CPP_HEADER_FILES	communication.h
+						es_apifunc.h
+						es_connection.h
+						es_driver_connect.h
+						es_helper.h
+						es_info.h
+						es_odbc.h
+						es_parse_result.h
+						es_result_queue.h
+						es_semaphore.h
+						es_statement.h
+						es_types.h
+						es_utility.h
+						ts_communication.h
+						version.h)
 
 # Generate dll (SHARED)
 if(WIN32)
 set(RESOURCE_FILES ts_odbc.rc)
-add_library(odfesqlodbc SHARED ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES} ${AWSSDK_LIB_DIR})
+add_library(odfesqlodbc SHARED ${C_SOURCE_FILES} ${C_HEADER_FILES} ${CPP_SOURCE_FILES} ${CPP_HEADER_FILES} ${RESOURCE_FILES} ${AWSSDK_LIB_DIR})
 else()
-add_library(odfesqlodbc SHARED ${SOURCE_FILES} ${HEADER_FILES})
+add_library(odfesqlodbc SHARED ${C_SOURCE_FILES} ${C_HEADER_FILES} ${CPP_SOURCE_FILES} ${CPP_HEADER_FILES})
 endif()
 
 include_directories(

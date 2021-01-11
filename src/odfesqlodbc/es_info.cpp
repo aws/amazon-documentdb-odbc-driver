@@ -839,9 +839,9 @@ ESAPI_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
         // with DESCRIBE & SELECT * query
         std::vector< std::string > list_of_columns;
         if (table_valid) {
-            ConnectionClass *conn = SC_get_conn(stmt);
+            ConnectionClass *cc = SC_get_conn(stmt);
             list_of_columns =
-                GetColumnsWithSelectQuery(conn->esconn, table_name);
+                GetColumnsWithSelectQuery(cc->conn, table_name);
         }
 
         // TODO #324 (SQL Plugin)- evaluate catalog & schema support
