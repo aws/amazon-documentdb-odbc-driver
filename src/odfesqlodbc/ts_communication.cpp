@@ -21,17 +21,9 @@
 // clang-format off
 #include "es_odbc.h"
 #include "mylog.h"
-//#include <aws/core/utils/StringUtils.h>
-//#include <aws/core/client/RetryStrategy.h>
-//#include <aws/core/client/AWSClient.h>
-//#include <aws/core/utils/HashingUtils.h>
-//#include <aws/core/auth/AWSAuthSigner.h>
-//#include <aws/core/auth/AWSCredentialsProvider.h>
-//#include <aws/core/http/HttpClient.h>
 #include <aws/core/auth/AWSCredentials.h>
 #include <aws/timestream-query/model/QueryRequest.h>
-#include <aws/timestream-query/model/DescribeEndpointsResult.h>
-#include <aws/timestream-query/model/DescribeEndpointsRequest.h>
+
 // clang-format on
 
 //static const std::string ctype = "application/json";
@@ -200,35 +192,68 @@ void TSCommunication::AwsHttpResponseToString(
     */
 // }
 
-TSCommunication::TSCommunication()
-#ifdef __APPLE__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wreorder"
-#endif  // __APPLE__
-    // : m_status(ConnStatusType::CONNECTION_BAD),
-      // m_error_type(ConnErrorType::CONN_ERROR_SUCCESS),
-      // m_is_valid_connection_options(false)
-      // m_is_retrieving(false),
-     //  m_result_queue(2),
-      // m_client_encoding(m_supported_client_encodings[0])
-#ifdef __APPLE__
-#pragma clang diagnostic pop
-#endif  // __APPLE__
-{
+bool TSCommunication::Validate(const runtime_options& options) {
+    if (options.auth.username.empty()) {
+        throw std::invalid_argument("UID cannot be empty.");
+    }
+    if (options.auth.password.empty()) {
+        throw std::invalid_argument("PWD cannot be empty.");
+    }
+    if (options.auth.region.empty()) {
+        throw std::invalid_argument("Region cannot be empty.");
+    }
+    if (options.auth.auth_type != AUTHTYPE_BASIC && 
+        options.auth.auth_type != AUTHTYPE_IAM) {
+        throw std::invalid_argument("Unknown authentication type: \"" + options.auth.auth_type + "\".");
+    }
+    if (!options.conn.timeout.empty()) {
+        std::stol(options.conn.timeout);
+    }
+    LogMsg(ES_DEBUG, "Required connection options are valid.");
+    return true;
 }
 
-std::string TSCommunication::GetErrorPrefix() {
-    return "[Timestream][SQL ODBC Driver][SQL Plugin] ";
+bool TSCommunication::Connect(const runtime_options& options) {
+    Aws::Client::ClientConfiguration config;
+    config.enableEndpointDiscovery = true;
+    config.region = options.auth.region;
+    config.verifySSL = options.crypt.verify_server;
+    long response_timeout =
+        static_cast< long >(DEFAULT_RESPONSE_TIMEOUT) * 1000L;
+    response_timeout = std::stol(options.conn.timeout) * 1000L;
+    config.connectTimeoutMs = response_timeout;
+    config.httpRequestTimeoutMs = response_timeout;
+    config.requestTimeoutMs = response_timeout;
+
+    if (options.auth.auth_type == AUTHTYPE_BASIC) {
+        Aws::Auth::AWSCredentials credentials(options.auth.username,
+                                              options.auth.password, options.auth.token);
+        m_client =
+            std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(
+                credentials, config);
+    } else if (options.auth.auth_type == AUTHTYPE_IAM) {
+    } else {
+        throw std::runtime_error("Unknown auth type.");
+    }
+    
+    if (m_client == nullptr) {
+        throw std::runtime_error("Unable create TimestreamQueryClient.");
+    }
+
+    Aws::TimestreamQuery::Model::QueryRequest req;
+    req.SetQueryString("select 1");
+    auto outcome = m_client->Query(req);
+    if (!outcome.IsSuccess()) {
+        auto err = outcome.GetError().GetMessage();
+        LogMsg(ES_ERROR, err.c_str());
+        Disconnect();
+        throw std::runtime_error("Failed to establish connection: " + err);
+    }
+    return true;
 }
 
-bool TSCommunication::ConnectionOptions(runtime_options& rt_opts) {
-    LogMsg(ES_ALL, "Connection Options:");
-    m_rt_opts = rt_opts;
-    return CheckConnectionOptions();
-}
-
-void TSCommunication::DropDBConnection() {
-    LogMsg(ES_ALL, "Dropping DB connection.");
+void TSCommunication::Disconnect() {
+    LogMsg(ES_ALL, "Disconnecting timestream connection.");
     if (m_client) {
         m_client.reset();
     }
@@ -236,80 +261,13 @@ void TSCommunication::DropDBConnection() {
     StopResultRetrieval();
 }
 
-bool TSCommunication::CheckConnectionOptions() {
-    // LogMsg(ES_ALL, "Verifying connection options.");
-    m_error_message = "";
-    if (/*m_rt_opts.auth.auth_type != AUTHTYPE_NONE
-        &&*/ m_rt_opts.auth.auth_type != AUTHTYPE_IAM) {
-        if (m_rt_opts.auth.auth_type == AUTHTYPE_BASIC) {
-            if (m_rt_opts.auth.username.empty()
-                || m_rt_opts.auth.password.empty()) {
-                m_error_message = AUTHTYPE_BASIC
-                    " authentication requires a username and password.";
-                SetErrorDetails("Auth error", m_error_message,
-                                ConnErrorType::CONN_ERROR_INVALID_AUTH);
-            }
-        } else {
-            m_error_message = "Unknown authentication type: '"
-                              + m_rt_opts.auth.auth_type + "'";
-            SetErrorDetails("Auth error", m_error_message,
-                            ConnErrorType::CONN_ERROR_INVALID_AUTH);
-        }
-    } /*else if (m_rt_opts.conn.server == "") {
-        m_error_message = "Host connection option was not specified.";
-        SetErrorDetails("Connection error", m_error_message,
-                        ConnErrorType::CONN_ERROR_UNABLE_TO_ESTABLISH);
-    }*/
-
-    if (m_error_message != "") {
-        LogMsg(ES_ERROR, m_error_message.c_str());
-        m_is_valid_connection_options = false;
-        return false;
-    } else {
-        LogMsg(ES_DEBUG, "Required connection option are valid.");
-        m_is_valid_connection_options = true;
-    }
-    return m_is_valid_connection_options;
+std::string TSCommunication::GetVersion() {
+    // AWS SDK version
+    return "1.7.329";
 }
 
-void TSCommunication::InitializeConnection() {
-    Aws::Client::ClientConfiguration config;
-    config.enableEndpointDiscovery = true;
-    config.region = m_rt_opts.auth.region;
-    /*
-    // HTTP doesn't work
-    config.scheme = (m_rt_opts.crypt.use_ssl ? Aws::Http::Scheme::HTTPS
-                                             : Aws::Http::Scheme::HTTP);
-    */
-    config.verifySSL = m_rt_opts.crypt.verify_server;
-    long response_timeout =
-        static_cast< long >(DEFAULT_RESPONSE_TIMEOUT) * 1000L;
-    try {
-        response_timeout =
-            std::stol(m_rt_opts.conn.timeout, nullptr, 10) * 1000L;
-    } catch (...) {
-    }
-    config.connectTimeoutMs = response_timeout;
-    config.httpRequestTimeoutMs = response_timeout;
-    config.requestTimeoutMs = response_timeout;
-
-    LogMsg(ES_ALL, m_rt_opts.auth.auth_type.c_str());
-    LogMsg(ES_ALL, m_rt_opts.auth.username.c_str());
-    LogMsg(ES_ALL, m_rt_opts.auth.password.c_str());
-    LogMsg(ES_ALL, m_rt_opts.auth.token.c_str());
-    
-    if (m_rt_opts.auth.auth_type == AUTHTYPE_BASIC) {
-        Aws::Auth::AWSCredentials credentials(m_rt_opts.auth.username,
-                                              m_rt_opts.auth.password,
-                                              m_rt_opts.auth.token);
-        m_client =
-            std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(
-                credentials, config);
-    } else if (m_rt_opts.auth.auth_type == AUTHTYPE_IAM) {
-        /*m_client =
-            std::make_shared< Aws::TimestreamQuery::TimestreamQueryClient >(
-                config);*/
-    }
+std::string TSCommunication::GetErrorPrefix() {
+    return "[Timestream][SQL ODBC Driver] ";
 }
 
 std::shared_ptr< Aws::Http::HttpResponse > TSCommunication::IssueRequest(
@@ -371,28 +329,6 @@ std::shared_ptr< Aws::Http::HttpResponse > TSCommunication::IssueRequest(
     //// Issue request and return response
     //return m_http_client->MakeRequest(request);
     return nullptr;
-}
-
-bool TSCommunication::EstablishConnection() {
-    // Generate HttpClient Connection class if it does not exist
-    LogMsg(ES_ALL, "Attempting to establish DB connection.");
-    if (!m_client) {
-        InitializeConnection();
-    }
-    if (m_client != nullptr) {
-        Aws::TimestreamQuery::Model::QueryRequest req;
-        req.SetQueryString("select 1");
-        auto outcome = m_client->Query(req);
-        if (outcome.IsSuccess()) {
-            return true;
-        } else {
-            m_error_message = outcome.GetError().GetMessage();
-            SetErrorDetails("Connection error", m_error_message,
-                            ConnErrorType::CONN_ERROR_COMM_LINK_FAILURE);
-        }
-    }
-    LogMsg(ES_ERROR, m_error_message.c_str());
-    return false;
 }
 
 std::vector< std::string > TSCommunication::GetColumnsWithSelectQuery(
@@ -665,12 +601,4 @@ ESResult* TSCommunication::PopResult() {
 
     return result;*/
     return nullptr;
-}
-
-std::string TSCommunication::GetServerVersion() {
-    return "";
-}
-
-std::string TSCommunication::GetClusterName() {
-    return "";
 }

@@ -76,22 +76,22 @@ runtime_options rt_opts = []() {
     return temp_opts;
 }();
 
-void GetVersionInfoString(std::string& version_info) {
-    // Connect to DB
-    TSCommunication comm;
-    comm.ConnectionOptions(rt_opts);
-    ASSERT_TRUE(comm.ConnectDBStart());
+// void GetVersionInfoString(std::string& version_info) {
+    //// Connect to DB
+    //TSCommunication comm;
+    //comm.ConnectionOptions(rt_opts);
+    //ASSERT_TRUE(comm.ConnectDBStart());
 
-    // Issue request
-    std::string endpoint, content_type, query, fetch_size;
-    std::shared_ptr< Aws::Http::HttpResponse > response =
-        comm.IssueRequest(endpoint, Aws::Http::HttpMethod::HTTP_GET,
-                             content_type, query, fetch_size);
+    //// Issue request
+    //std::string endpoint, content_type, query, fetch_size;
+    //std::shared_ptr< Aws::Http::HttpResponse > response =
+    //    comm.IssueRequest(endpoint, Aws::Http::HttpMethod::HTTP_GET,
+    //                         content_type, query, fetch_size);
 
-    // Convert response to string
-    ASSERT_TRUE(response != nullptr);
-    comm.AwsHttpResponseToString(response, version_info);
-}
+    //// Convert response to string
+    //ASSERT_TRUE(response != nullptr);
+    //comm.AwsHttpResponseToString(response, version_info);
+// }
 
 void ParseVersionInfoString(
     const std::string& input_info,
@@ -115,21 +115,21 @@ void ParseVersionInfoString(
     }
 }
 
-TEST(InfoCollect, EndPoint) {
-    // Get version string from endpoint
-    std::string version_info;
-    GetVersionInfoString(version_info);
-
-    // Parse into vector pair
-    std::vector< std::pair< std::string, std::string > > output_info;
-    ParseVersionInfoString(version_info, output_info);
-
-    std::cout << sync_start << std::endl;
-    for (auto& it : output_info) {
-        std::cout << it.first << sync_sep << it.second << std::endl;
-    }
-    std::cout << sync_end << std::endl;
-}
+//TEST(InfoCollect, EndPoint) {
+//    // Get version string from endpoint
+//    std::string version_info;
+//    GetVersionInfoString(version_info);
+//
+//    // Parse into vector pair
+//    std::vector< std::pair< std::string, std::string > > output_info;
+//    ParseVersionInfoString(version_info, output_info);
+//
+//    std::cout << sync_start << std::endl;
+//    for (auto& it : output_info) {
+//        std::cout << it.first << sync_sep << it.second << std::endl;
+//    }
+//    std::cout << sync_end << std::endl;
+//}
 
 int main(int argc, char** argv) {
     testing::internal::CaptureStdout();

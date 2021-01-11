@@ -47,7 +47,7 @@ RETCODE SQL_API ESAPI_AllocStmt(HDBC ConnectionHandle, HSTMT *StatementHandle,
 RETCODE SQL_API ESAPI_BindCol(HSTMT StatementHandle, SQLUSMALLINT ColumnNumber,
                               SQLSMALLINT TargetType, PTR TargetValue,
                               SQLLEN BufferLength, SQLLEN *StrLen_or_Ind);
-RETCODE SQL_API ESAPI_Connect(HDBC ConnectionHandle, const SQLCHAR *ServerName,
+RETCODE SQL_API API_Connect(HDBC ConnectionHandle, const SQLCHAR *ServerName,
                               SQLSMALLINT NameLength1, const SQLCHAR *UserName,
                               SQLSMALLINT NameLength2,
                               const SQLCHAR *Authentication,

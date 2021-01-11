@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  *
  */
-#include <regex>
+#include <stdexcept>
 #include "communication.h"
 // clang-format off
 #include "es_odbc.h"
@@ -23,78 +23,30 @@
 
 Communication::Communication()
     : m_status(ConnStatusType::CONNECTION_BAD),
-      m_is_valid_connection_options(false),
       m_client_encoding(m_supported_client_encodings[0]) {
     LogMsg(ES_ALL, "Initializing AWS API.");
-    Aws::InitAPI(m_options);
+    Aws::InitAPI(m_sdk_options);
 }
 
 Communication::~Communication() {
     LogMsg(ES_ALL, "Shutting down AWS API.");
-    Aws::ShutdownAPI(m_options);
+    Aws::ShutdownAPI(m_sdk_options);
 }
 
-bool Communication::ConnectDBStart() {
-    LogMsg(ES_ALL, "Starting DB connection.");
-    m_status = ConnStatusType::CONNECTION_BAD;
-    if (!m_is_valid_connection_options) {
-        // TODO: get error message from CheckConnectionOptions
-        m_error_message =
-            "Invalid connection options, unable to connect to Timestream.";
-        SetErrorDetails("Invalid connection options", m_error_message,
-                        ConnErrorType::CONN_ERROR_COMM_LINK_FAILURE);
-        LogMsg(ES_ERROR, m_error_message.c_str());
-        DropDBConnection();
-        return false;
+bool Communication::Setup(const runtime_options& options) {
+    if (Validate(options)) {
+        if (Connect(options)) {
+            m_status = ConnStatusType::CONNECTION_OK;
+            return true;
+        } else {
+            m_status = ConnStatusType::CONNECTION_NEEDED;
+            return false;
+        }
     }
-
-    m_status = ConnStatusType::CONNECTION_NEEDED;
-    if (!EstablishConnection()) {
-        m_error_message = "Failed to establish connection to DB.";
-        SetErrorDetails("Connection error", m_error_message,
-                        ConnErrorType::CONN_ERROR_COMM_LINK_FAILURE);
-        LogMsg(ES_ERROR, m_error_message.c_str());
-        DropDBConnection();
-        return false;
-    }
-
-    LogMsg(ES_DEBUG, "Connection established.");
-    m_status = ConnStatusType::CONNECTION_OK;
-    return true;
-}
-      
-std::string Communication::GetErrorMessage() {
-    if (m_error_details) {
-        m_error_details->details = std::regex_replace(
-            m_error_details->details, std::regex("\\n"), "\\\\n");
-        return GetErrorPrefix() + m_error_details->reason + ": "
-               + m_error_details->details;
-    } else {
-        return GetErrorPrefix() + "No error details available; check the driver logs.";
-    }
+    return false;
 }
 
-ConnErrorType Communication::GetErrorType() {
-    return m_error_type;
-}
-
-void Communication::SetErrorDetails(const std::string& reason, const std::string& message, ConnErrorType error_type) {
-	// Prepare document and validate schema
-	auto error_details = std::make_shared< ErrorDetails >();
-	error_details->reason = reason;
-	error_details->details = message;
-	error_details->source_type = "Dummy type";
-	error_details->type = error_type;
-	m_error_details = error_details;
-}
-
-void Communication::SetErrorDetails(ErrorDetails details) {
-	// Prepare document and validate schema
-	auto error_details = std::make_shared< ErrorDetails >(details);
-	m_error_details = error_details;
-}
-
-ConnStatusType Communication::GetConnectionStatus() {
+ConnStatusType Communication::Status() {
     return m_status;
 }
 

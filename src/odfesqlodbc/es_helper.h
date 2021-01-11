@@ -25,11 +25,8 @@ std::string GetClientEncoding(void* conn);
 bool SetClientEncoding(void* conn, std::string& encoding);
 ESResult* ESGetResult(void* conn);
 void ESClearResult(ESResult* es_result);
-void* ConnectDBParams(runtime_options& rt_opts);
-std::string GetServerVersion(void* conn);
-std::string GetClusterName(void* conn);
-std::string GetErrorMsg(void* conn);
-ConnErrorType GetErrorType(void* conn);
+void* ConnectDBParams(const runtime_options& rt_opts);
+std::string GetVersion(void* conn);
 std::vector< std::string > GetColumnsWithSelectQuery(
     void* conn, const std::string& table_name);
 
