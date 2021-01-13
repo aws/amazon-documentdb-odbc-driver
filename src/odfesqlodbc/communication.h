@@ -164,7 +164,7 @@ class Communication {
      * Get connection status
      * @return ConnStatusType
      */
-    ConnStatusType Status();
+    ConnStatusType GetStatus();
    protected:
     /**
      * Connection status
