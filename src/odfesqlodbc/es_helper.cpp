@@ -24,7 +24,15 @@
 
 void* ConnectDBParams(const runtime_options& rt_opts) {
     auto conn = new TSCommunication();
-    conn->Setup(rt_opts);
+    if (conn != nullptr) {
+        try {
+            conn->Setup(rt_opts);
+        } catch (std::exception& e) {
+            Disconnect(conn);
+            // Propagate exceptions
+            throw e;
+        }
+    }
     return conn;
 }
 
