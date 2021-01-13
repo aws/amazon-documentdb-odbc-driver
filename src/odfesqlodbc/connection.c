@@ -166,9 +166,9 @@ RETCODE SQL_API ESAPI_BrowseConnect(HDBC hdbc, const SQLCHAR *szConnStrIn,
 }
 
 /* Drop any hstmts open on hdbc and disconnect from database */
-RETCODE SQL_API ESAPI_Disconnect(HDBC hdbc) {
+RETCODE SQL_API API_Disconnect(HDBC hdbc) {
     ConnectionClass *conn = (ConnectionClass *)hdbc;
-    CSTR func = "ESAPI_Disconnect";
+    CSTR func = "API_Disconnect";
     RETCODE ret = SQL_SUCCESS;
 
     MYLOG(ES_TRACE, "entering...\n");
