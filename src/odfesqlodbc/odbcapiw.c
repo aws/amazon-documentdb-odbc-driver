@@ -92,7 +92,7 @@ RETCODE SQL_API SQLConnectW(HDBC ConnectionHandle, SQLWCHAR *ServerName,
     usName = ucs2_to_utf8(UserName, NameLength2, &nmlen2, FALSE);
     auth = ucs2_to_utf8(Authentication, NameLength3, &nmlen3, FALSE);
     ret =
-        ESAPI_Connect(ConnectionHandle, (SQLCHAR *)svName, (SQLSMALLINT)nmlen1,
+        API_Connect(ConnectionHandle, (SQLCHAR *)svName, (SQLSMALLINT)nmlen1,
                       (SQLCHAR *)usName, (SQLSMALLINT)nmlen2, (SQLCHAR *)auth,
                       (SQLSMALLINT)nmlen3);
     LEAVE_CONN_CS(conn);

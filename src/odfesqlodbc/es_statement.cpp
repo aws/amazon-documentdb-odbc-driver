@@ -25,143 +25,150 @@
 extern "C" void *common_cs;
 
 RETCODE ExecuteStatement(StatementClass *stmt, BOOL commit) {
-    CSTR func = "ExecuteStatement";
-    int func_cs_count = 0;
-    ConnectionClass *conn = SC_get_conn(stmt);
-    CONN_Status oldstatus = conn->status;
+    try {
+        CSTR func = "ExecuteStatement";
+        int func_cs_count = 0;
+        ConnectionClass *conn = SC_get_conn(stmt);
+        CONN_Status oldstatus = conn->status;
 
-    auto CleanUp = [&]() -> RETCODE {
-        SC_SetExecuting(stmt, FALSE);
-        CLEANUP_FUNC_CONN_CS(func_cs_count, conn);
-        if (conn->status != CONN_DOWN)
-            conn->status = oldstatus;
-        if (SC_get_errornumber(stmt) == STMT_OK)
-            return SQL_SUCCESS;
-        else if (SC_get_errornumber(stmt) < STMT_OK)
-            return SQL_SUCCESS_WITH_INFO;
-        else {
-            if (!SC_get_errormsg(stmt) || !SC_get_errormsg(stmt)[0]) {
-                if (STMT_NO_MEMORY_ERROR != SC_get_errornumber(stmt))
-                    SC_set_errormsg(stmt, "Error while executing the query");
-                SC_log_error(func, NULL, stmt);
+        auto CleanUp = [&]() -> RETCODE {
+            SC_SetExecuting(stmt, FALSE);
+            CLEANUP_FUNC_CONN_CS(func_cs_count, conn);
+            if (conn->status != CONN_DOWN)
+                conn->status = oldstatus;
+            if (SC_get_errornumber(stmt) == STMT_OK)
+                return SQL_SUCCESS;
+            else if (SC_get_errornumber(stmt) < STMT_OK)
+                return SQL_SUCCESS_WITH_INFO;
+            else {
+                if (!SC_get_errormsg(stmt) || !SC_get_errormsg(stmt)[0]) {
+                    if (STMT_NO_MEMORY_ERROR != SC_get_errornumber(stmt))
+                        SC_set_errormsg(stmt,
+                                        "Error while executing the query");
+                    SC_log_error(func, NULL, stmt);
+                }
+                return SQL_ERROR;
             }
-            return SQL_ERROR;
-        }
-    };
+        };
 
-    ENTER_INNER_CONN_CS(conn, func_cs_count);
+        ENTER_INNER_CONN_CS(conn, func_cs_count);
 
-    if (conn->status == CONN_EXECUTING) {
-        SC_set_error(stmt, STMT_SEQUENCE_ERROR, "Connection is already in use.",
-                     func);
-        return CleanUp();
-    }
-
-    if (!SC_SetExecuting(stmt, TRUE)) {
-        SC_set_error(stmt, STMT_OPERATION_CANCELLED, "Cancel Request Accepted",
-                     func);
-        return CleanUp();
-    }
-
-    conn->status = CONN_EXECUTING;
-
-    QResultClass *res = SendQueryGetResult(stmt, commit);
-    if (!res) {
-        std::string es_conn_err = GetErrorMsg(SC_get_conn(stmt)->esconn);
-        ConnErrorType es_err_type = GetErrorType(SC_get_conn(stmt)->esconn);
-        std::string es_parse_err = GetResultParserError();
-        if (!es_conn_err.empty()) {
-            if (es_err_type == ConnErrorType::CONN_ERROR_QUERY_SYNTAX) {
-                SC_set_error(stmt, STMT_QUERY_SYNTAX_ERROR, es_conn_err.c_str(),
-                             func);
-            } else {
-                SC_set_error(stmt, STMT_NO_RESPONSE, es_conn_err.c_str(), func);
-            }
-        } else if (!es_parse_err.empty()) {
-            SC_set_error(stmt, STMT_EXEC_ERROR, es_parse_err.c_str(), func);
-        } else if (SC_get_errornumber(stmt) <= 0) {
-            SC_set_error(stmt, STMT_NO_RESPONSE,
-                         "Failed to retrieve error message from result. "
-                         "Connection may be down.",
-                         func);
-        }
-        return CleanUp();
-    }
-
-    if (CONN_DOWN != conn->status)
-        conn->status = oldstatus;
-    stmt->status = STMT_FINISHED;
-    LEAVE_INNER_CONN_CS(func_cs_count, conn);
-
-    // Check the status of the result
-    if (SC_get_errornumber(stmt) < 0) {
-        if (QR_command_successful(res))
-            SC_set_errornumber(stmt, STMT_OK);
-        else if (QR_command_nonfatal(res))
-            SC_set_errornumber(stmt, STMT_INFO_ONLY);
-        else
-            SC_set_errorinfo(stmt, res, 0);
-    }
-
-    // Set cursor before the first tuple in the list
-    stmt->currTuple = -1;
-    SC_set_current_col(stmt, static_cast< int >(stmt->currTuple));
-    SC_set_rowset_start(stmt, stmt->currTuple, FALSE);
-
-    // Only perform if query was not aborted
-    if (!QR_get_aborted(res)) {
-        // Check if result columns were obtained from query
-        for (QResultClass *tres = res; tres; tres = tres->next) {
-            Int2 numcols = QR_NumResultCols(tres);
-            if (numcols <= 0)
-                continue;
-            ARDFields *opts = SC_get_ARDF(stmt);
-            extend_column_bindings(opts, numcols);
-            if (opts->bindings)
-                break;
-
-            // Failed to allocate
-            QR_Destructor(res);
-            SC_set_error(stmt, STMT_NO_MEMORY_ERROR,
-                         "Could not get enough free memory to store "
-                         "the binding information",
-                         func);
+        if (conn->status == CONN_EXECUTING) {
+            SC_set_error(stmt, STMT_SEQUENCE_ERROR,
+                         "Connection is already in use.", func);
             return CleanUp();
         }
-    }
 
-    QResultClass *last = SC_get_Result(stmt);
-    if (last) {
-        // Statement already contains a result
-        // Append to end if this hasn't happened
-        while (last->next != NULL) {
-            if (last == res)
-                break;
-            last = last->next;
+        if (!SC_SetExecuting(stmt, TRUE)) {
+            SC_set_error(stmt, STMT_OPERATION_CANCELLED,
+                         "Cancel Request Accepted", func);
+            return CleanUp();
         }
-        if (last != res)
-            last->next = res;
-    } else {
-        // Statement does not contain a result
-        // Assign directly
-        SC_set_Result(stmt, res);
+
+        conn->status = CONN_EXECUTING;
+
+        QResultClass *res = SendQueryGetResult(stmt, commit);
+        if (!res) {
+            // TODO: handle by std::exception
+            std::string es_conn_err;  // =
+                // GetErrorMessage(SC_get_conn(stmt)->conn);
+            // ConnErrorType es_err_type =
+            // GetErrorType(SC_get_conn(stmt)->esconn);
+            std::string es_parse_err = GetResultParserError();
+            if (!es_conn_err.empty()) {
+                /*if (es_err_type == ConnErrorType::CONN_ERROR_QUERY_SYNTAX) {
+                    SC_set_error(stmt, STMT_QUERY_SYNTAX_ERROR,
+                es_conn_err.c_str(), func); } else { SC_set_error(stmt,
+                STMT_NO_RESPONSE, es_conn_err.c_str(), func);
+                }*/
+            } else if (!es_parse_err.empty()) {
+                SC_set_error(stmt, STMT_EXEC_ERROR, es_parse_err.c_str(), func);
+            } else if (SC_get_errornumber(stmt) <= 0) {
+                SC_set_error(stmt, STMT_NO_RESPONSE,
+                             "Failed to retrieve error message from result. "
+                             "Connection may be down.",
+                             func);
+            }
+            return CleanUp();
+        }
+
+        if (CONN_DOWN != conn->status)
+            conn->status = oldstatus;
+        stmt->status = STMT_FINISHED;
+        LEAVE_INNER_CONN_CS(func_cs_count, conn);
+
+        // Check the status of the result
+        if (SC_get_errornumber(stmt) < 0) {
+            if (QR_command_successful(res))
+                SC_set_errornumber(stmt, STMT_OK);
+            else if (QR_command_nonfatal(res))
+                SC_set_errornumber(stmt, STMT_INFO_ONLY);
+            else
+                SC_set_errorinfo(stmt, res, 0);
+        }
+
+        // Set cursor before the first tuple in the list
+        stmt->currTuple = -1;
+        SC_set_current_col(stmt, static_cast< int >(stmt->currTuple));
+        SC_set_rowset_start(stmt, stmt->currTuple, FALSE);
+
+        // Only perform if query was not aborted
+        if (!QR_get_aborted(res)) {
+            // Check if result columns were obtained from query
+            for (QResultClass *tres = res; tres; tres = tres->next) {
+                Int2 numcols = QR_NumResultCols(tres);
+                if (numcols <= 0)
+                    continue;
+                ARDFields *opts = SC_get_ARDF(stmt);
+                extend_column_bindings(opts, numcols);
+                if (opts->bindings)
+                    break;
+
+                // Failed to allocate
+                QR_Destructor(res);
+                SC_set_error(stmt, STMT_NO_MEMORY_ERROR,
+                             "Could not get enough free memory to store "
+                             "the binding information",
+                             func);
+                return CleanUp();
+            }
+        }
+
+        QResultClass *last = SC_get_Result(stmt);
+        if (last) {
+            // Statement already contains a result
+            // Append to end if this hasn't happened
+            while (last->next != NULL) {
+                if (last == res)
+                    break;
+                last = last->next;
+            }
+            if (last != res)
+                last->next = res;
+        } else {
+            // Statement does not contain a result
+            // Assign directly
+            SC_set_Result(stmt, res);
+        }
+
+        // This will commit results for SQLExecDirect and will not commit
+        // results for SQLPrepare since only metadata is required for SQLPrepare
+        if (commit) {
+            GetNextResultSet(stmt);
+        }
+
+        stmt->diag_row_count = res->recent_processed_row_count;
+
+        return CleanUp();
+    } catch (...) {
+        return SQL_ERROR;
     }
-
-    // This will commit results for SQLExecDirect and will not commit
-    // results for SQLPrepare since only metadata is required for SQLPrepare
-    if (commit) {
-        GetNextResultSet(stmt);
-    }
-
-    stmt->diag_row_count = res->recent_processed_row_count;
-
-    return CleanUp();
 }
 
 SQLRETURN GetNextResultSet(StatementClass *stmt) {
-    ConnectionClass *conn = SC_get_conn(stmt);
+    ConnectionClass *cc = SC_get_conn(stmt);
     QResultClass *q_res = SC_get_Result(stmt);
-    if ((q_res == NULL) && (conn == NULL)) {
+    if ((q_res == NULL) && (cc == NULL)) {
         return SQL_ERROR;
     }
 
@@ -171,7 +178,7 @@ SQLRETURN GetNextResultSet(StatementClass *stmt) {
         return SQL_ERROR;
     }
 
-    ESResult *es_res = ESGetResult(conn->esconn);
+    ESResult *es_res = ESGetResult(cc->conn);
     if (es_res != NULL) {
         // Save server cursor id to fetch more pages later
         if (es_res->es_result_doc.has("cursor")) {
@@ -244,8 +251,8 @@ QResultClass *SendQueryGetResult(StatementClass *stmt, BOOL commit) {
         return NULL;
 
     // Send command
-    ConnectionClass *conn = SC_get_conn(stmt);
-    if (ESExecDirect(conn->esconn, stmt->statement, conn->connInfo.fetch_size)
+    ConnectionClass *cc = SC_get_conn(stmt);
+    if (ESExecDirect(cc->conn, stmt->statement, cc->connInfo.fetch_size)
         != 0) {
         QR_Destructor(res);
         return NULL;
@@ -253,7 +260,7 @@ QResultClass *SendQueryGetResult(StatementClass *stmt, BOOL commit) {
     res->rstatus = PORES_COMMAND_OK;
 
     // Get ESResult
-    ESResult *es_res = ESGetResult(conn->esconn);
+    ESResult *es_res = ESGetResult(cc->conn);
     if (es_res == NULL) {
         QR_Destructor(res);
         return NULL;
@@ -261,8 +268,8 @@ QResultClass *SendQueryGetResult(StatementClass *stmt, BOOL commit) {
 
     BOOL success =
         commit
-            ? CC_from_ESResult(res, conn, res->cursor_name, *es_res)
-            : CC_Metadata_from_ESResult(res, conn, res->cursor_name, *es_res);
+            ? CC_from_ESResult(res, cc, res->cursor_name, *es_res)
+            : CC_Metadata_from_ESResult(res, cc, res->cursor_name, *es_res);
 
     // Convert result to QResultClass
     if (!success) {

@@ -196,7 +196,7 @@ RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
             break;
 
         case SQL_DBMS_VER: /* ODBC 1.0 */
-            STRCPY_FIXED(tmp, conn->es_version);
+            STRCPY_FIXED(tmp, conn->version);
             p = tmp;
             break;
 
@@ -356,6 +356,7 @@ RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
 
         case SQL_MAX_TABLE_NAME_LEN: /* ODBC 1.0 */
             len = 2;
+            // TO-DO
             if (ES_VERSION_GT(conn, 7.4))
                 value = CC_get_max_idlen(conn);
 #ifdef MAX_TABLE_LEN

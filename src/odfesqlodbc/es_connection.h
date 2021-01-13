@@ -188,15 +188,15 @@ typedef enum {
  *		3rd parameter: minor version number
  */
 #define SERVER_VERSION_GT(conn, major, minor) \
-    ((conn)->es_version_major > major         \
-     || ((conn)->es_version_major == major    \
-         && (conn)->es_version_minor > minor))
+    ((conn)->version_major > major         \
+     || ((conn)->version_major == major    \
+         && (conn)->version_minor > minor))
 #define SERVER_VERSION_GE(conn, major, minor) \
-    ((conn)->es_version_major > major         \
-     || ((conn)->es_version_major == major    \
-         && (conn)->es_version_minor >= minor))
+    ((conn)->version_major > major         \
+     || ((conn)->version_major == major    \
+         && (conn)->version_minor >= minor))
 #define SERVER_VERSION_EQ(conn, major, minor) \
-    ((conn)->es_version_major == major && (conn)->es_version_minor == minor)
+    ((conn)->version_major == major && (conn)->version_minor == minor)
 #define STRING_AFTER_DOT(string) (strchr(#string, '.') + 1)
 
 /*
@@ -271,7 +271,7 @@ struct ConnectionClass_ {
     StatementClass **stmts;
     Int2 num_stmts;
     Int2 ncursors;
-    void *esconn;
+    void *conn;
     Int4 lobj_type;
     Int2 coli_allocated;
     Int2 ntables;
@@ -282,12 +282,12 @@ struct ConnectionClass_ {
     DriverToDataSourceProc DriverToDataSource;
     char transact_status;             /* Is a transaction is currently
                                        * in progress */
-    char cluster_name[MAX_INFO_STRING];
-    char es_version[MAX_INFO_STRING]; /* Version of Elasticsearch driver
-                                       * we're connected to -
-                                       * DJP 25-1-2001 */
-    Int2 es_version_major;
-    Int2 es_version_minor;
+    char version[MAX_INFO_STRING];    /* Version of AWS sdk
+                                       * we're using "1.7.329"
+                                       */
+    Int2 version_major;
+    Int2 version_minor;
+    Int2 version_patch;
     char ms_jet;
     char unicode;
     char result_uncommitted;
@@ -409,11 +409,10 @@ int eatTableIdentifiers(const UCHAR *str, int ccsc, esNAME *table,
                         esNAME *schema);
 
 char CC_connect(ConnectionClass *self);
-int LIBES_connect(ConnectionClass *self);
-void LIBES_disconnect(void *conn);
+void LIB_disconnect(void *conn);
 int CC_send_client_encoding(ConnectionClass *self, const char *encoding);
 void CC_set_locale_encoding(ConnectionClass *self, const char *encoding);
-void CC_initialize_es_version(ConnectionClass *self);
+void CC_initialize_version(ConnectionClass *self);
 
 const char *CurrCat(const ConnectionClass *self);
 const char *CurrCatString(const ConnectionClass *self);
