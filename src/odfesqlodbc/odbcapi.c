@@ -240,7 +240,7 @@ RETCODE SQL_API SQLDisconnect(HDBC ConnectionHandle) {
 #endif /* _HANDLE_ENLIST_IN_DTC_ */
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
-    ret = ESAPI_Disconnect(ConnectionHandle);
+    ret = API_Disconnect(ConnectionHandle);
     LEAVE_CONN_CS(conn);
     return ret;
 }

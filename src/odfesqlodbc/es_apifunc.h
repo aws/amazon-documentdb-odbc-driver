@@ -61,7 +61,7 @@ RETCODE SQL_API ESAPI_DescribeCol(
     HSTMT StatementHandle, SQLUSMALLINT ColumnNumber, SQLCHAR *ColumnName,
     SQLSMALLINT BufferLength, SQLSMALLINT *NameLength, SQLSMALLINT *DataType,
     SQLULEN *ColumnSize, SQLSMALLINT *DecimalDigits, SQLSMALLINT *Nullable);
-RETCODE SQL_API ESAPI_Disconnect(HDBC ConnectionHandle);
+RETCODE SQL_API API_Disconnect(HDBC ConnectionHandle);
 /* Helper functions for Error handling */
 RETCODE SQL_API ESAPI_EnvError(HENV EnvironmentHandle, SQLSMALLINT RecNumber,
                                SQLCHAR *Sqlstate, SQLINTEGER *NativeError,
