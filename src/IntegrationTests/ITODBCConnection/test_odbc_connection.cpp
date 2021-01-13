@@ -37,7 +37,7 @@ std::wstring pass = L"<secretkey>";
 std::wstring wrong = L"wrong";
 
 // SQLDriverConnect constants
-std::wstring dsn_conn_string = L"DSN=test_dsn";
+std::wstring dsn_conn_string = L"DSN=timestream";
 
 class TestSQLConnect : public testing::Test {
    public:
@@ -101,41 +101,35 @@ TEST_F(TestSQLConnect, WrongDSN) {
     EXPECT_EQ(SQL_ERROR, ret);
 }
 
-//class TestSQLDriverConnect : public testing::Test {
-//   public:
-//    TestSQLDriverConnect() {
-//    }
-//
-//    void SetUp() {
-//        AllocConnection(&m_env, &m_conn, true, true);
-//    }
-//
-//    void TearDown() {
-//        if (SQL_NULL_HDBC != m_conn) {
-//            SQLFreeHandle(SQL_HANDLE_DBC, m_conn);
-//            SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-//        }
-//    }
-//
-//    ~TestSQLDriverConnect() {
-//        // cleanup any pending stuff, but no exceptions allowed
-//    }
-//
-//    SQLHENV m_env = SQL_NULL_HENV;
-//    SQLHDBC m_conn = SQL_NULL_HDBC;
-//    SQLTCHAR m_out_conn_string[1024];
-//    SQLSMALLINT m_out_conn_string_length;
-//};
-//
-//TEST_F(TestSQLDriverConnect, DSNConnectionString) {
-//    SQLRETURN ret = SQLDriverConnect(
-//        m_conn, NULL, (SQLTCHAR*)dsn_conn_string.c_str(), SQL_NTS,
-//        m_out_conn_string, IT_SIZEOF(m_out_conn_string),
-//        &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
-//
-//    EXPECT_EQ(SQL_SUCCESS, ret);
-//}
-//
+class TestSQLDriverConnect : public testing::Test {
+   public:
+    void SetUp() {
+        AllocConnection(&m_env, &m_conn, true, true);
+    }
+
+    void TearDown() {
+        if (SQL_NULL_HDBC != m_conn) {
+            SQLFreeHandle(SQL_HANDLE_DBC, m_conn);
+            SQLFreeHandle(SQL_HANDLE_ENV, m_env);
+        }
+    }
+
+    SQLHENV m_env = SQL_NULL_HENV;
+    SQLHDBC m_conn = SQL_NULL_HDBC;
+    SQLTCHAR m_out_conn_string[1024];
+    SQLSMALLINT m_out_conn_string_length;
+};
+
+TEST_F(TestSQLDriverConnect, DSNConnectionString) {
+    SQLRETURN ret = SQLDriverConnect(
+        m_conn, NULL, (SQLTCHAR*)dsn_conn_string.c_str(), SQL_NTS,
+        m_out_conn_string, IT_SIZEOF(m_out_conn_string),
+        &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
+
+    EXPECT_EQ(SQL_SUCCESS, ret);
+}
+
+// TODO: enable after aligning the connection string
 //TEST_F(TestSQLDriverConnect, SqlDriverPrompt) {
 //    SQLRETURN ret =
 //        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)conn_string.c_str(), SQL_NTS,
@@ -144,7 +138,7 @@ TEST_F(TestSQLConnect, WrongDSN) {
 //
 //    EXPECT_EQ(SQL_SUCCESS, ret);
 //}
-//
+
 //TEST_F(TestSQLDriverConnect, SqlDriverComplete) {
 //    SQLRETURN ret =
 //        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)conn_string.c_str(), SQL_NTS,
