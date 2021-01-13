@@ -75,7 +75,7 @@ void* LIB_connect(ConnectionClass *self) {
         throw std::runtime_error("Communication is nullptr.");
     }
     // Set sdk version
-    std::string version = GetVersion(self->conn);
+    std::string version = GetVersion(conn);
     STRCPY_FIXED(self->version, version.c_str());
 
     return conn;
