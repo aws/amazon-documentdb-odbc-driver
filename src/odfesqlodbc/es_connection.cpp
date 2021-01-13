@@ -36,7 +36,7 @@
 
 #include <map>
 #include <string>
-
+#include <stdexcept>
 #include "dlg_specific.h"
 #include "environ.h"
 #include "es_apifunc.h"
@@ -50,97 +50,73 @@
 
 void CC_determine_locale_encoding(ConnectionClass *self);
 
-char CC_connect(ConnectionClass *self) {
-    if (self == NULL)
-        return 0;
-
-    // Attempt to connect to ES
-    int conn_code = LIBES_connect(self);
-    if (conn_code <= 0)
-        return static_cast< char >(conn_code);
-
-    // Set encodings
-    CC_determine_locale_encoding(self);
-#ifdef UNICODE_SUPPORT
-    if (CC_is_in_unicode_driver(self)) {
-        if (!SQL_SUCCEEDED(CC_send_client_encoding(self, "UTF8"))) {
-            return 0;
-        }
-    } else
-#endif
-    {
-        if (!SQL_SUCCEEDED(
-                CC_send_client_encoding(self, self->locale_encoding))) {
-            return 0;
-        }
+void* LIB_connect(ConnectionClass *self) {
+    if (self == nullptr) {
+        throw std::invalid_argument("ConnectionClass is nullptr.");
     }
-
-    // Set cursor parameters based on connection info
-    self->status = CONN_CONNECTED;
-    if ((CC_is_in_unicode_driver(self)) && (CC_is_in_ansi_app(self)))
-        self->unicode |= CONN_DISALLOW_WCHAR;
-
-    // 1 is SQL_SUCCESS and 2 is SQL_SCCUESS_WITH_INFO
-    return 1;
-}
-
-int LIBES_connect(ConnectionClass *self) {
-    if (self == NULL)
-        return 0;
-
     // Setup options
     runtime_options rt_opts;
-
     // Connection
     rt_opts.conn.server.assign(self->connInfo.server);
     rt_opts.conn.port.assign(self->connInfo.port);
     rt_opts.conn.timeout.assign(self->connInfo.response_timeout);
-
     // Authentication
     rt_opts.auth.auth_type.assign(self->connInfo.authtype);
     rt_opts.auth.username.assign(self->connInfo.username);
     rt_opts.auth.password.assign(SAFE_NAME(self->connInfo.password));
     rt_opts.auth.token.assign(self->connInfo.token);
     rt_opts.auth.region.assign(self->connInfo.region);
-
     // Encryption
     rt_opts.crypt.verify_server = (self->connInfo.verify_server == 1);
     rt_opts.crypt.use_ssl = (self->connInfo.use_ssl == 1);
 
-    auto conn = ConnectDBParams(rt_opts);
+    auto conn = static_cast< void * >(ConnectDBParams(rt_opts));
     if (conn == nullptr) {
-        std::string err = GetErrorMsg(conn);
-        CC_set_error(self, CONN_OPENDB_ERROR,
-                     (err.empty()) ? "ConnectDBParams error" : err.c_str(),
-                     "LIBES_connect");
+        throw std::runtime_error("Communication is nullptr.");
+    }
+    // Set sdk version
+    std::string version = GetVersion(conn);
+    STRCPY_FIXED(self->version, version.c_str());
+
+    return conn;
+}
+
+char CC_connect(ConnectionClass *self) {
+    try {
+        if (self == nullptr)
+            throw std::invalid_argument("ConnectionClass is nullptr");
+
+        // Attempt to connect
+        self->conn = LIB_connect(self);
+
+        // Set encodings
+        CC_determine_locale_encoding(self);
+#ifdef UNICODE_SUPPORT
+        if (CC_is_in_unicode_driver(self)) {
+            if (!SQL_SUCCEEDED(CC_send_client_encoding(self, "UTF8"))) {
+                throw std::runtime_error("Cannot set UTF8 as client encoding");
+            }
+        } else
+#endif
+        {
+            if (!SQL_SUCCEEDED(
+                    CC_send_client_encoding(self, self->locale_encoding))) {
+                throw std::runtime_error("Cannot set " + std::string(self->locale_encoding)
+                                         + " as client encoding");
+            }
+        }
+
+        // Set cursor parameters based on connection info
+        self->status = CONN_CONNECTED;
+        if ((CC_is_in_unicode_driver(self)) && (CC_is_in_ansi_app(self)))
+            self->unicode |= CONN_DISALLOW_WCHAR;
+
+        // 1 is SQL_SUCCESS and 2 is SQL_SCCUESS_WITH_INFO
+        return 1;
+    } catch (const std::exception& e) {
+        CC_set_error(self, CONN_OPENDB_ERROR, e.what(), "CC_connect");
         return 0;
     }
-
-    // Check connection status
-    if (Status(conn) != CONNECTION_OK) {
-        std::string msg = GetErrorMsg(conn);
-        char error_message_out[ERROR_BUFF_SIZE] = "";
-        if (!msg.empty())
-            SPRINTF_FIXED(error_message_out, "Connection error: %s",
-                          msg.c_str());
-        else
-            STRCPY_FIXED(error_message_out,
-                         "Connection error: No message available.");
-        CC_set_error(self, CONN_OPENDB_ERROR, error_message_out,
-                     "LIBES_connect");
-        Disconnect(conn);
-        return 0;
-    }
-
-    // Set server version
-    std::string server_version = GetServerVersion(conn);
-    STRCPY_FIXED(self->es_version, server_version.c_str());
-
-    std::string cluster_name = GetClusterName(conn);
-    STRCPY_FIXED(self->cluster_name, cluster_name.c_str());
-
-    self->esconn = (void *)conn;
-    return 1;
 }
 
 // TODO #36 - When we fix encoding, we should look into returning a code here.
@@ -173,9 +149,9 @@ int CC_send_client_encoding(ConnectionClass *self, const char *encoding) {
 
     // Update client encoding
     std::string des_db_encoding(encoding);
-    std::string cur_db_encoding = GetClientEncoding(self->esconn);
+    std::string cur_db_encoding = GetClientEncoding(self->conn);
     if (des_db_encoding != cur_db_encoding) {
-        if (!SetClientEncoding(self->esconn, des_db_encoding)) {
+        if (!SetClientEncoding(self->conn, des_db_encoding)) {
             return SQL_ERROR;
         }
     }
@@ -191,12 +167,13 @@ int CC_send_client_encoding(ConnectionClass *self, const char *encoding) {
     return SQL_SUCCESS;
 }
 
-void CC_initialize_es_version(ConnectionClass *self) {
-    STRCPY_FIXED(self->es_version, "7.4");
-    self->es_version_major = 7;
-    self->es_version_minor = 4;
+void CC_initialize_version(ConnectionClass *self) {
+    STRCPY_FIXED(self->version, "1.7.329");
+    self->version_major = 1;
+    self->version_minor = 7;
+    self->version_patch = 329;
 }
 
-void LIBES_disconnect(void *conn) {
+void LIB_disconnect(void *conn) {
     Disconnect(conn);
 }

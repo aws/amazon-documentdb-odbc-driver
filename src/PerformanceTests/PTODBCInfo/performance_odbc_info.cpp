@@ -79,8 +79,7 @@ runtime_options rt_opts = []() {
 void GetVersionInfoString(std::string& version_info) {
     // Connect to DB
     TSCommunication comm;
-    comm.ConnectionOptions(rt_opts);
-    ASSERT_TRUE(comm.ConnectDBStart());
+    ASSERT_TRUE(comm.Setup(rt_opts));
 
     // Issue request
     std::string endpoint, content_type, query, fetch_size;

@@ -22,50 +22,30 @@
 
 #include "ts_communication.h"
 
-void* ConnectDBParams(runtime_options& rt_opts) {
+void* ConnectDBParams(const runtime_options& rt_opts) {
     auto conn = new TSCommunication();
-
-    if (!conn)
-        return nullptr;
-
-    // Set user defined connection options
-    if (!conn->ConnectionOptions(rt_opts))
-        return conn;
-
-    // Connect to DB
-    if (!conn->ConnectDBStart())
-        return conn;
-
-    // Technically this is always the result, so we could remove the above or
-    // make 1 large if statement, but I think this is more legible
+    if (conn != nullptr) {
+        try {
+            conn->Setup(rt_opts);
+        } catch (std::exception& e) {
+            Disconnect(conn);
+            // Propagate exceptions
+            throw e;
+        }
+    }
     return conn;
 }
 
-ConnStatusType Status(void* conn) {
+ConnStatusType GetStatus(void* conn) {
     return conn
-               ? static_cast< Communication* >(conn)->GetConnectionStatus()
+               ? static_cast< Communication* >(conn)->GetStatus()
                : ConnStatusType::CONNECTION_BAD;
 }
 
-std::string GetErrorMsg(void* conn) {
-    return conn ? static_cast< Communication* >(conn)->GetErrorMessage()
-                   : NULL;
-}
-
-ConnErrorType GetErrorType(void* conn) {
-    return conn ? static_cast< Communication* >(conn)->GetErrorType()
-                   : ConnErrorType::CONN_ERROR_SUCCESS;
-}
-
-std::string GetServerVersion(void* conn) {
+std::string GetVersion(void* conn) {
     return conn
-               ? static_cast< Communication* >(conn)->GetServerVersion()
-               : "";
-}
-
-std::string GetClusterName(void* conn) {
-    return conn ? static_cast< Communication* >(conn)->GetClusterName()
-                   : "";
+               ? static_cast< Communication* >(conn)->GetVersion()
+               : "1.7.329";
 }
 
 int ESExecDirect(void* conn, const char* statement, const char* fetch_size) {

@@ -88,13 +88,13 @@ RETCODE SQL_API ESAPI_AllocConnect(HENV henv, HDBC *phdbc) {
     return SQL_SUCCESS;
 }
 
-RETCODE SQL_API ESAPI_Connect(HDBC hdbc, const SQLCHAR *szDSN,
+RETCODE SQL_API API_Connect(HDBC hdbc, const SQLCHAR *szDSN,
                               SQLSMALLINT cbDSN, const SQLCHAR *szUID,
                               SQLSMALLINT cbUID, const SQLCHAR *szAuthStr,
                               SQLSMALLINT cbAuthStr) {
     ConnectionClass *conn = (ConnectionClass *)hdbc;
     ConnInfo *ci;
-    CSTR func = "ESAPI_Connect";
+    CSTR func = "API_Connect";
     RETCODE ret = SQL_SUCCESS;
     char fchar, *tmpstr;
 
@@ -114,8 +114,8 @@ RETCODE SQL_API ESAPI_Connect(HDBC hdbc, const SQLCHAR *szDSN,
     getDSNinfo(ci, NULL);
 
     logs_on_off(1, ci->drivers.loglevel, ci->drivers.loglevel);
-    /* initialize es_version from connInfo.protocol    */
-    CC_initialize_es_version(conn);
+    /* initialize version from connInfo.protocol    */
+    CC_initialize_version(conn);
 
     /*
      * override values from DSN info with UID and authStr(pwd) This only
@@ -166,9 +166,9 @@ RETCODE SQL_API ESAPI_BrowseConnect(HDBC hdbc, const SQLCHAR *szConnStrIn,
 }
 
 /* Drop any hstmts open on hdbc and disconnect from database */
-RETCODE SQL_API ESAPI_Disconnect(HDBC hdbc) {
+RETCODE SQL_API API_Disconnect(HDBC hdbc) {
     ConnectionClass *conn = (ConnectionClass *)hdbc;
-    CSTR func = "ESAPI_Disconnect";
+    CSTR func = "API_Disconnect";
     RETCODE ret = SQL_SUCCESS;
 
     MYLOG(ES_TRACE, "entering...\n");
@@ -416,16 +416,16 @@ CC_cleanup(ConnectionClass *self, BOOL keepCommunication) {
     /* Cancel an ongoing transaction */
     /* We are always in the middle of a transaction, */
     /* even if we are in auto commit. */
-    if (self->esconn) {
-        QLOG(0, "LIBES_disconnect: %p\n", self->esconn);
-        LIBES_disconnect(self->esconn);
-        self->esconn = NULL;
+    if (self->conn) {
+        QLOG(0, "LIB_disconnect: %p\n", self->conn);
+        LIB_disconnect(self->conn);
+        self->conn = NULL;
     } else {
         ret = SQL_ERROR;
         CC_set_error(self, CC_not_connected(self), "Connection not open", func);
     }
 
-    MYLOG(ES_DEBUG, "after LIBES_disconnect\n");
+    MYLOG(ES_DEBUG, "after LIB_disconnect\n");
 
     /* Free all the stmts on this connection */
     for (i = 0; i < self->num_stmts; i++) {
@@ -646,7 +646,7 @@ void CC_log_error(const char *func, const char *desc,
               "            henv=%p, conn=%p, status=%u, num_stmts=%d\n",
               self->henv, self, self->status, self->num_stmts);
         MYLOG(ES_ERROR, "            esconn=%p, stmts=%p, lobj_type=%d\n",
-              self->esconn, self->stmts, self->lobj_type);
+              self->conn, self->stmts, self->lobj_type);
     } else {
         MYLOG(ES_ERROR, "INVALID CONNECTION HANDLE ERROR: func=%s, desc='%s'\n",
               func, desc);
