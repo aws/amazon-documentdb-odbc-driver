@@ -237,7 +237,7 @@ bool TSCommunication::Connect(const runtime_options& options) {
     }
     
     if (m_client == nullptr) {
-        throw std::runtime_error("Unable create TimestreamQueryClient.");
+        throw std::runtime_error("Unable to create TimestreamQueryClient.");
     }
 
     Aws::TimestreamQuery::Model::QueryRequest req;
