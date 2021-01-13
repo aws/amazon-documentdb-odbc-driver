@@ -82,6 +82,7 @@ TEST(TestConnectionOptions, Timeout_is_alpha) {
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
 
+// TODO: enable gmock and mock the response from timestream
 //class TestTSConnConnectDBStart : public testing::Test {
 //   protected:
 //    void SetUp() override {
