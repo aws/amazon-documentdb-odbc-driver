@@ -28,9 +28,9 @@ void* ConnectDBParams(const runtime_options& rt_opts) {
     return conn;
 }
 
-ConnStatusType Status(void* conn) {
+ConnStatusType GetStatus(void* conn) {
     return conn
-               ? static_cast< Communication* >(conn)->Status()
+               ? static_cast< Communication* >(conn)->GetStatus()
                : ConnStatusType::CONNECTION_BAD;
 }
 

@@ -46,7 +46,7 @@ bool Communication::Setup(const runtime_options& options) {
     return false;
 }
 
-ConnStatusType Communication::Status() {
+ConnStatusType Communication::GetStatus() {
     return m_status;
 }
 

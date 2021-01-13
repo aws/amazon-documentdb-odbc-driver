@@ -50,7 +50,7 @@
 
 void CC_determine_locale_encoding(ConnectionClass *self);
 
-int LIB_connect(ConnectionClass *self) {
+void* LIB_connect(ConnectionClass *self) {
     if (self == nullptr) {
         throw std::invalid_argument("ConnectionClass is nullptr.");
     }
@@ -74,12 +74,11 @@ int LIB_connect(ConnectionClass *self) {
     if (conn == nullptr) {
         throw std::runtime_error("Communication is nullptr.");
     }
-    // Set connection
-    self->conn = conn;
     // Set sdk version
     std::string version = GetVersion(self->conn);
     STRCPY_FIXED(self->version, version.c_str());
-    return 1;
+
+    return conn;
 }
 
 char CC_connect(ConnectionClass *self) {
@@ -88,9 +87,7 @@ char CC_connect(ConnectionClass *self) {
             throw std::invalid_argument("ConnectionClass is nullptr");
 
         // Attempt to connect
-        auto conn_code = LIB_connect(self);
-        if (conn_code <= 0)
-            return static_cast< char >(conn_code);
+        self->conn = LIB_connect(self);
 
         // Set encodings
         CC_determine_locale_encoding(self);
