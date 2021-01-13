@@ -30,10 +30,10 @@
 #include "statement.h"
 
 BOOL SC_connection_lost_check(StatementClass *stmt, const char *funcname) {
-    ConnectionClass *conn = SC_get_conn(stmt);
+    ConnectionClass *cc = SC_get_conn(stmt);
     char message[64];
 
-    if (NULL != conn->esconn)
+    if (NULL != cc->conn)
         return FALSE;
     SC_clear_error(stmt);
     SPRINTF_FIXED(message, "%s unable due to the connection lost", funcname);
@@ -157,7 +157,7 @@ RETCODE SQL_API SQLConnect(HDBC ConnectionHandle, SQLCHAR *ServerName,
     MYLOG(ES_TRACE, "entering\n");
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
-    ret = ESAPI_Connect(ConnectionHandle, ServerName, NameLength1, UserName,
+    ret = API_Connect(ConnectionHandle, ServerName, NameLength1, UserName,
                         NameLength2, Authentication, NameLength3);
     LEAVE_CONN_CS(conn);
     return ret;
@@ -240,7 +240,7 @@ RETCODE SQL_API SQLDisconnect(HDBC ConnectionHandle) {
 #endif /* _HANDLE_ENLIST_IN_DTC_ */
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
-    ret = ESAPI_Disconnect(ConnectionHandle);
+    ret = API_Disconnect(ConnectionHandle);
     LEAVE_CONN_CS(conn);
     return ret;
 }
