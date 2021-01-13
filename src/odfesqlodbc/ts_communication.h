@@ -34,26 +34,27 @@
 #endif // __APPLE__
 // clang-format on
 
-
 /**
  * AWS Timestream communication class
  */
 class TSCommunication : public Communication {
    public:
     /**
-     * Default constructor
-     */
-    TSCommunication();
-    /**
-     * Setup connection options
-     * @param rt_opts runtime_options&
+     * Validate options
+     * @param options const runtime_options&
      * @return bool
      */
-    virtual bool ConnectionOptions(runtime_options& rt_opts) override;
+    virtual bool Validate(const runtime_options& options) override;
     /**
-     * Drop database connection
+     * Connect
+     * @param options const runtime_options&
+     * @return bool
      */
-    virtual void DropDBConnection() override;
+    virtual bool Connect(const runtime_options& options) override;
+    /**
+     * Disconnect
+     */
+    virtual void Disconnect() override;
     /**
      * Execute query
      * @param query const char*
@@ -61,6 +62,12 @@ class TSCommunication : public Communication {
      * @return int
      */
     virtual int ExecDirect(const char* query, const char* fetch_size) override;
+    /**
+     * Get version
+     * @return std::string
+     */
+    virtual std::string GetVersion() override;
+
     /**
      * Get columns using select query
      * @param table_name const std::string&
@@ -73,16 +80,6 @@ class TSCommunication : public Communication {
      * @return std::string
      */
     virtual std::string GetErrorPrefix() override;
-    /**
-     * Get server version
-     * @return std::string
-     */
-    virtual std::string GetServerVersion() override;
-    /**
-     * Get cluster name
-     * @return std::string
-     */
-    virtual std::string GetClusterName() override;
     /**
      * Pop result
      * @return ESResult*
@@ -123,26 +120,7 @@ class TSCommunication : public Communication {
     virtual void AwsHttpResponseToString(
         std::shared_ptr< Aws::Http::HttpResponse > response,
         std::string& output) override;
-   protected:
-    /**
-     * Validate connection options
-     * @return bool
-     */
-    virtual bool CheckConnectionOptions() override;
-    /**
-     * Estabilish connection
-     * @return bool
-     */
-    virtual bool EstablishConnection() override;
-    /**
-     * Initialize connection
-     */
-    void InitializeConnection();
 private:
-    /**
-     * Runtime options
-     */
-    runtime_options m_rt_opts;
     /**
      * Timestream query client
      */

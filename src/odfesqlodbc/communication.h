@@ -55,15 +55,21 @@ class Communication {
      */
     virtual ~Communication();
     /**
-     * Setup connection options
-     * @param rt_opts runtime_options&
+     * Validate options
+     * @param options const runtime_options&
      * @return bool
      */
-    virtual bool ConnectionOptions(runtime_options& rt_opts) = 0;
+    virtual bool Validate(const runtime_options& options) = 0;
     /**
-     * Drop database connection
+     * Connect
+     * @param options const runtime_options&
+     * @return bool
      */
-    virtual void DropDBConnection() = 0;
+    virtual bool Connect(const runtime_options& options) = 0;
+    /**
+     * Disconnect
+     */
+    virtual void Disconnect() = 0;
     /**
      * Execute query
      * @param query const char*
@@ -71,6 +77,20 @@ class Communication {
      * @return int
      */
     virtual int ExecDirect(const char* query, const char* fetch_size) = 0;
+    /**
+     * Get version
+     * @return std::string
+     */
+    virtual std::string GetVersion() = 0;
+    /**
+     * Setup
+     * @param options const runtime_options&
+     * @return bool
+     */
+    virtual bool Setup(const runtime_options& options);
+
+
+    // Pending for refactor
     /**
      * Get columns using select query
      * @param table_name const std::string&
@@ -83,16 +103,6 @@ class Communication {
      * @return std::string
      */
     virtual std::string GetErrorPrefix() = 0;
-    /**
-     * Get server version
-     * @return std::string
-     */
-    virtual std::string GetServerVersion() = 0;
-    /**
-     * Get cluster name
-     * @return std::string
-     */
-    virtual std::string GetClusterName() = 0;
     /**
      * Pop result
      * @return ESResult*
@@ -151,70 +161,15 @@ class Communication {
      */
     void LogMsg(ESLogLevel level, const char* msg);
     /**
-     * Get error message
-     * @return std::string
-     */
-    virtual std::string GetErrorMessage();
-    /**
-     * Get error type
-     * @return ConnErrorType
-     */
-    virtual ConnErrorType GetErrorType();
-    /**
-     * Connect database
-     * @return bool
-     */
-    virtual bool ConnectDBStart();
-    /**
      * Get connection status
      * @return ConnStatusType
      */
-    ConnStatusType GetConnectionStatus();
+    ConnStatusType GetStatus();
    protected:
-    /**
-     * Validate connection options
-     * @return bool
-     */
-    virtual bool CheckConnectionOptions() = 0;
-    /**
-     * Estabilish connection
-     * @return bool
-     */
-    virtual bool EstablishConnection() = 0;
-    /**
-     * Set error details
-     * @param reason const std::string&
-     * @param message const std::string&
-     * @param error_type ConnectErrorType
-     */
-    virtual void SetErrorDetails(const std::string& reason, const std::string& message,
-                         ConnErrorType error_type);
-    /**
-     * Set error details
-     * @param details ErrorDetails
-     */
-    virtual void SetErrorDetails(ErrorDetails details);
-
-    /**
-     * Latest error message
-     */
-    std::string m_error_message;
-    /**
-     * Latest error details
-     */
-    std::shared_ptr< ErrorDetails > m_error_details;
     /**
      * Connection status
      */
     ConnStatusType m_status;
-    /**
-     * Connection error type
-     */
-    ConnErrorType m_error_type;
-    /**
-     * Flag to indicate a valid connection options
-     */
-    bool m_is_valid_connection_options;
     /**
      * Current client encoding
      */
@@ -222,7 +177,7 @@ class Communication {
     /**
      * AWS sdk options
      */
-    Aws::SDKOptions m_options;
+    Aws::SDKOptions m_sdk_options;
 };
 
 #endif

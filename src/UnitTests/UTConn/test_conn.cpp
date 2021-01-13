@@ -20,100 +20,131 @@
 #include "ts_communication.h"
 // clang-format on
 
-const std::string valid_host = (use_ssl ? "https://localhost" : "localhost");
-const std::string valid_port = "9200";
-const std::string valid_user = "admin";
-const std::string valid_pw = "admin";
-const std::string valid_region = "us-west-3";
-const std::string invalid_host = "10.1.1.189";
-const std::string invalid_port = "920";
-const std::string invalid_user = "amin";
-const std::string invalid_pw = "amin";
-const std::string invalid_region = "bad-region";
-runtime_options valid_opt_val = {{valid_host, valid_port, "1", "0"},
-                                 {"BASIC", valid_user, valid_pw, "", valid_region},
-                                 {use_ssl, false, "", "", "", ""}};
-runtime_options invalid_opt_val = {
-    {invalid_host, invalid_port, "1", "0"},
-    {"BASIC", invalid_user, invalid_pw, "", valid_region},
-    {use_ssl, false, "", "", "", ""}};
-runtime_options missing_opt_val = {{"", "", "1", "0"},
-                                   {"BASIC", "", invalid_pw, "", valid_region},
-                                   {use_ssl, false, "", "", "", ""}};
+TEST(TestConnectionOptions, Good) {
+    runtime_options options;
+    options.auth.username = "UID";
+    options.auth.password = "PWD";
+    options.auth.region = "Region";
+    options.auth.auth_type = AUTHTYPE_BASIC;
+    TSCommunication conn;    
+    EXPECT_NO_THROW(conn.Validate(options));
+    EXPECT_TRUE(conn.Validate(options));
+}
 
-TEST(TestESConnConnectionOptions, ValidParameters) {
+TEST(TestConnectionOptions, UID_is_empty) {
+    runtime_options options;
+    options.auth.username = "";
+    options.auth.password = "PWD";
+    options.auth.region = "Region";
+    options.auth.auth_type = AUTHTYPE_BASIC;
     TSCommunication conn;
-    EXPECT_EQ(true,
-              conn.ConnectionOptions(valid_opt_val));
+    EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
 
-TEST(TestESConnConnectionOptions, MissingParameters) {
+TEST(TestConnectionOptions, PWD_is_empty) {
+    runtime_options options;
+    options.auth.username = "UID";
+    options.auth.password = "";
+    options.auth.region = "Region";
+    options.auth.auth_type = AUTHTYPE_BASIC;
     TSCommunication conn;
-    EXPECT_EQ(false, conn.ConnectionOptions(missing_opt_val));
+    EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
 
-class TestTSConnConnectDBStart : public testing::Test {
-   protected:
-    void SetUp() override {
-    }
-
-    void TearDown() override {
-        m_conn.DropDBConnection();
-    }
-
-   public:
-    TSCommunication m_conn;
-};
-
-TEST_F(TestTSConnConnectDBStart, ValidParameters) {
-    ASSERT_NE(false, m_conn.ConnectionOptions(valid_opt_val));
-    EXPECT_EQ(true, m_conn.ConnectDBStart());
-    EXPECT_EQ(CONNECTION_OK, m_conn.GetConnectionStatus());
-}
-
-TEST_F(TestTSConnConnectDBStart, InvalidParameters) {
-    ASSERT_TRUE(
-        m_conn.ConnectionOptions(invalid_opt_val));
-    EXPECT_EQ(false, m_conn.ConnectDBStart());
-    EXPECT_EQ(CONNECTION_BAD, m_conn.GetConnectionStatus());
-}
-
-TEST_F(TestTSConnConnectDBStart, MissingParameters) {
-    ASSERT_NE(true, m_conn.ConnectionOptions(missing_opt_val));
-    EXPECT_EQ(false, m_conn.ConnectDBStart());
-    EXPECT_EQ(CONNECTION_BAD, m_conn.GetConnectionStatus());
-}
-
-TEST(TestTSConnDropDBConnection, InvalidParameters) {
+TEST(TestConnectionOptions, Region_is_empty) {
+    runtime_options options;
+    options.auth.username = "UID";
+    options.auth.password = "PWD";
+    options.auth.region = "";
+    options.auth.auth_type = AUTHTYPE_BASIC;
     TSCommunication conn;
-    ASSERT_EQ(CONNECTION_BAD, conn.GetConnectionStatus());
-    ASSERT_TRUE(
-        conn.ConnectionOptions(invalid_opt_val));
-    ASSERT_NE(true, conn.ConnectDBStart());
-    ASSERT_EQ(CONNECTION_BAD, conn.GetConnectionStatus());
-    conn.DropDBConnection();
-    EXPECT_EQ(CONNECTION_BAD, conn.GetConnectionStatus());
+    EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
 
-TEST(TestTSConnDropDBConnection, MissingParameters) {
+TEST(TestConnectionOptions, Auth_type_is_empty) {
+    runtime_options options;
+    options.auth.username = "UID";
+    options.auth.password = "PWD";
+    options.auth.region = "Region";
+    options.auth.auth_type = "";
     TSCommunication conn;
-    ASSERT_EQ(CONNECTION_BAD, conn.GetConnectionStatus());
-    ASSERT_NE(true, conn.ConnectionOptions(missing_opt_val));
-    ASSERT_NE(true, conn.ConnectDBStart());
-    ASSERT_EQ(CONNECTION_BAD, conn.GetConnectionStatus());
-    conn.DropDBConnection();
-    EXPECT_EQ(CONNECTION_BAD, conn.GetConnectionStatus());
+    EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
 
-TEST(TestTSConnDropDBConnection, ValidParameters) {
+TEST(TestConnectionOptions, Timeout_is_alpha) {
+    runtime_options options;
+    options.auth.username = "UID";
+    options.auth.password = "PWD";
+    options.auth.region = "Region";
+    options.auth.auth_type = "";
+    options.conn.timeout = "timeout";
     TSCommunication conn;
-    ASSERT_NE(false,
-              conn.ConnectionOptions(valid_opt_val));
-    ASSERT_NE(false, conn.ConnectDBStart());
-    ASSERT_EQ(CONNECTION_OK, conn.GetConnectionStatus());
-    conn.DropDBConnection();
-    EXPECT_EQ(CONNECTION_BAD, conn.GetConnectionStatus());
+    EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
+
+// TODO: enable gmock and mock the response from timestream
+//class TestTSConnConnectDBStart : public testing::Test {
+//   protected:
+//    void SetUp() override {
+//    }
+//
+//    void TearDown() override {
+//        m_conn.Disconnect();
+//    }
+//
+//   public:
+//    TSCommunication m_conn;
+//};
+//
+//TEST_F(TestTSConnConnectDBStart, ValidParameters) {
+//    ASSERT_NE(false, m_conn.ConnectionOptions(valid_opt_val));
+//    EXPECT_EQ(true, m_conn.ConnectDBStart());
+//    EXPECT_EQ(CONNECTION_OK, m_conn.Status());
+//}
+//
+//TEST_F(TestTSConnConnectDBStart, InvalidParameters) {
+//    ASSERT_TRUE(
+//        m_conn.ConnectionOptions(invalid_opt_val));
+//    EXPECT_EQ(false, m_conn.ConnectDBStart());
+//    EXPECT_EQ(CONNECTION_BAD, m_conn.Status());
+//}
+//
+//TEST_F(TestTSConnConnectDBStart, MissingParameters) {
+//    ASSERT_NE(true, m_conn.ConnectionOptions(missing_opt_val));
+//    EXPECT_EQ(false, m_conn.ConnectDBStart());
+//    EXPECT_EQ(CONNECTION_BAD, m_conn.Status());
+//}
+//
+//TEST(TestTSConnDropDBConnection, InvalidParameters) {
+//    TSCommunication conn;
+//    ASSERT_EQ(CONNECTION_BAD, conn.Status());
+//    ASSERT_TRUE(
+//        conn.ConnectionOptions(invalid_opt_val));
+//    ASSERT_NE(true, conn.ConnectDBStart());
+//    ASSERT_EQ(CONNECTION_BAD, conn.Status());
+//    conn.Disconnect();
+//    EXPECT_EQ(CONNECTION_BAD, conn.Status());
+//}
+//
+//TEST(TestTSConnDropDBConnection, MissingParameters) {
+//    TSCommunication conn;
+//    ASSERT_EQ(CONNECTION_BAD, conn.Status());
+//    ASSERT_NE(true, conn.ConnectionOptions(missing_opt_val));
+//    ASSERT_NE(true, conn.ConnectDBStart());
+//    ASSERT_EQ(CONNECTION_BAD, conn.Status());
+//    conn.Disconnect();
+//    EXPECT_EQ(CONNECTION_BAD, conn.Status());
+//}
+//
+//TEST(TestTSConnDropDBConnection, ValidParameters) {
+//    TSCommunication conn;
+//    ASSERT_NE(false,
+//              conn.ConnectionOptions(valid_opt_val));
+//    ASSERT_NE(false, conn.ConnectDBStart());
+//    ASSERT_EQ(CONNECTION_OK, conn.Status());
+//    conn.Disconnect();
+//    EXPECT_EQ(CONNECTION_BAD, conn.Status());
+//}
 
 int main(int argc, char** argv) {
     testing::internal::CaptureStdout();
