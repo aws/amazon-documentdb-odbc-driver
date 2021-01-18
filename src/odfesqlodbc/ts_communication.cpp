@@ -192,6 +192,7 @@ void TSCommunication::AwsHttpResponseToString(
     */
 // }
 
+
 bool TSCommunication::Validate(const runtime_options& options) {
     if (options.auth.username.empty()) {
         throw std::invalid_argument("UID cannot be empty.");
@@ -269,65 +270,11 @@ std::string TSCommunication::GetVersion() {
 std::string TSCommunication::GetErrorPrefix() {
     return "[Timestream][SQL ODBC Driver] ";
 }
-
 std::shared_ptr< Aws::Http::HttpResponse > TSCommunication::IssueRequest(
-    const std::string& /*endpoint*/, const Aws::Http::HttpMethod /*request_type*/,
+    const std::string& /*endpoint*/,
+    const Aws::Http::HttpMethod /*request_type*/,
     const std::string& /*content_type*/, const std::string& /*query*/,
     const std::string& /*fetch_size*/, const std::string& /*cursor*/) {
-    //// Generate http request
-    //std::shared_ptr< Aws::Http::HttpRequest > request =
-    //    Aws::Http::CreateHttpRequest(
-    //        Aws::String(
-    //            m_rt_opts.conn.server
-    //            + (m_rt_opts.conn.port.empty() ? "" : ":" + m_rt_opts.conn.port)
-    //            + endpoint),
-    //        request_type,
-    //        Aws::Utils::Stream::DefaultResponseStreamFactoryMethod);
-
-    //// Set header type
-    //if (!content_type.empty())
-    //    request->SetHeaderValue(Aws::Http::CONTENT_TYPE_HEADER, ctype);
-
-    //// Set body
-    //if (!query.empty() || !cursor.empty()) {
-    //    rabbit::object body;
-    //    if (!query.empty()) {
-    //        body["query"] = query;
-    //        if (!fetch_size.empty() && fetch_size != "-1")
-    //            body["fetch_size"] = fetch_size;
-    //    } else if (!cursor.empty()) {
-    //        body["cursor"] = cursor;
-    //    }
-    //    std::shared_ptr< Aws::StringStream > aws_ss =
-    //        Aws::MakeShared< Aws::StringStream >("RabbitStream");
-    //    *aws_ss << std::string(body.str());
-    //    request->AddContentBody(aws_ss);
-    //    request->SetContentLength(std::to_string(body.str().size()));
-    //}
-
-    //// Handle authentication
-    //if (m_rt_opts.auth.auth_type == AUTHTYPE_BASIC) {
-    //    std::string userpw_str =
-    //        m_rt_opts.auth.username + ":" + m_rt_opts.auth.password;
-    //    Aws::Utils::Array< unsigned char > userpw_arr(
-    //        reinterpret_cast< const unsigned char* >(userpw_str.c_str()),
-    //        userpw_str.length());
-    //    std::string hashed_userpw =
-    //        Aws::Utils::HashingUtils::Base64Encode(userpw_arr);
-    //    request->SetAuthorization("Basic " + hashed_userpw);
-    //} else if (m_rt_opts.auth.auth_type == AUTHTYPE_IAM) {
-    //    std::shared_ptr< Aws::Auth::ProfileConfigFileAWSCredentialsProvider >
-    //        credential_provider = Aws::MakeShared<
-    //            Aws::Auth::ProfileConfigFileAWSCredentialsProvider >(
-    //            ALLOCATION_TAG.c_str(), ESODBC_PROFILE_NAME.c_str());
-    //    Aws::Client::AWSAuthV4Signer signer(credential_provider,
-    //                                        SERVICE_NAME.c_str(),
-    //                                        m_rt_opts.auth.region.c_str());
-    //    signer.SignRequest(*request);
-    //}
-
-    //// Issue request and return response
-    //return m_http_client->MakeRequest(request);
     return nullptr;
 }
 
@@ -399,7 +346,7 @@ std::vector< std::string > TSCommunication::GetColumnsWithSelectQuery(
     return std::vector< std::string >{};
 }
 
-int TSCommunication::ExecDirect(const char* /*query*/, const char* /*fetch_size_*/) {
+int TSCommunication::ExecDirect(const char* query, const char* fetch_size_) {
     //m_error_details.reset();
     //if (!query) {
     //    m_error_message = "Query is NULL";
@@ -407,7 +354,7 @@ int TSCommunication::ExecDirect(const char* /*query*/, const char* /*fetch_size_
     //                    ConnErrorType::CONN_ERROR_INVALID_NULL_PTR);
     //    LogMsg(ES_ERROR, m_error_message.c_str());
     //    return -1;
-    //} else if (!m_http_client) {
+    //} else if (!m_client) {
     //    m_error_message = "Unable to connect. Please try connecting again.";
     //    SetErrorDetails("Execution error", m_error_message,
     //                    ConnErrorType::CONN_ERROR_COMM_LINK_FAILURE);
@@ -415,82 +362,41 @@ int TSCommunication::ExecDirect(const char* /*query*/, const char* /*fetch_size_
     //    return -1;
     //}
 
-    //// Prepare statement
-    //std::string statement(query);
-    //std::string fetch_size(fetch_size_);
-    //std::string msg = "Attempting to execute a query \"" + statement + "\"";
-    //LogMsg(ES_DEBUG, msg.c_str());
+    // Prepare statement
+    std::string statement(query);
+    std::string size(fetch_size_);
+    std::string msg = "Attempting to execute a query \"" + statement + "\"";
+    LogMsg(ES_DEBUG, msg.c_str());
 
-    //// Issue request
-    //std::shared_ptr< Aws::Http::HttpResponse > response =
-    //    IssueRequest(SQL_ENDPOINT_FORMAT_JDBC, Aws::Http::HttpMethod::HTTP_POST,
-    //                 ctype, statement, fetch_size);
+    // Issue request
+    Aws::TimestreamQuery::Model::QueryRequest request;
+    request.SetQueryString(query);
+    Aws::TimestreamQuery::Model::QueryOutcome outcome = m_client->Query(request);
+    if (outcome.IsSuccess()) {
+    } else {
+        LogMsg(ES_ERROR, outcome.GetError().GetMessage().c_str());
+        return -1;
+    }
 
-    //// Validate response
-    //if (response == nullptr) {
-    //    m_error_message =
-    //        "Failed to receive response from query. "
-    //        "Received NULL response.";
-    //    SetErrorDetails("Execution error", m_error_message,
-    //                    ConnErrorType::CONN_ERROR_QUERY_SYNTAX);
-    //    LogMsg(ES_ERROR, m_error_message.c_str());
-    //    return -1;
-    //}
+    // Add to result queue and return
+    // TODO Need to redesign ESResultQueue, see https://github.com/Bit-Quill/timestream-odbc/pull/9#discussion_r558804240
+    std::unique_ptr< ESResult > result = std::make_unique< ESResult >();
+    result->ts_result = outcome.GetResult();
 
-    //// Convert body from Aws IOStream to string
-    //std::unique_ptr< ESResult > result = std::make_unique< ESResult >();
-    //AwsHttpResponseToString(response, result->result_json);
+    const std::string cursor = result->cursor;
+    while (!m_result_queue.push(QUEUE_TIMEOUT, result.get())) {
+        if (ConnStatusType::CONNECTION_OK == m_status) {
+            return -1;
+        }
+    }
+    result.release();
 
-    //// If response was not valid, set error
-    //if (response->GetResponseCode() != Aws::Http::HttpResponseCode::OK) {
-    //    m_error_type = ConnErrorType::CONN_ERROR_QUERY_SYNTAX;
-    //    m_error_message =
-    //        "Http response code was not OK. Code received: "
-    //        + std::to_string(static_cast< long >(response->GetResponseCode()))
-    //        + ".";
-    //    if (response->HasClientError())
-    //        m_error_message +=
-    //            " Client error: '" + response->GetClientErrorMessage() + "'.";
-    //    if (!result->result_json.empty()) {
-    //        m_error_details = ParseErrorResponse(*result.get());
-    //        m_error_message +=
-    //            " Response error: '" + result->result_json + "'.";
-    //    }
-    //    LogMsg(ES_ERROR, m_error_message.c_str());
-    //    return -1;
-    //}
+    if (!cursor.empty()) {
+        // If the response has a cursor, this thread will retrieve more result
+        // pages asynchronously.
+        std::thread([&, cursor]() { SendCursorQueries(cursor); }).detach();
+    }
 
-    //// Add to result queue and return
-    //try {
-    //    ConstructESResult(*result);
-    //} catch (std::runtime_error& e) {
-    //    m_error_message =
-    //        "Received runtime exception: " + std::string(e.what());
-    //    if (!result->result_json.empty()) {
-    //        m_error_message += " Result body: " + result->result_json;
-    //    }
-    //    SetErrorDetails("Execution error", m_error_message,
-    //                    ConnErrorType::CONN_ERROR_QUERY_SYNTAX);
-    //    LogMsg(ES_ERROR, m_error_message.c_str());
-    //    return -1;
-    //}
-
-    //const std::string cursor = result->cursor;
-    //while (!m_result_queue.push(QUEUE_TIMEOUT, result.get())) {
-    //    if (ConnStatusType::CONNECTION_OK == m_status) {
-    //        return -1;
-    //    }
-    //}
-
-    //result.release();
-
-    //if (!cursor.empty()) {
-    //    // If the response has a cursor, this thread will retrieve more result
-    //    // pages asynchronously.
-    //    std::thread([&, cursor]() { SendCursorQueries(cursor); }).detach();
-    //}
-
-    //return 0;
     return 0;
 }
 
@@ -564,41 +470,27 @@ void TSCommunication::SendCloseCursorRequest(const std::string& /*cursor*/) {
     }*/
 }
 
-void TSCommunication::StopResultRetrieval() {
-    /*m_is_retrieving = false;
-    m_result_queue.clear();*/
-}
-
-// void TSCommunication::ConstructESResult(ESResult& result) {
-    /*GetJsonSchema(result);
-    rabbit::array schema_array = result.es_result_doc["schema"];
-    for (rabbit::array::iterator it = schema_array.begin();
-         it != schema_array.end(); ++it) {
-        std::string column_name = it->at("name").as_string();
-
-        ColumnInfo col_info;
-        col_info.field_name = column_name;
-        col_info.type_oid = KEYWORD_TYPE_OID;
-        col_info.type_size = KEYWORD_TYPE_SIZE;
-        col_info.display_size = KEYWORD_DISPLAY_SIZE;
-        col_info.length_of_str = KEYWORD_TYPE_SIZE;
-        col_info.relation_id = 0;
-        col_info.attribute_number = 0;
-
-        result.column_info.push_back(col_info);
-    }
-    if (result.es_result_doc.has("cursor")) {
-        result.cursor = result.es_result_doc["cursor"].as_string();
-    }
-    result.command_type = "SELECT";
-    result.num_fields = (uint16_t)schema_array.size();*/
+// TODO Need to map Timestream::QueryResult to ESResult
+//void TSCommunication::ConstructESResult(ESResult& result) {
+//    rabbit::array schema_array = result.es_result_doc["schema"];
+//    for (rabbit::array::iterator it = schema_array.begin();
+//         it != schema_array.end(); ++it) {
+//        std::string column_name = it->at("name").as_string();
+//
+//        ColumnInfo col_info;
+//        col_info.field_name = column_name;
+//        col_info.type_oid = KEYWORD_TYPE_OID;
+//        col_info.type_size = KEYWORD_TYPE_SIZE;
+//        col_info.display_size = KEYWORD_DISPLAY_SIZE;
+//        col_info.length_of_str = KEYWORD_TYPE_SIZE;
+//        col_info.relation_id = 0;
+//        col_info.attribute_number = 0;
+//
+//        result.column_info.push_back(col_info);
+//    }
+//    if (result.es_result_doc.has("cursor")) {
+//        result.cursor = result.es_result_doc["cursor"].as_string();
+//    }
+//    result.command_type = "SELECT";
+//    result.num_fields = (uint16_t)schema_array.size();
 // }
-
-ESResult* TSCommunication::PopResult() {
-    /*ESResult* result = NULL;
-    while (!m_result_queue.pop(QUEUE_TIMEOUT, result) && m_is_retrieving) {
-    }
-
-    return result;*/
-    return nullptr;
-}

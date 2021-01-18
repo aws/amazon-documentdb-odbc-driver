@@ -83,6 +83,20 @@ const std::unordered_map< int, std::vector< int > > sql_es_type_map = {
      {ES_TYPE_KEYWORD, ES_TYPE_TEXT, ES_TYPE_NESTED, ES_TYPE_OBJECT}},
     {SQL_TYPE_TIMESTAMP, {ES_TYPE_DATETIME}}};
 
+const std::unordered_map< int, std::vector< int > > sql_ts_type_map = {
+    {SQL_BIT, {TS_TYPE_BOOLEAN}},
+    {SQL_INTEGER, {TS_TYPE_INTEGER}},
+    {SQL_BIGINT, {TS_TYPE_BIGINT}},
+    {SQL_DOUBLE, {TS_TYPE_DOUBLE}},
+    {SQL_WVARCHAR, {TS_TYPE_VARCHAR, TS_TYPE_UNKNOWN}},
+    {SQL_TYPE_DATE, {TS_TYPE_DATE}},
+    {SQL_TYPE_TIME, {TS_TYPE_TIME}},
+    {SQL_TYPE_TIMESTAMP, {TS_TYPE_TIMESTAMP}},
+    {SQL_INTERVAL_YEAR_TO_MONTH, {TS_TYPE_INTERVAL_YEAR_TO_MONTH}},
+    {SQL_INTERVAL_DAY_TO_SECOND, {TS_TYPE_INTERVAL_DAY_TO_SECOND}},
+
+};
+
 const std::unordered_map< std::string, int > data_name_data_type_map = {
     {ES_TYPE_NAME_BOOLEAN, SQL_BIT},
     {ES_TYPE_NAME_BYTE, SQL_TINYINT},
@@ -97,7 +111,20 @@ const std::unordered_map< std::string, int > data_name_data_type_map = {
     {ES_TYPE_NAME_TEXT, SQL_WVARCHAR},
     {ES_TYPE_NAME_DATE, SQL_TYPE_TIMESTAMP},
     {ES_TYPE_NAME_OBJECT, SQL_WVARCHAR},
-    {ES_TYPE_NAME_NESTED, SQL_WVARCHAR}};
+    {ES_TYPE_NAME_NESTED, SQL_WVARCHAR},
+
+    {TS_TYPE_NAME_VARCHAR, SQL_WVARCHAR},
+    {TS_TYPE_NAME_BOOLEAN, SQL_BIT},
+    {TS_TYPE_NAME_BIGINT, SQL_BIGINT},
+    {TS_TYPE_NAME_DOUBLE, SQL_DOUBLE},
+    {TS_TYPE_NAME_TIMESTAMP, SQL_TIMESTAMP},
+    {TS_TYPE_NAME_DATE, SQL_DATE},
+    {TS_TYPE_NAME_TIME, SQL_TIME},
+    {TS_TYPE_NAME_INTERVAL_DAY_TO_SECOND, SQL_INTERVAL_DAY_TO_SECOND},
+    {TS_TYPE_NAME_INTERVAL_YEAR_TO_MONTH, SQL_INTERVAL_YEAR_TO_MONTH},
+    {TS_TYPE_NAME_UNKNOWN, SQL_WVARCHAR},
+    {TS_TYPE_NAME_INTEGER, SQL_INTEGER},
+};
 
 // Boilerplate code for easy column bind handling
 class BindTemplate {

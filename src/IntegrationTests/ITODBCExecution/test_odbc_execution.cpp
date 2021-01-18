@@ -29,7 +29,7 @@
 #include <thread>
 #include <chrono>
 // clang-format on
-
+/*
 class TestSQLExecute : public testing::Test {
    public:
     TestSQLExecute() {
@@ -95,7 +95,7 @@ class TestSQLPrepare : public testing::Test {
     SQLHDBC m_conn = SQL_NULL_HDBC;
     SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
 };
-
+*/
 class TestSQLExecDirect : public testing::Test {
    public:
     TestSQLExecDirect() {
@@ -116,15 +116,15 @@ class TestSQLExecDirect : public testing::Test {
     ~TestSQLExecDirect() {
         // cleanup any pending stuff, but no exceptions allowed
     }
-
+    int m_limit = 10;
     std::wstring m_query =
-        L"SELECT Origin FROM kibana_sample_data_flights LIMIT 5";
+        L"SELECT * FROM test.IoT LIMIT " + std::to_wstring(m_limit);
     SQLHENV m_env = SQL_NULL_HENV;
     SQLHDBC m_conn = SQL_NULL_HDBC;
     SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
 };
 
-class TestSQLSetCursorName : public testing::Test {
+/*class TestSQLSetCursorName : public testing::Test {
    public:
     TestSQLSetCursorName() {
     }
@@ -289,11 +289,18 @@ TEST_F(TestSQLPrepare, NullQueryError) {
     SQLRETURN ret = SQLPrepare(m_hstmt, NULL, SQL_NTS);
     EXPECT_EQ(SQL_ERROR, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-}
+}*/
 
 TEST_F(TestSQLExecDirect, Success) {
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query.c_str(), SQL_NTS);
     EXPECT_EQ(SQL_SUCCESS, ret);
+    int cnt = 0;
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            cnt++;
+        }
+    }
+    EXPECT_EQ(m_limit, cnt);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -302,7 +309,7 @@ TEST_F(TestSQLExecDirect, NullQueryError) {
     EXPECT_EQ(SQL_ERROR, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
-
+/*
 TEST_F(TestSQLSetCursorName, Success) {
     SQLRETURN ret =
         SQLSetCursorName(m_hstmt, (SQLTCHAR*)m_cursor_name.c_str(), SQL_NTS);
@@ -329,7 +336,7 @@ TEST_F(TestSQLGetCursorName, WrongLengthForCursorName) {
 TEST_F(TestSQLCancel, NULLHandle) {
     SQLRETURN ret_exec = SQLCancel(NULL);
     EXPECT_EQ(ret_exec, SQL_INVALID_HANDLE);
-}
+}*/
 
 // This test will fail because we are not cancelling in flight queries at this time. 
 #if 0
@@ -364,7 +371,7 @@ TEST_F(TestSQLCancel, QueryInProgress) {
     EXPECT_EQ(cancel_info.ret_code, SQL_SUCCESS);
 }
 #endif
-
+/*
 TEST_F(TestSQLCancel, QueryNotSent) {
     SQLRETURN ret_exec = SQLCancel(m_hstmt);
     EXPECT_EQ(ret_exec, SQL_SUCCESS);
@@ -378,6 +385,7 @@ TEST_F(TestSQLCancel, QueryFinished) {
     ret_exec = SQLCancel(m_hstmt);
     EXPECT_EQ(ret_exec, SQL_SUCCESS);
 }
+*/
 
 int main(int argc, char** argv) {
 #ifdef __APPLE__

@@ -37,18 +37,19 @@
 #define IT_SIZEOF(x) (NULL == (x) ? 0 : (sizeof((x)) / sizeof((x)[0])))
 
 std::vector< std::pair< std::wstring, std::wstring > > conn_str_pair = {
-    {L"Driver", L"{Elasticsearch ODBC}"},
-    {L"host", (use_ssl ? L"https://localhost" : L"localhost")},
-    {L"port", L"9200"},
-    {L"user", L"admin"},
-    {L"password", L"admin"},
+    {L"Driver", L"timestreamodbc"},
+    //{L"host", (use_ssl ? L"https://localhost" : L"localhost")},
+    //{L"port", L"9200"},
+    {L"user", L"<accesskey>"},
+    {L"password", L"<secretkey>"},
+    {L"region", L"us-east-1"},
     {L"auth", L"BASIC"},
-    {L"useSSL", (use_ssl ? L"1" : L"0")},
+    {L"useSSL", L"1"},
     {L"hostnameVerification", L"0"},
-    {L"logLevel", L"0"},
+    {L"logLevel", L"7"},
     {L"logOutput", L"C:\\"},
     {L"responseTimeout", L"10"},
-    {L"fetchSize", L"0"}};
+    {L"fetchSize", L"-1"}};
 
 std::wstring conn_string = []() {
     std::wstring temp;

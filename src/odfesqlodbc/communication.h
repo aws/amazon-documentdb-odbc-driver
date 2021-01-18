@@ -104,11 +104,6 @@ class Communication {
      */
     virtual std::string GetErrorPrefix() = 0;
     /**
-     * Pop result
-     * @return ESResult*
-     */
-    virtual ESResult* PopResult() = 0;
-    /**
      * Send cursor queries
      * @param cursor const std::string&
      */
@@ -118,10 +113,6 @@ class Communication {
      * @param cursor const std::string&
      */
     virtual void SendCloseCursorRequest(const std::string& cursor) = 0;
-    /**
-     * Stop retrieving results
-     */
-    virtual void StopResultRetrieval() = 0;
     /**
      * Isses a request
      * @param endpoint const std::string&
@@ -155,6 +146,15 @@ class Communication {
      */
     virtual bool SetClientEncoding(const std::string& encoding);
     /**
+     * Stop retrieving results
+     */
+    virtual void StopResultRetrieval();
+    /**
+     * Pop result
+     * @return ESResult*
+     */
+    virtual ESResult* PopResult();
+    /**
      * Log messages
      * @param level ESLogLevel
      * @param msg const char*
@@ -178,6 +178,14 @@ class Communication {
      * AWS sdk options
      */
     Aws::SDKOptions m_sdk_options;
+    /**
+     * Indicates if it's still retrieving from the queue
+     */
+    bool m_is_retrieving;
+    /**
+     * Result set queue
+     */
+    ESResultQueue m_result_queue;
 };
 
 #endif
