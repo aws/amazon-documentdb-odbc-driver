@@ -20,9 +20,9 @@
 #include "dlg_specific.h"
 #include "es_odbc.h"
 #ifdef __cplusplus
+#include <aws/timestream-query/model/QueryResult.h>
 extern "C" {
 #endif
-
 /* the type numbers are defined by the OID's of the types' rows */
 /* in table es_type */
 
@@ -46,6 +46,37 @@ extern "C" {
 #define ES_TYPE_NAME_OBJECT "object"
 #define ES_TYPE_NAME_VARCHAR "varchar"
 #define ES_TYPE_NAME_UNSUPPORTED "unsupported"
+
+#define TS_TYPE_NAME_VARCHAR "VARCHAR"
+#define TS_TYPE_NAME_BOOLEAN "BOOLEAN"
+#define TS_TYPE_NAME_BIGINT "BIGINT"
+#define TS_TYPE_NAME_DOUBLE "DOUBLE"
+#define TS_TYPE_NAME_TIMESTAMP "TIMESTAMP"
+#define TS_TYPE_NAME_DATE "DATE"
+#define TS_TYPE_NAME_TIME "TIME"
+#define TS_TYPE_NAME_INTERVAL_DAY_TO_SECOND "INTERVAL_DAY_TO_SECOND"
+#define TS_TYPE_NAME_INTERVAL_YEAR_TO_MONTH "INTERVAL_TEAR_TO_MONTH"
+#define TS_TYPE_NAME_UNKNOWN "UNKNOWN"
+#define TS_TYPE_NAME_INTEGER "INTEGER"
+#define TS_TYPE_NAME_ARRAY "ARRAY"
+#define TS_TYPE_NAME_ROW "ROW"
+#define TS_TYPE_NAME_TIMESERIES "TIMESERIES"
+
+// TODO Figure out the number
+#define TS_TYPE_VARCHAR 0 
+#define TS_TYPE_BOOLEAN 1
+#define TS_TYPE_BIGINT 2
+#define TS_TYPE_DOUBLE 3
+#define TS_TYPE_TIMESTAMP 4
+#define TS_TYPE_DATE 5
+#define TS_TYPE_TIME 6
+#define TS_TYPE_INTERVAL_DAY_TO_SECOND 7
+#define TS_TYPE_INTERVAL_YEAR_TO_MONTH 8
+#define TS_TYPE_UNKNOWN 9
+#define TS_TYPE_INTEGER 10
+#define TS_TYPE_ARRAY 11
+#define TS_TYPE_ROW 12
+#define TS_TYPE_TIMESERIES 13
 
 #define MS_ACCESS_SERIAL "int identity"
 #define ES_TYPE_BOOL 16
@@ -322,6 +353,7 @@ typedef struct ESResult {
     std::string result_json;
     std::string command_type;  // SELECT / FETCH / etc
     rabbit::document es_result_doc;
+    Aws::TimestreamQuery::Model::QueryResult ts_result;
     ESResult() {
         ref_count = 0;
         num_fields = 0;
