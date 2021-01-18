@@ -22,6 +22,8 @@
 #include <string>
 #include "communication.h"
 #include <aws/timestream-query/TimestreamQueryClient.h>
+#include <aws/timestream-query/model/Type.h>
+#include <aws/timestream-query/model/ScalarType.h>
 
 //Keep rabbit at top otherwise it gives build error because of some variable names like max, min
 #ifdef __APPLE__
@@ -33,6 +35,7 @@
 #pragma clang diagnostic pop
 #endif // __APPLE__
 // clang-format on
+
 
 /**
  * AWS Timestream communication class
@@ -81,11 +84,6 @@ class TSCommunication : public Communication {
      */
     virtual std::string GetErrorPrefix() override;
     /**
-     * Pop result
-     * @return ESResult*
-     */
-    virtual ESResult* PopResult() override;
-    /**
      * Send cursor queries
      * @param cursor const std::string&
      */
@@ -95,10 +93,6 @@ class TSCommunication : public Communication {
      * @param cursor const std::string&
      */
     virtual void SendCloseCursorRequest(const std::string& cursor) override;
-    /**
-     * Stop retrieving results
-     */
-    virtual void StopResultRetrieval() override;
     /**
      * Isses a request
      * @param endpoint const std::string&
@@ -121,6 +115,16 @@ class TSCommunication : public Communication {
         std::shared_ptr< Aws::Http::HttpResponse > response,
         std::string& output) override;
 private:
+    /**
+     * Construct the result set
+     * @param result ESResult&
+     * @return output std::string
+     */
+    void ConstructESResult(ESResult& result);
+    /**
+     * Runtime options
+     */
+    runtime_options m_rt_opts;
     /**
      * Timestream query client
      */

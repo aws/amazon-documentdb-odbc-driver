@@ -23,7 +23,9 @@
 
 Communication::Communication()
     : m_status(ConnStatusType::CONNECTION_BAD),
-      m_client_encoding(m_supported_client_encodings[0]) {
+      m_client_encoding(m_supported_client_encodings[0]),
+      m_is_retrieving(false),
+      m_result_queue(2) {
     LogMsg(ES_ALL, "Initializing AWS API.");
     Aws::InitAPI(m_sdk_options);
 }
@@ -77,4 +79,17 @@ bool Communication::SetClientEncoding(const std::string& encoding) {
     LogMsg(ES_ERROR,
            std::string("Failed to find encoding " + encoding).c_str());
     return false;
+}
+
+void Communication::StopResultRetrieval() {
+    m_is_retrieving = false;
+    m_result_queue.clear();
+}
+
+ESResult* Communication::PopResult() {
+    ESResult* result = nullptr;
+    while (!m_result_queue.pop(QUEUE_TIMEOUT, result) && m_is_retrieving) {
+    }
+
+    return result;
 }

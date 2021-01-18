@@ -41,11 +41,10 @@ bool _CC_Metadata_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
 bool _CC_No_Metadata_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
                                    const char *cursor, ESResult &es_result);
 void GetSchemaInfo(schema_type &schema, json_doc &es_result_doc);
-bool AssignColumnHeaders(const schema_type &doc_schema, QResultClass *q_res,
+bool AssignColumnHeaders(QResultClass *q_res,
                          const ESResult &es_result);
-bool AssignTableData(json_doc &es_result_doc, QResultClass *q_res,
-                     size_t doc_schema_size, ColumnInfoClass &fields);
-bool AssignRowData(const json_arr_it &row, size_t row_schema_size,
+bool AssignTableData(ESResult &es_result, QResultClass *q_res, ColumnInfoClass &fields);
+bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
                    QResultClass *q_res, ColumnInfoClass &fields,
                    const size_t &row_size);
 void UpdateResultFields(QResultClass *q_res, const ConnectionClass *conn,
@@ -83,9 +82,28 @@ const std::unordered_map< std::string, OID > type_to_oid_map = {
     {ES_TYPE_NAME_DATE, ES_TYPE_TIMESTAMP},
     {ES_TYPE_NAME_OBJECT, ES_TYPE_VARCHAR},
     {ES_TYPE_NAME_VARCHAR, ES_TYPE_VARCHAR},
-    {ES_TYPE_NAME_DATE, ES_TYPE_DATE}};
+    {ES_TYPE_NAME_DATE, ES_TYPE_DATE},
+
+    {TS_TYPE_NAME_VARCHAR, TS_TYPE_VARCHAR},
+    {TS_TYPE_NAME_BOOLEAN, TS_TYPE_BOOLEAN},
+    {TS_TYPE_NAME_BIGINT, TS_TYPE_BIGINT},
+    {TS_TYPE_NAME_DOUBLE, TS_TYPE_DOUBLE},
+    {TS_TYPE_NAME_TIMESTAMP, TS_TYPE_TIMESTAMP},
+    {TS_TYPE_NAME_DATE, TS_TYPE_DATE},
+    {TS_TYPE_NAME_TIME, TS_TYPE_TIME},
+    {TS_TYPE_NAME_INTERVAL_DAY_TO_SECOND, TS_TYPE_INTERVAL_DAY_TO_SECOND},
+    {TS_TYPE_NAME_INTERVAL_YEAR_TO_MONTH, TS_TYPE_INTERVAL_YEAR_TO_MONTH},
+    {TS_TYPE_NAME_UNKNOWN, TS_TYPE_UNKNOWN},
+    {TS_TYPE_NAME_INTEGER, TS_TYPE_INTEGER},
+    {TS_TYPE_NAME_ROW, TS_TYPE_ROW},
+    {TS_TYPE_NAME_ARRAY, TS_TYPE_ARRAY},
+    {TS_TYPE_NAME_TIMESERIES, TS_TYPE_TIMESERIES}};
 
 #define ES_VARCHAR_SIZE (-2)
+#define TS_ROW_SIZE (-3)
+#define TS_ARRAY_SIZE (-4)
+#define TS_TIMESERIES_SIZE (-5)
+
 const std::unordered_map< OID, int16_t > oid_to_size_map = {
     {ES_TYPE_BOOL, (int16_t)1},
     {ES_TYPE_INT2, (int16_t)2},
@@ -95,7 +113,22 @@ const std::unordered_map< OID, int16_t > oid_to_size_map = {
     {ES_TYPE_FLOAT8, (int16_t)8},
     {ES_TYPE_VARCHAR, (int16_t)ES_VARCHAR_SIZE},
     {ES_TYPE_DATE, (int16_t)ES_VARCHAR_SIZE},
-    {ES_TYPE_TIMESTAMP, (int16_t)1}};
+    {ES_TYPE_TIMESTAMP, (int16_t)1},
+
+    {TS_TYPE_VARCHAR, (int16_t)ES_VARCHAR_SIZE},
+    {TS_TYPE_BOOLEAN, (int16_t)1},
+    {TS_TYPE_BIGINT, (int16_t)8},
+    {TS_TYPE_DOUBLE, (int16_t)8},
+    {TS_TYPE_TIMESTAMP, (int16_t)1},
+    {TS_TYPE_DATE, (int16_t)ES_VARCHAR_SIZE},
+    {TS_TYPE_TIME, (int16_t)ES_VARCHAR_SIZE},
+    {TS_TYPE_INTERVAL_DAY_TO_SECOND, (int16_t)ES_VARCHAR_SIZE},
+    {TS_TYPE_INTERVAL_YEAR_TO_MONTH, (int16_t)ES_VARCHAR_SIZE},
+    {TS_TYPE_UNKNOWN, (int16_t)ES_VARCHAR_SIZE},
+    {TS_TYPE_INTEGER, (int16_t)4},
+    {TS_TYPE_ROW, (int16_t)TS_ROW_SIZE},
+    {TS_ARRAY_SIZE, (int16_t)TS_ARRAY_SIZE},
+    {TS_TIMESERIES_SIZE, (int16_t)TS_TIMESERIES_SIZE}};
 
 // Using global variable here so that the error message can be propagated
 // without going otu of scope
@@ -131,10 +164,9 @@ BOOL CC_No_Metadata_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
                : FALSE;
 }
 
-BOOL CC_Append_Table_Data(json_doc &es_result_doc, QResultClass *q_res,
-                          size_t doc_schema_size, ColumnInfoClass &fields) {
+BOOL CC_Append_Table_Data(ESResult &es_result, QResultClass *q_res, ColumnInfoClass &fields) {
     ClearError();
-    return AssignTableData(es_result_doc, q_res, doc_schema_size, fields)
+    return AssignTableData(es_result, q_res, fields)
                ? TRUE
                : FALSE;
 }
@@ -152,8 +184,7 @@ bool _CC_No_Metadata_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
         SQLULEN starting_cached_rows = q_res->num_cached_rows;
 
         // Assign table data and column headers
-        if (!AssignTableData(es_result.es_result_doc, q_res, doc_schema.size(),
-                             *(q_res->fields)))
+        if (!AssignTableData(es_result, q_res, *(q_res->fields)))
             return false;
 
         // Update fields of QResult to reflect data written
@@ -188,7 +219,7 @@ bool _CC_Metadata_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
         GetSchemaInfo(doc_schema, es_result.es_result_doc);
 
         // Assign table data and column headers
-        if (!AssignColumnHeaders(doc_schema, q_res, es_result))
+        if (!AssignColumnHeaders(q_res, es_result))
             return false;
 
         // Set command type and cursor name
@@ -213,6 +244,19 @@ bool _CC_Metadata_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
     return false;
 }
 
+void print_log(const std::string &s) {
+#if WIN32
+#pragma warning(push)
+#pragma warning(disable : 4551)
+#endif  // WIN32
+        // cppcheck outputs an erroneous missing argument error which breaks
+        // build. Disable for this function call
+    MYLOG(ES_ALL, "%s\n", s.c_str());
+#if WIN32
+#pragma warning(pop)
+#endif  // WIN32
+}
+
 bool _CC_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
                        const char *cursor, ESResult &es_result) {
     // Note - NULL conn and/or cursor is valid
@@ -221,19 +265,17 @@ bool _CC_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
 
     QR_set_conn(q_res, conn);
     try {
-        schema_type doc_schema;
-        GetSchemaInfo(doc_schema, es_result.es_result_doc);
         SQLULEN starting_cached_rows = q_res->num_cached_rows;
 
         // Assign table data and column headers
-        if ((!AssignColumnHeaders(doc_schema, q_res, es_result))
-            || (!AssignTableData(es_result.es_result_doc, q_res, doc_schema.size(),
-                                 *(q_res->fields))))
+        if ((!AssignColumnHeaders(q_res, es_result))
+            || (!AssignTableData(es_result, q_res, *(q_res->fields))))
             return false;
 
         // Update fields of QResult to reflect data written
+        std::string command_type = "SELECT";
         UpdateResultFields(q_res, conn, starting_cached_rows, cursor,
-                           es_result.command_type);
+                           command_type);
 
         // Return true (success)
         return true;
@@ -263,28 +305,23 @@ void GetSchemaInfo(schema_type &schema, json_doc &es_result_doc) {
     }
 }
 
-bool AssignColumnHeaders(const schema_type &doc_schema, QResultClass *q_res,
+bool AssignColumnHeaders(QResultClass *q_res,
                          const ESResult &es_result) {
-    // Verify server_info size matches the schema size
-    if (es_result.column_info.size() != doc_schema.size())
-        return false;
-
     // Allocte memory for column fields
-    QR_set_num_fields(q_res, (uint16_t)es_result.column_info.size());
+    const auto &column_info = es_result.ts_result.GetColumnInfo();
+    QR_set_num_fields(q_res, (uint16_t)column_info.size());
     if (QR_get_fields(q_res)->coli_array == NULL)
         return false;
-
-    // Assign column info
-    for (size_t i = 0; i < doc_schema.size(); i++) {
-        auto type_size_ptr = oid_to_size_map.find(doc_schema[i].second);
-        int16_t type_size = (type_size_ptr == oid_to_size_map.end())
-                                ? ES_ADT_UNSET
-                                : type_size_ptr->second;
+    
+    for (size_t i = 0; i < column_info.size(); i++) {
+        auto column = column_info[i];
+        auto type =
+            Aws::TimestreamQuery::Model::ScalarTypeMapper::GetNameForScalarType(
+                column.GetType().GetScalarType());
+        // TODO Some historic fields needs to be removed, set 0 fow now.
         CI_set_field_info(QR_get_fields(q_res), (int)i,
-                          doc_schema[i].first.c_str(), doc_schema[i].second,
-                          type_size, es_result.column_info[i].length_of_str,
-                          es_result.column_info[i].relation_id,
-                          es_result.column_info[i].attribute_number);
+                          column.GetName().c_str(),
+                          TS_TYPE_UNKNOWN, ES_ADT_UNSET, 0, 0, 0);
         QR_set_rstatus(q_res, PORES_FIELDS_OK);
     }
     q_res->num_fields = CI_get_num_fields(QR_get_fields(q_res));
@@ -294,27 +331,15 @@ bool AssignColumnHeaders(const schema_type &doc_schema, QResultClass *q_res,
 
 // Responsible for looping through rows, allocating tuples and passing rows for
 // assignment
-bool AssignTableData(json_doc &es_result_doc, QResultClass *q_res,
-                     size_t doc_schema_size, ColumnInfoClass &fields) {
-    // Assign row info
-    json_arr es_result_data = es_result_doc[JSON_KW_DATAROWS];
-    if (es_result_data.size() == 0)
-        return true;
-
-    // Figure out number of columns are in a row and make schema is not bigger
-    // than it
-    size_t row_size = std::distance(es_result_data.begin()->value_begin(),
-                                    es_result_data.begin()->value_end());
-    if (row_size < doc_schema_size) {
-        return false;
-    }
-    for (auto it : es_result_data) {
+bool AssignTableData(ESResult &es_result, QResultClass *q_res, ColumnInfoClass &fields) {
+    auto rows = es_result.ts_result.GetRows();
+    for (const auto& row : rows) {
         // Setup memory to receive tuple
         if (!QR_prepare_for_tupledata(q_res))
             return false;
 
         // Assign row data
-        if (!AssignRowData(it, doc_schema_size, q_res, fields, row_size))
+        if (!AssignRowData(row, q_res, fields, es_result.ts_result.GetColumnInfo().size()))
             return false;
     }
 
@@ -322,11 +347,11 @@ bool AssignTableData(json_doc &es_result_doc, QResultClass *q_res,
 }
 
 // Responsible for assigning row data to tuples
-bool AssignRowData(const json_arr_it &row, size_t row_schema_size,
+bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
                    QResultClass *q_res, ColumnInfoClass &fields,
-                   const size_t &row_size) {
+                   const size_t &col_size) {
     TupleField *tuple =
-        q_res->backend_tuples + (q_res->num_cached_rows * row_size);
+        q_res->backend_tuples + (q_res->num_cached_rows * col_size);
 
     // Setup keyset if present
     KeySet *ks = NULL;
@@ -336,15 +361,15 @@ bool AssignRowData(const json_arr_it &row, size_t row_schema_size,
     }
 
     // Loop through and assign data
-    size_t i = 0;
-    for (auto row_column = row.value_begin(); i < row_schema_size;
-         ++row_column, ++i) {
-        if (row_column->is_null()) {
+    for (size_t i = 0; i < row.GetData().size(); i++) {
+        auto datum = row.GetData()[i];
+        auto scalar_value = datum.GetScalarValue();
+        if (scalar_value.empty()) {
             tuple[i].len = SQL_NULL_DATA;
             tuple[i].value = NULL;
         } else {
             // Copy string over to tuple
-            const std::string data = row_column->str();
+            const std::string data = scalar_value;
             tuple[i].len = static_cast< int >(data.length());
             QR_MALLOC_return_with_error(
                 tuple[i].value, char, data.length() + 1, q_res,
@@ -357,8 +382,9 @@ bool AssignRowData(const json_arr_it &row, size_t row_schema_size,
         }
     }
 
+    // TODO Commented out for now, needs refactoring
     // If there are more rows than schema suggests, we have Keyset data
-    if (row_size > row_schema_size) {
+    /*if (row_size > row_schema_size) {
         if (ks == NULL) {
             QR_set_rstatus(q_res, PORES_INTERNAL_ERROR);
             QR_set_message(q_res,
@@ -376,7 +402,7 @@ bool AssignRowData(const json_arr_it &row, size_t row_schema_size,
         }
         row_column++;
         ks->oid = std::stoul(row_column->str(), nullptr, 10);
-    }
+    }*/
 
     // Increment relevant data
     q_res->cursTuple++;
