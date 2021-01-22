@@ -33,11 +33,11 @@
 // "/_opendistro/_sql/close"; static const std::string
 // PLUGIN_ENDPOINT_FORMAT_JSON =
 //    "/_cat/plugins?format=json";
-// static const std::string OPENDISTRO_SQL_PLUGIN_NAME = "opendistro_sql";
-// static const std::string ALLOCATION_TAG = "AWS_SIGV4_AUTH";
-// static const std::string SERVICE_NAME = "es";
-// static const std::string ESODBC_PROFILE_NAME = "elasticsearchodbc";
-// static const std::string ERROR_MSG_PREFIX =
+//static const std::string OPENDISTRO_SQL_PLUGIN_NAME = "opendistro_sql";
+//static const std::string ALLOCATION_TAG = "IAM_AUTH";
+//static const std::string SERVICE_NAME = "es";
+//static const std::string ESODBC_PROFILE_NAME = "elasticsearchodbc";
+//static const std::string ERROR_MSG_PREFIX =
 //    "[Open Distro For Elasticsearch][SQL ODBC Driver][SQL Plugin] ";
 // static const std::string JSON_SCHEMA =
 //    "{"  // This was generated from the example elasticsearch data
@@ -180,10 +180,10 @@ bool TSCommunication::Validate(const runtime_options& options) {
     if (options.auth.region.empty()) {
         throw std::invalid_argument("Region cannot be empty.");
     }
-    if (options.auth.auth_type != AUTHTYPE_BASIC
-        && options.auth.auth_type != AUTHTYPE_IAM) {
-        throw std::invalid_argument("Unknown authentication type: \""
-                                    + options.auth.auth_type + "\".");
+    if (options.auth.auth_type != AUTHTYPE_IAM &&
+        options.auth.auth_type != AUTHTYPE_AAD &&
+        options.auth.auth_type != AUTHTYPE_OKTA) {
+        throw std::invalid_argument("Unknown authentication type: \"" + options.auth.auth_type + "\".");
     }
     if (!options.conn.timeout.empty()) {
         std::stol(options.conn.timeout);
@@ -204,13 +204,13 @@ bool TSCommunication::Connect(const runtime_options& options) {
     config.httpRequestTimeoutMs = response_timeout;
     config.requestTimeoutMs = response_timeout;
 
-    if (options.auth.auth_type == AUTHTYPE_BASIC) {
-        Aws::Auth::AWSCredentials credentials(
-            options.auth.username, options.auth.password, options.auth.token);
+    if (options.auth.auth_type == AUTHTYPE_IAM) {
+        Aws::Auth::AWSCredentials credentials(options.auth.username,
+                                              options.auth.password, options.auth.token);
         m_client =
             std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(
                 credentials, config);
-    } else if (options.auth.auth_type == AUTHTYPE_IAM) {
+    } else if (options.auth.auth_type == AUTHTYPE_OKTA) {
     } else {
         throw std::runtime_error("Unknown auth type.");
     }

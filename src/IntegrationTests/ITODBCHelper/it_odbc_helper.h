@@ -43,7 +43,7 @@ std::vector< std::pair< std::wstring, std::wstring > > conn_str_pair = {
     {L"user", L"<accesskey>"},
     {L"password", L"<secretkey>"},
     {L"region", L"us-east-1"},
-    {L"auth", L"BASIC"},
+    {L"auth", L"IAM"},
     {L"useSSL", L"1"},
     {L"hostnameVerification", L"0"},
     {L"logLevel", L"7"},

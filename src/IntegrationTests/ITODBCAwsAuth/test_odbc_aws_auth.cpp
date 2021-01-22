@@ -25,13 +25,13 @@ std::wstring aws_auth_conn_string =
     L"Host=https://"
     L"search-bit-quill-cx3hpfoxvasohujxkllmgjwqde.us-west-2."
     L"es.amazonaws.com;"
-    L"Auth=AWS_SIGV4;Region=us-west-2;LogLevel=1";
+    L"Auth=IAM;Region=us-west-2;LogLevel=1";
 std::wstring aws_auth_conn_string_invalid_region =
     L"Driver={Elasticsearch};DataBase=database_name;"
     L"Host=https://"
     L"search-bit-quill-cx3hpfoxvasohujxkllmgjwqde.us-west-2."
     L"es.amazonaws.com;"
-    L"Auth=AWS_SIGV4;Region=us-west-3;LogLevel=1";
+    L"Auth=IAM;Region=us-west-3;LogLevel=1";
 std::wstring aws_auth_conn_string_invalid_authtype =
     L"Driver={Elasticsearch};DataBase=database_name;"
     L"Host=https://"
