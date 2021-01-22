@@ -25,7 +25,7 @@ TEST(TestConnectionOptions, Good) {
     options.auth.username = "UID";
     options.auth.password = "PWD";
     options.auth.region = "Region";
-    options.auth.auth_type = AUTHTYPE_BASIC;
+    options.auth.auth_type = AUTHTYPE_IAM;
     TSCommunication conn;    
     EXPECT_NO_THROW(conn.Validate(options));
     EXPECT_TRUE(conn.Validate(options));
@@ -36,7 +36,7 @@ TEST(TestConnectionOptions, UID_is_empty) {
     options.auth.username = "";
     options.auth.password = "PWD";
     options.auth.region = "Region";
-    options.auth.auth_type = AUTHTYPE_BASIC;
+    options.auth.auth_type = AUTHTYPE_IAM;
     TSCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
@@ -46,7 +46,7 @@ TEST(TestConnectionOptions, PWD_is_empty) {
     options.auth.username = "UID";
     options.auth.password = "";
     options.auth.region = "Region";
-    options.auth.auth_type = AUTHTYPE_BASIC;
+    options.auth.auth_type = AUTHTYPE_IAM;
     TSCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
@@ -56,7 +56,7 @@ TEST(TestConnectionOptions, Region_is_empty) {
     options.auth.username = "UID";
     options.auth.password = "PWD";
     options.auth.region = "";
-    options.auth.auth_type = AUTHTYPE_BASIC;
+    options.auth.auth_type = AUTHTYPE_IAM;
     TSCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }

@@ -93,12 +93,12 @@ TEST_F(TestPagination, EnablePagination) {
     std::wstring fetch_size_15_conn_string =
         use_ssl ? L"Driver={Elasticsearch ODBC};"
                   L"host=https://localhost;port=9200;"
-                  L"user=admin;password=admin;auth=BASIC;useSSL="
+                  L"user=admin;password=admin;auth=IAM;useSSL="
                   L"1;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
                   L"responseTimeout=10;"
                 : L"Driver={Elasticsearch ODBC};"
                   L"host=localhost;port=9200;"
-                  L"user=admin;password=admin;auth=BASIC;useSSL="
+                  L"user=admin;password=admin;auth=IAM;useSSL="
                   L"0;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
                   L"responseTimeout=10;";
     ASSERT_EQ(SQL_SUCCESS,
@@ -115,12 +115,12 @@ TEST_F(TestPagination, DisablePagination) {
     std::wstring fetch_size_15_conn_string =
         use_ssl ? L"Driver={Elasticsearch ODBC};"
                   L"host=https://localhost;port=9200;"
-                  L"user=admin;password=admin;auth=BASIC;useSSL="
+                  L"user=admin;password=admin;auth=IAM;useSSL="
                   L"1;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
                   L"responseTimeout=10;fetchSize=0;"
                 : L"Driver={Elasticsearch ODBC};"
                   L"host=localhost;port=9200;"
-                  L"user=admin;password=admin;auth=BASIC;useSSL="
+                  L"user=admin;password=admin;auth=IAM;useSSL="
                   L"0;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
                   L"responseTimeout=10;fetchSize=0;";
     ASSERT_EQ(SQL_SUCCESS,
