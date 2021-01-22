@@ -282,17 +282,20 @@ INT_PTR CALLBACK ConfigDlgProc(HWND hdlg, UINT wMsg, WPARAM wParam,
             SendDlgItemMessage(hdlg, IDC_DESC, EM_LIMITTEXT,
                                (WPARAM)(MAXDESC - 1), 0L);
 
-            if (!stricmp(ci->authtype, AUTHTYPE_IAM)) {
+            if (stricmp(ci->authtype, AUTHTYPE_IAM) == 0) {
                 SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL, 0,
                                    (WPARAM)0);
-            } else if (!stricmp(ci->authtype, AUTHTYPE_BASIC)) {
+            } else if (stricmp(ci->authtype, AUTHTYPE_AAD) == 0) {
                 SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL, 1,
                                    (WPARAM)0);
-            } else { // AUTHTYPE_NONE
+            } else if (stricmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
                 SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL, 2,
                                    (WPARAM)0);
+            } else {
+                SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL, 0,
+                                   (WPARAM)0);
             }
-            
+
             return TRUE; /* Focus was not set */
 
             /* Process buttons */
