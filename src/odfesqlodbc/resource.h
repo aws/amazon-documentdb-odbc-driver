@@ -16,9 +16,9 @@
 #define IDC_FETCH_SIZE_STATIC           404
 #define IDC_SERVER                      407
 #define IDC_NOTICE_USER                 414
-#define IDS_AUTHTYPE_NONE               417
-#define IDS_AUTHTYPE_BASIC              418
-#define IDS_AUTHTYPE_IAM                419
+#define IDS_AUTHTYPE_IAM                417
+#define IDS_AUTHTYPE_AAD                418
+#define IDS_AUTHTYPE_OKTA               419
 #define IDS_LOGTYPE_OFF                 420
 #define IDS_LOGTYPE_FATAL               421
 #define IDS_LOGTYPE_ERROR               422

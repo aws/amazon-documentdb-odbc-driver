@@ -34,11 +34,11 @@ using namespace Aws::Client;
 using namespace Aws::Http;
 
 static const char service_name[] = "es";
-static const char allocation_tag[] = "AWS_SIGV4_Test";
+static const char allocation_tag[] = "IAM_Test";
 static const char host[] = "https://search-bit-quill-cx3hpfoxvasohujxkllmgjwqde.us-west-2.es.amazonaws.com";
 static const char region[] = "us-west-2";
 
-TEST(AWS_SIGV4, EnvironmentAWSCredentials) {
+TEST(IAM, EnvironmentAWSCredentials) {
 	Aws::SDKOptions options;
 	EXPECT_NO_THROW(Aws::InitAPI(options));
 
