@@ -26,7 +26,7 @@
 #include "xalibname.h"
 #endif /* _HANDLE_ENLIST_IN_DTC_ */
 
-#define AUTHMODE_CNT 2
+#define AUTHMODE_CNT 3
 #define LOGLEVEL_CNT 8
 extern HINSTANCE s_hModule;
 
@@ -41,9 +41,9 @@ int loglevels[LOGLEVEL_CNT] = {
     {IDS_LOGTYPE_ALL}};
 
 static const struct authmode authmodes[AUTHMODE_CNT] = {
-    // A bit tricky map for the selection list dialog
-    {IDS_AUTHTYPE_BASIC, AUTHTYPE_IAM},
-    {IDS_AUTHTYPE_IAM, AUTHTYPE_BASIC}};
+    {IDS_AUTHTYPE_IAM, AUTHTYPE_IAM},
+    {IDS_AUTHTYPE_AAD, AUTHTYPE_AAD},
+    {IDS_AUTHTYPE_OKTA, AUTHTYPE_OKTA}};
 
 const struct authmode *GetCurrentAuthMode(HWND hdlg) {
     unsigned int ams_cnt = 0;
@@ -72,12 +72,13 @@ int GetCurrentLogLevel(HWND hdlg) {
 
 
 void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
-    if (strcmp(am->authtype_str, AUTHTYPE_BASIC) == 0) {
+
+    if (strcmp(am->authtype_str, AUTHTYPE_IAM) == 0) {
         EnableWindow(GetDlgItem(hdlg, IDC_USER), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_PASSWORD), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_TOKEN), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_REGION), TRUE);
-    } else if (strcmp(am->authtype_str, AUTHTYPE_IAM) == 0) {
+    } else if (strcmp(am->authtype_str, AUTHTYPE_AAD) == 0) {
         EnableWindow(GetDlgItem(hdlg, IDC_USER), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_PASSWORD), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_TOKEN), FALSE);
@@ -105,13 +106,14 @@ void SetDlgStuff(HWND hdlg, const ConnInfo *ci) {
     for (unsigned int i = 0; i < ams_cnt; i++) {
         LoadString(GetWindowInstance(hdlg), ams[i].authtype_id, buff,
                    MEDIUM_REGISTRY_LEN);
-        SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_ADDSTRING, 0, (WPARAM)buff);
-        if (!stricmp(ci->authtype, ams[i].authtype_str)) {
+        SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_ADDSTRING, 0, (LPARAM)buff);
+        if (stricmp(ci->authtype, ams[i].authtype_str) == 0) {
             authtype_selection_idx = i;
         }
     }
     SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL,
                        ams[authtype_selection_idx].authtype_id, (WPARAM)0);
+    SetAuthenticationVisibility(hdlg, &ams[authtype_selection_idx]);
     SetDlgItemText(hdlg, IDC_USER, ci->username);
     SetDlgItemText(hdlg, IDC_PASSWORD, SAFE_NAME(ci->password));
     SetDlgItemText(hdlg, IDC_TOKEN, ci->token);
