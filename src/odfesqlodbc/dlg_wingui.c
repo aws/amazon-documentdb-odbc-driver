@@ -228,31 +228,31 @@ INT_PTR CALLBACK logOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
                     int log = GetCurrentLogLevel(hdlg);
                     switch (log) {
                         case IDS_LOGTYPE_OFF:
-                            ci->drivers.loglevel = (char)ES_OFF;
+                            ci->drivers.loglevel = (char)DRV_OFF;
                             break;
                         case IDS_LOGTYPE_FATAL:
-                            ci->drivers.loglevel = (char)ES_FATAL;
+                            ci->drivers.loglevel = (char)DRV_FATAL;
                             break;
                         case IDS_LOGTYPE_ERROR:
-                            ci->drivers.loglevel = (char)ES_ERROR;
+                            ci->drivers.loglevel = (char)DRV_ERROR;
                             break;
                         case IDS_LOGTYPE_WARNING:
-                            ci->drivers.loglevel = (char)ES_WARNING;
+                            ci->drivers.loglevel = (char)DRV_WARNING;
                             break;
                         case IDS_LOGTYPE_INFO:
-                            ci->drivers.loglevel = (char)ES_INFO;
+                            ci->drivers.loglevel = (char)DRV_INFO;
                             break;
                         case IDS_LOGTYPE_DEBUG:
-                            ci->drivers.loglevel = (char)ES_DEBUG;
+                            ci->drivers.loglevel = (char)DRV_DEBUG;
                             break;
                         case IDS_LOGTYPE_TRACE:
-                            ci->drivers.loglevel = (char)ES_TRACE;
+                            ci->drivers.loglevel = (char)DRV_TRACE;
                             break;
                         case IDS_LOGTYPE_ALL:
-                            ci->drivers.loglevel = (char)ES_ALL;
+                            ci->drivers.loglevel = (char)DRV_ALL;
                             break;
                         default:
-                            ci->drivers.loglevel = (char)ES_OFF;
+                            ci->drivers.loglevel = (char)DRV_OFF;
                             break;
                     }
                     setGlobalCommlog(ci->drivers.loglevel);

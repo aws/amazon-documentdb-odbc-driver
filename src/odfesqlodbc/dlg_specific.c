@@ -119,7 +119,7 @@ BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
              || (stricmp(attribute, INI_PASSWORD_ABBR) == 0)) {
         ci->password = decode_or_remove_braces(value);
 #ifndef FORCE_PASSWORDE_DISPLAY
-        MYLOG(ES_DEBUG, "key='%s' value='xxxxxxxx'\n", attribute);
+        MYLOG(DRV_DEBUG, "key='%s' value='xxxxxxxx'\n", attribute);
         printed = TRUE;
 #endif
     } else if (stricmp(attribute, INI_TOKEN) == 0 || stricmp(attribute, INI_TOKEN_ABBR) == 0)
@@ -144,7 +144,7 @@ BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
         found = FALSE;
 
     if (!printed)
-        MYLOG(ES_DEBUG, "key='%s' value='%s'%s\n", attribute, value,
+        MYLOG(DRV_DEBUG, "key='%s' value='%s'%s\n", attribute, value,
               found ? NULL_STRING : " not found");
 
     return found;
@@ -229,7 +229,7 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
 
     if (!drivername[0] && DSN[0])
         getDriverNameFromDSN(DSN, (char *)drivername, sizeof(ci->drivername));
-    MYLOG(ES_DEBUG, "drivername=%s\n", drivername);
+    MYLOG(DRV_DEBUG, "drivername=%s\n", drivername);
     if (!drivername[0])
         drivername = INVALID_DRIVER;
     getDriversDefaults(drivername, &(ci->drivers));
@@ -466,7 +466,7 @@ void CC_conninfo_release(ConnInfo *conninfo) {
 }
 
 void CC_conninfo_init(ConnInfo *conninfo, UInt4 option) {
-    MYLOG(ES_TRACE, "entering opt=%d\n", option);
+    MYLOG(DRV_TRACE, "entering opt=%d\n", option);
 
     if (0 != (CLEANUP_FOR_REUSE & option))
         CC_conninfo_release(conninfo);
