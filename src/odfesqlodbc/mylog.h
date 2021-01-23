@@ -125,17 +125,15 @@ const char *po_basename(const char *path);
     } while (0)
 #endif /* __GNUC__ */
 
-enum ESLogLevel {
-    // Prefixing with ES_ because C does not support namespaces and we may get a
-    // collision, given how common these names are
-    ES_OFF,
-    ES_FATAL,
-    ES_ERROR,
-    ES_WARNING,
-    ES_INFO,
-    ES_DEBUG,
-    ES_TRACE,
-    ES_ALL
+enum LogLevel {
+    DRV_OFF = 0,
+    DRV_FATAL,
+    DRV_ERROR,
+    DRV_WARNING,
+    DRV_INFO,
+    DRV_DEBUG,
+    DRV_TRACE,
+    DRV_ALL
 };
 
 int get_qlog(void);
