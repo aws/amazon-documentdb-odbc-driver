@@ -111,7 +111,7 @@
 /*
 // Prepare document and validate result
 try {
-    LogMsg(ES_DEBUG, "Parsing result JSON with cursor.");
+    LogMsg(DRV_DEBUG, "Parsing result JSON with cursor.");
     ts_result.es_result_doc.parse(ts_result.result_json,
                                   CURSOR_JSON_SCHEMA);
 } catch (const rabbit::parse_error& e) {
@@ -122,52 +122,68 @@ try {
                       + ts_result.result_json + "'.";
     throw std::runtime_error(str.c_str());
 }
-*/
+
+// void TSCommunication::PrepareCursorResult(ESResult& es_result) {
+    /*
+    // Prepare document and validate result
+    try {
+        LogMsg(DRV_DEBUG, "Parsing result JSON with cursor.");
+        es_result.es_result_doc.parse(es_result.result_json,
+                                      CURSOR_JSON_SCHEMA);
+    } catch (const rabbit::parse_error& e) {
+        // The exception rabbit gives is quite useless - providing the json
+        // will aid debugging for users
+        std::string str = "Exception obtained '" + std::string(e.what())
+                          + "' when parsing json string '"
+                          + es_result.result_json + "'.";
+        throw std::runtime_error(str.c_str());
+    }
+    */
 // }
 
-// std::shared_ptr< ErrorDetails > TSCommunication::ParseErrorResponse(
-//    TSResult& ts_result) {
-/*
-// Prepare document and validate schema
-try {
-    LogMsg(ES_DEBUG, "Parsing error response (with schema validation)");
-    ts_result.es_result_doc.parse(ts_result.result_json,
-                                  ERROR_RESPONSE_SCHEMA);
+//std::shared_ptr< ErrorDetails > TSCommunication::ParseErrorResponse(
+//    ESResult& es_result) {
+    /*
+    // Prepare document and validate schema
+    try {
+        LogMsg(DRV_DEBUG, "Parsing error response (with schema validation)");
+        es_result.es_result_doc.parse(es_result.result_json,
+                                      ERROR_RESPONSE_SCHEMA);
 
-    auto error_details = std::make_shared< ErrorDetails >();
-    error_details->reason =
-        ts_result.es_result_doc["error"]["reason"].as_string();
-    error_details->details =
-        ts_result.es_result_doc["error"]["details"].as_string();
-    error_details->source_type =
-        ts_result.es_result_doc["error"]["type"].as_string();
-    return error_details;
-} catch (const rabbit::parse_error& e) {
-    // The exception rabbit gives is quite useless - providing the json
-    // will aid debugging for users
-    std::string str = "Exception obtained '" + std::string(e.what())
-                      + "' when parsing json string '"
-                      + ts_result.result_json + "'.";
-    throw std::runtime_error(str.c_str());
-}
-*/
+        auto error_details = std::make_shared< ErrorDetails >();
+        error_details->reason =
+            es_result.es_result_doc["error"]["reason"].as_string();
+        error_details->details =
+            es_result.es_result_doc["error"]["details"].as_string();
+        error_details->source_type =
+            es_result.es_result_doc["error"]["type"].as_string();
+        return error_details;
+    } catch (const rabbit::parse_error& e) {
+        // The exception rabbit gives is quite useless - providing the json
+        // will aid debugging for users
+        std::string str = "Exception obtained '" + std::string(e.what())
+                          + "' when parsing json string '"
+                          + es_result.result_json + "'.";
+        throw std::runtime_error(str.c_str());
+    }
+    */
 // }
 
-// void TSCommunication::GetJsonSchema(TSResult& ts_result) {
-/*
-// Prepare document and validate schema
-try {
-    LogMsg(ES_DEBUG, "Parsing result JSON with schema.");
-    ts_result.es_result_doc.parse(ts_result.result_json, JSON_SCHEMA);
-} catch (const rabbit::parse_error& e) {
-    // The exception rabbit gives is quite useless - providing the json
-    // will aid debugging for users
-    std::string str = "Exception obtained '" + std::string(e.what())
-                      + "' when parsing json string '"
-                      + ts_result.result_json + "'.";
-    throw std::runtime_error(str.c_str());
-}
-*/
+// void TSCommunication::GetJsonSchema(ESResult& es_result) {
+    /*
+    // Prepare document and validate schema
+    try {
+        LogMsg(DRV_DEBUG, "Parsing result JSON with schema.");
+        es_result.es_result_doc.parse(es_result.result_json, JSON_SCHEMA);
+    } catch (const rabbit::parse_error& e) {
+        // The exception rabbit gives is quite useless - providing the json
+        // will aid debugging for users
+        std::string str = "Exception obtained '" + std::string(e.what())
+                          + "' when parsing json string '"
+                          + es_result.result_json + "'.";
+        throw std::runtime_error(str.c_str());
+    }
+    */
 // }
 
 bool TSCommunication::Validate(const runtime_options& options) {
@@ -188,7 +204,7 @@ bool TSCommunication::Validate(const runtime_options& options) {
     if (!options.conn.timeout.empty()) {
         std::stol(options.conn.timeout);
     }
-    LogMsg(ES_DEBUG, "Required connection options are valid.");
+    LogMsg(DRV_DEBUG, "Required connection options are valid.");
     return true;
 }
 
@@ -224,7 +240,7 @@ bool TSCommunication::Connect(const runtime_options& options) {
     auto outcome = m_client->Query(req);
     if (!outcome.IsSuccess()) {
         auto err = outcome.GetError().GetMessage();
-        LogMsg(ES_ERROR, err.c_str());
+        LogMsg(DRV_ERROR, err.c_str());
         Disconnect();
         throw std::runtime_error("Failed to establish connection: " + err);
     }
@@ -232,7 +248,7 @@ bool TSCommunication::Connect(const runtime_options& options) {
 }
 
 void TSCommunication::Disconnect() {
-    LogMsg(ES_ALL, "Disconnecting timestream connection.");
+    LogMsg(DRV_ALL, "Disconnecting timestream connection.");
     if (m_client) {
         m_client.reset();
     }
@@ -262,14 +278,14 @@ std::vector< std::string > TSCommunication::GetColumnsWithSelectQuery(
     // if (table_name.empty()) {
     //    m_error_type = ConnErrorType::CONN_ERROR_INVALID_NULL_PTR;
     //    m_error_message = "Query is NULL";
-    //    LogMsg(ES_ERROR, m_error_message.c_str());
+    //    LogMsg(DRV_ERROR, m_error_message.c_str());
     //    return list_of_column;
     //}
 
     //// Prepare query
-    // std::string query = "SELECT * FROM " + table_name + " LIMIT 0";
-    // std::string msg = "Attempting to execute a query \"" + query + "\"";
-    // LogMsg(ES_DEBUG, msg.c_str());
+    //std::string query = "SELECT * FROM " + table_name + " LIMIT 0";
+    //std::string msg = "Attempting to execute a query \"" + query + "\"";
+    //LogMsg(DRV_DEBUG, msg.c_str());
 
     //// Issue request
     // std::shared_ptr< Aws::Http::HttpResponse > response =
@@ -284,7 +300,7 @@ std::vector< std::string > TSCommunication::GetColumnsWithSelectQuery(
     //        "Received NULL response.";
     //    SetErrorDetails("HTTP client error", m_error_message,
     //                    ConnErrorType::CONN_ERROR_COMM_LINK_FAILURE);
-    //    LogMsg(ES_ERROR, m_error_message.c_str());
+    //    LogMsg(DRV_ERROR, m_error_message.c_str());
     //    return list_of_column;
     //}
 
@@ -308,7 +324,7 @@ std::vector< std::string > TSCommunication::GetColumnsWithSelectQuery(
     //    }
     //    SetErrorDetails("Connection error", m_error_message,
     //                    ConnErrorType::CONN_ERROR_COMM_LINK_FAILURE);
-    //    LogMsg(ES_ERROR, m_error_message.c_str());
+    //    LogMsg(DRV_ERROR, m_error_message.c_str());
     //    return list_of_column;
     //}
 
@@ -331,27 +347,27 @@ int TSCommunication::ExecDirect(const char* query, const char*) {
     //    m_error_message = "Query is NULL";
     //    SetErrorDetails("Execution error", m_error_message,
     //                    ConnErrorType::CONN_ERROR_INVALID_NULL_PTR);
-    //    LogMsg(ES_ERROR, m_error_message.c_str());
+    //    LogMsg(DRV_ERROR, m_error_message.c_str());
     //    return -1;
     //} else if (!m_client) {
     //    m_error_message = "Unable to connect. Please try connecting again.";
     //    SetErrorDetails("Execution error", m_error_message,
     //                    ConnErrorType::CONN_ERROR_COMM_LINK_FAILURE);
-    //    LogMsg(ES_ERROR, m_error_message.c_str());
+    //    LogMsg(DRV_ERROR, m_error_message.c_str());
     //    return -1;
     //}
 
     // Prepare statement
     std::string statement(query);
     std::string msg = "Attempting to execute a query \"" + statement + "\"";
-    LogMsg(ES_DEBUG, msg.c_str());
+    LogMsg(DRV_DEBUG, msg.c_str());
 
     // Issue request
     Aws::TimestreamQuery::Model::QueryRequest request;
     request.SetQueryString(query);
     auto outcome = m_client->Query(request);
     if (!outcome.IsSuccess()) {
-        LogMsg(ES_ERROR, outcome.GetError().GetMessage().c_str());
+        LogMsg(DRV_ERROR, outcome.GetError().GetMessage().c_str());
         return -1;
     }
 
@@ -377,18 +393,18 @@ int TSCommunication::ExecDirect(const char* query, const char*) {
 void TSCommunication::SendCursorQueries(
     Aws::TimestreamQuery::Model::QueryRequest request, Aws::String next_token) {
     if (next_token.empty()) {
-        LogMsg(ES_ERROR, "Next token is empty");
+        LogMsg(DRV_ERROR, "Next token is empty");
         return;
     }
     m_is_retrieving = true;
     try {
         while (!next_token.empty() && m_is_retrieving) {
-            LogMsg(ES_DEBUG,
+            LogMsg(DRV_DEBUG,
                    "SendCursorQueries: Start fetching more result sets in the "
                    "background");
             auto outcome = m_client->Query(request.WithNextToken(next_token));
             if (!outcome.IsSuccess()) {
-                LogMsg(ES_ERROR, outcome.GetError().GetMessage().c_str());
+                LogMsg(DRV_ERROR, outcome.GetError().GetMessage().c_str());
                 return;
             }
 
@@ -409,9 +425,9 @@ void TSCommunication::SendCursorQueries(
     } catch (std::runtime_error& e) {
         std::string error_message =
             "Received runtime exception: " + std::string(e.what());
-        LogMsg(ES_ERROR, error_message.c_str());
+        LogMsg(DRV_ERROR, error_message.c_str());
     }
-    LogMsg(ES_DEBUG, "SendCursorQueriesDone fetching more results");
+    LogMsg(DRV_DEBUG, "SendCursorQueriesDone fetching more results");
 
     if (!m_is_retrieving) {
         m_result_queue.clear();
@@ -430,7 +446,7 @@ void TSCommunication::SendCloseCursorRequest(const std::string& /*cursor*/) {
             "Received NULL response.";
         SetErrorDetails("Cursor error", m_error_message,
                         ConnErrorType::CONN_ERROR_QUERY_SYNTAX);
-        LogMsg(ES_ERROR, m_error_message.c_str());
+        LogMsg(DRV_ERROR, m_error_message.c_str());
     }*/
 }
 
