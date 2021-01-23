@@ -156,10 +156,10 @@ class Communication {
     virtual ESResult* PopResult();
     /**
      * Log messages
-     * @param level ESLogLevel
+     * @param level LogLevel
      * @param msg const char*
      */
-    void LogMsg(ESLogLevel level, const char* msg);
+    void LogMsg(LogLevel level, const char* msg);
     /**
      * Get connection status
      * @return ConnStatusType
