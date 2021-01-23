@@ -251,7 +251,7 @@ void print_log(const std::string &s) {
 #endif  // WIN32
         // cppcheck outputs an erroneous missing argument error which breaks
         // build. Disable for this function call
-    MYLOG(ES_ALL, "%s\n", s.c_str());
+    MYLOG(DRV_ALL, "%s\n", s.c_str());
 #if WIN32
 #pragma warning(pop)
 #endif  // WIN32
