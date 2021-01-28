@@ -74,20 +74,53 @@ int GetCurrentLogLevel(HWND hdlg) {
 void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
 
     if (strcmp(am->authtype_str, AUTHTYPE_IAM) == 0) {
-        EnableWindow(GetDlgItem(hdlg, IDC_USER), TRUE);
-        EnableWindow(GetDlgItem(hdlg, IDC_PASSWORD), TRUE);
-        EnableWindow(GetDlgItem(hdlg, IDC_TOKEN), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_REGION), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_END_POINT), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_NAME), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_HOST), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_PASSWORD), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_OKTA_APPLICATION_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_ROLE_ARN), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_APPLICATION_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_CLIENT_SECRET), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_TENANT), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_ARN), FALSE);
     } else if (strcmp(am->authtype_str, AUTHTYPE_AAD) == 0) {
-        EnableWindow(GetDlgItem(hdlg, IDC_USER), FALSE);
-        EnableWindow(GetDlgItem(hdlg, IDC_PASSWORD), FALSE);
-        EnableWindow(GetDlgItem(hdlg, IDC_TOKEN), FALSE);
-        EnableWindow(GetDlgItem(hdlg, IDC_REGION), TRUE);
-    } else {
-        EnableWindow(GetDlgItem(hdlg, IDC_USER), FALSE);
-        EnableWindow(GetDlgItem(hdlg, IDC_PASSWORD), FALSE);
-        EnableWindow(GetDlgItem(hdlg, IDC_TOKEN), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_REGION), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_END_POINT), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_NAME), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_HOST), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_PASSWORD), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_OKTA_APPLICATION_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_ROLE_ARN), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_APPLICATION_ID), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_CLIENT_SECRET), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_TENANT), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_ARN), TRUE);
+    } else {
+        EnableWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_REGION), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_END_POINT), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_NAME), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_HOST), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_PASSWORD), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_OKTA_APPLICATION_ID), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_ROLE_ARN), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_APPLICATION_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_CLIENT_SECRET), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_TENANT), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_ARN), TRUE);
     } 
 }
 
@@ -114,10 +147,11 @@ void SetDlgStuff(HWND hdlg, const ConnInfo *ci) {
     SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL,
                        ams[authtype_selection_idx].authtype_id, (WPARAM)0);
     SetAuthenticationVisibility(hdlg, &ams[authtype_selection_idx]);
-    SetDlgItemText(hdlg, IDC_USER, ci->username);
-    SetDlgItemText(hdlg, IDC_PASSWORD, SAFE_NAME(ci->password));
-    SetDlgItemText(hdlg, IDC_TOKEN, ci->token);
+    SetDlgItemText(hdlg, IDC_ACCESS_KEY_ID, ci->uid);
+    SetDlgItemText(hdlg, IDC_SECRET_ACCESS_KEY, SAFE_NAME(ci->pwd));
+    SetDlgItemText(hdlg, IDC_SESSION_TOKEN, ci->session_token);
     SetDlgItemText(hdlg, IDC_REGION, ci->region);
+    SetDlgItemText(hdlg, IDC_END_POINT, ci->end_point);
 }
 
 static void GetNameField(HWND hdlg, int item, esNAME *name) {
@@ -133,10 +167,12 @@ void GetDlgStuff(HWND hdlg, ConnInfo *ci) {
     GetDlgItemText(hdlg, IDC_PORT, ci->port, sizeof(ci->port));
 
     // Authentication
-    GetDlgItemText(hdlg, IDC_USER, ci->username, sizeof(ci->username));
-    GetNameField(hdlg, IDC_PASSWORD, &ci->password);
-    GetDlgItemText(hdlg, IDC_TOKEN, ci->token, sizeof(ci->token));
+    GetDlgItemText(hdlg, IDC_ACCESS_KEY_ID, ci->uid, sizeof(ci->uid));
+    GetNameField(hdlg, IDC_SECRET_ACCESS_KEY, &ci->pwd);
+    GetDlgItemText(hdlg, IDC_SESSION_TOKEN, ci->session_token,
+                   sizeof(ci->session_token));
     GetDlgItemText(hdlg, IDC_REGION, ci->region, sizeof(ci->region));
+    GetDlgItemText(hdlg, IDC_END_POINT, ci->end_point, sizeof(ci->end_point));
     const struct authmode *am = GetCurrentAuthMode(hdlg);
     SetAuthenticationVisibility(hdlg, am);
     STRCPY_FIXED(ci->authtype, am->authtype_str);
@@ -168,7 +204,9 @@ INT_PTR CALLBACK advancedOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
             ConnInfo *ci = (ConnInfo *)lParam;
             CheckDlgButton(hdlg, IDC_USESSL, ci->use_ssl);
             CheckDlgButton(hdlg, IDC_HOST_VER, ci->verify_server);
-            SetDlgItemText(hdlg, IDC_CONNTIMEOUT, ci->response_timeout);
+            SetDlgItemText(hdlg, IDC_REQUEST_TIMEOUT, ci->request_timeout);
+            SetDlgItemText(hdlg, IDC_CONNECTION_TIMEOUT, ci->connection_timeout);
+            SetDlgItemText(hdlg, IDC_MAX_CONNECTIONS, ci->max_connections);
             SetDlgItemText(hdlg, IDC_FETCH_SIZE, ci->fetch_size);
             break;
         }
@@ -180,8 +218,12 @@ INT_PTR CALLBACK advancedOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
                     // Get Dialog Values 
                     ci->use_ssl = (IsDlgButtonChecked(hdlg, IDC_USESSL) ? 1 : 0);
                     ci->verify_server = (IsDlgButtonChecked(hdlg, IDC_HOST_VER) ? 1 : 0);
-                    GetDlgItemText(hdlg, IDC_CONNTIMEOUT, ci->response_timeout,
-                                   sizeof(ci->response_timeout));
+                    GetDlgItemText(hdlg, IDC_REQUEST_TIMEOUT, ci->request_timeout,
+                                   sizeof(ci->request_timeout));
+                    GetDlgItemText(hdlg, IDC_CONNECTION_TIMEOUT, ci->connection_timeout,
+                                   sizeof(ci->connection_timeout));
+                    GetDlgItemText(hdlg, IDC_MAX_CONNECTIONS, ci->max_connections,
+                                   sizeof(ci->max_connections));
                     GetDlgItemText(hdlg, IDC_FETCH_SIZE, ci->fetch_size,
                                    sizeof(ci->fetch_size));
                 case IDCANCEL:

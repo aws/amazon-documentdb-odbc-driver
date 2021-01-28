@@ -289,10 +289,11 @@ typedef enum {
 
 typedef struct authentication_options {
     std::string auth_type;
-    std::string username;
-    std::string password;
-    std::string token;
+    std::string uid;
+    std::string pwd;
+    std::string session_token;
     std::string region;
+    std::string end_point;
 } authentication_options;
 
 typedef struct encryption_options {
@@ -308,6 +309,8 @@ typedef struct connection_options {
     std::string server;
     std::string port;
     std::string timeout;
+    std::string connection_timeout;
+    std::string max_connections;
     std::string fetch_size;
 } connection_options;
 
