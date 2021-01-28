@@ -297,8 +297,6 @@ typedef struct authentication_options {
 } authentication_options;
 
 typedef struct encryption_options {
-    bool use_ssl;
-    bool verify_server;
     std::string certificate_type;
     std::string certificate;
     std::string key;
@@ -311,7 +309,6 @@ typedef struct connection_options {
     std::string timeout;
     std::string connection_timeout;
     std::string max_connections;
-    std::string fetch_size;
 } connection_options;
 
 typedef struct runtime_options {
