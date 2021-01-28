@@ -59,14 +59,14 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
         "=%s;"
         "database=timestream;" INI_PORT "=%s;" INI_UID
         "=%s;" INI_PWD "=%s;" INI_SESSION_TOKEN "=%s;" INI_AUTH_MODE
-        "=%s;" INI_REGION "=%s;" INI_END_POINT "=%s;" INI_SSL_USE "=%d;" INI_SSL_HOST_VERIFY "=%d;" INI_LOG_LEVEL
+        "=%s;" INI_REGION "=%s;" INI_END_POINT "=%s;" INI_LOG_LEVEL
         "=%d;" INI_LOG_OUTPUT "=%s;" INI_REQUEST_TIMEOUT "=%s;" INI_CONNECTION_TIMEOUT
-                 "=%s;" INI_MAX_CONNECTIONS "=%s;" INI_FETCH_SIZE "=%s;",
+                 "=%s;" INI_MAX_CONNECTIONS "=%s;",
         got_dsn ? "DSN" : "DRIVER", got_dsn ? ci->dsn : ci->drivername,
         ci->server, ci->port, ci->uid, encoded_item, ci->session_token, ci->authtype,
-        ci->region, ci->end_point, (int)ci->use_ssl, (int)ci->verify_server,
+        ci->region, ci->end_point,
         (int)ci->drivers.loglevel, ci->drivers.output_dir,
-        ci->request_timeout, ci->connection_timeout, ci->max_connections, ci->fetch_size);
+        ci->request_timeout, ci->connection_timeout, ci->max_connections);
     if (olen < 0 || olen >= nlen) {
         connect_string[0] = '\0';
         return;
@@ -119,7 +119,7 @@ BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
              || (stricmp(attribute, INI_PWD) == 0)) {
         ci->pwd = decode_or_remove_braces(value);
 #ifndef FORCE_PASSWORDE_DISPLAY
-        MYLOG(DRV_DEBUG, "key='%s' value='xxxxxxxx'\n", attribute);
+        MYLOG(LOG_DEBUG, "key='%s' value='xxxxxxxx'\n", attribute);
         printed = TRUE;
 #endif
     } else if (stricmp(attribute, INI_SESSION_TOKEN) == 0)
@@ -130,10 +130,6 @@ BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
         STRCPY_FIXED(ci->region, value);
     else if (stricmp(attribute, INI_END_POINT) == 0)
         STRCPY_FIXED(ci->end_point, value);
-    else if (stricmp(attribute, INI_SSL_USE) == 0)
-        ci->use_ssl = (char)atoi(value);
-    else if (stricmp(attribute, INI_SSL_HOST_VERIFY) == 0)
-        ci->verify_server = (char)atoi(value);
     else if (stricmp(attribute, INI_LOG_LEVEL) == 0)
         ci->drivers.loglevel = (char)atoi(value);
     else if (stricmp(attribute, INI_LOG_OUTPUT) == 0)
@@ -144,13 +140,11 @@ BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
         STRCPY_FIXED(ci->connection_timeout, value);
     else if (stricmp(attribute, INI_MAX_CONNECTIONS) == 0)
         STRCPY_FIXED(ci->max_connections, value);
-    else if (stricmp(attribute, INI_FETCH_SIZE) == 0)
-        STRCPY_FIXED(ci->fetch_size, value);
     else
         found = FALSE;
 
     if (!printed)
-        MYLOG(DRV_DEBUG, "key='%s' value='%s'%s\n", attribute, value,
+        MYLOG(LOG_DEBUG, "key='%s' value='%s'%s\n", attribute, value,
               found ? NULL_STRING : " not found");
 
     return found;
@@ -167,8 +161,6 @@ static void getCiDefaults(ConnInfo *ci) {
             SMALL_REGISTRY_LEN);
     strncpy(ci->max_connections, DEFAULT_MAX_CONNECTIONS_STR,
             SMALL_REGISTRY_LEN);
-    strncpy(ci->fetch_size, DEFAULT_FETCH_SIZE_STR,
-            SMALL_REGISTRY_LEN);
     strncpy(ci->authtype, DEFAULT_AUTHTYPE, MEDIUM_REGISTRY_LEN);
     if (ci->pwd.name != NULL)
         free(ci->pwd.name);
@@ -177,8 +169,6 @@ static void getCiDefaults(ConnInfo *ci) {
     strncpy(ci->session_token, DEFAULT_SESSION_TOKEN, LARGE_REGISTRY_LEN);
     strncpy(ci->region, DEFAULT_REGION, MEDIUM_REGISTRY_LEN);
     strncpy(ci->end_point, DEFAULT_END_POINT, MEDIUM_REGISTRY_LEN);
-    ci->use_ssl = DEFAULT_USE_SSL;
-    ci->verify_server = DEFAULT_VERIFY_SERVER;
 #ifdef __APPLE__
     strcpy(ci->drivers.output_dir, "/tmp/");
 #else
@@ -240,7 +230,7 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
 
     if (!drivername[0] && DSN[0])
         getDriverNameFromDSN(DSN, (char *)drivername, sizeof(ci->drivername));
-    MYLOG(DRV_DEBUG, "drivername=%s\n", drivername);
+    MYLOG(LOG_DEBUG, "drivername=%s\n", drivername);
     if (!drivername[0])
         drivername = INVALID_DRIVER;
     getDriversDefaults(drivername, &(ci->drivers));
@@ -293,14 +283,6 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
                                    sizeof(temp), ODBC_INI)
         > 0)
         STRCPY_FIXED(ci->end_point, temp);
-    if (SQLGetPrivateProfileString(DSN, INI_SSL_USE, NULL_STRING, temp,
-                                   sizeof(temp), ODBC_INI)
-        > 0)
-        ci->use_ssl = (char)atoi(temp);
-    if (SQLGetPrivateProfileString(DSN, INI_SSL_HOST_VERIFY, NULL_STRING, temp,
-                                   sizeof(temp), ODBC_INI)
-        > 0)
-        ci->verify_server = (char)atoi(temp);
     if (SQLGetPrivateProfileString(DSN, INI_LOG_LEVEL, NULL_STRING, temp,
                                    sizeof(temp), ODBC_INI)
         > 0)
@@ -321,10 +303,6 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
                                    sizeof(temp), ODBC_INI)
         > 0)
         STRCPY_FIXED(ci->max_connections, temp);
-    if (SQLGetPrivateProfileString(DSN, INI_FETCH_SIZE, NULL_STRING, temp,
-                                   sizeof(temp), ODBC_INI)
-        > 0)
-        STRCPY_FIXED(ci->fetch_size, temp);
     STR_TO_NAME(ci->drivers.drivername, drivername);
 }
 /*
@@ -357,10 +335,6 @@ void writeDSNinfo(const ConnInfo *ci) {
     SQLWritePrivateProfileString(DSN, INI_AUTH_MODE, ci->authtype, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_REGION, ci->region, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_END_POINT, ci->end_point, ODBC_INI);
-    ITOA_FIXED(temp, ci->use_ssl);
-    SQLWritePrivateProfileString(DSN, INI_SSL_USE, temp, ODBC_INI);
-    ITOA_FIXED(temp, ci->verify_server);
-    SQLWritePrivateProfileString(DSN, INI_SSL_HOST_VERIFY, temp, ODBC_INI);
     ITOA_FIXED(temp, ci->drivers.loglevel);
     SQLWritePrivateProfileString(DSN, INI_LOG_LEVEL, temp, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_LOG_OUTPUT, ci->drivers.output_dir,
@@ -371,9 +345,6 @@ void writeDSNinfo(const ConnInfo *ci) {
                                  ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_MAX_CONNECTIONS, ci->max_connections,
                                  ODBC_INI);
-    SQLWritePrivateProfileString(DSN, INI_FETCH_SIZE, ci->fetch_size,
-                                 ODBC_INI);
-
 }
 
 static void encode(const esNAME in, char *out, int outlen) {
@@ -490,7 +461,7 @@ void CC_conninfo_release(ConnInfo *conninfo) {
 }
 
 void CC_conninfo_init(ConnInfo *conninfo, UInt4 option) {
-    MYLOG(DRV_TRACE, "entering opt=%d\n", option);
+    MYLOG(LOG_TRACE, "entering opt=%d\n", option);
 
     if (0 != (CLEANUP_FOR_REUSE & option))
         CC_conninfo_release(conninfo);
@@ -507,8 +478,6 @@ void CC_conninfo_init(ConnInfo *conninfo, UInt4 option) {
             SMALL_REGISTRY_LEN);
     strncpy(conninfo->max_connections, DEFAULT_MAX_CONNECTIONS_STR,
             SMALL_REGISTRY_LEN);
-    strncpy(conninfo->fetch_size, DEFAULT_FETCH_SIZE_STR,
-            SMALL_REGISTRY_LEN);
     strncpy(conninfo->authtype, DEFAULT_AUTHTYPE, MEDIUM_REGISTRY_LEN);
     if (conninfo->pwd.name != NULL)
         free(conninfo->pwd.name);
@@ -517,8 +486,6 @@ void CC_conninfo_init(ConnInfo *conninfo, UInt4 option) {
     strncpy(conninfo->session_token, DEFAULT_SESSION_TOKEN, LARGE_REGISTRY_LEN);
     strncpy(conninfo->region, DEFAULT_REGION, MEDIUM_REGISTRY_LEN);
     strncpy(conninfo->end_point, DEFAULT_END_POINT, MEDIUM_REGISTRY_LEN);
-    conninfo->use_ssl = DEFAULT_USE_SSL;
-    conninfo->verify_server = DEFAULT_VERIFY_SERVER;
 
     if (0 != (INIT_GLOBALS & option))
         init_globals(&(conninfo->drivers));
@@ -560,13 +527,10 @@ void CC_copy_conninfo(ConnInfo *ci, const ConnInfo *sci) {
     CORR_STRCPY(end_point);
     NAME_TO_NAME(ci->pwd, sci->pwd);
     CORR_STRCPY(session_token);
-    CORR_VALCPY(use_ssl);
-    CORR_VALCPY(verify_server);
     CORR_STRCPY(port);
     CORR_STRCPY(request_timeout);
     CORR_STRCPY(connection_timeout);
     CORR_STRCPY(max_connections);
-    CORR_STRCPY(fetch_size);
     copy_globals(&(ci->drivers), &(sci->drivers));
 }
 #undef CORR_STRCPY

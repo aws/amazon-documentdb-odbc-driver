@@ -553,12 +553,12 @@ typedef struct StatementOptions_ {
 } StatementOptions;
 
 /*	Used to pass extra query info to send_query */
-typedef struct QueryInfo_ {
-    SQLLEN row_size;
-    SQLLEN fetch_size;
-    QResultClass *result_in;
-    const char *next_token;
-} QueryInfo;
+//typedef struct QueryInfo_ {
+//    SQLLEN row_size;
+//    SQLLEN fetch_size;
+//    QResultClass *result_in;
+//    const char *cursor;
+//} QueryInfo;
 
 /*	Used to save the error information */
 typedef struct {
@@ -624,7 +624,6 @@ typedef struct {
     char request_timeout[SMALL_REGISTRY_LEN];
     char connection_timeout[SMALL_REGISTRY_LEN];
     char max_connections[SMALL_REGISTRY_LEN];
-    char fetch_size[SMALL_REGISTRY_LEN];
 
     // Authentication
     char authtype[MEDIUM_REGISTRY_LEN];
@@ -633,10 +632,6 @@ typedef struct {
     char session_token[LARGE_REGISTRY_LEN];
     char region[MEDIUM_REGISTRY_LEN];
     char end_point[MEDIUM_REGISTRY_LEN];
-
-    // Encryption
-    char use_ssl;
-    char verify_server;
 
     GLOBAL_VALUES drivers; /* moved from driver's option */
 } ConnInfo;
