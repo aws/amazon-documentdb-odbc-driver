@@ -68,7 +68,7 @@ char *hide_password(const char *str) {
 
 int paramRequired(const ConnInfo *ci, int reqs) {
     int required = 0;
-    const char *pw = SAFE_NAME(ci->password);
+    const char *pw = SAFE_NAME(ci->pwd);
 
     /* Password is not necessarily a required parameter. */
     if ((reqs & PASSWORD_IS_REQUIRED) != 0)
@@ -127,10 +127,12 @@ INT_PTR CALLBACK dconn_FDriverConnectProc(HWND hdlg, UINT wMsg, WPARAM wParam,
                 SetFocus(GetDlgItem(hdlg, IDC_SERVER));
             else if (ci->port[0] == '\0')
                 SetFocus(GetDlgItem(hdlg, IDC_PORT));
-            else if (ci->username[0] == '\0')
-                SetFocus(GetDlgItem(hdlg, IDC_USER));
+            else if (ci->uid[0] == '\0')
+                SetFocus(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID));
             else if (ci->region[0] == '\0')
                 SetFocus(GetDlgItem(hdlg, IDC_REGION));
+            else if (ci->end_point[0] == '\0')
+                SetFocus(GetDlgItem(hdlg, IDC_END_POINT));
 
             SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL, 2, (WPARAM)0);
 
