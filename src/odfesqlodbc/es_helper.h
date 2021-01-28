@@ -23,8 +23,8 @@
 // C++ interface
 std::string GetClientEncoding(void* conn);
 bool SetClientEncoding(void* conn, std::string& encoding);
-ESResult* ESGetResult(void* conn);
-void ESClearResult(ESResult* es_result);
+TSResult* TSGetResult(void* conn);
+void TSClearResult(TSResult* ts_result);
 void* ConnectDBParams(const runtime_options& rt_opts);
 std::string GetVersion(void* conn);
 std::vector< std::string > GetColumnsWithSelectQuery(
@@ -39,7 +39,6 @@ void XPlatformLeaveCriticalSection(void* critical_section_helper);
 void XPlatformDeleteCriticalSection(void** critical_section_helper);
 ConnStatusType Status(void* conn);
 int ESExecDirect(void* conn, const char* statement, const char* fetch_size);
-void SendCursorQueries(void* conn, const char* cursor);
 void Disconnect(void* conn);
 void StopRetrieval(void* conn);
 #ifdef __cplusplus

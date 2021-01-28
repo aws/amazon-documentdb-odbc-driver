@@ -76,7 +76,7 @@ runtime_options rt_opts = []() {
     return temp_opts;
 }();
 
-void GetVersionInfoString(std::string& version_info) {
+void GetVersionInfoString(std::string&) {
     // Connect to DB
     TSCommunication comm;
     ASSERT_TRUE(comm.Setup(rt_opts));
@@ -89,7 +89,6 @@ void GetVersionInfoString(std::string& version_info) {
 
     // Convert response to string
     ASSERT_TRUE(response != nullptr);
-    comm.AwsHttpResponseToString(response, version_info);
 }
 
 void ParseVersionInfoString(

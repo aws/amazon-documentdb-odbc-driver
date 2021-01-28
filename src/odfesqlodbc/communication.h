@@ -104,11 +104,6 @@ class Communication {
      */
     virtual std::string GetErrorPrefix() = 0;
     /**
-     * Send cursor queries
-     * @param cursor const std::string&
-     */
-    virtual void SendCursorQueries(const std::string& cursor) = 0;
-    /**
      * Send request to close cursor
      * @param cursor const std::string&
      */
@@ -127,14 +122,6 @@ class Communication {
         const std::string& content_type, const std::string& query,
         const std::string& fetch_size = "", const std::string& cursor = "") = 0;
     /**
-     * Convert Aws::Http::HttpResponse to std::string
-     * @param response std::shared_ptr< Aws::Http::HttpResposne >
-     * @return output std::string
-     */
-    virtual void AwsHttpResponseToString(
-        std::shared_ptr< Aws::Http::HttpResponse > response,
-        std::string& output) = 0;
-    /**
      * Get client encoding
      * @return std::string
      */
@@ -151,9 +138,9 @@ class Communication {
     virtual void StopResultRetrieval();
     /**
      * Pop result
-     * @return ESResult*
+     * @return TSResult*
      */
-    virtual ESResult* PopResult();
+    virtual TSResult* PopResult();
     /**
      * Log messages
      * @param level ESLogLevel

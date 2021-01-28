@@ -40,7 +40,7 @@ void ESResultQueue::clear() {
     }
 }
 
-bool ESResultQueue::pop(unsigned int timeout_ms, ESResult*& result) {
+bool ESResultQueue::pop(unsigned int timeout_ms, TSResult*& result) {
     if (m_pop_semaphore.try_lock_for(timeout_ms)) {
         std::scoped_lock lock(m_queue_mutex);
         result = m_queue.front();
@@ -52,7 +52,7 @@ bool ESResultQueue::pop(unsigned int timeout_ms, ESResult*& result) {
     return false;
 }
 
-bool ESResultQueue::push(unsigned int timeout_ms, ESResult* result) {
+bool ESResultQueue::push(unsigned int timeout_ms, TSResult* result) {
     if (m_push_semaphore.try_lock_for(timeout_ms)) {
         std::scoped_lock lock(m_queue_mutex);
         m_queue.push(result);
