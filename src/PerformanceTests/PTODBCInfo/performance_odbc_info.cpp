@@ -58,13 +58,13 @@ runtime_options rt_opts = []() {
             temp_opts.conn.port = wstring_to_string(it.second);
         else if (tmp == L"responsetimeout")
             temp_opts.conn.timeout = wstring_to_string(it.second);
-        else if (tmp == L"auth")
+        else if (tmp == L"Auth")
             temp_opts.auth.auth_type = wstring_to_string(it.second);
-        else if (tmp == L"user")
-            temp_opts.auth.username = wstring_to_string(it.second);
-        else if (tmp == L"password")
-            temp_opts.auth.password = wstring_to_string(it.second);
-        else if (tmp == L"region")
+        else if (tmp == L"AccessKeyId")
+            temp_opts.auth.uid = wstring_to_string(it.second);
+        else if (tmp == L"SecretAccessKey")
+            temp_opts.auth.pwd = wstring_to_string(it.second);
+        else if (tmp == L"Region")
             temp_opts.auth.region = wstring_to_string(it.second);
         else if (tmp == L"usessl")
             temp_opts.crypt.use_ssl =

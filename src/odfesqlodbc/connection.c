@@ -121,19 +121,19 @@ RETCODE SQL_API API_Connect(HDBC hdbc, const SQLCHAR *szDSN,
      * override values from DSN info with UID and authStr(pwd) This only
      * occurs if the values are actually there.
      */
-    fchar = ci->username[0]; /* save the first byte */
-    make_string(szUID, cbUID, ci->username, sizeof(ci->username));
-    if ('\0' == ci->username[0]) /* an empty string is specified */
-        ci->username[0] = fchar; /* restore the original username */
+    fchar = ci->uid[0]; /* save the first byte */
+    make_string(szUID, cbUID, ci->uid, sizeof(ci->uid));
+    if ('\0' == ci->uid[0]) /* an empty string is specified */
+        ci->uid[0] = fchar; /* restore the original uid */
     tmpstr = make_string(szAuthStr, cbAuthStr, NULL, 0);
     if (tmpstr) {
         if (tmpstr[0]) /* non-empty string is specified */
-            STR_TO_NAME(ci->password, tmpstr);
+            STR_TO_NAME(ci->pwd, tmpstr);
         free(tmpstr);
     }
 
     MYLOG(DRV_DEBUG, "conn = %p (DSN='%s', UID='%s', PWD='%s', TOKEN='%s')\n", conn, ci->dsn,
-          ci->username, NAME_IS_VALID(ci->password) ? "xxxxx" : "", ci->token);
+          ci->uid, NAME_IS_VALID(ci->pwd) ? "xxxxx" : "", ci->session_token);
 
     if ((fchar = CC_connect(conn)) <= 0) {
         /* Error messages are filled in */
