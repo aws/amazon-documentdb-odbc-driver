@@ -31,7 +31,7 @@ void print_tslog(const std::string &s) {
 #endif  // WIN32
         // cppcheck outputs an erroneous missing argument error which breaks
         // build. Disable for this function call
-    MYLOG(DRV_ALL, "%s\n", s.c_str());
+    MYLOG(LOG_ALL, "%s\n", s.c_str());
 #if WIN32
 #pragma warning(pop)
 #endif  // WIN32
@@ -264,8 +264,7 @@ QResultClass *SendQueryGetResult(StatementClass *stmt, BOOL commit) {
 
     // Send command
     ConnectionClass *cc = SC_get_conn(stmt);
-    if (ESExecDirect(cc->conn, stmt->statement, cc->connInfo.fetch_size)
-        != 0) {
+    if (ESExecDirect(cc->conn, stmt->statement) != 0) {
         QR_Destructor(res);
         return NULL;
     }
