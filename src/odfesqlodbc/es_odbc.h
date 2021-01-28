@@ -557,7 +557,7 @@ typedef struct QueryInfo_ {
     SQLLEN row_size;
     SQLLEN fetch_size;
     QResultClass *result_in;
-    const char *cursor;
+    const char *next_token;
 } QueryInfo;
 
 /*	Used to save the error information */

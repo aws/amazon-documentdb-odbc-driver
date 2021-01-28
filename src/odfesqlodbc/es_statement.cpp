@@ -38,7 +38,6 @@ void print_tslog(const std::string &s) {
 }
 
 RETCODE ExecuteStatement(StatementClass *stmt, BOOL commit) {
-    try {
         CSTR func = "ExecuteStatement";
         int func_cs_count = 0;
         ConnectionClass *conn = SC_get_conn(stmt);
@@ -173,9 +172,6 @@ RETCODE ExecuteStatement(StatementClass *stmt, BOOL commit) {
         stmt->diag_row_count = res->recent_processed_row_count;
 
         return CleanUp();
-    } catch (...) {
-        return SQL_ERROR;
-    }
 }
 
 SQLRETURN GetNextResultSet(StatementClass *stmt) {
@@ -191,14 +187,13 @@ SQLRETURN GetNextResultSet(StatementClass *stmt) {
         return SQL_ERROR;
     }
 
-    ESResult *es_res = ESGetResult(cc->conn);
+    TSResult *es_res = TSGetResult(cc->conn);
     if (es_res != NULL) {
         // Save server cursor id to fetch more pages later
-        if (es_res->es_result_doc.has("cursor")) {
-            QR_set_server_cursor_id(
-                q_res, es_res->es_result_doc["cursor"].as_string().c_str());
+        if (!es_res->next_token.empty()) {
+            QR_set_next_token(q_res, es_res->next_token.c_str());
         } else {
-            QR_set_server_cursor_id(q_res, NULL);
+            QR_set_next_token(q_res, NULL);
         }
 
         // Responsible for looping through rows, allocating tuples and
@@ -271,17 +266,17 @@ QResultClass *SendQueryGetResult(StatementClass *stmt, BOOL commit) {
     }
     res->rstatus = PORES_COMMAND_OK;
 
-    // Get ESResult
-    ESResult *es_res = ESGetResult(cc->conn);
-    if (es_res == NULL) {
+    // Get TSResult
+    TSResult *ts_res = TSGetResult(cc->conn);
+    if (ts_res == NULL) {
         QR_Destructor(res);
         return NULL;
     }
 
     BOOL success =
         commit
-            ? CC_from_ESResult(res, cc, res->cursor_name, *es_res)
-            : CC_Metadata_from_ESResult(res, cc, res->cursor_name, *es_res);
+            ? CC_from_TSResult(res, cc, res->cursor_name, *ts_res)
+            : CC_Metadata_from_TSResult(res, cc, res->cursor_name, *ts_res);
 
     // Convert result to QResultClass
     if (!success) {
@@ -290,12 +285,12 @@ QResultClass *SendQueryGetResult(StatementClass *stmt, BOOL commit) {
     }
 
     if (commit) {
-        // Deallocate ESResult
-        ESClearResult(es_res);
-        res->es_result = NULL;
+        // Deallocate TSResult
+        TSClearResult(ts_res);
+        res->ts_result = NULL;
     } else {
-        // Set ESResult into connection class so it can be used later
-        res->es_result = es_res;
+        // Set TSResult into connection class so it can be used later
+        res->ts_result = ts_res;
     }
     return res;
 }
@@ -305,29 +300,29 @@ RETCODE AssignResult(StatementClass *stmt) {
         return SQL_ERROR;
 
     QResultClass *res = SC_get_Result(stmt);
-    if (!res || !res->es_result) {
+    if (!res || !res->ts_result) {
         return SQL_ERROR;
     }
 
     // Commit result to QResultClass
-    ESResult *es_res = static_cast< ESResult * >(res->es_result);
+    TSResult *es_res = static_cast< TSResult * >(res->ts_result);
     ConnectionClass *conn = SC_get_conn(stmt);
-    if (!CC_No_Metadata_from_ESResult(res, conn, res->cursor_name, *es_res)) {
+    if (!CC_No_Metadata_from_TSResult(res, conn, res->cursor_name, *es_res)) {
         QR_Destructor(res);
         return SQL_ERROR;
     }
     GetNextResultSet(stmt);
 
     // Deallocate and return result
-    ESClearResult(es_res);
-    res->es_result = NULL;
+    TSClearResult(es_res);
+    res->ts_result = NULL;
     return SQL_SUCCESS;
 }
 
-void ClearESResult(void *es_result) {
-    if (es_result != NULL) {
-        ESResult *es_res = static_cast< ESResult * >(es_result);
-        ESClearResult(es_res);
+void ClearTSResult(void *ts_result) {
+    if (ts_result != NULL) {
+        TSResult *es_res = static_cast< TSResult * >(ts_result);
+        TSClearResult(es_res);
     }
 }
 

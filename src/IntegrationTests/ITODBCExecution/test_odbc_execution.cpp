@@ -116,9 +116,6 @@ class TestSQLExecDirect : public testing::Test {
     ~TestSQLExecDirect() {
         // cleanup any pending stuff, but no exceptions allowed
     }
-    int m_limit = 10;
-    std::wstring m_query =
-        L"SELECT * FROM test.IoT LIMIT " + std::to_wstring(m_limit);
     SQLHENV m_env = SQL_NULL_HENV;
     SQLHDBC m_conn = SQL_NULL_HDBC;
     SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
@@ -291,8 +288,11 @@ TEST_F(TestSQLPrepare, NullQueryError) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }*/
 
-TEST_F(TestSQLExecDirect, Success) {
-    SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query.c_str(), SQL_NTS);
+TEST_F(TestSQLExecDirect, Success_100) {
+    int limit = 100;
+    std::wstring query =
+        L"SELECT * FROM promPerf.query LIMIT " + std::to_wstring(limit);
+    SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_EQ(SQL_SUCCESS, ret);
     int cnt = 0;
     while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
@@ -300,7 +300,55 @@ TEST_F(TestSQLExecDirect, Success) {
             cnt++;
         }
     }
-    EXPECT_EQ(m_limit, cnt);
+    EXPECT_EQ(limit, cnt);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLExecDirect, Success_800) {
+    int limit = 800;
+    std::wstring query =
+        L"SELECT * FROM promPerf.query LIMIT " + std::to_wstring(limit);
+    SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_EQ(SQL_SUCCESS, ret);
+    int cnt = 0;
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            cnt++;
+        }
+    }
+    EXPECT_EQ(limit, cnt);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLExecDirect, Success_5000) {
+    int limit = 5000;
+    std::wstring query =
+        L"SELECT * FROM promPerf.query LIMIT " + std::to_wstring(limit);
+    SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_EQ(SQL_SUCCESS, ret);
+    int cnt = 0;
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            cnt++;
+        }
+    }
+    EXPECT_EQ(limit, cnt);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLExecDirect, Success_10000) {
+    int limit = 10000;
+    std::wstring query =
+        L"SELECT * FROM promPerf.query LIMIT " + std::to_wstring(limit);
+    SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_EQ(SQL_SUCCESS, ret);
+    int cnt = 0;
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            cnt++;
+        }
+    }
+    EXPECT_EQ(limit, cnt);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 

@@ -36,7 +36,6 @@
 #endif // __APPLE__
 // clang-format on
 
-
 /**
  * AWS Timestream communication class
  */
@@ -84,11 +83,6 @@ class TSCommunication : public Communication {
      */
     virtual std::string GetErrorPrefix() override;
     /**
-     * Send cursor queries
-     * @param cursor const std::string&
-     */
-    virtual void SendCursorQueries(const std::string& cursor) override;
-    /**
      * Send request to close cursor
      * @param cursor const std::string&
      */
@@ -105,22 +99,23 @@ class TSCommunication : public Communication {
     virtual std::shared_ptr< Aws::Http::HttpResponse > IssueRequest(
         const std::string& endpoint, const Aws::Http::HttpMethod request_type,
         const std::string& content_type, const std::string& query,
-        const std::string& fetch_size = "", const std::string& cursor = "") override;
-    /**
-     * Convert Aws::Http::HttpResponse to std::string
-     * @param response std::shared_ptr< Aws::Http::HttpResposne >
-     * @return output std::string
-     */
-    virtual void AwsHttpResponseToString(
-        std::shared_ptr< Aws::Http::HttpResponse > response,
-        std::string& output) override;
-private:
+        const std::string& fetch_size = "",
+        const std::string& cursor = "") override;
+
+   private:
     /**
      * Construct the result set
-     * @param result ESResult&
+     * @param result TSResult&
      * @return output std::string
      */
-    void ConstructESResult(ESResult& result);
+    void ConstructTSResult(TSResult& result);
+    /**
+     * Send cursor queries
+     * @param request Aws::TimestreamQuery::Model::QueryRequest
+     * @param cursor Aws::String
+     */
+    void SendCursorQueries(Aws::TimestreamQuery::Model::QueryRequest request,
+                           Aws::String next_token);
     /**
      * Runtime options
      */
@@ -128,7 +123,7 @@ private:
     /**
      * Timestream query client
      */
-    std::unique_ptr<Aws::TimestreamQuery::TimestreamQueryClient> m_client;
+    std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient > m_client;
 };
 
 #endif

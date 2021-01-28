@@ -190,8 +190,8 @@ QResultClass *QR_Constructor(void) {
         rv->dl_count = 0;
         rv->deleted = NULL;
         rv->deleted_keyset = NULL;
-        rv->es_result = NULL;
-        rv->server_cursor_id = NULL;
+        rv->ts_result = NULL;
+        rv->next_token = NULL;
     }
 
     MYLOG(ES_TRACE, "leaving\n");
@@ -240,10 +240,10 @@ void QR_close_result(QResultClass *self, BOOL destroy) {
             self->notice = NULL;
         }
 
-        /* Free server_cursor_id (this is from strdup()) */
-        if (self->server_cursor_id) {
-            free(self->server_cursor_id);
-            self->server_cursor_id = NULL;
+        /* Free next_token (this is from strdup()) */
+        if (self->next_token) {
+            free(self->next_token);
+            self->next_token = NULL;
         }
 
         /* Destruct the result object in the chain */
@@ -303,12 +303,12 @@ void QR_set_message(QResultClass *self, const char *msg) {
     self->message = msg ? strdup(msg) : NULL;
 }
 
-void QR_set_server_cursor_id(QResultClass *self, const char *server_cursor_id) {
-    if (self->server_cursor_id) {
-        free(self->server_cursor_id);
+void QR_set_next_token(QResultClass *self, const char *next_token) {
+    if (self->next_token) {
+        free(self->next_token);
     }
 
-    self->server_cursor_id = server_cursor_id ? strdup(server_cursor_id) : NULL;
+    self->next_token = next_token ? strdup(next_token) : NULL;
 }
 
 void QR_add_message(QResultClass *self, const char *msg) {
@@ -467,9 +467,9 @@ void QR_free_memory(QResultClass *self) {
         free(self->updated_tuples);
         self->updated_tuples = NULL;
     }
-    if (self->es_result) {
-        ClearESResult(self->es_result);
-        self->es_result = NULL;
+    if (self->ts_result) {
+        ClearTSResult(self->ts_result);
+        self->ts_result = NULL;
     }
 
     self->up_alloc = 0;

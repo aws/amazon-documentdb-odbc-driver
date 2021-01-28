@@ -1382,7 +1382,7 @@ RETCODE SQL_API ESAPI_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
         if (conn != NULL) {
             const SQLLEN end_rowset_size = rowset_start + rowsetSize;
             while ((end_rowset_size >= num_tuples)
-                   && (NULL != res->server_cursor_id)) {
+                   && (NULL != res->next_token)) {
                 GetNextResultSet(stmt);
                 num_tuples = QR_get_num_total_tuples(res);
             }
