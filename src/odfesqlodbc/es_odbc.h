@@ -621,15 +621,18 @@ typedef struct {
     char drivername[MEDIUM_REGISTRY_LEN];
     char server[MEDIUM_REGISTRY_LEN];
     char port[SMALL_REGISTRY_LEN];
-    char response_timeout[SMALL_REGISTRY_LEN];
+    char request_timeout[SMALL_REGISTRY_LEN];
+    char connection_timeout[SMALL_REGISTRY_LEN];
+    char max_connections[SMALL_REGISTRY_LEN];
     char fetch_size[SMALL_REGISTRY_LEN];
 
     // Authentication
     char authtype[MEDIUM_REGISTRY_LEN];
-    char username[MEDIUM_REGISTRY_LEN];
-    esNAME password;
-    char token[LARGE_REGISTRY_LEN];
+    char uid[MEDIUM_REGISTRY_LEN];
+    esNAME pwd;
+    char session_token[LARGE_REGISTRY_LEN];
     char region[MEDIUM_REGISTRY_LEN];
+    char end_point[MEDIUM_REGISTRY_LEN];
 
     // Encryption
     char use_ssl;
