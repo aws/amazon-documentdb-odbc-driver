@@ -26,12 +26,12 @@ Communication::Communication()
       m_client_encoding(m_supported_client_encodings[0]),
       m_is_retrieving(false),
       m_result_queue(2) {
-    LogMsg(DRV_ALL, "Initializing AWS API.");
+    LogMsg(LOG_ALL, "Initializing AWS API.");
     Aws::InitAPI(m_sdk_options);
 }
 
 Communication::~Communication() {
-    LogMsg(DRV_ALL, "Shutting down AWS API.");
+    LogMsg(LOG_ALL, "Shutting down AWS API.");
     Aws::ShutdownAPI(m_sdk_options);
 }
 
@@ -76,7 +76,7 @@ bool Communication::SetClientEncoding(const std::string& encoding) {
         m_client_encoding = encoding;
         return true;
     }
-    LogMsg(DRV_ERROR,
+    LogMsg(LOG_ERROR,
            std::string("Failed to find encoding " + encoding).c_str());
     return false;
 }

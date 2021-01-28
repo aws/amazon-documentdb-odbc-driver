@@ -66,12 +66,6 @@ runtime_options rt_opts = []() {
             temp_opts.auth.pwd = wstring_to_string(it.second);
         else if (tmp == L"Region")
             temp_opts.auth.region = wstring_to_string(it.second);
-        else if (tmp == L"usessl")
-            temp_opts.crypt.use_ssl =
-                (std::stoul(it.second, nullptr, 10) ? true : false);
-        else if (tmp == L"")
-            temp_opts.crypt.verify_server =
-                (std::stoul(it.second, nullptr, 10) ? true : false);
     }
     return temp_opts;
 }();
@@ -82,10 +76,10 @@ void GetVersionInfoString(std::string& version_info) {
     ASSERT_TRUE(comm.Setup(rt_opts));
 
     // Issue request
-    std::string endpoint, content_type, query, fetch_size;
+    std::string endpoint, content_type, query;
     std::shared_ptr< Aws::Http::HttpResponse > response =
         comm.IssueRequest(endpoint, Aws::Http::HttpMethod::HTTP_GET,
-                             content_type, query, fetch_size);
+                             content_type, query);
 
     // Convert response to string
     ASSERT_TRUE(response != nullptr);
