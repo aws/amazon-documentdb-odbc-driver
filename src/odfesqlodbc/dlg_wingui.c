@@ -72,7 +72,6 @@ int GetCurrentLogLevel(HWND hdlg) {
 
 
 void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
-
     if (strcmp(am->authtype_str, AUTHTYPE_IAM) == 0) {
         EnableWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), TRUE);
@@ -202,12 +201,9 @@ INT_PTR CALLBACK advancedOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
         case WM_INITDIALOG: {
             SetWindowLongPtr(hdlg, DWLP_USER, lParam);
             ConnInfo *ci = (ConnInfo *)lParam;
-            CheckDlgButton(hdlg, IDC_USESSL, ci->use_ssl);
-            CheckDlgButton(hdlg, IDC_HOST_VER, ci->verify_server);
             SetDlgItemText(hdlg, IDC_REQUEST_TIMEOUT, ci->request_timeout);
             SetDlgItemText(hdlg, IDC_CONNECTION_TIMEOUT, ci->connection_timeout);
             SetDlgItemText(hdlg, IDC_MAX_CONNECTIONS, ci->max_connections);
-            SetDlgItemText(hdlg, IDC_FETCH_SIZE, ci->fetch_size);
             break;
         }
 
@@ -216,16 +212,12 @@ INT_PTR CALLBACK advancedOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
             switch (GET_WM_COMMAND_ID(wParam, lParam)) {
                 case IDOK:
                     // Get Dialog Values 
-                    ci->use_ssl = (IsDlgButtonChecked(hdlg, IDC_USESSL) ? 1 : 0);
-                    ci->verify_server = (IsDlgButtonChecked(hdlg, IDC_HOST_VER) ? 1 : 0);
                     GetDlgItemText(hdlg, IDC_REQUEST_TIMEOUT, ci->request_timeout,
                                    sizeof(ci->request_timeout));
                     GetDlgItemText(hdlg, IDC_CONNECTION_TIMEOUT, ci->connection_timeout,
                                    sizeof(ci->connection_timeout));
                     GetDlgItemText(hdlg, IDC_MAX_CONNECTIONS, ci->max_connections,
                                    sizeof(ci->max_connections));
-                    GetDlgItemText(hdlg, IDC_FETCH_SIZE, ci->fetch_size,
-                                   sizeof(ci->fetch_size));
                 case IDCANCEL:
                     EndDialog(hdlg, FALSE);
                     return TRUE;
@@ -270,31 +262,31 @@ INT_PTR CALLBACK logOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
                     int log = GetCurrentLogLevel(hdlg);
                     switch (log) {
                         case IDS_LOGTYPE_OFF:
-                            ci->drivers.loglevel = (char)DRV_OFF;
+                            ci->drivers.loglevel = (char)LOG_OFF;
                             break;
                         case IDS_LOGTYPE_FATAL:
-                            ci->drivers.loglevel = (char)DRV_FATAL;
+                            ci->drivers.loglevel = (char)LOG_FATAL;
                             break;
                         case IDS_LOGTYPE_ERROR:
-                            ci->drivers.loglevel = (char)DRV_ERROR;
+                            ci->drivers.loglevel = (char)LOG_ERROR;
                             break;
                         case IDS_LOGTYPE_WARNING:
-                            ci->drivers.loglevel = (char)DRV_WARNING;
+                            ci->drivers.loglevel = (char)LOG_WARNING;
                             break;
                         case IDS_LOGTYPE_INFO:
-                            ci->drivers.loglevel = (char)DRV_INFO;
+                            ci->drivers.loglevel = (char)LOG_INFO;
                             break;
                         case IDS_LOGTYPE_DEBUG:
-                            ci->drivers.loglevel = (char)DRV_DEBUG;
+                            ci->drivers.loglevel = (char)LOG_DEBUG;
                             break;
                         case IDS_LOGTYPE_TRACE:
-                            ci->drivers.loglevel = (char)DRV_TRACE;
+                            ci->drivers.loglevel = (char)LOG_TRACE;
                             break;
                         case IDS_LOGTYPE_ALL:
-                            ci->drivers.loglevel = (char)DRV_ALL;
+                            ci->drivers.loglevel = (char)LOG_ALL;
                             break;
                         default:
-                            ci->drivers.loglevel = (char)DRV_OFF;
+                            ci->drivers.loglevel = (char)LOG_OFF;
                             break;
                     }
                     setGlobalCommlog(ci->drivers.loglevel);

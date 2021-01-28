@@ -38,14 +38,12 @@
 
 std::vector< std::pair< std::wstring, std::wstring > > conn_str_pair = {
     {L"Driver", L"timestreamodbc"},
-    //{L"host", (use_ssl ? L"https://localhost" : L"localhost")},
+    //{L"host", (L"localhost")},
     //{L"port", L"9200"},
     {L"AccessKeyId", L"<accesskey>"},
     {L"SecretAccessKey", L"<secretkey>"},
     {L"Region", L"us-east-1"},
     {L"Auth", L"IAM"},
-    {L"useSSL", L"1"},
-    {L"hostnameVerification", L"0"},
     {L"LogLevel", L"7"},
     {L"LogOutput", L"C:\\"},
     {L"RequestTimeout", L"0"},

@@ -111,7 +111,7 @@
 /*
 // Prepare document and validate result
 try {
-    LogMsg(DRV_DEBUG, "Parsing result JSON with cursor.");
+    LogMsg(LOG_DEBUG, "Parsing result JSON with cursor.");
     ts_result.es_result_doc.parse(ts_result.result_json,
                                   CURSOR_JSON_SCHEMA);
 } catch (const rabbit::parse_error& e) {
@@ -127,7 +127,7 @@ try {
     /*
     // Prepare document and validate result
     try {
-        LogMsg(DRV_DEBUG, "Parsing result JSON with cursor.");
+        LogMsg(LOG_DEBUG, "Parsing result JSON with cursor.");
         es_result.es_result_doc.parse(es_result.result_json,
                                       CURSOR_JSON_SCHEMA);
     } catch (const rabbit::parse_error& e) {
@@ -146,7 +146,7 @@ try {
     /*
     // Prepare document and validate schema
     try {
-        LogMsg(DRV_DEBUG, "Parsing error response (with schema validation)");
+        LogMsg(LOG_DEBUG, "Parsing error response (with schema validation)");
         es_result.es_result_doc.parse(es_result.result_json,
                                       ERROR_RESPONSE_SCHEMA);
 
@@ -173,7 +173,7 @@ try {
     /*
     // Prepare document and validate schema
     try {
-        LogMsg(DRV_DEBUG, "Parsing result JSON with schema.");
+        LogMsg(LOG_DEBUG, "Parsing result JSON with schema.");
         es_result.es_result_doc.parse(es_result.result_json, JSON_SCHEMA);
     } catch (const rabbit::parse_error& e) {
         // The exception rabbit gives is quite useless - providing the json
@@ -204,7 +204,7 @@ bool TSCommunication::Validate(const runtime_options& options) {
     if (!options.conn.timeout.empty()) {
         std::stol(options.conn.timeout);
     }
-    LogMsg(DRV_DEBUG, "Required connection options are valid.");
+    LogMsg(LOG_DEBUG, "Required connection options are valid.");
     return true;
 }
 
@@ -212,18 +212,20 @@ bool TSCommunication::Connect(const runtime_options& options) {
     Aws::Client::ClientConfiguration config;
     if (!options.auth.end_point.empty()) {
         config.endpointOverride = options.auth.end_point;
-        LogMsg(DRV_ALL, "Disconnecting timestream connection.");
     } else {
         config.enableEndpointDiscovery = true;
         config.region = options.auth.region;
     }
-    config.verifySSL = options.crypt.verify_server;
     long request_timeout = static_cast< long >(DEFAULT_REQUEST_TIMEOUT);
     request_timeout = std::stol(options.conn.timeout);
-    config.requestTimeoutMs = request_timeout;
+    if (request_timeout > 0) {
+        config.requestTimeoutMs = request_timeout;
+    }
     long connection_timeout = static_cast< long >(DEFAULT_CONNECTION_TIMEOUT);
     connection_timeout = std::stol(options.conn.connection_timeout);
-    config.connectTimeoutMs = connection_timeout;
+    if (connection_timeout > 0) {
+        config.connectTimeoutMs = connection_timeout;
+    }
     long max_connections = static_cast< long >(DEFAULT_MAX_CONNECTIONS);
     max_connections = std::stol(options.conn.max_connections);
     config.maxConnections = max_connections;
@@ -248,7 +250,7 @@ bool TSCommunication::Connect(const runtime_options& options) {
     auto outcome = m_client->Query(req);
     if (!outcome.IsSuccess()) {
         auto err = outcome.GetError().GetMessage();
-        LogMsg(DRV_ERROR, err.c_str());
+        LogMsg(LOG_ERROR, err.c_str());
         Disconnect();
         throw std::runtime_error("Failed to establish connection: " + err);
     }
@@ -256,7 +258,7 @@ bool TSCommunication::Connect(const runtime_options& options) {
 }
 
 void TSCommunication::Disconnect() {
-    LogMsg(DRV_ALL, "Disconnecting timestream connection.");
+    LogMsg(LOG_ALL, "Disconnecting timestream connection.");
     if (m_client) {
         m_client.reset();
     }
@@ -276,7 +278,7 @@ std::shared_ptr< Aws::Http::HttpResponse > TSCommunication::IssueRequest(
     const std::string& /*endpoint*/,
     const Aws::Http::HttpMethod /*request_type*/,
     const std::string& /*content_type*/, const std::string& /*query*/,
-    const std::string& /*fetch_size*/, const std::string& /*cursor*/) {
+    const std::string& /*cursor*/) {
     return nullptr;
 }
 
@@ -286,14 +288,14 @@ std::vector< std::string > TSCommunication::GetColumnsWithSelectQuery(
     // if (table_name.empty()) {
     //    m_error_type = ConnErrorType::CONN_ERROR_INVALID_NULL_PTR;
     //    m_error_message = "Query is NULL";
-    //    LogMsg(DRV_ERROR, m_error_message.c_str());
+    //    LogMsg(LOG_ERROR, m_error_message.c_str());
     //    return list_of_column;
     //}
 
     //// Prepare query
     //std::string query = "SELECT * FROM " + table_name + " LIMIT 0";
     //std::string msg = "Attempting to execute a query \"" + query + "\"";
-    //LogMsg(DRV_DEBUG, msg.c_str());
+    //LogMsg(LOG_DEBUG, msg.c_str());
 
     //// Issue request
     // std::shared_ptr< Aws::Http::HttpResponse > response =
@@ -308,7 +310,7 @@ std::vector< std::string > TSCommunication::GetColumnsWithSelectQuery(
     //        "Received NULL response.";
     //    SetErrorDetails("HTTP client error", m_error_message,
     //                    ConnErrorType::CONN_ERROR_COMM_LINK_FAILURE);
-    //    LogMsg(DRV_ERROR, m_error_message.c_str());
+    //    LogMsg(LOG_ERROR, m_error_message.c_str());
     //    return list_of_column;
     //}
 
@@ -332,7 +334,7 @@ std::vector< std::string > TSCommunication::GetColumnsWithSelectQuery(
     //    }
     //    SetErrorDetails("Connection error", m_error_message,
     //                    ConnErrorType::CONN_ERROR_COMM_LINK_FAILURE);
-    //    LogMsg(DRV_ERROR, m_error_message.c_str());
+    //    LogMsg(LOG_ERROR, m_error_message.c_str());
     //    return list_of_column;
     //}
 
@@ -349,33 +351,33 @@ std::vector< std::string > TSCommunication::GetColumnsWithSelectQuery(
     return std::vector< std::string >{};
 }
 
-int TSCommunication::ExecDirect(const char* query, const char*) {
-    // m_error_details.reset();
-    // if (!query) {
+int TSCommunication::ExecDirect(const char* query) {
+    //m_error_details.reset();
+    //if (!query) {
     //    m_error_message = "Query is NULL";
     //    SetErrorDetails("Execution error", m_error_message,
     //                    ConnErrorType::CONN_ERROR_INVALID_NULL_PTR);
-    //    LogMsg(DRV_ERROR, m_error_message.c_str());
+    //    LogMsg(LOG_ERROR, m_error_message.c_str());
     //    return -1;
     //} else if (!m_client) {
     //    m_error_message = "Unable to connect. Please try connecting again.";
     //    SetErrorDetails("Execution error", m_error_message,
     //                    ConnErrorType::CONN_ERROR_COMM_LINK_FAILURE);
-    //    LogMsg(DRV_ERROR, m_error_message.c_str());
+    //    LogMsg(LOG_ERROR, m_error_message.c_str());
     //    return -1;
     //}
 
     // Prepare statement
     std::string statement(query);
     std::string msg = "Attempting to execute a query \"" + statement + "\"";
-    LogMsg(DRV_DEBUG, msg.c_str());
+    LogMsg(LOG_DEBUG, msg.c_str());
 
     // Issue request
     Aws::TimestreamQuery::Model::QueryRequest request;
     request.SetQueryString(query);
     auto outcome = m_client->Query(request);
     if (!outcome.IsSuccess()) {
-        LogMsg(DRV_ERROR, outcome.GetError().GetMessage().c_str());
+        LogMsg(LOG_ERROR, outcome.GetError().GetMessage().c_str());
         return -1;
     }
 
@@ -401,18 +403,18 @@ int TSCommunication::ExecDirect(const char* query, const char*) {
 void TSCommunication::SendCursorQueries(
     Aws::TimestreamQuery::Model::QueryRequest request, Aws::String next_token) {
     if (next_token.empty()) {
-        LogMsg(DRV_ERROR, "Next token is empty");
+        LogMsg(LOG_ERROR, "Next token is empty");
         return;
     }
     m_is_retrieving = true;
     try {
         while (!next_token.empty() && m_is_retrieving) {
-            LogMsg(DRV_DEBUG,
+            LogMsg(LOG_DEBUG,
                    "SendCursorQueries: Start fetching more result sets in the "
                    "background");
             auto outcome = m_client->Query(request.WithNextToken(next_token));
             if (!outcome.IsSuccess()) {
-                LogMsg(DRV_ERROR, outcome.GetError().GetMessage().c_str());
+                LogMsg(LOG_ERROR, outcome.GetError().GetMessage().c_str());
                 return;
             }
 
@@ -433,9 +435,9 @@ void TSCommunication::SendCursorQueries(
     } catch (std::runtime_error& e) {
         std::string error_message =
             "Received runtime exception: " + std::string(e.what());
-        LogMsg(DRV_ERROR, error_message.c_str());
+        LogMsg(LOG_ERROR, error_message.c_str());
     }
-    LogMsg(DRV_DEBUG, "SendCursorQueriesDone fetching more results");
+    LogMsg(LOG_DEBUG, "SendCursorQueriesDone fetching more results");
 
     if (!m_is_retrieving) {
         m_result_queue.clear();
@@ -454,7 +456,7 @@ void TSCommunication::SendCloseCursorRequest(const std::string& /*cursor*/) {
             "Received NULL response.";
         SetErrorDetails("Cursor error", m_error_message,
                         ConnErrorType::CONN_ERROR_QUERY_SYNTAX);
-        LogMsg(DRV_ERROR, m_error_message.c_str());
+        LogMsg(LOG_ERROR, m_error_message.c_str());
     }*/
 }
 

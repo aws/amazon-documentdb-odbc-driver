@@ -126,14 +126,14 @@ const char *po_basename(const char *path);
 #endif /* __GNUC__ */
 
 enum LogLevel {
-    DRV_OFF = 0,
-    DRV_FATAL,
-    DRV_ERROR,
-    DRV_WARNING,
-    DRV_INFO,
-    DRV_DEBUG,
-    DRV_TRACE,
-    DRV_ALL
+    LOG_OFF = 0,
+    LOG_FATAL,
+    LOG_ERROR,
+    LOG_WARNING,
+    LOG_INFO,
+    LOG_DEBUG,
+    LOG_TRACE,
+    LOG_ALL
 };
 
 int get_qlog(void);
