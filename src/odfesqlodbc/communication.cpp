@@ -86,8 +86,8 @@ void Communication::StopResultRetrieval() {
     m_result_queue.clear();
 }
 
-ESResult* Communication::PopResult() {
-    ESResult* result = nullptr;
+TSResult* Communication::PopResult() {
+    TSResult* result = nullptr;
     while (!m_result_queue.pop(QUEUE_TIMEOUT, result) && m_is_retrieving) {
     }
 

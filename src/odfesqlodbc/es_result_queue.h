@@ -22,7 +22,7 @@
 
 #define QUEUE_TIMEOUT 20 // milliseconds
 
-struct ESResult;
+struct TSResult;
 
 class ESResultQueue {
     public:
@@ -30,11 +30,11 @@ class ESResultQueue {
         ~ESResultQueue();
 
         void clear();
-        bool pop(unsigned int timeout_ms, ESResult*& result);
-        bool push(unsigned int timeout_ms, ESResult* result);
+        bool pop(unsigned int timeout_ms, TSResult*& result);
+        bool push(unsigned int timeout_ms, TSResult* result);
 
     private:
-        std::queue<ESResult*> m_queue;
+        std::queue<TSResult*> m_queue;
         std::mutex m_queue_mutex;
         es_semaphore m_push_semaphore;
         es_semaphore m_pop_semaphore;

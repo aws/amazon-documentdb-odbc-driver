@@ -34,21 +34,21 @@ typedef std::vector< std::pair< std::string, OID > > schema_type;
 typedef rabbit::array json_arr;
 typedef json_arr::iterator::result_type json_arr_it;
 
-bool _CC_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
-                       const char *cursor, ESResult &es_result);
-bool _CC_Metadata_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
-                                const char *cursor, ESResult &es_result);
-bool _CC_No_Metadata_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
-                                   const char *cursor, ESResult &es_result);
+bool _CC_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
+                       const char *next_token, TSResult &ts_result);
+bool _CC_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
+                                const char *next_token, TSResult &ts_result);
+bool _CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
+                                   const char *next_token, TSResult &ts_result);
 void GetSchemaInfo(schema_type &schema, json_doc &es_result_doc);
 bool AssignColumnHeaders(QResultClass *q_res,
-                         const ESResult &es_result);
-bool AssignTableData(ESResult &es_result, QResultClass *q_res, ColumnInfoClass &fields);
+                         const TSResult &ts_result);
+bool AssignTableData(TSResult &ts_result, QResultClass *q_res, ColumnInfoClass &fields);
 bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
                    QResultClass *q_res, ColumnInfoClass &fields,
                    const size_t &row_size);
 void UpdateResultFields(QResultClass *q_res, const ConnectionClass *conn,
-                        const SQLULEN starting_cached_rows, const char *cursor,
+                        const SQLULEN starting_cached_rows, const char *next_token,
                         std::string &command_type);
 bool QR_prepare_for_tupledata(QResultClass *q_res);
 void SetError(const char *err);
@@ -144,52 +144,52 @@ std::string GetResultParserError() {
     return error_msg;
 }
 
-BOOL CC_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
-                      const char *cursor, ESResult &es_result) {
+BOOL CC_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
+                      const char *next_token, TSResult &ts_result) {
     ClearError();
-    return _CC_from_ESResult(q_res, conn, cursor, es_result) ? TRUE : FALSE;
+    return _CC_from_TSResult(q_res, conn, next_token, ts_result) ? TRUE : FALSE;
 }
 
-BOOL CC_Metadata_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
-                               const char *cursor, ESResult &es_result) {
+BOOL CC_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
+                               const char *next_token, TSResult &ts_result) {
     ClearError();
-    return _CC_Metadata_from_ESResult(q_res, conn, cursor, es_result) ? TRUE : FALSE;
+    return _CC_Metadata_from_TSResult(q_res, conn, next_token, ts_result) ? TRUE : FALSE;
 }
 
-BOOL CC_No_Metadata_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
-                                  const char *cursor, ESResult &es_result) {
+BOOL CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
+                                  const char *next_token, TSResult &ts_result) {
     ClearError();
-    return _CC_No_Metadata_from_ESResult(q_res, conn, cursor, es_result)
+    return _CC_No_Metadata_from_TSResult(q_res, conn, next_token, ts_result)
                ? TRUE
                : FALSE;
 }
 
-BOOL CC_Append_Table_Data(ESResult &es_result, QResultClass *q_res, ColumnInfoClass &fields) {
+BOOL CC_Append_Table_Data(TSResult &ts_result, QResultClass *q_res, ColumnInfoClass &fields) {
     ClearError();
-    return AssignTableData(es_result, q_res, fields)
+    return AssignTableData(ts_result, q_res, fields)
                ? TRUE
                : FALSE;
 }
 
-bool _CC_No_Metadata_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
-                                   const char *cursor, ESResult &es_result) {
+bool _CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
+                                   const char *next_token, TSResult &ts_result) {
     // Note - NULL conn and/or cursor is valid
     if (q_res == NULL)
         return false;
 
     try {
         schema_type doc_schema;
-        GetSchemaInfo(doc_schema, es_result.es_result_doc);
+        GetSchemaInfo(doc_schema, ts_result.es_result_doc);
 
         SQLULEN starting_cached_rows = q_res->num_cached_rows;
 
         // Assign table data and column headers
-        if (!AssignTableData(es_result, q_res, *(q_res->fields)))
+        if (!AssignTableData(ts_result, q_res, *(q_res->fields)))
             return false;
 
         // Update fields of QResult to reflect data written
-        UpdateResultFields(q_res, conn, starting_cached_rows, cursor,
-                           es_result.command_type);
+        UpdateResultFields(q_res, conn, starting_cached_rows, next_token,
+                           ts_result.command_type);
 
         // Return true (success)
         return true;
@@ -200,15 +200,15 @@ bool _CC_No_Metadata_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
     } catch (const std::exception &e) {
         SetError(e.what());
     } catch (...) {
-        SetError("Unknown exception thrown in _CC_No_Metadata_from_ESResult.");
+        SetError("Unknown exception thrown in _CC_No_Metadata_from_TSResult.");
     }
 
     // Exception occurred, return false (error)
     return false;
 }
 
-bool _CC_Metadata_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
-                                const char *cursor, ESResult &es_result) {
+bool _CC_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
+                                const char *next_token, TSResult &ts_result) {
     // Note - NULL conn and/or cursor is valid
     if (q_res == NULL)
         return false;
@@ -216,16 +216,16 @@ bool _CC_Metadata_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
     QR_set_conn(q_res, conn);
     try {
         schema_type doc_schema;
-        GetSchemaInfo(doc_schema, es_result.es_result_doc);
+        GetSchemaInfo(doc_schema, ts_result.es_result_doc);
 
         // Assign table data and column headers
-        if (!AssignColumnHeaders(q_res, es_result))
+        if (!AssignColumnHeaders(q_res, ts_result))
             return false;
 
         // Set command type and cursor name
-        QR_set_command(q_res, es_result.command_type.c_str());
-        QR_set_cursor(q_res, cursor);
-        if (cursor == NULL)
+        QR_set_command(q_res, ts_result.command_type.c_str());
+        QR_set_cursor(q_res, next_token);
+        if (next_token == NULL)
             QR_set_reached_eof(q_res);
 
         // Return true (success)
@@ -237,7 +237,7 @@ bool _CC_Metadata_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
     } catch (const std::exception &e) {
         SetError(e.what());
     } catch (...) {
-        SetError("Unknown exception thrown in _CC_Metadata_from_ESResult.");
+        SetError("Unknown exception thrown in _CC_Metadata_from_TSResult.");
     }
 
     // Exception occurred, return false (error)
@@ -257,8 +257,8 @@ void print_log(const std::string &s) {
 #endif  // WIN32
 }
 
-bool _CC_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
-                       const char *cursor, ESResult &es_result) {
+bool _CC_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
+                       const char *next_token, TSResult &ts_result) {
     // Note - NULL conn and/or cursor is valid
     if (q_res == NULL)
         return false;
@@ -268,13 +268,13 @@ bool _CC_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
         SQLULEN starting_cached_rows = q_res->num_cached_rows;
 
         // Assign table data and column headers
-        if ((!AssignColumnHeaders(q_res, es_result))
-            || (!AssignTableData(es_result, q_res, *(q_res->fields))))
+        if ((!AssignColumnHeaders(q_res, ts_result))
+            || (!AssignTableData(ts_result, q_res, *(q_res->fields))))
             return false;
 
         // Update fields of QResult to reflect data written
         std::string command_type = "SELECT";
-        UpdateResultFields(q_res, conn, starting_cached_rows, cursor,
+        UpdateResultFields(q_res, conn, starting_cached_rows, next_token,
                            command_type);
 
         // Return true (success)
@@ -286,7 +286,7 @@ bool _CC_from_ESResult(QResultClass *q_res, ConnectionClass *conn,
     } catch (const std::exception &e) {
         SetError(e.what());
     } catch (...) {
-        SetError("Unknown exception thrown in CC_from_ESResult.");
+        SetError("Unknown exception thrown in CC_from_TSResult.");
     }
 
     // Exception occurred, return false (error)
@@ -306,9 +306,9 @@ void GetSchemaInfo(schema_type &schema, json_doc &es_result_doc) {
 }
 
 bool AssignColumnHeaders(QResultClass *q_res,
-                         const ESResult &es_result) {
+                         const TSResult &ts_result) {
     // Allocte memory for column fields
-    const auto &column_info = es_result.ts_result.GetColumnInfo();
+    const auto &column_info = ts_result.sdk_result.GetColumnInfo();
     QR_set_num_fields(q_res, (uint16_t)column_info.size());
     if (QR_get_fields(q_res)->coli_array == NULL)
         return false;
@@ -331,15 +331,15 @@ bool AssignColumnHeaders(QResultClass *q_res,
 
 // Responsible for looping through rows, allocating tuples and passing rows for
 // assignment
-bool AssignTableData(ESResult &es_result, QResultClass *q_res, ColumnInfoClass &fields) {
-    auto rows = es_result.ts_result.GetRows();
+bool AssignTableData(TSResult &ts_result, QResultClass *q_res, ColumnInfoClass &fields) {
+    auto rows = ts_result.sdk_result.GetRows();
     for (const auto& row : rows) {
         // Setup memory to receive tuple
         if (!QR_prepare_for_tupledata(q_res))
             return false;
 
         // Assign row data
-        if (!AssignRowData(row, q_res, fields, es_result.ts_result.GetColumnInfo().size()))
+        if (!AssignRowData(row, q_res, fields, ts_result.sdk_result.GetColumnInfo().size()))
             return false;
     }
 
@@ -417,7 +417,7 @@ bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
 }
 
 void UpdateResultFields(QResultClass *q_res, const ConnectionClass *conn,
-                        const SQLULEN starting_cached_rows, const char *cursor,
+                        const SQLULEN starting_cached_rows, const char *next_token,
                         std::string &command_type) {
     // Adjust total read
     if (!QR_once_reached_eof(q_res)
@@ -440,8 +440,8 @@ void UpdateResultFields(QResultClass *q_res, const ConnectionClass *conn,
 
     // Set command type and cursor name
     QR_set_command(q_res, command_type.c_str());
-    QR_set_cursor(q_res, cursor);
-    if (cursor == NULL)
+    QR_set_cursor(q_res, next_token);
+    if (next_token == NULL)
         QR_set_reached_eof(q_res);
 
     // Set flags, adjust pointers, and return true (success)
