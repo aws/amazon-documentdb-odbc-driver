@@ -55,11 +55,7 @@ int ESExecDirect(void* conn, const char* statement, const char* fetch_size) {
                : -1;
 }
 
-void SendCursorQueries(void* conn, const char* cursor) {
-    static_cast< Communication* >(conn)->SendCursorQueries(cursor);
-}
-
-ESResult* ESGetResult(void* conn) {
+TSResult* TSGetResult(void* conn) {
     return conn ? static_cast< Communication* >(conn)->PopResult()
                    : NULL;
 }
@@ -81,8 +77,8 @@ void Disconnect(void* conn) {
     delete static_cast< Communication* >(conn);
 }
 
-void ESClearResult(ESResult* es_result) {
-    delete es_result;
+void TSClearResult(TSResult* ts_result) {
+    delete ts_result;
 }
 
 void StopRetrieval(void* conn) {
