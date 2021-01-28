@@ -38,7 +38,7 @@ void XPlatformEnterCriticalSection(void* critical_section_helper);
 void XPlatformLeaveCriticalSection(void* critical_section_helper);
 void XPlatformDeleteCriticalSection(void** critical_section_helper);
 ConnStatusType Status(void* conn);
-int ESExecDirect(void* conn, const char* statement, const char* fetch_size);
+int ESExecDirect(void* conn, const char* statement);
 void SendCursorQueries(void* conn, const char* cursor);
 void Disconnect(void* conn);
 void StopRetrieval(void* conn);

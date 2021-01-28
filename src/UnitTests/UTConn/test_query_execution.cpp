@@ -21,7 +21,6 @@
 #include "es_helper.h"
 // clang-format on
 
-//const std::string valid_host = (use_ssl ? "https://localhost" : "localhost");
 //const std::string valid_port = "9200";
 //const std::string valid_user = "admin";
 //const std::string valid_pw = "admin";
@@ -35,32 +34,29 @@
 //const std::string invalid_query = "SELECT";
 //const int EXECUTION_SUCCESS = 0;
 //const int EXECUTION_ERROR = -1;
-//const std::string fetch_size = "0";
 //const int all_columns_flights_count = 25;
 //const int some_columns_flights_count = 2;
 //runtime_options valid_conn_opt_val = {
-//    {valid_host, valid_port, "1", "0"},
-//    {"IAM", valid_user, valid_pw, "", valid_region},
-//    {use_ssl, false, "", "", "", ""}};
+//    {"IAM", valid_user, valid_pw, "", valid_region}};
 
 // TEST(TestESExecDirect, ValidQuery) {
     //TSCommunication conn;
     //ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     //ASSERT_TRUE(conn.ConnectDBStart());
     //EXPECT_EQ(EXECUTION_SUCCESS,
-    //    ESExecDirect(&conn, some_columns_flights_query.c_str(), fetch_size.c_str()));
+    //    ESExecDirect(&conn, some_columns_flights_query.c_str()));
 // }
 
 // TEST(TestTSExecDirect, MissingQuery) {
     //TSCommunication conn;
     //ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
     //ASSERT_TRUE(conn.ConnectDBStart());
-    //EXPECT_EQ(EXECUTION_ERROR, ESExecDirect(&conn, NULL, fetch_size.c_str()));
+    //EXPECT_EQ(EXECUTION_ERROR, ESExecDirect(&conn, NULL));
 // }
 
 //TEST(TesTSExecDirect, MissingConnection) {
 //    EXPECT_EQ(EXECUTION_ERROR,
-//              ESExecDirect(NULL, query.c_str(), fetch_size.c_str()));
+//              ESExecDirect(NULL));
 //}
 
 // Conn::ExecDirect
@@ -70,7 +66,7 @@
 //    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
 //    ASSERT_TRUE(conn.ConnectDBStart());
 //
-//    conn.ExecDirect(all_columns_flights_query.c_str(), fetch_size.c_str());
+//    conn.ExecDirect(all_columns_flights_query.c_str());
 //    ESResult* result = conn.PopResult();
 //    EXPECT_EQ("SELECT", result->command_type);
 //    EXPECT_FALSE(result->result_json.empty());
@@ -83,7 +79,7 @@
 //    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
 //    ASSERT_TRUE(conn.ConnectDBStart());
 //
-//    conn.ExecDirect(some_columns_flights_query.c_str(), fetch_size.c_str());
+//    conn.ExecDirect(some_columns_flights_query.c_str());
 //    ESResult* result = conn.PopResult();
 //    EXPECT_EQ("SELECT", result->command_type);
 //    EXPECT_FALSE(result->result_json.empty());
@@ -96,7 +92,7 @@
 //    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
 //    ASSERT_TRUE(conn.ConnectDBStart());
 //
-//    conn.ExecDirect(invalid_query.c_str(), fetch_size.c_str());
+//    conn.ExecDirect(invalid_query.c_str());
 //    ESResult* result = conn.PopResult();
 //    EXPECT_EQ(NULL, (void*)result);
 //}
@@ -117,8 +113,8 @@
 //    ASSERT_TRUE(conn.ConnectionOptions(valid_conn_opt_val));
 //    ASSERT_TRUE(conn.ConnectDBStart());
 //
-//    conn.ExecDirect(some_columns_flights_query.c_str(), fetch_size.c_str());
-//    conn.ExecDirect(all_columns_flights_query.c_str(), fetch_size.c_str());
+//    conn.ExecDirect(some_columns_flights_query.c_str());
+//    conn.ExecDirect(all_columns_flights_query.c_str());
 //
 //    // Pop some_columns
 //    ESResult* result = conn.PopResult();
