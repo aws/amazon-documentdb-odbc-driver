@@ -187,14 +187,14 @@ try {
 // }
 
 bool TSCommunication::Validate(const runtime_options& options) {
-    if (options.auth.username.empty()) {
-        throw std::invalid_argument("UID cannot be empty.");
+    if (options.auth.uid.empty()) {
+        throw std::invalid_argument("UID / AccessKeyId cannot be empty.");
     }
-    if (options.auth.password.empty()) {
-        throw std::invalid_argument("PWD cannot be empty.");
+    if (options.auth.pwd.empty()) {
+        throw std::invalid_argument("PWD / SecretAccessKey cannot be empty.");
     }
-    if (options.auth.region.empty()) {
-        throw std::invalid_argument("Region cannot be empty.");
+    if (options.auth.region.empty() && options.auth.end_point.empty()) {
+        throw std::invalid_argument("Both region and end point cannot be empty.");
     }
     if (options.auth.auth_type != AUTHTYPE_IAM &&
         options.auth.auth_type != AUTHTYPE_AAD &&
@@ -210,19 +210,27 @@ bool TSCommunication::Validate(const runtime_options& options) {
 
 bool TSCommunication::Connect(const runtime_options& options) {
     Aws::Client::ClientConfiguration config;
-    config.enableEndpointDiscovery = true;
-    config.region = options.auth.region;
+    if (!options.auth.end_point.empty()) {
+        config.endpointOverride = options.auth.end_point;
+        LogMsg(DRV_ALL, "Disconnecting timestream connection.");
+    } else {
+        config.enableEndpointDiscovery = true;
+        config.region = options.auth.region;
+    }
     config.verifySSL = options.crypt.verify_server;
-    long response_timeout =
-        static_cast< long >(DEFAULT_RESPONSE_TIMEOUT) * 1000L;
-    response_timeout = std::stol(options.conn.timeout) * 1000L;
-    config.connectTimeoutMs = response_timeout;
-    config.httpRequestTimeoutMs = response_timeout;
-    config.requestTimeoutMs = response_timeout;
+    long request_timeout = static_cast< long >(DEFAULT_REQUEST_TIMEOUT);
+    request_timeout = std::stol(options.conn.timeout);
+    config.requestTimeoutMs = request_timeout;
+    long connection_timeout = static_cast< long >(DEFAULT_CONNECTION_TIMEOUT);
+    connection_timeout = std::stol(options.conn.connection_timeout);
+    config.connectTimeoutMs = connection_timeout;
+    long max_connections = static_cast< long >(DEFAULT_MAX_CONNECTIONS);
+    max_connections = std::stol(options.conn.max_connections);
+    config.maxConnections = max_connections;
 
     if (options.auth.auth_type == AUTHTYPE_IAM) {
-        Aws::Auth::AWSCredentials credentials(options.auth.username,
-                                              options.auth.password, options.auth.token);
+        Aws::Auth::AWSCredentials credentials(options.auth.uid,
+                                              options.auth.pwd, options.auth.session_token);
         m_client =
             std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(
                 credentials, config);
