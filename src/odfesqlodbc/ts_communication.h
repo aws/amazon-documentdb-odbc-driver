@@ -60,10 +60,9 @@ class TSCommunication : public Communication {
     /**
      * Execute query
      * @param query const char*
-     * @param fetch_size const char*
      * @return int
      */
-    virtual int ExecDirect(const char* query, const char* fetch_size) override;
+    virtual int ExecDirect(const char* query) override;
     /**
      * Get version
      * @return std::string
@@ -92,17 +91,13 @@ class TSCommunication : public Communication {
      * @param endpoint const std::string&
      * @param request_type const Aws::Http::HttpMethod
      * @param content_type const std::string&
-     * @param fetch_size const std::string&
      * @param cursor const std::string&
      * @return std::shared_ptr< Aws::Http::HttpResponse >
      */
     virtual std::shared_ptr< Aws::Http::HttpResponse > IssueRequest(
         const std::string& endpoint, const Aws::Http::HttpMethod request_type,
         const std::string& content_type, const std::string& query,
-        const std::string& fetch_size = "",
         const std::string& cursor = "") override;
-
-   private:
     /**
      * Construct the result set
      * @param result TSResult&

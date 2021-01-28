@@ -91,15 +91,10 @@ TEST_F(TestPagination, EnablePagination) {
     //Total number of rows in kibana_sample_data_flights table
     int total_rows = 13059;
     std::wstring fetch_size_15_conn_string =
-        use_ssl ? L"Driver={Elasticsearch ODBC};"
+                  L"Driver={Elasticsearch ODBC};"
                   L"host=https://localhost;port=9200;"
-                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
-                  L"1;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
-                  L"responseTimeout=10;"
-                : L"Driver={Elasticsearch ODBC};"
-                  L"host=localhost;port=9200;"
-                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
-                  L"0;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
+                  L"UID=admin;PWD=admin;auth=IAM;"
+                  L"logLevel=0;logOutput=C:\\;"
                   L"responseTimeout=10;";
     ASSERT_EQ(SQL_SUCCESS,
               SQLDriverConnect(
@@ -113,15 +108,10 @@ TEST_F(TestPagination, DisablePagination) {
     // Fetch size 0 implies no pagination
     int total_rows = 200;
     std::wstring fetch_size_15_conn_string =
-        use_ssl ? L"Driver={Elasticsearch ODBC};"
+                  L"Driver={Elasticsearch ODBC};"
                   L"host=https://localhost;port=9200;"
-                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
-                  L"1;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
-                  L"responseTimeout=10;fetchSize=0;"
-                : L"Driver={Elasticsearch ODBC};"
-                  L"host=localhost;port=9200;"
-                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
-                  L"0;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
+                  L"UID=admin;PWD=admin;auth=IAM;"
+                  L"logLevel=0;logOutput=C:\\;"
                   L"responseTimeout=10;fetchSize=0;";
     ASSERT_EQ(SQL_SUCCESS,
               SQLDriverConnect(

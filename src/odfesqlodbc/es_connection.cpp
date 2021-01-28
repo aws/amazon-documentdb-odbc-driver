@@ -69,9 +69,6 @@ void* LIB_connect(ConnectionClass *self) {
     rt_opts.auth.session_token.assign(self->connInfo.session_token);
     rt_opts.auth.region.assign(self->connInfo.region);
     rt_opts.auth.end_point.assign(self->connInfo.end_point);
-    // Encryption
-    rt_opts.crypt.verify_server = (self->connInfo.verify_server == 1);
-    rt_opts.crypt.use_ssl = (self->connInfo.use_ssl == 1);
 
     auto conn = static_cast< void * >(ConnectDBParams(rt_opts));
     if (conn == nullptr) {
