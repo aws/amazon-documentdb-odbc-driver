@@ -172,12 +172,12 @@ TEST_F(TestSQLDriverConnect, DSNConnectionString) {
 //    std::wstring invalid_driver_conn_string =
 //         use_ssl ? L"Driver=xxxx;"
 //                   L"host=https://localhost;port=5432;"
-//                   L"user=admin;password=admin;auth=IAM;useSSL="
+//                   L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                   L"1;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                   L"responseTimeout=10;"
 //                 : L"Driver=xxxx;"
 //                   L"host=localhost;port=5432;"
-//                   L"user=admin;password=admin;auth=IAM;useSSL="
+//                   L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                   L"0;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                   L"responseTimeout=10;";
 //
@@ -192,12 +192,12 @@ TEST_F(TestSQLDriverConnect, DSNConnectionString) {
 //    std::wstring invalid_host_conn_string =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"host=https://8.8.8.8;port=9200;"
-//                  L"user=admin;password=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"1;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=1;"
 //                : L"Driver={Elasticsearch ODBC};"
 //                  L"host=8.8.8.8;port=9200;"
-//                  L"user=admin;password=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"0;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=1;";
 //
@@ -212,12 +212,12 @@ TEST_F(TestSQLDriverConnect, DSNConnectionString) {
 //    std::wstring invalid_port_conn_string =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"host=https://localhost;port=5432;"
-//                  L"user=admin;password=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"1;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=10;"
 //                : L"Driver={Elasticsearch ODBC};"
 //                  L"host=localhost;port=5432;"
-//                  L"user=admin;password=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"0;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=10;";
 //
@@ -235,12 +235,12 @@ TEST_F(TestSQLDriverConnect, DSNConnectionString) {
 //    std::wstring unsupported_keyword_conn_string =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"host=https://localhost;port=5432;"
-//                  L"user=admin;password=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"1;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=10;extra=1"
 //                : L"Driver={Elasticsearch ODBC};"
 //                  L"host=localhost;port=5432;"
-//                  L"user=admin;password=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"0;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=10;extra=1";
 //
@@ -255,12 +255,12 @@ TEST_F(TestSQLDriverConnect, DSNConnectionString) {
 //    std::wstring abbrev_str =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"host=https://localhost;port=9200;"
-//                  L"UID=admin;password=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"1;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=10;"
 //                : L"Driver={Elasticsearch ODBC};"
 //                  L"host=localhost;port=9200;"
-//                  L"UID=admin;password=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"0;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=10;";
 //
@@ -275,12 +275,12 @@ TEST_F(TestSQLDriverConnect, DSNConnectionString) {
 //    std::wstring abbrev_str =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"host=https://localhost;port=9200;"
-//                  L"user=admin;PWD=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"1;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=10;"
 //                : L"Driver={Elasticsearch ODBC};"
 //                  L"host=localhost;port=9200;"
-//                  L"user=admin;PWD=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"0;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=10;";
 //
@@ -315,12 +315,12 @@ TEST_F(TestSQLDriverConnect, DSNConnectionString) {
 //    std::wstring abbrev_str =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"server=https://localhost;port=9200;"
-//                  L"user=admin;password=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"1;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=10;"
 //                : L"Driver={Elasticsearch ODBC};"
 //                  L"server=localhost;port=9200;"
-//                  L"user=admin;password=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"0;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=10;";
 //
@@ -355,12 +355,12 @@ TEST_F(TestSQLDriverConnect, DSNConnectionString) {
 //    std::wstring one_second_timeout =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"host=https://8.8.8.8;port=9200;"
-//                  L"user=admin;password=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"1;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=1;"
 //                : L"Driver={Elasticsearch ODBC};"
 //                  L"host=8.8.8.8;port=9200;"
-//                  L"user=admin;password=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"0;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=1;";
 //
@@ -391,12 +391,12 @@ TEST_F(TestSQLDriverConnect, DSNConnectionString) {
 //    std::wstring one_second_timeout =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"host=https://8.8.8.8;port=9200;"
-//                  L"user=admin;password=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"1;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=3;"
 //                : L"Driver={Elasticsearch ODBC};"
 //                  L"host=8.8.8.8;port=9200;"
-//                  L"user=admin;password=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"0;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=3;";
 //
@@ -427,12 +427,12 @@ TEST_F(TestSQLDriverConnect, DSNConnectionString) {
 //    std::wstring seven_second_timeout =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"host=https://8.8.8.8;port=9200;"
-//                  L"user=admin;password=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"1;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=7;"
 //                : L"Driver={Elasticsearch ODBC};"
 //                  L"host=8.8.8.8;port=9200;"
-//                  L"user=admin;password=admin;auth=IAM;useSSL="
+//                  L"UID=admin;PWD=admin;auth=IAM;useSSL="
 //                  L"0;hostnameVerification=0;logLevel=0;logOutput=C:\\;"
 //                  L"responseTimeout=7;";
 //
