@@ -57,8 +57,6 @@ void* LIB_connect(ConnectionClass *self) {
     // Setup options
     runtime_options rt_opts;
     // Connection
-    rt_opts.conn.server.assign(self->connInfo.server);
-    rt_opts.conn.port.assign(self->connInfo.port);
     rt_opts.conn.timeout.assign(self->connInfo.request_timeout);
     rt_opts.conn.connection_timeout.assign(self->connInfo.connection_timeout);
     rt_opts.conn.max_connections.assign(self->connInfo.max_connections);

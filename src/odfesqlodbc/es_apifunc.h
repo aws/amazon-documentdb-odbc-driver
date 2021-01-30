@@ -52,7 +52,7 @@ RETCODE SQL_API API_Connect(HDBC ConnectionHandle, const SQLCHAR *ServerName,
                               SQLSMALLINT NameLength2,
                               const SQLCHAR *Authentication,
                               SQLSMALLINT NameLength3);
-RETCODE SQL_API ESAPI_BrowseConnect(HDBC hdbc, const SQLCHAR *szConnStrIn,
+RETCODE SQL_API API_BrowseConnect(HDBC hdbc, const SQLCHAR *szConnStrIn,
                                     SQLSMALLINT cbConnStrIn,
                                     SQLCHAR *szConnStrOut,
                                     SQLSMALLINT cbConnStrOutMax,
