@@ -552,14 +552,6 @@ typedef struct StatementOptions_ {
     SQLULEN stmt_timeout;
 } StatementOptions;
 
-/*	Used to pass extra query info to send_query */
-//typedef struct QueryInfo_ {
-//    SQLLEN row_size;
-//    SQLLEN fetch_size;
-//    QResultClass *result_in;
-//    const char *cursor;
-//} QueryInfo;
-
 /*	Used to save the error information */
 typedef struct {
     UInt4 status;
