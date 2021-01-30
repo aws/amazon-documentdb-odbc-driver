@@ -108,82 +108,59 @@
 //)EOF";
 
 // void TSCommunication::PrepareCursorResult(TSResult& ts_result) {
-/*
+
 // Prepare document and validate result
-try {
-    LogMsg(LOG_DEBUG, "Parsing result JSON with cursor.");
-    ts_result.es_result_doc.parse(ts_result.result_json,
-                                  CURSOR_JSON_SCHEMA);
-} catch (const rabbit::parse_error& e) {
-    // The exception rabbit gives is quite useless - providing the json
-    // will aid debugging for users
-    std::string str = "Exception obtained '" + std::string(e.what())
-                      + "' when parsing json string '"
-                      + ts_result.result_json + "'.";
-    throw std::runtime_error(str.c_str());
-}
-
-// void TSCommunication::PrepareCursorResult(ESResult& es_result) {
-    /*
-    // Prepare document and validate result
-    try {
-        LogMsg(LOG_DEBUG, "Parsing result JSON with cursor.");
-        es_result.es_result_doc.parse(es_result.result_json,
-                                      CURSOR_JSON_SCHEMA);
-    } catch (const rabbit::parse_error& e) {
-        // The exception rabbit gives is quite useless - providing the json
-        // will aid debugging for users
-        std::string str = "Exception obtained '" + std::string(e.what())
-                          + "' when parsing json string '"
-                          + es_result.result_json + "'.";
-        throw std::runtime_error(str.c_str());
-    }
-    */
-// }
-
-//std::shared_ptr< ErrorDetails > TSCommunication::ParseErrorResponse(
-//    ESResult& es_result) {
-    /*
-    // Prepare document and validate schema
-    try {
-        LogMsg(LOG_DEBUG, "Parsing error response (with schema validation)");
-        es_result.es_result_doc.parse(es_result.result_json,
-                                      ERROR_RESPONSE_SCHEMA);
-
-        auto error_details = std::make_shared< ErrorDetails >();
-        error_details->reason =
-            es_result.es_result_doc["error"]["reason"].as_string();
-        error_details->details =
-            es_result.es_result_doc["error"]["details"].as_string();
-        error_details->source_type =
-            es_result.es_result_doc["error"]["type"].as_string();
-        return error_details;
-    } catch (const rabbit::parse_error& e) {
-        // The exception rabbit gives is quite useless - providing the json
-        // will aid debugging for users
-        std::string str = "Exception obtained '" + std::string(e.what())
-                          + "' when parsing json string '"
-                          + es_result.result_json + "'.";
-        throw std::runtime_error(str.c_str());
-    }
-    */
-// }
-
-// void TSCommunication::GetJsonSchema(ESResult& es_result) {
-    /*
-    // Prepare document and validate schema
-    try {
-        LogMsg(LOG_DEBUG, "Parsing result JSON with schema.");
-        es_result.es_result_doc.parse(es_result.result_json, JSON_SCHEMA);
-    } catch (const rabbit::parse_error& e) {
-        // The exception rabbit gives is quite useless - providing the json
-        // will aid debugging for users
-        std::string str = "Exception obtained '" + std::string(e.what())
-                          + "' when parsing json string '"
-                          + es_result.result_json + "'.";
-        throw std::runtime_error(str.c_str());
-    }
-    */
+//try {
+//    LogMsg(LOG_DEBUG, "Parsing result JSON with cursor.");
+//    ts_result.es_result_doc.parse(ts_result.result_json,
+//                                  CURSOR_JSON_SCHEMA);
+//} catch (const rabbit::parse_error& e) {
+//    // The exception rabbit gives is quite useless - providing the json
+//    // will aid debugging for users
+//    std::string str = "Exception obtained '" + std::string(e.what())
+//                      + "' when parsing json string '"
+//                      + ts_result.result_json + "'.";
+//    throw std::runtime_error(str.c_str());
+//}
+//
+//// std::shared_ptr< ErrorDetails > TSCommunication::ParseErrorResponse(
+////    TSResult& ts_result) {
+//// Prepare document and validate schema
+//try {
+//    LogMsg(ES_DEBUG, "Parsing error response (with schema validation)");
+//    ts_result.es_result_doc.parse(ts_result.result_json,
+//                                  ERROR_RESPONSE_SCHEMA);
+//    auto error_details = std::make_shared< ErrorDetails >();
+//    error_details->reason =
+//        ts_result.es_result_doc["error"]["reason"].as_string();
+//    error_details->details =
+//        ts_result.es_result_doc["error"]["details"].as_string();
+//    error_details->source_type =
+//        ts_result.es_result_doc["error"]["type"].as_string();
+//    return error_details;
+//} catch (const rabbit::parse_error& e) {
+//    // The exception rabbit gives is quite useless - providing the json
+//    // will aid debugging for users
+//    std::string str = "Exception obtained '" + std::string(e.what())
+//                      + "' when parsing json string '"
+//                      + ts_result.result_json + "'.";
+//    throw std::runtime_error(str.c_str());
+//}
+//// }
+//
+//// void TSCommunication::GetJsonSchema(TSResult& ts_result) {
+//// Prepare document and validate schema
+//try {
+//    LogMsg(ES_DEBUG, "Parsing result JSON with schema.");
+//    ts_result.es_result_doc.parse(ts_result.result_json, JSON_SCHEMA);
+//} catch (const rabbit::parse_error& e) {
+//    // The exception rabbit gives is quite useless - providing the json
+//    // will aid debugging for users
+//    std::string str = "Exception obtained '" + std::string(e.what())
+//                      + "' when parsing json string '"
+//                      + ts_result.result_json + "'.";
+//    throw std::runtime_error(str.c_str());
+//}
 // }
 
 bool TSCommunication::Validate(const runtime_options& options) {
