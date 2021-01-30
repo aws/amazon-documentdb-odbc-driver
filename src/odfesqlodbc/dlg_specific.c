@@ -48,23 +48,109 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
 #ifdef _HANDLE_ENLIST_IN_DTC_
     char xaOptStr[16];
 #endif
-    ssize_t hlen, nlen, olen;
+    ssize_t hlen, nlen, olen=-1;
 
     encode(ci->pwd, encoded_item, sizeof(encoded_item));
     /* fundamental info */
     nlen = MAX_CONNECT_STRING;
-    olen = snprintf(
-        connect_string, nlen,
-        "%s=%s;" INI_UID
-        "=%s;" INI_PWD "=%s;" INI_SESSION_TOKEN "=%s;" INI_AUTH_MODE
-        "=%s;" INI_REGION "=%s;" INI_END_POINT "=%s;" INI_LOG_LEVEL
-        "=%d;" INI_LOG_OUTPUT "=%s;" INI_REQUEST_TIMEOUT "=%s;" INI_CONNECTION_TIMEOUT
-                 "=%s;" INI_MAX_CONNECTIONS "=%s;",
-        got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
-        ci->uid, encoded_item, ci->session_token, ci->authtype,
-        ci->region, ci->end_point,
-        (int)ci->drivers.loglevel, ci->drivers.output_dir,
-        ci->request_timeout, ci->connection_timeout, ci->max_connections);
+    if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {        
+        olen = snprintf(
+            connect_string, nlen,
+            "%s=%s;"
+            INI_AUTH_MODE "=%s;"
+            INI_UID "=%s;"
+            INI_PWD "=%s;"
+            INI_SESSION_TOKEN "=%s;"
+            INI_REGION "=%s;"
+            INI_END_POINT "=%s;"
+            INI_LOG_LEVEL "=%d;"
+            INI_LOG_OUTPUT "=%s;"
+            INI_REQUEST_TIMEOUT "=%s;"
+            INI_CONNECTION_TIMEOUT "=%s;"
+            INI_MAX_CONNECTIONS "=%s;",
+            got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
+            ci->authtype,
+            ci->uid, 
+            encoded_item, 
+            ci->session_token,
+            ci->region,
+            ci->end_point, 
+            (int)ci->drivers.loglevel,
+            ci->drivers.output_dir,
+            ci->request_timeout,
+            ci->connection_timeout,
+            ci->max_connections);
+    } else if (strcmp(ci->authtype, AUTHTYPE_AAD) == 0) {
+        olen = snprintf(
+            connect_string, nlen,
+            "%s=%s;"
+            INI_AUTH_MODE "=%s;"
+            INI_UID "=%s;"
+            INI_PWD "=%s;"
+            INI_IDP_NAME "=%s;"
+            INI_AAD_APPLICATION_ID "=%s;"
+            INI_AAD_CLIENT_SECRET "=%s;"
+            INI_AAD_TENANT "=%s;"
+            INI_IDP_ARN "=%s;"
+            INI_REGION "=%s;"
+            INI_END_POINT "=%s;"
+            INI_LOG_LEVEL "=%d;"
+            INI_LOG_OUTPUT "=%s;"
+            INI_REQUEST_TIMEOUT "=%s;"
+            INI_CONNECTION_TIMEOUT "=%s;"
+            INI_MAX_CONNECTIONS "=%s;",
+            got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
+            ci->authtype,
+            ci->uid, 
+            encoded_item, 
+            ci->idp_name,
+            ci->aad_application_id,
+            ci->aad_client_secret,
+            ci->aad_tenant,
+            ci->idp_arn,
+            ci->region,
+            ci->end_point, 
+            (int)ci->drivers.loglevel,
+            ci->drivers.output_dir,
+            ci->request_timeout,
+            ci->connection_timeout,
+            ci->max_connections);
+    } else if (strcmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
+        olen = snprintf(
+            connect_string, nlen,
+            "%s=%s;"
+            INI_AUTH_MODE "=%s;"
+            INI_UID "=%s;"
+            INI_PWD "=%s;"
+            INI_IDP_NAME "=%s;"
+            INI_IDP_HOST "=%s;"
+            INI_OKTA_APPLICATION_ID "=%s;"
+            INI_ROLE_ARN "=%s;"
+            INI_IDP_ARN "=%s;"
+            INI_REGION "=%s;"
+            INI_END_POINT "=%s;"
+            INI_LOG_LEVEL "=%d;"
+            INI_LOG_OUTPUT "=%s;"
+            INI_REQUEST_TIMEOUT "=%s;"
+            INI_CONNECTION_TIMEOUT "=%s;"
+            INI_MAX_CONNECTIONS "=%s;",
+            got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
+            ci->authtype,
+            ci->uid, 
+            encoded_item, 
+            ci->idp_name,
+            ci->idp_host,
+            ci->okta_application_id,
+            ci->role_arn,
+            ci->idp_arn,
+            ci->region,
+            ci->end_point, 
+            (int)ci->drivers.loglevel,
+            ci->drivers.output_dir,
+            ci->request_timeout,
+            ci->connection_timeout,
+            ci->max_connections);
+    }
     if (olen < 0 || olen >= nlen) {
         connect_string[0] = '\0';
         return;
