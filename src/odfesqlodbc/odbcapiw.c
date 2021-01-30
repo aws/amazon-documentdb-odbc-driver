@@ -191,7 +191,7 @@ RETCODE SQL_API SQLBrowseConnectW(HDBC hdbc, SQLWCHAR *szConnStrIn,
     obuflen = cbConnStrOutMax + 1;
     szOut = malloc(obuflen);
     if (szOut)
-        ret = ESAPI_BrowseConnect(hdbc, (SQLCHAR *)szIn, (SQLSMALLINT)inlen,
+        ret = API_BrowseConnect(hdbc, (SQLCHAR *)szIn, (SQLSMALLINT)inlen,
                                   (SQLCHAR *)szOut, cbConnStrOutMax, &olen);
     else {
         CC_set_error(conn, CONN_NO_MEMORY_ERROR,
