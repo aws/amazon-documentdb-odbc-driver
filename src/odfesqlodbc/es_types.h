@@ -294,6 +294,14 @@ typedef struct authentication_options {
     std::string session_token;
     std::string region;
     std::string end_point;
+    std::string idp_name;
+    std::string idp_host;
+    std::string okta_application_id;
+    std::string role_arn;
+    std::string aad_application_id;
+    std::string aad_client_secret;
+    std::string aad_tenant;
+    std::string idp_arn;
 } authentication_options;
 
 typedef struct encryption_options {
