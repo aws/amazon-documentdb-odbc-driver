@@ -123,18 +123,20 @@ INT_PTR CALLBACK dconn_FDriverConnectProc(HWND hdlg, UINT wMsg, WPARAM wParam,
                              lParam); /* Save the ConnInfo for the "OK" */
             SetDlgStuff(hdlg, ci);
 
-            if (ci->server[0] == '\0')
-                SetFocus(GetDlgItem(hdlg, IDC_SERVER));
-            else if (ci->port[0] == '\0')
-                SetFocus(GetDlgItem(hdlg, IDC_PORT));
-            else if (ci->uid[0] == '\0')
-                SetFocus(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID));
-            else if (ci->region[0] == '\0')
+            SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL, 2, (WPARAM)0);
+
+            if (ci->uid[0] == '\0') {
+                if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
+                    SetFocus(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID));
+                } else if (strcmp(ci->authtype, AUTHTYPE_AAD) == 0) {
+                    SetFocus(GetDlgItem(hdlg, IDC_IDP_USERNAME));
+                } else if (strcmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
+                    SetFocus(GetDlgItem(hdlg, IDC_IDP_USERNAME));
+                }
+            } else if (ci->region[0] == '\0')
                 SetFocus(GetDlgItem(hdlg, IDC_REGION));
             else if (ci->end_point[0] == '\0')
                 SetFocus(GetDlgItem(hdlg, IDC_END_POINT));
-
-            SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL, 2, (WPARAM)0);
 
             break;
 

@@ -52,11 +52,7 @@ runtime_options rt_opts = []() {
     for (auto it : conn_str_pair) {
         std::wstring tmp = it.first;
         std::transform(tmp.begin(), tmp.end(), tmp.begin(), towlower);
-        if (tmp == L"host")
-            temp_opts.conn.server = wstring_to_string(it.second);
-        else if (tmp == L"port")
-            temp_opts.conn.port = wstring_to_string(it.second);
-        else if (tmp == L"responsetimeout")
+        if (tmp == L"responsetimeout")
             temp_opts.conn.timeout = wstring_to_string(it.second);
         else if (tmp == L"Auth")
             temp_opts.auth.auth_type = wstring_to_string(it.second);

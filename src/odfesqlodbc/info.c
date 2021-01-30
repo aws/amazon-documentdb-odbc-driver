@@ -526,7 +526,7 @@ RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
             break;
 
         case SQL_SERVER_NAME: /* ODBC 1.0 */
-            p = CC_get_server(conn);
+            p = "AWS Timestream";
             break;
 
         case SQL_SPECIAL_CHARACTERS: /* ODBC 2.0 */
