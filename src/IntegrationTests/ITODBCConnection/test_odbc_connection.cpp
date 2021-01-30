@@ -32,8 +32,8 @@
 
 // SQLConnect constants
 std::wstring wdsn_name = L"timestream";
-std::wstring user = L"***REMOVED***";
-std::wstring pass = L"CMgAXQw7MFDKbGNJL0ztayA2pKVfsMq3PgLlGz3K";
+std::wstring user = L"<accesskey>";
+std::wstring pass = L"<secretkey>";
 std::wstring wrong = L"wrong";
 std::wstring empty_server = L"";
 
