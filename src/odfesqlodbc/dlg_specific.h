@@ -46,24 +46,36 @@ extern "C" {
 #define INVALID_DRIVER " @@driver not exist@@ "
 
 #ifdef UNICODE_SUPPORT
-#define INI_DSN "Elasticsearch35W"
+#define INI_DSN "Timestream35W"
 #else
-#define INI_DSN "Elasticsearch30"
+#define INI_DSN "Timestream30"
 #endif /* UNICODE_SUPPORT */
-    
-#define INI_HOST "host"
-#define INI_SERVER "server"
-#define INI_PORT "port"
-#define INI_ACCESS_KEY_ID "AccessKeyId"
+
+#define INI_DRIVER "Driver"
 #define INI_UID "UID"
-#define INI_SECRET_ACCESS_KEY "SecretAccessKey"
 #define INI_PWD "PWD"
-#define INI_SESSION_TOKEN "SessionToken"
 #define INI_AUTH_MODE "Auth"
+// IAM
+#define INI_ACCESS_KEY_ID "AccessKeyId"
+#define INI_SECRET_ACCESS_KEY "SecretAccessKey"
+#define INI_SESSION_TOKEN "SessionToken"
 #define INI_REGION "Region"
 #define INI_END_POINT "EndPoint"
+// SAML-based
+#define INI_IDP_NAME "IdpName"
+#define INI_IDP_HOST "IdpHost"
+#define INI_IDP_USERNAME "IdpUserName"
+#define INI_IDP_PASSWORD "IdpPassword"
+#define INI_OKTA_APPLICATION_ID "OktaApplicationID"
+#define INI_ROLE_ARN "RoleARN"
+#define INI_AAD_APPLICATION_ID "AADApplicationID"
+#define INI_AAD_CLIENT_SECRET "AADClientSecret"
+#define INI_AAD_TENANT "AADTenant"
+#define INI_IDP_ARN "IdpARN"
+// Logging
 #define INI_LOG_LEVEL "LogLevel"
 #define INI_LOG_OUTPUT "LogOutput"
+// Advanced
 #define INI_REQUEST_TIMEOUT "RequestTimeout"
 #define INI_CONNECTION_TIMEOUT "ConnectionTimeout"
 #define INI_MAX_CONNECTIONS "MaxConnections"
@@ -75,15 +87,9 @@ extern "C" {
 #define DEFAULT_MAX_CONNECTIONS 25
 #define DEFAULT_MAX_CONNECTIONS_STR "25"
 #define DEFAULT_AUTHTYPE "IAM"
-#define DEFAULT_HOST ""
-#define DEFAULT_PORT ""
-#define DEFAULT_UID ""
-#define DEFAULT_SESSION_TOKEN ""
 #define DEFAULT_DRIVERNAME "timestreamodbc"
-#define DEFAULT_DESC ""
-#define DEFAULT_DSN ""
 #define DEFAULT_REGION "us-east-1"
-#define DEFAULT_END_POINT ""
+#define DEFAULT_NONE ""
 
 #define AUTHTYPE_IAM "IAM"
 #define AUTHTYPE_AAD "AAD"
