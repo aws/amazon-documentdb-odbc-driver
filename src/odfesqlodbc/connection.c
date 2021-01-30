@@ -148,14 +148,14 @@ RETCODE SQL_API API_Connect(HDBC hdbc, const SQLCHAR *szDSN,
     return ret;
 }
 
-RETCODE SQL_API ESAPI_BrowseConnect(HDBC hdbc, const SQLCHAR *szConnStrIn,
+RETCODE SQL_API API_BrowseConnect(HDBC hdbc, const SQLCHAR *szConnStrIn,
                                     SQLSMALLINT cbConnStrIn,
                                     SQLCHAR *szConnStrOut,
                                     SQLSMALLINT cbConnStrOutMax,
                                     SQLSMALLINT *pcbConnStrOut) {
     UNUSED(szConnStrIn, cbConnStrIn, szConnStrOut, cbConnStrOutMax,
            cbConnStrOutMax, pcbConnStrOut);
-    CSTR func = "ESAPI_BrowseConnect";
+    CSTR func = "API_BrowseConnect";
     ConnectionClass *conn = (ConnectionClass *)hdbc;
 
     MYLOG(LOG_TRACE, "entering...\n");

@@ -190,7 +190,7 @@ RETCODE SQL_API SQLBrowseConnect(HDBC hdbc, SQLCHAR *szConnStrIn,
     MYLOG(LOG_TRACE, "entering\n");
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
-    ret = ESAPI_BrowseConnect(hdbc, szConnStrIn, cbConnStrIn, szConnStrOut,
+    ret = API_BrowseConnect(hdbc, szConnStrIn, cbConnStrIn, szConnStrOut,
                               cbConnStrOutMax, pcbConnStrOut);
     LEAVE_CONN_CS(conn);
     return ret;
