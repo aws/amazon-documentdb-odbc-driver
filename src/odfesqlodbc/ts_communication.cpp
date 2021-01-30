@@ -236,9 +236,12 @@ bool TSCommunication::Connect(const runtime_options& options) {
         m_client =
             std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(
                 credentials, config);
+    } else if (options.auth.auth_type == AUTHTYPE_AAD) {
+        // AAD
     } else if (options.auth.auth_type == AUTHTYPE_OKTA) {
+        // OKTA
     } else {
-        throw std::runtime_error("Unknown auth type.");
+        throw std::runtime_error("Unknown auth type: " + options.auth.auth_type);
     }
 
     if (m_client == nullptr) {
@@ -254,6 +257,7 @@ bool TSCommunication::Connect(const runtime_options& options) {
         Disconnect();
         throw std::runtime_error("Failed to establish connection: " + err);
     }
+    LogMsg(LOG_DEBUG, "Connection Established.");
     return true;
 }
 
