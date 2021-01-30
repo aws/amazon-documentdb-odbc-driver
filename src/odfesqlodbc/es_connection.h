@@ -334,7 +334,6 @@ struct ConnectionClass_ {
 /* Accessor functions */
 #define CC_get_env(x) ((x)->henv)
 #define CC_get_database(x) (x->connInfo.database)
-#define CC_get_server(x) (x->connInfo.server)
 #define CC_get_DSN(x) (x->connInfo.dsn)
 #define CC_get_username(x) (x->connInfo.uid)
 #define CC_is_onlyread(x) (x->connInfo.onlyread[0] == '1')
