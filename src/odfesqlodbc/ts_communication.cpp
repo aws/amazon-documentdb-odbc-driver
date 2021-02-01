@@ -407,11 +407,11 @@ void TSCommunication::SendCursorQueries(
                    && !m_result_queue.push(QUEUE_TIMEOUT, result.get())) {
             }
 
+            next_token = result->next_token;
+
             // Don't release when attempting to push to the queue as it may take
             // multiple tries.
             result.release();
-
-            next_token = outcome.GetResult().GetNextToken();
         }
     } catch (std::runtime_error& e) {
         std::string error_message =
