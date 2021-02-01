@@ -18,6 +18,7 @@
 #define IDC_FETCH_SIZE_STATIC           404
 #define IDC_SERVER                      407
 #define IDC_NOTICE_USER                 414
+#define IDS_AUTHTYPE_AWS_PROFILE		416
 #define IDS_AUTHTYPE_IAM                417
 #define IDS_AUTHTYPE_AAD                418
 #define IDS_AUTHTYPE_OKTA               419

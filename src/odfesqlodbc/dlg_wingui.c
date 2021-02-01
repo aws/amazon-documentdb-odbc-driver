@@ -26,7 +26,7 @@
 #include "xalibname.h"
 #endif /* _HANDLE_ENLIST_IN_DTC_ */
 
-#define AUTHMODE_CNT 3
+#define AUTHMODE_CNT 4
 #define LOGLEVEL_CNT 8
 extern HINSTANCE s_hModule;
 
@@ -41,6 +41,7 @@ int loglevels[LOGLEVEL_CNT] = {
     {IDS_LOGTYPE_ALL}};
 
 static const struct authmode authmodes[AUTHMODE_CNT] = {
+    {IDS_AUTHTYPE_AWS_PROFILE, AUTHTYPE_AWS_PROFILE},
     {IDS_AUTHTYPE_IAM, AUTHTYPE_IAM},
     {IDS_AUTHTYPE_AAD, AUTHTYPE_AAD},
     {IDS_AUTHTYPE_OKTA, AUTHTYPE_OKTA}};
@@ -72,7 +73,23 @@ int GetCurrentLogLevel(HWND hdlg) {
 
 
 void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
-    if (strcmp(am->authtype_str, AUTHTYPE_IAM) == 0) {
+    if (strcmp(am->authtype_str, AUTHTYPE_AWS_PROFILE) == 0) {
+        EnableWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_REGION), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_END_POINT), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_NAME), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_HOST), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_PASSWORD), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_OKTA_APPLICATION_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_ROLE_ARN), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_APPLICATION_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_CLIENT_SECRET), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_TENANT), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_ARN), FALSE);
+    } else if (strcmp(am->authtype_str, AUTHTYPE_IAM) == 0) {
         EnableWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), TRUE);

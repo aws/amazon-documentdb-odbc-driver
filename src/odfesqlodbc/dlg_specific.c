@@ -53,7 +53,28 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
     encode(ci->pwd, encoded_item, sizeof(encoded_item));
     /* fundamental info */
     nlen = MAX_CONNECT_STRING;
-    if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {        
+    if (strcmp(ci->authtype, AUTHTYPE_AWS_PROFILE) == 0) {
+        olen = snprintf(
+            connect_string, nlen,
+            "%s=%s;"
+            INI_AUTH_MODE "=%s;"
+            INI_REGION "=%s;"
+            INI_END_POINT "=%s;"
+            INI_LOG_LEVEL "=%d;"
+            INI_LOG_OUTPUT "=%s;"
+            INI_REQUEST_TIMEOUT "=%s;"
+            INI_CONNECTION_TIMEOUT "=%s;"
+            INI_MAX_CONNECTIONS "=%s;",
+            got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
+            ci->authtype,
+            ci->region,
+            ci->end_point, 
+            (int)ci->drivers.loglevel,
+            ci->drivers.output_dir,
+            ci->request_timeout,
+            ci->connection_timeout,
+            ci->max_connections);
+    } else if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
         olen = snprintf(
             connect_string, nlen,
             "%s=%s;"
@@ -365,14 +386,16 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
             > 0)
             ci->pwd = decode(temp);
     }
-    if (SQLGetPrivateProfileString(DSN, INI_UID, NULL_STRING, temp,
-                                   sizeof(temp), ODBC_INI)
-        > 0)
-        STRCPY_FIXED(ci->uid, temp);
-    if (SQLGetPrivateProfileString(DSN, INI_PWD, NULL_STRING, temp,
-                                   sizeof(temp), ODBC_INI)
-        > 0)
-        ci->pwd = decode(temp);
+    if (strcmp(ci->authtype, AUTHTYPE_AWS_PROFILE) != 0) {
+        if (SQLGetPrivateProfileString(DSN, INI_UID, NULL_STRING, temp,
+                                       sizeof(temp), ODBC_INI)
+            > 0)
+            STRCPY_FIXED(ci->uid, temp);
+        if (SQLGetPrivateProfileString(DSN, INI_PWD, NULL_STRING, temp,
+                                       sizeof(temp), ODBC_INI)
+            > 0)
+            ci->pwd = decode(temp);
+    }
     if (SQLGetPrivateProfileString(DSN, INI_SESSION_TOKEN, NULL_STRING, temp,
                                    sizeof(temp), ODBC_INI)
         > 0)

@@ -164,19 +164,20 @@
 // }
 
 bool TSCommunication::Validate(const runtime_options& options) {
-    if (options.auth.uid.empty()) {
-        throw std::invalid_argument("UID / AccessKeyId cannot be empty.");
-    }
-    if (options.auth.pwd.empty()) {
-        throw std::invalid_argument("PWD / SecretAccessKey cannot be empty.");
-    }
     if (options.auth.region.empty() && options.auth.end_point.empty()) {
         throw std::invalid_argument("Both region and end point cannot be empty.");
     }
-    if (options.auth.auth_type != AUTHTYPE_IAM &&
+    if (options.auth.auth_type != AUTHTYPE_AWS_PROFILE &&
+        options.auth.auth_type != AUTHTYPE_IAM &&
         options.auth.auth_type != AUTHTYPE_AAD &&
         options.auth.auth_type != AUTHTYPE_OKTA) {
         throw std::invalid_argument("Unknown authentication type: \"" + options.auth.auth_type + "\".");
+    }
+    if (options.auth.auth_type != AUTHTYPE_AWS_PROFILE && options.auth.uid.empty()) {
+        throw std::invalid_argument("UID / AccessKeyId cannot be empty.");
+    }
+    if (options.auth.auth_type != AUTHTYPE_AWS_PROFILE && options.auth.pwd.empty()) {
+        throw std::invalid_argument("PWD / SecretAccessKey cannot be empty.");
     }
     if (!options.conn.timeout.empty()) {
         std::stol(options.conn.timeout);
@@ -207,7 +208,10 @@ bool TSCommunication::Connect(const runtime_options& options) {
     max_connections = std::stol(options.conn.max_connections);
     config.maxConnections = max_connections;
 
-    if (options.auth.auth_type == AUTHTYPE_IAM) {
+    if (options.auth.auth_type == AUTHTYPE_AWS_PROFILE) {
+        m_client =
+            std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(config);
+    } else if (options.auth.auth_type == AUTHTYPE_IAM) {
         Aws::Auth::AWSCredentials credentials(options.auth.uid,
                                               options.auth.pwd, options.auth.session_token);
         m_client =
