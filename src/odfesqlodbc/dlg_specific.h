@@ -91,6 +91,7 @@ extern "C" {
 #define DEFAULT_REGION "us-east-1"
 #define DEFAULT_NONE ""
 
+#define AUTHTYPE_AWS_PROFILE "AWS PROFILE"
 #define AUTHTYPE_IAM "IAM"
 #define AUTHTYPE_AAD "AAD"
 #define AUTHTYPE_OKTA "OKTA"

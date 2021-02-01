@@ -31,11 +31,12 @@
 #define IT_SIZEOF(x) (NULL == (x) ? 0 : (sizeof((x)) / sizeof((x)[0])))
 
 // SQLConnect constants
+std::wstring default_credential_chain = L"default_credential_chain";
 std::wstring wdsn_name = L"timestream";
 std::wstring user = L"<accesskey>";
 std::wstring pass = L"<secretkey>";
 std::wstring wrong = L"wrong";
-std::wstring empty_server = L"";
+std::wstring empty = L"";
 
 // SQLDriverConnect constants
 std::wstring dsn_conn_string = L"DSN=timestream";
@@ -62,6 +63,15 @@ class TestSQLConnect : public testing::Test {
     SQLHDBC m_conn;
 };
 
+TEST_F(TestSQLConnect, Default_credential_chain) {
+    SQLRETURN ret = SQLConnect(
+        m_conn, (SQLTCHAR*)default_credential_chain.c_str(), SQL_NTS,
+        (SQLTCHAR*)empty.c_str(), static_cast< SQLSMALLINT >(empty.length()),
+        (SQLTCHAR*)empty.c_str(), static_cast< SQLSMALLINT >(empty.length()));
+    LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
+    EXPECT_EQ(SQL_SUCCESS, ret);
+}
+
 TEST_F(TestSQLConnect, Success) {
     SQLRETURN ret = SQLConnect(
         m_conn, (SQLTCHAR*)wdsn_name.c_str(), SQL_NTS, (SQLTCHAR*)user.c_str(),
@@ -74,7 +84,7 @@ TEST_F(TestSQLConnect, Success) {
 
 TEST_F(TestSQLConnect, empty_server_used_default) {
     SQLRETURN ret = SQLConnect(
-        m_conn, (SQLTCHAR*)empty_server.c_str(), SQL_NTS,
+        m_conn, (SQLTCHAR*)empty.c_str(), SQL_NTS,
         (SQLTCHAR*)user.c_str(), static_cast< SQLSMALLINT >(user.length()),
         (SQLTCHAR*)pass.c_str(), static_cast< SQLSMALLINT >(pass.length()));
 
