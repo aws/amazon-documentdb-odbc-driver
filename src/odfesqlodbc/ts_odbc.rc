@@ -244,10 +244,11 @@ END
 //
 
 STRINGTABLE
-BEGIN
-    IDS_AUTHTYPE_IAM        "IAM"
-    IDS_AUTHTYPE_AAD        "AAD"
-    IDS_AUTHTYPE_OKTA       "OKTA"
+BEGIN 
+    IDS_AUTHTYPE_AWS_PROFILE"AWS Profile"
+    IDS_AUTHTYPE_IAM        "AWS IAM Credentials"
+    IDS_AUTHTYPE_AAD        "Identity Provider: Azure AD"
+    IDS_AUTHTYPE_OKTA       "Identity Provider: Okta"
     IDS_LOGTYPE_OFF         "OFF"
     IDS_LOGTYPE_FATAL       "FATAL"
     IDS_LOGTYPE_ERROR       "ERROR"
