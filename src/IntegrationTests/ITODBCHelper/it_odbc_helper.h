@@ -36,20 +36,22 @@
 
 #define IT_SIZEOF(x) (NULL == (x) ? 0 : (sizeof((x)) / sizeof((x)[0])))
 
+#define IT_DRIVER L"Driver"
+#define IT_ACCESSKEYID L"AccessKeyId"
+#define IT_SECRETACCESSKEY L"SecretAccessKey"
+#define IT_REGION L"Region"
+#define IT_AUTH L"Auth"
+#define IT_LOGLEVEL L"LogLevel"
+#define IT_LOGOUTPUT L"LogOutput"
+
 std::vector< std::pair< std::wstring, std::wstring > > conn_str_pair = {
-    {L"Driver", L"timestreamodbc"},
-    //{L"host", (L"localhost")},
-    //{L"port", L"9200"},
-    {L"AccessKeyId", L"<accesskey>"},
-    {L"SecretAccessKey", L"<secretkey>"},
-    {L"Region", L"us-east-1"},
-    {L"Auth", L"IAM"},
-    {L"LogLevel", L"7"},
-    {L"LogOutput", L"C:\\"},
-    {L"RequestTimeout", L"0"},
-    {L"ConnectionTimeout", L"50000"},
-    {L"MaxConnections", L"50"},
-    {L"fetchSize", L"-1"}};
+    {IT_DRIVER, L"timestreamodbc"},
+    {IT_ACCESSKEYID, L"<accesskey>"},
+    {IT_SECRETACCESSKEY, L"<secretkey>"},
+    {IT_REGION, L"us-east-1"},
+    {IT_AUTH, L"IAM"},
+    {IT_LOGLEVEL, L"7"},
+    {IT_LOGOUTPUT, L"C:\\"}};
 
 std::wstring conn_string = []() {
     std::wstring temp;

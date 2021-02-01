@@ -52,15 +52,13 @@ runtime_options rt_opts = []() {
     for (auto it : conn_str_pair) {
         std::wstring tmp = it.first;
         std::transform(tmp.begin(), tmp.end(), tmp.begin(), towlower);
-        if (tmp == L"responsetimeout")
-            temp_opts.conn.timeout = wstring_to_string(it.second);
-        else if (tmp == L"Auth")
+        if (tmp == IT_AUTH)
             temp_opts.auth.auth_type = wstring_to_string(it.second);
-        else if (tmp == L"AccessKeyId")
+        else if (tmp == IT_ACCESSKEYID)
             temp_opts.auth.uid = wstring_to_string(it.second);
-        else if (tmp == L"SecretAccessKey")
+        else if (tmp == IT_SECRETACCESSKEY)
             temp_opts.auth.pwd = wstring_to_string(it.second);
-        else if (tmp == L"Region")
+        else if (tmp == IT_REGION)
             temp_opts.auth.region = wstring_to_string(it.second);
     }
     return temp_opts;
