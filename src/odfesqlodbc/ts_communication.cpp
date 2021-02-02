@@ -164,7 +164,7 @@
 // }
 
 bool TSCommunication::Validate(const runtime_options& options) {
-    if (options.auth.region.empty() && options.auth.end_point.empty()) {
+    if (options.auth.region.empty() && options.auth.end_point_override.empty()) {
         throw std::invalid_argument("Both region and end point cannot be empty.");
     }
     if (options.auth.auth_type != AUTHTYPE_AWS_PROFILE &&
@@ -188,8 +188,8 @@ bool TSCommunication::Validate(const runtime_options& options) {
 
 bool TSCommunication::Connect(const runtime_options& options) {
     Aws::Client::ClientConfiguration config;
-    if (!options.auth.end_point.empty()) {
-        config.endpointOverride = options.auth.end_point;
+    if (!options.auth.end_point_override.empty()) {
+        config.endpointOverride = options.auth.end_point_override;
     } else {
         config.enableEndpointDiscovery = true;
         config.region = options.auth.region;

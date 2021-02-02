@@ -293,7 +293,7 @@ typedef struct authentication_options {
     std::string pwd;
     std::string session_token;
     std::string region;
-    std::string end_point;
+    std::string end_point_override;
     std::string idp_name;
     std::string idp_host;
     std::string okta_application_id;

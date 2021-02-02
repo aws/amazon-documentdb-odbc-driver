@@ -60,9 +60,9 @@
 #define IDC_DRIVER_VERSION              1126
 #define IDC_AUTH_SETTINGS               1127
 #define IDC_CONN_SETTINGS               1128
-#define IDC_END_POINT_STATIC            1128
+#define IDC_END_POINT_OVERRIDE_STATIC   1128
 #define DLG_ADVANCED_OPTIONS            1129
-#define IDC_END_POINT                   1129
+#define IDC_END_POINT_OVERRIDE          1129
 #define IDC_REQUEST_TIMEOUT             1130
 #define IDC_IDP_NAME_STATIC             1130
 #define DLG_LOG_OPTIONS                 1131

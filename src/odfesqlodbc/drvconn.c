@@ -135,8 +135,8 @@ INT_PTR CALLBACK dconn_FDriverConnectProc(HWND hdlg, UINT wMsg, WPARAM wParam,
                 }
             } else if (ci->region[0] == '\0')
                 SetFocus(GetDlgItem(hdlg, IDC_REGION));
-            else if (ci->end_point[0] == '\0')
-                SetFocus(GetDlgItem(hdlg, IDC_END_POINT));
+            else if (ci->end_point_override[0] == '\0')
+                SetFocus(GetDlgItem(hdlg, IDC_END_POINT_OVERRIDE));
 
             break;
 

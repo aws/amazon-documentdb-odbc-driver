@@ -78,7 +78,7 @@ void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
         EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_REGION), TRUE);
-        EnableWindow(GetDlgItem(hdlg, IDC_END_POINT), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_END_POINT_OVERRIDE), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_IDP_NAME), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_IDP_HOST), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME), FALSE);
@@ -94,7 +94,7 @@ void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
         EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_REGION), TRUE);
-        EnableWindow(GetDlgItem(hdlg, IDC_END_POINT), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_END_POINT_OVERRIDE), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_IDP_NAME), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_IDP_HOST), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME), FALSE);
@@ -110,7 +110,7 @@ void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
         EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_REGION), TRUE);
-        EnableWindow(GetDlgItem(hdlg, IDC_END_POINT), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_END_POINT_OVERRIDE), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_IDP_NAME), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_IDP_HOST), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME), TRUE);
@@ -126,7 +126,7 @@ void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
         EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_REGION), TRUE);
-        EnableWindow(GetDlgItem(hdlg, IDC_END_POINT), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_END_POINT_OVERRIDE), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_IDP_NAME), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_IDP_HOST), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME), TRUE);
@@ -174,7 +174,7 @@ void SetDlgStuff(HWND hdlg, const ConnInfo *ci) {
         SetDlgItemText(hdlg, IDC_IDP_ARN, ci->idp_arn);
     }
     SetDlgItemText(hdlg, IDC_REGION, ci->region);
-    SetDlgItemText(hdlg, IDC_END_POINT, ci->end_point);
+    SetDlgItemText(hdlg, IDC_END_POINT_OVERRIDE, ci->end_point_override);
     if (strcmp(ci->authtype, AUTHTYPE_AAD) == 0) {
         SetDlgItemText(hdlg, IDC_AAD_APPLICATION_ID, ci->aad_application_id);
         SetDlgItemText(hdlg, IDC_AAD_CLIENT_SECRET, ci->aad_client_secret);
@@ -227,7 +227,7 @@ void GetDlgStuff(HWND hdlg, ConnInfo *ci) {
         GetDlgItemText(hdlg, IDC_IDP_ARN, ci->idp_arn, sizeof(ci->idp_arn));
     }
     GetDlgItemText(hdlg, IDC_REGION, ci->region, sizeof(ci->region));
-    GetDlgItemText(hdlg, IDC_END_POINT, ci->end_point, sizeof(ci->end_point));
+    GetDlgItemText(hdlg, IDC_END_POINT_OVERRIDE, ci->end_point_override, sizeof(ci->end_point_override));
 }
 
 const struct authmode *GetAuthModes(unsigned int *count) {

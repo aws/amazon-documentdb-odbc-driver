@@ -66,7 +66,7 @@ void* LIB_connect(ConnectionClass *self) {
     rt_opts.auth.pwd.assign(SAFE_NAME(self->connInfo.pwd));
     rt_opts.auth.session_token.assign(self->connInfo.session_token);
     rt_opts.auth.region.assign(self->connInfo.region);
-    rt_opts.auth.end_point.assign(self->connInfo.end_point);
+    rt_opts.auth.end_point_override.assign(self->connInfo.end_point_override);
     rt_opts.auth.idp_name.assign(self->connInfo.idp_name);
     rt_opts.auth.idp_host.assign(self->connInfo.idp_host);
     rt_opts.auth.okta_application_id.assign(self->connInfo.okta_application_id);
