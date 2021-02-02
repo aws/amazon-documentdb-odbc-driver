@@ -620,7 +620,7 @@ typedef struct {
     esNAME pwd;
     char session_token[LARGE_REGISTRY_LEN];
     char region[MEDIUM_REGISTRY_LEN];
-    char end_point[MEDIUM_REGISTRY_LEN];
+    char end_point_override[MEDIUM_REGISTRY_LEN];
 
     // SAML
     char idp_name[MEDIUM_REGISTRY_LEN];
