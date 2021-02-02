@@ -60,7 +60,7 @@ extern "C" {
 #define INI_SECRET_ACCESS_KEY "SecretAccessKey"
 #define INI_SESSION_TOKEN "SessionToken"
 #define INI_REGION "Region"
-#define INI_END_POINT "EndPoint"
+#define INI_END_POINT_OVERRIDE "EndPointOverride"
 // SAML-based
 #define INI_IDP_NAME "IdpName"
 #define INI_IDP_HOST "IdpHost"

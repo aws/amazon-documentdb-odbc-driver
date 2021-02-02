@@ -59,7 +59,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             "%s=%s;"
             INI_AUTH_MODE "=%s;"
             INI_REGION "=%s;"
-            INI_END_POINT "=%s;"
+            INI_END_POINT_OVERRIDE "=%s;"
             INI_LOG_LEVEL "=%d;"
             INI_LOG_OUTPUT "=%s;"
             INI_REQUEST_TIMEOUT "=%s;"
@@ -68,7 +68,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
             ci->authtype,
             ci->region,
-            ci->end_point, 
+            ci->end_point_override,
             (int)ci->drivers.loglevel,
             ci->drivers.output_dir,
             ci->request_timeout,
@@ -83,7 +83,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             INI_PWD "=%s;"
             INI_SESSION_TOKEN "=%s;"
             INI_REGION "=%s;"
-            INI_END_POINT "=%s;"
+            INI_END_POINT_OVERRIDE "=%s;"
             INI_LOG_LEVEL "=%d;"
             INI_LOG_OUTPUT "=%s;"
             INI_REQUEST_TIMEOUT "=%s;"
@@ -95,7 +95,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             encoded_item, 
             ci->session_token,
             ci->region,
-            ci->end_point, 
+            ci->end_point_override,
             (int)ci->drivers.loglevel,
             ci->drivers.output_dir,
             ci->request_timeout,
@@ -114,7 +114,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             INI_AAD_TENANT "=%s;"
             INI_IDP_ARN "=%s;"
             INI_REGION "=%s;"
-            INI_END_POINT "=%s;"
+            INI_END_POINT_OVERRIDE "=%s;"
             INI_LOG_LEVEL "=%d;"
             INI_LOG_OUTPUT "=%s;"
             INI_REQUEST_TIMEOUT "=%s;"
@@ -130,7 +130,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             ci->aad_tenant,
             ci->idp_arn,
             ci->region,
-            ci->end_point, 
+            ci->end_point_override,
             (int)ci->drivers.loglevel,
             ci->drivers.output_dir,
             ci->request_timeout,
@@ -149,7 +149,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             INI_ROLE_ARN "=%s;"
             INI_IDP_ARN "=%s;"
             INI_REGION "=%s;"
-            INI_END_POINT "=%s;"
+            INI_END_POINT_OVERRIDE "=%s;"
             INI_LOG_LEVEL "=%d;"
             INI_LOG_OUTPUT "=%s;"
             INI_REQUEST_TIMEOUT "=%s;"
@@ -165,7 +165,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             ci->role_arn,
             ci->idp_arn,
             ci->region,
-            ci->end_point, 
+            ci->end_point_override,
             (int)ci->drivers.loglevel,
             ci->drivers.output_dir,
             ci->request_timeout,
@@ -230,8 +230,8 @@ BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
         STRCPY_FIXED(ci->authtype, value);
     else if (stricmp(attribute, INI_REGION) == 0)
         STRCPY_FIXED(ci->region, value);
-    else if (stricmp(attribute, INI_END_POINT) == 0)
-        STRCPY_FIXED(ci->end_point, value);
+    else if (stricmp(attribute, INI_END_POINT_OVERRIDE) == 0)
+        STRCPY_FIXED(ci->end_point_override, value);
     else if (stricmp(attribute, INI_LOG_LEVEL) == 0)
         ci->drivers.loglevel = (char)atoi(value);
     else if (stricmp(attribute, INI_LOG_OUTPUT) == 0)
@@ -283,7 +283,7 @@ static void getCiDefaults(ConnInfo *ci) {
     strncpy(ci->uid, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
     strncpy(ci->session_token, DEFAULT_NONE, LARGE_REGISTRY_LEN);
     strncpy(ci->region, DEFAULT_REGION, MEDIUM_REGISTRY_LEN);
-    strncpy(ci->end_point, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
+    strncpy(ci->end_point_override, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
     strncpy(ci->idp_name, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
     strncpy(ci->idp_host, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
     strncpy(ci->okta_application_id, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
@@ -404,10 +404,10 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
                                    sizeof(temp), ODBC_INI)
         > 0)
         STRCPY_FIXED(ci->region, temp);
-    if (SQLGetPrivateProfileString(DSN, INI_END_POINT, NULL_STRING, temp,
+    if (SQLGetPrivateProfileString(DSN, INI_END_POINT_OVERRIDE, NULL_STRING, temp,
                                    sizeof(temp), ODBC_INI)
         > 0)
-        STRCPY_FIXED(ci->end_point, temp);
+        STRCPY_FIXED(ci->end_point_override, temp);
     if (SQLGetPrivateProfileString(DSN, INI_LOG_LEVEL, NULL_STRING, temp,
                                    sizeof(temp), ODBC_INI)
         > 0)
@@ -493,7 +493,7 @@ void writeDSNinfo(const ConnInfo *ci) {
     SQLWritePrivateProfileString(DSN, INI_SESSION_TOKEN, ci->session_token, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_AUTH_MODE, ci->authtype, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_REGION, ci->region, ODBC_INI);
-    SQLWritePrivateProfileString(DSN, INI_END_POINT, ci->end_point, ODBC_INI);
+    SQLWritePrivateProfileString(DSN, INI_END_POINT_OVERRIDE, ci->end_point_override, ODBC_INI);
     ITOA_FIXED(temp, ci->drivers.loglevel);
     SQLWritePrivateProfileString(DSN, INI_LOG_LEVEL, temp, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_LOG_OUTPUT, ci->drivers.output_dir,
@@ -660,7 +660,7 @@ void CC_conninfo_init(ConnInfo *conninfo, UInt4 option) {
     strncpy(conninfo->uid, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
     strncpy(conninfo->session_token, DEFAULT_NONE, LARGE_REGISTRY_LEN);
     strncpy(conninfo->region, DEFAULT_REGION, MEDIUM_REGISTRY_LEN);
-    strncpy(conninfo->end_point, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
+    strncpy(conninfo->end_point_override, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
     strncpy(conninfo->idp_name, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
     strncpy(conninfo->idp_host, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
     strncpy(conninfo->okta_application_id, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
@@ -705,7 +705,7 @@ void CC_copy_conninfo(ConnInfo *ci, const ConnInfo *sci) {
     CORR_STRCPY(uid);
     CORR_STRCPY(authtype);
     CORR_STRCPY(region);
-    CORR_STRCPY(end_point);
+    CORR_STRCPY(end_point_override);
     NAME_TO_NAME(ci->pwd, sci->pwd);
     CORR_STRCPY(session_token);
     CORR_STRCPY(request_timeout);
