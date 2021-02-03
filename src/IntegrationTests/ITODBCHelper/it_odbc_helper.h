@@ -51,7 +51,12 @@ std::vector< std::pair< std::wstring, std::wstring > > conn_str_pair = {
     {IT_REGION, L"us-east-1"},
     {IT_AUTH, L"IAM"},
     {IT_LOGLEVEL, L"7"},
-    {IT_LOGOUTPUT, L"C:\\"}};
+#ifdef __APPLE__
+    {IT_LOGOUTPUT, L"/tmp/"}
+#else
+    {IT_LOGOUTPUT, L"C:\\"}
+#endif
+    };
 
 std::wstring conn_string = []() {
     std::wstring temp;
