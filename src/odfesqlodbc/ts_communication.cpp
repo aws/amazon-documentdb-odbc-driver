@@ -181,9 +181,6 @@ bool TSCommunication::Validate(const runtime_options& options) {
     if (options.auth.auth_type != AUTHTYPE_AWS_PROFILE && options.auth.pwd.empty()) {
         throw std::invalid_argument("PWD / SecretAccessKey cannot be empty.");
     }
-    if (!options.conn.timeout.empty()) {
-        std::stol(options.conn.timeout);
-    }
     LogMsg(LOG_DEBUG, "Required connection options are valid.");
     return true;
 }
@@ -197,19 +194,26 @@ bool TSCommunication::Connect(const runtime_options& options) {
         config.region = options.auth.region;
     }
     long request_timeout = static_cast< long >(DEFAULT_REQUEST_TIMEOUT);
-    request_timeout = std::stol(options.conn.timeout);
-    if (request_timeout > 0) {
+    if (!options.conn.timeout.empty()) {
+        request_timeout = std::stol(options.conn.timeout);
+    }
+    if (request_timeout >= 0) {
         config.requestTimeoutMs = request_timeout;
     }
     long connection_timeout = static_cast< long >(DEFAULT_CONNECTION_TIMEOUT);
-    connection_timeout = std::stol(options.conn.connection_timeout);
-    if (connection_timeout > 0) {
+    if (!options.conn.connection_timeout.empty()) {
+        connection_timeout = std::stol(options.conn.connection_timeout);
+    }
+    if (connection_timeout >= 0) {
         config.connectTimeoutMs = connection_timeout;
     }
-    long max_connections = static_cast< long >(DEFAULT_MAX_CONNECTIONS);
-    max_connections = std::stol(options.conn.max_connections);
-    config.maxConnections = max_connections;
-
+    int max_connections = static_cast< int >(DEFAULT_MAX_CONNECTIONS);
+    if (!options.conn.max_connections.empty()) {
+        max_connections = std::stoi(options.conn.max_connections);
+    }
+    if (max_connections >= 0) {
+        config.maxConnections = max_connections;
+    }
     if (!options.conn.max_retry_count_client.empty()) {
         long max_retry_count_client = std::stol(options.conn.max_retry_count_client);
         if (max_retry_count_client < 0) {
