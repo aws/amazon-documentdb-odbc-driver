@@ -255,6 +255,7 @@ INT_PTR CALLBACK advancedOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
             ConnInfo *ci = (ConnInfo *)lParam;
             SetDlgItemText(hdlg, IDC_REQUEST_TIMEOUT, ci->request_timeout);
             SetDlgItemText(hdlg, IDC_CONNECTION_TIMEOUT, ci->connection_timeout);
+            SetDlgItemText(hdlg, IDC_MAX_RETRY_COUNT_CLIENT, ci->max_retry_count_client);
             SetDlgItemText(hdlg, IDC_MAX_CONNECTIONS, ci->max_connections);
             break;
         }
@@ -268,6 +269,8 @@ INT_PTR CALLBACK advancedOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
                                    sizeof(ci->request_timeout));
                     GetDlgItemText(hdlg, IDC_CONNECTION_TIMEOUT, ci->connection_timeout,
                                    sizeof(ci->connection_timeout));
+                    GetDlgItemText(hdlg, IDC_MAX_RETRY_COUNT_CLIENT, ci->max_retry_count_client,
+                                   sizeof(ci->max_retry_count_client));
                     GetDlgItemText(hdlg, IDC_MAX_CONNECTIONS, ci->max_connections,
                                    sizeof(ci->max_connections));
                 case IDCANCEL:

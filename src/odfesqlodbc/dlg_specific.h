@@ -78,6 +78,7 @@ extern "C" {
 // Advanced
 #define INI_REQUEST_TIMEOUT "RequestTimeout"
 #define INI_CONNECTION_TIMEOUT "ConnectionTimeout"
+#define INI_MAX_RETRY_COUNT_CLIENT "MaxRetryCountClient"
 #define INI_MAX_CONNECTIONS "MaxConnections"
 
 #define DEFAULT_REQUEST_TIMEOUT 3000

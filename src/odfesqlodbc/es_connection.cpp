@@ -59,6 +59,7 @@ void* LIB_connect(ConnectionClass *self) {
     // Connection
     rt_opts.conn.timeout.assign(self->connInfo.request_timeout);
     rt_opts.conn.connection_timeout.assign(self->connInfo.connection_timeout);
+    rt_opts.conn.max_retry_count_client.assign(self->connInfo.max_retry_count_client);
     rt_opts.conn.max_connections.assign(self->connInfo.max_connections);
     // Authentication
     rt_opts.auth.auth_type.assign(self->connInfo.authtype);
