@@ -63,7 +63,7 @@ class TestSQLConnect : public testing::Test {
     SQLHDBC m_conn;
 };
 
-TEST_F(TestSQLConnect, Default_credential_chain) {
+TEST_F(TestSQLConnect, AWS_Profile_Default_credential_chain) {
     SQLRETURN ret = SQLConnect(
         m_conn, (SQLTCHAR*)default_credential_chain.c_str(), SQL_NTS,
         (SQLTCHAR*)empty.c_str(), static_cast< SQLSMALLINT >(empty.length()),
@@ -72,7 +72,7 @@ TEST_F(TestSQLConnect, Default_credential_chain) {
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
-TEST_F(TestSQLConnect, Success) {
+TEST_F(TestSQLConnect, IAM_Success) {
     SQLRETURN ret = SQLConnect(
         m_conn, (SQLTCHAR*)wdsn_name.c_str(), SQL_NTS, (SQLTCHAR*)user.c_str(),
         static_cast< SQLSMALLINT >(user.length()), (SQLTCHAR*)pass.c_str(),
@@ -82,7 +82,7 @@ TEST_F(TestSQLConnect, Success) {
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
-TEST_F(TestSQLConnect, empty_server_used_default) {
+TEST_F(TestSQLConnect, IAM_empty_server_used_default) {
     SQLRETURN ret = SQLConnect(
         m_conn, (SQLTCHAR*)empty.c_str(), SQL_NTS,
         (SQLTCHAR*)user.c_str(), static_cast< SQLSMALLINT >(user.length()),
@@ -92,7 +92,7 @@ TEST_F(TestSQLConnect, empty_server_used_default) {
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
-TEST_F(TestSQLConnect, WrongUser) {
+TEST_F(TestSQLConnect, IAM_WrongUser) {
     SQLRETURN ret = SQLConnect(
         m_conn, (SQLTCHAR*)wdsn_name.c_str(), SQL_NTS, (SQLTCHAR*)wrong.c_str(),
         static_cast< SQLSMALLINT >(wrong.length()), (SQLTCHAR*)pass.c_str(),
@@ -102,7 +102,7 @@ TEST_F(TestSQLConnect, WrongUser) {
     EXPECT_EQ(SQL_ERROR, ret);
 }
 
-TEST_F(TestSQLConnect, WrongPassword) {
+TEST_F(TestSQLConnect, IAM_WrongPassword) {
     SQLRETURN ret = SQLConnect(
         m_conn, (SQLTCHAR*)wdsn_name.c_str(), SQL_NTS, (SQLTCHAR*)user.c_str(),
         static_cast< SQLSMALLINT >(user.length()), (SQLTCHAR*)wrong.c_str(),
@@ -131,7 +131,7 @@ class TestSQLDriverConnect : public testing::Test {
     SQLSMALLINT m_out_conn_string_length;
 };
 
-TEST_F(TestSQLDriverConnect, DSNConnectionString) {
+TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
     SQLRETURN ret = SQLDriverConnect(
         m_conn, NULL, (SQLTCHAR*)dsn_conn_string.c_str(), SQL_NTS,
         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
@@ -139,7 +139,7 @@ TEST_F(TestSQLDriverConnect, DSNConnectionString) {
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
-TEST_F(TestSQLDriverConnect, MinimalConnectionString) {
+TEST_F(TestSQLDriverConnect, IAM_MinimalConnectionString) {
     std::wstring wstr;
     wstr += L"Driver=timestreamodbc;";
     wstr += (L"UID=" + user + L";");
@@ -151,7 +151,7 @@ TEST_F(TestSQLDriverConnect, MinimalConnectionString) {
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
-TEST_F(TestSQLDriverConnect, MinimalAliasConnectionString) {
+TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString) {
     std::wstring wstr;
     wstr += L"Driver=timestreamodbc;";
     wstr += (L"AccessKeyId=" + user + L";");
@@ -163,7 +163,7 @@ TEST_F(TestSQLDriverConnect, MinimalAliasConnectionString) {
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
-TEST_F(TestSQLDriverConnect, MinimalAliasConnectionString_Cross1) {
+TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross1) {
     std::wstring wstr;
     wstr += L"Driver=timestreamodbc;";
     wstr += (L"UID=" + user + L";");
@@ -175,7 +175,7 @@ TEST_F(TestSQLDriverConnect, MinimalAliasConnectionString_Cross1) {
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
-TEST_F(TestSQLDriverConnect, MinimalAliasConnectionString_Cross2) {
+TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross2) {
     std::wstring wstr;
     wstr += L"Driver=timestreamodbc;";
     wstr += (L"AccessKeyId=" + user + L";");
