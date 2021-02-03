@@ -612,6 +612,7 @@ typedef struct {
     char drivername[MEDIUM_REGISTRY_LEN];
     char request_timeout[SMALL_REGISTRY_LEN];
     char connection_timeout[SMALL_REGISTRY_LEN];
+    char max_retry_count_client[SMALL_REGISTRY_LEN];
     char max_connections[SMALL_REGISTRY_LEN];
 
     // Authentication

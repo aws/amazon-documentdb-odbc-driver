@@ -64,6 +64,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             INI_LOG_OUTPUT "=%s;"
             INI_REQUEST_TIMEOUT "=%s;"
             INI_CONNECTION_TIMEOUT "=%s;"
+            INI_MAX_RETRY_COUNT_CLIENT "=%s;"
             INI_MAX_CONNECTIONS "=%s;",
             got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
             ci->authtype,
@@ -73,6 +74,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             ci->drivers.output_dir,
             ci->request_timeout,
             ci->connection_timeout,
+            ci->max_retry_count_client,
             ci->max_connections);
     } else if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
         olen = snprintf(
@@ -88,6 +90,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             INI_LOG_OUTPUT "=%s;"
             INI_REQUEST_TIMEOUT "=%s;"
             INI_CONNECTION_TIMEOUT "=%s;"
+            INI_MAX_RETRY_COUNT_CLIENT "=%s;"
             INI_MAX_CONNECTIONS "=%s;",
             got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
             ci->authtype,
@@ -100,6 +103,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             ci->drivers.output_dir,
             ci->request_timeout,
             ci->connection_timeout,
+            ci->max_retry_count_client,
             ci->max_connections);
     } else if (strcmp(ci->authtype, AUTHTYPE_AAD) == 0) {
         olen = snprintf(
@@ -119,6 +123,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             INI_LOG_OUTPUT "=%s;"
             INI_REQUEST_TIMEOUT "=%s;"
             INI_CONNECTION_TIMEOUT "=%s;"
+            INI_MAX_RETRY_COUNT_CLIENT "=%s;"
             INI_MAX_CONNECTIONS "=%s;",
             got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
             ci->authtype,
@@ -135,6 +140,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             ci->drivers.output_dir,
             ci->request_timeout,
             ci->connection_timeout,
+            ci->max_retry_count_client,
             ci->max_connections);
     } else if (strcmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
         olen = snprintf(
@@ -154,6 +160,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             INI_LOG_OUTPUT "=%s;"
             INI_REQUEST_TIMEOUT "=%s;"
             INI_CONNECTION_TIMEOUT "=%s;"
+            INI_MAX_RETRY_COUNT_CLIENT "=%s;"
             INI_MAX_CONNECTIONS "=%s;",
             got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
             ci->authtype,
@@ -170,6 +177,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             ci->drivers.output_dir,
             ci->request_timeout,
             ci->connection_timeout,
+            ci->max_retry_count_client,
             ci->max_connections);
     }
     if (olen < 0 || olen >= nlen) {
@@ -240,6 +248,8 @@ BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
         STRCPY_FIXED(ci->request_timeout, value);
     else if (stricmp(attribute, INI_CONNECTION_TIMEOUT) == 0)
         STRCPY_FIXED(ci->connection_timeout, value);
+    else if (stricmp(attribute, INI_MAX_RETRY_COUNT_CLIENT) == 0)
+        STRCPY_FIXED(ci->max_retry_count_client, value);
     else if (stricmp(attribute, INI_MAX_CONNECTIONS) == 0)
         STRCPY_FIXED(ci->max_connections, value);
     else if (stricmp(attribute, INI_IDP_NAME) == 0)
@@ -274,6 +284,7 @@ static void getCiDefaults(ConnInfo *ci) {
             SMALL_REGISTRY_LEN);
     strncpy(ci->connection_timeout, DEFAULT_CONNECTION_TIMEOUT_STR,
             SMALL_REGISTRY_LEN);
+    strncpy(ci->max_retry_count_client, DEFAULT_NONE, SMALL_REGISTRY_LEN);
     strncpy(ci->max_connections, DEFAULT_MAX_CONNECTIONS_STR,
             SMALL_REGISTRY_LEN);
     strncpy(ci->authtype, DEFAULT_AUTHTYPE, MEDIUM_REGISTRY_LEN);
@@ -424,6 +435,10 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
                                    sizeof(temp), ODBC_INI)
         > 0)
         STRCPY_FIXED(ci->connection_timeout, temp);
+    if (SQLGetPrivateProfileString(DSN, INI_MAX_RETRY_COUNT_CLIENT, NULL_STRING,
+                                   temp, sizeof(temp), ODBC_INI)
+        > 0)
+        STRCPY_FIXED(ci->max_retry_count_client, temp);
     if (SQLGetPrivateProfileString(DSN, INI_MAX_CONNECTIONS, NULL_STRING, temp,
                                    sizeof(temp), ODBC_INI)
         > 0)
@@ -501,6 +516,8 @@ void writeDSNinfo(const ConnInfo *ci) {
     SQLWritePrivateProfileString(DSN, INI_REQUEST_TIMEOUT, ci->request_timeout,
                                  ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_CONNECTION_TIMEOUT, ci->connection_timeout,
+                                 ODBC_INI);
+    SQLWritePrivateProfileString(DSN, INI_MAX_RETRY_COUNT_CLIENT, ci->max_retry_count_client,
                                  ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_MAX_CONNECTIONS, ci->max_connections,
                                  ODBC_INI);
@@ -651,6 +668,8 @@ void CC_conninfo_init(ConnInfo *conninfo, UInt4 option) {
             SMALL_REGISTRY_LEN);
     strncpy(conninfo->connection_timeout, DEFAULT_CONNECTION_TIMEOUT_STR,
             SMALL_REGISTRY_LEN);
+    strncpy(conninfo->max_retry_count_client, DEFAULT_NONE,
+            SMALL_REGISTRY_LEN);
     strncpy(conninfo->max_connections, DEFAULT_MAX_CONNECTIONS_STR,
             SMALL_REGISTRY_LEN);
     strncpy(conninfo->authtype, DEFAULT_AUTHTYPE, MEDIUM_REGISTRY_LEN);
@@ -710,6 +729,7 @@ void CC_copy_conninfo(ConnInfo *ci, const ConnInfo *sci) {
     CORR_STRCPY(session_token);
     CORR_STRCPY(request_timeout);
     CORR_STRCPY(connection_timeout);
+    CORR_STRCPY(max_retry_count_client);
     CORR_STRCPY(max_connections);
     CORR_STRCPY(idp_name);
     CORR_STRCPY(idp_host);

@@ -18,7 +18,7 @@
 #define IDC_FETCH_SIZE_STATIC           404
 #define IDC_SERVER                      407
 #define IDC_NOTICE_USER                 414
-#define IDS_AUTHTYPE_AWS_PROFILE		416
+#define IDS_AUTHTYPE_AWS_PROFILE        416
 #define IDS_AUTHTYPE_IAM                417
 #define IDS_AUTHTYPE_AAD                418
 #define IDS_AUTHTYPE_OKTA               419
@@ -52,6 +52,7 @@
 #define IDC_USERNAME_STATIC             1116
 #define IDC_MAX_CONNECTIONS_STATIC      1116
 #define IDC_ACCESS_KEY_ID_STATIC        1116
+#define IDC_MAX_RETRY_COUNT_CLIENT_STATIC 1117
 #define IDC_REGION                      1121
 #define IDC_REGION_STATIC               1122
 #define IDC_AUTH_STATIC                 1123
@@ -75,6 +76,8 @@
 #define IDC_MAX_CONNECTIONS             1133
 #define IDC_IDP_HOST                    1133
 #define IDC_IDP_USERNAME_STATIC         1134
+#define IDC_MAX_CONNECTIONS2            1134
+#define IDC_MAX_RETRY_COUNT_CLIENT      1134
 #define IDC_IDP_USERNAME                1135
 #define IDC_IDP_PASSWORD_STATIC         1136
 #define IDC_IDP_PASSWORD                1137
