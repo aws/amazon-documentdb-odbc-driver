@@ -21,7 +21,9 @@
 // clang-format off
 #include "es_odbc.h"
 #include "mylog.h"
+#include <memory>
 #include <aws/core/auth/AWSCredentials.h>
+#include <aws/core/client/DefaultRetryStrategy.h>
 #include <aws/timestream-query/model/QueryRequest.h>
 
 // clang-format on
@@ -207,6 +209,14 @@ bool TSCommunication::Connect(const runtime_options& options) {
     long max_connections = static_cast< long >(DEFAULT_MAX_CONNECTIONS);
     max_connections = std::stol(options.conn.max_connections);
     config.maxConnections = max_connections;
+
+    if (!options.conn.max_retry_count_client.empty()) {
+        long max_retry_count_client = std::stol(options.conn.max_retry_count_client);
+        if (max_retry_count_client < 0) {
+            throw std::invalid_argument("Max retry count client cannot be negative.");
+        }
+        config.retryStrategy = std::make_shared< Aws::Client::DefaultRetryStrategy >(max_retry_count_client);
+    }
 
     if (options.auth.auth_type == AUTHTYPE_AWS_PROFILE) {
         m_client =
