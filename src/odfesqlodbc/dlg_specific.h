@@ -46,48 +46,56 @@ extern "C" {
 #define INVALID_DRIVER " @@driver not exist@@ "
 
 #ifdef UNICODE_SUPPORT
-#define INI_DSN "Elasticsearch35W"
+#define INI_DSN "Timestream35W"
 #else
-#define INI_DSN "Elasticsearch30"
+#define INI_DSN "Timestream30"
 #endif /* UNICODE_SUPPORT */
-    
-#define INI_HOST "host"
-#define INI_SERVER "server"
-#define INI_PORT "port"
-#define INI_USERNAME "user"    
-#define INI_USERNAME_ABBR "UID"        
-#define INI_PASSWORD "password"
-#define INI_PASSWORD_ABBR "PWD"
-#define INI_TOKEN "token"
-#define INI_TOKEN_ABBR "TOKEN"
-#define INI_AUTH_MODE "auth"
-#define INI_REGION "region" 
-#define INI_SSL_USE "useSSL"  
-#define INI_SSL_HOST_VERIFY "hostnameVerification"
-#define INI_LOG_LEVEL "logLevel"
-#define INI_LOG_OUTPUT "logOutput"
-#define INI_TIMEOUT "responseTimeout"
-#define INI_FETCH_SIZE "fetchSize"
 
-#define DEFAULT_FETCH_SIZE -1
-#define DEFAULT_FETCH_SIZE_STR "-1"
-#define DEFAULT_RESPONSE_TIMEOUT 10  // Seconds
-#define DEFAULT_RESPONSE_TIMEOUT_STR "10"
-#define DEFAULT_AUTHTYPE "NONE"
-#define DEFAULT_HOST ""
-#define DEFAULT_PORT ""
-#define DEFAULT_USERNAME ""
-#define DEFAULT_PASSWORD ""
-#define DEFAULT_TOKEN ""
+#define INI_DRIVER "Driver"
+#define INI_UID "UID"
+#define INI_PWD "PWD"
+#define INI_AUTH_MODE "Auth"
+// IAM
+#define INI_ACCESS_KEY_ID "AccessKeyId"
+#define INI_SECRET_ACCESS_KEY "SecretAccessKey"
+#define INI_SESSION_TOKEN "SessionToken"
+#define INI_REGION "Region"
+#define INI_END_POINT_OVERRIDE "EndPointOverride"
+// SAML-based
+#define INI_IDP_NAME "IdpName"
+#define INI_IDP_HOST "IdpHost"
+#define INI_IDP_USERNAME "IdpUserName"
+#define INI_IDP_PASSWORD "IdpPassword"
+#define INI_OKTA_APPLICATION_ID "OktaApplicationID"
+#define INI_ROLE_ARN "RoleARN"
+#define INI_AAD_APPLICATION_ID "AADApplicationID"
+#define INI_AAD_CLIENT_SECRET "AADClientSecret"
+#define INI_AAD_TENANT "AADTenant"
+#define INI_IDP_ARN "IdpARN"
+// Logging
+#define INI_LOG_LEVEL "LogLevel"
+#define INI_LOG_OUTPUT "LogOutput"
+// Advanced
+#define INI_REQUEST_TIMEOUT "RequestTimeout"
+#define INI_CONNECTION_TIMEOUT "ConnectionTimeout"
+#define INI_MAX_RETRY_COUNT_CLIENT "MaxRetryCountClient"
+#define INI_MAX_CONNECTIONS "MaxConnections"
+
+#define DEFAULT_REQUEST_TIMEOUT 3000
+#define DEFAULT_REQUEST_TIMEOUT_STR "3000"
+#define DEFAULT_CONNECTION_TIMEOUT 1000
+#define DEFAULT_CONNECTION_TIMEOUT_STR "1000"
+#define DEFAULT_MAX_CONNECTIONS 25
+#define DEFAULT_MAX_CONNECTIONS_STR "25"
+#define DEFAULT_AUTHTYPE "IAM"
 #define DEFAULT_DRIVERNAME "timestreamodbc"
-#define DEFAULT_DESC ""
-#define DEFAULT_DSN ""
-#define DEFAULT_REGION ""
-#define DEFAULT_VERIFY_SERVER 1
+#define DEFAULT_REGION "us-east-1"
+#define DEFAULT_NONE ""
 
-#define AUTHTYPE_NONE "NONE"
-#define AUTHTYPE_BASIC "BASIC"
-#define AUTHTYPE_IAM "AWS_SIGV4"  
+#define AUTHTYPE_AWS_PROFILE "AWS PROFILE"
+#define AUTHTYPE_IAM "IAM"
+#define AUTHTYPE_AAD "AAD"
+#define AUTHTYPE_OKTA "OKTA"
 
 #ifdef _HANDLE_ENLIST_IN_DTC_
 #define INI_XAOPT "XaOpt"
@@ -138,11 +146,9 @@ extern "C" {
 #define DEFAULT_UNKNOWNSASLONGVARCHAR 0
 #define DEFAULT_BOOLSASCHAR 0
 #define DEFAULT_UNIQUEINDEX 1 /* dont recognize */
-#define DEFAULT_LOGLEVEL ES_WARNING
-#define DEFAULT_USE_SSL 1
+#define DEFAULT_LOGLEVEL LOG_WARNING
 #define DEFAULT_TRUST_SELF_SIGNED 0
-#define DEFAULT_AUTH_MODE "NONE"
-#define DEFAULT_REGION ""
+#define DEFAULT_AUTH_MODE "IAM"
 #define DEFAULT_CERTIFICATE ""
 #define DEFAULT_KEY ""
 #define DEFAULT_UNKNOWNSIZES UNKNOWNS_AS_MAX

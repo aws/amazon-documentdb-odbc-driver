@@ -26,7 +26,7 @@
 #include "xalibname.h"
 #endif /* _HANDLE_ENLIST_IN_DTC_ */
 
-#define AUTHMODE_CNT 2
+#define AUTHMODE_CNT 4
 #define LOGLEVEL_CNT 8
 extern HINSTANCE s_hModule;
 
@@ -41,9 +41,10 @@ int loglevels[LOGLEVEL_CNT] = {
     {IDS_LOGTYPE_ALL}};
 
 static const struct authmode authmodes[AUTHMODE_CNT] = {
-    // A bit tricky map for the selection list dialog
-    {IDS_AUTHTYPE_BASIC, AUTHTYPE_IAM},
-    {IDS_AUTHTYPE_IAM, AUTHTYPE_BASIC}};
+    {IDS_AUTHTYPE_AWS_PROFILE, AUTHTYPE_AWS_PROFILE},
+    {IDS_AUTHTYPE_IAM, AUTHTYPE_IAM},
+    {IDS_AUTHTYPE_AAD, AUTHTYPE_AAD},
+    {IDS_AUTHTYPE_OKTA, AUTHTYPE_OKTA}};
 
 const struct authmode *GetCurrentAuthMode(HWND hdlg) {
     unsigned int ams_cnt = 0;
@@ -72,21 +73,70 @@ int GetCurrentLogLevel(HWND hdlg) {
 
 
 void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
-    if (strcmp(am->authtype_str, AUTHTYPE_BASIC) == 0) {
-        EnableWindow(GetDlgItem(hdlg, IDC_USER), TRUE);
-        EnableWindow(GetDlgItem(hdlg, IDC_PASSWORD), TRUE);
-        EnableWindow(GetDlgItem(hdlg, IDC_TOKEN), TRUE);
+    if (strcmp(am->authtype_str, AUTHTYPE_AWS_PROFILE) == 0) {
+        EnableWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_REGION), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_END_POINT_OVERRIDE), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_NAME), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_HOST), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_PASSWORD), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_OKTA_APPLICATION_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_ROLE_ARN), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_APPLICATION_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_CLIENT_SECRET), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_TENANT), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_ARN), FALSE);
     } else if (strcmp(am->authtype_str, AUTHTYPE_IAM) == 0) {
-        EnableWindow(GetDlgItem(hdlg, IDC_USER), FALSE);
-        EnableWindow(GetDlgItem(hdlg, IDC_PASSWORD), FALSE);
-        EnableWindow(GetDlgItem(hdlg, IDC_TOKEN), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_REGION), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_END_POINT_OVERRIDE), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_NAME), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_HOST), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_PASSWORD), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_OKTA_APPLICATION_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_ROLE_ARN), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_APPLICATION_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_CLIENT_SECRET), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_TENANT), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_ARN), FALSE);
+    } else if (strcmp(am->authtype_str, AUTHTYPE_AAD) == 0) {
+        EnableWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_REGION), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_END_POINT_OVERRIDE), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_NAME), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_HOST), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_PASSWORD), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_OKTA_APPLICATION_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_ROLE_ARN), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_APPLICATION_ID), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_CLIENT_SECRET), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_TENANT), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_ARN), TRUE);
     } else {
-        EnableWindow(GetDlgItem(hdlg, IDC_USER), FALSE);
-        EnableWindow(GetDlgItem(hdlg, IDC_PASSWORD), FALSE);
-        EnableWindow(GetDlgItem(hdlg, IDC_TOKEN), FALSE);
-        EnableWindow(GetDlgItem(hdlg, IDC_REGION), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_REGION), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_END_POINT_OVERRIDE), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_NAME), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_HOST), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_PASSWORD), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_OKTA_APPLICATION_ID), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_ROLE_ARN), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_APPLICATION_ID), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_CLIENT_SECRET), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_AAD_TENANT), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_IDP_ARN), TRUE);
     } 
 }
 
@@ -94,8 +144,6 @@ void SetDlgStuff(HWND hdlg, const ConnInfo *ci) {
     // Connection
     SetDlgItemText(hdlg, IDC_DRIVER_VERSION, "V."TIMESTREAMDRIVERVERSION);
     SetDlgItemText(hdlg, IDC_DSNAME, ci->dsn);
-    SetDlgItemText(hdlg, IDC_SERVER, ci->server);
-    SetDlgItemText(hdlg, IDC_PORT, ci->port);
 
     // Authentication
     int authtype_selection_idx = 0;
@@ -105,17 +153,37 @@ void SetDlgStuff(HWND hdlg, const ConnInfo *ci) {
     for (unsigned int i = 0; i < ams_cnt; i++) {
         LoadString(GetWindowInstance(hdlg), ams[i].authtype_id, buff,
                    MEDIUM_REGISTRY_LEN);
-        SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_ADDSTRING, 0, (WPARAM)buff);
-        if (!stricmp(ci->authtype, ams[i].authtype_str)) {
+        SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_ADDSTRING, 0, (LPARAM)buff);
+        if (stricmp(ci->authtype, ams[i].authtype_str) == 0) {
             authtype_selection_idx = i;
         }
     }
     SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL,
                        ams[authtype_selection_idx].authtype_id, (WPARAM)0);
-    SetDlgItemText(hdlg, IDC_USER, ci->username);
-    SetDlgItemText(hdlg, IDC_PASSWORD, SAFE_NAME(ci->password));
-    SetDlgItemText(hdlg, IDC_TOKEN, ci->token);
+    SetAuthenticationVisibility(hdlg, &ams[authtype_selection_idx]);
+    
+    if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
+        SetDlgItemText(hdlg, IDC_ACCESS_KEY_ID, ci->uid);
+        SetDlgItemText(hdlg, IDC_SECRET_ACCESS_KEY, SAFE_NAME(ci->pwd));
+        SetDlgItemText(hdlg, IDC_SESSION_TOKEN, ci->session_token);
+    } else if (strcmp(ci->authtype, AUTHTYPE_AAD) == 0
+               || strcmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
+        SetDlgItemText(hdlg, IDC_IDP_USERNAME, ci->uid);
+        SetDlgItemText(hdlg, IDC_IDP_PASSWORD, SAFE_NAME(ci->pwd));
+        SetDlgItemText(hdlg, IDC_IDP_NAME, ci->idp_name);
+        SetDlgItemText(hdlg, IDC_IDP_ARN, ci->idp_arn);
+    }
     SetDlgItemText(hdlg, IDC_REGION, ci->region);
+    SetDlgItemText(hdlg, IDC_END_POINT_OVERRIDE, ci->end_point_override);
+    if (strcmp(ci->authtype, AUTHTYPE_AAD) == 0) {
+        SetDlgItemText(hdlg, IDC_AAD_APPLICATION_ID, ci->aad_application_id);
+        SetDlgItemText(hdlg, IDC_AAD_CLIENT_SECRET, ci->aad_client_secret);
+        SetDlgItemText(hdlg, IDC_AAD_TENANT, ci->aad_tenant);
+    } else if (strcmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
+        SetDlgItemText(hdlg, IDC_IDP_HOST, ci->idp_host);
+        SetDlgItemText(hdlg, IDC_OKTA_APPLICATION_ID, ci->okta_application_id);
+        SetDlgItemText(hdlg, IDC_ROLE_ARN, ci->role_arn);
+    }
 }
 
 static void GetNameField(HWND hdlg, int item, esNAME *name) {
@@ -126,19 +194,40 @@ static void GetNameField(HWND hdlg, int item, esNAME *name) {
 
 void GetDlgStuff(HWND hdlg, ConnInfo *ci) {
     // Connection
-    GetDlgItemText(hdlg, IDC_DESC, ci->desc, sizeof(ci->desc));
-    GetDlgItemText(hdlg, IDC_SERVER, ci->server, sizeof(ci->server));
-    GetDlgItemText(hdlg, IDC_PORT, ci->port, sizeof(ci->port));
 
     // Authentication
-    GetDlgItemText(hdlg, IDC_USER, ci->username, sizeof(ci->username));
-    GetNameField(hdlg, IDC_PASSWORD, &ci->password);
-    GetDlgItemText(hdlg, IDC_TOKEN, ci->token, sizeof(ci->token));
-    GetDlgItemText(hdlg, IDC_REGION, ci->region, sizeof(ci->region));
     const struct authmode *am = GetCurrentAuthMode(hdlg);
     SetAuthenticationVisibility(hdlg, am);
     STRCPY_FIXED(ci->authtype, am->authtype_str);
-
+    if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
+        GetDlgItemText(hdlg, IDC_ACCESS_KEY_ID, ci->uid, sizeof(ci->uid));
+        GetNameField(hdlg, IDC_SECRET_ACCESS_KEY, &ci->pwd);
+        GetDlgItemText(hdlg, IDC_SESSION_TOKEN, ci->session_token,
+                       sizeof(ci->session_token));
+    } else if (strcmp(ci->authtype, AUTHTYPE_AAD) == 0) {
+        GetDlgItemText(hdlg, IDC_IDP_NAME, ci->idp_name,
+                       sizeof(ci->idp_name));
+        GetDlgItemText(hdlg, IDC_IDP_USERNAME, ci->uid, sizeof(ci->uid));
+        GetNameField(hdlg, IDC_IDP_PASSWORD, &ci->pwd);
+        GetDlgItemText(hdlg, IDC_AAD_APPLICATION_ID, ci->aad_application_id,
+                       sizeof(ci->aad_application_id));
+        GetDlgItemText(hdlg, IDC_AAD_CLIENT_SECRET, ci->aad_client_secret,
+                       sizeof(ci->aad_client_secret));
+        GetDlgItemText(hdlg, IDC_AAD_TENANT, ci->aad_tenant,
+                       sizeof(ci->aad_tenant));
+        GetDlgItemText(hdlg, IDC_IDP_ARN, ci->idp_arn, sizeof(ci->idp_arn));
+    } else if (strcmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
+        GetDlgItemText(hdlg, IDC_IDP_NAME, ci->idp_name, sizeof(ci->idp_name));
+        GetDlgItemText(hdlg, IDC_IDP_HOST, ci->idp_host, sizeof(ci->idp_host));
+        GetDlgItemText(hdlg, IDC_IDP_USERNAME, ci->uid, sizeof(ci->uid));
+        GetNameField(hdlg, IDC_IDP_PASSWORD, &ci->pwd);
+        GetDlgItemText(hdlg, IDC_OKTA_APPLICATION_ID, ci->okta_application_id,
+                       sizeof(ci->okta_application_id));
+        GetDlgItemText(hdlg, IDC_ROLE_ARN, ci->role_arn, sizeof(ci->role_arn));
+        GetDlgItemText(hdlg, IDC_IDP_ARN, ci->idp_arn, sizeof(ci->idp_arn));
+    }
+    GetDlgItemText(hdlg, IDC_REGION, ci->region, sizeof(ci->region));
+    GetDlgItemText(hdlg, IDC_END_POINT_OVERRIDE, ci->end_point_override, sizeof(ci->end_point_override));
 }
 
 const struct authmode *GetAuthModes(unsigned int *count) {
@@ -164,10 +253,10 @@ INT_PTR CALLBACK advancedOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
         case WM_INITDIALOG: {
             SetWindowLongPtr(hdlg, DWLP_USER, lParam);
             ConnInfo *ci = (ConnInfo *)lParam;
-            CheckDlgButton(hdlg, IDC_USESSL, ci->use_ssl);
-            CheckDlgButton(hdlg, IDC_HOST_VER, ci->verify_server);
-            SetDlgItemText(hdlg, IDC_CONNTIMEOUT, ci->response_timeout);
-            SetDlgItemText(hdlg, IDC_FETCH_SIZE, ci->fetch_size);
+            SetDlgItemText(hdlg, IDC_REQUEST_TIMEOUT, ci->request_timeout);
+            SetDlgItemText(hdlg, IDC_CONNECTION_TIMEOUT, ci->connection_timeout);
+            SetDlgItemText(hdlg, IDC_MAX_RETRY_COUNT_CLIENT, ci->max_retry_count_client);
+            SetDlgItemText(hdlg, IDC_MAX_CONNECTIONS, ci->max_connections);
             break;
         }
 
@@ -176,12 +265,14 @@ INT_PTR CALLBACK advancedOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
             switch (GET_WM_COMMAND_ID(wParam, lParam)) {
                 case IDOK:
                     // Get Dialog Values 
-                    ci->use_ssl = (IsDlgButtonChecked(hdlg, IDC_USESSL) ? 1 : 0);
-                    ci->verify_server = (IsDlgButtonChecked(hdlg, IDC_HOST_VER) ? 1 : 0);
-                    GetDlgItemText(hdlg, IDC_CONNTIMEOUT, ci->response_timeout,
-                                   sizeof(ci->response_timeout));
-                    GetDlgItemText(hdlg, IDC_FETCH_SIZE, ci->fetch_size,
-                                   sizeof(ci->fetch_size));
+                    GetDlgItemText(hdlg, IDC_REQUEST_TIMEOUT, ci->request_timeout,
+                                   sizeof(ci->request_timeout));
+                    GetDlgItemText(hdlg, IDC_CONNECTION_TIMEOUT, ci->connection_timeout,
+                                   sizeof(ci->connection_timeout));
+                    GetDlgItemText(hdlg, IDC_MAX_RETRY_COUNT_CLIENT, ci->max_retry_count_client,
+                                   sizeof(ci->max_retry_count_client));
+                    GetDlgItemText(hdlg, IDC_MAX_CONNECTIONS, ci->max_connections,
+                                   sizeof(ci->max_connections));
                 case IDCANCEL:
                     EndDialog(hdlg, FALSE);
                     return TRUE;
@@ -226,31 +317,31 @@ INT_PTR CALLBACK logOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
                     int log = GetCurrentLogLevel(hdlg);
                     switch (log) {
                         case IDS_LOGTYPE_OFF:
-                            ci->drivers.loglevel = (char)ES_OFF;
+                            ci->drivers.loglevel = (char)LOG_OFF;
                             break;
                         case IDS_LOGTYPE_FATAL:
-                            ci->drivers.loglevel = (char)ES_FATAL;
+                            ci->drivers.loglevel = (char)LOG_FATAL;
                             break;
                         case IDS_LOGTYPE_ERROR:
-                            ci->drivers.loglevel = (char)ES_ERROR;
+                            ci->drivers.loglevel = (char)LOG_ERROR;
                             break;
                         case IDS_LOGTYPE_WARNING:
-                            ci->drivers.loglevel = (char)ES_WARNING;
+                            ci->drivers.loglevel = (char)LOG_WARNING;
                             break;
                         case IDS_LOGTYPE_INFO:
-                            ci->drivers.loglevel = (char)ES_INFO;
+                            ci->drivers.loglevel = (char)LOG_INFO;
                             break;
                         case IDS_LOGTYPE_DEBUG:
-                            ci->drivers.loglevel = (char)ES_DEBUG;
+                            ci->drivers.loglevel = (char)LOG_DEBUG;
                             break;
                         case IDS_LOGTYPE_TRACE:
-                            ci->drivers.loglevel = (char)ES_TRACE;
+                            ci->drivers.loglevel = (char)LOG_TRACE;
                             break;
                         case IDS_LOGTYPE_ALL:
-                            ci->drivers.loglevel = (char)ES_ALL;
+                            ci->drivers.loglevel = (char)LOG_ALL;
                             break;
                         default:
-                            ci->drivers.loglevel = (char)ES_OFF;
+                            ci->drivers.loglevel = (char)LOG_OFF;
                             break;
                     }
                     setGlobalCommlog(ci->drivers.loglevel);

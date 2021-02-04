@@ -52,26 +52,14 @@ runtime_options rt_opts = []() {
     for (auto it : conn_str_pair) {
         std::wstring tmp = it.first;
         std::transform(tmp.begin(), tmp.end(), tmp.begin(), towlower);
-        if (tmp == L"host")
-            temp_opts.conn.server = wstring_to_string(it.second);
-        else if (tmp == L"port")
-            temp_opts.conn.port = wstring_to_string(it.second);
-        else if (tmp == L"responsetimeout")
-            temp_opts.conn.timeout = wstring_to_string(it.second);
-        else if (tmp == L"auth")
+        if (tmp == IT_AUTH)
             temp_opts.auth.auth_type = wstring_to_string(it.second);
-        else if (tmp == L"user")
-            temp_opts.auth.username = wstring_to_string(it.second);
-        else if (tmp == L"password")
-            temp_opts.auth.password = wstring_to_string(it.second);
-        else if (tmp == L"region")
+        else if (tmp == IT_ACCESSKEYID)
+            temp_opts.auth.uid = wstring_to_string(it.second);
+        else if (tmp == IT_SECRETACCESSKEY)
+            temp_opts.auth.pwd = wstring_to_string(it.second);
+        else if (tmp == IT_REGION)
             temp_opts.auth.region = wstring_to_string(it.second);
-        else if (tmp == L"usessl")
-            temp_opts.crypt.use_ssl =
-                (std::stoul(it.second, nullptr, 10) ? true : false);
-        else if (tmp == L"")
-            temp_opts.crypt.verify_server =
-                (std::stoul(it.second, nullptr, 10) ? true : false);
     }
     return temp_opts;
 }();
@@ -82,10 +70,10 @@ void GetVersionInfoString(std::string&) {
     ASSERT_TRUE(comm.Setup(rt_opts));
 
     // Issue request
-    std::string endpoint, content_type, query, fetch_size;
+    std::string endpoint, content_type, query;
     std::shared_ptr< Aws::Http::HttpResponse > response =
         comm.IssueRequest(endpoint, Aws::Http::HttpMethod::HTTP_GET,
-                             content_type, query, fetch_size);
+                             content_type, query);
 
     // Convert response to string
     ASSERT_TRUE(response != nullptr);
