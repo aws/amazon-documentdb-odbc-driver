@@ -552,14 +552,6 @@ typedef struct StatementOptions_ {
     SQLULEN stmt_timeout;
 } StatementOptions;
 
-/*	Used to pass extra query info to send_query */
-typedef struct QueryInfo_ {
-    SQLLEN row_size;
-    SQLLEN fetch_size;
-    QResultClass *result_in;
-    const char *next_token;
-} QueryInfo;
-
 /*	Used to save the error information */
 typedef struct {
     UInt4 status;
@@ -617,23 +609,29 @@ void logs_on_off(int cnopen, int, int);
 typedef struct {
     // Connection
     char dsn[MEDIUM_REGISTRY_LEN];
-    char desc[MEDIUM_REGISTRY_LEN];
     char drivername[MEDIUM_REGISTRY_LEN];
-    char server[MEDIUM_REGISTRY_LEN];
-    char port[SMALL_REGISTRY_LEN];
-    char response_timeout[SMALL_REGISTRY_LEN];
-    char fetch_size[SMALL_REGISTRY_LEN];
+    char request_timeout[SMALL_REGISTRY_LEN];
+    char connection_timeout[SMALL_REGISTRY_LEN];
+    char max_retry_count_client[SMALL_REGISTRY_LEN];
+    char max_connections[SMALL_REGISTRY_LEN];
 
     // Authentication
     char authtype[MEDIUM_REGISTRY_LEN];
-    char username[MEDIUM_REGISTRY_LEN];
-    esNAME password;
-    char token[LARGE_REGISTRY_LEN];
+    char uid[MEDIUM_REGISTRY_LEN];
+    esNAME pwd;
+    char session_token[LARGE_REGISTRY_LEN];
     char region[MEDIUM_REGISTRY_LEN];
+    char end_point_override[MEDIUM_REGISTRY_LEN];
 
-    // Encryption
-    char use_ssl;
-    char verify_server;
+    // SAML
+    char idp_name[MEDIUM_REGISTRY_LEN];
+    char idp_host[MEDIUM_REGISTRY_LEN];
+    char okta_application_id[MEDIUM_REGISTRY_LEN];
+    char role_arn[MEDIUM_REGISTRY_LEN];
+    char idp_arn[MEDIUM_REGISTRY_LEN];
+    char aad_application_id[MEDIUM_REGISTRY_LEN];
+    char aad_client_secret[MEDIUM_REGISTRY_LEN];
+    char aad_tenant[MEDIUM_REGISTRY_LEN];
 
     GLOBAL_VALUES drivers; /* moved from driver's option */
 } ConnInfo;

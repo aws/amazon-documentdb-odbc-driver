@@ -48,10 +48,10 @@ std::string GetVersion(void* conn) {
                : "1.7.329";
 }
 
-int ESExecDirect(void* conn, const char* statement, const char* fetch_size) {
+int ESExecDirect(void* conn, const char* statement) {
     return (conn && statement)
                ? static_cast< Communication* >(conn)->ExecDirect(
-                   statement, fetch_size)
+                   statement)
                : -1;
 }
 
@@ -127,7 +127,7 @@ class CriticalSectionHelper {
 #pragma warning(disable : 4551)  // MYLOG complains 'function call missing
                                  // argument list' on Windows, which is isn't
 #endif
-                MYLOG(ES_ERROR, "%s\n",
+                MYLOG(LOG_ERROR, "%s\n",
                       "CRITICAL WARNING: ExitCritical section called when lock "
                       "count was already 0!");
 #ifdef WIN32
@@ -145,7 +145,7 @@ class CriticalSectionHelper {
 #pragma warning(disable : 4551)  // MYLOG complains 'function call missing
                                  // argument list' on Windows, which is isn't
 #endif
-            MYLOG(ES_ERROR, "%s\n",
+            MYLOG(LOG_ERROR, "%s\n",
                   "CRITICAL WARNING: ExitCritical section called by thread "
                   "that does not own the lock!");
 #ifdef WIN32

@@ -117,7 +117,6 @@ add_compile_definitions		(	_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING
 								_USRDLL	
 								_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
 								_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
-								# USE_SSL					
 							)
 
 # Platform specific compiler definitions

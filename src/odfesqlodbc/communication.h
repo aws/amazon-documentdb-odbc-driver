@@ -73,10 +73,9 @@ class Communication {
     /**
      * Execute query
      * @param query const char*
-     * @param fetch_size const char*
      * @return int
      */
-    virtual int ExecDirect(const char* query, const char* fetch_size) = 0;
+    virtual int ExecDirect(const char* query) = 0;
     /**
      * Get version
      * @return std::string
@@ -113,14 +112,12 @@ class Communication {
      * @param endpoint const std::string&
      * @param request_type const Aws::Http::HttpMethod
      * @param content_type const std::string&
-     * @param fetch_size const std::string&
      * @param cursor const std::string&
      * @return std::shared_ptr< Aws::Http::HttpResponse >
      */
     virtual std::shared_ptr< Aws::Http::HttpResponse > IssueRequest(
         const std::string& endpoint, const Aws::Http::HttpMethod request_type,
-        const std::string& content_type, const std::string& query,
-        const std::string& fetch_size = "", const std::string& cursor = "") = 0;
+        const std::string& content_type, const std::string& query, const std::string& cursor = "") = 0;
     /**
      * Get client encoding
      * @return std::string
@@ -143,10 +140,10 @@ class Communication {
     virtual TSResult* PopResult();
     /**
      * Log messages
-     * @param level ESLogLevel
+     * @param level LogLevel
      * @param msg const char*
      */
-    void LogMsg(ESLogLevel level, const char* msg);
+    void LogMsg(LogLevel level, const char* msg);
     /**
      * Get connection status
      * @return ConnStatusType

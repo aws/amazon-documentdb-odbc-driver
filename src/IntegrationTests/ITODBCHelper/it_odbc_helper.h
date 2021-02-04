@@ -36,20 +36,27 @@
 
 #define IT_SIZEOF(x) (NULL == (x) ? 0 : (sizeof((x)) / sizeof((x)[0])))
 
+#define IT_DRIVER L"Driver"
+#define IT_ACCESSKEYID L"AccessKeyId"
+#define IT_SECRETACCESSKEY L"SecretAccessKey"
+#define IT_REGION L"Region"
+#define IT_AUTH L"Auth"
+#define IT_LOGLEVEL L"LogLevel"
+#define IT_LOGOUTPUT L"LogOutput"
+
 std::vector< std::pair< std::wstring, std::wstring > > conn_str_pair = {
-    {L"Driver", L"timestreamodbc"},
-    //{L"host", (use_ssl ? L"https://localhost" : L"localhost")},
-    //{L"port", L"9200"},
-    {L"user", L"<accesskey>"},
-    {L"password", L"<secretkey>"},
-    {L"region", L"us-east-1"},
-    {L"auth", L"BASIC"},
-    {L"useSSL", L"1"},
-    {L"hostnameVerification", L"0"},
-    {L"logLevel", L"7"},
-    {L"logOutput", L"C:\\"},
-    {L"responseTimeout", L"10"},
-    {L"fetchSize", L"-1"}};
+    {IT_DRIVER, L"timestreamodbc"},
+    {IT_ACCESSKEYID, L"<accesskey>"},
+    {IT_SECRETACCESSKEY, L"<secretkey>"},
+    {IT_REGION, L"us-east-1"},
+    {IT_AUTH, L"IAM"},
+    {IT_LOGLEVEL, L"7"},
+#ifdef __APPLE__
+    {IT_LOGOUTPUT, L"/tmp/"}
+#else
+    {IT_LOGOUTPUT, L"C:\\"}
+#endif
+    };
 
 std::wstring conn_string = []() {
     std::wstring temp;
