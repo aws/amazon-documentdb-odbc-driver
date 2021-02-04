@@ -68,7 +68,7 @@ char *hide_password(const char *str) {
 
 int paramRequired(const ConnInfo *ci, int reqs) {
     int required = 0;
-    const char *pw = SAFE_NAME(ci->password);
+    const char *pw = SAFE_NAME(ci->pwd);
 
     /* Password is not necessarily a required parameter. */
     if ((reqs & PASSWORD_IS_REQUIRED) != 0)
@@ -83,7 +83,7 @@ RETCODE
 dconn_DoDialog(HWND hwnd, ConnInfo *ci) {
     INT_PTR dialog_result;
 
-    MYLOG(ES_TRACE, "entering ci = %p\n", ci);
+    MYLOG(LOG_TRACE, "entering ci = %p\n", ci);
 
     if (hwnd) {
         dialog_result =
@@ -91,7 +91,7 @@ dconn_DoDialog(HWND hwnd, ConnInfo *ci) {
                            dconn_FDriverConnectProc, (LPARAM)ci);
         if (-1 == dialog_result) {
             int errc = GetLastError();
-            MYLOG(ES_DEBUG, " LastError=%d\n", errc);
+            MYLOG(LOG_DEBUG, " LastError=%d\n", errc);
         }
         if (!dialog_result || (dialog_result == -1))
             return SQL_NO_DATA_FOUND;
@@ -99,13 +99,13 @@ dconn_DoDialog(HWND hwnd, ConnInfo *ci) {
             return SQL_SUCCESS;
     }
 
-    MYLOG(ES_DEBUG, " No window specified\n");
+    MYLOG(LOG_DEBUG, " No window specified\n");
     return SQL_ERROR;
 }
 
 INT_PTR CALLBACK dconn_FDriverConnectProc(HWND hdlg, UINT wMsg, WPARAM wParam,
                                           LPARAM lParam) {
-    MYLOG(ES_DEBUG, "dconn_FDriverConnectProc\n");
+    MYLOG(LOG_DEBUG, "dconn_FDriverConnectProc\n");
     ConnInfo *ci;
 
     switch (wMsg) {
@@ -123,19 +123,21 @@ INT_PTR CALLBACK dconn_FDriverConnectProc(HWND hdlg, UINT wMsg, WPARAM wParam,
                              lParam); /* Save the ConnInfo for the "OK" */
             SetDlgStuff(hdlg, ci);
 
-            if (ci->server[0] == '\0')
-                SetFocus(GetDlgItem(hdlg, IDC_SERVER));
-            else if (ci->port[0] == '\0')
-                SetFocus(GetDlgItem(hdlg, IDC_PORT));
-            else if (ci->username[0] == '\0')
-                SetFocus(GetDlgItem(hdlg, IDC_USER));
-            else if (ci->region[0] == '\0')
-                SetFocus(GetDlgItem(hdlg, IDC_REGION));
-
             SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL, 2, (WPARAM)0);
 
-            // Encryption
-            ci->use_ssl = (IsDlgButtonChecked(hdlg, IDC_USESSL) ? 1 : 0);
+            if (ci->uid[0] == '\0') {
+                if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
+                    SetFocus(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID));
+                } else if (strcmp(ci->authtype, AUTHTYPE_AAD) == 0) {
+                    SetFocus(GetDlgItem(hdlg, IDC_IDP_USERNAME));
+                } else if (strcmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
+                    SetFocus(GetDlgItem(hdlg, IDC_IDP_USERNAME));
+                }
+            } else if (ci->region[0] == '\0')
+                SetFocus(GetDlgItem(hdlg, IDC_REGION));
+            else if (ci->end_point_override[0] == '\0')
+                SetFocus(GetDlgItem(hdlg, IDC_END_POINT_OVERRIDE));
+
             break;
 
         case WM_COMMAND:
@@ -215,12 +217,12 @@ BOOL dconn_get_attributes(copyfunc func, const char *connect_string,
     strtok_arg = our_connect_string;
 
 #ifdef FORCE_PASSWORD_DISPLAY
-    MYLOG(ES_DEBUG, "our_connect_string = '%s'\n", our_connect_string);
+    MYLOG(LOG_DEBUG, "our_connect_string = '%s'\n", our_connect_string);
 #else
     if (get_mylog()) {
         char *hide_str = hide_password(our_connect_string);
 
-        MYLOG(ES_DEBUG, "our_connect_string = '%s'\n", hide_str);
+        MYLOG(LOG_DEBUG, "our_connect_string = '%s'\n", hide_str);
         free(hide_str);
     }
 #endif /* FORCE_PASSWORD_DISPLAY */
@@ -273,7 +275,7 @@ BOOL dconn_get_attributes(copyfunc func, const char *connect_string,
                     if (NULL == closep) {
                         if (!delp) /* error */
                         {
-                            MYLOG(ES_DEBUG,
+                            MYLOG(LOG_DEBUG,
                                   "closing bracket doesn't exist 1\n");
                             ret = FALSE;
                             goto cleanup;
@@ -281,7 +283,7 @@ BOOL dconn_get_attributes(copyfunc func, const char *connect_string,
                         closep = strchr(delp + 1, CLOSING_BRACKET);
                         if (!closep) /* error */
                         {
-                            MYLOG(ES_DEBUG,
+                            MYLOG(LOG_DEBUG,
                                   "closing bracket doesn't exist 2\n");
                             ret = FALSE;
                             goto cleanup;
@@ -307,7 +309,7 @@ BOOL dconn_get_attributes(copyfunc func, const char *connect_string,
                             eoftok = TRUE;
                         break;
                     }
-                    MYLOG(ES_DEBUG,
+                    MYLOG(LOG_DEBUG,
                           "subsequent char to the closing bracket is %c "
                           "value=%s\n",
                           closep[1], value);

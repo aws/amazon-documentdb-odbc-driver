@@ -22,10 +22,10 @@
 
 TEST(TestConnectionOptions, Good) {
     runtime_options options;
-    options.auth.username = "UID";
-    options.auth.password = "PWD";
+    options.auth.uid = "UID";
+    options.auth.pwd = "PWD";
     options.auth.region = "Region";
-    options.auth.auth_type = AUTHTYPE_BASIC;
+    options.auth.auth_type = AUTHTYPE_IAM;
     TSCommunication conn;    
     EXPECT_NO_THROW(conn.Validate(options));
     EXPECT_TRUE(conn.Validate(options));
@@ -33,38 +33,38 @@ TEST(TestConnectionOptions, Good) {
 
 TEST(TestConnectionOptions, UID_is_empty) {
     runtime_options options;
-    options.auth.username = "";
-    options.auth.password = "PWD";
+    options.auth.uid = "";
+    options.auth.pwd = "PWD";
     options.auth.region = "Region";
-    options.auth.auth_type = AUTHTYPE_BASIC;
+    options.auth.auth_type = AUTHTYPE_IAM;
     TSCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
 
 TEST(TestConnectionOptions, PWD_is_empty) {
     runtime_options options;
-    options.auth.username = "UID";
-    options.auth.password = "";
+    options.auth.uid = "UID";
+    options.auth.pwd = "";
     options.auth.region = "Region";
-    options.auth.auth_type = AUTHTYPE_BASIC;
+    options.auth.auth_type = AUTHTYPE_IAM;
     TSCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
 
 TEST(TestConnectionOptions, Region_is_empty) {
     runtime_options options;
-    options.auth.username = "UID";
-    options.auth.password = "PWD";
+    options.auth.uid = "UID";
+    options.auth.pwd = "PWD";
     options.auth.region = "";
-    options.auth.auth_type = AUTHTYPE_BASIC;
+    options.auth.auth_type = AUTHTYPE_IAM;
     TSCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
 
 TEST(TestConnectionOptions, Auth_type_is_empty) {
     runtime_options options;
-    options.auth.username = "UID";
-    options.auth.password = "PWD";
+    options.auth.uid = "UID";
+    options.auth.pwd = "PWD";
     options.auth.region = "Region";
     options.auth.auth_type = "";
     TSCommunication conn;
@@ -73,8 +73,8 @@ TEST(TestConnectionOptions, Auth_type_is_empty) {
 
 TEST(TestConnectionOptions, Timeout_is_alpha) {
     runtime_options options;
-    options.auth.username = "UID";
-    options.auth.password = "PWD";
+    options.auth.uid = "UID";
+    options.auth.pwd = "PWD";
     options.auth.region = "Region";
     options.auth.auth_type = "";
     options.conn.timeout = "timeout";

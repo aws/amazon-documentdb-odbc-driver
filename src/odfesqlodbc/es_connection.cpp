@@ -57,18 +57,25 @@ void* LIB_connect(ConnectionClass *self) {
     // Setup options
     runtime_options rt_opts;
     // Connection
-    rt_opts.conn.server.assign(self->connInfo.server);
-    rt_opts.conn.port.assign(self->connInfo.port);
-    rt_opts.conn.timeout.assign(self->connInfo.response_timeout);
+    rt_opts.conn.timeout.assign(self->connInfo.request_timeout);
+    rt_opts.conn.connection_timeout.assign(self->connInfo.connection_timeout);
+    rt_opts.conn.max_retry_count_client.assign(self->connInfo.max_retry_count_client);
+    rt_opts.conn.max_connections.assign(self->connInfo.max_connections);
     // Authentication
     rt_opts.auth.auth_type.assign(self->connInfo.authtype);
-    rt_opts.auth.username.assign(self->connInfo.username);
-    rt_opts.auth.password.assign(SAFE_NAME(self->connInfo.password));
-    rt_opts.auth.token.assign(self->connInfo.token);
+    rt_opts.auth.uid.assign(self->connInfo.uid);
+    rt_opts.auth.pwd.assign(SAFE_NAME(self->connInfo.pwd));
+    rt_opts.auth.session_token.assign(self->connInfo.session_token);
     rt_opts.auth.region.assign(self->connInfo.region);
-    // Encryption
-    rt_opts.crypt.verify_server = (self->connInfo.verify_server == 1);
-    rt_opts.crypt.use_ssl = (self->connInfo.use_ssl == 1);
+    rt_opts.auth.end_point_override.assign(self->connInfo.end_point_override);
+    rt_opts.auth.idp_name.assign(self->connInfo.idp_name);
+    rt_opts.auth.idp_host.assign(self->connInfo.idp_host);
+    rt_opts.auth.okta_application_id.assign(self->connInfo.okta_application_id);
+    rt_opts.auth.role_arn.assign(self->connInfo.role_arn);
+    rt_opts.auth.aad_application_id.assign(self->connInfo.aad_application_id);
+    rt_opts.auth.aad_client_secret.assign(self->connInfo.aad_client_secret);
+    rt_opts.auth.aad_tenant.assign(self->connInfo.aad_tenant);
+    rt_opts.auth.idp_arn.assign(self->connInfo.idp_arn);
 
     auto conn = static_cast< void * >(ConnectDBParams(rt_opts));
     if (conn == nullptr) {

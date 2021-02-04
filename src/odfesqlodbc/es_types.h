@@ -289,15 +289,22 @@ typedef enum {
 
 typedef struct authentication_options {
     std::string auth_type;
-    std::string username;
-    std::string password;
-    std::string token;
+    std::string uid;
+    std::string pwd;
+    std::string session_token;
     std::string region;
+    std::string end_point_override;
+    std::string idp_name;
+    std::string idp_host;
+    std::string okta_application_id;
+    std::string role_arn;
+    std::string aad_application_id;
+    std::string aad_client_secret;
+    std::string aad_tenant;
+    std::string idp_arn;
 } authentication_options;
 
 typedef struct encryption_options {
-    bool use_ssl;
-    bool verify_server;
     std::string certificate_type;
     std::string certificate;
     std::string key;
@@ -305,10 +312,10 @@ typedef struct encryption_options {
 } encryption_options;
 
 typedef struct connection_options {
-    std::string server;
-    std::string port;
     std::string timeout;
-    std::string fetch_size;
+    std::string connection_timeout;
+    std::string max_retry_count_client;
+    std::string max_connections;
 } connection_options;
 
 typedef struct runtime_options {

@@ -129,7 +129,7 @@ BOOL CALLBACK ConfigDSN(HWND hwnd, WORD fRequest, LPCSTR lpszDriver,
                  == DialogBoxParam(s_hModule, MAKEINTRESOURCE(DLG_CONFIG), hwnd,
                                    ConfigDlgProc, (LPARAM)lpsetupdlg));
         } else if (lpsetupdlg->ci.dsn[0]) {
-            MYLOG(ES_DEBUG, "SetDSNAttributes\n");
+            MYLOG(LOG_DEBUG, "SetDSNAttributes\n");
             fSuccess = SetDSNAttributes(hwnd, lpsetupdlg, NULL);
         } else
             fSuccess = FALSE;
@@ -282,17 +282,23 @@ INT_PTR CALLBACK ConfigDlgProc(HWND hdlg, UINT wMsg, WPARAM wParam,
             SendDlgItemMessage(hdlg, IDC_DESC, EM_LIMITTEXT,
                                (WPARAM)(MAXDESC - 1), 0L);
 
-            if (!stricmp(ci->authtype, AUTHTYPE_IAM)) {
+            if (stricmp(ci->authtype, AUTHTYPE_AWS_PROFILE) == 0) {
                 SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL, 0,
                                    (WPARAM)0);
-            } else if (!stricmp(ci->authtype, AUTHTYPE_BASIC)) {
+            } else if (stricmp(ci->authtype, AUTHTYPE_IAM) == 0) {
                 SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL, 1,
                                    (WPARAM)0);
-            } else { // AUTHTYPE_NONE
+            } else if (stricmp(ci->authtype, AUTHTYPE_AAD) == 0) {
                 SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL, 2,
                                    (WPARAM)0);
+            } else if (stricmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
+                SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL, 3,
+                                   (WPARAM)0);
+            } else {
+                SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL, 0,
+                                   (WPARAM)0);
             }
-            
+
             return TRUE; /* Focus was not set */
 
             /* Process buttons */
@@ -437,7 +443,7 @@ void test_connection(HANDLE hwnd, ConnInfo *ci, BOOL withDTC) {
     dsn_1st = ci->dsn[0];
     ci->dsn[0] = '\0';
     makeConnectString(out_conn, ci, sizeof(out_conn));
-    MYLOG(ES_DEBUG, "conn_string=%s\n", out_conn);
+    MYLOG(LOG_DEBUG, "conn_string=%s\n", out_conn);
 #ifdef UNICODE_SUPPORT
     MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, out_conn, -1, wout_conn,
                         sizeof(wout_conn) / sizeof(wout_conn[0]));
@@ -581,7 +587,7 @@ static void ParseAttributes(LPCSTR lpszAttributes, LPSETUPDLG lpsetupdlg) {
         /* lpsetupdlg->aAttr[iElement].fSupplied = TRUE; */
         memcpy(value, lpszStart, MIN(lpsz - lpszStart + 1, MAXESPATH));
 
-        MYLOG(ES_DEBUG, "aszKey='%s', value='%s'\n", aszKey, value);
+        MYLOG(LOG_DEBUG, "aszKey='%s', value='%s'\n", aszKey, value);
 
         /* Copy the appropriate value to the conninfo  */
         copyConnAttributes(&lpsetupdlg->ci, aszKey, value);
