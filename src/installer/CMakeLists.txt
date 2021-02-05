@@ -19,8 +19,8 @@ include(CPackComponent)
 set(CMAKE_INSTALL_PREFIX ${INSTALL_ROOT})
 
 # General package info
-set(CPACK_PACKAGE_NAME "Open Distro for Elasticsearch SQL ODBC Driver ${BITNESS}-bit")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Open Distro for Elasticsearch SQL ODBC Driver ${BITNESS}-bit")
+set(CPACK_PACKAGE_NAME "Amazon Timestream ODBC Driver ${BITNESS}-bit")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Amazon Timestream ODBC Driver ${BITNESS}-bit")
 set(CPACK_PACKAGE_VENDOR "Amazon")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
 set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}")
@@ -33,7 +33,7 @@ if(WIN32)
 
     # This is a unique id for the installer - required for Windows
     # Generated at https://www.guidgen.com/
-    set(CPACK_WIX_UPGRADE_GUID "2D325BD7-1176-40E8-8AB8-C52DD2F7B792")
+    set(CPACK_WIX_UPGRADE_GUID "c4223f46-763a-4800-90d1-cc4fb64e9580")
 	
     # The Icon shown next to the program name in Add/Remove programs
     set(CPACK_WIX_PRODUCT_ICON "${CMAKE_CURRENT_SOURCE_DIR}/icon.ico")
@@ -79,16 +79,16 @@ endif()
 # Set up components for installer
 cpack_add_component(Docs
 	DISPLAY_NAME "Documentation"
-	DESCRIPTION "Documentation about Open Distro for Elasticsearch SQL ODBC Driver"
+	DESCRIPTION "Documentation about Amazon Timestream ODBC Driver"
 )
 cpack_add_component(Driver
 	DISPLAY_NAME "Driver"
-	DESCRIPTION "Library files for running the Open Distro for Elasticsearch SQL ODBC Driver"
+	DESCRIPTION "Library files for running the Amazon Timestream ODBC Driver"
     REQUIRED 
 )
 cpack_add_component(Resources
 	DISPLAY_NAME "Resources"
-	DESCRIPTION "Resources for Open Distro for Elasticsearch SQL ODBC Driver"
+	DESCRIPTION "Resources for Amazon Timestream ODBC Driver"
 )
 
 # Install driver files
@@ -114,6 +114,7 @@ if(WIN32)
     install(FILES "${AWS_SDK_BIN_DIR}/aws-c-event-stream.dll" DESTINATION bin COMPONENT "Driver")
     install(FILES "${AWS_SDK_BIN_DIR}/aws-checksums.dll" DESTINATION bin COMPONENT "Driver")
     install(FILES "${AWS_SDK_BIN_DIR}/aws-cpp-sdk-core.dll" DESTINATION bin COMPONENT "Driver")
+	install(FILES "${AWS_SDK_BIN_DIR}/aws-cpp-sdk-timestream-query.dll" DESTINATION bin COMPONENT "Driver")
 endif()
 
 include(CPack)
