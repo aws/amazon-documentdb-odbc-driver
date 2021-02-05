@@ -25,7 +25,7 @@
 		
 		<!-- Set DSN attributes -->
 		<RegistryKey Root="HKLM" Key="SOFTWARE\ODBC\ODBC.INI\Amazon Timestream ODBC DSN"  >
-			<RegistryValue Type="string" Name="Driver" Value="Amazon Timestream ODBC Driver" />
+			<RegistryValue Type="string" Name="Driver" Value="[INSTALL_ROOT]bin\odfesqlodbc.dll" />
 			<RegistryValue Type="string" Name="Auth" Value="IAM" />
 			<RegistryValue Type="string" Name="UID" Value="" />
 			<RegistryValue Type="string" Name="PWD" Value="" />
