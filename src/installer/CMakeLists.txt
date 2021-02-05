@@ -35,9 +35,6 @@ if(WIN32)
     # Generated at https://www.guidgen.com/
     set(CPACK_WIX_UPGRADE_GUID "c4223f46-763a-4800-90d1-cc4fb64e9580")
 	
-    # The Icon shown next to the program name in Add/Remove programs
-    set(CPACK_WIX_PRODUCT_ICON "${CMAKE_CURRENT_SOURCE_DIR}/icon.ico")
-	
     # The bitmap will appear at the top of all installer pages other than the welcome and completion dialogs
     set(CPACK_WIX_UI_BANNER "${CMAKE_CURRENT_SOURCE_DIR}/banner.bmp")
 	
