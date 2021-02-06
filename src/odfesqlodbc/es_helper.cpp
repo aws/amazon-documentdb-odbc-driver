@@ -30,7 +30,7 @@ void* ConnectDBParams(const runtime_options& rt_opts) {
         } catch (std::exception& e) {
             Disconnect(conn);
             // Propagate exceptions
-            throw e;
+            throw std::runtime_error(e.what());
         }
     }
     return conn;
