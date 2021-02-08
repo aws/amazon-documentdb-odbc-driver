@@ -27,7 +27,7 @@ void* ConnectDBParams(const runtime_options& rt_opts) {
     if (conn != nullptr) {
         try {
             conn->Setup(rt_opts);
-        } catch (std::exception& e) {
+        } catch (...) {
             Disconnect(conn);
             // Propagate exceptions
             throw;
