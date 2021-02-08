@@ -291,9 +291,9 @@ TEST_F(TestSQLPrepare, NullQueryError) {
 TEST_F(TestSQLExecDirect, Success_100) {
     int limit = 100;
     std::wstring query =
-        L"SELECT * FROM promPerf.query LIMIT " + std::to_wstring(limit);
+        L"SELECT * FROM ODBCTest.test LIMIT " + std::to_wstring(limit);
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
-    EXPECT_EQ(SQL_SUCCESS, ret);
+    ASSERT_EQ(SQL_SUCCESS, ret);
     int cnt = 0;
     while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
         if (SQL_SUCCEEDED(ret)) {
@@ -304,12 +304,12 @@ TEST_F(TestSQLExecDirect, Success_100) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestSQLExecDirect, Success_800) {
-    int limit = 800;
+TEST_F(TestSQLExecDirect, Success_400) {
+    int limit = 400;
     std::wstring query =
-        L"SELECT * FROM promPerf.query LIMIT " + std::to_wstring(limit);
+        L"SELECT * FROM ODBCTest.test LIMIT " + std::to_wstring(limit);
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
-    EXPECT_EQ(SQL_SUCCESS, ret);
+    ASSERT_EQ(SQL_SUCCESS, ret);
     int cnt = 0;
     while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
         if (SQL_SUCCEEDED(ret)) {
@@ -323,9 +323,9 @@ TEST_F(TestSQLExecDirect, Success_800) {
 TEST_F(TestSQLExecDirect, Success_5000) {
     int limit = 5000;
     std::wstring query =
-        L"SELECT * FROM promPerf.query LIMIT " + std::to_wstring(limit);
+        L"SELECT * FROM ODBCTest.test LIMIT " + std::to_wstring(limit);
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
-    EXPECT_EQ(SQL_SUCCESS, ret);
+    ASSERT_EQ(SQL_SUCCESS, ret);
     int cnt = 0;
     while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
         if (SQL_SUCCEEDED(ret)) {
@@ -339,9 +339,9 @@ TEST_F(TestSQLExecDirect, Success_5000) {
 TEST_F(TestSQLExecDirect, Success_10000) {
     int limit = 10000;
     std::wstring query =
-        L"SELECT * FROM promPerf.query LIMIT " + std::to_wstring(limit);
+        L"SELECT * FROM ODBCTest.test LIMIT " + std::to_wstring(limit);
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
-    EXPECT_EQ(SQL_SUCCESS, ret);
+    ASSERT_EQ(SQL_SUCCESS, ret);
     int cnt = 0;
     while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
         if (SQL_SUCCEEDED(ret)) {
@@ -357,6 +357,7 @@ TEST_F(TestSQLExecDirect, NullQueryError) {
     EXPECT_EQ(SQL_ERROR, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
+
 /*
 TEST_F(TestSQLSetCursorName, Success) {
     SQLRETURN ret =
@@ -386,7 +387,7 @@ TEST_F(TestSQLCancel, NULLHandle) {
     EXPECT_EQ(ret_exec, SQL_INVALID_HANDLE);
 }*/
 
-// This test will fail because we are not cancelling in flight queries at this time. 
+// This test will fail because we are not cancelling in flight queries at this time.
 #if 0
 TEST_F(TestSQLCancel, QueryInProgress) {
     // Create lambda thread

@@ -46,10 +46,8 @@
 
 std::vector< std::pair< std::wstring, std::wstring > > conn_str_pair = {
     {IT_DRIVER, L"timestreamodbc"},
-    {IT_ACCESSKEYID, L"<accesskey>"},
-    {IT_SECRETACCESSKEY, L"<secretkey>"},
     {IT_REGION, L"us-east-1"},
-    {IT_AUTH, L"IAM"},
+    {IT_AUTH, L"AWS PROFILE"},
     {IT_LOGLEVEL, L"7"},
 #ifdef __APPLE__
     {IT_LOGOUTPUT, L"/tmp/"}
