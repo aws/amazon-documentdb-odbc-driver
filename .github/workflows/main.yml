@@ -9,7 +9,7 @@ on:
     branches:
       - master
       - develop
-    
+
 env:
   CI_OUTPUT_PATH: "ci-output"
   ODBC_LIB_PATH: "./build/odbc/lib"
@@ -17,7 +17,7 @@ env:
   ODBC_BUILD_PATH: "./build/odbc/build"
   AWS_SDK_INSTALL_PATH: "./build/aws-sdk/install"
 
-jobs:    
+jobs:
   build-mac:
     runs-on: macos-latest
     steps:
@@ -41,14 +41,44 @@ jobs:
     - name: configure-and-build-driver
       run: |
         ./build_mac_release64.sh
+    - name: configure-aws-credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    - name: prepare-dsn
+      run: |
+        sudo mkdir /Library/ODBC
+        sudo mv ./src/IntegrationTests/ITODBCConnection/odbc.ini /Library/ODBC
+        mkdir ${{ github.workspace }}/odbc-logs
+    - name: run-integration-tests
+      run: |
+        ./build/odbc/bin/itodbc_connection
+    - name: run-integration-execution-tests
+      run: |
+        ./build/odbc/bin/itodbc_execution
+    - name: print-test-logs
+      if: failure()
+      run: |
+        cat /tmp/mylog_*.log
+        cat /tmp/elasticodbc_*.log
+        cat ./aws_sdk_*.log
+    - name: upload-integration-test-results
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: integration-test-results-mac64
+        path: |
+          ${{ github.workspace }}/odbc-logs/
     #- name: test
-    #  run: | 
+    #  run: |
     #    bash ./run_test_runner.sh
     - name: build-installer
       if: success()
       run: |
         cd cmake-build64
-        cmake ../src 
+        cmake ../src
         make
         cpack .
         cd ..
@@ -66,19 +96,19 @@ jobs:
     #    cp ./bin64/*.log test-output
     - name: upload-build
       if: success()
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: mac64-build
         path: build-output
     - name: upload-installer
       if: success()
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: mac64-installer
         path: installer
     #- name: upload-test-results
     #  if: success()
-    #  uses: actions/upload-artifact@v1
+    #  uses: actions/upload-artifact@v2
     #  with:
     #    name: mac-test-results
     #    path: test-output
@@ -93,6 +123,32 @@ jobs:
     - name: configure-and-build-driver
       run: |
         .\build_win_release32.ps1
+    - name: build-integration-tests
+      run: |
+        MSBuild.exe ./build/odbc/cmake/global_make_list.sln -target:itodbc_connection,itodbc_execution -property:Configuration=Release,Platform=Win32
+    - name: configure-aws-credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    - name: import-registry
+      run: |
+        reg import .\src\IntegrationTests\ITODBCConnection\AWSProfileRegistry_Win32.reg
+        reg import .\src\IntegrationTests\ITODBCConnection\IAMRegistry_Win32.reg
+        mkdir ${{ github.workspace }}\odbc-logs
+    - name: run-integration-connection-tests
+      run: |
+        .\build\odbc\bin\Release\itodbc_connection.exe
+    - name: run-integration-execution-tests
+      run: |
+        .\build\odbc\bin\Release\itodbc_execution.exe
+    - name: upload-integration-test-results
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: integration-test-results-win32
+        path: ${{ github.workspace }}\odbc-logs\
     - name: build-installer
       if: success()
       run: |
@@ -108,19 +164,19 @@ jobs:
         .\scripts\prepare_ci_output.ps1 $Env:ODBC_BIN_PATH $Env:ODBC_LIB_PATH $Env:ODBC_BUILD_PATH
     - name: upload-build
       if: always()
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: windows32-build
         path: ci-output/build
     - name: upload-installer
       if: always()
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: windows32-installer
         path: ci-output/installer
     #- name: upload-test-results
     #  if: always()
-    #  uses: actions/upload-artifact@v1
+    #  uses: actions/upload-artifact@v2
     #  with:
     #    name: windows-test-results
     #    path: $CI_OUTPUT_PATH/test
@@ -135,6 +191,32 @@ jobs:
     - name: configure-and-build-driver
       run: |
         .\build_win_release64.ps1
+    - name: build-integration-tests
+      run: |
+        MSBuild.exe ./build/odbc/cmake/global_make_list.sln -target:itodbc_connection,itodbc_execution -property:Configuration=Release,Platform=x64
+    - name: configure-aws-credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    - name: import-registry
+      run: |
+        reg import .\src\IntegrationTests\ITODBCConnection\AWSProfileRegistry.reg
+        reg import .\src\IntegrationTests\ITODBCConnection\IAMRegistry.reg
+        mkdir ${{ github.workspace }}\odbc-logs
+    - name: run-integration-connection-tests
+      run: |
+        .\build\odbc\bin\Release\itodbc_connection.exe
+    - name: run-integration-execution-tests
+      run: |
+        .\build\odbc\bin\Release\itodbc_execution.exe
+    - name: upload-integration-test-results
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: integration-test-results-win64
+        path: ${{ github.workspace }}\odbc-logs\
     - name: build-installer
       if: success()
       run: |
@@ -150,19 +232,19 @@ jobs:
         .\scripts\prepare_ci_output.ps1 $Env:ODBC_BIN_PATH $Env:ODBC_LIB_PATH $Env:ODBC_BUILD_PATH
     - name: upload-build
       if: always()
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: windows64-build
         path: ci-output/build
     - name: upload-installer
       if: always()
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: windows64-installer
         path: ci-output/installer
     #- name: upload-test-results
     #  if: always()
-    #  uses: actions/upload-artifact@v1
+    #  uses: actions/upload-artifact@v2
     #  with:
     #    name: windows-test-results
     #    path: ci-output/test-output

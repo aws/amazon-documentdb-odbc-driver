@@ -1,2 +1,15 @@
-ut_aws_sdk_cpp
 itodbc_aws_auth
+itodbc_catalog
+itodbc_descriptors
+itodbc_info
+itodbc_pagination
+itodbc_results
+itodbc_tableau_queries
+performance_info
+performance_results
+ut_aws_sdk_cpp
+ut_conn
+ut_critical_section
+ut_rabbit
+it_odbc_helper.cpp.o
+itodbc_execution
