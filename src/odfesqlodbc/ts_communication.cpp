@@ -257,7 +257,7 @@ bool TSCommunication::Connect(const runtime_options& options) {
 }
 
 void TSCommunication::Disconnect() {
-    LogMsg(LOG_ALL, "Disconnecting timestream connection.");
+    LogMsg(LOG_DEBUG, "Disconnecting Timestream connection.");
     if (m_client) {
         m_client.reset();
     }

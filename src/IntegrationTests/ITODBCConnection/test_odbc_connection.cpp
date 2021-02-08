@@ -18,6 +18,8 @@
 #include "pch.h"
 #include "unit_test_helper.h"
 #include "it_odbc_helper.h"
+#include <codecvt>
+
 
 #ifdef WIN32
 #include <windows.h>
@@ -31,15 +33,19 @@
 #define IT_SIZEOF(x) (NULL == (x) ? 0 : (sizeof((x)) / sizeof((x)[0])))
 
 // SQLConnect constants
-std::wstring default_credential_chain = L"default_credential_chain";
-std::wstring wdsn_name = L"timestream";
-std::wstring user = L"<accesskey>";
-std::wstring pass = L"<secretkey>";
+std::wstring default_credential_chain = L"timestream-aws-profile";
+std::wstring wdsn_name = L"timestream-iam";
+std::wstring user =
+    std::wstring_convert< std::codecvt_utf8< wchar_t > >().from_bytes(
+        std::getenv("AWS_ACCESS_KEY_ID"));
+std::wstring pass =
+    std::wstring_convert< std::codecvt_utf8< wchar_t > >().from_bytes(
+        std::getenv("AWS_SECRET_ACCESS_KEY"));
 std::wstring wrong = L"wrong";
 std::wstring empty = L"";
 
 // SQLDriverConnect constants
-std::wstring dsn_conn_string = L"DSN=timestream";
+std::wstring dsn_conn_string = L"DSN=timestream-aws-profile";
 
 class TestSQLConnect : public testing::Test {
    public:
@@ -139,53 +145,53 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
-TEST_F(TestSQLDriverConnect, IAM_MinimalConnectionString) {
-    std::wstring wstr;
-    wstr += L"Driver=timestreamodbc;";
-    wstr += (L"UID=" + user + L";");
-    wstr += (L"PWD=" + pass + L";");
-    SQLRETURN ret = SQLDriverConnect(
-        m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
-        m_out_conn_string, IT_SIZEOF(m_out_conn_string),
-        &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
-    EXPECT_EQ(SQL_SUCCESS, ret);
-}
-
-TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString) {
-    std::wstring wstr;
-    wstr += L"Driver=timestreamodbc;";
-    wstr += (L"AccessKeyId=" + user + L";");
-    wstr += (L"SecretAccessKey=" + pass + L";");
-    SQLRETURN ret =
-        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
-                         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
-                         &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
-    EXPECT_EQ(SQL_SUCCESS, ret);
-}
-
-TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross1) {
-    std::wstring wstr;
-    wstr += L"Driver=timestreamodbc;";
-    wstr += (L"UID=" + user + L";");
-    wstr += (L"SecretAccessKey=" + pass + L";");
-    SQLRETURN ret =
-        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
-                         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
-                         &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
-    EXPECT_EQ(SQL_SUCCESS, ret);
-}
-
-TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross2) {
-    std::wstring wstr;
-    wstr += L"Driver=timestreamodbc;";
-    wstr += (L"AccessKeyId=" + user + L";");
-    wstr += (L"PWD=" + pass + L";");
-    SQLRETURN ret =
-        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
-                         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
-                         &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
-    EXPECT_EQ(SQL_SUCCESS, ret);
-}
+//TEST_F(TestSQLDriverConnect, IAM_MinimalConnectionString) {
+//    std::wstring wstr;
+//    wstr += L"Driver=timestreamodbc;";
+//    wstr += (L"UID=" + user + L";");
+//    wstr += (L"PWD=" + pass + L";");
+//    SQLRETURN ret = SQLDriverConnect(
+//        m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
+//        m_out_conn_string, IT_SIZEOF(m_out_conn_string),
+//        &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
+//    EXPECT_EQ(SQL_SUCCESS, ret);
+//}
+//
+//TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString) {
+//    std::wstring wstr;
+//    wstr += L"Driver=timestreamodbc;";
+//    wstr += (L"AccessKeyId=" + user + L";");
+//    wstr += (L"SecretAccessKey=" + pass + L";");
+//    SQLRETURN ret =
+//        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
+//                         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
+//                         &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
+//    EXPECT_EQ(SQL_SUCCESS, ret);
+//}
+//
+//TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross1) {
+//    std::wstring wstr;
+//    wstr += L"Driver=timestreamodbc;";
+//    wstr += (L"UID=" + user + L";");
+//    wstr += (L"SecretAccessKey=" + pass + L";");
+//    SQLRETURN ret =
+//        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
+//                         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
+//                         &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
+//    EXPECT_EQ(SQL_SUCCESS, ret);
+//}
+//
+//TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross2) {
+//    std::wstring wstr;
+//    wstr += L"Driver=timestreamodbc;";
+//    wstr += (L"AccessKeyId=" + user + L";");
+//    wstr += (L"PWD=" + pass + L";");
+//    SQLRETURN ret =
+//        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
+//                         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
+//                         &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
+//    EXPECT_EQ(SQL_SUCCESS, ret);
+//}
 
 // TODO: enable after aligning the connection string
 //TEST_F(TestSQLDriverConnect, SqlDriverPrompt) {
