@@ -175,10 +175,10 @@ int CC_send_client_encoding(ConnectionClass *self, const char *encoding) {
 }
 
 void CC_initialize_version(ConnectionClass *self) {
-    STRCPY_FIXED(self->version, "1.7.329");
+    STRCPY_FIXED(self->version, "1.8.108");
     self->version_major = 1;
-    self->version_minor = 7;
-    self->version_patch = 329;
+    self->version_minor = 8;
+    self->version_patch = 108;
 }
 
 void LIB_disconnect(void *conn) {

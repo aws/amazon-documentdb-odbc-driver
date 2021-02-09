@@ -34,10 +34,10 @@ class ESResultQueue {
         bool push(unsigned int timeout_ms, TSResult* result);
 
     private:
-        std::queue<TSResult*> m_queue;
-        std::mutex m_queue_mutex;
-        es_semaphore m_push_semaphore;
-        es_semaphore m_pop_semaphore;
+        // std::queue<TSResult*> m_queue;
+        // std::mutex m_queue_mutex;
+        // es_semaphore m_push_semaphore;
+        // es_semaphore m_pop_semaphore;
 };
 
 #endif
