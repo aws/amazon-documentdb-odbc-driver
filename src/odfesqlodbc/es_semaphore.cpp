@@ -59,6 +59,7 @@ es_semaphore::~es_semaphore() {
 #ifdef WIN32
     CloseHandle(m_semaphore);
 #elif defined(__APPLE__)
+    dispatch_release(m_semaphore);
 #else
     sem_destroy(&m_semaphore);
 #endif
