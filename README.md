@@ -1,6 +1,6 @@
-# Open Distro for Elasticsearch ODBC Driver
+# Amazon Timestream ODBC Driver
 
-ElasticsearchODBC is a read-only ODBC driver for Windows and Mac for connecting to Open Distro for Elasticsearch SQL support.
+TimestreamODBC is a read-only ODBC driver for Windows and Mac for connecting to Amazon Timestream.
 
 ## Specifications
 
@@ -12,7 +12,8 @@ The driver is compatible with ODBC 3.51.
   | Operating System  | Version | Supported Bitness |
   | ------------- |-------------| ----------------- |
   |  Windows    |  Windows 10   | 32-bit, 64-bit |
-  |  MacOS    |  Catalina 10.15.4, Mojave 10.14.6 | 64-bit |
+  |  MacOS    |  Mojave | 64-bit |
+  |  Linux    |  Amazon Linux 2  |  64-bit   | 
 
 ## Connectors
 
@@ -25,25 +26,25 @@ You can use the installers generated as part of the most recent release.
 
 ### Windows
 
-1. Run the `.msi` installer to install the Open Distro for Elasticsearch SQL ODBC Driver.
+1. Run the `.msi` installer to install the Amazon Timestream ODBC Driver.
 2. [Test connection](./docs/user/windows_configure_dsn.md) using ODBC Data Source Administrator.
 
 To use the driver with Tableau:
 1. Copy the `.tdc` file from `<driver-install-dir>/resources` to `<windows-user-dir>/Documents/My Tableau Repository/Datasources`.
 
-This will customize the connection from Tableau to Open Distro for Elasticsearch, ensuring that the correct forms of queries are used. 
+This will customize the connection from Tableau to Amazon Timestream, ensuring that the correct forms of queries are used. 
 
 ### Mac
 
-iODBC Driver Manager should be installed before installing the Open Distro for Elasticsearch SQL ODBC Driver on Mac.
+iODBC Driver Manager should be installed before installing the Amazon Timestream ODBC Driver on Mac.
 
-1. Run the `.pkg` installer to install the Open Distro for Elasticsearch SQL ODBC Driver.
-2. Configure a Driver and DSN entry for the Open Distro for Elasticsearch SQL ODBC Driver, following the instructions [here](./docs/user/mac_configure_dsn.md).
+1. Run the `.pkg` installer to install the Amazon Timestream ODBC Driver.
+2. Configure a Driver and DSN entry for the Amazon Timestream ODBC Driver, following the instructions [here](./docs/user/mac_configure_dsn.md).
 
 To use the driver with Tableau:
 1. Copy the `.tdc` file from `<driver-install-dir>/resources` to `<mac-user-dir>/Documents/My Tableau Repository/Datasources`.
 
-This will customize the connection from Tableau to Open Distro for Elasticsearch, ensuring that the correct forms of queries are used.
+This will customize the connection from Tableau to Amazon Timestream, ensuring that the correct forms of queries are used.
 
 ## Using the Driver
 
@@ -79,14 +80,6 @@ From the projects root directory, then build the project using Visual Studio (Wi
 ### Testing
 
 **NOTE**: Some tests in ITODBCConnection will fail if a test DSN (Data Source Name) is not configured on your system. Refer to "Running Tests" in the [build instructions](./BUILD_INSTRUCTIONS.md) for more information on configuring this.
-
-## Documentation
-
-Please refer to the [documentation](https://opendistro.github.io/for-elasticsearch-docs/) for detailed information on installing and configuring Open Distro for Elasticsearch.
-
-## Code of Conduct
-
-This project has adopted an [Open Source Code of Conduct](https://opendistro.github.io/for-elasticsearch/codeofconduct.html).
 
 ## Security issue notifications
 
