@@ -283,7 +283,7 @@ struct ConnectionClass_ {
     char transact_status;             /* Is a transaction is currently
                                        * in progress */
     char version[MAX_INFO_STRING];    /* Version of AWS sdk
-                                       * we're using "1.7.329"
+                                       * we're using "1.8.108"
                                        */
     Int2 version_major;
     Int2 version_minor;
