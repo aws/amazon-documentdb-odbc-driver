@@ -380,7 +380,6 @@ int TSCommunication::ExecDirect(const char* query) {
         return -1;
     }
 
-    // std::unique_ptr< TSResult > ts_result = std::make_unique< TSResult >();
     auto ts_result = new TSResult();
     ts_result->sdk_result = outcome.GetResult();
     ts_result->next_token = outcome.GetResult().GetNextToken();
@@ -389,7 +388,6 @@ int TSCommunication::ExecDirect(const char* query) {
             return -1;
         }
     }
-    // ts_result.release();
 
     if (!outcome.GetResult().GetNextToken().empty()) {
         auto next_token = outcome.GetResult().GetNextToken();
@@ -427,10 +425,6 @@ void TSCommunication::SendCursorQueries(
             }
 
             next_token = result->next_token;
-
-            // Don't release when attempting to push to the queue as it may take
-            // multiple tries.
-            // result.release();
         }
     } catch (std::runtime_error& e) {
         std::string error_message =
