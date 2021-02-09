@@ -49,9 +49,68 @@ std::wstring dsn_conn_string = L"DSN=timestream-aws-profile";
 
 class TestSQLConnect : public testing::Test {
    public:
-    TestSQLConnect() : m_env(SQL_NULL_HENV), m_conn(SQL_NULL_HDBC) {
+    void SetUp() {
+        AllocConnection(&m_env, &m_conn, true, true);
     }
+    void TearDown() {
+        if (SQL_NULL_HDBC != m_conn) {
+            SQLFreeHandle(SQL_HANDLE_DBC, m_conn);
+        }
+        if (SQL_NULL_HENV != m_env) {
+            SQLFreeHandle(SQL_HANDLE_ENV, m_env);
+        }
+    }
+    SQLHENV m_env;
+    SQLHDBC m_conn;
+};
 
+TEST_F(TestSQLConnect, AWS_Profile_Default_credential_chain) {
+    SQLRETURN ret = SQLConnect(
+        m_conn, (SQLTCHAR*)default_credential_chain.c_str(), SQL_NTS,
+        (SQLTCHAR*)empty.c_str(), static_cast< SQLSMALLINT >(empty.length()),
+        (SQLTCHAR*)empty.c_str(), static_cast< SQLSMALLINT >(empty.length()));
+    EXPECT_EQ(SQL_SUCCESS, ret);
+    LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
+}
+
+TEST_F(TestSQLConnect, IAM_Success) {
+    SQLRETURN ret = SQLConnect(
+        m_conn, (SQLTCHAR*)wdsn_name.c_str(), SQL_NTS, (SQLTCHAR*)user.c_str(),
+        static_cast< SQLSMALLINT >(user.length()), (SQLTCHAR*)pass.c_str(),
+        static_cast< SQLSMALLINT >(pass.length()));
+    EXPECT_EQ(SQL_SUCCESS, ret);
+    LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
+}
+
+TEST_F(TestSQLConnect, IAM_empty_server_used_default) {
+    SQLRETURN ret = SQLConnect(
+        m_conn, (SQLTCHAR*)empty.c_str(), SQL_NTS,
+        (SQLTCHAR*)user.c_str(), static_cast< SQLSMALLINT >(user.length()),
+        (SQLTCHAR*)pass.c_str(), static_cast< SQLSMALLINT >(pass.length()));
+    EXPECT_EQ(SQL_SUCCESS, ret);
+    LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
+}
+
+TEST_F(TestSQLConnect, IAM_WrongUser) {
+    SQLRETURN ret = SQLConnect(
+        m_conn, (SQLTCHAR*)wdsn_name.c_str(), SQL_NTS, (SQLTCHAR*)wrong.c_str(),
+        static_cast< SQLSMALLINT >(wrong.length()), (SQLTCHAR*)pass.c_str(),
+        static_cast< SQLSMALLINT >(pass.length()));
+    EXPECT_EQ(SQL_ERROR, ret);
+    LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
+}
+
+TEST_F(TestSQLConnect, IAM_WrongPassword) {
+    SQLRETURN ret = SQLConnect(
+        m_conn, (SQLTCHAR*)wdsn_name.c_str(), SQL_NTS, (SQLTCHAR*)user.c_str(),
+        static_cast< SQLSMALLINT >(user.length()), (SQLTCHAR*)wrong.c_str(),
+        static_cast< SQLSMALLINT >(wrong.length()));
+    EXPECT_EQ(SQL_ERROR, ret);
+    LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
+}
+
+class TestSQLDriverConnect : public testing::Test {
+   public:
     void SetUp() {
         AllocConnection(&m_env, &m_conn, true, true);
     }
@@ -64,73 +123,6 @@ class TestSQLConnect : public testing::Test {
             SQLFreeHandle(SQL_HANDLE_ENV, m_env);
         }
     }
-
-    SQLHENV m_env;
-    SQLHDBC m_conn;
-};
-
-TEST_F(TestSQLConnect, AWS_Profile_Default_credential_chain) {
-    SQLRETURN ret = SQLConnect(
-        m_conn, (SQLTCHAR*)default_credential_chain.c_str(), SQL_NTS,
-        (SQLTCHAR*)empty.c_str(), static_cast< SQLSMALLINT >(empty.length()),
-        (SQLTCHAR*)empty.c_str(), static_cast< SQLSMALLINT >(empty.length()));
-    LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
-    EXPECT_EQ(SQL_SUCCESS, ret);
-}
-
-TEST_F(TestSQLConnect, IAM_Success) {
-    SQLRETURN ret = SQLConnect(
-        m_conn, (SQLTCHAR*)wdsn_name.c_str(), SQL_NTS, (SQLTCHAR*)user.c_str(),
-        static_cast< SQLSMALLINT >(user.length()), (SQLTCHAR*)pass.c_str(),
-        static_cast< SQLSMALLINT >(pass.length()));
-
-    LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
-    EXPECT_EQ(SQL_SUCCESS, ret);
-}
-
-TEST_F(TestSQLConnect, IAM_empty_server_used_default) {
-    SQLRETURN ret = SQLConnect(
-        m_conn, (SQLTCHAR*)empty.c_str(), SQL_NTS,
-        (SQLTCHAR*)user.c_str(), static_cast< SQLSMALLINT >(user.length()),
-        (SQLTCHAR*)pass.c_str(), static_cast< SQLSMALLINT >(pass.length()));
-
-    LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
-    EXPECT_EQ(SQL_SUCCESS, ret);
-}
-
-TEST_F(TestSQLConnect, IAM_WrongUser) {
-    SQLRETURN ret = SQLConnect(
-        m_conn, (SQLTCHAR*)wdsn_name.c_str(), SQL_NTS, (SQLTCHAR*)wrong.c_str(),
-        static_cast< SQLSMALLINT >(wrong.length()), (SQLTCHAR*)pass.c_str(),
-        static_cast< SQLSMALLINT >(pass.length()));
-
-    LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
-    EXPECT_EQ(SQL_ERROR, ret);
-}
-
-TEST_F(TestSQLConnect, IAM_WrongPassword) {
-    SQLRETURN ret = SQLConnect(
-        m_conn, (SQLTCHAR*)wdsn_name.c_str(), SQL_NTS, (SQLTCHAR*)user.c_str(),
-        static_cast< SQLSMALLINT >(user.length()), (SQLTCHAR*)wrong.c_str(),
-        static_cast< SQLSMALLINT >(wrong.length()));
-
-    LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
-    EXPECT_EQ(SQL_ERROR, ret);
-}
-
-class TestSQLDriverConnect : public testing::Test {
-   public:
-    void SetUp() {
-        AllocConnection(&m_env, &m_conn, true, true);
-    }
-
-    void TearDown() {
-        if (SQL_NULL_HDBC != m_conn) {
-            SQLFreeHandle(SQL_HANDLE_DBC, m_conn);
-            SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-        }
-    }
-
     SQLHENV m_env = SQL_NULL_HENV;
     SQLHDBC m_conn = SQL_NULL_HDBC;
     SQLTCHAR m_out_conn_string[1024];
@@ -570,26 +562,26 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 //    EXPECT_EQ(SQL_ERROR, SQLDisconnect(m_conn));
 //}
 //
-//int main(int argc, char** argv) {
-//#ifdef __APPLE__
-//    // Enable malloc logging for detecting memory leaks.
-//    system("export MallocStackLogging=1");
-//#endif
-//    testing::internal::CaptureStdout();
-//    ::testing::InitGoogleTest(&argc, argv);
-//
-//    int failures = RUN_ALL_TESTS();
-//
-//    std::string output = testing::internal::GetCapturedStdout();
-//    std::cout << output << std::endl;
-//    std::cout << (failures ? "Not all tests passed." : "All tests passed")
-//              << std::endl;
-//    WriteFileIfSpecified(argv, argv + argc, "-fout", output);
-//
-//#ifdef __APPLE__
-//    // Disable malloc logging and report memory leaks
-//    system("unset MallocStackLogging");
-//    system("leaks itodbc_connection > leaks_itodbc_connection");
-//#endif
-//    return failures;
-//}
+int main(int argc, char** argv) {
+#ifdef __APPLE__
+   // Enable malloc logging for detecting memory leaks.
+   system("export MallocStackLogging=1");
+#endif
+   testing::internal::CaptureStdout();
+   ::testing::InitGoogleTest(&argc, argv);
+
+   int failures = RUN_ALL_TESTS();
+
+   std::string output = testing::internal::GetCapturedStdout();
+   std::cout << output << std::endl;
+   std::cout << (failures ? "Not all tests passed." : "All tests passed")
+             << std::endl;
+   WriteFileIfSpecified(argv, argv + argc, "-fout", output);
+
+#ifdef __APPLE__
+   // Disable malloc logging and report memory leaks
+   system("unset MallocStackLogging");
+   system("leaks itodbc_connection > leaks_itodbc_connection");
+#endif
+   return failures;
+}
