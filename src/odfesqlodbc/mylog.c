@@ -523,6 +523,7 @@ static void start_logging() {
 }
 
 void InitializeLogging(void) {
+    FinalizeLogging();
     char dir[PATH_MAX];
     getLogDir(dir, sizeof(dir));
     if (dir[0])

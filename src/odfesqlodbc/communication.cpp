@@ -26,12 +26,12 @@ Communication::Communication()
       m_client_encoding(m_supported_client_encodings[0]),
       m_is_retrieving(false),
       m_result_queue(2) {
-    LogMsg(LOG_ALL, "Initializing AWS API.");
+    LogMsg(LOG_DEBUG, "Initializing AWS API.");
     Aws::InitAPI(m_sdk_options);
 }
 
 Communication::~Communication() {
-    LogMsg(LOG_ALL, "Shutting down AWS API.");
+    LogMsg(LOG_DEBUG, "Shutting down AWS API.");
     Aws::ShutdownAPI(m_sdk_options);
 }
 
