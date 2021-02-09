@@ -267,7 +267,7 @@ void TSCommunication::Disconnect() {
 
 std::string TSCommunication::GetVersion() {
     // AWS SDK version
-    return "1.7.329";
+    return "1.8.108";
 }
 
 std::string TSCommunication::GetErrorPrefix() {
