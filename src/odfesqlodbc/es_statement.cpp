@@ -31,7 +31,7 @@ void print_tslog(const std::string &s) {
 #endif  // WIN32
         // cppcheck outputs an erroneous missing argument error which breaks
         // build. Disable for this function call
-    MYLOG(LOG_ALL, "%s\n", s.c_str());
+    MYLOG(LOG_DEBUG, "%s\n", s.c_str());
 #if WIN32
 #pragma warning(pop)
 #endif  // WIN32
@@ -200,7 +200,11 @@ SQLRETURN GetNextResultSet(StatementClass *stmt) {
         // appending these rows in q_result
         CC_Append_Table_Data(*es_res, q_res, *(q_res->fields));
     }
-
+    // Deallocate the TSResult from the queue
+    if (es_res) {
+        delete es_res;
+        es_res = nullptr;
+    }
     return SQL_SUCCESS;
 }
 
