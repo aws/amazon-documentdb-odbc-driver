@@ -1,14 +1,12 @@
-# ODFE SQL ODBC Driver Testing
+# Amazon Timestream ODBC Driver Testing
 
 ## Preparation
 
-* Latest version of [Open Distro for Elasticsearch](https://opendistro.github.io/for-elasticsearch-docs/docs/install/)
+* [Amazon Timestream](https://aws.amazon.com/timestream/)
 
-### Loading Test Datasets
+### Loading Test Datasets [TBD]
 
-Loading a dataset requires an [elasticsearch](https://opendistro.github.io/for-elasticsearch-docs/docs/install/) service running with [kibana](https://opendistro.github.io/for-elasticsearch-docs/docs/kibana/). If either of these are missing, please refer to the documentation on how to set them up.
-
-Note, if you wish to work with SSL/TLS, you need to configure Elasticsearch and Kibana to support it. See Working With SSL/TLS below.
+Loading a dataset requires an [Amazone Timestream](https://aws.amazon.com/timestream/) service. If missing, please refer to the documentation on how to set them up.
 
 First load the sample datasets provided by kibana.
 
@@ -29,10 +27,9 @@ Tests can be **executed directly**, or by using the **Test Runner**.
 
 **NOTES:**
 
-* A test DSN named `test_dsn` must be set up in order for certain tests in ITODBCConnection to pass. To configure the DSN, see the instructions, below.
-* Datasets must be loaded into Elasticsearch using [kibana](https://www.elastic.co/guide/en/kibana/current/connect-to-elasticsearch.html). See the section on loading datasets below.
+* A test DSN named `timestream-aws-profile` and `timestream-iam` must be set up in order for certain tests in ITODBCConnection to pass. To configure the DSN, see the instructions, below.
 
-### Windows Test DSN Setup
+### Windows Test DSN Setup [TBD]
 
 1. Open `src/IntegrationTests/ITODBCConnection/test_dsn.reg`.
    * This contains the registry entries needed for setting up `test_dsn`.
@@ -40,7 +37,7 @@ Tests can be **executed directly**, or by using the **Test Runner**.
    * As an Administrator, run a command prompt or Powershell and run `reg import <.reg-file>` to add the entries to your registry.
    * Manually add the entries to your registry using Registry Editor.
 
-### Mac Test DSN Setup
+### Mac Test DSN Setup [TBD]
 
 1. Open `src/IntegrationTests/ITODBCConnection/test_odbc.ini` and `src/IntegrationTests/ITODBCConnection/test_odbcinst.ini`
    * These contain the minimal configuration necessary for setting up `test_dsn`.
@@ -50,7 +47,7 @@ Tests can be **executed directly**, or by using the **Test Runner**.
       * `export ODBCINSTINI=<project-dir>/src/IntegrationTests/ITODBCConnection/test_odbcinst.ini`
    * Manually add the entries to your existing `odbc.ini` and `odbcinst.ini` entries. (normally found at `~/.odbc.ini` and `~/.odbcinst.ini`)
 
-### Running Tests directly on Windows
+### Running Tests directly on Windows [TBD]
 
 Tests can be executed directly using **Visual Studio** by setting the desired test as a **Start up Project**
 
