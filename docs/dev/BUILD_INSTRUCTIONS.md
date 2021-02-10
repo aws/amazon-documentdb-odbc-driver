@@ -1,4 +1,4 @@
-# ODFE SQL ODBC Driver Build Instructions
+# Amazon Timestream ODBC Driver Build Instructions
 
 ## Windows
 
@@ -6,7 +6,7 @@
 
 * [cmake](https://cmake.org/install/)
 * [Visual Studio 2019](https://visualstudio.microsoft.com/vs/) (Other versions may work, but only 2019 has been tested)
-* [ODBC Driver source code](https://github.com/opendistro-for-elasticsearch/sql/tree/master/sql-odbc)
+* [Amazon Timestream ODBC Driver source code](https://github.com/opendistro-for-elasticsearch/sql/tree/master/sql-odbc)
 
 ### Build
 
@@ -49,7 +49,7 @@ From a Developer Powershell, run:
 msbuild .\build\Release<Bitness>\odbc\PACKAGE.vcxproj -p:Configuration=Release
 ```
 
-An installer named as `Open Distro for Elasticsearch SQL ODBC Driver-<version>-Windows-<Bitness>-bit.msi` will be generated in the build directory.
+An installer named as `Amazon Timestream ODBC Driver-<version>-Windows-<Bitness>-bit.msi` will be generated in the build directory.
 
 
 ## Mac
@@ -80,7 +80,7 @@ Compiling on Mac will output the tests to **bin64** and the driver to **lib64**.
 Run below command from the project's build directory.
 >cpack .
 
-Installer named as `Open Distro for Elasticsearch SQL ODBC Driver-<version>-Darwin.pkg` will be generated in the build directory.
+Installer named as `Amazon Timestream ODBC Driver-<version>-Darwin.pkg` will be generated in the build directory.
 
 ## General Build Info
 
@@ -89,14 +89,6 @@ Installer named as `Open Distro for Elasticsearch SQL ODBC Driver-<version>-Darw
 **BUILD_WITH_TESTS**
 
 (Defaults to ON) If disabled, all tests and and test dependencies will be excluded from build which will optimize the installer package size. This option can set with the command line (using `-D`).
-
-### Working With SSL/TLS
-
-To disable SSL/TLS in the tests, the main CMakeLists.txt file must be edited. This can be found in the project 'src' directory. In the 'General compiler definitions' in the CMakeLists.txt file, USE_SSL is set. Remove this from the add_compile_definitions function to stop SSL/TLS from being used in the tests.
-
-To enable SSL/TLS on Elasticsearch, you must edit the Elasticsearch.yml file, found in the config directory of Elasticsearch. An example Elasticsearch yml file can be found in the dev folder of this project. The certificates specified MUST be in the config directory of the Elasticsearch instance. For more information, please refer to the [Elasticsearch security settings documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-settings.html).
-
-If you plan to use Kibana, as suggested for this project, you must also edit the Kibana settings. Notice, when specifying a certificate for Kibana, you do not need to place it in the Kibana config directory, but instead must provide the absolute path to it. An example Kibana.yml file can be found in the dev folder of this project. For more information, please refer to the [Kibana settings documentation](https://www.elastic.co/guide/en/kibana/current/settings.html).
 
 ### Setting up a DSN
 
