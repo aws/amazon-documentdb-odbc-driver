@@ -1,7 +1,7 @@
-# Opendistro ODBC Driver Cursor (Pagination) Support Design Documentation
+# Amazon Timestream ODBC Driver Cursor (Pagination) Support Design Documentation [TBD]
 
 ## Overview
-Elasticsearch ODBC Driver supports forward-only cursor. This document illustrates how the cursor(pagination) is handled in the driver. 
+Amazon Timestream ODBC Driver supports forward-only cursor. This document illustrates how the cursor(pagination) is handled in the driver.
 
 For information on how the pagination is supported on Elasticsearch server, check [Opendistro SQL Cursor (Pagination) Support](https://github.com/opendistro-for-elasticsearch/sql/blob/master/docs/dev/Pagination.md).
 

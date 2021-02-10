@@ -1,17 +1,17 @@
-#  Connecting Open Distro For ElasticSearch to Microsoft Excel on Windows
+#  Connecting AWS Timestream to Microsoft Excel on Windows
 
 ## Prerequisites
 
 * Microsoft Excel 2016 and higher
-* [Open Distro for Elasticsearch](https://opendistro.github.io/for-elasticsearch-docs/docs/install/)
-* [Open Distro for Elasticsearch SQL ODBC driver](https://opendistro.github.io/for-elasticsearch-docs/docs/sql/odbc/)
+* [Amazon Timestream](https://aws.amazon.com/timestream/)
+* [Amazon Timestream ODBC driver](https://opendistro.github.io/for-elasticsearch-docs/docs/sql/odbc/)
 * A preconfigured [User or System DSN](../../README.md)
 
 ## Test Successful Connection
 
 * Open **ODBC Data Source Administrator**.
 * Click on **System DSN**.
-* Select **ODFE SQL ODBC DSN**.
+* Select **Amazon Timestream ODBC DSN**.
 * Click on **Configure**.
 
 <img src="img/test_dsn_configure.png" width=500>
@@ -30,7 +30,7 @@
 
 <img src="img/excel_select_odbc.png" width="400">
 
-* Select **ODFE SQL ODBC DSN**. Click **OK**.
+* Select **Amazon Timestream ODBC DSN**. Click **OK**.
 
 <img src="img/excel_select_dsn.png" width="400">
 
