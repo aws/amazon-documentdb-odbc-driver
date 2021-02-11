@@ -1,10 +1,10 @@
-#  Connecting Open Distro For ElasticSearch to Micosoft Excel on Mac OS
+#  Connecting Amazon Timestream to Micosoft Excel on Mac OS
 
 ## Prerequisites
 
 * Microsoft Excel 2016 and higher
-* [Open Distro for Elasticsearch](https://opendistro.github.io/for-elasticsearch-docs/docs/install/)
-* [Open Distro for Elasticsearch SQL ODBC driver](https://opendistro.github.io/for-elasticsearch-docs/docs/sql/odbc/)
+* [Amazon Timestream](https://aws.amazon.com/timestream/)
+* [Amazon Timestream ODBC driver](https://opendistro.github.io/for-elasticsearch-docs/docs/sql/odbc/)
 * A preconfigured [User or System DSN](mac_configure_dsn.md)
 
 ## Test Successful Connection
@@ -14,7 +14,7 @@
 `sudo /Applications/iODBC/iODBC\ Administrator64.app/Contents/MacOS/iODBC\ Administrator64`
 
 * Click on **System DSN**.
-* Select **ODFE SQL ODBC DSN**.
+* Select **Amazon Timestream ODBC DSN**.
 * Click on **Configure**.
 
 <img src="img/excel_iodbc_dsn.png" width="650">
@@ -37,7 +37,7 @@
 
 <img src="img/excel_select_database.png" width="400">
 
-* Select **ODFE SQL ODBC DSN**. Click **OK**.
+* Select **Amazon Timestream ODBC DSN**. Click **OK**.
 
 <img src="img/excel_select_dsn_mac.png" width="400">
 

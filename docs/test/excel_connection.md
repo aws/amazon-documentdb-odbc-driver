@@ -1,9 +1,9 @@
 # Testing Microsoft Excel Connection
 
 ## Prerequisites
-* [Download and install](../../README.md) Open Distro for Elasticsearch SQL ODBC Driver.
-* [Install and configure](https://opendistro.github.io/for-elasticsearch-docs/docs/install/) Open Distro for Elasticsearch.
-* Open ODBC Data Source Administrator. Click on **System DSN** > **ODFE SQL ODBC DSN** > **Configure**.
+* [Download and install](../../README.md) Amazon Timestream ODBC Driver.
+* [configure](https://aws.amazon.com/timestream/) Amazon Timestream.
+* Open ODBC Data Source Administrator. Click on **System DSN** > **Amazon Timestream ODBC DSN** > **Configure**.
 * Set all connection options & Click on **Test**. Connection test should return `Connection Successful`.
 
 ## Microsoft Excel Connectivity
@@ -14,7 +14,7 @@ There are multiple ways to load data from Elasticsearch in Microsoft Excel.
 * [Query Wizard](query_wizard_connection.md)
 * [Data Connection Wizard (Legacy)](data_connection_wizard.md)
 
-## Use Microsoft Excel with data loaded from Open distro for Elasticsearch
+## Use Microsoft Excel with data loaded from Amazon Timestream
 
 * [Refresh the data](refresh_data.md)
 * [Exporting CSV files](exporting_csv_files.md)
