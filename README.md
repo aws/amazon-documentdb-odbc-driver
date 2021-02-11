@@ -29,22 +29,12 @@ You can use the installers generated as part of the most recent release.
 1. Run the `.msi` installer to install the Amazon Timestream ODBC Driver.
 2. [Test connection](./docs/user/windows_configure_dsn.md) using ODBC Data Source Administrator.
 
-To use the driver with Tableau:
-1. Copy the `.tdc` file from `<driver-install-dir>/resources` to `<windows-user-dir>/Documents/My Tableau Repository/Datasources`.
-
-This will customize the connection from Tableau to Amazon Timestream, ensuring that the correct forms of queries are used.
-
 ### Mac
 
 iODBC Driver Manager should be installed before installing the Amazon Timestream ODBC Driver on Mac.
 
 1. Run the `.pkg` installer to install the Amazon Timestream ODBC Driver.
 2. Configure a Driver and DSN entry for the Amazon Timestream ODBC Driver, following the instructions [here](./docs/user/mac_configure_dsn.md).
-
-To use the driver with Tableau:
-1. Copy the `.tdc` file from `<driver-install-dir>/resources` to `<mac-user-dir>/Documents/My Tableau Repository/Datasources`.
-
-This will customize the connection from Tableau to Amazon Timestream, ensuring that the correct forms of queries are used.
 
 ## Using the Driver
 
