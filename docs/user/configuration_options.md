@@ -1,38 +1,62 @@
 # Configuration Options
 
->**NOTE:** All option names are *case-insensitive*.
-
-#### Basic Options
+#### Driver Specific Options
 
 | Option | Description | Type | Default |
 |--------|-------------|------|---------------|
-| `DSN` | **D**ata **S**ource **N**ame used for configuring the connection. | string | |
-| `Host` / `Server` | Hostname or IP address for the target cluster. | string | |
-| `Port` | Port number on which the cluster's REST interface is listening. | string | |
+| `Driver` | Driver name.| string | timestreamodbc |
+| `DSN` | **D**ata **S**ource **N**ame used for configuring the connection. | string | `<NONE>` |
+| `Auth` | Authentication mode. | one of `AWS PROFILE`, `IAM`, `AAD`, `OKTA` | `IAM`
+| `LogLevel` | Severity level for driver logs. | one of `OFF`, `FATAL`, `ERROR`, `INFO`, `DEBUG`, `TRACE`, `ALL` | `WARNING` |
+| `LogOutput` | Location for storing driver logs. | string | WIN: `C:\`, MAC/Linux: `/tmp` |
 
-#### Authentication Options
-
-| Option | Description | Type | Default |
-|--------|-------------|------|---------------|
-| `Auth` | Authentication mechanism to use. | one of `BASIC` (basic HTTP), `AWS_SIGV4` (AWS auth), `NONE` | `NONE`
-| `User` / `UID` | [`Auth=BASIC`] Username for the connection. | string | |
-| `Password` / `PWD` | [`Auth=BASIC`] Password for the connection. | string | |
-| `Region` | [`Auth=AWS_SIGV4`] Region used for signing requests | AWS region (eg. `us-west-1`) | |
-
-#### Advanced Options
+#### AWS IAM Authentication Options
 
 | Option | Description | Type | Default |
 |--------|-------------|------|---------------|
-| `UseSSL` | Whether to establish the connection over SSL/TLS | boolean (`0` or `1`) | false (`0`) |
-| `HostnameVerification` | Indicate whether certificate hostname verification should be performed for an SSL/TLS connection. | boolean (`0` or `1`) | true (`1`) |
-| `ResponseTimeout` | The maximum time to wait for responses from the `Host`, in seconds. | integer | `10` |
-| `FetchSize` | The page size for all cursor requests. The default value (-1) uses server-defined page size. Set FetchSize to 0 for non-cursor behavior. | integer | `-1` |
+| `UID` / `AccessKeyId` | The AWS user access key id.| string | `<NONE>` |
+| `PWD` / `SecretAccessKey` | The AWS user secret access key. | string | `<NONE>` |
+| `SessionToken` | The temporary session token required to access a database with multi-factor authentication (MFA) enabled. | string | `<NONE>` |
+| `Region` | The database's region. | string |`us-east-1`|
 
-#### Logging Options
+#### AWS SDK Options
 
 | Option | Description | Type | Default |
 |--------|-------------|------|---------------|
-| `LogLevel` | Severity level for driver logs. | one of `ES_OFF`, `ES_FATAL`, `ES_ERROR`, `ES_INFO`, `ES_DEBUG`, `ES_TRACE`, `ES_ALL` | `ES_WARNING` |
-| `LogOutput` | Location for storing driver logs. | string | WIN: `C:\`, MAC: `/tmp` |
+| `RequestTimeout` | The time in milliseconds the AWS SDK will wait for a query request before timing out. Non-positive value disables request timeout. | int | `3000` |
+| `ConnectionTimeout` | Socket connect timeout. Value must be non-negative. A value of 0 disables socket timeout. | int | `1000` |
+| `MaxRetryCountClient` | The maximum number of retry attempts for retryable errors with 5XX error codes in the SDK. The value must be non-negative, 0 means no retry. | int | `<NONE>` |
+| `MaxConnections` | The maximum number of allowed concurrently opened HTTP connections to the Timestream service. The value must be positive. | int | `25` |
 
-**NOTE:** Administrative privileges are required to change the value of logging options on Windows.
+#### Endpoint Configuration Options
+
+| Option | Description | Type | Default |
+|--------|-------------|------|---------------|
+| `EndpointOverride` | The endpoint override for the Timestream service. It overrides the region. It is an advanced option. | string | `<NONE>` |
+
+#### SAML-based authenication options for Okta
+
+| Option | Description | Type | Default |
+|--------|-------------|------|---------------|
+| `IdpName` | The Identity Provider (Idp) name to use for SAML-based authentication. One of Okta or AzureAD. | string | `<NONE>` |
+| `IdpHost` | The hostname of the specified Idp. | string | `<NONE>` |
+| `UID` / `IdpUserName` | The username for the specified Idp account. | string | `<NONE>` |
+| `PWD` / `IdpPassword` | The password for the specified Idp account. | string | `<NONE>` |
+| `OktaApplicationID` | The unique Okta-provided ID associated with the Timestream application. A place to find the AppId is in the entityID field provided in the application metadata. | string | `<NONE>` |
+| `RoleARN` | The Amazon Resource Name (ARN) of the role that the caller is assuming. | string | `<NONE>` |
+| `IdpARN` | The Amazon Resource Name (ARN) of the SAML provider in IAM that describes the Idp. | string | `<NONE>` |
+
+#### SAML-based authenication options for Azure AD
+
+| Option | Description | Type | Default |
+|--------|-------------|------|---------------|
+| `IdpName` | The Identity Provider (Idp) name to use for SAML-based authentication. One of Okta or AzureAD. | string | `<NONE>` |
+| `IdpHost` | The hostname of the specified Idp. | string | `<NONE>` |
+| `UID` / `IdpUserName` | The username for the specified Idp account. | string | `<NONE>` |
+| `PWD` / `IdpPassword` | The password for the specified Idp account. | string | `<NONE>` |
+| `AADApplicationID` | The unique id of the registered application on Azure AD. | string | `<NONE>` |
+| `AADClientSecret` | The client secret associated with the registered application on Azure AD used to authorize fetching tokens. | string | `<NONE>` |
+| `AADTenant` | The Azure AD Tenant ID. | string | `<NONE>` |
+| `IdpARN` | The Amazon Resource Name (ARN) of the SAML provider in IAM that describes the Idp. | string | `<NONE>` |
+
+**NOTE:** Administrative privileges are required to change the value of logging options on Windows / macOS.
