@@ -40,7 +40,6 @@ bool _CC_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
                                 const char *next_token, TSResult &ts_result);
 bool _CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
                                    const char *next_token, TSResult &ts_result);
-void GetSchemaInfo(schema_type &schema, json_doc &es_result_doc);
 bool AssignColumnHeaders(QResultClass *q_res,
                          const TSResult &ts_result);
 bool AssignTableData(TSResult &ts_result, QResultClass *q_res, ColumnInfoClass &fields);
@@ -67,37 +66,37 @@ static const std::string JSON_KW_ERROR = "error";
 static const std::string JSON_KW_CURSOR = "cursor";
 
 // clang-format on
-const std::unordered_map< std::string, OID > type_to_oid_map = {
-    {ES_TYPE_NAME_BOOLEAN, ES_TYPE_BOOL},
-    {ES_TYPE_NAME_BYTE, ES_TYPE_INT2},
-    {ES_TYPE_NAME_SHORT, ES_TYPE_INT2},
-    {ES_TYPE_NAME_INTEGER, ES_TYPE_INT4},
-    {ES_TYPE_NAME_LONG, ES_TYPE_INT8},
-    {ES_TYPE_NAME_HALF_FLOAT, ES_TYPE_FLOAT4},
-    {ES_TYPE_NAME_FLOAT, ES_TYPE_FLOAT4},
-    {ES_TYPE_NAME_DOUBLE, ES_TYPE_FLOAT8},
-    {ES_TYPE_NAME_SCALED_FLOAT, ES_TYPE_FLOAT8},
-    {ES_TYPE_NAME_KEYWORD, ES_TYPE_VARCHAR},
-    {ES_TYPE_NAME_TEXT, ES_TYPE_VARCHAR},
-    {ES_TYPE_NAME_DATE, ES_TYPE_TIMESTAMP},
-    {ES_TYPE_NAME_OBJECT, ES_TYPE_VARCHAR},
-    {ES_TYPE_NAME_VARCHAR, ES_TYPE_VARCHAR},
-    {ES_TYPE_NAME_DATE, ES_TYPE_DATE},
-
-    {TS_TYPE_NAME_VARCHAR, TS_TYPE_VARCHAR},
-    {TS_TYPE_NAME_BOOLEAN, TS_TYPE_BOOLEAN},
-    {TS_TYPE_NAME_BIGINT, TS_TYPE_BIGINT},
-    {TS_TYPE_NAME_DOUBLE, TS_TYPE_DOUBLE},
-    {TS_TYPE_NAME_TIMESTAMP, TS_TYPE_TIMESTAMP},
-    {TS_TYPE_NAME_DATE, TS_TYPE_DATE},
-    {TS_TYPE_NAME_TIME, TS_TYPE_TIME},
-    {TS_TYPE_NAME_INTERVAL_DAY_TO_SECOND, TS_TYPE_INTERVAL_DAY_TO_SECOND},
-    {TS_TYPE_NAME_INTERVAL_YEAR_TO_MONTH, TS_TYPE_INTERVAL_YEAR_TO_MONTH},
-    {TS_TYPE_NAME_UNKNOWN, TS_TYPE_UNKNOWN},
-    {TS_TYPE_NAME_INTEGER, TS_TYPE_INTEGER},
-    {TS_TYPE_NAME_ROW, TS_TYPE_ROW},
-    {TS_TYPE_NAME_ARRAY, TS_TYPE_ARRAY},
-    {TS_TYPE_NAME_TIMESERIES, TS_TYPE_TIMESERIES}};
+//const std::unordered_map< std::string, OID > type_to_oid_map = {
+//    {ES_TYPE_NAME_BOOLEAN, ES_TYPE_BOOL},
+//    {ES_TYPE_NAME_BYTE, ES_TYPE_INT2},
+//    {ES_TYPE_NAME_SHORT, ES_TYPE_INT2},
+//    {ES_TYPE_NAME_INTEGER, ES_TYPE_INT4},
+//    {ES_TYPE_NAME_LONG, ES_TYPE_INT8},
+//    {ES_TYPE_NAME_HALF_FLOAT, ES_TYPE_FLOAT4},
+//    {ES_TYPE_NAME_FLOAT, ES_TYPE_FLOAT4},
+//    {ES_TYPE_NAME_DOUBLE, ES_TYPE_FLOAT8},
+//    {ES_TYPE_NAME_SCALED_FLOAT, ES_TYPE_FLOAT8},
+//    {ES_TYPE_NAME_KEYWORD, ES_TYPE_VARCHAR},
+//    {ES_TYPE_NAME_TEXT, ES_TYPE_VARCHAR},
+//    {ES_TYPE_NAME_DATE, ES_TYPE_TIMESTAMP},
+//    {ES_TYPE_NAME_OBJECT, ES_TYPE_VARCHAR},
+//    {ES_TYPE_NAME_VARCHAR, ES_TYPE_VARCHAR},
+//    {ES_TYPE_NAME_DATE, ES_TYPE_DATE},
+//
+//    {TS_TYPE_NAME_VARCHAR, TS_TYPE_VARCHAR},
+//    {TS_TYPE_NAME_BOOLEAN, TS_TYPE_BOOLEAN},
+//    {TS_TYPE_NAME_BIGINT, TS_TYPE_BIGINT},
+//    {TS_TYPE_NAME_DOUBLE, TS_TYPE_DOUBLE},
+//    {TS_TYPE_NAME_TIMESTAMP, TS_TYPE_TIMESTAMP},
+//    {TS_TYPE_NAME_DATE, TS_TYPE_DATE},
+//    {TS_TYPE_NAME_TIME, TS_TYPE_TIME},
+//    {TS_TYPE_NAME_INTERVAL_DAY_TO_SECOND, TS_TYPE_INTERVAL_DAY_TO_SECOND},
+//    {TS_TYPE_NAME_INTERVAL_YEAR_TO_MONTH, TS_TYPE_INTERVAL_YEAR_TO_MONTH},
+//    {TS_TYPE_NAME_UNKNOWN, TS_TYPE_UNKNOWN},
+//    {TS_TYPE_NAME_INTEGER, TS_TYPE_INTEGER},
+//    {TS_TYPE_NAME_ROW, TS_TYPE_ROW},
+//    {TS_TYPE_NAME_ARRAY, TS_TYPE_ARRAY},
+//    {TS_TYPE_NAME_TIMESERIES, TS_TYPE_TIMESERIES}};
 
 #define ES_VARCHAR_SIZE (-2)
 #define TS_ROW_SIZE (-3)
@@ -178,8 +177,6 @@ bool _CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
         return false;
 
     try {
-        schema_type doc_schema;
-        GetSchemaInfo(doc_schema, ts_result.es_result_doc);
 
         SQLULEN starting_cached_rows = q_res->num_cached_rows;
 
@@ -215,8 +212,6 @@ bool _CC_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
 
     QR_set_conn(q_res, conn);
     try {
-        schema_type doc_schema;
-        GetSchemaInfo(doc_schema, ts_result.es_result_doc);
 
         // Assign table data and column headers
         if (!AssignColumnHeaders(q_res, ts_result))
@@ -273,9 +268,8 @@ bool _CC_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
             return false;
 
         // Update fields of QResult to reflect data written
-        std::string command_type = "SELECT";
         UpdateResultFields(q_res, conn, starting_cached_rows, next_token,
-                           command_type);
+                           ts_result.command_type);
 
         // Return true (success)
         return true;
@@ -291,18 +285,6 @@ bool _CC_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
 
     // Exception occurred, return false (error)
     return false;
-}
-
-void GetSchemaInfo(schema_type &schema, json_doc &es_result_doc) {
-    json_arr schema_arr = es_result_doc[JSON_KW_SCHEMA];
-    for (auto it : schema_arr) {
-        auto mapped_oid = type_to_oid_map.find(it[JSON_KW_TYPE].as_string());
-        OID type_oid = (mapped_oid == type_to_oid_map.end())
-                           ? SQL_WVARCHAR
-                           : mapped_oid->second;
-        schema.push_back(
-            std::make_pair(it[JSON_KW_NAME].as_string(), type_oid));
-    }
 }
 
 bool AssignColumnHeaders(QResultClass *q_res,
