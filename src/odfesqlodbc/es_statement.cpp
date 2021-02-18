@@ -189,9 +189,9 @@ SQLRETURN GetNextResultSet(StatementClass *stmt) {
 
     TSResult *es_res = TSGetResult(cc->conn);
     if (es_res != NULL) {
-        // Save server cursor id to fetch more pages later
-        if (!es_res->next_token.empty()) {
-            QR_set_next_token(q_res, es_res->next_token.c_str());
+        // Save next token to fetch more pages later
+        if (!es_res->sdk_result.GetNextToken().empty()) {
+            QR_set_next_token(q_res, es_res->sdk_result.GetNextToken().c_str());
         } else {
             QR_set_next_token(q_res, NULL);
         }
