@@ -275,15 +275,6 @@ typedef enum {
 #ifdef __cplusplus
 #include <stdint.h>
 
-#ifdef __APPLE__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-#endif  // __APPLE__
-#include "rabbit.hpp"
-#ifdef __APPLE__
-#pragma clang diagnostic pop
-#endif  // __APPLE__
-
 #include <string>
 #include <vector>
 
@@ -330,42 +321,11 @@ typedef struct runtime_options {
 #define KEYWORD_DISPLAY_SIZE 255
 #define KEYWORD_LENGTH_OF_STR 255
 
-// Copied from ColumnInfoClass's 'srvr_info' struct. Comments are the relevant
-// name in 'srvr_info'
-typedef struct ColumnInfo {
-    std::string field_name;    // name
-    uint32_t type_oid;         // adtid
-    int16_t type_size;         // adtsize
-    int32_t display_size;      // longest row
-    int32_t length_of_str;     // the length of bpchar/varchar
-    uint32_t relation_id;      // relid
-    int16_t attribute_number;  // attid
-    ColumnInfo() {
-        field_name = "";
-        type_oid = INVALID_OID;
-        type_size = 0;      // ?
-        display_size = 0;   // ?
-        length_of_str = 0;  // ?
-        relation_id = INVALID_OID;
-        attribute_number = INVALID_OID;
-    }
-} ColumnInfo;
-
 typedef struct TSResult {
-    uint32_t ref_count;  // reference count. A ColumnInfo can be shared by
-                         // several qresults.
-    uint16_t num_fields;
-    std::vector< ColumnInfo > column_info;
-    std::string next_token;
-    std::string result_json;
-    std::string command_type;  // SELECT / FETCH / etc
-    rabbit::document es_result_doc;
+    std::string command_type;  // Timestream supports SELECT for query only
     Aws::TimestreamQuery::Model::QueryResult sdk_result;
-    TSResult() {
-        ref_count = 0;
-        num_fields = 0;
-        result_json = "";
-        command_type = "";
+    TSResult(const std::string& command_type = "SELECT") {
+        this->command_type = command_type;
     }
 } TSResult;
 
