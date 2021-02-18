@@ -315,13 +315,40 @@ bool AssignColumnHeaders(QResultClass *q_res,
     
     for (size_t i = 0; i < column_info.size(); i++) {
         auto column = column_info[i];
-        auto type =
-            Aws::TimestreamQuery::Model::ScalarTypeMapper::GetNameForScalarType(
-                column.GetType().GetScalarType());
-        // TODO Some historic fields needs to be removed, set 0 fow now.
+        std::string column_name;
+        if (column.NameHasBeenSet()) {
+            column_name = column.GetName();
+        }
+        OID column_type_id = TS_TYPE_UNKNOWN;
+        int16_t column_size = 0;
+        if (column.TypeHasBeenSet()) {
+            auto type = column.GetType();
+            if (type.ScalarTypeHasBeenSet()) {
+                switch (type.GetScalarType()) { 
+                    case Aws::TimestreamQuery::Model::ScalarType::INTEGER:
+                        column_type_id = TS_TYPE_INTEGER;
+                        column_size = 4;
+                        break;
+                    default:
+                        break;
+                }
+            } else if (type.ArrayColumnInfoHasBeenSet()) {
+            
+            } else if (type.RowColumnInfoHasBeenSet()) {
+            
+            } else if (type.TimeSeriesMeasureValueColumnInfoHasBeenSet()) {
+            
+            } else {
+                // Empty
+            }
+        }
+        //auto type =
+        //    Aws::TimestreamQuery::Model::ScalarTypeMapper::GetNameForScalarType(
+        //        column.GetType().GetScalarType());
+        //// TODO Some historic fields needs to be removed, set 0 fow now.
         CI_set_field_info(QR_get_fields(q_res), (int)i,
-                          column.GetName().c_str(),
-                          TS_TYPE_UNKNOWN, ES_ADT_UNSET, 0, 0, 0);
+                          column.GetName().c_str(), column_type_id, column_size,
+                          0, 0, 0);
         QR_set_rstatus(q_res, PORES_FIELDS_OK);
     }
     q_res->num_fields = CI_get_num_fields(QR_get_fields(q_res));
@@ -363,23 +390,45 @@ bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
     // Loop through and assign data
     for (size_t i = 0; i < row.GetData().size(); i++) {
         auto datum = row.GetData()[i];
-        auto scalar_value = datum.GetScalarValue();
-        if (scalar_value.empty()) {
-            tuple[i].len = SQL_NULL_DATA;
-            tuple[i].value = NULL;
-        } else {
-            // Copy string over to tuple
-            const std::string data = scalar_value;
-            tuple[i].len = static_cast< int >(data.length());
+        if (datum.ScalarValueHasBeenSet()) {
+            auto scalar_value = datum.GetScalarValue();
+            tuple[i].len = static_cast< int >(scalar_value.length());
             QR_MALLOC_return_with_error(
-                tuple[i].value, char, data.length() + 1, q_res,
+                tuple[i].value, char, scalar_value.length() + 1, q_res,
                 "Out of memory in allocating item buffer.", false);
-            strcpy((char *)tuple[i].value, data.c_str());
-
+            strcpy((char *)tuple[i].value, scalar_value.c_str());
             // If data length exceeds current display size, set display size
             if (fields.coli_array[i].display_size < tuple[i].len)
                 fields.coli_array[i].display_size = tuple[i].len;
+        } else if (datum.ArrayValueHasBeenSet()) {
+        
+        } else if (datum.RowValueHasBeenSet()) {
+        
+        } else if (datum.TimeSeriesValueHasBeenSet()) {
+        
+        } else if (datum.NullValueHasBeenSet()) {
+
+        } else {
+            // Empty
         }
+
+        //auto scalar_value = datum.GetScalarValue();
+        //if (scalar_value.empty()) {
+        //    tuple[i].len = SQL_NULL_DATA;
+        //    tuple[i].value = NULL;
+        //} else {
+        //    // Copy string over to tuple
+        //    const std::string data = scalar_value;
+        //    tuple[i].len = static_cast< int >(data.length());
+        //    QR_MALLOC_return_with_error(
+        //        tuple[i].value, char, data.length() + 1, q_res,
+        //        "Out of memory in allocating item buffer.", false);
+        //    strcpy((char *)tuple[i].value, data.c_str());
+
+        //    // If data length exceeds current display size, set display size
+        //    if (fields.coli_array[i].display_size < tuple[i].len)
+        //        fields.coli_array[i].display_size = tuple[i].len;
+        //}
     }
 
     // TODO Commented out for now, needs refactoring
