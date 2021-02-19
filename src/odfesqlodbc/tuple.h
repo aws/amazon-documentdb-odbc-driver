@@ -26,7 +26,7 @@ extern "C" {
 
 /*	Used by backend data AND manual result sets */
 struct TupleField_ {
-    Int4 len;    /* ES length of the current Tuple */
+    Int4 len;    /* length of the current Tuple */
     void *value; /* an array representing the value */
 };
 
