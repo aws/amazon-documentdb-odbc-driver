@@ -716,7 +716,7 @@ static int setup_getdataclass(SQLLEN *const length_return,
             BOOL is_utf8 = (UTF8 == conn->ccsc);
 
             switch (field_type) {
-                case ES_TYPE_UNKNOWN:
+                case TS_TYPE_UNKNOWN:
                 case ES_TYPE_BPCHAR:
                 case ES_TYPE_VARCHAR:
                 case ES_TYPE_TEXT:
@@ -1275,7 +1275,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
             break;
         case SQL_C_BINARY:
             switch (field_type) {
-                case ES_TYPE_UNKNOWN:
+                case TS_TYPE_UNKNOWN:
                 case ES_TYPE_BPCHAR:
                 case ES_TYPE_VARCHAR:
                 case ES_TYPE_TEXT:
@@ -1590,7 +1590,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
 #endif /* ODBCINT64 */
             case SQL_C_BINARY:
                 /* The following is for SQL_C_VARBOOKMARK */
-                if (ES_TYPE_INT4 == field_type) {
+                if (TS_TYPE_INTEGER == field_type) {
                     UInt4 ival = ATOI32U(neut_str);
 
                     MYLOG(LOG_ALL, "SQL_C_VARBOOKMARK value=%d\n", ival);

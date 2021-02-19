@@ -70,8 +70,8 @@ static const std::string JSON_KW_CURSOR = "cursor";
 //    {ES_TYPE_NAME_BOOLEAN, ES_TYPE_BOOL},
 //    {ES_TYPE_NAME_BYTE, ES_TYPE_INT2},
 //    {ES_TYPE_NAME_SHORT, ES_TYPE_INT2},
-//    {ES_TYPE_NAME_INTEGER, ES_TYPE_INT4},
-//    {ES_TYPE_NAME_LONG, ES_TYPE_INT8},
+//    {TS_TYPE_NAME_INTEGER, TS_TYPE_INTEGER},
+//    {TS_TYPE_NAME_BIGINT, TS_TYPE_BIGINT},
 //    {ES_TYPE_NAME_HALF_FLOAT, ES_TYPE_FLOAT4},
 //    {ES_TYPE_NAME_FLOAT, ES_TYPE_FLOAT4},
 //    {ES_TYPE_NAME_DOUBLE, ES_TYPE_FLOAT8},
@@ -103,31 +103,31 @@ static const std::string JSON_KW_CURSOR = "cursor";
 #define TS_ARRAY_SIZE (-4)
 #define TS_TIMESERIES_SIZE (-5)
 
-const std::unordered_map< OID, int16_t > oid_to_size_map = {
-    {ES_TYPE_BOOL, (int16_t)1},
-    {ES_TYPE_INT2, (int16_t)2},
-    {ES_TYPE_INT4, (int16_t)4},
-    {ES_TYPE_INT8, (int16_t)8},
-    {ES_TYPE_FLOAT4, (int16_t)4},
-    {ES_TYPE_FLOAT8, (int16_t)8},
-    {ES_TYPE_VARCHAR, (int16_t)ES_VARCHAR_SIZE},
-    {ES_TYPE_DATE, (int16_t)ES_VARCHAR_SIZE},
-    {ES_TYPE_TIMESTAMP, (int16_t)1},
-
-    {TS_TYPE_VARCHAR, (int16_t)ES_VARCHAR_SIZE},
-    {TS_TYPE_BOOLEAN, (int16_t)1},
-    {TS_TYPE_BIGINT, (int16_t)8},
-    {TS_TYPE_DOUBLE, (int16_t)8},
-    {TS_TYPE_TIMESTAMP, (int16_t)1},
-    {TS_TYPE_DATE, (int16_t)ES_VARCHAR_SIZE},
-    {TS_TYPE_TIME, (int16_t)ES_VARCHAR_SIZE},
-    {TS_TYPE_INTERVAL_DAY_TO_SECOND, (int16_t)ES_VARCHAR_SIZE},
-    {TS_TYPE_INTERVAL_YEAR_TO_MONTH, (int16_t)ES_VARCHAR_SIZE},
-    {TS_TYPE_UNKNOWN, (int16_t)ES_VARCHAR_SIZE},
-    {TS_TYPE_INTEGER, (int16_t)4},
-    {TS_TYPE_ROW, (int16_t)TS_ROW_SIZE},
-    {TS_ARRAY_SIZE, (int16_t)TS_ARRAY_SIZE},
-    {TS_TIMESERIES_SIZE, (int16_t)TS_TIMESERIES_SIZE}};
+//const std::unordered_map< OID, int16_t > oid_to_size_map = {
+//    {ES_TYPE_BOOL, (int16_t)1},
+//    {ES_TYPE_INT2, (int16_t)2},
+//    {TS_TYPE_INTEGER, (int16_t)4},
+//    {TS_TYPE_BIGINT, (int16_t)8},
+//    {ES_TYPE_FLOAT4, (int16_t)4},
+//    {ES_TYPE_FLOAT8, (int16_t)8},
+//    {ES_TYPE_VARCHAR, (int16_t)ES_VARCHAR_SIZE},
+//    {ES_TYPE_DATE, (int16_t)ES_VARCHAR_SIZE},
+//    {ES_TYPE_TIMESTAMP, (int16_t)1},
+//
+//    {TS_TYPE_VARCHAR, (int16_t)ES_VARCHAR_SIZE},
+//    {TS_TYPE_BOOLEAN, (int16_t)1},
+//    {TS_TYPE_BIGINT, (int16_t)8},
+//    {TS_TYPE_DOUBLE, (int16_t)8},
+//    {TS_TYPE_TIMESTAMP, (int16_t)1},
+//    {TS_TYPE_DATE, (int16_t)ES_VARCHAR_SIZE},
+//    {TS_TYPE_TIME, (int16_t)ES_VARCHAR_SIZE},
+//    {TS_TYPE_INTERVAL_DAY_TO_SECOND, (int16_t)ES_VARCHAR_SIZE},
+//    {TS_TYPE_INTERVAL_YEAR_TO_MONTH, (int16_t)ES_VARCHAR_SIZE},
+//    {TS_TYPE_UNKNOWN, (int16_t)ES_VARCHAR_SIZE},
+//    {TS_TYPE_INTEGER, (int16_t)4},
+//    {TS_TYPE_ROW, (int16_t)TS_ROW_SIZE},
+//    {TS_ARRAY_SIZE, (int16_t)TS_ARRAY_SIZE},
+//    {TS_TIMESERIES_SIZE, (int16_t)TS_TIMESERIES_SIZE}};
 
 // Using global variable here so that the error message can be propagated
 // without going otu of scope
@@ -212,7 +212,6 @@ bool _CC_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
 
     QR_set_conn(q_res, conn);
     try {
-
         // Assign table data and column headers
         if (!AssignColumnHeaders(q_res, ts_result))
             return false;
@@ -307,15 +306,38 @@ bool AssignColumnHeaders(QResultClass *q_res,
             auto type = column.GetType();
             if (type.ScalarTypeHasBeenSet()) {
                 switch (type.GetScalarType()) { 
+                    case Aws::TimestreamQuery::Model::ScalarType::BIGINT:
+                        column_type_id = TS_TYPE_BIGINT;
+                        column_size = 8;
+                        break;
+                    case Aws::TimestreamQuery::Model::ScalarType::BOOLEAN:
+                        break;
+                    case Aws::TimestreamQuery::Model::ScalarType::DATE:
+                        break;
+                    case Aws::TimestreamQuery::Model::ScalarType::DOUBLE:
+                        break;
                     case Aws::TimestreamQuery::Model::ScalarType::INTEGER:
                         column_type_id = TS_TYPE_INTEGER;
                         column_size = 4;
                         break;
+                    case Aws::TimestreamQuery::Model::ScalarType::INTERVAL_DAY_TO_SECOND:
+                        break;
+                    case Aws::TimestreamQuery::Model::ScalarType::INTERVAL_YEAR_TO_MONTH:
+                        break;
+                    case Aws::TimestreamQuery::Model::ScalarType::TIME:
+                        break;
+                    case Aws::TimestreamQuery::Model::ScalarType::TIMESTAMP:
+                        break;
+                    case Aws::TimestreamQuery::Model::ScalarType::VARCHAR:
+                        break;
+                    case Aws::TimestreamQuery::Model::ScalarType::NOT_SET:
+                    case Aws::TimestreamQuery::Model::ScalarType::UNKNOWN:
                     default:
+                        // NOT_SET, UNKNOWN & default
                         break;
                 }
             } else if (type.ArrayColumnInfoHasBeenSet()) {
-            
+
             } else if (type.RowColumnInfoHasBeenSet()) {
             
             } else if (type.TimeSeriesMeasureValueColumnInfoHasBeenSet()) {
@@ -324,9 +346,6 @@ bool AssignColumnHeaders(QResultClass *q_res,
                 // Empty
             }
         }
-        //auto type =
-        //    Aws::TimestreamQuery::Model::ScalarTypeMapper::GetNameForScalarType(
-        //        column.GetType().GetScalarType());
         //// TODO Some historic fields needs to be removed, set 0 fow now.
         CI_set_field_info(QR_get_fields(q_res), (int)i,
                           column.GetName().c_str(), column_type_id, column_size,
@@ -351,7 +370,6 @@ bool AssignTableData(TSResult &ts_result, QResultClass *q_res, ColumnInfoClass &
         if (!AssignRowData(row, q_res, fields, ts_result.sdk_result.GetColumnInfo().size()))
             return false;
     }
-
     return true;
 }
 
@@ -376,12 +394,9 @@ bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
             auto scalar_value = datum.GetScalarValue();
             tuple[i].len = static_cast< int >(scalar_value.length());
             QR_MALLOC_return_with_error(
-                tuple[i].value, char, scalar_value.length() + 1, q_res,
+                tuple[i].value, char, tuple[i].len + 1, q_res,
                 "Out of memory in allocating item buffer.", false);
             strcpy((char *)tuple[i].value, scalar_value.c_str());
-            // If data length exceeds current display size, set display size
-            if (fields.coli_array[i].display_size < tuple[i].len)
-                fields.coli_array[i].display_size = tuple[i].len;
         } else if (datum.ArrayValueHasBeenSet()) {
         
         } else if (datum.RowValueHasBeenSet()) {
@@ -393,24 +408,9 @@ bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
         } else {
             // Empty
         }
-
-        //auto scalar_value = datum.GetScalarValue();
-        //if (scalar_value.empty()) {
-        //    tuple[i].len = SQL_NULL_DATA;
-        //    tuple[i].value = NULL;
-        //} else {
-        //    // Copy string over to tuple
-        //    const std::string data = scalar_value;
-        //    tuple[i].len = static_cast< int >(data.length());
-        //    QR_MALLOC_return_with_error(
-        //        tuple[i].value, char, data.length() + 1, q_res,
-        //        "Out of memory in allocating item buffer.", false);
-        //    strcpy((char *)tuple[i].value, data.c_str());
-
-        //    // If data length exceeds current display size, set display size
-        //    if (fields.coli_array[i].display_size < tuple[i].len)
-        //        fields.coli_array[i].display_size = tuple[i].len;
-        //}
+        // If data length exceeds current display size, set display size
+        if (fields.coli_array[i].display_size < tuple[i].len)
+            fields.coli_array[i].display_size = tuple[i].len;
     }
 
     // TODO Commented out for now, needs refactoring
