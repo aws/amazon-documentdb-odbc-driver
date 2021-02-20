@@ -58,6 +58,9 @@ jobs:
     - name: run-integration-execution-tests
       run: |
         ./build/odbc/bin/itodbc_execution
+    - name: run-integration-results-tests
+      run: |
+        ./build/odbc/bin/itodbc_results
     - name: print-test-logs
       if: failure()
       run: |
@@ -143,6 +146,9 @@ jobs:
     - name: run-integration-execution-tests
       run: |
         .\build\odbc\bin\Release\itodbc_execution.exe
+    - name: run-integration-results-tests
+      run: |
+        .\build\odbc\bin\Release\itodbc_results.exe
     - name: upload-integration-test-results
       if: always()
       uses: actions/upload-artifact@v2
@@ -211,6 +217,9 @@ jobs:
     - name: run-integration-execution-tests
       run: |
         .\build\odbc\bin\Release\itodbc_execution.exe
+    - name: run-integration-results-tests
+      run: |
+        .\build\odbc\bin\Release\itodbc_results.exe
     - name: upload-integration-test-results
       if: always()
       uses: actions/upload-artifact@v2

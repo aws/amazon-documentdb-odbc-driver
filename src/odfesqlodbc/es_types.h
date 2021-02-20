@@ -31,8 +31,6 @@ extern "C" {
 #endif
 
 #define TS_TYPE_NAME_BOOLEAN "BOOLEAN"
-#define ES_TYPE_NAME_BYTE "byte"
-#define ES_TYPE_NAME_SHORT "short"
 #define TS_TYPE_NAME_INTEGER "INTEGER"
 #define TS_TYPE_NAME_BIGINT "BIGINT"
 #define ES_TYPE_NAME_HALF_FLOAT "half_float"
@@ -48,12 +46,12 @@ extern "C" {
 #define ES_TYPE_NAME_UNSUPPORTED "unsupported"
 
 #define MS_ACCESS_SERIAL "int identity"
-#define ES_TYPE_BOOL 16
+#define TS_TYPE_BOOLEAN 16
 #define ES_TYPE_BYTEA 17
 #define ES_TYPE_CHAR 18
 #define ES_TYPE_NAME 19
 #define TS_TYPE_BIGINT 20
-#define ES_TYPE_INT2 21
+#define TS_TYPE_INT2 21
 #define ES_TYPE_INT2VECTOR 22
 #define TS_TYPE_INTEGER 23
 #define ES_TYPE_REGPROC 24
@@ -63,7 +61,6 @@ extern "C" {
 #define ES_TYPE_XID 28
 #define ES_TYPE_CID 29
 #define ES_TYPE_OIDVECTOR 30
-#define ES_TYPE_INT1 31
 #define ES_TYPE_HALF_FLOAT 32
 #define ES_TYPE_SCALED_FLOAT 33
 #define ES_TYPE_KEYWORD 34
