@@ -1168,7 +1168,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
             }
             break;
 
-        case ES_TYPE_BOOL: { /* change T/F to 1/0 */
+        case TS_TYPE_BOOLEAN: { /* change T/F to 1/0 */
             switch (((char *)value)[0]) {
                 case 'f':
                 case 'F':
