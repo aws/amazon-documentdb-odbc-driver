@@ -770,6 +770,28 @@ class TestSQLGetData : public testing::Test {
 //    EXPECT_TRUE(found_expected_data);
 //}
 
+TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_STINYINT) {
+    int v1 = -293719;
+    int v2 = 741370;
+    std::wstring columns = L"INTEGER\'" + std::to_wstring(v1) + L"\', INTEGER\'"
+                           + std::to_wstring(v2) + L"\'";
+    std::wstring table_name = L"ODBCTest.test";
+    std::wstring count = L"1";
+    QueryFetch(columns, table_name, count, &m_hstmt);
+    SQLINTEGER data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_STINYINT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    int expected_v1 = static_cast<int>(static_cast<unsigned char>(v1));
+    EXPECT_EQ(expected_v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_STINYINT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    int expected_v2 = static_cast<int>(static_cast<unsigned char>(v2));
+    EXPECT_EQ(expected_v2, data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SLONG) {
     int v1 = -293719;
     int v2 = 741370;
@@ -906,6 +928,76 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_CHAR) {
     for (int i = 0; i < indicator; i++) {
         EXPECT_EQ(expected_v2[i], data[i]);
     }
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_BIT) {
+    std::wstring columns = L"true, false";
+    std::wstring table_name = L"ODBCTest.test";
+    std::wstring count = L"1";
+    QueryFetch(columns, table_name, count, &m_hstmt);
+    bool data = false;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_TRUE(data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_FALSE(data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_SLONG) {
+    std::wstring columns = L"true, false";
+    std::wstring table_name = L"ODBCTest.test";
+    std::wstring count = L"1";
+    QueryFetch(columns, table_name, count, &m_hstmt);
+    SQLINTEGER data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_SLONG, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_TRUE(data != 0);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_SLONG, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_TRUE(data == 0);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_ULONG) {
+    std::wstring columns = L"true, false";
+    std::wstring table_name = L"ODBCTest.test";
+    std::wstring count = L"1";
+    QueryFetch(columns, table_name, count, &m_hstmt);
+    SQLUINTEGER data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_ULONG, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_TRUE(data != 0);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_ULONG, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_TRUE(data == 0);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_CHAR) {
+    std::wstring columns = L"true, false";
+    std::wstring table_name = L"ODBCTest.test";
+    std::wstring count = L"1";
+    QueryFetch(columns, table_name, count, &m_hstmt);
+    SQLCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    ASSERT_EQ(1, indicator);
+    EXPECT_EQ('1', data[0]);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    ASSERT_EQ(1, indicator);
+    EXPECT_EQ('0', data[0]);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 

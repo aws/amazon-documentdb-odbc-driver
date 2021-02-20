@@ -67,9 +67,9 @@ static const std::string JSON_KW_CURSOR = "cursor";
 
 // clang-format on
 //const std::unordered_map< std::string, OID > type_to_oid_map = {
-//    {ES_TYPE_NAME_BOOLEAN, ES_TYPE_BOOL},
-//    {ES_TYPE_NAME_BYTE, ES_TYPE_INT2},
-//    {ES_TYPE_NAME_SHORT, ES_TYPE_INT2},
+//    {ES_TYPE_NAME_BOOLEAN, TS_TYPE_BOOLEAN},
+//    {ES_TYPE_NAME_BYTE, TS_TYPE_INT2},
+//    {ES_TYPE_NAME_SHORT, TS_TYPE_INT2},
 //    {TS_TYPE_NAME_INTEGER, TS_TYPE_INTEGER},
 //    {TS_TYPE_NAME_BIGINT, TS_TYPE_BIGINT},
 //    {ES_TYPE_NAME_HALF_FLOAT, ES_TYPE_FLOAT4},
@@ -99,13 +99,13 @@ static const std::string JSON_KW_CURSOR = "cursor";
 //    {TS_TYPE_NAME_TIMESERIES, TS_TYPE_TIMESERIES}};
 
 #define ES_VARCHAR_SIZE (-2)
-#define TS_ROW_SIZE (-3)
-#define TS_ARRAY_SIZE (-4)
-#define TS_TIMESERIES_SIZE (-5)
+//#define TS_ROW_SIZE (-3)
+//#define TS_ARRAY_SIZE (-4)
+//#define TS_TIMESERIES_SIZE (-5)
 
 //const std::unordered_map< OID, int16_t > oid_to_size_map = {
-//    {ES_TYPE_BOOL, (int16_t)1},
-//    {ES_TYPE_INT2, (int16_t)2},
+//    {TS_TYPE_BOOLEAN, (int16_t)1},
+//    {TS_TYPE_INT2, (int16_t)2},
 //    {TS_TYPE_INTEGER, (int16_t)4},
 //    {TS_TYPE_BIGINT, (int16_t)8},
 //    {ES_TYPE_FLOAT4, (int16_t)4},
@@ -311,6 +311,8 @@ bool AssignColumnHeaders(QResultClass *q_res,
                         column_size = 8;
                         break;
                     case Aws::TimestreamQuery::Model::ScalarType::BOOLEAN:
+                        column_type_id = TS_TYPE_BOOLEAN;
+                        column_size = 1;
                         break;
                     case Aws::TimestreamQuery::Model::ScalarType::DATE:
                         break;
