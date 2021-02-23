@@ -74,6 +74,7 @@ int GetCurrentLogLevel(HWND hdlg) {
 
 void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
     if (strcmp(am->authtype_str, AUTHTYPE_AWS_PROFILE) == 0) {
+        EnableWindow(GetDlgItem(hdlg, IDC_PROFILE_NAME), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), FALSE);
@@ -90,6 +91,7 @@ void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
         EnableWindow(GetDlgItem(hdlg, IDC_AAD_TENANT), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_IDP_ARN), FALSE);
     } else if (strcmp(am->authtype_str, AUTHTYPE_IAM) == 0) {
+        EnableWindow(GetDlgItem(hdlg, IDC_PROFILE_NAME), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), TRUE);
@@ -106,6 +108,7 @@ void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
         EnableWindow(GetDlgItem(hdlg, IDC_AAD_TENANT), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_IDP_ARN), FALSE);
     } else if (strcmp(am->authtype_str, AUTHTYPE_AAD) == 0) {
+        EnableWindow(GetDlgItem(hdlg, IDC_PROFILE_NAME), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), FALSE);
@@ -122,6 +125,7 @@ void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
         EnableWindow(GetDlgItem(hdlg, IDC_AAD_TENANT), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_IDP_ARN), TRUE);
     } else {
+        EnableWindow(GetDlgItem(hdlg, IDC_PROFILE_NAME), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), FALSE);
         EnableWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), FALSE);
@@ -161,8 +165,9 @@ void SetDlgStuff(HWND hdlg, const ConnInfo *ci) {
     SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL,
                        ams[authtype_selection_idx].authtype_id, (WPARAM)0);
     SetAuthenticationVisibility(hdlg, &ams[authtype_selection_idx]);
-    
-    if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
+    if (strcmp(ci->authtype, AUTHTYPE_AWS_PROFILE) == 0) {
+        SetDlgItemText(hdlg, IDC_PROFILE_NAME, ci->profile_name);
+    } else if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
         SetDlgItemText(hdlg, IDC_ACCESS_KEY_ID, ci->uid);
         SetDlgItemText(hdlg, IDC_SECRET_ACCESS_KEY, SAFE_NAME(ci->pwd));
         SetDlgItemText(hdlg, IDC_SESSION_TOKEN, ci->session_token);
@@ -199,7 +204,9 @@ void GetDlgStuff(HWND hdlg, ConnInfo *ci) {
     const struct authmode *am = GetCurrentAuthMode(hdlg);
     SetAuthenticationVisibility(hdlg, am);
     STRCPY_FIXED(ci->authtype, am->authtype_str);
-    if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
+    if (strcmp(ci->authtype, AUTHTYPE_AWS_PROFILE) == 0) {
+        GetDlgItemText(hdlg, IDC_PROFILE_NAME, ci->profile_name, sizeof(ci->profile_name));
+    } else if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
         GetDlgItemText(hdlg, IDC_ACCESS_KEY_ID, ci->uid, sizeof(ci->uid));
         GetNameField(hdlg, IDC_SECRET_ACCESS_KEY, &ci->pwd);
         GetDlgItemText(hdlg, IDC_SESSION_TOKEN, ci->session_token,

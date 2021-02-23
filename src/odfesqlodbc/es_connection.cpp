@@ -63,6 +63,7 @@ void* LIB_connect(ConnectionClass *self) {
     rt_opts.conn.max_connections.assign(self->connInfo.max_connections);
     // Authentication
     rt_opts.auth.auth_type.assign(self->connInfo.authtype);
+    rt_opts.auth.profile_name.assign(self->connInfo.profile_name);
     rt_opts.auth.uid.assign(self->connInfo.uid);
     rt_opts.auth.pwd.assign(SAFE_NAME(self->connInfo.pwd));
     rt_opts.auth.session_token.assign(self->connInfo.session_token);
