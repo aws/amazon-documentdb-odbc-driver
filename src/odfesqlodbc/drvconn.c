@@ -125,7 +125,9 @@ INT_PTR CALLBACK dconn_FDriverConnectProc(HWND hdlg, UINT wMsg, WPARAM wParam,
 
             SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL, 2, (WPARAM)0);
 
-            if (ci->uid[0] == '\0') {
+            if (strcmp(ci->authtype, AUTHTYPE_AWS_PROFILE) == 0) {
+                SetFocus(GetDlgItem(hdlg, IDC_PROFILE_NAME));
+            } else if (ci->uid[0] == '\0') {
                 if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
                     SetFocus(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID));
                 } else if (strcmp(ci->authtype, AUTHTYPE_AAD) == 0) {

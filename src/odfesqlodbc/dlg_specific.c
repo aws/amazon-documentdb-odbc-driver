@@ -58,6 +58,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             connect_string, nlen,
             "%s=%s;"
             INI_AUTH_MODE "=%s;"
+            INI_PROFILE_NAME "=%s;"
             INI_REGION "=%s;"
             INI_END_POINT_OVERRIDE "=%s;"
             INI_LOG_LEVEL "=%d;"
@@ -68,6 +69,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             INI_MAX_CONNECTIONS "=%s;",
             got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
             ci->authtype,
+            ci->profile_name,
             ci->region,
             ci->end_point_override,
             (int)ci->drivers.loglevel,
@@ -236,6 +238,8 @@ BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
         STRCPY_FIXED(ci->session_token, value);
     else if (stricmp(attribute, INI_AUTH_MODE) == 0)
         STRCPY_FIXED(ci->authtype, value);
+    else if (stricmp(attribute, INI_PROFILE_NAME) == 0)
+        STRCPY_FIXED(ci->profile_name, value);
     else if (stricmp(attribute, INI_REGION) == 0)
         STRCPY_FIXED(ci->region, value);
     else if (stricmp(attribute, INI_END_POINT_OVERRIDE) == 0)
@@ -288,6 +292,7 @@ static void getCiDefaults(ConnInfo *ci) {
     strncpy(ci->max_connections, DEFAULT_MAX_CONNECTIONS_STR,
             SMALL_REGISTRY_LEN);
     strncpy(ci->authtype, DEFAULT_AUTHTYPE, MEDIUM_REGISTRY_LEN);
+    strncpy(ci->profile_name, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
     if (ci->pwd.name != NULL)
         free(ci->pwd.name);
     ci->pwd.name = NULL;
@@ -377,6 +382,10 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
                                    sizeof(temp), ODBC_INI)
         > 0)
         STRCPY_FIXED(ci->authtype, temp);
+    if (SQLGetPrivateProfileString(DSN, INI_PROFILE_NAME, NULL_STRING, temp,
+                                   sizeof(temp), ODBC_INI)
+        > 0)
+        STRCPY_FIXED(ci->profile_name, temp);
     if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
         if (SQLGetPrivateProfileString(DSN, INI_ACCESS_KEY_ID, NULL_STRING,
                                        temp, sizeof(temp), ODBC_INI)
@@ -507,6 +516,7 @@ void writeDSNinfo(const ConnInfo *ci) {
     SQLWritePrivateProfileString(DSN, INI_PWD, encoded_item, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_SESSION_TOKEN, ci->session_token, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_AUTH_MODE, ci->authtype, ODBC_INI);
+    SQLWritePrivateProfileString(DSN, INI_PROFILE_NAME, ci->profile_name, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_REGION, ci->region, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_END_POINT_OVERRIDE, ci->end_point_override, ODBC_INI);
     ITOA_FIXED(temp, ci->drivers.loglevel);
@@ -673,6 +683,7 @@ void CC_conninfo_init(ConnInfo *conninfo, UInt4 option) {
     strncpy(conninfo->max_connections, DEFAULT_MAX_CONNECTIONS_STR,
             SMALL_REGISTRY_LEN);
     strncpy(conninfo->authtype, DEFAULT_AUTHTYPE, MEDIUM_REGISTRY_LEN);
+    strncpy(conninfo->profile_name, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
     if (conninfo->pwd.name != NULL)
         free(conninfo->pwd.name);
     conninfo->pwd.name = NULL;
@@ -723,6 +734,7 @@ void CC_copy_conninfo(ConnInfo *ci, const ConnInfo *sci) {
     CORR_STRCPY(drivername);
     CORR_STRCPY(uid);
     CORR_STRCPY(authtype);
+    CORR_STRCPY(profile_name);
     CORR_STRCPY(region);
     CORR_STRCPY(end_point_override);
     NAME_TO_NAME(ci->pwd, sci->pwd);
