@@ -289,6 +289,7 @@ typedef enum {
 
 typedef struct authentication_options {
     std::string auth_type;
+    std::string profile_name;
     std::string uid;
     std::string pwd;
     std::string session_token;
