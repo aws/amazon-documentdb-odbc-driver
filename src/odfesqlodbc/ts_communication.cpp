@@ -23,6 +23,7 @@
 #include "mylog.h"
 #include <memory>
 #include <aws/core/auth/AWSCredentials.h>
+#include <aws/core/auth/AWSCredentialsProvider.h>
 #include <aws/core/client/DefaultRetryStrategy.h>
 #include <aws/timestream-query/model/QueryRequest.h>
 
@@ -221,10 +222,15 @@ bool TSCommunication::Connect(const runtime_options& options) {
         }
         config.retryStrategy = std::make_shared< Aws::Client::DefaultRetryStrategy >(max_retry_count_client);
     }
-
     if (options.auth.auth_type == AUTHTYPE_AWS_PROFILE) {
-        m_client =
-            std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(config);
+        if (!options.auth.profile_name.empty()) {
+            auto cp = std::make_shared<Aws::Auth::ProfileConfigFileAWSCredentialsProvider>(options.auth.profile_name.c_str());
+            m_client =
+                std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(cp, config);
+        } else {
+            m_client =
+                std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(config);
+        }
     } else if (options.auth.auth_type == AUTHTYPE_IAM) {
         Aws::Auth::AWSCredentials credentials(options.auth.uid,
                                               options.auth.pwd, options.auth.session_token);
