@@ -34,6 +34,7 @@
 #define IDC_PORT                        1002
 #define IDC_USER                        1006
 #define IDC_ACCESS_KEY_ID               1006
+#define IDC_PROFILE_NAME                1007
 #define IDC_PASSWORD                    1009
 #define IDC_SECRET_ACCESS_KEY           1009
 #define IDC_TOKEN                       1010
@@ -53,6 +54,7 @@
 #define IDC_MAX_CONNECTIONS_STATIC      1116
 #define IDC_ACCESS_KEY_ID_STATIC        1116
 #define IDC_MAX_RETRY_COUNT_CLIENT_STATIC 1117
+#define IDC_PROFILE_NAME_STATIC         1117
 #define IDC_REGION                      1121
 #define IDC_REGION_STATIC               1122
 #define IDC_AUTH_STATIC                 1123

@@ -55,6 +55,8 @@ extern "C" {
 #define INI_UID "UID"
 #define INI_PWD "PWD"
 #define INI_AUTH_MODE "Auth"
+// AWS_PROFILE
+#define INI_PROFILE_NAME "ProfileName"
 // IAM
 #define INI_ACCESS_KEY_ID "AccessKeyId"
 #define INI_SECRET_ACCESS_KEY "SecretAccessKey"
@@ -87,12 +89,12 @@ extern "C" {
 #define DEFAULT_CONNECTION_TIMEOUT_STR "1000"
 #define DEFAULT_MAX_CONNECTIONS 25
 #define DEFAULT_MAX_CONNECTIONS_STR "25"
-#define DEFAULT_AUTHTYPE "IAM"
+#define DEFAULT_AUTHTYPE "AWS_PROFILE"
 #define DEFAULT_DRIVERNAME "timestreamodbc"
 #define DEFAULT_REGION "us-east-1"
 #define DEFAULT_NONE ""
 
-#define AUTHTYPE_AWS_PROFILE "AWS PROFILE"
+#define AUTHTYPE_AWS_PROFILE "AWS_PROFILE"
 #define AUTHTYPE_IAM "IAM"
 #define AUTHTYPE_AAD "AAD"
 #define AUTHTYPE_OKTA "OKTA"
