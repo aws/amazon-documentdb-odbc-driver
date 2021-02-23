@@ -617,6 +617,7 @@ typedef struct {
 
     // Authentication
     char authtype[MEDIUM_REGISTRY_LEN];
+    char profile_name[MEDIUM_REGISTRY_LEN];
     char uid[MEDIUM_REGISTRY_LEN];
     esNAME pwd;
     char session_token[LARGE_REGISTRY_LEN];
