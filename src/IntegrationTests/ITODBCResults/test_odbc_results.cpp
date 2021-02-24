@@ -945,6 +945,44 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_USHORT) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
+TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SBIGINT) {
+    int v1 = -293719;
+    int v2 = 741370;
+    std::wstring columns = L"INTEGER\'" + std::to_wstring(v1) + L"\', INTEGER\'"
+                           + std::to_wstring(v2) + L"\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLBIGINT data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_SBIGINT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_SBIGINT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(v2, data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_UBIGINT) {
+    int v1 = -293719;
+    unsigned long long us1 = (unsigned long long)v1;
+    int v2 = 741370;
+    unsigned long long us2 = (unsigned long long)v2;
+    std::wstring columns = L"INTEGER\'" + std::to_wstring(v1) + L"\', INTEGER\'"
+                           + std::to_wstring(v2) + L"\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLUBIGINT data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_UBIGINT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(us1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_UBIGINT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(us2, data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_CHAR) {
     int v1 = -293719;
     int v2 = 741370;
