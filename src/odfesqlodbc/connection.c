@@ -113,7 +113,7 @@ RETCODE SQL_API API_Connect(HDBC hdbc, const SQLCHAR *szDSN,
     /* get the values for the DSN from the registry */
     getDSNinfo(ci, NULL);
 
-    logs_on_off(1, ci->drivers.loglevel, ci->drivers.loglevel);
+    logs_on_off(1, ci->drivers.loglevel);
     /* initialize version from connInfo.protocol    */
     CC_initialize_version(conn);
 
@@ -186,8 +186,7 @@ RETCODE SQL_API API_Disconnect(HDBC hdbc) {
         return SQL_ERROR;
     }
 
-    logs_on_off(-1, conn->connInfo.drivers.loglevel,
-                conn->connInfo.drivers.loglevel);
+    logs_on_off(-1, conn->connInfo.drivers.loglevel);
     MYLOG(LOG_DEBUG, "about to CC_cleanup\n");
 
     /* Close the connection and free statements */
@@ -417,7 +416,7 @@ CC_cleanup(ConnectionClass *self, BOOL keepCommunication) {
     /* We are always in the middle of a transaction, */
     /* even if we are in auto commit. */
     if (self->conn) {
-        QLOG(0, "LIB_disconnect: %p\n", self->conn);
+        MYLOG(0, "LIB_disconnect: %p\n", self->conn);
         LIB_disconnect(self->conn);
         self->conn = NULL;
     } else {

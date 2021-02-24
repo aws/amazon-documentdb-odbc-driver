@@ -154,39 +154,40 @@ const char *GetExeProgramName() {
     return exename;
 }
 
-static void *qlog_cs, *mylog_cs;
+static void *mylog_cs;
 
-static int mylog_on = LOG_WARNING, qlog_on = LOG_WARNING;
+static int mylog_on = LOG_WARNING;
+//qlog_on = LOG_WARNING;
 
-#define INIT_QLOG_CS XPlatformInitializeCriticalSection(&qlog_cs)
-#define ENTER_QLOG_CS XPlatformEnterCriticalSection(qlog_cs)
-#define LEAVE_QLOG_CS XPlatformLeaveCriticalSection(qlog_cs)
-#define DELETE_QLOG_CS XPlatformDeleteCriticalSection(&qlog_cs)
+//#define INIT_QLOG_CS XPlatformInitializeCriticalSection(&qlog_cs)
+//#define ENTER_QLOG_CS XPlatformEnterCriticalSection(qlog_cs)
+//#define LEAVE_QLOG_CS XPlatformLeaveCriticalSection(qlog_cs)
+//#define DELETE_QLOG_CS XPlatformDeleteCriticalSection(&qlog_cs)
 #define INIT_MYLOG_CS XPlatformInitializeCriticalSection(&mylog_cs)
 #define ENTER_MYLOG_CS XPlatformEnterCriticalSection(mylog_cs)
 #define LEAVE_MYLOG_CS XPlatformLeaveCriticalSection(mylog_cs)
 #define DELETE_MYLOG_CS XPlatformDeleteCriticalSection(&mylog_cs)
 
-#define MYLOGFILE "mylog_"
+#define MYLOGFILE "timestreamodbc_"
 #ifndef WIN32
 #define MYLOGDIR "/tmp"
 #else
-#define MYLOGDIR "c:"
+#define MYLOGDIR ""
 #endif /* WIN32 */
 
-#define QLOGFILE "elasticodbc_"
-#ifndef WIN32
-#define QLOGDIR "/tmp"
-#else
-#define QLOGDIR "c:"
-#endif /* WIN32 */
+//#define QLOGFILE "elasticodbc_"
+//#ifndef WIN32
+//#define QLOGDIR "/tmp"
+//#else
+//#define QLOGDIR "c:"
+//#endif /* WIN32 */
 
 int get_mylog(void) {
     return mylog_on;
 }
-int get_qlog(void) {
-    return qlog_on;
-}
+//int get_qlog(void) {
+//    return qlog_on;
+//}
 
 const char *po_basename(const char *path) {
     char *p;
@@ -196,9 +197,8 @@ const char *po_basename(const char *path) {
     return path;
 }
 
-void logs_on_off(int cnopen, int mylog_onoff, int qlog_onoff) {
-    static int mylog_on_count = 0, mylog_off_count = 0, qlog_on_count = 0,
-               qlog_off_count = 0;
+void logs_on_off(int cnopen, int mylog_onoff) {
+    static int mylog_on_count = 0, mylog_off_count = 0;
 
     ENTER_MYLOG_CS;
     if (mylog_onoff)
@@ -216,22 +216,22 @@ void logs_on_off(int cnopen, int mylog_onoff, int qlog_onoff) {
         mylog_on = getGlobalDebug();
     LEAVE_MYLOG_CS;
 
-    ENTER_QLOG_CS;
-    if (qlog_onoff)
-        qlog_on_count += cnopen;
-    else
-        qlog_off_count += cnopen;
-    if (qlog_on_count > 0) {
-        if (qlog_onoff > qlog_on)
-            qlog_on = qlog_onoff;
-        else if (qlog_on < 1)
-            qlog_on = 1;
-    } else if (qlog_off_count > 0)
-        qlog_on = 0;
-    else if (getGlobalCommlog() > 0)
-        qlog_on = getGlobalCommlog();
-    LEAVE_QLOG_CS;
-    MYLOG(LOG_DEBUG, "mylog_on=%d qlog_on=%d\n", mylog_on, qlog_on);
+    //ENTER_QLOG_CS;
+    //if (qlog_onoff)
+    //    qlog_on_count += cnopen;
+    //else
+    //    qlog_off_count += cnopen;
+    //if (qlog_on_count > 0) {
+    //    if (qlog_onoff > qlog_on)
+    //        qlog_on = qlog_onoff;
+    //    else if (qlog_on < 1)
+    //        qlog_on = 1;
+    //} else if (qlog_off_count > 0)
+    //    qlog_on = 0;
+    //else if (getGlobalCommlog() > 0)
+    //    qlog_on = getGlobalCommlog();
+    //LEAVE_QLOG_CS;
+    MYLOG(LOG_DEBUG, "mylog_on=%d\n", mylog_on);
 }
 
 #ifdef WIN32
@@ -245,7 +245,7 @@ static DWORD start_time = 0;
 static FILE *MLOGFP = NULL;
 
 static void MLOG_open() {
-    char filebuf[80], errbuf[160];
+    char filebuf[1024], errbuf[1024];
     BOOL open_error = FALSE;
 
     // TODO (#585): Add option to log to stderr stream
@@ -351,84 +351,84 @@ static void mylog_finalize(void) {
     DELETE_MYLOG_CS;
 }
 
-static FILE *QLOGFP = NULL;
+//static FILE *QLOGFP = NULL;
 
-static int qlog_misc(unsigned int option, const char *fmt, va_list args) {
-    char filebuf[80];
-    int gerrno;
-
-    if (!qlog_on)
-        return 0;
-
-    gerrno = GENERAL_ERRNO;
-    ENTER_QLOG_CS;
-#ifdef LOGGING_PROCESS_TIME
-    if (!start_time)
-        start_time = timeGetTime();
-#endif /* LOGGING_PROCESS_TIME */
-
-    if (!QLOGFP) {
-        generate_filename(logdir ? logdir : QLOGDIR, QLOGFILE, filebuf,
-                          sizeof(filebuf));
-        QLOGFP = fopen(filebuf, ES_BINARY_A);
-        if (!QLOGFP) {
-            generate_homefile(QLOGFILE, filebuf, sizeof(filebuf));
-            QLOGFP = fopen(filebuf, ES_BINARY_A);
-        }
-        if (!QLOGFP)
-            qlog_on = 0;
-    }
-
-    if (QLOGFP) {
-        if (option) {
-#ifdef LOGGING_PROCESS_TIME
-            DWORD proc_time = timeGetTime() - start_time;
-            fprintf(QLOGFP, "[%d.%03d]", proc_time / 1000, proc_time % 1000);
-#endif /* LOGGING_PROCESS_TIME */
-        }
-        vfprintf(QLOGFP, fmt, args);
-        fflush(QLOGFP);
-    }
-
-    LEAVE_QLOG_CS;
-    GENERAL_ERRNO_SET(gerrno);
-
-    return 1;
-}
-int qlog(const char *fmt, ...) {
-    int ret = 0;
-    unsigned int option = 1;
-    va_list args;
-
-    if (!qlog_on)
-        return ret;
-
-    va_start(args, fmt);
-    ret = qlog_misc(option, fmt, args);
-    va_end(args);
-    return ret;
-}
-int qprintf(char *fmt, ...) {
-    int ret = 0;
-    va_list args;
-
-    va_start(args, fmt);
-    ret = qlog_misc(0, fmt, args);
-    va_end(args);
-    return ret;
-}
-
-static void qlog_initialize(void) {
-    INIT_QLOG_CS;
-}
-static void qlog_finalize(void) {
-    qlog_on = 0;
-    if (QLOGFP) {
-        fclose(QLOGFP);
-        QLOGFP = NULL;
-    }
-    DELETE_QLOG_CS;
-}
+//static int qlog_misc(unsigned int option, const char *fmt, va_list args) {
+//    char filebuf[80];
+//    int gerrno;
+//
+//    if (!qlog_on)
+//        return 0;
+//
+//    gerrno = GENERAL_ERRNO;
+//    ENTER_QLOG_CS;
+//#ifdef LOGGING_PROCESS_TIME
+//    if (!start_time)
+//        start_time = timeGetTime();
+//#endif /* LOGGING_PROCESS_TIME */
+//
+//    if (!QLOGFP) {
+//        generate_filename(logdir ? logdir : QLOGDIR, QLOGFILE, filebuf,
+//                          sizeof(filebuf));
+//        QLOGFP = fopen(filebuf, ES_BINARY_A);
+//        if (!QLOGFP) {
+//            generate_homefile(QLOGFILE, filebuf, sizeof(filebuf));
+//            QLOGFP = fopen(filebuf, ES_BINARY_A);
+//        }
+//        if (!QLOGFP)
+//            qlog_on = 0;
+//    }
+//
+//    if (QLOGFP) {
+//        if (option) {
+//#ifdef LOGGING_PROCESS_TIME
+//            DWORD proc_time = timeGetTime() - start_time;
+//            fprintf(QLOGFP, "[%d.%03d]", proc_time / 1000, proc_time % 1000);
+//#endif /* LOGGING_PROCESS_TIME */
+//        }
+//        vfprintf(QLOGFP, fmt, args);
+//        fflush(QLOGFP);
+//    }
+//
+//    LEAVE_QLOG_CS;
+//    GENERAL_ERRNO_SET(gerrno);
+//
+//    return 1;
+//}
+//int qlog(const char *fmt, ...) {
+//    int ret = 0;
+//    unsigned int option = 1;
+//    va_list args;
+//
+//    if (!qlog_on)
+//        return ret;
+//
+//    va_start(args, fmt);
+//    ret = qlog_misc(option, fmt, args);
+//    va_end(args);
+//    return ret;
+//}
+//int qprintf(char *fmt, ...) {
+//    int ret = 0;
+//    va_list args;
+//
+//    va_start(args, fmt);
+//    ret = qlog_misc(0, fmt, args);
+//    va_end(args);
+//    return ret;
+//}
+//
+//static void qlog_initialize(void) {
+//    INIT_QLOG_CS;
+//}
+//static void qlog_finalize(void) {
+//    qlog_on = 0;
+//    if (QLOGFP) {
+//        fclose(QLOGFP);
+//        QLOGFP = NULL;
+//    }
+//    DELETE_QLOG_CS;
+//}
 
 static int globalDebug = -1;
 int getGlobalDebug() {
@@ -517,7 +517,7 @@ static void start_logging() {
      * out of the connection time or not but doesn't mean the default of
      * ci->drivers.debug(commlog).
      */
-    logs_on_off(0, 0, 0);
+    logs_on_off(0, 0);
     mylog("\t%s:Global.debug&commlog=%d&%d\n", __FUNCTION__, getGlobalDebug(),
           getGlobalCommlog());
 }
@@ -529,14 +529,14 @@ void InitializeLogging(void) {
     if (dir[0])
         logdir = strdup(dir);
     mylog_initialize();
-    qlog_initialize();
+    //qlog_initialize();
     start_logging();
     MYLOG(LOG_DEBUG, "Log Output Dir: %s\n", logdir);
 }
 
 void FinalizeLogging(void) {
     mylog_finalize();
-    qlog_finalize();
+    //qlog_finalize();
     if (logdir) {
         free(logdir);
         logdir = NULL;
