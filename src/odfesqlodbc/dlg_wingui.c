@@ -25,6 +25,7 @@
 #include "connexp.h"
 #include "xalibname.h"
 #endif /* _HANDLE_ENLIST_IN_DTC_ */
+#include <ShlObj_core.h>
 
 #define AUTHMODE_CNT 4
 #define LOGLEVEL_CNT 8
@@ -71,6 +72,24 @@ int GetCurrentLogLevel(HWND hdlg) {
     return log[loglevel_selection_idx];
 }
 
+void SetLoggingVisibility(HWND hdlg, int logLevel) {
+    if (logLevel == IDS_LOGTYPE_OFF) {
+        EnableWindow(GetDlgItem(hdlg, IDC_LOG_PATH), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_BROWSE_BTN), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDOK), TRUE);
+    } else {
+        EnableWindow(GetDlgItem(hdlg, IDC_LOG_PATH), TRUE);
+        EnableWindow(GetDlgItem(hdlg, IDC_BROWSE_BTN), TRUE);
+
+        char buf[LARGE_REGISTRY_LEN];
+        GetDlgItemText(hdlg, IDC_LOG_PATH, buf, sizeof(buf));
+        if (strcmp(buf, "") == 0) {
+            EnableWindow(GetDlgItem(hdlg, IDOK), FALSE);
+        } else {
+            EnableWindow(GetDlgItem(hdlg, IDOK), TRUE);
+        }
+    }
+}
 
 void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
     if (strcmp(am->authtype_str, AUTHTYPE_AWS_PROFILE) == 0) {
@@ -289,6 +308,16 @@ INT_PTR CALLBACK advancedOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
     return FALSE;
 }
 
+static int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam,
+                                    LPARAM lpData) {
+    if (uMsg == BFFM_SETSELECTION) {
+        UNUSED(lParam);
+        LPCTSTR path = (LPCTSTR)lpData;
+        SendMessage(hwnd, BFFM_SETSELECTION, TRUE, (LPARAM)path);
+    }
+    return 0;
+}
+
 INT_PTR CALLBACK logOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
                                 LPARAM lParam) {
     switch (wMsg) {
@@ -319,6 +348,29 @@ INT_PTR CALLBACK logOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
         case WM_COMMAND: {
             ConnInfo *ci = (ConnInfo *)GetWindowLongPtr(hdlg, DWLP_USER);
             switch (GET_WM_COMMAND_ID(wParam, lParam)) {
+                case IDC_BROWSE_BTN: {
+                    BROWSEINFO bi = {0};
+                    bi.lpszTitle = ("Choose log file target directory:");
+                    bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
+                    bi.lpfn = BrowseCallbackProc;
+                    bi.lParam = (LPARAM)ci->drivers.output_dir;
+
+                    LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
+
+                    if (pidl != NULL) {
+                        // get the name of the folder and put it in path
+                        SHGetPathFromIDList(pidl, ci->drivers.output_dir);
+                        SetDlgItemText(hdlg, IDC_LOG_PATH,
+                                       ci->drivers.output_dir);
+                        // free memory used
+                        CoTaskMemFree(pidl);
+                    }
+                    break;
+                }
+                case IDC_LOG_LEVEL: {
+                    SetLoggingVisibility(hdlg, GetCurrentLogLevel(hdlg));
+                    break;
+                }
                 case IDOK: {
                     // Get Dialog Values
                     int log = GetCurrentLogLevel(hdlg);
@@ -359,11 +411,16 @@ INT_PTR CALLBACK logOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
                     setLogDir(ci->drivers.output_dir);
                 }
 
-                case IDCANCEL:
+                case IDCANCEL: {
                     EndDialog(hdlg, FALSE);
                     return TRUE;
                 }
             }
+        }
+        case WM_ENTERIDLE: {
+            SetLoggingVisibility(hdlg, GetCurrentLogLevel(hdlg));
+            break;
+        }
     }
     return FALSE;
 }
