@@ -30,11 +30,9 @@ extern "C" {
 #define ES_TYPE_LO ? ? ? ? /* waiting for permanent type */
 #endif
 
-#define ES_TYPE_NAME_BOOLEAN "boolean"
-#define ES_TYPE_NAME_BYTE "byte"
-#define ES_TYPE_NAME_SHORT "short"
-#define ES_TYPE_NAME_INTEGER "integer"
-#define ES_TYPE_NAME_LONG "long"
+#define TS_TYPE_NAME_BOOLEAN "BOOLEAN"
+#define TS_TYPE_NAME_INTEGER "INTEGER"
+#define TS_TYPE_NAME_BIGINT "BIGINT"
 #define ES_TYPE_NAME_HALF_FLOAT "half_float"
 #define ES_TYPE_NAME_FLOAT "float"
 #define ES_TYPE_NAME_DOUBLE "double"
@@ -47,46 +45,15 @@ extern "C" {
 #define ES_TYPE_NAME_VARCHAR "varchar"
 #define ES_TYPE_NAME_UNSUPPORTED "unsupported"
 
-#define TS_TYPE_NAME_VARCHAR "VARCHAR"
-#define TS_TYPE_NAME_BOOLEAN "BOOLEAN"
-#define TS_TYPE_NAME_BIGINT "BIGINT"
-#define TS_TYPE_NAME_DOUBLE "DOUBLE"
-#define TS_TYPE_NAME_TIMESTAMP "TIMESTAMP"
-#define TS_TYPE_NAME_DATE "DATE"
-#define TS_TYPE_NAME_TIME "TIME"
-#define TS_TYPE_NAME_INTERVAL_DAY_TO_SECOND "INTERVAL_DAY_TO_SECOND"
-#define TS_TYPE_NAME_INTERVAL_YEAR_TO_MONTH "INTERVAL_TEAR_TO_MONTH"
-#define TS_TYPE_NAME_UNKNOWN "UNKNOWN"
-#define TS_TYPE_NAME_INTEGER "INTEGER"
-#define TS_TYPE_NAME_ARRAY "ARRAY"
-#define TS_TYPE_NAME_ROW "ROW"
-#define TS_TYPE_NAME_TIMESERIES "TIMESERIES"
-
-// TODO Figure out the number
-#define TS_TYPE_VARCHAR 0 
-#define TS_TYPE_BOOLEAN 1
-#define TS_TYPE_BIGINT 2
-#define TS_TYPE_DOUBLE 3
-#define TS_TYPE_TIMESTAMP 4
-#define TS_TYPE_DATE 5
-#define TS_TYPE_TIME 6
-#define TS_TYPE_INTERVAL_DAY_TO_SECOND 7
-#define TS_TYPE_INTERVAL_YEAR_TO_MONTH 8
-#define TS_TYPE_UNKNOWN 9
-#define TS_TYPE_INTEGER 10
-#define TS_TYPE_ARRAY 11
-#define TS_TYPE_ROW 12
-#define TS_TYPE_TIMESERIES 13
-
 #define MS_ACCESS_SERIAL "int identity"
-#define ES_TYPE_BOOL 16
+#define TS_TYPE_BOOLEAN 16
 #define ES_TYPE_BYTEA 17
 #define ES_TYPE_CHAR 18
 #define ES_TYPE_NAME 19
-#define ES_TYPE_INT8 20
-#define ES_TYPE_INT2 21
+#define TS_TYPE_BIGINT 20
+#define TS_TYPE_INT2 21
 #define ES_TYPE_INT2VECTOR 22
-#define ES_TYPE_INT4 23
+#define TS_TYPE_INTEGER 23
 #define ES_TYPE_REGPROC 24
 #define ES_TYPE_TEXT 25
 #define ES_TYPE_OID 26
@@ -94,7 +61,6 @@ extern "C" {
 #define ES_TYPE_XID 28
 #define ES_TYPE_CID 29
 #define ES_TYPE_OIDVECTOR 30
-#define ES_TYPE_INT1 31
 #define ES_TYPE_HALF_FLOAT 32
 #define ES_TYPE_SCALED_FLOAT 33
 #define ES_TYPE_KEYWORD 34
@@ -106,7 +72,7 @@ extern "C" {
 #define ES_TYPE_FLOAT4 700
 #define ES_TYPE_FLOAT8 701
 #define ES_TYPE_ABSTIME 702
-#define ES_TYPE_UNKNOWN 705
+#define TS_TYPE_UNKNOWN 705
 #define ES_TYPE_MONEY 790
 #define ES_TYPE_MACADDR 829
 #define ES_TYPE_INET 869
@@ -275,15 +241,6 @@ typedef enum {
 #ifdef __cplusplus
 #include <stdint.h>
 
-#ifdef __APPLE__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-#endif  // __APPLE__
-#include "rabbit.hpp"
-#ifdef __APPLE__
-#pragma clang diagnostic pop
-#endif  // __APPLE__
-
 #include <string>
 #include <vector>
 
@@ -331,42 +288,11 @@ typedef struct runtime_options {
 #define KEYWORD_DISPLAY_SIZE 255
 #define KEYWORD_LENGTH_OF_STR 255
 
-// Copied from ColumnInfoClass's 'srvr_info' struct. Comments are the relevant
-// name in 'srvr_info'
-typedef struct ColumnInfo {
-    std::string field_name;    // name
-    uint32_t type_oid;         // adtid
-    int16_t type_size;         // adtsize
-    int32_t display_size;      // longest row
-    int32_t length_of_str;     // the length of bpchar/varchar
-    uint32_t relation_id;      // relid
-    int16_t attribute_number;  // attid
-    ColumnInfo() {
-        field_name = "";
-        type_oid = INVALID_OID;
-        type_size = 0;      // ?
-        display_size = 0;   // ?
-        length_of_str = 0;  // ?
-        relation_id = INVALID_OID;
-        attribute_number = INVALID_OID;
-    }
-} ColumnInfo;
-
 typedef struct TSResult {
-    uint32_t ref_count;  // reference count. A ColumnInfo can be shared by
-                         // several qresults.
-    uint16_t num_fields;
-    std::vector< ColumnInfo > column_info;
-    std::string next_token;
-    std::string result_json;
-    std::string command_type;  // SELECT / FETCH / etc
-    rabbit::document es_result_doc;
+    std::string command_type;  // Timestream supports SELECT for query only
     Aws::TimestreamQuery::Model::QueryResult sdk_result;
-    TSResult() {
-        ref_count = 0;
-        num_fields = 0;
-        result_json = "";
-        command_type = "";
+    TSResult(const std::string& command_type = "SELECT") {
+        this->command_type = command_type;
     }
 } TSResult;
 

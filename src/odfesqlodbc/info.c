@@ -1302,20 +1302,20 @@ RETCODE SQL_API ESAPI_SpecialColumns(
 
     // Setup fields
     QR_set_num_fields(res, NUM_OF_SPECOLS_FIELDS);
-    QR_set_field_info_v(res, SPECOLS_SCOPE, "SCOPE", ES_TYPE_INT2, 2);
+    QR_set_field_info_v(res, SPECOLS_SCOPE, "SCOPE", TS_TYPE_INT2, 2);
     QR_set_field_info_v(res, SPECOLS_COLUMN_NAME, "COLUMN_NAME",
                         ES_TYPE_VARCHAR, MAX_INFO_STRING);
-    QR_set_field_info_v(res, SPECOLS_DATA_TYPE, "DATA_TYPE", ES_TYPE_INT2, 2);
+    QR_set_field_info_v(res, SPECOLS_DATA_TYPE, "DATA_TYPE", TS_TYPE_INT2, 2);
     QR_set_field_info_v(res, SPECOLS_TYPE_NAME, "TYPE_NAME", ES_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, SPECOLS_COLUMN_SIZE, "COLUMN_SIZE", ES_TYPE_INT4,
+    QR_set_field_info_v(res, SPECOLS_COLUMN_SIZE, "COLUMN_SIZE", TS_TYPE_INTEGER,
                         4);
     QR_set_field_info_v(res, SPECOLS_BUFFER_LENGTH, "BUFFER_LENGTH",
-                        ES_TYPE_INT4, 4);
+                        TS_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, SPECOLS_DECIMAL_DIGITS, "DECIMAL_DIGITS",
-                        ES_TYPE_INT2, 2);
+                        TS_TYPE_INT2, 2);
     QR_set_field_info_v(res, SPECOLS_PSEUDO_COLUMN, "PSEUDO_COLUMN",
-                        ES_TYPE_INT2, 2);
+                        TS_TYPE_INT2, 2);
 
     // Set result to okay and adjust fields if keys exist
     QR_set_rstatus(res, PORES_FIELDS_OK);
@@ -1373,19 +1373,19 @@ RETCODE SQL_API ESAPI_Statistics(
                         MAX_INFO_STRING);
     QR_set_field_info_v(res, STATS_TABLE_NAME, "TABLE_NAME", ES_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, STATS_NON_UNIQUE, "NON_UNIQUE", ES_TYPE_INT2, 2);
+    QR_set_field_info_v(res, STATS_NON_UNIQUE, "NON_UNIQUE", TS_TYPE_INT2, 2);
     QR_set_field_info_v(res, STATS_INDEX_QUALIFIER, "INDEX_QUALIFIER",
                         ES_TYPE_VARCHAR, MAX_INFO_STRING);
     QR_set_field_info_v(res, STATS_INDEX_NAME, "INDEX_NAME", ES_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, STATS_TYPE, "TYPE", ES_TYPE_INT2, 2);
-    QR_set_field_info_v(res, STATS_SEQ_IN_INDEX, "SEQ_IN_INDEX", ES_TYPE_INT2,
+    QR_set_field_info_v(res, STATS_TYPE, "TYPE", TS_TYPE_INT2, 2);
+    QR_set_field_info_v(res, STATS_SEQ_IN_INDEX, "SEQ_IN_INDEX", TS_TYPE_INT2,
                         2);
     QR_set_field_info_v(res, STATS_COLUMN_NAME, "COLUMN_NAME", ES_TYPE_VARCHAR,
                         MAX_INFO_STRING);
     QR_set_field_info_v(res, STATS_COLLATION, "COLLATION", ES_TYPE_CHAR, 1);
-    QR_set_field_info_v(res, STATS_CARDINALITY, "CARDINALITY", ES_TYPE_INT4, 4);
-    QR_set_field_info_v(res, STATS_PAGES, "PAGES", ES_TYPE_INT4, 4);
+    QR_set_field_info_v(res, STATS_CARDINALITY, "CARDINALITY", TS_TYPE_INTEGER, 4);
+    QR_set_field_info_v(res, STATS_PAGES, "PAGES", TS_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, STATS_FILTER_CONDITION, "FILTER_CONDITION",
                         ES_TYPE_VARCHAR, MAX_INFO_STRING);
 
@@ -1521,7 +1521,7 @@ RETCODE SQL_API ESAPI_PrimaryKeys(HSTMT hstmt,
                         MAX_INFO_STRING);
     QR_set_field_info_v(res, PKS_COLUMN_NAME, "COLUMN_NAME", ES_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, PKS_KEY_SQ, "KEY_SEQ", ES_TYPE_INT2, 2);
+    QR_set_field_info_v(res, PKS_KEY_SQ, "KEY_SEQ", TS_TYPE_INT2, 2);
     QR_set_field_info_v(res, PKS_PK_NAME, "PK_NAME", ES_TYPE_VARCHAR,
                         MAX_INFO_STRING);
 
@@ -1595,14 +1595,14 @@ RETCODE SQL_API ESAPI_ForeignKeys(
                         MAX_INFO_STRING);
     QR_set_field_info_v(res, FKS_FKCOLUMN_NAME, "FKCOLUMN_NAME",
                         ES_TYPE_VARCHAR, MAX_INFO_STRING);
-    QR_set_field_info_v(res, FKS_KEY_SEQ, "KEY_SEQ", ES_TYPE_INT2, 2);
-    QR_set_field_info_v(res, FKS_UPDATE_RULE, "UPDATE_RULE", ES_TYPE_INT2, 2);
-    QR_set_field_info_v(res, FKS_DELETE_RULE, "DELETE_RULE", ES_TYPE_INT2, 2);
+    QR_set_field_info_v(res, FKS_KEY_SEQ, "KEY_SEQ", TS_TYPE_INT2, 2);
+    QR_set_field_info_v(res, FKS_UPDATE_RULE, "UPDATE_RULE", TS_TYPE_INT2, 2);
+    QR_set_field_info_v(res, FKS_DELETE_RULE, "DELETE_RULE", TS_TYPE_INT2, 2);
     QR_set_field_info_v(res, FKS_FK_NAME, "FK_NAME", ES_TYPE_VARCHAR,
                         MAX_INFO_STRING);
     QR_set_field_info_v(res, FKS_PK_NAME, "PK_NAME", ES_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, FKS_DEFERRABILITY, "DEFERRABILITY", ES_TYPE_INT2,
+    QR_set_field_info_v(res, FKS_DEFERRABILITY, "DEFERRABILITY", TS_TYPE_INT2,
                         2);
     QR_set_field_info_v(res, FKS_TRIGGER_NAME, "TRIGGER_NAME", ES_TYPE_VARCHAR,
                         MAX_INFO_STRING);
@@ -1669,32 +1669,32 @@ RETCODE SQL_API ESAPI_ProcedureColumns(
                         ES_TYPE_VARCHAR, MAX_INFO_STRING);
     QR_set_field_info_v(res, PROCOLS_COLUMN_NAME, "COLUMN_NAME",
                         ES_TYPE_VARCHAR, MAX_INFO_STRING);
-    QR_set_field_info_v(res, PROCOLS_COLUMN_TYPE, "COLUMN_TYPE", ES_TYPE_INT2,
+    QR_set_field_info_v(res, PROCOLS_COLUMN_TYPE, "COLUMN_TYPE", TS_TYPE_INT2,
                         2);
-    QR_set_field_info_v(res, PROCOLS_DATA_TYPE, "DATA_TYPE", ES_TYPE_INT2, 2);
+    QR_set_field_info_v(res, PROCOLS_DATA_TYPE, "DATA_TYPE", TS_TYPE_INT2, 2);
     QR_set_field_info_v(res, PROCOLS_TYPE_NAME, "TYPE_NAME", ES_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, PROCOLS_COLUMN_SIZE, "COLUMN_SIZE", ES_TYPE_INT4,
+    QR_set_field_info_v(res, PROCOLS_COLUMN_SIZE, "COLUMN_SIZE", TS_TYPE_INTEGER,
                         4);
     QR_set_field_info_v(res, PROCOLS_BUFFER_LENGTH, "BUFFER_LENGTH",
-                        ES_TYPE_INT4, 4);
+                        TS_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, PROCOLS_DECIMAL_DIGITS, "DECIMAL_DIGITS",
-                        ES_TYPE_INT2, 2);
+                        TS_TYPE_INT2, 2);
     QR_set_field_info_v(res, PROCOLS_NUM_PREC_RADIX, "NUM_PREC_RADIX",
-                        ES_TYPE_INT2, 2);
-    QR_set_field_info_v(res, PROCOLS_NULLABLE, "NULLABLE", ES_TYPE_INT2, 2);
+                        TS_TYPE_INT2, 2);
+    QR_set_field_info_v(res, PROCOLS_NULLABLE, "NULLABLE", TS_TYPE_INT2, 2);
     QR_set_field_info_v(res, PROCOLS_REMARKS, "REMARKS", ES_TYPE_VARCHAR,
                         MAX_INFO_STRING);
     QR_set_field_info_v(res, PROCOLS_COLUMN_DEF, "COLUMN_DEF", ES_TYPE_VARCHAR,
                         MAX_INFO_STRING);
     QR_set_field_info_v(res, PROCOLS_SQL_DATA_TYPE, "SQL_DATA_TYPE",
-                        ES_TYPE_INT2, 2);
+                        TS_TYPE_INT2, 2);
     QR_set_field_info_v(res, PROCOLS_SQL_DATETIME_SUB, "SQL_DATETIME_SUB",
-                        ES_TYPE_INT2, 2);
+                        TS_TYPE_INT2, 2);
     QR_set_field_info_v(res, PROCOLS_CHAR_OCTET_LENGTH, "CHAR_OCTET_LENGTH",
-                        ES_TYPE_INT4, 4);
+                        TS_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, PROCOLS_ORDINAL_POSITION, "ORDINAL_POSITION",
-                        ES_TYPE_INT4, 4);
+                        TS_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, PROCOLS_IS_NULLABLE, "IS_NULLABLE",
                         ES_TYPE_VARCHAR, MAX_INFO_STRING);
 
@@ -1756,15 +1756,15 @@ RETCODE SQL_API ESAPI_Procedures(HSTMT hstmt,
     QR_set_field_info_v(res, PRO_PROCEDURE_NAME, "PRO_PROCEDURE_NAME",
                         ES_TYPE_VARCHAR, MAX_INFO_STRING);
     QR_set_field_info_v(res, PRO_NUM_INPUT_PARAMS, "PRO_NUM_INPUT_PARAMS",
-                        ES_TYPE_INT4, 4);
+                        TS_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, PRO_NUM_OUTPUT_PARAMS, "PRO_NUM_OUTPUT_PARAMS",
-                        ES_TYPE_INT4, 4);
-    QR_set_field_info_v(res, PRO_RESULT_SETS, "PRO_RESULT_SETS", ES_TYPE_INT4,
+                        TS_TYPE_INTEGER, 4);
+    QR_set_field_info_v(res, PRO_RESULT_SETS, "PRO_RESULT_SETS", TS_TYPE_INTEGER,
                         4);
     QR_set_field_info_v(res, PRO_REMARKS, "PRO_REMARKS", ES_TYPE_VARCHAR,
                         MAX_INFO_STRING);
     QR_set_field_info_v(res, PRO_PROCEDURE_TYPE, "PRO_PROCEDURE_TYPE",
-                        ES_TYPE_INT2, 2);
+                        TS_TYPE_INT2, 2);
 
     // Set result to okay and adjust fields if keys exist
     QR_set_rstatus(res, PORES_FIELDS_OK);
