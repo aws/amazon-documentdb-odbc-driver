@@ -31,8 +31,8 @@
 			<RegistryValue Type="string" Name="ConnectionTimeout" Value="1000" />
 			<RegistryValue Type="string" Name="RequestTimeout" Value="3000" />
 			<RegistryValue Type="string" Name="MaxConnections" Value="25" />
-			<RegistryValue Type="string" Name="LogLevel" Value="3" />
-			<RegistryValue Type="string" Name="LogOutput" Value="C:\" />
+			<RegistryValue Type="string" Name="LogLevel" Value="0" />
+      <RegistryValue Type="string" Name="LogOutput" Value="" />
 		</RegistryKey>
 
 	</CPackWiXFragment>

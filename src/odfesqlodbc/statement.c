@@ -1276,7 +1276,7 @@ void SC_log_error(const char *func, const char *desc,
             head = "STATEMENT WARNING";
         else {
             head = "STATEMENT ERROR";
-            QLOG(level, "%s: func=%s, desc='%s', errnum=%d, errmsg='%s'\n",
+            MYLOG(level, "%s: func=%s, desc='%s', errnum=%d, errmsg='%s'\n",
                  head, func, desc, self->__error_number,
                  NULLCHECK(self->__error_message));
         }
@@ -1284,57 +1284,58 @@ void SC_log_error(const char *func, const char *desc,
               head, func, desc, self->__error_number,
               NULLCHECK(self->__error_message));
         if (SC_get_errornumber(self) > 0) {
-            QLOG(level,
+            MYLOG(level,
                  "                 "
                  "------------------------------------------------------------"
                  "\n");
-            QLOG(level, "                 hdbc=%p, stmt=%p, result=%p\n",
+            MYLOG(level, "                 hdbc=%p, stmt=%p, result=%p\n",
                  self->hdbc, self, res);
-            QLOG(level, "                 prepare=%d, external=%d\n",
+            MYLOG(level, "                 prepare=%d, external=%d\n",
                  self->prepare, self->external);
-            QLOG(level, "                 bindings=%p, bindings_allocated=%d\n",
+            MYLOG(level,
+                  "                 bindings=%p, bindings_allocated=%d\n",
                  opts->bindings, opts->allocated);
-            QLOG(level,
+            MYLOG(level,
                  "                 parameters=%p, parameters_allocated=%d\n",
                  apdopts->parameters, apdopts->allocated);
-            QLOG(level, "                 statement_type=%d, statement='%s'\n",
+            MYLOG(level, "                 statement_type=%d, statement='%s'\n",
                  self->statement_type, NULLCHECK(self->statement));
-            QLOG(level,
+            MYLOG(level,
                  "                 currTuple=" FORMAT_LEN
                  ", current_col=%d, lobj_fd=%d\n",
                  self->currTuple, self->current_col, self->lobj_fd);
-            QLOG(level,
+            MYLOG(level,
                  "                 maxRows=" FORMAT_LEN
                  ", rowset_size=" FORMAT_LEN ", keyset_size=" FORMAT_LEN
                  ", cursor_type=" FORMAT_UINTEGER
                  ", scroll_concurrency=" FORMAT_UINTEGER "\n",
                  self->options.maxRows, rowsetSize, self->options.keyset_size,
                  self->options.cursor_type, self->options.scroll_concurrency);
-            QLOG(level, "                 cursor_name='%s'\n",
+            MYLOG(level, "                 cursor_name='%s'\n",
                  SC_cursor_name(self));
 
-            QLOG(level,
+            MYLOG(level,
                  "                 ----------------QResult Info "
                  "-------------------------------\n");
 
             if (res) {
-                QLOG(level,
+                MYLOG(level,
                      "                 fields=%p, backend_tuples=%p, "
                      "tupleField=%p, conn=%p\n",
                      QR_get_fields(res), res->backend_tuples, res->tupleField,
                      res->conn);
-                QLOG(level,
+                MYLOG(level,
                      "                 fetch_count=" FORMAT_LEN
                      ", num_total_rows=" FORMAT_ULEN
                      ", num_fields=%d, cursor='%s'\n",
                      res->fetch_number, QR_get_num_total_tuples(res),
                      res->num_fields, NULLCHECK(QR_get_cursor(res)));
-                QLOG(level,
+                MYLOG(level,
                      "                 message='%s', command='%s', "
                      "notice='%s'\n",
                      NULLCHECK(QR_get_message(res)), NULLCHECK(res->command),
                      NULLCHECK(res->notice));
-                QLOG(level, "                 status=%d\n",
+                MYLOG(level, "                 status=%d\n",
                      QR_get_rstatus(res));
             }
 

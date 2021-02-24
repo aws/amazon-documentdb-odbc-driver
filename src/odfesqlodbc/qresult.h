@@ -283,7 +283,7 @@ void QR_set_next_token(QResultClass *self, const char *next_token);
     do {                                               \
         if (t = (tp *)malloc(s), NULL == t) {          \
             QR_set_rstatus(a, PORES_NO_MEMORY_ERROR);  \
-            qlog("QR_MALLOC_error\n");                 \
+            mylog("QR_MALLOC_error\n");                 \
             QR_free_memory(a);                         \
             QR_set_messageref(a, m);                   \
             return r;                                  \
@@ -294,7 +294,7 @@ void QR_set_next_token(QResultClass *self, const char *next_token);
         tp *tmp;                                        \
         if (tmp = (tp *)realloc(t, s), NULL == tmp) {   \
             QR_set_rstatus(a, PORES_NO_MEMORY_ERROR);   \
-            qlog("QR_REALLOC_error\n");                 \
+            mylog("QR_REALLOC_error\n");                 \
             QR_free_memory(a);                          \
             QR_set_messageref(a, m);                    \
             return r;                                   \

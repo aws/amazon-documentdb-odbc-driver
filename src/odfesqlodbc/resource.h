@@ -96,6 +96,7 @@
 #define IDC_IDP_ARN_STATIC              1148
 #define IDC_AAD_TENANT2                 1149
 #define IDC_IDP_ARN                     1149
+#define IDC_BROWSE_BTN                  1150
 
 // Next default values for new objects
 // 
@@ -103,7 +104,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        113
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1135
+#define _APS_NEXT_CONTROL_VALUE         1136
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
