@@ -282,16 +282,16 @@ estype_attr_to_concise_type(const ConnectionClass *conn, OID type,
         case ES_TYPE_LO_UNDEFINED:
             return SQL_LONGVARBINARY;
 
-        case ES_TYPE_INT2:
+        case TS_TYPE_INT2:
             return SQL_SMALLINT;
 
         case ES_TYPE_OID:
         case ES_TYPE_XID:
-        case ES_TYPE_INT4:
+        case TS_TYPE_INTEGER:
             return SQL_INTEGER;
 
             /* Change this to SQL_BIGINT for ODBC v3 bjm 2001-01-23 */
-        case ES_TYPE_INT8:
+        case TS_TYPE_BIGINT:
             if (conn->ms_jet)
                 return SQL_NUMERIC; /* maybe a little better than SQL_VARCHAR */
             return SQL_BIGINT;
@@ -320,7 +320,7 @@ estype_attr_to_concise_type(const ConnectionClass *conn, OID type,
             return SQL_TIMESTAMP;
         case ES_TYPE_MONEY:
             return SQL_FLOAT;
-        case ES_TYPE_BOOL:
+        case TS_TYPE_BOOLEAN:
             return SQL_BIT;
         case ES_TYPE_XML:
             return ansi_to_wtype(conn, SQL_LONGVARCHAR);
@@ -403,18 +403,18 @@ estype_attr_to_ctype(const ConnectionClass *conn, OID type, int atttypmod) {
 #endif /* ES_INTERVAL_A_SQL_INTERVAL */
 
     switch (type) {
-        case ES_TYPE_INT8:
+        case TS_TYPE_BIGINT:
             if (!conn->ms_jet)
                 return ALLOWED_C_BIGINT;
             return SQL_C_CHAR;
         case ES_TYPE_NUMERIC:
             return SQL_C_CHAR;
-        case ES_TYPE_INT2:
+        case TS_TYPE_INT2:
             return SQL_C_SSHORT;
         case ES_TYPE_OID:
         case ES_TYPE_XID:
             return SQL_C_ULONG;
-        case ES_TYPE_INT4:
+        case TS_TYPE_INTEGER:
             return SQL_C_SLONG;
         case ES_TYPE_FLOAT4:
             return SQL_C_FLOAT;
@@ -437,7 +437,7 @@ estype_attr_to_ctype(const ConnectionClass *conn, OID type, int atttypmod) {
             return SQL_C_TIMESTAMP;
         case ES_TYPE_MONEY:
             return SQL_C_FLOAT;
-        case ES_TYPE_BOOL:
+        case TS_TYPE_BOOLEAN:
             return SQL_C_BIT;
 
         case ES_TYPE_BYTEA:
@@ -478,16 +478,12 @@ const char *estype_attr_to_name(const ConnectionClass *conn, OID type,
                                 int typmod, BOOL auto_increment) {
     UNUSED(conn, typmod, conn, auto_increment);
     switch (type) {
-        case ES_TYPE_BOOL:
-            return ES_TYPE_NAME_BOOLEAN;
-        case ES_TYPE_INT1:
-            return ES_TYPE_NAME_BYTE;
-        case ES_TYPE_INT2:
-            return ES_TYPE_NAME_SHORT;
-        case ES_TYPE_INT4:
-            return ES_TYPE_NAME_INTEGER;
-        case ES_TYPE_INT8:
-            return ES_TYPE_NAME_LONG;
+        case TS_TYPE_BOOLEAN:
+            return TS_TYPE_NAME_BOOLEAN;
+        case TS_TYPE_INTEGER:
+            return TS_TYPE_NAME_INTEGER;
+        case TS_TYPE_BIGINT:
+            return TS_TYPE_NAME_BIGINT;
         case ES_TYPE_HALF_FLOAT:
             return ES_TYPE_NAME_HALF_FLOAT;
         case ES_TYPE_FLOAT4:
@@ -518,15 +514,13 @@ estype_attr_column_size(const ConnectionClass *conn, OID type, int atttypmod,
                         int adtsize_or_longest, int handle_unknown_size_as) {
     UNUSED(handle_unknown_size_as, adtsize_or_longest, atttypmod, conn);
     switch (type) {
-        case ES_TYPE_BOOL:
+        case TS_TYPE_BOOLEAN:
             return 1;
-        case ES_TYPE_INT1:
-            return 3;
-        case ES_TYPE_INT2:
+        case TS_TYPE_INT2:
             return 5;
-        case ES_TYPE_INT4:
+        case TS_TYPE_INTEGER:
             return 10;
-        case ES_TYPE_INT8:
+        case TS_TYPE_BIGINT:
             return 19;
         case ES_TYPE_HALF_FLOAT:
             return 7;
@@ -577,17 +571,17 @@ Int4 estype_attr_display_size(const ConnectionClass *conn, OID type,
     int dsize;
 
     switch (type) {
-        case ES_TYPE_INT2:
+        case TS_TYPE_INT2:
             return 6;
 
         case ES_TYPE_OID:
         case ES_TYPE_XID:
             return 10;
 
-        case ES_TYPE_INT4:
+        case TS_TYPE_INTEGER:
             return 11;
 
-        case ES_TYPE_INT8:
+        case TS_TYPE_BIGINT:
             return 20; /* signed: 19 digits + sign */
 
         case ES_TYPE_NUMERIC:
@@ -631,15 +625,15 @@ Int4 estype_attr_buffer_length(const ConnectionClass *conn, OID type,
     int dsize;
 
     switch (type) {
-        case ES_TYPE_INT2:
+        case TS_TYPE_INT2:
             return 2; /* sizeof(SQLSMALLINT) */
 
         case ES_TYPE_OID:
         case ES_TYPE_XID:
-        case ES_TYPE_INT4:
+        case TS_TYPE_INTEGER:
             return 4; /* sizeof(SQLINTEGER) */
 
-        case ES_TYPE_INT8:
+        case TS_TYPE_BIGINT:
             if (SQL_C_CHAR == estype_attr_to_ctype(conn, type, atttypmod))
                 return 20; /* signed: 19 digits + sign */
             return 8;      /* sizeof(SQLSBININT) */
@@ -720,15 +714,15 @@ Int4 estype_attr_desclength(const ConnectionClass *conn, OID type,
     int dsize;
 
     switch (type) {
-        case ES_TYPE_INT2:
+        case TS_TYPE_INT2:
             return 2;
 
         case ES_TYPE_OID:
         case ES_TYPE_XID:
-        case ES_TYPE_INT4:
+        case TS_TYPE_INTEGER:
             return 4;
 
-        case ES_TYPE_INT8:
+        case TS_TYPE_BIGINT:
             return 20; /* signed: 19 digits + sign */
 
         case ES_TYPE_NUMERIC:
@@ -766,15 +760,15 @@ Int2 estype_attr_decimal_digits(const ConnectionClass *conn, OID type,
                                 int atttypmod, int adtsize_or_longestlen,
                                 int UNUSED_handle_unknown_size_as) {
     switch (type) {
-        case ES_TYPE_INT2:
+        case TS_TYPE_INT2:
         case ES_TYPE_OID:
         case ES_TYPE_XID:
-        case ES_TYPE_INT4:
-        case ES_TYPE_INT8:
+        case TS_TYPE_INTEGER:
+        case TS_TYPE_BIGINT:
         case ES_TYPE_FLOAT4:
         case ES_TYPE_FLOAT8:
         case ES_TYPE_MONEY:
-        case ES_TYPE_BOOL:
+        case TS_TYPE_BOOLEAN:
 
             /*
              * Number of digits to the right of the decimal point in
@@ -826,7 +820,7 @@ Int4 estype_attr_transfer_octet_length(const ConnectionClass *conn, OID type,
         case ES_TYPE_VARCHAR:
         case ES_TYPE_BPCHAR:
         case ES_TYPE_TEXT:
-        case ES_TYPE_UNKNOWN:
+        case TS_TYPE_UNKNOWN:
             column_size = estype_attr_column_size(
                 conn, type, atttypmod, ES_ADT_UNSET, handle_unknown_size_as);
             if (SQL_NO_TOTAL == column_size)
@@ -942,7 +936,7 @@ OID sqltype_to_estype(const ConnectionClass *conn, SQLSMALLINT fSqlType) {
 #endif /* UNICODE_SUPPORT */
 
         case SQL_BIT:
-            esType = ES_TYPE_BOOL;
+            esType = TS_TYPE_BOOLEAN;
             break;
 
         case SQL_TYPE_DATE:
@@ -961,11 +955,11 @@ OID sqltype_to_estype(const ConnectionClass *conn, SQLSMALLINT fSqlType) {
             break;
 
         case SQL_BIGINT:
-            esType = ES_TYPE_INT8;
+            esType = TS_TYPE_BIGINT;
             break;
 
         case SQL_INTEGER:
-            esType = ES_TYPE_INT4;
+            esType = TS_TYPE_INTEGER;
             break;
 
         case SQL_LONGVARBINARY:
@@ -988,7 +982,7 @@ OID sqltype_to_estype(const ConnectionClass *conn, SQLSMALLINT fSqlType) {
 
         case SQL_SMALLINT:
         case SQL_TINYINT:
-            esType = ES_TYPE_INT2;
+            esType = TS_TYPE_INT2;
             break;
 
         case SQL_TIME:
@@ -1314,7 +1308,7 @@ Int2 estype_searchable(const ConnectionClass *conn, OID type) {
 Int2 estype_unsigned(const ConnectionClass *conn, OID type) {
     UNUSED(conn);
     switch (type) {
-        case ES_TYPE_BOOL:
+        case TS_TYPE_BOOLEAN:
         case ES_TYPE_KEYWORD:
         case ES_TYPE_TEXT:
         case ES_TYPE_NESTED:
@@ -1322,10 +1316,9 @@ Int2 estype_unsigned(const ConnectionClass *conn, OID type) {
         case ES_TYPE_OBJECT:
             return SQL_TRUE;
 
-        case ES_TYPE_INT1:
-        case ES_TYPE_INT2:
-        case ES_TYPE_INT4:
-        case ES_TYPE_INT8:
+        case TS_TYPE_INT2:
+        case TS_TYPE_INTEGER:
+        case TS_TYPE_BIGINT:
         case ES_TYPE_HALF_FLOAT:
         case ES_TYPE_FLOAT4:
         case ES_TYPE_FLOAT8:

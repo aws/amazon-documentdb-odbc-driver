@@ -388,7 +388,6 @@ int TSCommunication::ExecDirect(const char* query) {
 
     auto ts_result = new TSResult();
     ts_result->sdk_result = outcome.GetResult();
-    ts_result->next_token = outcome.GetResult().GetNextToken();
     while (!m_result_queue.push(QUEUE_TIMEOUT, ts_result)) {
         if (ConnStatusType::CONNECTION_OK == m_status) {
             return -1;
@@ -421,16 +420,13 @@ void TSCommunication::SendCursorQueries(
                 LogMsg(LOG_ERROR, outcome.GetError().GetMessage().c_str());
                 return;
             }
+            next_token = outcome.GetResult().GetNextToken();
 
             auto result = new TSResult();
             result->sdk_result = outcome.GetResult();
-            result->next_token = outcome.GetResult().GetNextToken();
-
             while (m_is_retrieving
                    && !m_result_queue.push(QUEUE_TIMEOUT, result)) {
             }
-
-            next_token = result->next_token;
         }
     } catch (std::runtime_error& e) {
         std::string error_message =
