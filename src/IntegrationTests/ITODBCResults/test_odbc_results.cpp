@@ -968,8 +968,8 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_CHAR) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_SBIGINT) {
-    long int v1 = 3147483648l;
-    long int v2 = 3147483649l;
+    auto v1 = 2147483649ll;
+    auto v2 = 2147483649ll;
     v2 *= -1;
     std::wstring columns = L"BIGINT\'" + std::to_wstring(v1) + L"\', BIGINT\'"
                            + std::to_wstring(v2) + L"\'";
@@ -987,12 +987,11 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_SBIGINT) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_UBIGINT) {
-    long int v1 = 3147483648l;
-    unsigned long int uv1 = v1;
-    long int v2 = 3147483649l;
+    auto v1 = 2147483649ll;
+    unsigned long long uv1 = v1;
+    auto v2 = 2147483649ll;
     v2 *= -1;
-    unsigned long int uv2 = v2;
-
+    unsigned long long uv2 = v2;
     std::wstring columns = L"BIGINT\'" + std::to_wstring(v1) + L"\', BIGINT\'"
                            + std::to_wstring(v2) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -1009,8 +1008,8 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_UBIGINT) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_CHAR) {
-    long int v1 = 2147483648l;
-    long int v2 = 2147483649l;
+    auto v1 = 2147483649ll;
+    auto v2 = 2147483649ll;
     v2 *= -1;
     std::wstring columns = L"BIGINT\'" + std::to_wstring(v1) + L"\', BIGINT\'"
                            + std::to_wstring(v2) + L"\'";
