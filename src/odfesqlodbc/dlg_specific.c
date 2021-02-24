@@ -311,7 +311,7 @@ static void getCiDefaults(ConnInfo *ci) {
 #ifdef __APPLE__
     strcpy(ci->drivers.output_dir, "/tmp/");
 #else
-    strcpy(ci->drivers.output_dir, "C:\\");
+    strcpy(ci->drivers.output_dir, "");
 #endif
 }
 

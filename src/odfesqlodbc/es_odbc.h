@@ -569,7 +569,7 @@ RETCODE SQL_API ER_ReturnError(ES_ErrorInfo *, SQLSMALLINT, UCHAR *,
                                SQLINTEGER *, UCHAR *, SQLSMALLINT,
                                SQLSMALLINT *, UWORD);
 
-void logs_on_off(int cnopen, int, int);
+void logs_on_off(int cnopen, int);
 
 #define ES_TYPE_LO_UNDEFINED         \
     (-999) /* hack until permanent \ \

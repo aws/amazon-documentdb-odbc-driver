@@ -1599,31 +1599,31 @@ RETCODE SQL_API ESAPI_SetConnectAttr(HDBC ConnectionHandle,
         case SQL_ATTR_ESOPT_DEBUG:
             newValue = CAST_UPTR(SQLCHAR, Value);
             if (newValue > 0) {
-                logs_on_off(-1, conn->connInfo.drivers.loglevel, 0);
+                logs_on_off(-1, conn->connInfo.drivers.loglevel);
                 conn->connInfo.drivers.loglevel = (char)newValue;
-                logs_on_off(1, conn->connInfo.drivers.loglevel, 0);
+                logs_on_off(1, conn->connInfo.drivers.loglevel);
                 MYLOG(LOG_DEBUG, "debug => %d\n",
                       conn->connInfo.drivers.loglevel);
             } else if (newValue == 0 && conn->connInfo.drivers.loglevel > 0) {
                 MYLOG(LOG_DEBUG, "debug => %d\n", newValue);
-                logs_on_off(-1, conn->connInfo.drivers.loglevel, 0);
+                logs_on_off(-1, conn->connInfo.drivers.loglevel);
                 conn->connInfo.drivers.loglevel = (char)newValue;
-                logs_on_off(1, 0, 0);
+                logs_on_off(1, 0);
             }
             break;
         case SQL_ATTR_ESOPT_COMMLOG:
             newValue = CAST_UPTR(SQLCHAR, Value);
             if (newValue > 0) {
-                logs_on_off(-1, 0, conn->connInfo.drivers.loglevel);
+                logs_on_off(-1, 0);
                 conn->connInfo.drivers.loglevel = (char)newValue;
-                logs_on_off(1, 0, conn->connInfo.drivers.loglevel);
+                logs_on_off(1, 0);
                 MYLOG(LOG_DEBUG, "commlog => %d\n",
                       conn->connInfo.drivers.loglevel);
             } else if (newValue == 0 && conn->connInfo.drivers.loglevel > 0) {
                 MYLOG(LOG_DEBUG, "commlog => %d\n", newValue);
-                logs_on_off(-1, 0, conn->connInfo.drivers.loglevel);
+                logs_on_off(-1, 0);
                 conn->connInfo.drivers.loglevel = (char)newValue;
-                logs_on_off(1, 0, 0);
+                logs_on_off(1, 0);
             }
             break;
         default:

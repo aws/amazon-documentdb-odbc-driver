@@ -194,7 +194,7 @@ static SQLRETURN SetupConnString(const SQLCHAR *conn_str_in,
                      func);
         return SQL_ERROR;
     }
-    logs_on_off(1, ci->drivers.loglevel, ci->drivers.loglevel);
+    logs_on_off(1, ci->drivers.loglevel);
 
     //Sets log output dir to path retrived from connection string
     //If connection string doesn't have log path then takes value from DSN
