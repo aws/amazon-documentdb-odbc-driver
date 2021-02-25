@@ -769,7 +769,7 @@ class TestSQLGetData : public testing::Test {
 //        (data == distance_miles_1 || data == distance_miles_2);
 //    EXPECT_TRUE(found_expected_data);
 //}
-
+/*
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_STINYINT) {
     int v1 = -293719;
     int v2 = 741370;
@@ -1127,6 +1127,47 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_CHAR) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     ASSERT_EQ(1, indicator);
     EXPECT_EQ('0', data[0]);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_CHAR) {
+    std::wstring columns = L"ARRAY[ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]], ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]]], ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[1, 2, 3]]]]]]]]]]]]";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::string expected;
+    expected = "[[[[1.1,2.3],[1.1,2.3]]],[[[1.1,2.3],[1.1,2.3]]]]";
+    ASSERT_EQ((int)expected.size(), indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    expected = "[[[[[[[[[[[[1,2,3]]]]]]]]]]]]";
+    ASSERT_EQ((int)expected.size(), indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+*/
+TEST_F(TestSQLGetData, ROW_TO_SQL_C_CHAR) {
+    std::wstring columns =
+        L"ROW(ROW(ROW(INTEGER '03', BIGINT '10', true), ARRAY[ARRAY[1,2],ARRAY[1.1,2.2]])), ROW(true)";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::string expected;
+    expected = "(((3,10,true),[[1.0,2.0],[1.1,2.2]]))";
+    ASSERT_EQ((int)expected.size(), indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    expected = "(true)";
+    ASSERT_EQ((int)expected.size(), indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
