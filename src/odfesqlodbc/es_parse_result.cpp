@@ -347,7 +347,8 @@ bool AssignColumnHeaders(QResultClass *q_res,
                 column_type_id = ES_TYPE_VARCHAR;
                 column_size = ES_VARCHAR_SIZE;
             } else if (type.RowColumnInfoHasBeenSet()) {
-            
+                column_type_id = ES_TYPE_VARCHAR;
+                column_size = ES_VARCHAR_SIZE;
             } else if (type.TimeSeriesMeasureValueColumnInfoHasBeenSet()) {
             
             } else {
@@ -395,6 +396,9 @@ void parseArray(
             }
         } else if (datum.TimeSeriesValueHasBeenSet()) {
         } else if (datum.NullValueHasBeenSet()) {
+            if (datum.GetNullValue()) {
+                array_value += "-";
+            }
         } else {
             // Empty
         }
@@ -419,6 +423,9 @@ void parseRow(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
             }
         } else if (datum.TimeSeriesValueHasBeenSet()) {
         } else if (datum.NullValueHasBeenSet()) {
+            if (datum.GetNullValue()) {
+                row_value += "-";
+            }
         } else {
             // Empty
         }
@@ -472,6 +479,14 @@ bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
                 strcpy((char *)tuple[i].value, row_value.c_str());
             } else if (datum.TimeSeriesValueHasBeenSet()) {
             } else if (datum.NullValueHasBeenSet()) {
+                if (datum.GetNullValue()) {
+                    std::string null_value = "-";
+                    tuple[i].len = static_cast< int >(null_value.length());
+                    QR_MALLOC_return_with_error(
+                        tuple[i].value, char, tuple[i].len + 1, q_res,
+                        "Out of memory in allocating item buffer.", false);
+                    strcpy((char *)tuple[i].value, null_value.c_str());
+                }
             } else {
                 // Empty
             }
