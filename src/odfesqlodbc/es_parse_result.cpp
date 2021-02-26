@@ -53,9 +53,19 @@ bool QR_prepare_for_tupledata(QResultClass *q_res);
 void SetError(const char *err);
 void ClearError();
 
-void parseArray(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
+/**
+ * Parse array
+ * @param datums const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &
+ * @param array_value std::string &
+ */
+void ParseArray(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
                 std::string &array_value);
-void parseRow(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
+/**
+ * Parse row
+ * @param datums const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &
+ * @param row_value std::string &
+ */
+void ParseRow(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
               std::string &row_value);
 
 // clang-format off
@@ -382,17 +392,17 @@ bool AssignTableData(TSResult &ts_result, QResultClass *q_res, ColumnInfoClass &
     return true;
 }
 
-void parseArray(
+void ParseArray(
     const Aws::Vector< Aws::TimestreamQuery::Model::Datum > & datums, std::string& array_value) {
     array_value += "[";
     for (auto &datum : datums) {
         if (datum.ScalarValueHasBeenSet()) {
             array_value += datum.GetScalarValue();
         } else if (datum.ArrayValueHasBeenSet()) {
-            parseArray(datum.GetArrayValue(), array_value);
+            ParseArray(datum.GetArrayValue(), array_value);
         } else if (datum.RowValueHasBeenSet()) {
             if (datum.GetRowValue().DataHasBeenSet()) {
-                parseRow(datum.GetRowValue().GetData(), array_value);
+                ParseRow(datum.GetRowValue().GetData(), array_value);
             }
         } else if (datum.TimeSeriesValueHasBeenSet()) {
         } else if (datum.NullValueHasBeenSet()) {
@@ -409,17 +419,17 @@ void parseArray(
     array_value += "]";
 }
 
-void parseRow(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
+void ParseRow(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
               std::string &row_value) {
     row_value += "(";
     for (auto &datum : datums) {
         if (datum.ScalarValueHasBeenSet()) {
             row_value += datum.GetScalarValue();
         } else if (datum.ArrayValueHasBeenSet()) {
-            parseArray(datum.GetArrayValue(), row_value);
+            ParseArray(datum.GetArrayValue(), row_value);
         } else if (datum.RowValueHasBeenSet()) {
             if (datum.GetRowValue().DataHasBeenSet()) {
-                parseRow(datum.GetRowValue().GetData(), row_value);
+                ParseRow(datum.GetRowValue().GetData(), row_value);
             }
         } else if (datum.TimeSeriesValueHasBeenSet()) {
         } else if (datum.NullValueHasBeenSet()) {
@@ -463,7 +473,7 @@ bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
                 strcpy((char *)tuple[i].value, scalar_value.c_str());
             } else if (datum.ArrayValueHasBeenSet()) {
                 std::string array_value;
-                parseArray(datum.GetArrayValue(), array_value);
+                ParseArray(datum.GetArrayValue(), array_value);
                 tuple[i].len = static_cast< int >(array_value.length());
                 QR_MALLOC_return_with_error(
                     tuple[i].value, char, tuple[i].len + 1, q_res,
@@ -471,7 +481,7 @@ bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
                 strcpy((char *)tuple[i].value, array_value.c_str());
             } else if (datum.RowValueHasBeenSet()) {
                 std::string row_value;
-                parseRow(datum.GetRowValue().GetData(), row_value);
+                ParseRow(datum.GetRowValue().GetData(), row_value);
                 tuple[i].len = static_cast< int >(row_value.length());
                 QR_MALLOC_return_with_error(
                     tuple[i].value, char, tuple[i].len + 1, q_res,
