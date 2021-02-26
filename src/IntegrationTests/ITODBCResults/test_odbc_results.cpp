@@ -1150,9 +1150,34 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_CHAR) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
+TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_WCHAR) {
+    std::wstring columns =
+        L"ARRAY[ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]], "
+        L"ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]]], "
+        L"ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY["
+        L"ARRAY[1, 2, 3]]]]]]]]]]]]";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected;
+    expected = L"[[[[1.1,2.3],[1.1,2.3]]],[[[1.1,2.3],[1.1,2.3]]]]";
+    ASSERT_EQ((int)(2*expected.size()), indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    expected = L"[[[[[[[[[[[[1,2,3]]]]]]]]]]]]";
+    ASSERT_EQ((int)(2 * expected.size()), indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
 TEST_F(TestSQLGetData, ROW_TO_SQL_C_CHAR) {
     std::wstring columns =
-        L"ROW(ROW(ROW(INTEGER '03', BIGINT '10', true), ARRAY[ARRAY[1,2],ARRAY[1.1,2.2]])), ROW(true)";
+        L"ROW(ROW(ROW(INTEGER '03', BIGINT '10', true), "
+        L"ARRAY[ARRAY[1,2],ARRAY[1.1,2.2]])), ROW(true)";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLCHAR data[1024] = {0};
     SQLLEN indicator = 0;
@@ -1168,6 +1193,28 @@ TEST_F(TestSQLGetData, ROW_TO_SQL_C_CHAR) {
     expected = "(true)";
     ASSERT_EQ((int)expected.size(), indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, ROW_TO_SQL_C_WCHAR) {
+    std::wstring columns =
+        L"ROW(ROW(ROW(INTEGER '03', BIGINT '10', true), "
+        L"ARRAY[ARRAY[1,2],ARRAY[1.1,2.2]])), ROW(true)";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected;
+    expected = L"(((3,10,true),[[1.0,2.0],[1.1,2.2]]))";
+    ASSERT_EQ((int)(2 * expected.size()), indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    expected = L"(true)";
+    ASSERT_EQ((int)(2 * expected.size()), indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1192,6 +1239,26 @@ TEST_F(TestSQLGetData, NULL_TO_SQL_C_CHAR) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
+TEST_F(TestSQLGetData, NULL_TO_SQL_C_WCHAR) {
+    std::wstring columns = L"null, NULL";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected;
+    expected = L"-";
+    ASSERT_EQ((int)(2 * expected.size()), indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    expected = L"-";
+    ASSERT_EQ((int)(2 * expected.size()), indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
 TEST_F(TestSQLGetData, ARRAY_ROW_NULL_TO_SQL_C_CHAR) {
     std::wstring columns = L"Array[Row(null), Row(NULL)], Row(Array[null], Array[NULL])";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -1209,6 +1276,27 @@ TEST_F(TestSQLGetData, ARRAY_ROW_NULL_TO_SQL_C_CHAR) {
     expected = "([-],[-])";
     ASSERT_EQ((int)expected.size(), indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, ARRAY_ROW_NULL_TO_SQL_C_WCHAR) {
+    std::wstring columns =
+        L"Array[Row(null), Row(NULL)], Row(Array[null], Array[NULL])";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected;
+    expected = L"[(-),(-)]";
+    ASSERT_EQ((int)(2 * expected.size()), indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    expected = L"([-],[-])";
+    ASSERT_EQ((int)(2 * expected.size()), indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
