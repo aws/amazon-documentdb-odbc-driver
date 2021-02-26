@@ -455,20 +455,20 @@ void AssignTableBindTemplates(bind_vector &tabs) {
 void SetupTableQResInfo(QResultClass *res, EnvironmentClass *env) {
     if (EN_is_odbc3(env)) {
         QR_set_field_info_v(res, TABLES_CATALOG_NAME, TABLE_CAT,
-                            ES_TYPE_VARCHAR, MAX_INFO_STRING);
+                            TS_TYPE_VARCHAR, MAX_INFO_STRING);
         QR_set_field_info_v(res, TABLES_SCHEMA_NAME, TABLE_SCHEM,
-                            ES_TYPE_VARCHAR, MAX_INFO_STRING);
+                            TS_TYPE_VARCHAR, MAX_INFO_STRING);
     } else {
         QR_set_field_info_v(res, TABLES_CATALOG_NAME, TABLE_QUALIFIER,
-                            ES_TYPE_VARCHAR, MAX_INFO_STRING);
+                            TS_TYPE_VARCHAR, MAX_INFO_STRING);
         QR_set_field_info_v(res, TABLES_SCHEMA_NAME, TABLE_OWNER,
-                            ES_TYPE_VARCHAR, MAX_INFO_STRING);
+                            TS_TYPE_VARCHAR, MAX_INFO_STRING);
     }
-    QR_set_field_info_v(res, TABLES_TABLE_NAME, TABLE_NAME, ES_TYPE_VARCHAR,
+    QR_set_field_info_v(res, TABLES_TABLE_NAME, TABLE_NAME, TS_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, TABLES_TABLE_TYPE, TABLE_TYPE, ES_TYPE_VARCHAR,
+    QR_set_field_info_v(res, TABLES_TABLE_TYPE, TABLE_TYPE, TS_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, TABLES_REMARKS, REMARKS, ES_TYPE_VARCHAR,
+    QR_set_field_info_v(res, TABLES_REMARKS, REMARKS, TS_TYPE_VARCHAR,
                         INFO_VARCHAR_SIZE);
 }
 
@@ -614,25 +614,25 @@ void AssignColumnBindTemplates(bind_vector &cols);
 void SetupColumnQResInfo(QResultClass *res, EnvironmentClass *unused) {
     (void)(unused);
 
-    QR_set_field_info_v(res, COLUMNS_CATALOG_NAME, TABLE_CAT, ES_TYPE_VARCHAR,
+    QR_set_field_info_v(res, COLUMNS_CATALOG_NAME, TABLE_CAT, TS_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, COLUMNS_SCHEMA_NAME, TABLE_SCHEM, ES_TYPE_VARCHAR,
+    QR_set_field_info_v(res, COLUMNS_SCHEMA_NAME, TABLE_SCHEM, TS_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, COLUMNS_TABLE_NAME, TABLE_NAME, ES_TYPE_VARCHAR,
+    QR_set_field_info_v(res, COLUMNS_TABLE_NAME, TABLE_NAME, TS_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, COLUMNS_COLUMN_NAME, COLUMN_NAME, ES_TYPE_VARCHAR,
+    QR_set_field_info_v(res, COLUMNS_COLUMN_NAME, COLUMN_NAME, TS_TYPE_VARCHAR,
                         MAX_INFO_STRING);
     QR_set_field_info_v(res, COLUMNS_DATA_TYPE, DATA_TYPE, TS_TYPE_INT2, 2);
-    QR_set_field_info_v(res, COLUMNS_TYPE_NAME, TYPE_NAME, ES_TYPE_VARCHAR,
+    QR_set_field_info_v(res, COLUMNS_TYPE_NAME, TYPE_NAME, TS_TYPE_VARCHAR,
                         MAX_INFO_STRING);
     QR_set_field_info_v(res, COLUMNS_PRECISION, COLUMN_SIZE, TS_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, COLUMNS_LENGTH, BUFFER_LENGTH, TS_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, COLUMNS_SCALE, DECIMAL_DIGITS, TS_TYPE_INT2, 2);
     QR_set_field_info_v(res, COLUMNS_RADIX, NUM_PREC_RADIX, TS_TYPE_INT2, 2);
     QR_set_field_info_v(res, COLUMNS_NULLABLE, NULLABLE, TS_TYPE_INT2, 2);
-    QR_set_field_info_v(res, COLUMNS_REMARKS, REMARKS, ES_TYPE_VARCHAR,
+    QR_set_field_info_v(res, COLUMNS_REMARKS, REMARKS, TS_TYPE_VARCHAR,
                         INFO_VARCHAR_SIZE);
-    QR_set_field_info_v(res, COLUMNS_COLUMN_DEF, COLUMN_DEF, ES_TYPE_VARCHAR,
+    QR_set_field_info_v(res, COLUMNS_COLUMN_DEF, COLUMN_DEF, TS_TYPE_VARCHAR,
                         INFO_VARCHAR_SIZE);
     QR_set_field_info_v(res, COLUMNS_SQL_DATA_TYPE, SQL_DATA_TYPE, TS_TYPE_INT2,
                         2);
@@ -642,7 +642,7 @@ void SetupColumnQResInfo(QResultClass *res, EnvironmentClass *unused) {
                         TS_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, COLUMNS_ORDINAL_POSITION, ORDINAL_POSITION,
                         TS_TYPE_INTEGER, 4);
-    QR_set_field_info_v(res, COLUMNS_IS_NULLABLE, IS_NULLABLE, ES_TYPE_VARCHAR,
+    QR_set_field_info_v(res, COLUMNS_IS_NULLABLE, IS_NULLABLE, TS_TYPE_VARCHAR,
                         INFO_VARCHAR_SIZE);
 }
 
@@ -878,16 +878,16 @@ void CleanUp_GetTypeInfo(StatementClass *stmt, const RETCODE ret = SQL_ERROR) {
 }
 
 void SetupTypeQResInfo(QResultClass *res) {
-    QR_set_field_info_v(res, GETTYPE_TYPE_NAME, TYPE_NAME, ES_TYPE_VARCHAR,
+    QR_set_field_info_v(res, GETTYPE_TYPE_NAME, TYPE_NAME, TS_TYPE_VARCHAR,
                         MAX_INFO_STRING);
     QR_set_field_info_v(res, GETTYPE_DATA_TYPE, DATA_TYPE, TS_TYPE_INT2, 2);
     QR_set_field_info_v(res, GETTYPE_COLUMN_SIZE, PRECISION, TS_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, GETTYPE_LITERAL_PREFIX, LITERAL_PREFIX,
-                        ES_TYPE_VARCHAR, MAX_INFO_STRING);
+                        TS_TYPE_VARCHAR, MAX_INFO_STRING);
     QR_set_field_info_v(res, GETTYPE_LITERAL_SUFFIX, LITERAL_SUFFIX,
-                        ES_TYPE_VARCHAR, MAX_INFO_STRING);
+                        TS_TYPE_VARCHAR, MAX_INFO_STRING);
     QR_set_field_info_v(res, GETTYPE_CREATE_PARAMS, CREATE_PARAMS,
-                        ES_TYPE_VARCHAR, MAX_INFO_STRING);
+                        TS_TYPE_VARCHAR, MAX_INFO_STRING);
     QR_set_field_info_v(res, GETTYPE_NULLABLE, NULLABLE, TS_TYPE_INT2, 2);
     QR_set_field_info_v(res, GETTYPE_CASE_SENSITIVE, CASE_SENSITIVE,
                         TS_TYPE_INT2, 2);
@@ -899,7 +899,7 @@ void SetupTypeQResInfo(QResultClass *res) {
     QR_set_field_info_v(res, GETTYPE_AUTO_UNIQUE_VALUE, AUTO_INCREMENT,
                         TS_TYPE_INT2, 2);
     QR_set_field_info_v(res, GETTYPE_LOCAL_TYPE_NAME, LOCAL_TYPE_NAME,
-                        ES_TYPE_VARCHAR, MAX_INFO_STRING);
+                        TS_TYPE_VARCHAR, MAX_INFO_STRING);
     QR_set_field_info_v(res, GETTYPE_MINIMUM_SCALE, MINIMUM_SCALE, TS_TYPE_INT2,
                         2);
     QR_set_field_info_v(res, GETTYPE_MAXIMUM_SCALE, MAXIMUM_SCALE, TS_TYPE_INT2,
