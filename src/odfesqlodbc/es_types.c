@@ -154,7 +154,7 @@ static Int4 getCharColumnSizeX(const ConnectionClass *conn, OID type,
         return maxsize;
     switch (type) {
         case ES_TYPE_BPCHAR:
-        case ES_TYPE_VARCHAR:
+        case TS_TYPE_VARCHAR:
         case ES_TYPE_TEXT:
             return maxsize;
     }
@@ -255,7 +255,7 @@ estype_attr_to_concise_type(const ConnectionClass *conn, OID type,
 
         case ES_TYPE_BPCHAR:
             bFixed = TRUE;
-        case ES_TYPE_VARCHAR:
+        case TS_TYPE_VARCHAR:
             if (getCharColumnSizeX(conn, type, atttypmod, adtsize_or_longestlen,
                                    handle_unknown_size_as)
                 > MAX_VARCHAR_SIZE)
@@ -445,7 +445,7 @@ estype_attr_to_ctype(const ConnectionClass *conn, OID type, int atttypmod) {
         case ES_TYPE_LO_UNDEFINED:
             return SQL_C_BINARY;
         case ES_TYPE_BPCHAR:
-        case ES_TYPE_VARCHAR:
+        case TS_TYPE_VARCHAR:
         case ES_TYPE_TEXT:
             return ansi_to_wtype(conn, SQL_C_CHAR);
         case ES_TYPE_UUID:
@@ -502,7 +502,7 @@ const char *estype_attr_to_name(const ConnectionClass *conn, OID type,
             return ES_TYPE_NAME_DATE;
         case ES_TYPE_OBJECT:
             return ES_TYPE_NAME_OBJECT;
-        case ES_TYPE_VARCHAR:
+        case TS_TYPE_VARCHAR:
             return ES_TYPE_NAME_VARCHAR;
         default:
             return ES_TYPE_NAME_UNSUPPORTED;
@@ -670,7 +670,7 @@ Int4 estype_attr_buffer_length(const ConnectionClass *conn, OID type,
             return 16; /* sizeof(SQLGUID) */
 
             /* Character types use the default precision */
-        case ES_TYPE_VARCHAR:
+        case TS_TYPE_VARCHAR:
         case ES_TYPE_BPCHAR: {
             int coef = 1;
             Int4 prec = estype_attr_column_size(conn, type, atttypmod,
@@ -744,7 +744,7 @@ Int4 estype_attr_desclength(const ConnectionClass *conn, OID type,
         case ES_TYPE_DATETIME:
         case ES_TYPE_TIMESTAMP_NO_TMZONE:
         case ES_TYPE_TIMESTAMP:
-        case ES_TYPE_VARCHAR:
+        case TS_TYPE_VARCHAR:
         case ES_TYPE_BPCHAR:
             return estype_attr_column_size(conn, type, atttypmod,
                                            adtsize_or_longestlen,
@@ -817,7 +817,7 @@ Int4 estype_attr_transfer_octet_length(const ConnectionClass *conn, OID type,
     Int4 maxvarc, column_size;
 
     switch (type) {
-        case ES_TYPE_VARCHAR:
+        case TS_TYPE_VARCHAR:
         case ES_TYPE_BPCHAR:
         case ES_TYPE_TEXT:
         case TS_TYPE_UNKNOWN:
@@ -967,12 +967,12 @@ OID sqltype_to_estype(const ConnectionClass *conn, SQLSMALLINT fSqlType) {
             break;
 
         case SQL_LONGVARCHAR:
-            esType = ES_TYPE_VARCHAR;
+            esType = TS_TYPE_VARCHAR;
             break;
 
 #ifdef UNICODE_SUPPORT
         case SQL_WLONGVARCHAR:
-            esType = ES_TYPE_VARCHAR;
+            esType = TS_TYPE_VARCHAR;
             break;
 #endif /* UNICODE_SUPPORT */
 
@@ -1000,12 +1000,12 @@ OID sqltype_to_estype(const ConnectionClass *conn, SQLSMALLINT fSqlType) {
             break;
 
         case SQL_VARCHAR:
-            esType = ES_TYPE_VARCHAR;
+            esType = TS_TYPE_VARCHAR;
             break;
 
 #ifdef UNICODE_SUPPORT
         case SQL_WVARCHAR:
-            esType = ES_TYPE_VARCHAR;
+            esType = TS_TYPE_VARCHAR;
             break;
 #endif /* UNICODE_SUPPORT */
 
@@ -1121,7 +1121,7 @@ const char *estype_to_name(const StatementClass *stmt, OID type, int col,
 /*
  *	This corresponds to "precision" in ODBC 2.x.
  *
- *	For ES_TYPE_VARCHAR, ES_TYPE_BPCHAR, ES_TYPE_NUMERIC, SQLColumns will
+ *	For TS_TYPE_VARCHAR, ES_TYPE_BPCHAR, ES_TYPE_NUMERIC, SQLColumns will
  *	override this length with the atttypmod length from es_attribute .
  *
  *	If col >= 0, then will attempt to get the info from the result set.
@@ -1199,7 +1199,7 @@ Int4 estype_transfer_octet_length(const StatementClass *stmt, OID type,
     int coef = 1;
     Int4 maxvarc;
     switch (type) {
-        case ES_TYPE_VARCHAR:
+        case TS_TYPE_VARCHAR:
         case ES_TYPE_BPCHAR:
         case ES_TYPE_TEXT:
             if (SQL_NO_TOTAL == column_size)

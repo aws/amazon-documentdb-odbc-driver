@@ -81,11 +81,11 @@ static const std::string JSON_KW_CURSOR = "cursor";
 //    {ES_TYPE_NAME_FLOAT, ES_TYPE_FLOAT4},
 //    {ES_TYPE_NAME_DOUBLE, ES_TYPE_FLOAT8},
 //    {ES_TYPE_NAME_SCALED_FLOAT, ES_TYPE_FLOAT8},
-//    {ES_TYPE_NAME_KEYWORD, ES_TYPE_VARCHAR},
-//    {ES_TYPE_NAME_TEXT, ES_TYPE_VARCHAR},
+//    {ES_TYPE_NAME_KEYWORD, TS_TYPE_VARCHAR},
+//    {ES_TYPE_NAME_TEXT, TS_TYPE_VARCHAR},
 //    {ES_TYPE_NAME_DATE, ES_TYPE_TIMESTAMP},
-//    {ES_TYPE_NAME_OBJECT, ES_TYPE_VARCHAR},
-//    {ES_TYPE_NAME_VARCHAR, ES_TYPE_VARCHAR},
+//    {ES_TYPE_NAME_OBJECT, TS_TYPE_VARCHAR},
+//    {ES_TYPE_NAME_VARCHAR, TS_TYPE_VARCHAR},
 //    {ES_TYPE_NAME_DATE, ES_TYPE_DATE},
 //
 //    {TS_TYPE_NAME_VARCHAR, TS_TYPE_VARCHAR},
@@ -103,7 +103,7 @@ static const std::string JSON_KW_CURSOR = "cursor";
 //    {TS_TYPE_NAME_ARRAY, TS_TYPE_ARRAY},
 //    {TS_TYPE_NAME_TIMESERIES, TS_TYPE_TIMESERIES}};
 
-#define ES_VARCHAR_SIZE (-2)
+#define TS_VARCHAR_SIZE (-2)
 //#define TS_ROW_SIZE (-3)
 //#define TS_ARRAY_SIZE (-4)
 //#define TS_TIMESERIES_SIZE (-5)
@@ -115,20 +115,20 @@ static const std::string JSON_KW_CURSOR = "cursor";
 //    {TS_TYPE_BIGINT, (int16_t)8},
 //    {ES_TYPE_FLOAT4, (int16_t)4},
 //    {ES_TYPE_FLOAT8, (int16_t)8},
-//    {ES_TYPE_VARCHAR, (int16_t)ES_VARCHAR_SIZE},
-//    {ES_TYPE_DATE, (int16_t)ES_VARCHAR_SIZE},
+//    {TS_TYPE_VARCHAR, (int16_t)TS_VARCHAR_SIZE},
+//    {ES_TYPE_DATE, (int16_t)TS_VARCHAR_SIZE},
 //    {ES_TYPE_TIMESTAMP, (int16_t)1},
 //
-//    {TS_TYPE_VARCHAR, (int16_t)ES_VARCHAR_SIZE},
+//    {TS_TYPE_VARCHAR, (int16_t)TS_VARCHAR_SIZE},
 //    {TS_TYPE_BOOLEAN, (int16_t)1},
 //    {TS_TYPE_BIGINT, (int16_t)8},
 //    {TS_TYPE_DOUBLE, (int16_t)8},
 //    {TS_TYPE_TIMESTAMP, (int16_t)1},
-//    {TS_TYPE_DATE, (int16_t)ES_VARCHAR_SIZE},
-//    {TS_TYPE_TIME, (int16_t)ES_VARCHAR_SIZE},
-//    {TS_TYPE_INTERVAL_DAY_TO_SECOND, (int16_t)ES_VARCHAR_SIZE},
-//    {TS_TYPE_INTERVAL_YEAR_TO_MONTH, (int16_t)ES_VARCHAR_SIZE},
-//    {TS_TYPE_UNKNOWN, (int16_t)ES_VARCHAR_SIZE},
+//    {TS_TYPE_DATE, (int16_t)TS_VARCHAR_SIZE},
+//    {TS_TYPE_TIME, (int16_t)TS_VARCHAR_SIZE},
+//    {TS_TYPE_INTERVAL_DAY_TO_SECOND, (int16_t)TS_VARCHAR_SIZE},
+//    {TS_TYPE_INTERVAL_YEAR_TO_MONTH, (int16_t)TS_VARCHAR_SIZE},
+//    {TS_TYPE_UNKNOWN, (int16_t)TS_VARCHAR_SIZE},
 //    {TS_TYPE_INTEGER, (int16_t)4},
 //    {TS_TYPE_ROW, (int16_t)TS_ROW_SIZE},
 //    {TS_ARRAY_SIZE, (int16_t)TS_ARRAY_SIZE},
@@ -344,11 +344,11 @@ bool AssignColumnHeaders(QResultClass *q_res,
                         break;
                 }
             } else if (type.ArrayColumnInfoHasBeenSet()) {
-                column_type_id = ES_TYPE_VARCHAR;
-                column_size = ES_VARCHAR_SIZE;
+                column_type_id = TS_TYPE_VARCHAR;
+                column_size = TS_VARCHAR_SIZE;
             } else if (type.RowColumnInfoHasBeenSet()) {
-                column_type_id = ES_TYPE_VARCHAR;
-                column_size = ES_VARCHAR_SIZE;
+                column_type_id = TS_TYPE_VARCHAR;
+                column_size = TS_VARCHAR_SIZE;
             } else if (type.TimeSeriesMeasureValueColumnInfoHasBeenSet()) {
             
             } else {
