@@ -718,7 +718,7 @@ static int setup_getdataclass(SQLLEN *const length_return,
             switch (field_type) {
                 case TS_TYPE_UNKNOWN:
                 case ES_TYPE_BPCHAR:
-                case ES_TYPE_VARCHAR:
+                case TS_TYPE_VARCHAR:
                 case ES_TYPE_TEXT:
                 case ES_TYPE_BPCHARARRAY:
                 case ES_TYPE_VARCHARARRAY:
@@ -1277,7 +1277,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
             switch (field_type) {
                 case TS_TYPE_UNKNOWN:
                 case ES_TYPE_BPCHAR:
-                case ES_TYPE_VARCHAR:
+                case TS_TYPE_VARCHAR:
                 case ES_TYPE_TEXT:
                 case ES_TYPE_XML:
                 case ES_TYPE_BPCHARARRAY:
