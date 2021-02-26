@@ -1192,6 +1192,26 @@ TEST_F(TestSQLGetData, NULL_TO_SQL_C_CHAR) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
+TEST_F(TestSQLGetData, ARRAY_ROW_NULL_TO_SQL_C_CHAR) {
+    std::wstring columns = L"Array[Row(null), Row(NULL)], Row(Array[null], Array[NULL])";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::string expected;
+    expected = "[(-),(-)]";
+    ASSERT_EQ((int)expected.size(), indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    expected = "([-],[-])";
+    ASSERT_EQ((int)expected.size(), indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
 //TEST_F(TestSQLGetData, GetBitData) {
 //    QueryFetch(single_bit_col, flight_data_set, single_row, &m_hstmt);
 //
