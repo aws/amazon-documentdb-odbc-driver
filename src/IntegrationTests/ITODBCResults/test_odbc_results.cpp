@@ -1164,12 +1164,20 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_WCHAR) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::wstring expected;
     expected = L"[[[[1.1,2.3],[1.1,2.3]]],[[[1.1,2.3],[1.1,2.3]]]]";
-    ASSERT_EQ((int)(2*expected.size()), indicator);
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected.size()), indicator);
+#else
+    ASSERT_EQ((int)(2 * expected.size()), indicator);
+#endif
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"[[[[[[[[[[[[1,2,3]]]]]]]]]]]]";
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected.size()), indicator);
+#else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
+#endif
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -1208,12 +1216,20 @@ TEST_F(TestSQLGetData, ROW_TO_SQL_C_WCHAR) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::wstring expected;
     expected = L"(((3,10,true),[[1.0,2.0],[1.1,2.2]]))";
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected.size()), indicator);
+#else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
+#endif
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"(true)";
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected.size()), indicator);
+#else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
+#endif
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -1249,12 +1265,20 @@ TEST_F(TestSQLGetData, NULL_TO_SQL_C_WCHAR) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::wstring expected;
     expected = L"-";
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected.size()), indicator);
+#else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
+#endif
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"-";
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected.size()), indicator);
+#else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
+#endif
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -1290,12 +1314,20 @@ TEST_F(TestSQLGetData, ARRAY_ROW_NULL_TO_SQL_C_WCHAR) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::wstring expected;
     expected = L"[(-),(-)]";
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected.size()), indicator);
+#else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
+#endif
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"([-],[-])";
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected.size()), indicator);
+#else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
+#endif
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
