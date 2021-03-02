@@ -53,6 +53,21 @@ bool QR_prepare_for_tupledata(QResultClass *q_res);
 void SetError(const char *err);
 void ClearError();
 
+/**
+ * Parse array
+ * @param datums const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &
+ * @param array_value std::string &
+ */
+void ParseArray(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
+                std::string &array_value);
+/**
+ * Parse row
+ * @param datums const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &
+ * @param row_value std::string &
+ */
+void ParseRow(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
+              std::string &row_value);
+
 // clang-format off
 // Not all of these are being used at the moment, but these are the keywords in the json
 static const std::string JSON_KW_SCHEMA = "schema";
@@ -76,11 +91,11 @@ static const std::string JSON_KW_CURSOR = "cursor";
 //    {ES_TYPE_NAME_FLOAT, ES_TYPE_FLOAT4},
 //    {ES_TYPE_NAME_DOUBLE, ES_TYPE_FLOAT8},
 //    {ES_TYPE_NAME_SCALED_FLOAT, ES_TYPE_FLOAT8},
-//    {ES_TYPE_NAME_KEYWORD, ES_TYPE_VARCHAR},
-//    {ES_TYPE_NAME_TEXT, ES_TYPE_VARCHAR},
+//    {ES_TYPE_NAME_KEYWORD, TS_TYPE_VARCHAR},
+//    {ES_TYPE_NAME_TEXT, TS_TYPE_VARCHAR},
 //    {ES_TYPE_NAME_DATE, ES_TYPE_TIMESTAMP},
-//    {ES_TYPE_NAME_OBJECT, ES_TYPE_VARCHAR},
-//    {ES_TYPE_NAME_VARCHAR, ES_TYPE_VARCHAR},
+//    {ES_TYPE_NAME_OBJECT, TS_TYPE_VARCHAR},
+//    {ES_TYPE_NAME_VARCHAR, TS_TYPE_VARCHAR},
 //    {ES_TYPE_NAME_DATE, ES_TYPE_DATE},
 //
 //    {TS_TYPE_NAME_VARCHAR, TS_TYPE_VARCHAR},
@@ -98,7 +113,7 @@ static const std::string JSON_KW_CURSOR = "cursor";
 //    {TS_TYPE_NAME_ARRAY, TS_TYPE_ARRAY},
 //    {TS_TYPE_NAME_TIMESERIES, TS_TYPE_TIMESERIES}};
 
-#define ES_VARCHAR_SIZE (-2)
+#define TS_VARCHAR_SIZE (-2)
 //#define TS_ROW_SIZE (-3)
 //#define TS_ARRAY_SIZE (-4)
 //#define TS_TIMESERIES_SIZE (-5)
@@ -110,20 +125,20 @@ static const std::string JSON_KW_CURSOR = "cursor";
 //    {TS_TYPE_BIGINT, (int16_t)8},
 //    {ES_TYPE_FLOAT4, (int16_t)4},
 //    {ES_TYPE_FLOAT8, (int16_t)8},
-//    {ES_TYPE_VARCHAR, (int16_t)ES_VARCHAR_SIZE},
-//    {ES_TYPE_DATE, (int16_t)ES_VARCHAR_SIZE},
+//    {TS_TYPE_VARCHAR, (int16_t)TS_VARCHAR_SIZE},
+//    {ES_TYPE_DATE, (int16_t)TS_VARCHAR_SIZE},
 //    {ES_TYPE_TIMESTAMP, (int16_t)1},
 //
-//    {TS_TYPE_VARCHAR, (int16_t)ES_VARCHAR_SIZE},
+//    {TS_TYPE_VARCHAR, (int16_t)TS_VARCHAR_SIZE},
 //    {TS_TYPE_BOOLEAN, (int16_t)1},
 //    {TS_TYPE_BIGINT, (int16_t)8},
 //    {TS_TYPE_DOUBLE, (int16_t)8},
 //    {TS_TYPE_TIMESTAMP, (int16_t)1},
-//    {TS_TYPE_DATE, (int16_t)ES_VARCHAR_SIZE},
-//    {TS_TYPE_TIME, (int16_t)ES_VARCHAR_SIZE},
-//    {TS_TYPE_INTERVAL_DAY_TO_SECOND, (int16_t)ES_VARCHAR_SIZE},
-//    {TS_TYPE_INTERVAL_YEAR_TO_MONTH, (int16_t)ES_VARCHAR_SIZE},
-//    {TS_TYPE_UNKNOWN, (int16_t)ES_VARCHAR_SIZE},
+//    {TS_TYPE_DATE, (int16_t)TS_VARCHAR_SIZE},
+//    {TS_TYPE_TIME, (int16_t)TS_VARCHAR_SIZE},
+//    {TS_TYPE_INTERVAL_DAY_TO_SECOND, (int16_t)TS_VARCHAR_SIZE},
+//    {TS_TYPE_INTERVAL_YEAR_TO_MONTH, (int16_t)TS_VARCHAR_SIZE},
+//    {TS_TYPE_UNKNOWN, (int16_t)TS_VARCHAR_SIZE},
 //    {TS_TYPE_INTEGER, (int16_t)4},
 //    {TS_TYPE_ROW, (int16_t)TS_ROW_SIZE},
 //    {TS_ARRAY_SIZE, (int16_t)TS_ARRAY_SIZE},
@@ -339,9 +354,11 @@ bool AssignColumnHeaders(QResultClass *q_res,
                         break;
                 }
             } else if (type.ArrayColumnInfoHasBeenSet()) {
-
+                column_type_id = TS_TYPE_VARCHAR;
+                column_size = TS_VARCHAR_SIZE;
             } else if (type.RowColumnInfoHasBeenSet()) {
-            
+                column_type_id = TS_TYPE_VARCHAR;
+                column_size = TS_VARCHAR_SIZE;
             } else if (type.TimeSeriesMeasureValueColumnInfoHasBeenSet()) {
             
             } else {
@@ -375,6 +392,60 @@ bool AssignTableData(TSResult &ts_result, QResultClass *q_res, ColumnInfoClass &
     return true;
 }
 
+void ParseArray(
+    const Aws::Vector< Aws::TimestreamQuery::Model::Datum > & datums, std::string& array_value) {
+    array_value += "[";
+    for (auto &datum : datums) {
+        if (datum.ScalarValueHasBeenSet()) {
+            array_value += datum.GetScalarValue();
+        } else if (datum.ArrayValueHasBeenSet()) {
+            ParseArray(datum.GetArrayValue(), array_value);
+        } else if (datum.RowValueHasBeenSet()) {
+            if (datum.GetRowValue().DataHasBeenSet()) {
+                ParseRow(datum.GetRowValue().GetData(), array_value);
+            }
+        } else if (datum.TimeSeriesValueHasBeenSet()) {
+        } else if (datum.NullValueHasBeenSet()) {
+            if (datum.GetNullValue()) {
+                array_value += "-";
+            }
+        } else {
+            // Empty
+        }
+        array_value += ",";
+    }
+    // remove the last ','
+    array_value.pop_back();
+    array_value += "]";
+}
+
+void ParseRow(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
+              std::string &row_value) {
+    row_value += "(";
+    for (auto &datum : datums) {
+        if (datum.ScalarValueHasBeenSet()) {
+            row_value += datum.GetScalarValue();
+        } else if (datum.ArrayValueHasBeenSet()) {
+            ParseArray(datum.GetArrayValue(), row_value);
+        } else if (datum.RowValueHasBeenSet()) {
+            if (datum.GetRowValue().DataHasBeenSet()) {
+                ParseRow(datum.GetRowValue().GetData(), row_value);
+            }
+        } else if (datum.TimeSeriesValueHasBeenSet()) {
+        } else if (datum.NullValueHasBeenSet()) {
+            if (datum.GetNullValue()) {
+                row_value += "-";
+            }
+        } else {
+            // Empty
+        }
+        row_value += ",";
+    }
+    // remove the last ','
+    row_value.pop_back();
+    row_value += ")";
+}
+
 // Responsible for assigning row data to tuples
 bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
                    QResultClass *q_res, ColumnInfoClass &fields,
@@ -391,28 +462,48 @@ bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
 
     // Loop through and assign data
     for (size_t i = 0; i < row.GetData().size(); i++) {
-        auto datum = row.GetData()[i];
-        if (datum.ScalarValueHasBeenSet()) {
-            auto scalar_value = datum.GetScalarValue();
-            tuple[i].len = static_cast< int >(scalar_value.length());
-            QR_MALLOC_return_with_error(
-                tuple[i].value, char, tuple[i].len + 1, q_res,
-                "Out of memory in allocating item buffer.", false);
-            strcpy((char *)tuple[i].value, scalar_value.c_str());
-        } else if (datum.ArrayValueHasBeenSet()) {
-        
-        } else if (datum.RowValueHasBeenSet()) {
-        
-        } else if (datum.TimeSeriesValueHasBeenSet()) {
-        
-        } else if (datum.NullValueHasBeenSet()) {
-
-        } else {
-            // Empty
+        if (row.DataHasBeenSet()) {
+            auto datum = row.GetData()[i];
+            if (datum.ScalarValueHasBeenSet()) {
+                auto scalar_value = datum.GetScalarValue();
+                tuple[i].len = static_cast< int >(scalar_value.length());
+                QR_MALLOC_return_with_error(
+                    tuple[i].value, char, tuple[i].len + 1, q_res,
+                    "Out of memory in allocating item buffer.", false);
+                strcpy((char *)tuple[i].value, scalar_value.c_str());
+            } else if (datum.ArrayValueHasBeenSet()) {
+                std::string array_value;
+                ParseArray(datum.GetArrayValue(), array_value);
+                tuple[i].len = static_cast< int >(array_value.length());
+                QR_MALLOC_return_with_error(
+                    tuple[i].value, char, tuple[i].len + 1, q_res,
+                    "Out of memory in allocating item buffer.", false);
+                strcpy((char *)tuple[i].value, array_value.c_str());
+            } else if (datum.RowValueHasBeenSet()) {
+                std::string row_value;
+                ParseRow(datum.GetRowValue().GetData(), row_value);
+                tuple[i].len = static_cast< int >(row_value.length());
+                QR_MALLOC_return_with_error(
+                    tuple[i].value, char, tuple[i].len + 1, q_res,
+                    "Out of memory in allocating item buffer.", false);
+                strcpy((char *)tuple[i].value, row_value.c_str());
+            } else if (datum.TimeSeriesValueHasBeenSet()) {
+            } else if (datum.NullValueHasBeenSet()) {
+                if (datum.GetNullValue()) {
+                    std::string null_value = "-";
+                    tuple[i].len = static_cast< int >(null_value.length());
+                    QR_MALLOC_return_with_error(
+                        tuple[i].value, char, tuple[i].len + 1, q_res,
+                        "Out of memory in allocating item buffer.", false);
+                    strcpy((char *)tuple[i].value, null_value.c_str());
+                }
+            } else {
+                // Empty
+            }
+            // If data length exceeds current display size, set display size
+            if (fields.coli_array[i].display_size < tuple[i].len)
+                fields.coli_array[i].display_size = tuple[i].len;
         }
-        // If data length exceeds current display size, set display size
-        if (fields.coli_array[i].display_size < tuple[i].len)
-            fields.coli_array[i].display_size = tuple[i].len;
     }
 
     // TODO Commented out for now, needs refactoring
