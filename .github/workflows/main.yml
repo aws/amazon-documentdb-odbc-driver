@@ -64,7 +64,7 @@ jobs:
     - name: print-test-logs
       if: failure()
       run: |
-        cat /tmp/mylog_*.log
+        cat /tmp/timestreamodbc_*.log
         cat /tmp/elasticodbc_*.log
         cat ./aws_sdk_*.log
     - name: upload-integration-test-results
