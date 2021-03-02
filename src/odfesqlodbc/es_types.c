@@ -301,7 +301,7 @@ estype_attr_to_concise_type(const ConnectionClass *conn, OID type,
 
         case ES_TYPE_FLOAT4:
             return SQL_REAL;
-        case ES_TYPE_FLOAT8:
+        case TS_TYPE_DOUBLE:
             return SQL_FLOAT;
         case ES_TYPE_DATE:
             if (EN_is_odbc3(env))
@@ -418,7 +418,7 @@ estype_attr_to_ctype(const ConnectionClass *conn, OID type, int atttypmod) {
             return SQL_C_SLONG;
         case ES_TYPE_FLOAT4:
             return SQL_C_FLOAT;
-        case ES_TYPE_FLOAT8:
+        case TS_TYPE_DOUBLE:
             return SQL_C_DOUBLE;
         case ES_TYPE_DATE:
             if (EN_is_odbc3(env))
@@ -488,8 +488,8 @@ const char *estype_attr_to_name(const ConnectionClass *conn, OID type,
             return ES_TYPE_NAME_HALF_FLOAT;
         case ES_TYPE_FLOAT4:
             return ES_TYPE_NAME_FLOAT;
-        case ES_TYPE_FLOAT8:
-            return ES_TYPE_NAME_DOUBLE;
+        case TS_TYPE_DOUBLE:
+            return TS_TYPE_NAME_DOUBLE;
         case ES_TYPE_SCALED_FLOAT:
             return ES_TYPE_NAME_SCALED_FLOAT;
         case ES_TYPE_KEYWORD:
@@ -526,7 +526,7 @@ estype_attr_column_size(const ConnectionClass *conn, OID type, int atttypmod,
             return 7;
         case ES_TYPE_FLOAT4:
             return 7;
-        case ES_TYPE_FLOAT8:
+        case TS_TYPE_DOUBLE:
             return 15;
         case ES_TYPE_SCALED_FLOAT:
             return 15;
@@ -597,7 +597,7 @@ Int4 estype_attr_display_size(const ConnectionClass *conn, OID type,
                                 the letter E, a sign, and 2 digits */
             return (1 + ES_REAL_DIGITS + 1 + 1 + 3);
 
-        case ES_TYPE_FLOAT8: /* a sign, ES_DOUBLE_DIGITS digits, a decimal
+        case TS_TYPE_DOUBLE: /* a sign, ES_DOUBLE_DIGITS digits, a decimal
                                 point, the letter E, a sign, and 3 digits */
             return (1 + ES_DOUBLE_DIGITS + 1 + 1 + 1 + 3);
 
@@ -648,7 +648,7 @@ Int4 estype_attr_buffer_length(const ConnectionClass *conn, OID type,
         case ES_TYPE_MONEY:
             return 4; /* sizeof(SQLREAL) */
 
-        case ES_TYPE_FLOAT8:
+        case TS_TYPE_DOUBLE:
             return 8; /* sizeof(SQLFLOAT) */
 
         case ES_TYPE_DATE:
@@ -735,7 +735,7 @@ Int4 estype_attr_desclength(const ConnectionClass *conn, OID type,
         case ES_TYPE_MONEY:
             return 4;
 
-        case ES_TYPE_FLOAT8:
+        case TS_TYPE_DOUBLE:
             return 8;
 
         case ES_TYPE_DATE:
@@ -766,7 +766,7 @@ Int2 estype_attr_decimal_digits(const ConnectionClass *conn, OID type,
         case TS_TYPE_INTEGER:
         case TS_TYPE_BIGINT:
         case ES_TYPE_FLOAT4:
-        case ES_TYPE_FLOAT8:
+        case TS_TYPE_DOUBLE:
         case ES_TYPE_MONEY:
         case TS_TYPE_BOOLEAN:
 
@@ -946,7 +946,7 @@ OID sqltype_to_estype(const ConnectionClass *conn, SQLSMALLINT fSqlType) {
 
         case SQL_DOUBLE:
         case SQL_FLOAT:
-            esType = ES_TYPE_FLOAT8;
+            esType = TS_TYPE_DOUBLE;
             break;
 
         case SQL_DECIMAL:
@@ -1321,7 +1321,7 @@ Int2 estype_unsigned(const ConnectionClass *conn, OID type) {
         case TS_TYPE_BIGINT:
         case ES_TYPE_HALF_FLOAT:
         case ES_TYPE_FLOAT4:
-        case ES_TYPE_FLOAT8:
+        case TS_TYPE_DOUBLE:
         case ES_TYPE_SCALED_FLOAT:
             return SQL_FALSE;
 

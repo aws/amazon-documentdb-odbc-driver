@@ -888,7 +888,7 @@ static int convert_text_field_to_sql_c(
 
     switch (field_type) {
         case ES_TYPE_FLOAT4:
-        case ES_TYPE_FLOAT8:
+        case TS_TYPE_DOUBLE:
         case ES_TYPE_NUMERIC:
             set_client_decimal_point((char *)neut_str);
             break;

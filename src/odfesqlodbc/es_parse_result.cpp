@@ -89,8 +89,8 @@ static const std::string JSON_KW_CURSOR = "cursor";
 //    {TS_TYPE_NAME_BIGINT, TS_TYPE_BIGINT},
 //    {ES_TYPE_NAME_HALF_FLOAT, ES_TYPE_FLOAT4},
 //    {ES_TYPE_NAME_FLOAT, ES_TYPE_FLOAT4},
-//    {ES_TYPE_NAME_DOUBLE, ES_TYPE_FLOAT8},
-//    {ES_TYPE_NAME_SCALED_FLOAT, ES_TYPE_FLOAT8},
+//    {TS_TYPE_NAME_DOUBLE, TS_TYPE_DOUBLE},
+//    {ES_TYPE_NAME_SCALED_FLOAT, TS_TYPE_DOUBLE},
 //    {ES_TYPE_NAME_KEYWORD, TS_TYPE_VARCHAR},
 //    {ES_TYPE_NAME_TEXT, TS_TYPE_VARCHAR},
 //    {ES_TYPE_NAME_DATE, ES_TYPE_TIMESTAMP},
@@ -124,7 +124,7 @@ static const std::string JSON_KW_CURSOR = "cursor";
 //    {TS_TYPE_INTEGER, (int16_t)4},
 //    {TS_TYPE_BIGINT, (int16_t)8},
 //    {ES_TYPE_FLOAT4, (int16_t)4},
-//    {ES_TYPE_FLOAT8, (int16_t)8},
+//    {TS_TYPE_DOUBLE, (int16_t)8},
 //    {TS_TYPE_VARCHAR, (int16_t)TS_VARCHAR_SIZE},
 //    {ES_TYPE_DATE, (int16_t)TS_VARCHAR_SIZE},
 //    {ES_TYPE_TIMESTAMP, (int16_t)1},
@@ -332,6 +332,8 @@ bool AssignColumnHeaders(QResultClass *q_res,
                     case Aws::TimestreamQuery::Model::ScalarType::DATE:
                         break;
                     case Aws::TimestreamQuery::Model::ScalarType::DOUBLE:
+                        column_type_id = TS_TYPE_DOUBLE;
+                        column_size = 8;
                         break;
                     case Aws::TimestreamQuery::Model::ScalarType::INTEGER:
                         column_type_id = TS_TYPE_INTEGER;
@@ -466,6 +468,10 @@ bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
             auto datum = row.GetData()[i];
             if (datum.ScalarValueHasBeenSet()) {
                 auto scalar_value = datum.GetScalarValue();
+                if (fields.coli_array[i].adtid == TS_TYPE_DOUBLE) {
+                    double d = atof(scalar_value.c_str());
+                    scalar_value = std::to_string(d);
+                }
                 tuple[i].len = static_cast< int >(scalar_value.length());
                 QR_MALLOC_return_with_error(
                     tuple[i].value, char, tuple[i].len + 1, q_res,
