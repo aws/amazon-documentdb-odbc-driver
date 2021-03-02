@@ -35,7 +35,7 @@ extern "C" {
 #define TS_TYPE_NAME_BIGINT "BIGINT"
 #define ES_TYPE_NAME_HALF_FLOAT "half_float"
 #define ES_TYPE_NAME_FLOAT "float"
-#define ES_TYPE_NAME_DOUBLE "double"
+#define TS_TYPE_NAME_DOUBLE "DOUBLE"
 #define ES_TYPE_NAME_SCALED_FLOAT "scaled_float"
 #define ES_TYPE_NAME_KEYWORD "keyword"
 #define ES_TYPE_NAME_TEXT "text"
@@ -70,7 +70,7 @@ extern "C" {
 #define ES_TYPE_XMLARRAY 143
 #define ES_TYPE_CIDR 650
 #define ES_TYPE_FLOAT4 700
-#define ES_TYPE_FLOAT8 701
+#define TS_TYPE_DOUBLE 701
 #define ES_TYPE_ABSTIME 702
 #define TS_TYPE_UNKNOWN 705
 #define ES_TYPE_MONEY 790
