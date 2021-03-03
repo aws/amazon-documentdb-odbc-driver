@@ -1077,8 +1077,8 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
 
         case ES_TYPE_ABSTIME:
         case ES_TYPE_DATETIME:
-        case ES_TYPE_TIMESTAMP_NO_TMZONE:
-        case ES_TYPE_TIMESTAMP:
+        case TS_TYPE_TIMESTAMP_NO_TMZONE:
+        case TS_TYPE_TIMESTAMP:
             std_time.fr = 0;
             std_time.infinity = 0;
             if (strnicmp(value, INFINITY_STRING, 8) == 0) {
@@ -1101,7 +1101,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                 std_time.ss = 0;
             }
             if (strnicmp(value, "invalid", 7) != 0) {
-                BOOL bZone = field_type != ES_TYPE_TIMESTAMP_NO_TMZONE;
+                BOOL bZone = field_type != TS_TYPE_TIMESTAMP_NO_TMZONE;
                 int zone;
 
                 /*
@@ -1288,8 +1288,8 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
 
             case ES_TYPE_ABSTIME:
             case ES_TYPE_DATETIME:
-            case ES_TYPE_TIMESTAMP_NO_TMZONE:
-            case ES_TYPE_TIMESTAMP:
+            case TS_TYPE_TIMESTAMP_NO_TMZONE:
+            case TS_TYPE_TIMESTAMP:
                 len = stime2timestamp(&std_time, midtemp, midsize, FALSE,
                                       (int)(midsize - 19 - 2));
                 break;
