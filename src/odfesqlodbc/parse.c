@@ -41,7 +41,7 @@ Int4 FI_precision(const FIELD_INFO *fi) {
         case ES_TYPE_NUMERIC:
             return fi->column_size;
         case ES_TYPE_DATETIME:
-        case ES_TYPE_TIMESTAMP_NO_TMZONE:
+        case TS_TYPE_TIMESTAMP_NO_TMZONE:
             return fi->decimal_digits;
     }
     return 0;
