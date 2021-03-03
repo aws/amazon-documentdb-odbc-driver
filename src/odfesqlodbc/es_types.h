@@ -83,11 +83,11 @@ extern "C" {
 #define TS_TYPE_VARCHAR 1043
 #define ES_TYPE_DATE 1082
 #define ES_TYPE_TIME 1083
-#define ES_TYPE_TIMESTAMP_NO_TMZONE 1114 /* since 7.2 */
+#define TS_TYPE_TIMESTAMP_NO_TMZONE 1114 /* since 7.2 */
 #define ES_TYPE_DATETIME 1184            /* timestamptz */
 #define ES_TYPE_INTERVAL 1186
 #define ES_TYPE_TIME_WITH_TMZONE 1266 /* since 7.1 */
-#define ES_TYPE_TIMESTAMP 1296        /* deprecated since 7.0 */
+#define TS_TYPE_TIMESTAMP 1296        /* deprecated since 7.0 */
 #define ES_TYPE_BIT 1560
 #define ES_TYPE_NUMERIC 1700
 #define ES_TYPE_REFCURSOR 1790
