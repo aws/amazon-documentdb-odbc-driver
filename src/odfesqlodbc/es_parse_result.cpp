@@ -93,7 +93,7 @@ static const std::string JSON_KW_CURSOR = "cursor";
 //    {ES_TYPE_NAME_SCALED_FLOAT, TS_TYPE_DOUBLE},
 //    {ES_TYPE_NAME_KEYWORD, TS_TYPE_VARCHAR},
 //    {ES_TYPE_NAME_TEXT, TS_TYPE_VARCHAR},
-//    {ES_TYPE_NAME_DATE, ES_TYPE_TIMESTAMP},
+//    {ES_TYPE_NAME_DATE, TS_TYPE_TIMESTAMP},
 //    {ES_TYPE_NAME_OBJECT, TS_TYPE_VARCHAR},
 //    {ES_TYPE_NAME_VARCHAR, TS_TYPE_VARCHAR},
 //    {ES_TYPE_NAME_DATE, ES_TYPE_DATE},
@@ -127,7 +127,7 @@ static const std::string JSON_KW_CURSOR = "cursor";
 //    {TS_TYPE_DOUBLE, (int16_t)8},
 //    {TS_TYPE_VARCHAR, (int16_t)TS_VARCHAR_SIZE},
 //    {ES_TYPE_DATE, (int16_t)TS_VARCHAR_SIZE},
-//    {ES_TYPE_TIMESTAMP, (int16_t)1},
+//    {TS_TYPE_TIMESTAMP, (int16_t)1},
 //
 //    {TS_TYPE_VARCHAR, (int16_t)TS_VARCHAR_SIZE},
 //    {TS_TYPE_BOOLEAN, (int16_t)1},
@@ -346,6 +346,8 @@ bool AssignColumnHeaders(QResultClass *q_res,
                     case Aws::TimestreamQuery::Model::ScalarType::TIME:
                         break;
                     case Aws::TimestreamQuery::Model::ScalarType::TIMESTAMP:
+                        column_type_id = TS_TYPE_TIMESTAMP;
+                        column_size = 16;
                         break;
                     case Aws::TimestreamQuery::Model::ScalarType::VARCHAR:
                         break;
