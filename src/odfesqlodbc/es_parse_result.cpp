@@ -96,7 +96,7 @@ static const std::string JSON_KW_CURSOR = "cursor";
 //    {ES_TYPE_NAME_DATE, TS_TYPE_TIMESTAMP},
 //    {ES_TYPE_NAME_OBJECT, TS_TYPE_VARCHAR},
 //    {ES_TYPE_NAME_VARCHAR, TS_TYPE_VARCHAR},
-//    {ES_TYPE_NAME_DATE, ES_TYPE_DATE},
+//    {ES_TYPE_NAME_DATE, TS_TYPE_DATE},
 //
 //    {TS_TYPE_NAME_VARCHAR, TS_TYPE_VARCHAR},
 //    {TS_TYPE_NAME_BOOLEAN, TS_TYPE_BOOLEAN},
@@ -126,7 +126,7 @@ static const std::string JSON_KW_CURSOR = "cursor";
 //    {ES_TYPE_FLOAT4, (int16_t)4},
 //    {TS_TYPE_DOUBLE, (int16_t)8},
 //    {TS_TYPE_VARCHAR, (int16_t)TS_VARCHAR_SIZE},
-//    {ES_TYPE_DATE, (int16_t)TS_VARCHAR_SIZE},
+//    {TS_TYPE_DATE, (int16_t)TS_VARCHAR_SIZE},
 //    {TS_TYPE_TIMESTAMP, (int16_t)1},
 //
 //    {TS_TYPE_VARCHAR, (int16_t)TS_VARCHAR_SIZE},
@@ -330,6 +330,8 @@ bool AssignColumnHeaders(QResultClass *q_res,
                         column_size = 1;
                         break;
                     case Aws::TimestreamQuery::Model::ScalarType::DATE:
+                        column_type_id = TS_TYPE_DATE;
+                        column_size = 6;
                         break;
                     case Aws::TimestreamQuery::Model::ScalarType::DOUBLE:
                         column_type_id = TS_TYPE_DOUBLE;
@@ -344,6 +346,8 @@ bool AssignColumnHeaders(QResultClass *q_res,
                     case Aws::TimestreamQuery::Model::ScalarType::INTERVAL_YEAR_TO_MONTH:
                         break;
                     case Aws::TimestreamQuery::Model::ScalarType::TIME:
+                        column_type_id = TS_TYPE_TIME;
+                        column_size = 6;
                         break;
                     case Aws::TimestreamQuery::Model::ScalarType::TIMESTAMP:
                         column_type_id = TS_TYPE_TIMESTAMP;
