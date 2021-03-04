@@ -19,6 +19,7 @@
 #include "unit_test_helper.h"
 #include "it_odbc_helper.h"
 #include <cmath>
+#include <time.h>
 // clang-format on
 
 //typedef struct DescribeColumnData {
@@ -2169,6 +2170,256 @@ TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_TIME) {
     std::wstring columns =
         L"TIMESTAMP \'2021-01-02 18:01:13.524000000\', TIMESTAMP \'2021-11-20 "
         L"06:39:45.123456789\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    TIME_STRUCT data;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_TIME, &data, sizeof(data), &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
+    EXPECT_EQ(18, data.hour);
+    EXPECT_EQ(1, data.minute);
+    EXPECT_EQ(13, data.second);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_TIME, &data, sizeof(data), &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
+    EXPECT_EQ(6, data.hour);
+    EXPECT_EQ(39, data.minute);
+    EXPECT_EQ(45, data.second);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, DATE_TO_SQL_C_CHAR) {
+    std::wstring columns = L"DATE \'2021-01-02\', DATE \'2021-11-20\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::string expected;
+    expected = "2021-01-02";
+    ASSERT_EQ((int)expected.size(), indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    expected = "2021-11-20";
+    ASSERT_EQ((int)expected.size(), indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, DATE_TO_SQL_C_WCHAR) {
+    std::wstring columns = L"DATE \'2021-01-02\', DATE \'2021-11-20\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected;
+    expected = L"2021-01-02";
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected.size()), indicator);
+#else
+    ASSERT_EQ((int)(2 * expected.size()), indicator);
+#endif
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    expected = L"2021-11-20";
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected.size()), indicator);
+#else
+    ASSERT_EQ((int)(2 * expected.size()), indicator);
+#endif
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, DATE_TO_SQL_C_TIMESTAMP) {
+    std::wstring columns = L"DATE \'2021-01-02\', DATE \'2021-11-20\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    TIMESTAMP_STRUCT data;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_TIMESTAMP, &data, sizeof(data),
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+    EXPECT_EQ(2021, data.year);
+    EXPECT_EQ(1, data.month);
+    EXPECT_EQ(2, data.day);
+    EXPECT_EQ(0, data.hour);
+    EXPECT_EQ(0, data.minute);
+    EXPECT_EQ(0, data.second);
+    EXPECT_EQ((SQLUINTEGER)0, data.fraction);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_TIMESTAMP, &data, sizeof(data),
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+    EXPECT_EQ(2021, data.year);
+    EXPECT_EQ(11, data.month);
+    EXPECT_EQ(20, data.day);
+    EXPECT_EQ(0, data.hour);
+    EXPECT_EQ(0, data.minute);
+    EXPECT_EQ(0, data.second);
+    EXPECT_EQ((SQLUINTEGER)0, data.fraction);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, DATE_TO_SQL_C_DATE) {
+    std::wstring columns = L"DATE \'2021-01-02\', DATE \'2021-11-20\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    DATE_STRUCT data;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_DATE, &data, sizeof(data), &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
+    EXPECT_EQ(2021, data.year);
+    EXPECT_EQ(1, data.month);
+    EXPECT_EQ(2, data.day);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_DATE, &data, sizeof(data), &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
+    EXPECT_EQ(2021, data.year);
+    EXPECT_EQ(11, data.month);
+    EXPECT_EQ(20, data.day);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, DATE_TO_SQL_C_TIME) {
+    std::wstring columns = L"DATE \'2021-01-02\', DATE \'2021-11-20\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    TIME_STRUCT data;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_TIME, &data, sizeof(data), &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
+    EXPECT_EQ(0, data.hour);
+    EXPECT_EQ(0, data.minute);
+    EXPECT_EQ(0, data.second);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_TIME, &data, sizeof(data), &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
+    EXPECT_EQ(0, data.hour);
+    EXPECT_EQ(0, data.minute);
+    EXPECT_EQ(0, data.second);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, TIME_TO_SQL_C_CHAR) {
+    std::wstring columns = L"TIME \'18:01:13.524000000\', TIME \'06:39:45.123456789\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::string expected;
+    expected = "18:01:13.524";
+    ASSERT_EQ((int)expected.size(), indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    expected = "06:39:45.123456789";
+    ASSERT_EQ((int)expected.size(), indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, TIME_TO_SQL_C_WCHAR) {
+    std::wstring columns = L"TIME \'18:01:13.524000000\', TIME \'06:39:45.123456789\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected;
+    expected = L"18:01:13.524";
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected.size()), indicator);
+#else
+    ASSERT_EQ((int)(2 * expected.size()), indicator);
+#endif
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    expected = L"06:39:45.123456789";
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected.size()), indicator);
+#else
+    ASSERT_EQ((int)(2 * expected.size()), indicator);
+#endif
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, TIME_TO_SQL_C_TIMESTAMP) {
+    std::wstring columns = L"TIME \'18:01:13.524000000\', TIME \'06:39:45.123456789\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    TIMESTAMP_STRUCT data;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_TIMESTAMP, &data, sizeof(data),
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+    time_t rawtime;
+    struct tm* timeinfo;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    EXPECT_EQ(timeinfo->tm_year+1900, data.year);
+    EXPECT_EQ(timeinfo->tm_mon+1, data.month);
+    EXPECT_EQ(timeinfo->tm_mday, data.day);
+    EXPECT_EQ(18, data.hour);
+    EXPECT_EQ(1, data.minute);
+    EXPECT_EQ(13, data.second);
+    EXPECT_EQ((SQLUINTEGER)524000000, data.fraction);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_TIMESTAMP, &data, sizeof(data),
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+    EXPECT_EQ(timeinfo->tm_year + 1900, data.year);
+    EXPECT_EQ(timeinfo->tm_mon + 1, data.month);
+    EXPECT_EQ(timeinfo->tm_mday, data.day);
+    EXPECT_EQ(6, data.hour);
+    EXPECT_EQ(39, data.minute);
+    EXPECT_EQ(45, data.second);
+    EXPECT_EQ((SQLUINTEGER)123456789, data.fraction);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, TIME_TO_SQL_C_DATE) {
+    std::wstring columns = L"TIME \'18:01:13.524000000\', TIME \'06:39:45.123456789\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    DATE_STRUCT data;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_DATE, &data, sizeof(data), &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
+    time_t rawtime;
+    struct tm* timeinfo;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    EXPECT_EQ(timeinfo->tm_year + 1900, data.year);
+    EXPECT_EQ(timeinfo->tm_mon + 1, data.month);
+    EXPECT_EQ(timeinfo->tm_mday, data.day);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_DATE, &data, sizeof(data), &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
+    EXPECT_EQ(timeinfo->tm_year + 1900, data.year);
+    EXPECT_EQ(timeinfo->tm_mon + 1, data.month);
+    EXPECT_EQ(timeinfo->tm_mday, data.day);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, TIME_TO_SQL_C_TIME) {
+    std::wstring columns = L"TIME \'18:01:13.524000000\', TIME \'06:39:45.123456789\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     TIME_STRUCT data;
     SQLLEN indicator = 0;
