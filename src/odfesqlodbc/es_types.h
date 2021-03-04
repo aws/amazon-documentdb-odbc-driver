@@ -81,8 +81,8 @@ extern "C" {
 #define ES_TYPE_VARCHARARRAY 1015
 #define ES_TYPE_BPCHAR 1042
 #define TS_TYPE_VARCHAR 1043
-#define ES_TYPE_DATE 1082
-#define ES_TYPE_TIME 1083
+#define TS_TYPE_DATE 1082
+#define TS_TYPE_TIME 1083
 #define TS_TYPE_TIMESTAMP_NO_TMZONE 1114 /* since 7.2 */
 #define ES_TYPE_DATETIME 1184            /* timestamptz */
 #define ES_TYPE_INTERVAL 1186
