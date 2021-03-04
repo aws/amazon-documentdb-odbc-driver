@@ -88,12 +88,12 @@ static SQLLEN es_bin2whex(const char *src, SQLWCHAR *dst, SQLLEN length);
  *
  *			field_type		fCType				Output
  *			----------		------				----------
- *			ES_TYPE_DATE	SQL_C_DEFAULT		SQL_C_DATE
- *			ES_TYPE_DATE	SQL_C_DATE			SQL_C_DATE
- *			ES_TYPE_DATE	SQL_C_TIMESTAMP		SQL_C_TIMESTAMP		(time = 0
- *(midnight)) ES_TYPE_TIME	SQL_C_DEFAULT		SQL_C_TIME ES_TYPE_TIME
+ *			TS_TYPE_DATE	SQL_C_DEFAULT		SQL_C_DATE
+ *			TS_TYPE_DATE	SQL_C_DATE			SQL_C_DATE
+ *			TS_TYPE_DATE	SQL_C_TIMESTAMP		SQL_C_TIMESTAMP		(time = 0
+ *(midnight)) TS_TYPE_TIME	SQL_C_DEFAULT		SQL_C_TIME TS_TYPE_TIME
  *SQL_C_TIME			SQL_C_TIME
- *			ES_TYPE_TIME	SQL_C_TIMESTAMP		SQL_C_TIMESTAMP		(date =
+ *			TS_TYPE_TIME	SQL_C_TIMESTAMP		SQL_C_TIMESTAMP		(date =
  *current date) ES_TYPE_ABSTIME SQL_C_DEFAULT		SQL_C_TIMESTAMP
  *ES_TYPE_ABSTIME SQL_C_DATE			SQL_C_DATE			(time is truncated)
  *ES_TYPE_ABSTIME SQL_C_TIME			SQL_C_TIME			(date is truncated)
@@ -1100,11 +1100,11 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
              * $$$ need to add parsing for date/time/timestamp strings in
              * ES_TYPE_CHAR,VARCHAR $$$
              */
-        case ES_TYPE_DATE:
+        case TS_TYPE_DATE:
             sscanf(value, "%4d-%2d-%2d", &std_time.y, &std_time.m, &std_time.d);
             break;
 
-        case ES_TYPE_TIME: {
+        case TS_TYPE_TIME: {
             BOOL bZone = FALSE; /* time zone stuff is unreliable */
             int zone;
             timestamp2stime(value, &std_time, &bZone, &zone);
@@ -1303,21 +1303,19 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
          * enough.
          */
         switch (field_type) {
-            case ES_TYPE_DATE:
+            case TS_TYPE_DATE:
                 len = SPRINTF_FIXED(midtemp, "%.4d-%.2d-%.2d", std_time.y,
                                     std_time.m, std_time.d);
                 break;
 
-            case ES_TYPE_TIME:
+            case TS_TYPE_TIME:
                 len = SPRINTF_FIXED(midtemp, "%.2d:%.2d:%.2d", std_time.hh,
                                     std_time.mm, std_time.ss);
                 if (std_time.fr > 0) {
                     int wdt;
                     int fr = effective_fraction(std_time.fr, &wdt);
 
-                    char *fraction = NULL;
-                    len = sprintf(fraction, ".%0*d", wdt, fr);
-                    strcat(midtemp, fraction);
+                    len = SPRINTF_FIXED(midtemp, "%s.%0*d", midtemp, wdt, fr);
                 }
                 break;
 
