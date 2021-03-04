@@ -631,12 +631,6 @@ static int char2guid(const char *str, SQLGUID *g) {
     return COPY_OK;
 }
 
-static int effective_fraction(int fraction, int *width) {
-    for (*width = 9; fraction % 10 == 0; (*width)--, fraction /= 10)
-        ;
-    return fraction;
-}
-
 static int get_terminator_len(SQLSMALLINT fCType) {
     switch (fCType) {
 #ifdef UNICODE_SUPPORT
