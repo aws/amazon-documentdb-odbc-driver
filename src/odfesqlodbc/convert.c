@@ -289,8 +289,8 @@ static BOOL timestamp2stime(const char *str, SIMPLE_TIME *st, BOOL *bZone,
 static int stime2timestamp(const SIMPLE_TIME *st, char *str, size_t bufsize,
                            BOOL bZone, int precision) {
     UNUSED(bZone);
-    char precstr[16], zonestr[16];
-    int i;
+    char precstr[16] = {0};
+    char zonestr[16] = {0};
 
     precstr[0] = '\0';
     if (st->infinity > 0) {
@@ -298,19 +298,12 @@ static int stime2timestamp(const SIMPLE_TIME *st, char *str, size_t bufsize,
     } else if (st->infinity < 0) {
         return snprintf(str, bufsize, "%s", MINFINITY_STRING);
     }
-    if (precision > 0 && st->fr) {
+    if (precision > 0) {
         SPRINTF_FIXED(precstr, ".%09d", st->fr);
         if (precision < 9)
             precstr[precision + 1] = '\0';
         else if (precision > 9)
             precision = 9;
-        for (i = precision; i > 0; i--) {
-            if (precstr[i] != '0')
-                break;
-            precstr[i] = '\0';
-        }
-        if (i == 0)
-            precstr[i] = '\0';
     }
     zonestr[0] = '\0';
 #ifdef TIMEZONE_GLOBAL
@@ -1008,8 +1001,8 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
     const ConnectionClass *conn = SC_get_conn(stmt);
     BOOL text_bin_handling;
     const char *neut_str = value;
-    char booltemp[3];
-    char midtemp[64];
+    char booltemp[3] = {0};
+    char midtemp[64] = {0};
     GetDataClass *esdc;
 
     if (stmt->current_col >= 0) {
@@ -1311,12 +1304,8 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
             case TS_TYPE_TIME:
                 len = SPRINTF_FIXED(midtemp, "%.2d:%.2d:%.2d", std_time.hh,
                                     std_time.mm, std_time.ss);
-                if (std_time.fr > 0) {
-                    int wdt;
-                    int fr = effective_fraction(std_time.fr, &wdt);
-
-                    len = SPRINTF_FIXED(midtemp, "%s.%0*d", midtemp, wdt, fr);
-                }
+                int wdt = 9; // nanosecond for fraction portion
+                len = SPRINTF_FIXED(midtemp, "%s.%0*d", midtemp, wdt, std_time.fr);
                 break;
 
             case ES_TYPE_ABSTIME:
