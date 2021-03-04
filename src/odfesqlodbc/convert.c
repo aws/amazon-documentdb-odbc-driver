@@ -1296,10 +1296,8 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                 break;
 
             case TS_TYPE_TIME:
-                len = SPRINTF_FIXED(midtemp, "%.2d:%.2d:%.2d", std_time.hh,
-                                    std_time.mm, std_time.ss);
-                int wdt = 9; // nanosecond for fraction portion
-                len = SPRINTF_FIXED(midtemp, "%s.%0*d", midtemp, wdt, std_time.fr);
+                len = SPRINTF_FIXED(midtemp, "%.2d:%.2d:%.2d.%09d", std_time.hh,
+                                    std_time.mm, std_time.ss, std_time.fr);
                 break;
 
             case ES_TYPE_ABSTIME:
