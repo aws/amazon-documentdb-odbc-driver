@@ -291,7 +291,7 @@ TEST_F(TestSQLPrepare, NullQueryError) {
 TEST_F(TestSQLExecDirect, Success_100) {
     int limit = 100;
     std::wstring query =
-        L"SELECT * FROM ODBCTest.test LIMIT " + std::to_wstring(limit);
+        L"SELECT * FROM ODBCTest.IoT LIMIT " + std::to_wstring(limit);
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     ASSERT_EQ(SQL_SUCCESS, ret);
     int cnt = 0;
@@ -307,7 +307,7 @@ TEST_F(TestSQLExecDirect, Success_100) {
 TEST_F(TestSQLExecDirect, Success_400) {
     int limit = 400;
     std::wstring query =
-        L"SELECT * FROM ODBCTest.test LIMIT " + std::to_wstring(limit);
+        L"SELECT * FROM ODBCTest.IoT LIMIT " + std::to_wstring(limit);
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     ASSERT_EQ(SQL_SUCCESS, ret);
     int cnt = 0;
@@ -323,7 +323,7 @@ TEST_F(TestSQLExecDirect, Success_400) {
 TEST_F(TestSQLExecDirect, Success_5000) {
     int limit = 5000;
     std::wstring query =
-        L"SELECT * FROM ODBCTest.test LIMIT " + std::to_wstring(limit);
+        L"SELECT * FROM ODBCTest.IoT LIMIT " + std::to_wstring(limit);
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     ASSERT_EQ(SQL_SUCCESS, ret);
     int cnt = 0;
@@ -339,7 +339,7 @@ TEST_F(TestSQLExecDirect, Success_5000) {
 TEST_F(TestSQLExecDirect, Success_10000) {
     int limit = 10000;
     std::wstring query =
-        L"SELECT * FROM ODBCTest.test LIMIT " + std::to_wstring(limit);
+        L"SELECT * FROM ODBCTest.IoT LIMIT " + std::to_wstring(limit);
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     ASSERT_EQ(SQL_SUCCESS, ret);
     int cnt = 0;
