@@ -51,7 +51,7 @@
 //                                          {L"DestRegion", SQL_WVARCHAR},
 //                                          {L"OriginAirportID", SQL_WVARCHAR},
 //                                          {L"DestCityName", SQL_WVARCHAR}};
-const std::wstring table_name = L"ODBCTest.test";
+const std::wstring table_name = L"ODBCTest.IoT";
 //const std::wstring multi_type_data_set = L"kibana_sample_data_types";
 //const std::wstring single_col = L"Origin";
 //// TODO (#110): Improve sample data result checks
