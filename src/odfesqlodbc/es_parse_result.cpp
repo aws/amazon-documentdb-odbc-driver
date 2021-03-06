@@ -54,19 +54,39 @@ void SetError(const char *err);
 void ClearError();
 
 /**
+ * Parse datum
+ * @param datum const Aws::TimestreamQuery::Model::Datum > &
+ * @param datum_value std::string &
+ * @param column_attr_id OID
+ */
+void ParseDatum(const Aws::TimestreamQuery::Model::Datum &datum,
+                std::string &datum_value, OID column_attr_id);
+
+/**
  * Parse array
  * @param datums const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &
  * @param array_value std::string &
+ * @param column_attr_id OID
  */
 void ParseArray(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
-                std::string &array_value);
+                std::string &array_value, OID column_attr_id);
 /**
  * Parse row
  * @param datums const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &
  * @param row_value std::string &
+ * @param column_attr_id OID
  */
 void ParseRow(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
-              std::string &row_value);
+              std::string &row_value, OID column_attr_id);
+
+/**
+ * Parse time series
+ * @param series const Aws::Vector< Aws::TimestreamQuery::Model::TimeSeriesDataPoint > &
+ * @param timeseries_value std::string &
+ * @param column_attr_id OID
+ */
+void ParseTimeSeries(const Aws::Vector< Aws::TimestreamQuery::Model::TimeSeriesDataPoint >  &series,
+    std::string &timeseries_value, OID column_attr_id);
 
 // clang-format off
 // Not all of these are being used at the moment, but these are the keywords in the json
@@ -362,7 +382,8 @@ bool AssignColumnHeaders(QResultClass *q_res,
                 column_type_id = TS_TYPE_VARCHAR;
                 column_size = TS_VARCHAR_SIZE;
             } else if (type.TimeSeriesMeasureValueColumnInfoHasBeenSet()) {
-            
+                column_type_id = TS_TYPE_VARCHAR;
+                column_size = TS_VARCHAR_SIZE;
             } else {
                 // Empty
             }
@@ -394,58 +415,84 @@ bool AssignTableData(TSResult &ts_result, QResultClass *q_res, ColumnInfoClass &
     return true;
 }
 
-void ParseArray(
-    const Aws::Vector< Aws::TimestreamQuery::Model::Datum > & datums, std::string& array_value) {
-    array_value += "[";
-    for (auto &datum : datums) {
-        if (datum.ScalarValueHasBeenSet()) {
-            array_value += datum.GetScalarValue();
-        } else if (datum.ArrayValueHasBeenSet()) {
-            ParseArray(datum.GetArrayValue(), array_value);
-        } else if (datum.RowValueHasBeenSet()) {
-            if (datum.GetRowValue().DataHasBeenSet()) {
-                ParseRow(datum.GetRowValue().GetData(), array_value);
-            }
-        } else if (datum.TimeSeriesValueHasBeenSet()) {
-        } else if (datum.NullValueHasBeenSet()) {
-            if (datum.GetNullValue()) {
-                array_value += "-";
-            }
-        } else {
-            // Empty
+void ParseDatum(const Aws::TimestreamQuery::Model::Datum &datum,
+                std::string &datum_value, OID column_attr_id) {
+    if (datum.ScalarValueHasBeenSet()) {
+        auto scalar_value = datum.GetScalarValue();
+        if (column_attr_id == TS_TYPE_DOUBLE) {
+            auto d = atof(scalar_value.c_str());
+            scalar_value = std::to_string(d);
         }
-        array_value += ",";
+        datum_value += scalar_value;
+    } else if (datum.ArrayValueHasBeenSet()) {
+        ParseArray(datum.GetArrayValue(), datum_value, column_attr_id);
+    } else if (datum.RowValueHasBeenSet()) {
+        if (datum.GetRowValue().DataHasBeenSet()) {
+            ParseRow(datum.GetRowValue().GetData(), datum_value, column_attr_id);
+        }
+    } else if (datum.TimeSeriesValueHasBeenSet()) {
+        ParseTimeSeries(datum.GetTimeSeriesValue(), datum_value, column_attr_id);
+    } else if (datum.NullValueHasBeenSet()) {
+        if (datum.GetNullValue()) {
+            datum_value += "-";
+        }
+    } else {
+        // Empty
+        datum_value += "-";
     }
-    // remove the last ','
-    array_value.pop_back();
-    array_value += "]";
+}
+
+void ParseArray(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > & datums, std::string& array_value, OID column_attr_id) {
+    if (datums.size() == 0) {
+        array_value += "-";
+    } else {
+        array_value += "[";
+        for (auto &datum : datums) {
+            ParseDatum(datum, array_value, column_attr_id);
+            array_value += ",";
+        }
+        // remove the last ','
+        if (array_value.back() == ',')
+            array_value.pop_back();
+        array_value += "]";
+    }
 }
 
 void ParseRow(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
-              std::string &row_value) {
+              std::string &row_value, OID column_attr_id) {
     row_value += "(";
     for (auto &datum : datums) {
-        if (datum.ScalarValueHasBeenSet()) {
-            row_value += datum.GetScalarValue();
-        } else if (datum.ArrayValueHasBeenSet()) {
-            ParseArray(datum.GetArrayValue(), row_value);
-        } else if (datum.RowValueHasBeenSet()) {
-            if (datum.GetRowValue().DataHasBeenSet()) {
-                ParseRow(datum.GetRowValue().GetData(), row_value);
-            }
-        } else if (datum.TimeSeriesValueHasBeenSet()) {
-        } else if (datum.NullValueHasBeenSet()) {
-            if (datum.GetNullValue()) {
-                row_value += "-";
-            }
-        } else {
-            // Empty
-        }
+        ParseDatum(datum, row_value, column_attr_id);
         row_value += ",";
     }
     // remove the last ','
-    row_value.pop_back();
+    if (row_value.back() == ',')
+        row_value.pop_back();
     row_value += ")";
+}
+
+void ParseTimeSeries(const Aws::Vector< Aws::TimestreamQuery::Model::TimeSeriesDataPoint > &series,
+    std::string &timeseries_value, OID column_attr_id) {
+    timeseries_value += "[";
+    for (auto &s : series) {
+        timeseries_value += "{";
+        timeseries_value += "time: ";
+        if (s.TimeHasBeenSet()) {
+            timeseries_value += s.GetTime();
+        }
+        timeseries_value += ", ";
+        timeseries_value += "value: ";
+        if (s.ValueHasBeenSet()) {
+            std::string value;
+            ParseDatum(s.GetValue(), value, column_attr_id);
+            timeseries_value += value;
+        }
+        timeseries_value += "},";
+    }
+    // remove the last ','
+    if (timeseries_value.back() == ',')
+        timeseries_value.pop_back();
+    timeseries_value += "]";
 }
 
 // Responsible for assigning row data to tuples
@@ -466,46 +513,13 @@ bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
     for (size_t i = 0; i < row.GetData().size(); i++) {
         if (row.DataHasBeenSet()) {
             auto datum = row.GetData()[i];
-            if (datum.ScalarValueHasBeenSet()) {
-                auto scalar_value = datum.GetScalarValue();
-                if (fields.coli_array[i].adtid == TS_TYPE_DOUBLE) {
-                    double d = atof(scalar_value.c_str());
-                    scalar_value = std::to_string(d);
-                }
-                tuple[i].len = static_cast< int >(scalar_value.length());
-                QR_MALLOC_return_with_error(
-                    tuple[i].value, char, tuple[i].len + 1, q_res,
-                    "Out of memory in allocating item buffer.", false);
-                strcpy((char *)tuple[i].value, scalar_value.c_str());
-            } else if (datum.ArrayValueHasBeenSet()) {
-                std::string array_value;
-                ParseArray(datum.GetArrayValue(), array_value);
-                tuple[i].len = static_cast< int >(array_value.length());
-                QR_MALLOC_return_with_error(
-                    tuple[i].value, char, tuple[i].len + 1, q_res,
-                    "Out of memory in allocating item buffer.", false);
-                strcpy((char *)tuple[i].value, array_value.c_str());
-            } else if (datum.RowValueHasBeenSet()) {
-                std::string row_value;
-                ParseRow(datum.GetRowValue().GetData(), row_value);
-                tuple[i].len = static_cast< int >(row_value.length());
-                QR_MALLOC_return_with_error(
-                    tuple[i].value, char, tuple[i].len + 1, q_res,
-                    "Out of memory in allocating item buffer.", false);
-                strcpy((char *)tuple[i].value, row_value.c_str());
-            } else if (datum.TimeSeriesValueHasBeenSet()) {
-            } else if (datum.NullValueHasBeenSet()) {
-                if (datum.GetNullValue()) {
-                    std::string null_value = "-";
-                    tuple[i].len = static_cast< int >(null_value.length());
-                    QR_MALLOC_return_with_error(
-                        tuple[i].value, char, tuple[i].len + 1, q_res,
-                        "Out of memory in allocating item buffer.", false);
-                    strcpy((char *)tuple[i].value, null_value.c_str());
-                }
-            } else {
-                // Empty
-            }
+            std::string datum_value;
+            ParseDatum(datum, datum_value, fields.coli_array[i].adtid);
+            tuple[i].len = static_cast< int >(datum_value.length());
+            QR_MALLOC_return_with_error(
+                tuple[i].value, char, tuple[i].len + 1, q_res,
+                "Out of memory in allocating item buffer.", false);
+            strcpy((char *)tuple[i].value, datum_value.c_str());
             // If data length exceeds current display size, set display size
             if (fields.coli_array[i].display_size < tuple[i].len)
                 fields.coli_array[i].display_size = tuple[i].len;

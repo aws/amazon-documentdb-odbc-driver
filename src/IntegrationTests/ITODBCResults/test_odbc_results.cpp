@@ -1426,8 +1426,65 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_CHAR) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
+TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring statement =
+        L"WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 "
+        L"14:18:30.123456789' AS binned_timestamp, CAST(ROW(9.9, 19) AS "
+        L"ROW(sum DOUBLE, count INTEGER)) AS data FROM ODBCTest.DevOps LIMIT "
+        L"1), interpolated_timeseries AS(SELECT "
+        L"CREATE_TIME_SERIES(binned_timestamp, data) FROM binned_timeseries) "
+        L"SELECT *FROM interpolated_timeseries";
+    ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)statement.c_str(), (SQLINTEGER)statement.length());
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    ret = SQLFetch(m_hstmt);
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    SQLCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::string expected;
+    expected = "[{time: 2021-03-05 14:18:30.123456789, value: (9.9,19)}]";
+    ASSERT_EQ((int)expected.size(), indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring statement =
+        L"WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 "
+        L"14:18:30.123456789' AS binned_timestamp, CAST(ROW(9.9, 19) AS "
+        L"ROW(sum DOUBLE, count INTEGER)) AS data FROM ODBCTest.DevOps LIMIT "
+        L"1), interpolated_timeseries AS(SELECT "
+        L"CREATE_TIME_SERIES(binned_timestamp, data) FROM binned_timeseries) "
+        L"SELECT *FROM interpolated_timeseries";
+    ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)statement.c_str(),
+                        (SQLINTEGER)statement.length());
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    ret = SQLFetch(m_hstmt);
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    SQLTCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected;
+    expected = L"[{time: 2021-03-05 14:18:30.123456789, value: (9.9,19)}]";
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected.size()), indicator);
+#else
+    ASSERT_EQ((int)(2 * expected.size()), indicator);
+#endif
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
 TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_CHAR) {
-    std::wstring columns = L"ARRAY[ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]], ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]]], ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[1, 2, 3]]]]]]]]]]]]";
+    std::wstring columns = L"ARRAY[ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]], ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]]], ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[1, 2, 3]]]]]]]]]]]], ARRAY[]";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLCHAR data[1024] = {0};
     SQLLEN indicator = 0;
@@ -1443,6 +1500,11 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_CHAR) {
     expected = "[[[[[[[[[[[[1,2,3]]]]]]]]]]]]";
     ASSERT_EQ((int)expected.size(), indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    expected = "-";
+    ASSERT_EQ((int)expected.size(), indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1450,8 +1512,8 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_WCHAR) {
     std::wstring columns =
         L"ARRAY[ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]], "
         L"ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]]], "
-        L"ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY["
-        L"ARRAY[1, 2, 3]]]]]]]]]]]]";
+        L"ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[1, 2, 3]]]]]]]]]]]], "
+        L"ARRAY[]";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLTCHAR data[1024] = {0};
     SQLLEN indicator = 0;
@@ -1469,6 +1531,15 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_WCHAR) {
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"[[[[[[[[[[[[1,2,3]]]]]]]]]]]]";
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected.size()), indicator);
+#else
+    ASSERT_EQ((int)(2 * expected.size()), indicator);
+#endif
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    expected = L"-";
 #ifdef __APPLE__
     ASSERT_EQ((int)(4 * expected.size()), indicator);
 #else
@@ -1652,7 +1723,7 @@ TEST_F(TestSQLGetData, ARRAY_ROW_NULL_TO_SQL_C_WCHAR) {
 //    // Since it can return either true or false, will disable check for now
 //    // EXPECT_FALSE(data_false);
 //}
-//
+
 //GET_DATA_TEST(TypeDataSet_GetBoolData, type_boolean, SQL_C_BIT,
 //              type_boolean_vals, 1)
 //
