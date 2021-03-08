@@ -1426,12 +1426,70 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_CHAR) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR) {
+TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR_ARRAY) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring statement =
+        L"WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 "
+        L"14:18:30.123456789' AS binned_timestamp, ARRAY[1,2,3] "
+        L"AS data FROM ODBCTest.IoT LIMIT "
+        L"1), interpolated_timeseries AS(SELECT "
+        L"CREATE_TIME_SERIES(binned_timestamp, data) FROM binned_timeseries) "
+        L"SELECT *FROM interpolated_timeseries";
+    ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)statement.c_str(),
+                        (SQLINTEGER)statement.length());
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    ret = SQLFetch(m_hstmt);
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    SQLCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::string expected;
+    expected = "[{time: 2021-03-05 14:18:30.123456789, value: [1,2,3]}]";
+    ASSERT_EQ((int)expected.size(), indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR_ARRAY) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring statement =
+        L"WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 "
+        L"14:18:30.123456789' AS binned_timestamp, ARRAY[1,2,3] "
+        L"AS data FROM ODBCTest.IoT LIMIT "
+        L"1), interpolated_timeseries AS(SELECT "
+        L"CREATE_TIME_SERIES(binned_timestamp, data) FROM binned_timeseries) "
+        L"SELECT *FROM interpolated_timeseries";
+    ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)statement.c_str(),
+                        (SQLINTEGER)statement.length());
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    ret = SQLFetch(m_hstmt);
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    SQLTCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected;
+    expected = L"[{time: 2021-03-05 14:18:30.123456789, value: [1,2,3]}]";
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected.size()), indicator);
+#else
+    ASSERT_EQ((int)(2 * expected.size()), indicator);
+#endif
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR_ROW) {
     SQLRETURN ret = SQL_ERROR;
     std::wstring statement =
         L"WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 "
         L"14:18:30.123456789' AS binned_timestamp, CAST(ROW(9.9, 19) AS "
-        L"ROW(sum DOUBLE, count INTEGER)) AS data FROM ODBCTest.DevOps LIMIT "
+        L"ROW(sum DOUBLE, count INTEGER)) AS data FROM ODBCTest.IoT LIMIT "
         L"1), interpolated_timeseries AS(SELECT "
         L"CREATE_TIME_SERIES(binned_timestamp, data) FROM binned_timeseries) "
         L"SELECT *FROM interpolated_timeseries";
@@ -1452,12 +1510,12 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR) {
+TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR_ROW) {
     SQLRETURN ret = SQL_ERROR;
     std::wstring statement =
         L"WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 "
         L"14:18:30.123456789' AS binned_timestamp, CAST(ROW(9.9, 19) AS "
-        L"ROW(sum DOUBLE, count INTEGER)) AS data FROM ODBCTest.DevOps LIMIT "
+        L"ROW(sum DOUBLE, count INTEGER)) AS data FROM ODBCTest.IoT LIMIT "
         L"1), interpolated_timeseries AS(SELECT "
         L"CREATE_TIME_SERIES(binned_timestamp, data) FROM binned_timeseries) "
         L"SELECT *FROM interpolated_timeseries";
@@ -1474,6 +1532,64 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::wstring expected;
     expected = L"[{time: 2021-03-05 14:18:30.123456789, value: (9.9,19)}]";
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected.size()), indicator);
+#else
+    ASSERT_EQ((int)(2 * expected.size()), indicator);
+#endif
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR_ARRAY_ROW_COMBINATION) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring statement =
+        L"WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 "
+        L"14:18:30.123456789' AS binned_timestamp, ROW(null, ARRAY[ARRAY[ROW(12345, ARRAY[1, 2, 3])]]) "
+        L"AS data FROM ODBCTest.IoT LIMIT "
+        L"1), interpolated_timeseries AS(SELECT "
+        L"CREATE_TIME_SERIES(binned_timestamp, data) FROM binned_timeseries) "
+        L"SELECT *FROM interpolated_timeseries";
+    ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)statement.c_str(),
+                        (SQLINTEGER)statement.length());
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    ret = SQLFetch(m_hstmt);
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    SQLCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::string expected;
+    expected = "[{time: 2021-03-05 14:18:30.123456789, value: (-,[[(12345,[1,2,3])]])}]";
+    ASSERT_EQ((int)expected.size(), indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR_ARRAY_ROW_COMBINATION) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring statement =
+        L"WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 "
+        L"14:18:30.123456789' AS binned_timestamp, ROW(null, ARRAY[ARRAY[ROW(12345, ARRAY[1, 2, 3])]]) "
+        L"AS data FROM ODBCTest.IoT LIMIT "
+        L"1), interpolated_timeseries AS(SELECT "
+        L"CREATE_TIME_SERIES(binned_timestamp, data) FROM binned_timeseries) "
+        L"SELECT *FROM interpolated_timeseries";
+    ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)statement.c_str(),
+                        (SQLINTEGER)statement.length());
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    ret = SQLFetch(m_hstmt);
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    SQLTCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected;
+    expected = L"[{time: 2021-03-05 14:18:30.123456789, value: (-,[[(12345,[1,2,3])]])}]";
 #ifdef __APPLE__
     ASSERT_EQ((int)(4 * expected.size()), indicator);
 #else
