@@ -88,12 +88,12 @@ static SQLLEN es_bin2whex(const char *src, SQLWCHAR *dst, SQLLEN length);
  *
  *			field_type		fCType				Output
  *			----------		------				----------
- *			ES_TYPE_DATE	SQL_C_DEFAULT		SQL_C_DATE
- *			ES_TYPE_DATE	SQL_C_DATE			SQL_C_DATE
- *			ES_TYPE_DATE	SQL_C_TIMESTAMP		SQL_C_TIMESTAMP		(time = 0
- *(midnight)) ES_TYPE_TIME	SQL_C_DEFAULT		SQL_C_TIME ES_TYPE_TIME
+ *			TS_TYPE_DATE	SQL_C_DEFAULT		SQL_C_DATE
+ *			TS_TYPE_DATE	SQL_C_DATE			SQL_C_DATE
+ *			TS_TYPE_DATE	SQL_C_TIMESTAMP		SQL_C_TIMESTAMP		(time = 0
+ *(midnight)) TS_TYPE_TIME	SQL_C_DEFAULT		SQL_C_TIME TS_TYPE_TIME
  *SQL_C_TIME			SQL_C_TIME
- *			ES_TYPE_TIME	SQL_C_TIMESTAMP		SQL_C_TIMESTAMP		(date =
+ *			TS_TYPE_TIME	SQL_C_TIMESTAMP		SQL_C_TIMESTAMP		(date =
  *current date) ES_TYPE_ABSTIME SQL_C_DEFAULT		SQL_C_TIMESTAMP
  *ES_TYPE_ABSTIME SQL_C_DATE			SQL_C_DATE			(time is truncated)
  *ES_TYPE_ABSTIME SQL_C_TIME			SQL_C_TIME			(date is truncated)
@@ -278,8 +278,8 @@ static BOOL timestamp2stime(const char *str, SIMPLE_TIME *st, BOOL *bZone,
 static int stime2timestamp(const SIMPLE_TIME *st, char *str, size_t bufsize,
                            BOOL bZone, int precision) {
     UNUSED(bZone);
-    char precstr[16], zonestr[16];
-    int i;
+    char precstr[16] = {0};
+    char zonestr[16] = {0};
 
     precstr[0] = '\0';
     if (st->infinity > 0) {
@@ -287,19 +287,12 @@ static int stime2timestamp(const SIMPLE_TIME *st, char *str, size_t bufsize,
     } else if (st->infinity < 0) {
         return snprintf(str, bufsize, "%s", MINFINITY_STRING);
     }
-    if (precision > 0 && st->fr) {
+    if (precision > 0) {
         SPRINTF_FIXED(precstr, ".%09d", st->fr);
         if (precision < 9)
             precstr[precision + 1] = '\0';
         else if (precision > 9)
             precision = 9;
-        for (i = precision; i > 0; i--) {
-            if (precstr[i] != '0')
-                break;
-            precstr[i] = '\0';
-        }
-        if (i == 0)
-            precstr[i] = '\0';
     }
     zonestr[0] = '\0';
 #ifdef TIMEZONE_GLOBAL
@@ -600,12 +593,6 @@ static int char2guid(const char *str, SQLGUID *g) {
         return COPY_GENERAL_ERROR;
     g->Data1 = Data1;
     return COPY_OK;
-}
-
-static int effective_fraction(int fraction, int *width) {
-    for (*width = 9; fraction % 10 == 0; (*width)--, fraction /= 10)
-        ;
-    return fraction;
 }
 
 static int get_terminator_len(SQLSMALLINT fCType) {
@@ -972,8 +959,8 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
     const ConnectionClass *conn = SC_get_conn(stmt);
     BOOL text_bin_handling;
     const char *neut_str = value;
-    char booltemp[3];
-    char midtemp[64];
+    char booltemp[3] = {0};
+    char midtemp[64] = {0};
     GetDataClass *esdc;
     long slong;
 
@@ -1065,11 +1052,11 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
              * $$$ need to add parsing for date/time/timestamp strings in
              * ES_TYPE_CHAR,VARCHAR $$$
              */
-        case ES_TYPE_DATE:
+        case TS_TYPE_DATE:
             sscanf(value, "%4d-%2d-%2d", &std_time.y, &std_time.m, &std_time.d);
             break;
 
-        case ES_TYPE_TIME: {
+        case TS_TYPE_TIME: {
             BOOL bZone = FALSE; /* time zone stuff is unreliable */
             int zone;
             timestamp2stime(value, &std_time, &bZone, &zone);
@@ -1077,8 +1064,8 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
 
         case ES_TYPE_ABSTIME:
         case ES_TYPE_DATETIME:
-        case ES_TYPE_TIMESTAMP_NO_TMZONE:
-        case ES_TYPE_TIMESTAMP:
+        case TS_TYPE_TIMESTAMP_NO_TMZONE:
+        case TS_TYPE_TIMESTAMP:
             std_time.fr = 0;
             std_time.infinity = 0;
             if (strnicmp(value, INFINITY_STRING, 8) == 0) {
@@ -1101,7 +1088,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                 std_time.ss = 0;
             }
             if (strnicmp(value, "invalid", 7) != 0) {
-                BOOL bZone = field_type != ES_TYPE_TIMESTAMP_NO_TMZONE;
+                BOOL bZone = field_type != TS_TYPE_TIMESTAMP_NO_TMZONE;
                 int zone;
 
                 /*
@@ -1268,28 +1255,20 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
          * enough.
          */
         switch (field_type) {
-            case ES_TYPE_DATE:
+            case TS_TYPE_DATE:
                 len = SPRINTF_FIXED(midtemp, "%.4d-%.2d-%.2d", std_time.y,
                                     std_time.m, std_time.d);
                 break;
 
-            case ES_TYPE_TIME:
-                len = SPRINTF_FIXED(midtemp, "%.2d:%.2d:%.2d", std_time.hh,
-                                    std_time.mm, std_time.ss);
-                if (std_time.fr > 0) {
-                    int wdt;
-                    int fr = effective_fraction(std_time.fr, &wdt);
-
-                    char *fraction = NULL;
-                    len = sprintf(fraction, ".%0*d", wdt, fr);
-                    strcat(midtemp, fraction);
-                }
+            case TS_TYPE_TIME:
+                len = SPRINTF_FIXED(midtemp, "%.2d:%.2d:%.2d.%09d", std_time.hh,
+                                    std_time.mm, std_time.ss, std_time.fr);
                 break;
 
             case ES_TYPE_ABSTIME:
             case ES_TYPE_DATETIME:
-            case ES_TYPE_TIMESTAMP_NO_TMZONE:
-            case ES_TYPE_TIMESTAMP:
+            case TS_TYPE_TIMESTAMP_NO_TMZONE:
+            case TS_TYPE_TIMESTAMP:
                 len = stime2timestamp(&std_time, midtemp, midsize, FALSE,
                                       (int)(midsize - 19 - 2));
                 break;
@@ -1347,49 +1326,57 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
         switch (fCType) {
             case SQL_C_DATE:
             case SQL_C_TYPE_DATE: /* 91 */
-                len = 6;
-                {
-                    DATE_STRUCT *ds;
-                    struct tm *tim;
+                if (field_type == TS_TYPE_TIME) {
+                    result = COPY_UNSUPPORTED_CONVERSION;
+                } else {
+                    len = 6;
+                    {
+                        DATE_STRUCT *ds;
+                        struct tm *tim;
 
-                    if (bind_size > 0)
-                        ds = (DATE_STRUCT *)rgbValueBindRow;
-                    else
-                        ds = (DATE_STRUCT *)rgbValue + bind_row;
+                        if (bind_size > 0)
+                            ds = (DATE_STRUCT *)rgbValueBindRow;
+                        else
+                            ds = (DATE_STRUCT *)rgbValue + bind_row;
 
-                    /*
-                     * Initialize date in case conversion destination
-                     * expects date part from this source time data.
-                     * A value may be partially set here, so do some
-                     * sanity checks on the existing values before
-                     * setting them.
-                     */
-                    tim = SC_get_localtime(stmt);
-                    if (std_time.m == 0)
-                        std_time.m = tim->tm_mon + 1;
-                    if (std_time.d == 0)
-                        std_time.d = tim->tm_mday;
-                    if (std_time.y == 0)
-                        std_time.y = tim->tm_year + 1900;
-                    ds->year = (SQLSMALLINT)std_time.y;
-                    ds->month = (SQLUSMALLINT)std_time.m;
-                    ds->day = (SQLUSMALLINT)std_time.d;
+                        /*
+                         * Initialize date in case conversion destination
+                         * expects date part from this source time data.
+                         * A value may be partially set here, so do some
+                         * sanity checks on the existing values before
+                         * setting them.
+                         */
+                        tim = SC_get_localtime(stmt);
+                        if (std_time.m == 0)
+                            std_time.m = tim->tm_mon + 1;
+                        if (std_time.d == 0)
+                            std_time.d = tim->tm_mday;
+                        if (std_time.y == 0)
+                            std_time.y = tim->tm_year + 1900;
+                        ds->year = (SQLSMALLINT)std_time.y;
+                        ds->month = (SQLUSMALLINT)std_time.m;
+                        ds->day = (SQLUSMALLINT)std_time.d;
+                    }
                 }
                 break;
 
             case SQL_C_TIME:
             case SQL_C_TYPE_TIME: /* 92 */
-                len = 6;
-                {
-                    TIME_STRUCT *ts;
+                if (field_type == TS_TYPE_DATE) {
+                    result = COPY_UNSUPPORTED_CONVERSION;
+                } else {
+                    len = 6;
+                    {
+                        TIME_STRUCT *ts;
 
-                    if (bind_size > 0)
-                        ts = (TIME_STRUCT *)rgbValueBindRow;
-                    else
-                        ts = (TIME_STRUCT *)rgbValue + bind_row;
-                    ts->hour = (SQLUSMALLINT)std_time.hh;
-                    ts->minute = (SQLUSMALLINT)std_time.mm;
-                    ts->second = (SQLUSMALLINT)std_time.ss;
+                        if (bind_size > 0)
+                            ts = (TIME_STRUCT *)rgbValueBindRow;
+                        else
+                            ts = (TIME_STRUCT *)rgbValue + bind_row;
+                        ts->hour = (SQLUSMALLINT)std_time.hh;
+                        ts->minute = (SQLUSMALLINT)std_time.mm;
+                        ts->second = (SQLUSMALLINT)std_time.ss;
+                    }
                 }
                 break;
 
