@@ -745,11 +745,47 @@ class TestSQLNumResultCols : public Fixture {};
 //    EXPECT_TRUE(found_expected_data);
 //}
 
-TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_STINYINT) {
-    int v1 = -293719;
-    int v2 = 741370;
+TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_BIT) {
+    int v1 = 0;
+    int v2 = 1;
+    int v3 = -1;  // underflow
+    int v4 = 2;  // overflow
     std::wstring columns = L"INTEGER\'" + std::to_wstring(v1) + L"\', INTEGER\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', INTEGER\'"
+                           + std::to_wstring(v3) + L"\', INTEGER\'"
+                           + std::to_wstring(v4) + L"\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLCHAR data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
+    EXPECT_EQ(expected_v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLCHAR expected_v2 = static_cast< SQLCHAR >(v2);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 4, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_STINYINT) {
+    int v1 = SCHAR_MIN;
+    int v2 = SCHAR_MAX;
+    int v3 = SCHAR_MIN - 1;  // underflow
+    int v4 = SCHAR_MAX + 1;      // overflow
+    std::wstring columns = L"INTEGER\'" + std::to_wstring(v1) + L"\', INTEGER\'"
+                           + std::to_wstring(v2) + L"\', INTEGER\'"
+                           + std::to_wstring(v3) + L"\', INTEGER\'"
+                           + std::to_wstring(v4) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLSCHAR data = 0;
     SQLLEN indicator = 0;
@@ -762,14 +798,26 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_STINYINT) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSCHAR expected_v2 = static_cast< SQLSCHAR >(v2);
     EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_STINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 4, SQL_C_STINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_TINYINT) {
-    int v1 = -293719;
-    int v2 = 741370;
+    int v1 = SCHAR_MIN;
+    int v2 = SCHAR_MAX;
+    int v3 = INT_MIN;   // underflow
+    int v4 = INT_MAX;  // overflow
     std::wstring columns = L"INTEGER\'" + std::to_wstring(v1) + L"\', INTEGER\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', INTEGER\'"
+                           + std::to_wstring(v3) + L"\', INTEGER\'"
+                           + std::to_wstring(v4) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLSCHAR data = 0;
     SQLLEN indicator = 0;
@@ -782,14 +830,24 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_TINYINT) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSCHAR expected_v2 = static_cast< SQLSCHAR >(v2);
     EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_TINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 4, SQL_C_TINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_UTINYINT) {
-    int v1 = -293719;
-    int v2 = 741370;
+    int v1 = UCHAR_MAX;
+    int v2 = -1;  // underflow
+    int v3 = UCHAR_MAX + 1;  // overflow
     std::wstring columns = L"INTEGER\'" + std::to_wstring(v1) + L"\', INTEGER\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', INTEGER\'"
+                           + std::to_wstring(v3) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLCHAR data = 0;
     SQLLEN indicator = 0;
@@ -799,9 +857,13 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_UTINYINT) {
     SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_UTINYINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLCHAR expected_v2 = static_cast< SQLCHAR >(v2);
-    EXPECT_EQ(expected_v2, data);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 3, SQL_C_UTINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -845,8 +907,8 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_LONG) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_ULONG) {
-    int v1 = -293719;
-    int v2 = 741370;
+    int v1 = 293719;
+    int v2 = -1;  // underflow
     std::wstring columns = L"INTEGER\'" + std::to_wstring(v1) + L"\', INTEGER\'"
                            + std::to_wstring(v2) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -858,17 +920,21 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_ULONG) {
     SQLUINTEGER expected_v1 = static_cast< SQLUINTEGER >(v1);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_ULONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLUINTEGER expected_v2 = static_cast< SQLUINTEGER >(v2);
-    EXPECT_EQ(expected_v2, data);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SSHORT) {
-    int v1 = -293719;
-    int v2 = 741370;
+    int v1 = SHRT_MIN;
+    int v2 = SHRT_MAX;
+    int v3 = SHRT_MIN - 1;  // underflow
+    int v4 = SHRT_MAX + 1;  // overflow
     std::wstring columns = L"INTEGER\'" + std::to_wstring(v1) + L"\', INTEGER\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', INTEGER\'"
+                           + std::to_wstring(v3) + L"\', INTEGER\'"
+                           + std::to_wstring(v4) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLSMALLINT data = 0;
     SQLLEN indicator = 0;
@@ -881,14 +947,26 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SSHORT) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT expected_v2 = static_cast< SQLSMALLINT >(v2);
     EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_SSHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 4, SQL_C_SSHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SHORT) {
-    int v1 = -293719;
-    int v2 = 741370;
+    int v1 = SHRT_MIN;
+    int v2 = SHRT_MAX;
+    int v3 = INT_MIN;  // underflow
+    int v4 = INT_MAX;  // overflow
     std::wstring columns = L"INTEGER\'" + std::to_wstring(v1) + L"\', INTEGER\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', INTEGER\'"
+                           + std::to_wstring(v3) + L"\', INTEGER\'"
+                           + std::to_wstring(v4) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLSMALLINT data = 0;
     SQLLEN indicator = 0;
@@ -901,14 +979,24 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SHORT) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT expected_v2 = static_cast< SQLSMALLINT >(v2);
     EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_SHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 4, SQL_C_SHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_USHORT) {
-    int v1 = -293719;
-    int v2 = 741370;
+    int v1 = USHRT_MAX;
+    int v2 = -1;  // underflow
+    int v3 = USHRT_MAX + 1;  // overflow
     std::wstring columns = L"INTEGER\'" + std::to_wstring(v1) + L"\', INTEGER\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', INTEGER\'"
+                           + std::to_wstring(v3) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLUSMALLINT data = 0;
     SQLLEN indicator = 0;
@@ -918,9 +1006,13 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_USHORT) {
     SQLUSMALLINT expected_v1 = static_cast< SQLUSMALLINT >(v1);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_USHORT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLUSMALLINT expected_v2 = static_cast< SQLUSMALLINT >(v2);
-    EXPECT_EQ(expected_v2, data);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 3, SQL_C_USHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -945,8 +1037,8 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SBIGINT) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_UBIGINT) {
-    int v1 = -293719;
-    int v2 = 741370;
+    int v1 = 293719;
+    int v2 = -1;  // underflow
     std::wstring columns = L"INTEGER\'" + std::to_wstring(v1) + L"\', INTEGER\'"
                            + std::to_wstring(v2) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -958,9 +1050,9 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_UBIGINT) {
     SQLUBIGINT expected_v1 = static_cast< SQLUBIGINT >(v1);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_UBIGINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLUBIGINT expected_v2 = static_cast< SQLUBIGINT >(v2);
-    EXPECT_EQ(expected_v2, data);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -986,11 +1078,47 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_CHAR) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_STINYINT) {
-    double v1 = 1.1;
-    double v2 = -3.9E-5;
+TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_BIT) {
+    double v1 = 0.0;
+    double v2 = 1.0;
+    double v3 = -1.0;  // underflow
+    double v4 = 2.0;   // overflow
     std::wstring columns = L"DOUBLE\'" + std::to_wstring(v1) + L"\', DOUBLE\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', DOUBLE\'"
+                           + std::to_wstring(v3) + L"\', DOUBLE\'"
+                           + std::to_wstring(v4) + L"\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLCHAR data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
+    EXPECT_EQ(expected_v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLCHAR expected_v2 = static_cast< SQLCHAR >(v2);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 4, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_STINYINT) {
+    double v1 = -3.9E-5;
+    double v2 = 3.9E-5;
+    double v3 = -1.29E2;  // underflow
+    double v4 = 1.28E2;  // overflow     
+    std::wstring columns = L"DOUBLE\'" + std::to_wstring(v1) + L"\', DOUBLE\'"
+                           + std::to_wstring(v2) + L"\', DOUBLE\'"
+                           + std::to_wstring(v3) + L"\', DOUBLE\'"
+                           + std::to_wstring(v4) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLSCHAR data = 0;
     SQLLEN indicator = 0;
@@ -1003,14 +1131,26 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_STINYINT) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSCHAR expected_v2 = static_cast< SQLSCHAR >(v2);
     EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_STINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 4, SQL_C_STINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_TINYINT) {
-    double v1 = 1.1;
-    double v2 = -3.9E5;
+    double v1 = -1.279E2;
+    double v2 = 1.269E2;
+    double v3 = LLONG_MIN;  // underflow
+    double v4 = ULONG_MAX;  // overflow
     std::wstring columns = L"DOUBLE\'" + std::to_wstring(v1) + L"\', DOUBLE\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', DOUBLE\'"
+                           + std::to_wstring(v3) + L"\', DOUBLE\'"
+                           + std::to_wstring(v4) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLSCHAR data = 0;
     SQLLEN indicator = 0;
@@ -1021,17 +1161,26 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_TINYINT) {
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_TINYINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSCHAR expected_v2 =
-        static_cast< SQLSCHAR >(strtol(std::to_string(v2).c_str(), NULL, 10));
+    SQLSCHAR expected_v2 = static_cast< SQLSCHAR >(v2);
     EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_TINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 4, SQL_C_TINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_UTINYINT) {
     double v1 = 1.1;
-    double v2 = -3.0;
+    double v2 = -3.0; // underflow
+    double v3 = 2.56E2;  // overflow
     std::wstring columns = L"DOUBLE\'" + std::to_wstring(v1) + L"\', DOUBLE\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', DOUBLE\'"
+                           + std::to_wstring(v3) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLCHAR data = 0;
     SQLLEN indicator = 0;
@@ -1041,18 +1190,25 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_UTINYINT) {
     SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_UTINYINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLCHAR expected_v2 =
-        static_cast< SQLCHAR >(strtol(std::to_string(v2).c_str(), NULL, 10));
-    EXPECT_EQ(expected_v2, data);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 3, SQL_C_UTINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SLONG) {
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
+    double v3 = -9.3E18;  // underflow
+    double v4 = (double)LONG_MAX + (double)1;  // overflow  
     std::wstring columns = L"DOUBLE\'" + std::to_wstring(v1) + L"\', DOUBLE\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', DOUBLE\'"
+                           + std::to_wstring(v3) + L"\', DOUBLE\'"
+                           + std::to_wstring(v4) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLINTEGER data = 0;
     SQLLEN indicator = 0;
@@ -1065,14 +1221,26 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SLONG) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLINTEGER expected_v2 = static_cast< SQLINTEGER >(v2);
     EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_SLONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 4, SQL_C_SLONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_LONG) {
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
+    double v3 = -DBL_MAX;  // underflow
+    double v4 = DBL_MAX;  // overflow
     std::wstring columns = L"DOUBLE\'" + std::to_wstring(v1) + L"\', DOUBLE\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', DOUBLE\'"
+                           + std::to_wstring(v3) + L"\', DOUBLE\'"
+                           + std::to_wstring(v4) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLINTEGER data = 0;
     SQLLEN indicator = 0;
@@ -1085,14 +1253,24 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_LONG) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLINTEGER expected_v2 = static_cast< SQLINTEGER >(v2);
     EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_LONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 4, SQL_C_LONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_ULONG) {
-    double v1 = -293719.0;
-    double v2 = 7.41370E5;
+    double v1 = 293719.0;
+    double v2 = -1;
+    double v3 = (double)ULONG_MAX + (double)1;
     std::wstring columns = L"DOUBLE\'" + std::to_wstring(v1) + L"\', DOUBLE\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', DOUBLE\'"
+                           + std::to_wstring(v3) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLUINTEGER data = 0;
     SQLLEN indicator = 0;
@@ -1103,17 +1281,25 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_ULONG) {
         strtoul(std::to_string(v1).c_str(), NULL, 10));
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_ULONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLUINTEGER expected_v2 = static_cast< SQLUINTEGER >(v2);
-    EXPECT_EQ(expected_v2, data);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 3, SQL_C_ULONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SSHORT) {
-    double v1 = -2.93719E5;
-    double v2 = 7.41370E5;
+    double v1 = SHRT_MIN;
+    double v2 = SHRT_MAX;
+    double v3 = -3.2769E4;
+    double v4 = 3.2768E4;
     std::wstring columns = L"DOUBLE\'" + std::to_wstring(v1) + L"\', DOUBLE\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', DOUBLE\'"
+                           + std::to_wstring(v3) + L"\', DOUBLE\'"
+                           + std::to_wstring(v4) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLSMALLINT data = 0;
     SQLLEN indicator = 0;
@@ -1128,14 +1314,26 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SSHORT) {
     SQLSMALLINT expected_v2 = static_cast< SQLSMALLINT >(
         strtol(std::to_string(v2).c_str(), NULL, 10));
     EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_SSHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 4, SQL_C_SSHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SHORT) {
-    double v1 = -2.93719E5;
-    double v2 = 7.41370E5;
+    double v1 = SHRT_MIN;
+    double v2 = SHRT_MAX;
+    double v3 = -DBL_MAX;
+    double v4 = DBL_MAX;
     std::wstring columns = L"DOUBLE\'" + std::to_wstring(v1) + L"\', DOUBLE\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', DOUBLE\'"
+                           + std::to_wstring(v3) + L"\', DOUBLE\'"
+                           + std::to_wstring(v4) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLSMALLINT data = 0;
     SQLLEN indicator = 0;
@@ -1150,14 +1348,24 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SHORT) {
     SQLSMALLINT expected_v2 = static_cast< SQLSMALLINT >(
         strtol(std::to_string(v2).c_str(), NULL, 10));
     EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_SSHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 4, SQL_C_SSHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_USHORT) {
-    double v1 = -2.93719E5;
-    double v2 = 7.41370E5;
+    double v1 = 0;
+    double v2 = -1.0;  // underflow
+    double v3 = 6.5536E4;  // overflow
     std::wstring columns = L"DOUBLE\'" + std::to_wstring(v1) + L"\', DOUBLE\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', DOUBLE\'"
+                           + std::to_wstring(v3) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLUSMALLINT data = 0;
     SQLLEN indicator = 0;
@@ -1168,18 +1376,25 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_USHORT) {
         strtol(std::to_string(v1).c_str(), NULL, 10));
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_USHORT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLUSMALLINT expected_v2 = static_cast< SQLUSMALLINT >(
-        strtol(std::to_string(v2).c_str(), NULL, 10));
-    EXPECT_EQ(expected_v2, data);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 3, SQL_C_USHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SBIGINT) {
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
+    double v3 = -DBL_MAX;  // underflow
+    double v4 = DBL_MAX; // overflow
     std::wstring columns = L"DOUBLE\'" + std::to_wstring(v1) + L"\', DOUBLE\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', DOUBLE\'"
+                           + std::to_wstring(v3) + L"\', DOUBLE\'"
+                           + std::to_wstring(v4) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLBIGINT data = 0;
     SQLLEN indicator = 0;
@@ -1192,14 +1407,24 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SBIGINT) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLBIGINT expected_v2 = static_cast< SQLBIGINT >(v2);
     EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_SBIGINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 4, SQL_C_SBIGINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_UBIGINT) {
-    double v1 = -2.93719E5;
-    double v2 = 7.41370E5;
+    double v1 = 2.93719E5;
+    double v2 = -1.0;  // underflow
+    double v3 = DBL_MAX;  //overflow
     std::wstring columns = L"DOUBLE\'" + std::to_wstring(v1) + L"\', DOUBLE\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', DOUBLE\'"
+                           + std::to_wstring(v3) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLUBIGINT data = 0;
     SQLLEN indicator = 0;
@@ -1210,9 +1435,13 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_UBIGINT) {
         strtoull(std::to_string(v1).c_str(), NULL, 10));
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_UBIGINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLUBIGINT expected_v2 = static_cast< SQLUBIGINT >(v2);
-    EXPECT_EQ(expected_v2, data);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 3, SQL_C_UBIGINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1259,8 +1488,12 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_DOUBLE) {
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_FLOAT) {
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
+    double v3 = -DBL_MAX;  // underflow
+    double v4 = DBL_MAX;  // overflow
     std::wstring columns = L"DOUBLE\'" + std::to_wstring(v1) + L"\', DOUBLE\'"
-                           + std::to_wstring(v2) + L"\'";
+                           + std::to_wstring(v2) + L"\', DOUBLE\'"
+                           + std::to_wstring(v3) + L"\', DOUBLE\'"
+                           + std::to_wstring(v4) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLREAL data = 0;
     SQLLEN indicator = 0;
@@ -1273,13 +1506,52 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_FLOAT) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLREAL expected_v2 = static_cast< SQLREAL >(v2);
     EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_FLOAT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 4, SQL_C_FLOAT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_BIT) {
+    long long v1 = 0;
+    long long v2 = 1;
+    long long v3 = -2147483649ll;  // underflow
+    long long v4 = 2147483649ll;   // overflow
+    std::wstring columns = L"BIGINT\'" + std::to_wstring(v1) + L"\', BIGINT\'"
+                           + std::to_wstring(v2) + L"\', BIGINT\'"
+                           + std::to_wstring(v3) + L"\', BIGINT\'"
+                           + std::to_wstring(v4) + L"\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLBIGINT data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
+    EXPECT_EQ(expected_v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLCHAR expected_v2 = static_cast< SQLCHAR >(v2);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 4, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_SBIGINT) {
-    auto v1 = 2147483649ll;
-    auto v2 = 2147483649ll;
-    v2 *= -1;
+    long long  v1 = -2147483649ll;
+    long long  v2 = 2147483649ll;
     std::wstring columns = L"BIGINT\'" + std::to_wstring(v1) + L"\', BIGINT\'"
                            + std::to_wstring(v2) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -1296,11 +1568,8 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_SBIGINT) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_UBIGINT) {
-    auto v1 = 2147483649ll;
-    unsigned long long uv1 = v1;
-    auto v2 = 2147483649ll;
-    v2 *= -1;
-    unsigned long long uv2 = v2;
+    long long v1 = 2147483649ll;
+    long long v2 = -1ll;  // underflow
     std::wstring columns = L"BIGINT\'" + std::to_wstring(v1) + L"\', BIGINT\'"
                            + std::to_wstring(v2) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -1309,10 +1578,12 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_UBIGINT) {
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_UBIGINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ(uv1, data);
+    SQLUBIGINT expected_v1 = static_cast< SQLUBIGINT > (v1);
+    EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_UBIGINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ(uv2, data);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
