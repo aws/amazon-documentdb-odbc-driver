@@ -303,18 +303,18 @@ estype_attr_to_concise_type(const ConnectionClass *conn, OID type,
             return SQL_REAL;
         case TS_TYPE_DOUBLE:
             return SQL_FLOAT;
-        case ES_TYPE_DATE:
+        case TS_TYPE_DATE:
             if (EN_is_odbc3(env))
                 return SQL_TYPE_DATE;
             return SQL_DATE;
-        case ES_TYPE_TIME:
+        case TS_TYPE_TIME:
             if (EN_is_odbc3(env))
                 return SQL_TYPE_TIME;
             return SQL_TIME;
         case ES_TYPE_ABSTIME:
         case ES_TYPE_DATETIME:
-        case ES_TYPE_TIMESTAMP_NO_TMZONE:
-        case ES_TYPE_TIMESTAMP:
+        case TS_TYPE_TIMESTAMP_NO_TMZONE:
+        case TS_TYPE_TIMESTAMP:
             if (EN_is_odbc3(env))
                 return SQL_TYPE_TIMESTAMP;
             return SQL_TIMESTAMP;
@@ -420,18 +420,18 @@ estype_attr_to_ctype(const ConnectionClass *conn, OID type, int atttypmod) {
             return SQL_C_FLOAT;
         case TS_TYPE_DOUBLE:
             return SQL_C_DOUBLE;
-        case ES_TYPE_DATE:
+        case TS_TYPE_DATE:
             if (EN_is_odbc3(env))
                 return SQL_C_TYPE_DATE;
             return SQL_C_DATE;
-        case ES_TYPE_TIME:
+        case TS_TYPE_TIME:
             if (EN_is_odbc3(env))
                 return SQL_C_TYPE_TIME;
             return SQL_C_TIME;
         case ES_TYPE_ABSTIME:
         case ES_TYPE_DATETIME:
-        case ES_TYPE_TIMESTAMP_NO_TMZONE:
-        case ES_TYPE_TIMESTAMP:
+        case TS_TYPE_TIMESTAMP_NO_TMZONE:
+        case TS_TYPE_TIMESTAMP:
             if (EN_is_odbc3(env))
                 return SQL_C_TYPE_TIMESTAMP;
             return SQL_C_TIMESTAMP;
@@ -553,9 +553,9 @@ estype_attr_precision(const ConnectionClass *conn, OID type, int atttypmod,
             return (SQLSMALLINT)getNumericColumnSizeX(conn, type, atttypmod,
                                                       adtsize_or_longest,
                                                       handle_unknown_size_as);
-        case ES_TYPE_TIME:
+        case TS_TYPE_TIME:
         case ES_TYPE_DATETIME:
-        case ES_TYPE_TIMESTAMP_NO_TMZONE:
+        case TS_TYPE_TIMESTAMP_NO_TMZONE:
             return getTimestampDecimalDigitsX(conn, type, atttypmod);
 #ifdef ES_INTERVAL_AS_SQL_INTERVAL
         case ES_TYPE_INTERVAL:
@@ -651,14 +651,14 @@ Int4 estype_attr_buffer_length(const ConnectionClass *conn, OID type,
         case TS_TYPE_DOUBLE:
             return 8; /* sizeof(SQLFLOAT) */
 
-        case ES_TYPE_DATE:
-        case ES_TYPE_TIME:
+        case TS_TYPE_DATE:
+        case TS_TYPE_TIME:
             return 6; /* sizeof(DATE(TIME)_STRUCT) */
 
         case ES_TYPE_ABSTIME:
         case ES_TYPE_DATETIME:
-        case ES_TYPE_TIMESTAMP:
-        case ES_TYPE_TIMESTAMP_NO_TMZONE:
+        case TS_TYPE_TIMESTAMP:
+        case TS_TYPE_TIMESTAMP_NO_TMZONE:
             return 16; /* sizeof(TIMESTAMP_STRUCT) */
 
         case ES_TYPE_MACADDR:
@@ -738,12 +738,12 @@ Int4 estype_attr_desclength(const ConnectionClass *conn, OID type,
         case TS_TYPE_DOUBLE:
             return 8;
 
-        case ES_TYPE_DATE:
-        case ES_TYPE_TIME:
+        case TS_TYPE_DATE:
+        case TS_TYPE_TIME:
         case ES_TYPE_ABSTIME:
         case ES_TYPE_DATETIME:
-        case ES_TYPE_TIMESTAMP_NO_TMZONE:
-        case ES_TYPE_TIMESTAMP:
+        case TS_TYPE_TIMESTAMP_NO_TMZONE:
+        case TS_TYPE_TIMESTAMP:
         case TS_TYPE_VARCHAR:
         case ES_TYPE_BPCHAR:
             return estype_attr_column_size(conn, type, atttypmod,
@@ -775,11 +775,11 @@ Int2 estype_attr_decimal_digits(const ConnectionClass *conn, OID type,
              * "yyyy-mm=dd hh:mm:ss[.f...]"
              */
         case ES_TYPE_ABSTIME:
-        case ES_TYPE_TIMESTAMP:
+        case TS_TYPE_TIMESTAMP:
             return 0;
-        case ES_TYPE_TIME:
+        case TS_TYPE_TIME:
         case ES_TYPE_DATETIME:
-        case ES_TYPE_TIMESTAMP_NO_TMZONE:
+        case TS_TYPE_TIMESTAMP_NO_TMZONE:
             /* return 0; */
             return getTimestampDecimalDigitsX(conn, type, atttypmod);
 
@@ -941,7 +941,7 @@ OID sqltype_to_estype(const ConnectionClass *conn, SQLSMALLINT fSqlType) {
 
         case SQL_TYPE_DATE:
         case SQL_DATE:
-            esType = ES_TYPE_DATE;
+            esType = TS_TYPE_DATE;
             break;
 
         case SQL_DOUBLE:
@@ -987,7 +987,7 @@ OID sqltype_to_estype(const ConnectionClass *conn, SQLSMALLINT fSqlType) {
 
         case SQL_TIME:
         case SQL_TYPE_TIME:
-            esType = ES_TYPE_TIME;
+            esType = TS_TYPE_TIME;
             break;
 
         case SQL_TIMESTAMP:
