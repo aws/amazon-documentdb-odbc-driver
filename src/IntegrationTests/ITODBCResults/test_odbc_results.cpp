@@ -257,7 +257,7 @@ void QueryFetch(const std::wstring& column, const std::wstring& dataset,
     LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
 }
 
-auto CompareTimeStampStruct = [](const TIMESTAMP_STRUCT& l,
+auto CompareTimestampStruct = [](const TIMESTAMP_STRUCT& l,
                                  const TIMESTAMP_STRUCT& r) {
     EXPECT_EQ(l.year, r.year);
     EXPECT_EQ(l.month, r.month);
@@ -2217,32 +2217,32 @@ TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_TIMESTAMP) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
     TIMESTAMP_STRUCT ts1{2021, 1, 2, 18, 1, 13, 0};
-    CompareTimeStampStruct(ts1, data);
+    CompareTimestampStruct(ts1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_TIMESTAMP, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
     TIMESTAMP_STRUCT ts2{2021, 11, 20, 6, 39, 45, 123456789};
-    CompareTimeStampStruct(ts2, data);
+    CompareTimestampStruct(ts2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_TIMESTAMP, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
     TIMESTAMP_STRUCT ts3{2021, 11, 20, 6, 39, 45, 123450000};
-    CompareTimeStampStruct(ts3, data);
+    CompareTimestampStruct(ts3, data);
     ret = SQLGetData(m_hstmt, 4, SQL_C_TIMESTAMP, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
     TIMESTAMP_STRUCT ts4{2021, 11, 20, 6, 39, 45, 0};
-    CompareTimeStampStruct(ts4, data);
+    CompareTimestampStruct(ts4, data);
     ret = SQLGetData(m_hstmt, 5, SQL_C_TIMESTAMP, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
     TIMESTAMP_STRUCT ts5{2021, 11, 20, 6, 39, 0, 0};
-    CompareTimeStampStruct(ts5, data);
+    CompareTimestampStruct(ts5, data);
     ret = SQLGetData(m_hstmt, 6, SQL_C_TIMESTAMP, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
     TIMESTAMP_STRUCT ts6{2021, 11, 20, 0, 0, 0, 0};
-    CompareTimeStampStruct(ts6, data);
+    CompareTimestampStruct(ts6, data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -2388,14 +2388,14 @@ TEST_F(TestSQLGetData, DATE_TO_SQL_C_TIMESTAMP) {
                      &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts1 {2021, 1, 2, 0, 0, 0};
-    CompareTimeStampStruct(ts1, data);
+    TIMESTAMP_STRUCT ts1 {2021, 1, 2, 0, 0, 0, 0};
+    CompareTimestampStruct(ts1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_TIMESTAMP, &data, sizeof(data),
                      &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts2{2021, 11, 20, 0, 0, 0};
-    CompareTimeStampStruct(ts2, data);
+    TIMESTAMP_STRUCT ts2{2021, 11, 20, 0, 0, 0, 0};
+    CompareTimestampStruct(ts2, data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -2561,7 +2561,7 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_TIMESTAMP) {
                          1,
                          13,
                          0};
-    CompareTimeStampStruct(ts1, data);
+    CompareTimestampStruct(ts1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_TIMESTAMP, &data, sizeof(data),
                      &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -2573,7 +2573,7 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_TIMESTAMP) {
                          39,
                          45,
                          123456789};
-    CompareTimeStampStruct(ts2, data);
+    CompareTimestampStruct(ts2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_TIMESTAMP, &data, sizeof(data),
                      &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -2585,7 +2585,7 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_TIMESTAMP) {
                          39,
                          45,
                          123450000};
-    CompareTimeStampStruct(ts3, data);
+    CompareTimestampStruct(ts3, data);
     ret = SQLGetData(m_hstmt, 4, SQL_C_TIMESTAMP, &data, sizeof(data),
                      &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -2597,7 +2597,7 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_TIMESTAMP) {
                          39,
                          45,
                          0};
-    CompareTimeStampStruct(ts4, data);
+    CompareTimestampStruct(ts4, data);
     ret = SQLGetData(m_hstmt, 5, SQL_C_TIMESTAMP, &data, sizeof(data),
                      &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -2609,7 +2609,7 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_TIMESTAMP) {
                          39,
                          0,
                          0};
-    CompareTimeStampStruct(ts5, data);
+    CompareTimestampStruct(ts5, data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
