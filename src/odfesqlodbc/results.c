@@ -986,6 +986,12 @@ RETCODE SQL_API ESAPI_GetData(HSTMT hstmt, SQLUSMALLINT icol,
             result = SQL_SUCCESS_WITH_INFO;
             break;
 
+        case COPY_RESULT_OVERFLOW_UNDERFLOW:
+            SC_set_error(stmt, STMT_VALUE_OUT_OF_RANGE,
+                         "An overflow or underflow happened during conversion.", func);
+            result = SQL_ERROR;
+            break;
+
         case COPY_INVALID_STRING_CONVERSION: /* invalid string */
             SC_set_error(stmt, STMT_STRING_CONVERSION_ERROR,
                          "invalid string conversion occured.", func);

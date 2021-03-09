@@ -35,6 +35,7 @@
 #include <limits.h>
 #include <math.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include "bind.h"
 #include "catfunc.h"
@@ -44,7 +45,6 @@
 #include "qresult.h"
 #include "statement.h"
 
-CSTR NAN_STRING = "NaN";
 CSTR INFINITY_STRING = "Infinity";
 CSTR MINFINITY_STRING = "-Infinity";
 
@@ -100,17 +100,6 @@ static SQLLEN es_bin2whex(const char *src, SQLWCHAR *dst, SQLLEN length);
  *ES_TYPE_ABSTIME SQL_C_TIMESTAMP		SQL_C_TIMESTAMP
  *---------
  */
-
-/*
- *	Macros for unsigned long handling.
- */
-#ifdef WIN32
-#define ATOI32U(val) strtoul(val, NULL, 10)
-#elif defined(HAVE_STRTOUL)
-#define ATOI32U(val) strtoul(val, NULL, 10)
-#else /* HAVE_STRTOUL */
-#define ATOI32U atol
-#endif /* WIN32 */
 
 /*
  *	Macros for BIGINT handling.
@@ -594,31 +583,6 @@ int copy_and_convert_field_bindinfo(StatementClass *stmt, OID field_type,
                                   LENADDR_SHIFT(bic->indicator, offset));
 }
 
-static double get_double_value(const char *str) {
-    if (stricmp(str, NAN_STRING) == 0)
-#ifdef NAN
-        return (double)NAN;
-#else
-    {
-        double a = .0;
-        return .0 / a;
-    }
-#endif /* NAN */
-    else if (stricmp(str, INFINITY_STRING) == 0)
-#ifdef INFINITY
-        return (double)INFINITY;
-#else
-        return (double)(HUGE_VAL * HUGE_VAL);
-#endif /* INFINITY */
-    else if (stricmp(str, MINFINITY_STRING) == 0)
-#ifdef INFINITY
-        return (double)-INFINITY;
-#else
-        return (double)-(HUGE_VAL * HUGE_VAL);
-#endif /* INFINITY */
-    return atof(str);
-}
-
 static int char2guid(const char *str, SQLGUID *g) {
     /*
      * SQLGUID.Data1 is an "unsigned long" on some platforms, and
@@ -1011,6 +975,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
     char booltemp[3];
     char midtemp[64];
     GetDataClass *esdc;
+    long slong;
 
     if (stmt->current_col >= 0) {
         if (stmt->current_col >= opts->allocated) {
@@ -1467,55 +1432,72 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
 
             case SQL_C_BIT:
                 len = 1;
-                if (bind_size > 0)
-                    *((UCHAR *)rgbValueBindRow) = (UCHAR)atoi(neut_str);
-                else
-                    *((UCHAR *)rgbValue + bind_row) = (UCHAR)atoi(neut_str);
+                slong = strtol(neut_str, 0, 10);
+                if (slong < 0 || slong >= 2) {
+                    result = COPY_RESULT_OVERFLOW_UNDERFLOW;
+                } else {
+                    if (bind_size > 0)
+                        *((UCHAR *)rgbValueBindRow) = (UCHAR)slong;
+                    else
+                        *((UCHAR *)rgbValue + bind_row) = (UCHAR)slong;
+                }
 
                 MYLOG(99,
                       "SQL_C_BIT: bind_row = " FORMAT_POSIROW
-                      " val = %d, cb = " FORMAT_LEN ", rgb=%d\n",
-                      bind_row, atoi(neut_str), cbValueMax,
+                      " val = %ld, cb = " FORMAT_LEN ", rgb=%d\n",
+                      bind_row, slong, cbValueMax,
                       *((UCHAR *)rgbValue));
                 break;
 
             case SQL_C_STINYINT:
             case SQL_C_TINYINT:
                 len = 1;
-                if (bind_size > 0)
-                    *((SCHAR *)rgbValueBindRow) = (SCHAR)atoi(neut_str);
-                else
-                    *((SCHAR *)rgbValue + bind_row) = (SCHAR)atoi(neut_str);
+                slong = strtol(neut_str, 0, 10);
+                if (slong < SCHAR_MIN || slong > SCHAR_MAX) {
+                    result = COPY_RESULT_OVERFLOW_UNDERFLOW;
+                } else {
+                    if (bind_size > 0)
+                        *((SCHAR *)rgbValueBindRow) = (SCHAR)slong;
+                    else
+                        *((SCHAR *)rgbValue + bind_row) = (SCHAR)slong;
+                }
                 break;
 
             case SQL_C_UTINYINT:
                 len = 1;
-                if (bind_size > 0)
-                    *((UCHAR *)rgbValueBindRow) = (UCHAR)atoi(neut_str);
-                else
-                    *((UCHAR *)rgbValue + bind_row) = (UCHAR)atoi(neut_str);
+                slong = strtol(neut_str, 0, 10);
+                if (slong < 0 || slong > UCHAR_MAX) {
+                    result = COPY_RESULT_OVERFLOW_UNDERFLOW;
+                } else {
+                    if (bind_size > 0)
+                        *((UCHAR *)rgbValueBindRow) = (UCHAR)slong;
+                    else
+                        *((UCHAR *)rgbValue + bind_row) = (UCHAR)slong;
+                }
                 break;
 
             case SQL_C_FLOAT:
                 set_client_decimal_point((char *)neut_str);
                 len = 4;
-                if (bind_size > 0)
-                    *((SFLOAT *)rgbValueBindRow) =
-                        (SFLOAT)get_double_value(neut_str);
-                else
-                    *((SFLOAT *)rgbValue + bind_row) =
-                        (SFLOAT)get_double_value(neut_str);
+                errno = 0;
+                float f = strtof(neut_str, 0);
+                if (errno == ERANGE) {
+                    result = COPY_RESULT_OVERFLOW_UNDERFLOW;
+                } else {
+                    if (bind_size > 0)
+                        *((SFLOAT *)rgbValueBindRow) = f;
+                    else
+                        *((SFLOAT *)rgbValue + bind_row) = f;
+                }
                 break;
 
             case SQL_C_DOUBLE:
                 set_client_decimal_point((char *)neut_str);
                 len = 8;
                 if (bind_size > 0)
-                    *((SDOUBLE *)rgbValueBindRow) =
-                        (SDOUBLE)get_double_value(neut_str);
+                    *((SDOUBLE *)rgbValueBindRow) = strtod(neut_str, 0);
                 else
-                    *((SDOUBLE *)rgbValue + bind_row) =
-                        (SDOUBLE)get_double_value(neut_str);
+                    *((SDOUBLE *)rgbValue + bind_row) = strtod(neut_str, 0);
                 break;
 
             case SQL_C_NUMERIC: {
@@ -1535,63 +1517,108 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
             case SQL_C_SSHORT:
             case SQL_C_SHORT:
                 len = 2;
-                if (bind_size > 0)
-                    *((SQLSMALLINT *)rgbValueBindRow) =
-                        (SQLSMALLINT)atoi(neut_str);
-                else
-                    *((SQLSMALLINT *)rgbValue + bind_row) =
-                        (SQLSMALLINT)atoi(neut_str);
+                slong = strtol(neut_str, 0, 10);
+                if (slong < SHRT_MIN || slong > SHRT_MAX) {
+                    result = COPY_RESULT_OVERFLOW_UNDERFLOW;
+                } else {
+                    if (bind_size > 0)
+                        *((SQLSMALLINT *)rgbValueBindRow) = (SQLSMALLINT)slong;
+                    else
+                        *((SQLSMALLINT *)rgbValue + bind_row) =
+                            (SQLSMALLINT)slong;
+                }
                 break;
 
             case SQL_C_USHORT:
                 len = 2;
-                if (bind_size > 0)
-                    *((SQLUSMALLINT *)rgbValueBindRow) =
-                        (SQLUSMALLINT)atoi(neut_str);
-                else
-                    *((SQLUSMALLINT *)rgbValue + bind_row) =
-                        (SQLUSMALLINT)atoi(neut_str);
+                slong = strtol(neut_str, 0, 10);
+                if (slong < 0 || slong > USHRT_MAX) {
+                    result = COPY_RESULT_OVERFLOW_UNDERFLOW;
+                } else {
+                    if (bind_size > 0)
+                        *((SQLUSMALLINT *)rgbValueBindRow) =
+                            (SQLUSMALLINT)slong;
+                    else
+                        *((SQLUSMALLINT *)rgbValue + bind_row) =
+                            (SQLUSMALLINT)slong;
+                }
                 break;
 
             case SQL_C_SLONG:
             case SQL_C_LONG:
                 len = 4;
-                if (bind_size > 0)
-                    *((SQLINTEGER *)rgbValueBindRow) = atol(neut_str);
-                else
-                    *((SQLINTEGER *)rgbValue + bind_row) = atol(neut_str);
+                errno = 0;
+                slong = strtol(neut_str, 0, 10);
+                if ((slong == LONG_MIN || slong == LONG_MAX)
+                    && errno == ERANGE) {
+                    result = COPY_RESULT_OVERFLOW_UNDERFLOW;
+                } else {
+                    if (bind_size > 0)
+                        *((SQLINTEGER *)rgbValueBindRow) = slong;
+                    else
+                        *((SQLINTEGER *)rgbValue + bind_row) = slong;
+                }
                 break;
 
             case SQL_C_ULONG:
                 len = 4;
-                if (bind_size > 0)
-                    *((SQLUINTEGER *)rgbValueBindRow) = ATOI32U(neut_str);
-                else
-                    *((SQLUINTEGER *)rgbValue + bind_row) = ATOI32U(neut_str);
+                // negative case
+                if (strtol(neut_str, 0, 10) < 0) {
+                    result = COPY_RESULT_OVERFLOW_UNDERFLOW;
+                    break;
+                }
+                errno = 0;
+                unsigned long ulong = strtoul(neut_str, 0, 10);
+                if (ulong == ULONG_MAX && errno == ERANGE) {
+                    result = COPY_RESULT_OVERFLOW_UNDERFLOW;
+                } else {
+                    if (bind_size > 0)
+                        *((SQLUINTEGER *)rgbValueBindRow) = ulong;
+                    else
+                        *((SQLUINTEGER *)rgbValue + bind_row) = ulong;
+                }
                 break;
 
 #ifdef ODBCINT64
             case SQL_C_SBIGINT:
                 len = 8;
-                if (bind_size > 0)
-                    *((SQLBIGINT *)rgbValueBindRow) = ATOI64(neut_str);
-                else
-                    *((SQLBIGINT *)rgbValue + bind_row) = ATOI64(neut_str);
+                errno = 0;
+                signed long long sllong = strtoll(neut_str, 0, 10);
+                if ((sllong == LLONG_MIN || sllong == LLONG_MAX)
+                    && errno == ERANGE) {
+                    result = COPY_RESULT_OVERFLOW_UNDERFLOW;
+                } else {
+                    if (bind_size > 0)
+                        *((SQLBIGINT *)rgbValueBindRow) = sllong;
+                    else
+                        *((SQLBIGINT *)rgbValue + bind_row) = sllong;
+                }
                 break;
 
             case SQL_C_UBIGINT:
                 len = 8;
-                if (bind_size > 0)
-                    *((SQLUBIGINT *)rgbValueBindRow) = ATOI64U(neut_str);
-                else
-                    *((SQLUBIGINT *)rgbValue + bind_row) = ATOI64U(neut_str);
+                // negative case
+                if (strtol(neut_str, 0, 10) < 0) {
+                    result = COPY_RESULT_OVERFLOW_UNDERFLOW;
+                    break;
+                }
+                errno = 0;
+                unsigned long long ullong = strtoull(neut_str, 0, 10);
+                if (ullong == ULLONG_MAX && errno == ERANGE) {
+                    result = COPY_RESULT_OVERFLOW_UNDERFLOW;
+                } else {
+                    if (bind_size > 0)
+                        *((SQLUBIGINT *)rgbValueBindRow) = ullong;
+                    else
+                        *((SQLUBIGINT *)rgbValue + bind_row) = ullong;
+                }
                 break;
 
 #endif /* ODBCINT64 */
             case SQL_C_BINARY:
                 /* The following is for SQL_C_VARBOOKMARK */
                 if (TS_TYPE_INTEGER == field_type) {
-                    UInt4 ival = ATOI32U(neut_str);
+                    UInt4 ival = strtoul(neut_str, 0, 10);
 
                     MYLOG(LOG_ALL, "SQL_C_VARBOOKMARK value=%d\n", ival);
                     if (pcbValue)
