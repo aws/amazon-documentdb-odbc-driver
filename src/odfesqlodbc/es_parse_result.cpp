@@ -434,7 +434,7 @@ void ParseDatum(const Aws::TimestreamQuery::Model::Datum &datum,
         ParseTimeSeries(datum.GetTimeSeriesValue(), datum_value, column_attr_id);
     } else if (datum.NullValueHasBeenSet()) {
         if (datum.GetNullValue()) {
-            datum_value += "-";
+            datum_value += "null";
         }
     } else {
         // Empty
@@ -449,11 +449,14 @@ void ParseArray(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > & datums
         array_value += "[";
         for (auto &datum : datums) {
             ParseDatum(datum, array_value, column_attr_id);
-            array_value += ",";
+            array_value += ", ";
         }
-        // remove the last ','
-        if (array_value.back() == ',')
+        // remove the last ',' & ' '
+        if (array_value.size() > 1 && array_value[array_value.size() - 1] == ' '
+            && array_value[array_value.size() - 2] == ',') {
             array_value.pop_back();
+            array_value.pop_back();
+        }
         array_value += "]";
     }
 }
@@ -463,11 +466,14 @@ void ParseRow(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
     row_value += "(";
     for (auto &datum : datums) {
         ParseDatum(datum, row_value, column_attr_id);
-        row_value += ",";
+        row_value += ", ";
     }
-    // remove the last ','
-    if (row_value.back() == ',')
+    // remove the last ',' & ' '
+    if (row_value.size() > 1 && row_value[row_value.size() - 1] == ' '
+        && row_value[row_value.size() - 2] == ',') {
         row_value.pop_back();
+        row_value.pop_back();
+    }
     row_value += ")";
 }
 
@@ -480,18 +486,20 @@ void ParseTimeSeries(const Aws::Vector< Aws::TimestreamQuery::Model::TimeSeriesD
         if (s.TimeHasBeenSet()) {
             timeseries_value += s.GetTime();
         }
-        timeseries_value += ", ";
-        timeseries_value += "value: ";
+        timeseries_value += ", value: ";
         if (s.ValueHasBeenSet()) {
             std::string value;
             ParseDatum(s.GetValue(), value, column_attr_id);
             timeseries_value += value;
         }
-        timeseries_value += "},";
+        timeseries_value += "}, ";
     }
-    // remove the last ','
-    if (timeseries_value.back() == ',')
+    // remove the last ',' & ' '
+    if (timeseries_value.size() > 1 && timeseries_value[timeseries_value.size() - 1] == ' '
+        && timeseries_value[timeseries_value.size() - 2] == ',') {
         timeseries_value.pop_back();
+        timeseries_value.pop_back();
+    }
     timeseries_value += "]";
 }
 
