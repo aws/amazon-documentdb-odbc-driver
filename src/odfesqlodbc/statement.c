@@ -1181,6 +1181,14 @@ SC_fetch(StatementClass *self) {
                     result = SQL_ERROR;
                     break;
 
+                case COPY_RESULT_OVERFLOW_UNDERFLOW:
+                    SC_set_error(
+                        self, STMT_VALUE_OUT_OF_RANGE,
+                        "An overflow or underflow happened during conversion.",
+                        func);
+                    result = SQL_ERROR;
+                    break;
+
                 case COPY_RESULT_TRUNCATED:
                     SC_set_error(self, STMT_TRUNCATED,
                                  "Fetched item was truncated.", func);
