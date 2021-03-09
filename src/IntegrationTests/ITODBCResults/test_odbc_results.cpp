@@ -1447,7 +1447,7 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR_ARRAY) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::string expected;
-    expected = "[{time: 2021-03-05 14:18:30.123456789, value: [1,2,3]}]";
+    expected = "[{time: 2021-03-05 14:18:30.123456789, value: [1, 2, 3]}]";
     ASSERT_EQ((int)expected.size(), indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1474,7 +1474,7 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR_ARRAY) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::wstring expected;
-    expected = L"[{time: 2021-03-05 14:18:30.123456789, value: [1,2,3]}]";
+    expected = L"[{time: 2021-03-05 14:18:30.123456789, value: [1, 2, 3]}]";
 #ifdef __APPLE__
     ASSERT_EQ((int)(4 * expected.size()), indicator);
 #else
@@ -1504,7 +1504,7 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR_ROW) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::string expected;
-    expected = "[{time: 2021-03-05 14:18:30.123456789, value: (9.9,19)}]";
+    expected = "[{time: 2021-03-05 14:18:30.123456789, value: (9.9, 19)}]";
     ASSERT_EQ((int)expected.size(), indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1531,7 +1531,7 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR_ROW) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::wstring expected;
-    expected = L"[{time: 2021-03-05 14:18:30.123456789, value: (9.9,19)}]";
+    expected = L"[{time: 2021-03-05 14:18:30.123456789, value: (9.9, 19)}]";
 #ifdef __APPLE__
     ASSERT_EQ((int)(4 * expected.size()), indicator);
 #else
@@ -1562,7 +1562,7 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR_ARRAY_ROW_COMBINATION) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::string expected;
-    expected = "[{time: 2021-03-05 14:18:30.123456789, value: (-,[[(12345,[1,2,3])]])}]";
+    expected = "[{time: 2021-03-05 14:18:30.123456789, value: (null, [[(12345, [1, 2, 3])]])}]";
     ASSERT_EQ((int)expected.size(), indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1589,7 +1589,7 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR_ARRAY_ROW_COMBINATION) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::wstring expected;
-    expected = L"[{time: 2021-03-05 14:18:30.123456789, value: (-,[[(12345,[1,2,3])]])}]";
+    expected = L"[{time: 2021-03-05 14:18:30.123456789, value: (null, [[(12345, [1, 2, 3])]])}]";
 #ifdef __APPLE__
     ASSERT_EQ((int)(4 * expected.size()), indicator);
 #else
@@ -1608,12 +1608,12 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_CHAR) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::string expected;
-    expected = "[[[[1.1,2.3],[1.1,2.3]]],[[[1.1,2.3],[1.1,2.3]]]]";
+    expected = "[[[[1.1, 2.3], [1.1, 2.3]]], [[[1.1, 2.3], [1.1, 2.3]]]]";
     ASSERT_EQ((int)expected.size(), indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    expected = "[[[[[[[[[[[[1,2,3]]]]]]]]]]]]";
+    expected = "[[[[[[[[[[[[1, 2, 3]]]]]]]]]]]]";
     ASSERT_EQ((int)expected.size(), indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_CHAR, data, 1024, &indicator);
@@ -1637,7 +1637,7 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_WCHAR) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::wstring expected;
-    expected = L"[[[[1.1,2.3],[1.1,2.3]]],[[[1.1,2.3],[1.1,2.3]]]]";
+    expected = L"[[[[1.1, 2.3], [1.1, 2.3]]], [[[1.1, 2.3], [1.1, 2.3]]]]";
 #ifdef __APPLE__
     ASSERT_EQ((int)(4 * expected.size()), indicator);
 #else
@@ -1646,7 +1646,7 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_WCHAR) {
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    expected = L"[[[[[[[[[[[[1,2,3]]]]]]]]]]]]";
+    expected = L"[[[[[[[[[[[[1, 2, 3]]]]]]]]]]]]";
 #ifdef __APPLE__
     ASSERT_EQ((int)(4 * expected.size()), indicator);
 #else
@@ -1676,7 +1676,7 @@ TEST_F(TestSQLGetData, ROW_TO_SQL_C_CHAR) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::string expected;
-    expected = "(((3,10,true),[[1.0,2.0],[1.1,2.2]]))";
+    expected = "(((3, 10, true), [[1.0, 2.0], [1.1, 2.2]]))";
     ASSERT_EQ((int)expected.size(), indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
@@ -1698,7 +1698,7 @@ TEST_F(TestSQLGetData, ROW_TO_SQL_C_WCHAR) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::wstring expected;
-    expected = L"(((3,10,true),[[1.0,2.0],[1.1,2.2]]))";
+    expected = L"(((3, 10, true), [[1.0, 2.0], [1.1, 2.2]]))";
 #ifdef __APPLE__
     ASSERT_EQ((int)(4 * expected.size()), indicator);
 #else
@@ -1727,12 +1727,12 @@ TEST_F(TestSQLGetData, NULL_TO_SQL_C_CHAR) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::string expected;
-    expected = "-";
+    expected = "null";
     ASSERT_EQ((int)expected.size(), indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    expected = "-";
+    expected = "null";
     ASSERT_EQ((int)expected.size(), indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1747,7 +1747,7 @@ TEST_F(TestSQLGetData, NULL_TO_SQL_C_WCHAR) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::wstring expected;
-    expected = L"-";
+    expected = L"null";
 #ifdef __APPLE__
     ASSERT_EQ((int)(4 * expected.size()), indicator);
 #else
@@ -1756,7 +1756,7 @@ TEST_F(TestSQLGetData, NULL_TO_SQL_C_WCHAR) {
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    expected = L"-";
+    expected = L"null";
 #ifdef __APPLE__
     ASSERT_EQ((int)(4 * expected.size()), indicator);
 #else
@@ -1775,12 +1775,12 @@ TEST_F(TestSQLGetData, ARRAY_ROW_NULL_TO_SQL_C_CHAR) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::string expected;
-    expected = "[(-),(-)]";
+    expected = "[(null), (null)]";
     ASSERT_EQ((int)expected.size(), indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    expected = "([-],[-])";
+    expected = "([null], [null])";
     ASSERT_EQ((int)expected.size(), indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1796,7 +1796,7 @@ TEST_F(TestSQLGetData, ARRAY_ROW_NULL_TO_SQL_C_WCHAR) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::wstring expected;
-    expected = L"[(-),(-)]";
+    expected = L"[(null), (null)]";
 #ifdef __APPLE__
     ASSERT_EQ((int)(4 * expected.size()), indicator);
 #else
@@ -1805,7 +1805,7 @@ TEST_F(TestSQLGetData, ARRAY_ROW_NULL_TO_SQL_C_WCHAR) {
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    expected = L"([-],[-])";
+    expected = L"([null], [null])";
 #ifdef __APPLE__
     ASSERT_EQ((int)(4 * expected.size()), indicator);
 #else
