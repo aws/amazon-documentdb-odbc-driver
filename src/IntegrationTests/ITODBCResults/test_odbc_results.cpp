@@ -256,7 +256,30 @@ void QueryFetch(const std::wstring& column, const std::wstring& dataset,
     ASSERT_TRUE(SQL_SUCCEEDED(ret));
     LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
 }
-//
+
+auto CompareTimeStampStruct = [](const TIMESTAMP_STRUCT& l,
+                                 const TIMESTAMP_STRUCT& r) {
+    EXPECT_EQ(l.year, r.year);
+    EXPECT_EQ(l.month, r.month);
+    EXPECT_EQ(l.day, r.day);
+    EXPECT_EQ(l.hour, r.hour);
+    EXPECT_EQ(l.minute, r.minute);
+    EXPECT_EQ(l.second, r.second);
+    EXPECT_EQ(l.fraction, l.fraction);
+};
+
+auto CompareDateStruct = [](const DATE_STRUCT& l, const DATE_STRUCT& r) {
+    EXPECT_EQ(l.year, r.year);
+    EXPECT_EQ(l.month, r.month);
+    EXPECT_EQ(l.day, r.day);
+};
+
+auto CompareTimeStruct = [](const TIME_STRUCT& l, const TIME_STRUCT& r) {
+    EXPECT_EQ(l.hour, r.hour);
+    EXPECT_EQ(l.minute, r.minute);
+    EXPECT_EQ(l.second, r.second);
+};
+
 //template < class T >
 //void CheckData(const std::wstring& type_name, const std::wstring& data_set,
 //               const std::wstring row, SQLHSTMT* hstmt,
@@ -2193,63 +2216,33 @@ TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_TIMESTAMP) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_TIMESTAMP, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    EXPECT_EQ(2021, data.year);
-    EXPECT_EQ(1, data.month);
-    EXPECT_EQ(2, data.day);
-    EXPECT_EQ(18, data.hour);
-    EXPECT_EQ(1, data.minute);
-    EXPECT_EQ(13, data.second);
-    EXPECT_EQ((SQLUINTEGER)0, data.fraction);
+    TIMESTAMP_STRUCT ts1{2021, 1, 2, 18, 1, 13, 0};
+    CompareTimeStampStruct(ts1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_TIMESTAMP, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    EXPECT_EQ(2021, data.year);
-    EXPECT_EQ(11, data.month);
-    EXPECT_EQ(20, data.day);
-    EXPECT_EQ(6, data.hour);
-    EXPECT_EQ(39, data.minute);
-    EXPECT_EQ(45, data.second);
-    EXPECT_EQ((SQLUINTEGER)123456789, data.fraction);
+    TIMESTAMP_STRUCT ts2{2021, 11, 20, 6, 39, 45, 123456789};
+    CompareTimeStampStruct(ts2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_TIMESTAMP, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    EXPECT_EQ(2021, data.year);
-    EXPECT_EQ(11, data.month);
-    EXPECT_EQ(20, data.day);
-    EXPECT_EQ(6, data.hour);
-    EXPECT_EQ(39, data.minute);
-    EXPECT_EQ(45, data.second);
-    EXPECT_EQ((SQLUINTEGER)123450000, data.fraction);
+    TIMESTAMP_STRUCT ts3{2021, 11, 20, 6, 39, 45, 123450000};
+    CompareTimeStampStruct(ts3, data);
     ret = SQLGetData(m_hstmt, 4, SQL_C_TIMESTAMP, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    EXPECT_EQ(2021, data.year);
-    EXPECT_EQ(11, data.month);
-    EXPECT_EQ(20, data.day);
-    EXPECT_EQ(6, data.hour);
-    EXPECT_EQ(39, data.minute);
-    EXPECT_EQ(45, data.second);
-    EXPECT_EQ((SQLUINTEGER)0, data.fraction);
+    TIMESTAMP_STRUCT ts4{2021, 11, 20, 6, 39, 45, 0};
+    CompareTimeStampStruct(ts4, data);
     ret = SQLGetData(m_hstmt, 5, SQL_C_TIMESTAMP, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    EXPECT_EQ(2021, data.year);
-    EXPECT_EQ(11, data.month);
-    EXPECT_EQ(20, data.day);
-    EXPECT_EQ(6, data.hour);
-    EXPECT_EQ(39, data.minute);
-    EXPECT_EQ(0, data.second);
-    EXPECT_EQ((SQLUINTEGER)0, data.fraction);
+    TIMESTAMP_STRUCT ts5{2021, 11, 20, 6, 39, 0, 0};
+    CompareTimeStampStruct(ts5, data);
     ret = SQLGetData(m_hstmt, 6, SQL_C_TIMESTAMP, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    EXPECT_EQ(2021, data.year);
-    EXPECT_EQ(11, data.month);
-    EXPECT_EQ(20, data.day);
-    EXPECT_EQ(0, data.hour);
-    EXPECT_EQ(0, data.minute);
-    EXPECT_EQ(0, data.second);
-    EXPECT_EQ((SQLUINTEGER)0, data.fraction);
+    TIMESTAMP_STRUCT ts6{2021, 11, 20, 0, 0, 0, 0};
+    CompareTimeStampStruct(ts6, data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -2268,39 +2261,29 @@ TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_DATE) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_DATE, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    EXPECT_EQ(2021, data.year);
-    EXPECT_EQ(1, data.month);
-    EXPECT_EQ(2, data.day);
+    DATE_STRUCT ds1{2021, 1, 2};
+    CompareDateStruct(ds1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_DATE, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    EXPECT_EQ(2021, data.year);
-    EXPECT_EQ(11, data.month);
-    EXPECT_EQ(20, data.day);
+    DATE_STRUCT ds{2021, 11, 20};
+    CompareDateStruct(ds, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_DATE, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    EXPECT_EQ(2021, data.year);
-    EXPECT_EQ(11, data.month);
-    EXPECT_EQ(20, data.day);
+    CompareDateStruct(ds, data);
     ret = SQLGetData(m_hstmt, 4, SQL_C_DATE, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    EXPECT_EQ(2021, data.year);
-    EXPECT_EQ(11, data.month);
-    EXPECT_EQ(20, data.day);
+    CompareDateStruct(ds, data);
     ret = SQLGetData(m_hstmt, 5, SQL_C_DATE, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    EXPECT_EQ(2021, data.year);
-    EXPECT_EQ(11, data.month);
-    EXPECT_EQ(20, data.day);
+    CompareDateStruct(ds, data);
     ret = SQLGetData(m_hstmt, 6, SQL_C_DATE, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    EXPECT_EQ(2021, data.year);
-    EXPECT_EQ(11, data.month);
-    EXPECT_EQ(20, data.day);
+    CompareDateStruct(ds, data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -2319,39 +2302,31 @@ TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_TIME) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_TIME, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    EXPECT_EQ(18, data.hour);
-    EXPECT_EQ(1, data.minute);
-    EXPECT_EQ(13, data.second);
+    TIME_STRUCT ts1{18, 1, 13};
+    CompareTimeStruct(ts1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_TIME, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    EXPECT_EQ(6, data.hour);
-    EXPECT_EQ(39, data.minute);
-    EXPECT_EQ(45, data.second);
+    TIME_STRUCT ts2{6, 39, 45};
+    CompareTimeStruct(ts2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_TIME, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    EXPECT_EQ(6, data.hour);
-    EXPECT_EQ(39, data.minute);
-    EXPECT_EQ(45, data.second);
+    CompareTimeStruct(ts2, data);
     ret = SQLGetData(m_hstmt, 4, SQL_C_TIME, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    EXPECT_EQ(6, data.hour);
-    EXPECT_EQ(39, data.minute);
-    EXPECT_EQ(45, data.second);
+    CompareTimeStruct(ts2, data);
     ret = SQLGetData(m_hstmt, 5, SQL_C_TIME, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    EXPECT_EQ(6, data.hour);
-    EXPECT_EQ(39, data.minute);
-    EXPECT_EQ(0, data.second);
+    TIME_STRUCT ts3{6, 39, 0};
+    CompareTimeStruct(ts3, data);
     ret = SQLGetData(m_hstmt, 6, SQL_C_TIME, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    EXPECT_EQ(0, data.hour);
-    EXPECT_EQ(0, data.minute);
-    EXPECT_EQ(0, data.second);
+    TIME_STRUCT ts4{0, 0, 0};
+    CompareTimeStruct(ts4, data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -2413,24 +2388,14 @@ TEST_F(TestSQLGetData, DATE_TO_SQL_C_TIMESTAMP) {
                      &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    EXPECT_EQ(2021, data.year);
-    EXPECT_EQ(1, data.month);
-    EXPECT_EQ(2, data.day);
-    EXPECT_EQ(0, data.hour);
-    EXPECT_EQ(0, data.minute);
-    EXPECT_EQ(0, data.second);
-    EXPECT_EQ((SQLUINTEGER)0, data.fraction);
+    TIMESTAMP_STRUCT ts1 {2021, 1, 2, 0, 0, 0};
+    CompareTimeStampStruct(ts1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_TIMESTAMP, &data, sizeof(data),
                      &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    EXPECT_EQ(2021, data.year);
-    EXPECT_EQ(11, data.month);
-    EXPECT_EQ(20, data.day);
-    EXPECT_EQ(0, data.hour);
-    EXPECT_EQ(0, data.minute);
-    EXPECT_EQ(0, data.second);
-    EXPECT_EQ((SQLUINTEGER)0, data.fraction);
+    TIMESTAMP_STRUCT ts2{2021, 11, 20, 0, 0, 0};
+    CompareTimeStampStruct(ts2, data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -2443,15 +2408,13 @@ TEST_F(TestSQLGetData, DATE_TO_SQL_C_DATE) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_DATE, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    EXPECT_EQ(2021, data.year);
-    EXPECT_EQ(1, data.month);
-    EXPECT_EQ(2, data.day);
+    DATE_STRUCT ds1{2021, 1, 2};
+    CompareDateStruct(ds1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_DATE, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    EXPECT_EQ(2021, data.year);
-    EXPECT_EQ(11, data.month);
-    EXPECT_EQ(20, data.day);
+    DATE_STRUCT ds2{2021, 11, 20};
+    CompareDateStruct(ds2, data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -2462,17 +2425,13 @@ TEST_F(TestSQLGetData, DATE_TO_SQL_C_TIME) {
     SQLLEN indicator = 0;
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_TIME, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    EXPECT_EQ(0, data.hour);
-    EXPECT_EQ(0, data.minute);
-    EXPECT_EQ(0, data.second);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
     ret = SQLGetData(m_hstmt, 2, SQL_C_TIME, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    EXPECT_EQ(0, data.hour);
-    EXPECT_EQ(0, data.minute);
-    EXPECT_EQ(0, data.second);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -2595,57 +2554,62 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_TIMESTAMP) {
     struct tm* timeinfo;
     time(&rawtime);
     timeinfo = localtime(&rawtime);
-    EXPECT_EQ(timeinfo->tm_year+1900, data.year);
-    EXPECT_EQ(timeinfo->tm_mon+1, data.month);
-    EXPECT_EQ(timeinfo->tm_mday, data.day);
-    EXPECT_EQ(18, data.hour);
-    EXPECT_EQ(1, data.minute);
-    EXPECT_EQ(13, data.second);
-    EXPECT_EQ((SQLUINTEGER)0, data.fraction);
+    TIMESTAMP_STRUCT ts1{(SQLSMALLINT)(timeinfo->tm_year + 1900),
+                         (SQLUSMALLINT)(timeinfo->tm_mon + 1),
+                         (SQLUSMALLINT)(timeinfo->tm_mday),
+                         18,
+                         1,
+                         13,
+                         0};
+    CompareTimeStampStruct(ts1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_TIMESTAMP, &data, sizeof(data),
                      &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    EXPECT_EQ(timeinfo->tm_year + 1900, data.year);
-    EXPECT_EQ(timeinfo->tm_mon + 1, data.month);
-    EXPECT_EQ(timeinfo->tm_mday, data.day);
-    EXPECT_EQ(6, data.hour);
-    EXPECT_EQ(39, data.minute);
-    EXPECT_EQ(45, data.second);
-    EXPECT_EQ((SQLUINTEGER)123456789, data.fraction);
+    TIMESTAMP_STRUCT ts2{(SQLSMALLINT)(timeinfo->tm_year + 1900),
+                         (SQLUSMALLINT)(timeinfo->tm_mon + 1),
+                         (SQLUSMALLINT)(timeinfo->tm_mday),
+                         6,
+                         39,
+                         45,
+                         123456789};
+    CompareTimeStampStruct(ts2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_TIMESTAMP, &data, sizeof(data),
                      &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    EXPECT_EQ(timeinfo->tm_year + 1900, data.year);
-    EXPECT_EQ(timeinfo->tm_mon + 1, data.month);
-    EXPECT_EQ(timeinfo->tm_mday, data.day);
-    EXPECT_EQ(6, data.hour);
-    EXPECT_EQ(39, data.minute);
-    EXPECT_EQ(45, data.second);
-    EXPECT_EQ((SQLUINTEGER)123450000, data.fraction);
+    TIMESTAMP_STRUCT ts3{(SQLSMALLINT)(timeinfo->tm_year + 1900),
+                         (SQLUSMALLINT)(timeinfo->tm_mon + 1),
+                         (SQLUSMALLINT)(timeinfo->tm_mday),
+                         6,
+                         39,
+                         45,
+                         123450000};
+    CompareTimeStampStruct(ts3, data);
     ret = SQLGetData(m_hstmt, 4, SQL_C_TIMESTAMP, &data, sizeof(data),
                      &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    EXPECT_EQ(timeinfo->tm_year + 1900, data.year);
-    EXPECT_EQ(timeinfo->tm_mon + 1, data.month);
-    EXPECT_EQ(timeinfo->tm_mday, data.day);
-    EXPECT_EQ(6, data.hour);
-    EXPECT_EQ(39, data.minute);
-    EXPECT_EQ(45, data.second);
-    EXPECT_EQ((SQLUINTEGER)0, data.fraction);
+    TIMESTAMP_STRUCT ts4{(SQLSMALLINT)(timeinfo->tm_year + 1900),
+                         (SQLUSMALLINT)(timeinfo->tm_mon + 1),
+                         (SQLUSMALLINT)(timeinfo->tm_mday),
+                         6,
+                         39,
+                         45,
+                         0};
+    CompareTimeStampStruct(ts4, data);
     ret = SQLGetData(m_hstmt, 5, SQL_C_TIMESTAMP, &data, sizeof(data),
                      &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    EXPECT_EQ(timeinfo->tm_year + 1900, data.year);
-    EXPECT_EQ(timeinfo->tm_mon + 1, data.month);
-    EXPECT_EQ(timeinfo->tm_mday, data.day);
-    EXPECT_EQ(6, data.hour);
-    EXPECT_EQ(39, data.minute);
-    EXPECT_EQ(0, data.second);
-    EXPECT_EQ((SQLUINTEGER)0, data.fraction);
+    TIMESTAMP_STRUCT ts5{(SQLSMALLINT)(timeinfo->tm_year + 1900),
+                         (SQLUSMALLINT)(timeinfo->tm_mon + 1),
+                         (SQLUSMALLINT)(timeinfo->tm_mday),
+                         6,
+                         39,
+                         0,
+                         0};
+    CompareTimeStampStruct(ts5, data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -2656,21 +2620,13 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_DATE) {
     SQLLEN indicator = 0;
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_DATE, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    time_t rawtime;
-    struct tm* timeinfo;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    EXPECT_EQ(timeinfo->tm_year + 1900, data.year);
-    EXPECT_EQ(timeinfo->tm_mon + 1, data.month);
-    EXPECT_EQ(timeinfo->tm_mday, data.day);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
     ret = SQLGetData(m_hstmt, 2, SQL_C_DATE, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    EXPECT_EQ(timeinfo->tm_year + 1900, data.year);
-    EXPECT_EQ(timeinfo->tm_mon + 1, data.month);
-    EXPECT_EQ(timeinfo->tm_mday, data.day);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -2688,33 +2644,26 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_TIME) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_TIME, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    EXPECT_EQ(18, data.hour);
-    EXPECT_EQ(1, data.minute);
-    EXPECT_EQ(13, data.second);
+    TIME_STRUCT ts1{18, 1, 13};
+    CompareTimeStruct(ts1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_TIME, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    EXPECT_EQ(6, data.hour);
-    EXPECT_EQ(39, data.minute);
-    EXPECT_EQ(45, data.second);
+    TIME_STRUCT ts2{6, 39, 45};
+    CompareTimeStruct(ts2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_TIME, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    EXPECT_EQ(6, data.hour);
-    EXPECT_EQ(39, data.minute);
-    EXPECT_EQ(45, data.second);
+    CompareTimeStruct(ts2, data);
     ret = SQLGetData(m_hstmt, 4, SQL_C_TIME, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    EXPECT_EQ(6, data.hour);
-    EXPECT_EQ(39, data.minute);
-    EXPECT_EQ(45, data.second);
+    CompareTimeStruct(ts2, data);
     ret = SQLGetData(m_hstmt, 5, SQL_C_TIME, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    EXPECT_EQ(6, data.hour);
-    EXPECT_EQ(39, data.minute);
-    EXPECT_EQ(0, data.second);
+    TIME_STRUCT ts3{6, 39, 0};
+    CompareTimeStruct(ts3, data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
