@@ -2388,13 +2388,13 @@ TEST_F(TestSQLGetData, DATE_TO_SQL_C_TIMESTAMP) {
                      &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts1 {2021, 1, 2, 0, 0, 0};
+    TIMESTAMP_STRUCT ts1 {2021, 1, 2, 0, 0, 0, 0};
     CompareTimeStampStruct(ts1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_TIMESTAMP, &data, sizeof(data),
                      &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts2{2021, 11, 20, 0, 0, 0};
+    TIMESTAMP_STRUCT ts2{2021, 11, 20, 0, 0, 0, 0};
     CompareTimeStampStruct(ts2, data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
