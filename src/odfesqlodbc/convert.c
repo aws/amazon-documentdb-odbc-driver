@@ -1326,49 +1326,57 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
         switch (fCType) {
             case SQL_C_DATE:
             case SQL_C_TYPE_DATE: /* 91 */
-                len = 6;
-                {
-                    DATE_STRUCT *ds;
-                    struct tm *tim;
+                if (field_type == TS_TYPE_TIME) {
+                    result = COPY_UNSUPPORTED_CONVERSION;
+                } else {
+                    len = 6;
+                    {
+                        DATE_STRUCT *ds;
+                        struct tm *tim;
 
-                    if (bind_size > 0)
-                        ds = (DATE_STRUCT *)rgbValueBindRow;
-                    else
-                        ds = (DATE_STRUCT *)rgbValue + bind_row;
+                        if (bind_size > 0)
+                            ds = (DATE_STRUCT *)rgbValueBindRow;
+                        else
+                            ds = (DATE_STRUCT *)rgbValue + bind_row;
 
-                    /*
-                     * Initialize date in case conversion destination
-                     * expects date part from this source time data.
-                     * A value may be partially set here, so do some
-                     * sanity checks on the existing values before
-                     * setting them.
-                     */
-                    tim = SC_get_localtime(stmt);
-                    if (std_time.m == 0)
-                        std_time.m = tim->tm_mon + 1;
-                    if (std_time.d == 0)
-                        std_time.d = tim->tm_mday;
-                    if (std_time.y == 0)
-                        std_time.y = tim->tm_year + 1900;
-                    ds->year = (SQLSMALLINT)std_time.y;
-                    ds->month = (SQLUSMALLINT)std_time.m;
-                    ds->day = (SQLUSMALLINT)std_time.d;
+                        /*
+                         * Initialize date in case conversion destination
+                         * expects date part from this source time data.
+                         * A value may be partially set here, so do some
+                         * sanity checks on the existing values before
+                         * setting them.
+                         */
+                        tim = SC_get_localtime(stmt);
+                        if (std_time.m == 0)
+                            std_time.m = tim->tm_mon + 1;
+                        if (std_time.d == 0)
+                            std_time.d = tim->tm_mday;
+                        if (std_time.y == 0)
+                            std_time.y = tim->tm_year + 1900;
+                        ds->year = (SQLSMALLINT)std_time.y;
+                        ds->month = (SQLUSMALLINT)std_time.m;
+                        ds->day = (SQLUSMALLINT)std_time.d;
+                    }
                 }
                 break;
 
             case SQL_C_TIME:
             case SQL_C_TYPE_TIME: /* 92 */
-                len = 6;
-                {
-                    TIME_STRUCT *ts;
+                if (field_type == TS_TYPE_DATE) {
+                    result = COPY_UNSUPPORTED_CONVERSION;
+                } else {
+                    len = 6;
+                    {
+                        TIME_STRUCT *ts;
 
-                    if (bind_size > 0)
-                        ts = (TIME_STRUCT *)rgbValueBindRow;
-                    else
-                        ts = (TIME_STRUCT *)rgbValue + bind_row;
-                    ts->hour = (SQLUSMALLINT)std_time.hh;
-                    ts->minute = (SQLUSMALLINT)std_time.mm;
-                    ts->second = (SQLUSMALLINT)std_time.ss;
+                        if (bind_size > 0)
+                            ts = (TIME_STRUCT *)rgbValueBindRow;
+                        else
+                            ts = (TIME_STRUCT *)rgbValue + bind_row;
+                        ts->hour = (SQLUSMALLINT)std_time.hh;
+                        ts->minute = (SQLUSMALLINT)std_time.mm;
+                        ts->second = (SQLUSMALLINT)std_time.ss;
+                    }
                 }
                 break;
 
