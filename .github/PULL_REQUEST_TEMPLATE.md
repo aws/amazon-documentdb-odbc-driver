@@ -12,8 +12,7 @@
 <!--- Link to issue where this is tracked -->
 
 ### Additional Reviewers
-@kylepbit
-@rayl-bitquill
+@raymond-lum
 @yanw-bq
 @jerrytfleung
 <!-- Any additional reviewers -->
