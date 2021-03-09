@@ -469,7 +469,7 @@ void QueryFetch(const std::wstring& column, const std::wstring& dataset,
 //    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
 //};
 
-class TestSQLGetData : public testing::Test {
+class Fixture : public testing::Test {
    public:
     void SetUp() {
         ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env,
@@ -486,35 +486,10 @@ class TestSQLGetData : public testing::Test {
     SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
 };
 
-//class TestSQLNumResultCols : public testing::Test {
-//   public:
-//    TestSQLNumResultCols() {
-//    }
-//
-//    void SetUp() {
-//        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env,
-//                                       &m_conn, &m_hstmt, true, true));
-//    }
-//
-//    void TearDown() {
-//        if (m_hstmt != SQL_NULL_HSTMT) {
-//            ASSERT_NO_THROW(CloseCursor(&m_hstmt, true, true));
-//            SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
-//            SQLDisconnect(m_conn);
-//            SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-//        }
-//    }
-//
-//    ~TestSQLNumResultCols() {
-//        // cleanup any pending stuff, but no exceptions allowed
-//    }
-//
-//    SQLHENV m_env = SQL_NULL_HENV;
-//    SQLHDBC m_conn = SQL_NULL_HDBC;
-//    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
-//    SQLSMALLINT m_column_count;
-//};
-//
+class TestSQLGetData : public Fixture {};
+
+class TestSQLNumResultCols : public Fixture {};
+
 //class TestSQLMoreResults : public testing::Test {
 //   public:
 //    TestSQLMoreResults() {
@@ -1815,6 +1790,8 @@ TEST_F(TestSQLGetData, ARRAY_ROW_NULL_TO_SQL_C_WCHAR) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
+
+
 //TEST_F(TestSQLGetData, GetBitData) {
 //    QueryFetch(single_bit_col, flight_data_set, single_row, &m_hstmt);
 //
@@ -1922,21 +1899,29 @@ TEST_F(TestSQLGetData, ARRAY_ROW_NULL_TO_SQL_C_WCHAR) {
 //                              SQLSTATE_INVALID_DESCRIPTOR_INDEX));
 //}
 
-//TEST_F(TestSQLNumResultCols, SingleColumn) {
-//    std::wstring row_str = std::to_wstring(single_row_cnt);
-//    ExecuteQuery(single_col, flight_data_set, row_str, &m_hstmt);
-//
-//    EXPECT_EQ(SQL_SUCCESS, SQLNumResultCols(m_hstmt, &m_column_count));
-//    EXPECT_EQ(single_col_cnt, (size_t)m_column_count);
-//}
-//
-//TEST_F(TestSQLNumResultCols, MultiColumn) {
-//    std::wstring row_str = std::to_wstring(multi_row_cnt);
-//    ExecuteQuery(multi_col, flight_data_set, row_str, &m_hstmt);
-//
-//    EXPECT_EQ(SQL_SUCCESS, SQLNumResultCols(m_hstmt, &m_column_count));
-//    EXPECT_EQ(multi_col_cnt, (size_t)m_column_count);
-//}
+TEST_F(TestSQLNumResultCols, SingleColumn) {
+    std::wstring columns =
+        L"Array[Row(null), Row(NULL)]";
+    ExecuteQuery(columns, table_name, single_row, &m_hstmt);
+    SQLSMALLINT column_count = 0;
+    EXPECT_EQ(SQL_SUCCESS, SQLNumResultCols(m_hstmt, &column_count));
+    EXPECT_EQ(1, column_count);
+}
+
+TEST_F(TestSQLNumResultCols, MultiColumn) {
+    std::wstring columns =
+        L"Array[Row(null), Row(NULL)], Row(Array[null], Array[NULL]), "
+        L"Array[Row(null), Row(NULL)], Row(Array[null], Array[NULL]), "
+        L"Array[Row(null), Row(NULL)], Row(Array[null], Array[NULL]), "
+        L"Array[Row(null), Row(NULL)], Row(Array[null], Array[NULL]), "
+        L"Array[Row(null), Row(NULL)], Row(Array[null], Array[NULL]), "
+        L"Array[Row(null), Row(NULL)], Row(Array[null], Array[NULL]), "
+        L"Array[Row(null), Row(NULL)], Row(Array[null], Array[NULL])";
+    ExecuteQuery(columns, table_name, single_row, &m_hstmt);
+    SQLSMALLINT column_count = 0;
+    EXPECT_EQ(SQL_SUCCESS, SQLNumResultCols(m_hstmt, &column_count));
+    EXPECT_EQ(14, column_count);
+}
 //
 //TEST_F(TestSQLDescribeCol, SingleColumnMetadata) {
 //    ExecuteQuery(single_col, flight_data_set, single_row, &m_hstmt);
