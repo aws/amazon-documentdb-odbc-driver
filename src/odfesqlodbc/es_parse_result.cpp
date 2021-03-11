@@ -362,8 +362,12 @@ bool AssignColumnHeaders(QResultClass *q_res,
                         column_size = 4;
                         break;
                     case Aws::TimestreamQuery::Model::ScalarType::INTERVAL_DAY_TO_SECOND:
+                        column_type_id = TS_TYPE_VARCHAR;
+                        column_size = TS_VARCHAR_SIZE;
                         break;
                     case Aws::TimestreamQuery::Model::ScalarType::INTERVAL_YEAR_TO_MONTH:
+                        column_type_id = TS_TYPE_VARCHAR;
+                        column_size = TS_VARCHAR_SIZE;
                         break;
                     case Aws::TimestreamQuery::Model::ScalarType::TIME:
                         column_type_id = TS_TYPE_TIME;
