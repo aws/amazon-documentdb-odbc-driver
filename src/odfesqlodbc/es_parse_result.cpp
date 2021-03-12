@@ -375,8 +375,11 @@ bool AssignColumnHeaders(QResultClass *q_res,
                         break;
                     case Aws::TimestreamQuery::Model::ScalarType::VARCHAR:
                         break;
-                    case Aws::TimestreamQuery::Model::ScalarType::NOT_SET:
                     case Aws::TimestreamQuery::Model::ScalarType::UNKNOWN:
+                        column_type_id = TS_TYPE_VARCHAR;
+                        column_size = TS_VARCHAR_SIZE;
+                        break;
+                    case Aws::TimestreamQuery::Model::ScalarType::NOT_SET:
                     default:
                         // NOT_SET, UNKNOWN & default
                         break;
