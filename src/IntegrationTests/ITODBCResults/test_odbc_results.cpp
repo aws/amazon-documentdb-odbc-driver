@@ -2784,14 +2784,7 @@ TEST_F(TestSQLGetData, INVERVAL_YEAR_TO_MONTH_TO_SQL_C_WCHAR) {
 }
 
 TEST_F(TestSQLGetData, INVERVAL_DAY_TO_SECOND_TO_SQL_C_CHAR) {
-    std::wstring columns =
-        L"parse_duration('1d'),"
-        L"parse_duration('1h'),"
-        L"parse_duration('1m'),"
-        L"parse_duration('1s'),"
-        L"parse_duration('1ms'),"
-        L"parse_duration('1us'),"
-        L"parse_duration('1ns')";
+    std::wstring columns = L"1d,1h,1m,1s,1ms,1us,1ns";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLCHAR data[1024] = {0};
     SQLLEN indicator = 0;
@@ -2836,14 +2829,7 @@ TEST_F(TestSQLGetData, INVERVAL_DAY_TO_SECOND_TO_SQL_C_CHAR) {
 }
 
 TEST_F(TestSQLGetData, INVERVAL_DAY_TO_SECOND_TO_SQL_C_WCHAR) {
-    std::wstring columns =
-        L"parse_duration('1d'),"
-        L"parse_duration('1h'),"
-        L"parse_duration('1m'),"
-        L"parse_duration('1s'),"
-        L"parse_duration('1ms'),"
-        L"parse_duration('1us'),"
-        L"parse_duration('1ns')";
+    std::wstring columns = L"1d,1h,1m,1s,1ms,1us,1ns";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLTCHAR data[1024] = {0};
     SQLLEN indicator = 0;
