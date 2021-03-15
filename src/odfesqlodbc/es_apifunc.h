@@ -149,7 +149,7 @@ RETCODE SQL_API ESAPI_ForeignKeys(
     const SQLCHAR *szFkCatalogName, SQLSMALLINT cbFkCatalogName,
     const SQLCHAR *szFkSchemaName, SQLSMALLINT cbFkSchemaName,
     const SQLCHAR *szFkTableName, SQLSMALLINT cbFkTableName);
-RETCODE SQL_API ESAPI_MoreResults(HSTMT hstmt);
+RETCODE SQL_API API_MoreResults(HSTMT hstmt);
 RETCODE SQL_API ESAPI_NativeSql(HDBC hdbc, const SQLCHAR *szSqlStrIn,
                                 SQLINTEGER cbSqlStrIn, SQLCHAR *szSqlStr,
                                 SQLINTEGER cbSqlStrMax, SQLINTEGER *pcbSqlStr);
