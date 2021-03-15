@@ -1567,7 +1567,7 @@ cleanup:
  *		the "hstmt".
  */
 /* CC: return SQL_NO_DATA_FOUND since we do not support multiple result sets */
-RETCODE SQL_API ESAPI_MoreResults(HSTMT hstmt) {
+RETCODE SQL_API API_MoreResults(HSTMT hstmt) {
     StatementClass *stmt = (StatementClass *)hstmt;
     QResultClass *res;
     RETCODE ret = SQL_SUCCESS;
