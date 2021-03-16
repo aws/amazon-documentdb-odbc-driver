@@ -967,7 +967,7 @@ RETCODE SQL_API SQLMoreResults(HSTMT hstmt) {
 
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
-    ret = ESAPI_MoreResults(hstmt);
+    ret = API_MoreResults(hstmt);
     LEAVE_STMT_CS(stmt);
     return ret;
 }
