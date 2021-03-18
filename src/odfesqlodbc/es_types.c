@@ -302,7 +302,7 @@ estype_attr_to_concise_type(const ConnectionClass *conn, OID type,
         case ES_TYPE_FLOAT4:
             return SQL_REAL;
         case TS_TYPE_DOUBLE:
-            return SQL_FLOAT;
+            return SQL_DOUBLE;
         case TS_TYPE_DATE:
             if (EN_is_odbc3(env))
                 return SQL_TYPE_DATE;

@@ -387,7 +387,7 @@ bool AssignColumnHeaders(QResultClass *q_res,
                         break;
                     case Aws::TimestreamQuery::Model::ScalarType::NOT_SET:
                     default:
-                        // NOT_SET, UNKNOWN & default
+                        // NOT_SET & default
                         break;
                 }
             } else if (type.ArrayColumnInfoHasBeenSet()) {
