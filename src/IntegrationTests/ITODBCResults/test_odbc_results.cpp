@@ -4407,10 +4407,254 @@ TEST_F(TestSQLDescribeCol, TIMESERIES_COLUMN) {
     std::wstring expected_column_name = L"_col0";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ(78, column_size);
+    std::string expected = "[{time: 2021-03-05 14:18:30.123456789, value: (null, [[(12345, [1, 2, 3])]])}]";
+    EXPECT_EQ((int)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
+
+TEST_F(TestSQLDescribeCol, ARRAY_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring columns =
+        L"ARRAY[ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]], ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]]]";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_WVARCHAR, data_type);
+    std::string expected =
+        "[[[[1.1, 2.3], [1.1, 2.3]]], [[[1.1, 2.3], [1.1, 2.3]]]]";
+    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+}
+
+TEST_F(TestSQLDescribeCol, ROW_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring columns = L"ROW(ROW(ROW(INTEGER '03', BIGINT '10', true), ARRAY[ARRAY[1,2],ARRAY[1.1,2.2]]))";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_WVARCHAR, data_type);
+    std::string expected = "(((3, 10, true), [[1.0, 2.0], [1.1, 2.2]]))";
+    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+}
+
+TEST_F(TestSQLDescribeCol, NULL_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring columns = L"null";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_WVARCHAR, data_type);
+    std::string expected = "null";
+    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+}
+
+TEST_F(TestSQLDescribeCol, TIMESTAMP_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring columns = L"TIMESTAMP \'2021-01-02 18:01:13.000000000\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_TYPE_TIMESTAMP, data_type);
+    std::string expected = "2021-01-02 18:01:13.000000000";
+    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+}
+
+TEST_F(TestSQLDescribeCol, DATE_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring columns = L"DATE \'2021-01-02\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_TYPE_DATE, data_type);
+    std::string expected = "2021-01-02";
+    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+}
+
+TEST_F(TestSQLDescribeCol, TIME_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring columns = L"TIME \'06:39:45.123456789\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_TYPE_TIME, data_type);
+    std::string expected = "06:39:45.123456789";
+    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+}
+
+TEST_F(TestSQLDescribeCol, INTERVAL_YEAR_TO_MONTH_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring columns = L"1year";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_WVARCHAR, data_type);
+    std::string expected = "1-0";
+    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+}
+
+TEST_F(TestSQLDescribeCol, INTERVAL_DAY_TO_SECOND_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring columns = L"1d";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_WVARCHAR, data_type);
+    std::string expected = "1 00:00:00.000000000";
+    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+}
+
+TEST_F(TestSQLDescribeCol, OUT_OF_INDEX_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring columns = L"INTEGER\'1\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 2, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_INVALID_DESCRIPTOR_INDEX));
+}
+
+TEST_F(TestSQLDescribeCol, MULTIPLE_COLUMNS) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring columns = L"INTEGER\'1\', DOUBLE \'1.0\', BIGINT \'2147483648\', true";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_INTEGER, data_type);
+    EXPECT_EQ(10, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    ret = SQLDescribeCol(m_hstmt, 2, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    expected_column_name = L"_col1";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_DOUBLE, data_type);
+    EXPECT_EQ(15, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    ret = SQLDescribeCol(m_hstmt, 3, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    expected_column_name = L"_col2";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_BIGINT, data_type);
+    EXPECT_EQ(19, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    ret = SQLDescribeCol(m_hstmt, 4, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    expected_column_name = L"_col3";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_BIT, data_type);
+    EXPECT_EQ(1, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+}
+
 //
 //TEST_F(TestSQLDescribeCol, MultiColumnMetadata) {
 //    ExecuteQuery(multi_col, flight_data_set, multi_row, &m_hstmt);
