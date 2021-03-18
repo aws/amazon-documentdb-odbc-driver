@@ -257,28 +257,72 @@ void QueryFetch(const std::wstring& column, const std::wstring& dataset,
     LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
 }
 
-auto CompareTimestampStruct = [](const TIMESTAMP_STRUCT& l,
-                                 const TIMESTAMP_STRUCT& r) {
-    EXPECT_EQ(l.year, r.year);
-    EXPECT_EQ(l.month, r.month);
-    EXPECT_EQ(l.day, r.day);
-    EXPECT_EQ(l.hour, r.hour);
-    EXPECT_EQ(l.minute, r.minute);
-    EXPECT_EQ(l.second, r.second);
-    EXPECT_EQ(l.fraction, l.fraction);
+auto CompareTimestampStruct = [](const TIMESTAMP_STRUCT& expected,
+                                 const TIMESTAMP_STRUCT& actual) {
+    EXPECT_EQ(expected.year, actual.year);
+    EXPECT_EQ(expected.month, actual.month);
+    EXPECT_EQ(expected.day, actual.day);
+    EXPECT_EQ(expected.hour, actual.hour);
+    EXPECT_EQ(expected.minute, actual.minute);
+    EXPECT_EQ(expected.second, actual.second);
+    EXPECT_EQ(expected.fraction, actual.fraction);
 };
 
-auto CompareDateStruct = [](const DATE_STRUCT& l, const DATE_STRUCT& r) {
-    EXPECT_EQ(l.year, r.year);
-    EXPECT_EQ(l.month, r.month);
-    EXPECT_EQ(l.day, r.day);
+auto CompareDateStruct = [](const DATE_STRUCT& expected,
+                            const DATE_STRUCT& actual) {
+    EXPECT_EQ(expected.year, actual.year);
+    EXPECT_EQ(expected.month, actual.month);
+    EXPECT_EQ(expected.day, actual.day);
 };
 
-auto CompareTimeStruct = [](const TIME_STRUCT& l, const TIME_STRUCT& r) {
-    EXPECT_EQ(l.hour, r.hour);
-    EXPECT_EQ(l.minute, r.minute);
-    EXPECT_EQ(l.second, r.second);
+auto CompareTimeStruct = [](const TIME_STRUCT& expected,
+                            const TIME_STRUCT& actual) {
+    EXPECT_EQ(expected.hour, actual.hour);
+    EXPECT_EQ(expected.minute, actual.minute);
+    EXPECT_EQ(expected.second, actual.second);
 };
+
+auto CompareIntervalStruct = [](const SQL_INTERVAL_STRUCT& expected,
+                                const SQL_INTERVAL_STRUCT& actual) {
+    ASSERT_TRUE(actual.interval_type == SQL_IS_YEAR_TO_MONTH
+                || actual.interval_type == SQL_IS_DAY_TO_SECOND);
+    ASSERT_EQ(expected.interval_type, actual.interval_type);
+    EXPECT_EQ(expected.interval_sign, actual.interval_sign);
+    if (expected.interval_type == SQL_IS_YEAR_TO_MONTH) {
+        EXPECT_EQ(expected.intval.year_month.month,
+                  actual.intval.year_month.month);
+        EXPECT_EQ(expected.intval.year_month.year,
+                  actual.intval.year_month.year);
+    } else if (expected.interval_type == SQL_IS_DAY_TO_SECOND) {
+        EXPECT_EQ(expected.intval.day_second.day, actual.intval.day_second.day);
+        EXPECT_EQ(expected.intval.day_second.hour, actual.intval.day_second.hour);
+        EXPECT_EQ(expected.intval.day_second.minute, actual.intval.day_second.minute);
+        EXPECT_EQ(expected.intval.day_second.second, actual.intval.day_second.second);
+        EXPECT_EQ(expected.intval.day_second.fraction, actual.intval.day_second.fraction);
+    } else {
+        FAIL();
+    }
+};
+
+auto ConstructIntervalStruct =
+    [](SQLINTERVAL type, SQLSMALLINT sign,
+       SQLUINTEGER year, SQLUINTEGER month, SQLUINTEGER day, SQLUINTEGER hour,
+       SQLUINTEGER minute, SQLUINTEGER second, SQLUINTEGER fraction) {
+        SQL_INTERVAL_STRUCT st;
+        st.interval_type = type;
+        st.interval_sign = sign;
+        if (SQL_IS_YEAR_TO_MONTH == type) {
+            st.intval.year_month.year = year;
+            st.intval.year_month.month = month;
+        } else if (SQL_IS_DAY_TO_SECOND == type) {
+            st.intval.day_second.day = day;
+            st.intval.day_second.hour = hour;
+            st.intval.day_second.minute = minute;
+            st.intval.day_second.second = second;
+            st.intval.day_second.fraction = fraction;
+        }
+        return st;
+    };
 
 //template < class T >
 //void CheckData(const std::wstring& type_name, const std::wstring& data_set,
@@ -759,10 +803,12 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_BIT) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_BIT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLCHAR expected_v2 = static_cast< SQLCHAR >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
     EXPECT_EQ(expected_v2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_BIT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -791,10 +837,12 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_STINYINT) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_STINYINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSCHAR expected_v1 = static_cast< SQLSCHAR >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_STINYINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSCHAR expected_v2 = static_cast< SQLSCHAR >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
     EXPECT_EQ(expected_v2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_STINYINT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -823,10 +871,12 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_TINYINT) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_TINYINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSCHAR expected_v1 = static_cast< SQLSCHAR >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_TINYINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSCHAR expected_v2 = static_cast< SQLSCHAR >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
     EXPECT_EQ(expected_v2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_TINYINT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -853,6 +903,7 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_UTINYINT) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_UTINYINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_UTINYINT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -876,10 +927,12 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SLONG) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_SLONG , &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLINTEGER expected_v1 = static_cast< SQLINTEGER >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_SLONG , &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLINTEGER expected_v2 = static_cast< SQLINTEGER >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
     EXPECT_EQ(expected_v2, data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -896,10 +949,12 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_LONG) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_LONG, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLINTEGER expected_v1 = static_cast< SQLINTEGER >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_LONG, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLINTEGER expected_v2 = static_cast< SQLINTEGER >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
     EXPECT_EQ(expected_v2, data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -916,6 +971,7 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_ULONG) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_ULONG, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLUINTEGER expected_v1 = static_cast< SQLUINTEGER >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLUINTEGER), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_ULONG, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -940,10 +996,12 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SSHORT) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_SSHORT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT expected_v1 = static_cast< SQLSMALLINT >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_SSHORT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT expected_v2 = static_cast< SQLSMALLINT >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
     EXPECT_EQ(expected_v2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_SSHORT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -972,10 +1030,12 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SHORT) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_SHORT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT expected_v1 = static_cast< SQLSMALLINT >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_SHORT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT expected_v2 = static_cast< SQLSMALLINT >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
     EXPECT_EQ(expected_v2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_SHORT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1002,6 +1062,7 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_USHORT) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_USHORT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLUSMALLINT expected_v1 = static_cast< SQLUSMALLINT >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLUSMALLINT), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_USHORT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1026,10 +1087,12 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SBIGINT) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_SBIGINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLBIGINT expected_v1 = static_cast< SQLBIGINT >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_SBIGINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLBIGINT expected_v2 = static_cast< SQLBIGINT >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
     EXPECT_EQ(expected_v2, data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -1046,6 +1109,7 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_UBIGINT) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_UBIGINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLUBIGINT expected_v1 = static_cast< SQLUBIGINT >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLUBIGINT), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_UBIGINT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1061,6 +1125,7 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_CHAR) {
                            + std::to_wstring(v2) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLCHAR data[1024] = {0};
+    SQLCHAR data2[1024] = {0};
     SQLLEN indicator = 0;
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
@@ -1068,11 +1133,15 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_CHAR) {
     std::string expected_v1 = std::to_string(v1);
     ASSERT_EQ((SQLLEN)expected_v1.size(), indicator);
     EXPECT_STREQ(expected_v1.c_str(), (char*)data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    std::string expected_v2 = std::to_string(v2);
-    ASSERT_EQ((SQLLEN)expected_v2.size(), indicator);
-    EXPECT_STREQ(expected_v2.c_str(), (char*)data);
+    SQLLEN expected_size = std::to_string(v2).size();
+    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data2, expected_size, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_DATA_RIGHT_TRUNCATED));
+    ASSERT_EQ(expected_size, indicator);
+    char expected_v2[1024] = {0};
+    strncpy(expected_v2, std::to_string(v2).c_str(), expected_size - 1);
+    EXPECT_STREQ(expected_v2, (char*)data2);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1092,10 +1161,12 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_BIT) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_BIT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLCHAR expected_v2 = static_cast< SQLCHAR >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
     EXPECT_EQ(expected_v2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_BIT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1124,10 +1195,12 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_STINYINT) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_STINYINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSCHAR expected_v1 = static_cast< SQLSCHAR >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_STINYINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSCHAR expected_v2 = static_cast< SQLSCHAR >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
     EXPECT_EQ(expected_v2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_STINYINT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1156,10 +1229,12 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_TINYINT) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_TINYINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSCHAR expected_v1 = static_cast< SQLSCHAR >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_TINYINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSCHAR expected_v2 = static_cast< SQLSCHAR >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
     EXPECT_EQ(expected_v2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_TINYINT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1186,6 +1261,7 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_UTINYINT) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_UTINYINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_UTINYINT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1214,10 +1290,12 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SLONG) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_SLONG, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLINTEGER expected_v1 = static_cast< SQLINTEGER >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_SLONG, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLINTEGER expected_v2 = static_cast< SQLINTEGER >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
     EXPECT_EQ(expected_v2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_SLONG, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1246,10 +1324,12 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_LONG) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_LONG, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLINTEGER expected_v1 = static_cast< SQLINTEGER >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_LONG, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLINTEGER expected_v2 = static_cast< SQLINTEGER >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
     EXPECT_EQ(expected_v2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_LONG, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1264,8 +1344,8 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_LONG) {
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_ULONG) {
     double v1 = 293719.0;
-    double v2 = -1;
-    double v3 = (double)ULONG_MAX + (double)1;
+    double v2 = -1;  // underflow
+    double v3 = (double)ULONG_MAX + (double)1;  // overflow
     std::wstring columns = L"DOUBLE\'" + std::to_wstring(v1) + L"\', DOUBLE\'"
                            + std::to_wstring(v2) + L"\', DOUBLE\'"
                            + std::to_wstring(v3) + L"\'";
@@ -1277,6 +1357,7 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_ULONG) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLUINTEGER expected_v1 = static_cast< SQLUINTEGER >(
         strtoul(std::to_string(v1).c_str(), NULL, 10));
+    EXPECT_EQ((SQLLEN)sizeof(SQLUINTEGER), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_ULONG, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1306,11 +1387,13 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SSHORT) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT expected_v1 = static_cast< SQLSMALLINT >(
         strtol(std::to_string(v1).c_str(), NULL, 10));
+    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_SSHORT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT expected_v2 = static_cast< SQLSMALLINT >(
         strtol(std::to_string(v2).c_str(), NULL, 10));
+    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
     EXPECT_EQ(expected_v2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_SSHORT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1340,11 +1423,13 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SHORT) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT expected_v1 = static_cast< SQLSMALLINT >(
         strtol(std::to_string(v1).c_str(), NULL, 10));
+    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_SHORT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT expected_v2 = static_cast< SQLSMALLINT >(
         strtol(std::to_string(v2).c_str(), NULL, 10));
+    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
     EXPECT_EQ(expected_v2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_SSHORT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1372,6 +1457,7 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_USHORT) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLUSMALLINT expected_v1 = static_cast< SQLUSMALLINT >(
         strtol(std::to_string(v1).c_str(), NULL, 10));
+    EXPECT_EQ((SQLLEN)sizeof(SQLUSMALLINT), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_USHORT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1400,10 +1486,12 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SBIGINT) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_SBIGINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLBIGINT expected_v1 = static_cast< SQLBIGINT >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_SBIGINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLBIGINT expected_v2 = static_cast< SQLBIGINT >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
     EXPECT_EQ(expected_v2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_SBIGINT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1431,6 +1519,7 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_UBIGINT) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLUBIGINT expected_v1 = static_cast< SQLUBIGINT >(
         strtoull(std::to_string(v1).c_str(), NULL, 10));
+    EXPECT_EQ((SQLLEN)sizeof(SQLUBIGINT), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_UBIGINT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1450,6 +1539,7 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_CHAR) {
                            + std::to_wstring(v2) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLCHAR data[1024] = {0};
+    SQLCHAR data2[1024] = {0};
     SQLLEN indicator = 0;
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
@@ -1457,11 +1547,11 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_CHAR) {
     std::string expected_v1 = std::to_string(v1);
     ASSERT_EQ((SQLLEN)expected_v1.size(), indicator);
     EXPECT_STREQ(expected_v1.c_str(), (char*)data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data2, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::string expected_v2 = std::to_string(v2);
     ASSERT_EQ((SQLLEN)expected_v2.size(), indicator);
-    EXPECT_STREQ(expected_v2.c_str(), (char*)data);
+    EXPECT_STREQ(expected_v2.c_str(), (char*)data2);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1476,9 +1566,11 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_DOUBLE) {
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_DOUBLE, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQLDOUBLE), indicator);
     EXPECT_EQ(v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_DOUBLE, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQLDOUBLE), indicator);
     EXPECT_EQ(v2, data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -1499,10 +1591,12 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_FLOAT) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_FLOAT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLREAL expected_v1 = static_cast< SQLREAL >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLREAL), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_FLOAT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLREAL expected_v2 = static_cast< SQLREAL >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLREAL), indicator);
     EXPECT_EQ(expected_v2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_FLOAT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1525,16 +1619,18 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_BIT) {
                            + std::to_wstring(v3) + L"\', BIGINT\'"
                            + std::to_wstring(v4) + L"\'";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLBIGINT data = 0;
+    SQLCHAR data = 0;
     SQLLEN indicator = 0;
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_BIT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLCHAR expected_v2 = static_cast< SQLCHAR >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
     EXPECT_EQ(expected_v2, data);
     ret = SQLGetData(m_hstmt, 3, SQL_C_BIT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1558,9 +1654,11 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_SBIGINT) {
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_SBIGINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
     EXPECT_EQ(v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_SBIGINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
     EXPECT_EQ(v2, data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -1577,6 +1675,7 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_UBIGINT) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_UBIGINT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLUBIGINT expected_v1 = static_cast< SQLUBIGINT > (v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLUBIGINT), indicator);
     EXPECT_EQ(expected_v1, data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_UBIGINT, &data, 0, &indicator);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -1616,8 +1715,10 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_BIT) {
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
     EXPECT_TRUE(data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_FALSE(data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1631,9 +1732,11 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_SLONG) {
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_SLONG, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
     EXPECT_TRUE(data != 0);
     ret = SQLGetData(m_hstmt, 2, SQL_C_SLONG, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
     EXPECT_TRUE(data == 0);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -1646,9 +1749,11 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_ULONG) {
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_ULONG, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQLUINTEGER), indicator);
     EXPECT_TRUE(data != 0);
     ret = SQLGetData(m_hstmt, 2, SQL_C_ULONG, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQLUINTEGER), indicator);
     EXPECT_TRUE(data == 0);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -1847,6 +1952,8 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_CHAR) {
     std::wstring columns = L"ARRAY[ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]], ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]]], ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[1, 2, 3]]]]]]]]]]]], ARRAY[]";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLCHAR data[1024] = {0};
+    SQLCHAR data2[1024] = {0};
+    SQLCHAR data3[1024] = {0};
     SQLLEN indicator = 0;
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
@@ -1855,16 +1962,16 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_CHAR) {
     expected = "[[[[1.1, 2.3], [1.1, 2.3]]], [[[1.1, 2.3], [1.1, 2.3]]]]";
     ASSERT_EQ((int)expected.size(), indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data2, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = "[[[[[[[[[[[[1, 2, 3]]]]]]]]]]]]";
     ASSERT_EQ((int)expected.size(), indicator);
-    EXPECT_STREQ(expected.c_str(), (char*)data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data2);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_CHAR, data3, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = "-";
     ASSERT_EQ((int)expected.size(), indicator);
-    EXPECT_STREQ(expected.c_str(), (char*)data);
+    EXPECT_STREQ(expected.c_str(), (char*)data3);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1875,7 +1982,9 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_WCHAR) {
         L"ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[1, 2, 3]]]]]]]]]]]], "
         L"ARRAY[]";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLTCHAR data[1024] = {0};
+    SQLWCHAR data[1024] = {0};
+    SQLWCHAR data2[1024] = {0};
+    SQLWCHAR data3[1024] = {0};
     SQLLEN indicator = 0;
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
@@ -1888,7 +1997,7 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_WCHAR) {
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"[[[[[[[[[[[[1, 2, 3]]]]]]]]]]]]";
 #ifdef __APPLE__
@@ -1896,8 +2005,8 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_WCHAR) {
 #else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
-    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data2);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_WCHAR, data3, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"-";
 #ifdef __APPLE__
@@ -1905,7 +2014,7 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_WCHAR) {
 #else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
-    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data3);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1915,6 +2024,7 @@ TEST_F(TestSQLGetData, ROW_TO_SQL_C_CHAR) {
         L"ARRAY[ARRAY[1,2],ARRAY[1.1,2.2]])), ROW(true)";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLCHAR data[1024] = {0};
+    SQLCHAR data2[1024] = {0};
     SQLLEN indicator = 0;
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
@@ -1923,11 +2033,11 @@ TEST_F(TestSQLGetData, ROW_TO_SQL_C_CHAR) {
     expected = "(((3, 10, true), [[1.0, 2.0], [1.1, 2.2]]))";
     ASSERT_EQ((int)expected.size(), indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data2, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = "(true)";
     ASSERT_EQ((int)expected.size(), indicator);
-    EXPECT_STREQ(expected.c_str(), (char*)data);
+    EXPECT_STREQ(expected.c_str(), (char*)data2);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1936,7 +2046,8 @@ TEST_F(TestSQLGetData, ROW_TO_SQL_C_WCHAR) {
         L"ROW(ROW(ROW(INTEGER '03', BIGINT '10', true), "
         L"ARRAY[ARRAY[1,2],ARRAY[1.1,2.2]])), ROW(true)";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLTCHAR data[1024] = {0};
+    SQLWCHAR data[1024] = {0};
+    SQLWCHAR data2[1024] = {0};
     SQLLEN indicator = 0;
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
@@ -1949,7 +2060,7 @@ TEST_F(TestSQLGetData, ROW_TO_SQL_C_WCHAR) {
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"(true)";
 #ifdef __APPLE__
@@ -1957,7 +2068,7 @@ TEST_F(TestSQLGetData, ROW_TO_SQL_C_WCHAR) {
 #else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
-    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data2);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -2641,7 +2752,1197 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_TIME) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestSQLGetData, INVERVAL_YEAR_TO_MONTH_TO_SQL_C_CHAR) {
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_BIT) {
+    int v1 = 0;
+    int v2 = 1;
+    double v3 = 1.5;  // truncation
+    int v4 = -1;  // underflow
+    int v5 = 2;  // overflow
+    std::wstring columns =
+        L"VARCHAR\'" + std::to_wstring(v1)
+        + L"\', VARCHAR\'" + std::to_wstring(v2)
+        + L"\', VARCHAR\'" + std::to_wstring(v3)
+        + L"\', VARCHAR\'   " + std::to_wstring(v3) // truncation with leading and trailing spaces
+        + L"   \', VARCHAR\'" + std::to_wstring(v4) 
+        + L"\', VARCHAR\'" + std::to_wstring(v5)
+        + L"\', VARCHAR\'" + L"1.a" + L"\'"; // not a numeric literal
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLCHAR data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
+    EXPECT_EQ(expected_v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLCHAR expected_v2 = static_cast< SQLCHAR >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    SQLCHAR expected_v3 = static_cast< SQLCHAR >(v3);
+    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
+    EXPECT_EQ(expected_v3, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
+    EXPECT_EQ(expected_v3, data);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
+    ret = SQLGetData(m_hstmt, 5, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 6, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 7, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_STINYINT) {
+    int v1 = SCHAR_MIN;
+    int v2 = SCHAR_MAX;
+    double v3 = 1.5; // truncation
+    int v4 = SCHAR_MIN - 1;  // underflow
+    int v5 = SCHAR_MAX + 1;  // overflow
+    std::wstring columns =
+        L"VARCHAR\'" + std::to_wstring(v1)
+        + L"\', VARCHAR\'" + std::to_wstring(v2)
+        + L"\', VARCHAR\'" + std::to_wstring(v3)
+        + L"\', VARCHAR\'   " + std::to_wstring(v3) // truncation with leading and trailing spaces
+        + L"   \', VARCHAR\'" + std::to_wstring(v4) 
+        + L"\', VARCHAR\'" + std::to_wstring(v5)
+        + L"\', VARCHAR\'" + L"1.a" + L"\'"; // not a numeric literal
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLSCHAR data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_STINYINT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSCHAR expected_v1 = static_cast< SQLSCHAR >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
+    EXPECT_EQ(expected_v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_STINYINT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSCHAR expected_v2 = static_cast< SQLSCHAR >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_STINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    SQLCHAR expected_v3 = static_cast< SQLSCHAR >(v3);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
+    EXPECT_EQ(expected_v3, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_STINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
+    EXPECT_EQ(expected_v3, data);
+    ret = SQLGetData(m_hstmt, 5, SQL_C_STINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 6, SQL_C_STINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 7, SQL_C_STINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TINYINT) {
+    int v1 = SCHAR_MIN;
+    int v2 = SCHAR_MAX;
+    double v3 = 1.5;  // truncation
+    int v4 = INT_MIN;  // underflow
+    int v5 = INT_MAX;  // overflow
+    std::wstring columns =
+        L"VARCHAR\'" + std::to_wstring(v1)
+        + L"\', VARCHAR\'" + std::to_wstring(v2)
+        + L"\', VARCHAR\'" + std::to_wstring(v3)
+        + L"\', VARCHAR\'   " + std::to_wstring(v3) // truncation with leading and trailing spaces
+        + L"   \', VARCHAR\'" + std::to_wstring(v4) 
+        + L"\', VARCHAR\'" + std::to_wstring(v5)
+        + L"\', VARCHAR\'" + L"1.a" + L"\'"; // Not a numeric literal
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLSCHAR data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_TINYINT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSCHAR expected_v1 = static_cast< SQLSCHAR >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
+    EXPECT_EQ(expected_v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_TINYINT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSCHAR expected_v2 = static_cast< SQLSCHAR >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_TINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    SQLCHAR expected_v3 = static_cast< SQLSCHAR >(v3);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
+    EXPECT_EQ(expected_v3, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_TINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
+    EXPECT_EQ(expected_v3, data);
+    ret = SQLGetData(m_hstmt, 5, SQL_C_TINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 6, SQL_C_TINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 7, SQL_C_TINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_UTINYINT) {
+    int v1 = UCHAR_MAX;
+    double v2 = 1.5;         // truncation
+    int v3 = -1;             // underflow
+    int v4 = UCHAR_MAX + 1;  // overflow
+    std::wstring columns =
+        L"VARCHAR\'" + std::to_wstring(v1)
+        + L"\', VARCHAR\'" + std::to_wstring(v2)
+        + L"\', VARCHAR\'   " + std::to_wstring(v2) // truncation with leading and trailing spaces
+        + L"   \', VARCHAR\'" + std::to_wstring(v3) 
+        + L"\', VARCHAR\'" + std::to_wstring(v4)
+        + L"\', VARCHAR\'" + L"1.a" + L"\'"; // not a numeric literal
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLCHAR data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_UTINYINT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
+    EXPECT_EQ(expected_v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_UTINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    SQLCHAR expected_v2 = static_cast< SQLCHAR >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_UTINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_UTINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 5, SQL_C_UTINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 6, SQL_C_UTINYINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SLONG) {
+    int v1 = -293719;
+    int v2 = 741370;
+    double v3 = 1.5;  // truncation
+    double v4 = -9.3E18;  // underflow
+    double v5 = (double)LONG_MAX + (double)1;  // overflow  
+    std::wstring columns =
+        L"VARCHAR\'" + std::to_wstring(v1)
+        + L"\', VARCHAR\'" + std::to_wstring(v2)
+        + L"\', VARCHAR\'" + std::to_wstring(v3)
+        + L"\', VARCHAR\'   " + std::to_wstring(v3) // truncation with leading and trailing spaces
+        + L"   \', VARCHAR\'" + std::to_wstring(v4) 
+        + L"\', VARCHAR\'" + std::to_wstring(v5)
+        + L"\', VARCHAR\'" + L"1.a" + L"\'"; // Not a numeric literal
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLINTEGER data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_SLONG, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLINTEGER expected_v1 = static_cast< SQLINTEGER >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
+    EXPECT_EQ(expected_v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_SLONG, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLINTEGER expected_v2 = static_cast< SQLINTEGER >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_SLONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    SQLINTEGER expected_v3 = static_cast< SQLINTEGER >(v3);
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
+    EXPECT_EQ(expected_v3, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_SLONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
+    EXPECT_EQ(expected_v3, data);
+    ret = SQLGetData(m_hstmt, 5, SQL_C_SLONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 6, SQL_C_SLONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 7, SQL_C_SLONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_LONG) {
+    int v1 = -293719;
+    int v2 = 741370;
+    double v3 = 1.5;  // truncation
+    double v4 = -DBL_MAX;  // underflow
+    double v5 = DBL_MAX;  // overflow
+    std::wstring columns =
+        L"VARCHAR\'" + std::to_wstring(v1)
+        + L"\', VARCHAR\'" + std::to_wstring(v2)
+        + L"\', VARCHAR\'" + std::to_wstring(v3)
+        + L"\', VARCHAR\'   " + std::to_wstring(v3) // truncation with leading and trailing spaces
+        + L"   \', VARCHAR\'" + std::to_wstring(v4) 
+        + L"\', VARCHAR\'" + std::to_wstring(v5)
+        + L"\', VARCHAR\'" + L"1.a" + L"\'"; // Not a numeric literal
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLINTEGER data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_LONG, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLINTEGER expected_v1 = static_cast< SQLINTEGER >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
+    EXPECT_EQ(expected_v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_LONG, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLINTEGER expected_v2 = static_cast< SQLINTEGER >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_LONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    SQLINTEGER expected_v3 = static_cast< SQLINTEGER >(v3);
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
+    EXPECT_EQ(expected_v3, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_LONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
+    EXPECT_EQ(expected_v3, data);
+    ret = SQLGetData(m_hstmt, 5, SQL_C_LONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 6, SQL_C_LONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 7, SQL_C_LONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_ULONG) {
+    int v1 = 293719;
+    double v2 = 1.5;  // truncation
+    int v3 = -1;  // underflow
+    double v4 = (double)ULONG_MAX + (double)1;  // overflow
+    std::wstring columns =
+        L"VARCHAR\'" + std::to_wstring(v1)
+        + L"\', VARCHAR\'" + std::to_wstring(v2)
+        + L"\', VARCHAR\'   " + std::to_wstring(v2) // truncation with leading and trailing spaces
+        + L"   \', VARCHAR\'" + std::to_wstring(v3) 
+        + L"\', VARCHAR\'" + std::to_wstring(v4)
+        + L"\', VARCHAR\'" + L"1.a" + L"\'"; // not a numeric literal
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLUINTEGER data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_ULONG, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLUINTEGER expected_v1 = static_cast< SQLUINTEGER >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLUINTEGER), indicator);
+    EXPECT_EQ(expected_v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_ULONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    SQLUINTEGER expected_v2 = static_cast< SQLUINTEGER >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLUINTEGER), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_ULONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_EQ((SQLLEN)sizeof(SQLUINTEGER), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_ULONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 5, SQL_C_ULONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 6, SQL_C_ULONG, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SSHORT) {
+    int v1 = SHRT_MIN;
+    int v2 = SHRT_MAX;
+    double v3 = 1.5;  // truncation
+    int v4 = SHRT_MIN - 1;  // underflow
+    int v5 = SHRT_MAX + 1;  // overflow
+    std::wstring columns =
+        L"VARCHAR\'" + std::to_wstring(v1)
+        + L"\', VARCHAR\'" + std::to_wstring(v2)
+        + L"\', VARCHAR\'" + std::to_wstring(v3)
+        + L"\', VARCHAR\'   " + std::to_wstring(v3) // truncation with leading and trailing spaces
+        + L"   \', VARCHAR\'" + std::to_wstring(v4) 
+        + L"\', VARCHAR\'" + std::to_wstring(v5)
+        + L"\', VARCHAR\'" + L"1.a" + L"\'"; // not a numeric literal
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLSMALLINT data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_SSHORT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSMALLINT expected_v1 = static_cast< SQLSMALLINT >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
+    EXPECT_EQ(expected_v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_SSHORT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSMALLINT expected_v2 = static_cast< SQLSMALLINT >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_SSHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    SQLSMALLINT expected_v3 = static_cast< SQLSMALLINT >(v3);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
+    EXPECT_EQ(expected_v3, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_SSHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
+    EXPECT_EQ(expected_v3, data);
+    ret = SQLGetData(m_hstmt, 5, SQL_C_SSHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 6, SQL_C_SSHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 7, SQL_C_SSHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SHORT) {
+    int v1 = SHRT_MIN;
+    int v2 = SHRT_MAX;
+    double v3 = 1.5;  // truncation
+    int v4 = INT_MIN;  // underflow
+    int v5 = INT_MAX;  // overflow
+    std::wstring columns =
+        L"VARCHAR\'" + std::to_wstring(v1)
+        + L"\', VARCHAR\'" + std::to_wstring(v2)
+        + L"\', VARCHAR\'" + std::to_wstring(v3)
+        + L"\', VARCHAR\'   " + std::to_wstring(v3)  // truncation with leading and trailing spaces
+        + L"   \', VARCHAR\'" + std::to_wstring(v4) 
+        + L"\', VARCHAR\'" + std::to_wstring(v5)
+        + L"\', VARCHAR\'" + L"1.a" + L"\'";  // not a numeric literal
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLSMALLINT data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_SHORT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSMALLINT expected_v1 = static_cast< SQLSMALLINT >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
+    EXPECT_EQ(expected_v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_SHORT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSMALLINT expected_v2 = static_cast< SQLSMALLINT >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_SHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    SQLSMALLINT expected_v3 = static_cast< SQLSMALLINT >(v3);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
+    EXPECT_EQ(expected_v3, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_SHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
+    EXPECT_EQ(expected_v3, data);
+    ret = SQLGetData(m_hstmt, 5, SQL_C_SHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 6, SQL_C_SHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 7, SQL_C_SHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_USHORT) {
+    int v1 = USHRT_MAX;
+    double v2 = 1.5;         // truncation
+    int v3 = -1;             // underflow
+    int v4 = USHRT_MAX + 1;  // overflow
+    std::wstring columns =
+        L"VARCHAR\'" + std::to_wstring(v1)
+        + L"\', VARCHAR\'" + std::to_wstring(v2)
+        + L"\', VARCHAR\'   " + std::to_wstring(v2) // truncation with leading and trailing spaces
+        + L"   \', VARCHAR\'" + std::to_wstring(v3) 
+        + L"\', VARCHAR\'" + std::to_wstring(v4)
+        + L"\', VARCHAR\'" + L"1.a" + L"\'"; // not a numeric literal
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLUSMALLINT data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_USHORT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLUSMALLINT expected_v1 = static_cast< SQLUSMALLINT >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLUSMALLINT), indicator);
+    EXPECT_EQ(expected_v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_USHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    SQLUSMALLINT expected_v2 = static_cast< SQLUSMALLINT >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLUSMALLINT), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_USHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_EQ((SQLLEN)sizeof(SQLUSMALLINT), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_USHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 5, SQL_C_USHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 6, SQL_C_USHORT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SBIGINT) {
+    int v1 = -293719;
+    int v2 = 741370;
+    double v3 = 1.5;  // truncation
+    double v4 = -DBL_MAX;  // underflow
+    double v5 = DBL_MAX;  // overflow
+    std::wstring columns =
+        L"VARCHAR\'" + std::to_wstring(v1)
+        + L"\', VARCHAR\'" + std::to_wstring(v2)
+        + L"\', VARCHAR\'" + std::to_wstring(v3)
+        + L"\', VARCHAR\'   " + std::to_wstring(v3)  // truncation with leading and trailing spaces
+        + L"   \', VARCHAR\'" + std::to_wstring(v4) 
+        + L"\', VARCHAR\'" + std::to_wstring(v5)
+        + L"\', VARCHAR\'" + L"1.a" + L"\'";  // not a numeric literal
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLBIGINT data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_SBIGINT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLBIGINT expected_v1 = static_cast< SQLBIGINT >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
+    EXPECT_EQ(expected_v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_SBIGINT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLBIGINT expected_v2 = static_cast< SQLBIGINT >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_SBIGINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    SQLBIGINT expected_v3 = static_cast< SQLBIGINT >(v3);
+    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
+    EXPECT_EQ(expected_v3, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_SBIGINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
+    EXPECT_EQ(expected_v3, data);
+    ret = SQLGetData(m_hstmt, 5, SQL_C_SBIGINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 6, SQL_C_SBIGINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 7, SQL_C_SBIGINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_UBIGINT) {
+    int v1 = 293719;
+    double v2 = 1.5;
+    double v3 = -1.0;  // underflow
+    double v4 = DBL_MAX;  //overflow
+    std::wstring columns =
+        L"VARCHAR\'" + std::to_wstring(v1)
+        + L"\', VARCHAR\'" + std::to_wstring(v2)
+        + L"\', VARCHAR\'   " + std::to_wstring(v2) // truncation with leading and trailing spaces
+        + L"   \', VARCHAR\'" + std::to_wstring(v3) 
+        + L"\', VARCHAR\'" + std::to_wstring(v4)
+        + L"\', VARCHAR\'" + L"1.a" + L"\'"; // not a numeric literal
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLUBIGINT data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_UBIGINT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLUBIGINT expected_v1 = static_cast< SQLUBIGINT >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLUBIGINT), indicator);
+    EXPECT_EQ(expected_v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_UBIGINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    SQLUBIGINT expected_v2 = static_cast< SQLUBIGINT >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLUBIGINT), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_UBIGINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_EQ((SQLLEN)sizeof(SQLUBIGINT), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_UBIGINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 5, SQL_C_UBIGINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 6, SQL_C_UBIGINT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_DOUBLE) {
+    double v1 = -2.93719E5;
+    double v2 = 7.41370E5;
+    std::wstring columns =
+        L"VARCHAR\'" + std::to_wstring(v1)
+        + L"\', VARCHAR\'" + std::to_wstring(v2)
+        + L"\', VARCHAR\'   " + std::to_wstring(v2)  // leading and trailing spaces
+        + L"   \', VARCHAR\'"
+        + L"9179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368"  // overflow
+        + L"\', VARCHAR\'"
+        + L"-9179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368"  // underflow
+        + L"\', VARCHAR\'" + L"1.a" + L"\'"; // not a numeric literal
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLDOUBLE data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_DOUBLE, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQLDOUBLE), indicator);
+    EXPECT_EQ(v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_DOUBLE, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQLDOUBLE), indicator);
+    EXPECT_EQ(v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_DOUBLE, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQLDOUBLE), indicator);
+    EXPECT_EQ(v2, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_DOUBLE, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 5, SQL_C_DOUBLE, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 6, SQL_C_DOUBLE, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_FLOAT) {
+    double v1 = -2.93719E5;
+    double v2 = 7.41370E5;
+    double v3 = -DBL_MAX;  // underflow
+    double v4 = DBL_MAX;   // overflow
+    std::wstring columns =
+        L"VARCHAR\'" + std::to_wstring(v1)
+        + L"\', VARCHAR\'" + std::to_wstring(v2)
+        + L"\', VARCHAR\'   " + std::to_wstring(v2) // truncation with leading and trailing spaces
+        + L"   \', VARCHAR\'" + std::to_wstring(v3) 
+        + L"\', VARCHAR\'" + std::to_wstring(v4)
+        + L"\', VARCHAR\'" + L"1.a" + L"\'"; // not a numeric literal
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLREAL data = 0;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_FLOAT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLREAL expected_v1 = static_cast< SQLREAL >(v1);
+    EXPECT_EQ((SQLLEN)sizeof(SQLREAL), indicator);
+    EXPECT_EQ(expected_v1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_FLOAT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLREAL expected_v2 = static_cast< SQLREAL >(v2);
+    EXPECT_EQ((SQLLEN)sizeof(SQLREAL), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_FLOAT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQLREAL), indicator);
+    EXPECT_EQ(expected_v2, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_FLOAT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 5, SQL_C_FLOAT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    ret = SQLGetData(m_hstmt, 6, SQL_C_FLOAT, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_CHAR) {
+    int v1 = -293719;
+    int v2 = 741370;
+    std::wstring columns = L"VARCHAR\'" + std::to_wstring(v1) + L"\', VARCHAR\'"
+                           + std::to_wstring(v2) + L"\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLCHAR data[1024] = {0};
+    SQLCHAR data2[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::string expected_v1 = std::to_string(v1);
+    ASSERT_EQ((SQLLEN)expected_v1.size(), indicator);
+    EXPECT_STREQ(expected_v1.c_str(), (char*)data);
+    SQLLEN expected_size = std::to_string(v2).size();
+    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data2, expected_size,
+                     &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_DATA_RIGHT_TRUNCATED));
+    ASSERT_EQ(expected_size, indicator);
+    char expected_v2[1024] = {0};
+    strncpy(expected_v2, std::to_string(v2).c_str(), expected_size - 1);
+    EXPECT_STREQ(expected_v2, (char*)data2);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_WCHAR) {
+    int v1 = -293719;
+    int v2 = 741370;
+    std::wstring columns = L"VARCHAR\'" + std::to_wstring(v1) + L"\', VARCHAR\'"
+                           + std::to_wstring(v2) + L"\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLWCHAR data[1024] = {0};
+    SQLWCHAR data2[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_v1 = std::to_wstring(v1);
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected_v1.size()), indicator);
+#else
+    ASSERT_EQ((int)(2 * expected_v1.size()), indicator);
+#endif
+    EXPECT_STREQ(expected_v1.c_str(), (wchar_t*)data);
+    SQLLEN expected_size = std::to_wstring(v2).size();
+#ifdef __APPLE__
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 4 * (expected_size),
+                     &indicator);
+#else
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 2 * (expected_size),
+                     &indicator);
+#endif
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_DATA_RIGHT_TRUNCATED));
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected_size), indicator);
+#else
+    ASSERT_EQ((int)(2 * expected_size), indicator);
+#endif
+    wchar_t expected_v2[1024] = {0};
+    wcsncpy(expected_v2, std::to_wstring(v2).c_str(), expected_size - 1);
+    EXPECT_STREQ(expected_v2, (wchar_t*)data2);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TIMESTAMP) {
+    std::wstring columns =
+        L"VARCHAR \'2021-01-02 18:01:13.000000000\',"
+        L"VARCHAR \'2021-11-20 06:39:45.123456789\',"
+        L"VARCHAR \'2021-11-20 06:39:45.12345\',"
+        L"VARCHAR \'2021-11-20 06:39:45\',"
+        L"VARCHAR \'2021-11-20 06:39\',"
+        L"VARCHAR \'2021-11-20 06\',"
+        L"VARCHAR \'2021-11-20\',"
+        L"VARCHAR \'2021-11\',"
+        L"VARCHAR \'06:39:45.123456789\',"
+        L"VARCHAR \'06:39:45\',"
+        L"VARCHAR \'06:39\',"
+        L"VARCHAR \'2021-11-20 06:39:45.1234567890\',"
+        L"VARCHAR \'2021-11-20 06:39:45a\',"
+        L"VARCHAR \'   2021-01-02 18:01:13.000000000   \'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    TIMESTAMP_STRUCT data;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_TIMESTAMP, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+    TIMESTAMP_STRUCT ts1{2021, 1, 2, 18, 1, 13, 0};
+    CompareTimestampStruct(ts1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_TIMESTAMP, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+    TIMESTAMP_STRUCT ts2{2021, 11, 20, 6, 39, 45, 123456789};
+    CompareTimestampStruct(ts2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_TIMESTAMP, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+    TIMESTAMP_STRUCT ts3{2021, 11, 20, 6, 39, 45, 123450000};
+    CompareTimestampStruct(ts3, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_TIMESTAMP, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+    TIMESTAMP_STRUCT ts4{2021, 11, 20, 6, 39, 45, 0};
+    CompareTimestampStruct(ts4, data);
+    ret = SQLGetData(m_hstmt, 5, SQL_C_TIMESTAMP, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+    TIMESTAMP_STRUCT ts5{2021, 11, 20, 6, 39, 0, 0};
+    CompareTimestampStruct(ts5, data);
+    ret = SQLGetData(m_hstmt, 6, SQL_C_TIMESTAMP, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+    TIMESTAMP_STRUCT ts6{2021, 11, 20, 6, 0, 0, 0};
+    CompareTimestampStruct(ts6, data);
+    ret = SQLGetData(m_hstmt, 7, SQL_C_TIMESTAMP, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+    TIMESTAMP_STRUCT ts7{2021, 11, 20, 0, 0, 0, 0};
+    CompareTimestampStruct(ts7, data);
+    ret = SQLGetData(m_hstmt, 8, SQL_C_TIMESTAMP, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+    TIMESTAMP_STRUCT ts8{2021, 11, 1, 0, 0, 0, 0};
+    CompareTimestampStruct(ts8, data);
+    ret = SQLGetData(m_hstmt, 9, SQL_C_TIMESTAMP, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+    time_t rawtime;
+    struct tm* timeinfo;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    TIMESTAMP_STRUCT ts9{(SQLSMALLINT)(timeinfo->tm_year + 1900),
+                         (SQLUSMALLINT)(timeinfo->tm_mon + 1),
+                         (SQLUSMALLINT)(timeinfo->tm_mday),
+                         6,
+                         39,
+                         45,
+                         123456789};
+    CompareTimestampStruct(ts9, data);
+    ret = SQLGetData(m_hstmt, 10, SQL_C_TIMESTAMP, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+    TIMESTAMP_STRUCT ts10{(SQLSMALLINT)(timeinfo->tm_year + 1900),
+                         (SQLUSMALLINT)(timeinfo->tm_mon + 1),
+                         (SQLUSMALLINT)(timeinfo->tm_mday),
+                         6,
+                         39,
+                         45,
+                         0};
+    CompareTimestampStruct(ts10, data);
+    ret = SQLGetData(m_hstmt, 11, SQL_C_TIMESTAMP, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+    TIMESTAMP_STRUCT ts11{(SQLSMALLINT)(timeinfo->tm_year + 1900),
+                          (SQLUSMALLINT)(timeinfo->tm_mon + 1),
+                          (SQLUSMALLINT)(timeinfo->tm_mday),
+                          6,
+                          39,
+                          0,
+                          0};
+    CompareTimestampStruct(ts11, data);
+    ret = SQLGetData(m_hstmt, 12, SQL_C_TIMESTAMP, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    ret = SQLGetData(m_hstmt, 13, SQL_C_TIMESTAMP, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    ret = SQLGetData(m_hstmt, 14, SQL_C_TIMESTAMP, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+    CompareTimestampStruct(ts1, data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_DATE) {
+    std::wstring columns =
+        L"VARCHAR \'2021-01-02 18:01:13.000000000\',"
+        L"VARCHAR \'2021-11-20 06:39:45.123456789\',"
+        L"VARCHAR \'2021-11-20 06:39:45.12345\',"
+        L"VARCHAR \'2021-11-20 06:39:45\',"
+        L"VARCHAR \'2021-11-20 06:39\',"
+        L"VARCHAR \'2021-11-20 06\',"
+        L"VARCHAR \'2021-11-20\',"
+        L"VARCHAR \'2021-11\',"
+        L"VARCHAR \'06:39:45.123456789\',"
+        L"VARCHAR \'06:39:45\',"
+        L"VARCHAR \'06:39\',"
+        L"VARCHAR \'2021-11-20 06:39:45.1234567890\',"
+        L"VARCHAR \'2021-11-20 06:39:45a\',"
+        L"VARCHAR \'   2021-01-02 18:01:13.000000000   \'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    DATE_STRUCT data;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_DATE, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
+    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
+    DATE_STRUCT ds1{2021, 1, 2};
+    CompareDateStruct(ds1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_DATE, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
+    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
+    DATE_STRUCT ds2{2021, 11, 20};
+    CompareDateStruct(ds2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_DATE, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
+    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
+    CompareDateStruct(ds2, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_DATE, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
+    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
+    CompareDateStruct(ds2, data);
+    ret = SQLGetData(m_hstmt, 5, SQL_C_DATE, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
+    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
+    CompareDateStruct(ds2, data);
+    ret = SQLGetData(m_hstmt, 6, SQL_C_DATE, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
+    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
+    CompareDateStruct(ds2, data);
+    ret = SQLGetData(m_hstmt, 7, SQL_C_DATE, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
+    CompareDateStruct(ds2, data);
+    ret = SQLGetData(m_hstmt, 8, SQL_C_DATE, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
+    DATE_STRUCT ds3{2021, 11, 1};
+    CompareDateStruct(ds3, data);
+    ret = SQLGetData(m_hstmt, 9, SQL_C_DATE, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    ret = SQLGetData(m_hstmt, 10, SQL_C_DATE, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    ret = SQLGetData(m_hstmt, 11, SQL_C_DATE, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    ret = SQLGetData(m_hstmt, 12, SQL_C_DATE, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    ret = SQLGetData(m_hstmt, 13, SQL_C_DATE, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    ret = SQLGetData(m_hstmt, 14, SQL_C_DATE, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
+    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
+    CompareDateStruct(ds1, data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TIME) {
+    std::wstring columns =
+        L"VARCHAR \'2021-01-02 18:01:13.000000000\',"
+        L"VARCHAR \'2021-11-20 06:39:45.123456789\',"
+        L"VARCHAR \'2021-11-20 06:39:45.12345\',"
+        L"VARCHAR \'2021-11-20 06:39:45\',"
+        L"VARCHAR \'2021-11-20 06:39\',"
+        L"VARCHAR \'2021-11-20 06\',"
+        L"VARCHAR \'2021-11-20\',"
+        L"VARCHAR \'2021-11\',"
+        L"VARCHAR \'06:39:45.123456789\',"
+        L"VARCHAR \'06:39:45\',"
+        L"VARCHAR \'06:39\',"
+        L"VARCHAR \'2021-11-20 06:39:45.1234567890\',"
+        L"VARCHAR \'2021-11-20 06:39:45a\',"
+        L"VARCHAR \'   2021-01-02 18:01:13.000000000   \'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    TIME_STRUCT data;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_TIME, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
+    TIME_STRUCT ts1{18, 1, 13};
+    CompareTimeStruct(ts1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_TIME, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
+    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
+    TIME_STRUCT ts2{6, 39, 45};
+    CompareTimeStruct(ts2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_TIME, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
+    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
+    CompareTimeStruct(ts2, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_TIME, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
+    CompareTimeStruct(ts2, data);
+    ret = SQLGetData(m_hstmt, 5, SQL_C_TIME, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
+    TIME_STRUCT ts3{6, 39, 0};
+    CompareTimeStruct(ts3, data);
+    ret = SQLGetData(m_hstmt, 6, SQL_C_TIME, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
+    TIME_STRUCT ts4{6, 0, 0};
+    CompareTimeStruct(ts4, data);
+    ret = SQLGetData(m_hstmt, 7, SQL_C_TIME, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    ret = SQLGetData(m_hstmt, 8, SQL_C_TIME, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    ret = SQLGetData(m_hstmt, 9, SQL_C_TIME, &data, 0, &indicator);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
+    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
+    CompareTimeStruct(ts2, data);
+    ret = SQLGetData(m_hstmt, 10, SQL_C_TIME, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
+    CompareTimeStruct(ts2, data);
+    ret = SQLGetData(m_hstmt, 11, SQL_C_TIME, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
+    CompareTimeStruct(ts3, data);
+    ret = SQLGetData(m_hstmt, 12, SQL_C_TIME, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    ret = SQLGetData(m_hstmt, 13, SQL_C_TIME, &data, 0, &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    ret = SQLGetData(m_hstmt, 14, SQL_C_TIME, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
+    CompareTimeStruct(ts1, data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_INTERVAL_YEAR_TO_MONTH) {
+    std::wstring columns =
+        L"VARCHAR \'1-0',"
+        L"VARCHAR \'0-1\',"
+        L"VARCHAR \'-1-0\',"
+        L"VARCHAR \'-0-1\',"
+        L"VARCHAR \'0-0\',"
+        L"VARCHAR \'a0-0\',"
+        L"VARCHAR \'   0-0   \'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQL_INTERVAL_STRUCT data;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_INTERVAL_YEAR_TO_MONTH, &data, 0,
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
+    SQL_INTERVAL_STRUCT is1 = ConstructIntervalStruct(
+        SQL_IS_YEAR_TO_MONTH, SQL_FALSE, 1, 0, 0, 0, 0, 0, 0);
+    CompareIntervalStruct(is1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_INTERVAL_YEAR_TO_MONTH, &data, 0,
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
+    SQL_INTERVAL_STRUCT is2 = ConstructIntervalStruct(
+        SQL_IS_YEAR_TO_MONTH, SQL_FALSE, 0, 1, 0, 0, 0, 0, 0);
+    CompareIntervalStruct(is2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_INTERVAL_YEAR_TO_MONTH, &data, 0,
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
+    SQL_INTERVAL_STRUCT is3 = ConstructIntervalStruct(
+        SQL_IS_YEAR_TO_MONTH, SQL_TRUE, 1, 0, 0, 0, 0, 0, 0);
+    CompareIntervalStruct(is3, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_INTERVAL_YEAR_TO_MONTH, &data, 0,
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
+    SQL_INTERVAL_STRUCT is4 = ConstructIntervalStruct(
+        SQL_IS_YEAR_TO_MONTH, SQL_TRUE, 0, 1, 0, 0, 0, 0, 0);
+    CompareIntervalStruct(is4, data);
+    ret = SQLGetData(m_hstmt, 5, SQL_C_INTERVAL_YEAR_TO_MONTH, &data, 0,
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
+    SQL_INTERVAL_STRUCT is5 = ConstructIntervalStruct(
+        SQL_IS_YEAR_TO_MONTH, SQL_FALSE, 0, 0, 0, 0, 0, 0, 0);
+    CompareIntervalStruct(is5, data);
+    ret = SQLGetData(m_hstmt, 6, SQL_C_INTERVAL_YEAR_TO_MONTH, &data, 0,
+                     &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    ret = SQLGetData(m_hstmt, 7, SQL_C_INTERVAL_YEAR_TO_MONTH, &data, 0,
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
+    CompareIntervalStruct(is5, data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, VARCHAR_TO_INTERVAL_DAY_TO_SECOND) {
+    std::wstring columns =
+        L"VARCHAR \'1 00:00:00.000000000\',"
+        L"VARCHAR \'0 01:00:00.000000000\',"
+        L"VARCHAR \'0 00:01:00.000000000\',"
+        L"VARCHAR \'0 00:00:01.000000000\',"
+        L"VARCHAR \'0 00:00:00.001000000\',"
+        L"VARCHAR \'0 00:00:00.000001000\',"
+        L"VARCHAR \'0 00:00:00.000000001\',"
+        L"VARCHAR \'a0 00:00:00.000000001\',"
+        L"VARCHAR \'   0 00:00:00.000000001   \'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQL_INTERVAL_STRUCT data;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
+    SQL_INTERVAL_STRUCT is1 = ConstructIntervalStruct(
+        SQL_IS_DAY_TO_SECOND, SQL_FALSE, 0, 0, 1, 0, 0, 0, 0);
+    CompareIntervalStruct(is1, data);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
+    SQL_INTERVAL_STRUCT is2 = ConstructIntervalStruct(
+        SQL_IS_DAY_TO_SECOND, SQL_FALSE, 0, 0, 0, 1, 0, 0, 0);
+    CompareIntervalStruct(is2, data);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
+    SQL_INTERVAL_STRUCT is3 = ConstructIntervalStruct(
+        SQL_IS_DAY_TO_SECOND, SQL_FALSE, 0, 0, 0, 0, 1, 0, 0);
+    CompareIntervalStruct(is3, data);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
+    SQL_INTERVAL_STRUCT is4 = ConstructIntervalStruct(
+        SQL_IS_DAY_TO_SECOND, SQL_FALSE, 0, 0, 0, 0, 0, 1, 0);
+    CompareIntervalStruct(is4, data);
+    ret = SQLGetData(m_hstmt, 5, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
+    SQL_INTERVAL_STRUCT is5 = ConstructIntervalStruct(
+        SQL_IS_DAY_TO_SECOND, SQL_FALSE, 0, 0, 0, 0, 0, 0, 1000000);
+    CompareIntervalStruct(is5, data);
+    ret = SQLGetData(m_hstmt, 6, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
+    SQL_INTERVAL_STRUCT is6 = ConstructIntervalStruct(
+        SQL_IS_DAY_TO_SECOND, SQL_FALSE, 0, 0, 0, 0, 0, 0, 1000);
+    CompareIntervalStruct(is6, data);
+    ret = SQLGetData(m_hstmt, 7, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
+    SQL_INTERVAL_STRUCT is7 = ConstructIntervalStruct(
+        SQL_IS_DAY_TO_SECOND, SQL_FALSE, 0, 0, 0, 0, 0, 0, 1);
+    CompareIntervalStruct(is7, data);
+    ret = SQLGetData(m_hstmt, 8, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
+                     &indicator);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
+    ret = SQLGetData(m_hstmt, 9, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
+                     &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
+    CompareIntervalStruct(is7, data);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, INTERVAL_YEAR_TO_MONTH_TO_SQL_C_CHAR) {
     std::wstring columns =
         L"1year,"
         L"1month,"
@@ -2651,6 +3952,11 @@ TEST_F(TestSQLGetData, INVERVAL_YEAR_TO_MONTH_TO_SQL_C_CHAR) {
         L"0month";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLCHAR data[1024] = {0};
+    SQLCHAR data2[1024] = {0};
+    SQLCHAR data3[1024] = {0};
+    SQLCHAR data4[1024] = {0};
+    SQLCHAR data5[1024] = {0};
+    SQLCHAR data6[1024] = {0};
     SQLLEN indicator = 0;
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
@@ -2659,35 +3965,35 @@ TEST_F(TestSQLGetData, INVERVAL_YEAR_TO_MONTH_TO_SQL_C_CHAR) {
     expected = "1-0";
     ASSERT_EQ((int)expected.size(), indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data2, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = "0-1";
     ASSERT_EQ((int)expected.size(), indicator);
-    EXPECT_STREQ(expected.c_str(), (char*)data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data2);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_CHAR, data3, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = "-1-0";
     ASSERT_EQ((int)expected.size(), indicator);
-    EXPECT_STREQ(expected.c_str(), (char*)data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data3);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_CHAR, data4, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = "-0-1";
     ASSERT_EQ((int)expected.size(), indicator);
-    EXPECT_STREQ(expected.c_str(), (char*)data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data4);
+    ret = SQLGetData(m_hstmt, 5, SQL_C_CHAR, data5, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = "0-0";
     ASSERT_EQ((int)expected.size(), indicator);
-    EXPECT_STREQ(expected.c_str(), (char*)data);
-    ret = SQLGetData(m_hstmt, 6, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data5);
+    ret = SQLGetData(m_hstmt, 6, SQL_C_CHAR, data6, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = "0-0";
     ASSERT_EQ((int)expected.size(), indicator);
-    EXPECT_STREQ(expected.c_str(), (char*)data);
+    EXPECT_STREQ(expected.c_str(), (char*)data6);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestSQLGetData, INVERVAL_YEAR_TO_MONTH_TO_SQL_C_WCHAR) {
+TEST_F(TestSQLGetData, INTERVAL_YEAR_TO_MONTH_TO_SQL_C_WCHAR) {
     std::wstring columns =
         L"1year,"
         L"1month,"
@@ -2696,7 +4002,12 @@ TEST_F(TestSQLGetData, INVERVAL_YEAR_TO_MONTH_TO_SQL_C_WCHAR) {
         L"0year,"
         L"0month";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLTCHAR data[1024] = {0};
+    SQLWCHAR data[1024] = {0};
+    SQLWCHAR data2[1024] = {0};
+    SQLWCHAR data3[1024] = {0};
+    SQLWCHAR data4[1024] = {0};
+    SQLWCHAR data5[1024] = {0};
+    SQLWCHAR data6[1024] = {0};
     SQLLEN indicator = 0;
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
@@ -2709,7 +4020,7 @@ TEST_F(TestSQLGetData, INVERVAL_YEAR_TO_MONTH_TO_SQL_C_WCHAR) {
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"0-1";
 #ifdef __APPLE__
@@ -2717,8 +4028,8 @@ TEST_F(TestSQLGetData, INVERVAL_YEAR_TO_MONTH_TO_SQL_C_WCHAR) {
 #else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
-    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data2);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_WCHAR, data3, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"-1-0";
 #ifdef __APPLE__
@@ -2726,8 +4037,8 @@ TEST_F(TestSQLGetData, INVERVAL_YEAR_TO_MONTH_TO_SQL_C_WCHAR) {
 #else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
-    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data3);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_WCHAR, data4, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"-0-1";
 #ifdef __APPLE__
@@ -2735,8 +4046,8 @@ TEST_F(TestSQLGetData, INVERVAL_YEAR_TO_MONTH_TO_SQL_C_WCHAR) {
 #else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
-    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data4);
+    ret = SQLGetData(m_hstmt, 5, SQL_C_WCHAR, data5, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"0-0";
 #ifdef __APPLE__
@@ -2744,8 +4055,8 @@ TEST_F(TestSQLGetData, INVERVAL_YEAR_TO_MONTH_TO_SQL_C_WCHAR) {
 #else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
-    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
-    ret = SQLGetData(m_hstmt, 6, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data5);
+    ret = SQLGetData(m_hstmt, 6, SQL_C_WCHAR, data6, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"0-0";
 #ifdef __APPLE__
@@ -2753,14 +4064,20 @@ TEST_F(TestSQLGetData, INVERVAL_YEAR_TO_MONTH_TO_SQL_C_WCHAR) {
 #else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
-    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data6);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestSQLGetData, INVERVAL_DAY_TO_SECOND_TO_SQL_C_CHAR) {
+TEST_F(TestSQLGetData, INTERVAL_DAY_TO_SECOND_TO_SQL_C_CHAR) {
     std::wstring columns = L"1d,1h,1m,1s,1ms,1us,1ns";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLCHAR data[1024] = {0};
+    SQLCHAR data2[1024] = {0};
+    SQLCHAR data3[1024] = {0};
+    SQLCHAR data4[1024] = {0};
+    SQLCHAR data5[1024] = {0};
+    SQLCHAR data6[1024] = {0};
+    SQLCHAR data7[1024] = {0};
     SQLLEN indicator = 0;
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
@@ -2769,43 +4086,49 @@ TEST_F(TestSQLGetData, INVERVAL_DAY_TO_SECOND_TO_SQL_C_CHAR) {
     expected = "1 00:00:00.000000000";
     ASSERT_EQ((int)expected.size(), indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data2, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = "0 01:00:00.000000000";
     ASSERT_EQ((int)expected.size(), indicator);
-    EXPECT_STREQ(expected.c_str(), (char*)data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data2);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_CHAR, data3, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = "0 00:01:00.000000000";
     ASSERT_EQ((int)expected.size(), indicator);
-    EXPECT_STREQ(expected.c_str(), (char*)data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data3);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_CHAR, data4, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = "0 00:00:01.000000000";
     ASSERT_EQ((int)expected.size(), indicator);
-    EXPECT_STREQ(expected.c_str(), (char*)data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data4);
+    ret = SQLGetData(m_hstmt, 5, SQL_C_CHAR, data5, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = "0 00:00:00.001000000";
     ASSERT_EQ((int)expected.size(), indicator);
-    EXPECT_STREQ(expected.c_str(), (char*)data);
-    ret = SQLGetData(m_hstmt, 6, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data5);
+    ret = SQLGetData(m_hstmt, 6, SQL_C_CHAR, data6, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = "0 00:00:00.000001000";
     ASSERT_EQ((int)expected.size(), indicator);
-    EXPECT_STREQ(expected.c_str(), (char*)data);
-    ret = SQLGetData(m_hstmt, 7, SQL_C_CHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (char*)data6);
+    ret = SQLGetData(m_hstmt, 7, SQL_C_CHAR, data7, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = "0 00:00:00.000000001";
     ASSERT_EQ((int)expected.size(), indicator);
-    EXPECT_STREQ(expected.c_str(), (char*)data);
+    EXPECT_STREQ(expected.c_str(), (char*)data7);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestSQLGetData, INVERVAL_DAY_TO_SECOND_TO_SQL_C_WCHAR) {
+TEST_F(TestSQLGetData, INTERVAL_DAY_TO_SECOND_TO_SQL_C_WCHAR) {
     std::wstring columns = L"1d,1h,1m,1s,1ms,1us,1ns";
     QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLTCHAR data[1024] = {0};
+    SQLWCHAR data[1024] = {0};
+    SQLWCHAR data2[1024] = {0};
+    SQLWCHAR data3[1024] = {0};
+    SQLWCHAR data4[1024] = {0};
+    SQLWCHAR data5[1024] = {0};
+    SQLWCHAR data6[1024] = {0};
+    SQLWCHAR data7[1024] = {0};
     SQLLEN indicator = 0;
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
@@ -2818,7 +4141,7 @@ TEST_F(TestSQLGetData, INVERVAL_DAY_TO_SECOND_TO_SQL_C_WCHAR) {
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"0 01:00:00.000000000";
 #ifdef __APPLE__
@@ -2826,8 +4149,8 @@ TEST_F(TestSQLGetData, INVERVAL_DAY_TO_SECOND_TO_SQL_C_WCHAR) {
 #else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
-    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data2);
+    ret = SQLGetData(m_hstmt, 3, SQL_C_WCHAR, data3, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"0 00:01:00.000000000";
 #ifdef __APPLE__
@@ -2835,8 +4158,8 @@ TEST_F(TestSQLGetData, INVERVAL_DAY_TO_SECOND_TO_SQL_C_WCHAR) {
 #else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
-    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data3);
+    ret = SQLGetData(m_hstmt, 4, SQL_C_WCHAR, data4, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"0 00:00:01.000000000";
 #ifdef __APPLE__
@@ -2844,8 +4167,8 @@ TEST_F(TestSQLGetData, INVERVAL_DAY_TO_SECOND_TO_SQL_C_WCHAR) {
 #else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
-    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data4);
+    ret = SQLGetData(m_hstmt, 5, SQL_C_WCHAR, data5, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"0 00:00:00.001000000";
 #ifdef __APPLE__
@@ -2853,8 +4176,8 @@ TEST_F(TestSQLGetData, INVERVAL_DAY_TO_SECOND_TO_SQL_C_WCHAR) {
 #else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
-    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
-    ret = SQLGetData(m_hstmt, 6, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data5);
+    ret = SQLGetData(m_hstmt, 6, SQL_C_WCHAR, data6, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"0 00:00:00.000001000";
 #ifdef __APPLE__
@@ -2862,8 +4185,8 @@ TEST_F(TestSQLGetData, INVERVAL_DAY_TO_SECOND_TO_SQL_C_WCHAR) {
 #else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
-    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
-    ret = SQLGetData(m_hstmt, 7, SQL_C_WCHAR, data, 1024, &indicator);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data6);
+    ret = SQLGetData(m_hstmt, 7, SQL_C_WCHAR, data7, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected = L"0 00:00:00.000000001";
 #ifdef __APPLE__
@@ -2871,7 +4194,7 @@ TEST_F(TestSQLGetData, INVERVAL_DAY_TO_SECOND_TO_SQL_C_WCHAR) {
 #else
     ASSERT_EQ((int)(2 * expected.size()), indicator);
 #endif
-    EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
+    EXPECT_STREQ(expected.c_str(), (wchar_t*)data7);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 

@@ -268,7 +268,7 @@ RETCODE SQL_API ESAPI_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
 
         if (len >= cbColNameMax) {
             result = SQL_SUCCESS_WITH_INFO;
-            SC_set_error(stmt, STMT_TRUNCATED,
+            SC_set_error(stmt, STMT_STRING_TRUNCATED,
                          "The buffer was too small for the colName.", func);
         }
     }
@@ -753,7 +753,7 @@ RETCODE SQL_API ESAPI_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
 
             if (len >= (size_t)cbDescMax) {
                 result = SQL_SUCCESS_WITH_INFO;
-                SC_set_error(stmt, STMT_TRUNCATED,
+                SC_set_error(stmt, STMT_STRING_TRUNCATED,
                              "The buffer was too small for the rgbDesc.", func);
             }
         }
@@ -941,7 +941,7 @@ RETCODE SQL_API ESAPI_GetData(HSTMT hstmt, SQLUSMALLINT icol,
         if (contents_get)
             result = SQL_SUCCESS;
         else {
-            SC_set_error(stmt, STMT_TRUNCATED,
+            SC_set_error(stmt, STMT_STRING_TRUNCATED,
                          "The buffer was too small for the GetData.", func);
             result = SQL_SUCCESS_WITH_INFO;
         }
@@ -980,9 +980,15 @@ RETCODE SQL_API ESAPI_GetData(HSTMT hstmt, SQLUSMALLINT icol,
             result = SQL_ERROR;
             break;
 
-        case COPY_RESULT_TRUNCATED:
-            SC_set_error(stmt, STMT_TRUNCATED,
+        case COPY_RESULT_STRING_TRUNCATED:
+            SC_set_error(stmt, STMT_STRING_TRUNCATED,
                          "The buffer was too small for the GetData.", func);
+            result = SQL_SUCCESS_WITH_INFO;
+            break;
+
+        case COPY_RESULT_FRACTIONAL_TRUNCATED:
+            SC_set_error(stmt, STMT_FRACTIONAL_TRUNCATED,
+                         "Data converted with truncation of fractional digits.", func);
             result = SQL_SUCCESS_WITH_INFO;
             break;
 
@@ -1664,7 +1670,7 @@ RETCODE SQL_API ESAPI_GetCursorName(HSTMT hstmt, SQLCHAR *szCursor,
 
         if (len >= (size_t)cbCursorMax) {
             result = SQL_SUCCESS_WITH_INFO;
-            SC_set_error(stmt, STMT_TRUNCATED,
+            SC_set_error(stmt, STMT_STRING_TRUNCATED,
                          "The buffer was too small for the GetCursorName.",
                          func);
         }

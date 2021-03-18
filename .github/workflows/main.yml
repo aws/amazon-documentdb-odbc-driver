@@ -67,6 +67,10 @@ jobs:
         cat /tmp/timestreamodbc_*.log
         cat /tmp/elasticodbc_*.log
         cat ./aws_sdk_*.log
+    - name: print-memory-leak-logs
+      if: always()
+      run: |
+        cat ./leaks_*
     - name: upload-integration-test-results
       if: always()
       uses: actions/upload-artifact@v2
@@ -74,6 +78,7 @@ jobs:
         name: integration-test-results-mac64
         path: |
           ${{ github.workspace }}/odbc-logs/
+          ${{ github.workspace }}/leaks_
     #- name: test
     #  run: |
     #    bash ./run_test_runner.sh
