@@ -255,7 +255,7 @@ RETCODE SQL_API SQLDescribeColW(HSTMT StatementHandle,
             break;
         }
         clName = clNamet;
-        ret = ESAPI_DescribeCol(StatementHandle, ColumnNumber,
+        ret = API_DescribeCol(StatementHandle, ColumnNumber,
                                 (SQLCHAR *)clName, buflen, &nmlen, DataType,
                                 ColumnSize, DecimalDigits, Nullable);
         if (SQL_SUCCESS_WITH_INFO != ret || nmlen < buflen)
