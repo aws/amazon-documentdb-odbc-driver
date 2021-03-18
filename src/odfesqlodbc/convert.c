@@ -275,6 +275,195 @@ static BOOL timestamp2stime(const char *str, SIMPLE_TIME *st, BOOL *bZone,
     return TRUE;
 }
 
+BOOL valid_datetime_format(const char *str) {
+    // yyyy-mm-dd hh:mm:ss.nnnnnnnnn
+    int sz = (int)strlen(str);
+    if (sz > 29)
+        return FALSE;
+    if (sz == 7 || sz == 10 || sz == 13 || sz == 16 || sz == 19 || sz > 20) {
+        for (int i = 0; i < sz; i++) {
+            if (i == 4 || i == 7) {
+                if (str[i] != '-')
+                    return FALSE;
+            } else if (i == 10) {
+                if (str[i] != ' ')
+                    return FALSE;
+            } else if (i == 13 || i == 16) {
+                if (str[i] != ':')
+                    return FALSE;
+            } else if (i == 19) {
+                if (str[i] != '.')
+                    return FALSE;
+            } else if (!isdigit(str[i])) {
+                return FALSE;
+            }
+        }
+        return TRUE;
+    }
+    return FALSE;
+}
+
+BOOL valid_time_format(const char *str) {
+    // hh:mm:ss.nnnnnnnnn
+    int sz = (int)strlen(str);
+    if (sz > 18)
+        return FALSE;
+    if (sz == 5 || sz == 8 || sz > 9) {
+        for (int i = 0; i < sz; i++) {
+            if (i == 2 || i == 5) {
+                if (str[i] != ':')
+                    return FALSE;
+            } else if (i == 8) {
+                if (str[i] != '.')
+                    return FALSE;
+            } else if (!isdigit(str[i])) {
+                return FALSE;
+            }
+        }
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static BOOL char2stime(const char *str, SIMPLE_TIME *st, int *errcode,
+                       const SQLSMALLINT fCType) {
+    char rest[64];
+    int scnt, i;
+    int y, m, d, hh, mm, ss;
+    st->fr = 0;
+    st->infinity = 0;
+    rest[0] = '\0';
+
+    // time hh:mm:ss[.nnnnnnnnn]
+    if (valid_time_format(str)) {
+        if (fCType == SQL_C_DATE) {
+            *errcode = COPY_INVALID_STRING_CONVERSION;
+            return FALSE;
+        }
+        scnt = sscanf(str, "%2d:%2d:%2d%10s", &hh, &mm, &ss, rest);
+        if (scnt >= 3) {
+            st->hh = hh;
+            st->mm = mm;
+            st->ss = ss;
+            if (scnt == 3)
+                return TRUE;
+        } else if (scnt == 2) {
+            st->hh = hh;
+            st->mm = mm;
+            st->ss = 0;
+            return TRUE;
+        } else {
+            *errcode = COPY_INVALID_STRING_CONVERSION;
+            return FALSE;
+        }
+        if (fCType == SQL_C_TIME) {
+            *errcode = COPY_RESULT_FRACTIONAL_TRUNCATED;
+            return TRUE;
+        }
+        if (rest[0] != '.') {
+            *errcode = COPY_INVALID_STRING_CONVERSION;
+            return FALSE;
+        } else {
+            for (i = 1; i < 10; i++) {
+                if (!isdigit((UCHAR)rest[i]))
+                    break;
+            }
+            for (; i < 10; i++)
+                rest[i] = '0';
+            rest[i] = '\0';
+            st->fr = atoi(&rest[1]);
+        }
+        return TRUE;
+    }
+
+    // timestamp and date
+    if (valid_datetime_format(str)) {
+        scnt = sscanf(str, "%4d-%2d-%2d %2d:%2d:%2d%10s", &y, &m, &d, &hh, &mm,
+                      &ss, rest);
+        if (scnt >= 6) {
+            st->y = y;
+            st->m = m;
+            st->d = d;
+            st->hh = hh;
+            st->mm = mm;
+            st->ss = ss;
+            if (fCType == SQL_C_DATE)
+                *errcode = COPY_RESULT_FRACTIONAL_TRUNCATED;
+            if (scnt == 6)
+                return TRUE;
+        } else if (scnt == 5) {
+            st->y = y;
+            st->m = m;
+            st->d = d;
+            st->hh = hh;
+            st->mm = mm;
+            st->ss = 0;
+            if (fCType == SQL_C_DATE)
+                *errcode = COPY_RESULT_FRACTIONAL_TRUNCATED;
+            return TRUE;
+        } else if (scnt == 4) {
+            st->y = y;
+            st->m = m;
+            st->d = d;
+            st->hh = hh;
+            st->mm = 0;
+            st->ss = 0;
+            if (fCType == SQL_C_DATE)
+                *errcode = COPY_RESULT_FRACTIONAL_TRUNCATED;
+            return TRUE;
+        } else if (scnt == 3) {
+            if (fCType == SQL_C_TIME) {
+                *errcode = COPY_INVALID_STRING_CONVERSION;
+                return FALSE;
+            }
+            st->y = y;
+            st->m = m;
+            st->d = d;
+            st->hh = 0;
+            st->mm = 0;
+            st->ss = 0;
+            return TRUE;
+        } else if (scnt == 2) {
+            if (fCType == SQL_C_TIME) {
+                *errcode = COPY_INVALID_STRING_CONVERSION;
+                return FALSE;
+            }
+            st->y = y;
+            st->m = m;
+            st->d = 1;
+            st->hh = 0;
+            st->mm = 0;
+            st->ss = 0;
+            return TRUE;
+        } else {
+            *errcode = COPY_INVALID_STRING_CONVERSION;
+            return FALSE;
+        }
+        if (fCType == SQL_C_TIME) {
+            *errcode = COPY_RESULT_FRACTIONAL_TRUNCATED;
+            return TRUE;
+        }
+        if (rest[0] != '.') {
+            *errcode = COPY_INVALID_STRING_CONVERSION;
+            return FALSE;
+        } else {
+            for (i = 1; i < 10; i++) {
+                if (!isdigit((UCHAR)rest[i]))
+                    break;
+            }
+            for (; i < 10; i++)
+                rest[i] = '0';
+            rest[i] = '\0';
+            st->fr = atoi(&rest[1]);
+        }
+        return TRUE;
+    }
+
+    // no match
+    *errcode = COPY_INVALID_STRING_CONVERSION;
+    return FALSE;
+}
+
 static int stime2timestamp(const SIMPLE_TIME *st, char *str, size_t bufsize,
                            BOOL bZone, int precision) {
     UNUSED(bZone);
@@ -409,7 +598,7 @@ static BOOL interval2istruct(SQLSMALLINT ctype, int precision, const char *str,
     memset(st, 0, sizeof(SQL_INTERVAL_STRUCT));
     if ((scnt = sscanf(str, "%d-%d", &years, &mons)) >= 2) {
         if (SQL_IS_YEAR_TO_MONTH == itype) {
-            sign = years < 0 ? SQL_TRUE : SQL_FALSE;
+            sign = str[0] == '-' ? SQL_TRUE : SQL_FALSE;
             st->interval_type = itype;
             st->interval_sign = sign;
             st->intval.year_month.year = sign ? (-years) : years;
@@ -420,7 +609,7 @@ static BOOL interval2istruct(SQLSMALLINT ctype, int precision, const char *str,
     } else if (scnt = sscanf(str, "%d %02d:%02d:%02d.%09s", &days, &hours,
                              &minutes, &seconds, lit2),
                5 == scnt || 4 == scnt) {
-        sign = days < 0 ? SQL_TRUE : SQL_FALSE;
+        sign = str[0] == '-' ? SQL_TRUE : SQL_FALSE;
         st->interval_type = itype;
         st->interval_sign = sign;
         st->intval.day_second.day = sign ? (-days) : days;
@@ -726,7 +915,7 @@ static int setup_getdataclass(SQLLEN *const length_return,
 
     /* just returns length info */
     if (cbValueMax == 0) {
-        result = COPY_RESULT_TRUNCATED;
+        result = COPY_RESULT_STRING_TRUNCATED;
         goto cleanup;
     }
 
@@ -876,7 +1065,6 @@ static int convert_text_field_to_sql_c(
     if (cbValueMax > 0) {
         BOOL already_copied = FALSE;
         int terminatorlen;
-
         terminatorlen = get_terminator_len(fCType);
         if (terminatorlen >= cbValueMax)
             copy_len = 0;
@@ -903,7 +1091,7 @@ static int convert_text_field_to_sql_c(
      * be returned
      */
     if (cbValueMax > 0 && needbuflen > cbValueMax)
-        result = COPY_RESULT_TRUNCATED;
+        result = COPY_RESULT_STRING_TRUNCATED;
     else {
         if (esdc->ttlbuf != NULL) {
             free(esdc->ttlbuf);
@@ -936,6 +1124,35 @@ cleanup:
     return result;
 }
 
+static int is_numeric(const char *s) {
+    if (s == NULL || *s == '\0' || isspace(*s))
+        return 0;
+    char *p;
+    strtod(s, &p);
+    return *p == '\0';
+}
+
+static char *trim_white_space(char *str) {
+    char *end;
+
+    // Trim leading spaces
+    while (isspace((unsigned char)*str))
+        str++;
+
+    if (*str == 0)  // All spaces?
+        return str;
+
+    // Trim trailing spaces
+    end = str + strlen(str) - 1;
+    while (end > str && isspace((unsigned char)*end))
+        end--;
+
+    // Write new null terminator character
+    end[1] = '\0';
+
+    return str;
+}
+
 /*	This is called by SQLGetData() */
 int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                            void *valuei, SQLSMALLINT fCType, int precision,
@@ -963,6 +1180,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
     char midtemp[64] = {0};
     GetDataClass *esdc;
     long slong;
+    char *p_end;
 
     if (stmt->current_col >= 0) {
         if (stmt->current_col >= opts->allocated) {
@@ -1120,6 +1338,59 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
             }
             break;
 
+        case TS_TYPE_VARCHAR: {
+            char *copy = strdup(value);
+            char *trimmed = trim_white_space(copy);
+            if (fCType == SQL_C_DATE || fCType == SQL_C_TIME) {
+                char2stime(trimmed, &std_time, &result, fCType);
+            } else if (fCType == SQL_C_TIMESTAMP) {
+                std_time.fr = 0;
+                std_time.infinity = 0;
+                if (strnicmp(trimmed, INFINITY_STRING, 8) == 0) {
+                    std_time.infinity = 1;
+                    std_time.m = 12;
+                    std_time.d = 31;
+                    std_time.y = 9999;
+                    std_time.hh = 23;
+                    std_time.mm = 59;
+                    std_time.ss = 59;
+                }
+                if (strnicmp(trimmed, MINFINITY_STRING, 9) == 0) {
+                    std_time.infinity = -1;
+                    std_time.m = 1;
+                    std_time.d = 1;
+                    // std_time.y = -4713;
+                    std_time.y = -9999;
+                    std_time.hh = 0;
+                    std_time.mm = 0;
+                    std_time.ss = 0;
+                }
+                if (strnicmp(trimmed, "invalid", 7) != 0) {
+                    char2stime(trimmed, &std_time, &result, fCType);
+                    MYLOG(LOG_ALL, "2stime fr=%d\n", std_time.fr);
+                } else {
+                    /*
+                     * The timestamp is invalid so set something conspicuous,
+                     * like the epoch
+                     */
+                    struct tm *tim;
+                    time_t t = 0;
+#ifdef HAVE_LOCALTIME_R
+                    tim = localtime_r(&t, &tm);
+#else
+                    tim = localtime(&t);
+#endif /* HAVE_LOCALTIME_R */
+                    std_time.m = tim->tm_mon + 1;
+                    std_time.d = tim->tm_mday;
+                    std_time.y = tim->tm_year + 1900;
+                    std_time.hh = tim->tm_hour;
+                    std_time.mm = tim->tm_min;
+                    std_time.ss = tim->tm_sec;
+                }
+            }
+            free(copy);
+            break;
+        }
         case TS_TYPE_BOOLEAN: { /* change T/F to 1/0 */
             switch (((char *)value)[0]) {
                 case 'f':
@@ -1179,7 +1450,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     return COPY_OK; /* dont go any further or the data will be
                                      * trashed */
                 else
-                    return COPY_RESULT_TRUNCATED;
+                    return COPY_RESULT_STRING_TRUNCATED;
             }
             break;
 
@@ -1417,9 +1688,19 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                 }
                 break;
 
-            case SQL_C_BIT:
+            case SQL_C_BIT: {
                 len = 1;
-                slong = strtol(neut_str, 0, 10);
+                char *copy = strdup(neut_str);
+                char *trimmed = trim_white_space(copy);
+                if (!is_numeric(trimmed)) {
+                    result = COPY_INVALID_STRING_CONVERSION;
+                    free(copy);
+                    break;
+                }
+                slong = strtol(trimmed, &p_end, 10);
+                if (*p_end != '\0') {
+                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
+                }
                 if (slong < 0 || slong >= 2) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
@@ -1428,18 +1709,29 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     else
                         *((UCHAR *)rgbValue + bind_row) = (UCHAR)slong;
                 }
+                free(copy);
 
                 MYLOG(99,
                       "SQL_C_BIT: bind_row = " FORMAT_POSIROW
                       " val = %ld, cb = " FORMAT_LEN ", rgb=%d\n",
-                      bind_row, slong, cbValueMax,
-                      *((UCHAR *)rgbValue));
+                      bind_row, slong, cbValueMax, *((UCHAR *)rgbValue));
                 break;
+            }
 
             case SQL_C_STINYINT:
-            case SQL_C_TINYINT:
+            case SQL_C_TINYINT: {
                 len = 1;
-                slong = strtol(neut_str, 0, 10);
+                char *copy = strdup(neut_str);
+                char *trimmed = trim_white_space(copy);
+                if (!is_numeric(trimmed)) {
+                    result = COPY_INVALID_STRING_CONVERSION;
+                    free(copy);
+                    break;
+                }
+                slong = strtol(trimmed, &p_end, 10);
+                if (*p_end != '\0') {
+                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
+                }
                 if (slong < SCHAR_MIN || slong > SCHAR_MAX) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
@@ -1448,11 +1740,23 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     else
                         *((SCHAR *)rgbValue + bind_row) = (SCHAR)slong;
                 }
+                free(copy);
                 break;
+            }
 
-            case SQL_C_UTINYINT:
+            case SQL_C_UTINYINT: {
                 len = 1;
-                slong = strtol(neut_str, 0, 10);
+                char *copy = strdup(neut_str);
+                char *trimmed = trim_white_space(copy);
+                if (!is_numeric(trimmed)) {
+                    result = COPY_INVALID_STRING_CONVERSION;
+                    free(copy);
+                    break;
+                }
+                slong = strtol(trimmed, &p_end, 10);
+                if (*p_end != '\0') {
+                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
+                }
                 if (slong < 0 || slong > UCHAR_MAX) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
@@ -1461,13 +1765,21 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     else
                         *((UCHAR *)rgbValue + bind_row) = (UCHAR)slong;
                 }
+                free(copy);
                 break;
-
-            case SQL_C_FLOAT:
-                set_client_decimal_point((char *)neut_str);
+            }
+            case SQL_C_FLOAT: {
+                char *copy = strdup(neut_str);
+                char *trimmed = trim_white_space(copy);
+                if (!is_numeric(trimmed)) {
+                    result = COPY_INVALID_STRING_CONVERSION;
+                    free(copy);
+                    break;
+                }
+                set_client_decimal_point((char *)trimmed);
                 len = 4;
                 errno = 0;
-                float f = strtof(neut_str, 0);
+                float f = strtof(trimmed, 0);
                 if (errno == ERANGE) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
@@ -1476,16 +1788,34 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     else
                         *((SFLOAT *)rgbValue + bind_row) = f;
                 }
+                free(copy);
                 break;
+            }
 
-            case SQL_C_DOUBLE:
-                set_client_decimal_point((char *)neut_str);
+            case SQL_C_DOUBLE: {
+                char *copy = strdup(neut_str);
+                char *trimmed = trim_white_space(copy);
+                if (!is_numeric(trimmed)) {
+                    result = COPY_INVALID_STRING_CONVERSION;
+                    free(copy);
+                    break;
+                }
+                set_client_decimal_point((char *)trimmed);
                 len = 8;
-                if (bind_size > 0)
-                    *((SDOUBLE *)rgbValueBindRow) = strtod(neut_str, 0);
-                else
-                    *((SDOUBLE *)rgbValue + bind_row) = strtod(neut_str, 0);
+                errno = 0;
+                double d = strtod(trimmed, 0);
+                if ((d == -HUGE_VAL || d == HUGE_VAL)
+                    && errno == ERANGE) {
+                    result = COPY_RESULT_OVERFLOW_UNDERFLOW;
+                } else {
+                    if (bind_size > 0)
+                        *((SDOUBLE *)rgbValueBindRow) = d;
+                    else
+                        *((SDOUBLE *)rgbValue + bind_row) = d;
+                }
+                free(copy);
                 break;
+            }
 
             case SQL_C_NUMERIC: {
                 SQL_NUMERIC_STRUCT *ns;
@@ -1498,13 +1828,23 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
 
                 parse_to_numeric_struct(neut_str, ns, &overflowed);
                 if (overflowed)
-                    result = COPY_RESULT_TRUNCATED;
+                    result = COPY_RESULT_STRING_TRUNCATED;
             } break;
 
             case SQL_C_SSHORT:
-            case SQL_C_SHORT:
+            case SQL_C_SHORT: {
                 len = 2;
-                slong = strtol(neut_str, 0, 10);
+                char *copy = strdup(neut_str);
+                char *trimmed = trim_white_space(copy);
+                if (!is_numeric(trimmed)) {
+                    result = COPY_INVALID_STRING_CONVERSION;
+                    free(copy);
+                    break;
+                }
+                slong = strtol(trimmed, &p_end, 10);
+                if (*p_end != '\0') {
+                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
+                }
                 if (slong < SHRT_MIN || slong > SHRT_MAX) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
@@ -1514,11 +1854,23 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                         *((SQLSMALLINT *)rgbValue + bind_row) =
                             (SQLSMALLINT)slong;
                 }
+                free(copy);
                 break;
+            }
 
-            case SQL_C_USHORT:
+            case SQL_C_USHORT: {
                 len = 2;
-                slong = strtol(neut_str, 0, 10);
+                char *copy = strdup(neut_str);
+                char *trimmed = trim_white_space(copy);
+                if (!is_numeric(trimmed)) {
+                    result = COPY_INVALID_STRING_CONVERSION;
+                    free(copy);
+                    break;
+                }
+                slong = strtol(trimmed, &p_end, 10);
+                if (*p_end != '\0') {
+                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
+                }
                 if (slong < 0 || slong > USHRT_MAX) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
@@ -1529,13 +1881,25 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                         *((SQLUSMALLINT *)rgbValue + bind_row) =
                             (SQLUSMALLINT)slong;
                 }
+                free(copy);
                 break;
+            }
 
             case SQL_C_SLONG:
-            case SQL_C_LONG:
+            case SQL_C_LONG: {
                 len = 4;
+                char *copy = strdup(neut_str);
+                char *trimmed = trim_white_space(copy);
+                if (!is_numeric(trimmed)) {
+                    result = COPY_INVALID_STRING_CONVERSION;
+                    free(copy);
+                    break;
+                }
                 errno = 0;
-                slong = strtol(neut_str, 0, 10);
+                slong = strtol(trimmed, &p_end, 10);
+                if (*p_end != '\0') {
+                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
+                }
                 if ((slong == LONG_MIN || slong == LONG_MAX)
                     && errno == ERANGE) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
@@ -1545,17 +1909,30 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     else
                         *((SQLINTEGER *)rgbValue + bind_row) = slong;
                 }
+                free(copy);
                 break;
+            }
 
-            case SQL_C_ULONG:
+            case SQL_C_ULONG: {
                 len = 4;
+                char *copy = strdup(neut_str);
+                char *trimmed = trim_white_space(copy);
+                if (!is_numeric(trimmed)) {
+                    result = COPY_INVALID_STRING_CONVERSION;
+                    free(copy);
+                    break;
+                }
                 // negative case
-                if (strtol(neut_str, 0, 10) < 0) {
+                if (strtol(trimmed, 0, 10) < 0) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
+                    free(copy);
                     break;
                 }
                 errno = 0;
-                unsigned long ulong = strtoul(neut_str, 0, 10);
+                unsigned long ulong = strtoul(trimmed, &p_end, 10);
+                if (*p_end != '\0') {
+                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
+                }
                 if (ulong == ULONG_MAX && errno == ERANGE) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
@@ -1564,13 +1941,25 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     else
                         *((SQLUINTEGER *)rgbValue + bind_row) = ulong;
                 }
+                free(copy);
                 break;
+            }
 
 #ifdef ODBCINT64
-            case SQL_C_SBIGINT:
+            case SQL_C_SBIGINT: {
                 len = 8;
+                char *copy = strdup(neut_str);
+                char *trimmed = trim_white_space(copy);
+                if (!is_numeric(trimmed)) {
+                    result = COPY_INVALID_STRING_CONVERSION;
+                    free(copy);
+                    break;
+                }
                 errno = 0;
-                signed long long sllong = strtoll(neut_str, 0, 10);
+                signed long long sllong = strtoll(trimmed, &p_end, 10);
+                if (*p_end != '\0') {
+                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
+                }
                 if ((sllong == LLONG_MIN || sllong == LLONG_MAX)
                     && errno == ERANGE) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
@@ -1580,17 +1969,30 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     else
                         *((SQLBIGINT *)rgbValue + bind_row) = sllong;
                 }
+                free(copy);
                 break;
+            }
 
-            case SQL_C_UBIGINT:
+            case SQL_C_UBIGINT: {
                 len = 8;
+                char *copy = strdup(neut_str);
+                char *trimmed = trim_white_space(copy);
+                if (!is_numeric(trimmed)) {
+                    result = COPY_INVALID_STRING_CONVERSION;
+                    free(copy);
+                    break;
+                }
                 // negative case
-                if (strtol(neut_str, 0, 10) < 0) {
+                if (strtol(trimmed, 0, 10) < 0) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
+                    free(copy);
                     break;
                 }
                 errno = 0;
-                unsigned long long ullong = strtoull(neut_str, 0, 10);
+                unsigned long long ullong = strtoull(trimmed, &p_end, 10);
+                if (*p_end != '\0') {
+                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
+                }
                 if (ullong == ULLONG_MAX && errno == ERANGE) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
@@ -1599,7 +2001,9 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     else
                         *((SQLUBIGINT *)rgbValue + bind_row) = ullong;
                 }
+                free(copy);
                 break;
+            }
 
 #endif /* ODBCINT64 */
             case SQL_C_BINARY:
@@ -1614,7 +2018,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                         memcpy(rgbValueBindRow, &ival, sizeof(ival));
                         return COPY_OK;
                     } else
-                        return COPY_RESULT_TRUNCATED;
+                        return COPY_RESULT_STRING_TRUNCATED;
                 } else if (ES_TYPE_UUID == field_type) {
                     int rtn = char2guid(neut_str, &g);
 
@@ -1626,7 +2030,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                         memcpy(rgbValueBindRow, &g, sizeof(g));
                         return COPY_OK;
                     } else
-                        return COPY_RESULT_TRUNCATED;
+                        return COPY_RESULT_STRING_TRUNCATED;
                 } else {
                     MYLOG(LOG_DEBUG,
                           "couldn't convert the type %d to SQL_C_BINARY\n",
@@ -1659,10 +2063,18 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
             case SQL_C_INTERVAL_DAY_TO_SECOND:
             case SQL_C_INTERVAL_HOUR_TO_SECOND:
             case SQL_C_INTERVAL_MINUTE_TO_SECOND:
-                interval2istruct(
-                    fCType, precision, neut_str,
-                    bind_size > 0 ? (SQL_INTERVAL_STRUCT *)rgbValueBindRow
-                                  : (SQL_INTERVAL_STRUCT *)rgbValue + bind_row);
+                len = sizeof(SQL_INTERVAL_STRUCT);
+                UNUSED(precision);
+                char *copy = strdup(neut_str);
+                char *trimmed = trim_white_space(copy);
+                result = interval2istruct(
+                             fCType, 9, trimmed,
+                             bind_size > 0
+                                 ? (SQL_INTERVAL_STRUCT *)rgbValueBindRow
+                                 : (SQL_INTERVAL_STRUCT *)rgbValue + bind_row)
+                             ? result
+                             : COPY_INVALID_STRING_CONVERSION;
+                free(copy);
                 break;
 
             default:

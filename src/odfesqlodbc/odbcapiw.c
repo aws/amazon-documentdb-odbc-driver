@@ -268,7 +268,7 @@ RETCODE SQL_API SQLDescribeColW(HSTMT StatementHandle,
             nmcount = utf8_to_ucs2(clName, nmlen, ColumnName, BufferLength);
         if (SQL_SUCCESS == ret && BufferLength > 0 && nmcount > BufferLength) {
             ret = SQL_SUCCESS_WITH_INFO;
-            SC_set_error(stmt, STMT_TRUNCATED, "Column name too large", func);
+            SC_set_error(stmt, STMT_STRING_TRUNCATED, "Column name too large", func);
         }
         if (NameLength)
             *NameLength = (SQLSMALLINT)nmcount;
@@ -349,7 +349,7 @@ RETCODE SQL_API SQLGetCursorNameW(HSTMT StatementHandle, SQLWCHAR *CursorName,
             nmcount = utf8_to_ucs2(crName, clen, CursorName, BufferLength);
         if (SQL_SUCCESS == ret && nmcount > BufferLength) {
             ret = SQL_SUCCESS_WITH_INFO;
-            SC_set_error(stmt, STMT_TRUNCATED, "Cursor name too large", func);
+            SC_set_error(stmt, STMT_STRING_TRUNCATED, "Cursor name too large", func);
         }
         if (NameLength)
             *NameLength = (SQLSMALLINT)nmcount;
@@ -958,7 +958,7 @@ SQLRETURN SQL_API SQLColAttributesW(SQLHSTMT hstmt, SQLUSMALLINT iCol,
                 if (SQL_SUCCESS == ret
                     && blen * WCLEN >= (unsigned long)cbCharAttrMax) {
                     ret = SQL_SUCCESS_WITH_INFO;
-                    SC_set_error(stmt, STMT_TRUNCATED,
+                    SC_set_error(stmt, STMT_STRING_TRUNCATED,
                                  "The buffer was too small for the pCharAttr.",
                                  func);
                 }

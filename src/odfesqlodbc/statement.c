@@ -740,11 +740,12 @@ static const struct {
     const char ver2str[6];
 } Statement_sqlstate[] =
 
-    {{STMT_ERROR_IN_ROW, "01S01", "01S01"},
+    {{STMT_FRACTIONAL_TRUNCATED, "01S07", "01S07"},
+     {STMT_ERROR_IN_ROW, "01S01", "01S01"},
      {STMT_OPTION_VALUE_CHANGED, "01S02", "01S02"},
      {STMT_ROW_VERSION_CHANGED, "01001", "01001"}, /* data changed */
      {STMT_POS_BEFORE_RECORDSET, "01S06", "01S06"},
-     {STMT_TRUNCATED, "01004", "01004"}, /* data truncated */
+     {STMT_STRING_TRUNCATED, "01004", "01004"}, /* data truncated */
      {STMT_INFO_ONLY, "00000",
       "00000"}, /* just an information that is returned, no error */
 
@@ -786,7 +787,8 @@ static const struct {
      {STMT_COUNT_FIELD_INCORRECT, "07002", "07002"},
      {STMT_INVALID_NULL_ARG, "HY009", "S1009"},
      {STMT_NO_RESPONSE, "08S01", "08S01"},
-     {STMT_COMMUNICATION_ERROR, "08S01", "08S01"}};
+     {STMT_COMMUNICATION_ERROR, "08S01", "08S01"},
+     {STMT_STRING_CONVERSION_ERROR, "22018", "22005"}};
 
 static ES_ErrorInfo *SC_create_errorinfo(const StatementClass *self,
                                          ES_ErrorInfo *eserror_fail_safe) {
@@ -1189,13 +1191,21 @@ SC_fetch(StatementClass *self) {
                     result = SQL_ERROR;
                     break;
 
-                case COPY_RESULT_TRUNCATED:
-                    SC_set_error(self, STMT_TRUNCATED,
+                case COPY_RESULT_STRING_TRUNCATED:
+                    SC_set_error(self, STMT_STRING_TRUNCATED,
                                  "Fetched item was truncated.", func);
                     MYLOG(LOG_DEBUG, "The %dth item was truncated\n", lf + 1);
                     MYLOG(LOG_DEBUG, "The buffer size = " FORMAT_LEN,
                           opts->bindings[lf].buflen);
                     MYLOG(LOG_DEBUG, " and the value is '%s'\n", value);
+                    result = SQL_SUCCESS_WITH_INFO;
+                    break;
+
+                case COPY_RESULT_FRACTIONAL_TRUNCATED:
+                    SC_set_error(
+                        self, STMT_FRACTIONAL_TRUNCATED,
+                        "Data converted with truncation of fractional digits.",
+                        func);
                     result = SQL_SUCCESS_WITH_INFO;
                     break;
 
