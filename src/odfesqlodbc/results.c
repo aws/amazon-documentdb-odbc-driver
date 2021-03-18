@@ -109,13 +109,13 @@ cleanup:
  *	Return information about the database column the user wants
  *	information about.
  */
-RETCODE SQL_API ESAPI_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
+RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
                                   SQLCHAR *szColName, SQLSMALLINT cbColNameMax,
                                   SQLSMALLINT *pcbColName,
                                   SQLSMALLINT *pfSqlType, SQLULEN *pcbColDef,
                                   SQLSMALLINT *pibScale,
                                   SQLSMALLINT *pfNullable) {
-    CSTR func = "ESAPI_DescribeCol";
+    CSTR func = "API_DescribeCol";
 
     /* gets all the information about a specific column */
     StatementClass *stmt = (StatementClass *)hstmt;
