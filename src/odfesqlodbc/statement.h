@@ -62,14 +62,15 @@ typedef enum {
  *		codes follow after it.
  */
 enum {
-    LOWEST_STMT_ERROR = (-6)
+    LOWEST_STMT_ERROR = (-7)
     /* minus values mean warning returns */
     ,
+    STMT_FRACTIONAL_TRUNCATED = (-7),
     STMT_ERROR_IN_ROW = (-6),
     STMT_OPTION_VALUE_CHANGED = (-5),
     STMT_ROW_VERSION_CHANGED = (-4),
     STMT_POS_BEFORE_RECORDSET = (-3),
-    STMT_TRUNCATED = (-2),
+    STMT_STRING_TRUNCATED = (-2),
     STMT_INFO_ONLY = (-1)
     /* not an error message,
      * just a notification

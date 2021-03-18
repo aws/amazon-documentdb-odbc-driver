@@ -165,7 +165,7 @@ RETCODE SQL_API SQLGetDescFieldW(SQLHDESC hdesc, SQLSMALLINT iRecord,
                 if (SQL_SUCCESS == ret
                     && blen * WCLEN >= (unsigned long)cbValueMax) {
                     ret = SQL_SUCCESS_WITH_INFO;
-                    DC_set_error(hdesc, STMT_TRUNCATED,
+                    DC_set_error(hdesc, STMT_STRING_TRUNCATED,
                                  "The buffer was too small for the rgbDesc.");
                 }
                 if (pcbValue)
@@ -286,7 +286,7 @@ SQLRETURN SQL_API SQLColAttributeW(SQLHSTMT hstmt, SQLUSMALLINT iCol,
                 if (SQL_SUCCESS == ret
                     && blen * WCLEN >= (unsigned long)cbCharAttrMax) {
                     ret = SQL_SUCCESS_WITH_INFO;
-                    SC_set_error(stmt, STMT_TRUNCATED,
+                    SC_set_error(stmt, STMT_STRING_TRUNCATED,
                                  "The buffer was too small for the pCharAttr.",
                                  func);
                 }
