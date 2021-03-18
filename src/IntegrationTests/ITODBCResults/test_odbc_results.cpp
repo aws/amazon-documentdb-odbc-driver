@@ -560,41 +560,8 @@ class TestSQLNumResultCols : public Fixture {};
 
 class TestSQLMoreResults : public Fixture {};
 
-//class TestSQLDescribeCol : public testing::Test {
-//   public:
-//    TestSQLDescribeCol() {
-//    }
-//
-//    void SetUp() {
-//        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env,
-//                                       &m_conn, &m_hstmt, true, true));
-//    }
-//
-//    void TearDown() {
-//        if (m_hstmt != SQL_NULL_HSTMT) {
-//            ASSERT_NO_THROW(CloseCursor(&m_hstmt, true, true));
-//            SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
-//            SQLDisconnect(m_conn);
-//            SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-//        }
-//    }
-//
-//    ~TestSQLDescribeCol() {
-//        // cleanup any pending stuff, but no exceptions allowed
-//    }
-//
-//    SQLHENV m_env = SQL_NULL_HENV;
-//    SQLHDBC m_conn = SQL_NULL_HDBC;
-//    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
-//    SQLSMALLINT m_column_number;
-//    SQLTCHAR m_column_name[50];
-//    SQLSMALLINT m_column_name_length;
-//    SQLSMALLINT m_data_type;
-//    SQLULEN m_column_size;
-//    SQLSMALLINT m_decimal_digits;
-//    SQLSMALLINT m_nullable;
-//};
-//
+class TestSQLDescribeCol : public Fixture {};
+
 //class TestSQLRowCount : public testing::Test {
 //   public:
 //    TestSQLRowCount() {
@@ -4328,23 +4295,122 @@ TEST_F(TestSQLNumResultCols, MultiColumn) {
     EXPECT_EQ(SQL_SUCCESS, SQLNumResultCols(m_hstmt, &column_count));
     EXPECT_EQ(14, column_count);
 }
-//
-//TEST_F(TestSQLDescribeCol, SingleColumnMetadata) {
-//    ExecuteQuery(single_col, flight_data_set, single_row, &m_hstmt);
-//
-//    EXPECT_EQ(
-//        SQL_SUCCESS,
-//        SQLDescribeCol(m_hstmt, 1, m_column_name, IT_SIZEOF(m_column_name),
-//                       &m_column_name_length, &m_data_type, &m_column_size,
-//                       &m_decimal_digits, &m_nullable));
-//    EXPECT_EQ(single_col, m_column_name);
-//    EXPECT_EQ(single_col_name_length, m_column_name_length);
-//    EXPECT_EQ(single_col_data_type, m_data_type);
-//    // TODO #628 - Investigate why value differs & fix validation accordingly
-//    EXPECT_EQ(single_col_column_size, m_column_size);
-//    EXPECT_EQ(single_col_decimal_digit, m_decimal_digits);
-//    EXPECT_EQ(single_col_nullable, m_nullable);
-//}
+
+TEST_F(TestSQLDescribeCol, INTEGER_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring columns = L"INTEGER \'1\'";
+    ExecuteQuery(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_INTEGER, data_type);
+    EXPECT_EQ(10, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+}
+
+TEST_F(TestSQLDescribeCol, DOUBLE_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring columns = L"DOUBLE \'1.0\'";
+    ExecuteQuery(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_DOUBLE, data_type);
+    EXPECT_EQ(15, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+}
+
+TEST_F(TestSQLDescribeCol, BIGINT_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring columns = L"BIGINT \'2147483648\'";
+    ExecuteQuery(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_BIGINT, data_type);
+    EXPECT_EQ(19, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+}
+
+TEST_F(TestSQLDescribeCol, BOOLEAN_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring columns = L"true";
+    ExecuteQuery(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_BIT, data_type);
+    EXPECT_EQ(1, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+}
+
+TEST_F(TestSQLDescribeCol, TIMESERIES_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring statement =
+        L"WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 "
+        L"14:18:30.123456789' AS binned_timestamp, ROW(null, ARRAY[ARRAY[ROW(12345, ARRAY[1, 2, 3])]]) "
+        L"AS data FROM ODBCTest.IoT LIMIT " L"1), interpolated_timeseries AS(SELECT "
+        L"CREATE_TIME_SERIES(binned_timestamp, data) FROM binned_timeseries) "
+        L"SELECT *FROM interpolated_timeseries";
+    ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)statement.c_str(),
+                        (SQLINTEGER)statement.length());
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    ret = SQLFetch(m_hstmt);
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_WVARCHAR, data_type);
+    EXPECT_EQ(78, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+}
 //
 //TEST_F(TestSQLDescribeCol, MultiColumnMetadata) {
 //    ExecuteQuery(multi_col, flight_data_set, multi_row, &m_hstmt);
