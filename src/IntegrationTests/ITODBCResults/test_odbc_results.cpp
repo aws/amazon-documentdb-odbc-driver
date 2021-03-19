@@ -4312,7 +4312,7 @@ TEST_F(TestSQLDescribeCol, INTEGER_COLUMN) {
     std::wstring expected_column_name = L"_col0";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_INTEGER, data_type);
-    EXPECT_EQ(10, column_size);
+    EXPECT_EQ((SQLULEN)10, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
@@ -4333,7 +4333,7 @@ TEST_F(TestSQLDescribeCol, DOUBLE_COLUMN) {
     std::wstring expected_column_name = L"_col0";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_DOUBLE, data_type);
-    EXPECT_EQ(15, column_size);
+    EXPECT_EQ((SQLULEN)15, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
@@ -4354,7 +4354,7 @@ TEST_F(TestSQLDescribeCol, BIGINT_COLUMN) {
     std::wstring expected_column_name = L"_col0";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_BIGINT, data_type);
-    EXPECT_EQ(19, column_size);
+    EXPECT_EQ((SQLULEN)19, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
@@ -4375,7 +4375,7 @@ TEST_F(TestSQLDescribeCol, BOOLEAN_COLUMN) {
     std::wstring expected_column_name = L"_col0";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_BIT, data_type);
-    EXPECT_EQ(1, column_size);
+    EXPECT_EQ((SQLULEN)1, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
@@ -4397,7 +4397,7 @@ TEST_F(TestSQLDescribeCol, VARCHAR_COLUMN) {
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_WVARCHAR, data_type);
     std::string expected = "ABCDEFG";
-    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
@@ -4430,7 +4430,7 @@ TEST_F(TestSQLDescribeCol, TIMESERIES_COLUMN) {
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_WVARCHAR, data_type);
     std::string expected = "[{time: 2021-03-05 14:18:30.123456789, value: (null, [[(12345, [1, 2, 3])]])}]";
-    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
@@ -4454,7 +4454,7 @@ TEST_F(TestSQLDescribeCol, ARRAY_COLUMN) {
     EXPECT_EQ(SQL_WVARCHAR, data_type);
     std::string expected =
         "[[[[1.1, 2.3], [1.1, 2.3]]], [[[1.1, 2.3], [1.1, 2.3]]]]";
-    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
@@ -4476,7 +4476,7 @@ TEST_F(TestSQLDescribeCol, ROW_COLUMN) {
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_WVARCHAR, data_type);
     std::string expected = "(((3, 10, true), [[1.0, 2.0], [1.1, 2.2]]))";
-    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
@@ -4498,7 +4498,7 @@ TEST_F(TestSQLDescribeCol, NULL_COLUMN) {
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_WVARCHAR, data_type);
     std::string expected = "null";
-    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
@@ -4520,7 +4520,7 @@ TEST_F(TestSQLDescribeCol, TIMESTAMP_COLUMN) {
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_TYPE_TIMESTAMP, data_type);
     std::string expected = "2021-01-02 18:01:13.000000000";
-    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
@@ -4542,7 +4542,7 @@ TEST_F(TestSQLDescribeCol, DATE_COLUMN) {
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_TYPE_DATE, data_type);
     std::string expected = "2021-01-02";
-    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
@@ -4564,7 +4564,7 @@ TEST_F(TestSQLDescribeCol, TIME_COLUMN) {
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_TYPE_TIME, data_type);
     std::string expected = "06:39:45.123456789";
-    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
@@ -4586,7 +4586,7 @@ TEST_F(TestSQLDescribeCol, INTERVAL_YEAR_TO_MONTH_COLUMN) {
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_WVARCHAR, data_type);
     std::string expected = "1-0";
-    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
@@ -4608,7 +4608,7 @@ TEST_F(TestSQLDescribeCol, INTERVAL_DAY_TO_SECOND_COLUMN) {
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_WVARCHAR, data_type);
     std::string expected = "1 00:00:00.000000000";
-    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
@@ -4645,7 +4645,7 @@ TEST_F(TestSQLDescribeCol, MULTIPLE_COLUMNS) {
     std::wstring expected_column_name = L"_col0";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_INTEGER, data_type);
-    EXPECT_EQ(10, column_size);
+    EXPECT_EQ((SQLULEN)10, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
     ret = SQLDescribeCol(m_hstmt, 2, column_name, 60, &column_name_length,
@@ -4654,7 +4654,7 @@ TEST_F(TestSQLDescribeCol, MULTIPLE_COLUMNS) {
     expected_column_name = L"_col1";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_DOUBLE, data_type);
-    EXPECT_EQ(15, column_size);
+    EXPECT_EQ((SQLULEN)15, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
     ret = SQLDescribeCol(m_hstmt, 3, column_name, 60, &column_name_length,
@@ -4663,7 +4663,7 @@ TEST_F(TestSQLDescribeCol, MULTIPLE_COLUMNS) {
     expected_column_name = L"_col2";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_BIGINT, data_type);
-    EXPECT_EQ(19, column_size);
+    EXPECT_EQ((SQLULEN)19, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
     ret = SQLDescribeCol(m_hstmt, 4, column_name, 60, &column_name_length,
@@ -4672,7 +4672,7 @@ TEST_F(TestSQLDescribeCol, MULTIPLE_COLUMNS) {
     expected_column_name = L"_col3";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_BIT, data_type);
-    EXPECT_EQ(1, column_size);
+    EXPECT_EQ((SQLULEN)1, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
