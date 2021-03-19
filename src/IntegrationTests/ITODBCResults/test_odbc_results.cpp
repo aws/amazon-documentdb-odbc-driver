@@ -4655,45 +4655,6 @@ TEST_F(TestSQLDescribeCol, MULTIPLE_COLUMNS) {
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
 
-//
-//TEST_F(TestSQLDescribeCol, MultiColumnMetadata) {
-//    ExecuteQuery(multi_col, flight_data_set, multi_row, &m_hstmt);
-//
-//    for (SQLUSMALLINT i = 1; i <= multi_col_cnt; i++) {
-//        EXPECT_EQ(
-//            SQL_SUCCESS,
-//            SQLDescribeCol(m_hstmt, i, m_column_name, IT_SIZEOF(m_column_name),
-//                           &m_column_name_length, &m_data_type, &m_column_size,
-//                           &m_decimal_digits, &m_nullable));
-//    }
-//}
-//
-//TEST_F(TestSQLDescribeCol, MultiColumnNameLengthType) {
-//    ExecuteQuery(multi_col, flight_data_set, multi_row, &m_hstmt);
-//
-//    for (SQLUSMALLINT i = 1; i <= multi_col_cnt; i++) {
-//        EXPECT_EQ(
-//            SQL_SUCCESS,
-//            SQLDescribeCol(m_hstmt, i, m_column_name, IT_SIZEOF(m_column_name),
-//                           &m_column_name_length, &m_data_type, &m_column_size,
-//                           &m_decimal_digits, &m_nullable));
-//        EXPECT_EQ(column_data[i - 1].column_name, std::wstring(m_column_name));
-//        EXPECT_EQ(column_data[i - 1].data_type, m_data_type);
-//    }
-//}
-//
-//TEST_F(TestSQLDescribeCol, InvalidColumnMetadata) {
-//    ExecuteQuery(multi_col, flight_data_set, multi_row, &m_hstmt);
-//
-//    EXPECT_EQ(SQL_ERROR,
-//              SQLDescribeCol(m_hstmt, multi_col_cnt + 1, m_column_name,
-//                             IT_SIZEOF(m_column_name), &m_column_name_length,
-//                             &m_data_type, &m_column_size, &m_decimal_digits,
-//                             &m_nullable));
-//    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-//                              SQLSTATE_INVALID_DESCRIPTOR_INDEX));
-//}
-//
 TEST_F(TestSQLMoreResults, NoData_noquery) {
     SQLRETURN ret = SQLMoreResults(m_hstmt);
     EXPECT_EQ(SQL_NO_DATA, ret);
