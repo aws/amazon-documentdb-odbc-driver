@@ -238,6 +238,12 @@ RETCODE SQL_API SQLDescribeColW(HSTMT StatementHandle,
     if (SC_connection_lost_check(stmt, __FUNCTION__))
         return SQL_ERROR;
 
+    if (BufferLength < 0) {
+        SC_set_error(stmt, STMT_INVALID_STRING_OR_BUFFER_LENGTH_ERROR,
+                     "Invalid string or buffer length", __FUNCTION__);
+        return SQL_ERROR;
+    }
+
     buflen = 0;
     if (BufferLength > 0)
         buflen = BufferLength * 3;
@@ -255,7 +261,7 @@ RETCODE SQL_API SQLDescribeColW(HSTMT StatementHandle,
             break;
         }
         clName = clNamet;
-        ret = ESAPI_DescribeCol(StatementHandle, ColumnNumber,
+        ret = API_DescribeCol(StatementHandle, ColumnNumber,
                                 (SQLCHAR *)clName, buflen, &nmlen, DataType,
                                 ColumnSize, DecimalDigits, Nullable);
         if (SQL_SUCCESS_WITH_INFO != ret || nmlen < buflen)
