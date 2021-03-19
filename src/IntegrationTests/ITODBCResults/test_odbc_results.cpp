@@ -4380,6 +4380,28 @@ TEST_F(TestSQLDescribeCol, BOOLEAN_COLUMN) {
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
 }
 
+TEST_F(TestSQLDescribeCol, VARCHAR_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring columns = L"VARCHAR\'ABCDEFG\'";
+    ExecuteQuery(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_WVARCHAR, data_type);
+    std::string expected = "ABCDEFG";
+    EXPECT_EQ((int)expected.size(), column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+}
+
 TEST_F(TestSQLDescribeCol, TIMESERIES_COLUMN) {
     SQLRETURN ret = SQL_ERROR;
     std::wstring statement =
