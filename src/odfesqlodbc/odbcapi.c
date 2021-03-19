@@ -219,9 +219,15 @@ RETCODE SQL_API SQLDescribeCol(HSTMT StatementHandle, SQLUSMALLINT ColumnNumber,
     if (SC_connection_lost_check(stmt, __FUNCTION__))
         return SQL_ERROR;
 
+    if (BufferLength < 0) {
+        SC_set_error(stmt, STMT_INVALID_STRING_OR_BUFFER_LENGTH_ERROR,
+                     "Invalid string or buffer length", __FUNCTION__);
+        return SQL_ERROR;
+    }
+
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
-    ret = ESAPI_DescribeCol(StatementHandle, ColumnNumber, ColumnName,
+    ret = API_DescribeCol(StatementHandle, ColumnNumber, ColumnName,
                             BufferLength, NameLength, DataType, ColumnSize,
                             DecimalDigits, Nullable);
     LEAVE_STMT_CS(stmt);
@@ -823,7 +829,7 @@ RETCODE SQL_API SQLDescribeParam(HSTMT hstmt, SQLUSMALLINT ipar,
 
     // COLNUM_ERROR translates to 'invalid descriptor index'
     SC_set_error(stmt, STMT_COLNUM_ERROR,
-                 "Elasticsearch does not support parameters.", "SQLNumParams");
+                 "Amazon Timestream does not support parameters.", "SQLDescribeParam");
     return SQL_ERROR;
 }
 
@@ -998,7 +1004,7 @@ RETCODE SQL_API SQLNumParams(HSTMT hstmt, SQLSMALLINT *pcpar) {
         return SQL_ERROR;
     SC_clear_error(stmt);
     SC_set_error(stmt, STMT_NOT_IMPLEMENTED_ERROR,
-                 "Elasticsearch does not support parameters.", "SQLNumParams");
+                 "Amazon Timestream does not support parameters.", "SQLNumParams");
     return SQL_SUCCESS_WITH_INFO;
 }
 

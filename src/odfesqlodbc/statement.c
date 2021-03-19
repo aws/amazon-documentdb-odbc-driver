@@ -788,7 +788,8 @@ static const struct {
      {STMT_INVALID_NULL_ARG, "HY009", "S1009"},
      {STMT_NO_RESPONSE, "08S01", "08S01"},
      {STMT_COMMUNICATION_ERROR, "08S01", "08S01"},
-     {STMT_STRING_CONVERSION_ERROR, "22018", "22005"}};
+     {STMT_STRING_CONVERSION_ERROR, "22018", "22005"},
+     {STMT_INVALID_STRING_OR_BUFFER_LENGTH_ERROR, "HY090", "HY090"}};
 
 static ES_ErrorInfo *SC_create_errorinfo(const StatementClass *self,
                                          ES_ErrorInfo *eserror_fail_safe) {
