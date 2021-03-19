@@ -4660,7 +4660,7 @@ TEST_F(TestSQLDescribeCol, TRUNCATED_COLUMN_NAME_COLUMN) {
     EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
                               SQLSTATE_STRING_DATA_RIGHT_TRUNCATED));
     std::wstring truncated_column_name = L"_";
-    EXPECT_STREQ(truncated_column_name.c_str(), column_name);
+    EXPECT_EQ(truncated_column_name[0], column_name[0]);
     std::wstring expected_column_name = L"_col0";
     EXPECT_EQ((SQLSMALLINT)expected_column_name.size(), column_name_length);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
