@@ -57,7 +57,7 @@ RETCODE SQL_API API_BrowseConnect(HDBC hdbc, const SQLCHAR *szConnStrIn,
                                     SQLCHAR *szConnStrOut,
                                     SQLSMALLINT cbConnStrOutMax,
                                     SQLSMALLINT *pcbConnStrOut);
-RETCODE SQL_API ESAPI_DescribeCol(
+RETCODE SQL_API API_DescribeCol(
     HSTMT StatementHandle, SQLUSMALLINT ColumnNumber, SQLCHAR *ColumnName,
     SQLSMALLINT BufferLength, SQLSMALLINT *NameLength, SQLSMALLINT *DataType,
     SQLULEN *ColumnSize, SQLSMALLINT *DecimalDigits, SQLSMALLINT *Nullable);
