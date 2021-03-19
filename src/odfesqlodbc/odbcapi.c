@@ -219,6 +219,12 @@ RETCODE SQL_API SQLDescribeCol(HSTMT StatementHandle, SQLUSMALLINT ColumnNumber,
     if (SC_connection_lost_check(stmt, __FUNCTION__))
         return SQL_ERROR;
 
+    if (BufferLength < 0) {
+        SC_set_error(stmt, STMT_INVALID_STRING_OR_BUFFER_LENGTH_ERROR,
+                     "Invalid string or buffer length", __FUNCTION__);
+        return SQL_ERROR;
+    }
+
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
     ret = API_DescribeCol(StatementHandle, ColumnNumber, ColumnName,
