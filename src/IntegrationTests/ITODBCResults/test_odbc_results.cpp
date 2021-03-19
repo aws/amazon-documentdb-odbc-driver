@@ -4315,6 +4315,7 @@ TEST_F(TestSQLDescribeCol, INTEGER_COLUMN) {
     EXPECT_EQ((SQLULEN)10, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLDescribeCol, DOUBLE_COLUMN) {
@@ -4336,6 +4337,7 @@ TEST_F(TestSQLDescribeCol, DOUBLE_COLUMN) {
     EXPECT_EQ((SQLULEN)15, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLDescribeCol, BIGINT_COLUMN) {
@@ -4357,6 +4359,7 @@ TEST_F(TestSQLDescribeCol, BIGINT_COLUMN) {
     EXPECT_EQ((SQLULEN)19, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLDescribeCol, BOOLEAN_COLUMN) {
@@ -4378,6 +4381,7 @@ TEST_F(TestSQLDescribeCol, BOOLEAN_COLUMN) {
     EXPECT_EQ((SQLULEN)1, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLDescribeCol, VARCHAR_COLUMN) {
@@ -4400,6 +4404,7 @@ TEST_F(TestSQLDescribeCol, VARCHAR_COLUMN) {
     EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLDescribeCol, TIMESERIES_COLUMN) {
@@ -4433,6 +4438,7 @@ TEST_F(TestSQLDescribeCol, TIMESERIES_COLUMN) {
     EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLDescribeCol, ARRAY_COLUMN) {
@@ -4457,6 +4463,7 @@ TEST_F(TestSQLDescribeCol, ARRAY_COLUMN) {
     EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLDescribeCol, ROW_COLUMN) {
@@ -4479,6 +4486,7 @@ TEST_F(TestSQLDescribeCol, ROW_COLUMN) {
     EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLDescribeCol, NULL_COLUMN) {
@@ -4501,6 +4509,7 @@ TEST_F(TestSQLDescribeCol, NULL_COLUMN) {
     EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLDescribeCol, TIMESTAMP_COLUMN) {
@@ -4523,6 +4532,7 @@ TEST_F(TestSQLDescribeCol, TIMESTAMP_COLUMN) {
     EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLDescribeCol, DATE_COLUMN) {
@@ -4545,6 +4555,7 @@ TEST_F(TestSQLDescribeCol, DATE_COLUMN) {
     EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLDescribeCol, TIME_COLUMN) {
@@ -4567,6 +4578,7 @@ TEST_F(TestSQLDescribeCol, TIME_COLUMN) {
     EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLDescribeCol, INTERVAL_YEAR_TO_MONTH_COLUMN) {
@@ -4589,6 +4601,7 @@ TEST_F(TestSQLDescribeCol, INTERVAL_YEAR_TO_MONTH_COLUMN) {
     EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLDescribeCol, INTERVAL_DAY_TO_SECOND_COLUMN) {
@@ -4611,6 +4624,7 @@ TEST_F(TestSQLDescribeCol, INTERVAL_DAY_TO_SECOND_COLUMN) {
     EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLDescribeCol, OUT_OF_INDEX_COLUMN) {
@@ -4627,6 +4641,47 @@ TEST_F(TestSQLDescribeCol, OUT_OF_INDEX_COLUMN) {
                          &data_type, &column_size, &decimal_digits, &nullable);
     EXPECT_EQ(SQL_ERROR, ret);
     EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_INVALID_DESCRIPTOR_INDEX));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLDescribeCol, TRUNCATED_COLUMN_NAME_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring columns = L"INTEGER\'1\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR column_name[1];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 1, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_DATA_RIGHT_TRUNCATED));
+    std::wstring truncated_column_name = L"_";
+    EXPECT_STREQ(truncated_column_name.c_str(), column_name);
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_EQ((SQLSMALLINT)expected_column_name.size(), column_name_length);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLDescribeCol, INVALID_STRING_OR_BUFFER_LENGTH) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring columns = L"INTEGER\'1\'";
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, -1, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_INVALID_STRING_OR_BUFFER_LENGTH));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLDescribeCol, MULTIPLE_COLUMNS) {
@@ -4675,6 +4730,7 @@ TEST_F(TestSQLDescribeCol, MULTIPLE_COLUMNS) {
     EXPECT_EQ((SQLULEN)1, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLMoreResults, NoData_noquery) {
