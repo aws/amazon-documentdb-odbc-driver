@@ -199,7 +199,7 @@ RETCODE SQL_API SQLFetchScroll(HSTMT StatementHandle,
     if (SQL_SUCCESS == ret) {
         ARDFields *opts = SC_get_ARDF(stmt);
 
-        ret = ESAPI_ExtendedFetch(StatementHandle, FetchOrientation,
+        ret = API_ExtendedFetch(StatementHandle, FetchOrientation,
                                   FetchOffset, pcRow, rowStatusArray, bkmarkoff,
                                   opts->size_of_rowset);
         stmt->transition_status = STMT_TRANSITION_FETCH_SCROLL;

@@ -1239,12 +1239,12 @@ getNthValid(const QResultClass *res, SQLLEN sta, UWORD orientation, SQLULEN nth,
     }
 
 /*	This fetchs a block of data (rowset). */
-RETCODE SQL_API ESAPI_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
+RETCODE SQL_API API_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
                                     SQLLEN irow, SQLULEN *pcrow,
                                     SQLUSMALLINT *rgfRowStatus,
                                     SQLLEN bookmark_offset, SQLLEN rowsetSize) {
     UNUSED(bookmark_offset, irow);
-    CSTR func = "ESAPI_ExtendedFetch";
+    CSTR func = "API_ExtendedFetch";
     StatementClass *stmt = (StatementClass *)hstmt;
     ARDFields *opts;
     QResultClass *res;
@@ -1281,7 +1281,7 @@ RETCODE SQL_API ESAPI_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
 
     if (!(res = SC_get_Curres(stmt), res)) {
         SC_set_error(stmt, STMT_INVALID_CURSOR_STATE_ERROR,
-                     "Null statement result in ESAPI_ExtendedFetch.", func);
+                     "Null statement result in API_ExtendedFetch.", func);
         return SQL_ERROR;
     }
 
@@ -1373,7 +1373,7 @@ RETCODE SQL_API ESAPI_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
             break;
         default:
             SC_set_error(stmt, STMT_FETCH_OUT_OF_RANGE,
-                         "Unsupported ESAPI_ExtendedFetch Direction", func);
+                         "Unsupported API_ExtendedFetch Direction", func);
             return SQL_ERROR;
     }
 

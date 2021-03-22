@@ -96,30 +96,26 @@ class TestSQLPrepare : public testing::Test {
     SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
 };
 */
-class TestSQLExecDirect : public testing::Test {
+class Fixture : public testing::Test {
    public:
-    TestSQLExecDirect() {
-    }
-
     void SetUp() {
         ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env,
                                        &m_conn, &m_hstmt, true, true));
     }
-
     void TearDown() {
         CloseCursor(&m_hstmt, true, true);
         SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
         SQLDisconnect(m_conn);
         SQLFreeHandle(SQL_HANDLE_ENV, m_env);
     }
-
-    ~TestSQLExecDirect() {
-        // cleanup any pending stuff, but no exceptions allowed
-    }
     SQLHENV m_env = SQL_NULL_HENV;
     SQLHDBC m_conn = SQL_NULL_HDBC;
     SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
 };
+
+class TestSQLFetch : public Fixture {};
+
+class TestSQLExecDirect : public Fixture {};
 
 /*class TestSQLSetCursorName : public testing::Test {
    public:
@@ -287,6 +283,91 @@ TEST_F(TestSQLPrepare, NullQueryError) {
     EXPECT_EQ(SQL_ERROR, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }*/
+
+TEST_F(TestSQLFetch, INVALID_HANDLE) {
+    EXPECT_EQ(SQL_INVALID_HANDLE, SQLFetch(nullptr));
+}
+
+TEST_F(TestSQLFetch, INVALID_CURSOR_STATE) {
+    EXPECT_EQ(SQL_ERROR, SQLFetch(m_hstmt));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_INVALID_CURSUR_STATE));
+}
+
+TEST_F(TestSQLFetch, SUCCESS) {
+    std::wstring query = L"SELECT 1 FROM ODBCTest.IoT LIMIT 1";
+    SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(SQL_SUCCESS, SQLFetch(m_hstmt));
+}
+
+TEST_F(TestSQLFetch, NO_MORE_DATA) {
+    std::wstring query = L"SELECT 1 FROM ODBCTest.IoT LIMIT 1";
+    SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(SQL_SUCCESS, SQLFetch(m_hstmt));
+    EXPECT_EQ(SQL_NO_DATA, SQLFetch(m_hstmt));
+}
+
+TEST_F(TestSQLFetch, FRACTIONAL_TRUNCATION) {
+    std::wstring query = L"SELECT VARCHAR \'1.5\' FROM ODBCTest.IoT LIMIT 1";
+    SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLCHAR data;
+    SQLLEN indicator = 0;
+    ret = SQLBindCol(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, SQLFetch(m_hstmt));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_FRACTIONAL_TRUNCATION));
+}
+
+TEST_F(TestSQLFetch, RIGHT_TRUNCATION) {
+    std::wstring query = L"SELECT VARCHAR \'741370\' FROM ODBCTest.IoT LIMIT 1";
+    SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    ret = SQLBindCol(m_hstmt, 1, SQL_C_CHAR, &data, 6, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, SQLFetch(m_hstmt));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_DATA_RIGHT_TRUNCATED));
+}
+
+TEST_F(TestSQLFetch, OUT_OF_RANGE) {
+    std::wstring query = L"SELECT VARCHAR \'2\' FROM ODBCTest.IoT LIMIT 1";
+    SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLCHAR data;
+    SQLLEN indicator = 0;
+    ret = SQLBindCol(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(SQL_ERROR, SQLFetch(m_hstmt));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+}
+
+TEST_F(TestSQLFetch, RESTRICTED_DATA_TYPE_VIOLATION) {
+    std::wstring query = L"SELECT DATE \'2021-01-02\' FROM ODBCTest.IoT LIMIT 1";
+    SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    TIME_STRUCT data;
+    SQLLEN indicator = 0;
+    ret = SQLBindCol(m_hstmt, 1, SQL_C_TIME, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(SQL_ERROR, SQLFetch(m_hstmt));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
+}
+
+TEST_F(TestSQLFetch, STRING_CONVERSION_ERROR) {
+    std::wstring query = L"SELECT VARCHAR \'1.a\' FROM ODBCTest.IoT LIMIT 1";
+    SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLCHAR data;
+    SQLLEN indicator = 0;
+    ret = SQLBindCol(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(SQL_ERROR, SQLFetch(m_hstmt));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_STRING_CONVERSION_ERROR));
+}
 
 TEST_F(TestSQLExecDirect, Success_100) {
     int limit = 100;
