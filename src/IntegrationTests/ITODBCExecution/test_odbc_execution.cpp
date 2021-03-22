@@ -57,44 +57,6 @@ class TestSQLExecute : public testing::Test {
     SQLHDBC m_conn = SQL_NULL_HDBC;
     SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
 };
-
-class TestSQLPrepare : public testing::Test {
-   public:
-    TestSQLPrepare() {
-    }
-
-    void SetUp() {
-        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env,
-                                       &m_conn, &m_hstmt, true, true));
-    }
-
-    void TearDown() {
-        CloseCursor(&m_hstmt, true, true);
-        SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
-        SQLDisconnect(m_conn);
-        SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-    }
-
-    ~TestSQLPrepare() {
-        // cleanup any pending stuff, but no exceptions allowed
-    }
-
-    std::wstring m_query =
-        L"SELECT Origin FROM kibana_sample_data_flights LIMIT 5";
-    std::wstring m_1_col =
-        L"SELECT Origin FROM kibana_sample_data_flights LIMIT 5";
-    std::wstring m_2_col =
-        L"SELECT Origin, AvgTicketPrice FROM kibana_sample_data_flights LIMIT "
-        L"5";
-    std::wstring m_all_col =
-        L"SELECT * FROM kibana_sample_data_flights LIMIT 5";
-    const SQLSMALLINT m_1_col_cnt = 1;
-    const SQLSMALLINT m_2_col_cnt = 2;
-    const SQLSMALLINT m_all_col_cnt = 25;
-    SQLHENV m_env = SQL_NULL_HENV;
-    SQLHDBC m_conn = SQL_NULL_HDBC;
-    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
-};
 */
 class Fixture : public testing::Test {
    public:
@@ -116,6 +78,10 @@ class Fixture : public testing::Test {
 class TestSQLFetch : public Fixture {};
 
 class TestSQLExecDirect : public Fixture {};
+
+class TestSQLPrepare : public Fixture {};
+
+class TestSQLDescribeParam : public Fixture {};
 
 /*class TestSQLSetCursorName : public testing::Test {
    public:
@@ -240,49 +206,52 @@ TEST_F(TestSQLExecute, ResetPrepareError) {
     EXPECT_EQ(SQL_ERROR, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
-
-TEST_F(TestSQLPrepare, Success) {
-    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)m_query.c_str(), SQL_NTS);
+*/
+TEST_F(TestSQLPrepare, SUCCESS_NO_PARAM) {
+    std::wstring query = L"SELECT 1 FROM ODBCTest.IoT LIMIT 1";
+    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_EQ(SQL_SUCCESS, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestSQLPrepare, PrepareMetadata) {
-    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)m_all_col.c_str(), SQL_NTS);
+TEST_F(TestSQLPrepare, ERROR_WITH_PARAM) {
+    std::wstring query = L"SELECT 1 FROM ODBCTest.IoT where time = ? LIMIT 1";
+    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_EQ(SQL_ERROR, ret);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLPrepare, PREPARE_METADATA) {
+    std::wstring query = L"SELECT 1, 2, 3, 4 FROM ODBCTest.IoT LIMIT 1";
+    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_EQ(SQL_SUCCESS, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
     SQLSMALLINT column_count = 0;
     EXPECT_TRUE(SQL_SUCCEEDED(SQLNumResultCols(m_hstmt, &column_count)));
-    EXPECT_EQ(column_count, m_all_col_cnt);
-    EXPECT_TRUE(SQL_SUCCEEDED(SQLFreeStmt(m_hstmt, SQL_CLOSE)));
-
-    ret = SQLPrepare(m_hstmt, (SQLTCHAR*)m_2_col.c_str(), SQL_NTS);
-    EXPECT_EQ(SQL_SUCCESS, ret);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-    EXPECT_TRUE(SQL_SUCCEEDED(SQLNumResultCols(m_hstmt, &column_count)));
-    EXPECT_EQ(column_count, m_2_col_cnt);
-    EXPECT_TRUE(SQL_SUCCEEDED(SQLFreeStmt(m_hstmt, SQL_CLOSE)));
-
-    ret = SQLPrepare(m_hstmt, (SQLTCHAR*)m_all_col.c_str(), SQL_NTS);
-    EXPECT_EQ(SQL_SUCCESS, ret);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-    EXPECT_TRUE(SQL_SUCCEEDED(SQLNumResultCols(m_hstmt, &column_count)));
-    EXPECT_EQ(column_count, m_all_col_cnt);
-    EXPECT_TRUE(SQL_SUCCEEDED(SQLFreeStmt(m_hstmt, SQL_CLOSE)));
-
-    ret = SQLPrepare(m_hstmt, (SQLTCHAR*)m_1_col.c_str(), SQL_NTS);
-    EXPECT_EQ(SQL_SUCCESS, ret);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-    EXPECT_TRUE(SQL_SUCCEEDED(SQLNumResultCols(m_hstmt, &column_count)));
-    EXPECT_EQ(column_count, m_1_col_cnt);
+    EXPECT_EQ(4, column_count);
     EXPECT_TRUE(SQL_SUCCEEDED(SQLFreeStmt(m_hstmt, SQL_CLOSE)));
 }
 
-TEST_F(TestSQLPrepare, NullQueryError) {
+TEST_F(TestSQLPrepare, ERROR_NULL_QUERY) {
     SQLRETURN ret = SQLPrepare(m_hstmt, NULL, SQL_NTS);
     EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_MEMORY_ALLOCATION_ERROR));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-}*/
+}
+
+TEST_F(TestSQLDescribeParam, DESCRIBE_PARAM) {
+    std::wstring query = L"SELECT 1 FROM ODBCTest.IoT where time = ? LIMIT 1";
+    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_EQ(SQL_ERROR, ret);
+    SQLSMALLINT sqlType;
+    SQLULEN paramDef;
+    SQLSMALLINT scale;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeParam(m_hstmt, 1, &sqlType, &paramDef, &scale, &nullable);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_COLUMN_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
 
 TEST_F(TestSQLFetch, INVALID_HANDLE) {
     EXPECT_EQ(SQL_INVALID_HANDLE, SQLFetch(nullptr));
