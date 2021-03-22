@@ -305,18 +305,20 @@ RETCODE SQL_API SQLExecute(HSTMT StatementHandle) {
 RETCODE SQL_API SQLFetch(HSTMT StatementHandle) {
     RETCODE ret;
     StatementClass *stmt = (StatementClass *)StatementHandle;
+    MYLOG(LOG_TRACE, "entering\n");
+    if (!stmt) {
+        return SQL_INVALID_HANDLE;
+    }
+    if (SC_connection_lost_check(stmt, __FUNCTION__))
+        return SQL_ERROR;
     IRDFields *irdopts = SC_get_IRDF(stmt);
     ARDFields *ardopts = SC_get_ARDF(stmt);
     SQLUSMALLINT *rowStatusArray = irdopts->rowStatusArray;
     SQLULEN *pcRow = irdopts->rowsFetched;
 
-    MYLOG(LOG_TRACE, "entering\n");
-    if (SC_connection_lost_check(stmt, __FUNCTION__))
-        return SQL_ERROR;
-
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
-    ret = ESAPI_ExtendedFetch(StatementHandle, SQL_FETCH_NEXT, 0, pcRow,
+    ret = API_ExtendedFetch(StatementHandle, SQL_FETCH_NEXT, 0, pcRow,
                               rowStatusArray, 0, ardopts->size_of_rowset);
     stmt->transition_status = STMT_TRANSITION_FETCH_SCROLL;
 
@@ -854,14 +856,14 @@ RETCODE SQL_API SQLExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
     {
         SQLULEN retrieved;
 
-        ret = ESAPI_ExtendedFetch(hstmt, fFetchType, irow, &retrieved,
+        ret = API_ExtendedFetch(hstmt, fFetchType, irow, &retrieved,
                                   rgfRowStatus, 0,
                                   SC_get_ARDF(stmt)->size_of_rowset_odbc2);
         if (pcrow)
             *pcrow = retrieved;
     }
 #else
-    ret = ESAPI_ExtendedFetch(hstmt, fFetchType, irow, pcrow, rgfRowStatus, 0,
+    ret = API_ExtendedFetch(hstmt, fFetchType, irow, pcrow, rgfRowStatus, 0,
                               SC_get_ARDF(stmt)->size_of_rowset_odbc2);
 #endif /* WITH_UNIXODBC */
     stmt->transition_status = STMT_TRANSITION_EXTENDED_FETCH;
