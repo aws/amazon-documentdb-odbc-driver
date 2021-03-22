@@ -138,7 +138,7 @@ RETCODE SQL_API ESAPI_ColumnPrivileges(
     const SQLCHAR *szSchemaName, SQLSMALLINT cbSchemaName,
     const SQLCHAR *szTableName, SQLSMALLINT cbTableName,
     const SQLCHAR *szColumnName, SQLSMALLINT cbColumnName, UWORD flag);
-RETCODE SQL_API ESAPI_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
+RETCODE SQL_API API_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
                                     SQLLEN irow, SQLULEN *pcrow,
                                     SQLUSMALLINT *rgfRowStatus,
                                     SQLLEN FetchOffset, SQLLEN rowsetSize);
