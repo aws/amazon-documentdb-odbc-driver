@@ -961,8 +961,8 @@ public:
         if (IsInt64()) {
             int64_t i = GetInt64();
             volatile double d = static_cast<double>(i);
-            return (d >= static_cast<double>((std::numeric_limits<uint64_t>::min)()))
-                && (d < static_cast<double>((std::numeric_limits<uint64_t>::max)()))
+            return (d >= static_cast<double>((std::numeric_limits<int64_t>::min)()))
+                && (d < static_cast<double>((std::numeric_limits<int64_t>::max)()))
                 && (i == static_cast<int64_t>(d));
         }
         return true; // double, int, uint are always lossless
