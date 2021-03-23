@@ -83,6 +83,8 @@ class TestSQLPrepare : public Fixture {};
 
 class TestSQLDescribeParam : public Fixture {};
 
+class TestSQLNumParams : public Fixture {};
+
 /*class TestSQLSetCursorName : public testing::Test {
    public:
     TestSQLSetCursorName() {
@@ -250,6 +252,16 @@ TEST_F(TestSQLDescribeParam, DESCRIBE_PARAM) {
     ret = SQLDescribeParam(m_hstmt, 1, &sqlType, &paramDef, &scale, &nullable);
     EXPECT_EQ(SQL_ERROR, ret);
     EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_COLUMN_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLNumParams, NUM_PARAMS) {
+    SQLSMALLINT num = 0;
+    SQLRETURN ret = SQLNumParams(nullptr, &num);
+    EXPECT_EQ(SQL_ERROR, ret);
+    ret = SQLNumParams(m_hstmt, &num);
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_NOT_IMPLEMENTED_ERROR));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
