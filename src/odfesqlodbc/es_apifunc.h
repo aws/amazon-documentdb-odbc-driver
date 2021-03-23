@@ -131,7 +131,7 @@ RETCODE SQL_API ESAPI_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
                                     SQLUSMALLINT fDescType, PTR rgbDesc,
                                     SQLSMALLINT cbDescMax, SQLSMALLINT *pcbDesc,
                                     SQLLEN *pfDesc);
-RETCODE SQL_API ESAPI_Prepare(HSTMT hstmt, const SQLCHAR *szSqlStr,
+RETCODE SQL_API API_Prepare(HSTMT hstmt, const SQLCHAR *szSqlStr,
                               SQLINTEGER cbSqlStr);
 RETCODE SQL_API ESAPI_ColumnPrivileges(
     HSTMT hstmt, const SQLCHAR *szCatalogName, SQLSMALLINT cbCatalogName,
