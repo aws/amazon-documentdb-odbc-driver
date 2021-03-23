@@ -529,7 +529,7 @@ RETCODE SQL_API SQLRowCount(HSTMT StatementHandle, SQLLEN *RowCount) {
 
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
-    ret = TSAPI_RowCount(StatementHandle, RowCount);
+    ret = API_RowCount(StatementHandle, RowCount);
     LEAVE_STMT_CS(stmt);
     return ret;
 }

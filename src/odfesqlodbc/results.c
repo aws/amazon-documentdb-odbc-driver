@@ -36,8 +36,8 @@
     es_true_type((conn), (fi)->columntype, FI_type(fi))
 #define NULL_IF_NULL(a) ((a) ? ((const char *)(a)) : "(null)")
 
-RETCODE SQL_API TSAPI_RowCount(HSTMT hstmt, SQLLEN *pcrow) {
-    CSTR func = "TSAPI_RowCount";
+RETCODE SQL_API API_RowCount(HSTMT hstmt, SQLLEN *pcrow) {
+    CSTR func = "API_RowCount";
     StatementClass *stmt = (StatementClass *)hstmt;
     QResultClass *res;
 
