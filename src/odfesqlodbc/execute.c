@@ -34,7 +34,7 @@
 #include "qresult.h"
 #include "statement.h"
 
-RETCODE SQL_API ESAPI_Prepare(HSTMT hstmt, const SQLCHAR *stmt_str,
+RETCODE SQL_API API_Prepare(HSTMT hstmt, const SQLCHAR *stmt_str,
                               SQLINTEGER stmt_sz) {
     if (hstmt == NULL)
         return SQL_ERROR;
