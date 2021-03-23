@@ -407,7 +407,7 @@ RETCODE SQL_API SQLPrepareW(HSTMT StatementHandle, SQLWCHAR *StatementText,
     // Prepare statement if statement is ready
     RETCODE ret = SQL_ERROR;
     if (!SC_opencheck(stmt, func))
-        ret = ESAPI_Prepare(StatementHandle, (const SQLCHAR *)stxt,
+        ret = API_Prepare(StatementHandle, (const SQLCHAR *)stxt,
                             (SQLINTEGER)slen);
 
     // Exit critical
