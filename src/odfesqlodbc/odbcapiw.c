@@ -953,7 +953,7 @@ SQLRETURN SQL_API SQLColAttributesW(SQLHSTMT hstmt, SQLUSMALLINT iCol,
                     break;
                 }
                 rgbD = rgbDt;
-                ret = ESAPI_ColAttributes(hstmt, iCol, iField, rgbD, bMax, rgbL,
+                ret = API_ColAttributes(hstmt, iCol, iField, rgbD, bMax, rgbL,
                                           pNumAttr);
                 if (SQL_SUCCESS_WITH_INFO != ret || blen < bMax)
                     break;
@@ -978,7 +978,7 @@ SQLRETURN SQL_API SQLColAttributesW(SQLHSTMT hstmt, SQLUSMALLINT iCol,
             rgbD = pCharAttr;
             bMax = cbCharAttrMax;
             rgbL = pcbCharAttr;
-            ret = ESAPI_ColAttributes(hstmt, iCol, iField, rgbD, bMax, rgbL,
+            ret = API_ColAttributes(hstmt, iCol, iField, rgbD, bMax, rgbL,
                                       pNumAttr);
             break;
     }

@@ -1278,21 +1278,14 @@ Int2 estype_nullable(const ConnectionClass *conn, OID type) {
     return SQL_NULLABLE_UNKNOWN; /* everything should be nullable unknown */
 }
 
-Int2 estype_auto_increment(const ConnectionClass *conn, OID type) {
+Int2 tstype_auto_increment(const ConnectionClass *conn, OID type) {
     UNUSED(conn, type);
     return SQL_FALSE;
 }
 
-Int2 estype_case_sensitive(const ConnectionClass *conn, OID type) {
+Int2 tstype_case_sensitive(const ConnectionClass *conn, OID type) {
     UNUSED(conn, type);
-    switch (type) {
-        case ES_TYPE_KEYWORD:
-        case ES_TYPE_TEXT:
-            return SQL_TRUE;
-
-        default:
-            return SQL_FALSE;
-    }
+    return SQL_FALSE;
 }
 
 Int2 estype_money(const ConnectionClass *conn, OID type) {

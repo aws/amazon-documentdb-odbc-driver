@@ -124,7 +124,7 @@ SQLRETURN SQL_API SQLColAttribute(SQLHSTMT StatementHandle,
 
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
-    ret = ESAPI_ColAttributes(StatementHandle, ColumnNumber, FieldIdentifier,
+    ret = API_ColAttributes(StatementHandle, ColumnNumber, FieldIdentifier,
                               CharacterAttribute, BufferLength, StringLength,
                               NumericAttribute);
     LEAVE_STMT_CS(stmt);
@@ -260,7 +260,7 @@ RETCODE SQL_API SQLGetDescField(SQLHDESC DescriptorHandle,
     RETCODE ret;
 
     MYLOG(LOG_TRACE, "entering\n");
-    ret = ESAPI_GetDescField(DescriptorHandle, RecNumber, FieldIdentifier,
+    ret = API_GetDescField(DescriptorHandle, RecNumber, FieldIdentifier,
                              Value, BufferLength, StringLength);
     return ret;
 }
