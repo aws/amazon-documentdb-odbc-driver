@@ -1281,7 +1281,7 @@ static RETCODE SQL_API IRDGetField(DescriptorClass *desc, SQLSMALLINT RecNumber,
         StatementClass *stmt;
 
         stmt = opts->stmt;
-        ret = ESAPI_ColAttributes(stmt, RecNumber, FieldIdentifier, Value,
+        ret = API_ColAttributes(stmt, RecNumber, FieldIdentifier, Value,
                                   (SQLSMALLINT)BufferLength, &pcbL, &ival);
         len = pcbL;
     }
@@ -1645,12 +1645,12 @@ RETCODE SQL_API ESAPI_SetConnectAttr(HDBC ConnectionHandle,
 }
 
 /*	new function */
-RETCODE SQL_API ESAPI_GetDescField(SQLHDESC DescriptorHandle,
+RETCODE SQL_API API_GetDescField(SQLHDESC DescriptorHandle,
                                    SQLSMALLINT RecNumber,
                                    SQLSMALLINT FieldIdentifier, PTR Value,
                                    SQLINTEGER BufferLength,
                                    SQLINTEGER *StringLength) {
-    CSTR func = "ESAPI_GetDescField";
+    CSTR func = "API_GetDescField";
     RETCODE ret = SQL_SUCCESS;
     DescriptorClass *desc = (DescriptorClass *)DescriptorHandle;
 

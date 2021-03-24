@@ -1373,7 +1373,7 @@ SQLRETURN SQL_API SQLColAttributes(SQLHSTMT StatementHandle,
 
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
-    ret = ESAPI_ColAttributes(StatementHandle, ColumnNumber, FieldIdentifier,
+    ret = API_ColAttributes(StatementHandle, ColumnNumber, FieldIdentifier,
                               CharacterAttribute, BufferLength, StringLength,
                               NumericAttribute);
     LEAVE_STMT_CS(stmt);
