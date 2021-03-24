@@ -518,6 +518,10 @@ RETCODE SQL_API SQLPutData(HSTMT StatementHandle, PTR Data,
 RETCODE SQL_API SQLRowCount(HSTMT StatementHandle, SQLLEN *RowCount) {
     RETCODE ret;
     StatementClass *stmt = (StatementClass *)StatementHandle;
+    if (!stmt) {
+        *RowCount = -1;
+        return SQL_INVALID_HANDLE;
+    }
 
     MYLOG(LOG_TRACE, "entering\n");
     if (SC_connection_lost_check(stmt, __FUNCTION__))
@@ -525,7 +529,7 @@ RETCODE SQL_API SQLRowCount(HSTMT StatementHandle, SQLLEN *RowCount) {
 
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
-    ret = ESAPI_RowCount(StatementHandle, RowCount);
+    ret = API_RowCount(StatementHandle, RowCount);
     LEAVE_STMT_CS(stmt);
     return ret;
 }
