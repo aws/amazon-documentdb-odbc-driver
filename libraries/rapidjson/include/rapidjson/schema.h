@@ -12,8 +12,6 @@
 // CONDITIONS OF ANY KIND, either express or implied-> See the License for the 
 // specific language governing permissions and limitations under the License->
 
-// clang-format off
-
 #ifndef RAPIDJSON_SCHEMA_H_
 #define RAPIDJSON_SCHEMA_H_
 
@@ -1277,14 +1275,14 @@ struct TokenHelper {
 template <typename Stack>
 struct TokenHelper<Stack, char> {
     RAPIDJSON_FORCEINLINE static void AppendIndexToken(Stack& documentStack, SizeType index) {
-        #ifdef WIN32
-        #pragma warning(push)
-        #pragma warning(disable: 4127) // Conditional Expression is Constant
-        #endif // WIN32
+#ifdef WIN32
+#pragma warning(push)
+#pragma warning(disable : 4127)  // Conditional Expression is Constant
+#endif
         if (sizeof(SizeType) == 4) {
-        #ifdef WIN32
-        #pragma warning(pop)
-        #endif // WIN32
+#ifdef WIN32
+#pragma warning(pop)
+#endif  // WIN32
             char *buffer = documentStack.template Push<char>(1 + 10); // '/' + uint
             *buffer++ = '/';
             const char* end = internal::u32toa(index, buffer);
