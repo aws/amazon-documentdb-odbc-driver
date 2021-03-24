@@ -383,7 +383,7 @@ static void IPDFields_copy(const IPDFields *src, IPDFields *target) {
     }
 }
 
-RETCODE SQL_API ESAPI_CopyDesc(SQLHDESC SourceDescHandle,
+RETCODE SQL_API API_CopyDesc(SQLHDESC SourceDescHandle,
                                SQLHDESC TargetDescHandle) {
     RETCODE ret = SQL_ERROR;
     DescriptorClass *src, *target;

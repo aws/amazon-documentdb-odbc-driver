@@ -138,7 +138,7 @@ RETCODE SQL_API SQLCopyDesc(SQLHDESC SourceDescHandle,
     RETCODE ret;
 
     MYLOG(LOG_TRACE, "entering\n");
-    ret = ESAPI_CopyDesc(SourceDescHandle, TargetDescHandle);
+    ret = API_CopyDesc(SourceDescHandle, TargetDescHandle);
     return ret;
 }
 
