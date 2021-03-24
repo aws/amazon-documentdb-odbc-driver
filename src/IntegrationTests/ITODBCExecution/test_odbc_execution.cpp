@@ -251,7 +251,8 @@ TEST_F(TestSQLDescribeParam, DESCRIBE_PARAM) {
     SQLSMALLINT nullable;
     ret = SQLDescribeParam(m_hstmt, 1, &sqlType, &paramDef, &scale, &nullable);
     EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_COLUMN_ERROR));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_INVALID_DESCRIPTOR_INDEX));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 

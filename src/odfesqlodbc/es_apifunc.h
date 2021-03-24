@@ -44,7 +44,7 @@ RETCODE SQL_API ESAPI_AllocConnect(HENV EnvironmentHandle,
 RETCODE SQL_API ESAPI_AllocEnv(HENV *EnvironmentHandle);
 RETCODE SQL_API ESAPI_AllocStmt(HDBC ConnectionHandle, HSTMT *StatementHandle,
                                 UDWORD flag);
-RETCODE SQL_API ESAPI_BindCol(HSTMT StatementHandle, SQLUSMALLINT ColumnNumber,
+RETCODE SQL_API API_BindCol(HSTMT StatementHandle, SQLUSMALLINT ColumnNumber,
                               SQLSMALLINT TargetType, PTR TargetValue,
                               SQLLEN BufferLength, SQLLEN *StrLen_or_Ind);
 RETCODE SQL_API API_Connect(HDBC ConnectionHandle, const SQLCHAR *ServerName,
