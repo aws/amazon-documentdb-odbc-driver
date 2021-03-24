@@ -201,7 +201,7 @@ void InitializeEmbeddedDescriptor(DescriptorClass *self, StatementClass *stmt,
 void InitializeARDFields(ARDFields *opt) {
     memset(opt, 0, sizeof(ARDFields));
     opt->size_of_rowset = 1;
-    opt->bind_size = 0; /* default is to bind by column */
+    opt->bind_size = SQL_BIND_BY_COLUMN; /* default is to bind by column */
     opt->size_of_rowset_odbc2 = 1;
 }
 /*
@@ -210,7 +210,8 @@ void InitializeARDFields(ARDFields *opt) {
 void InitializeAPDFields(APDFields *opt) {
     memset(opt, 0, sizeof(APDFields));
     opt->paramset_size = 1;
-    opt->param_bind_type = 0;     /* default is to bind by column */
+    opt->param_bind_type =
+        SQL_BIND_BY_COLUMN;       /* default is to bind by column */
     opt->paramset_size_dummy = 1; /* dummy setting */
 }
 

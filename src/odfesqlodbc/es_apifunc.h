@@ -127,7 +127,7 @@ RETCODE SQL_API ESAPI_Statistics(
     const SQLCHAR *SchemaName, SQLSMALLINT NameLength2,
     const SQLCHAR *TableName, SQLSMALLINT NameLength3, SQLUSMALLINT Unique,
     SQLUSMALLINT Reserved);
-RETCODE SQL_API ESAPI_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
+RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
                                     SQLUSMALLINT fDescType, PTR rgbDesc,
                                     SQLSMALLINT cbDescMax, SQLSMALLINT *pcbDesc,
                                     SQLLEN *pfDesc);
@@ -226,7 +226,7 @@ RETCODE SQL_API ESAPI_SetDescField(SQLHDESC DescriptorHandle,
                                    SQLSMALLINT RecNumber,
                                    SQLSMALLINT FieldIdentifier, PTR Value,
                                    SQLINTEGER BufferLength);
-RETCODE SQL_API ESAPI_GetDescField(SQLHDESC DescriptorHandle,
+RETCODE SQL_API API_GetDescField(SQLHDESC DescriptorHandle,
                                    SQLSMALLINT RecNumber,
                                    SQLSMALLINT FieldIdentifier, PTR Value,
                                    SQLINTEGER BufferLength,
