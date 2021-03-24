@@ -12,8 +12,6 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
-// clang-format off
-
 #ifndef RAPIDJSON_POINTER_H_
 #define RAPIDJSON_POINTER_H_
 
@@ -268,15 +266,14 @@ public:
         char* end = sizeof(SizeType) == 4 ? internal::u32toa(index, buffer) : internal::u64toa(index, buffer);
         SizeType length = static_cast<SizeType>(end - buffer);
         buffer[length] = '\0';
-
-        #ifdef WIN32
-        #pragma warning(push)
-        #pragma warning(disable: 4127) // Conditional Expression is Constant
-        #endif // WIN32
+#ifdef WIN32
+#pragma warning(push)
+#pragma warning(disable : 4127)  // Conditional Expression is Constant
+#endif             // WIN32
         if (sizeof(Ch) == 1) {
-        #ifdef WIN32
-        #pragma warning(pop)
-        #endif // WIN32
+#ifdef WIN32
+#pragma warning(pop)
+#endif  // WIN32
             Token token = { reinterpret_cast<Ch*>(buffer), length, index };
             return Append(token, allocator);
         }
