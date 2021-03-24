@@ -562,33 +562,8 @@ class TestSQLMoreResults : public Fixture {};
 
 class TestSQLDescribeCol : public Fixture {};
 
-//class TestSQLRowCount : public testing::Test {
-//   public:
-//    TestSQLRowCount() {
-//    }
-//
-//    void SetUp() {
-//        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env,
-//                                       &m_conn, &m_hstmt, true, true));
-//    }
-//
-//    void TearDown() {
-//        if (m_hstmt != SQL_NULL_HSTMT) {
-//            ASSERT_NO_THROW(CloseCursor(&m_hstmt, true, true));
-//            SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
-//            SQLDisconnect(m_conn);
-//            SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-//        }
-//    }
-//
-//    ~TestSQLRowCount() {
-//        // cleanup any pending stuff, but no exceptions allowed
-//    }
-//
-//    SQLHENV m_env = SQL_NULL_HENV;
-//    SQLHDBC m_conn = SQL_NULL_HDBC;
-//    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
-//};
+class TestSQLRowCount : public Fixture {};
+
 //
 //TEST_F(TestSQLBindCol, SingleColumnSingleBind) {
 //    std::vector< std::vector< Col > > cols(single_col_cnt);
@@ -4746,15 +4721,22 @@ TEST_F(TestSQLMoreResults, NoData_query) {
     EXPECT_EQ(SQL_NO_DATA, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
-//
-//// Row count is not supported for the driver, so this should return -1,
-//// as defined in the ODBC API.
-//TEST_F(TestSQLRowCount, RowCountNotAvailable) {
-//    SQLLEN row_count;
-//    SQLRETURN ret = SQLRowCount(m_hstmt, &row_count);
-//    EXPECT_EQ(SQL_SUCCESS, ret);
-//    EXPECT_EQ(row_count, -1L);
-//}
+
+// Row count is not supported for the driver, so this should return -1,
+// as defined in the ODBC API.
+TEST_F(TestSQLRowCount, RowCountNotAvailable) {
+    SQLLEN row_count = 0;
+    SQLRETURN ret = SQLRowCount(m_hstmt, &row_count);
+    EXPECT_EQ(SQL_SUCCESS, ret);
+    EXPECT_EQ(row_count, -1L);
+}
+
+TEST_F(TestSQLRowCount, InvalidHandle) {
+    SQLLEN row_count = 0;
+    SQLRETURN ret = SQLRowCount(nullptr, &row_count);
+    EXPECT_EQ(SQL_INVALID_HANDLE, ret);
+    EXPECT_EQ(row_count, -1L);
+}
 
 int main(int argc, char** argv) {
 #ifdef __APPLE__
