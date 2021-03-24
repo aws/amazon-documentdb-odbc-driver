@@ -933,7 +933,7 @@ RETCODE SetTypeResult(ConnectionClass *conn, StatementClass *stmt,
     set_tuplefield_int2(&tuple[GETTYPE_DATA_TYPE],
                         static_cast< short >(sqlType));
     set_tuplefield_int2(&tuple[GETTYPE_CASE_SENSITIVE],
-                        estype_case_sensitive(conn, esType));
+                        tstype_case_sensitive(conn, esType));
     set_tuplefield_int2(&tuple[GETTYPE_SEARCHABLE],
                         estype_searchable(conn, esType));
     set_tuplefield_int2(&tuple[GETTYPE_FIXED_PREC_SCALE],
@@ -956,7 +956,7 @@ RETCODE SetTypeResult(ConnectionClass *conn, StatementClass *stmt,
     set_nullfield_int2(&tuple[GETTYPE_UNSIGNED_ATTRIBUTE],
                        estype_unsigned(conn, esType));
     set_nullfield_int2(&tuple[GETTYPE_AUTO_UNIQUE_VALUE],
-                       estype_auto_increment(conn, esType));
+                       tstype_auto_increment(conn, esType));
     set_nullfield_int2(&tuple[GETTYPE_MINIMUM_SCALE],
                        estype_min_decimal_digits(conn, esType));
     set_nullfield_int2(&tuple[GETTYPE_MAXIMUM_SCALE],

@@ -325,11 +325,11 @@ cleanup:
 }
 
 /*		Returns result column descriptor information for a result set. */
-RETCODE SQL_API ESAPI_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
+RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
                                     SQLUSMALLINT fDescType, PTR rgbDesc,
                                     SQLSMALLINT cbDescMax, SQLSMALLINT *pcbDesc,
                                     SQLLEN *pfDesc) {
-    CSTR func = "ESAPI_ColAttributes";
+    CSTR func = "API_ColAttributes";
     StatementClass *stmt = (StatementClass *)hstmt;
     IRDFields *irdflds;
     OID field_type = 0;
@@ -500,7 +500,7 @@ RETCODE SQL_API ESAPI_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
             if (fi && fi->auto_increment)
                 value = TRUE;
             else
-                value = estype_auto_increment(conn, field_type);
+                value = tstype_auto_increment(conn, field_type);
             if (value == -1) /* non-numeric becomes FALSE (ODBC Doc) */
                 value = FALSE;
             MYLOG(LOG_DEBUG, "AUTO_INCREMENT=" FORMAT_LEN "\n", value);
@@ -508,7 +508,7 @@ RETCODE SQL_API ESAPI_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
             break;
 
         case SQL_COLUMN_CASE_SENSITIVE: /* == SQL_DESC_CASE_SENSITIVE */
-            value = estype_case_sensitive(conn, field_type);
+            value = tstype_case_sensitive(conn, field_type);
             break;
 
             /*

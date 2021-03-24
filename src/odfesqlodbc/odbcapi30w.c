@@ -154,7 +154,7 @@ RETCODE SQL_API SQLGetDescFieldW(SQLHDESC hdesc, SQLSMALLINT iRecord,
                     break;
                 }
                 rgbV = rgbVt;
-                ret = ESAPI_GetDescField(hdesc, iRecord, iField, rgbV, bMax,
+                ret = API_GetDescField(hdesc, iRecord, iField, rgbV, bMax,
                                          pcbV);
                 if (SQL_SUCCESS_WITH_INFO != ret || blen < bMax)
                     break;
@@ -178,7 +178,7 @@ RETCODE SQL_API SQLGetDescFieldW(SQLHDESC hdesc, SQLSMALLINT iRecord,
             rgbV = rgbValue;
             bMax = cbValueMax;
             pcbV = pcbValue;
-            ret = ESAPI_GetDescField(hdesc, iRecord, iField, rgbV, bMax, pcbV);
+            ret = API_GetDescField(hdesc, iRecord, iField, rgbV, bMax, pcbV);
             break;
     }
 
@@ -275,7 +275,7 @@ SQLRETURN SQL_API SQLColAttributeW(SQLHSTMT hstmt, SQLUSMALLINT iCol,
                     break;
                 }
                 rgbD = rgbDt;
-                ret = ESAPI_ColAttributes(hstmt, iCol, iField, rgbD, bMax, rgbL,
+                ret = API_ColAttributes(hstmt, iCol, iField, rgbD, bMax, rgbL,
                                           pNumAttr);
                 if (SQL_SUCCESS_WITH_INFO != ret || blen < bMax)
                     break;
@@ -300,7 +300,7 @@ SQLRETURN SQL_API SQLColAttributeW(SQLHSTMT hstmt, SQLUSMALLINT iCol,
             rgbD = pCharAttr;
             bMax = cbCharAttrMax;
             rgbL = pcbCharAttr;
-            ret = ESAPI_ColAttributes(hstmt, iCol, iField, rgbD, bMax, rgbL,
+            ret = API_ColAttributes(hstmt, iCol, iField, rgbD, bMax, rgbL,
                                       pNumAttr);
             break;
     }

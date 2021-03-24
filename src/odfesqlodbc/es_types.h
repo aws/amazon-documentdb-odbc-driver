@@ -193,8 +193,8 @@ SQLSMALLINT estype_scale(const StatementClass *stmt, OID type,
                          int col); /* ODBC 3.x " */
 Int2 estype_radix(const ConnectionClass *conn, OID type);
 Int2 estype_nullable(const ConnectionClass *conn, OID type);
-Int2 estype_auto_increment(const ConnectionClass *conn, OID type);
-Int2 estype_case_sensitive(const ConnectionClass *conn, OID type);
+Int2 tstype_auto_increment(const ConnectionClass *conn, OID type);
+Int2 tstype_case_sensitive(const ConnectionClass *conn, OID type);
 Int2 estype_money(const ConnectionClass *conn, OID type);
 Int2 estype_searchable(const ConnectionClass *conn, OID type);
 Int2 estype_unsigned(const ConnectionClass *conn, OID type);
