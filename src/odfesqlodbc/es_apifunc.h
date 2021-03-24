@@ -108,7 +108,7 @@ RETCODE SQL_API ESAPI_GetStmtOption(HSTMT StatementHandle, SQLUSMALLINT Option,
                                     SQLINTEGER BufferLength);
 RETCODE SQL_API ESAPI_NumResultCols(HSTMT StatementHandle,
                                     SQLSMALLINT *ColumnCount);
-RETCODE SQL_API ESAPI_RowCount(HSTMT StatementHandle, SQLLEN *RowCount);
+RETCODE SQL_API API_RowCount(HSTMT StatementHandle, SQLLEN *RowCount);
 RETCODE SQL_API ESAPI_SetConnectOption(HDBC ConnectionHandle,
                                        SQLUSMALLINT Option, SQLULEN Value);
 RETCODE SQL_API ESAPI_SetCursorName(HSTMT StatementHandle,
