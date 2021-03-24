@@ -55,7 +55,7 @@ RETCODE SQL_API API_Prepare(HSTMT hstmt, const SQLCHAR *stmt_str,
     return ret;
 }
 
-RETCODE SQL_API ESAPI_Execute(HSTMT hstmt) {
+RETCODE SQL_API API_Execute(HSTMT hstmt) {
     if (hstmt == NULL)
         return SQL_ERROR;
 
