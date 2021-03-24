@@ -54,7 +54,7 @@
 //                                          {L"DestCityName", SQL_WVARCHAR}};
 const std::wstring table_name = L"ODBCTest.IoT";
 //const std::wstring multi_type_data_set = L"kibana_sample_data_types";
-//const std::wstring single_col = L"Origin";
+const std::wstring single_col = L"time";
 //// TODO (#110): Improve sample data result checks
 //const std::wstring m_expected_origin_column_data_1 =
 //    L"Frankfurt am Main Airport";
@@ -106,18 +106,18 @@ const std::wstring table_name = L"ODBCTest.IoT";
 //const SQLSMALLINT single_col_nullable = 2;
 const std::wstring single_row = L"1";
 //const size_t multi_row_cnt = 25;
-//const size_t single_row_cnt = 1;
-//const size_t multi_col_cnt = 25;
-//const size_t single_col_cnt = 1;
+const size_t single_row_cnt = 1;
+const size_t multi_col_cnt = 5;
+const size_t single_col_cnt = 1;
 //const size_t single_row_rd_cnt = 1;
 //const size_t multi_row_rd_cnt_aligned = 5;
 //const size_t multi_row_rd_cnt_misaligned = 3;
-//const std::wstring multi_col = L"*";
+const std::wstring multi_col = L"null, 1, VARCHAR '2', DOUBLE '3.3', true";
 //const std::wstring multi_row = std::to_wstring(multi_row_cnt);
-//typedef struct Col {
-//    SQLLEN data_len;
-//    SQLCHAR data_dat[255];
-//} Col;
+typedef struct Col {
+    SQLLEN data_len;
+    SQLCHAR data_dat[255];
+} Col;
 
 //template < class T >
 //void CheckData(const std::wstring& type_name, const std::wstring& data_set,
@@ -146,17 +146,17 @@ const std::wstring single_row = L"1";
 //    return std::abs(a - b) <= epsil;
 //}
 
-//inline void BindColumns(std::vector< std::vector< Col > >& cols,
-//                        SQLHSTMT* hstmt) {
-//    SQLRETURN ret;
-//    for (size_t i = 0; i < cols.size(); i++) {
-//        ret = SQLBindCol(*hstmt, (SQLUSMALLINT)i + 1, SQL_C_CHAR,
-//                         (SQLPOINTER)&cols[i][0].data_dat[i], 255,
-//                         &cols[i][0].data_len);
-//        LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
-//        ASSERT_TRUE(SQL_SUCCEEDED(ret));
-//    }
-//}
+inline void BindColumns(std::vector< std::vector< Col > >& cols,
+                        SQLHSTMT* hstmt) {
+    SQLRETURN ret;
+    for (size_t i = 0; i < cols.size(); i++) {
+        ret = SQLBindCol(*hstmt, (SQLUSMALLINT)i + 1, SQL_C_CHAR,
+                         (SQLPOINTER)&cols[i][0].data_dat[i], 255,
+                         &cols[i][0].data_len);
+        LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
+        ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    }
+}
 
 void ExecuteQuery(const std::wstring& column,
                          const std::wstring& table, const std::wstring& count,
@@ -204,25 +204,23 @@ void ExecuteQuery(const std::wstring& column,
 //    EXPECT_EQ(exp_row_cnt, read_cnt);
 //}
 
-//inline void QueryBind(const size_t row_cnt, const size_t col_cnt,
-//                      const size_t row_fetch_cnt,
-//                      const std::wstring& column_name,
-//                      std::vector< std::vector< Col > >& cols,
-//                      SQLHSTMT* hstmt) {
-//    (void)col_cnt;
-//    SQLRETURN ret =
-//        SQLSetStmtAttr(*hstmt, SQL_ROWSET_SIZE, (void*)row_fetch_cnt, 0);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
-//    ASSERT_EQ(ret, SQL_SUCCESS);
-//
-//    std::wstring row_str = std::to_wstring(row_cnt);
-//    ExecuteQuery(column_name, flight_data_set, row_str, hstmt);
-//
-//    for (size_t i = 0; i < cols.size(); i++) {
-//        cols[i].resize(row_fetch_cnt);
-//    }
-//    BindColumns(cols, hstmt);
-//}
+inline void QueryBind(const size_t row_cnt, const size_t row_fetch_cnt,
+                      const std::wstring& column_name,
+                      std::vector< std::vector< Col > >& cols,
+                      SQLHSTMT* hstmt) {
+    SQLRETURN ret =
+        SQLSetStmtAttr(*hstmt, SQL_ROWSET_SIZE, (void*)row_fetch_cnt, 0);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
+    ASSERT_EQ(ret, SQL_SUCCESS);
+
+    std::wstring row_str = std::to_wstring(row_cnt);
+    ExecuteQuery(column_name, table_name, row_str, hstmt);
+
+    for (size_t i = 0; i < cols.size(); i++) {
+        cols[i].resize(row_fetch_cnt);
+    }
+    BindColumns(cols, hstmt);
+}
 
 //inline void QueryBindExtendedFetch(const size_t row_cnt, const size_t col_cnt,
 //                                   const size_t row_fetch_cnt,
@@ -455,32 +453,7 @@ auto ConstructIntervalStruct =
 //        }                                                               \
 //    }
 //
-//class TestSQLBindCol : public testing::Test {
-//   public:
-//    TestSQLBindCol() {
-//    }
-//
-//    void SetUp() {
-//        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env,
-//                                       &m_conn, &m_hstmt, true, true));
-//    }
-//
-//    void TearDown() {
-//        ASSERT_NO_THROW(CloseCursor(&m_hstmt, true, true));
-//        SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
-//        SQLDisconnect(m_conn);
-//        SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-//    }
-//
-//    ~TestSQLBindCol() {
-//        // cleanup any pending stuff, but no exceptions allowed
-//    }
-//
-//    SQLHENV m_env = SQL_NULL_HENV;
-//    SQLHDBC m_conn = SQL_NULL_HDBC;
-//    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
-//};
-//
+
 //class TestSQLFetch : public testing::Test {
 //   public:
 //    TestSQLFetch() {
@@ -564,72 +537,119 @@ class TestSQLDescribeCol : public Fixture {};
 
 class TestSQLRowCount : public Fixture {};
 
-//
-//TEST_F(TestSQLBindCol, SingleColumnSingleBind) {
-//    std::vector< std::vector< Col > > cols(single_col_cnt);
-//    QueryBind(single_row_cnt, single_col_cnt, 1, single_col, cols, &m_hstmt);
-//}
-//
-//TEST_F(TestSQLBindCol, MultiColumnMultiBind) {
-//    std::vector< std::vector< Col > > cols(multi_col_cnt);
-//    QueryBind(single_row_cnt, multi_col_cnt, 1, multi_col, cols, &m_hstmt);
-//}
-//
-//// Looked at SQLBindCol - if < requested column are allocated, it will
-//// reallocate additional space for that column
-//TEST_F(TestSQLBindCol, InvalidColIndex0) {
-//    std::vector< std::vector< Col > > cols(single_col_cnt);
-//    SQLRETURN ret = SQLSetStmtAttr(m_hstmt, SQL_ROWSET_SIZE, (void*)1, 0);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-//    ASSERT_EQ(ret, SQL_SUCCESS);
-//
-//    std::wstring row_str = std::to_wstring(single_row_cnt);
-//    ExecuteQuery(single_col, flight_data_set, row_str, &m_hstmt);
-//
-//    for (size_t i = 0; i < cols.size(); i++) {
-//        cols[i].resize(1);
-//    }
-//    ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)1, SQL_C_CHAR,
-//                     (SQLPOINTER)&cols[0][0].data_dat[0], 255,
-//                     &cols[0][0].data_len);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-//    ASSERT_TRUE(SQL_SUCCEEDED(ret));
-//    ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)0, SQL_C_CHAR,
-//                     (SQLPOINTER)&cols[0][0].data_dat[0], 255,
-//                     &cols[0][0].data_len);
-//    EXPECT_FALSE(SQL_SUCCEEDED(ret));
-//}
-//
-//TEST_F(TestSQLBindCol, InsufficientSpace) {
-//    SQLRETURN ret = SQLSetStmtAttr(m_hstmt, SQL_ROWSET_SIZE, (void*)1, 0);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-//    ASSERT_EQ(ret, SQL_SUCCESS);
-//
-//    std::wstring row_str = std::to_wstring(single_row_cnt);
-//    ExecuteQuery(single_col, flight_data_set, row_str, &m_hstmt);
-//
-//    SQLLEN length = 0;
-//    std::vector< SQLTCHAR > data_buffer(2);
-//    ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)1, SQL_C_CHAR,
-//                     (SQLPOINTER)data_buffer.data(), 2, &length);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-//    ASSERT_TRUE(SQL_SUCCEEDED(ret));
-//
-//    SQLULEN row_cnt = 0;
-//    SQLUSMALLINT row_stat = 0;
-//    std::vector< SQLTCHAR > msg_buffer(512);
-//    ret = SQLExtendedFetch(m_hstmt, SQL_FETCH_NEXT, 0, &row_cnt, &row_stat);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret, msg_buffer.data(), 512);
-//    EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
-//    EXPECT_STREQ(msg_buffer.data(), L"Fetched item was truncated.");
-//    // TODO (#110): Improve sample data result checks
-//    const wchar_t* data =
-//        reinterpret_cast< const wchar_t* >(data_buffer.data());
-//    bool found_expected_data =
-//        wcscmp(data, m_expected_origin_column_data_1.substr(0, 1).c_str())
-//        || wcscmp(data, m_expected_origin_column_data_2.substr(0, 1).c_str());
-//    EXPECT_TRUE(found_expected_data);
-//}
+class TestSQLBindCol : public Fixture {};
+
+TEST_F(TestSQLBindCol, SingleColumnSingleBind) {
+    std::vector< std::vector< Col > > cols(single_col_cnt);
+    QueryBind(single_row_cnt, 1, single_col, cols, &m_hstmt);
+}
+
+TEST_F(TestSQLBindCol, MultiColumnMultiBind) {
+    std::vector< std::vector< Col > > cols(multi_col_cnt);
+    QueryBind(single_row_cnt, 1, multi_col, cols, &m_hstmt);
+}
+
+// Looked at SQLBindCol - if < requested column are allocated, it will
+// reallocate additional space for that column
+TEST_F(TestSQLBindCol, InvalidColIndex0) {
+    std::vector< std::vector< Col > > cols(single_col_cnt);
+    SQLRETURN ret = SQLSetStmtAttr(m_hstmt, SQL_ROWSET_SIZE, (void*)1, 0);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    ASSERT_EQ(ret, SQL_SUCCESS);
+
+    std::wstring row_str = std::to_wstring(single_row_cnt);
+    ExecuteQuery(single_col, table_name, row_str, &m_hstmt);
+
+    for (size_t i = 0; i < cols.size(); i++) {
+        cols[i].resize(1);
+    }
+    ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)1, SQL_C_CHAR,
+                     (SQLPOINTER)&cols[0][0].data_dat[0], 255,
+                     &cols[0][0].data_len);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)0, SQL_C_CHAR,
+                     (SQLPOINTER)&cols[0][0].data_dat[0], 255,
+                     &cols[0][0].data_len);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
+}
+
+TEST_F(TestSQLBindCol, InvalidColIndex2) {
+    std::vector< std::vector< Col > > cols(2);
+    SQLRETURN ret = SQLSetStmtAttr(m_hstmt, SQL_ROWSET_SIZE, (void*)1, 0);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    ASSERT_EQ(ret, SQL_SUCCESS);
+
+    std::wstring row_str = std::to_wstring(single_row_cnt);
+    ExecuteQuery(single_col, table_name, row_str, &m_hstmt);
+
+    for (size_t i = 0; i < cols.size(); i++) {
+        cols[i].resize(1);
+    }
+    ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)1, SQL_C_CHAR,
+                     (SQLPOINTER)&cols[0][0].data_dat[0], 255,
+                     &cols[0][0].data_len);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)2, SQL_C_CHAR,
+                     (SQLPOINTER)&cols[1][0].data_dat[0], 255,
+                     &cols[1][0].data_len);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_INVALID_DESCRIPTOR_INDEX));
+}
+
+TEST_F(TestSQLBindCol, InvalidBufferLength) {
+    std::vector< std::vector< Col > > cols(single_col_cnt);
+    SQLRETURN ret = SQLSetStmtAttr(m_hstmt, SQL_ROWSET_SIZE, (void*)1, 0);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    ASSERT_EQ(ret, SQL_SUCCESS);
+
+    std::wstring row_str = std::to_wstring(single_row_cnt);
+    ExecuteQuery(single_col, table_name, row_str, &m_hstmt);
+
+    for (size_t i = 0; i < cols.size(); i++) {
+        cols[i].resize(1);
+    }
+    ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)1, SQL_C_CHAR,
+                     (SQLPOINTER)&cols[0][0].data_dat[0], -1,
+                     &cols[0][0].data_len);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_INVALID_STRING_OR_BUFFER_LENGTH));
+}
+
+TEST_F(TestSQLBindCol, InsufficientSpace) {
+    SQLRETURN ret = SQLSetStmtAttr(m_hstmt, SQL_ROWSET_SIZE, (void*)1, 0);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    ASSERT_EQ(ret, SQL_SUCCESS);
+
+    std::wstring row_str = std::to_wstring(single_row_cnt);
+    std::wstring col = L"VARCHAR '12345'";
+    ExecuteQuery(col, table_name, row_str, &m_hstmt);
+
+    SQLLEN length = 0;
+    std::vector< SQLTCHAR > data_buffer(2);
+    ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)1, SQL_C_CHAR,
+                     (SQLPOINTER)data_buffer.data(), 2, &length);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+
+    SQLULEN row_cnt = 0;
+    SQLUSMALLINT row_stat = 0;
+    std::vector< SQLTCHAR > msg_buffer(512);
+    ret = SQLExtendedFetch(m_hstmt, SQL_FETCH_NEXT, 0, &row_cnt, &row_stat);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret, msg_buffer.data(), 512);
+    EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+    EXPECT_STREQ(msg_buffer.data(), L"Fetched item was truncated.");
+    const wchar_t* data =
+        reinterpret_cast< const wchar_t* >(data_buffer.data());
+    bool found_expected_data = wcscmp(data, col.substr(0, 1).c_str());
+    EXPECT_TRUE(found_expected_data);
+}
 //
 //TEST_F(TestSQLFetch, SingleCol_SingleRow) {
 //    EXPECT_NO_THROW(
