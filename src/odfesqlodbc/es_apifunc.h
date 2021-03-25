@@ -220,7 +220,7 @@ RETCODE SQL_API ESAPI_SetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
 RETCODE SQL_API ESAPI_AllocDesc(HDBC ConnectionHandle,
                                 SQLHDESC *DescriptorHandle);
 RETCODE SQL_API ESAPI_FreeDesc(SQLHDESC DescriptorHandle);
-RETCODE SQL_API ESAPI_CopyDesc(SQLHDESC SourceDescHandle,
+RETCODE SQL_API API_CopyDesc(SQLHDESC SourceDescHandle,
                                SQLHDESC TargetDescHandle);
 RETCODE SQL_API ESAPI_SetDescField(SQLHDESC DescriptorHandle,
                                    SQLSMALLINT RecNumber,

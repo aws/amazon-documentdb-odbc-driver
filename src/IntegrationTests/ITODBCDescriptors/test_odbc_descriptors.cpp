@@ -53,57 +53,260 @@ class Fixture : public testing::Test {
     SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
 };
 
-//class TestSQLCopyDesc : public testing::Test {
-//   public:
-//    TestSQLCopyDesc() {
-//    }
-//
-//    void SetUp() {
-//        AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env, &m_conn,
-//                       &m_hstmt, true, true);
-//        SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &m_hstmt_copy);
-//    }
-//
-//    void TearDown() {
-//        SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
-//        SQLDisconnect(m_conn);
-//        SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-//    }
-//
-//    ~TestSQLCopyDesc() {
-//        // cleanup any pending stuff, but no exceptions allowed
-//    }
-//
-//    SQLHENV m_env = SQL_NULL_HENV;
-//    SQLHDBC m_conn = SQL_NULL_HDBC;
-//    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
-//    SQLHSTMT m_hstmt_copy = SQL_NULL_HSTMT;
-//    SQLHDESC m_ard_hdesc = SQL_NULL_HDESC;
-//    SQLHDESC m_ard_hdesc_copy = SQL_NULL_HDESC;
-//    SQLHDESC m_ird_hdesc_copy = SQL_NULL_HDESC;
-//};
-//
-//TEST_F(TestSQLCopyDesc, TestCopyArdToArd) {
-//    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
-//
-//    SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_ROW_DESC, &m_ard_hdesc, 0, NULL);
-//    SQLGetStmtAttr(m_hstmt_copy, SQL_ATTR_APP_ROW_DESC, &m_ard_hdesc_copy, 0,
-//                   NULL);
-//
-//    EXPECT_EQ(SQL_SUCCESS, SQLCopyDesc(m_ard_hdesc, m_ard_hdesc_copy));
-//}
-//
-//TEST_F(TestSQLCopyDesc, TestNotCopyArdToIrd) {
-//    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
-//
-//    SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_ROW_DESC, &m_ard_hdesc, 0, NULL);
-//    SQLGetStmtAttr(m_hstmt_copy, SQL_ATTR_IMP_ROW_DESC, &m_ird_hdesc_copy, 0,
-//                   NULL);
-//
-//    EXPECT_EQ(SQL_ERROR, SQLCopyDesc(m_ard_hdesc, m_ird_hdesc_copy));
-//    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, m_ird_hdesc_copy,
-//                              SQLSTATE_GENERAL_ERROR, true));
-//}
+class TestSQLSetDescRec : public Fixture {};
+
+class TestSQLGetDescRec : public Fixture {};
+
+class TestSQLCopyDesc : public Fixture {};
+
+TEST_F(TestSQLCopyDesc, ARD_TO_ARD) {
+    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
+    SQLHDESC ard = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_ROW_DESC, &ard, 0, NULL)));
+    SQLHSTMT another_stmt = SQL_NULL_HSTMT;
+    ASSERT_TRUE(
+        SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &another_stmt)));
+    SQLHDESC copy = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(another_stmt, SQL_ATTR_APP_ROW_DESC, &copy, 0, NULL)));
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLCopyDesc(ard, copy)));
+    SQLSMALLINT left;
+    SQLINTEGER left_indicator;
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLGetDescField(copy, SQL_ATTR_APP_ROW_DESC,
+                                              SQL_DESC_COUNT, &left, 0,
+                                              &left_indicator)));
+    SQLSMALLINT right;
+    SQLINTEGER right_indicator;
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLGetDescField(copy, SQL_ATTR_APP_ROW_DESC,
+                                              SQL_DESC_COUNT, &right, 0,
+                                              &right_indicator)));
+    EXPECT_EQ(left, right);
+    EXPECT_EQ(left_indicator, right_indicator);
+}
+
+TEST_F(TestSQLCopyDesc, ARD_TO_APD) {
+    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
+    SQLHDESC ard = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_ROW_DESC, &ard, 0, NULL)));
+    SQLHSTMT another_stmt = SQL_NULL_HSTMT;
+    ASSERT_TRUE(
+        SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &another_stmt)));
+    SQLHDESC copy = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(another_stmt, SQL_ATTR_APP_PARAM_DESC, &copy, 0, NULL)));
+    EXPECT_EQ(SQL_ERROR, SQLCopyDesc(ard, copy));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_GENERAL_ERROR));
+}
+
+TEST_F(TestSQLCopyDesc, ARD_TO_IPD) {
+    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
+    SQLHDESC ard = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_ROW_DESC, &ard, 0, NULL)));
+    SQLHSTMT another_stmt = SQL_NULL_HSTMT;
+    ASSERT_TRUE(
+        SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &another_stmt)));
+    SQLHDESC copy = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(another_stmt, SQL_ATTR_IMP_PARAM_DESC, &copy, 0, NULL)));
+    EXPECT_EQ(SQL_ERROR, SQLCopyDesc(ard, copy));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_GENERAL_ERROR));
+}
+
+TEST_F(TestSQLCopyDesc, ARD_TO_IRD) {
+    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
+    SQLHDESC ard = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_ROW_DESC, &ard, 0, NULL)));
+    SQLHSTMT another_stmt = SQL_NULL_HSTMT;
+    ASSERT_TRUE(
+        SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &another_stmt)));
+    SQLHDESC copy = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(another_stmt, SQL_ATTR_IMP_ROW_DESC, &copy, 0, NULL)));
+    EXPECT_EQ(SQL_ERROR, SQLCopyDesc(ard, copy));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_CANNOT_MODIFY_IRD));
+}
+
+TEST_F(TestSQLCopyDesc, IRD_TO_IRD) {
+    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
+    SQLHDESC ard = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(m_hstmt, SQL_ATTR_IMP_ROW_DESC, &ard, 0, NULL)));
+    SQLHSTMT another_stmt = SQL_NULL_HSTMT;
+    ASSERT_TRUE(
+        SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &another_stmt)));
+    SQLHDESC copy = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(another_stmt, SQL_ATTR_IMP_ROW_DESC, &copy, 0, NULL)));
+    EXPECT_EQ(SQL_ERROR, SQLCopyDesc(ard, copy));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_CANNOT_MODIFY_IRD));
+}
+
+TEST_F(TestSQLCopyDesc, IRD_TO_ARD) {
+    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
+    SQLHDESC ard = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(m_hstmt, SQL_ATTR_IMP_ROW_DESC, &ard, 0, NULL)));
+    SQLHSTMT another_stmt = SQL_NULL_HSTMT;
+    ASSERT_TRUE(
+        SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &another_stmt)));
+    SQLHDESC copy = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(another_stmt, SQL_ATTR_APP_ROW_DESC, &copy, 0, NULL)));
+    EXPECT_EQ(SQL_ERROR, SQLCopyDesc(ard, copy));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_GENERAL_ERROR));
+}
+
+TEST_F(TestSQLCopyDesc, IRD_TO_APD) {
+    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
+    SQLHDESC ard = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(m_hstmt, SQL_ATTR_IMP_ROW_DESC, &ard, 0, NULL)));
+    SQLHSTMT another_stmt = SQL_NULL_HSTMT;
+    ASSERT_TRUE(
+        SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &another_stmt)));
+    SQLHDESC copy = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(another_stmt, SQL_ATTR_APP_PARAM_DESC, &copy, 0, NULL)));
+    EXPECT_EQ(SQL_ERROR, SQLCopyDesc(ard, copy));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_GENERAL_ERROR));
+}
+
+TEST_F(TestSQLCopyDesc, IRD_TO_IPD) {
+    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
+    SQLHDESC ard = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(m_hstmt, SQL_ATTR_IMP_ROW_DESC, &ard, 0, NULL)));
+    SQLHSTMT another_stmt = SQL_NULL_HSTMT;
+    ASSERT_TRUE(
+        SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &another_stmt)));
+    SQLHDESC copy = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(another_stmt, SQL_ATTR_IMP_PARAM_DESC, &copy, 0, NULL)));
+    EXPECT_EQ(SQL_ERROR, SQLCopyDesc(ard, copy));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_GENERAL_ERROR));
+}
+
+TEST_F(TestSQLCopyDesc, APD_TO_APD) {
+    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
+    SQLHDESC ard = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_PARAM_DESC, &ard, 0, NULL)));
+    SQLHSTMT another_stmt = SQL_NULL_HSTMT;
+    ASSERT_TRUE(
+        SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &another_stmt)));
+    SQLHDESC copy = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(another_stmt, SQL_ATTR_APP_PARAM_DESC, &copy, 0, NULL)));
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLCopyDesc(ard, copy)));
+}
+
+TEST_F(TestSQLCopyDesc, APD_TO_ARD) {
+    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
+    SQLHDESC ard = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_PARAM_DESC, &ard, 0, NULL)));
+    SQLHSTMT another_stmt = SQL_NULL_HSTMT;
+    ASSERT_TRUE(
+        SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &another_stmt)));
+    SQLHDESC copy = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(another_stmt, SQL_ATTR_APP_ROW_DESC, &copy, 0, NULL)));
+    EXPECT_EQ(SQL_ERROR, SQLCopyDesc(ard, copy));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_GENERAL_ERROR));
+}
+
+TEST_F(TestSQLCopyDesc, APD_TO_IPD) {
+    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
+    SQLHDESC ard = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_PARAM_DESC, &ard, 0, NULL)));
+    SQLHSTMT another_stmt = SQL_NULL_HSTMT;
+    ASSERT_TRUE(
+        SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &another_stmt)));
+    SQLHDESC copy = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(another_stmt, SQL_ATTR_IMP_PARAM_DESC, &copy, 0, NULL)));
+    EXPECT_EQ(SQL_ERROR, SQLCopyDesc(ard, copy));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_GENERAL_ERROR));
+}
+
+TEST_F(TestSQLCopyDesc, APD_TO_IRD) {
+    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
+    SQLHDESC ard = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_ROW_DESC, &ard, 0, NULL)));
+    SQLHSTMT another_stmt = SQL_NULL_HSTMT;
+    ASSERT_TRUE(
+        SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &another_stmt)));
+    SQLHDESC copy = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(another_stmt, SQL_ATTR_IMP_ROW_DESC, &copy, 0, NULL)));
+    EXPECT_EQ(SQL_ERROR, SQLCopyDesc(ard, copy));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_CANNOT_MODIFY_IRD));
+}
+
+TEST_F(TestSQLCopyDesc, IPD_TO_IPD) {
+    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
+    SQLHDESC ard = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(m_hstmt, SQL_ATTR_IMP_PARAM_DESC, &ard, 0, NULL)));
+    SQLHSTMT another_stmt = SQL_NULL_HSTMT;
+    ASSERT_TRUE(
+        SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &another_stmt)));
+    SQLHDESC copy = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(another_stmt, SQL_ATTR_IMP_PARAM_DESC, &copy, 0, NULL)));
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLCopyDesc(ard, copy)));
+}
+
+TEST_F(TestSQLCopyDesc, IPD_TO_ARD) {
+    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
+    SQLHDESC ard = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(m_hstmt, SQL_ATTR_IMP_PARAM_DESC, &ard, 0, NULL)));
+    SQLHSTMT another_stmt = SQL_NULL_HSTMT;
+    ASSERT_TRUE(
+        SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &another_stmt)));
+    SQLHDESC copy = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(another_stmt, SQL_ATTR_APP_ROW_DESC, &copy, 0, NULL)));
+    EXPECT_EQ(SQL_ERROR, SQLCopyDesc(ard, copy));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_GENERAL_ERROR));
+}
+
+TEST_F(TestSQLCopyDesc, IPD_TO_ARP) {
+    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
+    SQLHDESC ard = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(m_hstmt, SQL_ATTR_IMP_PARAM_DESC, &ard, 0, NULL)));
+    SQLHSTMT another_stmt = SQL_NULL_HSTMT;
+    ASSERT_TRUE(
+        SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &another_stmt)));
+    SQLHDESC copy = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(another_stmt, SQL_ATTR_APP_ROW_DESC, &copy, 0, NULL)));
+    EXPECT_EQ(SQL_ERROR, SQLCopyDesc(ard, copy));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_GENERAL_ERROR));
+}
+
+TEST_F(TestSQLCopyDesc, IPD_TO_IRD) {
+    ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt), &m_hstmt);
+    SQLHDESC ard = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(m_hstmt, SQL_ATTR_IMP_PARAM_DESC, &ard, 0, NULL)));
+    SQLHSTMT another_stmt = SQL_NULL_HSTMT;
+    ASSERT_TRUE(
+        SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &another_stmt)));
+    SQLHDESC copy = SQL_NULL_HDESC;
+    ASSERT_TRUE(SQL_SUCCEEDED(
+        SQLGetStmtAttr(another_stmt, SQL_ATTR_IMP_ROW_DESC, &copy, 0, NULL)));
+    EXPECT_EQ(SQL_ERROR, SQLCopyDesc(ard, copy));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_CANNOT_MODIFY_IRD));
+}
 
 class TestSQLSetDescField : public testing::Test {
    public:
@@ -582,10 +785,6 @@ TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_TYPE, SQL_DESC_TYPE, 255, 1,
 TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_TYPE_NAME, SQL_DESC_TYPE_NAME, 255, 1,
                         SQLCHAR m_value_ptr[255];
                         , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
-
-class TestSQLSetDescRec : public Fixture {};
-
-class TestSQLGetDescRec : public Fixture {};
 
 TEST_F(TestSQLSetDescRec, APP_PARAM_SET) {
     SQLHDESC hdesc;
