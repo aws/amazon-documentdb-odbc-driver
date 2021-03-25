@@ -383,7 +383,7 @@ static void IPDFields_copy(const IPDFields *src, IPDFields *target) {
     }
 }
 
-RETCODE SQL_API ESAPI_CopyDesc(SQLHDESC SourceDescHandle,
+RETCODE SQL_API API_CopyDesc(SQLHDESC SourceDescHandle,
                                SQLHDESC TargetDescHandle) {
     RETCODE ret = SQL_ERROR;
     DescriptorClass *src, *target;
@@ -407,7 +407,7 @@ RETCODE SQL_API ESAPI_CopyDesc(SQLHDESC SourceDescHandle,
               targethd->desc_type);
         if (SQL_ATTR_IMP_ROW_DESC == targethd->desc_type) {
             MYLOG(LOG_DEBUG, "can't modify IRD\n");
-            DC_set_error(target, DESC_EXEC_ERROR, "can't copy to IRD");
+            DC_set_error(target, DESC_CANNOT_MODIFY_IRD, "can't copy to IRD");
             return ret;
         } else if (targethd->desc_type != srchd->desc_type) {
             if (targethd->embedded) {
@@ -535,6 +535,7 @@ static const struct {
         {DESC_OPTION_NOT_FOR_THE_DRIVER, "HYC00", "HYC00"},
         {DESC_FETCH_OUT_OF_RANGE, "HY106", "S1106"},
         {DESC_COUNT_FIELD_INCORRECT, "07002", "07002"},
+        {DESC_CANNOT_MODIFY_IRD, "HY016", "HY016"}
 };
 
 static ES_ErrorInfo *DC_create_errorinfo(const DescriptorClass *self) {
