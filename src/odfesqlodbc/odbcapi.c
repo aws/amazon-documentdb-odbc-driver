@@ -301,7 +301,7 @@ RETCODE SQL_API SQLExecute(HSTMT StatementHandle) {
     SC_clear_error(stmt);
     RETCODE ret = SQL_ERROR;
     if (!SC_opencheck(stmt, "SQLExecute"))
-        ret = ESAPI_Execute(StatementHandle);
+        ret = API_Execute(StatementHandle);
 
     // Exit critical
     LEAVE_STMT_CS(stmt);
