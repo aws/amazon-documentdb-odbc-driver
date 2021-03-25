@@ -1306,16 +1306,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                 std_time.ss = 0;
             }
             if (strnicmp(value, "invalid", 7) != 0) {
-                BOOL bZone = field_type != TS_TYPE_TIMESTAMP_NO_TMZONE;
-                int zone;
-
-                /*
-                 * sscanf(value, "%4d-%2d-%2d %2d:%2d:%2d", &std_time.y,
-                 * &std_time.m, &std_time.d, &std_time.hh, &std_time.mm,
-                 * &std_time.ss);
-                 */
-                bZone = FALSE; /* time zone stuff is unreliable */
-                timestamp2stime(value, &std_time, &bZone, &zone);
+                char2stime(value, &std_time, &result, fCType);
                 MYLOG(LOG_ALL, "2stime fr=%d\n", std_time.fr);
             } else {
                 /*
