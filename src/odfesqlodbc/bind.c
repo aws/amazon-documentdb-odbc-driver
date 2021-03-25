@@ -29,11 +29,11 @@
 #include "statement.h"
 
 /*	Associate a user-supplied buffer with a database column. */
-RETCODE SQL_API ESAPI_BindCol(HSTMT hstmt, SQLUSMALLINT icol,
+RETCODE SQL_API API_BindCol(HSTMT hstmt, SQLUSMALLINT icol,
                               SQLSMALLINT fCType, PTR rgbValue,
                               SQLLEN cbValueMax, SQLLEN *pcbValue) {
     StatementClass *stmt = (StatementClass *)hstmt;
-    CSTR func = "ESAPI_BindCol";
+    CSTR func = "API_BindCol";
     ARDFields *opts;
     GetDataInfo *gdata_info;
     BindInfoClass *bookmark;
@@ -82,7 +82,7 @@ RETCODE SQL_API ESAPI_BindCol(HSTMT hstmt, SQLUSMALLINT icol,
                 case SQL_C_VARBOOKMARK:
                     break;
                 default:
-                    SC_set_error(stmt, STMT_PROGRAM_TYPE_OUT_OF_RANGE,
+                    SC_set_error(stmt, STMT_RESTRICTED_DATA_TYPE_ERROR,
                                  "Bind column 0 is not of type SQL_C_BOOKMARK",
                                  func);
                     MYLOG(
@@ -102,6 +102,16 @@ RETCODE SQL_API ESAPI_BindCol(HSTMT hstmt, SQLUSMALLINT icol,
         goto cleanup;
     }
 
+    QResultClass *res;
+    UInt2 num_cols;
+    res = SC_get_Curres(stmt);
+    num_cols = QR_NumPublicResultCols(res);
+    if (icol > num_cols) {
+        SC_set_error(stmt, STMT_INVALID_COLUMN_NUMBER_ERROR,
+                     "Invalid column number in BindCol.", func);
+        ret = SQL_ERROR;
+        goto cleanup;
+    }
     /*
      * Allocate enough bindings if not already done. Most likely,
      * execution of a statement would have setup the necessary bindings.

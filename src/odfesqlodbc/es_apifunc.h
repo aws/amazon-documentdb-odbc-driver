@@ -44,7 +44,7 @@ RETCODE SQL_API ESAPI_AllocConnect(HENV EnvironmentHandle,
 RETCODE SQL_API ESAPI_AllocEnv(HENV *EnvironmentHandle);
 RETCODE SQL_API ESAPI_AllocStmt(HDBC ConnectionHandle, HSTMT *StatementHandle,
                                 UDWORD flag);
-RETCODE SQL_API ESAPI_BindCol(HSTMT StatementHandle, SQLUSMALLINT ColumnNumber,
+RETCODE SQL_API API_BindCol(HSTMT StatementHandle, SQLUSMALLINT ColumnNumber,
                               SQLSMALLINT TargetType, PTR TargetValue,
                               SQLLEN BufferLength, SQLLEN *StrLen_or_Ind);
 RETCODE SQL_API API_Connect(HDBC ConnectionHandle, const SQLCHAR *ServerName,
@@ -79,7 +79,7 @@ RETCODE SQL_API ESAPI_StmtError(HSTMT StatementHandle, SQLSMALLINT RecNumber,
 RETCODE SQL_API ESAPI_ExecDirect(HSTMT StatementHandle,
                                  const SQLCHAR *StatementText,
                                  SQLINTEGER TextLength, BOOL commit);
-RETCODE SQL_API ESAPI_Execute(HSTMT StatementHandle);
+RETCODE SQL_API API_Execute(HSTMT StatementHandle);
 RETCODE SQL_API ESAPI_Fetch(HSTMT StatementHandle);
 RETCODE SQL_API ESAPI_FreeConnect(HDBC ConnectionHandle);
 RETCODE SQL_API ESAPI_FreeEnv(HENV EnvironmentHandle);
