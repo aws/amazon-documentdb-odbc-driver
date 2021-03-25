@@ -48,9 +48,15 @@ RETCODE SQL_API SQLBindCol(HSTMT StatementHandle, SQLUSMALLINT ColumnNumber,
     StatementClass *stmt = (StatementClass *)StatementHandle;
 
     MYLOG(LOG_TRACE, "entering\n");
+    if (BufferLength < 0) {
+        SC_set_error(stmt, STMT_INVALID_STRING_OR_BUFFER_LENGTH_ERROR,
+                     "Invalid string or buffer length", __FUNCTION__);
+        return SQL_ERROR;
+    }
+
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
-    ret = ESAPI_BindCol(StatementHandle, ColumnNumber, TargetType, TargetValue,
+    ret = API_BindCol(StatementHandle, ColumnNumber, TargetType, TargetValue,
                         BufferLength, StrLen_or_Ind);
     LEAVE_STMT_CS(stmt);
     return ret;
@@ -295,7 +301,7 @@ RETCODE SQL_API SQLExecute(HSTMT StatementHandle) {
     SC_clear_error(stmt);
     RETCODE ret = SQL_ERROR;
     if (!SC_opencheck(stmt, "SQLExecute"))
-        ret = ESAPI_Execute(StatementHandle);
+        ret = API_Execute(StatementHandle);
 
     // Exit critical
     LEAVE_STMT_CS(stmt);

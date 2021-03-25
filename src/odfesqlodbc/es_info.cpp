@@ -135,7 +135,7 @@ class BindTemplate {
     }
 
     void BindColumn(StatementClass *stmt) {
-        RETCODE err = ESAPI_BindCol(stmt, m_ordinal, GetType(),
+        RETCODE err = API_BindCol(stmt, m_ordinal, GetType(),
                                     GetDataForBind(), GetSize(), &m_len);
         if (!SQL_SUCCEEDED(err)) {
             std::string error_msg =

@@ -29,35 +29,6 @@
 #include <thread>
 #include <chrono>
 // clang-format on
-/*
-class TestSQLExecute : public testing::Test {
-   public:
-    TestSQLExecute() {
-    }
-
-    void SetUp() {
-        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env,
-                                       &m_conn, &m_hstmt, true, true));
-    }
-
-    void TearDown() {
-        CloseCursor(&m_hstmt, true, true);
-        SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
-        SQLDisconnect(m_conn);
-        SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-    }
-
-    ~TestSQLExecute() {
-        // cleanup any pending stuff, but no exceptions allowed
-    }
-
-    std::wstring m_query =
-        L"SELECT Origin FROM kibana_sample_data_flights LIMIT 5";
-    SQLHENV m_env = SQL_NULL_HENV;
-    SQLHDBC m_conn = SQL_NULL_HDBC;
-    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
-};
-*/
 class Fixture : public testing::Test {
    public:
     void SetUp() {
@@ -76,6 +47,8 @@ class Fixture : public testing::Test {
 };
 
 class TestSQLFetch : public Fixture {};
+
+class TestSQLExecute : public Fixture {};
 
 class TestSQLExecDirect : public Fixture {};
 
@@ -181,34 +154,103 @@ class TestSQLCancel : public testing::Test {
     SQLHDBC m_conn = SQL_NULL_HDBC;
     SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
 };
-
-TEST_F(TestSQLExecute, NoPrepareCallError) {
+*/
+TEST_F(TestSQLExecute, NO_SQLPREPARE) {
     SQLRETURN ret = SQLExecute(m_hstmt);
     EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_SEQUENCE_ERROR));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestSQLExecute, Success) {
-    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)m_query.c_str(), SQL_NTS);
+TEST_F(TestSQLExecute, BASIC) {
+    std::wstring query = L"SELECT 12345 FROM ODBCTest.IoT LIMIT 5";
+    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-    ASSERT_EQ(SQL_SUCCESS, ret);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
     ret = SQLExecute(m_hstmt);
-    EXPECT_EQ(SQL_SUCCESS, ret);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    int cnt = 0;
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            cnt++;
+        }
+        SQLINTEGER data = 0;
+        SQLLEN indicator = 0;
+        ret = SQLGetData(m_hstmt, 1, SQL_C_SLONG, &data, 0, &indicator);
+        EXPECT_TRUE(SQL_SUCCEEDED(ret));
+        EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
+        EXPECT_EQ(12345, data);
+    }
+    EXPECT_EQ(5, cnt);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestSQLExecute, ResetPrepareError) {
-    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)m_query.c_str(), SQL_NTS);
+TEST_F(TestSQLExecute, DOUBLE_EXECUTE) {
+    std::wstring query = L"SELECT 12345 FROM ODBCTest.IoT LIMIT 5";
+    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-    ASSERT_EQ(SQL_SUCCESS, ret);
-    ret = SQLPrepare(m_hstmt, NULL, SQL_NTS);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-    ASSERT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    ret = SQLExecute(m_hstmt);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    int cnt = 0;
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            cnt++;
+        }
+        SQLINTEGER data = 0;
+        SQLLEN indicator = 0;
+        ret = SQLGetData(m_hstmt, 1, SQL_C_SLONG, &data, 0, &indicator);
+        EXPECT_TRUE(SQL_SUCCEEDED(ret));
+        EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
+        EXPECT_EQ(12345, data);
+    }
+    EXPECT_EQ(5, cnt);
+    // Second trial
     ret = SQLExecute(m_hstmt);
     EXPECT_EQ(SQL_ERROR, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
-*/
+
+TEST_F(TestSQLExecute, UPDATE_PREPARE) {
+    std::wstring query = L"SELECT 12345 FROM ODBCTest.IoT LIMIT 5";
+    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    query = L"SELECT 34567 FROM ODBCTest.IoT LIMIT 3";
+    ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    ret = SQLExecute(m_hstmt);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    int cnt = 0;
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            cnt++;
+        }
+        SQLINTEGER data = 0;
+        SQLLEN indicator = 0;
+        ret = SQLGetData(m_hstmt, 1, SQL_C_SLONG, &data, 0, &indicator);
+        EXPECT_TRUE(SQL_SUCCEEDED(ret));
+        EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
+        EXPECT_EQ(34567, data);
+    }
+    EXPECT_EQ(3, cnt);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLExecute, CLEAR_PREPARE) {
+    std::wstring query = L"SELECT 1 FROM ODBCTest.IoT LIMIT 1";
+    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    ret = SQLPrepare(m_hstmt, NULL, SQL_NTS);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    EXPECT_EQ(SQL_ERROR, ret);
+    ret = SQLExecute(m_hstmt);
+    EXPECT_EQ(SQL_ERROR, ret);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
 TEST_F(TestSQLPrepare, SUCCESS_NO_PARAM) {
     std::wstring query = L"SELECT 1 FROM ODBCTest.IoT LIMIT 1";
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
@@ -251,7 +293,8 @@ TEST_F(TestSQLDescribeParam, DESCRIBE_PARAM) {
     SQLSMALLINT nullable;
     ret = SQLDescribeParam(m_hstmt, 1, &sqlType, &paramDef, &scale, &nullable);
     EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_COLUMN_ERROR));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_INVALID_DESCRIPTOR_INDEX));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
