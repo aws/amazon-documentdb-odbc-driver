@@ -56,6 +56,7 @@ RETCODE SQL_API API_Prepare(HSTMT hstmt, const SQLCHAR *stmt_str,
 }
 
 RETCODE SQL_API API_Execute(HSTMT hstmt) {
+    CSTR func = "API_Execute";
     if (hstmt == NULL)
         return SQL_ERROR;
 
@@ -77,6 +78,7 @@ RETCODE SQL_API API_Execute(HSTMT hstmt) {
             stmt->prepared = EXECUTED;
             break;
         case NOT_PREPARED:
+            SC_set_error(stmt, STMT_SEQUENCE_ERROR, "No prepared statement", func);
             ret = SQL_ERROR;
             break;
         default:
