@@ -2310,23 +2310,33 @@ TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_DATE) {
     EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
     DATE_STRUCT ds1{2021, 1, 2};
     CompareDateStruct(ds1, data);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
     ret = SQLGetData(m_hstmt, 2, SQL_C_DATE, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
     DATE_STRUCT ds{2021, 11, 20};
     CompareDateStruct(ds, data);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
     ret = SQLGetData(m_hstmt, 3, SQL_C_DATE, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
     CompareDateStruct(ds, data);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
     ret = SQLGetData(m_hstmt, 4, SQL_C_DATE, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
     CompareDateStruct(ds, data);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
     ret = SQLGetData(m_hstmt, 5, SQL_C_DATE, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
     CompareDateStruct(ds, data);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
     ret = SQLGetData(m_hstmt, 6, SQL_C_DATE, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
@@ -2356,10 +2366,14 @@ TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_TIME) {
     EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
     TIME_STRUCT ts2{6, 39, 45};
     CompareTimeStruct(ts2, data);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
     ret = SQLGetData(m_hstmt, 3, SQL_C_TIME, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
     CompareTimeStruct(ts2, data);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
     ret = SQLGetData(m_hstmt, 4, SQL_C_TIME, &data, sizeof(data), &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
