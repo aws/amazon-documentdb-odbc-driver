@@ -11,9 +11,9 @@ The driver is compatible with ODBC 3.51.
 
   | Operating System  | Version | Supported Bitness |
   | ------------- |-------------| ----------------- |
-  |  Windows    |  Windows 10   | 32-bit, 64-bit |
+  |  Windows    |  Windows Server 2019, Windows 10  | 32-bit, 64-bit |
   |  MacOS    |  Mojave | 64-bit |
-  |  Linux    |  Amazon Linux 2  |  64-bit   |
+  |  Linux    |  Debian distro, Redhat like distro(Amazon Linux 2)  |  32-bit, 64-bit  |
 
 ## Connectors
 
