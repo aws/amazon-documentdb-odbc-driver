@@ -63,7 +63,7 @@ Try the following:
     
     [<DSN Name>]
     Driver = <odbc-root>/lib64/libodfesqlodbc.dylib
-    Auth = IAM
+    Auth = AWS_PROFILE
     UID = 
     PWD = 
     Region = us-east-1
@@ -71,5 +71,5 @@ Try the following:
     RequestTimeout = 3000
     MaxConnections = 25
     LogLevel = 3
-    LogOutput = C:\
+    LogOutput = /tmp/
 	```
