@@ -16,15 +16,10 @@
 
 4. Change values of configuration options accordingly. [TBD]
 
-For example, if you can connect to server using following curl command
-
- `curl -XGET https://localhost:9200 -u admin:admin`.
-
  The DSN configuration options can be set as shown below
 
  <img src="img/win_configure_dsn_values.png" width="80%">
 
-> **NOTE**: For encrypted connection, the `Host` needs to be prefaced with `https://` and `Enable SSL` in Advanced Options should be checked.
 
 5. Click on `Test` to verify connectivity. You will get a message as `Connection successful`.
 
