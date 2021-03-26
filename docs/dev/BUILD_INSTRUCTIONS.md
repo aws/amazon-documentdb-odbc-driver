@@ -49,7 +49,7 @@ From a Developer Powershell, run:
 msbuild .\build\Release<Bitness>\odbc\PACKAGE.vcxproj -p:Configuration=Release
 ```
 
-An installer named as `Amazon Timestream ODBC Driver-<version>-Windows-<Bitness>-bit.msi` will be generated in the build directory.
+An installer named as `AmazonTimestreamODBC<Bitness>-<version>.msi` will be generated in the build directory.
 
 
 ## Mac
@@ -80,7 +80,7 @@ Compiling on Mac will output the tests to **bin64** and the driver to **lib64**.
 Run below command from the project's build directory.
 >cpack .
 
-Installer named as `Amazon Timestream ODBC Driver-<version>-Darwin.pkg` will be generated in the build directory.
+Installer named as `AmazonTimestreamODBC-<version>.pkg` will be generated in the build directory.
 
 ## General Build Info
 
