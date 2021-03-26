@@ -6,10 +6,16 @@
 |--------|-------------|------|---------------|
 | `Driver` | Driver name.| string | timestreamodbc |
 | `DSN` | **D**ata **S**ource **N**ame used for configuring the connection. | string | `<NONE>` |
-| `Auth` | Authentication mode. | one of `AWS PROFILE`, `IAM`, `AAD`, `OKTA` | `IAM`
-| `LogLevel` | Severity level for driver logs. | one of `OFF`, `FATAL`, `ERROR`, `INFO`, `DEBUG`, `TRACE`, `ALL` | `WARNING` |
-| `LogOutput` | Location for storing driver logs. | string | WIN: `C:\`, MAC/Linux: `/tmp` |
+| `Auth` | Authentication mode. | one of `AWS_PROFILE`, `IAM`, `AAD`, `OKTA` | `AWS_PROFILE`
+| `LogLevel` | Severity level for driver logs. | one of `OFF`, `FATAL`, `ERROR`, `INFO`, `DEBUG`, `TRACE`, `ALL` | `OFF` |
+| `LogOutput` | Location for storing driver logs. | string | WIN: `<NONE>`, MAC/Linux: `/tmp` |
 
+#### AWS_PROFILE Options
+
+| Option | Description | Type | Default |
+|--------|-------------|------|---------------|
+| `ProfileName` | Profile name for the AWS credentials. <NONE> means loading default credential chain. | string | `<NONE>` |
+| `Region` | The database's region. | string |`us-east-1`|
 #### AWS IAM Authentication Options
 
 | Option | Description | Type | Default |
