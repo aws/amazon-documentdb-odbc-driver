@@ -14,8 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for SQL column descriptors (SQLDescribe, SQLGetDescRec, SQLSetDescRec, SQLGetDescField, SQLSetDescField)
 - Support `ProfileName` in `AWS_PROFILE` authentication mode
 ### Changed
-- Changed `AWS PROFILE` authentication mode to `AWS_PROFILE`
-- Changed default log level from WARNING to OFF
+- `AWS PROFILE` authentication mode to `AWS_PROFILE`
+- Default log level from WARNING to OFF
 - Removed the default log location for Windows
 
 ## [v0.1.0](https://github.com/Bit-Quill/timestream-odbc/releases/tag/v0.1.0) - 2021-02-12
