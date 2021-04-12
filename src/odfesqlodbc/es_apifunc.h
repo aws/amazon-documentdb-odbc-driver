@@ -31,7 +31,7 @@ extern "C" {
 #define PODBC_SEARCH_BY_IDS (1L << 2)
 #define PODBC_SHOW_OID_COLUMN (1L << 3)
 #define PODBC_ROW_VERSIONING (1L << 4)
-/*	Internal flags for ESAPI_AllocStmt functions */
+/*	Internal flags for API_AllocStmt functions */
 #define PODBC_EXTERNAL_STATEMENT 1L /* visible to the driver manager */
 #define PODBC_INHERIT_CONNECT_OPTIONS (1L << 1)
 /*	Internal flags for ESAPI_Exec... functions */
@@ -42,7 +42,7 @@ extern "C" {
 RETCODE SQL_API ESAPI_AllocConnect(HENV EnvironmentHandle,
                                    HDBC *ConnectionHandle);
 RETCODE SQL_API ESAPI_AllocEnv(HENV *EnvironmentHandle);
-RETCODE SQL_API ESAPI_AllocStmt(HDBC ConnectionHandle, HSTMT *StatementHandle,
+RETCODE SQL_API API_AllocStmt(HDBC ConnectionHandle, HSTMT *StatementHandle,
                                 UDWORD flag);
 RETCODE SQL_API API_BindCol(HSTMT StatementHandle, SQLUSMALLINT ColumnNumber,
                               SQLSMALLINT TargetType, PTR TargetValue,
@@ -76,7 +76,7 @@ RETCODE SQL_API ESAPI_StmtError(HSTMT StatementHandle, SQLSMALLINT RecNumber,
                                 SQLCHAR *Sqlstate, SQLINTEGER *NativeError,
                                 SQLCHAR *MessageText, SQLSMALLINT BufferLength,
                                 SQLSMALLINT *TextLength, UWORD flag);
-RETCODE SQL_API ESAPI_ExecDirect(HSTMT StatementHandle,
+RETCODE SQL_API API_ExecDirect(HSTMT StatementHandle,
                                  const SQLCHAR *StatementText,
                                  SQLINTEGER TextLength, BOOL commit);
 RETCODE SQL_API API_Execute(HSTMT StatementHandle);

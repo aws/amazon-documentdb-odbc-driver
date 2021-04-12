@@ -307,7 +307,7 @@ RETCODE SQL_API SQLExecDirectW(HSTMT StatementHandle, SQLWCHAR *StatementText,
     // Execute statement if statement is ready
     RETCODE ret = SQL_ERROR;
     if (!SC_opencheck(stmt, "SQLExecDirectW"))
-        ret = ESAPI_ExecDirect(StatementHandle, (const SQLCHAR *)stxt,
+        ret = API_ExecDirect(StatementHandle, (const SQLCHAR *)stxt,
                                (SQLINTEGER)slen, 1);
 
     // Exit critical
@@ -551,7 +551,7 @@ RETCODE SQL_API SQLTablesW(HSTMT StatementHandle, SQLWCHAR *CatalogName,
     if (SC_opencheck(stmt, func))
         ret = SQL_ERROR;
     else
-        ret = ESAPI_Tables(
+        ret = API_Tables(
             StatementHandle, (SQLCHAR *)ctName, (SQLSMALLINT)nmlen1,
             (SQLCHAR *)scName, (SQLSMALLINT)nmlen2, (SQLCHAR *)tbName,
             (SQLSMALLINT)nmlen3, (SQLCHAR *)tbType, (SQLSMALLINT)nmlen4, flag);
