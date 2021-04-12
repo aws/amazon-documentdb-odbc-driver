@@ -192,7 +192,7 @@ RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
             break;
 
         case SQL_DBMS_NAME: /* ODBC 1.0 */
-            p = "Elasticsearch";
+            p = "Amazon Timestream";
             break;
 
         case SQL_DBMS_VER: /* ODBC 1.0 */
@@ -480,20 +480,20 @@ RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
 
         case SQL_QUALIFIER_LOCATION: /* ODBC 2.0 */
             len = 2;
-            value = 0;
+            value = SQL_CL_START;
             break;
 
         case SQL_QUALIFIER_NAME_SEPARATOR: /* ODBC 1.0 */
-            p = "";
+            p = ".";
             break;
 
         case SQL_QUALIFIER_TERM: /* ODBC 1.0 */
-            p = "";
+            p = "database";
             break;
 
         case SQL_QUALIFIER_USAGE: /* ODBC 2.0 */
             len = 4;
-            value = 0;
+            value = SQL_CU_DML_STATEMENTS;
             break;
 
         case SQL_QUOTED_IDENTIFIER_CASE: /* ODBC 2.0 */
@@ -665,7 +665,7 @@ RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
             value = SQL_BS_SELECT_EXPLICIT | SQL_BS_ROW_COUNT_EXPLICIT;
             break;
         case SQL_CATALOG_NAME:
-            p = "N";
+            p = "Y";
             break;
         case SQL_COLLATION_SEQ:
             p = "";

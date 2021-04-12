@@ -276,7 +276,7 @@ RETCODE SQL_API SQLExecDirect(HSTMT StatementHandle, SQLCHAR *StatementText,
     // Execute statement if statement is ready
     RETCODE ret = SQL_ERROR;
     if (!SC_opencheck(stmt, "SQLExecDirect"))
-        ret = ESAPI_ExecDirect(StatementHandle, StatementText, TextLength, 1);
+        ret = API_ExecDirect(StatementHandle, StatementText, TextLength, 1);
 
     // Exit critical
     LEAVE_STMT_CS(stmt);
@@ -716,7 +716,7 @@ RETCODE SQL_API SQLTables(HSTMT StatementHandle, SQLCHAR *CatalogName,
     if (SC_opencheck(stmt, func))
         ret = SQL_ERROR;
     else
-        ret = ESAPI_Tables(StatementHandle, ctName, NameLength1, scName,
+        ret = API_Tables(StatementHandle, ctName, NameLength1, scName,
                            NameLength2, tbName, NameLength3, TableType,
                            NameLength4, flag);
     if (SQL_SUCCESS == ret && theResultIsEmpty(stmt)) {
@@ -743,7 +743,7 @@ RETCODE SQL_API SQLTables(HSTMT StatementHandle, SQLCHAR *CatalogName,
             reexec = TRUE;
         }
         if (reexec) {
-            ret = ESAPI_Tables(StatementHandle, ctName, NameLength1, scName,
+            ret = API_Tables(StatementHandle, ctName, NameLength1, scName,
                                NameLength2, tbName, NameLength3, TableType,
                                NameLength4, flag);
             if (newCt)
@@ -1320,7 +1320,7 @@ RETCODE SQL_API SQLAllocStmt(SQLHDBC InputHandle, SQLHSTMT *OutputHandle) {
 
     conn = (ConnectionClass *)InputHandle;
     ENTER_CONN_CS(conn);
-    ret = ESAPI_AllocStmt(
+    ret = API_AllocStmt(
         InputHandle, OutputHandle,
         PODBC_EXTERNAL_STATEMENT | PODBC_INHERIT_CONNECT_OPTIONS);
     if (*OutputHandle)

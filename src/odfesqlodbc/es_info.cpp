@@ -71,6 +71,10 @@
 #define MAXIMUM_SCALE "MAXIMUM_SCALE"
 #define INTERVAL_PRECISION "INTERVAL_PRECISION"
 
+auto case_insensitive_compare = [](char &c1, char &c2) {
+    return std::toupper(c1) == std::toupper(c2);
+};
+
 const std::unordered_map< int, std::vector< int > > sql_es_type_map = {
     {SQL_BIT, {TS_TYPE_BOOLEAN}},
     {SQL_TINYINT, {TS_TYPE_INTEGER}},
@@ -314,8 +318,7 @@ typedef std::vector< bind_ptr > bind_vector;
 enum class TableResultSet { Catalog, Schema, TableTypes, TableLookUp, All };
 void ConvertToString(std::string &out, bool &valid, const SQLCHAR *sql_char,
                      const SQLSMALLINT sz);
-QResultClass *SetupQResult(const bind_vector &cols, StatementClass *stmt,
-                           StatementClass *col_stmt, const int col_cnt);
+QResultClass *SetupQResult(StatementClass *stmt, const int col_cnt);
 void CleanUp(StatementClass *stmt, StatementClass *sub_stmt, const RETCODE ret);
 void ExecuteQuery(ConnectionClass *conn, HSTMT *stmt, const std::string &query);
 void GetCatalogData(const std::string &query, StatementClass *stmt,
@@ -341,11 +344,7 @@ void ConvertToString(std::string &out, bool &valid, const SQLCHAR *sql_char,
     }
 }
 
-QResultClass *SetupQResult(const bind_vector &cols, StatementClass *stmt,
-                           StatementClass *col_stmt, const int col_cnt) {
-    (void)(cols);
-    (void)(col_stmt);
-
+QResultClass *SetupQResult(StatementClass *stmt, const int col_cnt) {
     // Initialize memory for data retreival
     QResultClass *res = NULL;
     if ((res = QR_Constructor()) == NULL) {
@@ -386,12 +385,12 @@ void CleanUp(StatementClass *stmt, StatementClass *sub_stmt,
 void ExecuteQuery(ConnectionClass *conn, HSTMT *stmt,
                   const std::string &query) {
     // Prepare statement
-    if (!SQL_SUCCEEDED(ESAPI_AllocStmt(conn, stmt, 0))) {
+    if (!SQL_SUCCEEDED(API_AllocStmt(conn, stmt, 0))) {
         throw std::runtime_error("Failed to allocate memory for statement.");
     }
 
     // Execute query
-    if (!SQL_SUCCEEDED(ESAPI_ExecDirect(
+    if (!SQL_SUCCEEDED(API_ExecDirect(
             *stmt, reinterpret_cast< const SQLCHAR * >(query.c_str()), SQL_NTS,
             1))) {
         std::string error_msg = "Failed to execute query '" + query + "'.";
@@ -402,11 +401,6 @@ void ExecuteQuery(ConnectionClass *conn, HSTMT *stmt,
 // Table specific function definitions
 void split(const std::string &input, const std::string &delim,
            std::vector< std::string > &output);
-void GenerateTableQuery(std::string &tables_query, const UWORD flag,
-                        const std::string &table_name_value,
-                        const TableResultSet result_type,
-                        const bool table_valid);
-void AssignTableBindTemplates(bind_vector &tabs);
 void SetupTableQResInfo(QResultClass *res, EnvironmentClass *env);
 void SetTableTuples(QResultClass *res, const TableResultSet res_type,
                     const bind_vector &bind_tbl, std::string &table_type,
@@ -424,32 +418,6 @@ void split(const std::string &input, const std::string &delim,
         end = input.find(delim, start);
     }
     output.push_back(input.substr(start, end));
-}
-
-// TODO #324 (SQL Plugin)- Fix patterns and escape characters for this
-void GenerateTableQuery(std::string &tables_query, const UWORD flag,
-                        const std::string &table_name_value,
-                        const TableResultSet result_type,
-                        const bool table_valid) {
-    bool search_pattern = (~flag & PODBC_NOT_SEARCH_PATTERN);
-    tables_query = "SHOW TABLES LIKE ";
-    if (table_valid && (table_name_value != "")
-        && (result_type == TableResultSet::All))
-        tables_query +=
-            search_pattern ? table_name_value : "^" + table_name_value + "$";
-    else
-        tables_query += "%";
-}
-
-// In case of unique_ptr's, using push_back (over emplace_back) is preferred in
-// C++14 and higher
-void AssignTableBindTemplates(bind_vector &tabs) {
-    tabs.reserve(TABLE_TEMPLATE_COUNT);
-    tabs.push_back(_SQLCHAR_(false, 1, EMPTY_VARCHAR));  // TABLE_CAT		1
-    tabs.push_back(_SQLCHAR_(false, 2, EMPTY_VARCHAR));  // TABLE_SCHEM		2
-    tabs.push_back(_SQLCHAR_(false, 3, EMPTY_VARCHAR));  // TABLE_NAME		3
-    tabs.push_back(_SQLCHAR_(false, 4, EMPTY_VARCHAR));  // TABLE_TYPE		4
-    tabs.push_back(_SQLCHAR_(true, 5));                  // REMARKS			5
 }
 
 void SetupTableQResInfo(QResultClass *res, EnvironmentClass *env) {
@@ -702,9 +670,7 @@ void GetCatalogData(const std::string &query, StatementClass *stmt,
     (*populate_binds)(binds);
     std::for_each(binds.begin(), binds.end(),
                   [&](const auto &b) { b->BindColumn(sub_stmt); });
-    QResultClass *res =
-        SetupQResult(binds, stmt, sub_stmt, static_cast< int >(binds.size()));
-
+    QResultClass *res = SetupQResult(stmt, static_cast< int >(binds.size()));
     // Setup QResultClass
     (*setup_qres_info)(
         res, static_cast< EnvironmentClass * >(CC_get_env(SC_get_conn(stmt))));
@@ -714,14 +680,20 @@ void GetCatalogData(const std::string &query, StatementClass *stmt,
 }
 
 RETCODE SQL_API
-ESAPI_Tables(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
+API_Tables(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
              const SQLSMALLINT catalog_name_sz, const SQLCHAR *schema_name_sql,
              const SQLSMALLINT schema_name_sz, const SQLCHAR *table_name_sql,
              const SQLSMALLINT table_name_sz, const SQLCHAR *table_type_sql,
              const SQLSMALLINT table_type_sz, const UWORD flag) {
-    CSTR func = "ESAPI_Tables";
+    CSTR func = "API_Tables";
     StatementClass *stmt = (StatementClass *)hstmt;
-    StatementClass *tbl_stmt = NULL;
+    bool is_search_pattern = (~flag & PODBC_NOT_SEARCH_PATTERN);
+    if (!is_search_pattern
+        && (catalog_name_sql == nullptr || schema_name_sql == nullptr
+            || table_name_sql == nullptr)) {
+        SC_set_error(stmt, STMT_INVALID_NULL_ARG, "Invalid use of null pointer", func);
+        return SQL_ERROR;
+    }
     RETCODE result = SQL_ERROR;
     if ((result = SC_initialize_and_recycle(stmt)) != SQL_SUCCESS)
         return result;
@@ -738,49 +710,201 @@ ESAPI_Tables(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
         ConvertToString(table_type, table_type_valid, table_type_sql,
                         table_type_sz);
 
-        //  Special semantics for the CatalogName, SchemaName, and TableType
-        //  arguments
-        TableResultSet result_type = TableResultSet::All;
+        // Setup QResultClass
+        QResultClass *res = SetupQResult(stmt, TABLE_TEMPLATE_COUNT);
+        SetupTableQResInfo(res, static_cast< EnvironmentClass * >(
+                                    CC_get_env(SC_get_conn(stmt))));
 
-        if (catalog_name == SQL_ALL_CATALOGS) {
-            if (schema_valid && table_valid && (table_name == "")
-                && (schema_name == "")) {
-                std::string error_msg("Catalogs not supported.");
-                SC_set_error(stmt, STMT_NOT_IMPLEMENTED_ERROR,
-                             error_msg.c_str(), func);
-                CleanUp(stmt, tbl_stmt);
-                return SQL_ERROR;
+        if (catalog_name == SQL_ALL_CATALOGS && schema_name.empty()
+            && table_name.empty() && table_type.empty()) {
+            /**
+             * If CatalogName is SQL_ALL_CATALOGS and SchemaName and TableName
+             * are empty strings, the result set contains a list of valid
+             * catalogs for the data source. (All columns except the TABLE_CAT
+             * column contain NULLs.)
+             */
+            std::string query = "SHOW DATABASES";
+            if (is_search_pattern && !catalog_name.empty()) {
+                query += " LIKE \'" + catalog_name + "\'";
             }
-            // result_type = TableResultSet::Catalog;
-        }
-        if (schema_name == SQL_ALL_SCHEMAS) {
-            if (catalog_valid && table_valid && (table_name == "")
-                && (catalog_name == "")) {
-                std::string error_msg("Schemas not supported.");
-                SC_set_error(stmt, STMT_NOT_IMPLEMENTED_ERROR,
-                             error_msg.c_str(), func);
-                CleanUp(stmt, tbl_stmt);
-                return SQL_ERROR;
+            StatementClass *database_stmt = NULL;
+            // Execute query
+            ExecuteQuery(SC_get_conn(stmt),
+                         reinterpret_cast< HSTMT * >(&database_stmt), query);
+            RETCODE ret = SQL_NO_DATA;
+            while ((ret = ESAPI_Fetch(database_stmt)) != SQL_NO_DATA
+                   && SQL_SUCCEEDED(ret)) {
+                SQLCHAR data[256] = {0};
+                SQLLEN indicator = 0;
+                ret = ESAPI_GetData(database_stmt, 1, SQL_C_CHAR, data, 256,
+                                    &indicator);
+                if (SQL_SUCCEEDED(ret)) {
+                    std::string database_name;
+                    database_name.assign(reinterpret_cast< const char * >(data),
+                                         static_cast< size_t >(indicator));
+                    if (is_search_pattern
+                        || std::equal(database_name.begin(),
+                                      database_name.end(), catalog_name.begin(),
+                                      case_insensitive_compare)) {
+                        TupleField *tuple = QR_AddNew(res);
+                        tuple[TABLES_CATALOG_NAME].value =
+                            strdup(database_name.c_str());
+                        tuple[TABLES_CATALOG_NAME].len =
+                            (int)database_name.size();
+                        tuple[TABLES_SCHEMA_NAME].value = NULL;
+                        tuple[TABLES_SCHEMA_NAME].len = 0;
+                        tuple[TABLES_TABLE_NAME].value = NULL;
+                        tuple[TABLES_TABLE_NAME].len = 0;
+                        tuple[TABLES_TABLE_TYPE].value = NULL;
+                        tuple[TABLES_TABLE_TYPE].len = 0;
+                        tuple[TABLES_REMARKS].value = NULL;
+                        tuple[TABLES_REMARKS].len = 0;
+                    }
+                }
             }
-            // result_type = TableResultSet::Schema;
+            CleanUp(stmt, database_stmt, SQL_SUCCESS);
+        } else if (schema_valid && !schema_name.empty() && catalog_name.empty()
+                   && table_name.empty()) {
+            /**
+             * If SchemaName is SQL_ALL_SCHEMAS and CatalogName and TableName
+             * are empty strings, the result set contains a list of valid
+             * schemas for the data source. (All columns except the TABLE_SCHEM
+             * column contain NULLs.) Note: We don't have schema in Amazon
+             * Timestream, empty list returns
+             */
+            CleanUp(stmt, nullptr, SQL_SUCCESS);
+        } else if ( catalog_valid && catalog_name.empty() && 
+                    schema_valid && schema_name.empty() && 
+                    table_valid && table_name.empty() && 
+                    table_type == SQL_ALL_TABLE_TYPES) {
+            /**
+             * If TableType is SQL_ALL_TABLE_TYPES and CatalogName, SchemaName, and TableName
+             * are empty strings, the result set contains a list of valid table types for the 
+             * data source. (All columns except the TABLE_TYPE column contain NULLs.)
+             */
+            TupleField *tuple = QR_AddNew(res);
+            tuple[TABLES_CATALOG_NAME].value = NULL;
+            tuple[TABLES_CATALOG_NAME].len = 0;
+            tuple[TABLES_SCHEMA_NAME].value = NULL;
+            tuple[TABLES_SCHEMA_NAME].len = 0;
+            tuple[TABLES_TABLE_NAME].value = NULL;
+            tuple[TABLES_TABLE_NAME].len = 0;
+            std::string table_type_return = "TABLE";
+            tuple[TABLES_TABLE_TYPE].value = strdup(table_type_return.c_str());
+            tuple[TABLES_TABLE_TYPE].len = (int)table_type_return.size();
+            tuple[TABLES_REMARKS].value = NULL;
+            tuple[TABLES_REMARKS].len = 0;
+            CleanUp(stmt, nullptr, SQL_SUCCESS);
+        } else {
+            // Parse table types
+            bool table_type_filter = true;
+            if (table_type_valid && !table_type.empty()) {
+                if (table_type == SQL_ALL_TABLE_TYPES) {
+                    table_type_filter = false;
+                } else {
+                    table_type.erase(
+                        std::remove(table_type.begin(), table_type.end(), '\''),
+                        table_type.end());
+                    std::vector< std::string > table_types;
+                    split(table_type, ",", table_types);
+                    for (auto &t : table_types) {
+                        std::transform(
+                            t.begin(), t.end(), t.begin(),
+                            [](char c) { return (char)std::toupper(c); });
+                        if (t == "TABLE") {
+                            // We support "TABLE" only
+                            table_type_filter = false;
+                        }
+                    }
+                }
+            } else {
+                // No filter
+                table_type_filter = false;
+            }
+            // Get all databases
+            std::string database_query = "SHOW DATABASES";
+            if (is_search_pattern && !catalog_name.empty()) {
+                database_query += " LIKE \'" + catalog_name + "\'";
+            }
+            StatementClass *database_stmt = NULL;
+            ExecuteQuery(SC_get_conn(stmt),
+                         reinterpret_cast< HSTMT * >(&database_stmt),
+                         database_query);
+            RETCODE ret = SQL_NO_DATA;
+            std::vector< std::string > databases;
+            while ((ret = ESAPI_Fetch(database_stmt)) != SQL_NO_DATA
+                   && SQL_SUCCEEDED(ret)) {
+                SQLCHAR data[256] = {0};
+                SQLLEN indicator = 0;
+                ret = ESAPI_GetData(database_stmt, 1, SQL_C_CHAR, data, 256,
+                                    &indicator);
+                std::string database_name;
+                if (SQL_SUCCEEDED(ret)) {
+                    database_name.assign(reinterpret_cast< const char * >(data),
+                                         static_cast< size_t >(indicator));
+                    if (is_search_pattern
+                        || std::equal(database_name.begin(),
+                                      database_name.end(), catalog_name.begin(),
+                                      case_insensitive_compare)) {
+                        databases.push_back(database_name);
+                    }
+                }
+            }
+            ESAPI_FreeStmt(database_stmt, SQL_DROP);
+            // Get all tables per database
+            for (auto database : databases) {
+                std::string table_query =
+                    "SHOW TABLES FROM \"" + database + "\"";
+                if (is_search_pattern && !table_name.empty()) {
+                    table_query += " LIKE \'" + table_name + "\'";
+                }
+                StatementClass *table_stmt = NULL;
+                ExecuteQuery(SC_get_conn(stmt),
+                             reinterpret_cast< HSTMT * >(&table_stmt),
+                             table_query);
+                while ((ret = ESAPI_Fetch(table_stmt)) != SQL_NO_DATA
+                       && SQL_SUCCEEDED(ret)) {
+                    SQLCHAR data[256] = {0};
+                    SQLLEN indicator = 0;
+                    ret = ESAPI_GetData(table_stmt, 1, SQL_C_CHAR, data, 256,
+                                        &indicator);
+                    std::string table_name_return;
+                    if (SQL_SUCCEEDED(ret)) {
+                        table_name_return.assign(
+                            reinterpret_cast< const char * >(data),
+                            static_cast< size_t >(indicator));
+                        if (!table_type_filter) {
+                            if (is_search_pattern
+                                || std::equal(table_name_return.begin(),
+                                              table_name_return.end(),
+                                              table_name.begin(),
+                                              case_insensitive_compare)) {
+                                TupleField *tuple = QR_AddNew(res);
+                                tuple[TABLES_CATALOG_NAME].value =
+                                    strdup(database.c_str());
+                                tuple[TABLES_CATALOG_NAME].len =
+                                    (int)database.size();
+                                tuple[TABLES_SCHEMA_NAME].value = NULL;
+                                tuple[TABLES_SCHEMA_NAME].len = 0;
+                                tuple[TABLES_TABLE_NAME].value =
+                                    strdup(table_name_return.c_str());
+                                tuple[TABLES_TABLE_NAME].len =
+                                    (int)table_name_return.size();
+                                std::string table_type_return = "TABLE";
+                                tuple[TABLES_TABLE_TYPE].value =
+                                    strdup(table_type_return.c_str());
+                                tuple[TABLES_TABLE_TYPE].len =
+                                    (int)table_type_return.size();
+                                tuple[TABLES_REMARKS].value = NULL;
+                                tuple[TABLES_REMARKS].len = 0;
+                            }
+                        }
+                    }
+                }
+                ESAPI_FreeStmt(table_stmt, SQL_DROP);
+            }
+            CleanUp(stmt, nullptr, SQL_SUCCESS);
         }
-        if (table_type_valid && (table_type == SQL_ALL_TABLE_TYPES)) {
-            if (catalog_valid && table_valid && schema_valid
-                && (table_name == "") && (catalog_name == "")
-                && (schema_name == ""))
-                result_type = TableResultSet::TableTypes;
-        }
-        if (table_type_valid && (table_type != SQL_ALL_TABLE_TYPES)) {
-            result_type = TableResultSet::TableLookUp;
-        }
-
-        // Create query to find out list
-        std::string query;
-        GenerateTableQuery(query, flag, table_name, result_type, table_valid);
-
-        // TODO #324 (SQL Plugin)- evaluate catalog & schema support
-        GetCatalogData(query, stmt, tbl_stmt, result_type, table_type,
-                       AssignTableBindTemplates, SetupTableQResInfo);
         return SQL_SUCCESS;
     } catch (std::bad_alloc &e) {
         std::string error_msg = std::string("Bad allocation exception: '")
@@ -794,7 +918,7 @@ ESAPI_Tables(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
         std::string error_msg = std::string("Unknown exception raised.");
         SC_set_error(stmt, STMT_INTERNAL_ERROR, error_msg.c_str(), func);
     }
-    CleanUp(stmt, tbl_stmt);
+    CleanUp(stmt, nullptr);
     return SQL_ERROR;
 }
 

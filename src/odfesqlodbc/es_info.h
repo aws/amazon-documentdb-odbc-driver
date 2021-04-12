@@ -41,7 +41,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-RETCODE SQL_API ESAPI_Tables(HSTMT hstmt, const SQLCHAR* catalog_name_sql,
+RETCODE SQL_API API_Tables(HSTMT hstmt, const SQLCHAR* catalog_name_sql,
                              const SQLSMALLINT catalog_name_sz,
                              const SQLCHAR* schema_name_sql,
                              const SQLSMALLINT schema_name_sz,
