@@ -64,6 +64,9 @@ jobs:
     - name: run-integration-descriptors-tests
       run: |
         ./build/odbc/bin/itodbc_descriptors
+    - name: run-integration-catalog-tests
+      run: |
+        ./build/odbc/bin/itodbc_catalog
     - name: print-test-logs
       if: failure()
       run: |
@@ -160,6 +163,9 @@ jobs:
     - name: run-integration-descriptors-tests
       run: |
         .\build\odbc\bin\Release\itodbc_descriptors.exe
+    - name: run-integration-catalog-tests
+      run: |
+        .\build\odbc\bin\Release\itodbc_catalog.exe
     - name: upload-integration-test-results
       if: always()
       uses: actions/upload-artifact@v2
@@ -234,6 +240,9 @@ jobs:
     - name: run-integration-descriptors-tests
       run: |
         .\build\odbc\bin\Release\itodbc_descriptors.exe
+    - name: run-integration-catalog-tests
+      run: |
+        .\build\odbc\bin\Release\itodbc_catalog.exe
     - name: upload-integration-test-results
       if: always()
       uses: actions/upload-artifact@v2

@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "unit_test_helper.h"
+#include "gtest/gtest.h"
 
 // SQLSTATEs
 #define SQLSTATE_STRING_DATA_RIGHT_TRUNCATED (SQLWCHAR*)L"01004"
@@ -43,6 +44,7 @@
 #define SQLSTATE_FRACTIONAL_TRUNCATION (SQLWCHAR*)L"01S07"
 #define SQLSTATE_CANNOT_MODIFY_IRD (SQLWCHAR*)L"HY016"
 #define SQLSTATE_SEQUENCE_ERROR (SQLWCHAR*)L"HY010"
+#define SQLSTATE_INVALID_USE_OF_NULL_POINTER (SQLWCHAR*)L"HY009"
 
 #define IT_SIZEOF(x) (NULL == (x) ? 0 : (sizeof((x)) / sizeof((x)[0])))
 
@@ -95,5 +97,23 @@ std::wstring QueryBuilder(const std::wstring& column,
 void CloseCursor(SQLHSTMT* h_statement, bool throw_on_error, bool log_diag);
 std::string u16string_to_string(const std::u16string& src);
 std::u16string string_to_u16string(const std::string& src);
+
+
+class Fixture : public testing::Test {
+   public:
+    void SetUp() {
+        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env,
+                                       &m_conn, &m_hstmt, true, true));
+    }
+    void TearDown() {
+        ASSERT_NO_THROW(CloseCursor(&m_hstmt, true, true));
+        SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
+        SQLDisconnect(m_conn);
+        SQLFreeHandle(SQL_HANDLE_ENV, m_env);
+    }
+    SQLHENV m_env = SQL_NULL_HENV;
+    SQLHDBC m_conn = SQL_NULL_HDBC;
+    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
+};
 
 #endif

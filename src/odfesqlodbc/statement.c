@@ -94,8 +94,8 @@ static const struct {
 static void SC_set_error_if_not_set(StatementClass *self, int errornumber,
                                     const char *errmsg, const char *func);
 
-RETCODE SQL_API ESAPI_AllocStmt(HDBC hdbc, HSTMT *phstmt, UDWORD flag) {
-    CSTR func = "ESAPI_AllocStmt";
+RETCODE SQL_API API_AllocStmt(HDBC hdbc, HSTMT *phstmt, UDWORD flag) {
+    CSTR func = "API_AllocStmt";
     ConnectionClass *conn = (ConnectionClass *)hdbc;
     StatementClass *stmt;
     ARDFields *ardopts;

@@ -43,7 +43,7 @@ RETCODE SQL_API SQLAllocHandle(SQLSMALLINT HandleType, SQLHANDLE InputHandle,
         case SQL_HANDLE_STMT:
             conn = (ConnectionClass *)InputHandle;
             ENTER_CONN_CS(conn);
-            ret = ESAPI_AllocStmt(
+            ret = API_AllocStmt(
                 InputHandle, OutputHandle,
                 PODBC_EXTERNAL_STATEMENT | PODBC_INHERIT_CONNECT_OPTIONS);
             if (*OutputHandle)

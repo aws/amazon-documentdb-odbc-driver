@@ -29,23 +29,6 @@
 #include <thread>
 #include <chrono>
 // clang-format on
-class Fixture : public testing::Test {
-   public:
-    void SetUp() {
-        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env,
-                                       &m_conn, &m_hstmt, true, true));
-    }
-    void TearDown() {
-        CloseCursor(&m_hstmt, true, true);
-        SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
-        SQLDisconnect(m_conn);
-        SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-    }
-    SQLHENV m_env = SQL_NULL_HENV;
-    SQLHDBC m_conn = SQL_NULL_HDBC;
-    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
-};
-
 class TestSQLFetch : public Fixture {};
 
 class TestSQLExecute : public Fixture {};

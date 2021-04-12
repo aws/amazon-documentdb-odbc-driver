@@ -87,7 +87,7 @@ RETCODE SQL_API API_Execute(HSTMT hstmt) {
     return ret;
 }
 
-RETCODE SQL_API ESAPI_ExecDirect(HSTMT hstmt, const SQLCHAR *stmt_str,
+RETCODE SQL_API API_ExecDirect(HSTMT hstmt, const SQLCHAR *stmt_str,
                                  SQLINTEGER stmt_sz, BOOL commit) {
     if (hstmt == NULL)
         return SQL_ERROR;
