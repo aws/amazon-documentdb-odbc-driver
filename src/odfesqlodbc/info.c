@@ -260,7 +260,7 @@ RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
 
         case SQL_IDENTIFIER_QUOTE_CHAR: /* ODBC 1.0 */
             /* the character used to quote "identifiers" */
-            p = "`";
+            p = "\"";
             break;
 
         case SQL_KEYWORDS: /* ODBC 2.0 */
