@@ -103,7 +103,7 @@ RETCODE SQL_API SQLColumns(HSTMT StatementHandle, SQLCHAR *CatalogName,
     if (SC_opencheck(stmt, func))
         ret = SQL_ERROR;
     else
-        ret = ESAPI_Columns(StatementHandle, ctName, NameLength1, scName,
+        ret = API_Columns(StatementHandle, ctName, NameLength1, scName,
                             NameLength2, tbName, NameLength3, clName,
                             NameLength4, flag, 0, 0);
     if (SQL_SUCCESS == ret && theResultIsEmpty(stmt)) {
@@ -136,7 +136,7 @@ RETCODE SQL_API SQLColumns(HSTMT StatementHandle, SQLCHAR *CatalogName,
             reexec = TRUE;
         }
         if (reexec) {
-            ret = ESAPI_Columns(StatementHandle, ctName, NameLength1, scName,
+            ret = API_Columns(StatementHandle, ctName, NameLength1, scName,
                                 NameLength2, tbName, NameLength3, clName,
                                 NameLength4, flag, 0, 0);
             if (newCt)
