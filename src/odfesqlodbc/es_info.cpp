@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <regex>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -88,20 +89,11 @@ const std::unordered_map< int, std::vector< int > > sql_es_type_map = {
     {SQL_TYPE_TIMESTAMP, {ES_TYPE_DATETIME}}};
 
 const std::unordered_map< std::string, int > data_name_data_type_map = {
-    {TS_TYPE_NAME_BOOLEAN, SQL_BIT},
-    {TS_TYPE_NAME_INTEGER, SQL_INTEGER},
-    {TS_TYPE_NAME_BIGINT, SQL_BIGINT},
-    {ES_TYPE_NAME_HALF_FLOAT, SQL_REAL},
-    {ES_TYPE_NAME_FLOAT, SQL_REAL},
     {TS_TYPE_NAME_DOUBLE, SQL_DOUBLE},
-    {ES_TYPE_NAME_SCALED_FLOAT, SQL_DOUBLE},
-    {ES_TYPE_NAME_KEYWORD, SQL_WVARCHAR},
-    {ES_TYPE_NAME_TEXT, SQL_WVARCHAR},
-    {ES_TYPE_NAME_DATE, SQL_TYPE_TIMESTAMP},
-    {ES_TYPE_NAME_OBJECT, SQL_WVARCHAR},
-    {ES_TYPE_NAME_NESTED, SQL_WVARCHAR},
-
-};
+    {TS_TYPE_NAME_VARCHAR, SQL_VARCHAR},
+    {TS_TYPE_NAME_TIMESTAMP, SQL_TYPE_TIMESTAMP},
+    {TS_TYPE_NAME_BIGINT, SQL_BIGINT},
+    {TS_TYPE_NAME_BOOLEAN, SQL_BIT}};
 
 // Boilerplate code for easy column bind handling
 class BindTemplate {
@@ -314,21 +306,16 @@ typedef std::vector< bind_ptr > bind_vector;
 #define _SQLINT4_(...) \
     (std::make_unique< BindTemplateInt4 >(BindTemplateInt4(__VA_ARGS__)))
 
-// Common function definitions
+// Common function declarations
 enum class TableResultSet { Catalog, Schema, TableTypes, TableLookUp, All };
 void ConvertToString(std::string &out, bool &valid, const SQLCHAR *sql_char,
                      const SQLSMALLINT sz);
 QResultClass *SetupQResult(StatementClass *stmt, const int col_cnt);
 void CleanUp(StatementClass *stmt, StatementClass *sub_stmt, const RETCODE ret);
 void ExecuteQuery(ConnectionClass *conn, HSTMT *stmt, const std::string &query);
-void GetCatalogData(const std::string &query, StatementClass *stmt,
-                    StatementClass *sub_stmt, const TableResultSet res_type,
-                    std::string &table_type,
-                    void (*populate_binds)(bind_vector &),
-                    void (*setup_qres_info)(QResultClass *, EnvironmentClass *),
-                    std::vector< std::string > *list_of_columns = NULL);
+std::regex ConvertPattern(const std::string &pattern);
 
-// Common function declarations
+// Common function definitions
 void ConvertToString(std::string &out, bool &valid, const SQLCHAR *sql_char,
                      const SQLSMALLINT sz) {
     valid = (sql_char != NULL);
@@ -363,6 +350,41 @@ QResultClass *SetupQResult(StatementClass *stmt, const int col_cnt) {
     QR_set_num_fields(res, col_cnt);
 
     return res;
+}
+
+std::regex ConvertPattern(const std::string &sql_pattern) {
+    std::string regex_pattern;
+    for (std::string::size_type i = 0; i < sql_pattern.size(); i++) {
+        if (i == 0) {
+            regex_pattern.push_back('^');
+        }
+        switch (sql_pattern[i]) {
+            case '_': {
+                regex_pattern += ".";
+                break;
+            }
+            case '%': {
+                regex_pattern += ".*";
+                break;
+            }
+            case '[':
+            case ']':
+            case '(':
+            case ')':
+            case '\\': {
+                regex_pattern += "\\";
+                [[fallthrough]];
+            }
+            default: {
+                regex_pattern.push_back(sql_pattern.at(i));
+                break;
+            }
+        }
+        if (i == sql_pattern.size() - 1) {
+            regex_pattern.push_back('$');
+        }
+    }
+    return std::regex(regex_pattern);
 }
 
 void CleanUp(StatementClass *stmt, StatementClass *sub_stmt,
@@ -576,7 +598,8 @@ void SetupColumnQResInfo(QResultClass *res, EnvironmentClass *unused);
 void GenerateColumnQuery(std::string &query, const std::string &table_name,
                          const std::string &column_name, const bool table_valid,
                          const bool column_valid, const UWORD flag);
-void AssignColumnBindTemplates(bind_vector &cols);
+int GetColumnSize(const std::string &type_name);
+int GetBufferLength(const std::string &type_name);
 
 // Column Specific function declarations
 void SetupColumnQResInfo(QResultClass *res, EnvironmentClass *unused) {
@@ -627,56 +650,38 @@ void GenerateColumnQuery(std::string &query, const std::string &table_name,
         query += " COLUMNS LIKE " + column_name;
 }
 
-// In case of unique_ptr's, using push_back (over emplace_back) is preferred in
-// C++14 and higher
-void AssignColumnBindTemplates(bind_vector &cols) {
-    cols.reserve(COLUMN_TEMPLATE_COUNT);
-    cols.push_back(_SQLCHAR_(true, 1));                  // TABLE_CAT			1
-    cols.push_back(_SQLCHAR_(true, 2));                  // TABLE_SCHEM			2
-    cols.push_back(_SQLCHAR_(false, 3, EMPTY_VARCHAR));  // TABLE_NAME 3
-    cols.push_back(_SQLCHAR_(false, 4, EMPTY_VARCHAR));  // COLUMN_NAME 4
-    cols.push_back(
-        _SQLINT2_(false, 5, DEFAULT_TYPE_INT));  // DATA_TYPE			5
-    cols.push_back(
-        _SQLCHAR_(false, 6, DEFAULT_TYPE_STR));  // TYPE_NAME			6
-    cols.push_back(_SQLINT4_(true, 7));          // COLUMN_SIZE			7
-    cols.push_back(_SQLINT4_(true, 8));          // BUFFER_LENGTH		8
-    cols.push_back(_SQLINT2_(true, 9));          // DECIMAL_DIGITS		9
-    cols.push_back(_SQLINT2_(true, 10));         // NUM_PREC_RADIX		10
-    cols.push_back(
-        _SQLINT2_(false, 11, SQL_NULLABLE_UNKNOWN));  // NULLABLE			11
-    cols.push_back(_SQLCHAR_(true, 12));              // REMARKS				12
-    cols.push_back(_SQLCHAR_(true, 13));              // COLUMN_DEF			13
-    cols.push_back(
-        _SQLINT2_(false, 14, DEFAULT_TYPE_INT));  // SQL_DATA_TYPE		14
-    cols.push_back(_SQLINT2_(true, 15));          // SQL_DATETIME_SUB	15
-    cols.push_back(_SQLINT4_(true, 16));          // CHAR_OCTET_LENGTH	16
-    cols.push_back(_SQLINT4_(false, 17, -1));     // ORDINAL_POSITION	17
-    cols.push_back(_SQLCHAR_(true, 18));          // IS_NULLABLE			18
+int GetColumnSize(const std::string &type_name) {
+    switch (data_name_data_type_map.find(type_name)->second) {
+        case SQL_VARCHAR:
+            return INT_MAX;
+        case SQL_DOUBLE:
+            return 15;
+        case SQL_TYPE_TIMESTAMP:
+            return 29;
+        case SQL_BIGINT:
+            return 20;
+        case SQL_BIT:
+            return 5;
+        default:
+            return 0;
+    }
 }
 
-void GetCatalogData(const std::string &query, StatementClass *stmt,
-                    StatementClass *sub_stmt, const TableResultSet res_type,
-                    std::string &table_type,
-                    void (*populate_binds)(bind_vector &),
-                    void (*setup_qres_info)(QResultClass *, EnvironmentClass *),
-                    std::vector< std::string > *list_of_columns) {
-    // Execute query
-    ExecuteQuery(SC_get_conn(stmt), reinterpret_cast< HSTMT * >(&sub_stmt),
-                 query);
-
-    // Bind Columns
-    bind_vector binds;
-    (*populate_binds)(binds);
-    std::for_each(binds.begin(), binds.end(),
-                  [&](const auto &b) { b->BindColumn(sub_stmt); });
-    QResultClass *res = SetupQResult(stmt, static_cast< int >(binds.size()));
-    // Setup QResultClass
-    (*setup_qres_info)(
-        res, static_cast< EnvironmentClass * >(CC_get_env(SC_get_conn(stmt))));
-    SetTableTuples(res, res_type, binds, table_type, stmt, sub_stmt,
-                   list_of_columns);
-    CleanUp(stmt, sub_stmt, SQL_SUCCESS);
+int GetBufferLength(const std::string &type_name) {
+    switch (data_name_data_type_map.find(type_name)->second) {
+        case SQL_VARCHAR:
+            return 256;
+        case SQL_DOUBLE:
+            return sizeof(SQLDOUBLE);
+        case SQL_TYPE_TIMESTAMP:
+            return sizeof(TIMESTAMP_STRUCT);
+        case SQL_BIGINT:
+            return sizeof(SQLBIGINT);
+        case SQL_BIT:
+            return 1;
+        default:
+            return 0;
+    }
 }
 
 RETCODE SQL_API
@@ -923,7 +928,7 @@ API_Tables(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
 }
 
 RETCODE SQL_API
-ESAPI_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
+API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
               const SQLSMALLINT catalog_name_sz, const SQLCHAR *schema_name_sql,
               const SQLSMALLINT schema_name_sz, const SQLCHAR *table_name_sql,
               const SQLSMALLINT table_name_sz, const SQLCHAR *column_name_sql,
@@ -932,49 +937,234 @@ ESAPI_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
     (void)(reloid);
     (void)(attnum);
 
-    CSTR func = "ESAPI_Columns";
+    CSTR func = "API_Columns";
 
     // Declare outside of try so we can clean them up properly if an exception
     // occurs
     StatementClass *stmt = (StatementClass *)hstmt;
-    StatementClass *col_stmt = NULL;
+    StatementClass *table_stmt = NULL;
+
+    bool is_search_pattern = (~flag & PODBC_NOT_SEARCH_PATTERN);
+    if (!is_search_pattern
+        && (catalog_name_sql == nullptr || schema_name_sql == nullptr
+            || table_name_sql == nullptr)) {
+        SC_set_error(stmt, STMT_INVALID_NULL_ARG, "Invalid use of null pointer",
+                     func);
+        return SQL_ERROR;
+    }
+    
     RETCODE result = SQL_ERROR;
     if ((result = SC_initialize_and_recycle(stmt)) != SQL_SUCCESS)
         return result;
 
     try {
-        // Convert const SQLCHAR *'s to strings
-        std::string catalog_name, schema_name, table_name, column_name;
-        bool catalog_valid, schema_valid, table_valid, column_valid;
-        ConvertToString(catalog_name, catalog_valid, catalog_name_sql,
-                        catalog_name_sz);
-        ConvertToString(schema_name, schema_valid, schema_name_sql,
-                        schema_name_sz);
-        ConvertToString(table_name, table_valid, table_name_sql, table_name_sz);
-        ConvertToString(column_name, column_valid, column_name_sql,
-                        column_name_sz);
-
-        // Generate query
-        std::string query;
-        GenerateColumnQuery(query, table_name, column_name, table_valid,
-                            column_valid, flag);
-
-        // Get list of columns with SELECT * query since columns doesn't match
-        // with DESCRIBE & SELECT * query
-        std::vector< std::string > list_of_columns;
-        if (table_valid) {
-            ConnectionClass *cc = SC_get_conn(stmt);
-            list_of_columns =
-                GetColumnsWithSelectQuery(cc->conn, table_name);
+        // Prepare statement
+        if (!SQL_SUCCEEDED(
+                API_AllocStmt(SC_get_conn(stmt),
+                                reinterpret_cast< HSTMT * >(&table_stmt), 0))) {
+            throw std::runtime_error(
+                "Failed to allocate memory for statement.");
         }
 
-        // TODO #324 (SQL Plugin)- evaluate catalog & schema support
+        RETCODE ret;
+        ret = API_Tables(table_stmt, catalog_name_sql, catalog_name_sz,
+                         schema_name_sql, schema_name_sz, table_name_sql,
+                         table_name_sz, (SQLCHAR *)SQL_ALL_TABLE_TYPES, SQL_NTS,
+                         flag);
+        if (!SQL_SUCCEEDED(ret)) {
+            SC_set_error(stmt, SC_get_errornumber(table_stmt),
+                         SC_get_errormsg(table_stmt), func);
+            ESAPI_FreeStmt(table_stmt, SQL_DROP);
+            CleanUp(stmt, nullptr);
+            return ret;
+        }
 
-        // Execute query
-        std::string table_type = "";
-        GetCatalogData(query, stmt, col_stmt, TableResultSet::All, table_type,
-                       AssignColumnBindTemplates, SetupColumnQResInfo,
-                       &list_of_columns);
+        std::vector< std::pair< std::string, std::string > > tables;
+        while ((ret = ESAPI_Fetch(table_stmt)) != SQL_NO_DATA
+               && SQL_SUCCEEDED(ret)) {
+            // Get database name
+            SQLCHAR database[256] = {0};
+            SQLLEN db_strlen_or_ind = 0;
+            ret = ESAPI_GetData(table_stmt, 1,
+                              SQL_C_CHAR, database, 256, &db_strlen_or_ind);
+            std::string database_name;
+            if (SQL_SUCCEEDED(ret)) {
+                database_name.assign(reinterpret_cast< const char * >(database),
+                                     static_cast< size_t >(db_strlen_or_ind));
+            }
+            
+            std::string catalog_name_sql_str;
+            if (catalog_name_sz == SQL_NTS) {
+                catalog_name_sql_str.assign(
+                    reinterpret_cast< const char * >(catalog_name_sql));
+            } else if (catalog_name_sz <= 0) {
+                catalog_name_sql_str = "";
+            } else {
+                catalog_name_sql_str.assign(
+                    reinterpret_cast< const char * >(catalog_name_sql),
+                    static_cast< size_t >(catalog_name_sz));
+            }
+            // Catalog name is an ordinary argument when SQL_ATTR_METADATA_ID is
+            // SQL_FALSE
+            if (is_search_pattern && database_name != catalog_name_sql_str) {
+                continue;
+            }
+
+            // Get table name
+            SQLCHAR table[256] = {0};
+            SQLLEN tb_strlen_or_ind = 0;
+            ret = ESAPI_GetData(table_stmt, 3,
+                                SQL_C_CHAR, table, 256, &tb_strlen_or_ind);
+            std::string table_name;
+            if (SQL_SUCCEEDED(ret)) {
+                table_name.assign(reinterpret_cast< const char * >(table),
+                                  static_cast< size_t >(tb_strlen_or_ind));
+            }
+            tables.push_back(std::make_pair(database_name, table_name));
+        }
+        ESAPI_FreeStmt(table_stmt, SQL_DROP);
+
+        // Setup QResultClass
+        QResultClass *res = SetupQResult(stmt, COLUMN_TEMPLATE_COUNT);
+        SetupColumnQResInfo(res, static_cast< EnvironmentClass * >(
+                                     CC_get_env(SC_get_conn(stmt))));
+
+        for (const std::pair< std::string, std::string > &table : tables) {
+            // Generate query
+            std::string query =
+                "DESCRIBE \"" + table.first + "\".\"" + table.second + "\"";
+
+            StatementClass *col_stmt = NULL;
+            ExecuteQuery(SC_get_conn(stmt),
+                         reinterpret_cast< HSTMT * >(&col_stmt), query);
+            int col_num = 0;
+            while ((ret = ESAPI_Fetch(col_stmt)) != SQL_NO_DATA
+                   && SQL_SUCCEEDED(ret)) {
+                SQLCHAR column[256] = {0};
+                SQLLEN col_strlen_or_ind = 0;
+                ret = ESAPI_GetData(col_stmt, 1, SQL_C_CHAR, column, 256,
+                                    &col_strlen_or_ind);
+                col_num++;
+
+                std::string column_name_return;
+                if (SQL_SUCCEEDED(ret)) {
+                    column_name_return.assign(
+                        reinterpret_cast< const char * >(column),
+                        static_cast< size_t >(col_strlen_or_ind));
+                }
+
+                std::string column_name;
+                bool column_valid;
+                ConvertToString(column_name, column_valid, column_name_sql,
+                                column_name_sz);
+
+                // Filter through search pattern
+                std::regex regex_pattern = ConvertPattern(column_name);
+                if (is_search_pattern
+                    && !std::regex_match(column_name_return, regex_pattern)) {
+                    continue;
+                } else if (!is_search_pattern
+                           && !std::equal(column_name_return.begin(),
+                                          column_name_return.end(),
+                                          column_name.begin(),
+                                          case_insensitive_compare)) {
+                    continue;
+                }
+
+                SQLCHAR type[256] = {0};
+                SQLLEN type_strlen_or_ind = 0;
+                ret = ESAPI_GetData(col_stmt, 2, SQL_C_CHAR, type, 256,
+                                    &type_strlen_or_ind);
+                std::string type_name_return;
+                if (SQL_SUCCEEDED(ret)) {
+                    type_name_return.assign(
+                        reinterpret_cast< const char * >(type),
+                        static_cast< size_t >(type_strlen_or_ind));
+                }
+
+                TupleField *tuple = QR_AddNew(res);
+                tuple[COLUMNS_CATALOG_NAME].value = strdup(table.first.c_str());
+                tuple[COLUMNS_CATALOG_NAME].len = (int)table.first.size();
+                tuple[COLUMNS_SCHEMA_NAME].value = NULL;
+                tuple[COLUMNS_SCHEMA_NAME].len = 0;
+                tuple[COLUMNS_TABLE_NAME].value = strdup(table.second.c_str());
+                tuple[COLUMNS_TABLE_NAME].len = (int)table.second.size();
+                tuple[COLUMNS_COLUMN_NAME].value =
+                    strdup(column_name_return.c_str());
+                tuple[COLUMNS_COLUMN_NAME].len = (int)column_name_return.size();
+                std::string col_data_type = std::to_string(
+                    data_name_data_type_map.find(type_name_return)->second);
+                tuple[COLUMNS_DATA_TYPE].value = strdup(col_data_type.c_str());
+                tuple[COLUMNS_DATA_TYPE].len = (int)col_data_type.size();
+                tuple[COLUMNS_TYPE_NAME].value =
+                    strdup(type_name_return.c_str());
+                tuple[COLUMNS_TYPE_NAME].len = (int)type_name_return.size();
+                std::string col_size =
+                    std::to_string(GetColumnSize(type_name_return));
+                tuple[COLUMNS_PRECISION].value = strdup(col_size.c_str());
+                tuple[COLUMNS_PRECISION].len = (int)col_size.size();
+                std::string buf_len =
+                    std::to_string(GetBufferLength(type_name_return));
+                tuple[COLUMNS_LENGTH].value = strdup(buf_len.c_str());
+                tuple[COLUMNS_LENGTH].len = (int)buf_len.size();
+                std::string decimal_digits = std::to_string(9);
+                tuple[COLUMNS_SCALE].value =
+                    (type_name_return == "timestamp")
+                        ? strdup(decimal_digits.c_str())
+                        : NULL;
+                tuple[COLUMNS_SCALE].len = (type_name_return == "timestamp")
+                                               ? (int)decimal_digits.size()
+                                               : 0;
+                std::string col_radix = std::to_string(10);
+                tuple[COLUMNS_RADIX].value = (type_name_return == "double")
+                                                 ? strdup(col_radix.c_str())
+                                                 : NULL;
+                tuple[COLUMNS_RADIX].len =
+                    (type_name_return == "double") ? (int)col_radix.size() : 0;
+                std::string col_nullable = std::to_string(SQL_NULLABLE);
+                tuple[COLUMNS_NULLABLE].value = strdup(col_nullable.c_str());
+                tuple[COLUMNS_NULLABLE].len = (int)col_nullable.size();
+                tuple[COLUMNS_REMARKS].value = NULL;
+                tuple[COLUMNS_REMARKS].len = 0;
+                tuple[COLUMNS_COLUMN_DEF].value = NULL;
+                tuple[COLUMNS_COLUMN_DEF].len = 0;
+                std::string sql_data_type =
+                    (col_data_type == std::to_string(SQL_TYPE_TIMESTAMP))
+                        ? std::to_string(SQL_DATETIME)
+                        : col_data_type;
+                tuple[COLUMNS_SQL_DATA_TYPE].value =
+                    strdup(sql_data_type.c_str());
+                tuple[COLUMNS_SQL_DATA_TYPE].len = (int)sql_data_type.size();
+                std::string datetime_sub = std::to_string(SQL_CODE_TIMESTAMP);
+                tuple[COLUMNS_SQL_DATETIME_SUB].value =
+                    (col_data_type == std::to_string(SQL_TYPE_TIMESTAMP))
+                        ? strdup(datetime_sub.c_str())
+                        : NULL;
+                tuple[COLUMNS_SQL_DATETIME_SUB].len =
+                    (col_data_type == std::to_string(SQL_TYPE_TIMESTAMP))
+                        ? (int)datetime_sub.size()
+                        : 0;
+                std::string col_char_octet_len = std::to_string(INT_MAX);
+                tuple[COLUMNS_CHAR_OCTET_LENGTH].value =
+                    (type_name_return == "varchar")
+                        ? strdup(col_char_octet_len.c_str())
+                        : NULL;
+                tuple[COLUMNS_CHAR_OCTET_LENGTH].len =
+                    (type_name_return == "varchar")
+                        ? (int)col_char_octet_len.size()
+                        : 0;
+                std::string col_number = std::to_string(col_num);
+                tuple[COLUMNS_ORDINAL_POSITION].value =
+                    strdup(col_number.c_str());
+                tuple[COLUMNS_ORDINAL_POSITION].len = (int)col_number.size();
+                std::string col_is_nullable = "YES";
+                tuple[COLUMNS_IS_NULLABLE].value =
+                    strdup(col_is_nullable.c_str());
+                tuple[COLUMNS_IS_NULLABLE].len = (int)col_is_nullable.size();
+            }
+            ESAPI_FreeStmt(col_stmt, SQL_DROP);
+        }
+        CleanUp(stmt, nullptr, SQL_SUCCESS);
         return SQL_SUCCESS;
     } catch (std::bad_alloc &e) {
         std::string error_msg = std::string("Bad allocation exception: '")
@@ -988,7 +1178,7 @@ ESAPI_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
         std::string error_msg("Unknown exception raised.");
         SC_set_error(stmt, STMT_INTERNAL_ERROR, error_msg.c_str(), func);
     }
-    CleanUp(stmt, col_stmt);
+    CleanUp(stmt, nullptr);
     return SQL_ERROR;
 }
 void CleanUp_GetTypeInfo(StatementClass *stmt, const RETCODE ret = SQL_ERROR) {

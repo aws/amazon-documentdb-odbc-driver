@@ -50,7 +50,7 @@ RETCODE SQL_API API_Tables(HSTMT hstmt, const SQLCHAR* catalog_name_sql,
                              const SQLCHAR* table_type_sql,
                              const SQLSMALLINT table_type_sz, const UWORD flag);
 RETCODE SQL_API
-ESAPI_Columns(HSTMT hstmt, const SQLCHAR* catalog_name_sql,
+API_Columns(HSTMT hstmt, const SQLCHAR* catalog_name_sql,
               const SQLSMALLINT catalog_name_sz, const SQLCHAR* schema_name_sql,
               const SQLSMALLINT schema_name_sz, const SQLCHAR* table_name_sql,
               const SQLSMALLINT table_name_sz, const SQLCHAR* column_name_sql,

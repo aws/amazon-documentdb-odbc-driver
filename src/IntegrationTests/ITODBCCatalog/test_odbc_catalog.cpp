@@ -38,6 +38,9 @@ typedef struct bind_info {
         target = data.data();
     }
     std::string AsString() {
+        if (out_len == SQL_NULL_DATA) {
+            return "";
+        }
         switch (target_type) {
             case SQL_C_CHAR:
                 return reinterpret_cast< char* >(data.data());
@@ -97,46 +100,6 @@ typedef struct bind_info {
 //const std::string flights_decimal_digits = "10";
 //const std::string flights_num_prec_radix = "2";
 //
-//class TestSQLColumns : public testing::Test {
-//   public:
-//    TestSQLColumns() {
-//    }
-//    void SetUp() {
-//        AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env, &m_conn,
-//                       &m_hstmt, true, true);
-//    }
-//    void TearDown() {
-//        SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
-//        SQLDisconnect(m_conn);
-//        SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-//    }
-//    ~TestSQLColumns() {
-//        // cleanup any pending stuff, but no exceptions allowed
-//    }
-//
-//    SQLHENV m_env = SQL_NULL_HENV;
-//    SQLHDBC m_conn = SQL_NULL_HDBC;
-//    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
-//};
-//
-//#define TEST_SQL_COLUMNS(test_name, catalog_patt, schema_patt, table_patt,   \
-//                         column_patt, enable_pattern, empty)                 \
-//    TEST_F(TestSQLColumns, test_name) {                                      \
-//        EXPECT_EQ(SQL_SUCCESS, SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, \
-//                                              (void*)(!enable_pattern), 0)); \
-//        SQLColumns(m_hstmt, catalog_patt, SQL_NTS, schema_patt, SQL_NTS,     \
-//                   table_patt, SQL_NTS, column_patt, SQL_NTS);               \
-//        size_t result_count = 0;                                             \
-//        SQLRETURN ret;                                                       \
-//        while ((ret = SQLFetch(m_hstmt)) == SQL_SUCCESS)                     \
-//            result_count++;                                                  \
-//        EXPECT_EQ(ret, SQL_NO_DATA);                                         \
-//        if (empty)                                                           \
-//            EXPECT_EQ(result_count, static_cast< size_t >(0));               \
-//        else                                                                 \
-//            EXPECT_FALSE(result_count == 0);                                 \
-//    }
-//
 //// Table test constants and macro
 //typedef struct table_data {
 //    std::string catalog_name;
@@ -166,7 +129,7 @@ typedef struct bind_info {
 //    {"", "", "", "BASE TABLE", ""}};
 
 class TestSQLTables : public Fixture {};
-
+class TestSQLColumns : public Fixture {};
 //
 //class TestSQLCatalogKeys : public testing::Test {
 //   public:
@@ -210,7 +173,7 @@ class TestSQLTables : public Fixture {};
  * ODBCTest.IoT
  * promDB.promTB
  */
-auto CheckSQLTables = [](const std::vector< std::vector< std::string > >& expected, 
+auto CheckRows = [](const std::vector< std::vector< std::string > >& expected, 
     const std::vector< std::vector< std::string > >& result) {
     EXPECT_EQ(expected.size(), result.size());
     if (expected.size() > 0) {
@@ -251,7 +214,7 @@ TEST_F(TestSQLTables, TEST_ALL_NULL) {
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
         {"promDB", "", "promTB", "TABLE", ""}};
-    CheckSQLTables(expected, result);
+    CheckRows(expected, result);
 }
 
 TEST_F(TestSQLTables, TEST_ALL_DATABASES_EXCEL) {
@@ -280,7 +243,7 @@ TEST_F(TestSQLTables, TEST_ALL_DATABASES_EXCEL) {
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "", "", ""},
         {"promDB", "", "", "", ""}};
-    CheckSQLTables(expected, result);
+    CheckRows(expected, result);
 }
 
 TEST_F(TestSQLTables, TEST_ALL_DATABASES_NULL) {
@@ -311,7 +274,7 @@ TEST_F(TestSQLTables, TEST_ALL_DATABASES_NULL) {
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
         {"promDB", "", "promTB", "TABLE", ""}};
-    CheckSQLTables(expected, result);
+    CheckRows(expected, result);
 }
 
 TEST_F(TestSQLTables, TEST_ALL_DATABASES_SEARCH_PATTERN) {
@@ -341,7 +304,7 @@ TEST_F(TestSQLTables, TEST_ALL_DATABASES_SEARCH_PATTERN) {
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""}};
-    CheckSQLTables(expected, result);
+    CheckRows(expected, result);
 }
 
 TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_BIND_EXCEL) {
@@ -372,7 +335,7 @@ TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_BIND_EXCEL) {
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
         {"promDB", "", "promTB", "TABLE", ""}};
-    CheckSQLTables(expected, result);
+    CheckRows(expected, result);
 }
 
 TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_GETDATA) {
@@ -402,7 +365,7 @@ TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_GETDATA) {
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
         {"promDB", "", "promTB", "TABLE", ""}};
-    CheckSQLTables(expected, result);
+    CheckRows(expected, result);
 }
 
 TEST_F(TestSQLTables, TEST_ALL_VIEWS_TYPES) {
@@ -428,7 +391,7 @@ TEST_F(TestSQLTables, TEST_ALL_VIEWS_TYPES) {
         result.push_back(row);
     }
     std::vector< std::vector< std::string > > expected{};
-    CheckSQLTables(expected, result);
+    CheckRows(expected, result);
 }
 
 TEST_F(TestSQLTables, TEST_ALL_TABLE_TYPES) {
@@ -459,7 +422,7 @@ TEST_F(TestSQLTables, TEST_ALL_TABLE_TYPES) {
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
         {"promDB", "", "promTB", "TABLE", ""}};
-    CheckSQLTables(expected, result);
+    CheckRows(expected, result);
 }
 
 TEST_F(TestSQLTables, TEST_SQL_ALL_TABLE_TYPES) {
@@ -490,7 +453,7 @@ TEST_F(TestSQLTables, TEST_SQL_ALL_TABLE_TYPES) {
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
         {"promDB", "", "promTB", "TABLE", ""}};
-    CheckSQLTables(expected, result);
+    CheckRows(expected, result);
 }
 
 TEST_F(TestSQLTables, TEST_SQL_ALL_TABLE_TYPES_OTHER_EMPTY) {
@@ -519,7 +482,7 @@ TEST_F(TestSQLTables, TEST_SQL_ALL_TABLE_TYPES_OTHER_EMPTY) {
     }
     std::vector< std::vector< std::string > > expected{
         {"", "", "", "TABLE", ""}};
-    CheckSQLTables(expected, result);
+    CheckRows(expected, result);
 }
 
 TEST_F(TestSQLTables, TEST_INVALID_TABLE_TYPES) {
@@ -545,7 +508,7 @@ TEST_F(TestSQLTables, TEST_INVALID_TABLE_TYPES) {
         result.push_back(row);
     }
     std::vector< std::vector< std::string > > expected{};
-    CheckSQLTables(expected, result);
+    CheckRows(expected, result);
 }
 
 TEST_F(TestSQLTables, TABLE_UNDER_DATABASE) {
@@ -574,7 +537,7 @@ TEST_F(TestSQLTables, TABLE_UNDER_DATABASE) {
     }
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "IoT", "TABLE", ""}};
-    CheckSQLTables(expected, result);
+    CheckRows(expected, result);
 }
 
 TEST_F(TestSQLTables, EXACT_MATCH_META_DATA) {
@@ -606,7 +569,7 @@ TEST_F(TestSQLTables, EXACT_MATCH_META_DATA) {
     }
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "IoT", "TABLE", ""}};
-    CheckSQLTables(expected, result);
+    CheckRows(expected, result);
 }
 
 TEST_F(TestSQLTables, EXACT_MATCH_META_DATA_CASE_INSENSITIVE) {
@@ -639,7 +602,7 @@ TEST_F(TestSQLTables, EXACT_MATCH_META_DATA_CASE_INSENSITIVE) {
     }
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "IoT", "TABLE", ""}};
-    CheckSQLTables(expected, result);
+    CheckRows(expected, result);
 }
 
 TEST_F(TestSQLTables, EXACT_MATCH_META_DATA_NOT_FOUND) {
@@ -670,7 +633,7 @@ TEST_F(TestSQLTables, EXACT_MATCH_META_DATA_NOT_FOUND) {
         result.push_back(row);
     }
     std::vector< std::vector< std::string > > expected{};
-    CheckSQLTables(expected, result);
+    CheckRows(expected, result);
 }
 
 TEST_F(TestSQLTables, INVALID_USE_OF_NULLPTR_CATALOG) {
@@ -703,113 +666,313 @@ TEST_F(TestSQLTables, INVALID_USE_OF_NULLPTR_TABLE_NAME) {
     EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_INVALID_USE_OF_NULL_POINTER));
 }
 
-//// SQL Columns Tests
-//// NULL test
-//TEST_SQL_COLUMNS(Null, NULL, NULL, NULL, NULL, true, false)
-//
-//// Table tests
-//TEST_SQL_COLUMNS(ValidTable, NULL, NULL, (SQLTCHAR*)L"kibana_%", NULL, true,
-//                 false)
-//TEST_SQL_COLUMNS(InvalidTable, NULL, NULL, (SQLTCHAR*)L"invalid_table", NULL,
-//                 true, true)
-//
-//// Column tests
-//TEST_SQL_COLUMNS(ValidColumn, NULL, NULL, NULL, (SQLTCHAR*)L"FlightNum", true,
-//                 false)
-//TEST_SQL_COLUMNS(InvalidColumn, NULL, NULL, NULL, (SQLTCHAR*)L"invalid_column",
-//                 true, true)
-//
-//// Table and column tests
-//TEST_SQL_COLUMNS(ValidTable_ValidColumn, NULL, NULL, (SQLTCHAR*)L"kibana_%",
-//                 NULL, true, false)
-//TEST_SQL_COLUMNS(ValidTable_InvalidColumn, NULL, NULL, (SQLTCHAR*)L"kibana_%",
-//                 (SQLTCHAR*)L"invalid_column", true, true)
-//TEST_SQL_COLUMNS(InvalidTable_ValidColumn, NULL, NULL,
-//                 (SQLTCHAR*)L"invalid_table", (SQLTCHAR*)L"FlightNum", true,
-//                 true)
-//TEST_SQL_COLUMNS(InvalidTable_InvalidColumn, NULL, NULL,
-//                 (SQLTCHAR*)L"invalid_table", (SQLTCHAR*)L"invalid_column",
-//                 true, true)
-//
-//// Data validation
-//TEST_F(TestSQLColumns, FlightsValidation) {
-//    EXPECT_EQ(SQL_SUCCESS, SQLColumns(m_hstmt, NULL, SQL_NTS, NULL, SQL_NTS,
-//                                      (SQLTCHAR*)L"kibana_sample_data_flights",
-//                                      SQL_NTS, NULL, SQL_NTS));
-//    std::vector< bind_info > binds;
-//    binds.push_back(bind_info(1, SQL_C_CHAR));
-//    binds.push_back(bind_info(2, SQL_C_CHAR));
-//    binds.push_back(bind_info(3, SQL_C_CHAR));
-//    binds.push_back(bind_info(4, SQL_C_CHAR));
-//    binds.push_back(bind_info(5, SQL_C_SHORT));
-//    binds.push_back(bind_info(6, SQL_C_CHAR));
-//    binds.push_back(bind_info(7, SQL_C_SLONG));
-//    binds.push_back(bind_info(8, SQL_C_SLONG));
-//    binds.push_back(bind_info(9, SQL_C_SSHORT));
-//    binds.push_back(bind_info(10, SQL_C_SSHORT));
-//    binds.push_back(bind_info(11, SQL_C_SSHORT));
-//    binds.push_back(bind_info(12, SQL_C_CHAR));
-//    binds.push_back(bind_info(13, SQL_C_CHAR));
-//    binds.push_back(bind_info(14, SQL_C_SHORT));
-//    binds.push_back(bind_info(15, SQL_C_SSHORT));
-//    binds.push_back(bind_info(16, SQL_C_SLONG));
-//    binds.push_back(bind_info(17, SQL_C_SLONG));
-//    binds.push_back(bind_info(18, SQL_C_CHAR));
-//
-//    for (auto& it : binds)
-//        SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
-//                   it.buffer_len, &it.out_len);
-//
-//    size_t column_idx = 0;
-//    while ((SQL_SUCCESS == SQLFetch(m_hstmt))
-//           && (column_idx < std::min(flights_column_name.size(),
-//                                     flights_data_type.size()))) {
-//        size_t ordinal = 0;
-//        for (auto& it : binds) {
-//            ordinal++;
-//            switch (ordinal) {
-//                case 1:
-//                    EXPECT_EQ(it.AsString(), "");
-//                    break;
-//                case 3:
-//                    EXPECT_EQ(it.AsString(), flights_table_name);
-//                    break;
-//                case 4:
-//                    EXPECT_EQ(it.AsString(), flights_column_name[column_idx]);
-//                    break;
-//                case 5:
-//                    EXPECT_EQ(
-//                        it.AsString(),
-//                        std::to_string(flights_sql_data_type[column_idx]));
-//                    break;
-//                case 6:
-//                    EXPECT_EQ(it.AsString(), flights_data_type[column_idx]);
-//                    break;
-//                case 10:
-//                    EXPECT_EQ(it.AsString(), flights_decimal_digits);
-//                    break;
-//                case 11:
-//                    EXPECT_EQ(it.AsString(), flights_num_prec_radix);
-//                    break;
-//                case 14:
-//                    EXPECT_EQ(
-//                        it.AsString(),
-//                        std::to_string(flights_sql_data_type[column_idx]));
-//                    break;
-//                case 17:
-//                    EXPECT_EQ(it.AsString(), std::to_string(column_idx + 1));
-//                    break;
-//                default:
-//                    EXPECT_TRUE(
-//                        ((it.AsString() == "0") || (it.AsString() == "")));
-//                    break;
-//            }
-//        }
-//        column_idx++;
-//    }
-//    EXPECT_EQ(column_idx, static_cast< size_t >(25));
-//}
-//
+
+void PopulateSQLColumnsBinds(std::vector< bind_info > &binds) {
+    binds.push_back(bind_info(1, SQL_C_CHAR));
+    binds.push_back(bind_info(2, SQL_C_CHAR));
+    binds.push_back(bind_info(3, SQL_C_CHAR));
+    binds.push_back(bind_info(4, SQL_C_CHAR));
+    binds.push_back(bind_info(5, SQL_C_SSHORT));
+    binds.push_back(bind_info(6, SQL_C_CHAR));
+    binds.push_back(bind_info(7, SQL_C_SLONG));
+    binds.push_back(bind_info(8, SQL_C_SLONG));
+    binds.push_back(bind_info(9, SQL_C_SSHORT));
+    binds.push_back(bind_info(10, SQL_C_SSHORT));
+    binds.push_back(bind_info(11, SQL_C_SSHORT));
+    binds.push_back(bind_info(12, SQL_C_CHAR));
+    binds.push_back(bind_info(13, SQL_C_CHAR));
+    binds.push_back(bind_info(14, SQL_C_SSHORT));
+    binds.push_back(bind_info(15, SQL_C_SSHORT));
+    binds.push_back(bind_info(16, SQL_C_SLONG));
+    binds.push_back(bind_info(17, SQL_C_SLONG));
+    binds.push_back(bind_info(18, SQL_C_CHAR));
+}
+
+/**
+ * SQLColumns Tests
+ * This integration required manual setup.
+ * Setup
+ * <Database>.<Table> in Amazon Timestream
+ * ODBCTest.DevOps
+ * ODBCTest.IoT
+ * promDB.promTB
+ */
+
+TEST_F(TestSQLColumns, EXACT_MATCH_ONE_COLUMN) {
+    SQLRETURN ret = SQL_SUCCESS;
+    ret = SQLColumns(m_hstmt, (SQLWCHAR*)L"ODBCTest", SQL_NTS, nullptr, 0,
+                     (SQLWCHAR*)L"IoT", SQL_NTS, (SQLWCHAR*)L"time", SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSMALLINT column_count = 0;
+    ret = SQLNumResultCols(m_hstmt, &column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(18, (int)column_count);
+    std::vector< bind_info > binds;
+    PopulateSQLColumnsBinds(binds);
+    for (auto& it : binds) {
+        ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
+                         it.buffer_len, &it.out_len);
+        EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    }
+    std::vector< std::vector< std::string > > result;
+    while ((ret = SQLFetch(m_hstmt)) == SQL_SUCCESS) {
+        std::vector< std::string > row;
+        for (int i = 0; i < (int)column_count; i++) {
+            row.push_back(binds[i].AsString());
+        }
+        result.push_back(row);
+    }
+    std::vector< std::vector< std::string > > expected{
+        {"ODBCTest", "", "IoT", "time", std::to_string(SQL_TYPE_TIMESTAMP),
+         "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
+         std::to_string(SQL_CODE_TIMESTAMP), "", "36", "YES"}};
+    CheckRows(expected, result);
+}
+
+TEST_F(TestSQLColumns, EXACT_MATCH_ALL_COLUMNS) {
+    SQLRETURN ret = SQL_SUCCESS;
+    ret = SQLColumns(m_hstmt, (SQLWCHAR*)L"ODBCTest", SQL_NTS, nullptr, 0,
+                     (SQLWCHAR*)L"DevOps", SQL_NTS, nullptr, 0);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSMALLINT column_count = 0;
+    ret = SQLNumResultCols(m_hstmt, &column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(18, (int)column_count);
+    std::vector< bind_info > binds;
+    PopulateSQLColumnsBinds(binds);
+    for (auto& it : binds) {
+        ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
+                         it.buffer_len, &it.out_len);
+        EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    }
+    std::vector< std::vector< std::string > > result;
+    while ((ret = SQLFetch(m_hstmt)) == SQL_SUCCESS) {
+        std::vector< std::string > row;
+        for (int i = 0; i < (int)column_count; i++) {
+            row.push_back(binds[i].AsString());
+        }
+        result.push_back(row);
+    }
+    std::vector< std::vector< std::string > > expected{
+        {"ODBCTest", "", "DevOps", "hostname", std::to_string(SQL_VARCHAR),
+         "varchar", std::to_string(INT_MAX), "256", "", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(INT_MAX), "1", "YES"},
+        {"ODBCTest", "", "DevOps", "az", std::to_string(SQL_VARCHAR), "varchar",
+         std::to_string(INT_MAX), "256", "", "", std::to_string(SQL_NULLABLE),
+         "", "", std::to_string(SQL_VARCHAR), "", std::to_string(INT_MAX), "2",
+         "YES"},
+        {"ODBCTest", "", "DevOps", "region", std::to_string(SQL_VARCHAR),
+         "varchar", std::to_string(INT_MAX), "256", "", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(INT_MAX), "3", "YES"},
+        {"ODBCTest", "", "DevOps", "measure_value::double",
+         std::to_string(SQL_DOUBLE), "double", "15",
+         std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
+         "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
+        {"ODBCTest", "", "DevOps", "measure_name", std::to_string(SQL_VARCHAR),
+         "varchar", std::to_string(INT_MAX), "256", "", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(INT_MAX), "5", "YES"},
+        {"ODBCTest", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
+         "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
+         std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"}};
+    CheckRows(expected, result);
+}
+
+TEST_F(TestSQLColumns, SEARCH_PATTERN_ALL_COLUMNS) {
+    SQLRETURN ret = SQL_SUCCESS;
+    ret = SQLColumns(m_hstmt, (SQLWCHAR*)L"ODBCTest", SQL_NTS, nullptr, 0,
+                     (SQLWCHAR*)L"DevOps", SQL_NTS, (SQLWCHAR*)L"%", SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSMALLINT column_count = 0;
+    ret = SQLNumResultCols(m_hstmt, &column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(18, (int)column_count);
+    std::vector< bind_info > binds;
+    PopulateSQLColumnsBinds(binds);
+    for (auto& it : binds) {
+        ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
+                         it.buffer_len, &it.out_len);
+        EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    }
+    std::vector< std::vector< std::string > > result;
+    while ((ret = SQLFetch(m_hstmt)) == SQL_SUCCESS) {
+        std::vector< std::string > row;
+        for (int i = 0; i < (int)column_count; i++) {
+            row.push_back(binds[i].AsString());
+        }
+        result.push_back(row);
+    }
+    std::vector< std::vector< std::string > > expected{
+        {"ODBCTest", "", "DevOps", "hostname", std::to_string(SQL_VARCHAR),
+         "varchar", std::to_string(INT_MAX), "256", "", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(INT_MAX), "1", "YES"},
+        {"ODBCTest", "", "DevOps", "az", std::to_string(SQL_VARCHAR), "varchar",
+         std::to_string(INT_MAX), "256", "", "", std::to_string(SQL_NULLABLE),
+         "", "", std::to_string(SQL_VARCHAR), "", std::to_string(INT_MAX), "2",
+         "YES"},
+        {"ODBCTest", "", "DevOps", "region", std::to_string(SQL_VARCHAR),
+         "varchar", std::to_string(INT_MAX), "256", "", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(INT_MAX), "3", "YES"},
+        {"ODBCTest", "", "DevOps", "measure_value::double",
+         std::to_string(SQL_DOUBLE), "double", "15",
+         std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
+         "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
+        {"ODBCTest", "", "DevOps", "measure_name", std::to_string(SQL_VARCHAR),
+         "varchar", std::to_string(INT_MAX), "256", "", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(INT_MAX), "5", "YES"},
+        {"ODBCTest", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
+         "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
+         std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"}};
+    CheckRows(expected, result);
+}
+
+TEST_F(TestSQLColumns, SEARCH_PATTERN_SOME_COLUMNS) {
+    SQLRETURN ret = SQL_SUCCESS;
+    ret = SQLColumns(m_hstmt, (SQLWCHAR*)L"ODBCTest", SQL_NTS, nullptr, 0,
+                     (SQLWCHAR*)L"DevOps", SQL_NTS, (SQLWCHAR*)L"measure%",
+                     SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSMALLINT column_count = 0;
+    ret = SQLNumResultCols(m_hstmt, &column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(18, (int)column_count);
+    std::vector< bind_info > binds;
+    PopulateSQLColumnsBinds(binds);
+    for (auto& it : binds) {
+        ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
+                         it.buffer_len, &it.out_len);
+        EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    }
+    std::vector< std::vector< std::string > > result;
+    while ((ret = SQLFetch(m_hstmt)) == SQL_SUCCESS) {
+        std::vector< std::string > row;
+        for (int i = 0; i < (int)column_count; i++) {
+            row.push_back(binds[i].AsString());
+        }
+        result.push_back(row);
+    }
+    std::vector< std::vector< std::string > > expected{
+        {"ODBCTest", "", "DevOps", "measure_value::double",
+         std::to_string(SQL_DOUBLE), "double", "15",
+         std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
+         "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
+        {"ODBCTest", "", "DevOps", "measure_name", std::to_string(SQL_VARCHAR),
+         "varchar", std::to_string(INT_MAX), "256", "", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(INT_MAX), "5", "YES"}};
+    CheckRows(expected, result);
+}
+
+TEST_F(TestSQLColumns, SEARCH_PATTERN_MULTI_TABLES_COLUMNS) {
+    SQLRETURN ret = SQL_SUCCESS;
+    ret = SQLColumns(m_hstmt, (SQLWCHAR*)L"ODBCTest", SQL_NTS, nullptr, 0,
+                     (SQLWCHAR*)L"%", SQL_NTS, (SQLWCHAR*)L"tim_", SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSMALLINT column_count = 0;
+    ret = SQLNumResultCols(m_hstmt, &column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(18, (int)column_count);
+    std::vector< bind_info > binds;
+    PopulateSQLColumnsBinds(binds);
+    for (auto& it : binds) {
+        ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
+                         it.buffer_len, &it.out_len);
+        EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    }
+    std::vector< std::vector< std::string > > result;
+    while ((ret = SQLFetch(m_hstmt)) == SQL_SUCCESS) {
+        std::vector< std::string > row;
+        for (int i = 0; i < (int)column_count; i++) {
+            row.push_back(binds[i].AsString());
+        }
+        result.push_back(row);
+    }
+    std::vector< std::vector< std::string > > expected{
+        {"ODBCTest", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
+         "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
+         std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"},
+        {"ODBCTest", "", "IoT", "time", std::to_string(SQL_TYPE_TIMESTAMP),
+         "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
+         std::to_string(SQL_CODE_TIMESTAMP), "", "36", "YES"}};
+    CheckRows(expected, result);
+}
+
+TEST_F(TestSQLColumns, META_DATA_CASE_INSENSITIVE) {
+    SQLRETURN ret = SQL_SUCCESS;
+    ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER) true, 0);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    ret = SQLColumns(m_hstmt, (SQLWCHAR*)L"odbctest", SQL_NTS, (SQLWCHAR*)L"",
+                     SQL_NTS, (SQLWCHAR*)L"devops", SQL_NTS, (SQLWCHAR*)L"TIME",
+                     SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSMALLINT column_count = 0;
+    ret = SQLNumResultCols(m_hstmt, &column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(18, (int)column_count);
+    std::vector< bind_info > binds;
+    PopulateSQLColumnsBinds(binds);
+    for (auto& it : binds) {
+        ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
+                         it.buffer_len, &it.out_len);
+        EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    }
+    std::vector< std::vector< std::string > > result;
+    while ((ret = SQLFetch(m_hstmt)) == SQL_SUCCESS) {
+        std::vector< std::string > row;
+        for (int i = 0; i < (int)column_count; i++) {
+            row.push_back(binds[i].AsString());
+        }
+        result.push_back(row);
+    }
+    std::vector< std::vector< std::string > > expected{
+        {"ODBCTest", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
+         "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
+         std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"}};
+    CheckRows(expected, result);
+}
+
+TEST_F(TestSQLColumns, META_DATA_CASE_INSENSITIVE_NOT_FOUND) {
+    SQLRETURN ret = SQL_SUCCESS;
+    ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER) true, 0);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    ret = SQLColumns(m_hstmt, (SQLWCHAR*)L"ODBCTest", SQL_NTS, (SQLWCHAR*)L"",
+                     SQL_NTS, (SQLWCHAR*)L"DevOps", SQL_NTS, (SQLWCHAR*)L"%",
+                     SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSMALLINT column_count = 0;
+    ret = SQLNumResultCols(m_hstmt, &column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(18, (int)column_count);
+    std::vector< bind_info > binds;
+    PopulateSQLColumnsBinds(binds);
+    for (auto& it : binds) {
+        ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
+                         it.buffer_len, &it.out_len);
+        EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    }
+    std::vector< std::vector< std::string > > result;
+    while ((ret = SQLFetch(m_hstmt)) == SQL_SUCCESS) {
+        std::vector< std::string > row;
+        for (int i = 0; i < (int)column_count; i++) {
+            row.push_back(binds[i].AsString());
+        }
+        result.push_back(row);
+    }
+    std::vector< std::vector< std::string > > expected{};
+    CheckRows(expected, result);
+}
+
 //// We expect an empty result set for PrimaryKeys and ForeignKeys
 //// Tableau specified catalog and table
 //// NULL args
