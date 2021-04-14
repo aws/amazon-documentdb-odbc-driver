@@ -30,19 +30,20 @@ extern "C" {
 #define ES_TYPE_LO ? ? ? ? /* waiting for permanent type */
 #endif
 
-#define TS_TYPE_NAME_BOOLEAN "BOOLEAN"
-#define TS_TYPE_NAME_INTEGER "INTEGER"
-#define TS_TYPE_NAME_BIGINT "BIGINT"
+#define TS_TYPE_NAME_BOOLEAN "boolean"
+#define TS_TYPE_NAME_INTEGER "int"
+#define TS_TYPE_NAME_BIGINT "bigint"
 #define ES_TYPE_NAME_HALF_FLOAT "half_float"
 #define ES_TYPE_NAME_FLOAT "float"
-#define TS_TYPE_NAME_DOUBLE "DOUBLE"
+#define TS_TYPE_NAME_DOUBLE "double"
 #define ES_TYPE_NAME_SCALED_FLOAT "scaled_float"
 #define ES_TYPE_NAME_KEYWORD "keyword"
 #define ES_TYPE_NAME_TEXT "text"
 #define ES_TYPE_NAME_NESTED "nested"
 #define ES_TYPE_NAME_DATE "date"
 #define ES_TYPE_NAME_OBJECT "object"
-#define ES_TYPE_NAME_VARCHAR "varchar"
+#define TS_TYPE_NAME_VARCHAR "varchar"
+#define TS_TYPE_NAME_TIMESTAMP "timestamp"
 #define ES_TYPE_NAME_UNSUPPORTED "unsupported"
 
 #define MS_ACCESS_SERIAL "int identity"

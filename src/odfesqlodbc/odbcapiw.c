@@ -58,7 +58,7 @@ RETCODE SQL_API SQLColumnsW(HSTMT StatementHandle, SQLWCHAR *CatalogName,
     if (SC_opencheck(stmt, func))
         ret = SQL_ERROR;
     else
-        ret = ESAPI_Columns(StatementHandle, (SQLCHAR *)ctName,
+        ret = API_Columns(StatementHandle, (SQLCHAR *)ctName,
                             (SQLSMALLINT)nmlen1, (SQLCHAR *)scName,
                             (SQLSMALLINT)nmlen2, (SQLCHAR *)tbName,
                             (SQLSMALLINT)nmlen3, (SQLCHAR *)clName,
