@@ -23,8 +23,9 @@
 #include <regex>
 #include <sstream>
 #include <string>
+#include <map>
 #include <unordered_map>
-#include <vector>
+#include <set>
 
 // TODO #324 (SQL Plugin)- Update if Elasticsearch extends support for multiple
 // tables
@@ -76,17 +77,31 @@ auto case_insensitive_compare = [](char &c1, char &c2) {
     return std::toupper(c1) == std::toupper(c2);
 };
 
-const std::unordered_map< int, std::vector< int > > sql_es_type_map = {
+const std::map< int, std::set< int > > sql_to_ts_type_map = {
     {SQL_BIT, {TS_TYPE_BOOLEAN}},
-    {SQL_TINYINT, {TS_TYPE_INTEGER}},
-    {SQL_SMALLINT, {TS_TYPE_INTEGER}},
     {SQL_INTEGER, {TS_TYPE_INTEGER}},
     {SQL_BIGINT, {TS_TYPE_BIGINT}},
-    {SQL_REAL, {ES_TYPE_HALF_FLOAT, ES_TYPE_FLOAT4}},
-    {SQL_DOUBLE, {TS_TYPE_DOUBLE, ES_TYPE_SCALED_FLOAT}},
-    {SQL_WVARCHAR,
-     {ES_TYPE_KEYWORD, ES_TYPE_TEXT, ES_TYPE_NESTED, ES_TYPE_OBJECT}},
-    {SQL_TYPE_TIMESTAMP, {ES_TYPE_DATETIME}}};
+    {SQL_DOUBLE, {TS_TYPE_DOUBLE}},
+#ifdef UNICODE_SUPPORT
+    {SQL_WVARCHAR, {TS_TYPE_ARRAY,
+                   TS_TYPE_INTERVAL_DAY_TO_SECOND,
+                   TS_TYPE_INTERVAL_YEAR_TO_MONTH,
+                   TS_TYPE_ROW,
+                   TS_TYPE_TIMESERIES,
+                   TS_TYPE_VARCHAR,
+                   TS_TYPE_UNKNOWN}},
+#else
+    {SQL_VARCHAR, {TS_TYPE_ARRAY,
+                   TS_TYPE_INTERVAL_DAY_TO_SECOND,
+                   TS_TYPE_INTERVAL_YEAR_TO_MONTH,
+                   TS_TYPE_ROW,
+                   TS_TYPE_TIMESERIES,
+                   TS_TYPE_VARCHAR,
+                   TS_TYPE_UNKNOWN}},
+#endif
+    {SQL_DATE, {TS_TYPE_DATE}},
+    {SQL_TIME, {TS_TYPE_TIME}},
+    {SQL_TIMESTAMP, {TS_TYPE_TIMESTAMP}}};
 
 const std::unordered_map< std::string, int > data_name_data_type_map = {
     {TS_TYPE_NAME_DOUBLE, SQL_DOUBLE},
@@ -1081,7 +1096,6 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                         reinterpret_cast< const char * >(type),
                         static_cast< size_t >(type_strlen_or_ind));
                 }
-
                 TupleField *tuple = QR_AddNew(res);
                 tuple[COLUMNS_CATALOG_NAME].value = strdup(table.first.c_str());
                 tuple[COLUMNS_CATALOG_NAME].len = (int)table.first.size();
@@ -1115,12 +1129,12 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                 tuple[COLUMNS_SCALE].len = (type_name_return == "timestamp")
                                                ? (int)decimal_digits.size()
                                                : 0;
-                std::string col_radix = std::to_string(10);
-                tuple[COLUMNS_RADIX].value = (type_name_return == "double")
-                                                 ? strdup(col_radix.c_str())
-                                                 : NULL;
-                tuple[COLUMNS_RADIX].len =
-                    (type_name_return == "double") ? (int)col_radix.size() : 0;
+                if (type_name_return == "double" || type_name_return == "int"
+                    || type_name_return == "bigint") {
+                    set_nullfield_int2(&tuple[COLUMNS_RADIX], 10);
+                } else {
+                    set_nullfield_int2(&tuple[COLUMNS_RADIX], -1);
+                }
                 std::string col_nullable = std::to_string(SQL_NULLABLE);
                 tuple[COLUMNS_NULLABLE].value = strdup(col_nullable.c_str());
                 tuple[COLUMNS_NULLABLE].len = (int)col_nullable.size();
@@ -1230,64 +1244,56 @@ void SetupTypeQResInfo(QResultClass *res) {
 
 RETCODE SetTypeResult(ConnectionClass *conn, StatementClass *stmt,
                       QResultClass *res, int esType, int sqlType) {
-    TupleField *tuple;
-
-    if (tuple = QR_AddNew(res), NULL == tuple) {
+    TupleField *tuple = QR_AddNew(res);
+    if (nullptr == tuple) {
         SC_set_error(stmt, STMT_NO_MEMORY_ERROR, "Couldn't QR_AddNew.",
                      "SetTypeResult");
         CleanUp_GetTypeInfo(stmt, SQL_ERROR);
         return SQL_ERROR;
     }
-
-    set_tuplefield_string(&tuple[GETTYPE_TYPE_NAME],
-                          estype_attr_to_name(conn, esType, -1, FALSE));
-    set_tuplefield_int2(&tuple[GETTYPE_NULLABLE],
-                        estype_nullable(conn, esType));
-
-    set_tuplefield_int2(&tuple[GETTYPE_DATA_TYPE],
-                        static_cast< short >(sqlType));
-    set_tuplefield_int2(&tuple[GETTYPE_CASE_SENSITIVE],
-                        tstype_case_sensitive(conn, esType));
-    set_tuplefield_int2(&tuple[GETTYPE_SEARCHABLE],
-                        estype_searchable(conn, esType));
-    set_tuplefield_int2(&tuple[GETTYPE_FIXED_PREC_SCALE],
-                        estype_money(conn, esType));
-
-    //  Localized data-source dependent data type name (always NULL)
+    // 1. GETTYPE_TYPE_NAME [cannot be null]
+    set_tuplefield_string(&tuple[GETTYPE_TYPE_NAME], tstype_attr_to_name(conn, esType, -1, FALSE));
+    // 2. GETTYPE_DATA_TYPE [cannot be null]
+    set_tuplefield_int2(&tuple[GETTYPE_DATA_TYPE], static_cast< short >(sqlType));
+    // 3. GETTYPE_COLUMN_SIZE
+    set_nullfield_int4( &tuple[GETTYPE_COLUMN_SIZE], tstype_attr_column_size(conn, esType, ES_ATP_UNSET, ES_ADT_UNSET, ES_UNKNOWNS_UNSET));
+    // 4. GETTYPE_LITERAL_PREFIX
+    set_nullfield_string(&tuple[GETTYPE_LITERAL_PREFIX], tstype_literal_prefix(conn, esType));
+    // 5. GETTYPE_LITERAL_SUFFIX
+    set_nullfield_string(&tuple[GETTYPE_LITERAL_SUFFIX], tstype_literal_suffix(conn, esType));
+    // 6. GETTYPE_CREATE_PARAMS
+    set_nullfield_string(&tuple[GETTYPE_CREATE_PARAMS], nullptr);
+    // 7. GETTYPE_NULLABLE [cannot be null]
+    set_tuplefield_int2(&tuple[GETTYPE_NULLABLE], tstype_nullable(conn, esType));
+    // 8. GETTYPE_CASE_SENSITIVE [cannot be null]
+    set_tuplefield_int2(&tuple[GETTYPE_CASE_SENSITIVE], tstype_case_sensitive(conn, esType));
+    // 9. GETTYPE_SEARCHABLE [cannot be null]
+    set_tuplefield_int2(&tuple[GETTYPE_SEARCHABLE], tstype_searchable(conn, esType));
+    // 10. GETTYPE_UNSIGNED_ATTRIBUTE
+    set_nullfield_int2(&tuple[GETTYPE_UNSIGNED_ATTRIBUTE], tstype_unsigned(conn, esType));
+    // 11. GETTYPE_FIXED_PREC_SCALE [cannot be null]
+    set_tuplefield_int2(&tuple[GETTYPE_FIXED_PREC_SCALE], SQL_FALSE);
+    // 12. GETTYPE_AUTO_UNIQUE_VALUE
+    set_nullfield_int2(&tuple[GETTYPE_AUTO_UNIQUE_VALUE], tstype_auto_increment(conn, esType));
+    // 13. GETTYPE_LOCAL_TYPE_NAME
     set_tuplefield_null(&tuple[GETTYPE_LOCAL_TYPE_NAME]);
-
-    // These values can be NULL
-    set_nullfield_int4(
-        &tuple[GETTYPE_COLUMN_SIZE],
-        estype_attr_column_size(conn, esType, ES_ATP_UNSET, ES_ADT_UNSET,
-                                ES_UNKNOWNS_UNSET));
-    set_nullfield_string(&tuple[GETTYPE_LITERAL_PREFIX],
-                         estype_literal_prefix(conn, esType));
-    set_nullfield_string(&tuple[GETTYPE_LITERAL_SUFFIX],
-                         estype_literal_suffix(conn, esType));
-    set_nullfield_string(&tuple[GETTYPE_CREATE_PARAMS],
-                         estype_create_params(conn, esType));
-    set_nullfield_int2(&tuple[GETTYPE_UNSIGNED_ATTRIBUTE],
-                       estype_unsigned(conn, esType));
-    set_nullfield_int2(&tuple[GETTYPE_AUTO_UNIQUE_VALUE],
-                       tstype_auto_increment(conn, esType));
-    set_nullfield_int2(&tuple[GETTYPE_MINIMUM_SCALE],
-                       estype_min_decimal_digits(conn, esType));
-    set_nullfield_int2(&tuple[GETTYPE_MAXIMUM_SCALE],
-                       estype_max_decimal_digits(conn, esType));
-    set_tuplefield_int2(&tuple[GETTYPE_SQL_DATA_TYPE],
-                        static_cast< short >(sqlType));
-    set_nullfield_int2(&tuple[GETTYPE_SQL_DATETIME_SUB],
-                       estype_attr_to_datetime_sub(conn, esType, ES_ATP_UNSET));
-    set_nullfield_int4(&tuple[GETTYPE_NUM_PREC_RADIX],
-                       estype_radix(conn, esType));
+    // 14. GETTYPE_MINIMUM_SCALE
+    set_nullfield_int2(&tuple[GETTYPE_MINIMUM_SCALE], tstype_min_decimal_digits(conn, esType));
+    // 15. GETTYPE_MAXIMUM_SCALE
+    set_nullfield_int2(&tuple[GETTYPE_MAXIMUM_SCALE], tstype_max_decimal_digits(conn, esType));
+    // 16. GETTYPE_SQL_DATA_TYPE [cannot be null]
+    set_tuplefield_int2(&tuple[GETTYPE_SQL_DATA_TYPE], static_cast< short >(sqlType));
+    // 17. GETTYPE_SQL_DATETIME_SUB
+    set_nullfield_int2(&tuple[GETTYPE_SQL_DATETIME_SUB], tstype_attr_to_datetime_sub(conn, esType, ES_ATP_UNSET));
+    // 18. GETTYPE_NUM_PREC_RADIX
+    set_nullfield_int4(&tuple[GETTYPE_NUM_PREC_RADIX], tstype_radix(conn, esType));
+    // 19. GETTYPE_INTERVAL_PRECISION
     set_nullfield_int4(&tuple[GETTYPE_INTERVAL_PRECISION], 0);
-
     return SQL_SUCCESS;
 }
 
-RETCODE SQL_API ESAPI_GetTypeInfo(HSTMT hstmt, SQLSMALLINT fSqlType) {
-    CSTR func = "ESAPI_GetTypeInfo";
+RETCODE SQL_API API_GetTypeInfo(HSTMT hstmt, SQLSMALLINT fSqlType) {
+    CSTR func = "API_GetTypeInfo";
     StatementClass *stmt = (StatementClass *)hstmt;
     ConnectionClass *conn;
     conn = SC_get_conn(stmt);
@@ -1299,52 +1305,36 @@ RETCODE SQL_API ESAPI_GetTypeInfo(HSTMT hstmt, SQLSMALLINT fSqlType) {
     if (result = SC_initialize_and_recycle(stmt), SQL_SUCCESS != result)
         return result;
 
-    try {
-        if (res = QR_Constructor(), !res) {
-            SC_set_error(stmt, STMT_INTERNAL_ERROR, "Error creating result.",
-                         func);
-            return SQL_ERROR;
-        }
-        SC_set_Result(stmt, res);
+    if (res = QR_Constructor(), !res) {
+        SC_set_error(stmt, STMT_INTERNAL_ERROR, "Error creating result.",
+                        func);
+        return SQL_ERROR;
+    }
+    SC_set_Result(stmt, res);
 
-        result_cols = NUM_OF_GETTYPE_FIELDS;
-        extend_column_bindings(SC_get_ARDF(stmt),
-                               static_cast< SQLSMALLINT >(result_cols));
+    result_cols = NUM_OF_GETTYPE_FIELDS;
+    extend_column_bindings(SC_get_ARDF(stmt),
+                            static_cast< SQLSMALLINT >(result_cols));
 
-        stmt->catalog_result = TRUE;
-        QR_set_num_fields(res, result_cols);
-        SetupTypeQResInfo(res);
+    stmt->catalog_result = TRUE;
+    QR_set_num_fields(res, result_cols);
+    SetupTypeQResInfo(res);
 
-        if (fSqlType == SQL_ALL_TYPES) {
-            for (std::pair< int, std::vector< int > > sqlType :
-                 sql_es_type_map) {
-                for (auto const &esType : sqlType.second) {
-                    result =
-                        SetTypeResult(conn, stmt, res, esType, sqlType.first);
-                }
-            }
-        } else {
-            if (sql_es_type_map.count(fSqlType) > 0) {
-                for (auto esType : sql_es_type_map.at(fSqlType)) {
-                    result = SetTypeResult(conn, stmt, res, esType, fSqlType);
-                }
+    if (fSqlType == SQL_ALL_TYPES) {
+        for (auto sqlType : sql_to_ts_type_map) {
+            for (auto type : sqlType.second) {
+                result = SetTypeResult(conn, stmt, res, type, sqlType.first);
             }
         }
-        result = SQL_SUCCESS;
-
-    } catch (std::bad_alloc &e) {
-        std::string error_msg = std::string("Bad allocation exception: '")
-                                + e.what() + std::string("'.");
-        SC_set_error(stmt, STMT_NO_MEMORY_ERROR, error_msg.c_str(), func);
-    } catch (std::exception &e) {
-        std::string error_msg =
-            std::string("Generic exception: '") + e.what() + std::string("'.");
-        SC_set_error(stmt, STMT_INTERNAL_ERROR, error_msg.c_str(), func);
-    } catch (...) {
-        std::string error_msg("Unknown exception raised.");
-        SC_set_error(stmt, STMT_INTERNAL_ERROR, error_msg.c_str(), func);
+    } else {
+        if (sql_to_ts_type_map.find(fSqlType) != sql_to_ts_type_map.end()) {
+            for (auto type : sql_to_ts_type_map.at(fSqlType)) {
+                result = SetTypeResult(conn, stmt, res, type, fSqlType);
+            }
+        }
     }
 
+    result = SQL_SUCCESS;
     CleanUp_GetTypeInfo(stmt, result);
     return result;
 }

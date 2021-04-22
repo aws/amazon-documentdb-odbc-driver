@@ -57,7 +57,7 @@ API_Columns(HSTMT hstmt, const SQLCHAR* catalog_name_sql,
               const SQLSMALLINT column_name_sz, const UWORD flag,
               const OID reloid, const Int2 attnum);
 
-RETCODE SQL_API ESAPI_GetTypeInfo(HSTMT hstmt, SQLSMALLINT fSqlType);
+RETCODE SQL_API API_GetTypeInfo(HSTMT hstmt, SQLSMALLINT fSqlType);
 #ifdef __cplusplus
 }
 #endif

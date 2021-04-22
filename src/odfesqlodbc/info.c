@@ -330,7 +330,7 @@ RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
 
         case SQL_MAX_OWNER_NAME_LEN: /* ODBC 1.0 */
             len = 2;
-            value = 0;
+            value = NAMEDATALEN_V73 - 1;
             break;
 
         case SQL_MAX_PROCEDURE_NAME_LEN: /* ODBC 1.0 */
@@ -450,7 +450,7 @@ RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
             break;
 
         case SQL_OWNER_TERM: /* ODBC 1.0 */
-            p = "";
+            p = "schema";
             break;
 
         case SQL_OWNER_USAGE: /* ODBC 2.0 */
@@ -922,7 +922,7 @@ cleanup:
  *	macros for estype_xxxx() calls which have ES_ATP_UNSET parameters
  */
 #define ESTYPE_COLUMN_SIZE(conn, esType)                              \
-    estype_attr_column_size(conn, esType, ES_ATP_UNSET, ES_ADT_UNSET, \
+    tstype_attr_column_size(conn, esType, ES_ATP_UNSET, ES_ADT_UNSET, \
                             ES_UNKNOWNS_UNSET)
 #define ESTYPE_TO_CONCISE_TYPE(conn, esType)                              \
     estype_attr_to_concise_type(conn, esType, ES_ATP_UNSET, ES_ADT_UNSET, \
@@ -940,7 +940,7 @@ cleanup:
     estype_attr_transfer_octet_length(conn, esType, ES_ATP_UNSET, \
                                       ES_UNKNOWNS_UNSET)
 #define ESTYPE_TO_NAME(conn, esType, auto_increment) \
-    estype_attr_to_name(conn, esType, ES_ATP_UNSET, auto_increment)
+    tstype_attr_to_name(conn, esType, ES_ATP_UNSET, auto_increment)
 
 RETCODE SQL_API ESAPI_GetFunctions(HDBC hdbc, SQLUSMALLINT fFunction,
                                    SQLUSMALLINT *pfExists) {
@@ -1247,7 +1247,7 @@ char *identifierEscape(const SQLCHAR *src, SQLLEN srclen,
  *		ES_ADT_UNSET or ES_UNKNOWNS_UNSET parameters
  */
 #define ESTYPE_ATTR_COLUMN_SIZE(conn, esType, atttypmod)           \
-    estype_attr_column_size(conn, esType, atttypmod, ES_ADT_UNSET, \
+    tstype_attr_column_size(conn, esType, atttypmod, ES_ADT_UNSET, \
                             ES_UNKNOWNS_UNSET)
 #define ESTYPE_ATTR_TO_CONCISE_TYPE(conn, esType, atttypmod)           \
     estype_attr_to_concise_type(conn, esType, atttypmod, ES_ADT_UNSET, \
