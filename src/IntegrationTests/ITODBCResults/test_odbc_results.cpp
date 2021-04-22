@@ -2027,13 +2027,13 @@ TEST_F(TestSQLGetData, NULL_TO_SQL_C_CHAR) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::string expected;
-    expected = "null";
-    ASSERT_EQ((int)expected.size(), indicator);
+    expected = "";
+    ASSERT_EQ(SQL_NULL_DATA, indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    expected = "null";
-    ASSERT_EQ((int)expected.size(), indicator);
+    expected = "";
+    ASSERT_EQ(SQL_NULL_DATA, indicator);
     EXPECT_STREQ(expected.c_str(), (char*)data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -2047,21 +2047,13 @@ TEST_F(TestSQLGetData, NULL_TO_SQL_C_WCHAR) {
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     std::wstring expected;
-    expected = L"null";
-#ifdef __APPLE__
-    ASSERT_EQ((int)(4 * expected.size()), indicator);
-#else
-    ASSERT_EQ((int)(2 * expected.size()), indicator);
-#endif
+    expected = L"";
+    ASSERT_EQ(SQL_NULL_DATA, indicator);
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    expected = L"null";
-#ifdef __APPLE__
-    ASSERT_EQ((int)(4 * expected.size()), indicator);
-#else
-    ASSERT_EQ((int)(2 * expected.size()), indicator);
-#endif
+    expected = L"";
+    ASSERT_EQ(SQL_NULL_DATA, indicator);
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -4304,9 +4296,9 @@ TEST_F(TestSQLDescribeCol, INTEGER_COLUMN) {
     std::wstring expected_column_name = L"_col0";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_INTEGER, data_type);
-    EXPECT_EQ((SQLULEN)10, column_size);
+    EXPECT_EQ((SQLULEN)11, column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -4328,7 +4320,7 @@ TEST_F(TestSQLDescribeCol, DOUBLE_COLUMN) {
     EXPECT_EQ(SQL_DOUBLE, data_type);
     EXPECT_EQ((SQLULEN)15, column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -4348,9 +4340,9 @@ TEST_F(TestSQLDescribeCol, BIGINT_COLUMN) {
     std::wstring expected_column_name = L"_col0";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_BIGINT, data_type);
-    EXPECT_EQ((SQLULEN)19, column_size);
+    EXPECT_EQ((SQLULEN)20, column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -4372,7 +4364,7 @@ TEST_F(TestSQLDescribeCol, BOOLEAN_COLUMN) {
     EXPECT_EQ(SQL_BIT, data_type);
     EXPECT_EQ((SQLULEN)1, column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -4392,10 +4384,9 @@ TEST_F(TestSQLDescribeCol, VARCHAR_COLUMN) {
     std::wstring expected_column_name = L"_col0";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    std::string expected = "ABCDEFG";
-    EXPECT_EQ((SQLULEN)expected.size(), column_size);
+    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -4426,10 +4417,9 @@ TEST_F(TestSQLDescribeCol, TIMESERIES_COLUMN) {
     std::wstring expected_column_name = L"_col0";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    std::string expected = "[{time: 2021-03-05 14:18:30.123456789, value: (null, [[(12345, [1, 2, 3])]])}]";
-    EXPECT_EQ((SQLULEN)expected.size(), column_size);
+    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -4450,11 +4440,9 @@ TEST_F(TestSQLDescribeCol, ARRAY_COLUMN) {
     std::wstring expected_column_name = L"_col0";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    std::string expected =
-        "[[[[1.1, 2.3], [1.1, 2.3]]], [[[1.1, 2.3], [1.1, 2.3]]]]";
-    EXPECT_EQ((SQLULEN)expected.size(), column_size);
+    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -4474,10 +4462,9 @@ TEST_F(TestSQLDescribeCol, ROW_COLUMN) {
     std::wstring expected_column_name = L"_col0";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    std::string expected = "(((3, 10, true), [[1.0, 2.0], [1.1, 2.2]]))";
-    EXPECT_EQ((SQLULEN)expected.size(), column_size);
+    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -4497,10 +4484,9 @@ TEST_F(TestSQLDescribeCol, NULL_COLUMN) {
     std::wstring expected_column_name = L"_col0";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    std::string expected = "null";
-    EXPECT_EQ((SQLULEN)expected.size(), column_size);
+    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -4523,7 +4509,7 @@ TEST_F(TestSQLDescribeCol, TIMESTAMP_COLUMN) {
     std::string expected = "2021-01-02 18:01:13.000000000";
     EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -4546,7 +4532,7 @@ TEST_F(TestSQLDescribeCol, DATE_COLUMN) {
     std::string expected = "2021-01-02";
     EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -4569,7 +4555,7 @@ TEST_F(TestSQLDescribeCol, TIME_COLUMN) {
     std::string expected = "06:39:45.123456789";
     EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -4589,10 +4575,9 @@ TEST_F(TestSQLDescribeCol, INTERVAL_YEAR_TO_MONTH_COLUMN) {
     std::wstring expected_column_name = L"_col0";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    std::string expected = "1-0";
-    EXPECT_EQ((SQLULEN)expected.size(), column_size);
+    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -4612,10 +4597,9 @@ TEST_F(TestSQLDescribeCol, INTERVAL_DAY_TO_SECOND_COLUMN) {
     std::wstring expected_column_name = L"_col0";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    std::string expected = "1 00:00:00.000000000";
-    EXPECT_EQ((SQLULEN)expected.size(), column_size);
+    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -4692,9 +4676,9 @@ TEST_F(TestSQLDescribeCol, MULTIPLE_COLUMNS) {
     std::wstring expected_column_name = L"_col0";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_INTEGER, data_type);
-    EXPECT_EQ((SQLULEN)10, column_size);
+    EXPECT_EQ((SQLULEN)11, column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     ret = SQLDescribeCol(m_hstmt, 2, column_name, 60, &column_name_length,
                          &data_type, &column_size, &decimal_digits, &nullable);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -4703,16 +4687,16 @@ TEST_F(TestSQLDescribeCol, MULTIPLE_COLUMNS) {
     EXPECT_EQ(SQL_DOUBLE, data_type);
     EXPECT_EQ((SQLULEN)15, column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     ret = SQLDescribeCol(m_hstmt, 3, column_name, 60, &column_name_length,
                          &data_type, &column_size, &decimal_digits, &nullable);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     expected_column_name = L"_col2";
     EXPECT_STREQ(expected_column_name.c_str(), column_name);
     EXPECT_EQ(SQL_BIGINT, data_type);
-    EXPECT_EQ((SQLULEN)19, column_size);
+    EXPECT_EQ((SQLULEN)20, column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     ret = SQLDescribeCol(m_hstmt, 4, column_name, 60, &column_name_length,
                          &data_type, &column_size, &decimal_digits, &nullable);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -4721,7 +4705,7 @@ TEST_F(TestSQLDescribeCol, MULTIPLE_COLUMNS) {
     EXPECT_EQ(SQL_BIT, data_type);
     EXPECT_EQ((SQLULEN)1, column_size);
     EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE_UNKNOWN, nullable);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 

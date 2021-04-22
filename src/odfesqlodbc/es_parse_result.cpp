@@ -34,15 +34,16 @@ typedef std::vector< std::pair< std::string, OID > > schema_type;
 typedef rabbit::array json_arr;
 typedef json_arr::iterator::result_type json_arr_it;
 
-bool _CC_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
-                       const char *next_token, TSResult &ts_result);
-bool _CC_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
-                                const char *next_token, TSResult &ts_result);
-bool _CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
-                                   const char *next_token, TSResult &ts_result);
+bool _CC_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
+    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
+bool _CC_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
+    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
+bool _CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
+    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
 bool AssignColumnHeaders(QResultClass *q_res,
-                         const TSResult &ts_result);
-bool AssignTableData(TSResult &ts_result, QResultClass *q_res, ColumnInfoClass &fields);
+    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
+bool AssignTableData(const Aws::TimestreamQuery::Model::QueryOutcome &ts_result,
+                     QResultClass *q_res, ColumnInfoClass &fields);
 bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
                    QResultClass *q_res, ColumnInfoClass &fields,
                    const size_t &row_size);
@@ -179,34 +180,36 @@ std::string GetResultParserError() {
 }
 
 BOOL CC_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
-                      const char *next_token, TSResult &ts_result) {
+                      const char *next_token, const Aws::TimestreamQuery::Model::QueryOutcome &ts_result) {
     ClearError();
     return _CC_from_TSResult(q_res, conn, next_token, ts_result) ? TRUE : FALSE;
 }
 
-BOOL CC_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
-                               const char *next_token, TSResult &ts_result) {
+BOOL CC_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
+    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result) {
     ClearError();
     return _CC_Metadata_from_TSResult(q_res, conn, next_token, ts_result) ? TRUE : FALSE;
 }
 
-BOOL CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
-                                  const char *next_token, TSResult &ts_result) {
+BOOL CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
+    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result) {
     ClearError();
     return _CC_No_Metadata_from_TSResult(q_res, conn, next_token, ts_result)
                ? TRUE
                : FALSE;
 }
 
-BOOL CC_Append_Table_Data(TSResult &ts_result, QResultClass *q_res, ColumnInfoClass &fields) {
+BOOL CC_Append_Table_Data(
+    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result,
+    QResultClass *q_res, ColumnInfoClass &fields) {
     ClearError();
     return AssignTableData(ts_result, q_res, fields)
                ? TRUE
                : FALSE;
 }
 
-bool _CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
-                                   const char *next_token, TSResult &ts_result) {
+bool _CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
+    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result) {
     // Note - NULL conn and/or cursor is valid
     if (q_res == NULL)
         return false;
@@ -218,10 +221,10 @@ bool _CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
         // Assign table data and column headers
         if (!AssignTableData(ts_result, q_res, *(q_res->fields)))
             return false;
-
+        std::string command_type = "SELECT";
         // Update fields of QResult to reflect data written
         UpdateResultFields(q_res, conn, starting_cached_rows, next_token,
-                           ts_result.command_type);
+                           command_type);
 
         // Return true (success)
         return true;
@@ -239,8 +242,8 @@ bool _CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
     return false;
 }
 
-bool _CC_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
-                                const char *next_token, TSResult &ts_result) {
+bool _CC_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
+    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result) {
     // Note - NULL conn and/or cursor is valid
     if (q_res == NULL)
         return false;
@@ -252,7 +255,8 @@ bool _CC_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
             return false;
 
         // Set command type and cursor name
-        QR_set_command(q_res, ts_result.command_type.c_str());
+        std::string command = "SELECT";
+        QR_set_command(q_res, command.c_str());
         QR_set_cursor(q_res, next_token);
         if (next_token == NULL)
             QR_set_reached_eof(q_res);
@@ -286,8 +290,8 @@ void print_log(const std::string &s) {
 #endif  // WIN32
 }
 
-bool _CC_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
-                       const char *next_token, TSResult &ts_result) {
+bool _CC_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
+    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result) {
     // Note - NULL conn and/or cursor is valid
     if (q_res == NULL)
         return false;
@@ -302,8 +306,9 @@ bool _CC_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
             return false;
 
         // Update fields of QResult to reflect data written
+        std::string command = "SELECT";
         UpdateResultFields(q_res, conn, starting_cached_rows, next_token,
-                           ts_result.command_type);
+                           command);
 
         // Return true (success)
         return true;
@@ -322,9 +327,9 @@ bool _CC_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
 }
 
 bool AssignColumnHeaders(QResultClass *q_res,
-                         const TSResult &ts_result) {
+    const Aws::TimestreamQuery::Model::QueryOutcome &outcome) {
     // Allocte memory for column fields
-    const auto &column_info = ts_result.sdk_result.GetColumnInfo();
+    const auto &column_info = outcome.GetResult().GetColumnInfo();
     QR_set_num_fields(q_res, (uint16_t)column_info.size());
     if (QR_get_fields(q_res)->coli_array == NULL)
         return false;
@@ -416,15 +421,16 @@ bool AssignColumnHeaders(QResultClass *q_res,
 
 // Responsible for looping through rows, allocating tuples and passing rows for
 // assignment
-bool AssignTableData(TSResult &ts_result, QResultClass *q_res, ColumnInfoClass &fields) {
-    auto rows = ts_result.sdk_result.GetRows();
+bool AssignTableData(const Aws::TimestreamQuery::Model::QueryOutcome &outcome,
+                     QResultClass *q_res, ColumnInfoClass &fields) {
+    auto rows = outcome.GetResult().GetRows();
     for (const auto& row : rows) {
         // Setup memory to receive tuple
         if (!QR_prepare_for_tupledata(q_res))
             return false;
 
         // Assign row data
-        if (!AssignRowData(row, q_res, fields, ts_result.sdk_result.GetColumnInfo().size()))
+        if (!AssignRowData(row, q_res, fields, outcome.GetResult().GetColumnInfo().size()))
             return false;
     }
     return true;
@@ -536,16 +542,21 @@ bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
     for (size_t i = 0; i < row.GetData().size(); i++) {
         if (row.DataHasBeenSet()) {
             auto datum = row.GetData()[i];
-            std::string datum_value;
-            ParseDatum(datum, datum_value, fields.coli_array[i].adtid);
-            tuple[i].len = static_cast< int >(datum_value.length());
-            QR_MALLOC_return_with_error(
-                tuple[i].value, char, tuple[i].len + 1, q_res,
-                "Out of memory in allocating item buffer.", false);
-            strcpy((char *)tuple[i].value, datum_value.c_str());
-            // If data length exceeds current display size, set display size
-            if (fields.coli_array[i].display_size < tuple[i].len)
-                fields.coli_array[i].display_size = tuple[i].len;
+            if (datum.NullValueHasBeenSet()) {
+                tuple[i].len = SQL_NULL_DATA;
+                tuple[i].value = NULL;
+            } else {
+                std::string datum_value;
+                ParseDatum(datum, datum_value, fields.coli_array[i].adtid);
+                tuple[i].len = static_cast< int >(datum_value.length());
+                QR_MALLOC_return_with_error(
+                    tuple[i].value, char, tuple[i].len + 1, q_res,
+                    "Out of memory in allocating item buffer.", false);
+                strcpy((char *)tuple[i].value, datum_value.c_str());
+                // If data length exceeds current display size, set display size
+                if (fields.coli_array[i].display_size < tuple[i].len)
+                    fields.coli_array[i].display_size = tuple[i].len;
+            }
         }
     }
 

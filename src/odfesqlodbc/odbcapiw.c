@@ -901,7 +901,7 @@ RETCODE SQL_API SQLGetTypeInfoW(SQLHSTMT StatementHandle,
     if (SC_opencheck(stmt, func))
         ret = SQL_ERROR;
     else
-        ret = ESAPI_GetTypeInfo(StatementHandle, DataType);
+        ret = API_GetTypeInfo(StatementHandle, DataType);
     LEAVE_STMT_CS(stmt);
     return ret;
 }

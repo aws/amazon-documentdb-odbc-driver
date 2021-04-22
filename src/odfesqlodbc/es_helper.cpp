@@ -21,6 +21,7 @@
 #include <thread>
 
 #include "ts_communication.h"
+#include "es_statement.h"
 
 void* ConnectDBParams(const runtime_options& rt_opts) {
     auto conn = new TSCommunication();
@@ -36,6 +37,27 @@ void* ConnectDBParams(const runtime_options& rt_opts) {
     return conn;
 }
 
+void* AllocateStatement() {
+    return (void*)new Statement< Aws::TimestreamQuery::Model::QueryOutcome >();
+}
+
+void DeallocateStatement(void* stmt) {
+    if (stmt) {
+        Statement< Aws::TimestreamQuery::Model::QueryOutcome >* p =
+            (Statement< Aws::TimestreamQuery::Model::QueryOutcome >*)stmt;
+        delete p;
+        p = nullptr;
+    }
+}
+
+void ClearStatement(void* stmt) {
+    if (stmt) {
+        Statement< Aws::TimestreamQuery::Model::QueryOutcome >* pStmt =
+            (Statement< Aws::TimestreamQuery::Model::QueryOutcome >*)(stmt);
+        pStmt->Clear();
+    }
+}
+
 ConnStatusType GetStatus(void* conn) {
     return conn
                ? static_cast< Communication* >(conn)->GetStatus()
@@ -48,16 +70,11 @@ std::string GetVersion(void* conn) {
                : "1.8.108";
 }
 
-int ESExecDirect(void* conn, const char* statement) {
-    return (conn && statement)
+int ESExecDirect(void* conn, void* stmt, const char* statement) {
+    return (conn && stmt && statement)
                ? static_cast< Communication* >(conn)->ExecDirect(
-                   statement)
+                   stmt, statement)
                : -1;
-}
-
-TSResult* TSGetResult(void* conn) {
-    return conn ? static_cast< Communication* >(conn)->PopResult()
-                   : NULL;
 }
 
 std::string GetClientEncoding(void* conn) {
@@ -81,8 +98,8 @@ void TSClearResult(TSResult* ts_result) {
     delete ts_result;
 }
 
-void StopRetrieval(void* conn) {
-    static_cast< Communication* >(conn)->StopResultRetrieval();
+void StopRetrieval(void* /*conn*/) {
+    // static_cast< Communication* >(conn)->StopResultRetrieval();
 }
 
 std::vector< std::string > GetColumnsWithSelectQuery(

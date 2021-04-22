@@ -30,15 +30,17 @@ extern "C" {
 #include "es_helper.h"
 #include <aws/timestream-query/model/Type.h>
 #include <aws/timestream-query/model/ScalarType.h>
+#include <aws/timestream-query/TimestreamQueryClient.h>
 // const char* is used instead of string for the cursor, because a NULL cursor
 // is sometimes used Cannot pass q_res as reference because it breaks qresult.h
 // macros that expect to use -> operator
 BOOL CC_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
-                      const char *next_token, TSResult &ts_result);
-BOOL CC_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
-                               const char *next_token, TSResult &ts_result);
-BOOL CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
-                                  const char *next_token, TSResult &ts_result);
-BOOL CC_Append_Table_Data(TSResult &ts_result, QResultClass *q_res, ColumnInfoClass &fields);
+                      const char *next_token,
+                      const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
+BOOL CC_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
+    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
+BOOL CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
+    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
+BOOL CC_Append_Table_Data(const Aws::TimestreamQuery::Model::QueryOutcome &ts_result, QResultClass *q_res, ColumnInfoClass &fields);
 #endif
 #endif

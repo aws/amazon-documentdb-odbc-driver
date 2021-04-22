@@ -314,7 +314,7 @@ RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
         if (SC_has_outer_join(stmt))
             *pfNullable = TRUE;
         else
-            *pfNullable = fi ? fi->nullable : estype_nullable(conn, fieldtype);
+            *pfNullable = fi ? fi->nullable : tstype_nullable(conn, fieldtype);
 
         MYLOG(LOG_DEBUG, "col %d  *pfNullable = %d\n", icol, *pfNullable);
     }
@@ -573,7 +573,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
             if (SC_has_outer_join(stmt))
                 value = TRUE;
             else
-                value = fi ? fi->nullable : estype_nullable(conn, field_type);
+                value = fi ? fi->nullable : tstype_nullable(conn, field_type);
             MYLOG(LOG_ALL, "COLUMN_NULLABLE=" FORMAT_LEN "\n", value);
             break;
 
@@ -604,7 +604,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
             break;
 
         case SQL_COLUMN_SEARCHABLE: /* == SQL_DESC_SEARCHABLE */
-            value = estype_searchable(conn, field_type);
+            value = tstype_searchable(conn, field_type);
             break;
 
         case SQL_COLUMN_TABLE_NAME: /* == SQL_DESC_TABLE_NAME */
@@ -625,7 +625,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
             break;
 
         case SQL_COLUMN_UNSIGNED: /* == SQL_DESC_UNSINGED */
-            value = estype_unsigned(conn, field_type);
+            value = tstype_unsigned(conn, field_type);
             if (value == -1) /* non-numeric becomes TRUE (ODBC Doc) */
                 value = SQL_TRUE;
 
@@ -715,13 +715,13 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
                 estype_to_sqldesctype(stmt, field_type, col_idx, unknown_sizes);
             break;
         case SQL_DESC_NUM_PREC_RADIX:
-            value = estype_radix(conn, field_type);
+            value = tstype_radix(conn, field_type);
             break;
         case SQL_DESC_LITERAL_PREFIX:
-            p = estype_literal_prefix(conn, field_type);
+            p = tstype_literal_prefix(conn, field_type);
             break;
         case SQL_DESC_LITERAL_SUFFIX:
-            p = estype_literal_suffix(conn, field_type);
+            p = tstype_literal_suffix(conn, field_type);
             break;
         case SQL_DESC_UNNAMED:
             value = (fi && NAME_IS_NULL(fi->column_name)

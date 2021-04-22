@@ -655,7 +655,7 @@ TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_BASE_TABLE_NAME, SQL_DESC_BASE_TABLE_NAME,
 
 TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_CASE_SENSITIVE, SQL_DESC_CASE_SENSITIVE,
                         0, 1, SQLINTEGER m_value_ptr;
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 1, SQL_FALSE);
+                        , SQL_SUCCESS, m_ird_hdesc, 0, 1, SQL_TRUE);
 
 // TODO: need to assert on return value
 TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_CATALOG_NAME, SQL_DESC_CATALOG_NAME, 255,
