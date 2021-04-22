@@ -15,6 +15,7 @@
  */
 
 #include "ts_communication.h"
+#include "es_statement.h"
 
 // odfesqlodbc needs to be included before mylog, otherwise mylog will generate
 // compiler warnings
@@ -268,7 +269,7 @@ void TSCommunication::Disconnect() {
         m_client.reset();
     }
     m_status = ConnStatusType::CONNECTION_BAD;
-    StopResultRetrieval();
+    // StopResultRetrieval();
 }
 
 std::string TSCommunication::GetVersion() {
@@ -356,7 +357,7 @@ std::vector< std::string > TSCommunication::GetColumnsWithSelectQuery(
     return std::vector< std::string >{};
 }
 
-int TSCommunication::ExecDirect(const char* query) {
+int TSCommunication::ExecDirect(void* stmt, const char* query) {
     //m_error_details.reset();
     //if (!query) {
     //    m_error_message = "Query is NULL";
@@ -377,70 +378,86 @@ int TSCommunication::ExecDirect(const char* query) {
     std::string msg = "Attempting to execute a query \"" + statement + "\"";
     LogMsg(LOG_DEBUG, msg.c_str());
 
+    Statement< Aws::TimestreamQuery::Model::QueryOutcome >* pStmt =
+        (Statement< Aws::TimestreamQuery::Model::QueryOutcome >*)stmt;
     // Issue request
     Aws::TimestreamQuery::Model::QueryRequest request;
-    request.SetQueryString(query);
-    auto outcome = m_client->Query(request);
-    if (!outcome.IsSuccess()) {
-        LogMsg(LOG_ERROR, outcome.GetError().GetMessage().c_str());
-        return -1;
-    }
-
-    auto ts_result = new TSResult();
-    ts_result->sdk_result = outcome.GetResult();
-    while (!m_result_queue.push(QUEUE_TIMEOUT, ts_result)) {
-        if (ConnStatusType::CONNECTION_OK == m_status) {
-            return -1;
+    request.SetQueryString(statement.c_str());
+    Aws::TimestreamQuery::Model::QueryOutcome outcome;
+    bool success = false;
+    std::string token;
+    do {
+        outcome = m_client->Query(request);
+        success = outcome.IsSuccess();
+        if (success) {
+            token = outcome.GetResult().GetNextToken();
+            request.WithNextToken(token);
+            // auto ts_result = new TSResult();
+            // ts_result->sdk_result = outcome.GetResult();
+            pStmt->Add(std::move(outcome));
         }
-    }
+    } while (success && !token.empty());
+    //auto outcome = m_client->Query(request);
+    //if (!outcome.IsSuccess()) {
+    //    LogMsg(LOG_ERROR, outcome.GetError().GetMessage().c_str());
+    //    return -1;
+    //}
 
-    if (!outcome.GetResult().GetNextToken().empty()) {
-        auto next_token = outcome.GetResult().GetNextToken();
-        std::thread([this, request, next_token]() {
-            this->SendCursorQueries(request, next_token);
-        }).detach();
-    }
+    //auto ts_result = new TSResult();
+    //ts_result->sdk_result = outcome.GetResult();
+    //while (!m_result_queue.push(QUEUE_TIMEOUT, ts_result)) {
+    //    if (ConnStatusType::CONNECTION_OK == m_status) {
+    //        return -1;
+    //    }
+    //}
+
+    //if (!outcome.GetResult().GetNextToken().empty()) {
+    //    auto next_token = outcome.GetResult().GetNextToken();
+    //    std::thread([this, request, next_token]() {
+    //        this->SendCursorQueries(request, next_token);
+    //    }).detach();
+    //}
     return 0;
 }
 
-void TSCommunication::SendCursorQueries(
-    Aws::TimestreamQuery::Model::QueryRequest request, Aws::String next_token) {
-    if (next_token.empty()) {
-        LogMsg(LOG_ERROR, "Next token is empty");
-        return;
-    }
-    m_is_retrieving = true;
-    try {
-        while (!next_token.empty() && m_is_retrieving) {
-            LogMsg(LOG_DEBUG,
-                   "SendCursorQueries: Start fetching more result sets in the "
-                   "background");
-            auto outcome = m_client->Query(request.WithNextToken(next_token));
-            if (!outcome.IsSuccess()) {
-                LogMsg(LOG_ERROR, outcome.GetError().GetMessage().c_str());
-                return;
-            }
-            next_token = outcome.GetResult().GetNextToken();
-
-            auto result = new TSResult();
-            result->sdk_result = outcome.GetResult();
-            while (m_is_retrieving
-                   && !m_result_queue.push(QUEUE_TIMEOUT, result)) {
-            }
-        }
-    } catch (std::runtime_error& e) {
-        std::string error_message =
-            "Received runtime exception: " + std::string(e.what());
-        LogMsg(LOG_ERROR, error_message.c_str());
-    }
-    LogMsg(LOG_DEBUG, "SendCursorQueriesDone fetching more results");
-
-    if (!m_is_retrieving) {
-        m_result_queue.clear();
-    } else {
-        m_is_retrieving = false;
-    }
-}
+//void TSCommunication::SendCursorQueries(
+//    Aws::TimestreamQuery::Model::QueryRequest request, Aws::String next_token) {
+//    if (next_token.empty()) {
+//        LogMsg(LOG_ERROR, "Next token is empty");
+//        return;
+//    }
+//    m_is_retrieving = true;
+//    try {
+//        while (!next_token.empty() && m_is_retrieving) {
+//            LogMsg(LOG_DEBUG,
+//                   "SendCursorQueries: Start fetching more result sets in the "
+//                   "background");
+//            auto outcome = m_client->Query(request.WithNextToken(next_token));
+//            if (!outcome.IsSuccess()) {
+//                LogMsg(LOG_ERROR, outcome.GetError().GetMessage().c_str());
+//                return;
+//            }
+//            next_token = outcome.GetResult().GetNextToken();
+//
+//            auto result = new TSResult();
+//            result->sdk_result = outcome.GetResult();
+//            while (m_is_retrieving
+//                   && !m_result_queue.push(QUEUE_TIMEOUT, result)) {
+//            }
+//        }
+//    } catch (std::runtime_error& e) {
+//        std::string error_message =
+//            "Received runtime exception: " + std::string(e.what());
+//        LogMsg(LOG_ERROR, error_message.c_str());
+//    }
+//    LogMsg(LOG_DEBUG, "SendCursorQueriesDone fetching more results");
+//
+//    if (!m_is_retrieving) {
+//        m_result_queue.clear();
+//    } else {
+//        m_is_retrieving = false;
+//    }
+//}
 
 void TSCommunication::SendCloseCursorRequest(const std::string& /*cursor*/) {
     /*std::shared_ptr< Aws::Http::HttpResponse > response =

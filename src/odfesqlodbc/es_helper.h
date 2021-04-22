@@ -23,7 +23,6 @@
 // C++ interface
 std::string GetClientEncoding(void* conn);
 bool SetClientEncoding(void* conn, std::string& encoding);
-TSResult* TSGetResult(void* conn);
 void TSClearResult(TSResult* ts_result);
 void* ConnectDBParams(const runtime_options& rt_opts);
 std::string GetVersion(void* conn);
@@ -38,9 +37,12 @@ void XPlatformEnterCriticalSection(void* critical_section_helper);
 void XPlatformLeaveCriticalSection(void* critical_section_helper);
 void XPlatformDeleteCriticalSection(void** critical_section_helper);
 ConnStatusType Status(void* conn);
-int ESExecDirect(void* conn, const char* statement);
+int ESExecDirect(void* conn, void* stmt, const char* statement);
 void Disconnect(void* conn);
 void StopRetrieval(void* conn);
+void* AllocateStatement();
+void DeallocateStatement(void* stmt);
+void ClearStatement(void* stmt);
 #ifdef __cplusplus
 }
 #endif

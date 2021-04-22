@@ -129,7 +129,10 @@ typedef struct bind_info {
 //    {"", "", "", "BASE TABLE", ""}};
 
 class TestSQLTables : public Fixture {};
+
 class TestSQLColumns : public Fixture {};
+
+class TestSQLGetTypeInfo : public Fixture {};
 //
 //class TestSQLCatalogKeys : public testing::Test {
 //   public:
@@ -1003,196 +1006,185 @@ TEST_F(TestSQLColumns, META_DATA_CASE_INSENSITIVE_NOT_FOUND) {
 //              SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS, (SQLTCHAR*)L"odfe-cluster",
 //              SQL_NTS, (SQLTCHAR*)L"kibana_sample_data_flights", SQL_NTS)
 //
-//// GetTypeInfo expected output struct
-//typedef struct sample_data_getTypeInfo_struct {
-//    std::string TYPE_NAME;
-//    SQLSMALLINT DATA_TYPE;
-//    SQLINTEGER COLUMN_SIZE;
-//    std::string LITERAL_PREFIX;
-//    std::string LITERAL_SUFFIX;
-//    std::string CREATE_PARAMS;
-//    SQLSMALLINT NULLABLE;
-//    SQLSMALLINT CASE_SENSITIVE;
-//    SQLSMALLINT SEARCHABLE;
-//    SQLSMALLINT UNSIGNED_ATTRIBUTE;
-//    SQLSMALLINT FIXED_PREC_SCALE;
-//    SQLSMALLINT AUTO_UNIQUE_VALUE;
-//    std::string LOCAL_TYPE_NAME;
-//    SQLSMALLINT MINIMUM_SCALE;
-//    SQLSMALLINT MAXIMUM_SCALE;
-//    SQLSMALLINT SQL_DATA_TYPE;
-//    SQLSMALLINT SQL_DATETIME_SUB;
-//    SQLINTEGER NUM_PREC_RADIX;
-//    SQLSMALLINT INTERVAL_PRECISION;
-//} sample_data_getTypeInfo_struct;
-//
-//// GetTypeInfo expected output
-//const std::vector< sample_data_getTypeInfo_struct > sample_data_all_types_info{
-//    {"boolean", SQL_BIT, 1, "", "", "", 2, 0, 3, 1, 0, 0, "", 0, 0, SQL_BIT, 0,
-//     10, 0},
-//    {"byte", SQL_TINYINT, 3, "", "", "", 2, 0, 3, 0, 0, 0, "", 0, 0,
-//     SQL_TINYINT, 0, 10, 0},
-//    {"short", SQL_SMALLINT, 5, "", "", "", 2, 0, 3, 0, 0, 0, "", 0, 0,
-//     SQL_SMALLINT, 0, 10, 0},
-//    {"keyword", SQL_WVARCHAR, 256, "\'", "\'", "", 2, 1, 3, 1, 0, 0, "", 0, 0,
-//     SQL_WVARCHAR, 0, 10, 0},
-//    {"text", SQL_WVARCHAR, 2147483647, "\'", "\'", "", 2, 1, 3, 1, 0, 0, "", 0,
-//     0, SQL_WVARCHAR, 0, 10, 0},
-//    {"nested", SQL_WVARCHAR, 0, "\'", "\'", "", 2, 0, 3, 1, 0, 0, "", 0, 0,
-//     SQL_WVARCHAR, 0, 10, 0},
-//    {"object", SQL_WVARCHAR, 0, "\'", "\'", "", 2, 0, 3, 1, 0, 0, "", 0, 0,
-//     SQL_WVARCHAR, 0, 10, 0},
-//    {"integer", SQL_INTEGER, 10, "", "", "", 2, 0, 3, 0, 0, 0, "", 0, 0,
-//     SQL_INTEGER, 0, 10, 0},
-//    {"double", SQL_DOUBLE, 15, "", "", "", 2, 0, 3, 0, 0, 0, "", 0, 0,
-//     SQL_DOUBLE, 0, 10, 0},
-//    {"scaled_float", SQL_DOUBLE, 15, "", "", "", 2, 0, 3, 0, 0, 0, "", 0, 0,
-//     SQL_DOUBLE, 0, 10, 0},
-//    {"long", SQL_BIGINT, 19, "", "", "", 2, 0, 3, 0, 0, 0, "", 0, 0, SQL_BIGINT,
-//     0, 10, 0},
-//    {"half_float", SQL_REAL, 7, "", "", "", 2, 0, 3, 0, 0, 0, "", 0, 0,
-//     SQL_REAL, 0, 10, 0},
-//    {"float", SQL_REAL, 7, "", "", "", 2, 0, 3, 0, 0, 0, "", 0, 0, SQL_REAL, 0,
-//     10, 0},
-//    {"date", SQL_TYPE_TIMESTAMP, 24, "", "", "", 2, 0, 3, 1, 0, 0, "", 0, 0,
-//     SQL_TYPE_TIMESTAMP, 0, 10, 0}};
-//
-//const std::vector< sample_data_getTypeInfo_struct >
-//    sample_data_single_type_multiple_row{
-//        {"keyword", SQL_WVARCHAR, 256, "\'", "\'", "", 2, 1, 3, 1, 0, 0, "", 0,
-//         0, SQL_WVARCHAR, 0, 10, 0},
-//        {"text", SQL_WVARCHAR, 2147483647, "\'", "\'", "", 2, 1, 3, 1, 0, 0, "",
-//         0, 0, SQL_WVARCHAR, 0, 10, 0},
-//        {"nested", SQL_WVARCHAR, 0, "\'", "\'", "", 2, 0, 3, 1, 0, 0, "", 0, 0,
-//         SQL_WVARCHAR, 0, 10, 0},
-//        {"object", SQL_WVARCHAR, 0, "\'", "\'", "", 2, 0, 3, 1, 0, 0, "", 0, 0,
-//         SQL_WVARCHAR, 0, 10, 0}};
-//
-//const std::vector< sample_data_getTypeInfo_struct >
-//    sample_data_single_type_info{{"boolean", SQL_BIT, 1, "", "", "", 2, 0, 3, 1,
-//                                  0, 0, "", 0, 0, SQL_BIT, 0, 10, 0}};
-//
-//const std::vector< sample_data_getTypeInfo_struct > sample_data_empty{};
-//
-//void CheckGetTypeInfoData(
-//    SQLHSTMT m_hstmt,
-//    const std::vector< sample_data_getTypeInfo_struct >& sample_data) {
-//    std::vector< bind_info > binds;
-//    binds.push_back(bind_info(1, SQL_C_CHAR));
-//    binds.push_back(bind_info(2, SQL_C_SHORT));
-//    binds.push_back(bind_info(3, SQL_C_LONG));
-//    binds.push_back(bind_info(4, SQL_C_CHAR));
-//    binds.push_back(bind_info(5, SQL_C_CHAR));
-//    binds.push_back(bind_info(6, SQL_C_CHAR));
-//    binds.push_back(bind_info(7, SQL_C_SHORT));
-//    binds.push_back(bind_info(8, SQL_C_SHORT));
-//    binds.push_back(bind_info(9, SQL_C_SHORT));
-//    binds.push_back(bind_info(10, SQL_C_SHORT));
-//    binds.push_back(bind_info(11, SQL_C_SHORT));
-//    binds.push_back(bind_info(12, SQL_C_SHORT));
-//    binds.push_back(bind_info(13, SQL_C_CHAR));
-//    binds.push_back(bind_info(14, SQL_C_SHORT));
-//    binds.push_back(bind_info(15, SQL_C_SHORT));
-//    binds.push_back(bind_info(16, SQL_C_SHORT));
-//    binds.push_back(bind_info(17, SQL_C_SHORT));
-//    binds.push_back(bind_info(18, SQL_C_LONG));
-//    binds.push_back(bind_info(19, SQL_C_SHORT));
-//
-//    for (auto& it : binds)
-//        SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
-//                   it.buffer_len, &it.out_len);
-//
-//    SQLRETURN ret = SQL_ERROR;
-//    if (sample_data.empty()) {
-//        size_t result_count = 0;
-//        while ((ret = SQLFetch(m_hstmt)) == SQL_SUCCESS)
-//            result_count++;
-//        EXPECT_TRUE(result_count != 0);
-//    } else {
-//        size_t result_count = 0;
-//        for (; ((ret = SQLFetch(m_hstmt)) == SQL_SUCCESS)
-//               && (result_count < sample_data.size());
-//             result_count++) {
-//            auto it =
-//                std::find_if(sample_data.begin(), sample_data.end(),
-//                             [&](const sample_data_getTypeInfo_struct& d) {
-//                                 return d.TYPE_NAME == binds[0].AsString();
-//                             });
-//            ASSERT_NE(it, sample_data.end());
-//            EXPECT_EQ(binds[0].AsString(), it->TYPE_NAME);
-//            EXPECT_EQ(binds[1].AsString(), std::to_string(it->DATA_TYPE));
-//            EXPECT_EQ(binds[2].AsString(), std::to_string(it->COLUMN_SIZE));
-//            EXPECT_EQ(binds[3].AsString(), it->LITERAL_PREFIX);
-//            EXPECT_EQ(binds[4].AsString(), it->LITERAL_SUFFIX);
-//            EXPECT_EQ(binds[5].AsString(), it->CREATE_PARAMS);
-//            EXPECT_EQ(binds[6].AsString(), std::to_string(it->NULLABLE));
-//            EXPECT_EQ(binds[7].AsString(), std::to_string(it->CASE_SENSITIVE));
-//            EXPECT_EQ(binds[8].AsString(), std::to_string(it->SEARCHABLE));
-//            EXPECT_EQ(binds[9].AsString(),
-//                      std::to_string(it->UNSIGNED_ATTRIBUTE));
-//            EXPECT_EQ(binds[10].AsString(),
-//                      std::to_string(it->FIXED_PREC_SCALE));
-//            EXPECT_EQ(binds[11].AsString(),
-//                      std::to_string(it->AUTO_UNIQUE_VALUE));
-//            EXPECT_EQ(binds[12].AsString(), it->LOCAL_TYPE_NAME);
-//            EXPECT_EQ(binds[13].AsString(), std::to_string(it->MINIMUM_SCALE));
-//            EXPECT_EQ(binds[14].AsString(), std::to_string(it->MAXIMUM_SCALE));
-//            EXPECT_EQ(binds[15].AsString(), std::to_string(it->SQL_DATA_TYPE));
-//            EXPECT_EQ(binds[16].AsString(),
-//                      std::to_string(it->SQL_DATETIME_SUB));
-//            EXPECT_EQ(binds[17].AsString(), std::to_string(it->NUM_PREC_RADIX));
-//            EXPECT_EQ(binds[18].AsString(),
-//                      std::to_string(it->INTERVAL_PRECISION));
-//        }
-//        EXPECT_EQ(result_count, sample_data.size());
-//    }
-//    EXPECT_EQ(ret, SQL_NO_DATA);
-//}
-//
-//class TestSQLGetTypeInfo : public testing::Test {
-//   public:
-//    TestSQLGetTypeInfo() {
-//    }
-//    void SetUp() {
-//        AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env, &m_conn,
-//                       &m_hstmt, true, true);
-//    }
-//    void TearDown() {
-//        SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
-//        SQLDisconnect(m_conn);
-//        SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-//    }
-//    ~TestSQLGetTypeInfo() {
-//        // cleanup any pending stuff, but no exceptions allowed
-//    }
-//
-//    SQLHENV m_env = SQL_NULL_HENV;
-//    SQLHDBC m_conn = SQL_NULL_HDBC;
-//    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
-//};
-//
-//#define TEST_SQL_GET_TYPE_INFO(test_name, data_type, empty, exp_out)    \
-//    TEST_F(TestSQLGetTypeInfo, test_name) {                             \
-//        EXPECT_TRUE(SQL_SUCCEEDED(SQLGetTypeInfo(m_hstmt, data_type))); \
-//        if (empty) {                                                    \
-//            size_t result_count = 0;                                    \
-//            SQLRETURN ret;                                              \
-//            while ((ret = SQLFetch(m_hstmt)) == SQL_SUCCESS)            \
-//                result_count++;                                         \
-//            EXPECT_EQ(ret, SQL_NO_DATA);                                \
-//            EXPECT_EQ(result_count, static_cast< size_t >(0));          \
-//        } else                                                          \
-//            CheckGetTypeInfoData(m_hstmt, exp_out);                     \
-//    }
-//
-//TEST_SQL_GET_TYPE_INFO(AllTypes, SQL_ALL_TYPES, 0, sample_data_all_types_info)
-//
-//TEST_SQL_GET_TYPE_INFO(SingleTypeMultipleRows, SQL_WVARCHAR, 0,
-//                       sample_data_single_type_multiple_row)
-//
-//TEST_SQL_GET_TYPE_INFO(SingleType, SQL_BIT, 0, sample_data_single_type_info)
-//
-//TEST_SQL_GET_TYPE_INFO(UnsupportedType, SQL_DECIMAL, 1, sample_data_empty)
+
+TEST_F(TestSQLGetTypeInfo, TEST_SQL_ALL_TYPES) {
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetTypeInfo(m_hstmt, SQL_ALL_TYPES);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSMALLINT column_count = 0;
+    ret = SQLNumResultCols(m_hstmt, &column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::vector< std::vector< std::string > > result;
+    while ((ret = SQLFetch(m_hstmt)) == SQL_SUCCESS) {
+        std::vector< std::string > row;
+        for (int i = 1; i <= (int)column_count; i++) {
+            SQLCHAR data[1024] = {0};
+            SQLLEN indicator = 0;
+            ret = SQLGetData(m_hstmt, (SQLUSMALLINT)i, SQL_C_CHAR, data, 1024, &indicator);
+            EXPECT_TRUE(SQL_SUCCEEDED(ret));
+            std::string data_as_string;
+            if (indicator != SQL_NULL_DATA) {
+                data_as_string.assign((const char *)data, indicator);
+            }
+            row.push_back(data_as_string);
+        }
+        result.push_back(row);
+    }
+    std::vector< std::vector< std::string > > expected{
+        {"array[T,...]", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX),
+         "", "", "", "1", "0", "3", "", "0", "0", "", "", "",
+         std::to_string(SQL_WVARCHAR), "", "", "0"},
+        {"interval day to second", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX),
+         "", "", "", "1", "0", "3", "", "0", "0", "", "", "",
+         std::to_string(SQL_WVARCHAR), "", "", "0"},
+        {"interval year to month", std::to_string(SQL_WVARCHAR),
+         std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
+         "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
+        {"row(T,...)", std::to_string(SQL_WVARCHAR),
+         std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
+         "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
+        {"timeseries[row(timestamp, T,...)]", std::to_string(SQL_WVARCHAR),
+         std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
+         "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
+        {"varchar", std::to_string(SQL_WVARCHAR),
+         std::to_string(INT_MAX), "'", "'", "", "1", "1", "3", "", "0", "0", "",
+         "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
+        {"unknown", std::to_string(SQL_WVARCHAR),
+         std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
+         "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
+        {"boolean", std::to_string(SQL_BIT), "1", "",
+         "", "", "1", "0", "3", "1", "0", "0", "", "", "",
+         std::to_string(SQL_BIT), "", "", "0"},
+        {"bigint", std::to_string(SQL_BIGINT), "20", "BIGINT '",
+         "'", "", "1", "0", "3", "0", "0", "0", "", "", "",
+         std::to_string(SQL_BIGINT), "", "10", "0"},
+        {"int", std::to_string(SQL_INTEGER), "11", "INTEGER '",
+         "'", "", "1", "0", "3", "0", "0", "0", "", "", "",
+         std::to_string(SQL_INTEGER), "", "10", "0"},
+        {"double", std::to_string(SQL_DOUBLE), "15", "DOUBLE '",
+         "'", "", "1", "0", "3", "0", "0", "0", "", "", "",
+         std::to_string(SQL_DOUBLE), "", "10", "0"},
+        {"date", std::to_string(SQL_DATE), "10", "",
+         "", "", "1", "0", "3", "", "0", "0", "", "", "",
+         std::to_string(SQL_DATE), "1", "", "0"},
+        {"time", std::to_string(SQL_TIME), "18", "",
+         "", "", "1", "0", "3", "", "0", "0", "", "9", "9",
+         std::to_string(SQL_TIME), "2", "", "0"},
+        {"timestamp", std::to_string(SQL_TIMESTAMP), "29", "",
+         "", "", "1", "0", "3", "", "0", "0", "", "9", "9",
+         std::to_string(SQL_TIMESTAMP), "3", "", "0"}
+    };
+    CheckRows(expected, result);
+}
+
+TEST_F(TestSQLGetTypeInfo, TEST_SQL_WVARCHAR) {
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetTypeInfo(m_hstmt, SQL_WVARCHAR);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSMALLINT column_count = 0;
+    ret = SQLNumResultCols(m_hstmt, &column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::vector< std::vector< std::string > > result;
+    while ((ret = SQLFetch(m_hstmt)) == SQL_SUCCESS) {
+        std::vector< std::string > row;
+        for (int i = 1; i <= (int)column_count; i++) {
+            SQLCHAR data[1024] = {0};
+            SQLLEN indicator = 0;
+            ret = SQLGetData(m_hstmt, (SQLUSMALLINT)i, SQL_C_CHAR, data, 1024,
+                             &indicator);
+            EXPECT_TRUE(SQL_SUCCEEDED(ret));
+            std::string data_as_string;
+            if (indicator != SQL_NULL_DATA) {
+                data_as_string.assign((const char *)data, indicator);
+            }
+            row.push_back(data_as_string);
+        }
+        result.push_back(row);
+    }
+    std::vector< std::vector< std::string > > expected{
+        {"array[T,...]", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX),
+         "", "", "", "1", "0", "3", "", "0", "0", "", "", "",
+         std::to_string(SQL_WVARCHAR), "", "", "0"},
+        {"interval day to second", std::to_string(SQL_WVARCHAR),
+         std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
+         "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
+        {"interval year to month", std::to_string(SQL_WVARCHAR),
+         std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
+         "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
+        {"row(T,...)", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX),
+         "", "", "", "1", "0", "3", "", "0", "0", "", "", "",
+         std::to_string(SQL_WVARCHAR), "", "", "0"},
+        {"timeseries[row(timestamp, T,...)]", std::to_string(SQL_WVARCHAR),
+         std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
+         "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
+        {"varchar", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX), "'",
+         "'", "", "1", "1", "3", "", "0", "0", "", "", "",
+         std::to_string(SQL_WVARCHAR), "", "", "0"},
+        {"unknown", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX), "",
+         "", "", "1", "0", "3", "", "0", "0", "", "", "",
+         std::to_string(SQL_WVARCHAR), "", "", "0"}
+    };
+    CheckRows(expected, result);
+}
+
+TEST_F(TestSQLGetTypeInfo, TEST_SQL_BIT) {
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetTypeInfo(m_hstmt, SQL_BIT);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSMALLINT column_count = 0;
+    ret = SQLNumResultCols(m_hstmt, &column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::vector< std::vector< std::string > > result;
+    while ((ret = SQLFetch(m_hstmt)) == SQL_SUCCESS) {
+        std::vector< std::string > row;
+        for (int i = 1; i <= (int)column_count; i++) {
+            SQLCHAR data[1024] = {0};
+            SQLLEN indicator = 0;
+            ret = SQLGetData(m_hstmt, (SQLUSMALLINT)i, SQL_C_CHAR, data, 1024,
+                             &indicator);
+            EXPECT_TRUE(SQL_SUCCEEDED(ret));
+            std::string data_as_string;
+            if (indicator != SQL_NULL_DATA) {
+                data_as_string.assign((const char *)data, indicator);
+            }
+            row.push_back(data_as_string);
+        }
+        result.push_back(row);
+    }
+    std::vector< std::vector< std::string > > expected{
+        {"boolean", std::to_string(SQL_BIT), "1", "", "", "", "1", "0", "3",
+         "1", "0", "0", "", "", "", std::to_string(SQL_BIT), "", "", "0"}
+    };
+    CheckRows(expected, result);
+}
+
+TEST_F(TestSQLGetTypeInfo, TEST_SQL_DECIMAL) {
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetTypeInfo(m_hstmt, SQL_DECIMAL);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSMALLINT column_count = 0;
+    ret = SQLNumResultCols(m_hstmt, &column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::vector< std::vector< std::string > > result;
+    while ((ret = SQLFetch(m_hstmt)) == SQL_SUCCESS) {
+        std::vector< std::string > row;
+        for (int i = 1; i <= (int)column_count; i++) {
+            SQLCHAR data[1024] = {0};
+            SQLLEN indicator = 0;
+            ret = SQLGetData(m_hstmt, (SQLUSMALLINT)i, SQL_C_CHAR, data, 1024,
+                             &indicator);
+            EXPECT_TRUE(SQL_SUCCEEDED(ret));
+            std::string data_as_string;
+            if (indicator != SQL_NULL_DATA) {
+                data_as_string.assign((const char *)data, indicator);
+            }
+            row.push_back(data_as_string);
+        }
+        result.push_back(row);
+    }
+    std::vector< std::vector< std::string > > expected{};
+    CheckRows(expected, result);
+}
 
 int main(int argc, char** argv) {
 #ifdef __APPLE__
