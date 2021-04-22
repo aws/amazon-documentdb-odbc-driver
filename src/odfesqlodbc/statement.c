@@ -346,6 +346,7 @@ StatementClass *SC_Constructor(ConnectionClass *conn) {
         PutDataInfoInitialize(SC_get_PDTI(rv));
         rv->lock_CC_for_rb = FALSE;
         INIT_STMT_CS(rv);
+        rv->stmt = AllocateStatement();
     }
     return rv;
 }
@@ -392,6 +393,9 @@ char SC_Destructor(StatementClass *self) {
     if (self->callbacks)
         free(self->callbacks);
 
+    if (self->stmt) {
+        DeallocateStatement(self->stmt);
+    }
     DELETE_STMT_CS(self);
     free(self);
 
@@ -684,7 +688,7 @@ char SC_recycle_statement(StatementClass *self) {
     self->options.keyset_size = self->options_orig.keyset_size;
     self->options.maxLength = self->options_orig.maxLength;
     self->options.maxRows = self->options_orig.maxRows;
-
+    ClearStatement(self->stmt);
     return TRUE;
 }
 

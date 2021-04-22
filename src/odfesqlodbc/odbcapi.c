@@ -446,7 +446,7 @@ RETCODE SQL_API SQLGetTypeInfo(HSTMT StatementHandle, SQLSMALLINT DataType) {
     if (SC_opencheck(stmt, func))
         ret = SQL_ERROR;
     else
-        ret = ESAPI_GetTypeInfo(StatementHandle, DataType);
+        ret = API_GetTypeInfo(StatementHandle, DataType);
     LEAVE_STMT_CS(stmt);
     return ret;
 }

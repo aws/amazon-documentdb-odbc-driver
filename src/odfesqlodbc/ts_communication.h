@@ -59,10 +59,11 @@ class TSCommunication : public Communication {
     virtual void Disconnect() override;
     /**
      * Execute query
+     * @param stmt void *
      * @param query const char*
      * @return int
      */
-    virtual int ExecDirect(const char* query) override;
+    virtual int ExecDirect(void* stmt, const char* query) override;
     /**
      * Get version
      * @return std::string
@@ -111,8 +112,8 @@ class TSCommunication : public Communication {
      * @param request Aws::TimestreamQuery::Model::QueryRequest
      * @param cursor Aws::String
      */
-    void SendCursorQueries(Aws::TimestreamQuery::Model::QueryRequest request,
-                           Aws::String next_token);
+    //void SendCursorQueries(Aws::TimestreamQuery::Model::QueryRequest request,
+                           //Aws::String next_token);
     /**
      * Runtime options
      */

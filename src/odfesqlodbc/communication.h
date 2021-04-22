@@ -20,7 +20,6 @@
 // clang-format off
 #include <memory>
 #include "es_types.h"
-#include "es_result_queue.h"
 
 //Keep rabbit at top otherwise it gives build error because of some variable names like max, min
 #ifdef __APPLE__
@@ -72,10 +71,11 @@ class Communication {
     virtual void Disconnect() = 0;
     /**
      * Execute query
+     * @param stmt void *
      * @param query const char*
      * @return int
      */
-    virtual int ExecDirect(const char* query) = 0;
+    virtual int ExecDirect(void *stmt, const char* query) = 0;
     /**
      * Get version
      * @return std::string
@@ -130,15 +130,6 @@ class Communication {
      */
     virtual bool SetClientEncoding(const std::string& encoding);
     /**
-     * Stop retrieving results
-     */
-    virtual void StopResultRetrieval();
-    /**
-     * Pop result
-     * @return TSResult*
-     */
-    virtual TSResult* PopResult();
-    /**
      * Log messages
      * @param level LogLevel
      * @param msg const char*
@@ -162,14 +153,6 @@ class Communication {
      * AWS sdk options
      */
     Aws::SDKOptions m_sdk_options;
-    /**
-     * Indicates if it's still retrieving from the queue
-     */
-    bool m_is_retrieving;
-    /**
-     * Result set queue
-     */
-    ESResultQueue m_result_queue;
 };
 
 #endif
