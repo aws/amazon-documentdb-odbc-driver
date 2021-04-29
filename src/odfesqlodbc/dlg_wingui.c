@@ -138,7 +138,7 @@ void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
         EnableWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_IDP_PASSWORD), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_OKTA_APPLICATION_ID), FALSE);
-        EnableWindow(GetDlgItem(hdlg, IDC_ROLE_ARN), FALSE);
+        EnableWindow(GetDlgItem(hdlg, IDC_ROLE_ARN), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_AAD_APPLICATION_ID), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_AAD_CLIENT_SECRET), TRUE);
         EnableWindow(GetDlgItem(hdlg, IDC_AAD_TENANT), TRUE);
@@ -196,6 +196,7 @@ void SetDlgStuff(HWND hdlg, const ConnInfo *ci) {
         SetDlgItemText(hdlg, IDC_IDP_PASSWORD, SAFE_NAME(ci->pwd));
         SetDlgItemText(hdlg, IDC_IDP_NAME, ci->idp_name);
         SetDlgItemText(hdlg, IDC_IDP_ARN, ci->idp_arn);
+        SetDlgItemText(hdlg, IDC_ROLE_ARN, ci->role_arn);
     }
     SetDlgItemText(hdlg, IDC_REGION, ci->region);
     SetDlgItemText(hdlg, IDC_END_POINT_OVERRIDE, ci->end_point_override);
@@ -206,7 +207,6 @@ void SetDlgStuff(HWND hdlg, const ConnInfo *ci) {
     } else if (strcmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
         SetDlgItemText(hdlg, IDC_IDP_HOST, ci->idp_host);
         SetDlgItemText(hdlg, IDC_OKTA_APPLICATION_ID, ci->okta_application_id);
-        SetDlgItemText(hdlg, IDC_ROLE_ARN, ci->role_arn);
     }
 }
 
@@ -241,6 +241,7 @@ void GetDlgStuff(HWND hdlg, ConnInfo *ci) {
                        sizeof(ci->aad_client_secret));
         GetDlgItemText(hdlg, IDC_AAD_TENANT, ci->aad_tenant,
                        sizeof(ci->aad_tenant));
+        GetDlgItemText(hdlg, IDC_ROLE_ARN, ci->role_arn, sizeof(ci->role_arn));
         GetDlgItemText(hdlg, IDC_IDP_ARN, ci->idp_arn, sizeof(ci->idp_arn));
     } else if (strcmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
         GetDlgItemText(hdlg, IDC_IDP_NAME, ci->idp_name, sizeof(ci->idp_name));
