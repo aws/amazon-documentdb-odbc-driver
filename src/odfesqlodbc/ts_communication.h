@@ -115,6 +115,19 @@ class TSCommunication : public Communication {
     //void SendCursorQueries(Aws::TimestreamQuery::Model::QueryRequest request,
                            //Aws::String next_token);
     /**
+     * Fetches an access token from Azure AD Oauth2 endpoint using the provided properties.
+     * @param auth const authentication_options&
+     * @return std::string
+     */ 
+    std::string GetAccessToken(const authentication_options& auth);
+
+    /**
+     * Constructs the SAML Assertion with the access token.
+     * @param auth const authentication_options&
+     * @return Aws::String
+     */
+    Aws::String GetSAMLAssertion(const authentication_options& auth);
+    /**
      * Runtime options
      */
     runtime_options m_rt_opts;
