@@ -118,6 +118,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             INI_AAD_APPLICATION_ID "=%s;"
             INI_AAD_CLIENT_SECRET "=%s;"
             INI_AAD_TENANT "=%s;"
+            INI_ROLE_ARN "=%s;"
             INI_IDP_ARN "=%s;"
             INI_REGION "=%s;"
             INI_END_POINT_OVERRIDE "=%s;"
@@ -135,6 +136,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             ci->aad_application_id,
             ci->aad_client_secret,
             ci->aad_tenant,
+            ci->role_arn,
             ci->idp_arn,
             ci->region,
             ci->end_point_override,

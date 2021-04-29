@@ -20,8 +20,7 @@ set(SOURCE_FILES test_conn.cpp test_query_execution.cpp)
 include_directories(	${UT_HELPER}
 						${ODFEODBC_SRC} 
 						${RAPIDJSON_SRC} 
-						${RABBIT_SRC}		
-						${LIBCURL_SRC}
+						${RABBIT_SRC}
 						${VLD_SRC} )
 
 # Generate executable
