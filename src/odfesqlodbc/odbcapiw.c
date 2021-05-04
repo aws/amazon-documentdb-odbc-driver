@@ -47,10 +47,10 @@ RETCODE SQL_API SQLColumnsW(HSTMT StatementHandle, SQLWCHAR *CatalogName,
     conn = SC_get_conn(stmt);
     ci = &(conn->connInfo);
     lower_id = DEFAULT_LOWERCASEIDENTIFIER;
-    ctName = ucs2_to_utf8(CatalogName, NameLength1, &nmlen1, lower_id);
-    scName = ucs2_to_utf8(SchemaName, NameLength2, &nmlen2, lower_id);
-    tbName = ucs2_to_utf8(TableName, NameLength3, &nmlen3, lower_id);
-    clName = ucs2_to_utf8(ColumnName, NameLength4, &nmlen4, lower_id);
+    ctName = ucs2_to_utf8(CatalogName, NameLength1, &nmlen1, lower_id, TRUE);
+    scName = ucs2_to_utf8(SchemaName, NameLength2, &nmlen2, lower_id, TRUE);
+    tbName = ucs2_to_utf8(TableName, NameLength3, &nmlen3, lower_id, TRUE);
+    clName = ucs2_to_utf8(ColumnName, NameLength4, &nmlen4, lower_id, TRUE);
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
     if (stmt->options.metadata_id)
@@ -88,9 +88,9 @@ RETCODE SQL_API SQLConnectW(HDBC ConnectionHandle, SQLWCHAR *ServerName,
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
     CC_set_in_unicode_driver(conn);
-    svName = ucs2_to_utf8(ServerName, NameLength1, &nmlen1, FALSE);
-    usName = ucs2_to_utf8(UserName, NameLength2, &nmlen2, FALSE);
-    auth = ucs2_to_utf8(Authentication, NameLength3, &nmlen3, FALSE);
+    svName = ucs2_to_utf8(ServerName, NameLength1, &nmlen1, FALSE, TRUE);
+    usName = ucs2_to_utf8(UserName, NameLength2, &nmlen2, FALSE, TRUE);
+    auth = ucs2_to_utf8(Authentication, NameLength3, &nmlen3, FALSE, FALSE);
     ret =
         API_Connect(ConnectionHandle, (SQLCHAR *)svName, (SQLSMALLINT)nmlen1,
                       (SQLCHAR *)usName, (SQLSMALLINT)nmlen2, (SQLCHAR *)auth,
@@ -123,7 +123,7 @@ RETCODE SQL_API SQLDriverConnectW(HDBC hdbc, HWND hwnd, SQLWCHAR *szConnStrIn,
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
     CC_set_in_unicode_driver(conn);
-    szIn = ucs2_to_utf8(szConnStrIn, cbConnStrIn, &inlen, FALSE);
+    szIn = ucs2_to_utf8(szConnStrIn, cbConnStrIn, &inlen, FALSE, FALSE);
     maxlen = cbConnStrOutMax;
     pCSO = NULL;
     olen = 0;
@@ -187,7 +187,7 @@ RETCODE SQL_API SQLBrowseConnectW(HDBC hdbc, SQLWCHAR *szConnStrIn,
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
     CC_set_in_unicode_driver(conn);
-    szIn = ucs2_to_utf8(szConnStrIn, cbConnStrIn, &inlen, FALSE);
+    szIn = ucs2_to_utf8(szConnStrIn, cbConnStrIn, &inlen, FALSE, FALSE);
     obuflen = cbConnStrOutMax + 1;
     szOut = malloc(obuflen);
     if (szOut)
@@ -296,7 +296,7 @@ RETCODE SQL_API SQLExecDirectW(HSTMT StatementHandle, SQLWCHAR *StatementText,
 
     // Get query string
     SQLLEN slen = 0;
-    char *stxt = ucs2_to_utf8(StatementText, TextLength, &slen, FALSE);
+    char *stxt = ucs2_to_utf8(StatementText, TextLength, &slen, FALSE, TRUE);
 
     // Enter critical
     ENTER_STMT_CS(stmt);
@@ -396,7 +396,7 @@ RETCODE SQL_API SQLPrepareW(HSTMT StatementHandle, SQLWCHAR *StatementText,
         return SQL_ERROR;
 
     SQLLEN slen;
-    char *stxt = ucs2_to_utf8(StatementText, TextLength, &slen, FALSE);
+    char *stxt = ucs2_to_utf8(StatementText, TextLength, &slen, FALSE, TRUE);
 
     // Enter critical
     ENTER_STMT_CS(stmt);
@@ -427,7 +427,7 @@ RETCODE SQL_API SQLSetCursorNameW(HSTMT StatementHandle, SQLWCHAR *CursorName,
     SQLLEN nlen;
 
     MYLOG(LOG_TRACE, "entering\n");
-    crName = ucs2_to_utf8(CursorName, NameLength, &nlen, FALSE);
+    crName = ucs2_to_utf8(CursorName, NameLength, &nlen, FALSE, TRUE);
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
     ret = ESAPI_SetCursorName(StatementHandle, (SQLCHAR *)crName,
@@ -457,9 +457,9 @@ RETCODE SQL_API SQLSpecialColumnsW(
 
     conn = SC_get_conn(stmt);
     lower_id = DEFAULT_LOWERCASEIDENTIFIER;
-    ctName = ucs2_to_utf8(CatalogName, NameLength1, &nmlen1, lower_id);
-    scName = ucs2_to_utf8(SchemaName, NameLength2, &nmlen2, lower_id);
-    tbName = ucs2_to_utf8(TableName, NameLength3, &nmlen3, lower_id);
+    ctName = ucs2_to_utf8(CatalogName, NameLength1, &nmlen1, lower_id, TRUE);
+    scName = ucs2_to_utf8(SchemaName, NameLength2, &nmlen2, lower_id, TRUE);
+    tbName = ucs2_to_utf8(TableName, NameLength3, &nmlen3, lower_id, TRUE);
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
     if (SC_opencheck(stmt, func))
@@ -498,9 +498,9 @@ RETCODE SQL_API SQLStatisticsW(HSTMT StatementHandle, SQLWCHAR *CatalogName,
 
     conn = SC_get_conn(stmt);
     lower_id = DEFAULT_LOWERCASEIDENTIFIER;
-    ctName = ucs2_to_utf8(CatalogName, NameLength1, &nmlen1, lower_id);
-    scName = ucs2_to_utf8(SchemaName, NameLength2, &nmlen2, lower_id);
-    tbName = ucs2_to_utf8(TableName, NameLength3, &nmlen3, lower_id);
+    ctName = ucs2_to_utf8(CatalogName, NameLength1, &nmlen1, lower_id, TRUE);
+    scName = ucs2_to_utf8(SchemaName, NameLength2, &nmlen2, lower_id, TRUE);
+    tbName = ucs2_to_utf8(TableName, NameLength3, &nmlen3, lower_id, TRUE);
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
     if (SC_opencheck(stmt, func))
@@ -540,10 +540,10 @@ RETCODE SQL_API SQLTablesW(HSTMT StatementHandle, SQLWCHAR *CatalogName,
 
     conn = SC_get_conn(stmt);
     lower_id = DEFAULT_LOWERCASEIDENTIFIER;
-    ctName = ucs2_to_utf8(CatalogName, NameLength1, &nmlen1, lower_id);
-    scName = ucs2_to_utf8(SchemaName, NameLength2, &nmlen2, lower_id);
-    tbName = ucs2_to_utf8(TableName, NameLength3, &nmlen3, lower_id);
-    tbType = ucs2_to_utf8(TableType, NameLength4, &nmlen4, FALSE);
+    ctName = ucs2_to_utf8(CatalogName, NameLength1, &nmlen1, lower_id, TRUE);
+    scName = ucs2_to_utf8(SchemaName, NameLength2, &nmlen2, lower_id, TRUE);
+    tbName = ucs2_to_utf8(TableName, NameLength3, &nmlen3, lower_id, TRUE);
+    tbType = ucs2_to_utf8(TableType, NameLength4, &nmlen4, FALSE, TRUE);
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
     if (stmt->options.metadata_id)
@@ -586,10 +586,11 @@ RETCODE SQL_API SQLColumnPrivilegesW(
 
     conn = SC_get_conn(stmt);
     lower_id = DEFAULT_LOWERCASEIDENTIFIER;
-    ctName = ucs2_to_utf8(szCatalogName, cbCatalogName, &nmlen1, lower_id);
-    scName = ucs2_to_utf8(szSchemaName, cbSchemaName, &nmlen2, lower_id);
-    tbName = ucs2_to_utf8(szTableName, cbTableName, &nmlen3, lower_id);
-    clName = ucs2_to_utf8(szColumnName, cbColumnName, &nmlen4, lower_id);
+    ctName =
+        ucs2_to_utf8(szCatalogName, cbCatalogName, &nmlen1, lower_id, TRUE);
+    scName = ucs2_to_utf8(szSchemaName, cbSchemaName, &nmlen2, lower_id, TRUE);
+    tbName = ucs2_to_utf8(szTableName, cbTableName, &nmlen3, lower_id, TRUE);
+    clName = ucs2_to_utf8(szColumnName, cbColumnName, &nmlen4, lower_id, TRUE);
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
     if (stmt->options.metadata_id)
@@ -634,13 +635,13 @@ RETCODE SQL_API SQLForeignKeysW(
 
     conn = SC_get_conn(stmt);
     lower_id = DEFAULT_LOWERCASEIDENTIFIER;
-    ctName = ucs2_to_utf8(szPkCatalogName, cbPkCatalogName, &nmlen1, lower_id);
-    scName = ucs2_to_utf8(szPkSchemaName, cbPkSchemaName, &nmlen2, lower_id);
-    tbName = ucs2_to_utf8(szPkTableName, cbPkTableName, &nmlen3, lower_id);
+    ctName = ucs2_to_utf8(szPkCatalogName, cbPkCatalogName, &nmlen1, lower_id, TRUE);
+    scName = ucs2_to_utf8(szPkSchemaName, cbPkSchemaName, &nmlen2, lower_id, TRUE);
+    tbName = ucs2_to_utf8(szPkTableName, cbPkTableName, &nmlen3, lower_id, TRUE);
     fkctName =
-        ucs2_to_utf8(szFkCatalogName, cbFkCatalogName, &nmlen4, lower_id);
-    fkscName = ucs2_to_utf8(szFkSchemaName, cbFkSchemaName, &nmlen5, lower_id);
-    fktbName = ucs2_to_utf8(szFkTableName, cbFkTableName, &nmlen6, lower_id);
+        ucs2_to_utf8(szFkCatalogName, cbFkCatalogName, &nmlen4, lower_id, TRUE);
+    fkscName = ucs2_to_utf8(szFkSchemaName, cbFkSchemaName, &nmlen5, lower_id, TRUE);
+    fktbName = ucs2_to_utf8(szFkTableName, cbFkTableName, &nmlen6, lower_id, TRUE);
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
     if (SC_opencheck(stmt, func))
@@ -681,7 +682,7 @@ RETCODE SQL_API SQLNativeSqlW(HDBC hdbc, SQLWCHAR *szSqlStrIn,
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
     CC_set_in_unicode_driver(conn);
-    szIn = ucs2_to_utf8(szSqlStrIn, cbSqlStrIn, &slen, FALSE);
+    szIn = ucs2_to_utf8(szSqlStrIn, cbSqlStrIn, &slen, FALSE, TRUE);
     buflen = 3 * cbSqlStrMax;
     if (buflen > 0)
         szOutt = malloc(buflen);
@@ -736,9 +737,9 @@ RETCODE SQL_API SQLPrimaryKeysW(HSTMT hstmt, SQLWCHAR *szCatalogName,
 
     conn = SC_get_conn(stmt);
     lower_id = DEFAULT_LOWERCASEIDENTIFIER;
-    ctName = ucs2_to_utf8(szCatalogName, cbCatalogName, &nmlen1, lower_id);
-    scName = ucs2_to_utf8(szSchemaName, cbSchemaName, &nmlen2, lower_id);
-    tbName = ucs2_to_utf8(szTableName, cbTableName, &nmlen3, lower_id);
+    ctName = ucs2_to_utf8(szCatalogName, cbCatalogName, &nmlen1, lower_id, TRUE);
+    scName = ucs2_to_utf8(szSchemaName, cbSchemaName, &nmlen2, lower_id, TRUE);
+    tbName = ucs2_to_utf8(szTableName, cbTableName, &nmlen3, lower_id, TRUE);
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
     if (SC_opencheck(stmt, func))
@@ -773,10 +774,10 @@ RETCODE SQL_API SQLProcedureColumnsW(
     MYLOG(LOG_TRACE, "entering\n");
     conn = SC_get_conn(stmt);
     lower_id = DEFAULT_LOWERCASEIDENTIFIER;
-    ctName = ucs2_to_utf8(szCatalogName, cbCatalogName, &nmlen1, lower_id);
-    scName = ucs2_to_utf8(szSchemaName, cbSchemaName, &nmlen2, lower_id);
-    prName = ucs2_to_utf8(szProcName, cbProcName, &nmlen3, lower_id);
-    clName = ucs2_to_utf8(szColumnName, cbColumnName, &nmlen4, lower_id);
+    ctName = ucs2_to_utf8(szCatalogName, cbCatalogName, &nmlen1, lower_id, TRUE);
+    scName = ucs2_to_utf8(szSchemaName, cbSchemaName, &nmlen2, lower_id, TRUE);
+    prName = ucs2_to_utf8(szProcName, cbProcName, &nmlen3, lower_id, TRUE);
+    clName = ucs2_to_utf8(szColumnName, cbColumnName, &nmlen4, lower_id, TRUE);
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
     if (stmt->options.metadata_id)
@@ -819,9 +820,9 @@ RETCODE SQL_API SQLProceduresW(HSTMT hstmt, SQLWCHAR *szCatalogName,
 
     conn = SC_get_conn(stmt);
     lower_id = DEFAULT_LOWERCASEIDENTIFIER;
-    ctName = ucs2_to_utf8(szCatalogName, cbCatalogName, &nmlen1, lower_id);
-    scName = ucs2_to_utf8(szSchemaName, cbSchemaName, &nmlen2, lower_id);
-    prName = ucs2_to_utf8(szProcName, cbProcName, &nmlen3, lower_id);
+    ctName = ucs2_to_utf8(szCatalogName, cbCatalogName, &nmlen1, lower_id, TRUE);
+    scName = ucs2_to_utf8(szSchemaName, cbSchemaName, &nmlen2, lower_id, TRUE);
+    prName = ucs2_to_utf8(szProcName, cbProcName, &nmlen3, lower_id, TRUE);
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
     if (stmt->options.metadata_id)
@@ -863,9 +864,9 @@ RETCODE SQL_API SQLTablePrivilegesW(HSTMT hstmt, SQLWCHAR *szCatalogName,
 
     conn = SC_get_conn(stmt);
     lower_id = DEFAULT_LOWERCASEIDENTIFIER;
-    ctName = ucs2_to_utf8(szCatalogName, cbCatalogName, &nmlen1, lower_id);
-    scName = ucs2_to_utf8(szSchemaName, cbSchemaName, &nmlen2, lower_id);
-    tbName = ucs2_to_utf8(szTableName, cbTableName, &nmlen3, lower_id);
+    ctName = ucs2_to_utf8(szCatalogName, cbCatalogName, &nmlen1, lower_id, TRUE);
+    scName = ucs2_to_utf8(szSchemaName, cbSchemaName, &nmlen2, lower_id, TRUE);
+    tbName = ucs2_to_utf8(szTableName, cbTableName, &nmlen3, lower_id, TRUE);
     ENTER_STMT_CS((StatementClass *)hstmt);
     SC_clear_error(stmt);
     if (stmt->options.metadata_id)
