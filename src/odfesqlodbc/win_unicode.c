@@ -120,10 +120,12 @@ SQLULEN ucs2strlen(const SQLWCHAR *ucs2str) {
     return len;
 }
 char *ucs2_to_utf8(const SQLWCHAR *ucs2str, SQLLEN ilen, SQLLEN *olen,
-                   BOOL lower_identifier) {
+                   BOOL lower_identifier, BOOL loggable) {
     char *utf8str;
     int len = 0;
-    MYLOG(LOG_DEBUG, "%p ilen=" FORMAT_LEN " ", ucs2str, ilen);
+    if (loggable) {
+        MYLOG(LOG_DEBUG, "%p ilen=" FORMAT_LEN " ", ucs2str, ilen);
+    }
 
     if (!ucs2str) {
         if (olen)
@@ -204,7 +206,9 @@ char *ucs2_to_utf8(const SQLWCHAR *ucs2str, SQLLEN ilen, SQLLEN *olen,
         if (olen)
             *olen = len;
     }
-    MYPRINTF(0, " olen=%d utf8str=%s\n", len, utf8str ? utf8str : "");
+    if (loggable) {
+        MYPRINTF(0, " olen=%d utf8str=%s\n", len, utf8str ? utf8str : "");
+    }
     return utf8str;
 }
 
@@ -687,7 +691,7 @@ static char *wcs_to_utf8(const wchar_t *wcsstr, SQLLEN ilen, SQLLEN *olen,
     switch (get_convtype()) {
         case WCSTYPE_UTF16_LE:
             return ucs2_to_utf8((const SQLWCHAR *)wcsstr, ilen, olen,
-                                lower_identifier);
+                                lower_identifier, TRUE);
         case WCSTYPE_UTF32_LE:
             return ucs4_to_utf8((const UInt4 *)wcsstr, ilen, olen,
                                 lower_identifier);

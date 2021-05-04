@@ -106,7 +106,7 @@ RETCODE SQL_API SQLSetDescFieldW(SQLHDESC DescriptorHandle,
                 uval = ucs2_to_utf8(
                     Value,
                     BufferLength > 0 ? BufferLength / WCLEN : BufferLength,
-                    &vallen, FALSE);
+                    &vallen, FALSE, TRUE);
                 val_alloced = TRUE;
                 break;
             default:
