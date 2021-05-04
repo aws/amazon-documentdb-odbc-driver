@@ -409,7 +409,7 @@ RETCODE SQL_API ESAPI_SetConnectOption(HDBC hdbc, SQLUSMALLINT fOption,
 #ifdef UNICODE_SUPPORT
                 if (CC_is_in_unicode_driver(conn)) {
                     char *asPara =
-                        ucs2_to_utf8((SQLWCHAR *)vParam, SQL_NTS, NULL, FALSE);
+                        ucs2_to_utf8((SQLWCHAR *)vParam, SQL_NTS, NULL, FALSE, TRUE);
                     cmp = strcmp(asPara, "Microsoft Jet");
                     free(asPara);
                 } else

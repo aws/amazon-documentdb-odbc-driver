@@ -23,7 +23,7 @@
 #define WCLEN sizeof(SQLWCHAR)
 enum { CONVTYPE_UNKNOWN, WCSTYPE_UTF16_LE, WCSTYPE_UTF32_LE, C16TYPE_UTF16_LE };
 char *ucs2_to_utf8(const SQLWCHAR *ucs2str, SQLLEN ilen, SQLLEN *olen,
-                   BOOL tolower);
+                   BOOL tolower, BOOL loggable);
 SQLULEN utf8_to_ucs2_lf(const char *utf8str, SQLLEN ilen, BOOL lfconv,
                         SQLWCHAR *ucs2str, SQLULEN buflen, BOOL errcheck);
 int get_convtype(void);
