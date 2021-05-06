@@ -1,7 +1,6 @@
 ** aws-cpp-sdk-core -- https://github.com/aws/aws-sdk-cpp (1.8.108)
 ** rapidjson -- https://github.com/Tencent/rapidjson (1.1.0)
 ** rabbit -- https://github.com/mashiro/rabbit (master branch on November 18th, 2019)
-** Visual Leak Detector -- https://github.com/KindDragon/vld (v2.5.1)
 ** PostgreSQL v12.0 -- https://www.postgresql.org/ftp/source/v12.0/ (v12.0)
 ** Googletest -- https://github.com/google/googletest (release-1.10.0)
 ** StableCoder - code-coverage.cmake -- https://github.com/StableCoder/cmake-scripts/blob/master/code-coverage.cmake (21.01)
