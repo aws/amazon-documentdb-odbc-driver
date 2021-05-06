@@ -19,11 +19,10 @@ project(ut_rabbit)
 set(SOURCE_FILES test_rabbit.cpp)
 include_directories(	${UT_HELPER}
 						${RAPIDJSON_SRC} 
-						${RABBIT_SRC} 
-						${VLD_SRC} )
+						${RABBIT_SRC})
 
 # Generate executable
 add_executable(ut_rabbit ${SOURCE_FILES})
 
-target_link_libraries(ut_rabbit ut_helper gtest_main ${VLD})
+target_link_libraries(ut_rabbit ut_helper gtest_main)
 target_compile_definitions(ut_rabbit PUBLIC _UNICODE UNICODE)

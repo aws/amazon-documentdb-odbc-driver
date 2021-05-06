@@ -20,7 +20,6 @@ set(SOURCE_FILES test_odbc_aws_auth.cpp)
 include_directories(	${UT_HELPER}
 						${IT_HELPER}
 						${ODFEODBC_SRC}
-						${VLD_SRC}
 						${AWSSDK_INCLUDE_DIR}
 						)
 

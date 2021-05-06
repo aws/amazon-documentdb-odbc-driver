@@ -20,7 +20,6 @@ set(SOURCE_FILES test_critical_section.cpp)
 include_directories(	${UT_HELPER}
 						${ODFEODBC_SRC}
 						${RAPIDJSON_SRC}
-						${VLD_SRC}
 						${RABBIT_SRC}  )
 
 # Generate executable
