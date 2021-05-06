@@ -51,11 +51,11 @@ set(CPP_SOURCE_FILES	communication.cpp
 						es_helper.cpp
 						es_info.cpp
 						es_parse_result.cpp
-						es_result_queue.cpp
 						es_semaphore.cpp
 						es_statement.cpp
 						es_utility.cpp
-						ts_communication.cpp)
+						ts_communication.cpp
+						ts_prefetch_queue.cpp)
 						
 if(WIN32)
 set(C_SOURCE_FILES ${C_SOURCE_FILES} dlg_wingui.c setup.c)
@@ -88,12 +88,12 @@ set(CPP_HEADER_FILES	communication.h
 						es_info.h
 						es_odbc.h
 						es_parse_result.h
-						es_result_queue.h
 						es_semaphore.h
 						es_statement.h
 						es_types.h
 						es_utility.h
 						ts_communication.h
+						ts_prefetch_queue.h
 						version.h)
 
 # Generate dll (SHARED)

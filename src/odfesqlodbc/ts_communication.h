@@ -59,11 +59,11 @@ class TSCommunication : public Communication {
     virtual void Disconnect() override;
     /**
      * Execute query
-     * @param stmt void *
+     * @param stmt StatementClass *
      * @param query const char*
      * @return int
      */
-    virtual int ExecDirect(void* stmt, const char* query) override;
+    virtual int ExecDirect(StatementClass* stmt, const char* query) override;
     /**
      * Get version
      * @return std::string
@@ -71,49 +71,20 @@ class TSCommunication : public Communication {
     virtual std::string GetVersion() override;
 
     /**
-     * Get columns using select query
-     * @param table_name const std::string&
-     * @return std::vector<std::string>
-     */
-    virtual std::vector< std::string > GetColumnsWithSelectQuery(
-        const std::string& table_name) override;
-    /**
      * Get error prefix
      * @return std::string
      */
     virtual std::string GetErrorPrefix() override;
+
     /**
-     * Send request to close cursor
-     * @param cursor const std::string&
+     * For prefetch mechanism
+     * During retrieving data from database, caller can call SQLFreeStmt /
+     * SQLCloseCursor to stop it
+     * @param stmt StatementClass*
      */
-    virtual void SendCloseCursorRequest(const std::string& cursor) override;
-    /**
-     * Isses a request
-     * @param endpoint const std::string&
-     * @param request_type const Aws::Http::HttpMethod
-     * @param content_type const std::string&
-     * @param cursor const std::string&
-     * @return std::shared_ptr< Aws::Http::HttpResponse >
-     */
-    virtual std::shared_ptr< Aws::Http::HttpResponse > IssueRequest(
-        const std::string& endpoint, const Aws::Http::HttpMethod request_type,
-        const std::string& content_type, const std::string& query,
-        const std::string& cursor = "") override;
+    virtual void StopResultRetrieval(StatementClass* stmt) override;
 
    private:
-    /**
-     * Construct the result set
-     * @param result TSResult&
-     * @return output std::string
-     */
-    void ConstructTSResult(TSResult& result);
-    /**
-     * Send cursor queries
-     * @param request Aws::TimestreamQuery::Model::QueryRequest
-     * @param cursor Aws::String
-     */
-    //void SendCursorQueries(Aws::TimestreamQuery::Model::QueryRequest request,
-                           //Aws::String next_token);
     /**
      * Fetches an access token from Azure AD Oauth2 endpoint using the provided properties.
      * @param auth const authentication_options&
@@ -127,10 +98,6 @@ class TSCommunication : public Communication {
      * @return Aws::String
      */
     Aws::String GetSAMLAssertion(const authentication_options& auth);
-    /**
-     * Runtime options
-     */
-    runtime_options m_rt_opts;
     /**
      * Timestream query client
      */
