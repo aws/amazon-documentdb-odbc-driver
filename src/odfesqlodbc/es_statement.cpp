@@ -187,22 +187,28 @@ SQLRETURN GetNextResultSet(StatementClass *stmt) {
         || (total_columns == -1)) {
         return SQL_ERROR;
     }
-
-    Statement< Aws::TimestreamQuery::Model::QueryOutcome > *pStmt =
-        (Statement< Aws::TimestreamQuery::Model::QueryOutcome > *)stmt->stmt;
-
-    if (!pStmt->IsEmpty()) {
-        Aws::TimestreamQuery::Model::QueryOutcome&& outcome = pStmt->Get();
-        if (!outcome.GetResult().GetNextToken().empty()) {
-            QR_set_next_token(q_res, outcome.GetResult().GetNextToken().c_str());
+    
+    PrefetchQueue *pPrefetchQueue = GetPrefetchQueue(cc->conn, stmt);
+    if (pPrefetchQueue != nullptr && !pPrefetchQueue->IsEmpty()) {
+        auto outcome = pPrefetchQueue->Front();
+        pPrefetchQueue->Pop();
+        if (outcome.IsSuccess()) {
+            if (!outcome.GetResult().GetNextToken().empty()) {
+                QR_set_next_token(q_res,
+                                  outcome.GetResult().GetNextToken().c_str());
+            } else {
+                QR_set_next_token(q_res, NULL);
+            }
+            // Responsible for looping through rows, allocating tuples and
+            // appending these rows in q_result
+            CC_Append_Table_Data(outcome, q_res, *(q_res->fields));
+            return SQL_SUCCESS;
         } else {
-            QR_set_next_token(q_res, NULL);
+            return SQL_ERROR;
         }
-        // Responsible for looping through rows, allocating tuples and
-        // appending these rows in q_result
-        CC_Append_Table_Data(outcome, q_res, *(q_res->fields));
+    } else {
+        return SQL_ERROR;
     }
-    return SQL_SUCCESS;
 }
 
 RETCODE RePrepareStatement(StatementClass *stmt) {
@@ -260,31 +266,32 @@ QResultClass *SendQueryGetResult(StatementClass *stmt, BOOL commit) {
 
     // Send command
     ConnectionClass *cc = SC_get_conn(stmt);
-    if (ESExecDirect(cc->conn, stmt->stmt, stmt->statement) != 0) {
+    if (ESExecDirect(cc->conn, stmt, stmt->statement) != 0) {
         QR_Destructor(res);
         return NULL;
     }
     res->rstatus = PORES_COMMAND_OK;
 
-    // Get TSResult
-    Statement< Aws::TimestreamQuery::Model::QueryOutcome > *pStmt =
-        (Statement< Aws::TimestreamQuery::Model::QueryOutcome > *)stmt->stmt;
-    // TSResult *ts_res = nullptr;
-    if (!pStmt->IsEmpty()) {
+    PrefetchQueue *pPrefetchQueue = GetPrefetchQueue(cc->conn, stmt);
+    if (pPrefetchQueue != nullptr && !pPrefetchQueue->IsEmpty()) {
         bool success = false;
         if (commit) {
-            // Use pop()
-            Aws::TimestreamQuery::Model::QueryOutcome &&outcome = pStmt->Get();
-            success = CC_from_TSResult(res, cc, res->cursor_name, outcome);
+            auto outcome = pPrefetchQueue->Front();
+            pPrefetchQueue->Pop();
+            if (outcome.IsSuccess()) {
+                success = CC_from_TSResult(res, cc, res->cursor_name, outcome);
+            } else {
+                success = false;
+            }
         } else {
-            // Use front() to see
-            Aws::TimestreamQuery::Model::QueryOutcome outcome = pStmt->Front();
-            success = CC_Metadata_from_TSResult(res, cc, res->cursor_name, outcome);
+            // Use Front() to see only
+            auto outcome = pPrefetchQueue->Front();
+            if (outcome.IsSuccess()) {
+                success = CC_Metadata_from_TSResult(res, cc, res->cursor_name, outcome);
+            } else {
+                success = false;
+            }
         }
-        //bool success =
-        //    commit
-        //        ? CC_from_TSResult(res, cc, res->cursor_name, outcome)
-        //        : CC_Metadata_from_TSResult(res, cc, res->cursor_name, outcome);
          if (!success) {
             QR_Destructor(res);
             res = NULL;
@@ -293,26 +300,6 @@ QResultClass *SendQueryGetResult(StatementClass *stmt, BOOL commit) {
         QR_Destructor(res);
         res = NULL;
     }
-
-    //BOOL success =
-    //    commit
-    //        ? CC_from_TSResult(res, cc, res->cursor_name, *ts_res)
-    //        : CC_Metadata_from_TSResult(res, cc, res->cursor_name, *ts_res);
-
-    //// Convert result to QResultClass
-    //if (!success) {
-    //    QR_Destructor(res);
-    //    res = NULL;
-    //}
-
-    //if (commit) {
-    //    // Deallocate TSResult
-    //    TSClearResult(ts_res);
-    //    res->ts_result = NULL;
-    //} else {
-    //    // Set TSResult into connection class so it can be used later
-    //    res->ts_result = ts_res;
-    //}
     return res;
 }
 
@@ -326,18 +313,21 @@ RETCODE AssignResult(StatementClass *stmt) {
     }
 
     // Commit result to QResultClass
-    // TSResult *es_res = static_cast< TSResult * >(res->ts_result);
-    Statement< Aws::TimestreamQuery::Model::QueryOutcome > *pStmt =
-        (Statement< Aws::TimestreamQuery::Model::QueryOutcome > *)stmt->stmt;
-
-    if (!pStmt->IsEmpty()) {
-        Aws::TimestreamQuery::Model::QueryOutcome &&outcome = pStmt->Get();
-        ConnectionClass *conn = SC_get_conn(stmt);
-         if (!CC_No_Metadata_from_TSResult(res, conn, res->cursor_name, outcome)) {
+    ConnectionClass *cc = SC_get_conn(stmt);
+    PrefetchQueue *pPrefetchQueue = GetPrefetchQueue(cc->conn, stmt);
+    if (pPrefetchQueue != nullptr && !pPrefetchQueue->IsEmpty()) {
+        auto outcome = pPrefetchQueue->Front();
+        pPrefetchQueue->Pop();
+        if (outcome.IsSuccess()) {
+            if (!CC_No_Metadata_from_TSResult(res, cc, res->cursor_name, outcome)) {
+                QR_Destructor(res);
+                return SQL_ERROR;
+            }
+            GetNextResultSet(stmt);
+        } else {
             QR_Destructor(res);
             return SQL_ERROR;
-         }
-         GetNextResultSet(stmt);
+        }
     } else {
         QR_Destructor(res);
         return SQL_ERROR;

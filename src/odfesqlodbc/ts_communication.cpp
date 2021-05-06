@@ -38,144 +38,6 @@
 #include <aws/timestream-query/model/QueryRequest.h>
 
 // clang-format on
-
-// static const std::string ctype = "application/json";
-// static const std::string SQL_ENDPOINT_FORMAT_JDBC =
-//    "/_opendistro/_sql?format=jdbc";
-// static const std::string SQL_ENDPOINT_CLOSE_CURSOR =
-// "/_opendistro/_sql/close"; static const std::string
-// PLUGIN_ENDPOINT_FORMAT_JSON =
-//    "/_cat/plugins?format=json";
-//static const std::string OPENDISTRO_SQL_PLUGIN_NAME = "opendistro_sql";
-//static const std::string ALLOCATION_TAG = "IAM_AUTH";
-//static const std::string SERVICE_NAME = "es";
-//static const std::string ESODBC_PROFILE_NAME = "elasticsearchodbc";
-//static const std::string ERROR_MSG_PREFIX =
-//    "[Open Distro For Elasticsearch][SQL ODBC Driver][SQL Plugin] ";
-// static const std::string JSON_SCHEMA =
-//    "{"  // This was generated from the example elasticsearch data
-//    "\"type\": \"object\","
-//    "\"properties\": {"
-//    "\"schema\": {"
-//    "\"type\": \"array\","
-//    "\"items\": [{"
-//    "\"type\": \"object\","
-//    "\"properties\": {"
-//    "\"name\": { \"type\": \"string\" },"
-//    "\"type\": { \"type\": \"string\" }"
-//    "},"
-//    "\"required\": [ \"name\", \"type\" ]"
-//    "}]"
-//    "},"
-//    "\"cursor\": { \"type\": \"string\" },"
-//    "\"total\": { \"type\": \"integer\" },"
-//    "\"datarows\": {"
-//    "\"type\": \"array\","
-//    "\"items\": {}"
-//    "},"
-//    "\"size\": { \"type\": \"integer\" },"
-//    "\"status\": { \"type\": \"integer\" }"
-//    "},"
-//    "\"required\": [\"schema\", \"total\", \"datarows\", \"size\",
-//    \"status\"]"
-//    "}";
-// static const std::string CURSOR_JSON_SCHEMA =
-//    "{"  // This was generated from the example elasticsearch data
-//    "\"type\": \"object\","
-//    "\"properties\": {"
-//    "\"cursor\": { \"type\": \"string\" },"
-//    "\"datarows\": {"
-//    "\"type\": \"array\","
-//    "\"items\": {}"
-//    "},"
-//    "\"status\": { \"type\": \"integer\" }"
-//    "},"
-//    "\"required\":  [\"datarows\"]"
-//    "}";
-// static const std::string ERROR_RESPONSE_SCHEMA = R"EOF(
-//{
-//    "type": "object",
-//    "properties": {
-//        "error": {
-//            "type": "object",
-//            "properties": {
-//                "reason": { "type": "string" },
-//                "details": { "type": "string" },
-//                "type": { "type": "string" }
-//            },
-//            "required": [
-//                "reason",
-//                "details",
-//                "type"
-//            ]
-//        },
-//        "status": {
-//            "type": "integer"
-//        }
-//    },
-//    "required": [
-//        "error",
-//        "status"
-//    ]
-//}
-//)EOF";
-
-// void TSCommunication::PrepareCursorResult(TSResult& ts_result) {
-
-// Prepare document and validate result
-//try {
-//    LogMsg(LOG_DEBUG, "Parsing result JSON with cursor.");
-//    ts_result.es_result_doc.parse(ts_result.result_json,
-//                                  CURSOR_JSON_SCHEMA);
-//} catch (const rabbit::parse_error& e) {
-//    // The exception rabbit gives is quite useless - providing the json
-//    // will aid debugging for users
-//    std::string str = "Exception obtained '" + std::string(e.what())
-//                      + "' when parsing json string '"
-//                      + ts_result.result_json + "'.";
-//    throw std::runtime_error(str.c_str());
-//}
-//
-//// std::shared_ptr< ErrorDetails > TSCommunication::ParseErrorResponse(
-////    TSResult& ts_result) {
-//// Prepare document and validate schema
-//try {
-//    LogMsg(ES_DEBUG, "Parsing error response (with schema validation)");
-//    ts_result.es_result_doc.parse(ts_result.result_json,
-//                                  ERROR_RESPONSE_SCHEMA);
-//    auto error_details = std::make_shared< ErrorDetails >();
-//    error_details->reason =
-//        ts_result.es_result_doc["error"]["reason"].as_string();
-//    error_details->details =
-//        ts_result.es_result_doc["error"]["details"].as_string();
-//    error_details->source_type =
-//        ts_result.es_result_doc["error"]["type"].as_string();
-//    return error_details;
-//} catch (const rabbit::parse_error& e) {
-//    // The exception rabbit gives is quite useless - providing the json
-//    // will aid debugging for users
-//    std::string str = "Exception obtained '" + std::string(e.what())
-//                      + "' when parsing json string '"
-//                      + ts_result.result_json + "'.";
-//    throw std::runtime_error(str.c_str());
-//}
-//// }
-//
-//// void TSCommunication::GetJsonSchema(TSResult& ts_result) {
-//// Prepare document and validate schema
-//try {
-//    LogMsg(ES_DEBUG, "Parsing result JSON with schema.");
-//    ts_result.es_result_doc.parse(ts_result.result_json, JSON_SCHEMA);
-//} catch (const rabbit::parse_error& e) {
-//    // The exception rabbit gives is quite useless - providing the json
-//    // will aid debugging for users
-//    std::string str = "Exception obtained '" + std::string(e.what())
-//                      + "' when parsing json string '"
-//                      + ts_result.result_json + "'.";
-//    throw std::runtime_error(str.c_str());
-//}
-// }
-
 bool TSCommunication::Validate(const runtime_options& options) {
     if (options.auth.region.empty() && options.auth.end_point_override.empty()) {
         throw std::invalid_argument("Both region and end point cannot be empty.");
@@ -298,7 +160,9 @@ void TSCommunication::Disconnect() {
         m_client.reset();
     }
     m_status = ConnStatusType::CONNECTION_BAD;
-    // StopResultRetrieval();
+    for (auto& [stmt, prefetchQueue] : prefetch_queues_map) {
+        StopResultRetrieval(stmt);
+    }
 }
 
 std::string TSCommunication::GetVersion() {
@@ -309,223 +173,106 @@ std::string TSCommunication::GetVersion() {
 std::string TSCommunication::GetErrorPrefix() {
     return "[Timestream][SQL ODBC Driver] ";
 }
-std::shared_ptr< Aws::Http::HttpResponse > TSCommunication::IssueRequest(
-    const std::string& /*endpoint*/,
-    const Aws::Http::HttpMethod /*request_type*/,
-    const std::string& /*content_type*/, const std::string& /*query*/,
-    const std::string& /*cursor*/) {
-    return nullptr;
+
+void TSCommunication::StopResultRetrieval(StatementClass* stmt) {
+    if (stmt != nullptr && prefetch_queues_map.find(stmt) != prefetch_queues_map.end()) {
+        prefetch_queues_map[stmt]->Clear();
+        prefetch_queues_map.erase(stmt);
+    }
 }
 
-std::vector< std::string > TSCommunication::GetColumnsWithSelectQuery(
-    const std::string& /*table_name*/) {
-    // std::vector< std::string > list_of_column;
-    // if (table_name.empty()) {
-    //    m_error_type = ConnErrorType::CONN_ERROR_INVALID_NULL_PTR;
-    //    m_error_message = "Query is NULL";
-    //    LogMsg(LOG_ERROR, m_error_message.c_str());
-    //    return list_of_column;
-    //}
+/**
+ * Context class for Aws::Client::AsyncCallerContext
+ * Only for execution
+ */
+class Context : public Aws::Client::AsyncCallerContext {
+   public:
+    /**
+     * Parameterized constructor for the context
+     */
+    Context(PrefetchQueue* q, std::promise< Aws::TimestreamQuery::Model::QueryOutcome > p)
+        : Aws::Client::AsyncCallerContext(), queue_(q), promise_(std::move(p)) {
+    }
+    /**
+     * Get the prefetch queue
+     * @return PrefetchQueue*
+     */
+    PrefetchQueue* GetPrefetchQueue() {
+        return queue_;
+    }
+    /**
+     * Make promise
+     * @param outcome const Aws::TimestreamQuery::Model::QueryOutcome&
+     */
+    void MakePromise(const Aws::TimestreamQuery::Model::QueryOutcome& outcome) {
+        promise_.set_value(outcome);
+    }
+   private:
+    /**
+     * PrefetchQueue pointer
+     */
+    PrefetchQueue* queue_;
+    /**
+     * Promise made by the request
+     * Wait to be fullfilled in the QueryCallback function
+     */
+    std::promise< Aws::TimestreamQuery::Model::QueryOutcome > promise_;
+};
 
-    //// Prepare query
-    //std::string query = "SELECT * FROM " + table_name + " LIMIT 0";
-    //std::string msg = "Attempting to execute a query \"" + query + "\"";
-    //LogMsg(LOG_DEBUG, msg.c_str());
-
-    //// Issue request
-    // std::shared_ptr< Aws::Http::HttpResponse > response =
-    //    IssueRequest(SQL_ENDPOINT_FORMAT_JDBC,
-    //    Aws::Http::HttpMethod::HTTP_POST,
-    //                 ctype, query);
-
-    //// Validate response
-    // if (response == nullptr) {
-    //    m_error_message =
-    //        "Failed to receive response from query. "
-    //        "Received NULL response.";
-    //    SetErrorDetails("HTTP client error", m_error_message,
-    //                    ConnErrorType::CONN_ERROR_COMM_LINK_FAILURE);
-    //    LogMsg(LOG_ERROR, m_error_message.c_str());
-    //    return list_of_column;
-    //}
-
-    //// Convert body from Aws IOStream to string
-    // std::unique_ptr< TSResult > result = std::make_unique< TSResult >();
-    // AwsHttpResponseToString(response, result->result_json);
-
-    //// If response was not valid, set error
-    // if (response->GetResponseCode() != Aws::Http::HttpResponseCode::OK) {
-    //    m_error_type = ConnErrorType::CONN_ERROR_QUERY_SYNTAX;
-    //    m_error_message =
-    //        "Http response code was not OK. Code received: "
-    //        + std::to_string(static_cast< long >(response->GetResponseCode()))
-    //        + ".";
-    //    if (response->HasClientError())
-    //        m_error_message +=
-    //            " Client error: '" + response->GetClientErrorMessage() + "'.";
-    //    if (!result->result_json.empty()) {
-    //        m_error_message +=
-    //            " Response error: '" + result->result_json + "'.";
-    //    }
-    //    SetErrorDetails("Connection error", m_error_message,
-    //                    ConnErrorType::CONN_ERROR_COMM_LINK_FAILURE);
-    //    LogMsg(LOG_ERROR, m_error_message.c_str());
-    //    return list_of_column;
-    //}
-
-    // GetJsonSchema(*result);
-
-    // rabbit::array schema_array = result->es_result_doc["schema"];
-    // for (rabbit::array::iterator it = schema_array.begin();
-    //     it != schema_array.end(); ++it) {
-    //    std::string column_name = it->at("name").as_string();
-    //    list_of_column.push_back(column_name);
-    //}
-
-    // return list_of_column;
-    return std::vector< std::string >{};
+// Callback function of QueryAsync operation by aws-sdk-cpp timestream-query
+void QueryCallback(
+    const Aws::TimestreamQuery::TimestreamQueryClient* client,
+    const Aws::TimestreamQuery::Model::QueryRequest& request,
+    const Aws::TimestreamQuery::Model::QueryOutcome& outcome,
+    const std::shared_ptr< const Aws::Client::AsyncCallerContext >& context) {
+    auto ctxt = (std::static_pointer_cast< const Context >(context));
+    auto p = const_cast< Context* >(ctxt.get());
+    if (p != nullptr) {
+        if (outcome.IsSuccess()
+            && !outcome.GetResult().GetNextToken().empty()) {
+            // Next request
+            Aws::TimestreamQuery::Model::QueryRequest next_request(request);
+            std::promise< Aws::TimestreamQuery::Model::QueryOutcome >
+                next_promise;
+            if (!p->GetPrefetchQueue()->IsEmpty()) {
+                PrefetchQueue* pPrefetchQueue =
+                    (PrefetchQueue*)p->GetPrefetchQueue();
+                pPrefetchQueue->Push(next_promise.get_future());
+                client->QueryAsync(
+                    next_request.WithNextToken(
+                        outcome.GetResult().GetNextToken()),
+                    QueryCallback,
+                    std::make_shared< Context >(pPrefetchQueue,
+                                                std::move(next_promise)));
+            }
+        }
+        // Made promise from previous query
+        p->MakePromise(outcome);
+    }
 }
 
-int TSCommunication::ExecDirect(void* stmt, const char* query) {
-    //m_error_details.reset();
-    //if (!query) {
-    //    m_error_message = "Query is NULL";
-    //    SetErrorDetails("Execution error", m_error_message,
-    //                    ConnErrorType::CONN_ERROR_INVALID_NULL_PTR);
-    //    LogMsg(LOG_ERROR, m_error_message.c_str());
-    //    return -1;
-    //} else if (!m_client) {
-    //    m_error_message = "Unable to connect. Please try connecting again.";
-    //    SetErrorDetails("Execution error", m_error_message,
-    //                    ConnErrorType::CONN_ERROR_COMM_LINK_FAILURE);
-    //    LogMsg(LOG_ERROR, m_error_message.c_str());
-    //    return -1;
-    //}
-
+int TSCommunication::ExecDirect(StatementClass* sc, const char* query) {
     // Prepare statement
     std::string statement(query);
     std::string msg = "Attempting to execute a query \"" + statement + "\"";
     LogMsg(LOG_DEBUG, msg.c_str());
-
-    Statement< Aws::TimestreamQuery::Model::QueryOutcome >* pStmt =
-        (Statement< Aws::TimestreamQuery::Model::QueryOutcome >*)stmt;
-    // Issue request
+    if (prefetch_queues_map.find(sc) == prefetch_queues_map.end()) {
+        prefetch_queues_map[sc] = std::make_shared<PrefetchQueue>();
+    }
+    PrefetchQueue* pPrefetchQueue = prefetch_queues_map[sc].get();
+    pPrefetchQueue->Clear();
+    //// Issue request
     Aws::TimestreamQuery::Model::QueryRequest request;
     request.SetQueryString(statement.c_str());
-    Aws::TimestreamQuery::Model::QueryOutcome outcome;
-    bool success = false;
-    std::string token;
-    do {
-        outcome = m_client->Query(request);
-        success = outcome.IsSuccess();
-        if (success) {
-            token = outcome.GetResult().GetNextToken();
-            request.WithNextToken(token);
-            // auto ts_result = new TSResult();
-            // ts_result->sdk_result = outcome.GetResult();
-            pStmt->Add(std::move(outcome));
-        }
-    } while (success && !token.empty());
-    //auto outcome = m_client->Query(request);
-    //if (!outcome.IsSuccess()) {
-    //    LogMsg(LOG_ERROR, outcome.GetError().GetMessage().c_str());
-    //    return -1;
-    //}
-
-    //auto ts_result = new TSResult();
-    //ts_result->sdk_result = outcome.GetResult();
-    //while (!m_result_queue.push(QUEUE_TIMEOUT, ts_result)) {
-    //    if (ConnStatusType::CONNECTION_OK == m_status) {
-    //        return -1;
-    //    }
-    //}
-
-    //if (!outcome.GetResult().GetNextToken().empty()) {
-    //    auto next_token = outcome.GetResult().GetNextToken();
-    //    std::thread([this, request, next_token]() {
-    //        this->SendCursorQueries(request, next_token);
-    //    }).detach();
-    //}
+    
+    // Use QueryAsync
+    std::promise< Aws::TimestreamQuery::Model::QueryOutcome > promise;
+    pPrefetchQueue->Push(promise.get_future());
+    m_client->QueryAsync(
+        request, QueryCallback,
+        std::make_shared< Context >(pPrefetchQueue, std::move(promise)));
     return 0;
 }
-
-//void TSCommunication::SendCursorQueries(
-//    Aws::TimestreamQuery::Model::QueryRequest request, Aws::String next_token) {
-//    if (next_token.empty()) {
-//        LogMsg(LOG_ERROR, "Next token is empty");
-//        return;
-//    }
-//    m_is_retrieving = true;
-//    try {
-//        while (!next_token.empty() && m_is_retrieving) {
-//            LogMsg(LOG_DEBUG,
-//                   "SendCursorQueries: Start fetching more result sets in the "
-//                   "background");
-//            auto outcome = m_client->Query(request.WithNextToken(next_token));
-//            if (!outcome.IsSuccess()) {
-//                LogMsg(LOG_ERROR, outcome.GetError().GetMessage().c_str());
-//                return;
-//            }
-//            next_token = outcome.GetResult().GetNextToken();
-//
-//            auto result = new TSResult();
-//            result->sdk_result = outcome.GetResult();
-//            while (m_is_retrieving
-//                   && !m_result_queue.push(QUEUE_TIMEOUT, result)) {
-//            }
-//        }
-//    } catch (std::runtime_error& e) {
-//        std::string error_message =
-//            "Received runtime exception: " + std::string(e.what());
-//        LogMsg(LOG_ERROR, error_message.c_str());
-//    }
-//    LogMsg(LOG_DEBUG, "SendCursorQueriesDone fetching more results");
-//
-//    if (!m_is_retrieving) {
-//        m_result_queue.clear();
-//    } else {
-//        m_is_retrieving = false;
-//    }
-//}
-
-void TSCommunication::SendCloseCursorRequest(const std::string& /*cursor*/) {
-    /*std::shared_ptr< Aws::Http::HttpResponse > response =
-        IssueRequest(SQL_ENDPOINT_CLOSE_CURSOR,
-                     Aws::Http::HttpMethod::HTTP_POST, ctype, "", "", cursor);
-    if (response == nullptr) {
-        m_error_message =
-            "Failed to receive response from cursor close request. "
-            "Received NULL response.";
-        SetErrorDetails("Cursor error", m_error_message,
-                        ConnErrorType::CONN_ERROR_QUERY_SYNTAX);
-        LogMsg(LOG_ERROR, m_error_message.c_str());
-    }*/
-}
-
-// TODO Need to map Timestream::QueryResult to TSResult
-// void TSCommunication::ConstructTSResult(TSResult& result) {
-//    rabbit::array schema_array = result.es_result_doc["schema"];
-//    for (rabbit::array::iterator it = schema_array.begin();
-//         it != schema_array.end(); ++it) {
-//        std::string column_name = it->at("name").as_string();
-//
-//        ColumnInfo col_info;
-//        col_info.field_name = column_name;
-//        col_info.type_oid = KEYWORD_TYPE_OID;
-//        col_info.type_size = KEYWORD_TYPE_SIZE;
-//        col_info.display_size = KEYWORD_DISPLAY_SIZE;
-//        col_info.length_of_str = KEYWORD_TYPE_SIZE;
-//        col_info.relation_id = 0;
-//        col_info.attribute_number = 0;
-//
-//        result.column_info.push_back(col_info);
-//    }
-//    if (result.es_result_doc.has("cursor")) {
-//        result.cursor = result.es_result_doc["cursor"].as_string();
-//    }
-//    result.command_type = "SELECT";
-//    result.num_fields = (uint16_t)schema_array.size();
-// }
 
 std::string TSCommunication::GetAccessToken(
     const authentication_options& auth) {
@@ -606,5 +353,3 @@ Aws::String TSCommunication::GetSAMLAssertion(
         assertion.size());
     return base64.Encode(encode_buffer);
 }
-
-

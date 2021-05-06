@@ -78,3 +78,11 @@ bool Communication::SetClientEncoding(const std::string& encoding) {
            std::string("Failed to find encoding " + encoding).c_str());
     return false;
 }
+
+PrefetchQueue* Communication::GetPrefetchQueue(StatementClass* stmt) {
+    if (stmt == nullptr || prefetch_queues_map.find(stmt) == prefetch_queues_map.end()) {
+        return nullptr;
+    } else {
+        return prefetch_queues_map[stmt].get();
+    }
+}

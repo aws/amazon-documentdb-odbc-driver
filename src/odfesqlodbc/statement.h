@@ -298,7 +298,6 @@ struct StatementClass_ {
     UInt2 num_callbacks;
     NeedDataCallback *callbacks;
     void *cs;
-    void *stmt; // statement class
 };
 
 #define SC_get_conn(a) ((a)->hdbc)
