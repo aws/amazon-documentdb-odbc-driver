@@ -17,13 +17,6 @@
 #ifndef UNIT_TEST_HELPER
 #define UNIT_TEST_HELPER
 
-#if defined(WIN32) || defined (WIN64)
-#ifdef _DEBUG
-#define VLD_FORCE_ENABLE 1
-#include <vld.h>
-#endif
-#endif
-
 #include <string>
 
 void WriteFileIfSpecified(char** begin, char** end, const std::string& option,

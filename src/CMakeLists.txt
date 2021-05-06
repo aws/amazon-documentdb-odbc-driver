@@ -93,7 +93,6 @@ set(UT_HELPER "${UNIT_TESTS}/UTHelper")
 set(IT_HELPER "${INTEGRATION_TESTS}/ITODBCHelper")
 set(RABBIT_SRC ${LIBRARY_DIRECTORY}/rabbit/include)
 set(RAPIDJSON_SRC ${LIBRARY_DIRECTORY}/rapidjson/include)
-set(VLD_SRC ${LIBRARY_DIRECTORY}/VisualLeakDetector/include)
 
 # Without this symbols will be exporting to Unix but not Windows
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)	

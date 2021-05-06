@@ -20,9 +20,7 @@ set(SOURCE_FILES it_odbc_helper.cpp)
 set(HEADER_FILES it_odbc_helper.h)	
 include_directories(	
                         ${UT_HELPER}
-                        ${ODFEODBC_SRC}
-						${VLD_SRC}  
-                    )
+                        ${ODFEODBC_SRC})
 
 # Generate dll (SHARED)
 add_library(itodbc_helper SHARED ${SOURCE_FILES} ${HEADER_FILES})
