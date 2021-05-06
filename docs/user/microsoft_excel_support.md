@@ -34,6 +34,10 @@
 
 <img src="img/excel_select_dsn.png" width="400">
 
+* Expand **Advanced options** and type the query statement
+
+<img src="img/excel_select_odbc.png" width="400">
+
 * Select **Default or Custom** in connection credentials windows and click on **Connect**.
 
 <img src="img/excel_auth.png" width="500">
@@ -45,8 +49,6 @@
 * Data will be loaded in the spreadsheet.
 
 <img src="img/excel_load_data.png">
-
-**NOTE**: There are multiple ways to load data in Microsoft Excel. Alternate options are [Data Connection Wizard](../test/data_connection_wizard.md), [Microsoft Query Connection](../test/microsoft_query_connection.md) and [Query Wizard Connection](../test/query_wizard_connection.md). These connection modes will load data relatively faster.
 
 ## Refresh Data
 
@@ -70,19 +72,4 @@ Alternately, **Data** > **Refresh** option can also be used to refresh the data.
 
 ## Troubleshooting
 
-* If the table has large number of datarows, increase [the keepalive](https://github.com/opendistro-for-elasticsearch/sql/blob/master/docs/dev/Pagination.md#opendistrosqlcursorkeep_alive) value accordlingly. 
-
-* If the table has nested or object type column, you might get an error as below.
-
-<img src="img/excel_data_preview_error.png" width=500>
-
-If you ignore the error and try to load the data, column name and values might not match.
-
-In this case, please use advanced options while connecting to the data source.
-
-<img src="img/excel_advanced_option.png" width=500>
-
-Also, make sure query doesn't include the name of nested or object type column name. For example, `SELECT products FROM kibana_sample_data_ecommerce` where product is nested type column might have data loss.
-
-This issue will be resolved when [Object field is missing in SELECT result](https://github.com/opendistro-for-elasticsearch/sql/issues/564) is fixed.
-
+* There is a known issue when loading large amounts of data without using Advanced Options. The performance can be very slow or sometimes crash after several minutes. We recommend always using Advanced options to enter the query statement explicitly to load the data. For example, "SELECT * from ODBCTest.IoT

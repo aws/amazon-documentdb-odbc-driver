@@ -36,33 +36,4 @@ void ClearTSResult(void *ts_result);
 }
 #endif
 
-#ifdef __cplusplus
-#include <queue>
-template <class T>
-class Statement {
-   public:
-    void Add(T &&data) {
-        q.push(std::move(data));
-    }
-    T Get() {
-        auto f = std::move(q.front());
-        q.pop();
-        return f;
-    }
-    T Front() {
-        return q.front();
-    }
-    bool IsEmpty() {
-        return q.empty();
-    }
-    void Clear() {
-        while (!q.empty()) {
-            q.pop();
-        }
-    }
-   private:
-	   std::queue<T> q;
-};
-#endif
-
 #endif

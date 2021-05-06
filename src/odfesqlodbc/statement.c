@@ -163,7 +163,7 @@ RETCODE SQL_API ESAPI_FreeStmt(HSTMT hstmt, SQLUSMALLINT fOption) {
     if (fOption == SQL_DROP) {
         ConnectionClass *cc = stmt->hdbc;
 
-        StopRetrieval(cc->conn);
+        StopRetrieval(cc->conn, stmt);
 
         /* Remove the statement from the connection's statement list */
         if (cc) {
@@ -201,7 +201,7 @@ RETCODE SQL_API ESAPI_FreeStmt(HSTMT hstmt, SQLUSMALLINT fOption) {
     } else if (fOption == SQL_UNBIND)
         SC_unbind_cols(stmt);
     else if (fOption == SQL_CLOSE) {
-        StopRetrieval(stmt->hdbc->conn);
+        StopRetrieval(stmt->hdbc->conn, stmt);
 
         /*
          * this should discard all the results, but leave the statement
@@ -346,7 +346,6 @@ StatementClass *SC_Constructor(ConnectionClass *conn) {
         PutDataInfoInitialize(SC_get_PDTI(rv));
         rv->lock_CC_for_rb = FALSE;
         INIT_STMT_CS(rv);
-        rv->stmt = AllocateStatement();
     }
     return rv;
 }
@@ -393,9 +392,6 @@ char SC_Destructor(StatementClass *self) {
     if (self->callbacks)
         free(self->callbacks);
 
-    if (self->stmt) {
-        DeallocateStatement(self->stmt);
-    }
     DELETE_STMT_CS(self);
     free(self);
 
@@ -688,7 +684,6 @@ char SC_recycle_statement(StatementClass *self) {
     self->options.keyset_size = self->options_orig.keyset_size;
     self->options.maxLength = self->options_orig.maxLength;
     self->options.maxRows = self->options_orig.maxRows;
-    ClearStatement(self->stmt);
     return TRUE;
 }
 

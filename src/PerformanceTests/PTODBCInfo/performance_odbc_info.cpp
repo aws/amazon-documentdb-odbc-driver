@@ -64,59 +64,6 @@ runtime_options rt_opts = []() {
     return temp_opts;
 }();
 
-void GetVersionInfoString(std::string&) {
-    // Connect to DB
-    TSCommunication comm;
-    ASSERT_TRUE(comm.Setup(rt_opts));
-
-    // Issue request
-    std::string endpoint, content_type, query;
-    std::shared_ptr< Aws::Http::HttpResponse > response =
-        comm.IssueRequest(endpoint, Aws::Http::HttpMethod::HTTP_GET,
-                             content_type, query);
-
-    // Convert response to string
-    ASSERT_TRUE(response != nullptr);
-}
-
-void ParseVersionInfoString(
-    const std::string& input_info,
-    std::vector< std::pair< std::string, std::string > >& output_info) {
-    // Parse input
-    rabbit::document doc;
-    doc.parse(input_info);
-
-    // Populate output with info
-    for (auto& it : base_items) {
-        ASSERT_TRUE(doc.has(it));
-        output_info.push_back(
-            std::pair< std::string, std::string >(it, doc[it].str()));
-    }
-
-    ASSERT_TRUE(doc.has("version"));
-    for (auto& it : version_items) {
-        ASSERT_TRUE(doc["version"].has(it));
-        output_info.push_back(std::pair< std::string, std::string >(
-            it, doc["version"][it].str()));
-    }
-}
-
-TEST(InfoCollect, EndPoint) {
-    // Get version string from endpoint
-    std::string version_info;
-    GetVersionInfoString(version_info);
-
-    // Parse into vector pair
-    std::vector< std::pair< std::string, std::string > > output_info;
-    ParseVersionInfoString(version_info, output_info);
-
-    std::cout << sync_start << std::endl;
-    for (auto& it : output_info) {
-        std::cout << it.first << sync_sep << it.second << std::endl;
-    }
-    std::cout << sync_end << std::endl;
-}
-
 int main(int argc, char** argv) {
     testing::internal::CaptureStdout();
     ::testing::InitGoogleTest(&argc, argv);

@@ -18,16 +18,15 @@
 #define __ES_HELPER_H__
 
 #include "es_types.h"
-
 #ifdef __cplusplus
+#include "ts_prefetch_queue.h"
 // C++ interface
 std::string GetClientEncoding(void* conn);
 bool SetClientEncoding(void* conn, std::string& encoding);
 void TSClearResult(TSResult* ts_result);
 void* ConnectDBParams(const runtime_options& rt_opts);
 std::string GetVersion(void* conn);
-std::vector< std::string > GetColumnsWithSelectQuery(
-    void* conn, const std::string& table_name);
+PrefetchQueue* GetPrefetchQueue(void* conn, StatementClass* stmt);
 
 // C Interface
 extern "C" {
@@ -37,12 +36,9 @@ void XPlatformEnterCriticalSection(void* critical_section_helper);
 void XPlatformLeaveCriticalSection(void* critical_section_helper);
 void XPlatformDeleteCriticalSection(void** critical_section_helper);
 ConnStatusType Status(void* conn);
-int ESExecDirect(void* conn, void* stmt, const char* statement);
+int ESExecDirect(void* conn, StatementClass* stmt, const char* statement);
 void Disconnect(void* conn);
-void StopRetrieval(void* conn);
-void* AllocateStatement();
-void DeallocateStatement(void* stmt);
-void ClearStatement(void* stmt);
+void StopRetrieval(void* conn, StatementClass* stmt);
 #ifdef __cplusplus
 }
 #endif
