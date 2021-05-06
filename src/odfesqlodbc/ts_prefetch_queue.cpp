@@ -13,31 +13,28 @@
  * permissions and limitations under the License.
  *
  */
-#ifndef ES_RESULT_QUEUE
-#define ES_RESULT_QUEUE
+#include "ts_prefetch_queue.h"
 
-#include <queue>
-#include <mutex>
-#include "es_semaphore.h"
 
-#define QUEUE_TIMEOUT 20 // milliseconds
+void PrefetchQueue::Push(std::shared_future< Aws::TimestreamQuery::Model::QueryOutcome > future_outcome) {
+	q.push(std::move(future_outcome));
+}
 
-struct TSResult;
+void PrefetchQueue::Pop() {
+	q.pop();
+}
 
-class ESResultQueue {
-    public:
-        ESResultQueue(unsigned int capacity);
-        ~ESResultQueue();
+Aws::TimestreamQuery::Model::QueryOutcome PrefetchQueue::Front() {
+	auto outcome = q.front().get();
+	return outcome;
+}
 
-        void clear();
-        bool pop(unsigned int timeout_ms, TSResult*& result);
-        bool push(unsigned int timeout_ms, TSResult* result);
+bool PrefetchQueue::IsEmpty() {
+	return q.empty();
+}
 
-    private:
-        std::queue<TSResult*> m_queue;
-        std::mutex m_queue_mutex;
-        es_semaphore m_push_semaphore;
-        es_semaphore m_pop_semaphore;
-};
-
-#endif
+void PrefetchQueue::Clear() {
+	while (!q.empty()) {
+		q.pop();
+	}
+}

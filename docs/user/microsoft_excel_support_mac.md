@@ -49,7 +49,7 @@
 
 <img src="img/excel_table_list.png" width="500">
 
-* Edit SQL statement if required and click on **Run**. Data preview will be loaded.
+* Edit SQL statement if required (e.g. removing the semi colon from generated query statement) and click on **Run**. Data preview will be loaded.
 > **NOTE**: Excel for Mac currently will not show an error if you provide an incorrect query ([Github issue here](https://github.com/opendistro-for-elasticsearch/sql/issues/601)). If no data appears, check your ODFE server logs to see if the query failed.
 
 <img src="img/excel_data_preview_mac.png">
@@ -84,7 +84,5 @@ Alternately, **Data** > **Refresh** option can also be used to refresh the data.
 
 ## Troubleshooting
 
-* If the table has large number of datarows, increase [the keepalive](https://github.com/opendistro-for-elasticsearch/sql/blob/master/docs/dev/Pagination.md#opendistrosqlcursorkeep_alive) value accordlingly. 
-
-* You might need to remove `;` from SQL statement to load data preview.
+* You need to remove `;` from SQL statement to load data preview.
 

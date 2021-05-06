@@ -20,6 +20,8 @@
 // clang-format off
 #include <memory>
 #include "es_types.h"
+#include <unordered_map>
+#include "ts_prefetch_queue.h"
 
 //Keep rabbit at top otherwise it gives build error because of some variable names like max, min
 #ifdef __APPLE__
@@ -71,11 +73,11 @@ class Communication {
     virtual void Disconnect() = 0;
     /**
      * Execute query
-     * @param stmt void *
+     * @param stmt StatementClass *
      * @param query const char*
      * @return int
      */
-    virtual int ExecDirect(void *stmt, const char* query) = 0;
+    virtual int ExecDirect(StatementClass* stmt, const char* query) = 0;
     /**
      * Get version
      * @return std::string
@@ -91,33 +93,16 @@ class Communication {
 
     // Pending for refactor
     /**
-     * Get columns using select query
-     * @param table_name const std::string&
-     * @return std::vector<std::string>
-     */
-    virtual std::vector< std::string > GetColumnsWithSelectQuery(
-        const std::string& table_name) = 0;
-    /**
      * Get error prefix
      * @return std::string
      */
     virtual std::string GetErrorPrefix() = 0;
     /**
-     * Send request to close cursor
-     * @param cursor const std::string&
+     * For prefetch mechanism
+     * During retrieving data from database, caller can call SQLFreeStmt / SQLCloseCursor to stop it 
+     * @param stmt StatementClass*
      */
-    virtual void SendCloseCursorRequest(const std::string& cursor) = 0;
-    /**
-     * Isses a request
-     * @param endpoint const std::string&
-     * @param request_type const Aws::Http::HttpMethod
-     * @param content_type const std::string&
-     * @param cursor const std::string&
-     * @return std::shared_ptr< Aws::Http::HttpResponse >
-     */
-    virtual std::shared_ptr< Aws::Http::HttpResponse > IssueRequest(
-        const std::string& endpoint, const Aws::Http::HttpMethod request_type,
-        const std::string& content_type, const std::string& query, const std::string& cursor = "") = 0;
+    virtual void StopResultRetrieval(StatementClass* stmt) = 0;
     /**
      * Get client encoding
      * @return std::string
@@ -140,6 +125,11 @@ class Communication {
      * @return ConnStatusType
      */
     ConnStatusType GetStatus();
+    /**
+     * Get the prefetch queue
+     * @return stmt StatementClass*
+     */
+    PrefetchQueue* GetPrefetchQueue(StatementClass* stmt);
    protected:
     /**
      * Connection status
@@ -153,6 +143,10 @@ class Communication {
      * AWS sdk options
      */
     Aws::SDKOptions m_sdk_options;
+    /**
+     * Map storing prefetch queues
+     */
+    std::unordered_map< StatementClass*, std::shared_ptr<PrefetchQueue> > prefetch_queues_map;
 };
 
 #endif
