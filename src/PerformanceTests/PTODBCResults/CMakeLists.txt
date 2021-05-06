@@ -19,8 +19,7 @@ project(performance_results)
 set(SOURCE_FILES performance_odbc_results.cpp)
 include_directories(	${UT_HELPER}
 						${IT_HELPER}
-						${ODFEODBC_SRC}
-						${VLD_SRC}  )
+						${ODFEODBC_SRC})
 
 # Generate executable
 add_executable(performance_results ${SOURCE_FILES})

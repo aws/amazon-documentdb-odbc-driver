@@ -19,8 +19,7 @@ project(itodbc_execution)
 set(SOURCE_FILES test_odbc_execution.cpp)
 include_directories(	${UT_HELPER}
 						${IT_HELPER}
-						${ODFEODBC_SRC}
-						${VLD_SRC}  )
+						${ODFEODBC_SRC})
 
 # Generate executable
 add_executable(itodbc_execution ${SOURCE_FILES})
