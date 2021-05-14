@@ -71,62 +71,6 @@ typedef struct bind_info {
    private:
     std::vector< SQLCHAR > data;
 } bind_info;
-//
-//// Column test constants and macro
-//const std::vector< std::string > flights_column_name = {
-//    "FlightNum",       "Origin",         "FlightDelay",
-//    "DistanceMiles",   "FlightTimeMin",  "OriginWeather",
-//    "dayOfWeek",       "AvgTicketPrice", "Carrier",
-//    "FlightDelayMin",  "OriginRegion",   "DestAirportID",
-//    "FlightDelayType", "timestamp",      "Dest",
-//    "FlightTimeHour",  "Cancelled",      "DistanceKilometers",
-//    "OriginCityName",  "DestWeather",    "OriginCountry",
-//    "DestCountry",     "DestRegion",     "DestCityName",
-//    "OriginAirportID"};
-//const std::vector< std::string > flights_data_type = {
-//    "keyword", "keyword", "boolean", "float",   "float",   "keyword", "integer",
-//    "float",   "keyword", "integer", "keyword", "keyword", "keyword", "date",
-//    "keyword", "keyword", "boolean", "float",   "keyword", "keyword", "keyword",
-//    "keyword", "keyword", "keyword", "keyword"};
-//const std::vector< short > flights_sql_data_type = {
-//    SQL_WVARCHAR, SQL_WVARCHAR, SQL_BIT,      SQL_REAL,           SQL_REAL,
-//    SQL_WVARCHAR, SQL_INTEGER,  SQL_REAL,     SQL_WVARCHAR,       SQL_INTEGER,
-//    SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_TYPE_TIMESTAMP, SQL_WVARCHAR,
-//    SQL_WVARCHAR, SQL_BIT,      SQL_REAL,     SQL_WVARCHAR,       SQL_WVARCHAR,
-//    SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR,       SQL_WVARCHAR};
-//const std::string flights_catalog_odfe = "odfe-cluster";
-//const std::string flights_catalog_elas = "elasticsearch";
-//const std::string flights_table_name = "kibana_sample_data_flights";
-//const std::string flights_decimal_digits = "10";
-//const std::string flights_num_prec_radix = "2";
-//
-//// Table test constants and macro
-//typedef struct table_data {
-//    std::string catalog_name;
-//    std::string schema_name;
-//    std::string table_name;
-//    std::string table_type;
-//    std::string remarks;
-//} table_data;
-//
-//const std::vector< table_data > table_data_filtered{
-//    {"", "", "kibana_sample_data_ecommerce", "BASE TABLE", ""},
-//    {"", "", "kibana_sample_data_flights", "BASE TABLE", ""},
-//    {"", "", "kibana_sample_data_types", "BASE TABLE", ""}};
-//const std::vector< table_data > table_data_single{
-//    {"", "", "kibana_sample_data_flights", "BASE TABLE", ""}};
-//const std::vector< table_data > table_data_all{
-//    {"", "", "kibana_sample_data_ecommerce", "BASE TABLE", ""},
-//    {"", "", "kibana_sample_data_flights", "BASE TABLE", ""},
-//    {"", "", "kibana_sample_data_types", "BASE TABLE", ""},
-//};
-//const std::vector< table_data > excel_table_data_all{
-//    {"", "", "kibana_sample_data_ecommerce", "TABLE", ""},
-//    {"", "", "kibana_sample_data_flights", "TABLE", ""},
-//    {"", "", "kibana_sample_data_types", "TABLE", ""},
-//};
-//const std::vector< table_data > table_data_types{
-//    {"", "", "", "BASE TABLE", ""}};
 
 class TestSQLTables : public Fixture {};
 
@@ -216,7 +160,9 @@ TEST_F(TestSQLTables, TEST_ALL_NULL) {
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
-        {"promDB", "", "promTB", "TABLE", ""}};
+        {"promDB", "", "promTB", "TABLE", ""},
+        {"sampleDB", "", "DevOps", "TABLE", ""},
+        {"sampleDB", "", "IoT", "TABLE", ""}};
     CheckRows(expected, result);
 }
 
@@ -245,7 +191,8 @@ TEST_F(TestSQLTables, TEST_ALL_DATABASES_EXCEL) {
     }
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "", "", ""},
-        {"promDB", "", "", "", ""}};
+        {"promDB", "", "", "", ""},
+        {"sampleDB", "", "", "", ""}};
     CheckRows(expected, result);
 }
 
@@ -276,7 +223,9 @@ TEST_F(TestSQLTables, TEST_ALL_DATABASES_NULL) {
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
-        {"promDB", "", "promTB", "TABLE", ""}};
+        {"promDB", "", "promTB", "TABLE", ""},
+        {"sampleDB", "", "DevOps", "TABLE", ""},
+        {"sampleDB", "", "IoT", "TABLE", ""}};
     CheckRows(expected, result);
 }
 
@@ -337,7 +286,9 @@ TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_BIND_EXCEL) {
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
-        {"promDB", "", "promTB", "TABLE", ""}};
+        {"promDB", "", "promTB", "TABLE", ""},
+        {"sampleDB", "", "DevOps", "TABLE", ""},
+        {"sampleDB", "", "IoT", "TABLE", ""}};
     CheckRows(expected, result);
 }
 
@@ -367,7 +318,9 @@ TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_GETDATA) {
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
-        {"promDB", "", "promTB", "TABLE", ""}};
+        {"promDB", "", "promTB", "TABLE", ""},
+        {"sampleDB", "", "DevOps", "TABLE", ""},
+        {"sampleDB", "", "IoT", "TABLE", ""}};
     CheckRows(expected, result);
 }
 
@@ -424,7 +377,9 @@ TEST_F(TestSQLTables, TEST_ALL_TABLE_TYPES) {
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
-        {"promDB", "", "promTB", "TABLE", ""}};
+        {"promDB", "", "promTB", "TABLE", ""},
+        {"sampleDB", "", "DevOps", "TABLE", ""},
+        {"sampleDB", "", "IoT", "TABLE", ""}};
     CheckRows(expected, result);
 }
 
@@ -455,7 +410,9 @@ TEST_F(TestSQLTables, TEST_SQL_ALL_TABLE_TYPES) {
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
-        {"promDB", "", "promTB", "TABLE", ""}};
+        {"promDB", "", "promTB", "TABLE", ""},
+        {"sampleDB", "", "DevOps", "TABLE", ""},
+        {"sampleDB", "", "IoT", "TABLE", ""}};
     CheckRows(expected, result);
 }
 
