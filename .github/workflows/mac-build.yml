@@ -45,7 +45,7 @@ jobs:
         sudo mkdir /Library/ODBC
         sudo mv ./src/IntegrationTests/ITODBCConnection/odbc.ini /Library/ODBC
         mkdir ${{ github.workspace }}/odbc-logs
-    - name: run-integration-tests
+    - name: run-integration-connection-tests
       run: |
         ./build/odbc/bin/itodbc_connection
     - name: run-integration-execution-tests
@@ -70,7 +70,6 @@ jobs:
       if: failure()
       run: |
         cat /tmp/timestreamodbc_*.log
-        cat /tmp/elasticodbc_*.log
         cat ./aws_sdk_*.log
     - name: print-memory-leak-logs
       if: always()

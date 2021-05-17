@@ -15,12 +15,13 @@
  */
 
 #include "ts_communication.h"
-#include "es_statement.h"
 
 // odfesqlodbc needs to be included before mylog, otherwise mylog will generate
 // compiler warnings
 // clang-format off
 #include "es_odbc.h"
+#include "es_statement.h"
+#include "version.h"
 #include "mylog.h"
 #include <sstream>
 #include <memory>
@@ -166,8 +167,7 @@ void TSCommunication::Disconnect() {
 }
 
 std::string TSCommunication::GetVersion() {
-    // AWS SDK version
-    return "1.8.108";
+    return TIMESTREAMDRIVERVERSION;
 }
 
 std::string TSCommunication::GetErrorPrefix() {
