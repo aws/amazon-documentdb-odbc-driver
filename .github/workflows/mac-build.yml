@@ -45,6 +45,9 @@ jobs:
         sudo mkdir /Library/ODBC
         sudo mv ./src/IntegrationTests/ITODBCConnection/odbc.ini /Library/ODBC
         mkdir ${{ github.workspace }}/odbc-logs
+    - name: run-connection-unit-test
+      run: |
+        ./build/odbc/bin/ut_conn
     - name: run-integration-connection-tests
       run: |
         ./build/odbc/bin/itodbc_connection

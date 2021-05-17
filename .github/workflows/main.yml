@@ -43,6 +43,9 @@ jobs:
         reg import .\src\IntegrationTests\ITODBCConnection\AWSProfileRegistry_Win32.reg
         reg import .\src\IntegrationTests\ITODBCConnection\IAMRegistry_Win32.reg
         mkdir ${{ github.workspace }}\odbc-logs
+    - name: run-connection-unit-test
+      run: |
+        .\build\odbc\bin\Release\ut_conn.exe
     - name: run-integration-connection-tests
       run: |
         .\build\odbc\bin\Release\itodbc_connection.exe
@@ -126,6 +129,9 @@ jobs:
         reg import .\src\IntegrationTests\ITODBCConnection\AWSProfileRegistry.reg
         reg import .\src\IntegrationTests\ITODBCConnection\IAMRegistry.reg
         mkdir ${{ github.workspace }}\odbc-logs
+    - name: run-connection-unit-test
+      run: |
+        .\build\odbc\bin\Release\ut_conn.exe
     - name: run-integration-connection-tests
       run: |
         .\build\odbc\bin\Release\itodbc_connection.exe
