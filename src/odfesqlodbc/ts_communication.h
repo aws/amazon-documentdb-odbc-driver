@@ -65,7 +65,7 @@ class TSCommunication : public Communication {
      */
     virtual int ExecDirect(StatementClass* stmt, const char* query) override;
     /**
-     * Get version
+     * Get driver version
      * @return std::string
      */
     virtual std::string GetVersion() override;

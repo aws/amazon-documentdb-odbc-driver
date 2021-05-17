@@ -2,7 +2,7 @@
 # $BITNESS=64
 
 cd src
-git clone --recurse-submodules -b "1.8.108" "https://github.com/aws/aws-sdk-cpp.git"
+git clone --recurse-submodules -b "1.8.186" "https://github.com/aws/aws-sdk-cpp.git"
 cd ..
 
 PREFIX_PATH=$(pwd)
