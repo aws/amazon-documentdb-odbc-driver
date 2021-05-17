@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 #include "communication.h"
+#include "saml_credentials_provider.h"
 #include <aws/timestream-query/TimestreamQueryClient.h>
 #include <aws/timestream-query/model/Type.h>
 #include <aws/timestream-query/model/ScalarType.h>
@@ -86,18 +87,16 @@ class TSCommunication : public Communication {
 
    private:
     /**
-     * Fetches an access token from Azure AD Oauth2 endpoint using the provided properties.
+     * Create an unique_ptr of TimestreamQueryClient using the given credentials
+     * provider and configs
+     * @param cp std::unique_ptr<SAMLCredentialsProvider>
      * @param auth const authentication_options&
-     * @return std::string
-     */ 
-    std::string GetAccessToken(const authentication_options& auth);
-
-    /**
-     * Constructs the SAML Assertion with the access token.
-     * @param auth const authentication_options&
-     * @return Aws::String
+     * @param config const Aws::Client::ClientConfiguration&
+     * @return std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient >
      */
-    Aws::String GetSAMLAssertion(const authentication_options& auth);
+    std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient >
+    CreateQueryClientWithIdp(std::unique_ptr< SAMLCredentialsProvider > cp,
+                             const Aws::Client::ClientConfiguration& config);
     /**
      * Timestream query client
      */

@@ -25,6 +25,7 @@ set(RESULTS_ITEST "${CMAKE_CURRENT_SOURCE_DIR}/ITODBCResults")
 set(TABLEAU_QUERIES_ITEST "${CMAKE_CURRENT_SOURCE_DIR}/ITODBCTableauQueries")
 set(AWS_AUTH_ITEST "${CMAKE_CURRENT_SOURCE_DIR}/ITODBCAwsAuth")
 set(PAGINATION_ITEST "${CMAKE_CURRENT_SOURCE_DIR}/ITODBCPagination")
+set(SAML_AUTH_ITEST "${CMAKE_CURRENT_SOURCE_DIR}/ITODBCSAMLAuthentication")
 
 # Projects to build
 add_subdirectory(${HELPER_ITEST})
@@ -37,3 +38,4 @@ add_subdirectory(${RESULTS_ITEST})
 add_subdirectory(${TABLEAU_QUERIES_ITEST})
 add_subdirectory(${AWS_AUTH_ITEST})
 add_subdirectory(${PAGINATION_ITEST})
+add_subdirectory(${SAML_AUTH_ITEST})

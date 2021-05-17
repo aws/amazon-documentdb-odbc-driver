@@ -54,6 +54,7 @@ class TestSQLConnect : public testing::Test {
     }
     void TearDown() {
         if (SQL_NULL_HDBC != m_conn) {
+            SQLDisconnect(m_conn);
             SQLFreeHandle(SQL_HANDLE_DBC, m_conn);
         }
         if (SQL_NULL_HENV != m_env) {
