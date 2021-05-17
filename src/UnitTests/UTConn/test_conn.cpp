@@ -18,6 +18,7 @@
 #include "pch.h"
 #include "unit_test_helper.h"
 #include "ts_communication.h"
+#include "okta_credentials_provider.h"
 // clang-format on
 
 TEST(TestConnectionOptions, Good) {
@@ -80,6 +81,46 @@ TEST(TestConnectionOptions, Timeout_is_alpha) {
     options.conn.timeout = "timeout";
     TSCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
+}
+
+TEST(TestDecodeHex, Single_hex) {
+    const std::string hex_encoded = "&#x3d;";
+    const std::string expected = "=";
+    EXPECT_EQ(expected, OktaCredentialsProvider::DecodeHex(hex_encoded));
+}
+
+TEST(TestDecodeHex, Invalid_single_hex) {
+    const std::string hex_encoded = "&#x3d";
+    EXPECT_EQ(hex_encoded, OktaCredentialsProvider::DecodeHex(hex_encoded));
+}
+
+TEST(TestDecodeHex, Double_ampersand) {
+    const std::string hex_encoded = "&&#x3d;";
+    const std::string expected = "&=";
+    EXPECT_EQ(expected, OktaCredentialsProvider::DecodeHex(hex_encoded));
+}
+
+TEST(TestDecodeHex, Hex_with_numbers) {
+    const std::string hex_encoded = "12345&#x3d;&#x2b;12345";
+    const std::string expected = "12345=+12345";
+    EXPECT_EQ(expected, OktaCredentialsProvider::DecodeHex(hex_encoded));
+}
+
+TEST(TestDecodeHex, Empty) {
+    const std::string hex_encoded = "";
+    const std::string expected = "";
+    EXPECT_EQ(expected, OktaCredentialsProvider::DecodeHex(hex_encoded));
+}
+
+TEST(TestDecodeHex, No_hex) {
+    const std::string hex_encoded = "12345abc";
+    EXPECT_EQ(hex_encoded, OktaCredentialsProvider::DecodeHex(hex_encoded));
+}
+
+TEST(TestDecodeHex, All_possible_hex) {
+    const std::string hex_encoded = "&#x2b;&#x2f;&#x3d;&#x2c;&#x2d;&#x5f;";
+    const std::string expected = "+/=,-_";
+    EXPECT_EQ(expected, OktaCredentialsProvider::DecodeHex(hex_encoded));
 }
 
 // TODO: enable gmock and mock the response from timestream
