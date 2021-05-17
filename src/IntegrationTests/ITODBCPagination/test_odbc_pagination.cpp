@@ -18,107 +18,124 @@
 #include "pch.h"
 #include "unit_test_helper.h"
 #include "it_odbc_helper.h"
+#include <vector>
 // clang-format on
 
-#define BIND_SIZE 255
-#define SINGLE_ROW 1
-typedef struct Col {
-    SQLLEN data_len;
-    SQLCHAR data_dat[BIND_SIZE];
-} Col;
+// Size of the cell
+// Modify to a larger value if necessary
+#define BIND_SIZE 1024
 
-class TestPagination : public testing::Test {
-   public:
-    TestPagination() {
-    }
-
-    void SetUp() {
-        AllocConnection(&m_env, &m_conn, true, true);
-    }
-
-    void TearDown() {
-        if (SQL_NULL_HDBC != m_conn) {
-            SQLFreeHandle(SQL_HANDLE_DBC, m_conn);
-            SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-        }
-    }
-
-    int GetTotalRowsAfterQueryExecution() {
-        SQLAllocHandle(SQL_HANDLE_STMT, m_conn, &m_hstmt);
-        SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query.c_str(), SQL_NTS);
-        EXPECT_EQ(SQL_SUCCESS, ret);
-
-        // Get column count
-        SQLSMALLINT total_columns = -1;
-        SQLNumResultCols(m_hstmt, &total_columns);
-        std::vector< std::vector< Col > > cols(total_columns);
-        for (size_t i = 0; i < cols.size(); i++) {
-            cols[i].resize(SINGLE_ROW);
-        }
-
-        // Bind and fetch
-        for (size_t i = 0; i < cols.size(); i++) {
-            ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)i + 1, SQL_C_CHAR,
-                             (SQLPOINTER)&cols[i][0].data_dat[i], 255,
-                             &cols[i][0].data_len);
-        }
-
-        // Get total number of rows
-        int row_count = 0;
-        while (SQLFetch(m_hstmt) == SQL_SUCCESS) {
-            row_count++;
-        }
-        return row_count;
-    }
-
-    ~TestPagination() {
-        // cleanup any pending stuff, but no exceptions allowed
-    }
-
-    SQLHENV m_env = SQL_NULL_HENV;
-    SQLHDBC m_conn = SQL_NULL_HDBC;
-    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
-    SQLTCHAR m_out_conn_string[1024];
-    SQLSMALLINT m_out_conn_string_length;
-    std::wstring m_query =
-        L"SELECT Origin FROM kibana_sample_data_flights";
+struct Cell {
+    SQLLEN len;
+    SQLCHAR data[BIND_SIZE];
 };
 
-TEST_F(TestPagination, EnablePagination) {
-    // Default fetch size is -1 for driver.
-    // Server default page size for all cursor requests is 1000.
+constexpr int NUM_ROWS_IOT = 1600;
+constexpr int NUM_ROWS_DEVOPS = 2100;
 
-    //Total number of rows in kibana_sample_data_flights table
-    int total_rows = 13059;
-    std::wstring fetch_size_15_conn_string =
-                  L"Driver={Elasticsearch ODBC};"
-                  L"host=https://localhost;port=9200;"
-                  L"UID=admin;PWD=admin;auth=IAM;"
-                  L"logLevel=0;logOutput=C:\\;"
-                  L"responseTimeout=10;";
-    ASSERT_EQ(SQL_SUCCESS,
-              SQLDriverConnect(
-                  m_conn, NULL, (SQLTCHAR*)fetch_size_15_conn_string.c_str(),
-                  SQL_NTS, m_out_conn_string, IT_SIZEOF(m_out_conn_string),
-                  &m_out_conn_string_length, SQL_DRIVER_PROMPT));
-    EXPECT_EQ(total_rows, GetTotalRowsAfterQueryExecution());
+/**
+ * Setup before running the test
+ * 1. Create sample database in Amazon Timestream service
+ * 2. Check to create sample table IoT and DevOps
+ */
+
+class TestPagination : public Fixture {};
+
+TEST_F(TestPagination, TimestreamSampleDatabase_IoT_SQLGetData) {
+    std::wstring query = L"SELECT * FROM sampleDB.IoT";
+    auto ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_EQ(SQL_SUCCESS, ret);
+    SQLSMALLINT column_count = 0;
+    ret = SQLNumResultCols(m_hstmt, &column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    int count = 0;
+    int expected_count = NUM_ROWS_IOT;
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            for (SQLUSMALLINT i = 0; i < column_count; i++) {
+                SQLCHAR data[BIND_SIZE] = {0};
+                SQLLEN indicator = 0;
+                ret = SQLGetData(m_hstmt, i+1, SQL_C_CHAR, data, BIND_SIZE,
+                    &indicator);
+                EXPECT_TRUE(SQL_SUCCEEDED(ret));
+            }
+            count++;
+        }
+    }
+    EXPECT_EQ(expected_count, count);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestPagination, DisablePagination) {
-    // Fetch size 0 implies no pagination
-    int total_rows = 200;
-    std::wstring fetch_size_15_conn_string =
-                  L"Driver={Elasticsearch ODBC};"
-                  L"host=https://localhost;port=9200;"
-                  L"UID=admin;PWD=admin;auth=IAM;"
-                  L"logLevel=0;logOutput=C:\\;"
-                  L"responseTimeout=10;fetchSize=0;";
-    ASSERT_EQ(SQL_SUCCESS,
-              SQLDriverConnect(
-                  m_conn, NULL, (SQLTCHAR*)fetch_size_15_conn_string.c_str(),
-                  SQL_NTS, m_out_conn_string, IT_SIZEOF(m_out_conn_string),
-                  &m_out_conn_string_length, SQL_DRIVER_PROMPT));
-    EXPECT_EQ(total_rows, GetTotalRowsAfterQueryExecution());
+TEST_F(TestPagination, TimestreamSampleDatabase_IoT_SQLBindCol) {
+    std::wstring query = L"SELECT * FROM sampleDB.IoT";
+    auto ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_EQ(SQL_SUCCESS, ret);
+    SQLSMALLINT column_count = 0;
+    ret = SQLNumResultCols(m_hstmt, &column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    int count = 0;
+    int expected_count = NUM_ROWS_IOT;
+    std::vector< Cell > row(column_count);
+    for (SQLUSMALLINT i = 0; i < row.size(); i++) {
+        ret = SQLBindCol(m_hstmt, i + 1, SQL_C_CHAR, row[i].data, BIND_SIZE, &row[i].len);
+        EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    }
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            count++;
+        }
+    }
+    EXPECT_EQ(expected_count, count);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestPagination, TimestreamSampleDatabase_DevOps_SQLGetData) {
+    std::wstring query = L"SELECT * FROM sampleDB.DevOps";
+    auto ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_EQ(SQL_SUCCESS, ret);
+    SQLSMALLINT column_count = 0;
+    ret = SQLNumResultCols(m_hstmt, &column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    int count = 0;
+    int expected_count = NUM_ROWS_DEVOPS;
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            for (SQLUSMALLINT i = 0; i < column_count; i++) {
+                SQLCHAR data[BIND_SIZE] = {0};
+                SQLLEN indicator = 0;
+                ret = SQLGetData(m_hstmt, i + 1, SQL_C_CHAR, data, BIND_SIZE,
+                                 &indicator);
+                EXPECT_TRUE(SQL_SUCCEEDED(ret));
+            }
+            count++;
+        }
+    }
+    EXPECT_EQ(expected_count, count);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestPagination, TimestreamSampleDatabase_DevOps_SQLBindCol) {
+    std::wstring query = L"SELECT * FROM sampleDB.DevOps";
+    auto ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_EQ(SQL_SUCCESS, ret);
+    SQLSMALLINT column_count = 0;
+    ret = SQLNumResultCols(m_hstmt, &column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    int count = 0;
+    int expected_count = NUM_ROWS_DEVOPS;
+    std::vector< Cell > row(column_count);
+    for (SQLUSMALLINT i = 0; i < row.size(); i++) {
+        ret = SQLBindCol(m_hstmt, i + 1, SQL_C_CHAR, row[i].data, BIND_SIZE,
+                         &row[i].len);
+        EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    }
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            count++;
+        }
+    }
+    EXPECT_EQ(expected_count, count);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 int main(int argc, char** argv) {
