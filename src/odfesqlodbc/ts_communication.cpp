@@ -21,24 +21,17 @@
 // clang-format off
 #include "es_odbc.h"
 #include "es_statement.h"
+#include "aad_credentials_provider.h"
+#include "okta_credentials_provider.h"
 #include "version.h"
 #include "mylog.h"
-#include <sstream>
 #include <memory>
 #include <aws/core/auth/AWSCredentials.h>
 #include <aws/core/auth/AWSCredentialsProvider.h>
 #include <aws/core/client/DefaultRetryStrategy.h>
-#include <aws/core/http/standard/StandardHttpRequest.h>
-#include <aws/core/http/standard/StandardHttpResponse.h>
-#include <aws/core/http/HttpClientFactory.h>
-#include <aws/core/http/HttpClient.h>
-#include <aws/core/utils/base64/Base64.h>
-#include <aws/core/utils/Array.h>
-#include <aws/sts/STSClient.h>
-#include <aws/sts/model/AssumeRoleWithSAMLRequest.h>
 #include <aws/timestream-query/model/QueryRequest.h>
-
 // clang-format on
+
 bool TSCommunication::Validate(const runtime_options& options) {
     if (options.auth.region.empty() && options.auth.end_point_override.empty()) {
         throw std::invalid_argument("Both region and end point cannot be empty.");
@@ -111,29 +104,11 @@ bool TSCommunication::Connect(const runtime_options& options) {
             std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(
                 credentials, config);
     } else if (options.auth.auth_type == AUTHTYPE_AAD) {
-        LogMsg(LOG_DEBUG, "Constructing an AssumeRoleWithSAMLRequest.");
-        Aws::STS::Model::AssumeRoleWithSAMLRequest saml_request;
-        saml_request = saml_request.WithRoleArn(options.auth.role_arn.c_str())
-                           .WithSAMLAssertion(GetSAMLAssertion(options.auth))
-                           .WithPrincipalArn(options.auth.idp_arn.c_str());
-
-        LogMsg(LOG_DEBUG,
-               "Fetching the AWS credentials with the SAML assertion.");
-        Aws::STS::STSClient sts_client;
-        auto outcome = sts_client.AssumeRoleWithSAML(saml_request);
-        if (!outcome.IsSuccess()) {
-            auto err = outcome.GetError().GetMessage();
-            LogMsg(LOG_ERROR, err.c_str());
-        }
-        auto creds = outcome.GetResult().GetCredentials();
-        Aws::Auth::AWSCredentials credentials(creds.GetAccessKeyId(),
-                                              creds.GetSecretAccessKey(),
-                                              creds.GetSessionToken());
-        m_client =
-            std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(
-                credentials, config);
+        m_client = CreateQueryClientWithIdp(
+            std::make_unique< AADCredentialsProvider >(options.auth), config);
     } else if (options.auth.auth_type == AUTHTYPE_OKTA) {
-        // OKTA
+        m_client = CreateQueryClientWithIdp(
+            std::make_unique< OktaCredentialsProvider >(options.auth), config);
     } else {
         throw std::runtime_error("Unknown auth type: " + options.auth.auth_type);
     }
@@ -179,6 +154,17 @@ void TSCommunication::StopResultRetrieval(StatementClass* stmt) {
         prefetch_queues_map[stmt]->Clear();
         prefetch_queues_map.erase(stmt);
     }
+}
+
+std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient >
+TSCommunication::CreateQueryClientWithIdp(
+    std::unique_ptr< SAMLCredentialsProvider > cp,
+    const Aws::Client::ClientConfiguration& config) {
+    auto credentials = cp->GetAWSCredentials();
+    auto query_client =
+        std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(
+            credentials, config);
+    return query_client;
 }
 
 /**
@@ -261,7 +247,7 @@ int TSCommunication::ExecDirect(StatementClass* sc, const char* query) {
     }
     PrefetchQueue* pPrefetchQueue = prefetch_queues_map[sc].get();
     pPrefetchQueue->Clear();
-    //// Issue request
+    // Issue request
     Aws::TimestreamQuery::Model::QueryRequest request;
     request.SetQueryString(statement.c_str());
     
@@ -272,84 +258,4 @@ int TSCommunication::ExecDirect(StatementClass* sc, const char* query) {
         request, QueryCallback,
         std::make_shared< Context >(pPrefetchQueue, std::move(promise)));
     return 0;
-}
-
-std::string TSCommunication::GetAccessToken(
-    const authentication_options& auth) {
-
-    auto http_client =
-        Aws::Http::CreateHttpClient(Aws::Client::ClientConfiguration());
-    Aws::String access_token_endpoint = "https://login.microsoftonline.com/"
-                                        + auth.aad_tenant + "/oauth2/token";
-    auto req = Aws::Http::CreateHttpRequest(
-        access_token_endpoint, Aws::Http::HttpMethod::HTTP_POST,
-        Aws::Utils::Stream::DefaultResponseStreamFactoryMethod);
-    req->SetHeaderValue(Aws::Http::ACCEPT_HEADER, "application/json");
-    req->SetHeaderValue(Aws::Http::CONTENT_TYPE_HEADER,
-                        "application/x-www-form-urlencoded");
-
-    std::shared_ptr< Aws::StringStream > aws_ss =
-        Aws::MakeShared< Aws::StringStream >("");
-    *aws_ss << "grant_type=password&requested_token_type=urn:ietf:params:oauth:"
-               "token-type:saml2&username="
-            << auth.uid.c_str() << "&password=" << auth.pwd.c_str()
-            << "&client_secret=" << auth.aad_client_secret.c_str()
-            << "&client_id=" << auth.aad_application_id.c_str()
-            << "&resource=" << auth.aad_application_id.c_str();
-
-    req->AddContentBody(aws_ss);
-    req->SetContentLength(std::to_string(aws_ss.get()->str().size()));
-
-    std::shared_ptr< Aws::Http::HttpResponse > res;
-    std::string access_token;
-    try {
-        res = http_client->MakeRequest(req);
-        if (res->GetResponseCode() != Aws::Http::HttpResponseCode::OK) {
-            if (res->HasClientError()) {
-                LogMsg(LOG_ERROR, res->GetClientErrorMessage().c_str());
-            }
-        }
-
-        std::string body(
-            std::istreambuf_iterator< char >(res->GetResponseBody()), {});
-        rabbit::document doc;
-        doc.parse(body);
-        access_token = doc["access_token"].as_string();
-    } catch (const rabbit::parse_error& e) {
-        std::string rabbit_err =
-            "Error parsing response body" + std::string(e.what());
-        LogMsg(LOG_ERROR, rabbit_err.c_str());
-    }
-
-    if (access_token.empty()) {
-        throw std::runtime_error(
-            "Request to Azure Active Directory for access token failed.");
-    }
-    return access_token;
-}
-
-Aws::String TSCommunication::GetSAMLAssertion(
-    const authentication_options& auth) {
-    std::string access_token = GetAccessToken(auth);
-    auto base64 = Aws::Utils::Base64::Base64(
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_");
-    Aws::String aws_token(access_token.c_str(), access_token.size());
-    auto decode_buffer = base64.Decode(aws_token);
-    auto size = base64.Decode(aws_token).GetLength();
-
-    std::string decoded(
-        reinterpret_cast< char const* >(decode_buffer.GetUnderlyingData()),
-        size);
-
-    std::string assertion =
-        "<samlp:Response "
-        "xmlns:samlp=\"urn:oasis:names:tc:SAML:2.0:protocol\"><samlp:Status><"
-        "samlp:StatusCode "
-        "Value=\"urn:oasis:names:tc:SAML:2.0:status:Success\"/></samlp:Status>"
-        + decoded + "</samlp:Response>";
-
-    Aws::Utils::ByteBuffer encode_buffer = Aws::Utils::Array(
-        reinterpret_cast< unsigned char const* >(assertion.c_str()),
-        assertion.size());
-    return base64.Encode(encode_buffer);
 }
