@@ -61,6 +61,9 @@ jobs:
     - name: run-integration-info-tests
       run: |
         .\build\odbc\bin\Release\itodbc_info.exe
+    - name: run-integration-pagination-tests
+      run: |
+        .\build\odbc\bin\Release\itodbc_pagination.exe
     - name: upload-integration-test-results
       if: always()
       uses: actions/upload-artifact@v2
@@ -141,6 +144,9 @@ jobs:
     - name: run-integration-info-tests
       run: |
         .\build\odbc\bin\Release\itodbc_info.exe
+    - name: run-integration-pagination-tests
+      run: |
+        .\build\odbc\bin\Release\itodbc_pagination.exe
     - name: upload-integration-test-results
       if: always()
       uses: actions/upload-artifact@v2

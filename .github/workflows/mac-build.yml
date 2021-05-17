@@ -63,6 +63,9 @@ jobs:
     - name: run-integration-info-tests
       run: |
         ./build/odbc/bin/itodbc_info
+    - name: run-integration-pagination-tests
+      run: |
+        ./build/odbc/bin/itodbc_pagination
     - name: print-test-logs
       if: failure()
       run: |
