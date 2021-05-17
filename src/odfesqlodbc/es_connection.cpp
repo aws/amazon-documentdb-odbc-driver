@@ -45,6 +45,7 @@
 #include "multibyte.h"
 #include "qresult.h"
 #include "statement.h"
+#include "version.h"
 
 #define ERROR_BUFF_SIZE 200
 
@@ -82,7 +83,7 @@ void* LIB_connect(ConnectionClass *self) {
     if (conn == nullptr) {
         throw std::runtime_error("Communication is nullptr.");
     }
-    // Set sdk version
+    // Set driver version
     std::string version = GetVersion(conn);
     STRCPY_FIXED(self->version, version.c_str());
 
@@ -176,10 +177,10 @@ int CC_send_client_encoding(ConnectionClass *self, const char *encoding) {
 }
 
 void CC_initialize_version(ConnectionClass *self) {
-    STRCPY_FIXED(self->version, "1.8.108");
-    self->version_major = 1;
-    self->version_minor = 8;
-    self->version_patch = 108;
+    STRCPY_FIXED(self->version, TIMESTREAMDRIVERVERSION);
+    self->version_major = 0;
+    self->version_minor = 2;
+    self->version_patch = 0;
 }
 
 void LIB_disconnect(void *conn) {

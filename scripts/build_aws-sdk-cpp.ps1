@@ -7,7 +7,7 @@ $INSTALL_DIR = $args[4]
 Write-Host $args
 
 # Clone the AWS SDK CPP repo
-git clone --recurse-submodules -b "1.8.108" "https://github.com/aws/aws-sdk-cpp.git" $SRC_DIR
+git clone --recurse-submodules -b "1.8.186" "https://github.com/aws/aws-sdk-cpp.git" $SRC_DIR
 
 # Make and move to build directory
 New-Item -Path $BUILD_DIR -ItemType Directory -Force | Out-Null

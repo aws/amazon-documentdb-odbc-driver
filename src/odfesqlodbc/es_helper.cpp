@@ -46,7 +46,7 @@ ConnStatusType GetStatus(void* conn) {
 std::string GetVersion(void* conn) {
     return conn
                ? static_cast< Communication* >(conn)->GetVersion()
-               : "1.8.108";
+               : "0.2.0";
 }
 
 int ESExecDirect(void* conn, StatementClass* stmt, const char* statement) {
