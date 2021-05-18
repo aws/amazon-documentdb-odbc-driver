@@ -10,6 +10,5 @@ performance_results
 ut_aws_sdk_cpp
 ut_conn
 ut_critical_section
-ut_rabbit
 it_odbc_helper.cpp.o
 itodbc_execution

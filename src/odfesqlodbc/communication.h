@@ -17,25 +17,15 @@
 #ifndef COMMUNICATION
 #define COMMUNICATION
 
-// clang-format off
-#include <memory>
-#include "es_types.h"
-#include <unordered_map>
-#include "ts_prefetch_queue.h"
-
-//Keep rabbit at top otherwise it gives build error because of some variable names like max, min
-#ifdef __APPLE__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-#endif // __APPLE__
-#include "rabbit.hpp"
-#ifdef __APPLE__
-#pragma clang diagnostic pop
-#endif // __APPLE__
-#include <map>
-#include <string>
 #include <aws/core/Aws.h>
-// clang-format on
+
+#include <map>
+#include <memory>
+#include <string>
+#include <unordered_map>
+
+#include "es_types.h"
+#include "ts_prefetch_queue.h"
 
 /**
  * Communication interface between ODBC library and actual database implementation

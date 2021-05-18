@@ -17,25 +17,15 @@
 #ifndef TS_COMMUNICATION
 #define TS_COMMUNICATION
 
-// clang-format off
+#include <aws/timestream-query/TimestreamQueryClient.h>
+#include <aws/timestream-query/model/ScalarType.h>
+#include <aws/timestream-query/model/Type.h>
+
 #include <memory>
 #include <string>
+
 #include "communication.h"
 #include "saml_credentials_provider.h"
-#include <aws/timestream-query/TimestreamQueryClient.h>
-#include <aws/timestream-query/model/Type.h>
-#include <aws/timestream-query/model/ScalarType.h>
-
-//Keep rabbit at top otherwise it gives build error because of some variable names like max, min
-#ifdef __APPLE__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-#endif // __APPLE__
-
-#ifdef __APPLE__
-#pragma clang diagnostic pop
-#endif // __APPLE__
-// clang-format on
 
 /**
  * AWS Timestream communication class
