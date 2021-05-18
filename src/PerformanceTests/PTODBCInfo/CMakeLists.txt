@@ -17,11 +17,9 @@ project(performance_info)
 
 # Source, headers, and include dirs
 set(SOURCE_FILES performance_odbc_info.cpp)
-include_directories(	${UT_HELPER}
-						${IT_HELPER}
-						${ODFEODBC_SRC}
-						${RABBIT_SRC}
-						${RAPIDJSON_SRC})
+include_directories(${UT_HELPER}
+					${IT_HELPER}
+					${ODFEODBC_SRC})
 
 # Generate executable
 add_executable(performance_info ${SOURCE_FILES})
