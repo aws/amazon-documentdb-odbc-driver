@@ -21,7 +21,6 @@
 #include "it_odbc_helper.h"
 #include "chrono"
 #include <cwctype>
-#include "rabbit.hpp"
 #include <codecvt>
 #include <locale>
 // clang-format on
