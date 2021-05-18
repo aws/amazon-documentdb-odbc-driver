@@ -114,8 +114,6 @@ include_directories(
 						${LIBRARY_DIRECTORY}/../src
 						${CMAKE_CURRENT_SOURCE_DIR}
 						${ODFEENLIST_SRC} 
-						${RABBIT_SRC}
-						${RAPIDJSON_SRC}
 						${AWSSDK_INCLUDE_DIR}
 					)
 

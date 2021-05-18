@@ -20,19 +20,9 @@
 
 #include "es_helper.h"
 #include "es_types.h"
-#ifdef __APPLE__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-#endif  // __APPLE__
-#include "rabbit.hpp"
-#ifdef __APPLE__
-#pragma clang diagnostic pop
-#endif  // __APPLE__
 #include "statement.h"
 
 typedef std::vector< std::pair< std::string, OID > > schema_type;
-typedef rabbit::array json_arr;
-typedef json_arr::iterator::result_type json_arr_it;
 
 bool _CC_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
     const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
@@ -228,10 +218,6 @@ bool _CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn, c
 
         // Return true (success)
         return true;
-    } catch (const rabbit::type_mismatch &e) {
-        SetError(e.what());
-    } catch (const rabbit::parse_error &e) {
-        SetError(e.what());
     } catch (const std::exception &e) {
         SetError(e.what());
     } catch (...) {
@@ -263,10 +249,6 @@ bool _CC_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn, cons
 
         // Return true (success)
         return true;
-    } catch (const rabbit::type_mismatch &e) {
-        SetError(e.what());
-    } catch (const rabbit::parse_error &e) {
-        SetError(e.what());
     } catch (const std::exception &e) {
         SetError(e.what());
     } catch (...) {
@@ -312,10 +294,6 @@ bool _CC_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *n
 
         // Return true (success)
         return true;
-    } catch (const rabbit::type_mismatch &e) {
-        SetError(e.what());
-    } catch (const rabbit::parse_error &e) {
-        SetError(e.what());
     } catch (const std::exception &e) {
         SetError(e.what());
     } catch (...) {

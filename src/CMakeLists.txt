@@ -91,8 +91,6 @@ add_compile_definitions( TS_ODBC_VERSION="${DRIVER_PACKAGE_VERSION}"
 set(PERFORMANCE_TESTS "${CMAKE_CURRENT_SOURCE_DIR}/PerformanceTests")
 set(UT_HELPER "${UNIT_TESTS}/UTHelper")
 set(IT_HELPER "${INTEGRATION_TESTS}/ITODBCHelper")
-set(RABBIT_SRC ${LIBRARY_DIRECTORY}/rabbit/include)
-set(RAPIDJSON_SRC ${LIBRARY_DIRECTORY}/rapidjson/include)
 
 # Without this symbols will be exporting to Unix but not Windows
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)	
