@@ -33,6 +33,60 @@
 #include <aws/timestream-query/model/QueryRequest.h>
 // clang-format on
 
+namespace {
+    typedef std::function< std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient >(
+        const runtime_options& options,
+        const Aws::Client::ClientConfiguration& config) > QueryClientCreator;
+
+    QueryClientCreator profile =
+        [](const runtime_options& options,
+           const Aws::Client::ClientConfiguration& config) {
+        if (!options.auth.profile_name.empty()) {
+            auto cp = std::make_shared<
+                Aws::Auth::ProfileConfigFileAWSCredentialsProvider >(
+                options.auth.profile_name.c_str());
+            return std::make_unique<
+                Aws::TimestreamQuery::TimestreamQueryClient >(cp, config);
+        } else {
+            return std::make_unique<
+                Aws::TimestreamQuery::TimestreamQueryClient >(config);
+        }
+    };
+
+    QueryClientCreator iam =
+        [](const runtime_options& options,
+           const Aws::Client::ClientConfiguration& config) {
+        Aws::Auth::AWSCredentials credentials(
+            options.auth.uid, options.auth.pwd, options.auth.session_token);
+        return std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(
+            credentials, config);
+    };
+
+    QueryClientCreator aad =
+        [](const runtime_options& options,
+           const Aws::Client::ClientConfiguration& config) {
+        auto credential_provider =
+            std::make_unique< AADCredentialsProvider >(options.auth);
+        return std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(credential_provider->GetAWSCredentials(), config);
+    };
+
+    QueryClientCreator okta =
+        [](const runtime_options& options,
+           const Aws::Client::ClientConfiguration& config) {
+        auto credential_provider =
+            std::make_unique< OktaCredentialsProvider >(options.auth);
+        return std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(
+            credential_provider->GetAWSCredentials(), config);
+    };
+
+    std::unordered_map< std::string, QueryClientCreator > creators = {
+        {AUTHTYPE_AWS_PROFILE, profile},
+        {AUTHTYPE_IAM, iam},
+        {AUTHTYPE_AAD, aad},
+        {AUTHTYPE_OKTA, okta},
+    };
+};
+
 bool TSCommunication::Validate(const runtime_options& options) {
     if (options.auth.region.empty() && options.auth.end_point_override.empty()) {
         throw std::invalid_argument("Both region and end point cannot be empty.");
@@ -53,7 +107,7 @@ bool TSCommunication::Validate(const runtime_options& options) {
     return true;
 }
 
-bool TSCommunication::Connect(const runtime_options& options) {
+std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient > TSCommunication::CreateQueryClient(const runtime_options& options) {
     Aws::Client::ClientConfiguration config;
     if (!options.auth.end_point_override.empty()) {
         config.endpointOverride = options.auth.end_point_override;
@@ -83,41 +137,24 @@ bool TSCommunication::Connect(const runtime_options& options) {
         config.maxConnections = max_connections;
     }
     if (!options.conn.max_retry_count_client.empty()) {
-        long max_retry_count_client = std::stol(options.conn.max_retry_count_client);
+        long max_retry_count_client =
+            std::stol(options.conn.max_retry_count_client);
         if (max_retry_count_client < 0) {
-            throw std::invalid_argument("Max retry count client cannot be negative.");
+            throw std::invalid_argument(
+                "Max retry count client cannot be negative.");
         }
-        config.retryStrategy = std::make_shared< Aws::Client::DefaultRetryStrategy >(max_retry_count_client);
+        config.retryStrategy =
+            std::make_shared< Aws::Client::DefaultRetryStrategy >(
+                max_retry_count_client);
     }
-    if (options.auth.auth_type == AUTHTYPE_AWS_PROFILE) {
-        if (!options.auth.profile_name.empty()) {
-            auto cp = std::make_shared<Aws::Auth::ProfileConfigFileAWSCredentialsProvider>(options.auth.profile_name.c_str());
-            m_client =
-                std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(cp, config);
-        } else {
-            m_client =
-                std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(config);
-        }
-    } else if (options.auth.auth_type == AUTHTYPE_IAM) {
-        Aws::Auth::AWSCredentials credentials(options.auth.uid,
-                                              options.auth.pwd, options.auth.session_token);
-        m_client =
-            std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(
-                credentials, config);
-    } else if (options.auth.auth_type == AUTHTYPE_AAD) {
-        m_client = CreateQueryClientWithIdp(
-            std::make_unique< AADCredentialsProvider >(options.auth), config);
-    } else if (options.auth.auth_type == AUTHTYPE_OKTA) {
-        m_client = CreateQueryClientWithIdp(
-            std::make_unique< OktaCredentialsProvider >(options.auth), config);
-    } else {
-        throw std::runtime_error("Unknown auth type: " + options.auth.auth_type);
+    if (creators.find(options.auth.auth_type) == creators.end()) {
+        throw std::runtime_error("Unknown auth type: "
+                                 + options.auth.auth_type);
     }
+    return creators[options.auth.auth_type](options, config);
+}
 
-    if (m_client == nullptr) {
-        throw std::runtime_error("Unable to create TimestreamQueryClient.");
-    }
-
+bool TSCommunication::TestQueryClient() {
     Aws::TimestreamQuery::Model::QueryRequest req;
     req.SetQueryString("select 1");
     auto outcome = m_client->Query(req);
@@ -129,6 +166,14 @@ bool TSCommunication::Connect(const runtime_options& options) {
     }
     LogMsg(LOG_DEBUG, "Connection Established.");
     return true;
+}
+
+bool TSCommunication::Connect(const runtime_options& options) {
+    m_client = CreateQueryClient(options);
+    if (m_client == nullptr) {
+        throw std::runtime_error("Unable to create TimestreamQueryClient.");
+    }
+    return TestQueryClient();
 }
 
 void TSCommunication::Disconnect() {
@@ -158,17 +203,6 @@ void TSCommunication::StopResultRetrieval(StatementClass* stmt) {
         prefetch_queues_map[stmt]->Clear();
         prefetch_queues_map.erase(stmt);
     }
-}
-
-std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient >
-TSCommunication::CreateQueryClientWithIdp(
-    std::unique_ptr< SAMLCredentialsProvider > cp,
-    const Aws::Client::ClientConfiguration& config) {
-    auto credentials = cp->GetAWSCredentials();
-    auto query_client =
-        std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(
-            credentials, config);
-    return query_client;
 }
 
 /**

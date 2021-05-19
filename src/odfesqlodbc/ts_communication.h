@@ -83,16 +83,19 @@ class TSCommunication : public Communication {
 
    private:
     /**
-     * Create an unique_ptr of TimestreamQueryClient using the given credentials
-     * provider and configs
-     * @param cp std::unique_ptr<SAMLCredentialsProvider>
-     * @param auth const authentication_options&
-     * @param config const Aws::Client::ClientConfiguration&
+     * Create Timestream Query Client
+     * @param options const runtime_options&
      * @return std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient >
      */
     std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient >
-    CreateQueryClientWithIdp(std::unique_ptr< SAMLCredentialsProvider > cp,
-                             const Aws::Client::ClientConfiguration& config);
+      CreateQueryClient(const runtime_options& options);
+
+    /**
+     * Test Query Client using "Select 1"
+     * @return bool
+     */
+    bool TestQueryClient();
+
     /**
      * Timestream query client
      */
