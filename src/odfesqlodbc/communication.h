@@ -65,9 +65,15 @@ class Communication {
      * Execute query
      * @param stmt StatementClass *
      * @param query const char*
-     * @return int
+     * @return bool
      */
-    virtual int ExecDirect(StatementClass* stmt, const char* query) = 0;
+    virtual bool ExecDirect(StatementClass* stmt, const char* query) = 0;
+    /**
+     * Cancel query
+     * @param stmt StatementClass *
+     * @return bool
+     */
+    virtual bool CancelQuery(StatementClass* stmt) = 0;
     /**
      * Get version
      * @return std::string

@@ -41,6 +41,8 @@ class TestSQLDescribeParam : public Fixture {};
 
 class TestSQLNumParams : public Fixture {};
 
+class TestSQLCancel : public Fixture {};
+
 /*class TestSQLSetCursorName : public testing::Test {
    public:
     TestSQLSetCursorName() {
@@ -96,43 +98,6 @@ class TestSQLGetCursorName : public testing::Test {
     SQLSMALLINT m_wrong_buffer_length = 1;
     SQLTCHAR m_cursor_name_buf[20];
     SQLSMALLINT m_cursor_name_length;
-    SQLHENV m_env = SQL_NULL_HENV;
-    SQLHDBC m_conn = SQL_NULL_HDBC;
-    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
-};
-
-class TestSQLCancel : public testing::Test {
-   public:
-    TestSQLCancel() {
-    }
-
-    void SetUp() {
-        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env,
-                                       &m_conn, &m_hstmt, true, true));
-    }
-
-    void TearDown() {
-        if (m_hstmt != SQL_NULL_HSTMT) {
-            CloseCursor(&m_hstmt, true, true);
-            SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
-            SQLDisconnect(m_conn);
-            SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-        }
-    }
-
-    ~TestSQLCancel() {
-        // cleanup any pending stuff, but no exceptions allowed
-    }
-
-    typedef struct SQLCancelInfo {
-        SQLHDBC hstmt;
-        SQLRETURN ret_code;
-    } SQLCancelInfo;
-
-    const long long m_min_time_diff = 20;
-    std::wstring m_query =
-        L"SELECT * FROM kibana_sample_data_flights AS f WHERE "
-        L"f.Origin=f.Origin";
     SQLHENV m_env = SQL_NULL_HENV;
     SQLHDBC m_conn = SQL_NULL_HDBC;
     SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
@@ -469,60 +434,81 @@ TEST_F(TestSQLGetCursorName, WrongLengthForCursorName) {
     EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
+*/
 
 TEST_F(TestSQLCancel, NULLHandle) {
     SQLRETURN ret_exec = SQLCancel(NULL);
     EXPECT_EQ(ret_exec, SQL_INVALID_HANDLE);
-}*/
-
-// This test will fail because we are not cancelling in flight queries at this time.
-#if 0
-TEST_F(TestSQLCancel, QueryInProgress) {
-    // Create lambda thread
-    auto f = [](SQLCancelInfo* info) {
-        Sleep(10);
-        info->ret_code = SQLCancel(info->hstmt);
-    };
-
-    // Launch cancel thread
-    SQLCancelInfo cancel_info;
-    cancel_info.hstmt = m_hstmt;
-    cancel_info.ret_code = SQL_ERROR;
-    std::thread thread_object(f, &cancel_info);
-
-    // Time ExecDirect execution
-    auto start = std::chrono::steady_clock::now();
-    SQLRETURN ret_exec =
-        SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query.c_str(), SQL_NTS);
-    auto end = std::chrono::steady_clock::now();
-    auto time =
-        std::chrono::duration_cast< std::chrono::milliseconds >(end - start)
-            .count();
-
-    // Join thread
-    thread_object.join();
-
-    // Check return codes and time diff
-    ASSERT_LE(m_min_time_diff, time);
-    EXPECT_EQ(ret_exec, SQL_ERROR);
-    EXPECT_EQ(cancel_info.ret_code, SQL_SUCCESS);
 }
-#endif
-/*
+
+TEST_F(TestSQLCancel, QueryInProgress) {
+    int limit = 32925;
+    std::wstring query =
+        L"SELECT * FROM ODBCTest.IoT LIMIT " + std::to_wstring(limit);
+    SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    ASSERT_EQ(SQL_SUCCESS, ret);
+    ret = SQLCancel(m_hstmt);
+    EXPECT_EQ(SQL_SUCCESS, ret);
+    int cnt = 0;
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            cnt++;
+        }
+    }
+    EXPECT_LT(cnt, limit);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+// The following test case needs to change the logic of ts_communication before running.
+// The objective of the test is to simulate a long query in SQLExecDirect
+// and caller issues a SQLCancel to cancel the operation
+// We need to add a sleep e.g. Sleep(1000) in the first line of function QueryCallback to
+// simulate that
+//TEST_F(TestSQLCancel, QueryInProgressMultithread) {
+//    std::wstring query =
+//        L"SELECT * FROM ODBCTest.IoT";
+//    std::thread th1([&]() {
+//        auto ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+//        EXPECT_EQ(SQL_ERROR, ret);
+//        EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+//                                  SQLSTATE_OPERATION_CANCELLED));
+//    });
+//    std::thread th2([&]() {
+//        Sleep(500);
+//        auto ret = SQLCancel(m_hstmt);
+//        EXPECT_EQ(SQL_SUCCESS, ret);
+//    });
+//    th2.join();
+//    th1.join();
+//    SQLRETURN ret = SQLFetch(m_hstmt);
+//    EXPECT_EQ(SQL_ERROR, ret);
+//    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+//        SQLSTATE_INVALID_CURSUR_STATE));
+//    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+//}
+
 TEST_F(TestSQLCancel, QueryNotSent) {
     SQLRETURN ret_exec = SQLCancel(m_hstmt);
     EXPECT_EQ(ret_exec, SQL_SUCCESS);
 }
 
 TEST_F(TestSQLCancel, QueryFinished) {
-    SQLRETURN ret_exec =
-        SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query.c_str(), SQL_NTS);
-    ASSERT_EQ(ret_exec, SQL_SUCCESS);
-
-    ret_exec = SQLCancel(m_hstmt);
-    EXPECT_EQ(ret_exec, SQL_SUCCESS);
+    int limit = 10000;
+    std::wstring query =
+        L"SELECT * FROM ODBCTest.IoT LIMIT " + std::to_wstring(limit);
+    SQLRETURN ret =
+        SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    ASSERT_EQ(ret, SQL_SUCCESS);
+    int cnt = 0;
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            cnt++;
+        }
+    }
+    EXPECT_EQ(cnt, limit);
+    ret = SQLCancel(m_hstmt);
+    EXPECT_EQ(ret, SQL_SUCCESS);
 }
-*/
 
 int main(int argc, char** argv) {
 #ifdef __APPLE__
