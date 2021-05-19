@@ -298,6 +298,10 @@ struct StatementClass_ {
     UInt2 num_callbacks;
     NeedDataCallback *callbacks;
     void *cs;
+    char *query_id;
+    BOOL retrieving;
+    void *cv_mutex;
+    void *cv;
 };
 
 #define SC_get_conn(a) ((a)->hdbc)
@@ -486,7 +490,7 @@ int SC_Create_bookmark(StatementClass *stmt, BindInfoClass *bookmark,
                        Int4 row_pos, Int4 currTuple, const KeySet *keyset);
 int SC_set_current_col(StatementClass *self, int col);
 BOOL SC_SetExecuting(StatementClass *self, BOOL on);
-BOOL SC_SetCancelRequest(StatementClass *self);
+void SC_UnsetQueryId(StatementClass *self);
 
 BOOL SC_connection_lost_check(StatementClass *stmt, const char *funcname);
 void SC_set_errorinfo(StatementClass *self, QResultClass *res, int errkind);

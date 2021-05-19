@@ -49,11 +49,21 @@ std::string GetVersion(void* conn) {
                : "0.2.0";
 }
 
-int ESExecDirect(void* conn, StatementClass* stmt, const char* statement) {
+BOOL ExecDirect(void* conn, StatementClass* stmt, const char* statement) {
     return (conn && stmt && statement)
                ? static_cast< Communication* >(conn)->ExecDirect(
                    stmt, statement)
-               : -1;
+               : FALSE;
+}
+
+BOOL CancelQuery(StatementClass* stmt) {
+    if (stmt != nullptr && SC_get_conn(stmt) != nullptr) {
+        auto conn = static_cast< Communication* >(SC_get_conn(stmt)->conn);
+        if (conn != nullptr) {
+            return conn->CancelQuery(stmt);
+        }
+    }
+    return FALSE;
 }
 
 std::string GetClientEncoding(void* conn) {
@@ -84,6 +94,44 @@ PrefetchQueue* GetPrefetchQueue(void* conn, StatementClass* stmt) {
 
 void StopRetrieval(void* conn, StatementClass* stmt) {
     static_cast< Communication* >(conn)->StopResultRetrieval(stmt);
+}
+
+BOOL AllocateMutexForConditionVariable(StatementClass* stmt) {
+    if (stmt != NULL) {
+        if (stmt->cv_mutex == NULL) {
+            auto new_cv_mutex = new std::mutex();
+            stmt->cv_mutex = new_cv_mutex;
+        }
+        return true;
+    }
+    return false;
+}
+
+void DeallocateMutexForConditionVariable(StatementClass* stmt) {
+    if (stmt->cv_mutex != NULL) {
+        auto ptr = static_cast< std::mutex* >(stmt->cv_mutex);
+        delete ptr;
+        stmt->cv_mutex = NULL;
+    }
+}
+
+BOOL AllocateConditionVariable(StatementClass* stmt) {
+    if (stmt != NULL) {
+        if (stmt->cv == NULL) {
+            auto new_cv = new std::condition_variable();
+            stmt->cv = new_cv;
+        }
+        return true;
+    }
+    return false;
+}
+
+void DeallocateConditionVariable(StatementClass* stmt) {
+    if (stmt->cv != NULL) {
+        auto ptr = static_cast< std::condition_variable* >(stmt->cv);
+        delete ptr;
+        stmt->cv = NULL;
+    }
 }
 
 // This class provides a cross platform way of entering critical sections

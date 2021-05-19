@@ -346,6 +346,11 @@ StatementClass *SC_Constructor(ConnectionClass *conn) {
         PutDataInfoInitialize(SC_get_PDTI(rv));
         rv->lock_CC_for_rb = FALSE;
         INIT_STMT_CS(rv);
+        rv->query_id = NULL;
+        rv->cv_mutex = NULL;
+        rv->cv = NULL;
+        AllocateMutexForConditionVariable(rv);
+        AllocateConditionVariable(rv);
     }
     return rv;
 }
@@ -391,10 +396,11 @@ char SC_Destructor(StatementClass *self) {
     cancelNeedDataState(self);
     if (self->callbacks)
         free(self->callbacks);
-
+    DeallocateMutexForConditionVariable(self);
+    DeallocateConditionVariable(self);
     DELETE_STMT_CS(self);
     free(self);
-
+    self = NULL;
     MYLOG(LOG_TRACE, "leaving\n");
 
     return TRUE;
@@ -531,6 +537,7 @@ SC_initialize_stmts(StatementClass *self, BOOL initializeOriginal) {
         self->join_info = 0;
         SC_init_parse_method(self);
         SC_init_discard_output_params(self);
+        SC_UnsetQueryId(self);
     }
     if (self->load_statement) {
         free(self->load_statement);
@@ -1385,26 +1392,12 @@ BOOL SC_SetExecuting(StatementClass *self, BOOL on) {
     return exeSet;
 }
 
-#ifdef NOT_USED
-BOOL SC_SetCancelRequest(StatementClass *self) {
-    BOOL enteredCS = FALSE;
-
-    ENTER_COMMON_CS;
-    if (0 != (self->cancel_info & CancelCompleted))
-        ;
-    else if (STMT_EXECUTING == self->status) {
-        self->cancel_info |= CancelRequestSet;
-    } else {
-        /* try to acquire */
-        if (TRY_ENTER_STMT_CS(self))
-            enteredCS = TRUE;
-        else
-            self->cancel_info |= CancelRequestSet;
+void SC_UnsetQueryId(StatementClass *self) {
+    if (self != NULL && self->query_id != NULL) {
+        free(self->query_id);
+        self->query_id = NULL;
     }
-    LEAVE_COMMON_CS;
-    return enteredCS;
 }
-#endif /* NOT_USED */
 
 static void SC_set_error_if_not_set(StatementClass *self, int errornumber,
                                     const char *errmsg, const char *func) {

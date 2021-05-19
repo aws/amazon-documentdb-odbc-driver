@@ -29,6 +29,7 @@
 #include <aws/core/auth/AWSCredentials.h>
 #include <aws/core/auth/AWSCredentialsProvider.h>
 #include <aws/core/client/DefaultRetryStrategy.h>
+#include <aws/timestream-query/model/CancelQueryRequest.h>
 #include <aws/timestream-query/model/QueryRequest.h>
 // clang-format on
 
@@ -150,6 +151,9 @@ std::string TSCommunication::GetErrorPrefix() {
 }
 
 void TSCommunication::StopResultRetrieval(StatementClass* stmt) {
+    // Call Cancel logic
+    CancelQuery(stmt);
+    // Clean the queue
     if (stmt != nullptr && prefetch_queues_map.find(stmt) != prefetch_queues_map.end()) {
         prefetch_queues_map[stmt]->Clear();
         prefetch_queues_map.erase(stmt);
@@ -176,8 +180,8 @@ class Context : public Aws::Client::AsyncCallerContext {
     /**
      * Parameterized constructor for the context
      */
-    Context(PrefetchQueue* q, std::promise< Aws::TimestreamQuery::Model::QueryOutcome > p)
-        : Aws::Client::AsyncCallerContext(), queue_(q), promise_(std::move(p)) {
+    Context(PrefetchQueue* q, StatementClass* s, std::promise< Aws::TimestreamQuery::Model::QueryOutcome > p)
+        : Aws::Client::AsyncCallerContext(), queue_(q), stmt_(s), promise_(std::move(p)) {
     }
     /**
      * Get the prefetch queue
@@ -185,6 +189,13 @@ class Context : public Aws::Client::AsyncCallerContext {
      */
     PrefetchQueue* GetPrefetchQueue() {
         return queue_;
+    }
+    /**
+     * Get the statement
+     * @return StatementClass*
+     */
+    StatementClass* GetStatement() {
+        return stmt_;
     }
     /**
      * Make promise
@@ -198,6 +209,10 @@ class Context : public Aws::Client::AsyncCallerContext {
      * PrefetchQueue pointer
      */
     PrefetchQueue* queue_;
+    /**
+     * Statement pointer
+     */
+    StatementClass* stmt_;
     /**
      * Promise made by the request
      * Wait to be fullfilled in the QueryCallback function
@@ -213,31 +228,57 @@ void QueryCallback(
     const std::shared_ptr< const Aws::Client::AsyncCallerContext >& context) {
     auto ctxt = (std::static_pointer_cast< const Context >(context));
     auto p = const_cast< Context* >(ctxt.get());
-    if (p != nullptr) {
-        if (outcome.IsSuccess()
-            && !outcome.GetResult().GetNextToken().empty()) {
-            // Next request
-            Aws::TimestreamQuery::Model::QueryRequest next_request(request);
-            std::promise< Aws::TimestreamQuery::Model::QueryOutcome >
-                next_promise;
-            if (!p->GetPrefetchQueue()->IsEmpty()) {
-                PrefetchQueue* pPrefetchQueue =
-                    (PrefetchQueue*)p->GetPrefetchQueue();
-                pPrefetchQueue->Push(next_promise.get_future());
-                client->QueryAsync(
-                    next_request.WithNextToken(
-                        outcome.GetResult().GetNextToken()),
-                    QueryCallback,
-                    std::make_shared< Context >(pPrefetchQueue,
-                                                std::move(next_promise)));
+    auto sc = p->GetStatement();
+    if (p != nullptr && sc != nullptr) {
+        if (outcome.IsSuccess()) {
+            if (!outcome.GetResult().GetNextToken().empty() && sc->retrieving) {
+                // Update the query id in statement class if different
+                if (sc->query_id == NULL
+                    || strcmp(sc->query_id,
+                              outcome.GetResult().GetQueryId().c_str())
+                           != 0) {
+                    SC_UnsetQueryId(sc);
+                    sc->query_id =
+                        strdup(outcome.GetResult().GetQueryId().c_str());
+                }
+                // Issue next request
+                Aws::TimestreamQuery::Model::QueryRequest next_request(request);
+                std::promise< Aws::TimestreamQuery::Model::QueryOutcome >
+                    next_promise;
+                if (!p->GetPrefetchQueue()->IsEmpty()) {
+                    PrefetchQueue* pPrefetchQueue =
+                        (PrefetchQueue*)p->GetPrefetchQueue();
+                    pPrefetchQueue->Push(next_promise.get_future());
+                    client->QueryAsync(next_request.WithNextToken(
+                                           outcome.GetResult().GetNextToken()),
+                                       QueryCallback,
+                                       std::make_shared< Context >(
+                                           pPrefetchQueue, p->GetStatement(),
+                                           std::move(next_promise)));
+                }
+            } else {
+                // End of query
+                sc->retrieving = FALSE;
+                SC_UnsetQueryId(sc);
             }
+        } else {
+            sc->retrieving = FALSE;
         }
         // Made promise from previous query
-        p->MakePromise(outcome);
+        std::mutex* mx = static_cast< std::mutex* >(sc->cv_mutex);
+        std::condition_variable* cv =
+            static_cast< std::condition_variable* >(sc->cv);
+        if (mx != nullptr && cv != nullptr) {
+            {
+                std::unique_lock< std::mutex > lock(*mx);
+                p->MakePromise(outcome);
+            }
+            cv->notify_one();
+        }
     }
 }
 
-int TSCommunication::ExecDirect(StatementClass* sc, const char* query) {
+bool TSCommunication::ExecDirect(StatementClass* sc, const char* query) {
     // Prepare statement
     std::string statement(query);
     std::string msg = "Attempting to execute a query \"" + statement + "\"";
@@ -250,12 +291,46 @@ int TSCommunication::ExecDirect(StatementClass* sc, const char* query) {
     // Issue request
     Aws::TimestreamQuery::Model::QueryRequest request;
     request.SetQueryString(statement.c_str());
-    
     // Use QueryAsync
     std::promise< Aws::TimestreamQuery::Model::QueryOutcome > promise;
     pPrefetchQueue->Push(promise.get_future());
+    sc->retrieving = TRUE;
     m_client->QueryAsync(
         request, QueryCallback,
-        std::make_shared< Context >(pPrefetchQueue, std::move(promise)));
-    return 0;
+        std::make_shared< Context >(pPrefetchQueue, sc, std::move(promise)));
+    return true;
+}
+
+bool TSCommunication::CancelQuery(StatementClass* stmt) {
+    if (stmt == nullptr)
+        return false;
+    std::mutex* mx = static_cast< std::mutex* >(stmt->cv_mutex);
+    std::condition_variable* cv =
+        static_cast< std::condition_variable* >(stmt->cv);
+    {
+        std::unique_lock< std::mutex > lock(*mx);
+        // Break the next request
+        stmt->retrieving = FALSE;
+    }
+    // Set condition variables
+    cv->notify_one();
+    // Try to cancel current query (Not guaranteed in Timestream service)
+    if (stmt->query_id != nullptr && strlen(stmt->query_id) != 0) {
+        Aws::TimestreamQuery::Model::CancelQueryRequest cancel_request;
+        cancel_request.SetQueryId(stmt->query_id);
+        auto outcome = m_client->CancelQuery(cancel_request);
+        if (outcome.IsSuccess()) {
+            std::string message =
+                "Query ID: " + cancel_request.GetQueryId() + "is cancelled. "
+                + outcome.GetResult().GetCancellationMessage();
+            LogMsg(LOG_DEBUG, message.c_str());
+        } else {
+            std::string message =
+                "Query ID: " + cancel_request.GetQueryId() + "can't cancel. "
+                                  + outcome.GetError().GetMessage();
+            LogMsg(LOG_DEBUG, message.c_str());
+        }
+        return outcome.IsSuccess();
+    }
+    return false;
 }

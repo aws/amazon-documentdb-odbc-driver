@@ -27,6 +27,8 @@ class PrefetchQueue {
     void Pop();
 	
     Aws::TimestreamQuery::Model::QueryOutcome Front();
+
+    bool FrontIsReady();
 	
     bool IsEmpty();
 	
