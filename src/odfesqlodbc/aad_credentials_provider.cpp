@@ -99,6 +99,22 @@ std::string AADCredentialsProvider::GetAADAccessToken() const {
 
 Aws::String AADCredentialsProvider::GetSAMLAssertion() {
     std::string access_token = GetAADAccessToken();
+    // Microsoft Azure AD doesn't send tail padding to us,
+    // the size of the access_token may not be a multiple of 4.
+    // While AWS::Utils::Base64 is expecting the size of the encoded is a multiple of 4.
+    // we need to pad ourself for the AWS::Utils::Base64 decoder
+    auto mod = access_token.size() % 4;
+    switch (mod) {
+        case 1:
+            access_token += "===";
+            break;
+        case 2:
+            access_token += "==";
+            break;
+        case 3:
+            access_token += "=";
+            break;
+    }
     // Base64URL decode
     auto decode_buffer = BASE64_URL.Decode(access_token);
     auto size = decode_buffer.GetLength();
