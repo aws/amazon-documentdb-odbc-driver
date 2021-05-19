@@ -36,9 +36,14 @@ void XPlatformEnterCriticalSection(void* critical_section_helper);
 void XPlatformLeaveCriticalSection(void* critical_section_helper);
 void XPlatformDeleteCriticalSection(void** critical_section_helper);
 ConnStatusType Status(void* conn);
-int ESExecDirect(void* conn, StatementClass* stmt, const char* statement);
+BOOL ExecDirect(void* conn, StatementClass* stmt, const char* statement);
+BOOL CancelQuery(StatementClass* stmt);
 void Disconnect(void* conn);
 void StopRetrieval(void* conn, StatementClass* stmt);
+BOOL AllocateMutexForConditionVariable(StatementClass* stmt);
+void DeallocateMutexForConditionVariable(StatementClass* stmt);
+BOOL AllocateConditionVariable(StatementClass* stmt);
+void DeallocateConditionVariable(StatementClass* stmt);
 #ifdef __cplusplus
 }
 #endif

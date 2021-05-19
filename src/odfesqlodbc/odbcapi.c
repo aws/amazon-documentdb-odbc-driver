@@ -69,7 +69,7 @@ RETCODE SQL_API SQLCancel(HSTMT StatementHandle) {
     if (SC_connection_lost_check((StatementClass *)StatementHandle,
                                  __FUNCTION__))
         return SQL_ERROR;
-    return ESAPI_Cancel(StatementHandle);
+    return API_Cancel(StatementHandle);
 }
 
 static BOOL theResultIsEmpty(const StatementClass *stmt) {

@@ -52,9 +52,15 @@ class TSCommunication : public Communication {
      * Execute query
      * @param stmt StatementClass *
      * @param query const char*
-     * @return int
+     * @return bool
      */
-    virtual int ExecDirect(StatementClass* stmt, const char* query) override;
+    virtual bool ExecDirect(StatementClass* stmt, const char* query) override;
+    /**
+     * Cancel query
+     * @param stmt StatementClass *
+     * @return bool
+     */
+    virtual bool CancelQuery(StatementClass* stmt) override;
     /**
      * Get driver version
      * @return std::string

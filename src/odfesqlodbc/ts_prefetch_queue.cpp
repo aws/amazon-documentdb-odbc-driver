@@ -29,6 +29,11 @@ Aws::TimestreamQuery::Model::QueryOutcome PrefetchQueue::Front() {
 	return outcome;
 }
 
+bool PrefetchQueue::FrontIsReady() {
+    auto status = q.front().wait_for(std::chrono::milliseconds(1));
+    return status == std::future_status::ready;	
+}
+
 bool PrefetchQueue::IsEmpty() {
 	return q.empty();
 }
