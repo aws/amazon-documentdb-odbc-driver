@@ -81,6 +81,12 @@ class TSCommunication : public Communication {
      */
     virtual void StopResultRetrieval(StatementClass* stmt) override;
 
+    /**
+     * Get the user agent for Aws::Client::ClientConfiguration.
+     * @return the user agent.
+     */
+    Aws::String GetUserAgent();
+
    private:
     /**
      * Create Timestream Query Client
