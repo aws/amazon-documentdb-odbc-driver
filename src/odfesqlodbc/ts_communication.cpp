@@ -34,6 +34,8 @@
 // clang-format on
 
 namespace {
+    const Aws::String UA_ID_PREFIX = Aws::String("ts-odbc.");
+
     typedef std::function< std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient >(
         const runtime_options& options,
         const Aws::Client::ClientConfiguration& config) > QueryClientCreator;
@@ -109,6 +111,7 @@ bool TSCommunication::Validate(const runtime_options& options) {
 
 std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient > TSCommunication::CreateQueryClient(const runtime_options& options) {
     Aws::Client::ClientConfiguration config;
+    config.userAgent = GetUserAgent();
     if (!options.auth.end_point_override.empty()) {
         config.endpointOverride = options.auth.end_point_override;
     } else {
@@ -203,6 +206,14 @@ void TSCommunication::StopResultRetrieval(StatementClass* stmt) {
         prefetch_queues_map[stmt]->Clear();
         prefetch_queues_map.erase(stmt);
     }
+}
+
+Aws::String TSCommunication::GetUserAgent() {
+    Aws::String program_name(GetExeProgramName());
+    Aws::String name_suffix = " [" + program_name + "]";
+    Aws::String msg = "Name of the application using the driver: " + name_suffix;
+    LogMsg(LOG_INFO, msg.c_str());
+    return UA_ID_PREFIX + GetVersion() + name_suffix;
 }
 
 /**

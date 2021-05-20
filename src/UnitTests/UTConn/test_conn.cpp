@@ -123,6 +123,12 @@ TEST(TestDecodeHex, All_possible_hex) {
     EXPECT_EQ(expected, OktaCredentialsProvider::DecodeHex(hex_encoded));
 }
 
+TEST(TestGetUserAgent, Success) {
+    TSCommunication conn;
+    std::string expected = "ts-odbc." TIMESTREAMDRIVERVERSION " [ut_conn]";
+    EXPECT_EQ(expected, conn.GetUserAgent());
+}
+
 // TODO: enable gmock and mock the response from timestream
 //class TestTSConnConnectDBStart : public testing::Test {
 //   protected:
