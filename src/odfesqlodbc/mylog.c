@@ -27,6 +27,10 @@
 #include "es_odbc.h"
 #include "misc.h"
 
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
+
 #ifndef WIN32
 #include <errno.h>
 #include <pwd.h>
@@ -124,6 +128,13 @@ const char *GetExeProgramName() {
 
         if (GetModuleFileName(NULL, pathname, sizeof(pathname)) > 0)
             _splitpath(pathname, NULL, NULL, exename, NULL);
+#elif __APPLE__
+        char pathname[PATH_MAX + 1];
+        uint32_t size = PATH_MAX + 1;
+
+        if (_NSGetExecutablePath(pathname, &size) == 0) {
+            STRCPY_FIXED(exename, po_basename(pathname));
+        }
 #else
         CSTR flist[] = {"/proc/self/exe", "/proc/curproc/file",
                         "/proc/curproc/exe"};
