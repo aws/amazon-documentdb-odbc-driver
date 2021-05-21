@@ -111,7 +111,6 @@ add_library(odfesqlodbc SHARED ${C_SOURCE_FILES} ${C_HEADER_FILES} ${CPP_SOURCE_
 endif()
 
 include_directories(
-						${LIBRARY_DIRECTORY}/../src
 						${CMAKE_CURRENT_SOURCE_DIR}
 						${ODFEENLIST_SRC} 
 						${AWSSDK_INCLUDE_DIR}
