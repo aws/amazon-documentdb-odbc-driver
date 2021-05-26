@@ -298,8 +298,8 @@ QResultClass *SendQueryGetResult(StatementClass *stmt, BOOL commit) {
                 auto outcome = pPrefetchQueue->Front();
                 pPrefetchQueue->Pop();
                 if (outcome.IsSuccess()) {
-                    success =
-                        CC_from_TSResult(res, cc, res->cursor_name, outcome);
+                    success = CC_from_TSResult(res, cc, stmt, res->cursor_name,
+                                               outcome);
                 } else {
                     success = false;
                     SC_set_error(stmt, STMT_EXEC_ERROR,
@@ -310,7 +310,7 @@ QResultClass *SendQueryGetResult(StatementClass *stmt, BOOL commit) {
                 auto outcome = pPrefetchQueue->Front();
                 if (outcome.IsSuccess()) {
                     success = CC_Metadata_from_TSResult(
-                        res, cc, res->cursor_name, outcome);
+                        res, cc, stmt, res->cursor_name, outcome);
                 } else {
                     success = false;
                     SC_set_error(stmt, STMT_EXEC_ERROR,
