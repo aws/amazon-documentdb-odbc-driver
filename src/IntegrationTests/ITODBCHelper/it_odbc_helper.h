@@ -102,11 +102,11 @@ std::u16string string_to_u16string(const std::string& src);
 
 class Fixture : public testing::Test {
    public:
-    void SetUp() {
+    void SetUp() override {
         ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env,
                                        &m_conn, &m_hstmt, true, true));
     }
-    void TearDown() {
+    void TearDown() override {
         ASSERT_NO_THROW(CloseCursor(&m_hstmt, true, true));
         SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
         SQLDisconnect(m_conn);

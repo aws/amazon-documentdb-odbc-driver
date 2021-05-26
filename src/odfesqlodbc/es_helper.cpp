@@ -96,44 +96,6 @@ void StopRetrieval(void* conn, StatementClass* stmt) {
     static_cast< Communication* >(conn)->StopResultRetrieval(stmt);
 }
 
-BOOL AllocateMutexForConditionVariable(StatementClass* stmt) {
-    if (stmt != NULL) {
-        if (stmt->cv_mutex == NULL) {
-            auto new_cv_mutex = new std::mutex();
-            stmt->cv_mutex = new_cv_mutex;
-        }
-        return true;
-    }
-    return false;
-}
-
-void DeallocateMutexForConditionVariable(StatementClass* stmt) {
-    if (stmt->cv_mutex != NULL) {
-        auto ptr = static_cast< std::mutex* >(stmt->cv_mutex);
-        delete ptr;
-        stmt->cv_mutex = NULL;
-    }
-}
-
-BOOL AllocateConditionVariable(StatementClass* stmt) {
-    if (stmt != NULL) {
-        if (stmt->cv == NULL) {
-            auto new_cv = new std::condition_variable();
-            stmt->cv = new_cv;
-        }
-        return true;
-    }
-    return false;
-}
-
-void DeallocateConditionVariable(StatementClass* stmt) {
-    if (stmt->cv != NULL) {
-        auto ptr = static_cast< std::condition_variable* >(stmt->cv);
-        delete ptr;
-        stmt->cv = NULL;
-    }
-}
-
 // This class provides a cross platform way of entering critical sections
 class CriticalSectionHelper {
    public:

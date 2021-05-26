@@ -177,20 +177,12 @@ SQLRETURN GetNextResultSet(StatementClass *stmt) {
     
     PrefetchQueue *pPrefetchQueue = GetPrefetchQueue(cc->conn, stmt);
     if (pPrefetchQueue != nullptr && !pPrefetchQueue->IsEmpty()) {
-        std::mutex *mx = static_cast< std::mutex * >(stmt->cv_mutex);
-        std::condition_variable *cv = static_cast< std::condition_variable * >(stmt->cv);
-        {
-            std::unique_lock< std::mutex > lock(*mx);
-            cv->wait(lock, [&]() {
-                return pPrefetchQueue->FrontIsReady() || !stmt->retrieving;
-            });
-        }
-        if (pPrefetchQueue->FrontIsReady()) {
+        if (pPrefetchQueue->WaitForReadinessOfFront()) {
             auto outcome = pPrefetchQueue->Front();
             pPrefetchQueue->Pop();
             if (outcome.IsSuccess()) {
                 if (!outcome.GetResult().GetNextToken().empty()
-                    && stmt->retrieving) {
+                    && pPrefetchQueue->IsRetrieving()) {
                     QR_set_next_token(
                         q_res, outcome.GetResult().GetNextToken().c_str());
                 } else {
@@ -201,16 +193,19 @@ SQLRETURN GetNextResultSet(StatementClass *stmt) {
                 CC_Append_Table_Data(outcome, q_res, *(q_res->fields));
                 return SQL_SUCCESS;
             } else {
+                QR_set_next_token(q_res, NULL);
                 SC_set_error(stmt, STMT_EXEC_ERROR,
                              outcome.GetError().GetMessage().c_str(), func);
                 return SQL_ERROR;
             }
         } else {
+            QR_set_next_token(q_res, NULL);
             SC_set_error(stmt, STMT_OPERATION_CANCELLED, "Operation cancelled",
                          func);
             return SQL_ERROR;
         }
     } else {
+        QR_set_next_token(q_res, NULL);
         if (pPrefetchQueue == nullptr) {
             SC_set_error(stmt, STMT_INTERNAL_ERROR,
                          "PrefetchQueue is not found", func);
@@ -283,16 +278,7 @@ QResultClass *SendQueryGetResult(StatementClass *stmt, BOOL commit) {
 
     PrefetchQueue *pPrefetchQueue = GetPrefetchQueue(cc->conn, stmt);
     if (pPrefetchQueue != nullptr && !pPrefetchQueue->IsEmpty()) {
-        std::mutex *mx = static_cast< std::mutex * >(stmt->cv_mutex);
-        std::condition_variable *cv =
-            static_cast< std::condition_variable * >(stmt->cv);
-        {
-            std::unique_lock< std::mutex > lock(*mx);
-            cv->wait(lock, [&]() {
-                return pPrefetchQueue->FrontIsReady() || !stmt->retrieving;
-            });
-        }
-        if (pPrefetchQueue->FrontIsReady()) {
+        if (pPrefetchQueue->WaitForReadinessOfFront()) {
             bool success = false;
             if (commit) {
                 auto outcome = pPrefetchQueue->Front();
@@ -352,16 +338,7 @@ RETCODE AssignResult(StatementClass *stmt) {
     ConnectionClass *cc = SC_get_conn(stmt);
     PrefetchQueue *pPrefetchQueue = GetPrefetchQueue(cc->conn, stmt);
     if (pPrefetchQueue != nullptr && !pPrefetchQueue->IsEmpty()) {
-        std::mutex *mx = static_cast< std::mutex * >(stmt->cv_mutex);
-        std::condition_variable *cv =
-            static_cast< std::condition_variable * >(stmt->cv);
-        {
-            std::unique_lock< std::mutex > lock(*mx);
-            cv->wait(lock, [&]() {
-                return pPrefetchQueue->FrontIsReady() || !stmt->retrieving;
-            });
-        }
-        if (pPrefetchQueue->FrontIsReady()) {
+        if (pPrefetchQueue->WaitForReadinessOfFront()) {
             auto outcome = pPrefetchQueue->Front();
             pPrefetchQueue->Pop();
             if (outcome.IsSuccess()) {
