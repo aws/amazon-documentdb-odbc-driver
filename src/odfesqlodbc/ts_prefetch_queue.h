@@ -20,21 +20,81 @@
 #include <future>
 #include <aws/timestream-query/TimestreamQueryClient.h>
 
+/**
+ * PrefetchQueue class for query
+ */
 class PrefetchQueue {
    public:
-    void Push(std::shared_future< Aws::TimestreamQuery::Model::QueryOutcome > future_outcome);
-	
+    /**
+     * The max capacity of the queue
+     */
+    static constexpr int CAPACITY = 2;
+    /**
+     * Push function
+     * @param future_outcome std::shared_future< Aws::TimestreamQuery::Model::QueryOutcome >
+     * @return bool
+     */
+    bool Push(std::shared_future< Aws::TimestreamQuery::Model::QueryOutcome > future_outcome);
+    /**
+     * Pop function
+     * @return void
+     */
     void Pop();
-	
+    /**
+     * Front function
+     * @return Aws::TimestreamQuery::Model::QueryOutcome
+     */
     Aws::TimestreamQuery::Model::QueryOutcome Front();
-
-    bool FrontIsReady();
-	
+    /**
+     * Check the readiness of the front
+     * It could be interrupted by if the caller cancels
+     * @return bool
+     */
+    bool WaitForReadinessOfFront();
+    /**
+     * IsEmpty function
+     * @return bool
+     */
     bool IsEmpty();
-	
-    void Clear();
+    /**
+     * Reset the queue
+     * @return void
+     */
+    void Reset();
+    /**
+     * Set retrieving
+     * @param retrieving_ bool
+     * @return void
+     */
+    void SetRetrieving(bool retrieving_);
+    /**
+     * Is retrieving
+     * @return bool
+     */
+    bool IsRetrieving();
+    /**
+     * Notify one thread that something is changed
+     * @return void
+     */
+    void NotifyOne();
 	
    private:
-    std::queue< std::shared_future< Aws::TimestreamQuery::Model::QueryOutcome > > q;
+    /**
+     * The queue storing the future object
+     * If future object is not ready, it means AWS is still processing the corresponding query request
+     */
+    std::queue< std::shared_future< Aws::TimestreamQuery::Model::QueryOutcome > > queue;
+    /**
+     * If true, it is in retrieving state
+     */
+    bool retrieving;
+    /**
+     * Mutex for protection
+     */
+    std::mutex mutex;
+    /**
+     * Conditional variable for signalling
+     */
+    std::condition_variable condition_variable;
 };
 #endif

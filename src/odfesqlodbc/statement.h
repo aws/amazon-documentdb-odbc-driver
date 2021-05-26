@@ -299,9 +299,6 @@ struct StatementClass_ {
     NeedDataCallback *callbacks;
     void *cs;
     char *query_id;
-    BOOL retrieving;
-    void *cv_mutex;
-    void *cv;
 };
 
 #define SC_get_conn(a) ((a)->hdbc)
