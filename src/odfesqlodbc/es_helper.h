@@ -40,10 +40,6 @@ BOOL ExecDirect(void* conn, StatementClass* stmt, const char* statement);
 BOOL CancelQuery(StatementClass* stmt);
 void Disconnect(void* conn);
 void StopRetrieval(void* conn, StatementClass* stmt);
-BOOL AllocateMutexForConditionVariable(StatementClass* stmt);
-void DeallocateMutexForConditionVariable(StatementClass* stmt);
-BOOL AllocateConditionVariable(StatementClass* stmt);
-void DeallocateConditionVariable(StatementClass* stmt);
 #ifdef __cplusplus
 }
 #endif
