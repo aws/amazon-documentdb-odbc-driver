@@ -15,31 +15,69 @@
  */
 #include "ts_prefetch_queue.h"
 
-
-void PrefetchQueue::Push(std::shared_future< Aws::TimestreamQuery::Model::QueryOutcome > future_outcome) {
-	q.push(std::move(future_outcome));
+bool PrefetchQueue::Push(std::shared_future< Aws::TimestreamQuery::Model::QueryOutcome > future_outcome) {
+    std::unique_lock< std::mutex > lock(mutex);
+    condition_variable.wait(
+        lock, [&]() { return queue.size() < CAPACITY || !retrieving; });
+    if (retrieving) {
+        queue.push(std::move(future_outcome));
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void PrefetchQueue::Pop() {
-	q.pop();
+    {
+        std::unique_lock< std::mutex > lock(mutex);
+        queue.pop();
+        if (queue.empty()) {
+            retrieving = false;
+        }
+    }
+    condition_variable.notify_one();
 }
 
 Aws::TimestreamQuery::Model::QueryOutcome PrefetchQueue::Front() {
-	auto outcome = q.front().get();
-	return outcome;
+    auto outcome = queue.front().get();
+    return outcome;
 }
 
-bool PrefetchQueue::FrontIsReady() {
-    auto status = q.front().wait_for(std::chrono::milliseconds(1));
-    return status == std::future_status::ready;	
+bool PrefetchQueue::WaitForReadinessOfFront() {
+    std::unique_lock< std::mutex > lock(mutex);
+    condition_variable.wait(lock, [&]() { 
+        return std::future_status::ready
+                   == queue.front().wait_for(std::chrono::milliseconds(1))
+            || !retrieving;
+    });
+    return retrieving;
 }
 
 bool PrefetchQueue::IsEmpty() {
-	return q.empty();
+    return queue.empty();
 }
 
-void PrefetchQueue::Clear() {
-	while (!q.empty()) {
-		q.pop();
+void PrefetchQueue::Reset() {
+    std::unique_lock< std::mutex > lock(mutex);
+    while (!queue.empty()) {
+        queue.pop();
 	}
+    retrieving = false;
+    condition_variable.notify_one();
+}
+
+void PrefetchQueue::SetRetrieving(bool retrieving_) {
+    {
+        std::unique_lock< std::mutex > lock(mutex);
+        retrieving = retrieving_;
+    }
+    condition_variable.notify_one();
+}
+
+bool PrefetchQueue::IsRetrieving() {
+    return retrieving;
+}
+
+void PrefetchQueue::NotifyOne() {
+    condition_variable.notify_one();
 }

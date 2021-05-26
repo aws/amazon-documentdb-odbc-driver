@@ -347,10 +347,6 @@ StatementClass *SC_Constructor(ConnectionClass *conn) {
         rv->lock_CC_for_rb = FALSE;
         INIT_STMT_CS(rv);
         rv->query_id = NULL;
-        rv->cv_mutex = NULL;
-        rv->cv = NULL;
-        AllocateMutexForConditionVariable(rv);
-        AllocateConditionVariable(rv);
     }
     return rv;
 }
@@ -396,8 +392,6 @@ char SC_Destructor(StatementClass *self) {
     cancelNeedDataState(self);
     if (self->callbacks)
         free(self->callbacks);
-    DeallocateMutexForConditionVariable(self);
-    DeallocateConditionVariable(self);
     DELETE_STMT_CS(self);
     free(self);
     self = NULL;
