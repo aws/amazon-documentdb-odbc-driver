@@ -34,10 +34,13 @@ extern "C" {
 // const char* is used instead of string for the cursor, because a NULL cursor
 // is sometimes used Cannot pass q_res as reference because it breaks qresult.h
 // macros that expect to use -> operator
-BOOL CC_from_TSResult(QResultClass *q_res, ConnectionClass *conn,
-                      const char *next_token,
-                      const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
-BOOL CC_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
+BOOL CC_from_TSResult(
+    QResultClass *q_res, ConnectionClass *conn, StatementClass *stmt,
+    const char *next_token,
+    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
+BOOL CC_Metadata_from_TSResult(
+    QResultClass *q_res, ConnectionClass *conn, StatementClass *stmt,
+    const char *next_token,
     const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
 BOOL CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
     const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
