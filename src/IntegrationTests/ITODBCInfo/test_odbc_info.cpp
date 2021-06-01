@@ -15,6 +15,11 @@
  */
 
 // clang-format off
+#ifdef WIN32
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#endif
 #include "pch.h"
 #include "unit_test_helper.h"
 #include "it_odbc_helper.h"
@@ -149,7 +154,7 @@ std::wstring version =
         .from_bytes(TIMESTREAMDRIVERVERSION);
 TEST_SQL_GET_INFO_STRING(SQLDriverVer, SQL_DRIVER_VER, version);
 
-TEST_SQL_GET_INFO_UINT16(SQLGetDataExtensions, SQL_GETDATA_EXTENSIONS,
+TEST_SQL_GET_INFO_UINT_MASK(SQLGetDataExtensions, SQL_GETDATA_EXTENSIONS,
                          (SQL_GD_ANY_COLUMN | SQL_GD_ANY_ORDER | SQL_GD_BOUND
                           | SQL_GD_BLOCK));
 TEST_SQL_GET_INFO_STRING(SQLSearchPatternEscape, SQL_SEARCH_PATTERN_ESCAPE,
@@ -292,6 +297,12 @@ TEST_SQL_GET_INFO_UINT16(SQLMaxColumnsInOrderBy, SQL_MAX_COLUMNS_IN_ORDER_BY,
 TEST_SQL_GET_INFO_UINT16(SQLMaxColumnsInSelect, SQL_MAX_COLUMNS_IN_SELECT, 0);
 
 int main(int argc, char** argv) {
+#ifdef WIN32
+    // Enable CRT for detecting memory leaks
+    _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG | _CRTDBG_MODE_FILE);
+    _CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDERR);
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 #ifdef __APPLE__
     // Enable malloc logging for detecting memory leaks.
     system("export MallocStackLogging=1");
