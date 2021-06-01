@@ -904,7 +904,7 @@ RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
     } else {
         /* numeric data */
         if (rgbInfoValue) {
-            if (len == sizeof(SQLSMALLINT))
+            if (len == sizeof(SQLUSMALLINT))
                 *((SQLUSMALLINT *)rgbInfoValue) = (SQLUSMALLINT)value;
             else if (len == sizeof(SQLINTEGER))
                 *((SQLUINTEGER *)rgbInfoValue) = (SQLUINTEGER)value;
