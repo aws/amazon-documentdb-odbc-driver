@@ -895,10 +895,11 @@ API_Tables(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                             static_cast< size_t >(indicator));
                         if (!table_type_filter) {
                             if (is_search_pattern
-                                || std::equal(table_name_return.begin(),
+                                || (table_name.size() >= table_name_return.size() &&
+                                    std::equal(table_name_return.begin(),
                                               table_name_return.end(),
                                               table_name.begin(),
-                                              case_insensitive_compare)) {
+                                              case_insensitive_compare))) {
                                 TupleField *tuple = QR_AddNew(res);
                                 tuple[TABLES_CATALOG_NAME].value =
                                     strdup(database.c_str());
@@ -1079,10 +1080,11 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                     && !std::regex_match(column_name_return, regex_pattern)) {
                     continue;
                 } else if (!is_search_pattern
-                           && !std::equal(column_name_return.begin(),
+                           && (column_name.size() < column_name_return.size() ||
+                                !std::equal(column_name_return.begin(),
                                           column_name_return.end(),
                                           column_name.begin(),
-                                          case_insensitive_compare)) {
+                                          case_insensitive_compare))) {
                     continue;
                 }
 
