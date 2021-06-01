@@ -34,13 +34,39 @@ bool _CC_Metadata_from_TSResult(
     const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
 bool _CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
     const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
+
+/**
+ * Responsible for looping through columns, allocating memory for column fields
+ * and setting column info
+ * @param q_res QResultClass to set column info
+ * @param ts_result Timestream query outcome to get column info
+ * @return true if successfully assigned
+ */
 bool AssignColumnHeaders(QResultClass *q_res,
     const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
+
+/**
+ * Responsible for looping through rows, allocating tuples and passing rows for
+ * assignment
+ * @param ts_result Timestream query outcome to get rows
+ * @param q_res QResultClass to hold tuples
+ * @param fields ColumnInfoClass to get information about columns
+ * @return true if successfully assigned
+ */
 bool AssignTableData(const Aws::TimestreamQuery::Model::QueryOutcome &ts_result,
                      QResultClass *q_res, ColumnInfoClass &fields);
+
+/**
+ * Responsible for assigning the current row data to tuples
+ * @param row Timestream row object
+ * @param q_res QResultClass to hold tuples
+ * @param fields ColumnInfoClass to get information about columns
+ * @param col_size size of the column
+ * @return true if successfully assigned
+ */
 bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
                    QResultClass *q_res, ColumnInfoClass &fields,
-                   const size_t &row_size);
+                   const size_t &col_size);
 void UpdateResultFields(QResultClass *q_res, const ConnectionClass *conn,
                         const SQLULEN starting_cached_rows, const char *next_token,
                         std::string &command_type);
@@ -49,36 +75,44 @@ void SetError(const char *err);
 void ClearError();
 
 /**
- * Parse datum
- * @param datum const Aws::TimestreamQuery::Model::Datum > &
- * @param datum_value std::string &
- * @param column_attr_id OID
+ * Recursively parse the Timestream datum object to intermidiate string
+ * representation for further conversion.
+ * @param datum Timestream Datum object to be parsed
+ * @param datum_value String representation of the datum to fill in recursively
+ * @param column_attr_id Column attribute ID
  */
 void ParseDatum(const Aws::TimestreamQuery::Model::Datum &datum,
                 std::string &datum_value, OID column_attr_id);
 
 /**
- * Parse array
- * @param datums const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &
- * @param array_value std::string &
- * @param column_attr_id OID
+ * Parse Timestream array object to intermidiate string
+ * representation for further conversion.
+ * e.g. ARRAY[1.1, 2.3] -> [1.1, 2.3]
+ * @param datums An array of Timestream Datum objects to be parsed
+ * @param array_value String representation of the datum to fill in recursively
+ * @param column_attr_id Column attribute ID
  */
 void ParseArray(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
                 std::string &array_value, OID column_attr_id);
+
 /**
- * Parse row
- * @param datums const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &
- * @param row_value std::string &
- * @param column_attr_id OID
+ * Parse Timestream row object to intermidiate string
+ * representation for further conversion.
+ * e.g. ROW(INTEGER '03', BIGINT '10', true) -> (3, 10, true)
+ * @param datums An array of Timestream Datum objects to be parsed
+ * @param row_value String representation of the datum to fill in recursively
+ * @param column_attr_id Column attribute ID
  */
 void ParseRow(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
               std::string &row_value, OID column_attr_id);
 
 /**
- * Parse time series
- * @param series const Aws::Vector< Aws::TimestreamQuery::Model::TimeSeriesDataPoint > &
- * @param timeseries_value std::string &
- * @param column_attr_id OID
+ * Parse Timestream timeseries object to intermidiate string
+ * representation for further conversion.
+ * e.g. timeseries[row(timestamp, T,...)] -> [{time: 2021-03-05 14:18:30.123456789, value: [1, 2, 3]}]
+ * @param series An array of Timestream TimeSeriesDataPoint objects to be parsed
+ * @param timeseries_value String representation of the datum to fill in recursively
+ * @param column_attr_id Column attribute ID
  */
 void ParseTimeSeries(const Aws::Vector< Aws::TimestreamQuery::Model::TimeSeriesDataPoint >  &series,
     std::string &timeseries_value, OID column_attr_id);
@@ -375,18 +409,17 @@ bool AssignColumnHeaders(QResultClass *q_res,
     return true;
 }
 
-// Responsible for looping through rows, allocating tuples and passing rows for
-// assignment
 bool AssignTableData(const Aws::TimestreamQuery::Model::QueryOutcome &outcome,
                      QResultClass *q_res, ColumnInfoClass &fields) {
     auto rows = outcome.GetResult().GetRows();
-    for (const auto& row : rows) {
+    auto col_size = outcome.GetResult().GetColumnInfo().size();
+    for (const auto &row : rows) {
         // Setup memory to receive tuple
         if (!QR_prepare_for_tupledata(q_res))
             return false;
 
         // Assign row data
-        if (!AssignRowData(row, q_res, fields, outcome.GetResult().GetColumnInfo().size()))
+        if (!AssignRowData(row, q_res, fields, col_size))
             return false;
     }
     return true;
@@ -480,7 +513,6 @@ void ParseTimeSeries(const Aws::Vector< Aws::TimestreamQuery::Model::TimeSeriesD
     timeseries_value += "]";
 }
 
-// Responsible for assigning row data to tuples
 bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
                    QResultClass *q_res, ColumnInfoClass &fields,
                    const size_t &col_size) {
