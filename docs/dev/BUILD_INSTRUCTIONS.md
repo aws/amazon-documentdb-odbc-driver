@@ -53,7 +53,6 @@ An installer named as `AmazonTimestreamODBC<Bitness>-<version>.msi` will be gene
 
 
 ## Mac
-(TODO: upgrade build scripts & documentation for Mac)
 
 ### Dependencies
 
@@ -88,15 +87,16 @@ Installer named as `AmazonTimestreamODBC-<version>.pkg` will be generated in the
 
 **BUILD_WITH_TESTS**
 
-(Defaults to ON) If disabled, all tests and and test dependencies will be excluded from build which will optimize the installer package size. This option can set with the command line (using `-D`).
+(Defaults to ON) If disabled, all tests and test dependencies will be excluded from build which will optimize the installer package size. This option can set with the command line (using `-D` for example `-D BUILD_WITH_TESTS=OFF`).
 
 ### Setting up a DSN
 
 A **D**ata **S**ouce **N**ame is used to store driver information in the system. By storing the information in the system, the information does not need to be specified each time the driver connects.
 
 #### Windows
+The DSN can be setup for Windows using the 32-bit or 64-bit version of the ODBC database manager.
 
-> To setup DSN, add following keys in the Registry
+> If not using the ODBC database manager, add the following keys in the Registry
 >
    >* **HKEY_LOCAL_MACHINE/SOFTWARE/ODBC/ODBC.INI** : Contains a key for each Data Source Name (DSN)
    >* **HKEY_LOCAL_MACHINE/SOFTWARE/ODBC/ODBC.INI/ODBC Data Sources** : Lists the data sources
