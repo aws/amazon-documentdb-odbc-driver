@@ -87,7 +87,7 @@ Installer named as `AmazonTimestreamODBC-<version>.pkg` will be generated in the
 
 **BUILD_WITH_TESTS**
 
-(Defaults to ON) If disabled, all tests and and test dependencies will be excluded from build which will optimize the installer package size. This option can set with the command line (using `-D` for example `-D BUILD_WITH_TESTS=OFF`).
+(Defaults to ON) If disabled, all tests and test dependencies will be excluded from build which will optimize the installer package size. This option can set with the command line (using `-D` for example `-D BUILD_WITH_TESTS=OFF`).
 
 ### Setting up a DSN
 
