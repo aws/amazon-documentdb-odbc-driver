@@ -23,9 +23,9 @@
 #include <time.h>
 
 #include "dlg_specific.h"
-#include "es_helper.h"
-#include "es_odbc.h"
+#include "helper.h"
 #include "misc.h"
+#include "odbc.h"
 
 #ifdef __APPLE__
 #include <mach-o/dyld.h>

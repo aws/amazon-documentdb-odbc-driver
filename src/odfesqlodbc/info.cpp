@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  *
  */
-#include "es_info.h"
+#include "info.h"
 
 #include <stdio.h>
 #include <string.h>

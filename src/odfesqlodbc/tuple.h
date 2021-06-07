@@ -17,7 +17,7 @@
 #ifndef __TUPLE_H__
 #define __TUPLE_H__
 
-#include "es_odbc.h"
+#include "odbc.h"
 
 // C Interface
 #ifdef __cplusplus

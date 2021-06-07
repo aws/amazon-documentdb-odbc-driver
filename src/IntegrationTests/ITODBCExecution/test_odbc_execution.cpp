@@ -524,7 +524,7 @@ TEST_F(TestSQLCancel, QueryInProgress) {
     Sleep(1000);
 }
 
-// The following test case needs to change the logic of ts_communication before running.
+// The following test case needs to change the logic of odbc_communication before running.
 // The objective of the test is to simulate a long query in SQLExecDirect
 // and caller issues a SQLCancel to cancel the operation
 // We need to add a sleep e.g. Sleep(1000) in the first line of function QueryCallback to

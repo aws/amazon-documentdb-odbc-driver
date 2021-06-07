@@ -18,7 +18,7 @@
 
 #include <ctype.h>
 
-#include "es_apifunc.h"
+#include "apifunc.h"
 #include "misc.h"
 
 #define NULL_IF_NULL(a) ((a) ? ((const char *)(a)) : "(null)")

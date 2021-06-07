@@ -22,9 +22,9 @@
 #include <time.h>
 
 #include "descriptor.h"
-#include "es_helper.h"
-#include "es_odbc.h"
-#include "es_utility.h"
+#include "helper.h"
+#include "odbc.h"
+#include "utility.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -17,8 +17,8 @@
 #include "saml_credentials_provider.h"
 
 // clang-format off
-#include "es_odbc.h"
 #include "mylog.h"
+#include "odbc.h"
 #include <aws/sts/STSClient.h>
 #include <aws/sts/model/AssumeRoleWithSAMLRequest.h>
 // clang-format on

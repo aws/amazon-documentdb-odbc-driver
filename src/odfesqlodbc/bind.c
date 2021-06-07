@@ -19,14 +19,14 @@
 #include <ctype.h>
 #include <string.h>
 
+#include "apifunc.h"
 #include "descriptor.h"
 #include "environ.h"
-#include "es_apifunc.h"
-#include "es_types.h"
 #include "misc.h"
 #include "multibyte.h"
 #include "qresult.h"
 #include "statement.h"
+#include "types.h"
 
 /*	Associate a user-supplied buffer with a database column. */
 RETCODE SQL_API API_BindCol(HSTMT hstmt, SQLUSMALLINT icol,

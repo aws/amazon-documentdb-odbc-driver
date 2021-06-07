@@ -18,8 +18,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "es_apifunc.h"
-#include "es_connection.h"
+#include "apifunc.h"
+#include "connection.h"
 #include "misc.h"
 #include "multibyte.h"
 #ifndef WIN32

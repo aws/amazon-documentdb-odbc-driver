@@ -16,7 +16,7 @@
 
 #ifdef WIN32
 #include "elasticenlist.h"
-#include "es_odbc.h"
+#include "odbc.h"
 #include "loadlib.h"
 #include "misc.h"  // strncpy_null
 
@@ -27,8 +27,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "apifunc.h"
 #include "dlg_specific.h"
-#include "es_apifunc.h"
 #include "resource.h"
 #include "win_setup.h"
 

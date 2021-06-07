@@ -14,7 +14,7 @@
  *
  */
 
-#include "es_odbc.h"
+#include "odbc.h"
 #include "unicode_support.h"
 
 #include <stdio.h>
@@ -25,21 +25,21 @@
 #endif
 
 #include "dlg_specific.h"
-#include "es_types.h"
 #include "tuple.h"
+#include "types.h"
 
+#include "apifunc.h"
 #include "bind.h"
 #include "catfunc.h"
+#include "connection.h"
 #include "environ.h"
-#include "es_apifunc.h"
-#include "es_connection.h"
-#include "es_info.h"
-#include "es_types.h"
+#include "info.h"
 #include "misc.h"
 #include "multibyte.h"
 #include "qresult.h"
 #include "statement.h"
 #include "tuple.h"
+#include "types.h"
 
 /*	Trigger related stuff for SQLForeign Keys */
 #define TRIGGER_SHIFT 3
@@ -934,8 +934,7 @@ cleanup:
     estype_attr_buffer_length(conn, esType, ES_ATP_UNSET, ES_ADT_UNSET, \
                               ES_UNKNOWNS_UNSET)
 #define ESTYPE_DECIMAL_DIGITS(conn, esType)                              \
-    estype_attr_decimal_digits(conn, esType, ES_ATP_UNSET, ES_ADT_UNSET, \
-                               ES_UNKNOWNS_UNSET)
+    estype_attr_decimal_digits(conn, esType, ES_ATP_UNSET)
 #define ESTYPE_TRANSFER_OCTET_LENGTH(conn, esType)                \
     estype_attr_transfer_octet_length(conn, esType, ES_ATP_UNSET, \
                                       ES_UNKNOWNS_UNSET)
@@ -1262,8 +1261,7 @@ char *identifierEscape(const SQLCHAR *src, SQLLEN srclen,
     estype_attr_buffer_length(conn, esType, atttypmod, ES_ADT_UNSET, \
                               ES_UNKNOWNS_UNSET)
 #define ESTYPE_ATTR_DECIMAL_DIGITS(conn, esType, atttypmod)           \
-    estype_attr_decimal_digits(conn, esType, atttypmod, ES_ADT_UNSET, \
-                               ES_UNKNOWNS_UNSET)
+    estype_attr_decimal_digits(conn, esType, atttypmod)
 #define ESTYPE_ATTR_TRANSFER_OCTET_LENGTH(conn, esType, atttypmod) \
     estype_attr_transfer_octet_length(conn, esType, atttypmod,     \
                                       ES_UNKNOWNS_UNSET)

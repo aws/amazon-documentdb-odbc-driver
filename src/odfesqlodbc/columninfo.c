@@ -15,12 +15,12 @@
  */
 
 #include "columninfo.h"
-#include "es_types.h"
+#include "types.h"
 
 #include <stdlib.h>
 #include <string.h>
-#include "es_apifunc.h"
-#include "es_connection.h"
+#include "apifunc.h"
+#include "connection.h"
 
 ColumnInfoClass *CI_Constructor(void) {
     ColumnInfoClass *rv;

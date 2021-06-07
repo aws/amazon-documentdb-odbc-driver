@@ -20,10 +20,11 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #endif
+
+#include "odbc_communication.h"
+#include "okta_credentials_provider.h"
 #include "pch.h"
 #include "unit_test_helper.h"
-#include "ts_communication.h"
-#include "okta_credentials_provider.h"
 // clang-format on
 
 TEST(TestConnectionOptions, Good) {

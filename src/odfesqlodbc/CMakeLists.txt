@@ -41,21 +41,21 @@ set(C_SOURCE_FILES	bind.c
 					odbcapi.c
 					odbcapiw.c
 					win_unicode.c
-					es_api30.c
-					es_types.c
-					es_odbc.c)
+					api30.c
+					types.c
+					odbc.c)
 
 set(CPP_SOURCE_FILES	communication.cpp
-						es_connection.cpp
-						es_driver_connect.cpp
-						es_helper.cpp
-						es_info.cpp
-						es_parse_result.cpp
-						es_semaphore.cpp
-						es_statement.cpp
-						es_utility.cpp
-						ts_communication.cpp
-						ts_prefetch_queue.cpp
+						connection.cpp
+						driver_connect.cpp
+						helper.cpp
+						info.cpp
+						parse_result.cpp
+						semaphore.cpp
+						odbc_statement.cpp
+						utility.cpp
+						odbc_communication.cpp
+						prefetch_queue.cpp
 						saml_credentials_provider.cpp
 						aad_credentials_provider.cpp
 						okta_credentials_provider.cpp)
@@ -84,19 +84,19 @@ set(C_HEADER_FILES	bind.h
 					win_setup.h)
 	
 set(CPP_HEADER_FILES	communication.h
-						es_apifunc.h
-						es_connection.h
-						es_driver_connect.h
-						es_helper.h
-						es_info.h
-						es_odbc.h
-						es_parse_result.h
-						es_semaphore.h
-						es_statement.h
-						es_types.h
-						es_utility.h
-						ts_communication.h
-						ts_prefetch_queue.h
+						apifunc.h
+						connection.h
+						driver_connect.h
+						helper.h
+						info.h
+						odbc.h
+						parse_result.h
+						semaphore.h
+						odbc_statement.h
+						types.h
+						utility.h
+						odbc_communication.h
+						prefetch_queue.h
 						saml_credentials_provider.h
 						aad_credentials_provider.h
 						okta_credentials_provider.h
