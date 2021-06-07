@@ -32,7 +32,7 @@
 #define DEFAULT_TYPE_INT (SQL_WVARCHAR)
 #define EMPTY_VARCHAR \
     { '\0' }
-#define ES_UNINITIALIZED (-2)
+#define TS_UNINITIALIZED (-2)
 #define COLUMN_TEMPLATE_COUNT 18
 #define TABLE_TEMPLATE_COUNT 5
 
@@ -112,7 +112,7 @@ const std::unordered_map< std::string, int > data_name_data_type_map = {
 class BindTemplate {
    public:
     BindTemplate(const bool can_be_null, const SQLUSMALLINT ordinal)
-        : m_len(ES_UNINITIALIZED), m_ordinal(ordinal) {
+        : m_len(TS_UNINITIALIZED), m_ordinal(ordinal) {
         if (!can_be_null)
             throw std::runtime_error(
                 "Do not use this constructor for values that can be NULL. A "
@@ -120,23 +120,23 @@ class BindTemplate {
                 "supplied default value must be used if value can be NULL.");
     }
     BindTemplate(const bool can_be_null, const SQLUSMALLINT ordinal, const Int2)
-        : m_len(ES_UNINITIALIZED), m_ordinal(ordinal) {
+        : m_len(TS_UNINITIALIZED), m_ordinal(ordinal) {
         (void)(can_be_null);
     }
     BindTemplate(const bool can_be_null, const SQLUSMALLINT ordinal, const Int4)
-        : m_len(ES_UNINITIALIZED), m_ordinal(ordinal) {
+        : m_len(TS_UNINITIALIZED), m_ordinal(ordinal) {
         (void)(can_be_null);
     }
     BindTemplate(const bool can_be_null, const SQLUSMALLINT ordinal,
                  const std::vector< SQLCHAR > &)
-        : m_len(ES_UNINITIALIZED), m_ordinal(ordinal) {
+        : m_len(TS_UNINITIALIZED), m_ordinal(ordinal) {
         (void)(can_be_null);
     }
     virtual ~BindTemplate() {
     }
 
     SQLPOINTER GetData() {
-        if (m_len == ES_UNINITIALIZED)
+        if (m_len == TS_UNINITIALIZED)
             throw std::runtime_error(
                 "Length is uninitialized - Fetch must be executed before data "
                 "is retreived.");
@@ -1256,7 +1256,7 @@ RETCODE SetTypeResult(ConnectionClass *conn, StatementClass *stmt,
     // 2. GETTYPE_DATA_TYPE [cannot be null]
     set_tuplefield_int2(&tuple[GETTYPE_DATA_TYPE], static_cast< short >(sqlType));
     // 3. GETTYPE_COLUMN_SIZE
-    set_nullfield_int4( &tuple[GETTYPE_COLUMN_SIZE], tstype_attr_column_size(conn, esType, ES_ATP_UNSET, ES_ADT_UNSET, ES_UNKNOWNS_UNSET));
+    set_nullfield_int4( &tuple[GETTYPE_COLUMN_SIZE], tstype_attr_column_size(conn, esType, TS_ATP_UNSET, TS_ADT_UNSET, TS_UNKNOWNS_UNSET));
     // 4. GETTYPE_LITERAL_PREFIX
     set_nullfield_string(&tuple[GETTYPE_LITERAL_PREFIX], tstype_literal_prefix(conn, esType));
     // 5. GETTYPE_LITERAL_SUFFIX
@@ -1284,7 +1284,7 @@ RETCODE SetTypeResult(ConnectionClass *conn, StatementClass *stmt,
     // 16. GETTYPE_SQL_DATA_TYPE [cannot be null]
     set_tuplefield_int2(&tuple[GETTYPE_SQL_DATA_TYPE], static_cast< short >(sqlType));
     // 17. GETTYPE_SQL_DATETIME_SUB
-    set_nullfield_int2(&tuple[GETTYPE_SQL_DATETIME_SUB], tstype_attr_to_datetime_sub(conn, esType, ES_ATP_UNSET));
+    set_nullfield_int2(&tuple[GETTYPE_SQL_DATETIME_SUB], tstype_attr_to_datetime_sub(conn, esType, TS_ATP_UNSET));
     // 18. GETTYPE_NUM_PREC_RADIX
     set_nullfield_int4(&tuple[GETTYPE_NUM_PREC_RADIX], tstype_radix(conn, esType));
     // 19. GETTYPE_INTERVAL_PRECISION

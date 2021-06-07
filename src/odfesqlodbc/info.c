@@ -357,7 +357,7 @@ RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
         case SQL_MAX_TABLE_NAME_LEN: /* ODBC 1.0 */
             len = 2;
             // TO-DO
-            if (ES_VERSION_GT(conn, 7.4))
+            if (VERSION_GT(conn, 7.4))
                 value = CC_get_max_idlen(conn);
 #ifdef MAX_TABLE_LEN
             else
@@ -922,24 +922,24 @@ cleanup:
  *	macros for estype_xxxx() calls which have ES_ATP_UNSET parameters
  */
 #define ESTYPE_COLUMN_SIZE(conn, esType)                              \
-    tstype_attr_column_size(conn, esType, ES_ATP_UNSET, ES_ADT_UNSET, \
-                            ES_UNKNOWNS_UNSET)
+    tstype_attr_column_size(conn, esType, TS_ATP_UNSET, TS_ADT_UNSET, \
+                            TS_UNKNOWNS_UNSET)
 #define ESTYPE_TO_CONCISE_TYPE(conn, esType)                              \
-    estype_attr_to_concise_type(conn, esType, ES_ATP_UNSET, ES_ADT_UNSET, \
-                                ES_UNKNOWNS_UNSET)
+    estype_attr_to_concise_type(conn, esType, TS_ATP_UNSET, TS_ADT_UNSET, \
+                                TS_UNKNOWNS_UNSET)
 #define ESTYPE_TO_SQLDESCTYPE(conn, esType)                              \
-    estype_attr_to_sqldesctype(conn, esType, ES_ATP_UNSET, ES_ADT_UNSET, \
-                               ES_UNKNOWNS_UNSET)
+    estype_attr_to_sqldesctype(conn, esType, TS_ATP_UNSET, TS_ADT_UNSET, \
+                               TS_UNKNOWNS_UNSET)
 #define ESTYPE_BUFFER_LENGTH(conn, esType)                              \
-    estype_attr_buffer_length(conn, esType, ES_ATP_UNSET, ES_ADT_UNSET, \
-                              ES_UNKNOWNS_UNSET)
+    estype_attr_buffer_length(conn, esType, TS_ATP_UNSET, TS_ADT_UNSET, \
+                              TS_UNKNOWNS_UNSET)
 #define ESTYPE_DECIMAL_DIGITS(conn, esType)                              \
-    estype_attr_decimal_digits(conn, esType, ES_ATP_UNSET)
+    estype_attr_decimal_digits(conn, esType, TS_ATP_UNSET)
 #define ESTYPE_TRANSFER_OCTET_LENGTH(conn, esType)                \
-    estype_attr_transfer_octet_length(conn, esType, ES_ATP_UNSET, \
-                                      ES_UNKNOWNS_UNSET)
+    estype_attr_transfer_octet_length(conn, esType, TS_ATP_UNSET, \
+                                      TS_UNKNOWNS_UNSET)
 #define ESTYPE_TO_NAME(conn, esType, auto_increment) \
-    tstype_attr_to_name(conn, esType, ES_ATP_UNSET, auto_increment)
+    tstype_attr_to_name(conn, esType, TS_ATP_UNSET, auto_increment)
 
 RETCODE SQL_API ESAPI_GetFunctions(HDBC hdbc, SQLUSMALLINT fFunction,
                                    SQLUSMALLINT *pfExists) {

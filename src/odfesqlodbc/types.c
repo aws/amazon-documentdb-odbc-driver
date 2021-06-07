@@ -199,7 +199,7 @@ static SQLSMALLINT getTimestampDecimalDigitsX(const ConnectionClass *conn,
     return (SQLSMALLINT)(atttypmod > -1 ? atttypmod : 6);
 }
 
-#ifdef ES_INTERVAL_AS_SQL_INTERVAL
+#ifdef TS_INTERVAL_AS_SQL_INTERVAL
 static SQLSMALLINT getIntervalDecimalDigits(OID type, int atttypmod) {
     Int4 prec;
 
@@ -209,16 +209,16 @@ static SQLSMALLINT getIntervalDecimalDigits(OID type, int atttypmod) {
         return 0;
     return (SQLSMALLINT)((prec = atttypmod & 0xffff) == 0xffff ? 6 : prec);
 }
-#endif  // ES_INTERVAL_AS_SQL_INTERVAL
+#endif  // TS_INTERVAL_AS_SQL_INTERVAL
 
 SQLSMALLINT
 estype_attr_to_concise_type(const ConnectionClass *conn, OID type,
                             int atttypmod, int adtsize_or_longestlen,
                             int handle_unknown_size_as) {
     EnvironmentClass *env = (EnvironmentClass *)CC_get_env(conn);
-#ifdef ES_INTERVAL_AS_SQL_INTERVAL
+#ifdef TS_INTERVAL_AS_SQL_INTERVAL
     SQLSMALLINT sqltype;
-#endif /* ES_INTERVAL_AS_SQL_INTERVAL */
+#endif /* TS_INTERVAL_AS_SQL_INTERVAL */
     BOOL bLongVarchar, bFixed = FALSE;
 
     switch (type) {
@@ -313,7 +313,7 @@ tstype_attr_to_datetime_sub(const ConnectionClass *conn, OID type,
                             int atttypmod) {
     UNUSED(conn, type, atttypmod);
     SQLSMALLINT rettype;
-    switch (rettype = estype_attr_to_concise_type( conn, type, atttypmod, ES_ADT_UNSET, ES_UNKNOWNS_UNSET)) {
+    switch (rettype = estype_attr_to_concise_type( conn, type, atttypmod, TS_ADT_UNSET, TS_UNKNOWNS_UNSET)) {
         case SQL_TYPE_DATE:
             return SQL_CODE_DATE;
         case SQL_TYPE_TIME:
@@ -342,9 +342,9 @@ SQLSMALLINT
 estype_attr_to_ctype(const ConnectionClass *conn, OID type, int atttypmod) {
     UNUSED(atttypmod);
     EnvironmentClass *env = (EnvironmentClass *)CC_get_env(conn);
-#ifdef ES_INTERVAL_AS_SQL_INTERVAL
+#ifdef TS_INTERVAL_AS_SQL_INTERVAL
     SQLSMALLINT ctype;
-#endif /* ES_INTERVAL_A_SQL_INTERVAL */
+#endif /* TS_INTERVAL_A_SQL_INTERVAL */
 
     switch (type) {
         case TS_TYPE_BIGINT:
@@ -481,9 +481,9 @@ Int4 estype_attr_display_size(const ConnectionClass *conn, OID type,
         case TS_TYPE_BIGINT:
             return 20; /* signed: 19 digits + sign */
 
-        case TS_TYPE_DOUBLE: /* a sign, ES_DOUBLE_DIGITS digits, a decimal
+        case TS_TYPE_DOUBLE: /* a sign, TS_DOUBLE_DIGITS digits, a decimal
                                 point, the letter E, a sign, and 3 digits */
-            return (1 + ES_DOUBLE_DIGITS + 1 + 1 + 1 + 3);
+            return (1 + TS_DOUBLE_DIGITS + 1 + 1 + 1 + 3);
 
             /* Character types use regular precision */
         default:
@@ -612,7 +612,7 @@ Int4 estype_attr_transfer_octet_length(const ConnectionClass *conn, OID type,
         case TS_TYPE_VARCHAR:
         case TS_TYPE_UNKNOWN:
             column_size = tstype_attr_column_size(
-                conn, type, atttypmod, ES_ADT_UNSET, handle_unknown_size_as);
+                conn, type, atttypmod, TS_ADT_UNSET, handle_unknown_size_as);
             if (SQL_NO_TOTAL == column_size)
                 return column_size;
 #ifdef UNICODE_SUPPORT
@@ -632,7 +632,7 @@ Int4 estype_attr_transfer_octet_length(const ConnectionClass *conn, OID type,
         default:
             if (type == (OID)conn->lobj_type)
                 return tstype_attr_column_size(conn, type, atttypmod,
-                                               ES_ADT_UNSET,
+                                               TS_ADT_UNSET,
                                                handle_unknown_size_as);
     }
     return -1;
@@ -682,7 +682,7 @@ const char *sqltype_to_escast(const ConnectionClass *conn,
             esCast = "::timestamp";
             break;
         case SQL_GUID:
-            if (ES_VERSION_GE(conn, 8.3))
+            if (VERSION_GE(conn, 8.3))
                 esCast = "::uuid";
             break;
         case SQL_INTERVAL_MONTH:
@@ -774,7 +774,7 @@ static int getAtttypmodEtc(const StatementClass *stmt, int col,
     int atttypmod = -1;
 
     if (NULL != adtsize_or_longestlen)
-        *adtsize_or_longestlen = ES_ADT_UNSET;
+        *adtsize_or_longestlen = TS_ADT_UNSET;
     if (col >= 0) {
         const QResultClass *res;
 
@@ -795,14 +795,14 @@ static int getAtttypmodEtc(const StatementClass *stmt, int col,
 /*
  *	There are two ways of calling this function:
  *
- *	1.	When going through the supported ES types (SQLGetTypeInfo)
+ *	1.	When going through the supported TS types (SQLGetTypeInfo)
  *
  *	2.	When taking any type id (SQLColumns, SQLGetData)
  *
  *	The first type will always work because all the types defined are returned
  *here. The second type will return a default based on global parameter when it
  *does not know.	This allows for supporting types that are unknown.  All
- *other es routines in here return a suitable default.
+ *other ts routines in here return a suitable default.
  */
 SQLSMALLINT
 estype_to_concise_type(const StatementClass *stmt, OID type, int col,
