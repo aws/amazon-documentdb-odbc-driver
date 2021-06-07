@@ -19,8 +19,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "es_connection.h"
-#include "es_odbc.h"
+#include "connection.h"
+#include "odbc.h"
 #include "misc.h"
 
 #ifndef WIN32
@@ -38,8 +38,8 @@
 #include "resource.h"
 #include "win_setup.h"
 #endif
+#include "apifunc.h"
 #include "dlg_specific.h"
-#include "es_apifunc.h"
 
 #ifdef WIN32
 INT_PTR CALLBACK dconn_FDriverConnectProc(HWND hdlg, UINT wMsg, WPARAM wParam,

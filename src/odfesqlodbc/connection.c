@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "es_connection.h"
+#include "connection.h"
 #include "misc.h"
 
 /* for htonl */
@@ -33,11 +33,10 @@
 #include <arpa/inet.h>
 #endif
 
+#include "apifunc.h"
 #include "dlg_specific.h"
 #include "environ.h"
-#include "es_apifunc.h"
-#include "es_connection.h"
-#include "es_helper.h"
+#include "helper.h"
 #include "loadlib.h"
 #include "multibyte.h"
 #include "qresult.h"

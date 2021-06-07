@@ -16,8 +16,8 @@
 
 #ifdef WIN32
 
+#include "apifunc.h"
 #include "dlg_specific.h"
-#include "es_apifunc.h"
 #include "loadlib.h"
 #include "misc.h"  // strncpy_null
 #include "win_setup.h"

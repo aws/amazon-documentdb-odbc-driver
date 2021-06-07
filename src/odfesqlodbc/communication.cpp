@@ -16,7 +16,7 @@
 #include <stdexcept>
 #include "communication.h"
 // clang-format off
-#include "es_odbc.h"
+#include "odbc.h"
 #include "mylog.h"
 
 // clang-format on

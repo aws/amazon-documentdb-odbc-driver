@@ -37,13 +37,13 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#include "apifunc.h"
 #include "bind.h"
 #include "catfunc.h"
-#include "es_apifunc.h"
-#include "es_connection.h"
-#include "es_types.h"
+#include "connection.h"
 #include "qresult.h"
 #include "statement.h"
+#include "types.h"
 
 CSTR INFINITY_STRING = "Infinity";
 CSTR MINFINITY_STRING = "-Infinity";
@@ -90,14 +90,10 @@ static SQLLEN es_bin2whex(const char *src, SQLWCHAR *dst, SQLLEN length);
  *			----------		------				----------
  *			TS_TYPE_DATE	SQL_C_DEFAULT		SQL_C_DATE
  *			TS_TYPE_DATE	SQL_C_DATE			SQL_C_DATE
- *			TS_TYPE_DATE	SQL_C_TIMESTAMP		SQL_C_TIMESTAMP		(time = 0
- *(midnight)) TS_TYPE_TIME	SQL_C_DEFAULT		SQL_C_TIME TS_TYPE_TIME
- *SQL_C_TIME			SQL_C_TIME
- *			TS_TYPE_TIME	SQL_C_TIMESTAMP		SQL_C_TIMESTAMP		(date =
- *current date) ES_TYPE_ABSTIME SQL_C_DEFAULT		SQL_C_TIMESTAMP
- *ES_TYPE_ABSTIME SQL_C_DATE			SQL_C_DATE			(time is truncated)
- *ES_TYPE_ABSTIME SQL_C_TIME			SQL_C_TIME			(date is truncated)
- *ES_TYPE_ABSTIME SQL_C_TIMESTAMP		SQL_C_TIMESTAMP
+ *			TS_TYPE_DATE	SQL_C_TIMESTAMP		SQL_C_TIMESTAMP		(time = 0 (midnight)) 
+ *          TS_TYPE_TIME	SQL_C_DEFAULT		SQL_C_TIME 
+ *          TS_TYPE_TIME    SQL_C_TIME			SQL_C_TIME
+ *			TS_TYPE_TIME	SQL_C_TIMESTAMP		SQL_C_TIMESTAMP		(date = current date) 
  *---------
  */
 
@@ -836,15 +832,6 @@ static int setup_getdataclass(SQLLEN *const length_return,
     BOOL hybrid = FALSE;
 #endif /* UNICODE_SUPPORT */
 
-    if (ES_TYPE_BYTEA == field_type) {
-        if (SQL_C_BINARY == fCType)
-            bytea_process_kind = BYTEA_PROCESS_BINARY;
-        else if (0 == strnicmp(neut_str, "\\x", 2)) /* hex format */
-            neut_str += 2;
-        else
-            bytea_process_kind = BYTEA_PROCESS_ESCAPE;
-    }
-
 #ifdef UNICODE_SUPPORT
     if (0 == bytea_process_kind) {
         if (get_convtype()
@@ -857,12 +844,7 @@ static int setup_getdataclass(SQLLEN *const length_return,
 
             switch (field_type) {
                 case TS_TYPE_UNKNOWN:
-                case ES_TYPE_BPCHAR:
                 case TS_TYPE_VARCHAR:
-                case ES_TYPE_TEXT:
-                case ES_TYPE_BPCHARARRAY:
-                case ES_TYPE_VARCHARARRAY:
-                case ES_TYPE_TEXTARRAY:
                     if (SQL_C_CHAR == fCType || SQL_C_BINARY == fCType)
                         localize_needed = (!same_encoding || wcs_debug);
                     if (SQL_C_WCHAR == fCType)
@@ -1027,9 +1009,7 @@ static int convert_text_field_to_sql_c(
     MYLOG(LOG_DEBUG, "field_type=%u type=%d\n", field_type, fCType);
 
     switch (field_type) {
-        case ES_TYPE_FLOAT4:
         case TS_TYPE_DOUBLE:
-        case ES_TYPE_NUMERIC:
             set_client_decimal_point((char *)neut_str);
             break;
     }
@@ -1266,10 +1246,6 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
      * to SQL_C_DATE,SQL_C_TIME, SQL_C_TIMESTAMP not supported
      */
     switch (field_type) {
-            /*
-             * $$$ need to add parsing for date/time/timestamp strings in
-             * ES_TYPE_CHAR,VARCHAR $$$
-             */
         case TS_TYPE_DATE:
             sscanf(value, "%4d-%2d-%2d", &std_time.y, &std_time.m, &std_time.d);
             break;
@@ -1280,8 +1256,6 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
             timestamp2stime(value, &std_time, &bZone, &zone);
         } break;
 
-        case ES_TYPE_ABSTIME:
-        case ES_TYPE_DATETIME:
         case TS_TYPE_TIMESTAMP_NO_TMZONE:
         case TS_TYPE_TIMESTAMP:
             std_time.fr = 0;
@@ -1299,7 +1273,6 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                 std_time.infinity = -1;
                 std_time.m = 1;
                 std_time.d = 1;
-                // std_time.y = -4713;
                 std_time.y = -9999;
                 std_time.hh = 0;
                 std_time.mm = 0;
@@ -1397,63 +1370,6 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
             neut_str = booltemp;
         } break;
 
-            /* This is for internal use by SQLStatistics() */
-        case ES_TYPE_INT2VECTOR:
-            if (SQL_C_DEFAULT == fCType) {
-                int i, nval, maxc;
-                const char *vp;
-                /* this is an array of eight integers */
-                short *short_array = (short *)rgbValueBindRow, shortv;
-
-                maxc = 0;
-                if (NULL != short_array)
-                    maxc = (int)cbValueMax / sizeof(short);
-                vp = value;
-                nval = 0;
-                MYLOG(LOG_DEBUG, "index=(");
-                for (i = 0;; i++) {
-                    if (sscanf(vp, "%hi", &shortv) != 1)
-                        break;
-                    MYPRINTF(0, " %hi", shortv);
-                    nval++;
-                    if (nval < maxc)
-                        short_array[i + 1] = shortv;
-
-                    /* skip the current token */
-                    while (IS_NOT_SPACE(*vp))
-                        vp++;
-                    /* and skip the space to the next token */
-                    while ((*vp != '\0') && (isspace(*vp)))
-                        vp++;
-                    if (*vp == '\0')
-                        break;
-                }
-                MYPRINTF(0, ") nval = %i\n", nval);
-                if (maxc > 0)
-                    short_array[0] = (short)nval;
-
-                /* There is no corresponding fCType for this. */
-                len = (nval + 1) * sizeof(short);
-                if (pcbValue)
-                    *pcbValueBindRow = len;
-
-                if (len <= cbValueMax)
-                    return COPY_OK; /* dont go any further or the data will be
-                                     * trashed */
-                else
-                    return COPY_RESULT_STRING_TRUNCATED;
-            }
-            break;
-
-            /*
-             * This is a large object OID, which is used to store
-             * LONGVARBINARY objects.
-             */
-        case ES_TYPE_LO_UNDEFINED:
-
-            return convert_lo(stmt, value, fCType, rgbValueBindRow, cbValueMax,
-                              pcbValueBindRow);
-
         case 0:
             break;
 
@@ -1461,8 +1377,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
             if (field_type
                     == (OID)stmt->hdbc
                            ->lobj_type /* hack until permanent type available */
-                || (ES_TYPE_OID == field_type && SQL_C_BINARY == fCType
-                    && conn->lo_is_domain))
+                )
                 return convert_lo(stmt, value, fCType, rgbValueBindRow,
                                   cbValueMax, pcbValueBindRow);
     }
@@ -1490,15 +1405,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
         case SQL_C_BINARY:
             switch (field_type) {
                 case TS_TYPE_UNKNOWN:
-                case ES_TYPE_BPCHAR:
                 case TS_TYPE_VARCHAR:
-                case ES_TYPE_TEXT:
-                case ES_TYPE_XML:
-                case ES_TYPE_BPCHARARRAY:
-                case ES_TYPE_VARCHARARRAY:
-                case ES_TYPE_TEXTARRAY:
-                case ES_TYPE_XMLARRAY:
-                case ES_TYPE_BYTEA:
                     text_bin_handling = TRUE;
                     break;
             }
@@ -1508,7 +1415,6 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
     if (text_bin_handling) {
         BOOL pre_convert = TRUE;
         int midsize = sizeof(midtemp);
-        int i;
 
         /* Special character formatting as required */
 
@@ -1527,38 +1433,11 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                                     std_time.mm, std_time.ss, std_time.fr);
                 break;
 
-            case ES_TYPE_ABSTIME:
-            case ES_TYPE_DATETIME:
             case TS_TYPE_TIMESTAMP_NO_TMZONE:
             case TS_TYPE_TIMESTAMP:
                 len = stime2timestamp(&std_time, midtemp, midsize, FALSE,
                                       (int)(midsize - 19 - 2));
                 break;
-
-            case ES_TYPE_UUID:
-                len = strlen(neut_str);
-                for (i = 0; i < len && i < midsize - 2; i++)
-                    midtemp[i] = (char)toupper((UCHAR)neut_str[i]);
-                midtemp[i] = '\0';
-                MYLOG(LOG_DEBUG, "ES_TYPE_UUID: rgbValueBindRow = '%s'\n",
-                      rgbValueBindRow);
-                break;
-
-                /*
-                 * Currently, data is SILENTLY TRUNCATED for BYTEA and
-                 * character data types if there is not enough room in
-                 * cbValueMax because the driver can't handle multiple
-                 * calls to SQLGetData for these, yet.	Most likely, the
-                 * buffer passed in will be big enough to handle the
-                 * maximum limit of elasticsearch, anyway.
-                 *
-                 * LongVarBinary types are handled correctly above, observing
-                 * truncation and all that stuff since there is
-                 * essentially no limit on the large object used to store
-                 * those.
-                 */
-            case ES_TYPE_BYTEA: /* convert binary data to hex strings
-                                 * (i.e, 255 = "FF") */
 
             default:
                 pre_convert = FALSE;
@@ -1570,20 +1449,6 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
             rgbValueBindRow, cbValueMax, conn, &len);
     } else {
         SQLGUID g;
-
-        /*
-         * for SQL_C_CHAR, it's probably ok to leave currency symbols in.
-         * But to convert to numeric types, it is necessary to get rid of
-         * those.
-         */
-        if (field_type == ES_TYPE_MONEY) {
-            if (convert_money(neut_str, midtemp, sizeof(midtemp)))
-                neut_str = midtemp;
-            else {
-                MYLOG(LOG_DEBUG, "couldn't convert money type to %d\n", fCType);
-                return COPY_UNSUPPORTED_TYPE;
-            }
-        }
 
         switch (fCType) {
             case SQL_C_DATE:
@@ -2007,18 +1872,6 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                         *pcbValueBindRow = sizeof(ival);
                     if (cbValueMax >= (SQLLEN)sizeof(ival)) {
                         memcpy(rgbValueBindRow, &ival, sizeof(ival));
-                        return COPY_OK;
-                    } else
-                        return COPY_RESULT_STRING_TRUNCATED;
-                } else if (ES_TYPE_UUID == field_type) {
-                    int rtn = char2guid(neut_str, &g);
-
-                    if (COPY_OK != rtn)
-                        return rtn;
-                    if (pcbValue)
-                        *pcbValueBindRow = sizeof(g);
-                    if (cbValueMax >= (SQLLEN)sizeof(g)) {
-                        memcpy(rgbValueBindRow, &g, sizeof(g));
                         return COPY_OK;
                     } else
                         return COPY_RESULT_STRING_TRUNCATED;

@@ -19,9 +19,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "apifunc.h"
+#include "connection.h"
 #include "dlg_specific.h"
-#include "es_apifunc.h"
-#include "es_connection.h"
 #include "misc.h"
 #include "statement.h"
 #ifdef WIN32
