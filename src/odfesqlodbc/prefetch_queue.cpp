@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  *
  */
-#include "ts_prefetch_queue.h"
+#include "prefetch_queue.h"
 
 bool PrefetchQueue::Push(std::shared_future< Aws::TimestreamQuery::Model::QueryOutcome > future_outcome) {
     std::unique_lock< std::mutex > lock(mutex);

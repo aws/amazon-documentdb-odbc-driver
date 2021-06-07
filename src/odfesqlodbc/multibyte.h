@@ -22,7 +22,7 @@
  * Multibyte library header
  *
  */
-#include "es_odbc.h"
+#include "odbc.h"
 #include "qresult.h"
 
 /* Elastic client encoding */

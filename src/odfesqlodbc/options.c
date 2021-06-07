@@ -16,11 +16,11 @@
 
 #include <string.h>
 
+#include "apifunc.h"
+#include "connection.h"
 #include "environ.h"
-#include "es_apifunc.h"
-#include "es_connection.h"
-#include "es_odbc.h"
 #include "misc.h"
+#include "odbc.h"
 #include "qresult.h"
 #include "statement.h"
 #include "unicode_support.h"

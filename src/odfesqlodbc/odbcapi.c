@@ -17,15 +17,15 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "apifunc.h"
+#include "connection.h"
+#include "driver_connect.h"
 #include "environ.h"
-#include "es_apifunc.h"
-#include "es_connection.h"
-#include "es_driver_connect.h"
-#include "es_info.h"
-#include "es_odbc.h"
-#include "es_statement.h"
+#include "info.h"
 #include "loadlib.h"
 #include "misc.h"
+#include "odbc.h"
+#include "odbc_statement.h"
 #include "qresult.h"
 #include "statement.h"
 

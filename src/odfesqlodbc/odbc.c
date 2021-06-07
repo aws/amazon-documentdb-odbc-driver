@@ -22,8 +22,8 @@
 #include <string.h>
 #include "dlg_specific.h"
 #include "environ.h"
-#include "es_odbc.h"
 #include "misc.h"
+#include "odbc.h"
 
 #ifdef WIN32
 #include "loadlib.h"

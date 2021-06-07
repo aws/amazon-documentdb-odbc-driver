@@ -20,9 +20,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "apifunc.h"
+#include "connection.h"
 #include "environ.h"
-#include "es_apifunc.h"
-#include "es_connection.h"
 #include "misc.h"
 #include "qresult.h"
 #include "statement.h"
