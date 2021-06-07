@@ -496,8 +496,8 @@ CC_cleanup(ConnectionClass *self, BOOL keepCommunication) {
     return ret;
 }
 
-#ifndef ES_DIAG_SEVERITY_NONLOCALIZED
-#define ES_DIAG_SEVERITY_NONLOCALIZED 'V'
+#ifndef TS_DIAG_SEVERITY_NONLOCALIZED
+#define TS_DIAG_SEVERITY_NONLOCALIZED 'V'
 #endif
 
 #define TRANSACTION_ISOLATION "transaction_isolation"
