@@ -55,12 +55,12 @@ void unused_vargs(int cnt, ...);
 
 #if defined(__GNUC__) || defined(__IBMC__)
 #if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 404
-#define ES_PRINTF_ATTRIBUTE gnu_printf
+#define TS_PRINTF_ATTRIBUTE gnu_printf
 #else
-#define ES_PRINTF_ATTRIBUTE printf
+#define TS_PRINTF_ATTRIBUTE printf
 #endif
 #define es_attribute_printf(f, a) \
-    __attribute__((format(ES_PRINTF_ATTRIBUTE, f, a)))
+    __attribute__((format(TS_PRINTF_ATTRIBUTE, f, a)))
 #else
 #define __attribute__(x)
 #define es_attribute_printf(f, a)
@@ -570,7 +570,7 @@ void logs_on_off(int cnopen, int);
 
 /* Sufficient digits to recover original float values */
 #define ES_REAL_DIGITS 9
-#define ES_DOUBLE_DIGITS 17
+#define TS_DOUBLE_DIGITS 17
 
 #define INFO_INQUIRY_LEN                                                  \
     8192                             /* this seems sufficiently big for \ \

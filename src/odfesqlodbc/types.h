@@ -67,9 +67,9 @@ extern "C" {
 #define TYPE_MAY_BE_ARRAY(type) \
     (type) >= 1000 && (type) <= 1041
 
-#define ES_ATP_UNSET (-3) /* atttypmod */
-#define ES_ADT_UNSET (-3) /* adtsize_or_longestlen */
-#define ES_UNKNOWNS_UNSET 0 /* UNKNOWNS_AS_MAX */
+#define TS_ATP_UNSET (-3) /* atttypmod */
+#define TS_ADT_UNSET (-3) /* adtsize_or_longestlen */
+#define TS_UNKNOWNS_UNSET 0 /* UNKNOWNS_AS_MAX */
 
 OID es_true_type(const ConnectionClass *, OID, OID);
 OID sqltype_to_estype(const ConnectionClass *conn, SQLSMALLINT fSqlType);
