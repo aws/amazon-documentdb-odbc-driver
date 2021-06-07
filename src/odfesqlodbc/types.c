@@ -930,8 +930,6 @@ Int4 estype_transfer_octet_length(const StatementClass *stmt, OID type,
             if (column_size <= maxvarc && column_size * coef > maxvarc)
                 return maxvarc;
             return coef * column_size;
-        case ES_TYPE_BYTEA:
-            return column_size;
         default:
             if (type == conn->lobj_type)
                 return column_size;
