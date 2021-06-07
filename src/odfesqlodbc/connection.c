@@ -272,7 +272,7 @@ static ConnectionClass *CC_initialize(ConnectionClass *rv, BOOL lockinit) {
 
     rv->num_descs = STMT_INCREMENT;
 
-    rv->lobj_type = ES_TYPE_LO_UNDEFINED;
+    rv->lobj_type = TS_TYPE_LO_UNDEFINED;
     if (isMsAccess())
         rv->ms_jet = 1;
     rv->isolation = 0;  // means initially unknown server's default isolation

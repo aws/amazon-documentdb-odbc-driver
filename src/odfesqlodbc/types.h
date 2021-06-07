@@ -14,8 +14,8 @@
  *
  */
 
-#ifndef ES_TYPES
-#define ES_TYPES
+#ifndef TS_TYPES
+#define TS_TYPES
 
 #include "dlg_specific.h"
 #include "odbc.h"
@@ -24,10 +24,10 @@
 extern "C" {
 #endif
 /* the type numbers are defined by the OID's of the types' rows */
-/* in table es_type */
+/* in table ts_type */
 
 #ifdef NOT_USED
-#define ES_TYPE_LO ? ? ? ? /* waiting for permanent type */
+#define TS_TYPE_LO ? ? ? ? /* waiting for permanent type */
 #endif
 
 #define TS_TYPE_NAME_BOOLEAN "boolean"
