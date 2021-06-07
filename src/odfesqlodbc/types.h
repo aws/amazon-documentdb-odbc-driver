@@ -47,7 +47,6 @@ extern "C" {
 
 #define MS_ACCESS_SERIAL "int identity"
 #define TS_TYPE_BOOLEAN 16
-#define ES_TYPE_CHAR 18
 #define TS_TYPE_BIGINT 20
 #define TS_TYPE_INT2 21
 #define TS_TYPE_INTEGER 23

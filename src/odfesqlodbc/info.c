@@ -1381,7 +1381,7 @@ RETCODE SQL_API ESAPI_Statistics(
                         2);
     QR_set_field_info_v(res, STATS_COLUMN_NAME, "COLUMN_NAME", TS_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, STATS_COLLATION, "COLLATION", ES_TYPE_CHAR, 1);
+    QR_set_field_info_v(res, STATS_COLLATION, "COLLATION", SQL_CHAR, 1);
     QR_set_field_info_v(res, STATS_CARDINALITY, "CARDINALITY", TS_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, STATS_PAGES, "PAGES", TS_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, STATS_FILTER_CONDITION, "FILTER_CONDITION",
