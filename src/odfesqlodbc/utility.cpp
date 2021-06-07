@@ -14,7 +14,7 @@
  *
  */
 
-#include "es_utility.h"
+#include "utility.h"
 
 #include <ctype.h>
 #include <errno.h>

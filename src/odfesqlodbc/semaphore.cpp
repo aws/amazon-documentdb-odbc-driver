@@ -14,7 +14,7 @@
  *
  */
 
-#include "es_semaphore.h"
+#include "semaphore.h"
 
 #include <string>
 

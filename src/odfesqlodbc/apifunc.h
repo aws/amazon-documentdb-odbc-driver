@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "es_odbc.h"
+#include "odbc.h"
 
 #ifdef __cplusplus
 extern "C" {

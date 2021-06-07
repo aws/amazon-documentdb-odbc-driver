@@ -20,8 +20,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "es_connection.h"
-#include "es_odbc.h"
+#include "connection.h"
+#include "odbc.h"
 #include "misc.h"
 
 #ifndef WIN32
@@ -38,8 +38,8 @@
 
 #include "resource.h"
 #endif
+#include "apifunc.h"
 #include "dlg_specific.h"
-#include "es_apifunc.h"
 
 #define PASSWORD_IS_REQUIRED 1
 

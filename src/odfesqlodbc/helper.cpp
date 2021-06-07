@@ -14,14 +14,14 @@
  *
  */
 
-#include "es_helper.h"
+#include "helper.h"
 
 #include <atomic>
 #include <mutex>
 #include <thread>
 
-#include "ts_communication.h"
-#include "es_statement.h"
+#include "odbc_communication.h"
+#include "odbc_statement.h"
 
 void* ConnectDBParams(const runtime_options& rt_opts) {
     auto conn = new TSCommunication();

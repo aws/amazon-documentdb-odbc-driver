@@ -13,35 +13,25 @@
  * permissions and limitations under the License.
  *
  */
-#ifndef ES_SEMAPHORE
-#define ES_SEMAPHORE
 
-#ifdef WIN32
-  #include <windows.h>
-  #undef GetMessage
-#elif defined(__APPLE__)
-  #include <dispatch/dispatch.h>
-#else 
-  #include <semaphore.h>
+#ifndef _ODBC_STATEMENT_H_
+#define _ODBC_STATEMENT_H_
+
+#include "parse_result.h"
+#include "qresult.h"
+#include "statement.h"
+
+#ifdef __cplusplus
+extern "C" {
 #endif
-
-class es_semaphore {
-    public:
-        es_semaphore(unsigned int initial, unsigned int capacity);
-        ~es_semaphore();
-
-        void lock();
-        void release();
-        bool try_lock_for(unsigned int timeout_ms);
-
-    private:
-#ifdef WIN32
-        HANDLE m_semaphore;
-#elif defined(__APPLE__)
-        dispatch_semaphore_t m_semaphore;
-#else 
-        sem_t m_semaphore;
+RETCODE RePrepareStatement(StatementClass *stmt);
+RETCODE PrepareStatement(StatementClass* stmt, const SQLCHAR *stmt_str, SQLINTEGER stmt_sz);
+RETCODE ExecuteStatement(StatementClass *stmt);
+QResultClass *SendQueryGetResult(StatementClass *stmt);
+SQLRETURN API_Cancel(HSTMT hstmt);
+SQLRETURN GetNextResultSet(StatementClass *stmt);
+#ifdef __cplusplus
+}
 #endif
-};
 
 #endif

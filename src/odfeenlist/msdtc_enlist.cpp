@@ -80,12 +80,12 @@ BOOL WINAPI DllMain(HANDLE hInst, ULONG ul_reason_for_call, LPVOID lpReserved) {
  *	1:ELOCK -- the strongest per IAsyncES object lock
  *	  When the *isolated* or *dtcconn* member of an IAsyncES object
  *	  is changed, this lock should be held.
- *	  While an IAsyncES object accesses a es_odbc connection,
+ *	  While an IAsyncES object accesses a odbc connection,
  *	  this lock should be held.
  *
- *	2:[CONN_CS] -- per es_odbc connection lock
+ *	2:[CONN_CS] -- per odbc connection lock
  *	  This lock would be held for a pretty long time while accessing
- *	  the es_odbc connection assigned to an IAsyncES object. You
+ *	  the odbc connection assigned to an IAsyncES object. You
  *	  can use the connecion safely by holding a ELOCK for the
  *	  IAsyncES object because the assignment is ensured to be
  *	  fixed while the ELOCK is held.
