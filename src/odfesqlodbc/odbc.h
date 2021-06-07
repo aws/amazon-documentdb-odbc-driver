@@ -546,10 +546,10 @@ RETCODE SQL_API ER_ReturnError(ES_ErrorInfo *, SQLSMALLINT, UCHAR *,
 
 void logs_on_off(int cnopen, int);
 
-#define ES_TYPE_LO_UNDEFINED         \
+#define TS_TYPE_LO_UNDEFINED         \
     (-999) /* hack until permanent \ \
             * type available */
-#define ES_TYPE_LO_NAME "lo"
+#define TS_TYPE_LO_NAME "lo"
 #define CTID_ATTNUM (-1) /* the attnum of ctid */
 #define OID_ATTNUM (-2)  /* the attnum of oid */
 #define XMIN_ATTNUM (-3) /* the attnum of xmin */
