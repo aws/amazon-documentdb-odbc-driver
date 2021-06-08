@@ -34,6 +34,12 @@
 #include <thread>
 #include <chrono>
 // clang-format on
+#ifdef WIN32
+#define Sleep(milliseconds) Sleep(milliseconds)
+#else
+#define Sleep(milliseconds) usleep(milliseconds * 1000)
+#endif
+
 class TestSQLFetch : public Fixture {};
 
 class TestSQLExecute : public Fixture {};
@@ -462,6 +468,7 @@ TEST_F(TestSQLCancel, QueryInProgress) {
     }
     EXPECT_LT(cnt, limit);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    Sleep(1000);
 }
 
 // The following test case needs to change the logic of ts_communication before running.
