@@ -3,12 +3,20 @@
 
 cd src
 git clone --recurse-submodules -b "1.8.186" "https://github.com/aws/aws-sdk-cpp.git"
-cd ..
+cd aws-sdk-cpp
+mkdir install
+mkdir build
+cd build
+cmake ../ -DCMAKE_BUILD_TYPE=Release -DBUILD_ONLY="core;sts;timestream-query" -DCUSTOM_MEMORY_MANAGEMENT="OFF" -DENABLE_TESTING="OFF" -DBUILD_SHARED_LIBS="OFF"
+# Rerun to set the install prefix (https://github.com/aws/aws-sdk-cpp/issues/1156)
+cmake ../ -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Release -DBUILD_ONLY="core;sts;timestream-query" -DCUSTOM_MEMORY_MANAGEMENT="OFF" -DENABLE_TESTING="OFF" -DBUILD_SHARED_LIBS="OFF"
+make -j 4
+make install
+cd ../../../
 
 PREFIX_PATH=$(pwd)
 mkdir cmake-build64
 cd cmake-build64
-cmake ../src -DCMAKE_INSTALL_PREFIX=${PREFIX_PATH}/AWSSDK/ -DCMAKE_BUILD_TYPE=Release -DBUILD_ONLY="core;sts;timestream-query" -DCUSTOM_MEMORY_MANAGEMENT="OFF" -DENABLE_RTTI="OFF" -DENABLE_TESTING="OFF"
+cmake ../src -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_TESTS=ON -DCODE_COVERAGE=ON -DBUILD_SHARED_LIBS="OFF"
+make -j 4
 cd ..
-
-cmake --build cmake-build64 -- -j 4

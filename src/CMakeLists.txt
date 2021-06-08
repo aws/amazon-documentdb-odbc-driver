@@ -13,17 +13,12 @@
 #   permissions and limitations under the License.
 #
 
-# Pre 3.16 versions of Windows set MD/MT incorrectly and cause linker 'warnings' which are actually serious issues
-if(WIN32)
 cmake_minimum_required(VERSION 3.16) 
-else()
-cmake_minimum_required(VERSION 3.13) 
-endif()
 
 project(global_make_list)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/modules/code-coverage.cmake")
-add_code_coverage_all_targets(EXCLUDE libraries aws-cpp-sdk googletest IntegrationTests)
+add_code_coverage_all_targets(EXCLUDE libraries aws-cpp-sdk googletest IntegrationTests UnitTests)
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 	set(BITNESS 64)
@@ -39,32 +34,21 @@ elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../build/odbc/bin")
 endif()
 
+set(CMAKE_CXX_STANDARD 17)
 # This wasn't being picked up on mac, causes some symbol errors
 if(APPLE)
-	set(CMAKE_CXX_STANDARD 17)
 	add_definitions(-DHAVE_STRLCAT)
-	# Do not use shared libraries for AWS SDK.
 	option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-	# Set BUILD_WITH_TESTS to OFF before building installer package for size optimization.
-	option(BUILD_WITH_TESTS "Enable testing" ON)
 else()
-	set(CMAKE_CXX_STANDARD 17)
-	# Use shared libraries for AWS SDK.
 	option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-	# Set BUILD_WITH_TESTS to OFF before building installer package for size optimization.
-	option(BUILD_WITH_TESTS "Enable testing" ON)
 endif()
+# Set BUILD_WITH_TESTS to OFF before building installer package for size optimization.
+option(BUILD_WITH_TESTS "Enable testing" ON)
 
 if(MSVC)
   add_compile_options(/W4 /WX)
 else()
   add_compile_options(-Wall -Wextra -pedantic -Werror)
-endif()
-
-if(NOT WIN32)
-	# Unix builds require autoconf
-	option(AUTOCONF_ENABLE "Enable autoconf" ON)
-	configure_file(autoconf.h.in generated/autoconf.h @ONLY)
 endif()
 
 # Base directories
@@ -76,7 +60,7 @@ set(UNIT_TESTS "${CMAKE_CURRENT_SOURCE_DIR}/UnitTests")
 set(INSTALL_SRC "${CMAKE_CURRENT_SOURCE_DIR}/installer")
 set(DSN_INSTALLER_SRC "${CMAKE_CURRENT_SOURCE_DIR}/DSNInstaller")
 
-# ODBC Driver version 
+# ODBC Driver version
 set(MAJOR 0)
 set(MINOR 2)
 set(PATCH 0)
@@ -92,29 +76,41 @@ set(UT_HELPER "${UNIT_TESTS}/UTHelper")
 set(IT_HELPER "${INTEGRATION_TESTS}/ITODBCHelper")
 
 # Without this symbols will be exporting to Unix but not Windows
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)	
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 
 # Set path for AWS SDK
 set(aws-cpp-sdk-base "${CMAKE_CURRENT_SOURCE_DIR}/aws-sdk-cpp")
-set(aws-cpp-sdk-core_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/cmake/aws-cpp-sdk-core")
-set(aws-cpp-sdk-sts_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/cmake/aws-cpp-sdk-sts")
-set(aws-cpp-sdk-timestream-query_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/cmake/aws-cpp-sdk-timestream-query")
-
-set(aws-c-event-stream_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/aws-c-event-stream/cmake")
-set(aws-c-common_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/aws-c-common/cmake")
-set(aws-checksums_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/aws-checksums/cmake")
+if(WIN32)
+	set(aws-cpp-sdk-core_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/cmake/aws-cpp-sdk-core")
+	set(aws-cpp-sdk-sts_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/cmake/aws-cpp-sdk-sts")
+	set(aws-cpp-sdk-timestream-query_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/cmake/aws-cpp-sdk-timestream-query")
+	# AWS SDK dependencies
+	set(aws-c-event-stream_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/aws-c-event-stream/cmake")
+	set(aws-c-common_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/aws-c-common/cmake")
+	set(aws-checksums_DIR "${PROJECT_ROOT}/sdk-build${BITNESS}/AWSSDK/lib/aws-checksums/cmake")
+else()
+	set(aws-cpp-sdk-core_DIR "${aws-cpp-sdk-base}/install/lib/cmake/aws-cpp-sdk-core")
+	set(aws-cpp-sdk-sts_DIR "${aws-cpp-sdk-base}/install/lib/cmake/aws-cpp-sdk-sts")
+	set(aws-cpp-sdk-timestream-query_DIR "${aws-cpp-sdk-base}/install/lib/cmake/aws-cpp-sdk-timestream-query")
+	# AWS SDK dependencies
+	set(aws-c-event-stream_DIR "${aws-cpp-sdk-base}/install/lib/aws-c-event-stream/cmake")
+	set(aws-c-common_DIR "${aws-cpp-sdk-base}/install/lib/aws-c-common/cmake")
+	set(aws-checksums_DIR "${aws-cpp-sdk-base}/install/lib/aws-checksums/cmake")
+endif()
 
 if (WIN32)
     find_package(AWSSDK REQUIRED core sts timestream-query)
+else()
+    find_package(AWSSDK REQUIRED COMPONENTS core sts timestream-query PATHS aws-sdk-cpp/install NO_DEFAULT_PATH)
 endif()
 
 # General compiler definitions
 add_compile_definitions		(	_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING
-								UNICODE_SUPPORT	
-								DYNAMIC_LOAD	
+								UNICODE_SUPPORT
+								DYNAMIC_LOAD
 								_MBCS
-								_CRT_SECURE_NO_DEPRECATE	
-								_USRDLL	
+								_CRT_SECURE_NO_DEPRECATE
+								_USRDLL
 								_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
 								_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 							)
@@ -122,28 +118,28 @@ add_compile_definitions		(	_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING
 # Platform specific compiler definitions
 if (WIN32 AND BITNESS EQUAL 64)
 	# Windows specific
-	add_compile_definitions	(	_WINDLL						
-								_WIN64			
+	add_compile_definitions	(	_WINDLL
+								_WIN64
 								_WINDOWS
-								WIN_EXPORT				
+								WIN_EXPORT
 							)
 elseif (WIN32 AND BITNESS EQUAL 32)
 	# Windows specific
-	add_compile_definitions	(	_WINDLL						
-								_WIN32			
+	add_compile_definitions	(	_WINDLL
+								_WIN32
 								_WINDOWS
-								WIN_EXPORT				
+								WIN_EXPORT
 							)
 elseif(APPLE)
 	# macOS specific
-	add_compile_definitions	(	WITH_IODBC	
+	add_compile_definitions	(	WITH_IODBC
 								SQLCOLATTRIBUTE_SQLLEN
 							)
 	# iODBC includes
 	include_directories(/usr/local/include)
 elseif(UNIX)
 	# Unix specific
-	add_compile_definitions	(	WITH_UNIXODBC	
+	add_compile_definitions	(	WITH_UNIXODBC
 								SQLCOLATTRIBUTE_SQLLEN
 							)
 endif()
@@ -159,9 +155,6 @@ if(BUILD_WITH_TESTS)
 endif()
 
 # Projects to build
-if (APPLE)
-	add_subdirectory(${aws-cpp-sdk-base})
-endif()
 add_subdirectory(${ODFEODBC_SRC})
 add_subdirectory(${ODFEENLIST_SRC})
 add_subdirectory(${INSTALL_SRC})
