@@ -38,12 +38,6 @@ BOOL CC_from_TSResult(
     QResultClass *q_res, ConnectionClass *conn, StatementClass *stmt,
     const char *next_token,
     const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
-BOOL CC_Metadata_from_TSResult(
-    QResultClass *q_res, ConnectionClass *conn, StatementClass *stmt,
-    const char *next_token,
-    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
-BOOL CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
-    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
 BOOL CC_Append_Table_Data(const Aws::TimestreamQuery::Model::QueryOutcome &ts_result, QResultClass *q_res, ColumnInfoClass &fields);
 #endif
 #endif

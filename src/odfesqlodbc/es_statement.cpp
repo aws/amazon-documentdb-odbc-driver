@@ -38,7 +38,7 @@ void print_tslog(const std::string &s) {
 #endif  // WIN32
 }
 
-RETCODE ExecuteStatement(StatementClass *stmt, BOOL commit) {
+RETCODE ExecuteStatement(StatementClass *stmt) {
     CSTR func = "ExecuteStatement";
     int func_cs_count = 0;
     ConnectionClass *conn = SC_get_conn(stmt);
@@ -80,7 +80,7 @@ RETCODE ExecuteStatement(StatementClass *stmt, BOOL commit) {
 
     conn->status = CONN_EXECUTING;
 
-    QResultClass *res = SendQueryGetResult(stmt, commit);
+    QResultClass *res = SendQueryGetResult(stmt);
     if (!res) {
         if (SC_get_errornumber(stmt) <= 0) {
             SC_set_error(stmt, STMT_NO_RESPONSE,
@@ -150,12 +150,6 @@ RETCODE ExecuteStatement(StatementClass *stmt, BOOL commit) {
         SC_set_Result(stmt, res);
     }
 
-    // This will commit results for SQLExecDirect and will not commit
-    // results for SQLPrepare since only metadata is required for SQLPrepare
-    if (commit) {
-        GetNextResultSet(stmt);
-    }
-
     stmt->diag_row_count = res->recent_processed_row_count;
 
     return CleanUp();
@@ -216,9 +210,7 @@ SQLRETURN GetNextResultSet(StatementClass *stmt) {
 
 RETCODE RePrepareStatement(StatementClass *stmt) {
     CSTR func = "RePrepareStatement";
-    RETCODE result = SC_initialize_and_recycle(stmt);
-    if (result != SQL_SUCCESS)
-        return result;
+    SC_reset_result_for_rerun(stmt);
     if (!stmt->statement) {
         SC_set_error(stmt, STMT_NO_MEMORY_ERROR,
                      "Expected statement to be allocated.", func);
@@ -258,50 +250,46 @@ RETCODE PrepareStatement(StatementClass *stmt, const SQLCHAR *stmt_str,
     return SQL_SUCCESS;
 }
 
-QResultClass *SendQueryGetResult(StatementClass *stmt, BOOL commit) {
+QResultClass *SendQueryGetResult(StatementClass *stmt) {
     CSTR func = "SendQueryGetResult";
     if (stmt == NULL)
         return NULL;
+
+    // Execute the query
+    ConnectionClass *cc = SC_get_conn(stmt);
+    if (!ExecDirect(cc->conn, stmt, stmt->statement)) {
+        return NULL;
+    }
 
     // Allocate QResultClass
     QResultClass *res = QR_Constructor();
     if (res == NULL)
         return NULL;
 
-    // Send command
-    ConnectionClass *cc = SC_get_conn(stmt);
-    if (!ExecDirect(cc->conn, stmt, stmt->statement)) {
-        QR_Destructor(res);
-        return NULL;
-    }
     res->rstatus = PORES_COMMAND_OK;
 
     PrefetchQueue *pPrefetchQueue = GetPrefetchQueue(cc->conn, stmt);
     if (pPrefetchQueue != nullptr && !pPrefetchQueue->IsEmpty()) {
         if (pPrefetchQueue->WaitForReadinessOfFront()) {
             bool success = false;
-            if (commit) {
-                auto outcome = pPrefetchQueue->Front();
-                pPrefetchQueue->Pop();
-                if (outcome.IsSuccess()) {
-                    success = CC_from_TSResult(res, cc, stmt, res->cursor_name,
-                                               outcome);
+            auto outcome = pPrefetchQueue->Front();
+            pPrefetchQueue->Pop();
+            if (outcome.IsSuccess()) {
+                success =
+                    CC_from_TSResult(res, cc, stmt, res->cursor_name, outcome);
+
+                // Check for pagination
+                if (!outcome.GetResult().GetNextToken().empty()
+                    && pPrefetchQueue->IsRetrieving()) {
+                    QR_set_next_token(
+                        res, outcome.GetResult().GetNextToken().c_str());
                 } else {
-                    success = false;
-                    SC_set_error(stmt, STMT_EXEC_ERROR,
-                                 outcome.GetError().GetMessage().c_str(), func);
+                    QR_set_next_token(res, NULL);
                 }
             } else {
-                // Use Front() to see only
-                auto outcome = pPrefetchQueue->Front();
-                if (outcome.IsSuccess()) {
-                    success = CC_Metadata_from_TSResult(
-                        res, cc, stmt, res->cursor_name, outcome);
-                } else {
-                    success = false;
-                    SC_set_error(stmt, STMT_EXEC_ERROR,
-                                 outcome.GetError().GetMessage().c_str(), func);
-                }
+                success = false;
+                SC_set_error(stmt, STMT_EXEC_ERROR,
+                             outcome.GetError().GetMessage().c_str(), func);
             }
             if (!success) {
                 QR_Destructor(res);
@@ -322,60 +310,6 @@ QResultClass *SendQueryGetResult(StatementClass *stmt, BOOL commit) {
         res = NULL;
     }
     return res;
-}
-
-RETCODE AssignResult(StatementClass *stmt) {
-    CSTR func = "AssignResult";
-    if (stmt == NULL)
-        return SQL_ERROR;
-
-    QResultClass *res = SC_get_Result(stmt);
-    if (!res /*|| !res->ts_result*/) {
-        return SQL_ERROR;
-    }
-
-    // Commit result to QResultClass
-    ConnectionClass *cc = SC_get_conn(stmt);
-    PrefetchQueue *pPrefetchQueue = GetPrefetchQueue(cc->conn, stmt);
-    if (pPrefetchQueue != nullptr && !pPrefetchQueue->IsEmpty()) {
-        if (pPrefetchQueue->WaitForReadinessOfFront()) {
-            auto outcome = pPrefetchQueue->Front();
-            pPrefetchQueue->Pop();
-            if (outcome.IsSuccess()) {
-                if (!CC_No_Metadata_from_TSResult(res, cc, res->cursor_name,
-                                                  outcome)) {
-                    QR_Destructor(res);
-                    return SQL_ERROR;
-                }
-                GetNextResultSet(stmt);
-            } else {
-                SC_set_error(stmt, STMT_EXEC_ERROR,
-                             outcome.GetError().GetMessage().c_str(), func);
-                QR_Destructor(res);
-                return SQL_ERROR;
-            }
-        } else {
-            SC_set_error(stmt, STMT_OPERATION_CANCELLED, "Operation cancelled",
-                         func);
-            QR_Destructor(res);
-            return SQL_ERROR;
-        }
-    } else {
-        if (pPrefetchQueue == nullptr) {
-            SC_set_error(stmt, STMT_INTERNAL_ERROR,
-                         "PrefetchQueue is not found", func);
-        }
-        QR_Destructor(res);
-        return SQL_ERROR;
-    }
-    return SQL_SUCCESS;
-}
-
-void ClearTSResult(void *ts_result) {
-    if (ts_result != NULL) {
-        TSResult *es_res = static_cast< TSResult * >(ts_result);
-        TSClearResult(es_res);
-    }
 }
 
 SQLRETURN API_Cancel(HSTMT hstmt) {

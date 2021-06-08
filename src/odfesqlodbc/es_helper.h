@@ -23,7 +23,6 @@
 // C++ interface
 std::string GetClientEncoding(void* conn);
 bool SetClientEncoding(void* conn, std::string& encoding);
-void TSClearResult(TSResult* ts_result);
 void* ConnectDBParams(const runtime_options& rt_opts);
 std::string GetVersion(void* conn);
 PrefetchQueue* GetPrefetchQueue(void* conn, StatementClass* stmt);
