@@ -101,9 +101,9 @@ static BOOL loaded_elasticenlist = FALSE;
 static HMODULE enlist_module = NULL;
 static BOOL loaded_elasticodbc = FALSE;
 /*
- *	Load a DLL based on elasticodbc path.
+ *	Load a DLL based on timestream path.
  */
-HMODULE MODULE_load_from_elasticodbc_path(const char *module_name) {
+HMODULE MODULE_load_from_timestreamodbc_path(const char *module_name) {
     extern HINSTANCE s_hModule;
     HMODULE hmodule = NULL;
     char szFileName[MAX_PATH];
@@ -117,7 +117,7 @@ HMODULE MODULE_load_from_elasticodbc_path(const char *module_name) {
         if (_strnicmp(szFileName, sysdir, strlen(sysdir)) != 0) {
             hmodule =
                 LoadLibraryEx(szFileName, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
-            MYLOG(LOG_DEBUG, "elasticodbc path based %s loaded module=%p\n",
+            MYLOG(LOG_DEBUG, "timestream-odbc path based %s loaded module=%p\n",
                   module_name, hmodule);
         }
     }
@@ -140,7 +140,7 @@ static FARPROC WINAPI DliErrorHook(unsigned dliNotify, PDelayLoadInfo pdli) {
             if (_strnicmp(pdli->szDll, elasticodbc, strlen(elasticodbc)) == 0)
                 call_module = elasticodbc;
             if (call_module) {
-                if (hmodule = MODULE_load_from_elasticodbc_path(call_module),
+                if (hmodule = MODULE_load_from_timestreamodbc_path(call_module),
                     NULL == hmodule)
                     hmodule = LoadLibrary(call_module);
                 if (NULL != hmodule) {
@@ -153,10 +153,6 @@ static FARPROC WINAPI DliErrorHook(unsigned dliNotify, PDelayLoadInfo pdli) {
             break;
     }
     return (FARPROC)hmodule;
-}
-
-void AlreadyLoadedElasticsearchodbc(void) {
-    loaded_elasticodbc = TRUE;
 }
 
 /*
@@ -209,7 +205,7 @@ RETCODE CALL_EnlistInDtc(ConnectionClass *conn, void *pTra, int method) {
     __except ((GetExceptionCode() & 0xffff) == ERROR_MOD_NOT_FOUND
                   ? EXCEPTION_EXECUTE_HANDLER
                   : EXCEPTION_CONTINUE_SEARCH) {
-        if (enlist_module = MODULE_load_from_elasticodbc_path(elasticenlist),
+        if (enlist_module = MODULE_load_from_timestreamodbc_path(elasticenlist),
             NULL == enlist_module)
             loaded = FALSE;
         else
@@ -249,7 +245,7 @@ void *CALL_GetTransactionObject(HRESULT *hres) {
     __except ((GetExceptionCode() & 0xffff) == ERROR_MOD_NOT_FOUND
                   ? EXCEPTION_EXECUTE_HANDLER
                   : EXCEPTION_CONTINUE_SEARCH) {
-        if (enlist_module = MODULE_load_from_elasticodbc_path(elasticenlist),
+        if (enlist_module = MODULE_load_from_timestreamodbc_path(elasticenlist),
             NULL == enlist_module)
             loaded = FALSE;
         else

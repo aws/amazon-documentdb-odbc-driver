@@ -534,20 +534,22 @@ static void start_logging() {
 }
 
 void InitializeLogging(void) {
-    FinalizeLogging();
+    static int initLogging = 1;
+    if (!initLogging)
+        return;
+    initLogging = 0;
+
     char dir[PATH_MAX];
     getLogDir(dir, sizeof(dir));
     if (dir[0])
         logdir = strdup(dir);
     mylog_initialize();
-    //qlog_initialize();
     start_logging();
     MYLOG(LOG_DEBUG, "Log Output Dir: %s\n", logdir);
 }
 
 void FinalizeLogging(void) {
     mylog_finalize();
-    //qlog_finalize();
     if (logdir) {
         free(logdir);
         logdir = NULL;
