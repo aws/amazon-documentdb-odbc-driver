@@ -415,13 +415,16 @@ CC_cleanup(ConnectionClass *self, BOOL keepCommunication) {
     /* Cancel an ongoing transaction */
     /* We are always in the middle of a transaction, */
     /* even if we are in auto commit. */
-    if (self->conn) {
-        MYLOG(0, "LIB_disconnect: %p\n", self->conn);
-        LIB_disconnect(self->conn);
-        self->conn = NULL;
-    } else {
-        ret = SQL_ERROR;
-        CC_set_error(self, CC_not_connected(self), "Connection not open", func);
+    if (self->status != CONN_NOT_CONNECTED) {
+        if (self->conn) {
+            MYLOG(0, "LIB_disconnect: %p\n", self->conn);
+            LIB_disconnect(self->conn);
+            self->conn = NULL;
+        } else {
+            ret = SQL_ERROR;
+            CC_set_error(self, CC_not_connected(self), "Connection not open",
+                         func);
+        }
     }
 
     MYLOG(LOG_DEBUG, "after LIB_disconnect\n");

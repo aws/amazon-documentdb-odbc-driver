@@ -306,7 +306,7 @@ TEST_F(TestSQLDescribeParam, DESCRIBE_PARAM) {
     ret = SQLDescribeParam(m_hstmt, 1, &sqlType, &paramDef, &scale, &nullable);
     EXPECT_EQ(SQL_ERROR, ret);
     EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_INVALID_DESCRIPTOR_INDEX));
+                              SQLSTATE_NOT_IMPLEMENTED_ERROR));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 

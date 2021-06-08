@@ -324,12 +324,6 @@ extern int posix_snprintf(char *buf, size_t size, const char *format, ...);
 #endif
 
 /* Driver stuff */
-
-#define DRIVERNAME "Elasticsearch ODBC"
-
-#define DBMS_NAME_UNICODE "Elasticsearch Unicode"
-#define DBMS_NAME_ANSI "Elasticsearch ANSI"
-
 #define DRIVER_ODBC_VER "03.51"
 
 #ifdef UNICODE_SUPPORT
@@ -348,35 +342,16 @@ SQLULEN ucs2strlen(const SQLWCHAR *);
 
 #ifndef DBMS_NAME
 #ifdef _WIN64
-#ifdef UNICODE_SUPPORT
-#define DBMS_NAME DBMS_NAME_UNICODE "(x64)"
+#define DBMS_NAME "Amazon Timestream ODBC Driver(x64)"
 #else
-#define DBMS_NAME DBMS_NAME_ANSI "(x64)"
-#endif /* UNICODE_SUPPORT */
-#else  /* _WIN64 */
-#ifdef UNICODE_SUPPORT
-#define DBMS_NAME DBMS_NAME_UNICODE
-#else
-#define DBMS_NAME DBMS_NAME_ANSI
-#endif /* UNICODE_SUPPORT */
-#endif /* _WIN64 */
+#define DBMS_NAME "Amazon Timestream ODBC Driver"
+#endif
 #endif /* DBMS_NAME */
 
-#ifndef DBMS_NAME
-#define DBMS_NAME "Elasticsearch Legacy"
-#endif /* DBMS_NAME */
 #ifdef WIN32
-#ifdef UNICODE_SUPPORT
 #define DRIVER_FILE_NAME "odfesqlodbc.dll"
 #else
-#define DRIVER_FILE_NAME "odfesqlodbc.dll"
-#endif /* UNICODE_SUPPORT */
-#else
-#ifdef UNICODE_SUPPORT
 #define DRIVER_FILE_NAME "libodfesqlodbc.dylib"
-#else
-#define DRIVER_FILE_NAME "libodfesqlodbc.dylib"
-#endif
 #endif /* WIN32 */
 BOOL isMsAccess(void);
 BOOL isMsQuery(void);

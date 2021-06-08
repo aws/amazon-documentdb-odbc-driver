@@ -454,7 +454,7 @@ RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
             break;
 
         case SQL_OWNER_USAGE: /* ODBC 2.0 */
-            // Elasticsearch does not support schemas.
+            // Timestream does not support schemas.
             // This will disable showing an empty schema box in Tableau.
             len = 4;
             value = 0;
@@ -578,7 +578,7 @@ RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
 
         case SQL_TXN_CAPABLE: /* ODBC 1.0 */
             /*
-             * Elasticsearch does not support transactions.
+             * Timestream does not support transactions.
              */
             len = 2;
             value = SQL_TC_NONE;

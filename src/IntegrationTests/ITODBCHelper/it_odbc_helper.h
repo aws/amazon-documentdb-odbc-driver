@@ -28,6 +28,7 @@
 
 #include "unit_test_helper.h"
 #include "gtest/gtest.h"
+#include "mylog.h"
 
 // SQLSTATEs
 #define SQLSTATE_STRING_DATA_RIGHT_TRUNCATED (SQLWCHAR*)L"01004"
@@ -49,30 +50,33 @@
 
 #define IT_SIZEOF(x) (NULL == (x) ? 0 : (sizeof((x)) / sizeof((x)[0])))
 
-#define IT_DRIVER L"Driver"
-#define IT_ACCESSKEYID L"AccessKeyId"
-#define IT_SECRETACCESSKEY L"SecretAccessKey"
-#define IT_REGION L"Region"
-#define IT_AUTH L"Auth"
-#define IT_LOGLEVEL L"LogLevel"
-#define IT_LOGOUTPUT L"LogOutput"
+#define IT_DRIVER "Driver"
+#define IT_ACCESSKEYID "AccessKeyId"
+#define IT_SECRETACCESSKEY "SecretAccessKey"
+#define IT_REGION "Region"
+#define IT_AUTH "Auth"
+#define IT_LOGLEVEL "LogLevel"
+#define IT_LOGOUTPUT "LogOutput"
 
-std::vector< std::pair< std::wstring, std::wstring > > conn_str_pair = {
-    {IT_DRIVER, L"timestreamodbc"},
-    {IT_REGION, L"us-east-1"},
-    {IT_AUTH, L"AWS_PROFILE"},
-    {IT_LOGLEVEL, L"7"},
-#ifdef __APPLE__
-    {IT_LOGOUTPUT, L"/tmp/"}
-#else
-    {IT_LOGOUTPUT, L"C:\\"}
-#endif
+std::vector< std::pair< std::string, std::string > > conn_str_pair = {
+    {IT_DRIVER, "timestreamodbc"},
+    {IT_REGION, "us-east-1"},
+    {IT_AUTH, "AWS_PROFILE"},
+    {IT_LOGLEVEL, "7"}
     };
 
-std::wstring conn_string = []() {
-    std::wstring temp;
-    for (auto it : conn_str_pair)
-        temp += it.first + L"=" + it.second + L";";
+std::string conn_string = []() {
+    std::string temp;
+    for (auto it : conn_str_pair) {
+        temp += it.first + "=" + it.second + ";";
+    }
+    char dir[1024];
+    if (getLogDir(dir, sizeof(dir)) > 0) {
+        temp += IT_LOGOUTPUT;
+        temp += "=";
+        temp += dir;
+        temp += ";";
+    }
     return temp;
 }();
 

@@ -27,7 +27,7 @@ elseif(APPLE)
     set(CPACK_PACKAGE_FILE_NAME "AmazonTimestreamODBC-${CPACK_PACKAGE_VERSION}")
     set(CPACK_PACKAGE_NAME "Amazon Timestream ODBC Driver ${CPACK_PACKAGE_VERSION}")
 else()
-    if(${BITNESS} EQUAL 32)
+    if(BITNESS EQUAL 32)
         set(CPACK_PACKAGE_FILE_NAME "AmazonTimestreamODBC-${BITNESS}-bit-${CPACK_PACKAGE_VERSION}.i686")
     else()
         set(CPACK_PACKAGE_FILE_NAME "AmazonTimestreamODBC-${BITNESS}-bit-${CPACK_PACKAGE_VERSION}.x86_64")
@@ -43,18 +43,25 @@ if(WIN32)
     # Set generator to WIX
     set(CPACK_GENERATOR "WIX")
 
-    # This is a unique id for the installer - required for Windows
-    # Generated at https://www.guidgen.com/
-    set(CPACK_WIX_UPGRADE_GUID "c4223f46-763a-4800-90d1-cc4fb64e9580")
-	
     # The bitmap will appear at the top of all installer pages other than the welcome and completion dialogs
     set(CPACK_WIX_UI_BANNER "${CMAKE_CURRENT_SOURCE_DIR}/banner.bmp")
-	
+
     # Background bitmap used on the welcome and completion dialogs
     set(CPACK_WIX_UI_DIALOG "${CMAKE_CURRENT_SOURCE_DIR}/dialog.bmp")
 
-    # This XML file is used for registry setup
-    set(CPACK_WIX_PATCH_FILE "${CMAKE_CURRENT_SOURCE_DIR}/patch.xml")
+	if(BITNESS EQUAL 32)
+		# This is a unique id for the installer - required for Windows
+		# Generated at https://www.guidgen.com/
+		set(CPACK_WIX_UPGRADE_GUID "b5076201-7e60-4be1-b098-49fabd619982")
+		# This XML file is used for registry setup
+		set(CPACK_WIX_PATCH_FILE "${CMAKE_CURRENT_SOURCE_DIR}/patch.xml")
+	else()
+		# This is a unique id for the installer(x64) - required for Windows
+		# Generated at https://www.guidgen.com/
+		set(CPACK_WIX_UPGRADE_GUID "c4223f46-763a-4800-90d1-cc4fb64e9580")
+		# This XML file is used for registry setup (x64)
+		set(CPACK_WIX_PATCH_FILE "${CMAKE_CURRENT_SOURCE_DIR}/patch64.xml")
+	endif()
 
     # CPack doesn't allow extensionless licenses, need to make a copy with an extension, .txt is appropriate
     configure_file("${PROJECT_ROOT}/LICENSE" "${PROJECT_ROOT}/LICENSE.txt" COPYONLY)

@@ -27,8 +27,6 @@
 #include <unordered_map>
 #include <set>
 
-// TODO #324 (SQL Plugin)- Update if Elasticsearch extends support for multiple
-// tables
 #define DEFAULT_TYPE_STR \
     { 'k', 'e', 'y', 'w', 'o', 'r', 'd', '\0' }
 #define DEFAULT_TYPE_INT (SQL_WVARCHAR)

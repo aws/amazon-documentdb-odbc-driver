@@ -1,7 +1,7 @@
 <CPackWiXPatch>
 	<CPackWiXFragment Id="CM_CP_Driver.bin.odfesqlodbc.dll">
 		<!-- Add driver entry in Software -->
-		<RegistryKey Root="HKLM" Key="SOFTWARE\Amazon\Amazon Timestream ODBC Driver\Driver" >
+		<RegistryKey Root="HKLM" Key="SOFTWARE\Amazon\Amazon Timestream ODBC Driver(x64)\Driver" >
 			<RegistryValue Type="string" Name="InstallPath" Value="[INSTALL_ROOT]" />
 			<RegistryValue Type="string" Name="LogLevel" Value="" />
 			<RegistryValue Type="string" Name="LogOutput" Value="" />
@@ -9,18 +9,18 @@
 		
 		<!-- Add driver entry in ODBC Drivers -->
 		<RegistryKey Root="HKLM" Key="SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers" >
-			<RegistryValue Type="string" Name="Amazon Timestream ODBC Driver" Value="Installed" />
+			<RegistryValue Type="string" Name="Amazon Timestream ODBC Driver(x64)" Value="Installed" />
 		</RegistryKey>
 		
 		<!-- Set driver attributes -->
-		<RegistryKey Root="HKLM" Key="SOFTWARE\ODBC\ODBCINST.INI\Amazon Timestream ODBC Driver" >
+		<RegistryKey Root="HKLM" Key="SOFTWARE\ODBC\ODBCINST.INI\Amazon Timestream ODBC Driver(x64)" >
 			<RegistryValue Type="string" Name="Driver" Value="[INSTALL_ROOT]bin\odfesqlodbc.dll" />
 			<RegistryValue Type="string" Name="Setup" Value="[INSTALL_ROOT]bin\odfesqlodbc.dll" />
 		</RegistryKey>
 		
 		<!-- Add DSN entry in ODBC Data Sources -->
 		<RegistryKey Root="HKLM" Key="SOFTWARE\ODBC\ODBC.INI\ODBC Data Sources">
-			<RegistryValue Type="string" Name="Amazon Timestream ODBC DSN" Value="Amazon Timestream ODBC Driver" />
+			<RegistryValue Type="string" Name="Amazon Timestream ODBC DSN" Value="Amazon Timestream ODBC Driver(x64)" />
 		</RegistryKey>
 		
 		<!-- Set DSN attributes -->

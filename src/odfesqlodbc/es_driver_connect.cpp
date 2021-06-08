@@ -203,7 +203,9 @@ static SQLRETURN SetupConnString(const SQLCHAR *conn_str_in,
         setLogDir(conn_string_log_dir.c_str());
         conn_string_log_dir.clear();
     } else {
-        setLogDir(ci->drivers.output_dir);
+        if (strcmp(ci->drivers.output_dir, "") != 0) {
+            setLogDir(ci->drivers.output_dir);
+        }
     }
     InitializeLogging();
     return SQL_SUCCESS;

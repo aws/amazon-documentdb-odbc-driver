@@ -36,8 +36,6 @@ typedef struct tagSETUPDLG {
 /* Prototypes */
 INT_PTR CALLBACK ConfigDlgProc(HWND hdlg, UINT wMsg, WPARAM wParam,
                                LPARAM lParam);
-BOOL INTFUNC ChangeDriverName(HWND hwnd, LPSETUPDLG lpsetupdlg,
-                              LPCSTR driver_name);
 
 void test_connection(HANDLE hwnd, ConnInfo *ci, BOOL withDTC);
 

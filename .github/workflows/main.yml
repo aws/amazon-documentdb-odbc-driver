@@ -68,7 +68,6 @@ jobs:
       run: |
         .\build\odbc\bin\Release\itodbc_pagination.exe
     - name: upload-integration-test-results
-      if: always()
       uses: actions/upload-artifact@v2
       with:
         name: integration-test-results-win32
@@ -154,7 +153,6 @@ jobs:
       run: |
         .\build\odbc\bin\Release\itodbc_pagination.exe
     - name: upload-integration-test-results
-      if: always()
       uses: actions/upload-artifact@v2
       with:
         name: integration-test-results-win64
