@@ -190,7 +190,6 @@ QResultClass *QR_Constructor(void) {
         rv->dl_count = 0;
         rv->deleted = NULL;
         rv->deleted_keyset = NULL;
-        rv->ts_result = NULL;
         rv->next_token = NULL;
     }
 
@@ -466,10 +465,6 @@ void QR_free_memory(QResultClass *self) {
         ClearCachedRows(self->updated_tuples, num_fields, self->up_count);
         free(self->updated_tuples);
         self->updated_tuples = NULL;
-    }
-    if (self->ts_result) {
-        ClearTSResult(self->ts_result);
-        self->ts_result = NULL;
     }
 
     self->up_alloc = 0;

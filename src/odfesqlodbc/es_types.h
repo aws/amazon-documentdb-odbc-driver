@@ -290,13 +290,5 @@ typedef struct runtime_options {
 #define KEYWORD_DISPLAY_SIZE 255
 #define KEYWORD_LENGTH_OF_STR 255
 
-typedef struct TSResult {
-    std::string command_type;  // Timestream supports SELECT for query only
-    Aws::TimestreamQuery::Model::QueryResult sdk_result;
-    TSResult(const std::string& command_type = "SELECT") {
-        this->command_type = command_type;
-    }
-} TSResult;
-
 #endif
 #endif

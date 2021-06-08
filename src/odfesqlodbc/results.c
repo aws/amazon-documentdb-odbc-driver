@@ -324,7 +324,7 @@ cleanup:
     return result;
 }
 
-/*		Returns result column descriptor information for a result set. */
+/*  Returns result column descriptor information for a result set. */
 RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
                                     SQLUSMALLINT fDescType, PTR rgbDesc,
                                     SQLSMALLINT cbDescMax, SQLSMALLINT *pcbDesc,

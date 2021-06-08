@@ -591,7 +591,7 @@ void SC_reset_result_for_rerun(StatementClass *self) {
         SC_set_Result(self, NULL);
     else {
         QR_reset_for_re_execute(res);
-        SC_set_Curres(self, NULL);
+        SC_set_Result(self, NULL);
     }
 }
 
@@ -789,7 +789,7 @@ static const struct {
      {STMT_NO_RESPONSE, "08S01", "08S01"},
      {STMT_COMMUNICATION_ERROR, "08S01", "08S01"},
      {STMT_STRING_CONVERSION_ERROR, "22018", "22005"},
-     {STMT_INVALID_STRING_OR_BUFFER_LENGTH_ERROR, "HY090", "HY090"}};
+     {STMT_INVALID_STRING_OR_BUFFER_LENGTH_ERROR, "HY090", "S1090"}};
 
 static ES_ErrorInfo *SC_create_errorinfo(const StatementClass *self,
                                          ES_ErrorInfo *eserror_fail_safe) {
