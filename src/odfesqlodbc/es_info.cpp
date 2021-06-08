@@ -428,8 +428,8 @@ void ExecuteQuery(ConnectionClass *conn, HSTMT *stmt,
 
     // Execute query
     if (!SQL_SUCCEEDED(API_ExecDirect(
-            *stmt, reinterpret_cast< const SQLCHAR * >(query.c_str()), SQL_NTS,
-            1))) {
+            *stmt, reinterpret_cast< const SQLCHAR * >(query.c_str()),
+            SQL_NTS))) {
         std::string error_msg = "Failed to execute query '" + query + "'.";
         throw std::runtime_error(error_msg.c_str());
     }

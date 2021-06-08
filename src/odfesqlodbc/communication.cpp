@@ -80,9 +80,10 @@ bool Communication::SetClientEncoding(const std::string& encoding) {
 }
 
 PrefetchQueue* Communication::GetPrefetchQueue(StatementClass* stmt) {
-    if (stmt == nullptr || prefetch_queues_map.find(stmt) == prefetch_queues_map.end()) {
+    if (stmt == nullptr) {
         return nullptr;
-    } else {
-        return prefetch_queues_map[stmt].get();
     }
+    auto queue_it = prefetch_queues_map.find(stmt);
+    return queue_it == prefetch_queues_map.end() ? nullptr
+                                                 : queue_it->second.get();
 }

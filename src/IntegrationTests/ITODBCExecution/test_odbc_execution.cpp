@@ -144,7 +144,7 @@ TEST_F(TestSQLExecute, BASIC) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestSQLExecute, DOUBLE_EXECUTE) {
+TEST_F(TestSQLExecute, EXECUTE_TWICE) {
     std::wstring query = L"SELECT 12345 FROM ODBCTest.IoT LIMIT 5";
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -167,6 +167,58 @@ TEST_F(TestSQLExecute, DOUBLE_EXECUTE) {
     // Second trial
     ret = SQLExecute(m_hstmt);
     EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(
+        CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_SEQUENCE_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLExecute, EXECUTE_TWICE_WITH_CLOSECURSOR) {
+    std::wstring query = L"SELECT 12345 FROM ODBCTest.IoT LIMIT 5";
+    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    ret = SQLExecute(m_hstmt);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    int cnt = 0;
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            cnt++;
+        }
+        SQLINTEGER data = 0;
+        SQLLEN indicator = 0;
+        ret = SQLGetData(m_hstmt, 1, SQL_C_SLONG, &data, 0, &indicator);
+        EXPECT_TRUE(SQL_SUCCEEDED(ret));
+        EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
+        EXPECT_EQ(12345, data);
+    }
+    EXPECT_EQ(5, cnt);
+    // Second trial
+    ret = SQLCloseCursor(m_hstmt);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    ret = SQLExecute(m_hstmt);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLExecute, PREPARE_AND_EXECDIRECT) {
+    std::wstring query = L"SELECT 12345 FROM ODBCTest.IoT LIMIT 5";
+    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    int cnt = 0;
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            cnt++;
+        }
+        SQLINTEGER data = 0;
+        SQLLEN indicator = 0;
+        ret = SQLGetData(m_hstmt, 1, SQL_C_SLONG, &data, 0, &indicator);
+        EXPECT_TRUE(SQL_SUCCEEDED(ret));
+        EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
+        EXPECT_EQ(12345, data);
+    }
+    EXPECT_EQ(5, cnt);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -238,7 +290,8 @@ TEST_F(TestSQLPrepare, PREPARE_METADATA) {
 TEST_F(TestSQLPrepare, ERROR_NULL_QUERY) {
     SQLRETURN ret = SQLPrepare(m_hstmt, NULL, SQL_NTS);
     EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_MEMORY_ALLOCATION_ERROR));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_INVALID_USE_OF_NULL_POINTER));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 

@@ -276,7 +276,7 @@ RETCODE SQL_API SQLExecDirect(HSTMT StatementHandle, SQLCHAR *StatementText,
     // Execute statement if statement is ready
     RETCODE ret = SQL_ERROR;
     if (!SC_opencheck(stmt, "SQLExecDirect"))
-        ret = API_ExecDirect(StatementHandle, StatementText, TextLength, 1);
+        ret = API_ExecDirect(StatementHandle, StatementText, TextLength);
 
     // Exit critical
     LEAVE_STMT_CS(stmt);

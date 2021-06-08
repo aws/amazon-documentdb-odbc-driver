@@ -308,7 +308,7 @@ RETCODE SQL_API SQLExecDirectW(HSTMT StatementHandle, SQLWCHAR *StatementText,
     RETCODE ret = SQL_ERROR;
     if (!SC_opencheck(stmt, "SQLExecDirectW"))
         ret = API_ExecDirect(StatementHandle, (const SQLCHAR *)stxt,
-                               (SQLINTEGER)slen, 1);
+                             (SQLINTEGER)slen);
 
     // Exit critical
     LEAVE_STMT_CS(stmt);

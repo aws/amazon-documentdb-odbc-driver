@@ -78,7 +78,7 @@ RETCODE SQL_API ESAPI_StmtError(HSTMT StatementHandle, SQLSMALLINT RecNumber,
                                 SQLSMALLINT *TextLength, UWORD flag);
 RETCODE SQL_API API_ExecDirect(HSTMT StatementHandle,
                                  const SQLCHAR *StatementText,
-                                 SQLINTEGER TextLength, BOOL commit);
+                                 SQLINTEGER TextLength);
 RETCODE SQL_API API_Execute(HSTMT StatementHandle);
 RETCODE SQL_API ESAPI_Fetch(HSTMT StatementHandle);
 RETCODE SQL_API ESAPI_FreeConnect(HDBC ConnectionHandle);

@@ -83,10 +83,6 @@ void Disconnect(void* conn) {
     delete static_cast< Communication* >(conn);
 }
 
-void TSClearResult(TSResult* ts_result) {
-    delete ts_result;
-}
-
 PrefetchQueue* GetPrefetchQueue(void* conn, StatementClass* stmt) {
     return conn ? static_cast< Communication* >(conn)->GetPrefetchQueue(stmt)
                 : nullptr;

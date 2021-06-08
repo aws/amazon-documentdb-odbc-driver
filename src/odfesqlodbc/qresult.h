@@ -117,7 +117,6 @@ struct QResultClass_ {
     SQLLEN *updated;            /* updated index info */
     KeySet *updated_keyset;     /* uddated keyset info */
     TupleField *updated_tuples; /* uddated data by myself */
-    void *ts_result;
     char *next_token;
 };
 

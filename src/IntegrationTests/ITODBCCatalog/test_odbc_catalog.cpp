@@ -80,6 +80,10 @@ class TestSQLTables : public Fixture {};
 
 class TestSQLColumns : public Fixture {};
 
+class TestSQLColAttribute : public Fixture {};
+
+class TestSQLDescribeCol : public Fixture {};
+
 class TestSQLGetTypeInfo : public Fixture {};
 //
 //class TestSQLCatalogKeys : public testing::Test {
@@ -935,6 +939,364 @@ TEST_F(TestSQLColumns, META_DATA_CASE_INSENSITIVE_NOT_FOUND) {
     }
     std::vector< std::vector< std::string > > expected{};
     CheckRows(expected, result);
+}
+
+TEST_F(TestSQLColAttribute, SQL_DESC_CONCISE_TYPE) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring query = L"SELECT INTEGER \'1\' from ODBCTest.IoT LIMIT 1";
+    ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLLEN numeric_attr = 0;
+
+    ret = SQLColAttribute(m_hstmt, 1, SQL_DESC_CONCISE_TYPE, nullptr, 0,
+                          nullptr, &numeric_attr);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(SQL_INTEGER, numeric_attr);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLDescribeCol, INTEGER_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring query = L"SELECT INTEGER \'1\' from ODBCTest.IoT LIMIT 1";
+    ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_INTEGER, data_type);
+    EXPECT_EQ((SQLULEN)11, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLDescribeCol, DOUBLE_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring query = L"SELECT DOUBLE \'1.0\' from ODBCTest.IoT LIMIT 1";
+    ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_DOUBLE, data_type);
+    EXPECT_EQ((SQLULEN)15, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLDescribeCol, BIGINT_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring query = L"SELECT BIGINT \'2147483648\' from ODBCTest.IoT LIMIT 1";
+    ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_BIGINT, data_type);
+    EXPECT_EQ((SQLULEN)20, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLDescribeCol, BOOLEAN_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring query =
+        L"SELECT true from ODBCTest.IoT LIMIT 1";
+    ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_BIT, data_type);
+    EXPECT_EQ((SQLULEN)1, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLDescribeCol, VARCHAR_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring query = L"SELECT VARCHAR\'ABCDEFG\' from ODBCTest.IoT LIMIT 1";
+    ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_WVARCHAR, data_type);
+    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLDescribeCol, TIMESERIES_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring query =
+        L"WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 "
+        L"14:18:30.123456789' AS binned_timestamp, ROW(null, "
+        L"ARRAY[ARRAY[ROW(12345, ARRAY[1, 2, 3])]]) "
+        L"AS data FROM ODBCTest.IoT LIMIT "
+        L"1), interpolated_timeseries AS(SELECT "
+        L"CREATE_TIME_SERIES(binned_timestamp, data) FROM binned_timeseries) "
+        L"SELECT *FROM interpolated_timeseries";
+    ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
+    ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_WVARCHAR, data_type);
+    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLDescribeCol, ARRAY_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring query =
+        L"SELECT ARRAY[ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]], "
+        L"ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]]] from ODBCTest.IoT "
+        L"LIMIT 1";
+    ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_WVARCHAR, data_type);
+    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLDescribeCol, ROW_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring query =
+        L"SELECT ROW(ROW(ROW(INTEGER '03', BIGINT '10', true), "
+        L"ARRAY[ARRAY[1,2],ARRAY[1.1,2.2]])) from ODBCTest.IoT "
+        L"LIMIT 1";
+    ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_WVARCHAR, data_type);
+    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLDescribeCol, NULL_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring query = L"SELECT null from ODBCTest.IoT LIMIT 1";
+    ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_WVARCHAR, data_type);
+    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLDescribeCol, TIMESTAMP_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring query =
+        L"SELECT TIMESTAMP \'2021-01-02 18:01:13.000000000\' from ODBCTest.IoT "
+        L"LIMIT 1";
+    ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_TYPE_TIMESTAMP, data_type);
+    std::string expected = "2021-01-02 18:01:13.000000000";
+    EXPECT_EQ((SQLULEN)expected.size(), column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLDescribeCol, DATE_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring query =
+        L"SELECT DATE \'2021-01-02\' from ODBCTest.IoT LIMIT 1";
+    ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_TYPE_DATE, data_type);
+    std::string expected = "2021-01-02";
+    EXPECT_EQ((SQLULEN)expected.size(), column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLDescribeCol, TIME_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring query =
+        L"SELECT TIME \'06:39:45.123456789\' from ODBCTest.IoT LIMIT 1";
+    ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_TYPE_TIME, data_type);
+    std::string expected = "06:39:45.123456789";
+    EXPECT_EQ((SQLULEN)expected.size(), column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLDescribeCol, INTERVAL_YEAR_TO_MONTH_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring query = L"SELECT 1year from ODBCTest.IoT LIMIT 1";
+    ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_WVARCHAR, data_type);
+    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLDescribeCol, INTERVAL_DAY_TO_SECOND_COLUMN) {
+    SQLRETURN ret = SQL_ERROR;
+    std::wstring query = L"SELECT 1d from ODBCTest.IoT LIMIT 1";
+    ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLTCHAR column_name[60];
+    SQLSMALLINT column_name_length;
+    SQLSMALLINT data_type;
+    SQLULEN column_size;
+    SQLSMALLINT decimal_digits;
+    SQLSMALLINT nullable;
+    ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
+                         &data_type, &column_size, &decimal_digits, &nullable);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    std::wstring expected_column_name = L"_col0";
+    EXPECT_STREQ(expected_column_name.c_str(), column_name);
+    EXPECT_EQ(SQL_WVARCHAR, data_type);
+    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 //// We expect an empty result set for PrimaryKeys and ForeignKeys
