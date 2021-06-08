@@ -29,6 +29,15 @@
 #include "qresult.h"
 #include "statement.h"
 
+SQLRETURN ParametersNotSupported(StatementClass *stmt, const char* func) {
+    if (stmt == NULL)
+        return SQL_ERROR;
+    SC_clear_error(stmt);
+    SC_set_error(stmt, STMT_NOT_IMPLEMENTED_ERROR,
+                 "Timestream does not support parameters.", func);
+    return SQL_ERROR;
+}
+
 BOOL SC_connection_lost_check(StatementClass *stmt, const char *funcname) {
     ConnectionClass *cc = SC_get_conn(stmt);
     char message[64];
@@ -470,13 +479,8 @@ RETCODE SQL_API SQLNumResultCols(HSTMT StatementHandle,
 
 RETCODE SQL_API SQLParamData(HSTMT StatementHandle, PTR *Value) {
     UNUSED(Value);
-    StatementClass *stmt = (StatementClass *)StatementHandle;
-    if (stmt == NULL)
-        return SQL_ERROR;
-    SC_clear_error(stmt);
-    SC_set_error(stmt, STMT_NOT_IMPLEMENTED_ERROR,
-                 "Elasticsearch does not support parameters.", "SQLParamData");
-    return SQL_ERROR;
+    return ParametersNotSupported((StatementClass *)StatementHandle,
+                                  "SQLParamData");
 }
 
 #ifndef UNICODE_SUPPORTXX
@@ -512,13 +516,8 @@ RETCODE SQL_API SQLPrepare(HSTMT StatementHandle, SQLCHAR *StatementText,
 RETCODE SQL_API SQLPutData(HSTMT StatementHandle, PTR Data,
                            SQLLEN StrLen_or_Ind) {
     UNUSED(Data, StrLen_or_Ind);
-    StatementClass *stmt = (StatementClass *)StatementHandle;
-    if (stmt == NULL)
-        return SQL_ERROR;
-    SC_clear_error(stmt);
-    SC_set_error(stmt, STMT_NOT_IMPLEMENTED_ERROR,
-                 "Elasticsearch does not support parameters.", "SQLPutData");
-    return SQL_ERROR;
+    return ParametersNotSupported((StatementClass *)StatementHandle,
+                                  "SQLPutData");
 }
 
 RETCODE SQL_API SQLRowCount(HSTMT StatementHandle, SQLLEN *RowCount) {
@@ -561,13 +560,8 @@ RETCODE SQL_API SQLSetParam(HSTMT StatementHandle, SQLUSMALLINT ParameterNumber,
                             PTR ParameterValue, SQLLEN *StrLen_or_Ind) {
     UNUSED(ParameterNumber, ValueType, ParameterType, LengthPrecision,
            ParameterScale, ParameterValue, StrLen_or_Ind);
-    StatementClass *stmt = (StatementClass *)StatementHandle;
-    if (stmt == NULL)
-        return SQL_ERROR;
-    SC_clear_error(stmt);
-    SC_set_error(stmt, STMT_NOT_IMPLEMENTED_ERROR,
-                 "Elasticsearch does not support parameters.", "SQLSetParam");
-    return SQL_ERROR;
+    return ParametersNotSupported((StatementClass *)StatementHandle,
+                                  "SQLSetParam");
 }
 
 #ifndef UNICODE_SUPPORTXX
@@ -836,13 +830,8 @@ RETCODE SQL_API SQLDescribeParam(HSTMT hstmt, SQLUSMALLINT ipar,
                                  SQLSMALLINT *pibScale,
                                  SQLSMALLINT *pfNullable) {
     UNUSED(ipar, pfSqlType, pcbParamDef, pibScale, pfNullable);
-    StatementClass *stmt = (StatementClass *)hstmt;
-    SC_clear_error(stmt);
-
-    // COLNUM_ERROR translates to 'invalid descriptor index'
-    SC_set_error(stmt, STMT_COLNUM_ERROR,
-                 "Amazon Timestream does not support parameters.", "SQLDescribeParam");
-    return SQL_ERROR;
+    return ParametersNotSupported((StatementClass *)hstmt,
+                                  "SQLDescribeParam");
 }
 
 RETCODE SQL_API SQLExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
@@ -1016,7 +1005,7 @@ RETCODE SQL_API SQLNumParams(HSTMT hstmt, SQLSMALLINT *pcpar) {
         return SQL_ERROR;
     SC_clear_error(stmt);
     SC_set_error(stmt, STMT_NOT_IMPLEMENTED_ERROR,
-                 "Amazon Timestream does not support parameters.", "SQLNumParams");
+                 "Timestream does not support parameters.", "SQLNumParams");
     return SQL_SUCCESS_WITH_INFO;
 }
 
@@ -1300,14 +1289,8 @@ RETCODE SQL_API SQLBindParameter(HSTMT hstmt, SQLUSMALLINT ipar,
                                  SQLLEN cbValueMax, SQLLEN *pcbValue) {
     UNUSED(ipar, fParamType, fCType, fSqlType, cbColDef, ibScale, rgbValue,
            cbValueMax, pcbValue);
-    StatementClass *stmt = (StatementClass *)hstmt;
-    if (stmt == NULL)
-        return SQL_ERROR;
-    SC_clear_error(stmt);
-    SC_set_error(stmt, STMT_NOT_IMPLEMENTED_ERROR,
-                 "Elasticsearch does not support parameters.",
-                 "SQLBindParameter");
-    return SQL_ERROR;
+    return ParametersNotSupported((StatementClass *)hstmt,
+                                  "SQLBindParameter");
 }
 
 /* ODBC 2.x-specific functions */

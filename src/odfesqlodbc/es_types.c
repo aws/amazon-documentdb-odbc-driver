@@ -167,7 +167,7 @@ static SQLSMALLINT getNumericDecimalDigitsX(const ConnectionClass *conn,
     return (SQLSMALLINT)adtsize_or_longest;
 }
 
-static Int4 /* Elasticsearch restritiction */
+static Int4
 getNumericColumnSizeX(const ConnectionClass *conn, OID type, int atttypmod,
                       int adtsize_or_longest, int handle_unknown_size_as) {
     UNUSED(conn);
@@ -1121,13 +1121,13 @@ const char *estype_to_name(const StatementClass *stmt, OID type, int col,
 /*
  *	This corresponds to "precision" in ODBC 2.x.
  *
- *	For TS_TYPE_VARCHAR, ES_TYPE_BPCHAR, ES_TYPE_NUMERIC, SQLColumns will
- *	override this length with the atttypmod length from es_attribute .
+ *	For TS_TYPE_VARCHAR, SQLColumns will
+ *	override this length with the atttypmod length from attribute .
  *
  *	If col >= 0, then will attempt to get the info from the result set.
  *	This is used for functions SQLDescribeCol and SQLColAttributes.
  */
-Int4 /* Elasticsearch restriction */
+Int4 /* Timestream restriction */
 estype_column_size(const StatementClass *stmt, OID type, int col,
                    int handle_unknown_size_as) {
     int atttypmod, adtsize_or_longestlen;
