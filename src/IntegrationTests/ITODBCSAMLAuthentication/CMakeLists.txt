@@ -25,7 +25,6 @@ include_directories(${UT_HELPER}
 add_executable(itodbc_saml_authentication ${SOURCE_FILES})
 
 # Library dependencies
-target_code_coverage(itodbc_saml_authentication PUBLIC AUTO ALL)
 target_link_libraries(itodbc_saml_authentication odfesqlodbc itodbc_helper ut_helper gtest_main)
 target_compile_definitions(itodbc_saml_authentication PUBLIC _UNICODE UNICODE)
 
