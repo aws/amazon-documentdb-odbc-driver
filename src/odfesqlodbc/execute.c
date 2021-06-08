@@ -35,22 +35,71 @@
 #include "statement.h"
 
 RETCODE SQL_API API_Prepare(HSTMT hstmt, const SQLCHAR *stmt_str,
-                              SQLINTEGER stmt_sz) {
+                            SQLINTEGER stmt_sz) {
+    CSTR func = "API_Prepare";
     if (hstmt == NULL)
         return SQL_ERROR;
 
     // We know cursor is not open at this point
     StatementClass *stmt = (StatementClass *)hstmt;
 
-    // PrepareStatement deallocates memory if necessary
-    RETCODE ret = PrepareStatement(stmt, stmt_str, stmt_sz);
-    if (ret != SQL_SUCCESS)
-        return ret;
+    size_t original_stmt_len;
+    if (!stmt_str) {
+        SC_initialize_and_recycle(stmt);
+        SC_set_error(stmt, STMT_INVALID_NULL_ARG, "Invalid use of null pointer",
+                     func);
+        return SQL_ERROR;
+    }
+    if (stmt_sz >= 0)
+        original_stmt_len = stmt_sz;
+    else if (SQL_NTS == stmt_sz)
+        original_stmt_len = strlen((char *)stmt_str);
+    else {
+        MYLOG(LOG_DEBUG, "invalid length=" FORMAT_INTEGER "\n", stmt_sz);
+        SC_initialize_and_recycle(stmt);
+        SC_set_error(stmt, STMT_INVALID_NULL_ARG, "Invalid buffer length",
+                     func);
+        return SQL_ERROR;
+    }
 
-    // Execute the statement
-    ret = ExecuteStatement(stmt, FALSE);
+    // Construct the metadata statement
+    const char *metadata_stmt_prefix = "SELECT * FROM (";
+    const char *metadata_stmt_suffix = ") AS original LIMIT 0";
+    const size_t metadata_stmt_affix_len = 36;
+    char *metadata_stmt;
+    metadata_stmt =
+        calloc(metadata_stmt_affix_len + original_stmt_len + 1, sizeof(char));
+    if (!metadata_stmt) {
+        SC_initialize_and_recycle(stmt);
+        SC_set_error(stmt, STMT_NO_MEMORY_ERROR,
+                     "No memory available to store statement to get metadata",
+                     func);
+        return SQL_ERROR;
+    }
+    strcpy(metadata_stmt, metadata_stmt_prefix);
+    strncat(metadata_stmt, (char *)stmt_str, original_stmt_len);
+    strcat(metadata_stmt, metadata_stmt_suffix);
+
+    // Prepare metadata statement to get metadata
+    // PrepareStatement deallocates memory if necessary
+    RETCODE ret = PrepareStatement(
+        stmt, (SQLCHAR *)metadata_stmt,
+        (SQLINTEGER)(metadata_stmt_affix_len + original_stmt_len));
+
+    // Not used afterwards
+    free(metadata_stmt);
+
+    if (ret != SQL_SUCCESS) {
+        return ret;
+    }
+
+    // Execute the metadata statement
+    ret = ExecuteStatement(stmt);
     if (ret == SQL_SUCCESS)
         stmt->prepared = PREPARED;
+
+    // Restore to original statement
+    strncpy_null(stmt->statement, (char *)stmt_str, original_stmt_len + 1);
 
     return ret;
 }
@@ -65,14 +114,15 @@ RETCODE SQL_API API_Execute(HSTMT hstmt) {
     RETCODE ret = SQL_ERROR;
     switch (stmt->prepared) {
         case PREPARED:
-            ret = AssignResult(stmt);
+            SC_reset_result_for_rerun(stmt);
+            ret = ExecuteStatement(stmt);
             stmt->prepared = EXECUTED;
             break;
         case EXECUTED:
             ret = RePrepareStatement(stmt);
             if (ret != SQL_SUCCESS)
                 break;
-            ret = ExecuteStatement(stmt, TRUE);
+            ret = ExecuteStatement(stmt);
             if (ret != SQL_SUCCESS)
                 break;
             stmt->prepared = EXECUTED;
@@ -88,7 +138,7 @@ RETCODE SQL_API API_Execute(HSTMT hstmt) {
 }
 
 RETCODE SQL_API API_ExecDirect(HSTMT hstmt, const SQLCHAR *stmt_str,
-                                 SQLINTEGER stmt_sz, BOOL commit) {
+                               SQLINTEGER stmt_sz) {
     if (hstmt == NULL)
         return SQL_ERROR;
 
@@ -99,7 +149,7 @@ RETCODE SQL_API API_ExecDirect(HSTMT hstmt, const SQLCHAR *stmt_str,
         return ret;
 
     // Execute statement
-    ret = ExecuteStatement(hstmt, commit);
+    ret = ExecuteStatement(hstmt);
     if (ret != SQL_SUCCESS)
         return ret;
     stmt->prepared = NOT_PREPARED;

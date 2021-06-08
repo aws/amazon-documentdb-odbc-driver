@@ -26,12 +26,10 @@ extern "C" {
 #endif
 RETCODE RePrepareStatement(StatementClass *stmt);
 RETCODE PrepareStatement(StatementClass* stmt, const SQLCHAR *stmt_str, SQLINTEGER stmt_sz);
-RETCODE ExecuteStatement(StatementClass *stmt, BOOL commit);
-QResultClass *SendQueryGetResult(StatementClass *stmt, BOOL commit);
-RETCODE AssignResult(StatementClass *stmt);
+RETCODE ExecuteStatement(StatementClass *stmt);
+QResultClass *SendQueryGetResult(StatementClass *stmt);
 SQLRETURN API_Cancel(HSTMT hstmt);
 SQLRETURN GetNextResultSet(StatementClass *stmt);
-void ClearTSResult(void *ts_result);
 #ifdef __cplusplus
 }
 #endif

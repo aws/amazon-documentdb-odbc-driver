@@ -28,13 +28,6 @@ bool _CC_from_TSResult(
     QResultClass *q_res, ConnectionClass *conn, StatementClass *stmt,
     const char *next_token,
     const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
-bool _CC_Metadata_from_TSResult(
-    QResultClass *q_res, ConnectionClass *conn, StatementClass *stmt,
-    const char *next_token,
-    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
-bool _CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
-    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
-
 /**
  * Responsible for looping through columns, allocating memory for column fields
  * and setting column info
@@ -217,24 +210,6 @@ BOOL CC_from_TSResult(
                                                                        : FALSE;
 }
 
-BOOL CC_Metadata_from_TSResult(
-    QResultClass *q_res, ConnectionClass *conn, StatementClass *stmt,
-    const char *next_token,
-    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result) {
-    ClearError();
-    return _CC_Metadata_from_TSResult(q_res, conn, stmt, next_token, ts_result)
-               ? TRUE
-               : FALSE;
-}
-
-BOOL CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
-    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result) {
-    ClearError();
-    return _CC_No_Metadata_from_TSResult(q_res, conn, next_token, ts_result)
-               ? TRUE
-               : FALSE;
-}
-
 BOOL CC_Append_Table_Data(
     const Aws::TimestreamQuery::Model::QueryOutcome &ts_result,
     QResultClass *q_res, ColumnInfoClass &fields) {
@@ -242,70 +217,6 @@ BOOL CC_Append_Table_Data(
     return AssignTableData(ts_result, q_res, fields)
                ? TRUE
                : FALSE;
-}
-
-bool _CC_No_Metadata_from_TSResult(QResultClass *q_res, ConnectionClass *conn, const char *next_token,
-    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result) {
-    // Note - NULL conn and/or cursor is valid
-    if (q_res == NULL)
-        return false;
-
-    try {
-
-        SQLULEN starting_cached_rows = q_res->num_cached_rows;
-
-        // Assign table data and column headers
-        if (!AssignTableData(ts_result, q_res, *(q_res->fields)))
-            return false;
-        std::string command_type = "SELECT";
-        // Update fields of QResult to reflect data written
-        UpdateResultFields(q_res, conn, starting_cached_rows, next_token,
-                           command_type);
-
-        // Return true (success)
-        return true;
-    } catch (const std::exception &e) {
-        SetError(e.what());
-    } catch (...) {
-        SetError("Unknown exception thrown in _CC_No_Metadata_from_TSResult.");
-    }
-
-    // Exception occurred, return false (error)
-    return false;
-}
-
-bool _CC_Metadata_from_TSResult(
-    QResultClass *q_res, ConnectionClass *conn, StatementClass *stmt,
-    const char *next_token,
-    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result) {
-    CSTR func = "_CC_Metadata_from_TSResult";
-    // Note - NULL conn and/or cursor is valid
-    if (q_res == NULL)
-        return false;
-
-    QR_set_conn(q_res, conn);
-    try {
-        // Assign table data and column headers
-        if (!AssignColumnHeaders(q_res, ts_result))
-            return false;
-
-        // Set command type and cursor name
-        std::string command = "SELECT";
-        QR_set_command(q_res, command.c_str());
-        QR_set_cursor(q_res, next_token);
-        if (next_token == NULL)
-            QR_set_reached_eof(q_res);
-
-        // Return true (success)
-        return true;
-    } catch (const std::exception &e) {
-        SC_set_error(stmt, STMT_EXEC_ERROR, e.what(), func);
-    } catch (...) {
-        SC_set_error(stmt, STMT_EXEC_ERROR, "Unknown exception thrown", func);
-    }
-
-    // Exception occurred, return false (error)
-    return false;
 }
 
 void print_log(const LogLevel &level, const std::string &s) {
