@@ -694,26 +694,4 @@ cleanup:
     return ret;
 }
 
-BOOL INTFUNC ChangeDriverName(HWND hwndParent, LPSETUPDLG lpsetupdlg,
-                              LPCSTR driver_name) {
-    DWORD err = 0;
-    ConnInfo *ci = &lpsetupdlg->ci;
-
-    if (!ci->dsn[0]) {
-        err = IDS_BADDSN;
-    } else if (!driver_name || strnicmp(driver_name, "elasticsearch", 13)) {
-        err = IDS_BADDSN;
-    } else {
-        LPCSTR lpszDrvr = lpsetupdlg->lpszDrvr;
-
-        lpsetupdlg->lpszDrvr = driver_name;
-        if (!SetDSNAttributes(hwndParent, lpsetupdlg, &err)) {
-            if (!err)
-                err = IDS_BADDSN;
-            lpsetupdlg->lpszDrvr = lpszDrvr;
-        }
-    }
-    return (err == 0);
-}
-
 #endif /* WIN32 */
