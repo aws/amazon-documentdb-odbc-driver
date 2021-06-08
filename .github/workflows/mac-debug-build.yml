@@ -1,0 +1,89 @@
+name: Timestream ODBC Driver for Mac (Debug)
+
+on:
+  workflow_dispatch:
+
+env:
+  CI_OUTPUT_PATH: "ci-output"
+  ODBC_LIB_PATH: "./build/odbc/lib"
+  ODBC_BIN_PATH: "./build/odbc/bin"
+  ODBC_BUILD_PATH: "./build/odbc/build"
+  AWS_SDK_INSTALL_PATH: "./build/aws-sdk/install"
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: run-cppcheck
+      run: |
+        brew install cppcheck
+        sh run_cppcheck.sh
+    - name: upload-cppcheck-results
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: cppcheck-results
+        path: cppcheck-results.log
+    - name: get-dependencies
+      run: |
+        brew unlink unixodbc
+        brew install curl
+        brew install cmake
+        brew install libiodbc
+    - name: configure-and-build-driver
+      run: |
+        ./build_mac_debug64.sh
+    - name: configure-aws-credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    - name: prepare-dsn
+      run: |
+        sudo mkdir /Library/ODBC
+        sudo mv ./src/IntegrationTests/ITODBCConnection/odbc.ini /Library/ODBC
+        mkdir ${{ github.workspace }}/odbc-logs
+    - name: run-connection-unit-test
+      run: |
+        ./build/odbc/bin/ut_conn
+    - name: run-integration-connection-tests
+      run: |
+        ./build/odbc/bin/itodbc_connection
+    - name: run-integration-execution-tests
+      run: |
+        ./build/odbc/bin/itodbc_execution
+    - name: run-integration-results-tests
+      run: |
+        ./build/odbc/bin/itodbc_results
+    - name: run-integration-descriptors-tests
+      run: |
+        ./build/odbc/bin/itodbc_descriptors
+    - name: run-integration-catalog-tests
+      run: |
+        ./build/odbc/bin/itodbc_catalog
+    - name: run-integration-info-tests
+      run: |
+        ./build/odbc/bin/itodbc_info
+    - name: run-integration-pagination-tests
+      run: |
+        ./build/odbc/bin/itodbc_pagination
+    - name: print-test-logs
+      if: failure()
+      run: |
+        cat /tmp/timestreamodbc_*.log
+        cat ./aws_sdk_*.log
+    - name: print-memory-leak-logs
+      if: always()
+      run: |
+        cat ./leaks_*
+    - name: upload-integration-test-results
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: integration-test-results-mac64
+        path: |
+          ${{ github.workspace }}/odbc-logs/
+          ${{ github.workspace }}/leaks_
+

@@ -25,5 +25,6 @@ include_directories(	${UT_HELPER}
 add_executable(itodbc_execution ${SOURCE_FILES})
 
 # Library dependencies
+target_code_coverage(itodbc_execution PUBLIC AUTO ALL)
 target_link_libraries(itodbc_execution odfesqlodbc itodbc_helper ut_helper gtest_main)
 target_compile_definitions(itodbc_execution PUBLIC _UNICODE UNICODE)
