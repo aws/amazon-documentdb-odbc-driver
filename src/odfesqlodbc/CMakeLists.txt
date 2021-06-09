@@ -51,7 +51,6 @@ set(CPP_SOURCE_FILES	communication.cpp
 						helper.cpp
 						info.cpp
 						parse_result.cpp
-						semaphore.cpp
 						odbc_statement.cpp
 						utility.cpp
 						odbc_communication.cpp
@@ -91,7 +90,6 @@ set(CPP_HEADER_FILES	communication.h
 						info.h
 						odbc.h
 						parse_result.h
-						semaphore.h
 						odbc_statement.h
 						types.h
 						utility.h
