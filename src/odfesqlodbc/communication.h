@@ -24,8 +24,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "es_types.h"
-#include "ts_prefetch_queue.h"
+#include "prefetch_queue.h"
+#include "types.h"
 
 /**
  * Communication interface between ODBC library and actual database implementation

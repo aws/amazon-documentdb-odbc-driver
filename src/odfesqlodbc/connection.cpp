@@ -19,7 +19,7 @@
 #define _WIN32_WINNT 0x0400
 #endif /* _WIN32_WINNT */
 
-#include "es_connection.h"
+#include "connection.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -37,10 +37,10 @@
 #include <map>
 #include <string>
 #include <stdexcept>
+#include "apifunc.h"
 #include "dlg_specific.h"
 #include "environ.h"
-#include "es_apifunc.h"
-#include "es_helper.h"
+#include "helper.h"
 #include "loadlib.h"
 #include "multibyte.h"
 #include "qresult.h"

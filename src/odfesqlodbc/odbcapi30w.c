@@ -16,12 +16,12 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "es_odbc.h"
 #include "unicode_support.h"
 
-#include "es_apifunc.h"
-#include "es_connection.h"
+#include "apifunc.h"
+#include "connection.h"
 #include "misc.h"
+#include "odbc.h"
 #include "statement.h"
 
 RETCODE SQL_API SQLGetStmtAttrW(SQLHSTMT hstmt, SQLINTEGER fAttribute,

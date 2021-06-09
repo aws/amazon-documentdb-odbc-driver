@@ -15,10 +15,10 @@
  */
 
 // clang-format off
+#include "helper.h"
+#include "odbc_communication.h"
 #include "pch.h"
 #include "unit_test_helper.h"
-#include "ts_communication.h"
-#include "es_helper.h"
 // clang-format on
 
 //const std::string valid_port = "9200";

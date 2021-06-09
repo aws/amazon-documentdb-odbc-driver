@@ -14,9 +14,9 @@
  *
  */
 
-#ifndef __ES_DRIVER_CONNECT_H__
-#define __ES_DRIVER_CONNECT_H__
-#include "es_connection.h"
+#ifndef __DRIVER_CONNECT_H__
+#define __DRIVER_CONNECT_H__
+#include "connection.h"
 
 // C Interface
 #ifdef __cplusplus
@@ -31,4 +31,4 @@ RETCODE ESAPI_DriverConnect(HDBC hdbc, HWND hwnd, SQLCHAR *conn_str_in,
 }
 #endif
 
-#endif /* __ES_DRIVER_CONNECT_H__ */
+#endif /* __DRIVER_CONNECT_H__ */
