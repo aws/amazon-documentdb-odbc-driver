@@ -1,6 +1,6 @@
-# ODBCCli
+# ODBC sample client application - ODBCCli
 
-It is a very simple odbc client application to support fuzzy testing of an ODBC driver.
+It is a very simple odbc client application.
 
 ## Prerequisite
 - [CMake](https://cmake.org/)
