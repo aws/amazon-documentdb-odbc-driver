@@ -14,8 +14,8 @@
  *
  */
 
-#ifndef _ES_PARSE_RESULT_H_
-#define _ES_PARSE_RESULT_H_
+#ifndef _PARSE_RESULT_H_
+#define _PARSE_RESULT_H_
 #include "qresult.h"
 
 #ifdef __cplusplus
@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 #ifdef __cplusplus
-#include "es_helper.h"
+#include "helper.h"
 #include <aws/timestream-query/model/Type.h>
 #include <aws/timestream-query/model/ScalarType.h>
 #include <aws/timestream-query/TimestreamQueryClient.h>

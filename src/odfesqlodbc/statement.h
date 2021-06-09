@@ -21,10 +21,10 @@
 
 #include "bind.h"
 #include "descriptor.h"
-#include "es_helper.h"
-#include "es_odbc.h"
-#include "es_types.h"
+#include "helper.h"
+#include "odbc.h"
 #include "tuple.h"
+#include "types.h"
 
 // C Interface
 #ifdef __cplusplus

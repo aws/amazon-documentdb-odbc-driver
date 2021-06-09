@@ -24,7 +24,7 @@
 #include <memory>
 #include <string>
 
-#include "es_types.h"
+#include "types.h"
 
 /**
  * SAML credentials provider class to provider AWS credentials.

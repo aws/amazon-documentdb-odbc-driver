@@ -14,28 +14,28 @@
  *
  */
 
-#ifndef __ES_INFO_H__
-#define __ES_INFO_H__
-#include "es_helper.h"
-#include "es_odbc.h"
+#ifndef __INFO_H__
+#define __INFO_H__
+#include "helper.h"
+#include "odbc.h"
 #include "unicode_support.h"
 
 #ifndef WIN32
 #include <ctype.h>
 #endif
 
+#include "apifunc.h"
 #include "bind.h"
 #include "catfunc.h"
+#include "connection.h"
 #include "dlg_specific.h"
 #include "environ.h"
-#include "es_apifunc.h"
-#include "es_connection.h"
-#include "es_types.h"
 #include "misc.h"
 #include "multibyte.h"
 #include "qresult.h"
 #include "statement.h"
 #include "tuple.h"
+#include "types.h"
 
 // C Interface
 #ifdef __cplusplus
@@ -62,4 +62,4 @@ RETCODE SQL_API API_GetTypeInfo(HSTMT hstmt, SQLSMALLINT fSqlType);
 }
 #endif
 
-#endif /* __ES_INFO_H__ */
+#endif /* __INFO_H__ */

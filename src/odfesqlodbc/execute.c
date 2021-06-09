@@ -17,22 +17,22 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "es_odbc.h"
+#include "odbc.h"
 #include "misc.h"
 
 #ifndef WIN32
 #include <ctype.h>
 #endif /* WIN32 */
 
+#include "apifunc.h"
 #include "bind.h"
+#include "connection.h"
 #include "convert.h"
 #include "environ.h"
-#include "es_apifunc.h"
-#include "es_connection.h"
-#include "es_statement.h"
-#include "es_types.h"
+#include "odbc_statement.h"
 #include "qresult.h"
 #include "statement.h"
+#include "types.h"
 
 RETCODE SQL_API API_Prepare(HSTMT hstmt, const SQLCHAR *stmt_str,
                             SQLINTEGER stmt_sz) {

@@ -18,18 +18,18 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "apifunc.h"
 #include "bind.h"
+#include "connection.h"
 #include "convert.h"
 #include "dlg_specific.h"
 #include "environ.h"
-#include "es_apifunc.h"
-#include "es_connection.h"
-#include "es_odbc.h"
-#include "es_types.h"
 #include "misc.h"
+#include "odbc.h"
+#include "odbc_statement.h"
 #include "qresult.h"
 #include "statement.h"
-#include "es_statement.h"
+#include "types.h"
 
 /*	Helper macro */
 #define getEffectiveOid(conn, fi) \
@@ -632,13 +632,6 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
             break;
 
         case SQL_COLUMN_UPDATABLE: /* == SQL_DESC_UPDATABLE */
-
-            /*
-             * Neither Access or Borland care about this.
-             *
-             * if (field_type == ES_TYPE_OID) pfDesc = SQL_ATTR_READONLY;
-             * else
-             */
             if (!stmt_updatable)
                 value = SQL_ATTR_READONLY;
             else
@@ -694,7 +687,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
         case SQL_DESC_PRECISION: /* different from SQL_COLUMN_PRECISION */
             if (value = FI_precision(fi), value <= 0)
                 value =
-                    estype_precision(stmt, field_type, col_idx, unknown_sizes);
+                    estype_precision(stmt, field_type, col_idx);
             if (value < 0)
                 value = 0;
 
@@ -702,9 +695,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
                   col_idx, value);
             break;
         case SQL_DESC_SCALE: /* different from SQL_COLUMN_SCALE */
-            value = estype_scale(stmt, field_type, col_idx);
-            if (value < 0)
-                value = 0;
+            value = 0;
             break;
         case SQL_DESC_LOCAL_TYPE_NAME:
             p = estype_to_name(stmt, field_type, col_idx,

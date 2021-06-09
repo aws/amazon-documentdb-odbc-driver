@@ -14,7 +14,7 @@
  *
  */
 
-#include "es_odbc.h"
+#include "odbc.h"
 #include "unicode_support.h"
 
 #include <stdio.h>
@@ -25,21 +25,21 @@
 #endif
 
 #include "dlg_specific.h"
-#include "es_types.h"
 #include "tuple.h"
+#include "types.h"
 
+#include "apifunc.h"
 #include "bind.h"
 #include "catfunc.h"
+#include "connection.h"
 #include "environ.h"
-#include "es_apifunc.h"
-#include "es_connection.h"
-#include "es_info.h"
-#include "es_types.h"
+#include "info.h"
 #include "misc.h"
 #include "multibyte.h"
 #include "qresult.h"
 #include "statement.h"
 #include "tuple.h"
+#include "types.h"
 
 /*	Trigger related stuff for SQLForeign Keys */
 #define TRIGGER_SHIFT 3
@@ -357,7 +357,7 @@ RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
         case SQL_MAX_TABLE_NAME_LEN: /* ODBC 1.0 */
             len = 2;
             // TO-DO
-            if (ES_VERSION_GT(conn, 7.4))
+            if (VERSION_GT(conn, 7.4))
                 value = CC_get_max_idlen(conn);
 #ifdef MAX_TABLE_LEN
             else
@@ -922,25 +922,24 @@ cleanup:
  *	macros for estype_xxxx() calls which have ES_ATP_UNSET parameters
  */
 #define ESTYPE_COLUMN_SIZE(conn, esType)                              \
-    tstype_attr_column_size(conn, esType, ES_ATP_UNSET, ES_ADT_UNSET, \
-                            ES_UNKNOWNS_UNSET)
+    tstype_attr_column_size(conn, esType, TS_ATP_UNSET, TS_ADT_UNSET, \
+                            TS_UNKNOWNS_UNSET)
 #define ESTYPE_TO_CONCISE_TYPE(conn, esType)                              \
-    estype_attr_to_concise_type(conn, esType, ES_ATP_UNSET, ES_ADT_UNSET, \
-                                ES_UNKNOWNS_UNSET)
+    estype_attr_to_concise_type(conn, esType, TS_ATP_UNSET, TS_ADT_UNSET, \
+                                TS_UNKNOWNS_UNSET)
 #define ESTYPE_TO_SQLDESCTYPE(conn, esType)                              \
-    estype_attr_to_sqldesctype(conn, esType, ES_ATP_UNSET, ES_ADT_UNSET, \
-                               ES_UNKNOWNS_UNSET)
+    estype_attr_to_sqldesctype(conn, esType, TS_ATP_UNSET, TS_ADT_UNSET, \
+                               TS_UNKNOWNS_UNSET)
 #define ESTYPE_BUFFER_LENGTH(conn, esType)                              \
-    estype_attr_buffer_length(conn, esType, ES_ATP_UNSET, ES_ADT_UNSET, \
-                              ES_UNKNOWNS_UNSET)
+    estype_attr_buffer_length(conn, esType, TS_ATP_UNSET, TS_ADT_UNSET, \
+                              TS_UNKNOWNS_UNSET)
 #define ESTYPE_DECIMAL_DIGITS(conn, esType)                              \
-    estype_attr_decimal_digits(conn, esType, ES_ATP_UNSET, ES_ADT_UNSET, \
-                               ES_UNKNOWNS_UNSET)
+    estype_attr_decimal_digits(conn, esType, TS_ATP_UNSET)
 #define ESTYPE_TRANSFER_OCTET_LENGTH(conn, esType)                \
-    estype_attr_transfer_octet_length(conn, esType, ES_ATP_UNSET, \
-                                      ES_UNKNOWNS_UNSET)
+    estype_attr_transfer_octet_length(conn, esType, TS_ATP_UNSET, \
+                                      TS_UNKNOWNS_UNSET)
 #define ESTYPE_TO_NAME(conn, esType, auto_increment) \
-    tstype_attr_to_name(conn, esType, ES_ATP_UNSET, auto_increment)
+    tstype_attr_to_name(conn, esType, TS_ATP_UNSET, auto_increment)
 
 RETCODE SQL_API ESAPI_GetFunctions(HDBC hdbc, SQLUSMALLINT fFunction,
                                    SQLUSMALLINT *pfExists) {
@@ -1262,8 +1261,7 @@ char *identifierEscape(const SQLCHAR *src, SQLLEN srclen,
     estype_attr_buffer_length(conn, esType, atttypmod, ES_ADT_UNSET, \
                               ES_UNKNOWNS_UNSET)
 #define ESTYPE_ATTR_DECIMAL_DIGITS(conn, esType, atttypmod)           \
-    estype_attr_decimal_digits(conn, esType, atttypmod, ES_ADT_UNSET, \
-                               ES_UNKNOWNS_UNSET)
+    estype_attr_decimal_digits(conn, esType, atttypmod)
 #define ESTYPE_ATTR_TRANSFER_OCTET_LENGTH(conn, esType, atttypmod) \
     estype_attr_transfer_octet_length(conn, esType, atttypmod,     \
                                       ES_UNKNOWNS_UNSET)
@@ -1383,7 +1381,7 @@ RETCODE SQL_API ESAPI_Statistics(
                         2);
     QR_set_field_info_v(res, STATS_COLUMN_NAME, "COLUMN_NAME", TS_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, STATS_COLLATION, "COLLATION", ES_TYPE_CHAR, 1);
+    QR_set_field_info_v(res, STATS_COLLATION, "COLLATION", SQL_CHAR, 1);
     QR_set_field_info_v(res, STATS_CARDINALITY, "CARDINALITY", TS_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, STATS_PAGES, "PAGES", TS_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, STATS_FILTER_CONDITION, "FILTER_CONDITION",

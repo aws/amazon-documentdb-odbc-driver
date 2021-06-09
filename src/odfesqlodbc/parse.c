@@ -14,20 +14,19 @@
  *
  */
 
-#include "es_odbc.h"
-
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
+#include "apifunc.h"
 #include "catfunc.h"
-#include "es_apifunc.h"
-#include "es_connection.h"
-#include "es_types.h"
+#include "connection.h"
+#include "odbc.h"
 #include "qresult.h"
 #include "statement.h"
+#include "types.h"
 
-#include "es_info.h"
+#include "info.h"
 #include "misc.h"
 #include "multibyte.h"
 
@@ -38,9 +37,6 @@ Int4 FI_precision(const FIELD_INFO *fi) {
         return -1;
     ftype = FI_type(fi);
     switch (ftype) {
-        case ES_TYPE_NUMERIC:
-            return fi->column_size;
-        case ES_TYPE_DATETIME:
         case TS_TYPE_TIMESTAMP_NO_TMZONE:
             return fi->decimal_digits;
     }
