@@ -4,11 +4,20 @@
 #ifdef WIN32
 
 #include <windows.h>
+#include <sql.h>
+#include <sqlext.h>
+
+#elif defined(WITH_IODBC)
+
+#include "isql.h"
+#include "isqlext.h"
+
+#elif defined(WITH_UNIXODBC)
+
+#include <odbcinst.h>
 
 #endif
 
-#include <sql.h>
-#include <sqlext.h>
 #include <vector>
 #include <string>
 #include <optional>
