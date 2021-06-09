@@ -15,8 +15,8 @@
  */
 
 // clang-format off
+#include "odbc_communication.h"
 #include "pch.h"
-#include "ts_communication.h"
 #include "unit_test_helper.h"
 #include "it_odbc_helper.h"
 #include "chrono"

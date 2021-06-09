@@ -14,12 +14,12 @@
  *
  */
 
-#ifndef _ES_API_FUNC_H__
-#define _ES_API_FUNC_H__
+#ifndef _TS_API_FUNC_H__
+#define _TS_API_FUNC_H__
 
 #include <stdio.h>
 #include <string.h>
-#include "es_odbc.h"
+#include "odbc.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -240,4 +240,4 @@ RETCODE SQL_API ESAPI_DescError(SQLHDESC DescriptorHandle,
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* define_ES_API_FUNC_H__ */
+#endif /* define_TS_API_FUNC_H__ */

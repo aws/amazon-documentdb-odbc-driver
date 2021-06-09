@@ -14,12 +14,12 @@
  *
  */
 
-#ifndef __ES_HELPER_H__
-#define __ES_HELPER_H__
+#ifndef __HELPER_H__
+#define __HELPER_H__
 
-#include "es_types.h"
+#include "types.h"
 #ifdef __cplusplus
-#include "ts_prefetch_queue.h"
+#include "prefetch_queue.h"
 // C++ interface
 std::string GetClientEncoding(void* conn);
 bool SetClientEncoding(void* conn, std::string& encoding);
@@ -43,4 +43,4 @@ void StopRetrieval(void* conn, StatementClass* stmt);
 }
 #endif
 
-#endif  // __ES_HELPER_H__
+#endif  // __HELPER_H__

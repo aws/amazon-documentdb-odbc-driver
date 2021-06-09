@@ -15,7 +15,7 @@
  */
 
 // clang-format off
-#include "es_odbc.h"
+#include "odbc.h" //must come before misc.h
 #include "misc.h"
 
 #include <stdio.h>

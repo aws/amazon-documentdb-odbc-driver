@@ -17,14 +17,14 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "apifunc.h"
+#include "connection.h"
 #include "descriptor.h"
 #include "dlg_specific.h"
 #include "environ.h"
-#include "es_apifunc.h"
-#include "es_connection.h"
-#include "es_odbc.h"
 #include "loadlib.h"
 #include "misc.h"
+#include "odbc.h"
 #include "qresult.h"
 #include "statement.h"
 

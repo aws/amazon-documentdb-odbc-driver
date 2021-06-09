@@ -22,9 +22,9 @@
 #include <time.h>
 
 #include "descriptor.h"
-#include "es_helper.h"
-#include "es_odbc.h"
-#include "es_utility.h"
+#include "helper.h"
+#include "odbc.h"
+#include "utility.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -205,14 +205,14 @@ typedef enum {
  *	Note: Never pass a variable as the second parameter.
  *		  It must be a decimal constant of the form %d.%d .
  */
-#define ES_VERSION_GT(conn, ver) \
+#define VERSION_GT(conn, ver) \
     (SERVER_VERSION_GT(conn, (int)ver, atoi(STRING_AFTER_DOT(ver))))
-#define ES_VERSION_GE(conn, ver) \
+#define VERSION_GE(conn, ver) \
     (SERVER_VERSION_GE(conn, (int)ver, atoi(STRING_AFTER_DOT(ver))))
-#define ES_VERSION_EQ(conn, ver) \
+#define VERSION_EQ(conn, ver) \
     (SERVER_VERSION_EQ(conn, (int)ver, atoi(STRING_AFTER_DOT(ver))))
-#define ES_VERSION_LE(conn, ver) (!ES_VERSION_GT(conn, ver))
-#define ES_VERSION_LT(conn, ver) (!ES_VERSION_GE(conn, ver))
+#define VERSION_LE(conn, ver) (!VERSION_GT(conn, ver))
+#define VERSION_LT(conn, ver) (!VERSION_GE(conn, ver))
 
 /*	This is used to store cached table information in the connection */
 struct col_info {

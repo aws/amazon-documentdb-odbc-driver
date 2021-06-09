@@ -14,13 +14,13 @@
  *
  */
 
-#include "es_parse_result.h"
+#include "parse_result.h"
 
 #include <unordered_map>
 
-#include "es_helper.h"
-#include "es_types.h"
+#include "helper.h"
 #include "statement.h"
+#include "types.h"
 
 typedef std::vector< std::pair< std::string, OID > > schema_type;
 
@@ -28,6 +28,7 @@ bool _CC_from_TSResult(
     QResultClass *q_res, ConnectionClass *conn, StatementClass *stmt,
     const char *next_token,
     const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
+
 /**
  * Responsible for looping through columns, allocating memory for column fields
  * and setting column info
@@ -122,43 +123,7 @@ static const std::string JSON_KW_DATAROWS = "datarows";
 static const std::string JSON_KW_ERROR = "error";
 static const std::string JSON_KW_CURSOR = "cursor";
 
-// clang-format on
-//const std::unordered_map< std::string, OID > type_to_oid_map = {
-//    {ES_TYPE_NAME_BOOLEAN, TS_TYPE_BOOLEAN},
-//    {ES_TYPE_NAME_BYTE, TS_TYPE_INT2},
-//    {ES_TYPE_NAME_SHORT, TS_TYPE_INT2},
-//    {TS_TYPE_NAME_INTEGER, TS_TYPE_INTEGER},
-//    {TS_TYPE_NAME_BIGINT, TS_TYPE_BIGINT},
-//    {ES_TYPE_NAME_HALF_FLOAT, ES_TYPE_FLOAT4},
-//    {ES_TYPE_NAME_FLOAT, ES_TYPE_FLOAT4},
-//    {TS_TYPE_NAME_DOUBLE, TS_TYPE_DOUBLE},
-//    {ES_TYPE_NAME_SCALED_FLOAT, TS_TYPE_DOUBLE},
-//    {ES_TYPE_NAME_KEYWORD, TS_TYPE_VARCHAR},
-//    {ES_TYPE_NAME_TEXT, TS_TYPE_VARCHAR},
-//    {ES_TYPE_NAME_DATE, TS_TYPE_TIMESTAMP},
-//    {ES_TYPE_NAME_OBJECT, TS_TYPE_VARCHAR},
-//    {TS_TYPE_NAME_VARCHAR, TS_TYPE_VARCHAR},
-//    {ES_TYPE_NAME_DATE, TS_TYPE_DATE},
-//
-//    {TS_TYPE_NAME_VARCHAR, TS_TYPE_VARCHAR},
-//    {TS_TYPE_NAME_BOOLEAN, TS_TYPE_BOOLEAN},
-//    {TS_TYPE_NAME_BIGINT, TS_TYPE_BIGINT},
-//    {TS_TYPE_NAME_DOUBLE, TS_TYPE_DOUBLE},
-//    {TS_TYPE_NAME_TIMESTAMP, TS_TYPE_TIMESTAMP},
-//    {TS_TYPE_NAME_DATE, TS_TYPE_DATE},
-//    {TS_TYPE_NAME_TIME, TS_TYPE_TIME},
-//    {TS_TYPE_NAME_INTERVAL_DAY_TO_SECOND, TS_TYPE_INTERVAL_DAY_TO_SECOND},
-//    {TS_TYPE_NAME_INTERVAL_YEAR_TO_MONTH, TS_TYPE_INTERVAL_YEAR_TO_MONTH},
-//    {TS_TYPE_NAME_UNKNOWN, TS_TYPE_UNKNOWN},
-//    {TS_TYPE_NAME_INTEGER, TS_TYPE_INTEGER},
-//    {TS_TYPE_NAME_ROW, TS_TYPE_ROW},
-//    {TS_TYPE_NAME_ARRAY, TS_TYPE_ARRAY},
-//    {TS_TYPE_NAME_TIMESERIES, TS_TYPE_TIMESERIES}};
-
 #define TS_VARCHAR_SIZE (-2)
-//#define TS_ROW_SIZE (-3)
-//#define TS_ARRAY_SIZE (-4)
-//#define TS_TIMESERIES_SIZE (-5)
 
 const std::unordered_map< Aws::TimestreamQuery::Model::ScalarType,
                           std::pair< OID, int16_t > >
