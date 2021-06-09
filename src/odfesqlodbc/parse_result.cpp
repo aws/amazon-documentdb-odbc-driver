@@ -28,6 +28,7 @@ bool _CC_from_TSResult(
     QResultClass *q_res, ConnectionClass *conn, StatementClass *stmt,
     const char *next_token,
     const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
+
 /**
  * Responsible for looping through columns, allocating memory for column fields
  * and setting column info
