@@ -14,11 +14,11 @@
  *
  */
 
-#include "es_statement.h"
+#include "odbc_statement.h"
 
+#include "apifunc.h"
 #include "environ.h"  // Critical section for statment
-#include "es_apifunc.h"
-#include "es_helper.h"
+#include "helper.h"
 #include "misc.h"
 #include "statement.h"
 #include <aws/timestream-query/TimestreamQueryClient.h>

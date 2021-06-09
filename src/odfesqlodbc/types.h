@@ -14,20 +14,20 @@
  *
  */
 
-#ifndef ES_TYPES
-#define ES_TYPES
+#ifndef TS_TYPES
+#define TS_TYPES
 
 #include "dlg_specific.h"
-#include "es_odbc.h"
+#include "odbc.h"
 #ifdef __cplusplus
 #include <aws/timestream-query/model/QueryResult.h>
 extern "C" {
 #endif
 /* the type numbers are defined by the OID's of the types' rows */
-/* in table es_type */
+/* in table ts_type */
 
 #ifdef NOT_USED
-#define ES_TYPE_LO ? ? ? ? /* waiting for permanent type */
+#define TS_TYPE_LO ? ? ? ? /* waiting for permanent type */
 #endif
 
 #define TS_TYPE_NAME_BOOLEAN "boolean"
@@ -47,76 +47,29 @@ extern "C" {
 
 #define MS_ACCESS_SERIAL "int identity"
 #define TS_TYPE_BOOLEAN 16
-#define ES_TYPE_BYTEA 17
-#define ES_TYPE_CHAR 18
-#define ES_TYPE_NAME 19
 #define TS_TYPE_BIGINT 20
 #define TS_TYPE_INT2 21
-#define ES_TYPE_INT2VECTOR 22
 #define TS_TYPE_INTEGER 23
-#define ES_TYPE_REGPROC 24
-#define ES_TYPE_TEXT 25
-#define ES_TYPE_OID 26
-#define ES_TYPE_TID 27
-#define ES_TYPE_XID 28
-#define ES_TYPE_CID 29
-#define ES_TYPE_OIDVECTOR 30
-#define ES_TYPE_HALF_FLOAT 32
-#define ES_TYPE_SCALED_FLOAT 33
-#define ES_TYPE_KEYWORD 34
-#define ES_TYPE_NESTED 35
-#define ES_TYPE_OBJECT 36
-#define ES_TYPE_XML 142
-#define ES_TYPE_XMLARRAY 143
-#define ES_TYPE_CIDR 650
-#define ES_TYPE_FLOAT4 700
 #define TS_TYPE_DOUBLE 701
-#define ES_TYPE_ABSTIME 702
-#define ES_TYPE_MONEY 790
-#define ES_TYPE_MACADDR 829
-#define ES_TYPE_INET 869
-#define ES_TYPE_TEXTARRAY 1009
-#define ES_TYPE_BPCHARARRAY 1014
-#define ES_TYPE_VARCHARARRAY 1015
 #define TS_TYPE_ARRAY 1016
 #define TS_TYPE_INTERVAL_DAY_TO_SECOND 1017
 #define TS_TYPE_INTERVAL_YEAR_TO_MONTH 1018
 #define TS_TYPE_ROW 1019
 #define TS_TYPE_TIMESERIES 1020
-#define ES_TYPE_BPCHAR 1042
 #define TS_TYPE_VARCHAR 1043
 #define TS_TYPE_UNKNOWN 1048
 #define TS_TYPE_DATE 1082
 #define TS_TYPE_TIME 1083
 #define TS_TYPE_TIMESTAMP_NO_TMZONE 1114 /* since 7.2 */
-#define ES_TYPE_DATETIME 1184            /* timestamptz */
-#define ES_TYPE_INTERVAL 1186
-#define ES_TYPE_TIME_WITH_TMZONE 1266 /* since 7.1 */
 #define TS_TYPE_TIMESTAMP 1296        /* deprecated since 7.0 */
-#define ES_TYPE_BIT 1560
-#define ES_TYPE_NUMERIC 1700
-#define ES_TYPE_REFCURSOR 1790
-#define ES_TYPE_RECORD 2249
-#define ES_TYPE_ANY 2276
-#define ES_TYPE_VOID 2278
-#define ES_TYPE_UUID 2950
 #define INTERNAL_ASIS_TYPE (-9999)
 
 #define TYPE_MAY_BE_ARRAY(type) \
-    ((type) == ES_TYPE_XMLARRAY || ((type) >= 1000 && (type) <= 1041))
+    (type) >= 1000 && (type) <= 1041
 
-/*	Defines for estype_precision */
-#define ES_ATP_UNSET (-3)   /* atttypmod */
-#define ES_ADT_UNSET (-3)   /* adtsize_or_longestlen */
-#define ES_UNKNOWNS_UNSET 0 /* UNKNOWNS_AS_MAX */
-#define ES_WIDTH_OF_BOOLS_AS_CHAR 5
-
-/*
- *	SQL_INTERVAL support is disabled because I found
- *	some applications which are unhappy with it.
- *
-#define	ES_INTERVAL_AS_SQL_INTERVAL
- */
+#define TS_ATP_UNSET (-3) /* atttypmod */
+#define TS_ADT_UNSET (-3) /* adtsize_or_longestlen */
+#define TS_UNKNOWNS_UNSET 0 /* UNKNOWNS_AS_MAX */
 
 OID es_true_type(const ConnectionClass *, OID, OID);
 OID sqltype_to_estype(const ConnectionClass *conn, SQLSMALLINT fSqlType);
@@ -152,27 +105,22 @@ Int4 estype_attr_display_size(const ConnectionClass *conn, OID type,
                               int atttypmod, int adtsize_or_longestlen,
                               int handle_unknown_size_as);
 Int2 estype_attr_decimal_digits(const ConnectionClass *conn, OID type,
-                                int atttypmod, int adtsize_or_longestlen,
-                                int handle_unknown_size_as);
+                                int atttypmod);
 Int4 estype_attr_transfer_octet_length(const ConnectionClass *conn, OID type,
                                        int atttypmod,
                                        int handle_unknown_size_as);
 SQLSMALLINT estype_attr_precision(const ConnectionClass *conn, OID type,
-                                  int atttypmod, int adtsize_or_longest,
-                                  int handle_unknown_size_as);
+                                  int atttypmod);
 Int4 estype_attr_desclength(const ConnectionClass *conn, OID type,
                             int atttypmod, int adtsize_or_longestlen,
                             int handle_unknown_size_as);
-Int2 estype_attr_scale(const ConnectionClass *conn, OID type, int atttypmod,
-                       int adtsize_or_longestlen, int handle_unknown_size_as);
 
 /*	These functions can use static numbers or result sets(col parameter) */
 Int4 estype_column_size(
     const StatementClass *stmt, OID type, int col,
     int handle_unknown_size_as); /* corresponds to "precision" in ODBC 2.x */
 SQLSMALLINT estype_precision(
-    const StatementClass *stmt, OID type, int col,
-    int handle_unknown_size_as); /* "precsion in ODBC 3.x */
+    const StatementClass *stmt, OID type, int col); /* "precsion in ODBC 3.x */
 /* the following size/length are of Int4 due to ES restriction */
 Int4 estype_display_size(const StatementClass *stmt, OID type, int col,
                          int handle_unknown_size_as);
@@ -192,8 +140,6 @@ SQLSMALLINT tstype_min_decimal_digits(
 SQLSMALLINT tstype_max_decimal_digits(
     const ConnectionClass *conn,
     OID type); /* corresponds to "max_scale" in ODBC 2.x */
-SQLSMALLINT estype_scale(const StatementClass *stmt, OID type,
-                         int col); /* ODBC 3.x " */
 Int2 tstype_radix(const ConnectionClass *conn, OID type);
 Int2 tstype_nullable(const ConnectionClass *conn, OID type);
 Int2 tstype_auto_increment(const ConnectionClass *conn, OID type);

@@ -14,13 +14,13 @@
  *
  */
 
-#include "ts_communication.h"
+#include "odbc_communication.h"
 
 // odfesqlodbc needs to be included before mylog, otherwise mylog will generate
 // compiler warnings
 // clang-format off
-#include "es_odbc.h"
-#include "es_statement.h"
+#include "odbc.h"
+#include "odbc_statement.h"
 #include "aad_credentials_provider.h"
 #include "okta_credentials_provider.h"
 #include "version.h"
