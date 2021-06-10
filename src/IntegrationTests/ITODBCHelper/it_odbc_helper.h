@@ -17,6 +17,8 @@
 #ifndef IT_ODBC_HELPER_H
 #define IT_ODBC_HELPER_H
 
+#include "odbc.h"
+
 #ifdef WIN32
 #include <windows.h>
 #endif
@@ -28,7 +30,6 @@
 
 #include "unit_test_helper.h"
 #include "gtest/gtest.h"
-#include "mylog.h"
 
 // SQLSTATEs
 #define SQLSTATE_STRING_DATA_RIGHT_TRUNCATED (SQLWCHAR*)L"01004"
