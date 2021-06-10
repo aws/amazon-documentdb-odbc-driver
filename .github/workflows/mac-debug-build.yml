@@ -31,6 +31,9 @@ jobs:
         brew install curl
         brew install cmake
         brew install libiodbc
+    - name: set-PATH
+      run: |
+        export PATH=/Library/Developer/CommandLineTools/usr/bin:$PATH
     - name: configure-and-build-driver
       run: |
         ./build_mac_debug64.sh
