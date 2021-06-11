@@ -60,10 +60,12 @@ void Client::Query(const char *query) {
 std::optional<std::vector<std::string>> Client::FetchOne() {
     auto retcode = SQLFetch(hstmt);
     if (SQL_SUCCEEDED(retcode)) {
-        SQLSMALLINT cols = 0;
-        retcode = SQLNumResultCols(hstmt, &cols);
-        if (!SQL_SUCCEEDED(retcode)) {
-            throw std::runtime_error("Failed at SQLNumResultCols");
+        static SQLSMALLINT cols = 0;
+        if (cols == 0) {
+            retcode = SQLNumResultCols(hstmt, &cols);
+            if (!SQL_SUCCEEDED(retcode)) {
+                throw std::runtime_error("Failed at SQLNumResultCols");
+            }
         }
         std::vector<std::string> row;
         for (int i = 1; i <= cols; i++) {
