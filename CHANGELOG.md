@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.3.0](https://github.com/Bit-Quill/timestream-odbc/releases/tag/v0.3.0) - 2021-06-15
+### Added
+- The ability to connect using Azure Active Directory and Okta.
+- Support for SQL Metadata (SQLColumns, SQLTables, SQLGetInfo, SQLGetTypeInfo)
+- Query Cancellation
+- Support for Excel and PowerBI
+### Changed
+- Removed "ES_" and "TS_" from filenames
+- Changed the user interface in Windows to mask the passwords and secret keys
+- Paginated the results
+- Changed SQLPrepare to get metadata rather than running the query
+
 ## [v0.2.0](https://github.com/Bit-Quill/timestream-odbc/releases/tag/v0.2.0) - 2021-03-26
 ### Added
 - The ability to query data from Amazon Timestream.
