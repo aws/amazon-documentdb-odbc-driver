@@ -1299,12 +1299,20 @@ static RETCODE SQL_API IRDGetField(DescriptorClass *desc, SQLSMALLINT RecNumber,
             len = sizeof(SQLSMALLINT);
             *((SQLSMALLINT *)Value) = (SQLSMALLINT)ival;
             break;
+        case SQL_IS_LEN:
+            len = sizeof(SQLLEN);
+            *((SQLLEN *)Value) = (SQLLEN)ival;
+            break;
         case SQL_IS_POINTER:
             len = sizeof(SQLPOINTER);
             *((void **)Value) = ptr;
             break;
         case SQL_NTS:
             break;
+        default:
+            ret = SQL_ERROR;
+            DC_set_error(desc, DESC_INTERNAL_ERROR,
+                         "unknown return type");
     }
 
     if (StringLength)

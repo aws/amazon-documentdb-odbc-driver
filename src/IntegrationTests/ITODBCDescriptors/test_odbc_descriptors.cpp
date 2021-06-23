@@ -28,9 +28,10 @@
 const std::wstring data_set = L"ODBCTest.IoT";
 const std::wstring single_row = L"1";
 const uint64_t multi_row_cnt = 25;
-const uint64_t multi_col_cnt = 5;
+const uint64_t multi_col_cnt = 7;
 const uint64_t single_col_cnt = 1;
-const std::wstring multi_col = L"null, 1, VARCHAR '2', DOUBLE '3.3', true";
+const std::wstring multi_col =
+    L"null, 1, VARCHAR '2', DOUBLE '3.3', true, date '2021-01-01', 1d";
 
 inline void ExecuteQuery(const std::wstring& column, const std::wstring& table,
                          const std::wstring& count, SQLHSTMT* hstmt) {
@@ -61,14 +62,12 @@ TEST_F(TestSQLCopyDesc, ARD_TO_ARD) {
     EXPECT_TRUE(SQL_SUCCEEDED(SQLCopyDesc(ard, copy)));
     SQLSMALLINT left;
     SQLINTEGER left_indicator;
-    EXPECT_TRUE(SQL_SUCCEEDED(SQLGetDescField(copy, SQL_ATTR_APP_ROW_DESC,
-                                              SQL_DESC_COUNT, &left, 0,
-                                              &left_indicator)));
+    EXPECT_TRUE(SQL_SUCCEEDED(
+        SQLGetDescField(copy, 0, SQL_DESC_COUNT, &left, 0, &left_indicator)));
     SQLSMALLINT right;
     SQLINTEGER right_indicator;
-    EXPECT_TRUE(SQL_SUCCEEDED(SQLGetDescField(copy, SQL_ATTR_APP_ROW_DESC,
-                                              SQL_DESC_COUNT, &right, 0,
-                                              &right_indicator)));
+    EXPECT_TRUE(SQL_SUCCEEDED(
+        SQLGetDescField(copy, 0, SQL_DESC_COUNT, &right, 0, &right_indicator)));
     EXPECT_EQ(left, right);
     EXPECT_EQ(left_indicator, right_indicator);
 }
@@ -358,7 +357,6 @@ class TestSQLSetDescField : public testing::Test {
 #endif  // WIN32
 
 // Descriptor Header Fields Tests
-
 TEST_SQL_SET_DESC_FIELD(Test_SQL_DESC_ALLOC_TYPE, SQL_DESC_ALLOC_TYPE,
                         SQL_IS_SMALLINT, 0,
                         SQLSMALLINT m_value_ptr = SQL_DESC_ALLOC_USER;
@@ -392,7 +390,6 @@ TEST_SQL_SET_DESC_FIELD(Test_SQL_DESC_ROWS_PROCESSED_PTR,
                         , SQL_SUCCESS, m_ird_hdesc, 0);
 
 // Descriptor Record Fields Tests
-
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_AUTO_UNIQUE_VALUE,
                         SQL_DESC_AUTO_UNIQUE_VALUE, SQL_NTS, 1,
                         SQLINTEGER m_value_ptr = 0;
@@ -561,6 +558,8 @@ class TestSQLGetDescField : public testing::Test {
                        &m_hstmt, true, true);
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_ROW_DESC, &m_ard_hdesc, 0, NULL);
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_IMP_ROW_DESC, &m_ird_hdesc, 0, NULL);
+        ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt),
+                     &m_hstmt);
     }
 
     void TearDown() {
@@ -581,199 +580,349 @@ class TestSQLGetDescField : public testing::Test {
     SQLHDESC m_ard_hdesc = SQL_NULL_HDESC;
     SQLHDESC m_ird_hdesc = SQL_NULL_HDESC;
     SQLSMALLINT m_rec_number = 0;
-    SQLSMALLINT m_field_identifier;
     SQLINTEGER m_buffer_length = 0;
     SQLINTEGER m_string_length_ptr = 0;
 };
 
-// Template for tests of SQLGetDescField
-#define TEST_SQL_GET_DESC_FIELD(test_name, identifier, buffer_length, rec_num, \
-                                value_ptr_assignment, expected_val, hdesc,     \
-                                check_state, check_data, check_data_value)     \
-    TEST_F(TestSQLGetDescField, test_name) {                                   \
-        ExecuteQuery(multi_col, data_set, std::to_wstring(multi_row_cnt),      \
-                     &m_hstmt);                                                \
-        m_field_identifier = identifier;                                       \
-        m_buffer_length = buffer_length;                                       \
-        m_rec_number = rec_num;                                                \
-        value_ptr_assignment;                                                  \
-        EXPECT_EQ(expected_val,                                                \
-                  SQLGetDescField(hdesc, m_rec_number, m_field_identifier,     \
-                                  &m_value_ptr, m_buffer_length,               \
-                                  &m_string_length_ptr));                      \
-        if (check_state)                                                       \
-            EXPECT_TRUE(                                                       \
-                CheckSQLSTATE(SQL_HANDLE_DESC, hdesc,                          \
-                              SQLSTATE_INVALID_DESCRIPTOR_FIELD_IDENTIFIER));  \
-        if (check_data)                                                        \
-            EXPECT_EQ((uint64_t)check_data_value, (uint64_t)m_value_ptr);      \
-    }
-
 // Descriptor Header Fields Tests
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_ALLOC_TYPE) {
+    SQLSMALLINT m_value_ptr = 0;
+    ASSERT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 0, SQL_DESC_ALLOC_TYPE,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)SQL_DESC_ALLOC_AUTO, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_ALLOC_TYPE, SQL_DESC_ALLOC_TYPE, 0, 0,
-                        SQLSMALLINT m_value_ptr = 0;
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 1, SQL_DESC_ALLOC_AUTO);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_ARRAY_SIZE) {
+    SQLULEN m_value_ptr = 0;
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ard_hdesc, 0, SQL_DESC_ARRAY_SIZE,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)1, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_ARRAY_SIZE, SQL_DESC_ARRAY_SIZE, 0, 0,
-                        SQLULEN m_value_ptr = 0;
-                        , SQL_SUCCESS, m_ard_hdesc, 0, 1, single_col_cnt);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_ARRAY_STATUS_PTR) {
+    SQLUSMALLINT* m_value_ptr;
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ard_hdesc, 0, SQL_DESC_ARRAY_STATUS_PTR,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ(nullptr, m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_ARRAY_STATUS_PTR,
-                        SQL_DESC_ARRAY_STATUS_PTR, 0, 0,
-                        SQLUSMALLINT* m_value_ptr;
-                        , SQL_SUCCESS, m_ard_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_BIND_OFFSET_PTR) {
+    SQLLEN* m_value_ptr;
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ard_hdesc, 0, SQL_DESC_BIND_OFFSET_PTR,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ(nullptr, m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_BIND_OFFSET_PTR, SQL_DESC_BIND_OFFSET_PTR,
-                        0, 0, SQLLEN* m_value_ptr;
-                        , SQL_SUCCESS, m_ard_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_BIND_TYPE) {
+    SQLINTEGER m_value_ptr = 0;
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ard_hdesc, 0, SQL_DESC_BIND_TYPE,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)SQL_BIND_BY_COLUMN, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_BIND_TYPE, SQL_DESC_BIND_TYPE, 0, 0,
-                        SQLINTEGER m_value_ptr = 0;
-                        , SQL_SUCCESS, m_ard_hdesc, 0, 1, SQL_BIND_BY_COLUMN);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_COUNT) {
+    SQLSMALLINT m_value_ptr = 0;
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ard_hdesc, 0, SQL_DESC_COUNT,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)multi_col_cnt, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_COUNT, SQL_DESC_COUNT, 0, 0,
-                        SQLSMALLINT m_value_ptr = 0;
-                        , SQL_SUCCESS, m_ard_hdesc, 0, 1, multi_col_cnt);
-
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_ROWS_PROCESSED_PTR,
-                        SQL_DESC_ROWS_PROCESSED_PTR, 0, 0, SQLULEN* m_value_ptr;
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_ROWS_PROCESSED_PTR) {
+    SQLULEN* m_value_ptr = 0;
+    EXPECT_TRUE(SQL_SUCCEEDED(
+        SQLGetDescField(m_ird_hdesc, 0, SQL_DESC_ROWS_PROCESSED_PTR,
+                        &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ(nullptr, m_value_ptr);
+}
 
 // Descriptor Record Fields Tests
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_AUTO_UNIQUE_VALUE) {
+    SQLINTEGER m_value_ptr = 0;
+    EXPECT_TRUE(SQL_SUCCEEDED(
+        SQLGetDescField(m_ird_hdesc, 0, SQL_DESC_AUTO_UNIQUE_VALUE,
+                        &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)FALSE, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_AUTO_UNIQUE_VALUE,
-                        SQL_DESC_AUTO_UNIQUE_VALUE, 0, 1,
-                        SQLINTEGER m_value_ptr;
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 1, FALSE);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_BASE_COLUMN_NAME) {
+    SQLWCHAR m_value_ptr[255];
+    EXPECT_TRUE(SQL_SUCCEEDED(
+        SQLGetDescField(m_ird_hdesc, 1, SQL_DESC_BASE_COLUMN_NAME, &m_value_ptr,
+                        255, &m_string_length_ptr)));
+    SQLWCHAR expected[] = L"_col0";
+    EXPECT_STREQ((wchar_t*)expected, (wchar_t*)m_value_ptr);
+}
 
-// TODO: need to assert on return value
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_BASE_COLUMN_NAME,
-                        SQL_DESC_BASE_COLUMN_NAME, 255, 1,
-                        SQLCHAR m_value_ptr[255];
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_BASE_TABLE_NAME) {
+    SQLWCHAR m_value_ptr[255];
+    EXPECT_TRUE(SQL_SUCCEEDED(
+        SQLGetDescField(m_ird_hdesc, 1, SQL_DESC_BASE_TABLE_NAME, &m_value_ptr,
+                        255, &m_string_length_ptr)));
+    SQLWCHAR expected[] = L"";
+    EXPECT_STREQ((wchar_t*)expected, (wchar_t*)m_value_ptr);
+}
 
-// TODO: Investigate why table info(ti) is always null
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_BASE_TABLE_NAME, SQL_DESC_BASE_TABLE_NAME,
-                        255, 1, SQLCHAR m_value_ptr[255];
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_CASE_SENSITIVE) {
+    SQLINTEGER m_value_ptr;
+    EXPECT_TRUE(SQL_SUCCEEDED(
+        SQLGetDescField(m_ird_hdesc, 1, SQL_DESC_CASE_SENSITIVE, &m_value_ptr,
+                        0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)SQL_TRUE, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_CASE_SENSITIVE, SQL_DESC_CASE_SENSITIVE,
-                        0, 1, SQLINTEGER m_value_ptr;
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 1, SQL_TRUE);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_CATALOG_NAME) {
+    SQLWCHAR m_value_ptr[255];
+    EXPECT_TRUE(SQL_SUCCEEDED(
+        SQLGetDescField(m_ird_hdesc, 1, SQL_DESC_CATALOG_NAME, &m_value_ptr,
+                        255, &m_string_length_ptr)));
+    SQLWCHAR expected[] = L"";
+    EXPECT_STREQ((wchar_t*)expected, (wchar_t*)m_value_ptr);
+}
 
-// TODO: need to assert on return value
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_CATALOG_NAME, SQL_DESC_CATALOG_NAME, 255,
-                        1, SQLCHAR m_value_ptr[255];
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_CONCISE_TYPE) {
+    SQLSMALLINT m_value_ptr;
+    EXPECT_TRUE(SQL_SUCCEEDED(
+        SQLGetDescField(m_ird_hdesc, 6, SQL_DESC_CONCISE_TYPE, &m_value_ptr,
+                        0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)SQL_TYPE_DATE, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_CONCISE_TYPE, SQL_DESC_CONCISE_TYPE, 0, 1,
-                        SQLSMALLINT m_value_ptr;
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_DATA_PTR) {
+    SQLPOINTER m_value_ptr;
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLGetDescField(m_ard_hdesc, 1, SQL_DESC_DATA_PTR,
+                                              &m_value_ptr,
+                        0, &m_string_length_ptr)));
+    EXPECT_EQ(nullptr, m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_DATA_PTR, SQL_DESC_DATA_PTR, 0, 1,
-                        SQLPOINTER m_value_ptr;
-                        , SQL_SUCCESS, m_ard_hdesc, 0, 0, 0);
-
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_DATETIME_INTERVAL_CODE,
-                        SQL_DESC_DATETIME_INTERVAL_CODE, 0, 1,
-                        SQLSMALLINT m_value_ptr;
-                        , SQL_SUCCESS, m_ard_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_DATETIME_INTERVAL_CODE) {
+    DATE_STRUCT date;
+    SQLLEN indicator = 0;
+    EXPECT_TRUE(SQL_SUCCEEDED(
+        SQLBindCol(m_hstmt, 6, SQL_C_TYPE_DATE, &date, 0, &indicator)));
+    SQLSMALLINT m_value_ptr;
+    EXPECT_TRUE(SQL_SUCCEEDED(
+        SQLGetDescField(m_ard_hdesc, 6, SQL_DESC_DATETIME_INTERVAL_CODE,
+                        &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)SQL_CODE_DATE, (uint64_t)m_value_ptr);
+}
 
 // This field contains the interval leading precision if the SQL_DESC_TYPE field
 // is SQL_INTERVAL. As SQL_INTERVAL support is disabled because some
 // applications are unhappy with it, this test should return SQL_ERROR as
 // DESC_INVALID_DESCRIPTOR_IDENTIFIER
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_DATETIME_INTERVAL_PRECISION,
-                        SQL_DESC_DATETIME_INTERVAL_PRECISION, 0, 1,
-                        SQLINTEGER m_value_ptr = 0;
-                        , SQL_ERROR, m_ard_hdesc, 1, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_DATETIME_INTERVAL_PRECISION) {
+    SQLINTEGER m_value_ptr = 0;
+    EXPECT_EQ(
+        SQL_ERROR,
+        SQLGetDescField(m_ard_hdesc, 7, SQL_DESC_DATETIME_INTERVAL_PRECISION,
+                        &m_value_ptr, 0, &m_string_length_ptr));
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_DISPLAY_SIZE, SQL_DESC_DISPLAY_SIZE, 0, 1,
-                        SQLLEN m_value_ptr;
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_DISPLAY_SIZE) {
+    SQLLEN m_value_ptr;
+    // Column 4 with type Double
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 4, SQL_DESC_DISPLAY_SIZE,
+                        &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)24, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_FIXED_PREC_SCALE,
-                        SQL_DESC_FIXED_PREC_SCALE, 0, 1,
-                        SQLSMALLINT m_value_ptr;
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_FIXED_PREC_SCALE) {
+    SQLSMALLINT m_value_ptr;
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 4, SQL_DESC_FIXED_PREC_SCALE,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)SQL_FALSE, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_INDICATOR_PTR, SQL_DESC_INDICATOR_PTR, 0,
-                        1, SQLLEN m_value_ptr;
-                        , SQL_SUCCESS, m_ard_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_INDICATOR_PTR) {
+    SQLLEN* m_value_ptr;
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ard_hdesc, 4, SQL_DESC_INDICATOR_PTR,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ(nullptr, m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_LABEL, SQL_DESC_LABEL, 255, 1,
-                        SQLCHAR m_value_ptr[255];
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_LABEL) {
+    SQLWCHAR m_value_ptr[255];
+    // Column 1 with name "_col0"
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 1, SQL_DESC_LABEL,
+                                              &m_value_ptr, 255,
+                                              &m_string_length_ptr)));
+    SQLWCHAR expected[] = L"_col0";
+    EXPECT_STREQ((wchar_t*)expected, (wchar_t*)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_LENGTH, SQL_DESC_LENGTH, 0, 1,
-                        SQLULEN m_value_ptr;
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_LENGTH) {
+    SQLULEN m_value_ptr;
+    // Column 6 with type Date
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 6, SQL_DESC_LENGTH,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t) 10, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_LITERAL_PREFIX, SQL_DESC_LITERAL_PREFIX,
-                        255, 1, SQLCHAR m_value_ptr[255];
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_LITERAL_PREFIX) {
+    SQLWCHAR m_value_ptr[255];
+    // Column 4 with type Double
+    EXPECT_TRUE(SQL_SUCCEEDED(
+        SQLGetDescField(m_ird_hdesc, 4, SQL_DESC_LITERAL_PREFIX,
+                                              &m_value_ptr, 255,
+                                              &m_string_length_ptr)));
+    SQLWCHAR expected[] = L"DOUBLE '";
+    EXPECT_STREQ((wchar_t*)expected, (wchar_t*)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_LITERAL_SUFFIX, SQL_DESC_LITERAL_SUFFIX,
-                        255, 1, SQLCHAR m_value_ptr[255];
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_LITERAL_SUFFIX) {
+    SQLWCHAR m_value_ptr[255];
+    // Column 4 with type Double
+    EXPECT_TRUE(SQL_SUCCEEDED(
+        SQLGetDescField(m_ird_hdesc, 4, SQL_DESC_LITERAL_SUFFIX, &m_value_ptr,
+                        255, &m_string_length_ptr)));
+    SQLWCHAR expected[] = L"'";
+    EXPECT_STREQ((wchar_t*)expected, (wchar_t*)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_LOCAL_TYPE_NAME, SQL_DESC_LOCAL_TYPE_NAME,
-                        255, 1, SQLCHAR m_value_ptr[255];
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_LOCAL_TYPE_NAME) {
+    SQLWCHAR m_value_ptr[255];
+    // Column 4 with type Double
+    EXPECT_TRUE(SQL_SUCCEEDED(
+        SQLGetDescField(m_ird_hdesc, 4, SQL_DESC_LOCAL_TYPE_NAME, &m_value_ptr,
+                        255, &m_string_length_ptr)));
+    SQLWCHAR expected[] = L"double";
+    EXPECT_STREQ((wchar_t*)expected, (wchar_t*)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_NAME, SQL_DESC_NAME, 255, 1,
-                        SQLCHAR m_value_ptr[255];
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_NAME) {
+    SQLWCHAR m_value_ptr[255];
+    // Column 1 with name "_col0"
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 1, SQL_DESC_NAME,
+                                              &m_value_ptr,
+                        255, &m_string_length_ptr)));
+    SQLWCHAR expected[] = L"_col0";
+    EXPECT_STREQ((wchar_t*)expected, (wchar_t*)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_NULLABLE, SQL_DESC_NULLABLE, 0, 1,
-                        SQLSMALLINT m_value_ptr;
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_NULLABLE) {
+    SQLSMALLINT m_value_ptr;
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 1, SQL_DESC_NULLABLE,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)SQL_NULLABLE, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_NUM_PREC_RADIX, SQL_DESC_NUM_PREC_RADIX,
-                        0, 1, SQLINTEGER m_value_ptr;
-                        , SQL_SUCCESS, m_ard_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_NUM_PREC_RADIX) {
+    SQLINTEGER m_value_ptr;
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ard_hdesc, 1, SQL_DESC_NUM_PREC_RADIX,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)10, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_OCTET_LENGTH, SQL_DESC_OCTET_LENGTH, 0, 1,
-                        SQLLEN m_value_ptr;
-                        , SQL_SUCCESS, m_ard_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_OCTET_LENGTH) {
+    SQLCHAR data[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLLEN buf_len = 1;
+    SQLUSMALLINT col = 2;
+    EXPECT_TRUE(SQL_SUCCEEDED(
+        SQLBindCol(m_hstmt, col, SQL_C_CHAR, &data, buf_len, &indicator)));
+    SQLLEN m_value_ptr = 0;
+    // Column 2 with type Varchar
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ard_hdesc, col, SQL_DESC_OCTET_LENGTH,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)buf_len, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_OCTET_LENGTH_PTR,
-                        SQL_DESC_OCTET_LENGTH_PTR, 0, 1, SQLLEN m_value_ptr;
-                        , SQL_SUCCESS, m_ard_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_OCTET_LENGTH_PTR) {
+    SQLLEN* m_value_ptr;
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ard_hdesc, 1, SQL_DESC_OCTET_LENGTH_PTR,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ(nullptr, m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_PRECISION, SQL_DESC_PRECISION, 0, 1,
-                        SQLSMALLINT m_value_ptr;
-                        , SQL_SUCCESS, m_ard_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_PRECISION) {
+    DATE_STRUCT date;
+    SQLLEN indicator = 0;
+    SQLUSMALLINT col = 7;
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLBindCol(
+        m_hstmt, col, SQL_C_INTERVAL_DAY_TO_SECOND, &date, 0, &indicator)));
+    SQLSMALLINT m_value_ptr = 0;
+    // Column 7 with type interval day to second
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ard_hdesc, col, SQL_DESC_PRECISION,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)6, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_ROWVER, SQL_DESC_ROWVER, 0, 1,
-                        SQLSMALLINT m_value_ptr;
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_ROWVER) {
+    SQLSMALLINT m_value_ptr;
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 1, SQL_DESC_ROWVER,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)SQL_FALSE, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_SCALE, SQL_DESC_SCALE, 0, 1,
-                        SQLSMALLINT m_value_ptr;
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_SCALE) {
+    SQLSMALLINT m_value_ptr;
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 1, SQL_DESC_SCALE,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)0, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_SCHEMA_NAME, SQL_DESC_SCHEMA_NAME, 255, 1,
-                        SQLCHAR m_value_ptr[255];
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_SCHEMA_NAME) {
+    SQLWCHAR m_value_ptr[255];
+    // Column 4 with type Double
+    EXPECT_TRUE(SQL_SUCCEEDED(
+        SQLGetDescField(m_ird_hdesc, 4, SQL_DESC_SCHEMA_NAME, &m_value_ptr,
+                        255, &m_string_length_ptr)));
+    SQLWCHAR expected[] = L"";
+    EXPECT_STREQ((wchar_t*)expected, (wchar_t*)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_SEARCHABLE, SQL_DESC_SEARCHABLE, 0, 1,
-                        SQLSMALLINT m_value_ptr;
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_SEARCHABLE) {
+    SQLSMALLINT m_value_ptr;
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 1, SQL_DESC_SEARCHABLE,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)SQL_SEARCHABLE, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_TABLE_NAME, SQL_DESC_TABLE_NAME, 255, 1,
-                        SQLCHAR m_value_ptr[255];
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_TABLE_NAME) {
+    SQLWCHAR m_value_ptr[255];
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 1,
+                                              SQL_DESC_TABLE_NAME, &m_value_ptr,
+                                              255, &m_string_length_ptr)));
+    SQLWCHAR expected[] = L"";
+    EXPECT_STREQ((wchar_t*)expected, (wchar_t*)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_TYPE, SQL_DESC_TYPE, 255, 1,
-                        SQLSMALLINT m_value_ptr = 0;
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_TYPE) {
+    SQLSMALLINT m_value_ptr = 0;
+    // Column 6 with type Date
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLGetDescField(
+        m_ird_hdesc, 6, SQL_DESC_TYPE, &m_value_ptr, 0, &m_string_length_ptr)));
+    EXPECT_EQ((uint64_t)SQL_DATETIME, (uint64_t)m_value_ptr);
+}
 
-TEST_SQL_GET_DESC_FIELD(Test_SQL_DESC_TYPE_NAME, SQL_DESC_TYPE_NAME, 255, 1,
-                        SQLCHAR m_value_ptr[255];
-                        , SQL_SUCCESS, m_ird_hdesc, 0, 0, 0);
-
+TEST_F(TestSQLGetDescField, Test_SQL_DESC_TYPE_NAME) {
+    SQLWCHAR m_value_ptr[255];
+    // Column 6 with type Date
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 6,
+                                              SQL_DESC_TYPE_NAME, &m_value_ptr,
+                                              255, &m_string_length_ptr)));
+    SQLWCHAR expected[] = L"date";
+    EXPECT_STREQ((wchar_t*)expected, (wchar_t*)m_value_ptr);
+}
 TEST_F(TestSQLSetDescRec, APP_PARAM_SET) {
     SQLHDESC hdesc;
     SQLRETURN ret = SQL_ERROR;

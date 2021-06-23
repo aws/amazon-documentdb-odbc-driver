@@ -162,6 +162,7 @@ RETCODE SQL_API API_BindCol(HSTMT hstmt, SQLUSMALLINT icol,
                 opts->bindings[icol].precision = 32;
                 break;
             case SQL_C_TIMESTAMP:
+            case SQL_C_TYPE_TIMESTAMP:
             case SQL_C_INTERVAL_DAY_TO_SECOND:
             case SQL_C_INTERVAL_HOUR_TO_SECOND:
             case SQL_C_INTERVAL_MINUTE_TO_SECOND:
