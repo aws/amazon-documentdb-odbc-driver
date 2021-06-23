@@ -27,129 +27,17 @@
 #include <time.h>
 // clang-format on
 
-//typedef struct DescribeColumnData {
-//    std::wstring column_name;
-//    SQLSMALLINT data_type;
-//} DescribeColumnData;
-//
-//const DescribeColumnData column_data[] = {{L"Origin", SQL_WVARCHAR},
-//                                          {L"FlightNum", SQL_WVARCHAR},
-//                                          {L"FlightDelay", SQL_BIT},
-//                                          {L"DistanceMiles", SQL_REAL},
-//                                          {L"FlightTimeMin", SQL_REAL},
-//                                          {L"OriginWeather", SQL_WVARCHAR},
-//                                          {L"dayOfWeek", SQL_INTEGER},
-//                                          {L"AvgTicketPrice", SQL_REAL},
-//                                          {L"Carrier", SQL_WVARCHAR},
-//                                          {L"FlightDelayMin", SQL_INTEGER},
-//                                          {L"OriginRegion", SQL_WVARCHAR},
-//                                          {L"DestAirportID", SQL_WVARCHAR},
-//                                          {L"FlightDelayType", SQL_WVARCHAR},
-//                                          {L"timestamp", SQL_TYPE_TIMESTAMP},
-//                                          {L"Dest", SQL_WVARCHAR},
-//                                          {L"FlightTimeHour", SQL_WVARCHAR},
-//                                          {L"Cancelled", SQL_BIT},
-//                                          {L"DistanceKilometers", SQL_REAL},
-//                                          {L"OriginCityName", SQL_WVARCHAR},
-//                                          {L"DestWeather", SQL_WVARCHAR},
-//                                          {L"OriginCountry", SQL_WVARCHAR},
-//                                          {L"DestCountry", SQL_WVARCHAR},
-//                                          {L"DestRegion", SQL_WVARCHAR},
-//                                          {L"OriginAirportID", SQL_WVARCHAR},
-//                                          {L"DestCityName", SQL_WVARCHAR}};
 const std::wstring table_name = L"ODBCTest.IoT";
-//const std::wstring multi_type_data_set = L"kibana_sample_data_types";
 const std::wstring single_col = L"time";
-//// TODO (#110): Improve sample data result checks
-//const std::wstring m_expected_origin_column_data_1 =
-//    L"Frankfurt am Main Airport";
-//const std::wstring m_expected_origin_column_data_2 = L"Olenya Air Base";
-//const std::wstring single_float_col = L"DistanceMiles";
-//const std::wstring single_integer_col = L"FlightDelayMin";
-//const std::wstring single_timestamp_col = L"timestamp";
-//const std::wstring single_bit_col = L"Cancelled";
-//const std::wstring single_row_offset_3 = L"1 OFFSET 3";
-//const uint32_t data_cnt = 2;
-//const std::wstring single_row_offsets[data_cnt] = {L"1", L"1 OFFSET 1"};
-//const std::wstring type_boolean = L"type_boolean";
-//const std::vector< bool > type_boolean_vals = {false, true, true};
-//const std::wstring type_byte = L"type_byte";
-//const std::vector< int16_t > type_byte_vals = {100, -120};
-//const std::wstring type_short = L"type_short";
-//const std::vector< int16_t > type_short_vals = {1000, -2000};
-//const std::wstring type_integer = L"type_integer";
-//const std::vector< int32_t > type_integer_vals = {250000000, -350000000};
-//const std::wstring type_long = L"type_long";
-//const std::vector< int64_t > type_long_vals = {8000000000, -8010000000};
-//const std::wstring type_half_float = L"type_half_float";
-//const std::vector< float > type_half_float_vals = {1.115f, -2.115f};
-//const std::wstring type_float = L"type_float";
-//const std::vector< float > type_float_vals = {2.1512f, -3.1512f};
-//const std::wstring type_double = L"type_double";
-//const std::vector< double > type_double_vals = {25235.2215, -5335.2215};
-//const std::wstring type_scaled_float = L"type_scaled_float";
-//const std::vector< double > type_scaled_float_vals = {100, -100.1};
-//const std::wstring type_keyword = L"type_keyword";
-//const std::vector< std::wstring > type_keyword_vals = {L"hello", L"goodbye"};
-//const std::wstring type_text = L"type_text";
-//const std::vector< std::wstring > type_text_vals = {L"world", L"planet"};
-//const std::wstring type_date = L"type_date";
-//const std::vector< TIMESTAMP_STRUCT > type_date_vals = {
-//    {2016, 02, 21, 12, 23, 52, 803000000},
-//    {2018, 07, 22, 12, 23, 52, 803000000}};
-//const std::wstring type_object = L"type_object";
-//const std::wstring type_nested = L"type_nested";
-//// TODO (#110): Improve sample data result checks
-//const float distance_miles_1 = 1738.98f;
-//const float distance_miles_2 = 10247.90f;
-//const int delay_offset_3_1 = 0;
-//const int delay_offset_3_2 = 180;
-//const SQLSMALLINT single_col_name_length = 6;
-//const SQLSMALLINT single_col_data_type = SQL_WVARCHAR;
-//const SQLULEN single_col_column_size = 25;
-//const SQLSMALLINT single_col_decimal_digit = 0;
-//const SQLSMALLINT single_col_nullable = 2;
 const std::wstring single_row = L"1";
-//const size_t multi_row_cnt = 25;
 const size_t single_row_cnt = 1;
 const size_t multi_col_cnt = 5;
 const size_t single_col_cnt = 1;
-//const size_t single_row_rd_cnt = 1;
-//const size_t multi_row_rd_cnt_aligned = 5;
-//const size_t multi_row_rd_cnt_misaligned = 3;
 const std::wstring multi_col = L"null, 1, VARCHAR '2', DOUBLE '3.3', true";
-//const std::wstring multi_row = std::to_wstring(multi_row_cnt);
 typedef struct Col {
     SQLLEN data_len;
     SQLCHAR data_dat[255];
 } Col;
-
-//template < class T >
-//void CheckData(const std::wstring& type_name, const std::wstring& data_set,
-//               const std::wstring row, SQLHSTMT* hstmt,
-//               const SQLUSMALLINT ordinal_pos, const SQLUSMALLINT type,
-//               const std::vector< T >& expected_val, const SQLLEN data_size);
-//template < class T >
-//inline bool FuzzyEquals(T a, T b, T epsil);
-//void BindColumns(std::vector< std::vector< Col > >& cols, SQLHSTMT* hstmt);
-// void ExecuteQuery(const std::wstring& column, const std::wstring& dataset,
-//                   const std::wstring& count, SQLHSTMT* hstmt);
-//void ExtendedFetch(const size_t exp_row_cnt, const size_t exp_read_cnt,
-//                   const bool aligned, const size_t total_row_cnt,
-//                   SQLHSTMT* hstmt);
-//void Fetch(size_t exp_row_cnt, SQLHSTMT* hstmt);
-//void QueryBind(const size_t row_cnt, const size_t col_cnt,
-//               const size_t row_fetch_cnt, const std::wstring& column_name,
-//               std::vector< std::vector< Col > >& cols, SQLHSTMT* hstmt);
-//void QueryBindFetch(const size_t row_cnt, const size_t col_cnt,
-//                    const std::wstring& column_name, SQLHSTMT* hstmt);
-// void QueryFetch(const std::wstring& column, const std::wstring& dataset,
-//                 const std::wstring& count, SQLHSTMT* hstmt);
-
-//template < class T >
-//inline bool FuzzyEquals(T a, T b, T epsil) {
-//    return std::abs(a - b) <= epsil;
-//}
 
 inline void BindColumns(std::vector< std::vector< Col > >& cols,
                         SQLHSTMT* hstmt) {
@@ -172,47 +60,10 @@ void ExecuteQuery(const std::wstring& column,
     LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
     ASSERT_TRUE(SQL_SUCCEEDED(ret));
 }
-//
-//inline void ExtendedFetch(const size_t exp_row_cnt, const size_t exp_read_cnt,
-//                          const bool aligned, const size_t total_row_cnt,
-//                          SQLHSTMT* hstmt) {
-//    SQLULEN row_cnt = 0;
-//    SQLUSMALLINT row_stat[10];
-//    size_t read_cnt = 0;
-//    SQLRETURN ret;
-//    while (
-//        (ret = SQLExtendedFetch(*hstmt, SQL_FETCH_NEXT, 0, &row_cnt, row_stat))
-//        == SQL_SUCCESS) {
-//        read_cnt++;
-//        if (aligned) {
-//            EXPECT_EQ(row_cnt, exp_row_cnt);
-//        } else {
-//            size_t adj_exp_row_cnt = ((read_cnt * exp_row_cnt) > total_row_cnt)
-//                                         ? (total_row_cnt % exp_row_cnt)
-//                                         : exp_row_cnt;
-//            EXPECT_EQ(row_cnt, adj_exp_row_cnt);
-//        }
-//    }
-//
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
-//    EXPECT_EQ(exp_read_cnt, read_cnt);
-//}
-//
-//inline void Fetch(size_t exp_row_cnt, SQLHSTMT* hstmt) {
-//    SQLRETURN ret;
-//    size_t read_cnt = 0;
-//    while ((ret = SQLFetch(*hstmt)) == SQL_SUCCESS) {
-//        read_cnt++;
-//    }
-//
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
-//    EXPECT_EQ(exp_row_cnt, read_cnt);
-//}
 
-inline void QueryBind(const size_t row_cnt, const size_t row_fetch_cnt,
-                      const std::wstring& column_name,
-                      std::vector< std::vector< Col > >& cols,
-                      SQLHSTMT* hstmt) {
+void BindColSetup(const size_t row_cnt, const size_t row_fetch_cnt,
+                  const std::wstring& column_name,
+                  std::vector< std::vector< Col > >& cols, SQLHSTMT* hstmt) {
     SQLRETURN ret =
         SQLSetStmtAttr(*hstmt, SQL_ROWSET_SIZE, (void*)row_fetch_cnt, 0);
     LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
@@ -224,34 +75,16 @@ inline void QueryBind(const size_t row_cnt, const size_t row_fetch_cnt,
     for (size_t i = 0; i < cols.size(); i++) {
         cols[i].resize(row_fetch_cnt);
     }
+}
+
+inline void QueryBind(const size_t row_cnt, const size_t row_fetch_cnt,
+                      const std::wstring& column_name,
+                      std::vector< std::vector< Col > >& cols,
+                      SQLHSTMT* hstmt) {
+    BindColSetup(row_cnt, row_fetch_cnt, column_name, cols, hstmt);
     BindColumns(cols, hstmt);
 }
 
-//inline void QueryBindExtendedFetch(const size_t row_cnt, const size_t col_cnt,
-//                                   const size_t row_fetch_cnt,
-//                                   const std::wstring& column_name,
-//                                   SQLHSTMT* hstmt) {
-//    std::vector< std::vector< Col > > cols(col_cnt);
-//    QueryBind(row_cnt, col_cnt, row_fetch_cnt, column_name, cols, hstmt);
-//
-//    // Fetch data
-//    size_t misaligned = ((row_cnt % row_fetch_cnt) != 0);
-//    size_t exp_read_cnt = (row_cnt / row_fetch_cnt) + misaligned;
-//    ExtendedFetch(row_fetch_cnt, exp_read_cnt, (bool)!misaligned, row_cnt,
-//                  hstmt);
-//    CloseCursor(hstmt, true, true);
-//}
-//
-//inline void QueryBindFetch(const size_t row_cnt, const size_t col_cnt,
-//                           const std::wstring& column_name, SQLHSTMT* hstmt) {
-//    std::vector< std::vector< Col > > cols(col_cnt);
-//    QueryBind(row_cnt, col_cnt, 1, column_name, cols, hstmt);
-//
-//    // Fetch data
-//    Fetch(row_cnt, hstmt);
-//    CloseCursor(hstmt, true, true);
-//}
-//
 void QueryFetch(const std::wstring& column, const std::wstring& dataset,
                 const std::wstring& count, SQLHSTMT* hstmt) {
     ExecuteQuery(column, dataset, count, hstmt);
@@ -327,193 +160,84 @@ auto ConstructIntervalStruct =
         return st;
     };
 
-//template < class T >
-//void CheckData(const std::wstring& type_name, const std::wstring& data_set,
-//               const std::wstring row, SQLHSTMT* hstmt,
-//               const SQLUSMALLINT ordinal_pos, const SQLUSMALLINT type,
-//               const std::vector< T >& expected_val, const SQLLEN data_size) {
-//    QueryFetch(type_name, data_set, row, hstmt);
-//    T val;
-//    SQLLEN out_size;
-//    const SQLRETURN ret =
-//        SQLGetData(*hstmt, ordinal_pos, type, &val, data_size, &out_size);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
-//    ASSERT_TRUE(SQL_SUCCEEDED(ret));
-//    bool valid = false;
-//    for (size_t i = 0; i < expected_val.size(); i++) {
-//        valid |= (val == expected_val[i]);
-//        if (valid)
-//            break;
-//    }
-//    EXPECT_TRUE(valid);
-//}
-//
-//template <>
-//void CheckData< float >(const std::wstring& type_name,
-//                        const std::wstring& data_set, const std::wstring row,
-//                        SQLHSTMT* hstmt, const SQLUSMALLINT ordinal_pos,
-//                        const SQLUSMALLINT type,
-//                        const std::vector< float >& expected_val,
-//                        const SQLLEN data_size) {
-//    QueryFetch(type_name, data_set, row, hstmt);
-//    float val;
-//    SQLLEN out_size;
-//    const SQLRETURN ret =
-//        SQLGetData(*hstmt, ordinal_pos, type, &val, data_size, &out_size);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
-//    ASSERT_TRUE(SQL_SUCCEEDED(ret));
-//    bool valid = false;
-//    for (auto& it : expected_val) {
-//        valid |= FuzzyEquals(val, it, 0.1f);
-//        if (valid)
-//            break;
-//    }
-//}
-//
-//template <>
-//void CheckData< double >(const std::wstring& type_name,
-//                         const std::wstring& data_set, const std::wstring row,
-//                         SQLHSTMT* hstmt, const SQLUSMALLINT ordinal_pos,
-//                         const SQLUSMALLINT type,
-//                         const std::vector< double >& expected_val,
-//                         const SQLLEN data_size) {
-//    QueryFetch(type_name, data_set, row, hstmt);
-//    double val;
-//    SQLLEN out_size;
-//    const SQLRETURN ret =
-//        SQLGetData(*hstmt, ordinal_pos, type, &val, data_size, &out_size);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
-//    ASSERT_TRUE(SQL_SUCCEEDED(ret));
-//    bool valid = false;
-//    for (auto& it : expected_val) {
-//        valid |= FuzzyEquals(val, it, 0.1);
-//        if (valid)
-//            break;
-//    }
-//    EXPECT_TRUE(valid);
-//}
-//
-//template <>
-//void CheckData< std::wstring >(const std::wstring& type_name,
-//                               const std::wstring& data_set,
-//                               const std::wstring row, SQLHSTMT* hstmt,
-//                               const SQLUSMALLINT ordinal_pos,
-//                               const SQLUSMALLINT type,
-//                               const std::vector< std::wstring >& expected_val,
-//                               const SQLLEN data_size) {
-//    QueryFetch(type_name, data_set, row, hstmt);
-//    std::vector< SQLTCHAR > val(data_size);
-//    bool valid = false;
-//    for (auto& it : expected_val) {
-//        std::wstring str;
-//        SQLLEN out_size;
-//        while (SQLGetData(*hstmt, ordinal_pos, type, val.data(),
-//                          data_size * sizeof(SQLTCHAR), &out_size)
-//               == SQL_SUCCESS_WITH_INFO) {
-//            str += val.data();
-//        }
-//        valid |= (str == it);
-//        if (valid)
-//            break;
-//    }
-//}
-//
-//template <>
-//void CheckData< TIMESTAMP_STRUCT >(
-//    const std::wstring& type_name, const std::wstring& data_set,
-//    const std::wstring row, SQLHSTMT* hstmt, const SQLUSMALLINT ordinal_pos,
-//    const SQLUSMALLINT type,
-//    const std::vector< TIMESTAMP_STRUCT >& expected_val,
-//    const SQLLEN data_size) {
-//    auto compare_ts_struct = [](const TIMESTAMP_STRUCT& x,
-//                                const TIMESTAMP_STRUCT& y) {
-//        return ((x.year == y.year) && (x.month == y.month) && (x.day == y.day)
-//                && (x.hour == y.hour) && (x.minute == y.minute)
-//                && (x.second == y.second) && (x.fraction == y.fraction));
-//    };
-//    QueryFetch(type_name, data_set, row, hstmt);
-//    TIMESTAMP_STRUCT val;
-//    SQLLEN out_size;
-//    const SQLRETURN ret =
-//        SQLGetData(*hstmt, ordinal_pos, type, &val, data_size, &out_size);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
-//    ASSERT_TRUE(SQL_SUCCEEDED(ret));
-//    bool valid = false;
-//    for (size_t i = 0; i < expected_val.size(); i++) {
-//        valid |= compare_ts_struct(val, expected_val[i]);
-//        if (valid)
-//            break;
-//    }
-//    EXPECT_TRUE(valid);
-//}
-//
-//#define GET_DATA_TEST(type, name, c_type, val_array, sz)                \
-//    TEST_F(TestSQLGetData, type) {                                      \
-//        for (uint32_t i = 0; i < data_cnt; i++) {                       \
-//            CheckData(name, multi_type_data_set, single_row_offsets[i], \
-//                      &m_hstmt, m_single_column_ordinal_position,       \
-//                      (SQLUSMALLINT)c_type, val_array, sz);             \
-//            if (i != (data_cnt - 1))                                    \
-//                ASSERT_NO_THROW(CloseCursor(&m_hstmt, true, true));     \
-//        }                                                               \
-//    }
-//
+template < class T >
+void TypeConversionAssertionTemplate(
+    SQLHSTMT& hstmt, SQLSMALLINT type, const std::wstring& columns,
+    const std::vector< std::pair< T, SQLWCHAR* > >& expected,
+    void (*compare_func)(const T&, const T&)) {
+    QueryFetch(columns, table_name, single_row, &hstmt);
+    T actual;
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    for (size_t i = 0; i < expected.size(); ++i) {
+        ret = SQLGetData(hstmt, static_cast< SQLUSMALLINT >(i + 1), type,
+                         &actual, sizeof(actual), &indicator);
+        LogAnyDiagnostics(SQL_HANDLE_STMT, hstmt, ret);
+        SQLWCHAR* expected_state = expected[i].second;
+        // Success and no error code
+        if (!expected_state) {
+            EXPECT_EQ(SQL_SUCCESS, ret);
+            EXPECT_EQ((SQLLEN)sizeof(T), indicator);
+            compare_func(expected[i].first, actual);
+        }
+        // Success with info and error code
+        else if (std::wcscmp(expected_state, SQLSTATE_FRACTIONAL_TRUNCATION)
+                 == 0) {
+            EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+            EXPECT_EQ((SQLLEN)sizeof(T), indicator);
+            compare_func(expected[i].first, actual);
+            EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, hstmt,
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+        }
+        // Error and error code
+        else if (std::wcscmp(expected_state, SQLSTATE_STRING_CONVERSION_ERROR)
+                 == 0) {
+            EXPECT_EQ(SQL_ERROR, ret);
+            EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, hstmt,
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+        } else if (std::wcscmp(expected_state,
+                               SQLSTATE_RESTRICTED_DATA_TYPE_ERROR)
+                   == 0) {
+            EXPECT_EQ(SQL_ERROR, ret);
+            EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, hstmt,
+                                      SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
+        }
+        // Unknown SQL state
+        else {
+            FAIL();
+        }
+    }
+    ASSERT_NO_THROW(CloseCursor(&hstmt, true, true));
+}
 
-//class TestSQLFetch : public testing::Test {
-//   public:
-//    TestSQLFetch() {
-//    }
-//
-//    void SetUp() {
-//        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env,
-//                                       &m_conn, &m_hstmt, true, true));
-//    }
-//
-//    void TearDown() {
-//        if (m_hstmt != SQL_NULL_HSTMT) {
-//            ASSERT_NO_THROW(CloseCursor(&m_hstmt, true, true));
-//            SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
-//            SQLDisconnect(m_conn);
-//            SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-//        }
-//    }
-//
-//    ~TestSQLFetch() {
-//        // cleanup any pending stuff, but no exceptions allowed
-//    }
-//
-//    SQLHENV m_env = SQL_NULL_HENV;
-//    SQLHDBC m_conn = SQL_NULL_HDBC;
-//    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
-//};
-//
-//class TestSQLExtendedFetch : public testing::Test {
-//   public:
-//    TestSQLExtendedFetch() {
-//    }
-//
-//    void SetUp() {
-//        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env,
-//                                       &m_conn, &m_hstmt, true, true));
-//    }
-//
-//    void TearDown() {
-//        if (m_hstmt != SQL_NULL_HSTMT) {
-//            ASSERT_NO_THROW(CloseCursor(&m_hstmt, true, true));
-//            SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
-//            SQLDisconnect(m_conn);
-//            SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-//        }
-//    }
-//
-//    ~TestSQLExtendedFetch() {
-//        // cleanup any pending stuff, but no exceptions allowed
-//    }
-//
-//    SQLHENV m_env = SQL_NULL_HENV;
-//    SQLHDBC m_conn = SQL_NULL_HDBC;
-//    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
-//};
+auto TestConvertingToDate =
+    [](SQLHSTMT& hstmt, const std::wstring& columns,
+       const std::vector< std::pair< DATE_STRUCT, SQLWCHAR* > >& expected) {
+        TypeConversionAssertionTemplate< DATE_STRUCT >(
+            hstmt, SQL_C_TYPE_DATE, columns, expected, CompareDateStruct);
+        TypeConversionAssertionTemplate< DATE_STRUCT >(
+            hstmt, SQL_C_DATE, columns, expected, CompareDateStruct);
+    };
+
+auto TestConvertingToTime =
+    [](SQLHSTMT& hstmt, const std::wstring& columns,
+       const std::vector< std::pair< TIME_STRUCT, SQLWCHAR* > >& expected) {
+        TypeConversionAssertionTemplate< TIME_STRUCT >(
+            hstmt, SQL_C_TYPE_TIME, columns, expected, CompareTimeStruct);
+        TypeConversionAssertionTemplate< TIME_STRUCT >(
+            hstmt, SQL_C_TIME, columns, expected, CompareTimeStruct);
+    };
+
+auto TestConvertingToTimestamp =
+    [](SQLHSTMT& hstmt, const std::wstring& columns,
+       const std::vector< std::pair< TIMESTAMP_STRUCT, SQLWCHAR* > >&
+           expected) {
+        TypeConversionAssertionTemplate< TIMESTAMP_STRUCT >(
+            hstmt, SQL_C_TYPE_TIMESTAMP, columns, expected,
+            CompareTimestampStruct);
+        TypeConversionAssertionTemplate< TIMESTAMP_STRUCT >(
+            hstmt, SQL_C_TIMESTAMP, columns, expected, CompareTimestampStruct);
+    };
 
 class TestSQLGetData : public Fixture {};
 
@@ -532,7 +256,7 @@ TEST_F(TestSQLBindCol, SingleColumnSingleBind) {
     QueryBind(single_row_cnt, 1, single_col, cols, &m_hstmt);
 }
 
-TEST_F(TestSQLBindCol, MultiColumnMultiBind) {
+TEST_F(TestSQLBindCol, MultiColumnsMultiBind) {
     std::vector< std::vector< Col > > cols(multi_col_cnt);
     QueryBind(single_row_cnt, 1, multi_col, cols, &m_hstmt);
 }
@@ -541,17 +265,8 @@ TEST_F(TestSQLBindCol, MultiColumnMultiBind) {
 // reallocate additional space for that column
 TEST_F(TestSQLBindCol, InvalidColIndex0) {
     std::vector< std::vector< Col > > cols(single_col_cnt);
-    SQLRETURN ret = SQLSetStmtAttr(m_hstmt, SQL_ROWSET_SIZE, (void*)1, 0);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-    ASSERT_EQ(ret, SQL_SUCCESS);
-
-    std::wstring row_str = std::to_wstring(single_row_cnt);
-    ExecuteQuery(single_col, table_name, row_str, &m_hstmt);
-
-    for (size_t i = 0; i < cols.size(); i++) {
-        cols[i].resize(1);
-    }
-    ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)1, SQL_C_CHAR,
+    BindColSetup(single_row_cnt, 1, single_col, cols, &m_hstmt);
+    SQLRETURN ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)1, SQL_C_CHAR,
                      (SQLPOINTER)&cols[0][0].data_dat[0], 255,
                      &cols[0][0].data_len);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -566,17 +281,8 @@ TEST_F(TestSQLBindCol, InvalidColIndex0) {
 
 TEST_F(TestSQLBindCol, InvalidColIndex2) {
     std::vector< std::vector< Col > > cols(2);
-    SQLRETURN ret = SQLSetStmtAttr(m_hstmt, SQL_ROWSET_SIZE, (void*)1, 0);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-    ASSERT_EQ(ret, SQL_SUCCESS);
-
-    std::wstring row_str = std::to_wstring(single_row_cnt);
-    ExecuteQuery(single_col, table_name, row_str, &m_hstmt);
-
-    for (size_t i = 0; i < cols.size(); i++) {
-        cols[i].resize(1);
-    }
-    ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)1, SQL_C_CHAR,
+    BindColSetup(single_row_cnt, 1, single_col, cols, &m_hstmt);
+    SQLRETURN ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)1, SQL_C_CHAR,
                      (SQLPOINTER)&cols[0][0].data_dat[0], 255,
                      &cols[0][0].data_len);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -591,17 +297,8 @@ TEST_F(TestSQLBindCol, InvalidColIndex2) {
 
 TEST_F(TestSQLBindCol, InvalidBufferLength) {
     std::vector< std::vector< Col > > cols(single_col_cnt);
-    SQLRETURN ret = SQLSetStmtAttr(m_hstmt, SQL_ROWSET_SIZE, (void*)1, 0);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-    ASSERT_EQ(ret, SQL_SUCCESS);
-
-    std::wstring row_str = std::to_wstring(single_row_cnt);
-    ExecuteQuery(single_col, table_name, row_str, &m_hstmt);
-
-    for (size_t i = 0; i < cols.size(); i++) {
-        cols[i].resize(1);
-    }
-    ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)1, SQL_C_CHAR,
+    BindColSetup(single_row_cnt, 1, single_col, cols, &m_hstmt);
+    SQLRETURN ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)1, SQL_C_CHAR,
                      (SQLPOINTER)&cols[0][0].data_dat[0], -1,
                      &cols[0][0].data_len);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -638,104 +335,6 @@ TEST_F(TestSQLBindCol, InsufficientSpace) {
     bool found_expected_data = wcscmp(data, col.substr(0, 1).c_str());
     EXPECT_TRUE(found_expected_data);
 }
-//
-//TEST_F(TestSQLFetch, SingleCol_SingleRow) {
-//    EXPECT_NO_THROW(
-//        QueryBindFetch(single_row_cnt, single_col_cnt, single_col, &m_hstmt));
-//}
-//
-//TEST_F(TestSQLFetch, SingleCol_MultiRow) {
-//    EXPECT_NO_THROW(
-//        QueryBindFetch(multi_row_cnt, single_col_cnt, single_col, &m_hstmt));
-//}
-//
-//TEST_F(TestSQLFetch, MultiCol_SingleRow) {
-//    EXPECT_NO_THROW(
-//        QueryBindFetch(single_row_cnt, multi_col_cnt, multi_col, &m_hstmt));
-//}
-//
-//TEST_F(TestSQLFetch, MultiCol_MultiRow) {
-//    EXPECT_NO_THROW(
-//        QueryBindFetch(multi_row_cnt, multi_col_cnt, multi_col, &m_hstmt));
-//}
-//
-//TEST_F(TestSQLExtendedFetch, SingleCol_SingleRow) {
-//    EXPECT_NO_THROW(QueryBindExtendedFetch(single_row_cnt, single_col_cnt,
-//                                           single_row_rd_cnt, single_col,
-//                                           &m_hstmt));
-//}
-//
-//TEST_F(TestSQLExtendedFetch, SingleCol_MultiRow_SingleFetch) {
-//    EXPECT_NO_THROW(QueryBindExtendedFetch(multi_row_cnt, single_col_cnt,
-//                                           single_row_rd_cnt, single_col,
-//                                           &m_hstmt));
-//}
-//
-//TEST_F(TestSQLExtendedFetch, SingleCol_MultiRow_MultiFetch_Aligned) {
-//    EXPECT_NO_THROW(QueryBindExtendedFetch(multi_row_cnt, single_col_cnt,
-//                                           multi_row_rd_cnt_aligned, single_col,
-//                                           &m_hstmt));
-//}
-//
-//TEST_F(TestSQLExtendedFetch, SingleCol_MultiRow_MultiFetch_Misaligned) {
-//    EXPECT_NO_THROW(QueryBindExtendedFetch(multi_row_cnt, single_col_cnt,
-//                                           multi_row_rd_cnt_misaligned,
-//                                           single_col, &m_hstmt));
-//}
-//
-//TEST_F(TestSQLExtendedFetch, MultiCol_SingleRow) {
-//    EXPECT_NO_THROW(QueryBindExtendedFetch(
-//        single_row_cnt, multi_col_cnt, single_row_rd_cnt, multi_col, &m_hstmt));
-//}
-//
-//TEST_F(TestSQLExtendedFetch, MultiCol_MultiRow_SingleFetch) {
-//    EXPECT_NO_THROW(QueryBindExtendedFetch(
-//        multi_row_cnt, multi_col_cnt, single_row_rd_cnt, multi_col, &m_hstmt));
-//}
-//
-//TEST_F(TestSQLExtendedFetch, MultiCol_MultiRow_MultiFetch_Aligned) {
-//    EXPECT_NO_THROW(QueryBindExtendedFetch(multi_row_cnt, multi_col_cnt,
-//                                           multi_row_rd_cnt_aligned, multi_col,
-//                                           &m_hstmt));
-//}
-//
-//TEST_F(TestSQLExtendedFetch, MultiCol_MultiRow_MultiFetch_Misaligned) {
-//    EXPECT_NO_THROW(QueryBindExtendedFetch(multi_row_cnt, multi_col_cnt,
-//                                           multi_row_rd_cnt_misaligned,
-//                                           multi_col, &m_hstmt));
-//}
-
-//TEST_F(TestSQLGetData, GetWVARCHARData) {
-//    QueryFetch(single_col, flight_data_set, single_row, &m_hstmt);
-//
-//    SQLRETURN ret =
-//        SQLGetData(m_hstmt, m_single_column_ordinal_position, SQL_C_WCHAR,
-//                   m_origin_column_data, m_origin_column_buffer_length,
-//                   &m_origin_indicator);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-//    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-//    // TODO (#110): Improve sample data result checks
-//    bool found_expected_data =
-//        wcscmp(m_origin_column_data, m_expected_origin_column_data_1.c_str())
-//        || wcscmp(m_origin_column_data,
-//                  m_expected_origin_column_data_2.c_str());
-//    EXPECT_TRUE(found_expected_data);
-//}
-//
-//TEST_F(TestSQLGetData, GetFloatData) {
-//    QueryFetch(single_float_col, flight_data_set, single_row, &m_hstmt);
-//
-//    float data = 0.0f;
-//    SQLRETURN ret = SQLGetData(m_hstmt, m_single_column_ordinal_position,
-//                               SQL_C_FLOAT, &data, 4, &m_origin_indicator);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-//    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-//    // TODO (#110): Improve sample data result checks
-//    printf("%f\n", data);
-//    bool found_expected_data =
-//        (data == distance_miles_1 || data == distance_miles_2);
-//    EXPECT_TRUE(found_expected_data);
-//}
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_BIT) {
     int v1 = 0;
@@ -1090,7 +689,8 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_CHAR) {
                               SQLSTATE_STRING_DATA_RIGHT_TRUNCATED));
     ASSERT_EQ(expected_size, indicator);
     char expected_v2[1024] = {0};
-    strncpy(expected_v2, std::to_string(v2).c_str(), expected_size - 1);
+    strncpy(expected_v2, std::to_string(v2).c_str(),
+            static_cast< size_t >(expected_size - 1));
     EXPECT_STREQ(expected_v2, (char*)data2);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -2228,7 +1828,7 @@ TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_WCHAR) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_TIMESTAMP) {
+TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_TYPE_TIMESTAMP) {
     std::wstring columns =
         L"TIMESTAMP \'2021-01-02 18:01:13.000000000\',"
         L"TIMESTAMP \'2021-11-20 06:39:45.123456789\',"
@@ -2236,44 +1836,25 @@ TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_TIMESTAMP) {
         L"TIMESTAMP \'2021-11-20 06:39:45\',"
         L"TIMESTAMP \'2021-11-20 06:39\',"
         L"TIMESTAMP \'2021-11-20\'";
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    TIMESTAMP_STRUCT data;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_TIMESTAMP, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts1{2021, 1, 2, 18, 1, 13, 0};
-    CompareTimestampStruct(ts1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_TIMESTAMP, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts2{2021, 11, 20, 6, 39, 45, 123456789};
-    CompareTimestampStruct(ts2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_TIMESTAMP, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts3{2021, 11, 20, 6, 39, 45, 123450000};
-    CompareTimestampStruct(ts3, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_TIMESTAMP, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts4{2021, 11, 20, 6, 39, 45, 0};
-    CompareTimestampStruct(ts4, data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_TIMESTAMP, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts5{2021, 11, 20, 6, 39, 0, 0};
-    CompareTimestampStruct(ts5, data);
-    ret = SQLGetData(m_hstmt, 6, SQL_C_TIMESTAMP, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts6{2021, 11, 20, 0, 0, 0, 0};
-    CompareTimestampStruct(ts6, data);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+
+    std::vector< std::pair< TIMESTAMP_STRUCT, SQLWCHAR* > > expected;
+    expected.push_back(
+        std::make_pair(TIMESTAMP_STRUCT{2021, 1, 2, 18, 1, 13, 0}, nullptr));
+    expected.push_back(std::make_pair(
+        TIMESTAMP_STRUCT{2021, 11, 20, 6, 39, 45, 123456789}, nullptr));
+    expected.push_back(std::make_pair(
+        TIMESTAMP_STRUCT{2021, 11, 20, 6, 39, 45, 123450000}, nullptr));
+    expected.push_back(
+        std::make_pair(TIMESTAMP_STRUCT{2021, 11, 20, 6, 39, 45, 0}, nullptr));
+    expected.push_back(
+        std::make_pair(TIMESTAMP_STRUCT{2021, 11, 20, 6, 39, 0, 0}, nullptr));
+    expected.push_back(
+        std::make_pair(TIMESTAMP_STRUCT{2021, 11, 20, 0, 0, 0, 0}, nullptr));
+
+    TestConvertingToTimestamp(m_hstmt, columns, expected);
 }
 
-TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_DATE) {
+TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_TYPE_DATE) {
     std::wstring columns =
         L"TIMESTAMP \'2021-01-02 18:01:13.000000000\',"
         L"TIMESTAMP \'2021-11-20 06:39:45.123456789\',"
@@ -2281,94 +1862,42 @@ TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_DATE) {
         L"TIMESTAMP \'2021-11-20 06:39:45\',"
         L"TIMESTAMP \'2021-11-20 06:39\',"
         L"TIMESTAMP \'2021-11-20\'";
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    DATE_STRUCT data;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_DATE, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    DATE_STRUCT ds1{2021, 1, 2};
-    CompareDateStruct(ds1, data);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    ret = SQLGetData(m_hstmt, 2, SQL_C_DATE, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    DATE_STRUCT ds{2021, 11, 20};
-    CompareDateStruct(ds, data);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    ret = SQLGetData(m_hstmt, 3, SQL_C_DATE, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    CompareDateStruct(ds, data);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    ret = SQLGetData(m_hstmt, 4, SQL_C_DATE, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    CompareDateStruct(ds, data);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    ret = SQLGetData(m_hstmt, 5, SQL_C_DATE, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    CompareDateStruct(ds, data);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    ret = SQLGetData(m_hstmt, 6, SQL_C_DATE, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    CompareDateStruct(ds, data);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+
+    std::vector< std::pair< DATE_STRUCT, SQLWCHAR* > > expected;
+    expected.push_back(std::make_pair(DATE_STRUCT{2021, 1, 2},
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(DATE_STRUCT{2021, 11, 20},
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(DATE_STRUCT{2021, 11, 20},
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(DATE_STRUCT{2021, 11, 20},
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(DATE_STRUCT{2021, 11, 20},
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(DATE_STRUCT{2021, 11, 20}, nullptr));
+
+    TestConvertingToDate(m_hstmt, columns, expected);
 }
 
-TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_TIME) {
-    std::wstring columns =
-        L"TIMESTAMP \'2021-01-02 18:01:13.000000000\',"
+TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_TYPE_TIME) {
+    std::wstring columns = L"TIMESTAMP \'2021-01-02 18:01:13.000000000\',"
         L"TIMESTAMP \'2021-11-20 06:39:45.123456789\',"
         L"TIMESTAMP \'2021-11-20 06:39:45.12345\',"
         L"TIMESTAMP \'2021-11-20 06:39:45\',"
         L"TIMESTAMP \'2021-11-20 06:39\',"
         L"TIMESTAMP \'2021-11-20\'";
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    TIME_STRUCT data;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_TIME, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    TIME_STRUCT ts1{18, 1, 13};
-    CompareTimeStruct(ts1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_TIME, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    TIME_STRUCT ts2{6, 39, 45};
-    CompareTimeStruct(ts2, data);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    ret = SQLGetData(m_hstmt, 3, SQL_C_TIME, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    CompareTimeStruct(ts2, data);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    ret = SQLGetData(m_hstmt, 4, SQL_C_TIME, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    CompareTimeStruct(ts2, data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_TIME, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    TIME_STRUCT ts3{6, 39, 0};
-    CompareTimeStruct(ts3, data);
-    ret = SQLGetData(m_hstmt, 6, SQL_C_TIME, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    TIME_STRUCT ts4{0, 0, 0};
-    CompareTimeStruct(ts4, data);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+
+    std::vector< std::pair< TIME_STRUCT, SQLWCHAR* > > expected;
+    expected.push_back(std::make_pair(TIME_STRUCT{18, 1, 13}, nullptr));
+    expected.push_back(
+        std::make_pair(TIME_STRUCT{6, 39, 45}, SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(
+        std::make_pair(TIME_STRUCT{6, 39, 45}, SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(TIME_STRUCT{6, 39, 45}, nullptr));
+    expected.push_back(std::make_pair(TIME_STRUCT{6, 39, 0}, nullptr));
+    expected.push_back(std::make_pair(TIME_STRUCT{0, 0, 0}, nullptr));
+
+    TestConvertingToTime(m_hstmt, columns, expected);
 }
 
 TEST_F(TestSQLGetData, DATE_TO_SQL_C_CHAR) {
@@ -2419,61 +1948,38 @@ TEST_F(TestSQLGetData, DATE_TO_SQL_C_WCHAR) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestSQLGetData, DATE_TO_SQL_C_TIMESTAMP) {
+TEST_F(TestSQLGetData, DATE_TO_SQL_C_TYPE_TIMESTAMP) {
     std::wstring columns = L"DATE \'2021-01-02\', DATE \'2021-11-20\'";
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    TIMESTAMP_STRUCT data;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_TIMESTAMP, &data, sizeof(data),
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts1 {2021, 1, 2, 0, 0, 0, 0};
-    CompareTimestampStruct(ts1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_TIMESTAMP, &data, sizeof(data),
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts2{2021, 11, 20, 0, 0, 0, 0};
-    CompareTimestampStruct(ts2, data);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+
+    std::vector< std::pair< TIMESTAMP_STRUCT, SQLWCHAR* > > expected;
+    expected.push_back(
+        std::make_pair(TIMESTAMP_STRUCT{2021, 1, 2, 0, 0, 0, 0}, nullptr));
+    expected.push_back(
+        std::make_pair(TIMESTAMP_STRUCT{2021, 11, 20, 0, 0, 0, 0}, nullptr));
+
+    TestConvertingToTimestamp(m_hstmt, columns, expected);
 }
 
-TEST_F(TestSQLGetData, DATE_TO_SQL_C_DATE) {
+TEST_F(TestSQLGetData, DATE_TO_SQL_C_TYPE_DATE) {
     std::wstring columns = L"DATE \'2021-01-02\', DATE \'2021-11-20\'";
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    DATE_STRUCT data;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_DATE, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    DATE_STRUCT ds1{2021, 1, 2};
-    CompareDateStruct(ds1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_DATE, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    DATE_STRUCT ds2{2021, 11, 20};
-    CompareDateStruct(ds2, data);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+
+    std::vector< std::pair< DATE_STRUCT, SQLWCHAR* > > expected;
+    expected.push_back(std::make_pair(DATE_STRUCT{2021, 1, 2}, nullptr));
+    expected.push_back(std::make_pair(DATE_STRUCT{2021, 11, 20}, nullptr));
+
+    TestConvertingToDate(m_hstmt, columns, expected);
 }
 
-TEST_F(TestSQLGetData, DATE_TO_SQL_C_TIME) {
+TEST_F(TestSQLGetData, DATE_TO_SQL_C_TYPE_TIME) {
     std::wstring columns = L"DATE \'2021-01-02\', DATE \'2021-11-20\'";
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    TIME_STRUCT data;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_TIME, &data, sizeof(data), &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
-    ret = SQLGetData(m_hstmt, 2, SQL_C_TIME, &data, sizeof(data), &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+
+    std::vector< std::pair< TIME_STRUCT, SQLWCHAR* > > expected;
+    expected.push_back(
+        std::make_pair(TIME_STRUCT{0}, SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
+    expected.push_back(
+        std::make_pair(TIME_STRUCT{0}, SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
+
+    TestConvertingToTime(m_hstmt, columns, expected);
 }
 
 TEST_F(TestSQLGetData, TIME_TO_SQL_C_CHAR) {
@@ -2576,136 +2082,66 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_WCHAR) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestSQLGetData, TIME_TO_SQL_C_TIMESTAMP) {
+TEST_F(TestSQLGetData, TIME_TO_SQL_C_TYPE_TIMESTAMP) {
     std::wstring columns =
         L"TIME \'18:01:13.000000000\',"
         L"TIME \'06:39:45.123456789\',"
         L"TIME \'06:39:45.12345\',"
         L"TIME \'06:39:45\',"
         L"TIME \'06:39\'";
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    TIMESTAMP_STRUCT data;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_TIMESTAMP, &data, sizeof(data),
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+
     time_t rawtime;
-    struct tm* timeinfo;
+    struct tm* now;
     time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    TIMESTAMP_STRUCT ts1{(SQLSMALLINT)(timeinfo->tm_year + 1900),
-                         (SQLUSMALLINT)(timeinfo->tm_mon + 1),
-                         (SQLUSMALLINT)(timeinfo->tm_mday),
-                         18,
-                         1,
-                         13,
-                         0};
-    CompareTimestampStruct(ts1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_TIMESTAMP, &data, sizeof(data),
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts2{(SQLSMALLINT)(timeinfo->tm_year + 1900),
-                         (SQLUSMALLINT)(timeinfo->tm_mon + 1),
-                         (SQLUSMALLINT)(timeinfo->tm_mday),
-                         6,
-                         39,
-                         45,
-                         123456789};
-    CompareTimestampStruct(ts2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_TIMESTAMP, &data, sizeof(data),
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts3{(SQLSMALLINT)(timeinfo->tm_year + 1900),
-                         (SQLUSMALLINT)(timeinfo->tm_mon + 1),
-                         (SQLUSMALLINT)(timeinfo->tm_mday),
-                         6,
-                         39,
-                         45,
-                         123450000};
-    CompareTimestampStruct(ts3, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_TIMESTAMP, &data, sizeof(data),
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts4{(SQLSMALLINT)(timeinfo->tm_year + 1900),
-                         (SQLUSMALLINT)(timeinfo->tm_mon + 1),
-                         (SQLUSMALLINT)(timeinfo->tm_mday),
-                         6,
-                         39,
-                         45,
-                         0};
-    CompareTimestampStruct(ts4, data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_TIMESTAMP, &data, sizeof(data),
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts5{(SQLSMALLINT)(timeinfo->tm_year + 1900),
-                         (SQLUSMALLINT)(timeinfo->tm_mon + 1),
-                         (SQLUSMALLINT)(timeinfo->tm_mday),
-                         6,
-                         39,
-                         0,
-                         0};
-    CompareTimestampStruct(ts5, data);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    now = localtime(&rawtime);
+    SQLSMALLINT year = static_cast< SQLSMALLINT >(now->tm_year + 1900);
+    SQLUSMALLINT month = static_cast< SQLUSMALLINT >(now->tm_mon + 1);
+    SQLUSMALLINT day = static_cast< SQLUSMALLINT >(now->tm_mday);
+
+    std::vector< std::pair< TIMESTAMP_STRUCT, SQLWCHAR* > > expected;
+    expected.push_back(std::make_pair(
+        TIMESTAMP_STRUCT{year, month, day, 18, 1, 13, 0}, nullptr));
+    expected.push_back(std::make_pair(
+        TIMESTAMP_STRUCT{year, month, day, 6, 39, 45, 123456789}, nullptr));
+    expected.push_back(std::make_pair(
+        TIMESTAMP_STRUCT{year, month, day, 6, 39, 45, 123450000}, nullptr));
+    expected.push_back(std::make_pair(
+        TIMESTAMP_STRUCT{year, month, day, 6, 39, 45, 0}, nullptr));
+    expected.push_back(std::make_pair(
+        TIMESTAMP_STRUCT{year, month, day, 6, 39, 0, 0}, nullptr));
+
+    TestConvertingToTimestamp(m_hstmt, columns, expected);
 }
 
-TEST_F(TestSQLGetData, TIME_TO_SQL_C_DATE) {
-    std::wstring columns = L"TIME \'18:01:13.524000000\', TIME \'06:39:45.123456789\'";
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    DATE_STRUCT data;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_DATE, &data, sizeof(data), &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
-    ret = SQLGetData(m_hstmt, 2, SQL_C_DATE, &data, sizeof(data), &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+TEST_F(TestSQLGetData, TIME_TO_SQL_C_TYPE_DATE) {
+    std::wstring columns =
+        L"TIME \'18:01:13.524000000\', TIME \'06:39:45.123456789\'";
+
+    std::vector< std::pair< DATE_STRUCT, SQLWCHAR* > > expected;
+    expected.push_back(
+        std::make_pair(DATE_STRUCT{0}, SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
+    expected.push_back(
+        std::make_pair(DATE_STRUCT{0}, SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
+
+    TestConvertingToDate(m_hstmt, columns, expected);
 }
 
-TEST_F(TestSQLGetData, TIME_TO_SQL_C_TIME) {
+TEST_F(TestSQLGetData, TIME_TO_SQL_C_TYPE_TIME) {
     std::wstring columns =
         L"TIME \'18:01:13.000000000\',"
         L"TIME \'06:39:45.123456789\',"
         L"TIME \'06:39:45.12345\',"
         L"TIME \'06:39:45\',"
         L"TIME \'06:39\'";
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    TIME_STRUCT data;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_TIME, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    TIME_STRUCT ts1{18, 1, 13};
-    CompareTimeStruct(ts1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_TIME, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    TIME_STRUCT ts2{6, 39, 45};
-    CompareTimeStruct(ts2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_TIME, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    CompareTimeStruct(ts2, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_TIME, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    CompareTimeStruct(ts2, data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_TIME, &data, sizeof(data), &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    TIME_STRUCT ts3{6, 39, 0};
-    CompareTimeStruct(ts3, data);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+
+    std::vector< std::pair< TIME_STRUCT, SQLWCHAR* > > expected;
+    expected.push_back(std::make_pair(TIME_STRUCT{18, 1, 13}, nullptr));
+    expected.push_back(std::make_pair(TIME_STRUCT{6, 39, 45}, nullptr));
+    expected.push_back(std::make_pair(TIME_STRUCT{6, 39, 45}, nullptr));
+    expected.push_back(std::make_pair(TIME_STRUCT{6, 39, 45}, nullptr));
+    expected.push_back(std::make_pair(TIME_STRUCT{6, 39, 0}, nullptr));
+
+    TestConvertingToTime(m_hstmt, columns, expected);
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_BIT) {
@@ -3417,7 +2853,8 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_CHAR) {
                               SQLSTATE_STRING_DATA_RIGHT_TRUNCATED));
     ASSERT_EQ(expected_size, indicator);
     char expected_v2[1024] = {0};
-    strncpy(expected_v2, std::to_string(v2).c_str(), expected_size - 1);
+    strncpy(expected_v2, std::to_string(v2).c_str(),
+            static_cast< size_t >(expected_size - 1));
     EXPECT_STREQ(expected_v2, (char*)data2);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -3458,12 +2895,13 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_WCHAR) {
     ASSERT_EQ((int)(2 * expected_size), indicator);
 #endif
     wchar_t expected_v2[1024] = {0};
-    wcsncpy(expected_v2, std::to_wstring(v2).c_str(), expected_size - 1);
+    wcsncpy(expected_v2, std::to_wstring(v2).c_str(),
+            static_cast< size_t >(expected_size - 1));
     EXPECT_STREQ(expected_v2, (wchar_t*)data2);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TIMESTAMP) {
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TYPE_TIMESTAMP) {
     std::wstring columns =
         L"VARCHAR \'2021-01-02 18:01:13.000000000\',"
         L"VARCHAR \'2021-11-20 06:39:45.123456789\',"
@@ -3476,106 +2914,54 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TIMESTAMP) {
         L"VARCHAR \'06:39:45.123456789\',"
         L"VARCHAR \'06:39:45\',"
         L"VARCHAR \'06:39\',"
+        L"VARCHAR \'   2021-01-02 18:01:13.000000000   \',"
+        // invalid
         L"VARCHAR \'2021-11-20 06:39:45.1234567890\',"
-        L"VARCHAR \'2021-11-20 06:39:45a\',"
-        L"VARCHAR \'   2021-01-02 18:01:13.000000000   \'";
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    TIMESTAMP_STRUCT data;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_TIMESTAMP, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts1{2021, 1, 2, 18, 1, 13, 0};
-    CompareTimestampStruct(ts1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_TIMESTAMP, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts2{2021, 11, 20, 6, 39, 45, 123456789};
-    CompareTimestampStruct(ts2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_TIMESTAMP, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts3{2021, 11, 20, 6, 39, 45, 123450000};
-    CompareTimestampStruct(ts3, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_TIMESTAMP, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts4{2021, 11, 20, 6, 39, 45, 0};
-    CompareTimestampStruct(ts4, data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_TIMESTAMP, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts5{2021, 11, 20, 6, 39, 0, 0};
-    CompareTimestampStruct(ts5, data);
-    ret = SQLGetData(m_hstmt, 6, SQL_C_TIMESTAMP, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts6{2021, 11, 20, 6, 0, 0, 0};
-    CompareTimestampStruct(ts6, data);
-    ret = SQLGetData(m_hstmt, 7, SQL_C_TIMESTAMP, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts7{2021, 11, 20, 0, 0, 0, 0};
-    CompareTimestampStruct(ts7, data);
-    ret = SQLGetData(m_hstmt, 8, SQL_C_TIMESTAMP, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts8{2021, 11, 1, 0, 0, 0, 0};
-    CompareTimestampStruct(ts8, data);
-    ret = SQLGetData(m_hstmt, 9, SQL_C_TIMESTAMP, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
+        L"VARCHAR \'2021-11-20 06:39:45a\'";
+
     time_t rawtime;
-    struct tm* timeinfo;
+    struct tm* now;
     time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    TIMESTAMP_STRUCT ts9{(SQLSMALLINT)(timeinfo->tm_year + 1900),
-                         (SQLUSMALLINT)(timeinfo->tm_mon + 1),
-                         (SQLUSMALLINT)(timeinfo->tm_mday),
-                         6,
-                         39,
-                         45,
-                         123456789};
-    CompareTimestampStruct(ts9, data);
-    ret = SQLGetData(m_hstmt, 10, SQL_C_TIMESTAMP, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts10{(SQLSMALLINT)(timeinfo->tm_year + 1900),
-                         (SQLUSMALLINT)(timeinfo->tm_mon + 1),
-                         (SQLUSMALLINT)(timeinfo->tm_mday),
-                         6,
-                         39,
-                         45,
-                         0};
-    CompareTimestampStruct(ts10, data);
-    ret = SQLGetData(m_hstmt, 11, SQL_C_TIMESTAMP, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    TIMESTAMP_STRUCT ts11{(SQLSMALLINT)(timeinfo->tm_year + 1900),
-                          (SQLUSMALLINT)(timeinfo->tm_mon + 1),
-                          (SQLUSMALLINT)(timeinfo->tm_mday),
-                          6,
-                          39,
-                          0,
-                          0};
-    CompareTimestampStruct(ts11, data);
-    ret = SQLGetData(m_hstmt, 12, SQL_C_TIMESTAMP, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    ret = SQLGetData(m_hstmt, 13, SQL_C_TIMESTAMP, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    ret = SQLGetData(m_hstmt, 14, SQL_C_TIMESTAMP, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIMESTAMP_STRUCT), indicator);
-    CompareTimestampStruct(ts1, data);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    now = localtime(&rawtime);
+    SQLSMALLINT year = static_cast< SQLSMALLINT >(now->tm_year + 1900);
+    SQLUSMALLINT month = static_cast< SQLUSMALLINT >(now->tm_mon + 1);
+    SQLUSMALLINT day = static_cast< SQLUSMALLINT >(now->tm_mday);
+
+    std::vector< std::pair< TIMESTAMP_STRUCT, SQLWCHAR* > > expected;
+    expected.push_back(
+        std::make_pair(TIMESTAMP_STRUCT{2021, 1, 2, 18, 1, 13, 0}, nullptr));
+    expected.push_back(std::make_pair(
+        TIMESTAMP_STRUCT{2021, 11, 20, 6, 39, 45, 123456789}, nullptr));
+    expected.push_back(std::make_pair(
+        TIMESTAMP_STRUCT{2021, 11, 20, 6, 39, 45, 123450000}, nullptr));
+    expected.push_back(
+        std::make_pair(TIMESTAMP_STRUCT{2021, 11, 20, 6, 39, 45, 0}, nullptr));
+    expected.push_back(
+        std::make_pair(TIMESTAMP_STRUCT{2021, 11, 20, 6, 39, 0, 0}, nullptr));
+    expected.push_back(
+        std::make_pair(TIMESTAMP_STRUCT{2021, 11, 20, 6, 0, 0, 0}, nullptr));
+    expected.push_back(
+        std::make_pair(TIMESTAMP_STRUCT{2021, 11, 20, 0, 0, 0, 0}, nullptr));
+    expected.push_back(
+        std::make_pair(TIMESTAMP_STRUCT{2021, 11, 1, 0, 0, 0, 0}, nullptr));
+    expected.push_back(std::make_pair(
+        TIMESTAMP_STRUCT{year, month, day, 6, 39, 45, 123456789}, nullptr));
+    expected.push_back(std::make_pair(
+        TIMESTAMP_STRUCT{year, month, day, 6, 39, 45, 0}, nullptr));
+    expected.push_back(std::make_pair(
+        TIMESTAMP_STRUCT{year, month, day, 6, 39, 0, 0}, nullptr));
+    expected.push_back(
+        std::make_pair(TIMESTAMP_STRUCT{2021, 1, 2, 18, 1, 13, 0}, nullptr));
+    expected.push_back(
+        std::make_pair(TIMESTAMP_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+    expected.push_back(
+        std::make_pair(TIMESTAMP_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+
+    TestConvertingToTimestamp(m_hstmt, columns, expected);
 }
 
-TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_DATE) {
+
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TYPE_DATE) {
     std::wstring columns =
         L"VARCHAR \'2021-01-02 18:01:13.000000000\',"
         L"VARCHAR \'2021-11-20 06:39:45.123456789\',"
@@ -3583,95 +2969,48 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_DATE) {
         L"VARCHAR \'2021-11-20 06:39:45\',"
         L"VARCHAR \'2021-11-20 06:39\',"
         L"VARCHAR \'2021-11-20 06\',"
+        L"VARCHAR \'   2021-01-02 18:01:13.000000000   \',"
         L"VARCHAR \'2021-11-20\',"
         L"VARCHAR \'2021-11\',"
+        // invalid
         L"VARCHAR \'06:39:45.123456789\',"
         L"VARCHAR \'06:39:45\',"
         L"VARCHAR \'06:39\',"
         L"VARCHAR \'2021-11-20 06:39:45.1234567890\',"
-        L"VARCHAR \'2021-11-20 06:39:45a\',"
-        L"VARCHAR \'   2021-01-02 18:01:13.000000000   \'";
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    DATE_STRUCT data;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_DATE, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    DATE_STRUCT ds1{2021, 1, 2};
-    CompareDateStruct(ds1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_DATE, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    DATE_STRUCT ds2{2021, 11, 20};
-    CompareDateStruct(ds2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_DATE, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    CompareDateStruct(ds2, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_DATE, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    CompareDateStruct(ds2, data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_DATE, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    CompareDateStruct(ds2, data);
-    ret = SQLGetData(m_hstmt, 6, SQL_C_DATE, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    CompareDateStruct(ds2, data);
-    ret = SQLGetData(m_hstmt, 7, SQL_C_DATE, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    CompareDateStruct(ds2, data);
-    ret = SQLGetData(m_hstmt, 8, SQL_C_DATE, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    DATE_STRUCT ds3{2021, 11, 1};
-    CompareDateStruct(ds3, data);
-    ret = SQLGetData(m_hstmt, 9, SQL_C_DATE, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    ret = SQLGetData(m_hstmt, 10, SQL_C_DATE, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    ret = SQLGetData(m_hstmt, 11, SQL_C_DATE, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    ret = SQLGetData(m_hstmt, 12, SQL_C_DATE, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    ret = SQLGetData(m_hstmt, 13, SQL_C_DATE, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    ret = SQLGetData(m_hstmt, 14, SQL_C_DATE, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    EXPECT_EQ((SQLLEN)sizeof(DATE_STRUCT), indicator);
-    CompareDateStruct(ds1, data);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+        L"VARCHAR \'2021-11-20 06:39:45a\'";
+
+    std::vector< std::pair< DATE_STRUCT, SQLWCHAR* > > expected;
+    expected.push_back(std::make_pair(DATE_STRUCT{2021, 1, 2},
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(DATE_STRUCT{2021, 11, 20},
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(DATE_STRUCT{2021, 11, 20},
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(DATE_STRUCT{2021, 11, 20},
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(DATE_STRUCT{2021, 11, 20},
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(DATE_STRUCT{2021, 11, 20},
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(DATE_STRUCT{2021, 1, 2},
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(DATE_STRUCT{2021, 11, 20}, nullptr));
+    expected.push_back(std::make_pair(DATE_STRUCT{2021, 11, 1}, nullptr));
+    expected.push_back(
+        std::make_pair(DATE_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+    expected.push_back(
+        std::make_pair(DATE_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+    expected.push_back(
+        std::make_pair(DATE_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+    expected.push_back(
+        std::make_pair(DATE_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+    expected.push_back(
+        std::make_pair(DATE_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+
+    TestConvertingToDate(m_hstmt, columns, expected);
 }
 
-TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TIME) {
+TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TYPE_TIME) {
     std::wstring columns =
         L"VARCHAR \'2021-01-02 18:01:13.000000000\',"
         L"VARCHAR \'2021-11-20 06:39:45.123456789\',"
@@ -3679,85 +3018,40 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TIME) {
         L"VARCHAR \'2021-11-20 06:39:45\',"
         L"VARCHAR \'2021-11-20 06:39\',"
         L"VARCHAR \'2021-11-20 06\',"
-        L"VARCHAR \'2021-11-20\',"
-        L"VARCHAR \'2021-11\',"
         L"VARCHAR \'06:39:45.123456789\',"
         L"VARCHAR \'06:39:45\',"
         L"VARCHAR \'06:39\',"
+        L"VARCHAR \'   2021-01-02 18:01:13.000000000   \',"
+        // invalid
+        L"VARCHAR \'2021-11-20\',"
+        L"VARCHAR \'2021-11\',"
         L"VARCHAR \'2021-11-20 06:39:45.1234567890\',"
-        L"VARCHAR \'2021-11-20 06:39:45a\',"
-        L"VARCHAR \'   2021-01-02 18:01:13.000000000   \'";
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    TIME_STRUCT data;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_TIME, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    TIME_STRUCT ts1{18, 1, 13};
-    CompareTimeStruct(ts1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_TIME, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    TIME_STRUCT ts2{6, 39, 45};
-    CompareTimeStruct(ts2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_TIME, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    CompareTimeStruct(ts2, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_TIME, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    CompareTimeStruct(ts2, data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_TIME, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    TIME_STRUCT ts3{6, 39, 0};
-    CompareTimeStruct(ts3, data);
-    ret = SQLGetData(m_hstmt, 6, SQL_C_TIME, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    TIME_STRUCT ts4{6, 0, 0};
-    CompareTimeStruct(ts4, data);
-    ret = SQLGetData(m_hstmt, 7, SQL_C_TIME, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    ret = SQLGetData(m_hstmt, 8, SQL_C_TIME, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    ret = SQLGetData(m_hstmt, 9, SQL_C_TIME, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    CompareTimeStruct(ts2, data);
-    ret = SQLGetData(m_hstmt, 10, SQL_C_TIME, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    CompareTimeStruct(ts2, data);
-    ret = SQLGetData(m_hstmt, 11, SQL_C_TIME, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    CompareTimeStruct(ts3, data);
-    ret = SQLGetData(m_hstmt, 12, SQL_C_TIME, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    ret = SQLGetData(m_hstmt, 13, SQL_C_TIME, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    ret = SQLGetData(m_hstmt, 14, SQL_C_TIME, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(TIME_STRUCT), indicator);
-    CompareTimeStruct(ts1, data);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+        L"VARCHAR \'2021-11-20 06:39:45a\'";
+
+    std::vector< std::pair< TIME_STRUCT, SQLWCHAR* > > expected;
+    expected.push_back(std::make_pair(TIME_STRUCT{18, 1, 13}, nullptr));
+    expected.push_back(
+        std::make_pair(TIME_STRUCT{6, 39, 45}, SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(
+        std::make_pair(TIME_STRUCT{6, 39, 45}, SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(TIME_STRUCT{6, 39, 45}, nullptr));
+    expected.push_back(std::make_pair(TIME_STRUCT{6, 39, 0}, nullptr));
+    expected.push_back(std::make_pair(TIME_STRUCT{6, 0, 0}, nullptr));
+    expected.push_back(
+        std::make_pair(TIME_STRUCT{6, 39, 45}, SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(TIME_STRUCT{6, 39, 45}, nullptr));
+    expected.push_back(std::make_pair(TIME_STRUCT{6, 39, 0}, nullptr));
+    expected.push_back(std::make_pair(TIME_STRUCT{18, 1, 13}, nullptr));
+    expected.push_back(
+        std::make_pair(TIME_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+    expected.push_back(
+        std::make_pair(TIME_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+    expected.push_back(
+        std::make_pair(TIME_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+    expected.push_back(
+        std::make_pair(TIME_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+
+    TestConvertingToTime(m_hstmt, columns, expected);
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_INTERVAL_YEAR_TO_MONTH) {
@@ -4153,113 +3447,6 @@ TEST_F(TestSQLGetData, INTERVAL_DAY_TO_SECOND_TO_SQL_C_WCHAR) {
     EXPECT_STREQ(expected.c_str(), (wchar_t*)data7);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
-
-//TEST_F(TestSQLGetData, GetBitData) {
-//    QueryFetch(single_bit_col, flight_data_set, single_row, &m_hstmt);
-//
-//    bool data_false;
-//    SQLRETURN ret = SQLGetData(m_hstmt, m_single_column_ordinal_position,
-//                               SQL_C_BIT, &data_false, 1, &m_origin_indicator);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-//    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-//    // TODO (#110): Improve sample data result checks
-//    // Since it can return either true or false, will disable check for now
-//    // EXPECT_FALSE(data_false);
-//
-//    // Send another query
-//    ASSERT_NO_THROW(CloseCursor(&m_hstmt, true, true));
-//    QueryFetch(single_bit_col, flight_data_set, single_row_offset_3, &m_hstmt);
-//
-//    ret = SQLGetData(m_hstmt, m_single_column_ordinal_position, SQL_C_BIT,
-//                     &data_false, 1, &m_origin_indicator);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-//    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-//    // TODO (#110): Improve sample data result checks
-//    // Since it can return either true or false, will disable check for now
-//    // EXPECT_FALSE(data_false);
-//}
-
-//GET_DATA_TEST(TypeDataSet_GetBoolData, type_boolean, SQL_C_BIT,
-//              type_boolean_vals, 1)
-//
-//GET_DATA_TEST(TypeDataSet_GetByteData, type_byte, SQL_C_SHORT, type_byte_vals,
-//              2)
-//
-//GET_DATA_TEST(TypeDataSet_GetDateData, type_date, SQL_C_TIMESTAMP,
-//              type_date_vals, sizeof(TIMESTAMP_STRUCT))
-//
-//GET_DATA_TEST(TypeDataSet_GetShortData, type_short, SQL_C_SHORT,
-//              type_short_vals, 2)
-//
-//GET_DATA_TEST(TypeDataSet_GetIntegerData, type_integer, SQL_C_LONG,
-//              type_integer_vals, 4)
-//
-//GET_DATA_TEST(TypeDataSet_GetLongData, type_long, SQL_C_SBIGINT, type_long_vals,
-//              8)
-//
-//GET_DATA_TEST(TypeDataSet_GetHalfFloatData, type_half_float, SQL_C_FLOAT,
-//              type_half_float_vals, 4)
-//
-//GET_DATA_TEST(TypeDataSet_GetFloatData, type_float, SQL_C_FLOAT,
-//              type_float_vals, 4)
-//
-//GET_DATA_TEST(TypeDataSet_GetDoubleData, type_double, SQL_C_DOUBLE,
-//              type_double_vals, 8)
-//
-//GET_DATA_TEST(TypeDataSet_GetScaledFloatData, type_scaled_float, SQL_C_DOUBLE,
-//              type_scaled_float_vals, 8)
-//
-//GET_DATA_TEST(TypeDataSet_GetKeywordData, type_keyword, SQL_C_WCHAR,
-//              type_keyword_vals, 512)
-//GET_DATA_TEST(TypeDataSet_GetKeywordDataMultiReadSingleByte, type_keyword,
-//              SQL_C_WCHAR, type_keyword_vals, 2)
-//GET_DATA_TEST(TypeDataSet_GetKeywordDataMultiReadMultiByte, type_keyword,
-//              SQL_C_WCHAR, type_keyword_vals, 4)
-//
-//GET_DATA_TEST(TypeDataSet_GetTextData, type_text, SQL_C_WCHAR, type_text_vals,
-//              512)
-//GET_DATA_TEST(TypeDataSet_GetTextDataMultiReadSingleByte, type_text,
-//              SQL_C_WCHAR, type_text_vals, 2)
-//GET_DATA_TEST(TypeDataSet_GetTextDataMultiReadMultiByte, type_text, SQL_C_WCHAR,
-//              type_text_vals, 4)
-//
-//TEST_F(TestSQLGetData, SQLSTATE_01004_StringDataRightTruncated) {
-//    SQLRETURN ret;
-//    SQLLEN insufficient_buffer_length = 1;
-//
-//    ExecuteQuery(single_col, flight_data_set, single_row, &m_hstmt);
-//
-//    ret = SQLFetch(m_hstmt);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-//    ASSERT_TRUE(SQL_SUCCEEDED(ret));
-//
-//    ret = SQLGetData(m_hstmt, m_single_column_ordinal_position, SQL_C_WCHAR,
-//                     m_origin_column_data, insufficient_buffer_length,
-//                     &m_origin_indicator);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-//    EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
-//    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-//                              SQLSTATE_STRING_DATA_RIGHT_TRUNCATED));
-//}
-//
-//TEST_F(TestSQLGetData, SQLSTATE_07009_InvalidDescriptorIndex) {
-//    SQLRETURN ret;
-//    SQLUSMALLINT invalid_column_ordinal_position = 2;
-//
-//    ExecuteQuery(single_col, flight_data_set, single_row, &m_hstmt);
-//
-//    ret = SQLFetch(m_hstmt);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-//    ASSERT_TRUE(SQL_SUCCEEDED(ret));
-//
-//    ret = SQLGetData(m_hstmt, invalid_column_ordinal_position, SQL_C_WCHAR,
-//                     m_origin_column_data, m_origin_column_buffer_length,
-//                     &m_origin_indicator);
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-//    EXPECT_EQ(ret, SQL_ERROR);
-//    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-//                              SQLSTATE_INVALID_DESCRIPTOR_INDEX));
-//}
 
 TEST_F(TestSQLNumResultCols, SingleColumn) {
     std::wstring columns =
