@@ -1355,7 +1355,7 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_ALL_TYPES) {
     }
     std::vector< std::vector< std::string > > expected{
         {"array[T,...]", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX),
-         "", "", "", "1", "0", "3", "", "0", "0", "", "", "",
+         "ARRAY [", "]", "", "1", "0", "3", "", "0", "0", "", "", "",
          std::to_string(SQL_WVARCHAR), "", "", "0"},
         {"interval day to second", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX),
          "", "", "", "1", "0", "3", "", "0", "0", "", "", "",
@@ -1364,19 +1364,19 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_ALL_TYPES) {
          std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
          "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
         {"row(T,...)", std::to_string(SQL_WVARCHAR),
-         std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
+         std::to_string(INT_MAX), "ROW (", ")", "", "1", "0", "3", "", "0", "0", "",
          "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
         {"timeseries[row(timestamp, T,...)]", std::to_string(SQL_WVARCHAR),
          std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
          "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
         {"varchar", std::to_string(SQL_WVARCHAR),
-         std::to_string(INT_MAX), "'", "'", "", "1", "1", "3", "", "0", "0", "",
+         std::to_string(INT_MAX), "VARCHAR '", "'", "", "1", "1", "3", "", "0", "0", "",
          "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
         {"unknown", std::to_string(SQL_WVARCHAR),
          std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
          "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
-        {"boolean", std::to_string(SQL_BIT), "1", "",
-         "", "", "1", "0", "3", "1", "0", "0", "", "", "",
+        {"boolean", std::to_string(SQL_BIT), "1", "BOOLEAN '",
+         "'", "", "1", "0", "3", "1", "0", "0", "", "", "",
          std::to_string(SQL_BIT), "", "", "0"},
         {"bigint", std::to_string(SQL_BIGINT), "20", "BIGINT '",
          "'", "", "1", "0", "3", "0", "0", "0", "", "", "",
@@ -1387,14 +1387,14 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_ALL_TYPES) {
         {"double", std::to_string(SQL_DOUBLE), "15", "DOUBLE '",
          "'", "", "1", "0", "3", "0", "0", "0", "", "", "",
          std::to_string(SQL_DOUBLE), "", "10", "0"},
-        {"date", std::to_string(SQL_DATE), "10", "",
-         "", "", "1", "0", "3", "", "0", "0", "", "", "",
+        {"date", std::to_string(SQL_DATE), "10", "DATE '",
+         "'", "", "1", "0", "3", "", "0", "0", "", "", "",
          std::to_string(SQL_DATE), "1", "", "0"},
-        {"time", std::to_string(SQL_TIME), "18", "",
-         "", "", "1", "0", "3", "", "0", "0", "", "9", "9",
+        {"time", std::to_string(SQL_TIME), "18", "TIME '",
+         "'", "", "1", "0", "3", "", "0", "0", "", "9", "9",
          std::to_string(SQL_TIME), "2", "", "0"},
-        {"timestamp", std::to_string(SQL_TIMESTAMP), "29", "",
-         "", "", "1", "0", "3", "", "0", "0", "", "9", "9",
+        {"timestamp", std::to_string(SQL_TIMESTAMP), "29", "TIMESTAMP '",
+         "'", "", "1", "0", "3", "", "0", "0", "", "9", "9",
          std::to_string(SQL_TIMESTAMP), "3", "", "0"}
     };
     CheckRows(expected, result);
@@ -1426,7 +1426,7 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_WVARCHAR) {
     }
     std::vector< std::vector< std::string > > expected{
         {"array[T,...]", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX),
-         "", "", "", "1", "0", "3", "", "0", "0", "", "", "",
+         "ARRAY [", "]", "", "1", "0", "3", "", "0", "0", "", "", "",
          std::to_string(SQL_WVARCHAR), "", "", "0"},
         {"interval day to second", std::to_string(SQL_WVARCHAR),
          std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
@@ -1435,12 +1435,12 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_WVARCHAR) {
          std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
          "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
         {"row(T,...)", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX),
-         "", "", "", "1", "0", "3", "", "0", "0", "", "", "",
+         "ROW (", ")", "", "1", "0", "3", "", "0", "0", "", "", "",
          std::to_string(SQL_WVARCHAR), "", "", "0"},
         {"timeseries[row(timestamp, T,...)]", std::to_string(SQL_WVARCHAR),
          std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
          "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
-        {"varchar", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX), "'",
+        {"varchar", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX), "VARCHAR '",
          "'", "", "1", "1", "3", "", "0", "0", "", "", "",
          std::to_string(SQL_WVARCHAR), "", "", "0"},
         {"unknown", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX), "",
@@ -1475,7 +1475,7 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_BIT) {
         result.push_back(row);
     }
     std::vector< std::vector< std::string > > expected{
-        {"boolean", std::to_string(SQL_BIT), "1", "", "", "", "1", "0", "3",
+        {"boolean", std::to_string(SQL_BIT), "1", "BOOLEAN '", "'", "", "1", "0", "3",
          "1", "0", "0", "", "", "", std::to_string(SQL_BIT), "", "", "0"}
     };
     CheckRows(expected, result);

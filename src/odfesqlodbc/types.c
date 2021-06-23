@@ -573,9 +573,6 @@ Int4 estype_attr_desclength(const ConnectionClass *conn, OID type,
         case TS_TYPE_TIMESTAMP_NO_TMZONE:
         case TS_TYPE_TIMESTAMP:
         case TS_TYPE_VARCHAR:
-            return tstype_attr_column_size(conn, type, atttypmod,
-                                           adtsize_or_longestlen,
-                                           handle_unknown_size_as);
         default:
             return tstype_attr_column_size(conn, type, atttypmod,
                                            adtsize_or_longestlen,
@@ -1038,13 +1035,25 @@ const char *tstype_literal_prefix(const ConnectionClass *conn, OID type) {
     UNUSED(conn);
     switch (type) {
         case TS_TYPE_VARCHAR:
-            return "'";
+            return "VARCHAR '";
         case TS_TYPE_BIGINT:
             return "BIGINT '";
         case TS_TYPE_DOUBLE:
             return "DOUBLE '";
         case TS_TYPE_INTEGER:
             return "INTEGER '";
+        case TS_TYPE_DATE:
+            return "DATE '";
+        case TS_TYPE_TIME:
+            return "TIME '";
+        case TS_TYPE_TIMESTAMP:
+            return "TIMESTAMP '";
+        case TS_TYPE_BOOLEAN:
+            return "BOOLEAN '";
+        case TS_TYPE_ARRAY:
+            return "ARRAY [";
+        case TS_TYPE_ROW:
+            return "ROW (";
         default:
             return NULL;
     }
@@ -1057,7 +1066,15 @@ const char *tstype_literal_suffix(const ConnectionClass *conn, OID type) {
         case TS_TYPE_BIGINT:
         case TS_TYPE_DOUBLE:
         case TS_TYPE_INTEGER:
+        case TS_TYPE_DATE:
+        case TS_TYPE_TIME:
+        case TS_TYPE_TIMESTAMP:
+        case TS_TYPE_BOOLEAN:
             return "'";
+        case TS_TYPE_ARRAY:
+            return "]";
+        case TS_TYPE_ROW:
+            return ")";
         default:
             return NULL;
     }
