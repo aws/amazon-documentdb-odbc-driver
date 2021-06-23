@@ -332,7 +332,7 @@ static BOOL char2stime(const char *str, SIMPLE_TIME *st, int *errcode,
 
     // time hh:mm:ss[.nnnnnnnnn]
     if (valid_time_format(str)) {
-        if (fCType == SQL_C_DATE) {
+        if (fCType == SQL_C_DATE || fCType == SQL_C_TYPE_DATE) {
             *errcode = COPY_INVALID_STRING_CONVERSION;
             return FALSE;
         }
@@ -352,10 +352,6 @@ static BOOL char2stime(const char *str, SIMPLE_TIME *st, int *errcode,
             *errcode = COPY_INVALID_STRING_CONVERSION;
             return FALSE;
         }
-        if (fCType == SQL_C_TIME) {
-            *errcode = COPY_RESULT_FRACTIONAL_TRUNCATED;
-            return TRUE;
-        }
         if (rest[0] != '.') {
             *errcode = COPY_INVALID_STRING_CONVERSION;
             return FALSE;
@@ -368,6 +364,12 @@ static BOOL char2stime(const char *str, SIMPLE_TIME *st, int *errcode,
                 rest[i] = '0';
             rest[i] = '\0';
             st->fr = atoi(&rest[1]);
+            // Fractional seconds portion is nonzero
+            if ((fCType == SQL_C_TIME || fCType == SQL_C_TYPE_TIME)
+                && st->fr != 0) {
+                *errcode = COPY_RESULT_FRACTIONAL_TRUNCATED;
+                return TRUE;
+            }
         }
         return TRUE;
     }
@@ -383,8 +385,11 @@ static BOOL char2stime(const char *str, SIMPLE_TIME *st, int *errcode,
             st->hh = hh;
             st->mm = mm;
             st->ss = ss;
-            if (fCType == SQL_C_DATE)
+            // Time portion of timestamp is nonzero
+            if ((fCType == SQL_C_DATE || fCType == SQL_C_TYPE_DATE)
+                && (ss != 0 || mm != 0 || hh != 0)) {
                 *errcode = COPY_RESULT_FRACTIONAL_TRUNCATED;
+            }
             if (scnt == 6)
                 return TRUE;
         } else if (scnt == 5) {
@@ -394,8 +399,11 @@ static BOOL char2stime(const char *str, SIMPLE_TIME *st, int *errcode,
             st->hh = hh;
             st->mm = mm;
             st->ss = 0;
-            if (fCType == SQL_C_DATE)
+            // Time portion of timestamp is nonzero
+            if ((fCType == SQL_C_DATE || fCType == SQL_C_TYPE_DATE)
+                && (mm != 0 || hh != 0)) {
                 *errcode = COPY_RESULT_FRACTIONAL_TRUNCATED;
+            }
             return TRUE;
         } else if (scnt == 4) {
             st->y = y;
@@ -404,11 +412,14 @@ static BOOL char2stime(const char *str, SIMPLE_TIME *st, int *errcode,
             st->hh = hh;
             st->mm = 0;
             st->ss = 0;
-            if (fCType == SQL_C_DATE)
+            // Time portion of timestamp is nonzero
+            if ((fCType == SQL_C_DATE || fCType == SQL_C_TYPE_DATE)
+                && hh != 0) {
                 *errcode = COPY_RESULT_FRACTIONAL_TRUNCATED;
+            }
             return TRUE;
         } else if (scnt == 3) {
-            if (fCType == SQL_C_TIME) {
+            if (fCType == SQL_C_TIME || fCType == SQL_C_TYPE_TIME) {
                 *errcode = COPY_INVALID_STRING_CONVERSION;
                 return FALSE;
             }
@@ -420,7 +431,7 @@ static BOOL char2stime(const char *str, SIMPLE_TIME *st, int *errcode,
             st->ss = 0;
             return TRUE;
         } else if (scnt == 2) {
-            if (fCType == SQL_C_TIME) {
+            if (fCType == SQL_C_TIME || fCType == SQL_C_TYPE_TIME) {
                 *errcode = COPY_INVALID_STRING_CONVERSION;
                 return FALSE;
             }
@@ -435,10 +446,6 @@ static BOOL char2stime(const char *str, SIMPLE_TIME *st, int *errcode,
             *errcode = COPY_INVALID_STRING_CONVERSION;
             return FALSE;
         }
-        if (fCType == SQL_C_TIME) {
-            *errcode = COPY_RESULT_FRACTIONAL_TRUNCATED;
-            return TRUE;
-        }
         if (rest[0] != '.') {
             *errcode = COPY_INVALID_STRING_CONVERSION;
             return FALSE;
@@ -451,6 +458,12 @@ static BOOL char2stime(const char *str, SIMPLE_TIME *st, int *errcode,
                 rest[i] = '0';
             rest[i] = '\0';
             st->fr = atoi(&rest[1]);
+            // Fractional seconds portion is nonzero
+            if ((fCType == SQL_C_TIME || fCType == SQL_C_TYPE_TIME)
+                && st->fr != 0) {
+                *errcode = COPY_RESULT_FRACTIONAL_TRUNCATED;
+                return TRUE;
+            }
         }
         return TRUE;
     }
@@ -1305,9 +1318,11 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
         case TS_TYPE_VARCHAR: {
             char *copy = strdup(value);
             char *trimmed = trim_white_space(copy);
-            if (fCType == SQL_C_DATE || fCType == SQL_C_TIME) {
+            if (fCType == SQL_C_DATE || fCType == SQL_C_TYPE_DATE
+                || fCType == SQL_C_TIME || fCType == SQL_C_TYPE_TIME) {
                 char2stime(trimmed, &std_time, &result, fCType);
-            } else if (fCType == SQL_C_TIMESTAMP) {
+            } else if (fCType == SQL_C_TIMESTAMP
+                       || fCType == SQL_C_TYPE_TIMESTAMP) {
                 std_time.fr = 0;
                 std_time.infinity = 0;
                 if (strnicmp(trimmed, INFINITY_STRING, 8) == 0) {

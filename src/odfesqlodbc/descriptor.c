@@ -406,8 +406,10 @@ RETCODE SQL_API API_CopyDesc(SQLHDESC SourceDescHandle,
         MYLOG(LOG_DEBUG, "source type=%d -> target type=%d\n", srchd->desc_type,
               targethd->desc_type);
         if (SQL_ATTR_IMP_ROW_DESC == targethd->desc_type) {
-            MYLOG(LOG_DEBUG, "can't modify IRD\n");
-            DC_set_error(target, DESC_CANNOT_MODIFY_IRD, "can't copy to IRD");
+            MYLOG(LOG_DEBUG,
+                  "cannot modify an implementation row descriptor\n");
+            DC_set_error(target, DESC_CANNOT_MODIFY_IRD,
+                         "cannot modify an implementation row descriptor");
             return ret;
         } else if (targethd->desc_type != srchd->desc_type) {
             if (targethd->embedded) {
