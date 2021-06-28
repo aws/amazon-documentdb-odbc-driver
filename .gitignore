@@ -62,3 +62,4 @@ CTestTestfile.cmake
 /src/PowerBIConnector/bin/Debug/
 /src/PowerBIConnector/obj/
 /src/PowerBIConnector/.vs/
+src/aws-sdk-cpp/
