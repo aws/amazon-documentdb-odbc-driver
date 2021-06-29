@@ -200,7 +200,7 @@ typedef UInt4 OID;
 // HAVE_SSIZE_T for APPLE __ssize_t_defined for Linux.
 #ifndef HAVE_SSIZE_T
 typedef long ssize_t;
-#endif // HAVE_SSIZE_T
+#endif /* HAVE_SSIZE_T */
 #elif __linux__
 #ifndef __ssize_t_defined
 typedef long ssize_t;

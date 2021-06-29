@@ -18,7 +18,6 @@
 #define IT_ODBC_HELPER_H
 
 #ifdef __linux__
-// #define SQL_WCHART_CONVERT
 #include <climits>
 #endif
 
@@ -119,9 +118,6 @@ test_string conn_string();
 class Fixture : public testing::Test {
    public:
     void SetUp() override {
-        m_env = SQL_NULL_HENV;
-        m_conn = SQL_NULL_HDBC;
-        m_hstmt = SQL_NULL_HSTMT;
         ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string().c_str(), &m_env,
                                        &m_conn, &m_hstmt, true, true));
     }
