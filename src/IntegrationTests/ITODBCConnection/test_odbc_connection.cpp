@@ -99,7 +99,7 @@ TEST_F(TestSQLConnect, IAM_empty_server_used_default) {
 }
 
 #ifndef __linux__
-// TODO: Linux currently fails on these because the DSN is not configured correctly in GitHub actions.
+// TODO AT-864: Linux currently fails on these because the DSN is not configured correctly in GitHub actions.
 TEST_F(TestSQLConnect, IAM_WrongUser) {
     SQLRETURN ret = SQLConnect(
         m_conn, AS_SQLTCHAR(wdsn_name.c_str()), SQL_NTS, 
