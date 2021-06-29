@@ -34,7 +34,7 @@ const test_string single_row = CREATE_STRING("1");
 const size_t single_row_cnt = 1;
 const size_t multi_col_cnt = 5;
 const size_t single_col_cnt = 1;
-const test_string multi_col = CREATE_STRING("null, 1, VARCHAR '2', DOUBLE '3.3', true;");
+const test_string multi_col = CREATE_STRING("null, 1, VARCHAR '2', DOUBLE '3.3', true");
 typedef struct Col {
     SQLLEN data_len;
     SQLCHAR data_dat[255];
@@ -337,6 +337,7 @@ TEST_F(TestSQLBindCol, InsufficientSpace) {
 
     test_string row_str = convert_to_test_string(single_row_cnt);
     test_string col = CREATE_STRING("VARCHAR '12345'");
+    test_string colret = CREATE_STRING("1");
     ExecuteQuery(col, table_name, row_str, &m_hstmt);
 
     SQLLEN length = 0;
@@ -353,7 +354,7 @@ TEST_F(TestSQLBindCol, InsufficientSpace) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret, msg_buffer.data(), 512);
     EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
     EXPECT_EQ(tchar_to_string(msg_buffer.data()), tchar_to_string((SQLTCHAR*)CREATE_STRING("Fetched item was truncated.")));
-    EXPECT_EQ(tchar_to_string(data_buffer.data()), tchar_to_string((SQLTCHAR*)col.substr(0, 1).c_str()));
+    EXPECT_EQ(tchar_to_string(data_buffer.data()), tchar_to_string((SQLTCHAR*)colret.c_str()));
 }
 #endif
 
