@@ -36,19 +36,19 @@
 #define IT_SIZEOF(x) (NULL == (x) ? 0 : (sizeof((x)) / sizeof((x)[0])))
 
 // SQLConnect constants
-std::wstring default_credential_chain = L"timestream-aws-profile";
-std::wstring wdsn_name = L"timestream-iam";
-std::wstring user =
-    std::wstring_convert< std::codecvt_utf8< wchar_t > >().from_bytes(
-        std::getenv("AWS_ACCESS_KEY_ID"));
-std::wstring pass =
-    std::wstring_convert< std::codecvt_utf8< wchar_t > >().from_bytes(
-        std::getenv("AWS_SECRET_ACCESS_KEY"));
-std::wstring wrong = L"wrong";
-std::wstring empty = L"";
+
+char* access_key = std::getenv("AWS_ACCESS_KEY_ID");
+char* secret_key = std::getenv("AWS_SECRET_ACCESS_KEY");
+test_string default_credential_chain = CREATE_STRING("timestream-aws-profile");
+test_string wdsn_name = CREATE_STRING("timestream-iam");
+test_string user = to_test_string(std::string((access_key == NULL) ? "" : access_key));
+test_string pass = to_test_string(std::string((secret_key == NULL) ? "" : secret_key));
+test_string wrong = CREATE_STRING("wrong");
+test_string empty = CREATE_STRING("");
 
 // SQLDriverConnect constants
-std::wstring dsn_conn_string = L"DSN=timestream-aws-profile";
+test_string dsn_conn_string = CREATE_STRING("DSN=timestream-aws-profile");
+
 
 class TestSQLConnect : public testing::Test {
    public:
@@ -68,50 +68,57 @@ class TestSQLConnect : public testing::Test {
     SQLHDBC m_conn;
 };
 
+
 TEST_F(TestSQLConnect, AWS_Profile_Default_credential_chain) {
     SQLRETURN ret = SQLConnect(
-        m_conn, (SQLTCHAR*)default_credential_chain.c_str(), SQL_NTS,
-        (SQLTCHAR*)empty.c_str(), static_cast< SQLSMALLINT >(empty.length()),
-        (SQLTCHAR*)empty.c_str(), static_cast< SQLSMALLINT >(empty.length()));
+        m_conn, AS_SQLTCHAR(default_credential_chain.c_str()), SQL_NTS,
+        AS_SQLTCHAR(empty.c_str()), static_cast< SQLSMALLINT >(empty.length()),
+        AS_SQLTCHAR(empty.c_str()), static_cast< SQLSMALLINT >(empty.length()));
     EXPECT_EQ(SQL_SUCCESS, ret);
     LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
 }
 
 TEST_F(TestSQLConnect, IAM_Success) {
     SQLRETURN ret = SQLConnect(
-        m_conn, (SQLTCHAR*)wdsn_name.c_str(), SQL_NTS, (SQLTCHAR*)user.c_str(),
-        static_cast< SQLSMALLINT >(user.length()), (SQLTCHAR*)pass.c_str(),
+        m_conn, AS_SQLTCHAR(wdsn_name.c_str()), SQL_NTS, 
+        AS_SQLTCHAR(user.c_str()),
+        static_cast< SQLSMALLINT >(user.length()), AS_SQLTCHAR(pass.c_str()),
         static_cast< SQLSMALLINT >(pass.length()));
     EXPECT_EQ(SQL_SUCCESS, ret);
     LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
 }
+
 
 TEST_F(TestSQLConnect, IAM_empty_server_used_default) {
     SQLRETURN ret = SQLConnect(
-        m_conn, (SQLTCHAR*)empty.c_str(), SQL_NTS,
-        (SQLTCHAR*)user.c_str(), static_cast< SQLSMALLINT >(user.length()),
-        (SQLTCHAR*)pass.c_str(), static_cast< SQLSMALLINT >(pass.length()));
+        m_conn, AS_SQLTCHAR(empty.c_str()), SQL_NTS,
+        AS_SQLTCHAR(user.c_str()), static_cast< SQLSMALLINT >(user.length()),
+        AS_SQLTCHAR(pass.c_str()), static_cast< SQLSMALLINT >(pass.length()));
     EXPECT_EQ(SQL_SUCCESS, ret);
     LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
 }
 
+#ifndef __linux__
+// TODO AT-864: Linux currently fails on these because the DSN is not configured correctly in GitHub actions.
 TEST_F(TestSQLConnect, IAM_WrongUser) {
     SQLRETURN ret = SQLConnect(
-        m_conn, (SQLTCHAR*)wdsn_name.c_str(), SQL_NTS, (SQLTCHAR*)wrong.c_str(),
-        static_cast< SQLSMALLINT >(wrong.length()), (SQLTCHAR*)pass.c_str(),
-        static_cast< SQLSMALLINT >(pass.length()));
+        m_conn, AS_SQLTCHAR(wdsn_name.c_str()), SQL_NTS, 
+        AS_SQLTCHAR(wrong.c_str()), static_cast< SQLSMALLINT >(wrong.length()),    
+        AS_SQLTCHAR(pass.c_str()), static_cast< SQLSMALLINT >(pass.length()));
     EXPECT_EQ(SQL_ERROR, ret);
     LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
 }
 
 TEST_F(TestSQLConnect, IAM_WrongPassword) {
     SQLRETURN ret = SQLConnect(
-        m_conn, (SQLTCHAR*)wdsn_name.c_str(), SQL_NTS, (SQLTCHAR*)user.c_str(),
-        static_cast< SQLSMALLINT >(user.length()), (SQLTCHAR*)wrong.c_str(),
+        m_conn, AS_SQLTCHAR(wdsn_name.c_str()), SQL_NTS, AS_SQLTCHAR(user.c_str()),
+        static_cast< SQLSMALLINT >(user.length()),     AS_SQLTCHAR(wrong.c_str()),
         static_cast< SQLSMALLINT >(wrong.length()));
     EXPECT_EQ(SQL_ERROR, ret);
     LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
 }
+#endif
+
 
 class TestSQLDriverConnect : public testing::Test {
    public:
@@ -141,58 +148,58 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
-//TEST_F(TestSQLDriverConnect, IAM_MinimalConnectionString) {
-//    std::wstring wstr;
-//    wstr += L"Driver=timestreamodbc;";
-//    wstr += (L"UID=" + user + L";");
-//    wstr += (L"PWD=" + pass + L";");
-//    SQLRETURN ret = SQLDriverConnect(
-//        m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
-//        m_out_conn_string, IT_SIZEOF(m_out_conn_string),
-//        &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
-//    EXPECT_EQ(SQL_SUCCESS, ret);
-//}
-//
-//TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString) {
-//    std::wstring wstr;
-//    wstr += L"Driver=timestreamodbc;";
-//    wstr += (L"AccessKeyId=" + user + L";");
-//    wstr += (L"SecretAccessKey=" + pass + L";");
-//    SQLRETURN ret =
-//        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
-//                         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
-//                         &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
-//    EXPECT_EQ(SQL_SUCCESS, ret);
-//}
-//
-//TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross1) {
-//    std::wstring wstr;
-//    wstr += L"Driver=timestreamodbc;";
-//    wstr += (L"UID=" + user + L";");
-//    wstr += (L"SecretAccessKey=" + pass + L";");
-//    SQLRETURN ret =
-//        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
-//                         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
-//                         &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
-//    EXPECT_EQ(SQL_SUCCESS, ret);
-//}
-//
-//TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross2) {
-//    std::wstring wstr;
-//    wstr += L"Driver=timestreamodbc;";
-//    wstr += (L"AccessKeyId=" + user + L";");
-//    wstr += (L"PWD=" + pass + L";");
-//    SQLRETURN ret =
-//        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
-//                         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
-//                         &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
-//    EXPECT_EQ(SQL_SUCCESS, ret);
-//}
+TEST_F(TestSQLDriverConnect, IAM_MinimalConnectionString) {
+    test_string wstr;
+    wstr += CREATE_STRING("Driver=timestreamodbc;");
+    wstr += (CREATE_STRING("UID=") + user + CREATE_STRING(";"));
+    wstr += (CREATE_STRING("PWD=") + pass + CREATE_STRING(";"));
+    SQLRETURN ret = SQLDriverConnect(
+        m_conn, NULL, AS_SQLTCHAR(wstr.c_str()), SQL_NTS,
+        m_out_conn_string, IT_SIZEOF(m_out_conn_string),
+        &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
+    EXPECT_EQ(SQL_SUCCESS, ret);
+}
+
+TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString) {
+    test_string wstr;
+    wstr += CREATE_STRING("Driver=timestreamodbc;");
+    wstr += (CREATE_STRING("AccessKeyId=") + user + CREATE_STRING(";"));
+    wstr += (CREATE_STRING("SecretAccessKey=") + pass + CREATE_STRING(";"));
+    SQLRETURN ret =
+        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
+                         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
+                         &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
+    EXPECT_EQ(SQL_SUCCESS, ret);
+}
+
+TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross1) {
+    test_string wstr;
+    wstr += CREATE_STRING("Driver=timestreamodbc;");
+    wstr += (CREATE_STRING("UID=") + user + CREATE_STRING(";"));
+    wstr += (CREATE_STRING("SecretAccessKey=") + pass + CREATE_STRING(";"));
+    SQLRETURN ret =
+        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
+                         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
+                         &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
+    EXPECT_EQ(SQL_SUCCESS, ret);
+}
+
+TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross2) {
+    test_string wstr;
+    wstr += CREATE_STRING("Driver=timestreamodbc;");
+    wstr += (CREATE_STRING("AccessKeyId=") + user + CREATE_STRING(";"));
+    wstr += (CREATE_STRING("PWD=") + pass + CREATE_STRING(";"));
+    SQLRETURN ret =
+        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
+                         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
+                         &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
+    EXPECT_EQ(SQL_SUCCESS, ret);
+}
 
 // TODO: enable after aligning the connection string
 //TEST_F(TestSQLDriverConnect, SqlDriverPrompt) {
 //    SQLRETURN ret =
-//        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)conn_string.c_str(), SQL_NTS,
+//        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)(conn_string().c_str()), SQL_NTS,
 //                         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
 //                         &m_out_conn_string_length, SQL_DRIVER_PROMPT);
 //
@@ -201,7 +208,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 
 //TEST_F(TestSQLDriverConnect, SqlDriverComplete) {
 //    SQLRETURN ret =
-//        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)conn_string.c_str(), SQL_NTS,
+//        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)(conn_string().c_str()), SQL_NTS,
 //                         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
 //                         &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
 //
@@ -210,7 +217,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 //
 //TEST_F(TestSQLDriverConnect, SqlDriverCompleteRequired) {
 //    SQLRETURN ret = SQLDriverConnect(
-//        m_conn, NULL, (SQLTCHAR*)conn_string.c_str(), SQL_NTS,
+//        m_conn, NULL, (SQLTCHAR*)(conn_string().c_str()), SQL_NTS,
 //        m_out_conn_string, IT_SIZEOF(m_out_conn_string),
 //        &m_out_conn_string_length, SQL_DRIVER_COMPLETE_REQUIRED);
 //
@@ -219,7 +226,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 //
 //TEST_F(TestSQLDriverConnect, SqlDriverNoprompt) {
 //    SQLRETURN ret =
-//        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)conn_string.c_str(), SQL_NTS,
+//        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)(conn_string().c_str()), SQL_NTS,
 //                         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
 //                         &m_out_conn_string_length, SQL_DRIVER_NOPROMPT);
 //
@@ -229,7 +236,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 //// TODO #41 - Revisit when parser code
 //// This should return SQL_SUCCESS_WITH_INFO
 //TEST_F(TestSQLDriverConnect, InvalidDriver) {
-//    std::wstring invalid_driver_conn_string =
+//    test_string invalid_driver_conn_string =
 //         use_ssl ? L"Driver=xxxx;"
 //                   L"host=https://localhost;port=5432;"
 //                   L"UID=admin;PWD=admin;auth=IAM;"
@@ -249,7 +256,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 // }
 //
 //TEST_F(TestSQLDriverConnect, InvalidHost) {
-//    std::wstring invalid_host_conn_string =
+//    test_string invalid_host_conn_string =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"host=https://8.8.8.8;port=9200;"
 //                  L"UID=admin;PWD=admin;auth=IAM;"
@@ -269,7 +276,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 //}
 //
 //TEST_F(TestSQLDriverConnect, InvalidPort) {
-//    std::wstring invalid_port_conn_string =
+//    test_string invalid_port_conn_string =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"host=https://localhost;port=5432;"
 //                  L"UID=admin;PWD=admin;auth=IAM;"
@@ -292,7 +299,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 //// This should return SQL_SUCCESS_WITH_INFO (SQLSTATE 01S00 - Invalid connection
 //// string attribute)
 //TEST_F(TestSQLDriverConnect, UnsupportedKeyword) {
-//    std::wstring unsupported_keyword_conn_string =
+//    test_string unsupported_keyword_conn_string =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"host=https://localhost;port=5432;"
 //                  L"UID=admin;PWD=admin;auth=IAM;"
@@ -312,7 +319,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 //}
 //
 //TEST_F(TestSQLDriverConnect, ConnStringAbbrevsUID) {
-//    std::wstring abbrev_str =
+//    test_string abbrev_str =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"host=https://localhost;port=9200;"
 //                  L"UID=admin;PWD=admin;auth=IAM;"
@@ -332,7 +339,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 //}
 //
 //TEST_F(TestSQLDriverConnect, ConnStringAbbrevsPWD) {
-//    std::wstring abbrev_str =
+//    test_string abbrev_str =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"host=https://localhost;port=9200;"
 //                  L"UID=admin;PWD=admin;auth=IAM;"
@@ -352,7 +359,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 //}
 //
 //TEST_F(TestSQLDriverConnect, ConnStringAbbrevsUIDPWD) {
-//    std::wstring abbrev_str =
+//    test_string abbrev_str =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"host=https://localhost;port=9200;"
 //                  L"UID=admin;PWD=admin;auth=IAM;"
@@ -372,7 +379,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 //}
 //
 //TEST_F(TestSQLDriverConnect, ConnStringAbbrevsServer) {
-//    std::wstring abbrev_str =
+//    test_string abbrev_str =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"UID=admin;PWD=admin;auth=IAM;"
 //                  L"logLevel=0;logOutput=C:\\;"
@@ -390,7 +397,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 //}
 //
 //TEST_F(TestSQLDriverConnect, ConnStringAbbrevsServerUIDPWD) {
-//    std::wstring abbrev_str =
+//    test_string abbrev_str =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"UID=admin;PWD=admin;auth=IAM;"
 //                  L"logLevel=0;logOutput=C:\\;"
@@ -408,7 +415,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 //}
 //
 //TEST_F(TestSQLDriverConnect, Timeout1Second) {
-//    std::wstring one_second_timeout =
+//    test_string one_second_timeout =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"host=https://8.8.8.8;port=9200;"
 //                  L"UID=admin;PWD=admin;auth=IAM;"
@@ -444,7 +451,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 //}
 //
 //TEST_F(TestSQLDriverConnect, Timeout3Second) {
-//    std::wstring one_second_timeout =
+//    test_string one_second_timeout =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"host=https://8.8.8.8;port=9200;"
 //                  L"UID=admin;PWD=admin;auth=IAM;"
@@ -480,7 +487,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 //}
 //
 //TEST_F(TestSQLDriverConnect, Timeout7Second) {
-//    std::wstring seven_second_timeout =
+//    test_string seven_second_timeout =
 //        use_ssl ? L"Driver={Elasticsearch ODBC};"
 //                  L"host=https://8.8.8.8;port=9200;"
 //                  L"UID=admin;PWD=admin;auth=IAM;"
@@ -539,14 +546,14 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 //};
 //
 //TEST_F(TestSQLDisconnect, TestSuccess) {
-//    ASSERT_NO_THROW(ITDriverConnect((SQLTCHAR*)conn_string.c_str(), &m_env,
+//    ASSERT_NO_THROW(ITDriverConnect((SQLTCHAR*)(conn_string().c_str()), &m_env,
 //                                    &m_conn, true, true));
 //    EXPECT_EQ(SQL_SUCCESS, SQLDisconnect(m_conn));
 //}
 //
 //TEST_F(TestSQLDisconnect, TestReconnectOnce) {
 //    for (int i = 0; i <= 1; i++) {
-//        ASSERT_NO_THROW((ITDriverConnect((SQLTCHAR*)conn_string.c_str(), &m_env,
+//        ASSERT_NO_THROW((ITDriverConnect((SQLTCHAR*)(conn_string().c_str()), &m_env,
 //                                         &m_conn, true, true)));
 //        EXPECT_EQ(SQL_SUCCESS, SQLDisconnect(m_conn));
 //    }
@@ -554,7 +561,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 //
 //TEST_F(TestSQLDisconnect, TestReconnectMultipleTimes) {
 //    for (int i = 0; i <= 10; i++) {
-//        ASSERT_NO_THROW((ITDriverConnect((SQLTCHAR*)conn_string.c_str(), &m_env,
+//        ASSERT_NO_THROW((ITDriverConnect((SQLTCHAR*)(conn_string().c_str()), &m_env,
 //                                         &m_conn, true, true)));
 //        EXPECT_EQ(SQL_SUCCESS, SQLDisconnect(m_conn));
 //    }
@@ -566,6 +573,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 //    EXPECT_EQ(SQL_ERROR, SQLDisconnect(m_conn));
 //}
 //
+
 int main(int argc, char** argv) {
 #ifdef WIN32
     // Enable CRT for detecting memory leaks
@@ -584,7 +592,7 @@ int main(int argc, char** argv) {
 
    std::string output = testing::internal::GetCapturedStdout();
    std::cout << output << std::endl;
-   std::cout << (failures ? "Not all tests passed." : "All tests passed")
+   std::cout << (failures ? "Not all tests passed." : "All tests passed.")
              << std::endl;
    WriteFileIfSpecified(argv, argv + argc, "-fout", output);
 

@@ -49,7 +49,8 @@ class TestPerformance : public testing::Test {
     TestPerformance() {
     }
     void SetUp() {
-        AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env, &m_conn,
+        test_string conn_str = conn_string();
+        AllocStatement((SQLTCHAR*)conn_str.c_str(), &m_env, &m_conn,
                        &m_hstmt, true, true);
     }
     void TearDown() {
