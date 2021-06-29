@@ -37,7 +37,7 @@ test_string aws_auth_conn_string_invalid_authtype =
     test_string(CREATE_STRING("Host=https://")) +
     test_string(CREATE_STRING("search-bit-quill-cx3hpfoxvasohujxkllmgjwqde.us-west-2.")) +
     test_string(CREATE_STRING("es.amazonaws.com;")) +
-    test_string(CREATE_STRING("Auth=AWS;Region=us-west-2;LogLevel=1")); +
+    test_string(CREATE_STRING("Auth=AWS;Region=us-west-2;LogLevel=1"));
 
 class TestAwsAuthConnection : public testing::Test {
    public:
