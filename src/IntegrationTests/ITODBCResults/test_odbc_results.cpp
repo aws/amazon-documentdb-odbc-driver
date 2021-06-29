@@ -323,7 +323,7 @@ TEST_F(TestSQLBindCol, InvalidBufferLength) {
     BindColSetup(single_row_cnt, 1, single_col, cols, &m_hstmt);
     SQLRETURN ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)1, SQL_C_CHAR,
                      (SQLPOINTER)(cols[0][0].data_dat), -1,
-                     (cols[0][0].data_len));
+                     &(cols[0][0].data_len));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
     EXPECT_EQ(SQL_ERROR, ret);
     EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
