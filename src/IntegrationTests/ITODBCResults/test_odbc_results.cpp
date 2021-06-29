@@ -2739,7 +2739,8 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_WCHAR) {
     
     SQLLEN expected_size = convert_to_test_string(v2).size();
 #ifdef __APPLE__
-    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 1024, &indicator);
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 4 * (expected_size),
+                     &indicator);
 #else
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 2 * (expected_size),
                      &indicator);
