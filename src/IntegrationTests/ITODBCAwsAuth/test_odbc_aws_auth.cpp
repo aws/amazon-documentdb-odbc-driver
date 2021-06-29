@@ -21,17 +21,23 @@
 
 test_string dsn_name = CREATE_STRING("test_aws_auth_dsn");
 test_string aws_auth_conn_string =
-    CREATE_STRING("Driver={Elasticsearch};DataBase=database_name;Host=https://")
-    CREATE_STRING("search-bit-quill-cx3hpfoxvasohujxkllmgjwqde.us-west-2.")
-    CREATE_STRING("es.amazonaws.com;Auth=IAM;Region=us-west-2;LogLevel=1");
+    test_string(CREATE_STRING("Driver={Elasticsearch};DataBase=database_name;")) +
+    test_string(CREATE_STRING("Host=https://")) +
+    test_string(CREATE_STRING("search-bit-quill-cx3hpfoxvasohujxkllmgjwqde.us-west-2.")) +
+    test_string(CREATE_STRING("es.amazonaws.com;")) +
+    test_string(CREATE_STRING("Auth=IAM;Region=us-west-2;LogLevel=1"));
 test_string aws_auth_conn_string_invalid_region =
-    CREATE_STRING("Driver={Elasticsearch};DataBase=database_name;Host=https://")
-    CREATE_STRING("search-bit-quill-cx3hpfoxvasohujxkllmgjwqde.us-west-2.")
-    CREATE_STRING("es.amazonaws.com;Auth=IAM;Region=us-west-3;LogLevel=1");
+    test_string(CREATE_STRING("Driver={Elasticsearch};DataBase=database_name;")) +
+    test_string(CREATE_STRING("Host=https://")) +
+    test_string(CREATE_STRING("search-bit-quill-cx3hpfoxvasohujxkllmgjwqde.us-west-2.")) +
+    test_string(CREATE_STRING("es.amazonaws.com;")) +
+    test_string(CREATE_STRING("Auth=IAM;Region=us-west-3;LogLevel=1"));
 test_string aws_auth_conn_string_invalid_authtype =
-    CREATE_STRING("Driver={Elasticsearch};DataBase=database_name;Host=https://")
-    CREATE_STRING("search-bit-quill-cx3hpfoxvasohujxkllmgjwqde.us-west-2.")
-    CREATE_STRING("es.amazonaws.com;Auth=AWS;Region=us-west-2;LogLevel=1");
+    test_string(CREATE_STRING("Driver={Elasticsearch};DataBase=database_name;")) +
+    test_string(CREATE_STRING("Host=https://")) +
+    test_string(CREATE_STRING("search-bit-quill-cx3hpfoxvasohujxkllmgjwqde.us-west-2.")) +
+    test_string(CREATE_STRING("es.amazonaws.com;")) +
+    test_string(CREATE_STRING("Auth=AWS;Region=us-west-2;LogLevel=1")); +
 
 class TestAwsAuthConnection : public testing::Test {
    public:
