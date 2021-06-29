@@ -32,16 +32,16 @@
 // clang-format on
 
 // SQLConnect constants
-std::wstring azure_ad_dsn = L"timestream-aad";
-std::wstring okta_dsn = L"timestream-okta";
-std::wstring empty;
-std::wstring wrong = L"wrong";
+test_string azure_ad_dsn = CREATE_STRING("timestream-aad");
+test_string okta_dsn = CREATE_STRING("timestream-okta");
+test_string empty;
+test_string wrong = CREATE_STRING("wrong");
 
 // Remember to replace with your IDP username and password
-std::wstring correct_aad_username = L"";
-std::wstring correct_aad_password = L"";
-std::wstring correct_okta_username = L"";
-std::wstring correct_okta_password = L"";
+test_string correct_aad_username = CREATE_STRING("");
+test_string correct_aad_password = CREATE_STRING("");
+test_string correct_okta_username = CREATE_STRING("");
+test_string correct_okta_password = CREATE_STRING("");
 
 class TestSQLConnectSAMLAuth : public testing::Test {
    public:
@@ -67,14 +67,14 @@ class TestSQLConnectSAMLAuth : public testing::Test {
     SQLHDBC m_conn = SQL_NULL_HDBC;
 };
 
-void SQLConnectWithDSN(SQLHDBC conn, std::wstring dsn,
-                       std::wstring idp_username, std::wstring idp_password,
+void SQLConnectWithDSN(SQLHDBC conn, test_string dsn,
+                       test_string idp_username, test_string idp_password,
                        SQLRETURN expected_ret) {
     SQLRETURN ret =
-        SQLConnect(conn, const_cast< SQLTCHAR* >(dsn.c_str()), SQL_NTS,
-                   const_cast< SQLTCHAR* >(idp_username.c_str()),
+        SQLConnect(conn, AS_SQLTCHAR(dsn.c_str()), SQL_NTS,
+                   AS_SQLTCHAR(idp_username.c_str()),
                    static_cast< SQLSMALLINT >(idp_username.length()),
-                   const_cast< SQLTCHAR* >(idp_password.c_str()),
+                   AS_SQLTCHAR(idp_password.c_str()),
                    static_cast< SQLSMALLINT >(idp_password.length()));
     EXPECT_EQ(expected_ret, ret);
     LogAnyDiagnostics(SQL_HANDLE_DBC, conn, ret);
@@ -133,17 +133,17 @@ class TestSQLDriverConnectSAMLAuth : public testing::Test {
 };
 
 TEST_F(TestSQLDriverConnectSAMLAuth, AzureAD_ConnectionString) {
-    std::wstring wstr;
-    wstr += L"Driver=timestreamodbc;";
-    wstr += (L"UID=;");
-    wstr += (L"PWD=;");
-    wstr += (L"Auth=AAD;");
-    wstr += (L"IdpName=AzureAD;");
-    wstr += (L"AADApplicationID=;");
-    wstr += (L"AADClientSecret=;");
-    wstr += (L"AADTenant=;");
-    wstr += (L"RoleARN=;");
-    wstr += (L"IdpARN=;");
+    test_string wstr;
+    wstr += CREATE_STRING("Driver=timestreamodbc;");
+    wstr += CREATE_STRING("UID=;");
+    wstr += CREATE_STRING("PWD=;");
+    wstr += CREATE_STRING("Auth=AAD;");
+    wstr += CREATE_STRING("IdpName=AzureAD;");
+    wstr += CREATE_STRING("AADApplicationID=;");
+    wstr += CREATE_STRING("AADClientSecret=;");
+    wstr += CREATE_STRING("AADTenant=;");
+    wstr += CREATE_STRING("RoleARN=;");
+    wstr += CREATE_STRING("IdpARN=;");
     SQLRETURN ret =
         SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
                          m_out_conn_string, IT_SIZEOF(m_out_conn_string),
@@ -152,16 +152,16 @@ TEST_F(TestSQLDriverConnectSAMLAuth, AzureAD_ConnectionString) {
 }
 
 TEST_F(TestSQLDriverConnectSAMLAuth, Okta_ConnectionString) {
-    std::wstring wstr;
-    wstr += L"Driver=timestreamodbc;";
-    wstr += (L"UID=;");
-    wstr += (L"PWD=;");
-    wstr += (L"Auth=OKTA;");
-    wstr += (L"IdpName=Okta;");
-    wstr += (L"IdpHost=;");
-    wstr += (L"OktaApplicationID=;");
-    wstr += (L"RoleARN=;");
-    wstr += (L"IdpARN=;");
+    test_string wstr;
+    wstr += CREATE_STRING("Driver=timestreamodbc;");
+    wstr += CREATE_STRING("UID=;");
+    wstr += CREATE_STRING("PWD=;");
+    wstr += CREATE_STRING("Auth=OKTA;");
+    wstr += CREATE_STRING("IdpName=Okta;");
+    wstr += CREATE_STRING("IdpHost=;");
+    wstr += CREATE_STRING("OktaApplicationID=;");
+    wstr += CREATE_STRING("RoleARN=;");
+    wstr += CREATE_STRING("IdpARN=;");
     SQLRETURN ret =
         SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
                          m_out_conn_string, IT_SIZEOF(m_out_conn_string),
