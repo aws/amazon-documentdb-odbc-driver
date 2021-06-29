@@ -117,10 +117,8 @@ void LogAnyDiagnostics(SQLSMALLINT handle_type, SQLHANDLE handle, SQLRETURN ret,
             handle_type, handle, rec_number, sqlstate, &native_error_code,
             msg_return == NULL ? diag_message : msg_return,
             msg_return == NULL ? IT_SIZEOF(diag_message) : sz, &message_length);
-        std::string diag_str = (msg_return == NULL) ?
-            u16string_to_string(std::u16string((char16_t*)diag_message)) :
-            u16string_to_string(std::u16string((char16_t*)msg_return));
-        std::string state_str = u16string_to_string(std::u16string((char16_t*)sqlstate));
+        std::string diag_str = tchar_to_string((msg_return == NULL) ? diag_message : msg_return);
+        std::string state_str = tchar_to_string(sqlstate);
         if (diag_ret == SQL_INVALID_HANDLE)
             printf("Invalid handle\n");
         else if (SQL_SUCCEEDED(diag_ret))
@@ -154,7 +152,7 @@ bool CheckSQLSTATE(SQLSMALLINT handle_type, SQLHANDLE handle,
         }
         // Only return if this SQLSTATE is the expected state, otherwise keep
         // checking
-        if (!memcmp(sqlstate, expected_sqlstate, sizeof(expected_sqlstate))) {
+        if (!memcmp(sqlstate, expected_sqlstate, 6 * sizeof(SQLWCHAR))) {
             return true;
         }
     } while (diag_ret == SQL_SUCCESS);
@@ -197,6 +195,12 @@ std::string u16string_to_string(const std::u16string& src) {
         .to_bytes(src);
 }
 
+std::string u32string_to_string(const std::u32string& src) {
+    return std::wstring_convert< std::codecvt_utf8< char32_t >,
+                                 char32_t >{}
+        .to_bytes(src);
+}
+
 std::u16string string_to_u16string(const std::string& src) {
     return std::wstring_convert< std::codecvt_utf8_utf16< char16_t >,
                                  char16_t >{}
@@ -208,20 +212,20 @@ std::string tchar_to_string(const SQLTCHAR* tchar) {
         std::u16string temp((const char16_t*) tchar);
         return u16string_to_string(temp);
     } else if constexpr(sizeof(SQLTCHAR) == 4) {
-        std::wstring temp((const wchar_t*) tchar);
-        return wstring_to_string(temp);
+        std::u32string temp((const char32_t*) tchar);
+        return u32string_to_string(temp);
     } else {
         return std::string((const char*) tchar);
     }
 }
 
-std::string wchar_to_string(const SQLTCHAR* tchar) {
+std::string wchar_to_string(const SQLWCHAR* tchar) {
     if constexpr(sizeof(SQLWCHAR) == 2) {
         std::u16string temp((const char16_t*) tchar);
         return u16string_to_string(temp);
     } else if constexpr(sizeof(SQLWCHAR) == 4) {
-        std::wstring temp((const wchar_t*) tchar);
-        return wstring_to_string(temp);
+        std::u32string temp((const char32_t*) tchar);
+        return u32string_to_string(temp);
     } else {
         return std::string((const char*) tchar);
     }
