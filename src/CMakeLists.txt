@@ -23,16 +23,14 @@ add_code_coverage_all_targets(EXCLUDE libraries aws-cpp-sdk googletest Integrati
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 	set(BITNESS 64)
 	set(BITNESS_NAME "x64")
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../build/odbc/lib")
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../build/odbc/lib")
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../build/odbc/bin")
 elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
 	set(BITNESS 32)
 	set(BITNESS_NAME "x86")
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../build/odbc/lib")
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../build/odbc/lib")
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../build/odbc/bin")
 endif()
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../build/odbc/lib")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../build/odbc/lib")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../build/odbc/bin")
 
 set(CMAKE_CXX_STANDARD 17)
 # This wasn't being picked up on mac, causes some symbol errors
@@ -139,6 +137,7 @@ elseif(APPLE)
 	include_directories(/usr/local/include)
 elseif(UNIX)
 	# Unix specific
+	set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 	add_compile_definitions	(	WITH_UNIXODBC
 								SQLCOLATTRIBUTE_SQLLEN
 							)

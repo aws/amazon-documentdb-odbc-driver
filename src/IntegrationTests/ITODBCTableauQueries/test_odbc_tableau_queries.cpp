@@ -49,7 +49,7 @@ TEST(TableauQuery, IssueQueriesAll) {
     SQLHENV env = SQL_NULL_HENV;
     SQLHDBC conn = SQL_NULL_HDBC;
     SQLHSTMT stmt = SQL_NULL_HSTMT;
-    ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string.c_str(), &env, &conn,
+    ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)(conn_string().c_str()), &env, &conn,
                                    &stmt, true, false));
 
     // Execute queries

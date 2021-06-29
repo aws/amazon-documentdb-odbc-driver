@@ -47,7 +47,7 @@ constexpr int NUM_ROWS_DEVOPS = 2100;
 class TestPagination : public Fixture {};
 
 TEST_F(TestPagination, TimestreamSampleDatabase_IoT_SQLGetData) {
-    std::wstring query = L"SELECT * FROM sampleDB.IoT";
+    test_string query = CREATE_STRING("SELECT * FROM sampleDB.IoT");
     auto ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_EQ(SQL_SUCCESS, ret);
     SQLSMALLINT column_count = 0;
@@ -72,7 +72,7 @@ TEST_F(TestPagination, TimestreamSampleDatabase_IoT_SQLGetData) {
 }
 
 TEST_F(TestPagination, TimestreamSampleDatabase_IoT_SQLBindCol) {
-    std::wstring query = L"SELECT * FROM sampleDB.IoT";
+    test_string query = CREATE_STRING("SELECT * FROM sampleDB.IoT");
     auto ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_EQ(SQL_SUCCESS, ret);
     SQLSMALLINT column_count = 0;
@@ -95,7 +95,7 @@ TEST_F(TestPagination, TimestreamSampleDatabase_IoT_SQLBindCol) {
 }
 
 TEST_F(TestPagination, TimestreamSampleDatabase_DevOps_SQLGetData) {
-    std::wstring query = L"SELECT * FROM sampleDB.DevOps";
+    test_string query = CREATE_STRING("SELECT * FROM sampleDB.DevOps");
     auto ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_EQ(SQL_SUCCESS, ret);
     SQLSMALLINT column_count = 0;
@@ -120,7 +120,7 @@ TEST_F(TestPagination, TimestreamSampleDatabase_DevOps_SQLGetData) {
 }
 
 TEST_F(TestPagination, TimestreamSampleDatabase_DevOps_SQLBindCol) {
-    std::wstring query = L"SELECT * FROM sampleDB.DevOps";
+    test_string query = CREATE_STRING("SELECT * FROM sampleDB.DevOps");
     auto ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_EQ(SQL_SUCCESS, ret);
     SQLSMALLINT column_count = 0;
