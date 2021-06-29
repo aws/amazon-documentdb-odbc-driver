@@ -29,7 +29,7 @@ void unused_vargs(int cnt, ...);
 #elif __APPLE__
 
 #elif __linux__
-#include "linux/kconfig.h"
+
 #endif
 
 #include <stdio.h> /* for FILE* pointers: see GLOBAL_VALUES */
@@ -195,24 +195,44 @@ typedef UInt4 OID;
 #else                        /* WIN32 */
 #define FORMAT_SIZE_T "%zu"  /* size_t */
 #define FORMAT_SSIZE_T "%zd" /* ssize_t */
+
+#ifdef __APPLE__
+// HAVE_SSIZE_T for APPLE __ssize_t_defined for Linux.
 #ifndef HAVE_SSIZE_T
 typedef long ssize_t;
 #endif /* HAVE_SSIZE_T */
+#elif __linux__
+#ifndef __ssize_t_defined
+typedef long ssize_t;
+#endif /* __ssize_t_defined */
+#endif /* __APPLE__*/
 
 #ifndef SIZEOF_VOID_P
 #ifdef __APPLE__
 #define SIZEOF_VOID_P 8
-#else
+#elif __linux__
+#if __x86_64__
+#define SIZEOF_VOID_P 8 
+#else 
+#define SIZEOF_VOID_P 4
+#endif
+#else // __APPLE__ / __linux__
 #error "SIZEOF_VOID_P must be defined"
-#endif  // __APPLE__
+#endif  // __APPLE__ / __linux__
 #endif  // SIZEOF_VOID_P
 
 #ifndef SIZEOF_LONG
 #ifdef __APPLE__
 #define SIZEOF_LONG 8
-#else
+#elif __linux__
+#if __x86_64__
+#define SIZEOF_LONG 8
+#else 
+#define SIZEOF_LONG 4
+#endif // __x86_64__
+#else // __APPLE__ / __linux__
 #error "SIZEOF_LONG must be defined"
-#endif  // __APPLE__
+#endif  // __APPLE__ / __linux__
 #endif  // SIZEOF_LONG
 
 #if (SIZEOF_VOID_P == SIZEOF_LONG) /* ILP32 or LP64 */

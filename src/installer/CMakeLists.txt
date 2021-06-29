@@ -20,18 +20,11 @@ set(CMAKE_INSTALL_PREFIX ${INSTALL_ROOT})
 
 # General package info
 set(CPACK_PACKAGE_VERSION "${DRIVER_PACKAGE_VERSION}")
-if(WIN32)
-    set(CPACK_PACKAGE_FILE_NAME "AmazonTimestreamODBC${BITNESS}-${CPACK_PACKAGE_VERSION}")
-    set(CPACK_PACKAGE_NAME "Amazon Timestream ODBC Driver ${BITNESS}-bit ${CPACK_PACKAGE_VERSION}")
-elseif(APPLE)
+if(APPLE)
     set(CPACK_PACKAGE_FILE_NAME "AmazonTimestreamODBC-${CPACK_PACKAGE_VERSION}")
     set(CPACK_PACKAGE_NAME "Amazon Timestream ODBC Driver ${CPACK_PACKAGE_VERSION}")
 else()
-    if(BITNESS EQUAL 32)
-        set(CPACK_PACKAGE_FILE_NAME "AmazonTimestreamODBC-${BITNESS}-bit-${CPACK_PACKAGE_VERSION}.i686")
-    else()
-        set(CPACK_PACKAGE_FILE_NAME "AmazonTimestreamODBC-${BITNESS}-bit-${CPACK_PACKAGE_VERSION}.x86_64")
-    endif()
+    set(CPACK_PACKAGE_FILE_NAME "AmazonTimestreamODBC${BITNESS}-${CPACK_PACKAGE_VERSION}")
     set(CPACK_PACKAGE_NAME "Amazon Timestream ODBC Driver ${BITNESS}-bit ${CPACK_PACKAGE_VERSION}")
 endif()
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${CPACK_PACKAGE_NAME}")
@@ -65,8 +58,7 @@ if(WIN32)
 
     # CPack doesn't allow extensionless licenses, need to make a copy with an extension, .txt is appropriate
     configure_file("${PROJECT_ROOT}/LICENSE" "${PROJECT_ROOT}/LICENSE.txt" COPYONLY)
-    set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_ROOT}/LICENSE.txt")
-else()
+elseif(APPLE)
     set(CPACK_GENERATOR "productbuild")
 
     # This script will be run once the Driver component has finished installing.
@@ -84,13 +76,50 @@ else()
     set(CPACK_PRODUCTBUILD_BACKGROUND_DARKAQUA "background_darkaqua.bmp")
     set(CPACK_PRODUCTBUILD_BACKGROUND_DARKAQUA_ALIGNMENT "bottomleft")
     set(CPACK_PRODUCTBUILD_BACKGROUND_DARKAQUA_SCALING "none")
-
-    # CPack doesn't allow extensionless licenses, need to make a copy with an extension, .txt is appropriate
-    configure_file("${PROJECT_ROOT}/LICENSE" "${PROJECT_ROOT}/LICENSE.txt" COPYONLY)
-    set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_ROOT}/LICENSE.txt")
     set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/Resources/README.txt")
     set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Welcome.txt")
+else()
+    if(INSTALLER_TYPE STREQUAL "DEB")        
+        if (BITNESS EQUAL 32)
+            set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE i686)
+        else()
+            set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE amd64)
+        endif()
+        set(CPACK_GENERATOR "DEB")
+        set(CPACK_PACKAGE_VERSION_MAJOR "0")
+        set(CPACK_PACKAGE_VERSION_MINOR "2")
+        set(CPACK_PACKAGE_VERSION_PATCH "0")
+
+        # TODO: Need to update both of these.
+        set(CPACK_PACKAGE_CONTACT "lyndonb@bitquilltech.com")
+        set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Lyndon Bauto")
+        
+        set(CPACK_PACKAGE_DESCRIPTION "Amazon Timestream ODBC Driver - ${BITNESS}-bit")
+        
+        # Add postrm and postinst with dsn stuff to add and remove them.
+        #set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/Debian/postinst")
+
+        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    elseif(INSTALLER_TYPE STREQUAL "RPM")
+        set(CPACK_GENERATOR RPM)
+        set(CPACK_RPM_COMPONENT_INSTALL ON)
+        set(CPACK_RPM_FILE_NAME "RPM-DEFAULT")
+        set(CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR})
+        set(CPACK_TEMPORARY_PACKAGE_FILE_NAME "${CMAKE_BINARY_DIR}/_CPack_Packages/Linux/RPM/RPMS/${CMAKE_SYSTEM_PROCESSOR}/${CPACK_PACKAGE_FILE_NAME}.rpm")
+
+        if (BITNESS EQUAL 32)
+            set(CPACK_RPM_PACKAGE_ARCHITECTURE i686)
+        else()
+            set(CPACK_RPM_PACKAGE_ARCHITECTURE x86_64)
+        endif()
+    else()
+        message(FATAL_ERROR "INSTALLER_TYPE '${INSTALLER_TYPE}' must be DEB or RPM for Linux installer." )
+    endif()
 endif()
+
+# CPack doesn't allow extensionless licenses, need to make a copy with an extension, .txt is appropriate
+set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_ROOT}/LICENSE.txt")
+configure_file("${PROJECT_ROOT}/LICENSE" "${PROJECT_ROOT}/LICENSE.txt" COPYONLY)
 
 # Set up components for installer
 cpack_add_component(Docs
