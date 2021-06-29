@@ -19,25 +19,25 @@
 #include "it_odbc_helper.h"
 // clang-format on
 
-std::wstring dsn_name = L"test_aws_auth_dsn";
-std::wstring aws_auth_conn_string =
-    L"Driver={Elasticsearch};DataBase=database_name;"
-    L"Host=https://"
-    L"search-bit-quill-cx3hpfoxvasohujxkllmgjwqde.us-west-2."
-    L"es.amazonaws.com;"
-    L"Auth=IAM;Region=us-west-2;LogLevel=1";
-std::wstring aws_auth_conn_string_invalid_region =
-    L"Driver={Elasticsearch};DataBase=database_name;"
-    L"Host=https://"
-    L"search-bit-quill-cx3hpfoxvasohujxkllmgjwqde.us-west-2."
-    L"es.amazonaws.com;"
-    L"Auth=IAM;Region=us-west-3;LogLevel=1";
-std::wstring aws_auth_conn_string_invalid_authtype =
-    L"Driver={Elasticsearch};DataBase=database_name;"
-    L"Host=https://"
-    L"search-bit-quill-cx3hpfoxvasohujxkllmgjwqde.us-west-2."
-    L"es.amazonaws.com;"
-    L"Auth=AWS;Region=us-west-2;LogLevel=1";
+test_string dsn_name = CREATE_STRING("test_aws_auth_dsn");
+test_string aws_auth_conn_string =
+    CREATE_STRING("Driver={Elasticsearch};DataBase=database_name;")
+    CREATE_STRING("Host=https://")
+    CREATE_STRING("search-bit-quill-cx3hpfoxvasohujxkllmgjwqde.us-west-2.")
+    CREATE_STRING("es.amazonaws.com;")
+    CREATE_STRING("Auth=IAM;Region=us-west-2;LogLevel=1");
+test_string aws_auth_conn_string_invalid_region =
+    CREATE_STRING("Driver={Elasticsearch};DataBase=database_name;")
+    CREATE_STRING("Host=https://")
+    CREATE_STRING("search-bit-quill-cx3hpfoxvasohujxkllmgjwqde.us-west-2.")
+    CREATE_STRING("es.amazonaws.com;")
+    CREATE_STRING("Auth=IAM;Region=us-west-3;LogLevel=1");
+test_string aws_auth_conn_string_invalid_authtype =
+    CREATE_STRING("Driver={Elasticsearch};DataBase=database_name;")
+    CREATE_STRING("Host=https://")
+    CREATE_STRING("search-bit-quill-cx3hpfoxvasohujxkllmgjwqde.us-west-2.")
+    CREATE_STRING("es.amazonaws.com;")
+    CREATE_STRING("Auth=AWS;Region=us-west-2;LogLevel=1");
 
 class TestAwsAuthConnection : public testing::Test {
    public:

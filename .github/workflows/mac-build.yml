@@ -43,7 +43,7 @@ jobs:
     - name: prepare-dsn
       run: |
         sudo mkdir /Library/ODBC
-        sudo mv ./src/IntegrationTests/ITODBCConnection/odbc.ini /Library/ODBC
+        sudo mv ./src/IntegrationTests/ITODBCConnection/odbc-mac.ini /Library/ODBC/odbc.ini
         mkdir ${{ github.workspace }}/odbc-logs
     - name: run-connection-unit-test
       run: |

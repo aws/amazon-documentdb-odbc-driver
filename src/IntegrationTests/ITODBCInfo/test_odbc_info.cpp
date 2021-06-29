@@ -36,7 +36,7 @@ class TestSQLGetInfo : public testing::Test {
     }
 
     void SetUp() {
-        ITDriverConnect((SQLTCHAR*)conn_string.c_str(), &m_env, &m_conn, true,
+        ITDriverConnect((SQLTCHAR*)(conn_string().c_str()), &m_env, &m_conn, true,
                         true);
     }
 
@@ -54,18 +54,20 @@ class TestSQLGetInfo : public testing::Test {
 };
 
 // 1 for ver1 >= ver2, 0 for ver1 < ver2, -1 for error
-int Ver1GEVer2(std::wstring ver_1_str, std::wstring ver_2_str) {
+int Ver1GEVer2(test_string ver_1_str, test_string ver_2_str) {
     auto VersionSplit = [&](std::vector< unsigned long >& output,
-                            std::wstring& input, std::wstring delim) {
+                            test_string& input, test_string delim) {
         try {
+            std::string delim_str = tchar_to_string((const SQLTCHAR*)delim.c_str());
+            std::string input_str = tchar_to_string((const SQLTCHAR*)input.c_str());
             size_t start = 0;
-            size_t end = input.find(delim);
+            size_t end = input_str.find(delim_str);
             while (end != std::string::npos) {
-                output.push_back(std::stoul(input.substr(start, end - start)));
-                start = end + delim.length();
-                end = input.find(delim, start);
+                output.push_back(std::stoul(input_str.substr(start, end - start)));
+                start = end + delim_str.length();
+                end = input_str.find(delim_str, start);
             }
-            output.push_back(std::stoul(input.substr(start, end)));
+            output.push_back(std::stoul(input_str.substr(start, end)));
         } catch (...) {
             output.clear();
         }
@@ -73,8 +75,8 @@ int Ver1GEVer2(std::wstring ver_1_str, std::wstring ver_2_str) {
 
     std::vector< unsigned long > ver_1;
     std::vector< unsigned long > ver_2;
-    VersionSplit(ver_1, ver_1_str, L".");
-    VersionSplit(ver_2, ver_2_str, L".");
+    VersionSplit(ver_1, ver_1_str,CREATE_STRING("."));
+    VersionSplit(ver_2, ver_2_str, CREATE_STRING("."));
     if ((ver_1.size() == 0) || (ver_2.size() == 0))
         return -1;
 
@@ -96,10 +98,10 @@ int Ver1GEVer2(std::wstring ver_1_str, std::wstring ver_2_str) {
         SQLTCHAR info_value_ptr[1024];                                         \
         SQLSMALLINT string_length_ptr;                                         \
         SQLRETURN ret =                                                        \
-            SQLGetInfo(m_conn, info_type, info_value_ptr,                      \
-                       IT_SIZEOF(info_value_ptr), &string_length_ptr);         \
+            SQLGetInfo(m_conn, info_type, (SQLTCHAR*)info_value_ptr,       \
+                       IT_SIZEOF(info_value_ptr), &string_length_ptr);                              \
         LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);                        \
-        EXPECT_EQ(std::wstring(info_value_ptr), std::wstring(expected_value)); \
+        EXPECT_EQ(to_test_string(tchar_to_string(info_value_ptr)), test_string(expected_value));                    \
     }
 
 // Test template for SQLGetInfo
@@ -111,7 +113,9 @@ int Ver1GEVer2(std::wstring ver_1_str, std::wstring ver_2_str) {
             SQLGetInfo(m_conn, info_type, info_value_ptr,                  \
                        IT_SIZEOF(info_value_ptr), &string_length_ptr);     \
         LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);                    \
-        EXPECT_EQ(Ver1GEVer2(info_value_ptr, expected_value), 1);          \
+        test_string info_value_str =                                       \
+            to_test_string(tchar_to_string(info_value_ptr));               \
+        EXPECT_EQ(Ver1GEVer2(info_value_str, expected_value), 1);          \
     }
 
 // Test template for SQLGetInfo
@@ -143,22 +147,20 @@ int Ver1GEVer2(std::wstring ver_1_str, std::wstring ver_2_str) {
 /////////////////
 
 #if defined(WIN32)
-TEST_SQL_GET_INFO_STRING(SQLDriverName, SQL_DRIVER_NAME, L"odfesqlodbc.dll");
+TEST_SQL_GET_INFO_STRING(SQLDriverName, SQL_DRIVER_NAME, CREATE_STRING("odfesqlodbc.dll"));
 #elif defined(__APPLE__)
-TEST_SQL_GET_INFO_STRING(SQLDriverName, SQL_DRIVER_NAME, L"libodfesqlodbc.dylib");
+TEST_SQL_GET_INFO_STRING(SQLDriverName, SQL_DRIVER_NAME, CREATE_STRING("libodfesqlodbc.dylib"));
 #endif
-TEST_SQL_GET_INFO_STRING(SQLDriverODBCVer, SQL_DRIVER_ODBC_VER, L"03.51");
+TEST_SQL_GET_INFO_STRING(SQLDriverODBCVer, SQL_DRIVER_ODBC_VER, CREATE_STRING("03.51"));
 
-std::wstring version =
-    std::wstring_convert< std::codecvt_utf8_utf16< wchar_t >, wchar_t >{}
-        .from_bytes(TIMESTREAMDRIVERVERSION);
+test_string version = CREATE_STRING("") TIMESTREAMDRIVERVERSION;
 TEST_SQL_GET_INFO_STRING(SQLDriverVer, SQL_DRIVER_VER, version);
 
 TEST_SQL_GET_INFO_UINT_MASK(SQLGetDataExtensions, SQL_GETDATA_EXTENSIONS,
                          (SQL_GD_ANY_COLUMN | SQL_GD_ANY_ORDER | SQL_GD_BOUND
                           | SQL_GD_BLOCK));
 TEST_SQL_GET_INFO_STRING(SQLSearchPatternEscape, SQL_SEARCH_PATTERN_ESCAPE,
-                         L"");
+                         CREATE_STRING(""));
 
 //////////////////////
 // Data Source Info //
@@ -169,32 +171,32 @@ TEST_SQL_GET_INFO_UINT16(SQLCursorCommitBehavior, SQL_CURSOR_COMMIT_BEHAVIOR,
 TEST_SQL_GET_INFO_UINT16(SQLTxnCapable, SQL_TXN_CAPABLE, SQL_TC_NONE);
 TEST_SQL_GET_INFO_UINT16(SQLConcatNullBehavior, SQL_CONCAT_NULL_BEHAVIOR,
                          SQL_CB_NULL);
-TEST_SQL_GET_INFO_STRING(SQLSchemaTerm, SQL_SCHEMA_TERM, L"schema");
-TEST_SQL_GET_INFO_STRING(SQLCatalogTerm, SQL_CATALOG_TERM, L"database");
+TEST_SQL_GET_INFO_STRING(SQLSchemaTerm, SQL_SCHEMA_TERM, CREATE_STRING("schema"));
+TEST_SQL_GET_INFO_STRING(SQLCatalogTerm, SQL_CATALOG_TERM, CREATE_STRING("database"));
 
 ///////////////
 // DBMS Info //
 ///////////////
 
-TEST_SQL_GET_INFO_STRING(SQLDBMSName, SQL_DBMS_NAME, L"Amazon Timestream");
-TEST_SQL_GET_INFO_VERSION_GE(SQLDBMSVer, SQL_DBMS_VER, L"0.2.0");
+TEST_SQL_GET_INFO_STRING(SQLDBMSName, SQL_DBMS_NAME, CREATE_STRING("Amazon Timestream"));
+TEST_SQL_GET_INFO_VERSION_GE(SQLDBMSVer, SQL_DBMS_VER, CREATE_STRING("0.2.0"));
 
 ///////////////////
 // Supported SQL //
 ///////////////////
 
-TEST_SQL_GET_INFO_STRING(SQLColumnAlias, SQL_COLUMN_ALIAS, L"Y");
+TEST_SQL_GET_INFO_STRING(SQLColumnAlias, SQL_COLUMN_ALIAS, CREATE_STRING("Y"));
 TEST_SQL_GET_INFO_UINT16(SQLGroupBy, SQL_GROUP_BY,
                          SQL_GB_GROUP_BY_CONTAINS_SELECT);
 TEST_SQL_GET_INFO_STRING(SQLIdentifierQuoteChar, SQL_IDENTIFIER_QUOTE_CHAR,
-                         L"\"");
+                         CREATE_STRING("\""));
 TEST_SQL_GET_INFO_UINT_MASK(SQLOJCapabilities, SQL_OJ_CAPABILITIES,
                             SQL_OJ_LEFT | SQL_OJ_RIGHT | SQL_OJ_NOT_ORDERED
                                 | SQL_OJ_ALL_COMPARISON_OPS);
 TEST_SQL_GET_INFO_UINT_MASK(SQLSchemaUsage, SQL_SCHEMA_USAGE, 0);
 TEST_SQL_GET_INFO_UINT16(SQLQuotedIdentifierCase, SQL_QUOTED_IDENTIFIER_CASE,
                          SQL_IC_SENSITIVE);
-TEST_SQL_GET_INFO_STRING(SQLSpecialCharacters, SQL_SPECIAL_CHARACTERS, L"_");
+TEST_SQL_GET_INFO_STRING(SQLSpecialCharacters, SQL_SPECIAL_CHARACTERS, CREATE_STRING("_"));
 TEST_SQL_GET_INFO_UINT_MASK(SQLODBCInterfaceConformance,
                             SQL_ODBC_INTERFACE_CONFORMANCE, SQL_OIC_CORE);
 TEST_SQL_GET_INFO_UINT_MASK(SQLSQLConformance, SQL_SQL_CONFORMANCE,
@@ -202,7 +204,7 @@ TEST_SQL_GET_INFO_UINT_MASK(SQLSQLConformance, SQL_SQL_CONFORMANCE,
 TEST_SQL_GET_INFO_UINT_MASK(SQLCatalogUsage, SQL_CATALOG_USAGE, SQL_CU_DML_STATEMENTS);
 TEST_SQL_GET_INFO_UINT16(SQLCatalogLocation, SQL_CATALOG_LOCATION, SQL_CL_START);
 TEST_SQL_GET_INFO_STRING(SQLCatalogNameSeparator, SQL_CATALOG_NAME_SEPARATOR,
-                         L".");
+                         CREATE_STRING("."));
 TEST_SQL_GET_INFO_UINT_MASK(SQLSQL92Predicates, SQL_SQL92_PREDICATES,
                             SQL_SP_BETWEEN | SQL_SP_COMPARISON | SQL_SP_IN
                                 | SQL_SP_ISNULL | SQL_SP_LIKE);
@@ -216,8 +218,8 @@ TEST_SQL_GET_INFO_UINT_MASK(SQLSQL92ValueExpressions,
                             SQL_SVE_CASE | SQL_SVE_CAST);
 TEST_SQL_GET_INFO_UINT_MASK(SQLDatetimeLiterals, SQL_DATETIME_LITERALS, 0);
 TEST_SQL_GET_INFO_STRING(SQLOrderByColumnsInSelect,
-                         SQL_ORDER_BY_COLUMNS_IN_SELECT, L"Y");
-TEST_SQL_GET_INFO_STRING(SQLCatalogName, SQL_CATALOG_NAME, L"Y");
+                         SQL_ORDER_BY_COLUMNS_IN_SELECT, CREATE_STRING("Y"));
+TEST_SQL_GET_INFO_STRING(SQLCatalogName, SQL_CATALOG_NAME, CREATE_STRING("Y"));
 
 ////////////////
 // Conversion //

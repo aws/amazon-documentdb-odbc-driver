@@ -34,12 +34,15 @@ extern "C" {
 #define UNKNOWNS_AS_LONGEST 2
 
 /* ODBC initialization files */
-#ifndef WIN32
-#define ODBC_INI ".odbc.ini"
-#define ODBCINST_INI "odbcinst.ini"
-#else
+#ifdef WIN32
 #define ODBC_INI "ODBC.INI"
 #define ODBCINST_INI "ODBCINST.INI"
+#elif __APPLE__
+#define ODBC_INI ".odbc.ini"
+#define ODBCINST_INI "odbcinst.ini"
+#elif __linux__
+#define ODBC_INI "odbc.ini"
+#define ODBCINST_INI "odbcinst.ini"
 #endif
 
 #define ODBC_DATASOURCES "ODBC Data Sources"

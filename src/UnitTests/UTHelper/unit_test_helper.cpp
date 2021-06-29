@@ -18,6 +18,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 
 void WriteFileIfSpecified(char** begin, char** end, const std::string& option,
                           std::string& output) {
