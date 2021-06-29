@@ -17,6 +17,10 @@
 #ifndef IT_ODBC_HELPER_H
 #define IT_ODBC_HELPER_H
 
+#ifdef __linux__
+#include <climits>
+#endif
+
 #include "odbc.h"
 
 #ifdef WIN32
@@ -25,61 +29,64 @@
 #include <sql.h>
 #include <sqlext.h>
 
+
+#include <codecvt>
 #include <iostream>
+#include <locale>
+#include <string>
 #include <vector>
 
 #include "unit_test_helper.h"
 #include "gtest/gtest.h"
 
+#ifdef __linux__
+typedef std::u16string test_string;
+#define CREATE_STRING(str) u"" str
+#define AS_SQLTCHAR(str) const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(str))
+#define convert_to_test_string(t) to_test_string(std::to_string(t))
+test_string to_test_string(const std::string& src) {
+    return std::wstring_convert< std::codecvt_utf8_utf16< char16_t >,
+                                 char16_t >{}
+        .from_bytes(src);
+}
+#else
+typedef std::wstring test_string;
+#define CREATE_STRING(str) L"" str
+#define AS_SQLTCHAR(str) const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(str))
+#define convert_to_test_string(t) to_test_string(std::to_string(t))
+test_string to_test_string(const std::string& src) {
+    return std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>
+        {}.from_bytes(src);
+}
+#endif
+
 // SQLSTATEs
-#define SQLSTATE_STRING_DATA_RIGHT_TRUNCATED (SQLWCHAR*)L"01004"
-#define SQLSTATE_RESTRICTED_DATA_TYPE_ERROR (SQLWCHAR*)L"07006"
-#define SQLSTATE_INVALID_DESCRIPTOR_INDEX (SQLWCHAR*)L"07009"
-#define SQLSTATE_GENERAL_ERROR (SQLWCHAR*)L"HY000"
-#define SQLSTATE_MEMORY_ALLOCATION_ERROR (SQLWCHAR*)L"HY001"
-#define SQLSTATE_INVALID_STRING_OR_BUFFER_LENGTH (SQLWCHAR*)L"HY090"
-#define SQLSTATE_INVALID_DESCRIPTOR_FIELD_IDENTIFIER (SQLWCHAR*)L"HY091"
-#define SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE (SQLWCHAR*) L"HY019"
-#define SQLSTATE_NOT_IMPLEMENTED_ERROR (SQLWCHAR*)L"HYC00"
-#define SQLSTATE_STRING_CONVERSION_ERROR (SQLWCHAR*)L"22018"
-#define SQLSTATE_INVALID_CURSUR_STATE (SQLWCHAR*)L"07005"
-#define SQLSTATE_FRACTIONAL_TRUNCATION (SQLWCHAR*)L"01S07"
-#define SQLSTATE_CANNOT_MODIFY_IRD (SQLWCHAR*)L"HY016"
-#define SQLSTATE_SEQUENCE_ERROR (SQLWCHAR*)L"HY010"
-#define SQLSTATE_INVALID_USE_OF_NULL_POINTER (SQLWCHAR*)L"HY009"
-#define SQLSTATE_OPERATION_CANCELLED (SQLWCHAR*)L"HY008"
+#define SQLSTATE_STRING_DATA_RIGHT_TRUNCATED (SQLWCHAR*)CREATE_STRING("01004")
+#define SQLSTATE_RESTRICTED_DATA_TYPE_ERROR (SQLWCHAR*)CREATE_STRING("07006")
+#define SQLSTATE_INVALID_DESCRIPTOR_INDEX (SQLWCHAR*)CREATE_STRING("07009")
+#define SQLSTATE_GENERAL_ERROR (SQLWCHAR*)CREATE_STRING("HY000")
+#define SQLSTATE_MEMORY_ALLOCATION_ERROR (SQLWCHAR*)CREATE_STRING("HY001")
+#define SQLSTATE_INVALID_STRING_OR_BUFFER_LENGTH (SQLWCHAR*)CREATE_STRING("HY090")
+#define SQLSTATE_INVALID_DESCRIPTOR_FIELD_IDENTIFIER (SQLWCHAR*)CREATE_STRING("HY091")
+#define SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE (SQLWCHAR*)CREATE_STRING("HY019")
+#define SQLSTATE_NOT_IMPLEMENTED_ERROR (SQLWCHAR*)CREATE_STRING("HYC00")
+#define SQLSTATE_STRING_CONVERSION_ERROR (SQLWCHAR*)CREATE_STRING("22018")
+#define SQLSTATE_INVALID_CURSUR_STATE (SQLWCHAR*)CREATE_STRING("07005")
+#define SQLSTATE_FRACTIONAL_TRUNCATION (SQLWCHAR*)CREATE_STRING("01S07")
+#define SQLSTATE_CANNOT_MODIFY_IRD (SQLWCHAR*)CREATE_STRING("HY016")
+#define SQLSTATE_SEQUENCE_ERROR (SQLWCHAR*)CREATE_STRING("HY010")
+#define SQLSTATE_INVALID_USE_OF_NULL_POINTER (SQLWCHAR*)CREATE_STRING("HY009")
+#define SQLSTATE_OPERATION_CANCELLED (SQLWCHAR*)CREATE_STRING("HY008")
 
 #define IT_SIZEOF(x) (NULL == (x) ? 0 : (sizeof((x)) / sizeof((x)[0])))
 
-#define IT_DRIVER "Driver"
-#define IT_ACCESSKEYID "AccessKeyId"
-#define IT_SECRETACCESSKEY "SecretAccessKey"
-#define IT_REGION "Region"
-#define IT_AUTH "Auth"
-#define IT_LOGLEVEL "LogLevel"
-#define IT_LOGOUTPUT "LogOutput"
-
-std::vector< std::pair< std::string, std::string > > conn_str_pair = {
-    {IT_DRIVER, "timestreamodbc"},
-    {IT_REGION, "us-east-1"},
-    {IT_AUTH, "AWS_PROFILE"},
-    {IT_LOGLEVEL, "7"}
-    };
-
-std::string conn_string = []() {
-    std::string temp;
-    for (auto it : conn_str_pair) {
-        temp += it.first + "=" + it.second + ";";
-    }
-    char dir[1024];
-    if (getLogDir(dir, sizeof(dir)) > 0) {
-        temp += IT_LOGOUTPUT;
-        temp += "=";
-        temp += dir;
-        temp += ";";
-    }
-    return temp;
-}();
+#define IT_DRIVER CREATE_STRING("Driver")
+#define IT_ACCESSKEYID CREATE_STRING("AccessKeyId")
+#define IT_SECRETACCESSKEY CREATE_STRING"SecretAccessKey")
+#define IT_REGION CREATE_STRING("Region")
+#define IT_AUTH CREATE_STRING("Auth")
+#define IT_LOGLEVEL CREATE_STRING("LogLevel")
+#define IT_LOGOUTPUT CREATE_STRING("LogOutput")
 
 void AllocConnection(SQLHENV* db_environment, SQLHDBC* db_connection,
                      bool throw_on_error, bool log_diag);
@@ -95,27 +102,38 @@ bool CheckSQLSTATE(SQLSMALLINT handle_type, SQLHANDLE handle,
                    SQLWCHAR* expected_sqlstate, bool log_message);
 bool CheckSQLSTATE(SQLSMALLINT handle_type, SQLHANDLE handle,
                    SQLWCHAR* expected_sqlstate);
-std::wstring QueryBuilder(const std::wstring& column,
-                          const std::wstring& dataset,
-                          const std::wstring& count);
-std::wstring QueryBuilder(const std::wstring& column,
-                          const std::wstring& dataset);
+test_string QueryBuilder(const test_string& column,
+                          const test_string& dataset,
+                          const test_string& count);
+test_string QueryBuilder(const test_string& column,
+                          const test_string& dataset);
 void CloseCursor(SQLHSTMT* h_statement, bool throw_on_error, bool log_diag);
+std::string wstring_to_string(const std::wstring& src);
 std::string u16string_to_string(const std::u16string& src);
+std::string u32string_to_string(const std::u32string& src);
 std::u16string string_to_u16string(const std::string& src);
-
+std::string tchar_to_string(const SQLTCHAR* tchar);
+std::string wchar_to_string(const SQLWCHAR* tchar);
+test_string conn_string();
 
 class Fixture : public testing::Test {
    public:
     void SetUp() override {
-        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string.c_str(), &m_env,
+        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string().c_str(), &m_env,
                                        &m_conn, &m_hstmt, true, true));
     }
     void TearDown() override {
-        ASSERT_NO_THROW(CloseCursor(&m_hstmt, true, true));
-        SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
-        SQLDisconnect(m_conn);
-        SQLFreeHandle(SQL_HANDLE_ENV, m_env);
+        if (SQL_NULL_HSTMT != m_hstmt) {
+            ASSERT_NO_THROW(CloseCursor(&m_hstmt, true, true));
+            SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
+        }
+        if (SQL_NULL_HDBC != m_conn) {
+            SQLDisconnect(m_conn);
+            SQLFreeHandle(SQL_HANDLE_DBC, m_conn);
+        }
+        if (SQL_NULL_HENV != m_env) {
+            SQLFreeHandle(SQL_HANDLE_ENV, m_env);
+        }
     }
     SQLHENV m_env = SQL_NULL_HENV;
     SQLHDBC m_conn = SQL_NULL_HDBC;

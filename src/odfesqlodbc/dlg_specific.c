@@ -310,7 +310,7 @@ static void getCiDefaults(ConnInfo *ci) {
     strncpy(ci->aad_application_id, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
     strncpy(ci->aad_client_secret, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
     strncpy(ci->aad_tenant, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__linux__)
     strcpy(ci->drivers.output_dir, "/tmp/");
 #else
     strcpy(ci->drivers.output_dir, "");
