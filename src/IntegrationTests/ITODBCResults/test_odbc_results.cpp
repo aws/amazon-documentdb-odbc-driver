@@ -322,7 +322,7 @@ TEST_F(TestSQLBindCol, InvalidBufferLength) {
     std::vector< std::vector< Col > > cols(single_col_cnt);
     BindColSetup(single_row_cnt, 1, single_col, cols, &m_hstmt);
     SQLRETURN ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)1, SQL_C_CHAR,
-                     (SQLPOINTER)(cols[0][0].data_dat[0]), -1,
+                     (SQLPOINTER)(cols[0][0].data_dat), -1,
                      (cols[0][0].data_len));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
     EXPECT_EQ(SQL_ERROR, ret);
