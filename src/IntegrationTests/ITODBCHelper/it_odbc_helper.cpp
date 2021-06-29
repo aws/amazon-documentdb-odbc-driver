@@ -16,9 +16,6 @@
 
 #include "it_odbc_helper.h"
 
-#include <codecvt>
-#include <locale>
-
 #define EXECUTION_HANDLER(throw_on_error, log_diag, handle_type, handle, \
                           ret_code, statement, error_msg)                \
     do {                                                                 \
@@ -120,11 +117,14 @@ void LogAnyDiagnostics(SQLSMALLINT handle_type, SQLHANDLE handle, SQLRETURN ret,
             handle_type, handle, rec_number, sqlstate, &native_error_code,
             msg_return == NULL ? diag_message : msg_return,
             msg_return == NULL ? IT_SIZEOF(diag_message) : sz, &message_length);
+        std::string diag_str = (msg_return == NULL) ?
+            u16string_to_string(std::u16string((char16_t*)diag_message)) :
+            u16string_to_string(std::u16string((char16_t*)msg_return));
+        std::string state_str = u16string_to_string(std::u16string((char16_t*)sqlstate));
         if (diag_ret == SQL_INVALID_HANDLE)
             printf("Invalid handle\n");
         else if (SQL_SUCCEEDED(diag_ret))
-            printf("SQLState: %S: %S\n", sqlstate,
-                   (msg_return == NULL) ? diag_message : msg_return);
+            printf("SQLState: %s: %s\n", state_str.c_str(), diag_str.c_str());
     } while (diag_ret == SQL_SUCCESS);
 
     if (diag_ret == SQL_NO_DATA && rec_number == 1)
@@ -154,7 +154,7 @@ bool CheckSQLSTATE(SQLSMALLINT handle_type, SQLHANDLE handle,
         }
         // Only return if this SQLSTATE is the expected state, otherwise keep
         // checking
-        if (std::wstring(sqlstate) == std::wstring(expected_sqlstate)) {
+        if (!memcmp(sqlstate, expected_sqlstate, sizeof(expected_sqlstate))) {
             return true;
         }
     } while (diag_ret == SQL_SUCCESS);
@@ -168,15 +168,15 @@ bool CheckSQLSTATE(SQLSMALLINT handle_type, SQLHANDLE handle,
     return CheckSQLSTATE(handle_type, handle, expected_sqlstate, false);
 }
 
-std::wstring QueryBuilder(const std::wstring& column,
-                          const std::wstring& dataset,
-                          const std::wstring& count) {
-    return L"SELECT " + column + L" FROM " + dataset + L" LIMIT " + count;
+test_string QueryBuilder(const test_string& column,
+                          const test_string& dataset,
+                          const test_string& count) {
+    return CREATE_STRING("SELECT ") + column + CREATE_STRING(" FROM ") + dataset + CREATE_STRING(" LIMIT ") + count;
 }
 
-std::wstring QueryBuilder(const std::wstring& column,
-                          const std::wstring& dataset) {
-    return L"SELECT " + column + L" FROM " + dataset;
+test_string QueryBuilder(const test_string& column,
+                          const test_string& dataset) {
+    return CREATE_STRING("SELECT ") + column + CREATE_STRING(" FROM ") + dataset;
 }
 
 void CloseCursor(SQLHSTMT* h_statement, bool throw_on_error, bool log_diag) {
@@ -186,10 +186,10 @@ void CloseCursor(SQLHSTMT* h_statement, bool throw_on_error, bool log_diag) {
                       "Failed to set allocate handle for statement.");
 }
 
-// std::wstring SQLTCHAR_to_string(SQLTCHAR* src) {
-// 	// std::wstring _src = (char16_t*)src;
-// 	return wstring_to_string(_src);
-// }
+std::string wstring_to_string(const std::wstring& src) {
+    return std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>
+        {}.to_bytes(src);
+}
 
 std::string u16string_to_string(const std::u16string& src) {
     return std::wstring_convert< std::codecvt_utf8_utf16< char16_t >,
@@ -201,4 +201,44 @@ std::u16string string_to_u16string(const std::string& src) {
     return std::wstring_convert< std::codecvt_utf8_utf16< char16_t >,
                                  char16_t >{}
         .from_bytes(src);
+}
+
+std::string tchar_to_string(const SQLTCHAR* tchar) {
+    if constexpr(sizeof(SQLTCHAR) == 2) {
+        std::u16string temp((const char16_t*) tchar);
+        return u16string_to_string(temp);
+    } else if constexpr(sizeof(SQLTCHAR) == 4) {
+        std::wstring temp((const wchar_t*) tchar);
+        return wstring_to_string(temp);
+    } else {
+        return std::string((const char*) tchar);
+    }
+}
+
+std::string wchar_to_string(const SQLTCHAR* tchar) {
+    if constexpr(sizeof(SQLWCHAR) == 2) {
+        std::u16string temp((const char16_t*) tchar);
+        return u16string_to_string(temp);
+    } else if constexpr(sizeof(SQLWCHAR) == 4) {
+        std::wstring temp((const wchar_t*) tchar);
+        return wstring_to_string(temp);
+    } else {
+        return std::string((const char*) tchar);
+    }
+}
+
+test_string conn_string() {
+    std::vector< std::pair< test_string, test_string > > conn_str_pair = {
+        {IT_DRIVER, CREATE_STRING("timestreamodbc")},
+        {IT_REGION, CREATE_STRING("us-east-1")},
+        {IT_AUTH, CREATE_STRING("AWS_PROFILE")},
+        {IT_LOGLEVEL, CREATE_STRING("7")}};
+
+    test_string temp;
+    for (auto it : conn_str_pair)
+        temp += it.first + CREATE_STRING("=") + it.second + CREATE_STRING(";");
+    char dir[1024];
+    if (getLogDir(dir, sizeof(dir)) > 0)
+        temp += IT_LOGOUTPUT CREATE_STRING("=") + to_test_string(dir) + CREATE_STRING(";");
+    return temp;
 }
