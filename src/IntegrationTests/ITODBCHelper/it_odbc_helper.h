@@ -110,6 +110,7 @@ test_string QueryBuilder(const test_string& column,
 void CloseCursor(SQLHSTMT* h_statement, bool throw_on_error, bool log_diag);
 std::string wstring_to_string(const std::wstring& src);
 std::string u16string_to_string(const std::u16string& src);
+std::string u32string_to_string(const std::u32string& src);
 std::u16string string_to_u16string(const std::string& src);
 std::string tchar_to_string(const SQLTCHAR* tchar);
 std::string wchar_to_string(const SQLWCHAR* tchar);
