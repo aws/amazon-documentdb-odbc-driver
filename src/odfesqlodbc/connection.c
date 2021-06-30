@@ -124,6 +124,7 @@ RETCODE SQL_API API_Connect(HDBC hdbc, const SQLCHAR *szDSN,
     make_string(szUID, cbUID, ci->uid, sizeof(ci->uid));
     if ('\0' == ci->uid[0]) /* an empty string is specified */
         ci->uid[0] = fchar; /* restore the original uid */
+
     tmpstr = make_string(szAuthStr, cbAuthStr, NULL, 0);
     if (tmpstr) {
         if (tmpstr[0]) /* non-empty string is specified */
@@ -131,8 +132,9 @@ RETCODE SQL_API API_Connect(HDBC hdbc, const SQLCHAR *szDSN,
         free(tmpstr);
     }
 
-    MYLOG(LOG_DEBUG, "conn = %p (DSN='%s', UID='%s', PWD='%s', TOKEN='%s')\n", conn, ci->dsn,
-          ci->uid, NAME_IS_VALID(ci->pwd) ? "xxxxx" : "", ci->session_token);
+    MYLOG(LOG_DEBUG, "conn = %p (DSN='%s', UID='%s', PWD='%s', TOKEN='%s')\n",
+          conn, ci->dsn, ci->uid, NAME_IS_VALID(ci->pwd) ? "xxxxx" : "",
+          ci->session_token);
 
     if ((fchar = CC_connect(conn)) <= 0) {
         /* Error messages are filled in */

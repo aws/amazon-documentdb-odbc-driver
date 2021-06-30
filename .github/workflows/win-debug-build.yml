@@ -60,11 +60,11 @@ jobs:
     - name: run-integration-pagination-tests
       run: |
         .\build\odbc\bin\Debug\itodbc_pagination.exe
-    - name: upload-integration-test-results
+    - name: upload-test-logs
       if: always()
       uses: actions/upload-artifact@v2
       with:
-        name: integration-test-results-win32
+        name: test-logs-win32
         path: ${{ github.workspace }}\odbc-logs\
     - name: prepare-output
       if: always()
@@ -93,7 +93,7 @@ jobs:
     - name: configure-and-build-driver
       run: |
         .\build_win_debug64.ps1
-    - name: build-integration-tests
+    - name: build-tests
       run: |
         MSBuild.exe ./build/odbc/cmake/global_make_list.sln -property:Configuration=Debug,Platform=x64
     - name: configure-aws-credentials
@@ -131,11 +131,11 @@ jobs:
     - name: run-integration-pagination-tests
       run: |
         .\build\odbc\bin\Debug\itodbc_pagination.exe
-    - name: upload-integration-test-results
+    - name: upload-test-logs
       if: always()
       uses: actions/upload-artifact@v2
       with:
-        name: integration-test-results-win64
+        name: test-logs-win64
         path: ${{ github.workspace }}\odbc-logs\
     - name: prepare-output
       if: always()
