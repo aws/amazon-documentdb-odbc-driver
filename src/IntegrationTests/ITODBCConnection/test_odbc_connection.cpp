@@ -41,8 +41,8 @@ char* access_key = std::getenv("AWS_ACCESS_KEY_ID");
 char* secret_key = std::getenv("AWS_SECRET_ACCESS_KEY");
 test_string default_credential_chain = CREATE_STRING("timestream-aws-profile");
 test_string wdsn_name = CREATE_STRING("timestream-iam");
-test_string user = to_test_string(std::string((access_key == NULL) ? "" : access_key));
-test_string pass = to_test_string(std::string((secret_key == NULL) ? "" : secret_key));
+test_string user = to_test_string(std::string((access_key == NULL) ? "fake_user" : access_key));
+test_string pass = to_test_string(std::string((secret_key == NULL) ? "fake_secret" : secret_key));
 test_string wrong = CREATE_STRING("wrong");
 test_string empty = CREATE_STRING("");
 
