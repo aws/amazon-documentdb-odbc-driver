@@ -75,10 +75,10 @@ jobs:
           --track-origins=yes \
           --verbose \
           ./build/odbc/bin/itodbc_connection
-    - name: run-integration-execution-tests
-      if: always()
-      run: |
-        ./build/odbc/bin/itodbc_execution
+    # - name: run-integration-execution-tests
+    #   if: always()
+    #   run: |
+    #     ./build/odbc/bin/itodbc_execution
     - name: run-integration-results-tests
       if: always()
       run: |
@@ -91,33 +91,33 @@ jobs:
           --track-origins=yes \
           --verbose \
           ./build/odbc/bin/itodbc_results
-    - name: run-integration-descriptors-tests
-      if: always()
-      run: |
-        ./build/odbc/bin/itodbc_descriptors
-    - name: run-integration-catalog-tests
-      if: always()
-      run: |
-        ./build/odbc/bin/itodbc_catalog
-    - name: run-integration-info-tests
-      if: always()
-      run: |
-        ./build/odbc/bin/itodbc_info
-    - name: run-integration-pagination-tests
-      if: always()
-      run: |
-        ./build/odbc/bin/itodbc_pagination
-    - name: prepare-test-results
-      if: always()
-      run: |
-        cp /tmp/timestreamodbc_*.log ${{ github.workspace }}/odbc-logs/
-    - name: upload-integration-test-results
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: integration-test-results-linux64
-        path: |
-          ${{ github.workspace }}/odbc-logs/
+    # - name: run-integration-descriptors-tests
+    #   if: always()
+    #   run: |
+    #     ./build/odbc/bin/itodbc_descriptors
+    # - name: run-integration-catalog-tests
+    #   if: always()
+    #   run: |
+    #     ./build/odbc/bin/itodbc_catalog
+    # - name: run-integration-info-tests
+    #   if: always()
+    #   run: |
+    #     ./build/odbc/bin/itodbc_info
+    # - name: run-integration-pagination-tests
+    #   if: always()
+    #   run: |
+    #     ./build/odbc/bin/itodbc_pagination
+    # - name: prepare-test-results
+    #   if: always()
+    #   run: |
+    #     cp /tmp/timestreamodbc_*.log ${{ github.workspace }}/odbc-logs/
+    # - name: upload-integration-test-results
+    #   if: always()
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: integration-test-results-linux64
+    #     path: |
+    #       ${{ github.workspace }}/odbc-logs/
     - name: build-installer-rpm
       if: always()
       run: |
