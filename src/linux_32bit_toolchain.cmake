@@ -11,3 +11,5 @@ set(CMAKE_SHARED_LINKER_FLAGS -m32)
 
 # here is the target environment located
 set(CMAKE_FIND_ROOT_PATH  /usr/i386-linux-gnu)
+set(CMAKE_LIBRARY_PATH "/usr/lib/i386-linux-gnu")
+include_directories(BEFORE /usr/include/i386-linux-gnu)
