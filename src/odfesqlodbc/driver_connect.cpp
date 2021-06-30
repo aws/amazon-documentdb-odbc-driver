@@ -231,6 +231,7 @@ RETCODE ESAPI_DriverConnect(HDBC hdbc, HWND hwnd, SQLCHAR *conn_str_in,
 
     // Setup connection string
     {
+        printf("SetupConnString\n");
         const SQLRETURN return_code =
             SetupConnString(conn_str_in, conn_str_in_len, ci, conn);
         if (return_code != SQL_SUCCESS)
@@ -243,12 +244,14 @@ RETCODE ESAPI_DriverConnect(HDBC hdbc, HWND hwnd, SQLCHAR *conn_str_in,
     int reqs = 0;
     int retval = 0;
     do {
+        printf("GetRequirementsAndConnect\n");
         const SQLRETURN return_code = GetRequirementsAndConnect(
             driver_completion, hwnd, ci, reqs, conn, retval);
         if (return_code != SQL_SUCCESS)
             return return_code;
 
         // Check for errors
+        printf("CheckRetVal\n");
         const std::string error_msg =
             CheckRetVal(retval, hwnd, driver_completion, reqs, ci);
 
@@ -260,9 +263,11 @@ RETCODE ESAPI_DriverConnect(HDBC hdbc, HWND hwnd, SQLCHAR *conn_str_in,
     } while (retval <= 0);
 
     ssize_t len = 0;
+    printf("CreateOutputConnectionString\n");
     const RETCODE result = CreateOutputConnectionString(
         len, conn, ci, conn_str_out_len, conn_str_out, retval);
     if (pcb_conn_str_out)
         *pcb_conn_str_out = static_cast< SQLSMALLINT >(len);
+    printf("return result; ESAPI_DriverConnect\n");
     return result;
 }

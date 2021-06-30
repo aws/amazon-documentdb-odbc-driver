@@ -285,7 +285,6 @@ TEST_F(TestSQLBindCol, MultiColumnsMultiBind) {
 
 // Looked at SQLBindCol - if < requested column are allocated, it will
 // reallocate additional space for that column
-#ifndef __linux__
 TEST_F(TestSQLBindCol, InvalidColIndex0) {
     std::vector< std::vector< Col > > cols(single_col_cnt);
     BindColSetup(single_row_cnt, 1, single_col, cols, &m_hstmt);
@@ -318,6 +317,7 @@ TEST_F(TestSQLBindCol, InvalidColIndex2) {
                               SQLSTATE_INVALID_DESCRIPTOR_INDEX));
 }
 
+#ifndef __linux__
 TEST_F(TestSQLBindCol, InvalidBufferLength) {
     std::vector< std::vector< Col > > cols(single_col_cnt);
     BindColSetup(single_row_cnt, 1, single_col, cols, &m_hstmt);
