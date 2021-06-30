@@ -67,6 +67,14 @@ jobs:
       if: always()
       run: |
         ./build/odbc/bin/itodbc_connection
+    - name: run-integration-connection-tests-valgrind
+      if: always()
+      run: |
+        valgrind --leak-check=full \
+          --show-leak-kinds=all \
+          --track-origins=yes \
+          --verbose \
+          ./build/odbc/bin/itodbc_connection
     - name: run-integration-execution-tests
       if: always()
       run: |
@@ -75,6 +83,14 @@ jobs:
       if: always()
       run: |
         ./build/odbc/bin/itodbc_results
+    - name: run-integration-results-tests-valgrind
+      if: always()
+      run: |
+        valgrind --leak-check=full \
+          --show-leak-kinds=all \
+          --track-origins=yes \
+          --verbose \
+          ./build/odbc/bin/itodbc_results
     - name: run-integration-descriptors-tests
       if: always()
       run: |
