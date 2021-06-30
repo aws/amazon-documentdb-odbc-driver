@@ -10,4 +10,4 @@ set(CMAKE_CXX_FLAGS -m32)
 set(CMAKE_SHARED_LINKER_FLAGS -m32)
 
 # here is the target environment located
-set(CMAKE_FIND_ROOT_PATH  /usr/i386-linux-gnu)cmake_minimum_required(VERSION 2.8)
+set(CMAKE_FIND_ROOT_PATH  /usr/i386-linux-gnu)
