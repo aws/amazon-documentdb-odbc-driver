@@ -229,8 +229,14 @@ BOOL dconn_get_attributes(copyfunc func, const char *connect_string,
 
     if (get_mylog()) {
         char *hide_str = hide_password(our_connect_string);
-        MYLOG(LOG_DEBUG, "our_connect_string = '%s'\n", hide_str);
-        free(hide_str);
+        if (hide_str != NULL) {
+            printf("hide_str != NULL\n");
+            MYLOG(LOG_DEBUG, "our_connect_string = '%s'\n", hide_str);
+            free(hide_str);
+        } else {
+            printf("hide_str == NULL\n");
+        }
+        printf("hide_str done.\n");
     }
 
     termp = strchr(our_connect_string, '\0');
