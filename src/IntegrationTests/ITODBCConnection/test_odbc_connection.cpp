@@ -154,8 +154,8 @@ TEST_F(TestSQLDriverConnect, IAM_MinimalConnectionString) {
     printf("Entering IAM_MinimalConnectionString\n");
     test_string wstr;
     wstr += CREATE_STRING("Driver=timestreamodbc;");
-    wstr += (CREATE_STRING("UID=user;");
-    wstr += (CREATE_STRING("SecretAccessKey=secret;");
+    wstr += CREATE_STRING("UID=user;");
+    wstr += CREATE_STRING("SecretAccessKey=secret;");
     printf("SQLRETURN ret = SQLDriverConnect\n");
     SQLRETURN ret = SQLDriverConnect(
         m_conn, NULL, AS_SQLTCHAR(wstr.c_str()), SQL_NTS,
