@@ -38,7 +38,6 @@ static esNAME remove_braces(const char *in);
 #pragma clang diagnostic ignored "-Wembedded-directive"
 #endif  // __APPLE__
 void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
-    printf("makeConnectionString\n");
     UNUSED(len);
     char got_dsn = (ci->dsn[0] != '\0');
     char *connsetStr = NULL;
@@ -51,7 +50,6 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
     /* fundamental info */
     nlen = MAX_CONNECT_STRING;
     if (strcmp(ci->authtype, AUTHTYPE_AWS_PROFILE) == 0) {
-        printf("strcmp(ci->authtype, AUTHTYPE_AWS_PROFILE) == 0\n");
         olen = snprintf(
             connect_string, nlen,
             "%s=%s;"
@@ -77,7 +75,6 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             ci->max_retry_count_client,
             ci->max_connections);
     } else if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
-        printf("strcmp(ci->authtype, AUTHTYPE_IAM) == 0\n");
         olen = snprintf(
             connect_string, nlen,
             "%s=%s;"
@@ -107,7 +104,6 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             ci->max_retry_count_client,
             ci->max_connections);
     } else if (strcmp(ci->authtype, AUTHTYPE_AAD) == 0) {
-        printf("strcmp(ci->authtype, AUTHTYPE_AAD) == 0\n");
         olen = snprintf(
             connect_string, nlen,
             "%s=%s;"
@@ -147,7 +143,6 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             ci->max_retry_count_client,
             ci->max_connections);
     } else if (strcmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
-        printf("strcmp(ci->authtype, AUTHTYPE_OKTA) == 0\n");
         olen = snprintf(
             connect_string, nlen,
             "%s=%s;"
@@ -186,7 +181,6 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             ci->max_connections);
     }
     if (olen < 0 || olen >= nlen) {
-        printf("strcmp(ci->authtype, AUTHTYPE_OKTA) == 0\n");
         connect_string[0] = '\0';
         return;
     }
@@ -201,7 +195,6 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
         free(connsetStr);
     if (NULL != esoptStr)
         free(esoptStr);
-    printf("Done\n");
 }
 #ifdef __APPLE__
 #pragma clang diagnostic pop
@@ -560,15 +553,12 @@ void writeDSNinfo(const ConnInfo *ci) {
  *	Remove braces if the input value is enclosed by braces({}).
  */
 static esNAME remove_braces(const char *in) {
-    printf("remove_braces\n");
     esNAME out;
     INIT_NAME(out);
     if (OPENING_BRACKET == in[0]) {
-        printf("OPENING_BRACKET == in[0]\n");
         size_t inlen = strlen(in);
         if (CLOSING_BRACKET == in[inlen - 1]) /* enclosed with braces */
         {
-            printf("CLOSING_BRACKET == in[inlen - 1]\n");
             int i;
             const char *istr, *eptr;
             char *ostr;
@@ -586,9 +576,7 @@ static esNAME remove_braces(const char *in) {
             return out;
         }
     }
-    printf("STR_TO_NAME(out, in)\n");
     STR_TO_NAME(out, in);
-    printf("return out\n");
     return out;
 }
 
