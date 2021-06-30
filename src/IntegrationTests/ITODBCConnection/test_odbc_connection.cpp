@@ -78,7 +78,6 @@ TEST_F(TestSQLConnect, AWS_Profile_Default_credential_chain) {
     LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
 }
 
-#ifndef __linux__
 TEST_F(TestSQLConnect, IAM_Success) {
     SQLRETURN ret = SQLConnect(
         m_conn, AS_SQLTCHAR(wdsn_name.c_str()), SQL_NTS, 
@@ -196,7 +195,6 @@ TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross2) {
                          &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
-#endif
 
 // TODO: enable after aligning the connection string
 //TEST_F(TestSQLDriverConnect, SqlDriverPrompt) {
@@ -587,12 +585,12 @@ int main(int argc, char** argv) {
    // Enable malloc logging for detecting memory leaks.
    system("export MallocStackLogging=1");
 #endif
-   testing::internal::CaptureStdout();
    ::testing::InitGoogleTest(&argc, argv);
 
    int failures = RUN_ALL_TESTS();
 
-   std::string output = testing::internal::GetCapturedStdout();
+   // TODO: Fix
+   std::string output = "No output";
    std::cout << output << std::endl;
    std::cout << (failures ? "Not all tests passed." : "All tests passed.")
              << std::endl;

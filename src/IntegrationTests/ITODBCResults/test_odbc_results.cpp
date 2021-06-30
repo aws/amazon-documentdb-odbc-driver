@@ -3734,21 +3734,14 @@ int main(int argc, char** argv) {
     system("export MallocStackLogging=1");
 #endif
     ::testing::InitGoogleTest(&argc, argv);
-
-#ifndef __linux
+    
+    // TODO: Fix this.
     int failures = RUN_ALL_TESTS();
-    std::string output = testing::internal::GetCapturedStdout();
-    std::cout << output << std::endl;
-    std::cout << (failures ? "Not all tests passed." : "All tests passed")
-              << std::endl;
-    WriteFileIfSpecified(argv, argv + argc, "-fout", output);
-#else
     std::string output = "No output.";
     std::cout << output << std::endl;
     std::cout << (failures ? "Not all tests passed." : "All tests passed")
               << std::endl;
     WriteFileIfSpecified(argv, argv + argc, "-fout", output);
-#endif
 #ifdef __APPLE__
     // Disable malloc logging and report memory leaks
     system("unset MallocStackLogging");
