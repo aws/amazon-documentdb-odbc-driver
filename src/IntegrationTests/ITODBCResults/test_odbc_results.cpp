@@ -83,7 +83,7 @@ inline void QueryBind(const size_t row_cnt, const size_t row_fetch_cnt,
                       std::vector< std::vector< Col > >& cols,
                       SQLHSTMT* hstmt) {
     BindColSetup(row_cnt, row_fetch_cnt, column_name, cols, hstmt);
-    // BindColumns(cols, hstmt);
+    BindColumns(cols, hstmt);
 }
 
 void QueryFetch(const test_string& column, const test_string& dataset,
