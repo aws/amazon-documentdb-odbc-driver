@@ -99,7 +99,9 @@ static RETCODE CreateOutputConnectionString(ssize_t &len, ConnectionClass *conn,
     if (conn->ms_jet && len_str_out > 255)
         len_str_out = 255;
     char conn_str[MAX_CONNECT_STRING];
+    printf("makeConnectionString enter\n");
     makeConnectString(conn_str, ci, len_str_out);
+    printf("makeConnectionString exit\n");
 
     // Set result and check connection string
     RETCODE result = ((retval == 1) ? SQL_SUCCESS : SQL_SUCCESS_WITH_INFO);
@@ -111,6 +113,7 @@ static RETCODE CreateOutputConnectionString(ssize_t &len, ConnectionClass *conn,
         //  However, it seems ok to just always construct an output string.
         //  There are possible bad side effects on working applications (Access)
         //  by implementing the correct behavior
+        printf("strncpy\n");
         strncpy((char *)conn_str_out, conn_str, conn_str_out_len);
         if (len >= conn_str_out_len) {
             for (int clen = conn_str_out_len - 1;
@@ -122,6 +125,7 @@ static RETCODE CreateOutputConnectionString(ssize_t &len, ConnectionClass *conn,
                          "CreateOutputConnectionString");
         }
     }
+    printf("return result\n");
     return result;
 }
 

@@ -553,12 +553,15 @@ void writeDSNinfo(const ConnInfo *ci) {
  *	Remove braces if the input value is enclosed by braces({}).
  */
 static esNAME remove_braces(const char *in) {
+    printf("remove_braces\n");
     esNAME out;
     INIT_NAME(out);
     if (OPENING_BRACKET == in[0]) {
+        printf("OPENING_BRACKET == in[0]\n");
         size_t inlen = strlen(in);
         if (CLOSING_BRACKET == in[inlen - 1]) /* enclosed with braces */
         {
+            printf("CLOSING_BRACKET == in[inlen - 1]\n");
             int i;
             const char *istr, *eptr;
             char *ostr;
@@ -576,7 +579,9 @@ static esNAME remove_braces(const char *in) {
             return out;
         }
     }
+    printf("STR_TO_NAME(out, in)\n");
     STR_TO_NAME(out, in);
+    printf("return out\n");
     return out;
 }
 
