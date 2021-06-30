@@ -175,6 +175,8 @@ jobs:
     - name: check-path
       run: |
         echo $PATH
+        ls /usr/lib/x86_64-linux-gnu | grep libssl
+        ls /usr/lib/i386-linux-gnu | grep libssl
     - name: run-cppcheck
       run: |
         sudo apt install cppcheck
