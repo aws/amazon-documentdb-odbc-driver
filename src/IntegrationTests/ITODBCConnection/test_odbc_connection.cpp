@@ -123,6 +123,8 @@ TEST_F(TestSQLConnect, IAM_WrongPassword) {
 class TestSQLDriverConnect : public testing::Test {
    public:
     void SetUp() {
+        m_env = SQL_NULL_HENV;
+        m_conn = SQL_NULL_HDBC;
         AllocConnection(&m_env, &m_conn, true, true);
     }
 
@@ -149,14 +151,17 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 }
 
 TEST_F(TestSQLDriverConnect, IAM_MinimalConnectionString) {
+    printf("Entering IAM_MinimalConnectionString\n");
     test_string wstr;
     wstr += CREATE_STRING("Driver=timestreamodbc;");
     wstr += (CREATE_STRING("UID=") + user + CREATE_STRING(";"));
     wstr += (CREATE_STRING("PWD=") + pass + CREATE_STRING(";"));
+    printf("SQLRETURN ret = SQLDriverConnect\n");
     SQLRETURN ret = SQLDriverConnect(
         m_conn, NULL, AS_SQLTCHAR(wstr.c_str()), SQL_NTS,
         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
         &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
+    printf("EXPECT_EQ(SQL_SUCCESS, ret);\n");
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
