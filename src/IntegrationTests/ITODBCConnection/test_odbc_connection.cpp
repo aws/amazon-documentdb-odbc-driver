@@ -41,8 +41,13 @@ char* access_key = std::getenv("AWS_ACCESS_KEY_ID");
 char* secret_key = std::getenv("AWS_SECRET_ACCESS_KEY");
 test_string default_credential_chain = CREATE_STRING("timestream-aws-profile");
 test_string wdsn_name = CREATE_STRING("timestream-iam");
+#ifndef __linux__
 test_string user = to_test_string(std::string((access_key == NULL) ? "fake_user" : access_key));
 test_string pass = to_test_string(std::string((secret_key == NULL) ? "fake_secret" : secret_key));
+#else
+test_string user = CREATE_STRING("fake_user");
+test_string pass = CREATE_STRING("fake-secret");
+#endif
 test_string wrong = CREATE_STRING("wrong");
 test_string empty = CREATE_STRING("");
 
@@ -154,8 +159,8 @@ TEST_F(TestSQLDriverConnect, IAM_MinimalConnectionString) {
     printf("Entering IAM_MinimalConnectionString\n");
     test_string wstr;
     wstr += CREATE_STRING("Driver=timestreamodbc;");
-    wstr += CREATE_STRING("UID=user;");
-    wstr += CREATE_STRING("SecretAccessKey=secret;");
+    wstr += (CREATE_STRING("UID=") + user + CREATE_STRING(";"));
+    wstr += (CREATE_STRING("SecretAccessKey=") + pass + CREATE_STRING(";"));
     printf("SQLRETURN ret = SQLDriverConnect\n");
     SQLRETURN ret = SQLDriverConnect(
         m_conn, NULL, AS_SQLTCHAR(wstr.c_str()), SQL_NTS,
@@ -165,7 +170,6 @@ TEST_F(TestSQLDriverConnect, IAM_MinimalConnectionString) {
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
-#ifndef __linux__
 TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString) {
     test_string wstr;
     wstr += CREATE_STRING("Driver=timestreamodbc;");
@@ -201,7 +205,6 @@ TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross2) {
                          &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
-#endif
 
 // TODO: enable after aligning the connection string
 //TEST_F(TestSQLDriverConnect, SqlDriverPrompt) {
