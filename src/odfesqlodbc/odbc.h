@@ -308,6 +308,7 @@ typedef double SDOUBLE;
 #ifndef WIN32
 #define stricmp strcasecmp
 #define strnicmp strncasecmp
+#define stristr strcasestr
 #ifndef TRUE
 #define TRUE (BOOL)1
 #endif /* TRUE */
@@ -326,6 +327,9 @@ extern int posix_snprintf(char *buf, size_t size, const char *format, ...);
 #endif /* strdup */
 #define strnicmp _strnicmp
 #define stricmp _stricmp
+#include <shlwapi.h>
+#pragma comment(lib, "Shlwapi.lib")
+#define stristr StrStrIA
 #endif /* WIN32 */
 
 #define IS_NOT_SPACE(c) ((c) && !isspace((UCHAR)c))

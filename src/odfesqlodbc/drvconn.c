@@ -49,18 +49,25 @@ extern HINSTANCE s_hModule; /* Saved module handle. */
 
 char *hide_password(const char *str) {
     char *outstr, *pwdp;
+    const char *pwd_key = "PWD=";
+    const char *aad_secret_key = "AADClientSecret=";
 
     if (!str)
         return NULL;
     outstr = strdup(str);
     if (!outstr)
         return NULL;
-    if (pwdp = strstr(outstr, "PWD="), !pwdp)
-        pwdp = strstr(outstr, "pwd=");
-    if (pwdp) {
+    if (pwdp = stristr(outstr, pwd_key), pwdp) {
         char *p;
 
-        for (p = pwdp + 4; *p && *p != ';'; p++)
+        for (p = pwdp + strlen(pwd_key); *p && *p != ';'; p++)
+            *p = 'x';
+    }
+
+    if (pwdp = stristr(outstr, aad_secret_key), pwdp) {
+        char *p;
+
+        for (p = pwdp + strlen(aad_secret_key); *p && *p != ';'; p++)
             *p = 'x';
     }
     return outstr;
@@ -218,16 +225,11 @@ BOOL dconn_get_attributes(copyfunc func, const char *connect_string,
     }
     strtok_arg = our_connect_string;
 
-#ifdef FORCE_PASSWORD_DISPLAY
-    MYLOG(LOG_DEBUG, "our_connect_string = '%s'\n", our_connect_string);
-#else
     if (get_mylog()) {
         char *hide_str = hide_password(our_connect_string);
-
         MYLOG(LOG_DEBUG, "our_connect_string = '%s'\n", hide_str);
         free(hide_str);
     }
-#endif /* FORCE_PASSWORD_DISPLAY */
 
     termp = strchr(our_connect_string, '\0');
     eoftok = FALSE;
@@ -254,7 +256,7 @@ BOOL dconn_get_attributes(copyfunc func, const char *connect_string,
         /*
          * Values enclosed with braces({}) can contain ; etc
          * We don't remove the braces here because
-         * decode_or_remove_braces() in dlg_specifi.c
+         * remove_braces() in dlg_specifi.c
          * would remove them later.
          * Just correct the misdetected delimter(;).
          */

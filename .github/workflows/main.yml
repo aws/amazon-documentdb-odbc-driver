@@ -29,7 +29,7 @@ jobs:
     - name: configure-and-build-driver
       run: |
         .\build_win_release32.ps1
-    - name: build-integration-tests
+    - name: build-tests
       run: |
         MSBuild.exe ./build/odbc/cmake/global_make_list.sln -property:Configuration=Release,Platform=Win32
     - name: configure-aws-credentials
@@ -67,10 +67,11 @@ jobs:
     - name: run-integration-pagination-tests
       run: |
         .\build\odbc\bin\Release\itodbc_pagination.exe
-    - name: upload-integration-test-results
+    - name: upload-test-logs
+      if: failure()
       uses: actions/upload-artifact@v2
       with:
-        name: integration-test-results-win32
+        name: test-logs-win32
         path: ${{ github.workspace }}\odbc-logs\
     - name: build-installer
       if: success()
@@ -114,7 +115,7 @@ jobs:
     - name: configure-and-build-driver
       run: |
         .\build_win_release64.ps1
-    - name: build-integration-tests
+    - name: build-tests
       run: |
         MSBuild.exe ./build/odbc/cmake/global_make_list.sln -property:Configuration=Release,Platform=x64
     - name: configure-aws-credentials
@@ -152,10 +153,11 @@ jobs:
     - name: run-integration-pagination-tests
       run: |
         .\build\odbc\bin\Release\itodbc_pagination.exe
-    - name: upload-integration-test-results
+    - name: upload-test-logs
+      if: failure()
       uses: actions/upload-artifact@v2
       with:
-        name: integration-test-results-win64
+        name: test-logs-win64
         path: ${{ github.workspace }}\odbc-logs\
     - name: build-installer
       if: success()
