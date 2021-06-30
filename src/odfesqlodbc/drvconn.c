@@ -48,6 +48,7 @@ extern HINSTANCE s_hModule; /* Saved module handle. */
 #endif
 
 char *hide_password(const char *str) {
+    printf("hide_password\n");
     char *outstr, *pwdp;
     const char *pwd_key = "PWD=";
     const char *aad_secret_key = "AADClientSecret=";
@@ -70,6 +71,7 @@ char *hide_password(const char *str) {
         for (p = pwdp + strlen(aad_secret_key); *p && *p != ';'; p++)
             *p = 'x';
     }
+    printf("hide_password exit\n");
     return outstr;
 }
 

@@ -252,8 +252,14 @@ utf8_to_ucs2_lf(const char *utf8str, SQLLEN ilen, BOOL lfconv,
         return 0;
 
     char *hide_str = hide_password(utf8str);
-    MYPRINTF(LOG_DEBUG, " string=%s", hide_str);
-    free(hide_str);
+    if (hide_str != NULL) {
+        printf("hide_str != NULL\n");
+        MYPRINTF(LOG_DEBUG, " string=%s", hide_str);
+        free(hide_str);
+    } else {
+        printf("hide_str == NULL\n");
+    }
+    printf("hide_str done.\n");
 
     if (!bufcount)
         ucs2str = NULL;
