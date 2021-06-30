@@ -33,31 +33,22 @@
 #include <chrono>
 // clang-format on
 
-#define IT_SIZEOF(x) (NULL == (x) ? 0 : (sizeof((x)) / sizeof((x)[0])))
-
-// SQLConnect constants
-
-char* access_key = std::getenv("AWS_ACCESS_KEY_ID");
-char* secret_key = std::getenv("AWS_SECRET_ACCESS_KEY");
-test_string default_credential_chain = CREATE_STRING("timestream-aws-profile");
-test_string wdsn_name = CREATE_STRING("timestream-iam");
-#ifndef __linux__
-test_string user = to_test_string(std::string((access_key == NULL) ? "fake_user" : access_key));
-test_string pass = to_test_string(std::string((secret_key == NULL) ? "fake_secret" : secret_key));
-#else
-test_string user = CREATE_STRING("fake_user");
-test_string pass = CREATE_STRING("fake-secret");
-#endif
-test_string wrong = CREATE_STRING("wrong");
-test_string empty = CREATE_STRING("");
-
 // SQLDriverConnect constants
-test_string dsn_conn_string = CREATE_STRING("DSN=timestream-aws-profile");
-
-
 class TestSQLConnect : public testing::Test {
    public:
     void SetUp() {
+        wdsn_name = CREATE_STRING("timestream-iam");
+        wrong = CREATE_STRING("wrong");
+        empty = CREATE_STRING("");
+#ifndef __linux__
+        char* access_key = std::getenv("AWS_ACCESS_KEY_ID");
+        char* secret_key = std::getenv("AWS_SECRET_ACCESS_KEY");
+        user = to_test_string(std::string((access_key == NULL) ? "fake_user" : access_key));
+        pass = to_test_string(std::string((secret_key == NULL) ? "fake_secret" : secret_key));
+#else
+        user = CREATE_STRING("fake_user");
+        pass = CREATE_STRING("fake-secret");
+#endif
         AllocConnection(&m_env, &m_conn, true, true);
     }
     void TearDown() {
@@ -69,12 +60,18 @@ class TestSQLConnect : public testing::Test {
             SQLFreeHandle(SQL_HANDLE_ENV, m_env);
         }
     }
+    test_string wdsn_name;
+    test_string wrong;
+    test_string empty;
+    test_string user;
+    test_string pass;
     SQLHENV m_env;
     SQLHDBC m_conn;
 };
 
 
 TEST_F(TestSQLConnect, AWS_Profile_Default_credential_chain) {
+    test_string default_credential_chain = CREATE_STRING("timestream-aws-profile");
     SQLRETURN ret = SQLConnect(
         m_conn, AS_SQLTCHAR(default_credential_chain.c_str()), SQL_NTS,
         AS_SQLTCHAR(empty.c_str()), static_cast< SQLSMALLINT >(empty.length()),
@@ -128,8 +125,18 @@ TEST_F(TestSQLConnect, IAM_WrongPassword) {
 class TestSQLDriverConnect : public testing::Test {
    public:
     void SetUp() {
+        dsn_conn_string = CREATE_STRING("DSN=timestream-aws-profile");
         m_env = SQL_NULL_HENV;
         m_conn = SQL_NULL_HDBC;
+#ifndef __linux__
+        char* access_key = std::getenv("AWS_ACCESS_KEY_ID");
+        char* secret_key = std::getenv("AWS_SECRET_ACCESS_KEY");
+        user = to_test_string(std::string((access_key == NULL) ? "fake_user" : access_key));
+        pass = to_test_string(std::string((secret_key == NULL) ? "fake_secret" : secret_key));
+#else
+        user = CREATE_STRING("fake_user");
+        pass = CREATE_STRING("fake-secret");
+#endif
         AllocConnection(&m_env, &m_conn, true, true);
     }
 
@@ -141,10 +148,13 @@ class TestSQLDriverConnect : public testing::Test {
             SQLFreeHandle(SQL_HANDLE_ENV, m_env);
         }
     }
+    test_string dsn_conn_string;
     SQLHENV m_env = SQL_NULL_HENV;
     SQLHDBC m_conn = SQL_NULL_HDBC;
     SQLTCHAR m_out_conn_string[1024];
     SQLSMALLINT m_out_conn_string_length;
+    test_string user;
+    test_string pass;
 };
 
 TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
