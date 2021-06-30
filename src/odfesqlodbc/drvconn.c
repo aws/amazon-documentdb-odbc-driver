@@ -48,7 +48,6 @@ extern HINSTANCE s_hModule; /* Saved module handle. */
 #endif
 
 char *hide_password(const char *str) {
-    printf("hide_password\n");
     char *outstr, *pwdp;
     const char *pwd_key = "PWD=";
     const char *aad_secret_key = "AADClientSecret=";
@@ -71,7 +70,6 @@ char *hide_password(const char *str) {
         for (p = pwdp + strlen(aad_secret_key); *p && *p != ';'; p++)
             *p = 'x';
     }
-    printf("hide_password exit\n");
     return outstr;
 }
 
@@ -229,14 +227,8 @@ BOOL dconn_get_attributes(copyfunc func, const char *connect_string,
 
     if (get_mylog()) {
         char *hide_str = hide_password(our_connect_string);
-        if (hide_str != NULL) {
-            printf("hide_str != NULL\n");
-            MYLOG(LOG_DEBUG, "our_connect_string = '%s'\n", hide_str);
-            free(hide_str);
-        } else {
-            printf("hide_str == NULL\n");
-        }
-        printf("hide_str done.\n");
+        MYLOG(LOG_DEBUG, "our_connect_string = '%s'\n", hide_str);
+        free(hide_str);
     }
 
     termp = strchr(our_connect_string, '\0');

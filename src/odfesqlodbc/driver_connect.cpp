@@ -99,9 +99,7 @@ static RETCODE CreateOutputConnectionString(ssize_t &len, ConnectionClass *conn,
     if (conn->ms_jet && len_str_out > 255)
         len_str_out = 255;
     char conn_str[MAX_CONNECT_STRING];
-    printf("makeConnectionString enter\n");
     makeConnectString(conn_str, ci, len_str_out);
-    printf("makeConnectionString exit\n");
 
     // Set result and check connection string
     RETCODE result = ((retval == 1) ? SQL_SUCCESS : SQL_SUCCESS_WITH_INFO);
@@ -113,7 +111,6 @@ static RETCODE CreateOutputConnectionString(ssize_t &len, ConnectionClass *conn,
         //  However, it seems ok to just always construct an output string.
         //  There are possible bad side effects on working applications (Access)
         //  by implementing the correct behavior
-        printf("strncpy\n");
         strncpy((char *)conn_str_out, conn_str, conn_str_out_len);
         if (len >= conn_str_out_len) {
             for (int clen = conn_str_out_len - 1;
@@ -125,7 +122,6 @@ static RETCODE CreateOutputConnectionString(ssize_t &len, ConnectionClass *conn,
                          "CreateOutputConnectionString");
         }
     }
-    printf("return result\n");
     return result;
 }
 
@@ -231,7 +227,6 @@ RETCODE ESAPI_DriverConnect(HDBC hdbc, HWND hwnd, SQLCHAR *conn_str_in,
 
     // Setup connection string
     {
-        printf("SetupConnString\n");
         const SQLRETURN return_code =
             SetupConnString(conn_str_in, conn_str_in_len, ci, conn);
         if (return_code != SQL_SUCCESS)
@@ -244,14 +239,12 @@ RETCODE ESAPI_DriverConnect(HDBC hdbc, HWND hwnd, SQLCHAR *conn_str_in,
     int reqs = 0;
     int retval = 0;
     do {
-        printf("GetRequirementsAndConnect\n");
         const SQLRETURN return_code = GetRequirementsAndConnect(
             driver_completion, hwnd, ci, reqs, conn, retval);
         if (return_code != SQL_SUCCESS)
             return return_code;
 
         // Check for errors
-        printf("CheckRetVal\n");
         const std::string error_msg =
             CheckRetVal(retval, hwnd, driver_completion, reqs, ci);
 
@@ -263,11 +256,9 @@ RETCODE ESAPI_DriverConnect(HDBC hdbc, HWND hwnd, SQLCHAR *conn_str_in,
     } while (retval <= 0);
 
     ssize_t len = 0;
-    printf("CreateOutputConnectionString\n");
     const RETCODE result = CreateOutputConnectionString(
         len, conn, ci, conn_str_out_len, conn_str_out, retval);
     if (pcb_conn_str_out)
         *pcb_conn_str_out = static_cast< SQLSMALLINT >(len);
-    printf("return result; ESAPI_DriverConnect\n");
     return result;
 }
