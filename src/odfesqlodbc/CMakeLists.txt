@@ -109,7 +109,7 @@ else()
 endif()
 
 if(UNIX)
-	if(BITNESS EQUAL 32))
+	if(BITNESS EQUAL 32)
 		set_target_properties(odfesqlodbc PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 	endif()
 endif()
