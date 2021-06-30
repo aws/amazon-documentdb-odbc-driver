@@ -154,8 +154,8 @@ TEST_F(TestSQLDriverConnect, IAM_MinimalConnectionString) {
     printf("Entering IAM_MinimalConnectionString\n");
     test_string wstr;
     wstr += CREATE_STRING("Driver=timestreamodbc;");
-    wstr += (CREATE_STRING("UID=") + user + CREATE_STRING(";"));
-    wstr += (CREATE_STRING("PWD=") + pass + CREATE_STRING(";"));
+    wstr += (CREATE_STRING("UID=user;");
+    wstr += (CREATE_STRING("SecretAccessKey=secret;");
     printf("SQLRETURN ret = SQLDriverConnect\n");
     SQLRETURN ret = SQLDriverConnect(
         m_conn, NULL, AS_SQLTCHAR(wstr.c_str()), SQL_NTS,
@@ -165,6 +165,7 @@ TEST_F(TestSQLDriverConnect, IAM_MinimalConnectionString) {
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
+#ifndef __linux__
 TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString) {
     test_string wstr;
     wstr += CREATE_STRING("Driver=timestreamodbc;");
@@ -200,6 +201,7 @@ TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross2) {
                          &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
+#endif
 
 // TODO: enable after aligning the connection string
 //TEST_F(TestSQLDriverConnect, SqlDriverPrompt) {
