@@ -36,8 +36,8 @@
 #include <string>
 #include <vector>
 
-#include "unit_test_helper.h"
 #include "gtest/gtest.h"
+#include "unit_test_helper.h"
 
 #ifdef __linux__
 typedef std::u16string test_string;
@@ -119,6 +119,9 @@ test_string conn_string();
 class Fixture : public testing::Test {
    public:
     void SetUp() override {
+        m_env = SQL_NULL_HENV;
+        m_conn = SQL_NULL_HDBC;
+        m_hstmt = SQL_NULL_HSTMT;
         ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string().c_str(), &m_env,
                                        &m_conn, &m_hstmt, true, true));
     }

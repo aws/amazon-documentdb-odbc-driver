@@ -23,9 +23,7 @@
 
 #define NULL_IF_NULL(a) ((a) ? ((const char *)(a)) : "(null)")
 
-static void encode(const esNAME, char *out, int outlen);
-static esNAME decode(const char *in);
-static esNAME decode_or_remove_braces(const char *in);
+static esNAME remove_braces(const char *in);
 
 #define OVR_EXTRA_BITS                                                      \
     (BIT_FORCEABBREVCONNSTR | BIT_FAKE_MSS | BIT_BDE_ENVIRONMENT            \
@@ -42,7 +40,6 @@ static esNAME decode_or_remove_braces(const char *in);
 void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
     UNUSED(len);
     char got_dsn = (ci->dsn[0] != '\0');
-    char encoded_item[LARGE_REGISTRY_LEN];
     char *connsetStr = NULL;
     char *esoptStr = NULL;
 #ifdef _HANDLE_ENLIST_IN_DTC_
@@ -50,7 +47,6 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
 #endif
     ssize_t hlen, nlen, olen=-1;
 
-    encode(ci->pwd, encoded_item, sizeof(encoded_item));
     /* fundamental info */
     nlen = MAX_CONNECT_STRING;
     if (strcmp(ci->authtype, AUTHTYPE_AWS_PROFILE) == 0) {
@@ -97,7 +93,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
             ci->authtype,
             ci->uid, 
-            encoded_item, 
+            SAFE_NAME(ci->pwd),
             ci->session_token,
             ci->region,
             ci->end_point_override,
@@ -131,7 +127,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
             ci->authtype,
             ci->uid, 
-            encoded_item, 
+            SAFE_NAME(ci->pwd),
             ci->idp_name,
             ci->aad_application_id,
             ci->aad_client_secret,
@@ -169,7 +165,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
             ci->authtype,
             ci->uid, 
-            encoded_item, 
+            SAFE_NAME(ci->pwd),
             ci->idp_name,
             ci->idp_host,
             ci->okta_application_id,
@@ -231,11 +227,9 @@ BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
     else if (stricmp(attribute, INI_SECRET_ACCESS_KEY) == 0
              || stricmp(attribute, INI_PWD) == 0
              || stricmp(attribute, INI_IDP_PASSWORD) == 0) {
-        ci->pwd = decode_or_remove_braces(value);
-#ifndef FORCE_PASSWORDE_DISPLAY
+        STR_TO_NAME(ci->pwd, value);
         MYLOG(LOG_DEBUG, "key='%s' value='xxxxxxxx'\n", attribute);
         printed = TRUE;
-#endif
     } else if (stricmp(attribute, INI_SESSION_TOKEN) == 0)
         STRCPY_FIXED(ci->session_token, value);
     else if (stricmp(attribute, INI_AUTH_MODE) == 0)
@@ -268,9 +262,11 @@ BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
         STRCPY_FIXED(ci->role_arn, value);
     else if (stricmp(attribute, INI_AAD_APPLICATION_ID) == 0)
         STRCPY_FIXED(ci->aad_application_id, value);
-    else if (stricmp(attribute, INI_AAD_CLIENT_SECRET) == 0)
+    else if (stricmp(attribute, INI_AAD_CLIENT_SECRET) == 0) {
         STRCPY_FIXED(ci->aad_client_secret, value);
-    else if (stricmp(attribute, INI_AAD_TENANT) == 0)
+        MYLOG(LOG_DEBUG, "key='%s' value='xxxxxxxx'\n", attribute);
+        printed = TRUE;
+    } else if (stricmp(attribute, INI_AAD_TENANT) == 0)
         STRCPY_FIXED(ci->aad_tenant, value);
     else if (stricmp(attribute, INI_IDP_ARN) == 0)
         STRCPY_FIXED(ci->idp_arn, value);
@@ -396,7 +392,7 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
         if (SQLGetPrivateProfileString(DSN, INI_SECRET_ACCESS_KEY, NULL_STRING,
                                        temp, sizeof(temp), ODBC_INI)
             > 0)
-            ci->pwd = decode(temp);
+            STR_TO_NAME(ci->pwd, temp);
     } else if (strcmp(ci->authtype, AUTHTYPE_AAD) == 0
                || strcmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
         if (SQLGetPrivateProfileString(DSN, INI_IDP_USERNAME, NULL_STRING, temp,
@@ -406,7 +402,7 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
         if (SQLGetPrivateProfileString(DSN, INI_IDP_PASSWORD, NULL_STRING, temp,
                                        sizeof(temp), ODBC_INI)
             > 0)
-            ci->pwd = decode(temp);
+            STR_TO_NAME(ci->pwd, temp);
     }
     if (strcmp(ci->authtype, AUTHTYPE_AWS_PROFILE) != 0) {
         if (SQLGetPrivateProfileString(DSN, INI_UID, NULL_STRING, temp,
@@ -416,7 +412,7 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
         if (SQLGetPrivateProfileString(DSN, INI_PWD, NULL_STRING, temp,
                                        sizeof(temp), ODBC_INI)
             > 0)
-            ci->pwd = decode(temp);
+            STR_TO_NAME(ci->pwd, temp);
     }
     if (SQLGetPrivateProfileString(DSN, INI_SESSION_TOKEN, NULL_STRING, temp,
                                    sizeof(temp), ODBC_INI)
@@ -511,11 +507,10 @@ int writeDriversDefaults(const char *drivername, const GLOBAL_VALUES *comval) {
 /*	This is for datasource based options only */
 void writeDSNinfo(const ConnInfo *ci) {
     const char *DSN = ci->dsn;
-    char encoded_item[MEDIUM_REGISTRY_LEN], temp[SMALL_REGISTRY_LEN];
+    char temp[SMALL_REGISTRY_LEN];
 
     SQLWritePrivateProfileString(DSN, INI_UID, ci->uid, ODBC_INI);
-    encode(ci->pwd, encoded_item, sizeof(encoded_item));
-    SQLWritePrivateProfileString(DSN, INI_PWD, encoded_item, ODBC_INI);
+    SQLWritePrivateProfileString(DSN, INI_PWD, SAFE_NAME(ci->pwd), ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_SESSION_TOKEN, ci->session_token, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_AUTH_MODE, ci->authtype, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_PROFILE_NAME, ci->profile_name, ODBC_INI);
@@ -554,88 +549,12 @@ void writeDSNinfo(const ConnInfo *ci) {
                                  ODBC_INI);
 }
 
-static void encode(const esNAME in, char *out, int outlen) {
-    size_t i, ilen = 0;
-    int o = 0;
-    char inc, *ins;
-
-    if (NAME_IS_NULL(in)) {
-        out[0] = '\0';
-        return;
-    }
-    ins = GET_NAME(in);
-    ilen = strlen(ins);
-    for (i = 0; i < ilen && o < outlen - 1; i++) {
-        inc = ins[i];
-        if (inc == '+') {
-            if (o + 2 >= outlen)
-                break;
-            snprintf(&out[o], outlen - o, "%%2B");
-            o += 3;
-        } else if (isspace((unsigned char)inc))
-            out[o++] = '+';
-        else if (!isalnum((unsigned char)inc)) {
-            if (o + 2 >= outlen)
-                break;
-            snprintf(&out[o], outlen - o, "%%%02x", inc);
-            o += 3;
-        } else
-            out[o++] = inc;
-    }
-    out[o++] = '\0';
-}
-
-static unsigned int conv_from_hex(const char *s) {
-    int i, y = 0, val;
-
-    for (i = 1; i <= 2; i++) {
-        if (s[i] >= 'a' && s[i] <= 'f')
-            val = s[i] - 'a' + 10;
-        else if (s[i] >= 'A' && s[i] <= 'F')
-            val = s[i] - 'A' + 10;
-        else
-            val = s[i] - '0';
-
-        y += val << (4 * (2 - i));
-    }
-
-    return y;
-}
-
-static esNAME decode(const char *in) {
-    size_t i, ilen = strlen(in), o = 0;
-    char inc, *outs;
-    esNAME out;
-
-    INIT_NAME(out);
-    if (0 == ilen) {
-        return out;
-    }
-    outs = (char *)malloc(ilen + 1);
-    if (!outs)
-        return out;
-    for (i = 0; i < ilen; i++) {
-        inc = in[i];
-        if (inc == '+')
-            outs[o++] = ' ';
-        else if (inc == '%') {
-            snprintf(&outs[o], ilen + 1 - o, "%c", conv_from_hex(&in[i]));
-            o++;
-            i += 2;
-        } else
-            outs[o++] = inc;
-    }
-    outs[o++] = '\0';
-    STR_TO_NAME(out, outs);
-    free(outs);
-    return out;
-}
-
 /*
  *	Remove braces if the input value is enclosed by braces({}).
- *	Othewise decode the input value.
  */
-static esNAME decode_or_remove_braces(const char *in) {
+static esNAME remove_braces(const char *in) {
+    esNAME out;
+    INIT_NAME(out);
     if (OPENING_BRACKET == in[0]) {
         size_t inlen = strlen(in);
         if (CLOSING_BRACKET == in[inlen - 1]) /* enclosed with braces */
@@ -643,9 +562,7 @@ static esNAME decode_or_remove_braces(const char *in) {
             int i;
             const char *istr, *eptr;
             char *ostr;
-            esNAME out;
 
-            INIT_NAME(out);
             if (NULL == (ostr = (char *)malloc(inlen)))
                 return out;
             eptr = in + inlen - 1;
@@ -659,7 +576,8 @@ static esNAME decode_or_remove_braces(const char *in) {
             return out;
         }
     }
-    return decode(in);
+    STR_TO_NAME(out, in);
+    return out;
 }
 
 void CC_conninfo_release(ConnInfo *conninfo) {

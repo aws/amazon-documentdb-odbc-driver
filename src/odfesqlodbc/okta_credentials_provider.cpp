@@ -48,12 +48,25 @@ std::string OktaCredentialsProvider::GetOktaSessionToken() const {
     req->SetHeaderValue(Aws::Http::ACCEPT_HEADER, "application/json");
     req->SetHeaderValue(Aws::Http::CONTENT_TYPE_HEADER, "application/json");
 
+    auto json_body = Aws::Utils::Json::JsonValue();
+    json_body.WithString("username", Aws::String(m_auth.uid));
+    if (!json_body.WasParseSuccessful()) {
+        throw std::runtime_error(
+            "Error adding Okta username to json request body. "
+            + json_body.GetErrorMessage());
+    }
+    json_body.WithString("password", Aws::String(m_auth.pwd));
+    if (!json_body.WasParseSuccessful()) {
+        throw std::runtime_error(
+            "Error adding Okta password to json request body. "
+            + json_body.GetErrorMessage());
+    }
+    auto body = json_body.View().WriteReadable();
     auto aws_ss = Aws::MakeShared< Aws::StringStream >("");
-    *aws_ss << "{\"username\":\"" << m_auth.uid << "\",\"password\":\""
-            << m_auth.pwd << "\"}";
+    aws_ss->write(body.c_str(), body.size());
 
     req->AddContentBody(aws_ss);
-    req->SetContentLength(std::to_string(aws_ss.get()->str().size()));
+    req->SetContentLength(std::to_string(body.size()));
 
     std::shared_ptr< Aws::Http::HttpResponse > res;
     std::string session_token;

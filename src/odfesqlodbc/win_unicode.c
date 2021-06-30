@@ -19,6 +19,8 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "drvconn.h"
 #include "unicode_support.h"
 
 #ifdef WIN32
@@ -248,7 +250,10 @@ utf8_to_ucs2_lf(const char *utf8str, SQLLEN ilen, BOOL lfconv,
           bufcount);
     if (!utf8str)
         return 0;
-    MYPRINTF(LOG_DEBUG, " string=%s", utf8str);
+
+    char *hide_str = hide_password(utf8str);
+    MYPRINTF(LOG_DEBUG, " string=%s", hide_str);
+    free(hide_str);
 
     if (!bufcount)
         ucs2str = NULL;
