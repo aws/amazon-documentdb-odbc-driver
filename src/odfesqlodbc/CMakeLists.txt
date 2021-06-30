@@ -108,12 +108,6 @@ else()
 	add_library(odfesqlodbc SHARED ${C_SOURCE_FILES} ${C_HEADER_FILES} ${CPP_SOURCE_FILES} ${CPP_HEADER_FILES})
 endif()
 
-if(UNIX)
-	if(BITNESS EQUAL 32)
-		set_target_properties(odfesqlodbc PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
-	endif()
-endif()
-
 include_directories(
 						${CMAKE_CURRENT_SOURCE_DIR}
 						${ODFEENLIST_SRC} 
