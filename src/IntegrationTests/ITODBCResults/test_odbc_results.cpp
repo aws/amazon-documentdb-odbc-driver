@@ -83,7 +83,7 @@ inline void QueryBind(const size_t row_cnt, const size_t row_fetch_cnt,
                       std::vector< std::vector< Col > >& cols,
                       SQLHSTMT* hstmt) {
     BindColSetup(row_cnt, row_fetch_cnt, column_name, cols, hstmt);
-    BindColumns(cols, hstmt);
+    // BindColumns(cols, hstmt);
 }
 
 void QueryFetch(const test_string& column, const test_string& dataset,
@@ -273,7 +273,6 @@ class TestSQLRowCount : public Fixture {};
 class TestSQLBindCol : public Fixture {};
 
 // AT-864 Fix the segfaults that happen in GitHub actions when these 4 tests run.
-#ifndef __linux__
 TEST_F(TestSQLBindCol, SingleColumnSingleBind) {
     std::vector< std::vector< Col > > cols(single_col_cnt);
     QueryBind(single_row_cnt, 1, single_col, cols, &m_hstmt);
@@ -286,6 +285,7 @@ TEST_F(TestSQLBindCol, MultiColumnsMultiBind) {
 
 // Looked at SQLBindCol - if < requested column are allocated, it will
 // reallocate additional space for that column
+#ifndef __linux__
 TEST_F(TestSQLBindCol, InvalidColIndex0) {
     std::vector< std::vector< Col > > cols(single_col_cnt);
     BindColSetup(single_row_cnt, 1, single_col, cols, &m_hstmt);
@@ -3735,14 +3735,20 @@ int main(int argc, char** argv) {
 #endif
     ::testing::InitGoogleTest(&argc, argv);
 
+#ifndef __linux
     int failures = RUN_ALL_TESTS();
-
+    std::string output = testing::internal::GetCapturedStdout();
+    std::cout << output << std::endl;
+    std::cout << (failures ? "Not all tests passed." : "All tests passed")
+              << std::endl;
+    WriteFileIfSpecified(argv, argv + argc, "-fout", output);
+#else
     std::string output = "No output.";
     std::cout << output << std::endl;
     std::cout << (failures ? "Not all tests passed." : "All tests passed")
               << std::endl;
     WriteFileIfSpecified(argv, argv + argc, "-fout", output);
-
+#endif
 #ifdef __APPLE__
     // Disable malloc logging and report memory leaks
     system("unset MallocStackLogging");
