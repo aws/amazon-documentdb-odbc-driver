@@ -103,9 +103,15 @@ set(CPP_HEADER_FILES	communication.h
 # Generate dll (SHARED)
 if(WIN32)
 set(RESOURCE_FILES ts_odbc.rc)
-add_library(odfesqlodbc SHARED ${C_SOURCE_FILES} ${C_HEADER_FILES} ${CPP_SOURCE_FILES} ${CPP_HEADER_FILES} ${RESOURCE_FILES} ${AWSSDK_LIB_DIR})
+	add_library(odfesqlodbc SHARED ${C_SOURCE_FILES} ${C_HEADER_FILES} ${CPP_SOURCE_FILES} ${CPP_HEADER_FILES} ${RESOURCE_FILES} ${AWSSDK_LIB_DIR})
 else()
-add_library(odfesqlodbc SHARED ${C_SOURCE_FILES} ${C_HEADER_FILES} ${CPP_SOURCE_FILES} ${CPP_HEADER_FILES})
+	add_library(odfesqlodbc SHARED ${C_SOURCE_FILES} ${C_HEADER_FILES} ${CPP_SOURCE_FILES} ${CPP_HEADER_FILES})
+endif()
+
+if(UNIX)
+	if(BITNESS EQUAL 32))
+		set_target_properties(odfesqlodbc PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
+	endif()
 endif()
 
 include_directories(
