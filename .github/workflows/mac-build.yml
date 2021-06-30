@@ -78,11 +78,11 @@ jobs:
       if: always()
       run: |
         cat ./leaks_*
-    - name: upload-integration-test-results
-      if: always()
+    - name: upload-test-logs
+      if: failure()
       uses: actions/upload-artifact@v2
       with:
-        name: integration-test-results-mac64
+        name: test-logs-mac64
         path: |
           ${{ github.workspace }}/odbc-logs/
           ${{ github.workspace }}/leaks_

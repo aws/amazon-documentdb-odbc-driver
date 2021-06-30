@@ -36,6 +36,8 @@ const char BASE64_ENCODING_TABLE_URL[] =
 // Base64URL instace to encode or decode
 const Aws::Utils::Base64::Base64 BASE64_URL =
     Aws::Utils::Base64::Base64(BASE64_ENCODING_TABLE_URL);
+
+const std::string COLON = "%3A";
 }  // namespace
 
 AADCredentialsProvider::AADCredentialsProvider(const authentication_options& auth)
@@ -55,12 +57,17 @@ std::string AADCredentialsProvider::GetAADAccessToken() const {
                         "application/x-www-form-urlencoded");
 
     auto aws_ss = Aws::MakeShared< Aws::StringStream >("");
-    *aws_ss << "grant_type=password&requested_token_type=urn:ietf:params:oauth:"
-               "token-type:saml2&username="
-            << m_auth.uid << "&password=" << m_auth.pwd
-            << "&client_secret=" << m_auth.aad_client_secret
-            << "&client_id=" << m_auth.aad_application_id
-            << "&resource=" << m_auth.aad_application_id;
+    *aws_ss << "grant_type=password&requested_token_type=urn" << COLON << "ietf"
+            << COLON << "params" << COLON << "oauth" << COLON << "token-type"
+            << COLON
+            << "saml2&username=" << Aws::Http::URI::URLEncodePath(m_auth.uid)
+            << "&password=" << Aws::Http::URI::URLEncodePath(m_auth.pwd)
+            << "&client_secret="
+            << Aws::Http::URI::URLEncodePath(m_auth.aad_client_secret)
+            << "&client_id="
+            << Aws::Http::URI::URLEncodePath(m_auth.aad_application_id)
+            << "&resource="
+            << Aws::Http::URI::URLEncodePath(m_auth.aad_application_id);
 
     req->AddContentBody(aws_ss);
     req->SetContentLength(std::to_string(aws_ss.get()->str().size()));
