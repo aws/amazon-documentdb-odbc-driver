@@ -142,6 +142,7 @@ const char *GetExeProgramName() {
         char path_name[256];
 
         for (i = 0; i < sizeof(flist) / sizeof(flist[0]); i++) {
+            printf("flist[%d]\n" (int)i);
             if (readlink(flist[i], path_name, sizeof(path_name)) > 0) {
                 /* fprintf(stderr, "i=%d pathname=%s\n", i, path_name); */
                 STRCPY_FIXED(exename, po_basename(path_name));
