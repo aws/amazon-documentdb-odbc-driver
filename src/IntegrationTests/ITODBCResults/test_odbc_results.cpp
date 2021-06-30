@@ -317,7 +317,6 @@ TEST_F(TestSQLBindCol, InvalidColIndex2) {
                               SQLSTATE_INVALID_DESCRIPTOR_INDEX));
 }
 
-#ifndef __linux__
 TEST_F(TestSQLBindCol, InvalidBufferLength) {
     std::vector< std::vector< Col > > cols(single_col_cnt);
     BindColSetup(single_row_cnt, 1, single_col, cols, &m_hstmt);
@@ -356,7 +355,6 @@ TEST_F(TestSQLBindCol, InsufficientSpace) {
     EXPECT_EQ(tchar_to_string(msg_buffer.data()), tchar_to_string((SQLTCHAR*)CREATE_STRING("Fetched item was truncated.")));
     EXPECT_EQ(tchar_to_string(data_buffer.data()), tchar_to_string((SQLTCHAR*)colret.c_str()));
 }
-#endif
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_BIT) {
     int v1 = 0;
