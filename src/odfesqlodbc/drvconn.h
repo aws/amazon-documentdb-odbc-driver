@@ -17,6 +17,11 @@
 #ifndef _DRVCONN_H_
 #define _DRVCONN_H_
 
+// Required for strccasestr.
+#if defined(__linux__) && !defined(_GNU_SOURCE) 
+#define _GNU_SOURCE
+#endif // __linux__
+
 #include <stdio.h>
 #include <stdlib.h>
 
