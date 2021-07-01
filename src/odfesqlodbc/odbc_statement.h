@@ -17,8 +17,8 @@
 #ifndef _ODBC_STATEMENT_H_
 #define _ODBC_STATEMENT_H_
 
+#include "odbc.h"
 #include "parse_result.h"
-#include "qresult.h"
 #include "statement.h"
 
 #ifdef __cplusplus

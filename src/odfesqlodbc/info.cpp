@@ -31,6 +31,8 @@
 #include <climits>
 #endif // __linux__
 
+#include "qresult.h"
+
 #define DEFAULT_TYPE_STR \
     { 'k', 'e', 'y', 'w', 'o', 'r', 'd', '\0' }
 #define DEFAULT_TYPE_INT (SQL_WVARCHAR)
