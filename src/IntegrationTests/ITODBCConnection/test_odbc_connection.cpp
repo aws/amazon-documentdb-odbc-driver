@@ -214,18 +214,6 @@ TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross2) {
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
-TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross3) {
-    test_string wstr;
-    wstr += CREATE_STRING("Driver=timestreamodbc;");
-    wstr += (CREATE_STRING("AccessKeyId=") + user + CREATE_STRING(";"));
-    wstr += (CREATE_STRING("PWD=") + pass + CREATE_STRING(";"));
-    SQLRETURN ret =
-        SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
-                         m_out_conn_string, IT_SIZEOF(m_out_conn_string),
-                         &m_out_conn_string_length, SQL_DRIVER_COMPLETE);
-    EXPECT_EQ(SQL_SUCCESS, ret);
-}
-
 // TODO: enable after aligning the connection string
 //TEST_F(TestSQLDriverConnect, SqlDriverPrompt) {
 //    SQLRETURN ret =
