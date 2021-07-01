@@ -32,7 +32,6 @@
 #include "environ.h"
 #include "misc.h"
 #include "multibyte.h"
-#include "qresult.h"
 #include "statement.h"
 #include "tuple.h"
 #include "types.h"
