@@ -23,7 +23,6 @@
  *
  */
 #include "odbc.h"
-#include "qresult.h"
 
 /* Elastic client encoding */
 enum {
