@@ -22,7 +22,6 @@
 #include "catfunc.h"
 #include "connection.h"
 #include "odbc.h"
-#include "qresult.h"
 #include "statement.h"
 #include "types.h"
 
