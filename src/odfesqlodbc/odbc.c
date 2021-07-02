@@ -42,7 +42,9 @@ void unused_vargs(int cnt, ...) {
     (void)(cnt);
 #ifdef __APPLE__
 #pragma clang diagnostic pop
-#endif  // __APPLE__
+#elif defined(__linux__)
+#pragma GCC diagnostic pop
+#endif  // __APPLE__ / __linux__
 }
 
 static int exeesm = 0;
