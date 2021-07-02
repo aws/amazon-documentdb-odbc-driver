@@ -61,16 +61,11 @@ RETCODE SQL_API API_BindCol(HSTMT hstmt, SQLUSMALLINT icol,
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wkeyword-macro"
-#elif defined(__linux__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wkeyword-macro"
-#endif  // __APPLE__ / __linux__
+#endif  // __APPLE__
 #define return DONT_CALL_RETURN_FROM_HERE ? ? ?
 #ifdef __APPLE__
 #pragma clang diagnostic pop
-#elif defined(__linux__)
-#pragma GCC diagnostic pop
-#endif  // __APPLE__ / __linux__
+#endif  // __APPLE__
     SC_clear_error(stmt);
     /* If the bookmark column is being bound, then just save it */
     if (icol == 0) {
