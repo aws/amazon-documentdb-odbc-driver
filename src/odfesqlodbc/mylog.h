@@ -70,12 +70,12 @@ const char *po_basename(const char *path);
 #if defined(__GNUC__) && !defined(__APPLE__)
 #define MYLOG(level, fmt, ...)                                                      \
 #ifdef __linux__                                                                    \
-#pragma GCC diagnostic push                                                         \
-#pragma GCC diagnostic ignored "-Wcomment"                                          \
+_Pragma("GCC diagnostic push")                                                      \
+_Pragma("GCC diagnostic ignored \"-Wformat=\"")                                     \
 #endif                                                                              \
     (level < get_mylog() ? mylog(PREPEND_FMT fmt PREPEND_ITEMS, ##__VA_ARGS__) : 0) \
 #ifdef __linux__                                                                    \
-#pragma GCC diagnostic pop                                                          \
+_Pragma("GCC diagnostic pop")                                                       \
 #endif
 
 #define MYPRINTF(level, fmt, ...) \
