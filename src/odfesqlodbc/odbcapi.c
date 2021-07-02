@@ -1319,7 +1319,7 @@ RETCODE SQL_API SQLGetConnectOption(HDBC ConnectionHandle, SQLUSMALLINT Option,
                                     PTR Value) {
     RETCODE ret;
 
-    MYLOG(LOG_TRACE, "entering " FORMAT_UINTEGER "\n", Option);
+    MYLOG(LOG_TRACE, "entering " FORMAT_USMALLI "\n", Option);
     ENTER_CONN_CS((ConnectionClass *)ConnectionHandle);
     CC_clear_error((ConnectionClass *)ConnectionHandle);
     ret = ESAPI_GetConnectOption(ConnectionHandle, Option, Value, NULL, 0);
@@ -1333,7 +1333,7 @@ RETCODE SQL_API SQLSetConnectOption(HDBC ConnectionHandle, SQLUSMALLINT Option,
     RETCODE ret;
     ConnectionClass *conn = (ConnectionClass *)ConnectionHandle;
 
-    MYLOG(LOG_TRACE, "entering " FORMAT_INTEGER "\n", Option);
+    MYLOG(LOG_TRACE, "entering " FORMAT_USMALLI "\n", Option);
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
     ret = ESAPI_SetConnectOption(ConnectionHandle, Option, Value);

@@ -339,7 +339,7 @@ class TestSQLSetDescField : public testing::Test {
         value_ptr_assignment;                                                  \
         EXPECT_EQ(expected_val,                                                \
                   SQLSetDescField(hdesc, m_rec_number, m_field_identifier,     \
-                                  (SQLPOINTER)m_value_ptr, m_buffer_length));  \
+                                  (SQLPOINTER)&m_value_ptr, m_buffer_length));  \
         if (check_state)                                                       \
             EXPECT_TRUE(                                                       \
                 CheckSQLSTATE(SQL_HANDLE_DESC, hdesc,                          \
