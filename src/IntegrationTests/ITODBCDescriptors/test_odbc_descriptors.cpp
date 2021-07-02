@@ -357,7 +357,7 @@ class TestSQLSetDescField : public testing::Test {
 #elif defined(__linux__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
-#endif // WIN32 / __APPLE__/__linux__
+#endif // WIN32 / __APPLE__ / __linux__
 
 // Descriptor Header Fields Tests
 TEST_SQL_SET_DESC_FIELD(Test_SQL_DESC_ALLOC_TYPE, SQL_DESC_ALLOC_TYPE,

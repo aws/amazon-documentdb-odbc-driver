@@ -1,8 +1,7 @@
 # Build AWS SDK
 # $BITNESS=32
 
-BASEDIR="$(pwd)"
-TOOLCHAIN="${BASEDIR}/src/linux_32bit_toolchain.cmake"
+TOOLCHAIN="$(pwd)/src/linux_32bit_toolchain.cmake"
 cd src
 git clone --recurse-submodules -b "1.8.186" "https://github.com/aws/aws-sdk-cpp.git"
 cd aws-sdk-cpp
