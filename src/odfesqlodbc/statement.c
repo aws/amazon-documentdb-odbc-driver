@@ -1123,12 +1123,11 @@ SC_fetch(StatementClass *self) {
     gdata = SC_get_GDTI(self);
     if (gdata->allocated != opts->allocated)
         extend_getdata_info(gdata, opts->allocated, TRUE);
-    for (lf = 0; lf < num_cols; lf++) {
-        MYLOG(LOG_DEBUG,
-              "fetch: cols=%d, lf=%d, opts = %p, opts->bindings = %p, buffer[] "
-              "= %p\n",
-              num_cols, lf, opts, opts->bindings, opts->bindings[lf].buffer);
 
+    MYLOG(LOG_ALL,
+            "fetch: cols=%d, opts = %p, opts->bindings = %p\n",
+            num_cols, opts, opts->bindings);
+    for (lf = 0; lf < num_cols; lf++) {
         /* reset for SQLGetData */
         GETDATA_RESET(gdata->gdata[lf]);
 

@@ -35,6 +35,9 @@ void unused_vargs(int cnt, ...) {
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-value"
+#elif defined(__linux__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-value"
 #endif  // __APPLE__
     (void)(cnt);
 #ifdef __APPLE__

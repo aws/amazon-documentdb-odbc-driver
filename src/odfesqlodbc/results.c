@@ -85,11 +85,16 @@ RETCODE SQL_API ESAPI_NumResultCols(HSTMT hstmt, SQLSMALLINT *pccol) {
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wkeyword-macro"
-#endif  // __APPLE__
+#elif defined(__linux__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wkeyword-macro"
+#endif  // __APPLE__ / __linux
 #define return DONT_CALL_RETURN_FROM_HERE ? ? ?
 #ifdef __APPLE__
 #pragma clang diagnostic pop
-#endif  // __APPLE__
+#elif defined(__linux__)
+#pragma GCC diagnostic pop
+#endif  // __APPLE__ / __linux__
     if (stmt->proc_return > 0) {
         *pccol = 0;
         goto cleanup;
@@ -149,11 +154,16 @@ RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wkeyword-macro"
-#endif  // __APPLE__
+#elif defined(__linux__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wkeyword-macro"
+#endif  // __APPLE__ / __linux
 #define return DONT_CALL_RETURN_FROM_HERE ? ? ?
 #ifdef __APPLE__
 #pragma clang diagnostic pop
-#endif  // __APPLE__
+#elif defined(__linux__)
+#pragma GCC diagnostic pop
+#endif  // __APPLE__ / __linux__
     irdflds = SC_get_IRDF(stmt);
     if (0 == icol) /* bookmark column */
     {
@@ -871,11 +881,16 @@ RETCODE SQL_API ESAPI_GetData(HSTMT hstmt, SQLUSMALLINT icol,
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wkeyword-macro"
-#endif  // __APPLE__
+#elif defined(__linux__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wkeyword-macro"
+#endif  // __APPLE__ / __linux
 #define return DONT_CALL_RETURN_FROM_HERE ? ? ?
 #ifdef __APPLE__
 #pragma clang diagnostic pop
-#endif  // __APPLE__
+#elif defined(__linux__)
+#pragma GCC diagnostic pop
+#endif  // __APPLE__ / __linux__
     if (!SC_is_fetchcursor(stmt)) {
         /* make sure we're positioned on a valid row */
         num_rows = QR_get_num_total_tuples(res);
@@ -1083,11 +1098,16 @@ RETCODE SQL_API ESAPI_Fetch(HSTMT hstmt) {
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wkeyword-macro"
-#endif  // __APPLE__
+#elif defined(__linux__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wkeyword-macro"
+#endif  // __APPLE__ / __linux
 #define return DONT_CALL_RETURN_FROM_HERE ? ? ?
 #ifdef __APPLE__
 #pragma clang diagnostic pop
-#endif  // __APPLE__
+#elif defined(__linux__)
+#pragma GCC diagnostic pop
+#endif  // __APPLE__ / __linux__
     if (stmt->rowset_start < 0)
         SC_set_rowset_start(stmt, 0, TRUE);
     QR_set_reqsize(res, 1);
@@ -1416,11 +1436,16 @@ RETCODE SQL_API API_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wkeyword-macro"
-#endif  // __APPLE__
+#elif defined(__linux__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wkeyword-macro"
+#endif  // __APPLE__ / __linux
 #define return DONT_CALL_RETURN_FROM_HERE ? ? ?
 #ifdef __APPLE__
 #pragma clang diagnostic pop
-#endif  // __APPLE__
+#elif defined(__linux__)
+#pragma GCC diagnostic pop
+#endif  // __APPLE__ / __linux__
     /* set the rowset_start if needed */
     if (should_set_rowset_start)
         SC_set_rowset_start(stmt, rowset_start, TRUE);

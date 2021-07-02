@@ -829,11 +829,16 @@ HRESULT STDMETHODCALLTYPE IAsyncES::AbortRequest(BOID *pboidReason,
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wkeyword-macro"
-#endif  // __APPLE__
+#elif defined(__linux__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wkeyword-macro"
+#endif  // __APPLE__ / __linux__
 #define return DONT_CALL_RETURN_FROM_HERE ? ? ?
 #ifdef __APPLE__
 #pragma clang diagnostic pop
-#endif  // __APPLE__
+#elif defined(__linux__)
+#pragma GCC diagnostic pop
+#endif  // __APPLE__ / __linux__
     AddRef();
     ELOCK_ACQUIRE();
     if (!prepared && dtcconn) {
