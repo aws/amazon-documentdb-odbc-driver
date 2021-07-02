@@ -45,8 +45,6 @@ test_string wrong = CREATE_STRING("wrong");
 test_string empty = CREATE_STRING("");
 test_string dsn_conn_string = CREATE_STRING("DSN=timestream-aws-profile");
 
-
-// SQLDriverConnect constants
 class TestSQLConnect : public testing::Test {
    public:
     void SetUp() {
@@ -64,7 +62,6 @@ class TestSQLConnect : public testing::Test {
     SQLHENV m_env;
     SQLHDBC m_conn;
 };
-
 
 TEST_F(TestSQLConnect, AWS_Profile_Default_credential_chain) {
     SQLRETURN ret = SQLConnect(
