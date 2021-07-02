@@ -32,21 +32,20 @@ const test_string table_name = CREATE_STRING("ODBCTest.IoT");
 const test_string single_col = CREATE_STRING("time");
 const test_string single_row = CREATE_STRING("1");
 const size_t single_row_cnt = 1;
+const size_t multi_row_cnt = 2;
 const size_t multi_col_cnt = 5;
 const size_t single_col_cnt = 1;
 const test_string multi_col = CREATE_STRING("null, 1, VARCHAR '2', DOUBLE '3.3', true");
-typedef struct Col {
-    SQLLEN data_len;
-    SQLCHAR data_dat[255];
-} Col;
+const size_t buffer_size = 255;
 
-inline void BindColumns(std::vector< std::vector< Col > >& cols,
+inline void BindColumns(std::vector< std::vector< char > >& cols,
+                        std::vector< std::vector< SQLLEN > >& lens,
                         SQLHSTMT* hstmt) {
     SQLRETURN ret;
     for (size_t i = 0; i < cols.size(); i++) {
         ret = SQLBindCol(*hstmt, (SQLUSMALLINT)i + 1, SQL_C_CHAR,
-                         (SQLPOINTER)cols[i][0].data_dat, 255,
-                         &(cols[i][0].data_len));
+                         &cols[i][0], buffer_size,
+                         &lens[i][0]);
         LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
         ASSERT_TRUE(SQL_SUCCEEDED(ret));
     }
@@ -64,7 +63,8 @@ void ExecuteQuery(const test_string& column,
 
 void BindColSetup(const size_t row_cnt, const size_t row_fetch_cnt,
                   const test_string& column_name,
-                  std::vector< std::vector< Col > >& cols, SQLHSTMT* hstmt) {
+                  std::vector< std::vector< char > >& cols, 
+                  std::vector< std::vector< SQLLEN > >& lens, SQLHSTMT* hstmt) {
     SQLRETURN ret =
         SQLSetStmtAttr(*hstmt, SQL_ROWSET_SIZE, (void*)row_fetch_cnt, 0);
     LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
@@ -74,16 +74,18 @@ void BindColSetup(const size_t row_cnt, const size_t row_fetch_cnt,
     ExecuteQuery(column_name, table_name, row_str, hstmt);
 
     for (size_t i = 0; i < cols.size(); i++) {
-        cols[i].resize(row_fetch_cnt);
+        cols[i].resize(row_fetch_cnt * buffer_size);
+        lens[i].resize(row_fetch_cnt);
     }
 }
 
 inline void QueryBind(const size_t row_cnt, const size_t row_fetch_cnt,
                       const test_string& column_name,
-                      std::vector< std::vector< Col > >& cols,
+                      std::vector< std::vector< char > >& cols,
+                      std::vector< std::vector< SQLLEN > >& lens,
                       SQLHSTMT* hstmt) {
-    BindColSetup(row_cnt, row_fetch_cnt, column_name, cols, hstmt);
-    BindColumns(cols, hstmt);
+    BindColSetup(row_cnt, row_fetch_cnt, column_name, cols, lens, hstmt);
+    BindColumns(cols, lens, hstmt);
 }
 
 void QueryFetch(const test_string& column, const test_string& dataset,
@@ -275,55 +277,66 @@ class TestSQLBindCol : public Fixture {};
 // AT-864 Fix the segfaults that happen in GitHub actions when these 4 tests run.
 #ifndef __linux__
 TEST_F(TestSQLBindCol, SingleColumnSingleBind) {
-    std::vector< std::vector< Col > > cols(single_col_cnt);
-    QueryBind(single_row_cnt, 1, single_col, cols, &m_hstmt);
+    std::vector< std::vector< char > > cols(single_col_cnt);
+    std::vector< std::vector< SQLLEN > > lens(single_col_cnt);
+    QueryBind(single_row_cnt, 1, single_col, cols, lens, &m_hstmt);
 }
 
 TEST_F(TestSQLBindCol, MultiColumnsMultiBind) {
-    std::vector< std::vector< Col > > cols(multi_col_cnt);
-    QueryBind(single_row_cnt, 1, multi_col, cols, &m_hstmt);
+    std::vector< std::vector< char > > cols(multi_col_cnt);
+    std::vector< std::vector< SQLLEN > > lens(multi_col_cnt);
+    QueryBind(single_row_cnt, 1, multi_col, cols, lens, &m_hstmt);
+}
+
+TEST_F(TestSQLBindCol, MultiColumnsMultiRows) {
+    std::vector< std::vector< char > > cols(multi_col_cnt);
+    std::vector< std::vector< SQLLEN > > lens(multi_col_cnt);
+    QueryBind(multi_row_cnt, multi_row_cnt, multi_col, cols, lens, &m_hstmt);
 }
 
 // Looked at SQLBindCol - if < requested column are allocated, it will
 // reallocate additional space for that column
 TEST_F(TestSQLBindCol, InvalidColIndex0) {
-    std::vector< std::vector< Col > > cols(single_col_cnt);
-    BindColSetup(single_row_cnt, 1, single_col, cols, &m_hstmt);
+    std::vector< std::vector< char > > cols(single_col_cnt);
+    std::vector< std::vector< SQLLEN > > lens(single_col_cnt);
+    BindColSetup(single_row_cnt, 1, single_col, cols, lens, &m_hstmt);
     SQLRETURN ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)1, SQL_C_CHAR,
-                     (SQLPOINTER)(cols[0][0].data_dat), 255,
-                     &(cols[0][0].data_len));
+                     &cols[0][0], buffer_size,
+                     &lens[0][0]);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
     ASSERT_TRUE(SQL_SUCCEEDED(ret));
     ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)0, SQL_C_CHAR,
-                     (SQLPOINTER)(cols[0][0].data_dat), 255,
-                     &(cols[0][0].data_len));
+                     &cols[0][0], buffer_size,
+                     &lens[0][0]);
     EXPECT_EQ(SQL_ERROR, ret);
     EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
                               SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
 }
 
 TEST_F(TestSQLBindCol, InvalidColIndex2) {
-    std::vector< std::vector< Col > > cols(2);
-    BindColSetup(single_row_cnt, 1, single_col, cols, &m_hstmt);
+    std::vector< std::vector< char > > cols(2);
+    std::vector< std::vector< SQLLEN > > lens(2);
+    BindColSetup(single_row_cnt, 1, single_col, cols, lens, &m_hstmt);
     SQLRETURN ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)1, SQL_C_CHAR,
-                     (SQLPOINTER)(cols[0][0].data_dat), 255,
-                     &(cols[0][0].data_len));
+                     &cols[0][0], buffer_size,
+                     &lens[0][0]);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
     ASSERT_TRUE(SQL_SUCCEEDED(ret));
     ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)2, SQL_C_CHAR,
-                     (SQLPOINTER)(cols[1][0].data_dat), 255,
-                     &(cols[1][0].data_len));
+                     &cols[1][0], buffer_size,
+                     &lens[1][0]);
     EXPECT_EQ(SQL_ERROR, ret);
     EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
                               SQLSTATE_INVALID_DESCRIPTOR_INDEX));
 }
 
 TEST_F(TestSQLBindCol, InvalidBufferLength) {
-    std::vector< std::vector< Col > > cols(single_col_cnt);
-    BindColSetup(single_row_cnt, 1, single_col, cols, &m_hstmt);
+    std::vector< std::vector< char > > cols(single_col_cnt);
+    std::vector< std::vector< SQLLEN > > lens(single_col_cnt);
+    BindColSetup(single_row_cnt, 1, single_col, cols, lens, &m_hstmt);
     SQLRETURN ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)1, SQL_C_CHAR,
-                     (SQLPOINTER)(cols[0][0].data_dat), -1,
-                     &(cols[0][0].data_len));
+                     &cols[0][0], -1,
+                     &lens[0][0]);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
     EXPECT_EQ(SQL_ERROR, ret);
     EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
