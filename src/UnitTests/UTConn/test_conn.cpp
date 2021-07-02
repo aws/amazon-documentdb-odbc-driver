@@ -200,7 +200,6 @@ TEST(TestGetUserAgent, Success) {
 //}
 
 int main(int argc, char** argv) {
-    printf("argv[0]: %s\n", argv[0]);
 #ifdef WIN32
     // Enable CRT for detecting memory leaks
     _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG | _CRTDBG_MODE_FILE);
