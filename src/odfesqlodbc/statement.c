@@ -1123,7 +1123,6 @@ SC_fetch(StatementClass *self) {
     gdata = SC_get_GDTI(self);
     if (gdata->allocated != opts->allocated)
         extend_getdata_info(gdata, opts->allocated, TRUE);
-
     MYLOG(LOG_ALL,
             "fetch: cols=%d, opts = %p, opts->bindings = %p\n",
             num_cols, opts, opts->bindings);

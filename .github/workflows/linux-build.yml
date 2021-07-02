@@ -22,9 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: check-path
-      run: |
-        echo $PATH
     - name: run-cppcheck
       run: |
         sudo apt install cppcheck
@@ -70,57 +67,41 @@ jobs:
       if: always()
       run: |
         ./build/odbc/bin/itodbc_connection
-    - name: run-integration-connection-tests-valgrind
+    - name: run-integration-execution-tests
       if: always()
       run: |
-        valgrind --leak-check=full \
-          --show-leak-kinds=all \
-          --track-origins=yes \
-          --verbose \
-          ./build/odbc/bin/itodbc_connection
-    # - name: run-integration-execution-tests
-    #   if: always()
-    #   run: |
-    #     ./build/odbc/bin/itodbc_execution
+        ./build/odbc/bin/itodbc_execution
     - name: run-integration-results-tests
       if: always()
       run: |
         ./build/odbc/bin/itodbc_results
-    - name: run-integration-results-tests-valgrind
+    - name: run-integration-descriptors-tests
       if: always()
       run: |
-        valgrind --leak-check=full \
-          --show-leak-kinds=all \
-          --track-origins=yes \
-          --verbose \
-          ./build/odbc/bin/itodbc_results
-    # - name: run-integration-descriptors-tests
-    #   if: always()
-    #   run: |
-    #     ./build/odbc/bin/itodbc_descriptors
-    # - name: run-integration-catalog-tests
-    #   if: always()
-    #   run: |
-    #     ./build/odbc/bin/itodbc_catalog
-    # - name: run-integration-info-tests
-    #   if: always()
-    #   run: |
-    #     ./build/odbc/bin/itodbc_info
-    # - name: run-integration-pagination-tests
-    #   if: always()
-    #   run: |
-    #     ./build/odbc/bin/itodbc_pagination
-    # - name: prepare-test-results
-    #   if: always()
-    #   run: |
-    #     cp /tmp/timestreamodbc_*.log ${{ github.workspace }}/odbc-logs/
-    # - name: upload-integration-test-results
-    #   if: always()
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: integration-test-results-linux64
-    #     path: |
-    #       ${{ github.workspace }}/odbc-logs/
+        ./build/odbc/bin/itodbc_descriptors
+    - name: run-integration-catalog-tests
+      if: always()
+      run: |
+        ./build/odbc/bin/itodbc_catalog
+    - name: run-integration-info-tests
+      if: always()
+      run: |
+        ./build/odbc/bin/itodbc_info
+    - name: run-integration-pagination-tests
+      if: always()
+      run: |
+        ./build/odbc/bin/itodbc_pagination
+    - name: prepare-test-results
+      if: always()
+      run: |
+        cp /tmp/timestreamodbc_*.log ${{ github.workspace }}/odbc-logs/
+    - name: upload-integration-test-results
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: integration-test-results-linux64
+        path: |
+          ${{ github.workspace }}/odbc-logs/
     - name: build-installer-rpm
       if: always()
       run: |
@@ -167,7 +148,6 @@ jobs:
       with:
         name: linux64-installer-deb
         path: installer-deb
-  # TODO AT-864: Fix linker build issue for 32-bit build.
   build-linux32:
     runs-on: ubuntu-latest
     steps:
@@ -188,11 +168,6 @@ jobs:
         sudo dpkg --add-architecture i386
         sudo apt update 
         sudo apt install unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386 zlib1g-dev:i386 linux-headers-$(uname -r) gcc-multilib:i386 g++-multilib:i386 cmake g++-9:i386 gcc-9:i386 gcc-9-multilib:i386 g++-9-multilib:i386 binutils:i386 make:i386
-    - name: check-path
-      run: |
-        echo $PATH
-        ls /usr/lib/x86_64-linux-gnu | grep libssl
-        ls /usr/lib/i386-linux-gnu | grep libssl
     - name: prepare-dsn
       run: |
         # TODO: This is broken, needs to be
