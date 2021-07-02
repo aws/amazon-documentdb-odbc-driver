@@ -72,7 +72,7 @@ const char *po_basename(const char *path);
     do {                                                                                \
         _Pragma("GCC diagnostic push");                                                 \
         _Pragma("GCC diagnostic ignored \"-Wformat=\"");                                \
-        (level < get_mylog() ? mylog(PREPEND_FMT fmt PREPEND_ITEMS, ##__VA_ARGS__) : 0) \
+        (level < get_mylog() ? mylog(PREPEND_FMT fmt PREPEND_ITEMS, ##__VA_ARGS__) : 0);\
         _Pragma("GCC diagnostic pop");                                                  \
     } while (0)
 
@@ -80,7 +80,7 @@ const char *po_basename(const char *path);
     do {                                                                                    \
         _Pragma("GCC diagnostic push");                                                     \
         _Pragma("GCC diagnostic ignored \"-Wformat=\"");                                    \
-        (level < get_mylog() ? myprintf((fmt), ##__VA_ARGS__) : 0)                          \
+        (level < get_mylog() ? myprintf((fmt), ##__VA_ARGS__) : 0);                         \
         _Pragma("GCC diagnostic pop");                                                      \
     } while (0)
 //#define QLOG(level, fmt, ...)                               \
