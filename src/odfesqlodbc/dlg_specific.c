@@ -36,10 +36,7 @@ static esNAME remove_braces(const char *in);
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wembedded-directive"
-#elif defined(__linux__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wembedded-directive"
-#endif  // __APPLE__ / __linux__
+#endif  // __APPLE__
 void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
     UNUSED(len);
     char got_dsn = (ci->dsn[0] != '\0');
@@ -201,9 +198,7 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
 }
 #ifdef __APPLE__
 #pragma clang diagnostic pop
-#elif defined(__linux__)
-#pragma GCC diagnostic pop
-#endif  // __APPLE__ / __linux__
+#endif  // __APPLE__
 
 BOOL get_DSN_or_Driver(ConnInfo *ci, const char *attribute, const char *value) {
     BOOL found = TRUE;
@@ -321,10 +316,7 @@ static void getCiDefaults(ConnInfo *ci) {
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wembedded-directive"
-#elif defined(__linux__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wembedded-directive"
-#endif  // __APPLE__ / __linux__
+#endif  // __APPLE__
 int getDriverNameFromDSN(const char *dsn, char *driver_name, int namelen) {
 #ifdef WIN32
     return SQLGetPrivateProfileString(ODBC_DATASOURCES, dsn, NULL_STRING,
@@ -345,9 +337,7 @@ int getDriverNameFromDSN(const char *dsn, char *driver_name, int namelen) {
 #endif /* WIN32 */
 #ifdef __APPLE__
 #pragma clang diagnostic pop
-#elif defined(__linux__)
-#pragma GCC diagnostic pop
-#endif  // __APPLE__ / __linux__
+#endif  // __APPLE__
 }
 
 void getDriversDefaults(const char *drivername, GLOBAL_VALUES *comval) {
