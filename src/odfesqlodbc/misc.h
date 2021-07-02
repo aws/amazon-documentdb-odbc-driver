@@ -56,16 +56,6 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src, ssize_t src_len);
  *	With GCC, the macro CHECK_NOT_CHAR_P() causes a compilation error
  *		when the target is pointer not a fixed array.
  */
-#ifdef __linux__
-#define REMOVE_PEDANTIC_PUSH                                             \
-    _Pragma("GCC diagnostic push")                                       \
-    _Pragma("GCC diagnostic ignored \"-Wpedantic\"")
-#define REMOVE_PEDANTIC_POP                                              \
-    _Pragma("GCC diagnostic pop")
-#else
-#define REMOVE_PEDANTIC_PUSH
-#define REMOVE_PEDANTIC_POP
-#endif
 
 #if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
 #define FUNCTION_BEGIN_MACRO ({
@@ -75,20 +65,21 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src, ssize_t src_len);
 #define CHECK_NOT_CHAR_P(t)                                              \
     _Pragma("GCC diagnostic push")                                       \
     _Pragma("GCC diagnostic ignored \"-Wunused-variable\"")              \
-    REMOVE_PEDANTIC_PUSH
+    _Pragma("GCC diagnostic ignored \"-Wpedantic\"")                     \
     if (0) {                                                             \
         typeof(t) dummy_for_check = {};                                  \
     }                                                                    \
     _Pragma("GCC diagnostic pop")
-    REMOVE_PEDANTIC_POP
 #else
 #define FUNCTION_BEGIN_MACRO
 #define FUNCTION_END_MACRO
 #define CHECK_NOT_CHAR_P(t)
 #endif
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+
 /* macro to safely strcpy() to fixed arrays. */
-REMOVE_PEDANTIC_PUSH
 #define STRCPY_FIXED(to, from) \
     FUNCTION_BEGIN_MACRO       \
     CHECK_NOT_CHAR_P(to)       \
@@ -116,7 +107,8 @@ REMOVE_PEDANTIC_PUSH
     FUNCTION_BEGIN_MACRO     \
     CHECK_NOT_CHAR_P(to)     \
     snprintf((to), sizeof(to), "%d", from) FUNCTION_END_MACRO
-REMOVE_PEDANTIC_POP
+
+#pragma GCC diagnostic pop
 
 #ifdef __cplusplus
 }
