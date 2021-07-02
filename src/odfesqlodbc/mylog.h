@@ -45,6 +45,12 @@ extern "C" {
 #define __attribute__(x)
 #endif
 
+#ifdef __linux__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcomment"
+#endif  // __linux__
+
+
 DLL_DECLARE int mylog(const char *fmt, ...)
     __attribute__((format(TS_PRINTF_ATTRIBUTE, 1, 2)));
 DLL_DECLARE int myprintf(const char *fmt, ...)
@@ -62,9 +68,16 @@ const char *po_basename(const char *path);
 //#define QLOG_MARK "[QLOG]"
 
 #if defined(__GNUC__) && !defined(__APPLE__)
-#define MYLOG(level, fmt, ...)                                                 \
-    (level < get_mylog() ? mylog(PREPEND_FMT fmt PREPEND_ITEMS, ##__VA_ARGS__) \
-                         : 0)
+#define MYLOG(level, fmt, ...)                                                      \
+#ifdef __linux__                                                                    \
+#pragma GCC diagnostic push                                                         \
+#pragma GCC diagnostic ignored "-Wcomment"                                          \
+#endif                                                                              \
+    (level < get_mylog() ? mylog(PREPEND_FMT fmt PREPEND_ITEMS, ##__VA_ARGS__) : 0) \
+#ifdef __linux__                                                                    \
+#pragma GCC diagnostic pop                                                          \
+#endif
+
 #define MYPRINTF(level, fmt, ...) \
     (level < get_mylog() ? myprintf((fmt), ##__VA_ARGS__) : 0)
 //#define QLOG(level, fmt, ...)                               \
@@ -149,6 +162,10 @@ int setLogDir(const char *dir);
 
 void InitializeLogging(void);
 void FinalizeLogging(void);
+
+#ifdef __linux__
+#pragma GCC diagnostic pop
+#endif  // __linux__
 
 #ifdef __cplusplus
 }
