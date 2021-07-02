@@ -205,7 +205,6 @@ void TypeConversionAssertionTemplate(
             compare_func(expected[i].first, actual);
         }
         // Success with info and error code
-        // TODO: Fix this string compare.
         else if (tchar_to_string(expected_state) == tchar_to_string(SQLSTATE_FRACTIONAL_TRUNCATION)) {
             EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
             EXPECT_EQ((SQLLEN)sizeof(T), indicator);
@@ -3732,14 +3731,15 @@ int main(int argc, char** argv) {
     system("export MallocStackLogging=1");
 #endif
     ::testing::InitGoogleTest(&argc, argv);
-    
-    // TODO: Fix this.
+
     int failures = RUN_ALL_TESTS();
+
     std::string output = "No output.";
     std::cout << output << std::endl;
     std::cout << (failures ? "Not all tests passed." : "All tests passed")
               << std::endl;
     WriteFileIfSpecified(argv, argv + argc, "-fout", output);
+
 #ifdef __APPLE__
     // Disable malloc logging and report memory leaks
     system("unset MallocStackLogging");
