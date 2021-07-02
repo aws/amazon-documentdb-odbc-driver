@@ -428,7 +428,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
         fi = irdflds->fi[col_idx];
     if (FI_is_applicable(fi))
         field_type = getEffectiveOid(conn, fi);
-    else
+    else {
         fi = NULL;
 
         res = SC_get_Curres(stmt);
