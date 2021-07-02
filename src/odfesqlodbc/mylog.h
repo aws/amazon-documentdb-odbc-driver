@@ -69,17 +69,16 @@ const char *po_basename(const char *path);
 
 #if defined(__GNUC__) && !defined(__APPLE__)
 #define MYLOG(level, fmt, ...)                                                      \
-#ifdef __linux__                                                                    \
 _Pragma("GCC diagnostic push")                                                      \
 _Pragma("GCC diagnostic ignored \"-Wformat=\"")                                     \
-#endif                                                                              \
     (level < get_mylog() ? mylog(PREPEND_FMT fmt PREPEND_ITEMS, ##__VA_ARGS__) : 0) \
-#ifdef __linux__                                                                    \
-_Pragma("GCC diagnostic pop")                                                       \
-#endif
+_Pragma("GCC diagnostic pop")
 
-#define MYPRINTF(level, fmt, ...) \
-    (level < get_mylog() ? myprintf((fmt), ##__VA_ARGS__) : 0)
+#define MYPRINTF(level, fmt, ...)                                                   \
+_Pragma("GCC diagnostic push")                                                      \
+_Pragma("GCC diagnostic ignored \"-Wformat=\"")                                     \
+    (level < get_mylog() ? myprintf((fmt), ##__VA_ARGS__) : 0)                      \
+_Pragma("GCC diagnostic pop")
 //#define QLOG(level, fmt, ...)                               \
 //    ((level < get_qlog() ? qlog((fmt), ##__VA_ARGS__) : 0), \
 //     MYLOG(level, QLOG_MARK fmt, ##__VA_ARGS__))
