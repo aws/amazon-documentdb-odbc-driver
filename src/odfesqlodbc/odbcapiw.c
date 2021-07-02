@@ -41,7 +41,7 @@ RETCODE SQL_API SQLColumnsW(HSTMT StatementHandle, SQLWCHAR *CatalogName,
     ConnInfo *ci;
 
     MYLOG(LOG_TRACE, "entering\n");
-    if (SC_connection_lost_check(stmt, __FUNCTION__))
+    if (SC_connection_lost_check(stmt, __func__))
         return SQL_ERROR;
 
     conn = SC_get_conn(stmt);
@@ -235,12 +235,12 @@ RETCODE SQL_API SQLDescribeColW(HSTMT StatementHandle,
     char *clName = NULL, *clNamet = NULL;
 
     MYLOG(LOG_TRACE, "entering\n");
-    if (SC_connection_lost_check(stmt, __FUNCTION__))
+    if (SC_connection_lost_check(stmt, __func__))
         return SQL_ERROR;
 
     if (BufferLength < 0) {
         SC_set_error(stmt, STMT_INVALID_STRING_OR_BUFFER_LENGTH_ERROR,
-                     "Invalid string or buffer length", __FUNCTION__);
+                     "Invalid string or buffer length", __func__);
         return SQL_ERROR;
     }
 
@@ -291,7 +291,7 @@ RETCODE SQL_API SQLExecDirectW(HSTMT StatementHandle, SQLWCHAR *StatementText,
         return SQL_ERROR;
 
     StatementClass *stmt = (StatementClass *)StatementHandle;
-    if (SC_connection_lost_check(stmt, __FUNCTION__))
+    if (SC_connection_lost_check(stmt, __func__))
         return SQL_ERROR;
 
     // Get query string
@@ -392,7 +392,7 @@ RETCODE SQL_API SQLPrepareW(HSTMT StatementHandle, SQLWCHAR *StatementText,
     StatementClass *stmt = (StatementClass *)StatementHandle;
 
     MYLOG(LOG_TRACE, "entering\n");
-    if (SC_connection_lost_check(stmt, __FUNCTION__))
+    if (SC_connection_lost_check(stmt, __func__))
         return SQL_ERROR;
 
     SQLLEN slen;
@@ -452,7 +452,7 @@ RETCODE SQL_API SQLSpecialColumnsW(
     BOOL lower_id;
 
     MYLOG(LOG_TRACE, "entering\n");
-    if (SC_connection_lost_check(stmt, __FUNCTION__))
+    if (SC_connection_lost_check(stmt, __func__))
         return SQL_ERROR;
 
     conn = SC_get_conn(stmt);
@@ -493,7 +493,7 @@ RETCODE SQL_API SQLStatisticsW(HSTMT StatementHandle, SQLWCHAR *CatalogName,
     BOOL lower_id;
 
     MYLOG(LOG_TRACE, "entering\n");
-    if (SC_connection_lost_check(stmt, __FUNCTION__))
+    if (SC_connection_lost_check(stmt, __func__))
         return SQL_ERROR;
 
     conn = SC_get_conn(stmt);
@@ -535,7 +535,7 @@ RETCODE SQL_API SQLTablesW(HSTMT StatementHandle, SQLWCHAR *CatalogName,
     UWORD flag = 0;
 
     MYLOG(LOG_TRACE, "entering\n");
-    if (SC_connection_lost_check(stmt, __FUNCTION__))
+    if (SC_connection_lost_check(stmt, __func__))
         return SQL_ERROR;
 
     conn = SC_get_conn(stmt);
@@ -581,7 +581,7 @@ RETCODE SQL_API SQLColumnPrivilegesW(
     UWORD flag = 0;
 
     MYLOG(LOG_TRACE, "entering\n");
-    if (SC_connection_lost_check(stmt, __FUNCTION__))
+    if (SC_connection_lost_check(stmt, __func__))
         return SQL_ERROR;
 
     conn = SC_get_conn(stmt);
@@ -630,7 +630,7 @@ RETCODE SQL_API SQLForeignKeysW(
     BOOL lower_id;
 
     MYLOG(LOG_TRACE, "entering\n");
-    if (SC_connection_lost_check(stmt, __FUNCTION__))
+    if (SC_connection_lost_check(stmt, __func__))
         return SQL_ERROR;
 
     conn = SC_get_conn(stmt);
@@ -732,7 +732,7 @@ RETCODE SQL_API SQLPrimaryKeysW(HSTMT hstmt, SQLWCHAR *szCatalogName,
     BOOL lower_id;
 
     MYLOG(LOG_TRACE, "entering\n");
-    if (SC_connection_lost_check(stmt, __FUNCTION__))
+    if (SC_connection_lost_check(stmt, __func__))
         return SQL_ERROR;
 
     conn = SC_get_conn(stmt);
@@ -815,7 +815,7 @@ RETCODE SQL_API SQLProceduresW(HSTMT hstmt, SQLWCHAR *szCatalogName,
     UWORD flag = 0;
 
     MYLOG(LOG_TRACE, "entering\n");
-    if (SC_connection_lost_check(stmt, __FUNCTION__))
+    if (SC_connection_lost_check(stmt, __func__))
         return SQL_ERROR;
 
     conn = SC_get_conn(stmt);
@@ -859,7 +859,7 @@ RETCODE SQL_API SQLTablePrivilegesW(HSTMT hstmt, SQLWCHAR *szCatalogName,
     UWORD flag = 0;
 
     MYLOG(LOG_TRACE, "entering\n");
-    if (SC_connection_lost_check(stmt, __FUNCTION__))
+    if (SC_connection_lost_check(stmt, __func__))
         return SQL_ERROR;
 
     conn = SC_get_conn(stmt);
@@ -894,7 +894,7 @@ RETCODE SQL_API SQLGetTypeInfoW(SQLHSTMT StatementHandle,
     StatementClass *stmt = (StatementClass *)StatementHandle;
 
     MYLOG(LOG_TRACE, "entering\n");
-    if (SC_connection_lost_check(stmt, __FUNCTION__))
+    if (SC_connection_lost_check(stmt, __func__))
         return SQL_ERROR;
 
     ENTER_STMT_CS(stmt);
@@ -927,7 +927,7 @@ SQLRETURN SQL_API SQLColAttributesW(SQLHSTMT hstmt, SQLUSMALLINT iCol,
     char *rgbD = NULL, *rgbDt;
 
     MYLOG(LOG_TRACE, "entering\n");
-    if (SC_connection_lost_check(stmt, __FUNCTION__))
+    if (SC_connection_lost_check(stmt, __func__))
         return SQL_ERROR;
 
     ENTER_STMT_CS(stmt);
@@ -1006,7 +1006,7 @@ RETCODE SQL_API SQLSetConnectOptionW(HDBC ConnectionHandle, SQLUSMALLINT Option,
     ConnectionClass *conn = (ConnectionClass *)ConnectionHandle;
     RETCODE ret;
 
-    MYLOG(LOG_TRACE, "entering " FORMAT_INTEGER "\n", Option);
+    MYLOG(LOG_TRACE, "entering " FORMAT_USMALLI "\n", Option);
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
     ret = ESAPI_SetConnectOption(ConnectionHandle, Option, Value);

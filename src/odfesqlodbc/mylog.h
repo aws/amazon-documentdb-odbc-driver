@@ -59,7 +59,7 @@ DLL_DECLARE int myprintf(const char *fmt, ...)
 const char *po_basename(const char *path);
 
 #define PREPEND_FMT "%20.20s[%s]%d: "
-#define PREPEND_ITEMS , po_basename(__FILE__), __FUNCTION__, __LINE__
+#define PREPEND_ITEMS , po_basename(__FILE__), __func__, __LINE__
 
 #if defined(__GNUC__) && !defined(__APPLE__)
 #define MYLOG(level, fmt, ...)                                                          \

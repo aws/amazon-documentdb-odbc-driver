@@ -85,16 +85,11 @@ RETCODE SQL_API ESAPI_NumResultCols(HSTMT hstmt, SQLSMALLINT *pccol) {
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wkeyword-macro"
-#elif defined(__linux__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wkeyword-macro"
-#endif  // __APPLE__ / __linux
+#endif  // __APPLE__
 #define return DONT_CALL_RETURN_FROM_HERE ? ? ?
 #ifdef __APPLE__
 #pragma clang diagnostic pop
-#elif defined(__linux__)
-#pragma GCC diagnostic pop
-#endif  // __APPLE__ / __linux__
+#endif  // __APPLE__
     if (stmt->proc_return > 0) {
         *pccol = 0;
         goto cleanup;
@@ -154,16 +149,11 @@ RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wkeyword-macro"
-#elif defined(__linux__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wkeyword-macro"
 #endif  // __APPLE__ / __linux
 #define return DONT_CALL_RETURN_FROM_HERE ? ? ?
 #ifdef __APPLE__
 #pragma clang diagnostic pop
-#elif defined(__linux__)
-#pragma GCC diagnostic pop
-#endif  // __APPLE__ / __linux__
+#endif  // __APPLE__
     irdflds = SC_get_IRDF(stmt);
     if (0 == icol) /* bookmark column */
     {
@@ -438,24 +428,8 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
         fi = irdflds->fi[col_idx];
     if (FI_is_applicable(fi))
         field_type = getEffectiveOid(conn, fi);
-    else {
-        BOOL build_fi = FALSE;
-
+    else
         fi = NULL;
-        switch (fDescType) {
-            case SQL_COLUMN_OWNER_NAME:
-            case SQL_COLUMN_TABLE_NAME:
-            case SQL_COLUMN_TYPE:
-            case SQL_COLUMN_TYPE_NAME:
-            case SQL_COLUMN_AUTO_INCREMENT:
-            case SQL_DESC_NULLABLE:
-            case SQL_DESC_BASE_TABLE_NAME:
-            case SQL_DESC_BASE_COLUMN_NAME:
-            case SQL_COLUMN_UPDATABLE:
-            case 1212: /* SQL_CA_SS_COLUMN_KEY ? */
-                build_fi = TRUE;
-                break;
-        }
 
         res = SC_get_Curres(stmt);
         cols = QR_NumPublicResultCols(res);
@@ -881,16 +855,11 @@ RETCODE SQL_API ESAPI_GetData(HSTMT hstmt, SQLUSMALLINT icol,
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wkeyword-macro"
-#elif defined(__linux__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wkeyword-macro"
 #endif  // __APPLE__ / __linux
 #define return DONT_CALL_RETURN_FROM_HERE ? ? ?
 #ifdef __APPLE__
 #pragma clang diagnostic pop
-#elif defined(__linux__)
-#pragma GCC diagnostic pop
-#endif  // __APPLE__ / __linux__
+#endif  // __APPLE__
     if (!SC_is_fetchcursor(stmt)) {
         /* make sure we're positioned on a valid row */
         num_rows = QR_get_num_total_tuples(res);
@@ -1098,16 +1067,11 @@ RETCODE SQL_API ESAPI_Fetch(HSTMT hstmt) {
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wkeyword-macro"
-#elif defined(__linux__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wkeyword-macro"
 #endif  // __APPLE__ / __linux
 #define return DONT_CALL_RETURN_FROM_HERE ? ? ?
 #ifdef __APPLE__
 #pragma clang diagnostic pop
-#elif defined(__linux__)
-#pragma GCC diagnostic pop
-#endif  // __APPLE__ / __linux__
+#endif  // __APPLE__
     if (stmt->rowset_start < 0)
         SC_set_rowset_start(stmt, 0, TRUE);
     QR_set_reqsize(res, 1);
@@ -1436,16 +1400,11 @@ RETCODE SQL_API API_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wkeyword-macro"
-#elif defined(__linux__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wkeyword-macro"
 #endif  // __APPLE__ / __linux
 #define return DONT_CALL_RETURN_FROM_HERE ? ? ?
 #ifdef __APPLE__
 #pragma clang diagnostic pop
-#elif defined(__linux__)
-#pragma GCC diagnostic pop
-#endif  // __APPLE__ / __linux__
+#endif  // __APPLE__
     /* set the rowset_start if needed */
     if (should_set_rowset_start)
         SC_set_rowset_start(stmt, rowset_start, TRUE);
