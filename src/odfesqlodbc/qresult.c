@@ -478,3 +478,7 @@ void QR_free_memory(QResultClass *self) {
 
     MYLOG(LOG_TRACE, "leaving\n");
 }
+
+void QR_free_backend_row_data(QResultClass *self, SQLLEN tupleNo) {
+  ClearCachedRows(self->backend_tuples + (tupleNo * self->num_fields), self->num_fields, 1);
+}
