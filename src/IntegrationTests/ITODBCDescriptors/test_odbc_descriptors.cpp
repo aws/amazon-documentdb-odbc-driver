@@ -339,7 +339,7 @@ class TestSQLSetDescField : public testing::Test {
         value_ptr_assignment;                                                  \
         EXPECT_EQ(expected_val,                                                \
                   SQLSetDescField(hdesc, m_rec_number, m_field_identifier,     \
-                                  (SQLPOINTER)&m_value_ptr, m_buffer_length));  \
+                                  (SQLPOINTER)m_value_ptr, m_buffer_length));  \
         if (check_state)                                                       \
             EXPECT_TRUE(                                                       \
                 CheckSQLSTATE(SQL_HANDLE_DESC, hdesc,                          \
@@ -354,7 +354,10 @@ class TestSQLSetDescField : public testing::Test {
 // This warning detects casts from integer types to void*.
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wint-to-void-pointer-cast"
-#endif  // WIN32
+#elif defined(__linux__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
+#endif // WIN32 / __APPLE__/__linux__
 
 // Descriptor Header Fields Tests
 TEST_SQL_SET_DESC_FIELD(Test_SQL_DESC_ALLOC_TYPE, SQL_DESC_ALLOC_TYPE,
@@ -1008,7 +1011,9 @@ TEST_F(TestSQLGetDescRec, IMP_ROW_GET) {
 #pragma warning(pop)
 #elif __APPLE__
 #pragma clang diagnostic pop
-#endif
+#elif defined(__linux__)
+#pragma GCC diagnostic pop
+#endif // WIN32 / __APPLE__ / __linux__
 
 int main(int argc, char** argv) {
 #ifdef WIN32
