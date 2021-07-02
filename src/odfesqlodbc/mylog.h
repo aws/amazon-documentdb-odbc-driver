@@ -56,22 +56,17 @@ DLL_DECLARE int mylog(const char *fmt, ...)
 DLL_DECLARE int myprintf(const char *fmt, ...)
     __attribute__((format(TS_PRINTF_ATTRIBUTE, 1, 2)));
 
-//extern int qlog(const char *fmt, ...)
-//    __attribute__((format(TS_PRINTF_ATTRIBUTE, 1, 2)));
-//extern int qprintf(char *fmt, ...)
-//    __attribute__((format(TS_PRINTF_ATTRIBUTE, 1, 2)));
-
 const char *po_basename(const char *path);
 
 #define PREPEND_FMT "%20.20s[%s]%d: "
 #define PREPEND_ITEMS , po_basename(__FILE__), __FUNCTION__, __LINE__
-//#define QLOG_MARK "[QLOG]"
 
 #if defined(__GNUC__) && !defined(__APPLE__)
 #define MYLOG(level, fmt, ...)                                                          \
     do {                                                                                \
         _Pragma("GCC diagnostic push");                                                 \
         _Pragma("GCC diagnostic ignored \"-Wformat=\"");                                \
+        _Pragma("GCC diagnostic ignored \"-Wpedantic\"");                               \
         (level < get_mylog() ? mylog(PREPEND_FMT fmt PREPEND_ITEMS, ##__VA_ARGS__) : 0);\
         _Pragma("GCC diagnostic pop");                                                  \
     } while (0)
@@ -80,15 +75,10 @@ const char *po_basename(const char *path);
     do {                                                                                    \
         _Pragma("GCC diagnostic push");                                                     \
         _Pragma("GCC diagnostic ignored \"-Wformat=\"");                                    \
+        _Pragma("GCC diagnostic ignored \"-Wpedantic\"");                                   \
         (level < get_mylog() ? myprintf((fmt), ##__VA_ARGS__) : 0);                         \
         _Pragma("GCC diagnostic pop");                                                      \
     } while (0)
-//#define QLOG(level, fmt, ...)                               \
-//    ((level < get_qlog() ? qlog((fmt), ##__VA_ARGS__) : 0), \
-//     MYLOG(level, QLOG_MARK fmt, ##__VA_ARGS__))
-//#define QPRINTF(level, fmt, ...)                               \
-//    ((level < get_qlog() ? qprintf((fmt), ##__VA_ARGS__) : 0), \
-//     MYPRINTF(level, (fmt), ##__VA_ARGS__))
 #elif defined WIN32 /* && _MSC_VER > 1800 */
 #define MYLOG(level, fmt, ...)                               \
     ((int)level <= get_mylog()                               \
@@ -97,14 +87,6 @@ const char *po_basename(const char *path);
 #define MYPRINTF(level, fmt, ...)                           \
     ((int)level <= get_mylog() ? myprintf(fmt, __VA_ARGS__) \
                                : (printf || printf((fmt), __VA_ARGS__)))
-//#define QLOG(level, fmt, ...)                                           \
-//    (((int)level <= get_qlog() ? qlog((fmt), __VA_ARGS__)               \
-//                               : (printf || printf(fmt, __VA_ARGS__))), \
-//     MYLOG(level, QLOG_MARK fmt, __VA_ARGS__))
-//#define QPRINTF(level, fmt, ...)                                          \
-//    (((int)level <= get_qlog() ? qprintf(fmt, __VA_ARGS__)                \
-//                               : (printf || printf((fmt), __VA_ARGS__))), \
-//     MYPRINTF(level, (fmt), __VA_ARGS__))
 #else
 #define MYLOG(level, ...)                                                \
     do {                                                                 \
@@ -122,23 +104,6 @@ const char *po_basename(const char *path);
         (level < get_mylog() ? myprintf(__VA_ARGS__) : 0);         \
         _Pragma("clang diagnostic pop");                           \
     } while (0)
-//#define QLOG(level, ...)                                           \
-//    do {                                                           \
-//        _Pragma("clang diagnostic push");                          \
-//        _Pragma("clang diagnostic ignored \"-Wformat-pedantic\""); \
-//        (level < get_qlog() ? qlog(__VA_ARGS__) : 0);              \
-//        MYLOG(level, QLOG_MARK);                                   \
-//        MYPRINTF(level, __VA_ARGS__);                              \
-//        _Pragma("clang diagnostic pop");                           \
-//    } while (0)
-//#define QPRINTF(level, ...)                                        \
-//    do {                                                           \
-//        _Pragma("clang diagnostic push");                          \
-//        _Pragma("clang diagnostic ignored \"-Wformat-pedantic\""); \
-//        (level < get_qlog() ? qprintf(__VA_ARGS__) : 0);           \
-//        MYPRINTF(level, __VA_ARGS__);                              \
-//        _Pragma("clang diagnostic pop");                           \
-//    } while (0)
 #endif /* __GNUC__ */
 
 enum LogLevel {
