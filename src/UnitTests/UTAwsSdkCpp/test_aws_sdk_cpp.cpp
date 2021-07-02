@@ -21,7 +21,7 @@
 #pragma clang diagnostic ignored "-Wunused-parameter"
 #elif defined(__linux__)
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif  // __APPLE__ / __linux
 #include <aws/core/Aws.h>
 #include <aws/core/auth/AWSAuthSigner.h>
