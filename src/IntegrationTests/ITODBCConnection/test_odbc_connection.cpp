@@ -43,6 +43,8 @@ test_string user = to_test_string(std::string((access_key == NULL) ? "" : access
 test_string pass = to_test_string(std::string((secret_key == NULL) ? "" : secret_key));
 test_string wrong = CREATE_STRING("wrong");
 test_string empty = CREATE_STRING("");
+test_string dsn_conn_string = CREATE_STRING("DSN=timestream-aws-profile");
+
 
 // SQLDriverConnect constants
 class TestSQLConnect : public testing::Test {
@@ -585,8 +587,7 @@ int main(int argc, char** argv) {
 
    int failures = RUN_ALL_TESTS();
 
-   // TODO: Fix
-   std::string output = "No output";
+   std::string output = testing::internal::GetCapturedStdout();
    std::cout << output << std::endl;
    std::cout << (failures ? "Not all tests passed." : "All tests passed.")
              << std::endl;
