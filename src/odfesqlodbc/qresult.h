@@ -260,6 +260,7 @@ TupleField *QR_AddNew(QResultClass *self);
 void QR_close_result(QResultClass *self, BOOL destroy);
 void QR_reset_for_re_execute(QResultClass *self);
 void QR_free_memory(QResultClass *self);
+void QR_free_backend_row_data(QResultClass *self, SQLLEN tupleNo);
 void QR_set_command(QResultClass *self, const char *msg);
 void QR_set_message(QResultClass *self, const char *msg);
 void QR_add_message(QResultClass *self, const char *msg);

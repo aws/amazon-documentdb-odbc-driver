@@ -23,7 +23,7 @@
 #include "pch.h"
 #include "unit_test_helper.h"
 #include "it_odbc_helper.h"
-#include "version.h"
+#include "../odfesqlodbc/version.h"
 #include <codecvt>
 #ifndef WIN32
 #include <climits>

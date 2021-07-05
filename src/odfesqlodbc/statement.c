@@ -94,6 +94,12 @@ static const struct {
 static void SC_set_error_if_not_set(StatementClass *self, int errornumber,
                                     const char *errmsg, const char *func);
 
+static void FreePreviousRow(StatementClass *self) {
+  QResultClass *res = SC_get_Curres(self);
+  SQLLEN curt = GIdx2CacheIdx(self->currTuple, self, res);
+  QR_free_backend_row_data(res, curt);
+}
+
 RETCODE SQL_API API_AllocStmt(HDBC hdbc, HSTMT *phstmt, UDWORD flag) {
     CSTR func = "API_AllocStmt";
     ConnectionClass *conn = (ConnectionClass *)hdbc;
@@ -1067,7 +1073,6 @@ SC_fetch(StatementClass *self) {
     char *value;
     ColumnInfoClass *coli;
     BindInfoClass *bookmark;
-    BOOL useCursor = FALSE;
     KeySet *keyset = NULL;
 
     /* TupleField *tupleField; */
@@ -1093,6 +1098,9 @@ SC_fetch(StatementClass *self) {
     }
 
     MYLOG(LOG_DEBUG, "**** : non-cursor_result\n");
+    if (self->currTuple >= 0) {
+      FreePreviousRow(self);
+    }
     (self->currTuple)++;
 
     num_cols = QR_NumPublicResultCols(res);
@@ -1141,18 +1149,14 @@ SC_fetch(StatementClass *self) {
 
             MYLOG(LOG_DEBUG, "type = %d, atttypmod = %d\n", type, atttypmod);
 
-            if (useCursor)
-                value = QR_get_value_backend(res, lf);
-            else {
-                SQLLEN curt = GIdx2CacheIdx(self->currTuple, self, res);
-                MYLOG(LOG_DEBUG,
-                      "%p->base=" FORMAT_LEN " curr=" FORMAT_LEN
-                      " st=" FORMAT_LEN " valid=%d\n",
-                      res, QR_get_rowstart_in_cache(res), self->currTuple,
-                      SC_get_rowset_start(self), QR_has_valid_base(res));
-                MYLOG(LOG_DEBUG, "curt=" FORMAT_LEN "\n", curt);
-                value = QR_get_value_backend_row(res, curt, lf);
-            }
+            SQLLEN curt = GIdx2CacheIdx(self->currTuple, self, res);
+            MYLOG(LOG_ALL,
+                  "%p->base=" FORMAT_LEN " curr=" FORMAT_LEN
+                  " st=" FORMAT_LEN " valid=%d\n",
+                  res, QR_get_rowstart_in_cache(res), self->currTuple,
+                  SC_get_rowset_start(self), QR_has_valid_base(res));
+            MYLOG(LOG_ALL, "curt=" FORMAT_LEN "\n", curt);
+            value = QR_get_value_backend_row(res, curt, lf);
 
             MYLOG(LOG_DEBUG, "value = '%s'\n",
                   (value == NULL) ? "<NULL>" : value);
@@ -1169,7 +1173,7 @@ SC_fetch(StatementClass *self) {
                 case COPY_UNSUPPORTED_TYPE:
                     SC_set_error(
                         self, STMT_RESTRICTED_DATA_TYPE_ERROR,
-                        "Received an unsupported type from Elasticsearch.",
+                        "Received an unsupported type from Timestream.",
                         func);
                     result = SQL_ERROR;
                     break;
