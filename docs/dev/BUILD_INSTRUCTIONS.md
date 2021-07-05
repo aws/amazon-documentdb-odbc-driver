@@ -81,6 +81,39 @@ Run below command from the project's build directory.
 
 Installer named as `AmazonTimestreamODBC-<version>.pkg` will be generated in the build directory.
 
+
+## Linux
+
+### Dependencies
+
+The terminal can be used to install all the dependencies for Linux.
+
+On 64-bit, the following commands can be used to collect the required dependencies.
+>sudo apt update
+>sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib cmake linux-headers-$(uname -r) build-essential unixodbc-dev
+
+On 32-bit, the following commands can be used to collect the required dependencies.
+>sudo dpkg --add-architecture i386
+>sudo apt update 
+>sudo apt install unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386 zlib1g-dev:i386 linux-headers-$(uname -r) gcc-multilib:i386 g++-multilib:i386 cmake g++-9:i386 gcc-9:i386 gcc-9-multilib:i386 g++-9-multilib:i386 binutils:i386 make:i386
+
+### Building the Driver
+
+From a terminal, execute:
+
+`./build_linux_<config><bitness>_<installer_type>.sh`
+
+### Output Location on Linux
+
+Compiling on Linux will output the tests to **bin64** and the driver to **lib64**. There are also some additional test infrastructure files which output to the **lib64** directory.
+
+### Packaging
+
+Run below command from the project's build directory.
+>cpack .
+
+Installer named as `AmazonTimestreamODBC-<version>.<installer_type>` will be generated in the build directory.
+
 ## General Build Info
 
 ### ODBC Driver CMake Options
