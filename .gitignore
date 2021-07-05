@@ -62,3 +62,7 @@ CTestTestfile.cmake
 /src/PowerBIConnector/bin/Debug/
 /src/PowerBIConnector/obj/
 /src/PowerBIConnector/.vs/
+src/aws-sdk-cpp/
+default.profraw
+test_output.html
+leaks_itodbc_results

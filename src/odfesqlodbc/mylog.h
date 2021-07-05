@@ -52,9 +52,9 @@ extern "C" {
 
 
 DLL_DECLARE int mylog(const char *fmt, ...)
-    __attribute__((format(TS_PRINTF_ATTRIBUTE, 1, 2)));
+    __attribute__((format(printf, 1, 2)));
 DLL_DECLARE int myprintf(const char *fmt, ...)
-    __attribute__((format(TS_PRINTF_ATTRIBUTE, 1, 2)));
+    __attribute__((format(printf, 1, 2)));
 
 const char *po_basename(const char *path);
 
