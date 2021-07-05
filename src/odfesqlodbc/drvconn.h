@@ -17,7 +17,7 @@
 #ifndef _DRVCONN_H_
 #define _DRVCONN_H_
 
-// Required for strccasestr.
+// Required for strcasestr.
 #if defined(__linux__) && !defined(_GNU_SOURCE) 
 #define _GNU_SOURCE
 #endif // __linux__
