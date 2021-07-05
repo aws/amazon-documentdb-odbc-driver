@@ -77,11 +77,6 @@ jobs:
       if: success()
       run: |
         .\scripts\build_installer.ps1 Release Win32 .\src $Env:ODBC_BUILD_PATH $Env:AWS_SDK_INSTALL_PATH
-    #- name: test
-    #  run: |
-    #    cp .\\libraries\\VisualLeakDetector\\bin32\\*.* .\\bin32\\Release
-    #    cp .\\libraries\\VisualLeakDetector\\lib32\\*.lib .\\lib32\\Release
-    #    .\run_test_runner.bat
     - name: prepare-output
       if: always()
       run: |
@@ -163,11 +158,6 @@ jobs:
       if: success()
       run: |
         .\scripts\build_installer.ps1 Release x64 .\src $Env:ODBC_BUILD_PATH $Env:AWS_SDK_INSTALL_PATH
-    #- name: test
-    #  run: |
-    #    cp .\\libraries\\VisualLeakDetector\\bin64\\*.* .\\bin64\\Release
-    #    cp .\\libraries\\VisualLeakDetector\\lib64\\*.lib .\\lib64\\Release
-    #    .\run_test_runner.bat
     - name: prepare-output
       if: always()
       run: |

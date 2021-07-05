@@ -72,7 +72,7 @@ From a Bash shell:
 
 ### Output Location on Mac
 
-Compiling on Mac will output the tests to **bin64** and the driver to **lib64**. There are also some additional test infrastructure files which output to the **lib64** directory.
+Compiling on Mac will output the tests to **bin** and the driver to **lib**. There are also some additional test infrastructure files which output to the **lib** directory.
 
 ### Packaging
 
@@ -105,7 +105,7 @@ From a terminal, execute:
 
 ### Output Location on Linux
 
-Compiling on Linux will output the tests to **bin64** and the driver to **lib64**. There are also some additional test infrastructure files which output to the **lib64** directory.
+Compiling on Linux will output the tests to **bin** and the driver to **lib**. There are also some additional test infrastructure files which output to the **lib** directory. Both 32-bit and 64-bit builds output here.
 
 ### Packaging
 
