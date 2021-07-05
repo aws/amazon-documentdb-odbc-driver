@@ -41,7 +41,6 @@
 #include "bind.h"
 #include "catfunc.h"
 #include "connection.h"
-#include "qresult.h"
 #include "statement.h"
 #include "types.h"
 
