@@ -39,25 +39,31 @@ jobs:
     - name: prepare-dsn
       run: |
         # TODO: This is broken, needs to be fixed
-        echo "ls /home/runner"
+        echo "!!!!!!!!!ls /home/runner"
         ls /home/runner
+        echo "!!!!!!!!!ls /home/runners"
+        ls /home/runners
+        echo "!!!!!!!!!ls /etc/odbc"
+        ls /etc/odbc
+        echo "!!!!!!!!!ls ~/.odbc"
+        ls ~/.odbc
         sudo mv ./src/IntegrationTests/ITODBCConnection/odbc-linux.ini /home/runner/odbc.ini
         sudo mv ./src/IntegrationTests/ITODBCConnection/odbcinst-linux.ini /home/runner/odbcinst.ini
         mkdir /home/runner/work/timestream-odbc/timestream-odbc/odbc-logs
         export ODBCSYSINI=/home/runner
         export ODBCINSTINI=odbcinst.ini
         export ODBCINI=/home/runner/odbc.ini
-        echo "printenv ODBCSYSINI ODBCINSTINI ODBCINI"
+        echo "!!!!!!!!!printenv ODBCSYSINI ODBCINSTINI ODBCINI"
         printenv ODBCSYSINI ODBCINSTINI ODBCINI
-        echo "odbcinst -q -d"
+        echo "!!!!!!!!!odbcinst -q -d"
         odbcinst -q -d
-        echo "odbcinst -q -s"
+        echo "!!!!!!!!!odbcinst -q -s"
         odbcinst -q -s
-        echo "odbcinst -j"
+        echo "!!!!!!!!!odbcinst -j"
         odbcinst -j
-        echo "cat /home/runner/odbc.ini"
+        echo "!!!!!!!!!cat /home/runner/odbc.ini"
         cat /home/runner/odbc.ini
-        echo "cat /home/runner/odbcinst.ini"
+        echo "!!!!!!!!!cat /home/runner/odbcinst.ini"
         cat /home/runner/odbcinst.ini
     - name: configure-and-build-driver
       run: |
