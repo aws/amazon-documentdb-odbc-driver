@@ -236,7 +236,7 @@ test_string conn_string() {
         {IT_DRIVER, CREATE_STRING("timestreamodbc")},
         {IT_REGION, CREATE_STRING("us-east-1")},
         {IT_AUTH, CREATE_STRING("AWS_PROFILE")},
-        {IT_LOGLEVEL, CREATE_STRING("7")}};
+        {IT_LOGLEVEL, CREATE_STRING("5")}}; // DEBUG level logging
 
     test_string temp;
     for (auto it : conn_str_pair)
