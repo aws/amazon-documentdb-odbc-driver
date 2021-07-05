@@ -76,8 +76,10 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src, ssize_t src_len);
 #define CHECK_NOT_CHAR_P(t)
 #endif
 
+#ifdef __linux__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
+#endif // __linux__
 
 /* macro to safely strcpy() to fixed arrays. */
 #define STRCPY_FIXED(to, from) \
@@ -108,7 +110,9 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src, ssize_t src_len);
     CHECK_NOT_CHAR_P(to)     \
     snprintf((to), sizeof(to), "%d", from) FUNCTION_END_MACRO
 
+#ifdef __linux__
 #pragma GCC diagnostic pop
+#endif // __linux__
 
 #ifdef __cplusplus
 }
