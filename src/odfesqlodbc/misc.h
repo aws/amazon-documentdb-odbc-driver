@@ -61,15 +61,14 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src, ssize_t src_len);
 #define FUNCTION_BEGIN_MACRO \
     _Pragma("GCC diagnostic push")                                       \
     _Pragma("GCC diagnostic ignored \"-Wpedantic\"")                     \
-    ({                                                                   \
-    _Pragma("GCC diagnostic pop")
+    ({
 #define FUNCTION_END_MACRO \
     ;                      \
-    })
+    })                     \
+    _Pragma("GCC diagnostic pop")
 #define CHECK_NOT_CHAR_P(t)                                              \
     _Pragma("GCC diagnostic push")                                       \
     _Pragma("GCC diagnostic ignored \"-Wunused-variable\"")              \
-    _Pragma("GCC diagnostic ignored \"-Wpedantic\"")                     \
     if (0) {                                                             \
         typeof(t) dummy_for_check = {};                                  \
     }                                                                    \
