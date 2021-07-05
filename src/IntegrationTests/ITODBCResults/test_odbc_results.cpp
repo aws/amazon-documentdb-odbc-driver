@@ -273,7 +273,6 @@ class TestSQLRowCount : public Fixture {};
 
 class TestSQLBindCol : public Fixture {};
 
-// AT-864 Fix the segfaults that happen in GitHub actions when these 4 tests run.
 TEST_F(TestSQLBindCol, SingleColumnSingleBind) {
     std::vector< std::vector< char > > cols(single_col_cnt);
     std::vector< std::vector< SQLLEN > > lens(single_col_cnt);
