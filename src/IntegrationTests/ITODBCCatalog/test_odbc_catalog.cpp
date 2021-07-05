@@ -697,7 +697,7 @@ TEST_F(TestSQLColumns, EXACT_MATCH_ONE_COLUMN) {
         {"ODBCTest", "", "IoT", "time", std::to_string(SQL_TYPE_TIMESTAMP),
          "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
          std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
-         std::to_string(SQL_CODE_TIMESTAMP), "", "4", "YES"}};
+         std::to_string(SQL_CODE_TIMESTAMP), "", "36", "YES"}};
     CheckRows(expected, result);
 }
 
@@ -726,30 +726,30 @@ TEST_F(TestSQLColumns, EXACT_MATCH_ALL_COLUMNS) {
         result.push_back(row);
     }
     std::vector< std::vector< std::string > > expected{
-        {"ODBCTest", "", "DevOps", "measure_value::double",
-         std::to_string(SQL_DOUBLE), "double", "15",
-         std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
-         "", "", std::to_string(SQL_DOUBLE), "", "", "1", "YES"},
-        {"ODBCTest", "", "DevOps", "measure_name", std::to_string(SQL_VARCHAR),
-         "varchar", std::to_string(INT_MAX), "256", "", "",
-         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
-         std::to_string(INT_MAX), "2", "YES"},
-        {"ODBCTest", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
-         "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
-         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
-         std::to_string(SQL_CODE_TIMESTAMP), "", "3", "YES"},
         {"ODBCTest", "", "DevOps", "hostname", std::to_string(SQL_VARCHAR),
          "varchar", std::to_string(INT_MAX), "256", "", "",
          std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
-         std::to_string(INT_MAX), "4", "YES"},
+         std::to_string(INT_MAX), "1", "YES"},
         {"ODBCTest", "", "DevOps", "az", std::to_string(SQL_VARCHAR), "varchar",
          std::to_string(INT_MAX), "256", "", "", std::to_string(SQL_NULLABLE),
-         "", "", std::to_string(SQL_VARCHAR), "", std::to_string(INT_MAX), "5",
+         "", "", std::to_string(SQL_VARCHAR), "", std::to_string(INT_MAX), "2",
          "YES"},
         {"ODBCTest", "", "DevOps", "region", std::to_string(SQL_VARCHAR),
          "varchar", std::to_string(INT_MAX), "256", "", "",
          std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
-         std::to_string(INT_MAX), "6", "YES"}};
+         std::to_string(INT_MAX), "3", "YES"},
+        {"ODBCTest", "", "DevOps", "measure_value::double",
+         std::to_string(SQL_DOUBLE), "double", "15",
+         std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
+         "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
+        {"ODBCTest", "", "DevOps", "measure_name", std::to_string(SQL_VARCHAR),
+         "varchar", std::to_string(INT_MAX), "256", "", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(INT_MAX), "5", "YES"},
+        {"ODBCTest", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
+         "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
+         std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"}};
     CheckRows(expected, result);
 }
 
@@ -778,30 +778,30 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_ALL_COLUMNS) {
         result.push_back(row);
     }
     std::vector< std::vector< std::string > > expected{
-        {"ODBCTest", "", "DevOps", "measure_value::double",
-         std::to_string(SQL_DOUBLE), "double", "15",
-         std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
-         "", "", std::to_string(SQL_DOUBLE), "", "", "1", "YES"},
-        {"ODBCTest", "", "DevOps", "measure_name", std::to_string(SQL_VARCHAR),
-         "varchar", std::to_string(INT_MAX), "256", "", "",
-         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
-         std::to_string(INT_MAX), "2", "YES"},
-        {"ODBCTest", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
-         "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
-         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
-         std::to_string(SQL_CODE_TIMESTAMP), "", "3", "YES"},
         {"ODBCTest", "", "DevOps", "hostname", std::to_string(SQL_VARCHAR),
          "varchar", std::to_string(INT_MAX), "256", "", "",
          std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
-         std::to_string(INT_MAX), "4", "YES"},
+         std::to_string(INT_MAX), "1", "YES"},
         {"ODBCTest", "", "DevOps", "az", std::to_string(SQL_VARCHAR), "varchar",
          std::to_string(INT_MAX), "256", "", "", std::to_string(SQL_NULLABLE),
-         "", "", std::to_string(SQL_VARCHAR), "", std::to_string(INT_MAX), "5",
+         "", "", std::to_string(SQL_VARCHAR), "", std::to_string(INT_MAX), "2",
          "YES"},
         {"ODBCTest", "", "DevOps", "region", std::to_string(SQL_VARCHAR),
          "varchar", std::to_string(INT_MAX), "256", "", "",
          std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
-         std::to_string(INT_MAX), "6", "YES"}};
+         std::to_string(INT_MAX), "3", "YES"},
+        {"ODBCTest", "", "DevOps", "measure_value::double",
+         std::to_string(SQL_DOUBLE), "double", "15",
+         std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
+         "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
+        {"ODBCTest", "", "DevOps", "measure_name", std::to_string(SQL_VARCHAR),
+         "varchar", std::to_string(INT_MAX), "256", "", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(INT_MAX), "5", "YES"},
+        {"ODBCTest", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
+         "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
+         std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"}};
     CheckRows(expected, result);
 }
 
@@ -834,11 +834,11 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_SOME_COLUMNS) {
         {"ODBCTest", "", "DevOps", "measure_value::double",
          std::to_string(SQL_DOUBLE), "double", "15",
          std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
-         "", "", std::to_string(SQL_DOUBLE), "", "", "1", "YES"},
+         "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
         {"ODBCTest", "", "DevOps", "measure_name", std::to_string(SQL_VARCHAR),
          "varchar", std::to_string(INT_MAX), "256", "", "",
          std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
-         std::to_string(INT_MAX), "2", "YES"}};
+         std::to_string(INT_MAX), "5", "YES"}};
     CheckRows(expected, result);
 }
 
@@ -870,11 +870,11 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_MULTI_TABLES_COLUMNS) {
         {"ODBCTest", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
          "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
          std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
-         std::to_string(SQL_CODE_TIMESTAMP), "", "3", "YES"},
+         std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"},
         {"ODBCTest", "", "IoT", "time", std::to_string(SQL_TYPE_TIMESTAMP),
          "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
          std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
-         std::to_string(SQL_CODE_TIMESTAMP), "", "4", "YES"}};
+         std::to_string(SQL_CODE_TIMESTAMP), "", "36", "YES"}};
     CheckRows(expected, result);
 }
 
@@ -909,7 +909,7 @@ TEST_F(TestSQLColumns, META_DATA_CASE_INSENSITIVE) {
         {"ODBCTest", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
          "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
          std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
-         std::to_string(SQL_CODE_TIMESTAMP), "", "3", "YES"}};
+         std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"}};
     CheckRows(expected, result);
 }
 
