@@ -62,9 +62,9 @@ jobs:
         echo "!!!!!!!!!odbcinst -j"
         odbcinst -j
         echo "!!!!!!!!!cat /etc/odbc.ini"
-        cat /home/runner/odbc.ini
+        cat /etc/odbc.ini
         echo "!!!!!!!!!cat /etc/odbcinst.ini"
-        cat /home/runner/odbcinst.ini
+        cat /etc/odbcinst.ini
     - name: configure-and-build-driver
       run: |
         ./build_linux_release64_rpm.sh
