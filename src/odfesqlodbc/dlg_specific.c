@@ -365,12 +365,15 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
     while (*(DSN + strlen(DSN) - 1) == ' ')
         *(DSN + strlen(DSN) - 1) = '\0';
 
+    printf("DSN: %s\n", DSN);
     if (!drivername[0] && DSN[0])
         getDriverNameFromDSN(DSN, (char *)drivername, sizeof(ci->drivername));
     MYLOG(LOG_DEBUG, "drivername=%s\n", drivername);
     if (!drivername[0])
         drivername = INVALID_DRIVER;
+    printf("Driver name1: %s\n", drivername);
     getDriversDefaults(drivername, &(ci->drivers));
+    printf("Driver name2: %s\n", drivername);
 
     if (DSN[0] == '\0')
         return;
