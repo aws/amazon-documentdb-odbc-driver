@@ -1,5 +1,7 @@
 #include "client.h"
+#include <cstring>
 #include <stdexcept>
+#include "sqlext.h"
 
 Client::Client(const char *connection_string) : henv(SQL_NULL_HENV),
                                                 hdbc(SQL_NULL_HDBC),
