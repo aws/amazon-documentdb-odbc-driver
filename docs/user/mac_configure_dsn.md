@@ -53,8 +53,8 @@ Try the following:
     <Driver Name> = Installed
       
     [<Driver Name>]
-    Driver = <odbc-root>/lib64/libodfesqlodbc.dylib
-    Setup = <odbc-root>/lib64/libodfesqlodbc.dylib
+    Driver = <odbc-root>/lib/libodfesqlodbc.dylib
+    Setup = <odbc-root>/lib/libodfesqlodbc.dylib
 	```
    * **odbc.ini** (will be found in **User DSNs**)
 	```ini
@@ -62,7 +62,7 @@ Try the following:
     <DSN Name> = <Driver Name>
     
     [<DSN Name>]
-    Driver = <odbc-root>/lib64/libodfesqlodbc.dylib
+    Driver = <odbc-root>/lib/libodfesqlodbc.dylib
     Auth = AWS_PROFILE
     UID = 
     PWD = 
