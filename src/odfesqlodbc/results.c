@@ -127,7 +127,6 @@ RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
     SQLLEN column_size = 0;
     int unknown_sizes;
     SQLINTEGER decimal_digits = 0;
-    ConnInfo *ci;
     FIELD_INFO *fi;
     char buf[255];
     int len = 0;
@@ -141,7 +140,6 @@ RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
     }
 
     conn = SC_get_conn(stmt);
-    ci = &(conn->connInfo);
     unknown_sizes = DEFAULT_UNKNOWNSIZES;
 
     SC_clear_error(stmt);
