@@ -41,8 +41,8 @@ jobs:
         # TODO: This is broken, needs to be fixed
         echo "!!!!!!!!!ls /home/runner"
         ls /home/runner
-        echo "!!!!!!!!!ls /home/runners"
-        ls /home/runners
+        echo "!!!!!!!!!ls /home/runner/runners"
+        ls /home/runner/runners
         echo "!!!!!!!!!ls /etc/odbc"
         ls /etc/odbc
         echo "!!!!!!!!!ls ~/.odbc"
