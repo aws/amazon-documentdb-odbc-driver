@@ -58,14 +58,10 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src, ssize_t src_len);
  */
 
 #if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
-#define FUNCTION_BEGIN_MACRO \
-    _Pragma("GCC diagnostic push")                                       \
-    _Pragma("GCC diagnostic ignored \"-Wpedantic\"")                     \
-    ({
+#define FUNCTION_BEGIN_MACRO ({
 #define FUNCTION_END_MACRO \
     ;                      \
-    })                     \
-    _Pragma("GCC diagnostic pop")
+    })
 #define CHECK_NOT_CHAR_P(t)                                              \
     _Pragma("GCC diagnostic push")                                       \
     _Pragma("GCC diagnostic ignored \"-Wunused-variable\"")              \
@@ -78,11 +74,6 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src, ssize_t src_len);
 #define FUNCTION_END_MACRO
 #define CHECK_NOT_CHAR_P(t)
 #endif
-
-#ifdef __linux__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
-#endif // __linux__
 
 /* macro to safely strcpy() to fixed arrays. */
 #define STRCPY_FIXED(to, from) \
@@ -112,10 +103,6 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src, ssize_t src_len);
     FUNCTION_BEGIN_MACRO     \
     CHECK_NOT_CHAR_P(to)     \
     snprintf((to), sizeof(to), "%d", from) FUNCTION_END_MACRO
-
-#ifdef __linux__
-#pragma GCC diagnostic pop
-#endif // __linux__
 
 #ifdef __cplusplus
 }
