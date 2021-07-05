@@ -43,10 +43,10 @@ jobs:
         ls /home/runner
         echo "!!!!!!!!!ls /home/runner/runners"
         ls /home/runner/runners
-        echo "!!!!!!!!!ls /etc/odbc"
-        ls /etc/odbc
-        echo "!!!!!!!!!ls ~/.odbc"
-        ls ~/.odbc
+        echo "!!!!!!!!!ls /etc/"
+        ls /etc/
+        echo "!!!!!!!!!ls -a ~/"
+        ls -a ~/
         sudo mv ./src/IntegrationTests/ITODBCConnection/odbc-linux.ini /home/runner/odbc.ini
         sudo mv ./src/IntegrationTests/ITODBCConnection/odbcinst-linux.ini /home/runner/odbcinst.ini
         mkdir /home/runner/work/timestream-odbc/timestream-odbc/odbc-logs
