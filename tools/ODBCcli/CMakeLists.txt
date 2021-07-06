@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.16)
 project(ODBCcli)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -17,5 +17,5 @@ if(WIN32)
 elseif(APPLE)
     target_link_libraries(ODBCcli iodbc)
 elseif(UNIX)
-    target_link_libraries(ODBCcli unixodbc)
+    target_link_libraries(ODBCcli  odbc odbcinst)
 endif()
