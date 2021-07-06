@@ -56,6 +56,7 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src, ssize_t src_len);
  *	With GCC, the macro CHECK_NOT_CHAR_P() causes a compilation error
  *		when the target is pointer not a fixed array.
  */
+
 #if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
 #define FUNCTION_BEGIN_MACRO ({
 #define FUNCTION_END_MACRO \
@@ -63,7 +64,8 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src, ssize_t src_len);
     })
 #define CHECK_NOT_CHAR_P(t)                                              \
     _Pragma("GCC diagnostic push")                                       \
-        _Pragma("GCC diagnostic ignored \"-Wunused-variable\"") if (0) { \
+    _Pragma("GCC diagnostic ignored \"-Wunused-variable\"")              \
+    if (0) {                                                             \
         typeof(t) dummy_for_check = {};                                  \
     }                                                                    \
     _Pragma("GCC diagnostic pop")
