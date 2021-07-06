@@ -91,7 +91,7 @@ namespace {
         {AUTHTYPE_AAD, aad},
         {AUTHTYPE_OKTA, okta},
     };
-};
+}
 
 bool TSCommunication::Validate(const runtime_options& options) {
     if (options.auth.region.empty() && options.auth.end_point_override.empty()) {

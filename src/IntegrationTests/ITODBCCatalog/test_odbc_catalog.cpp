@@ -108,8 +108,9 @@ class TestSQLGetTypeInfo : public Fixture {};
 //    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
 //};
 
-#ifdef __linux
+#ifdef __linux__
 #pragma GCC diagnostic ignored "-Wcomment"
+#endif
 //#define TEST_SQL_KEYS(test_name, test_function, ...)                     \
 //    TEST_F(TestSQLCatalogKeys, test_name) {                              \
 //        EXPECT_TRUE(SQL_SUCCEEDED(test_function(m_hstmt, __VA_ARGS__))); \
