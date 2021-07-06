@@ -143,7 +143,7 @@ const char *GetExeProgramName() {
 
         for (i = 0; i < sizeof(flist) / sizeof(flist[0]); i++) {
             if (readlink(flist[i], path_name, sizeof(path_name)) > 0) {
-                printf("Found path: '%s'\n". path_name);
+                printf("Found path: '%s'\n", path_name);
                 /* fprintf(stderr, "i=%d pathname=%s\n", i, path_name); */
                 STRCPY_FIXED(exename, po_basename(path_name));
                 break;
