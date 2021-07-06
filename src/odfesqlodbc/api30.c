@@ -775,6 +775,10 @@ static RETCODE SQL_API IPDSetField(DescriptorClass *desc, SQLSMALLINT RecNumber,
     IPDFields *ipdopts = &(desc->ipdf);
     SQLSMALLINT para_idx;
 
+#ifdef __linux__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough="
+#endif // __linux__
     switch (FieldIdentifier) {
         case SQL_DESC_ARRAY_STATUS_PTR:
             ipdopts->param_status_ptr = (SQLUSMALLINT *)Value;
@@ -800,6 +804,9 @@ static RETCODE SQL_API IPDSetField(DescriptorClass *desc, SQLSMALLINT RecNumber,
             parameter_ibindings_set(ipdopts, RecNumber, TRUE);
             break;
     }
+#ifdef __linux__
+#pragma GCC diagnostic pop
+#endif // __linux__
     if (RecNumber <= 0 || RecNumber > ipdopts->allocated) {
         MYLOG(LOG_ALL, "RecN=%d allocated=%d\n", RecNumber, ipdopts->allocated);
         DC_set_error(desc, DESC_BAD_PARAMETER_NUMBER_ERROR,
@@ -1763,7 +1770,6 @@ RETCODE SQL_API ESAPI_SetDescField(SQLHDESC DescriptorHandle,
                         desc,
                         "can't SQLSetDescField for this parameter number");
                     break;
-                    break;
             }
         }
         DC_log_error(func, "", desc);
@@ -1782,6 +1788,10 @@ RETCODE SQL_API ESAPI_SetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
     MYLOG(LOG_TRACE,
           "entering Handle=%p " FORMAT_INTEGER "," FORMAT_ULEN "(%p)\n",
           StatementHandle, Attribute, (SQLULEN)Value, Value);
+#ifdef __linux__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough="
+#endif // __linux__
     switch (Attribute) {
         case SQL_ATTR_ENABLE_AUTO_IPD: /* 15 */
             if (SQL_FALSE == Value)
@@ -1862,5 +1872,8 @@ RETCODE SQL_API ESAPI_SetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
             return ESAPI_SetStmtOption(StatementHandle, (SQLUSMALLINT)Attribute,
                                        (SQLULEN)Value);
     }
+#ifdef __linux__
+#pragma GCC diagnostic pop
+#endif // __linux__
     return ret;
 }

@@ -164,8 +164,8 @@ char *ucs2_to_utf8(const SQLWCHAR *ucs2str, SQLLEN ilen, SQLLEN *olen,
                     memcpy(utf8str + len, (char *)&byte2code,
                            sizeof(byte2code));
                 else {
-                    utf8str[len] = ((char *)&byte2code)[1];
-                    utf8str[len + 1] = ((char *)&byte2code)[0];
+                    utf8str[len] = (char)((byte2code >> 8) & 0xFF);
+                    utf8str[len + 1] = (char)(byte2code & 0xFF);
                 }
                 len += sizeof(byte2code);
             }
@@ -184,10 +184,10 @@ char *ucs2_to_utf8(const SQLWCHAR *ucs2str, SQLLEN ilen, SQLLEN *olen,
                     memcpy(utf8str + len, (char *)&byte4code,
                            sizeof(byte4code));
                 else {
-                    utf8str[len] = ((char *)&byte4code)[3];
-                    utf8str[len + 1] = ((char *)&byte4code)[2];
-                    utf8str[len + 2] = ((char *)&byte4code)[1];
-                    utf8str[len + 3] = ((char *)&byte4code)[0];
+                    utf8str[len] = (char)((byte4code >> 24) & 0xFF);
+                    utf8str[len + 1] = (char)((byte4code >> 16) & 0xFF);
+                    utf8str[len + 2] = (char)((byte4code >> 8) & 0xFF);
+                    utf8str[len + 3] = (char)(byte4code & 0xFF);
                 }
                 len += sizeof(byte4code);
             } else {
@@ -197,9 +197,9 @@ char *ucs2_to_utf8(const SQLWCHAR *ucs2str, SQLLEN ilen, SQLLEN *olen,
                 if (little_endian)
                     memcpy(utf8str + len, (char *)&byte4code, 3);
                 else {
-                    utf8str[len] = ((char *)&byte4code)[3];
-                    utf8str[len + 1] = ((char *)&byte4code)[2];
-                    utf8str[len + 2] = ((char *)&byte4code)[1];
+                    utf8str[len] = (char)((byte4code >> 16) & 0xFF);
+                    utf8str[len + 1] = (char)((byte4code >> 8) & 0xFF);
+                    utf8str[len + 2] = (char)((byte4code) & 0xFF);
                 }
                 len += 3;
             }
@@ -874,6 +874,10 @@ static SQLLEN c16tombs(char *c8dt, const char16_t *c16dt, size_t n) {
 //	SQLBindParameter	SQL_C_CHAR to UTF-8 case
 //		the current locale => UTF-8
 //
+#ifdef __linux__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif // __linux__
 SQLLEN bindpara_msg_to_utf8(const char *ldt, char **wcsbuf, SQLLEN used) {
     SQLLEN l = (-2);
     char *utf8 = NULL, *ldt_nts, *alloc_nts = NULL, ntsbuf[128];
@@ -927,6 +931,9 @@ SQLLEN bindpara_msg_to_utf8(const char *ldt, char **wcsbuf, SQLLEN used) {
         free(alloc_nts);
     return l;
 }
+#ifdef __linux__
+#pragma GCC diagnostic pop
+#endif // __linux__
 
 //
 //	SQLBindParameter	hybrid case

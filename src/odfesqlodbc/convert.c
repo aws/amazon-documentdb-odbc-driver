@@ -68,7 +68,6 @@ typedef struct {
     int fr;
 } SIMPLE_TIME;
 
-static BOOL convert_money(const char *s, char *sout, size_t soutmax);
 size_t convert_linefeeds(const char *s, char *dst, size_t max, BOOL convlf,
                          BOOL *changed);
 static size_t convert_from_esbinary(const char *value, char *rgbValue,
@@ -95,35 +94,6 @@ static SQLLEN es_bin2whex(const char *src, SQLWCHAR *dst, SQLLEN length);
  *			TS_TYPE_TIME	SQL_C_TIMESTAMP		SQL_C_TIMESTAMP		(date = current date) 
  *---------
  */
-
-/*
- *	Macros for BIGINT handling.
- */
-#ifdef ODBCINT64
-#ifdef WIN32
-#define ATOI64(val) _strtoi64(val, NULL, 10)
-#define ATOI64U(val) _strtoui64(val, NULL, 10)
-#elif (SIZEOF_LONG == 8)
-#define ATOI64(val) strtol(val, NULL, 10)
-#define ATOI64U(val) strtoul(val, NULL, 10)
-#else
-#if defined(HAVE_STRTOLL)
-#define ATOI64(val) strtoll(val, NULL, 10)
-#define ATOI64U(val) strtoull(val, NULL, 10)
-#else
-static ODBCINT64 ATOI64(const char *val) {
-    ODBCINT64 ll;
-    sscanf(val, "%lld", &ll);
-    return ll;
-}
-static unsigned ODBCINT64 ATOI64U(const char *val) {
-    unsigned ODBCINT64 ll;
-    sscanf(val, "%llu", &ll);
-    return ll;
-}
-#endif /* HAVE_STRTOLL */
-#endif /* WIN32 */
-#endif /* ODBCINT64 */
 
 static void parse_to_numeric_struct(const char *wv, SQL_NUMERIC_STRUCT *ns,
                                     BOOL *overflow);
@@ -2359,49 +2329,6 @@ static void parse_to_numeric_struct(const char *wv, SQL_NUMERIC_STRUCT *ns,
         if (carry != 0)
             *overflow = TRUE;
     }
-}
-
-static BOOL convert_money(const char *s, char *sout, size_t soutmax) {
-    char in, decp = 0;
-    size_t i = 0, out = 0;
-    int num_in = -1, period_in = -1, comma_in = -1;
-
-    for (i = 0; s[i]; i++) {
-        switch (in = s[i]) {
-            case '.':
-                if (period_in < 0)
-                    period_in = (int)i;
-                break;
-            case ',':
-                if (comma_in < 0)
-                    comma_in = (int)i;
-                break;
-            default:
-                if ('0' <= in && '9' >= in)
-                    num_in = (int)i;
-                break;
-        }
-    }
-    if (period_in > comma_in) {
-        if (period_in >= num_in - 2)
-            decp = '.';
-    } else if (comma_in >= 0 && comma_in >= num_in - 2)
-        decp = ',';
-    for (i = 0; s[i] && out + 1 < soutmax; i++) {
-        switch (in = s[i]) {
-            case '(':
-            case '-':
-                sout[out++] = '-';
-                break;
-            default:
-                if (in >= '0' && in <= '9')
-                    sout[out++] = in;
-                else if (in == decp)
-                    sout[out++] = '.';
-        }
-    }
-    sout[out] = '\0';
-    return TRUE;
 }
 
 /*	Change linefeed to carriage-return/linefeed */
