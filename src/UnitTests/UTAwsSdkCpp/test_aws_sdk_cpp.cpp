@@ -19,14 +19,19 @@
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
-#endif  // __APPLE__
+#elif defined(__linux__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif  // __APPLE__ / __linux__
 #include <aws/core/Aws.h>
 #include <aws/core/auth/AWSAuthSigner.h>
 #include <aws/core/auth/AWSCredentialsProvider.h>
 #include <aws/core/http/HttpClient.h>
 #ifdef __APPLE__
 #pragma clang diagnostic pop
-#endif  // __APPLE__
+#elif defined(__linux__)
+#pragma GCC diagnostic pop
+#endif  // __APPLE__ / __linux__
 #include "unit_test_helper.h"
 
 using namespace Aws::Auth;

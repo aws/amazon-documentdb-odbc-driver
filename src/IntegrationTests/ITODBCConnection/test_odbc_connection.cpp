@@ -33,8 +33,6 @@
 #include <chrono>
 // clang-format on
 
-#define IT_SIZEOF(x) (NULL == (x) ? 0 : (sizeof((x)) / sizeof((x)[0])))
-
 // SQLConnect constants
 
 char* access_key = std::getenv("AWS_ACCESS_KEY_ID");
@@ -45,10 +43,7 @@ test_string user = to_test_string(std::string((access_key == NULL) ? "" : access
 test_string pass = to_test_string(std::string((secret_key == NULL) ? "" : secret_key));
 test_string wrong = CREATE_STRING("wrong");
 test_string empty = CREATE_STRING("");
-
-// SQLDriverConnect constants
 test_string dsn_conn_string = CREATE_STRING("DSN=timestream-aws-profile");
-
 
 class TestSQLConnect : public testing::Test {
    public:
@@ -67,7 +62,6 @@ class TestSQLConnect : public testing::Test {
     SQLHENV m_env;
     SQLHDBC m_conn;
 };
-
 
 TEST_F(TestSQLConnect, AWS_Profile_Default_credential_chain) {
     SQLRETURN ret = SQLConnect(

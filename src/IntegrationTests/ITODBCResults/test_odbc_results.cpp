@@ -207,7 +207,6 @@ void TypeConversionAssertionTemplate(
             compare_func(expected[i].first, actual);
         }
         // Success with info and error code
-        // TODO: Fix this string compare.
         else if (tchar_to_string(expected_state) == tchar_to_string(SQLSTATE_FRACTIONAL_TRUNCATION)) {
             EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
             EXPECT_EQ((SQLLEN)sizeof(T), indicator);
@@ -274,8 +273,6 @@ class TestSQLRowCount : public Fixture {};
 
 class TestSQLBindCol : public Fixture {};
 
-// AT-864 Fix the segfaults that happen in GitHub actions when these 4 tests run.
-#ifndef __linux__
 TEST_F(TestSQLBindCol, SingleColumnSingleBind) {
     std::vector< std::vector< char > > cols(single_col_cnt);
     std::vector< std::vector< SQLLEN > > lens(single_col_cnt);
@@ -369,7 +366,6 @@ TEST_F(TestSQLBindCol, InsufficientSpace) {
     EXPECT_EQ(tchar_to_string(msg_buffer.data()), tchar_to_string((SQLTCHAR*)CREATE_STRING("Fetched item was truncated.")));
     EXPECT_EQ(tchar_to_string(data_buffer.data()), tchar_to_string((SQLTCHAR*)colret.c_str()));
 }
-#endif
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_BIT) {
     int v1 = 0;

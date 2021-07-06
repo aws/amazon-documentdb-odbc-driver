@@ -340,10 +340,11 @@ class TestSQLSetDescField : public testing::Test {
         EXPECT_EQ(expected_val,                                                \
                   SQLSetDescField(hdesc, m_rec_number, m_field_identifier,     \
                                   (SQLPOINTER)m_value_ptr, m_buffer_length));  \
-        if (check_state)                                                       \
+        if (check_state) {                                                     \
             EXPECT_TRUE(                                                       \
                 CheckSQLSTATE(SQL_HANDLE_DESC, hdesc,                          \
                               SQLSTATE_INVALID_DESCRIPTOR_FIELD_IDENTIFIER));  \
+        }                                                                      \
     }
 #ifdef WIN32
 #pragma warning(push)
@@ -354,202 +355,205 @@ class TestSQLSetDescField : public testing::Test {
 // This warning detects casts from integer types to void*.
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wint-to-void-pointer-cast"
-#endif  // WIN32
+#elif defined(__linux__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
+#endif // WIN32 / __APPLE__ / __linux__
 
 // Descriptor Header Fields Tests
 TEST_SQL_SET_DESC_FIELD(Test_SQL_DESC_ALLOC_TYPE, SQL_DESC_ALLOC_TYPE,
                         SQL_IS_SMALLINT, 0,
                         SQLSMALLINT m_value_ptr = SQL_DESC_ALLOC_USER;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(Test_SQL_DESC_ARRAY_SIZE, SQL_DESC_ARRAY_SIZE, SQL_NTS,
                         0, SQLULEN m_value_ptr = single_col_cnt;
-                        , SQL_SUCCESS, m_ard_hdesc, 0);
+                        , SQL_SUCCESS, m_ard_hdesc, 0)
 
 TEST_SQL_SET_DESC_FIELD(Test_SQL_DESC_ARRAY_STATUS_PTR,
                         SQL_DESC_ARRAY_STATUS_PTR, SQL_NTS, 0, SQLUSMALLINT foo;
                         SQLUSMALLINT* m_value_ptr = &foo;
-                        , SQL_SUCCESS, m_ard_hdesc, 0);
+                        , SQL_SUCCESS, m_ard_hdesc, 0)
 
 TEST_SQL_SET_DESC_FIELD(Test_SQL_DESC_BIND_OFFSET_PTR, SQL_DESC_BIND_OFFSET_PTR,
                         SQL_NTS, 0, SQLLEN foo;
                         SQLLEN* m_value_ptr = &foo;
-                        , SQL_SUCCESS, m_ard_hdesc, 0);
+                        , SQL_SUCCESS, m_ard_hdesc, 0)
 
 TEST_SQL_SET_DESC_FIELD(Test_SQL_DESC_BIND_TYPE, SQL_DESC_BIND_TYPE, SQL_NTS, 0,
                         SQLINTEGER m_value_ptr = SQL_BIND_BY_COLUMN;
-                        , SQL_SUCCESS, m_ard_hdesc, 0);
+                        , SQL_SUCCESS, m_ard_hdesc, 0)
 
 TEST_SQL_SET_DESC_FIELD(Test_SQL_DESC_COUNT, SQL_DESC_COUNT, SQL_IS_SMALLINT, 0,
                         SQLSMALLINT m_value_ptr = 25;
-                        , SQL_SUCCESS, m_ard_hdesc, 0);
+                        , SQL_SUCCESS, m_ard_hdesc, 0)
 
 TEST_SQL_SET_DESC_FIELD(Test_SQL_DESC_ROWS_PROCESSED_PTR,
                         SQL_DESC_ROWS_PROCESSED_PTR, SQL_NTS, 0, SQLULEN foo;
                         SQLULEN* m_value_ptr = &foo;
-                        , SQL_SUCCESS, m_ird_hdesc, 0);
+                        , SQL_SUCCESS, m_ird_hdesc, 0)
 
 // Descriptor Record Fields Tests
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_AUTO_UNIQUE_VALUE,
                         SQL_DESC_AUTO_UNIQUE_VALUE, SQL_NTS, 1,
                         SQLINTEGER m_value_ptr = 0;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_BASE_COLUMN_NAME,
                         SQL_DESC_BASE_COLUMN_NAME, SQL_NTS, 1,
                         SQLCHAR m_value_ptr[255] = "_col2";
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_BASE_TABLE_NAME,
                         SQL_DESC_BASE_TABLE_NAME, SQL_NTS, 1,
                         SQLCHAR m_value_ptr[255] = "ODBCTest.Test";
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_CASE_SENSITIVE,
                         SQL_DESC_CASE_SENSITIVE, SQL_NTS, 1,
                         SQLINTEGER m_value_ptr = 1;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_CATALOG_NAME,
                         SQL_DESC_CATALOG_NAME, SQL_NTS, 1,
                         SQLCHAR m_value_ptr[255] = "";
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_CONCISE_TYPE,
                         SQL_DESC_CONCISE_TYPE, SQL_IS_INTEGER, 1,
                         SQLSMALLINT m_value_ptr = SQL_WLONGVARCHAR;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_DATA_PTR, SQL_DESC_DATA_PTR,
                         SQL_IS_POINTER, 1, SQLPOINTER m_value_ptr = NULL;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_DATETIME_INTERVAL_CODE,
                         SQL_DESC_DATETIME_INTERVAL_CODE, SQL_IS_SMALLINT, 1,
                         SQLSMALLINT m_value_ptr = 0;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_DATETIME_INTERVAL_PRECISION,
                         SQL_DESC_DATETIME_INTERVAL_PRECISION, SQL_IS_INTEGER, 1,
                         SQLINTEGER m_value_ptr = 0;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_DISPLAY_SIZE,
                         SQL_DESC_DISPLAY_SIZE, SQL_IS_POINTER, 1,
                         SQLLEN m_value_ptr = 32766;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_FIXED_PREC_SCALE,
                         SQL_DESC_FIXED_PREC_SCALE, SQL_IS_INTEGER, 1,
                         SQLSMALLINT m_value_ptr = 0;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_INDICATOR_PTR,
                         SQL_DESC_INDICATOR_PTR, SQL_IS_INTEGER, 1,
                         SQLLEN m_value_ptr = 0;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_LABEL, SQL_DESC_LABEL,
                         SQL_NTS, 1, SQLCHAR m_value_ptr[255] = "_col2";
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_LENGTH, SQL_DESC_LENGTH,
                         SQL_IS_INTEGER, 1, SQLULEN m_value_ptr = 32766;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_LITERAL_PREFIX,
                         SQL_DESC_LITERAL_PREFIX, SQL_NTS, 1,
                         SQLCHAR m_value_ptr[255] = "";
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_LITERAL_SUFFIX,
                         SQL_DESC_LITERAL_SUFFIX, SQL_NTS, 1,
                         SQLCHAR m_value_ptr[255] = "";
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_LOCAL_TYPE_NAME,
                         SQL_DESC_LOCAL_TYPE_NAME, SQL_NTS, 1,
                         SQLCHAR m_value_ptr[255] = "varchar";
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_NAME, SQL_DESC_NAME,
                         SQL_NTS, 1, SQLCHAR m_value_ptr[255] = "_col2";
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_NULLABLE, SQL_DESC_NULLABLE,
                         SQL_IS_SMALLINT, 1, SQLSMALLINT m_value_ptr = 1;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_NUM_PREC_RADIX,
                         SQL_DESC_NUM_PREC_RADIX, SQL_IS_INTEGER, 1,
                         SQLINTEGER m_value_ptr = 0;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_OCTET_LENGTH,
                         SQL_DESC_OCTET_LENGTH, SQL_NTS, 1,
                         SQLLEN m_value_ptr = 0;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_OCTET_LENGTH_PTR,
                         SQL_DESC_OCTET_LENGTH_PTR, SQL_IS_INTEGER, 1,
                         SQLLEN m_value_ptr = 0;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_PARAMETER_TYPE,
                         SQL_DESC_PARAMETER_TYPE, SQL_IS_SMALLINT, 1,
                         SQLSMALLINT m_value_ptr = 1;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_PRECISION,
                         SQL_DESC_PRECISION, SQL_IS_SMALLINT, 1,
                         SQLSMALLINT m_value_ptr = 30585;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_ROWVER, SQL_DESC_ROWVER,
                         SQL_NTS, 1, SQLSMALLINT m_value_ptr = 1;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_SCALE, SQL_DESC_SCALE,
                         SQL_IS_SMALLINT, 1, SQLSMALLINT m_value_ptr = 0;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_SCHEMA_NAME,
                         SQL_DESC_SCHEMA_NAME, SQL_NTS, 1,
                         SQLCHAR m_value_ptr[255] = "";
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_SEARCHABLE,
                         SQL_DESC_SEARCHABLE, SQL_IS_SMALLINT, 1,
                         SQLSMALLINT m_value_ptr = SQL_PRED_SEARCHABLE;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_TABLE_NAME,
                         SQL_DESC_TABLE_NAME, SQL_NTS, 1,
                         SQLCHAR m_value_ptr[255] = "ODBCTest.Test";
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_TYPE, SQL_DESC_TYPE,
                         SQL_IS_SMALLINT, 1,
                         SQLSMALLINT m_value_ptr = SQL_WLONGVARCHAR;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_TYPE_NAME,
                         SQL_DESC_TYPE_NAME, SQL_NTS, 1,
                         SQLCHAR m_value_ptr[255] = "varchar";
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_UNNAMED, SQL_DESC_UNNAMED,
                         SQL_IS_SMALLINT, 1, SQLSMALLINT m_value_ptr = SQL_NAMED;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_UNSIGNED, SQL_DESC_UNSIGNED,
                         SQL_IS_SMALLINT, 1, SQLSMALLINT m_value_ptr = SQL_TRUE;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_UPDATABLE,
                         SQL_DESC_UPDATABLE, SQL_IS_SMALLINT, 1,
                         SQLSMALLINT m_value_ptr = SQL_ATTR_READONLY;
-                        , SQL_ERROR, m_ird_hdesc, 1);
+                        , SQL_ERROR, m_ird_hdesc, 1)
 
 class TestSQLGetDescField : public testing::Test {
    public:
@@ -1008,7 +1012,9 @@ TEST_F(TestSQLGetDescRec, IMP_ROW_GET) {
 #pragma warning(pop)
 #elif __APPLE__
 #pragma clang diagnostic pop
-#endif
+#elif defined(__linux__)
+#pragma GCC diagnostic pop
+#endif // WIN32 / __APPLE__ / __linux__
 
 int main(int argc, char** argv) {
 #ifdef WIN32
