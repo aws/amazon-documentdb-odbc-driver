@@ -102,30 +102,23 @@ jobs:
     - name: build-installer-rpm
       if: success()
       run: |
+        mkdir rpm-installer
         ./build_linux_release64_rpm.sh
         cd cmake-build64
-        mkdir rpm-installer
         cmake ../src
         make -j4
         cpack .
-        cp -v ./*.rpm rpm-installer
-        ls
-        cd ..
-        echo "cd .."
-        ls
+        cp -v ./*.rpm ../rpm-installer
     - name: build-installer-deb
       if: success()
       run: |
+        mkdir deb-installer
         ./build_linux_release64_deb.sh
         cd cmake-build64
-        mkdir deb-installer
         cmake ../src
         make -j4
         cpack .
-        cp ./*.deb deb-installer
-        ls
-        echo "cd .."
-        ls
+        cp -v ./*.deb ../deb-installer
     - name: create-output
       if: success()
       run: |
@@ -238,30 +231,23 @@ jobs:
     - name: build-installer-rpm
       if: success()
       run: |
+        mkdir rpm-installer
         ./build_linux_release32_rpm.sh
         cd cmake-build32
-        mkdir rpm-installer
         cmake ../src
         make -j4
         cpack .
-        cp -v ./*.rpm rpm-installer
-        ls
-        cd ..
-        echo "cd .."
-        ls
+        cp -v ./*.rpm ../rpm-installer
     - name: build-installer-deb
       if: success()
       run: |
+        mkdir deb-installer
         ./build_linux_release32_deb.sh
         cd cmake-build32
-        mkdir deb-installer
         cmake ../src
         make -j4
         cpack .
-        cp ./*.deb deb-installer
-        ls
-        echo "cd .."
-        ls
+        cp -v ./*.deb ../deb-installer
     - name: create-output
       if: success()
       run: |

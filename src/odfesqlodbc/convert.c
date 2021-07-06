@@ -68,7 +68,6 @@ typedef struct {
     int fr;
 } SIMPLE_TIME;
 
-static BOOL convert_money(const char *s, char *sout, size_t soutmax);
 size_t convert_linefeeds(const char *s, char *dst, size_t max, BOOL convlf,
                          BOOL *changed);
 static size_t convert_from_esbinary(const char *value, char *rgbValue,
@@ -2359,49 +2358,6 @@ static void parse_to_numeric_struct(const char *wv, SQL_NUMERIC_STRUCT *ns,
         if (carry != 0)
             *overflow = TRUE;
     }
-}
-
-static BOOL convert_money(const char *s, char *sout, size_t soutmax) {
-    char in, decp = 0;
-    size_t i = 0, out = 0;
-    int num_in = -1, period_in = -1, comma_in = -1;
-
-    for (i = 0; s[i]; i++) {
-        switch (in = s[i]) {
-            case '.':
-                if (period_in < 0)
-                    period_in = (int)i;
-                break;
-            case ',':
-                if (comma_in < 0)
-                    comma_in = (int)i;
-                break;
-            default:
-                if ('0' <= in && '9' >= in)
-                    num_in = (int)i;
-                break;
-        }
-    }
-    if (period_in > comma_in) {
-        if (period_in >= num_in - 2)
-            decp = '.';
-    } else if (comma_in >= 0 && comma_in >= num_in - 2)
-        decp = ',';
-    for (i = 0; s[i] && out + 1 < soutmax; i++) {
-        switch (in = s[i]) {
-            case '(':
-            case '-':
-                sout[out++] = '-';
-                break;
-            default:
-                if (in >= '0' && in <= '9')
-                    sout[out++] = in;
-                else if (in == decp)
-                    sout[out++] = '.';
-        }
-    }
-    sout[out] = '\0';
-    return TRUE;
 }
 
 /*	Change linefeed to carriage-return/linefeed */
