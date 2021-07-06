@@ -25,7 +25,7 @@ Client::Client(const char *connection_string) : henv(SQL_NULL_HENV),
     SQLCHAR strConnIn[BUF_LEN] = {0}, strConnOut[BUF_LEN] = {0};
     SQLSMALLINT lenConnOut;
     strcpy((char *) strConnIn, connection_string);
-    retcode = SQLDriverConnect(hdbc, NULL, strConnIn, SQL_NTS, strConnOut, BUF_LEN, &lenConnOut, SQL_DRIVER_COMPLETE);
+    retcode = SQLDriverConnectA(hdbc, NULL, strConnIn, SQL_NTS, strConnOut, BUF_LEN, &lenConnOut, SQL_DRIVER_COMPLETE);
     if (!SQL_SUCCEEDED(retcode)) {
         throw std::runtime_error("Failed at SQLDriverConnect with code " + std::to_string(retcode) + ".");
     }
@@ -53,7 +53,7 @@ Client::~Client() {
 }
 
 void Client::Query(const char *query) {
-    auto retcode = SQLExecDirect(hstmt, (SQLCHAR *) query, (SQLINTEGER) strlen(query));
+    auto retcode = SQLExecDirectA(hstmt, (SQLCHAR *) query, (SQLINTEGER) strlen(query));
     if (!SQL_SUCCEEDED(retcode)) {
         throw std::runtime_error("Failed at SQLExecDirect " + std::to_string(retcode) + ".");
     }
