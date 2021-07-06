@@ -85,7 +85,8 @@ size_t strncpy_null(char *dst, const char *src, ssize_t len) {
         return 0;
     if (src[i])
         return strlen(src);
-    printf("Output: '%s'\n");
+    printf("Output: '%s'\n", dst);
+    printf("Input: '%s'\n", src);
     return i;
 }
 
