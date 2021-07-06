@@ -222,7 +222,6 @@ RETCODE ESAPI_DriverConnect(HDBC hdbc, HWND hwnd, SQLCHAR *conn_str_in,
     CSTR func = "ESAPI_DriverConnect";
     ConnectionClass *conn = (ConnectionClass *)hdbc;
 
-    printf("Connection string: '%s'\n", (char*)conn_str_in);
     if (!conn) {
         CC_log_error(func, "ConnectionClass handle is NULL", NULL);
         return SQL_INVALID_HANDLE;

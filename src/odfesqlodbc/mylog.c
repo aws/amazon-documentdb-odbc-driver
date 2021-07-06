@@ -140,22 +140,12 @@ const char *GetExeProgramName() {
                         "/proc/curproc/exe"};
         unsigned long i;
         char path_name[256];
-        int path_found = 0;
-        printf("Attempting to find exe name.\n");
         for (i = 0; i < sizeof(flist) / sizeof(flist[0]); i++) {
-            printf("Attempting.\n");
             if (readlink(flist[i], path_name, sizeof(path_name)) > 0) {
-                printf("Found path: '%s'\n", path_name);
                 /* fprintf(stderr, "i=%d pathname=%s\n", i, path_name); */
                 STRCPY_FIXED(exename, po_basename(path_name));
-                path_found = 1;
                 break;
             }
-        }
-
-        if (path_found == 0) {
-            strcpy(exename, "unable-to-determine-exe-name");
-            printf("Failed to find executable name\n");
         }
 #endif /* WIN32 */
         for (p = (UCHAR *)exename; '\0' != *p; p++) {
@@ -214,7 +204,6 @@ const char *po_basename(const char *path) {
 
     if (p = strrchr(path, DIRSEPARATOR[0]), NULL != p)
         return p + 1;
-    printf("output path: %s\n", path);
     return path;
 }
 
