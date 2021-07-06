@@ -111,7 +111,7 @@ char CC_connect(ConnectionClass *self) {
             if (!SQL_SUCCEEDED(
                     CC_send_client_encoding(self, self->locale_encoding))) {
                 throw std::runtime_error("Cannot set " + std::string(self->locale_encoding)
-                                         + " as client encoding");
+                                         + " as client encoding. #define UNICODE_SUPPORT to enable UTF8.");
             }
         }
 
