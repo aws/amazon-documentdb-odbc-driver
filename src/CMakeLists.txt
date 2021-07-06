@@ -43,11 +43,12 @@ endif()
 # Set BUILD_WITH_TESTS to OFF before building installer package for size optimization.
 option(BUILD_WITH_TESTS "Enable testing" ON)
 
+# Do not under any circumstance reduce or remove the compiler warning flags.
+# These are our (best) friends.
 if(MSVC)
   add_compile_options(/W4 /WX)
 else()
-  # TODO: add -Werror once all warnings are resolved.
-  add_compile_options(-Wall -Wextra -pedantic)
+  add_compile_options(-Wall -Wextra -pedantic -Werror)
 endif()
 
 # Base directories

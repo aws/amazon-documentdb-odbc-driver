@@ -1880,9 +1880,9 @@ TEST_F(TestSQLGetData, DATE_TO_SQL_C_TYPE_TIME) {
 
     std::vector< std::pair< TIME_STRUCT, SQLTCHAR* > > expected;
     expected.push_back(
-        std::make_pair(TIME_STRUCT{0}, SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
+        std::make_pair(TIME_STRUCT{0, 0, 0}, SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
     expected.push_back(
-        std::make_pair(TIME_STRUCT{0}, SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
+        std::make_pair(TIME_STRUCT{0, 0, 0}, SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
 
     TestConvertingToTime(m_hstmt, columns, expected);
 }
@@ -1992,9 +1992,9 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_TYPE_DATE) {
 
     std::vector< std::pair< DATE_STRUCT, SQLTCHAR* > > expected;
     expected.push_back(
-        std::make_pair(DATE_STRUCT{0}, SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
+        std::make_pair(DATE_STRUCT{0, 0, 0}, SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
     expected.push_back(
-        std::make_pair(DATE_STRUCT{0}, SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
+        std::make_pair(DATE_STRUCT{0, 0, 0}, SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
 
     TestConvertingToDate(m_hstmt, columns, expected);
 }
@@ -2864,15 +2864,15 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TYPE_DATE) {
     expected.push_back(std::make_pair(DATE_STRUCT{2021, 11, 20}, nullptr));
     expected.push_back(std::make_pair(DATE_STRUCT{2021, 11, 1}, nullptr));
     expected.push_back(
-        std::make_pair(DATE_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+        std::make_pair(DATE_STRUCT{0, 0, 0}, SQLSTATE_STRING_CONVERSION_ERROR));
     expected.push_back(
-        std::make_pair(DATE_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+        std::make_pair(DATE_STRUCT{0, 0, 0}, SQLSTATE_STRING_CONVERSION_ERROR));
     expected.push_back(
-        std::make_pair(DATE_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+        std::make_pair(DATE_STRUCT{0, 0, 0}, SQLSTATE_STRING_CONVERSION_ERROR));
     expected.push_back(
-        std::make_pair(DATE_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+        std::make_pair(DATE_STRUCT{0, 0, 0}, SQLSTATE_STRING_CONVERSION_ERROR));
     expected.push_back(
-        std::make_pair(DATE_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+        std::make_pair(DATE_STRUCT{0, 0, 0}, SQLSTATE_STRING_CONVERSION_ERROR));
 
     TestConvertingToDate(m_hstmt, columns, expected);
 }
@@ -2910,13 +2910,13 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TYPE_TIME) {
     expected.push_back(std::make_pair(TIME_STRUCT{6, 39, 0}, nullptr));
     expected.push_back(std::make_pair(TIME_STRUCT{18, 1, 13}, nullptr));
     expected.push_back(
-        std::make_pair(TIME_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+        std::make_pair(TIME_STRUCT{0, 0, 0}, SQLSTATE_STRING_CONVERSION_ERROR));
     expected.push_back(
-        std::make_pair(TIME_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+        std::make_pair(TIME_STRUCT{0, 0, 0}, SQLSTATE_STRING_CONVERSION_ERROR));
     expected.push_back(
-        std::make_pair(TIME_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+        std::make_pair(TIME_STRUCT{0, 0, 0}, SQLSTATE_STRING_CONVERSION_ERROR));
     expected.push_back(
-        std::make_pair(TIME_STRUCT{0}, SQLSTATE_STRING_CONVERSION_ERROR));
+        std::make_pair(TIME_STRUCT{0, 0, 0}, SQLSTATE_STRING_CONVERSION_ERROR));
 
     TestConvertingToTime(m_hstmt, columns, expected);
 }
