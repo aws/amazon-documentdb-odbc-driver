@@ -214,7 +214,7 @@ const char *po_basename(const char *path) {
 
     if (p = strrchr(path, DIRSEPARATOR[0]), NULL != p)
         return p + 1;
-    printf("output path: %s\n", path)
+    printf("output path: %s\n", path);
     return path;
 }
 
