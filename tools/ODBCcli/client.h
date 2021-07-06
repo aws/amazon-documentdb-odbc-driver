@@ -3,6 +3,9 @@
 
 #ifdef WIN32
 
+// Add UNICODE_SUPPORT so driver properly encodes characters.
+#define UNICODE_SUPPORT
+
 #include <windows.h>
 #include <sql.h>
 #include <sqlext.h>
