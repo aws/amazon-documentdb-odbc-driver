@@ -877,7 +877,6 @@ static SQLLEN c16tombs(char *c8dt, const char16_t *c16dt, size_t n) {
 SQLLEN bindpara_msg_to_utf8(const char *ldt, char **wcsbuf, SQLLEN used) {
     SQLLEN l = (-2);
     char *utf8 = NULL, *ldt_nts, *alloc_nts = NULL, ntsbuf[128];
-    int count;
 
     if (SQL_NTS == used) {
         count = (int)strlen(ldt);
