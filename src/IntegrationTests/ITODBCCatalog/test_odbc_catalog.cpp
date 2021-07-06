@@ -108,6 +108,8 @@ class TestSQLGetTypeInfo : public Fixture {};
 //    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
 //};
 
+#ifdef __linux
+#pragma GCC diagnostic ignored "-Wcomment"
 //#define TEST_SQL_KEYS(test_name, test_function, ...)                     \
 //    TEST_F(TestSQLCatalogKeys, test_name) {                              \
 //        EXPECT_TRUE(SQL_SUCCEEDED(test_function(m_hstmt, __VA_ARGS__))); \
@@ -118,6 +120,9 @@ class TestSQLGetTypeInfo : public Fixture {};
 //        EXPECT_EQ(ret, SQL_NO_DATA);                                     \
 //        EXPECT_EQ(result_count, static_cast< size_t >(0));               \
 //    }
+#ifdef __linux__
+#pragma GCC diagnostic pop
+#endif // __linux__
 
 /**
  * SQLTables Tests

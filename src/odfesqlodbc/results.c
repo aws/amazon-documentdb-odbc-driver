@@ -333,7 +333,6 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
     OID field_type = 0;
     Int2 col_idx;
     ConnectionClass *conn;
-    ConnInfo *ci;
     int column_size, unknown_sizes;
     int cols = 0;
     RETCODE result;
@@ -361,7 +360,6 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
         *pcbDesc = 0;
     irdflds = SC_get_IRDF(stmt);
     conn = SC_get_conn(stmt);
-    ci = &(conn->connInfo);
 
     /*
      * Dont check for bookmark column.	This is the responsibility of the
@@ -477,6 +475,10 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
         (USE_FI(fi, unknown_sizes) && fi->column_size > 0)
             ? fi->column_size
             : estype_column_size(stmt, field_type, col_idx, unknown_sizes);
+#ifdef __linux__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough="
+#endif // __linux__
     switch (fDescType) {
         case SQL_COLUMN_AUTO_INCREMENT: /* == SQL_DESC_AUTO_UNIQUE_VALUE */
             if (fi && fi->auto_increment)
@@ -715,6 +717,9 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
                          func);
             return SQL_ERROR;
     }
+#ifdef __linux__
+#pragma GCC diagnostic pop
+#endif // __linux__
 
     result = SQL_SUCCESS;
 

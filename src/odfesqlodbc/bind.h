@@ -106,12 +106,12 @@ typedef struct {
 #define EXEC_PARAM_CAST TRUE
 #define SIMPLE_PARAM_CAST TRUE
 
-#define CALC_BOOKMARK_ADDR(book, offset, bind_size, index)             \
-    (book->buffer + offset                                             \
-     + (bind_size > 0                                                  \
-            ? bind_size                                                \
-            : (SQL_C_VARBOOKMARK == book->returntype ? book->buflen    \
-                                                     : sizeof(UInt4))) \
+#define CALC_BOOKMARK_ADDR(book, offset, bind_size, index)                          \
+    (book->buffer + offset                                                          \
+     + (bind_size > 0                                                               \
+            ? bind_size                                                             \
+            : (SQL_C_VARBOOKMARK == book->returntype ? book->buflen                 \
+                                                     : ((SQLLEN)sizeof(UInt4))))    \
            * index)
 
 /* Macros to handle estype of parameters */
