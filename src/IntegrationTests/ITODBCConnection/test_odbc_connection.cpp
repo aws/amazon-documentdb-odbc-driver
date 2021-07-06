@@ -92,8 +92,6 @@ TEST_F(TestSQLConnect, IAM_empty_server_used_default) {
     LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
 }
 
-#ifndef __linux__
-// TODO AT-864: Linux currently fails on these because the DSN is not configured correctly in GitHub actions.
 TEST_F(TestSQLConnect, IAM_WrongUser) {
     SQLRETURN ret = SQLConnect(
         m_conn, AS_SQLTCHAR(wdsn_name.c_str()), SQL_NTS, 
@@ -111,8 +109,6 @@ TEST_F(TestSQLConnect, IAM_WrongPassword) {
     EXPECT_EQ(SQL_ERROR, ret);
     LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
 }
-#endif
-
 
 class TestSQLDriverConnect : public testing::Test {
    public:

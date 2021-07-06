@@ -144,54 +144,6 @@ static Int4 getCharColumnSizeX(const ConnectionClass *conn, OID type,
  */
 #define UNUSED_HANDLE_UNKNOWN_SIZE_AS (-2)
 
-static SQLSMALLINT getNumericDecimalDigitsX(const ConnectionClass *conn,
-                                            OID type, int atttypmod,
-                                            int adtsize_or_longest,
-                                            int handle_unknown_size_as) {
-    UNUSED(conn, handle_unknown_size_as);
-    SQLSMALLINT default_decimal_digits = 6;
-
-    MYLOG(LOG_TRACE, "entering type=%d, atttypmod=%d\n", type, atttypmod);
-
-    if (atttypmod < 0 && adtsize_or_longest < 0)
-        return default_decimal_digits;
-
-    if (atttypmod > -1)
-        return (SQLSMALLINT)(atttypmod & 0xffff);
-    if (adtsize_or_longest <= 0)
-        return default_decimal_digits;
-    adtsize_or_longest >>= 16; /* extract the scale part */
-    return (SQLSMALLINT)adtsize_or_longest;
-}
-
-static Int4
-getNumericColumnSizeX(const ConnectionClass *conn, OID type, int atttypmod,
-                      int adtsize_or_longest, int handle_unknown_size_as) {
-    UNUSED(conn);
-    Int4 default_column_size = 28;
-    MYLOG(LOG_TRACE, "entering type=%d, typmod=%d\n", type, atttypmod);
-
-    if (atttypmod > -1)
-        return (atttypmod >> 16) & 0xffff;
-    switch (handle_unknown_size_as) {
-        case UNKNOWNS_AS_DONTKNOW:
-            return SQL_NO_TOTAL;
-    }
-    if (adtsize_or_longest <= 0)
-        return default_column_size;
-    adtsize_or_longest %= (1 << 16); /* extract the precision part */
-    switch (handle_unknown_size_as) {
-        case UNKNOWNS_AS_MAX:
-            return adtsize_or_longest > default_column_size
-                       ? adtsize_or_longest
-                       : default_column_size;
-        default:
-            if (adtsize_or_longest < 10)
-                adtsize_or_longest = 10;
-    }
-    return adtsize_or_longest;
-}
-
 static SQLSMALLINT getTimestampDecimalDigitsX(const ConnectionClass *conn,
                                               OID type, int atttypmod) {
     UNUSED(conn);

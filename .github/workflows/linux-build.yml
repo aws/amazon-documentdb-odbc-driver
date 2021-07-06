@@ -33,62 +33,59 @@ jobs:
         name: cppcheck-results
         path: cppcheck-results.log
     - name: get-dependencies
+      if: success()
       run: |
         sudo apt update
         sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib cmake linux-headers-$(uname -r) build-essential valgrind
     - name: prepare-dsn
+      if: success()
       run: |
-        # TODO: This is broken, needs to be fixed
-        sudo mv ./src/IntegrationTests/ITODBCConnection/odbc-linux.ini /home/runner/odbc.ini
-        sudo mv ./src/IntegrationTests/ITODBCConnection/odbcinst-linux.ini /home/runner/odbcinst.ini
-        mkdir ${{ github.workspace }}/odbc-logs
-        export ODBCSYSINI=/home/runner
+        sudo mv ./src/IntegrationTests/ITODBCConnection/odbc-linux.ini /etc/odbc.ini
+        sudo mv ./src/IntegrationTests/ITODBCConnection/odbcinst-linux.ini /etc/odbcinst.ini
+        mkdir /home/runner/work/timestream-odbc/timestream-odbc/odbc-logs
+        export ODBCSYSINI=/etc/
         export ODBCINSTINI=odbcinst.ini
-        export ODBCINI=/home/runner/odbc.ini
-        printenv ODBCSYSINI ODBCINSTINI ODBCINI
-        odbcinst -q -d
-        odbcinst -q -s
-        odbcinst -j
-        cat /home/runner/odbc.ini
-        cat /home/runner/odbcinst.ini
+        export ODBCINI=/etc/odbc.ini
     - name: configure-and-build-driver
       run: |
         ./build_linux_release64_rpm.sh
     - name: configure-aws-credentials
+      if: success()
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
     - name: run-connection-unit-test
+      if: success()
       run: |
         ./build/odbc/bin/ut_conn
     - name: run-integration-connection-tests
-      if: always()
+      if: success()
       run: |
         ./build/odbc/bin/itodbc_connection
     - name: run-integration-execution-tests
-      if: always()
+      if: success()
       run: |
         ./build/odbc/bin/itodbc_execution
     - name: run-integration-results-tests
-      if: always()
+      if: success()
       run: |
         ./build/odbc/bin/itodbc_results
     - name: run-integration-descriptors-tests
-      if: always()
+      if: success()
       run: |
         ./build/odbc/bin/itodbc_descriptors
     - name: run-integration-catalog-tests
-      if: always()
+      if: success()
       run: |
         ./build/odbc/bin/itodbc_catalog
     - name: run-integration-info-tests
-      if: always()
+      if: success()
       run: |
         ./build/odbc/bin/itodbc_info
     - name: run-integration-pagination-tests
-      if: always()
+      if: success()
       run: |
         ./build/odbc/bin/itodbc_pagination
     - name: prepare-test-results
@@ -102,52 +99,53 @@ jobs:
         name: integration-test-results-linux64
         path: |
           ${{ github.workspace }}/odbc-logs/
-    - name: build-installer-rpm
-      if: always()
+    - name: build-rpm-installer
+      if: success()
       run: |
+        ./build_linux_release64_rpm.sh
         cd cmake-build64
         cmake ../src
-        make
+        make -j4
         cpack .
         cd ..
-    - name: build-installer-deb
-      if: always()
+    - name: build-deb-installer
+      if: success()
       run: |
         ./build_linux_release64_deb.sh
         cd cmake-build64
         cmake ../src
-        make
+        make -j4
         cpack .
         cd ..
     - name: create-output
       if: success()
       run: |
-        mkdir build-output
-        mkdir test-output
         mkdir rpm-installer
         mkdir deb-installer
-        cp ./build/odbc/lib/*.so build-output/
-        cp ./build/odbc/lib/*.a build-output/
-        cp ./cmake-build64/*.rpm rpm-installer/
-        cp ./cmake-build64/*.deb deb-installer/
+        mkdir build-output
+        mkdir test-output
+        cp -v ./build/odbc/lib/*.a build-output/
+        cp -v ./build/odbc/lib/*.so build-output/
+        cp -v ./cmake-build64/*.rpm rpm-installer/
+        cp -v ./cmake-build64/*.deb deb-installer/
     - name: upload-build
       if: success()
       uses: actions/upload-artifact@v2
       with:
         name: linux64-build
         path: build-output
-    - name: upload-linux64-installer-rpm
+    - name: upload-linux64-rpm-installer
       if: success()
       uses: actions/upload-artifact@v2
       with:
-        name: linux64-installer-rpm
-        path: installer-rpm
-    - name: upload-linux64-installer-deb
+        name: linux64-rpm-installer
+        path: rpm-installer
+    - name: upload-linux64-deb-installer
       if: success()
       uses: actions/upload-artifact@v2
       with:
-        name: linux64-installer-deb
-        path: installer-deb
+        name: linux64-deb-installer
+        path: deb-installer
   build-linux32:
     runs-on: ubuntu-latest
     steps:
@@ -163,64 +161,62 @@ jobs:
         name: cppcheck-results
         path: cppcheck-results.log
     - name: get-dependencies
+      if: success()
       run: |
         # Need to install i386 versions
         sudo dpkg --add-architecture i386
         sudo apt update 
         sudo apt install unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386 zlib1g-dev:i386 linux-headers-$(uname -r) gcc-multilib:i386 g++-multilib:i386 cmake g++-9:i386 gcc-9:i386 gcc-9-multilib:i386 g++-9-multilib:i386 binutils:i386 make:i386
     - name: prepare-dsn
+      if: success()
       run: |
-        # TODO: This is broken, needs to be
-        sudo mv ./src/IntegrationTests/ITODBCConnection/odbc-linux.ini /home/runner/odbc.ini
-        sudo mv ./src/IntegrationTests/ITODBCConnection/odbcinst-linux.ini /home/runner/odbcinst.ini
-        mkdir ${{ github.workspace }}/odbc-logs
-        export ODBCSYSINI=/home/runner
+        sudo mv ./src/IntegrationTests/ITODBCConnection/odbc-linux.ini /etc/odbc.ini
+        sudo mv ./src/IntegrationTests/ITODBCConnection/odbcinst-linux.ini /etc/odbcinst.ini
+        mkdir /home/runner/work/timestream-odbc/timestream-odbc/odbc-logs
+        export ODBCSYSINI=/etc/
         export ODBCINSTINI=odbcinst.ini
-        export ODBCINI=/home/runner/odbc.ini
-        printenv ODBCSYSINI ODBCINSTINI ODBCINI
-        odbcinst -q -d
-        odbcinst -q -s
-        odbcinst -j
-        cat /home/runner/odbc.ini
-        cat /home/runner/odbcinst.ini
+        export ODBCINI=/etc/odbc.ini
     - name: configure-aws-credentials
+      if: success()
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
     - name: configure-and-build-driver
+      if: success()
       run: |
         ./build_linux_release32_rpm.sh
     - name: run-connection-unit-test
+      if: success()
       run: |
         ./build/odbc/bin/ut_conn
     - name: run-integration-connection-tests
-      if: always()
+      if: success()
       run: |
         ./build/odbc/bin/itodbc_connection
     - name: run-integration-execution-tests
-      if: always()
+      if: success()
       run: |
         ./build/odbc/bin/itodbc_execution
     - name: run-integration-results-tests
-      if: always()
+      if: success()
       run: |
         ./build/odbc/bin/itodbc_results
     - name: run-integration-descriptors-tests
-      if: always()
+      if: success()
       run: |
         ./build/odbc/bin/itodbc_descriptors
     - name: run-integration-catalog-tests
-      if: always()
+      if: success()
       run: |
         ./build/odbc/bin/itodbc_catalog
     - name: run-integration-info-tests
-      if: always()
+      if: success()
       run: |
         ./build/odbc/bin/itodbc_info
     - name: run-integration-pagination-tests
-      if: always()
+      if: success()
       run: |
         ./build/odbc/bin/itodbc_pagination
     - name: prepare-test-results
@@ -234,49 +230,50 @@ jobs:
         name: integration-test-results-linux32
         path: |
           ${{ github.workspace }}/odbc-logs/
-    - name: build-installer-rpm
-      if: always()
+    - name: build-rpm-installer
+      if: success()
       run: |
+        ./build_linux_release32_rpm.sh
         cd cmake-build32
         cmake ../src
-        make
+        make -j4
         cpack .
         cd ..
-    - name: build-installer-deb
-      if: always()
+    - name: build-deb-installer
+      if: success()
       run: |
         ./build_linux_release32_deb.sh
         cd cmake-build32
         cmake ../src
-        make
+        make -j4
         cpack .
         cd ..
     - name: create-output
       if: success()
       run: |
-        mkdir build-output
-        mkdir test-output
         mkdir rpm-installer
         mkdir deb-installer
-        cp ./build/odbc/lib/*.so build-output/
-        cp ./build/odbc/lib/*.a build-output/
-        cp ./cmake-build32/*.rpm rpm-installer/
-        cp ./cmake-build32/*.deb deb-installer/
+        mkdir build-output
+        mkdir test-output
+        cp -v ./build/odbc/lib/*.a build-output/
+        cp -v ./build/odbc/lib/*.so build-output/
+        cp -v ./cmake-build32/*.rpm rpm-installer/
+        cp -v ./cmake-build32/*.deb deb-installer/
     - name: upload-build
       if: success()
       uses: actions/upload-artifact@v2
       with:
         name: linux32-build
         path: build-output
-    - name: upload-linux32-installer-rpm
+    - name: upload-linux32-rpm-installer
       if: success()
       uses: actions/upload-artifact@v2
       with:
-        name: linux32-installer-rpm
-        path: installer-rpm
-    - name: upload-linux32-installer-deb
+        name: linux32-rpm-installer
+        path: rpm-installer
+    - name: upload-linux32-deb-installer
       if: success()
       uses: actions/upload-artifact@v2
       with:
-        name: linux32-installer-deb
-        path: installer-deb
+        name: linux32-deb-installer
+        path: deb-installer

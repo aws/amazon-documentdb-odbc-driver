@@ -189,7 +189,6 @@ RETCODE SQL_API SQLDriverConnect(HDBC hdbc, HWND hwnd, SQLCHAR *szConnStrIn,
     MYLOG(LOG_TRACE, "entering\n");
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
-    printf("ESAPI_DriverConnect\n");
     ret =
         ESAPI_DriverConnect(hdbc, hwnd, szConnStrIn, cbConnStrIn, szConnStrOut,
                             cbConnStrOutMax, pcbConnStrOut, fDriverCompletion);
