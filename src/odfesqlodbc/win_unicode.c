@@ -164,7 +164,7 @@ char *ucs2_to_utf8(const SQLWCHAR *ucs2str, SQLLEN ilen, SQLLEN *olen,
                     memcpy(utf8str + len, (char *)&byte2code,
                            sizeof(byte2code));
                 else {
-                    utf8str[len] = (char)((byte2code >> 8) && 0xFF);
+                    utf8str[len] = (char)((byte2code >> 8) & 0xFF);
                     utf8str[len + 1] = (char)(byte2code & 0xFF);
                 }
                 len += sizeof(byte2code);
@@ -184,9 +184,9 @@ char *ucs2_to_utf8(const SQLWCHAR *ucs2str, SQLLEN ilen, SQLLEN *olen,
                     memcpy(utf8str + len, (char *)&byte4code,
                            sizeof(byte4code));
                 else {
-                    utf8str[len] = (char)((byte4code >> 24) && 0xFF);
-                    utf8str[len + 1] = (char)((byte4code >> 16) && 0xFF);
-                    utf8str[len + 2] = (char)((byte4code >> 8) && 0xFF);
+                    utf8str[len] = (char)((byte4code >> 24) & 0xFF);
+                    utf8str[len + 1] = (char)((byte4code >> 16) & 0xFF);
+                    utf8str[len + 2] = (char)((byte4code >> 8) & 0xFF);
                     utf8str[len + 3] = (char)(byte4code & 0xFF);
                 }
                 len += sizeof(byte4code);
@@ -197,9 +197,9 @@ char *ucs2_to_utf8(const SQLWCHAR *ucs2str, SQLLEN ilen, SQLLEN *olen,
                 if (little_endian)
                     memcpy(utf8str + len, (char *)&byte4code, 3);
                 else {
-                    utf8str[len] = (char)((byte4code >> 16) && 0xFF);
-                    utf8str[len + 1] = (char)((byte4code >> 8) && 0xFF);
-                    utf8str[len + 2] = (char)((byte4code) && 0xFF);
+                    utf8str[len] = (char)((byte4code >> 16) & 0xFF);
+                    utf8str[len + 1] = (char)((byte4code >> 8) & 0xFF);
+                    utf8str[len + 2] = (char)((byte4code) & 0xFF);
                 }
                 len += 3;
             }
