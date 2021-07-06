@@ -1,4 +1,4 @@
-# ODBC sample client application - ODBCCli
+# ODBC sample client application - ODBCcli
 
 A simple odbc client application that lets you pass a dsn and query to run on a Timestream database.
 
@@ -31,7 +31,7 @@ $ make
 8. Right click on ODBCcli and click Build.
 9. odbccli.exe will be created in the Build\Debug directory or Build\Release directory depending on the version built
 ```
-## Running the Sample Application - ODBCCli
+## Running the Sample Application - ODBCcli
 On Windows:
 ```
 ODBCcli.exe <your-connection-string> <your-query>
