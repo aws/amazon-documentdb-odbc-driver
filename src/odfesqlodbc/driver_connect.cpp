@@ -86,7 +86,6 @@ static RETCODE GetRequirementsAndConnect(const SQLUSMALLINT driver_completion,
         return SQL_ERROR;
     }
     ret_val = CC_connect(conn);
-
     return SQL_SUCCESS;
 }
 
