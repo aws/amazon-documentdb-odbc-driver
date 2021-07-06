@@ -35,7 +35,6 @@ RETCODE SQL_API SQLColumnsW(HSTMT StatementHandle, SQLWCHAR *CatalogName,
     char *ctName, *scName, *tbName, *clName;
     SQLLEN nmlen1, nmlen2, nmlen3, nmlen4;
     StatementClass *stmt = (StatementClass *)StatementHandle;
-    ConnectionClass *conn;
     BOOL lower_id;
     UWORD flag = PODBC_SEARCH_PUBLIC_SCHEMA;
 
@@ -43,7 +42,6 @@ RETCODE SQL_API SQLColumnsW(HSTMT StatementHandle, SQLWCHAR *CatalogName,
     if (SC_connection_lost_check(stmt, __func__))
         return SQL_ERROR;
 
-    conn = SC_get_conn(stmt);
     lower_id = DEFAULT_LOWERCASEIDENTIFIER;
     ctName = ucs2_to_utf8(CatalogName, NameLength1, &nmlen1, lower_id, TRUE);
     scName = ucs2_to_utf8(SchemaName, NameLength2, &nmlen2, lower_id, TRUE);

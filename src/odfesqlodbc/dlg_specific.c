@@ -377,6 +377,10 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
         return;
 
     /* Proceed with getting info for the given DSN. */
+#ifdef __linux
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waddress"
+#endif
     if (SQLGetPrivateProfileString(DSN, INI_AUTH_MODE, NULL_STRING, temp,
                                    sizeof(temp), ODBC_INI)
         > 0)
@@ -488,6 +492,10 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
         STRCPY_FIXED(ci->idp_arn, temp);
 
     STR_TO_NAME(ci->drivers.drivername, drivername);
+
+#ifdef __linux
+#pragma GCC diagnostic pop
+#endif
 }
 /*
  *	This function writes any global parameters (that can be manipulated)
