@@ -9,17 +9,17 @@ Client::Client(const char *connection_string) : henv(SQL_NULL_HENV),
     // Allocate the environment handle
     auto retcode = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
     if (!SQL_SUCCEEDED(retcode)) {
-        throw std::runtime_error("Failed at SQLAllocHandle SQL_HANDLE_ENV");
+        throw std::runtime_error("Failed at SQLAllocHandle SQL_HANDLE_ENV " + std::to_string(retcode) + ".");
     }
     // Set the version environment attribute
     retcode = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER *) SQL_OV_ODBC3, 0);
     if (!SQL_SUCCEEDED(retcode)) {
-        throw std::runtime_error("Failed at SQLSetEnvAttr SQL_ATTR_ODBC_VERSION");
+        throw std::runtime_error("Failed at SQLSetEnvAttr SQL_ATTR_ODBC_VERSION " + std::to_string(retcode) + ".");
     }
     // Allocate the connection handle
     retcode = SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
     if (!SQL_SUCCEEDED(retcode)) {
-        throw std::runtime_error("Failed at SQLAllocHandle SQL_HANDLE_DBC");
+        throw std::runtime_error("Failed at SQLAllocHandle SQL_HANDLE_DBC " + std::to_string(retcode) + ".");
     }
     // Connect
     SQLCHAR strConnIn[BUF_LEN] = {0}, strConnOut[BUF_LEN] = {0};
@@ -27,12 +27,12 @@ Client::Client(const char *connection_string) : henv(SQL_NULL_HENV),
     strcpy((char *) strConnIn, connection_string);
     retcode = SQLDriverConnect(hdbc, NULL, strConnIn, SQL_NTS, strConnOut, BUF_LEN, &lenConnOut, SQL_DRIVER_COMPLETE);
     if (!SQL_SUCCEEDED(retcode)) {
-        throw std::runtime_error("Failed at SQLDriverConnect");
+        throw std::runtime_error("Failed at SQLDriverConnect with code " + std::to_string(retcode) + ".");
     }
     // Allocate the statement handle
     retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
     if (!SQL_SUCCEEDED(retcode)) {
-        throw std::runtime_error("Failed at SQLAllocHandle SQL_HANDLE_STMT");
+        throw std::runtime_error("Failed at SQLAllocHandle SQL_HANDLE_STMT " + std::to_string(retcode) + ".");
     }
 }
 
@@ -55,7 +55,7 @@ Client::~Client() {
 void Client::Query(const char *query) {
     auto retcode = SQLExecDirect(hstmt, (SQLCHAR *) query, (SQLINTEGER) strlen(query));
     if (!SQL_SUCCEEDED(retcode)) {
-        throw std::runtime_error("Failed at SQLExecDirect");
+        throw std::runtime_error("Failed at SQLExecDirect " + std::to_string(retcode) + ".");
     }
 }
 
@@ -66,7 +66,7 @@ std::optional<std::vector<std::string>> Client::FetchOne() {
         if (cols == 0) {
             retcode = SQLNumResultCols(hstmt, &cols);
             if (!SQL_SUCCEEDED(retcode)) {
-                throw std::runtime_error("Failed at SQLNumResultCols");
+                throw std::runtime_error("Failed at SQLNumResultCols " + std::to_string(retcode) + ".");
             }
         }
         std::vector<std::string> row;
@@ -75,7 +75,7 @@ std::optional<std::vector<std::string>> Client::FetchOne() {
             SQLLEN indicator = 0;
             retcode = SQLGetData(hstmt, i, SQL_C_CHAR, &data, BUF_LEN, &indicator);
             if (!SQL_SUCCEEDED(retcode)) {
-                throw std::runtime_error("Failed at SQLGetData");
+                throw std::runtime_error("Failed at SQLGetData " + std::to_string(retcode) + ".");
             }
             if (indicator != SQL_NULL_DATA) {
                 std::string cell((const char *) data, indicator);
