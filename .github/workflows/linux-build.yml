@@ -110,12 +110,14 @@ jobs:
         cd ..
     - name: build-deb-installer
       if: success()
+      # TODO: Remove deb install. Temporarily adding so I can test sample application
       run: |
         ./build_linux_release64_deb.sh
         cd cmake-build64
         cmake ../src
         make -j4
         cpack .
+        sudo dpkg -i amazontimestreamodbcdriver64-bit0.3.2_0.3.2_amd64.deb
         cd ..
     - name: create-output
       if: success()
