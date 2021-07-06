@@ -95,35 +95,6 @@ static SQLLEN es_bin2whex(const char *src, SQLWCHAR *dst, SQLLEN length);
  *---------
  */
 
-/*
- *	Macros for BIGINT handling.
- */
-#ifdef ODBCINT64
-#ifdef WIN32
-#define ATOI64(val) _strtoi64(val, NULL, 10)
-#define ATOI64U(val) _strtoui64(val, NULL, 10)
-#elif (SIZEOF_LONG == 8)
-#define ATOI64(val) strtol(val, NULL, 10)
-#define ATOI64U(val) strtoul(val, NULL, 10)
-#else
-#if defined(HAVE_STRTOLL)
-#define ATOI64(val) strtoll(val, NULL, 10)
-#define ATOI64U(val) strtoull(val, NULL, 10)
-#else
-static ODBCINT64 ATOI64(const char *val) {
-    ODBCINT64 ll;
-    sscanf(val, "%lld", &ll);
-    return ll;
-}
-static unsigned ODBCINT64 ATOI64U(const char *val) {
-    unsigned ODBCINT64 ll;
-    sscanf(val, "%llu", &ll);
-    return ll;
-}
-#endif /* HAVE_STRTOLL */
-#endif /* WIN32 */
-#endif /* ODBCINT64 */
-
 static void parse_to_numeric_struct(const char *wv, SQL_NUMERIC_STRUCT *ns,
                                     BOOL *overflow);
 
