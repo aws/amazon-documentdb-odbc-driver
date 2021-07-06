@@ -75,8 +75,10 @@ size_t strncpy_null(char *dst, const char *src, ssize_t len) {
     int i;
 
     if (NULL != dst && len > 0) {
-        for (i = 0; src[i] && i < len - 1; i++)
+        for (i = 0; src[i] && i < len - 1; i++) {
             dst[i] = src[i];
+            printf("copying\n");
+        }
 
         dst[i] = '\0';
     } else
