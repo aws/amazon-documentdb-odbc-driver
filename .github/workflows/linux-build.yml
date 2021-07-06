@@ -46,17 +46,6 @@ jobs:
         export ODBCSYSINI=/etc/
         export ODBCINSTINI=odbcinst.ini
         export ODBCINI=/etc/odbc.ini
-    - name: build-and-test-sample-application
-      if: success()
-      run: |
-        pwd
-        ls -l
-        cd tools/ODBCCli
-        mkdir build
-        cd build
-        cmake ../ -DCMAKE_BUILD_TYPE=Release
-        make -j 4
-        ./ODBCcli "DSN=timestream-aws-profile" "* FROM ODBCTest.IoT LIMIT 1"
     - name: configure-and-build-driver
       run: |
         ./build_linux_release64_rpm.sh
@@ -157,6 +146,15 @@ jobs:
       with:
         name: linux64-deb-installer
         path: deb-installer
+    - name: build-and-test-sample-application
+      if: success()
+      run: |
+        cd tools/ODBCcli
+        mkdir build
+        cd build
+        cmake ../ -DCMAKE_BUILD_TYPE=Release
+        make -j 4
+        ./ODBCcli "DSN=timestream-aws-profile" "* FROM ODBCTest.IoT LIMIT 1"
   build-linux32:
     runs-on: ubuntu-latest
     steps:
