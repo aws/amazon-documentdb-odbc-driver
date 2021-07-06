@@ -256,7 +256,7 @@ static DWORD start_time = 0;
 static FILE *MLOGFP = NULL;
 
 static void MLOG_open() {
-    char filebuf[1024], errbuf[1024];
+    char filebuf[1024], errbuf[2048];
     BOOL open_error = FALSE;
 
     // TODO (#585): Add option to log to stderr stream
