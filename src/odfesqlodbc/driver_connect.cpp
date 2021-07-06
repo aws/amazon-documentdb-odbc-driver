@@ -219,7 +219,6 @@ RETCODE ESAPI_DriverConnect(HDBC hdbc, HWND hwnd, SQLCHAR *conn_str_in,
     CSTR func = "ESAPI_DriverConnect";
     ConnectionClass *conn = (ConnectionClass *)hdbc;
 
-    printf("Conn handle\n");
     if (!conn) {
         CC_log_error(func, "ConnectionClass handle is NULL", NULL);
         return SQL_INVALID_HANDLE;
@@ -228,13 +227,10 @@ RETCODE ESAPI_DriverConnect(HDBC hdbc, HWND hwnd, SQLCHAR *conn_str_in,
 
     // Setup connection string
     {
-        printf("Setup conn string\n");
         const SQLRETURN return_code =
             SetupConnString(conn_str_in, conn_str_in_len, ci, conn);
-        if (return_code != SQL_SUCCESS) {
-            printf("Setup conn string failed\n");
+        if (return_code != SQL_SUCCESS)
             return return_code;
-        }
     }
 
     // Initialize version
@@ -243,19 +239,16 @@ RETCODE ESAPI_DriverConnect(HDBC hdbc, HWND hwnd, SQLCHAR *conn_str_in,
     int reqs = 0;
     int retval = 0;
     do {
-        printf("GetRequirementsAndConnect\n");
         const SQLRETURN return_code = GetRequirementsAndConnect(
             driver_completion, hwnd, ci, reqs, conn, retval);
         if (return_code != SQL_SUCCESS)
             return return_code;
 
         // Check for errors
-        printf("CheckRetVal\n");
         const std::string error_msg =
             CheckRetVal(retval, hwnd, driver_completion, reqs, ci);
 
         // If we have an error, log it and exit
-        printf("Error msg: '%s'\n", error_msg.c_str());
         if (error_msg != "") {
             CC_log_error(func, error_msg.c_str(), conn);
             return SQL_ERROR;
