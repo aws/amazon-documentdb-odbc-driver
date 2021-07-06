@@ -127,7 +127,6 @@ RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
     SQLLEN column_size = 0;
     int unknown_sizes;
     SQLINTEGER decimal_digits = 0;
-    ConnInfo *ci;
     FIELD_INFO *fi;
     char buf[255];
     int len = 0;
@@ -141,7 +140,6 @@ RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
     }
 
     conn = SC_get_conn(stmt);
-    ci = &(conn->connInfo);
     unknown_sizes = DEFAULT_UNKNOWNSIZES;
 
     SC_clear_error(stmt);
@@ -429,23 +427,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
     if (FI_is_applicable(fi))
         field_type = getEffectiveOid(conn, fi);
     else {
-        BOOL build_fi = FALSE;
-
         fi = NULL;
-        switch (fDescType) {
-            case SQL_COLUMN_OWNER_NAME:
-            case SQL_COLUMN_TABLE_NAME:
-            case SQL_COLUMN_TYPE:
-            case SQL_COLUMN_TYPE_NAME:
-            case SQL_COLUMN_AUTO_INCREMENT:
-            case SQL_DESC_NULLABLE:
-            case SQL_DESC_BASE_TABLE_NAME:
-            case SQL_DESC_BASE_COLUMN_NAME:
-            case SQL_COLUMN_UPDATABLE:
-            case 1212: /* SQL_CA_SS_COLUMN_KEY ? */
-                build_fi = TRUE;
-                break;
-        }
 
         res = SC_get_Curres(stmt);
         cols = QR_NumPublicResultCols(res);
