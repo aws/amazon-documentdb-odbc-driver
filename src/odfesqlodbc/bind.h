@@ -109,9 +109,9 @@ typedef struct {
 #define CALC_BOOKMARK_ADDR(book, offset, bind_size, index)                          \
     (book->buffer + offset                                                          \
      + (bind_size > 0                                                               \
-            ? bind_size                                                             \
-            : (SQL_C_VARBOOKMARK == book->returntype ? book->buflen                 \
-                                                     : ((SQLULEN)sizeof(UInt4))))   \
+            ? (SQLLEN)bind_size                                                     \
+            : (SQL_C_VARBOOKMARK == book->returntype ? (SQLLEN)book->buflen         \
+                                                     : ((SQLLEN)sizeof(UInt4))))    \
            * index)
 
 /* Macros to handle estype of parameters */
