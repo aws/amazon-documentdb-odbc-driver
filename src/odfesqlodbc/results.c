@@ -147,7 +147,7 @@ RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wkeyword-macro"
-#endif  // __APPLE__ / __linux
+#endif  // __APPLE__
 #define return DONT_CALL_RETURN_FROM_HERE ? ? ?
 #ifdef __APPLE__
 #pragma clang diagnostic pop
@@ -853,7 +853,7 @@ RETCODE SQL_API ESAPI_GetData(HSTMT hstmt, SQLUSMALLINT icol,
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wkeyword-macro"
-#endif  // __APPLE__ / __linux
+#endif  // __APPLE__
 #define return DONT_CALL_RETURN_FROM_HERE ? ? ?
 #ifdef __APPLE__
 #pragma clang diagnostic pop
@@ -1065,7 +1065,7 @@ RETCODE SQL_API ESAPI_Fetch(HSTMT hstmt) {
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wkeyword-macro"
-#endif  // __APPLE__ / __linux
+#endif  // __APPLE__
 #define return DONT_CALL_RETURN_FROM_HERE ? ? ?
 #ifdef __APPLE__
 #pragma clang diagnostic pop
@@ -1398,7 +1398,7 @@ RETCODE SQL_API API_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
 #ifdef __APPLE__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wkeyword-macro"
-#endif  // __APPLE__ / __linux
+#endif  // __APPLE__
 #define return DONT_CALL_RETURN_FROM_HERE ? ? ?
 #ifdef __APPLE__
 #pragma clang diagnostic pop
