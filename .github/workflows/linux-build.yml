@@ -102,30 +102,37 @@ jobs:
     - name: build-installer-rpm
       if: success()
       run: |
-        mkdir rpm-installer
         ./build_linux_release64_rpm.sh
         cd cmake-build64
         cmake ../src
         make -j4
         cpack .
-        cp -v ./*.rpm ../rpm-installer
+        cd ..
     - name: build-installer-deb
       if: success()
       run: |
-        mkdir deb-installer
         ./build_linux_release64_deb.sh
         cd cmake-build64
         cmake ../src
         make -j4
         cpack .
-        cp -v ./*.deb ../deb-installer
+        cd ..
     - name: create-output
       if: success()
       run: |
+        pwd
+        ls
+        mkdir rpm-installer
+        mkdir deb-installer
         mkdir build-output
         mkdir test-output
-        cp ./build/odbc/lib/*.so build-output/
-        cp ./build/odbc/lib/*.a build-output/
+        cp -v ./build/odbc/lib/*.a build-output/
+        cp -v ./build/odbc/lib/*.so build-output/
+        cp -v cmake-build64/*.rpm rpm-installer/
+        cp -v cmake-build64/*.deb deb-installer/
+        pwd
+        ls
+        ls rpm-installer
     - name: upload-build
       if: success()
       uses: actions/upload-artifact@v2
@@ -231,13 +238,12 @@ jobs:
     - name: build-installer-rpm
       if: success()
       run: |
-        mkdir rpm-installer
         ./build_linux_release32_rpm.sh
         cd cmake-build32
         cmake ../src
         make -j4
         cpack .
-        cp -v ./*.rpm ../rpm-installer
+        cd ..
     - name: build-installer-deb
       if: success()
       run: |
@@ -247,14 +253,23 @@ jobs:
         cmake ../src
         make -j4
         cpack .
-        cp -v ./*.deb ../deb-installer
+        cd..
     - name: create-output
       if: success()
       run: |
+        pwd
+        ls
+        mkdir rpm-installer
+        mkdir deb-installer
         mkdir build-output
         mkdir test-output
-        cp ./build/odbc/lib/*.so build-output/
-        cp ./build/odbc/lib/*.a build-output/
+        cp -v ./build/odbc/lib/*.a build-output/
+        cp -v ./build/odbc/lib/*.so build-output/
+        cp -v cmake-build32/*.rpm rpm-installer/
+        cp -v cmake-build32/*.deb deb-installer/
+        pwd
+        ls
+        ls rpm-installer
     - name: upload-build
       if: success()
       uses: actions/upload-artifact@v2
