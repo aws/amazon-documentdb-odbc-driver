@@ -637,6 +637,7 @@ int CC_get_error(ConnectionClass *self, int *number, char **message) {
 void CC_log_error(const char *func, const char *desc,
                   const ConnectionClass *self) {
 #define NULLCHECK(a) (a ? a : "(NULL)")
+    printf("Error: '%s'", NULLCHECK(self->__error_message));
 
     if (self) {
         MYLOG(LOG_ERROR,
