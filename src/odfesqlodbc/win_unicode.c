@@ -874,9 +874,14 @@ static SQLLEN c16tombs(char *c8dt, const char16_t *c16dt, size_t n) {
 //	SQLBindParameter	SQL_C_CHAR to UTF-8 case
 //		the current locale => UTF-8
 //
+#ifdef __linux__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif // __linux__
 SQLLEN bindpara_msg_to_utf8(const char *ldt, char **wcsbuf, SQLLEN used) {
     SQLLEN l = (-2);
     char *utf8 = NULL, *ldt_nts, *alloc_nts = NULL, ntsbuf[128];
+    int count;
 
     if (SQL_NTS == used) {
         count = (int)strlen(ldt);
@@ -926,6 +931,9 @@ SQLLEN bindpara_msg_to_utf8(const char *ldt, char **wcsbuf, SQLLEN used) {
         free(alloc_nts);
     return l;
 }
+#ifdef __linux__
+#pragma GCC diagnostic pop
+#endif // __linux__
 
 //
 //	SQLBindParameter	hybrid case
