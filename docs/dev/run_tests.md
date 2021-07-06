@@ -60,7 +60,7 @@ For more information, see the [Visual Studio Console Application documentation](
 ### Running Tests directly on Mac
 
 Tests can be executed using a command line interface. From the project root directory, enter:
-> **bin64/<test_name>**
+> **bin/<test_name>**
 
 ### Running Tests using the Test Runner
 
