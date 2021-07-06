@@ -111,7 +111,7 @@ typedef struct {
      + (bind_size > 0                                                               \
             ? bind_size                                                             \
             : (SQL_C_VARBOOKMARK == book->returntype ? book->buflen                 \
-                                                     : ((SQLLEN)sizeof(UInt4))))    \
+                                                     : ((SQLULEN)sizeof(UInt4))))   \
            * index)
 
 /* Macros to handle estype of parameters */
