@@ -596,21 +596,14 @@ SQLUINTEGER CC_get_isolation(ConnectionClass *self) {
 void CC_set_error(ConnectionClass *self, int number, const char *message,
                   const char *func) {
     CONNLOCK_ACQUIRE(self);
-    if (self->__error_message) {
-        printf("Current error: '%s'\n", self->__error_message);
+    if (self->__error_message)
         free(self->__error_message);
-    }
     self->__error_number = number;
     self->__error_message = message ? strdup(message) : NULL;
     if (0 != number)
         CC_set_error_statements(self);
     if (func && number != 0)
         CC_log_error(func, "", self);
-    
-    if (self->__error_message != NULL)
-        printf("New error: '%s'\n", self->__error_message);
-    else
-        printf("Error null, number %d\n", (int)self->__error_number);
     CONNLOCK_RELEASE(self);
 }
 
