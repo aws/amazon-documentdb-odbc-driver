@@ -2822,7 +2822,7 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TYPE_TIMESTAMP) {
     expected.push_back(
         std::make_pair(TIMESTAMP_STRUCT{0, 0, 0, 0, 0, 0, 0}, SQLSTATE_STRING_CONVERSION_ERROR));
     expected.push_back(
-        std::make_pair(TIMESTAMP_STRUCT{0 0, 0, 0, 0, 0, 0}, SQLSTATE_STRING_CONVERSION_ERROR));
+        std::make_pair(TIMESTAMP_STRUCT{0, 0, 0, 0, 0, 0, 0}, SQLSTATE_STRING_CONVERSION_ERROR));
 
     TestConvertingToTimestamp(m_hstmt, columns, expected);
 }
