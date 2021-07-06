@@ -1,6 +1,9 @@
 #ifndef ODBCCLI_CLIENT_H
 #define ODBCCLI_CLIENT_H
 
+// Add UNICODE_SUPPORT so driver properly encodes characters.
+#define UNICODE_SUPPORT
+
 #ifdef WIN32
 
 #include <windows.h>

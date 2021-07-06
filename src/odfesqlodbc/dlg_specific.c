@@ -23,8 +23,6 @@
 
 #define NULL_IF_NULL(a) ((a) ? ((const char *)(a)) : "(null)")
 
-static esNAME remove_braces(const char *in);
-
 #define OVR_EXTRA_BITS                                                      \
     (BIT_FORCEABBREVCONNSTR | BIT_FAKE_MSS | BIT_BDE_ENVIRONMENT            \
      | BIT_CVT_NULL_DATE | BIT_ACCESSIBLE_ONLY | BIT_IGNORE_ROUND_TRIP_TIME \
@@ -376,6 +374,10 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
         return;
 
     /* Proceed with getting info for the given DSN. */
+#ifdef __linux
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waddress"
+#endif
     if (SQLGetPrivateProfileString(DSN, INI_AUTH_MODE, NULL_STRING, temp,
                                    sizeof(temp), ODBC_INI)
         > 0)
@@ -487,6 +489,10 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
         STRCPY_FIXED(ci->idp_arn, temp);
 
     STR_TO_NAME(ci->drivers.drivername, drivername);
+
+#ifdef __linux
+#pragma GCC diagnostic pop
+#endif
 }
 /*
  *	This function writes any global parameters (that can be manipulated)
@@ -547,37 +553,6 @@ void writeDSNinfo(const ConnInfo *ci) {
                                  ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_IDP_ARN, ci->idp_arn,
                                  ODBC_INI);
-}
-
-/*
- *	Remove braces if the input value is enclosed by braces({}).
- */
-static esNAME remove_braces(const char *in) {
-    esNAME out;
-    INIT_NAME(out);
-    if (OPENING_BRACKET == in[0]) {
-        size_t inlen = strlen(in);
-        if (CLOSING_BRACKET == in[inlen - 1]) /* enclosed with braces */
-        {
-            int i;
-            const char *istr, *eptr;
-            char *ostr;
-
-            if (NULL == (ostr = (char *)malloc(inlen)))
-                return out;
-            eptr = in + inlen - 1;
-            for (istr = in + 1, i = 0; *istr && istr < eptr; i++) {
-                if (CLOSING_BRACKET == istr[0] && CLOSING_BRACKET == istr[1])
-                    istr++;
-                ostr[i] = *(istr++);
-            }
-            ostr[i] = '\0';
-            SET_NAME_DIRECTLY(out, ostr);
-            return out;
-        }
-    }
-    STR_TO_NAME(out, in);
-    return out;
 }
 
 void CC_conninfo_release(ConnInfo *conninfo) {
