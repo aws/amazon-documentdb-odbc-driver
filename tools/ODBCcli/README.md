@@ -46,5 +46,5 @@ On macOS or Linux:
 ```
 For example:
 ```
-ODBCcli "DSN=timestream-aws-profile" "SELECT * FROM CLIExample.ExampleTable LIMIT 1"
+./ODBCcli "DSN=timestream-aws-profile" "SELECT * FROM CLIExample.ExampleTable LIMIT 1"
 ```
