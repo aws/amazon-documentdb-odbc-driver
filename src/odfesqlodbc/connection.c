@@ -605,7 +605,8 @@ void CC_set_error(ConnectionClass *self, int number, const char *message,
     if (0 != number)
         CC_set_error_statements(self);
     if (func && number != 0)
-        CC_log_error(func, "", self); {
+        CC_log_error(func, "", self);
+    
     if (self->__error_message != NULL)
         printf("New error: '%s'\n", self->__error_message);
     else
