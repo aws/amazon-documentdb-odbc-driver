@@ -140,7 +140,7 @@ cpack_add_component(Resources
 install(TARGETS odfesqlodbc DESTINATION bin COMPONENT "Driver")
 # TODO: look into DSN Installer failure
 # if(APPLE)
-#     install(FILES "${PROJECT_ROOT}/bin64/dsn_installer" DESTINATION bin COMPONENT "Driver")
+#     install(FILES "${PROJECT_ROOT}/bin/dsn_installer" DESTINATION bin COMPONENT "Driver")
 #     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/remove-odfe-dsn.sh" DESTINATION bin COMPONENT "Driver")
 # endif()
 
