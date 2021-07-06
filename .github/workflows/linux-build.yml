@@ -146,14 +146,6 @@ jobs:
       with:
         name: linux64-deb-installer
         path: deb-installer
-    - name: build-and-test-sample-application
-      if: success()
-      run: |
-        cd tools/ODBCcli
-        mkdir build
-        cd build
-        cmake ../ -DCMAKE_BUILD_TYPE=Release
-        make -j 4
   build-linux32:
     runs-on: ubuntu-latest
     steps:
