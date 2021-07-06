@@ -99,7 +99,7 @@ jobs:
         name: integration-test-results-linux64
         path: |
           ${{ github.workspace }}/odbc-logs/
-    - name: build-installer-rpm
+    - name: build-rpm-installer
       if: success()
       run: |
         ./build_linux_release64_rpm.sh
@@ -108,7 +108,7 @@ jobs:
         make -j4
         cpack .
         cd ..
-    - name: build-installer-deb
+    - name: build-deb-installer
       if: success()
       run: |
         ./build_linux_release64_deb.sh
@@ -120,37 +120,32 @@ jobs:
     - name: create-output
       if: success()
       run: |
-        pwd
-        ls
         mkdir rpm-installer
         mkdir deb-installer
         mkdir build-output
         mkdir test-output
         cp -v ./build/odbc/lib/*.a build-output/
         cp -v ./build/odbc/lib/*.so build-output/
-        cp -v cmake-build64/*.rpm rpm-installer/
-        cp -v cmake-build64/*.deb deb-installer/
-        pwd
-        ls
-        ls rpm-installer
+        cp -v ./cmake-build64/*.rpm rpm-installer/
+        cp -v ./cmake-build64/*.deb deb-installer/
     - name: upload-build
       if: success()
       uses: actions/upload-artifact@v2
       with:
         name: linux64-build
         path: build-output
-    - name: upload-linux64-installer-rpm
+    - name: upload-linux64-rpm-installer
       if: success()
       uses: actions/upload-artifact@v2
       with:
-        name: linux64-installer-rpm
-        path: installer-rpm
-    - name: upload-linux64-installer-deb
+        name: linux64-rpm-installer
+        path: rpm-installer
+    - name: upload-linux64-deb-installer
       if: success()
       uses: actions/upload-artifact@v2
       with:
-        name: linux64-installer-deb
-        path: installer-deb
+        name: linux64-deb-installer
+        path: deb-installer
   build-linux32:
     runs-on: ubuntu-latest
     steps:
@@ -235,7 +230,7 @@ jobs:
         name: integration-test-results-linux32
         path: |
           ${{ github.workspace }}/odbc-logs/
-    - name: build-installer-rpm
+    - name: build-rpm-installer
       if: success()
       run: |
         ./build_linux_release32_rpm.sh
@@ -244,7 +239,7 @@ jobs:
         make -j4
         cpack .
         cd ..
-    - name: build-installer-deb
+    - name: build-deb-installer
       if: success()
       run: |
         mkdir deb-installer
@@ -253,38 +248,33 @@ jobs:
         cmake ../src
         make -j4
         cpack .
-        cd..
+        cd ..
     - name: create-output
       if: success()
       run: |
-        pwd
-        ls
         mkdir rpm-installer
         mkdir deb-installer
         mkdir build-output
         mkdir test-output
         cp -v ./build/odbc/lib/*.a build-output/
         cp -v ./build/odbc/lib/*.so build-output/
-        cp -v cmake-build32/*.rpm rpm-installer/
-        cp -v cmake-build32/*.deb deb-installer/
-        pwd
-        ls
-        ls rpm-installer
+        cp -v ./cmake-build32/*.rpm rpm-installer/
+        cp -v ./cmake-build32/*.deb deb-installer/
     - name: upload-build
       if: success()
       uses: actions/upload-artifact@v2
       with:
         name: linux32-build
         path: build-output
-    - name: upload-linux32-installer-rpm
+    - name: upload-linux32-rpm-installer
       if: success()
       uses: actions/upload-artifact@v2
       with:
-        name: linux32-installer-rpm
-        path: installer-rpm
-    - name: upload-linux32-installer-deb
+        name: linux32-rpm-installer
+        path: rpm-installer
+    - name: upload-linux32-deb-installer
       if: success()
       uses: actions/upload-artifact@v2
       with:
-        name: linux32-installer-deb
-        path: installer-deb
+        name: linux32-deb-installer
+        path: deb-installer

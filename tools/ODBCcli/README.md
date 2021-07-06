@@ -40,3 +40,7 @@ In macOS:
 ```
 ./ODBCcli <your-dsn> <your-query>
 ```
+In Linux:
+```
+./ODBCcli <your-dsn> <your-query>
+```
