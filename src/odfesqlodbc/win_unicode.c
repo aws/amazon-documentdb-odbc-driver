@@ -197,9 +197,9 @@ char *ucs2_to_utf8(const SQLWCHAR *ucs2str, SQLLEN ilen, SQLLEN *olen,
                 if (little_endian)
                     memcpy(utf8str + len, (char *)&byte4code, 3);
                 else {
-                    utf8str[len] = ((char *)&byte4code)[3];
-                    utf8str[len + 1] = ((char *)&byte4code)[2];
-                    utf8str[len + 2] = ((char *)&byte4code)[1];
+                    utf8str[len] = (char)((byte4code >> 16) && 0xFF);
+                    utf8str[len + 1] = (char)((byte4code >> 8) && 0xFF);
+                    utf8str[len + 2] = (char)((byte4code) && 0xFF);
                 }
                 len += 3;
             }
