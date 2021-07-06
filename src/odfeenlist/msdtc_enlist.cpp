@@ -530,7 +530,7 @@ void *IAsyncES::isolateXAConn(bool spinAcquired, bool continueConnection) {
 //	Acquire/releases [ELOCK -> LIFELOCK -> ] SLOCK.
 //
 void *IAsyncES::separateXAConn(bool spinAcquired, bool continueConnection) {
-    mylog("%s isolated=%d dtcconn=%p\n", __FUNCTION__, isolated, dtcconn);
+    mylog("%s isolated=%d dtcconn=%p\n", __func__, isolated, dtcconn);
     if (!spinAcquired)
         SLOCK_ACQUIRE();
     if (prepared)
@@ -970,10 +970,10 @@ static int regkeyCheck(const char *xalibname, const char *xalibpath) {
             ret = ::RegCreateKeyEx(HKEY_LOCAL_MACHINE, regKey, 0, NULL,
                                    REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS,
                                    NULL, &sKey, NULL);
-            mylog("%s:CreateKeyEx ret=%d\n", __FUNCTION__, ret);
+            mylog("%s:CreateKeyEx ret=%d\n", __func__, ret);
             break;
         default:
-            mylog("%s:OpenKeyEx ret=%d\n", __FUNCTION__, ret);
+            mylog("%s:OpenKeyEx ret=%d\n", __func__, ret);
     }
     if (ERROR_SUCCESS != ret)
         return -1;
@@ -988,17 +988,17 @@ static int regkeyCheck(const char *xalibname, const char *xalibpath) {
                     if (0 == _stricmp(keyval, xalibpath))
                         break;
                     mylog("%s:XADLL value %s is different from %s\n",
-                          __FUNCTION__, keyval, xalibpath);
+                          __func__, keyval, xalibpath);
                     if (IsWow64()) {
                         mylog(
                             "%s:avoid RegSetValue operation from wow64 "
                             "process\n",
-                            __FUNCTION__);
+                            __func__);
                         break;
                     }
                 }
             case ERROR_FILE_NOT_FOUND:
-                mylog("%s:Setting value %s\n", __FUNCTION__, xalibpath);
+                mylog("%s:Setting value %s\n", __func__, xalibpath);
                 ret = ::RegSetValueEx(sKey, xalibname, 0, REG_SZ,
                                       (CONST BYTE *)xalibpath,
                                       (DWORD)strlen(xalibpath) + 1);
@@ -1006,12 +1006,12 @@ static int regkeyCheck(const char *xalibname, const char *xalibpath) {
                     retcode = 1;
                 else {
                     retcode = -1;
-                    mylog("%s:SetValuEx ret=%d\n", __FUNCTION__, ret);
+                    mylog("%s:SetValuEx ret=%d\n", __func__, ret);
                 }
                 break;
             default:
                 retcode = -1;
-                mylog("%s:QueryValuEx ret=%d\n", __FUNCTION__, ret);
+                mylog("%s:QueryValuEx ret=%d\n", __func__, ret);
                 break;
         }
         ::RegCloseKey(sKey);
@@ -1269,7 +1269,7 @@ EXTERN_C RETCODE EnlistInDtc(void *conn, void *pTra, int method) {
         snprintf(errmsg, sizeof(errmsg),
                  "enlistment error:DtcGetTransactionManager error code=%x",
                  hres);
-        EsDtc_set_error(conn, errmsg, __FUNCTION__);
+        EsDtc_set_error(conn, errmsg, __func__);
         return SQL_ERROR;
     }
     ret = EnlistInDtc_1pipe(conn, (ITransaction *)pTra, pDtc, method);

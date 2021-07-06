@@ -46,7 +46,8 @@ option(BUILD_WITH_TESTS "Enable testing" ON)
 if(MSVC)
   add_compile_options(/W4 /WX)
 else()
-  # add_compile_options(-Wall -Wextra -pedantic -Werror)
+  # TODO: add -Werror once all warnings are resolved.
+  add_compile_options(-Wall -Wextra -pedantic)
 endif()
 
 # Base directories
