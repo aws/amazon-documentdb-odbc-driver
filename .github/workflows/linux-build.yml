@@ -119,20 +119,30 @@ jobs:
     - name: build-installer-rpm
       if: always()
       run: |
+        mkdir rpm-installer
+        ./build_linux_release64_rpm.sh
         cd cmake-build64
         cmake ../src
-        make
+        make -j4
         cpack .
+        cp -v ./*.rpm rpm-installer
+        ls
         cd ..
+        echo "cd .."
+        ls
     - name: build-installer-deb
       if: always()
       run: |
+        mkdir deb-installer
         ./build_linux_release64_deb.sh
         cd cmake-build64
         cmake ../src
-        make
+        make -j4
         cpack .
-        cd ..
+        cp ./*.deb deb-installer
+        ls
+        echo "cd .."
+        ls
     - name: create-output
       if: success()
       run: |
@@ -142,8 +152,6 @@ jobs:
         mkdir deb-installer
         cp ./build/odbc/lib/*.so build-output/
         cp ./build/odbc/lib/*.a build-output/
-        cp ./cmake-build64/*.rpm rpm-installer/
-        cp ./cmake-build64/*.deb deb-installer/
     - name: upload-build
       if: success()
       uses: actions/upload-artifact@v2
@@ -251,31 +259,37 @@ jobs:
     - name: build-installer-rpm
       if: always()
       run: |
+        mkdir rpm-installer
+        ./build_linux_release32_rpm.sh
         cd cmake-build32
         cmake ../src
-        make
+        make -j4
         cpack .
+        cp -v ./*.rpm rpm-installer
+        ls
         cd ..
+        echo "cd .."
+        ls
     - name: build-installer-deb
       if: always()
       run: |
+        mkdir deb-installer
         ./build_linux_release32_deb.sh
         cd cmake-build32
         cmake ../src
-        make
+        make -j4
         cpack .
-        cd ..
+        cp ./*.deb deb-installer
+        ls
+        echo "cd .."
+        ls
     - name: create-output
       if: success()
       run: |
         mkdir build-output
         mkdir test-output
-        mkdir rpm-installer
-        mkdir deb-installer
         cp ./build/odbc/lib/*.so build-output/
         cp ./build/odbc/lib/*.a build-output/
-        cp ./cmake-build32/*.rpm rpm-installer/
-        cp ./cmake-build32/*.deb deb-installer/
     - name: upload-build
       if: success()
       uses: actions/upload-artifact@v2
