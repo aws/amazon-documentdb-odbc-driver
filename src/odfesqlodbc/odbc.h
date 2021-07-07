@@ -560,11 +560,11 @@ typedef struct {
     char sqlstate[6];
     SQLLEN diag_row_count;
     char __error_message[40];
-} ES_ErrorInfo;
-ES_ErrorInfo *ER_Constructor(SDWORD errornumber, const char *errormsg);
-ES_ErrorInfo *ER_Dup(const ES_ErrorInfo *from);
-void ER_Destructor(ES_ErrorInfo *);
-RETCODE SQL_API ER_ReturnError(ES_ErrorInfo *, SQLSMALLINT, UCHAR *,
+} ErrorInfo;
+ErrorInfo *ER_Constructor(SDWORD errornumber, const char *errormsg);
+ErrorInfo *ER_Dup(const ErrorInfo *from);
+void ER_Destructor(ErrorInfo *);
+RETCODE SQL_API ER_ReturnError(ErrorInfo *, SQLSMALLINT, UCHAR *,
                                SQLINTEGER *, UCHAR *, SQLSMALLINT,
                                SQLSMALLINT *, UWORD);
 

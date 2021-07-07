@@ -69,8 +69,8 @@ RETCODE SQL_API API_RowCount(HSTMT hstmt, SQLLEN *pcrow) {
  *	This returns the number of columns associated with the database
  *	attached to "hstmt".
  */
-RETCODE SQL_API ESAPI_NumResultCols(HSTMT hstmt, SQLSMALLINT *pccol) {
-    CSTR func = "ESAPI_NumResultCols";
+RETCODE SQL_API API_NumResultCols(HSTMT hstmt, SQLSMALLINT *pccol) {
+    CSTR func = "API_NumResultCols";
     StatementClass *stmt = (StatementClass *)hstmt;
     QResultClass *result;
     RETCODE ret = SQL_SUCCESS;
@@ -748,10 +748,10 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
 }
 
 /*	Returns result data for a single column in the current row. */
-RETCODE SQL_API ESAPI_GetData(HSTMT hstmt, SQLUSMALLINT icol,
+RETCODE SQL_API API_GetData(HSTMT hstmt, SQLUSMALLINT icol,
                               SQLSMALLINT fCType, PTR rgbValue,
                               SQLLEN cbValueMax, SQLLEN *pcbValue) {
-    CSTR func = "ESAPI_GetData";
+    CSTR func = "API_GetData";
     QResultClass *res;
     StatementClass *stmt = (StatementClass *)hstmt;
     UInt2 num_cols;
@@ -1009,8 +1009,8 @@ cleanup:
  *		Returns data for bound columns in the current row ("hstmt->iCursor"),
  *		advances the cursor.
  */
-RETCODE SQL_API ESAPI_Fetch(HSTMT hstmt) {
-    CSTR func = "ESAPI_Fetch";
+RETCODE SQL_API API_Fetch(HSTMT hstmt) {
+    CSTR func = "API_Fetch";
     StatementClass *stmt = (StatementClass *)hstmt;
     ARDFields *opts;
     QResultClass *res;
@@ -1029,7 +1029,7 @@ RETCODE SQL_API ESAPI_Fetch(HSTMT hstmt) {
 
     if (!(res = SC_get_Curres(stmt), res)) {
         SC_set_error(stmt, STMT_INVALID_CURSOR_STATE_ERROR,
-                     "Null statement result in ESAPI_Fetch.", func);
+                     "Null statement result in API_Fetch.", func);
         return SQL_ERROR;
     }
 
@@ -1038,7 +1038,7 @@ RETCODE SQL_API ESAPI_Fetch(HSTMT hstmt) {
     if ((bookmark = opts->bookmark, bookmark) && bookmark->buffer) {
         SC_set_error(
             stmt, STMT_COLNUM_ERROR,
-            "Not allowed to bind a bookmark column when using ESAPI_Fetch",
+            "Not allowed to bind a bookmark column when using API_Fetch",
             func);
         return SQL_ERROR;
     }
@@ -1566,7 +1566,7 @@ RETCODE SQL_API API_MoreResults(HSTMT hstmt) {
         SQLSMALLINT num_p;
 
         if (stmt->multi_statement < 0)
-            ESAPI_NumParams(stmt, &num_p);
+            API_NumParams(stmt, &num_p);
         if (stmt->multi_statement > 0) {
             const char *cmdstr;
 
@@ -1581,7 +1581,7 @@ RETCODE SQL_API API_MoreResults(HSTMT hstmt) {
         SC_set_rowset_start(stmt, -1, FALSE);
         stmt->currTuple = -1;
     } else {
-        ESAPI_FreeStmt(hstmt, SQL_CLOSE);
+        API_FreeStmt(hstmt, SQL_CLOSE);
         ret = SQL_NO_DATA_FOUND;
     }
     MYLOG(LOG_DEBUG, "leaving %d\n", ret);
@@ -1605,9 +1605,9 @@ SQLLEN ClearCachedRows(TupleField *tuple, int num_fields, SQLLEN num_rows) {
 }
 
 /*	Set the cursor name on a statement handle */
-RETCODE SQL_API ESAPI_SetCursorName(HSTMT hstmt, const SQLCHAR *szCursor,
+RETCODE SQL_API API_SetCursorName(HSTMT hstmt, const SQLCHAR *szCursor,
                                     SQLSMALLINT cbCursor) {
-    CSTR func = "ESAPI_SetCursorName";
+    CSTR func = "API_SetCursorName";
     StatementClass *stmt = (StatementClass *)hstmt;
 
     MYLOG(LOG_TRACE, "entering hstmt=%p, szCursor=%p, cbCursorMax=%d\n", hstmt,
@@ -1624,10 +1624,10 @@ RETCODE SQL_API ESAPI_SetCursorName(HSTMT hstmt, const SQLCHAR *szCursor,
 }
 
 /*	Return the cursor name for a statement handle */
-RETCODE SQL_API ESAPI_GetCursorName(HSTMT hstmt, SQLCHAR *szCursor,
+RETCODE SQL_API API_GetCursorName(HSTMT hstmt, SQLCHAR *szCursor,
                                     SQLSMALLINT cbCursorMax,
                                     SQLSMALLINT *pcbCursor) {
-    CSTR func = "ESAPI_GetCursorName";
+    CSTR func = "API_GetCursorName";
     StatementClass *stmt = (StatementClass *)hstmt;
     size_t len = 0;
     RETCODE result;

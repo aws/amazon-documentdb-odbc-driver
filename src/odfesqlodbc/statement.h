@@ -226,7 +226,7 @@ struct StatementClass_ {
     STMT_Status status;
     char *__error_message;
     int __error_number;
-    ES_ErrorInfo *eserror;
+    ErrorInfo *eserror;
 
     SQLLEN currTuple; /* current absolute row number (GetData,
                        * SetPos, SQLFetch) */

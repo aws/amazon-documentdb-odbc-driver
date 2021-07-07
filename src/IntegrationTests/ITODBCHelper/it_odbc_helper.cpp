@@ -231,6 +231,44 @@ std::string wchar_to_string(const SQLWCHAR* tchar) {
     }
 }
 
+void CheckIndicatorRet(const test_string& expected, const SQLLEN indicator,
+                       const SQLRETURN ret, const bool is_wchar) {
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    if (is_wchar) {
+#ifdef __APPLE__
+        ASSERT_EQ((long)(4 * expected.size()), (long)indicator);
+#else
+        ASSERT_EQ((long)(2 * expected.size()), (long)indicator);
+#endif
+    } else {
+        ASSERT_EQ((long)(expected.size()), (long)indicator);
+    }
+}
+
+void CheckTextLenRet(const test_string& expected, const SQLINTEGER text_length,
+                     const SQLRETURN ret) {
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    ASSERT_EQ((long)(expected.size()), (long)text_length);
+}
+
+void CompareStrNumBytes(const test_string& expected, const SQLLEN indicator,
+                 const SQLWCHAR* data, const SQLRETURN ret) {
+    CheckIndicatorRet(expected, indicator, ret, true);
+    EXPECT_EQ(expected, to_test_string(wchar_to_string(data)));
+}
+
+void CompareStrNumBytes(const test_string& expected, const SQLLEN indicator,
+                 const SQLCHAR* data, const SQLRETURN ret) {
+    CheckIndicatorRet(expected, indicator, ret, false);
+    EXPECT_EQ(expected, to_test_string(std::string((char*)data)));
+}
+
+void CompareStrNumChar(const test_string& expected, const SQLINTEGER num_chars,
+                       const SQLWCHAR* data, const SQLRETURN ret) {
+    CheckTextLenRet(expected, num_chars, ret);
+    EXPECT_EQ(expected, to_test_string(wchar_to_string(data)));
+}
+
 test_string conn_string() {
     std::vector< std::pair< test_string, test_string > > conn_str_pair = {
         {IT_DRIVER, CREATE_STRING("timestreamodbc")},
