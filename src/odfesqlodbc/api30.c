@@ -29,7 +29,7 @@
 #include "statement.h"
 
 /*	SQLError -> SQLDiagRec */
-RETCODE SQL_API ESAPI_GetDiagRec(SQLSMALLINT HandleType, SQLHANDLE Handle,
+RETCODE SQL_API API_GetDiagRec(SQLSMALLINT HandleType, SQLHANDLE Handle,
                                  SQLSMALLINT RecNumber, SQLCHAR *Sqlstate,
                                  SQLINTEGER *NativeError, SQLCHAR *MessageText,
                                  SQLSMALLINT BufferLength,
@@ -39,19 +39,19 @@ RETCODE SQL_API ESAPI_GetDiagRec(SQLSMALLINT HandleType, SQLHANDLE Handle,
     MYLOG(LOG_TRACE, "entering type=%d rec=%d\n", HandleType, RecNumber);
     switch (HandleType) {
         case SQL_HANDLE_ENV:
-            ret = ESAPI_EnvError(Handle, RecNumber, Sqlstate, NativeError,
+            ret = API_EnvError(Handle, RecNumber, Sqlstate, NativeError,
                                  MessageText, BufferLength, TextLength, 0);
             break;
         case SQL_HANDLE_DBC:
-            ret = ESAPI_ConnectError(Handle, RecNumber, Sqlstate, NativeError,
+            ret = API_ConnectError(Handle, RecNumber, Sqlstate, NativeError,
                                      MessageText, BufferLength, TextLength, 0);
             break;
         case SQL_HANDLE_STMT:
-            ret = ESAPI_StmtError(Handle, RecNumber, Sqlstate, NativeError,
+            ret = API_StmtError(Handle, RecNumber, Sqlstate, NativeError,
                                   MessageText, BufferLength, TextLength, 0);
             break;
         case SQL_HANDLE_DESC:
-            ret = ESAPI_DescError(Handle, RecNumber, Sqlstate, NativeError,
+            ret = API_DescError(Handle, RecNumber, Sqlstate, NativeError,
                                   MessageText, BufferLength, TextLength, 0);
             break;
         default:
@@ -65,7 +65,7 @@ RETCODE SQL_API ESAPI_GetDiagRec(SQLSMALLINT HandleType, SQLHANDLE Handle,
  *	Minimal implementation.
  *
  */
-RETCODE SQL_API ESAPI_GetDiagField(SQLSMALLINT HandleType, SQLHANDLE Handle,
+RETCODE SQL_API API_GetDiagField(SQLSMALLINT HandleType, SQLHANDLE Handle,
                                    SQLSMALLINT RecNumber,
                                    SQLSMALLINT DiagIdentifier, PTR DiagInfoPtr,
                                    SQLSMALLINT BufferLength,
@@ -94,19 +94,19 @@ RETCODE SQL_API ESAPI_GetDiagField(SQLSMALLINT HandleType, SQLHANDLE Handle,
                         ret = SQL_SUCCESS_WITH_INFO;
                     break;
                 case SQL_DIAG_MESSAGE_TEXT:
-                    ret = ESAPI_EnvError(Handle, RecNumber, NULL, NULL,
+                    ret = API_EnvError(Handle, RecNumber, NULL, NULL,
                                          DiagInfoPtr, BufferLength,
                                          StringLengthPtr, 0);
                     break;
                 case SQL_DIAG_NATIVE:
                     rtnctype = SQL_C_LONG;
-                    ret = ESAPI_EnvError(Handle, RecNumber, NULL,
+                    ret = API_EnvError(Handle, RecNumber, NULL,
                                          (SQLINTEGER *)DiagInfoPtr, NULL, 0,
                                          NULL, 0);
                     break;
                 case SQL_DIAG_NUMBER:
                     rtnctype = SQL_C_LONG;
-                    ret = ESAPI_EnvError(Handle, RecNumber, NULL, NULL, NULL, 0,
+                    ret = API_EnvError(Handle, RecNumber, NULL, NULL, NULL, 0,
                                          NULL, 0);
                     if (SQL_SUCCEEDED(ret)) {
                         *((SQLINTEGER *)DiagInfoPtr) = 1;
@@ -114,7 +114,7 @@ RETCODE SQL_API ESAPI_GetDiagField(SQLSMALLINT HandleType, SQLHANDLE Handle,
                     break;
                 case SQL_DIAG_SQLSTATE:
                     rtnlen = 5;
-                    ret = ESAPI_EnvError(Handle, RecNumber, DiagInfoPtr, NULL,
+                    ret = API_EnvError(Handle, RecNumber, DiagInfoPtr, NULL,
                                          NULL, 0, NULL, 0);
                     if (SQL_SUCCESS_WITH_INFO == ret)
                         ret = SQL_SUCCESS;
@@ -153,19 +153,19 @@ RETCODE SQL_API ESAPI_GetDiagField(SQLSMALLINT HandleType, SQLHANDLE Handle,
                         ret = SQL_SUCCESS_WITH_INFO;
                     break;
                 case SQL_DIAG_MESSAGE_TEXT:
-                    ret = ESAPI_ConnectError(Handle, RecNumber, NULL, NULL,
+                    ret = API_ConnectError(Handle, RecNumber, NULL, NULL,
                                              DiagInfoPtr, BufferLength,
                                              StringLengthPtr, 0);
                     break;
                 case SQL_DIAG_NATIVE:
                     rtnctype = SQL_C_LONG;
-                    ret = ESAPI_ConnectError(Handle, RecNumber, NULL,
+                    ret = API_ConnectError(Handle, RecNumber, NULL,
                                              (SQLINTEGER *)DiagInfoPtr, NULL, 0,
                                              NULL, 0);
                     break;
                 case SQL_DIAG_NUMBER:
                     rtnctype = SQL_C_LONG;
-                    ret = ESAPI_ConnectError(Handle, RecNumber, NULL, NULL,
+                    ret = API_ConnectError(Handle, RecNumber, NULL, NULL,
                                              NULL, 0, NULL, 0);
                     if (SQL_SUCCEEDED(ret)) {
                         *((SQLINTEGER *)DiagInfoPtr) = 1;
@@ -173,7 +173,7 @@ RETCODE SQL_API ESAPI_GetDiagField(SQLSMALLINT HandleType, SQLHANDLE Handle,
                     break;
                 case SQL_DIAG_SQLSTATE:
                     rtnlen = 5;
-                    ret = ESAPI_ConnectError(Handle, RecNumber, DiagInfoPtr,
+                    ret = API_ConnectError(Handle, RecNumber, DiagInfoPtr,
                                              NULL, NULL, 0, NULL, 0);
                     if (SQL_SUCCESS_WITH_INFO == ret)
                         ret = SQL_SUCCESS;
@@ -212,13 +212,13 @@ RETCODE SQL_API ESAPI_GetDiagField(SQLSMALLINT HandleType, SQLHANDLE Handle,
                         ret = SQL_SUCCESS_WITH_INFO;
                     break;
                 case SQL_DIAG_MESSAGE_TEXT:
-                    ret = ESAPI_StmtError(Handle, RecNumber, NULL, NULL,
+                    ret = API_StmtError(Handle, RecNumber, NULL, NULL,
                                           DiagInfoPtr, BufferLength,
                                           StringLengthPtr, 0);
                     break;
                 case SQL_DIAG_NATIVE:
                     rtnctype = SQL_C_LONG;
-                    ret = ESAPI_StmtError(Handle, RecNumber, NULL,
+                    ret = API_StmtError(Handle, RecNumber, NULL,
                                           (SQLINTEGER *)DiagInfoPtr, NULL, 0,
                                           NULL, 0);
                     break;
@@ -227,7 +227,7 @@ RETCODE SQL_API ESAPI_GetDiagField(SQLSMALLINT HandleType, SQLHANDLE Handle,
                     *((SQLINTEGER *)DiagInfoPtr) = 0;
                     ret = SQL_NO_DATA_FOUND;
                     stmt = (StatementClass *)Handle;
-                    rtn = ESAPI_StmtError(Handle, -1, NULL, NULL, NULL, 0,
+                    rtn = API_StmtError(Handle, -1, NULL, NULL, NULL, 0,
                                           &pcbErrm, 0);
                     switch (rtn) {
                         case SQL_SUCCESS:
@@ -244,7 +244,7 @@ RETCODE SQL_API ESAPI_GetDiagField(SQLSMALLINT HandleType, SQLHANDLE Handle,
                     break;
                 case SQL_DIAG_SQLSTATE:
                     rtnlen = 5;
-                    ret = ESAPI_StmtError(Handle, RecNumber, DiagInfoPtr, NULL,
+                    ret = API_StmtError(Handle, RecNumber, DiagInfoPtr, NULL,
                                           NULL, 0, NULL, 0);
                     if (SQL_SUCCESS_WITH_INFO == ret)
                         ret = SQL_SUCCESS;
@@ -317,7 +317,7 @@ RETCODE SQL_API ESAPI_GetDiagField(SQLSMALLINT HandleType, SQLHANDLE Handle,
                     break;
                 case SQL_DIAG_SQLSTATE:
                     rtnlen = 5;
-                    ret = ESAPI_DescError(Handle, RecNumber, DiagInfoPtr, NULL,
+                    ret = API_DescError(Handle, RecNumber, DiagInfoPtr, NULL,
                                           NULL, 0, NULL, 0);
                     if (SQL_SUCCESS_WITH_INFO == ret)
                         ret = SQL_SUCCESS;
@@ -356,7 +356,7 @@ RETCODE SQL_API ESAPI_GetDiagField(SQLSMALLINT HandleType, SQLHANDLE Handle,
 }
 
 /*	SQLGetConnectOption -> SQLGetconnectAttr */
-RETCODE SQL_API ESAPI_GetConnectAttr(HDBC ConnectionHandle,
+RETCODE SQL_API API_GetConnectAttr(HDBC ConnectionHandle,
                                      SQLINTEGER Attribute, PTR Value,
                                      SQLINTEGER BufferLength,
                                      SQLINTEGER *StringLength) {
@@ -388,7 +388,7 @@ RETCODE SQL_API ESAPI_GetConnectAttr(HDBC ConnectionHandle,
             *((SQLINTEGER *)Value) = conn->connInfo.drivers.loglevel;
             break;
         default:
-            ret = ESAPI_GetConnectOption(ConnectionHandle, (UWORD)Attribute,
+            ret = API_GetConnectOption(ConnectionHandle, (UWORD)Attribute,
                                          Value, &len, BufferLength);
     }
     if (StringLength)
@@ -1470,10 +1470,10 @@ static RETCODE SQL_API IPDGetField(DescriptorClass *desc, SQLSMALLINT RecNumber,
 }
 
 /*	SQLGetStmtOption -> SQLGetStmtAttr */
-RETCODE SQL_API ESAPI_GetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
+RETCODE SQL_API API_GetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
                                   PTR Value, SQLINTEGER BufferLength,
                                   SQLINTEGER *StringLength) {
-    CSTR func = "ESAPI_GetStmtAttr";
+    CSTR func = "API_GetStmtAttr";
     StatementClass *stmt = (StatementClass *)StatementHandle;
     RETCODE ret = SQL_SUCCESS;
     SQLINTEGER len = 0;
@@ -1564,8 +1564,8 @@ RETCODE SQL_API ESAPI_GetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
                          "Unsupported statement option (Get)", func);
             return SQL_ERROR;
         default:
-            ret = ESAPI_GetStmtOption(StatementHandle, (SQLSMALLINT)Attribute,
-                                      Value, &len, BufferLength);
+            ret = API_GetStmtOption(StatementHandle, (SQLSMALLINT)Attribute,
+                                    Value, &len, BufferLength);
     }
     if (ret == SQL_SUCCESS && StringLength)
         *StringLength = len;
@@ -1573,11 +1573,11 @@ RETCODE SQL_API ESAPI_GetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
 }
 
 /*	SQLSetConnectOption -> SQLSetConnectAttr */
-RETCODE SQL_API ESAPI_SetConnectAttr(HDBC ConnectionHandle,
+RETCODE SQL_API API_SetConnectAttr(HDBC ConnectionHandle,
                                      SQLINTEGER Attribute, PTR Value,
                                      SQLINTEGER StringLength) {
     UNUSED(StringLength);
-    CSTR func = "ESAPI_SetConnectAttr";
+    CSTR func = "API_SetConnectAttr";
     ConnectionClass *conn = (ConnectionClass *)ConnectionHandle;
     RETCODE ret = SQL_SUCCESS;
     BOOL unsupported = FALSE;
@@ -1643,7 +1643,7 @@ RETCODE SQL_API ESAPI_SetConnectAttr(HDBC ConnectionHandle,
             break;
         default:
             if (Attribute < 65536)
-                ret = ESAPI_SetConnectOption(
+                ret = API_SetConnectOption(
                     ConnectionHandle, (SQLUSMALLINT)Attribute, (SQLLEN)Value);
             else
                 unsupported = TRUE;
@@ -1719,11 +1719,11 @@ RETCODE SQL_API API_GetDescField(SQLHDESC DescriptorHandle,
 }
 
 /*	new function */
-RETCODE SQL_API ESAPI_SetDescField(SQLHDESC DescriptorHandle,
+RETCODE SQL_API API_SetDescField(SQLHDESC DescriptorHandle,
                                    SQLSMALLINT RecNumber,
                                    SQLSMALLINT FieldIdentifier, PTR Value,
                                    SQLINTEGER BufferLength) {
-    CSTR func = "ESAPI_SetDescField";
+    CSTR func = "API_SetDescField";
     RETCODE ret = SQL_SUCCESS;
     DescriptorClass *desc = (DescriptorClass *)DescriptorHandle;
 
@@ -1778,11 +1778,11 @@ RETCODE SQL_API ESAPI_SetDescField(SQLHDESC DescriptorHandle,
 }
 
 /*	SQLSet(Param/Scroll/Stmt)Option -> SQLSetStmtAttr */
-RETCODE SQL_API ESAPI_SetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
+RETCODE SQL_API API_SetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
                                   PTR Value, SQLINTEGER StringLength) {
     UNUSED(StringLength);
     RETCODE ret = SQL_SUCCESS;
-    CSTR func = "ESAPI_SetStmtAttr";
+    CSTR func = "API_SetStmtAttr";
     StatementClass *stmt = (StatementClass *)StatementHandle;
 
     MYLOG(LOG_TRACE,
@@ -1869,7 +1869,7 @@ RETCODE SQL_API ESAPI_SetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
             SC_get_ARDF(stmt)->size_of_rowset = CAST_UPTR(SQLULEN, Value);
             break;
         default:
-            return ESAPI_SetStmtOption(StatementHandle, (SQLUSMALLINT)Attribute,
+            return API_SetStmtOption(StatementHandle, (SQLUSMALLINT)Attribute,
                                        (SQLULEN)Value);
     }
 #ifdef __linux__

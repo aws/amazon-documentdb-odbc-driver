@@ -258,9 +258,9 @@ char CC_add_descriptor(ConnectionClass *self, DescriptorClass *desc) {
 /*
  *	This API allocates a Application descriptor.
  */
-RETCODE SQL_API ESAPI_AllocDesc(HDBC ConnectionHandle,
+RETCODE SQL_API API_AllocDesc(HDBC ConnectionHandle,
                                 SQLHDESC *DescriptorHandle) {
-    CSTR func = "ESAPI_AllocDesc";
+    CSTR func = "API_AllocDesc";
     ConnectionClass *conn = (ConnectionClass *)ConnectionHandle;
     RETCODE ret = SQL_SUCCESS;
     DescriptorClass *desc;
@@ -287,7 +287,7 @@ RETCODE SQL_API ESAPI_AllocDesc(HDBC ConnectionHandle,
     return ret;
 }
 
-RETCODE SQL_API ESAPI_FreeDesc(SQLHDESC DescriptorHandle) {
+RETCODE SQL_API API_FreeDesc(SQLHDESC DescriptorHandle) {
     DescriptorClass *desc = (DescriptorClass *)DescriptorHandle;
     RETCODE ret = SQL_SUCCESS;
 
@@ -540,9 +540,9 @@ static const struct {
         {DESC_CANNOT_MODIFY_IRD, "HY016", "HY016"}
 };
 
-static ES_ErrorInfo *DC_create_errorinfo(const DescriptorClass *self) {
+static ErrorInfo *DC_create_errorinfo(const DescriptorClass *self) {
     const DescriptorHeader *deschd = &(self->deschd);
-    ES_ErrorInfo *error;
+    ErrorInfo *error;
     ConnectionClass *conn;
     EnvironmentClass *env;
     Int4 errornum;
@@ -579,7 +579,7 @@ void DC_log_error(const char *func, const char *desc,
 }
 
 /*		Returns the next SQL error information. */
-RETCODE SQL_API ESAPI_DescError(SQLHDESC hdesc, SQLSMALLINT RecNumber,
+RETCODE SQL_API API_DescError(SQLHDESC hdesc, SQLSMALLINT RecNumber,
                                 SQLCHAR *szSqlState, SQLINTEGER *pfNativeError,
                                 SQLCHAR *szErrorMsg, SQLSMALLINT cbErrorMsgMax,
                                 SQLSMALLINT *pcbErrorMsg, UWORD flag) {

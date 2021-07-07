@@ -33,7 +33,7 @@ RETCODE SQL_API SQLGetStmtAttrW(SQLHSTMT hstmt, SQLINTEGER fAttribute,
     MYLOG(LOG_TRACE, "entering\n");
     ENTER_STMT_CS((StatementClass *)hstmt);
     SC_clear_error((StatementClass *)hstmt);
-    ret = ESAPI_GetStmtAttr(hstmt, fAttribute, rgbValue, cbValueMax, pcbValue);
+    ret = API_GetStmtAttr(hstmt, fAttribute, rgbValue, cbValueMax, pcbValue);
     LEAVE_STMT_CS((StatementClass *)hstmt);
     return ret;
 }
@@ -46,7 +46,7 @@ RETCODE SQL_API SQLSetStmtAttrW(SQLHSTMT hstmt, SQLINTEGER fAttribute,
     MYLOG(LOG_TRACE, "entering\n");
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
-    ret = ESAPI_SetStmtAttr(hstmt, fAttribute, rgbValue, cbValueMax);
+    ret = API_SetStmtAttr(hstmt, fAttribute, rgbValue, cbValueMax);
     LEAVE_STMT_CS(stmt);
     return ret;
 }
@@ -60,7 +60,7 @@ RETCODE SQL_API SQLGetConnectAttrW(HDBC hdbc, SQLINTEGER fAttribute,
     ENTER_CONN_CS((ConnectionClass *)hdbc);
     CC_clear_error((ConnectionClass *)hdbc);
     ret =
-        ESAPI_GetConnectAttr(hdbc, fAttribute, rgbValue, cbValueMax, pcbValue);
+        API_GetConnectAttr(hdbc, fAttribute, rgbValue, cbValueMax, pcbValue);
     LEAVE_CONN_CS((ConnectionClass *)hdbc);
     return ret;
 }
@@ -74,7 +74,7 @@ RETCODE SQL_API SQLSetConnectAttrW(HDBC hdbc, SQLINTEGER fAttribute,
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
     CC_set_in_unicode_driver(conn);
-    ret = ESAPI_SetConnectAttr(hdbc, fAttribute, rgbValue, cbValue);
+    ret = API_SetConnectAttr(hdbc, fAttribute, rgbValue, cbValue);
     LEAVE_CONN_CS(conn);
     return ret;
 }
@@ -118,7 +118,7 @@ RETCODE SQL_API SQLSetDescFieldW(SQLHDESC DescriptorHandle,
         vallen = BufferLength;
         uval = Value;
     }
-    ret = ESAPI_SetDescField(DescriptorHandle, RecNumber, FieldIdentifier, uval,
+    ret = API_SetDescField(DescriptorHandle, RecNumber, FieldIdentifier, uval,
                              (SQLINTEGER)vallen);
     if (val_alloced)
         free(uval);
@@ -200,7 +200,7 @@ RETCODE SQL_API SQLGetDiagRecW(SQLSMALLINT fHandleType, SQLHANDLE handle,
         buflen = cbErrorMsgMax;
         mtxt = malloc(buflen);
     }
-    ret = ESAPI_GetDiagRec(fHandleType, handle, iRecord, (SQLCHAR *)qstr_ansi,
+    ret = API_GetDiagRec(fHandleType, handle, iRecord, (SQLCHAR *)qstr_ansi,
                            pfNativeError, (SQLCHAR *)mtxt, buflen, &tlen);
     if (SQL_SUCCEEDED(ret)) {
         if (szSqlState)
@@ -338,7 +338,7 @@ RETCODE SQL_API SQLGetDiagFieldW(SQLSMALLINT fHandleType, SQLHANDLE handle,
                     return SQL_ERROR;
                 }
                 rgbD = rgbDt;
-                ret = ESAPI_GetDiagField(fHandleType, handle, iRecord,
+                ret = API_GetDiagField(fHandleType, handle, iRecord,
                                          fDiagField, rgbD, bMax, rgbL);
                 if (SQL_SUCCESS_WITH_INFO != ret || blen < bMax)
                     break;
@@ -367,7 +367,7 @@ RETCODE SQL_API SQLGetDiagFieldW(SQLSMALLINT fHandleType, SQLHANDLE handle,
             rgbD = rgbDiagInfo;
             bMax = cbDiagInfoMax;
             rgbL = pcbDiagInfo;
-            ret = ESAPI_GetDiagField(fHandleType, handle, iRecord, fDiagField,
+            ret = API_GetDiagField(fHandleType, handle, iRecord, fDiagField,
                                      rgbD, bMax, rgbL);
             break;
     }

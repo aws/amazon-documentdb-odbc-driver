@@ -34,14 +34,14 @@ extern "C" {
 /*	Internal flags for API_AllocStmt functions */
 #define PODBC_EXTERNAL_STATEMENT 1L /* visible to the driver manager */
 #define PODBC_INHERIT_CONNECT_OPTIONS (1L << 1)
-/*	Internal flags for ESAPI_Exec... functions */
+/*	Internal flags for API_Exec... functions */
 /*	Flags for the error handling */
 #define PODBC_ALLOW_PARTIAL_EXTRACT 1L
 /* #define	PODBC_ERROR_CLEAR		(1L << 1) 	no longer used */
 
-RETCODE SQL_API ESAPI_AllocConnect(HENV EnvironmentHandle,
+RETCODE SQL_API API_AllocConnect(HENV EnvironmentHandle,
                                    HDBC *ConnectionHandle);
-RETCODE SQL_API ESAPI_AllocEnv(HENV *EnvironmentHandle);
+RETCODE SQL_API API_AllocEnv(HENV *EnvironmentHandle);
 RETCODE SQL_API API_AllocStmt(HDBC ConnectionHandle, HSTMT *StatementHandle,
                                 UDWORD flag);
 RETCODE SQL_API API_BindCol(HSTMT StatementHandle, SQLUSMALLINT ColumnNumber,
@@ -63,16 +63,16 @@ RETCODE SQL_API API_DescribeCol(
     SQLULEN *ColumnSize, SQLSMALLINT *DecimalDigits, SQLSMALLINT *Nullable);
 RETCODE SQL_API API_Disconnect(HDBC ConnectionHandle);
 /* Helper functions for Error handling */
-RETCODE SQL_API ESAPI_EnvError(HENV EnvironmentHandle, SQLSMALLINT RecNumber,
+RETCODE SQL_API API_EnvError(HENV EnvironmentHandle, SQLSMALLINT RecNumber,
                                SQLCHAR *Sqlstate, SQLINTEGER *NativeError,
                                SQLCHAR *MessageText, SQLSMALLINT BufferLength,
                                SQLSMALLINT *TextLength, UWORD flag);
-RETCODE SQL_API ESAPI_ConnectError(HDBC ConnectionHandle, SQLSMALLINT RecNumber,
+RETCODE SQL_API API_ConnectError(HDBC ConnectionHandle, SQLSMALLINT RecNumber,
                                    SQLCHAR *Sqlstate, SQLINTEGER *NativeError,
                                    SQLCHAR *MessageText,
                                    SQLSMALLINT BufferLength,
                                    SQLSMALLINT *TextLength, UWORD flag);
-RETCODE SQL_API ESAPI_StmtError(HSTMT StatementHandle, SQLSMALLINT RecNumber,
+RETCODE SQL_API API_StmtError(HSTMT StatementHandle, SQLSMALLINT RecNumber,
                                 SQLCHAR *Sqlstate, SQLINTEGER *NativeError,
                                 SQLCHAR *MessageText, SQLSMALLINT BufferLength,
                                 SQLSMALLINT *TextLength, UWORD flag);
@@ -80,49 +80,49 @@ RETCODE SQL_API API_ExecDirect(HSTMT StatementHandle,
                                  const SQLCHAR *StatementText,
                                  SQLINTEGER TextLength);
 RETCODE SQL_API API_Execute(HSTMT StatementHandle);
-RETCODE SQL_API ESAPI_Fetch(HSTMT StatementHandle);
-RETCODE SQL_API ESAPI_FreeConnect(HDBC ConnectionHandle);
-RETCODE SQL_API ESAPI_FreeEnv(HENV EnvironmentHandle);
-RETCODE SQL_API ESAPI_FreeStmt(HSTMT StatementHandle, SQLUSMALLINT Option);
-RETCODE SQL_API ESAPI_GetConnectOption(HDBC ConnectionHandle,
+RETCODE SQL_API API_Fetch(HSTMT StatementHandle);
+RETCODE SQL_API API_FreeConnect(HDBC ConnectionHandle);
+RETCODE SQL_API API_FreeEnv(HENV EnvironmentHandle);
+RETCODE SQL_API API_FreeStmt(HSTMT StatementHandle, SQLUSMALLINT Option);
+RETCODE SQL_API API_GetConnectOption(HDBC ConnectionHandle,
                                        SQLUSMALLINT Option, PTR Value,
                                        SQLINTEGER *StringLength,
                                        SQLINTEGER BufferLength);
-RETCODE SQL_API ESAPI_GetCursorName(HSTMT StatementHandle, SQLCHAR *CursorName,
+RETCODE SQL_API API_GetCursorName(HSTMT StatementHandle, SQLCHAR *CursorName,
                                     SQLSMALLINT BufferLength,
                                     SQLSMALLINT *NameLength);
-RETCODE SQL_API ESAPI_GetData(HSTMT StatementHandle, SQLUSMALLINT ColumnNumber,
+RETCODE SQL_API API_GetData(HSTMT StatementHandle, SQLUSMALLINT ColumnNumber,
                               SQLSMALLINT TargetType, PTR TargetValue,
                               SQLLEN BufferLength, SQLLEN *StrLen_or_Ind);
-RETCODE SQL_API ESAPI_GetFunctions(HDBC ConnectionHandle,
+RETCODE SQL_API API_GetFunctions(HDBC ConnectionHandle,
                                    SQLUSMALLINT FunctionId,
                                    SQLUSMALLINT *Supported);
-RETCODE SQL_API ESAPI_GetFunctions30(HDBC ConnectionHandle,
+RETCODE SQL_API API_GetFunctions30(HDBC ConnectionHandle,
                                      SQLUSMALLINT FunctionId,
                                      SQLUSMALLINT *Supported);
-RETCODE SQL_API ESAPI_GetInfo(HDBC ConnectionHandle, SQLUSMALLINT InfoType,
+RETCODE SQL_API API_GetInfo(HDBC ConnectionHandle, SQLUSMALLINT InfoType,
                               PTR InfoValue, SQLSMALLINT BufferLength,
                               SQLSMALLINT *StringLength);
-RETCODE SQL_API ESAPI_GetStmtOption(HSTMT StatementHandle, SQLUSMALLINT Option,
+RETCODE SQL_API API_GetStmtOption(HSTMT StatementHandle, SQLUSMALLINT Option,
                                     PTR Value, SQLINTEGER *StringLength,
                                     SQLINTEGER BufferLength);
-RETCODE SQL_API ESAPI_NumResultCols(HSTMT StatementHandle,
+RETCODE SQL_API API_NumResultCols(HSTMT StatementHandle,
                                     SQLSMALLINT *ColumnCount);
 RETCODE SQL_API API_RowCount(HSTMT StatementHandle, SQLLEN *RowCount);
-RETCODE SQL_API ESAPI_SetConnectOption(HDBC ConnectionHandle,
+RETCODE SQL_API API_SetConnectOption(HDBC ConnectionHandle,
                                        SQLUSMALLINT Option, SQLULEN Value);
-RETCODE SQL_API ESAPI_SetCursorName(HSTMT StatementHandle,
+RETCODE SQL_API API_SetCursorName(HSTMT StatementHandle,
                                     const SQLCHAR *CursorName,
                                     SQLSMALLINT NameLength);
-RETCODE SQL_API ESAPI_SetStmtOption(HSTMT StatementHandle, SQLUSMALLINT Option,
+RETCODE SQL_API API_SetStmtOption(HSTMT StatementHandle, SQLUSMALLINT Option,
                                     SQLULEN Value);
 RETCODE SQL_API
-ESAPI_SpecialColumns(HSTMT StatementHandle, SQLUSMALLINT IdentifierType,
+API_SpecialColumns(HSTMT StatementHandle, SQLUSMALLINT IdentifierType,
                      const SQLCHAR *CatalogName, SQLSMALLINT NameLength1,
                      const SQLCHAR *SchemaName, SQLSMALLINT NameLength2,
                      const SQLCHAR *TableName, SQLSMALLINT NameLength3,
                      SQLUSMALLINT Scope, SQLUSMALLINT Nullable);
-RETCODE SQL_API ESAPI_Statistics(
+RETCODE SQL_API API_Statistics(
     HSTMT StatementHandle, const SQLCHAR *CatalogName, SQLSMALLINT NameLength1,
     const SQLCHAR *SchemaName, SQLSMALLINT NameLength2,
     const SQLCHAR *TableName, SQLSMALLINT NameLength3, SQLUSMALLINT Unique,
@@ -133,7 +133,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
                                     SQLLEN *pfDesc);
 RETCODE SQL_API API_Prepare(HSTMT hstmt, const SQLCHAR *szSqlStr,
                               SQLINTEGER cbSqlStr);
-RETCODE SQL_API ESAPI_ColumnPrivileges(
+RETCODE SQL_API API_ColumnPrivileges(
     HSTMT hstmt, const SQLCHAR *szCatalogName, SQLSMALLINT cbCatalogName,
     const SQLCHAR *szSchemaName, SQLSMALLINT cbSchemaName,
     const SQLCHAR *szTableName, SQLSMALLINT cbTableName,
@@ -142,7 +142,7 @@ RETCODE SQL_API API_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
                                     SQLLEN irow, SQLULEN *pcrow,
                                     SQLUSMALLINT *rgfRowStatus,
                                     SQLLEN FetchOffset, SQLLEN rowsetSize);
-RETCODE SQL_API ESAPI_ForeignKeys(
+RETCODE SQL_API API_ForeignKeys(
     HSTMT hstmt, const SQLCHAR *szPkCatalogName, SQLSMALLINT cbPkCatalogName,
     const SQLCHAR *szPkSchemaName, SQLSMALLINT cbPkSchemaName,
     const SQLCHAR *szPkTableName, SQLSMALLINT cbPkTableName,
@@ -150,48 +150,48 @@ RETCODE SQL_API ESAPI_ForeignKeys(
     const SQLCHAR *szFkSchemaName, SQLSMALLINT cbFkSchemaName,
     const SQLCHAR *szFkTableName, SQLSMALLINT cbFkTableName);
 RETCODE SQL_API API_MoreResults(HSTMT hstmt);
-RETCODE SQL_API ESAPI_NativeSql(HDBC hdbc, const SQLCHAR *szSqlStrIn,
+RETCODE SQL_API API_NativeSql(HDBC hdbc, const SQLCHAR *szSqlStrIn,
                                 SQLINTEGER cbSqlStrIn, SQLCHAR *szSqlStr,
                                 SQLINTEGER cbSqlStrMax, SQLINTEGER *pcbSqlStr);
-RETCODE SQL_API ESAPI_NumParams(HSTMT hstmt, SQLSMALLINT *pcpar);
-RETCODE SQL_API ESAPI_PrimaryKeys(HSTMT hstmt, const SQLCHAR *szCatalogName,
+RETCODE SQL_API API_NumParams(HSTMT hstmt, SQLSMALLINT *pcpar);
+RETCODE SQL_API API_PrimaryKeys(HSTMT hstmt, const SQLCHAR *szCatalogName,
                                   SQLSMALLINT cbCatalogName,
                                   const SQLCHAR *szSchemaName,
                                   SQLSMALLINT cbSchemaName,
                                   const SQLCHAR *szTableName,
                                   SQLSMALLINT cbTableName, OID reloid);
-RETCODE SQL_API ESAPI_ProcedureColumns(
+RETCODE SQL_API API_ProcedureColumns(
     HSTMT hstmt, const SQLCHAR *szCatalogName, SQLSMALLINT cbCatalogName,
     const SQLCHAR *szSchemaName, SQLSMALLINT cbSchemaName,
     const SQLCHAR *szProcName, SQLSMALLINT cbProcName,
     const SQLCHAR *szColumnName, SQLSMALLINT cbColumnName, UWORD flag);
-RETCODE SQL_API ESAPI_Procedures(HSTMT hstmt, const SQLCHAR *szCatalogName,
+RETCODE SQL_API API_Procedures(HSTMT hstmt, const SQLCHAR *szCatalogName,
                                  SQLSMALLINT cbCatalogName,
                                  const SQLCHAR *szSchemaName,
                                  SQLSMALLINT cbSchemaName,
                                  const SQLCHAR *szProcName,
                                  SQLSMALLINT cbProcName, UWORD flag);
-RETCODE SQL_API ESAPI_TablePrivileges(HSTMT hstmt, const SQLCHAR *szCatalogName,
+RETCODE SQL_API API_TablePrivileges(HSTMT hstmt, const SQLCHAR *szCatalogName,
                                       SQLSMALLINT cbCatalogName,
                                       const SQLCHAR *szSchemaName,
                                       SQLSMALLINT cbSchemaName,
                                       const SQLCHAR *szTableName,
                                       SQLSMALLINT cbTableName, UWORD flag);
-RETCODE SQL_API ESAPI_GetDiagRec(SQLSMALLINT HandleType, SQLHANDLE Handle,
+RETCODE SQL_API API_GetDiagRec(SQLSMALLINT HandleType, SQLHANDLE Handle,
                                  SQLSMALLINT RecNumber, SQLCHAR *Sqlstate,
                                  SQLINTEGER *NativeError, SQLCHAR *MessageText,
                                  SQLSMALLINT BufferLength,
                                  SQLSMALLINT *TextLength);
-RETCODE SQL_API ESAPI_GetDiagField(SQLSMALLINT HandleType, SQLHANDLE Handle,
+RETCODE SQL_API API_GetDiagField(SQLSMALLINT HandleType, SQLHANDLE Handle,
                                    SQLSMALLINT RecNumber,
                                    SQLSMALLINT DiagIdentifier, PTR DiagInfoPtr,
                                    SQLSMALLINT BufferLength,
                                    SQLSMALLINT *StringLengthPtr);
-RETCODE SQL_API ESAPI_GetConnectAttr(HDBC ConnectionHandle,
+RETCODE SQL_API API_GetConnectAttr(HDBC ConnectionHandle,
                                      SQLINTEGER Attribute, PTR Value,
                                      SQLINTEGER BufferLength,
                                      SQLINTEGER *StringLength);
-RETCODE SQL_API ESAPI_GetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
+RETCODE SQL_API API_GetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
                                   PTR Value, SQLINTEGER BufferLength,
                                   SQLINTEGER *StringLength);
 
@@ -212,17 +212,17 @@ enum {
     SQL_ATTR_ESOPT_WCSDEBUG = 65548,
     SQL_ATTR_ESOPT_MSJET = 65549
 };
-RETCODE SQL_API ESAPI_SetConnectAttr(HDBC ConnectionHandle,
+RETCODE SQL_API API_SetConnectAttr(HDBC ConnectionHandle,
                                      SQLINTEGER Attribute, PTR Value,
                                      SQLINTEGER StringLength);
-RETCODE SQL_API ESAPI_SetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
+RETCODE SQL_API API_SetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
                                   PTR Value, SQLINTEGER StringLength);
-RETCODE SQL_API ESAPI_AllocDesc(HDBC ConnectionHandle,
+RETCODE SQL_API API_AllocDesc(HDBC ConnectionHandle,
                                 SQLHDESC *DescriptorHandle);
-RETCODE SQL_API ESAPI_FreeDesc(SQLHDESC DescriptorHandle);
+RETCODE SQL_API API_FreeDesc(SQLHDESC DescriptorHandle);
 RETCODE SQL_API API_CopyDesc(SQLHDESC SourceDescHandle,
                                SQLHDESC TargetDescHandle);
-RETCODE SQL_API ESAPI_SetDescField(SQLHDESC DescriptorHandle,
+RETCODE SQL_API API_SetDescField(SQLHDESC DescriptorHandle,
                                    SQLSMALLINT RecNumber,
                                    SQLSMALLINT FieldIdentifier, PTR Value,
                                    SQLINTEGER BufferLength);
@@ -231,7 +231,7 @@ RETCODE SQL_API API_GetDescField(SQLHDESC DescriptorHandle,
                                    SQLSMALLINT FieldIdentifier, PTR Value,
                                    SQLINTEGER BufferLength,
                                    SQLINTEGER *StringLength);
-RETCODE SQL_API ESAPI_DescError(SQLHDESC DescriptorHandle,
+RETCODE SQL_API API_DescError(SQLHDESC DescriptorHandle,
                                 SQLSMALLINT RecNumber, SQLCHAR *Sqlstate,
                                 SQLINTEGER *NativeError, SQLCHAR *MessageText,
                                 SQLSMALLINT BufferLength,

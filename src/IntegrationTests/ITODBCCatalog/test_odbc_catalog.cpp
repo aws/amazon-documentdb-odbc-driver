@@ -23,6 +23,7 @@
 #include "pch.h"
 #include "unit_test_helper.h"
 #include "it_odbc_helper.h"
+#include "catfunc.h"
 // clang-format on
 
 // General test constants and structures
@@ -76,6 +77,31 @@ typedef struct bind_info {
     std::vector< SQLCHAR > data;
 } bind_info;
 
+auto CheckRows = [](const std::vector< std::vector< std::string > > &expected,
+                    const std::vector< std::vector< std::string > > &result) {
+    EXPECT_EQ(expected.size(), result.size());
+    if (expected.size() > 0) {
+        for (size_t i = 0; i < expected.size(); i++) {
+            EXPECT_EQ(expected[i].size(), result[i].size());
+            for (size_t j = 0; j < expected[i].size(); j++) {
+                EXPECT_EQ(expected[i][j], result[i][j]);
+            }
+        }
+    }
+};
+
+auto CheckForEmptyResultSet = [](SQLHSTMT &hstmt, int expected_col_count) {
+    SQLSMALLINT column_count = 0;
+    SQLRETURN ret = SQLNumResultCols(hstmt, &column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(expected_col_count, static_cast< int >(column_count));
+    int row_count = 0;
+    while ((ret = SQLFetch(hstmt)) == SQL_SUCCESS)
+        row_count++;
+    EXPECT_EQ(ret, SQL_NO_DATA);
+    EXPECT_EQ(row_count, 0);
+};
+
 class TestSQLTables : public Fixture {};
 
 class TestSQLColumns : public Fixture {};
@@ -85,6 +111,23 @@ class TestSQLColAttribute : public Fixture {};
 class TestSQLDescribeCol : public Fixture {};
 
 class TestSQLGetTypeInfo : public Fixture {};
+
+class TestSQLColumnPrivileges : public Fixture {};
+
+class TestSQLTablePrivileges : public Fixture {};
+
+class TestSQLPrimaryKeys : public Fixture {};
+
+class TestSQLForeignKeys : public Fixture {};
+
+class TestSQLProcedureColumns : public Fixture {};
+
+class TestSQLProcedures : public Fixture {};
+
+class TestSQLSpecialColumns : public Fixture {};
+
+class TestSQLStatistics : public Fixture {};
+
 //
 //class TestSQLCatalogKeys : public testing::Test {
 //   public:
@@ -108,19 +151,6 @@ class TestSQLGetTypeInfo : public Fixture {};
 //    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
 //};
 
-/*
-#define TEST_SQL_KEYS(test_name, test_function, ...)                     \
-   TEST_F(TestSQLCatalogKeys, test_name) {                              \
-       EXPECT_TRUE(SQL_SUCCEEDED(test_function(m_hstmt, __VA_ARGS__))); \
-       size_t result_count = 0;                                         \
-       SQLRETURN ret;                                                   \
-       while ((ret = SQLFetch(m_hstmt)) == SQL_SUCCESS)                 \
-           result_count++;                                              \
-       EXPECT_EQ(ret, SQL_NO_DATA);                                     \
-       EXPECT_EQ(result_count, static_cast< size_t >(0));               \
-   }
-*/
-
 /**
  * SQLTables Tests
  * This integration required manual setup.
@@ -130,18 +160,6 @@ class TestSQLGetTypeInfo : public Fixture {};
  * ODBCTest.IoT
  * promDB.promTB
  */
-auto CheckRows = [](const std::vector< std::vector< std::string > >& expected, 
-    const std::vector< std::vector< std::string > >& result) {
-    EXPECT_EQ(expected.size(), result.size());
-    if (expected.size() > 0) {
-        EXPECT_EQ(expected[0].size(), result[0].size());
-        for (int i = 0; i < (int)expected.size(); i++) {
-            for (int j = 0; j < (int)expected[i].size(); j++) {
-                EXPECT_EQ(expected[i][j], result[i][j]);
-            }
-        }
-    }
-};
 
 TEST_F(TestSQLTables, TEST_ALL_NULL) {
     SQLRETURN ret = SQL_SUCCESS;
@@ -1304,36 +1322,6 @@ TEST_F(TestSQLDescribeCol, INTERVAL_DAY_TO_SECOND_COLUMN) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-//// We expect an empty result set for PrimaryKeys and ForeignKeys
-//// Tableau specified catalog and table
-//// NULL args
-//TEST_SQL_KEYS(PrimaryKeys_NULL, SQLPrimaryKeys, NULL, SQL_NTS, NULL, SQL_NTS,
-//              NULL, SQL_NTS)
-//TEST_SQL_KEYS(ForeignKeys_NULL, SQLForeignKeys, NULL, SQL_NTS, NULL, SQL_NTS,
-//              NULL, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS)
-//
-//// Catalog specified
-//TEST_SQL_KEYS(PrimaryKeys_Catalog, SQLPrimaryKeys, NULL, SQL_NTS,
-//              (SQLTCHAR*)CREATE_STRING("odfe-cluster", SQL_NTS, NULL, SQL_NTS)
-//TEST_SQL_KEYS(ForeignKeys_Catalog, SQLForeignKeys, NULL, SQL_NTS, NULL, SQL_NTS,
-//              NULL, SQL_NTS, NULL, SQL_NTS, (SQLTCHAR*)CREATE_STRING("odfe-cluster", SQL_NTS,
-//              NULL, SQL_NTS)
-//
-//// Table specified
-//TEST_SQL_KEYS(PrimaryKeys_Table, SQLPrimaryKeys, NULL, SQL_NTS, NULL, SQL_NTS,
-//              (SQLTCHAR*)CREATE_STRING("kibana_sample_data_flights", SQL_NTS)
-//TEST_SQL_KEYS(ForeignKeys_Table, SQLForeignKeys, NULL, SQL_NTS, NULL, SQL_NTS,
-//              NULL, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS,
-//              (SQLTCHAR*)CREATE_STRING("kibana_sample_data_flights", SQL_NTS)
-//
-//// Catalog and table specified
-//TEST_SQL_KEYS(PrimaryKeys_CatalogTable, SQLPrimaryKeys, NULL, SQL_NTS,
-//              (SQLTCHAR*)CREATE_STRING("odfe-cluster", SQL_NTS,
-//              (SQLTCHAR*)CREATE_STRING("kibana_sample_data_flights", SQL_NTS)
-//TEST_SQL_KEYS(ForeignKeys_CatalogTable, SQLForeignKeys, NULL, SQL_NTS, NULL,
-//              SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS, (SQLTCHAR*)CREATE_STRING("odfe-cluster",
-//              SQL_NTS, (SQLTCHAR*)CREATE_STRING("kibana_sample_data_flights", SQL_NTS)
-//
 
 TEST_F(TestSQLGetTypeInfo, TEST_SQL_ALL_TYPES) {
     SQLRETURN ret = SQL_ERROR;
@@ -1513,6 +1501,112 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_DECIMAL) {
     std::vector< std::vector< std::string > > expected{};
     CheckRows(expected, result);
 }
+
+TEST_F(TestSQLColumnPrivileges, EMPTY) {
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLColumnPrivileges(m_hstmt, (SQLTCHAR *)CREATE_STRING("ODBCTest"),
+                              SQL_NTS, (SQLTCHAR *)CREATE_STRING(""), SQL_NTS,
+                              (SQLTCHAR *)CREATE_STRING("DevOps"), SQL_NTS,
+                              (SQLTCHAR *)CREATE_STRING("%"), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    CheckForEmptyResultSet(m_hstmt, NUM_OF_COLPRIV_FIELDS);
+}
+
+TEST_F(TestSQLTablePrivileges, EMPTY) {
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLTablePrivileges(m_hstmt, (SQLTCHAR *)CREATE_STRING("ODBCTest"),
+                             SQL_NTS, (SQLTCHAR *)CREATE_STRING(""), SQL_NTS,
+                             (SQLTCHAR *)CREATE_STRING("DevOps"), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    CheckForEmptyResultSet(m_hstmt, NUM_OF_TABPRIV_FIELDS);
+}
+
+// We expect an empty result set for PrimaryKeys and ForeignKeys
+// Tableau specified catalog, table and NULL args
+TEST_F(TestSQLPrimaryKeys, EMPTY_RESULT_SET_WITH_CATALOG) {
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLPrimaryKeys(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS,
+                         NULL, 0, NULL, 0);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    CheckForEmptyResultSet(m_hstmt, NUM_OF_PKS_FIELDS);
+}
+
+TEST_F(TestSQLPrimaryKeys, EMPTY_RESULT_SET_WITH_TABLE) {
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLPrimaryKeys(m_hstmt, NULL, 0, NULL, 0,
+                         (SQLTCHAR*)CREATE_STRING("DevOps"), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    CheckForEmptyResultSet(m_hstmt, NUM_OF_PKS_FIELDS);
+}
+
+TEST_F(TestSQLPrimaryKeys, EMPTY_RESULT_SET_WITH_NULL) {
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLPrimaryKeys(m_hstmt, NULL, 0, NULL, 0, NULL, 0);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    CheckForEmptyResultSet(m_hstmt, NUM_OF_PKS_FIELDS);
+}
+
+TEST_F(TestSQLForeignKeys, EMPTY_RESULT_SET_WITH_CATALOG) {
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLForeignKeys(m_hstmt, NULL, 0, NULL, 0, NULL, 0, NULL, 0,
+                         (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS, NULL, 0);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    CheckForEmptyResultSet(m_hstmt, NUM_OF_FKS_FIELDS);
+}
+
+TEST_F(TestSQLForeignKeys, EMPTY_RESULT_SET_WITH_TABLE) {
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLForeignKeys(m_hstmt, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0,
+                         (SQLTCHAR*)CREATE_STRING("DevOps"), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    CheckForEmptyResultSet(m_hstmt, NUM_OF_FKS_FIELDS);
+}
+
+TEST_F(TestSQLForeignKeys, EMPTY_RESULT_SET_WITH_NULL) {
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLForeignKeys(m_hstmt, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0,
+                         NULL, 0);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    CheckForEmptyResultSet(m_hstmt, NUM_OF_FKS_FIELDS);
+}
+
+TEST_F(TestSQLProcedureColumns, EMPTY) {
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLProcedureColumns(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"),
+                              SQL_NTS, NULL, 0, (SQLTCHAR*)CREATE_STRING("%"),
+                              SQL_NTS, (SQLTCHAR*)CREATE_STRING("%"), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    CheckForEmptyResultSet(m_hstmt, NUM_OF_PROCOLS_FIELDS);
+}
+
+TEST_F(TestSQLProcedures, EMPTY) {
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLProcedures(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS,
+                        (SQLTCHAR*)CREATE_STRING("%"), SQL_NTS,
+                        (SQLTCHAR*)CREATE_STRING("%"), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    CheckForEmptyResultSet(m_hstmt, NUM_OF_PRO_FIELDS);
+}
+
+TEST_F(TestSQLSpecialColumns, EMPTY) {
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLSpecialColumns(m_hstmt, SQL_BEST_ROWID,
+                            (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS, NULL,
+                            0, (SQLTCHAR*)CREATE_STRING("%"), SQL_NTS,
+                            SQL_SCOPE_CURROW, SQL_NULLABLE);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    CheckForEmptyResultSet(m_hstmt, NUM_OF_SPECOLS_FIELDS);
+}
+
+TEST_F(TestSQLStatistics, EMPTY) {
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLStatistics(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS,
+                        NULL, 0, (SQLTCHAR*)CREATE_STRING("%"), SQL_NTS,
+                        SQL_INDEX_ALL, SQL_ENSURE);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    CheckForEmptyResultSet(m_hstmt, NUM_OF_STATS_FIELDS);
+}
+
 
 int main(int argc, char** argv) {
 #ifdef WIN32
