@@ -154,8 +154,8 @@ RETCODE SQL_API API_AllocStmt(HDBC hdbc, HSTMT *phstmt, UDWORD flag) {
     return SQL_SUCCESS;
 }
 
-RETCODE SQL_API ESAPI_FreeStmt(HSTMT hstmt, SQLUSMALLINT fOption) {
-    CSTR func = "ESAPI_FreeStmt";
+RETCODE SQL_API API_FreeStmt(HSTMT hstmt, SQLUSMALLINT fOption) {
+    CSTR func = "API_FreeStmt";
     StatementClass *stmt = (StatementClass *)hstmt;
 
     MYLOG(LOG_TRACE, "entering...hstmt=%p, fOption=%hi\n", hstmt, fOption);
@@ -197,7 +197,7 @@ RETCODE SQL_API ESAPI_FreeStmt(HSTMT hstmt, SQLUSMALLINT fOption) {
         }
 
         if (stmt->execute_delegate) {
-            ESAPI_FreeStmt(stmt->execute_delegate, SQL_DROP);
+            API_FreeStmt(stmt->execute_delegate, SQL_DROP);
             stmt->execute_delegate = NULL;
         }
         if (stmt->execute_parent)
@@ -215,7 +215,7 @@ RETCODE SQL_API ESAPI_FreeStmt(HSTMT hstmt, SQLUSMALLINT fOption) {
          */
         stmt->transition_status = STMT_TRANSITION_ALLOCATED;
         if (stmt->execute_delegate) {
-            ESAPI_FreeStmt(stmt->execute_delegate, SQL_DROP);
+            API_FreeStmt(stmt->execute_delegate, SQL_DROP);
             stmt->execute_delegate = NULL;
         }
         if (!SC_recycle_statement(stmt)) {
@@ -226,7 +226,7 @@ RETCODE SQL_API ESAPI_FreeStmt(HSTMT hstmt, SQLUSMALLINT fOption) {
         ;
     else {
         SC_set_error(stmt, STMT_OPTION_OUT_OF_RANGE_ERROR,
-                     "Invalid option passed to ESAPI_FreeStmt.", func);
+                     "Invalid option passed to API_FreeStmt.", func);
         return SQL_ERROR;
     }
 
@@ -797,8 +797,8 @@ static const struct {
      {STMT_STRING_CONVERSION_ERROR, "22018", "22005"},
      {STMT_INVALID_STRING_OR_BUFFER_LENGTH_ERROR, "HY090", "S1090"}};
 
-static ES_ErrorInfo *SC_create_errorinfo(const StatementClass *self,
-                                         ES_ErrorInfo *eserror_fail_safe) {
+static ErrorInfo *SC_create_errorinfo(const StatementClass *self,
+                                         ErrorInfo *eserror_fail_safe) {
     QResultClass *res = SC_get_Curres(self);
     ConnectionClass *conn = SC_get_conn(self);
     Int4 errornum;
@@ -807,7 +807,7 @@ static ES_ErrorInfo *SC_create_errorinfo(const StatementClass *self,
     BOOL looponce, loopend;
     char msg[4096], *wmsg;
     char *ermsg = NULL, *sqlstate = NULL;
-    ES_ErrorInfo *eserror;
+    ErrorInfo *eserror;
 
     if (self->eserror)
         return self->eserror;
@@ -913,7 +913,7 @@ void SC_reset_delegate(RETCODE retcode, StatementClass *stmt) {
 
     if (!delegate)
         return;
-    ESAPI_FreeStmt(delegate, SQL_DROP);
+    API_FreeStmt(delegate, SQL_DROP);
 }
 
 void SC_set_error(StatementClass *self, int number, const char *message,
@@ -981,7 +981,7 @@ void SC_error_copy(StatementClass *self, const StatementClass *from,
 
 void SC_full_error_copy(StatementClass *self, const StatementClass *from,
                         BOOL allres) {
-    ES_ErrorInfo *eserror;
+    ErrorInfo *eserror;
 
     MYLOG(LOG_TRACE, "entering %p->%p\n", from, self);
     if (!from)
@@ -1013,12 +1013,12 @@ void SC_full_error_copy(StatementClass *self, const StatementClass *from,
 }
 
 /* Returns the next SQL error information. */
-RETCODE SQL_API ESAPI_StmtError(SQLHSTMT hstmt, SQLSMALLINT RecNumber,
+RETCODE SQL_API API_StmtError(SQLHSTMT hstmt, SQLSMALLINT RecNumber,
                                 SQLCHAR *szSqlState, SQLINTEGER *pfNativeError,
                                 SQLCHAR *szErrorMsg, SQLSMALLINT cbErrorMsgMax,
                                 SQLSMALLINT *pcbErrorMsg, UWORD flag) {
     /* CC: return an error of a hdesc  */
-    ES_ErrorInfo *eserror, error;
+    ErrorInfo *eserror, error;
     StatementClass *stmt = (StatementClass *)hstmt;
     int errnum = SC_get_errornumber(stmt);
 

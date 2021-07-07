@@ -54,10 +54,10 @@
 
 #define PROTOCOL3_OPTS_MAX 30
 
-RETCODE SQL_API ESAPI_AllocConnect(HENV henv, HDBC *phdbc) {
+RETCODE SQL_API API_AllocConnect(HENV henv, HDBC *phdbc) {
     EnvironmentClass *env = (EnvironmentClass *)henv;
     ConnectionClass *conn;
-    CSTR func = "ESAPI_AllocConnect";
+    CSTR func = "API_AllocConnect";
 
     MYLOG(LOG_TRACE, "entering...\n");
 
@@ -199,9 +199,9 @@ RETCODE SQL_API API_Disconnect(HDBC hdbc) {
     return ret;
 }
 
-RETCODE SQL_API ESAPI_FreeConnect(HDBC hdbc) {
+RETCODE SQL_API API_FreeConnect(HDBC hdbc) {
     ConnectionClass *conn = (ConnectionClass *)hdbc;
-    CSTR func = "ESAPI_FreeConnect";
+    CSTR func = "API_FreeConnect";
     EnvironmentClass *env;
 
     MYLOG(LOG_TRACE, "entering...hdbc=%p\n", hdbc);

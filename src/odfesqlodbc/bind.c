@@ -181,13 +181,13 @@ cleanup:
     return ret;
 }
 
-RETCODE SQL_API ESAPI_NumParams(HSTMT hstmt, SQLSMALLINT *pcpar) {
+RETCODE SQL_API API_NumParams(HSTMT hstmt, SQLSMALLINT *pcpar) {
     StatementClass *stmt = (StatementClass *)hstmt;
     if (pcpar != NULL) {
         *pcpar = 0;
     } else {
         SC_set_error(stmt, STMT_EXEC_ERROR, "Parameter count address is null",
-                     "ESAPI_NumParams");
+                     "API_NumParams");
         return SQL_ERROR;
     }
     return SQL_SUCCESS;

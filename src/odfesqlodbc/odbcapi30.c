@@ -33,11 +33,11 @@ RETCODE SQL_API SQLAllocHandle(SQLSMALLINT HandleType, SQLHANDLE InputHandle,
     MYLOG(LOG_TRACE, "entering\n");
     switch (HandleType) {
         case SQL_HANDLE_ENV:
-            ret = ESAPI_AllocEnv(OutputHandle);
+            ret = API_AllocEnv(OutputHandle);
             break;
         case SQL_HANDLE_DBC:
             ENTER_ENV_CS((EnvironmentClass *)InputHandle);
-            ret = ESAPI_AllocConnect(InputHandle, OutputHandle);
+            ret = API_AllocConnect(InputHandle, OutputHandle);
             LEAVE_ENV_CS((EnvironmentClass *)InputHandle);
             break;
         case SQL_HANDLE_STMT:
@@ -53,7 +53,7 @@ RETCODE SQL_API SQLAllocHandle(SQLSMALLINT HandleType, SQLHANDLE InputHandle,
         case SQL_HANDLE_DESC:
             conn = (ConnectionClass *)InputHandle;
             ENTER_CONN_CS(conn);
-            ret = ESAPI_AllocDesc(InputHandle, OutputHandle);
+            ret = API_AllocDesc(InputHandle, OutputHandle);
             LEAVE_CONN_CS(conn);
             MYLOG(LOG_DEBUG, "OutputHandle=%p\n", *OutputHandle);
             break;
@@ -96,7 +96,7 @@ RETCODE SQL_API SQLCloseCursor(HSTMT StatementHandle) {
 
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
-    ret = ESAPI_FreeStmt(StatementHandle, SQL_CLOSE);
+    ret = API_FreeStmt(StatementHandle, SQL_CLOSE);
     LEAVE_STMT_CS(stmt);
     return ret;
 }
@@ -220,10 +220,10 @@ RETCODE SQL_API SQLFreeHandle(SQLSMALLINT HandleType, SQLHANDLE Handle) {
 
     switch (HandleType) {
         case SQL_HANDLE_ENV:
-            ret = ESAPI_FreeEnv(Handle);
+            ret = API_FreeEnv(Handle);
             break;
         case SQL_HANDLE_DBC:
-            ret = ESAPI_FreeConnect(Handle);
+            ret = API_FreeConnect(Handle);
             break;
         case SQL_HANDLE_STMT:
             stmt = (StatementClass *)Handle;
@@ -234,14 +234,14 @@ RETCODE SQL_API SQLFreeHandle(SQLSMALLINT HandleType, SQLHANDLE Handle) {
                     ENTER_CONN_CS(conn);
             }
 
-            ret = ESAPI_FreeStmt(Handle, SQL_DROP);
+            ret = API_FreeStmt(Handle, SQL_DROP);
 
             if (conn)
                 LEAVE_CONN_CS(conn);
 
             break;
         case SQL_HANDLE_DESC:
-            ret = ESAPI_FreeDesc(Handle);
+            ret = API_FreeDesc(Handle);
             break;
         default:
             ret = SQL_ERROR;
@@ -290,7 +290,7 @@ RETCODE SQL_API SQLGetDiagField(SQLSMALLINT HandleType, SQLHANDLE Handle,
     MYLOG(LOG_TRACE, "entering Handle=(%u,%p) Rec=%d Id=%d info=(%p,%d)\n",
           HandleType, Handle, RecNumber, DiagIdentifier, DiagInfo,
           BufferLength);
-    ret = ESAPI_GetDiagField(HandleType, Handle, RecNumber, DiagIdentifier,
+    ret = API_GetDiagField(HandleType, Handle, RecNumber, DiagIdentifier,
                              DiagInfo, BufferLength, StringLength);
     return ret;
 }
@@ -304,7 +304,7 @@ RETCODE SQL_API SQLGetDiagRec(SQLSMALLINT HandleType, SQLHANDLE Handle,
     RETCODE ret;
 
     MYLOG(LOG_TRACE, "entering\n");
-    ret = ESAPI_GetDiagRec(HandleType, Handle, RecNumber, Sqlstate, NativeError,
+    ret = API_GetDiagRec(HandleType, Handle, RecNumber, Sqlstate, NativeError,
                            MessageText, BufferLength, TextLength);
     return ret;
 }
@@ -354,8 +354,8 @@ RETCODE SQL_API SQLGetConnectAttr(HDBC ConnectionHandle, SQLINTEGER Attribute,
     MYLOG(LOG_TRACE, "entering " FORMAT_UINTEGER "\n", Attribute);
     ENTER_CONN_CS((ConnectionClass *)ConnectionHandle);
     CC_clear_error((ConnectionClass *)ConnectionHandle);
-    ret = ESAPI_GetConnectAttr(ConnectionHandle, Attribute, Value, BufferLength,
-                               StringLength);
+    ret = API_GetConnectAttr(ConnectionHandle, Attribute, Value, BufferLength,
+                             StringLength);
     LEAVE_CONN_CS((ConnectionClass *)ConnectionHandle);
     return ret;
 }
@@ -371,8 +371,8 @@ RETCODE SQL_API SQLGetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
           Attribute);
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
-    ret = ESAPI_GetStmtAttr(StatementHandle, Attribute, Value, BufferLength,
-                            StringLength);
+    ret = API_GetStmtAttr(StatementHandle, Attribute, Value, BufferLength,
+                          StringLength);
     LEAVE_STMT_CS(stmt);
     return ret;
 }
@@ -386,8 +386,7 @@ RETCODE SQL_API SQLSetConnectAttr(HDBC ConnectionHandle, SQLINTEGER Attribute,
     MYLOG(LOG_TRACE, "entering " FORMAT_INTEGER "\n", Attribute);
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
-    ret =
-        ESAPI_SetConnectAttr(ConnectionHandle, Attribute, Value, StringLength);
+    ret = API_SetConnectAttr(ConnectionHandle, Attribute, Value, StringLength);
     LEAVE_CONN_CS(conn);
     return ret;
 }
@@ -401,7 +400,7 @@ RETCODE SQL_API SQLSetDescField(SQLHDESC DescriptorHandle,
 
     MYLOG(LOG_TRACE, "entering h=%p rec=%d field=%d val=%p\n", DescriptorHandle,
           RecNumber, FieldIdentifier, Value);
-    ret = ESAPI_SetDescField(DescriptorHandle, RecNumber, FieldIdentifier,
+    ret = API_SetDescField(DescriptorHandle, RecNumber, FieldIdentifier,
                              Value, BufferLength);
     return ret;
 }
@@ -485,7 +484,7 @@ RETCODE SQL_API SQLSetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
           StatementHandle, Attribute, (SQLULEN)Value);
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
-    ret = ESAPI_SetStmtAttr(StatementHandle, Attribute, Value, StringLength);
+    ret = API_SetStmtAttr(StatementHandle, Attribute, Value, StringLength);
     LEAVE_STMT_CS(stmt);
     return ret;
 }
@@ -493,7 +492,7 @@ RETCODE SQL_API SQLSetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
 
 #define SQL_FUNC_ESET(pfExists, uwAPI) \
     (*(((UWORD *)(pfExists)) + ((uwAPI) >> 4)) |= (1 << ((uwAPI)&0x000F)))
-RETCODE SQL_API ESAPI_GetFunctions30(HDBC hdbc, SQLUSMALLINT fFunction,
+RETCODE SQL_API API_GetFunctions30(HDBC hdbc, SQLUSMALLINT fFunction,
                                      SQLUSMALLINT FAR *pfExists) {
     ConnectionClass *conn = (ConnectionClass *)hdbc;
     CC_clear_error(conn);

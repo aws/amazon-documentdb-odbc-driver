@@ -37,8 +37,8 @@ void *conns_cs = NULL;
 void *common_cs = NULL;
 void *common_lcs = NULL;
 
-RETCODE SQL_API ESAPI_AllocEnv(HENV *phenv) {
-    CSTR func = "ESAPI_AllocEnv";
+RETCODE SQL_API API_AllocEnv(HENV *phenv) {
+    CSTR func = "API_AllocEnv";
     SQLRETURN ret = SQL_SUCCESS;
 
     MYLOG(LOG_TRACE, "entering\n");
@@ -61,8 +61,8 @@ RETCODE SQL_API ESAPI_AllocEnv(HENV *phenv) {
     return ret;
 }
 
-RETCODE SQL_API ESAPI_FreeEnv(HENV henv) {
-    CSTR func = "ESAPI_FreeEnv";
+RETCODE SQL_API API_FreeEnv(HENV henv) {
+    CSTR func = "API_FreeEnv";
     SQLRETURN ret = SQL_SUCCESS;
     EnvironmentClass *env = (EnvironmentClass *)henv;
 
@@ -81,14 +81,14 @@ cleanup:
 
 #define SIZEOF_SQLSTATE 6
 
-static void es_sqlstate_set(const EnvironmentClass *env, UCHAR *szSqlState,
+static void sqlstate_set(const EnvironmentClass *env, UCHAR *szSqlState,
                             const char *ver3str, const char *ver2str) {
     strncpy_null((char *)szSqlState, EN_is_odbc3(env) ? ver3str : ver2str,
                  SIZEOF_SQLSTATE);
 }
 
-ES_ErrorInfo *ER_Constructor(SDWORD errnumber, const char *msg) {
-    ES_ErrorInfo *error;
+ErrorInfo *ER_Constructor(SDWORD errnumber, const char *msg) {
+    ErrorInfo *error;
     ssize_t aladd, errsize;
 
     if (DESC_OK == errnumber)
@@ -102,9 +102,9 @@ ES_ErrorInfo *ER_Constructor(SDWORD errnumber, const char *msg) {
         errsize = -1;
         aladd = 0;
     }
-    error = (ES_ErrorInfo *)malloc(sizeof(ES_ErrorInfo) + aladd);
+    error = (ErrorInfo *)malloc(sizeof(ErrorInfo) + aladd);
     if (error) {
-        memset(error, 0, sizeof(ES_ErrorInfo));
+        memset(error, 0, sizeof(ErrorInfo));
         error->status = errnumber;
         error->errorsize = (Int2)errsize;
         if (errsize > 0)
@@ -115,20 +115,20 @@ ES_ErrorInfo *ER_Constructor(SDWORD errnumber, const char *msg) {
     return error;
 }
 
-void ER_Destructor(ES_ErrorInfo *self) {
+void ER_Destructor(ErrorInfo *self) {
     free(self);
 }
 
-ES_ErrorInfo *ER_Dup(const ES_ErrorInfo *self) {
-    ES_ErrorInfo *new;
+ErrorInfo *ER_Dup(const ErrorInfo *self) {
+    ErrorInfo *new;
     Int4 alsize;
 
     if (!self)
         return NULL;
-    alsize = sizeof(ES_ErrorInfo);
+    alsize = sizeof(ErrorInfo);
     if (self->errorsize > 0)
         alsize += self->errorsize;
-    new = (ES_ErrorInfo *)malloc(alsize);
+    new = (ErrorInfo *)malloc(alsize);
     if (new)
         memcpy(new, self, alsize);
 
@@ -137,12 +137,12 @@ ES_ErrorInfo *ER_Dup(const ES_ErrorInfo *self) {
 
 #define DRVMNGRDIV 511
 /*		Returns the next SQL error information. */
-RETCODE SQL_API ER_ReturnError(ES_ErrorInfo *eserror, SQLSMALLINT RecNumber,
+RETCODE SQL_API ER_ReturnError(ErrorInfo *eserror, SQLSMALLINT RecNumber,
                                SQLCHAR *szSqlState, SQLINTEGER *pfNativeError,
                                SQLCHAR *szErrorMsg, SQLSMALLINT cbErrorMsgMax,
                                SQLSMALLINT *pcbErrorMsg, UWORD flag) {
     /* CC: return an error of a hstmt  */
-    ES_ErrorInfo *error;
+    ErrorInfo *error;
     BOOL partial_ok = ((flag & PODBC_ALLOW_PARTIAL_EXTRACT) != 0);
     const char *msg;
     SWORD msglen, stapos, wrtlen, pcblen;
@@ -211,7 +211,7 @@ RETCODE SQL_API ER_ReturnError(ES_ErrorInfo *eserror, SQLSMALLINT RecNumber,
         return SQL_SUCCESS;
 }
 
-RETCODE SQL_API ESAPI_ConnectError(HDBC hdbc, SQLSMALLINT RecNumber,
+RETCODE SQL_API API_ConnectError(HDBC hdbc, SQLSMALLINT RecNumber,
                                    SQLCHAR *szSqlState,
                                    SQLINTEGER *pfNativeError,
                                    SQLCHAR *szErrorMsg,
@@ -263,64 +263,64 @@ RETCODE SQL_API ESAPI_ConnectError(HDBC hdbc, SQLSMALLINT RecNumber,
         else
             switch (status) {
                 case CONN_OPTION_VALUE_CHANGED:
-                    es_sqlstate_set(env, szSqlState, "01S02", "01S02");
+                    sqlstate_set(env, szSqlState, "01S02", "01S02");
                     break;
                 case CONN_TRUNCATED:
-                    es_sqlstate_set(env, szSqlState, "01004", "01004");
+                    sqlstate_set(env, szSqlState, "01004", "01004");
                     /* data truncated */
                     break;
                 case CONN_INIREAD_ERROR:
-                    es_sqlstate_set(env, szSqlState, "IM002", "IM002");
+                    sqlstate_set(env, szSqlState, "IM002", "IM002");
                     /* data source not found */
                     break;
                 case CONNECTION_SERVER_NOT_REACHED:
                 case CONN_OPENDB_ERROR:
-                    es_sqlstate_set(env, szSqlState, "08001", "08001");
+                    sqlstate_set(env, szSqlState, "08001", "08001");
                     /* unable to connect to data source */
                     break;
                 case CONN_INVALID_AUTHENTICATION:
                 case CONN_AUTH_TYPE_UNSUPPORTED:
-                    es_sqlstate_set(env, szSqlState, "28000", "28000");
+                    sqlstate_set(env, szSqlState, "28000", "28000");
                     break;
                 case CONN_STMT_ALLOC_ERROR:
-                    es_sqlstate_set(env, szSqlState, "HY001", "S1001");
+                    sqlstate_set(env, szSqlState, "HY001", "S1001");
                     /* memory allocation failure */
                     break;
                 case CONN_IN_USE:
-                    es_sqlstate_set(env, szSqlState, "HY000", "S1000");
+                    sqlstate_set(env, szSqlState, "HY000", "S1000");
                     /* general error */
                     break;
                 case CONN_UNSUPPORTED_OPTION:
-                    es_sqlstate_set(env, szSqlState, "HYC00", "IM001");
+                    sqlstate_set(env, szSqlState, "HYC00", "IM001");
                     /* driver does not support this function */
                     break;
                 case CONN_INVALID_ARGUMENT_NO:
-                    es_sqlstate_set(env, szSqlState, "HY009", "S1009");
+                    sqlstate_set(env, szSqlState, "HY009", "S1009");
                     /* invalid argument value */
                     break;
                 case CONN_TRANSACT_IN_PROGRES:
-                    es_sqlstate_set(env, szSqlState, "HY011", "S1011");
+                    sqlstate_set(env, szSqlState, "HY011", "S1011");
                     break;
                 case CONN_NO_MEMORY_ERROR:
-                    es_sqlstate_set(env, szSqlState, "HY001", "S1001");
+                    sqlstate_set(env, szSqlState, "HY001", "S1001");
                     break;
                 case CONN_NOT_IMPLEMENTED_ERROR:
-                    es_sqlstate_set(env, szSqlState, "HYC00", "S1C00");
+                    sqlstate_set(env, szSqlState, "HYC00", "S1C00");
                     break;
                 case CONN_ILLEGAL_TRANSACT_STATE:
-                    es_sqlstate_set(env, szSqlState, "25000", "S1010");
+                    sqlstate_set(env, szSqlState, "25000", "S1010");
                     break;
                 case CONN_VALUE_OUT_OF_RANGE:
-                    es_sqlstate_set(env, szSqlState, "HY019", "22003");
+                    sqlstate_set(env, szSqlState, "HY019", "22003");
                     break;
                 case CONNECTION_COULD_NOT_SEND:
                 case CONNECTION_COULD_NOT_RECEIVE:
                 case CONNECTION_COMMUNICATION_ERROR:
                 case CONNECTION_NO_RESPONSE:
-                    es_sqlstate_set(env, szSqlState, "08S01", "08S01");
+                    sqlstate_set(env, szSqlState, "08S01", "08S01");
                     break;
                 default:
-                    es_sqlstate_set(env, szSqlState, "HY000", "S1000");
+                    sqlstate_set(env, szSqlState, "HY000", "S1000");
                     /* general error */
                     break;
             }
@@ -337,7 +337,7 @@ RETCODE SQL_API ESAPI_ConnectError(HDBC hdbc, SQLSMALLINT RecNumber,
         return SQL_SUCCESS;
 }
 
-RETCODE SQL_API ESAPI_EnvError(HENV henv, SQLSMALLINT RecNumber,
+RETCODE SQL_API API_EnvError(HENV henv, SQLSMALLINT RecNumber,
                                SQLCHAR *szSqlState, SQLINTEGER *pfNativeError,
                                SQLCHAR *szErrorMsg, SQLSMALLINT cbErrorMsgMax,
                                SQLSMALLINT *pcbErrorMsg, UWORD flag) {
@@ -355,7 +355,7 @@ RETCODE SQL_API ESAPI_EnvError(HENV henv, SQLSMALLINT RecNumber,
         MYLOG(LOG_ERROR, "EN_get_error: msg = #%s#\n", msg);
 
         if (NULL != szSqlState)
-            es_sqlstate_set(env, szSqlState, "00000", "00000");
+            sqlstate_set(env, szSqlState, "00000", "00000");
         if (NULL != pcbErrorMsg)
             *pcbErrorMsg = 0;
         if ((NULL != szErrorMsg) && (cbErrorMsgMax > 0))
@@ -376,10 +376,10 @@ RETCODE SQL_API ESAPI_EnvError(HENV henv, SQLSMALLINT RecNumber,
         switch (status) {
             case ENV_ALLOC_ERROR:
                 /* memory allocation failure */
-                es_sqlstate_set(env, szSqlState, "HY001", "S1001");
+                sqlstate_set(env, szSqlState, "HY001", "S1001");
                 break;
             default:
-                es_sqlstate_set(env, szSqlState, "HY000", "S1000");
+                sqlstate_set(env, szSqlState, "HY000", "S1000");
                 /* general error */
                 break;
         }
