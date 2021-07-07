@@ -47,10 +47,10 @@
 #define TRIGGER_DELETE 0x01
 #define TRIGGER_UPDATE 0x02
 
-RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
+RETCODE SQL_API API_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
                               PTR rgbInfoValue, SQLSMALLINT cbInfoValueMax,
                               SQLSMALLINT *pcbInfoValue) {
-    CSTR func = "ESAPI_GetInfo";
+    CSTR func = "API_GetInfo";
     ConnectionClass *conn = (ConnectionClass *)hdbc;
     const char *p = NULL;
     char tmp[MAX_INFO_STRING];
@@ -859,7 +859,7 @@ RETCODE SQL_API ESAPI_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
         default:
             /* unrecognized key */
             CC_set_error(conn, CONN_NOT_IMPLEMENTED_ERROR,
-                         "Unrecognized key passed to ESAPI_GetInfo.", NULL);
+                         "Unrecognized key passed to API_GetInfo.", NULL);
             goto cleanup;
     }
 
@@ -938,7 +938,7 @@ cleanup:
 #define ESTYPE_TO_NAME(conn, esType, auto_increment) \
     tstype_attr_to_name(conn, esType, TS_ATP_UNSET, auto_increment)
 
-RETCODE SQL_API ESAPI_GetFunctions(HDBC hdbc, SQLUSMALLINT fFunction,
+RETCODE SQL_API API_GetFunctions(HDBC hdbc, SQLUSMALLINT fFunction,
                                    SQLUSMALLINT *pfExists) {
     UNUSED(hdbc);
     MYLOG(LOG_TRACE, "entering...%u\n", fFunction);
@@ -947,9 +947,9 @@ RETCODE SQL_API ESAPI_GetFunctions(HDBC hdbc, SQLUSMALLINT fFunction,
         memset(pfExists, 0, sizeof(pfExists[0]) * 100);
 
         /* ODBC core functions */
-        pfExists[SQL_API_SQLALLOCCONNECT] = TRUE;
-        pfExists[SQL_API_SQLALLOCENV] = TRUE;
-        pfExists[SQL_API_SQLALLOCSTMT] = TRUE;
+        pfExists[SQL_API_SQLALLOCCONNECT] = FALSE;
+        pfExists[SQL_API_SQLALLOCENV] = FALSE;
+        pfExists[SQL_API_SQLALLOCSTMT] = FALSE;
         pfExists[SQL_API_SQLBINDCOL] = TRUE;
         pfExists[SQL_API_SQLCANCEL] = TRUE;
         pfExists[SQL_API_SQLCOLATTRIBUTES] = TRUE;
@@ -960,9 +960,9 @@ RETCODE SQL_API ESAPI_GetFunctions(HDBC hdbc, SQLUSMALLINT fFunction,
         pfExists[SQL_API_SQLEXECDIRECT] = TRUE;
         pfExists[SQL_API_SQLEXECUTE] = TRUE;
         pfExists[SQL_API_SQLFETCH] = TRUE;
-        pfExists[SQL_API_SQLFREECONNECT] = TRUE;
-        pfExists[SQL_API_SQLFREEENV] = TRUE;
-        pfExists[SQL_API_SQLFREESTMT] = TRUE;
+        pfExists[SQL_API_SQLFREECONNECT] = FALSE;
+        pfExists[SQL_API_SQLFREEENV] = FALSE;
+        pfExists[SQL_API_SQLFREESTMT] = FALSE;
         pfExists[SQL_API_SQLGETCURSORNAME] = TRUE;
         pfExists[SQL_API_SQLNUMRESULTCOLS] = TRUE;
         pfExists[SQL_API_SQLPREPARE] = TRUE; /* complete? */
@@ -984,14 +984,14 @@ RETCODE SQL_API ESAPI_GetFunctions(HDBC hdbc, SQLUSMALLINT fFunction,
         pfExists[SQL_API_SQLPARAMDATA] = TRUE;
         pfExists[SQL_API_SQLPUTDATA] = TRUE;
         pfExists[SQL_API_SQLSETCONNECTOPTION] = TRUE; /* partial */
-        pfExists[SQL_API_SQLSETSTMTOPTION] = TRUE;
+        pfExists[SQL_API_SQLSETSTMTOPTION] = FALSE;
         pfExists[SQL_API_SQLSPECIALCOLUMNS] = TRUE;
         pfExists[SQL_API_SQLSTATISTICS] = TRUE;
         pfExists[SQL_API_SQLTABLES] = TRUE;
 
         /* ODBC level 2 functions */
         pfExists[SQL_API_SQLBROWSECONNECT] = FALSE;
-        pfExists[SQL_API_SQLCOLUMNPRIVILEGES] = FALSE;
+        pfExists[SQL_API_SQLCOLUMNPRIVILEGES] = TRUE;
         pfExists[SQL_API_SQLDATASOURCES] = FALSE; /* only implemented by
                                                    * DM */
         if (SUPPORT_DESCRIBE_PARAM(ci))
@@ -1006,12 +1006,12 @@ RETCODE SQL_API ESAPI_GetFunctions(HDBC hdbc, SQLUSMALLINT fFunction,
         pfExists[SQL_API_SQLMORERESULTS] = TRUE;
         pfExists[SQL_API_SQLNATIVESQL] = TRUE;
         pfExists[SQL_API_SQLNUMPARAMS] = TRUE;
-        pfExists[SQL_API_SQLPARAMOPTIONS] = TRUE;
+        pfExists[SQL_API_SQLPARAMOPTIONS] = FALSE;
         pfExists[SQL_API_SQLPRIMARYKEYS] = TRUE;
         pfExists[SQL_API_SQLPROCEDURECOLUMNS] = TRUE;
         pfExists[SQL_API_SQLPROCEDURES] = TRUE;
         pfExists[SQL_API_SQLSETPOS] = TRUE;
-        pfExists[SQL_API_SQLSETSCROLLOPTIONS] = TRUE; /* odbc 1.0 */
+        pfExists[SQL_API_SQLSETSCROLLOPTIONS] = FALSE; /* odbc 1.0 */
         pfExists[SQL_API_SQLTABLEPRIVILEGES] = TRUE;
         pfExists[SQL_API_SQLBULKOPERATIONS] = FALSE;
     } else {
@@ -1105,7 +1105,7 @@ RETCODE SQL_API ESAPI_GetFunctions(HDBC hdbc, SQLUSMALLINT fFunction,
                 *pfExists = FALSE;
                 break;
             case SQL_API_SQLCOLUMNPRIVILEGES:
-                *pfExists = FALSE;
+                *pfExists = TRUE;
                 break;
             case SQL_API_SQLDATASOURCES:
                 *pfExists = FALSE;
@@ -1263,14 +1263,14 @@ char *identifierEscape(const SQLCHAR *src, SQLLEN srclen,
     estype_attr_transfer_octet_length(conn, esType, atttypmod,     \
                                       ES_UNKNOWNS_UNSET)
 
-RETCODE SQL_API ESAPI_SpecialColumns(
+RETCODE SQL_API API_SpecialColumns(
     HSTMT hstmt, SQLUSMALLINT fColType, const SQLCHAR *szTableQualifier,
     SQLSMALLINT cbTableQualifier, const SQLCHAR *szTableOwner, /* OA E*/
     SQLSMALLINT cbTableOwner, const SQLCHAR *szTableName,      /* OA(R) E*/
     SQLSMALLINT cbTableName, SQLUSMALLINT fScope, SQLUSMALLINT fNullable) {
     UNUSED(fColType, szTableQualifier, cbTableQualifier, szTableOwner,
            cbTableOwner, szTableName, cbTableName, fScope, fNullable);
-    CSTR func = "ESAPI_SpecialColumns";
+    CSTR func = "API_SpecialColumns";
 
     // Initialize Statement
     StatementClass *stmt = (StatementClass *)hstmt;
@@ -1283,7 +1283,7 @@ RETCODE SQL_API ESAPI_SpecialColumns(
     if (!res) {
         SC_set_error(
             stmt, STMT_NO_MEMORY_ERROR,
-            "Couldn't allocate memory for ESAPI_SpecialColumns result.", func);
+            "Couldn't allocate memory for API_SpecialColumns result.", func);
         return SQL_ERROR;
     }
 
@@ -1328,14 +1328,14 @@ RETCODE SQL_API ESAPI_SpecialColumns(
 }
 
 #define INDOPTION_DESC 0x0001 /* values are in reverse order */
-RETCODE SQL_API ESAPI_Statistics(
+RETCODE SQL_API API_Statistics(
     HSTMT hstmt, const SQLCHAR *szTableQualifier,              /* OA X*/
     SQLSMALLINT cbTableQualifier, const SQLCHAR *szTableOwner, /* OA E*/
     SQLSMALLINT cbTableOwner, const SQLCHAR *szTableName,      /* OA(R) E*/
     SQLSMALLINT cbTableName, SQLUSMALLINT fUnique, SQLUSMALLINT fAccuracy) {
     UNUSED(szTableQualifier, cbTableQualifier, szTableOwner, cbTableOwner,
            szTableName, cbTableName, fUnique, fAccuracy);
-    CSTR func = "ESAPI_Statistics";
+    CSTR func = "API_Statistics";
 
     // Initialize Statement
     StatementClass *stmt = (StatementClass *)hstmt;
@@ -1347,7 +1347,7 @@ RETCODE SQL_API ESAPI_Statistics(
     QResultClass *res = QR_Constructor();
     if (!res) {
         SC_set_error(stmt, STMT_NO_MEMORY_ERROR,
-                     "Couldn't allocate memory for ESAPI_Statistics result.",
+                     "Couldn't allocate memory for API_Statistics result.",
                      func);
         return SQL_ERROR;
     }
@@ -1399,7 +1399,7 @@ RETCODE SQL_API ESAPI_Statistics(
     return SQL_SUCCESS;
 }
 
-RETCODE SQL_API ESAPI_ColumnPrivileges(
+RETCODE SQL_API API_ColumnPrivileges(
     HSTMT hstmt, const SQLCHAR *szTableQualifier,              /* OA X*/
     SQLSMALLINT cbTableQualifier, const SQLCHAR *szTableOwner, /* OA E*/
     SQLSMALLINT cbTableOwner, const SQLCHAR *szTableName,      /* OA(R) E*/
@@ -1407,7 +1407,7 @@ RETCODE SQL_API ESAPI_ColumnPrivileges(
     SQLSMALLINT cbColumnName, UWORD flag) {
     UNUSED(szTableQualifier, cbTableQualifier, szTableOwner, cbTableOwner,
            szTableName, cbTableName, szColumnName, cbColumnName, flag);
-    CSTR func = "ESAPI_ColumnPrivileges";
+    CSTR func = "API_ColumnPrivileges";
 
     // Initialize Statement
     StatementClass *stmt = (StatementClass *)hstmt;
@@ -1420,7 +1420,7 @@ RETCODE SQL_API ESAPI_ColumnPrivileges(
     if (!res) {
         SC_set_error(
             stmt, STMT_NO_MEMORY_ERROR,
-            "Couldn't allocate memory for ESAPI_ColumnPrivileges result.",
+            "Couldn't allocate memory for API_ColumnPrivileges result.",
             func);
         return SQL_ERROR;
     }
@@ -1472,7 +1472,7 @@ RETCODE SQL_API ESAPI_ColumnPrivileges(
  *
  *	Retrieve the primary key columns for the specified table.
  */
-RETCODE SQL_API ESAPI_PrimaryKeys(HSTMT hstmt,
+RETCODE SQL_API API_PrimaryKeys(HSTMT hstmt,
                                   const SQLCHAR *szTableQualifier, /* OA X*/
                                   SQLSMALLINT cbTableQualifier,
                                   const SQLCHAR *szTableOwner, /* OA E*/
@@ -1481,7 +1481,7 @@ RETCODE SQL_API ESAPI_PrimaryKeys(HSTMT hstmt,
                                   SQLSMALLINT cbTableName, OID reloid) {
     UNUSED(szTableQualifier, cbTableQualifier, szTableOwner, cbTableOwner,
            szTableName, cbTableName, reloid);
-    CSTR func = "ESAPI_PrimaryKeys";
+    CSTR func = "API_PrimaryKeys";
 
     // Initialize Statement
     StatementClass *stmt = (StatementClass *)hstmt;
@@ -1493,7 +1493,7 @@ RETCODE SQL_API ESAPI_PrimaryKeys(HSTMT hstmt,
     QResultClass *res = QR_Constructor();
     if (res == NULL) {
         SC_set_error(stmt, STMT_NO_MEMORY_ERROR,
-                     "Couldn't allocate memory for ESAPI_PrimaryKeys result.",
+                     "Couldn't allocate memory for API_PrimaryKeys result.",
                      func);
         return SQL_ERROR;
     }
@@ -1535,7 +1535,7 @@ RETCODE SQL_API ESAPI_PrimaryKeys(HSTMT hstmt,
     return ret;
 }
 
-RETCODE SQL_API ESAPI_ForeignKeys(
+RETCODE SQL_API API_ForeignKeys(
     HSTMT hstmt, const SQLCHAR *szPkTableQualifier,                /* OA X*/
     SQLSMALLINT cbPkTableQualifier, const SQLCHAR *szPkTableOwner, /* OA E*/
     SQLSMALLINT cbPkTableOwner, const SQLCHAR *szPkTableName,      /* OA(R) E*/
@@ -1547,7 +1547,7 @@ RETCODE SQL_API ESAPI_ForeignKeys(
            cbPkTableOwner, szPkTableName, cbPkTableName, szFkTableQualifier,
            cbFkTableQualifier, szFkTableOwner, cbFkTableOwner, szFkTableName,
            cbFkTableName);
-    CSTR func = "ESAPI_ForeignKeys";
+    CSTR func = "API_ForeignKeys";
 
     // Initialize Statement
     StatementClass *stmt = (StatementClass *)hstmt;
@@ -1559,7 +1559,7 @@ RETCODE SQL_API ESAPI_ForeignKeys(
     QResultClass *res = QR_Constructor();
     if (!res) {
         SC_set_error(stmt, STMT_NO_MEMORY_ERROR,
-                     "Couldn't allocate memory for ESAPI_ForeignKeys result.",
+                     "Couldn't allocate memory for API_ForeignKeys result.",
                      func);
         return SQL_ERROR;
     }
@@ -1620,7 +1620,7 @@ RETCODE SQL_API ESAPI_ForeignKeys(
 #define PRORET_COUNT
 #define DISPLAY_ARGNAME
 
-RETCODE SQL_API ESAPI_ProcedureColumns(
+RETCODE SQL_API API_ProcedureColumns(
     HSTMT hstmt, const SQLCHAR *szProcQualifier,             /* OA X*/
     SQLSMALLINT cbProcQualifier, const SQLCHAR *szProcOwner, /* PV E*/
     SQLSMALLINT cbProcOwner, const SQLCHAR *szProcName,      /* PV E*/
@@ -1628,7 +1628,7 @@ RETCODE SQL_API ESAPI_ProcedureColumns(
     SQLSMALLINT cbColumnName, UWORD flag) {
     UNUSED(szProcQualifier, cbProcQualifier, szProcOwner, cbProcOwner,
            szProcName, cbProcName, szColumnName, cbColumnName, flag);
-    CSTR func = "ESAPI_ProcedureColumns";
+    CSTR func = "API_ProcedureColumns";
 
     // Initialize Statement
     StatementClass *stmt = (StatementClass *)hstmt;
@@ -1641,7 +1641,7 @@ RETCODE SQL_API ESAPI_ProcedureColumns(
     if (res == NULL) {
         SC_set_error(
             stmt, STMT_NO_MEMORY_ERROR,
-            "Couldn't allocate memory for ESAPI_ProcedureColumns result.",
+            "Couldn't allocate memory for API_ProcedureColumns result.",
             func);
         return SQL_ERROR;
     }
@@ -1708,7 +1708,7 @@ RETCODE SQL_API ESAPI_ProcedureColumns(
     return ret;
 }
 
-RETCODE SQL_API ESAPI_Procedures(HSTMT hstmt,
+RETCODE SQL_API API_Procedures(HSTMT hstmt,
                                  const SQLCHAR *szProcQualifier, /* OA X*/
                                  SQLSMALLINT cbProcQualifier,
                                  const SQLCHAR *szProcOwner, /* PV E*/
@@ -1717,7 +1717,7 @@ RETCODE SQL_API ESAPI_Procedures(HSTMT hstmt,
                                  SQLSMALLINT cbProcName, UWORD flag) {
     UNUSED(szProcQualifier, cbProcQualifier, szProcOwner, cbProcOwner,
            szProcName, cbProcName, flag);
-    CSTR func = "ESAPI_Procedures";
+    CSTR func = "API_Procedures";
 
     // Initialize Statement
     StatementClass *stmt = (StatementClass *)hstmt;
@@ -1729,7 +1729,7 @@ RETCODE SQL_API ESAPI_Procedures(HSTMT hstmt,
     QResultClass *res = QR_Constructor();
     if (res == NULL) {
         SC_set_error(stmt, STMT_NO_MEMORY_ERROR,
-                     "Couldn't allocate memory for ESAPI_Procedures result.",
+                     "Couldn't allocate memory for API_Procedures result.",
                      func);
         return SQL_ERROR;
     }
@@ -1779,7 +1779,7 @@ RETCODE SQL_API ESAPI_Procedures(HSTMT hstmt,
 #define ACLMAX 8
 #define ALL_PRIVILIGES "arwdRxt"
 
-RETCODE SQL_API ESAPI_TablePrivileges(HSTMT hstmt,
+RETCODE SQL_API API_TablePrivileges(HSTMT hstmt,
                                       const SQLCHAR *szTableQualifier, /* OA X*/
                                       SQLSMALLINT cbTableQualifier,
                                       const SQLCHAR *szTableOwner, /* PV E*/
@@ -1788,7 +1788,7 @@ RETCODE SQL_API ESAPI_TablePrivileges(HSTMT hstmt,
                                       SQLSMALLINT cbTableName, UWORD flag) {
     UNUSED(szTableQualifier, cbTableQualifier, szTableOwner, cbTableOwner,
            szTableName, cbTableName, flag);
-    CSTR func = "ESAPI_TablePrivileges";
+    CSTR func = "API_TablePrivileges";
 
     // Initialize Statement
     StatementClass *stmt = (StatementClass *)hstmt;
@@ -1800,7 +1800,7 @@ RETCODE SQL_API ESAPI_TablePrivileges(HSTMT hstmt,
     QResultClass *res = QR_Constructor();
     if (!res) {
         SC_set_error(stmt, STMT_NO_MEMORY_ERROR,
-                     "Couldn't allocate memory for ESAPI_Statistics result.",
+                     "Couldn't allocate memory for API_Statistics result.",
                      func);
         return SQL_ERROR;
     }

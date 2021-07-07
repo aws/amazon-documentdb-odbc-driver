@@ -161,10 +161,10 @@ RETCODE SQL_API API_ExecDirect(HSTMT hstmt, const SQLCHAR *stmt_str,
  *	Currently, just copy the input string without modification
  *	observing buffer limits and truncation.
  */
-RETCODE SQL_API ESAPI_NativeSql(HDBC hdbc, const SQLCHAR *szSqlStrIn,
+RETCODE SQL_API API_NativeSql(HDBC hdbc, const SQLCHAR *szSqlStrIn,
                                 SQLINTEGER cbSqlStrIn, SQLCHAR *szSqlStr,
                                 SQLINTEGER cbSqlStrMax, SQLINTEGER *pcbSqlStr) {
-    CSTR func = "ESAPI_NativeSql";
+    CSTR func = "API_NativeSql";
     size_t len = 0;
     char *ptr;
     ConnectionClass *conn = (ConnectionClass *)hdbc;

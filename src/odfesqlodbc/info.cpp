@@ -420,7 +420,7 @@ void CleanUp(StatementClass *stmt, StatementClass *sub_stmt,
     SC_set_current_col(stmt, -1);
 
     if (sub_stmt)
-        ESAPI_FreeStmt(sub_stmt, SQL_DROP);
+        API_FreeStmt(sub_stmt, SQL_DROP);
 }
 
 void ExecuteQuery(ConnectionClass *conn, HSTMT *stmt,
@@ -530,7 +530,7 @@ void SetTableTuples(QResultClass *res, const TableResultSet res_type,
     if (res_type == TableResultSet::All) {
         RETCODE result = SQL_NO_DATA_FOUND;
         int ordinal_position = 0;
-        while (SQL_SUCCEEDED(result = ESAPI_Fetch(tbl_stmt))) {
+        while (SQL_SUCCEEDED(result = API_Fetch(tbl_stmt))) {
             if (bind_tbl[TABLES_TABLE_TYPE]->AsString() == "BASE TABLE") {
                 std::string table("TABLE");
                 bind_tbl[TABLES_TABLE_TYPE]->UpdateData((void *)table.c_str(),
@@ -560,7 +560,7 @@ void SetTableTuples(QResultClass *res, const TableResultSet res_type,
 
         // Loop through all data
         RETCODE result = SQL_NO_DATA_FOUND;
-        while (SQL_SUCCEEDED(result = ESAPI_Fetch(tbl_stmt))) {
+        while (SQL_SUCCEEDED(result = API_Fetch(tbl_stmt))) {
             // Replace BASE TABLE with TABLE for Excel & Power BI SQLTables call
             if (bind_tbl[TABLES_TABLE_TYPE]->AsString() == "BASE TABLE") {
                 std::string table("TABLE");
@@ -580,7 +580,7 @@ void SetTableTuples(QResultClass *res, const TableResultSet res_type,
     // Special cases - only need single grab for this one
     else {
         RETCODE result;
-        if (!SQL_SUCCEEDED(result = ESAPI_Fetch(tbl_stmt))) {
+        if (!SQL_SUCCEEDED(result = API_Fetch(tbl_stmt))) {
             SC_full_error_copy(stmt, tbl_stmt, FALSE);
             throw std::runtime_error(
                 std::string("Failed to fetch data after query. Error code :"
@@ -756,11 +756,11 @@ API_Tables(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
             ExecuteQuery(SC_get_conn(stmt),
                          reinterpret_cast< HSTMT * >(&database_stmt), query);
             RETCODE ret = SQL_NO_DATA;
-            while ((ret = ESAPI_Fetch(database_stmt)) != SQL_NO_DATA
+            while ((ret = API_Fetch(database_stmt)) != SQL_NO_DATA
                    && SQL_SUCCEEDED(ret)) {
                 SQLCHAR data[256] = {0};
                 SQLLEN indicator = 0;
-                ret = ESAPI_GetData(database_stmt, 1, SQL_C_CHAR, data, 256,
+                ret = API_GetData(database_stmt, 1, SQL_C_CHAR, data, 256,
                                     &indicator);
                 if (SQL_SUCCEEDED(ret)) {
                     std::string database_name;
@@ -856,11 +856,11 @@ API_Tables(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                          database_query);
             RETCODE ret = SQL_NO_DATA;
             std::vector< std::string > databases;
-            while ((ret = ESAPI_Fetch(database_stmt)) != SQL_NO_DATA
+            while ((ret = API_Fetch(database_stmt)) != SQL_NO_DATA
                    && SQL_SUCCEEDED(ret)) {
                 SQLCHAR data[256] = {0};
                 SQLLEN indicator = 0;
-                ret = ESAPI_GetData(database_stmt, 1, SQL_C_CHAR, data, 256,
+                ret = API_GetData(database_stmt, 1, SQL_C_CHAR, data, 256,
                                     &indicator);
                 std::string database_name;
                 if (SQL_SUCCEEDED(ret)) {
@@ -874,7 +874,7 @@ API_Tables(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                     }
                 }
             }
-            ESAPI_FreeStmt(database_stmt, SQL_DROP);
+            API_FreeStmt(database_stmt, SQL_DROP);
             // Get all tables per database
             for (auto database : databases) {
                 std::string table_query =
@@ -886,11 +886,11 @@ API_Tables(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                 ExecuteQuery(SC_get_conn(stmt),
                              reinterpret_cast< HSTMT * >(&table_stmt),
                              table_query);
-                while ((ret = ESAPI_Fetch(table_stmt)) != SQL_NO_DATA
+                while ((ret = API_Fetch(table_stmt)) != SQL_NO_DATA
                        && SQL_SUCCEEDED(ret)) {
                     SQLCHAR data[256] = {0};
                     SQLLEN indicator = 0;
-                    ret = ESAPI_GetData(table_stmt, 1, SQL_C_CHAR, data, 256,
+                    ret = API_GetData(table_stmt, 1, SQL_C_CHAR, data, 256,
                                         &indicator);
                     std::string table_name_return;
                     if (SQL_SUCCEEDED(ret)) {
@@ -926,7 +926,7 @@ API_Tables(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                         }
                     }
                 }
-                ESAPI_FreeStmt(table_stmt, SQL_DROP);
+                API_FreeStmt(table_stmt, SQL_DROP);
             }
             CleanUp(stmt, nullptr, SQL_SUCCESS);
         }
@@ -994,18 +994,18 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
         if (!SQL_SUCCEEDED(ret)) {
             SC_set_error(stmt, SC_get_errornumber(table_stmt),
                          SC_get_errormsg(table_stmt), func);
-            ESAPI_FreeStmt(table_stmt, SQL_DROP);
+            API_FreeStmt(table_stmt, SQL_DROP);
             CleanUp(stmt, nullptr);
             return ret;
         }
 
         std::vector< std::pair< std::string, std::string > > tables;
-        while ((ret = ESAPI_Fetch(table_stmt)) != SQL_NO_DATA
+        while ((ret = API_Fetch(table_stmt)) != SQL_NO_DATA
                && SQL_SUCCEEDED(ret)) {
             // Get database name
             SQLCHAR database[256] = {0};
             SQLLEN db_strlen_or_ind = 0;
-            ret = ESAPI_GetData(table_stmt, 1,
+            ret = API_GetData(table_stmt, 1,
                               SQL_C_CHAR, database, 256, &db_strlen_or_ind);
             std::string database_name;
             if (SQL_SUCCEEDED(ret)) {
@@ -1033,7 +1033,7 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
             // Get table name
             SQLCHAR table[256] = {0};
             SQLLEN tb_strlen_or_ind = 0;
-            ret = ESAPI_GetData(table_stmt, 3,
+            ret = API_GetData(table_stmt, 3,
                                 SQL_C_CHAR, table, 256, &tb_strlen_or_ind);
             std::string table_name;
             if (SQL_SUCCEEDED(ret)) {
@@ -1042,7 +1042,7 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
             }
             tables.push_back(std::make_pair(database_name, table_name));
         }
-        ESAPI_FreeStmt(table_stmt, SQL_DROP);
+        API_FreeStmt(table_stmt, SQL_DROP);
 
         // Setup QResultClass
         QResultClass *res = SetupQResult(stmt, COLUMN_TEMPLATE_COUNT);
@@ -1058,11 +1058,11 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
             ExecuteQuery(SC_get_conn(stmt),
                          reinterpret_cast< HSTMT * >(&col_stmt), query);
             int col_num = 0;
-            while ((ret = ESAPI_Fetch(col_stmt)) != SQL_NO_DATA
+            while ((ret = API_Fetch(col_stmt)) != SQL_NO_DATA
                    && SQL_SUCCEEDED(ret)) {
                 SQLCHAR column[256] = {0};
                 SQLLEN col_strlen_or_ind = 0;
-                ret = ESAPI_GetData(col_stmt, 1, SQL_C_CHAR, column, 256,
+                ret = API_GetData(col_stmt, 1, SQL_C_CHAR, column, 256,
                                     &col_strlen_or_ind);
                 col_num++;
 
@@ -1094,7 +1094,7 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
 
                 SQLCHAR type[256] = {0};
                 SQLLEN type_strlen_or_ind = 0;
-                ret = ESAPI_GetData(col_stmt, 2, SQL_C_CHAR, type, 256,
+                ret = API_GetData(col_stmt, 2, SQL_C_CHAR, type, 256,
                                     &type_strlen_or_ind);
                 std::string type_name_return;
                 if (SQL_SUCCEEDED(ret)) {
@@ -1182,7 +1182,7 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                     strdup(col_is_nullable.c_str());
                 tuple[COLUMNS_IS_NULLABLE].len = (int)col_is_nullable.size();
             }
-            ESAPI_FreeStmt(col_stmt, SQL_DROP);
+            API_FreeStmt(col_stmt, SQL_DROP);
         }
         CleanUp(stmt, nullptr, SQL_SUCCESS);
         return SQL_SUCCESS;

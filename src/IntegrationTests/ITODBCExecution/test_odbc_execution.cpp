@@ -54,66 +54,41 @@ class TestSQLNumParams : public Fixture {};
 
 class TestSQLCancel : public Fixture {};
 
-/*class TestSQLSetCursorName : public testing::Test {
+class TestSQLEndTran : public Fixture {};
+
+class TestSQLTransact : public Fixture {};
+
+class TestSQLNativeSql : public Fixture {};
+
+class TestSQLParamData : public Fixture {};
+
+class TestSQLPutData : public Fixture {};
+
+class TestSQLBindParameter : public Fixture {};
+
+class TestSQLSetCursorName : public Fixture {
    public:
-    TestSQLSetCursorName() {
-    }
-
-    void SetUp() {
-        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)(conn_string().c_str()), &m_env,
-                                       &m_conn, &m_hstmt, true, true));
-    }
-
-    void TearDown() {
-        CloseCursor(&m_hstmt, true, true);
-        SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
-        SQLDisconnect(m_conn);
-        SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-    }
-
-    ~TestSQLSetCursorName() {
-        // cleanup any pending stuff, but no exceptions allowed
-    }
-
     test_string m_cursor_name = CREATE_STRING("test_cursor");
-    SQLHENV m_env = SQL_NULL_HENV;
-    SQLHDBC m_conn = SQL_NULL_HDBC;
-    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
 };
 
-class TestSQLGetCursorName : public testing::Test {
+class TestSQLGetCursorName : public Fixture {
    public:
-    TestSQLGetCursorName() {
-    }
-
-    void SetUp() {
-        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)(conn_string().c_str()), &m_env,
-                                       &m_conn, &m_hstmt, true, true));
+    void SetUp() override {
+        Fixture::SetUp();
         ASSERT_EQ(SQLSetCursorName(m_hstmt, (SQLTCHAR*)m_cursor_name.c_str(),
                                    SQL_NTS),
                   SQL_SUCCESS);
     }
-
-    void TearDown() {
-        CloseCursor(&m_hstmt, true, true);
-        SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
-        SQLDisconnect(m_conn);
-        SQLFreeHandle(SQL_HANDLE_ENV, m_env);
-    }
-
-    ~TestSQLGetCursorName() {
-        // cleanup any pending stuff, but no exceptions allowed
-    }
-
     test_string m_cursor_name = CREATE_STRING("test_cursor");
     SQLSMALLINT m_wrong_buffer_length = 1;
-    SQLTCHAR m_cursor_name_buf[20];
-    SQLSMALLINT m_cursor_name_length;
-    SQLHENV m_env = SQL_NULL_HENV;
-    SQLHDBC m_conn = SQL_NULL_HDBC;
-    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
+    SQLTCHAR m_cursor_name_buf[20] = {0};
+    SQLSMALLINT m_cursor_name_length = 0;
 };
-*/
+
+class TestSQLBulkOperations : public Fixture {};
+
+class TestSQLSetPos : public Fixture {};
+
 TEST_F(TestSQLExecute, NO_SQLPREPARE) {
     SQLRETURN ret = SQLExecute(m_hstmt);
     EXPECT_EQ(SQL_ERROR, ret);
@@ -315,7 +290,7 @@ TEST_F(TestSQLNumParams, NUM_PARAMS) {
     SQLRETURN ret = SQLNumParams(nullptr, &num);
     EXPECT_EQ(SQL_ERROR, ret);
     ret = SQLNumParams(m_hstmt, &num);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_EQ(SQL_ERROR, ret);
     EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_NOT_IMPLEMENTED_ERROR));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -475,7 +450,6 @@ TEST_F(TestSQLExecDirect, NullQueryError) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-/*
 TEST_F(TestSQLSetCursorName, Success) {
     SQLRETURN ret =
         SQLSetCursorName(m_hstmt, (SQLTCHAR*)m_cursor_name.c_str(), SQL_NTS);
@@ -487,8 +461,9 @@ TEST_F(TestSQLGetCursorName, Success) {
     SQLRETURN ret =
         SQLGetCursorName(m_hstmt, m_cursor_name_buf,
                          IT_SIZEOF(m_cursor_name_buf), &m_cursor_name_length);
+    CompareStrNumChar(m_cursor_name, (SQLINTEGER)m_cursor_name_length,
+                m_cursor_name_buf, ret);
     EXPECT_EQ(SQL_SUCCESS, ret);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLGetCursorName, WrongLengthForCursorName) {
@@ -496,9 +471,10 @@ TEST_F(TestSQLGetCursorName, WrongLengthForCursorName) {
         SQLGetCursorName(m_hstmt, m_cursor_name_buf, m_wrong_buffer_length,
                          &m_cursor_name_length);
     EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_DATA_RIGHT_TRUNCATED));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
-*/
 
 TEST_F(TestSQLCancel, NULLHandle) {
     SQLRETURN ret_exec = SQLCancel(NULL);
@@ -573,6 +549,75 @@ TEST_F(TestSQLCancel, QueryFinished) {
     EXPECT_EQ(cnt, limit);
     ret = SQLCancel(m_hstmt);
     EXPECT_EQ(ret, SQL_SUCCESS);
+}
+
+TEST_F(TestSQLEndTran, NOT_SUPPORTED) {
+    SQLRETURN ret = SQLEndTran(SQL_HANDLE_DBC, m_conn, SQL_COMMIT);
+    EXPECT_EQ(ret, SQL_ERROR);
+    EXPECT_TRUE(
+        CheckSQLSTATE(SQL_HANDLE_DBC, m_conn, SQLSTATE_NOT_IMPLEMENTED_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
+}
+
+TEST_F(TestSQLTransact, NOT_SUPPORTED) {
+    SQLRETURN ret = SQLTransact(m_env, m_conn, SQL_COMMIT);
+    EXPECT_EQ(ret, SQL_ERROR);
+    EXPECT_TRUE(
+        CheckSQLSTATE(SQL_HANDLE_DBC, m_conn, SQLSTATE_NOT_IMPLEMENTED_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_DBC, m_conn, ret);
+}
+
+TEST_F(TestSQLNativeSql, SUCCESS) {
+    test_string query = CREATE_STRING("SELECT * FROM ODBCTest.IoT LIMIT 1");
+    SQLTCHAR out_query[1024] = {0};
+    SQLINTEGER out_length = 0;
+    SQLRETURN ret = SQLNativeSql(m_conn, (SQLTCHAR*)query.c_str(), SQL_NTS,
+                                 out_query, 1024, &out_length);
+    CompareStrNumChar(query, out_length, out_query, ret);
+}
+
+TEST_F(TestSQLParamData, NOT_SUPPORTED) {
+    SQLRETURN ret = SQLParamData(m_hstmt, NULL);
+    EXPECT_EQ(ret, SQL_ERROR);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NOT_IMPLEMENTED_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLPutData, NOT_SUPPORTED) {
+    SQLCHAR data;
+    SQLRETURN ret = SQLPutData(m_hstmt, &data, SQL_NULL_DATA);
+    EXPECT_EQ(ret, SQL_ERROR);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NOT_IMPLEMENTED_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLBindParameter, NOT_SUPPORTED) {
+    SQLCHAR data[1024];  
+    SQLLEN indicator;
+    SQLRETURN ret = SQLBindParameter(m_hstmt, 1, SQL_PARAM_INPUT, SQL_C_CHAR,
+                                     SQL_CHAR, 1024, 0, data, 0, &indicator);
+    EXPECT_EQ(ret, SQL_ERROR);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NOT_IMPLEMENTED_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLBulkOperations, NOT_SUPPORTED) {
+    SQLRETURN ret = SQLBulkOperations(m_hstmt, SQL_ADD);
+    EXPECT_EQ(ret, SQL_ERROR);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NOT_IMPLEMENTED_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLSetPos, NOT_SUPPORTED) {
+    SQLRETURN ret = SQLSetPos(m_hstmt, 0, SQL_POSITION, SQL_LOCK_NO_CHANGE);
+    EXPECT_EQ(ret, SQL_ERROR);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NOT_IMPLEMENTED_ERROR));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 int main(int argc, char** argv) {

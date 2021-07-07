@@ -189,8 +189,7 @@ RETCODE SQL_API SQLDriverConnect(HDBC hdbc, HWND hwnd, SQLCHAR *szConnStrIn,
     MYLOG(LOG_TRACE, "entering\n");
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
-    ret =
-        ESAPI_DriverConnect(hdbc, hwnd, szConnStrIn, cbConnStrIn, szConnStrOut,
+    ret = API_DriverConnect(hdbc, hwnd, szConnStrIn, cbConnStrIn, szConnStrOut,
                             cbConnStrOutMax, pcbConnStrOut, fDriverCompletion);
     LEAVE_CONN_CS(conn);
     return ret;
@@ -357,7 +356,7 @@ RETCODE SQL_API SQLFreeStmt(HSTMT StatementHandle, SQLUSMALLINT Option) {
             ENTER_STMT_CS(stmt);
     }
 
-    ret = ESAPI_FreeStmt(StatementHandle, Option);
+    ret = API_FreeStmt(StatementHandle, Option);
 
     if (stmt) {
         if (Option == SQL_DROP) {
@@ -380,7 +379,7 @@ RETCODE SQL_API SQLGetCursorName(HSTMT StatementHandle, SQLCHAR *CursorName,
     MYLOG(LOG_TRACE, "entering\n");
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
-    ret = ESAPI_GetCursorName(StatementHandle, CursorName, BufferLength,
+    ret = API_GetCursorName(StatementHandle, CursorName, BufferLength,
                               NameLength);
     LEAVE_STMT_CS(stmt);
     return ret;
@@ -399,7 +398,7 @@ RETCODE SQL_API SQLGetData(HSTMT StatementHandle, SQLUSMALLINT ColumnNumber,
 
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
-    ret = ESAPI_GetData(StatementHandle, ColumnNumber, TargetType, TargetValue,
+    ret = API_GetData(StatementHandle, ColumnNumber, TargetType, TargetValue,
                         BufferLength, StrLen_or_Ind);
     LEAVE_STMT_CS(stmt);
     return ret;
@@ -414,9 +413,9 @@ RETCODE SQL_API SQLGetFunctions(HDBC ConnectionHandle, SQLUSMALLINT FunctionId,
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
     if (FunctionId == SQL_API_ODBC3_ALL_FUNCTIONS)
-        ret = ESAPI_GetFunctions30(ConnectionHandle, FunctionId, Supported);
+        ret = API_GetFunctions30(ConnectionHandle, FunctionId, Supported);
     else
-        ret = ESAPI_GetFunctions(ConnectionHandle, FunctionId, Supported);
+        ret = API_GetFunctions(ConnectionHandle, FunctionId, Supported);
 
     LEAVE_CONN_CS(conn);
     return ret;
@@ -432,7 +431,7 @@ RETCODE SQL_API SQLGetInfo(HDBC ConnectionHandle, SQLUSMALLINT InfoType,
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
     MYLOG(LOG_TRACE, "entering\n");
-    if ((ret = ESAPI_GetInfo(ConnectionHandle, InfoType, InfoValue,
+    if ((ret = API_GetInfo(ConnectionHandle, InfoType, InfoValue,
                              BufferLength, StringLength))
         == SQL_ERROR)
         CC_log_error("SQLGetInfo(30)", "", conn);
@@ -472,7 +471,7 @@ RETCODE SQL_API SQLNumResultCols(HSTMT StatementHandle,
 
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
-    ret = ESAPI_NumResultCols(StatementHandle, ColumnCount);
+    ret = API_NumResultCols(StatementHandle, ColumnCount);
     LEAVE_STMT_CS(stmt);
     return ret;
 }
@@ -548,7 +547,7 @@ RETCODE SQL_API SQLSetCursorName(HSTMT StatementHandle, SQLCHAR *CursorName,
     MYLOG(LOG_TRACE, "entering\n");
     ENTER_STMT_CS(stmt);
     SC_clear_error(stmt);
-    ret = ESAPI_SetCursorName(StatementHandle, CursorName, NameLength);
+    ret = API_SetCursorName(StatementHandle, CursorName, NameLength);
     LEAVE_STMT_CS(stmt);
     return ret;
 }
@@ -585,7 +584,7 @@ RETCODE SQL_API SQLSpecialColumns(HSTMT StatementHandle,
     if (SC_opencheck(stmt, func))
         ret = SQL_ERROR;
     else
-        ret = ESAPI_SpecialColumns(StatementHandle, IdentifierType, ctName,
+        ret = API_SpecialColumns(StatementHandle, IdentifierType, ctName,
                                    NameLength1, scName, NameLength2, tbName,
                                    NameLength3, Scope, Nullable);
     if (SQL_SUCCESS == ret && theResultIsEmpty(stmt)) {
@@ -612,7 +611,7 @@ RETCODE SQL_API SQLSpecialColumns(HSTMT StatementHandle,
             reexec = TRUE;
         }
         if (reexec) {
-            ret = ESAPI_SpecialColumns(StatementHandle, IdentifierType, ctName,
+            ret = API_SpecialColumns(StatementHandle, IdentifierType, ctName,
                                        NameLength1, scName, NameLength2, tbName,
                                        NameLength3, Scope, Nullable);
             if (newCt)
@@ -646,7 +645,7 @@ RETCODE SQL_API SQLStatistics(HSTMT StatementHandle, SQLCHAR *CatalogName,
     if (SC_opencheck(stmt, func))
         ret = SQL_ERROR;
     else
-        ret = ESAPI_Statistics(StatementHandle, ctName, NameLength1, scName,
+        ret = API_Statistics(StatementHandle, ctName, NameLength1, scName,
                                NameLength2, tbName, NameLength3, Unique,
                                Reserved);
     if (SQL_SUCCESS == ret && theResultIsEmpty(stmt)) {
@@ -673,7 +672,7 @@ RETCODE SQL_API SQLStatistics(HSTMT StatementHandle, SQLCHAR *CatalogName,
             reexec = TRUE;
         }
         if (reexec) {
-            ret = ESAPI_Statistics(StatementHandle, ctName, NameLength1, scName,
+            ret = API_Statistics(StatementHandle, ctName, NameLength1, scName,
                                    NameLength2, tbName, NameLength3, Unique,
                                    Reserved);
             if (newCt)
@@ -774,7 +773,7 @@ RETCODE SQL_API SQLColumnPrivileges(
     if (SC_opencheck(stmt, func))
         ret = SQL_ERROR;
     else
-        ret = ESAPI_ColumnPrivileges(hstmt, ctName, cbCatalogName, scName,
+        ret = API_ColumnPrivileges(hstmt, ctName, cbCatalogName, scName,
                                      cbSchemaName, tbName, cbTableName, clName,
                                      cbColumnName, flag);
     if (SQL_SUCCESS == ret && theResultIsEmpty(stmt)) {
@@ -807,7 +806,7 @@ RETCODE SQL_API SQLColumnPrivileges(
             reexec = TRUE;
         }
         if (reexec) {
-            ret = ESAPI_ColumnPrivileges(hstmt, ctName, cbCatalogName, scName,
+            ret = API_ColumnPrivileges(hstmt, ctName, cbCatalogName, scName,
                                          cbSchemaName, tbName, cbTableName,
                                          clName, cbColumnName, flag);
             if (newCt)
@@ -894,7 +893,7 @@ RETCODE SQL_API SQLForeignKeys(
     if (SC_opencheck(stmt, func))
         ret = SQL_ERROR;
     else
-        ret = ESAPI_ForeignKeys(hstmt, pkctName, cbPkCatalogName, pkscName,
+        ret = API_ForeignKeys(hstmt, pkctName, cbPkCatalogName, pkscName,
                                 cbPkSchemaName, pktbName, cbPkTableName,
                                 fkctName, cbFkCatalogName, fkscName,
                                 cbFkSchemaName, fktbName, cbFkTableName);
@@ -941,7 +940,7 @@ RETCODE SQL_API SQLForeignKeys(
             reexec = TRUE;
         }
         if (reexec) {
-            ret = ESAPI_ForeignKeys(hstmt, pkctName, cbPkCatalogName, pkscName,
+            ret = API_ForeignKeys(hstmt, pkctName, cbPkCatalogName, pkscName,
                                     cbPkSchemaName, pktbName, cbPkTableName,
                                     fkctName, cbFkCatalogName, fkscName,
                                     cbFkSchemaName, fktbName, cbFkTableName);
@@ -989,7 +988,7 @@ RETCODE SQL_API SQLNativeSql(HDBC hdbc, SQLCHAR *szSqlStrIn,
     MYLOG(LOG_TRACE, "entering\n");
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
-    ret = ESAPI_NativeSql(hdbc, szSqlStrIn, cbSqlStrIn, szSqlStr, cbSqlStrMax,
+    ret = API_NativeSql(hdbc, szSqlStrIn, cbSqlStrIn, szSqlStr, cbSqlStrMax,
                           pcbSqlStr);
     LEAVE_CONN_CS(conn);
     return ret;
@@ -1000,13 +999,7 @@ RETCODE SQL_API SQLNumParams(HSTMT hstmt, SQLSMALLINT *pcpar) {
     if (pcpar != NULL)
         *pcpar = 0;
 
-    StatementClass *stmt = (StatementClass *)hstmt;
-    if (stmt == NULL)
-        return SQL_ERROR;
-    SC_clear_error(stmt);
-    SC_set_error(stmt, STMT_NOT_IMPLEMENTED_ERROR,
-                 "Timestream does not support parameters.", "SQLNumParams");
-    return SQL_SUCCESS_WITH_INFO;
+    return ParametersNotSupported((StatementClass *)hstmt, "SQLNumParams");
 }
 
 #ifndef UNICODE_SUPPORTXX
@@ -1029,7 +1022,7 @@ RETCODE SQL_API SQLPrimaryKeys(HSTMT hstmt, SQLCHAR *szCatalogName,
     if (SC_opencheck(stmt, func))
         ret = SQL_ERROR;
     else
-        ret = ESAPI_PrimaryKeys(hstmt, ctName, cbCatalogName, scName,
+        ret = API_PrimaryKeys(hstmt, ctName, cbCatalogName, scName,
                                 cbSchemaName, tbName, cbTableName, 0);
     if (SQL_SUCCESS == ret && theResultIsEmpty(stmt)) {
         BOOL ifallupper = TRUE, reexec = FALSE;
@@ -1055,7 +1048,7 @@ RETCODE SQL_API SQLPrimaryKeys(HSTMT hstmt, SQLCHAR *szCatalogName,
             reexec = TRUE;
         }
         if (reexec) {
-            ret = ESAPI_PrimaryKeys(hstmt, ctName, cbCatalogName, scName,
+            ret = API_PrimaryKeys(hstmt, ctName, cbCatalogName, scName,
                                     cbSchemaName, tbName, cbTableName, 0);
             if (newCt)
                 free(newCt);
@@ -1091,7 +1084,7 @@ RETCODE SQL_API SQLProcedureColumns(
     if (SC_opencheck(stmt, func))
         ret = SQL_ERROR;
     else
-        ret = ESAPI_ProcedureColumns(hstmt, ctName, cbCatalogName, scName,
+        ret = API_ProcedureColumns(hstmt, ctName, cbCatalogName, scName,
                                      cbSchemaName, prName, cbProcName, clName,
                                      cbColumnName, flag);
     if (SQL_SUCCESS == ret && theResultIsEmpty(stmt)) {
@@ -1124,7 +1117,7 @@ RETCODE SQL_API SQLProcedureColumns(
             reexec = TRUE;
         }
         if (reexec) {
-            ret = ESAPI_ProcedureColumns(hstmt, ctName, cbCatalogName, scName,
+            ret = API_ProcedureColumns(hstmt, ctName, cbCatalogName, scName,
                                          cbSchemaName, prName, cbProcName,
                                          clName, cbColumnName, flag);
             if (newCt)
@@ -1163,7 +1156,7 @@ RETCODE SQL_API SQLProcedures(HSTMT hstmt, SQLCHAR *szCatalogName,
     if (SC_opencheck(stmt, func))
         ret = SQL_ERROR;
     else
-        ret = ESAPI_Procedures(hstmt, ctName, cbCatalogName, scName,
+        ret = API_Procedures(hstmt, ctName, cbCatalogName, scName,
                                cbSchemaName, prName, cbProcName, flag);
     if (SQL_SUCCESS == ret && theResultIsEmpty(stmt)) {
         BOOL ifallupper = TRUE, reexec = FALSE;
@@ -1189,7 +1182,7 @@ RETCODE SQL_API SQLProcedures(HSTMT hstmt, SQLCHAR *szCatalogName,
             reexec = TRUE;
         }
         if (reexec) {
-            ret = ESAPI_Procedures(hstmt, ctName, cbCatalogName, scName,
+            ret = API_Procedures(hstmt, ctName, cbCatalogName, scName,
                                    cbSchemaName, prName, cbProcName, flag);
             if (newCt)
                 free(newCt);
@@ -1241,8 +1234,8 @@ RETCODE SQL_API SQLTablePrivileges(HSTMT hstmt, SQLCHAR *szCatalogName,
     if (SC_opencheck(stmt, func))
         ret = SQL_ERROR;
     else
-        ret = ESAPI_TablePrivileges(hstmt, ctName, cbCatalogName, scName,
-                                    cbSchemaName, tbName, cbTableName, flag);
+        ret = API_TablePrivileges(hstmt, ctName, cbCatalogName, scName,
+                                  cbSchemaName, tbName, cbTableName, flag);
     if (SQL_SUCCESS == ret && theResultIsEmpty(stmt)) {
         BOOL ifallupper = TRUE, reexec = FALSE;
         SQLCHAR *newCt = NULL, *newSc = NULL, *newTb = NULL;
@@ -1267,7 +1260,7 @@ RETCODE SQL_API SQLTablePrivileges(HSTMT hstmt, SQLCHAR *szCatalogName,
             reexec = TRUE;
         }
         if (reexec) {
-            ret = ESAPI_TablePrivileges(hstmt, ctName, cbCatalogName, scName,
+            ret = API_TablePrivileges(hstmt, ctName, cbCatalogName, scName,
                                         cbSchemaName, tbName, cbTableName, 0);
             if (newCt)
                 free(newCt);
@@ -1282,6 +1275,17 @@ RETCODE SQL_API SQLTablePrivileges(HSTMT hstmt, SQLCHAR *szCatalogName,
 }
 #endif /* UNICODE_SUPPORTXX */
 
+RETCODE SQL_API SQLTransact(HENV henv, HDBC hdbc, SQLUSMALLINT fType) {
+    UNUSED(henv, fType);
+    ConnectionClass *conn = (ConnectionClass *)hdbc;
+    if (conn == NULL)
+        return SQL_ERROR;
+    CC_clear_error(conn);
+    CC_set_error(conn, CONN_NOT_IMPLEMENTED_ERROR,
+                 "SQLTransact is not supported.", "SQLTransact");
+    return SQL_ERROR;
+}
+
 RETCODE SQL_API SQLBindParameter(HSTMT hstmt, SQLUSMALLINT ipar,
                                  SQLSMALLINT fParamType, SQLSMALLINT fCType,
                                  SQLSMALLINT fSqlType, SQLULEN cbColDef,
@@ -1294,7 +1298,6 @@ RETCODE SQL_API SQLBindParameter(HSTMT hstmt, SQLUSMALLINT ipar,
 }
 
 /* ODBC 2.x-specific functions */
-// TODO (#590): Add implementations for remaining ODBC 2.x function
 
 RETCODE SQL_API SQLAllocStmt(SQLHDBC InputHandle, SQLHSTMT *OutputHandle) {
     RETCODE ret;
@@ -1321,7 +1324,7 @@ RETCODE SQL_API SQLGetConnectOption(HDBC ConnectionHandle, SQLUSMALLINT Option,
     MYLOG(LOG_TRACE, "entering " FORMAT_USMALLI "\n", Option);
     ENTER_CONN_CS((ConnectionClass *)ConnectionHandle);
     CC_clear_error((ConnectionClass *)ConnectionHandle);
-    ret = ESAPI_GetConnectOption(ConnectionHandle, Option, Value, NULL, 0);
+    ret = API_GetConnectOption(ConnectionHandle, Option, Value, NULL, 0);
     LEAVE_CONN_CS((ConnectionClass *)ConnectionHandle);
     return ret;
 }
@@ -1335,7 +1338,7 @@ RETCODE SQL_API SQLSetConnectOption(HDBC ConnectionHandle, SQLUSMALLINT Option,
     MYLOG(LOG_TRACE, "entering " FORMAT_USMALLI "\n", Option);
     ENTER_CONN_CS(conn);
     CC_clear_error(conn);
-    ret = ESAPI_SetConnectOption(ConnectionHandle, Option, Value);
+    ret = API_SetConnectOption(ConnectionHandle, Option, Value);
     LEAVE_CONN_CS(conn);
     return ret;
 }
@@ -1380,16 +1383,15 @@ RETCODE SQL_API SQLError(SQLHENV EnvironmentHandle, SQLHDBC ConnectionHandle,
     MYLOG(LOG_TRACE, "entering\n");
 
     if (StatementHandle) {
-        ret =
-            ESAPI_StmtError(StatementHandle, RecNumber, Sqlstate, NativeError,
-                           MessageText, BufferLength, TextLength, 0);
+        ret = API_StmtError(StatementHandle, RecNumber, Sqlstate, NativeError,
+                            MessageText, BufferLength, TextLength, 0);
     } else if (ConnectionHandle) {
-        ret = ESAPI_ConnectError(ConnectionHandle, RecNumber, Sqlstate,
-                                 NativeError, MessageText, BufferLength,
-                                 TextLength, 0);
+        ret =
+            API_ConnectError(ConnectionHandle, RecNumber, Sqlstate, NativeError,
+                             MessageText, BufferLength, TextLength, 0);
     } else if (EnvironmentHandle) {
-        ret = ESAPI_EnvError(EnvironmentHandle, RecNumber, Sqlstate, NativeError,
-                              MessageText, BufferLength, TextLength, 0);
+        ret = API_EnvError(EnvironmentHandle, RecNumber, Sqlstate, NativeError,
+                           MessageText, BufferLength, TextLength, 0);
     } else {
         ret = SQL_ERROR;
     }

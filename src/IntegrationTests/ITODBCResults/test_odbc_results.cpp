@@ -96,29 +96,6 @@ void QueryFetch(const test_string& column, const test_string& dataset,
     LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
 }
 
-void CheckIndicatorRet(const test_string& expected, const SQLLEN indicator, const SQLRETURN ret, const bool is_wchar) {
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    if (is_wchar) {
-#ifdef __APPLE__
-        ASSERT_EQ((long)(4 * expected.size()), (long)indicator);
-#else
-        ASSERT_EQ((long)(2 * expected.size()), (long)indicator);
-#endif
-    } else {
-        ASSERT_EQ((long)(expected.size()), (long)indicator);
-    }
-}
-
-void CompareData(const test_string& expected, const SQLLEN indicator, const SQLWCHAR* data, const SQLRETURN ret) {
-    CheckIndicatorRet(expected, indicator, ret, true);
-    EXPECT_EQ(expected, to_test_string(wchar_to_string(data)));
-}
-
-void CompareData(const test_string& expected, const SQLLEN indicator, const SQLCHAR* data, const SQLRETURN ret) {
-    CheckIndicatorRet(expected, indicator, ret, false);
-    EXPECT_EQ(expected, to_test_string(std::string((char*)data)));
-}
-
 auto CompareTimestampStruct = [](const TIMESTAMP_STRUCT& expected,
                                  const TIMESTAMP_STRUCT& actual) {
     EXPECT_EQ(expected.year, actual.year);
@@ -1376,7 +1353,7 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR_ARRAY) {
     SQLLEN indicator = 0;
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("[{time: 2021-03-05 14:18:30.123456789, value: [1, 2, 3]}]");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1400,7 +1377,7 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR_ARRAY) {
     SQLLEN indicator = 0;
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("[{time: 2021-03-05 14:18:30.123456789, value: [1, 2, 3]}]");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1423,7 +1400,7 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR_ROW) {
     SQLLEN indicator = 0;
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("[{time: 2021-03-05 14:18:30.123456789, value: (9.9, 19)}]");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1447,7 +1424,7 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR_ROW) {
     SQLLEN indicator = 0;
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("[{time: 2021-03-05 14:18:30.123456789, value: (9.9, 19)}]");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1471,7 +1448,7 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR_ARRAY_ROW_COMBINATION) {
     SQLLEN indicator = 0;
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("[{time: 2021-03-05 14:18:30.123456789, value: (null, [[(12345, [1, 2, 3])]])}]");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1495,7 +1472,7 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR_ARRAY_ROW_COMBINATION) {
     SQLLEN indicator = 0;
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("[{time: 2021-03-05 14:18:30.123456789, value: (null, [[(12345, [1, 2, 3])]])}]");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1510,15 +1487,15 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_CHAR) {
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("[[[[1.1, 2.3], [1.1, 2.3]]], [[[1.1, 2.3], [1.1, 2.3]]]]");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data2, 1024, &indicator);
     expected = CREATE_STRING("[[[[[[[[[[[[1, 2, 3]]]]]]]]]]]]");
-    CompareData(expected, indicator, data2, ret);
+    CompareStrNumBytes(expected, indicator, data2, ret);
     
     ret = SQLGetData(m_hstmt, 3, SQL_C_CHAR, data3, 1024, &indicator);
     expected = CREATE_STRING("-");
-    CompareData(expected, indicator, data3, ret);
+    CompareStrNumBytes(expected, indicator, data3, ret);
     
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -1537,15 +1514,15 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_WCHAR) {
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("[[[[1.1, 2.3], [1.1, 2.3]]], [[[1.1, 2.3], [1.1, 2.3]]]]");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
 
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 1024, &indicator);
     expected = CREATE_STRING("[[[[[[[[[[[[1, 2, 3]]]]]]]]]]]]");
-    CompareData(expected, indicator, data2, ret);
+    CompareStrNumBytes(expected, indicator, data2, ret);
     
     ret = SQLGetData(m_hstmt, 3, SQL_C_WCHAR, data3, 1024, &indicator);
     expected = CREATE_STRING("-");
-    CompareData(expected, indicator, data3, ret);
+    CompareStrNumBytes(expected, indicator, data3, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1583,11 +1560,11 @@ TEST_F(TestSQLGetData, ROW_TO_SQL_C_WCHAR) {
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("(((3, 10, true), [[1.0, 2.0], [1.1, 2.2]]))");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
 
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 1024, &indicator);
     expected = CREATE_STRING("(true)");
-    CompareData(expected, indicator, data2, ret);
+    CompareStrNumBytes(expected, indicator, data2, ret);
 
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -1661,11 +1638,11 @@ TEST_F(TestSQLGetData, ARRAY_ROW_NULL_TO_SQL_C_WCHAR) {
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("[(null), (null)]");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 1024, &indicator);
     expected = CREATE_STRING("([null], [null])");
-    CompareData(expected, indicator, data2, ret);
+    CompareStrNumBytes(expected, indicator, data2, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1683,27 +1660,27 @@ TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_CHAR) {
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("2021-01-02 18:01:13.000000000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
     expected = CREATE_STRING("2021-11-20 18:01:13.123456789");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 3, SQL_C_CHAR, data, 1024, &indicator);
     expected = CREATE_STRING( "2021-11-20 18:01:13.123450000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 4, SQL_C_CHAR, data, 1024, &indicator);
     expected = CREATE_STRING("2021-11-20 18:01:13.000000000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 5, SQL_C_CHAR, data, 1024, &indicator);
     expected = CREATE_STRING("2021-11-20 18:01:00.000000000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 6, SQL_C_CHAR, data, 1024, &indicator);
     expected = CREATE_STRING("2021-11-20 00:00:00.000000000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1722,27 +1699,27 @@ TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_WCHAR) {
     
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("2021-01-02 18:01:13.000000000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
     expected = CREATE_STRING("2021-11-20 18:01:13.123456789");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 3, SQL_C_WCHAR, data, 1024, &indicator);
     expected = CREATE_STRING("2021-11-20 18:01:13.123450000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 4, SQL_C_WCHAR, data, 1024, &indicator);
     expected = CREATE_STRING("2021-11-20 18:01:13.000000000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 5, SQL_C_WCHAR, data, 1024, &indicator);
     expected = CREATE_STRING("2021-11-20 18:01:00.000000000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 6, SQL_C_WCHAR, data, 1024, &indicator);
     expected = CREATE_STRING("2021-11-20 00:00:00.000000000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1828,11 +1805,11 @@ TEST_F(TestSQLGetData, DATE_TO_SQL_C_CHAR) {
 
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("2021-01-02");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
 
     ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
     expected = CREATE_STRING("2021-11-20");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1845,11 +1822,11 @@ TEST_F(TestSQLGetData, DATE_TO_SQL_C_WCHAR) {
 
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("2021-01-02");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
 
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
     expected = CREATE_STRING("2021-11-20");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
@@ -1900,23 +1877,23 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_CHAR) {
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("18:01:13.000000000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
 
     ret = SQLGetData(m_hstmt, 2, SQL_C_CHAR, data, 1024, &indicator);
     expected = CREATE_STRING("06:39:45.123456789");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
 
     ret = SQLGetData(m_hstmt, 3, SQL_C_CHAR, data, 1024, &indicator);
     expected = CREATE_STRING("06:39:45.123450000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 4, SQL_C_CHAR, data, 1024, &indicator);
     expected = CREATE_STRING("06:39:45.000000000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 5, SQL_C_CHAR, data, 1024, &indicator);
     expected = CREATE_STRING("06:39:00.000000000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -1934,23 +1911,23 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_WCHAR) {
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("18:01:13.000000000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
 
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data, 1024, &indicator);
     expected = CREATE_STRING("06:39:45.123456789");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 3, SQL_C_WCHAR, data, 1024, &indicator);
     expected = CREATE_STRING("06:39:45.123450000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 4, SQL_C_WCHAR, data, 1024, &indicator);
     expected = CREATE_STRING("06:39:45.000000000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 5, SQL_C_WCHAR, data, 1024, &indicator);
     expected = CREATE_STRING("06:39:00.000000000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -2744,7 +2721,7 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_WCHAR) {
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     test_string expected = convert_to_test_string(v1);
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     SQLLEN expected_size = convert_to_test_string(v2).size();
 #ifdef __APPLE__
@@ -3129,27 +3106,27 @@ TEST_F(TestSQLGetData, INTERVAL_YEAR_TO_MONTH_TO_SQL_C_WCHAR) {
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("1-0");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
     
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 1024, &indicator);
     expected = CREATE_STRING("0-1");
-    CompareData(expected, indicator, data2, ret);
+    CompareStrNumBytes(expected, indicator, data2, ret);
 
     ret = SQLGetData(m_hstmt, 3, SQL_C_WCHAR, data3, 1024, &indicator);
     expected = CREATE_STRING("-1-0");
-    CompareData(expected, indicator, data3, ret);
+    CompareStrNumBytes(expected, indicator, data3, ret);
 
     ret = SQLGetData(m_hstmt, 4, SQL_C_WCHAR, data4, 1024, &indicator);
     expected = CREATE_STRING("-0-1");
-    CompareData(expected, indicator, data4, ret);
+    CompareStrNumBytes(expected, indicator, data4, ret);
 
     ret = SQLGetData(m_hstmt, 5, SQL_C_WCHAR, data5, 1024, &indicator);
     expected = CREATE_STRING("0-0");
-    CompareData(expected, indicator, data5, ret);
+    CompareStrNumBytes(expected, indicator, data5, ret);
 
     ret = SQLGetData(m_hstmt, 6, SQL_C_WCHAR, data6, 1024, &indicator);
     expected = CREATE_STRING("0-0");
-    CompareData(expected, indicator, data6, ret);
+    CompareStrNumBytes(expected, indicator, data6, ret);
 
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -3219,31 +3196,31 @@ TEST_F(TestSQLGetData, INTERVAL_DAY_TO_SECOND_TO_SQL_C_WCHAR) {
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
     test_string expected = CREATE_STRING("1 00:00:00.000000000");
-    CompareData(expected, indicator, data, ret);
+    CompareStrNumBytes(expected, indicator, data, ret);
 
     ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 1024, &indicator);
     expected = CREATE_STRING("0 01:00:00.000000000");
-    CompareData(expected, indicator, data2, ret);
+    CompareStrNumBytes(expected, indicator, data2, ret);
 
     ret = SQLGetData(m_hstmt, 3, SQL_C_WCHAR, data3, 1024, &indicator);
     expected = CREATE_STRING("0 00:01:00.000000000");
-    CompareData(expected, indicator, data3, ret);
+    CompareStrNumBytes(expected, indicator, data3, ret);
 
     ret = SQLGetData(m_hstmt, 4, SQL_C_WCHAR, data4, 1024, &indicator);
     expected = CREATE_STRING("0 00:00:01.000000000");
-    CompareData(expected, indicator, data4, ret);
+    CompareStrNumBytes(expected, indicator, data4, ret);
 
     ret = SQLGetData(m_hstmt, 5, SQL_C_WCHAR, data5, 1024, &indicator);
     expected = CREATE_STRING("0 00:00:00.001000000");
-    CompareData(expected, indicator, data5, ret);
+    CompareStrNumBytes(expected, indicator, data5, ret);
     
     ret = SQLGetData(m_hstmt, 6, SQL_C_WCHAR, data6, 1024, &indicator);
     expected = CREATE_STRING("0 00:00:00.000001000");
-    CompareData(expected, indicator, data6, ret);
+    CompareStrNumBytes(expected, indicator, data6, ret);
     
     ret = SQLGetData(m_hstmt, 7, SQL_C_WCHAR, data7, 1024, &indicator);
     expected = CREATE_STRING("0 00:00:00.000000001");
-    CompareData(expected, indicator, data7, ret);
+    CompareStrNumBytes(expected, indicator, data7, ret);
     
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }

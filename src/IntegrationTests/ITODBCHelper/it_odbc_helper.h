@@ -114,6 +114,12 @@ std::string u32string_to_string(const std::u32string& src);
 std::u16string string_to_u16string(const std::string& src);
 std::string tchar_to_string(const SQLTCHAR* tchar);
 std::string wchar_to_string(const SQLWCHAR* tchar);
+void CompareStrNumBytes(const test_string& expected, const SQLLEN indicator,
+                        const SQLWCHAR* data, const SQLRETURN ret);
+void CompareStrNumBytes(const test_string& expected, const SQLLEN indicator,
+                        const SQLCHAR* data, const SQLRETURN ret);
+void CompareStrNumChar(const test_string& expected, const SQLINTEGER num_chars,
+                       const SQLWCHAR* data, const SQLRETURN ret);
 test_string conn_string();
 
 class Fixture : public testing::Test {
