@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.4.1](https://github.com/Bit-Quill/timestream-odbc/releases/tag/v0.4.1) - 2021-07-08
+### Fixed
+- Intermittent crash in Excel in multi-connection environments on disconnect. Aws::InitApi and Aws::ShutdownApi is now only called once per application instead of once per connection.
+
 ## [v0.4.0](https://github.com/Bit-Quill/timestream-odbc/releases/tag/v0.4.0) - 2021-07-07
 ### Added
 - Linux 32-bit and Linux 64-bit support for the ODBC Driver
@@ -14,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved test cases
 - Removed "ES_" and "TS_" from function and variable names
 - All warnings in driver and enabled -Werror for Mac and Linux build
+- Plus sign (+) not working in connection string
+- Removed "es_" and "ts_" from filename prefixes
+- Failing tests when using Okta or Azure AD authentication
 
 ## [v0.3.2](https://github.com/Bit-Quill/timestream-odbc/releases/tag/v0.3.2) - 2021-06-30
 ### Fixed
