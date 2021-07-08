@@ -17,8 +17,6 @@
 #ifndef COMMUNICATION
 #define COMMUNICATION
 
-#include <aws/core/Aws.h>
-
 #include <map>
 #include <memory>
 #include <string>
@@ -135,10 +133,6 @@ class Communication {
      * Current client encoding
      */
     std::string m_client_encoding;
-    /**
-     * AWS sdk options
-     */
-    Aws::SDKOptions m_sdk_options;
     /**
      * Map storing prefetch queues
      */

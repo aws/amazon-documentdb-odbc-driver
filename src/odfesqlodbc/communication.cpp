@@ -24,13 +24,9 @@
 Communication::Communication()
     : m_status(ConnStatusType::CONNECTION_BAD),
       m_client_encoding(m_supported_client_encodings[0]) {
-    LogMsg(LOG_DEBUG, "Initializing AWS API.");
-    Aws::InitAPI(m_sdk_options);
 }
 
 Communication::~Communication() {
-    LogMsg(LOG_DEBUG, "Shutting down AWS API.");
-    Aws::ShutdownAPI(m_sdk_options);
 }
 
 bool Communication::Setup(const runtime_options& options) {

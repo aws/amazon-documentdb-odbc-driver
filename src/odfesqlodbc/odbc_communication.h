@@ -32,6 +32,10 @@
  */
 class TSCommunication : public Communication {
    public:
+    TSCommunication();
+
+    ~TSCommunication();
+
     /**
      * Validate options
      * @param options const runtime_options&

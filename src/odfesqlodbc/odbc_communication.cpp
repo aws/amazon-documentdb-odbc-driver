@@ -25,7 +25,10 @@
 #include "okta_credentials_provider.h"
 #include "version.h"
 #include "mylog.h"
+#include <atomic>
 #include <memory>
+#include <mutex>
+#include <aws/core/Aws.h>
 #include <aws/core/auth/AWSCredentials.h>
 #include <aws/core/auth/AWSCredentialsProvider.h>
 #include <aws/core/client/DefaultRetryStrategy.h>
@@ -34,6 +37,38 @@
 // clang-format on
 
 namespace {
+    /**
+     * A helper class to initialize/shutdown AWS API once per DLL load/unload.
+     */
+    class AwsSdkHelper {
+      public:
+        AwsSdkHelper() :
+          m_reference_count(0) {
+        }
+
+        AwsSdkHelper& operator++() {
+          if (1 == ++m_reference_count) {
+            std::scoped_lock lock(m_mutex);
+            Aws::InitAPI(m_sdk_options);
+          }
+          return *this;
+        }
+
+        AwsSdkHelper& operator--() {
+          if (0 == --m_reference_count) {
+            std::scoped_lock lock(m_mutex);
+            Aws::ShutdownAPI(m_sdk_options);
+          }
+          return *this;
+        }
+
+        Aws::SDKOptions m_sdk_options;
+        std::atomic<int> m_reference_count;
+        std::mutex m_mutex;
+    };
+
+    AwsSdkHelper AWS_SDK_HELPER;
+
     const Aws::String UA_ID_PREFIX = Aws::String("ts-odbc.");
     const std::string DEFAULT_CREATOR_TYPE = "DEFAULT";
 
@@ -91,6 +126,14 @@ namespace {
         {AUTHTYPE_AAD, aad},
         {AUTHTYPE_OKTA, okta},
     };
+}
+
+TSCommunication::TSCommunication() {
+  ++AWS_SDK_HELPER;
+}
+
+TSCommunication::~TSCommunication() {
+  --AWS_SDK_HELPER;
 }
 
 bool TSCommunication::Validate(const runtime_options& options) {
