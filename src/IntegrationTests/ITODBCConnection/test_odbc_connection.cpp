@@ -564,6 +564,58 @@ TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross2) {
 //}
 //
 
+class TestSQLDriverConnectMultiConnection : public Fixture {
+   public:
+    void SetUp() override {
+        Fixture::SetUp();
+        m_env2 = SQL_NULL_HENV;
+        m_conn2 = SQL_NULL_HDBC;
+        m_hstmt2 = SQL_NULL_HSTMT;
+        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string().c_str(), &m_env2,
+                                       &m_conn2, &m_hstmt2, true, true));
+    }
+
+    void TearDown() override {
+        Fixture::TearDown();
+        if (SQL_NULL_HSTMT != m_hstmt2) {
+            ASSERT_NO_THROW(CloseCursor(&m_hstmt2, true, true));
+            SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt2);
+        }
+        if (SQL_NULL_HDBC != m_conn2) {
+            SQLDisconnect(m_conn2);
+            SQLFreeHandle(SQL_HANDLE_DBC, m_conn2);
+        }
+        if (SQL_NULL_HENV != m_env2) {
+            SQLFreeHandle(SQL_HANDLE_ENV, m_env2);
+        }
+    }
+    SQLHENV m_env2 = SQL_NULL_HENV;
+    SQLHDBC m_conn2 = SQL_NULL_HDBC;
+    SQLHSTMT m_hstmt2 = SQL_NULL_HSTMT;
+};
+
+TEST_F(TestSQLDriverConnectMultiConnection, AWSAPI_INIT_SHUTDOWN) {
+    if (SQL_NULL_HSTMT != m_hstmt2) {
+        ASSERT_NO_THROW(CloseCursor(&m_hstmt2, true, true));
+        SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt2);
+        m_hstmt2 = SQL_NULL_HSTMT;
+    }
+    if (SQL_NULL_HDBC != m_conn2) {
+        SQLDisconnect(m_conn2);
+        SQLFreeHandle(SQL_HANDLE_DBC, m_conn2);
+        m_conn2 = SQL_NULL_HDBC;
+    }
+    if (SQL_NULL_HENV != m_env2) {
+        SQLFreeHandle(SQL_HANDLE_ENV, m_env2);
+        m_env2 = SQL_NULL_HENV;
+    }
+    
+    test_string query = CREATE_STRING("SELECT 12345 FROM ODBCTest.IoT LIMIT 5");
+    SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
 int main(int argc, char** argv) {
 #ifdef WIN32
     // Enable CRT for detecting memory leaks
