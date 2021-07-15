@@ -19,12 +19,12 @@ project(itodbc_saml_authentication)
 set(SOURCE_FILES test_odbc_saml_authentication.cpp)
 include_directories(${UT_HELPER}
 					${IT_HELPER}
-					${ODFEODBC_SRC})
+					${ODBC_SRC})
 
 # Generate executable
 add_executable(itodbc_saml_authentication ${SOURCE_FILES})
 
 # Library dependencies
-target_link_libraries(itodbc_saml_authentication odfesqlodbc itodbc_helper ut_helper gtest_main)
+target_link_libraries(itodbc_saml_authentication timestreamsqlodbc itodbc_helper ut_helper gtest_main)
 target_compile_definitions(itodbc_saml_authentication PUBLIC _UNICODE UNICODE)
 

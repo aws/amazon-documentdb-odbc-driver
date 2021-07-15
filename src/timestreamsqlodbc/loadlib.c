@@ -21,7 +21,7 @@
 #include <errno.h>
 #endif /* WIN32 */
 
-#include "elasticenlist.h"
+#include "enlist.h"
 #include "loadlib.h"
 #include "misc.h"
 
@@ -30,18 +30,18 @@
 #pragma comment(lib, "Delayimp")
 #ifdef _HANDLE_ENLIST_IN_DTC_
 #ifdef UNICODE_SUPPORT
-#pragma comment(lib, "elasticenlist")
+#pragma comment(lib, "timestreamenlist")
 #else
-#pragma comment(lib, "elasticenlista")
+#pragma comment(lib, "timestreamenlista")
 #endif /* UNICODE_SUPPORT */
 #endif /* _HANDLE_ENLIST_IN_DTC_ */
 // The followings works under VC++6.0 but doesn't work under VC++7.0.
 // Please add the equivalent linker options using command line etc.
 #if (_MSC_VER == 1200) && defined(DYNAMIC_LOAD)  // VC6.0
 #ifdef UNICODE_SUPPORT
-#pragma comment(linker, "/Delayload:elasticenlist.dll")
+#pragma comment(linker, "/Delayload:timestreamenlist.dll")
 #else
-#pragma comment(linker, "/Delayload:elasticenlista.dll")
+#pragma comment(linker, "/Delayload:timestreamenlista.dll")
 #endif /* UNICODE_SUPPORT */
 #pragma comment(linker, "/Delay:UNLOAD")
 #endif /* _MSC_VER */
@@ -50,15 +50,15 @@
 #if defined(DYNAMIC_LOAD)
 #define WIN_DYN_LOAD
 #ifdef UNICODE_SUPPORT
-CSTR elasticenlist = "elasticenlist";
-CSTR elasticenlistdll = "elasticenlist.dll";
-CSTR elasticodbc = "odfesqlodbc35w";
-CSTR elasticodbcdll = "odfesqlodbc35w.dll";
+CSTR timestreamenlist = "timestreamenlist";
+CSTR timestreamenlistdll = "timestreamenlist.dll";
+CSTR timestreamodbc = "timestreamsqlodbc35w";
+CSTR timestreamodbcdll = "timestreamsqlodbc35w.dll";
 #else
-CSTR elasticenlist = "elasticenlista";
-CSTR elasticenlistdll = "elasticenlista.dll";
-CSTR elasticodbc = "odfesqlodbc30a";
-CSTR elasticodbcdll = "odfesqlodbc30a.dll";
+CSTR timestreamenlist = "timestreamenlista";
+CSTR timestreamenlistdll = "timestreamenlista.dll";
+CSTR timestreamodbc = "timestreamsqlodbc30a";
+CSTR timestreamodbcdll = "timestreamsqlodbc30a.dll";
 #endif /* UNICODE_SUPPORT */
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 #define _MSC_DELAY_LOAD_IMPORT
@@ -69,7 +69,7 @@ CSTR elasticodbcdll = "odfesqlodbc30a.dll";
 #if defined(_MSC_DELAY_LOAD_IMPORT)
 /*
  *	Error hook function for delay load import.
- *	Try to load a DLL based on elasticodbc path.
+ *	Try to load a DLL based on timestreamodbc path.
  */
 #if (_MSC_VER >= 1900) /* vc14 or later */
 #define TRY_DLI_HOOK __try {
@@ -97,9 +97,9 @@ extern PfnDliHook __pfnDliNotifyHook2;
 #endif /* _MSC_DELAY_LOAD_IMPORT */
 
 #if defined(_MSC_DELAY_LOAD_IMPORT)
-static BOOL loaded_elasticenlist = FALSE;
+static BOOL loaded_timestreamenlist = FALSE;
 static HMODULE enlist_module = NULL;
-static BOOL loaded_elasticodbc = FALSE;
+static BOOL loaded_timestreamodbc = FALSE;
 /*
  *	Load a DLL based on timestream path.
  */
@@ -137,17 +137,17 @@ static FARPROC WINAPI DliErrorHook(unsigned dliNotify, PDelayLoadInfo pdli) {
         case dliNotePreLoadLibrary:
         case dliFailLoadLib:
             RELEASE_NOTIFY_HOOK
-            if (_strnicmp(pdli->szDll, elasticodbc, strlen(elasticodbc)) == 0)
-                call_module = elasticodbc;
+            if (_strnicmp(pdli->szDll, timestreamodbc, strlen(timestreamodbc)) == 0)
+                call_module = timestreamodbc;
             if (call_module) {
                 if (hmodule = MODULE_load_from_timestreamodbc_path(call_module),
                     NULL == hmodule)
                     hmodule = LoadLibrary(call_module);
                 if (NULL != hmodule) {
-                    if (elasticenlist == call_module)
-                        loaded_elasticenlist = TRUE;
-                    else if (elasticodbc == call_module)
-                        loaded_elasticodbc = TRUE;
+                    if (timestreamenlist == call_module)
+                        loaded_timestreamenlist = TRUE;
+                    else if (timestreamodbc == call_module)
+                        loaded_timestreamodbc = TRUE;
                 }
             }
             break;
@@ -168,21 +168,21 @@ void CleanupDelayLoadedDLLs(void) {
     UnloadFunc func = __FUnloadDelayLoadedDLL2;
 #endif
     /* The dll names are case sensitive for the unload helper */
-    if (loaded_elasticenlist) {
+    if (loaded_timestreamenlist) {
         if (enlist_module != NULL) {
-            MYLOG(LOG_DEBUG, "Freeing Library %s\n", elasticenlistdll);
+            MYLOG(LOG_DEBUG, "Freeing Library %s\n", timestreamenlistdll);
             FreeLibrary(enlist_module);
         }
-        MYLOG(LOG_DEBUG, "%s unloading\n", elasticenlistdll);
-        success = (*func)(elasticenlistdll);
-        MYLOG(LOG_DEBUG, "%s unloaded success=%d\n", elasticenlistdll, success);
-        loaded_elasticenlist = FALSE;
+        MYLOG(LOG_DEBUG, "%s unloading\n", timestreamenlistdll);
+        success = (*func)(timestreamenlistdll);
+        MYLOG(LOG_DEBUG, "%s unloaded success=%d\n", timestreamenlistdll, success);
+        loaded_timestreamenlist = FALSE;
     }
-    if (loaded_elasticodbc) {
-        MYLOG(LOG_DEBUG, "%s unloading\n", elasticodbcdll);
-        success = (*func)(elasticodbcdll);
-        MYLOG(LOG_DEBUG, "%s unloaded success=%d\n", elasticodbcdll, success);
-        loaded_elasticodbc = FALSE;
+    if (loaded_timestreamodbc) {
+        MYLOG(LOG_DEBUG, "%s unloading\n", timestreamodbcdll);
+        success = (*func)(timestreamodbcdll);
+        MYLOG(LOG_DEBUG, "%s unloaded success=%d\n", timestreamodbcdll, success);
+        loaded_timestreamodbc = FALSE;
     }
     return;
 }
@@ -198,37 +198,37 @@ RETCODE CALL_EnlistInDtc(ConnectionClass *conn, void *pTra, int method) {
     BOOL loaded = TRUE;
 
 #if defined(_MSC_DELAY_LOAD_IMPORT)
-    if (!loaded_elasticenlist) {
+    if (!loaded_timestreamenlist) {
         TRY_DLI_HOOK
         ret = EnlistInDtc(conn, pTra, method);
     }
     __except ((GetExceptionCode() & 0xffff) == ERROR_MOD_NOT_FOUND
                   ? EXCEPTION_EXECUTE_HANDLER
                   : EXCEPTION_CONTINUE_SEARCH) {
-        if (enlist_module = MODULE_load_from_timestreamodbc_path(elasticenlist),
+        if (enlist_module = MODULE_load_from_timestreamodbc_path(timestreamenlist),
             NULL == enlist_module)
             loaded = FALSE;
         else
             ret = EnlistInDtc(conn, pTra, method);
     }
     if (loaded)
-        loaded_elasticenlist = TRUE;
+        loaded_timestreamenlist = TRUE;
     RELEASE_NOTIFY_HOOK
 }
 else ret = EnlistInDtc(conn, pTra, method);
 #else
     ret = EnlistInDtc(conn, pTra, method);
-    loaded_elasticenlist = TRUE;
+    loaded_timestreamenlist = TRUE;
 #endif /* _MSC_DELAY_LOAD_IMPORT */
 return ret;
 }
 RETCODE CALL_DtcOnDisconnect(ConnectionClass *conn) {
-    if (loaded_elasticenlist)
+    if (loaded_timestreamenlist)
         return DtcOnDisconnect(conn);
     return FALSE;
 }
 RETCODE CALL_IsolateDtcConn(ConnectionClass *conn, BOOL continueConnection) {
-    if (loaded_elasticenlist)
+    if (loaded_timestreamenlist)
         return IsolateDtcConn(conn, continueConnection);
     return FALSE;
 }
@@ -238,32 +238,32 @@ void *CALL_GetTransactionObject(HRESULT *hres) {
     BOOL loaded = TRUE;
 
 #if defined(_MSC_DELAY_LOAD_IMPORT)
-    if (!loaded_elasticenlist) {
+    if (!loaded_timestreamenlist) {
         TRY_DLI_HOOK
         ret = GetTransactionObject(hres);
     }
     __except ((GetExceptionCode() & 0xffff) == ERROR_MOD_NOT_FOUND
                   ? EXCEPTION_EXECUTE_HANDLER
                   : EXCEPTION_CONTINUE_SEARCH) {
-        if (enlist_module = MODULE_load_from_timestreamodbc_path(elasticenlist),
+        if (enlist_module = MODULE_load_from_timestreamodbc_path(timestreamenlist),
             NULL == enlist_module)
             loaded = FALSE;
         else
             ret = GetTransactionObject(hres);
     }
     if (loaded)
-        loaded_elasticenlist = TRUE;
+        loaded_timestreamenlist = TRUE;
     RELEASE_NOTIFY_HOOK
 }
 else ret = GetTransactionObject(hres);
 #else
     ret = GetTransactionObject(hres);
-    loaded_elasticenlist = TRUE;
+    loaded_timestreamenlist = TRUE;
 #endif /* _MSC_DELAY_LOAD_IMPORT */
 return ret;
 }
 void CALL_ReleaseTransactionObject(void *pObj) {
-    if (loaded_elasticenlist)
+    if (loaded_timestreamenlist)
         ReleaseTransactionObject(pObj);
     return;
 }
