@@ -373,9 +373,9 @@ SQLULEN ucs2strlen(const SQLWCHAR *);
 #endif /* DBMS_NAME */
 
 #ifdef WIN32
-#define DRIVER_FILE_NAME "odfesqlodbc.dll"
+#define DRIVER_FILE_NAME "timestreamsqlodbc.dll"
 #else
-#define DRIVER_FILE_NAME "libodfesqlodbc.dylib"
+#define DRIVER_FILE_NAME "libtimestreamsqlodbc.dylib"
 #endif /* WIN32 */
 BOOL isMsAccess(void);
 BOOL isMsQuery(void);
@@ -432,7 +432,7 @@ BOOL isSqlServr(void);
 #define SMALL_REGISTRY_LEN 10 /* for 1/0 settings */
 
 /*	These prefixes denote system tables */
-#define ELASTIC_SYS_PREFIX "es_"
+#define TIMESTREAM_SYS_PREFIX "ts_"
 
 /*	Info limits */
 #define MAX_INFO_STRING 128

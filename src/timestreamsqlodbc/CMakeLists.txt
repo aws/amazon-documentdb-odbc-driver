@@ -13,9 +13,9 @@
 #   permissions and limitations under the License.
 #
 
-project(odfesqlodbc)
+project(timestreamsqlodbc)
 
-# Source files for odfesqlodbc
+# Source files for timestreamsqlodbc
 set(C_SOURCE_FILES	bind.c
 					columninfo.c
 					connection.c
@@ -103,28 +103,28 @@ set(CPP_HEADER_FILES	communication.h
 # Generate dll (SHARED)
 if(WIN32)
 set(RESOURCE_FILES ts_odbc.rc)
-add_library(odfesqlodbc SHARED ${C_SOURCE_FILES} ${C_HEADER_FILES} ${CPP_SOURCE_FILES} ${CPP_HEADER_FILES} ${RESOURCE_FILES} ${AWSSDK_LIB_DIR})
+add_library(timestreamsqlodbc SHARED ${C_SOURCE_FILES} ${C_HEADER_FILES} ${CPP_SOURCE_FILES} ${CPP_HEADER_FILES} ${RESOURCE_FILES} ${AWSSDK_LIB_DIR})
 else()
-add_library(odfesqlodbc SHARED ${C_SOURCE_FILES} ${C_HEADER_FILES} ${CPP_SOURCE_FILES} ${CPP_HEADER_FILES})
+add_library(timestreamsqlodbc SHARED ${C_SOURCE_FILES} ${C_HEADER_FILES} ${CPP_SOURCE_FILES} ${CPP_HEADER_FILES})
 endif()
 
 include_directories(
 						${CMAKE_CURRENT_SOURCE_DIR}
-						${ODFEENLIST_SRC} 
+						${ENLIST_SRC} 
 						${AWSSDK_INCLUDE_DIR}
 					)
 
 # Platform specific library dependencies
 if(WIN32)
 	# Windows specifiec
-	target_link_libraries(odfesqlodbc wsock32 ws2_32 winmm user32 gdi32 legacy_stdio_definitions aws-cpp-sdk-core aws-cpp-sdk-sts aws-cpp-sdk-timestream-query kernel32 advapi32 secur32 XOleHlp Wldap32 crypt32 Normaliz odbccp32 odbc32)
-	target_link_libraries(odfesqlodbc debug msvcrtd)
-	target_link_libraries(odfesqlodbc optimized msvcrt)
+	target_link_libraries(timestreamsqlodbc wsock32 ws2_32 winmm user32 gdi32 legacy_stdio_definitions aws-cpp-sdk-core aws-cpp-sdk-sts aws-cpp-sdk-timestream-query kernel32 advapi32 secur32 XOleHlp Wldap32 crypt32 Normaliz odbccp32 odbc32)
+	target_link_libraries(timestreamsqlodbc debug msvcrtd)
+	target_link_libraries(timestreamsqlodbc optimized msvcrt)
 elseif(APPLE)
 	# Apple specific
-	target_link_libraries(odfesqlodbc iodbc iodbcinst aws-cpp-sdk-core aws-cpp-sdk-sts aws-cpp-sdk-timestream-query)
+	target_link_libraries(timestreamsqlodbc iodbc iodbcinst aws-cpp-sdk-core aws-cpp-sdk-sts aws-cpp-sdk-timestream-query)
 elseif(UNIX)
 	# Unix specific
 	include_directories(/usr/src/linux-headers-5.0.0-27/include)
-	target_link_libraries(odfesqlodbc aws-cpp-sdk-core aws-cpp-sdk-sts aws-cpp-sdk-timestream-query odbc odbcinst)
+	target_link_libraries(timestreamsqlodbc aws-cpp-sdk-core aws-cpp-sdk-sts aws-cpp-sdk-timestream-query odbc odbcinst)
 endif()

@@ -144,11 +144,11 @@ BOOL WINAPI DllMain(HANDLE hInst, ULONG ul_reason_for_call, LPVOID lpReserved) {
 
 /* Shared library initializer and destructor, using gcc's attributes */
 
-static void __attribute__((constructor)) elasticodbc_init(void) {
+static void __attribute__((constructor)) timestreamodbc_init(void) {
     initialize_global_cs();
 }
 
-static void __attribute__((destructor)) elasticodbc_fini(void) {
+static void __attribute__((destructor)) timestreamodbc_fini(void) {
     finalize_global_cs();
 }
 
