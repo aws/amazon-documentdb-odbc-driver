@@ -46,8 +46,8 @@
 #endif
 #define SAFE_STR(s) (NULL != (s) ? (s) : "(null)")
 
-#define ELASTIC_MAXIMUM_ID_LEN SHRT_MAX  // Max 16-bit signed int
-#define ELASTIC_TRANSACTION_SUPPORT 0    // Not supported
+#define MAXIMUM_ID_LEN SHRT_MAX  // Max 16-bit signed int
+#define TRANSACTION_SUPPORT 0    // Not supported
 #define STMT_INCREMENT                             \
     16 /* how many statement holders to allocate \ \
         * at a time */
@@ -279,7 +279,7 @@ static ConnectionClass *CC_initialize(ConnectionClass *rv, BOOL lockinit) {
         rv->ms_jet = 1;
     rv->isolation = 0;  // means initially unknown server's default isolation
     rv->mb_maxbyte_per_char = 1;
-    rv->max_identifier_length = ELASTIC_MAXIMUM_ID_LEN;
+    rv->max_identifier_length = MAXIMUM_ID_LEN;
     rv->autocommit_public = SQL_AUTOCOMMIT_ON;
 
     /* Initialize statement options to defaults */
@@ -590,7 +590,7 @@ int CC_get_max_idlen(ConnectionClass *self) {
 
 SQLUINTEGER CC_get_isolation(ConnectionClass *self) {
     UNUSED(self);
-    return ELASTIC_TRANSACTION_SUPPORT;
+    return TRANSACTION_SUPPORT;
 }
 
 void CC_set_error(ConnectionClass *self, int number, const char *message,

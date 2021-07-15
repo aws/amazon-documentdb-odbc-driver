@@ -16,7 +16,7 @@
 
 #include "odbc_communication.h"
 
-// odfesqlodbc needs to be included before mylog, otherwise mylog will generate
+// timestreamsqlodbc needs to be included before mylog, otherwise mylog will generate
 // compiler warnings
 // clang-format off
 #include "odbc.h"

@@ -185,7 +185,7 @@ static int mylog_on = LOG_WARNING;
 #define MYLOGDIR ""
 #endif /* WIN32 */
 
-//#define QLOGFILE "elasticodbc_"
+//#define QLOGFILE "timestreamodbc_"
 //#ifndef WIN32
 //#define QLOGDIR "/tmp"
 //#else

@@ -23,7 +23,7 @@
 #include "pch.h"
 #include "unit_test_helper.h"
 #include "it_odbc_helper.h"
-#include "../odfesqlodbc/version.h"
+#include "../timestreamsqlodbc/version.h"
 #include <codecvt>
 #ifndef WIN32
 #include <climits>
@@ -147,9 +147,9 @@ int Ver1GEVer2(test_string ver_1_str, test_string ver_2_str) {
 /////////////////
 
 #if defined(WIN32)
-TEST_SQL_GET_INFO_STRING(SQLDriverName, SQL_DRIVER_NAME, CREATE_STRING("odfesqlodbc.dll"))
+TEST_SQL_GET_INFO_STRING(SQLDriverName, SQL_DRIVER_NAME, CREATE_STRING("timestreamsqlodbc.dll"))
 #elif defined(__APPLE__)
-TEST_SQL_GET_INFO_STRING(SQLDriverName, SQL_DRIVER_NAME, CREATE_STRING("libodfesqlodbc.dylib"))
+TEST_SQL_GET_INFO_STRING(SQLDriverName, SQL_DRIVER_NAME, CREATE_STRING("libtimestreamsqlodbc.dylib"))
 #endif
 TEST_SQL_GET_INFO_STRING(SQLDriverODBCVer, SQL_DRIVER_ODBC_VER, CREATE_STRING("03.51"))
 

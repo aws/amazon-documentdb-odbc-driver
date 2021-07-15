@@ -19,7 +19,7 @@
 
 /*
  *	BuildAll may pass DRIVERVERSION, RESOURCE_VERSION
- *	and DRVFILE_VERSION via winbuild/elasticodbc.vcxproj.
+ *	and DRVFILE_VERSION via winbuild/timestreamodbc.vcxproj.
  */
 #ifdef TS_ODBC_VERSION
 
