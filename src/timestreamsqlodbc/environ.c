@@ -45,7 +45,7 @@ RETCODE SQL_API API_AllocEnv(HENV *phenv) {
 
     /*
      * For systems on which none of the constructor-making
-     * techniques in elasticodbc.c work:
+     * techniques in timestreamodbc.c work:
      * It's ok to call initialize_global_cs() twice.
      */
     { initialize_global_cs(); }

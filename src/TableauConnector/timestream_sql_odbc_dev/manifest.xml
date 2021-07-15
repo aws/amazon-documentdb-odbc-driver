@@ -19,3 +19,4 @@
   <connection-resolver file="connectionResolver.tdr"/>
   <dialect file='dialect.tdd'/>
 </connector-plugin>
+ugin>

@@ -12,20 +12,23 @@
 #   express or implied. See the License for the specific language governing
 #   permissions and limitations under the License.
 #
- 
-project(itodbc_aws_auth)
 
-# Source, headers, and include dirs
-set(SOURCE_FILES test_odbc_aws_auth.cpp)
-include_directories(	${UT_HELPER}
-						${IT_HELPER}
-						${ODFEODBC_SRC}
-						${AWSSDK_INCLUDE_DIR}
-						)
+project(timestreamenlist)
 
-# Generate executable
-add_executable(itodbc_aws_auth ${SOURCE_FILES})
+# Source files for timestreamenlist
+set(SOURCE_FILES msdtc_enlist.cpp)
+set(HEADER_FILES enlist.h)
 
+# Generate static lib
+add_library(timestreamenlist STATIC ${SOURCE_FILES} ${HEADER_FILES})
+ 		
 # Library dependencies
-target_link_libraries(itodbc_aws_auth odfesqlodbc itodbc_helper ut_helper gtest_main aws-cpp-sdk-core)
-target_compile_definitions(itodbc_aws_auth PUBLIC _UNICODE UNICODE)
+target_link_libraries(timestreamenlist kernel32 advapi32 Delayimp XOleHlp)
+
+# Platform specific library dependencies
+if(WIN32)
+	# Windows specifiec 
+	target_link_libraries(timestreamenlist wsock32 winspool user32 gdi32 comdlg32 shell32 uuid)
+else()
+	# Unix specific
+endif()

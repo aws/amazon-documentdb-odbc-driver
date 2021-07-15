@@ -1,5 +1,5 @@
 <CPackWiXPatch>
-	<CPackWiXFragment Id="CM_CP_Driver.bin.odfesqlodbc.dll">
+	<CPackWiXFragment Id="CM_CP_Driver.bin.timestreamsqlodbc.dll">
 		<!-- Add driver entry in Software -->
 		<RegistryKey Root="HKLM" Key="SOFTWARE\Amazon\Amazon Timestream ODBC Driver(x64)\Driver" >
 			<RegistryValue Type="string" Name="InstallPath" Value="[INSTALL_ROOT]" />
@@ -14,8 +14,8 @@
 		
 		<!-- Set driver attributes -->
 		<RegistryKey Root="HKLM" Key="SOFTWARE\ODBC\ODBCINST.INI\Amazon Timestream ODBC Driver(x64)" >
-			<RegistryValue Type="string" Name="Driver" Value="[INSTALL_ROOT]bin\odfesqlodbc.dll" />
-			<RegistryValue Type="string" Name="Setup" Value="[INSTALL_ROOT]bin\odfesqlodbc.dll" />
+			<RegistryValue Type="string" Name="Driver" Value="[INSTALL_ROOT]bin\timestreamsqlodbc.dll" />
+			<RegistryValue Type="string" Name="Setup" Value="[INSTALL_ROOT]bin\timestreamsqlodbc.dll" />
 		</RegistryKey>
 		
 		<!-- Add DSN entry in ODBC Data Sources -->
@@ -25,7 +25,7 @@
 		
 		<!-- Set DSN attributes -->
 		<RegistryKey Root="HKLM" Key="SOFTWARE\ODBC\ODBC.INI\Amazon Timestream ODBC DSN"  >
-			<RegistryValue Type="string" Name="Driver" Value="[INSTALL_ROOT]bin\odfesqlodbc.dll" />
+			<RegistryValue Type="string" Name="Driver" Value="[INSTALL_ROOT]bin\timestreamsqlodbc.dll" />
 			<RegistryValue Type="string" Name="Auth" Value="AWS_PROFILE" />
 			<RegistryValue Type="string" Name="Region" Value="us-east-1" />
 			<RegistryValue Type="string" Name="ConnectionTimeout" Value="1000" />

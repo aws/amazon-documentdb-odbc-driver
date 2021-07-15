@@ -19,12 +19,12 @@ project(itodbc_execution)
 set(SOURCE_FILES test_odbc_execution.cpp)
 include_directories(	${UT_HELPER}
 						${IT_HELPER}
-						${ODFEODBC_SRC})
+						${ODBC_SRC})
 
 # Generate executable
 add_executable(itodbc_execution ${SOURCE_FILES})
 
 # Library dependencies
 target_code_coverage(itodbc_execution PUBLIC AUTO ALL)
-target_link_libraries(itodbc_execution odfesqlodbc itodbc_helper ut_helper gtest_main)
+target_link_libraries(itodbc_execution timestreamsqlodbc itodbc_helper ut_helper gtest_main)
 target_compile_definitions(itodbc_execution PUBLIC _UNICODE UNICODE)
