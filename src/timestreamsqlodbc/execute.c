@@ -64,7 +64,9 @@ RETCODE SQL_API API_Prepare(HSTMT hstmt, const SQLCHAR *stmt_str,
 
     // Construct the metadata statement
     const char *metadata_stmt_prefix = "SELECT * FROM (";
+    const size_t metadata_stmt_prefix_len = 15;
     const char *metadata_stmt_suffix = ") AS original LIMIT 0";
+    const size_t metadata_stmt_suffix_len = 21;
     const size_t metadata_stmt_affix_len = 36;
     char *metadata_stmt;
     metadata_stmt =
@@ -76,9 +78,9 @@ RETCODE SQL_API API_Prepare(HSTMT hstmt, const SQLCHAR *stmt_str,
                      func);
         return SQL_ERROR;
     }
-    strcpy(metadata_stmt, metadata_stmt_prefix);
+    strncpy(metadata_stmt, metadata_stmt_prefix, metadata_stmt_prefix_len + 1);
     strncat(metadata_stmt, (char *)stmt_str, original_stmt_len);
-    strcat(metadata_stmt, metadata_stmt_suffix);
+    strncat(metadata_stmt, metadata_stmt_suffix, metadata_stmt_suffix_len);
 
     // Prepare metadata statement to get metadata
     // PrepareStatement deallocates memory if necessary

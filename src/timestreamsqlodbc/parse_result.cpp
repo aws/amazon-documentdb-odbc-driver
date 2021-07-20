@@ -416,7 +416,7 @@ bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
                 QR_MALLOC_return_with_error(
                     tuple[i].value, char, tuple[i].len + 1, q_res,
                     "Out of memory in allocating item buffer.", false);
-                strcpy((char *)tuple[i].value, datum_value.c_str());
+                strncpy((char *)tuple[i].value, datum_value.c_str(), datum_value.size() + 1);
                 // If data length exceeds current display size, set display size
                 if (fields.coli_array[i].display_size < tuple[i].len)
                     fields.coli_array[i].display_size = tuple[i].len;
