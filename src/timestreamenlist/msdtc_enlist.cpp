@@ -126,11 +126,11 @@ static const char *XidToText(const XID &xid, char *rtext) {
     int i, j;
 
     for (i = 0, j = 0; i < glen; i++, j += 2)
-        sprintf(rtext + j, "%02x", (unsigned char)xid.data[i]);
-    strcat(rtext, "-");
+        snprintf(rtext + j, 2, "%02x", (unsigned char)xid.data[i]);
+    strncat(rtext, "-", 1);
     j++;
     for (; i < glen + blen; i++, j += 2)
-        sprintf(rtext + j, "%02x", (unsigned char)xid.data[i]);
+        snprintf(rtext + j, 2, "%02x", (unsigned char)xid.data[i]);
     return rtext;
 }
 
@@ -1127,7 +1127,8 @@ RETCODE static EnlistInDtc_1pipe(void *conn, ITransaction *pTra,
                     case DTC_CHECK_RM_CONNECTION:
                         if (!confirmingLink) {
                             confirmingLink = true;
-                            strcat(dtcname, ";" KEYWORD_DTC_CHECK "=0");
+                            strncat(dtcname, ";" KEYWORD_DTC_CHECK "=0",
+                                   sizeof(";" KEYWORD_DTC_CHECK "=0"));
                             continue;
                         }
                     default:
