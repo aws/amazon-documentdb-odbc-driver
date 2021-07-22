@@ -284,3 +284,20 @@ test_string conn_string() {
         temp += IT_LOGOUTPUT CREATE_STRING("=") + to_test_string(dir) + CREATE_STRING(";");
     return temp;
 }
+
+test_string perf_conn_string() {
+    std::vector< std::pair< test_string, test_string > > conn_str_pair = {
+        {IT_DRIVER, CREATE_STRING("timestreamodbc")},
+        {IT_REGION, CREATE_STRING("us-east-2")},
+        {IT_AUTH, CREATE_STRING("AWS_PROFILE")},
+        {IT_LOGLEVEL, CREATE_STRING("0")}};
+
+    test_string temp;
+    for (auto it : conn_str_pair)
+        temp += it.first + CREATE_STRING("=") + it.second + CREATE_STRING(";");
+    char dir[1024];
+    if (getLogDir(dir, sizeof(dir)) > 0)
+        temp += IT_LOGOUTPUT CREATE_STRING("=") + to_test_string(dir)
+                + CREATE_STRING(";");
+    return temp;
+}
