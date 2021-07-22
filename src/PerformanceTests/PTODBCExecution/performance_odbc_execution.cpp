@@ -20,21 +20,25 @@
 #include <string>
 #include <vector>
 #include <iostream>
+
+#include "it_odbc_helper.h"
 // clang-format on
 #define IT_SIZEOF(x) (NULL == (x) ? 0 : (sizeof((x)) / sizeof((x)[0])))
 #define ITERATION_COUNT 12
-std::wstring dsn_name = L"DSN=test_dsn";
-const wchar_t* const query = L"SELECT * FROM kibana_sample_data_flights limit 10000";
+test_string dsn_conn_string = CREATE_STRING("DSN=timestream-aws-profile");
+const wchar_t* const query = L"SELECT * FROM ODBCTest.IoT limit 10000";
 
 int Setup(SQLHENV* env, SQLHDBC* conn, SQLHSTMT* hstmt) {
     SQLTCHAR out_conn_string[1024];
     SQLSMALLINT out_conn_string_length;
     if (SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, env))
-        && SQL_SUCCEEDED(SQLSetEnvAttr(*env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0))
+        && SQL_SUCCEEDED(
+            SQLSetEnvAttr(*env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0))
         && SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_DBC, *env, conn))
-        && SQL_SUCCEEDED(SQLDriverConnect(*conn, NULL, (SQLTCHAR*)dsn_name.c_str(), SQL_NTS,
-                             out_conn_string, IT_SIZEOF(out_conn_string),
-                             &out_conn_string_length, SQL_DRIVER_COMPLETE))
+        && SQL_SUCCEEDED(SQLDriverConnect(
+            *conn, NULL, (SQLTCHAR*)dsn_conn_string.c_str(), SQL_NTS,
+            out_conn_string, IT_SIZEOF(out_conn_string),
+            &out_conn_string_length, SQL_DRIVER_COMPLETE))
         && SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, *conn, hstmt))) {
         return SQL_SUCCESS;
     }
