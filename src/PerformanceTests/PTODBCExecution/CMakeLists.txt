@@ -17,11 +17,13 @@ project(performance_execution)
 
 # Source, headers, and include dirs
 set(SOURCE_FILES performance_odbc_execution.cpp)
-include_directories(${ODBC_SRC})
+include_directories(${UT_HELPER}
+					${IT_HELPER}
+					${ODBC_SRC})
 
 # Generate executable
 add_executable(performance_execution ${SOURCE_FILES})
 
 # Library dependencies
-target_link_libraries(performance_execution timestreamsqlodbc)
+target_link_libraries(performance_execution timestreamsqlodbc itodbc_helper ut_helper)
 target_compile_definitions(performance_execution PUBLIC _UNICODE UNICODE)

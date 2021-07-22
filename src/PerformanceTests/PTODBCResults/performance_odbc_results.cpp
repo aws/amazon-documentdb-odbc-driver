@@ -36,31 +36,25 @@ typedef SQLULEN SQLTRANSID;
 typedef SQLLEN SQLROWOFFSET;
 #endif
 
-const wchar_t* const m_query =
-    L"SELECT * FROM kibana_sample_data_flights limit 10000";
+const test_string m_query =
+    CREATE_STRING("SELECT * FROM ODBCPerfTest.DevOps LIMIT 10000");
 
 typedef struct Col {
     SQLLEN data_len;
     SQLCHAR data_dat[BIND_SIZE];
 } Col;
 
-class TestPerformance : public testing::Test {
-   public:
-    TestPerformance() {
-    }
-    void SetUp() {
-        test_string conn_str = conn_string();
-        AllocStatement((SQLTCHAR*)conn_str.c_str(), &m_env, &m_conn,
-                       &m_hstmt, true, true);
-    }
-    void TearDown() {
-        SQLDisconnect(m_conn);
-    }
+test_string perf_conn_string();
 
-   protected:
-    SQLHENV m_env = SQL_NULL_HENV;
-    SQLHDBC m_conn = SQL_NULL_HDBC;
-    SQLHSTMT m_hstmt = SQL_NULL_HSTMT;
+class TestPerformance : public Fixture {
+   public:
+    void SetUp() override {
+        m_env = SQL_NULL_HENV;
+        m_conn = SQL_NULL_HDBC;
+        m_hstmt = SQL_NULL_HSTMT;
+        ASSERT_NO_THROW(AllocStatement(AS_SQLTCHAR(perf_conn_string().c_str()),
+                                       &m_env, &m_conn, &m_hstmt, true, true));
+    }
 };
 
 const std::string sync_start = "%%__PARSE__SYNC__START__%%";
@@ -93,7 +87,7 @@ void ReportTime(const std::string test_case, std::vector< long long > data) {
     // Output results
     std::cout << sync_start << std::endl;
     std::cout << sync_query;
-    std::wcout << std::wstring(m_query) << std::endl;
+    std::wcout << AS_SQLTCHAR(m_query.c_str()) << std::endl;
     std::cout << sync_case << test_case << std::endl;
     std::cout << sync_min << time_min << " ms" << std::endl;
     std::cout << sync_max << time_max << " ms" << std::endl;
@@ -113,23 +107,24 @@ void ReportTime(const std::string test_case, std::vector< long long > data) {
 TEST_F(TestPerformance, Time_Execute) {
     // Execute a query just to wake the server up in case it has been sleeping
     // for a while
-    SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query, SQL_NTS);
+    SQLRETURN ret =
+        SQLExecDirect(m_hstmt, AS_SQLTCHAR(m_query.c_str()), SQL_NTS);
     ASSERT_TRUE(SQL_SUCCEEDED(ret));
     ASSERT_TRUE(SQL_SUCCEEDED(SQLCloseCursor(m_hstmt)));
 
-    std::vector< long long > times;
-    for (size_t iter = 0; iter < ITERATION_COUNT; iter++) {
-        auto start = std::chrono::steady_clock::now();
-        ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query, SQL_NTS);
-        auto end = std::chrono::steady_clock::now();
-        LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-        ASSERT_TRUE(SQL_SUCCEEDED(ret));
-        ASSERT_TRUE(SQL_SUCCEEDED(SQLCloseCursor(m_hstmt)));
-        times.push_back(
-            std::chrono::duration_cast< std::chrono::milliseconds >(end - start)
-                .count());
-    }
-    ReportTime("Execute Query", times);
+   std::vector< long long > times;
+   for (size_t iter = 0; iter < ITERATION_COUNT; iter++) {
+       auto start = std::chrono::steady_clock::now();
+       ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query.c_str(), SQL_NTS);
+       auto end = std::chrono::steady_clock::now();
+       LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+       ASSERT_TRUE(SQL_SUCCEEDED(ret));
+       ASSERT_TRUE(SQL_SUCCEEDED(SQLCloseCursor(m_hstmt)));
+       times.push_back(
+           std::chrono::duration_cast< std::chrono::milliseconds >(end - start)
+               .count());
+   }
+   ReportTime("Execute Query", times);
 }
 
 TEST_F(TestPerformance, Time_BindColumn_FetchSingleRow) {
@@ -139,7 +134,7 @@ TEST_F(TestPerformance, Time_BindColumn_FetchSingleRow) {
     std::vector< long long > times;
     for (size_t iter = 0; iter < ITERATION_COUNT; iter++) {
         // Execute query
-        SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query, SQL_NTS);
+        SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query.c_str(), SQL_NTS);
         ASSERT_TRUE(SQL_SUCCEEDED(ret));
 
         // Get column count
@@ -166,86 +161,88 @@ TEST_F(TestPerformance, Time_BindColumn_FetchSingleRow) {
 }
 
 TEST_F(TestPerformance, Time_BindColumn_Fetch5Rows) {
-    SQLROWSETSIZE row_count = 0;
-    SQLSMALLINT total_columns = 0;
-    SQLROWSETSIZE rows_fetched = 0;
-    SQLUSMALLINT row_status[ROWSET_SIZE_5];
-    SQLSetStmtAttr(m_hstmt, SQL_ROWSET_SIZE, (void*)ROWSET_SIZE_5, 0);
+   SQLROWSETSIZE row_count = 0;
+   SQLSMALLINT total_columns = 0;
+   SQLROWSETSIZE rows_fetched = 0;
+   SQLUSMALLINT row_status[ROWSET_SIZE_5];
+   SQLSetStmtAttr(m_hstmt, SQL_ROWSET_SIZE, (void*)ROWSET_SIZE_5, 0);
 
-    std::vector< long long > times;
-    for (size_t iter = 0; iter < ITERATION_COUNT; iter++) {
-        // Execute query
-        SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query, SQL_NTS);
-        ASSERT_TRUE(SQL_SUCCEEDED(ret));
+   std::vector< long long > times;
+   for (size_t iter = 0; iter < ITERATION_COUNT; iter++) {
+       // Execute query
+       SQLRETURN ret =
+           SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query.c_str(), SQL_NTS);
+       ASSERT_TRUE(SQL_SUCCEEDED(ret));
 
-        // Get column count
-        SQLNumResultCols(m_hstmt, &total_columns);
-        std::vector< std::vector< Col > > cols(total_columns);
-        for (size_t i = 0; i < cols.size(); i++)
-            cols[i].resize(ROWSET_SIZE_5);
+       // Get column count
+       SQLNumResultCols(m_hstmt, &total_columns);
+       std::vector< std::vector< Col > > cols(total_columns);
+       for (size_t i = 0; i < cols.size(); i++)
+           cols[i].resize(ROWSET_SIZE_5);
 
-        // Bind and fetch
-        auto start = std::chrono::steady_clock::now();
-        for (size_t i = 0; i < cols.size(); i++)
-            ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)i + 1, SQL_C_CHAR,
-                             (SQLPOINTER)&cols[i][0].data_dat[i], BIND_SIZE,
-                             &cols[i][0].data_len);
-        while (SQLExtendedFetch(m_hstmt, SQL_FETCH_NEXT, 0, &rows_fetched,
-                                row_status)
-               == SQL_SUCCESS) {
-            row_count += rows_fetched;
-            if (rows_fetched < ROWSET_SIZE_5)
-                break;
-        }
-        auto end = std::chrono::steady_clock::now();
-        ASSERT_TRUE(SQL_SUCCEEDED(SQLCloseCursor(m_hstmt)));
-        times.push_back(
-            std::chrono::duration_cast< std::chrono::milliseconds >(end - start)
-                .count());
-    }
-    ReportTime("Bind and (5 row) Fetch", times);
+       // Bind and fetch
+       auto start = std::chrono::steady_clock::now();
+       for (size_t i = 0; i < cols.size(); i++)
+           ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)i + 1, SQL_C_CHAR,
+                            (SQLPOINTER)&cols[i][0].data_dat[i], BIND_SIZE,
+                            &cols[i][0].data_len);
+       while (SQLExtendedFetch(m_hstmt, SQL_FETCH_NEXT, 0, &rows_fetched,
+                               row_status)
+              == SQL_SUCCESS) {
+           row_count += rows_fetched;
+           if (rows_fetched < ROWSET_SIZE_5)
+               break;
+       }
+       auto end = std::chrono::steady_clock::now();
+       ASSERT_TRUE(SQL_SUCCEEDED(SQLCloseCursor(m_hstmt)));
+       times.push_back(
+           std::chrono::duration_cast< std::chrono::milliseconds >(end - start)
+               .count());
+   }
+   ReportTime("Bind and (5 row) Fetch", times);
 }
 
 TEST_F(TestPerformance, Time_BindColumn_Fetch50Rows) {
-    SQLROWSETSIZE row_count = 0;
-    SQLSMALLINT total_columns = 0;
-    SQLROWSETSIZE rows_fetched = 0;
-    SQLUSMALLINT row_status[ROWSET_SIZE_50];
-    SQLSetStmtAttr(m_hstmt, SQL_ROWSET_SIZE, (void*)ROWSET_SIZE_50, 0);
+   SQLROWSETSIZE row_count = 0;
+   SQLSMALLINT total_columns = 0;
+   SQLROWSETSIZE rows_fetched = 0;
+   SQLUSMALLINT row_status[ROWSET_SIZE_50];
+   SQLSetStmtAttr(m_hstmt, SQL_ROWSET_SIZE, (void*)ROWSET_SIZE_50, 0);
 
-    std::vector< long long > times;
-    for (size_t iter = 0; iter < ITERATION_COUNT; iter++) {
-        // Execute query
-        SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query, SQL_NTS);
-        ASSERT_TRUE(SQL_SUCCEEDED(ret));
+   std::vector< long long > times;
+   for (size_t iter = 0; iter < ITERATION_COUNT; iter++) {
+       // Execute query
+       SQLRETURN ret =
+           SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query.c_str(), SQL_NTS);
+       ASSERT_TRUE(SQL_SUCCEEDED(ret));
 
-        // Get column count
-        SQLNumResultCols(m_hstmt, &total_columns);
-        std::vector< std::vector< Col > > cols(total_columns);
-        for (size_t i = 0; i < cols.size(); i++)
-            cols[i].resize(ROWSET_SIZE_50);
+       // Get column count
+       SQLNumResultCols(m_hstmt, &total_columns);
+       std::vector< std::vector< Col > > cols(total_columns);
+       for (size_t i = 0; i < cols.size(); i++)
+           cols[i].resize(ROWSET_SIZE_50);
 
-        // Bind and fetch
-        auto start = std::chrono::steady_clock::now();
-        for (size_t i = 0; i < cols.size(); i++)
-            ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)i + 1, SQL_C_CHAR,
-                             (SQLPOINTER)&cols[i][0].data_dat[i], BIND_SIZE,
-                             &cols[i][0].data_len);
-        while (SQLExtendedFetch(m_hstmt, SQL_FETCH_NEXT, 0, &rows_fetched,
-                                row_status)
-               == SQL_SUCCESS) {
-            row_count += rows_fetched;
-            if (rows_fetched < ROWSET_SIZE_50)
-                break;
-        }
+       // Bind and fetch
+       auto start = std::chrono::steady_clock::now();
+       for (size_t i = 0; i < cols.size(); i++)
+           ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)i + 1, SQL_C_CHAR,
+                            (SQLPOINTER)&cols[i][0].data_dat[i], BIND_SIZE,
+                            &cols[i][0].data_len);
+       while (SQLExtendedFetch(m_hstmt, SQL_FETCH_NEXT, 0, &rows_fetched,
+                               row_status)
+              == SQL_SUCCESS) {
+           row_count += rows_fetched;
+           if (rows_fetched < ROWSET_SIZE_50)
+               break;
+       }
 
-        auto end = std::chrono::steady_clock::now();
-        ASSERT_TRUE(SQL_SUCCEEDED(SQLCloseCursor(m_hstmt)));
-        times.push_back(
-            std::chrono::duration_cast< std::chrono::milliseconds >(end - start)
-                .count());
-    }
-    ReportTime("Bind and (50 row) Fetch", times);
+       auto end = std::chrono::steady_clock::now();
+       ASSERT_TRUE(SQL_SUCCEEDED(SQLCloseCursor(m_hstmt)));
+       times.push_back(
+           std::chrono::duration_cast< std::chrono::milliseconds >(end - start)
+               .count());
+   }
+   ReportTime("Bind and (50 row) Fetch", times);
 }
 
 TEST_F(TestPerformance, Time_Execute_FetchSingleRow) {
@@ -256,7 +253,8 @@ TEST_F(TestPerformance, Time_Execute_FetchSingleRow) {
     for (size_t iter = 0; iter < ITERATION_COUNT; iter++) {
         // Execute query
         auto start = std::chrono::steady_clock::now();
-        SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query, SQL_NTS);
+        SQLRETURN ret =
+            SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query.c_str(), SQL_NTS);
         ASSERT_TRUE(SQL_SUCCEEDED(ret));
 
         // Get column count
@@ -283,6 +281,12 @@ TEST_F(TestPerformance, Time_Execute_FetchSingleRow) {
 }
 
 int main(int argc, char** argv) {
+#ifdef WIN32
+    // Enable CRT for detecting memory leaks
+    _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG | _CRTDBG_MODE_FILE);
+    _CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDERR);
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 #ifdef __APPLE__
     // Enable malloc logging for detecting memory leaks.
     system("export MallocStackLogging=1");

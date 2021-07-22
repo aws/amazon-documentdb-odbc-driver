@@ -571,8 +571,9 @@ class TestSQLDriverConnectMultiConnection : public Fixture {
         m_env2 = SQL_NULL_HENV;
         m_conn2 = SQL_NULL_HDBC;
         m_hstmt2 = SQL_NULL_HSTMT;
-        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string().c_str(), &m_env2,
-                                       &m_conn2, &m_hstmt2, true, true));
+        ASSERT_NO_THROW(AllocStatement(AS_SQLTCHAR(conn_string().c_str()),
+                                       &m_env2, &m_conn2, &m_hstmt2, true,
+                                       true));
     }
 
     void TearDown() override {
