@@ -128,8 +128,8 @@ class Fixture : public testing::Test {
         m_env = SQL_NULL_HENV;
         m_conn = SQL_NULL_HDBC;
         m_hstmt = SQL_NULL_HSTMT;
-        ASSERT_NO_THROW(AllocStatement((SQLTCHAR*)conn_string().c_str(), &m_env,
-                                       &m_conn, &m_hstmt, true, true));
+        ASSERT_NO_THROW(AllocStatement(AS_SQLTCHAR(conn_string().c_str()),
+                                       &m_env, &m_conn, &m_hstmt, true, true));
     }
     void TearDown() override {
         if (SQL_NULL_HSTMT != m_hstmt) {
