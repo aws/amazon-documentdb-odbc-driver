@@ -96,6 +96,11 @@ void QueryFetch(const test_string& column, const test_string& dataset,
     LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
 }
 
+template < class T >
+auto CompareSQLType = [](const T& expected, const T& actual) {
+    EXPECT_EQ(expected, actual);
+};
+
 auto CompareTimestampStruct = [](const TIMESTAMP_STRUCT& expected,
                                  const TIMESTAMP_STRUCT& actual) {
     EXPECT_EQ(expected.year, actual.year);
@@ -176,15 +181,17 @@ void TypeConversionAssertionTemplate(
         ret = SQLGetData(hstmt, static_cast< SQLUSMALLINT >(i + 1), type,
                          &actual, sizeof(actual), &indicator);
         LogAnyDiagnostics(SQL_HANDLE_STMT, hstmt, ret);
-        SQLTCHAR* expected_state = expected[i].second;
+        auto expected_state_str =
+            expected[i].second ? tchar_to_string(expected[i].second) : "";
         // Success and no error code
-        if (!expected_state) {
+        if (expected_state_str.empty()) {
             EXPECT_EQ(SQL_SUCCESS, ret);
             EXPECT_EQ((SQLLEN)sizeof(T), indicator);
             compare_func(expected[i].first, actual);
         }
         // Success with info and error code
-        else if (tchar_to_string(expected_state) == tchar_to_string(SQLSTATE_FRACTIONAL_TRUNCATION)) {
+        else if (expected_state_str
+                 == tchar_to_string(SQLSTATE_FRACTIONAL_TRUNCATION)) {
             EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
             EXPECT_EQ((SQLLEN)sizeof(T), indicator);
             compare_func(expected[i].first, actual);
@@ -192,14 +199,21 @@ void TypeConversionAssertionTemplate(
                                       SQLSTATE_FRACTIONAL_TRUNCATION));
         }
         // Error and error code
-        else if (tchar_to_string(expected_state) == tchar_to_string(SQLSTATE_STRING_CONVERSION_ERROR)) {
+        else if (expected_state_str
+                 == tchar_to_string(SQLSTATE_STRING_CONVERSION_ERROR)) {
             EXPECT_EQ(SQL_ERROR, ret);
             EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, hstmt,
                                       SQLSTATE_STRING_CONVERSION_ERROR));
-        } else if (tchar_to_string(expected_state) == tchar_to_string(SQLSTATE_RESTRICTED_DATA_TYPE_ERROR)) {
+        } else if (expected_state_str
+                   == tchar_to_string(SQLSTATE_RESTRICTED_DATA_TYPE_ERROR)) {
             EXPECT_EQ(SQL_ERROR, ret);
             EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, hstmt,
                                       SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
+        } else if (expected_state_str
+                   == tchar_to_string(SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE)) {
+            EXPECT_EQ(SQL_ERROR, ret);
+            EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, hstmt,
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
         }
         // Unknown SQL state
         else {
@@ -238,7 +252,10 @@ auto TestConvertingToTimestamp =
             hstmt, SQL_C_TIMESTAMP, columns, expected, CompareTimestampStruct);
     };
 
-class TestSQLGetData : public Fixture {};
+class TestSQLGetData : public Fixture {
+   public:
+    test_string bool_columns = CREATE_STRING("true, false");
+};
 
 class TestSQLNumResultCols : public Fixture {};
 
@@ -348,68 +365,48 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_BIT) {
     int v1 = 0;
     int v2 = 1;
     int v3 = -1;  // underflow
-    int v4 = 2;  // overflow
-    test_string columns = CREATE_STRING("INTEGER\'") + convert_to_test_string(v1) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v4) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLCHAR data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLCHAR expected_v2 = static_cast< SQLCHAR >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 4, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    int v4 = 2;   // overflow
+    test_string columns =
+        CREATE_STRING("INTEGER\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLCHAR >(
+        m_hstmt, SQL_C_BIT, columns, expected, CompareSQLType< SQLCHAR >);
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_STINYINT) {
     int v1 = SCHAR_MIN;
     int v2 = SCHAR_MAX;
     int v3 = SCHAR_MIN - 1;  // underflow
-    int v4 = SCHAR_MAX + 1;      // overflow
-    test_string columns = CREATE_STRING("INTEGER\'") + convert_to_test_string(v1) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v4) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLSCHAR data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_STINYINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSCHAR expected_v1 = static_cast< SQLSCHAR >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_STINYINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSCHAR expected_v2 = static_cast< SQLSCHAR >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_STINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 4, SQL_C_STINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    int v4 = SCHAR_MAX + 1;  // overflow
+    test_string columns =
+        CREATE_STRING("INTEGER\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLSCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLSCHAR >(
+        m_hstmt, SQL_C_STINYINT, columns, expected, CompareSQLType< SQLSCHAR >);
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_TINYINT) {
@@ -417,124 +414,93 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_TINYINT) {
     int v2 = SCHAR_MAX;
     int v3 = INT_MIN;   // underflow
     int v4 = INT_MAX;  // overflow
-    test_string columns = CREATE_STRING("INTEGER\'") + convert_to_test_string(v1) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v4) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLSCHAR data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_TINYINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSCHAR expected_v1 = static_cast< SQLSCHAR >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_TINYINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSCHAR expected_v2 = static_cast< SQLSCHAR >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_TINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 4, SQL_C_TINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns =
+        CREATE_STRING("INTEGER\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLSCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLSCHAR >(
+        m_hstmt, SQL_C_TINYINT, columns, expected, CompareSQLType< SQLSCHAR >);
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_UTINYINT) {
     int v1 = UCHAR_MAX;
-    int v2 = -1;  // underflow
+    int v2 = -1;             // underflow
     int v3 = UCHAR_MAX + 1;  // overflow
-    test_string columns = CREATE_STRING("INTEGER\'") + to_test_string(std::to_string(v1)) + CREATE_STRING("\', INTEGER\'")
-                           + to_test_string(std::to_string(v2)) + CREATE_STRING("\', INTEGER\'")
-                           + to_test_string(std::to_string(v3)) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLCHAR data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_UTINYINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_UTINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 3, SQL_C_UTINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns =
+        CREATE_STRING("INTEGER\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLCHAR >(
+        m_hstmt, SQL_C_UTINYINT, columns, expected, CompareSQLType< SQLCHAR >);
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SLONG) {
     int v1 = -293719;
     int v2 = 741370;
-    test_string columns = CREATE_STRING("INTEGER\'") + convert_to_test_string(v1) + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v2) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLINTEGER data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_SLONG , &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLINTEGER expected_v1 = static_cast< SQLINTEGER >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_SLONG , &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLINTEGER expected_v2 = static_cast< SQLINTEGER >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_EQ(expected_v2, data);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns = CREATE_STRING("INTEGER\'")
+                          + convert_to_test_string(v1)
+                          + CREATE_STRING("\', INTEGER\'")
+                          + convert_to_test_string(v2) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLINTEGER, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v2), nullptr));
+
+    TypeConversionAssertionTemplate< SQLINTEGER >(
+        m_hstmt, SQL_C_SLONG, columns, expected, CompareSQLType< SQLINTEGER >);
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_LONG) {
     int v1 = -293719;
     int v2 = 741370;
-    test_string columns = CREATE_STRING("INTEGER\'") + convert_to_test_string(v1) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLINTEGER data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_LONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLINTEGER expected_v1 = static_cast< SQLINTEGER >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_LONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLINTEGER expected_v2 = static_cast< SQLINTEGER >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_EQ(expected_v2, data);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns = CREATE_STRING("INTEGER\'")
+                          + convert_to_test_string(v1)
+                          + CREATE_STRING("\', INTEGER\'")
+                          + convert_to_test_string(v2) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLINTEGER, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v2), nullptr));
+
+    TypeConversionAssertionTemplate< SQLINTEGER >(
+        m_hstmt, SQL_C_LONG, columns, expected, CompareSQLType< SQLINTEGER >);
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_ULONG) {
     int v1 = 293719;
     int v2 = -1;  // underflow
-    test_string columns = CREATE_STRING("INTEGER\'") + convert_to_test_string(v1) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLUINTEGER data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_ULONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLUINTEGER expected_v1 = static_cast< SQLUINTEGER >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLUINTEGER), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_ULONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns = CREATE_STRING("INTEGER\'")
+                          + convert_to_test_string(v1)
+                          + CREATE_STRING("\', INTEGER\'")
+                          + convert_to_test_string(v2) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLUINTEGER, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLUINTEGER >(
+        m_hstmt, SQL_C_ULONG, columns, expected, CompareSQLType< SQLUINTEGER >);
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SSHORT) {
@@ -542,33 +508,24 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SSHORT) {
     int v2 = SHRT_MAX;
     int v3 = SHRT_MIN - 1;  // underflow
     int v4 = SHRT_MAX + 1;  // overflow
-    test_string columns = CREATE_STRING("INTEGER\'") + convert_to_test_string(v1) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v4) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLSMALLINT data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_SSHORT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSMALLINT expected_v1 = static_cast< SQLSMALLINT >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_SSHORT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSMALLINT expected_v2 = static_cast< SQLSMALLINT >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_SSHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 4, SQL_C_SSHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns =
+        CREATE_STRING("INTEGER\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLSMALLINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLSMALLINT >(
+        m_hstmt, SQL_C_SSHORT, columns, expected,
+        CompareSQLType< SQLSMALLINT >);
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SHORT) {
@@ -576,110 +533,90 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SHORT) {
     int v2 = SHRT_MAX;
     int v3 = INT_MIN;  // underflow
     int v4 = INT_MAX;  // overflow
-    test_string columns = CREATE_STRING("INTEGER\'") + convert_to_test_string(v1) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v4) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLSMALLINT data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_SHORT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSMALLINT expected_v1 = static_cast< SQLSMALLINT >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_SHORT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSMALLINT expected_v2 = static_cast< SQLSMALLINT >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_SHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 4, SQL_C_SHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns =
+        CREATE_STRING("INTEGER\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLSMALLINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLSMALLINT >(
+        m_hstmt, SQL_C_SHORT, columns, expected, CompareSQLType< SQLSMALLINT >);
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_USHORT) {
     int v1 = USHRT_MAX;
-    int v2 = -1;  // underflow
+    int v2 = -1;             // underflow
     int v3 = USHRT_MAX + 1;  // overflow
-    test_string columns = CREATE_STRING("INTEGER\'") + convert_to_test_string(v1) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLUSMALLINT data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_USHORT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLUSMALLINT expected_v1 = static_cast< SQLUSMALLINT >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLUSMALLINT), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_USHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 3, SQL_C_USHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns =
+        CREATE_STRING("INTEGER\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', INTEGER\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLUSMALLINT, SQLTCHAR* > > expected;
+    expected.push_back(
+        std::make_pair(static_cast< SQLUSMALLINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLUSMALLINT >(
+        m_hstmt, SQL_C_USHORT, columns, expected,
+        CompareSQLType< SQLUSMALLINT >);
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SBIGINT) {
     int v1 = -293719;
     int v2 = 741370;
-    test_string columns = CREATE_STRING("INTEGER\'") + convert_to_test_string(v1) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLBIGINT data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_SBIGINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLBIGINT expected_v1 = static_cast< SQLBIGINT >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_SBIGINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLBIGINT expected_v2 = static_cast< SQLBIGINT >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
-    EXPECT_EQ(expected_v2, data);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns = CREATE_STRING("INTEGER\'")
+                          + convert_to_test_string(v1)
+                          + CREATE_STRING("\', INTEGER\'")
+                          + convert_to_test_string(v2) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLBIGINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(v2), nullptr));
+
+    TypeConversionAssertionTemplate< SQLBIGINT >(
+        m_hstmt, SQL_C_SBIGINT, columns, expected, CompareSQLType< SQLBIGINT >);
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_UBIGINT) {
     int v1 = 293719;
     int v2 = -1;  // underflow
-    test_string columns = CREATE_STRING("INTEGER\'") + convert_to_test_string(v1) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLUBIGINT data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_UBIGINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLUBIGINT expected_v1 = static_cast< SQLUBIGINT >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLUBIGINT), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_UBIGINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns = CREATE_STRING("INTEGER\'")
+                          + convert_to_test_string(v1)
+                          + CREATE_STRING("\', INTEGER\'")
+                          + convert_to_test_string(v2) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLUBIGINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLUBIGINT >(m_hstmt, SQL_C_UBIGINT,
+                                                  columns, expected,
+                                                  CompareSQLType< SQLUBIGINT >);
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_CHAR) {
     int v1 = -293719;
     int v2 = 741370;
-    test_string columns = CREATE_STRING("INTEGER\'") + convert_to_test_string(v1) + CREATE_STRING("\', INTEGER\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\'");
+    test_string columns = CREATE_STRING("INTEGER\'")
+                          + convert_to_test_string(v1)
+                          + CREATE_STRING("\', INTEGER\'")
+                          + convert_to_test_string(v2) + CREATE_STRING("\'");
+
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLCHAR data[1024] = {0};
     SQLCHAR data2[1024] = {0};
@@ -703,72 +640,128 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_CHAR) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
+TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_WCHAR) {
+    int v1 = -293719;
+    int v2 = 741370;
+    test_string columns = CREATE_STRING("INTEGER\'")
+                          + convert_to_test_string(v1)
+                          + CREATE_STRING("\', INTEGER\'")
+                          + convert_to_test_string(v2) + CREATE_STRING("\'");
+
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLWCHAR data[1024] = {0};
+    SQLWCHAR data2[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
+    test_string expected_v1 = convert_to_test_string(v1);
+    CompareStrNumBytes(expected_v1, indicator, data, ret);
+
+    SQLLEN expected_size = convert_to_test_string(v2).size();
+#ifdef __APPLE__
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 4 * (expected_size),
+                     &indicator);
+#else
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 2 * (expected_size),
+                     &indicator);
+#endif
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_DATA_RIGHT_TRUNCATED));
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected_size), indicator);
+#else
+    ASSERT_EQ((int)(2 * expected_size), indicator);
+#endif
+    std::string expected_v2 = std::to_string(v2);
+    EXPECT_EQ(expected_v2.substr(0, expected_v2.size() - 1),
+              tchar_to_string(data2));
+
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_DOUBLE) {
+    int v1 = -293719;
+    int v2 = 741370;
+    test_string columns = CREATE_STRING("INTEGER\'")
+                          + convert_to_test_string(v1)
+                          + CREATE_STRING("\', INTEGER\'")
+                          + convert_to_test_string(v2) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLDOUBLE, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLDOUBLE >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLDOUBLE >(v2), nullptr));
+
+    TypeConversionAssertionTemplate< SQLDOUBLE >(
+        m_hstmt, SQL_C_DOUBLE, columns, expected, CompareSQLType< SQLDOUBLE >);
+}
+
+TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_FLOAT) {
+    int v1 = -293719;
+    int v2 = 741370;
+    test_string columns = CREATE_STRING("INTEGER\'")
+                          + convert_to_test_string(v1)
+                          + CREATE_STRING("\', INTEGER\'")
+                          + convert_to_test_string(v2) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLREAL, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLREAL >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLREAL >(v2), nullptr));
+
+    TypeConversionAssertionTemplate< SQLREAL >(
+        m_hstmt, SQL_C_FLOAT, columns, expected, CompareSQLType< SQLREAL >);
+}
+
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_BIT) {
     double v1 = 0.0;
     double v2 = 1.0;
     double v3 = -1.0;  // underflow
     double v4 = 2.0;   // overflow
-    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v4) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLCHAR data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLCHAR expected_v2 = static_cast< SQLCHAR >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 4, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns =
+        CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v1),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v2),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLCHAR >(
+        m_hstmt, SQL_C_BIT, columns, expected, CompareSQLType< SQLCHAR >);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_STINYINT) {
     double v1 = -3.9E-5;
     double v2 = 3.9E-5;
     double v3 = -1.29E2;  // underflow
-    double v4 = 1.28E2;  // overflow     
-    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v4) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLSCHAR data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_STINYINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSCHAR expected_v1 = static_cast< SQLSCHAR >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_STINYINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSCHAR expected_v2 = static_cast< SQLSCHAR >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_STINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 4, SQL_C_STINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    double v4 = 1.28E2;   // overflow
+    test_string columns =
+        CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLSCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v1),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v2),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLSCHAR >(
+        m_hstmt, SQL_C_STINYINT, columns, expected, CompareSQLType< SQLSCHAR >);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_TINYINT) {
@@ -776,325 +769,254 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_TINYINT) {
     double v2 = 1.269E2;
     double v3 = LLONG_MIN;  // underflow
     double v4 = ULONG_MAX;  // overflow
-    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v4) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLSCHAR data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_TINYINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSCHAR expected_v1 = static_cast< SQLSCHAR >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_TINYINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSCHAR expected_v2 = static_cast< SQLSCHAR >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_TINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 4, SQL_C_TINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns =
+        CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLSCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v1),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v2),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLSCHAR >(
+        m_hstmt, SQL_C_TINYINT, columns, expected, CompareSQLType< SQLSCHAR >);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_UTINYINT) {
     double v1 = 1.1;
-    double v2 = -3.0; // underflow
+    double v2 = -3.0;    // underflow
     double v3 = 2.56E2;  // overflow
-    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLCHAR data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_UTINYINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_UTINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 3, SQL_C_UTINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+                          + CREATE_STRING("\', DOUBLE\'")
+                          + convert_to_test_string(v2)
+                          + CREATE_STRING("\', DOUBLE\'")
+                          + convert_to_test_string(v3) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v1),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLCHAR >(
+        m_hstmt, SQL_C_UTINYINT, columns, expected, CompareSQLType< SQLCHAR >);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SLONG) {
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
-    double v3 = -9.3E18;  // underflow
-    double v4 = (double)LONG_MAX + (double)1;  // overflow  
-    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v4) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLINTEGER data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_SLONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLINTEGER expected_v1 = static_cast< SQLINTEGER >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_SLONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLINTEGER expected_v2 = static_cast< SQLINTEGER >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_SLONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 4, SQL_C_SLONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    double v3 = -9.3E18;                       // underflow
+    double v4 = (double)LONG_MAX + (double)1;  // overflow
+    test_string columns =
+        CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLINTEGER, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v1),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v2),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLINTEGER >(
+        m_hstmt, SQL_C_SLONG, columns, expected, CompareSQLType< SQLINTEGER >);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_LONG) {
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
     double v3 = -DBL_MAX;  // underflow
-    double v4 = DBL_MAX;  // overflow
-    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v4) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLINTEGER data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_LONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLINTEGER expected_v1 = static_cast< SQLINTEGER >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_LONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLINTEGER expected_v2 = static_cast< SQLINTEGER >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_LONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 4, SQL_C_LONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    double v4 = DBL_MAX;   // overflow
+    test_string columns =
+        CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLINTEGER, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v1),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v2),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLINTEGER >(
+        m_hstmt, SQL_C_LONG, columns, expected, CompareSQLType< SQLINTEGER >);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_ULONG) {
     double v1 = 293719.0;
-    double v2 = -1;  // underflow
+    double v2 = -1;                             // underflow
     double v3 = (double)ULONG_MAX + (double)1;  // overflow
-    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLUINTEGER data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_ULONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLUINTEGER expected_v1 = static_cast< SQLUINTEGER >(
-        strtoul(std::to_string(v1).c_str(), NULL, 10));
-    EXPECT_EQ((SQLLEN)sizeof(SQLUINTEGER), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_ULONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 3, SQL_C_ULONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+                          + CREATE_STRING("\', DOUBLE\'")
+                          + convert_to_test_string(v2)
+                          + CREATE_STRING("\', DOUBLE\'")
+                          + convert_to_test_string(v3) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLUINTEGER, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(v1),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLUINTEGER >(
+        m_hstmt, SQL_C_ULONG, columns, expected, CompareSQLType< SQLUINTEGER >);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SSHORT) {
     double v1 = SHRT_MIN;
     double v2 = SHRT_MAX;
-    double v3 = -3.2769E4;
-    double v4 = 3.2768E4;
-    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v4) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLSMALLINT data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_SSHORT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSMALLINT expected_v1 = static_cast< SQLSMALLINT >(
-        strtol(std::to_string(v1).c_str(), NULL, 10));
-    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_SSHORT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSMALLINT expected_v2 = static_cast< SQLSMALLINT >(
-        strtol(std::to_string(v2).c_str(), NULL, 10));
-    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_SSHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 4, SQL_C_SSHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    double v3 = -3.2769E4;  // underflow
+    double v4 = 3.2768E4;   // overflow
+    test_string columns =
+        CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLSMALLINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v1),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v2),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLSMALLINT >(
+        m_hstmt, SQL_C_SSHORT, columns, expected,
+        CompareSQLType< SQLSMALLINT >);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SHORT) {
     double v1 = SHRT_MIN;
     double v2 = SHRT_MAX;
-    double v3 = -DBL_MAX;
-    double v4 = DBL_MAX;
-    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v4) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLSMALLINT data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_SHORT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSMALLINT expected_v1 = static_cast< SQLSMALLINT >(
-        strtol(std::to_string(v1).c_str(), NULL, 10));
-    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_SHORT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSMALLINT expected_v2 = static_cast< SQLSMALLINT >(
-        strtol(std::to_string(v2).c_str(), NULL, 10));
-    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_SSHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 4, SQL_C_SSHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    double v3 = -DBL_MAX;  // underflow
+    double v4 = DBL_MAX;   // overflow
+    test_string columns =
+        CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLSMALLINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v1),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v2),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLSMALLINT >(
+        m_hstmt, SQL_C_SHORT, columns, expected, CompareSQLType< SQLSMALLINT >);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_USHORT) {
     double v1 = 0;
-    double v2 = -1.0;  // underflow
+    double v2 = -1.0;      // underflow
     double v3 = 6.5536E4;  // overflow
-    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLUSMALLINT data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_USHORT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLUSMALLINT expected_v1 = static_cast< SQLUSMALLINT >(
-        strtol(std::to_string(v1).c_str(), NULL, 10));
-    EXPECT_EQ((SQLLEN)sizeof(SQLUSMALLINT), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_USHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 3, SQL_C_USHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+                          + CREATE_STRING("\', DOUBLE\'")
+                          + convert_to_test_string(v2)
+                          + CREATE_STRING("\', DOUBLE\'")
+                          + convert_to_test_string(v3) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLUSMALLINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(v1),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLUSMALLINT >(
+        m_hstmt, SQL_C_USHORT, columns, expected,
+        CompareSQLType< SQLUSMALLINT >);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SBIGINT) {
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
     double v3 = -DBL_MAX;  // underflow
-    double v4 = DBL_MAX; // overflow
-    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v4) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLBIGINT data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_SBIGINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLBIGINT expected_v1 = static_cast< SQLBIGINT >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_SBIGINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLBIGINT expected_v2 = static_cast< SQLBIGINT >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_SBIGINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 4, SQL_C_SBIGINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    double v4 = DBL_MAX;   // overflow
+    test_string columns =
+        CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLBIGINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(v1),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(v2),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLBIGINT >(
+        m_hstmt, SQL_C_SBIGINT, columns, expected, CompareSQLType< SQLBIGINT >);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_UBIGINT) {
     double v1 = 2.93719E5;
-    double v2 = -1.0;  // underflow
-    double v3 = DBL_MAX;  //overflow
-    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLUBIGINT data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_UBIGINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLUBIGINT expected_v1 = static_cast< SQLUBIGINT >(
-        strtoull(std::to_string(v1).c_str(), NULL, 10));
-    EXPECT_EQ((SQLLEN)sizeof(SQLUBIGINT), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_UBIGINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 3, SQL_C_UBIGINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    double v2 = -1.0;     // underflow
+    double v3 = DBL_MAX;  // overflow
+    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+                          + CREATE_STRING("\', DOUBLE\'")
+                          + convert_to_test_string(v2)
+                          + CREATE_STRING("\', DOUBLE\'")
+                          + convert_to_test_string(v3) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLUBIGINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(v1),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLUBIGINT >(m_hstmt, SQL_C_UBIGINT,
+                                                  columns, expected,
+                                                  CompareSQLType< SQLUBIGINT >);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_CHAR) {
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
-    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\'");
+    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+                          + CREATE_STRING("\', DOUBLE\'")
+                          + convert_to_test_string(v2) + CREATE_STRING("\'");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLCHAR data[1024] = {0};
     SQLCHAR data2[1024] = {0};
@@ -1113,24 +1035,57 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_CHAR) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
+TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_WCHAR) {
+    double v1 = -2.93719E5;
+    double v2 = 7.41370E5;
+    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+                          + CREATE_STRING("\', DOUBLE\'")
+                          + convert_to_test_string(v2) + CREATE_STRING("\'");
+    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    SQLWCHAR data[1024] = {0};
+    SQLWCHAR data2[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
+    test_string expected_v1 = convert_to_test_string(v1);
+    CompareStrNumBytes(expected_v1, indicator, data, ret);
+
+    SQLLEN expected_size = convert_to_test_string(v2).size();
+#ifdef __APPLE__
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 4 * (expected_size),
+                     &indicator);
+#else
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 2 * (expected_size),
+                     &indicator);
+#endif
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_DATA_RIGHT_TRUNCATED));
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected_size), indicator);
+#else
+    ASSERT_EQ((int)(2 * expected_size), indicator);
+#endif
+    std::string expected_v2 = std::to_string(v2);
+    EXPECT_EQ(expected_v2.substr(0, expected_v2.size() - 1),
+              tchar_to_string(data2));
+
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_DOUBLE) {
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
-    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLDOUBLE data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_DOUBLE, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQLDOUBLE), indicator);
-    EXPECT_EQ(v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_DOUBLE, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQLDOUBLE), indicator);
-    EXPECT_EQ(v2, data);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+                          + CREATE_STRING("\', DOUBLE\'")
+                          + convert_to_test_string(v2) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLDOUBLE, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLDOUBLE >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLDOUBLE >(v2), nullptr));
+
+    TypeConversionAssertionTemplate< SQLDOUBLE >(
+        m_hstmt, SQL_C_DOUBLE, columns, expected, CompareSQLType< SQLDOUBLE >);
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_FLOAT) {
@@ -1138,33 +1093,23 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_FLOAT) {
     double v2 = 7.41370E5;
     double v3 = -DBL_MAX;  // underflow
     double v4 = DBL_MAX;  // overflow
-    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\', DOUBLE\'")
-                           + convert_to_test_string(v4) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLREAL data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_FLOAT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLREAL expected_v1 = static_cast< SQLREAL >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLREAL), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_FLOAT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLREAL expected_v2 = static_cast< SQLREAL >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLREAL), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_FLOAT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 4, SQL_C_FLOAT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns =
+        CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLREAL, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLREAL >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLREAL >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLREAL >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLREAL >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLREAL >(
+        m_hstmt, SQL_C_FLOAT, columns, expected, CompareSQLType< SQLREAL >);
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_BIT) {
@@ -1172,79 +1117,289 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_BIT) {
     long long v2 = 1;
     long long v3 = -2147483649ll;  // underflow
     long long v4 = 2147483649ll;   // overflow
-    test_string columns = CREATE_STRING("BIGINT\'") + convert_to_test_string(v1) + CREATE_STRING("\', BIGINT\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\', BIGINT\'")
-                           + convert_to_test_string(v3) + CREATE_STRING("\', BIGINT\'")
-                           + convert_to_test_string(v4) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLCHAR data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLCHAR expected_v2 = static_cast< SQLCHAR >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 4, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns =
+        CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLCHAR >(
+        m_hstmt, SQL_C_BIT, columns, expected, CompareSQLType< SQLCHAR >);
+}
+
+TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_STINYINT) {
+    long long v1 = SCHAR_MIN;
+    long long v2 = SCHAR_MAX;
+    long long v3 = SCHAR_MIN - 1;  // underflow
+    long long v4 = SCHAR_MAX + 1;  // overflow
+    test_string columns =
+        CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLSCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLSCHAR >(
+        m_hstmt, SQL_C_STINYINT, columns, expected, CompareSQLType< SQLSCHAR >);
+}
+
+TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_TINYINT) {
+    long long v1 = SCHAR_MIN;
+    long long v2 = SCHAR_MAX;
+    long long v3 = INT_MIN;  // underflow
+    long long v4 = INT_MAX;  // overflow
+    test_string columns =
+        CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLSCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLSCHAR >(
+        m_hstmt, SQL_C_TINYINT, columns, expected, CompareSQLType< SQLSCHAR >);
+}
+
+TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_UTINYINT) {
+    long long v1 = UCHAR_MAX;
+    long long v2 = -1;             // underflow
+    long long v3 = UCHAR_MAX + 1;  // overflow
+    test_string columns = CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
+                          + CREATE_STRING("\', BIGINT\'")
+                          + convert_to_test_string(v2)
+                          + CREATE_STRING("\', BIGINT\'")
+                          + convert_to_test_string(v3) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLCHAR >(
+        m_hstmt, SQL_C_UTINYINT, columns, expected, CompareSQLType< SQLCHAR >);
+}
+
+// SQLINTEGER(long) is 8 bytes in Linux 64 bit and Mac
+TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_SLONG) {
+    long long v1 = -293719;
+    long long v2 = 741370;
+#ifdef WIN32
+    long long v3 = -2147483649ll;  // underflow
+    long long v4 = 2147483648ll;   // overflow
+#endif
+    test_string columns =
+        CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v2)
+#ifdef WIN32
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v4)
+#endif
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLINTEGER, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v2), nullptr));
+#ifdef WIN32
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+#endif
+
+    TypeConversionAssertionTemplate< SQLINTEGER >(
+        m_hstmt, SQL_C_SLONG, columns, expected, CompareSQLType< SQLINTEGER >);
+}
+
+TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_LONG) {
+    long long v1 = -293719;
+    long long v2 = 741370;
+#ifdef WIN32
+    long long v3 = -2147483649ll;  // underflow
+    long long v4 = 2147483648ll;   // overflow
+#endif
+    test_string columns =
+        CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v2)
+#ifdef WIN32
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v4)
+#endif
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLINTEGER, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v2), nullptr));
+#ifdef WIN32
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+#endif
+
+    TypeConversionAssertionTemplate< SQLINTEGER >(
+        m_hstmt, SQL_C_LONG, columns, expected, CompareSQLType< SQLINTEGER >);
+}
+
+TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_ULONG) {
+    long long v1 = 293719;
+    long long v2 = -1;  // underflow
+#ifdef WIN32
+    long long v3 = 4294967296ll;  // overflow
+#endif
+    test_string columns =
+        CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v2)
+#ifdef WIN32
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v3)
+#endif
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLUINTEGER, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+#ifdef WIN32
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+#endif
+
+    TypeConversionAssertionTemplate< SQLUINTEGER >(
+        m_hstmt, SQL_C_ULONG, columns, expected, CompareSQLType< SQLUINTEGER >);
+}
+
+TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_SSHORT) {
+    long long v1 = SHRT_MIN;
+    long long v2 = SHRT_MAX;
+    long long v3 = SHRT_MIN - 1;  // underflow
+    long long v4 = SHRT_MAX + 1;  // overflow
+    test_string columns =
+        CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLSMALLINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLSMALLINT >(
+        m_hstmt, SQL_C_SSHORT, columns, expected,
+        CompareSQLType< SQLSMALLINT >);
+}
+
+TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_SHORT) {
+    long long v1 = SHRT_MIN;
+    long long v2 = SHRT_MAX;
+    long long v3 = INT_MIN;  // underflow
+    long long v4 = INT_MAX;  // overflow
+    test_string columns =
+        CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLSMALLINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLSMALLINT >(
+        m_hstmt, SQL_C_SHORT, columns, expected, CompareSQLType< SQLSMALLINT >);
+}
+
+TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_USHORT) {
+    long long v1 = USHRT_MAX;
+    long long v2 = -1;             // underflow
+    long long v3 = USHRT_MAX + 1;  // overflow
+    test_string columns = CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
+                          + CREATE_STRING("\', BIGINT\'")
+                          + convert_to_test_string(v2)
+                          + CREATE_STRING("\', BIGINT\'")
+                          + convert_to_test_string(v3) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLUSMALLINT, SQLTCHAR* > > expected;
+    expected.push_back(
+        std::make_pair(static_cast< SQLUSMALLINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLUSMALLINT >(
+        m_hstmt, SQL_C_USHORT, columns, expected,
+        CompareSQLType< SQLUSMALLINT >);
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_SBIGINT) {
-    long long  v1 = -2147483649ll;
-    long long  v2 = 2147483649ll;
-    test_string columns = CREATE_STRING("BIGINT\'") + convert_to_test_string(v1) + CREATE_STRING("\', BIGINT\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLBIGINT data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_SBIGINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
-    EXPECT_EQ(v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_SBIGINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
-    EXPECT_EQ(v2, data);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    long long v1 = -2147483649ll;
+    long long v2 = 2147483649ll;
+    test_string columns = CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
+                          + CREATE_STRING("\', BIGINT\'")
+                          + convert_to_test_string(v2) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLBIGINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(v2), nullptr));
+
+    TypeConversionAssertionTemplate< SQLBIGINT >(
+        m_hstmt, SQL_C_SBIGINT, columns, expected, CompareSQLType< SQLBIGINT >);
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_UBIGINT) {
     long long v1 = 2147483649ll;
     long long v2 = -1ll;  // underflow
-    test_string columns = CREATE_STRING("BIGINT\'") + convert_to_test_string(v1) + CREATE_STRING("\', BIGINT\'")
-                           + convert_to_test_string(v2) + CREATE_STRING("\'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLUBIGINT data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_UBIGINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLUBIGINT expected_v1 = static_cast< SQLUBIGINT > (v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLUBIGINT), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_UBIGINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    test_string columns = CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
+                          + CREATE_STRING("\', BIGINT\'")
+                          + convert_to_test_string(v2) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLUBIGINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+
+    TypeConversionAssertionTemplate< SQLUBIGINT >(m_hstmt, SQL_C_UBIGINT,
+                                                  columns, expected,
+                                                  CompareSQLType< SQLUBIGINT >);
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_CHAR) {
-    auto v1 = 2147483649ll;
-    auto v2 = 2147483649ll;
+    long long v1 = 2147483649ll;
+    long long v2 = 2147483649ll;
     v2 *= -1;
     test_string columns = CREATE_STRING("BIGINT\'") + convert_to_test_string(v1) + CREATE_STRING("\', BIGINT\'")
                            + convert_to_test_string(v2) + CREATE_STRING("\'");
@@ -1265,60 +1420,196 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_CHAR) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_BIT) {
-    test_string columns = CREATE_STRING("true, false");
+TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_WCHAR) {
+    long long v1 = -2147483649ll;
+    long long v2 = 2147483649ll;
+    test_string columns = CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
+                          + CREATE_STRING("\', BIGINT\'")
+                          + convert_to_test_string(v2) + CREATE_STRING("\'");
+
     QueryFetch(columns, table_name, single_row, &m_hstmt);
-    bool data = false;
+    SQLWCHAR data[1024] = {0};
+    SQLWCHAR data2[1024] = {0};
     SQLLEN indicator = 0;
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
-    EXPECT_TRUE(data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_FALSE(data);
+    ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
+    test_string expected_v1 = convert_to_test_string(v1);
+    CompareStrNumBytes(expected_v1, indicator, data, ret);
+
+    SQLLEN expected_size = convert_to_test_string(v2).size();
+#ifdef __APPLE__
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 4 * (expected_size),
+                     &indicator);
+#else
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 2 * (expected_size),
+                     &indicator);
+#endif
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_DATA_RIGHT_TRUNCATED));
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected_size), indicator);
+#else
+    ASSERT_EQ((int)(2 * expected_size), indicator);
+#endif
+    std::string expected_v2 = std::to_string(v2);
+    EXPECT_EQ(expected_v2.substr(0, expected_v2.size() - 1),
+              tchar_to_string(data2));
+
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_DOUBLE) {
+    long long v1 = -2147483649ll;
+    long long v2 = 2147483649ll;
+    test_string columns = CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
+                          + CREATE_STRING("\', BIGINT\'")
+                          + convert_to_test_string(v2) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLDOUBLE, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLDOUBLE >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLDOUBLE >(v2), nullptr));
+
+    TypeConversionAssertionTemplate< SQLDOUBLE >(
+        m_hstmt, SQL_C_DOUBLE, columns, expected, CompareSQLType< SQLDOUBLE >);
+}
+
+TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_FLOAT) {
+    long long v1 = -2147483649ll;
+    long long v2 = 2147483649ll;
+    test_string columns = CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
+                          + CREATE_STRING("\', BIGINT\'")
+                          + convert_to_test_string(v2) + CREATE_STRING("\'");
+
+    std::vector< std::pair< SQLREAL, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLREAL >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLREAL >(v2), nullptr));
+
+    TypeConversionAssertionTemplate< SQLREAL >(
+        m_hstmt, SQL_C_FLOAT, columns, expected, CompareSQLType< SQLREAL >);
+}
+
+TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_BIT) {
+    std::vector< std::pair< bool, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(true, nullptr));
+    expected.push_back(std::make_pair(false, nullptr));
+
+    TypeConversionAssertionTemplate< bool >(m_hstmt, SQL_C_BIT, bool_columns,
+                                            expected, CompareSQLType< bool >);
+}
+
+TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_STINYINT) {
+    std::vector< std::pair< SQLSCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0), nullptr));
+
+    TypeConversionAssertionTemplate< SQLSCHAR >(m_hstmt, SQL_C_STINYINT,
+                                                bool_columns, expected,
+                                                CompareSQLType< SQLSCHAR >);
+}
+
+TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_TINYINT) {
+    std::vector< std::pair< SQLSCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0), nullptr));
+
+    TypeConversionAssertionTemplate< SQLSCHAR >(m_hstmt, SQL_C_TINYINT,
+                                                bool_columns, expected,
+                                                CompareSQLType< SQLSCHAR >);
+}
+
+TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_UTINYINT) {
+    std::vector< std::pair< SQLCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0), nullptr));
+
+    TypeConversionAssertionTemplate< SQLCHAR >(m_hstmt, SQL_C_UTINYINT,
+                                               bool_columns, expected,
+                                               CompareSQLType< SQLCHAR >);
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_SLONG) {
-    test_string columns = CREATE_STRING("true, false");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLINTEGER data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_SLONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_TRUE(data != 0);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_SLONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_TRUE(data == 0);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    std::vector< std::pair< SQLINTEGER, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0), nullptr));
+
+    TypeConversionAssertionTemplate< SQLINTEGER >(m_hstmt, SQL_C_SLONG,
+                                                  bool_columns, expected,
+                                                  CompareSQLType< SQLINTEGER >);
+}
+
+TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_LONG) {
+    std::vector< std::pair< SQLINTEGER, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0), nullptr));
+
+    TypeConversionAssertionTemplate< SQLINTEGER >(m_hstmt, SQL_C_LONG,
+                                                  bool_columns, expected,
+                                                  CompareSQLType< SQLINTEGER >);
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_ULONG) {
-    test_string columns = CREATE_STRING("true, false");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLUINTEGER data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_ULONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQLUINTEGER), indicator);
-    EXPECT_TRUE(data != 0);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_ULONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQLUINTEGER), indicator);
-    EXPECT_TRUE(data == 0);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    std::vector< std::pair< SQLUINTEGER, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0), nullptr));
+
+    TypeConversionAssertionTemplate< SQLUINTEGER >(
+        m_hstmt, SQL_C_ULONG, bool_columns, expected,
+        CompareSQLType< SQLUINTEGER >);
+}
+
+TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_SSHORT) {
+    std::vector< std::pair< SQLSMALLINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0), nullptr));
+
+    TypeConversionAssertionTemplate< SQLSMALLINT >(
+        m_hstmt, SQL_C_SSHORT, bool_columns, expected,
+        CompareSQLType< SQLSMALLINT >);
+}
+
+TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_SHORT) {
+    std::vector< std::pair< SQLSMALLINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0), nullptr));
+
+    TypeConversionAssertionTemplate< SQLSMALLINT >(
+        m_hstmt, SQL_C_SHORT, bool_columns, expected,
+        CompareSQLType< SQLSMALLINT >);
+}
+
+TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_USHORT) {
+    std::vector< std::pair< SQLUSMALLINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(0), nullptr));
+
+    TypeConversionAssertionTemplate< SQLUSMALLINT >(
+        m_hstmt, SQL_C_USHORT, bool_columns, expected,
+        CompareSQLType< SQLUSMALLINT >);
+}
+
+TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_SBIGINT) {
+    std::vector< std::pair< SQLBIGINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(0), nullptr));
+
+    TypeConversionAssertionTemplate< SQLBIGINT >(m_hstmt, SQL_C_SBIGINT,
+                                                 bool_columns, expected,
+                                                 CompareSQLType< SQLBIGINT >);
+}
+
+TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_UBIGINT) {
+    std::vector< std::pair< SQLUBIGINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(0), nullptr));
+
+    TypeConversionAssertionTemplate< SQLUBIGINT >(m_hstmt, SQL_C_UBIGINT,
+                                                  bool_columns, expected,
+                                                  CompareSQLType< SQLUBIGINT >);
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_CHAR) {
-    test_string columns = CREATE_STRING("true, false");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
+    QueryFetch(bool_columns, table_name, single_row, &m_hstmt);
     SQLCHAR data[1024] = {0};
     SQLLEN indicator = 0;
     SQLRETURN ret = SQL_ERROR;
@@ -1331,6 +1622,59 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_CHAR) {
     ASSERT_EQ(1, indicator);
     EXPECT_EQ('0', data[0]);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_WCHAR) {
+    QueryFetch(bool_columns, table_name, single_row, &m_hstmt);
+    SQLWCHAR data[1024] = {0};
+    SQLWCHAR data2[1024] = {0};
+    SQLLEN indicator = 0;
+    SQLRETURN ret = SQL_ERROR;
+    ret = SQLGetData(m_hstmt, 1, SQL_C_WCHAR, data, 1024, &indicator);
+    test_string expected_v1 = convert_to_test_string(1);
+    CompareStrNumBytes(expected_v1, indicator, data, ret);
+
+    SQLLEN expected_size = convert_to_test_string(0).size();
+#ifdef __APPLE__
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 4 * (expected_size),
+                     &indicator);
+#else
+    ret = SQLGetData(m_hstmt, 2, SQL_C_WCHAR, data2, 2 * (expected_size),
+                     &indicator);
+#endif
+    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_DATA_RIGHT_TRUNCATED));
+#ifdef __APPLE__
+    ASSERT_EQ((int)(4 * expected_size), indicator);
+#else
+    ASSERT_EQ((int)(2 * expected_size), indicator);
+#endif
+    std::string expected_v2 = std::to_string(0);
+    EXPECT_EQ(expected_v2.substr(0, expected_v2.size() - 1),
+              tchar_to_string(data2));
+
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_DOUBLE) {
+    std::vector< std::pair< SQLDOUBLE, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLDOUBLE >(1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLDOUBLE >(0), nullptr));
+
+    TypeConversionAssertionTemplate< SQLDOUBLE >(m_hstmt, SQL_C_DOUBLE,
+                                                 bool_columns, expected,
+                                                 CompareSQLType< SQLDOUBLE >);
+}
+
+TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_FLOAT) {
+    std::vector< std::pair< SQLREAL, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLREAL >(1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLREAL >(0), nullptr));
+
+    TypeConversionAssertionTemplate< SQLREAL >(m_hstmt, SQL_C_FLOAT,
+                                               bool_columns, expected,
+                                               CompareSQLType< SQLREAL >);
 }
 
 TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR_ARRAY) {
@@ -1475,7 +1819,6 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR_ARRAY_ROW_COMBINATION) {
     CompareStrNumBytes(expected, indicator, data, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
-
 
 TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_CHAR) {
     test_string columns = CREATE_STRING("ARRAY[ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]], ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]]], ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[1, 2, 3]]]]]]]]]]]], ARRAY[]");
@@ -1998,158 +2341,109 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_BIT) {
     int v1 = 0;
     int v2 = 1;
     double v3 = 1.5;  // truncation
-    int v4 = -1;  // underflow
-    int v5 = 2;  // overflow
+    int v4 = -1;      // underflow
+    int v5 = 2;       // overflow
+
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v3)
-        + CREATE_STRING("\', VARCHAR\'   ") + convert_to_test_string(v3) // truncation with leading and trailing spaces
-        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4) 
+        + CREATE_STRING("\', VARCHAR\'   ")
+        + convert_to_test_string(
+            v3)  // truncation with leading and trailing spaces
+        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v5)
-        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a") + CREATE_STRING("\'"); // not a numeric literal
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLCHAR data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLCHAR expected_v2 = static_cast< SQLCHAR >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    SQLCHAR expected_v3 = static_cast< SQLCHAR >(v3);
-    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
-    EXPECT_EQ(expected_v3, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
-    EXPECT_EQ(expected_v3, data);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_FRACTIONAL_TRUNCATION));
-    ret = SQLGetData(m_hstmt, 5, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 6, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 7, SQL_C_BIT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
+        + CREATE_STRING("\'");  // not a numeric literal
+
+    std::vector< std::pair< SQLCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v3),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v3),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+
+    TypeConversionAssertionTemplate< SQLCHAR >(
+        m_hstmt, SQL_C_BIT, columns, expected, CompareSQLType< SQLCHAR >);
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_STINYINT) {
     int v1 = SCHAR_MIN;
     int v2 = SCHAR_MAX;
-    double v3 = 1.5; // truncation
+    double v3 = 1.5;         // truncation
     int v4 = SCHAR_MIN - 1;  // underflow
     int v5 = SCHAR_MAX + 1;  // overflow
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v3)
-        + CREATE_STRING("\', VARCHAR\'   ") + convert_to_test_string(v3) // truncation with leading and trailing spaces
-        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4) 
+        + CREATE_STRING("\', VARCHAR\'   ")
+        + convert_to_test_string(
+            v3)  // truncation with leading and trailing spaces
+        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v5)
-        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a") + CREATE_STRING("\'"); // not a numeric literal
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLSCHAR data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_STINYINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSCHAR expected_v1 = static_cast< SQLSCHAR >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_STINYINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSCHAR expected_v2 = static_cast< SQLSCHAR >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_STINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    SQLCHAR expected_v3 = static_cast< SQLSCHAR >(v3);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
-    EXPECT_EQ(expected_v3, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_STINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
-    EXPECT_EQ(expected_v3, data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_STINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 6, SQL_C_STINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 7, SQL_C_STINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
+        + CREATE_STRING("\'");  // not a numeric literal
+
+    std::vector< std::pair< SQLSCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v3),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v3),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+
+    TypeConversionAssertionTemplate< SQLSCHAR >(
+        m_hstmt, SQL_C_STINYINT, columns, expected, CompareSQLType< SQLSCHAR >);
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TINYINT) {
     int v1 = SCHAR_MIN;
     int v2 = SCHAR_MAX;
-    double v3 = 1.5;  // truncation
+    double v3 = 1.5;   // truncation
     int v4 = INT_MIN;  // underflow
     int v5 = INT_MAX;  // overflow
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v3)
-        + CREATE_STRING("\', VARCHAR\'   ") + convert_to_test_string(v3) // truncation with leading and trailing spaces
-        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4) 
+        + CREATE_STRING("\', VARCHAR\'   ")
+        + convert_to_test_string(
+            v3)  // truncation with leading and trailing spaces
+        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v5)
-        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a") + CREATE_STRING("\'"); // Not a numeric literal
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLSCHAR data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_TINYINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSCHAR expected_v1 = static_cast< SQLSCHAR >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_TINYINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSCHAR expected_v2 = static_cast< SQLSCHAR >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_TINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    SQLCHAR expected_v3 = static_cast< SQLSCHAR >(v3);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
-    EXPECT_EQ(expected_v3, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_TINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSCHAR), indicator);
-    EXPECT_EQ(expected_v3, data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_TINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 6, SQL_C_TINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 7, SQL_C_TINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
+        + CREATE_STRING("\'");  // Not a numeric literal
+
+    std::vector< std::pair< SQLSCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v3),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v3),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+
+    TypeConversionAssertionTemplate< SQLSCHAR >(
+        m_hstmt, SQL_C_TINYINT, columns, expected, CompareSQLType< SQLSCHAR >);
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_UTINYINT) {
@@ -2160,294 +2454,207 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_UTINYINT) {
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
-        + CREATE_STRING("\', VARCHAR\'   ") + convert_to_test_string(v2) // truncation with leading and trailing spaces
-        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v3) 
+        + CREATE_STRING("\', VARCHAR\'   ")
+        + convert_to_test_string(
+            v2)  // truncation with leading and trailing spaces
+        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v3)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v4)
-        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a") + CREATE_STRING("\'"); // not a numeric literal
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLCHAR data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_UTINYINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLCHAR expected_v1 = static_cast< SQLCHAR >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_UTINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    SQLCHAR expected_v2 = static_cast< SQLCHAR >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_UTINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_EQ((SQLLEN)sizeof(SQLCHAR), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_UTINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 5, SQL_C_UTINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 6, SQL_C_UTINYINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
+        + CREATE_STRING("\'");  // not a numeric literal
+
+    std::vector< std::pair< SQLCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v2),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v2),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+
+    TypeConversionAssertionTemplate< SQLCHAR >(
+        m_hstmt, SQL_C_UTINYINT, columns, expected, CompareSQLType< SQLCHAR >);
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SLONG) {
     int v1 = -293719;
     int v2 = 741370;
-    double v3 = 1.5;  // truncation
-    double v4 = -9.3E18;  // underflow
-    double v5 = (double)LONG_MAX + (double)1;  // overflow  
+    double v3 = 1.5;                           // truncation
+    double v4 = -9.3E18;                       // underflow
+    double v5 = (double)LONG_MAX + (double)1;  // overflow
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v3)
-        + CREATE_STRING("\', VARCHAR\'   ") + convert_to_test_string(v3) // truncation with leading and trailing spaces
-        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4) 
+        + CREATE_STRING("\', VARCHAR\'   ")
+        + convert_to_test_string(
+            v3)  // truncation with leading and trailing spaces
+        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v5)
-        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a") + CREATE_STRING("\'"); // Not a numeric literal
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLINTEGER data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_SLONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLINTEGER expected_v1 = static_cast< SQLINTEGER >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_SLONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLINTEGER expected_v2 = static_cast< SQLINTEGER >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_SLONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    SQLINTEGER expected_v3 = static_cast< SQLINTEGER >(v3);
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_EQ(expected_v3, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_SLONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_EQ(expected_v3, data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_SLONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 6, SQL_C_SLONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 7, SQL_C_SLONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
+        + CREATE_STRING("\'");  // Not a numeric literal
+
+    std::vector< std::pair< SQLINTEGER, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v3),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v3),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+
+    TypeConversionAssertionTemplate< SQLINTEGER >(
+        m_hstmt, SQL_C_SLONG, columns, expected, CompareSQLType< SQLINTEGER >);
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_LONG) {
     int v1 = -293719;
     int v2 = 741370;
-    double v3 = 1.5;  // truncation
+    double v3 = 1.5;       // truncation
     double v4 = -DBL_MAX;  // underflow
-    double v5 = DBL_MAX;  // overflow
+    double v5 = DBL_MAX;   // overflow
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v3)
-        + CREATE_STRING("\', VARCHAR\'   ") + convert_to_test_string(v3) // truncation with leading and trailing spaces
-        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4) 
+        + CREATE_STRING("\', VARCHAR\'   ")
+        + convert_to_test_string(
+            v3)  // truncation with leading and trailing spaces
+        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v5)
-        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a") + CREATE_STRING("\'"); // Not a numeric literal
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLINTEGER data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_LONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLINTEGER expected_v1 = static_cast< SQLINTEGER >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_LONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLINTEGER expected_v2 = static_cast< SQLINTEGER >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_LONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    SQLINTEGER expected_v3 = static_cast< SQLINTEGER >(v3);
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_EQ(expected_v3, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_LONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_EQ((SQLLEN)sizeof(SQLINTEGER), indicator);
-    EXPECT_EQ(expected_v3, data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_LONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 6, SQL_C_LONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 7, SQL_C_LONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
+        + CREATE_STRING("\'");  // Not a numeric literal
+
+    std::vector< std::pair< SQLINTEGER, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v3),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v3),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+
+    TypeConversionAssertionTemplate< SQLINTEGER >(
+        m_hstmt, SQL_C_LONG, columns, expected, CompareSQLType< SQLINTEGER >);
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_ULONG) {
     int v1 = 293719;
-    double v2 = 1.5;  // truncation
-    int v3 = -1;  // underflow
+    double v2 = 1.5;                            // truncation
+    int v3 = -1;                                // underflow
     double v4 = (double)ULONG_MAX + (double)1;  // overflow
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
-        + CREATE_STRING("\', VARCHAR\'   ") + convert_to_test_string(v2) // truncation with leading and trailing spaces
-        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v3) 
+        + CREATE_STRING("\', VARCHAR\'   ")
+        + convert_to_test_string(
+            v2)  // truncation with leading and trailing spaces
+        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v3)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v4)
-        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a") + CREATE_STRING("\'"); // not a numeric literal
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLUINTEGER data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_ULONG, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLUINTEGER expected_v1 = static_cast< SQLUINTEGER >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLUINTEGER), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_ULONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    SQLUINTEGER expected_v2 = static_cast< SQLUINTEGER >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLUINTEGER), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_ULONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_EQ((SQLLEN)sizeof(SQLUINTEGER), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_ULONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 5, SQL_C_ULONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 6, SQL_C_ULONG, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
+        + CREATE_STRING("\'");  // not a numeric literal
+
+    std::vector< std::pair< SQLUINTEGER, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(v2),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(v2),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+
+    TypeConversionAssertionTemplate< SQLUINTEGER >(
+        m_hstmt, SQL_C_ULONG, columns, expected, CompareSQLType< SQLUINTEGER >);
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SSHORT) {
     int v1 = SHRT_MIN;
     int v2 = SHRT_MAX;
-    double v3 = 1.5;  // truncation
+    double v3 = 1.5;        // truncation
     int v4 = SHRT_MIN - 1;  // underflow
     int v5 = SHRT_MAX + 1;  // overflow
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v3)
-        + CREATE_STRING("\', VARCHAR\'   ") + convert_to_test_string(v3) // truncation with leading and trailing spaces
-        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4) 
+        + CREATE_STRING("\', VARCHAR\'   ")
+        + convert_to_test_string(
+            v3)  // truncation with leading and trailing spaces
+        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v5)
-        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a") + CREATE_STRING("\'"); // not a numeric literal
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLSMALLINT data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_SSHORT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSMALLINT expected_v1 = static_cast< SQLSMALLINT >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_SSHORT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSMALLINT expected_v2 = static_cast< SQLSMALLINT >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_SSHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    SQLSMALLINT expected_v3 = static_cast< SQLSMALLINT >(v3);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
-    EXPECT_EQ(expected_v3, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_SSHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
-    EXPECT_EQ(expected_v3, data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_SSHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 6, SQL_C_SSHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 7, SQL_C_SSHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
+        + CREATE_STRING("\'");  // not a numeric literal
+
+    std::vector< std::pair< SQLSMALLINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v3),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v3),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+
+    TypeConversionAssertionTemplate< SQLSMALLINT >(
+        m_hstmt, SQL_C_SSHORT, columns, expected,
+        CompareSQLType< SQLSMALLINT >);
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SHORT) {
     int v1 = SHRT_MIN;
     int v2 = SHRT_MAX;
-    double v3 = 1.5;  // truncation
+    double v3 = 1.5;   // truncation
     int v4 = INT_MIN;  // underflow
     int v5 = INT_MAX;  // overflow
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v3)
-        + CREATE_STRING("\', VARCHAR\'   ") + convert_to_test_string(v3)  // truncation with leading and trailing spaces
-        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4) 
+        + CREATE_STRING("\', VARCHAR\'   ")
+        + convert_to_test_string(
+            v3)  // truncation with leading and trailing spaces
+        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v5)
-        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a") + CREATE_STRING("\'");  // not a numeric literal
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLSMALLINT data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_SHORT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSMALLINT expected_v1 = static_cast< SQLSMALLINT >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_SHORT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLSMALLINT expected_v2 = static_cast< SQLSMALLINT >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_SHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    SQLSMALLINT expected_v3 = static_cast< SQLSMALLINT >(v3);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
-    EXPECT_EQ(expected_v3, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_SHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_EQ((SQLLEN)sizeof(SQLSMALLINT), indicator);
-    EXPECT_EQ(expected_v3, data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_SHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 6, SQL_C_SHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 7, SQL_C_SHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
+        + CREATE_STRING("\'");  // not a numeric literal
+
+    std::vector< std::pair< SQLSMALLINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v3),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v3),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+
+    TypeConversionAssertionTemplate< SQLSMALLINT >(
+        m_hstmt, SQL_C_SHORT, columns, expected, CompareSQLType< SQLSMALLINT >);
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_USHORT) {
@@ -2458,138 +2665,101 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_USHORT) {
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
-        + CREATE_STRING("\', VARCHAR\'   ") + convert_to_test_string(v2) // truncation with leading and trailing spaces
-        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v3) 
+        + CREATE_STRING("\', VARCHAR\'   ")
+        + convert_to_test_string(
+            v2)  // truncation with leading and trailing spaces
+        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v3)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v4)
-        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a") + CREATE_STRING("\'"); // not a numeric literal
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLUSMALLINT data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_USHORT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLUSMALLINT expected_v1 = static_cast< SQLUSMALLINT >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLUSMALLINT), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_USHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    SQLUSMALLINT expected_v2 = static_cast< SQLUSMALLINT >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLUSMALLINT), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_USHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_EQ((SQLLEN)sizeof(SQLUSMALLINT), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_USHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 5, SQL_C_USHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 6, SQL_C_USHORT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
+        + CREATE_STRING("\'");  // not a numeric literal
+
+    std::vector< std::pair< SQLUSMALLINT, SQLTCHAR* > > expected;
+    expected.push_back(
+        std::make_pair(static_cast< SQLUSMALLINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(v2),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(v2),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(0),
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+
+    TypeConversionAssertionTemplate< SQLUSMALLINT >(
+        m_hstmt, SQL_C_USHORT, columns, expected,
+        CompareSQLType< SQLUSMALLINT >);
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SBIGINT) {
     int v1 = -293719;
     int v2 = 741370;
-    double v3 = 1.5;  // truncation
+    double v3 = 1.5;       // truncation
     double v4 = -DBL_MAX;  // underflow
-    double v5 = DBL_MAX;  // overflow
+    double v5 = DBL_MAX;   // overflow
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v3)
-        + CREATE_STRING("\', VARCHAR\'   ") + convert_to_test_string(v3)  // truncation with leading and trailing spaces
-        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4) 
+        + CREATE_STRING("\', VARCHAR\'   ")
+        + convert_to_test_string(
+            v3)  // truncation with leading and trailing spaces
+        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v5)
-        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a") + CREATE_STRING("\'");  // not a numeric literal
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLBIGINT data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_SBIGINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLBIGINT expected_v1 = static_cast< SQLBIGINT >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_SBIGINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLBIGINT expected_v2 = static_cast< SQLBIGINT >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_SBIGINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    SQLBIGINT expected_v3 = static_cast< SQLBIGINT >(v3);
-    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
-    EXPECT_EQ(expected_v3, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_SBIGINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_EQ((SQLLEN)sizeof(SQLBIGINT), indicator);
-    EXPECT_EQ(expected_v3, data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_SBIGINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 6, SQL_C_SBIGINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 7, SQL_C_SBIGINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
+        + CREATE_STRING("\'");  // not a numeric literal
+
+    std::vector< std::pair< SQLBIGINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(v3),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(v3),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(0),
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+
+    TypeConversionAssertionTemplate< SQLBIGINT >(
+        m_hstmt, SQL_C_SBIGINT, columns, expected, CompareSQLType< SQLBIGINT >);
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_UBIGINT) {
     int v1 = 293719;
-    double v2 = 1.5;
-    double v3 = -1.0;  // underflow
-    double v4 = DBL_MAX;  //overflow
+    double v2 = 1.5;      // truncation
+    double v3 = -1.0;     // underflow
+    double v4 = DBL_MAX;  // overflow
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
-        + CREATE_STRING("\', VARCHAR\'   ") + convert_to_test_string(v2) // truncation with leading and trailing spaces
-        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v3) 
+        + CREATE_STRING("\', VARCHAR\'   ")
+        + convert_to_test_string(
+            v2)  // truncation with leading and trailing spaces
+        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v3)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v4)
-        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a") + CREATE_STRING("\'"); // not a numeric literal
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLUBIGINT data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_UBIGINT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLUBIGINT expected_v1 = static_cast< SQLUBIGINT >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLUBIGINT), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_UBIGINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    SQLUBIGINT expected_v2 = static_cast< SQLUBIGINT >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLUBIGINT), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_UBIGINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
-    EXPECT_EQ((SQLLEN)sizeof(SQLUBIGINT), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_UBIGINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 5, SQL_C_UBIGINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 6, SQL_C_UBIGINT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
+        + CREATE_STRING("\'");  // not a numeric literal
+
+    std::vector< std::pair< SQLUBIGINT, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(v2),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(v2),
+                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(0),
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+
+    TypeConversionAssertionTemplate< SQLUBIGINT >(m_hstmt, SQL_C_UBIGINT,
+                                                  columns, expected,
+                                                  CompareSQLType< SQLUBIGINT >);
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_DOUBLE) {
@@ -2598,41 +2768,38 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_DOUBLE) {
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
-        + CREATE_STRING("\', VARCHAR\'   ") + convert_to_test_string(v2)  // leading and trailing spaces
+        + CREATE_STRING("\', VARCHAR\'   ")
+        + convert_to_test_string(v2)  // leading and trailing spaces
         + CREATE_STRING("  \', VARCHAR\'")
-        + CREATE_STRING("9179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368") // overflow
+        + CREATE_STRING(
+            "917976931348623157081452742373170435679807056752584499659891747680"
+            "315726078002853876058955863276687817154045895351438246423432132688"
+            "946418276846754670353751698604991057655128207624549009038932894407"
+            "586850845513394230458323690322294816580855933212334827479782620414"
+            "4723168738177180919299881250404026184124858368")  // overflow
         + CREATE_STRING("\', VARCHAR\'")
-        + CREATE_STRING("-9179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368") // underflow
-        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a") + CREATE_STRING("\'"); // not a numeric literal
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLDOUBLE data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_DOUBLE, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQLDOUBLE), indicator);
-    EXPECT_EQ(v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_DOUBLE, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQLDOUBLE), indicator);
-    EXPECT_EQ(v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_DOUBLE, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQLDOUBLE), indicator);
-    EXPECT_EQ(v2, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_DOUBLE, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 5, SQL_C_DOUBLE, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 6, SQL_C_DOUBLE, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+        + CREATE_STRING(
+            "-91797693134862315708145274237317043567980705675258449965989174768"
+            "031572607800285387605895586327668781715404589535143824642343213268"
+            "894641827684675467035375169860499105765512820762454900903893289440"
+            "758685084551339423045832369032229481658085593321233482747978262041"
+            "44723168738177180919299881250404026184124858368")  // underflow
+        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
+        + CREATE_STRING("\'");  // not a numeric literal
+
+    std::vector< std::pair< SQLDOUBLE, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLDOUBLE >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLDOUBLE >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLDOUBLE >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLDOUBLE >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLDOUBLE >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLDOUBLE >(0),
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+
+    TypeConversionAssertionTemplate< SQLDOUBLE >(
+        m_hstmt, SQL_C_DOUBLE, columns, expected, CompareSQLType< SQLDOUBLE >);
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_FLOAT) {
@@ -2643,41 +2810,27 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_FLOAT) {
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
-        + CREATE_STRING("\', VARCHAR\'   ") + convert_to_test_string(v2) // truncation with leading and trailing spaces
-        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v3) 
+        + CREATE_STRING("\', VARCHAR\'   ")
+        + convert_to_test_string(
+            v2)  // truncation with leading and trailing spaces
+        + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v3)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v4)
-        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a") + CREATE_STRING("\'"); // not a numeric literal
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQLREAL data = 0;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_FLOAT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLREAL expected_v1 = static_cast< SQLREAL >(v1);
-    EXPECT_EQ((SQLLEN)sizeof(SQLREAL), indicator);
-    EXPECT_EQ(expected_v1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_FLOAT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    SQLREAL expected_v2 = static_cast< SQLREAL >(v2);
-    EXPECT_EQ((SQLLEN)sizeof(SQLREAL), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_FLOAT, &data, 0, &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQLREAL), indicator);
-    EXPECT_EQ(expected_v2, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_FLOAT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 5, SQL_C_FLOAT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
-    ret = SQLGetData(m_hstmt, 6, SQL_C_FLOAT, &data, 0, &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
+        + CREATE_STRING("\'");  // not a numeric literal
+
+    std::vector< std::pair< SQLREAL, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLREAL >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLREAL >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLREAL >(v2), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLREAL >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLREAL >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLREAL >(0),
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+
+    TypeConversionAssertionTemplate< SQLREAL >(
+        m_hstmt, SQL_C_FLOAT, columns, expected, CompareSQLType< SQLREAL >);
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_CHAR) {
@@ -2796,14 +2949,13 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TYPE_TIMESTAMP) {
         TIMESTAMP_STRUCT{year, month, day, 6, 39, 0, 0}, nullptr));
     expected.push_back(
         std::make_pair(TIMESTAMP_STRUCT{2021, 1, 2, 18, 1, 13, 0}, nullptr));
-    expected.push_back(
-        std::make_pair(TIMESTAMP_STRUCT{0, 0, 0, 0, 0, 0, 0}, SQLSTATE_STRING_CONVERSION_ERROR));
-    expected.push_back(
-        std::make_pair(TIMESTAMP_STRUCT{0, 0, 0, 0, 0, 0, 0}, SQLSTATE_STRING_CONVERSION_ERROR));
+    expected.push_back(std::make_pair(TIMESTAMP_STRUCT{0, 0, 0, 0, 0, 0, 0},
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+    expected.push_back(std::make_pair(TIMESTAMP_STRUCT{0, 0, 0, 0, 0, 0, 0},
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
 
     TestConvertingToTimestamp(m_hstmt, columns, expected);
 }
-
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TYPE_DATE) {
     test_string columns =
@@ -2907,56 +3059,38 @@ TEST_F(TestSQLGetData, VARCHAR_TO_INTERVAL_YEAR_TO_MONTH) {
         CREATE_STRING("VARCHAR \'0-0\',")
         CREATE_STRING("VARCHAR \'a0-0\',")
         CREATE_STRING("VARCHAR \'   0-0   \'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQL_INTERVAL_STRUCT data;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_INTERVAL_YEAR_TO_MONTH, &data, 0,
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
-    SQL_INTERVAL_STRUCT is1 = ConstructIntervalStruct(
-        SQL_IS_YEAR_TO_MONTH, SQL_FALSE, 1, 0, 0, 0, 0, 0, 0);
-    CompareIntervalStruct(is1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_INTERVAL_YEAR_TO_MONTH, &data, 0,
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
-    SQL_INTERVAL_STRUCT is2 = ConstructIntervalStruct(
-        SQL_IS_YEAR_TO_MONTH, SQL_FALSE, 0, 1, 0, 0, 0, 0, 0);
-    CompareIntervalStruct(is2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_INTERVAL_YEAR_TO_MONTH, &data, 0,
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
-    SQL_INTERVAL_STRUCT is3 = ConstructIntervalStruct(
-        SQL_IS_YEAR_TO_MONTH, SQL_TRUE, 1, 0, 0, 0, 0, 0, 0);
-    CompareIntervalStruct(is3, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_INTERVAL_YEAR_TO_MONTH, &data, 0,
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
-    SQL_INTERVAL_STRUCT is4 = ConstructIntervalStruct(
-        SQL_IS_YEAR_TO_MONTH, SQL_TRUE, 0, 1, 0, 0, 0, 0, 0);
-    CompareIntervalStruct(is4, data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_INTERVAL_YEAR_TO_MONTH, &data, 0,
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
-    SQL_INTERVAL_STRUCT is5 = ConstructIntervalStruct(
-        SQL_IS_YEAR_TO_MONTH, SQL_FALSE, 0, 0, 0, 0, 0, 0, 0);
-    CompareIntervalStruct(is5, data);
-    ret = SQLGetData(m_hstmt, 6, SQL_C_INTERVAL_YEAR_TO_MONTH, &data, 0,
-                     &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    ret = SQLGetData(m_hstmt, 7, SQL_C_INTERVAL_YEAR_TO_MONTH, &data, 0,
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
-    CompareIntervalStruct(is5, data);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+
+    std::vector< std::pair< SQL_INTERVAL_STRUCT, SQLTCHAR* > > expected;
+    expected.push_back(
+        std::make_pair(ConstructIntervalStruct(SQL_IS_YEAR_TO_MONTH, SQL_FALSE,
+                                               1, 0, 0, 0, 0, 0, 0),
+                       nullptr));
+    expected.push_back(
+        std::make_pair(ConstructIntervalStruct(SQL_IS_YEAR_TO_MONTH, SQL_FALSE,
+                                               0, 1, 0, 0, 0, 0, 0),
+                       nullptr));
+    expected.push_back(
+        std::make_pair(ConstructIntervalStruct(SQL_IS_YEAR_TO_MONTH, SQL_TRUE,
+                                               1, 0, 0, 0, 0, 0, 0),
+                       nullptr));
+    expected.push_back(
+        std::make_pair(ConstructIntervalStruct(SQL_IS_YEAR_TO_MONTH, SQL_TRUE,
+                                               0, 1, 0, 0, 0, 0, 0),
+                       nullptr));
+    expected.push_back(
+        std::make_pair(ConstructIntervalStruct(SQL_IS_YEAR_TO_MONTH, SQL_FALSE,
+                                               0, 0, 0, 0, 0, 0, 0),
+                       nullptr));
+    expected.push_back(std::make_pair(SQL_INTERVAL_STRUCT{},
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+    expected.push_back(
+        std::make_pair(ConstructIntervalStruct(SQL_IS_YEAR_TO_MONTH, SQL_FALSE,
+                                               0, 0, 0, 0, 0, 0, 0),
+                       nullptr));
+
+    TypeConversionAssertionTemplate< SQL_INTERVAL_STRUCT >(
+        m_hstmt, SQL_C_INTERVAL_YEAR_TO_MONTH, columns, expected,
+        CompareIntervalStruct);
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_INTERVAL_DAY_TO_SECOND) {
@@ -2970,70 +3104,46 @@ TEST_F(TestSQLGetData, VARCHAR_TO_INTERVAL_DAY_TO_SECOND) {
         CREATE_STRING("VARCHAR \'0 00:00:00.000000001\',")
         CREATE_STRING("VARCHAR \'a0 00:00:00.000000001\',")
         CREATE_STRING("VARCHAR \'   0 00:00:00.000000001   \'");
-    QueryFetch(columns, table_name, single_row, &m_hstmt);
-    SQL_INTERVAL_STRUCT data;
-    SQLLEN indicator = 0;
-    SQLRETURN ret = SQL_ERROR;
-    ret = SQLGetData(m_hstmt, 1, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
-    SQL_INTERVAL_STRUCT is1 = ConstructIntervalStruct(
-        SQL_IS_DAY_TO_SECOND, SQL_FALSE, 0, 0, 1, 0, 0, 0, 0);
-    CompareIntervalStruct(is1, data);
-    ret = SQLGetData(m_hstmt, 2, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
-    SQL_INTERVAL_STRUCT is2 = ConstructIntervalStruct(
-        SQL_IS_DAY_TO_SECOND, SQL_FALSE, 0, 0, 0, 1, 0, 0, 0);
-    CompareIntervalStruct(is2, data);
-    ret = SQLGetData(m_hstmt, 3, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
-    SQL_INTERVAL_STRUCT is3 = ConstructIntervalStruct(
-        SQL_IS_DAY_TO_SECOND, SQL_FALSE, 0, 0, 0, 0, 1, 0, 0);
-    CompareIntervalStruct(is3, data);
-    ret = SQLGetData(m_hstmt, 4, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
-    SQL_INTERVAL_STRUCT is4 = ConstructIntervalStruct(
-        SQL_IS_DAY_TO_SECOND, SQL_FALSE, 0, 0, 0, 0, 0, 1, 0);
-    CompareIntervalStruct(is4, data);
-    ret = SQLGetData(m_hstmt, 5, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
-    SQL_INTERVAL_STRUCT is5 = ConstructIntervalStruct(
-        SQL_IS_DAY_TO_SECOND, SQL_FALSE, 0, 0, 0, 0, 0, 0, 1000000);
-    CompareIntervalStruct(is5, data);
-    ret = SQLGetData(m_hstmt, 6, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
-    SQL_INTERVAL_STRUCT is6 = ConstructIntervalStruct(
-        SQL_IS_DAY_TO_SECOND, SQL_FALSE, 0, 0, 0, 0, 0, 0, 1000);
-    CompareIntervalStruct(is6, data);
-    ret = SQLGetData(m_hstmt, 7, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
-    SQL_INTERVAL_STRUCT is7 = ConstructIntervalStruct(
-        SQL_IS_DAY_TO_SECOND, SQL_FALSE, 0, 0, 0, 0, 0, 0, 1);
-    CompareIntervalStruct(is7, data);
-    ret = SQLGetData(m_hstmt, 8, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
-                     &indicator);
-    EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-                              SQLSTATE_STRING_CONVERSION_ERROR));
-    ret = SQLGetData(m_hstmt, 9, SQL_C_INTERVAL_DAY_TO_SECOND, &data, 0,
-                     &indicator);
-    EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    EXPECT_EQ((SQLLEN)sizeof(SQL_INTERVAL_STRUCT), indicator);
-    CompareIntervalStruct(is7, data);
-    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+
+    std::vector< std::pair< SQL_INTERVAL_STRUCT, SQLTCHAR* > > expected;
+    expected.push_back(
+        std::make_pair(ConstructIntervalStruct(SQL_IS_DAY_TO_SECOND, SQL_FALSE,
+                                               0, 0, 1, 0, 0, 0, 0),
+                       nullptr));
+    expected.push_back(
+        std::make_pair(ConstructIntervalStruct(SQL_IS_DAY_TO_SECOND, SQL_FALSE,
+                                               0, 0, 0, 1, 0, 0, 0),
+                       nullptr));
+    expected.push_back(
+        std::make_pair(ConstructIntervalStruct(SQL_IS_DAY_TO_SECOND, SQL_FALSE,
+                                               0, 0, 0, 0, 1, 0, 0),
+                       nullptr));
+    expected.push_back(
+        std::make_pair(ConstructIntervalStruct(SQL_IS_DAY_TO_SECOND, SQL_FALSE,
+                                               0, 0, 0, 0, 0, 1, 0),
+                       nullptr));
+    expected.push_back(
+        std::make_pair(ConstructIntervalStruct(SQL_IS_DAY_TO_SECOND, SQL_FALSE,
+                                               0, 0, 0, 0, 0, 0, 1000000),
+                       nullptr));
+    expected.push_back(
+        std::make_pair(ConstructIntervalStruct(SQL_IS_DAY_TO_SECOND, SQL_FALSE,
+                                               0, 0, 0, 0, 0, 0, 1000),
+                       nullptr));
+    expected.push_back(
+        std::make_pair(ConstructIntervalStruct(SQL_IS_DAY_TO_SECOND, SQL_FALSE,
+                                               0, 0, 0, 0, 0, 0, 1),
+                       nullptr));
+    expected.push_back(std::make_pair(SQL_INTERVAL_STRUCT{},
+                                      SQLSTATE_STRING_CONVERSION_ERROR));
+    expected.push_back(
+        std::make_pair(ConstructIntervalStruct(SQL_IS_DAY_TO_SECOND, SQL_FALSE,
+                                               0, 0, 0, 0, 0, 0, 1),
+                       nullptr));
+
+    TypeConversionAssertionTemplate< SQL_INTERVAL_STRUCT >(
+        m_hstmt, SQL_C_INTERVAL_DAY_TO_SECOND, columns, expected,
+        CompareIntervalStruct);
 }
 
 TEST_F(TestSQLGetData, INTERVAL_YEAR_TO_MONTH_TO_SQL_C_CHAR) {
