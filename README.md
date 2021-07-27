@@ -2,6 +2,8 @@
 
 TimestreamODBC is a read-only ODBC driver for Windows, Mac and Linux for connecting to Amazon Timestream.
 
+[![codecov](https://codecov.io/gh/Bit-Quill/timestream-odbc/branch/develop/graph/badge.svg?token=MNHPEGAK9D)](https://codecov.io/gh/Bit-Quill/timestream-odbc)
+
 ## Specifications
 
 The driver is compatible with ODBC 3.51.
