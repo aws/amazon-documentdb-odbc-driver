@@ -24,7 +24,7 @@ Client::Client(const char *connection_string) : henv(SQL_NULL_HENV),
     // Connect
     SQLCHAR strConnIn[BUF_LEN] = {0}, strConnOut[BUF_LEN] = {0};
     SQLSMALLINT lenConnOut;
-    strncpy((char *)strConnIn, connection_string, sizeof(connection_string));
+    strncpy((char *)strConnIn, connection_string, connection_string.size() + 1);
     retcode = SQLDriverConnectA(hdbc, NULL, strConnIn, SQL_NTS, strConnOut, BUF_LEN, &lenConnOut, SQL_DRIVER_COMPLETE);
     if (!SQL_SUCCEEDED(retcode)) {
         throw std::runtime_error("Failed at SQLDriverConnect with code " + std::to_string(retcode) + ".");

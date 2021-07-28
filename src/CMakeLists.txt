@@ -18,7 +18,7 @@ cmake_minimum_required(VERSION 3.16)
 project(global_make_list)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/modules/code-coverage.cmake")
-add_code_coverage_all_targets(EXCLUDE libraries aws-cpp-sdk googletest IntegrationTests UnitTests)
+add_code_coverage_all_targets(EXCLUDE libraries aws-cpp-sdk googletest IntegrationTests)
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 	set(BITNESS 64)
@@ -55,8 +55,7 @@ endif()
 set(PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/..")
 set(ODBC_SRC "${CMAKE_CURRENT_SOURCE_DIR}/timestreamsqlodbc")
 set(ENLIST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/timestreamenlist")
-set(INTEGRATION_TESTS "${CMAKE_CURRENT_SOURCE_DIR}/IntegrationTests")
-set(UNIT_TESTS "${CMAKE_CURRENT_SOURCE_DIR}/UnitTests")
+set(TESTS "${CMAKE_CURRENT_SOURCE_DIR}/Tests")
 set(INSTALL_SRC "${CMAKE_CURRENT_SOURCE_DIR}/installer")
 set(DSN_INSTALLER_SRC "${CMAKE_CURRENT_SOURCE_DIR}/DSNInstaller")
 
@@ -72,8 +71,8 @@ add_compile_definitions( TS_ODBC_VERSION="${DRIVER_PACKAGE_VERSION}"
 
 # Extensions of base directories
 set(PERFORMANCE_TESTS "${CMAKE_CURRENT_SOURCE_DIR}/PerformanceTests")
-set(UT_HELPER "${UNIT_TESTS}/UTHelper")
-set(IT_HELPER "${INTEGRATION_TESTS}/ITODBCHelper")
+set(UT_HELPER "${TESTS}/UTHelper")
+set(IT_HELPER "${TESTS}/ITODBCHelper")
 
 # Without this symbols will be exporting to Unix but not Windows
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
@@ -166,7 +165,6 @@ if(APPLE)
 endif()
 
 if(BUILD_WITH_TESTS)
-	add_subdirectory(${INTEGRATION_TESTS})
-	add_subdirectory(${UNIT_TESTS})
+	add_subdirectory(${TESTS})
 	add_subdirectory(${PERFORMANCE_TESTS})
 endif()
