@@ -29,9 +29,6 @@ jobs:
     - name: configure-and-build-driver
       run: |
         .\build_win_release32.ps1
-    - name: build-tests
-      run: |
-        MSBuild.exe ./build/odbc/cmake/global_make_list.sln -property:Configuration=Release,Platform=Win32
     - name: configure-aws-credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -40,33 +37,12 @@ jobs:
         aws-region: us-east-1
     - name: import-registry
       run: |
-        reg import .\src\IntegrationTests\ITODBCConnection\AWSProfileRegistry_Win32.reg
-        reg import .\src\IntegrationTests\ITODBCConnection\IAMRegistry_Win32.reg
+        reg import .\src\Tests\Tests\AWSProfileRegistry_Win32.reg
+        reg import .\src\Tests\Tests\IAMRegistry_Win32.reg
         mkdir ${{ github.workspace }}\odbc-logs
-    - name: run-connection-unit-test
+    - name: run-tests
       run: |
-        .\build\odbc\bin\Release\ut_conn.exe
-    - name: run-integration-connection-tests
-      run: |
-        .\build\odbc\bin\Release\itodbc_connection.exe
-    - name: run-integration-execution-tests
-      run: |
-        .\build\odbc\bin\Release\itodbc_execution.exe
-    - name: run-integration-results-tests
-      run: |
-        .\build\odbc\bin\Release\itodbc_results.exe
-    - name: run-integration-descriptors-tests
-      run: |
-        .\build\odbc\bin\Release\itodbc_descriptors.exe
-    - name: run-integration-catalog-tests
-      run: |
-        .\build\odbc\bin\Release\itodbc_catalog.exe
-    - name: run-integration-info-tests
-      run: |
-        .\build\odbc\bin\Release\itodbc_info.exe
-    - name: run-integration-pagination-tests
-      run: |
-        .\build\odbc\bin\Release\itodbc_pagination.exe
+        .\build\odbc\bin\Release\tests.exe --gtest_filter=-TestSQLConnectSAMLAuth.*:TestSQLDriverConnectSAMLAuth.*
     - name: upload-test-logs
       if: failure()
       uses: actions/upload-artifact@v2
@@ -78,7 +54,7 @@ jobs:
       run: |
         .\scripts\build_installer.ps1 Release Win32 .\src $Env:ODBC_BUILD_PATH $Env:AWS_SDK_INSTALL_PATH
     - name: prepare-output
-      if: always()
+      if: success()
       run: |
         .\scripts\prepare_ci_output.ps1 $Env:ODBC_BIN_PATH $Env:ODBC_LIB_PATH $Env:ODBC_BUILD_PATH
     - name: upload-build
@@ -88,7 +64,7 @@ jobs:
         name: windows32-build
         path: ci-output/build
     - name: upload-installer
-      if: always()
+      if: success()
       uses: actions/upload-artifact@v2
       with:
         name: windows32-installer
@@ -110,9 +86,6 @@ jobs:
     - name: configure-and-build-driver
       run: |
         .\build_win_release64.ps1
-    - name: build-tests
-      run: |
-        MSBuild.exe ./build/odbc/cmake/global_make_list.sln -property:Configuration=Release,Platform=x64
     - name: configure-aws-credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -121,33 +94,12 @@ jobs:
         aws-region: us-east-1
     - name: import-registry
       run: |
-        reg import .\src\IntegrationTests\ITODBCConnection\AWSProfileRegistry.reg
-        reg import .\src\IntegrationTests\ITODBCConnection\IAMRegistry.reg
+        reg import .\src\Tests\Tests\AWSProfileRegistry.reg
+        reg import .\src\Tests\Tests\IAMRegistry.reg
         mkdir ${{ github.workspace }}\odbc-logs
-    - name: run-connection-unit-test
+    - name: run-tests
       run: |
-        .\build\odbc\bin\Release\ut_conn.exe
-    - name: run-integration-connection-tests
-      run: |
-        .\build\odbc\bin\Release\itodbc_connection.exe
-    - name: run-integration-execution-tests
-      run: |
-        .\build\odbc\bin\Release\itodbc_execution.exe
-    - name: run-integration-results-tests
-      run: |
-        .\build\odbc\bin\Release\itodbc_results.exe
-    - name: run-integration-descriptors-tests
-      run: |
-        .\build\odbc\bin\Release\itodbc_descriptors.exe
-    - name: run-integration-catalog-tests
-      run: |
-        .\build\odbc\bin\Release\itodbc_catalog.exe
-    - name: run-integration-info-tests
-      run: |
-        .\build\odbc\bin\Release\itodbc_info.exe
-    - name: run-integration-pagination-tests
-      run: |
-        .\build\odbc\bin\Release\itodbc_pagination.exe
+        .\build\odbc\bin\Release\tests.exe --gtest_filter=-TestSQLConnectSAMLAuth.*:TestSQLDriverConnectSAMLAuth.*
     - name: upload-test-logs
       if: failure()
       uses: actions/upload-artifact@v2
@@ -159,7 +111,7 @@ jobs:
       run: |
         .\scripts\build_installer.ps1 Release x64 .\src $Env:ODBC_BUILD_PATH $Env:AWS_SDK_INSTALL_PATH
     - name: prepare-output
-      if: always()
+      if: success()
       run: |
         .\scripts\prepare_ci_output.ps1 $Env:ODBC_BIN_PATH $Env:ODBC_LIB_PATH $Env:ODBC_BUILD_PATH
     - name: upload-build
@@ -169,14 +121,44 @@ jobs:
         name: windows64-build
         path: ci-output/build
     - name: upload-installer
-      if: always()
+      if: success()
       uses: actions/upload-artifact@v2
       with:
         name: windows64-installer
         path: ci-output/installer
-    #- name: upload-test-results
-    #  if: always()
-    #  uses: actions/upload-artifact@v2
-    #  with:
-    #    name: windows-test-results
-    #    path: ci-output/test-output
+  build-windows64_coverage:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Get specific version CMake, v3.20.1
+      uses: lukka/get-cmake@v3.20.1
+    - name: add-msbuild-to-path
+      uses: microsoft/setup-msbuild@v1.0.2
+    - name: setup-opencppcoverage-and-add-to-path
+      id: setup_opencppcoverage
+      run: |
+        choco install OpenCppCoverage -y
+        echo "C:\Program Files\OpenCppCoverage" >> $env:GITHUB_PATH
+    - name: configure-and-build-driver
+      run: |
+        .\build_win_debug64.ps1
+    - name: configure-aws-credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    - name: import-registry
+      run: |
+        reg import .\src\Tests\Tests\AWSProfileRegistry.reg
+        reg import .\src\Tests\Tests\IAMRegistry.reg
+    - name: run-tests
+      run: |
+        opencppcoverage --sources src --excluded_modules ut_conn --excluded_modules ut_helper --excluded_modules gtest --excluded_modules aws --export_type cobertura:coverage.xml -- ${{ github.workspace }}\build\odbc\bin\Debug\tests.exe --gtest_filter=-TestSQLConnectSAMLAuth.*:TestSQLDriverConnectSAMLAuth.*
+    - name: Upload Report to Codecov
+      if: always()
+      uses: codecov/codecov-action@v2.0.2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.xml
+        fail_ci_if_error: true

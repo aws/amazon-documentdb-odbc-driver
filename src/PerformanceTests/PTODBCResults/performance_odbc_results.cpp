@@ -66,7 +66,7 @@ const std::string sync_mean = "%%__MEAN__%%";
 const std::string sync_median = "%%__MEDIAN__%%";
 const std::string sync_end = "%%__PARSE__SYNC__END__%%";
 
-void ReportTime(const std::string test_case, std::vector< long long > data) {
+void ReportTime(const std::string& test_case, std::vector< long long >& data) {
     size_t size = data.size();
     ASSERT_EQ(size, (size_t)ITERATION_COUNT);
 
