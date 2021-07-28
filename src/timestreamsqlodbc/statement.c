@@ -169,10 +169,10 @@ RETCODE SQL_API API_FreeStmt(HSTMT hstmt, SQLUSMALLINT fOption) {
     if (fOption == SQL_DROP) {
         ConnectionClass *cc = stmt->hdbc;
 
-        StopRetrieval(cc->conn, stmt);
-
         /* Remove the statement from the connection's statement list */
         if (cc) {
+            StopRetrieval(cc->conn, stmt);
+        
             QResultClass *res;
 
             if (STMT_EXECUTING == stmt->status) {
