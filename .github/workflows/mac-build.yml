@@ -43,32 +43,11 @@ jobs:
     - name: prepare-dsn
       run: |
         sudo mkdir /Library/ODBC
-        sudo mv ./src/IntegrationTests/ITODBCConnection/odbc-mac.ini /Library/ODBC/odbc.ini
+        sudo mv ./src/Tests/Tests/odbc-mac.ini /Library/ODBC/odbc.ini
         mkdir ${{ github.workspace }}/odbc-logs
-    - name: run-connection-unit-test
+    - name: run-tests
       run: |
-        ./build/odbc/bin/ut_conn
-    - name: run-integration-connection-tests
-      run: |
-        ./build/odbc/bin/itodbc_connection
-    - name: run-integration-execution-tests
-      run: |
-        ./build/odbc/bin/itodbc_execution
-    - name: run-integration-results-tests
-      run: |
-        ./build/odbc/bin/itodbc_results
-    - name: run-integration-descriptors-tests
-      run: |
-        ./build/odbc/bin/itodbc_descriptors
-    - name: run-integration-catalog-tests
-      run: |
-        ./build/odbc/bin/itodbc_catalog
-    - name: run-integration-info-tests
-      run: |
-        ./build/odbc/bin/itodbc_info
-    - name: run-integration-pagination-tests
-      run: |
-        ./build/odbc/bin/itodbc_pagination
+        ./build/odbc/bin/tests --gtest_filter=-TestSQLConnectSAMLAuth.*:TestSQLDriverConnectSAMLAuth.*
     - name: print-test-logs
       if: failure()
       run: |

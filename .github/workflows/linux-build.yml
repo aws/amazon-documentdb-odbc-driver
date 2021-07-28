@@ -40,8 +40,8 @@ jobs:
     - name: prepare-dsn
       if: success()
       run: |
-        sudo mv ./src/IntegrationTests/ITODBCConnection/odbc-linux.ini /etc/odbc.ini
-        sudo mv ./src/IntegrationTests/ITODBCConnection/odbcinst-linux.ini /etc/odbcinst.ini
+        sudo mv ./src/Tests/Tests/odbc-linux.ini /etc/odbc.ini
+        sudo mv ./src/Tests/Tests/odbcinst-linux.ini /etc/odbcinst.ini
         mkdir /home/runner/work/timestream-odbc/timestream-odbc/odbc-logs
         export ODBCSYSINI=/etc/
         export ODBCINSTINI=odbcinst.ini
@@ -56,47 +56,19 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
-    - name: run-connection-unit-test
+    - name: run-tests
       if: success()
       run: |
-        ./build/odbc/bin/ut_conn
-    - name: run-integration-connection-tests
-      if: success()
-      run: |
-        ./build/odbc/bin/itodbc_connection
-    - name: run-integration-execution-tests
-      if: success()
-      run: |
-        ./build/odbc/bin/itodbc_execution
-    - name: run-integration-results-tests
-      if: success()
-      run: |
-        ./build/odbc/bin/itodbc_results
-    - name: run-integration-descriptors-tests
-      if: success()
-      run: |
-        ./build/odbc/bin/itodbc_descriptors
-    - name: run-integration-catalog-tests
-      if: success()
-      run: |
-        ./build/odbc/bin/itodbc_catalog
-    - name: run-integration-info-tests
-      if: success()
-      run: |
-        ./build/odbc/bin/itodbc_info
-    - name: run-integration-pagination-tests
-      if: success()
-      run: |
-        ./build/odbc/bin/itodbc_pagination
+        ./build/odbc/bin/tests --gtest_filter=-TestSQLConnectSAMLAuth.*:TestSQLDriverConnectSAMLAuth.*
     - name: prepare-test-results
       if: always()
       run: |
         cp /tmp/timestreamodbc_*.log ${{ github.workspace }}/odbc-logs/
-    - name: upload-integration-test-results
+    - name: upload-test-results
       if: always()
       uses: actions/upload-artifact@v2
       with:
-        name: integration-test-results-linux64
+        name: test-results-linux64
         path: |
           ${{ github.workspace }}/odbc-logs/
     - name: build-rpm-installer
@@ -170,8 +142,8 @@ jobs:
     - name: prepare-dsn
       if: success()
       run: |
-        sudo mv ./src/IntegrationTests/ITODBCConnection/odbc-linux.ini /etc/odbc.ini
-        sudo mv ./src/IntegrationTests/ITODBCConnection/odbcinst-linux.ini /etc/odbcinst.ini
+        sudo mv ./src/Tests/Tests/odbc-linux.ini /etc/odbc.ini
+        sudo mv ./src/Tests/Tests/odbcinst-linux.ini /etc/odbcinst.ini
         mkdir /home/runner/work/timestream-odbc/timestream-odbc/odbc-logs
         export ODBCSYSINI=/etc/
         export ODBCINSTINI=odbcinst.ini
@@ -187,47 +159,19 @@ jobs:
       if: success()
       run: |
         ./build_linux_release32_rpm.sh
-    - name: run-connection-unit-test
+    - name: run-tests
       if: success()
       run: |
-        ./build/odbc/bin/ut_conn
-    - name: run-integration-connection-tests
-      if: success()
-      run: |
-        ./build/odbc/bin/itodbc_connection
-    - name: run-integration-execution-tests
-      if: success()
-      run: |
-        ./build/odbc/bin/itodbc_execution
-    - name: run-integration-results-tests
-      if: success()
-      run: |
-        ./build/odbc/bin/itodbc_results
-    - name: run-integration-descriptors-tests
-      if: success()
-      run: |
-        ./build/odbc/bin/itodbc_descriptors
-    - name: run-integration-catalog-tests
-      if: success()
-      run: |
-        ./build/odbc/bin/itodbc_catalog
-    - name: run-integration-info-tests
-      if: success()
-      run: |
-        ./build/odbc/bin/itodbc_info
-    - name: run-integration-pagination-tests
-      if: success()
-      run: |
-        ./build/odbc/bin/itodbc_pagination
+        ./build/odbc/bin/tests --gtest_filter=-TestSQLConnectSAMLAuth.*:TestSQLDriverConnectSAMLAuth.*
     - name: prepare-test-results
       if: always()
       run: |
         cp /tmp/timestreamodbc_*.log ${{ github.workspace }}/odbc-logs/
-    - name: upload-integration-test-results
+    - name: upload-test-results
       if: always()
       uses: actions/upload-artifact@v2
       with:
-        name: integration-test-results-linux32
+        name: test-results-linux32
         path: |
           ${{ github.workspace }}/odbc-logs/
     - name: build-rpm-installer
