@@ -18,7 +18,7 @@ cmake_minimum_required(VERSION 3.16)
 project(global_make_list)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/modules/code-coverage.cmake")
-add_code_coverage_all_targets(EXCLUDE libraries aws-cpp-sdk googletest IntegrationTests)
+add_code_coverage_all_targets(EXCLUDE libraries aws-cpp-sdk googletest Tests)
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 	set(BITNESS 64)
