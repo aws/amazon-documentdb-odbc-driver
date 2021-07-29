@@ -46,9 +46,9 @@ Aws::TimestreamQuery::Model::QueryOutcome PrefetchQueue::Front() {
 bool PrefetchQueue::WaitForReadinessOfFront() {
     std::unique_lock< std::mutex > lock(mutex);
     condition_variable.wait(lock, [&]() { 
-        return std::future_status::ready
-                   == queue.front().wait_for(std::chrono::milliseconds(1))
-            || !retrieving;
+        return !retrieving ||
+            std::future_status::ready
+               == queue.front().wait_for(std::chrono::milliseconds(1));
     });
     return retrieving;
 }
