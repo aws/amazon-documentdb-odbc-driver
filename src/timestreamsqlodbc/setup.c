@@ -409,7 +409,6 @@ INT_PTR CALLBACK ConfigDlgProc(HWND hdlg, UINT wMsg, WPARAM wParam,
 #endif /* UNICODE_SUPPORT */
 #endif /* USE_PROC_ADDRESS */
 
-#define MAX_CONNECT_STRING_LEN 2048
 #ifdef UNICODE_SUPPORT
 #define MESSAGEBOXFUNC MessageBoxW
 #define _T(str) L##str
@@ -422,7 +421,7 @@ INT_PTR CALLBACK ConfigDlgProc(HWND hdlg, UINT wMsg, WPARAM wParam,
 
 void test_connection(HANDLE hwnd, ConnInfo *ci, BOOL withDTC) {
     SQLINTEGER errnum;
-    char out_conn[MAX_CONNECT_STRING_LEN];
+    char out_conn[MAX_CONNECT_STRING];
     SQLRETURN ret;
     SQLHENV env = SQL_NULL_HANDLE;
     SQLHDBC conn = SQL_NULL_HANDLE;
@@ -430,7 +429,7 @@ void test_connection(HANDLE hwnd, ConnInfo *ci, BOOL withDTC) {
     char dsn_1st;
     BOOL connected = FALSE;
 #ifdef UNICODE_SUPPORT
-    SQLWCHAR wout_conn[MAX_CONNECT_STRING_LEN];
+    SQLWCHAR wout_conn[MAX_CONNECT_STRING];
     SQLWCHAR szMsg[SQL_MAX_MESSAGE_LENGTH];
     const SQLWCHAR *ermsg = NULL;
     SQLWCHAR *conn_str;
@@ -469,7 +468,7 @@ void test_connection(HANDLE hwnd, ConnInfo *ci, BOOL withDTC) {
         goto cleanup;
     }
     if (!SQL_SUCCEEDED(ret = SQLDRIVERCONNECTFUNC(conn, hwnd, conn_str, SQL_NTS,
-                                                  NULL, MAX_CONNECT_STRING_LEN,
+                                                  NULL, MAX_CONNECT_STRING,
                                                   &str_len,
                                                   SQL_DRIVER_NOPROMPT))) {
         SQLGETDIAGRECFUNC(SQL_HANDLE_DBC, conn, 1, NULL, &errnum, szMsg,
