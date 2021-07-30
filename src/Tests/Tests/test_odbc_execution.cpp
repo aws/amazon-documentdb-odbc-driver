@@ -500,33 +500,29 @@ TEST_F(TestSQLCancel, QueryInProgress) {
     Sleep(1000);
 }
 
-// The following test case needs to change the logic of odbc_communication before running.
-// The objective of the test is to simulate a long query in SQLExecDirect
-// and caller issues a SQLCancel to cancel the operation
-// We need to add a sleep e.g. Sleep(1000) in the first line of function QueryCallback to
-// simulate that
-//TEST_F(TestSQLCancel, QueryInProgressMultithread) {
-//    test_string query =
-//        CREATE_STRING("SELECT * FROM ODBCTest.IoT");
-//    std::thread th1([&]() {
-//        auto ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
-//        EXPECT_EQ(SQL_ERROR, ret);
-//        EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-//                                  SQLSTATE_OPERATION_CANCELLED));
-//    });
-//    std::thread th2([&]() {
-//        Sleep(500);
-//        auto ret = SQLCancel(m_hstmt);
-//        EXPECT_EQ(SQL_SUCCESS, ret);
-//    });
-//    th2.join();
-//    th1.join();
-//    SQLRETURN ret = SQLFetch(m_hstmt);
-//    EXPECT_EQ(SQL_ERROR, ret);
-//    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-//        SQLSTATE_INVALID_CURSUR_STATE));
-//    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-//}
+TEST_F(TestSQLCancel, QueryInProgressMultithread) {
+    test_string query =
+        CREATE_STRING("SELECT * FROM ODBCTest.IoT");
+    std::thread th1([&]() {
+        auto ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+        EXPECT_EQ(SQL_ERROR, ret);
+        EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                                  SQLSTATE_OPERATION_CANCELLED));
+    });
+    std::thread th2([&]() {
+        Sleep(100);
+        auto ret = SQLCancel(m_hstmt);
+        EXPECT_EQ(SQL_SUCCESS, ret);
+    });
+    th2.join();
+    th1.join();
+    SQLRETURN ret = SQLFetch(m_hstmt);
+    EXPECT_EQ(SQL_ERROR, ret);
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+        SQLSTATE_INVALID_CURSUR_STATE));
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    Sleep(1000);
+}
 
 TEST_F(TestSQLCancel, QueryNotSent) {
     SQLRETURN ret_exec = SQLCancel(m_hstmt);
