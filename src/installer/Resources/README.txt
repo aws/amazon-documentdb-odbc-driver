@@ -9,9 +9,11 @@ To setup a connection, you can use DSN to store your data source connection info
 
 If using with ODBC compatible BI tools, refer to the tool documentation on configuring a new ODBC driver. The typical requirement is to make the tool aware of the location of the driver library file and then use it to setup database connections.
 
-For example, if you want to use Tableau with Amazon Timestream,
-1. Open 'Tableau'.
-2. Click on 'Other Databases (ODBC)'.
-3. Select 'AMAZON TIMESTREAM ODBC DSN' from the DSN list or 'Amazon Timestream ODBC Driver' from the driver list. If using driver, you need to enter connection string values.
-4. Click on 'Connect'. All connection attributes will be retrived.
-5. Click on 'Sign In'. You will be successfully connected to Amazon Timestream.
+For example, if you want to use Microsoft Power BI with Amazon Timestream,
+1. Open 'Power BI Desktop'.
+2. Select 'Get Data'.
+3. Select 'ODBC'.
+4. Select the appropriate item from the DSN list (e.g. 'Amazon Timestream ODBC DSN').
+5. Optionally enter a SQL Statement (you may want to limit large result sets).
+6. Click 'OK'
+7. Enter the connection information and Click on 'Connect'. All connection attributes will be retrived.

@@ -158,9 +158,6 @@ install(FILES "${PROJECT_ROOT}/README.md" DESTINATION doc COMPONENT "Docs")
 install(FILES "${PROJECT_ROOT}/LICENSE" DESTINATION doc COMPONENT "Docs")
 install(FILES "${PROJECT_ROOT}/THIRD-PARTY" DESTINATION doc COMPONENT "Docs")
 
-# Install resource files
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/Resources/timestream_sql_odbc.tdc" DESTINATION resources COMPONENT "Resources")
-
 # Install AWS dependencies
 if(WIN32)
     set(AWS_SDK_BIN_DIR "${PROJECT_ROOT}/build/aws-sdk/install/bin")
