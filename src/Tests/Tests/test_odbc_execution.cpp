@@ -521,6 +521,7 @@ TEST_F(TestSQLCancel, QueryInProgressMultithread) {
     EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
         SQLSTATE_INVALID_CURSUR_STATE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    Sleep(1000);
 }
 
 TEST_F(TestSQLCancel, QueryNotSent) {
