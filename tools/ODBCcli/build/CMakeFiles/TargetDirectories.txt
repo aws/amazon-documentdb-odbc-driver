@@ -1,3 +1,0 @@
-C:/Users/Charlene/Documents/GitHub/timestream-odbc/tools/ODBCcli/build/CMakeFiles/ODBCcli.dir
-C:/Users/Charlene/Documents/GitHub/timestream-odbc/tools/ODBCcli/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/Charlene/Documents/GitHub/timestream-odbc/tools/ODBCcli/build/CMakeFiles/ZERO_CHECK.dir
