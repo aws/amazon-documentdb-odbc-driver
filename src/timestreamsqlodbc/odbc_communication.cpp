@@ -325,7 +325,10 @@ void QueryCallback(
     const std::shared_ptr< const Aws::Client::AsyncCallerContext >& context) {
     auto ctxt = (std::static_pointer_cast< const Context >(context));
     auto p = const_cast< Context* >(ctxt.get());
-    auto sc = p->GetStatement();
+    StatementClass* sc = nullptr;
+    if (p != nullptr) {
+        sc = p->GetStatement();
+    }
     if (p != nullptr && sc != nullptr) {
         if (outcome.IsSuccess() && !outcome.GetResult().GetNextToken().empty()) {
             // Update the query id in statement class if different
