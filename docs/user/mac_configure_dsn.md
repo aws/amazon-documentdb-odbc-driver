@@ -6,8 +6,6 @@
 	1. `sudo /Applications/iODBC/iODBC\ Administrator64.app/Contents/MacOS/iODBC\ Administrator64`
 
 ## Adding a Driver Entry
-[TBD]
-Note: In order to use the Amazon Timestream ODBC driver with the [Tableau Connector](), the **Description of the Driver** field *must* start with `Amazon Timestream ODBC Driver`.
 
 1. Go to the **ODBC Drivers** tab.
 2. Click **Add a Driver**.
@@ -24,8 +22,7 @@ Note: In order to use the Amazon Timestream ODBC driver with the [Tableau Connec
 
 ## Adding a DSN Entry
 
-This is not required if you are using the Tableau Connector, but will help with connecting to your data source through other applications.
-
+<img width="502" alt="Screen Shot 2021-07-15 at 3 33 02 PM" src="https://user-images.githubusercontent.com/69494372/125866207-937d9a8d-7938-4b8d-a055-bd2ce599a861.png">
 1. Go to the **User DSN** tab
 2. Select **Add** on the right side of the window.
 	* Choose the Driver you added above.
