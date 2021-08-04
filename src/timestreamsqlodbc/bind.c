@@ -39,10 +39,10 @@ RETCODE SQL_API API_BindCol(HSTMT hstmt, SQLUSMALLINT icol,
     BindInfoClass *bookmark;
     RETCODE ret = SQL_SUCCESS;
 
-    MYLOG(LOG_TRACE, "entering...\n");
+    MYLOG(LOG_TRACE, "entering...");
 
-    MYLOG(LOG_DEBUG, "**** : stmt = %p, icol = %d\n", stmt, icol);
-    MYLOG(LOG_DEBUG, "**** : fCType=%d rgb=%p valusMax=" FORMAT_LEN " pcb=%p\n",
+    MYLOG(LOG_DEBUG, "**** : stmt = %p, icol = %d", stmt, icol);
+    MYLOG(LOG_DEBUG, "**** : fCType=%d rgb=%p valusMax=" FORMAT_LEN " pcb=%p",
           fCType, rgbValue, cbValueMax, pcbValue);
 
     if (!stmt) {
@@ -87,7 +87,7 @@ RETCODE SQL_API API_BindCol(HSTMT hstmt, SQLUSMALLINT icol,
                                  func);
                     MYLOG(
                         LOG_ERROR,
-                        "Bind column 0 is type %d not of type SQL_C_BOOKMARK\n",
+                        "Bind column 0 is type %d not of type SQL_C_BOOKMARK",
                         fCType);
                     ret = SQL_ERROR;
                     goto cleanup;
@@ -172,7 +172,7 @@ RETCODE SQL_API API_BindCol(HSTMT hstmt, SQLUSMALLINT icol,
         }
         opts->bindings[icol].scale = 0;
 
-        MYLOG(LOG_DEBUG, "       bound buffer[%d] = %p\n", icol,
+        MYLOG(LOG_DEBUG, "       bound buffer[%d] = %p", icol,
               opts->bindings[icol].buffer);
     }
 
@@ -217,7 +217,7 @@ void extend_parameter_bindings(APDFields *self, SQLSMALLINT num_params) {
     ParameterInfoClass *new_bindings;
 
     MYLOG(LOG_TRACE,
-          "entering ... self=%p, parameters_allocated=%d, num_params=%d,%p\n",
+          "entering ... self=%p, parameters_allocated=%d, num_params=%d,%p",
           self, self->allocated, num_params, self->parameters);
 
     /*
@@ -229,7 +229,7 @@ void extend_parameter_bindings(APDFields *self, SQLSMALLINT num_params) {
             self->parameters, sizeof(ParameterInfoClass) * num_params);
         if (!new_bindings) {
             MYLOG(LOG_DEBUG,
-                  "unable to create %d new bindings from %d old bindings\n",
+                  "unable to create %d new bindings from %d old bindings",
                   num_params, self->allocated);
 
             if (self->parameters)
@@ -245,14 +245,14 @@ void extend_parameter_bindings(APDFields *self, SQLSMALLINT num_params) {
         self->allocated = num_params;
     }
 
-    MYLOG(LOG_TRACE, "leaving %p\n", self->parameters);
+    MYLOG(LOG_TRACE, "leaving %p", self->parameters);
 }
 
 void extend_iparameter_bindings(IPDFields *self, SQLSMALLINT num_params) {
     ParameterImplClass *new_bindings;
 
     MYLOG(LOG_TRACE,
-          "entering ... self=%p, parameters_allocated=%d, num_params=%d\n",
+          "entering ... self=%p, parameters_allocated=%d, num_params=%d",
           self, self->allocated, num_params);
 
     /*
@@ -264,7 +264,7 @@ void extend_iparameter_bindings(IPDFields *self, SQLSMALLINT num_params) {
             self->parameters, sizeof(ParameterImplClass) * num_params);
         if (!new_bindings) {
             MYLOG(LOG_DEBUG,
-                  "unable to create %d new bindings from %d old bindings\n",
+                  "unable to create %d new bindings from %d old bindings",
                   num_params, self->allocated);
 
             if (self->parameters)
@@ -280,11 +280,11 @@ void extend_iparameter_bindings(IPDFields *self, SQLSMALLINT num_params) {
         self->allocated = num_params;
     }
 
-    MYLOG(LOG_TRACE, "leaving %p\n", self->parameters);
+    MYLOG(LOG_TRACE, "leaving %p", self->parameters);
 }
 
 void reset_a_parameter_binding(APDFields *self, int ipar) {
-    MYLOG(LOG_TRACE, "entering ... self=%p, parameters_allocated=%d, ipar=%d\n",
+    MYLOG(LOG_TRACE, "entering ... self=%p, parameters_allocated=%d, ipar=%d",
           self, self->allocated, ipar);
 
     if (ipar < 1 || ipar > self->allocated)
@@ -301,7 +301,7 @@ void reset_a_parameter_binding(APDFields *self, int ipar) {
 }
 
 void reset_a_iparameter_binding(IPDFields *self, int ipar) {
-    MYLOG(LOG_TRACE, "entering ... self=%p, parameters_allocated=%d, ipar=%d\n",
+    MYLOG(LOG_TRACE, "entering ... self=%p, parameters_allocated=%d, ipar=%d",
           self, self->allocated, ipar);
 
     if (ipar < 1 || ipar > self->allocated)
@@ -357,7 +357,7 @@ int CountParameters(const StatementClass *self, Int2 *inputCount, Int2 *ioCount,
  *	Free parameters and free the memory.
  */
 void APD_free_params(APDFields *apdopts, char option) {
-    MYLOG(LOG_TRACE, "entering self=%p\n", apdopts);
+    MYLOG(LOG_TRACE, "entering self=%p", apdopts);
 
     if (!apdopts->parameters)
         return;
@@ -368,13 +368,13 @@ void APD_free_params(APDFields *apdopts, char option) {
         apdopts->allocated = 0;
     }
 
-    MYLOG(LOG_TRACE, "leaving\n");
+    MYLOG(LOG_TRACE, "leaving");
 }
 
 void PDATA_free_params(PutDataInfo *pdata, char option) {
     int i;
 
-    MYLOG(LOG_TRACE, "entering self=%p\n", pdata);
+    MYLOG(LOG_TRACE, "entering self=%p", pdata);
 
     if (!pdata->pdata)
         return;
@@ -396,14 +396,14 @@ void PDATA_free_params(PutDataInfo *pdata, char option) {
         pdata->allocated = 0;
     }
 
-    MYLOG(LOG_TRACE, "leaving\n");
+    MYLOG(LOG_TRACE, "leaving");
 }
 
 /*
  *	Free parameters and free the memory.
  */
 void IPD_free_params(IPDFields *ipdopts, char option) {
-    MYLOG(LOG_TRACE, "entering self=%p\n", ipdopts);
+    MYLOG(LOG_TRACE, "entering self=%p", ipdopts);
 
     if (!ipdopts->parameters)
         return;
@@ -413,7 +413,7 @@ void IPD_free_params(IPDFields *ipdopts, char option) {
         ipdopts->allocated = 0;
     }
 
-    MYLOG(LOG_TRACE, "leaving\n");
+    MYLOG(LOG_TRACE, "leaving");
 }
 
 void extend_column_bindings(ARDFields *self, SQLSMALLINT num_columns) {
@@ -421,7 +421,7 @@ void extend_column_bindings(ARDFields *self, SQLSMALLINT num_columns) {
     SQLSMALLINT i;
 
     MYLOG(LOG_TRACE,
-          "entering ... self=%p, bindings_allocated=%d, num_columns=%d\n", self,
+          "entering ... self=%p, bindings_allocated=%d, num_columns=%d", self,
           self->allocated, num_columns);
 
     /*
@@ -432,7 +432,7 @@ void extend_column_bindings(ARDFields *self, SQLSMALLINT num_columns) {
         new_bindings = create_empty_bindings(num_columns);
         if (!new_bindings) {
             MYLOG(LOG_DEBUG,
-                  "unable to create %d new bindings from %d old bindings\n",
+                  "unable to create %d new bindings from %d old bindings",
                   num_columns, self->allocated);
 
             if (self->bindings) {
@@ -464,13 +464,13 @@ void extend_column_bindings(ARDFields *self, SQLSMALLINT num_columns) {
     /* SQLExecDirect(...)  # returns 5 cols */
     /* SQLExecDirect(...)  # returns 10 cols  (now OK) */
 
-    MYLOG(LOG_TRACE, "leaving %p\n", self->bindings);
+    MYLOG(LOG_TRACE, "leaving %p", self->bindings);
 }
 
 void reset_a_column_binding(ARDFields *self, int icol) {
     BindInfoClass *bookmark;
 
-    MYLOG(LOG_TRACE, "entering ... self=%p, bindings_allocated=%d, icol=%d\n",
+    MYLOG(LOG_TRACE, "entering ... self=%p, bindings_allocated=%d, icol=%d",
           self, self->allocated, icol);
 
     if (icol > self->allocated)
@@ -496,7 +496,7 @@ void reset_a_column_binding(ARDFields *self, int icol) {
 void ARD_unbind_cols(ARDFields *self, BOOL freeall) {
     Int2 lf;
 
-    MYLOG(LOG_ALL, "freeall=%d allocated=%d bindings=%p\n", freeall,
+    MYLOG(LOG_ALL, "freeall=%d allocated=%d bindings=%p", freeall,
           self->allocated, self->bindings);
     for (lf = 1; lf <= self->allocated; lf++)
         reset_a_column_binding(self, lf);
@@ -510,7 +510,7 @@ void ARD_unbind_cols(ARDFields *self, BOOL freeall) {
 void GDATA_unbind_cols(GetDataInfo *self, BOOL freeall) {
     Int2 lf;
 
-    MYLOG(LOG_ALL, "freeall=%d allocated=%d gdata=%p\n", freeall,
+    MYLOG(LOG_ALL, "freeall=%d allocated=%d gdata=%p", freeall,
           self->allocated, self->gdata);
     if (self->fdata.ttlbuf) {
         free(self->fdata.ttlbuf);
@@ -556,7 +556,7 @@ void extend_getdata_info(GetDataInfo *self, SQLSMALLINT num_columns,
     GetDataClass *new_gdata;
 
     MYLOG(LOG_TRACE,
-          "entering ... self=%p, gdata_allocated=%d, num_columns=%d\n", self,
+          "entering ... self=%p, gdata_allocated=%d, num_columns=%d", self,
           self->allocated, num_columns);
 
     /*
@@ -566,7 +566,7 @@ void extend_getdata_info(GetDataInfo *self, SQLSMALLINT num_columns,
     if (self->allocated < num_columns) {
         new_gdata = create_empty_gdata(num_columns);
         if (!new_gdata) {
-            MYLOG(LOG_DEBUG, "unable to create %d new gdata from %d old gdata\n",
+            MYLOG(LOG_DEBUG, "unable to create %d new gdata from %d old gdata",
                   num_columns, self->allocated);
 
             if (self->gdata) {
@@ -603,7 +603,7 @@ void extend_getdata_info(GetDataInfo *self, SQLSMALLINT num_columns,
      * about it by unbinding those columns.
      */
 
-    MYLOG(LOG_TRACE, "leaving %p\n", self->gdata);
+    MYLOG(LOG_TRACE, "leaving %p", self->gdata);
 }
 void reset_a_getdata_info(GetDataInfo *gdata_info, int icol) {
     if (icol < 1 || icol > gdata_info->allocated)
@@ -626,7 +626,7 @@ void extend_putdata_info(PutDataInfo *self, SQLSMALLINT num_params,
     PutDataClass *new_pdata;
 
     MYLOG(LOG_TRACE,
-          "entering ... self=%p, parameters_allocated=%d, num_params=%d\n",
+          "entering ... self=%p, parameters_allocated=%d, num_params=%d",
           self, self->allocated, num_params);
 
     /*
@@ -635,13 +635,13 @@ void extend_putdata_info(PutDataInfo *self, SQLSMALLINT num_params,
      */
     if (self->allocated < num_params) {
         if (self->allocated <= 0 && self->pdata) {
-            MYLOG(LOG_DEBUG, "??? pdata is not null while allocated == 0\n");
+            MYLOG(LOG_DEBUG, "??? pdata is not null while allocated == 0");
             self->pdata = NULL;
         }
         new_pdata = (PutDataClass *)realloc(self->pdata,
                                             sizeof(PutDataClass) * num_params);
         if (!new_pdata) {
-            MYLOG(LOG_DEBUG, "unable to create %d new pdata from %d old pdata\n",
+            MYLOG(LOG_DEBUG, "unable to create %d new pdata from %d old pdata",
                   num_params, self->allocated);
 
             self->pdata = NULL;
@@ -665,7 +665,7 @@ void extend_putdata_info(PutDataInfo *self, SQLSMALLINT num_params,
         }
     }
 
-    MYLOG(LOG_TRACE, "leaving %p\n", self->pdata);
+    MYLOG(LOG_TRACE, "leaving %p", self->pdata);
 }
 void reset_a_putdata_info(PutDataInfo *pdata_info, int ipar) {
     if (ipar < 1 || ipar > pdata_info->allocated)
