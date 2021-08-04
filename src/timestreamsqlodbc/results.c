@@ -522,10 +522,10 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
         case SQL_DESC_NAME:
             MYLOG(LOG_ALL, "fi=%p (alias, name)=", fi);
             if (fi)
-                MYPRINTF(LOG_DEBUG, "(%s,%s)\n", PRINT_NAME(fi->column_alias),
+                MYPRINTF(LOG_DEBUG, "(%s,%s)", PRINT_NAME(fi->column_alias),
                          PRINT_NAME(fi->column_name));
             else
-                MYPRINTF(LOG_DEBUG, "NULL\n");
+                MYPRINTF(LOG_DEBUG, "NULL");
             p = fi ? (NAME_IS_NULL(fi->column_alias)
                           ? SAFE_NAME(fi->column_name)
                           : GET_NAME(fi->column_alias))
@@ -1189,7 +1189,7 @@ getNthValid(const QResultClass *res, SQLLEN sta, UWORD orientation, SQLULEN nth,
         }
         *nearest = num_tuples;
     }
-    MYPRINTF(LOG_DEBUG, " nearest not found\n");
+    MYPRINTF(LOG_DEBUG, " nearest not found");
     return -(SQLLEN)count;
 }
 
