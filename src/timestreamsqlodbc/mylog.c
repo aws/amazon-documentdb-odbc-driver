@@ -241,7 +241,7 @@ void logs_on_off(int cnopen, int mylog_onoff) {
     //else if (getGlobalCommlog() > 0)
     //    qlog_on = getGlobalCommlog();
     //LEAVE_QLOG_CS;
-    MYLOG(LOG_DEBUG, "mylog_on=%d\n", mylog_on);
+    MYLOG(LOG_DEBUG, "mylog_on=%d", mylog_on);
 }
 
 #ifdef WIN32
@@ -508,7 +508,7 @@ void logInstallerError(int ret, const char *dir) {
     msg[0] = '\0';
     ret = SQLInstallerError(1, &err, msg, sizeof(msg), NULL);
     if (msg[0] != '\0')
-        MYLOG(LOG_DEBUG, "Dir= %s ErrorMsg = %s\n", dir, msg);
+        MYLOG(LOG_DEBUG, "Dir= %s ErrorMsg = %s", dir, msg);
 }
 
 int getLogDir(char *dir, int dirmax) {
@@ -538,7 +538,7 @@ static void start_logging() {
      * ci->drivers.debug(commlog).
      */
     logs_on_off(0, 0);
-    mylog("\t%s:Global.debug&commlog=%d&%d\n", __func__, getGlobalDebug(),
+    mylog("\t%s:Global.debug&commlog=%d&%d", __func__, getGlobalDebug(),
           getGlobalCommlog());
 }
 
@@ -554,7 +554,7 @@ void InitializeLogging(void) {
         logdir = strdup(dir);
     mylog_initialize();
     start_logging();
-    MYLOG(LOG_DEBUG, "Log Output Dir: %s\n", logdir);
+    MYLOG(LOG_DEBUG, "Log Output Dir: %s", logdir);
 }
 
 void FinalizeLogging(void) {
