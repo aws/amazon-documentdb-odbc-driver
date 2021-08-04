@@ -9,31 +9,13 @@
 		
 		<!-- Add driver entry in ODBC Drivers -->
 		<RegistryKey Root="HKLM" Key="SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers" >
-			<RegistryValue Type="string" Name="Amazon Timestream ODBC Driver(x64)" Value="Installed" />
+			<RegistryValue Type="string" Name="Amazon Timestream ODBC Driver" Value="Installed" />
 		</RegistryKey>
 		
 		<!-- Set driver attributes -->
-		<RegistryKey Root="HKLM" Key="SOFTWARE\ODBC\ODBCINST.INI\Amazon Timestream ODBC Driver(x64)" >
+		<RegistryKey Root="HKLM" Key="SOFTWARE\ODBC\ODBCINST.INI\Amazon Timestream ODBC Driver" >
 			<RegistryValue Type="string" Name="Driver" Value="[INSTALL_ROOT]bin\timestreamsqlodbc.dll" />
 			<RegistryValue Type="string" Name="Setup" Value="[INSTALL_ROOT]bin\timestreamsqlodbc.dll" />
 		</RegistryKey>
-		
-		<!-- Add DSN entry in ODBC Data Sources -->
-		<RegistryKey Root="HKLM" Key="SOFTWARE\ODBC\ODBC.INI\ODBC Data Sources">
-			<RegistryValue Type="string" Name="Amazon Timestream ODBC DSN" Value="Amazon Timestream ODBC Driver(x64)" />
-		</RegistryKey>
-		
-		<!-- Set DSN attributes -->
-		<RegistryKey Root="HKLM" Key="SOFTWARE\ODBC\ODBC.INI\Amazon Timestream ODBC DSN"  >
-			<RegistryValue Type="string" Name="Driver" Value="[INSTALL_ROOT]bin\timestreamsqlodbc.dll" />
-			<RegistryValue Type="string" Name="Auth" Value="AWS_PROFILE" />
-			<RegistryValue Type="string" Name="Region" Value="us-east-1" />
-			<RegistryValue Type="string" Name="ConnectionTimeout" Value="1000" />
-			<RegistryValue Type="string" Name="RequestTimeout" Value="3000" />
-			<RegistryValue Type="string" Name="MaxConnections" Value="25" />
-			<RegistryValue Type="string" Name="LogLevel" Value="0" />
-			<RegistryValue Type="string" Name="LogOutput" Value="" />
-		</RegistryKey>
-
 	</CPackWiXFragment>
 </CPackWiXPatch>
