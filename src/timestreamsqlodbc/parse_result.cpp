@@ -191,7 +191,7 @@ void print_log(const LogLevel &level, const std::string &s) {
 #endif  // WIN32
         // cppcheck outputs an erroneous missing argument error which breaks
         // build. Disable for this function call
-    MYLOG(level, "%s\n", s.c_str());
+    MYLOG(level, "%s", s.c_str());
 #if WIN32
 #pragma warning(pop)
 #endif  // WIN32

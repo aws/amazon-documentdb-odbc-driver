@@ -214,15 +214,15 @@ enum {
     } while (0)
 #define QR_set_next_in_cache(self, number)                               \
     do {                                                                 \
-        MYLOG(LOG_ALL, "set the number to " FORMAT_LEN " to read next\n", \
+        MYLOG(LOG_ALL, "set the number to " FORMAT_LEN " to read next",  \
               number);                                                   \
         self->fetch_number = number;                                     \
     } while (0)
-#define QR_inc_next_in_cache(self)                                             \
-    do {                                                                       \
+#define QR_inc_next_in_cache(self)                                              \
+    do {                                                                        \
         MYLOG(LOG_ALL, "increased the number " FORMAT_LEN, self->fetch_number); \
-        self->fetch_number++;                                                  \
-        MYLOG(LOG_ALL, "to " FORMAT_LEN " to next read\n", self->fetch_number); \
+        self->fetch_number++;                                                   \
+        MYLOG(LOG_ALL, "to " FORMAT_LEN " to next read", self->fetch_number);   \
     } while (0)
 
 #define QR_get_message(self) \
@@ -283,7 +283,7 @@ void QR_set_next_token(QResultClass *self, const char *next_token);
     do {                                               \
         if (t = (tp *)malloc(s), NULL == t) {          \
             QR_set_rstatus(a, PORES_NO_MEMORY_ERROR);  \
-            mylog("QR_MALLOC_error\n");                 \
+            mylog("QR_MALLOC_error");                 \
             QR_free_memory(a);                         \
             QR_set_messageref(a, m);                   \
             return r;                                  \
@@ -294,7 +294,7 @@ void QR_set_next_token(QResultClass *self, const char *next_token);
         tp *tmp;                                        \
         if (tmp = (tp *)realloc(t, s), NULL == tmp) {   \
             QR_set_rstatus(a, PORES_NO_MEMORY_ERROR);   \
-            mylog("QR_REALLOC_error\n");                 \
+            mylog("QR_REALLOC_error");                 \
             QR_free_memory(a);                          \
             QR_set_messageref(a, m);                    \
             return r;                                   \
