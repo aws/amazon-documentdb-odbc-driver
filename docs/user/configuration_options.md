@@ -7,7 +7,7 @@
 | `Driver` | Driver name.| string | timestreamodbc |
 | `DSN` | **D**ata **S**ource **N**ame used for configuring the connection. | string | `<NONE>` |
 | `Auth` | Authentication mode. | one of `AWS_PROFILE`, `IAM`, `AAD`, `OKTA` | `AWS_PROFILE`
-| `LogLevel` | Severity level for driver logs. | one of `OFF`, `FATAL`, `ERROR`, `INFO`, `DEBUG`, `TRACE`, `ALL` | `OFF` |
+| `LogLevel` | Severity level for driver logs. | one of `OFF`, `FATAL`, `ERROR`, `WARNING`, `INFO`, `DEBUG`, `TRACE`, `ALL` | `OFF` |
 | `LogOutput` | Location for storing driver logs. | string | WIN: `<NONE>`, MAC/Linux: `/tmp` |
 
 #### AWS_PROFILE Options
@@ -16,12 +16,13 @@
 |--------|-------------|------|---------------|
 | `ProfileName` | Profile name for the AWS credentials. <NONE> means loading default credential chain. | string | `<NONE>` |
 | `Region` | The database's region. | string |`us-east-1`|
+
 #### AWS IAM Authentication Options
 
 | Option | Description | Type | Default |
 |--------|-------------|------|---------------|
-| `UID` / `AccessKeyId` | The AWS user access key id.| string | `<NONE>` |
-| `PWD` / `SecretAccessKey` | The AWS user secret access key. | string | `<NONE>` |
+| `UID` | The AWS user access key id.| string | `<NONE>` |
+| `PWD` | The AWS user secret access key. | string | `<NONE>` |
 | `SessionToken` | The temporary session token required to access a database with multi-factor authentication (MFA) enabled. | string | `<NONE>` |
 | `Region` | The database's region. | string |`us-east-1`|
 
@@ -46,8 +47,8 @@
 |--------|-------------|------|---------------|
 | `IdpName` | The Identity Provider (Idp) name to use for SAML-based authentication. One of Okta or AzureAD. | string | `<NONE>` |
 | `IdpHost` | The hostname of the specified Idp. | string | `<NONE>` |
-| `UID` / `IdpUserName` | The username for the specified Idp account. | string | `<NONE>` |
-| `PWD` / `IdpPassword` | The password for the specified Idp account. | string | `<NONE>` |
+| `UID` | The username for the specified Idp account. | string | `<NONE>` |
+| `PWD` | The password for the specified Idp account. | string | `<NONE>` |
 | `OktaApplicationID` | The unique Okta-provided ID associated with the Timestream application. A place to find the AppId is in the entityID field provided in the application metadata. | string | `<NONE>` |
 | `RoleARN` | The Amazon Resource Name (ARN) of the role that the caller is assuming. | string | `<NONE>` |
 | `IdpARN` | The Amazon Resource Name (ARN) of the SAML provider in IAM that describes the Idp. | string | `<NONE>` |
@@ -58,8 +59,8 @@
 |--------|-------------|------|---------------|
 | `IdpName` | The Identity Provider (Idp) name to use for SAML-based authentication. One of Okta or AzureAD. | string | `<NONE>` |
 | `IdpHost` | The hostname of the specified Idp. | string | `<NONE>` |
-| `UID` / `IdpUserName` | The username for the specified Idp account. | string | `<NONE>` |
-| `PWD` / `IdpPassword` | The password for the specified Idp account. | string | `<NONE>` |
+| `UID` | The username for the specified Idp account. | string | `<NONE>` |
+| `PWD` | The password for the specified Idp account. | string | `<NONE>` |
 | `AADApplicationID` | The unique id of the registered application on Azure AD. | string | `<NONE>` |
 | `AADClientSecret` | The client secret associated with the registered application on Azure AD used to authorize fetching tokens. | string | `<NONE>` |
 | `AADTenant` | The Azure AD Tenant ID. | string | `<NONE>` |
