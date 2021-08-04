@@ -439,7 +439,7 @@ RETCODE SQL_API API_CopyDesc(SQLHDESC SourceDescHandle,
             ard_tgt = &(target->ardf);
             MYPRINTF(LOG_DEBUG, " target=%p", ard_tgt);
             ARDFields_copy(ard_src, ard_tgt);
-            MYPRINTF(LOG_DEBUG, " offset_ptr=%p\n", ard_tgt->row_offset_ptr);
+            MYPRINTF(LOG_DEBUG, " offset_ptr=%p", ard_tgt->row_offset_ptr);
             break;
         case SQL_ATTR_APP_PARAM_DESC:
             if (!targethd->type_defined) {

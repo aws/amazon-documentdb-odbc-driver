@@ -209,7 +209,7 @@ char *ucs2_to_utf8(const SQLWCHAR *ucs2str, SQLLEN ilen, SQLLEN *olen,
             *olen = len;
     }
     if (loggable) {
-        MYPRINTF(0, " olen=%d utf8str=%s\n", len, utf8str ? utf8str : "");
+        MYPRINTF(0, " olen=%d utf8str=%s", len, utf8str ? utf8str : "");
     }
     return utf8str;
 }
@@ -351,7 +351,7 @@ cleanup:
     }
     if (ocount < bufcount && ucs2str)
         ucs2str[ocount] = 0;
-    MYPRINTF(LOG_ALL, " ocount=" FORMAT_ULEN "\n", ocount);
+    MYPRINTF(LOG_ALL, " ocount=" FORMAT_ULEN, ocount);
     return rtn;
 }
 
