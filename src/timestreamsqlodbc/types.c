@@ -73,7 +73,7 @@ static Int4 getCharColumnSizeX(const ConnectionClass *conn, OID type,
                                int handle_unknown_size_as) {
     int p = -1, maxsize;
     MYLOG(LOG_TRACE,
-          "entering type=%d, atttypmod=%d, adtsize_or=%d, unknown = %d\n", type,
+          "entering type=%d, atttypmod=%d, adtsize_or=%d, unknown = %d", type,
           atttypmod, adtsize_or_longestlen, handle_unknown_size_as);
 
     maxsize = MAX_VARCHAR_SIZE;
@@ -89,19 +89,19 @@ static Int4 getCharColumnSizeX(const ConnectionClass *conn, OID type,
      * Static ColumnSize (i.e., the Maximum ColumnSize of the datatype) This
      * has nothing to do with a result set.
      */
-    MYLOG(LOG_DEBUG, "!!! atttypmod  < 0 ?\n");
+    MYLOG(LOG_DEBUG, "!!! atttypmod  < 0 ?");
     if (atttypmod < 0 && adtsize_or_longestlen < 0)
         return maxsize;
 
-    MYLOG(LOG_DEBUG, "!!! adtsize_or_logngest=%d\n", adtsize_or_longestlen);
+    MYLOG(LOG_DEBUG, "!!! adtsize_or_logngest=%d", adtsize_or_longestlen);
     p = adtsize_or_longestlen; /* longest */
                                /*
                                 * Catalog Result Sets -- use assigned column width (i.e., from
                                 * set_tuplefield_string)
                                 */
-    MYLOG(LOG_DEBUG, "!!! catalog_result=%d\n", handle_unknown_size_as);
+    MYLOG(LOG_DEBUG, "!!! catalog_result=%d", handle_unknown_size_as);
     if (UNKNOWNS_AS_LONGEST == handle_unknown_size_as) {
-        MYLOG(LOG_DEBUG, "LONGEST: p = %d\n", p);
+        MYLOG(LOG_DEBUG, "LONGEST: p = %d", p);
         if (p > 0 && (atttypmod < 0 || atttypmod > p))
             return p;
     }
@@ -147,7 +147,7 @@ static Int4 getCharColumnSizeX(const ConnectionClass *conn, OID type,
 static SQLSMALLINT getTimestampDecimalDigitsX(const ConnectionClass *conn,
                                               OID type, int atttypmod) {
     UNUSED(conn);
-    MYLOG(LOG_DEBUG, "type=%d, atttypmod=%d\n", type, atttypmod);
+    MYLOG(LOG_DEBUG, "type=%d, atttypmod=%d", type, atttypmod);
     return (SQLSMALLINT)(atttypmod > -1 ? atttypmod : 6);
 }
 
@@ -155,7 +155,7 @@ static SQLSMALLINT getTimestampDecimalDigitsX(const ConnectionClass *conn,
 static SQLSMALLINT getIntervalDecimalDigits(OID type, int atttypmod) {
     Int4 prec;
 
-    MYLOG(LOG_TRACE, "entering type=%d, atttypmod=%d\n", type, atttypmod);
+    MYLOG(LOG_TRACE, "entering type=%d, atttypmod=%d", type, atttypmod);
 
     if ((atttypmod & SECOND_BIT) == 0)
         return 0;

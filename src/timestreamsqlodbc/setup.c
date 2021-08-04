@@ -129,7 +129,7 @@ BOOL CALLBACK ConfigDSN(HWND hwnd, WORD fRequest, LPCSTR lpszDriver,
                  == DialogBoxParam(s_hModule, MAKEINTRESOURCE(DLG_CONFIG), hwnd,
                                    ConfigDlgProc, (LPARAM)lpsetupdlg));
         } else if (lpsetupdlg->ci.dsn[0]) {
-            MYLOG(LOG_DEBUG, "SetDSNAttributes\n");
+            MYLOG(LOG_DEBUG, "SetDSNAttributes");
             fSuccess = SetDSNAttributes(hwnd, lpsetupdlg, NULL);
         } else
             fSuccess = FALSE;
@@ -585,7 +585,7 @@ static void ParseAttributes(LPCSTR lpszAttributes, LPSETUPDLG lpsetupdlg) {
         /* lpsetupdlg->aAttr[iElement].fSupplied = TRUE; */
         memcpy(value, lpszStart, MIN(lpsz - lpszStart + 1, MAXESPATH));
 
-        MYLOG(LOG_DEBUG, "aszKey='%s', value='%s'\n", aszKey, value);
+        MYLOG(LOG_DEBUG, "aszKey='%s', value='%s'", aszKey, value);
 
         /* Copy the appropriate value to the conninfo  */
         copyConnAttributes(&lpsetupdlg->ci, aszKey, value);
