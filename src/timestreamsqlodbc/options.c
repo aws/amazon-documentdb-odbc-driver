@@ -65,7 +65,7 @@ static RETCODE set_statement_option(ConnectionClass *conn, StatementClass *stmt,
             }
             if (setval != vParam)
                 changed = TRUE;
-            MYPRINTF(0, "-> " FORMAT_LEN "\n", setval);
+            MYPRINTF(0, "-> " FORMAT_LEN, setval);
             break;
 
         case SQL_CURSOR_TYPE:
@@ -97,7 +97,7 @@ static RETCODE set_statement_option(ConnectionClass *conn, StatementClass *stmt,
             }
             if (setval != vParam)
                 changed = TRUE;
-            MYPRINTF(0, "-> " FORMAT_LEN "\n", setval);
+            MYPRINTF(0, "-> " FORMAT_LEN, setval);
             break;
 
         case SQL_KEYSET_SIZE: /* ignored, but saved and returned	*/
@@ -494,7 +494,7 @@ RETCODE SQL_API API_GetConnectOption(HDBC hdbc, SQLUSMALLINT fOption,
 #endif /* SQL_ATTR_CONNECTION_DEAD */
             MYLOG(LOG_DEBUG, "CONNECTION_DEAD status=%d", conn->status);
             *((SQLUINTEGER *)pvParam) = CC_not_connected(conn);
-            MYPRINTF(0, " val=" FORMAT_UINTEGER "\n",
+            MYPRINTF(0, " val=" FORMAT_UINTEGER,
                      *((SQLUINTEGER *)pvParam));
             break;
 

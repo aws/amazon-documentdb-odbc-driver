@@ -473,7 +473,7 @@ void SC_set_rowset_start(StatementClass *stmt, SQLLEN start, BOOL valid_base) {
                  QR_has_valid_base(res) ? "valid" : "unknown");
     }
     stmt->rowset_start = start;
-    MYPRINTF(LOG_DEBUG, ":stmt result=" FORMAT_LEN "\n", stmt->rowset_start);
+    MYPRINTF(LOG_DEBUG, ":stmt result=" FORMAT_LEN, stmt->rowset_start);
 }
 void SC_inc_rowset_start(StatementClass *stmt, SQLLEN inc) {
     SQLLEN start = stmt->rowset_start + inc;
