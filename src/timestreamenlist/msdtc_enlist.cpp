@@ -66,7 +66,7 @@ BOOL WINAPI DllMain(HANDLE hInst, ULONG ul_reason_for_call, LPVOID lpReserved) {
             s_hModule = (HINSTANCE)hInst; /* Save for dialog boxes */
             break;
         case DLL_PROCESS_DETACH:
-            mylog("DETACHING esenlist\n");
+            mylog("DETACHING esenlist");
             break;
     }
     return TRUE;
@@ -307,7 +307,7 @@ IAsyncES::~IAsyncES(void) {
     SLOCK_RELEASE();
     LIFELOCK_RELEASE;
     if (fconn) {
-        mylog("IAsyncES Destructor is freeing the connection\n");
+        mylog("IAsyncES Destructor is freeing the connection");
         EsDtc_free_connect(fconn);
     }
     DeleteCriticalSection(&as_spin);
@@ -317,7 +317,7 @@ IAsyncES::~IAsyncES(void) {
 }
 HRESULT STDMETHODCALLTYPE IAsyncES::QueryInterface(REFIID riid,
                                                    void **ppvObject) {
-    mylog("%p QueryInterface called\n", this);
+    mylog("%p QueryInterface called", this);
     if (riid == IID_IUnknown || riid == IID_ITransactionResourceAsync) {
         *ppvObject = this;
         AddRef();
@@ -330,7 +330,7 @@ HRESULT STDMETHODCALLTYPE IAsyncES::QueryInterface(REFIID riid,
 //	acquire/releases SLOCK.
 //
 ULONG STDMETHODCALLTYPE IAsyncES::AddRef(void) {
-    mylog("%p->AddRef called\n", this);
+    mylog("%p->AddRef called", this);
     SLOCK_ACQUIRE();
     refcnt++;
     SLOCK_RELEASE();
@@ -340,7 +340,7 @@ ULONG STDMETHODCALLTYPE IAsyncES::AddRef(void) {
 //	acquire/releases [ELOCK -> LIFELOCK -> ] SLOCK.
 //
 ULONG STDMETHODCALLTYPE IAsyncES::Release(void) {
-    mylog("%p->Release called refcnt=%d\n", this, refcnt);
+    mylog("%p->Release called refcnt=%d", this, refcnt);
     SLOCK_ACQUIRE();
     refcnt--;
     if (refcnt <= 0) {
@@ -350,7 +350,7 @@ ULONG STDMETHODCALLTYPE IAsyncES::Release(void) {
         SLOCK_ACQUIRE();
         if (refcnt <= 0) {
             const int refcnt_copy = refcnt;
-            mylog("delete %p\n", this);
+            mylog("delete %p", this);
             delete this;
             return refcnt_copy;
         } else {
@@ -367,7 +367,7 @@ ULONG STDMETHODCALLTYPE IAsyncES::Release(void) {
 //	Acquire/release SLOCK.
 //
 void IAsyncES::Wait_pThread(bool slock_hold) {
-    mylog("Wait_pThread %d in\n", slock_hold);
+    mylog("Wait_pThread %d in", slock_hold);
     HANDLE wThread;
     int wait_idx = PrepareExec;
     DWORD ret;
@@ -383,7 +383,7 @@ void IAsyncES::Wait_pThread(bool slock_hold) {
     }
     if (!slock_hold)
         SLOCK_RELEASE();
-    mylog("Wait_pThread out\n");
+    mylog("Wait_pThread out");
 }
 
 //
@@ -394,7 +394,7 @@ void IAsyncES::Wait_cThread(bool slock_hold, bool once) {
     int wait_idx;
     DWORD ret;
 
-    mylog("Wait_cThread %d,%d in\n", slock_hold, once);
+    mylog("Wait_cThread %d,%d in", slock_hold, once);
     if (!slock_hold)
         SLOCK_ACQUIRE();
     if (NULL != eThread[CommitExec])
@@ -412,7 +412,7 @@ void IAsyncES::Wait_cThread(bool slock_hold, bool once) {
     }
     if (!slock_hold)
         SLOCK_RELEASE();
-    mylog("Wait_cThread out\n");
+    mylog("Wait_cThread out");
 }
 
 /* Processing Prepare/Commit Request */
@@ -441,7 +441,7 @@ void IAsyncES::SetDone(HRESULT res) {
             LIFELOCK_RELEASE;
             ELOCK_ACQUIRE();
             if (dtcconn) {
-                mylog("Freeing isolated connection=%p\n", dtcconn);
+                mylog("Freeing isolated connection=%p", dtcconn);
                 EsDtc_free_connect(dtcconn);
                 SetConnection(NULL);
             }
@@ -461,7 +461,7 @@ void IAsyncES::SetDone(HRESULT res) {
 //	Acquire/releases [ELOCK -> LIFELOCK -> ] SLOCK.
 //
 void *IAsyncES::generateXAConn(bool spinAcquired) {
-    mylog("generateXAConn isolated=%d dtcconn=%p\n", isolated, dtcconn);
+    mylog("generateXAConn isolated=%d dtcconn=%p", isolated, dtcconn);
     if (!spinAcquired)
         SLOCK_ACQUIRE();
     if (isolated || done) {
@@ -494,7 +494,7 @@ void *IAsyncES::generateXAConn(bool spinAcquired) {
 void *IAsyncES::isolateXAConn(bool spinAcquired, bool continueConnection) {
     void *sconn;
 
-    mylog("isolateXAConn isolated=%d dtcconn=%p\n", isolated, dtcconn);
+    mylog("isolateXAConn isolated=%d dtcconn=%p", isolated, dtcconn);
     if (!spinAcquired)
         SLOCK_ACQUIRE();
     if (isolated || done || NULL == dtcconn) {
@@ -530,7 +530,7 @@ void *IAsyncES::isolateXAConn(bool spinAcquired, bool continueConnection) {
 //	Acquire/releases [ELOCK -> LIFELOCK -> ] SLOCK.
 //
 void *IAsyncES::separateXAConn(bool spinAcquired, bool continueConnection) {
-    mylog("%s isolated=%d dtcconn=%p\n", __func__, isolated, dtcconn);
+    mylog("%s isolated=%d dtcconn=%p", __func__, isolated, dtcconn);
     if (!spinAcquired)
         SLOCK_ACQUIRE();
     if (prepared)
@@ -587,7 +587,7 @@ HRESULT IAsyncES::RequestExec(DWORD type, HRESULT res) {
     void *econn;
     char esxid[258];
 
-    mylog("%p->RequestExec type=%d conn=%p\n", this, type, dtcconn);
+    mylog("%p->RequestExec type=%d conn=%p", this, type, dtcconn);
     XidToText(xid, esxid);
 #ifdef _SLEEP_FOR_TEST_
     /*Sleep(2000);*/
@@ -663,7 +663,7 @@ HRESULT IAsyncES::RequestExec(DWORD type, HRESULT res) {
         enlist->Release();
     }
     ELOCK_RELEASE();
-    mylog("%p->Done ret=%d\n", this, ret);
+    mylog("%p->Done ret=%d", this, ret);
     return ret;
 }
 
@@ -672,7 +672,7 @@ HRESULT IAsyncES::RequestExec(DWORD type, HRESULT res) {
 //	 	or 	[ELOCK -> LIFELOCK -> ] SLOCK.
 //
 HRESULT IAsyncES::ReleaseConnection(void) {
-    mylog("%p->ReleaseConnection\n", this);
+    mylog("%p->ReleaseConnection", this);
 
     SLOCK_ACQUIRE();
     if (isolated || NULL == dtcconn) {
@@ -690,7 +690,7 @@ HRESULT IAsyncES::ReleaseConnection(void) {
         isolateXAConn(true, false);
     } else
         SLOCK_RELEASE();
-    mylog("%p->ReleaseConnection exit\n", this);
+    mylog("%p->ReleaseConnection exit", this);
     return SQL_SUCCESS;
 }
 
@@ -709,7 +709,7 @@ HRESULT STDMETHODCALLTYPE IAsyncES::PrepareRequest(BOOL fRetaining, DWORD grfRM,
     RequestPara *reqp;
     const DWORD reqtype = PrepareExec;
 
-    mylog("%p PrepareRequest called grhRM=%d enl=%p\n", this, grfRM, enlist);
+    mylog("%p PrepareRequest called grhRM=%d enl=%p", this, grfRM, enlist);
     SLOCK_ACQUIRE();
     if (dtcconn && 0 != EsDtc_get_property(dtcconn, errorNumber))
         res = ret = E_FAIL;
@@ -717,7 +717,7 @@ HRESULT STDMETHODCALLTYPE IAsyncES::PrepareRequest(BOOL fRetaining, DWORD grfRM,
         ret = S_OK;
         if (fSinglePhase) {
             res = XACT_S_SINGLEPHASE;
-            mylog("XACT is singlePhase\n");
+            mylog("XACT is singlePhase");
         } else
             res = S_OK;
     }
@@ -762,7 +762,7 @@ HRESULT STDMETHODCALLTYPE IAsyncES::CommitRequest(DWORD grfRM,
     RequestPara *reqp;
     const DWORD reqtype = CommitExec;
 
-    mylog("%p CommitRequest called grfRM=%d enl=%p\n", this, grfRM, enlist);
+    mylog("%p CommitRequest called grfRM=%d enl=%p", this, grfRM, enlist);
 
     SLOCK_ACQUIRE();
     if (!prepared || done)
@@ -800,7 +800,7 @@ HRESULT STDMETHODCALLTYPE IAsyncES::CommitRequest(DWORD grfRM,
          */
         _beginthread(CloseCommitThread, 0, (void *)this);
     }
-    mylog("CommitRequest ret=%d\n", ret);
+    mylog("CommitRequest ret=%d", ret);
     requestAccepted = true;
     ELOCK_RELEASE();
     Release();
@@ -817,7 +817,7 @@ HRESULT STDMETHODCALLTYPE IAsyncES::AbortRequest(BOID *pboidReason,
     RequestPara *reqp;
     const DWORD reqtype = AbortExec;
 
-    mylog("%p AbortRequest called\n", this);
+    mylog("%p AbortRequest called", this);
     SLOCK_ACQUIRE();
     if (done)
         ret = E_UNEXPECTED;
@@ -863,7 +863,7 @@ HRESULT STDMETHODCALLTYPE IAsyncES::AbortRequest(BOID *pboidReason,
          */
         _beginthread(CloseAbortThread, 0, (void *)this);
     }
-    mylog("AbortRequest ret=%d\n", ret);
+    mylog("AbortRequest ret=%d", ret);
     requestAccepted = true;
     ELOCK_RELEASE();
     Release();
@@ -871,7 +871,7 @@ HRESULT STDMETHODCALLTYPE IAsyncES::AbortRequest(BOID *pboidReason,
     return ret;
 }
 HRESULT STDMETHODCALLTYPE IAsyncES::TMDown(void) {
-    mylog("%p TMDown called\n", this);
+    mylog("%p TMDown called", this);
     return S_OK;
 }
 
@@ -881,7 +881,7 @@ bool IAsyncES::CloseThread(DWORD type) {
     DWORD ret, excode = S_OK;
     bool rls_async = false;
 
-    mylog("%s for %p thread=%d\n", func, this, eThread[type]);
+    mylog("%s for %p thread=%d", func, this, eThread[type]);
     if (th = eThread[type], NULL == th || eFin[type])
         return false;
     ret = WaitForSingleObject(th, INFINITE);
@@ -902,7 +902,7 @@ bool IAsyncES::CloseThread(DWORD type) {
         SLOCK_RELEASE();
         CloseHandle(th);
     }
-    mylog("%s ret=%d\n", func, ret);
+    mylog("%s ret=%d", func, ret);
     return rls_async;
 }
 
@@ -914,7 +914,7 @@ EXTERN_C static void __cdecl ClosePrepareThread(LPVOID para) {
     mylog("%s for %p", func, async);
     if (release = async->CloseThread(IAsyncES::PrepareExec), release)
         async->Release();
-    mylog("%s release=%d\n", func, release);
+    mylog("%s release=%d", func, release);
 }
 
 EXTERN_C static void __cdecl CloseCommitThread(LPVOID para) {
@@ -925,7 +925,7 @@ EXTERN_C static void __cdecl CloseCommitThread(LPVOID para) {
     mylog("%s for %p", func, async);
     if (release = async->CloseThread(IAsyncES::CommitExec), release)
         async->Release();
-    mylog("%s release=%d\n", func, release);
+    mylog("%s release=%d", func, release);
 }
 
 EXTERN_C static void __cdecl CloseAbortThread(LPVOID para) {
@@ -936,7 +936,7 @@ EXTERN_C static void __cdecl CloseAbortThread(LPVOID para) {
     mylog("%s for %p", func, async);
     if (release = async->CloseThread(IAsyncES::AbortExec), release)
         async->Release();
-    mylog("%s release=%d\n", func, release);
+    mylog("%s release=%d", func, release);
 }
 
 EXTERN_C static unsigned WINAPI DtcRequestExec(LPVOID para) {
@@ -948,7 +948,7 @@ EXTERN_C static unsigned WINAPI DtcRequestExec(LPVOID para) {
     mylog("DtcRequestExec type=%d", reqp->type);
     delete (reqp);
     ret = async->RequestExec(type, res);
-    mylog(" Done ret=%d\n", ret);
+    mylog(" Done ret=%d", ret);
     return ret;
 }
 
@@ -970,10 +970,10 @@ static int regkeyCheck(const char *xalibname, const char *xalibpath) {
             ret = ::RegCreateKeyEx(HKEY_LOCAL_MACHINE, regKey, 0, NULL,
                                    REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS,
                                    NULL, &sKey, NULL);
-            mylog("%s:CreateKeyEx ret=%d\n", __func__, ret);
+            mylog("%s:CreateKeyEx ret=%d", __func__, ret);
             break;
         default:
-            mylog("%s:OpenKeyEx ret=%d\n", __func__, ret);
+            mylog("%s:OpenKeyEx ret=%d", __func__, ret);
     }
     if (ERROR_SUCCESS != ret)
         return -1;
@@ -987,18 +987,18 @@ static int regkeyCheck(const char *xalibname, const char *xalibpath) {
                 if (rSize > 0) {
                     if (0 == _stricmp(keyval, xalibpath))
                         break;
-                    mylog("%s:XADLL value %s is different from %s\n",
+                    mylog("%s:XADLL value %s is different from %s",
                           __func__, keyval, xalibpath);
                     if (IsWow64()) {
                         mylog(
                             "%s:avoid RegSetValue operation from wow64 "
-                            "process\n",
+                            "process",
                             __func__);
                         break;
                     }
                 }
             case ERROR_FILE_NOT_FOUND:
-                mylog("%s:Setting value %s\n", __func__, xalibpath);
+                mylog("%s:Setting value %s", __func__, xalibpath);
                 ret = ::RegSetValueEx(sKey, xalibname, 0, REG_SZ,
                                       (CONST BYTE *)xalibpath,
                                       (DWORD)strlen(xalibpath) + 1);
@@ -1006,12 +1006,12 @@ static int regkeyCheck(const char *xalibname, const char *xalibpath) {
                     retcode = 1;
                 else {
                     retcode = -1;
-                    mylog("%s:SetValuEx ret=%d\n", __func__, ret);
+                    mylog("%s:SetValuEx ret=%d", __func__, ret);
                 }
                 break;
             default:
                 retcode = -1;
-                mylog("%s:QueryValuEx ret=%d\n", __func__, ret);
+                mylog("%s:QueryValuEx ret=%d", __func__, ret);
                 break;
         }
         ::RegCloseKey(sKey);
@@ -1039,14 +1039,14 @@ RETCODE static EnlistInDtc_1pipe(void *conn, ITransaction *pTra,
         res = pDtc->QueryInterface(IID_IDtcToXaHelperSinglePipe,
                                    (void **)&pHelper);
         if (res != S_OK || !pHelper) {
-            mylog("DtcToXaHelperSingelPipe get error %d\n", res);
+            mylog("DtcToXaHelperSingelPipe get error %d", res);
             pHelper = NULL;
             return SQL_ERROR;
         }
     }
     res = (NULL != (asdum = new IAsyncES)) ? S_OK : E_FAIL;
     if (S_OK != res) {
-        mylog("CoCreateInstance error %d\n", res);
+        mylog("CoCreateInstance error %d", res);
         return SQL_ERROR;
     }
 
@@ -1061,7 +1061,7 @@ RETCODE static EnlistInDtc_1pipe(void *conn, ITransaction *pTra,
                 return SQL_ERROR;
             }
     }
-    /*mylog("dllname=%s dsn=%s\n", xalibname, conn->connInfo.dsn); res = 0;*/
+    /*mylog("dllname=%s dsn=%s", xalibname, conn->connInfo.dsn); res = 0;*/
     char dtcname[1024];
     EsDtc_create_connect_string(conn, dtcname, sizeof(dtcname));
 
@@ -1070,7 +1070,7 @@ RETCODE static EnlistInDtc_1pipe(void *conn, ITransaction *pTra,
     while (true) {
         res = pHelper->XARMCreate(dtcname, (char *)xalibname, &dwRMCookie);
 
-        mylog("XARMcreate error code=%x (%d %d)\n", res, confirmedRegkey,
+        mylog("XARMcreate error code=%x (%d %d)", res, confirmedRegkey,
               confirmingLink);
         xarmerr = true;
         if (!confirmingLink)
@@ -1157,13 +1157,13 @@ RETCODE static EnlistInDtc_1pipe(void *conn, ITransaction *pTra,
 
     res = pHelper->ConvertTridToXID((DWORD *)pTra, dwRMCookie, &xid);
     if (res != S_OK) {
-        mylog("ConvertTridToXid error %d\n", res);
+        mylog("ConvertTridToXid error %d", res);
         return SQL_ERROR;
     }
     {
         char esxid[258];
         XidToText(xid, esxid);
-        mylog("ConvertTridToXID -> %s\n", esxid);
+        mylog("ConvertTridToXID -> %s", esxid);
     }
     asdum->SetXid(&xid);
     /* Create an IAsyncES instance by myself */
@@ -1173,12 +1173,12 @@ RETCODE static EnlistInDtc_1pipe(void *conn, ITransaction *pTra,
     asdum->SetHelper(pHelper, dwRMCookie);
     res = pHelper->EnlistWithRM(dwRMCookie, pTra, asdum, &asdum->enlist);
     if (res != S_OK) {
-        mylog("EnlistWithRM error %d\n", res);
+        mylog("EnlistWithRM error %d", res);
         pHelper->ReleaseRMCookie(dwRMCookie, TRUE);
         return SQL_ERROR;
     }
 
-    mylog("asdum=%p start transaction\n", asdum);
+    mylog("asdum=%p start transaction", asdum);
     asdum->SetConnection(conn);
     LIFELOCK_ACQUIRE;
     EsDtc_set_async(conn, asdum);
@@ -1214,7 +1214,7 @@ static ITransactionDispenser *getITransactionDispenser(DWORD grfOptions,
 
                                          grfOptions, NULL, (void **)&pDtc);
         if (FAILED(res)) {
-            mylog("DtcGetTransactionManager error %x\n", res);
+            mylog("DtcGetTransactionManager error %x", res);
             pDtc = NULL;
         }
     }
@@ -1280,7 +1280,7 @@ EXTERN_C RETCODE EnlistInDtc(void *conn, void *pTra, int method) {
 }
 
 EXTERN_C RETCODE DtcOnDisconnect(void *conn) {
-    mylog("DtcOnDisconnect\n");
+    mylog("DtcOnDisconnect");
     LIFELOCK_ACQUIRE;
     IAsyncES *asdum = (IAsyncES *)EsDtc_get_async(conn);
     if (asdum) {

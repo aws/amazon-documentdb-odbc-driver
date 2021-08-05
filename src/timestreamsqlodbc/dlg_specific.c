@@ -226,7 +226,7 @@ BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
              || stricmp(attribute, INI_PWD) == 0
              || stricmp(attribute, INI_IDP_PASSWORD) == 0) {
         STR_TO_NAME(ci->pwd, value);
-        MYLOG(LOG_DEBUG, "key='%s' value='xxxxxxxx'\n", attribute);
+        MYLOG(LOG_DEBUG, "key='%s' value='xxxxxxxx'", attribute);
         printed = TRUE;
     } else if (stricmp(attribute, INI_SESSION_TOKEN) == 0)
         STRCPY_FIXED(ci->session_token, value);
@@ -262,7 +262,7 @@ BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
         STRCPY_FIXED(ci->aad_application_id, value);
     else if (stricmp(attribute, INI_AAD_CLIENT_SECRET) == 0) {
         STRCPY_FIXED(ci->aad_client_secret, value);
-        MYLOG(LOG_DEBUG, "key='%s' value='xxxxxxxx'\n", attribute);
+        MYLOG(LOG_DEBUG, "key='%s' value='xxxxxxxx'", attribute);
         printed = TRUE;
     } else if (stricmp(attribute, INI_AAD_TENANT) == 0)
         STRCPY_FIXED(ci->aad_tenant, value);
@@ -272,7 +272,7 @@ BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
         found = FALSE;
 
     if (!printed)
-        MYLOG(LOG_DEBUG, "key='%s' value='%s'%s\n", attribute, value,
+        MYLOG(LOG_DEBUG, "key='%s' value='%s'%s", attribute, value,
               found ? NULL_STRING : " not found");
 
     return found;
@@ -365,7 +365,7 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
 
     if (!drivername[0] && DSN[0])
         getDriverNameFromDSN(DSN, (char *)drivername, sizeof(ci->drivername));
-    MYLOG(LOG_DEBUG, "drivername=%s\n", drivername);
+    MYLOG(LOG_DEBUG, "drivername=%s", drivername);
     if (!drivername[0])
         drivername = INVALID_DRIVER;
     getDriversDefaults(drivername, &(ci->drivers));
@@ -561,7 +561,7 @@ void CC_conninfo_release(ConnInfo *conninfo) {
 }
 
 void CC_conninfo_init(ConnInfo *conninfo, UInt4 option) {
-    MYLOG(LOG_TRACE, "entering opt=%d\n", option);
+    MYLOG(LOG_TRACE, "entering opt=%d", option);
 
     if (0 != (CLEANUP_FOR_REUSE & option))
         CC_conninfo_release(conninfo);
