@@ -100,7 +100,7 @@ else()
         endif()
         set(CPACK_GENERATOR "DEB")
         set(CPACK_PACKAGE_VERSION_MAJOR "0")
-        set(CPACK_PACKAGE_VERSION_MINOR "2")
+        set(CPACK_PACKAGE_VERSION_MINOR "5")
         set(CPACK_PACKAGE_VERSION_PATCH "0")
 
         # TODO: Need to update both of these.

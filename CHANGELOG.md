@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.5.0](https://github.com/Bit-Quill/timestream-odbc/releases/tag/v0.5.0) - 2021-08-04
+### Added
+- More connection tests.
+
+### Fixed
+- Removed the version and bitness from the default path in the Windows ODBC installers.
+- Set the default log level to "OFF" instead of "WARNING".
+- Updated the DSN setup documentation for Windows.
+- AWS AppSec Finding: Added nullptr checks before dereferencing.
+- Tab order in ODBC UI for Windows.
+- Hid fields in the ODBC UI for Windows instead of disabling them.
+- Automated SQLCancel tests.
+
 ## [v0.4.3](https://github.com/Bit-Quill/timestream-odbc/releases/tag/v0.4.3) - 2021-07-29
 ### Added
 - Merged tests into one executable
