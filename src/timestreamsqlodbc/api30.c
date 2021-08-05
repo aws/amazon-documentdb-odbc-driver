@@ -36,7 +36,7 @@ RETCODE SQL_API API_GetDiagRec(SQLSMALLINT HandleType, SQLHANDLE Handle,
                                  SQLSMALLINT *TextLength) {
     RETCODE ret;
 
-    MYLOG(LOG_TRACE, "entering type=%d rec=%d\n", HandleType, RecNumber);
+    MYLOG(LOG_TRACE, "entering type=%d rec=%d", HandleType, RecNumber);
     switch (HandleType) {
         case SQL_HANDLE_ENV:
             ret = API_EnvError(Handle, RecNumber, Sqlstate, NativeError,
@@ -57,7 +57,7 @@ RETCODE SQL_API API_GetDiagRec(SQLSMALLINT HandleType, SQLHANDLE Handle,
         default:
             ret = SQL_ERROR;
     }
-    MYLOG(LOG_TRACE, "leaving %d\n", ret);
+    MYLOG(LOG_TRACE, "leaving %d", ret);
     return ret;
 }
 
@@ -78,7 +78,7 @@ RETCODE SQL_API API_GetDiagField(SQLSMALLINT HandleType, SQLHANDLE Handle,
     ssize_t rtnlen = -1;
     int rtnctype = SQL_C_CHAR;
 
-    MYLOG(LOG_TRACE, "entering rec=%d\n", RecNumber);
+    MYLOG(LOG_TRACE, "entering rec=%d", RecNumber);
     switch (HandleType) {
         case SQL_HANDLE_ENV:
             switch (DiagIdentifier) {
@@ -265,7 +265,7 @@ RETCODE SQL_API API_GetDiagField(SQLSMALLINT HandleType, SQLHANDLE Handle,
                             rc = QR_get_num_total_tuples(res) - res->dl_count;
                     }
                     *((SQLLEN *)DiagInfoPtr) = rc;
-                    MYLOG(LOG_ALL, "rc=" FORMAT_LEN "\n", rc);
+                    MYLOG(LOG_ALL, "rc=" FORMAT_LEN, rc);
                     ret = SQL_SUCCESS;
                     break;
                 case SQL_DIAG_ROW_COUNT:
@@ -351,7 +351,7 @@ RETCODE SQL_API API_GetDiagField(SQLSMALLINT HandleType, SQLHANDLE Handle,
         if (StringLengthPtr)
             *StringLengthPtr = (SQLSMALLINT)rtnlen;
     }
-    MYLOG(LOG_TRACE, "leaving %d\n", ret);
+    MYLOG(LOG_TRACE, "leaving %d", ret);
     return ret;
 }
 
@@ -364,7 +364,7 @@ RETCODE SQL_API API_GetConnectAttr(HDBC ConnectionHandle,
     RETCODE ret = SQL_SUCCESS;
     SQLINTEGER len = 4;
 
-    MYLOG(LOG_TRACE, "entering " FORMAT_INTEGER "\n", Attribute);
+    MYLOG(LOG_TRACE, "entering " FORMAT_INTEGER, Attribute);
     switch (Attribute) {
         case SQL_ATTR_ASYNC_ENABLE:
             *((SQLINTEGER *)Value) = SQL_ASYNC_ENABLE_OFF;
@@ -636,13 +636,13 @@ static RETCODE SQL_API APDSetField(DescriptorClass *desc, SQLSMALLINT RecNumber,
             break;
     }
     if (RecNumber <= 0) {
-        MYLOG(LOG_ALL, "RecN=%d allocated=%d\n", RecNumber, opts->allocated);
+        MYLOG(LOG_ALL, "RecN=%d allocated=%d", RecNumber, opts->allocated);
         DC_set_error(desc, DESC_BAD_PARAMETER_NUMBER_ERROR,
                      "bad parameter number");
         return SQL_ERROR;
     }
     if (RecNumber > opts->allocated) {
-        MYLOG(LOG_ALL, "RecN=%d allocated=%d\n", RecNumber, opts->allocated);
+        MYLOG(LOG_ALL, "RecN=%d allocated=%d", RecNumber, opts->allocated);
         parameter_bindings_set(opts, RecNumber, TRUE);
         /* DC_set_error(desc, DESC_BAD_PARAMETER_NUMBER_ERROR,
                 "bad parameter number");
@@ -808,7 +808,7 @@ static RETCODE SQL_API IPDSetField(DescriptorClass *desc, SQLSMALLINT RecNumber,
 #pragma GCC diagnostic pop
 #endif // __linux__
     if (RecNumber <= 0 || RecNumber > ipdopts->allocated) {
-        MYLOG(LOG_ALL, "RecN=%d allocated=%d\n", RecNumber, ipdopts->allocated);
+        MYLOG(LOG_ALL, "RecN=%d allocated=%d", RecNumber, ipdopts->allocated);
         DC_set_error(desc, DESC_BAD_PARAMETER_NUMBER_ERROR,
                      "bad parameter number");
         return SQL_ERROR;
@@ -1080,7 +1080,7 @@ static RETCODE SQL_API APDGetField(DescriptorClass *desc, SQLSMALLINT RecNumber,
             break;
         default:
             if (RecNumber <= 0 || RecNumber > opts->allocated) {
-                MYLOG(LOG_ALL, "RecN=%d allocated=%d\n", RecNumber,
+                MYLOG(LOG_ALL, "RecN=%d allocated=%d", RecNumber,
                       opts->allocated);
                 DC_set_error(desc, DESC_BAD_PARAMETER_NUMBER_ERROR,
                              "bad parameter number");
@@ -1345,7 +1345,7 @@ static RETCODE SQL_API IPDGetField(DescriptorClass *desc, SQLSMALLINT RecNumber,
             break;
         default:
             if (RecNumber <= 0 || RecNumber > ipdopts->allocated) {
-                MYLOG(LOG_ALL, "RecN=%d allocated=%d\n", RecNumber,
+                MYLOG(LOG_ALL, "RecN=%d allocated=%d", RecNumber,
                       ipdopts->allocated);
                 DC_set_error(desc, DESC_BAD_PARAMETER_NUMBER_ERROR,
                              "bad parameter number");
@@ -1478,7 +1478,7 @@ RETCODE SQL_API API_GetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
     RETCODE ret = SQL_SUCCESS;
     SQLINTEGER len = 0;
 
-    MYLOG(LOG_TRACE, "entering Handle=%p " FORMAT_INTEGER "\n", StatementHandle,
+    MYLOG(LOG_TRACE, "entering Handle=%p " FORMAT_INTEGER, StatementHandle,
           Attribute);
     switch (Attribute) {
         case SQL_ATTR_FETCH_BOOKMARK_PTR: /* 16 */
@@ -1583,7 +1583,7 @@ RETCODE SQL_API API_SetConnectAttr(HDBC ConnectionHandle,
     BOOL unsupported = FALSE;
     int newValue;
 
-    MYLOG(LOG_TRACE, "entering for %p: " FORMAT_INTEGER " %p\n",
+    MYLOG(LOG_TRACE, "entering for %p: " FORMAT_INTEGER " %p",
           ConnectionHandle, Attribute, Value);
     switch (Attribute) {
         case SQL_ATTR_METADATA_ID:
@@ -1591,11 +1591,11 @@ RETCODE SQL_API API_SetConnectAttr(HDBC ConnectionHandle,
             break;
         case SQL_ATTR_ANSI_APP:
             if (SQL_AA_FALSE != CAST_PTR(SQLINTEGER, Value)) {
-                MYLOG(LOG_DEBUG, "the application is ansi\n");
+                MYLOG(LOG_DEBUG, "the application is ansi");
                 if (CC_is_in_unicode_driver(conn)) /* the driver is unicode */
                     CC_set_in_ansi_app(conn);      /* but the app is ansi */
             } else {
-                MYLOG(LOG_DEBUG, "the application is unicode\n");
+                MYLOG(LOG_DEBUG, "the application is unicode");
             }
             /*return SQL_ERROR;*/
             return SQL_SUCCESS;
@@ -1617,10 +1617,10 @@ RETCODE SQL_API API_SetConnectAttr(HDBC ConnectionHandle,
                 logs_on_off(-1, conn->connInfo.drivers.loglevel);
                 conn->connInfo.drivers.loglevel = (char)newValue;
                 logs_on_off(1, conn->connInfo.drivers.loglevel);
-                MYLOG(LOG_DEBUG, "debug => %d\n",
+                MYLOG(LOG_DEBUG, "debug => %d",
                       conn->connInfo.drivers.loglevel);
             } else if (newValue == 0 && conn->connInfo.drivers.loglevel > 0) {
-                MYLOG(LOG_DEBUG, "debug => %d\n", newValue);
+                MYLOG(LOG_DEBUG, "debug => %d", newValue);
                 logs_on_off(-1, conn->connInfo.drivers.loglevel);
                 conn->connInfo.drivers.loglevel = (char)newValue;
                 logs_on_off(1, 0);
@@ -1632,10 +1632,10 @@ RETCODE SQL_API API_SetConnectAttr(HDBC ConnectionHandle,
                 logs_on_off(-1, 0);
                 conn->connInfo.drivers.loglevel = (char)newValue;
                 logs_on_off(1, 0);
-                MYLOG(LOG_DEBUG, "commlog => %d\n",
+                MYLOG(LOG_DEBUG, "commlog => %d",
                       conn->connInfo.drivers.loglevel);
             } else if (newValue == 0 && conn->connInfo.drivers.loglevel > 0) {
-                MYLOG(LOG_DEBUG, "commlog => %d\n", newValue);
+                MYLOG(LOG_DEBUG, "commlog => %d", newValue);
                 logs_on_off(-1, 0);
                 conn->connInfo.drivers.loglevel = (char)newValue;
                 logs_on_off(1, 0);
@@ -1671,7 +1671,7 @@ RETCODE SQL_API API_GetDescField(SQLHDESC DescriptorHandle,
 
     MYLOG(LOG_TRACE,
           "entering h=%p rec=" FORMAT_SMALLI " field=" FORMAT_SMALLI
-          " blen=" FORMAT_INTEGER "\n",
+          " blen=" FORMAT_INTEGER,
           DescriptorHandle, RecNumber, FieldIdentifier, BufferLength);
     switch (DC_get_desc_type(desc)) {
         case SQL_ATTR_APP_ROW_DESC:
@@ -1729,7 +1729,7 @@ RETCODE SQL_API API_SetDescField(SQLHDESC DescriptorHandle,
 
     MYLOG(LOG_TRACE,
           "entering h=%p(%d) rec=" FORMAT_SMALLI " field=" FORMAT_SMALLI
-          " val=%p," FORMAT_INTEGER "\n",
+          " val=%p," FORMAT_INTEGER,
           DescriptorHandle, DC_get_desc_type(desc), RecNumber, FieldIdentifier,
           Value, BufferLength);
     switch (DC_get_desc_type(desc)) {
@@ -1786,7 +1786,7 @@ RETCODE SQL_API API_SetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
     StatementClass *stmt = (StatementClass *)StatementHandle;
 
     MYLOG(LOG_TRACE,
-          "entering Handle=%p " FORMAT_INTEGER "," FORMAT_ULEN "(%p)\n",
+          "entering Handle=%p " FORMAT_INTEGER "," FORMAT_ULEN "(%p)",
           StatementHandle, Attribute, (SQLULEN)Value, Value);
 #ifdef __linux__
 #pragma GCC diagnostic push
@@ -1822,7 +1822,7 @@ RETCODE SQL_API API_SetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
                 stmt->ard = &(stmt->ardi);
             } else {
                 stmt->ard = (DescriptorClass *)Value;
-                MYLOG(LOG_ALL, "set ard=%p\n", stmt->ard);
+                MYLOG(LOG_ALL, "set ard=%p", stmt->ard);
             }
             break;
         case SQL_ATTR_APP_PARAM_DESC: /* 10011 */

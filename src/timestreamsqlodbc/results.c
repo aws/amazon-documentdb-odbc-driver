@@ -41,7 +41,7 @@ RETCODE SQL_API API_RowCount(HSTMT hstmt, SQLLEN *pcrow) {
     StatementClass *stmt = (StatementClass *)hstmt;
     QResultClass *res;
 
-    MYLOG(LOG_TRACE, "entering...\n");
+    MYLOG(LOG_TRACE, "entering...");
     if (!stmt) {
         SC_log_error(func, NULL_STRING, NULL);
         return SQL_INVALID_HANDLE;
@@ -75,7 +75,7 @@ RETCODE SQL_API API_NumResultCols(HSTMT hstmt, SQLSMALLINT *pccol) {
     QResultClass *result;
     RETCODE ret = SQL_SUCCESS;
 
-    MYLOG(LOG_TRACE, "entering...\n");
+    MYLOG(LOG_TRACE, "entering...");
     if (!stmt) {
         SC_log_error(func, NULL_STRING, NULL);
         return SQL_INVALID_HANDLE;
@@ -132,7 +132,7 @@ RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
     int len = 0;
     RETCODE result = SQL_SUCCESS;
 
-    MYLOG(LOG_TRACE, "entering.%d..\n", icol);
+    MYLOG(LOG_TRACE, "entering.%d..", icol);
 
     if (!stmt) {
         SC_log_error(func, NULL_STRING, NULL);
@@ -159,7 +159,7 @@ RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
                                 ? SQL_BINARY
                                 : SQL_INTEGER;
 
-        MYLOG(LOG_ALL, "answering bookmark info\n");
+        MYLOG(LOG_ALL, "answering bookmark info");
         if (szColName && cbColNameMax > 0)
             *szColName = '\0';
         if (pcbColName)
@@ -233,8 +233,7 @@ RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
         }
 
         MYLOG(LOG_DEBUG,
-              "PARSE: fieldtype=%u, col_name='%s', column_size=" FORMAT_LEN
-              "\n",
+              "PARSE: fieldtype=%u, col_name='%s', column_size=" FORMAT_LEN,
               fieldtype, NULL_IF_NULL(col_name), column_size);
     } else {
         col_name = QR_get_fieldname(res, icol);
@@ -244,9 +243,9 @@ RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
         decimal_digits = estype_decimal_digits(stmt, fieldtype, icol);
     }
 
-    MYLOG(LOG_DEBUG, "col %d fieldname = '%s'\n", icol, NULL_IF_NULL(col_name));
-    MYLOG(LOG_DEBUG, "col %d fieldtype = %d\n", icol, fieldtype);
-    MYLOG(LOG_DEBUG, "col %d column_size = " FORMAT_LEN "\n", icol, column_size);
+    MYLOG(LOG_DEBUG, "col %d fieldname = '%s'", icol, NULL_IF_NULL(col_name));
+    MYLOG(LOG_DEBUG, "col %d fieldtype = %d", icol, fieldtype);
+    MYLOG(LOG_DEBUG, "col %d column_size = " FORMAT_LEN, icol, column_size);
 
     result = SQL_SUCCESS;
 
@@ -278,7 +277,7 @@ RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
         *pfSqlType =
             estype_to_concise_type(stmt, fieldtype, icol, unknown_sizes);
 
-        MYLOG(LOG_DEBUG, "col %d *pfSqlType = %d\n", icol, *pfSqlType);
+        MYLOG(LOG_DEBUG, "col %d *pfSqlType = %d", icol, *pfSqlType);
     }
 
     /*
@@ -290,7 +289,7 @@ RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
 
         *pcbColDef = column_size;
 
-        MYLOG(LOG_DEBUG, "Col: col %d  *pcbColDef = " FORMAT_ULEN "\n", icol,
+        MYLOG(LOG_DEBUG, "Col: col %d  *pcbColDef = " FORMAT_ULEN, icol,
               *pcbColDef);
     }
 
@@ -302,7 +301,7 @@ RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
             decimal_digits = 0;
 
         *pibScale = (SQLSMALLINT)decimal_digits;
-        MYLOG(LOG_DEBUG, "col %d  *pibScale = %d\n", icol, *pibScale);
+        MYLOG(LOG_DEBUG, "col %d  *pibScale = %d", icol, *pibScale);
     }
 
     /*
@@ -314,7 +313,7 @@ RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
         else
             *pfNullable = fi ? fi->nullable : tstype_nullable(conn, fieldtype);
 
-        MYLOG(LOG_DEBUG, "col %d  *pfNullable = %d\n", icol, *pfNullable);
+        MYLOG(LOG_DEBUG, "col %d  *pfNullable = %d", icol, *pfNullable);
     }
 
 cleanup:
@@ -343,7 +342,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
     QResultClass *res;
     BOOL stmt_updatable;
 
-    MYLOG(LOG_TRACE, "entering..col=%d %d len=%d.\n", icol, fDescType,
+    MYLOG(LOG_TRACE, "entering..col=%d %d len=%d.", icol, fDescType,
           cbDescMax);
 
     if (!stmt) {
@@ -370,7 +369,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
     res = SC_get_Curres(stmt);
     if (0 == icol && SQL_DESC_COUNT != fDescType) /* bookmark column */
     {
-        MYLOG(LOG_ALL, "answering bookmark info\n");
+        MYLOG(LOG_ALL, "answering bookmark info");
         switch (fDescType) {
             case SQL_DESC_OCTET_LENGTH:
                 if (pfDesc)
@@ -456,7 +455,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
         field_type = getEffectiveOid(conn, fi);
     }
 
-    MYLOG(LOG_DEBUG, "col %d field_type=%d fi,ti=%p,%p\n", col_idx, field_type,
+    MYLOG(LOG_DEBUG, "col %d field_type=%d fi,ti=%p,%p", col_idx, field_type,
           fi, ti);
 
 #ifdef SUPPRESS_LONGEST_ON_CURSORS
@@ -487,7 +486,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
                 value = tstype_auto_increment(conn, field_type);
             if (value == -1) /* non-numeric becomes FALSE (ODBC Doc) */
                 value = FALSE;
-            MYLOG(LOG_DEBUG, "AUTO_INCREMENT=" FORMAT_LEN "\n", value);
+            MYLOG(LOG_DEBUG, "AUTO_INCREMENT=" FORMAT_LEN, value);
 
             break;
 
@@ -506,7 +505,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
                         : estype_display_size(stmt, field_type, col_idx,
                                               unknown_sizes);
 
-            MYLOG(LOG_DEBUG, "col %d, display_size= " FORMAT_LEN "\n", col_idx,
+            MYLOG(LOG_DEBUG, "col %d, display_size= " FORMAT_LEN, col_idx,
                   value);
 
             break;
@@ -515,7 +514,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
             if (fi && (NAME_IS_VALID(fi->column_alias))) {
                 p = GET_NAME(fi->column_alias);
 
-                MYLOG(LOG_DEBUG, "COLUMN_LABEL = '%s'\n", p);
+                MYLOG(LOG_DEBUG, "COLUMN_LABEL = '%s'", p);
                 break;
             }
             /* otherwise same as column name -- FALL THROUGH!!! */
@@ -523,16 +522,16 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
         case SQL_DESC_NAME:
             MYLOG(LOG_ALL, "fi=%p (alias, name)=", fi);
             if (fi)
-                MYPRINTF(LOG_DEBUG, "(%s,%s)\n", PRINT_NAME(fi->column_alias),
+                MYPRINTF(LOG_DEBUG, "(%s,%s)", PRINT_NAME(fi->column_alias),
                          PRINT_NAME(fi->column_name));
             else
-                MYPRINTF(LOG_DEBUG, "NULL\n");
+                MYPRINTF(LOG_DEBUG, "NULL");
             p = fi ? (NAME_IS_NULL(fi->column_alias)
                           ? SAFE_NAME(fi->column_name)
                           : GET_NAME(fi->column_alias))
                    : QR_get_fieldname(res, col_idx);
 
-            MYLOG(LOG_DEBUG, "COLUMN_NAME = '%s'\n", p);
+            MYLOG(LOG_DEBUG, "COLUMN_NAME = '%s'", p);
             break;
 
         case SQL_COLUMN_LENGTH:
@@ -544,13 +543,13 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
                 /* if (-1 == value)  I'm not sure which is right */
                 value = 0;
 
-            MYLOG(LOG_DEBUG, "col %d, column_length = " FORMAT_LEN "\n", col_idx,
+            MYLOG(LOG_DEBUG, "col %d, column_length = " FORMAT_LEN, col_idx,
                   value);
             break;
 
         case SQL_COLUMN_MONEY: /* == SQL_DESC_FIXED_PREC_SCALE */
             value = estype_money(conn, field_type);
-            MYLOG(LOG_ALL, "COLUMN_MONEY=" FORMAT_LEN "\n", value);
+            MYLOG(LOG_ALL, "COLUMN_MONEY=" FORMAT_LEN, value);
             break;
 
         case SQL_DESC_NULLABLE:
@@ -558,12 +557,12 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
                 value = TRUE;
             else
                 value = fi ? fi->nullable : tstype_nullable(conn, field_type);
-            MYLOG(LOG_ALL, "COLUMN_NULLABLE=" FORMAT_LEN "\n", value);
+            MYLOG(LOG_ALL, "COLUMN_NULLABLE=" FORMAT_LEN, value);
             break;
 
         case SQL_COLUMN_OWNER_NAME: /* == SQL_DESC_SCHEMA_NAME */
             p = ti ? SAFE_NAME(ti->schema_name) : NULL_STRING;
-            MYLOG(LOG_DEBUG, "SCHEMA_NAME = '%s'\n", p);
+            MYLOG(LOG_DEBUG, "SCHEMA_NAME = '%s'", p);
             break;
 
         case SQL_COLUMN_PRECISION: /* in 2.x */
@@ -571,7 +570,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
             if (value < 0)
                 value = 0;
 
-            MYLOG(LOG_DEBUG, "col %d, column_size = " FORMAT_LEN "\n", col_idx,
+            MYLOG(LOG_DEBUG, "col %d, column_size = " FORMAT_LEN, col_idx,
                   value);
             break;
 
@@ -582,7 +581,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
 
         case SQL_COLUMN_SCALE: /* in 2.x */
             value = estype_decimal_digits(stmt, field_type, col_idx);
-            MYLOG(LOG_ALL, "COLUMN_SCALE=" FORMAT_LEN "\n", value);
+            MYLOG(LOG_ALL, "COLUMN_SCALE=" FORMAT_LEN, value);
             if (value < 0)
                 value = 0;
             break;
@@ -594,13 +593,13 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
         case SQL_COLUMN_TABLE_NAME: /* == SQL_DESC_TABLE_NAME */
             p = ti ? SAFE_NAME(ti->table_name) : NULL_STRING;
 
-            MYLOG(LOG_DEBUG, "TABLE_NAME = '%s'\n", p);
+            MYLOG(LOG_DEBUG, "TABLE_NAME = '%s'", p);
             break;
 
         case SQL_COLUMN_TYPE: /* == SQL_DESC_CONCISE_TYPE */
             value = estype_to_concise_type(stmt, field_type, col_idx,
                                            unknown_sizes);
-            MYLOG(LOG_DEBUG, "COLUMN_TYPE=" FORMAT_LEN "\n", value);
+            MYLOG(LOG_DEBUG, "COLUMN_TYPE=" FORMAT_LEN, value);
             break;
 
         case SQL_COLUMN_TYPE_NAME: /* == SQL_DESC_TYPE_NAME */
@@ -633,19 +632,19 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
                     value = SQL_ATTR_READONLY;
             }
 
-            MYLOG(LOG_DEBUG, "%s: UPDATEABLE = " FORMAT_LEN "\n", func, value);
+            MYLOG(LOG_DEBUG, "%s: UPDATEABLE = " FORMAT_LEN, func, value);
             break;
         case SQL_DESC_BASE_COLUMN_NAME:
 
             p = fi ? SAFE_NAME(fi->column_name)
                    : QR_get_fieldname(res, col_idx);
 
-            MYLOG(LOG_DEBUG, "BASE_COLUMN_NAME = '%s'\n", p);
+            MYLOG(LOG_DEBUG, "BASE_COLUMN_NAME = '%s'", p);
             break;
         case SQL_DESC_BASE_TABLE_NAME: /* the same as TABLE_NAME ok ? */
             p = ti ? SAFE_NAME(ti->table_name) : NULL_STRING;
 
-            MYLOG(LOG_DEBUG, "BASE_TABLE_NAME = '%s'\n", p);
+            MYLOG(LOG_DEBUG, "BASE_TABLE_NAME = '%s'", p);
             break;
         case SQL_DESC_LENGTH: /* different from SQL_COLUMN_LENGTH */
             value = (fi && column_size > 0)
@@ -655,7 +654,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
             if (-1 == value)
                 value = 0;
 
-            MYLOG(LOG_DEBUG, "col %d, desc_length = " FORMAT_LEN "\n", col_idx,
+            MYLOG(LOG_DEBUG, "col %d, desc_length = " FORMAT_LEN, col_idx,
                   value);
             break;
         case SQL_DESC_OCTET_LENGTH:
@@ -665,7 +664,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
                             conn, field_type, column_size, unknown_sizes);
             if (-1 == value)
                 value = 0;
-            MYLOG(LOG_DEBUG, "col %d, octet_length = " FORMAT_LEN "\n", col_idx,
+            MYLOG(LOG_DEBUG, "col %d, octet_length = " FORMAT_LEN, col_idx,
                   value);
             break;
         case SQL_DESC_PRECISION: /* different from SQL_COLUMN_PRECISION */
@@ -675,7 +674,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
             if (value < 0)
                 value = 0;
 
-            MYLOG(LOG_DEBUG, "col %d, desc_precision = " FORMAT_LEN "\n",
+            MYLOG(LOG_DEBUG, "col %d, desc_precision = " FORMAT_LEN,
                   col_idx, value);
             break;
         case SQL_DESC_SCALE: /* different from SQL_COLUMN_SCALE */
@@ -767,7 +766,7 @@ RETCODE SQL_API API_GetData(HSTMT hstmt, SQLUSMALLINT icol,
     SQLCHAR dum_rgb[2] = "\0\0";
 #endif /* WITH_UNIXODBC */
 
-    MYLOG(LOG_TRACE, "entering stmt=%p icol=%d\n", stmt, icol);
+    MYLOG(LOG_TRACE, "entering stmt=%p icol=%d", stmt, icol);
 
     if (!stmt) {
         SC_log_error(func, NULL_STRING, NULL);
@@ -808,7 +807,7 @@ RETCODE SQL_API API_GetData(HSTMT hstmt, SQLUSMALLINT icol,
             binfo = &opts->bindings[icol - 1];
         if (binfo) {
             target_type = binfo->returntype;
-            MYLOG(LOG_DEBUG, "SQL_ARD_TYPE=%d\n", target_type);
+            MYLOG(LOG_DEBUG, "SQL_ARD_TYPE=%d", target_type);
             precision = binfo->precision;
         } else {
             SC_set_error(stmt, STMT_STATUS_ERROR,
@@ -834,7 +833,7 @@ RETCODE SQL_API API_GetData(HSTMT hstmt, SQLUSMALLINT icol,
             default:
                 MYLOG(
                     LOG_ALL,
-                    "GetData Column 0 is type %d not of type SQL_C_BOOKMARK\n",
+                    "GetData Column 0 is type %d not of type SQL_C_BOOKMARK",
                     target_type);
                 SC_set_error(stmt, STMT_PROGRAM_TYPE_OUT_OF_RANGE,
                              "Column 0 is not of type SQL_C_BOOKMARK", func);
@@ -872,17 +871,16 @@ RETCODE SQL_API API_GetData(HSTMT hstmt, SQLUSMALLINT icol,
             result = SQL_ERROR;
             goto cleanup;
         }
-        MYLOG(LOG_DEBUG, "     num_rows = " FORMAT_LEN "\n", num_rows);
+        MYLOG(LOG_DEBUG, "     num_rows = " FORMAT_LEN, num_rows);
 
         if (!get_bookmark) {
             SQLLEN curt = GIdx2CacheIdx(stmt->currTuple, stmt, res);
             value = QR_get_value_backend_row(res, curt, icol);
             MYLOG(LOG_DEBUG,
-                  "currT=" FORMAT_LEN " base=" FORMAT_LEN " rowset=" FORMAT_LEN
-                  "\n",
+                  "currT=" FORMAT_LEN " base=" FORMAT_LEN " rowset=" FORMAT_LEN,
                   stmt->currTuple, QR_get_rowstart_in_cache(res),
                   SC_get_rowset_start(stmt));
-            MYLOG(LOG_DEBUG, "     value = '%s'\n", NULL_IF_NULL(value));
+            MYLOG(LOG_DEBUG, "     value = '%s'", NULL_IF_NULL(value));
         }
     } else {
         /* it's a SOCKET result (backend data) */
@@ -899,7 +897,7 @@ RETCODE SQL_API API_GetData(HSTMT hstmt, SQLUSMALLINT icol,
             SQLLEN curt = GIdx2CacheIdx(stmt->currTuple, stmt, res);
             value = QR_get_value_backend_row(res, curt, icol);
         }
-        MYLOG(LOG_DEBUG, "  socket: value = '%s'\n", NULL_IF_NULL(value));
+        MYLOG(LOG_DEBUG, "  socket: value = '%s'", NULL_IF_NULL(value));
     }
 
     if (get_bookmark) {
@@ -930,7 +928,7 @@ RETCODE SQL_API API_GetData(HSTMT hstmt, SQLUSMALLINT icol,
     atttypmod = QR_get_atttypmod(res, icol);
 
     MYLOG(LOG_DEBUG,
-          "**** icol = %d, target_type = %d, field_type = %d, value = '%s'\n",
+          "**** icol = %d, target_type = %d, field_type = %d, value = '%s'",
           icol, target_type, field_type, NULL_IF_NULL(value));
 
     SC_set_current_col(stmt, icol);
@@ -1001,7 +999,7 @@ RETCODE SQL_API API_GetData(HSTMT hstmt, SQLUSMALLINT icol,
 
 cleanup:
 #undef return
-    MYLOG(LOG_TRACE, "leaving %d\n", result);
+    MYLOG(LOG_TRACE, "leaving %d", result);
     return result;
 }
 
@@ -1017,7 +1015,7 @@ RETCODE SQL_API API_Fetch(HSTMT hstmt) {
     BindInfoClass *bookmark;
     RETCODE retval = SQL_SUCCESS;
 
-    MYLOG(LOG_TRACE, "entering stmt = %p, stmt->result= %p\n", stmt,
+    MYLOG(LOG_TRACE, "entering stmt = %p, stmt->result= %p", stmt,
           stmt ? SC_get_Curres(stmt) : NULL);
 
     if (!stmt) {
@@ -1191,7 +1189,7 @@ getNthValid(const QResultClass *res, SQLLEN sta, UWORD orientation, SQLULEN nth,
         }
         *nearest = num_tuples;
     }
-    MYPRINTF(LOG_DEBUG, " nearest not found\n");
+    MYPRINTF(LOG_DEBUG, " nearest not found");
     return -(SQLLEN)count;
 }
 
@@ -1201,7 +1199,7 @@ getNthValid(const QResultClass *res, SQLLEN sta, UWORD orientation, SQLULEN nth,
  */
 #define EXTFETCH_RETURN_BOF(stmt, res)                   \
     {                                                    \
-        MYLOG(LOG_ALL, "RETURN_BOF\n");                   \
+        MYLOG(LOG_ALL, "RETURN_BOF");                    \
         SC_set_rowset_start(stmt, -1, TRUE);             \
         stmt->currTuple = -1;                            \
         /* move_cursor_position_if_needed(stmt, res); */ \
@@ -1209,7 +1207,7 @@ getNthValid(const QResultClass *res, SQLLEN sta, UWORD orientation, SQLULEN nth,
     }
 #define EXTFETCH_RETURN_EOF(stmt, res)                   \
     {                                                    \
-        MYLOG(LOG_ALL, "RETURN_EOF\n");                   \
+        MYLOG(LOG_ALL, "RETURN_EOF");                    \
         SC_set_rowset_start(stmt, num_tuples, TRUE);     \
         stmt->currTuple = -1;                            \
         /* move_cursor_position_if_needed(stmt, res); */ \
@@ -1237,7 +1235,7 @@ RETCODE SQL_API API_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
     BOOL currp_is_valid, reached_eof, useCursor;
     SQLLEN reqsize = rowsetSize;
 
-    MYLOG(LOG_TRACE, "entering stmt=%p rowsetSize=" FORMAT_LEN "\n", stmt,
+    MYLOG(LOG_TRACE, "entering stmt=%p rowsetSize=" FORMAT_LEN, stmt,
           rowsetSize);
 
     if (!stmt) {
@@ -1313,7 +1311,7 @@ RETCODE SQL_API API_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
     if (useCursor && !reached_eof)
         num_tuples = INT_MAX;
 
-    MYLOG(LOG_ALL, "num_tuples=" FORMAT_LEN "\n", num_tuples);
+    MYLOG(LOG_ALL, "num_tuples=" FORMAT_LEN, num_tuples);
     /* Save and discard the saved rowset size */
     save_rowset_size = stmt->save_rowset_size;
     stmt->save_rowset_size = -1;
@@ -1346,7 +1344,7 @@ RETCODE SQL_API API_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
                 SC_inc_rowset_start(stmt, progress_size);
             MYLOG(LOG_DEBUG,
                   "SQL_FETCH_NEXT: num_tuples=" FORMAT_LEN
-                  ", currtuple=" FORMAT_LEN ", rowst=" FORMAT_LEN "\n",
+                  ", currtuple=" FORMAT_LEN ", rowst=" FORMAT_LEN,
                   num_tuples, stmt->currTuple, rowset_start);
             break;
         default:
@@ -1422,7 +1420,7 @@ RETCODE SQL_API API_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
 
     /* Physical Row advancement occurs for each row fetched below */
 
-    MYLOG(LOG_DEBUG, "new currTuple = " FORMAT_LEN "\n", stmt->currTuple);
+    MYLOG(LOG_DEBUG, "new currTuple = " FORMAT_LEN, stmt->currTuple);
 
     truncated = error = FALSE;
 
@@ -1433,11 +1431,11 @@ RETCODE SQL_API API_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
         goto cleanup;
     if (SQL_NO_DATA_FOUND != result && res->keyset) {
         currp = GIdx2KResIdx(SC_get_rowset_start(stmt), stmt, res);
-        MYLOG(LOG_ALL, "currp=" FORMAT_LEN "\n", currp);
+        MYLOG(LOG_ALL, "currp=" FORMAT_LEN, currp);
         if (currp < 0) {
             result = SQL_ERROR;
             MYLOG(LOG_DEBUG,
-                  "rowset_start=" FORMAT_LEN " but currp=" FORMAT_LEN "\n",
+                  "rowset_start=" FORMAT_LEN " but currp=" FORMAT_LEN,
                   SC_get_rowset_start(stmt), currp);
             SC_set_error(stmt, STMT_INTERNAL_ERROR,
                          "rowset_start not in the keyset", func);
@@ -1454,14 +1452,14 @@ RETCODE SQL_API API_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
                 res->keyset[currp].status &=
                     ~CURS_IN_ROWSET; /* Off the flag first */
             } else {
-                MYLOG(LOG_DEBUG, "Umm current row is out of keyset\n");
+                MYLOG(LOG_DEBUG, "Umm current row is out of keyset");
                 break;
             }
         }
-        MYLOG(LOG_ALL, "ExtFetch result=%d\n", result);
+        MYLOG(LOG_ALL, "ExtFetch result=%d", result);
         if (currp_is_valid && SQL_SUCCESS_WITH_INFO == result
             && 0 == stmt->last_fetch_count) {
-            MYLOG(LOG_ALL, "just skipping deleted row " FORMAT_LEN "\n", currp);
+            MYLOG(LOG_ALL, "just skipping deleted row " FORMAT_LEN, currp);
             if (rowsetSize - i + fc_io > reqsize)
                 QR_set_reqsize(res, (Int4)(rowsetSize - i + fc_io));
             result = SC_fetch(stmt);
@@ -1527,7 +1525,7 @@ RETCODE SQL_API API_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
     /* Set the number of rows retrieved */
     if (pcrow)
         *pcrow = i;
-    MYLOG(LOG_ALL, "pcrow=" FORMAT_LEN "\n", i);
+    MYLOG(LOG_ALL, "pcrow=" FORMAT_LEN, i);
 
     if (i == 0)
         /* Only DeclareFetch should wind up here */
@@ -1556,7 +1554,7 @@ RETCODE SQL_API API_MoreResults(HSTMT hstmt) {
     QResultClass *res;
     RETCODE ret = SQL_SUCCESS;
 
-    MYLOG(LOG_TRACE, "entering...\n");
+    MYLOG(LOG_TRACE, "entering...");
     res = SC_get_Curres(stmt);
     if (res) {
         res = res->next;
@@ -1584,7 +1582,7 @@ RETCODE SQL_API API_MoreResults(HSTMT hstmt) {
         API_FreeStmt(hstmt, SQL_CLOSE);
         ret = SQL_NO_DATA_FOUND;
     }
-    MYLOG(LOG_DEBUG, "leaving %d\n", ret);
+    MYLOG(LOG_DEBUG, "leaving %d", ret);
     return ret;
 }
 
@@ -1594,7 +1592,7 @@ SQLLEN ClearCachedRows(TupleField *tuple, int num_fields, SQLLEN num_rows) {
     for (i = 0; i < num_fields * num_rows; i++, tuple++) {
         if (tuple->value) {
             MYLOG(LOG_ALL,
-                  "freeing tuple[" FORMAT_LEN "][" FORMAT_LEN "].value=%p\n",
+                  "freeing tuple[" FORMAT_LEN "][" FORMAT_LEN "].value=%p",
                   i / num_fields, i % num_fields, tuple->value);
             free(tuple->value);
             tuple->value = NULL;
@@ -1610,7 +1608,7 @@ RETCODE SQL_API API_SetCursorName(HSTMT hstmt, const SQLCHAR *szCursor,
     CSTR func = "API_SetCursorName";
     StatementClass *stmt = (StatementClass *)hstmt;
 
-    MYLOG(LOG_TRACE, "entering hstmt=%p, szCursor=%p, cbCursorMax=%d\n", hstmt,
+    MYLOG(LOG_TRACE, "entering hstmt=%p, szCursor=%p, cbCursorMax=%d", hstmt,
           szCursor, cbCursor);
 
     if (!stmt) {
@@ -1633,7 +1631,7 @@ RETCODE SQL_API API_GetCursorName(HSTMT hstmt, SQLCHAR *szCursor,
     RETCODE result;
 
     MYLOG(LOG_DEBUG,
-          "entering hstmt=%p, szCursor=%p, cbCursorMax=%d, pcbCursor=%p\n",
+          "entering hstmt=%p, szCursor=%p, cbCursorMax=%d, pcbCursor=%p",
           hstmt, szCursor, cbCursorMax, pcbCursor);
 
     if (!stmt) {
