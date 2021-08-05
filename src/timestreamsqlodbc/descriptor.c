@@ -30,13 +30,13 @@
 void TI_Destructor(TABLE_INFO **ti, int count) {
     int i;
 
-    MYLOG(LOG_TRACE, "entering count=%d\n", count);
+    MYLOG(LOG_TRACE, "entering count=%d", count);
     if (ti) {
         for (i = 0; i < count; i++) {
             if (ti[i]) {
                 COL_INFO *coli = ti[i]->col_info;
                 if (coli) {
-                    MYLOG(LOG_ALL, "!!!refcnt %p:%d -> %d\n", coli, coli->refcnt,
+                    MYLOG(LOG_ALL, "!!!refcnt %p:%d -> %d", coli, coli->refcnt,
                           coli->refcnt - 1);
                     coli->refcnt--;
                     if (coli->refcnt <= 0
@@ -60,7 +60,7 @@ void TI_Destructor(TABLE_INFO **ti, int count) {
 void FI_Destructor(FIELD_INFO **fi, int count, BOOL freeFI) {
     int i;
 
-    MYLOG(LOG_TRACE, "entering count=%d\n", count);
+    MYLOG(LOG_TRACE, "entering count=%d", count);
     if (fi) {
         for (i = 0; i < count; i++) {
             if (fi[i]) {
@@ -102,7 +102,7 @@ void DC_Constructor(DescriptorClass *self, BOOL embedded,
 }
 
 static void ARDFields_free(ARDFields *self) {
-    MYLOG(LOG_TRACE, "entering %p bookmark=%p\n", self, self->bookmark);
+    MYLOG(LOG_TRACE, "entering %p bookmark=%p", self, self->bookmark);
     if (self->bookmark) {
         free(self->bookmark);
         self->bookmark = NULL;
@@ -229,7 +229,7 @@ char CC_add_descriptor(ConnectionClass *self, DescriptorClass *desc) {
     int new_num_descs;
     DescriptorClass **descs;
 
-    MYLOG(LOG_TRACE, "entering self=%p, desc=%p\n", self, desc);
+    MYLOG(LOG_TRACE, "entering self=%p, desc=%p", self, desc);
 
     for (i = 0; i < self->num_descs; i++) {
         if (!self->descs[i]) {
@@ -265,7 +265,7 @@ RETCODE SQL_API API_AllocDesc(HDBC ConnectionHandle,
     RETCODE ret = SQL_SUCCESS;
     DescriptorClass *desc;
 
-    MYLOG(LOG_TRACE, "entering...\n");
+    MYLOG(LOG_TRACE, "entering...");
 
     desc = (DescriptorClass *)malloc(sizeof(DescriptorClass));
     if (desc) {
@@ -291,7 +291,7 @@ RETCODE SQL_API API_FreeDesc(SQLHDESC DescriptorHandle) {
     DescriptorClass *desc = (DescriptorClass *)DescriptorHandle;
     RETCODE ret = SQL_SUCCESS;
 
-    MYLOG(LOG_TRACE, "entering...\n");
+    MYLOG(LOG_TRACE, "entering...");
     DC_Destructor(desc);
     if (!desc->deschd.embedded) {
         int i;
@@ -392,28 +392,28 @@ RETCODE SQL_API API_CopyDesc(SQLHDESC SourceDescHandle,
     APDFields *apd_src, *apd_tgt;
     IPDFields *ipd_src, *ipd_tgt;
 
-    MYLOG(LOG_TRACE, "entering...\n");
+    MYLOG(LOG_TRACE, "entering...");
     src = (DescriptorClass *)SourceDescHandle;
     target = (DescriptorClass *)TargetDescHandle;
     srchd = &(src->deschd);
     targethd = &(target->deschd);
     if (!srchd->type_defined) {
-        MYLOG(LOG_ERROR, "source type undefined\n");
+        MYLOG(LOG_ERROR, "source type undefined");
         DC_set_error(target, DESC_EXEC_ERROR, "source handle type undefined");
         return ret;
     }
     if (targethd->type_defined) {
-        MYLOG(LOG_DEBUG, "source type=%d -> target type=%d\n", srchd->desc_type,
+        MYLOG(LOG_DEBUG, "source type=%d -> target type=%d", srchd->desc_type,
               targethd->desc_type);
         if (SQL_ATTR_IMP_ROW_DESC == targethd->desc_type) {
             MYLOG(LOG_DEBUG,
-                  "cannot modify an implementation row descriptor\n");
+                  "cannot modify an implementation row descriptor");
             DC_set_error(target, DESC_CANNOT_MODIFY_IRD,
                          "cannot modify an implementation row descriptor");
             return ret;
         } else if (targethd->desc_type != srchd->desc_type) {
             if (targethd->embedded) {
-                MYLOG(LOG_DEBUG, "src type != target type\n");
+                MYLOG(LOG_DEBUG, "src type != target type");
                 DC_set_error(
                     target, DESC_EXEC_ERROR,
                     "copying different type descriptor to embedded one");
@@ -439,7 +439,7 @@ RETCODE SQL_API API_CopyDesc(SQLHDESC SourceDescHandle,
             ard_tgt = &(target->ardf);
             MYPRINTF(LOG_DEBUG, " target=%p", ard_tgt);
             ARDFields_copy(ard_src, ard_tgt);
-            MYPRINTF(LOG_DEBUG, " offset_ptr=%p\n", ard_tgt->row_offset_ptr);
+            MYPRINTF(LOG_DEBUG, " offset_ptr=%p", ard_tgt->row_offset_ptr);
             break;
         case SQL_ATTR_APP_PARAM_DESC:
             if (!targethd->type_defined) {
@@ -458,7 +458,7 @@ RETCODE SQL_API API_CopyDesc(SQLHDESC SourceDescHandle,
             IPDFields_copy(ipd_src, ipd_tgt);
             break;
         default:
-            MYLOG(LOG_DEBUG, "invalid descriptor handle type=%d\n",
+            MYLOG(LOG_DEBUG, "invalid descriptor handle type=%d",
                   srchd->desc_type);
             DC_set_error(target, DESC_EXEC_ERROR, "invalid descriptor type");
             ret = SQL_ERROR;
@@ -572,7 +572,7 @@ void DC_log_error(const char *func, const char *desc,
 #define nullcheck(a) (a ? a : "(NULL)")
     if (self) {
         MYLOG(LOG_DEBUG,
-              "DESCRIPTOR ERROR: func=%s, desc='%s', errnum=%d, errmsg='%s'\n",
+              "DESCRIPTOR ERROR: func=%s, desc='%s', errnum=%d, errmsg='%s'",
               func, desc, self->deschd.__error_number,
               nullcheck(self->deschd.__error_message));
     }
@@ -587,7 +587,7 @@ RETCODE SQL_API API_DescError(SQLHDESC hdesc, SQLSMALLINT RecNumber,
     DescriptorClass *desc = (DescriptorClass *)hdesc;
     DescriptorHeader *deschd = &(desc->deschd);
 
-    MYLOG(LOG_TRACE, "entering RecN=%hd\n", RecNumber);
+    MYLOG(LOG_TRACE, "entering RecN=%hd", RecNumber);
     deschd->eserror = DC_create_errorinfo(desc);
     return ER_ReturnError(deschd->eserror, RecNumber, szSqlState, pfNativeError,
                           szErrorMsg, cbErrorMsgMax, pcbErrorMsg, flag);

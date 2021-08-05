@@ -117,7 +117,7 @@ HMODULE MODULE_load_from_timestreamodbc_path(const char *module_name) {
         if (_strnicmp(szFileName, sysdir, strlen(sysdir)) != 0) {
             hmodule =
                 LoadLibraryEx(szFileName, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
-            MYLOG(LOG_DEBUG, "timestream-odbc path based %s loaded module=%p\n",
+            MYLOG(LOG_DEBUG, "timestream-odbc path based %s loaded module=%p",
                   module_name, hmodule);
         }
     }
@@ -128,7 +128,7 @@ static FARPROC WINAPI DliErrorHook(unsigned dliNotify, PDelayLoadInfo pdli) {
     HMODULE hmodule = NULL;
     const char *call_module = NULL;
 
-    MYLOG(LOG_DEBUG, "Dli%sHook %s Notify=%d\n",
+    MYLOG(LOG_DEBUG, "Dli%sHook %s Notify=%d",
           (dliFailLoadLib == dliNotify || dliFailGetProc == dliNotify)
               ? "Error"
               : "Notify",
@@ -170,18 +170,18 @@ void CleanupDelayLoadedDLLs(void) {
     /* The dll names are case sensitive for the unload helper */
     if (loaded_timestreamenlist) {
         if (enlist_module != NULL) {
-            MYLOG(LOG_DEBUG, "Freeing Library %s\n", timestreamenlistdll);
+            MYLOG(LOG_DEBUG, "Freeing Library %s", timestreamenlistdll);
             FreeLibrary(enlist_module);
         }
-        MYLOG(LOG_DEBUG, "%s unloading\n", timestreamenlistdll);
+        MYLOG(LOG_DEBUG, "%s unloading", timestreamenlistdll);
         success = (*func)(timestreamenlistdll);
-        MYLOG(LOG_DEBUG, "%s unloaded success=%d\n", timestreamenlistdll, success);
+        MYLOG(LOG_DEBUG, "%s unloaded success=%d", timestreamenlistdll, success);
         loaded_timestreamenlist = FALSE;
     }
     if (loaded_timestreamodbc) {
-        MYLOG(LOG_DEBUG, "%s unloading\n", timestreamodbcdll);
+        MYLOG(LOG_DEBUG, "%s unloading", timestreamodbcdll);
         success = (*func)(timestreamodbcdll);
-        MYLOG(LOG_DEBUG, "%s unloaded success=%d\n", timestreamodbcdll, success);
+        MYLOG(LOG_DEBUG, "%s unloaded success=%d", timestreamodbcdll, success);
         loaded_timestreamodbc = FALSE;
     }
     return;

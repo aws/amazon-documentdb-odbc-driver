@@ -834,7 +834,7 @@ static int setup_getdataclass(SQLLEN *const length_return,
             }
             MYLOG(LOG_DEBUG,
                   "localize=%d hybrid=%d is_utf8=%d same_encoding=%d "
-                  "wcs_debug=%d\n",
+                  "wcs_debug=%d",
                   localize_needed, hybrid, is_utf8, same_encoding, wcs_debug);
         }
     }
@@ -842,7 +842,7 @@ static int setup_getdataclass(SQLLEN *const length_return,
         if (BYTEA_PROCESS_ESCAPE == bytea_process_kind)
             unicode_count = (int)convert_from_esbinary(neut_str, NULL, 0) * 2;
         else if (hybrid) {
-            MYLOG(LOG_DEBUG, "hybrid estimate\n");
+            MYLOG(LOG_DEBUG, "hybrid estimate");
             if ((unicode_count =
                      (int)bindcol_hybrid_estimate(neut_str, lf_conv, &allocbuf))
                 < 0) {
@@ -914,7 +914,7 @@ static int setup_getdataclass(SQLLEN *const length_return,
                                     FALSE);
                 else /* hybrid */
                 {
-                    MYLOG(LOG_DEBUG, "hybrid convert\n");
+                    MYLOG(LOG_DEBUG, "hybrid convert");
                     if (bindcol_hybrid_exec((SQLWCHAR *)esdc->ttlbuf, neut_str,
                                             unicode_count + 1, lf_conv,
                                             &allocbuf)
@@ -988,7 +988,7 @@ static int convert_text_field_to_sql_c(
     int copy_len = 0, needbuflen = 0, i;
     const char *ptr;
 
-    MYLOG(LOG_DEBUG, "field_type=%u type=%d\n", field_type, fCType);
+    MYLOG(LOG_DEBUG, "field_type=%u type=%d", field_type, fCType);
 
     switch (field_type) {
         case TS_TYPE_DOUBLE:
@@ -1012,7 +1012,7 @@ static int convert_text_field_to_sql_c(
         len = esdc->ttlbufused;
     }
 
-    MYLOG(LOG_DEBUG, "DEFAULT: len = " FORMAT_LEN ", ptr = '%.*s'\n", len,
+    MYLOG(LOG_DEBUG, "DEFAULT: len = " FORMAT_LEN ", ptr = '%.*s'", len,
           (int)len, ptr);
 
     if (current_col >= 0) {
@@ -1065,19 +1065,19 @@ static int convert_text_field_to_sql_c(
     if (SQL_C_WCHAR == fCType)
         MYLOG(LOG_DEBUG,
               "    SQL_C_WCHAR, default: len = " FORMAT_LEN
-              ", cbValueMax = " FORMAT_LEN ", rgbValueBindRow = '%s'\n",
+              ", cbValueMax = " FORMAT_LEN ", rgbValueBindRow = '%s'",
               len, cbValueMax, rgbValueBindRow);
     else
 #endif /* UNICODE_SUPPORT */
         if (SQL_C_BINARY == fCType)
         MYLOG(LOG_DEBUG,
               "    SQL_C_BINARY, default: len = " FORMAT_LEN
-              ", cbValueMax = " FORMAT_LEN ", rgbValueBindRow = '%.*s'\n",
+              ", cbValueMax = " FORMAT_LEN ", rgbValueBindRow = '%.*s'",
               len, cbValueMax, copy_len, rgbValueBindRow);
     else
         MYLOG(LOG_DEBUG,
               "    SQL_C_CHAR, default: len = " FORMAT_LEN
-              ", cbValueMax = " FORMAT_LEN ", rgbValueBindRow = '%s'\n",
+              ", cbValueMax = " FORMAT_LEN ", rgbValueBindRow = '%s'",
               len, cbValueMax, rgbValueBindRow);
 
 cleanup:
@@ -1192,8 +1192,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
     memset(&std_time, 0, sizeof(SIMPLE_TIME));
 
     MYLOG(LOG_DEBUG,
-          "field_type = %d, fctype = %d, value = '%s', cbValueMax=" FORMAT_LEN
-          "\n",
+          "field_type = %d, fctype = %d, value = '%s', cbValueMax=" FORMAT_LEN,
           field_type, fCType, (value == NULL) ? "<NULL>" : value, cbValueMax);
 
     if (!value) {
@@ -1262,7 +1261,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
             }
             if (strnicmp(value, "invalid", 7) != 0) {
                 char2stime(value, &std_time, &result, fCType);
-                MYLOG(LOG_ALL, "2stime fr=%d\n", std_time.fr);
+                MYLOG(LOG_ALL, "2stime fr=%d", std_time.fr);
             } else {
                 /*
                  * The timestamp is invalid so set something conspicuous,
@@ -1315,7 +1314,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                 }
                 if (strnicmp(trimmed, "invalid", 7) != 0) {
                     char2stime(trimmed, &std_time, &result, fCType);
-                    MYLOG(LOG_ALL, "2stime fr=%d\n", std_time.fr);
+                    MYLOG(LOG_ALL, "2stime fr=%d", std_time.fr);
                 } else {
                     /*
                      * The timestamp is invalid so set something conspicuous,
@@ -1374,7 +1373,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
             fCType = SQL_C_CHAR;
 #endif
 
-        MYLOG(LOG_DEBUG, ", SQL_C_DEFAULT: fCType = %d\n", fCType);
+        MYLOG(LOG_DEBUG, ", SQL_C_DEFAULT: fCType = %d", fCType);
     }
 
     text_bin_handling = FALSE;
@@ -1553,7 +1552,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
 
                 MYLOG(99,
                       "SQL_C_BIT: bind_row = " FORMAT_POSIROW
-                      " val = %ld, cb = " FORMAT_LEN ", rgb=%d\n",
+                      " val = %ld, cb = " FORMAT_LEN ", rgb=%d",
                       bind_row, slong, cbValueMax, *((UCHAR *)rgbValue));
                 break;
             }
@@ -1851,7 +1850,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                 if (TS_TYPE_INTEGER == field_type) {
                     UInt4 ival = strtoul(neut_str, 0, 10);
 
-                    MYLOG(LOG_ALL, "SQL_C_VARBOOKMARK value=%d\n", ival);
+                    MYLOG(LOG_ALL, "SQL_C_VARBOOKMARK value=%d", ival);
                     if (pcbValue)
                         *pcbValueBindRow = sizeof(ival);
                     if (cbValueMax >= (SQLLEN)sizeof(ival)) {
@@ -1861,7 +1860,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                         return COPY_RESULT_STRING_TRUNCATED;
                 } else {
                     MYLOG(LOG_DEBUG,
-                          "couldn't convert the type %d to SQL_C_BINARY\n",
+                          "couldn't convert the type %d to SQL_C_BINARY",
                           field_type);
                     return COPY_UNSUPPORTED_TYPE;
                 }
@@ -1870,7 +1869,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
 
                 result = char2guid(neut_str, &g);
                 if (COPY_OK != result) {
-                    MYLOG(LOG_DEBUG, "Could not convert to SQL_C_GUID\n");
+                    MYLOG(LOG_DEBUG, "Could not convert to SQL_C_GUID");
                     return COPY_UNSUPPORTED_TYPE;
                 }
                 len = sizeof(g);
@@ -1906,7 +1905,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                 break;
 
             default:
-                MYLOG(LOG_DEBUG, "conversion to the type %d isn't supported\n",
+                MYLOG(LOG_DEBUG, "conversion to the type %d isn't supported",
                       fCType);
                 return COPY_UNSUPPORTED_TYPE;
         }
@@ -2414,14 +2413,14 @@ static size_t convert_from_esbinary(const char *value, char *rgbValue,
             i++;
         }
         /** if (rgbValue)
-            MYLOG(LOG_DEBUG, "i=%d, rgbValue[%d] = %d, %c\n", i, o, rgbValue[o],
+            MYLOG(LOG_DEBUG, "i=%d, rgbValue[%d] = %d, %c", i, o, rgbValue[o],
            rgbValue[o]); ***/
     }
 
     if (rgbValue)
         rgbValue[o] = '\0'; /* extra protection */
 
-    MYLOG(LOG_DEBUG, "in=" FORMAT_SIZE_T ", out = " FORMAT_SIZE_T "\n", ilen, o);
+    MYLOG(LOG_DEBUG, "in=" FORMAT_SIZE_T ", out = " FORMAT_SIZE_T, ilen, o);
 
     return o;
 }
