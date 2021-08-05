@@ -338,7 +338,7 @@ DLL_DECLARE int mylog(const char *fmt, ...) {
     // Create new fmt string and prepend it with a formatted timestamp
     char *fmt_with_timestamp = (char *)malloc(sizeof(char) * 256);
     strftime(fmt_with_timestamp, 256, "\n%Y/%m/%d %X ", localtime(&current_time));
-    strcat(fmt_with_timestamp, fmt);
+    strncat(fmt_with_timestamp, fmt, 235); // 235 = 256 (buffer size) - 21 (length of formatted timestamp)
 
     va_start(args, fmt);
     ret = mylog_misc(option, fmt_with_timestamp, args);
