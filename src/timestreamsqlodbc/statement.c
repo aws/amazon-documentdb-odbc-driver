@@ -106,7 +106,7 @@ RETCODE SQL_API API_AllocStmt(HDBC hdbc, HSTMT *phstmt, UDWORD flag) {
     StatementClass *stmt;
     ARDFields *ardopts;
 
-    MYLOG(LOG_TRACE, "entering...\n");
+    MYLOG(LOG_TRACE, "entering...");
 
     if (!conn) {
         CC_log_error(func, "", NULL);
@@ -115,7 +115,7 @@ RETCODE SQL_API API_AllocStmt(HDBC hdbc, HSTMT *phstmt, UDWORD flag) {
 
     stmt = SC_Constructor(conn);
 
-    MYLOG(LOG_DEBUG, "**** : hdbc = %p, stmt = %p\n", hdbc, stmt);
+    MYLOG(LOG_DEBUG, "**** : hdbc = %p, stmt = %p", hdbc, stmt);
 
     if (!stmt) {
         CC_set_error(conn, CONN_STMT_ALLOC_ERROR,
@@ -158,7 +158,7 @@ RETCODE SQL_API API_FreeStmt(HSTMT hstmt, SQLUSMALLINT fOption) {
     CSTR func = "API_FreeStmt";
     StatementClass *stmt = (StatementClass *)hstmt;
 
-    MYLOG(LOG_TRACE, "entering...hstmt=%p, fOption=%hi\n", hstmt, fOption);
+    MYLOG(LOG_TRACE, "entering...hstmt=%p, fOption=%hi", hstmt, fOption);
 
     if (!stmt) {
         SC_log_error(func, "", NULL);
@@ -361,7 +361,7 @@ char SC_Destructor(StatementClass *self) {
     CSTR func = "SC_Destructor";
     QResultClass *res = SC_get_Result(self);
 
-    MYLOG(LOG_TRACE, "entering self=%p, self->result=%p, self->hdbc=%p\n", self,
+    MYLOG(LOG_TRACE, "entering self=%p, self->result=%p, self->hdbc=%p", self,
           res, self->hdbc);
     SC_clear_error(self);
     if (STMT_EXECUTING == self->status) {
@@ -401,19 +401,19 @@ char SC_Destructor(StatementClass *self) {
     DELETE_STMT_CS(self);
     free(self);
     self = NULL;
-    MYLOG(LOG_TRACE, "leaving\n");
+    MYLOG(LOG_TRACE, "leaving");
 
     return TRUE;
 }
 
 void SC_init_Result(StatementClass *self) {
     self->result = self->curres = NULL;
-    MYLOG(LOG_TRACE, "leaving(%p)\n", self);
+    MYLOG(LOG_TRACE, "leaving(%p)", self);
 }
 
 void SC_set_Result(StatementClass *self, QResultClass *res) {
     if (res != self->result) {
-        MYLOG(LOG_DEBUG, "(%p, %p)\n", self, res);
+        MYLOG(LOG_DEBUG, "(%p, %p)", self, res);
         QR_Destructor(self->result);
         self->result = self->curres = res;
     }
@@ -473,7 +473,7 @@ void SC_set_rowset_start(StatementClass *stmt, SQLLEN start, BOOL valid_base) {
                  QR_has_valid_base(res) ? "valid" : "unknown");
     }
     stmt->rowset_start = start;
-    MYPRINTF(LOG_DEBUG, ":stmt result=" FORMAT_LEN "\n", stmt->rowset_start);
+    MYPRINTF(LOG_DEBUG, ":stmt result=" FORMAT_LEN, stmt->rowset_start);
 }
 void SC_inc_rowset_start(StatementClass *stmt, SQLLEN inc) {
     SQLLEN start = stmt->rowset_start + inc;
@@ -561,7 +561,7 @@ BOOL SC_opencheck(StatementClass *self, const char *func) {
      * We can dispose the result of Describe-only any time.
      */
     if (self->prepare && self->status == STMT_DESCRIBED) {
-        MYLOG(LOG_DEBUG, "self->prepare && self->status == STMT_DESCRIBED\n");
+        MYLOG(LOG_DEBUG, "self->prepare && self->status == STMT_DESCRIBED");
         return FALSE;
     }
     if (res = SC_get_Curres(self), NULL != res) {
@@ -610,7 +610,7 @@ char SC_recycle_statement(StatementClass *self) {
     CSTR func = "SC_recycle_statement";
     ConnectionClass *conn;
 
-    MYLOG(LOG_TRACE, "entering self=%p\n", self);
+    MYLOG(LOG_TRACE, "entering self=%p", self);
 
     SC_clear_error(self);
     /* This would not happen */
@@ -650,7 +650,7 @@ char SC_recycle_statement(StatementClass *self) {
             /* Free the parsed table/field information */
             SC_initialize_cols_info(self, TRUE, TRUE);
 
-            MYLOG(LOG_DEBUG, "SC_clear_parse_status\n");
+            MYLOG(LOG_DEBUG, "SC_clear_parse_status");
             SC_clear_parse_status(self, conn);
             break;
     }
@@ -672,7 +672,7 @@ char SC_recycle_statement(StatementClass *self) {
     SC_set_rowset_start(self, -1, FALSE);
     SC_set_current_col(self, -1);
     self->bind_row = 0;
-    MYLOG(LOG_DEBUG, "statement=%p ommitted=0\n", self);
+    MYLOG(LOG_DEBUG, "statement=%p ommitted=0", self);
     self->last_fetch_count = self->last_fetch_count_include_ommitted = 0;
 
     self->__error_message = NULL;
@@ -937,7 +937,7 @@ void SC_error_copy(StatementClass *self, const StatementClass *from,
     QResultClass *self_res, *from_res;
     BOOL repstate;
 
-    MYLOG(LOG_TRACE, "entering %p->%p check=%i\n", from, self, check);
+    MYLOG(LOG_TRACE, "entering %p->%p check=%i", from, self, check);
     if (!from)
         return; /* for safety */
     if (self == from)
@@ -983,7 +983,7 @@ void SC_full_error_copy(StatementClass *self, const StatementClass *from,
                         BOOL allres) {
     ErrorInfo *eserror;
 
-    MYLOG(LOG_TRACE, "entering %p->%p\n", from, self);
+    MYLOG(LOG_TRACE, "entering %p->%p", from, self);
     if (!from)
         return; /* for safety */
     if (self == from)
@@ -1077,13 +1077,13 @@ SC_fetch(StatementClass *self) {
 
     /* TupleField *tupleField; */
 
-    MYLOG(LOG_TRACE, "entering statement=%p res=%p ommitted=0\n", self, res);
+    MYLOG(LOG_TRACE, "entering statement=%p res=%p ommitted=0", self, res);
     self->last_fetch_count = self->last_fetch_count_include_ommitted = 0;
     if (!res)
         return SQL_ERROR;
     coli = QR_get_fields(res); /* the column info */
 
-    MYLOG(LOG_DEBUG, "fetch_cursor=%d, %p->total_read=" FORMAT_LEN "\n",
+    MYLOG(LOG_DEBUG, "fetch_cursor=%d, %p->total_read=" FORMAT_LEN,
           SC_is_fetchcursor(self), res, res->num_total_read);
 
     if (self->currTuple >= (Int4)QR_get_num_total_tuples(res) - 1
@@ -1097,7 +1097,7 @@ SC_fetch(StatementClass *self) {
         return SQL_NO_DATA_FOUND;
     }
 
-    MYLOG(LOG_DEBUG, "**** : non-cursor_result\n");
+    MYLOG(LOG_DEBUG, "**** : non-cursor_result");
     if (self->currTuple >= 0) {
       FreePreviousRow(self);
     }
@@ -1107,7 +1107,7 @@ SC_fetch(StatementClass *self) {
 
     result = SQL_SUCCESS;
     self->last_fetch_count++;
-    MYLOG(LOG_DEBUG, "stmt=%p ommitted++\n", self);
+    MYLOG(LOG_DEBUG, "stmt=%p ommitted++", self);
     self->last_fetch_count_include_ommitted++;
 
     opts = SC_get_ARDF(self);
@@ -1132,7 +1132,7 @@ SC_fetch(StatementClass *self) {
     if (gdata->allocated != opts->allocated)
         extend_getdata_info(gdata, opts->allocated, TRUE);
     MYLOG(LOG_ALL,
-            "fetch: cols=%d, opts = %p, opts->bindings = %p\n",
+            "fetch: cols=%d, opts = %p, opts->bindings = %p",
             num_cols, opts, opts->bindings);
     for (lf = 0; lf < num_cols; lf++) {
         /* reset for SQLGetData */
@@ -1147,24 +1147,24 @@ SC_fetch(StatementClass *self) {
             type = CI_get_oid(coli, lf);            /* speed things up */
             atttypmod = CI_get_atttypmod(coli, lf); /* speed things up */
 
-            MYLOG(LOG_DEBUG, "type = %d, atttypmod = %d\n", type, atttypmod);
+            MYLOG(LOG_DEBUG, "type = %d, atttypmod = %d", type, atttypmod);
 
             SQLLEN curt = GIdx2CacheIdx(self->currTuple, self, res);
             MYLOG(LOG_ALL,
                   "%p->base=" FORMAT_LEN " curr=" FORMAT_LEN
-                  " st=" FORMAT_LEN " valid=%d\n",
+                  " st=" FORMAT_LEN " valid=%d",
                   res, QR_get_rowstart_in_cache(res), self->currTuple,
                   SC_get_rowset_start(self), QR_has_valid_base(res));
-            MYLOG(LOG_ALL, "curt=" FORMAT_LEN "\n", curt);
+            MYLOG(LOG_ALL, "curt=" FORMAT_LEN, curt);
             value = QR_get_value_backend_row(res, curt, lf);
 
-            MYLOG(LOG_DEBUG, "value = '%s'\n",
+            MYLOG(LOG_DEBUG, "value = '%s'",
                   (value == NULL) ? "<NULL>" : value);
 
             retval = copy_and_convert_field_bindinfo(self, type, atttypmod,
                                                      value, lf);
 
-            MYLOG(LOG_DEBUG, "copy_and_convert: retval = %d\n", retval);
+            MYLOG(LOG_DEBUG, "copy_and_convert: retval = %d", retval);
 
             switch (retval) {
                 case COPY_OK:
@@ -1197,10 +1197,10 @@ SC_fetch(StatementClass *self) {
                 case COPY_RESULT_STRING_TRUNCATED:
                     SC_set_error(self, STMT_STRING_TRUNCATED,
                                  "Fetched item was truncated.", func);
-                    MYLOG(LOG_DEBUG, "The %dth item was truncated\n", lf + 1);
+                    MYLOG(LOG_DEBUG, "The %dth item was truncated", lf + 1);
                     MYLOG(LOG_DEBUG, "The buffer size = " FORMAT_LEN,
                           opts->bindings[lf].buflen);
-                    MYLOG(LOG_DEBUG, " and the value is '%s'\n", value);
+                    MYLOG(LOG_DEBUG, " and the value is '%s'", value);
                     result = SQL_SUCCESS_WITH_INFO;
                     break;
 
@@ -1251,7 +1251,7 @@ RETCODE dequeueNeedDataCallback(RETCODE retcode, StatementClass *stmt) {
     void *data;
     int i, cnt;
 
-    MYLOG(LOG_TRACE, "entering ret=%d count=%d\n", retcode, stmt->num_callbacks);
+    MYLOG(LOG_TRACE, "entering ret=%d count=%d", retcode, stmt->num_callbacks);
     if (SQL_NEED_DATA == retcode)
         return retcode;
     if (stmt->num_callbacks <= 0)
@@ -1297,66 +1297,65 @@ void SC_log_error(const char *func, const char *desc,
             head = "STATEMENT WARNING";
         else {
             head = "STATEMENT ERROR";
-            MYLOG(level, "%s: func=%s, desc='%s', errnum=%d, errmsg='%s'\n",
+            MYLOG(level, "%s: func=%s, desc='%s', errnum=%d, errmsg='%s'",
                  head, func, desc, self->__error_number,
                  NULLCHECK(self->__error_message));
         }
-        MYLOG(LOG_DEBUG, "%s: func=%s, desc='%s', errnum=%d, errmsg='%s'\n",
+        MYLOG(LOG_DEBUG, "%s: func=%s, desc='%s', errnum=%d, errmsg='%s'",
               head, func, desc, self->__error_number,
               NULLCHECK(self->__error_message));
         if (SC_get_errornumber(self) > 0) {
             MYLOG(level,
                  "                 "
-                 "------------------------------------------------------------"
-                 "\n");
-            MYLOG(level, "                 hdbc=%p, stmt=%p, result=%p\n",
+                 "------------------------------------------------------------");
+            MYLOG(level, "                 hdbc=%p, stmt=%p, result=%p",
                  self->hdbc, self, res);
-            MYLOG(level, "                 prepare=%d, external=%d\n",
+            MYLOG(level, "                 prepare=%d, external=%d",
                  self->prepare, self->external);
             MYLOG(level,
-                  "                 bindings=%p, bindings_allocated=%d\n",
+                  "                 bindings=%p, bindings_allocated=%d",
                  opts->bindings, opts->allocated);
             MYLOG(level,
-                 "                 parameters=%p, parameters_allocated=%d\n",
+                 "                 parameters=%p, parameters_allocated=%d",
                  apdopts->parameters, apdopts->allocated);
-            MYLOG(level, "                 statement_type=%d, statement='%s'\n",
+            MYLOG(level, "                 statement_type=%d, statement='%s'",
                  self->statement_type, NULLCHECK(self->statement));
             MYLOG(level,
                  "                 currTuple=" FORMAT_LEN
-                 ", current_col=%d, lobj_fd=%d\n",
+                 ", current_col=%d, lobj_fd=%d",
                  self->currTuple, self->current_col, self->lobj_fd);
             MYLOG(level,
                  "                 maxRows=" FORMAT_LEN
                  ", rowset_size=" FORMAT_LEN ", keyset_size=" FORMAT_LEN
                  ", cursor_type=" FORMAT_UINTEGER
-                 ", scroll_concurrency=" FORMAT_UINTEGER "\n",
+                 ", scroll_concurrency=" FORMAT_UINTEGER,
                  self->options.maxRows, rowsetSize, self->options.keyset_size,
                  self->options.cursor_type, self->options.scroll_concurrency);
-            MYLOG(level, "                 cursor_name='%s'\n",
+            MYLOG(level, "                 cursor_name='%s'",
                  SC_cursor_name(self));
 
             MYLOG(level,
                  "                 ----------------QResult Info "
-                 "-------------------------------\n");
+                 "-------------------------------");
 
             if (res) {
                 MYLOG(level,
                      "                 fields=%p, backend_tuples=%p, "
-                     "tupleField=%p, conn=%p\n",
+                     "tupleField=%p, conn=%p",
                      QR_get_fields(res), res->backend_tuples, res->tupleField,
                      res->conn);
                 MYLOG(level,
                      "                 fetch_count=" FORMAT_LEN
                      ", num_total_rows=" FORMAT_ULEN
-                     ", num_fields=%d, cursor='%s'\n",
+                     ", num_fields=%d, cursor='%s'",
                      res->fetch_number, QR_get_num_total_tuples(res),
                      res->num_fields, NULLCHECK(QR_get_cursor(res)));
                 MYLOG(level,
                      "                 message='%s', command='%s', "
-                     "notice='%s'\n",
+                     "notice='%s'",
                      NULLCHECK(QR_get_message(res)), NULLCHECK(res->command),
                      NULLCHECK(res->notice));
-                MYLOG(level, "                 status=%d\n",
+                MYLOG(level, "                 status=%d",
                      QR_get_rstatus(res));
             }
 
@@ -1364,7 +1363,7 @@ void SC_log_error(const char *func, const char *desc,
             CC_log_error(func, desc, self->hdbc);
         }
     } else {
-        MYLOG(LOG_DEBUG, "INVALID STATEMENT HANDLE ERROR: func=%s, desc='%s'\n",
+        MYLOG(LOG_DEBUG, "INVALID STATEMENT HANDLE ERROR: func=%s, desc='%s'",
               func, desc);
     }
 }
@@ -1458,7 +1457,7 @@ int SC_Create_bookmark(StatementClass *self, BindInfoClass *bookmark,
     size_t cvtlen = sizeof(Int4);
     ES_BM ES_bm;
 
-    MYLOG(LOG_TRACE, "entering type=%d buflen=" FORMAT_LEN " buf=%p\n",
+    MYLOG(LOG_TRACE, "entering type=%d buflen=" FORMAT_LEN " buf=%p",
           bookmark->returntype, bookmark->buflen, bookmark->buffer);
     memset(&ES_bm, 0, sizeof(ES_bm));
     if (SQL_C_BOOKMARK == bookmark->returntype)
@@ -1481,7 +1480,7 @@ int SC_Create_bookmark(StatementClass *self, BindInfoClass *bookmark,
             used = (SQLLEN *)((char *)used + (bind_row * sizeof(SQLLEN)));
         *used = cvtlen;
     }
-    MYLOG(LOG_TRACE, "leaving cvtlen=" FORMAT_SIZE_T " ix(bl,of)=%d(%d,%d)\n",
+    MYLOG(LOG_TRACE, "leaving cvtlen=" FORMAT_SIZE_T " ix(bl,of)=%d(%d,%d)",
           cvtlen, ES_bm.index, ES_bm.keys.blocknum, ES_bm.keys.offset);
 
     return COPY_OK;

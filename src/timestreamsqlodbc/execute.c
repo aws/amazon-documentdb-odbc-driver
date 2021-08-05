@@ -55,7 +55,7 @@ RETCODE SQL_API API_Prepare(HSTMT hstmt, const SQLCHAR *stmt_str,
     else if (SQL_NTS == stmt_sz)
         original_stmt_len = strlen((char *)stmt_str);
     else {
-        MYLOG(LOG_DEBUG, "invalid length=" FORMAT_INTEGER "\n", stmt_sz);
+        MYLOG(LOG_DEBUG, "invalid length=" FORMAT_INTEGER, stmt_sz);
         SC_initialize_and_recycle(stmt);
         SC_set_error(stmt, STMT_INVALID_NULL_ARG, "Invalid buffer length",
                      func);
@@ -172,7 +172,7 @@ RETCODE SQL_API API_NativeSql(HDBC hdbc, const SQLCHAR *szSqlStrIn,
     ConnectionClass *conn = (ConnectionClass *)hdbc;
     RETCODE result;
 
-    MYLOG(LOG_TRACE, "entering...cbSqlStrIn=" FORMAT_INTEGER "\n", cbSqlStrIn);
+    MYLOG(LOG_TRACE, "entering...cbSqlStrIn=" FORMAT_INTEGER, cbSqlStrIn);
 
     ptr = (cbSqlStrIn == 0) ? "" : make_string(szSqlStrIn, cbSqlStrIn, NULL, 0);
     if (!ptr) {

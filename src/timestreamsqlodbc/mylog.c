@@ -241,7 +241,7 @@ void logs_on_off(int cnopen, int mylog_onoff) {
     //else if (getGlobalCommlog() > 0)
     //    qlog_on = getGlobalCommlog();
     //LEAVE_QLOG_CS;
-    MYLOG(LOG_DEBUG, "mylog_on=%d\n", mylog_on);
+    MYLOG(LOG_DEBUG, "mylog_on=%d", mylog_on);
 }
 
 #ifdef WIN32
@@ -333,9 +333,19 @@ DLL_DECLARE int mylog(const char *fmt, ...) {
     if (!mylog_on)
         return ret;
 
+    time_t current_time = time(NULL);
+    
+    // Create new fmt string and prepend it with a formatted timestamp
+    char *fmt_with_timestamp = (char *)malloc(sizeof(char) * 256);
+    strftime(fmt_with_timestamp, 256, "\n%Y/%m/%d %X ", localtime(&current_time));
+    strncat(fmt_with_timestamp, fmt, 235); // 235 = 256 (buffer size) - 21 (length of formatted timestamp)
+
     va_start(args, fmt);
-    ret = mylog_misc(option, fmt, args);
+    ret = mylog_misc(option, fmt_with_timestamp, args);
     va_end(args);
+    
+    free(fmt_with_timestamp);
+
     return ret;
 }
 
@@ -498,7 +508,7 @@ void logInstallerError(int ret, const char *dir) {
     msg[0] = '\0';
     ret = SQLInstallerError(1, &err, msg, sizeof(msg), NULL);
     if (msg[0] != '\0')
-        MYLOG(LOG_DEBUG, "Dir= %s ErrorMsg = %s\n", dir, msg);
+        MYLOG(LOG_DEBUG, "Dir= %s ErrorMsg = %s", dir, msg);
 }
 
 int getLogDir(char *dir, int dirmax) {
@@ -528,7 +538,7 @@ static void start_logging() {
      * ci->drivers.debug(commlog).
      */
     logs_on_off(0, 0);
-    mylog("\t%s:Global.debug&commlog=%d&%d\n", __func__, getGlobalDebug(),
+    mylog("\t%s:Global.debug&commlog=%d&%d", __func__, getGlobalDebug(),
           getGlobalCommlog());
 }
 
@@ -544,7 +554,7 @@ void InitializeLogging(void) {
         logdir = strdup(dir);
     mylog_initialize();
     start_logging();
-    MYLOG(LOG_DEBUG, "Log Output Dir: %s\n", logdir);
+    MYLOG(LOG_DEBUG, "Log Output Dir: %s", logdir);
 }
 
 void FinalizeLogging(void) {

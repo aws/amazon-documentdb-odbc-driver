@@ -53,7 +53,7 @@ void Communication::LogMsg(LogLevel level, const char* msg) {
 #endif  // WIN32
     // cppcheck outputs an erroneous missing argument error which breaks build.
     // Disable for this function call
-    MYLOG(level, "%s\n", msg);
+    MYLOG(level, "%s", msg);
 #if WIN32
 #pragma warning(pop)
 #endif  // WIN32
