@@ -179,11 +179,6 @@ static int mylog_on = LOG_WARNING;
 #define DELETE_MYLOG_CS XPlatformDeleteCriticalSection(&mylog_cs)
 
 #define MYLOGFILE "timestreamodbc_"
-#ifndef WIN32
-#define MYLOGDIR "/tmp"
-#else
-#define MYLOGDIR ""
-#endif /* WIN32 */
 
 //#define QLOGFILE "timestreamodbc_"
 //#ifndef WIN32
@@ -263,8 +258,7 @@ static void MLOG_open() {
     if (MLOGFP)
         return;
 
-    generate_filename(logdir ? logdir : MYLOGDIR, MYLOGFILE, filebuf,
-                      sizeof(filebuf));
+    generate_filename(logdir, MYLOGFILE, filebuf, sizeof(filebuf));
     MLOGFP = fopen(filebuf, ES_BINARY_A);
     if (!MLOGFP) {
         int lasterror = GENERAL_ERRNO;
@@ -549,9 +543,18 @@ void InitializeLogging(void) {
     initLogging = 0;
 
     char dir[PATH_MAX];
-    getLogDir(dir, sizeof(dir));
-    if (dir[0])
+    if (getLogDir(dir, sizeof(dir))) {
         logdir = strdup(dir);
+    } else {
+#ifdef WIN32
+        if (GetTempPathA(PATH_MAX, dir)) {
+            logdir = strdup(dir);
+        }
+#else
+        logdir = "/tmp";
+#endif
+    }
+
     mylog_initialize();
     start_logging();
     MYLOG(LOG_DEBUG, "Log Output Dir: %s", logdir);
