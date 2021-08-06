@@ -75,10 +75,12 @@ class TestSQLGetCursorName : public Fixture {
    public:
     void SetUp() override {
         Fixture::SetUp();
-        ASSERT_EQ(SQLSetCursorName(m_hstmt, (SQLTCHAR*)m_cursor_name.c_str(),
-                                   SQL_NTS),
-                  SQL_SUCCESS);
+        if (m_hstmt != SQL_NULL_HSTMT) {
+            ASSERT_EQ(SQLSetCursorName(
+                          m_hstmt, AS_SQLTCHAR(m_cursor_name.c_str()), SQL_NTS), SQL_SUCCESS);
+        }
     }
+
     test_string m_cursor_name = CREATE_STRING("test_cursor");
     SQLSMALLINT m_wrong_buffer_length = 1;
     SQLTCHAR m_cursor_name_buf[20] = {0};
@@ -452,7 +454,7 @@ TEST_F(TestSQLExecDirect, NullQueryError) {
 
 TEST_F(TestSQLSetCursorName, Success) {
     SQLRETURN ret =
-        SQLSetCursorName(m_hstmt, (SQLTCHAR*)m_cursor_name.c_str(), SQL_NTS);
+        SQLSetCursorName(m_hstmt, AS_SQLTCHAR(m_cursor_name.c_str()), SQL_NTS);
     EXPECT_EQ(SQL_SUCCESS, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
@@ -461,8 +463,9 @@ TEST_F(TestSQLGetCursorName, Success) {
     SQLRETURN ret =
         SQLGetCursorName(m_hstmt, m_cursor_name_buf,
                          IT_SIZEOF(m_cursor_name_buf), &m_cursor_name_length);
-    CompareStrNumChar(m_cursor_name, (SQLINTEGER)m_cursor_name_length,
-                m_cursor_name_buf, ret);
+    CompareStrNumChar(m_cursor_name,
+                      static_cast< SQLINTEGER >(m_cursor_name_length),
+                      m_cursor_name_buf, ret);
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
