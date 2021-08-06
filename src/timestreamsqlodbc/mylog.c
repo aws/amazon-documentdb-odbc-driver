@@ -532,7 +532,7 @@ static void start_logging() {
      * ci->drivers.debug(commlog).
      */
     logs_on_off(0, 0);
-    mylog("\t%s:Global.debug&commlog=%d&%d", __func__, getGlobalDebug(),
+    MYLOG(LOG_TRACE, "\t%s:Global.debug&commlog=%d&%d", __func__, getGlobalDebug(),
           getGlobalCommlog());
 }
 
