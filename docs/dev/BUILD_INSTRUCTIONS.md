@@ -6,51 +6,45 @@
 
 * [cmake](https://cmake.org/install/)
 * [Visual Studio 2019](https://visualstudio.microsoft.com/vs/) (Other versions may work, but only 2019 has been tested)
-* [Amazon Timestream ODBC Driver source code](https://github.com/opendistro-for-elasticsearch/sql/tree/master/sql-odbc)
+* [Amazon Timestream ODBC Driver source code](https://github.com/Bit-Quill/timestream-odbc)
 
 ### Build
+Using Developer Powershell, run one of the four powershell files to generate the build output. It also generates the VS2019 solution for building/testing the driver at `.\build\odbc\cmake\global_make_list.sln`. 
 
-#### with Visual Studio
-
-Run `./build_win_<config><bitness>.ps1` to generate a VS2019 project for building/testing the driver. (the build may fail, but should still generate a `.sln` file)
-
-The solution can be found at `<odbc-root>\build\odbc\build\global_make_list.sln`.
-
-#### with Developer Powershell
-
-Use `./build_win_<config><bitness>.ps1` to build the driver from a Developer Powershell prompt.
-
-> A shortcut is installed on your system with Visual Studio (search for **"Developer Powershell for VS 2019"**)
-
-> Programs launched with this prompt (ex: VS Code) also have access to the Developer shell.
+* `build_win_debug32.ps1`
+* `build_win_release32.ps1`
+* `build_win_debug64.ps1`
+* `build_win_release64.ps1`
 
 ### Build Output
 
 ```
 build
-└-- <Configuration><Bitness>
-  └-- odbc
-    └-- bin
-      └-- <Configuration>
-    └-- build
-    └-- lib
-  └-- aws-sdk
-    └-- build
-    └-- install
+└-- odbc
+  └-- bin
+    └-- <Configuration>
+  └-- cmake
+  └-- lib
+    └-- <Configuration>
+└-- aws-sdk
+  └-- build
+  └-- install
 ```
 
-* Driver DLL: `.\build\<Config><Bitness>\odbc\bin\<Config>\odfesqlodbc.dll`
-* Test binaries folder: `.\build\<Config><Bitness>\odbc\bin\<Config>`
+* Driver DLL: `.\build\odbc\bin\<Configuration>\timestreamsqlodbc.dll`
+* Test binaries folder: `.\build\odbc\bin\<Configuration>`
 
 ### Packaging
 
-From a Developer Powershell, run:
+From Developer Powershell, run:
 ```
-msbuild .\build\Release<Bitness>\odbc\PACKAGE.vcxproj -p:Configuration=Release
+msbuild .\build\odbc\PACKAGE.vcxproj -p:Configuration=Release
 ```
 
-An installer named as `AmazonTimestreamODBC<Bitness>-<version>.msi` will be generated in the build directory.
+An installer named `AmazonTimestreamODBC<Bitness>-<version>.msi` will be generated in the build\cmake directory.
 
+### Troubleshooting
+If you are changing the bitness (32-bit to/from 64-bit), you may need to delete the build directory and rebuild.
 
 ## Mac
 
@@ -80,7 +74,6 @@ Run below command from the project's build directory.
 >cpack .
 
 Installer named as `AmazonTimestreamODBC-<version>.pkg` will be generated in the build directory.
-
 
 ## Linux
 
