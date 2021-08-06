@@ -551,7 +551,7 @@ void InitializeLogging(void) {
             logdir = strdup(dir);
         }
 #else
-        logdir = "/tmp";
+        logdir = strdup("/tmp");
 #endif
     }
 
