@@ -41,7 +41,7 @@ From Developer Powershell, run:
 msbuild .\build\odbc\PACKAGE.vcxproj -p:Configuration=Release
 ```
 
-An installer named `AmazonTimestreamODBC<Bitness>-<version>.msi` will be generated in the build\cmake directory.
+An installer named `AmazonTimestreamODBC<Bitness>-<version>.msi` will be generated in the `.\build\cmake` directory.
 
 ### Troubleshooting
 If you are changing the bitness (32-bit to/from 64-bit), you may need to delete the build directory and rebuild.
