@@ -14,7 +14,6 @@ fi
 mkdir -p ${FINAL_INSTALL_DIR}
 mv ${PKG_INSTALL_DIR}/bin ${FINAL_INSTALL_DIR}/bin
 mv ${PKG_INSTALL_DIR}/doc ${FINAL_INSTALL_DIR}/doc
-mv ${PKG_INSTALL_DIR}/resources ${FINAL_INSTALL_DIR}/resources
 
 # TODO: look into why DSN installer is not working for fresh Mac install
 #   Current issue: "General installer error" when adding driver entry
