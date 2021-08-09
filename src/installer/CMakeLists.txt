@@ -144,10 +144,6 @@ cpack_add_component(Driver
 	DESCRIPTION "Library files for running the Amazon Timestream ODBC Driver"
     REQUIRED 
 )
-cpack_add_component(Resources
-	DISPLAY_NAME "Resources"
-	DESCRIPTION "Resources for Amazon Timestream ODBC Driver"
-)
 
 # Install driver files
 install(TARGETS timestreamsqlodbc DESTINATION bin COMPONENT "Driver")
