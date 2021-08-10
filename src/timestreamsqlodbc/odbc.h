@@ -365,11 +365,15 @@ SQLULEN ucs2strlen(const SQLWCHAR *);
 #endif
 
 #ifndef DBMS_NAME
+#ifdef WIN32
 #ifdef _WIN64
 #define DBMS_NAME "Amazon Timestream ODBC Driver(x64)"
 #else
 #define DBMS_NAME "Amazon Timestream ODBC Driver(x86)"
-#endif
+#endif /* _WIN64 */
+#else
+#define DBMS_NAME "Amazon Timestream ODBC Driver"
+#endif /* WIN32 */
 #endif /* DBMS_NAME */
 
 #ifdef WIN32
