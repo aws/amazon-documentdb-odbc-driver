@@ -146,12 +146,21 @@ bool TSCommunication::Validate(const runtime_options& options) {
         options.auth.auth_type != AUTHTYPE_OKTA) {
         throw std::invalid_argument("Unknown authentication type: \"" + options.auth.auth_type + "\".");
     }
-    if (options.auth.auth_type != AUTHTYPE_AWS_PROFILE && options.auth.uid.empty()) {
-        throw std::invalid_argument("UID / AccessKeyId cannot be empty.");
+    if (options.auth.uid.empty() && options.auth.auth_type != AUTHTYPE_AWS_PROFILE) {
+        if (options.auth.auth_type == AUTHTYPE_IAM) {
+            throw std::invalid_argument("Access Key ID cannot be empty.");
+        } else {
+            throw std::invalid_argument("IdP Username cannot be empty.");
+        }
     }
-    if (options.auth.auth_type != AUTHTYPE_AWS_PROFILE && options.auth.pwd.empty()) {
-        throw std::invalid_argument("PWD / SecretAccessKey cannot be empty.");
+    if (options.auth.pwd.empty() && options.auth.auth_type != AUTHTYPE_AWS_PROFILE) {
+        if (options.auth.auth_type == AUTHTYPE_IAM) {
+            throw std::invalid_argument("Secret Access Key cannot be empty.");
+        } else {
+            throw std::invalid_argument("IdP Password cannot be empty.");
+        }
     }
+
     LogMsg(LOG_DEBUG, "Required connection options are valid.");
     return true;
 }
