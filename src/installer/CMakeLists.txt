@@ -19,32 +19,81 @@ include(CPackComponent)
 set(CMAKE_INSTALL_PREFIX ${INSTALL_ROOT})
 
 # General package info
-set(CPACK_PACKAGE_VERSION "${DRIVER_PACKAGE_VERSION}")
+set(CPACK_PACKAGE_VERSION_MAJOR "${VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${VERSION_PATCH}")
+set(CPACK_PACKAGE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+
 if(APPLE)
     set(CPACK_PACKAGE_FILE_NAME "AmazonTimestreamODBC-${CPACK_PACKAGE_VERSION}")
     set(CPACK_PACKAGE_NAME "Amazon Timestream ODBC Driver ${CPACK_PACKAGE_VERSION}")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
+    set(CPACK_GENERATOR "productbuild")
+
+    # This script will be run once the Driver component has finished installing.
+    set(CPACK_POSTFLIGHT_DRIVER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/postinstall")
+
+    # The productbuild generator copies files from this directory
+    set(CPACK_PRODUCTBUILD_RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Resources")
+
+    # Background setup to Distribution XML
+    set(CPACK_PRODUCTBUILD_BACKGROUND "background.bmp")
+    set(CPACK_PRODUCTBUILD_BACKGROUND_ALIGNMENT "bottomleft")
+    set(CPACK_PRODUCTBUILD_BACKGROUND_SCALING "none")
+
+    # Background setup for the Dark Aqua theme to Distribution XML
+    set(CPACK_PRODUCTBUILD_BACKGROUND_DARKAQUA "background_darkaqua.bmp")
+    set(CPACK_PRODUCTBUILD_BACKGROUND_DARKAQUA_ALIGNMENT "bottomleft")
+    set(CPACK_PRODUCTBUILD_BACKGROUND_DARKAQUA_SCALING "none")
+    set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/Resources/README.txt")
+    set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Welcome.txt")
 elseif(UNIX)
     set(CPACK_PACKAGE_FILE_NAME "AmazonTimestreamODBC${BITNESS}-${CPACK_PACKAGE_VERSION}")
     if (INSTALLER_TYPE STREQUAL "DEB")
+        if (BITNESS EQUAL 32)
+            set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE i686)
+        else()
+            set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE amd64)
+        endif()
+        set(CPACK_GENERATOR "DEB")
+        set(CPACK_DEBIAN_FILE_NAME "AmazonTimestreamODBC_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
+
         # Deb installers fail if there's a space in them.
-        set(CPACK_PACKAGE_INSTALL_DIRECTORY "AmazonTimestreamODBCDriver${BITNESS}-bit$")
+        set(CPACK_PACKAGE_INSTALL_DIRECTORY "AmazonTimestreamODBCDriver${BITNESS}-bit")
         set(CPACK_PACKAGE_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY}${CPACK_PACKAGE_VERSION}")
-    else()
+
+        # TODO: Need to update both of these.
+        set(CPACK_PACKAGE_CONTACT "lyndonb@bitquilltech.com")
+        set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Lyndon Bauto")
+        set(CPACK_PACKAGE_DESCRIPTION "AmazonTimestreamODBCDriver-${BITNESS}-bit")
+        
+        # Add postrm and postinst with dsn stuff to add and remove them.
+        #set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/Debian/postinst")
+
+        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    elseif(INSTALLER_TYPE STREQUAL "RPM")
+        if (BITNESS EQUAL 32)
+            set(CPACK_RPM_PACKAGE_ARCHITECTURE i686)
+        else()
+            set(CPACK_RPM_PACKAGE_ARCHITECTURE x86_64)
+        endif()
+        set(CPACK_GENERATOR RPM)
+        set(CPACK_RPM_FILE_NAME "AmazonTimestreamODBC_${CPACK_PACKAGE_VERSION}_${CPACK_RPM_PACKAGE_ARCHITECTURE}.rpm")
+
         set(CPACK_PACKAGE_INSTALL_DIRECTORY "Amazon Timestream ODBC Driver ${BITNESS}-bit")
         set(CPACK_PACKAGE_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} ${CPACK_PACKAGE_VERSION}")
+        set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE 1)
+        set(CPACK_RPM_COMPONENT_INSTALL ON)
+        set(CPACK_TEMPORARY_PACKAGE_FILE_NAME "${CMAKE_BINARY_DIR}/_CPack_Packages/Linux/RPM/RPMS/${CMAKE_SYSTEM_PROCESSOR}/${CPACK_PACKAGE_FILE_NAME}.rpm")
+    else()
+        message(FATAL_ERROR "INSTALLER_TYPE '${INSTALLER_TYPE}' must be DEB or RPM for Linux installer." )
+
     endif()
 else()
     set(CPACK_PACKAGE_FILE_NAME "AmazonTimestreamODBC${BITNESS}-${CPACK_PACKAGE_VERSION}")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "Amazon Timestream ODBC Driver")
     set(CPACK_PACKAGE_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} ${BITNESS}-bit ${CPACK_PACKAGE_VERSION}")
-endif()
 
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${CPACK_PACKAGE_NAME}")
-set(CPACK_PACKAGE_VENDOR "Amazon")
-set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}")
-# OS-specific package info
-if(WIN32)
     # Set generator to WIX
     set(CPACK_GENERATOR "WIX")
 
@@ -70,65 +119,11 @@ if(WIN32)
 
     # CPack doesn't allow extensionless licenses, need to make a copy with an extension, .txt is appropriate
     configure_file("${PROJECT_ROOT}/LICENSE" "${PROJECT_ROOT}/LICENSE.txt" COPYONLY)
-elseif(APPLE)
-    set(CPACK_GENERATOR "productbuild")
-
-    # This script will be run once the Driver component has finished installing.
-    set(CPACK_POSTFLIGHT_DRIVER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/postinstall")
-
-    # The productbuild generator copies files from this directory
-    set(CPACK_PRODUCTBUILD_RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Resources")
-
-    # Background setup to Distribution XML
-    set(CPACK_PRODUCTBUILD_BACKGROUND "background.bmp")
-    set(CPACK_PRODUCTBUILD_BACKGROUND_ALIGNMENT "bottomleft")
-    set(CPACK_PRODUCTBUILD_BACKGROUND_SCALING "none")
-
-    # Background setup for the Dark Aqua theme to Distribution XML
-    set(CPACK_PRODUCTBUILD_BACKGROUND_DARKAQUA "background_darkaqua.bmp")
-    set(CPACK_PRODUCTBUILD_BACKGROUND_DARKAQUA_ALIGNMENT "bottomleft")
-    set(CPACK_PRODUCTBUILD_BACKGROUND_DARKAQUA_SCALING "none")
-    set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/Resources/README.txt")
-    set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Welcome.txt")
-else()
-    if(INSTALLER_TYPE STREQUAL "DEB")
-        set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
-        if (BITNESS EQUAL 32)
-            set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE i686)
-        else()
-            set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE amd64)
-        endif()
-        set(CPACK_GENERATOR "DEB")
-        set(CPACK_PACKAGE_VERSION_MAJOR "0")
-        set(CPACK_PACKAGE_VERSION_MINOR "5")
-        set(CPACK_PACKAGE_VERSION_PATCH "0")
-
-        # TODO: Need to update both of these.
-        set(CPACK_PACKAGE_CONTACT "lyndonb@bitquilltech.com")
-        set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Lyndon Bauto")
-        
-        set(CPACK_PACKAGE_DESCRIPTION "AmazonTimestreamODBCDriver-${BITNESS}-bit")
-        
-        # Add postrm and postinst with dsn stuff to add and remove them.
-        #set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/Debian/postinst")
-
-        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-    elseif(INSTALLER_TYPE STREQUAL "RPM")
-        set(CPACK_GENERATOR RPM)
-        set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE 1)
-        set(CPACK_RPM_COMPONENT_INSTALL ON)
-        set(CPACK_RPM_FILE_NAME "RPM-DEFAULT")
-        set(CPACK_TEMPORARY_PACKAGE_FILE_NAME "${CMAKE_BINARY_DIR}/_CPack_Packages/Linux/RPM/RPMS/${CMAKE_SYSTEM_PROCESSOR}/${CPACK_PACKAGE_FILE_NAME}.rpm")
-
-        if (BITNESS EQUAL 32)
-            set(CPACK_RPM_PACKAGE_ARCHITECTURE i686)
-        else()
-            set(CPACK_RPM_PACKAGE_ARCHITECTURE x86_64)
-        endif()
-    else()
-        message(FATAL_ERROR "INSTALLER_TYPE '${INSTALLER_TYPE}' must be DEB or RPM for Linux installer." )
-    endif()
 endif()
+
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${CPACK_PACKAGE_NAME}")
+set(CPACK_PACKAGE_VENDOR "Amazon")
+set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}")
 
 # CPack doesn't allow extensionless licenses, need to make a copy with an extension, .txt is appropriate
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_ROOT}/LICENSE.txt")
