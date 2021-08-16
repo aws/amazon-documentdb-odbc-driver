@@ -162,12 +162,6 @@ SQLRETURN GetNextResultSet(StatementClass *stmt) {
     if ((q_res == NULL) && (cc == NULL)) {
         return SQL_ERROR;
     }
-
-    SQLSMALLINT total_columns = -1;
-    if (!SQL_SUCCEEDED(SQLNumResultCols(stmt, &total_columns))
-        || (total_columns == -1)) {
-        return SQL_ERROR;
-    }
     
     PrefetchQueue *pPrefetchQueue = GetPrefetchQueue(cc->conn, stmt);
     if (pPrefetchQueue != nullptr && !pPrefetchQueue->IsEmpty()) {
