@@ -1371,7 +1371,8 @@ RETCODE SQL_API API_ExtendedFetch(HSTMT hstmt, SQLUSMALLINT fFetchType,
             const SQLLEN end_rowset_size = rowset_start + rowsetSize;
             while ((end_rowset_size >= num_tuples)
                    && (NULL != res->next_token)) {
-                GetNextResultSet(stmt);
+                if (SQL_ERROR == GetNextResultSet(stmt))
+                    break;
                 num_tuples = QR_get_num_total_tuples(res);
             }
         }
