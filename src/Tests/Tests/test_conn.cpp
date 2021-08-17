@@ -31,7 +31,7 @@ TEST(TestConnectionOptions, Good) {
     runtime_options options;
     options.auth.uid = "UID";
     options.auth.pwd = "PWD";
-    options.auth.region = "Region";
+    options.auth.region = "us-east-1";
     options.auth.auth_type = AUTHTYPE_IAM;
     TSCommunication conn;    
     EXPECT_NO_THROW(conn.Validate(options));
@@ -42,7 +42,7 @@ TEST(TestConnectionOptions, UID_is_empty) {
     runtime_options options;
     options.auth.uid = "";
     options.auth.pwd = "PWD";
-    options.auth.region = "Region";
+    options.auth.region = "us-east-1";
     options.auth.auth_type = AUTHTYPE_IAM;
     TSCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
@@ -52,7 +52,7 @@ TEST(TestConnectionOptions, PWD_is_empty) {
     runtime_options options;
     options.auth.uid = "UID";
     options.auth.pwd = "";
-    options.auth.region = "Region";
+    options.auth.region = "us-east-1";
     options.auth.auth_type = AUTHTYPE_IAM;
     TSCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
@@ -72,7 +72,7 @@ TEST(TestConnectionOptions, Auth_type_is_empty) {
     runtime_options options;
     options.auth.uid = "UID";
     options.auth.pwd = "PWD";
-    options.auth.region = "Region";
+    options.auth.region = "us-east-1";
     options.auth.auth_type = "";
     TSCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
@@ -82,7 +82,7 @@ TEST(TestConnectionOptions, Timeout_is_alpha) {
     runtime_options options;
     options.auth.uid = "UID";
     options.auth.pwd = "PWD";
-    options.auth.region = "Region";
+    options.auth.region = "us-east-1";
     options.auth.auth_type = "";
     options.conn.timeout = "timeout";
     TSCommunication conn;
