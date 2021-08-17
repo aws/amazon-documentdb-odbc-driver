@@ -160,6 +160,9 @@ bool TSCommunication::Validate(const runtime_options& options) {
             throw std::invalid_argument("IdP Password cannot be empty.");
         }
     }
+    if (options.auth.idp_host.empty() && options.auth.auth_type == AUTHTYPE_OKTA) {
+        throw std::invalid_argument("IdP Host cannot be empty.");
+    }
 
     LogMsg(LOG_DEBUG, "Required connection options are valid.");
     return true;
