@@ -7,7 +7,7 @@ $INSTALL_DIR = $args[4]
 Write-Host $args
 
 # Clone the AWS SDK CPP repo
-git clone --recurse-submodules -b "1.8.186" "https://github.com/aws/aws-sdk-cpp.git" $SRC_DIR
+git clone --recurse-submodules -b "1.9.79" "https://github.com/aws/aws-sdk-cpp.git" $SRC_DIR
 
 # Make and move to build directory
 New-Item -Path $BUILD_DIR -ItemType Directory -Force | Out-Null
@@ -22,7 +22,8 @@ cmake $SRC_DIR `
     -D ENABLE_UNITY_BUILD="ON" `
     -D CUSTOM_MEMORY_MANAGEMENT="OFF" `
     -D ENABLE_RTTI="OFF" `
-    -D ENABLE_TESTING="OFF"
+    -D ENABLE_TESTING="OFF" `
+    -D CPP_STANDARD="17"
 
 # Build AWS SDK and install to $INSTALL_DIR 
 msbuild ALL_BUILD.vcxproj /m /p:Configuration=$CONFIGURATION
