@@ -120,7 +120,7 @@ char CC_connect(ConnectionClass *self) {
         if ((CC_is_in_unicode_driver(self)) && (CC_is_in_ansi_app(self)))
             self->unicode |= CONN_DISALLOW_WCHAR;
 
-        // 1 is SQL_SUCCESS and 2 is SQL_SCCUESS_WITH_INFO
+        // 1 is SQL_SUCCESS and 2 is SQL_SUCCESS_WITH_INFO
         return 1;
     } catch (const std::exception& e) {
         CC_set_error(self, CONN_OPENDB_ERROR, e.what(), "CC_connect");
