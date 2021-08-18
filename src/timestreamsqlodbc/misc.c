@@ -72,7 +72,7 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src,
  * terminate the destination string.
  */
 void strncpy_null(char *dst, const char *src, ssize_t len) {
-    if (NULL != dst && len > 0) {
+    if (NULL != dst && NULL != src && len > 0) {
         int i;
         for (i = 0; src[i] && i < len - 1; i++)
             dst[i] = src[i];
@@ -86,7 +86,7 @@ void strncpy_null(char *dst, const char *src, ssize_t len) {
  * before being copied to the destination string.
  */
 void strncpy_lower_null(char *dst, const char *src, ssize_t len) {
-    if (NULL != dst && len > 0) {
+    if (NULL != dst && NULL != src && len > 0) {
         int i;
         for (i = 0; src[i] && i < len - 1; i++)
             dst[i] = (char)tolower(src[i]);
