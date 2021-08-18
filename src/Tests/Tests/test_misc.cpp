@@ -35,6 +35,12 @@ void copy_lower_case(char* dst, const char* src, size_t len) {
 TEST(TestMisc, strncpy_null) {
     char dst[BUFFER_LEN];
 
+    copy(dst, nullptr, BUFFER_LEN);
+    EXPECT_EQ("", std::string(dst));
+
+    copy(dst, "", BUFFER_LEN);
+    EXPECT_EQ("", std::string(dst));
+    
     copy(dst, test_str, test_str_len);
     EXPECT_EQ("The Quick Brown Fox Jumps Over The Lazy Do", std::string(dst));
 
@@ -48,6 +54,12 @@ TEST(TestMisc, strncpy_null) {
 TEST(TestMisc, strncpy_lower_null) {
     char dst[BUFFER_LEN];
 
+    copy_lower_case(dst, nullptr, BUFFER_LEN);
+    EXPECT_EQ("", std::string(dst));
+
+    copy_lower_case(dst, "", BUFFER_LEN);
+    EXPECT_EQ("", std::string(dst));
+    
     copy_lower_case(dst, test_str, test_str_len);
     EXPECT_EQ("the quick brown fox jumps over the lazy do", std::string(dst));
 
