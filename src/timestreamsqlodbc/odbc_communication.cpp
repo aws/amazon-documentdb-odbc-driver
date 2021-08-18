@@ -136,25 +136,9 @@ TSCommunication::~TSCommunication() {
   --AWS_SDK_HELPER;
 }
 
-bool static IsValidRegion(std::string region) {
-    return region == "us-east-1" || region == "us-east-2" || 
-        region == "us-west-1" || region == "us-west-2" || 
-        region == "ap-northeast-1" || region == "ap-northeast-2" || region == "ap-northeast-3" ||
-        region == "ap-southeast-1" || region == "ap-southeast-2" || 
-        region == "eu-west-1" || region == "eu-west-2" || region == "eu-west-3" || 
-        region == "af-south-1" || region == "ap-east-1" || region == "ap-south-1" || 
-        region == "ca-central-1" || region == "cn-north-1" || region == "cn-northwest-1" || 
-        region == "eu-central-1" || region == "eu-south-1" || region == "eu-north-1" || 
-        region == "me-south-1" || region == "sa-east-1";
-}
-
 bool TSCommunication::Validate(const runtime_options& options) {
-    if (options.auth.region.empty()) {
-        if (options.auth.end_point_override.empty()) {
-            throw std::invalid_argument("Region and end point cannot both be empty.");
-        }
-    } else if (!IsValidRegion(options.auth.region)) {
-        throw std::invalid_argument("Invalid region.");
+    if (options.auth.region.empty() && options.auth.end_point_override.empty()) {
+        throw std::invalid_argument("Region and end point cannot both be empty.");
     }
     if (options.auth.auth_type != AUTHTYPE_AWS_PROFILE &&
         options.auth.auth_type != AUTHTYPE_IAM &&
