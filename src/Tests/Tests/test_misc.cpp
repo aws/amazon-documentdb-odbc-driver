@@ -18,9 +18,10 @@
 #include <misc.h>
 
 #define BUFFER_LEN 256
-
-const char* test_str = "The Quick Brown Fox Jumps Over The Lazy Dog";
-const size_t test_str_len = strlen(test_str);
+#define TEST_STR "The Quick Brown Fox Jumps Over The Lazy Dog"
+#define TEST_STR_TRUNCATED "The Quick Brown Fox Jumps Over The Lazy Do"
+#define TEST_STR_LOWER "the quick brown fox jumps over the lazy dog"
+#define TEST_STR_LOWER_TRUNCATED "the quick brown fox jumps over the lazy do"
 
 void copy(char* dst, const char* src, size_t len) {
     memset(dst, 0, BUFFER_LEN);
@@ -41,14 +42,14 @@ TEST(TestMisc, strncpy_null) {
     copy(dst, "", BUFFER_LEN);
     EXPECT_EQ("", std::string(dst));
     
-    copy(dst, test_str, test_str_len);
-    EXPECT_EQ("The Quick Brown Fox Jumps Over The Lazy Do", std::string(dst));
+    copy(dst, TEST_STR, strlen(TEST_STR));
+    EXPECT_EQ(TEST_STR_TRUNCATED, std::string(dst));
 
-    copy(dst, test_str, test_str_len + 1);
-    EXPECT_EQ("The Quick Brown Fox Jumps Over The Lazy Dog", std::string(dst));
+    copy(dst, TEST_STR, strlen(TEST_STR) + 1);
+    EXPECT_EQ(TEST_STR, std::string(dst));
 
-    copy(dst, test_str, test_str_len + 2);
-    EXPECT_EQ("The Quick Brown Fox Jumps Over The Lazy Dog", std::string(dst));
+    copy(dst, TEST_STR, strlen(TEST_STR) + 2);
+    EXPECT_EQ(TEST_STR, std::string(dst));
 }
 
 TEST(TestMisc, strncpy_lower_null) {
@@ -60,12 +61,12 @@ TEST(TestMisc, strncpy_lower_null) {
     copy_lower_case(dst, "", BUFFER_LEN);
     EXPECT_EQ("", std::string(dst));
     
-    copy_lower_case(dst, test_str, test_str_len);
-    EXPECT_EQ("the quick brown fox jumps over the lazy do", std::string(dst));
+    copy_lower_case(dst, TEST_STR, strlen(TEST_STR));
+    EXPECT_EQ(TEST_STR_LOWER_TRUNCATED, std::string(dst));
 
-    copy_lower_case(dst, test_str, test_str_len + 1);
-    EXPECT_EQ("the quick brown fox jumps over the lazy dog", std::string(dst));
+    copy_lower_case(dst, TEST_STR, strlen(TEST_STR) + 1);
+    EXPECT_EQ(TEST_STR_LOWER, std::string(dst));
 
-    copy_lower_case(dst, test_str, test_str_len + 2);
-    EXPECT_EQ("the quick brown fox jumps over the lazy dog", std::string(dst));
+    copy_lower_case(dst, TEST_STR, strlen(TEST_STR) + 2);
+    EXPECT_EQ(TEST_STR_LOWER, std::string(dst));
 }
