@@ -86,6 +86,25 @@ size_t strncpy_null(char *dst, const char *src, ssize_t len) {
     return i;
 }
 
+/*
+ * Same as strncpy_null except each character is converted to lower case
+ * before being copied to the destination string.
+ */
+size_t strncpy_lower_null(char *dst, const char *src, ssize_t len) {
+    int i;
+
+    if (NULL != dst && len > 0) {
+        for (i = 0; src[i] && i < len - 1; i++)
+            dst[i] = (char)tolower(src[i]);
+
+        dst[i] = '\0';
+    } else
+        return 0;
+    if (src[i])
+        return strlen(src);
+    return i;
+}
+
 /*------
  *	Create a null terminated string (handling the SQL_NTS thing):
  *		1. If buf is supplied, place the string in there
