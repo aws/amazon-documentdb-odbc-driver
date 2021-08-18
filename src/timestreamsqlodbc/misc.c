@@ -71,38 +71,28 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src,
  * instead, I want it to copy up to len-1 characters and always
  * terminate the destination string.
  */
-size_t strncpy_null(char *dst, const char *src, ssize_t len) {
-    int i;
-
+void strncpy_null(char *dst, const char *src, ssize_t len) {
     if (NULL != dst && len > 0) {
+        int i;
         for (i = 0; src[i] && i < len - 1; i++)
             dst[i] = src[i];
 
         dst[i] = '\0';
-    } else
-        return 0;
-    if (src[i])
-        return strlen(src);
-    return i;
+    }
 }
 
 /*
  * Same as strncpy_null except each character is converted to lower case
  * before being copied to the destination string.
  */
-size_t strncpy_lower_null(char *dst, const char *src, ssize_t len) {
-    int i;
-
+void strncpy_lower_null(char *dst, const char *src, ssize_t len) {
     if (NULL != dst && len > 0) {
+        int i;
         for (i = 0; src[i] && i < len - 1; i++)
             dst[i] = (char)tolower(src[i]);
 
         dst[i] = '\0';
-    } else
-        return 0;
-    if (src[i])
-        return strlen(src);
-    return i;
+    }
 }
 
 /*------
