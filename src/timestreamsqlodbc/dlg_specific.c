@@ -235,7 +235,7 @@ BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
     else if (stricmp(attribute, INI_PROFILE_NAME) == 0)
         STRCPY_FIXED(ci->profile_name, value);
     else if (stricmp(attribute, INI_REGION) == 0)
-        STRCPY_FIXED(ci->region, value);
+        STRCPY_LOWER_FIXED(ci->region, value);
     else if (stricmp(attribute, INI_END_POINT_OVERRIDE) == 0)
         STRCPY_FIXED(ci->end_point_override, value);
     else if (stricmp(attribute, INI_LOG_LEVEL) == 0)
