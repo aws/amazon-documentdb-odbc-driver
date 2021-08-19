@@ -62,7 +62,7 @@ set(DSN_INSTALLER_SRC "${CMAKE_CURRENT_SOURCE_DIR}/DSNInstaller")
 # ODBC Driver version
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 5)
-set(VERSION_PATCH 0)
+set(VERSION_PATCH 1)
 
 add_compile_definitions( TS_ODBC_VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
                          # Comma separated version is required for odbc administrator's driver file.
