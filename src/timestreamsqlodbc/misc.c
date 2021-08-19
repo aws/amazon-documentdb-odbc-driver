@@ -71,28 +71,33 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src,
  * instead, I want it to copy up to len-1 characters and always
  * terminate the destination string.
  */
-void strncpy_null(char *dst, const char *src, ssize_t len) {
+size_t strncpy_null(char *dst, const char *src, ssize_t len) {
     if (NULL != dst && NULL != src && len > 0) {
-        int i;
-        for (i = 0; src[i] && i < len - 1; i++)
-            dst[i] = src[i];
+        if (len >= (ssize_t)strlen(dst)) {
+            // Use strcpy if len is too big to safely use strncpy
+            strcpy(dst, src);
+        } else {
+            strncpy(dst, src, len - 1);
+            dst[len - 1] = '\0';
+        }
 
-        dst[i] = '\0';
+        return strlen(dst);
     }
+
+    return 0;
 }
 
 /*
- * Same as strncpy_null except each character is converted to lower case
- * before being copied to the destination string.
+ * Copy characters and convert each character to lower case.
+ * 
  */
-void strncpy_lower_null(char *dst, const char *src, ssize_t len) {
-    if (NULL != dst && NULL != src && len > 0) {
-        int i;
-        for (i = 0; src[i] && i < len - 1; i++)
-            dst[i] = (char)tolower(src[i]);
-
-        dst[i] = '\0';
+size_t strncpy_lower_null(char *dst, const char *src, ssize_t len) {
+    size_t bytes_copied = strncpy_null(dst, src, len);
+    for (int i = 0; i < bytes_copied; i++) {
+        dst[i] = (char)tolower(dst[i]);
     }
+
+    return bytes_copied;
 }
 
 /*------
