@@ -93,7 +93,7 @@ size_t strncpy_null(char *dst, const char *src, ssize_t len) {
  */
 size_t strncpy_lower_null(char *dst, const char *src, ssize_t len) {
     size_t bytes_copied = strncpy_null(dst, src, len);
-    for (int i = 0; i < bytes_copied; i++) {
+    for (size_t i = 0; i < bytes_copied; i++) {
         dst[i] = (char)tolower(dst[i]);
     }
 
