@@ -89,6 +89,17 @@ TEST(TestConnectionOptions, Timeout_is_alpha) {
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
 
+TEST(TestConnectionOptions, IdP_host_is_empty) {
+    runtime_options options;
+    options.auth.uid = "UID";
+    options.auth.pwd = "PWD";
+    options.auth.region = "Region";
+    options.auth.auth_type = AUTHTYPE_OKTA;
+    options.auth.idp_host = "";
+    TSCommunication conn;
+    EXPECT_THROW(conn.Validate(options), std::invalid_argument);
+}
+
 TEST(TestDecodeHex, Single_hex) {
     const std::string hex_encoded = "&#x3d;";
     const std::string expected = "=";
