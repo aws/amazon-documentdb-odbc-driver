@@ -73,13 +73,16 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src,
  */
 size_t strncpy_null(char *dst, const char *src, ssize_t len) {
     if (NULL != dst && NULL != src && len > 0) {
-        if (len >= (ssize_t)strlen(dst)) {
-            // Use strcpy if len is too big to safely use strncpy
-            strcpy(dst, src);
-        } else {
-            strncpy(dst, src, len - 1);
-            dst[len - 1] = '\0';
-        }
+        ssize_t dst_len = strlen(dst);
+        if (len > dst_len + 1)
+            len = dst_len + 1;
+        
+        ssize_t src_len = strlen(src);
+        if (len > src_len + 1)
+            len = src_len + 1;
+
+        strncpy(dst, src, len - 1);
+        dst[len - 1] = '\0';
 
         return strlen(dst);
     }
