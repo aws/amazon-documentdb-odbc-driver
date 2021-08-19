@@ -23,50 +23,42 @@
 #define TEST_STR_LOWER "the quick brown fox jumps over the lazy dog"
 #define TEST_STR_LOWER_TRUNCATED "the quick brown fox jumps over the lazy do"
 
-void copy(char* dst, const char* src, size_t len) {
-    memset(dst, 0, BUFFER_LEN);
-    strncpy_null(dst, src, len);
+void test_copy(const char* src, size_t len, char* exp_dst, size_t exp_bytes_copied) {
+    char dst[BUFFER_LEN];
+    size_t bytes_copied = strncpy_null(dst, src, len);
+    if (src != nullptr) {
+        EXPECT_EQ(exp_dst, std::string(dst));
+    }
+    EXPECT_EQ(exp_bytes_copied, bytes_copied);
 }
 
-void copy_lower_case(char* dst, const char* src, size_t len) {
-    memset(dst, 0, BUFFER_LEN);
-    strncpy_lower_null(dst, src, len);
+void test_copy_lower_case(const char* src, size_t len, char* exp_dst, size_t exp_bytes_copied) {
+    char dst[BUFFER_LEN];
+    size_t bytes_copied = strncpy_lower_null(dst, src, len);
+    if (src != nullptr) {
+        EXPECT_EQ(exp_dst, std::string(dst));
+    }
+    EXPECT_EQ(exp_bytes_copied, bytes_copied);
 }
 
 TEST(TestMisc, strncpy_null) {
-    char dst[BUFFER_LEN];
-
-    copy(dst, nullptr, BUFFER_LEN);
-    EXPECT_EQ("", std::string(dst));
-
-    copy(dst, "", BUFFER_LEN);
-    EXPECT_EQ("", std::string(dst));
-    
-    copy(dst, TEST_STR, strlen(TEST_STR));
-    EXPECT_EQ(TEST_STR_TRUNCATED, std::string(dst));
-
-    copy(dst, TEST_STR, strlen(TEST_STR) + 1);
-    EXPECT_EQ(TEST_STR, std::string(dst));
-
-    copy(dst, TEST_STR, strlen(TEST_STR) + 2);
-    EXPECT_EQ(TEST_STR, std::string(dst));
+    test_copy(nullptr, BUFFER_LEN, "", 0);
+    test_copy("", BUFFER_LEN, "", 0);
+    test_copy(TEST_STR, strlen(TEST_STR), TEST_STR_TRUNCATED, strlen(TEST_STR_TRUNCATED));
+    test_copy(TEST_STR, strlen(TEST_STR) + 1, TEST_STR, strlen(TEST_STR));
+    test_copy(TEST_STR, strlen(TEST_STR) + 2, TEST_STR, strlen(TEST_STR));
+    test_copy(TEST_STR, 99999999999, TEST_STR, strlen(TEST_STR));
 }
 
 TEST(TestMisc, strncpy_lower_null) {
-    char dst[BUFFER_LEN];
-
-    copy_lower_case(dst, nullptr, BUFFER_LEN);
-    EXPECT_EQ("", std::string(dst));
-
-    copy_lower_case(dst, "", BUFFER_LEN);
-    EXPECT_EQ("", std::string(dst));
-    
-    copy_lower_case(dst, TEST_STR, strlen(TEST_STR));
-    EXPECT_EQ(TEST_STR_LOWER_TRUNCATED, std::string(dst));
-
-    copy_lower_case(dst, TEST_STR, strlen(TEST_STR) + 1);
-    EXPECT_EQ(TEST_STR_LOWER, std::string(dst));
-
-    copy_lower_case(dst, TEST_STR, strlen(TEST_STR) + 2);
-    EXPECT_EQ(TEST_STR_LOWER, std::string(dst));
+    test_copy_lower_case(nullptr, BUFFER_LEN, "", 0);
+    test_copy_lower_case("", BUFFER_LEN, "", 0);
+    test_copy_lower_case(TEST_STR, strlen(TEST_STR), TEST_STR_LOWER_TRUNCATED,
+                         strlen(TEST_STR_LOWER_TRUNCATED));
+    test_copy_lower_case(TEST_STR, strlen(TEST_STR) + 1, TEST_STR_LOWER,
+                         strlen(TEST_STR_LOWER));
+    test_copy_lower_case(TEST_STR, strlen(TEST_STR) + 2, TEST_STR_LOWER,
+                         strlen(TEST_STR_LOWER));
+    test_copy_lower_case(TEST_STR, 99999999999, TEST_STR_LOWER,
+                         strlen(TEST_STR_LOWER));
 }
