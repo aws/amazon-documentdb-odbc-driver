@@ -138,7 +138,7 @@ TSCommunication::~TSCommunication() {
 
 bool TSCommunication::Validate(const runtime_options& options) {
     if (options.auth.region.empty() && options.auth.end_point_override.empty()) {
-        throw std::invalid_argument("Both region and end point cannot be empty.");
+        throw std::invalid_argument("Region and end point cannot both be empty.");
     }
     if (options.auth.auth_type != AUTHTYPE_AWS_PROFILE &&
         options.auth.auth_type != AUTHTYPE_IAM &&
@@ -159,6 +159,9 @@ bool TSCommunication::Validate(const runtime_options& options) {
         } else {
             throw std::invalid_argument("IdP Password cannot be empty.");
         }
+    }
+    if (options.auth.idp_host.empty() && options.auth.auth_type == AUTHTYPE_OKTA) {
+        throw std::invalid_argument("IdP Host cannot be empty.");
     }
 
     LogMsg(LOG_DEBUG, "Required connection options are valid.");
