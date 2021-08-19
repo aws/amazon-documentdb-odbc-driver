@@ -47,7 +47,7 @@ TEST(TestMisc, strncpy_null) {
     test_copy(TEST_STR, strlen(TEST_STR), TEST_STR_TRUNCATED, strlen(TEST_STR_TRUNCATED));
     test_copy(TEST_STR, strlen(TEST_STR) + 1, TEST_STR, strlen(TEST_STR));
     test_copy(TEST_STR, strlen(TEST_STR) + 2, TEST_STR, strlen(TEST_STR));
-    test_copy(TEST_STR, 99999999999, TEST_STR, strlen(TEST_STR));
+    test_copy(TEST_STR, (size_t)999999, TEST_STR, strlen(TEST_STR));
 }
 
 TEST(TestMisc, strncpy_lower_null) {
@@ -59,6 +59,6 @@ TEST(TestMisc, strncpy_lower_null) {
                          strlen(TEST_STR_LOWER));
     test_copy_lower_case(TEST_STR, strlen(TEST_STR) + 2, TEST_STR_LOWER,
                          strlen(TEST_STR_LOWER));
-    test_copy_lower_case(TEST_STR, 99999999999, TEST_STR_LOWER,
+    test_copy_lower_case(TEST_STR, (size_t)999999, TEST_STR_LOWER,
                          strlen(TEST_STR_LOWER));
 }
