@@ -27,8 +27,8 @@ extern "C" {
 #endif
 
 void to_lower_case(char *str, size_t len);
-size_t strncpy_null(char *dst, const char *src, ssize_t len);
-size_t strncpy_null_lower_case(char *dst, const char *src, ssize_t len);
+size_t strncpy_null(char *dst, const char *src, ssize_t dst_buffer_len);
+size_t strncpy_null_lower_case(char *dst, const char *src, ssize_t dst_buffer_len);
 #ifndef HAVE_STRLCAT
 size_t strlcat(char *, const char *, size_t);
 #endif /* HAVE_STRLCAT */
