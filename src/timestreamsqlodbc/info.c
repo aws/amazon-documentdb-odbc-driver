@@ -956,7 +956,7 @@ RETCODE SQL_API API_GetFunctions(HDBC hdbc, SQLUSMALLINT fFunction,
         pfExists[SQL_API_SQLCONNECT] = TRUE;
         pfExists[SQL_API_SQLDESCRIBECOL] = TRUE; /* partial */
         pfExists[SQL_API_SQLDISCONNECT] = TRUE;
-        pfExists[SQL_API_SQLERROR] = TRUE;
+        pfExists[SQL_API_SQLERROR] = FALSE;
         pfExists[SQL_API_SQLEXECDIRECT] = TRUE;
         pfExists[SQL_API_SQLEXECUTE] = TRUE;
         pfExists[SQL_API_SQLFETCH] = TRUE;
