@@ -1372,31 +1372,4 @@ SQLRETURN SQL_API SQLColAttributes(SQLHSTMT StatementHandle,
     return ret;
 }
 
-/*	SQLError -> SQLDiagRec */
-RETCODE SQL_API SQLError(SQLHENV EnvironmentHandle, SQLHDBC ConnectionHandle,
-                         SQLHSTMT StatementHandle, SQLCHAR *Sqlstate,
-                         SQLINTEGER *NativeError, SQLCHAR *MessageText,
-                         SQLSMALLINT BufferLength, SQLSMALLINT *TextLength) {
-    RETCODE ret;
-    SQLSMALLINT RecNumber = 1;
-
-    MYLOG(LOG_TRACE, "entering");
-
-    if (StatementHandle) {
-        ret = API_StmtError(StatementHandle, RecNumber, Sqlstate, NativeError,
-                            MessageText, BufferLength, TextLength, 0);
-    } else if (ConnectionHandle) {
-        ret =
-            API_ConnectError(ConnectionHandle, RecNumber, Sqlstate, NativeError,
-                             MessageText, BufferLength, TextLength, 0);
-    } else if (EnvironmentHandle) {
-        ret = API_EnvError(EnvironmentHandle, RecNumber, Sqlstate, NativeError,
-                           MessageText, BufferLength, TextLength, 0);
-    } else {
-        ret = SQL_ERROR;
-    }
-
-    MYLOG(LOG_TRACE, "leaving %d", ret);
-    return ret;
-}
 #endif /* UNICODE_SUPPORTXX */
