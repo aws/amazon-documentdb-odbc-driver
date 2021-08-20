@@ -77,15 +77,18 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src,
 }
 
 /*
- * strncpy copies up to len characters, and doesn't terminate
- * the destination string if src has len characters or more.
- * instead, I want it to copy up to len-1 characters and always
+ * strncpy copies up to dst_buffer_len characters, and doesn't terminate
+ * the destination string if src has dst_buffer_len characters or more.
+ * instead, I want it to copy up to dst_buffer_len-1 characters and always
  * terminate the destination string.
+ * 
+ * dst_buffer_len is the total size of the destinaton buffer 
+ * (including the null terminating character).
  */
-size_t strncpy_null(char *dst, const char *src, ssize_t len) {
-    if (NULL != dst && NULL != src && len > 0) {
-        strncpy(dst, src, len - 1);
-        dst[len - 1] = '\0';
+size_t strncpy_null(char *dst, const char *src, ssize_t dst_buffer_len) {
+    if (NULL != dst && NULL != src && dst_buffer_len > 0) {
+        strncpy(dst, src, dst_buffer_len - 1);
+        dst[dst_buffer_len - 1] = '\0';
 
         return strlen(dst);
     }
@@ -97,9 +100,11 @@ size_t strncpy_null(char *dst, const char *src, ssize_t len) {
  * Copy characters from src to dst, null terminate the string,
  * and convert each character to lower case.
  * 
+ * dst_buffer_len is the total size of the destinaton buffer 
+ * (including the null terminating character).
  */
-size_t strncpy_null_lower_case(char *dst, const char *src, ssize_t len) {
-    size_t bytes_copied = strncpy_null(dst, src, len);
+size_t strncpy_null_lower_case(char *dst, const char *src, ssize_t dst_buffer_len) {
+    size_t bytes_copied = strncpy_null(dst, src, dst_buffer_len);
     to_lower_case(dst, bytes_copied);
     return bytes_copied;
 }
