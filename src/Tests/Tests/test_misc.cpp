@@ -25,14 +25,14 @@
 #define TEST_STR_LOWER "the quick brown fox jumps over the lazy dog"
 #define TEST_STR_LOWER_TRUNCATED "the quick"
 
-void test_to_lower_case(char* str, size_t len, char* exp_str) {
+void test_to_lower_case(char* str, size_t len, char const *exp_str) {
     to_lower_case(str, len);
     if (str != nullptr) {
         EXPECT_EQ(exp_str, std::string(str));
     }
 }
 
-void test_copy(const char* src, char* exp_dst) {
+void test_copy(const char* src, char const *exp_dst) {
     char dst[BUFFER_LEN];
     strncpy_null(dst, src, sizeof(dst));
     if (src != nullptr) {
@@ -40,7 +40,7 @@ void test_copy(const char* src, char* exp_dst) {
     }
 }
 
-void test_copy_small_buffer(const char* src, char* exp_dst) {
+void test_copy_small_buffer(const char* src, char const *exp_dst) {
     char dst[SMALL_BUFFER_LEN];
     strncpy_null(dst, src, sizeof(dst));
     if (src != nullptr) {
@@ -48,7 +48,7 @@ void test_copy_small_buffer(const char* src, char* exp_dst) {
     }
 }
 
-void test_copy_lower_case(const char* src, char* exp_dst) {
+void test_copy_lower_case(const char* src, char const *exp_dst) {
     char dst[BUFFER_LEN];
     strncpy_null_lower_case(dst, src, sizeof(dst));
     if (src != nullptr) {
@@ -56,7 +56,7 @@ void test_copy_lower_case(const char* src, char* exp_dst) {
     }
 }
 
-void test_copy_lower_case_small_buffer(const char* src, char* exp_dst) {
+void test_copy_lower_case_small_buffer(const char* src, char const *exp_dst) {
     char dst[SMALL_BUFFER_LEN];
     strncpy_null_lower_case(dst, src, sizeof(dst));
     if (src != nullptr) {
@@ -66,7 +66,7 @@ void test_copy_lower_case_small_buffer(const char* src, char* exp_dst) {
 
 TEST(TestMisc, to_lower_case) {
     test_to_lower_case(nullptr, 0, nullptr);
-    test_to_lower_case("", 0, "");
+    test_to_lower_case((char*)"", 0, "");
     
     char str[] = TEST_STR;
     test_to_lower_case(str, sizeof(str), TEST_STR_LOWER);
