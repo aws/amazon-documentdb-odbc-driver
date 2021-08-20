@@ -17,7 +17,6 @@
 @yanw-bq
 @lyndonb-bq
 @csolonynka
-@rajeiyer
-@vasudevkarthik
-@eric-coll
+@justing-bq
+@leszek-bq
 <!-- Any additional reviewers -->
