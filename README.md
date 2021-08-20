@@ -14,8 +14,8 @@ The driver is compatible with ODBC 3.51.
   | Operating System  | Version | Supported Bitness |
   | ------------- |-------------| ----------------- |
   |  Windows    |  Windows Server 2019, Windows 10  | 32-bit, 64-bit |
-  |  MacOS    |  Mojave | 64-bit |
-  |  Linux    |  Debian distro, Redhat like distro(Amazon Linux 2)  |  32-bit, 64-bit  |
+  |  MacOS    |  Catalina, Big Sur | 64-bit |
+  |  Linux    |  Debian distro, Redhat like distro (Amazon Linux 2) |  32-bit, 64-bit  |
 
 ## Installing the Driver
 
@@ -24,7 +24,7 @@ You can use the installers generated as part of the most recent release.
 ### Windows
 
 1. Run the `.msi` installer to install the Amazon Timestream ODBC Driver.
-2. [Test connection](./docs/user/windows_configure_dsn.md) using ODBC Data Source Administrator.
+2. [Test the connection](./docs/user/windows_configure_dsn.md) using ODBC Data Source Administrator.
 
 ### Mac
 
@@ -33,11 +33,15 @@ iODBC Driver Manager should be installed before installing the Amazon Timestream
 1. Run the `.pkg` installer to install the Amazon Timestream ODBC Driver.
 2. Configure a Driver and DSN entry for the Amazon Timestream ODBC Driver, following the instructions [here](./docs/user/mac_configure_dsn.md).
 
+### Linux `.deb` - TO DO
+
+### Linux `.rpm - TO DO
+
 ## Using the Driver
 
 The driver comes in the form of a library file:
-* Windows: `odfesqlodbc.dll`
-* Mac: `libodfesqlodbc.dylib`
+* Windows: `timestreamsqlodbc.dll`
+* Mac: `libtimestreamsqlodbc.dylib`
 
 If using with ODBC compatible BI tools, refer to the tool documentation on configuring a new ODBC driver. In most cases, you will need to make the tool aware of the location of the driver library file and then use it to setup Amazon Timestream database connections.
 
@@ -55,14 +59,6 @@ To setup a connection, the driver uses an ODBC connection string. Connection str
 ### Building
 
 Please refer to the [build instructions](./docs/dev/BUILD_INSTRUCTIONS.md) for detailed build instructions on your platform.
-If your PC is already setup to build the library, you can simply invoke cmake using
-
-> cmake ./src
-
-From the projects root directory, then build the project using Visual Studio (Windows) or make (Mac).
-
-* Visual Studio: Open **./global_make_list.sln**
-* Make: Run `make` from the build root.
 
 ### Testing
 
