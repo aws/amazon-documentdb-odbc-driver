@@ -4,17 +4,24 @@
 
 ### Dependencies
 
-* [cmake](https://cmake.org/install/)
 * [Visual Studio 2019](https://visualstudio.microsoft.com/vs/) (Other versions may work, but only 2019 has been tested)
+** Install Desktop development with C++
+** check “C++ MFC for latest vXXX build tools”
+** Install CLangFormat Extension from the Extensions menu in Visual Studio or from the [Marketplace](https://marketplace.visualstudio.com/items?itemName=LLVMExtensions.ClangFormat).
 * [Amazon Timestream ODBC Driver source code](https://github.com/Bit-Quill/timestream-odbc)
+* [cmake](https://cmake.org/install/). This is installed with Visual Studio.
+** Ensure that the PATH environment variable contains `C:\Program Files\Git\cmd`.
+* Turn on Microsoft .NET Framework 3.5.1 on Windows 2008
+* [Wix Toolset](https://wixtoolset.org/releases/)
 
 ### Build
+
 Using Developer Powershell, run one of the four powershell files to generate the build output. It also generates the VS2019 solution for building/testing the driver at `.\build\odbc\cmake\global_make_list.sln`. 
 
-* `build_win_debug32.ps1`
-* `build_win_release32.ps1`
-* `build_win_debug64.ps1`
-* `build_win_release64.ps1`
+* `.\build_win_debug32.ps1`
+* `.\build_win_release32.ps1`
+* `.\build_win_debug64.ps1`
+* `.\build_win_release64.ps1`
 
 ### Build Output
 
@@ -38,7 +45,7 @@ build
 
 From Developer Powershell, run:
 ```
-msbuild .\build\odbc\PACKAGE.vcxproj -p:Configuration=Release
+msbuild .\build\odbc\cmake\PACKAGE.vcxproj -p:Configuration=Release
 ```
 
 An installer named `AmazonTimestreamODBC<Bitness>-<version>.msi` will be generated in the `.\build\cmake` directory.
@@ -57,21 +64,26 @@ Using homebrew, install the following packages using the command provided:
 >* curl
 >* cmake
 >* libiodbc
+>* llvm (for debug version)
 
 ### Building the Driver
 
-From a Bash shell:
+From Terminal, run one of the following:
+* `./build_mac_debug64.sh`
+* `./build_mac_release64.sh`
 
-`./build_mac_<config><bitness>.sh`
 
 ### Output Location on Mac
 
-Compiling on Mac will output the tests to **bin** and the driver to **lib**. There are also some additional test infrastructure files which output to the **lib** directory.
+* Driver: `./build/odbc/lib/libimestreamsqlodbc.dylib`
+* Test binaries folder: `./build/odbc/bin`. Some additional test infrastructure files are also output to the **lib** directory.
 
 ### Packaging
 
 Run below command from the project's build directory.
->cpack .
+*  `cmake ../src`
+*  `make`
+*  `cpack .`
 
 Installer named as `AmazonTimestreamODBC-<version>.pkg` will be generated in the build directory.
 
@@ -82,19 +94,22 @@ Installer named as `AmazonTimestreamODBC-<version>.pkg` will be generated in the
 The terminal can be used to install all the dependencies for Linux.
 
 On 64-bit, the following commands can be used to collect the required dependencies.
->sudo apt update
->sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib cmake linux-headers-$(uname -r) build-essential unixodbc-dev
+> `sudo apt update`
+> `sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib cmake linux-headers-$(uname -r) build-essential unixodbc-dev`
 
 On 32-bit, the following commands can be used to collect the required dependencies.
->sudo dpkg --add-architecture i386
->sudo apt update 
->sudo apt install unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386 zlib1g-dev:i386 linux-headers-$(uname -r) gcc-multilib:i386 g++-multilib:i386 cmake g++-9:i386 gcc-9:i386 gcc-9-multilib:i386 g++-9-multilib:i386 binutils:i386 make:i386
+> `sudo dpkg --add-architecture i386`
+> `sudo apt update`
+> `sudo apt install unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386 zlib1g-dev:i386 linux-headers-$(uname -r) gcc-multilib:i386 g++-multilib:i386 cmake g++-9:i386 gcc-9:i386 gcc-9-multilib:i386 g++-9-multilib:i386 binutils:i386 make:i386`
 
 ### Building the Driver
 
-From a terminal, execute:
+From a terminal, execute one of the four files to generate the build output. 
 
-`./build_linux_<config><bitness>_<installer_type>.sh`
+* `./build_linux_release32_deb.sh`
+* `./build_linux_release64_deb.sh`
+* `./build_linux_release32_rpm.sh`
+* `./build_linux_release64_rpm.sh`
 
 ### Output Location on Linux
 
