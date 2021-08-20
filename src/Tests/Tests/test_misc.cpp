@@ -27,7 +27,9 @@
 
 void test_to_lower_case(char* str, size_t len, char const *exp_str) {
     to_lower_case(str, len);
-    if (str != nullptr) {
+    if (exp_str == nullptr) {
+        EXPECT_EQ(exp_str, str);
+    } else {
         EXPECT_EQ(exp_str, std::string(str));
     }
 }
@@ -35,7 +37,9 @@ void test_to_lower_case(char* str, size_t len, char const *exp_str) {
 void test_copy(const char* src, char const *exp_dst) {
     char dst[BUFFER_LEN];
     strncpy_null(dst, src, sizeof(dst));
-    if (src != nullptr) {
+    if (exp_dst == nullptr) {
+        EXPECT_EQ(exp_dst, src);
+    } else {
         EXPECT_EQ(exp_dst, std::string(dst));
     }
 }
@@ -43,7 +47,9 @@ void test_copy(const char* src, char const *exp_dst) {
 void test_copy_small_buffer(const char* src, char const *exp_dst) {
     char dst[SMALL_BUFFER_LEN];
     strncpy_null(dst, src, sizeof(dst));
-    if (src != nullptr) {
+    if (exp_dst == nullptr) {
+        EXPECT_EQ(exp_dst, src);
+    } else {
         EXPECT_EQ(exp_dst, std::string(dst));
     }
 }
@@ -51,7 +57,9 @@ void test_copy_small_buffer(const char* src, char const *exp_dst) {
 void test_copy_lower_case(const char* src, char const *exp_dst) {
     char dst[BUFFER_LEN];
     strncpy_null_lower_case(dst, src, sizeof(dst));
-    if (src != nullptr) {
+    if (exp_dst == nullptr) {
+        EXPECT_EQ(exp_dst, src);
+    } else {
         EXPECT_EQ(exp_dst, std::string(dst));
     }
 }
@@ -59,7 +67,9 @@ void test_copy_lower_case(const char* src, char const *exp_dst) {
 void test_copy_lower_case_small_buffer(const char* src, char const *exp_dst) {
     char dst[SMALL_BUFFER_LEN];
     strncpy_null_lower_case(dst, src, sizeof(dst));
-    if (src != nullptr) {
+    if (exp_dst == nullptr) {
+        EXPECT_EQ(exp_dst, src);
+    } else {
         EXPECT_EQ(exp_dst, std::string(dst));
     }
 }
@@ -69,24 +79,29 @@ TEST(TestMisc, to_lower_case) {
     test_to_lower_case((char*)"", 0, "");
     
     char str[] = TEST_STR;
-    test_to_lower_case(str, sizeof(str), TEST_STR_LOWER);
+    test_to_lower_case(str, strlen(str), TEST_STR_LOWER);
 
     char str_upper[] = TEST_STR_UPPER;
-    test_to_lower_case(str_upper, sizeof(str_upper), TEST_STR_LOWER);
+    test_to_lower_case(str_upper, strlen(str_upper), TEST_STR_LOWER);
+
+    char str_lower[] = TEST_STR_LOWER;
+    test_to_lower_case(str_lower, strlen(str_lower), TEST_STR_LOWER);
 }
 
 TEST(TestMisc, strncpy_null) {    
-    test_copy(nullptr, "");
+    test_copy(nullptr, nullptr);
     test_copy("", "");
     test_copy(TEST_STR, TEST_STR);
     test_copy_small_buffer(TEST_STR, TEST_STR_TRUNCATED);
 }
 
 TEST(TestMisc, strncpy_null_lower_case) {
-    test_copy_lower_case(nullptr, "");
+    test_copy_lower_case(nullptr, nullptr);
     test_copy_lower_case("", "");
     test_copy_lower_case(TEST_STR, TEST_STR_LOWER);
     test_copy_lower_case(TEST_STR_UPPER, TEST_STR_LOWER);
+    test_copy_lower_case(TEST_STR_LOWER, TEST_STR_LOWER);
     test_copy_lower_case_small_buffer(TEST_STR, TEST_STR_LOWER_TRUNCATED);
     test_copy_lower_case_small_buffer(TEST_STR_UPPER, TEST_STR_LOWER_TRUNCATED);
+    test_copy_lower_case_small_buffer(TEST_STR_LOWER, TEST_STR_LOWER_TRUNCATED);
 }
