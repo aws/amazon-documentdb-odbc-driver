@@ -35,6 +35,17 @@
 #endif
 
 /*
+ *	Converts a string buffer to lower case.
+ */
+void to_lower_case(char *str, size_t len) {
+    if (NULL != str) {
+        for (size_t i = 0; i < len; i++) {
+            str[i] = (char)tolower(str[i]);
+        }
+    }
+}
+
+/*
  *	returns STRCPY_FAIL, STRCPY_TRUNCATED, or #bytes copied
  *	(not including null term)
  */
@@ -73,14 +84,6 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src,
  */
 size_t strncpy_null(char *dst, const char *src, ssize_t len) {
     if (NULL != dst && NULL != src && len > 0) {
-        ssize_t dst_len = strlen(dst);
-        if (len > dst_len + 1)
-            len = dst_len + 1;
-        
-        ssize_t src_len = strlen(src);
-        if (len > src_len + 1)
-            len = src_len + 1;
-
         strncpy(dst, src, len - 1);
         dst[len - 1] = '\0';
 
@@ -91,15 +94,13 @@ size_t strncpy_null(char *dst, const char *src, ssize_t len) {
 }
 
 /*
- * Copy characters and convert each character to lower case.
+ * Copy characters from src to dst, null terminate the string,
+ * and convert each character to lower case.
  * 
  */
-size_t strncpy_lower_null(char *dst, const char *src, ssize_t len) {
+size_t strncpy_null_lower_case(char *dst, const char *src, ssize_t len) {
     size_t bytes_copied = strncpy_null(dst, src, len);
-    for (size_t i = 0; i < bytes_copied; i++) {
-        dst[i] = (char)tolower(dst[i]);
-    }
-
+    to_lower_case(dst, bytes_copied);
     return bytes_copied;
 }
 
