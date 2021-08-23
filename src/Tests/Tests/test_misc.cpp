@@ -37,9 +37,7 @@ void test_to_lower_case(char* str, size_t len, char const *exp_str) {
 void test_copy(const char* src, char const *exp_dst) {
     char dst[BUFFER_LEN];
     strncpy_null(dst, src, sizeof(dst));
-    if (exp_dst == nullptr) {
-        EXPECT_EQ(exp_dst, src);
-    } else {
+    if (exp_dst != nullptr) {
         EXPECT_EQ(exp_dst, std::string(dst));
     }
 }
@@ -47,9 +45,7 @@ void test_copy(const char* src, char const *exp_dst) {
 void test_copy_small_buffer(const char* src, char const *exp_dst) {
     char dst[SMALL_BUFFER_LEN];
     strncpy_null(dst, src, sizeof(dst));
-    if (exp_dst == nullptr) {
-        EXPECT_EQ(exp_dst, src);
-    } else {
+    if (exp_dst != nullptr) {
         EXPECT_EQ(exp_dst, std::string(dst));
     }
 }
@@ -57,9 +53,7 @@ void test_copy_small_buffer(const char* src, char const *exp_dst) {
 void test_copy_lower_case(const char* src, char const *exp_dst) {
     char dst[BUFFER_LEN];
     strncpy_null_lower_case(dst, src, sizeof(dst));
-    if (exp_dst == nullptr) {
-        EXPECT_EQ(exp_dst, src);
-    } else {
+    if (exp_dst != nullptr) {
         EXPECT_EQ(exp_dst, std::string(dst));
     }
 }
@@ -67,9 +61,7 @@ void test_copy_lower_case(const char* src, char const *exp_dst) {
 void test_copy_lower_case_small_buffer(const char* src, char const *exp_dst) {
     char dst[SMALL_BUFFER_LEN];
     strncpy_null_lower_case(dst, src, sizeof(dst));
-    if (exp_dst == nullptr) {
-        EXPECT_EQ(exp_dst, src);
-    } else {
+    if (exp_dst != nullptr) {
         EXPECT_EQ(exp_dst, std::string(dst));
     }
 }
