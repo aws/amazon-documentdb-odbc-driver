@@ -84,6 +84,8 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src,
  * 
  * dst_buffer_len is the total size of the destinaton buffer 
  * (including the null terminating character).
+ * 
+ * Does not currently support UTF-8 encoded strings.
  */
 size_t strncpy_null(char *dst, const char *src, ssize_t dst_buffer_len) {
     if (NULL != dst && NULL != src && dst_buffer_len > 0) {
@@ -102,6 +104,8 @@ size_t strncpy_null(char *dst, const char *src, ssize_t dst_buffer_len) {
  * 
  * dst_buffer_len is the total size of the destinaton buffer 
  * (including the null terminating character).
+ * 
+ * Does not currently support UTF-8 encoded strings.
  */
 size_t strncpy_null_lower_case(char *dst, const char *src, ssize_t dst_buffer_len) {
     size_t bytes_copied = strncpy_null(dst, src, dst_buffer_len);
