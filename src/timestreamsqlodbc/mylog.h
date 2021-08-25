@@ -48,6 +48,7 @@ extern "C" {
 #ifdef __linux__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcomment"
+#pragma GCC system_header
 #endif  // __linux__
 
 
