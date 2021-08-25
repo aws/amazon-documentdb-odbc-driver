@@ -177,7 +177,6 @@ class TestSQLStatistics : public Fixture {};
  * <Database>.<Table> in Amazon Timestream
  * ODBCTest.DevOps
  * ODBCTest.IoT
- * promDB.promTB
  */
 
 TEST_F(TestSQLTables, TEST_ALL_NULL) {
@@ -207,7 +206,6 @@ TEST_F(TestSQLTables, TEST_ALL_NULL) {
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
-        {"promDB", "", "promTB", "TABLE", ""},
         {"sampleDB", "", "DevOps", "TABLE", ""},
         {"sampleDB", "", "IoT", "TABLE", ""}};
     CheckRows(expected, result);
@@ -240,7 +238,6 @@ TEST_F(TestSQLTables, TEST_ALL_DATABASES_EXCEL) {
     }
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "", "", ""},
-        {"promDB", "", "", "", ""},
         {"sampleDB", "", "", "", ""}};
     CheckRows(expected, result);
 }
@@ -272,7 +269,6 @@ TEST_F(TestSQLTables, TEST_ALL_DATABASES_NULL) {
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
-        {"promDB", "", "promTB", "TABLE", ""},
         {"sampleDB", "", "DevOps", "TABLE", ""},
         {"sampleDB", "", "IoT", "TABLE", ""}};
     CheckRows(expected, result);
@@ -336,7 +332,6 @@ TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_BIND_EXCEL) {
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
-        {"promDB", "", "promTB", "TABLE", ""},
         {"sampleDB", "", "DevOps", "TABLE", ""},
         {"sampleDB", "", "IoT", "TABLE", ""}};
     CheckRows(expected, result);
@@ -368,7 +363,6 @@ TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_GETDATA) {
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
-        {"promDB", "", "promTB", "TABLE", ""},
         {"sampleDB", "", "DevOps", "TABLE", ""},
         {"sampleDB", "", "IoT", "TABLE", ""}};
     CheckRows(expected, result);
@@ -427,7 +421,6 @@ TEST_F(TestSQLTables, TEST_ALL_TABLE_TYPES) {
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
-        {"promDB", "", "promTB", "TABLE", ""},
         {"sampleDB", "", "DevOps", "TABLE", ""},
         {"sampleDB", "", "IoT", "TABLE", ""}};
     CheckRows(expected, result);
@@ -460,7 +453,6 @@ TEST_F(TestSQLTables, TEST_SQL_ALL_TABLE_TYPES) {
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "TABLE", ""},
         {"ODBCTest", "", "IoT", "TABLE", ""},
-        {"promDB", "", "promTB", "TABLE", ""},
         {"sampleDB", "", "DevOps", "TABLE", ""},
         {"sampleDB", "", "IoT", "TABLE", ""}};
     CheckRows(expected, result);
@@ -705,7 +697,6 @@ void PopulateSQLColumnsBinds(std::vector< bind_info > &binds) {
  * <Database>.<Table> in Amazon Timestream
  * ODBCTest.DevOps
  * ODBCTest.IoT
- * promDB.promTB
  */
 
 TEST_F(TestSQLColumns, EXACT_MATCH_ONE_COLUMN) {
