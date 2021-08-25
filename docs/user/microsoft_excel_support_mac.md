@@ -1,88 +1,44 @@
-#  Connecting Amazon Timestream to Micosoft Excel on Mac OS
+#  Connecting Amazon Timestream to Micosoft Excel on mac OS
 
 ## Prerequisites
 
 * Microsoft Excel 2016 and higher
 * [Amazon Timestream](https://aws.amazon.com/timestream/)
-* [Amazon Timestream ODBC driver](https://opendistro.github.io/for-elasticsearch-docs/docs/sql/odbc/)
+* Amazon Timestream ODBC driver
 * A preconfigured [User or System DSN](mac_configure_dsn.md)
 
-## Test Successful Connection
+## Loading Data 
 
-* Open **iODBC Data Source Administrator** using command 
-
-`sudo /Applications/iODBC/iODBC\ Administrator64.app/Contents/MacOS/iODBC\ Administrator64`
-
-* Click on **System DSN**.
-* Select **Amazon Timestream ODBC DSN**.
-* Click on **Configure**.
-
-<img src="img/excel_iodbc_dsn.png" width="650">
-
-* Modify connection attributes accordingly.
-* Click on **Ok**.
-* Click on **Test**.
-* Enter credentials if required and Click **Ok**.
-
-<img src="img/excel_iodbc_auth.png" width="250">
-
-* You should get a message as `The connection DSN was tested successfully, and can be used at this time.`
-
-<img src="img/excel_iodbc_test_dsn.png" width="350">
-
-## Load data 
-
-* Open blank workbook in Microsoft Excel.
-* Click on **Data** > **New Database Query** > **From Database**.
-
-<img src="img/excel_select_database.png" width="400">
-
-* Select **Amazon Timestream ODBC DSN**. Click **OK**.
-
-<img src="img/excel_select_dsn_mac.png" width="400">
-
-* Enter credentials if required and click on **OK**.
-
-<img src="img/excel_credentials.png" width="250">
-
+* Open a blank workbook in **Microsoft Excel**.
+* Click on **Data** > **Get Data** > **From Database**.
+* From the **User DSN** or **System DSN** tab, select the desired data source and click **OK**.
+* Enter the credentials if required and click on **OK**.
 * Select a table from the list. 
+* Edit the SQL statement if required and click **Run**:
+    * Remove the semi colon from the generated query
+    * You may want to add a limit clause to restrict the number of records being returned. For example:
+<pre>
+SELECT * FROM ODBCTest.DevOps LIMIT 10000
+</pre>
+* Click on **Return Data**. Select the sheet sheet and click **OK**.
 
-<img src="img/excel_table_list.png" width="500">
+The data will be loaded in the spreadsheet.
 
-* Edit SQL statement if required (e.g. removing the semi colon from generated query statement) and click on **Run**. Data preview will be loaded.
-> **NOTE**: Excel for Mac currently will not show an error if you provide an incorrect query ([Github issue here](https://github.com/opendistro-for-elasticsearch/sql/issues/601)). If no data appears, check your ODFE server logs to see if the query failed.
+## Refreshing Data
 
-<img src="img/excel_data_preview_mac.png">
+To refresh the data click on **Table** > **Refresh** or on **Data** > **Refresh**.
 
-* Click on **Return Data**. Select sheet and click OK.
-
-<img src="img/excel_select_worksheet.png" width="400">
-
-* Data will be loaded in the spreadsheet.
-
-<img src="img/excel_data_load.png">
-
-## Refresh Data
-
-To refresh the data click on **Table** > **Refresh**.
-
-<img src="img/excel_refresh_mac.png" width=500>
-
-Alternately, **Data** > **Refresh** option can also be used to refresh the data.
-
-## Export as CSV files
+## Exporting as CSV
 
 * Click on **File** > **Save As**.
 * Type the file name.
-* Select Location to Save file.
-* Set File Format to **CSV UTF-8(Comma delimited)(*.csv)**.
-
-<img src="img/excel_export_csv.png" width="450">
-
+* Select the location where you want to save the file.
+* Set the **File Format** to `CSV UTF-8 (Comma delimited) (*.csv)`.
 * Click **Save**.
-* Data will be exported to selected location in CSV format.
+
+The data will be exported to selected location in CSV format.
 
 ## Troubleshooting
 
-* You need to remove `;` from SQL statement to load data preview.
-
+* You may need to remove `;` from SQL statement to load data preview.
+* **AWS Profile** may not work if Excel does not have permission to access the `.aws\credentials` file. Depending on the version of macOS, opening Microsoft Excel from Terminal by running `/Applications/Microsoft\ Excel.app/Contents/MacOS/Microsoft\ Excel` will resolve the issue. 
