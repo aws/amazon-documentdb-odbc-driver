@@ -17,56 +17,83 @@
 #include "it_odbc_helper.h"
 #include <misc.h>
 
-#define BUFFER_LEN 256
+#define BUFFER_LEN 128
+#define SMALL_BUFFER_LEN 10
 #define TEST_STR "The Quick Brown Fox Jumps Over The Lazy Dog"
-#define TEST_STR_TRUNCATED "The Quick Brown Fox Jumps Over The Lazy Do"
+#define TEST_STR_TRUNCATED "The Quick"
+#define TEST_STR_UPPER "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG"
 #define TEST_STR_LOWER "the quick brown fox jumps over the lazy dog"
-#define TEST_STR_LOWER_TRUNCATED "the quick brown fox jumps over the lazy do"
+#define TEST_STR_LOWER_TRUNCATED "the quick"
 
-void copy(char* dst, const char* src, size_t len) {
-    memset(dst, 0, BUFFER_LEN);
-    strncpy_null(dst, src, len);
+void test_to_lower_case(char* str, size_t len, char const *exp_str) {
+    to_lower_case(str, len);
+    if (exp_str == nullptr) {
+        EXPECT_EQ(exp_str, str);
+    } else {
+        EXPECT_EQ(exp_str, std::string(str));
+    }
 }
 
-void copy_lower_case(char* dst, const char* src, size_t len) {
-    memset(dst, 0, BUFFER_LEN);
-    strncpy_lower_null(dst, src, len);
-}
-
-TEST(TestMisc, strncpy_null) {
+void test_copy(const char* src, char const *exp_dst) {
     char dst[BUFFER_LEN];
-
-    copy(dst, nullptr, BUFFER_LEN);
-    EXPECT_EQ("", std::string(dst));
-
-    copy(dst, "", BUFFER_LEN);
-    EXPECT_EQ("", std::string(dst));
-    
-    copy(dst, TEST_STR, strlen(TEST_STR));
-    EXPECT_EQ(TEST_STR_TRUNCATED, std::string(dst));
-
-    copy(dst, TEST_STR, strlen(TEST_STR) + 1);
-    EXPECT_EQ(TEST_STR, std::string(dst));
-
-    copy(dst, TEST_STR, strlen(TEST_STR) + 2);
-    EXPECT_EQ(TEST_STR, std::string(dst));
+    strncpy_null(dst, src, sizeof(dst));
+    if (exp_dst != nullptr) {
+        EXPECT_EQ(exp_dst, std::string(dst));
+    }
 }
 
-TEST(TestMisc, strncpy_lower_null) {
+void test_copy_small_buffer(const char* src, char const *exp_dst) {
+    char dst[SMALL_BUFFER_LEN];
+    strncpy_null(dst, src, sizeof(dst));
+    if (exp_dst != nullptr) {
+        EXPECT_EQ(exp_dst, std::string(dst));
+    }
+}
+
+void test_copy_lower_case(const char* src, char const *exp_dst) {
     char dst[BUFFER_LEN];
+    strncpy_null_lower_case(dst, src, sizeof(dst));
+    if (exp_dst != nullptr) {
+        EXPECT_EQ(exp_dst, std::string(dst));
+    }
+}
 
-    copy_lower_case(dst, nullptr, BUFFER_LEN);
-    EXPECT_EQ("", std::string(dst));
+void test_copy_lower_case_small_buffer(const char* src, char const *exp_dst) {
+    char dst[SMALL_BUFFER_LEN];
+    strncpy_null_lower_case(dst, src, sizeof(dst));
+    if (exp_dst != nullptr) {
+        EXPECT_EQ(exp_dst, std::string(dst));
+    }
+}
 
-    copy_lower_case(dst, "", BUFFER_LEN);
-    EXPECT_EQ("", std::string(dst));
+TEST(TestMisc, to_lower_case) {
+    test_to_lower_case(nullptr, 0, nullptr);
+    test_to_lower_case((char*)"", 0, "");
     
-    copy_lower_case(dst, TEST_STR, strlen(TEST_STR));
-    EXPECT_EQ(TEST_STR_LOWER_TRUNCATED, std::string(dst));
+    char str[] = TEST_STR;
+    test_to_lower_case(str, strlen(str), TEST_STR_LOWER);
 
-    copy_lower_case(dst, TEST_STR, strlen(TEST_STR) + 1);
-    EXPECT_EQ(TEST_STR_LOWER, std::string(dst));
+    char str_upper[] = TEST_STR_UPPER;
+    test_to_lower_case(str_upper, strlen(str_upper), TEST_STR_LOWER);
 
-    copy_lower_case(dst, TEST_STR, strlen(TEST_STR) + 2);
-    EXPECT_EQ(TEST_STR_LOWER, std::string(dst));
+    char str_lower[] = TEST_STR_LOWER;
+    test_to_lower_case(str_lower, strlen(str_lower), TEST_STR_LOWER);
+}
+
+TEST(TestMisc, strncpy_null) {    
+    test_copy(nullptr, nullptr);
+    test_copy("", "");
+    test_copy(TEST_STR, TEST_STR);
+    test_copy_small_buffer(TEST_STR, TEST_STR_TRUNCATED);
+}
+
+TEST(TestMisc, strncpy_null_lower_case) {
+    test_copy_lower_case(nullptr, nullptr);
+    test_copy_lower_case("", "");
+    test_copy_lower_case(TEST_STR, TEST_STR_LOWER);
+    test_copy_lower_case(TEST_STR_UPPER, TEST_STR_LOWER);
+    test_copy_lower_case(TEST_STR_LOWER, TEST_STR_LOWER);
+    test_copy_lower_case_small_buffer(TEST_STR, TEST_STR_LOWER_TRUNCATED);
+    test_copy_lower_case_small_buffer(TEST_STR_UPPER, TEST_STR_LOWER_TRUNCATED);
+    test_copy_lower_case_small_buffer(TEST_STR_LOWER, TEST_STR_LOWER_TRUNCATED);
 }

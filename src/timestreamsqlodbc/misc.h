@@ -26,8 +26,9 @@
 extern "C" {
 #endif
 
-void strncpy_null(char *dst, const char *src, ssize_t len);
-void strncpy_lower_null(char *dst, const char *src, ssize_t len);
+void to_lower_case(char *str, size_t len);
+size_t strncpy_null(char *dst, const char *src, ssize_t dst_buffer_len);
+size_t strncpy_null_lower_case(char *dst, const char *src, ssize_t dst_buffer_len);
 #ifndef HAVE_STRLCAT
 size_t strlcat(char *, const char *, size_t);
 #endif /* HAVE_STRLCAT */
@@ -57,7 +58,7 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src, ssize_t src_len);
 #define STRCPY_FIXED(to, from) strncpy_null((to), (from), sizeof(to))
 
 /* macro to safely lower case strcpy() to fixed arrays. */
-#define STRCPY_LOWER_FIXED(to, from) strncpy_lower_null((to), (from), sizeof(to))
+#define STRCPY_LOWER_FIXED(to, from) strncpy_null_lower_case((to), (from), sizeof(to))
 
 /* macro to safely strcat() to fixed arrays. */
 #define STRCAT_FIXED(to, from) strlcat((to), (from), sizeof(to))
