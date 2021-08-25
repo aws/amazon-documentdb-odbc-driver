@@ -47,8 +47,8 @@
 |--------|-------------|------|---------------|
 | `IdpName` | The Identity Provider (Idp) name to use for SAML-based authentication. One of Okta or AzureAD. | string | `<NONE>` |
 | `IdpHost` | The hostname of the specified Idp. | string | `<NONE>` |
-| `UID` | The username for the specified Idp account. | string | `<NONE>` |
-| `PWD` | The password for the specified Idp account. | string | `<NONE>` |
+| `UID` / `IdpUserName` | The username for the specified Idp account. | string | `<NONE>` |
+| `PWD` / `IdpPassword` | The password for the specified Idp account. | string | `<NONE>` |
 | `OktaApplicationID` | The unique Okta-provided ID associated with the Timestream application. A place to find the AppId is in the entityID field provided in the application metadata. | string | `<NONE>` |
 | `RoleARN` | The Amazon Resource Name (ARN) of the role that the caller is assuming. | string | `<NONE>` |
 | `IdpARN` | The Amazon Resource Name (ARN) of the SAML provider in IAM that describes the Idp. | string | `<NONE>` |
@@ -59,8 +59,8 @@
 |--------|-------------|------|---------------|
 | `IdpName` | The Identity Provider (Idp) name to use for SAML-based authentication. One of Okta or AzureAD. | string | `<NONE>` |
 | `IdpHost` | The hostname of the specified Idp. | string | `<NONE>` |
-| `UID` | The username for the specified Idp account. | string | `<NONE>` |
-| `PWD` | The password for the specified Idp account. | string | `<NONE>` |
+| `UID` / `IdpUserName` | The username for the specified Idp account. | string | `<NONE>` |
+| `PWD` / `IdpPassword` | The password for the specified Idp account. | string | `<NONE>` |
 | `AADApplicationID` | The unique id of the registered application on Azure AD. | string | `<NONE>` |
 | `AADClientSecret` | The client secret associated with the registered application on Azure AD used to authorize fetching tokens. | string | `<NONE>` |
 | `AADTenant` | The Azure AD Tenant ID. | string | `<NONE>` |

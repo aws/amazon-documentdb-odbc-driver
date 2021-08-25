@@ -72,10 +72,9 @@ From Terminal, run one of the following:
 * `./build_mac_debug64.sh`
 * `./build_mac_release64.sh`
 
-
 ### Output Location on Mac
 
-* Driver: `./build/odbc/lib/libimestreamsqlodbc.dylib`
+* Driver: `./build/odbc/lib/libtimestreamsqlodbc.dylib`
 * Test binaries folder: `./build/odbc/bin`. Some additional test infrastructure files are also output to the **lib** directory.
 
 ### Packaging
@@ -93,23 +92,36 @@ Installer named as `AmazonTimestreamODBC-<version>.pkg` will be generated in the
 
 The terminal can be used to install all the dependencies for Linux.
 
-On 64-bit, the following commands can be used to collect the required dependencies.
-> `sudo apt update`
-> `sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib cmake linux-headers-$(uname -r) build-essential unixodbc-dev`
+#### Ubuntu 64-bit
+```sh
+sudo apt update
+sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev gcc gcc-multilib  g++ g++-multilib cmake linux-headers-$(uname -r) build-essential unixodbc-dev
+```
+#### Ubuntu 32-bit
+```sh
+sudo dpkg --add-architecture i386
+sudo apt update 
+sudo apt install unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386 zlib1g-dev:i386 linux-headers-$(uname -r) gcc-multilib:i386 g++-multilib:i386 cmake g++-9:i386 gcc-9:i386 gcc-9-multilib:i386 g++-9-multilib:i386 binutils:i386 make:i386
+```
+#### Amazon Linux 2 64-bit
+```sh
+# Download and build CMake 3
+wget https://cmake.org/files/v3.18/cmake-3.18.0.tar.gz
+tar -xvzf cmake-3.18.0.tar.gz
+cd cmake-3.18.0
+./bootstrap
+make
+sudo make install
 
-On 32-bit, the following commands can be used to collect the required dependencies.
-> `sudo dpkg --add-architecture i386`
-> `sudo apt update`
-> `sudo apt install unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386 zlib1g-dev:i386 linux-headers-$(uname -r) gcc-multilib:i386 g++-multilib:i386 cmake g++-9:i386 gcc-9:i386 gcc-9-multilib:i386 g++-9-multilib:i386 binutils:i386 make:i386`
+# Install dependencies
+sudo yum install curl-devel openssl-devel uuid-devel zlib-devel pulseaudio-libs-devel kernel-devel gcc gcc-c++ unixODBC-devel
+```
 
 ### Building the Driver
 
-From a terminal, execute one of the four files to generate the build output. 
+From a terminal, execute:
 
-* `./build_linux_release32_deb.sh`
-* `./build_linux_release64_deb.sh`
-* `./build_linux_release32_rpm.sh`
-* `./build_linux_release64_rpm.sh`
+`./build_linux_<config><bitness>_<installer_type>.sh`
 
 ### Output Location on Linux
 
