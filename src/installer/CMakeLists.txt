@@ -87,7 +87,6 @@ elseif(UNIX)
         set(CPACK_TEMPORARY_PACKAGE_FILE_NAME "${CMAKE_BINARY_DIR}/_CPack_Packages/Linux/RPM/RPMS/${CMAKE_SYSTEM_PROCESSOR}/${CPACK_PACKAGE_FILE_NAME}.rpm")
     else()
         message(FATAL_ERROR "INSTALLER_TYPE '${INSTALLER_TYPE}' must be DEB or RPM for Linux installer." )
-
     endif()
 else()
     set(CPACK_PACKAGE_FILE_NAME "AmazonTimestreamODBC${BITNESS}-${CPACK_PACKAGE_VERSION}")
