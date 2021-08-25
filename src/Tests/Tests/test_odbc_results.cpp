@@ -725,10 +725,8 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_BIT) {
         + CREATE_STRING("\'");
 
     std::vector< std::pair< SQLCHAR, SQLTCHAR* > > expected;
-    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v1),
-                                      SQLSTATE_FRACTIONAL_TRUNCATION));
-    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v2),
-                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v2), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
@@ -743,11 +741,13 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_STINYINT) {
     double v2 = 3.9E-5;
     double v3 = -1.29E2;  // underflow
     double v4 = 1.28E2;   // overflow
+    double v5 = 0.0;
     test_string columns =
         CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v5)
         + CREATE_STRING("\'");
 
     std::vector< std::pair< SQLSCHAR, SQLTCHAR* > > expected;
@@ -759,6 +759,7 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_STINYINT) {
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v5), nullptr));
 
     TypeConversionAssertionTemplate< SQLSCHAR >(
         m_hstmt, SQL_C_STINYINT, columns, expected, CompareSQLType< SQLSCHAR >);
@@ -769,11 +770,13 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_TINYINT) {
     double v2 = 1.269E2;
     double v3 = LLONG_MIN;  // underflow
     double v4 = ULONG_MAX;  // overflow
+    double v5 = 0.0;
     test_string columns =
         CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v5)
         + CREATE_STRING("\'");
 
     std::vector< std::pair< SQLSCHAR, SQLTCHAR* > > expected;
@@ -785,6 +788,7 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_TINYINT) {
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSCHAR >(v5), nullptr));
 
     TypeConversionAssertionTemplate< SQLSCHAR >(
         m_hstmt, SQL_C_TINYINT, columns, expected, CompareSQLType< SQLSCHAR >);
@@ -794,11 +798,13 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_UTINYINT) {
     double v1 = 1.1;
     double v2 = -3.0;    // underflow
     double v3 = 2.56E2;  // overflow
-    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
-                          + CREATE_STRING("\', DOUBLE\'")
-                          + convert_to_test_string(v2)
-                          + CREATE_STRING("\', DOUBLE\'")
-                          + convert_to_test_string(v3) + CREATE_STRING("\'");
+    double v4 = 0.0;
+    test_string columns =
+        CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
 
     std::vector< std::pair< SQLCHAR, SQLTCHAR* > > expected;
     expected.push_back(std::make_pair(static_cast< SQLCHAR >(v1),
@@ -807,6 +813,7 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_UTINYINT) {
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLCHAR >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(v4), nullptr));
 
     TypeConversionAssertionTemplate< SQLCHAR >(
         m_hstmt, SQL_C_UTINYINT, columns, expected, CompareSQLType< SQLCHAR >);
@@ -817,22 +824,23 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SLONG) {
     double v2 = 7.41370E5;
     double v3 = -9.3E18;                       // underflow
     double v4 = (double)LONG_MAX + (double)1;  // overflow
+    double v5 = 0.0;
     test_string columns =
         CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v5)
         + CREATE_STRING("\'");
 
     std::vector< std::pair< SQLINTEGER, SQLTCHAR* > > expected;
-    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v1),
-                                      SQLSTATE_FRACTIONAL_TRUNCATION));
-    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v2),
-                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v2), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v5), nullptr));
 
     TypeConversionAssertionTemplate< SQLINTEGER >(
         m_hstmt, SQL_C_SLONG, columns, expected, CompareSQLType< SQLINTEGER >);
@@ -843,22 +851,23 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_LONG) {
     double v2 = 7.41370E5;
     double v3 = -DBL_MAX;  // underflow
     double v4 = DBL_MAX;   // overflow
+    double v5 = 0.0;
     test_string columns =
         CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v5)
         + CREATE_STRING("\'");
 
     std::vector< std::pair< SQLINTEGER, SQLTCHAR* > > expected;
-    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v1),
-                                      SQLSTATE_FRACTIONAL_TRUNCATION));
-    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v2),
-                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v2), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v5), nullptr));
 
     TypeConversionAssertionTemplate< SQLINTEGER >(
         m_hstmt, SQL_C_LONG, columns, expected, CompareSQLType< SQLINTEGER >);
@@ -875,8 +884,7 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_ULONG) {
                           + convert_to_test_string(v3) + CREATE_STRING("\'");
 
     std::vector< std::pair< SQLUINTEGER, SQLTCHAR* > > expected;
-    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(v1),
-                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(v1), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
@@ -891,22 +899,23 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SSHORT) {
     double v2 = SHRT_MAX;
     double v3 = -3.2769E4;  // underflow
     double v4 = 3.2768E4;   // overflow
+    double v5 = 0.0;
     test_string columns =
         CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v5)
         + CREATE_STRING("\'");
 
     std::vector< std::pair< SQLSMALLINT, SQLTCHAR* > > expected;
-    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v1),
-                                      SQLSTATE_FRACTIONAL_TRUNCATION));
-    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v2),
-                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v2), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v5), nullptr));
 
     TypeConversionAssertionTemplate< SQLSMALLINT >(
         m_hstmt, SQL_C_SSHORT, columns, expected,
@@ -918,22 +927,23 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SHORT) {
     double v2 = SHRT_MAX;
     double v3 = -DBL_MAX;  // underflow
     double v4 = DBL_MAX;   // overflow
+    double v5 = 0.0;
     test_string columns =
         CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v5)
         + CREATE_STRING("\'");
 
     std::vector< std::pair< SQLSMALLINT, SQLTCHAR* > > expected;
-    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v1),
-                                      SQLSTATE_FRACTIONAL_TRUNCATION));
-    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v2),
-                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v2), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(v5), nullptr));
 
     TypeConversionAssertionTemplate< SQLSMALLINT >(
         m_hstmt, SQL_C_SHORT, columns, expected, CompareSQLType< SQLSMALLINT >);
@@ -950,8 +960,8 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_USHORT) {
                           + convert_to_test_string(v3) + CREATE_STRING("\'");
 
     std::vector< std::pair< SQLUSMALLINT, SQLTCHAR* > > expected;
-    expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(v1),
-                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(
+        std::make_pair(static_cast< SQLUSMALLINT >(v1), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(0),
@@ -967,22 +977,23 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SBIGINT) {
     double v2 = 7.41370E5;
     double v3 = -DBL_MAX;  // underflow
     double v4 = DBL_MAX;   // overflow
+    double v5 = 0.0;
     test_string columns =
         CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
         + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v5)
         + CREATE_STRING("\'");
 
     std::vector< std::pair< SQLBIGINT, SQLTCHAR* > > expected;
-    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(v1),
-                                      SQLSTATE_FRACTIONAL_TRUNCATION));
-    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(v2),
-                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(v1), nullptr));
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(v2), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLBIGINT >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLBIGINT >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLBIGINT >(v5), nullptr));
 
     TypeConversionAssertionTemplate< SQLBIGINT >(
         m_hstmt, SQL_C_SBIGINT, columns, expected, CompareSQLType< SQLBIGINT >);
@@ -992,19 +1003,21 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_UBIGINT) {
     double v1 = 2.93719E5;
     double v2 = -1.0;     // underflow
     double v3 = DBL_MAX;  // overflow
-    test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
-                          + CREATE_STRING("\', DOUBLE\'")
-                          + convert_to_test_string(v2)
-                          + CREATE_STRING("\', DOUBLE\'")
-                          + convert_to_test_string(v3) + CREATE_STRING("\'");
+    double v4 = 0.0;
+    test_string columns =
+        CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v2)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v3)
+        + CREATE_STRING("\', DOUBLE\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\'");
 
     std::vector< std::pair< SQLUBIGINT, SQLTCHAR* > > expected;
-    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(v1),
-                                      SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(v1), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(v4), nullptr));
 
     TypeConversionAssertionTemplate< SQLUBIGINT >(m_hstmt, SQL_C_UBIGINT,
                                                   columns, expected,
@@ -2345,7 +2358,8 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_BIT) {
     int v5 = 2;       // overflow
 
     test_string columns =
-        CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
+        CREATE_STRING("VARCHAR\'0.0")
+        CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v3)
         + CREATE_STRING("\', VARCHAR\'   ")
@@ -2353,10 +2367,10 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_BIT) {
             v3)  // truncation with leading and trailing spaces
         + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v5)
-        + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
-        + CREATE_STRING("\'");  // not a numeric literal
+        + CREATE_STRING("\', VARCHAR\'1.a\'"); // not a numeric literal
 
     std::vector< std::pair< SQLCHAR, SQLTCHAR* > > expected;
+    expected.push_back(std::make_pair(static_cast< SQLCHAR >(0), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLCHAR >(v1), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLCHAR >(v2), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLCHAR >(v3),

@@ -1086,6 +1086,22 @@ cleanup:
     return result;
 }
 
+static void check_truncation(char *p_end, int *errcode) {
+    if (*p_end == '\0') {
+        return;
+    }
+    if (*p_end != '.') {
+        *errcode = COPY_INVALID_STRING_CONVERSION;
+        return;
+    }
+    for (char *copy = p_end + 1; *copy != '\0'; copy++) {
+        if (*copy != '0') {
+            *errcode = COPY_RESULT_FRACTIONAL_TRUNCATED;
+            return;
+        }
+    }
+}
+
 static int is_numeric(const char *s) {
     if (s == NULL || *s == '\0' || isspace(*s))
         return 0;
@@ -1537,9 +1553,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     break;
                 }
                 slong = strtol(trimmed, &p_end, 10);
-                if (*p_end != '\0') {
-                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
-                }
+                check_truncation(p_end, &result);
                 if (slong < 0 || slong >= 2) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
@@ -1568,9 +1582,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     break;
                 }
                 slong = strtol(trimmed, &p_end, 10);
-                if (*p_end != '\0') {
-                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
-                }
+                check_truncation(p_end, &result);
                 if (slong < SCHAR_MIN || slong > SCHAR_MAX) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
@@ -1593,9 +1605,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     break;
                 }
                 slong = strtol(trimmed, &p_end, 10);
-                if (*p_end != '\0') {
-                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
-                }
+                check_truncation(p_end, &result);
                 if (slong < 0 || slong > UCHAR_MAX) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
@@ -1681,9 +1691,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     break;
                 }
                 slong = strtol(trimmed, &p_end, 10);
-                if (*p_end != '\0') {
-                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
-                }
+                check_truncation(p_end, &result);
                 if (slong < SHRT_MIN || slong > SHRT_MAX) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
@@ -1707,9 +1715,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     break;
                 }
                 slong = strtol(trimmed, &p_end, 10);
-                if (*p_end != '\0') {
-                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
-                }
+                check_truncation(p_end, &result);
                 if (slong < 0 || slong > USHRT_MAX) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
@@ -1736,9 +1742,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                 }
                 errno = 0;
                 slong = strtol(trimmed, &p_end, 10);
-                if (*p_end != '\0') {
-                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
-                }
+                check_truncation(p_end, &result);
                 if ((slong == LONG_MIN || slong == LONG_MAX)
                     && errno == ERANGE) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
@@ -1769,9 +1773,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                 }
                 errno = 0;
                 unsigned long ulong = strtoul(trimmed, &p_end, 10);
-                if (*p_end != '\0') {
-                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
-                }
+                check_truncation(p_end, &result);
                 if (ulong == ULONG_MAX && errno == ERANGE) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
@@ -1796,9 +1798,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                 }
                 errno = 0;
                 signed long long sllong = strtoll(trimmed, &p_end, 10);
-                if (*p_end != '\0') {
-                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
-                }
+                check_truncation(p_end, &result);
                 if ((sllong == LLONG_MIN || sllong == LLONG_MAX)
                     && errno == ERANGE) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
@@ -1829,9 +1829,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                 }
                 errno = 0;
                 unsigned long long ullong = strtoull(trimmed, &p_end, 10);
-                if (*p_end != '\0') {
-                    result = COPY_RESULT_FRACTIONAL_TRUNCATED;
-                }
+                check_truncation(p_end, &result);
                 if (ullong == ULLONG_MAX && errno == ERANGE) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
