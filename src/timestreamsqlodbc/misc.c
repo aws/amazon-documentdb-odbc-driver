@@ -35,6 +35,19 @@
 #endif
 
 /*
+ *	Converts a string buffer to lower case.
+ * 
+ * Does not currently support UTF-8 encoded strings.
+ */
+void to_lower_case(char *str, size_t len) {
+    if (NULL != str) {
+        for (size_t i = 0; i < len; i++) {
+            str[i] = (char)tolower(str[i]);
+        }
+    }
+}
+
+/*
  *	returns STRCPY_FAIL, STRCPY_TRUNCATED, or #bytes copied
  *	(not including null term)
  */
@@ -66,33 +79,34 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src,
 }
 
 /*
- * strncpy copies up to len characters, and doesn't terminate
- * the destination string if src has len characters or more.
- * instead, I want it to copy up to len-1 characters and always
+ * strncpy copies up to dst_buffer_len characters, and doesn't terminate
+ * the destination string if src has dst_buffer_len characters or more.
+ * This function copies up to dst_buffer_len-1 characters and always
  * terminate the destination string.
+ * 
+ * Does not currently support UTF-8 encoded strings.
  */
-void strncpy_null(char *dst, const char *src, ssize_t len) {
-    if (NULL != dst && NULL != src && len > 0) {
-        int i;
-        for (i = 0; src[i] && i < len - 1; i++)
-            dst[i] = src[i];
+size_t strncpy_null(char *dst, const char *src, ssize_t dst_buffer_len) {
+    if (NULL != dst && NULL != src && dst_buffer_len > 0) {
+        strncpy(dst, src, dst_buffer_len - 1);
+        dst[dst_buffer_len - 1] = '\0';
 
-        dst[i] = '\0';
+        return strlen(dst);
     }
+
+    return 0;
 }
 
 /*
- * Same as strncpy_null except each character is converted to lower case
- * before being copied to the destination string.
+ * Copy characters from src to dst, null terminate the string,
+ * and convert each character to lower case.
+ * 
+ * Does not currently support UTF-8 encoded strings.
  */
-void strncpy_lower_null(char *dst, const char *src, ssize_t len) {
-    if (NULL != dst && NULL != src && len > 0) {
-        int i;
-        for (i = 0; src[i] && i < len - 1; i++)
-            dst[i] = (char)tolower(src[i]);
-
-        dst[i] = '\0';
-    }
+size_t strncpy_null_lower_case(char *dst, const char *src, ssize_t dst_buffer_len) {
+    size_t bytes_copied = strncpy_null(dst, src, dst_buffer_len);
+    to_lower_case(dst, bytes_copied);
+    return bytes_copied;
 }
 
 /*------
