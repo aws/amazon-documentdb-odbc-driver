@@ -32,16 +32,27 @@
 // clang-format on
 
 // SQLConnect constants
-test_string azure_ad_dsn = CREATE_STRING("timestream-aad");
-test_string okta_dsn = CREATE_STRING("timestream-okta");
-test_string empty;
-test_string wrong = CREATE_STRING("wrong");
+namespace {
+    test_string azure_ad_dsn = CREATE_STRING("timestream-aad");
+    test_string okta_dsn = CREATE_STRING("timestream-okta");
+    test_string empty;
+    test_string wrong = CREATE_STRING("wrong");
 
-// Remember to replace with your IDP username and password
-test_string correct_aad_username = CREATE_STRING("");
-test_string correct_aad_password = CREATE_STRING("");
-test_string correct_okta_username = CREATE_STRING("");
-test_string correct_okta_password = CREATE_STRING("");
+    // Remember to set your environment variables
+    char* aad_userid = std::getenv("AAD_USERID");
+    char* aad_password = std::getenv("AAD_PASSWORD");
+    char* okta_userid = std::getenv("OKTA_USERID");
+    char* okta_password = std::getenv("OKTA_PASSWORD");
+    char* env_aad_connect_string = std::getenv("AAD_CONNECT_STRING");
+    char* env_okta_connect_string = std::getenv("OKTA_CONNECT_STRING");
+
+    test_string correct_aad_username = to_test_string(std::string((aad_userid == NULL) ? "" : aad_userid));
+    test_string correct_aad_password = to_test_string(std::string((aad_password == NULL) ? "" : aad_password));
+    test_string correct_okta_username = to_test_string(std::string((okta_userid == NULL) ? "" : okta_userid));
+    test_string correct_okta_password = to_test_string(std::string((okta_password == NULL) ? "" : okta_password));
+    test_string correct_aad_connect_string = to_test_string(std::string((env_aad_connect_string == NULL) ? "" : env_aad_connect_string));
+    test_string correct_okta_connect_string = to_test_string(std::string((env_okta_connect_string == NULL) ? "" : env_okta_connect_string));
+}
 
 class TestSQLConnectSAMLAuth : public testing::Test {
    public:
@@ -134,16 +145,8 @@ class TestSQLDriverConnectSAMLAuth : public testing::Test {
 
 TEST_F(TestSQLDriverConnectSAMLAuth, AzureAD_ConnectionString) {
     test_string wstr;
-    wstr += CREATE_STRING("Driver=timestreamodbc;");
-    wstr += CREATE_STRING("UID=;");
-    wstr += CREATE_STRING("PWD=;");
-    wstr += CREATE_STRING("Auth=AAD;");
-    wstr += CREATE_STRING("IdpName=AzureAD;");
-    wstr += CREATE_STRING("AADApplicationID=;");
-    wstr += CREATE_STRING("AADClientSecret=;");
-    wstr += CREATE_STRING("AADTenant=;");
-    wstr += CREATE_STRING("RoleARN=;");
-    wstr += CREATE_STRING("IdpARN=;");
+    wstr = correct_aad_connect_string;
+
     SQLRETURN ret =
         SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
                          m_out_conn_string, IT_SIZEOF(m_out_conn_string),
@@ -153,15 +156,8 @@ TEST_F(TestSQLDriverConnectSAMLAuth, AzureAD_ConnectionString) {
 
 TEST_F(TestSQLDriverConnectSAMLAuth, Okta_ConnectionString) {
     test_string wstr;
-    wstr += CREATE_STRING("Driver=timestreamodbc;");
-    wstr += CREATE_STRING("UID=;");
-    wstr += CREATE_STRING("PWD=;");
-    wstr += CREATE_STRING("Auth=OKTA;");
-    wstr += CREATE_STRING("IdpName=Okta;");
-    wstr += CREATE_STRING("IdpHost=;");
-    wstr += CREATE_STRING("OktaApplicationID=;");
-    wstr += CREATE_STRING("RoleARN=;");
-    wstr += CREATE_STRING("IdpARN=;");
+    wstr = correct_okta_connect_string;
+    
     SQLRETURN ret =
         SQLDriverConnect(m_conn, NULL, (SQLTCHAR*)wstr.c_str(), SQL_NTS,
                          m_out_conn_string, IT_SIZEOF(m_out_conn_string),
