@@ -79,7 +79,7 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src,
 /*
  * strncpy copies up to dst_buffer_len characters, and doesn't terminate
  * the destination string if src has dst_buffer_len characters or more.
- * instead, I want it to copy up to dst_buffer_len-1 characters and always
+ * This function copies up to dst_buffer_len-1 characters and always
  * terminate the destination string.
  * 
  * dst_buffer_len is the total size of the destinaton buffer 
