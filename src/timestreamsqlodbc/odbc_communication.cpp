@@ -250,8 +250,8 @@ void TSCommunication::Disconnect() {
         m_client.reset();
     }
     m_status = ConnStatusType::CONNECTION_BAD;
-    for (auto& [stmt, prefetchQueue] : prefetch_queues_map) {
-        StopResultRetrieval(stmt);
+    for (auto& kv : prefetch_queues_map) {
+        StopResultRetrieval(kv.first);
     }
 }
 
