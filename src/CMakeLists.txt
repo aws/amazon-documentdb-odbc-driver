@@ -77,7 +77,14 @@ set(IT_HELPER "${TESTS}/ITODBCHelper")
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 
 # Set path for AWS SDK
-set(aws-cpp-sdk-base "${CMAKE_CURRENT_SOURCE_DIR}/aws-sdk-cpp")
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/aws-sdk-cpp/install/lib")
+	set(aws-cpp-sdk-base "${CMAKE_CURRENT_SOURCE_DIR}/aws-sdk-cpp/install/lib")
+elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/aws-sdk-cpp/install/lib64")
+	set(aws-cpp-sdk-base "${CMAKE_CURRENT_SOURCE_DIR}/aws-sdk-cpp/install/lib64")
+else()
+	message(FATAL_ERROR "Failed to find aws-sdk-cpp build in src directory. Exitting." )
+endif()
+
 if(UNIX OR APPLE)
 	set(aws-cpp-sdk-core_DIR "${aws-cpp-sdk-base}/install/lib/cmake/aws-cpp-sdk-core")
 	set(aws-cpp-sdk-sts_DIR "${aws-cpp-sdk-base}/install/lib/cmake/aws-cpp-sdk-sts")
