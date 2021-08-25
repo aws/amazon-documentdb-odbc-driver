@@ -36,6 +36,8 @@
 
 /*
  *	Converts a string buffer to lower case.
+ * 
+ * Does not currently support UTF-8 encoded strings.
  */
 void to_lower_case(char *str, size_t len) {
     if (NULL != str) {
@@ -82,9 +84,6 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src,
  * This function copies up to dst_buffer_len-1 characters and always
  * terminate the destination string.
  * 
- * dst_buffer_len is the total size of the destinaton buffer 
- * (including the null terminating character).
- * 
  * Does not currently support UTF-8 encoded strings.
  */
 size_t strncpy_null(char *dst, const char *src, ssize_t dst_buffer_len) {
@@ -101,9 +100,6 @@ size_t strncpy_null(char *dst, const char *src, ssize_t dst_buffer_len) {
 /*
  * Copy characters from src to dst, null terminate the string,
  * and convert each character to lower case.
- * 
- * dst_buffer_len is the total size of the destinaton buffer 
- * (including the null terminating character).
  * 
  * Does not currently support UTF-8 encoded strings.
  */
