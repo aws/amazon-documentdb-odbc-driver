@@ -15,6 +15,6 @@ cd ../../../
 PREFIX_PATH=$(pwd)
 mkdir cmake-build64
 cd cmake-build64
-cmake ../src -DCMAKE_BUILD_TYPE="Debug" -DBUILD_WITH_TESTS="ON" -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF"
+cmake ../src -DCMAKE_BUILD_TYPE="Debug" -DBUILD_WITH_TESTS="ON" -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF" -DCMAKE_PREFIX_PATH="../src/aws-sdk-cpp/install"
 make ccov-all -j 4
 cd ..
