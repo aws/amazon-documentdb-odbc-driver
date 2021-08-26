@@ -41,4 +41,4 @@ The data will be exported to selected location in CSV format.
 ## Troubleshooting
 
 * You may need to remove `;` from SQL statement to load data preview.
-* **AWS Profile** may not work if Excel does not have permission to access the `.aws\credentials` file. Depending on the version of macOS, opening Microsoft Excel from Terminal by running `/Applications/Microsoft\ Excel.app/Contents/MacOS/Microsoft\ Excel` will resolve the issue. 
+* **AWS Profile** authentication is not supported in Excel for Mac. We recommend using IAM authentication and populating the AWS Access Key ID, AWS Secret Access Key and AWS SessionToken in the `odbc.ini` file from the values in the `~/.aws/credentials` file.

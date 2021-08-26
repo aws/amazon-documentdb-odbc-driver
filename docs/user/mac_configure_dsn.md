@@ -74,13 +74,15 @@ To give the application permission to save the Driver & DSN configurations, run 
 **Note:** iODBC may crash when entering the key-value pairs if the Value is in **Edit** mode when the **OK** button is pressed. This can be resolved by pressing **return** while in the **Value** field before pressing **OK**
 
 ### Manually editing odbc.ini ###
-Use a text editor from Terminal to edit the odbc.ini file such as vi.
+Use a text editor from Terminal to edit the odbc.ini file such as vi. See [Configuration Options](./configuration_options.md) for more details on the individual entries.
 
 **To create a System DSN Entry run:**
+
 `sudo vi /Library/ODBC/odbc.ini`
 
 **To create a User DSN Entry run:**
-`sudo vi ~/Library/ODBC/odbc.ini`
+
+`vi ~/Library/ODBC/odbc.ini`
 
 #### <a name="odbc_data_source"></a>Sample odbc.ini
 ```
