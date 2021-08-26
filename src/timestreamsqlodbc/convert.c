@@ -1747,9 +1747,9 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
                     if (bind_size > 0)
-                        *((SQLINTEGER *)rgbValueBindRow) = sllong;
+                        *((SQLINTEGER *)rgbValueBindRow) = (SQLINTEGER)sllong;
                     else
-                        *((SQLINTEGER *)rgbValue + bind_row) = sllong;
+                        *((SQLINTEGER *)rgbValue + bind_row) = (SQLINTEGER)sllong;
                 }
                 free(copy);
                 break;
@@ -1777,9 +1777,9 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
                     if (bind_size > 0)
-                        *((SQLUINTEGER *)rgbValueBindRow) = ullong;
+                        *((SQLUINTEGER *)rgbValueBindRow) = (SQLUINTEGER)ullong;
                     else
-                        *((SQLUINTEGER *)rgbValue + bind_row) = ullong;
+                        *((SQLUINTEGER *)rgbValue + bind_row) = (SQLUINTEGER)ullong;
                 }
                 free(copy);
                 break;
