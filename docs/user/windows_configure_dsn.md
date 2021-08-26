@@ -14,7 +14,7 @@
 
  <img src="img/win_user_dsn_configure_options.png" width="50%">
 
-4. Update the values of the configuration options.
+4. Update the values of the configuration options. See [Configuration Options](./configuration_options.md) for more details.
 5. Click `Test` to verify connectivity; you will get a `Connection successful` message if your configuration is correct.
 6. Click `OK` to save the DSN values. 
 7. You will find this newly added DSN in the `System DSN` or `User DSN` list.
