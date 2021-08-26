@@ -76,27 +76,6 @@ set(IT_HELPER "${TESTS}/ITODBCHelper")
 # Without this symbols will be exporting to Unix but not Windows
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 
-# Set path for AWS SDK
-set(aws-cpp-sdk-base "${CMAKE_CURRENT_SOURCE_DIR}/aws-sdk-cpp")
-if(UNIX OR APPLE)
-	set(aws-cpp-sdk-core_DIR "${aws-cpp-sdk-base}/install/lib/cmake/aws-cpp-sdk-core")
-	set(aws-cpp-sdk-sts_DIR "${aws-cpp-sdk-base}/install/lib/cmake/aws-cpp-sdk-sts")
-	set(aws-cpp-sdk-timestream-query_DIR "${aws-cpp-sdk-base}/install/lib/cmake/aws-cpp-sdk-timestream-query")
-	# AWS SDK dependencies
-	set(aws-crt-cpp_DIR "${aws-cpp-sdk-base}/install/lib/aws-crt-cpp/cmake")
-	set(aws-c-io_DIR "${aws-cpp-sdk-base}/install/lib/aws-c-io/cmake")
-	set(aws-c-http_DIR "${aws-cpp-sdk-base}/install/lib/aws-c-http/cmake")
-	set(aws-c-event-stream_DIR "${aws-cpp-sdk-base}/install/lib/aws-c-event-stream/cmake")
-	set(aws-c-common_DIR "${aws-cpp-sdk-base}/install/lib/aws-c-common/cmake")
-	set(aws-checksums_DIR "${aws-cpp-sdk-base}/install/lib/aws-checksums/cmake")
-	set(s2n_DIR "${aws-cpp-sdk-base}/install/lib/s2n/cmake")
-	set(aws-c-cal_DIR "${aws-cpp-sdk-base}/install/lib/aws-c-cal/cmake")
-	set(aws-c-compression_DIR "${aws-cpp-sdk-base}/install/lib/aws-c-compression/cmake")
-	set(aws-c-mqtt_DIR "${aws-cpp-sdk-base}/install/lib/aws-c-mqtt/cmake")
-	set(aws-c-auth_DIR "${aws-cpp-sdk-base}/install/lib/aws-c-auth/cmake")
-	set(aws-c-s3_DIR "${aws-cpp-sdk-base}/install/lib/aws-c-s3/cmake")
-endif()
-
 if (WIN32)
     find_package(AWSSDK REQUIRED core sts timestream-query)
 else()
