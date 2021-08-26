@@ -40,8 +40,8 @@ jobs:
     - name: prepare-dsn
       if: success()
       run: |
-        sudo mv ./src/Tests/Tests/odbc-linux.ini /etc/odbc.ini
-        sudo mv ./src/Tests/Tests/odbcinst-linux.ini /etc/odbcinst.ini
+        sudo cp ./src/Tests/Tests/odbc-linux.ini /etc/odbc.ini
+        sudo cp ./src/Tests/Tests/odbcinst-linux.ini /etc/odbcinst.ini
         mkdir /home/runner/work/timestream-odbc/timestream-odbc/odbc-logs
         export ODBCSYSINI=/etc/
         export ODBCINSTINI=odbcinst.ini
@@ -142,8 +142,8 @@ jobs:
     - name: prepare-dsn
       if: success()
       run: |
-        sudo mv ./src/Tests/Tests/odbc-linux.ini /etc/odbc.ini
-        sudo mv ./src/Tests/Tests/odbcinst-linux.ini /etc/odbcinst.ini
+        sudo cp ./src/Tests/Tests/odbc-linux.ini /etc/odbc.ini
+        sudo cp ./src/Tests/Tests/odbcinst-linux.ini /etc/odbcinst.ini
         mkdir /home/runner/work/timestream-odbc/timestream-odbc/odbc-logs
         export ODBCSYSINI=/etc/
         export ODBCINSTINI=odbcinst.ini
