@@ -5,7 +5,7 @@
 * Microsoft Excel 2016 and higher
 * [Amazon Timestream](https://aws.amazon.com/timestream/)
 * Amazon Timestream ODBC driver
-* A preconfigured [User or System DSN](../../README.md)
+* A preconfigured [User or System DSN](windows_configure_dsn.md)
 
 ## Loading Data 
 
