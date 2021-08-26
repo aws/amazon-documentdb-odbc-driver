@@ -16,6 +16,6 @@ PREFIX_PATH=$(pwd)
 mkdir cmake-build64
 cd cmake-build64
 #INSTALLER_TYPE is required but irrelevant to this.
-cmake ../src -DCMAKE_BUILD_TYPE="Debug" -DBUILD_WITH_TESTS="ON" -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF" -DINSTALLER_TYPE="RPM"
+cmake ../src -DCMAKE_BUILD_TYPE="Debug" -DBUILD_WITH_TESTS="ON" -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF" -DINSTALLER_TYPE="RPM" -DCMAKE_PREFIX_PATH="../src/aws-sdk-cpp/install"
 make ccov-all -j 4
 cd ..

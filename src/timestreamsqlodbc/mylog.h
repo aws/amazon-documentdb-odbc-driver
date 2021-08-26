@@ -48,6 +48,9 @@ extern "C" {
 #ifdef __linux__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcomment"
+// This will basically disable all warnings.
+// There is no way to disable a warning that is coming out in Amazon Linux 2 so we need to blanket them off.
+#pragma GCC system_header 
 #endif  // __linux__
 
 
