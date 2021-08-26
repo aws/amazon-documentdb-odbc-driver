@@ -148,9 +148,9 @@ install(TARGETS timestreamsqlodbc DESTINATION bin COMPONENT "Driver")
 # endif()
 
 # Install documentation files
-install(FILES "${PROJECT_ROOT}/README.md" DESTINATION doc COMPONENT "Docs")
 install(FILES "${PROJECT_ROOT}/LICENSE" DESTINATION doc COMPONENT "Docs")
 install(FILES "${PROJECT_ROOT}/THIRD-PARTY" DESTINATION doc COMPONENT "Docs")
+install(FILES "${PROJECT_ROOT}/docs/user/configuration_options.md" DESTINATION doc COMPONENT "Docs")
 
 # Install AWS dependencies
 if(WIN32)
@@ -170,6 +170,16 @@ if(WIN32)
     install(FILES "${AWS_SDK_BIN_DIR}/aws-cpp-sdk-core.dll" DESTINATION bin COMPONENT "Driver")
     install(FILES "${AWS_SDK_BIN_DIR}/aws-cpp-sdk-sts.dll" DESTINATION bin COMPONENT "Driver")
     install(FILES "${AWS_SDK_BIN_DIR}/aws-cpp-sdk-timestream-query.dll" DESTINATION bin COMPONENT "Driver")
+    install(FILES "${PROJECT_ROOT}/docs/user/windows_configure_dsn.md" DESTINATION doc COMPONENT "Docs")
+    install(FILES "${PROJECT_ROOT}/docs/user/microsoft_excel_support.md" DESTINATION doc COMPONENT "Docs")
+elseif(APPLE)
+    install(FILES "${PROJECT_ROOT}/src/Tests/Tests/odbc-mac.ini" DESTINATION doc COMPONENT "Docs")
+    install(FILES "${PROJECT_ROOT}/src/Tests/Tests/odbcinst-mac.ini" DESTINATION doc COMPONENT "Docs")
+    install(FILES "${PROJECT_ROOT}/docs/user/mac_configure_dsn.md" DESTINATION doc COMPONENT "Docs")
+    install(FILES "${PROJECT_ROOT}/docs/user/microsoft_excel_support_mac.md" DESTINATION doc COMPONENT "Docs")
+else()
+    install(FILES "${TESTS_INI}/odbc-linux.ini" DESTINATION doc COMPONENT "Docs")
+    install(FILES "${TESTS_INI}/odbcinst-linux.ini" DESTINATION doc COMPONENT "Docs")
 endif()
 
 include(CPack)
