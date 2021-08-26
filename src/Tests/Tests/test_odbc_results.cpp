@@ -1306,20 +1306,16 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_LONG) {
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_ULONG) {
     long long v1 = 293719;
-    long long v2 = -1;              // underflow
-    long long v3 = UINT32_MAX + 1;  // overflow
-    long long v4 = UINT64_MAX;      // overflow
+    long long v2 = -1;                         // underflow
+    long long v3 = UINT32_MAX + (long long)1;  // overflow
     test_string columns =
         CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v2)
         + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v3)
-        + CREATE_STRING("\', BIGINT\'") + convert_to_test_string(v4)
         + CREATE_STRING("\'");
 
     std::vector< std::pair< SQLUINTEGER, SQLTCHAR* > > expected;
     expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(v1), nullptr));
-    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
-                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
