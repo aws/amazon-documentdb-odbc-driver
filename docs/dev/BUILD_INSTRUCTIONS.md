@@ -105,16 +105,18 @@ sudo apt install unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-
 ```
 #### Amazon Linux 2 64-bit
 ```sh
+# Install dependencies
+sudo yum update
+sudo yum install curl-devel openssl-devel uuid-devel zlib-devel pulseaudio-libs-devel kernel-devel gcc gcc-c++ unixODBC-devel rpm-build
+
 # Download and build CMake 3
 wget https://cmake.org/files/v3.18/cmake-3.18.0.tar.gz
 tar -xvzf cmake-3.18.0.tar.gz
 cd cmake-3.18.0
 ./bootstrap
-make
+make -j4
 sudo make install
-
-# Install dependencies
-sudo yum install curl-devel openssl-devel uuid-devel zlib-devel pulseaudio-libs-devel kernel-devel gcc gcc-c++ unixODBC-devel
+cd ..
 ```
 
 ### Building the Driver
