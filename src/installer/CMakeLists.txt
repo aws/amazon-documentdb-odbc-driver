@@ -171,7 +171,7 @@ if(WIN32)
     install(FILES "${AWS_SDK_BIN_DIR}/aws-cpp-sdk-sts.dll" DESTINATION bin COMPONENT "Driver")
     install(FILES "${AWS_SDK_BIN_DIR}/aws-cpp-sdk-timestream-query.dll" DESTINATION bin COMPONENT "Driver")
     install(FILES "${PROJECT_ROOT}/docs/user/windows_configure_dsn.md" DESTINATION doc COMPONENT "Docs")
-    install(FILES "${PROJECT_ROOT}/docs/user/microsoft_excel_support.md" DESTINATION doc COMPONENT "Docs")
+    install(FILES "${PROJECT_ROOT}/docs/user/microsoft_excel_support_win.md" DESTINATION doc COMPONENT "Docs")
 elseif(APPLE)
     install(FILES "${PROJECT_ROOT}/src/Tests/Tests/odbc-mac.ini" DESTINATION doc COMPONENT "Docs")
     install(FILES "${PROJECT_ROOT}/src/Tests/Tests/odbcinst-mac.ini" DESTINATION doc COMPONENT "Docs")
@@ -183,3 +183,4 @@ else()
 endif()
 
 include(CPack)
+
