@@ -1741,16 +1741,15 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     break;
                 }
                 errno = 0;
-                slong = strtol(trimmed, &p_end, 10);
+                signed long long sllong = strtoll(trimmed, &p_end, 10);
                 check_truncation(p_end, &result);
-                if ((slong == LONG_MIN || slong == LONG_MAX)
-                    && errno == ERANGE) {
+                if (errno == ERANGE || sllong < INT32_MIN || sllong > INT32_MAX) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
                     if (bind_size > 0)
-                        *((SQLINTEGER *)rgbValueBindRow) = slong;
+                        *((SQLINTEGER *)rgbValueBindRow) = (SQLINTEGER)sllong;
                     else
-                        *((SQLINTEGER *)rgbValue + bind_row) = slong;
+                        *((SQLINTEGER *)rgbValue + bind_row) = (SQLINTEGER)sllong;
                 }
                 free(copy);
                 break;
@@ -1772,15 +1771,15 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
                     break;
                 }
                 errno = 0;
-                unsigned long ulong = strtoul(trimmed, &p_end, 10);
+                unsigned long long ullong = strtoull(trimmed, &p_end, 10);
                 check_truncation(p_end, &result);
-                if (ulong == ULONG_MAX && errno == ERANGE) {
+                if (errno == ERANGE || ullong > UINT32_MAX) {
                     result = COPY_RESULT_OVERFLOW_UNDERFLOW;
                 } else {
                     if (bind_size > 0)
-                        *((SQLUINTEGER *)rgbValueBindRow) = ulong;
+                        *((SQLUINTEGER *)rgbValueBindRow) = (SQLUINTEGER)ullong;
                     else
-                        *((SQLUINTEGER *)rgbValue + bind_row) = ulong;
+                        *((SQLUINTEGER *)rgbValue + bind_row) = (SQLUINTEGER)ullong;
                 }
                 free(copy);
                 break;
