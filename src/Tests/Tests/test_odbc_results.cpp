@@ -2550,6 +2550,10 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SLONG) {
     double v4 = 1.5;                           // truncation
     double v5 = -9.3E18;                       // underflow
     double v6 = (double)INT32_MAX + (double)1; // overflow
+    long long v7 = (long long)INT32_MIN - 1;   // underflow
+    long long v8 = (long long)INT32_MAX + 1;   // overflow
+    unsigned long long v9 = 
+        (unsigned long long)INT32_MAX + 1;     // overflow
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
@@ -2560,6 +2564,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SLONG) {
         + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v5)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v6)
+        + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v7)
+        + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v8)
+        + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v9)
         + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
         + CREATE_STRING("\'");  // Not a numeric literal
 
@@ -2576,6 +2583,12 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SLONG) {
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
                                       SQLSTATE_STRING_CONVERSION_ERROR));
 
     TypeConversionAssertionTemplate< SQLINTEGER >(
@@ -2585,9 +2598,13 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SLONG) {
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_LONG) {
     int v1 = -293719;
     int v2 = 741370;
-    double v3 = 1.5;       // truncation
-    double v4 = -DBL_MAX;  // underflow
-    double v5 = DBL_MAX;   // overflow
+    double v3 = 1.5;                         // truncation
+    double v4 = -DBL_MAX;                    // underflow
+    double v5 = DBL_MAX;                     // overflow
+    long long v6 = (long long)INT32_MIN - 1; // underflow
+    long long v7 = (long long)INT32_MAX + 1; // overflow
+    unsigned long long v8 =
+        (unsigned long long)INT32_MAX + 1;   // overflow
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
@@ -2597,6 +2614,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_LONG) {
             v3)  // truncation with leading and trailing spaces
         + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v4)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v5)
+        + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v6)
+        + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v7)
+        + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v8)
         + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
         + CREATE_STRING("\'");  // Not a numeric literal
 
@@ -2612,6 +2632,12 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_LONG) {
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
                                       SQLSTATE_STRING_CONVERSION_ERROR));
 
     TypeConversionAssertionTemplate< SQLINTEGER >(
@@ -2622,7 +2648,8 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_ULONG) {
     int v1 = 293719;
     double v2 = 1.5;                            // truncation
     int v3 = -1;                                // underflow
-    double v4 = (double)ULONG_MAX + (double)1;  // overflow
+    double v4 = (double)UINT32_MAX + (double)1; // overflow
+    unsigned long long v5 = (unsigned long long)UINT32_MAX + 1;  // overflow
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
@@ -2631,6 +2658,7 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_ULONG) {
             v2)  // truncation with leading and trailing spaces
         + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v3)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v4)
+        + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v5)
         + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
         + CREATE_STRING("\'");  // not a numeric literal
 
@@ -2640,6 +2668,8 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_ULONG) {
                                       SQLSTATE_FRACTIONAL_TRUNCATION));
     expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(v2),
                                       SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
