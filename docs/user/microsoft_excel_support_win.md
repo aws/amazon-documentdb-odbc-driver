@@ -1,4 +1,4 @@
-#  Connecting AWS Timestream to Microsoft Excel on Windows
+#  Windows - Connecting to Microsoft Excel
 
 ## Prerequisites
 
