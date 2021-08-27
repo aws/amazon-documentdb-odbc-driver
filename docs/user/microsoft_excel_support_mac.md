@@ -1,4 +1,4 @@
-#  Connecting Amazon Timestream to Micosoft Excel on mac OS
+#  macOS - Connecting to Micosoft Excel
 
 ## Prerequisites
 
