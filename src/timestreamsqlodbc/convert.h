@@ -18,6 +18,7 @@
 #define __CONVERT_H__
 
 #include "odbc.h"
+#include "stdint.h"
 
 #ifdef __cplusplus
 extern "C" {
