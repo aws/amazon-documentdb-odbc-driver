@@ -2517,7 +2517,7 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SLONG) {
     int v2 = 741370;
     double v3 = 1.5;                           // truncation
     double v4 = -9.3E18;                       // underflow
-    double v5 = (double)LONG_MAX + (double)1;  // overflow
+    double v5 = (double)INT32_MAX + (double)1; // overflow
     test_string columns =
         CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v2)
