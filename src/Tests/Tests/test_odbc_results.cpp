@@ -2567,6 +2567,7 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SLONG) {
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v7)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v8)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v9)
+        + CREATE_STRING("\', VARCHAR\' 999999999999999999999999999999")
         + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
         + CREATE_STRING("\'");  // Not a numeric literal
 
@@ -2578,6 +2579,8 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SLONG) {
                                       SQLSTATE_FRACTIONAL_TRUNCATION));
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v4),
                                       SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
@@ -2617,6 +2620,7 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_LONG) {
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v6)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v7)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v8)
+        + CREATE_STRING("\', VARCHAR\' 999999999999999999999999999999")
         + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
         + CREATE_STRING("\'");  // Not a numeric literal
 
@@ -2627,6 +2631,8 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_LONG) {
                                       SQLSTATE_FRACTIONAL_TRUNCATION));
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(v3),
                                       SQLSTATE_FRACTIONAL_TRUNCATION));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
@@ -2659,6 +2665,7 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_ULONG) {
         + CREATE_STRING("  \', VARCHAR\'") + convert_to_test_string(v3)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v4)
         + CREATE_STRING("\', VARCHAR\'") + convert_to_test_string(v5)
+        + CREATE_STRING("\', VARCHAR\' 999999999999999999999999999999")
         + CREATE_STRING("\', VARCHAR\'") + CREATE_STRING("1.a")
         + CREATE_STRING("\'");  // not a numeric literal
 
@@ -2673,6 +2680,8 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_ULONG) {
     expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
+                                      SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0),
                                       SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
     expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0),
                                       SQLSTATE_STRING_CONVERSION_ERROR));
