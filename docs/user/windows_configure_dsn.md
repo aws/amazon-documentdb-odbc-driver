@@ -1,4 +1,4 @@
-# Configuring a DSN on Windows
+# Windows - Configuring a DSN
 
 ## Add DSN
 

@@ -1,4 +1,4 @@
-# macOS - Configuring a DSN
+# Linux - Configuring a DSN - TO DO
 
 ## Prerequisites
 In order to use the Timestream ODBC Driver, [iODBC Driver Manager](http://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/Downloads) must be installed.
