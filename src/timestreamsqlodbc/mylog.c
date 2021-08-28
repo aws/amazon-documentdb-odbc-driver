@@ -166,7 +166,7 @@ const char *GetExeProgramName() {
 
 static void *mylog_cs;
 
-static int mylog_on = LOG_WARNING;
+static int mylog_on = DEFAULT_LOGLEVEL;
 //qlog_on = LOG_WARNING;
 
 //#define INIT_QLOG_CS XPlatformInitializeCriticalSection(&qlog_cs)
