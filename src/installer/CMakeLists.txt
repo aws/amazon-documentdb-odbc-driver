@@ -60,7 +60,7 @@ elseif(UNIX)
 
         # Deb installers fail if there's a space in them.
         set(CPACK_PACKAGE_INSTALL_DIRECTORY "AmazonTimestreamODBCDriver${BITNESS}-bit")
-        set(CPACK_PACKAGE_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY}${CPACK_PACKAGE_VERSION}")
+        set(CPACK_PACKAGE_NAME "AmazonTimestreamODBC_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
 
         # TODO: Need to update both of these.
         set(CPACK_PACKAGE_CONTACT "lyndonb@bitquilltech.com")
@@ -140,17 +140,33 @@ cpack_add_component(Driver
 )
 
 # Install driver files
-install(TARGETS timestreamsqlodbc DESTINATION bin COMPONENT "Driver")
-# TODO: look into DSN Installer failure
-# if(APPLE)
-#     install(FILES "${PROJECT_ROOT}/bin/dsn_installer" DESTINATION bin COMPONENT "Driver")
-#     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/remove-dsn.sh" DESTINATION bin COMPONENT "Driver")
-# endif()
+if (INSTALLER_TYPE STREQUAL "DEB")
+    install(TARGETS timestreamsqlodbc DESTINATION bin/timestream-odbc/${BITNESS} COMPONENT "Driver")
+    
+    # Install documentation files
+    install(FILES "${PROJECT_ROOT}/LICENSE" DESTINATION "bin/timestream-odbc/${BITNESS}" COMPONENT "Docs")
+    install(FILES "${PROJECT_ROOT}/THIRD-PARTY" DESTINATION "bin/timestream-odbc/${BITNESS}" COMPONENT "Docs")
+    install(FILES "${PROJECT_ROOT}/docs/user/configuration_options.md" DESTINATION "bin/timestream-odbc/${BITNESS}" COMPONENT "Docs")
+    install(FILES "${TESTS_INI}/odbc-linux${BITNESS}.ini" DESTINATION "bin/timestream-odbc/${BITNESS}" COMPONENT "Docs")
+    install(FILES "${TESTS_INI}/odbcinst-ubuntu${BITNESS}.ini" DESTINATION "bin/timestream-odbc/${BITNESS}" COMPONENT "Docs")
+else()
+    install(TARGETS timestreamsqlodbc DESTINATION bin COMPONENT "Driver")
+    
+    # Install documentation files
+    install(FILES "${PROJECT_ROOT}/LICENSE" DESTINATION doc COMPONENT "Docs")
+    install(FILES "${PROJECT_ROOT}/THIRD-PARTY" DESTINATION doc COMPONENT "Docs")
+    install(FILES "${PROJECT_ROOT}/docs/user/configuration_options.md" DESTINATION doc COMPONENT "Docs")
 
-# Install documentation files
-install(FILES "${PROJECT_ROOT}/LICENSE" DESTINATION doc COMPONENT "Docs")
-install(FILES "${PROJECT_ROOT}/THIRD-PARTY" DESTINATION doc COMPONENT "Docs")
-install(FILES "${PROJECT_ROOT}/docs/user/configuration_options.md" DESTINATION doc COMPONENT "Docs")
+    if(APPLE)
+        install(FILES "${PROJECT_ROOT}/src/Tests/Tests/odbc-mac.ini" DESTINATION doc COMPONENT "Docs")
+        install(FILES "${PROJECT_ROOT}/src/Tests/Tests/odbcinst-mac.ini" DESTINATION doc COMPONENT "Docs")
+        install(FILES "${PROJECT_ROOT}/docs/user/mac_configure_dsn.md" DESTINATION doc COMPONENT "Docs")
+        install(FILES "${PROJECT_ROOT}/docs/user/microsoft_excel_support_mac.md" DESTINATION doc COMPONENT "Docs")
+    elseif (INSTALLER_TYPE STREQUAL "RPM")
+        install(FILES "${TESTS_INI}/odbc-linux64.ini" DESTINATION doc COMPONENT "Docs")
+        install(FILES "${TESTS_INI}/odbcinst-linux.ini" DESTINATION doc COMPONENT "Docs")
+    endif()
+endif()
 
 # Install AWS dependencies
 if(WIN32)
@@ -172,14 +188,6 @@ if(WIN32)
     install(FILES "${AWS_SDK_BIN_DIR}/aws-cpp-sdk-timestream-query.dll" DESTINATION bin COMPONENT "Driver")
     install(FILES "${PROJECT_ROOT}/docs/user/windows_configure_dsn.md" DESTINATION doc COMPONENT "Docs")
     install(FILES "${PROJECT_ROOT}/docs/user/microsoft_excel_support_win.md" DESTINATION doc COMPONENT "Docs")
-elseif(APPLE)
-    install(FILES "${PROJECT_ROOT}/src/Tests/Tests/odbc-mac.ini" DESTINATION doc COMPONENT "Docs")
-    install(FILES "${PROJECT_ROOT}/src/Tests/Tests/odbcinst-mac.ini" DESTINATION doc COMPONENT "Docs")
-    install(FILES "${PROJECT_ROOT}/docs/user/mac_configure_dsn.md" DESTINATION doc COMPONENT "Docs")
-    install(FILES "${PROJECT_ROOT}/docs/user/microsoft_excel_support_mac.md" DESTINATION doc COMPONENT "Docs")
-else()
-    install(FILES "${TESTS_INI}/odbc-linux.ini" DESTINATION doc COMPONENT "Docs")
-    install(FILES "${TESTS_INI}/odbcinst-linux.ini" DESTINATION doc COMPONENT "Docs")
 endif()
 
 include(CPack)
