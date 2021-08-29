@@ -140,7 +140,7 @@ cpack_add_component(Driver
 )
 
 # Install driver files
-if (INSTALLER_TYPE STREQUAL "DEB")
+if (UNIX)
     install(TARGETS timestreamsqlodbc DESTINATION bin/timestream-odbc/${BITNESS} COMPONENT "Driver")
     
     # Install documentation files
@@ -148,7 +148,7 @@ if (INSTALLER_TYPE STREQUAL "DEB")
     install(FILES "${PROJECT_ROOT}/THIRD-PARTY" DESTINATION "bin/timestream-odbc/${BITNESS}" COMPONENT "Docs")
     install(FILES "${PROJECT_ROOT}/docs/user/configuration_options.md" DESTINATION "bin/timestream-odbc/${BITNESS}" COMPONENT "Docs")
     install(FILES "${TESTS_INI}/odbc-linux${BITNESS}.ini" DESTINATION "bin/timestream-odbc/${BITNESS}" COMPONENT "Docs")
-    install(FILES "${TESTS_INI}/odbcinst-ubuntu${BITNESS}.ini" DESTINATION "bin/timestream-odbc/${BITNESS}" COMPONENT "Docs")
+    install(FILES "${TESTS_INI}/odbcinst-linux${BITNESS}.ini" DESTINATION "bin/timestream-odbc/${BITNESS}" COMPONENT "Docs")
 else()
     install(TARGETS timestreamsqlodbc DESTINATION bin COMPONENT "Driver")
     
@@ -162,9 +162,6 @@ else()
         install(FILES "${PROJECT_ROOT}/src/Tests/Tests/odbcinst-mac.ini" DESTINATION doc COMPONENT "Docs")
         install(FILES "${PROJECT_ROOT}/docs/user/mac_configure_dsn.md" DESTINATION doc COMPONENT "Docs")
         install(FILES "${PROJECT_ROOT}/docs/user/microsoft_excel_support_mac.md" DESTINATION doc COMPONENT "Docs")
-    elseif (INSTALLER_TYPE STREQUAL "RPM")
-        install(FILES "${TESTS_INI}/odbc-linux64.ini" DESTINATION doc COMPONENT "Docs")
-        install(FILES "${TESTS_INI}/odbcinst-linux.ini" DESTINATION doc COMPONENT "Docs")
     endif()
 endif()
 
