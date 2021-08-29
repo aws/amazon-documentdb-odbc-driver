@@ -17,9 +17,7 @@
 * Edit the SQL statement if required and click **Run**:
     * Remove the semi colon from the generated query
     * You may want to add a limit clause to restrict the number of records being returned. For example:
-<pre>
-SELECT * FROM ODBCTest.DevOps LIMIT 10000
-</pre>
+    <pre>SELECT * FROM ODBCTest.DevOps LIMIT 10000</pre>
 * Click on **Return Data**. Select the sheet sheet and click **OK**.
 
 The data will be loaded in the spreadsheet.

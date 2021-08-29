@@ -1,10 +1,10 @@
-# Linux - Building the Amazon Timestream ODBC Driver - TO DO
+# Linux - Building the Amazon Timestream ODBC Driver
 
 ## Linux
 
 ### Dependencies
 
-The terminal can be used to install all the dependencies for Linux.
+The Unix shell can be used to install all the dependencies for Linux.
 
 #### Ubuntu 64-bit
 ```sh
@@ -35,9 +35,18 @@ cd ..
 
 ### Building the Driver
 
-From a terminal, execute:
+From the Unix shell, run one of the following:
+* `./build_linux_debug64.sh`
+* `./build_linux_release32_deb.sh`
+* `./build_linux_release64_deb.sh`
+* `./build_linux_release32_rpm.sh`
+* `./build_linux_release64_rpm.sh`
 
-`./build_linux_<config><bitness>_<installer_type>.sh`
+**Notes:**
+* Ubuntu 20.04 can be used to build either the 32-bit or 64-bit deb files.
+* Ubuntu 18.04 can be used to build only the 64-bit deb file.
+* Amazon Linux 2 should be used to build the 64-bit rpm file.
+* The 32-bit rpm distributable is not supported at this time.
 
 ### Output Location on Linux
 
@@ -45,7 +54,7 @@ Compiling on Linux will output the tests to **bin** and the driver to **lib**. T
 
 ### Packaging
 
-Run below command from the project's build directory.
+From the <cmake-build64> or the <cmake-build32> type:
 >cpack .
 
-Installer named as `AmazonTimestreamODBC-<version>.<installer_type>` will be generated in the build directory.
+An installer named `AmazonTimestreamODBC-<version>.<installer_type>` will be generated in the build directory (for example `AmazonTimestreamODBC_1.0.0_x86_64.rpm` will be created in `make-build64`).
