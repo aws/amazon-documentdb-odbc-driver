@@ -9,7 +9,6 @@ itodbc_results
 itodbc_saml_authentication
 itodbc_tableau_queries
 performance_execution
-performance_info
 ut_aws_sdk_cpp
 ut_conn
 ut_critical_section
