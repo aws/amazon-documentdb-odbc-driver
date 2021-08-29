@@ -422,6 +422,12 @@ RETCODE SQL_API SQLGetFunctions(HDBC ConnectionHandle, SQLUSMALLINT FunctionId,
 }
 
 #ifndef UNICODE_SUPPORTXX
+RETCODE SQL_API SQLGetInfoA(HDBC ConnectionHandle, SQLUSMALLINT InfoType,
+                           PTR InfoValue, SQLSMALLINT BufferLength,
+                           SQLSMALLINT *StringLength) {
+    return SQLGetInfo(ConnectionHandle, InfoType, InfoValue, BufferLength, StringLength);
+}
+
 RETCODE SQL_API SQLGetInfo(HDBC ConnectionHandle, SQLUSMALLINT InfoType,
                            PTR InfoValue, SQLSMALLINT BufferLength,
                            SQLSMALLINT *StringLength) {
