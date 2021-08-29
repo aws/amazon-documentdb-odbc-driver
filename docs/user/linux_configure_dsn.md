@@ -110,8 +110,9 @@ SessionToken   =
 ## Testing Connections
 
 ### Testing the 64-bit Timestream ODBC Driver for Linux
-Use [iSQL](https://www.systutorials.com/docs/linux/man/1-isql/#:~:text=isql%20is%20a%20command%20line,with%20built%2Din%20Unicode%20support) to test the connections and run a sample query. For example, to connect to the timestream-aws-profile DSN, 
-* Type `iSQL [DSN]` to make a connection and enter interactive mode.
+Use [isql](https://www.systutorials.com/docs/linux/man/1-isql/#:~:text=isql%20is%20a%20command%20line,with%20built%2Din%20Unicode%20support) to test the connections and run a sample query. For example, to connect to the timestream-aws-profile DSN, 
+* Type `isql timestream-aws-profile` to make a connection and enter interactive mode.
+
 * Once the SQL prompt appears type a sample query such as `SELECT * FROM sampleDB.IoT`. 
 * Type `quit` to exit interactive mode.
 
