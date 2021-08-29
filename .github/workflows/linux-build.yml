@@ -38,17 +38,19 @@ jobs:
         sudo apt update
         sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib cmake linux-headers-$(uname -r) build-essential valgrind
     - name: prepare-dsn
+    # The odbc.ini file is the same for Linux 2 and Ubuntu so it is odbc-linux64
+    # The odbcinst.ini file has different paths for the dll, so it is odbcinst-linux64.ini for AL2 and odbcinst-ubuntu64.ini for Ubuntu
       if: success()
       run: |
-        sudo cp ./src/Tests/Tests/odbc-linux.ini /etc/odbc.ini
-        sudo cp ./src/Tests/Tests/odbcinst-linux.ini /etc/odbcinst.ini
+        sudo cp ./src/Tests/Tests/odbc-linux64.ini /etc/odbc.ini
+        sudo cp ./src/Tests/Tests/odbcinst-ubuntu64.ini /etc/odbcinst.ini
         mkdir /home/runner/work/timestream-odbc/timestream-odbc/odbc-logs
         export ODBCSYSINI=/etc/
         export ODBCINSTINI=odbcinst.ini
         export ODBCINI=/etc/odbc.ini
     - name: configure-and-build-driver
       run: |
-        ./build_linux_release64_rpm.sh
+        ./build_linux_release64_deb.sh
     - name: configure-aws-credentials
       if: success()
       uses: aws-actions/configure-aws-credentials@v1
@@ -106,12 +108,12 @@ jobs:
       with:
         name: linux64-build
         path: build-output
-    - name: upload-linux64-rpm-installer
-      if: success()
-      uses: actions/upload-artifact@v2
-      with:
-        name: linux64-rpm-installer
-        path: rpm-installer
+#    - name: upload-linux64-rpm-installer
+#      if: success()
+#      uses: actions/upload-artifact@v2
+#      with:
+#        name: linux64-rpm-installer
+#        path: rpm-installer
     - name: upload-linux64-deb-installer
       if: success()
       uses: actions/upload-artifact@v2
@@ -139,11 +141,13 @@ jobs:
         sudo dpkg --add-architecture i386
         sudo apt update 
         sudo apt install unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386 zlib1g-dev:i386 linux-headers-$(uname -r) gcc-multilib:i386 g++-multilib:i386 cmake g++-9:i386 gcc-9:i386 gcc-9-multilib:i386 g++-9-multilib:i386 binutils:i386 make:i386
+    # The odbc.ini file is the same for Linux 2 and Ubuntu so it is odbc-linux32
+    # The odbcinst.ini file has different paths for the dll, so it is odbcinst-linux32.ini for AL2 and odbcinst-ubuntu32.ini for Ubuntu
     - name: prepare-dsn
       if: success()
       run: |
-        sudo cp ./src/Tests/Tests/odbc-linux.ini /etc/odbc.ini
-        sudo cp ./src/Tests/Tests/odbcinst-linux.ini /etc/odbcinst.ini
+        sudo cp ./src/Tests/Tests/odbc-linux32.ini /etc/odbc.ini
+        sudo cp ./src/Tests/Tests/odbcinst-ubuntu32.ini /etc/odbcinst.ini
         mkdir /home/runner/work/timestream-odbc/timestream-odbc/odbc-logs
         export ODBCSYSINI=/etc/
         export ODBCINSTINI=odbcinst.ini
@@ -158,7 +162,7 @@ jobs:
     - name: configure-and-build-driver
       if: success()
       run: |
-        ./build_linux_release32_rpm.sh
+        ./build_linux_release32_deb.sh
     - name: run-tests
       if: success()
       run: |
