@@ -1,6 +1,6 @@
 # Windows - Configuring a DSN
 
-## Add DSN
+## Adding a DSN
 
 1. Run `ODBC Data Sources (64-bit)` or `ODBC Data Sources (32-bit)`. Click on the `System DSN` or `User DSN` tab then click `Add...`.
 

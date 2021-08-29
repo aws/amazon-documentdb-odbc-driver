@@ -37,7 +37,7 @@ Use a text editor from Terminal to edit the odbcinst.ini file such as vi.
 1. Add `Amazon Timestream ODBC Driver` in the `[ODBC Drivers]` section.
 2. Add the `[Amazon Timestream ODBC Driver]` section.
 
-#### Sample odbcinst.ini
+#### Sample odbcinst.ini file
 ```
 [ODBC Drivers]
 Amazon Timestream ODBC Driver  = Installed
@@ -84,7 +84,7 @@ Use a text editor from Terminal to edit the odbc.ini file such as vi. See [Confi
 
 `vi ~/Library/ODBC/odbc.ini`
 
-#### <a name="odbc_data_source"></a>Sample odbc.ini
+#### <a name="odbc_data_source"></a>Sample odbc.ini file
 ```
 [ODBC Data Sources]
 timestream-iam-profile  = Amazon Timestream ODBC Driver
