@@ -21,35 +21,61 @@ The driver is compatible with ODBC 3.51.
 
 You can use the installers generated from the most recent release
 
-### Windows Installer
+### Installing on Windows 10 or Windows Server 2019
 
 1. Run `AmazonTimestreamODBC32-[version].msi` or `AmazonTimestreamODBC64-[version].msi` to install the Amazon Timestream ODBC Driver.
 2. [Configure DSN entries](./docs/user/windows_configure_dsn.md) using ODBC Data Source Administrator.
 
-### macOS Installer
+### Installing on macOS Catalina or macOS Big Sur
 
-iODBC Driver Manager should be installed before installing the Amazon Timestream ODBC Driver on macOS.
+[iODBC Driver Manager](http://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/Downloads) should be installed before installing the Amazon Timestream ODBC Driver on macOS.
 
 1. Run `AmazonTimestreamODBC-[version].pkg` to install the Amazon Timestream ODBC Driver.
 2. [Configure Driver and DSN entries](./docs/user/mac_configure_dsn.md).
 
-### Linux 32-bit .deb - TO DO
-To DO - What needs to be installed to run?
+### Installing the 32-bit deb file on Ubuntu 20.4 64-bit
+
+The 32-bit dependencies need to be installed before installing the Amazon Timestream ODBC Driver on Ubuntu.
+
+```
+sudo apt update
+sudo dpkg --add-architecture i386 
+sudo apt install unixodbc:i386 unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386 zlib1g-dev:i386 linux-headers-$(uname -r) gcc-multilib:i386 g++-multilib:i386 cmake g++-9:i386 gcc-9:i386 gcc-9-multilib:i386 g++-9-multilib:i386 binutils:i386 make:i386
+```
+
+You may also want to install [isql32](.\tools) for testing. In the directory where it is installed:
+* Type `chmod +x ./isql32` to make it executable.
+* Type `./isql32 [DSN]` to make a connection and enter interactive mode.
+* Enter SQL statements to run.
+* Type `quit` to exit interactive mode.
+
+What needs to be installed to run?
 1. Run `AmazonTimestreamODBC_[version]_i386.deb` to install the Amazon Timestream ODBC Driver.
 2. [Configure Driver and DSN entries](./docs/user/linux_configure_dsn.md).
 
-### Linux 64-bit .deb - TO DO
-To DO - What needs to be installed to run?
+### Installing the 64-bit deb file on Ubuntu 20.4
+unixODBC should be installed before installing the Amazon Timestream ODBC Driver on Ubuntu.
+
+```
+sudo apt update
+sudo apt install unixodbc
+```
+
 1. Run `AmazonTimestreamODBC_[version]_amd64.deb` to install the Amazon Timestream ODBC Driver.
 2. [Configure Driver and DSN entries](./docs/user/linux_configure_dsn.md).
 
-### Linux 32-bit .rpm - TO DO
+### Installing the 32-bit rpm file on Amazon Linux 2 (TO DO)
 To DO - What needs to be installed to run?
 1. Run `AmazonTimestreamODBC_[version]_i386.rpm` to install the Amazon Timestream ODBC Driver.
 2. [Configure Driver and DSN entries](./docs/user/linux_configure_dsn.md).
 
-### Linux 64-bit .rpm - TO DO
-To DO - What needs to be installed to run?
+### Installing the 64-bit rpm file on Amazon Linux 2
+unixODBC should be installed before installing the Amazon Timestream ODBC Driver on Amazon Linux 2.
+
+```
+sudo apt update
+sudo apt install unixodbc
+```
 1. Run `AmazonTimestreamODBC_[version]_x86_64.rpm` to install the Amazon Timestream ODBC Driver.
 2. [Configure Driver and DSN entries](./docs/user/linux_configure_dsn.md).
 
@@ -58,7 +84,7 @@ To DO - What needs to be installed to run?
 The driver comes in the form of a library file:
 * Windows: `timestreamsqlodbc.dll`
 * Mac: `libtimestreamsqlodbc.dylib`
-* Linux: TO DO
+* Linux: `libtimestreamsqlodbc.so`
 
 If using with ODBC compatible BI tools, refer to the tool documentation on configuring a new ODBC driver. In most cases, you will need to make the tool aware of the location of the driver library file and then use it to setup Amazon Timestream database connections.
 
