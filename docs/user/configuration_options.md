@@ -22,7 +22,7 @@ The DSN specific options can be set in the `odbc.ini` file for macOS or Linux, o
 
 **Note:** We recommend setting the LogOutput for the driver (in the `odbcinst.ini` file or registry settings) and not the DSN (in the `odbc.ini` file or registry settings). Otherwise the first log file will live in a temporary folder and the DSN specified LogOutput value will not take effect until the next time the driver is initialized.
 
-#### AWS_PROFILE Options
+#### AWS Profile Authentication Options
 
 | Option | Description | Type | Default |
 |--------|-------------|------|---------------|
@@ -37,21 +37,6 @@ The DSN specific options can be set in the `odbc.ini` file for macOS or Linux, o
 | `PWD` | The AWS user secret access key. | string | `<NONE>` |
 | `SessionToken` | The temporary session token required to access a database with multi-factor authentication (MFA) enabled. | string | `<NONE>` |
 | `Region` | The database's region. | string |`us-east-1`|
-
-#### AWS SDK Options
-
-| Option | Description | Type | Default |
-|--------|-------------|------|---------------|
-| `RequestTimeout` | The time in milliseconds the AWS SDK will wait for a query request before timing out. Non-positive value disables request timeout. | int | `3000` |
-| `ConnectionTimeout` | Socket connect timeout. Value must be non-negative. A value of 0 disables socket timeout. | int | `1000` |
-| `MaxRetryCountClient` | The maximum number of retry attempts for retryable errors with 5XX error codes in the SDK. The value must be non-negative, 0 means no retry. | int | `<NONE>` |
-| `MaxConnections` | The maximum number of allowed concurrently opened HTTP connections to the Timestream service. The value must be positive. | int | `25` |
-
-#### Endpoint Configuration Options
-
-| Option | Description | Type | Default |
-|--------|-------------|------|---------------|
-| `EndpointOverride` | The endpoint override for the Timestream service. It overrides the region. It is an advanced option. | string | `<NONE>` |
 
 #### SAML-based authenication options for Okta
 
@@ -77,5 +62,20 @@ The DSN specific options can be set in the `odbc.ini` file for macOS or Linux, o
 | `AADClientSecret` | The client secret associated with the registered application on Azure AD used to authorize fetching tokens. | string | `<NONE>` |
 | `AADTenant` | The Azure AD Tenant ID. | string | `<NONE>` |
 | `IdpARN` | The Amazon Resource Name (ARN) of the SAML provider in IAM that describes the Idp. | string | `<NONE>` |
+
+#### AWS SDK Options
+
+| Option | Description | Type | Default |
+|--------|-------------|------|---------------|
+| `RequestTimeout` | The time in milliseconds the AWS SDK will wait for a query request before timing out. Non-positive value disables request timeout. | int | `3000` |
+| `ConnectionTimeout` | Socket connect timeout. Value must be non-negative. A value of 0 disables socket timeout. | int | `1000` |
+| `MaxRetryCountClient` | The maximum number of retry attempts for retryable errors with 5XX error codes in the SDK. The value must be non-negative, 0 means no retry. | int | `<NONE>` |
+| `MaxConnections` | The maximum number of allowed concurrently opened HTTP connections to the Timestream service. The value must be positive. | int | `25` |
+
+#### Endpoint Configuration Options
+
+| Option | Description | Type | Default |
+|--------|-------------|------|---------------|
+| `EndpointOverride` | The endpoint override for the Timestream service. It overrides the region. It is an advanced option. | string | `<NONE>` |
 
 **NOTE:** Administrative privileges are required to change the value of logging options on Windows / macOS.

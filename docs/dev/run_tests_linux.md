@@ -1,4 +1,4 @@
-# Linux - Running Amazon Timestream ODBC Driver Automated Tests - TO DO
+# Linux - Running the Amazon Timestream ODBC Driver Automated Tests
 
 ## Preparation
 
@@ -12,8 +12,8 @@ See [Running Amazon Timestream Automated Tests](https://github.com/Bit-Quill/tim
 
 ### Setup the DSN Entries
 
-1. Open [src/Tests/Tests/odbcinst-linux.ini](../../src/Tests/Tests/odbcinst-linux.ini) and manually add the entries to `/Library/ODBC/odbcinst.ini`.
-2. Open [src/Tests/Tests/odbc-linux.ini](../../src/Tests/Tests/odbc-linux.ini)
+1. Open [src/Tests/Tests/odbcinst-linux64.ini](../../src/Tests/Tests/odbcinst-linux64.ini) or [src/Tests/Tests/odbcinst-linux32.ini](../../src/Tests/Tests/odbcinst-linux32.ini) and manually add the entries to `/Library/ODBC/odbcinst.ini`.
+2. Open [src/Tests/Tests/odbc-linux64.ini](../../src/Tests/Tests/odbc-linux64.ini) or [src/Tests/Tests/odbc-linux32.ini](../../src/Tests/Tests/odbc-linux32.ini)
  * To create a System DSN, manually add the entries to `/Library/ODBC/odbc.ini`. 
  * To create a User DSN, manually add the entries to `~/Library/ODBC/odbc.ini`.
  * In the odbc.ini file populate the following settings (See [Configuration Options](../user/configuration_options.md) for more details).
@@ -24,8 +24,8 @@ See [Running Amazon Timestream Automated Tests](https://github.com/Bit-Quill/tim
 
 **Note:** You do not need to populate the `[timestream-aad]` or `[timestream-okta]` sections if your database does not have Azure AD or Okta setup and you are skipping the tests.
 
-### Running Tests from Terminal
-Tests can be executed using a command line interface. To run all tests, from the project root directory (replacing the values), run:
+### Running Tests from Unix Shell
+Tests can be executed from the Unix shell. To run all tests, from the project root directory (replacing the values), run:
 
 <pre>
 export AAD_CONNECT_STRING="<i>[AAD_CONNECT_STRING]</i>"

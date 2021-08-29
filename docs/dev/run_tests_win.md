@@ -1,4 +1,4 @@
-# Windows - Running Amazon Timestream ODBC Driver Automated Tests
+# Windows - Running the Amazon Timestream ODBC Driver Automated Tests
 
 ## Preparation
 
@@ -6,7 +6,7 @@ See [Running Amazon Timestream Automated Tests](https://github.com/Bit-Quill/tim
 
 ## Running the Automated Tests
 
-Tests can be executed directly using **Visual Studio** or through **Developer Powershell**
+Tests can be executed directly using **Visual Studio** or through **Developer Powershell**. See [Configuration Options](../user/configuration_options.md) for more details on specific configuration options.
 
 **NOTES:**
 
