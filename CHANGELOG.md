@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.5.2](https://github.com/Bit-Quill/timestream-odbc/releases/tag/v0.5.2) - 2021-08-29
+### Added
+- Sample odbc.ini and odbcinst.ini files.
+- Convert region to lower case when connecting.
+
+### Fixed
+- Don't treat trailing 0s as truncation during data conversion.
+- Seg fault in TestSQLGetCursorName when no AWS credentials are supplied.
+- Use exact number for longs in data-conversion.
+- Driver version is now displayed in iODBC Administrator.
+
 ## [v0.5.1](https://github.com/Bit-Quill/timestream-odbc/releases/tag/v0.5.1) - 2021-08-17
 ### Added
 - Big Sur support.
