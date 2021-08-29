@@ -3,13 +3,18 @@
 ### Dependencies
 
 Homebrew must be installed to manage packages, to install homebrew see the [homebrew homepage](https://brew.sh/).
-Using homebrew, install the following packages using the command provided:
->brew install [package]
->
->* curl
->* cmake
->* libiodbc
->* llvm (for debug version)
+
+From Terminal run the following:
+```
+brew install curl
+brew install cmake
+brew install libiodbc
+```
+
+For debugging also run the following:
+```
+brew install llvm
+```
 
 ### Building the Driver
 
@@ -25,8 +30,10 @@ From Terminal, run one of the following:
 ### Packaging
 
 Run below command from the project's build directory.
-*  `cmake ../src`
-*  `make`
-*  `cpack .`
+```
+cmake ../src
+make
+cpack .
+```
 
-Installer named as `AmazonTimestreamODBC-<version>.pkg` will be generated in the build directory.
+An installer named `AmazonTimestreamODBC-<version>.pkg` will be generated in the build directory (for example `AmazonTimestreamODBC_1.0.0.pkg` ).

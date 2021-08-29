@@ -1,4 +1,4 @@
-# macOS - Running Amazon Timestream ODBC Driver Automated Tests
+# macOS - Running the Amazon Timestream ODBC Driver Automated Tests
 
 ## Preparation
 
