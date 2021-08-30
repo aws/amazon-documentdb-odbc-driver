@@ -3,11 +3,26 @@
 ## Prerequisites
 In order to use the Timestream ODBC Driver, [unixODBC] (http://www.unixodbc.org/) must be installed.
 
-### Installing on Ubuntu
+### Installing on Ubuntu 64 bit
 
 ```
 sudo apt update
 sudo apt install unixodbc
+```
+
+### Installing on Ubuntu 32 bit
+
+```
+sudo dpkg --add-architecture i386
+sudo apt update
+sudo apt install unixodbc:i386
+```
+
+### Installing on Amazon Linux 2 64 bit
+
+```
+sudo yum update
+sudo yum install unixODBC
 ```
 
 ## Adding a Driver Entry
@@ -35,7 +50,7 @@ Setup  = /usr/bin/timestream-odbc/64/libtimestreamsqlodbc.so
 #### Sample odbcinst.ini file for 32-bit Linux
 ```
 [ODBC Drivers]
-Amazon Timestream ODBC Driver  = Installed
+Amazon Timestream ODBC Driver 32 = Installed
 
 [Amazon Timestream ODBC Driver 32]
 Driver = /usr/bin/timestream-odbc/32/libtimestreamsqlodbc.so
@@ -56,9 +71,9 @@ Use a text editor from the Unix shell to edit the odbc.ini file such as vi. See 
 #### <a name="odbc_data_source"></a>Sample odbc.ini file
 ```
 [ODBC Data Sources]
-timestream-iam-profile     = Amazon Timestream ODBC Driver
-timestream-aad-profile     = Amazon Timestream ODBC Driver
-timestream-okta-profile    = Amazon Timestream ODBC Driver
+timestream-iam             = Amazon Timestream ODBC Driver
+timestream-aad             = Amazon Timestream ODBC Driver
+timestream-okta            = Amazon Timestream ODBC Driver
 timestream-aws-profile     = Amazon Timestream ODBC Driver
 timestream-aws-profile-32  = Amazon Timestream ODBC Driver 32
 
@@ -72,7 +87,7 @@ Driver    = Amazon Timestream ODBC Driver
 Region    = us-east-2
 Auth      = AWS_PROFILE
 
-[timestream-aad-profile]
+[timestream-aad]
 Driver           = Amazon Timestream ODBC Driver
 Region           = us-east-1
 Auth             = AAD
@@ -85,7 +100,7 @@ IdpARN           =
 IdpUserName      = 
 IdpPassword      = 
 
-[timestream-okta-profile]
+[timestream-okta]
 Driver            = Amazon Timestream ODBC Driver
 Region            = us-east-1
 Auth              = OKTA
@@ -97,7 +112,7 @@ IdpARN            =
 IdpUserName       = 
 IdpPassword       = 
 
-[timestream-iam-profile]
+[timestream-iam]
 Driver         = Amazon Timestream ODBC Driver
 Region         = us-east-1
 LogLevel       = 0

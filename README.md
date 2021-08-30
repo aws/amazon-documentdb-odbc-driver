@@ -38,8 +38,8 @@ You can use the installers generated from the most recent release
 The 32-bit dependencies need to be installed before installing the Amazon Timestream ODBC Driver on Ubuntu.
 
 ```
-sudo apt update
 sudo dpkg --add-architecture i386 
+sudo apt update
 sudo apt install unixodbc:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386
 ```
 
