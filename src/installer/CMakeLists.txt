@@ -140,7 +140,7 @@ cpack_add_component(Driver
 )
 
 # Install driver files
-if (UNIX)
+if (UNIX AND NOT APPLE)
     install(TARGETS timestreamsqlodbc DESTINATION bin/timestream-odbc/${BITNESS} COMPONENT "Driver")
     
     # Install documentation files
