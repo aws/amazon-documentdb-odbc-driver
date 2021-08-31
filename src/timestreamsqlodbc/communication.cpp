@@ -21,9 +21,17 @@
 
 // clang-format on
 
+namespace {
+  /**
+   * Supported encodings list
+   * Currently we support UTF8 only
+   */
+  static const std::vector< std::string > SUPPORTED_CLIENT_ENCODINGS = {"UTF8"};
+}
+
 Communication::Communication()
     : m_status(ConnStatusType::CONNECTION_BAD),
-      m_client_encoding(m_supported_client_encodings[0]) {
+      m_client_encoding(SUPPORTED_CLIENT_ENCODINGS[0]) {
 }
 
 Communication::~Communication() {
@@ -64,9 +72,9 @@ std::string Communication::GetClientEncoding() {
 }
 
 bool Communication::SetClientEncoding(const std::string& encoding) {
-    if (std::find(m_supported_client_encodings.begin(),
-                  m_supported_client_encodings.end(), encoding)
-        != m_supported_client_encodings.end()) {
+    if (std::find(SUPPORTED_CLIENT_ENCODINGS.begin(),
+                  SUPPORTED_CLIENT_ENCODINGS.end(), encoding)
+        != SUPPORTED_CLIENT_ENCODINGS.end()) {
         m_client_encoding = encoding;
         return true;
     }

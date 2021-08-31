@@ -440,7 +440,7 @@ static RETCODE SQL_API ARDSetField(DescriptorClass *desc, SQLSMALLINT RecNumber,
                                    SQLINTEGER BufferLength) {
     UNUSED(BufferLength);
     RETCODE ret = SQL_SUCCESS;
-    ARDFields *opts = &(desc->ardf);
+    ARDFields *opts = &(desc->fields.ardf);
     SQLSMALLINT row_idx;
     BOOL unbind = TRUE;
 
@@ -608,7 +608,7 @@ static RETCODE SQL_API APDSetField(DescriptorClass *desc, SQLSMALLINT RecNumber,
                                    SQLINTEGER BufferLength) {
     UNUSED(BufferLength);
     RETCODE ret = SQL_SUCCESS;
-    APDFields *opts = &(desc->apdf);
+    APDFields *opts = &(desc->fields.apdf);
     SQLSMALLINT para_idx;
     BOOL unbind = TRUE;
 
@@ -718,7 +718,7 @@ static RETCODE SQL_API IRDSetField(DescriptorClass *desc, SQLSMALLINT RecNumber,
                                    SQLINTEGER BufferLength) {
     UNUSED(BufferLength, RecNumber);
     RETCODE ret = SQL_SUCCESS;
-    IRDFields *opts = &(desc->irdf);
+    IRDFields *opts = &(desc->fields.irdf);
 
     switch (FieldIdentifier) {
         case SQL_DESC_ARRAY_STATUS_PTR:
@@ -772,13 +772,13 @@ static RETCODE SQL_API IPDSetField(DescriptorClass *desc, SQLSMALLINT RecNumber,
                                    SQLINTEGER BufferLength) {
     UNUSED(BufferLength);
     RETCODE ret = SQL_SUCCESS;
-    IPDFields *ipdopts = &(desc->ipdf);
+    IPDFields *ipdopts = &(desc->fields.ipdf);
     SQLSMALLINT para_idx;
 
-#ifdef __linux__
+#if defined(__linux__) && __GNUC__ > 6
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough="
-#endif // __linux__
+#endif // defined(__linux__) && __GNUC__ > 6
     switch (FieldIdentifier) {
         case SQL_DESC_ARRAY_STATUS_PTR:
             ipdopts->param_status_ptr = (SQLUSMALLINT *)Value;
@@ -902,7 +902,7 @@ static RETCODE SQL_API ARDGetField(DescriptorClass *desc, SQLSMALLINT RecNumber,
     SQLLEN ival = 0;
     SQLINTEGER len, rettype = 0;
     PTR ptr = NULL;
-    const ARDFields *opts = &(desc->ardf);
+    const ARDFields *opts = &(desc->fields.ardf);
     SQLSMALLINT row_idx;
 
     len = sizeof(SQLINTEGER);
@@ -1067,7 +1067,7 @@ static RETCODE SQL_API APDGetField(DescriptorClass *desc, SQLSMALLINT RecNumber,
     SQLLEN ival = 0;
     SQLINTEGER len, rettype = 0;
     PTR ptr = NULL;
-    const APDFields *opts = (const APDFields *)&(desc->apdf);
+    const APDFields *opts = (const APDFields *)&(desc->fields.apdf);
     SQLSMALLINT para_idx;
 
     len = sizeof(SQLINTEGER);
@@ -1216,7 +1216,7 @@ static RETCODE SQL_API IRDGetField(DescriptorClass *desc, SQLSMALLINT RecNumber,
     SQLINTEGER len = 0, rettype = 0;
     PTR ptr = NULL;
     BOOL bCallColAtt = FALSE;
-    const IRDFields *opts = &(desc->irdf);
+    const IRDFields *opts = &(desc->fields.irdf);
 
     switch (FieldIdentifier) {
         case SQL_DESC_ROWVER: /* read-only */
@@ -1335,7 +1335,7 @@ static RETCODE SQL_API IPDGetField(DescriptorClass *desc, SQLSMALLINT RecNumber,
     RETCODE ret = SQL_SUCCESS;
     SQLINTEGER ival = 0, len = 0, rettype = 0;
     PTR ptr = NULL;
-    const IPDFields *ipdopts = (const IPDFields *)&(desc->ipdf);
+    const IPDFields *ipdopts = (const IPDFields *)&(desc->fields.ipdf);
     SQLSMALLINT para_idx;
 
     switch (FieldIdentifier) {
@@ -1788,10 +1788,10 @@ RETCODE SQL_API API_SetStmtAttr(HSTMT StatementHandle, SQLINTEGER Attribute,
     MYLOG(LOG_TRACE,
           "entering Handle=%p " FORMAT_INTEGER "," FORMAT_ULEN "(%p)",
           StatementHandle, Attribute, (SQLULEN)Value, Value);
-#ifdef __linux__
+#if defined(__linux__) && __GNUC__ > 6
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough="
-#endif // __linux__
+#endif // defined(__linux__) && __GNUC__ > 6
     switch (Attribute) {
         case SQL_ATTR_ENABLE_AUTO_IPD: /* 15 */
             if (SQL_FALSE == Value)
