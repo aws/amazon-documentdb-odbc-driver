@@ -139,11 +139,11 @@ RETCODE SQL_API API_AllocStmt(HDBC hdbc, HSTMT *phstmt, UDWORD flag) {
     /* Copy default statement options based from Connection options */
     if (0 != (PODBC_INHERIT_CONNECT_OPTIONS & flag)) {
         stmt->options = stmt->options_orig = conn->stmtOptions;
-        stmt->ardi.ardf = conn->ardOptions;
+        stmt->ardi.fields.ardf = conn->ardOptions;
     } else {
         InitializeStatementOptions(&stmt->options_orig);
         stmt->options = stmt->options_orig;
-        InitializeARDFields(&stmt->ardi.ardf);
+        InitializeARDFields(&stmt->ardi.fields.ardf);
     }
     ardopts = SC_get_ARDF(stmt);
     ARD_AllocBookmark(ardopts);

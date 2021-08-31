@@ -152,16 +152,16 @@ void DC_Destructor(DescriptorClass *self) {
     if (deschd->type_defined) {
         switch (deschd->desc_type) {
             case SQL_ATTR_APP_ROW_DESC:
-                ARDFields_free(&(self->ardf));
+                ARDFields_free(&(self->fields.ardf));
                 break;
             case SQL_ATTR_APP_PARAM_DESC:
-                APDFields_free(&(self->apdf));
+                APDFields_free(&(self->fields.apdf));
                 break;
             case SQL_ATTR_IMP_ROW_DESC:
-                IRDFields_free(&(self->irdf));
+                IRDFields_free(&(self->fields.irdf));
                 break;
             case SQL_ATTR_IMP_PARAM_DESC:
-                IPDFields_free(&(self->ipdf));
+                IPDFields_free(&(self->fields.ipdf));
                 break;
         }
     }
@@ -176,20 +176,20 @@ void InitializeEmbeddedDescriptor(DescriptorClass *self, StatementClass *stmt,
     deschd->desc_type = desc_type;
     switch (desc_type) {
         case SQL_ATTR_APP_ROW_DESC:
-            memset(&(self->ardf), 0, sizeof(ARDFields));
+            memset(&(self->fields.ardf), 0, sizeof(ARDFields));
             stmt->ard = self;
             break;
         case SQL_ATTR_APP_PARAM_DESC:
-            memset(&(self->apdf), 0, sizeof(APDFields));
+            memset(&(self->fields.apdf), 0, sizeof(APDFields));
             stmt->apd = self;
             break;
         case SQL_ATTR_IMP_ROW_DESC:
-            memset(&(self->irdf), 0, sizeof(IRDFields));
+            memset(&(self->fields.irdf), 0, sizeof(IRDFields));
             stmt->ird = self;
-            stmt->ird->irdf.stmt = stmt;
+            stmt->ird->fields.irdf.stmt = stmt;
             break;
         case SQL_ATTR_IMP_PARAM_DESC:
-            memset(&(self->ipdf), 0, sizeof(IPDFields));
+            memset(&(self->fields.ipdf), 0, sizeof(IPDFields));
             stmt->ipd = self;
             break;
     }
@@ -430,13 +430,13 @@ RETCODE SQL_API API_CopyDesc(SQLHDESC SourceDescHandle,
             if (!targethd->type_defined) {
                 targethd->desc_type = srchd->desc_type;
             }
-            ard_src = &(src->ardf);
+            ard_src = &(src->fields.ardf);
             MYPRINTF(LOG_DEBUG,
                      " rowset_size=" FORMAT_LEN " bind_size=" FORMAT_UINTEGER
                      " ope_ptr=%p off_ptr=%p\n",
                      ard_src->size_of_rowset, ard_src->bind_size,
                      ard_src->row_operation_ptr, ard_src->row_offset_ptr);
-            ard_tgt = &(target->ardf);
+            ard_tgt = &(target->fields.ardf);
             MYPRINTF(LOG_DEBUG, " target=%p", ard_tgt);
             ARDFields_copy(ard_src, ard_tgt);
             MYPRINTF(LOG_DEBUG, " offset_ptr=%p", ard_tgt->row_offset_ptr);
@@ -445,16 +445,16 @@ RETCODE SQL_API API_CopyDesc(SQLHDESC SourceDescHandle,
             if (!targethd->type_defined) {
                 targethd->desc_type = srchd->desc_type;
             }
-            apd_src = &(src->apdf);
-            apd_tgt = &(target->apdf);
+            apd_src = &(src->fields.apdf);
+            apd_tgt = &(target->fields.apdf);
             APDFields_copy(apd_src, apd_tgt);
             break;
         case SQL_ATTR_IMP_PARAM_DESC:
             if (!targethd->type_defined) {
                 targethd->desc_type = srchd->desc_type;
             }
-            ipd_src = &(src->ipdf);
-            ipd_tgt = &(target->ipdf);
+            ipd_src = &(src->fields.ipdf);
+            ipd_tgt = &(target->fields.ipdf);
             IPDFields_copy(ipd_src, ipd_tgt);
             break;
         default:

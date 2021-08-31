@@ -392,7 +392,10 @@ std::regex ConvertPattern(const std::string &sql_pattern) {
             case ')':
             case '\\': {
                 regex_pattern += "\\";
+#if !defined(__linux__) || __GNUC__ > 6
+                // This is not valid on Linux with GCC older than 7.
                 [[fallthrough]];
+#endif // !defined(__linux__) || __GNUC__ > 6
             }
             default: {
                 regex_pattern.push_back(sql_pattern.at(i));
@@ -485,7 +488,7 @@ void SetTableTuples(QResultClass *res, const TableResultSet res_type,
                     const bind_vector &bind_tbl, std::string &table_type,
                     StatementClass *stmt, StatementClass *tbl_stmt,
                     std::vector< std::string > *list_of_columns) {
-    auto CheckResult = [&](const auto &res) {
+    auto CheckResult = [&](RETCODE &res) {
         if (res != SQL_NO_DATA_FOUND) {
             SC_full_error_copy(stmt, tbl_stmt, FALSE);
             throw std::runtime_error(
@@ -494,7 +497,7 @@ void SetTableTuples(QResultClass *res, const TableResultSet res_type,
                     .c_str());
         }
     };
-    auto AssignData = [&](auto *res, const auto &binds) {
+    auto AssignData = [&](QResultClass *res, const bind_vector &binds) {
         TupleField *tuple = QR_AddNew(res);
         // Since we do not support catalogs, we will return an empty string for
         // catalog names. This is required for Excel for Mac, which uses this
