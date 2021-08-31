@@ -194,7 +194,7 @@ typedef struct {
         APDFields apdf;
         IRDFields irdf;
         IPDFields ipdf;
-    };
+    } fields;
 } DescriptorClass;
 
 #define DC_get_conn(a) ((a)->deschd.conn_conn)

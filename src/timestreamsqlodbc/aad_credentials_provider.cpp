@@ -137,7 +137,7 @@ Aws::String AADCredentialsProvider::GetSAMLAssertion() {
         "Value=\"urn:oasis:names:tc:SAML:2.0:status:Success\"/></samlp:Status>"
         + decoded + "</samlp:Response>";
 
-    Aws::Utils::ByteBuffer encode_buffer = Aws::Utils::Array(
+    Aws::Utils::ByteBuffer encode_buffer = Aws::Utils::ByteBuffer(
         reinterpret_cast< unsigned char const* >(assertion.c_str()),
         assertion.size());
     return BASE64_URL.Encode(encode_buffer);

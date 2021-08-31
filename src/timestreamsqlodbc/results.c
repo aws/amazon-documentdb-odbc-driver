@@ -474,10 +474,10 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
         (USE_FI(fi, unknown_sizes) && fi->column_size > 0)
             ? fi->column_size
             : estype_column_size(stmt, field_type, col_idx, unknown_sizes);
-#ifdef __linux__
+#if defined(__linux__) && __GNUC__ > 6
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough="
-#endif // __linux__
+#endif // __linux__ && __GNUC__ > 6
     switch (fDescType) {
         case SQL_COLUMN_AUTO_INCREMENT: /* == SQL_DESC_AUTO_UNIQUE_VALUE */
             if (fi && fi->auto_increment)
