@@ -54,7 +54,12 @@ Compiling on Linux will output the tests to **bin** and the driver to **lib**. T
 
 ### Packaging
 
-From the <cmake-build64> or the <cmake-build32> type:
->cpack .
+From the `cmake-build64` or the `cmake-build32` folder, run:
+
+```
+cmake ../src
+make
+cpack .
+```
 
 An installer named `AmazonTimestreamODBC-<version>.<installer_type>` will be generated in the build directory (for example `AmazonTimestreamODBC_1.0.0_x86_64.rpm` will be created in `make-build64`).
