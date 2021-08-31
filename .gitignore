@@ -42,8 +42,6 @@ LICENSE.txt
 /googletest/
 /installer/
 /IntegrationTests/
-/odfeenlist/
-/odfesqlodbc/
 /PerformanceTests/
 /UnitTests/
 *.filters

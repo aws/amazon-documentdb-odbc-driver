@@ -19,5 +19,5 @@
 @csolonynka
 @justing-bq
 @leszek-bq
-@James Duong
+@jduo
 <!-- Any additional reviewers -->
