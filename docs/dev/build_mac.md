@@ -29,7 +29,8 @@ From Terminal, run one of the following:
 
 ### Packaging
 
-Run below command from the project's build directory.
+From the `cmake-build64` or the `cmake-build32` directory, run:
+
 ```
 cmake ../src
 make
