@@ -36,6 +36,8 @@
 #include <aws/timestream-query/model/QueryRequest.h>
 // clang-format on
 
+using namespace Aws::TimestreamQuery;
+
 namespace {
     /**
      * A helper class to initialize/shutdown AWS API once per DLL load/unload.
@@ -48,7 +50,7 @@ namespace {
 
         AwsSdkHelper& operator++() {
           if (1 == ++m_reference_count) {
-            std::scoped_lock lock(m_mutex);
+            std::lock_guard<std::mutex> lock(m_mutex);
             Aws::InitAPI(m_sdk_options);
           }
           return *this;
@@ -56,7 +58,7 @@ namespace {
 
         AwsSdkHelper& operator--() {
           if (0 == --m_reference_count) {
-            std::scoped_lock lock(m_mutex);
+            std::lock_guard<std::mutex> lock(m_mutex);
             Aws::ShutdownAPI(m_sdk_options);
           }
           return *this;
@@ -72,15 +74,14 @@ namespace {
     const Aws::String UA_ID_PREFIX = Aws::String("ts-odbc.");
     const std::string DEFAULT_CREATOR_TYPE = "DEFAULT";
 
-    typedef std::function< std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient >(
+    typedef std::function< std::unique_ptr< TimestreamQueryClient >(
         const runtime_options& options,
         const Aws::Client::ClientConfiguration& config) > QueryClientCreator;
 
     QueryClientCreator default_creator =
         [](const runtime_options& ,
            const Aws::Client::ClientConfiguration& config) {
-            return std::make_unique<
-                Aws::TimestreamQuery::TimestreamQueryClient >(config);
+            return std::unique_ptr< TimestreamQueryClient >(new TimestreamQueryClient(config));
         };
 
     QueryClientCreator profile =
@@ -89,8 +90,7 @@ namespace {
         auto cp = std::make_shared<
             Aws::Auth::ProfileConfigFileAWSCredentialsProvider >(
             options.auth.profile_name.c_str());
-        return std::make_unique<
-            Aws::TimestreamQuery::TimestreamQueryClient >(cp, config);
+        return std::unique_ptr< TimestreamQueryClient >(new TimestreamQueryClient(cp, config));
     };
 
     QueryClientCreator iam =
@@ -98,25 +98,23 @@ namespace {
            const Aws::Client::ClientConfiguration& config) {
         Aws::Auth::AWSCredentials credentials(
             options.auth.uid, options.auth.pwd, options.auth.session_token);
-        return std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(
-            credentials, config);
+        return std::unique_ptr< TimestreamQueryClient >(new TimestreamQueryClient(credentials, config));
     };
 
     QueryClientCreator aad =
         [](const runtime_options& options,
            const Aws::Client::ClientConfiguration& config) {
         auto credential_provider =
-            std::make_unique< AADCredentialsProvider >(options.auth);
-        return std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(credential_provider->GetAWSCredentials(), config);
+            std::unique_ptr< AADCredentialsProvider >(new AADCredentialsProvider(options.auth));
+        return std::unique_ptr< TimestreamQueryClient >(new TimestreamQueryClient(credential_provider->GetAWSCredentials(), config));
     };
 
     QueryClientCreator okta =
         [](const runtime_options& options,
            const Aws::Client::ClientConfiguration& config) {
         auto credential_provider =
-            std::make_unique< OktaCredentialsProvider >(options.auth);
-        return std::make_unique< Aws::TimestreamQuery::TimestreamQueryClient >(
-            credential_provider->GetAWSCredentials(), config);
+            std::unique_ptr< OktaCredentialsProvider >(new OktaCredentialsProvider(options.auth));
+        return std::unique_ptr< TimestreamQueryClient >(new TimestreamQueryClient(credential_provider->GetAWSCredentials(), config));
     };
 
     std::unordered_map< std::string, QueryClientCreator > creators = {

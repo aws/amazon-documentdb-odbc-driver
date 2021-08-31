@@ -31,11 +31,6 @@
 class Communication {
    public:
     /**
-     * Supported encodings list
-     * Currently we support UTF8 only
-     */
-    static const inline std::vector< std::string > m_supported_client_encodings = {"UTF8"};
-    /**
      * Default constructor
      */
     Communication();

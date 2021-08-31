@@ -124,7 +124,7 @@ elseif(UNIX)
 							)
 endif()
 
-if(BUILD_WITH_TESTS)
+if(BUILD_WITH_TESTS STREQUAL ON)
 	# GTest import
 	include(gtest/googletest.cmake)
 	fetch_googletest(
@@ -144,7 +144,7 @@ if(APPLE)
 	add_subdirectory(${DSN_INSTALLER_SRC})
 endif()
 
-if(BUILD_WITH_TESTS)
+if(BUILD_WITH_TESTS STREQUAL ON)
 	add_subdirectory(${TESTS})
 	add_subdirectory(${PERFORMANCE_TESTS})
 endif()

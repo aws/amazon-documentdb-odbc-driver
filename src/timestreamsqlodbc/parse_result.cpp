@@ -16,7 +16,7 @@
 
 #include "parse_result.h"
 
-#include <unordered_map>
+#include <map>
 
 #include "helper.h"
 #include "statement.h"
@@ -125,7 +125,7 @@ static const std::string JSON_KW_CURSOR = "cursor";
 
 #define TS_VARCHAR_SIZE (-2)
 
-const std::unordered_map< Aws::TimestreamQuery::Model::ScalarType,
+const std::map< Aws::TimestreamQuery::Model::ScalarType,
                           std::pair< OID, int16_t > >
     scalar_type_to_oid_size_map = {
         {Aws::TimestreamQuery::Model::ScalarType::BIGINT,
