@@ -43,7 +43,7 @@ sudo apt update
 sudo apt install unixodbc:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386
 ```
 
-You may also want to install [isql32](.\tools) for testing. In the directory where it is installed:
+You may also want to install [isql32](./tools/isql32) for testing. In the directory where it is installed:
 * Type `chmod +x ./isql32` to make it executable.
 * Type `./isql32 [DSN]` to make a connection and enter interactive mode.
 * Enter the SQL statements to run.
@@ -64,7 +64,24 @@ sudo apt install unixodbc
 1. Run `sudo dpkg -i ./AmazonTimestreamODBC_[version]_amd64.deb` to install the Amazon Timestream ODBC Driver.
 2. [Configure the Driver and DSN entries](./docs/user/linux_configure_dsn.md).
 
-### Installing the 32-bit rpm file on Amazon Linux 2 (TO DO)
+### Installing the 32-bit rpm file on Amazon Linux 2
+The 32-bit dependencies need to be installed before installing the Amazon Timestream ODBC Driver on Amazon Linux 2.
+
+```
+sudo yum update
+sudo yum install libcurl.i686 zlib.i686 openssli686 libatomic.i686
+sudo yum install unixODBC.i686
+```
+
+You may also want to install [isql32](./tools/isql32) for testing. In the directory where it is installed:
+* Type `chmod +x ./isql32` to make it executable.
+* Type `./isql32 [DSN]` to make a connection and enter interactive mode.
+* Enter the SQL statements to run.
+* Type `quit` to exit interactive mode.
+
+What needs to be installed to run?
+1. Run `sudo rpm -i AmazonTimestreamODBC_[version]_i386.rpm` to install the Amazon Timestream ODBC Driver.
+2. [Configure the Driver and DSN entries](./docs/user/linux_configure_dsn.md).
 
 ### Installing the 64-bit rpm file on Amazon Linux 2
 unixODBC should be installed before installing the Amazon Timestream ODBC Driver on Amazon Linux 2.
