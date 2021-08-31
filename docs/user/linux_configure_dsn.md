@@ -43,8 +43,8 @@ Use a text editor from the Unix shell to edit the odbcinst.ini file such as vi.
 Amazon Timestream ODBC Driver  = Installed
 
 [Amazon Timestream ODBC Driver]
-Driver = /usr/bin/timestream-odbc/64/libtimestreamsqlodbc.so
-Setup  = /usr/bin/timestream-odbc/64/libtimestreamsqlodbc.so
+Driver = /usr/bin/timestream-odbc64/libtimestreamsqlodbc.so
+Setup  = /usr/bin/timestream-odbc64/libtimestreamsqlodbc.so
 ```
 
 #### Sample odbcinst.ini file for 32-bit Linux
@@ -53,8 +53,8 @@ Setup  = /usr/bin/timestream-odbc/64/libtimestreamsqlodbc.so
 Amazon Timestream ODBC Driver 32 = Installed
 
 [Amazon Timestream ODBC Driver 32]
-Driver = /usr/bin/timestream-odbc/32/libtimestreamsqlodbc.so
-Setup  = /usr/bin/timestream-odbc/32/libtimestreamsqlodbc.so
+Driver = /usr/bin/timestream-odbc32/libtimestreamsqlodbc.so
+Setup  = /usr/bin/timestream-odbc32/libtimestreamsqlodbc.so
 ```
 
 ### Manually editing the odbc.ini file ###
@@ -132,7 +132,7 @@ Use [isql](https://www.systutorials.com/docs/linux/man/1-isql/#:~:text=isql%20is
 * Type `quit` to exit interactive mode.
 
 ### Testing the 32-bit Timestream ODBC Driver for Linux
-You can use [isql32](.\tools) for testing. In the directory where it is located:
+You can use [isql32](../../tools/isql32) for testing. In the directory where it is located:
 * Type `chmod +x ./isql32` to make it executable.
 * Type `./isql32 [DSN]` to make a connection and enter interactive mode.
 * Once the SQL prompt appears type a sample query such as `SELECT * FROM sampleDB.IoT`.

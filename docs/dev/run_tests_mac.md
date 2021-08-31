@@ -2,13 +2,17 @@
 
 ## Preparation
 
-See [Running Amazon Timestream Automated Tests](https://github.com/Bit-Quill/timestream-odbc/blob/update_docs/docs/dev/run_tests.md) for information on how to load the test datasets.
+See [Running Amazon Timestream Automated Tests](./run_tests.md) for information on how to load the test datasets.
 
 ## Running the Automated Tests
 
 **NOTES:**
 
 * Test DSNs named `timestream-aws-profile`,  `timestream-iam`,  `timestream-aad` and `timestream-okta` must be set up in order for certain tests to pass. If you do not have Azure AD and Okta setup, exclude the `TestSQLConnectSAMLAuth` and `TestSQLDriverConnectSAMLAuth` tests.
+* If your region contains more databases other than `sampleDB` and `ODBCTest`, the table catalog tests should be disabled.
+```
+./build/odbc/bin/tests --gtest_filter=-'TestSQLTables.*'
+```
 
 ### Setup the DSN Entries
 
@@ -44,4 +48,10 @@ To exclude the Okta and Azure Active Directory tests, run:
 
 <pre>
 ./build/odbc/bin/tests --gtest_filter=-'TestSQLConnectSAMLAuth.*':'TestSQLDriverConnectSAMLAuth.*'
+</pre>
+
+To exclude the table catalog tests, run:
+
+<pre>
+./build/odbc/bin/tests --gtest_filter=-'TestSQLTables.*'
 </pre>
