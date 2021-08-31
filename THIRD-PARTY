@@ -1,4 +1,4 @@
-** aws-cpp-sdk-core -- https://github.com/aws/aws-sdk-cpp (1.8.186)
+** aws-sdk-cpp -- https://github.com/aws/aws-sdk-cpp (1.9.79)
 ** PostgreSQL v12.0 -- https://www.postgresql.org/ftp/source/v12.0/ (v12.0)
 ** Googletest -- https://github.com/google/googletest (release-1.10.0)
 ** StableCoder - code-coverage.cmake -- https://github.com/StableCoder/cmake-scripts/blob/master/code-coverage.cmake (21.01)

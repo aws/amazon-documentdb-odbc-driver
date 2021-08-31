@@ -1,14 +1,3 @@
-itodbc_aws_auth
-itodbc_catalog
-itodbc_connection
-itodbc_descriptors
-itodbc_execution
-itodbc_info
-itodbc_pagination
-itodbc_results
-itodbc_saml_authentication
-itodbc_tableau_queries
 performance_execution
-ut_aws_sdk_cpp
 ut_conn
 ut_critical_section

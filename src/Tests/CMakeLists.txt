@@ -19,11 +19,9 @@ set(HELPER_ITEST "${CMAKE_CURRENT_SOURCE_DIR}/ITODBCHelper")
 set(TESTS "${CMAKE_CURRENT_SOURCE_DIR}/Tests")
 set(HELPER_UTEST "${CMAKE_CURRENT_SOURCE_DIR}/UTHelper")
 set(CRITICALSECTION_UTEST "${CMAKE_CURRENT_SOURCE_DIR}/UTCriticalSection")
-set(AWSSDKCPP_UTEST "${CMAKE_CURRENT_SOURCE_DIR}/UTAwsSdkCpp")
 
 # Projects to build
 add_subdirectory(${HELPER_ITEST})
 add_subdirectory(${HELPER_UTEST})
 add_subdirectory(${TESTS})
 add_subdirectory(${CRITICALSECTION_UTEST})
-add_subdirectory(${AWSSDKCPP_UTEST})
