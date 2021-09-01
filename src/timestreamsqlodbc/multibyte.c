@@ -338,8 +338,6 @@ const char *derive_locale_encoding(const char *dbencoding) {
             wenc = "WIN1257";
             break;
     }
-#else
-        // TODO #34 - Investigate locale handling on Mac 
 #endif /* WIN32 */
     return wenc;
 }
