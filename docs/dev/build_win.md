@@ -1,6 +1,6 @@
 # Windows - Building the Amazon Timestream ODBC Driver
 
-### Dependencies
+## Dependencies
 
 * [Visual Studio 2019](https://visualstudio.microsoft.com/vs/) (Other versions may work, but only 2019 has been tested)
 ** Install Desktop development with C++
@@ -12,7 +12,7 @@
 * Turn on Microsoft .NET Framework 3.5.1 on Windows 2008
 * [Wix Toolset](https://wixtoolset.org/releases/)
 
-### Build
+## Build
 
 Using Developer Powershell, run one of the four powershell files to generate the build output. It also generates the VS2019 solution for building/testing the driver at `.\build\odbc\cmake\global_make_list.sln`. 
 

@@ -8,6 +8,7 @@ See [Running Amazon Timestream Automated Tests](./run_tests.md) for information 
 
 **NOTES:**
 
+* The automated tests cannot be run for the 32-bit version of the Timestream ODBC Driver for Amazon Linux 2. To generate the .rpm file, a Docker image must be used which does not support the codecvt import.
 * Test DSNs named `timestream-aws-profile`,  `timestream-iam`,  `timestream-aad` and `timestream-okta` must be set up in order for certain tests to pass. If you do not have Azure AD and Okta setup, exclude the `TestSQLConnectSAMLAuth` and `TestSQLDriverConnectSAMLAuth` tests.
 * If your region contains more databases other than `sampleDB` and `ODBCTest`, the table catalog tests should be disabled.
 ```
