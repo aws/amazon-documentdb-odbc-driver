@@ -224,7 +224,6 @@ TEST_F(TestSQLDriverConnect, SqlDriverNoprompt) {
     EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
-//// TODO - Revisit when parser code
 //// This should return SQL_SUCCESS_WITH_INFO (SQLSTATE 01S00 - Invalid
 /// connection / string attribute)
 TEST_F(TestSQLDriverConnect, UnsupportedKeyword) {

@@ -505,7 +505,6 @@ void SetTableTuples(QResultClass *res, const TableResultSet res_type,
         std::string catalog("");
         bind_tbl[TABLES_CATALOG_NAME]->UpdateData((void *)catalog.c_str(), 0);
 
-        // TODO #630 - Revisit logic of adding tuples for SQLTables & SQLColumns
         for (size_t i = 0; i < binds.size(); i++) {
             // Add tuples for SQLColumns
             if (binds.size() > COLUMNS_SQL_DATA_TYPE) {
@@ -604,7 +603,6 @@ void SetTableTuples(QResultClass *res, const TableResultSet res_type,
         }
 
         // Get new tuple and assign index of interest (NULL others)
-        // TODO #324 (SQL Plugin)- Should these be unique?
         TupleField *tuple = QR_AddNew(res);
         for (size_t i = 0; i < bind_tbl.size(); i++) {
             if (i == idx)
@@ -659,7 +657,6 @@ void SetupColumnQResInfo(QResultClass *res, EnvironmentClass *unused) {
                         INFO_VARCHAR_SIZE);
 }
 
-// TODO #325 (SQL Plugin)- Fix patterns and escape characters for this
 void GenerateColumnQuery(std::string &query, const std::string &table_name,
                          const std::string &column_name, const bool table_valid,
                          const bool column_valid, const UWORD flag) {
