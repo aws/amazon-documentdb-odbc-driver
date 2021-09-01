@@ -1,6 +1,6 @@
 # macOS - Building the Amazon Timestream ODBC Driver
 
-### Dependencies
+## Dependencies
 
 Homebrew must be installed to manage packages, to install homebrew see the [homebrew homepage](https://brew.sh/).
 
@@ -16,7 +16,7 @@ For debugging also run the following:
 brew install llvm
 ```
 
-### Building the Driver
+## Building the Driver
 
 From Terminal, run one of the following:
 * `./build_mac_debug64.sh`

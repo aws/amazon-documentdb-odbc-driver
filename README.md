@@ -69,8 +69,7 @@ The 32-bit dependencies need to be installed before installing the Amazon Timest
 
 ```
 sudo yum update
-sudo yum install libcurl.i686 zlib.i686 openssli686 libatomic.i686
-sudo yum install unixODBC.i686
+sudo yum install libcurl.i686 zlib.i686 openssli686 libatomic.i686 unixODBC.i686
 ```
 
 You may also want to install [isql32](./tools/isql32) for testing. In the directory where it is installed:
