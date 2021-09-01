@@ -253,7 +253,6 @@ static void MLOG_open() {
     char filebuf[1024], errbuf[2048];
     BOOL open_error = FALSE;
 
-    // TODO (#585): Add option to log to stderr stream
     // MLOGFP = stderr;
     if (MLOGFP)
         return;

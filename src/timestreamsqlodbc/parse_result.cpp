@@ -274,7 +274,6 @@ bool AssignColumnHeaders(QResultClass *q_res,
                 throw std::runtime_error("Unsupported Timestream type.");
             }
         }
-        // TODO Some historic fields needs to be removed, set 0 for now.
         CI_set_field_info(QR_get_fields(q_res), (int)i,
                           column.GetName().c_str(), column_type_id, column_size,
                           0, 0, 0);
@@ -423,29 +422,7 @@ bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
             }
         }
     }
-
-    // TODO Commented out for now, needs refactoring
-    // If there are more rows than schema suggests, we have Keyset data
-    /*if (row_size > row_schema_size) {
-        if (ks == NULL) {
-            QR_set_rstatus(q_res, PORES_INTERNAL_ERROR);
-            QR_set_message(q_res,
-                           "Keyset was NULL, but Keyset data was expected.");
-            return false;
-        }
-
-        auto row_column = row.value_begin() + row_schema_size;
-        if (sscanf(row_column->str().c_str(), "(%u,%hu)", &ks->blocknum,
-                   &ks->offset)
-            != 2) {
-            QR_set_rstatus(q_res, PORES_INTERNAL_ERROR);
-            QR_set_message(q_res, "Failed to assign Keyset.");
-            return false;
-        }
-        row_column++;
-        ks->oid = std::stoul(row_column->str(), nullptr, 10);
-    }*/
-
+    
     // Increment relevant data
     q_res->cursTuple++;
     if (q_res->num_fields > 0)
