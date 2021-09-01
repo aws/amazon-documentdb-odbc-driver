@@ -63,8 +63,8 @@ elseif(UNIX)
         set(CPACK_PACKAGE_NAME "AmazonTimestreamODBC_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
 
         # TODO: Need to update both of these.
-        set(CPACK_PACKAGE_CONTACT "lyndonb@bitquilltech.com")
-        set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Lyndon Bauto")
+        set(CPACK_PACKAGE_CONTACT "user@sample.com")
+        set(CPACK_DEBIAN_PACKAGE_MAINTAINER "User Name")
         set(CPACK_PACKAGE_DESCRIPTION "AmazonTimestreamODBCDriver-${BITNESS}-bit")
         
         # Add postrm and postinst with dsn stuff to add and remove them.

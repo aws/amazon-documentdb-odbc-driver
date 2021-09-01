@@ -71,15 +71,6 @@ jobs:
         name: test-results-linux64
         path: |
           ${{ github.workspace }}/odbc-logs/
-    - name: build-rpm-installer
-      if: success()
-      run: |
-        ./build_linux_release64_rpm.sh
-        cd cmake-build64
-        cmake ../src
-        make -j4
-        cpack .
-        cd ..
     - name: build-deb-installer
       if: success()
       run: |
@@ -92,13 +83,11 @@ jobs:
     - name: create-output
       if: success()
       run: |
-        mkdir rpm-installer
         mkdir deb-installer
         mkdir build-output
         mkdir test-output
         cp -v ./build/odbc/lib/*.a build-output/
         cp -v ./build/odbc/lib/*.so build-output/
-        cp -v ./cmake-build64/*.rpm rpm-installer/
         cp -v ./cmake-build64/*.deb deb-installer/
     - name: upload-build
       if: success()
@@ -106,12 +95,6 @@ jobs:
       with:
         name: linux64-build
         path: build-output
-    - name: upload-linux64-rpm-installer
-      if: success()
-      uses: actions/upload-artifact@v2
-      with:
-        name: linux64-rpm-installer
-        path: rpm-installer
     - name: upload-linux64-deb-installer
       if: success()
       uses: actions/upload-artifact@v2
@@ -137,7 +120,7 @@ jobs:
       run: |
         # Need to install i386 versions
         sudo dpkg --add-architecture i386
-        sudo apt update 
+        sudo apt update
         sudo apt install unixodbc:i386 unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386 zlib1g-dev:i386 linux-headers-$(uname -r) gcc-multilib:i386 g++-multilib:i386 cmake g++-9:i386 gcc-9:i386 gcc-9-multilib:i386 g++-9-multilib:i386 binutils:i386 make:i386
     - name: prepare-dsn
       if: success()
@@ -174,15 +157,6 @@ jobs:
         name: test-results-linux32
         path: |
           ${{ github.workspace }}/odbc-logs/
-    - name: build-rpm-installer
-      if: success()
-      run: |
-        ./build_linux_release32_rpm.sh
-        cd cmake-build32
-        cmake ../src
-        make -j4
-        cpack .
-        cd ..
     - name: build-deb-installer
       if: success()
       run: |
@@ -195,13 +169,11 @@ jobs:
     - name: create-output
       if: success()
       run: |
-        mkdir rpm-installer
         mkdir deb-installer
         mkdir build-output
         mkdir test-output
         cp -v ./build/odbc/lib/*.a build-output/
         cp -v ./build/odbc/lib/*.so build-output/
-        cp -v ./cmake-build32/*.rpm rpm-installer/
         cp -v ./cmake-build32/*.deb deb-installer/
     - name: upload-build
       if: success()
@@ -209,12 +181,6 @@ jobs:
       with:
         name: linux32-build
         path: build-output
-    - name: upload-linux32-rpm-installer
-      if: success()
-      uses: actions/upload-artifact@v2
-      with:
-        name: linux32-rpm-installer
-        path: rpm-installer
     - name: upload-linux32-deb-installer
       if: success()
       uses: actions/upload-artifact@v2
