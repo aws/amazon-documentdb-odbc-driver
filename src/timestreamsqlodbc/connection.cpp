@@ -128,7 +128,6 @@ char CC_connect(ConnectionClass *self) {
     }
 }
 
-// TODO #36 - When we fix encoding, we should look into returning a code here.
 // This is called in connection.c and the return code isn't checked
 void CC_set_locale_encoding(ConnectionClass *self, const char *encoding) {
     if (self == NULL)
@@ -141,14 +140,12 @@ void CC_set_locale_encoding(ConnectionClass *self, const char *encoding) {
         free(prev_encoding);
 }
 
-// TODO #36 - Add return code - see above function comment
 void CC_determine_locale_encoding(ConnectionClass *self) {
     // Don't update if it's already set
     if ((self == NULL) || (self->locale_encoding != NULL))
         return;
 
     // Get current db encoding and derive the locale encoding
-    // TODO #34 - Investigate locale
     CC_set_locale_encoding(self, "UTF8");
 }
 

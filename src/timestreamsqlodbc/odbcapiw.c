@@ -885,7 +885,6 @@ RETCODE SQL_API SQLGetTypeInfoW(SQLHSTMT StatementHandle,
 }
 
 /* ODBC 2.x-specific functions */
-// TODO (#590): Add implementations for remaining ODBC 2.x function
 
 SQLRETURN SQL_API SQLColAttributesW(SQLHSTMT hstmt, SQLUSMALLINT iCol,
                                     SQLUSMALLINT iField, SQLPOINTER pCharAttr,
