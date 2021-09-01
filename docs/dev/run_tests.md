@@ -2,7 +2,7 @@
 
 ## Preparation
 
-### Loading Test Datasets [TBD]
+### Loading Test Datasets
 
 Loading a dataset requires an [Amazon Timestream](https://aws.amazon.com/timestream/) service. If missing, please refer to the documentation on how to set them up.
 
