@@ -57,9 +57,9 @@ CTestTestfile.cmake
 /sdk-build64/
 /cmake-build32/
 /cmake-build64/
-/src/PowerBIConnector/bin/Debug/
-/src/PowerBIConnector/obj/
-/src/PowerBIConnector/.vs/
+/src/PowerBIConnector/TimestreamConnector/bin/Debug/
+/src/PowerBIConnector/TimestreamConnector/obj/
+/src/PowerBIConnector/TimestreamConnector/.vs/
 src/aws-sdk-cpp/
 default.profraw
 test_output.html
