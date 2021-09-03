@@ -41,7 +41,59 @@ TimestreamConnectorImpl = (DSN as text) as table =>
             DSN = DSN
         ],
 
+        SqlCapabilities = Diagnostics.LogValue("SqlCapabilities_Options", [
+            SupportsTop = false,
+            LimitClauseKind = LimitClauseKind.LimitOffset,
+            Sql92Conformance = ODBC[SQL_SC][SQL_SC_SQL92_FULL],
+            SupportsNumericLiterals = true,
+            SupportsStringLiterals = true,
+            SupportsOdbcDateLiterals = true,
+            SupportsOdbcTimeLiterals = true,
+            SupportsOdbcTimestampLiterals = true
+        ]),
+
+        // SQLColumns is a function handler that receives the results of an ODBC call to SQLColumns().
+        SQLColumns = (catalogName, schemaName, tableName, columnName, source) =>
+            if (EnableTraceOutput <> true) then source else
+            // the if statement conditions will force the values to evaluated/written to diagnostics
+            if (Diagnostics.LogValue("SQLColumns.TableName", tableName) <> "***" and Diagnostics.LogValue("SQLColumns.ColumnName", columnName) <> "***") then
+                let
+                    // Outputting the entire table might be too large, and result in the value being truncated.
+                    // We can output a row at a time instead with Table.TransformRows()
+                    rows = Table.TransformRows(source, each Diagnostics.LogValue("SQLColumns", _)),
+                    toTable = Table.FromRecords(rows)
+                in
+                    Value.ReplaceType(toTable, Value.Type(source))
+            else
+                source,
+
+        SQLGetInfo = Diagnostics.LogValue("SQLGetInfo_Options", [
+            SQL_AGGREGATE_FUNCTIONS = ODBC[SQL_AF][All],
+            SQL_SQL_CONFORMANCE = ODBC[SQL_SC][SQL_SC_SQL92_INTERMEDIATE]
+        ]),
+
+        SQLGetFunctions = Diagnostics.LogValue("SQLGetFunctions_Options", [
+            SQL_API_SQLBINDPARAMETER = false
+        ]),
+
+        SQLGetTypeInfo = (types) => 
+            if (EnableTraceOutput <> true) then types else
+            let
+                // Outputting the entire table might be too large, and result in the value being truncated.
+                // We can output a row at a time instead with Table.TransformRows()
+                rows = Table.TransformRows(types, each Diagnostics.LogValue("SQLGetTypeInfo " & _[TYPE_NAME], _)),
+                toTable = Table.FromRecords(rows)
+            in
+                Value.ReplaceType(toTable, Value.Type(types)),
+
         ConnectionOptions = [
+            // Handlers for ODBC driver capabilities.
+            SqlCapabilities = SqlCapabilities,
+            SQLColumns = SQLColumns,
+            SQLGetInfo = SQLGetInfo,
+            SQLGetFunctions = SQLGetFunctions,
+            SQLGetTypeInfo = SQLGetTypeInfo,
+            
             // Connection string properties used for encrypted connections.
             CredentialConnectionString = EncryptedConnectionString
         ],
