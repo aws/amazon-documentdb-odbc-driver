@@ -94,6 +94,9 @@ TimestreamConnectorImpl = (DSN as text) as table =>
             SQLGetFunctions = SQLGetFunctions,
             SQLGetTypeInfo = SQLGetTypeInfo,
             
+            // Handles ODBC Errors.
+            OnError = OnOdbcError,
+            
             // Connection string properties used for encrypted connections.
             CredentialConnectionString = EncryptedConnectionString
         ],
@@ -101,6 +104,26 @@ TimestreamConnectorImpl = (DSN as text) as table =>
         OdbcDatasource = Odbc.DataSource(ConnectionString, ConnectionOptions)
     in
         OdbcDatasource;
+
+// Handles ODBC errors.
+OnOdbcError = (errorRecord as record) =>
+    let
+        ErrorMessage = errorRecord[Message],
+
+        IsDriverNotInstalled = Text.Contains(ErrorMessage, "doesn't correspond to an installed ODBC driver"),
+
+        OdbcError = errorRecord[Detail][OdbcErrors]{0},
+        OdbcErrorCode = OdbcError[NativeError],
+        
+        // Failed to connect to given host
+        IsHostUnreachable = (OdbcErrorCode = 202)
+    in
+        if IsDriverNotInstalled then
+            error Error.Record(errorRecord[Reason], "The Timestream ODBC driver is not installed. Please install the driver", errorRecord[Detail])
+        else if IsHostUnreachable then
+            error Error.Record(errorRecord[Reason], "Could not reach server. Please double-check the authentication.", errorRecord[Detail])
+        else 
+            error errorRecord;
 
 // Data Source Kind description.
 TimestreamConnector = [
