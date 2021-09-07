@@ -119,7 +119,7 @@ OnOdbcError = (errorRecord as record) =>
         IsHostUnreachable = (OdbcErrorCode = 202)
     in
         if IsDriverNotInstalled then
-            error Error.Record(errorRecord[Reason], "The Timestream ODBC driver is not installed. Please install the driver", errorRecord[Detail])
+            error Error.Record(errorRecord[Reason], "The Timestream ODBC driver is not installed. Please install the driver.", errorRecord[Detail])
         else if IsHostUnreachable then
             error Error.Record(errorRecord[Reason], "Could not reach server. Please double-check the authentication.", errorRecord[Detail])
         else 
