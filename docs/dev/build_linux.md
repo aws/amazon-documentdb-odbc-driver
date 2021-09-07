@@ -9,7 +9,7 @@ The Unix shell can be used to install all the dependencies for Linux.
 
 ```sh
 sudo apt update
-sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev gcc gcc-multilib  g++ g++-multilib cmake linux-headers-$(uname -r) build-essential unixodbc-dev
+sudo apt install git-all libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev gcc gcc-multilib  g++ g++-multilib cmake linux-headers-$(uname -r) build-essential unixodbc-dev
 ```
 ### Ubuntu 32-bit
 *Note:* The Ubuntu 32-bit driver can be built as part of GitHub actions using the Ubuntu 20.04 hosted runner.
@@ -17,7 +17,7 @@ sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-de
 ```sh
 sudo dpkg --add-architecture i386
 sudo apt update 
-sudo apt install unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386 zlib1g-dev:i386 linux-headers-$(uname -r) gcc-multilib:i386 g++-multilib:i386 cmake g++-9:i386 gcc-9:i386 gcc-9-multilib:i386 g++-9-multilib:i386 binutils:i386 make:i386
+sudo apt install git-all:i386 unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386 zlib1g-dev:i386 linux-headers-$(uname -r) gcc-multilib:i386 g++-multilib:i386 cmake g++-9:i386 gcc-9:i386 gcc-9-multilib:i386 g++-9-multilib:i386 binutils:i386 make:i386
 ```
 
 ### Amazon Linux 2 64-bit
@@ -26,7 +26,7 @@ sudo apt install unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-
 ```sh
 # Install dependencies
 sudo yum update
-sudo yum install curl-devel openssl-devel uuid-devel zlib-devel pulseaudio-libs-devel kernel-devel gcc gcc-c++ unixODBC-devel rpm-build
+sudo yum install git curl-devel openssl-devel uuid-devel zlib-devel pulseaudio-libs-devel kernel-devel gcc gcc-c++ unixODBC-devel rpm-build
 
 # Download and build CMake 3
 wget https://cmake.org/files/v3.18/cmake-3.18.0.tar.gz
@@ -90,7 +90,7 @@ docker cp [container]://timestream-odbc/cmake-build32/AmazonTimestreamODBC_[vers
 
 ## Building the Amazon Timestream ODBC Driver for Ubuntu 64-bit, Ubuntu 32-bit or Amazon Linux 2 64-bit
 
-From the Unix shell, run one of the following:
+From the Unix shell, navigate to the project source directory, run one of the following:
 * `./build_linux_debug64.sh`
 * `./build_linux_release32_deb.sh`
 * `./build_linux_release64_deb.sh`
@@ -104,7 +104,7 @@ From the Unix shell, run one of the following:
 
 ### Output Location on Linux
 
-Compiling on Linux will output the tests to **bin** and the driver to **lib**. There are also some additional test infrastructure files which output to the **lib** directory. Both 32-bit and 64-bit builds output here.
+Compiling on Linux will output the tests to **build/odbc/bin** and the driver to **build/odbc/lib**. There are also some additional test infrastructure files which output to the **build/odbc/lib** directory. Both 32-bit and 64-bit builds output here.
 
 ### Packaging
 
@@ -116,4 +116,4 @@ make
 cpack .
 ```
 
-An installer named `AmazonTimestreamODBC-<version>.<installer_type>` will be generated in the build directory (for example `AmazonTimestreamODBC_1.0.0_x86_64.rpm` will be created in `make-build64`).
+An installer named `AmazonTimestreamODBC-<version>_<installer_type>` will be generated in the build directory (for example `AmazonTimestreamODBC_1.0.0_x86_64.rpm` will be created in `cmake-build64`).
