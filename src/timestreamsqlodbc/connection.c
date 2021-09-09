@@ -134,7 +134,7 @@ RETCODE SQL_API API_Connect(HDBC hdbc, const SQLCHAR *szDSN,
 
     MYLOG(LOG_DEBUG, "conn = %p (DSN='%s', UID='%s', PWD='%s', TOKEN='%s')",
           conn, ci->dsn, ci->uid, NAME_IS_VALID(ci->pwd) ? "xxxxx" : "",
-          ci->session_token);
+          "xxxxx");
 
     if ((fchar = CC_connect(conn)) <= 0) {
         /* Error messages are filled in */

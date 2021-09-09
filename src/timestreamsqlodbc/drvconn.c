@@ -56,8 +56,9 @@ char *hide_password(const char *str) {
     if (!outstr)
         return NULL;
 
-    const char *str_to_hide[] = {"PWD=", "SecretAccessKey=", "AADClientSecret="};
-    size_t size = sizeof(str_to_hide)/sizeof(str_to_hide[0]);
+    const char *str_to_hide[] = {
+        "PWD=", "SecretAccessKey=", "AADClientSecret=", "SessionToken="};
+    size_t size = sizeof(str_to_hide) / sizeof(str_to_hide[0]);
 
     for (size_t i = 0; i < size; ++i) {
         if (pwdp = stristr(outstr, str_to_hide[i]), pwdp) {
