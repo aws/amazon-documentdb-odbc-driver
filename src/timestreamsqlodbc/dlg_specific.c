@@ -228,8 +228,11 @@ BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
         STR_TO_NAME(ci->pwd, value);
         MYLOG(LOG_DEBUG, "key='%s' value='xxxxxxxx'", attribute);
         printed = TRUE;
-    } else if (stricmp(attribute, INI_SESSION_TOKEN) == 0)
+    } else if (stricmp(attribute, INI_SESSION_TOKEN) == 0) {
         STRCPY_FIXED(ci->session_token, value);
+        MYLOG(LOG_DEBUG, "key='%s' value='xxxxxxxx'", attribute);
+        printed = TRUE;
+    }
     else if (stricmp(attribute, INI_AUTH_MODE) == 0)
         STRCPY_FIXED(ci->authtype, value);
     else if (stricmp(attribute, INI_PROFILE_NAME) == 0)
