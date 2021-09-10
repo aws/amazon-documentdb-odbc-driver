@@ -11,18 +11,23 @@ shared TimestreamConnector.Contents = Value.ReplaceType(TimestreamConnectorImpl,
 
 // Wrapper function to provide additional UI customization.
 TimestreamConnectorType = type function (
-        DSN as (type text meta [
-            Documentation.FieldCaption = "DSN",
-            Documentation.FieldDescription = "The DSN for Timestream.",
-            Documentation.SampleValues = { "testdsn" }
+        Region as (type text meta [
+            Documentation.FieldCaption = "Region",
+            Documentation.FieldDescription = "The AWS Region.",
+            Documentation.SampleValues = { "us-east-1" }
+        ]),
+        optional ProfileName as (type text meta [
+            Documentation.FieldCaption = "Profile Name",
+            Documentation.FieldDescription = "The AWS profile name for Timestream.",
+            Documentation.SampleValues = { "default" }
         ])
     )
     as table meta [
         Documentation.Name = "Timestream"
     ];
 
-TimestreamConnectorImpl = (DSN as text) as table =>
-    let
+TimestreamConnectorImpl = (Region as text, optional ProfileName as text) as table =>
+    let        
         Credential = Extension.CurrentCredential(),
 
         // Sets connection string properties for encrypted connections.
@@ -36,10 +41,16 @@ TimestreamConnectorImpl = (DSN as text) as table =>
                     SSL = 0
                 ],
 
-        ConnectionString = [
+        BaseConnectionString = [
             Driver = "Amazon Timestream ODBC Driver",
-            DSN = DSN
+            Region = Region
         ],
+
+        ConnectionString = 
+            if ProfileName <> null then 
+                BaseConnectionString & [ ProfileName = ProfileName ]
+            else
+                BaseConnectionString,
 
         SqlCapabilities = Diagnostics.LogValue("SqlCapabilities_Options", [
             SupportsTop = false,
@@ -115,7 +126,7 @@ OnOdbcError = (errorRecord as record) =>
         OdbcError = errorRecord[Detail][OdbcErrors]{0},
         OdbcErrorCode = OdbcError[NativeError],
         
-        // Failed to connect to given host
+        // Failed to connect to given host.
         IsHostUnreachable = (OdbcErrorCode = 202)
     in
         if IsDriverNotInstalled then
@@ -131,16 +142,19 @@ TimestreamConnector = [
 
     SupportsEncryption = true,
     Authentication = [
-        Implicit = []
+        Implicit = [
+            Label = "AWS Auth"
+        ]
     ],
     
     // Needed for use with Power BI Service.
     TestConnection = (dataSourcePath) => 
         let
             json = Json.Document(dataSourcePath),
-            DSN = json[DSN]
+            Region = json[Region],
+            ProfileName = json[ProfileName]
         in
-            { "TimestreamConnector.Contents", DSN }
+            { "TimestreamConnector.Contents", Region, ProfileName }
 ];
 
 // Data Source UI publishing description.
