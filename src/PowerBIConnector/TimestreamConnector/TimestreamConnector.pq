@@ -27,7 +27,7 @@ TimestreamConnectorType = type function (
     ];
 
 TimestreamConnectorImpl = (Region as text, optional ProfileName as text) as table =>
-    let        
+    let
         Credential = Extension.CurrentCredential(),
 
         // Sets connection string properties for encrypted connections.
