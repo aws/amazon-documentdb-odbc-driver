@@ -13,7 +13,6 @@ make -j 4
 make install
 cd ../../../
 
-PREFIX_PATH=$(pwd)
 mkdir cmake-build32
 cd cmake-build32
 cmake ../src -DCMAKE_BUILD_TYPE="Release" -DBUILD_WITH_TESTS="OFF" -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DINSTALLER_TYPE="RPM" -DCMAKE_TOOLCHAIN_FILE="${TOOLCHAIN}" -DCMAKE_PREFIX_PATH="../src/aws-sdk-cpp/install" -DCMAKE_C_STANDARD="99" -DCPP_STANDARD="11"
