@@ -12,7 +12,6 @@ make -j 4
 make install
 cd ../../../
 
-PREFIX_PATH=$(pwd)
 mkdir cmake-build64
 cd cmake-build64
 #INSTALLER_TYPE is required but irrelevant to this.

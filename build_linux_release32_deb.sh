@@ -8,15 +8,13 @@ cd aws-sdk-cpp
 mkdir install
 mkdir build
 cd build
-
-cmake ../ -DCMAKE_INSTALL_PREFIX="../install" -DCMAKE_BUILD_TYPE="Release" -DBUILD_ONLY="core;sts;timestream-query" -DCUSTOM_MEMORY_MANAGEMENT="OFF" -DENABLE_TESTING="OFF" -DCMAKE_TOOLCHAIN_FILE="${TOOLCHAIN}" -DCPP_STANDARD="17"
+cmake ../ -DCMAKE_INSTALL_PREFIX="../install" -DCMAKE_BUILD_TYPE="Release" -DBUILD_ONLY="core;sts;timestream-query" -DCUSTOM_MEMORY_MANAGEMENT="OFF" -DENABLE_TESTING="OFF" -DBUILD_SHARED_LIBS="OFF" -DCMAKE_TOOLCHAIN_FILE="${TOOLCHAIN}" -DCPP_STANDARD="17"
 make -j 4
 make install
 cd ../../../
 
-PREFIX_PATH=$(pwd)
 mkdir cmake-build32
 cd cmake-build32
-cmake ../src -DCMAKE_BUILD_TYPE="Release" -DBUILD_WITH_TESTS="ON" -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DINSTALLER_TYPE="DEB" -DCMAKE_TOOLCHAIN_FILE="${TOOLCHAIN}" -DCMAKE_PREFIX_PATH="../src/aws-sdk-cpp/install"
+cmake ../src -DCMAKE_BUILD_TYPE="Release" -DBUILD_WITH_TESTS="ON" -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DINSTALLER_TYPE="DEB" -DCMAKE_TOOLCHAIN_FILE="${TOOLCHAIN}" -DCMAKE_PREFIX_PATH="../src/aws-sdk-cpp/install" -DCPP_STANDARD="17"
 make -j 4
 cd ..
