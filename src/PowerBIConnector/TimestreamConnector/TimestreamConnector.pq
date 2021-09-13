@@ -143,7 +143,7 @@ TimestreamConnector = [
     SupportsEncryption = true,
     Authentication = [
         Implicit = [
-            Label = "AWS Auth"
+            Label = "AWS Profile"
         ]
     ],
     
