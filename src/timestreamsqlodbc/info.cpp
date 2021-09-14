@@ -1220,14 +1220,14 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                     (col_data_type == std::to_string(SQL_TYPE_TIMESTAMP))
                         ? (int)datetime_sub.size()
                         : 0;
-                std::string col_char_octet_len = std::to_string(INT_MAX);
+                // CHAR_OCTET_LENGTH should be the same as BUFFER_LENGTH for varchar
                 tuple[COLUMNS_CHAR_OCTET_LENGTH].value =
                     (type_name_return == "varchar")
-                        ? strdup(col_char_octet_len.c_str())
+                        ? strdup(buf_len.c_str())
                         : NULL;
                 tuple[COLUMNS_CHAR_OCTET_LENGTH].len =
                     (type_name_return == "varchar")
-                        ? (int)col_char_octet_len.size()
+                        ? (int)buf_len.size()
                         : 0;
                 std::string col_number = std::to_string(col_num);
                 tuple[COLUMNS_ORDINAL_POSITION].value =
