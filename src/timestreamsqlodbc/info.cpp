@@ -693,7 +693,7 @@ int GetColumnSize(const std::string &type_name) {
     switch (data_name_data_type_map.find(type_name)->second) {
         case SQL_VARCHAR:
         case SQL_WVARCHAR:
-            return INT_MAX;
+            return 2048;
         case SQL_DOUBLE:
             return 15;
         case SQL_TYPE_TIMESTAMP:
@@ -710,8 +710,13 @@ int GetColumnSize(const std::string &type_name) {
 int GetBufferLength(const std::string &type_name) {
     switch (data_name_data_type_map.find(type_name)->second) {
         case SQL_VARCHAR:
+            return 2048;
         case SQL_WVARCHAR:
-            return 256;
+#ifdef __APPLE__
+            return 8192;
+#else
+            return 4096;
+#endif  // __APPLE__
         case SQL_DOUBLE:
             return sizeof(SQLDOUBLE);
         case SQL_TYPE_TIMESTAMP:
