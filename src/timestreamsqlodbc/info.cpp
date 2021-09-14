@@ -125,7 +125,11 @@ const std::map< int, std::set< int > > sql_to_ts_type_map = {
 
 const std::unordered_map< std::string, int > data_name_data_type_map = {
     {TS_TYPE_NAME_DOUBLE, SQL_DOUBLE},
+#ifdef UNICODE_SUPPORT
+    {TS_TYPE_NAME_VARCHAR, SQL_WVARCHAR},
+#else
     {TS_TYPE_NAME_VARCHAR, SQL_VARCHAR},
+#endif
     {TS_TYPE_NAME_TIMESTAMP, SQL_TYPE_TIMESTAMP},
     {TS_TYPE_NAME_BIGINT, SQL_BIGINT},
     {TS_TYPE_NAME_BOOLEAN, SQL_BIT}};
