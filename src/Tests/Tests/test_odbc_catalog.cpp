@@ -27,6 +27,12 @@
 #include "algorithm"
 // clang-format on
 
+#ifdef UNICODE_SUPPORT
+std::string varchar_type = std::to_string(SQL_WVARCHAR);
+#else
+std::string varchar_type = std::to_string(SQL_VARCHAR);
+#endif
+
 // General test constants and structures
 #define BIND_SIZE 512
 typedef struct bind_info {
@@ -674,7 +680,7 @@ void PopulateSQLColumnsBinds(std::vector< bind_info > &binds) {
     binds.push_back(bind_info(2, SQL_C_CHAR));
     binds.push_back(bind_info(3, SQL_C_CHAR));
     binds.push_back(bind_info(4, SQL_C_CHAR));
-    binds.push_back(bind_info(5, SQL_C_SSHORT));
+    binds.push_back(bind_info(5, SQL_C_SHORT));
     binds.push_back(bind_info(6, SQL_C_CHAR));
     binds.push_back(bind_info(7, SQL_C_SLONG));
     binds.push_back(bind_info(8, SQL_C_SLONG));
@@ -683,7 +689,7 @@ void PopulateSQLColumnsBinds(std::vector< bind_info > &binds) {
     binds.push_back(bind_info(11, SQL_C_SSHORT));
     binds.push_back(bind_info(12, SQL_C_CHAR));
     binds.push_back(bind_info(13, SQL_C_CHAR));
-    binds.push_back(bind_info(14, SQL_C_SSHORT));
+    binds.push_back(bind_info(14, SQL_C_SHORT));
     binds.push_back(bind_info(15, SQL_C_SSHORT));
     binds.push_back(bind_info(16, SQL_C_SLONG));
     binds.push_back(bind_info(17, SQL_C_SLONG));
@@ -835,25 +841,25 @@ TEST_F(TestSQLColumns, EXACT_MATCH_ALL_COLUMNS) {
         result.push_back(row);
     }
     std::vector< std::vector< std::string > > expected{
-        {"ODBCTest", "", "DevOps", "hostname", std::to_string(SQL_VARCHAR),
+        {"ODBCTest", "", "DevOps", "hostname", varchar_type,
          "varchar", std::to_string(INT_MAX), "256", "", "",
-         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          std::to_string(INT_MAX), "1", "YES"},
-        {"ODBCTest", "", "DevOps", "az", std::to_string(SQL_VARCHAR), "varchar",
+        {"ODBCTest", "", "DevOps", "az", varchar_type, "varchar",
          std::to_string(INT_MAX), "256", "", "", std::to_string(SQL_NULLABLE),
-         "", "", std::to_string(SQL_VARCHAR), "", std::to_string(INT_MAX), "2",
+         "", "", varchar_type, "", std::to_string(INT_MAX), "2",
          "YES"},
-        {"ODBCTest", "", "DevOps", "region", std::to_string(SQL_VARCHAR),
+        {"ODBCTest", "", "DevOps", "region", varchar_type,
          "varchar", std::to_string(INT_MAX), "256", "", "",
-         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          std::to_string(INT_MAX), "3", "YES"},
         {"ODBCTest", "", "DevOps", "measure_value::double",
          std::to_string(SQL_DOUBLE), "double", "15",
          std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
          "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
-        {"ODBCTest", "", "DevOps", "measure_name", std::to_string(SQL_VARCHAR),
+        {"ODBCTest", "", "DevOps", "measure_name", varchar_type,
          "varchar", std::to_string(INT_MAX), "256", "", "",
-         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          std::to_string(INT_MAX), "5", "YES"},
         {"ODBCTest", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
          "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
@@ -887,25 +893,25 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_ALL_COLUMNS) {
         result.push_back(row);
     }
     std::vector< std::vector< std::string > > expected{
-        {"ODBCTest", "", "DevOps", "hostname", std::to_string(SQL_VARCHAR),
+        {"ODBCTest", "", "DevOps", "hostname", varchar_type,
          "varchar", std::to_string(INT_MAX), "256", "", "",
-         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          std::to_string(INT_MAX), "1", "YES"},
-        {"ODBCTest", "", "DevOps", "az", std::to_string(SQL_VARCHAR), "varchar",
+        {"ODBCTest", "", "DevOps", "az", varchar_type, "varchar",
          std::to_string(INT_MAX), "256", "", "", std::to_string(SQL_NULLABLE),
-         "", "", std::to_string(SQL_VARCHAR), "", std::to_string(INT_MAX), "2",
+         "", "", varchar_type, "", std::to_string(INT_MAX), "2",
          "YES"},
-        {"ODBCTest", "", "DevOps", "region", std::to_string(SQL_VARCHAR),
+        {"ODBCTest", "", "DevOps", "region", varchar_type,
          "varchar", std::to_string(INT_MAX), "256", "", "",
-         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          std::to_string(INT_MAX), "3", "YES"},
         {"ODBCTest", "", "DevOps", "measure_value::double",
          std::to_string(SQL_DOUBLE), "double", "15",
          std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
          "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
-        {"ODBCTest", "", "DevOps", "measure_name", std::to_string(SQL_VARCHAR),
+        {"ODBCTest", "", "DevOps", "measure_name", varchar_type,
          "varchar", std::to_string(INT_MAX), "256", "", "",
-         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          std::to_string(INT_MAX), "5", "YES"},
         {"ODBCTest", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
          "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
@@ -944,9 +950,9 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_SOME_COLUMNS) {
          std::to_string(SQL_DOUBLE), "double", "15",
          std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
          "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
-        {"ODBCTest", "", "DevOps", "measure_name", std::to_string(SQL_VARCHAR),
+        {"ODBCTest", "", "DevOps", "measure_name", varchar_type,
          "varchar", std::to_string(INT_MAX), "256", "", "",
-         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          std::to_string(INT_MAX), "5", "YES"}};
     CheckSQLColumnsRows(expected, result);
 }
