@@ -690,8 +690,9 @@ void GenerateColumnQuery(std::string &query, const std::string &table_name,
 }
 
 int GetColumnSize(const std::string &type_name) {
-    switch (data_name_data_type_map.find(type_name)->second) {
+    switch (data_name_data_type_map.find(type_name)->second) {  
         case SQL_VARCHAR:
+        case SQL_WVARCHAR:
             return INT_MAX;
         case SQL_DOUBLE:
             return 15;
@@ -707,8 +708,9 @@ int GetColumnSize(const std::string &type_name) {
 }
 
 int GetBufferLength(const std::string &type_name) {
-    switch (data_name_data_type_map.find(type_name)->second) {
+    switch (data_name_data_type_map.find(type_name)->second) { 
         case SQL_VARCHAR:
+        case SQL_WVARCHAR:
             return 256;
         case SQL_DOUBLE:
             return sizeof(SQLDOUBLE);
