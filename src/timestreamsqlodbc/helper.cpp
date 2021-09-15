@@ -46,7 +46,7 @@ ConnStatusType GetStatus(void* conn) {
 std::string GetVersion(void* conn) {
     return conn
                ? static_cast< Communication* >(conn)->GetVersion()
-               : "1.0.0";
+               : "1.0.1";
 }
 
 BOOL ExecDirect(void* conn, StatementClass* stmt, const char* statement) {
