@@ -2,14 +2,17 @@
 
 shared TimestreamConnector.UnitTest =
 [
-    // Common variables for all tests
     Region = "us-east-2",
     ProfileName = "default",
     Source = TimestreamConnector.Contents(Region, ProfileName),
-    DevOps = Source{[Catalog="PowerBI", Schema="", Item="DevOps"]}[Data],
+    DevOpsOriginal = Source{[Catalog="PowerBI", Schema="", Item="DevOps"]}[Data],
+    
+    // Column is renamed because the ":" character can be problematic.
+    DevOps = Table.RenameColumns(DevOpsOriginal, {"measure_value::double", "measure_value"}),
 
     facts =
     {
+        // Basic
         Fact("Source has 7 columns",
              7,
              Table.ColumnCount(Source)
@@ -23,8 +26,297 @@ shared TimestreamConnector.UnitTest =
              Table.ColumnCount(DevOps)
         ),
         Fact("DevOps table has the right fields",
-            { "hostname", "az", "region", "measure_name", "time", "measure_value::double" },
+            { "hostname", "az", "region", "measure_name", "time", "measure_value" },
             Record.FieldNames(Type.RecordFields(Type.TableRow(Value.Type(DevOps))))
+        ),
+
+        // Filters
+        Fact("Operators",
+             1050,
+             let
+                Filtered = Table.SelectRows(DevOps, each [measure_name] = "cpu_utilization")
+             in
+                Table.RowCount(Filtered)
+        ),
+        Fact("And operation",
+             95,
+             let
+                Filtered = Table.SelectRows(DevOps, each [measure_name] = "cpu_utilization" and [measure_value] > 90)
+             in
+                Table.RowCount(Filtered)
+        ),
+        Fact("Or operation",
+             1050,
+             let
+                Filtered = Table.SelectRows(DevOps, each [measure_name] = "cpu_utilization" or [measure_value] > 90)
+             in
+                Table.RowCount(Filtered)
+        ),
+        Fact("LIKE operation",
+             300,
+             let
+                Filtered = Table.SelectRows(DevOps, each Text.StartsWith([az], "ap-"))
+             in
+                Table.RowCount(Filtered)
+        ),
+
+        // Joins: ToDo
+
+        // Aggregates
+        Fact("Count distinct",
+             true,
+             let
+                CountDistinctRegion = Table.Group(DevOps, {"region"}, {{"CountDistinctRegion", each Table.RowCount(Table.Distinct(_)), type number}}),
+                ThreeHundredDistinctHostname = Table.SelectRows(CountDistinctRegion, each [CountDistinctRegion] = 300)
+             in
+                Table.RowCount(CountDistinctRegion) = 7 and Table.RowCount(CountDistinctRegion) = Table.RowCount(ThreeHundredDistinctHostname)
+        ),
+        Fact("AVG operation",
+             53.8286181,
+             let
+                AverageMeasurePerHost = Table.Group(DevOps, {"hostname"}, {{"AverageMeasurePerHost", each List.Average([measure_value]), type number}})
+             in
+                AverageMeasurePerHost{[hostname="host-HGuD4"]}[AverageMeasurePerHost]
+        ),
+        Fact("Count",
+             true,
+             let
+                CountHostname = Table.Group(DevOps, {"hostname"}, {{"CountHostname", each Table.RowCount(_), type number}}),
+                TwentyCountHostname = Table.SelectRows(CountHostname, each [CountHostname] = 20)
+             in
+                Table.RowCount(CountHostname) = 105 and Table.RowCount(CountHostname) = Table.RowCount(TwentyCountHostname)
+        ),
+        Fact("GroupBy",
+             true,
+             let
+                GroupByRegion = Table.Group(DevOps, {"region"}, {{"GroupByRegion", each _, type table [hostname=text, az=text, measure_name=text, time=time, measure_value=number]}}),
+                UsWest1 = GroupByRegion{[region="us-west-1"]}[GroupByRegion]
+             in
+                Table.RowCount(GroupByRegion) = 7 and Table.RowCount(UsWest1) = 300
+        ),
+        Fact("Max",
+             99.573497,
+             let
+                MaxMeasureByRegion = Table.Group(DevOps, {"region"}, {{"MaxMeasureByRegion", each List.Max([measure_value]), type number}})
+             in
+                MaxMeasureByRegion{[region="us-west-1"]}[MaxMeasureByRegion]
+        ),
+        Fact("Min",
+             1.012575,
+             let
+                MinMeasureByRegion = Table.Group(DevOps, {"region"}, {{"MinMeasureByRegion", each List.Min([measure_value]), type number}})
+             in
+                MinMeasureByRegion{[region="us-west-1"]}[MinMeasureByRegion]
+        ),
+        Fact("Median",
+             50.943773,
+             let
+                MedianMeasureByRegion = Table.Group(DevOps, {"region"}, {{"MedianMeasureByRegion", each List.Median([measure_value]), type number}})
+             in
+                MedianMeasureByRegion{[region="us-west-1"]}[MedianMeasureByRegion]
+        ),
+        Fact("Sum",
+             14808.270005,
+             let
+                SumMeasureByRegion = Table.Group(DevOps, {"region"}, {{"SumMeasureByRegion", each List.Sum([measure_value]), type number}})
+             in
+                SumMeasureByRegion{[region="us-west-1"]}[SumMeasureByRegion]
+        ),
+
+        // Random
+        Fact("Replace Values",
+             true,
+             let
+                Replaced = Table.ReplaceValue(DevOps, "us-west-1", "US-WEST-1", Replacer.ReplaceValue, {"region"}),
+                uswest1 = Table.SelectRows(DevOps, each [region] = "us-west-1"),
+                uswest1AfterReplacement = Table.SelectRows(Replaced, each [region] = "us-west-1"),
+                USWEST1AfterReplacement = Table.SelectRows(Replaced, each [region] = "US-WEST-1")
+             in
+                Table.IsEmpty(uswest1AfterReplacement) and Table.RowCount(uswest1) = Table.RowCount(USWEST1AfterReplacement)
+        ),
+        Fact("Change Data Type",
+             type text,
+             let
+                ChangedType = Table.TransformColumnTypes(DevOps, {{"measure_value", type text}})
+             in
+                Value.Type(ChangedType{0}[measure_value])
+        ),
+        
+        // Functions
+        Fact("Earliest time",
+             #datetime(2021, 9, 8, 19, 33, 33.13),
+             List.Min(DevOps[time])
+        ),
+        Fact("Week of year",
+             37,
+             let
+                WeekOfYear = Table.TransformColumns(DevOps, {{"time", Date.WeekOfYear, Int64.Type}})
+             in
+                WeekOfYear{0}[time]
+        ),
+        Fact("Round Up",
+             true,
+             let
+                RoundUp = Table.TransformColumns(DevOps, {{"measure_value", Number.RoundUp, Int64.Type}})
+             in
+                DevOps{0}[measure_value] > 4 and DevOps{0}[measure_value] < 5 and RoundUp{0}[measure_value] = 5
+        ),
+        Fact("Round Down",
+             true,
+             let
+                RoundDown = Table.TransformColumns(DevOps, {{"measure_value", Number.RoundDown, Int64.Type}})
+             in
+                DevOps{0}[measure_value] > 4 and DevOps{0}[measure_value] < 5 and RoundDown{0}[measure_value] = 4
+        ),
+        Fact("Sine",
+             true,
+             let
+                Sine = Table.TransformColumns(DevOps, {{"measure_value", Number.Sin, type number}})
+             in
+                DevOps{0}[measure_value] = 4.887581 and Sine{0}[measure_value] = -0.98469308857334747
+        ),
+        Fact("Cosine",
+             true,
+             let
+                Cosine = Table.TransformColumns(DevOps, {{"measure_value", Number.Cos, type number}})
+             in
+                DevOps{0}[measure_value] = 4.887581 and Cosine{0}[measure_value] = 0.1742972211938032
+        ),
+        Fact("Tangent",
+             true,
+             let
+                Tangent = Table.TransformColumns(DevOps, {{"measure_value", Number.Tan, type number}})
+             in
+                DevOps{0}[measure_value] = 4.887581 and Tangent{0}[measure_value] = -5.6495053783930116
+        ),
+        Fact("Arcsine",
+             true,
+             let
+                // We divide the measure_value column by 10 so we can get a possible value (between -1 and 1) to calculate arcsine.
+                DivideByTen = Table.TransformColumns(DevOps, {{"measure_value", each _ / 10, type number}}),
+                Arcsine = Table.TransformColumns(DivideByTen, {{"measure_value", Number.Asin, type number}})
+             in
+                DivideByTen{0}[measure_value] = 0.488758 and Arcsine{0}[measure_value] = 0.51066555707643979
+        ),
+        Fact("Arccosine",
+             true,
+             let
+                // We divide the measure_value column by 10 so we can get a possible value (between -1 and 1) to calculate arccosine.
+                DivideByTen = Table.TransformColumns(DevOps, {{"measure_value", each _ / 10, type number}}),
+                Arccosine = Table.TransformColumns(DivideByTen, {{"measure_value", Number.Acos, type number}})
+             in
+                DivideByTen{0}[measure_value] = 0.488758 and Arccosine{0}[measure_value] = 1.0601307697184568
+        ),
+        Fact("Arctangent",
+             true,
+             let
+                Arctangent = Table.TransformColumns(DevOps, {{"measure_value", Number.Atan, type number}})
+             in
+                DevOps{0}[measure_value] = 4.887581 and Arctangent{0}[measure_value] = 1.3689814459303162
+        ),
+        Fact("Is Even",
+             true,
+             let
+                RoundDown = Table.TransformColumns(DevOps, {{"measure_value", Number.RoundDown, Int64.Type}}),
+                IsEven = Table.TransformColumns(RoundDown, {{"measure_value", Number.IsEven, type logical}})
+             in
+                RoundDown{0}[measure_value] = 4 and IsEven{0}[measure_value] = true
+        ),
+        Fact("Is Odd",
+             true,
+             let
+                RoundDown = Table.TransformColumns(DevOps, {{"measure_value", Number.RoundDown, Int64.Type}}),
+                IsOdd = Table.TransformColumns(RoundDown, {{"measure_value", Number.IsOdd, type logical}})
+             in
+                RoundDown{0}[measure_value] = 4 and IsOdd{0}[measure_value] = false
+        ),
+        Fact("Absolute Value",
+             true,
+             let
+                Negative = Table.TransformColumns(DevOps, {{"measure_value", (n) => -n, type number}}),
+                AbsValue = Table.TransformColumns(Negative, {{"measure_value", Number.Abs, type logical}})
+             in
+                Negative{0}[measure_value] = -4.887581 and AbsValue{0}[measure_value] = 4.887581
+        ),
+        Fact("Power",
+             true,
+             let
+                Cube = Table.TransformColumns(DevOps, {{"measure_value", each Number.Power(_, 3), type number}})
+             in
+                DevOps{0}[measure_value] = 4.887581 and Cube{0}[measure_value] = 116.75672471854494
+        ),
+        Fact("Square Root",
+             true,
+             let
+                SquareRoot = Table.TransformColumns(DevOps, {{"measure_value", Number.Sqrt, type number}})
+             in
+                DevOps{0}[measure_value] = 4.887581 and SquareRoot{0}[measure_value] = 2.2107874162840715
+        ),
+        Fact("Exponent",
+             true,
+             let
+                Exponent = Table.TransformColumns(DevOps, {{"measure_value", Number.Exp, type number}})
+             in
+                DevOps{0}[measure_value] = 4.887581 and Exponent{0}[measure_value] = 132.63234803515869
+        ),
+        Fact("Natural Logarithm",
+             true,
+             let
+                NatLog = Table.TransformColumns(DevOps, {{"measure_value", Number.Ln, type number}})
+             in
+                DevOps{0}[measure_value] = 4.887581 and NatLog{0}[measure_value] = 1.5866974980641808
+        ),
+        Fact("Factorial",
+             true,
+             let
+                RoundUp = Table.TransformColumns(DevOps, {{"measure_value", Number.RoundUp, Int64.Type}}),
+                Factorial = Table.TransformColumns(RoundUp, {{"measure_value", Number.Factorial, Int64.Type}})
+             in
+                RoundUp{0}[measure_value] = 5 and Factorial{0}[measure_value] = 120
+        ),
+        Fact("Add 100",
+             true,
+             let
+                Add = Table.TransformColumns(DevOps, {{"measure_value", each _ + 100, type number}})
+             in
+                DevOps{0}[measure_value] = 4.887581 and Add{0}[measure_value] = 104.887581
+        ),
+        Fact("Multiply by 100",
+             true,
+             let
+                Multiply = Table.TransformColumns(DevOps, {{"measure_value", each _ * 100, type number}})
+             in
+                DevOps{0}[measure_value] = 4.887581 and Multiply{0}[measure_value] = 488.758141
+        ),
+        Fact("Subtract 100",
+             true,
+             let
+                Subtract = Table.TransformColumns(DevOps, {{"measure_value", each _ - 100, type number}})
+             in
+                DevOps{0}[measure_value] = 4.887581 and Subtract{0}[measure_value] = -95.112419
+        ),
+        Fact("Divide by 100",
+             true,
+             let
+                Divide = Table.TransformColumns(DevOps, {{"measure_value", each _ / 100, type number}})
+             in
+                DevOps{0}[measure_value] = 4.887581 and Divide{0}[measure_value] = .048876
+        ),
+        Fact("Modulo",
+             true,
+             let
+                Multiply = Table.TransformColumns(DevOps, {{"measure_value", each _ * 100, type number}}),
+                RoundUp = Table.TransformColumns(Multiply, {{"measure_value", Number.RoundUp, Int64.Type}}),
+                Modulo = Table.TransformColumns(RoundUp, {{"measure_value", each Number.Mod(_, 5), Int64.Type}})
+             in
+                RoundUp{0}[measure_value] = 489 and Modulo{0}[measure_value] = 4
+        ),
+        Fact("Extract",
+             true,
+             let
+                Extract = Table.TransformColumns(DevOps, {{"region", each Text.AfterDelimiter(_, "ap-"), type text}})
+             in
+                DevOps{0}[region] = "ap-east-1" and Extract{0}[region] = "east-1"
         )
     },
 
