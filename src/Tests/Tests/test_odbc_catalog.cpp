@@ -1189,7 +1189,7 @@ TEST_F(TestCatalogSQLDescribeCol, VARCHAR_COLUMN) {
     std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ((SQLULEN)2048, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1220,7 +1220,7 @@ TEST_F(TestCatalogSQLDescribeCol, TIMESERIES_COLUMN) {
      std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ((SQLULEN)2048, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1246,7 +1246,7 @@ TEST_F(TestCatalogSQLDescribeCol, ARRAY_COLUMN) {
      std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ((SQLULEN)2048, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1272,7 +1272,7 @@ TEST_F(TestCatalogSQLDescribeCol, ROW_COLUMN) {
      std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ((SQLULEN)2048, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1295,7 +1295,7 @@ TEST_F(TestCatalogSQLDescribeCol, NULL_COLUMN) {
      std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ((SQLULEN)2048, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1394,7 +1394,7 @@ TEST_F(TestCatalogSQLDescribeCol, INTERVAL_YEAR_TO_MONTH_COLUMN) {
      std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ((SQLULEN)2048, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1417,7 +1417,7 @@ TEST_F(TestCatalogSQLDescribeCol, INTERVAL_DAY_TO_SECOND_COLUMN) {
      std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ((SQLULEN)2048, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1448,27 +1448,27 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_ALL_TYPES) {
         result.push_back(row);
     }
     std::vector< std::vector< std::string > > expected{
-        {"array[T,...]", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX),
+        {"varchar", varchar_type, "2048",
+         "VARCHAR '", "'", "", "1", "1", "3", "", "0", "0", "", "", "",
+         varchar_type, "", "", "0"},
+        {"array[T,...]", varchar_type, "2048",
          "ARRAY [", "]", "", "1", "0", "3", "", "0", "0", "", "", "",
-         std::to_string(SQL_WVARCHAR), "", "", "0"},
-        {"interval day to second", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX),
+         varchar_type, "", "", "0"},
+        {"interval day to second", varchar_type, "2048",
          "", "", "", "1", "0", "3", "", "0", "0", "", "", "",
-         std::to_string(SQL_WVARCHAR), "", "", "0"},
-        {"interval year to month", std::to_string(SQL_WVARCHAR),
-         std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
-         "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
-        {"row(T,...)", std::to_string(SQL_WVARCHAR),
-         std::to_string(INT_MAX), "ROW (", ")", "", "1", "0", "3", "", "0", "0", "",
-         "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
-        {"timeseries[row(timestamp, T,...)]", std::to_string(SQL_WVARCHAR),
-         std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
-         "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
-        {"varchar", std::to_string(SQL_WVARCHAR),
-         std::to_string(INT_MAX), "VARCHAR '", "'", "", "1", "1", "3", "", "0", "0", "",
-         "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
-        {"unknown", std::to_string(SQL_WVARCHAR),
-         std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
-         "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
+         varchar_type, "", "", "0"},
+        {"interval year to month", varchar_type,
+         "2048", "", "", "", "1", "0", "3", "", "0", "0", "",
+         "", "", varchar_type, "", "", "0"},
+        {"row(T,...)", varchar_type,
+         "2048", "ROW (", ")", "", "1", "0", "3", "", "0", "0", "",
+         "", "", varchar_type, "", "", "0"},
+        {"timeseries[row(timestamp, T,...)]", varchar_type,
+         "2048", "", "", "", "1", "0", "3", "", "0", "0", "",
+         "", "", varchar_type, "", "", "0"},
+        {"unknown", varchar_type,
+         "2048", "", "", "", "1", "0", "3", "", "0", "0", "",
+         "", "", varchar_type, "", "", "0"},
         {"boolean", std::to_string(SQL_BIT), "1", "BOOLEAN '",
          "'", "", "1", "0", "3", "1", "0", "0", "", "", "",
          std::to_string(SQL_BIT), "", "", "0"},
@@ -1519,27 +1519,27 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_WVARCHAR) {
         result.push_back(row);
     }
     std::vector< std::vector< std::string > > expected{
-        {"array[T,...]", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX),
+        {"varchar", varchar_type, "2048",
+         "VARCHAR '", "'", "", "1", "1", "3", "", "0", "0", "", "", "",
+         varchar_type, "", "", "0"},
+        {"array[T,...]", varchar_type, "2048",
          "ARRAY [", "]", "", "1", "0", "3", "", "0", "0", "", "", "",
-         std::to_string(SQL_WVARCHAR), "", "", "0"},
-        {"interval day to second", std::to_string(SQL_WVARCHAR),
-         std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
-         "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
-        {"interval year to month", std::to_string(SQL_WVARCHAR),
-         std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
-         "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
-        {"row(T,...)", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX),
+         varchar_type, "", "", "0"},
+        {"interval day to second", varchar_type,
+         "2048", "", "", "", "1", "0", "3", "", "0", "0", "",
+         "", "", varchar_type, "", "", "0"},
+        {"interval year to month", varchar_type,
+         "2048", "", "", "", "1", "0", "3", "", "0", "0", "",
+         "", "", varchar_type, "", "", "0"},
+        {"row(T,...)", varchar_type, "2048",
          "ROW (", ")", "", "1", "0", "3", "", "0", "0", "", "", "",
-         std::to_string(SQL_WVARCHAR), "", "", "0"},
-        {"timeseries[row(timestamp, T,...)]", std::to_string(SQL_WVARCHAR),
-         std::to_string(INT_MAX), "", "", "", "1", "0", "3", "", "0", "0", "",
-         "", "", std::to_string(SQL_WVARCHAR), "", "", "0"},
-        {"varchar", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX), "VARCHAR '",
-         "'", "", "1", "1", "3", "", "0", "0", "", "", "",
-         std::to_string(SQL_WVARCHAR), "", "", "0"},
-        {"unknown", std::to_string(SQL_WVARCHAR), std::to_string(INT_MAX), "",
+         varchar_type, "", "", "0"},
+        {"timeseries[row(timestamp, T,...)]", varchar_type,
+         "2048", "", "", "", "1", "0", "3", "", "0", "0", "",
+         "", "", varchar_type, "", "", "0"},
+        {"unknown", varchar_type, "2048", "",
          "", "", "1", "0", "3", "", "0", "0", "", "", "",
-         std::to_string(SQL_WVARCHAR), "", "", "0"}
+         varchar_type, "", "", "0"}
     };
     CheckRows(expected, result);
 }
