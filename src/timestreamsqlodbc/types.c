@@ -404,7 +404,7 @@ tstype_attr_column_size(const ConnectionClass *conn, OID type, int atttypmod,
         case TS_TYPE_TIMESERIES:
         case TS_TYPE_VARCHAR:
         case TS_TYPE_UNKNOWN:
-            return INT_MAX;
+            return 2048;
         default:
             return adtsize_or_longest;
     }
