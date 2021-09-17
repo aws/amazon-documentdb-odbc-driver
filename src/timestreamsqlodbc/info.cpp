@@ -97,26 +97,26 @@ auto case_insensitive_compare = [](char &c1, char &c2) {
     return std::toupper(c1) == std::toupper(c2);
 };
 
-const std::map< int, std::set< int > > sql_to_ts_type_map = {
+const std::map< int, std::vector< int > > sql_to_ts_type_map = {
     {SQL_BIT, {TS_TYPE_BOOLEAN}},
     {SQL_INTEGER, {TS_TYPE_INTEGER}},
     {SQL_BIGINT, {TS_TYPE_BIGINT}},
     {SQL_DOUBLE, {TS_TYPE_DOUBLE}},
 #ifdef UNICODE_SUPPORT
-    {SQL_WVARCHAR, {TS_TYPE_ARRAY,
+    {SQL_WVARCHAR, {TS_TYPE_VARCHAR,
+                   TS_TYPE_ARRAY,
                    TS_TYPE_INTERVAL_DAY_TO_SECOND,
                    TS_TYPE_INTERVAL_YEAR_TO_MONTH,
                    TS_TYPE_ROW,
                    TS_TYPE_TIMESERIES,
-                   TS_TYPE_VARCHAR,
                    TS_TYPE_UNKNOWN}},
 #else
-    {SQL_VARCHAR, {TS_TYPE_ARRAY,
+    {SQL_VARCHAR, {TS_TYPE_VARCHAR,
+                   TS_TYPE_ARRAY,
                    TS_TYPE_INTERVAL_DAY_TO_SECOND,
                    TS_TYPE_INTERVAL_YEAR_TO_MONTH,
                    TS_TYPE_ROW,
                    TS_TYPE_TIMESERIES,
-                   TS_TYPE_VARCHAR,
                    TS_TYPE_UNKNOWN}},
 #endif
     {SQL_DATE, {TS_TYPE_DATE}},
