@@ -17,7 +17,6 @@
 #ifndef OKTA_CREDENTIALS_PROVIDER
 #define OKTA_CREDENTIALS_PROVIDER
 
-#include <regex>
 #include <string>
 
 #include "saml_credentials_provider.h"

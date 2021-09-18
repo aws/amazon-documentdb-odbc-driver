@@ -20,12 +20,28 @@
 
 #include <algorithm>
 #include <memory>
-#include <regex>
 #include <sstream>
 #include <string>
 #include <map>
 #include <unordered_map>
 #include <set>
+
+#if !defined(__clang__) && defined(GNUC)
+#include <features.h>
+#if __GNUC_PREREQ(4, 9)  // If  gcc_version >= 4.9
+#include <regex>
+using namespace std;
+#define GET_PATTERN(pattern) regex(pattern)
+#else
+#include <boost/xpressive/xpressive.hpp>
+using namespace boost::xpressive;
+#define GET_PATTERN(pattern) sregex::compile(pattern)
+#endif
+#else
+#include <regex>
+using namespace std;
+#define GET_PATTERN(pattern) regex(pattern)
+#endif
 
 #ifdef __linux__
 #include <climits>
@@ -332,7 +348,7 @@ void ConvertToString(std::string &out, bool &valid, const SQLCHAR *sql_char,
 QResultClass *SetupQResult(StatementClass *stmt, const int col_cnt);
 void CleanUp(StatementClass *stmt, StatementClass *sub_stmt, const RETCODE ret);
 void ExecuteQuery(ConnectionClass *conn, HSTMT *stmt, const std::string &query);
-std::regex ConvertPattern(const std::string &pattern);
+std::string ConvertPattern(const std::string &pattern);
 
 // Common function definitions
 void ConvertToString(std::string &out, bool &valid, const SQLCHAR *sql_char,
@@ -371,7 +387,7 @@ QResultClass *SetupQResult(StatementClass *stmt, const int col_cnt) {
     return res;
 }
 
-std::regex ConvertPattern(const std::string &sql_pattern) {
+std::string ConvertPattern(const std::string &sql_pattern) {
     std::string regex_pattern;
     for (std::string::size_type i = 0; i < sql_pattern.size(); i++) {
         if (i == 0) {
@@ -406,7 +422,7 @@ std::regex ConvertPattern(const std::string &sql_pattern) {
             regex_pattern.push_back('$');
         }
     }
-    return std::regex(regex_pattern);
+    return regex_pattern;
 }
 
 void CleanUp(StatementClass *stmt, StatementClass *sub_stmt,
@@ -1079,16 +1095,17 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                                 column_name_sz);
 
                 // Filter through search pattern
-                std::regex regex_pattern = ConvertPattern(column_name);
+                std::string regex_pattern = ConvertPattern(column_name);
                 if (is_search_pattern
-                    && !std::regex_match(column_name_return, regex_pattern)) {
+                    && !regex_match(column_name_return,
+                                    GET_PATTERN(regex_pattern))) {
                     continue;
                 } else if (!is_search_pattern
-                           && (column_name.size() < column_name_return.size() ||
-                                !std::equal(column_name_return.begin(),
-                                          column_name_return.end(),
-                                          column_name.begin(),
-                                          case_insensitive_compare))) {
+                           && (column_name.size() < column_name_return.size()
+                               || !std::equal(column_name_return.begin(),
+                                              column_name_return.end(),
+                                              column_name.begin(),
+                                              case_insensitive_compare))) {
                     continue;
                 }
 
