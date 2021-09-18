@@ -63,7 +63,7 @@ set(DSN_INSTALLER_SRC "${CMAKE_CURRENT_SOURCE_DIR}/DSNInstaller")
 # ODBC Driver version
 set(VERSION_MAJOR 1)
 set(VERSION_MINOR 0)
-set(VERSION_PATCH 1)
+set(VERSION_PATCH 2)
 
 add_compile_definitions( TS_ODBC_VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
                          # Comma separated version is required for odbc administrator's driver file.
@@ -81,6 +81,10 @@ if (WIN32)
     find_package(AWSSDK REQUIRED core sts timestream-query)
 else()
     find_package(AWSSDK REQUIRED COMPONENTS core sts timestream-query PATHS aws-sdk-cpp/install NO_DEFAULT_PATH)
+    # Require at least gcc 4.9 for regex support
+    if((NOT APPLE) AND ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9))
+        find_package(Boost)
+    endif()
 endif()
 
 # General compiler definitions

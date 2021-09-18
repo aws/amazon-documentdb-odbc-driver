@@ -23,14 +23,31 @@
 #include <aws/core/http/standard/StandardHttpResponse.h>
 #include <aws/core/utils/json/JsonSerializer.h>
 
+#if !defined(__clang__) && defined(__GNUC__)
+#include <features.h>
+#if __GNUC_PREREQ(4, 9)  // If  gcc_version >= 4.9
+#include <regex>
+using namespace std;
+#define GET_PATTERN(pattern) regex(pattern)
+#else
+#include <boost/xpressive/xpressive.hpp>
+using namespace boost::xpressive;
+#define GET_PATTERN(pattern) sregex::compile(pattern)
+#endif
+#else
+#include <regex>
+using namespace std;
+#define GET_PATTERN(pattern) regex(pattern)
+#endif
+
 #include <sstream>
 
 #include "mylog.h"
 
 namespace {
 // Regex to search for SAMLResponse from Okta response.
-const std::regex SAML_RESPONSE_PATTERN =
-    std::regex(R"#(<input name="SAMLResponse" type="hidden" value="(.*?)"/>)#");
+const std::string SAML_RESPONSE_PATTERN =
+    std::string(R"#(<input name="SAMLResponse" type="hidden" value="(.*?)"/>)#");
 }  // namespace
 
 OktaCredentialsProvider::OktaCredentialsProvider(const authentication_options& auth)
@@ -158,10 +175,12 @@ Aws::String OktaCredentialsProvider::GetSAMLAssertion() {
     std::string body(std::istreambuf_iterator< char >(res->GetResponseBody()),
                      {});
 
-    std::smatch matches;
     std::string saml_response;
-    if (std::regex_search(body, matches, SAML_RESPONSE_PATTERN)) {
+    smatch matches;
+    if (regex_search(body, matches, GET_PATTERN(SAML_RESPONSE_PATTERN))) {
         saml_response = DecodeHex(matches.str(1));
+    } else {
+        LogMsg(LOG_DEBUG, "No regex match");
     }
 
     if (saml_response.empty()) {
