@@ -17,6 +17,7 @@
 #include "connection.h"
 #include "dlg_specific.h"
 #include "environ.h"
+#include "info.h"
 #include "qresult.h"
 #include "statement.h"
 #include "types.h"
@@ -404,7 +405,7 @@ tstype_attr_column_size(const ConnectionClass *conn, OID type, int atttypmod,
         case TS_TYPE_TIMESERIES:
         case TS_TYPE_VARCHAR:
         case TS_TYPE_UNKNOWN:
-            return 2048;
+            return VARCHAR_COLUMN_SIZE;
         default:
             return adtsize_or_longest;
     }

@@ -693,7 +693,7 @@ int GetColumnSize(const std::string &type_name) {
     switch (data_name_data_type_map.find(type_name)->second) {
         case SQL_VARCHAR:
         case SQL_WVARCHAR:
-            return 2048;
+            return VARCHAR_COLUMN_SIZE;
         case SQL_DOUBLE:
             return 15;
         case SQL_TYPE_TIMESTAMP:
