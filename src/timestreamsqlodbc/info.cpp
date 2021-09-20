@@ -720,12 +720,15 @@ int GetColumnSize(const std::string &type_name) {
 int GetBufferLength(const std::string &type_name) {
     switch (data_name_data_type_map.find(type_name)->second) {
         case SQL_VARCHAR:
-            return 2048;
+            // 1 byte per character.
+            return VARCHAR_COLUMN_SIZE;
         case SQL_WVARCHAR:
 #ifdef __APPLE__
-            return 8192;
+            // Mac has 4 bytes per wide character.
+            return 4 * VARCHAR_COLUMN_SIZE;
 #else
-            return 4096;
+            // 2 bytes per wide character.
+            return 2 * VARCHAR_COLUMN_SIZE;
 #endif  // __APPLE__
         case SQL_DOUBLE:
             return sizeof(SQLDOUBLE);
