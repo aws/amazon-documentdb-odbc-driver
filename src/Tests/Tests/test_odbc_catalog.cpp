@@ -1487,9 +1487,9 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_ALL_TYPES) {
         {"time", std::to_string(SQL_TIME), "18", "TIME '",
          "'", "", "1", "0", "3", "", "0", "0", "", "9", "9",
          std::to_string(SQL_TIME), "2", "", "0"},
-        {"timestamp", std::to_string(SQL_TIMESTAMP), "29", "TIMESTAMP '",
+        {"timestamp", std::to_string(SQL_TYPE_TIMESTAMP), "29", "TIMESTAMP '",
          "'", "", "1", "0", "3", "", "0", "0", "", "9", "9",
-         std::to_string(SQL_TIMESTAMP), "3", "", "0"}
+         std::to_string(SQL_TYPE_TIMESTAMP), "3", "", "0"}
     };
     CheckRows(expected, result);
 }

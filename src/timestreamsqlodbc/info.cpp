@@ -121,7 +121,7 @@ const std::map< int, std::vector< int > > sql_to_ts_type_map = {
 #endif
     {SQL_DATE, {TS_TYPE_DATE}},
     {SQL_TIME, {TS_TYPE_TIME}},
-    {SQL_TIMESTAMP, {TS_TYPE_TIMESTAMP}}};
+    {SQL_TYPE_TIMESTAMP, {TS_TYPE_TIMESTAMP}}};
 
 const std::unordered_map< std::string, int > data_name_data_type_map = {
     {TS_TYPE_NAME_DOUBLE, SQL_DOUBLE},
