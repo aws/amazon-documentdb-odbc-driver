@@ -36,6 +36,8 @@
 #include "tuple.h"
 #include "types.h"
 
+#define VARCHAR_COLUMN_SIZE 2048
+
 // C Interface
 #ifdef __cplusplus
 extern "C" {

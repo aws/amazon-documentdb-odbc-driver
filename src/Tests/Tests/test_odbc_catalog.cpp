@@ -22,6 +22,7 @@
 #endif
 #include "pch.h"
 #include "unit_test_helper.h"
+#include "info.h"
 #include "it_odbc_helper.h"
 #include "catfunc.h"
 #include "algorithm"
@@ -847,24 +848,24 @@ TEST_F(TestSQLColumns, EXACT_MATCH_ALL_COLUMNS) {
         result.push_back(row);
     }
     std::vector< std::vector< std::string > > expected{
-        {"ODBCTest", "", "DevOps", "hostname", varchar_type,
-         "varchar", "2048", varchar_buffer_len, "", "",
+        {"ODBCTest", "", "DevOps", "hostname", varchar_type, "varchar",
+         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
          std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          varchar_buffer_len, "1", "YES"},
         {"ODBCTest", "", "DevOps", "az", varchar_type, "varchar",
-         "2048", varchar_buffer_len, "", "", std::to_string(SQL_NULLABLE),
-         "", "", varchar_type, "", varchar_buffer_len, "2",
-         "YES"},
-        {"ODBCTest", "", "DevOps", "region", varchar_type,
-         "varchar", "2048", varchar_buffer_len, "", "",
+         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
+         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
+         varchar_buffer_len, "2", "YES"},
+        {"ODBCTest", "", "DevOps", "region", varchar_type, "varchar",
+         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
          std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          varchar_buffer_len, "3", "YES"},
         {"ODBCTest", "", "DevOps", "measure_value::double",
          std::to_string(SQL_DOUBLE), "double", "15",
          std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
          "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
-        {"ODBCTest", "", "DevOps", "measure_name", varchar_type,
-         "varchar", "2048", varchar_buffer_len, "", "",
+        {"ODBCTest", "", "DevOps", "measure_name", varchar_type, "varchar",
+         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
          std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          varchar_buffer_len, "5", "YES"},
         {"ODBCTest", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
@@ -899,24 +900,24 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_ALL_COLUMNS) {
         result.push_back(row);
     }
     std::vector< std::vector< std::string > > expected{
-        {"ODBCTest", "", "DevOps", "hostname", varchar_type,
-         "varchar", "2048", varchar_buffer_len, "", "",
+        {"ODBCTest", "", "DevOps", "hostname", varchar_type, "varchar",
+         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
          std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          varchar_buffer_len, "1", "YES"},
         {"ODBCTest", "", "DevOps", "az", varchar_type, "varchar",
-         "2048", varchar_buffer_len, "", "", std::to_string(SQL_NULLABLE),
-         "", "", varchar_type, "", varchar_buffer_len, "2",
-         "YES"},
-        {"ODBCTest", "", "DevOps", "region", varchar_type,
-         "varchar", "2048", varchar_buffer_len, "", "",
+         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
+         std::to_string(SQL_NULLABLE),
+         "", "", varchar_type, "", varchar_buffer_len, "2", "YES"},
+        {"ODBCTest", "", "DevOps", "region", varchar_type, "varchar",
+         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
          std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          varchar_buffer_len, "3", "YES"},
         {"ODBCTest", "", "DevOps", "measure_value::double",
          std::to_string(SQL_DOUBLE), "double", "15",
          std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
          "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
-        {"ODBCTest", "", "DevOps", "measure_name", varchar_type,
-         "varchar", "2048", varchar_buffer_len, "", "",
+        {"ODBCTest", "", "DevOps", "measure_name", varchar_type, "varchar",
+         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
          std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          varchar_buffer_len, "5", "YES"},
         {"ODBCTest", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
@@ -956,8 +957,8 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_SOME_COLUMNS) {
          std::to_string(SQL_DOUBLE), "double", "15",
          std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
          "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
-        {"ODBCTest", "", "DevOps", "measure_name", varchar_type,
-         "varchar", "2048", varchar_buffer_len, "", "",
+        {"ODBCTest", "", "DevOps", "measure_name", varchar_type, "varchar",
+         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
          std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          varchar_buffer_len, "5", "YES"}};
     CheckSQLColumnsRows(expected, result);
@@ -1189,7 +1190,7 @@ TEST_F(TestCatalogSQLDescribeCol, VARCHAR_COLUMN) {
     std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)2048, column_size);
+    EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1220,7 +1221,7 @@ TEST_F(TestCatalogSQLDescribeCol, TIMESERIES_COLUMN) {
      std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)2048, column_size);
+    EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1246,7 +1247,7 @@ TEST_F(TestCatalogSQLDescribeCol, ARRAY_COLUMN) {
      std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)2048, column_size);
+    EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1272,7 +1273,7 @@ TEST_F(TestCatalogSQLDescribeCol, ROW_COLUMN) {
      std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)2048, column_size);
+    EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1295,7 +1296,7 @@ TEST_F(TestCatalogSQLDescribeCol, NULL_COLUMN) {
      std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)2048, column_size);
+    EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1394,7 +1395,7 @@ TEST_F(TestCatalogSQLDescribeCol, INTERVAL_YEAR_TO_MONTH_COLUMN) {
      std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)2048, column_size);
+    EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1417,7 +1418,7 @@ TEST_F(TestCatalogSQLDescribeCol, INTERVAL_DAY_TO_SECOND_COLUMN) {
      std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)2048, column_size);
+    EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1448,27 +1449,26 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_ALL_TYPES) {
         result.push_back(row);
     }
     std::vector< std::vector< std::string > > expected{
-        {"varchar", varchar_type, "2048",
+        {"varchar", varchar_type, std::to_string(VARCHAR_COLUMN_SIZE),
          "VARCHAR '", "'", "", "1", "1", "3", "", "0", "0", "", "", "",
          varchar_type, "", "", "0"},
-        {"array[T,...]", varchar_type, "2048",
+        {"array[T,...]", varchar_type, std::to_string(VARCHAR_COLUMN_SIZE),
          "ARRAY [", "]", "", "1", "0", "3", "", "0", "0", "", "", "",
          varchar_type, "", "", "0"},
-        {"interval day to second", varchar_type, "2048",
-         "", "", "", "1", "0", "3", "", "0", "0", "", "", "",
-         varchar_type, "", "", "0"},
+        {"interval day to second", varchar_type,
+         std::to_string(VARCHAR_COLUMN_SIZE), "", "", "", "1", "0", "3",
+         "", "0", "0", "", "", "", varchar_type, "", "", "0"},
         {"interval year to month", varchar_type,
-         "2048", "", "", "", "1", "0", "3", "", "0", "0", "",
-         "", "", varchar_type, "", "", "0"},
-        {"row(T,...)", varchar_type,
-         "2048", "ROW (", ")", "", "1", "0", "3", "", "0", "0", "",
+         std::to_string(VARCHAR_COLUMN_SIZE), "", "", "", "1", "0", "3", "",
+         "0", "0", "", "", "", varchar_type, "", "", "0"},
+        {"row(T,...)", varchar_type, std::to_string(VARCHAR_COLUMN_SIZE),
+         "ROW (", ")", "", "1", "0", "3", "", "0", "0", "",
          "", "", varchar_type, "", "", "0"},
         {"timeseries[row(timestamp, T,...)]", varchar_type,
-         "2048", "", "", "", "1", "0", "3", "", "0", "0", "",
-         "", "", varchar_type, "", "", "0"},
-        {"unknown", varchar_type,
-         "2048", "", "", "", "1", "0", "3", "", "0", "0", "",
-         "", "", varchar_type, "", "", "0"},
+         std::to_string(VARCHAR_COLUMN_SIZE), "", "", "", "1", "0", "3", "",
+         "0", "0", "", "", "", varchar_type, "", "", "0"},
+        {"unknown", varchar_type, std::to_string(VARCHAR_COLUMN_SIZE), "", "",
+         "", "1", "0", "3", "", "0", "0", "", "", "", varchar_type, "", "", "0"},
         {"boolean", std::to_string(SQL_BIT), "1", "BOOLEAN '",
          "'", "", "1", "0", "3", "1", "0", "0", "", "", "",
          std::to_string(SQL_BIT), "", "", "0"},
@@ -1519,25 +1519,25 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_WVARCHAR) {
         result.push_back(row);
     }
     std::vector< std::vector< std::string > > expected{
-        {"varchar", varchar_type, "2048",
+        {"varchar", varchar_type, std::to_string(VARCHAR_COLUMN_SIZE),
          "VARCHAR '", "'", "", "1", "1", "3", "", "0", "0", "", "", "",
          varchar_type, "", "", "0"},
-        {"array[T,...]", varchar_type, "2048",
+        {"array[T,...]", varchar_type, std::to_string(VARCHAR_COLUMN_SIZE),
          "ARRAY [", "]", "", "1", "0", "3", "", "0", "0", "", "", "",
          varchar_type, "", "", "0"},
         {"interval day to second", varchar_type,
-         "2048", "", "", "", "1", "0", "3", "", "0", "0", "",
-         "", "", varchar_type, "", "", "0"},
+         std::to_string(VARCHAR_COLUMN_SIZE), "", "", "", "1", "0", "3", "",
+         "0", "0", "", "", "", varchar_type, "", "", "0"},
         {"interval year to month", varchar_type,
-         "2048", "", "", "", "1", "0", "3", "", "0", "0", "",
-         "", "", varchar_type, "", "", "0"},
-        {"row(T,...)", varchar_type, "2048",
+         std::to_string(VARCHAR_COLUMN_SIZE), "", "", "", "1", "0", "3", "",
+         "0", "0", "", "", "", varchar_type, "", "", "0"},
+        {"row(T,...)", varchar_type, std::to_string(VARCHAR_COLUMN_SIZE),
          "ROW (", ")", "", "1", "0", "3", "", "0", "0", "", "", "",
          varchar_type, "", "", "0"},
         {"timeseries[row(timestamp, T,...)]", varchar_type,
-         "2048", "", "", "", "1", "0", "3", "", "0", "0", "",
-         "", "", varchar_type, "", "", "0"},
-        {"unknown", varchar_type, "2048", "",
+         std::to_string(VARCHAR_COLUMN_SIZE), "", "", "", "1", "0", "3", "",
+         "0", "0", "", "", "", varchar_type, "", "", "0"},
+        {"unknown", varchar_type, std::to_string(VARCHAR_COLUMN_SIZE), "",
          "", "", "1", "0", "3", "", "0", "0", "", "", "",
          varchar_type, "", "", "0"}
     };
