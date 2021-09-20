@@ -31,13 +31,13 @@
 #ifdef UNICODE_SUPPORT
 std::string varchar_type = std::to_string(SQL_WVARCHAR);
 #ifdef __APPLE__
-std::string varchar_buffer_len = "8192";
+std::string varchar_buffer_len = std::to_string(4 * VARCHAR_COLUMN_SIZE);
 #else
-std::string varchar_buffer_len = "4096";
+std::string varchar_buffer_len = std::to_string(2 * VARCHAR_COLUMN_SIZE);
 #endif  // __APPLE__
 #else
 std::string varchar_type = std::to_string(SQL_VARCHAR);
-std::string varchar_buffer_len = "2048";
+std::string varchar_buffer_len = std::to_string(VARCHAR_COLUMN_SIZE);
 #endif
 
 #if (ODBCVER < 0x0300)
