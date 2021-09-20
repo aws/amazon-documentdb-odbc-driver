@@ -119,9 +119,15 @@ const std::map< int, std::vector< int > > sql_to_ts_type_map = {
                    TS_TYPE_TIMESERIES,
                    TS_TYPE_UNKNOWN}},
 #endif
+#if (ODBCVER < 0x0300)
     {SQL_DATE, {TS_TYPE_DATE}},
     {SQL_TIME, {TS_TYPE_TIME}},
+    {SQL_TIMESTAMP, {TS_TYPE_TIMESTAMP}}};
+#else
+    {SQL_TYPE_DATE, {TS_TYPE_DATE}},
+    {SQL_TYPE_TIME, {TS_TYPE_TIME}},
     {SQL_TYPE_TIMESTAMP, {TS_TYPE_TIMESTAMP}}};
+#endif
 
 const std::unordered_map< std::string, int > data_name_data_type_map = {
     {TS_TYPE_NAME_DOUBLE, SQL_DOUBLE},
@@ -130,7 +136,11 @@ const std::unordered_map< std::string, int > data_name_data_type_map = {
 #else
     {TS_TYPE_NAME_VARCHAR, SQL_VARCHAR},
 #endif
+#if (ODBCVER < 0x0300)
+    {TS_TYPE_NAME_TIMESTAMP, SQL_TIMESTAMP},
+#else
     {TS_TYPE_NAME_TIMESTAMP, SQL_TYPE_TIMESTAMP},
+#endif
     {TS_TYPE_NAME_BIGINT, SQL_BIGINT},
     {TS_TYPE_NAME_BOOLEAN, SQL_BIT}};
 
