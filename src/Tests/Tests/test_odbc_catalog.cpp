@@ -40,16 +40,6 @@ std::string varchar_type = std::to_string(SQL_VARCHAR);
 std::string varchar_buffer_len = std::to_string(VARCHAR_COLUMN_SIZE);
 #endif
 
-#if (ODBCVER < 0x0300)
-#define DATE_TYPE SQL_DATE
-#define TIME_TYPE SQL_TIME
-#define TIMESTAMP_TYPE SQL_TIMESTAMP
-#else
-#define DATE_TYPE SQL_TYPE_DATE
-#define TIME_TYPE SQL_TYPE_TIME
-#define TIMESTAMP_TYPE SQL_TYPE_TIMESTAMP
-#endif
-
 // General test constants and structures
 #define BIND_SIZE 512
 typedef struct bind_info {
@@ -825,8 +815,16 @@ TEST_F(TestSQLColumns, EXACT_MATCH_ONE_COLUMN) {
         }
         result.push_back(row);
     }
+
+    std::string timestamp_type;
+    if (IsOdbcVer2(m_hstmt)) {
+        timestamp_type = std::to_string(SQL_TIMESTAMP);
+    } else {
+        timestamp_type = std::to_string(SQL_TYPE_TIMESTAMP);
+    }
+
     std::vector< std::vector< std::string > > expected{
-        {"ODBCTest", "", "IoT", "time", std::to_string(TIMESTAMP_TYPE),
+        {"ODBCTest", "", "IoT", "time", timestamp_type,
          "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
          std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
          std::to_string(SQL_CODE_TIMESTAMP), "", "36", "YES"}};
@@ -857,6 +855,14 @@ TEST_F(TestSQLColumns, EXACT_MATCH_ALL_COLUMNS) {
         }
         result.push_back(row);
     }
+
+    std::string timestamp_type;
+    if (IsOdbcVer2(m_hstmt)) {
+        timestamp_type = std::to_string(SQL_TIMESTAMP);
+    } else {
+        timestamp_type = std::to_string(SQL_TYPE_TIMESTAMP);
+    }
+
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "hostname", varchar_type, "varchar",
          std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
@@ -878,7 +884,7 @@ TEST_F(TestSQLColumns, EXACT_MATCH_ALL_COLUMNS) {
          std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
          std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          varchar_buffer_len, "5", "YES"},
-        {"ODBCTest", "", "DevOps", "time", std::to_string(TIMESTAMP_TYPE),
+        {"ODBCTest", "", "DevOps", "time", timestamp_type,
          "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
          std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
          std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"}};
@@ -909,6 +915,14 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_ALL_COLUMNS) {
         }
         result.push_back(row);
     }
+
+    std::string timestamp_type;
+    if (IsOdbcVer2(m_hstmt)) {
+        timestamp_type = std::to_string(SQL_TIMESTAMP);
+    } else {
+        timestamp_type = std::to_string(SQL_TYPE_TIMESTAMP);
+    }
+
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "hostname", varchar_type, "varchar",
          std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
@@ -930,7 +944,7 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_ALL_COLUMNS) {
          std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
          std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          varchar_buffer_len, "5", "YES"},
-        {"ODBCTest", "", "DevOps", "time", std::to_string(TIMESTAMP_TYPE),
+        {"ODBCTest", "", "DevOps", "time", timestamp_type,
          "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
          std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
          std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"}};
@@ -998,12 +1012,20 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_MULTI_TABLES_COLUMNS) {
         }
         result.push_back(row);
     }
+
+    std::string timestamp_type;
+    if (IsOdbcVer2(m_hstmt)) {
+        timestamp_type = std::to_string(SQL_TIMESTAMP);
+    } else {
+        timestamp_type = std::to_string(SQL_TYPE_TIMESTAMP);
+    }
+
     std::vector< std::vector< std::string > > expected{
-        {"ODBCTest", "", "DevOps", "time", std::to_string(TIMESTAMP_TYPE),
+        {"ODBCTest", "", "DevOps", "time", timestamp_type,
          "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
          std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
          std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"},
-        {"ODBCTest", "", "IoT", "time", std::to_string(TIMESTAMP_TYPE),
+        {"ODBCTest", "", "IoT", "time", timestamp_type,
          "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
          std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
          std::to_string(SQL_CODE_TIMESTAMP), "", "36", "YES"}};
@@ -1037,8 +1059,16 @@ TEST_F(TestSQLColumns, META_DATA_CASE_INSENSITIVE) {
         }
         result.push_back(row);
     }
+
+    std::string timestamp_type;
+    if (IsOdbcVer2(m_hstmt)) {
+        timestamp_type = std::to_string(SQL_TIMESTAMP);
+    } else {
+        timestamp_type = std::to_string(SQL_TYPE_TIMESTAMP);
+    }
+
     std::vector< std::vector< std::string > > expected{
-        {"ODBCTest", "", "DevOps", "time", std::to_string(TIMESTAMP_TYPE),
+        {"ODBCTest", "", "DevOps", "time", timestamp_type,
          "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
          std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
          std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"}};
@@ -1325,12 +1355,20 @@ TEST_F(TestCatalogSQLDescribeCol, TIMESTAMP_COLUMN) {
     SQLULEN column_size;
     SQLSMALLINT decimal_digits;
     SQLSMALLINT nullable;
+
+    int timestamp_type;
+    if (IsOdbcVer2(m_hstmt)) {
+        timestamp_type = SQL_TIMESTAMP;
+    } else {
+        timestamp_type = SQL_TYPE_TIMESTAMP;
+    }
+
     ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
                          &data_type, &column_size, &decimal_digits, &nullable);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-     std::string expected_column_name = "_col0";
+    std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
-    EXPECT_EQ(TIMESTAMP_TYPE, data_type);
+    EXPECT_EQ(timestamp_type, data_type);
     std::string expected = "2021-01-02 18:01:13.000000000";
     EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
@@ -1350,12 +1388,20 @@ TEST_F(TestCatalogSQLDescribeCol, DATE_COLUMN) {
     SQLULEN column_size;
     SQLSMALLINT decimal_digits;
     SQLSMALLINT nullable;
+
+    int date_type;
+    if (IsOdbcVer2(m_hstmt)) {
+        date_type = SQL_DATE;
+    } else {
+        date_type = SQL_TYPE_DATE;
+    }
+
     ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
                          &data_type, &column_size, &decimal_digits, &nullable);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-     std::string expected_column_name = "_col0";
+    std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
-    EXPECT_EQ(DATE_TYPE, data_type);
+    EXPECT_EQ(date_type, data_type);
     std::string expected = "2021-01-02";
     EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
@@ -1375,12 +1421,20 @@ TEST_F(TestCatalogSQLDescribeCol, TIME_COLUMN) {
     SQLULEN column_size;
     SQLSMALLINT decimal_digits;
     SQLSMALLINT nullable;
+
+    int time_type;
+    if (IsOdbcVer2(m_hstmt)) {
+        time_type = SQL_TIMESTAMP;
+    } else {
+        time_type = SQL_TYPE_TIMESTAMP;
+    }
+
     ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
                          &data_type, &column_size, &decimal_digits, &nullable);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-     std::string expected_column_name = "_col0";
+    std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
-    EXPECT_EQ(TIME_TYPE, data_type);
+    EXPECT_EQ(time_type, data_type);
     std::string expected = "06:39:45.123456789";
     EXPECT_EQ((SQLULEN)expected.size(), column_size);
     EXPECT_EQ(0, decimal_digits);
@@ -1458,6 +1512,20 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_ALL_TYPES) {
         }
         result.push_back(row);
     }
+
+    std::string date_type;
+    std::string time_type;
+    std::string timestamp_type;
+    if (IsOdbcVer2(m_hstmt)) {
+        date_type = std::to_string(SQL_DATE);
+        time_type = std::to_string(SQL_TIME);
+        timestamp_type = std::to_string(SQL_TIMESTAMP);
+    } else {
+        date_type = std::to_string(SQL_TYPE_DATE);
+        time_type = std::to_string(SQL_TYPE_TIME);
+        timestamp_type = std::to_string(SQL_TYPE_TIMESTAMP);
+    }
+
     std::vector< std::vector< std::string > > expected{
         {"varchar", varchar_type, std::to_string(VARCHAR_COLUMN_SIZE),
          "VARCHAR '", "'", "", "1", "1", "3", "", "0", "0", "", "", "",
@@ -1491,15 +1559,15 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_ALL_TYPES) {
         {"double", std::to_string(SQL_DOUBLE), "15", "DOUBLE '",
          "'", "", "1", "0", "3", "0", "0", "0", "", "", "",
          std::to_string(SQL_DOUBLE), "", "10", "0"},
-        {"date", std::to_string(DATE_TYPE), "10", "DATE '",
+        {"date", date_type, "10", "DATE '",
          "'", "", "1", "0", "3", "", "0", "0", "", "", "",
-         std::to_string(DATE_TYPE), "1", "", "0"},
-        {"time", std::to_string(TIME_TYPE), "18", "TIME '",
+         date_type, "1", "", "0"},
+        {"time", time_type, "18", "TIME '",
          "'", "", "1", "0", "3", "", "0", "0", "", "9", "9",
-         std::to_string(TIME_TYPE), "2", "", "0"},
-        {"timestamp", std::to_string(TIMESTAMP_TYPE), "29", "TIMESTAMP '",
+         time_type, "2", "", "0"},
+        {"timestamp", timestamp_type, "29", "TIMESTAMP '",
          "'", "", "1", "0", "3", "", "0", "0", "", "9", "9",
-         std::to_string(TIMESTAMP_TYPE), "3", "", "0"}
+         timestamp_type, "3", "", "0"}
     };
     CheckRows(expected, result);
 }
