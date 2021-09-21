@@ -1232,14 +1232,15 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                 tuple[COLUMNS_LENGTH].len = (int)buf_len.size();
                 std::string decimal_digits = std::to_string(9);
                 tuple[COLUMNS_SCALE].value =
-                    (type_name_return == "timestamp")
+                    (type_name_return == TS_TYPE_NAME_TIMESTAMP)
                         ? strdup(decimal_digits.c_str())
                         : NULL;
-                tuple[COLUMNS_SCALE].len = (type_name_return == "timestamp")
+                tuple[COLUMNS_SCALE].len = (type_name_return == TS_TYPE_NAME_TIMESTAMP)
                                                ? (int)decimal_digits.size()
                                                : 0;
-                if (type_name_return == "double" || type_name_return == "int"
-                    || type_name_return == "bigint") {
+                if (type_name_return == TS_TYPE_NAME_DOUBLE ||
+                    type_name_return == TS_TYPE_NAME_INTEGER ||
+                    type_name_return == TS_TYPE_NAME_BIGINT) {
                     set_nullfield_int2(&tuple[COLUMNS_RADIX], 10);
                 } else {
                     set_nullfield_int2(&tuple[COLUMNS_RADIX], -1);
