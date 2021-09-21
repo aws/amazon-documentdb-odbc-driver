@@ -435,6 +435,18 @@ std::string ConvertPattern(const std::string &sql_pattern) {
     return regex_pattern;
 }
 
+int GetDataTypeFromTypeName(HSTMT hstmt, std::string type_name) {
+    if (type_name == TS_TYPE_NAME_TIMESTAMP) {
+        if (IsOdbcVer2(hstmt)) {
+            return SQL_TIMESTAMP;
+        }
+
+        return SQL_TYPE_TIMESTAMP;
+    }
+
+    return data_name_data_type_map.find(type_name)->second;
+}
+
 void CleanUp(StatementClass *stmt, StatementClass *sub_stmt,
              const RETCODE ret = SQL_ERROR) {
     stmt->status = STMT_FINISHED;
@@ -534,19 +546,9 @@ void SetTableTuples(QResultClass *res, const TableResultSet res_type,
         for (size_t i = 0; i < binds.size(); i++) {
             // Add tuples for SQLColumns
             if (binds.size() > COLUMNS_SQL_DATA_TYPE) {
-                int data_type;
-                std::string type_name = bind_tbl[COLUMNS_TYPE_NAME]->AsString();
-                
-                if (type_name == TS_TYPE_NAME_TIMESTAMP) {
-                    if (IsOdbcVer2(stmt)) {
-                        data_type = SQL_TIMESTAMP;
-                    } else {
-                        data_type = SQL_TYPE_TIMESTAMP;
-                    }
-                } else {
-                    // Add data type for data loading issue in Power BI Desktop
-                    data_type = data_name_data_type_map.find(type_name)->second;
-                }
+                // Add data type for data loading issue in Power BI Desktop
+                int data_type = GetDataTypeFromTypeName(
+                    stmt, bind_tbl[COLUMNS_TYPE_NAME]->AsString());
                 
                 if (i == COLUMNS_DATA_TYPE) {
                     set_tuplefield_int2(&tuple[COLUMNS_DATA_TYPE],
@@ -1181,16 +1183,7 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                         static_cast< size_t >(type_strlen_or_ind));
                 }
 
-                int sql_type;
-                if (type_name_return == TS_TYPE_NAME_TIMESTAMP) {
-                    if (IsOdbcVer2(stmt)) {
-                        sql_type = SQL_TIMESTAMP;
-                    } else {
-                        sql_type = SQL_TYPE_TIMESTAMP;
-                    }
-                } else {
-                    sql_type = data_name_data_type_map.find(type_name_return)->second;
-                }
+                int sql_type = GetDataTypeFromTypeName(stmt, type_name_return);
 
                 TupleField *tuple = QR_AddNew(res);
                 tuple[COLUMNS_CATALOG_NAME].value = strdup(table.first.c_str());
