@@ -1424,9 +1424,9 @@ TEST_F(TestCatalogSQLDescribeCol, TIME_COLUMN) {
 
     int time_type;
     if (IsOdbcVer2(m_hstmt)) {
-        time_type = SQL_TIMESTAMP;
+        time_type = SQL_TIME;
     } else {
-        time_type = SQL_TYPE_TIMESTAMP;
+        time_type = SQL_TYPE_TIME;
     }
 
     ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
