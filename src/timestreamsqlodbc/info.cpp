@@ -97,46 +97,73 @@ auto case_insensitive_compare = [](char &c1, char &c2) {
     return std::toupper(c1) == std::toupper(c2);
 };
 
-const std::map< int, std::vector< int > > sql_to_ts_type_map = {
+const std::map< int, std::vector< int > > sql_to_ts_type_map_odbc_v2 = {
     {SQL_BIT, {TS_TYPE_BOOLEAN}},
     {SQL_INTEGER, {TS_TYPE_INTEGER}},
     {SQL_BIGINT, {TS_TYPE_BIGINT}},
     {SQL_DOUBLE, {TS_TYPE_DOUBLE}},
 #ifdef UNICODE_SUPPORT
-    {SQL_WVARCHAR, {TS_TYPE_VARCHAR,
-                   TS_TYPE_ARRAY,
-                   TS_TYPE_INTERVAL_DAY_TO_SECOND,
-                   TS_TYPE_INTERVAL_YEAR_TO_MONTH,
-                   TS_TYPE_ROW,
-                   TS_TYPE_TIMESERIES,
-                   TS_TYPE_UNKNOWN}}};
+    {SQL_WVARCHAR,
 #else
-    {SQL_VARCHAR, {TS_TYPE_VARCHAR,
+    {SQL_VARCHAR,
+#endif
+                  {TS_TYPE_VARCHAR,
                    TS_TYPE_ARRAY,
                    TS_TYPE_INTERVAL_DAY_TO_SECOND,
                    TS_TYPE_INTERVAL_YEAR_TO_MONTH,
                    TS_TYPE_ROW,
                    TS_TYPE_TIMESERIES,
-                   TS_TYPE_UNKNOWN}}};
-#endif
-
-const std::map< int, int > sql_to_ts_date_time_type_map_ODBC_v2 = {
+                   TS_TYPE_UNKNOWN}},
     {SQL_DATE, {TS_TYPE_DATE}},
     {SQL_TIME, {TS_TYPE_TIME}},
-    {SQL_TIMESTAMP, {TS_TYPE_TIMESTAMP}}};
+    {SQL_TIMESTAMP, {TS_TYPE_TIMESTAMP}}
+};
 
-const std::map< int, int > sql_to_ts_date_time_type_map_ODBC_v3 = {
+const std::map< int, std::vector< int > > sql_to_ts_type_map_odbc_v3 = {
+    {SQL_BIT, {TS_TYPE_BOOLEAN}},
+    {SQL_INTEGER, {TS_TYPE_INTEGER}},
+    {SQL_BIGINT, {TS_TYPE_BIGINT}},
+    {SQL_DOUBLE, {TS_TYPE_DOUBLE}},
+#ifdef UNICODE_SUPPORT
+    {SQL_WVARCHAR,
+#else
+    {SQL_VARCHAR,
+#endif
+                  {TS_TYPE_VARCHAR,
+                   TS_TYPE_ARRAY,
+                   TS_TYPE_INTERVAL_DAY_TO_SECOND,
+                   TS_TYPE_INTERVAL_YEAR_TO_MONTH,
+                   TS_TYPE_ROW,
+                   TS_TYPE_TIMESERIES,
+                   TS_TYPE_UNKNOWN}},
     {SQL_TYPE_DATE, {TS_TYPE_DATE}},
     {SQL_TYPE_TIME, {TS_TYPE_TIME}},
-    {SQL_TYPE_TIMESTAMP, {TS_TYPE_TIMESTAMP}}};
+    {SQL_TYPE_TIMESTAMP, {TS_TYPE_TIMESTAMP}}
+};
 
-const std::unordered_map< std::string, int > data_name_data_type_map = {
+const std::unordered_map< std::string, int > data_name_data_type_map_odbc_v2 = {
     {TS_TYPE_NAME_DOUBLE, SQL_DOUBLE},
 #ifdef UNICODE_SUPPORT
     {TS_TYPE_NAME_VARCHAR, SQL_WVARCHAR},
 #else
     {TS_TYPE_NAME_VARCHAR, SQL_VARCHAR},
 #endif
+    {TS_TYPE_NAME_DATE, SQL_DATE},
+    {TS_TYPE_NAME_TIME, SQL_TIME},
+    {TS_TYPE_NAME_TIMESTAMP, SQL_TIMESTAMP},
+    {TS_TYPE_NAME_BIGINT, SQL_BIGINT},
+    {TS_TYPE_NAME_BOOLEAN, SQL_BIT}};
+
+const std::unordered_map< std::string, int > data_name_data_type_map_odbc_v3 = {
+    {TS_TYPE_NAME_DOUBLE, SQL_DOUBLE},
+#ifdef UNICODE_SUPPORT
+    {TS_TYPE_NAME_VARCHAR, SQL_WVARCHAR},
+#else
+    {TS_TYPE_NAME_VARCHAR, SQL_VARCHAR},
+#endif
+    {TS_TYPE_NAME_DATE, SQL_TYPE_DATE},
+    {TS_TYPE_NAME_TIME, SQL_TYPE_TIME},
+    {TS_TYPE_NAME_TIMESTAMP, SQL_TYPE_TIMESTAMP},
     {TS_TYPE_NAME_BIGINT, SQL_BIGINT},
     {TS_TYPE_NAME_BOOLEAN, SQL_BIT}};
 
@@ -435,16 +462,12 @@ std::string ConvertPattern(const std::string &sql_pattern) {
     return regex_pattern;
 }
 
-int GetDataTypeFromTypeName(HSTMT hstmt, std::string type_name) {
-    if (type_name == TS_TYPE_NAME_TIMESTAMP) {
-        if (IsOdbcVer2(hstmt)) {
-            return SQL_TIMESTAMP;
-        }
-
-        return SQL_TYPE_TIMESTAMP;
+int GetDataTypeFromTypeName(HSTMT hstmt, const std::string type_name) {
+    if (IsOdbcVer2(hstmt)) {
+        return data_name_data_type_map_odbc_v2.find(type_name)->second;
     }
 
-    return data_name_data_type_map.find(type_name)->second;
+    return data_name_data_type_map_odbc_v3.find(type_name)->second;
 }
 
 void CleanUp(StatementClass *stmt, StatementClass *sub_stmt,
@@ -1246,11 +1269,11 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                         : 0;
                 // CHAR_OCTET_LENGTH should be the same as BUFFER_LENGTH for varchar
                 tuple[COLUMNS_CHAR_OCTET_LENGTH].value =
-                    (type_name_return == "varchar")
+                    (type_name_return == TS_TYPE_NAME_VARCHAR)
                         ? strdup(buf_len.c_str())
                         : NULL;
                 tuple[COLUMNS_CHAR_OCTET_LENGTH].len =
-                    (type_name_return == "varchar")
+                    (type_name_return == TS_TYPE_NAME_VARCHAR)
                         ? (int)buf_len.size()
                         : 0;
                 std::string col_number = std::to_string(col_num);
@@ -1408,30 +1431,24 @@ RETCODE SQL_API API_GetTypeInfo(HSTMT hstmt, SQLSMALLINT fSqlType) {
     QR_set_num_fields(res, result_cols);
     SetupTypeQResInfo(res);
 
-    const std::map< int, int > *date_time_map;
+    const std::map< int, std::vector< int > > *data_type_map;
     if (EN_is_odbc2(env)) {
-        date_time_map = &sql_to_ts_date_time_type_map_ODBC_v2;
+        data_type_map = &sql_to_ts_type_map_odbc_v2;
     } else {
-        date_time_map = &sql_to_ts_date_time_type_map_ODBC_v3;
+        data_type_map = &sql_to_ts_type_map_odbc_v3;
     }
 
     if (fSqlType == SQL_ALL_TYPES) {
-        for (auto sqlType : sql_to_ts_type_map) {
+        for (auto sqlType : *(data_type_map)) {
             for (auto type : sqlType.second) {
                 result = SetTypeResult(conn, stmt, res, type, sqlType.first);
             }
         }
-        for (auto sqlType : *date_time_map) {
-            result = SetTypeResult(conn, stmt, res, sqlType.second, sqlType.first);
-        }
     } else {
-        if (sql_to_ts_type_map.find(fSqlType) != sql_to_ts_type_map.end()) {
-            for (auto type : sql_to_ts_type_map.at(fSqlType)) {
+        if ((*data_type_map).find(fSqlType) != (*data_type_map).end()) {
+            for (auto type : (*data_type_map).at(fSqlType)) {
                 result = SetTypeResult(conn, stmt, res, type, fSqlType);
             }
-        } else if ((*date_time_map).find(fSqlType) != (*date_time_map).end()) {
-            auto type = (*date_time_map).at(fSqlType);
-            result = SetTypeResult(conn, stmt, res, type, fSqlType);
         }
     }
 
