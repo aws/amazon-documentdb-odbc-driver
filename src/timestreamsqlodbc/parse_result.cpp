@@ -184,19 +184,6 @@ BOOL CC_Append_Table_Data(
                : FALSE;
 }
 
-void print_log(const LogLevel &level, const std::string &s) {
-#if WIN32
-#pragma warning(push)
-#pragma warning(disable : 4551)
-#endif  // WIN32
-        // cppcheck outputs an erroneous missing argument error which breaks
-        // build. Disable for this function call
-    MYLOG(level, "%s", s.c_str());
-#if WIN32
-#pragma warning(pop)
-#endif  // WIN32
-}
-
 bool _CC_from_TSResult(
     QResultClass *q_res, ConnectionClass *conn, StatementClass *stmt,
     const char *next_token,
