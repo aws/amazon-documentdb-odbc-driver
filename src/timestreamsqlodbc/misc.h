@@ -71,6 +71,8 @@ ssize_t my_strcpy(char *dst, ssize_t dst_len, const char *src, ssize_t src_len);
 
 #define ITOA_FIXED(to, from) snprintf((to), sizeof(to), "%d", from)
 
+int IsOdbcVer2(void *stmt);
+
 #ifdef __cplusplus
 }
 #endif
