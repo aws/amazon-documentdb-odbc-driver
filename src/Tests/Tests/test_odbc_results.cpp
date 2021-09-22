@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #endif
+#include "info.h"
 #include "pch.h"
 #include "unit_test_helper.h"
 #include "it_odbc_helper.h"
@@ -3569,7 +3570,7 @@ TEST_F(TestSQLDescribeCol, VARCHAR_COLUMN) {
     std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -3602,7 +3603,7 @@ TEST_F(TestSQLDescribeCol, TIMESERIES_COLUMN) {
     std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -3625,7 +3626,7 @@ TEST_F(TestSQLDescribeCol, ARRAY_COLUMN) {
     std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -3647,7 +3648,7 @@ TEST_F(TestSQLDescribeCol, ROW_COLUMN) {
     std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -3669,7 +3670,7 @@ TEST_F(TestSQLDescribeCol, NULL_COLUMN) {
     std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -3760,7 +3761,7 @@ TEST_F(TestSQLDescribeCol, INTERVAL_YEAR_TO_MONTH_COLUMN) {
     std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -3782,7 +3783,7 @@ TEST_F(TestSQLDescribeCol, INTERVAL_DAY_TO_SECOND_COLUMN) {
     std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
-    EXPECT_EQ((SQLULEN)INT_MAX, column_size);
+    EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
     EXPECT_EQ(0, decimal_digits);
     EXPECT_EQ(SQL_NULLABLE, nullable);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);

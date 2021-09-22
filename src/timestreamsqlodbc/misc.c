@@ -17,6 +17,9 @@
 // clang-format off
 #include "odbc.h" //must come before misc.h
 #include "misc.h"
+#include "connection.h"
+#include "environ.h"
+#include "statement.h"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -238,3 +241,10 @@ size_t strlcat(char *dst, const char *src, size_t size) {
     return ttllen;
 }
 #endif /* HAVE_STRLCAT */
+
+int IsOdbcVer2(void *stmt) {
+    ConnectionClass *conn = SC_get_conn((StatementClass *)stmt);
+    EnvironmentClass *env = (EnvironmentClass *)CC_get_env(conn);
+
+    return EN_is_odbc2(env);
+}
