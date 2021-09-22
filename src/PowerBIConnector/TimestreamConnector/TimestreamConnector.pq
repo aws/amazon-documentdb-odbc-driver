@@ -97,13 +97,33 @@ TimestreamConnectorImpl = (Region as text, optional ProfileName as text) as tabl
             in
                 Value.ReplaceType(toTable, Value.Type(types)),
 
+        AstVisitor = [
+            Constant =
+                let
+                    Quote = each Text.Format("'#{0}'", { _ }),
+                    Cast = (value, typeName) => [
+                        Text = Text.Format("CAST(#{0} as #{1})", { value, typeName })
+                    ],
+                    Visitor = [
+                        timestamp = each Cast(Quote(DateTime.ToText(_, "yyyy-MM-dd HH:mm:ss.fffffff")), "timestamp")
+                    ]
+                in
+                    (typeInfo, ast) => Record.FieldOrDefault(Visitor, typeInfo[TYPE_NAME], each null)(ast[Value])
+        ],
+        
         ConnectionOptions = [
+            // View the tables grouped by their schema names.
+            HierarchicalNavigation = true,
+            
             // Handlers for ODBC driver capabilities.
             SqlCapabilities = SqlCapabilities,
             SQLColumns = SQLColumns,
             SQLGetInfo = SQLGetInfo,
             SQLGetFunctions = SQLGetFunctions,
             SQLGetTypeInfo = SQLGetTypeInfo,
+
+            // For modifying generated SQL.
+            AstVisitor = AstVisitor,
             
             // Handles ODBC Errors.
             OnError = OnOdbcError,
@@ -161,6 +181,7 @@ TimestreamConnector = [
 TimestreamConnector.Publish = [
     Beta = true,
     Category = "Other",
+    SupportsDirectQuery = true,
 
     ButtonText = { Extension.LoadString("ButtonTitle"), Extension.LoadString("ButtonHelp") },
     LearnMoreUrl = "https://aws.amazon.com/timestream/",
