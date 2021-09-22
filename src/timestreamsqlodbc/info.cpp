@@ -26,7 +26,7 @@
 #include <unordered_map>
 #include <set>
 
-#if !defined(__clang__) && defined(GNUC)
+#if !defined(__clang__) && defined(__GNUC__)
 #include <features.h>
 #if __GNUC_PREREQ(4, 9)  // If  gcc_version >= 4.9
 #include <regex>
@@ -963,6 +963,19 @@ API_Tables(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
     return SQL_ERROR;
 }
 
+void print_info_log(const LogLevel &level, const std::string &s) {
+#if WIN32
+#pragma warning(push)
+#pragma warning(disable : 4551)
+#endif  // WIN32
+        // cppcheck outputs an erroneous missing argument error which breaks
+        // build. Disable for this function call
+    MYLOG(level, "%s", s.c_str());
+#if WIN32
+#pragma warning(pop)
+#endif  // WIN32
+}
+
 RETCODE SQL_API
 API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
               const SQLSMALLINT catalog_name_sz, const SQLCHAR *schema_name_sql,
@@ -1028,11 +1041,12 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                 database_name.assign(reinterpret_cast< const char * >(database),
                                      static_cast< size_t >(db_strlen_or_ind));
             }
-            
             std::string catalog_name_sql_str;
             if (catalog_name_sz == SQL_NTS) {
                 catalog_name_sql_str.assign(
                     reinterpret_cast< const char * >(catalog_name_sql));
+            } else if (catalog_name_sql == nullptr) {
+                catalog_name_sql_str.assign(database_name);
             } else if (catalog_name_sz <= 0) {
                 catalog_name_sql_str = "";
             } else {
@@ -1096,9 +1110,19 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
 
                 // Filter through search pattern
                 std::string regex_pattern = ConvertPattern(column_name);
+                print_info_log(
+                    LOG_DEBUG,
+                    std::string("Column name regex pattern: " + regex_pattern));
+                print_info_log(LOG_DEBUG, std::string("Column name to filter: "
+                                                      + column_name_return));
                 if (is_search_pattern
                     && !regex_match(column_name_return,
                                     GET_PATTERN(regex_pattern))) {
+                    print_info_log(
+                        LOG_DEBUG,
+                        std::string("No match for column name:"
+                                    + column_name_return
+                                    + " and pattern: " + regex_pattern));
                     continue;
                 } else if (!is_search_pattern
                            && (column_name.size() < column_name_return.size()
@@ -1106,6 +1130,10 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                                               column_name_return.end(),
                                               column_name.begin(),
                                               case_insensitive_compare))) {
+                    print_info_log(
+                        LOG_DEBUG,
+                        std::string(
+                            "Identifier argument, not a pattern value."));
                     continue;
                 }
 
