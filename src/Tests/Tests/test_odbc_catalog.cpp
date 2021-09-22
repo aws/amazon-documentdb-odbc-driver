@@ -697,7 +697,86 @@ void PopulateSQLColumnsBinds(std::vector< bind_info > &binds) {
  * <Database>.<Table> in Amazon Timestream
  * ODBCTest.DevOps
  * ODBCTest.IoT
+ * sampleDB.DevOps
+ * sampleDB.IoT
  */
+
+TEST_F(TestSQLColumns, ISQL_WORKFLOW) {
+    SQLRETURN ret = SQL_SUCCESS;
+    ret = SQLColumns(m_hstmt, nullptr, 0,
+                     nullptr, 0, (SQLTCHAR *)CREATE_STRING("DevOps"), SQL_NTS, nullptr, 0);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSMALLINT column_count = 0;
+    ret = SQLNumResultCols(m_hstmt, &column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    EXPECT_EQ(18, (int)column_count);
+    std::vector< bind_info > binds;
+    PopulateSQLColumnsBinds(binds);
+    for (auto &it : binds) {
+        ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
+                         it.buffer_len, &it.out_len);
+        EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    }
+    std::vector< std::vector< std::string > > result;
+    while ((ret = SQLFetch(m_hstmt)) == SQL_SUCCESS) {
+        std::vector< std::string > row;
+        for (int i = 0; i < (int)column_count; i++) {
+            row.push_back(binds[i].AsString());
+        }
+        result.push_back(row);
+    }
+    std::vector< std::vector< std::string > > expected{
+        {"ODBCTest", "", "DevOps", "hostname", std::to_string(SQL_VARCHAR),
+         "varchar", std::to_string(INT_MAX), "256", "", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(INT_MAX), "1", "YES"},
+        {"ODBCTest", "", "DevOps", "az", std::to_string(SQL_VARCHAR), "varchar",
+         std::to_string(INT_MAX), "256", "", "", std::to_string(SQL_NULLABLE),
+         "", "", std::to_string(SQL_VARCHAR), "", std::to_string(INT_MAX), "2",
+         "YES"},
+        {"ODBCTest", "", "DevOps", "region", std::to_string(SQL_VARCHAR),
+         "varchar", std::to_string(INT_MAX), "256", "", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(INT_MAX), "3", "YES"},
+        {"ODBCTest", "", "DevOps", "measure_value::double",
+         std::to_string(SQL_DOUBLE), "double", "15",
+         std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
+         "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
+        {"ODBCTest", "", "DevOps", "measure_name", std::to_string(SQL_VARCHAR),
+         "varchar", std::to_string(INT_MAX), "256", "", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(INT_MAX), "5", "YES"},
+        {"ODBCTest", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
+         "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
+         std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"},
+
+        {"sampleDB", "", "DevOps", "hostname", std::to_string(SQL_VARCHAR),
+         "varchar", std::to_string(INT_MAX), "256", "", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(INT_MAX), "1", "YES"},
+        {"sampleDB", "", "DevOps", "az", std::to_string(SQL_VARCHAR), "varchar",
+         std::to_string(INT_MAX), "256", "", "", std::to_string(SQL_NULLABLE),
+         "", "", std::to_string(SQL_VARCHAR), "", std::to_string(INT_MAX), "2",
+         "YES"},
+        {"sampleDB", "", "DevOps", "region", std::to_string(SQL_VARCHAR),
+         "varchar", std::to_string(INT_MAX), "256", "", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(INT_MAX), "3", "YES"},
+        {"sampleDB", "", "DevOps", "measure_value::double",
+         std::to_string(SQL_DOUBLE), "double", "15",
+         std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
+         "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
+        {"sampleDB", "", "DevOps", "measure_name", std::to_string(SQL_VARCHAR),
+         "varchar", std::to_string(INT_MAX), "256", "", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_VARCHAR), "",
+         std::to_string(INT_MAX), "5", "YES"},
+        {"sampleDB", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
+         "timestamp", "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
+         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
+         std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"}};
+    CheckSQLColumnsRows(expected, result);
+}
 
 TEST_F(TestSQLColumns, EXACT_MATCH_ONE_COLUMN) {
     SQLRETURN ret = SQL_SUCCESS;
