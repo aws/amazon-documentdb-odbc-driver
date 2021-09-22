@@ -97,35 +97,72 @@ auto case_insensitive_compare = [](char &c1, char &c2) {
     return std::toupper(c1) == std::toupper(c2);
 };
 
-const std::map< int, std::set< int > > sql_to_ts_type_map = {
+const std::map< int, std::vector< int > > sql_to_ts_type_map_odbc_v2 = {
     {SQL_BIT, {TS_TYPE_BOOLEAN}},
     {SQL_INTEGER, {TS_TYPE_INTEGER}},
     {SQL_BIGINT, {TS_TYPE_BIGINT}},
     {SQL_DOUBLE, {TS_TYPE_DOUBLE}},
 #ifdef UNICODE_SUPPORT
-    {SQL_WVARCHAR, {TS_TYPE_ARRAY,
-                   TS_TYPE_INTERVAL_DAY_TO_SECOND,
-                   TS_TYPE_INTERVAL_YEAR_TO_MONTH,
-                   TS_TYPE_ROW,
-                   TS_TYPE_TIMESERIES,
-                   TS_TYPE_VARCHAR,
-                   TS_TYPE_UNKNOWN}},
+    {SQL_WVARCHAR,
 #else
-    {SQL_VARCHAR, {TS_TYPE_ARRAY,
+    {SQL_VARCHAR,
+#endif
+                  {TS_TYPE_VARCHAR,
+                   TS_TYPE_ARRAY,
                    TS_TYPE_INTERVAL_DAY_TO_SECOND,
                    TS_TYPE_INTERVAL_YEAR_TO_MONTH,
                    TS_TYPE_ROW,
                    TS_TYPE_TIMESERIES,
-                   TS_TYPE_VARCHAR,
                    TS_TYPE_UNKNOWN}},
-#endif
     {SQL_DATE, {TS_TYPE_DATE}},
     {SQL_TIME, {TS_TYPE_TIME}},
-    {SQL_TIMESTAMP, {TS_TYPE_TIMESTAMP}}};
+    {SQL_TIMESTAMP, {TS_TYPE_TIMESTAMP}}
+};
 
-const std::unordered_map< std::string, int > data_name_data_type_map = {
+const std::map< int, std::vector< int > > sql_to_ts_type_map_odbc_v3 = {
+    {SQL_BIT, {TS_TYPE_BOOLEAN}},
+    {SQL_INTEGER, {TS_TYPE_INTEGER}},
+    {SQL_BIGINT, {TS_TYPE_BIGINT}},
+    {SQL_DOUBLE, {TS_TYPE_DOUBLE}},
+#ifdef UNICODE_SUPPORT
+    {SQL_WVARCHAR,
+#else
+    {SQL_VARCHAR,
+#endif
+                  {TS_TYPE_VARCHAR,
+                   TS_TYPE_ARRAY,
+                   TS_TYPE_INTERVAL_DAY_TO_SECOND,
+                   TS_TYPE_INTERVAL_YEAR_TO_MONTH,
+                   TS_TYPE_ROW,
+                   TS_TYPE_TIMESERIES,
+                   TS_TYPE_UNKNOWN}},
+    {SQL_TYPE_DATE, {TS_TYPE_DATE}},
+    {SQL_TYPE_TIME, {TS_TYPE_TIME}},
+    {SQL_TYPE_TIMESTAMP, {TS_TYPE_TIMESTAMP}}
+};
+
+const std::unordered_map< std::string, int > data_name_data_type_map_odbc_v2 = {
     {TS_TYPE_NAME_DOUBLE, SQL_DOUBLE},
+#ifdef UNICODE_SUPPORT
+    {TS_TYPE_NAME_VARCHAR, SQL_WVARCHAR},
+#else
     {TS_TYPE_NAME_VARCHAR, SQL_VARCHAR},
+#endif
+    {TS_TYPE_NAME_DATE, SQL_DATE},
+    {TS_TYPE_NAME_TIME, SQL_TIME},
+    {TS_TYPE_NAME_TIMESTAMP, SQL_TIMESTAMP},
+    {TS_TYPE_NAME_BIGINT, SQL_BIGINT},
+    {TS_TYPE_NAME_BOOLEAN, SQL_BIT}};
+
+const std::unordered_map< std::string, int > data_name_data_type_map_odbc_v3 = {
+    {TS_TYPE_NAME_DOUBLE, SQL_DOUBLE},
+#ifdef UNICODE_SUPPORT
+    {TS_TYPE_NAME_VARCHAR, SQL_WVARCHAR},
+#else
+    {TS_TYPE_NAME_VARCHAR, SQL_VARCHAR},
+#endif
+    {TS_TYPE_NAME_DATE, SQL_TYPE_DATE},
+    {TS_TYPE_NAME_TIME, SQL_TYPE_TIME},
     {TS_TYPE_NAME_TIMESTAMP, SQL_TYPE_TIMESTAMP},
     {TS_TYPE_NAME_BIGINT, SQL_BIGINT},
     {TS_TYPE_NAME_BOOLEAN, SQL_BIT}};
@@ -425,6 +462,14 @@ std::string ConvertPattern(const std::string &sql_pattern) {
     return regex_pattern;
 }
 
+int GetDataTypeFromTypeName(HSTMT hstmt, const std::string type_name) {
+    if (IsOdbcVer2(hstmt)) {
+        return data_name_data_type_map_odbc_v2.find(type_name)->second;
+    }
+
+    return data_name_data_type_map_odbc_v3.find(type_name)->second;
+}
+
 void CleanUp(StatementClass *stmt, StatementClass *sub_stmt,
              const RETCODE ret = SQL_ERROR) {
     stmt->status = STMT_FINISHED;
@@ -525,8 +570,9 @@ void SetTableTuples(QResultClass *res, const TableResultSet res_type,
             // Add tuples for SQLColumns
             if (binds.size() > COLUMNS_SQL_DATA_TYPE) {
                 // Add data type for data loading issue in Power BI Desktop
-                auto data_type = data_name_data_type_map
-                        .find(bind_tbl[COLUMNS_TYPE_NAME]->AsString())->second;
+                int data_type = GetDataTypeFromTypeName(
+                    stmt, bind_tbl[COLUMNS_TYPE_NAME]->AsString());
+                
                 if (i == COLUMNS_DATA_TYPE) {
                     set_tuplefield_int2(&tuple[COLUMNS_DATA_TYPE],
                                         static_cast< short >(data_type));
@@ -685,12 +731,14 @@ void GenerateColumnQuery(std::string &query, const std::string &table_name,
         query += " COLUMNS LIKE " + column_name;
 }
 
-int GetColumnSize(const std::string &type_name) {
-    switch (data_name_data_type_map.find(type_name)->second) {
+int GetColumnSize(int sql_type) {
+    switch (sql_type) {
         case SQL_VARCHAR:
-            return INT_MAX;
+        case SQL_WVARCHAR:
+            return VARCHAR_COLUMN_SIZE;
         case SQL_DOUBLE:
             return 15;
+        case SQL_TIMESTAMP:
         case SQL_TYPE_TIMESTAMP:
             return 29;
         case SQL_BIGINT:
@@ -702,12 +750,22 @@ int GetColumnSize(const std::string &type_name) {
     }
 }
 
-int GetBufferLength(const std::string &type_name) {
-    switch (data_name_data_type_map.find(type_name)->second) {
+int GetBufferLength(int sql_type) {
+    switch (sql_type) {
         case SQL_VARCHAR:
-            return 256;
+            // 1 byte per character.
+            return VARCHAR_COLUMN_SIZE;
+        case SQL_WVARCHAR:
+#ifdef __APPLE__
+            // Mac has 4 bytes per wide character.
+            return 4 * VARCHAR_COLUMN_SIZE;
+#else
+            // 2 bytes per wide character.
+            return 2 * VARCHAR_COLUMN_SIZE;
+#endif  // __APPLE__
         case SQL_DOUBLE:
             return sizeof(SQLDOUBLE);
+        case SQL_TIMESTAMP:
         case SQL_TYPE_TIMESTAMP:
             return sizeof(TIMESTAMP_STRUCT);
         case SQL_BIGINT:
@@ -1147,6 +1205,9 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                         reinterpret_cast< const char * >(type),
                         static_cast< size_t >(type_strlen_or_ind));
                 }
+
+                int sql_type = GetDataTypeFromTypeName(stmt, type_name_return);
+
                 TupleField *tuple = QR_AddNew(res);
                 tuple[COLUMNS_CATALOG_NAME].value = strdup(table.first.c_str());
                 tuple[COLUMNS_CATALOG_NAME].len = (int)table.first.size();
@@ -1157,31 +1218,29 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                 tuple[COLUMNS_COLUMN_NAME].value =
                     strdup(column_name_return.c_str());
                 tuple[COLUMNS_COLUMN_NAME].len = (int)column_name_return.size();
-                std::string col_data_type = std::to_string(
-                    data_name_data_type_map.find(type_name_return)->second);
+                std::string col_data_type = std::to_string(sql_type);
                 tuple[COLUMNS_DATA_TYPE].value = strdup(col_data_type.c_str());
                 tuple[COLUMNS_DATA_TYPE].len = (int)col_data_type.size();
                 tuple[COLUMNS_TYPE_NAME].value =
                     strdup(type_name_return.c_str());
                 tuple[COLUMNS_TYPE_NAME].len = (int)type_name_return.size();
-                std::string col_size =
-                    std::to_string(GetColumnSize(type_name_return));
+                std::string col_size = std::to_string(GetColumnSize(sql_type));
                 tuple[COLUMNS_PRECISION].value = strdup(col_size.c_str());
                 tuple[COLUMNS_PRECISION].len = (int)col_size.size();
-                std::string buf_len =
-                    std::to_string(GetBufferLength(type_name_return));
+                std::string buf_len = std::to_string(GetBufferLength(sql_type));
                 tuple[COLUMNS_LENGTH].value = strdup(buf_len.c_str());
                 tuple[COLUMNS_LENGTH].len = (int)buf_len.size();
                 std::string decimal_digits = std::to_string(9);
                 tuple[COLUMNS_SCALE].value =
-                    (type_name_return == "timestamp")
+                    (type_name_return == TS_TYPE_NAME_TIMESTAMP)
                         ? strdup(decimal_digits.c_str())
                         : NULL;
-                tuple[COLUMNS_SCALE].len = (type_name_return == "timestamp")
+                tuple[COLUMNS_SCALE].len = (type_name_return == TS_TYPE_NAME_TIMESTAMP)
                                                ? (int)decimal_digits.size()
                                                : 0;
-                if (type_name_return == "double" || type_name_return == "int"
-                    || type_name_return == "bigint") {
+                if (type_name_return == TS_TYPE_NAME_DOUBLE ||
+                    type_name_return == TS_TYPE_NAME_INTEGER ||
+                    type_name_return == TS_TYPE_NAME_BIGINT) {
                     set_nullfield_int2(&tuple[COLUMNS_RADIX], 10);
                 } else {
                     set_nullfield_int2(&tuple[COLUMNS_RADIX], -1);
@@ -1194,7 +1253,7 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                 tuple[COLUMNS_COLUMN_DEF].value = NULL;
                 tuple[COLUMNS_COLUMN_DEF].len = 0;
                 std::string sql_data_type =
-                    (col_data_type == std::to_string(SQL_TYPE_TIMESTAMP))
+                    (type_name_return == TS_TYPE_NAME_TIMESTAMP)
                         ? std::to_string(SQL_DATETIME)
                         : col_data_type;
                 tuple[COLUMNS_SQL_DATA_TYPE].value =
@@ -1209,14 +1268,14 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                     (col_data_type == std::to_string(SQL_TYPE_TIMESTAMP))
                         ? (int)datetime_sub.size()
                         : 0;
-                std::string col_char_octet_len = std::to_string(INT_MAX);
+                // CHAR_OCTET_LENGTH should be the same as BUFFER_LENGTH for varchar
                 tuple[COLUMNS_CHAR_OCTET_LENGTH].value =
-                    (type_name_return == "varchar")
-                        ? strdup(col_char_octet_len.c_str())
+                    (type_name_return == TS_TYPE_NAME_VARCHAR)
+                        ? strdup(buf_len.c_str())
                         : NULL;
                 tuple[COLUMNS_CHAR_OCTET_LENGTH].len =
-                    (type_name_return == "varchar")
-                        ? (int)col_char_octet_len.size()
+                    (type_name_return == TS_TYPE_NAME_VARCHAR)
+                        ? (int)buf_len.size()
                         : 0;
                 std::string col_number = std::to_string(col_num);
                 tuple[COLUMNS_ORDINAL_POSITION].value =
@@ -1347,7 +1406,9 @@ RETCODE SQL_API API_GetTypeInfo(HSTMT hstmt, SQLSMALLINT fSqlType) {
     CSTR func = "API_GetTypeInfo";
     StatementClass *stmt = (StatementClass *)hstmt;
     ConnectionClass *conn;
+    EnvironmentClass *env;
     conn = SC_get_conn(stmt);
+    env = (EnvironmentClass *)CC_get_env(conn);
     QResultClass *res = NULL;
 
     int result_cols;
@@ -1371,15 +1432,22 @@ RETCODE SQL_API API_GetTypeInfo(HSTMT hstmt, SQLSMALLINT fSqlType) {
     QR_set_num_fields(res, result_cols);
     SetupTypeQResInfo(res);
 
+    const std::map< int, std::vector< int > > *data_type_map;
+    if (EN_is_odbc2(env)) {
+        data_type_map = &sql_to_ts_type_map_odbc_v2;
+    } else {
+        data_type_map = &sql_to_ts_type_map_odbc_v3;
+    }
+
     if (fSqlType == SQL_ALL_TYPES) {
-        for (auto sqlType : sql_to_ts_type_map) {
+        for (auto sqlType : *(data_type_map)) {
             for (auto type : sqlType.second) {
                 result = SetTypeResult(conn, stmt, res, type, sqlType.first);
             }
         }
     } else {
-        if (sql_to_ts_type_map.find(fSqlType) != sql_to_ts_type_map.end()) {
-            for (auto type : sql_to_ts_type_map.at(fSqlType)) {
+        if ((*data_type_map).find(fSqlType) != (*data_type_map).end()) {
+            for (auto type : (*data_type_map).at(fSqlType)) {
                 result = SetTypeResult(conn, stmt, res, type, fSqlType);
             }
         }
