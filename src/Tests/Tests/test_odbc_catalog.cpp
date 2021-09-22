@@ -759,6 +759,9 @@ TEST_F(TestSQLColumns, ISQL_WORKFLOW) {
         }
         result.push_back(row);
     }
+
+    std::string timestamp_type = std::to_string(GetTimestampType(m_hstmt));
+
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "hostname", varchar_type, TS_TYPE_NAME_VARCHAR,
          std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
@@ -780,7 +783,7 @@ TEST_F(TestSQLColumns, ISQL_WORKFLOW) {
          std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
          std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          varchar_buffer_len, "5", "YES"},
-        {"ODBCTest", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
+        {"ODBCTest", "", "DevOps", "time", timestamp_type,
          TS_TYPE_NAME_TIMESTAMP, "29", std::to_string(sizeof(TIMESTAMP_STRUCT)),
          "9", "", std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
          std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"},
@@ -804,7 +807,7 @@ TEST_F(TestSQLColumns, ISQL_WORKFLOW) {
          std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
          std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
          varchar_buffer_len, "5", "YES"},
-        {"sampleDB", "", "DevOps", "time", std::to_string(SQL_TYPE_TIMESTAMP),
+        {"sampleDB", "", "DevOps", "time", timestamp_type,
          TS_TYPE_NAME_TIMESTAMP, "29", std::to_string(sizeof(TIMESTAMP_STRUCT)),
          "9", "", std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
          std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"}};
