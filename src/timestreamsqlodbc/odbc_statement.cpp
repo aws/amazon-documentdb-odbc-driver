@@ -25,19 +25,6 @@
 
 extern "C" void *common_cs;
 
-void print_tslog(const std::string &s) {
-#if WIN32
-#pragma warning(push)
-#pragma warning(disable : 4551)
-#endif  // WIN32
-        // cppcheck outputs an erroneous missing argument error which breaks
-        // build. Disable for this function call
-    MYLOG(LOG_DEBUG, "%s", s.c_str());
-#if WIN32
-#pragma warning(pop)
-#endif  // WIN32
-}
-
 RETCODE ExecuteStatement(StatementClass *stmt) {
     CSTR func = "ExecuteStatement";
     int func_cs_count = 0;
