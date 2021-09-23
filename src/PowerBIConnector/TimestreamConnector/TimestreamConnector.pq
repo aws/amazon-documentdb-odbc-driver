@@ -55,30 +55,28 @@ TimestreamConnectorImpl = (
             if AuthenticationMode = "UsernamePassword" then
                 [
                     UID = Credential[Username],
-                    PWD = Credential[Password],
-                    Region = Region
+                    PWD = Credential[Password]
                 ]
-            else
-                [
-                    Region = Region
-                ],
+            else [],
 
-        SessionTokenString =
+        SessionTokenParameter =
             if Token <> null then 
                 [
                     SessionToken = Token
                 ]
-            else EmptyString,
+            else [],
+
+        ProfileNameParameter = 
+            if ProfileName <> null then 
+               [ ProfileName = ProfileName ]
+            else [],
 
         BaseConnectionString = [
-            Driver = "Amazon Timestream ODBC Driver"
-        ] & AuthenticationString & SessionTokenString,
+            Driver = "Amazon Timestream ODBC Driver",
+            Region = Region
+        ],
 
-        ConnectionString = 
-            if ProfileName <> null then 
-                BaseConnectionString & [ ProfileName = ProfileName ]
-            else
-                BaseConnectionString,
+        ConnectionString = BaseConnectionString & AuthenticationString & SessionTokenParameter & ProfileNameParameter,
 
         SqlCapabilities = Diagnostics.LogValue("SqlCapabilities_Options", [
             SupportsTop = false,
