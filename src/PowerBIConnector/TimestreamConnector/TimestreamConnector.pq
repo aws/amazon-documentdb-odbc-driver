@@ -38,7 +38,6 @@ TimestreamConnectorImpl = (
     let
         Credential = Extension.CurrentCredential(),
         AuthenticationMode = Credential[AuthenticationKind],
-        EmptyString = "",
 
         // Sets connection string properties for encrypted connections.
         EncryptedConnectionString =
