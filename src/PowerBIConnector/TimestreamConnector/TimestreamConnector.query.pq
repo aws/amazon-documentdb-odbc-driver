@@ -5,7 +5,8 @@ shared TimestreamConnector.UnitTest =
     Region = "us-east-2",
     ProfileName = "default",
     Source = TimestreamConnector.Contents(Region, ProfileName),
-    DevOpsOriginal = Source{[Catalog="PowerBI", Schema="", Item="DevOps"]}[Data],
+    PowerBI_DB = Source{[Name="PowerBI",Kind="Database"]}[Data],
+    DevOpsOriginal = PowerBI_DB{[Name="DevOps", Kind="Table"]}[Data],
     
     // Renaming column because the ":" character can be problematic.
     DevOps = Table.RenameColumns(DevOpsOriginal, {"measure_value::double", "measure_value"}),
@@ -36,8 +37,8 @@ shared TimestreamConnector.UnitTest =
     facts =
     {
         // Basic
-        Fact("Source has 7 columns",
-             7,
+        Fact("Source has 4 columns",
+             4,
              Table.ColumnCount(Source)
         ),
         Fact("DevOps table has data",
