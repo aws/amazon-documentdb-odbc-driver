@@ -54,7 +54,8 @@ TimestreamConnectorImpl = (
             if AuthenticationMode = "UsernamePassword" then
                 [
                     UID = Credential[Username],
-                    PWD = Credential[Password]
+                    PWD = Credential[Password],
+                    Auth = "IAM"
                 ]
             else [],
 
