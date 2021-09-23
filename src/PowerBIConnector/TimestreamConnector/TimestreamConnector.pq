@@ -11,12 +11,7 @@ shared TimestreamConnector.Contents = Value.ReplaceType(TimestreamConnectorImpl,
 
 // Wrapper function to provide additional UI customization.
 TimestreamConnectorType = type function (
-        AuthenticationMethod as (type text meta [
-            Documentation.FieldCaption = "Authentication Method",
-            Documentation.FieldDescription = "The authentication method to use when connecting to Timestream.",
-            Documentation.AllowedValues = { "AWS IAM Profile", "AWS IAM Credentials" }
-        ]),
-        optional Region as (type text meta [
+        Region as (type text meta [
             Documentation.FieldCaption = "Region",
             Documentation.FieldDescription = "The AWS Region.",
             Documentation.SampleValues = { "us-east-1" }
@@ -36,8 +31,7 @@ TimestreamConnectorType = type function (
     ];
 
 TimestreamConnectorImpl = (
-    AuthenticationMethod as text, 
-    optional Region as text, 
+    Region as text, 
     optional ProfileName as text,
     optional Token as text
     ) as table =>
@@ -61,7 +55,8 @@ TimestreamConnectorImpl = (
             if AuthenticationMode = "UsernamePassword" then
                 [
                     UID = Credential[Username],
-                    PWD = Credential[Password]
+                    PWD = Credential[Password],
+                    Region = Region
                 ]
             else
                 [
