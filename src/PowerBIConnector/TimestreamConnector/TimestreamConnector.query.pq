@@ -7,8 +7,31 @@ shared TimestreamConnector.UnitTest =
     Source = TimestreamConnector.Contents(Region, ProfileName),
     DevOpsOriginal = Source{[Catalog="PowerBI", Schema="", Item="DevOps"]}[Data],
     
-    // Column is renamed because the ":" character can be problematic.
+    // Renaming column because the ":" character can be problematic.
     DevOps = Table.RenameColumns(DevOpsOriginal, {"measure_value::double", "measure_value"}),
+
+    HostNamePivot = "HOST-QLUVR",
+    UpperCaseHostNames = (hostname) => Text.Upper(hostname),
+    LowerCaseSomeHostNames = (hostname) => if hostname < HostNamePivot then hostname else Text.Lower(hostname),
+    
+    // LeftTable has an all upper case hostname column 
+    // while RightTable has upper case hostname for every hostname before the pivot 
+    // and lower case hostname for every hostname after the pivot.
+    // As a result the tables' hostname is overlapping before the pivot and non-overlapping after the pivot.
+    LeftTable = Table.TransformColumns(DevOps, {"hostname", UpperCaseHostNames}),
+    RightTable = Table.TransformColumns(LeftTable, {"hostname", LowerCaseSomeHostNames}),
+
+    AllRowsSatisfyCondition = (table, condition) =>
+        let
+            Filter = Table.SelectRows(table, condition)
+        in
+            Table.RowCount(Filter) = Table.RowCount(table),
+
+    NRowsSatisfyCondition = (table, condition, n) => 
+        let
+            Filter = Table.SelectRows(table, condition)
+        in
+            Table.RowCount(Filter) = n,
 
     facts =
     {
@@ -60,7 +83,95 @@ shared TimestreamConnector.UnitTest =
                 Table.RowCount(Filtered)
         ),
 
-        // Joins: ToDo
+        // Joins
+        Fact("Left Outer Join",
+             true,
+             let
+                ValidRowLeftJoin = (row) =>
+                    if row[hostname] < HostNamePivot then
+                        AllRowsSatisfyCondition(row[Join], each [hostname] = row[hostname])
+                    else Table.IsEmpty(row[Join]),
+                ValidLeftJoin = (table) =>
+                    NRowsSatisfyCondition(table, each [hostname] is null, 0) and
+                    AllRowsSatisfyCondition(table, each ValidRowLeftJoin(_)),
+                Join = Table.NestedJoin(LeftTable, {"hostname"}, RightTable, {"hostname"}, "Join", JoinKind.LeftOuter)
+             in
+                ValidLeftJoin(Join)
+        ),
+        Fact("Right Outer Join",
+             true,
+             let
+                 ValidRowRightJoin = (row) =>
+                    if row[hostname] is null then
+                        AllRowsSatisfyCondition(row[Join], each [hostname] >= HostNamePivot)
+                    else if row[hostname] < HostNamePivot then
+                        AllRowsSatisfyCondition(row[Join], each [hostname] = row[hostname])
+                    else false,
+                ValidRightJoin = (table) =>
+                    NRowsSatisfyCondition(table, each [hostname] is null, 1) and
+                    AllRowsSatisfyCondition(table, each ValidRowRightJoin(_)),
+                Join = Table.NestedJoin(LeftTable, {"hostname"}, RightTable, {"hostname"}, "Join", JoinKind.RightOuter)
+             in
+                ValidRightJoin(Join)
+        ),
+        Fact("Outer Join",
+             true,
+             let
+                ValidRowOuterJoin = (row) =>
+                    if row[hostname] is null then
+                        AllRowsSatisfyCondition(row[Join], each [hostname] >= HostNamePivot)
+                    else if row[hostname] < HostNamePivot then
+                        AllRowsSatisfyCondition(row[Join], each [hostname] = row[hostname])
+                    else Table.RowCount(row[Join]) = 1 and row[Join]{0}[hostname] is null,
+                ValidOuterJoin = (table) =>
+                    NRowsSatisfyCondition(table, each [hostname] is null, 1) and
+                    AllRowsSatisfyCondition(table, each ValidRowOuterJoin(_)),
+                Join = Table.NestedJoin(LeftTable, {"hostname"}, RightTable, {"hostname"}, "Join", JoinKind.FullOuter)
+             in
+                ValidOuterJoin(Join)
+        ),
+        Fact("Inner Join",
+             true,
+             let
+                ValidRowInnerJoin = (row) =>
+                    if row[hostname] < HostNamePivot then
+                        AllRowsSatisfyCondition(row[Join], each [hostname] = row[hostname])
+                    else false,
+                ValidInnerJoin = (table) =>
+                    NRowsSatisfyCondition(table, each [hostname] is null, 0) and
+                    AllRowsSatisfyCondition(table, each ValidRowInnerJoin(_)),
+                Join = Table.NestedJoin(LeftTable, {"hostname"}, RightTable, {"hostname"}, "Join", JoinKind.Inner)
+             in
+                ValidInnerJoin(Join)
+        ),
+        Fact("Left Anti Join",
+             true,
+             let
+                ValidRowLeftAntiJoin = (row) => 
+                    if row[hostname] >= HostNamePivot then 
+                        AllRowsSatisfyCondition(row[Join], each [hostname] is null) 
+                    else false,
+                ValidLeftAntiJoin = (table) =>
+                    NRowsSatisfyCondition(table, each [hostname] is null, 0) and
+                    AllRowsSatisfyCondition(table, each ValidRowLeftAntiJoin(_)),
+                Join = Table.NestedJoin(LeftTable, {"hostname"}, RightTable, {"hostname"}, "Join", JoinKind.LeftAnti)
+             in
+                ValidLeftAntiJoin(Join)
+        ),
+        Fact("Right Anti Join",
+             true,
+             let
+                ValidRowRightAntiJoin = (row) =>
+                    if row[hostname] is null then
+                        AllRowsSatisfyCondition(row[Join], each [hostname] >= HostNamePivot)
+                    else false,
+                ValidRightAntiJoin = (table) =>
+                    Table.RowCount(table) = 1 and table{0}[hostname] is null and
+                    AllRowsSatisfyCondition(table, each ValidRowRightAntiJoin(_)),
+                Join = Table.NestedJoin(LeftTable, {"hostname"}, RightTable, {"hostname"}, "Join", JoinKind.RightAnti)
+             in
+                ValidRightAntiJoin(Join)
+        ),
 
         // Aggregates
         Fact("Count distinct",
