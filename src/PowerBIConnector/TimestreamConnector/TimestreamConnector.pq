@@ -24,7 +24,7 @@ TimestreamConnectorType = type function (
         optional Token as (type text meta [
             Documentation.FieldCaption = "AWS IAM Session Token",
             Documentation.FieldDescription = "The temporary session token required to access a database with multi-factor authentication (MFA) enabled.",
-            Documentation.SampleValues = { "IQoJc0JpZ2luG5VjEMn//////////wEaY+auw95jJmM/paMUM+yVWD2s7uDVP" }
+            Documentation.SampleValues = { "IQoJc0JpZ2luGjEMn//////wEaY+auw95jJmM/paMUM+yVWD2s7uDVP" }
         ])
     )
     as table meta [
@@ -60,15 +60,15 @@ TimestreamConnectorImpl = (
                 ]
             else [],
 
-        SessionTokenParameter = if Token <> null then [ SessionToken = Token ] else [],
         ProfileNameParameter = if ProfileName <> null then [ ProfileName = ProfileName ]  else [],
+        SessionTokenParameter = if Token <> null then [ SessionToken = Token ] else [],
 
         BaseConnectionString = [
             Driver = "Amazon Timestream ODBC Driver",
             Region = Region
         ],
 
-        ConnectionString = BaseConnectionString & AuthenticationString & SessionTokenParameter & ProfileNameParameter,
+        ConnectionString = BaseConnectionString & AuthenticationString & ProfileNameParameter & SessionTokenParameter,
 
         SqlCapabilities = Diagnostics.LogValue("SqlCapabilities_Options", [
             SupportsTop = false,
