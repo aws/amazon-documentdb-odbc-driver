@@ -11,7 +11,12 @@ shared TimestreamConnector.Contents = Value.ReplaceType(TimestreamConnectorImpl,
 
 // Wrapper function to provide additional UI customization.
 TimestreamConnectorType = type function (
-        Region as (type text meta [
+        AuthenticationMethod as (type text meta [
+            Documentation.FieldCaption = "Authentication Method",
+            Documentation.FieldDescription = "The authentication method to use when connecting to Timestream.",
+            Documentation.AllowedValues = { "AWS IAM Profile", "AWS IAM Credentials" }
+        ]),
+        optional Region as (type text meta [
             Documentation.FieldCaption = "Region",
             Documentation.FieldDescription = "The AWS Region.",
             Documentation.SampleValues = { "us-east-1" }
@@ -20,15 +25,26 @@ TimestreamConnectorType = type function (
             Documentation.FieldCaption = "Profile Name",
             Documentation.FieldDescription = "The AWS profile name for Timestream.",
             Documentation.SampleValues = { "default" }
+        ]),
+        optional Token as (type text meta [
+            Documentation.FieldCaption = "AWS IAM Session Token",
+            Documentation.FieldDescription = "The temporary session token required to access a database with multi-factor authentication (MFA) enabled."
         ])
     )
     as table meta [
         Documentation.Name = "Timestream"
     ];
 
-TimestreamConnectorImpl = (Region as text, optional ProfileName as text) as table =>
+TimestreamConnectorImpl = (
+    AuthenticationMethod as text, 
+    optional Region as text, 
+    optional ProfileName as text,
+    optional Token as text
+    ) as table =>
     let
         Credential = Extension.CurrentCredential(),
+        AuthenticationMode = Credential[AuthenticationKind],
+        EmptyString = "",
 
         // Sets connection string properties for encrypted connections.
         EncryptedConnectionString =
@@ -41,10 +57,27 @@ TimestreamConnectorImpl = (Region as text, optional ProfileName as text) as tabl
                     SSL = 0
                 ],
 
+        AuthenticationString = 
+            if AuthenticationMode = "UsernamePassword" then
+                [
+                    UID = Credential[Username],
+                    PWD = Credential[Password]
+                ]
+            else
+                [
+                    Region = Region
+                ],
+
+        SessionTokenString =
+            if Token <> null then 
+                [
+                    SessionToken = Token
+                ]
+            else EmptyString,
+
         BaseConnectionString = [
-            Driver = "Amazon Timestream ODBC Driver",
-            Region = Region
-        ],
+            Driver = "Amazon Timestream ODBC Driver"
+        ] & AuthenticationString & SessionTokenString,
 
         ConnectionString = 
             if ProfileName <> null then 
@@ -164,6 +197,9 @@ TimestreamConnector = [
     Authentication = [
         Implicit = [
             Label = "AWS Profile"
+        ],
+        UsernamePassword = [
+            Label = "AWS IAM Credentials"
         ]
     ],
     
