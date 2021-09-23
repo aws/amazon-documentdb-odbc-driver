@@ -55,32 +55,35 @@ shared TimestreamConnector.UnitTest =
 
         // Filters
         Fact("Operators",
-             1050,
+             true,
              let
                 Filtered = Table.SelectRows(DevOps, each [measure_name] = "cpu_utilization")
              in
-                Table.RowCount(Filtered)
+                Table.RowCount(Filtered) < Table.RowCount(DevOps)
         ),
         Fact("And operation",
-             95,
+             true,
              let
-                Filtered = Table.SelectRows(DevOps, each [measure_name] = "cpu_utilization" and [measure_value] > 90)
+                Filter1 = Table.SelectRows(DevOps, each [measure_name] = "cpu_utilization"),
+                AndFilter = Table.SelectRows(DevOps, each [measure_name] = "cpu_utilization" and [measure_value] > 40)
              in
-                Table.RowCount(Filtered)
+                Table.RowCount(AndFilter) < Table.RowCount(Filter1)
         ),
         Fact("Or operation",
-             1050,
+             true,
              let
-                Filtered = Table.SelectRows(DevOps, each [measure_name] = "cpu_utilization" or [measure_value] > 90)
+                Filter1 = Table.SelectRows(DevOps, each [measure_name] = "cpu_utilization"),
+                Filter2 = Table.SelectRows(DevOps, each [measure_value] > 40),
+                OrFilter = Table.SelectRows(DevOps, each [measure_name] = "cpu_utilization" or [measure_value] > 40)
              in
-                Table.RowCount(Filtered)
+                Table.RowCount(OrFilter) > Table.RowCount(Filter1) and Table.RowCount(OrFilter) > Table.RowCount(Filter2)
         ),
         Fact("LIKE operation",
-             300,
+             true,
              let
                 Filtered = Table.SelectRows(DevOps, each Text.StartsWith([az], "ap-"))
              in
-                Table.RowCount(Filtered)
+                Table.RowCount(Filtered) > 0 and Table.RowCount(Filtered) < Table.RowCount(DevOps)
         ),
 
         // Joins
@@ -177,10 +180,9 @@ shared TimestreamConnector.UnitTest =
         Fact("Count distinct",
              true,
              let
-                CountDistinctRegion = Table.Group(DevOps, {"region"}, {{"CountDistinctRegion", each Table.RowCount(Table.Distinct(_)), type number}}),
-                ThreeHundredDistinctHostname = Table.SelectRows(CountDistinctRegion, each [CountDistinctRegion] = 300)
+                CountDistinctRegion = Table.Group(DevOps, {"region"}, {{"CountDistinctRegion", each Table.RowCount(Table.Distinct(_)), type number}})
              in
-                Table.RowCount(CountDistinctRegion) = 7 and Table.RowCount(CountDistinctRegion) = Table.RowCount(ThreeHundredDistinctHostname)
+                Table.RowCount(CountDistinctRegion) = 7 and AllRowsSatisfyCondition(CountDistinctRegion, each [CountDistinctRegion] = 300)
         ),
         Fact("AVG operation",
              53.8286181,
@@ -192,10 +194,9 @@ shared TimestreamConnector.UnitTest =
         Fact("Count",
              true,
              let
-                CountHostname = Table.Group(DevOps, {"hostname"}, {{"CountHostname", each Table.RowCount(_), type number}}),
-                TwentyCountHostname = Table.SelectRows(CountHostname, each [CountHostname] = 20)
+                CountHostName = Table.Group(DevOps, {"hostname"}, {{"CountHostname", each Table.RowCount(_), type number}})
              in
-                Table.RowCount(CountHostname) = 105 and Table.RowCount(CountHostname) = Table.RowCount(TwentyCountHostname)
+                Table.RowCount(CountHostName) = 105 and AllRowsSatisfyCondition(CountHostName, each [CountHostname] = 20)
         ),
         Fact("GroupBy",
              true,
@@ -240,10 +241,9 @@ shared TimestreamConnector.UnitTest =
              let
                 Replaced = Table.ReplaceValue(DevOps, "us-west-1", "US-WEST-1", Replacer.ReplaceValue, {"region"}),
                 uswest1 = Table.SelectRows(DevOps, each [region] = "us-west-1"),
-                uswest1AfterReplacement = Table.SelectRows(Replaced, each [region] = "us-west-1"),
                 USWEST1AfterReplacement = Table.SelectRows(Replaced, each [region] = "US-WEST-1")
              in
-                Table.IsEmpty(uswest1AfterReplacement) and Table.RowCount(uswest1) = Table.RowCount(USWEST1AfterReplacement)
+                NRowsSatisfyCondition(Replaced, each [region] = "us-west-1", 0) and Table.RowCount(uswest1) = Table.RowCount(USWEST1AfterReplacement)
         ),
         Fact("Change Data Type",
              type text,
