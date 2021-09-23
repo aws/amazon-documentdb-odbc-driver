@@ -23,7 +23,8 @@ TimestreamConnectorType = type function (
         ]),
         optional Token as (type text meta [
             Documentation.FieldCaption = "AWS IAM Session Token",
-            Documentation.FieldDescription = "The temporary session token required to access a database with multi-factor authentication (MFA) enabled."
+            Documentation.FieldDescription = "The temporary session token required to access a database with multi-factor authentication (MFA) enabled.",
+            Documentation.SampleValues = { "IQoJc0JpZ2luG5VjEMn//////////wEaY+auw95jJmM/paMUM+yVWD2s7uDVP" }
         ])
     )
     as table meta [
