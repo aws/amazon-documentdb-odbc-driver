@@ -59,17 +59,8 @@ TimestreamConnectorImpl = (
                 ]
             else [],
 
-        SessionTokenParameter =
-            if Token <> null then 
-                [
-                    SessionToken = Token
-                ]
-            else [],
-
-        ProfileNameParameter = 
-            if ProfileName <> null then 
-               [ ProfileName = ProfileName ]
-            else [],
+        SessionTokenParameter = if Token <> null then [ SessionToken = Token ] else [],
+        ProfileNameParameter = if ProfileName <> null then [ ProfileName = ProfileName ]  else [],
 
         BaseConnectionString = [
             Driver = "Amazon Timestream ODBC Driver",
