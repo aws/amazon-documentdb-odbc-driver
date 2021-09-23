@@ -20,15 +20,25 @@ TimestreamConnectorType = type function (
             Documentation.FieldCaption = "Profile Name",
             Documentation.FieldDescription = "The AWS profile name for Timestream.",
             Documentation.SampleValues = { "default" }
+        ]),
+        optional Token as (type text meta [
+            Documentation.FieldCaption = "AWS IAM Session Token",
+            Documentation.FieldDescription = "The temporary session token required to access a database with multi-factor authentication (MFA) enabled.",
+            Documentation.SampleValues = { "IQoJc0JpZ2luGjEMn//////wEaY+auw95jJmM/paMUM+yVWD2s7uDVP" }
         ])
     )
     as table meta [
         Documentation.Name = "Timestream"
     ];
 
-TimestreamConnectorImpl = (Region as text, optional ProfileName as text) as table =>
+TimestreamConnectorImpl = (
+    Region as text, 
+    optional ProfileName as text,
+    optional Token as text
+    ) as table =>
     let
         Credential = Extension.CurrentCredential(),
+        AuthenticationMode = Credential[AuthenticationKind],
 
         // Sets connection string properties for encrypted connections.
         EncryptedConnectionString =
@@ -41,16 +51,24 @@ TimestreamConnectorImpl = (Region as text, optional ProfileName as text) as tabl
                     SSL = 0
                 ],
 
+        AuthenticationString = 
+            if AuthenticationMode = "UsernamePassword" then
+                [
+                    UID = Credential[Username],
+                    PWD = Credential[Password],
+                    Auth = "IAM"
+                ]
+            else [],
+
+        ProfileNameParameter = if ProfileName <> null then [ ProfileName = ProfileName ]  else [],
+        SessionTokenParameter = if Token <> null then [ SessionToken = Token ] else [],
+
         BaseConnectionString = [
             Driver = "Amazon Timestream ODBC Driver",
             Region = Region
         ],
 
-        ConnectionString = 
-            if ProfileName <> null then 
-                BaseConnectionString & [ ProfileName = ProfileName ]
-            else
-                BaseConnectionString,
+        ConnectionString = BaseConnectionString & AuthenticationString & ProfileNameParameter & SessionTokenParameter,
 
         SqlCapabilities = Diagnostics.LogValue("SqlCapabilities_Options", [
             SupportsTop = false,
@@ -164,6 +182,9 @@ TimestreamConnector = [
     Authentication = [
         Implicit = [
             Label = "AWS Profile"
+        ],
+        UsernamePassword = [
+            Label = "AWS IAM Credentials"
         ]
     ],
     
