@@ -252,6 +252,15 @@ shared TimestreamConnector.UnitTest =
              in
                 Value.Type(ChangedType{0}[measure_value])
         ),
+        Fact("Remove Duplicates",
+             true,
+             let
+                RemovedDuplicateHostName = Table.Distinct(DevOps, {"hostname"}),
+                IsHostNameUnique = (row) => NRowsSatisfyCondition(RemovedDuplicateHostName, each [hostname] = row[hostname], 1),
+                AllDistinctHostNames = (table) => AllRowsSatisfyCondition(table, each IsHostNameUnique(_))
+             in
+                AllDistinctHostNames(RemovedDuplicateHostName)
+        ),
         
         // Functions
         Fact("Earliest time",
