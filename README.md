@@ -79,7 +79,7 @@ You may also want to install [isql32](./tools/isql32) for testing. In the direct
 * Type `quit` to exit interactive mode.
 
 What needs to be installed to run?
-1. Run `sudo rpm -i AmazonTimestreamODBC_[version]_i386.rpm` to install the Amazon Timestream ODBC Driver.
+1. Run `sudo rpm -U AmazonTimestreamODBC_[version]_i386.rpm` to install the Amazon Timestream ODBC Driver.
 2. [Configure the Driver and DSN entries](./docs/user/linux_configure_dsn.md).
 
 ### Installing the 64-bit rpm file on Amazon Linux 2
@@ -89,7 +89,7 @@ unixODBC should be installed before installing the Amazon Timestream ODBC Driver
 sudo yum update
 sudo yum install unixodbc
 ```
-1. Run `sudo rpm -i AmazonTimestreamODBC_[version]_x86_64.rpm` to install the Amazon Timestream ODBC Driver.
+1. Run `sudo rpm -U AmazonTimestreamODBC_[version]_x86_64.rpm` to install the Amazon Timestream ODBC Driver.
 2. [Configure the Driver and DSN entries](./docs/user/linux_configure_dsn.md).
 
 ## Using the Driver
