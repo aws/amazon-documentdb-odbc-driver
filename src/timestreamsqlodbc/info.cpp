@@ -93,10 +93,6 @@ using namespace std;
 #define MAXIMUM_SCALE "MAXIMUM_SCALE"
 #define INTERVAL_PRECISION "INTERVAL_PRECISION"
 
-auto case_insensitive_compare = [](char &c1, char &c2) {
-    return std::toupper(c1) == std::toupper(c2);
-};
-
 const std::map< int, std::vector< int > > sql_to_ts_type_map_odbc_v2 = {
     {SQL_BIT, {TS_TYPE_BOOLEAN}},
     {SQL_INTEGER, {TS_TYPE_INTEGER}},
@@ -380,6 +376,7 @@ typedef std::vector< bind_ptr > bind_vector;
 
 // Common function declarations
 enum class TableResultSet { Catalog, Schema, TableTypes, TableLookUp, All };
+void print_info_log(const LogLevel &level, const std::string &s);
 void ConvertToString(std::string &out, bool &valid, const SQLCHAR *sql_char,
                      const SQLSMALLINT sz);
 QResultClass *SetupQResult(StatementClass *stmt, const int col_cnt);
@@ -388,6 +385,19 @@ void ExecuteQuery(ConnectionClass *conn, HSTMT *stmt, const std::string &query);
 std::string ConvertPattern(const std::string &pattern);
 
 // Common function definitions
+void print_info_log(const LogLevel &level, const std::string &s) {
+#if WIN32
+#pragma warning(push)
+#pragma warning(disable : 4551)
+#endif  // WIN32
+        // cppcheck outputs an erroneous missing argument error which breaks
+        // build. Disable for this function call
+    MYLOG(level, "%s", s.c_str());
+#if WIN32
+#pragma warning(pop)
+#endif  // WIN32
+}
+
 void ConvertToString(std::string &out, bool &valid, const SQLCHAR *sql_char,
                      const SQLSMALLINT sz) {
     valid = (sql_char != NULL);
@@ -501,6 +511,47 @@ void ExecuteQuery(ConnectionClass *conn, HSTMT *stmt,
         std::string error_msg = "Failed to execute query '" + query + "'.";
         throw std::runtime_error(error_msg.c_str());
     }
+}
+
+std::string GetCharData_Iter(HSTMT *stmt, SQLUSMALLINT col_num) {
+    RETCODE ret;
+    SQLLEN indicator = 0;
+    // Retrieve 256 characters at a time plus 1 null terminator
+    const SQLLEN num_char_retrieve = 257;
+    SQLCHAR data[num_char_retrieve] = {0};
+    SQLLEN num_bytes = num_char_retrieve;
+    std::string value;
+    while ((ret = API_GetData(*stmt, col_num, SQL_C_CHAR, data, num_bytes,
+                              &indicator))
+           != SQL_NO_DATA) {
+        if (ret == SQL_SUCCESS_WITH_INFO
+            && (indicator > num_char_retrieve || indicator == SQL_NO_TOTAL)) {
+            // Concat without null terminator
+            num_bytes = num_char_retrieve;
+            value += std::string(reinterpret_cast< const char * >(data),
+                                 static_cast< size_t >(num_bytes - 1));
+        } else if (ret == SQL_SUCCESS) {
+            num_bytes = indicator;
+            value += std::string(reinterpret_cast< const char * >(data),
+                                 static_cast< size_t >(num_bytes));
+        } else {
+            throw std::runtime_error(
+                "Error iteratively retrieving characters in parts.");
+        }
+    }
+    return value;
+}
+
+auto compare_char = [](char &c1, char &c2) {
+    if (c1 == c2)
+        return true;
+    return std::toupper(c1) == std::toupper(c2);
+};
+
+bool case_insensitive_compare(std::string &str1, std::string &str2) {
+    return (
+        (str1.size() == str2.size())
+        && std::equal(str1.begin(), str1.end(), str2.begin(), compare_char));
 }
 
 // Table specific function definitions
@@ -677,9 +728,6 @@ void SetTableTuples(QResultClass *res, const TableResultSet res_type,
 
 // Column specific function definitions
 void SetupColumnQResInfo(QResultClass *res, EnvironmentClass *unused);
-void GenerateColumnQuery(std::string &query, const std::string &table_name,
-                         const std::string &column_name, const bool table_valid,
-                         const bool column_valid, const UWORD flag);
 int GetColumnSize(const std::string &type_name);
 int GetBufferLength(const std::string &type_name);
 
@@ -717,18 +765,6 @@ void SetupColumnQResInfo(QResultClass *res, EnvironmentClass *unused) {
                         TS_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, COLUMNS_IS_NULLABLE, IS_NULLABLE, TS_TYPE_VARCHAR,
                         INFO_VARCHAR_SIZE);
-}
-
-void GenerateColumnQuery(std::string &query, const std::string &table_name,
-                         const std::string &column_name, const bool table_valid,
-                         const bool column_valid, const UWORD flag) {
-    bool search_pattern = (~flag & PODBC_NOT_SEARCH_PATTERN);
-    query = "DESCRIBE TABLES LIKE ";
-    query += table_valid
-                 ? (search_pattern ? table_name : "^" + table_name + "$")
-                 : "%";
-    if (column_valid)
-        query += " COLUMNS LIKE " + column_name;
 }
 
 int GetColumnSize(int sql_type) {
@@ -832,32 +868,22 @@ API_Tables(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
             RETCODE ret = SQL_NO_DATA;
             while ((ret = API_Fetch(database_stmt)) != SQL_NO_DATA
                    && SQL_SUCCEEDED(ret)) {
-                SQLCHAR data[256] = {0};
-                SQLLEN indicator = 0;
-                ret = API_GetData(database_stmt, 1, SQL_C_CHAR, data, 256,
-                                    &indicator);
-                if (SQL_SUCCEEDED(ret)) {
-                    std::string database_name;
-                    database_name.assign(reinterpret_cast< const char * >(data),
-                                         static_cast< size_t >(indicator));
-                    if (is_search_pattern
-                        || std::equal(database_name.begin(),
-                                      database_name.end(), catalog_name.begin(),
-                                      case_insensitive_compare)) {
-                        TupleField *tuple = QR_AddNew(res);
-                        tuple[TABLES_CATALOG_NAME].value =
-                            strdup(database_name.c_str());
-                        tuple[TABLES_CATALOG_NAME].len =
-                            (int)database_name.size();
-                        tuple[TABLES_SCHEMA_NAME].value = NULL;
-                        tuple[TABLES_SCHEMA_NAME].len = 0;
-                        tuple[TABLES_TABLE_NAME].value = NULL;
-                        tuple[TABLES_TABLE_NAME].len = 0;
-                        tuple[TABLES_TABLE_TYPE].value = NULL;
-                        tuple[TABLES_TABLE_TYPE].len = 0;
-                        tuple[TABLES_REMARKS].value = NULL;
-                        tuple[TABLES_REMARKS].len = 0;
-                    }
+                std::string database_name = GetCharData_Iter(
+                    reinterpret_cast< HSTMT * >(&database_stmt), 1);
+                if (is_search_pattern
+                    || case_insensitive_compare(database_name, catalog_name)) {
+                    TupleField *tuple = QR_AddNew(res);
+                    tuple[TABLES_CATALOG_NAME].value =
+                        strdup(database_name.c_str());
+                    tuple[TABLES_CATALOG_NAME].len = (int)database_name.size();
+                    tuple[TABLES_SCHEMA_NAME].value = NULL;
+                    tuple[TABLES_SCHEMA_NAME].len = 0;
+                    tuple[TABLES_TABLE_NAME].value = NULL;
+                    tuple[TABLES_TABLE_NAME].len = 0;
+                    tuple[TABLES_TABLE_TYPE].value = NULL;
+                    tuple[TABLES_TABLE_TYPE].len = 0;
+                    tuple[TABLES_REMARKS].value = NULL;
+                    tuple[TABLES_REMARKS].len = 0;
                 }
             }
             CleanUp(stmt, database_stmt, SQL_SUCCESS);
@@ -932,20 +958,11 @@ API_Tables(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
             std::vector< std::string > databases;
             while ((ret = API_Fetch(database_stmt)) != SQL_NO_DATA
                    && SQL_SUCCEEDED(ret)) {
-                SQLCHAR data[256] = {0};
-                SQLLEN indicator = 0;
-                ret = API_GetData(database_stmt, 1, SQL_C_CHAR, data, 256,
-                                    &indicator);
-                std::string database_name;
-                if (SQL_SUCCEEDED(ret)) {
-                    database_name.assign(reinterpret_cast< const char * >(data),
-                                         static_cast< size_t >(indicator));
-                    if (is_search_pattern
-                        || std::equal(database_name.begin(),
-                                      database_name.end(), catalog_name.begin(),
-                                      case_insensitive_compare)) {
-                        databases.push_back(database_name);
-                    }
+                std::string database_name = GetCharData_Iter(
+                    reinterpret_cast< HSTMT * >(&database_stmt), 1);
+                if (is_search_pattern
+                    || case_insensitive_compare(database_name, catalog_name)) {
+                    databases.push_back(database_name);
                 }
             }
             API_FreeStmt(database_stmt, SQL_DROP);
@@ -962,41 +979,33 @@ API_Tables(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                              table_query);
                 while ((ret = API_Fetch(table_stmt)) != SQL_NO_DATA
                        && SQL_SUCCEEDED(ret)) {
-                    SQLCHAR data[256] = {0};
-                    SQLLEN indicator = 0;
-                    ret = API_GetData(table_stmt, 1, SQL_C_CHAR, data, 256,
-                                        &indicator);
-                    std::string table_name_return;
-                    if (SQL_SUCCEEDED(ret)) {
-                        table_name_return.assign(
-                            reinterpret_cast< const char * >(data),
-                            static_cast< size_t >(indicator));
-                        if (!table_type_filter) {
-                            if (is_search_pattern
-                                || (table_name.size() >= table_name_return.size() &&
-                                    std::equal(table_name_return.begin(),
+                    std::string table_name_return = GetCharData_Iter(
+                        reinterpret_cast< HSTMT * >(&table_stmt), 1);
+                    if (!table_type_filter) {
+                        if (is_search_pattern
+                            || (table_name.size() >= table_name_return.size()
+                                && std::equal(table_name_return.begin(),
                                               table_name_return.end(),
                                               table_name.begin(),
-                                              case_insensitive_compare))) {
-                                TupleField *tuple = QR_AddNew(res);
-                                tuple[TABLES_CATALOG_NAME].value =
-                                    strdup(database.c_str());
-                                tuple[TABLES_CATALOG_NAME].len =
-                                    (int)database.size();
-                                tuple[TABLES_SCHEMA_NAME].value = NULL;
-                                tuple[TABLES_SCHEMA_NAME].len = 0;
-                                tuple[TABLES_TABLE_NAME].value =
-                                    strdup(table_name_return.c_str());
-                                tuple[TABLES_TABLE_NAME].len =
-                                    (int)table_name_return.size();
-                                std::string table_type_return = "TABLE";
-                                tuple[TABLES_TABLE_TYPE].value =
-                                    strdup(table_type_return.c_str());
-                                tuple[TABLES_TABLE_TYPE].len =
-                                    (int)table_type_return.size();
-                                tuple[TABLES_REMARKS].value = NULL;
-                                tuple[TABLES_REMARKS].len = 0;
-                            }
+                                              compare_char))) {
+                            TupleField *tuple = QR_AddNew(res);
+                            tuple[TABLES_CATALOG_NAME].value =
+                                strdup(database.c_str());
+                            tuple[TABLES_CATALOG_NAME].len =
+                                (int)database.size();
+                            tuple[TABLES_SCHEMA_NAME].value = NULL;
+                            tuple[TABLES_SCHEMA_NAME].len = 0;
+                            tuple[TABLES_TABLE_NAME].value =
+                                strdup(table_name_return.c_str());
+                            tuple[TABLES_TABLE_NAME].len =
+                                (int)table_name_return.size();
+                            std::string table_type_return = "TABLE";
+                            tuple[TABLES_TABLE_TYPE].value =
+                                strdup(table_type_return.c_str());
+                            tuple[TABLES_TABLE_TYPE].len =
+                                (int)table_type_return.size();
+                            tuple[TABLES_REMARKS].value = NULL;
+                            tuple[TABLES_REMARKS].len = 0;
                         }
                     }
                 }
@@ -1019,19 +1028,6 @@ API_Tables(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
     }
     CleanUp(stmt, nullptr);
     return SQL_ERROR;
-}
-
-void print_info_log(const LogLevel &level, const std::string &s) {
-#if WIN32
-#pragma warning(push)
-#pragma warning(disable : 4551)
-#endif  // WIN32
-        // cppcheck outputs an erroneous missing argument error which breaks
-        // build. Disable for this function call
-    MYLOG(level, "%s", s.c_str());
-#if WIN32
-#pragma warning(pop)
-#endif  // WIN32
 }
 
 RETCODE SQL_API
@@ -1090,15 +1086,8 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
         while ((ret = API_Fetch(table_stmt)) != SQL_NO_DATA
                && SQL_SUCCEEDED(ret)) {
             // Get database name
-            SQLCHAR database[256] = {0};
-            SQLLEN db_strlen_or_ind = 0;
-            ret = API_GetData(table_stmt, 1,
-                              SQL_C_CHAR, database, 256, &db_strlen_or_ind);
-            std::string database_name;
-            if (SQL_SUCCEEDED(ret)) {
-                database_name.assign(reinterpret_cast< const char * >(database),
-                                     static_cast< size_t >(db_strlen_or_ind));
-            }
+            std::string database_name =
+                GetCharData_Iter(reinterpret_cast< HSTMT * >(&table_stmt), 1);
             std::string catalog_name_sql_str;
             if (catalog_name_sz == SQL_NTS) {
                 catalog_name_sql_str.assign(
@@ -1119,15 +1108,8 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
             }
 
             // Get table name
-            SQLCHAR table[256] = {0};
-            SQLLEN tb_strlen_or_ind = 0;
-            ret = API_GetData(table_stmt, 3,
-                                SQL_C_CHAR, table, 256, &tb_strlen_or_ind);
-            std::string table_name;
-            if (SQL_SUCCEEDED(ret)) {
-                table_name.assign(reinterpret_cast< const char * >(table),
-                                  static_cast< size_t >(tb_strlen_or_ind));
-            }
+            std::string table_name =
+                GetCharData_Iter(reinterpret_cast< HSTMT * >(&table_stmt), 3);
             tables.push_back(std::make_pair(database_name, table_name));
         }
         API_FreeStmt(table_stmt, SQL_DROP);
@@ -1148,19 +1130,9 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
             int col_num = 0;
             while ((ret = API_Fetch(col_stmt)) != SQL_NO_DATA
                    && SQL_SUCCEEDED(ret)) {
-                SQLCHAR column[256] = {0};
-                SQLLEN col_strlen_or_ind = 0;
-                ret = API_GetData(col_stmt, 1, SQL_C_CHAR, column, 256,
-                                    &col_strlen_or_ind);
                 col_num++;
-
-                std::string column_name_return;
-                if (SQL_SUCCEEDED(ret)) {
-                    column_name_return.assign(
-                        reinterpret_cast< const char * >(column),
-                        static_cast< size_t >(col_strlen_or_ind));
-                }
-
+                std::string column_name_return =
+                    GetCharData_Iter(reinterpret_cast< HSTMT * >(&col_stmt), 1);
                 std::string column_name;
                 bool column_valid;
                 ConvertToString(column_name, column_valid, column_name_sql,
@@ -1187,24 +1159,15 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                                || !std::equal(column_name_return.begin(),
                                               column_name_return.end(),
                                               column_name.begin(),
-                                              case_insensitive_compare))) {
+                                              compare_char))) {
                     print_info_log(
                         LOG_DEBUG,
                         std::string(
                             "Identifier argument, not a pattern value."));
                     continue;
                 }
-
-                SQLCHAR type[256] = {0};
-                SQLLEN type_strlen_or_ind = 0;
-                ret = API_GetData(col_stmt, 2, SQL_C_CHAR, type, 256,
-                                    &type_strlen_or_ind);
-                std::string type_name_return;
-                if (SQL_SUCCEEDED(ret)) {
-                    type_name_return.assign(
-                        reinterpret_cast< const char * >(type),
-                        static_cast< size_t >(type_strlen_or_ind));
-                }
+                std::string type_name_return =
+                    GetCharData_Iter(reinterpret_cast< HSTMT * >(&col_stmt), 2);
 
                 int sql_type = GetDataTypeFromTypeName(stmt, type_name_return);
 
