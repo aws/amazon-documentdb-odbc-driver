@@ -272,6 +272,107 @@ TEST_F(TestSQLPrepare, ERROR_NULL_QUERY) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
+TEST_F(TestSQLPrepare, SHOW_STATEMENT) {
+    test_string query = CREATE_STRING("SHOW DATABASES LIKE 'ODBC%'");
+    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    int cnt = 0;
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            cnt++;
+        }
+        SQLCHAR data[1024] = {0};
+        SQLLEN indicator = 0;
+        ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, &data, 1024, &indicator);
+        test_string expected = CREATE_STRING("ODBCTest");
+        CompareStrNumBytes(expected, indicator, data, ret);
+    }
+    EXPECT_EQ(1, cnt);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLPrepare, SHOW_STATEMENT_LEADING_SPACES) {
+    test_string query = CREATE_STRING("      SHOW DATABASES LIKE 'ODBC%'");
+    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    int cnt = 0;
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            cnt++;
+        }
+        SQLCHAR data[1024] = {0};
+        SQLLEN indicator = 0;
+        ret = SQLGetData(m_hstmt, 1, SQL_C_CHAR, &data, 1024, &indicator);
+        test_string expected = CREATE_STRING("ODBCTest");
+        CompareStrNumBytes(expected, indicator, data, ret);
+    }
+    EXPECT_EQ(1, cnt);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLPrepare, DESCRIBE_STATEMENT) {
+    test_string query = CREATE_STRING("DESCRIBE ODBCTest.DevOps");
+    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    EXPECT_TRUE(SQL_SUCCEEDED(ret));
+    SQLSMALLINT column_count = 0;
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLNumResultCols(m_hstmt, &column_count)));
+    EXPECT_EQ(0, column_count);
+    ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    int cnt = 0;
+    while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
+        if (SQL_SUCCEEDED(ret)) {
+            cnt++;
+        }
+    }
+    EXPECT_EQ(6, cnt);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+}
+
+TEST_F(TestSQLPrepare, DESCRIBE_STATEMENT_SIZE_0) {
+    test_string query = CREATE_STRING("DESCRIBE ODBCTest.DevOps");
+    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), 0);
+    EXPECT_EQ(SQL_SUCCESS, ret);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    SQLSMALLINT column_count = 0;
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLNumResultCols(m_hstmt, &column_count)));
+    EXPECT_EQ(0, column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLFreeStmt(m_hstmt, SQL_CLOSE)));
+}
+
+TEST_F(TestSQLPrepare, DESCRIBE_STATEMENT_GREATER_THAN_0) {
+    test_string query = CREATE_STRING("DESCRIBE ODBCTest.DevOps");
+    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), 5);
+    EXPECT_EQ(SQL_SUCCESS, ret);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    SQLSMALLINT column_count = 0;
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLNumResultCols(m_hstmt, &column_count)));
+    EXPECT_EQ(0, column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLFreeStmt(m_hstmt, SQL_CLOSE)));
+}
+
+
+TEST_F(TestSQLPrepare, WITH_SELECT_STATEMENT) {
+    test_string query =
+        CREATE_STRING("WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 ")
+        CREATE_STRING("14:18:30.123456789' AS binned_timestamp, ARRAY[1,2,3] ")
+        CREATE_STRING("AS data FROM ODBCTest.IoT LIMIT ")
+        CREATE_STRING("1), interpolated_timeseries AS(SELECT ")
+        CREATE_STRING("CREATE_TIME_SERIES(binned_timestamp, data) FROM binned_timeseries) ")
+        CREATE_STRING("SELECT *FROM interpolated_timeseries");
+    SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    EXPECT_EQ(SQL_SUCCESS, ret);
+    LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
+    SQLSMALLINT column_count = 0;
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLNumResultCols(m_hstmt, &column_count)));
+    EXPECT_EQ(1, column_count);
+    EXPECT_TRUE(SQL_SUCCEEDED(SQLFreeStmt(m_hstmt, SQL_CLOSE)));
+}
+
 TEST_F(TestSQLDescribeParam, DESCRIBE_PARAM) {
     test_string query = CREATE_STRING("SELECT 1 FROM ODBCTest.IoT where time = ? LIMIT 1");
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);

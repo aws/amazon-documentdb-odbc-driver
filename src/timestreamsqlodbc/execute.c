@@ -42,19 +42,34 @@ RETCODE SQL_API API_Prepare(HSTMT hstmt, const SQLCHAR *stmt_str,
 
     // We know cursor is not open at this point
     StatementClass *stmt = (StatementClass *)hstmt;
-
-    size_t original_stmt_len;
+    RETCODE ret;
     if (!stmt_str) {
         SC_initialize_and_recycle(stmt);
         SC_set_error(stmt, STMT_INVALID_NULL_ARG, "Invalid use of null pointer",
                      func);
         return SQL_ERROR;
     }
-    if (stmt_sz >= 0)
+
+    // Get statement size and type
+    size_t original_stmt_len;
+    int query_type = STMT_TYPE_UNKNOWN;
+    if (stmt_sz >= 0) {
         original_stmt_len = stmt_sz;
-    else if (SQL_NTS == stmt_sz)
+        char *temp_stmt;
+        temp_stmt = calloc(original_stmt_len + 1, sizeof(char));
+        if (!temp_stmt) {
+            SC_initialize_and_recycle(stmt);
+            SC_set_error(stmt, STMT_NO_MEMORY_ERROR,
+                         "No memory available to store statement", func);
+            return SQL_ERROR;
+        }
+        strncpy(temp_stmt, (char *)stmt_str, original_stmt_len);
+        query_type = statement_type(temp_stmt);
+        free(temp_stmt);
+    } else if (SQL_NTS == stmt_sz) {
         original_stmt_len = strlen((char *)stmt_str);
-    else {
+        query_type = statement_type((char *)stmt_str);
+    } else {
         MYLOG(LOG_DEBUG, "invalid length=" FORMAT_INTEGER, stmt_sz);
         SC_initialize_and_recycle(stmt);
         SC_set_error(stmt, STMT_INVALID_NULL_ARG, "Invalid buffer length",
@@ -62,47 +77,52 @@ RETCODE SQL_API API_Prepare(HSTMT hstmt, const SQLCHAR *stmt_str,
         return SQL_ERROR;
     }
 
-    // Construct the metadata statement
-    const char *metadata_stmt_prefix = "SELECT * FROM (";
-    const size_t metadata_stmt_prefix_len = 15;
-    const char *metadata_stmt_suffix = ") AS original LIMIT 0";
-    const size_t metadata_stmt_suffix_len = 21;
-    const size_t metadata_stmt_affix_len = 36;
-    char *metadata_stmt;
-    metadata_stmt =
-        calloc(metadata_stmt_affix_len + original_stmt_len + 1, sizeof(char));
-    if (!metadata_stmt) {
-        SC_initialize_and_recycle(stmt);
-        SC_set_error(stmt, STMT_NO_MEMORY_ERROR,
-                     "No memory available to store statement to get metadata",
-                     func);
-        return SQL_ERROR;
+    // Only run metadata statement on SELECT statements
+    if (query_type == STMT_TYPE_SELECT || query_type == STMT_TYPE_WITH) {
+        // Construct the metadata statement
+        const char *metadata_stmt_prefix = "SELECT * FROM (";
+        const size_t metadata_stmt_prefix_len = 15;
+        const char *metadata_stmt_suffix = ") AS original LIMIT 0";
+        const size_t metadata_stmt_suffix_len = 21;
+        const size_t metadata_stmt_affix_len = 36;
+        char *metadata_stmt;
+        metadata_stmt = calloc(metadata_stmt_affix_len + original_stmt_len + 1,
+                               sizeof(char));
+        if (!metadata_stmt) {
+            SC_initialize_and_recycle(stmt);
+            SC_set_error(
+                stmt, STMT_NO_MEMORY_ERROR,
+                "No memory available to store statement to get metadata", func);
+            return SQL_ERROR;
+        }
+        strncpy(metadata_stmt, metadata_stmt_prefix,
+                metadata_stmt_prefix_len + 1);
+        strncat(metadata_stmt, (char *)stmt_str, original_stmt_len);
+        strncat(metadata_stmt, metadata_stmt_suffix, metadata_stmt_suffix_len);
+
+        // Prepare metadata statement to get metadata
+        // PrepareStatement deallocates memory if necessary
+        ret = PrepareStatement(
+            stmt, (SQLCHAR *)metadata_stmt,
+            (SQLINTEGER)(metadata_stmt_affix_len + original_stmt_len));
+
+        // Not used afterwards
+        free(metadata_stmt);
+
+        if (ret != SQL_SUCCESS) {
+            return ret;
+        }
+
+        // Execute the metadata statement
+        ret = ExecuteStatement(stmt);
+        if (ret == SQL_SUCCESS)
+            stmt->prepared = PREPARED;
+
+        // Restore to original statement
+        strncpy_null(stmt->statement, (char *)stmt_str, original_stmt_len + 1);
+    } else {
+        ret = PrepareStatement(stmt, stmt_str, stmt_sz);
     }
-    strncpy(metadata_stmt, metadata_stmt_prefix, metadata_stmt_prefix_len + 1);
-    strncat(metadata_stmt, (char *)stmt_str, original_stmt_len);
-    strncat(metadata_stmt, metadata_stmt_suffix, metadata_stmt_suffix_len);
-
-    // Prepare metadata statement to get metadata
-    // PrepareStatement deallocates memory if necessary
-    RETCODE ret = PrepareStatement(
-        stmt, (SQLCHAR *)metadata_stmt,
-        (SQLINTEGER)(metadata_stmt_affix_len + original_stmt_len));
-
-    // Not used afterwards
-    free(metadata_stmt);
-
-    if (ret != SQL_SUCCESS) {
-        return ret;
-    }
-
-    // Execute the metadata statement
-    ret = ExecuteStatement(stmt);
-    if (ret == SQL_SUCCESS)
-        stmt->prepared = PREPARED;
-
-    // Restore to original statement
-    strncpy_null(stmt->statement, (char *)stmt_str, original_stmt_len + 1);
-
     return ret;
 }
 
