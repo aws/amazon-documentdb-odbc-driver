@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.3](https://github.com/Bit-Quill/timestream-odbc/releases/tag/v1.0.2) - 2021-09-17
+### Added
+- Power BI Connector with AWS Profile and IAM authentication.
+
+### Fixed
+- Database and table names of 256 characters prevents data from loading in Excel and Power BI
+- NULL catalog in SQLCatalog returns all columns.
+- Describe and Show queries not working with SQLPrepare.
+
 ## [v1.0.2](https://github.com/Bit-Quill/timestream-odbc/releases/tag/v1.0.2) - 2021-09-17
 ### Fixed
 - Okta authentication not working in 32-bit Amazon Linux 2.
