@@ -42,52 +42,8 @@ static const struct {
 } Statement_Type[] =
 
     {{STMT_TYPE_SELECT, "SELECT"},
-     {STMT_TYPE_INSERT, "INSERT"},
-     {STMT_TYPE_UPDATE, "UPDATE"},
-     {STMT_TYPE_DELETE, "DELETE"},
-     {STMT_TYPE_PROCCALL, "{"},
-     {STMT_TYPE_SET, "SET"},
-     {STMT_TYPE_RESET, "RESET"},
-     {STMT_TYPE_CREATE, "CREATE"},
-     {STMT_TYPE_DECLARE, "DECLARE"},
-     {STMT_TYPE_FETCH, "FETCH"},
-     {STMT_TYPE_MOVE, "MOVE"},
-     {STMT_TYPE_CLOSE, "CLOSE"},
-     {STMT_TYPE_PREPARE, "PREPARE"},
-     {STMT_TYPE_EXECUTE, "EXECUTE"},
-     {STMT_TYPE_DEALLOCATE, "DEALLOCATE"},
-     {STMT_TYPE_DROP, "DROP"},
-     {STMT_TYPE_START, "BEGIN"},
-     {STMT_TYPE_START, "START"},
-     {STMT_TYPE_TRANSACTION, "SAVEPOINT"},
-     {STMT_TYPE_TRANSACTION, "RELEASE"},
-     {STMT_TYPE_TRANSACTION, "COMMIT"},
-     {STMT_TYPE_TRANSACTION, "END"},
-     {STMT_TYPE_TRANSACTION, "ROLLBACK"},
-     {STMT_TYPE_TRANSACTION, "ABORT"},
-     {STMT_TYPE_LOCK, "LOCK"},
-     {STMT_TYPE_ALTER, "ALTER"},
-     {STMT_TYPE_GRANT, "GRANT"},
-     {STMT_TYPE_REVOKE, "REVOKE"},
-     {STMT_TYPE_COPY, "COPY"},
-     {STMT_TYPE_ANALYZE, "ANALYZE"},
-     {STMT_TYPE_NOTIFY, "NOTIFY"},
-     {STMT_TYPE_EXPLAIN, "EXPLAIN"}
-
-     /*
-      * Special-commands that cannot be run in a transaction block. This isn't
-      * as granular as it could be. VACUUM can never be run in a transaction
-      * block, but some variants of REINDEX and CLUSTER can be. CHECKPOINT
-      * doesn't throw an error if you do, but it cannot be rolled back so
-      * there's no point in beginning a new transaction for it.
-      */
-     ,
-     {STMT_TYPE_SPECIAL, "VACUUM"},
-     {STMT_TYPE_SPECIAL, "REINDEX"},
-     {STMT_TYPE_SPECIAL, "CLUSTER"},
-     {STMT_TYPE_SPECIAL, "CHECKPOINT"}
-
-     ,
+     {STMT_TYPE_DESCRIBE, "DESCRIBE"},
+     {STMT_TYPE_SHOW, "SHOW"},
      {STMT_TYPE_WITH, "WITH"},
      {0, NULL}};
 
