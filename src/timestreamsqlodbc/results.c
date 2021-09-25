@@ -96,7 +96,10 @@ RETCODE SQL_API API_NumResultCols(HSTMT hstmt, SQLSMALLINT *pccol) {
     }
 
     result = SC_get_Curres(stmt);
-    *pccol = QR_NumPublicResultCols(result);
+    if (!result)
+        *pccol = 0;
+    else
+        *pccol = QR_NumPublicResultCols(result);
 
 cleanup:
 #undef return
