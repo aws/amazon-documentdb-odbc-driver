@@ -119,7 +119,6 @@ RETCODE SQL_API API_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
         case SQL_CONVERT_TINYINT:
         case SQL_CONVERT_BIT:
         case SQL_CONVERT_VARCHAR:
-        case SQL_CONVERT_BIGINT:
         case SQL_CONVERT_DECIMAL:
         case SQL_CONVERT_DOUBLE:
         case SQL_CONVERT_FLOAT:
@@ -142,6 +141,11 @@ RETCODE SQL_API API_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
             value = 0; /* CONVERT is unavailable */
             break;
 
+        case SQL_CONVERT_BIGINT:
+            len = sizeof(SQLUINTEGER);
+            value = SQL_CVT_DOUBLE;
+            break;
+        
         case SQL_CONVERT_FUNCTIONS: /* ODBC 1.0 */
             len = sizeof(SQLUINTEGER);
             value = SQL_FN_CVT_CAST;
