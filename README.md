@@ -87,7 +87,7 @@ unixODBC should be installed before installing the Amazon Timestream ODBC Driver
 
 ```
 sudo yum update
-sudo yum install unixodbc
+sudo yum install unixODBC
 ```
 1. Run `sudo rpm -U AmazonTimestreamODBC_[version]_x86_64.rpm` to install the Amazon Timestream ODBC Driver.
 2. [Configure the Driver and DSN entries](./docs/user/linux_configure_dsn.md).
