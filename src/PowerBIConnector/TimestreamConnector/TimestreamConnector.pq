@@ -19,12 +19,14 @@ TimestreamConnectorType = type function (
         optional ProfileName as (type text meta [
             Documentation.FieldCaption = "Profile Name",
             Documentation.FieldDescription = "The AWS profile name for Timestream.",
-            Documentation.SampleValues = { "default" }
+            Documentation.SampleValues = { "default" },
+            DataSource.Path = true
         ]),
         optional Token as (type text meta [
             Documentation.FieldCaption = "AWS IAM Session Token",
             Documentation.FieldDescription = "The temporary session token required to access a database with multi-factor authentication (MFA) enabled.",
-            Documentation.SampleValues = { "IQoJc0JpZ2luGjEMn//////wEaY+auw95jJmM/paMUM+yVWD2s7uDVP" }
+            Documentation.SampleValues = { "IQoJc0JpZ2luGjEMn//////wEaY+auw95jJmM/paMUM+yVWD2s7uDVP" },
+            DataSource.Path = true
         ])
     )
     as table meta [
@@ -193,9 +195,10 @@ TimestreamConnector = [
         let
             json = Json.Document(dataSourcePath),
             Region = json[Region],
-            ProfileName = json[ProfileName]
+            ProfileName = json[ProfileName],
+            Token = json[Token]
         in
-            { "TimestreamConnector.Contents", Region, ProfileName }
+            { "TimestreamConnector.Contents", Region, ProfileName, Token }
 ];
 
 // Data Source UI publishing description.
