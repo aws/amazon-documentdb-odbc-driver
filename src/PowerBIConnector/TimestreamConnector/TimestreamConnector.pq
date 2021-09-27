@@ -16,16 +16,16 @@ TimestreamConnectorType = type function (
             Documentation.FieldDescription = "The AWS Region.",
             Documentation.SampleValues = { "us-east-1" }
         ]),
-        optional ProfileName as (type text meta [
-            Documentation.FieldCaption = "Profile Name",
-            Documentation.FieldDescription = "The AWS profile name for Timestream.",
-            Documentation.SampleValues = { "default" },
-            DataSource.Path = true
-        ]),
         optional Token as (type text meta [
             Documentation.FieldCaption = "AWS IAM Session Token",
             Documentation.FieldDescription = "The temporary session token required to access a database with multi-factor authentication (MFA) enabled.",
             Documentation.SampleValues = { "IQoJc0JpZ2luGjEMn//////wEaY+auw95jJmM/paMUM+yVWD2s7uDVP" },
+            DataSource.Path = true
+        ]),
+        optional ProfileName as (type text meta [
+            Documentation.FieldCaption = "Profile Name",
+            Documentation.FieldDescription = "The AWS profile name for Timestream.",
+            Documentation.SampleValues = { "default" },
             DataSource.Path = true
         ])
     )
@@ -34,9 +34,9 @@ TimestreamConnectorType = type function (
     ];
 
 TimestreamConnectorImpl = (
-    Region as text, 
-    optional ProfileName as text,
-    optional Token as text
+    Region as text,
+    optional Token as text,
+    optional ProfileName as text
     ) as table =>
     let
         Credential = Extension.CurrentCredential(),
@@ -62,15 +62,15 @@ TimestreamConnectorImpl = (
                 ]
             else [],
 
-        ProfileNameParameter = if ProfileName <> null then [ ProfileName = ProfileName ]  else [],
         SessionTokenParameter = if Token <> null then [ SessionToken = Token ] else [],
+        ProfileNameParameter = if ProfileName <> null then [ ProfileName = ProfileName ]  else [],
 
         BaseConnectionString = [
             Driver = "Amazon Timestream ODBC Driver",
             Region = Region
         ],
 
-        ConnectionString = BaseConnectionString & AuthenticationString & ProfileNameParameter & SessionTokenParameter,
+        ConnectionString = BaseConnectionString & AuthenticationString & SessionTokenParameter & ProfileNameParameter,
 
         SqlCapabilities = Diagnostics.LogValue("SqlCapabilities_Options", [
             SupportsTop = false,
@@ -195,10 +195,10 @@ TimestreamConnector = [
         let
             json = Json.Document(dataSourcePath),
             Region = json[Region],
-            ProfileName = json[ProfileName],
-            Token = json[Token]
+            Token = json[Token],
+            ProfileName = json[ProfileName]
         in
-            { "TimestreamConnector.Contents", Region, ProfileName, Token }
+            { "TimestreamConnector.Contents", Region, Token, ProfileName }
 ];
 
 // Data Source UI publishing description.
