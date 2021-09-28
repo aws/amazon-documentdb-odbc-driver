@@ -4,7 +4,7 @@ shared TimestreamConnector.UnitTest =
 [
     Region = "us-east-2",
     ProfileName = "default",
-    Source = TimestreamConnector.Contents(Region, ProfileName),
+    Source = TimestreamConnector.Contents(Region, null, ProfileName),
     PowerBI_DB = Source{[Name="PowerBI",Kind="Database"]}[Data],
     DevOpsOriginal = PowerBI_DB{[Name="DevOps", Kind="Table"]}[Data],
     
