@@ -15,6 +15,9 @@
 * [Running the Amazon Timestream ODBC Driver Automated Tests](./run_tests_linux.md)
 * [Configuring a DSN](../user/linux_configure_dsn.md)
 
+## Power BI Connector
+* [Building the Power BI Connector](./build_powerbi_connector.md)
+
 ## General Build Information
 
 ### ODBC Driver CMake Options
