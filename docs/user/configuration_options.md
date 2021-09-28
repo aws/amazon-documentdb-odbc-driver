@@ -6,7 +6,7 @@ The driver specific options can be set in the `odbcinst.ini` file for macOS or L
 | Option | Description | Type | Default |
 |--------|-------------|------|---------------|
 | `Driver` | Driver name.| string | timestreamodbc |
-| `LogLevel` | Severity level for driver logs. | one of `OFF`, `FATAL`, `ERROR`, `WARNING`, `INFO`, `DEBUG`, `TRACE`, `ALL` | `OFF` |
+| `LogLevel` | Severity level for driver logs. | integer<br />one of `0`(OFF), `1`(FATAL), `2`(ERROR), `3`(WARNING), `4`(INFO), `5`(DEBUG), `6`(TRACE), `7`(ALL) | `0`(OFF) |
 | `LogOutput` | Location for storing driver logs. | string | WIN: `TEMP environment variable`, MAC/Linux: `/tmp` |
 
 ## DSN Specific Options
@@ -17,7 +17,7 @@ The DSN specific options can be set in the `odbc.ini` file for macOS or Linux, o
 | `Driver` | Driver name.| string | timestreamodbc |
 | `DSN` | **D**ata **S**ource **N**ame used for configuring the connection. | string | `<NONE>` |
 | `Auth` | Authentication mode. | one of `AWS_PROFILE`, `IAM`, `AAD`, `OKTA` | `AWS_PROFILE`
-| `LogLevel` | Severity level for driver logs. | one of `OFF`, `FATAL`, `ERROR`, `WARNING`, `INFO`, `DEBUG`, `TRACE`, `ALL` | `OFF` |
+| `LogLevel` | Severity level for driver logs. | integer<br />one of `0`(OFF), `1`(FATAL), `2`(ERROR), `3`(WARNING), `4`(INFO), `5`(DEBUG), `6`(TRACE), `7`(ALL) | `0`(OFF) | `0`(OFF) |
 | `LogOutput` | Location for storing driver logs. | string | WIN: `TEMP environment variable`, MAC/Linux: `/tmp` |
 
 **Note:** We recommend setting the LogOutput for the driver (in the `odbcinst.ini` file or registry settings) and not the DSN (in the `odbc.ini` file or registry settings). Otherwise the first log file will live in a temporary folder and the DSN specified LogOutput value will not take effect until the next time the driver is initialized.
