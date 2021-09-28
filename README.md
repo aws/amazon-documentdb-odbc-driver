@@ -11,11 +11,11 @@ The driver is compatible with ODBC 3.51.
 ## Supported Versions
 
 
-  | Operating System  | Version | Supported Bitness |
-  | ------------- |-------------| ----------------- |
-  |  Windows    |  Windows Server 2019, Windows 10  | 32-bit, 64-bit |
-  |  MacOS    |  Catalina, Big Sur | 64-bit |
-  |  Linux    |  Debian distro, Redhat like distro (Amazon Linux 2) |  32-bit, 64-bit  |
+  | Operating System | Version                                            | Supported Bitness |
+  | ---------------- | -------------------------------------------------- | ----------------- |
+  | Windows          | Windows Server 2019, Windows 10                    | 32-bit, 64-bit    |
+  | MacOS            | Catalina, Big Sur                                  | 64-bit            |
+  | Linux            | Debian distro, Redhat like distro (Amazon Linux 2) | 32-bit, 64-bit    |
 
 ## Installing the Driver
 
@@ -115,6 +115,31 @@ To setup a connection, the driver uses an ODBC connection string. Connection str
 
 * specify a Data Source Name containing a pre-configured set of options (`DSN=xxx;`); or
 * configure options explicitly using the connection string (`Region=xxx;Auth=xxx;LogLevel=7;...`)
+
+### Enable ODBC Driver Manager Tracing
+#### Windows
+1. Open the ODBC Data Source Administrator.
+2. Select the `Tracing` tab.
+3. Specify the log file path and file name for the tracing log.
+4. Click `Start Tracing Now` and click `OK`.
+
+#### macOS
+1. Open the iODBC Data Source Administrator with sudo access
+```sh
+sudo /Applications/iODBC/iODBC\ Administrator64.app/Contents/MacOS/iODBC\ Administrator64
+```
+2. Select the `Tracing` tab.
+3. Specify the log file path and file name for the tracing log.
+4. Under `When to trace`, select `All the time` or `One time only`, click `Apply` and then `OK`.
+
+#### Linux
+1. In the `odbcinst.ini` file, add the following section for example.
+```
+[ODBC]
+Trace = 1
+TraceFile = /tmp/odbctrace.out
+```
+2. Save and close the file.
 
 ### Troubleshooting
 
