@@ -1,4 +1,4 @@
-﻿section TimestreamConnectorUnitTests;
+section TimestreamConnectorUnitTests;
 
 shared TimestreamConnector.UnitTest =
 [
