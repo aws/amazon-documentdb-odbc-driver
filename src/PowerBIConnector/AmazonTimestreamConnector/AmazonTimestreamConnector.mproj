@@ -19,7 +19,7 @@
     <SuppressCellErrors>False</SuppressCellErrors>
     <MaxRows>1000</MaxRows>
     <ExtensionProject>Yes</ExtensionProject>
-    <Name>TimestreamConnector</Name>
+    <Name>AmazonTimestreamConnector</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>false</DebugSymbols>
@@ -37,7 +37,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TimestreamConnector.pq">
+    <Compile Include="AmazonTimestreamConnector.pq">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="resources.resx">
@@ -49,31 +49,31 @@
     <Compile Include="OdbcConstants.pqm">
       <SubType>Content</SubType>
     </Compile>
-    <Content Include="TimestreamConnector.query.pq">
+    <Content Include="AmazonTimestreamConnector.query.pq">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="Timestream16.png">
+    <Content Include="AmazonTimestream16.png">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Timestream20.png">
+    <Content Include="AmazonTimestream20.png">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Timestream24.png">
+    <Content Include="AmazonTimestream24.png">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Timestream32.png">
+    <Content Include="AmazonTimestream32.png">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Timestream40.png">
+    <Content Include="AmazonTimestream40.png">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Timestream48.png">
+    <Content Include="AmazonTimestream48.png">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Timestream64.png">
+    <Content Include="AmazonTimestream64.png">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Timestream80.png">
+    <Content Include="AmazonTimestream80.png">
       <SubType>Content</SubType>
     </Content>
   </ItemGroup>
@@ -122,3 +122,4 @@
     <RemoveDir Directories="$(OutputPath)" />
   </Target>
 </Project>
+

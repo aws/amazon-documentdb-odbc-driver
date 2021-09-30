@@ -1,7 +1,7 @@
-# Microsoft Power BI Desktop - Connecting to a Timestream ODBC data source
+# Microsoft Power BI Desktop - Connecting to an Amazon Timestream ODBC data source
 
 ## Prerequisites
-Before you get started, [configure the Timestream ODBC driver DSN](./windows_configure_dsn.md) using the Windows ODBC Data Source Administrator. 
+Before you get started, [configure the Amazon Timestream ODBC driver DSN](./windows_configure_dsn.md) using the Windows ODBC Data Source Administrator. 
 
 ## Connecting to an ODBC data source
 
