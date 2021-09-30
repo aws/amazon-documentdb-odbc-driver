@@ -1,9 +1,9 @@
-#  Microsoft Power BI Service - Connecting to Timestream
+#  Microsoft Power BI Service - Connecting to Amazon Timestream
 
 ## Setup
 * Download and Install the [On-premises data gateway](https://docs.microsoft.com/en-us/data-integration/gateway/service-gateway-install)
-* Copy the Timestream.mez custom connector file to `C:\Windows\ServiceProfiles\PBIEgwService\Documents\Power BI Desktop\Custom Connectors`.
-* Start the On-premises data gateway and click on the `Connectors` tab. Ensure that `TimestreamConnector` appears.
+* Copy the `AmazonTimestream.mez` custom connector file to `C:\Windows\ServiceProfiles\PBIEgwService\Documents\Power BI Desktop\Custom Connectors`.
+* Start the On-premises data gateway and click on the `Connectors` tab. Ensure that `AmazonTimestreamConnector` appears.
 
 <img src="img/pbi_gateway_connector_path.png" width="60%">
 

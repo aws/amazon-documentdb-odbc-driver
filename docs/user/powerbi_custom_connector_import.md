@@ -1,13 +1,13 @@
-# Microsoft Power BI Desktop - Using Import Mode with the Timestream Custom Connector
+# Microsoft Power BI Desktop - Using Import Mode with the Amazon Timestream Custom Connector
 
 The custom connector only supports `AWS Profile` and `AWS IAM Credentials` authentication. Azure Active Directory and Okta authentication are not supported at this time.
 
 Import mode loads all data and stores the information on disk. The data must be refreshed and reloaded in order to show data updates. [Custom Connector - Import Mode vs Direct Query Mode](https://social.technet.microsoft.com/wiki/contents/articles/53078.power-bi-import-mode-vs-directquery-mode.aspx)
 
 ## Prerequisites
-Before you get started, make sure you've properly installed the Timestream ODBC driver. 
+Before you get started, make sure you've properly installed the Amazon Timestream ODBC driver. 
 
-Copy the `Timestream.mez` file to the `<User>\Documents\Power BI Desktop\Custom Connectors\` folder (or to `<User>\OneDrive\Documents\Power BI Desktop\Custom Connectors` if using OneDrive). This will let Power BI access custom connector.
+Copy the `AmazonTimestream.mez` file to the `<User>\Documents\Power BI Desktop\Custom Connectors\` folder (or to `<User>\OneDrive\Documents\Power BI Desktop\Custom Connectors` if using OneDrive). This will let Power BI access custom connector.
 
 From Power BI Desktop, change the settings to allow Power BI to use custom connectors.
 * Open Power BI Desktop.
@@ -17,11 +17,11 @@ From Power BI Desktop, change the settings to allow Power BI to use custom conne
 
 * Restart Power BI Desktop.
 
-**Note:** The Timestream custom connector only supports `AWS Profile` and `AWS IAM Credentials` authentication. Azure Active Directory and Okta authentication are not supported at this time.
+**Note:** The Amazon Timestream custom connector only supports `AWS Profile` and `AWS IAM Credentials` authentication. Azure Active Directory and Okta authentication are not supported at this time.
 
-## Connecting using the Timestream custom connector
+## Connecting using the Amazon Timestream custom connector
 
-1. Select `Timestream (Beta)` from `Get Data` and click `Connect'. You may get a warning for using third-party service. Click on `Continue`.
+1. Select `Amazon Timestream (Beta)` from `Get Data` and click `Connect`. You may get a warning for using third-party service. Click on `Continue`.
 
 <img src="img/get_data_custom_connector.png" width="60%">
 
