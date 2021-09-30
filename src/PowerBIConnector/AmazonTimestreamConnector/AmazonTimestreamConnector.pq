@@ -1,4 +1,4 @@
-section TimestreamConnector;
+section AmazonTimestreamConnector;
 
 // When set to true, additional trace information will be written out to the User log. 
 // This should be set to false before release. Tracing is done through a call to 
@@ -6,11 +6,11 @@ section TimestreamConnector;
 // no-op and simply returns the original value.
 EnableTraceOutput = false;
 
-[DataSource.Kind="TimestreamConnector", Publish="TimestreamConnector.Publish"]
-shared TimestreamConnector.Contents = Value.ReplaceType(TimestreamConnectorImpl, TimestreamConnectorType);
+[DataSource.Kind="AmazonTimestreamConnector", Publish="AmazonTimestreamConnector.Publish"]
+shared AmazonTimestreamConnector.Contents = Value.ReplaceType(AmazonTimestreamConnectorImpl, AmazonTimestreamConnectorType);
 
 // Wrapper function to provide additional UI customization.
-TimestreamConnectorType = type function (
+AmazonTimestreamConnectorType = type function (
         Region as (type text meta [
             Documentation.FieldCaption = "Region",
             Documentation.FieldDescription = "The AWS Region.",
@@ -24,16 +24,16 @@ TimestreamConnectorType = type function (
         ]),
         optional ProfileName as (type text meta [
             Documentation.FieldCaption = "Profile Name",
-            Documentation.FieldDescription = "The AWS profile name for Timestream.",
+            Documentation.FieldDescription = "The AWS profile name for Amazon Timestream.",
             Documentation.SampleValues = { "default" },
             DataSource.Path = true
         ])
     )
     as table meta [
-        Documentation.Name = "Timestream"
+        Documentation.Name = "Amazon Timestream"
     ];
 
-TimestreamConnectorImpl = (
+AmazonTimestreamConnectorImpl = (
     Region as text,
     optional Token as text,
     optional ProfileName as text
@@ -170,14 +170,14 @@ OnOdbcError = (errorRecord as record) =>
         IsHostUnreachable = (OdbcErrorCode = 202)
     in
         if IsDriverNotInstalled then
-            error Error.Record(errorRecord[Reason], "The Timestream ODBC driver is not installed. Please install the driver.", errorRecord[Detail])
+            error Error.Record(errorRecord[Reason], "The Amazon Timestream ODBC driver is not installed. Please install the driver.", errorRecord[Detail])
         else if IsHostUnreachable then
             error Error.Record(errorRecord[Reason], "Could not reach server. Please double-check the authentication.", errorRecord[Detail])
         else 
             error errorRecord;
 
 // Data Source Kind description.
-TimestreamConnector = [
+AmazonTimestreamConnector = [
     Label = Extension.LoadString("DataSourceLabel"),
 
     SupportsEncryption = true,
@@ -186,6 +186,8 @@ TimestreamConnector = [
             Label = "AWS Profile"
         ],
         UsernamePassword = [
+            UsernameLabel = Extension.LoadString("UsernameLabel"),
+            PasswordLabel = Extension.LoadString("PasswordLabel"),
             Label = "AWS IAM Credentials"
         ]
     ],
@@ -198,11 +200,11 @@ TimestreamConnector = [
             Token = json[Token],
             ProfileName = json[ProfileName]
         in
-            { "TimestreamConnector.Contents", Region, Token, ProfileName }
+            { "AmazonTimestreamConnector.Contents", Region, Token, ProfileName }
 ];
 
 // Data Source UI publishing description.
-TimestreamConnector.Publish = [
+AmazonTimestreamConnector.Publish = [
     Beta = true,
     Category = "Other",
     SupportsDirectQuery = true,
@@ -210,13 +212,13 @@ TimestreamConnector.Publish = [
     ButtonText = { Extension.LoadString("ButtonTitle"), Extension.LoadString("ButtonHelp") },
     LearnMoreUrl = "https://aws.amazon.com/timestream/",
 
-    SourceImage = TimestreamConnector.Icons,
-    SourceTypeImage = TimestreamConnector.Icons
+    SourceImage = AmazonTimestreamConnector.Icons,
+    SourceTypeImage = AmazonTimestreamConnector.Icons
 ];
 
-TimestreamConnector.Icons = [
-    Icon16 = { Extension.Contents("Timestream16.png"), Extension.Contents("Timestream20.png"), Extension.Contents("Timestream24.png"), Extension.Contents("Timestream32.png") },
-    Icon32 = { Extension.Contents("Timestream32.png"), Extension.Contents("Timestream40.png"), Extension.Contents("Timestream48.png"), Extension.Contents("Timestream64.png") }
+AmazonTimestreamConnector.Icons = [
+    Icon16 = { Extension.Contents("AmazonTimestream16.png"), Extension.Contents("AmazonTimestream20.png"), Extension.Contents("AmazonTimestream24.png"), Extension.Contents("AmazonTimestream32.png") },
+    Icon32 = { Extension.Contents("AmazonTimestream32.png"), Extension.Contents("AmazonTimestream40.png"), Extension.Contents("AmazonTimestream48.png"), Extension.Contents("AmazonTimestream64.png") }
 ];
 
 // Loads functions from another project file.
