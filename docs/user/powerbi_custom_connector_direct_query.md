@@ -7,7 +7,7 @@ Direct Query mode does not load data, but does live queries on the data. This me
 ## Prerequisites
 Before you get started, make sure you've properly installed the Amazon Timestream ODBC driver. 
 
-Copy the `AmazonTimestream.mez` file to the `<User>\Documents\Power BI Desktop\Custom Connectors\` folder (or to `<User>\OneDrive\Documents\Power BI Desktop\Custom Connectors` if using OneDrive). This will let Power BI access custom connector.
+Copy the `AmazonTimestreamConnector.mez` file to the `<User>\Documents\Power BI Desktop\Custom Connectors\` folder (or to `<User>\OneDrive\Documents\Power BI Desktop\Custom Connectors` if using OneDrive). This will let Power BI access custom connector.
 
 From Power BI Desktop, change the settings to allow Power BI to use custom connectors.
 * Open Power BI Desktop.

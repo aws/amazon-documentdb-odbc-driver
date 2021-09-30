@@ -1,6 +1,6 @@
 # Building the Amazon Timestream Power BI Connector
 
-The connector file `AmazonTimestream.mez` is a ZIP archive containing the power query files.
+The connector file `AmazonTimestreamConnector.mez` is a ZIP archive containing the power query files.
 
 ## Prerequisites
 1. Install Visual Studio 2019.
