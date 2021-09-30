@@ -1,10 +1,10 @@
-section TimestreamConnectorUnitTests;
+section AmazonTimestreamConnectorUnitTests;
 
-shared TimestreamConnector.UnitTest =
+shared AmazonTimestreamConnector.UnitTest =
 [
     Region = "us-east-2",
     ProfileName = "default",
-    Source = TimestreamConnector.Contents(Region, null, ProfileName),
+    Source = AmazonTimestreamConnector.Contents(Region, null, ProfileName),
     PowerBI_DB = Source{[Name="PowerBI",Kind="Database"]}[Data],
     DevOpsOriginal = PowerBI_DB{[Name="DevOps", Kind="Table"]}[Data],
     
@@ -186,7 +186,7 @@ shared TimestreamConnector.UnitTest =
                 Table.RowCount(CountDistinctRegion) = 7 and AllRowsSatisfyCondition(CountDistinctRegion, each [CountDistinctRegion] = 300)
         ),
         Fact("AVG operation",
-             53.8286181,
+             53.828618,
              let
                 AverageMeasurePerHost = Table.Group(DevOps, {"hostname"}, {{"AverageMeasurePerHost", each List.Average([measure_value]), type number}})
              in
@@ -229,7 +229,7 @@ shared TimestreamConnector.UnitTest =
                 MedianMeasureByRegion{[region="us-west-1"]}[MedianMeasureByRegion]
         ),
         Fact("Sum",
-             14808.270005,
+             14808.270004,
              let
                 SumMeasureByRegion = Table.Group(DevOps, {"region"}, {{"SumMeasureByRegion", each List.Sum([measure_value]), type number}})
              in

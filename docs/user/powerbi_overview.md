@@ -1,6 +1,6 @@
 # Power BI Overview
 
-There are four methods for connecting to Power BI.
+There are four methods for connecting Power BI to Amazon Timestream.
 
 1. [Power BI Desktop - ODBC](./powerbi_ODBC.md). Supports `AWS Profile`, `AWS IAM Credentials`, `Azure AD` and `Okta` authentication. ODBC data source must be created. Data is imported and must be refreshed for updates.
 2. [Power BI Desktop - Custom Connector - Import Mode](./powerbi_custom_connector_import.md). Supports `AWS Profile` and `AWS IAM Credentials` only. ODBC data sources do not need to be created. Data is imported and must be refreshed for updates.
