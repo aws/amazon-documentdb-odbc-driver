@@ -25,7 +25,6 @@
 #include <string>
 
 #include "communication.h"
-#include "saml_credentials_provider.h"
 
 /**
  * AWS Timestream communication class
