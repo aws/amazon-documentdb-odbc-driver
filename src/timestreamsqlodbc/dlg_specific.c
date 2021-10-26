@@ -47,130 +47,24 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
 
     /* fundamental info */
     nlen = MAX_CONNECT_STRING;
-    if (strcmp(ci->authtype, AUTHTYPE_AWS_PROFILE) == 0) {
-        olen = snprintf(
-            connect_string, nlen,
-            "%s=%s;"
-            INI_AUTH_MODE "=%s;"
-            INI_PROFILE_NAME "=%s;"
-            INI_REGION "=%s;"
-            INI_END_POINT_OVERRIDE "=%s;"
-            INI_LOG_LEVEL "=%d;"
-            INI_LOG_OUTPUT "=%s;"
-            INI_REQUEST_TIMEOUT "=%s;"
-            INI_CONNECTION_TIMEOUT "=%s;"
-            INI_MAX_RETRY_COUNT_CLIENT "=%s;"
-            INI_MAX_CONNECTIONS "=%s;",
-            got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
-            ci->authtype,
-            ci->profile_name,
-            ci->region,
-            ci->end_point_override,
-            (int)ci->drivers.loglevel,
-            ci->drivers.output_dir,
-            ci->request_timeout,
-            ci->connection_timeout,
-            ci->max_retry_count_client,
-            ci->max_connections);
-    } else if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
+
+    if (strcmp(ci->authtype, AUTHTYPE_DEFAULT) == 0) {
         olen = snprintf(
             connect_string, nlen,
             "%s=%s;"
             INI_AUTH_MODE "=%s;"
             INI_UID "=%s;"
-            INI_PWD "=%s;"
-            INI_SESSION_TOKEN "=%s;"
-            INI_REGION "=%s;"
-            INI_END_POINT_OVERRIDE "=%s;"
-            INI_LOG_LEVEL "=%d;"
-            INI_LOG_OUTPUT "=%s;"
-            INI_REQUEST_TIMEOUT "=%s;"
-            INI_CONNECTION_TIMEOUT "=%s;"
-            INI_MAX_RETRY_COUNT_CLIENT "=%s;"
+            INI_PWD "=%s;" 
+            INI_LOG_LEVEL "=%d;" 
+            INI_LOG_OUTPUT "=%s;" 
+            INI_REQUEST_TIMEOUT "=%s;" 
+            INI_CONNECTION_TIMEOUT "=%s;" 
+            INI_MAX_RETRY_COUNT_CLIENT "=%s" 
             INI_MAX_CONNECTIONS "=%s;",
             got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
             ci->authtype,
             ci->uid, 
             SAFE_NAME(ci->pwd),
-            ci->session_token,
-            ci->region,
-            ci->end_point_override,
-            (int)ci->drivers.loglevel,
-            ci->drivers.output_dir,
-            ci->request_timeout,
-            ci->connection_timeout,
-            ci->max_retry_count_client,
-            ci->max_connections);
-    } else if (strcmp(ci->authtype, AUTHTYPE_AAD) == 0) {
-        olen = snprintf(
-            connect_string, nlen,
-            "%s=%s;"
-            INI_AUTH_MODE "=%s;"
-            INI_UID "=%s;"
-            INI_PWD "=%s;"
-            INI_IDP_NAME "=%s;"
-            INI_AAD_APPLICATION_ID "=%s;"
-            INI_AAD_CLIENT_SECRET "=%s;"
-            INI_AAD_TENANT "=%s;"
-            INI_ROLE_ARN "=%s;"
-            INI_IDP_ARN "=%s;"
-            INI_REGION "=%s;"
-            INI_END_POINT_OVERRIDE "=%s;"
-            INI_LOG_LEVEL "=%d;"
-            INI_LOG_OUTPUT "=%s;"
-            INI_REQUEST_TIMEOUT "=%s;"
-            INI_CONNECTION_TIMEOUT "=%s;"
-            INI_MAX_RETRY_COUNT_CLIENT "=%s;"
-            INI_MAX_CONNECTIONS "=%s;",
-            got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
-            ci->authtype,
-            ci->uid, 
-            SAFE_NAME(ci->pwd),
-            ci->idp_name,
-            ci->aad_application_id,
-            ci->aad_client_secret,
-            ci->aad_tenant,
-            ci->role_arn,
-            ci->idp_arn,
-            ci->region,
-            ci->end_point_override,
-            (int)ci->drivers.loglevel,
-            ci->drivers.output_dir,
-            ci->request_timeout,
-            ci->connection_timeout,
-            ci->max_retry_count_client,
-            ci->max_connections);
-    } else if (strcmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
-        olen = snprintf(
-            connect_string, nlen,
-            "%s=%s;"
-            INI_AUTH_MODE "=%s;"
-            INI_UID "=%s;"
-            INI_PWD "=%s;"
-            INI_IDP_NAME "=%s;"
-            INI_IDP_HOST "=%s;"
-            INI_OKTA_APPLICATION_ID "=%s;"
-            INI_ROLE_ARN "=%s;"
-            INI_IDP_ARN "=%s;"
-            INI_REGION "=%s;"
-            INI_END_POINT_OVERRIDE "=%s;"
-            INI_LOG_LEVEL "=%d;"
-            INI_LOG_OUTPUT "=%s;"
-            INI_REQUEST_TIMEOUT "=%s;"
-            INI_CONNECTION_TIMEOUT "=%s;"
-            INI_MAX_RETRY_COUNT_CLIENT "=%s;"
-            INI_MAX_CONNECTIONS "=%s;",
-            got_dsn ? "DSN" : INI_DRIVER, got_dsn ? ci->dsn : ci->drivername,
-            ci->authtype,
-            ci->uid, 
-            SAFE_NAME(ci->pwd),
-            ci->idp_name,
-            ci->idp_host,
-            ci->okta_application_id,
-            ci->role_arn,
-            ci->idp_arn,
-            ci->region,
-            ci->end_point_override,
             (int)ci->drivers.loglevel,
             ci->drivers.output_dir,
             ci->request_timeout,
@@ -178,6 +72,8 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             ci->max_retry_count_client,
             ci->max_connections);
     }
+
+
     if (olen < 0 || olen >= nlen) {
         connect_string[0] = '\0';
         return;
@@ -214,65 +110,33 @@ BOOL get_DSN_or_Driver(ConnInfo *ci, const char *attribute, const char *value) {
 BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
                         const char *value) {
     BOOL found = TRUE, printed = FALSE;
-    if (stricmp(attribute, "DSN") == 0)
+    if (stricmp(attribute, "DSN") == 0) {
         STRCPY_FIXED(ci->dsn, value);
-    else if (stricmp(attribute, INI_DRIVER) == 0)
+    } else if (stricmp(attribute, INI_DRIVER) == 0) {
         STRCPY_FIXED(ci->drivername, value);
-    else if (stricmp(attribute, INI_ACCESS_KEY_ID) == 0
-             || stricmp(attribute, INI_UID) == 0
-             || stricmp(attribute, INI_IDP_USERNAME) == 0)
+    } else if (stricmp(attribute, INI_UID) == 0) {
         STRCPY_FIXED(ci->uid, value);
-    else if (stricmp(attribute, INI_SECRET_ACCESS_KEY) == 0
-             || stricmp(attribute, INI_PWD) == 0
-             || stricmp(attribute, INI_IDP_PASSWORD) == 0) {
+    } else if (stricmp(attribute, INI_PWD) == 0) {
         STR_TO_NAME(ci->pwd, value);
         MYLOG(LOG_DEBUG, "key='%s' value='xxxxxxxx'", attribute);
         printed = TRUE;
-    } else if (stricmp(attribute, INI_SESSION_TOKEN) == 0) {
-        STRCPY_FIXED(ci->session_token, value);
-        MYLOG(LOG_DEBUG, "key='%s' value='xxxxxxxx'", attribute);
-        printed = TRUE;
-    }
-    else if (stricmp(attribute, INI_AUTH_MODE) == 0)
+    } else if (stricmp(attribute, INI_AUTH_MODE) == 0) {
         STRCPY_FIXED(ci->authtype, value);
-    else if (stricmp(attribute, INI_PROFILE_NAME) == 0)
-        STRCPY_FIXED(ci->profile_name, value);
-    else if (stricmp(attribute, INI_REGION) == 0)
-        STRCPY_LOWER_FIXED(ci->region, value);
-    else if (stricmp(attribute, INI_END_POINT_OVERRIDE) == 0)
-        STRCPY_FIXED(ci->end_point_override, value);
-    else if (stricmp(attribute, INI_LOG_LEVEL) == 0)
+    } else if (stricmp(attribute, INI_LOG_LEVEL) == 0) {
         ci->drivers.loglevel = (char)atoi(value);
-    else if (stricmp(attribute, INI_LOG_OUTPUT) == 0)
+    } else if (stricmp(attribute, INI_LOG_OUTPUT) == 0) {
         STRCPY_FIXED(ci->drivers.output_dir, value);
-    else if (stricmp(attribute, INI_REQUEST_TIMEOUT) == 0)
+    } else if (stricmp(attribute, INI_REQUEST_TIMEOUT) == 0) {
         STRCPY_FIXED(ci->request_timeout, value);
-    else if (stricmp(attribute, INI_CONNECTION_TIMEOUT) == 0)
+    } else if (stricmp(attribute, INI_CONNECTION_TIMEOUT) == 0) {
         STRCPY_FIXED(ci->connection_timeout, value);
-    else if (stricmp(attribute, INI_MAX_RETRY_COUNT_CLIENT) == 0)
+    } else if (stricmp(attribute, INI_MAX_RETRY_COUNT_CLIENT) == 0) {
         STRCPY_FIXED(ci->max_retry_count_client, value);
-    else if (stricmp(attribute, INI_MAX_CONNECTIONS) == 0)
+    } else if (stricmp(attribute, INI_MAX_CONNECTIONS) == 0) {
         STRCPY_FIXED(ci->max_connections, value);
-    else if (stricmp(attribute, INI_IDP_NAME) == 0)
-        STRCPY_FIXED(ci->idp_name, value);
-    else if (stricmp(attribute, INI_IDP_HOST) == 0)
-        STRCPY_FIXED(ci->idp_host, value);
-    else if (stricmp(attribute, INI_OKTA_APPLICATION_ID) == 0)
-        STRCPY_FIXED(ci->okta_application_id, value);
-    else if (stricmp(attribute, INI_ROLE_ARN) == 0)
-        STRCPY_FIXED(ci->role_arn, value);
-    else if (stricmp(attribute, INI_AAD_APPLICATION_ID) == 0)
-        STRCPY_FIXED(ci->aad_application_id, value);
-    else if (stricmp(attribute, INI_AAD_CLIENT_SECRET) == 0) {
-        STRCPY_FIXED(ci->aad_client_secret, value);
-        MYLOG(LOG_DEBUG, "key='%s' value='xxxxxxxx'", attribute);
-        printed = TRUE;
-    } else if (stricmp(attribute, INI_AAD_TENANT) == 0)
-        STRCPY_FIXED(ci->aad_tenant, value);
-    else if (stricmp(attribute, INI_IDP_ARN) == 0)
-        STRCPY_FIXED(ci->idp_arn, value);
-    else
+    } else {
         found = FALSE;
+    }
 
     if (!printed)
         MYLOG(LOG_DEBUG, "key='%s' value='%s'%s", attribute, value,
@@ -291,22 +155,10 @@ static void getCiDefaults(ConnInfo *ci) {
     strncpy(ci->max_connections, DEFAULT_MAX_CONNECTIONS_STR,
             SMALL_REGISTRY_LEN);
     strncpy(ci->authtype, DEFAULT_AUTHTYPE, MEDIUM_REGISTRY_LEN);
-    strncpy(ci->profile_name, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
     if (ci->pwd.name != NULL)
         free(ci->pwd.name);
     ci->pwd.name = NULL;
     strncpy(ci->uid, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(ci->session_token, DEFAULT_NONE, LARGE_REGISTRY_LEN);
-    strncpy(ci->region, DEFAULT_REGION, MEDIUM_REGISTRY_LEN);
-    strncpy(ci->end_point_override, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(ci->idp_name, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(ci->idp_host, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(ci->okta_application_id, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(ci->role_arn, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(ci->idp_arn, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(ci->aad_application_id, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(ci->aad_client_secret, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(ci->aad_tenant, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
 #if defined(__APPLE__) || defined(__linux__)
     strcpy(ci->drivers.output_dir, "/tmp");
 #else
@@ -385,52 +237,17 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
                                    sizeof(temp), ODBC_INI)
         > 0)
         STRCPY_FIXED(ci->authtype, temp);
-    if (SQLGetPrivateProfileString(DSN, INI_PROFILE_NAME, NULL_STRING, temp,
-                                   sizeof(temp), ODBC_INI)
-        > 0)
-        STRCPY_FIXED(ci->profile_name, temp);
-    if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
-        if (SQLGetPrivateProfileString(DSN, INI_ACCESS_KEY_ID, NULL_STRING,
-                                       temp, sizeof(temp), ODBC_INI)
-            > 0)
-            STRCPY_FIXED(ci->uid, temp);
-        if (SQLGetPrivateProfileString(DSN, INI_SECRET_ACCESS_KEY, NULL_STRING,
-                                       temp, sizeof(temp), ODBC_INI)
-            > 0)
-            STR_TO_NAME(ci->pwd, temp);
-    } else if (strcmp(ci->authtype, AUTHTYPE_AAD) == 0
-               || strcmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
-        if (SQLGetPrivateProfileString(DSN, INI_IDP_USERNAME, NULL_STRING, temp,
-                                       sizeof(temp), ODBC_INI)
-            > 0)
-            STRCPY_FIXED(ci->uid, temp);
-        if (SQLGetPrivateProfileString(DSN, INI_IDP_PASSWORD, NULL_STRING, temp,
-                                       sizeof(temp), ODBC_INI)
-            > 0)
-            STR_TO_NAME(ci->pwd, temp);
-    }
-    if (strcmp(ci->authtype, AUTHTYPE_AWS_PROFILE) != 0) {
-        if (SQLGetPrivateProfileString(DSN, INI_UID, NULL_STRING, temp,
+    if (strcmp(ci->authtype, AUTHTYPE_DEFAULT) == 0) {
+        if (SQLGetPrivateProfileString(DSN, INI_UID, NULL_STRING, temp, 
                                        sizeof(temp), ODBC_INI)
             > 0)
             STRCPY_FIXED(ci->uid, temp);
         if (SQLGetPrivateProfileString(DSN, INI_PWD, NULL_STRING, temp,
                                        sizeof(temp), ODBC_INI)
+                 
             > 0)
             STR_TO_NAME(ci->pwd, temp);
     }
-    if (SQLGetPrivateProfileString(DSN, INI_SESSION_TOKEN, NULL_STRING, temp,
-                                   sizeof(temp), ODBC_INI)
-        > 0)
-        STRCPY_FIXED(ci->session_token, temp);
-    if (SQLGetPrivateProfileString(DSN, INI_REGION, NULL_STRING, temp,
-                                   sizeof(temp), ODBC_INI)
-        > 0)
-        STRCPY_FIXED(ci->region, temp);
-    if (SQLGetPrivateProfileString(DSN, INI_END_POINT_OVERRIDE, NULL_STRING, temp,
-                                   sizeof(temp), ODBC_INI)
-        > 0)
-        STRCPY_FIXED(ci->end_point_override, temp);
     if (SQLGetPrivateProfileString(DSN, INI_LOG_LEVEL, NULL_STRING, temp,
                                    sizeof(temp), ODBC_INI)
         > 0)
@@ -455,41 +272,7 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
                                    sizeof(temp), ODBC_INI)
         > 0)
         STRCPY_FIXED(ci->max_connections, temp);
-    if (SQLGetPrivateProfileString(DSN, INI_IDP_NAME, NULL_STRING, temp,
-                                   sizeof(temp), ODBC_INI)
-        > 0)
-        STRCPY_FIXED(ci->idp_name, temp);
-    if (SQLGetPrivateProfileString(DSN, INI_IDP_HOST, NULL_STRING, temp,
-                                   sizeof(temp), ODBC_INI)
-        > 0)
-        STRCPY_FIXED(ci->idp_host, temp);
-    if (SQLGetPrivateProfileString(DSN, INI_OKTA_APPLICATION_ID, NULL_STRING,
-                                   temp,
-                                   sizeof(temp), ODBC_INI)
-        > 0)
-        STRCPY_FIXED(ci->okta_application_id, temp);
-    if (SQLGetPrivateProfileString(DSN, INI_ROLE_ARN, NULL_STRING, temp,
-                                   sizeof(temp), ODBC_INI)
-        > 0)
-        STRCPY_FIXED(ci->role_arn, temp);
-    if (SQLGetPrivateProfileString(DSN, INI_AAD_APPLICATION_ID, NULL_STRING,
-                                   temp,
-                                   sizeof(temp), ODBC_INI)
-        > 0)
-        STRCPY_FIXED(ci->aad_application_id, temp);
-    if (SQLGetPrivateProfileString(DSN, INI_AAD_CLIENT_SECRET, NULL_STRING,
-                                   temp,
-                                   sizeof(temp), ODBC_INI)
-        > 0)
-        STRCPY_FIXED(ci->aad_client_secret, temp);
-    if (SQLGetPrivateProfileString(DSN, INI_AAD_TENANT, NULL_STRING,
-                                   temp, sizeof(temp), ODBC_INI)
-        > 0)
-        STRCPY_FIXED(ci->aad_tenant, temp);
-    if (SQLGetPrivateProfileString(DSN, INI_IDP_ARN, NULL_STRING,
-                                   temp, sizeof(temp), ODBC_INI)
-        > 0)
-        STRCPY_FIXED(ci->idp_arn, temp);
+   
 
     STR_TO_NAME(ci->drivers.drivername, drivername);
 
@@ -520,11 +303,7 @@ void writeDSNinfo(const ConnInfo *ci) {
 
     SQLWritePrivateProfileString(DSN, INI_UID, ci->uid, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_PWD, SAFE_NAME(ci->pwd), ODBC_INI);
-    SQLWritePrivateProfileString(DSN, INI_SESSION_TOKEN, ci->session_token, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_AUTH_MODE, ci->authtype, ODBC_INI);
-    SQLWritePrivateProfileString(DSN, INI_PROFILE_NAME, ci->profile_name, ODBC_INI);
-    SQLWritePrivateProfileString(DSN, INI_REGION, ci->region, ODBC_INI);
-    SQLWritePrivateProfileString(DSN, INI_END_POINT_OVERRIDE, ci->end_point_override, ODBC_INI);
     ITOA_FIXED(temp, ci->drivers.loglevel);
     SQLWritePrivateProfileString(DSN, INI_LOG_LEVEL, temp, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_LOG_OUTPUT, ci->drivers.output_dir,
@@ -536,25 +315,6 @@ void writeDSNinfo(const ConnInfo *ci) {
     SQLWritePrivateProfileString(DSN, INI_MAX_RETRY_COUNT_CLIENT, ci->max_retry_count_client,
                                  ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_MAX_CONNECTIONS, ci->max_connections,
-                                 ODBC_INI);
-    SQLWritePrivateProfileString(DSN, INI_IDP_NAME, ci->idp_name,
-                                 ODBC_INI);
-    SQLWritePrivateProfileString(DSN, INI_IDP_HOST, ci->idp_host,
-                                 ODBC_INI);
-    SQLWritePrivateProfileString(DSN, INI_OKTA_APPLICATION_ID,
-                                 ci->okta_application_id,
-                                 ODBC_INI);
-    SQLWritePrivateProfileString(DSN, INI_ROLE_ARN, ci->role_arn,
-                                 ODBC_INI);
-    SQLWritePrivateProfileString(DSN, INI_AAD_APPLICATION_ID,
-                                 ci->aad_application_id,
-                                 ODBC_INI);
-    SQLWritePrivateProfileString(DSN, INI_AAD_CLIENT_SECRET,
-                                 ci->aad_client_secret,
-                                 ODBC_INI);
-    SQLWritePrivateProfileString(DSN, INI_AAD_TENANT, ci->aad_tenant,
-                                 ODBC_INI);
-    SQLWritePrivateProfileString(DSN, INI_IDP_ARN, ci->idp_arn,
                                  ODBC_INI);
 }
 
@@ -581,22 +341,10 @@ void CC_conninfo_init(ConnInfo *conninfo, UInt4 option) {
     strncpy(conninfo->max_connections, DEFAULT_MAX_CONNECTIONS_STR,
             SMALL_REGISTRY_LEN);
     strncpy(conninfo->authtype, DEFAULT_AUTHTYPE, MEDIUM_REGISTRY_LEN);
-    strncpy(conninfo->profile_name, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
     if (conninfo->pwd.name != NULL)
         free(conninfo->pwd.name);
     conninfo->pwd.name = NULL;
     strncpy(conninfo->uid, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(conninfo->session_token, DEFAULT_NONE, LARGE_REGISTRY_LEN);
-    strncpy(conninfo->region, DEFAULT_REGION, MEDIUM_REGISTRY_LEN);
-    strncpy(conninfo->end_point_override, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(conninfo->idp_name, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(conninfo->idp_host, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(conninfo->okta_application_id, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(conninfo->role_arn, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(conninfo->aad_application_id, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(conninfo->aad_client_secret, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(conninfo->aad_tenant, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
-    strncpy(conninfo->idp_arn, DEFAULT_NONE, MEDIUM_REGISTRY_LEN);
 
     if (0 != (INIT_GLOBALS & option))
         init_globals(&(conninfo->drivers));
@@ -632,23 +380,11 @@ void CC_copy_conninfo(ConnInfo *ci, const ConnInfo *sci) {
     CORR_STRCPY(drivername);
     CORR_STRCPY(uid);
     CORR_STRCPY(authtype);
-    CORR_STRCPY(profile_name);
-    CORR_STRCPY(region);
-    CORR_STRCPY(end_point_override);
     NAME_TO_NAME(ci->pwd, sci->pwd);
-    CORR_STRCPY(session_token);
     CORR_STRCPY(request_timeout);
     CORR_STRCPY(connection_timeout);
     CORR_STRCPY(max_retry_count_client);
     CORR_STRCPY(max_connections);
-    CORR_STRCPY(idp_name);
-    CORR_STRCPY(idp_host);
-    CORR_STRCPY(okta_application_id);
-    CORR_STRCPY(role_arn);
-    CORR_STRCPY(aad_application_id);
-    CORR_STRCPY(aad_client_secret);
-    CORR_STRCPY(aad_tenant);
-    CORR_STRCPY(idp_arn);
     copy_globals(&(ci->drivers), &(sci->drivers));
 }
 #undef CORR_STRCPY

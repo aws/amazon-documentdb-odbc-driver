@@ -54,10 +54,7 @@ set(CPP_SOURCE_FILES	communication.cpp
 						odbc_statement.cpp
 						utility.cpp
 						odbc_communication.cpp
-						prefetch_queue.cpp
-						saml_credentials_provider.cpp
-						aad_credentials_provider.cpp
-						okta_credentials_provider.cpp)
+						prefetch_queue.cpp)
 						
 if(WIN32)
 set(C_SOURCE_FILES ${C_SOURCE_FILES} dlg_wingui.c setup.c)
@@ -95,9 +92,6 @@ set(CPP_HEADER_FILES	communication.h
 						utility.h
 						odbc_communication.h
 						prefetch_queue.h
-						saml_credentials_provider.h
-						aad_credentials_provider.h
-						okta_credentials_provider.h
 						version.h)
 
 # Generate dll (SHARED)
