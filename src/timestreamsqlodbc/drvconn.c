@@ -56,19 +56,17 @@ char *hide_password(const char *str) {
     if (!outstr)
         return NULL;
 
-    const char *str_to_hide[] = {
-        "PWD=", "SecretAccessKey=", "AADClientSecret=", "SessionToken="};
+    const char *str_to_hide[] = {"PWD="};
     size_t size = sizeof(str_to_hide) / sizeof(str_to_hide[0]);
 
     for (size_t i = 0; i < size; ++i) {
         if (pwdp = stristr(outstr, str_to_hide[i]), pwdp) {
             char *p;
-
-            for (p = pwdp + strlen(str_to_hide[i]); *p && *p != ';'; p++)
+            for (p = pwdp + strlen(str_to_hide[i]); *p && *p != ';'; p++) {
                 *p = 'x';
+            }
         }
     }
-
     return outstr;
 }
 
@@ -131,21 +129,10 @@ INT_PTR CALLBACK dconn_FDriverConnectProc(HWND hdlg, UINT wMsg, WPARAM wParam,
 
             SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL, 2, (WPARAM)0);
 
-            if (strcmp(ci->authtype, AUTHTYPE_AWS_PROFILE) == 0) {
-                SetFocus(GetDlgItem(hdlg, IDC_PROFILE_NAME));
-            } else if (ci->uid[0] == '\0') {
-                if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
-                    SetFocus(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID));
-                } else if (strcmp(ci->authtype, AUTHTYPE_AAD) == 0) {
-                    SetFocus(GetDlgItem(hdlg, IDC_IDP_USERNAME));
-                } else if (strcmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
-                    SetFocus(GetDlgItem(hdlg, IDC_IDP_USERNAME));
-                }
-            } else if (ci->region[0] == '\0')
-                SetFocus(GetDlgItem(hdlg, IDC_REGION));
-            else if (ci->end_point_override[0] == '\0')
-                SetFocus(GetDlgItem(hdlg, IDC_END_POINT_OVERRIDE));
-
+            if (strcmp(ci->authtype, AUTHTYPE_DEFAULT) == 0) {
+                SetFocus(GetDlgItem(hdlg, IDC_USER));
+            }
+            
             break;
 
         case WM_COMMAND:

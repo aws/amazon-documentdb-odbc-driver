@@ -620,22 +620,8 @@ typedef struct {
 
     // Authentication
     char authtype[MEDIUM_REGISTRY_LEN];
-    char profile_name[MEDIUM_REGISTRY_LEN];
     char uid[MEDIUM_REGISTRY_LEN];
     esNAME pwd;
-    char session_token[LARGE_REGISTRY_LEN];
-    char region[MEDIUM_REGISTRY_LEN];
-    char end_point_override[MEDIUM_REGISTRY_LEN];
-
-    // SAML
-    char idp_name[MEDIUM_REGISTRY_LEN];
-    char idp_host[MEDIUM_REGISTRY_LEN];
-    char okta_application_id[MEDIUM_REGISTRY_LEN];
-    char role_arn[MEDIUM_REGISTRY_LEN];
-    char idp_arn[MEDIUM_REGISTRY_LEN];
-    char aad_application_id[MEDIUM_REGISTRY_LEN];
-    char aad_client_secret[MEDIUM_REGISTRY_LEN];
-    char aad_tenant[MEDIUM_REGISTRY_LEN];
 
     GLOBAL_VALUES drivers; /* moved from driver's option */
 } ConnInfo;
