@@ -21,8 +21,6 @@
 // clang-format off
 #include "odbc.h"
 #include "odbc_statement.h"
-#include "aad_credentials_provider.h"
-#include "okta_credentials_provider.h"
 #include "version.h"
 #include "mylog.h"
 #include <atomic>
@@ -84,45 +82,8 @@ namespace {
             return std::unique_ptr< TimestreamQueryClient >(new TimestreamQueryClient(config));
         };
 
-    QueryClientCreator profile =
-        [](const runtime_options& options,
-           const Aws::Client::ClientConfiguration& config) {
-        auto cp = std::make_shared<
-            Aws::Auth::ProfileConfigFileAWSCredentialsProvider >(
-            options.auth.profile_name.c_str());
-        return std::unique_ptr< TimestreamQueryClient >(new TimestreamQueryClient(cp, config));
-    };
-
-    QueryClientCreator iam =
-        [](const runtime_options& options,
-           const Aws::Client::ClientConfiguration& config) {
-        Aws::Auth::AWSCredentials credentials(
-            options.auth.uid, options.auth.pwd, options.auth.session_token);
-        return std::unique_ptr< TimestreamQueryClient >(new TimestreamQueryClient(credentials, config));
-    };
-
-    QueryClientCreator aad =
-        [](const runtime_options& options,
-           const Aws::Client::ClientConfiguration& config) {
-        auto credential_provider =
-            std::unique_ptr< AADCredentialsProvider >(new AADCredentialsProvider(options.auth));
-        return std::unique_ptr< TimestreamQueryClient >(new TimestreamQueryClient(credential_provider->GetAWSCredentials(), config));
-    };
-
-    QueryClientCreator okta =
-        [](const runtime_options& options,
-           const Aws::Client::ClientConfiguration& config) {
-        auto credential_provider =
-            std::unique_ptr< OktaCredentialsProvider >(new OktaCredentialsProvider(options.auth));
-        return std::unique_ptr< TimestreamQueryClient >(new TimestreamQueryClient(credential_provider->GetAWSCredentials(), config));
-    };
-
     std::unordered_map< std::string, QueryClientCreator > creators = {
-        {DEFAULT_CREATOR_TYPE, default_creator},
-        {AUTHTYPE_AWS_PROFILE, profile},
-        {AUTHTYPE_IAM, iam},
-        {AUTHTYPE_AAD, aad},
-        {AUTHTYPE_OKTA, okta},
+        {DEFAULT_CREATOR_TYPE, default_creator}
     };
 }
 
@@ -135,31 +96,8 @@ TSCommunication::~TSCommunication() {
 }
 
 bool TSCommunication::Validate(const runtime_options& options) {
-    if (options.auth.region.empty() && options.auth.end_point_override.empty()) {
-        throw std::invalid_argument("Region and end point cannot both be empty.");
-    }
-    if (options.auth.auth_type != AUTHTYPE_AWS_PROFILE &&
-        options.auth.auth_type != AUTHTYPE_IAM &&
-        options.auth.auth_type != AUTHTYPE_AAD &&
-        options.auth.auth_type != AUTHTYPE_OKTA) {
+    if (options.auth.auth_type != AUTHTYPE_DEFAULT) {
         throw std::invalid_argument("Unknown authentication type: \"" + options.auth.auth_type + "\".");
-    }
-    if (options.auth.uid.empty() && options.auth.auth_type != AUTHTYPE_AWS_PROFILE) {
-        if (options.auth.auth_type == AUTHTYPE_IAM) {
-            throw std::invalid_argument("Access Key ID cannot be empty.");
-        } else {
-            throw std::invalid_argument("IdP Username cannot be empty.");
-        }
-    }
-    if (options.auth.pwd.empty() && options.auth.auth_type != AUTHTYPE_AWS_PROFILE) {
-        if (options.auth.auth_type == AUTHTYPE_IAM) {
-            throw std::invalid_argument("Secret Access Key cannot be empty.");
-        } else {
-            throw std::invalid_argument("IdP Password cannot be empty.");
-        }
-    }
-    if (options.auth.idp_host.empty() && options.auth.auth_type == AUTHTYPE_OKTA) {
-        throw std::invalid_argument("IdP Host cannot be empty.");
     }
 
     LogMsg(LOG_DEBUG, "Required connection options are valid.");
@@ -169,12 +107,7 @@ bool TSCommunication::Validate(const runtime_options& options) {
 std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient > TSCommunication::CreateQueryClient(const runtime_options& options) {
     Aws::Client::ClientConfiguration config;
     config.userAgent = GetUserAgent();
-    if (!options.auth.end_point_override.empty()) {
-        config.endpointOverride = options.auth.end_point_override;
-    } else {
-        config.enableEndpointDiscovery = true;
-        config.region = options.auth.region;
-    }
+
     long request_timeout = static_cast< long >(DEFAULT_REQUEST_TIMEOUT);
     if (!options.conn.timeout.empty()) {
         request_timeout = std::stol(options.conn.timeout);
@@ -208,9 +141,10 @@ std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient > TSCommunication::
                 max_retry_count_client);
     }
     auto creator_type = options.auth.auth_type;
-    if (options.auth.auth_type == AUTHTYPE_AWS_PROFILE && options.auth.profile_name.empty()) {
+    if (options.auth.auth_type == AUTHTYPE_DEFAULT) {
         creator_type = DEFAULT_CREATOR_TYPE;
     }
+   
     auto creator = creators.find(creator_type);
     if (creator == creators.end()) {
         throw std::runtime_error("Unknown auth type: "

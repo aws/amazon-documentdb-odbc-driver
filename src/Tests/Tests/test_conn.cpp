@@ -22,7 +22,6 @@
 #endif
 
 #include "odbc_communication.h"
-#include "okta_credentials_provider.h"
 #include "pch.h"
 #include "unit_test_helper.h"
 // clang-format on
@@ -31,8 +30,7 @@ TEST(TestConnectionOptions, Good) {
     runtime_options options;
     options.auth.uid = "UID";
     options.auth.pwd = "PWD";
-    options.auth.region = "Region";
-    options.auth.auth_type = AUTHTYPE_IAM;
+    options.auth.auth_type = AUTHTYPE_DEFAULT;
     TSCommunication conn;    
     EXPECT_NO_THROW(conn.Validate(options));
     EXPECT_TRUE(conn.Validate(options));
@@ -42,8 +40,7 @@ TEST(TestConnectionOptions, UID_is_empty) {
     runtime_options options;
     options.auth.uid = "";
     options.auth.pwd = "PWD";
-    options.auth.region = "Region";
-    options.auth.auth_type = AUTHTYPE_IAM;
+    options.auth.auth_type = AUTHTYPE_DEFAULT;
     TSCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
@@ -52,18 +49,7 @@ TEST(TestConnectionOptions, PWD_is_empty) {
     runtime_options options;
     options.auth.uid = "UID";
     options.auth.pwd = "";
-    options.auth.region = "Region";
-    options.auth.auth_type = AUTHTYPE_IAM;
-    TSCommunication conn;
-    EXPECT_THROW(conn.Validate(options), std::invalid_argument);
-}
-
-TEST(TestConnectionOptions, Region_is_empty) {
-    runtime_options options;
-    options.auth.uid = "UID";
-    options.auth.pwd = "PWD";
-    options.auth.region = "";
-    options.auth.auth_type = AUTHTYPE_IAM;
+    options.auth.auth_type = AUTHTYPE_DEFAULT;
     TSCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
@@ -72,7 +58,6 @@ TEST(TestConnectionOptions, Auth_type_is_empty) {
     runtime_options options;
     options.auth.uid = "UID";
     options.auth.pwd = "PWD";
-    options.auth.region = "Region";
     options.auth.auth_type = "";
     TSCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
@@ -82,62 +67,10 @@ TEST(TestConnectionOptions, Timeout_is_alpha) {
     runtime_options options;
     options.auth.uid = "UID";
     options.auth.pwd = "PWD";
-    options.auth.region = "Region";
     options.auth.auth_type = "";
     options.conn.timeout = "timeout";
     TSCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
-}
-
-TEST(TestConnectionOptions, IdP_host_is_empty) {
-    runtime_options options;
-    options.auth.uid = "UID";
-    options.auth.pwd = "PWD";
-    options.auth.region = "Region";
-    options.auth.auth_type = AUTHTYPE_OKTA;
-    options.auth.idp_host = "";
-    TSCommunication conn;
-    EXPECT_THROW(conn.Validate(options), std::invalid_argument);
-}
-
-TEST(TestDecodeHex, Single_hex) {
-    const std::string hex_encoded = "&#x3d;";
-    const std::string expected = "=";
-    EXPECT_EQ(expected, OktaCredentialsProvider::DecodeHex(hex_encoded));
-}
-
-TEST(TestDecodeHex, Invalid_single_hex) {
-    const std::string hex_encoded = "&#x3d";
-    EXPECT_EQ(hex_encoded, OktaCredentialsProvider::DecodeHex(hex_encoded));
-}
-
-TEST(TestDecodeHex, Double_ampersand) {
-    const std::string hex_encoded = "&&#x3d;";
-    const std::string expected = "&=";
-    EXPECT_EQ(expected, OktaCredentialsProvider::DecodeHex(hex_encoded));
-}
-
-TEST(TestDecodeHex, Hex_with_numbers) {
-    const std::string hex_encoded = "12345&#x3d;&#x2b;12345";
-    const std::string expected = "12345=+12345";
-    EXPECT_EQ(expected, OktaCredentialsProvider::DecodeHex(hex_encoded));
-}
-
-TEST(TestDecodeHex, Empty) {
-    const std::string hex_encoded = "";
-    const std::string expected = "";
-    EXPECT_EQ(expected, OktaCredentialsProvider::DecodeHex(hex_encoded));
-}
-
-TEST(TestDecodeHex, No_hex) {
-    const std::string hex_encoded = "12345abc";
-    EXPECT_EQ(hex_encoded, OktaCredentialsProvider::DecodeHex(hex_encoded));
-}
-
-TEST(TestDecodeHex, All_possible_hex) {
-    const std::string hex_encoded = "&#x2b;&#x2f;&#x3d;&#x2c;&#x2d;&#x5f;";
-    const std::string expected = "+/=,-_";
-    EXPECT_EQ(expected, OktaCredentialsProvider::DecodeHex(hex_encoded));
 }
 
 TEST(TestGetUserAgent, Success) {

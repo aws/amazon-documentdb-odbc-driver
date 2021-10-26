@@ -58,25 +58,6 @@ extern "C" {
 #define INI_UID "UID"
 #define INI_PWD "PWD"
 #define INI_AUTH_MODE "Auth"
-// AWS_PROFILE
-#define INI_PROFILE_NAME "ProfileName"
-// IAM
-#define INI_ACCESS_KEY_ID "AccessKeyId"
-#define INI_SECRET_ACCESS_KEY "SecretAccessKey"
-#define INI_SESSION_TOKEN "SessionToken"
-#define INI_REGION "Region"
-#define INI_END_POINT_OVERRIDE "EndPointOverride"
-// SAML-based
-#define INI_IDP_NAME "IdpName"
-#define INI_IDP_HOST "IdpHost"
-#define INI_IDP_USERNAME "IdpUserName"
-#define INI_IDP_PASSWORD "IdpPassword"
-#define INI_OKTA_APPLICATION_ID "OktaApplicationID"
-#define INI_ROLE_ARN "RoleARN"
-#define INI_AAD_APPLICATION_ID "AADApplicationID"
-#define INI_AAD_CLIENT_SECRET "AADClientSecret"
-#define INI_AAD_TENANT "AADTenant"
-#define INI_IDP_ARN "IdpARN"
 // Logging
 #define INI_LOG_LEVEL "LogLevel"
 #define INI_LOG_OUTPUT "LogOutput"
@@ -86,21 +67,19 @@ extern "C" {
 #define INI_MAX_RETRY_COUNT_CLIENT "MaxRetryCountClient"
 #define INI_MAX_CONNECTIONS "MaxConnections"
 
+#define AUTHTYPE_DEFAULT "DEFAULT"
+
 #define DEFAULT_REQUEST_TIMEOUT 3000
 #define DEFAULT_REQUEST_TIMEOUT_STR "3000"
 #define DEFAULT_CONNECTION_TIMEOUT 1000
 #define DEFAULT_CONNECTION_TIMEOUT_STR "1000"
 #define DEFAULT_MAX_CONNECTIONS 25
 #define DEFAULT_MAX_CONNECTIONS_STR "25"
-#define DEFAULT_AUTHTYPE "AWS_PROFILE"
+#define DEFAULT_AUTHTYPE AUTHTYPE_DEFAULT
 #define DEFAULT_DRIVERNAME "timestreamodbc"
-#define DEFAULT_REGION "us-east-1"
 #define DEFAULT_NONE ""
 
-#define AUTHTYPE_AWS_PROFILE "AWS_PROFILE"
-#define AUTHTYPE_IAM "IAM"
-#define AUTHTYPE_AAD "AAD"
-#define AUTHTYPE_OKTA "OKTA"
+
 
 #ifdef _HANDLE_ENLIST_IN_DTC_
 #define INI_XAOPT "XaOpt"
