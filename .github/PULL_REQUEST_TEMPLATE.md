@@ -12,12 +12,9 @@
 <!--- Link to issue where this is tracked -->
 
 ### Additional Reviewers
-@kylepbit
-@raymond-lum
-@yanw-bq
-@lyndonb-bq
-@csolonynka
-@justing-bq
-@leszek-bq
-@jduo
+@affonsoBQ
+@alexey-temnikov
+@andiem-bq
+@birschick-bq
+@garya-bitquill
 <!-- Any additional reviewers -->
