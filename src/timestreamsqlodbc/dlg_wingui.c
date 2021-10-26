@@ -27,7 +27,7 @@
 #endif /* _HANDLE_ENLIST_IN_DTC_ */
 #include <ShlObj_core.h>
 
-#define AUTHMODE_CNT 4
+#define AUTHMODE_CNT 1
 #define LOGLEVEL_CNT 8
 extern HINSTANCE s_hModule;
 
@@ -42,10 +42,7 @@ int loglevels[LOGLEVEL_CNT] = {
     {IDS_LOGTYPE_ALL}};
 
 static const struct authmode authmodes[AUTHMODE_CNT] = {
-    {IDS_AUTHTYPE_AWS_PROFILE, AUTHTYPE_AWS_PROFILE},
-    {IDS_AUTHTYPE_IAM, AUTHTYPE_IAM},
-    {IDS_AUTHTYPE_AAD, AUTHTYPE_AAD},
-    {IDS_AUTHTYPE_OKTA, AUTHTYPE_OKTA}};
+    {IDS_AUTHTYPE_DEFAULT, AUTHTYPE_DEFAULT}};
 
 const struct authmode *GetCurrentAuthMode(HWND hdlg) {
     unsigned int ams_cnt = 0;
@@ -92,122 +89,9 @@ void SetLoggingVisibility(HWND hdlg, int logLevel) {
 }
 
 void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
-    if (strcmp(am->authtype_str, AUTHTYPE_AWS_PROFILE) == 0) {
-        ShowWindow(GetDlgItem(hdlg, IDC_PROFILE_NAME), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_PROFILE_NAME_STATIC), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_NAME), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_NAME_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_HOST), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_HOST_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_PASSWORD), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_PASSWORD_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_OKTA_APPLICATION_ID), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_OKTA_APPLICATION_ID_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_ROLE_ARN), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_ROLE_ARN_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_APPLICATION_ID), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_APPLICATION_ID_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_CLIENT_SECRET), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_CLIENT_SECRET_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_TENANT), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_TENANT_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_ARN), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_ARN_STATIC), FALSE);
-    } else if (strcmp(am->authtype_str, AUTHTYPE_IAM) == 0) {
-        ShowWindow(GetDlgItem(hdlg, IDC_PROFILE_NAME), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_PROFILE_NAME_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID_STATIC), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY_STATIC), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN_STATIC), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_NAME), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_NAME_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_PASSWORD), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_PASSWORD_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_HOST), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_HOST_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_OKTA_APPLICATION_ID), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_OKTA_APPLICATION_ID_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_ROLE_ARN), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_ROLE_ARN_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_APPLICATION_ID), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_APPLICATION_ID_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_CLIENT_SECRET), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_CLIENT_SECRET_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_TENANT), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_TENANT_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_ARN), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_ARN_STATIC), FALSE);
-    } else if (strcmp(am->authtype_str, AUTHTYPE_AAD) == 0) {
-        ShowWindow(GetDlgItem(hdlg, IDC_PROFILE_NAME), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_PROFILE_NAME_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_NAME), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_NAME_STATIC), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME_STATIC), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_PASSWORD), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_PASSWORD_STATIC), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_HOST), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_HOST_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_OKTA_APPLICATION_ID), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_OKTA_APPLICATION_ID_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_ROLE_ARN), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_ROLE_ARN_STATIC), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_APPLICATION_ID), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_APPLICATION_ID_STATIC), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_CLIENT_SECRET), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_CLIENT_SECRET_STATIC), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_TENANT), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_TENANT_STATIC), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_ARN), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_ARN_STATIC), TRUE);
-    } else {
-        ShowWindow(GetDlgItem(hdlg, IDC_PROFILE_NAME), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_PROFILE_NAME_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_ACCESS_KEY_ID_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_SECRET_ACCESS_KEY_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_SESSION_TOKEN_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_NAME), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_NAME_STATIC), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_USERNAME_STATIC), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_PASSWORD), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_PASSWORD_STATIC), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_HOST), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_HOST_STATIC), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_OKTA_APPLICATION_ID), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_OKTA_APPLICATION_ID_STATIC), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_ROLE_ARN), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_ROLE_ARN_STATIC), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_APPLICATION_ID), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_APPLICATION_ID_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_CLIENT_SECRET), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_CLIENT_SECRET_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_TENANT), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_AAD_TENANT_STATIC), FALSE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_ARN), TRUE);
-        ShowWindow(GetDlgItem(hdlg, IDC_IDP_ARN_STATIC), TRUE);
+    if (strcmp(am->authtype_str, AUTHTYPE_DEFAULT) == 0) {
+        ShowWindow(GetDlgItem(hdlg, IDC_USER), TRUE);
+        ShowWindow(GetDlgItem(hdlg, IDC_PASSWORD), TRUE);
     }
 }
 
@@ -232,29 +116,9 @@ void SetDlgStuff(HWND hdlg, const ConnInfo *ci) {
     SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL,
                        ams[authtype_selection_idx].authtype_id, (WPARAM)0);
     SetAuthenticationVisibility(hdlg, &ams[authtype_selection_idx]);
-    if (strcmp(ci->authtype, AUTHTYPE_AWS_PROFILE) == 0) {
-        SetDlgItemText(hdlg, IDC_PROFILE_NAME, ci->profile_name);
-    } else if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
-        SetDlgItemText(hdlg, IDC_ACCESS_KEY_ID, ci->uid);
-        SetDlgItemText(hdlg, IDC_SECRET_ACCESS_KEY, SAFE_NAME(ci->pwd));
-        SetDlgItemText(hdlg, IDC_SESSION_TOKEN, ci->session_token);
-    } else if (strcmp(ci->authtype, AUTHTYPE_AAD) == 0
-               || strcmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
-        SetDlgItemText(hdlg, IDC_IDP_USERNAME, ci->uid);
-        SetDlgItemText(hdlg, IDC_IDP_PASSWORD, SAFE_NAME(ci->pwd));
-        SetDlgItemText(hdlg, IDC_IDP_NAME, ci->idp_name);
-        SetDlgItemText(hdlg, IDC_IDP_ARN, ci->idp_arn);
-        SetDlgItemText(hdlg, IDC_ROLE_ARN, ci->role_arn);
-    }
-    SetDlgItemText(hdlg, IDC_REGION, ci->region);
-    SetDlgItemText(hdlg, IDC_END_POINT_OVERRIDE, ci->end_point_override);
-    if (strcmp(ci->authtype, AUTHTYPE_AAD) == 0) {
-        SetDlgItemText(hdlg, IDC_AAD_APPLICATION_ID, ci->aad_application_id);
-        SetDlgItemText(hdlg, IDC_AAD_CLIENT_SECRET, ci->aad_client_secret);
-        SetDlgItemText(hdlg, IDC_AAD_TENANT, ci->aad_tenant);
-    } else if (strcmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
-        SetDlgItemText(hdlg, IDC_IDP_HOST, ci->idp_host);
-        SetDlgItemText(hdlg, IDC_OKTA_APPLICATION_ID, ci->okta_application_id);
+    if (strcmp(ci->authtype, AUTHTYPE_DEFAULT) == 0) {
+        SetDlgItemText(hdlg, IDC_USER, ci->uid);
+        SetDlgItemText(hdlg, IDC_PASSWORD, SAFE_NAME(ci->pwd));
     }
 }
 
@@ -271,38 +135,10 @@ void GetDlgStuff(HWND hdlg, ConnInfo *ci) {
     const struct authmode *am = GetCurrentAuthMode(hdlg);
     SetAuthenticationVisibility(hdlg, am);
     STRCPY_FIXED(ci->authtype, am->authtype_str);
-    if (strcmp(ci->authtype, AUTHTYPE_AWS_PROFILE) == 0) {
-        GetDlgItemText(hdlg, IDC_PROFILE_NAME, ci->profile_name, sizeof(ci->profile_name));
-    } else if (strcmp(ci->authtype, AUTHTYPE_IAM) == 0) {
-        GetDlgItemText(hdlg, IDC_ACCESS_KEY_ID, ci->uid, sizeof(ci->uid));
-        GetNameField(hdlg, IDC_SECRET_ACCESS_KEY, &ci->pwd);
-        GetDlgItemText(hdlg, IDC_SESSION_TOKEN, ci->session_token,
-                       sizeof(ci->session_token));
-    } else if (strcmp(ci->authtype, AUTHTYPE_AAD) == 0) {
-        GetDlgItemText(hdlg, IDC_IDP_NAME, ci->idp_name,
-                       sizeof(ci->idp_name));
-        GetDlgItemText(hdlg, IDC_IDP_USERNAME, ci->uid, sizeof(ci->uid));
-        GetNameField(hdlg, IDC_IDP_PASSWORD, &ci->pwd);
-        GetDlgItemText(hdlg, IDC_AAD_APPLICATION_ID, ci->aad_application_id,
-                       sizeof(ci->aad_application_id));
-        GetDlgItemText(hdlg, IDC_AAD_CLIENT_SECRET, ci->aad_client_secret,
-                       sizeof(ci->aad_client_secret));
-        GetDlgItemText(hdlg, IDC_AAD_TENANT, ci->aad_tenant,
-                       sizeof(ci->aad_tenant));
-        GetDlgItemText(hdlg, IDC_ROLE_ARN, ci->role_arn, sizeof(ci->role_arn));
-        GetDlgItemText(hdlg, IDC_IDP_ARN, ci->idp_arn, sizeof(ci->idp_arn));
-    } else if (strcmp(ci->authtype, AUTHTYPE_OKTA) == 0) {
-        GetDlgItemText(hdlg, IDC_IDP_NAME, ci->idp_name, sizeof(ci->idp_name));
-        GetDlgItemText(hdlg, IDC_IDP_HOST, ci->idp_host, sizeof(ci->idp_host));
-        GetDlgItemText(hdlg, IDC_IDP_USERNAME, ci->uid, sizeof(ci->uid));
-        GetNameField(hdlg, IDC_IDP_PASSWORD, &ci->pwd);
-        GetDlgItemText(hdlg, IDC_OKTA_APPLICATION_ID, ci->okta_application_id,
-                       sizeof(ci->okta_application_id));
-        GetDlgItemText(hdlg, IDC_ROLE_ARN, ci->role_arn, sizeof(ci->role_arn));
-        GetDlgItemText(hdlg, IDC_IDP_ARN, ci->idp_arn, sizeof(ci->idp_arn));
+    if (strcmp(ci->authtype, AUTHTYPE_DEFAULT) == 0) {
+        GetDlgItemText(hdlg, IDC_USER, ci->uid, sizeof(ci->uid));
+        GetNameField(hdlg, IDC_PASSWORD, &ci->pwd);
     }
-    GetDlgItemText(hdlg, IDC_REGION, ci->region, sizeof(ci->region));
-    GetDlgItemText(hdlg, IDC_END_POINT_OVERRIDE, ci->end_point_override, sizeof(ci->end_point_override));
 }
 
 const struct authmode *GetAuthModes(unsigned int *count) {
