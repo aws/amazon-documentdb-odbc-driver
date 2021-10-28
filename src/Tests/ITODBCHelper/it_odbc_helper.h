@@ -117,6 +117,9 @@ test_string conn_string();
 class Fixture : public testing::Test {
    public:
     void SetUp() override {
+        if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+        }
         m_env = SQL_NULL_HENV;
         m_conn = SQL_NULL_HDBC;
         m_hstmt = SQL_NULL_HSTMT;
