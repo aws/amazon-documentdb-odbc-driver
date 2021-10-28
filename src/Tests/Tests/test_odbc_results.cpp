@@ -269,18 +269,27 @@ class TestSQLRowCount : public Fixture {};
 class TestSQLBindCol : public Fixture {};
 
 TEST_F(TestSQLBindCol, SingleColumnSingleBind) {
+    if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+    }
     std::vector< std::vector< char > > cols(single_col_cnt);
     std::vector< std::vector< SQLLEN > > lens(single_col_cnt);
     QueryBind(single_row_cnt, 1, single_col, cols, lens, &m_hstmt);
 }
 
 TEST_F(TestSQLBindCol, MultiColumnsMultiBind) {
+    if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+    }
     std::vector< std::vector< char > > cols(multi_col_cnt);
     std::vector< std::vector< SQLLEN > > lens(multi_col_cnt);
     QueryBind(single_row_cnt, 1, multi_col, cols, lens, &m_hstmt);
 }
 
 TEST_F(TestSQLBindCol, MultiColumnsMultiRows) {
+    if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+    }
     std::vector< std::vector< char > > cols(multi_col_cnt);
     std::vector< std::vector< SQLLEN > > lens(multi_col_cnt);
     QueryBind(multi_row_cnt, multi_row_cnt, multi_col, cols, lens, &m_hstmt);
@@ -289,6 +298,9 @@ TEST_F(TestSQLBindCol, MultiColumnsMultiRows) {
 // Looked at SQLBindCol - if < requested column are allocated, it will
 // reallocate additional space for that column
 TEST_F(TestSQLBindCol, InvalidColIndex0) {
+    if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+    }
     std::vector< std::vector< char > > cols(single_col_cnt);
     std::vector< std::vector< SQLLEN > > lens(single_col_cnt);
     BindColSetup(single_row_cnt, 1, single_col, cols, lens, &m_hstmt);
@@ -306,6 +318,9 @@ TEST_F(TestSQLBindCol, InvalidColIndex0) {
 }
 
 TEST_F(TestSQLBindCol, InvalidColIndex2) {
+    if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+    }
     std::vector< std::vector< char > > cols(2);
     std::vector< std::vector< SQLLEN > > lens(2);
     BindColSetup(single_row_cnt, 1, single_col, cols, lens, &m_hstmt);
@@ -323,6 +338,9 @@ TEST_F(TestSQLBindCol, InvalidColIndex2) {
 }
 
 TEST_F(TestSQLBindCol, InvalidBufferLength) {
+    if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+    }
     std::vector< std::vector< char > > cols(single_col_cnt);
     std::vector< std::vector< SQLLEN > > lens(single_col_cnt);
     BindColSetup(single_row_cnt, 1, single_col, cols, lens, &m_hstmt);
@@ -336,6 +354,9 @@ TEST_F(TestSQLBindCol, InvalidBufferLength) {
 }
 
 TEST_F(TestSQLBindCol, InsufficientSpace) {
+    if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+    }
     SQLRETURN ret = SQLSetStmtAttr(m_hstmt, SQL_ROWSET_SIZE, (void*)1, 0);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
     ASSERT_EQ(ret, SQL_SUCCESS);
@@ -363,6 +384,9 @@ TEST_F(TestSQLBindCol, InsufficientSpace) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_BIT) {
+    if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+    }
     int v1 = 0;
     int v2 = 1;
     int v3 = -1;  // underflow
@@ -387,6 +411,9 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_BIT) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_STINYINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+    }
     int v1 = SCHAR_MIN;
     int v2 = SCHAR_MAX;
     int v3 = SCHAR_MIN - 1;  // underflow
@@ -411,6 +438,9 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_STINYINT) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_TINYINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = SCHAR_MIN;
     int v2 = SCHAR_MAX;
     int v3 = INT_MIN;   // underflow
@@ -435,6 +465,9 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_TINYINT) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_UTINYINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+    }
     int v1 = UCHAR_MAX;
     int v2 = -1;             // underflow
     int v3 = UCHAR_MAX + 1;  // overflow
@@ -456,6 +489,9 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_UTINYINT) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SLONG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = -293719;
     int v2 = 741370;
     test_string columns = CREATE_STRING("INTEGER\'")
@@ -472,6 +508,9 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SLONG) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_LONG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = -293719;
     int v2 = 741370;
     test_string columns = CREATE_STRING("INTEGER\'")
@@ -488,6 +527,9 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_LONG) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_ULONG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = 293719;
     int v2 = -1;  // underflow
     test_string columns = CREATE_STRING("INTEGER\'")
@@ -505,6 +547,9 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_ULONG) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SSHORT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = SHRT_MIN;
     int v2 = SHRT_MAX;
     int v3 = SHRT_MIN - 1;  // underflow
@@ -530,6 +575,9 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SSHORT) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SHORT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = SHRT_MIN;
     int v2 = SHRT_MAX;
     int v3 = INT_MIN;  // underflow
@@ -554,6 +602,9 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SHORT) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_USHORT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = USHRT_MAX;
     int v2 = -1;             // underflow
     int v3 = USHRT_MAX + 1;  // overflow
@@ -577,6 +628,9 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_USHORT) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SBIGINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = -293719;
     int v2 = 741370;
     test_string columns = CREATE_STRING("INTEGER\'")
@@ -593,6 +647,9 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_SBIGINT) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_UBIGINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = 293719;
     int v2 = -1;  // underflow
     test_string columns = CREATE_STRING("INTEGER\'")
@@ -611,6 +668,9 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_UBIGINT) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_CHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = -293719;
     int v2 = 741370;
     test_string columns = CREATE_STRING("INTEGER\'")
@@ -642,6 +702,9 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_CHAR) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_WCHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = -293719;
     int v2 = 741370;
     test_string columns = CREATE_STRING("INTEGER\'")
@@ -682,6 +745,9 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_WCHAR) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_DOUBLE) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = -293719;
     int v2 = 741370;
     test_string columns = CREATE_STRING("INTEGER\'")
@@ -698,6 +764,9 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_DOUBLE) {
 }
 
 TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_FLOAT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = -293719;
     int v2 = 741370;
     test_string columns = CREATE_STRING("INTEGER\'")
@@ -714,6 +783,9 @@ TEST_F(TestSQLGetData, INTEGER_TO_SQL_C_FLOAT) {
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_BIT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = 0.0;
     double v2 = 1.0;
     double v3 = -1.0;  // underflow
@@ -738,6 +810,9 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_BIT) {
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_STINYINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = -3.9E-5;
     double v2 = 3.9E-5;
     double v3 = -1.29E2;  // underflow
@@ -767,6 +842,9 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_STINYINT) {
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_TINYINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = -1.279E2;
     double v2 = 1.269E2;
     double v3 = LLONG_MIN;  // underflow
@@ -796,6 +874,9 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_TINYINT) {
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_UTINYINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = 1.1;
     double v2 = -3.0;    // underflow
     double v3 = 2.56E2;  // overflow
@@ -821,6 +902,9 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_UTINYINT) {
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SLONG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
     double v3 = (double)INT32_MIN;
@@ -862,6 +946,9 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SLONG) {
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_LONG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
     double v3 = (double)INT32_MIN;
@@ -903,6 +990,9 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_LONG) {
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_ULONG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = 293719.0;
     double v2 = (double)UINT32_MAX;
     double v3 = -1;                      // underflow
@@ -933,6 +1023,9 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_ULONG) {
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SSHORT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = SHRT_MIN;
     double v2 = SHRT_MAX;
     double v3 = -3.2769E4;  // underflow
@@ -961,6 +1054,9 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SSHORT) {
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SHORT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = SHRT_MIN;
     double v2 = SHRT_MAX;
     double v3 = -DBL_MAX;  // underflow
@@ -988,6 +1084,9 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SHORT) {
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_USHORT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = 0;
     double v2 = -1.0;      // underflow
     double v3 = 6.5536E4;  // overflow
@@ -1011,6 +1110,9 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_USHORT) {
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SBIGINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
     double v3 = -DBL_MAX;  // underflow
@@ -1038,6 +1140,9 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_SBIGINT) {
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_UBIGINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = 2.93719E5;
     double v2 = -1.0;     // underflow
     double v3 = DBL_MAX;  // overflow
@@ -1063,6 +1168,9 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_UBIGINT) {
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_CHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
     test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
@@ -1087,6 +1195,9 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_CHAR) {
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_WCHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
     test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
@@ -1125,6 +1236,9 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_WCHAR) {
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_DOUBLE) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
     test_string columns = CREATE_STRING("DOUBLE\'") + convert_to_test_string(v1)
@@ -1140,6 +1254,9 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_DOUBLE) {
 }
 
 TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_FLOAT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
     double v3 = -DBL_MAX;  // underflow
@@ -1164,6 +1281,9 @@ TEST_F(TestSQLGetData, DOUBLE_TO_SQL_C_FLOAT) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_BIT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     long long v1 = 0;
     long long v2 = 1;
     long long v3 = -2147483649ll;  // underflow
@@ -1188,6 +1308,9 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_BIT) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_STINYINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     long long v1 = SCHAR_MIN;
     long long v2 = SCHAR_MAX;
     long long v3 = SCHAR_MIN - 1;  // underflow
@@ -1212,6 +1335,9 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_STINYINT) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_TINYINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     long long v1 = SCHAR_MIN;
     long long v2 = SCHAR_MAX;
     long long v3 = INT_MIN;  // underflow
@@ -1236,6 +1362,9 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_TINYINT) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_UTINYINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     long long v1 = UCHAR_MAX;
     long long v2 = -1;             // underflow
     long long v3 = UCHAR_MAX + 1;  // overflow
@@ -1258,6 +1387,9 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_UTINYINT) {
 
 // SQLINTEGER(long) is 8 bytes in Linux 64 bit and Mac
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_SLONG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     long long v1 = -293719;
     long long v2 = 741370;
     long long v3 = (long long)INT32_MIN;
@@ -1296,6 +1428,9 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_SLONG) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_LONG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     long long v1 = -293719;
     long long v2 = 741370;
     long long v3 = (long long)INT32_MIN;
@@ -1334,6 +1469,9 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_LONG) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_ULONG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     long long v1 = 293719;
     long long v2 = UINT32_MAX;
     long long v3 = -1;                         // underflow
@@ -1358,6 +1496,9 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_ULONG) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_SSHORT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     long long v1 = SHRT_MIN;
     long long v2 = SHRT_MAX;
     long long v3 = SHRT_MIN - 1;  // underflow
@@ -1383,6 +1524,9 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_SSHORT) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_SHORT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     long long v1 = SHRT_MIN;
     long long v2 = SHRT_MAX;
     long long v3 = INT_MIN;  // underflow
@@ -1407,6 +1551,9 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_SHORT) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_USHORT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     long long v1 = USHRT_MAX;
     long long v2 = -1;             // underflow
     long long v3 = USHRT_MAX + 1;  // overflow
@@ -1430,6 +1577,9 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_USHORT) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_SBIGINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     long long v1 = -2147483649ll;
     long long v2 = 2147483649ll;
     test_string columns = CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
@@ -1445,6 +1595,9 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_SBIGINT) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_UBIGINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     long long v1 = 2147483649ll;
     long long v2 = -1ll;  // underflow
     test_string columns = CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
@@ -1462,6 +1615,9 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_UBIGINT) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_CHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     long long v1 = 2147483649ll;
     long long v2 = 2147483649ll;
     v2 *= -1;
@@ -1485,6 +1641,9 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_CHAR) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_WCHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     long long v1 = -2147483649ll;
     long long v2 = 2147483649ll;
     test_string columns = CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
@@ -1524,6 +1683,9 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_WCHAR) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_DOUBLE) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     long long v1 = -2147483649ll;
     long long v2 = 2147483649ll;
     test_string columns = CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
@@ -1539,6 +1701,9 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_DOUBLE) {
 }
 
 TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_FLOAT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     long long v1 = -2147483649ll;
     long long v2 = 2147483649ll;
     test_string columns = CREATE_STRING("BIGINT\'") + convert_to_test_string(v1)
@@ -1554,6 +1719,9 @@ TEST_F(TestSQLGetData, BIGINT_TO_SQL_C_FLOAT) {
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_BIT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     std::vector< std::pair< bool, SQLTCHAR* > > expected;
     expected.push_back(std::make_pair(true, nullptr));
     expected.push_back(std::make_pair(false, nullptr));
@@ -1563,6 +1731,9 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_BIT) {
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_STINYINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     std::vector< std::pair< SQLSCHAR, SQLTCHAR* > > expected;
     expected.push_back(std::make_pair(static_cast< SQLSCHAR >(1), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0), nullptr));
@@ -1573,6 +1744,9 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_STINYINT) {
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_TINYINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     std::vector< std::pair< SQLSCHAR, SQLTCHAR* > > expected;
     expected.push_back(std::make_pair(static_cast< SQLSCHAR >(1), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLSCHAR >(0), nullptr));
@@ -1583,6 +1757,9 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_TINYINT) {
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_UTINYINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     std::vector< std::pair< SQLCHAR, SQLTCHAR* > > expected;
     expected.push_back(std::make_pair(static_cast< SQLCHAR >(1), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLCHAR >(0), nullptr));
@@ -1593,6 +1770,9 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_UTINYINT) {
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_SLONG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     std::vector< std::pair< SQLINTEGER, SQLTCHAR* > > expected;
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(1), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0), nullptr));
@@ -1603,6 +1783,9 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_SLONG) {
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_LONG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     std::vector< std::pair< SQLINTEGER, SQLTCHAR* > > expected;
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(1), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLINTEGER >(0), nullptr));
@@ -1613,6 +1796,9 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_LONG) {
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_ULONG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     std::vector< std::pair< SQLUINTEGER, SQLTCHAR* > > expected;
     expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(1), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLUINTEGER >(0), nullptr));
@@ -1623,6 +1809,9 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_ULONG) {
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_SSHORT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     std::vector< std::pair< SQLSMALLINT, SQLTCHAR* > > expected;
     expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(1), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0), nullptr));
@@ -1633,6 +1822,9 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_SSHORT) {
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_SHORT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     std::vector< std::pair< SQLSMALLINT, SQLTCHAR* > > expected;
     expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(1), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLSMALLINT >(0), nullptr));
@@ -1643,6 +1835,9 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_SHORT) {
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_USHORT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     std::vector< std::pair< SQLUSMALLINT, SQLTCHAR* > > expected;
     expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(1), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLUSMALLINT >(0), nullptr));
@@ -1653,6 +1848,9 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_USHORT) {
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_SBIGINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     std::vector< std::pair< SQLBIGINT, SQLTCHAR* > > expected;
     expected.push_back(std::make_pair(static_cast< SQLBIGINT >(1), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLBIGINT >(0), nullptr));
@@ -1663,6 +1861,9 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_SBIGINT) {
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_UBIGINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     std::vector< std::pair< SQLUBIGINT, SQLTCHAR* > > expected;
     expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(1), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLUBIGINT >(0), nullptr));
@@ -1673,6 +1874,9 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_UBIGINT) {
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_CHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     QueryFetch(bool_columns, table_name, single_row, &m_hstmt);
     SQLCHAR data[1024] = {0};
     SQLLEN indicator = 0;
@@ -1689,6 +1893,9 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_CHAR) {
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_WCHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     QueryFetch(bool_columns, table_name, single_row, &m_hstmt);
     SQLWCHAR data[1024] = {0};
     SQLWCHAR data2[1024] = {0};
@@ -1722,6 +1929,9 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_WCHAR) {
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_DOUBLE) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     std::vector< std::pair< SQLDOUBLE, SQLTCHAR* > > expected;
     expected.push_back(std::make_pair(static_cast< SQLDOUBLE >(1), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLDOUBLE >(0), nullptr));
@@ -1732,6 +1942,9 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_DOUBLE) {
 }
 
 TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_FLOAT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     std::vector< std::pair< SQLREAL, SQLTCHAR* > > expected;
     expected.push_back(std::make_pair(static_cast< SQLREAL >(1), nullptr));
     expected.push_back(std::make_pair(static_cast< SQLREAL >(0), nullptr));
@@ -1742,6 +1955,9 @@ TEST_F(TestSQLGetData, BOOLEAN_TO_SQL_C_FLOAT) {
 }
 
 TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR_ARRAY) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string statement =
         CREATE_STRING("WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 ")
@@ -1766,6 +1982,9 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR_ARRAY) {
 }
 
 TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR_ARRAY) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string statement =
         CREATE_STRING("WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 ")
@@ -1790,6 +2009,9 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR_ARRAY) {
 }
 
 TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR_ROW) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string statement =
         CREATE_STRING("WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 ")
@@ -1813,6 +2035,9 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR_ROW) {
 }
 
 TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR_ROW) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string statement =
         CREATE_STRING("WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 ")
@@ -1837,6 +2062,9 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR_ROW) {
 }
 
 TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR_ARRAY_ROW_COMBINATION) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string statement =
         CREATE_STRING("WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 ")
@@ -1861,6 +2089,9 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_CHAR_ARRAY_ROW_COMBINATION) {
 }
 
 TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR_ARRAY_ROW_COMBINATION) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string statement =
         CREATE_STRING("WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 ")
@@ -1885,6 +2116,9 @@ TEST_F(TestSQLGetData, TIMESERIES_TO_SQL_C_WCHAR_ARRAY_ROW_COMBINATION) {
 }
 
 TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_CHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns = CREATE_STRING("ARRAY[ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]], ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]]], ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[ARRAY[1, 2, 3]]]]]]]]]]]], ARRAY[]");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLCHAR data[1024] = {0};
@@ -1908,6 +2142,9 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_CHAR) {
 }
 
 TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_WCHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("ARRAY[ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]], ")
         CREATE_STRING("ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]]], ")
@@ -1934,6 +2171,9 @@ TEST_F(TestSQLGetData, ARRAY_TO_SQL_C_WCHAR) {
 }
 
 TEST_F(TestSQLGetData, ROW_TO_SQL_C_CHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("ROW(ROW(ROW(INTEGER '03', BIGINT '10', true), ")
         CREATE_STRING("ARRAY[ARRAY[1,2],ARRAY[1.1,2.2]])), ROW(true)");
@@ -1957,6 +2197,9 @@ TEST_F(TestSQLGetData, ROW_TO_SQL_C_CHAR) {
 }
 
 TEST_F(TestSQLGetData, ROW_TO_SQL_C_WCHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("ROW(ROW(ROW(INTEGER '03', BIGINT '10', true), ")
         CREATE_STRING("ARRAY[ARRAY[1,2],ARRAY[1.1,2.2]])), ROW(true)");
@@ -1977,6 +2220,9 @@ TEST_F(TestSQLGetData, ROW_TO_SQL_C_WCHAR) {
 }
 
 TEST_F(TestSQLGetData, NULL_TO_SQL_C_CHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("null, NULL");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -1998,6 +2244,9 @@ TEST_F(TestSQLGetData, NULL_TO_SQL_C_CHAR) {
 }
 
 TEST_F(TestSQLGetData, NULL_TO_SQL_C_WCHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns = CREATE_STRING("null, NULL");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLWCHAR data[1024] = {0};
@@ -2016,6 +2265,9 @@ TEST_F(TestSQLGetData, NULL_TO_SQL_C_WCHAR) {
 }
 
 TEST_F(TestSQLGetData, ARRAY_ROW_NULL_TO_SQL_C_CHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns = CREATE_STRING("Array[Row(null), Row(NULL)], Row(Array[null], Array[NULL])");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLCHAR data[1024] = {0};
@@ -2036,6 +2288,9 @@ TEST_F(TestSQLGetData, ARRAY_ROW_NULL_TO_SQL_C_CHAR) {
 }
 
 TEST_F(TestSQLGetData, ARRAY_ROW_NULL_TO_SQL_C_WCHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("Array[Row(null), Row(NULL)], Row(Array[null], Array[NULL])");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -2054,6 +2309,9 @@ TEST_F(TestSQLGetData, ARRAY_ROW_NULL_TO_SQL_C_WCHAR) {
 }
 
 TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_CHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("TIMESTAMP \'2021-01-02 18:01:13.000000000\',")
         CREATE_STRING("TIMESTAMP \'2021-11-20 18:01:13.123456789\',")
@@ -2092,6 +2350,9 @@ TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_CHAR) {
 }
 
 TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_WCHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("TIMESTAMP \'2021-01-02 18:01:13.000000000\',")
         CREATE_STRING("TIMESTAMP \'2021-11-20 18:01:13.123456789\',")
@@ -2131,6 +2392,9 @@ TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_WCHAR) {
 }
 
 TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_TYPE_TIMESTAMP) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("TIMESTAMP \'2021-01-02 18:01:13.000000000\',")
         CREATE_STRING("TIMESTAMP \'2021-11-20 06:39:45.123456789\',")
@@ -2157,6 +2421,9 @@ TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_TYPE_TIMESTAMP) {
 }
 
 TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_TYPE_DATE) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("TIMESTAMP \'2021-01-02 18:01:13.000000000\',")
         CREATE_STRING("TIMESTAMP \'2021-11-20 06:39:45.123456789\',")
@@ -2182,6 +2449,9 @@ TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_TYPE_DATE) {
 }
 
 TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_TYPE_TIME) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns = 
         CREATE_STRING("TIMESTAMP \'2021-01-02 18:01:13.000000000\',")
         CREATE_STRING("TIMESTAMP \'2021-11-20 06:39:45.123456789\',")
@@ -2204,6 +2474,9 @@ TEST_F(TestSQLGetData, TIMESTAMP_TO_SQL_C_TYPE_TIME) {
 }
 
 TEST_F(TestSQLGetData, DATE_TO_SQL_C_CHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns = CREATE_STRING("DATE \'2021-01-02\', DATE \'2021-11-20\'");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLCHAR data[1024] = {0};
@@ -2221,6 +2494,9 @@ TEST_F(TestSQLGetData, DATE_TO_SQL_C_CHAR) {
 }
 
 TEST_F(TestSQLGetData, DATE_TO_SQL_C_WCHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns = CREATE_STRING("DATE \'2021-01-02\', DATE \'2021-11-20\'");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLTCHAR data[1024] = {0};
@@ -2238,6 +2514,9 @@ TEST_F(TestSQLGetData, DATE_TO_SQL_C_WCHAR) {
 }
 
 TEST_F(TestSQLGetData, DATE_TO_SQL_C_TYPE_TIMESTAMP) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns = CREATE_STRING("DATE \'2021-01-02\', DATE \'2021-11-20\'");
 
     std::vector< std::pair< TIMESTAMP_STRUCT, SQLTCHAR* > > expected;
@@ -2250,6 +2529,9 @@ TEST_F(TestSQLGetData, DATE_TO_SQL_C_TYPE_TIMESTAMP) {
 }
 
 TEST_F(TestSQLGetData, DATE_TO_SQL_C_TYPE_DATE) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns = CREATE_STRING("DATE \'2021-01-02\', DATE \'2021-11-20\'");
 
     std::vector< std::pair< DATE_STRUCT, SQLTCHAR* > > expected;
@@ -2260,6 +2542,9 @@ TEST_F(TestSQLGetData, DATE_TO_SQL_C_TYPE_DATE) {
 }
 
 TEST_F(TestSQLGetData, DATE_TO_SQL_C_TYPE_TIME) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns = CREATE_STRING("DATE \'2021-01-02\', DATE \'2021-11-20\'");
 
     std::vector< std::pair< TIME_STRUCT, SQLTCHAR* > > expected;
@@ -2272,6 +2557,9 @@ TEST_F(TestSQLGetData, DATE_TO_SQL_C_TYPE_TIME) {
 }
 
 TEST_F(TestSQLGetData, TIME_TO_SQL_C_CHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("TIME \'18:01:13.000000000\',")
         CREATE_STRING("TIME \'06:39:45.123456789\',")
@@ -2306,6 +2594,9 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_CHAR) {
 }
 
 TEST_F(TestSQLGetData, TIME_TO_SQL_C_WCHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("TIME \'18:01:13.000000000\',")
         CREATE_STRING("TIME \'06:39:45.123456789\',")
@@ -2340,6 +2631,9 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_WCHAR) {
 }
 
 TEST_F(TestSQLGetData, TIME_TO_SQL_C_TYPE_TIMESTAMP) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("TIME \'18:01:13.000000000\',")
         CREATE_STRING("TIME \'06:39:45.123456789\',")
@@ -2371,6 +2665,9 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_TYPE_TIMESTAMP) {
 }
 
 TEST_F(TestSQLGetData, TIME_TO_SQL_C_TYPE_DATE) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("TIME \'18:01:13.524000000\', TIME \'06:39:45.123456789\'");
 
@@ -2384,6 +2681,9 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_TYPE_DATE) {
 }
 
 TEST_F(TestSQLGetData, TIME_TO_SQL_C_TYPE_TIME) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("TIME \'18:01:13.000000000\',")
         CREATE_STRING("TIME \'06:39:45.123456789\',")
@@ -2402,6 +2702,9 @@ TEST_F(TestSQLGetData, TIME_TO_SQL_C_TYPE_TIME) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_BIT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = 0;
     int v2 = 1;
     double v3 = 1.5;  // truncation
@@ -2440,6 +2743,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_BIT) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_STINYINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = SCHAR_MIN;
     int v2 = SCHAR_MAX;
     double v3 = 1.5;         // truncation
@@ -2476,6 +2782,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_STINYINT) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TINYINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = SCHAR_MIN;
     int v2 = SCHAR_MAX;
     double v3 = 1.5;   // truncation
@@ -2512,6 +2821,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TINYINT) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_UTINYINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = UCHAR_MAX;
     double v2 = 1.5;         // truncation
     int v3 = -1;             // underflow
@@ -2545,6 +2857,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_UTINYINT) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SLONG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = -293719;
     int v2 = 741370;
     double v3 = (double)INT32_MAX;
@@ -2600,6 +2915,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SLONG) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_LONG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = -293719;
     int v2 = 741370;
     double v3 = 1.5;                         // truncation
@@ -2652,6 +2970,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_LONG) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_ULONG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = 293719;
     double v2 = 1.5;                            // truncation
     int v3 = -1;                                // underflow
@@ -2692,6 +3013,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_ULONG) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SSHORT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = SHRT_MIN;
     int v2 = SHRT_MAX;
     double v3 = 1.5;        // truncation
@@ -2729,6 +3053,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SSHORT) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SHORT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = SHRT_MIN;
     int v2 = SHRT_MAX;
     double v3 = 1.5;   // truncation
@@ -2765,6 +3092,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SHORT) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_USHORT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = USHRT_MAX;
     double v2 = 1.5;         // truncation
     int v3 = -1;             // underflow
@@ -2800,6 +3130,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_USHORT) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SBIGINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = -293719;
     int v2 = 741370;
     double v3 = 1.5;       // truncation
@@ -2836,6 +3169,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_SBIGINT) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_UBIGINT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = 293719;
     double v2 = 1.5;      // truncation
     double v3 = -1.0;     // underflow
@@ -2870,6 +3206,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_UBIGINT) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_DOUBLE) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
     test_string columns =
@@ -2910,6 +3249,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_DOUBLE) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_FLOAT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     double v1 = -2.93719E5;
     double v2 = 7.41370E5;
     double v3 = -DBL_MAX;  // underflow
@@ -2941,6 +3283,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_FLOAT) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_CHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = -293719;
     int v2 = 741370;
     test_string columns = CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1) + CREATE_STRING("\', VARCHAR\'")
@@ -2970,6 +3315,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_CHAR) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_WCHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     int v1 = -293719;
     int v2 = 741370;
     test_string columns = CREATE_STRING("VARCHAR\'") + convert_to_test_string(v1) + CREATE_STRING("\', VARCHAR\'")
@@ -3006,6 +3354,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_WCHAR) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TYPE_TIMESTAMP) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("VARCHAR \'2021-01-02 18:01:13.000000000\',")
         CREATE_STRING("VARCHAR \'2021-11-20 06:39:45.123456789\',")
@@ -3065,6 +3416,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TYPE_TIMESTAMP) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TYPE_DATE) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("VARCHAR \'2021-01-02 18:01:13.000000000\',")
         CREATE_STRING("VARCHAR \'2021-11-20 06:39:45.123456789\',")
@@ -3114,6 +3468,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TYPE_DATE) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TYPE_TIME) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("VARCHAR \'2021-01-02 18:01:13.000000000\',")
         CREATE_STRING("VARCHAR \'2021-11-20 06:39:45.123456789\',")
@@ -3158,6 +3515,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_SQL_C_TYPE_TIME) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_INTERVAL_YEAR_TO_MONTH) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("VARCHAR \'1-0',")
         CREATE_STRING("VARCHAR \'0-1\',")
@@ -3201,6 +3561,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_INTERVAL_YEAR_TO_MONTH) {
 }
 
 TEST_F(TestSQLGetData, VARCHAR_TO_INTERVAL_DAY_TO_SECOND) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("VARCHAR \'1 00:00:00.000000000\',")
         CREATE_STRING("VARCHAR \'0 01:00:00.000000000\',")
@@ -3254,6 +3617,9 @@ TEST_F(TestSQLGetData, VARCHAR_TO_INTERVAL_DAY_TO_SECOND) {
 }
 
 TEST_F(TestSQLGetData, INTERVAL_YEAR_TO_MONTH_TO_SQL_C_CHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("1year,")
         CREATE_STRING("1month,")
@@ -3305,6 +3671,9 @@ TEST_F(TestSQLGetData, INTERVAL_YEAR_TO_MONTH_TO_SQL_C_CHAR) {
 }
 
 TEST_F(TestSQLGetData, INTERVAL_YEAR_TO_MONTH_TO_SQL_C_WCHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("1year,")
         CREATE_STRING("1month,")
@@ -3349,6 +3718,9 @@ TEST_F(TestSQLGetData, INTERVAL_YEAR_TO_MONTH_TO_SQL_C_WCHAR) {
 }
 
 TEST_F(TestSQLGetData, INTERVAL_DAY_TO_SECOND_TO_SQL_C_CHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns = CREATE_STRING("1d,1h,1m,1s,1ms,1us,1ns");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLCHAR data[1024] = {0};
@@ -3400,6 +3772,9 @@ TEST_F(TestSQLGetData, INTERVAL_DAY_TO_SECOND_TO_SQL_C_CHAR) {
 }
 
 TEST_F(TestSQLGetData, INTERVAL_DAY_TO_SECOND_TO_SQL_C_WCHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns = CREATE_STRING("1d,1h,1m,1s,1ms,1us,1ns");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
     SQLTCHAR data[1024] = {0};
@@ -3443,6 +3818,9 @@ TEST_F(TestSQLGetData, INTERVAL_DAY_TO_SECOND_TO_SQL_C_WCHAR) {
 }
 
 TEST_F(TestSQLNumResultCols, SingleColumn) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("Array[Row(null), Row(NULL)]");
     ExecuteQuery(columns, table_name, single_row, &m_hstmt);
@@ -3452,6 +3830,9 @@ TEST_F(TestSQLNumResultCols, SingleColumn) {
 }
 
 TEST_F(TestSQLNumResultCols, MultiColumn) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns =
         CREATE_STRING("Array[Row(null), Row(NULL)], Row(Array[null], Array[NULL]), ")
         CREATE_STRING("Array[Row(null), Row(NULL)], Row(Array[null], Array[NULL]), ")
@@ -3467,6 +3848,9 @@ TEST_F(TestSQLNumResultCols, MultiColumn) {
 }
 
 TEST_F(TestSQLDescribeCol, INTEGER_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string columns = CREATE_STRING("INTEGER \'1\'");
     ExecuteQuery(columns, table_name, single_row, &m_hstmt);
@@ -3489,6 +3873,9 @@ TEST_F(TestSQLDescribeCol, INTEGER_COLUMN) {
 }
 
 TEST_F(TestSQLDescribeCol, DOUBLE_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string columns = CREATE_STRING("DOUBLE \'1.0\'");
     ExecuteQuery(columns, table_name, single_row, &m_hstmt);
@@ -3511,6 +3898,9 @@ TEST_F(TestSQLDescribeCol, DOUBLE_COLUMN) {
 }
 
 TEST_F(TestSQLDescribeCol, BIGINT_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string columns = CREATE_STRING("BIGINT \'2147483648\'");
     ExecuteQuery(columns, table_name, single_row, &m_hstmt);
@@ -3533,6 +3923,9 @@ TEST_F(TestSQLDescribeCol, BIGINT_COLUMN) {
 }
 
 TEST_F(TestSQLDescribeCol, BOOLEAN_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string columns = CREATE_STRING("true");
     ExecuteQuery(columns, table_name, single_row, &m_hstmt);
@@ -3555,6 +3948,9 @@ TEST_F(TestSQLDescribeCol, BOOLEAN_COLUMN) {
 }
 
 TEST_F(TestSQLDescribeCol, VARCHAR_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string columns = CREATE_STRING("VARCHAR\'ABCDEFG\'");
     ExecuteQuery(columns, table_name, single_row, &m_hstmt);
@@ -3577,6 +3973,9 @@ TEST_F(TestSQLDescribeCol, VARCHAR_COLUMN) {
 }
 
 TEST_F(TestSQLDescribeCol, TIMESERIES_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string statement =
         CREATE_STRING("WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 ")
@@ -3610,6 +4009,9 @@ TEST_F(TestSQLDescribeCol, TIMESERIES_COLUMN) {
 }
 
 TEST_F(TestSQLDescribeCol, ARRAY_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string columns =
         CREATE_STRING("ARRAY[ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]], ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]]]");
@@ -3633,6 +4035,9 @@ TEST_F(TestSQLDescribeCol, ARRAY_COLUMN) {
 }
 
 TEST_F(TestSQLDescribeCol, ROW_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string columns = CREATE_STRING("ROW(ROW(ROW(INTEGER '03', BIGINT '10', true), ARRAY[ARRAY[1,2],ARRAY[1.1,2.2]]))");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -3655,6 +4060,9 @@ TEST_F(TestSQLDescribeCol, ROW_COLUMN) {
 }
 
 TEST_F(TestSQLDescribeCol, NULL_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string columns = CREATE_STRING("null");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -3677,6 +4085,9 @@ TEST_F(TestSQLDescribeCol, NULL_COLUMN) {
 }
 
 TEST_F(TestSQLDescribeCol, TIMESTAMP_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string columns = CREATE_STRING("TIMESTAMP \'2021-01-02 18:01:13.000000000\'");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -3700,6 +4111,9 @@ TEST_F(TestSQLDescribeCol, TIMESTAMP_COLUMN) {
 }
 
 TEST_F(TestSQLDescribeCol, DATE_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string columns = CREATE_STRING("DATE \'2021-01-02\'");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -3723,6 +4137,9 @@ TEST_F(TestSQLDescribeCol, DATE_COLUMN) {
 }
 
 TEST_F(TestSQLDescribeCol, TIME_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string columns = CREATE_STRING("TIME \'06:39:45.123456789\'");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -3746,6 +4163,9 @@ TEST_F(TestSQLDescribeCol, TIME_COLUMN) {
 }
 
 TEST_F(TestSQLDescribeCol, INTERVAL_YEAR_TO_MONTH_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string columns = CREATE_STRING("1year");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -3768,6 +4188,9 @@ TEST_F(TestSQLDescribeCol, INTERVAL_YEAR_TO_MONTH_COLUMN) {
 }
 
 TEST_F(TestSQLDescribeCol, INTERVAL_DAY_TO_SECOND_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string columns = CREATE_STRING("1d");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -3790,6 +4213,9 @@ TEST_F(TestSQLDescribeCol, INTERVAL_DAY_TO_SECOND_COLUMN) {
 }
 
 TEST_F(TestSQLDescribeCol, OUT_OF_INDEX_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string columns = CREATE_STRING("INTEGER\'1\'");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -3807,6 +4233,9 @@ TEST_F(TestSQLDescribeCol, OUT_OF_INDEX_COLUMN) {
 }
 
 TEST_F(TestSQLDescribeCol, TRUNCATED_COLUMN_NAME_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string columns = CREATE_STRING("INTEGER\'1\'");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -3829,6 +4258,9 @@ TEST_F(TestSQLDescribeCol, TRUNCATED_COLUMN_NAME_COLUMN) {
 }
 
 TEST_F(TestSQLDescribeCol, INVALID_STRING_OR_BUFFER_LENGTH) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string columns = CREATE_STRING("INTEGER\'1\'");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -3847,6 +4279,9 @@ TEST_F(TestSQLDescribeCol, INVALID_STRING_OR_BUFFER_LENGTH) {
 }
 
 TEST_F(TestSQLDescribeCol, MULTIPLE_COLUMNS) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     test_string columns = CREATE_STRING("INTEGER\'1\', DOUBLE \'1.0\', BIGINT \'2147483648\', true");
     QueryFetch(columns, table_name, single_row, &m_hstmt);
@@ -3896,12 +4331,18 @@ TEST_F(TestSQLDescribeCol, MULTIPLE_COLUMNS) {
 }
 
 TEST_F(TestSQLMoreResults, NoData_noquery) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQLMoreResults(m_hstmt);
     EXPECT_EQ(SQL_NO_DATA, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLMoreResults, NoData_query) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     test_string columns = CREATE_STRING("Array[Row(null), Row(NULL)]");
     ExecuteQuery(columns, table_name, CREATE_STRING("100"), &m_hstmt);
     SQLRETURN ret = SQLMoreResults(m_hstmt);
@@ -3912,6 +4353,9 @@ TEST_F(TestSQLMoreResults, NoData_query) {
 // Row count is not supported for the driver, so this should return -1,
 // as defined in the ODBC API.
 TEST_F(TestSQLRowCount, RowCountNotAvailable) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLLEN row_count = 0;
     SQLRETURN ret = SQLRowCount(m_hstmt, &row_count);
     EXPECT_EQ(SQL_SUCCESS, ret);
@@ -3919,6 +4363,9 @@ TEST_F(TestSQLRowCount, RowCountNotAvailable) {
 }
 
 TEST_F(TestSQLRowCount, InvalidHandle) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLLEN row_count = 0;
     SQLRETURN ret = SQLRowCount(nullptr, &row_count);
     EXPECT_EQ(SQL_INVALID_HANDLE, ret);

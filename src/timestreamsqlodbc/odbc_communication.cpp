@@ -99,6 +99,13 @@ bool TSCommunication::Validate(const runtime_options& options) {
     if (options.auth.auth_type != AUTHTYPE_DEFAULT) {
         throw std::invalid_argument("Unknown authentication type: \"" + options.auth.auth_type + "\".");
     }
+    if (options.auth.uid.empty()) {
+        throw std::invalid_argument("UID cannot be empty.");
+    }
+
+    if (options.auth.pwd.empty()) {
+        throw std::invalid_argument("Password cannot be empty.");
+    }
 
     LogMsg(LOG_DEBUG, "Required connection options are valid.");
     return true;

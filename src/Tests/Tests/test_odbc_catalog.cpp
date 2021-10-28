@@ -224,6 +224,9 @@ class TestSQLStatistics : public Fixture {};
  */
 
 TEST_F(TestSQLTables, TEST_ALL_NULL) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQL_ERROR;
     ret = SQLTables(m_hstmt, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -257,6 +260,9 @@ TEST_F(TestSQLTables, TEST_ALL_NULL) {
 }
 
 TEST_F(TestSQLTables, TEST_LONG_TABLE_NAME) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret =
         SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("Lng%")), SQL_NTS, nullptr,
@@ -288,6 +294,9 @@ TEST_F(TestSQLTables, TEST_LONG_TABLE_NAME) {
 }
 
 TEST_F(TestSQLTables, TEST_ALL_DATABASES_EXCEL) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("%")), 1, 
         AS_SQLTCHAR(CREATE_STRING("")), 0, AS_SQLTCHAR(CREATE_STRING("")), 0, 
@@ -320,6 +329,9 @@ TEST_F(TestSQLTables, TEST_ALL_DATABASES_EXCEL) {
 }
 
 TEST_F(TestSQLTables, TEST_ALL_DATABASES_NULL) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("%")), SQL_NTS, nullptr, 0, nullptr, 0, nullptr, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -353,6 +365,9 @@ TEST_F(TestSQLTables, TEST_ALL_DATABASES_NULL) {
 }
 
 TEST_F(TestSQLTables, TEST_ALL_DATABASES_SEARCH_PATTERN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("%BC%")), SQL_NTS, AS_SQLTCHAR(CREATE_STRING("")), 
             SQL_NTS, AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS, AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS);
@@ -384,6 +399,9 @@ TEST_F(TestSQLTables, TEST_ALL_DATABASES_SEARCH_PATTERN) {
 }
 
 TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_BIND_EXCEL) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLTables(m_hstmt, nullptr, 0, nullptr, 0, nullptr, 0, AS_SQLTCHAR(CREATE_STRING("TABLE,VIEW")), 10);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -417,6 +435,9 @@ TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_BIND_EXCEL) {
 }
 
 TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_GETDATA) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLTables(m_hstmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS, AS_SQLTCHAR(CREATE_STRING("TABLE,VIEW")), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -449,6 +470,9 @@ TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_GETDATA) {
 }
 
 TEST_F(TestSQLTables, TEST_ALL_VIEWS_TYPES) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLTables(m_hstmt, nullptr, 0, nullptr, 0, nullptr, 0, AS_SQLTCHAR("VIEW"), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -475,6 +499,9 @@ TEST_F(TestSQLTables, TEST_ALL_VIEWS_TYPES) {
 }
 
 TEST_F(TestSQLTables, TEST_ALL_TABLE_TYPES) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLTables(m_hstmt, nullptr, 0, nullptr, 0, nullptr, 0, AS_SQLTCHAR(CREATE_STRING("TABLE")), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -508,6 +535,9 @@ TEST_F(TestSQLTables, TEST_ALL_TABLE_TYPES) {
 }
 
 TEST_F(TestSQLTables, TEST_SQL_ALL_TABLE_TYPES) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLTables(m_hstmt, nullptr, 0, nullptr, 0, nullptr, 0, AS_SQLTCHAR(CREATE_STRING("%")), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -541,6 +571,9 @@ TEST_F(TestSQLTables, TEST_SQL_ALL_TABLE_TYPES) {
 }
 
 TEST_F(TestSQLTables, TEST_SQL_ALL_TABLE_TYPES_OTHER_EMPTY) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("")), 0, AS_SQLTCHAR(CREATE_STRING("")), 0, AS_SQLTCHAR(CREATE_STRING("")), 0, AS_SQLTCHAR(CREATE_STRING("%")), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -570,6 +603,9 @@ TEST_F(TestSQLTables, TEST_SQL_ALL_TABLE_TYPES_OTHER_EMPTY) {
 }
 
 TEST_F(TestSQLTables, TEST_INVALID_TABLE_TYPES) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLTables(m_hstmt, nullptr, 0, nullptr, 0, nullptr, 0, AS_SQLTCHAR(CREATE_STRING("INVALID")), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -596,6 +632,9 @@ TEST_F(TestSQLTables, TEST_INVALID_TABLE_TYPES) {
 }
 
 TEST_F(TestSQLTables, TABLE_UNDER_DATABASE) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("%BCTes_")), SQL_NTS, nullptr, 0, AS_SQLTCHAR(CREATE_STRING("I_T")), SQL_NTS, AS_SQLTCHAR(CREATE_STRING("TABLE")), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -625,6 +664,9 @@ TEST_F(TestSQLTables, TABLE_UNDER_DATABASE) {
 }
 
 TEST_F(TestSQLTables, EXACT_MATCH_META_DATA) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER)true, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -657,6 +699,9 @@ TEST_F(TestSQLTables, EXACT_MATCH_META_DATA) {
 }
 
 TEST_F(TestSQLTables, EXACT_MATCH_META_DATA_CASE_INSENSITIVE) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER) true, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -690,6 +735,9 @@ TEST_F(TestSQLTables, EXACT_MATCH_META_DATA_CASE_INSENSITIVE) {
 }
 
 TEST_F(TestSQLTables, EXACT_MATCH_META_DATA_NOT_FOUND) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER) true, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -721,6 +769,9 @@ TEST_F(TestSQLTables, EXACT_MATCH_META_DATA_NOT_FOUND) {
 }
 
 TEST_F(TestSQLTables, INVALID_USE_OF_NULLPTR_CATALOG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER) true, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -731,6 +782,9 @@ TEST_F(TestSQLTables, INVALID_USE_OF_NULLPTR_CATALOG) {
 }
 
 TEST_F(TestSQLTables, INVALID_USE_OF_NULLPTR_SCHEMAS) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER) true, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -741,6 +795,9 @@ TEST_F(TestSQLTables, INVALID_USE_OF_NULLPTR_SCHEMAS) {
 }
 
 TEST_F(TestSQLTables, INVALID_USE_OF_NULLPTR_TABLE_NAME) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER) true, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -783,6 +840,9 @@ void PopulateSQLColumnsBinds(std::vector< bind_info > &binds) {
  */
 
 TEST_F(TestSQLColumns, ISQL_WORKFLOW) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLColumns(m_hstmt, nullptr, 0,
                      nullptr, 0, (SQLTCHAR *)CREATE_STRING("DevOps"), SQL_NTS, nullptr, 0);
@@ -862,6 +922,9 @@ TEST_F(TestSQLColumns, ISQL_WORKFLOW) {
 }
 
 TEST_F(TestSQLColumns, EXACT_MATCH_ONE_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLColumns(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS, nullptr, 0,
                      (SQLTCHAR*)CREATE_STRING("IoT"), SQL_NTS, (SQLTCHAR*)CREATE_STRING("time"), SQL_NTS);
@@ -897,6 +960,9 @@ TEST_F(TestSQLColumns, EXACT_MATCH_ONE_COLUMN) {
 }
 
 TEST_F(TestSQLColumns, EXACT_MATCH_ALL_COLUMNS) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLColumns(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS, nullptr, 0,
                      (SQLTCHAR*)CREATE_STRING("DevOps"), SQL_NTS, nullptr, 0);
@@ -952,6 +1018,9 @@ TEST_F(TestSQLColumns, EXACT_MATCH_ALL_COLUMNS) {
 }
 
 TEST_F(TestSQLColumns, SEARCH_PATTERN_ALL_COLUMNS) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLColumns(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS, nullptr, 0,
                      (SQLTCHAR*)CREATE_STRING("DevOps"), SQL_NTS, (SQLTCHAR*)CREATE_STRING("%"), SQL_NTS);
@@ -1007,6 +1076,9 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_ALL_COLUMNS) {
 }
 
 TEST_F(TestSQLColumns, SEARCH_PATTERN_SOME_COLUMNS) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLColumns(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS, nullptr, 0,
                      (SQLTCHAR*)CREATE_STRING("DevOps"), SQL_NTS, (SQLTCHAR*)CREATE_STRING("measure%"),
@@ -1044,6 +1116,9 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_SOME_COLUMNS) {
 }
 
 TEST_F(TestSQLColumns, SEARCH_PATTERN_MULTI_TABLES_COLUMNS) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLColumns(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS, nullptr, 0,
                      (SQLTCHAR*)CREATE_STRING("%"), SQL_NTS, (SQLTCHAR*)CREATE_STRING("tim_"), SQL_NTS);
@@ -1083,6 +1158,9 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_MULTI_TABLES_COLUMNS) {
 }
 
 TEST_F(TestSQLColumns, META_DATA_CASE_INSENSITIVE) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER) true, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -1121,6 +1199,9 @@ TEST_F(TestSQLColumns, META_DATA_CASE_INSENSITIVE) {
 }
 
 TEST_F(TestSQLColumns, META_DATA_CASE_INSENSITIVE_NOT_FOUND) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER) true, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -1152,6 +1233,9 @@ TEST_F(TestSQLColumns, META_DATA_CASE_INSENSITIVE_NOT_FOUND) {
 }
 
 TEST_F(TestSQLColumns, LONG_COLUMN_NAME) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLColumns(m_hstmt, nullptr, 0, (SQLTCHAR *)CREATE_STRING(""),
                      SQL_NTS, (SQLTCHAR *)CREATE_STRING("%"), SQL_NTS,
@@ -1187,6 +1271,9 @@ TEST_F(TestSQLColumns, LONG_COLUMN_NAME) {
 }
 
 TEST_F(TestSQLColAttribute, SQL_DESC_CONCISE_TYPE) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query = CREATE_STRING("SELECT INTEGER \'1\' from ODBCTest.IoT LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
@@ -1201,6 +1288,9 @@ TEST_F(TestSQLColAttribute, SQL_DESC_CONCISE_TYPE) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, INTEGER_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query = CREATE_STRING("SELECT INTEGER \'1\' from ODBCTest.IoT LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
@@ -1224,6 +1314,9 @@ TEST_F(TestCatalogSQLDescribeCol, INTEGER_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, DOUBLE_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query = CREATE_STRING("SELECT DOUBLE \'1.0\' from ODBCTest.IoT LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
@@ -1247,6 +1340,9 @@ TEST_F(TestCatalogSQLDescribeCol, DOUBLE_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, BIGINT_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query = CREATE_STRING("SELECT BIGINT \'2147483648\' from ODBCTest.IoT LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
@@ -1270,6 +1366,9 @@ TEST_F(TestCatalogSQLDescribeCol, BIGINT_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, BOOLEAN_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query =
         CREATE_STRING("SELECT true from ODBCTest.IoT LIMIT 1");
@@ -1294,6 +1393,9 @@ TEST_F(TestCatalogSQLDescribeCol, BOOLEAN_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, VARCHAR_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query = CREATE_STRING("SELECT VARCHAR\'ABCDEFG\' from ODBCTest.IoT LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
@@ -1317,6 +1419,9 @@ TEST_F(TestCatalogSQLDescribeCol, VARCHAR_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, TIMESERIES_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query =
         CREATE_STRING("WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 "
@@ -1348,6 +1453,9 @@ TEST_F(TestCatalogSQLDescribeCol, TIMESERIES_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, ARRAY_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query =
         CREATE_STRING("SELECT ARRAY[ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]], "
@@ -1374,6 +1482,9 @@ TEST_F(TestCatalogSQLDescribeCol, ARRAY_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, ROW_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query =
         CREATE_STRING("SELECT ROW(ROW(ROW(INTEGER '03', BIGINT '10', true), "
@@ -1400,6 +1511,9 @@ TEST_F(TestCatalogSQLDescribeCol, ROW_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, NULL_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query = CREATE_STRING("SELECT null from ODBCTest.IoT LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
@@ -1423,6 +1537,9 @@ TEST_F(TestCatalogSQLDescribeCol, NULL_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, TIMESTAMP_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query =
         CREATE_STRING("SELECT TIMESTAMP \'2021-01-02 18:01:13.000000000\' from ODBCTest.IoT "
@@ -1452,6 +1569,9 @@ TEST_F(TestCatalogSQLDescribeCol, TIMESTAMP_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, DATE_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query =
         CREATE_STRING("SELECT DATE \'2021-01-02\' from ODBCTest.IoT LIMIT 1");
@@ -1480,6 +1600,9 @@ TEST_F(TestCatalogSQLDescribeCol, DATE_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, TIME_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query =
         CREATE_STRING("SELECT TIME \'06:39:45.123456789\' from ODBCTest.IoT LIMIT 1");
@@ -1508,6 +1631,9 @@ TEST_F(TestCatalogSQLDescribeCol, TIME_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, INTERVAL_YEAR_TO_MONTH_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query = CREATE_STRING("SELECT 1year from ODBCTest.IoT LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
@@ -1531,6 +1657,9 @@ TEST_F(TestCatalogSQLDescribeCol, INTERVAL_YEAR_TO_MONTH_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, INTERVAL_DAY_TO_SECOND_COLUMN) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query = CREATE_STRING("SELECT 1d from ODBCTest.IoT LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
@@ -1555,6 +1684,9 @@ TEST_F(TestCatalogSQLDescribeCol, INTERVAL_DAY_TO_SECOND_COLUMN) {
 
 
 TEST_F(TestSQLGetTypeInfo, TEST_SQL_ALL_TYPES) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetTypeInfo(m_hstmt, SQL_ALL_TYPES);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -1629,6 +1761,9 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_ALL_TYPES) {
 }
 
 TEST_F(TestSQLGetTypeInfo, TEST_SQL_WVARCHAR) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetTypeInfo(m_hstmt, SQL_WVARCHAR);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -1679,6 +1814,9 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_WVARCHAR) {
 }
 
 TEST_F(TestSQLGetTypeInfo, TEST_SQL_BIT) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetTypeInfo(m_hstmt, SQL_BIT);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -1710,6 +1848,9 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_BIT) {
 }
 
 TEST_F(TestSQLGetTypeInfo, TEST_SQL_DECIMAL) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetTypeInfo(m_hstmt, SQL_DECIMAL);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -1738,6 +1879,9 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_DECIMAL) {
 }
 
 TEST_F(TestSQLColumnPrivileges, EMPTY) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLColumnPrivileges(m_hstmt, (SQLTCHAR *)CREATE_STRING("ODBCTest"),
                               SQL_NTS, (SQLTCHAR *)CREATE_STRING(""), SQL_NTS,
@@ -1748,6 +1892,9 @@ TEST_F(TestSQLColumnPrivileges, EMPTY) {
 }
 
 TEST_F(TestSQLTablePrivileges, EMPTY) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLTablePrivileges(m_hstmt, (SQLTCHAR *)CREATE_STRING("ODBCTest"),
                              SQL_NTS, (SQLTCHAR *)CREATE_STRING(""), SQL_NTS,
@@ -1759,6 +1906,9 @@ TEST_F(TestSQLTablePrivileges, EMPTY) {
 // We expect an empty result set for PrimaryKeys and ForeignKeys
 // Tableau specified catalog, table and NULL args
 TEST_F(TestSQLPrimaryKeys, EMPTY_RESULT_SET_WITH_CATALOG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLPrimaryKeys(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS,
                          NULL, 0, NULL, 0);
@@ -1767,6 +1917,9 @@ TEST_F(TestSQLPrimaryKeys, EMPTY_RESULT_SET_WITH_CATALOG) {
 }
 
 TEST_F(TestSQLPrimaryKeys, EMPTY_RESULT_SET_WITH_TABLE) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLPrimaryKeys(m_hstmt, NULL, 0, NULL, 0,
                          (SQLTCHAR*)CREATE_STRING("DevOps"), SQL_NTS);
@@ -1775,6 +1928,9 @@ TEST_F(TestSQLPrimaryKeys, EMPTY_RESULT_SET_WITH_TABLE) {
 }
 
 TEST_F(TestSQLPrimaryKeys, EMPTY_RESULT_SET_WITH_NULL) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLPrimaryKeys(m_hstmt, NULL, 0, NULL, 0, NULL, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -1782,6 +1938,9 @@ TEST_F(TestSQLPrimaryKeys, EMPTY_RESULT_SET_WITH_NULL) {
 }
 
 TEST_F(TestSQLForeignKeys, EMPTY_RESULT_SET_WITH_CATALOG) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLForeignKeys(m_hstmt, NULL, 0, NULL, 0, NULL, 0, NULL, 0,
                          (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS, NULL, 0);
@@ -1790,6 +1949,9 @@ TEST_F(TestSQLForeignKeys, EMPTY_RESULT_SET_WITH_CATALOG) {
 }
 
 TEST_F(TestSQLForeignKeys, EMPTY_RESULT_SET_WITH_TABLE) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLForeignKeys(m_hstmt, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0,
                          (SQLTCHAR*)CREATE_STRING("DevOps"), SQL_NTS);
@@ -1798,6 +1960,9 @@ TEST_F(TestSQLForeignKeys, EMPTY_RESULT_SET_WITH_TABLE) {
 }
 
 TEST_F(TestSQLForeignKeys, EMPTY_RESULT_SET_WITH_NULL) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLForeignKeys(m_hstmt, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0,
                          NULL, 0);
@@ -1806,6 +1971,9 @@ TEST_F(TestSQLForeignKeys, EMPTY_RESULT_SET_WITH_NULL) {
 }
 
 TEST_F(TestSQLProcedureColumns, EMPTY) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLProcedureColumns(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"),
                               SQL_NTS, NULL, 0, (SQLTCHAR*)CREATE_STRING("%"),
@@ -1815,6 +1983,9 @@ TEST_F(TestSQLProcedureColumns, EMPTY) {
 }
 
 TEST_F(TestSQLProcedures, EMPTY) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLProcedures(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS,
                         (SQLTCHAR*)CREATE_STRING("%"), SQL_NTS,
@@ -1824,6 +1995,9 @@ TEST_F(TestSQLProcedures, EMPTY) {
 }
 
 TEST_F(TestSQLSpecialColumns, EMPTY) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLSpecialColumns(m_hstmt, SQL_BEST_ROWID,
                             (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS, NULL,
@@ -1834,6 +2008,9 @@ TEST_F(TestSQLSpecialColumns, EMPTY) {
 }
 
 TEST_F(TestSQLStatistics, EMPTY) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLStatistics(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS,
                         NULL, 0, (SQLTCHAR*)CREATE_STRING("%"), SQL_NTS,

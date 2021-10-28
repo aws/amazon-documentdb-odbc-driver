@@ -68,6 +68,9 @@ class TestSQLConnect : public testing::Test {
 };
 
 TEST_F(TestSQLConnect, AWS_Profile_Default_credential_chain) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQLConnect(
         m_conn, AS_SQLTCHAR(default_credential_chain.c_str()), SQL_NTS,
         AS_SQLTCHAR(empty.c_str()), static_cast< SQLSMALLINT >(empty.length()),
@@ -77,6 +80,9 @@ TEST_F(TestSQLConnect, AWS_Profile_Default_credential_chain) {
 }
 
 TEST_F(TestSQLConnect, IAM_Success) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLRETURN ret = SQLConnect(
         m_conn, AS_SQLTCHAR(wdsn_name.c_str()), SQL_NTS,
         AS_SQLTCHAR(user.c_str()), static_cast< SQLSMALLINT >(user.length()),
@@ -86,6 +92,9 @@ TEST_F(TestSQLConnect, IAM_Success) {
 }
 
 TEST_F(TestSQLConnect, IAM_empty_server_used_default) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
     SQLRETURN ret = SQLConnect(
         m_conn, AS_SQLTCHAR(empty.c_str()), SQL_NTS, AS_SQLTCHAR(user.c_str()),
         static_cast< SQLSMALLINT >(user.length()), AS_SQLTCHAR(pass.c_str()),
@@ -115,10 +124,16 @@ TEST_F(TestSQLConnect, IAM_WrongPassword) {
 class TestSQLDriverConnect : public testing::Test {
    public:
     void SetUp() {
+        if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
         AllocConnection(&m_env, &m_conn, true, true);
     }
 
     void TearDown() {
+        if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
         if (SQL_NULL_HDBC != m_conn) {
             SQLFreeHandle(SQL_HANDLE_DBC, m_conn);
         }
@@ -245,11 +260,17 @@ TEST_F(TestSQLDriverConnect, UnsupportedKeyword) {
  class TestSQLDisconnect : public testing::Test {
    public:
     void SetUp() {
+        if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
         m_env = SQL_NULL_HENV;
         m_conn = SQL_NULL_HDBC;
     }
 
     void TearDown() {
+        if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    } 
         if (SQL_NULL_HDBC != m_conn) {
             SQLDisconnect(m_conn);
             SQLFreeHandle(SQL_HANDLE_DBC, m_conn);
@@ -294,6 +315,10 @@ TEST_F(TestSQLDisconnect, TestDisconnectWithoutConnect) {
 class TestSQLDriverConnectMultiConnection : public Fixture {
    public:
     void SetUp() override {
+        if (std::getenv("NOT_CONNECTED"))                                      \
+        {                                                                      \
+            GTEST_SKIP();                                                      \
+        } 
         Fixture::SetUp();
         m_env2 = SQL_NULL_HENV;
         m_conn2 = SQL_NULL_HDBC;
@@ -304,6 +329,10 @@ class TestSQLDriverConnectMultiConnection : public Fixture {
     }
 
     void TearDown() override {
+        if (std::getenv("NOT_CONNECTED"))                                      \
+        {                                                                      \
+            GTEST_SKIP();                                                      \
+        } 
         Fixture::TearDown();
         if (SQL_NULL_HSTMT != m_hstmt2) {
             ASSERT_NO_THROW(CloseCursor(&m_hstmt2, true, true));

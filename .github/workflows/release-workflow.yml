@@ -21,12 +21,6 @@ jobs:
         run: |
           brew install cppcheck
           sh run_cppcheck.sh
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
       - name: upload-cppcheck-results
         if: failure()
         uses: actions/upload-artifact@v2
@@ -79,12 +73,6 @@ jobs:
         uses: lukka/get-cmake@v3.18.3
       - name: add-msbuild-to-path
         uses: microsoft/setup-msbuild@v1.0.2
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
       - name: configure-and-build-driver
         run: |
           .\build_win_release32.ps1
@@ -116,12 +104,6 @@ jobs:
         uses: lukka/get-cmake@v3.18.3
       - name: add-msbuild-to-path
         uses: microsoft/setup-msbuild@v1.0.2
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
       - name: configure-and-build-driver
         run: |
           .\build_win_release64.ps1

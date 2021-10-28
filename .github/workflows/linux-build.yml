@@ -1,13 +1,13 @@
-name: Timestream ODBC Driver for Linux
+name: ODBC Driver for Linux
 
 on:
   push:
     branches:
-      - master
+      - main
       - develop
   pull_request:
     branches:
-      - master
+      - main
       - develop
 
 env:
@@ -16,6 +16,7 @@ env:
   ODBC_BIN_PATH: "./build/odbc/bin"
   ODBC_BUILD_PATH: "./build/odbc/build"
   AWS_SDK_INSTALL_PATH: "./build/aws-sdk/install"
+  NOT_CONNECTED: 1
 
 jobs:
   build-linux64:
@@ -42,35 +43,27 @@ jobs:
       run: |
         sudo cp ./src/Tests/Tests/odbc-linux64.ini /etc/odbc.ini
         sudo cp ./src/Tests/Tests/odbcinst-linux64.ini /etc/odbcinst.ini
-        mkdir /home/runner/work/timestream-odbc/timestream-odbc/odbc-logs
+        mkdir -p ${{ github.workspace }}/odbc-logs
         export ODBCSYSINI=/etc/
         export ODBCINSTINI=odbcinst.ini
         export ODBCINI=/etc/odbc.ini
     - name: configure-and-build-driver
       run: |
         ./build_linux_release64_deb.sh
-    - name: configure-aws-credentials
-      if: success()
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
     - name: run-tests
       if: success()
       run: |
-        ./build/odbc/bin/tests --gtest_filter=-TestSQLConnectSAMLAuth.*:TestSQLDriverConnectSAMLAuth.*
+        ./build/odbc/bin/tests --gtest_output="xml:report.xml"
     - name: prepare-test-results
       if: always()
       run: |
-        cp /tmp/timestreamodbc_*.log ${{ github.workspace }}/odbc-logs/
-    - name: upload-test-results
-      if: always()
+        cp ${{ github.workspace }}/report.xml ${{ github.workspace }}/odbc-logs/
+    - name: upload-test-report
+      if: failure()
       uses: actions/upload-artifact@v2
       with:
         name: test-results-linux64
-        path: |
-          ${{ github.workspace }}/odbc-logs/
+        path: ${{ github.workspace }}/report.xml
     - name: build-deb-installer
       if: success()
       run: |
@@ -126,17 +119,10 @@ jobs:
       run: |
         sudo cp ./src/Tests/Tests/odbc-linux32.ini /etc/odbc.ini
         sudo cp ./src/Tests/Tests/odbcinst-linux32.ini /etc/odbcinst.ini
-        mkdir /home/runner/work/timestream-odbc/timestream-odbc/odbc-logs
+        mkdir -p ${{ github.workspace }}/odbc-logs
         export ODBCSYSINI=/etc/
         export ODBCINSTINI=odbcinst.ini
         export ODBCINI=/etc/odbc.ini
-    - name: configure-aws-credentials
-      if: success()
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
     - name: configure-and-build-driver
       if: success()
       run: |
@@ -144,18 +130,17 @@ jobs:
     - name: run-tests
       if: success()
       run: |
-        ./build/odbc/bin/tests --gtest_filter=-TestSQLConnectSAMLAuth.*:TestSQLDriverConnectSAMLAuth.*
+        ./build/odbc/bin/tests --gtest_output="xml:report.xml"
     - name: prepare-test-results
       if: always()
       run: |
-        cp /tmp/timestreamodbc_*.log ${{ github.workspace }}/odbc-logs/
-    - name: upload-test-results
-      if: always()
+        cp ${{ github.workspace }}/report.xml ${{ github.workspace }}/odbc-logs/
+    - name: upload-test-report
+      if: failure()
       uses: actions/upload-artifact@v2
       with:
         name: test-results-linux32
-        path: |
-          ${{ github.workspace }}/odbc-logs/
+        path: ${{ github.workspace }}/report.xml
     - name: build-deb-installer
       if: success()
       run: |

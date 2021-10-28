@@ -1,7 +1,14 @@
-name: Timestream ODBC Driver for Mac
+name: ODBC Driver for Mac
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
 
 env:
   CI_OUTPUT_PATH: "ci-output"
@@ -9,6 +16,7 @@ env:
   ODBC_BIN_PATH: "./build/odbc/bin"
   ODBC_BUILD_PATH: "./build/odbc/build"
   AWS_SDK_INSTALL_PATH: "./build/aws-sdk/install"
+  NOT_CONNECTED: 1
 
 jobs:
   build-mac:
@@ -34,12 +42,6 @@ jobs:
     - name: configure-and-build-driver
       run: |
         ./build_mac_release64.sh
-    - name: configure-aws-credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
     - name: prepare-dsn
       run: |
         sudo mkdir /Library/ODBC
@@ -48,12 +50,13 @@ jobs:
         mkdir ${{ github.workspace }}/odbc-logs
     - name: run-tests
       run: |
-        ./build/odbc/bin/tests --gtest_filter=-TestSQLConnectSAMLAuth.*:TestSQLDriverConnectSAMLAuth.*
-    - name: print-test-logs
+        ./build/odbc/bin/tests --gtest_output="xml:report.xml"
+    - name: upload-test-report
       if: failure()
-      run: |
-        cat /tmp/timestreamodbc_*.log
-        cat ./aws_sdk_*.log
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-result-macos
+        path: ${{ github.workspace }}/report.xml
     - name: print-memory-leak-logs
       if: always()
       run: |
@@ -66,9 +69,9 @@ jobs:
         path: |
           ${{ github.workspace }}/odbc-logs/
           ${{ github.workspace }}/leaks_
-    #- name: test
-    #  run: |
-    #    bash ./run_test_runner.sh
+    # - name: test
+    #   run: |
+    #     bash ./run_test_runner.sh
     - name: build-installer
       if: success()
       run: |
@@ -98,9 +101,9 @@ jobs:
       with:
         name: mac64-installer
         path: installer
-    #- name: upload-test-results
-    #  if: success()
-    #  uses: actions/upload-artifact@v2
-    #  with:
-    #    name: mac-test-results
-    #    path: test-output
+    - name: upload-test-results
+      if: success()
+      uses: actions/upload-artifact@v2
+      with:
+        name: mac-test-results
+        path: test-output
