@@ -1,4 +1,4 @@
-name: Timestream ODBC Driver for Mac (Debug)
+name: ODBC Driver for Mac (Debug)
 
 on:
   workflow_dispatch:
@@ -9,10 +9,13 @@ env:
   ODBC_BIN_PATH: "./build/odbc/bin"
   ODBC_BUILD_PATH: "./build/odbc/build"
   AWS_SDK_INSTALL_PATH: "./build/aws-sdk/install"
+  NOT_CONNECTED: 1
 
 jobs:
   build-mac:
     runs-on: macos-latest
+    env: 
+      NOT_CONNETECD: 1
     steps:
     - uses: actions/checkout@v2
     - name: run-cppcheck
@@ -37,12 +40,6 @@ jobs:
     - name: configure-and-build-driver
       run: |
         ./build_mac_debug64.sh
-    - name: configure-aws-credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
     - name: prepare-dsn
       run: |
         sudo mkdir /Library/ODBC
@@ -50,12 +47,13 @@ jobs:
         mkdir ${{ github.workspace }}/odbc-logs
     - name: run-tests
       run: |
-        ./build/odbc/bin/tests --gtest_filter=-TestSQLConnectSAMLAuth.*:TestSQLDriverConnectSAMLAuth.*
-    - name: print-test-logs
+        ./build/odbc/bin/tests --gtest_output="xml:report.xml"
+    - name: upload-test-report
       if: failure()
-      run: |
-        cat /tmp/timestreamodbc_*.log
-        cat ./aws_sdk_*.log
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-result-macos
+        path: ${{ github.workspace }}\report.xml
     - name: print-memory-leak-logs
       if: always()
       run: |

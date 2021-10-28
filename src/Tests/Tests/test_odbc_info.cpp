@@ -36,11 +36,17 @@ class TestSQLGetInfo : public testing::Test {
     }
 
     void SetUp() {
+        if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+        }
         ITDriverConnect((SQLTCHAR*)(conn_string().c_str()), &m_env, &m_conn, true,
                         true);
     }
 
     void TearDown() {
+        if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+        }
         SQLDisconnect(m_conn);
         SQLFreeHandle(SQL_HANDLE_ENV, m_env);
     }
@@ -95,6 +101,9 @@ int Ver1GEVer2(test_string ver_1_str, test_string ver_2_str) {
 // Test template for SQLGetInfo
 #define TEST_SQL_GET_INFO_STRING(test_name, info_type, expected_value)         \
     TEST_F(TestSQLGetInfo, test_name) {                                        \
+        if (std::getenv("NOT_CONNECTED")) {                                    \
+            GTEST_SKIP();                                                      \
+        }                                                                      \
         SQLTCHAR info_value_ptr[1024];                                         \
         SQLSMALLINT string_length_ptr;                                         \
         SQLRETURN ret =                                                        \

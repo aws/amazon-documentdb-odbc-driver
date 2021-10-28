@@ -51,6 +51,9 @@ class TestSQLGetDescRec : public Fixture {};
 class TestSQLCopyDesc : public Fixture {};
 
 TEST_F(TestSQLCopyDesc, ARD_TO_ARD) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
@@ -75,6 +78,9 @@ TEST_F(TestSQLCopyDesc, ARD_TO_ARD) {
 }
 
 TEST_F(TestSQLCopyDesc, ARD_TO_APD) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
@@ -90,6 +96,9 @@ TEST_F(TestSQLCopyDesc, ARD_TO_APD) {
 }
 
 TEST_F(TestSQLCopyDesc, ARD_TO_IPD) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
@@ -105,6 +114,9 @@ TEST_F(TestSQLCopyDesc, ARD_TO_IPD) {
 }
 
 TEST_F(TestSQLCopyDesc, ARD_TO_IRD) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
@@ -120,6 +132,9 @@ TEST_F(TestSQLCopyDesc, ARD_TO_IRD) {
 }
 
 TEST_F(TestSQLCopyDesc, IRD_TO_IRD) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
@@ -135,6 +150,9 @@ TEST_F(TestSQLCopyDesc, IRD_TO_IRD) {
 }
 
 TEST_F(TestSQLCopyDesc, IRD_TO_ARD) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
@@ -150,6 +168,9 @@ TEST_F(TestSQLCopyDesc, IRD_TO_ARD) {
 }
 
 TEST_F(TestSQLCopyDesc, IRD_TO_APD) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
@@ -165,6 +186,9 @@ TEST_F(TestSQLCopyDesc, IRD_TO_APD) {
 }
 
 TEST_F(TestSQLCopyDesc, IRD_TO_IPD) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
@@ -180,6 +204,9 @@ TEST_F(TestSQLCopyDesc, IRD_TO_IPD) {
 }
 
 TEST_F(TestSQLCopyDesc, APD_TO_APD) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
@@ -194,6 +221,9 @@ TEST_F(TestSQLCopyDesc, APD_TO_APD) {
 }
 
 TEST_F(TestSQLCopyDesc, APD_TO_ARD) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
@@ -209,6 +239,9 @@ TEST_F(TestSQLCopyDesc, APD_TO_ARD) {
 }
 
 TEST_F(TestSQLCopyDesc, APD_TO_IPD) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
@@ -224,6 +257,9 @@ TEST_F(TestSQLCopyDesc, APD_TO_IPD) {
 }
 
 TEST_F(TestSQLCopyDesc, APD_TO_IRD) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
@@ -239,6 +275,9 @@ TEST_F(TestSQLCopyDesc, APD_TO_IRD) {
 }
 
 TEST_F(TestSQLCopyDesc, IPD_TO_IPD) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
@@ -253,6 +292,9 @@ TEST_F(TestSQLCopyDesc, IPD_TO_IPD) {
 }
 
 TEST_F(TestSQLCopyDesc, IPD_TO_ARD) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
@@ -268,6 +310,9 @@ TEST_F(TestSQLCopyDesc, IPD_TO_ARD) {
 }
 
 TEST_F(TestSQLCopyDesc, IPD_TO_ARP) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
@@ -283,6 +328,9 @@ TEST_F(TestSQLCopyDesc, IPD_TO_ARP) {
 }
 
 TEST_F(TestSQLCopyDesc, IPD_TO_IRD) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
@@ -300,6 +348,9 @@ TEST_F(TestSQLCopyDesc, IPD_TO_IRD) {
 class TestSQLSetDescField : public testing::Test {
    public:
     void SetUp() {
+        if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+        }
         AllocStatement((SQLTCHAR*)(conn_string().c_str()), &m_env, &m_conn,
                        &m_hstmt, true, true);
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_ROW_DESC, &m_ard_hdesc, 0, NULL);
@@ -307,6 +358,9 @@ class TestSQLSetDescField : public testing::Test {
     }
 
     void TearDown() {
+        if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+        }
         if (m_ard_hdesc != SQL_NULL_HDESC) {
             SQLFreeHandle(SQL_HANDLE_DESC, m_ard_hdesc);
         }
@@ -560,6 +614,9 @@ TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_UPDATABLE,
 class TestSQLGetDescField : public testing::Test {
    public:
     void SetUp() {
+            if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
         AllocStatement((SQLTCHAR*)(conn_string().c_str()), &m_env, &m_conn,
                        &m_hstmt, true, true);
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_ROW_DESC, &m_ard_hdesc, 0, NULL);
@@ -569,6 +626,9 @@ class TestSQLGetDescField : public testing::Test {
     }
 
     void TearDown() {
+            if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
         if (m_ard_hdesc != SQL_NULL_HDESC) {
             SQLFreeHandle(SQL_HANDLE_DESC, m_ard_hdesc);
         }
@@ -592,6 +652,9 @@ class TestSQLGetDescField : public testing::Test {
 
 // Descriptor Header Fields Tests
 TEST_F(TestSQLGetDescField, Test_SQL_DESC_ALLOC_TYPE) {
+    if (std::getenv("NOT_CONNECTED")) {
+        GTEST_SKIP();
+    }
     SQLSMALLINT m_value_ptr = 0;
     ASSERT_TRUE(
         SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 0, SQL_DESC_ALLOC_TYPE,
