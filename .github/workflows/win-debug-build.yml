@@ -1,4 +1,4 @@
-name: Timestream ODBC Driver for Windows (Debug)
+name: ODBC Driver for Windows (Debug)
 
 on:
   workflow_dispatch:
@@ -9,6 +9,7 @@ env:
   ODBC_BIN_PATH: "./build/odbc/bin"
   ODBC_BUILD_PATH: "./build/odbc/build"
   AWS_SDK_INSTALL_PATH: "./build/aws-sdk/install"
+  NOT_CONNECTED: 1
 
 jobs:
   build-windows32:
@@ -25,12 +26,6 @@ jobs:
     - name: build-tests
       run: |
         MSBuild.exe ./build/odbc/cmake/global_make_list.sln -property:Configuration=Debug,Platform=Win32
-    - name: configure-aws-credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
     - name: import-registry
       run: |
         reg import .\src\Tests\Tests\AWSProfileRegistry_Win32.reg
@@ -38,7 +33,7 @@ jobs:
         mkdir ${{ github.workspace }}\odbc-logs
     - name: run-tests
       run: |
-        .\build\odbc\bin\Debug\tests.exe --gtest_filter=-TestSQLConnectSAMLAuth.*:TestSQLDriverConnectSAMLAuth.*
+        .\build\odbc\bin\Debug\tests.exe --gtest_output="xml:report.xml"
     - name: upload-test-logs
       if: always()
       uses: actions/upload-artifact@v2
@@ -55,12 +50,12 @@ jobs:
       with:
         name: windows32-build
         path: ci-output/build
-    #- name: upload-test-results
-    #  if: always()
-    #  uses: actions/upload-artifact@v2
-    #  with:
-    #    name: windows-test-results
-    #    path: $CI_OUTPUT_PATH/test
+    - name: upload-test-report
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-logs-win32
+        path: ${{ github.workspace }}\report.xml
   build-windows64:
     runs-on: windows-latest
     steps:
@@ -75,12 +70,6 @@ jobs:
     - name: build-tests
       run: |
         MSBuild.exe ./build/odbc/cmake/global_make_list.sln -property:Configuration=Debug,Platform=x64
-    - name: configure-aws-credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
     - name: import-registry
       run: |
         reg import .\src\Tests\Tests\AWSProfileRegistry.reg
@@ -88,13 +77,13 @@ jobs:
         mkdir ${{ github.workspace }}\odbc-logs
     - name: run-tests
       run: |
-        .\build\odbc\bin\Debug\tests.exe --gtest_filter=-TestSQLConnectSAMLAuth.*:TestSQLDriverConnectSAMLAuth.*
-    - name: upload-test-logs
-      if: always()
+        .\build\odbc\bin\Debug\tests.exe --gtest_output="xml:report.xml"
+    - name: upload-test-report
+      if: failure()
       uses: actions/upload-artifact@v2
       with:
         name: test-logs-win64
-        path: ${{ github.workspace }}\odbc-logs\
+        path: ${{ github.workspace }}\report.xml
     - name: prepare-output
       if: always()
       run: |
@@ -105,9 +94,9 @@ jobs:
       with:
         name: windows64-build
         path: ci-output/build
-    #- name: upload-test-results
-    #  if: always()
-    #  uses: actions/upload-artifact@v2
-    #  with:
-    #    name: windows-test-results
-    #    path: ci-output/test-output
+    - name: upload-test-results
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows-test-results
+        path: ci-output/test-output

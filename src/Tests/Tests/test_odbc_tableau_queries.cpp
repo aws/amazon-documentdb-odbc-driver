@@ -41,6 +41,10 @@ inline void GetAllLinesInFile(const std::string file_name,
 }
 
 TEST(TableauQuery, IssueQueriesAll) {
+    if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+    }
+    
     // Get lines from file
     std::vector< std::string > lines;
     GetAllLinesInFile(all_queries_file, lines);
