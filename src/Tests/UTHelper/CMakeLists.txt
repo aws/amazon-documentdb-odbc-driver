@@ -24,5 +24,5 @@ include_directories(${ODBC_SRC})
 add_library(ut_helper SHARED ${SOURCE_FILES} ${HEADER_FILES})
 
 # Library dependencies
-target_link_libraries(ut_helper timestreamsqlodbc gtest_main)
+target_link_libraries(ut_helper odbcdriver gtest_main)
 target_compile_definitions(ut_helper PUBLIC _UNICODE UNICODE)

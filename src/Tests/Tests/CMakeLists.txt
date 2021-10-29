@@ -26,5 +26,5 @@ add_executable(tests ${SOURCE_FILES})
 
 # Library dependencies
 target_code_coverage(tests PUBLIC AUTO ALL)
-target_link_libraries(tests timestreamsqlodbc itodbc_helper ut_helper gtest_main)
+target_link_libraries(tests odbcdriver itodbc_helper ut_helper gtest_main)
 target_compile_definitions(tests PUBLIC _UNICODE UNICODE)

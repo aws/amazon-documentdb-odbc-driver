@@ -95,9 +95,9 @@ sudo yum install unixODBC
 ## Using the Driver
 
 The driver comes in the form of a library file:
-* Windows: `timestreamsqlodbc.dll`
-* Mac: `libtimestreamsqlodbc.dylib`
-* Linux: `libtimestreamsqlodbc.so`
+* Windows: `odbcdriver.dll`
+* Mac: `libodbcdriver.dylib`
+* Linux: `libodbcdriver.so`
 
 If using with ODBC compatible BI tools, refer to the tool documentation on configuring a new ODBC driver. In most cases, you will need to make the tool aware of the location of the driver library file and then use it to setup Amazon Timestream database connections.
 

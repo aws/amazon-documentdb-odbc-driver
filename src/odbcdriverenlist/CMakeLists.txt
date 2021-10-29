@@ -13,22 +13,22 @@
 #   permissions and limitations under the License.
 #
 
-project(timestreamenlist)
+project(odbcdriverenlist)
 
-# Source files for timestreamenlist
+# Source files for odbcdriverenlist
 set(SOURCE_FILES msdtc_enlist.cpp)
 set(HEADER_FILES enlist.h)
 
 # Generate static lib
-add_library(timestreamenlist STATIC ${SOURCE_FILES} ${HEADER_FILES})
+add_library(odbcdriverenlist STATIC ${SOURCE_FILES} ${HEADER_FILES})
  		
 # Library dependencies
-target_link_libraries(timestreamenlist kernel32 advapi32 Delayimp XOleHlp)
+target_link_libraries(odbcdriverenlist kernel32 advapi32 Delayimp XOleHlp)
 
 # Platform specific library dependencies
 if(WIN32)
 	# Windows specifiec 
-	target_link_libraries(timestreamenlist wsock32 winspool user32 gdi32 comdlg32 shell32 uuid)
+	target_link_libraries(odbcdriverenlist wsock32 winspool user32 gdi32 comdlg32 shell32 uuid)
 else()
 	# Unix specific
 endif()

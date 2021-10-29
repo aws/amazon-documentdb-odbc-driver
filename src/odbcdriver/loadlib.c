@@ -30,18 +30,18 @@
 #pragma comment(lib, "Delayimp")
 #ifdef _HANDLE_ENLIST_IN_DTC_
 #ifdef UNICODE_SUPPORT
-#pragma comment(lib, "timestreamenlist")
+#pragma comment(lib, "odbcdriverenlist")
 #else
-#pragma comment(lib, "timestreamenlista")
+#pragma comment(lib, "odbcdriverenlista")
 #endif /* UNICODE_SUPPORT */
 #endif /* _HANDLE_ENLIST_IN_DTC_ */
 // The followings works under VC++6.0 but doesn't work under VC++7.0.
 // Please add the equivalent linker options using command line etc.
 #if (_MSC_VER == 1200) && defined(DYNAMIC_LOAD)  // VC6.0
 #ifdef UNICODE_SUPPORT
-#pragma comment(linker, "/Delayload:timestreamenlist.dll")
+#pragma comment(linker, "/Delayload:odbcdriverenlist.dll")
 #else
-#pragma comment(linker, "/Delayload:timestreamenlista.dll")
+#pragma comment(linker, "/Delayload:odbcdriverenlista.dll")
 #endif /* UNICODE_SUPPORT */
 #pragma comment(linker, "/Delay:UNLOAD")
 #endif /* _MSC_VER */
@@ -50,15 +50,15 @@
 #if defined(DYNAMIC_LOAD)
 #define WIN_DYN_LOAD
 #ifdef UNICODE_SUPPORT
-CSTR timestreamenlist = "timestreamenlist";
-CSTR timestreamenlistdll = "timestreamenlist.dll";
-CSTR timestreamodbc = "timestreamsqlodbc35w";
-CSTR timestreamodbcdll = "timestreamsqlodbc35w.dll";
+CSTR odbcdriverenlist = "odbcdriverenlist";
+CSTR odbcdriverenlistdll = "odbcdriverenlist.dll";
+CSTR timestreamodbc = "odbcdriver35w";
+CSTR timestreamodbcdll = "odbcdriver35w.dll";
 #else
-CSTR timestreamenlist = "timestreamenlista";
-CSTR timestreamenlistdll = "timestreamenlista.dll";
-CSTR timestreamodbc = "timestreamsqlodbc30a";
-CSTR timestreamodbcdll = "timestreamsqlodbc30a.dll";
+CSTR odbcdriverenlist = "odbcdriverenlista";
+CSTR odbcdriverenlistdll = "odbcdriverenlista.dll";
+CSTR timestreamodbc = "odbcdriver30a";
+CSTR timestreamodbcdll = "odbcdriver30a.dll";
 #endif /* UNICODE_SUPPORT */
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 #define _MSC_DELAY_LOAD_IMPORT
@@ -97,7 +97,7 @@ extern PfnDliHook __pfnDliNotifyHook2;
 #endif /* _MSC_DELAY_LOAD_IMPORT */
 
 #if defined(_MSC_DELAY_LOAD_IMPORT)
-static BOOL loaded_timestreamenlist = FALSE;
+static BOOL loaded_odbcdriverenlist = FALSE;
 static HMODULE enlist_module = NULL;
 static BOOL loaded_timestreamodbc = FALSE;
 /*
@@ -144,8 +144,8 @@ static FARPROC WINAPI DliErrorHook(unsigned dliNotify, PDelayLoadInfo pdli) {
                     NULL == hmodule)
                     hmodule = LoadLibrary(call_module);
                 if (NULL != hmodule) {
-                    if (timestreamenlist == call_module)
-                        loaded_timestreamenlist = TRUE;
+                    if (odbcdriverenlist == call_module)
+                        loaded_odbcdriverenlist = TRUE;
                     else if (timestreamodbc == call_module)
                         loaded_timestreamodbc = TRUE;
                 }
@@ -168,15 +168,15 @@ void CleanupDelayLoadedDLLs(void) {
     UnloadFunc func = __FUnloadDelayLoadedDLL2;
 #endif
     /* The dll names are case sensitive for the unload helper */
-    if (loaded_timestreamenlist) {
+    if (loaded_odbcdriverenlist) {
         if (enlist_module != NULL) {
-            MYLOG(LOG_DEBUG, "Freeing Library %s", timestreamenlistdll);
+            MYLOG(LOG_DEBUG, "Freeing Library %s", odbcdriverenlistdll);
             FreeLibrary(enlist_module);
         }
-        MYLOG(LOG_DEBUG, "%s unloading", timestreamenlistdll);
-        success = (*func)(timestreamenlistdll);
-        MYLOG(LOG_DEBUG, "%s unloaded success=%d", timestreamenlistdll, success);
-        loaded_timestreamenlist = FALSE;
+        MYLOG(LOG_DEBUG, "%s unloading", odbcdriverenlistdll);
+        success = (*func)(odbcdriverenlistdll);
+        MYLOG(LOG_DEBUG, "%s unloaded success=%d", odbcdriverenlistdll, success);
+        loaded_odbcdriverenlist = FALSE;
     }
     if (loaded_timestreamodbc) {
         MYLOG(LOG_DEBUG, "%s unloading", timestreamodbcdll);
@@ -198,37 +198,37 @@ RETCODE CALL_EnlistInDtc(ConnectionClass *conn, void *pTra, int method) {
     BOOL loaded = TRUE;
 
 #if defined(_MSC_DELAY_LOAD_IMPORT)
-    if (!loaded_timestreamenlist) {
+    if (!loaded_odbcdriverenlist) {
         TRY_DLI_HOOK
         ret = EnlistInDtc(conn, pTra, method);
     }
     __except ((GetExceptionCode() & 0xffff) == ERROR_MOD_NOT_FOUND
                   ? EXCEPTION_EXECUTE_HANDLER
                   : EXCEPTION_CONTINUE_SEARCH) {
-        if (enlist_module = MODULE_load_from_timestreamodbc_path(timestreamenlist),
+        if (enlist_module = MODULE_load_from_timestreamodbc_path(odbcdriverenlist),
             NULL == enlist_module)
             loaded = FALSE;
         else
             ret = EnlistInDtc(conn, pTra, method);
     }
     if (loaded)
-        loaded_timestreamenlist = TRUE;
+        loaded_odbcdriverenlist = TRUE;
     RELEASE_NOTIFY_HOOK
 }
 else ret = EnlistInDtc(conn, pTra, method);
 #else
     ret = EnlistInDtc(conn, pTra, method);
-    loaded_timestreamenlist = TRUE;
+    loaded_odbcdriverenlist = TRUE;
 #endif /* _MSC_DELAY_LOAD_IMPORT */
 return ret;
 }
 RETCODE CALL_DtcOnDisconnect(ConnectionClass *conn) {
-    if (loaded_timestreamenlist)
+    if (loaded_odbcdriverenlist)
         return DtcOnDisconnect(conn);
     return FALSE;
 }
 RETCODE CALL_IsolateDtcConn(ConnectionClass *conn, BOOL continueConnection) {
-    if (loaded_timestreamenlist)
+    if (loaded_odbcdriverenlist)
         return IsolateDtcConn(conn, continueConnection);
     return FALSE;
 }
@@ -238,32 +238,32 @@ void *CALL_GetTransactionObject(HRESULT *hres) {
     BOOL loaded = TRUE;
 
 #if defined(_MSC_DELAY_LOAD_IMPORT)
-    if (!loaded_timestreamenlist) {
+    if (!loaded_odbcdriverenlist) {
         TRY_DLI_HOOK
         ret = GetTransactionObject(hres);
     }
     __except ((GetExceptionCode() & 0xffff) == ERROR_MOD_NOT_FOUND
                   ? EXCEPTION_EXECUTE_HANDLER
                   : EXCEPTION_CONTINUE_SEARCH) {
-        if (enlist_module = MODULE_load_from_timestreamodbc_path(timestreamenlist),
+        if (enlist_module = MODULE_load_from_timestreamodbc_path(odbcdriverenlist),
             NULL == enlist_module)
             loaded = FALSE;
         else
             ret = GetTransactionObject(hres);
     }
     if (loaded)
-        loaded_timestreamenlist = TRUE;
+        loaded_odbcdriverenlist = TRUE;
     RELEASE_NOTIFY_HOOK
 }
 else ret = GetTransactionObject(hres);
 #else
     ret = GetTransactionObject(hres);
-    loaded_timestreamenlist = TRUE;
+    loaded_odbcdriverenlist = TRUE;
 #endif /* _MSC_DELAY_LOAD_IMPORT */
 return ret;
 }
 void CALL_ReleaseTransactionObject(void *pObj) {
-    if (loaded_timestreamenlist)
+    if (loaded_odbcdriverenlist)
         ReleaseTransactionObject(pObj);
     return;
 }

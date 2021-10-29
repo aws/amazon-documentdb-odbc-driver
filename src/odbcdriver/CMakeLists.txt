@@ -13,9 +13,9 @@
 #   permissions and limitations under the License.
 #
 
-project(timestreamsqlodbc)
+project(odbcdriver)
 
-# Source files for timestreamsqlodbc
+# Source files for odbcdriver
 set(C_SOURCE_FILES	bind.c
 					columninfo.c
 					connection.c
@@ -97,9 +97,9 @@ set(CPP_HEADER_FILES	communication.h
 # Generate dll (SHARED)
 if(WIN32)
 set(RESOURCE_FILES ts_odbc.rc)
-add_library(timestreamsqlodbc SHARED ${C_SOURCE_FILES} ${C_HEADER_FILES} ${CPP_SOURCE_FILES} ${CPP_HEADER_FILES} ${RESOURCE_FILES} ${AWSSDK_LIB_DIR})
+add_library(odbcdriver SHARED ${C_SOURCE_FILES} ${C_HEADER_FILES} ${CPP_SOURCE_FILES} ${CPP_HEADER_FILES} ${RESOURCE_FILES} ${AWSSDK_LIB_DIR})
 else()
-add_library(timestreamsqlodbc SHARED ${C_SOURCE_FILES} ${C_HEADER_FILES} ${CPP_SOURCE_FILES} ${CPP_HEADER_FILES})
+add_library(odbcdriver SHARED ${C_SOURCE_FILES} ${C_HEADER_FILES} ${CPP_SOURCE_FILES} ${CPP_HEADER_FILES})
 endif()
 
 include_directories(
@@ -111,16 +111,16 @@ include_directories(
 # Platform specific library dependencies
 if(WIN32)
 	# Windows specifiec
-	target_link_libraries(timestreamsqlodbc wsock32 ws2_32 winmm user32 gdi32 legacy_stdio_definitions aws-cpp-sdk-core aws-cpp-sdk-sts aws-cpp-sdk-timestream-query kernel32 advapi32 secur32 XOleHlp Wldap32 crypt32 Normaliz odbccp32 odbc32)
-	target_link_libraries(timestreamsqlodbc debug msvcrtd)
-	target_link_libraries(timestreamsqlodbc optimized msvcrt)
+	target_link_libraries(odbcdriver wsock32 ws2_32 winmm user32 gdi32 legacy_stdio_definitions aws-cpp-sdk-core aws-cpp-sdk-sts aws-cpp-sdk-timestream-query kernel32 advapi32 secur32 XOleHlp Wldap32 crypt32 Normaliz odbccp32 odbc32)
+	target_link_libraries(odbcdriver debug msvcrtd)
+	target_link_libraries(odbcdriver optimized msvcrt)
 elseif(APPLE)
 	# Apple specific
-	target_link_libraries(timestreamsqlodbc iodbc iodbcinst aws-cpp-sdk-core aws-cpp-sdk-sts aws-cpp-sdk-timestream-query)
+	target_link_libraries(odbcdriver iodbc iodbcinst aws-cpp-sdk-core aws-cpp-sdk-sts aws-cpp-sdk-timestream-query)
 elseif(UNIX)
 	# Unix specific
 	include_directories(/usr/src/linux-headers-5.0.0-27/include)
-	target_link_libraries(timestreamsqlodbc aws-cpp-sdk-core aws-cpp-sdk-sts aws-cpp-sdk-timestream-query odbc odbcinst)
+	target_link_libraries(odbcdriver aws-cpp-sdk-core aws-cpp-sdk-sts aws-cpp-sdk-timestream-query odbc odbcinst)
 	if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9))
 		if (Boost_FOUND)
 			include_directories(${Boost_INCLUDE_DIRS})

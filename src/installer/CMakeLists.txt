@@ -141,7 +141,7 @@ cpack_add_component(Driver
 
 # Install driver files
 if (UNIX AND NOT APPLE)
-    install(TARGETS timestreamsqlodbc DESTINATION bin/timestream-odbc${BITNESS} COMPONENT "Driver")
+    install(TARGETS odbcdriver DESTINATION bin/timestream-odbc${BITNESS} COMPONENT "Driver")
     
     # Install documentation files
     install(FILES "${PROJECT_ROOT}/LICENSE" DESTINATION "bin/timestream-odbc${BITNESS}" COMPONENT "Docs")
@@ -150,7 +150,7 @@ if (UNIX AND NOT APPLE)
     install(FILES "${TESTS_INI}/odbc-linux${BITNESS}.ini" DESTINATION "bin/timestream-odbc${BITNESS}" COMPONENT "Docs")
     install(FILES "${TESTS_INI}/odbcinst-linux${BITNESS}.ini" DESTINATION "bin/timestream-odbc${BITNESS}" COMPONENT "Docs")
 else()
-    install(TARGETS timestreamsqlodbc DESTINATION bin COMPONENT "Driver")
+    install(TARGETS odbcdriver DESTINATION bin COMPONENT "Driver")
     
     # Install documentation files
     install(FILES "${PROJECT_ROOT}/LICENSE" DESTINATION doc COMPONENT "Docs")
