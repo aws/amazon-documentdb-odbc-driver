@@ -14,8 +14,8 @@
  *
  */
 
-#ifndef TS_TYPES
-#define TS_TYPES
+#ifndef DB_TYPES
+#define DB_TYPES
 
 #include "dlg_specific.h"
 #include "odbc.h"
@@ -30,46 +30,46 @@ extern "C" {
 #define TS_TYPE_LO ? ? ? ? /* waiting for permanent type */
 #endif
 
-#define TS_TYPE_NAME_BOOLEAN "boolean"
-#define TS_TYPE_NAME_INTEGER "int"
-#define TS_TYPE_NAME_BIGINT "bigint"
-#define TS_TYPE_NAME_DOUBLE "double"
-#define TS_TYPE_NAME_VARCHAR "varchar"
-#define TS_TYPE_NAME_ARRAY "array[T,...]"
-#define TS_TYPE_NAME_ROW "row(T,...)"
-#define TS_TYPE_NAME_DATE "date"
-#define TS_TYPE_NAME_TIME "time"
-#define TS_TYPE_NAME_TIMESTAMP "timestamp"
-#define TS_TYPE_NAME_INTERVAL_DAY_TO_SECOND "interval day to second"
-#define TS_TYPE_NAME_INTERVAL_YEAR_TO_MONTH "interval year to month"
-#define TS_TYPE_NAME_TIMESERIES "timeseries[row(timestamp, T,...)]"
-#define TS_TYPE_NAME_UNKNOWN "unknown"
+#define DB_TYPE_NAME_BOOLEAN "boolean"
+#define DB_TYPE_NAME_INTEGER "int"
+#define DB_TYPE_NAME_BIGINT "bigint"
+#define DB_TYPE_NAME_DOUBLE "double"
+#define DB_TYPE_NAME_VARCHAR "varchar"
+#define DB_TYPE_NAME_ARRAY "array[T,...]"
+#define DB_TYPE_NAME_ROW "row(T,...)"
+#define DB_TYPE_NAME_DATE "date"
+#define DB_TYPE_NAME_TIME "time"
+#define DB_TYPE_NAME_TIMESTAMP "timestamp"
+#define DB_TYPE_NAME_INTERVAL_DAY_TO_SECOND "interval day to second"
+#define DB_TYPE_NAME_INTERVAL_YEAR_TO_MONTH "interval year to month"
+#define DB_TYPE_NAME_TIMESERIES "timeseries[row(timestamp, T,...)]"
+#define DB_TYPE_NAME_UNKNOWN "unknown"
 
 #define MS_ACCESS_SERIAL "int identity"
-#define TS_TYPE_BOOLEAN 16
-#define TS_TYPE_BIGINT 20
-#define TS_TYPE_INT2 21
-#define TS_TYPE_INTEGER 23
-#define TS_TYPE_DOUBLE 701
-#define TS_TYPE_ARRAY 1016
-#define TS_TYPE_INTERVAL_DAY_TO_SECOND 1017
-#define TS_TYPE_INTERVAL_YEAR_TO_MONTH 1018
-#define TS_TYPE_ROW 1019
-#define TS_TYPE_TIMESERIES 1020
-#define TS_TYPE_VARCHAR 1043
-#define TS_TYPE_UNKNOWN 1048
-#define TS_TYPE_DATE 1082
-#define TS_TYPE_TIME 1083
-#define TS_TYPE_TIMESTAMP_NO_TMZONE 1114 /* since 7.2 */
-#define TS_TYPE_TIMESTAMP 1296        /* deprecated since 7.0 */
+#define DB_TYPE_BOOLEAN 16
+#define DB_TYPE_BIGINT 20
+#define DB_TYPE_INT2 21
+#define DB_TYPE_INTEGER 23
+#define DB_TYPE_DOUBLE 701
+#define DB_TYPE_ARRAY 1016
+#define DB_TYPE_INTERVAL_DAY_TO_SECOND 1017
+#define DB_TYPE_INTERVAL_YEAR_TO_MONTH 1018
+#define DB_TYPE_ROW 1019
+#define DB_TYPE_TIMESERIES 1020
+#define DB_TYPE_VARCHAR 1043
+#define DB_TYPE_UNKNOWN 1048
+#define DB_TYPE_DATE 1082
+#define DB_TYPE_TIME 1083
+#define DB_TYPE_TIMESTAMP_NO_TMZONE 1114 /* since 7.2 */
+#define DB_TYPE_TIMESTAMP 1296        /* deprecated since 7.0 */
 #define INTERNAL_ASIS_TYPE (-9999)
 
 #define TYPE_MAY_BE_ARRAY(type) \
     (type) >= 1000 && (type) <= 1041
 
-#define TS_ATP_UNSET (-3) /* atttypmod */
-#define TS_ADT_UNSET (-3) /* adtsize_or_longestlen */
-#define TS_UNKNOWNS_UNSET 0 /* UNKNOWNS_AS_MAX */
+#define DB_ATP_UNSET (-3) /* atttypmod */
+#define DB_ADT_UNSET (-3) /* adtsize_or_longestlen */
+#define DB_UNKNOWNS_UNSET 0 /* UNKNOWNS_AS_MAX */
 
 OID es_true_type(const ConnectionClass *, OID, OID);
 OID sqltype_to_estype(const ConnectionClass *conn, SQLSMALLINT fSqlType);
@@ -89,13 +89,13 @@ SQLSMALLINT estype_attr_to_concise_type(const ConnectionClass *conn, OID type,
 SQLSMALLINT estype_attr_to_sqldesctype(const ConnectionClass *conn, OID type,
                                        int typmod, int adtsize_or_longestlen,
                                        int handle_unknown_size_as);
-SQLSMALLINT tstype_attr_to_datetime_sub(const ConnectionClass *conn, OID type,
+SQLSMALLINT dbtype_attr_to_datetime_sub(const ConnectionClass *conn, OID type,
                                         int typmod);
 SQLSMALLINT estype_attr_to_ctype(const ConnectionClass *conn, OID type,
                                  int typmod);
-const char *tstype_attr_to_name(const ConnectionClass *conn, OID type,
+const char *dbtype_attr_to_name(const ConnectionClass *conn, OID type,
                                 int typmod, BOOL auto_increment);
-Int4 tstype_attr_column_size(const ConnectionClass *conn, OID type,
+Int4 dbtype_attr_column_size(const ConnectionClass *conn, OID type,
                              int atttypmod, int adtsize_or_longest,
                              int handle_unknown_size_as);
 Int4 estype_attr_buffer_length(const ConnectionClass *conn, OID type,
@@ -134,21 +134,21 @@ Int4 estype_desclength(const StatementClass *stmt, OID type, int col,
 SQLSMALLINT estype_decimal_digits(
     const StatementClass *stmt, OID type,
     int col); /* corresponds to "scale" in ODBC 2.x */
-SQLSMALLINT tstype_min_decimal_digits(
+SQLSMALLINT dbtype_min_decimal_digits(
     const ConnectionClass *conn,
     OID type); /* corresponds to "min_scale" in ODBC 2.x */
-SQLSMALLINT tstype_max_decimal_digits(
+SQLSMALLINT dbtype_max_decimal_digits(
     const ConnectionClass *conn,
     OID type); /* corresponds to "max_scale" in ODBC 2.x */
-Int2 tstype_radix(const ConnectionClass *conn, OID type);
-Int2 tstype_nullable(const ConnectionClass *conn, OID type);
-Int2 tstype_auto_increment(const ConnectionClass *conn, OID type);
-Int2 tstype_case_sensitive(const ConnectionClass *conn, OID type);
+Int2 dbtype_radix(const ConnectionClass *conn, OID type);
+Int2 dbtype_nullable(const ConnectionClass *conn, OID type);
+Int2 dbtype_auto_increment(const ConnectionClass *conn, OID type);
+Int2 dbtype_case_sensitive(const ConnectionClass *conn, OID type);
 Int2 estype_money(const ConnectionClass *conn, OID type);
-Int2 tstype_searchable(const ConnectionClass *conn, OID type);
-Int2 tstype_unsigned(const ConnectionClass *conn, OID type);
-const char *tstype_literal_prefix(const ConnectionClass *conn, OID type);
-const char *tstype_literal_suffix(const ConnectionClass *conn, OID type);
+Int2 dbtype_searchable(const ConnectionClass *conn, OID type);
+Int2 dbtype_unsigned(const ConnectionClass *conn, OID type);
+const char *dbtype_literal_prefix(const ConnectionClass *conn, OID type);
+const char *dbtype_literal_suffix(const ConnectionClass *conn, OID type);
 
 SQLSMALLINT sqltype_to_default_ctype(const ConnectionClass *stmt,
                                      SQLSMALLINT sqltype);

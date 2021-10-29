@@ -274,7 +274,7 @@ static ConnectionClass *CC_initialize(ConnectionClass *rv, BOOL lockinit) {
 
     rv->num_descs = STMT_INCREMENT;
 
-    rv->lobj_type = TS_TYPE_LO_UNDEFINED;
+    rv->lobj_type = DB_TYPE_LO_UNDEFINED;
     if (isMsAccess())
         rv->ms_jet = 1;
     rv->isolation = 0;  // means initially unknown server's default isolation
@@ -498,8 +498,8 @@ CC_cleanup(ConnectionClass *self, BOOL keepCommunication) {
     return ret;
 }
 
-#ifndef TS_DIAG_SEVERITY_NONLOCALIZED
-#define TS_DIAG_SEVERITY_NONLOCALIZED 'V'
+#ifndef DB_DIAG_SEVERITY_NONLOCALIZED
+#define DB_DIAG_SEVERITY_NONLOCALIZED 'V'
 #endif
 
 #define TRANSACTION_ISOLATION "transaction_isolation"

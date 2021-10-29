@@ -55,12 +55,12 @@ void unused_vargs(int cnt, ...);
 
 #if defined(__GNUC__) || defined(__IBMC__)
 #if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 404
-#define TS_PRINTF_ATTRIBUTE gnu_printf
+#define PRINTF_ATTRIBUTE gnu_printf
 #else
-#define TS_PRINTF_ATTRIBUTE printf
+#define PRINTF_ATTRIBUTE printf
 #endif
 #define es_attribute_printf(f, a) \
-    __attribute__((format(TS_PRINTF_ATTRIBUTE, f, a)))
+    __attribute__((format(PRINTF_ATTRIBUTE, f, a)))
 #else
 #define __attribute__(x)
 #define es_attribute_printf(f, a)
@@ -574,10 +574,10 @@ RETCODE SQL_API ER_ReturnError(ErrorInfo *, SQLSMALLINT, UCHAR *,
 
 void logs_on_off(int cnopen, int);
 
-#define TS_TYPE_LO_UNDEFINED         \
+#define DB_TYPE_LO_UNDEFINED         \
     (-999) /* hack until permanent \ \
             * type available */
-#define TS_TYPE_LO_NAME "lo"
+#define DB_TYPE_LO_NAME "lo"
 #define CTID_ATTNUM (-1) /* the attnum of ctid */
 #define OID_ATTNUM (-2)  /* the attnum of oid */
 #define XMIN_ATTNUM (-3) /* the attnum of xmin */
