@@ -377,9 +377,9 @@ SQLULEN ucs2strlen(const SQLWCHAR *);
 #endif /* DBMS_NAME */
 
 #ifdef WIN32
-#define DRIVER_FILE_NAME "timestreamsqlodbc.dll"
+#define DRIVER_FILE_NAME "odbcdriver.dll"
 #else
-#define DRIVER_FILE_NAME "libtimestreamsqlodbc.dylib"
+#define DRIVER_FILE_NAME "libodbcdriver.dylib"
 #endif /* WIN32 */
 BOOL isMsAccess(void);
 BOOL isMsQuery(void);
