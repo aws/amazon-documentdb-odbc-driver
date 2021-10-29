@@ -94,74 +94,74 @@ using namespace std;
 #define INTERVAL_PRECISION "INTERVAL_PRECISION"
 
 const std::map< int, std::vector< int > > sql_to_ts_type_map_odbc_v2 = {
-    {SQL_BIT, {TS_TYPE_BOOLEAN}},
-    {SQL_INTEGER, {TS_TYPE_INTEGER}},
-    {SQL_BIGINT, {TS_TYPE_BIGINT}},
-    {SQL_DOUBLE, {TS_TYPE_DOUBLE}},
+    {SQL_BIT, {DB_TYPE_BOOLEAN}},
+    {SQL_INTEGER, {DB_TYPE_INTEGER}},
+    {SQL_BIGINT, {DB_TYPE_BIGINT}},
+    {SQL_DOUBLE, {DB_TYPE_DOUBLE}},
 #ifdef UNICODE_SUPPORT
     {SQL_WVARCHAR,
 #else
     {SQL_VARCHAR,
 #endif
-                  {TS_TYPE_VARCHAR,
-                   TS_TYPE_ARRAY,
-                   TS_TYPE_INTERVAL_DAY_TO_SECOND,
-                   TS_TYPE_INTERVAL_YEAR_TO_MONTH,
-                   TS_TYPE_ROW,
-                   TS_TYPE_TIMESERIES,
-                   TS_TYPE_UNKNOWN}},
-    {SQL_DATE, {TS_TYPE_DATE}},
-    {SQL_TIME, {TS_TYPE_TIME}},
-    {SQL_TIMESTAMP, {TS_TYPE_TIMESTAMP}}
+                  {DB_TYPE_VARCHAR,
+                   DB_TYPE_ARRAY,
+                   DB_TYPE_INTERVAL_DAY_TO_SECOND,
+                   DB_TYPE_INTERVAL_YEAR_TO_MONTH,
+                   DB_TYPE_ROW,
+                   DB_TYPE_TIMESERIES,
+                   DB_TYPE_UNKNOWN}},
+    {SQL_DATE, {DB_TYPE_DATE}},
+    {SQL_TIME, {DB_TYPE_TIME}},
+    {SQL_TIMESTAMP, {DB_TYPE_TIMESTAMP}}
 };
 
 const std::map< int, std::vector< int > > sql_to_ts_type_map_odbc_v3 = {
-    {SQL_BIT, {TS_TYPE_BOOLEAN}},
-    {SQL_INTEGER, {TS_TYPE_INTEGER}},
-    {SQL_BIGINT, {TS_TYPE_BIGINT}},
-    {SQL_DOUBLE, {TS_TYPE_DOUBLE}},
+    {SQL_BIT, {DB_TYPE_BOOLEAN}},
+    {SQL_INTEGER, {DB_TYPE_INTEGER}},
+    {SQL_BIGINT, {DB_TYPE_BIGINT}},
+    {SQL_DOUBLE, {DB_TYPE_DOUBLE}},
 #ifdef UNICODE_SUPPORT
     {SQL_WVARCHAR,
 #else
     {SQL_VARCHAR,
 #endif
-                  {TS_TYPE_VARCHAR,
-                   TS_TYPE_ARRAY,
-                   TS_TYPE_INTERVAL_DAY_TO_SECOND,
-                   TS_TYPE_INTERVAL_YEAR_TO_MONTH,
-                   TS_TYPE_ROW,
-                   TS_TYPE_TIMESERIES,
-                   TS_TYPE_UNKNOWN}},
-    {SQL_TYPE_DATE, {TS_TYPE_DATE}},
-    {SQL_TYPE_TIME, {TS_TYPE_TIME}},
-    {SQL_TYPE_TIMESTAMP, {TS_TYPE_TIMESTAMP}}
+                  {DB_TYPE_VARCHAR,
+                   DB_TYPE_ARRAY,
+                   DB_TYPE_INTERVAL_DAY_TO_SECOND,
+                   DB_TYPE_INTERVAL_YEAR_TO_MONTH,
+                   DB_TYPE_ROW,
+                   DB_TYPE_TIMESERIES,
+                   DB_TYPE_UNKNOWN}},
+    {SQL_TYPE_DATE, {DB_TYPE_DATE}},
+    {SQL_TYPE_TIME, {DB_TYPE_TIME}},
+    {SQL_TYPE_TIMESTAMP, {DB_TYPE_TIMESTAMP}}
 };
 
 const std::unordered_map< std::string, int > data_name_data_type_map_odbc_v2 = {
-    {TS_TYPE_NAME_DOUBLE, SQL_DOUBLE},
+    {DB_TYPE_NAME_DOUBLE, SQL_DOUBLE},
 #ifdef UNICODE_SUPPORT
-    {TS_TYPE_NAME_VARCHAR, SQL_WVARCHAR},
+    {DB_TYPE_NAME_VARCHAR, SQL_WVARCHAR},
 #else
-    {TS_TYPE_NAME_VARCHAR, SQL_VARCHAR},
+    {DB_TYPE_NAME_VARCHAR, SQL_VARCHAR},
 #endif
-    {TS_TYPE_NAME_DATE, SQL_DATE},
-    {TS_TYPE_NAME_TIME, SQL_TIME},
-    {TS_TYPE_NAME_TIMESTAMP, SQL_TIMESTAMP},
-    {TS_TYPE_NAME_BIGINT, SQL_BIGINT},
-    {TS_TYPE_NAME_BOOLEAN, SQL_BIT}};
+    {DB_TYPE_NAME_DATE, SQL_DATE},
+    {DB_TYPE_NAME_TIME, SQL_TIME},
+    {DB_TYPE_NAME_TIMESTAMP, SQL_TIMESTAMP},
+    {DB_TYPE_NAME_BIGINT, SQL_BIGINT},
+    {DB_TYPE_NAME_BOOLEAN, SQL_BIT}};
 
 const std::unordered_map< std::string, int > data_name_data_type_map_odbc_v3 = {
-    {TS_TYPE_NAME_DOUBLE, SQL_DOUBLE},
+    {DB_TYPE_NAME_DOUBLE, SQL_DOUBLE},
 #ifdef UNICODE_SUPPORT
-    {TS_TYPE_NAME_VARCHAR, SQL_WVARCHAR},
+    {DB_TYPE_NAME_VARCHAR, SQL_WVARCHAR},
 #else
-    {TS_TYPE_NAME_VARCHAR, SQL_VARCHAR},
+    {DB_TYPE_NAME_VARCHAR, SQL_VARCHAR},
 #endif
-    {TS_TYPE_NAME_DATE, SQL_TYPE_DATE},
-    {TS_TYPE_NAME_TIME, SQL_TYPE_TIME},
-    {TS_TYPE_NAME_TIMESTAMP, SQL_TYPE_TIMESTAMP},
-    {TS_TYPE_NAME_BIGINT, SQL_BIGINT},
-    {TS_TYPE_NAME_BOOLEAN, SQL_BIT}};
+    {DB_TYPE_NAME_DATE, SQL_TYPE_DATE},
+    {DB_TYPE_NAME_TIME, SQL_TYPE_TIME},
+    {DB_TYPE_NAME_TIMESTAMP, SQL_TYPE_TIMESTAMP},
+    {DB_TYPE_NAME_BIGINT, SQL_BIGINT},
+    {DB_TYPE_NAME_BOOLEAN, SQL_BIT}};
 
 // Boilerplate code for easy column bind handling
 class BindTemplate {
@@ -579,20 +579,20 @@ void split(const std::string &input, const std::string &delim,
 void SetupTableQResInfo(QResultClass *res, EnvironmentClass *env) {
     if (EN_is_odbc3(env)) {
         QR_set_field_info_v(res, TABLES_CATALOG_NAME, TABLE_CAT,
-                            TS_TYPE_VARCHAR, MAX_INFO_STRING);
+                            DB_TYPE_VARCHAR, MAX_INFO_STRING);
         QR_set_field_info_v(res, TABLES_SCHEMA_NAME, TABLE_SCHEM,
-                            TS_TYPE_VARCHAR, MAX_INFO_STRING);
+                            DB_TYPE_VARCHAR, MAX_INFO_STRING);
     } else {
         QR_set_field_info_v(res, TABLES_CATALOG_NAME, TABLE_QUALIFIER,
-                            TS_TYPE_VARCHAR, MAX_INFO_STRING);
+                            DB_TYPE_VARCHAR, MAX_INFO_STRING);
         QR_set_field_info_v(res, TABLES_SCHEMA_NAME, TABLE_OWNER,
-                            TS_TYPE_VARCHAR, MAX_INFO_STRING);
+                            DB_TYPE_VARCHAR, MAX_INFO_STRING);
     }
-    QR_set_field_info_v(res, TABLES_TABLE_NAME, TABLE_NAME, TS_TYPE_VARCHAR,
+    QR_set_field_info_v(res, TABLES_TABLE_NAME, TABLE_NAME, DB_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, TABLES_TABLE_TYPE, TABLE_TYPE, TS_TYPE_VARCHAR,
+    QR_set_field_info_v(res, TABLES_TABLE_TYPE, TABLE_TYPE, DB_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, TABLES_REMARKS, REMARKS, TS_TYPE_VARCHAR,
+    QR_set_field_info_v(res, TABLES_REMARKS, REMARKS, DB_TYPE_VARCHAR,
                         INFO_VARCHAR_SIZE);
 }
 
@@ -735,35 +735,35 @@ int GetBufferLength(const std::string &type_name);
 void SetupColumnQResInfo(QResultClass *res, EnvironmentClass *unused) {
     (void)(unused);
 
-    QR_set_field_info_v(res, COLUMNS_CATALOG_NAME, TABLE_CAT, TS_TYPE_VARCHAR,
+    QR_set_field_info_v(res, COLUMNS_CATALOG_NAME, TABLE_CAT, DB_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, COLUMNS_SCHEMA_NAME, TABLE_SCHEM, TS_TYPE_VARCHAR,
+    QR_set_field_info_v(res, COLUMNS_SCHEMA_NAME, TABLE_SCHEM, DB_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, COLUMNS_TABLE_NAME, TABLE_NAME, TS_TYPE_VARCHAR,
+    QR_set_field_info_v(res, COLUMNS_TABLE_NAME, TABLE_NAME, DB_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, COLUMNS_COLUMN_NAME, COLUMN_NAME, TS_TYPE_VARCHAR,
+    QR_set_field_info_v(res, COLUMNS_COLUMN_NAME, COLUMN_NAME, DB_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, COLUMNS_DATA_TYPE, DATA_TYPE, TS_TYPE_INT2, 2);
-    QR_set_field_info_v(res, COLUMNS_TYPE_NAME, TYPE_NAME, TS_TYPE_VARCHAR,
+    QR_set_field_info_v(res, COLUMNS_DATA_TYPE, DATA_TYPE, DB_TYPE_INT2, 2);
+    QR_set_field_info_v(res, COLUMNS_TYPE_NAME, TYPE_NAME, DB_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, COLUMNS_PRECISION, COLUMN_SIZE, TS_TYPE_INTEGER, 4);
-    QR_set_field_info_v(res, COLUMNS_LENGTH, BUFFER_LENGTH, TS_TYPE_INTEGER, 4);
-    QR_set_field_info_v(res, COLUMNS_SCALE, DECIMAL_DIGITS, TS_TYPE_INT2, 2);
-    QR_set_field_info_v(res, COLUMNS_RADIX, NUM_PREC_RADIX, TS_TYPE_INT2, 2);
-    QR_set_field_info_v(res, COLUMNS_NULLABLE, NULLABLE, TS_TYPE_INT2, 2);
-    QR_set_field_info_v(res, COLUMNS_REMARKS, REMARKS, TS_TYPE_VARCHAR,
+    QR_set_field_info_v(res, COLUMNS_PRECISION, COLUMN_SIZE, DB_TYPE_INTEGER, 4);
+    QR_set_field_info_v(res, COLUMNS_LENGTH, BUFFER_LENGTH, DB_TYPE_INTEGER, 4);
+    QR_set_field_info_v(res, COLUMNS_SCALE, DECIMAL_DIGITS, DB_TYPE_INT2, 2);
+    QR_set_field_info_v(res, COLUMNS_RADIX, NUM_PREC_RADIX, DB_TYPE_INT2, 2);
+    QR_set_field_info_v(res, COLUMNS_NULLABLE, NULLABLE, DB_TYPE_INT2, 2);
+    QR_set_field_info_v(res, COLUMNS_REMARKS, REMARKS, DB_TYPE_VARCHAR,
                         INFO_VARCHAR_SIZE);
-    QR_set_field_info_v(res, COLUMNS_COLUMN_DEF, COLUMN_DEF, TS_TYPE_VARCHAR,
+    QR_set_field_info_v(res, COLUMNS_COLUMN_DEF, COLUMN_DEF, DB_TYPE_VARCHAR,
                         INFO_VARCHAR_SIZE);
-    QR_set_field_info_v(res, COLUMNS_SQL_DATA_TYPE, SQL_DATA_TYPE, TS_TYPE_INT2,
+    QR_set_field_info_v(res, COLUMNS_SQL_DATA_TYPE, SQL_DATA_TYPE, DB_TYPE_INT2,
                         2);
     QR_set_field_info_v(res, COLUMNS_SQL_DATETIME_SUB, SQL_DATETIME_SUB,
-                        TS_TYPE_INT2, 2);
+                        DB_TYPE_INT2, 2);
     QR_set_field_info_v(res, COLUMNS_CHAR_OCTET_LENGTH, CHAR_OCTET_LENGTH,
-                        TS_TYPE_INTEGER, 4);
+                        DB_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, COLUMNS_ORDINAL_POSITION, ORDINAL_POSITION,
-                        TS_TYPE_INTEGER, 4);
-    QR_set_field_info_v(res, COLUMNS_IS_NULLABLE, IS_NULLABLE, TS_TYPE_VARCHAR,
+                        DB_TYPE_INTEGER, 4);
+    QR_set_field_info_v(res, COLUMNS_IS_NULLABLE, IS_NULLABLE, DB_TYPE_VARCHAR,
                         INFO_VARCHAR_SIZE);
 }
 
@@ -1195,15 +1195,15 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                 tuple[COLUMNS_LENGTH].len = (int)buf_len.size();
                 std::string decimal_digits = std::to_string(9);
                 tuple[COLUMNS_SCALE].value =
-                    (type_name_return == TS_TYPE_NAME_TIMESTAMP)
+                    (type_name_return == DB_TYPE_NAME_TIMESTAMP)
                         ? strdup(decimal_digits.c_str())
                         : NULL;
-                tuple[COLUMNS_SCALE].len = (type_name_return == TS_TYPE_NAME_TIMESTAMP)
+                tuple[COLUMNS_SCALE].len = (type_name_return == DB_TYPE_NAME_TIMESTAMP)
                                                ? (int)decimal_digits.size()
                                                : 0;
-                if (type_name_return == TS_TYPE_NAME_DOUBLE ||
-                    type_name_return == TS_TYPE_NAME_INTEGER ||
-                    type_name_return == TS_TYPE_NAME_BIGINT) {
+                if (type_name_return == DB_TYPE_NAME_DOUBLE ||
+                    type_name_return == DB_TYPE_NAME_INTEGER ||
+                    type_name_return == DB_TYPE_NAME_BIGINT) {
                     set_nullfield_int2(&tuple[COLUMNS_RADIX], 10);
                 } else {
                     set_nullfield_int2(&tuple[COLUMNS_RADIX], -1);
@@ -1216,7 +1216,7 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                 tuple[COLUMNS_COLUMN_DEF].value = NULL;
                 tuple[COLUMNS_COLUMN_DEF].len = 0;
                 std::string sql_data_type =
-                    (type_name_return == TS_TYPE_NAME_TIMESTAMP)
+                    (type_name_return == DB_TYPE_NAME_TIMESTAMP)
                         ? std::to_string(SQL_DATETIME)
                         : col_data_type;
                 tuple[COLUMNS_SQL_DATA_TYPE].value =
@@ -1233,11 +1233,11 @@ API_Columns(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
                         : 0;
                 // CHAR_OCTET_LENGTH should be the same as BUFFER_LENGTH for varchar
                 tuple[COLUMNS_CHAR_OCTET_LENGTH].value =
-                    (type_name_return == TS_TYPE_NAME_VARCHAR)
+                    (type_name_return == DB_TYPE_NAME_VARCHAR)
                         ? strdup(buf_len.c_str())
                         : NULL;
                 tuple[COLUMNS_CHAR_OCTET_LENGTH].len =
-                    (type_name_return == TS_TYPE_NAME_VARCHAR)
+                    (type_name_return == DB_TYPE_NAME_VARCHAR)
                         ? (int)buf_len.size()
                         : 0;
                 std::string col_number = std::to_string(col_num);
@@ -1279,40 +1279,40 @@ void CleanUp_GetTypeInfo(StatementClass *stmt, const RETCODE ret = SQL_ERROR) {
 }
 
 void SetupTypeQResInfo(QResultClass *res) {
-    QR_set_field_info_v(res, GETTYPE_TYPE_NAME, TYPE_NAME, TS_TYPE_VARCHAR,
+    QR_set_field_info_v(res, GETTYPE_TYPE_NAME, TYPE_NAME, DB_TYPE_VARCHAR,
                         MAX_INFO_STRING);
-    QR_set_field_info_v(res, GETTYPE_DATA_TYPE, DATA_TYPE, TS_TYPE_INT2, 2);
-    QR_set_field_info_v(res, GETTYPE_COLUMN_SIZE, PRECISION, TS_TYPE_INTEGER, 4);
+    QR_set_field_info_v(res, GETTYPE_DATA_TYPE, DATA_TYPE, DB_TYPE_INT2, 2);
+    QR_set_field_info_v(res, GETTYPE_COLUMN_SIZE, PRECISION, DB_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, GETTYPE_LITERAL_PREFIX, LITERAL_PREFIX,
-                        TS_TYPE_VARCHAR, MAX_INFO_STRING);
+                        DB_TYPE_VARCHAR, MAX_INFO_STRING);
     QR_set_field_info_v(res, GETTYPE_LITERAL_SUFFIX, LITERAL_SUFFIX,
-                        TS_TYPE_VARCHAR, MAX_INFO_STRING);
+                        DB_TYPE_VARCHAR, MAX_INFO_STRING);
     QR_set_field_info_v(res, GETTYPE_CREATE_PARAMS, CREATE_PARAMS,
-                        TS_TYPE_VARCHAR, MAX_INFO_STRING);
-    QR_set_field_info_v(res, GETTYPE_NULLABLE, NULLABLE, TS_TYPE_INT2, 2);
+                        DB_TYPE_VARCHAR, MAX_INFO_STRING);
+    QR_set_field_info_v(res, GETTYPE_NULLABLE, NULLABLE, DB_TYPE_INT2, 2);
     QR_set_field_info_v(res, GETTYPE_CASE_SENSITIVE, CASE_SENSITIVE,
-                        TS_TYPE_INT2, 2);
-    QR_set_field_info_v(res, GETTYPE_SEARCHABLE, SEARCHABLE, TS_TYPE_INT2, 2);
+                        DB_TYPE_INT2, 2);
+    QR_set_field_info_v(res, GETTYPE_SEARCHABLE, SEARCHABLE, DB_TYPE_INT2, 2);
     QR_set_field_info_v(res, GETTYPE_UNSIGNED_ATTRIBUTE, UNSIGNED_ATTRIBUTE,
-                        TS_TYPE_INT2, 2);
+                        DB_TYPE_INT2, 2);
     QR_set_field_info_v(res, GETTYPE_FIXED_PREC_SCALE, FIXED_PREC_SCALE,
-                        TS_TYPE_INT2, 2);
+                        DB_TYPE_INT2, 2);
     QR_set_field_info_v(res, GETTYPE_AUTO_UNIQUE_VALUE, AUTO_INCREMENT,
-                        TS_TYPE_INT2, 2);
+                        DB_TYPE_INT2, 2);
     QR_set_field_info_v(res, GETTYPE_LOCAL_TYPE_NAME, LOCAL_TYPE_NAME,
-                        TS_TYPE_VARCHAR, MAX_INFO_STRING);
-    QR_set_field_info_v(res, GETTYPE_MINIMUM_SCALE, MINIMUM_SCALE, TS_TYPE_INT2,
+                        DB_TYPE_VARCHAR, MAX_INFO_STRING);
+    QR_set_field_info_v(res, GETTYPE_MINIMUM_SCALE, MINIMUM_SCALE, DB_TYPE_INT2,
                         2);
-    QR_set_field_info_v(res, GETTYPE_MAXIMUM_SCALE, MAXIMUM_SCALE, TS_TYPE_INT2,
+    QR_set_field_info_v(res, GETTYPE_MAXIMUM_SCALE, MAXIMUM_SCALE, DB_TYPE_INT2,
                         2);
-    QR_set_field_info_v(res, GETTYPE_SQL_DATA_TYPE, SQL_DATA_TYPE, TS_TYPE_INT2,
+    QR_set_field_info_v(res, GETTYPE_SQL_DATA_TYPE, SQL_DATA_TYPE, DB_TYPE_INT2,
                         2);
     QR_set_field_info_v(res, GETTYPE_SQL_DATETIME_SUB, SQL_DATETIME_SUB,
-                        TS_TYPE_INT2, 2);
+                        DB_TYPE_INT2, 2);
     QR_set_field_info_v(res, GETTYPE_NUM_PREC_RADIX, NUM_PREC_RADIX,
-                        TS_TYPE_INTEGER, 4);
+                        DB_TYPE_INTEGER, 4);
     QR_set_field_info_v(res, GETTYPE_INTERVAL_PRECISION, INTERVAL_PRECISION,
-                        TS_TYPE_INT2, 2);
+                        DB_TYPE_INT2, 2);
 }
 
 RETCODE SetTypeResult(ConnectionClass *conn, StatementClass *stmt,
@@ -1325,41 +1325,41 @@ RETCODE SetTypeResult(ConnectionClass *conn, StatementClass *stmt,
         return SQL_ERROR;
     }
     // 1. GETTYPE_TYPE_NAME [cannot be null]
-    set_tuplefield_string(&tuple[GETTYPE_TYPE_NAME], tstype_attr_to_name(conn, esType, -1, FALSE));
+    set_tuplefield_string(&tuple[GETTYPE_TYPE_NAME], dbtype_attr_to_name(conn, esType, -1, FALSE));
     // 2. GETTYPE_DATA_TYPE [cannot be null]
     set_tuplefield_int2(&tuple[GETTYPE_DATA_TYPE], static_cast< short >(sqlType));
     // 3. GETTYPE_COLUMN_SIZE
-    set_nullfield_int4( &tuple[GETTYPE_COLUMN_SIZE], tstype_attr_column_size(conn, esType, TS_ATP_UNSET, TS_ADT_UNSET, TS_UNKNOWNS_UNSET));
+    set_nullfield_int4( &tuple[GETTYPE_COLUMN_SIZE], dbtype_attr_column_size(conn, esType, DB_ATP_UNSET, DB_ADT_UNSET, DB_UNKNOWNS_UNSET));
     // 4. GETTYPE_LITERAL_PREFIX
-    set_nullfield_string(&tuple[GETTYPE_LITERAL_PREFIX], tstype_literal_prefix(conn, esType));
+    set_nullfield_string(&tuple[GETTYPE_LITERAL_PREFIX], dbtype_literal_prefix(conn, esType));
     // 5. GETTYPE_LITERAL_SUFFIX
-    set_nullfield_string(&tuple[GETTYPE_LITERAL_SUFFIX], tstype_literal_suffix(conn, esType));
+    set_nullfield_string(&tuple[GETTYPE_LITERAL_SUFFIX], dbtype_literal_suffix(conn, esType));
     // 6. GETTYPE_CREATE_PARAMS
     set_nullfield_string(&tuple[GETTYPE_CREATE_PARAMS], nullptr);
     // 7. GETTYPE_NULLABLE [cannot be null]
-    set_tuplefield_int2(&tuple[GETTYPE_NULLABLE], tstype_nullable(conn, esType));
+    set_tuplefield_int2(&tuple[GETTYPE_NULLABLE], dbtype_nullable(conn, esType));
     // 8. GETTYPE_CASE_SENSITIVE [cannot be null]
-    set_tuplefield_int2(&tuple[GETTYPE_CASE_SENSITIVE], tstype_case_sensitive(conn, esType));
+    set_tuplefield_int2(&tuple[GETTYPE_CASE_SENSITIVE], dbtype_case_sensitive(conn, esType));
     // 9. GETTYPE_SEARCHABLE [cannot be null]
-    set_tuplefield_int2(&tuple[GETTYPE_SEARCHABLE], tstype_searchable(conn, esType));
+    set_tuplefield_int2(&tuple[GETTYPE_SEARCHABLE], dbtype_searchable(conn, esType));
     // 10. GETTYPE_UNSIGNED_ATTRIBUTE
-    set_nullfield_int2(&tuple[GETTYPE_UNSIGNED_ATTRIBUTE], tstype_unsigned(conn, esType));
+    set_nullfield_int2(&tuple[GETTYPE_UNSIGNED_ATTRIBUTE], dbtype_unsigned(conn, esType));
     // 11. GETTYPE_FIXED_PREC_SCALE [cannot be null]
     set_tuplefield_int2(&tuple[GETTYPE_FIXED_PREC_SCALE], SQL_FALSE);
     // 12. GETTYPE_AUTO_UNIQUE_VALUE
-    set_nullfield_int2(&tuple[GETTYPE_AUTO_UNIQUE_VALUE], tstype_auto_increment(conn, esType));
+    set_nullfield_int2(&tuple[GETTYPE_AUTO_UNIQUE_VALUE], dbtype_auto_increment(conn, esType));
     // 13. GETTYPE_LOCAL_TYPE_NAME
     set_tuplefield_null(&tuple[GETTYPE_LOCAL_TYPE_NAME]);
     // 14. GETTYPE_MINIMUM_SCALE
-    set_nullfield_int2(&tuple[GETTYPE_MINIMUM_SCALE], tstype_min_decimal_digits(conn, esType));
+    set_nullfield_int2(&tuple[GETTYPE_MINIMUM_SCALE], dbtype_min_decimal_digits(conn, esType));
     // 15. GETTYPE_MAXIMUM_SCALE
-    set_nullfield_int2(&tuple[GETTYPE_MAXIMUM_SCALE], tstype_max_decimal_digits(conn, esType));
+    set_nullfield_int2(&tuple[GETTYPE_MAXIMUM_SCALE], dbtype_max_decimal_digits(conn, esType));
     // 16. GETTYPE_SQL_DATA_TYPE [cannot be null]
     set_tuplefield_int2(&tuple[GETTYPE_SQL_DATA_TYPE], static_cast< short >(sqlType));
     // 17. GETTYPE_SQL_DATETIME_SUB
-    set_nullfield_int2(&tuple[GETTYPE_SQL_DATETIME_SUB], tstype_attr_to_datetime_sub(conn, esType, TS_ATP_UNSET));
+    set_nullfield_int2(&tuple[GETTYPE_SQL_DATETIME_SUB], dbtype_attr_to_datetime_sub(conn, esType, DB_ATP_UNSET));
     // 18. GETTYPE_NUM_PREC_RADIX
-    set_nullfield_int4(&tuple[GETTYPE_NUM_PREC_RADIX], tstype_radix(conn, esType));
+    set_nullfield_int4(&tuple[GETTYPE_NUM_PREC_RADIX], dbtype_radix(conn, esType));
     // 19. GETTYPE_INTERVAL_PRECISION
     set_nullfield_int4(&tuple[GETTYPE_INTERVAL_PRECISION], 0);
     return SQL_SUCCESS;

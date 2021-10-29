@@ -14,8 +14,8 @@
  *
  */
 
-#ifndef TS_COMMUNICATION
-#define TS_COMMUNICATION
+#ifndef DB_COMMUNICATION
+#define DB_COMMUNICATION
 
 #include <aws/timestream-query/TimestreamQueryClient.h>
 #include <aws/timestream-query/model/ScalarType.h>

@@ -86,12 +86,12 @@ static SQLLEN es_bin2whex(const char *src, SQLWCHAR *dst, SQLLEN length);
  *
  *			field_type		fCType				Output
  *			----------		------				----------
- *			TS_TYPE_DATE	SQL_C_DEFAULT		SQL_C_DATE
- *			TS_TYPE_DATE	SQL_C_DATE			SQL_C_DATE
- *			TS_TYPE_DATE	SQL_C_TIMESTAMP		SQL_C_TIMESTAMP		(time = 0 (midnight)) 
- *          TS_TYPE_TIME	SQL_C_DEFAULT		SQL_C_TIME 
- *          TS_TYPE_TIME    SQL_C_TIME			SQL_C_TIME
- *			TS_TYPE_TIME	SQL_C_TIMESTAMP		SQL_C_TIMESTAMP		(date = current date) 
+ *			DB_TYPE_DATE	SQL_C_DEFAULT		SQL_C_DATE
+ *			DB_TYPE_DATE	SQL_C_DATE			SQL_C_DATE
+ *			DB_TYPE_DATE	SQL_C_TIMESTAMP		SQL_C_TIMESTAMP		(time = 0 (midnight)) 
+ *          DB_TYPE_TIME	SQL_C_DEFAULT		SQL_C_TIME 
+ *          DB_TYPE_TIME    SQL_C_TIME			SQL_C_TIME
+ *			DB_TYPE_TIME	SQL_C_TIMESTAMP		SQL_C_TIMESTAMP		(date = current date) 
  *---------
  */
 
@@ -825,8 +825,8 @@ static int setup_getdataclass(SQLLEN *const length_return,
             BOOL is_utf8 = (UTF8 == conn->ccsc);
 
             switch (field_type) {
-                case TS_TYPE_UNKNOWN:
-                case TS_TYPE_VARCHAR:
+                case DB_TYPE_UNKNOWN:
+                case DB_TYPE_VARCHAR:
                     if (SQL_C_CHAR == fCType || SQL_C_BINARY == fCType)
                         localize_needed = (!same_encoding || wcs_debug);
                     if (SQL_C_WCHAR == fCType)
@@ -991,7 +991,7 @@ static int convert_text_field_to_sql_c(
     MYLOG(LOG_DEBUG, "field_type=%u type=%d", field_type, fCType);
 
     switch (field_type) {
-        case TS_TYPE_DOUBLE:
+        case DB_TYPE_DOUBLE:
             set_client_decimal_point((char *)neut_str);
             break;
     }
@@ -1243,18 +1243,18 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
      * to SQL_C_DATE,SQL_C_TIME, SQL_C_TIMESTAMP not supported
      */
     switch (field_type) {
-        case TS_TYPE_DATE:
+        case DB_TYPE_DATE:
             sscanf(value, "%4d-%2d-%2d", &std_time.y, &std_time.m, &std_time.d);
             break;
 
-        case TS_TYPE_TIME: {
+        case DB_TYPE_TIME: {
             BOOL bZone = FALSE; /* time zone stuff is unreliable */
             int zone;
             timestamp2stime(value, &std_time, &bZone, &zone);
         } break;
 
-        case TS_TYPE_TIMESTAMP_NO_TMZONE:
-        case TS_TYPE_TIMESTAMP:
+        case DB_TYPE_TIMESTAMP_NO_TMZONE:
+        case DB_TYPE_TIMESTAMP:
             std_time.fr = 0;
             std_time.infinity = 0;
             if (strnicmp(value, INFINITY_STRING, 8) == 0) {
@@ -1299,7 +1299,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
             }
             break;
 
-        case TS_TYPE_VARCHAR: {
+        case DB_TYPE_VARCHAR: {
             char *copy = strdup(value);
             char *trimmed = trim_white_space(copy);
             if (fCType == SQL_C_DATE || fCType == SQL_C_TYPE_DATE
@@ -1354,7 +1354,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
             free(copy);
             break;
         }
-        case TS_TYPE_BOOLEAN: { /* change T/F to 1/0 */
+        case DB_TYPE_BOOLEAN: { /* change T/F to 1/0 */
             switch (((char *)value)[0]) {
                 case 'f':
                 case 'F':
@@ -1403,8 +1403,8 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
             break;
         case SQL_C_BINARY:
             switch (field_type) {
-                case TS_TYPE_UNKNOWN:
-                case TS_TYPE_VARCHAR:
+                case DB_TYPE_UNKNOWN:
+                case DB_TYPE_VARCHAR:
                     text_bin_handling = TRUE;
                     break;
             }
@@ -1422,18 +1422,18 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
          * enough.
          */
         switch (field_type) {
-            case TS_TYPE_DATE:
+            case DB_TYPE_DATE:
                 len = SPRINTF_FIXED(midtemp, "%.4d-%.2d-%.2d", std_time.y,
                                     std_time.m, std_time.d);
                 break;
 
-            case TS_TYPE_TIME:
+            case DB_TYPE_TIME:
                 len = SPRINTF_FIXED(midtemp, "%.2d:%.2d:%.2d.%09d", std_time.hh,
                                     std_time.mm, std_time.ss, std_time.fr);
                 break;
 
-            case TS_TYPE_TIMESTAMP_NO_TMZONE:
-            case TS_TYPE_TIMESTAMP:
+            case DB_TYPE_TIMESTAMP_NO_TMZONE:
+            case DB_TYPE_TIMESTAMP:
                 len = stime2timestamp(&std_time, midtemp, midsize, FALSE,
                                       (int)(midsize - 19 - 2));
                 break;
@@ -1452,7 +1452,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
         switch (fCType) {
             case SQL_C_DATE:
             case SQL_C_TYPE_DATE: /* 91 */
-                if (field_type == TS_TYPE_TIME) {
+                if (field_type == DB_TYPE_TIME) {
                     result = COPY_UNSUPPORTED_CONVERSION;
                 } else {
                     len = 6;
@@ -1488,7 +1488,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
 
             case SQL_C_TIME:
             case SQL_C_TYPE_TIME: /* 92 */
-                if (field_type == TS_TYPE_DATE) {
+                if (field_type == DB_TYPE_DATE) {
                     result = COPY_UNSUPPORTED_CONVERSION;
                 } else {
                     len = 6;
@@ -1844,7 +1844,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
 #endif /* ODBCINT64 */
             case SQL_C_BINARY:
                 /* The following is for SQL_C_VARBOOKMARK */
-                if (TS_TYPE_INTEGER == field_type) {
+                if (DB_TYPE_INTEGER == field_type) {
                     UInt4 ival = strtoul(neut_str, 0, 10);
 
                     MYLOG(LOG_ALL, "SQL_C_VARBOOKMARK value=%d", ival);
