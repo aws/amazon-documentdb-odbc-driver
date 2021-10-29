@@ -76,8 +76,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v0.4.2](https://github.com/Bit-Quill/timestream-odbc/releases/tag/v0.4.2) - 2021-07-20
 ### Fixed
-- Renamed odfesqlodbc directory to timestreamsqlodbc and updated references
-- Renamed odfeenlist directory to timestreamenlist and update references
+- Renamed odfesqlodbc directory to odbcdriver and updated references
+- Renamed odfeenlist directory to odbcdriverenlist and update references
 - AWS AppSec Finding: Unsafe C functions that do not check memory bounds
 
 ## [v0.4.1](https://github.com/Bit-Quill/timestream-odbc/releases/tag/v0.4.1) - 2021-07-08

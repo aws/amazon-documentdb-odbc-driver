@@ -1,5 +1,5 @@
 <CPackWiXPatch>
-	<CPackWiXFragment Id="CM_CP_Driver.bin.timestreamsqlodbc.dll">
+	<CPackWiXFragment Id="CM_CP_Driver.bin.odbcdriver.dll">
 		<!-- Add driver entry in Software -->
 		<RegistryKey Root="HKLM" Key="SOFTWARE\Amazon\Amazon Timestream ODBC Driver(x86)\Driver" >
 			<RegistryValue Type="string" Name="InstallPath" Value="[INSTALL_ROOT]" />
@@ -14,8 +14,8 @@
 		
 		<!-- Set driver attributes -->
 		<RegistryKey Root="HKLM" Key="SOFTWARE\ODBC\ODBCINST.INI\Amazon Timestream ODBC Driver" >
-			<RegistryValue Type="string" Name="Driver" Value="[INSTALL_ROOT]bin\timestreamsqlodbc.dll" />
-			<RegistryValue Type="string" Name="Setup" Value="[INSTALL_ROOT]bin\timestreamsqlodbc.dll" />
+			<RegistryValue Type="string" Name="Driver" Value="[INSTALL_ROOT]bin\odbcdriver.dll" />
+			<RegistryValue Type="string" Name="Setup" Value="[INSTALL_ROOT]bin\odbcdriver.dll" />
 		</RegistryKey>
 	</CPackWiXFragment>
 </CPackWiXPatch>

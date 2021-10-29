@@ -53,8 +53,8 @@ endif()
 
 # Base directories
 set(PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/..")
-set(ODBC_SRC "${CMAKE_CURRENT_SOURCE_DIR}/timestreamsqlodbc")
-set(ENLIST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/timestreamenlist")
+set(ODBC_SRC "${CMAKE_CURRENT_SOURCE_DIR}/odbcdriver")
+set(ENLIST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/odbcdriverenlist")
 set(TESTS "${CMAKE_CURRENT_SOURCE_DIR}/Tests")
 set(TESTS_INI "${TESTS}/Tests")
 set(INSTALL_SRC "${CMAKE_CURRENT_SOURCE_DIR}/installer")
