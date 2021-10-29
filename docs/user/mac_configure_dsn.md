@@ -14,8 +14,8 @@ To give the application permission to save the Driver & DSN configurations, run 
 1. Go to the **ODBC Drivers** tab.
 2. Click **Add a driver**.
     * **Description of the Driver**: The driver name used for ODBC connections (ex. `Amazon Timestream ODBC Driver`)
-    * **Driver File Name**: The path to the driver file (default installed path: `/Library/ODBC/timestream-odbc/bin/libtimestreamsqlodbc.dylib`)
-    * **Setup File Name**: The path to the driver file (default installed path: `/Library/ODBC/timestream-odbc/bin/libtimestreamsqlodbc.dylib`)
+    * **Driver File Name**: The path to the driver file (default installed path: `/Library/ODBC/timestream-odbc/bin/libodbcdriver.dylib`)
+    * **Setup File Name**: The path to the driver file (default installed path: `/Library/ODBC/timestream-odbc/bin/libodbcdriver.dylib`)
     * Set as a **System** driver
     * Below is a screenshot of how the final screen should look.
 3. Click **OK** to save the options.
@@ -43,7 +43,7 @@ Use a text editor from Terminal to edit the odbcinst.ini file such as vi.
 Amazon Timestream ODBC Driver  = Installed
 
 [Amazon Timestream ODBC Driver]
-Driver = /Library/ODBC/timestream-odbc/bin/libtimestreamsqlodbc.dylib
+Driver = /Library/ODBC/timestream-odbc/bin/libodbcdriver.dylib
 ```
 
 ## Adding a DSN Entry

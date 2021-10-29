@@ -37,7 +37,7 @@ build
   └-- install
 ```
 
-* Driver DLL: `.\build\odbc\bin\<Configuration>\timestreamsqlodbc.dll`
+* Driver DLL: `.\build\odbc\bin\<Configuration>\odbcdriver.dll`
 * Test binaries folder: `.\build\odbc\bin\<Configuration>`
 
 ### Packaging

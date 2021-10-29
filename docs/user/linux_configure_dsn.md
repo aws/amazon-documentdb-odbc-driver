@@ -43,8 +43,8 @@ Use a text editor from the Unix shell to edit the odbcinst.ini file such as vi.
 Amazon Timestream ODBC Driver  = Installed
 
 [Amazon Timestream ODBC Driver]
-Driver = /usr/bin/timestream-odbc64/libtimestreamsqlodbc.so
-Setup  = /usr/bin/timestream-odbc64/libtimestreamsqlodbc.so
+Driver = /usr/bin/timestream-odbc64/libodbcdriver.so
+Setup  = /usr/bin/timestream-odbc64/libodbcdriver.so
 ```
 
 #### Sample odbcinst.ini file for 32-bit Linux
@@ -53,8 +53,8 @@ Setup  = /usr/bin/timestream-odbc64/libtimestreamsqlodbc.so
 Amazon Timestream ODBC Driver 32 = Installed
 
 [Amazon Timestream ODBC Driver 32]
-Driver = /usr/bin/timestream-odbc32/libtimestreamsqlodbc.so
-Setup  = /usr/bin/timestream-odbc32/libtimestreamsqlodbc.so
+Driver = /usr/bin/timestream-odbc32/libodbcdriver.so
+Setup  = /usr/bin/timestream-odbc32/libodbcdriver.so
 ```
 
 ### Manually editing the odbc.ini file ###

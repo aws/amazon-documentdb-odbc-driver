@@ -25,7 +25,7 @@ From Terminal, navigate to the project source directory, run one of the followin
 
 ### Output Location on Mac
 
-* Driver: `./build/odbc/lib/libtimestreamsqlodbc.dylib`
+* Driver: `./build/odbc/lib/libodbcdriver.dylib`
 * Test binaries folder: `./build/odbc/bin`. Some additional test infrastructure files are also output to the **build/odbc/lib** directory.
 
 ### Packaging

@@ -25,5 +25,5 @@ include_directories(${UT_HELPER}
 add_executable(performance_execution ${SOURCE_FILES})
 
 # Library dependencies
-target_link_libraries(performance_execution timestreamsqlodbc itodbc_helper ut_helper)
+target_link_libraries(performance_execution odbcdriver itodbc_helper ut_helper)
 target_compile_definitions(performance_execution PUBLIC _UNICODE UNICODE)
