@@ -131,7 +131,7 @@ static Int4 getCharColumnSizeX(const ConnectionClass *conn, OID type,
     if (maxsize <= 0)
         return maxsize;
     switch (type) {
-        case TS_TYPE_VARCHAR:
+        case DB_TYPE_VARCHAR:
             return maxsize;
     }
 
@@ -152,7 +152,7 @@ static SQLSMALLINT getTimestampDecimalDigitsX(const ConnectionClass *conn,
     return (SQLSMALLINT)(atttypmod > -1 ? atttypmod : 6);
 }
 
-#ifdef TS_INTERVAL_AS_SQL_INTERVAL
+#ifdef DB_INTERVAL_AS_SQL_INTERVAL
 static SQLSMALLINT getIntervalDecimalDigits(OID type, int atttypmod) {
     Int4 prec;
 
@@ -162,20 +162,20 @@ static SQLSMALLINT getIntervalDecimalDigits(OID type, int atttypmod) {
         return 0;
     return (SQLSMALLINT)((prec = atttypmod & 0xffff) == 0xffff ? 6 : prec);
 }
-#endif  // TS_INTERVAL_AS_SQL_INTERVAL
+#endif  // DB_INTERVAL_AS_SQL_INTERVAL
 
 SQLSMALLINT
 estype_attr_to_concise_type(const ConnectionClass *conn, OID type,
                             int atttypmod, int adtsize_or_longestlen,
                             int handle_unknown_size_as) {
     EnvironmentClass *env = (EnvironmentClass *)CC_get_env(conn);
-#ifdef TS_INTERVAL_AS_SQL_INTERVAL
+#ifdef DB_INTERVAL_AS_SQL_INTERVAL
     SQLSMALLINT sqltype;
-#endif /* TS_INTERVAL_AS_SQL_INTERVAL */
+#endif /* DB_INTERVAL_AS_SQL_INTERVAL */
     BOOL bLongVarchar, bFixed = FALSE;
 
     switch (type) {
-        case TS_TYPE_VARCHAR:
+        case DB_TYPE_VARCHAR:
             if (getCharColumnSizeX(conn, type, atttypmod, adtsize_or_longestlen,
                                    handle_unknown_size_as)
                 > MAX_VARCHAR_SIZE)
@@ -186,34 +186,34 @@ estype_attr_to_concise_type(const ConnectionClass *conn, OID type,
                                            ? SQL_LONGVARCHAR
                                            : (bFixed ? SQL_CHAR : SQL_VARCHAR));
 
-        case TS_TYPE_INT2:
+        case DB_TYPE_INT2:
             return SQL_SMALLINT;
 
-        case TS_TYPE_INTEGER:
+        case DB_TYPE_INTEGER:
             return SQL_INTEGER;
 
             /* Change this to SQL_BIGINT for ODBC v3 bjm 2001-01-23 */
-        case TS_TYPE_BIGINT:
+        case DB_TYPE_BIGINT:
             if (conn->ms_jet)
                 return SQL_NUMERIC; /* maybe a little better than SQL_VARCHAR */
             return SQL_BIGINT;
 
-        case TS_TYPE_DOUBLE:
+        case DB_TYPE_DOUBLE:
             return SQL_DOUBLE;
-        case TS_TYPE_DATE:
+        case DB_TYPE_DATE:
             if (EN_is_odbc3(env))
                 return SQL_TYPE_DATE;
             return SQL_DATE;
-        case TS_TYPE_TIME:
+        case DB_TYPE_TIME:
             if (EN_is_odbc3(env))
                 return SQL_TYPE_TIME;
             return SQL_TIME;
-        case TS_TYPE_TIMESTAMP_NO_TMZONE:
-        case TS_TYPE_TIMESTAMP:
+        case DB_TYPE_TIMESTAMP_NO_TMZONE:
+        case DB_TYPE_TIMESTAMP:
             if (EN_is_odbc3(env))
                 return SQL_TYPE_TIMESTAMP;
             return SQL_TIMESTAMP;
-        case TS_TYPE_BOOLEAN:
+        case DB_TYPE_BOOLEAN:
             return SQL_BIT;
 
         default:
@@ -262,11 +262,11 @@ estype_attr_to_sqldesctype(const ConnectionClass *conn, OID type, int atttypmod,
 }
 
 SQLSMALLINT
-tstype_attr_to_datetime_sub(const ConnectionClass *conn, OID type,
+dbtype_attr_to_datetime_sub(const ConnectionClass *conn, OID type,
                             int atttypmod) {
     UNUSED(conn, type, atttypmod);
     SQLSMALLINT rettype;
-    switch (rettype = estype_attr_to_concise_type( conn, type, atttypmod, TS_ADT_UNSET, TS_UNKNOWNS_UNSET)) {
+    switch (rettype = estype_attr_to_concise_type( conn, type, atttypmod, DB_ADT_UNSET, DB_UNKNOWNS_UNSET)) {
         case SQL_TYPE_DATE:
             return SQL_CODE_DATE;
         case SQL_TYPE_TIME:
@@ -295,37 +295,37 @@ SQLSMALLINT
 estype_attr_to_ctype(const ConnectionClass *conn, OID type, int atttypmod) {
     UNUSED(atttypmod);
     EnvironmentClass *env = (EnvironmentClass *)CC_get_env(conn);
-#ifdef TS_INTERVAL_AS_SQL_INTERVAL
+#ifdef DB_INTERVAL_AS_SQL_INTERVAL
     SQLSMALLINT ctype;
-#endif /* TS_INTERVAL_A_SQL_INTERVAL */
+#endif /* DB_INTERVAL_AS_SQL_INTERVAL */
 
     switch (type) {
-        case TS_TYPE_BIGINT:
+        case DB_TYPE_BIGINT:
             if (!conn->ms_jet)
                 return ALLOWED_C_BIGINT;
             return SQL_C_CHAR;
-        case TS_TYPE_INT2:
+        case DB_TYPE_INT2:
             return SQL_C_SSHORT;
-        case TS_TYPE_INTEGER:
+        case DB_TYPE_INTEGER:
             return SQL_C_SLONG;
-        case TS_TYPE_DOUBLE:
+        case DB_TYPE_DOUBLE:
             return SQL_C_DOUBLE;
-        case TS_TYPE_DATE:
+        case DB_TYPE_DATE:
             if (EN_is_odbc3(env))
                 return SQL_C_TYPE_DATE;
             return SQL_C_DATE;
-        case TS_TYPE_TIME:
+        case DB_TYPE_TIME:
             if (EN_is_odbc3(env))
                 return SQL_C_TYPE_TIME;
             return SQL_C_TIME;
-        case TS_TYPE_TIMESTAMP_NO_TMZONE:
-        case TS_TYPE_TIMESTAMP:
+        case DB_TYPE_TIMESTAMP_NO_TMZONE:
+        case DB_TYPE_TIMESTAMP:
             if (EN_is_odbc3(env))
                 return SQL_C_TYPE_TIMESTAMP;
             return SQL_C_TIMESTAMP;
-        case TS_TYPE_BOOLEAN:
+        case DB_TYPE_BOOLEAN:
             return SQL_C_BIT;
-        case TS_TYPE_VARCHAR:
+        case DB_TYPE_VARCHAR:
             return ansi_to_wtype(conn, SQL_C_CHAR);
         default:
             /* hack until permanent type is available */
@@ -341,70 +341,70 @@ estype_attr_to_ctype(const ConnectionClass *conn, OID type, int atttypmod) {
     }
 }
 
-const char *tstype_attr_to_name(const ConnectionClass *conn, OID type,
+const char *dbtype_attr_to_name(const ConnectionClass *conn, OID type,
                                 int typmod, BOOL auto_increment) {
     UNUSED(conn, typmod, conn, auto_increment);
     switch (type) {
-        case TS_TYPE_BOOLEAN:
-            return TS_TYPE_NAME_BOOLEAN;
-        case TS_TYPE_INTEGER:
-            return TS_TYPE_NAME_INTEGER;
-        case TS_TYPE_BIGINT:
-            return TS_TYPE_NAME_BIGINT;
-        case TS_TYPE_DOUBLE:
-            return TS_TYPE_NAME_DOUBLE;
-        case TS_TYPE_VARCHAR:
-            return TS_TYPE_NAME_VARCHAR;
-        case TS_TYPE_ARRAY:
-            return TS_TYPE_NAME_ARRAY;
-        case TS_TYPE_ROW:
-            return TS_TYPE_NAME_ROW;
-        case TS_TYPE_DATE:
-            return TS_TYPE_NAME_DATE;
-        case TS_TYPE_TIME:
-            return TS_TYPE_NAME_TIME;
-        case TS_TYPE_TIMESTAMP:
-            return TS_TYPE_NAME_TIMESTAMP;
-        case TS_TYPE_INTERVAL_YEAR_TO_MONTH:
-            return TS_TYPE_NAME_INTERVAL_YEAR_TO_MONTH;
-        case TS_TYPE_INTERVAL_DAY_TO_SECOND:
-            return TS_TYPE_NAME_INTERVAL_DAY_TO_SECOND;
-        case TS_TYPE_TIMESERIES:
-            return TS_TYPE_NAME_TIMESERIES;
-        case TS_TYPE_UNKNOWN:
+        case DB_TYPE_BOOLEAN:
+            return DB_TYPE_NAME_BOOLEAN;
+        case DB_TYPE_INTEGER:
+            return DB_TYPE_NAME_INTEGER;
+        case DB_TYPE_BIGINT:
+            return DB_TYPE_NAME_BIGINT;
+        case DB_TYPE_DOUBLE:
+            return DB_TYPE_NAME_DOUBLE;
+        case DB_TYPE_VARCHAR:
+            return DB_TYPE_NAME_VARCHAR;
+        case DB_TYPE_ARRAY:
+            return DB_TYPE_NAME_ARRAY;
+        case DB_TYPE_ROW:
+            return DB_TYPE_NAME_ROW;
+        case DB_TYPE_DATE:
+            return DB_TYPE_NAME_DATE;
+        case DB_TYPE_TIME:
+            return DB_TYPE_NAME_TIME;
+        case DB_TYPE_TIMESTAMP:
+            return DB_TYPE_NAME_TIMESTAMP;
+        case DB_TYPE_INTERVAL_YEAR_TO_MONTH:
+            return DB_TYPE_NAME_INTERVAL_YEAR_TO_MONTH;
+        case DB_TYPE_INTERVAL_DAY_TO_SECOND:
+            return DB_TYPE_NAME_INTERVAL_DAY_TO_SECOND;
+        case DB_TYPE_TIMESERIES:
+            return DB_TYPE_NAME_TIMESERIES;
+        case DB_TYPE_UNKNOWN:
         default:
-            return TS_TYPE_NAME_UNKNOWN;
+            return DB_TYPE_NAME_UNKNOWN;
     }
 }
 
 Int4 /* Amazon Timestream restriction */
-tstype_attr_column_size(const ConnectionClass *conn, OID type, int atttypmod,
+dbtype_attr_column_size(const ConnectionClass *conn, OID type, int atttypmod,
                         int adtsize_or_longest, int handle_unknown_size_as) {
     UNUSED(handle_unknown_size_as, adtsize_or_longest, atttypmod, conn);
     switch (type) {
-        case TS_TYPE_BOOLEAN:
+        case DB_TYPE_BOOLEAN:
             return 1;
-        case TS_TYPE_INT2:
+        case DB_TYPE_INT2:
             return 5;
-        case TS_TYPE_INTEGER:
+        case DB_TYPE_INTEGER:
             return 11;
-        case TS_TYPE_BIGINT:
+        case DB_TYPE_BIGINT:
             return 20;
-        case TS_TYPE_DOUBLE:
+        case DB_TYPE_DOUBLE:
             return 15;
-        case TS_TYPE_DATE:
+        case DB_TYPE_DATE:
             return 10;
-        case TS_TYPE_TIME:
+        case DB_TYPE_TIME:
             return 18;
-        case TS_TYPE_TIMESTAMP:
+        case DB_TYPE_TIMESTAMP:
             return 29;
-        case TS_TYPE_INTERVAL_YEAR_TO_MONTH:
-        case TS_TYPE_INTERVAL_DAY_TO_SECOND:
-        case TS_TYPE_ARRAY:
-        case TS_TYPE_ROW:
-        case TS_TYPE_TIMESERIES:
-        case TS_TYPE_VARCHAR:
-        case TS_TYPE_UNKNOWN:
+        case DB_TYPE_INTERVAL_YEAR_TO_MONTH:
+        case DB_TYPE_INTERVAL_DAY_TO_SECOND:
+        case DB_TYPE_ARRAY:
+        case DB_TYPE_ROW:
+        case DB_TYPE_TIMESERIES:
+        case DB_TYPE_VARCHAR:
+        case DB_TYPE_UNKNOWN:
             return VARCHAR_COLUMN_SIZE;
         default:
             return adtsize_or_longest;
@@ -414,8 +414,8 @@ tstype_attr_column_size(const ConnectionClass *conn, OID type, int atttypmod,
 SQLSMALLINT
 estype_attr_precision(const ConnectionClass *conn, OID type, int atttypmod) {
     switch (type) {
-        case TS_TYPE_TIME:
-        case TS_TYPE_TIMESTAMP_NO_TMZONE:
+        case DB_TYPE_TIME:
+        case DB_TYPE_TIMESTAMP_NO_TMZONE:
             return getTimestampDecimalDigitsX(conn, type, atttypmod);
     }
     return -1;
@@ -425,22 +425,22 @@ Int4 estype_attr_display_size(const ConnectionClass *conn, OID type,
                               int atttypmod, int adtsize_or_longestlen,
                               int handle_unknown_size_as) {
     switch (type) {
-        case TS_TYPE_INT2:
+        case DB_TYPE_INT2:
             return 6;
 
-        case TS_TYPE_INTEGER:
+        case DB_TYPE_INTEGER:
             return 11;
 
-        case TS_TYPE_BIGINT:
+        case DB_TYPE_BIGINT:
             return 20; /* signed: 19 digits + sign */
 
-        case TS_TYPE_DOUBLE: /* a sign, TS_DOUBLE_DIGITS digits, a decimal
+        case DB_TYPE_DOUBLE: /* a sign, TS_DOUBLE_DIGITS digits, a decimal
                                 point, the letter E, a sign, and 3 digits */
             return (1 + TS_DOUBLE_DIGITS + 1 + 1 + 1 + 3);
 
             /* Character types use regular precision */
         default:
-            return tstype_attr_column_size(conn, type, atttypmod,
+            return dbtype_attr_column_size(conn, type, atttypmod,
                                            adtsize_or_longestlen,
                                            handle_unknown_size_as);
     }
@@ -450,32 +450,32 @@ Int4 estype_attr_buffer_length(const ConnectionClass *conn, OID type,
                                int atttypmod, int adtsize_or_longestlen,
                                int handle_unknown_size_as) {
     switch (type) {
-        case TS_TYPE_INT2:
+        case DB_TYPE_INT2:
             return 2; /* sizeof(SQLSMALLINT) */
 
-        case TS_TYPE_INTEGER:
+        case DB_TYPE_INTEGER:
             return 4; /* sizeof(SQLINTEGER) */
 
-        case TS_TYPE_BIGINT:
+        case DB_TYPE_BIGINT:
             if (SQL_C_CHAR == estype_attr_to_ctype(conn, type, atttypmod))
                 return 20; /* signed: 19 digits + sign */
             return 8;      /* sizeof(SQLSBININT) */
 
-        case TS_TYPE_DOUBLE:
+        case DB_TYPE_DOUBLE:
             return 8; /* sizeof(SQLFLOAT) */
 
-        case TS_TYPE_DATE:
-        case TS_TYPE_TIME:
+        case DB_TYPE_DATE:
+        case DB_TYPE_TIME:
             return 6; /* sizeof(DATE(TIME)_STRUCT) */
 
-        case TS_TYPE_TIMESTAMP:
-        case TS_TYPE_TIMESTAMP_NO_TMZONE:
+        case DB_TYPE_TIMESTAMP:
+        case DB_TYPE_TIMESTAMP_NO_TMZONE:
             return 16; /* sizeof(TIMESTAMP_STRUCT) */
 
             /* Character types use the default precision */
-        case TS_TYPE_VARCHAR: {
+        case DB_TYPE_VARCHAR: {
             int coef = 1;
-            Int4 prec = tstype_attr_column_size(conn, type, atttypmod,
+            Int4 prec = dbtype_attr_column_size(conn, type, atttypmod,
                                                 adtsize_or_longestlen,
                                                 handle_unknown_size_as),
                  maxvarc;
@@ -497,7 +497,7 @@ Int4 estype_attr_buffer_length(const ConnectionClass *conn, OID type,
             return coef * prec;
         }
         default:
-            return tstype_attr_column_size(conn, type, atttypmod,
+            return dbtype_attr_column_size(conn, type, atttypmod,
                                            adtsize_or_longestlen,
                                            handle_unknown_size_as);
     }
@@ -509,25 +509,25 @@ Int4 estype_attr_desclength(const ConnectionClass *conn, OID type,
                             int atttypmod, int adtsize_or_longestlen,
                             int handle_unknown_size_as) {
     switch (type) {
-        case TS_TYPE_INT2:
+        case DB_TYPE_INT2:
             return 2;
 
-        case TS_TYPE_INTEGER:
+        case DB_TYPE_INTEGER:
             return 4;
 
-        case TS_TYPE_BIGINT:
+        case DB_TYPE_BIGINT:
             return 20; /* signed: 19 digits + sign */
 
-        case TS_TYPE_DOUBLE:
+        case DB_TYPE_DOUBLE:
             return 8;
 
-        case TS_TYPE_DATE:
-        case TS_TYPE_TIME:
-        case TS_TYPE_TIMESTAMP_NO_TMZONE:
-        case TS_TYPE_TIMESTAMP:
-        case TS_TYPE_VARCHAR:
+        case DB_TYPE_DATE:
+        case DB_TYPE_TIME:
+        case DB_TYPE_TIMESTAMP_NO_TMZONE:
+        case DB_TYPE_TIMESTAMP:
+        case DB_TYPE_VARCHAR:
         default:
-            return tstype_attr_column_size(conn, type, atttypmod,
+            return dbtype_attr_column_size(conn, type, atttypmod,
                                            adtsize_or_longestlen,
                                            handle_unknown_size_as);
     }
@@ -536,15 +536,15 @@ Int4 estype_attr_desclength(const ConnectionClass *conn, OID type,
 Int2 estype_attr_decimal_digits(const ConnectionClass *conn, OID type,
                                 int atttypmod) {
     switch (type) {
-        case TS_TYPE_INT2:
-        case TS_TYPE_INTEGER:
-        case TS_TYPE_BIGINT:
-        case TS_TYPE_DOUBLE:
-        case TS_TYPE_BOOLEAN:
-        case TS_TYPE_TIMESTAMP:
+        case DB_TYPE_INT2:
+        case DB_TYPE_INTEGER:
+        case DB_TYPE_BIGINT:
+        case DB_TYPE_DOUBLE:
+        case DB_TYPE_BOOLEAN:
+        case DB_TYPE_TIMESTAMP:
             return 0;
-        case TS_TYPE_TIME:
-        case TS_TYPE_TIMESTAMP_NO_TMZONE:
+        case DB_TYPE_TIME:
+        case DB_TYPE_TIMESTAMP_NO_TMZONE:
             /* return 0; */
             return getTimestampDecimalDigitsX(conn, type, atttypmod);
         default:
@@ -559,10 +559,10 @@ Int4 estype_attr_transfer_octet_length(const ConnectionClass *conn, OID type,
     Int4 maxvarc, column_size;
 
     switch (type) {
-        case TS_TYPE_VARCHAR:
-        case TS_TYPE_UNKNOWN:
-            column_size = tstype_attr_column_size(
-                conn, type, atttypmod, TS_ADT_UNSET, handle_unknown_size_as);
+        case DB_TYPE_VARCHAR:
+        case DB_TYPE_UNKNOWN:
+            column_size = dbtype_attr_column_size(
+                conn, type, atttypmod, DB_ADT_UNSET, handle_unknown_size_as);
             if (SQL_NO_TOTAL == column_size)
                 return column_size;
 #ifdef UNICODE_SUPPORT
@@ -581,8 +581,8 @@ Int4 estype_attr_transfer_octet_length(const ConnectionClass *conn, OID type,
             return coef * column_size;
         default:
             if (type == (OID)conn->lobj_type)
-                return tstype_attr_column_size(conn, type, atttypmod,
-                                               TS_ADT_UNSET,
+                return dbtype_attr_column_size(conn, type, atttypmod,
+                                               DB_ADT_UNSET,
                                                handle_unknown_size_as);
     }
     return -1;
@@ -659,25 +659,25 @@ OID sqltype_to_estype(const ConnectionClass *conn, SQLSMALLINT fSqlType) {
     OID esType = 0;
     switch (fSqlType) {
         case SQL_BIT:
-            esType = TS_TYPE_BOOLEAN;
+            esType = DB_TYPE_BOOLEAN;
             break;
 
         case SQL_TYPE_DATE:
         case SQL_DATE:
-            esType = TS_TYPE_DATE;
+            esType = DB_TYPE_DATE;
             break;
 
         case SQL_DOUBLE:
         case SQL_FLOAT:
-            esType = TS_TYPE_DOUBLE;
+            esType = DB_TYPE_DOUBLE;
             break;
 
         case SQL_BIGINT:
-            esType = TS_TYPE_BIGINT;
+            esType = DB_TYPE_BIGINT;
             break;
 
         case SQL_INTEGER:
-            esType = TS_TYPE_INTEGER;
+            esType = DB_TYPE_INTEGER;
             break;
 
         case SQL_LONGVARBINARY:
@@ -685,32 +685,32 @@ OID sqltype_to_estype(const ConnectionClass *conn, SQLSMALLINT fSqlType) {
             break;
 
         case SQL_LONGVARCHAR:
-            esType = TS_TYPE_VARCHAR;
+            esType = DB_TYPE_VARCHAR;
             break;
 
 #ifdef UNICODE_SUPPORT
         case SQL_WLONGVARCHAR:
-            esType = TS_TYPE_VARCHAR;
+            esType = DB_TYPE_VARCHAR;
             break;
 #endif /* UNICODE_SUPPORT */
 
         case SQL_SMALLINT:
         case SQL_TINYINT:
-            esType = TS_TYPE_INT2;
+            esType = DB_TYPE_INT2;
             break;
 
         case SQL_TIME:
         case SQL_TYPE_TIME:
-            esType = TS_TYPE_TIME;
+            esType = DB_TYPE_TIME;
             break;
 
         case SQL_VARCHAR:
-            esType = TS_TYPE_VARCHAR;
+            esType = DB_TYPE_VARCHAR;
             break;
 
 #ifdef UNICODE_SUPPORT
         case SQL_WVARCHAR:
-            esType = TS_TYPE_VARCHAR;
+            esType = DB_TYPE_VARCHAR;
             break;
 #endif /* UNICODE_SUPPORT */
 
@@ -724,7 +724,7 @@ static int getAtttypmodEtc(const StatementClass *stmt, int col,
     int atttypmod = -1;
 
     if (NULL != adtsize_or_longestlen)
-        *adtsize_or_longestlen = TS_ADT_UNSET;
+        *adtsize_or_longestlen = DB_ADT_UNSET;
     if (col >= 0) {
         const QResultClass *res;
 
@@ -780,14 +780,14 @@ const char *estype_to_name(const StatementClass *stmt, OID type, int col,
                            BOOL auto_increment) {
     int atttypmod = getAtttypmodEtc(stmt, col, NULL);
 
-    return tstype_attr_to_name(SC_get_conn(stmt), type, atttypmod,
+    return dbtype_attr_to_name(SC_get_conn(stmt), type, atttypmod,
                                auto_increment);
 }
 
 /*
  *	This corresponds to "precision" in ODBC 2.x.
  *
- *	For TS_TYPE_VARCHAR, SQLColumns will
+ *	For DB_TYPE_VARCHAR, SQLColumns will
  *	override this length with the atttypmod length from attribute .
  *
  *	If col >= 0, then will attempt to get the info from the result set.
@@ -799,7 +799,7 @@ estype_column_size(const StatementClass *stmt, OID type, int col,
     int atttypmod, adtsize_or_longestlen;
 
     atttypmod = getAtttypmodEtc(stmt, col, &adtsize_or_longestlen);
-    return tstype_attr_column_size(
+    return dbtype_attr_column_size(
         SC_get_conn(stmt), type, atttypmod, adtsize_or_longestlen,
         stmt->catalog_result ? UNKNOWNS_AS_LONGEST : handle_unknown_size_as);
 }
@@ -863,7 +863,7 @@ Int4 estype_transfer_octet_length(const StatementClass *stmt, OID type,
     int coef = 1;
     Int4 maxvarc;
     switch (type) {
-        case TS_TYPE_VARCHAR:
+        case DB_TYPE_VARCHAR:
             if (SQL_NO_TOTAL == column_size)
                 return column_size;
 #ifdef UNICODE_SUPPORT
@@ -891,11 +891,11 @@ Int4 estype_transfer_octet_length(const StatementClass *stmt, OID type,
 /*
  *	corrsponds to "min_scale" in ODBC 2.x.
  */
-Int2 tstype_min_decimal_digits(const ConnectionClass *conn, OID type) {
+Int2 dbtype_min_decimal_digits(const ConnectionClass *conn, OID type) {
     UNUSED(conn, type);
     switch (type) {
-        case TS_TYPE_TIME:
-        case TS_TYPE_TIMESTAMP:
+        case DB_TYPE_TIME:
+        case DB_TYPE_TIMESTAMP:
             return 9;
         default:
             return -1;
@@ -905,11 +905,11 @@ Int2 tstype_min_decimal_digits(const ConnectionClass *conn, OID type) {
 /*
  *	corrsponds to "max_scale" in ODBC 2.x.
  */
-Int2 tstype_max_decimal_digits(const ConnectionClass *conn, OID type) {
+Int2 dbtype_max_decimal_digits(const ConnectionClass *conn, OID type) {
     UNUSED(conn, type);
     switch (type) {
-        case TS_TYPE_TIME:
-        case TS_TYPE_TIMESTAMP:
+        case DB_TYPE_TIME:
+        case DB_TYPE_TIMESTAMP:
             return 9;
         default:
             return -1;
@@ -926,36 +926,36 @@ Int2 estype_decimal_digits(const StatementClass *stmt, OID type, int col) {
     return estype_attr_decimal_digits(SC_get_conn(stmt), type, atttypmod);
 }
 
-Int2 tstype_radix(const ConnectionClass *conn, OID type) {
+Int2 dbtype_radix(const ConnectionClass *conn, OID type) {
     UNUSED(conn, type);
     switch (type) {
-        case TS_TYPE_INTEGER:
-        case TS_TYPE_BIGINT:
-        case TS_TYPE_DOUBLE:
+        case DB_TYPE_INTEGER:
+        case DB_TYPE_BIGINT:
+        case DB_TYPE_DOUBLE:
             return 10;
-        case TS_TYPE_VARCHAR:
-        case TS_TYPE_DATE:
-        case TS_TYPE_TIME:
-        case TS_TYPE_TIMESTAMP:
-        case TS_TYPE_UNKNOWN:
+        case DB_TYPE_VARCHAR:
+        case DB_TYPE_DATE:
+        case DB_TYPE_TIME:
+        case DB_TYPE_TIMESTAMP:
+        case DB_TYPE_UNKNOWN:
         default:
             return -1;
     }
 }
 
-Int2 tstype_nullable(const ConnectionClass *conn, OID type) {
+Int2 dbtype_nullable(const ConnectionClass *conn, OID type) {
     UNUSED(conn, type);
     return SQL_NULLABLE; /* everything should be nullable */
 }
 
-Int2 tstype_auto_increment(const ConnectionClass *conn, OID type) {
+Int2 dbtype_auto_increment(const ConnectionClass *conn, OID type) {
     UNUSED(conn, type);
     return SQL_FALSE;
 }
 
-Int2 tstype_case_sensitive(const ConnectionClass *conn, OID type) {
+Int2 dbtype_case_sensitive(const ConnectionClass *conn, OID type) {
     UNUSED(conn, type);
-    return (TS_TYPE_VARCHAR == type) ? SQL_TRUE : SQL_FALSE;
+    return (DB_TYPE_VARCHAR == type) ? SQL_TRUE : SQL_FALSE;
 }
 
 Int2 estype_money(const ConnectionClass *conn, OID type) {
@@ -963,20 +963,21 @@ Int2 estype_money(const ConnectionClass *conn, OID type) {
     return SQL_FALSE;
 }
 
-Int2 tstype_searchable(const ConnectionClass *conn, OID type) {
+Int2 dbtype_searchable(const ConnectionClass *conn, OID type) {
     UNUSED(conn, type);
     return SQL_SEARCHABLE;
 }
 
-Int2 tstype_unsigned(const ConnectionClass *conn, OID type) {
+Int2 dbtype_unsigned
+(const ConnectionClass *conn, OID type) {
     UNUSED(conn);
     switch (type) {
-        case TS_TYPE_BOOLEAN:
+        case DB_TYPE_BOOLEAN:
             return SQL_TRUE;
-        case TS_TYPE_INT2:
-        case TS_TYPE_INTEGER:
-        case TS_TYPE_BIGINT:
-        case TS_TYPE_DOUBLE:
+        case DB_TYPE_INT2:
+        case DB_TYPE_INTEGER:
+        case DB_TYPE_BIGINT:
+        case DB_TYPE_DOUBLE:
             return SQL_FALSE;
         default:
             // This is NULL representation in TupleInt2
@@ -984,49 +985,49 @@ Int2 tstype_unsigned(const ConnectionClass *conn, OID type) {
     }
 }
 
-const char *tstype_literal_prefix(const ConnectionClass *conn, OID type) {
+const char *dbtype_literal_prefix(const ConnectionClass *conn, OID type) {
     UNUSED(conn);
     switch (type) {
-        case TS_TYPE_VARCHAR:
+        case DB_TYPE_VARCHAR:
             return "VARCHAR '";
-        case TS_TYPE_BIGINT:
+        case DB_TYPE_BIGINT:
             return "BIGINT '";
-        case TS_TYPE_DOUBLE:
+        case DB_TYPE_DOUBLE:
             return "DOUBLE '";
-        case TS_TYPE_INTEGER:
+        case DB_TYPE_INTEGER:
             return "INTEGER '";
-        case TS_TYPE_DATE:
+        case DB_TYPE_DATE:
             return "DATE '";
-        case TS_TYPE_TIME:
+        case DB_TYPE_TIME:
             return "TIME '";
-        case TS_TYPE_TIMESTAMP:
+        case DB_TYPE_TIMESTAMP:
             return "TIMESTAMP '";
-        case TS_TYPE_BOOLEAN:
+        case DB_TYPE_BOOLEAN:
             return "BOOLEAN '";
-        case TS_TYPE_ARRAY:
+        case DB_TYPE_ARRAY:
             return "ARRAY [";
-        case TS_TYPE_ROW:
+        case DB_TYPE_ROW:
             return "ROW (";
         default:
             return NULL;
     }
 }
 
-const char *tstype_literal_suffix(const ConnectionClass *conn, OID type) {
+const char *dbtype_literal_suffix(const ConnectionClass *conn, OID type) {
     UNUSED(conn);
     switch (type) {
-        case TS_TYPE_VARCHAR:
-        case TS_TYPE_BIGINT:
-        case TS_TYPE_DOUBLE:
-        case TS_TYPE_INTEGER:
-        case TS_TYPE_DATE:
-        case TS_TYPE_TIME:
-        case TS_TYPE_TIMESTAMP:
-        case TS_TYPE_BOOLEAN:
+        case DB_TYPE_VARCHAR:
+        case DB_TYPE_BIGINT:
+        case DB_TYPE_DOUBLE:
+        case DB_TYPE_INTEGER:
+        case DB_TYPE_DATE:
+        case DB_TYPE_TIME:
+        case DB_TYPE_TIMESTAMP:
+        case DB_TYPE_BOOLEAN:
             return "'";
-        case TS_TYPE_ARRAY:
+        case DB_TYPE_ARRAY:
             return "]";
-        case TS_TYPE_ROW:
+        case DB_TYPE_ROW:
             return ")";
         default:
             return NULL;

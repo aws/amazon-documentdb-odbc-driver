@@ -314,7 +314,7 @@ RETCODE SQL_API API_DescribeCol(HSTMT hstmt, SQLUSMALLINT icol,
         if (SC_has_outer_join(stmt))
             *pfNullable = TRUE;
         else
-            *pfNullable = fi ? fi->nullable : tstype_nullable(conn, fieldtype);
+            *pfNullable = fi ? fi->nullable : dbtype_nullable(conn, fieldtype);
 
         MYLOG(LOG_DEBUG, "col %d  *pfNullable = %d", icol, *pfNullable);
     }
@@ -486,7 +486,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
             if (fi && fi->auto_increment)
                 value = TRUE;
             else
-                value = tstype_auto_increment(conn, field_type);
+                value = dbtype_auto_increment(conn, field_type);
             if (value == -1) /* non-numeric becomes FALSE (ODBC Doc) */
                 value = FALSE;
             MYLOG(LOG_DEBUG, "AUTO_INCREMENT=" FORMAT_LEN, value);
@@ -494,7 +494,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
             break;
 
         case SQL_COLUMN_CASE_SENSITIVE: /* == SQL_DESC_CASE_SENSITIVE */
-            value = tstype_case_sensitive(conn, field_type);
+            value = dbtype_case_sensitive(conn, field_type);
             break;
 
             /*
@@ -559,7 +559,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
             if (SC_has_outer_join(stmt))
                 value = TRUE;
             else
-                value = fi ? fi->nullable : tstype_nullable(conn, field_type);
+                value = fi ? fi->nullable : dbtype_nullable(conn, field_type);
             MYLOG(LOG_ALL, "COLUMN_NULLABLE=" FORMAT_LEN, value);
             break;
 
@@ -590,7 +590,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
             break;
 
         case SQL_COLUMN_SEARCHABLE: /* == SQL_DESC_SEARCHABLE */
-            value = tstype_searchable(conn, field_type);
+            value = dbtype_searchable(conn, field_type);
             break;
 
         case SQL_COLUMN_TABLE_NAME: /* == SQL_DESC_TABLE_NAME */
@@ -611,7 +611,7 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
             break;
 
         case SQL_COLUMN_UNSIGNED: /* == SQL_DESC_UNSINGED */
-            value = tstype_unsigned(conn, field_type);
+            value = dbtype_unsigned(conn, field_type);
             if (value == -1) /* non-numeric becomes TRUE (ODBC Doc) */
                 value = SQL_TRUE;
 
@@ -692,13 +692,13 @@ RETCODE SQL_API API_ColAttributes(HSTMT hstmt, SQLUSMALLINT icol,
                 estype_to_sqldesctype(stmt, field_type, col_idx, unknown_sizes);
             break;
         case SQL_DESC_NUM_PREC_RADIX:
-            value = tstype_radix(conn, field_type);
+            value = dbtype_radix(conn, field_type);
             break;
         case SQL_DESC_LITERAL_PREFIX:
-            p = tstype_literal_prefix(conn, field_type);
+            p = dbtype_literal_prefix(conn, field_type);
             break;
         case SQL_DESC_LITERAL_SUFFIX:
-            p = tstype_literal_suffix(conn, field_type);
+            p = dbtype_literal_suffix(conn, field_type);
             break;
         case SQL_DESC_UNNAMED:
             value = (fi && NAME_IS_NULL(fi->column_name)

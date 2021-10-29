@@ -27,27 +27,27 @@ typedef std::vector< std::pair< std::string, OID > > schema_type;
 bool _CC_from_TSResult(
     QResultClass *q_res, ConnectionClass *conn, StatementClass *stmt,
     const char *next_token,
-    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
+    const Aws::TimestreamQuery::Model::QueryOutcome &result);
 
 /**
  * Responsible for looping through columns, allocating memory for column fields
  * and setting column info
  * @param q_res QResultClass to set column info
- * @param ts_result Timestream query outcome to get column info
+ * @param result Timestream query outcome to get column info
  * @return true if successfully assigned
  */
 bool AssignColumnHeaders(QResultClass *q_res,
-    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result);
+    const Aws::TimestreamQuery::Model::QueryOutcome &result);
 
 /**
  * Responsible for looping through rows, allocating tuples and passing rows for
  * assignment
- * @param ts_result Timestream query outcome to get rows
+ * @param result Timestream query outcome to get rows
  * @param q_res QResultClass to hold tuples
  * @param fields ColumnInfoClass to get information about columns
  * @return true if successfully assigned
  */
-bool AssignTableData(const Aws::TimestreamQuery::Model::QueryOutcome &ts_result,
+bool AssignTableData(const Aws::TimestreamQuery::Model::QueryOutcome &result,
                      QResultClass *q_res, ColumnInfoClass &fields);
 
 /**
@@ -123,33 +123,33 @@ static const std::string JSON_KW_DATAROWS = "datarows";
 static const std::string JSON_KW_ERROR = "error";
 static const std::string JSON_KW_CURSOR = "cursor";
 
-#define TS_VARCHAR_SIZE (-2)
+#define DB_VARCHAR_SIZE (-2)
 
 const std::map< Aws::TimestreamQuery::Model::ScalarType,
                           std::pair< OID, int16_t > >
     scalar_type_to_oid_size_map = {
         {Aws::TimestreamQuery::Model::ScalarType::BIGINT,
-         std::make_pair(TS_TYPE_BIGINT, (int16_t)8)},
+         std::make_pair(DB_TYPE_BIGINT, (int16_t)8)},
         {Aws::TimestreamQuery::Model::ScalarType::BOOLEAN,
-         std::make_pair(TS_TYPE_BOOLEAN, (int16_t)1)},
+         std::make_pair(DB_TYPE_BOOLEAN, (int16_t)1)},
         {Aws::TimestreamQuery::Model::ScalarType::DATE,
-         std::make_pair(TS_TYPE_DATE, (int16_t)6)},
+         std::make_pair(DB_TYPE_DATE, (int16_t)6)},
         {Aws::TimestreamQuery::Model::ScalarType::DOUBLE,
-         std::make_pair(TS_TYPE_DOUBLE, (int16_t)8)},
+         std::make_pair(DB_TYPE_DOUBLE, (int16_t)8)},
         {Aws::TimestreamQuery::Model::ScalarType::INTEGER,
-         std::make_pair(TS_TYPE_INTEGER, (int16_t)4)},
+         std::make_pair(DB_TYPE_INTEGER, (int16_t)4)},
         {Aws::TimestreamQuery::Model::ScalarType::INTERVAL_DAY_TO_SECOND,
-         std::make_pair(TS_TYPE_VARCHAR, (int16_t)TS_VARCHAR_SIZE)},
+         std::make_pair(DB_TYPE_VARCHAR, (int16_t)DB_VARCHAR_SIZE)},
         {Aws::TimestreamQuery::Model::ScalarType::INTERVAL_YEAR_TO_MONTH,
-         std::make_pair(TS_TYPE_VARCHAR, (int16_t)TS_VARCHAR_SIZE)},
+         std::make_pair(DB_TYPE_VARCHAR, (int16_t)DB_VARCHAR_SIZE)},
         {Aws::TimestreamQuery::Model::ScalarType::TIME,
-         std::make_pair(TS_TYPE_TIME, (int16_t)6)},
+         std::make_pair(DB_TYPE_TIME, (int16_t)6)},
         {Aws::TimestreamQuery::Model::ScalarType::TIMESTAMP,
-         std::make_pair(TS_TYPE_TIMESTAMP, (int16_t)16)},
+         std::make_pair(DB_TYPE_TIMESTAMP, (int16_t)16)},
         {Aws::TimestreamQuery::Model::ScalarType::VARCHAR,
-         std::make_pair(TS_TYPE_VARCHAR, (int16_t)TS_VARCHAR_SIZE)},
+         std::make_pair(DB_TYPE_VARCHAR, (int16_t)DB_VARCHAR_SIZE)},
         {Aws::TimestreamQuery::Model::ScalarType::UNKNOWN,
-         std::make_pair(TS_TYPE_VARCHAR, (int16_t)TS_VARCHAR_SIZE)},
+         std::make_pair(DB_TYPE_VARCHAR, (int16_t)DB_VARCHAR_SIZE)},
 };
 
 // Using global variable here so that the error message can be propagated
@@ -169,17 +169,17 @@ std::string GetResultParserError() {
 BOOL CC_from_TSResult(
     QResultClass *q_res, ConnectionClass *conn, StatementClass *stmt,
     const char *next_token,
-    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result) {
+    const Aws::TimestreamQuery::Model::QueryOutcome &result) {
     ClearError();
-    return _CC_from_TSResult(q_res, conn, stmt, next_token, ts_result) ? TRUE
+    return _CC_from_TSResult(q_res, conn, stmt, next_token, result) ? TRUE
                                                                        : FALSE;
 }
 
 BOOL CC_Append_Table_Data(
-    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result,
+    const Aws::TimestreamQuery::Model::QueryOutcome &result,
     QResultClass *q_res, ColumnInfoClass &fields) {
     ClearError();
-    return AssignTableData(ts_result, q_res, fields)
+    return AssignTableData(result, q_res, fields)
                ? TRUE
                : FALSE;
 }
@@ -187,7 +187,7 @@ BOOL CC_Append_Table_Data(
 bool _CC_from_TSResult(
     QResultClass *q_res, ConnectionClass *conn, StatementClass *stmt,
     const char *next_token,
-    const Aws::TimestreamQuery::Model::QueryOutcome &ts_result) {
+    const Aws::TimestreamQuery::Model::QueryOutcome &result) {
     CSTR func = "_CC_from_TSResult";
     // Note - NULL conn and/or cursor is valid
     if (q_res == NULL)
@@ -198,8 +198,8 @@ bool _CC_from_TSResult(
         SQLULEN starting_cached_rows = q_res->num_cached_rows;
 
         // Assign table data and column headers
-        if ((!AssignColumnHeaders(q_res, ts_result))
-            || (!AssignTableData(ts_result, q_res, *(q_res->fields))))
+        if ((!AssignColumnHeaders(q_res, result))
+            || (!AssignTableData(result, q_res, *(q_res->fields))))
             return false;
 
         // Update fields of QResult to reflect data written
@@ -233,7 +233,7 @@ bool AssignColumnHeaders(QResultClass *q_res,
         if (column.NameHasBeenSet()) {
             column_name = column.GetName();
         }
-        OID column_type_id = TS_TYPE_UNKNOWN;
+        OID column_type_id = DB_TYPE_UNKNOWN;
         int16_t column_size = 0;
         if (column.TypeHasBeenSet()) {
             auto type = column.GetType();
@@ -249,14 +249,14 @@ bool AssignColumnHeaders(QResultClass *q_res,
                 column_type_id = oid_size_it->second.first;
                 column_size = oid_size_it->second.second;
             } else if (type.ArrayColumnInfoHasBeenSet()) {
-                column_type_id = TS_TYPE_VARCHAR;
-                column_size = TS_VARCHAR_SIZE;
+                column_type_id = DB_TYPE_VARCHAR;
+                column_size = DB_VARCHAR_SIZE;
             } else if (type.RowColumnInfoHasBeenSet()) {
-                column_type_id = TS_TYPE_VARCHAR;
-                column_size = TS_VARCHAR_SIZE;
+                column_type_id = DB_TYPE_VARCHAR;
+                column_size = DB_VARCHAR_SIZE;
             } else if (type.TimeSeriesMeasureValueColumnInfoHasBeenSet()) {
-                column_type_id = TS_TYPE_VARCHAR;
-                column_size = TS_VARCHAR_SIZE;
+                column_type_id = DB_TYPE_VARCHAR;
+                column_size = DB_VARCHAR_SIZE;
             } else {
                 throw std::runtime_error("Unsupported Timestream type.");
             }
@@ -291,7 +291,7 @@ void ParseDatum(const Aws::TimestreamQuery::Model::Datum &datum,
                 std::string &datum_value, OID column_attr_id) {
     if (datum.ScalarValueHasBeenSet()) {
         auto scalar_value = datum.GetScalarValue();
-        if (column_attr_id == TS_TYPE_DOUBLE) {
+        if (column_attr_id == DB_TYPE_DOUBLE) {
             auto d = atof(scalar_value.c_str());
             scalar_value = std::to_string(d);
         }

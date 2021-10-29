@@ -36,7 +36,7 @@ Int4 FI_precision(const FIELD_INFO *fi) {
         return -1;
     ftype = FI_type(fi);
     switch (ftype) {
-        case TS_TYPE_TIMESTAMP_NO_TMZONE:
+        case DB_TYPE_TIMESTAMP_NO_TMZONE:
             return fi->decimal_digits;
     }
     return 0;

@@ -65,9 +65,9 @@ set(VERSION_MAJOR 1)
 set(VERSION_MINOR 0)
 set(VERSION_PATCH 3)
 
-add_compile_definitions( TS_ODBC_VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
+add_compile_definitions( ODBC_VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
                          # Comma separated version is required for odbc administrator's driver file.
-                         TS_ODBC_DRVFILE_VERSION=${VERSION_MAJOR},${VERSION_MINOR},${VERSION_PATCH} )
+                         ODBC_DRVFILE_VERSION=${VERSION_MAJOR},${VERSION_MINOR},${VERSION_PATCH} )
 
 # Extensions of base directories
 set(PERFORMANCE_TESTS "${CMAKE_CURRENT_SOURCE_DIR}/PerformanceTests")
