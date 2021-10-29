@@ -33,7 +33,7 @@ size_t strncpy_null_lower_case(char *dst, const char *src, ssize_t dst_buffer_le
 size_t strlcat(char *, const char *, size_t);
 #endif /* HAVE_STRLCAT */
 int snprintfcat(char *buf, size_t size, const char *format, ...)
-    __attribute__((format(TS_PRINTF_ATTRIBUTE, 3, 4)));
+    __attribute__((format(PRINTF_ATTRIBUTE, 3, 4)));
 
 char *make_string(const SQLCHAR *s, SQLINTEGER len, char *buf, size_t bufsize);
 /* #define	GET_SCHEMA_NAME(nspname) 	(stricmp(nspname, "public") ? nspname :
