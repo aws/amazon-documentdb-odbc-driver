@@ -50,6 +50,7 @@ set(CPP_SOURCE_FILES	communication.cpp
 						driver_connect.cpp
 						helper.cpp
 						info.cpp
+						Datum.cpp
 						parse_result.cpp
 						odbc_statement.cpp
 						utility.cpp
@@ -91,6 +92,7 @@ set(CPP_HEADER_FILES	communication.h
 						helper.h
 						info.h
 						odbc.h
+						Datum.h
 						parse_result.h
 						odbc_statement.h
 						types.h
