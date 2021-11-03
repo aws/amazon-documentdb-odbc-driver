@@ -18,13 +18,13 @@
 #define DB_COMMUNICATION
 
 #include <aws/timestream-query/TimestreamQueryClient.h>
-#include <aws/timestream-query/model/ScalarType.h>
-#include <aws/timestream-query/model/Type.h>
 
 #include <memory>
 #include <string>
 
 #include "communication.h"
+#include "ScalarType.h"
+#include "Type.h"
 
 /**
  * AWS Timestream communication class
