@@ -17,7 +17,7 @@
 #ifndef __QRESULT_H__
 #define __QRESULT_H__
 
-#include "columninfo.h"
+#include "columninfoclass.h"
 #include "connection.h"
 #include "odbc.h"
 #include "tuple.h"

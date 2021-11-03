@@ -14,7 +14,7 @@
  *
  */
 
-#include "columninfo.h"
+#include "columninfoclass.h"
 #include "types.h"
 
 #include <stdlib.h>
