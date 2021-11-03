@@ -17,7 +17,7 @@ project(odbcdriver)
 
 # Source files for odbcdriver
 set(C_SOURCE_FILES	bind.c
-					columninfo.c
+					columninfoclass.c
 					connection.c
 					convert.c
 					descriptor.c
@@ -54,7 +54,12 @@ set(CPP_SOURCE_FILES	communication.cpp
 						odbc_statement.cpp
 						utility.cpp
 						odbc_communication.cpp
-						prefetch_queue.cpp)
+						prefetch_queue.cpp
+						ColumnInfo.cpp
+						Row.cpp
+						ScalarType.cpp
+						Type.cpp
+						)
 						
 if(WIN32)
 set(C_SOURCE_FILES ${C_SOURCE_FILES} dlg_wingui.c setup.c)
@@ -62,7 +67,7 @@ endif()
 
 set(C_HEADER_FILES	bind.h
 					catfunc.h
-					columninfo.h
+					columninfoclass.h
 					convert.h
 					descriptor.h
 					dlg_specific.h
@@ -92,7 +97,12 @@ set(CPP_HEADER_FILES	communication.h
 						utility.h
 						odbc_communication.h
 						prefetch_queue.h
-						version.h)
+						version.h
+						ColumnInfo.h
+						Row.h
+						ScalarType.h
+						Type.h
+						)
 
 # Generate dll (SHARED)
 if(WIN32)
