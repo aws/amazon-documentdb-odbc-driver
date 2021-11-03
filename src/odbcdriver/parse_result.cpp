@@ -100,16 +100,6 @@ void ParseArray(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
 void ParseRow(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
               std::string &row_value, OID column_attr_id);
 
-/**
- * Parse Timestream timeseries object to intermidiate string
- * representation for further conversion.
- * e.g. timeseries[row(timestamp, T,...)] -> [{time: 2021-03-05 14:18:30.123456789, value: [1, 2, 3]}]
- * @param series An array of Timestream TimeSeriesDataPoint objects to be parsed
- * @param timeseries_value String representation of the datum to fill in recursively
- * @param column_attr_id Column attribute ID
- */
-void ParseTimeSeries(const Aws::Vector< Aws::TimestreamQuery::Model::TimeSeriesDataPoint >  &series,
-    std::string &timeseries_value, OID column_attr_id);
 
 // clang-format off
 // Not all of these are being used at the moment, but these are the keywords in the json
@@ -302,8 +292,6 @@ void ParseDatum(const Aws::TimestreamQuery::Model::Datum &datum,
         if (datum.GetRowValue().DataHasBeenSet()) {
             ParseRow(datum.GetRowValue().GetData(), datum_value, column_attr_id);
         }
-    } else if (datum.TimeSeriesValueHasBeenSet()) {
-        ParseTimeSeries(datum.GetTimeSeriesValue(), datum_value, column_attr_id);
     } else if (datum.NullValueHasBeenSet()) {
         if (datum.GetNullValue()) {
             datum_value += "null";
@@ -347,32 +335,6 @@ void ParseRow(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
         row_value.pop_back();
     }
     row_value += ")";
-}
-
-void ParseTimeSeries(const Aws::Vector< Aws::TimestreamQuery::Model::TimeSeriesDataPoint > &series,
-    std::string &timeseries_value, OID column_attr_id) {
-    timeseries_value += "[";
-    for (auto &s : series) {
-        timeseries_value += "{";
-        timeseries_value += "time: ";
-        if (s.TimeHasBeenSet()) {
-            timeseries_value += s.GetTime();
-        }
-        timeseries_value += ", value: ";
-        if (s.ValueHasBeenSet()) {
-            std::string value;
-            ParseDatum(s.GetValue(), value, column_attr_id);
-            timeseries_value += value;
-        }
-        timeseries_value += "}, ";
-    }
-    // remove the last ',' & ' '
-    if (timeseries_value.size() > 1 && timeseries_value[timeseries_value.size() - 1] == ' '
-        && timeseries_value[timeseries_value.size() - 2] == ',') {
-        timeseries_value.pop_back();
-        timeseries_value.pop_back();
-    }
-    timeseries_value += "]";
 }
 
 bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
