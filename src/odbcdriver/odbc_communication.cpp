@@ -30,11 +30,9 @@
 #include <aws/core/auth/AWSCredentials.h>
 #include <aws/core/auth/AWSCredentialsProvider.h>
 #include <aws/core/client/DefaultRetryStrategy.h>
-#include <aws/timestream-query/model/CancelQueryRequest.h>
-#include <aws/timestream-query/model/QueryRequest.h>
+#include "CancelQueryRequest.h"
+#include "QueryRequest.h"
 // clang-format on
-
-using namespace Aws::TimestreamQuery;
 
 namespace {
     /**
@@ -72,14 +70,14 @@ namespace {
     const Aws::String UA_ID_PREFIX = Aws::String("ts-odbc.");
     const std::string DEFAULT_CREATOR_TYPE = "DEFAULT";
 
-    typedef std::function< std::unique_ptr< TimestreamQueryClient >(
+    typedef std::function< std::unique_ptr< DatabaseQueryClient >(
         const runtime_options& options,
         const Aws::Client::ClientConfiguration& config) > QueryClientCreator;
 
     QueryClientCreator default_creator =
         [](const runtime_options& ,
            const Aws::Client::ClientConfiguration& config) {
-            return std::unique_ptr< TimestreamQueryClient >(new TimestreamQueryClient(config));
+            return std::unique_ptr< DatabaseQueryClient >(new DatabaseQueryClient(config));
         };
 
     std::unordered_map< std::string, QueryClientCreator > creators = {
@@ -87,15 +85,15 @@ namespace {
     };
 }
 
-TSCommunication::TSCommunication() {
+DBCommunication::DBCommunication() {
   ++AWS_SDK_HELPER;
 }
 
-TSCommunication::~TSCommunication() {
+DBCommunication::~DBCommunication() {
   --AWS_SDK_HELPER;
 }
 
-bool TSCommunication::Validate(const runtime_options& options) {
+bool DBCommunication::Validate(const runtime_options& options) {
     if (options.auth.auth_type != AUTHTYPE_DEFAULT) {
         throw std::invalid_argument("Unknown authentication type: \"" + options.auth.auth_type + "\".");
     }
@@ -111,7 +109,7 @@ bool TSCommunication::Validate(const runtime_options& options) {
     return true;
 }
 
-std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient > TSCommunication::CreateQueryClient(const runtime_options& options) {
+std::unique_ptr< DatabaseQueryClient > DBCommunication::CreateQueryClient(const runtime_options& options) {
     Aws::Client::ClientConfiguration config;
     config.userAgent = GetUserAgent();
 
@@ -161,8 +159,8 @@ std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient > TSCommunication::
     }
 }
 
-bool TSCommunication::TestQueryClient() {
-    Aws::TimestreamQuery::Model::QueryRequest req;
+bool DBCommunication::TestQueryClient() {
+    QueryRequest req;
     req.SetQueryString("select 1");
     auto outcome = m_client->Query(req);
     if (!outcome.IsSuccess()) {
@@ -175,16 +173,16 @@ bool TSCommunication::TestQueryClient() {
     return true;
 }
 
-bool TSCommunication::Connect(const runtime_options& options) {
+bool DBCommunication::Connect(const runtime_options& options) {
     m_client = CreateQueryClient(options);
     if (m_client == nullptr) {
-        throw std::runtime_error("Unable to create TimestreamQueryClient.");
+        throw std::runtime_error("Unable to create DatabaseQueryClient.");
     }
     return TestQueryClient();
 }
 
-void TSCommunication::Disconnect() {
-    LogMsg(LOG_DEBUG, "Disconnecting Timestream connection.");
+void DBCommunication::Disconnect() {
+    LogMsg(LOG_DEBUG, "Disconnecting Database connection.");
     if (m_client) {
         m_client.reset();
     }
@@ -194,15 +192,15 @@ void TSCommunication::Disconnect() {
     }
 }
 
-std::string TSCommunication::GetVersion() {
+std::string DBCommunication::GetVersion() {
     return TIMESTREAMDRIVERVERSION;
 }
 
-std::string TSCommunication::GetErrorPrefix() {
+std::string DBCommunication::GetErrorPrefix() {
     return "[Timestream][SQL ODBC Driver] ";
 }
 
-void TSCommunication::StopResultRetrieval(StatementClass* stmt) {
+void DBCommunication::StopResultRetrieval(StatementClass* stmt) {
     // Call Cancel logic
     CancelQuery(stmt);
     // Clean the queue
@@ -211,7 +209,7 @@ void TSCommunication::StopResultRetrieval(StatementClass* stmt) {
     }
 }
 
-Aws::String TSCommunication::GetUserAgent() {
+Aws::String DBCommunication::GetUserAgent() {
     Aws::String program_name(GetExeProgramName());
     Aws::String name_suffix = " [" + program_name + "]";
     Aws::String msg = "Name of the application using the driver: " + name_suffix;
@@ -228,7 +226,7 @@ class Context : public Aws::Client::AsyncCallerContext {
     /**
      * Parameterized constructor for the context
      */
-    Context(PrefetchQueue* q, StatementClass* s, std::promise< Aws::TimestreamQuery::Model::QueryOutcome > p)
+    Context(PrefetchQueue* q, StatementClass* s, std::promise< QueryOutcome > p)
         : Aws::Client::AsyncCallerContext(), queue_(q), stmt_(s), promise_(std::move(p)) {
     }
     /**
@@ -249,7 +247,7 @@ class Context : public Aws::Client::AsyncCallerContext {
      * Make promise
      * @param outcome const Aws::TimestreamQuery::Model::QueryOutcome&
      */
-    void MakePromise(const Aws::TimestreamQuery::Model::QueryOutcome& outcome) {
+    void MakePromise(const QueryOutcome& outcome) {
         promise_.set_value(outcome);
     }
    private:
@@ -265,14 +263,14 @@ class Context : public Aws::Client::AsyncCallerContext {
      * Promise made by the request
      * Wait to be fullfilled in the QueryCallback function
      */
-    std::promise< Aws::TimestreamQuery::Model::QueryOutcome > promise_;
+    std::promise< QueryOutcome > promise_;
 };
 
 // Callback function of QueryAsync operation by aws-sdk-cpp timestream-query
 void QueryCallback(
-    const Aws::TimestreamQuery::TimestreamQueryClient* client,
-    const Aws::TimestreamQuery::Model::QueryRequest& request,
-    const Aws::TimestreamQuery::Model::QueryOutcome& outcome,
+    const DatabaseQueryClient* client,
+    const QueryRequest& request,
+    const QueryOutcome& outcome,
     const std::shared_ptr< const Aws::Client::AsyncCallerContext >& context) {
     auto ctxt = (std::static_pointer_cast< const Context >(context));
     auto p = const_cast< Context* >(ctxt.get());
@@ -288,8 +286,8 @@ void QueryCallback(
                 SC_UnsetQueryId(sc);
                 sc->query_id = strdup(outcome.GetResult().GetQueryId().c_str());
             }
-            Aws::TimestreamQuery::Model::QueryRequest next_request(request);
-            std::promise<Aws::TimestreamQuery::Model::QueryOutcome > next_promise;
+            QueryRequest next_request(request);
+            std::promise<QueryOutcome > next_promise;
             auto success = p->GetPrefetchQueue()->Push(next_promise.get_future());
             if (success) {
                 // Issue next request
@@ -307,7 +305,7 @@ void QueryCallback(
     }
 }
 
-bool TSCommunication::ExecDirect(StatementClass* sc, const char* query) {
+bool DBCommunication::ExecDirect(StatementClass* sc, const char* query) {
     CSTR func = "ExecDirect";
     std::string statement(query);
     std::string msg = "Attempting to execute a query \"" + statement + "\"";
@@ -318,10 +316,10 @@ bool TSCommunication::ExecDirect(StatementClass* sc, const char* query) {
     PrefetchQueue* pPrefetchQueue = prefetch_queues_map[sc].get();
     pPrefetchQueue->Reset();
     // Issue request
-    Aws::TimestreamQuery::Model::QueryRequest request;
+    QueryRequest request;
     request.SetQueryString(statement.c_str());
     // Use QueryAsync
-    std::promise< Aws::TimestreamQuery::Model::QueryOutcome > promise;
+    std::promise< QueryOutcome > promise;
     pPrefetchQueue->SetRetrieving(true);
     auto success = pPrefetchQueue->Push(promise.get_future());
     if (success) {
@@ -337,7 +335,7 @@ bool TSCommunication::ExecDirect(StatementClass* sc, const char* query) {
     }
 }
 
-bool TSCommunication::CancelQuery(StatementClass* stmt) {
+bool DBCommunication::CancelQuery(StatementClass* stmt) {
     if (stmt == nullptr)
         return false;
     auto prefetch_queue_iterator = prefetch_queues_map.find(stmt);
@@ -347,7 +345,7 @@ bool TSCommunication::CancelQuery(StatementClass* stmt) {
     }
     // Try to cancel current query (Not guaranteed in Timestream service)
     if (stmt->query_id != nullptr && strlen(stmt->query_id) != 0) {
-        Aws::TimestreamQuery::Model::CancelQueryRequest cancel_request;
+        CancelQueryRequest cancel_request;
         cancel_request.SetQueryId(stmt->query_id);
         auto outcome = m_client->CancelQuery(cancel_request);
         if (outcome.IsSuccess()) {

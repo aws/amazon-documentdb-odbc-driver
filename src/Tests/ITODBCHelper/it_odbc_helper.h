@@ -75,7 +75,6 @@ test_string to_test_string(const std::string& src);
 #define IT_DRIVER CREATE_STRING("Driver")
 #define IT_ACCESSKEYID CREATE_STRING("AccessKeyId")
 #define IT_SECRETACCESSKEY CREATE_STRING"SecretAccessKey")
-#define IT_REGION CREATE_STRING("Region")
 #define IT_AUTH CREATE_STRING("Auth")
 #define IT_LOGLEVEL CREATE_STRING("LogLevel")
 #define IT_LOGOUTPUT CREATE_STRING("LogOutput")
