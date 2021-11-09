@@ -5,11 +5,19 @@
 
 #pragma once
 #include <aws/core/utils/memory/stl/AWSVector.h>
-#include <aws/core/utils/json/JsonSerializer.h>
 #include <utility>
 #include <memory>
 #include "ScalarType.h"
 #include "ColumnInfo.h"
+
+namespace Aws {
+namespace Utils {
+namespace Json {
+class JsonValue;
+class JsonView;
+}  // namespace Json
+}  // namespace Utils
+}  // namespace Aws
 
 /**
  * <p>Contains the data type of a column in a query result set. The data type can
@@ -109,36 +117,6 @@ class Type {
     Type& WithArrayColumnInfo(ColumnInfo&& value);
 
     /**
-     * <p>Indicates if the column is a timeseries data type.</p>
-     */
-    const ColumnInfo& GetTimeSeriesMeasureValueColumnInfo() const;
-
-    /**
-     * <p>Indicates if the column is a timeseries data type.</p>
-     */
-    bool TimeSeriesMeasureValueColumnInfoHasBeenSet() const;
-
-    /**
-     * <p>Indicates if the column is a timeseries data type.</p>
-     */
-    void SetTimeSeriesMeasureValueColumnInfo(const ColumnInfo& value);
-
-    /**
-     * <p>Indicates if the column is a timeseries data type.</p>
-     */
-    void SetTimeSeriesMeasureValueColumnInfo(ColumnInfo&& value);
-
-    /**
-     * <p>Indicates if the column is a timeseries data type.</p>
-     */
-    Type& WithTimeSeriesMeasureValueColumnInfo(const ColumnInfo& value);
-
-    /**
-     * <p>Indicates if the column is a timeseries data type.</p>
-     */
-    Type& WithTimeSeriesMeasureValueColumnInfo(ColumnInfo&& value);
-
-    /**
      * <p>Indicates if the column is a row.</p>
      */
     inline const Aws::Vector< ColumnInfo >& GetRowColumnInfo() const {
@@ -208,9 +186,6 @@ class Type {
 
     std::shared_ptr< ColumnInfo > m_arrayColumnInfo;
     bool m_arrayColumnInfoHasBeenSet;
-
-    std::shared_ptr< ColumnInfo > m_timeSeriesMeasureValueColumnInfo;
-    bool m_timeSeriesMeasureValueColumnInfoHasBeenSet;
 
     Aws::Vector< ColumnInfo > m_rowColumnInfo;
     bool m_rowColumnInfoHasBeenSet;

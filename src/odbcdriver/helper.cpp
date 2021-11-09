@@ -24,7 +24,7 @@
 #include "odbc_statement.h"
 
 void* ConnectDBParams(const runtime_options& rt_opts) {
-    auto conn = new TSCommunication();
+    auto conn = new DBCommunication();
     if (conn != nullptr) {
         try {
             conn->Setup(rt_opts);
