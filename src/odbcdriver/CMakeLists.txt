@@ -56,7 +56,19 @@ set(CPP_SOURCE_FILES	communication.cpp
 						utility.cpp
 						odbc_communication.cpp
 						prefetch_queue.cpp
+						CancelQueryRequest.cpp
+						CancelQueryResult.cpp
 						ColumnInfo.cpp
+						DatabaseQueryClient.cpp
+						DatabaseQueryEndpoint.cpp
+						DatabaseQueryErrors.cpp
+						DatabaseQueryErrorMarshaller.cpp
+						DescribeEndpointsRequest.cpp
+						DescribeEndpointsResult.cpp
+						Endpoint.cpp
+						QueryRequest.cpp
+						QueryResult.cpp
+						QueryStatus.cpp
 						Row.cpp
 						ScalarType.cpp
 						Type.cpp
@@ -100,7 +112,20 @@ set(CPP_HEADER_FILES	communication.h
 						odbc_communication.h
 						prefetch_queue.h
 						version.h
+						CancelQueryRequest.h
+						CancelQueryResult.h
 						ColumnInfo.h
+						DatabaseQueryClient.h
+						DatabaseQueryEndpoint.h
+						DatabaseQueryErrors.h
+						DatabaseQueryErrorMarshaller.h
+						DatabaseQueryRequest.h
+						DescribeEndpointsRequest.h
+						DescribeEndpointsResult.h
+						Endpoint.h
+						QueryRequest.h
+						QueryResult.h
+						QueryStatus.h
 						Row.h
 						ScalarType.h
 						Type.h

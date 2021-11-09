@@ -18,7 +18,7 @@
 
 #include <queue>
 #include <future>
-#include <aws/timestream-query/TimestreamQueryClient.h>
+#include "DatabaseQueryClient.h"
 
 /**
  * PrefetchQueue class for query
@@ -34,7 +34,7 @@ class PrefetchQueue {
      * @param future_outcome std::shared_future< Aws::TimestreamQuery::Model::QueryOutcome >
      * @return bool
      */
-    bool Push(std::shared_future< Aws::TimestreamQuery::Model::QueryOutcome > future_outcome);
+    bool Push(std::shared_future< QueryOutcome > future_outcome);
     /**
      * Pop function
      * @return void
@@ -44,7 +44,7 @@ class PrefetchQueue {
      * Front function
      * @return Aws::TimestreamQuery::Model::QueryOutcome
      */
-    Aws::TimestreamQuery::Model::QueryOutcome Front();
+    QueryOutcome Front();
     /**
      * Check the readiness of the front
      * It could be interrupted by if the caller cancels
@@ -83,7 +83,7 @@ class PrefetchQueue {
      * The queue storing the future object
      * If future object is not ready, it means AWS is still processing the corresponding query request
      */
-    std::queue< std::shared_future< Aws::TimestreamQuery::Model::QueryOutcome > > queue;
+    std::queue< std::shared_future< QueryOutcome > > queue;
     /**
      * If true, it is in retrieving state
      */

@@ -285,7 +285,6 @@ void CompareStrNumChar(const test_string& expected, const SQLINTEGER num_chars,
 test_string conn_string() {
     std::vector< std::pair< test_string, test_string > > conn_str_pair = {
         {IT_DRIVER, CREATE_STRING("timestreamodbc")},
-        {IT_REGION, CREATE_STRING("us-east-1")},
         {IT_AUTH, CREATE_STRING("AWS_PROFILE")},
         {IT_LOGLEVEL, CREATE_STRING("5")}}; // DEBUG level logging
 
@@ -301,7 +300,6 @@ test_string conn_string() {
 test_string perf_conn_string() {
     std::vector< std::pair< test_string, test_string > > conn_str_pair = {
         {IT_DRIVER, CREATE_STRING("timestreamodbc")},
-        {IT_REGION, CREATE_STRING("us-east-2")},
         {IT_AUTH, CREATE_STRING("AWS_PROFILE")},
         {IT_LOGLEVEL, CREATE_STRING("0")}};
 

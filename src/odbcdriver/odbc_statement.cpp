@@ -21,7 +21,7 @@
 #include "helper.h"
 #include "misc.h"
 #include "statement.h"
-#include <aws/timestream-query/TimestreamQueryClient.h>
+#include "DatabaseQueryClient.h"
 
 extern "C" void *common_cs;
 
