@@ -4,11 +4,18 @@
  */
 
 #pragma once
-#include <aws/timestream-query/TimestreamQuery_EXPORTS.h>
 #include <aws/core/utils/memory/stl/AWSString.h>
-#include <aws/core/utils/json/JsonSerializer.h>
 #include <utility>
 #include <memory>
+
+namespace Aws {
+namespace Utils {
+namespace Json {
+class JsonValue;
+class JsonView;
+}  // namespace Json
+}  // namespace Utils
+}  // namespace Aws
 
 class Type;
 

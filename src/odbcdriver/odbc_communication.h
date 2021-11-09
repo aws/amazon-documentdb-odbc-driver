@@ -17,7 +17,7 @@
 #ifndef DB_COMMUNICATION
 #define DB_COMMUNICATION
 
-#include <aws/timestream-query/TimestreamQueryClient.h>
+#include "DatabaseQueryClient.h"
 
 #include <memory>
 #include <string>
@@ -29,11 +29,11 @@
 /**
  * AWS Timestream communication class
  */
-class TSCommunication : public Communication {
+class DBCommunication : public Communication {
    public:
-    TSCommunication();
+    DBCommunication();
 
-    ~TSCommunication();
+    ~DBCommunication();
 
     /**
      * Validate options
@@ -96,7 +96,7 @@ class TSCommunication : public Communication {
      * @param options const runtime_options&
      * @return std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient >
      */
-    std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient >
+    std::unique_ptr< DatabaseQueryClient >
       CreateQueryClient(const runtime_options& options);
 
     /**
@@ -108,7 +108,7 @@ class TSCommunication : public Communication {
     /**
      * Timestream query client
      */
-    std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient > m_client;
+    std::unique_ptr< DatabaseQueryClient > m_client;
 };
 
 #endif

@@ -15,7 +15,7 @@
  */
 #include "prefetch_queue.h"
 
-bool PrefetchQueue::Push(std::shared_future< Aws::TimestreamQuery::Model::QueryOutcome > future_outcome) {
+bool PrefetchQueue::Push(std::shared_future< QueryOutcome > future_outcome) {
     std::unique_lock< std::mutex > lock(mutex);
     condition_variable.wait(
         lock, [&]() { return queue.size() < CAPACITY || !retrieving; });
@@ -38,7 +38,7 @@ void PrefetchQueue::Pop() {
     condition_variable.notify_one();
 }
 
-Aws::TimestreamQuery::Model::QueryOutcome PrefetchQueue::Front() {
+QueryOutcome PrefetchQueue::Front() {
     auto outcome = queue.front().get();
     return outcome;
 }

@@ -31,7 +31,7 @@ TEST(TestConnectionOptions, Good) {
     options.auth.uid = "UID";
     options.auth.pwd = "PWD";
     options.auth.auth_type = AUTHTYPE_DEFAULT;
-    TSCommunication conn;    
+    DBCommunication conn;    
     EXPECT_NO_THROW(conn.Validate(options));
     EXPECT_TRUE(conn.Validate(options));
 }
@@ -41,7 +41,7 @@ TEST(TestConnectionOptions, UID_is_empty) {
     options.auth.uid = "";
     options.auth.pwd = "PWD";
     options.auth.auth_type = AUTHTYPE_DEFAULT;
-    TSCommunication conn;
+    DBCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
 
@@ -50,7 +50,7 @@ TEST(TestConnectionOptions, PWD_is_empty) {
     options.auth.uid = "UID";
     options.auth.pwd = "";
     options.auth.auth_type = AUTHTYPE_DEFAULT;
-    TSCommunication conn;
+    DBCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
 
@@ -59,7 +59,7 @@ TEST(TestConnectionOptions, Auth_type_is_empty) {
     options.auth.uid = "UID";
     options.auth.pwd = "PWD";
     options.auth.auth_type = "";
-    TSCommunication conn;
+    DBCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
 
@@ -69,12 +69,12 @@ TEST(TestConnectionOptions, Timeout_is_alpha) {
     options.auth.pwd = "PWD";
     options.auth.auth_type = "";
     options.conn.timeout = "timeout";
-    TSCommunication conn;
+    DBCommunication conn;
     EXPECT_THROW(conn.Validate(options), std::invalid_argument);
 }
 
 TEST(TestGetUserAgent, Success) {
-    TSCommunication conn;
+    DBCommunication conn;
     std::string expected = "ts-odbc." TIMESTREAMDRIVERVERSION " [tests]";
     EXPECT_EQ(expected, conn.GetUserAgent());
 }

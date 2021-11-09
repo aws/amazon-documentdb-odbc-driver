@@ -20,7 +20,7 @@
 #include "dlg_specific.h"
 #include "odbc.h"
 #ifdef __cplusplus
-#include <aws/timestream-query/model/QueryResult.h>
+#include "QueryResult.h"
 extern "C" {
 #endif
 /* the type numbers are defined by the OID's of the types' rows */

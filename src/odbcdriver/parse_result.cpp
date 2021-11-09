@@ -27,7 +27,7 @@ typedef std::vector< std::pair< std::string, OID > > schema_type;
 bool _CC_from_TSResult(
     QResultClass *q_res, ConnectionClass *conn, StatementClass *stmt,
     const char *next_token,
-    const Aws::TimestreamQuery::Model::QueryOutcome &result);
+    const QueryOutcome &result);
 
 /**
  * Responsible for looping through columns, allocating memory for column fields
@@ -37,7 +37,7 @@ bool _CC_from_TSResult(
  * @return true if successfully assigned
  */
 bool AssignColumnHeaders(QResultClass *q_res,
-    const Aws::TimestreamQuery::Model::QueryOutcome &result);
+    const QueryOutcome &result);
 
 /**
  * Responsible for looping through rows, allocating tuples and passing rows for
@@ -47,7 +47,7 @@ bool AssignColumnHeaders(QResultClass *q_res,
  * @param fields ColumnInfoClass to get information about columns
  * @return true if successfully assigned
  */
-bool AssignTableData(const Aws::TimestreamQuery::Model::QueryOutcome &result,
+bool AssignTableData(const QueryOutcome &result,
                      QResultClass *q_res, ColumnInfoClass &fields);
 
 /**
@@ -58,7 +58,7 @@ bool AssignTableData(const Aws::TimestreamQuery::Model::QueryOutcome &result,
  * @param col_size size of the column
  * @return true if successfully assigned
  */
-bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
+bool AssignRowData(const Row &row,
                    QResultClass *q_res, ColumnInfoClass &fields,
                    const size_t &col_size);
 void UpdateResultFields(QResultClass *q_res, const ConnectionClass *conn,
@@ -75,7 +75,7 @@ void ClearError();
  * @param datum_value String representation of the datum to fill in recursively
  * @param column_attr_id Column attribute ID
  */
-void ParseDatum(const Aws::TimestreamQuery::Model::Datum &datum,
+void ParseDatum(const Datum &datum,
                 std::string &datum_value, OID column_attr_id);
 
 /**
@@ -86,7 +86,7 @@ void ParseDatum(const Aws::TimestreamQuery::Model::Datum &datum,
  * @param array_value String representation of the datum to fill in recursively
  * @param column_attr_id Column attribute ID
  */
-void ParseArray(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
+void ParseArray(const Aws::Vector< Datum > &datums,
                 std::string &array_value, OID column_attr_id);
 
 /**
@@ -97,7 +97,7 @@ void ParseArray(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
  * @param row_value String representation of the datum to fill in recursively
  * @param column_attr_id Column attribute ID
  */
-void ParseRow(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
+void ParseRow(const Aws::Vector< Datum > &datums,
               std::string &row_value, OID column_attr_id);
 
 
@@ -115,30 +115,30 @@ static const std::string JSON_KW_CURSOR = "cursor";
 
 #define DB_VARCHAR_SIZE (-2)
 
-const std::map< Aws::TimestreamQuery::Model::ScalarType,
+const std::map< ScalarType,
                           std::pair< OID, int16_t > >
     scalar_type_to_oid_size_map = {
-        {Aws::TimestreamQuery::Model::ScalarType::BIGINT,
+        {ScalarType::BIGINT,
          std::make_pair(DB_TYPE_BIGINT, (int16_t)8)},
-        {Aws::TimestreamQuery::Model::ScalarType::BOOLEAN,
+        {ScalarType::BOOLEAN,
          std::make_pair(DB_TYPE_BOOLEAN, (int16_t)1)},
-        {Aws::TimestreamQuery::Model::ScalarType::DATE,
+        {ScalarType::DATE,
          std::make_pair(DB_TYPE_DATE, (int16_t)6)},
-        {Aws::TimestreamQuery::Model::ScalarType::DOUBLE,
+        {ScalarType::DOUBLE,
          std::make_pair(DB_TYPE_DOUBLE, (int16_t)8)},
-        {Aws::TimestreamQuery::Model::ScalarType::INTEGER,
+        {ScalarType::INTEGER,
          std::make_pair(DB_TYPE_INTEGER, (int16_t)4)},
-        {Aws::TimestreamQuery::Model::ScalarType::INTERVAL_DAY_TO_SECOND,
+        {ScalarType::INTERVAL_DAY_TO_SECOND,
          std::make_pair(DB_TYPE_VARCHAR, (int16_t)DB_VARCHAR_SIZE)},
-        {Aws::TimestreamQuery::Model::ScalarType::INTERVAL_YEAR_TO_MONTH,
+        {ScalarType::INTERVAL_YEAR_TO_MONTH,
          std::make_pair(DB_TYPE_VARCHAR, (int16_t)DB_VARCHAR_SIZE)},
-        {Aws::TimestreamQuery::Model::ScalarType::TIME,
+        {ScalarType::TIME,
          std::make_pair(DB_TYPE_TIME, (int16_t)6)},
-        {Aws::TimestreamQuery::Model::ScalarType::TIMESTAMP,
+        {ScalarType::TIMESTAMP,
          std::make_pair(DB_TYPE_TIMESTAMP, (int16_t)16)},
-        {Aws::TimestreamQuery::Model::ScalarType::VARCHAR,
+        {ScalarType::VARCHAR,
          std::make_pair(DB_TYPE_VARCHAR, (int16_t)DB_VARCHAR_SIZE)},
-        {Aws::TimestreamQuery::Model::ScalarType::UNKNOWN,
+        {ScalarType::UNKNOWN,
          std::make_pair(DB_TYPE_VARCHAR, (int16_t)DB_VARCHAR_SIZE)},
 };
 
@@ -159,14 +159,14 @@ std::string GetResultParserError() {
 BOOL CC_from_TSResult(
     QResultClass *q_res, ConnectionClass *conn, StatementClass *stmt,
     const char *next_token,
-    const Aws::TimestreamQuery::Model::QueryOutcome &result) {
+    const QueryOutcome &result) {
     ClearError();
     return _CC_from_TSResult(q_res, conn, stmt, next_token, result) ? TRUE
                                                                        : FALSE;
 }
 
 BOOL CC_Append_Table_Data(
-    const Aws::TimestreamQuery::Model::QueryOutcome &result,
+    const QueryOutcome &result,
     QResultClass *q_res, ColumnInfoClass &fields) {
     ClearError();
     return AssignTableData(result, q_res, fields)
@@ -177,7 +177,7 @@ BOOL CC_Append_Table_Data(
 bool _CC_from_TSResult(
     QResultClass *q_res, ConnectionClass *conn, StatementClass *stmt,
     const char *next_token,
-    const Aws::TimestreamQuery::Model::QueryOutcome &result) {
+    const QueryOutcome &result) {
     CSTR func = "_CC_from_TSResult";
     // Note - NULL conn and/or cursor is valid
     if (q_res == NULL)
@@ -210,7 +210,7 @@ bool _CC_from_TSResult(
 }
 
 bool AssignColumnHeaders(QResultClass *q_res,
-    const Aws::TimestreamQuery::Model::QueryOutcome &outcome) {
+    const QueryOutcome &outcome) {
     // Allocte memory for column fields
     const auto &column_info = outcome.GetResult().GetColumnInfo();
     QR_set_num_fields(q_res, (uint16_t)column_info.size());
@@ -244,9 +244,6 @@ bool AssignColumnHeaders(QResultClass *q_res,
             } else if (type.RowColumnInfoHasBeenSet()) {
                 column_type_id = DB_TYPE_VARCHAR;
                 column_size = DB_VARCHAR_SIZE;
-            } else if (type.TimeSeriesMeasureValueColumnInfoHasBeenSet()) {
-                column_type_id = DB_TYPE_VARCHAR;
-                column_size = DB_VARCHAR_SIZE;
             } else {
                 throw std::runtime_error("Unsupported Timestream type.");
             }
@@ -261,7 +258,7 @@ bool AssignColumnHeaders(QResultClass *q_res,
     return true;
 }
 
-bool AssignTableData(const Aws::TimestreamQuery::Model::QueryOutcome &outcome,
+bool AssignTableData(const QueryOutcome &outcome,
                      QResultClass *q_res, ColumnInfoClass &fields) {
     auto rows = outcome.GetResult().GetRows();
     auto col_size = outcome.GetResult().GetColumnInfo().size();
@@ -277,7 +274,7 @@ bool AssignTableData(const Aws::TimestreamQuery::Model::QueryOutcome &outcome,
     return true;
 }
 
-void ParseDatum(const Aws::TimestreamQuery::Model::Datum &datum,
+void ParseDatum(const Datum &datum,
                 std::string &datum_value, OID column_attr_id) {
     if (datum.ScalarValueHasBeenSet()) {
         auto scalar_value = datum.GetScalarValue();
@@ -302,7 +299,7 @@ void ParseDatum(const Aws::TimestreamQuery::Model::Datum &datum,
     }
 }
 
-void ParseArray(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > & datums, std::string& array_value, OID column_attr_id) {
+void ParseArray(const Aws::Vector< Datum > & datums, std::string& array_value, OID column_attr_id) {
     if (datums.size() == 0) {
         array_value += "-";
     } else {
@@ -321,7 +318,7 @@ void ParseArray(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > & datums
     }
 }
 
-void ParseRow(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
+void ParseRow(const Aws::Vector< Datum > &datums,
               std::string &row_value, OID column_attr_id) {
     row_value += "(";
     for (auto &datum : datums) {
@@ -337,7 +334,7 @@ void ParseRow(const Aws::Vector< Aws::TimestreamQuery::Model::Datum > &datums,
     row_value += ")";
 }
 
-bool AssignRowData(const Aws::TimestreamQuery::Model::Row &row,
+bool AssignRowData(const Row &row,
                    QResultClass *q_res, ColumnInfoClass &fields,
                    const size_t &col_size) {
     TupleField *tuple =
