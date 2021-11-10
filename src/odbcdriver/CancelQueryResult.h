@@ -4,7 +4,7 @@
  */
 
 #pragma once
-#include <aws/core/utils/memory/stl/AWSString.h>
+#include <string>
 
 #include <utility>
 
@@ -34,7 +34,7 @@ class CancelQueryResult {
      * <code>CancelQuery</code> request for the query specified by
      * <code>QueryId</code> has already been issued. </p>
      */
-    inline const Aws::String& GetCancellationMessage() const {
+    inline const std::string& GetCancellationMessage() const {
         return m_cancellationMessage;
     }
 
@@ -43,7 +43,7 @@ class CancelQueryResult {
      * <code>CancelQuery</code> request for the query specified by
      * <code>QueryId</code> has already been issued. </p>
      */
-    inline void SetCancellationMessage(const Aws::String& value) {
+    inline void SetCancellationMessage(const std::string& value) {
         m_cancellationMessage = value;
     }
 
@@ -52,7 +52,7 @@ class CancelQueryResult {
      * <code>CancelQuery</code> request for the query specified by
      * <code>QueryId</code> has already been issued. </p>
      */
-    inline void SetCancellationMessage(Aws::String&& value) {
+    inline void SetCancellationMessage(std::string&& value) {
         m_cancellationMessage = std::move(value);
     }
 
@@ -71,7 +71,7 @@ class CancelQueryResult {
      * <code>QueryId</code> has already been issued. </p>
      */
     inline CancelQueryResult& WithCancellationMessage(
-        const Aws::String& value) {
+        const std::string& value) {
         SetCancellationMessage(value);
         return *this;
     }
@@ -81,7 +81,7 @@ class CancelQueryResult {
      * <code>CancelQuery</code> request for the query specified by
      * <code>QueryId</code> has already been issued. </p>
      */
-    inline CancelQueryResult& WithCancellationMessage(Aws::String&& value) {
+    inline CancelQueryResult& WithCancellationMessage(std::string&& value) {
         SetCancellationMessage(std::move(value));
         return *this;
     }
@@ -97,5 +97,5 @@ class CancelQueryResult {
     }
 
    private:
-    Aws::String m_cancellationMessage;
+    std::string m_cancellationMessage;
 };

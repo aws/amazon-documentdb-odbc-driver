@@ -4,7 +4,7 @@
  */
 
 #pragma once
-#include <aws/core/utils/memory/stl/AWSString.h>
+#include <string>
 
 enum class ScalarType {
     NOT_SET,
@@ -22,6 +22,6 @@ enum class ScalarType {
 };
 
 namespace ScalarTypeMapper {
-    ScalarType GetScalarTypeForName(const Aws::String& name);
-    Aws::String GetNameForScalarType(ScalarType value);
+    ScalarType GetScalarTypeForName(const std::string& name);
+    std::string GetNameForScalarType(ScalarType value);
 }

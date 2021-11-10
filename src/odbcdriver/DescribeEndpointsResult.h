@@ -4,7 +4,7 @@
  */
 
 #pragma once
-#include <aws/core/utils/memory/stl/AWSVector.h>
+#include <vector>
 #include <utility>
 
 #include "Endpoint.h"
@@ -34,7 +34,7 @@ class DescribeEndpointsResult {
      * <p>An <code>Endpoints</code> object is returned when a
      * <code>DescribeEndpoints</code> request is made.</p>
      */
-    inline const Aws::Vector< Endpoint >& GetEndpoints() const {
+    inline const std::vector< Endpoint >& GetEndpoints() const {
         return m_endpoints;
     }
 
@@ -42,7 +42,7 @@ class DescribeEndpointsResult {
      * <p>An <code>Endpoints</code> object is returned when a
      * <code>DescribeEndpoints</code> request is made.</p>
      */
-    inline void SetEndpoints(const Aws::Vector< Endpoint >& value) {
+    inline void SetEndpoints(const std::vector< Endpoint >& value) {
         m_endpoints = value;
     }
 
@@ -50,7 +50,7 @@ class DescribeEndpointsResult {
      * <p>An <code>Endpoints</code> object is returned when a
      * <code>DescribeEndpoints</code> request is made.</p>
      */
-    inline void SetEndpoints(Aws::Vector< Endpoint >&& value) {
+    inline void SetEndpoints(std::vector< Endpoint >&& value) {
         m_endpoints = std::move(value);
     }
 
@@ -59,7 +59,7 @@ class DescribeEndpointsResult {
      * <code>DescribeEndpoints</code> request is made.</p>
      */
     inline DescribeEndpointsResult& WithEndpoints(
-        const Aws::Vector< Endpoint >& value) {
+        const std::vector< Endpoint >& value) {
         SetEndpoints(value);
         return *this;
     }
@@ -69,7 +69,7 @@ class DescribeEndpointsResult {
      * <code>DescribeEndpoints</code> request is made.</p>
      */
     inline DescribeEndpointsResult& WithEndpoints(
-        Aws::Vector< Endpoint >&& value) {
+        std::vector< Endpoint >&& value) {
         SetEndpoints(std::move(value));
         return *this;
     }
@@ -93,5 +93,5 @@ class DescribeEndpointsResult {
     }
 
    private:
-    Aws::Vector< Endpoint > m_endpoints;
+    std::vector< Endpoint > m_endpoints;
 };

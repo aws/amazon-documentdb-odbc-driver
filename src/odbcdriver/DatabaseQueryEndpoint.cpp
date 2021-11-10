@@ -4,7 +4,7 @@
  */
 
 #include <aws/core/utils/HashingUtils.h>
-#include <aws/core/utils/memory/stl/AWSStringStream.h>
+#include <sstream>
 #include "DatabaseQueryEndpoint.h"
 
 namespace DatabaseQueryEndpoint {
@@ -17,14 +17,14 @@ static const int US_ISO_EAST_1_HASH =
 static const int US_ISOB_EAST_1_HASH =
     Aws::Utils::HashingUtils::HashString("us-isob-east-1");
 
-Aws::String ForRegion(const Aws::String& regionName, bool useDualStack) {
+std::string ForRegion(const std::string& regionName, bool useDualStack) {
     // Fallback to us-east-1 if global endpoint does not exists.
-    Aws::String region = regionName == Aws::Region::AWS_GLOBAL
+    std::string region = regionName == Aws::Region::AWS_GLOBAL
                              ? Aws::Region::US_EAST_1
                              : regionName;
     auto hash = Aws::Utils::HashingUtils::HashString(region.c_str());
 
-    Aws::StringStream ss;
+    std::stringstream ss;
     ss << "query.database"
        << ".";
 

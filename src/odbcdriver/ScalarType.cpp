@@ -25,7 +25,7 @@ namespace ScalarTypeMapper {
     static const int UNKNOWN_HASH = HashingUtils::HashString("UNKNOWN");
     static const int INTEGER_HASH = HashingUtils::HashString("INTEGER");
 
-    ScalarType GetScalarTypeForName(const Aws::String& name) {
+    ScalarType GetScalarTypeForName(const std::string& name) {
         int hashCode = HashingUtils::HashString(name.c_str());
         if (hashCode == VARCHAR_HASH) {
             return ScalarType::VARCHAR;
@@ -60,7 +60,7 @@ namespace ScalarTypeMapper {
         return ScalarType::NOT_SET;
     }
 
-    Aws::String GetNameForScalarType(ScalarType enumValue) {
+    std::string GetNameForScalarType(ScalarType enumValue) {
         switch (enumValue) {
             case ScalarType::VARCHAR:
                 return "VARCHAR";

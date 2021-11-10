@@ -4,7 +4,7 @@
  */
 
 #pragma once
-#include <aws/core/utils/memory/stl/AWSVector.h>
+#include <vector>
 #include "Datum.h"
 #include <utility>
 
@@ -32,7 +32,7 @@ class Row {
     /**
      * <p>List of data points in a single row of the result set.</p>
      */
-    inline const Aws::Vector< Datum >& GetData()
+    inline const std::vector< Datum >& GetData()
         const {
         return m_data;
     }
@@ -48,7 +48,7 @@ class Row {
      * <p>List of data points in a single row of the result set.</p>
      */
     inline void SetData(
-        const Aws::Vector< Datum >& value) {
+        const std::vector< Datum >& value) {
         m_dataHasBeenSet = true;
         m_data = value;
     }
@@ -57,7 +57,7 @@ class Row {
      * <p>List of data points in a single row of the result set.</p>
      */
     inline void SetData(
-        Aws::Vector< Datum >&& value) {
+        std::vector< Datum >&& value) {
         m_dataHasBeenSet = true;
         m_data = std::move(value);
     }
@@ -66,7 +66,7 @@ class Row {
      * <p>List of data points in a single row of the result set.</p>
      */
     inline Row& WithData(
-        const Aws::Vector< Datum >& value) {
+        const std::vector< Datum >& value) {
         SetData(value);
         return *this;
     }
@@ -75,7 +75,7 @@ class Row {
      * <p>List of data points in a single row of the result set.</p>
      */
     inline Row& WithData(
-        Aws::Vector< Datum >&& value) {
+        std::vector< Datum >&& value) {
         SetData(std::move(value));
         return *this;
     }
@@ -99,6 +99,6 @@ class Row {
     }
 
    private:
-    Aws::Vector< Datum > m_data;
+    std::vector< Datum > m_data;
     bool m_dataHasBeenSet;
 };

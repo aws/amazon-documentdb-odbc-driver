@@ -4,7 +4,7 @@
  */
 
 #pragma once
-#include <aws/core/utils/memory/stl/AWSString.h>
+#include <string>
 
 #include "DatabaseQueryRequest.h"
 
@@ -23,7 +23,7 @@ class CancelQueryRequest : public DatabaseQueryRequest {
         return "CancelQuery";
     }
 
-    Aws::String SerializePayload() const override;
+    std::string SerializePayload() const override;
 
     Aws::Http::HeaderValueCollection GetRequestSpecificHeaders() const override;
 
@@ -31,7 +31,7 @@ class CancelQueryRequest : public DatabaseQueryRequest {
      * <p> The id of the query that needs to be cancelled. <code>QueryID</code>
      * is returned as part of QueryResult. </p>
      */
-    inline const Aws::String& GetQueryId() const {
+    inline const std::string& GetQueryId() const {
         return m_queryId;
     }
 
@@ -47,7 +47,7 @@ class CancelQueryRequest : public DatabaseQueryRequest {
      * <p> The id of the query that needs to be cancelled. <code>QueryID</code>
      * is returned as part of QueryResult. </p>
      */
-    inline void SetQueryId(const Aws::String& value) {
+    inline void SetQueryId(const std::string& value) {
         m_queryIdHasBeenSet = true;
         m_queryId = value;
     }
@@ -56,7 +56,7 @@ class CancelQueryRequest : public DatabaseQueryRequest {
      * <p> The id of the query that needs to be cancelled. <code>QueryID</code>
      * is returned as part of QueryResult. </p>
      */
-    inline void SetQueryId(Aws::String&& value) {
+    inline void SetQueryId(std::string&& value) {
         m_queryIdHasBeenSet = true;
         m_queryId = std::move(value);
     }
@@ -74,7 +74,7 @@ class CancelQueryRequest : public DatabaseQueryRequest {
      * <p> The id of the query that needs to be cancelled. <code>QueryID</code>
      * is returned as part of QueryResult. </p>
      */
-    inline CancelQueryRequest& WithQueryId(const Aws::String& value) {
+    inline CancelQueryRequest& WithQueryId(const std::string& value) {
         SetQueryId(value);
         return *this;
     }
@@ -83,7 +83,7 @@ class CancelQueryRequest : public DatabaseQueryRequest {
      * <p> The id of the query that needs to be cancelled. <code>QueryID</code>
      * is returned as part of QueryResult. </p>
      */
-    inline CancelQueryRequest& WithQueryId(Aws::String&& value) {
+    inline CancelQueryRequest& WithQueryId(std::string&& value) {
         SetQueryId(std::move(value));
         return *this;
     }
@@ -98,6 +98,6 @@ class CancelQueryRequest : public DatabaseQueryRequest {
     }
 
    private:
-    Aws::String m_queryId;
+    std::string m_queryId;
     bool m_queryIdHasBeenSet;
 };

@@ -4,7 +4,7 @@
  */
 
 #pragma once
-#include <aws/core/utils/memory/stl/AWSVector.h>
+#include <vector>
 #include <utility>
 #include <memory>
 #include "ScalarType.h"
@@ -119,7 +119,7 @@ class Type {
     /**
      * <p>Indicates if the column is a row.</p>
      */
-    inline const Aws::Vector< ColumnInfo >& GetRowColumnInfo() const {
+    inline const std::vector< ColumnInfo >& GetRowColumnInfo() const {
         return m_rowColumnInfo;
     }
 
@@ -133,7 +133,7 @@ class Type {
     /**
      * <p>Indicates if the column is a row.</p>
      */
-    inline void SetRowColumnInfo(const Aws::Vector< ColumnInfo >& value) {
+    inline void SetRowColumnInfo(const std::vector< ColumnInfo >& value) {
         m_rowColumnInfoHasBeenSet = true;
         m_rowColumnInfo = value;
     }
@@ -141,7 +141,7 @@ class Type {
     /**
      * <p>Indicates if the column is a row.</p>
      */
-    inline void SetRowColumnInfo(Aws::Vector< ColumnInfo >&& value) {
+    inline void SetRowColumnInfo(std::vector< ColumnInfo >&& value) {
         m_rowColumnInfoHasBeenSet = true;
         m_rowColumnInfo = std::move(value);
     }
@@ -149,7 +149,7 @@ class Type {
     /**
      * <p>Indicates if the column is a row.</p>
      */
-    inline Type& WithRowColumnInfo(const Aws::Vector< ColumnInfo >& value) {
+    inline Type& WithRowColumnInfo(const std::vector< ColumnInfo >& value) {
         SetRowColumnInfo(value);
         return *this;
     }
@@ -157,7 +157,7 @@ class Type {
     /**
      * <p>Indicates if the column is a row.</p>
      */
-    inline Type& WithRowColumnInfo(Aws::Vector< ColumnInfo >&& value) {
+    inline Type& WithRowColumnInfo(std::vector< ColumnInfo >&& value) {
         SetRowColumnInfo(std::move(value));
         return *this;
     }
@@ -187,6 +187,6 @@ class Type {
     std::shared_ptr< ColumnInfo > m_arrayColumnInfo;
     bool m_arrayColumnInfoHasBeenSet;
 
-    Aws::Vector< ColumnInfo > m_rowColumnInfo;
+    std::vector< ColumnInfo > m_rowColumnInfo;
     bool m_rowColumnInfoHasBeenSet;
 };
