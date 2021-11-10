@@ -11,7 +11,7 @@
 #include <aws/core/http/HttpTypes.h>
 #include <aws/core/utils/ConcurrentCache.h>
 #include <aws/core/utils/json/JsonSerializer.h>
-#include <aws/core/utils/memory/stl/AWSString.h>
+#include <string>
 
 #include <functional>
 #include <future>
@@ -273,7 +273,7 @@ class DatabaseQueryClient : public Aws::Client::AWSJsonClient {
         const std::shared_ptr< const Aws::Client::AsyncCallerContext >&
             context = nullptr) const;
 
-    void OverrideEndpoint(const Aws::String& endpoint);
+    void OverrideEndpoint(const std::string& endpoint);
 
    private:
     void init(const Aws::Client::ClientConfiguration& clientConfiguration);
@@ -295,10 +295,10 @@ class DatabaseQueryClient : public Aws::Client::AWSJsonClient {
         const std::shared_ptr< const Aws::Client::AsyncCallerContext >& context)
         const;
 
-    Aws::String m_uri;
-    mutable Aws::Utils::ConcurrentCache< Aws::String, Aws::String >
+    std::string m_uri;
+    mutable Aws::Utils::ConcurrentCache< std::string, std::string >
         m_endpointsCache;
     bool m_enableEndpointDiscovery;
-    Aws::String m_configScheme;
+    std::string m_configScheme;
     std::shared_ptr< Aws::Utils::Threading::Executor > m_executor;
 };

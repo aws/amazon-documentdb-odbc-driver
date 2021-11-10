@@ -22,7 +22,7 @@ class DescribeEndpointsRequest
         return "DescribeEndpoints";
     }
 
-    Aws::String SerializePayload() const override;
+    std::string SerializePayload() const override;
 
     Aws::Http::HeaderValueCollection GetRequestSpecificHeaders() const override;
 };

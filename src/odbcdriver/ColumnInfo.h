@@ -4,7 +4,7 @@
  */
 
 #pragma once
-#include <aws/core/utils/memory/stl/AWSString.h>
+#include <string>
 #include <utility>
 #include <memory>
 
@@ -36,7 +36,7 @@ class ColumnInfo {
      * <p> The name of the result set column. The name of the result set is
      * available for columns of all data types except for arrays. </p>
      */
-    inline const Aws::String& GetName() const {
+    inline const std::string& GetName() const {
         return m_name;
     }
 
@@ -52,7 +52,7 @@ class ColumnInfo {
      * <p> The name of the result set column. The name of the result set is
      * available for columns of all data types except for arrays. </p>
      */
-    inline void SetName(const Aws::String& value) {
+    inline void SetName(const std::string& value) {
         m_nameHasBeenSet = true;
         m_name = value;
     }
@@ -61,7 +61,7 @@ class ColumnInfo {
      * <p> The name of the result set column. The name of the result set is
      * available for columns of all data types except for arrays. </p>
      */
-    inline void SetName(Aws::String&& value) {
+    inline void SetName(std::string&& value) {
         m_nameHasBeenSet = true;
         m_name = std::move(value);
     }
@@ -79,7 +79,7 @@ class ColumnInfo {
      * <p> The name of the result set column. The name of the result set is
      * available for columns of all data types except for arrays. </p>
      */
-    inline ColumnInfo& WithName(const Aws::String& value) {
+    inline ColumnInfo& WithName(const std::string& value) {
         SetName(value);
         return *this;
     }
@@ -88,7 +88,7 @@ class ColumnInfo {
      * <p> The name of the result set column. The name of the result set is
      * available for columns of all data types except for arrays. </p>
      */
-    inline ColumnInfo& WithName(Aws::String&& value) {
+    inline ColumnInfo& WithName(std::string&& value) {
         SetName(std::move(value));
         return *this;
     }
@@ -151,7 +151,7 @@ class ColumnInfo {
     ColumnInfo& WithType(Type&& value);
 
    private:
-    Aws::String m_name;
+    std::string m_name;
     bool m_nameHasBeenSet;
 
     std::shared_ptr< Type > m_type;

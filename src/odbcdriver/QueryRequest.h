@@ -7,7 +7,7 @@
 #include "DatabaseQueryRequest.h"
 
 #include <aws/core/utils/UUID.h>
-#include <aws/core/utils/memory/stl/AWSString.h>
+#include <string>
 
 #include <utility>
 
@@ -26,14 +26,14 @@ class QueryRequest : public DatabaseQueryRequest {
         return "Query";
     }
 
-    Aws::String SerializePayload() const override;
+    std::string SerializePayload() const override;
 
     Aws::Http::HeaderValueCollection GetRequestSpecificHeaders() const override;
 
     /**
      * <p> The query to be executed by Timestream. </p>
      */
-    inline const Aws::String& GetQueryString() const {
+    inline const std::string& GetQueryString() const {
         return m_queryString;
     }
 
@@ -47,7 +47,7 @@ class QueryRequest : public DatabaseQueryRequest {
     /**
      * <p> The query to be executed by Timestream. </p>
      */
-    inline void SetQueryString(const Aws::String& value) {
+    inline void SetQueryString(const std::string& value) {
         m_queryStringHasBeenSet = true;
         m_queryString = value;
     }
@@ -55,7 +55,7 @@ class QueryRequest : public DatabaseQueryRequest {
     /**
      * <p> The query to be executed by Timestream. </p>
      */
-    inline void SetQueryString(Aws::String&& value) {
+    inline void SetQueryString(std::string&& value) {
         m_queryStringHasBeenSet = true;
         m_queryString = std::move(value);
     }
@@ -71,7 +71,7 @@ class QueryRequest : public DatabaseQueryRequest {
     /**
      * <p> The query to be executed by Timestream. </p>
      */
-    inline QueryRequest& WithQueryString(const Aws::String& value) {
+    inline QueryRequest& WithQueryString(const std::string& value) {
         SetQueryString(value);
         return *this;
     }
@@ -79,7 +79,7 @@ class QueryRequest : public DatabaseQueryRequest {
     /**
      * <p> The query to be executed by Timestream. </p>
      */
-    inline QueryRequest& WithQueryString(Aws::String&& value) {
+    inline QueryRequest& WithQueryString(std::string&& value) {
         SetQueryString(std::move(value));
         return *this;
     }
@@ -105,7 +105,7 @@ class QueryRequest : public DatabaseQueryRequest {
      * hours, any request with the same client token is treated as a new
      * request. </p>
      */
-    inline const Aws::String& GetClientToken() const {
+    inline const std::string& GetClientToken() const {
         return m_clientToken;
     }
 
@@ -139,7 +139,7 @@ class QueryRequest : public DatabaseQueryRequest {
      * hours, any request with the same client token is treated as a new
      * request. </p>
      */
-    inline void SetClientToken(const Aws::String& value) {
+    inline void SetClientToken(const std::string& value) {
         m_clientTokenHasBeenSet = true;
         m_clientToken = value;
     }
@@ -157,7 +157,7 @@ class QueryRequest : public DatabaseQueryRequest {
      * hours, any request with the same client token is treated as a new
      * request. </p>
      */
-    inline void SetClientToken(Aws::String&& value) {
+    inline void SetClientToken(std::string&& value) {
         m_clientTokenHasBeenSet = true;
         m_clientToken = std::move(value);
     }
@@ -193,7 +193,7 @@ class QueryRequest : public DatabaseQueryRequest {
      * hours, any request with the same client token is treated as a new
      * request. </p>
      */
-    inline QueryRequest& WithClientToken(const Aws::String& value) {
+    inline QueryRequest& WithClientToken(const std::string& value) {
         SetClientToken(value);
         return *this;
     }
@@ -211,7 +211,7 @@ class QueryRequest : public DatabaseQueryRequest {
      * hours, any request with the same client token is treated as a new
      * request. </p>
      */
-    inline QueryRequest& WithClientToken(Aws::String&& value) {
+    inline QueryRequest& WithClientToken(std::string&& value) {
         SetClientToken(std::move(value));
         return *this;
     }
@@ -237,7 +237,7 @@ class QueryRequest : public DatabaseQueryRequest {
     /**
      * <p> A pagination token passed to get a set of results. </p>
      */
-    inline const Aws::String& GetNextToken() const {
+    inline const std::string& GetNextToken() const {
         return m_nextToken;
     }
 
@@ -251,7 +251,7 @@ class QueryRequest : public DatabaseQueryRequest {
     /**
      * <p> A pagination token passed to get a set of results. </p>
      */
-    inline void SetNextToken(const Aws::String& value) {
+    inline void SetNextToken(const std::string& value) {
         m_nextTokenHasBeenSet = true;
         m_nextToken = value;
     }
@@ -259,7 +259,7 @@ class QueryRequest : public DatabaseQueryRequest {
     /**
      * <p> A pagination token passed to get a set of results. </p>
      */
-    inline void SetNextToken(Aws::String&& value) {
+    inline void SetNextToken(std::string&& value) {
         m_nextTokenHasBeenSet = true;
         m_nextToken = std::move(value);
     }
@@ -275,7 +275,7 @@ class QueryRequest : public DatabaseQueryRequest {
     /**
      * <p> A pagination token passed to get a set of results. </p>
      */
-    inline QueryRequest& WithNextToken(const Aws::String& value) {
+    inline QueryRequest& WithNextToken(const std::string& value) {
         SetNextToken(value);
         return *this;
     }
@@ -283,7 +283,7 @@ class QueryRequest : public DatabaseQueryRequest {
     /**
      * <p> A pagination token passed to get a set of results. </p>
      */
-    inline QueryRequest& WithNextToken(Aws::String&& value) {
+    inline QueryRequest& WithNextToken(std::string&& value) {
         SetNextToken(std::move(value));
         return *this;
     }
@@ -343,13 +343,13 @@ class QueryRequest : public DatabaseQueryRequest {
     }
 
    private:
-    Aws::String m_queryString;
+    std::string m_queryString;
     bool m_queryStringHasBeenSet;
 
-    Aws::String m_clientToken;
+    std::string m_clientToken;
     bool m_clientTokenHasBeenSet;
 
-    Aws::String m_nextToken;
+    std::string m_nextToken;
     bool m_nextTokenHasBeenSet;
 
     int m_maxRows;

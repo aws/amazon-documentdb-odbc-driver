@@ -14,7 +14,7 @@ using namespace Aws::Utils;
 DescribeEndpointsRequest::DescribeEndpointsRequest() {
 }
 
-Aws::String DescribeEndpointsRequest::SerializePayload() const {
+std::string DescribeEndpointsRequest::SerializePayload() const {
     return "{}";
 }
 

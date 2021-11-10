@@ -5,9 +5,9 @@
 
 #pragma once
 #include <aws/core/Region.h>
-#include <aws/core/utils/memory/stl/AWSString.h>
+#include <string>
 
 namespace DatabaseQueryEndpoint 
 {
-Aws::String ForRegion(const Aws::String& regionName, bool useDualStack = false);
+std::string ForRegion(const std::string& regionName, bool useDualStack = false);
 } // namespace DatabaseQueryEndpoint
