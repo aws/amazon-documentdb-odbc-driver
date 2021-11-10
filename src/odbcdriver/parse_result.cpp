@@ -86,7 +86,7 @@ void ParseDatum(const Datum &datum,
  * @param array_value String representation of the datum to fill in recursively
  * @param column_attr_id Column attribute ID
  */
-void ParseArray(const Aws::Vector< Datum > &datums,
+void ParseArray(const std::vector< Datum > &datums,
                 std::string &array_value, OID column_attr_id);
 
 /**
@@ -97,7 +97,7 @@ void ParseArray(const Aws::Vector< Datum > &datums,
  * @param row_value String representation of the datum to fill in recursively
  * @param column_attr_id Column attribute ID
  */
-void ParseRow(const Aws::Vector< Datum > &datums,
+void ParseRow(const std::vector< Datum > &datums,
               std::string &row_value, OID column_attr_id);
 
 
@@ -299,7 +299,7 @@ void ParseDatum(const Datum &datum,
     }
 }
 
-void ParseArray(const Aws::Vector< Datum > & datums, std::string& array_value, OID column_attr_id) {
+void ParseArray(const std::vector< Datum > & datums, std::string& array_value, OID column_attr_id) {
     if (datums.size() == 0) {
         array_value += "-";
     } else {
@@ -318,7 +318,7 @@ void ParseArray(const Aws::Vector< Datum > & datums, std::string& array_value, O
     }
 }
 
-void ParseRow(const Aws::Vector< Datum > &datums,
+void ParseRow(const std::vector< Datum > &datums,
               std::string &row_value, OID column_attr_id) {
     row_value += "(";
     for (auto &datum : datums) {

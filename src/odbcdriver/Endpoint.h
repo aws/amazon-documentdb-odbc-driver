@@ -4,7 +4,7 @@
  */
 
 #pragma once
-#include <aws/core/utils/memory/stl/AWSString.h>
+#include <string>
 
 #include <utility>
 
@@ -33,7 +33,7 @@ class Endpoint {
     /**
      * <p>An endpoint address.</p>
      */
-    inline const Aws::String& GetAddress() const {
+    inline const std::string& GetAddress() const {
         return m_address;
     }
 
@@ -47,7 +47,7 @@ class Endpoint {
     /**
      * <p>An endpoint address.</p>
      */
-    inline void SetAddress(const Aws::String& value) {
+    inline void SetAddress(const std::string& value) {
         m_addressHasBeenSet = true;
         m_address = value;
     }
@@ -55,7 +55,7 @@ class Endpoint {
     /**
      * <p>An endpoint address.</p>
      */
-    inline void SetAddress(Aws::String&& value) {
+    inline void SetAddress(std::string&& value) {
         m_addressHasBeenSet = true;
         m_address = std::move(value);
     }
@@ -71,7 +71,7 @@ class Endpoint {
     /**
      * <p>An endpoint address.</p>
      */
-    inline Endpoint& WithAddress(const Aws::String& value) {
+    inline Endpoint& WithAddress(const std::string& value) {
         SetAddress(value);
         return *this;
     }
@@ -79,7 +79,7 @@ class Endpoint {
     /**
      * <p>An endpoint address.</p>
      */
-    inline Endpoint& WithAddress(Aws::String&& value) {
+    inline Endpoint& WithAddress(std::string&& value) {
         SetAddress(std::move(value));
         return *this;
     }
@@ -123,7 +123,7 @@ class Endpoint {
     }
 
    private:
-    Aws::String m_address;
+    std::string m_address;
     bool m_addressHasBeenSet;
 
     long long m_cachePeriodInMinutes;

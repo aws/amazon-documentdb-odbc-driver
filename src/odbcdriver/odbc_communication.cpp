@@ -67,7 +67,7 @@ namespace {
 
     AwsSdkHelper AWS_SDK_HELPER;
 
-    const Aws::String UA_ID_PREFIX = Aws::String("ts-odbc.");
+    const std::string UA_ID_PREFIX = std::string("db-odbc.");
     const std::string DEFAULT_CREATOR_TYPE = "DEFAULT";
 
     typedef std::function< std::unique_ptr< DatabaseQueryClient >(
@@ -209,10 +209,10 @@ void DBCommunication::StopResultRetrieval(StatementClass* stmt) {
     }
 }
 
-Aws::String DBCommunication::GetUserAgent() {
-    Aws::String program_name(GetExeProgramName());
-    Aws::String name_suffix = " [" + program_name + "]";
-    Aws::String msg = "Name of the application using the driver: " + name_suffix;
+std::string DBCommunication::GetUserAgent() {
+    std::string program_name(GetExeProgramName());
+    std::string name_suffix = " [" + program_name + "]";
+    std::string msg = "Name of the application using the driver: " + name_suffix;
     LogMsg(LOG_INFO, msg.c_str());
     return UA_ID_PREFIX + GetVersion() + name_suffix;
 }

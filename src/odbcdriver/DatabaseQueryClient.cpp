@@ -15,7 +15,6 @@
 #include <aws/core/utils/Outcome.h>
 #include <aws/core/utils/json/JsonSerializer.h>
 #include <aws/core/utils/logging/LogMacros.h>
-#include <aws/core/utils/memory/stl/AWSStringStream.h>
 #include <aws/core/utils/threading/Executor.h>
 #include "DatabaseQueryClient.h"
 #include "DatabaseQueryEndpoint.h"
@@ -103,7 +102,7 @@ void DatabaseQueryClient::LoadDatabaseQuerySpecificConfig(
     } else {
         m_enableEndpointDiscovery = true;
 
-        Aws::String enableEndpointDiscovery =
+        std::string enableEndpointDiscovery =
             Aws::Environment::GetEnv("AWS_ENABLE_ENDPOINT_DISCOVERY");
         if (enableEndpointDiscovery.empty()) {
             enableEndpointDiscovery = Aws::Config::GetCachedConfigValue(
@@ -124,7 +123,7 @@ void DatabaseQueryClient::LoadDatabaseQuerySpecificConfig(
     }
 }
 
-void DatabaseQueryClient::OverrideEndpoint(const Aws::String& endpoint) {
+void DatabaseQueryClient::OverrideEndpoint(const std::string& endpoint) {
     if (endpoint.compare(0, 7, "http://") == 0
         || endpoint.compare(0, 8, "https://") == 0) {
         m_uri = endpoint;
@@ -138,8 +137,8 @@ CancelQueryOutcome DatabaseQueryClient::CancelQuery(
     const CancelQueryRequest& request) const {
     Aws::Http::URI uri = m_uri;
     if (m_enableEndpointDiscovery) {
-        Aws::String endpointKey = "Shared";
-        Aws::String endpoint;
+        std::string endpointKey = "Shared";
+        std::string endpoint;
         if (m_endpointsCache.Get(endpointKey, endpoint)) {
             AWS_LOGSTREAM_TRACE(
                 "CancelQuery",
@@ -178,7 +177,7 @@ CancelQueryOutcome DatabaseQueryClient::CancelQuery(
             }
         }
     } else {
-        Aws::String errorMessage =
+        std::string errorMessage =
             R"(Unable to perform "CancelQuery" without endpoint discovery. )"
             R"(Make sure your environment variable "AWS_ENABLE_ENDPOINT_DISCOVERY", )"
             R"(your config file's variable "endpoint_discovery_enabled" and )"
@@ -262,8 +261,8 @@ void DatabaseQueryClient::DescribeEndpointsAsyncHelper(
 QueryOutcome DatabaseQueryClient::Query(const QueryRequest& request) const {
     Aws::Http::URI uri = m_uri;
     if (m_enableEndpointDiscovery) {
-        Aws::String endpointKey = "Shared";
-        Aws::String endpoint;
+        std::string endpointKey = "Shared";
+        std::string endpoint;
         if (m_endpointsCache.Get(endpointKey, endpoint)) {
             AWS_LOGSTREAM_TRACE(
                 "Query", "Making request to cached endpoint: " << endpoint);
@@ -300,7 +299,7 @@ QueryOutcome DatabaseQueryClient::Query(const QueryRequest& request) const {
             }
         }
     } else {
-        Aws::String errorMessage =
+        std::string errorMessage =
             R"(Unable to perform "Query" without endpoint discovery. )"
             R"(Make sure your environment variable "AWS_ENABLE_ENDPOINT_DISCOVERY", )"
             R"(your config file's variable "endpoint_discovery_enabled" and )"
