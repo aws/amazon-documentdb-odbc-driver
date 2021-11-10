@@ -88,7 +88,7 @@ class DBCommunication : public Communication {
      * Get the user agent for Aws::Client::ClientConfiguration.
      * @return the user agent.
      */
-    Aws::String GetUserAgent();
+    std::string GetUserAgent();
 
    private:
     /**

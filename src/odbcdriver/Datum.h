@@ -4,8 +4,8 @@
  */
 
 #pragma once
-#include <aws/core/utils/memory/stl/AWSString.h>
-#include <aws/core/utils/memory/stl/AWSVector.h>
+#include <string>
+#include <vector>
 #include <utility>
 #include <memory>
 
@@ -39,7 +39,7 @@ class Row;
      * <p> Indicates if the data point is a scalar value such as integer, string,
      * double, or boolean. </p>
      */
-    inline const Aws::String& GetScalarValue() const{ return m_scalarValue; }
+    inline const std::string& GetScalarValue() const{ return m_scalarValue; }
 
     /**
      * <p> Indicates if the data point is a scalar value such as integer, string,
@@ -51,13 +51,13 @@ class Row;
      * <p> Indicates if the data point is a scalar value such as integer, string,
      * double, or boolean. </p>
      */
-    inline void SetScalarValue(const Aws::String& value) { m_scalarValueHasBeenSet = true; m_scalarValue = value; }
+    inline void SetScalarValue(const std::string& value) { m_scalarValueHasBeenSet = true; m_scalarValue = value; }
 
     /**
      * <p> Indicates if the data point is a scalar value such as integer, string,
      * double, or boolean. </p>
      */
-    inline void SetScalarValue(Aws::String&& value) { m_scalarValueHasBeenSet = true; m_scalarValue = std::move(value); }
+    inline void SetScalarValue(std::string&& value) { m_scalarValueHasBeenSet = true; m_scalarValue = std::move(value); }
 
     /**
      * <p> Indicates if the data point is a scalar value such as integer, string,
@@ -69,13 +69,13 @@ class Row;
      * <p> Indicates if the data point is a scalar value such as integer, string,
      * double, or boolean. </p>
      */
-    inline Datum& WithScalarValue(const Aws::String& value) { SetScalarValue(value); return *this;}
+    inline Datum& WithScalarValue(const std::string& value) { SetScalarValue(value); return *this;}
 
     /**
      * <p> Indicates if the data point is a scalar value such as integer, string,
      * double, or boolean. </p>
      */
-    inline Datum& WithScalarValue(Aws::String&& value) { SetScalarValue(std::move(value)); return *this;}
+    inline Datum& WithScalarValue(std::string&& value) { SetScalarValue(std::move(value)); return *this;}
 
     /**
      * <p> Indicates if the data point is a scalar value such as integer, string,
@@ -88,7 +88,7 @@ class Row;
     /**
      * <p> Indicates if the data point is an array. </p>
      */
-    inline const Aws::Vector<Datum>& GetArrayValue() const{ return m_arrayValue; }
+    inline const std::vector<Datum>& GetArrayValue() const{ return m_arrayValue; }
 
     /**
      * <p> Indicates if the data point is an array. </p>
@@ -98,22 +98,22 @@ class Row;
     /**
      * <p> Indicates if the data point is an array. </p>
      */
-    inline void SetArrayValue(const Aws::Vector<Datum>& value) { m_arrayValueHasBeenSet = true; m_arrayValue = value; }
+    inline void SetArrayValue(const std::vector<Datum>& value) { m_arrayValueHasBeenSet = true; m_arrayValue = value; }
 
     /**
      * <p> Indicates if the data point is an array. </p>
      */
-    inline void SetArrayValue(Aws::Vector<Datum>&& value) { m_arrayValueHasBeenSet = true; m_arrayValue = std::move(value); }
+    inline void SetArrayValue(std::vector<Datum>&& value) { m_arrayValueHasBeenSet = true; m_arrayValue = std::move(value); }
 
     /**
      * <p> Indicates if the data point is an array. </p>
      */
-    inline Datum& WithArrayValue(const Aws::Vector<Datum>& value) { SetArrayValue(value); return *this;}
+    inline Datum& WithArrayValue(const std::vector<Datum>& value) { SetArrayValue(value); return *this;}
 
     /**
      * <p> Indicates if the data point is an array. </p>
      */
-    inline Datum& WithArrayValue(Aws::Vector<Datum>&& value) { SetArrayValue(std::move(value)); return *this;}
+    inline Datum& WithArrayValue(std::vector<Datum>&& value) { SetArrayValue(std::move(value)); return *this;}
 
     /**
      * <p> Indicates if the data point is an array. </p>
@@ -179,10 +179,10 @@ class Row;
 
   private:
 
-    Aws::String m_scalarValue;
+    std::string m_scalarValue;
     bool m_scalarValueHasBeenSet;
 
-    Aws::Vector<Datum> m_arrayValue;
+    std::vector<Datum> m_arrayValue;
     bool m_arrayValueHasBeenSet;
 
     std::shared_ptr<Row> m_rowValue;

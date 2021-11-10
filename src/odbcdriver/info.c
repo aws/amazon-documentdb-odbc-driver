@@ -458,7 +458,7 @@ RETCODE SQL_API API_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
             // Timestream does not support schemas.
             // This will disable showing an empty schema box in Tableau.
             len = 4;
-            value = 0;
+            value = 0; //Check/set to SQL_TRUE if supporting schemas
             break;
 
         case SQL_POS_OPERATIONS: /* ODBC 2.0 */

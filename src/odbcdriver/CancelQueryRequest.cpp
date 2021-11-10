@@ -14,7 +14,7 @@ using namespace Aws::Utils;
 CancelQueryRequest::CancelQueryRequest() : m_queryIdHasBeenSet(false) {
 }
 
-Aws::String CancelQueryRequest::SerializePayload() const {
+std::string CancelQueryRequest::SerializePayload() const {
     JsonValue payload;
 
     if (m_queryIdHasBeenSet) {
@@ -28,6 +28,6 @@ Aws::Http::HeaderValueCollection CancelQueryRequest::GetRequestSpecificHeaders()
     const {
     Aws::Http::HeaderValueCollection headers;
     headers.insert(Aws::Http::HeaderValuePair(
-        "X-Amz-Target", "Timestream_20181101.CancelQuery"));
+        "X-Amz-Target", "Database_20181101.CancelQuery"));
     return headers;
 }
