@@ -1,6 +1,6 @@
 # ODBC sample client application - ODBCcli
 
-A simple odbc client application that lets you pass a dsn and query to run on a Timestream database.
+A simple odbc client application that lets you pass a dsn and query to run on a Database database.
 
 ## Prerequisites
 - [CMake](https://cmake.org/)
@@ -22,7 +22,7 @@ $ make
 - cmake needs to be run to generate the .vcxproj file
 ```
 1. Open the command prompt in Administrator mode
-2. Navigate to the direcory where the project was created (e.g. Documents\timestream-odbc\tools\ODBCcli)
+2. Navigate to the direcory where the project was created (e.g. Documents\Database-odbc\tools\ODBCcli)
 3. Create the build directory (mkdir build).
 4. Navigate to the build directory (cd build).
 5. Run cmake to generate the .vcxproj file (cmake ../ -DCMAKE_BUILD_TYPE=Release)
@@ -38,7 +38,7 @@ ODBCcli.exe <your-connection-string> <your-query>
 ```
 For example:
 ```
-ODBCcli.exe "DSN=timestream-aws-profile" "SELECT * FROM CLIExample.ExampleTable LIMIT 1"
+ODBCcli.exe "DSN=database-default" "SELECT * FROM CLIExample.ExampleTable LIMIT 1"
 ```
 On macOS or Linux:
 ```
@@ -46,5 +46,5 @@ On macOS or Linux:
 ```
 For example:
 ```
-./ODBCcli "DSN=timestream-aws-profile" "SELECT * FROM CLIExample.ExampleTable LIMIT 1"
+./ODBCcli "DSN=database-default" "SELECT * FROM CLIExample.ExampleTable LIMIT 1"
 ```

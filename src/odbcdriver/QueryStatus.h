@@ -15,9 +15,7 @@ class JsonView;
 
 /**
  * <p>Information about the status of the query, including progress and bytes
- * scannned.</p><p><h3>See Also:</h3>   <a
- * href="http://docs.aws.amazon.com/goto/WebAPI/timestream-query-2018-11-01/QueryStatus">AWS
- * API Reference</a></p>
+ * scannned.
  */
 class QueryStatus {
    public:

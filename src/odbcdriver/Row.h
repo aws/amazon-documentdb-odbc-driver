@@ -18,8 +18,7 @@ class JsonView;
 }  // namespace Aws
 
 /**
- * <p>Represents a single row in the query results.</p><p><h3>See Also:</h3> <a
- * href="http://docs.aws.amazon.com/goto/WebAPI/timestream-query-2018-11-01/Row">AWS
+ * <p>Represents a single row in the query results
  * API Reference</a></p>
  */
 class Row {

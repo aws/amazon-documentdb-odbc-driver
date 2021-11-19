@@ -34,7 +34,7 @@ SQLRETURN ParametersNotSupported(StatementClass *stmt, const char* func) {
         return SQL_ERROR;
     SC_clear_error(stmt);
     SC_set_error(stmt, STMT_NOT_IMPLEMENTED_ERROR,
-                 "Timestream does not support parameters.", func);
+                 "Database does not support parameters.", func);
     return SQL_ERROR;
 }
 

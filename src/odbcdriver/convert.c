@@ -1237,7 +1237,7 @@ int copy_and_convert_field(StatementClass *stmt, OID field_type, int atttypmod,
     }
 
     /*
-     * First convert any specific Amazon Timestream types into more useable data.
+     * First convert any specific Database types into more useable data.
      *
      * NOTE: Conversions from ES char/varchar of a date/time/timestamp value
      * to SQL_C_DATE,SQL_C_TIME, SQL_C_TIMESTAMP not supported

@@ -142,7 +142,7 @@ auto CheckSQLColumnsRows =
         for (size_t i = 0; i < expected.size(); i++) {
             EXPECT_EQ(expected[i].size(), result[i].size());
             for (size_t j = 0; j < expected[i].size(); j++) {
-                // not checking for ordinal position since Timestream may
+                // not checking for ordinal position since Database may
                 // change it at any time
                 if (j == COLUMNS_ORDINAL_POSITION)
                     continue;
@@ -216,7 +216,7 @@ class TestSQLStatistics : public Fixture {};
  * SQLTables Tests
  * This integration required manual setup.
  * Setup
- * <Database>.<Table> in Amazon Timestream
+ * <Database>.<Table> in Database
  * ODBCTest.DevOps
  * ODBCTest.IoT
  * sampleDB.DevOps
@@ -832,7 +832,7 @@ void PopulateSQLColumnsBinds(std::vector< bind_info > &binds) {
  * SQLColumns Tests
  * This integration required manual setup.
  * Setup
- * <Database>.<Table> in Amazon Timestream
+ * <Database>.<Table> in Amazon Database
  * ODBCTest.DevOps
  * ODBCTest.IoT
  * sampleDB.DevOps

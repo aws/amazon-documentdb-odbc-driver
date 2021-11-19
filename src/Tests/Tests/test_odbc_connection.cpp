@@ -38,15 +38,15 @@
 namespace {
 char* access_key = std::getenv("AWS_ACCESS_KEY_ID");
 char* secret_key = std::getenv("AWS_SECRET_ACCESS_KEY");
-test_string default_credential_chain = CREATE_STRING("timestream-aws-profile");
-test_string wdsn_name = CREATE_STRING("timestream-iam");
+test_string default_credential_chain = CREATE_STRING("database-default");
+test_string wdsn_name = CREATE_STRING("database-iam");
 test_string user =
     to_test_string(std::string((access_key == NULL) ? "" : access_key));
 test_string pass =
     to_test_string(std::string((secret_key == NULL) ? "" : secret_key));
 test_string wrong = CREATE_STRING("wrong");
 test_string empty = CREATE_STRING("");
-test_string dsn_conn_string = CREATE_STRING("DSN=timestream-aws-profile");
+test_string dsn_conn_string = CREATE_STRING("DSN=database-default");
 }
 
 class TestSQLConnect : public testing::Test {
@@ -67,7 +67,7 @@ class TestSQLConnect : public testing::Test {
     SQLHDBC m_conn;
 };
 
-TEST_F(TestSQLConnect, AWS_Profile_Default_credential_chain) {
+TEST_F(TestSQLConnect, Default_credential_chain) {
     if (std::getenv("NOT_CONNECTED")) {
         GTEST_SKIP();
     } 
@@ -157,7 +157,7 @@ TEST_F(TestSQLDriverConnect, IAM_DSNConnectionString) {
 
 TEST_F(TestSQLDriverConnect, IAM_MinimalConnectionString) {
     test_string wstr;
-    wstr += CREATE_STRING("Driver=timestreamodbc;");
+    wstr += CREATE_STRING("Driver=databaseodbc;");
     wstr += (CREATE_STRING("UID=") + user + CREATE_STRING(";"));
     wstr += (CREATE_STRING("PWD=") + pass + CREATE_STRING(";"));
     SQLRETURN ret =
@@ -169,7 +169,7 @@ TEST_F(TestSQLDriverConnect, IAM_MinimalConnectionString) {
 
 TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString) {
     test_string wstr;
-    wstr += CREATE_STRING("Driver=timestreamodbc;");
+    wstr += CREATE_STRING("Driver=databaseodbc;");
     wstr += (CREATE_STRING("AccessKeyId=") + user + CREATE_STRING(";"));
     wstr += (CREATE_STRING("SecretAccessKey=") + pass + CREATE_STRING(";"));
     SQLRETURN ret =
@@ -181,7 +181,7 @@ TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString) {
 
 TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross1) {
     test_string wstr;
-    wstr += CREATE_STRING("Driver=timestreamodbc;");
+    wstr += CREATE_STRING("Driver=databaseodbc;");
     wstr += (CREATE_STRING("UID=") + user + CREATE_STRING(";"));
     wstr += (CREATE_STRING("SecretAccessKey=") + pass + CREATE_STRING(";"));
     SQLRETURN ret =
@@ -193,7 +193,7 @@ TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross1) {
 
 TEST_F(TestSQLDriverConnect, IAM_MinimalAliasConnectionString_Cross2) {
     test_string wstr;
-    wstr += CREATE_STRING("Driver=timestreamodbc;");
+    wstr += CREATE_STRING("Driver=databaseodbc;");
     wstr += (CREATE_STRING("AccessKeyId=") + user + CREATE_STRING(";"));
     wstr += (CREATE_STRING("PWD=") + pass + CREATE_STRING(";"));
     SQLRETURN ret =
@@ -243,7 +243,7 @@ TEST_F(TestSQLDriverConnect, SqlDriverNoprompt) {
 /// connection / string attribute)
 TEST_F(TestSQLDriverConnect, UnsupportedKeyword) {
     test_string unsupported_keyword_conn_string;
-    unsupported_keyword_conn_string += CREATE_STRING("Driver=timestreamodbc;");
+    unsupported_keyword_conn_string += CREATE_STRING("Driver=databaseodbc;");
     unsupported_keyword_conn_string +=
         (CREATE_STRING("UID=") + user + CREATE_STRING(";"));
     unsupported_keyword_conn_string +=

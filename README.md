@@ -1,8 +1,8 @@
-# Amazon Timestream ODBC Driver
+# Database ODBC Driver
 
-TimestreamODBC is a read-only ODBC driver for Windows, Mac and Linux for connecting to Amazon Timestream.
+DatabaseODBC is a read-only ODBC driver for Windows, Mac and Linux for connecting to Database.
 
-[![codecov](https://codecov.io/gh/Bit-Quill/timestream-odbc/branch/develop/graph/badge.svg?token=MNHPEGAK9D)](https://codecov.io/gh/Bit-Quill/timestream-odbc)
+Code coverage badge placeholder.
 
 ## Specifications
 
@@ -23,19 +23,19 @@ You can use the installers generated from the most recent release
 
 ### Installing on Windows 10 or Windows Server 2019
 
-1. Run `AmazonTimestreamODBC32-[version].msi` or `AmazonTimestreamODBC64-[version].msi` to install the Amazon Timestream ODBC Driver.
+1. Run `DatabaseODBC32-[version].msi` or `DatabaseODBC64-[version].msi` to install the Database ODBC Driver.
 2. [Configure the DSN entries](./docs/user/windows_configure_dsn.md) using ODBC Data Source Administrator.
 
 ### Installing on macOS Catalina or macOS Big Sur
 
-[iODBC Driver Manager](http://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/Downloads) should be installed before installing the Amazon Timestream ODBC Driver on macOS.
+[iODBC Driver Manager](http://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/Downloads) should be installed before installing the Database ODBC Driver on macOS.
 
-1. Run `AmazonTimestreamODBC-[version].pkg` to install the Amazon Timestream ODBC Driver.
+1. Run `DatabaseODBC-[version].pkg` to install the Database ODBC Driver.
 2. [Configure the Driver and DSN entries](./docs/user/mac_configure_dsn.md).
 
 ### Installing the 32-bit deb file on Ubuntu 20.04 64-bit
 
-The 32-bit dependencies need to be installed before installing the Amazon Timestream ODBC Driver on Ubuntu.
+The 32-bit dependencies need to be installed before installing the Database ODBC Driver on Ubuntu.
 
 ```
 sudo dpkg --add-architecture i386 
@@ -50,22 +50,22 @@ You may also want to install [isql32](./tools/isql32) for testing. In the direct
 * Type `quit` to exit interactive mode.
 
 What needs to be installed to run?
-1. Run `sudo dpkg -i ./AmazonTimestreamODBC_[version]_i386.deb` to install the Amazon Timestream ODBC Driver.
+1. Run `sudo dpkg -i ./DatabaseODBC_[version]_i386.deb` to install the Database ODBC Driver.
 2. [Configure the Driver and DSN entries](./docs/user/linux_configure_dsn.md).
 
 ### Installing the 64-bit deb file on Ubuntu 20.04
-unixODBC should be installed before installing the Amazon Timestream ODBC Driver on Ubuntu.
+unixODBC should be installed before installing the Database ODBC Driver on Ubuntu.
 
 ```
 sudo apt update
 sudo apt install unixodbc
 ```
 
-1. Run `sudo dpkg -i ./AmazonTimestreamODBC_[version]_amd64.deb` to install the Amazon Timestream ODBC Driver.
+1. Run `sudo dpkg -i ./DatabaseODBC_[version]_amd64.deb` to install the Database ODBC Driver.
 2. [Configure the Driver and DSN entries](./docs/user/linux_configure_dsn.md).
 
 ### Installing the 32-bit rpm file on Amazon Linux 2
-The 32-bit dependencies need to be installed before installing the Amazon Timestream ODBC Driver on Amazon Linux 2.
+The 32-bit dependencies need to be installed before installing the Database ODBC Driver on Amazon Linux 2.
 
 ```
 sudo yum update
@@ -79,17 +79,17 @@ You may also want to install [isql32](./tools/isql32) for testing. In the direct
 * Type `quit` to exit interactive mode.
 
 What needs to be installed to run?
-1. Run `sudo rpm -U AmazonTimestreamODBC_[version]_i386.rpm` to install the Amazon Timestream ODBC Driver.
+1. Run `sudo rpm -U DatabaseODBC_[version]_i386.rpm` to install the Database ODBC Driver.
 2. [Configure the Driver and DSN entries](./docs/user/linux_configure_dsn.md).
 
 ### Installing the 64-bit rpm file on Amazon Linux 2
-unixODBC should be installed before installing the Amazon Timestream ODBC Driver on Amazon Linux 2.
+unixODBC should be installed before installing the Database ODBC Driver on Amazon Linux 2.
 
 ```
 sudo yum update
 sudo yum install unixODBC
 ```
-1. Run `sudo rpm -U AmazonTimestreamODBC_[version]_x86_64.rpm` to install the Amazon Timestream ODBC Driver.
+1. Run `sudo rpm -U DatabaseODBC_[version]_x86_64.rpm` to install the Database ODBC Driver.
 2. [Configure the Driver and DSN entries](./docs/user/linux_configure_dsn.md).
 
 ## Using the Driver
@@ -99,10 +99,10 @@ The driver comes in the form of a library file:
 * Mac: `libodbcdriver.dylib`
 * Linux: `libodbcdriver.so`
 
-If using with ODBC compatible BI tools, refer to the tool documentation on configuring a new ODBC driver. In most cases, you will need to make the tool aware of the location of the driver library file and then use it to setup Amazon Timestream database connections.
+If using with ODBC compatible BI tools, refer to the tool documentation on configuring a new ODBC driver. In most cases, you will need to make the tool aware of the location of the driver library file and then use it to setup Database database connections.
 
 ### Excel
-The Amazon Timestream ODBC driver supports both the Windows and macOS versions of Microsoft Excel.
+The Database ODBC driver supports both the Windows and macOS versions of Microsoft Excel.
 
 * [Microsoft Excel for Windows](./docs/user/microsoft_excel_support_win.md); or 
 * [Microsoft Excel for macOS](./docs/user/microsoft_excel_support_mac.md);
@@ -114,7 +114,7 @@ A list of options available for configuring driver behaviour is available [here]
 To setup a connection, the driver uses an ODBC connection string. Connection strings are semicolon-delimited strings specifying the set of options to use for a connection. Typically, a connection string will either:
 
 * specify a Data Source Name containing a pre-configured set of options (`DSN=xxx;`); or
-* configure options explicitly using the connection string (`Region=xxx;Auth=xxx;LogLevel=7;...`)
+* configure options explicitly using the connection string (`UID=xxx;PWD=xxx;Auth=xxx;LogLevel=7;...`)
 
 ### Enable ODBC Driver Manager Tracing
 #### Windows
@@ -144,7 +144,7 @@ TraceFile = /tmp/odbctrace.out
 ### Troubleshooting
 
 **Illegal parameter value for SQL_AUTOCOMMIT**
-By default, the Amazon Timestream ODBC Driver sets `SQL_AUTOCOMMIT=OFF`. pyodbc.connect overrides this and sets the value to `ON`.
+By default, the Database ODBC Driver sets `SQL_AUTOCOMMIT=OFF`. pyodbc.connect overrides this and sets the value to `ON`.
 
 To resolve the issue, excitly set the value `pyodbc.connect(connstr,autocommit=True)`
 

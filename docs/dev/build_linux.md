@@ -1,4 +1,4 @@
-# Linux - Building the Amazon Timestream ODBC Driver
+# Linux - Building the Database ODBC Driver
 
 ## Dependencies
 
@@ -38,7 +38,7 @@ sudo make install
 cd ..
 ```
 
-## Building the Amazon Timestream ODBC Driver for Amazon Linux 2 32-bit
+## Building the Database ODBC Driver for Amazon Linux 2 32-bit
 *Note:* The Amazon Linux 32-bit driver cannot be built as part of GitHub Actions as there is no supported hosted runner. In order to build the 32-bit driver, a Centos 7 machine environment needs to be used. The following instructions are for using a CentOS docker image.
 
 1. Install Docker
@@ -74,7 +74,7 @@ git clone <HTTP URL to GitHub .git file>
 ```
 6. Build the driver
 ```
-cd timestream-odbc
+cd database-odbc
 sh build_linux_release32_rpm.sh
 ```
 *Note:* There is an error in the AWS SDK in [AWSError.h](https://github.com/aws/aws-sdk-cpp/blob/4804f46df31b7539021237c62d79c54d6429a0c4/aws-cpp-sdk-core/include/aws/core/client/AWSError.h). [Line 95](https://github.com/aws/aws-sdk-cpp/blob/4804f46df31b7539021237c62d79c54d6429a0c4/aws-cpp-sdk-core/include/aws/core/client/AWSError.h#L95) will trigger a warning since "other" is unused which will break the build. To resolve this, use a text editor, such as `vi`, to replace `AWSError& operator=(AWSError<ERROR_TYPE>&& other) = default;` with `AWSError& operator=(AWSError<ERROR_TYPE>&& ) = default; ` 
@@ -89,10 +89,10 @@ cpack .
 ```
 8. From the host machine, copy the installer from the Docker image
 ```
-docker cp [container]://timestream-odbc/cmake-build32/AmazonTimestreamODBC_[version]_i386.rpm  [local path]
+docker cp [container]://database-odbc/cmake-build32/DatabaseODBC_[version]_i386.rpm  [local path]
 ```
 
-## Building the Amazon Timestream ODBC Driver for Ubuntu 64-bit, Ubuntu 32-bit or Amazon Linux 2 64-bit
+## Building the Database ODBC Driver for Ubuntu 64-bit, Ubuntu 32-bit or Amazon Linux 2 64-bit
 
 From the Unix shell, navigate to the project source directory, run one of the following:
 * `./build_linux_debug64.sh`
@@ -120,4 +120,4 @@ make
 cpack .
 ```
 
-An installer named `AmazonTimestreamODBC-<version>_<installer_type>` will be generated in the build directory (for example `AmazonTimestreamODBC_1.0.0_x86_64.rpm` will be created in `cmake-build64`).
+An installer named `DatabaseODBC-<version>_<installer_type>` will be generated in the build directory (for example `DatabaseODBC_1.0.0_x86_64.rpm` will be created in `cmake-build64`).

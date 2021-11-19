@@ -25,8 +25,8 @@ set(CPACK_PACKAGE_VERSION_PATCH "${VERSION_PATCH}")
 set(CPACK_PACKAGE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
 if(APPLE)
-    set(CPACK_PACKAGE_FILE_NAME "AmazonTimestreamODBC-${CPACK_PACKAGE_VERSION}")
-    set(CPACK_PACKAGE_NAME "Amazon Timestream ODBC Driver ${CPACK_PACKAGE_VERSION}")
+    set(CPACK_PACKAGE_FILE_NAME "DatabaseODBC-${CPACK_PACKAGE_VERSION}")
+    set(CPACK_PACKAGE_NAME "Database ODBC Driver ${CPACK_PACKAGE_VERSION}")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
     set(CPACK_GENERATOR "productbuild")
 
@@ -48,7 +48,7 @@ if(APPLE)
     set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/Resources/README.txt")
     set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Welcome.txt")
 elseif(UNIX)
-    set(CPACK_PACKAGE_FILE_NAME "AmazonTimestreamODBC${BITNESS}-${CPACK_PACKAGE_VERSION}")
+    set(CPACK_PACKAGE_FILE_NAME "DatabaseODBC${BITNESS}-${CPACK_PACKAGE_VERSION}")
     if (INSTALLER_TYPE STREQUAL "DEB")
         if (BITNESS EQUAL 32)
             set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE i386)
@@ -56,16 +56,16 @@ elseif(UNIX)
             set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE amd64)
         endif()
         set(CPACK_GENERATOR "DEB")
-        set(CPACK_DEBIAN_FILE_NAME "AmazonTimestreamODBC_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
+        set(CPACK_DEBIAN_FILE_NAME "DatabaseODBC_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
 
         # Deb installers fail if there's a space in them.
-        set(CPACK_PACKAGE_INSTALL_DIRECTORY "AmazonTimestreamODBCDriver${BITNESS}-bit")
-        set(CPACK_PACKAGE_NAME "AmazonTimestreamODBC_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
+        set(CPACK_PACKAGE_INSTALL_DIRECTORY "DatabaseODBCDriver${BITNESS}-bit")
+        set(CPACK_PACKAGE_NAME "DatabaseODBC_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
 
         # TODO: Need to update both of these.
         set(CPACK_PACKAGE_CONTACT "user@sample.com")
         set(CPACK_DEBIAN_PACKAGE_MAINTAINER "User Name")
-        set(CPACK_PACKAGE_DESCRIPTION "AmazonTimestreamODBCDriver-${BITNESS}-bit")
+        set(CPACK_PACKAGE_DESCRIPTION "DatabaseODBCDriver-${BITNESS}-bit")
         
         # Add postrm and postinst with dsn stuff to add and remove them.
         #set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/Debian/postinst")
@@ -78,9 +78,9 @@ elseif(UNIX)
             set(CPACK_RPM_PACKAGE_ARCHITECTURE x86_64)
         endif()
         set(CPACK_GENERATOR RPM)
-        set(CPACK_RPM_FILE_NAME "AmazonTimestreamODBC_${CPACK_PACKAGE_VERSION}_${CPACK_RPM_PACKAGE_ARCHITECTURE}.rpm")
+        set(CPACK_RPM_FILE_NAME "DatabaseODBC_${CPACK_PACKAGE_VERSION}_${CPACK_RPM_PACKAGE_ARCHITECTURE}.rpm")
 
-        set(CPACK_PACKAGE_INSTALL_DIRECTORY "Amazon Timestream ODBC Driver ${BITNESS}-bit")
+        set(CPACK_PACKAGE_INSTALL_DIRECTORY "Database ODBC Driver ${BITNESS}-bit")
         set(CPACK_PACKAGE_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY}")       
         set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE 1)
         set(CPACK_RPM_COMPONENT_INSTALL ON)
@@ -89,8 +89,8 @@ elseif(UNIX)
         message(FATAL_ERROR "INSTALLER_TYPE '${INSTALLER_TYPE}' must be DEB or RPM for Linux installer." )
     endif()
 else()
-    set(CPACK_PACKAGE_FILE_NAME "AmazonTimestreamODBC${BITNESS}-${CPACK_PACKAGE_VERSION}")
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY "Amazon Timestream ODBC Driver")
+    set(CPACK_PACKAGE_FILE_NAME "DatabaseODBC${BITNESS}-${CPACK_PACKAGE_VERSION}")
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "Database ODBC Driver")
     set(CPACK_PACKAGE_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} ${BITNESS}-bit ${CPACK_PACKAGE_VERSION}")
 
     # Set generator to WIX
@@ -131,24 +131,24 @@ configure_file("${PROJECT_ROOT}/LICENSE" "${PROJECT_ROOT}/LICENSE.txt" COPYONLY)
 # Set up components for installer
 cpack_add_component(Docs
 	DISPLAY_NAME "Documentation"
-	DESCRIPTION "Documentation about Amazon Timestream ODBC Driver"
+	DESCRIPTION "Documentation about Database ODBC Driver"
 )
 cpack_add_component(Driver
 	DISPLAY_NAME "Driver"
-	DESCRIPTION "Library files for running the Amazon Timestream ODBC Driver"
+	DESCRIPTION "Library files for running the Database ODBC Driver"
     REQUIRED 
 )
 
 # Install driver files
 if (UNIX AND NOT APPLE)
-    install(TARGETS odbcdriver DESTINATION bin/timestream-odbc${BITNESS} COMPONENT "Driver")
+    install(TARGETS odbcdriver DESTINATION bin/database-odbc${BITNESS} COMPONENT "Driver")
     
     # Install documentation files
-    install(FILES "${PROJECT_ROOT}/LICENSE" DESTINATION "bin/timestream-odbc${BITNESS}" COMPONENT "Docs")
-    install(FILES "${PROJECT_ROOT}/THIRD-PARTY" DESTINATION "bin/timestream-odbc${BITNESS}" COMPONENT "Docs")
-    install(FILES "${PROJECT_ROOT}/docs/user/configuration_options.md" DESTINATION "bin/timestream-odbc${BITNESS}" COMPONENT "Docs")
-    install(FILES "${TESTS_INI}/odbc-linux${BITNESS}.ini" DESTINATION "bin/timestream-odbc${BITNESS}" COMPONENT "Docs")
-    install(FILES "${TESTS_INI}/odbcinst-linux${BITNESS}.ini" DESTINATION "bin/timestream-odbc${BITNESS}" COMPONENT "Docs")
+    install(FILES "${PROJECT_ROOT}/LICENSE" DESTINATION "bin/database-odbc${BITNESS}" COMPONENT "Docs")
+    install(FILES "${PROJECT_ROOT}/THIRD-PARTY" DESTINATION "bin/database-odbc${BITNESS}" COMPONENT "Docs")
+    install(FILES "${PROJECT_ROOT}/docs/user/configuration_options.md" DESTINATION "bin/database-odbc${BITNESS}" COMPONENT "Docs")
+    install(FILES "${TESTS_INI}/odbc-linux${BITNESS}.ini" DESTINATION "bin/database-odbc${BITNESS}" COMPONENT "Docs")
+    install(FILES "${TESTS_INI}/odbcinst-linux${BITNESS}.ini" DESTINATION "bin/database-odbc${BITNESS}" COMPONENT "Docs")
 else()
     install(TARGETS odbcdriver DESTINATION bin COMPONENT "Driver")
     
@@ -182,7 +182,6 @@ if(WIN32)
     install(FILES "${AWS_SDK_BIN_DIR}/aws-checksums.dll" DESTINATION bin COMPONENT "Driver")
     install(FILES "${AWS_SDK_BIN_DIR}/aws-cpp-sdk-core.dll" DESTINATION bin COMPONENT "Driver")
     install(FILES "${AWS_SDK_BIN_DIR}/aws-cpp-sdk-sts.dll" DESTINATION bin COMPONENT "Driver")
-    install(FILES "${AWS_SDK_BIN_DIR}/aws-cpp-sdk-timestream-query.dll" DESTINATION bin COMPONENT "Driver")
     install(FILES "${PROJECT_ROOT}/docs/user/windows_configure_dsn.md" DESTINATION doc COMPONENT "Docs")
     install(FILES "${PROJECT_ROOT}/docs/user/microsoft_excel_support_win.md" DESTINATION doc COMPONENT "Docs")
 endif()

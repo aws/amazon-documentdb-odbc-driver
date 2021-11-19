@@ -947,7 +947,7 @@ RETCODE SQL_API API_GetData(HSTMT hstmt, SQLUSMALLINT icol,
 
         case COPY_UNSUPPORTED_TYPE:
             SC_set_error(stmt, STMT_RESTRICTED_DATA_TYPE_ERROR,
-                         "Received an unsupported type from Timestream.",
+                         "Received an unsupported type from Database.",
                          func);
             result = SQL_ERROR;
             break;

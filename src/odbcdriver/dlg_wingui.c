@@ -97,7 +97,7 @@ void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
 
 void SetDlgStuff(HWND hdlg, const ConnInfo *ci) {
     // Connection
-    SetDlgItemText(hdlg, IDC_DRIVER_VERSION, "V."TIMESTREAMDRIVERVERSION);
+    SetDlgItemText(hdlg, IDC_DRIVER_VERSION, "V."DATABASEDRIVERVERSION);
     SetDlgItemText(hdlg, IDC_DSNAME, ci->dsn);
 
     // Authentication

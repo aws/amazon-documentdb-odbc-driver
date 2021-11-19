@@ -9,7 +9,7 @@ Before you get started, [configure the Amazon Timestream ODBC driver DSN](./wind
 
 <img src="img/get_data_odbc.png" width="60%">
 
-2. Select the DSN from the `Data source name (DSN)` drop-down box (e.g. timestream-aws-profile) and click `OK`.
+2. Select the DSN from the `Data source name (DSN)` drop-down box (e.g. timestream-default) and click `OK`.
 
 <img src="img/from_odbc.png" width="60%">
 

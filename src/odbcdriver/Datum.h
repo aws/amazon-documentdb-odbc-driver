@@ -22,9 +22,6 @@ class Row;
 
   /**
    * <p> Datum represents a single data point in a query result. </p><p><h3>See
-   * Also:</h3>   <a
-   * href="http://docs.aws.amazon.com/goto/WebAPI/timestream-query-2018-11-01/Datum">AWS
-   * API Reference</a></p>
    */
   class Datum
   {
