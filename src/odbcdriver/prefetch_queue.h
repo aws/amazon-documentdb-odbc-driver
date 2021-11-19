@@ -31,7 +31,7 @@ class PrefetchQueue {
     static constexpr int CAPACITY = 2;
     /**
      * Push function
-     * @param future_outcome std::shared_future< Aws::TimestreamQuery::Model::QueryOutcome >
+     * @param future_outcome std::shared_future< Aws::DatabaseQuery::Model::QueryOutcome >
      * @return bool
      */
     bool Push(std::shared_future< QueryOutcome > future_outcome);
@@ -42,7 +42,7 @@ class PrefetchQueue {
     void Pop();
     /**
      * Front function
-     * @return Aws::TimestreamQuery::Model::QueryOutcome
+     * @return Aws::DatabaseQuery::Model::QueryOutcome
      */
     QueryOutcome Front();
     /**

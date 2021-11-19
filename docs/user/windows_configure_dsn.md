@@ -6,7 +6,7 @@
 
  <img src="img/win_user_dsn.png" width="60%">
 
-2. Select `Amazon Timestream ODBC Driver` and click on `Finish`.
+2. Select `Database ODBC Driver` and click on `Finish`.
 
 <img src="img/win_user_dsn_select_driver.png" width="50%">
 

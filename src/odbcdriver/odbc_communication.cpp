@@ -193,11 +193,11 @@ void DBCommunication::Disconnect() {
 }
 
 std::string DBCommunication::GetVersion() {
-    return TIMESTREAMDRIVERVERSION;
+    return DATABASEDRIVERVERSION;
 }
 
 std::string DBCommunication::GetErrorPrefix() {
-    return "[Timestream][SQL ODBC Driver] ";
+    return "[Database][SQL ODBC Driver] ";
 }
 
 void DBCommunication::StopResultRetrieval(StatementClass* stmt) {
@@ -245,7 +245,7 @@ class Context : public Aws::Client::AsyncCallerContext {
     }
     /**
      * Make promise
-     * @param outcome const Aws::TimestreamQuery::Model::QueryOutcome&
+     * @param outcome const Aws::DatabaseQuery::Model::QueryOutcome&
      */
     void MakePromise(const QueryOutcome& outcome) {
         promise_.set_value(outcome);
@@ -266,7 +266,7 @@ class Context : public Aws::Client::AsyncCallerContext {
     std::promise< QueryOutcome > promise_;
 };
 
-// Callback function of QueryAsync operation by aws-sdk-cpp timestream-query
+// Callback function of QueryAsync operation by aws-sdk-cpp database-query
 void QueryCallback(
     const DatabaseQueryClient* client,
     const QueryRequest& request,
@@ -343,7 +343,7 @@ bool DBCommunication::CancelQuery(StatementClass* stmt) {
         auto pPrefetchQueue = prefetch_queue_iterator->second;
         pPrefetchQueue->Reset();
     }
-    // Try to cancel current query (Not guaranteed in Timestream service)
+    // Try to cancel current query (Not guaranteed in Database service)
     if (stmt->query_id != nullptr && strlen(stmt->query_id) != 0) {
         CancelQueryRequest cancel_request;
         cancel_request.SetQueryId(stmt->query_id);

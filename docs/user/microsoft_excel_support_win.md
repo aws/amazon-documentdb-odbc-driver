@@ -3,8 +3,8 @@
 ## Prerequisites
 
 * Microsoft Excel 2016 and higher
-* [Amazon Timestream](https://aws.amazon.com/timestream/)
-* Amazon Timestream ODBC driver
+* [Database](TODO add database webpage)
+* Database ODBC driver
 * A preconfigured [User or System DSN](windows_configure_dsn.md)
 
 ## Loading Data 
@@ -12,7 +12,7 @@
 * Open a blank workbook in Microsoft Excel.
 * Click on **Data** > **Get Data** > **From Other Sources** > **From ODBC**
 * Select the desired data source. For improved performance you may want to enter a query directly in **Advanced options** and limit the results returned. For example `SELECT * FROM sampleDB.IoT LIMIT 10000`. Click **OK**.
-* For `AWS IAM Credentials`, `Identity Provider: Azure AD` or `Identity Provider: Okta connetions`, select **Database** from the left menu and enter a **User name** and **Password**. For AWS Profile connections, Select **Default or Custom** from the left menu. Click **Connect**.
+* For `Default` , select **Database** from the left menu and enter a **User name** and **Password**. Click **Connect**.
 * If you did not enter a query, select a table from list to load data preview; otherwise the preview will display automatically. Click **Load**.
 * The data will be loaded in the spreadsheet.
 

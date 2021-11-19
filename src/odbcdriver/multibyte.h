@@ -24,7 +24,7 @@
  */
 #include "odbc.h"
 
-/* Timestream client encoding */
+/* Database client encoding */
 enum {
     SQL_ASCII = 0 /* SQL/ASCII */
     ,

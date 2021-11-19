@@ -31,21 +31,21 @@ class QueryRequest : public DatabaseQueryRequest {
     Aws::Http::HeaderValueCollection GetRequestSpecificHeaders() const override;
 
     /**
-     * <p> The query to be executed by Timestream. </p>
+     * <p> The query to be executed by Database. </p>
      */
     inline const std::string& GetQueryString() const {
         return m_queryString;
     }
 
     /**
-     * <p> The query to be executed by Timestream. </p>
+     * <p> The query to be executed by Database. </p>
      */
     inline bool QueryStringHasBeenSet() const {
         return m_queryStringHasBeenSet;
     }
 
     /**
-     * <p> The query to be executed by Timestream. </p>
+     * <p> The query to be executed by Database. </p>
      */
     inline void SetQueryString(const std::string& value) {
         m_queryStringHasBeenSet = true;
@@ -53,7 +53,7 @@ class QueryRequest : public DatabaseQueryRequest {
     }
 
     /**
-     * <p> The query to be executed by Timestream. </p>
+     * <p> The query to be executed by Database. </p>
      */
     inline void SetQueryString(std::string&& value) {
         m_queryStringHasBeenSet = true;
@@ -61,7 +61,7 @@ class QueryRequest : public DatabaseQueryRequest {
     }
 
     /**
-     * <p> The query to be executed by Timestream. </p>
+     * <p> The query to be executed by Database. </p>
      */
     inline void SetQueryString(const char* value) {
         m_queryStringHasBeenSet = true;
@@ -69,7 +69,7 @@ class QueryRequest : public DatabaseQueryRequest {
     }
 
     /**
-     * <p> The query to be executed by Timestream. </p>
+     * <p> The query to be executed by Database. </p>
      */
     inline QueryRequest& WithQueryString(const std::string& value) {
         SetQueryString(value);
@@ -77,7 +77,7 @@ class QueryRequest : public DatabaseQueryRequest {
     }
 
     /**
-     * <p> The query to be executed by Timestream. </p>
+     * <p> The query to be executed by Database. </p>
      */
     inline QueryRequest& WithQueryString(std::string&& value) {
         SetQueryString(std::move(value));
@@ -85,7 +85,7 @@ class QueryRequest : public DatabaseQueryRequest {
     }
 
     /**
-     * <p> The query to be executed by Timestream. </p>
+     * <p> The query to be executed by Database. </p>
      */
     inline QueryRequest& WithQueryString(const char* value) {
         SetQueryString(value);

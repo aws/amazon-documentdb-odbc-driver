@@ -49,9 +49,9 @@ extern "C" {
 #define INVALID_DRIVER " @@driver not exist@@ "
 
 #ifdef UNICODE_SUPPORT
-#define INI_DSN "Timestream35W"
+#define INI_DSN "Database35W"
 #else
-#define INI_DSN "Timestream30"
+#define INI_DSN "Database30"
 #endif /* UNICODE_SUPPORT */
 
 #define INI_DRIVER "Driver"
@@ -76,7 +76,7 @@ extern "C" {
 #define DEFAULT_MAX_CONNECTIONS 25
 #define DEFAULT_MAX_CONNECTIONS_STR "25"
 #define DEFAULT_AUTHTYPE AUTHTYPE_DEFAULT
-#define DEFAULT_DRIVERNAME "timestreamodbc"
+#define DEFAULT_DRIVERNAME "databaseodbc"
 #define DEFAULT_NONE ""
 
 

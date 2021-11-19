@@ -193,7 +193,7 @@ RETCODE SQL_API API_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
             break;
 
         case SQL_DBMS_NAME: /* ODBC 1.0 */
-            p = "Amazon Timestream";
+            p = "Database";
             break;
 
         case SQL_DBMS_VER: /* ODBC 1.0 */
@@ -219,7 +219,7 @@ RETCODE SQL_API API_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
             break;
 
         case SQL_DRIVER_VER: /* ODBC 1.0 */
-            p = TIMESTREAMDRIVERVERSION;
+            p = DATABASEDRIVERVERSION;
             break;
 
         case SQL_EXPRESSIONS_IN_ORDERBY: /* ODBC 1.0 */
@@ -455,7 +455,7 @@ RETCODE SQL_API API_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
             break;
 
         case SQL_OWNER_USAGE: /* ODBC 2.0 */
-            // Timestream does not support schemas.
+            // Database does not support schemas.
             // This will disable showing an empty schema box in Tableau.
             len = 4;
             value = 0; //Check/set to SQL_TRUE if supporting schemas
@@ -527,7 +527,7 @@ RETCODE SQL_API API_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
             break;
 
         case SQL_SERVER_NAME: /* ODBC 1.0 */
-            p = "AWS Timestream";
+            p = "Database";
             break;
 
         case SQL_SPECIAL_CHARACTERS: /* ODBC 2.0 */
@@ -579,7 +579,7 @@ RETCODE SQL_API API_GetInfo(HDBC hdbc, SQLUSMALLINT fInfoType,
 
         case SQL_TXN_CAPABLE: /* ODBC 1.0 */
             /*
-             * Timestream does not support transactions.
+             * Database does not support transactions.
              */
             len = 2;
             value = SQL_TC_NONE;

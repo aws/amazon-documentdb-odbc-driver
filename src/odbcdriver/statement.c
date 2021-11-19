@@ -1129,7 +1129,7 @@ SC_fetch(StatementClass *self) {
                 case COPY_UNSUPPORTED_TYPE:
                     SC_set_error(
                         self, STMT_RESTRICTED_DATA_TYPE_ERROR,
-                        "Received an unsupported type from Timestream.",
+                        "Received an unsupported type from Database.",
                         func);
                     result = SQL_ERROR;
                     break;

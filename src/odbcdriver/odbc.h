@@ -367,12 +367,12 @@ SQLULEN ucs2strlen(const SQLWCHAR *);
 #ifndef DBMS_NAME
 #ifdef WIN32
 #ifdef _WIN64
-#define DBMS_NAME "Amazon Timestream ODBC Driver(x64)"
+#define DBMS_NAME "Database ODBC Driver(x64)"
 #else
-#define DBMS_NAME "Amazon Timestream ODBC Driver(x86)"
+#define DBMS_NAME "Database ODBC Driver(x86)"
 #endif /* _WIN64 */
 #else
-#define DBMS_NAME "Amazon Timestream ODBC Driver"
+#define DBMS_NAME "Database ODBC Driver"
 #endif /* WIN32 */
 #endif /* DBMS_NAME */
 
@@ -436,7 +436,7 @@ BOOL isSqlServr(void);
 #define SMALL_REGISTRY_LEN 10 /* for 1/0 settings */
 
 /*	These prefixes denote system tables */
-#define TIMESTREAM_SYS_PREFIX "ts_"
+#define DATABASE_SYS_PREFIX "ts_"
 
 /*	Info limits */
 #define MAX_INFO_STRING 128
