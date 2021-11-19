@@ -3,8 +3,8 @@
 ## Preparation
 
 * [Python 3](https://www.python.org/downloads/) is required to run the performance tests. This should also include pip3.
-* Setup a database named `ODBCPerfTest` with the table `DevOps`. More than 10,000 should be added using the [continuous ingestor tool](https://github.com/awslabs/amazon-timestream-tools/tree/mainline/tools/continuous-ingestor). Once the data has been ingested into the `DevOps` table, these tests use static queries and do not need to have live data. 
-* Setup a database named `perfdb_hcltps` with the table `perftable_hcltps`. Data should be ingested into this database for more than one hour using the [continuous ingestor tool](https://github.com/awslabs/amazon-timestream-tools/tree/mainline/tools/continuous-ingestor). This need to be run continuously while running these tests, as they are time sensitive and are based on the current time and the current time - 1 hour.
+* Setup a database named `ODBCPerfTest` with the table `DevOps`. More than 10,000 should be added using the [continuous ingestor tool](https://github.com/awslabs/amazon-Database-tools/tree/mainline/tools/continuous-ingestor). Once the data has been ingested into the `DevOps` table, these tests use static queries and do not need to have live data. 
+* Setup a database named `perfdb_hcltps` with the table `perftable_hcltps`. Data should be ingested into this database for more than one hour using the [continuous ingestor tool](https://github.com/awslabs/amazon-Database-tools/tree/mainline/tools/continuous-ingestor). This need to be run continuously while running these tests, as they are time sensitive and are based on the current time and the current time - 1 hour.
 
 ## Running the Automated Tests
 

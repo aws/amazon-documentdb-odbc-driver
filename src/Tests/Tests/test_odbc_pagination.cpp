@@ -40,13 +40,13 @@ constexpr int NUM_ROWS_DEVOPS = 2100;
 
 /**
  * Setup before running the test
- * 1. Create sample database in Amazon Timestream service
+ * 1. Create sample database in Amazon Database service
  * 2. Check to create sample table IoT and DevOps
  */
 
 class TestPagination : public Fixture {};
 
-TEST_F(TestPagination, TimestreamSampleDatabase_IoT_SQLGetData) {
+TEST_F(TestPagination, DatabaseSampleDatabase_IoT_SQLGetData) {
     test_string query = CREATE_STRING("SELECT * FROM sampleDB.IoT");
     auto ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_EQ(SQL_SUCCESS, ret);
@@ -71,7 +71,7 @@ TEST_F(TestPagination, TimestreamSampleDatabase_IoT_SQLGetData) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestPagination, TimestreamSampleDatabase_IoT_SQLBindCol) {
+TEST_F(TestPagination, DatabaseSampleDatabase_IoT_SQLBindCol) {
     test_string query = CREATE_STRING("SELECT * FROM sampleDB.IoT");
     auto ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_EQ(SQL_SUCCESS, ret);
@@ -94,7 +94,7 @@ TEST_F(TestPagination, TimestreamSampleDatabase_IoT_SQLBindCol) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestPagination, TimestreamSampleDatabase_DevOps_SQLGetData) {
+TEST_F(TestPagination, DatabaseSampleDatabase_DevOps_SQLGetData) {
     test_string query = CREATE_STRING("SELECT * FROM sampleDB.DevOps");
     auto ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_EQ(SQL_SUCCESS, ret);
@@ -119,7 +119,7 @@ TEST_F(TestPagination, TimestreamSampleDatabase_DevOps_SQLGetData) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-TEST_F(TestPagination, TimestreamSampleDatabase_DevOps_SQLBindCol) {
+TEST_F(TestPagination, DatabaseSampleDatabase_DevOps_SQLBindCol) {
     test_string query = CREATE_STRING("SELECT * FROM sampleDB.DevOps");
     auto ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_EQ(SQL_SUCCESS, ret);

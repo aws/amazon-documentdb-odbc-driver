@@ -1,7 +1,7 @@
 <CPackWiXPatch>
 	<CPackWiXFragment Id="CM_CP_Driver.bin.odbcdriver.dll">
 		<!-- Add driver entry in Software -->
-		<RegistryKey Root="HKLM" Key="SOFTWARE\Amazon\Amazon Timestream ODBC Driver(x86)\Driver" >
+		<RegistryKey Root="HKLM" Key="SOFTWARE\Amazon\Database ODBC Driver(x86)\Driver" >
 			<RegistryValue Type="string" Name="InstallPath" Value="[INSTALL_ROOT]" />
 			<RegistryValue Type="string" Name="LogLevel" Value="" />
 			<RegistryValue Type="string" Name="LogOutput" Value="" />
@@ -9,11 +9,11 @@
 		
 		<!-- Add driver entry in ODBC Drivers -->
 		<RegistryKey Root="HKLM" Key="SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers" >
-			<RegistryValue Type="string" Name="Amazon Timestream ODBC Driver" Value="Installed" />
+			<RegistryValue Type="string" Name="Database ODBC Driver" Value="Installed" />
 		</RegistryKey>
 		
 		<!-- Set driver attributes -->
-		<RegistryKey Root="HKLM" Key="SOFTWARE\ODBC\ODBCINST.INI\Amazon Timestream ODBC Driver" >
+		<RegistryKey Root="HKLM" Key="SOFTWARE\ODBC\ODBCINST.INI\Database ODBC Driver" >
 			<RegistryValue Type="string" Name="Driver" Value="[INSTALL_ROOT]bin\odbcdriver.dll" />
 			<RegistryValue Type="string" Name="Setup" Value="[INSTALL_ROOT]bin\odbcdriver.dll" />
 		</RegistryKey>

@@ -23,9 +23,7 @@ class JsonView;
  * <p>Contains the data type of a column in a query result set. The data type can
  * be scalar or complex. The supported scalar data types are integers, boolean,
  * string, double, timestamp, date, time, and intervals. The supported complex data
- * types are arrays, rows, and timeseries.</p><p><h3>See Also:</h3>   <a
- * href="http://docs.aws.amazon.com/goto/WebAPI/timestream-query-2018-11-01/Type">AWS
- * API Reference</a></p>
+ * types are arrays, rows
  */
 class Type {
    public:

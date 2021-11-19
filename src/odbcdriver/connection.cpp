@@ -162,7 +162,7 @@ int CC_send_client_encoding(ConnectionClass *self, const char *encoding) {
 }
 
 void CC_initialize_version(ConnectionClass *self) {
-    STRCPY_FIXED(self->version, TIMESTREAMDRIVERVERSION);
+    STRCPY_FIXED(self->version, DATABASEDRIVERVERSION);
     self->version_major = 0;
     self->version_minor = 2;
     self->version_patch = 0;

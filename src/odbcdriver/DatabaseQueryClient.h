@@ -123,10 +123,7 @@ class DatabaseQueryClient : public Aws::Client::AWSJsonClient {
      * if the query has not completed execution before the cancellation request
      * was issued. Because cancellation is an idempotent operation, subsequent
      * cancellation requests will return a <code>CancellationMessage</code>,
-     * indicating that the query has already been canceled. </p><p><h3>See
-     * Also:</h3>   <a
-     * href="http://docs.aws.amazon.com/goto/WebAPI/timestream-query-2018-11-01/CancelQuery">AWS
-     * API Reference</a></p>
+     * indicating that the query has already been canceled.
      */
     virtual CancelQueryOutcome CancelQuery(
         const CancelQueryRequest& request) const;
@@ -136,10 +133,7 @@ class DatabaseQueryClient : public Aws::Client::AWSJsonClient {
      * if the query has not completed execution before the cancellation request
      * was issued. Because cancellation is an idempotent operation, subsequent
      * cancellation requests will return a <code>CancellationMessage</code>,
-     * indicating that the query has already been canceled. </p><p><h3>See
-     * Also:</h3>   <a
-     * href="http://docs.aws.amazon.com/goto/WebAPI/timestream-query-2018-11-01/CancelQuery">AWS
-     * API Reference</a></p>
+     * indicating that the query has already been canceled.
      *
      * returns a future to the operation so that it can be executed in parallel
      * to other requests.
@@ -152,10 +146,7 @@ class DatabaseQueryClient : public Aws::Client::AWSJsonClient {
      * if the query has not completed execution before the cancellation request
      * was issued. Because cancellation is an idempotent operation, subsequent
      * cancellation requests will return a <code>CancellationMessage</code>,
-     * indicating that the query has already been canceled. </p><p><h3>See
-     * Also:</h3>   <a
-     * href="http://docs.aws.amazon.com/goto/WebAPI/timestream-query-2018-11-01/CancelQuery">AWS
-     * API Reference</a></p>
+     * indicating that the query has already been canceled.
      *
      * Queues the request into a thread executor and triggers associated
      * callback when operation has finished.
@@ -168,36 +159,28 @@ class DatabaseQueryClient : public Aws::Client::AWSJsonClient {
 
     /**
      * <p>DescribeEndpoints returns a list of available endpoints to make
-     * Timestream API calls against. This API is available through both Write
-     * and Query.</p> <p>Because Timestream’s SDKs are designed to transparently
-     * work with the service’s architecture, including the management and
+     * Database API calls against. This API is available through both Write
+     * and Query.</p> <p>Because Database's SDKs are designed to transparently
+     * work with the service's architecture, including the management and
      * mapping of the service endpoints, <i>it is not recommended that you use
      * this API unless</i>:</p> <ul> <li> <p>Your application uses a programming
      * language that does not yet have SDK support</p> </li> <li> <p>You require
      * better control over the client-side implementation</p> </li> </ul> <p>For
-     * detailed information on how to use DescribeEndpoints, see <a
-     * href="https://docs.aws.amazon.com/timestream/latest/developerguide/Using-API.endpoint-discovery.html">The
-     * Endpoint Discovery Pattern and REST APIs</a>.</p><p><h3>See Also:</h3> <a
-     * href="http://docs.aws.amazon.com/goto/WebAPI/timestream-query-2018-11-01/DescribeEndpoints">AWS
-     * API Reference</a></p>
+     * detailed information on how to use DescribeEndpoints.
      */
     virtual DescribeEndpointsOutcome DescribeEndpoints(
         const DescribeEndpointsRequest& request) const;
 
     /**
      * <p>DescribeEndpoints returns a list of available endpoints to make
-     * Timestream API calls against. This API is available through both Write
-     * and Query.</p> <p>Because Timestream’s SDKs are designed to transparently
-     * work with the service’s architecture, including the management and
+     * Database API calls against. This API is available through both Write
+     * and Query.</p> <p>Because Database's SDKs are designed to transparently
+     * work with the service's architecture, including the management and
      * mapping of the service endpoints, <i>it is not recommended that you use
      * this API unless</i>:</p> <ul> <li> <p>Your application uses a programming
      * language that does not yet have SDK support</p> </li> <li> <p>You require
      * better control over the client-side implementation</p> </li> </ul> <p>For
-     * detailed information on how to use DescribeEndpoints, see <a
-     * href="https://docs.aws.amazon.com/timestream/latest/developerguide/Using-API.endpoint-discovery.html">The
-     * Endpoint Discovery Pattern and REST APIs</a>.</p><p><h3>See Also:</h3> <a
-     * href="http://docs.aws.amazon.com/goto/WebAPI/timestream-query-2018-11-01/DescribeEndpoints">AWS
-     * API Reference</a></p>
+     * detailed information on how to use DescribeEndpoints.
      *
      * returns a future to the operation so that it can be executed in parallel
      * to other requests.
@@ -207,18 +190,14 @@ class DatabaseQueryClient : public Aws::Client::AWSJsonClient {
 
     /**
      * <p>DescribeEndpoints returns a list of available endpoints to make
-     * Timestream API calls against. This API is available through both Write
-     * and Query.</p> <p>Because Timestream’s SDKs are designed to transparently
-     * work with the service’s architecture, including the management and
+     * Database API calls against. This API is available through both Write
+     * and Query.</p> <p>Because Database's SDKs are designed to transparently
+     * work with the service's architecture, including the management and
      * mapping of the service endpoints, <i>it is not recommended that you use
      * this API unless</i>:</p> <ul> <li> <p>Your application uses a programming
      * language that does not yet have SDK support</p> </li> <li> <p>You require
      * better control over the client-side implementation</p> </li> </ul> <p>For
-     * detailed information on how to use DescribeEndpoints, see <a
-     * href="https://docs.aws.amazon.com/timestream/latest/developerguide/Using-API.endpoint-discovery.html">The
-     * Endpoint Discovery Pattern and REST APIs</a>.</p><p><h3>See Also:</h3> <a
-     * href="http://docs.aws.amazon.com/goto/WebAPI/timestream-query-2018-11-01/DescribeEndpoints">AWS
-     * API Reference</a></p>
+     * detailed information on how to use DescribeEndpoints.
      *
      * Queues the request into a thread executor and triggers associated
      * callback when operation has finished.
@@ -234,9 +213,7 @@ class DatabaseQueryClient : public Aws::Client::AWSJsonClient {
      * Query will timeout after 60 seconds. You must update the default timeout
      * in the SDK to support a timeout of 60 seconds. The result set will be
      * truncated to 1MB. Service quotas apply. For more information, see Quotas
-     * in the Timestream Developer Guide. </p><p><h3>See Also:</h3>   <a
-     * href="http://docs.aws.amazon.com/goto/WebAPI/timestream-query-2018-11-01/Query">AWS
-     * API Reference</a></p>
+     * in the Database Developer Guide.
      */
     virtual QueryOutcome Query(const QueryRequest& request) const;
 
@@ -245,9 +222,7 @@ class DatabaseQueryClient : public Aws::Client::AWSJsonClient {
      * Query will timeout after 60 seconds. You must update the default timeout
      * in the SDK to support a timeout of 60 seconds. The result set will be
      * truncated to 1MB. Service quotas apply. For more information, see Quotas
-     * in the Timestream Developer Guide. </p><p><h3>See Also:</h3>   <a
-     * href="http://docs.aws.amazon.com/goto/WebAPI/timestream-query-2018-11-01/Query">AWS
-     * API Reference</a></p>
+     * in the Database Developer Guide. 
      *
      * returns a future to the operation so that it can be executed in parallel
      * to other requests.
@@ -260,9 +235,7 @@ class DatabaseQueryClient : public Aws::Client::AWSJsonClient {
      * Query will timeout after 60 seconds. You must update the default timeout
      * in the SDK to support a timeout of 60 seconds. The result set will be
      * truncated to 1MB. Service quotas apply. For more information, see Quotas
-     * in the Timestream Developer Guide. </p><p><h3>See Also:</h3>   <a
-     * href="http://docs.aws.amazon.com/goto/WebAPI/timestream-query-2018-11-01/Query">AWS
-     * API Reference</a></p>
+     * in the Database Developer Guide.
      *
      * Queues the request into a thread executor and triggers associated
      * callback when operation has finished.

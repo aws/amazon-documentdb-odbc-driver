@@ -1,4 +1,4 @@
-# Windows - Building the Amazon Timestream ODBC Driver
+# Windows - Building the Database ODBC Driver
 
 ## Dependencies
 
@@ -6,7 +6,7 @@
   * Install Desktop development with C++
   * Check "C++ MFC for latest vXXX build tools"
   * Install ClangFormat Extension from the Extensions menu in Visual Studio or from the [Marketplace](https://marketplace.visualstudio.com/items?itemName=LLVMExtensions.ClangFormat).
-* [Amazon Timestream ODBC Driver source code](https://github.com/Bit-Quill/timestream-odbc)
+* [Database ODBC Driver source code](TODO add link github)
 * [Git](https://git-scm.com/download/win)
   * Ensure that the PATH environment variable contains the path to git executable. Default is `C:\Program Files\Git\cmd`.
 * [CMake](https://cmake.org/install/). This is installed with Visual Studio.
@@ -47,7 +47,7 @@ From Developer Powershell, navigate to the project source directory, run:
 msbuild .\build\odbc\cmake\PACKAGE.vcxproj -p:Configuration=Release
 ```
 
-An installer named `AmazonTimestreamODBC<Bitness>-<version>.msi` will be generated in the `.\build\cmake` directory (for example `AmazonTimestreamODBC64-1.0.0.msi` ).
+An installer named `DatabaseODBC<Bitness>-<version>.msi` will be generated in the `.\build\cmake` directory (for example `DatabaseODBC64-1.0.0.msi` ).
 
 ### Troubleshooting
 If you are changing the bitness (32-bit to/from 64-bit), you may need to delete the build directory and rebuild.

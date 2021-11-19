@@ -28,9 +28,9 @@
 // maintain null characters.
 using namespace std::string_literals;
 
-std::wstring driver_name = L"TIMESTREAM SQL ODBC Driver";
+std::wstring driver_name = L"DATABASE SQL ODBC Driver";
 std::wstring driver_filename = L"libodbcdriver.dylib";
-std::wstring dsn_name = L"TIMESTREAM SQL ODBC DSN";
+std::wstring dsn_name = L"DATABASE SQL ODBC DSN";
 std::wstring dsn_ini_filename = L"odbcdriver.ini";
 
 std::wstring driver_name_placeholder = L"%DRIVER_NAME%";

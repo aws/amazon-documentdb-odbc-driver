@@ -27,7 +27,7 @@
 #include "Type.h"
 
 /**
- * AWS Timestream communication class
+ * AWS Database communication class
  */
 class DBCommunication : public Communication {
    public:
@@ -92,9 +92,9 @@ class DBCommunication : public Communication {
 
    private:
     /**
-     * Create Timestream Query Client
+     * Create Database Query Client
      * @param options const runtime_options&
-     * @return std::unique_ptr< Aws::TimestreamQuery::TimestreamQueryClient >
+     * @return std::unique_ptr< Aws::DatabaseQuery::DatabaseQueryClient >
      */
     std::unique_ptr< DatabaseQueryClient >
       CreateQueryClient(const runtime_options& options);
@@ -106,7 +106,7 @@ class DBCommunication : public Communication {
     bool TestQueryClient();
 
     /**
-     * Timestream query client
+     * Database query client
      */
     std::unique_ptr< DatabaseQueryClient > m_client;
 };

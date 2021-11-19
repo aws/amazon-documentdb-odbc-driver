@@ -178,9 +178,9 @@ static int mylog_on = DEFAULT_LOGLEVEL;
 #define LEAVE_MYLOG_CS XPlatformLeaveCriticalSection(mylog_cs)
 #define DELETE_MYLOG_CS XPlatformDeleteCriticalSection(&mylog_cs)
 
-#define MYLOGFILE "timestreamodbc_"
+#define MYLOGFILE "databaseodbc_"
 
-//#define QLOGFILE "timestreamodbc_"
+//#define QLOGFILE "databaseodbc_"
 //#ifndef WIN32
 //#define QLOGDIR "/tmp"
 //#else

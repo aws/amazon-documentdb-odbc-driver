@@ -33,7 +33,7 @@ bool _CC_from_TSResult(
  * Responsible for looping through columns, allocating memory for column fields
  * and setting column info
  * @param q_res QResultClass to set column info
- * @param result Timestream query outcome to get column info
+ * @param result Database query outcome to get column info
  * @return true if successfully assigned
  */
 bool AssignColumnHeaders(QResultClass *q_res,
@@ -42,7 +42,7 @@ bool AssignColumnHeaders(QResultClass *q_res,
 /**
  * Responsible for looping through rows, allocating tuples and passing rows for
  * assignment
- * @param result Timestream query outcome to get rows
+ * @param result Database query outcome to get rows
  * @param q_res QResultClass to hold tuples
  * @param fields ColumnInfoClass to get information about columns
  * @return true if successfully assigned
@@ -52,7 +52,7 @@ bool AssignTableData(const QueryOutcome &result,
 
 /**
  * Responsible for assigning the current row data to tuples
- * @param row Timestream row object
+ * @param row Database row object
  * @param q_res QResultClass to hold tuples
  * @param fields ColumnInfoClass to get information about columns
  * @param col_size size of the column
@@ -69,9 +69,9 @@ void SetError(const char *err);
 void ClearError();
 
 /**
- * Recursively parse the Timestream datum object to intermidiate string
+ * Recursively parse the Database datum object to intermidiate string
  * representation for further conversion.
- * @param datum Timestream Datum object to be parsed
+ * @param datum Database Datum object to be parsed
  * @param datum_value String representation of the datum to fill in recursively
  * @param column_attr_id Column attribute ID
  */
@@ -79,10 +79,10 @@ void ParseDatum(const Datum &datum,
                 std::string &datum_value, OID column_attr_id);
 
 /**
- * Parse Timestream array object to intermidiate string
+ * Parse Database array object to intermidiate string
  * representation for further conversion.
  * e.g. ARRAY[1.1, 2.3] -> [1.1, 2.3]
- * @param datums An array of Timestream Datum objects to be parsed
+ * @param datums An array of Database Datum objects to be parsed
  * @param array_value String representation of the datum to fill in recursively
  * @param column_attr_id Column attribute ID
  */
@@ -90,10 +90,10 @@ void ParseArray(const std::vector< Datum > &datums,
                 std::string &array_value, OID column_attr_id);
 
 /**
- * Parse Timestream row object to intermidiate string
+ * Parse Database row object to intermidiate string
  * representation for further conversion.
  * e.g. ROW(INTEGER '03', BIGINT '10', true) -> (3, 10, true)
- * @param datums An array of Timestream Datum objects to be parsed
+ * @param datums An array of Database Datum objects to be parsed
  * @param row_value String representation of the datum to fill in recursively
  * @param column_attr_id Column attribute ID
  */
@@ -233,7 +233,7 @@ bool AssignColumnHeaders(QResultClass *q_res,
                 if (oid_size_it == scalar_type_to_oid_size_map.end()) {
                     // NOT_SET and unsupported
                     throw std::runtime_error(
-                        "Timestream scalar type is not set or unsupported "
+                        "Database scalar type is not set or unsupported "
                         "scalar type.");
                 }
                 column_type_id = oid_size_it->second.first;
@@ -245,7 +245,7 @@ bool AssignColumnHeaders(QResultClass *q_res,
                 column_type_id = DB_TYPE_VARCHAR;
                 column_size = DB_VARCHAR_SIZE;
             } else {
-                throw std::runtime_error("Unsupported Timestream type.");
+                throw std::runtime_error("Unsupported Database type.");
             }
         }
         CI_set_field_info(QR_get_fields(q_res), (int)i,

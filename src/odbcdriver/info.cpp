@@ -894,7 +894,7 @@ API_Tables(HSTMT hstmt, const SQLCHAR *catalog_name_sql,
              * are empty strings, the result set contains a list of valid
              * schemas for the data source. (All columns except the TABLE_SCHEM
              * column contain NULLs.) Note: We don't have schema in Amazon
-             * Timestream, empty list returns
+             * Database, empty list returns
              */
             CleanUp(stmt, nullptr, SQL_SUCCESS);
         } else if ( catalog_valid && catalog_name.empty() && 

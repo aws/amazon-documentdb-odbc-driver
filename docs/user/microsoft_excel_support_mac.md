@@ -3,8 +3,8 @@
 ## Prerequisites
 
 * Microsoft Excel 2016 and higher
-* [Amazon Timestream](https://aws.amazon.com/timestream/)
-* Amazon Timestream ODBC driver
+* [Database](TODO add link to database webpage)
+* Database ODBC driver
 * A preconfigured [User or System DSN](mac_configure_dsn.md)
 
 ## Loading Data 
@@ -39,4 +39,4 @@ The data will be exported to selected location in CSV format.
 ## Troubleshooting
 
 * You may need to remove `;` from SQL statement to load data preview.
-* **AWS Profile** authentication is not supported in Excel for Mac. We recommend using IAM authentication and populating the AWS Access Key ID, AWS Secret Access Key and AWS SessionToken in the `odbc.ini` file from the values in the `~/.aws/credentials` file.
+* **Default** authentication is not supported in Excel for Mac. 

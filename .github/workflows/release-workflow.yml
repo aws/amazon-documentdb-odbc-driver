@@ -1,4 +1,4 @@
-name: Build and Release timestream-odbc
+name: Build and Release database-odbc
 # This workflow is triggered on creating tags to master
 on:
   push:

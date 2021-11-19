@@ -1,12 +1,12 @@
-# Amazon Timestream ODBC Driver Automated Tests
+# Database ODBC Driver Automated Tests
 
 ## Preparation
 
 ### Loading Test Datasets
 
-Loading a dataset requires an [Amazon Timestream](https://aws.amazon.com/timestream/) service. If missing, please refer to the documentation on how to set them up.
+Loading a dataset requires an [Database](database_link_placeholder) service. If missing, please refer to the documentation on how to set them up.
 
-In order for all of the tests to pass, [create two sample databases](https://docs.aws.amazon.com/timestream/latest/developerguide/getting-started.db-w-sample-data.html#getting-started.db-w-sample-data.using-console) `sampleDB` and `ODBCTest`. If more databases exist for the region, the catalog tests for the region will fail and should be disabled.
+In order for all of the tests to pass, [create two sample databases](database_link_database_getting_started) `sampleDB` and `ODBCTest`. If more databases exist for the region, the catalog tests for the region will fail and should be disabled.
 
 ```
 ./build/odbc/bin/tests --gtest_filter=-'TestSQLTables.*'

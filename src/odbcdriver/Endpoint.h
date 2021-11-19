@@ -19,9 +19,7 @@ class JsonView;
 
 /**
  * <p>Represents an available endpoint against which to make API calls agaisnt,
- * as well as the TTL for that endpoint.</p><p><h3>See Also:</h3>   <a
- * href="http://docs.aws.amazon.com/goto/WebAPI/timestream-query-2018-11-01/Endpoint">AWS
- * API Reference</a></p>
+ * as well as the TTL for that endpoint
  */
 class Endpoint {
    public:

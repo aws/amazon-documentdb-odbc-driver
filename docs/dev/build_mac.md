@@ -1,4 +1,4 @@
-# macOS - Building the Amazon Timestream ODBC Driver
+# macOS - Building the Database ODBC Driver
 
 ## Dependencies
 
@@ -38,4 +38,4 @@ make
 cpack .
 ```
 
-An installer named `AmazonTimestreamODBC-<version>.pkg` will be generated in the build directory (for example `AmazonTimestreamODBC_1.0.0.pkg` will be created in `cmake-build64`).
+An installer named `DatabaseODBC-<version>.pkg` will be generated in the build directory (for example `DatabaseODBC_1.0.0.pkg` will be created in `cmake-build64`).
