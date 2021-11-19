@@ -41,7 +41,7 @@ void CALL_ReleaseTransactionObject(void *);
 /* void	UnloadDelayLoadedDLLs(BOOL); */
 void CleanupDelayLoadedDLLs(void);
 #ifdef WIN32
-HMODULE MODULE_load_from_timestreamodbc_path(const char *module_name);
+HMODULE MODULE_load_from_databaseodbc_path(const char *module_name);
 #endif /* WIN32 */
 
 #ifdef __cplusplus

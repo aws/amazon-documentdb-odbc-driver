@@ -46,6 +46,6 @@ Aws::Http::HeaderValueCollection QueryRequest::GetRequestSpecificHeaders()
     const {
     Aws::Http::HeaderValueCollection headers;
     headers.insert(Aws::Http::HeaderValuePair("X-Amz-Target",
-                                              "Timestream_20181101.Query"));
+                                              "Database_20181101.Query"));
     return headers;
 }

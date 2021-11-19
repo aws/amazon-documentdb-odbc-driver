@@ -1,7 +1,7 @@
 # macOS - Configuring a DSN
 
 ## Prerequisites
-In order to use the Timestream ODBC Driver, [iODBC Driver Manager](http://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/Downloads) must be installed.
+In order to use the Database ODBC Driver, [iODBC Driver Manager](http://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/Downloads) must be installed.
 
 ## Adding a Driver Entry
 You can use **iODBC Administrator** which is installed with the iODBC Driver Manager, or manually edit the `odbcinst.ini` file.  
@@ -13,9 +13,9 @@ To give the application permission to save the Driver & DSN configurations, run 
 
 1. Go to the **ODBC Drivers** tab.
 2. Click **Add a driver**.
-    * **Description of the Driver**: The driver name used for ODBC connections (ex. `Amazon Timestream ODBC Driver`)
-    * **Driver File Name**: The path to the driver file (default installed path: `/Library/ODBC/timestream-odbc/bin/libodbcdriver.dylib`)
-    * **Setup File Name**: The path to the driver file (default installed path: `/Library/ODBC/timestream-odbc/bin/libodbcdriver.dylib`)
+    * **Description of the Driver**: The driver name used for ODBC connections (ex. `Database ODBC Driver`)
+    * **Driver File Name**: The path to the driver file (default installed path: `/Library/ODBC/database-odbc/bin/libodbcdriver.dylib`)
+    * **Setup File Name**: The path to the driver file (default installed path: `/Library/ODBC/database-odbc/bin/libodbcdriver.dylib`)
     * Set as a **System** driver
     * Below is a screenshot of how the final screen should look.
 3. Click **OK** to save the options.
@@ -34,16 +34,16 @@ Use a text editor from Terminal to edit the odbcinst.ini file such as vi.
 `vi ~/Library/ODBC/odbcinst.ini`
 
 **To add the driver entries:**
-1. Add `Amazon Timestream ODBC Driver` in the `[ODBC Drivers]` section.
-2. Add the `[Amazon Timestream ODBC Driver]` section.
+1. Add `Database ODBC Driver` in the `[ODBC Drivers]` section.
+2. Add the `[Database ODBC Driver]` section.
 
 #### Sample odbcinst.ini file
 ```
 [ODBC Drivers]
-Amazon Timestream ODBC Driver  = Installed
+Database ODBC Driver  = Installed
 
-[Amazon Timestream ODBC Driver]
-Driver = /Library/ODBC/timestream-odbc/bin/libodbcdriver.dylib
+[Database ODBC Driver]
+Driver = /Library/ODBC/database-odbc/bin/libodbcdriver.dylib
 ```
 
 ## Adding a DSN Entry
@@ -57,8 +57,8 @@ To give the application permission to save the Driver & DSN configurations, run 
 
 1. Go to the **Users** tab to create an entry that only you can use or to the **System** tab to create an entry for all users.
 2. Select **Add** on the right side of the window.
-    * Choose the Driver you added above (e.g. Amazon Timestream ODBC Driver).
-    * **Data Source Name (DSN)**: The name of the DSN used to store connection options (e.g. `AWS Timestream ODBC DSN`)
+    * Choose the Driver you added above (e.g. Database ODBC Driver).
+    * **Data Source Name (DSN)**: The name of the DSN used to store connection options (e.g. `AWS Database ODBC DSN`)
     * **Comment**: Not required
     * Add key-value pairs by using the **'+'** button. See the sample [odbc.ini](#odbc_data_source) file below for entries for each authentication type.
 3. Click **OK** to save the DSN configuration.
@@ -87,49 +87,20 @@ Use a text editor from Terminal to edit the odbc.ini file such as vi. See [Confi
 #### <a name="odbc_data_source"></a>Sample odbc.ini file
 ```
 [ODBC Data Sources]
-timestream-iam-profile  = Amazon Timestream ODBC Driver
-timestream-aad-profile  = Amazon Timestream ODBC Driver
-timestream-okta-profile = Amazon Timestream ODBC Driver
-timestream-aws-profile  = Amazon Timestream ODBC Driver
+database-default     = Database ODBC Driver
+database-default-32  = Database ODBC Driver 32
 
-[timestream-aws-profile]
-Driver    = Amazon Timestream ODBC Driver
-Region    = us-east-2
-Auth      = AWS_PROFILE
+[database-default-32]
+Driver    = Database ODBC Driver 32
+Auth      = DEFAULT
+UID       = 
+PWD       = 
 
-[timestream-aad-profile]
-Driver           = Amazon Timestream ODBC Driver
-Region           = us-east-1
-Auth             = AAD
-IdpName          = AzureAD
-AADApplicationID = 
-AADClientSecret  = 
-RoleARN          = 
-AADTenant        = 
-IdpARN           = 
-IdpUserName      = 
-IdpPassword      = 
-
-[timestream-okta-profile]
-Driver            = Amazon Timestream ODBC Driver
-Region            = us-east-1
-Auth              = OKTA
-IdpName           = Okta
-IdpHost           = 
-OktaApplicationID = 
-RoleARN           = 
-IdpARN            = 
-IdpUserName       = 
-IdpPassword       = 
-
-[timestream-iam-profile]
-Driver         = Amazon Timestream ODBC Driver
-Region         = us-east-1
-LogLevel       = 0
-Auth           = IAM
-UID            = 
-PWD            = 
-SessionToken   = 
+[database-default]
+Driver    = Database ODBC Driver
+Auth      = DEFAULT
+UID       = 
+PWD       = 
 ```
 
 ## Troubleshooting

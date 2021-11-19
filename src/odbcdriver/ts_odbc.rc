@@ -64,7 +64,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 DLG_CONFIG DIALOGEX 65, 43, 313, 256
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION "Timestream ODBC Driver DSN Setup"
+CAPTION "Database ODBC Driver DSN Setup"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     LTEXT           "Data Source Name",IDC_DSNAMETEXT,23,7,77,12,NOT WS_GROUP
@@ -171,15 +171,15 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "Comments", "Timestream ANSI ODBC driver"
+            VALUE "Comments", "Database ANSI ODBC driver"
             VALUE "CompanyName", "Amazon"
-            VALUE "FileDescription", "Timestream ODBC Driver (English)"
+            VALUE "FileDescription", "Database ODBC Driver (English)"
             VALUE "FileVersion", ODBC_VERSION
             VALUE "InternalName", "odbcdriver"
             VALUE "LegalCopyright", "Copyright"
             VALUE "LegalTrademarks", "ODBC(TM) is a trademark of Microsoft Corporation.  Microsoft is a registered trademark of Microsoft Corporation. Windows(TM) is a trademark of Microsoft Corporation."
             VALUE "OriginalFilename", "odbcdriver.dll"
-            VALUE "ProductName", "Timestream"
+            VALUE "ProductName", "Database"
             VALUE "ProductVersion", ODBC_VERSION
         END
     END

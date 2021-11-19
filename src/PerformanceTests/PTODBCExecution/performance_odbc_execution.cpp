@@ -25,7 +25,7 @@
 // clang-format on
 #define IT_SIZEOF(x) (NULL == (x) ? 0 : (sizeof((x)) / sizeof((x)[0])))
 #define ITERATION_COUNT 12
-test_string dsn_conn_string = CREATE_STRING("DSN=timestream-aws-profile");
+test_string dsn_conn_string = CREATE_STRING("DSN=database-default");
 const wchar_t* const query = L"SELECT * FROM ODBCTest.IoT limit 10000";
 
 int Setup(SQLHENV* env, SQLHDBC* conn, SQLHSTMT* hstmt) {

@@ -78,9 +78,9 @@ set(IT_HELPER "${TESTS}/ITODBCHelper")
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 
 if (WIN32)
-    find_package(AWSSDK REQUIRED core sts timestream-query)
+    find_package(AWSSDK REQUIRED core sts )
 else()
-    find_package(AWSSDK REQUIRED COMPONENTS core sts timestream-query PATHS aws-sdk-cpp/install NO_DEFAULT_PATH)
+    find_package(AWSSDK REQUIRED COMPONENTS core sts PATHS aws-sdk-cpp/install NO_DEFAULT_PATH)
     # Require at least gcc 4.9 for regex support
     if((NOT APPLE) AND ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9))
         find_package(Boost)

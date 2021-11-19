@@ -52,13 +52,13 @@
 #ifdef UNICODE_SUPPORT
 CSTR odbcdriverenlist = "odbcdriverenlist";
 CSTR odbcdriverenlistdll = "odbcdriverenlist.dll";
-CSTR timestreamodbc = "odbcdriver35w";
-CSTR timestreamodbcdll = "odbcdriver35w.dll";
+CSTR databaseodbc = "odbcdriver35w";
+CSTR databaseodbcdll = "odbcdriver35w.dll";
 #else
 CSTR odbcdriverenlist = "odbcdriverenlista";
 CSTR odbcdriverenlistdll = "odbcdriverenlista.dll";
-CSTR timestreamodbc = "odbcdriver30a";
-CSTR timestreamodbcdll = "odbcdriver30a.dll";
+CSTR databaseodbc = "odbcdriver30a";
+CSTR databaseodbcdll = "odbcdriver30a.dll";
 #endif /* UNICODE_SUPPORT */
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 #define _MSC_DELAY_LOAD_IMPORT
@@ -69,7 +69,7 @@ CSTR timestreamodbcdll = "odbcdriver30a.dll";
 #if defined(_MSC_DELAY_LOAD_IMPORT)
 /*
  *	Error hook function for delay load import.
- *	Try to load a DLL based on timestreamodbc path.
+ *	Try to load a DLL based on databaseodbc path.
  */
 #if (_MSC_VER >= 1900) /* vc14 or later */
 #define TRY_DLI_HOOK __try {
@@ -99,11 +99,11 @@ extern PfnDliHook __pfnDliNotifyHook2;
 #if defined(_MSC_DELAY_LOAD_IMPORT)
 static BOOL loaded_odbcdriverenlist = FALSE;
 static HMODULE enlist_module = NULL;
-static BOOL loaded_timestreamodbc = FALSE;
+static BOOL loaded_databaseodbc = FALSE;
 /*
- *	Load a DLL based on timestream path.
+ *	Load a DLL based on database path.
  */
-HMODULE MODULE_load_from_timestreamodbc_path(const char *module_name) {
+HMODULE MODULE_load_from_databaseodbc_path(const char *module_name) {
     extern HINSTANCE s_hModule;
     HMODULE hmodule = NULL;
     char szFileName[MAX_PATH];
@@ -117,7 +117,7 @@ HMODULE MODULE_load_from_timestreamodbc_path(const char *module_name) {
         if (_strnicmp(szFileName, sysdir, strlen(sysdir)) != 0) {
             hmodule =
                 LoadLibraryEx(szFileName, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
-            MYLOG(LOG_DEBUG, "timestream-odbc path based %s loaded module=%p",
+            MYLOG(LOG_DEBUG, "database-odbc path based %s loaded module=%p",
                   module_name, hmodule);
         }
     }
@@ -137,17 +137,17 @@ static FARPROC WINAPI DliErrorHook(unsigned dliNotify, PDelayLoadInfo pdli) {
         case dliNotePreLoadLibrary:
         case dliFailLoadLib:
             RELEASE_NOTIFY_HOOK
-            if (_strnicmp(pdli->szDll, timestreamodbc, strlen(timestreamodbc)) == 0)
-                call_module = timestreamodbc;
+            if (_strnicmp(pdli->szDll, databaseodbc, strlen(databaseodbc)) == 0)
+                call_module = databaseodbc;
             if (call_module) {
-                if (hmodule = MODULE_load_from_timestreamodbc_path(call_module),
+                if (hmodule = MODULE_load_from_databaseodbc_path(call_module),
                     NULL == hmodule)
                     hmodule = LoadLibrary(call_module);
                 if (NULL != hmodule) {
                     if (odbcdriverenlist == call_module)
                         loaded_odbcdriverenlist = TRUE;
-                    else if (timestreamodbc == call_module)
-                        loaded_timestreamodbc = TRUE;
+                    else if (databaseodbc == call_module)
+                        loaded_databaseodbc = TRUE;
                 }
             }
             break;
@@ -178,11 +178,11 @@ void CleanupDelayLoadedDLLs(void) {
         MYLOG(LOG_DEBUG, "%s unloaded success=%d", odbcdriverenlistdll, success);
         loaded_odbcdriverenlist = FALSE;
     }
-    if (loaded_timestreamodbc) {
-        MYLOG(LOG_DEBUG, "%s unloading", timestreamodbcdll);
-        success = (*func)(timestreamodbcdll);
-        MYLOG(LOG_DEBUG, "%s unloaded success=%d", timestreamodbcdll, success);
-        loaded_timestreamodbc = FALSE;
+    if (loaded_databaseodbc) {
+        MYLOG(LOG_DEBUG, "%s unloading", databaseodbcdll);
+        success = (*func)(databaseodbcdll);
+        MYLOG(LOG_DEBUG, "%s unloaded success=%d", databaseodbcdll, success);
+        loaded_databaseodbc = FALSE;
     }
     return;
 }
@@ -205,7 +205,7 @@ RETCODE CALL_EnlistInDtc(ConnectionClass *conn, void *pTra, int method) {
     __except ((GetExceptionCode() & 0xffff) == ERROR_MOD_NOT_FOUND
                   ? EXCEPTION_EXECUTE_HANDLER
                   : EXCEPTION_CONTINUE_SEARCH) {
-        if (enlist_module = MODULE_load_from_timestreamodbc_path(odbcdriverenlist),
+        if (enlist_module = MODULE_load_from_databaseodbc_path(odbcdriverenlist),
             NULL == enlist_module)
             loaded = FALSE;
         else
@@ -245,7 +245,7 @@ void *CALL_GetTransactionObject(HRESULT *hres) {
     __except ((GetExceptionCode() & 0xffff) == ERROR_MOD_NOT_FOUND
                   ? EXCEPTION_EXECUTE_HANDLER
                   : EXCEPTION_CONTINUE_SEARCH) {
-        if (enlist_module = MODULE_load_from_timestreamodbc_path(odbcdriverenlist),
+        if (enlist_module = MODULE_load_from_databaseodbc_path(odbcdriverenlist),
             NULL == enlist_module)
             loaded = FALSE;
         else

@@ -21,9 +21,7 @@ class Type;
 
 /**
    * <p> Contains the meta data for query results such as the column names, data
-   * types, and other attributes. </p><p><h3>See Also:</h3>   <a
-   * href="http://docs.aws.amazon.com/goto/WebAPI/timestream-query-2018-11-01/ColumnInfo">AWS
-   * API Reference</a></p>
+   * types, and other attributes.
    */
 class ColumnInfo {
    public:

@@ -75,6 +75,6 @@ TEST(TestConnectionOptions, Timeout_is_alpha) {
 
 TEST(TestGetUserAgent, Success) {
     DBCommunication conn;
-    std::string expected = "db-odbc." TIMESTREAMDRIVERVERSION " [tests]";
+    std::string expected = "db-odbc." DATABASEDRIVERVERSION " [tests]";
     EXPECT_EQ(expected, conn.GetUserAgent());
 }
