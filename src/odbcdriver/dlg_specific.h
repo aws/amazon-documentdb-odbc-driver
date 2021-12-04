@@ -53,7 +53,7 @@ extern "C" {
 #else
 #define INI_DSN "Database30"
 #endif /* UNICODE_SUPPORT */
-
+// Driver
 #define INI_DRIVER "Driver"
 #define INI_UID "UID"
 #define INI_PWD "PWD"
@@ -67,8 +67,16 @@ extern "C" {
 #define INI_MAX_RETRY_COUNT_CLIENT "MaxRetryCountClient"
 #define INI_MAX_CONNECTIONS "MaxConnections"
 
+// Authentication Types
+// TODO: Add new authentication type macro here. E.g:
+// #define AUTHTYPE_NEWAUTHTYPE "NewAuthType" (no spaces)
 #define AUTHTYPE_DEFAULT "DEFAULT"
 
+// Authentication Parameters
+// TODO: Add authentication parameters here. E.g:
+// #define INI_NEWAUTHTYPE_PARAM "ParameterName" (No spaces)
+
+// Default Values
 #define DEFAULT_REQUEST_TIMEOUT 3000
 #define DEFAULT_REQUEST_TIMEOUT_STR "3000"
 #define DEFAULT_CONNECTION_TIMEOUT 1000
@@ -78,8 +86,6 @@ extern "C" {
 #define DEFAULT_AUTHTYPE AUTHTYPE_DEFAULT
 #define DEFAULT_DRIVERNAME "databaseodbc"
 #define DEFAULT_NONE ""
-
-
 
 #ifdef _HANDLE_ENLIST_IN_DTC_
 #define INI_XAOPT "XaOpt"
@@ -181,8 +187,9 @@ const struct authmode *GetAuthModes();
 void SetDlgStuff(HWND hdlg, const ConnInfo *ci);
 void GetDlgStuff(HWND hdlg, ConnInfo *ci);
 INT_PTR CALLBACK advancedOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
-                                 LPARAM lParam);
-INT_PTR CALLBACK logOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam, LPARAM lParam);
+                                     LPARAM lParam);
+INT_PTR CALLBACK logOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
+                                LPARAM lParam);
 #endif /* WIN32 */
 
 int write_Ci_Drivers(const char *fileName, const char *sectionName,

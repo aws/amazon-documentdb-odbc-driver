@@ -61,14 +61,13 @@ extern "C" {
 #define DB_TYPE_DATE 1082
 #define DB_TYPE_TIME 1083
 #define DB_TYPE_TIMESTAMP_NO_TMZONE 1114 /* since 7.2 */
-#define DB_TYPE_TIMESTAMP 1296        /* deprecated since 7.0 */
+#define DB_TYPE_TIMESTAMP 1296           /* deprecated since 7.0 */
 #define INTERNAL_ASIS_TYPE (-9999)
 
-#define TYPE_MAY_BE_ARRAY(type) \
-    (type) >= 1000 && (type) <= 1041
+#define TYPE_MAY_BE_ARRAY(type) (type) >= 1000 && (type) <= 1041
 
-#define DB_ATP_UNSET (-3) /* atttypmod */
-#define DB_ADT_UNSET (-3) /* adtsize_or_longestlen */
+#define DB_ATP_UNSET (-3)   /* atttypmod */
+#define DB_ADT_UNSET (-3)   /* adtsize_or_longestlen */
 #define DB_UNKNOWNS_UNSET 0 /* UNKNOWNS_AS_MAX */
 
 OID es_true_type(const ConnectionClass *, OID, OID);
@@ -119,8 +118,8 @@ Int4 estype_attr_desclength(const ConnectionClass *conn, OID type,
 Int4 estype_column_size(
     const StatementClass *stmt, OID type, int col,
     int handle_unknown_size_as); /* corresponds to "precision" in ODBC 2.x */
-SQLSMALLINT estype_precision(
-    const StatementClass *stmt, OID type, int col); /* "precsion in ODBC 3.x */
+SQLSMALLINT estype_precision(const StatementClass *stmt, OID type,
+                             int col); /* "precsion in ODBC 3.x */
 /* the following size/length are of Int4 due to ES restriction */
 Int4 estype_display_size(const StatementClass *stmt, OID type, int col,
                          int handle_unknown_size_as);
@@ -193,6 +192,7 @@ typedef enum {
 #include <vector>
 
 typedef struct authentication_options {
+    // TODO: add new authentication parameters/connection string options below
     std::string auth_type;
     std::string uid;
     std::string pwd;

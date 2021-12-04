@@ -60,6 +60,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
+// TODO: For each new authentication method, create "IDC_" macro in 
+// resource.h for each new authentication parameter and add to DLG_CONFIG below
 //
 
 DLG_CONFIG DIALOGEX 65, 43, 313, 256
@@ -72,6 +74,13 @@ BEGIN
     GROUPBOX        "Authentication Settings",IDC_AUTH_SETTINGS,12,25,286,180,BS_FLAT
     LTEXT           "Auth Type",IDC_AUTH_STATIC,20,42,19,8
     COMBOBOX        IDC_AUTHTYPE,91,40,192,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+
+
+    LTEXT           "User ID",IDC_USERNAME_STATIC,20,57,68,8
+    EDITTEXT        IDC_USER,91,55,191,12,ES_AUTOHSCROLL
+    LTEXT           "Password",IDC_PASSWORD_STATIC,20,71,68,8
+    EDITTEXT        IDC_PASSWORD,91,69,191,12,ES_AUTOHSCROLL|ES_PASSWORD
+
 
     PUSHBUTTON      "Advanced Options",ID_ADVANCED_OPTIONS,33,211,111,15,WS_GROUP
     PUSHBUTTON      "Logging Options",ID_LOG_OPTIONS,156,211,108,15
@@ -214,6 +223,8 @@ END
 /////////////////////////////////////////////////////////////////////////////
 //
 // String Table
+// TODO: For each new authentication method, create "IDS_" macro in
+// resource.h for the new method and add to STRINGTABLE below
 //
 
 STRINGTABLE
@@ -243,4 +254,3 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-

@@ -20,8 +20,8 @@
 #include <stdlib.h>
 
 #include "connection.h"
-#include "odbc.h"
 #include "misc.h"
+#include "odbc.h"
 
 #ifndef WIN32
 #include <sys/socket.h>
@@ -129,10 +129,13 @@ INT_PTR CALLBACK dconn_FDriverConnectProc(HWND hdlg, UINT wMsg, WPARAM wParam,
 
             SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL, 2, (WPARAM)0);
 
+            // TODO: If connection string has been modified (e.g. new
+            // authentication method) Update code accordingly below (add else if
+            // statement)
             if (strcmp(ci->authtype, AUTHTYPE_DEFAULT) == 0) {
                 SetFocus(GetDlgItem(hdlg, IDC_USER));
             }
-            
+
             break;
 
         case WM_COMMAND:
@@ -205,7 +208,8 @@ BOOL dconn_get_attributes(copyfunc func, const char *connect_string,
     char *last = NULL;
 #endif /* HAVE_STRTOK_R */
 
-    if (our_connect_string = strdup(connect_string), NULL == our_connect_string) {
+    if (our_connect_string = strdup(connect_string),
+        NULL == our_connect_string) {
         ret = FALSE;
         goto cleanup;
     }
@@ -265,16 +269,14 @@ BOOL dconn_get_attributes(copyfunc func, const char *connect_string,
                     if (NULL == closep) {
                         if (!delp) /* error */
                         {
-                            MYLOG(LOG_DEBUG,
-                                  "closing bracket doesn't exist 1");
+                            MYLOG(LOG_DEBUG, "closing bracket doesn't exist 1");
                             ret = FALSE;
                             goto cleanup;
                         }
                         closep = strchr(delp + 1, CLOSING_BRACKET);
                         if (!closep) /* error */
                         {
-                            MYLOG(LOG_DEBUG,
-                                  "closing bracket doesn't exist 2");
+                            MYLOG(LOG_DEBUG, "closing bracket doesn't exist 2");
                             ret = FALSE;
                             goto cleanup;
                         }

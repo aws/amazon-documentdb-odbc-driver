@@ -16,9 +16,9 @@
 
 #ifdef WIN32
 #include "enlist.h"
-#include "odbc.h"
 #include "loadlib.h"
 #include "misc.h"  // strncpy_null
+#include "odbc.h"
 
 //#include  "environ.h"
 #ifdef WIN32
@@ -282,6 +282,8 @@ INT_PTR CALLBACK ConfigDlgProc(HWND hdlg, UINT wMsg, WPARAM wParam,
             SendDlgItemMessage(hdlg, IDC_DESC, EM_LIMITTEXT,
                                (WPARAM)(MAXDESC - 1), 0L);
 
+            // TODO: If new authentication method is added, update below
+            // accordingly E.g. Add else if statement for new AUTHTYPE
             if (stricmp(ci->authtype, AUTHTYPE_DEFAULT) == 0) {
                 SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL, 0,
                                    (WPARAM)0);
@@ -337,14 +339,16 @@ INT_PTR CALLBACK ConfigDlgProc(HWND hdlg, UINT wMsg, WPARAM wParam,
                 case ID_ADVANCED_OPTIONS: {
                     if (DialogBoxParam(
                             s_hModule, MAKEINTRESOURCE(DLG_ADVANCED_OPTIONS),
-                            hdlg, advancedOptionsProc, (LPARAM)&lpsetupdlg->ci) > 0)
+                            hdlg, advancedOptionsProc, (LPARAM)&lpsetupdlg->ci)
+                        > 0)
                         EndDialog(hdlg, 0);
                     break;
                 }
                 case ID_LOG_OPTIONS: {
-                    if (DialogBoxParam(
-                            s_hModule, MAKEINTRESOURCE(DLG_LOG_OPTIONS), hdlg,
-                                       logOptionsProc, (LPARAM)&lpsetupdlg->ci) > 0)
+                    if (DialogBoxParam(s_hModule,
+                                       MAKEINTRESOURCE(DLG_LOG_OPTIONS), hdlg,
+                                       logOptionsProc, (LPARAM)&lpsetupdlg->ci)
+                        > 0)
                         EndDialog(hdlg, 0);
                     break;
                 }

@@ -17,11 +17,16 @@ env:
   ODBC_BUILD_PATH: "./build/odbc/build"
   AWS_SDK_INSTALL_PATH: "./build/aws-sdk/install"
   NOT_CONNECTED: 1
+  FAKE_CONNECTION: 1
 
 jobs:
   build-linux64:
     runs-on: ubuntu-latest
     steps:
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v1.11
+      with:
+        cmake-version: '3.21.4'
     - uses: actions/checkout@v2
     - name: run-cppcheck
       run: |
@@ -37,7 +42,7 @@ jobs:
       if: success()
       run: |
         sudo apt update
-        sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib cmake linux-headers-$(uname -r) build-essential valgrind
+        sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib linux-headers-$(uname -r) build-essential valgrind
     - name: prepare-dsn
       if: success()
       run: |
@@ -96,6 +101,10 @@ jobs:
   build-linux32:
     runs-on: ubuntu-latest
     steps:
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v1.11
+      with:
+        cmake-version: '3.21.4'
     - uses: actions/checkout@v2
     - name: run-cppcheck
       run: |
@@ -113,7 +122,7 @@ jobs:
         # Need to install i386 versions
         sudo dpkg --add-architecture i386
         sudo apt update
-        sudo apt install unixodbc:i386 unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386 zlib1g-dev:i386 linux-headers-$(uname -r) gcc-multilib:i386 g++-multilib:i386 cmake g++-9:i386 gcc-9:i386 gcc-9-multilib:i386 g++-9-multilib:i386 binutils:i386 make:i386
+        sudo apt install unixodbc:i386 unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386 zlib1g-dev:i386 linux-headers-$(uname -r) gcc-multilib:i386 g++-multilib:i386 g++-9:i386 gcc-9:i386 gcc-9-multilib:i386 g++-9-multilib:i386 binutils:i386 make:i386
     - name: prepare-dsn
       if: success()
       run: |

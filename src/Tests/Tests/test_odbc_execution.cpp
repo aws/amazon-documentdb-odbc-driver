@@ -77,7 +77,8 @@ class TestSQLGetCursorName : public Fixture {
         Fixture::SetUp();
         if (m_hstmt != SQL_NULL_HSTMT) {
             ASSERT_EQ(SQLSetCursorName(
-                          m_hstmt, AS_SQLTCHAR(m_cursor_name.c_str()), SQL_NTS), SQL_SUCCESS);
+                          m_hstmt, AS_SQLTCHAR(m_cursor_name.c_str()), SQL_NTS),
+                      SQL_SUCCESS);
         }
     }
 
@@ -92,19 +93,14 @@ class TestSQLBulkOperations : public Fixture {};
 class TestSQLSetPos : public Fixture {};
 
 TEST_F(TestSQLExecute, NO_SQLPREPARE) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     SQLRETURN ret = SQLExecute(m_hstmt);
     EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_SEQUENCE_ERROR));
+    EXPECT_TRUE(
+        CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_SEQUENCE_ERROR));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLExecute, BASIC) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     test_string query = CREATE_STRING("SELECT 12345 FROM ODBCTest.IoT LIMIT 5");
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -128,9 +124,6 @@ TEST_F(TestSQLExecute, BASIC) {
 }
 
 TEST_F(TestSQLExecute, EXECUTE_TWICE) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     test_string query = CREATE_STRING("SELECT 12345 FROM ODBCTest.IoT LIMIT 5");
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -159,9 +152,6 @@ TEST_F(TestSQLExecute, EXECUTE_TWICE) {
 }
 
 TEST_F(TestSQLExecute, EXECUTE_TWICE_WITH_CLOSECURSOR) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     test_string query = CREATE_STRING("SELECT 12345 FROM ODBCTest.IoT LIMIT 5");
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -190,9 +180,6 @@ TEST_F(TestSQLExecute, EXECUTE_TWICE_WITH_CLOSECURSOR) {
 }
 
 TEST_F(TestSQLExecute, PREPARE_AND_EXECDIRECT) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     test_string query = CREATE_STRING("SELECT 12345 FROM ODBCTest.IoT LIMIT 5");
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -215,9 +202,6 @@ TEST_F(TestSQLExecute, PREPARE_AND_EXECDIRECT) {
 }
 
 TEST_F(TestSQLExecute, UPDATE_PREPARE) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     test_string query = CREATE_STRING("SELECT 12345 FROM ODBCTest.IoT LIMIT 5");
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -245,9 +229,6 @@ TEST_F(TestSQLExecute, UPDATE_PREPARE) {
 }
 
 TEST_F(TestSQLExecute, CLEAR_PREPARE) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     test_string query = CREATE_STRING("SELECT 1 FROM ODBCTest.IoT LIMIT 1");
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -261,9 +242,6 @@ TEST_F(TestSQLExecute, CLEAR_PREPARE) {
 }
 
 TEST_F(TestSQLPrepare, SUCCESS_NO_PARAM) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     test_string query = CREATE_STRING("SELECT 1 FROM ODBCTest.IoT LIMIT 1");
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_EQ(SQL_SUCCESS, ret);
@@ -271,20 +249,16 @@ TEST_F(TestSQLPrepare, SUCCESS_NO_PARAM) {
 }
 
 TEST_F(TestSQLPrepare, ERROR_WITH_PARAM) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    test_string query = CREATE_STRING("SELECT 1 FROM ODBCTest.IoT where time = ? LIMIT 1");
+    test_string query =
+        CREATE_STRING("SELECT 1 FROM ODBCTest.IoT where time = ? LIMIT 1");
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_EQ(SQL_ERROR, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLPrepare, PREPARE_METADATA) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    test_string query = CREATE_STRING("SELECT 1, 2, 3, 4 FROM ODBCTest.IoT LIMIT 1");
+    test_string query =
+        CREATE_STRING("SELECT 1, 2, 3, 4 FROM ODBCTest.IoT LIMIT 1");
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_EQ(SQL_SUCCESS, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -295,9 +269,6 @@ TEST_F(TestSQLPrepare, PREPARE_METADATA) {
 }
 
 TEST_F(TestSQLPrepare, ERROR_NULL_QUERY) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     SQLRETURN ret = SQLPrepare(m_hstmt, NULL, SQL_NTS);
     EXPECT_EQ(SQL_ERROR, ret);
     EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
@@ -306,9 +277,6 @@ TEST_F(TestSQLPrepare, ERROR_NULL_QUERY) {
 }
 
 TEST_F(TestSQLPrepare, SHOW_STATEMENT) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     test_string query = CREATE_STRING("SHOW DATABASES LIKE 'ODBC%'");
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -330,9 +298,6 @@ TEST_F(TestSQLPrepare, SHOW_STATEMENT) {
 }
 
 TEST_F(TestSQLPrepare, SHOW_STATEMENT_LEADING_SPACES) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     test_string query = CREATE_STRING("      SHOW DATABASES LIKE 'ODBC%'");
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -354,9 +319,6 @@ TEST_F(TestSQLPrepare, SHOW_STATEMENT_LEADING_SPACES) {
 }
 
 TEST_F(TestSQLPrepare, DESCRIBE_STATEMENT) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     test_string query = CREATE_STRING("DESCRIBE ODBCTest.DevOps");
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -376,9 +338,6 @@ TEST_F(TestSQLPrepare, DESCRIBE_STATEMENT) {
 }
 
 TEST_F(TestSQLPrepare, DESCRIBE_STATEMENT_SIZE_0) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     test_string query = CREATE_STRING("DESCRIBE ODBCTest.DevOps");
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), 0);
     EXPECT_EQ(SQL_SUCCESS, ret);
@@ -390,9 +349,6 @@ TEST_F(TestSQLPrepare, DESCRIBE_STATEMENT_SIZE_0) {
 }
 
 TEST_F(TestSQLPrepare, DESCRIBE_STATEMENT_GREATER_THAN_0) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     test_string query = CREATE_STRING("DESCRIBE ODBCTest.DevOps");
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), 5);
     EXPECT_EQ(SQL_SUCCESS, ret);
@@ -403,18 +359,16 @@ TEST_F(TestSQLPrepare, DESCRIBE_STATEMENT_GREATER_THAN_0) {
     EXPECT_TRUE(SQL_SUCCEEDED(SQLFreeStmt(m_hstmt, SQL_CLOSE)));
 }
 
-
 TEST_F(TestSQLPrepare, WITH_SELECT_STATEMENT) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    test_string query =
-        CREATE_STRING("WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 ")
+    test_string query = CREATE_STRING(
+        "WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 ")
         CREATE_STRING("14:18:30.123456789' AS binned_timestamp, ARRAY[1,2,3] ")
-        CREATE_STRING("AS data FROM ODBCTest.IoT LIMIT ")
-        CREATE_STRING("1), interpolated_timeseries AS(SELECT ")
-        CREATE_STRING("CREATE_TIME_SERIES(binned_timestamp, data) FROM binned_timeseries) ")
-        CREATE_STRING("SELECT *FROM interpolated_timeseries");
+            CREATE_STRING("AS data FROM ODBCTest.IoT LIMIT ")
+                CREATE_STRING("1), interpolated_timeseries AS(SELECT ")
+                    CREATE_STRING(
+                        "CREATE_TIME_SERIES(binned_timestamp, data) FROM "
+                        "binned_timeseries) ")
+                        CREATE_STRING("SELECT *FROM interpolated_timeseries");
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_EQ(SQL_SUCCESS, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -425,10 +379,8 @@ TEST_F(TestSQLPrepare, WITH_SELECT_STATEMENT) {
 }
 
 TEST_F(TestSQLDescribeParam, DESCRIBE_PARAM) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    test_string query = CREATE_STRING("SELECT 1 FROM ODBCTest.IoT where time = ? LIMIT 1");
+    test_string query =
+        CREATE_STRING("SELECT 1 FROM ODBCTest.IoT where time = ? LIMIT 1");
     SQLRETURN ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_EQ(SQL_ERROR, ret);
     SQLSMALLINT sqlType;
@@ -443,37 +395,27 @@ TEST_F(TestSQLDescribeParam, DESCRIBE_PARAM) {
 }
 
 TEST_F(TestSQLNumParams, NUM_PARAMS) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     SQLSMALLINT num = 0;
     SQLRETURN ret = SQLNumParams(nullptr, &num);
     EXPECT_EQ(SQL_ERROR, ret);
     ret = SQLNumParams(m_hstmt, &num);
     EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_NOT_IMPLEMENTED_ERROR));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NOT_IMPLEMENTED_ERROR));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLFetch, INVALID_HANDLE) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     EXPECT_EQ(SQL_INVALID_HANDLE, SQLFetch(nullptr));
 }
 
 TEST_F(TestSQLFetch, INVALID_CURSOR_STATE) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     EXPECT_EQ(SQL_ERROR, SQLFetch(m_hstmt));
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_INVALID_CURSUR_STATE));
+    EXPECT_TRUE(
+        CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_INVALID_CURSUR_STATE));
 }
 
 TEST_F(TestSQLFetch, SUCCESS) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     test_string query = CREATE_STRING("SELECT 1 FROM ODBCTest.IoT LIMIT 1");
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -481,9 +423,6 @@ TEST_F(TestSQLFetch, SUCCESS) {
 }
 
 TEST_F(TestSQLFetch, NO_MORE_DATA) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     test_string query = CREATE_STRING("SELECT 1 FROM ODBCTest.IoT LIMIT 1");
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -492,10 +431,8 @@ TEST_F(TestSQLFetch, NO_MORE_DATA) {
 }
 
 TEST_F(TestSQLFetch, FRACTIONAL_TRUNCATION) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    test_string query = CREATE_STRING("SELECT VARCHAR \'1.5\' FROM ODBCTest.IoT LIMIT 1");
+    test_string query =
+        CREATE_STRING("SELECT VARCHAR \'1.5\' FROM ODBCTest.IoT LIMIT 1");
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLCHAR data;
@@ -503,14 +440,13 @@ TEST_F(TestSQLFetch, FRACTIONAL_TRUNCATION) {
     ret = SQLBindCol(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ(SQL_SUCCESS_WITH_INFO, SQLFetch(m_hstmt));
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_FRACTIONAL_TRUNCATION));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_FRACTIONAL_TRUNCATION));
 }
 
 TEST_F(TestSQLFetch, RIGHT_TRUNCATION) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    test_string query = CREATE_STRING("SELECT VARCHAR \'741370\' FROM ODBCTest.IoT LIMIT 1");
+    test_string query =
+        CREATE_STRING("SELECT VARCHAR \'741370\' FROM ODBCTest.IoT LIMIT 1");
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLCHAR data[1024] = {0};
@@ -523,10 +459,8 @@ TEST_F(TestSQLFetch, RIGHT_TRUNCATION) {
 }
 
 TEST_F(TestSQLFetch, OUT_OF_RANGE) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    test_string query = CREATE_STRING("SELECT VARCHAR \'2\' FROM ODBCTest.IoT LIMIT 1");
+    test_string query =
+        CREATE_STRING("SELECT VARCHAR \'2\' FROM ODBCTest.IoT LIMIT 1");
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLCHAR data;
@@ -534,14 +468,13 @@ TEST_F(TestSQLFetch, OUT_OF_RANGE) {
     ret = SQLBindCol(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ(SQL_ERROR, SQLFetch(m_hstmt));
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE));
 }
 
 TEST_F(TestSQLFetch, RESTRICTED_DATA_TYPE_VIOLATION) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    test_string query = CREATE_STRING("SELECT DATE \'2021-01-02\' FROM ODBCTest.IoT LIMIT 1");
+    test_string query =
+        CREATE_STRING("SELECT DATE \'2021-01-02\' FROM ODBCTest.IoT LIMIT 1");
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     TIME_STRUCT data;
@@ -549,14 +482,13 @@ TEST_F(TestSQLFetch, RESTRICTED_DATA_TYPE_VIOLATION) {
     ret = SQLBindCol(m_hstmt, 1, SQL_C_TIME, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ(SQL_ERROR, SQLFetch(m_hstmt));
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_RESTRICTED_DATA_TYPE_ERROR));
 }
 
 TEST_F(TestSQLFetch, STRING_CONVERSION_ERROR) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    test_string query = CREATE_STRING("SELECT VARCHAR \'1.a\' FROM ODBCTest.IoT LIMIT 1");
+    test_string query =
+        CREATE_STRING("SELECT VARCHAR \'1.a\' FROM ODBCTest.IoT LIMIT 1");
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLCHAR data;
@@ -564,16 +496,14 @@ TEST_F(TestSQLFetch, STRING_CONVERSION_ERROR) {
     ret = SQLBindCol(m_hstmt, 1, SQL_C_BIT, &data, 0, &indicator);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     EXPECT_EQ(SQL_ERROR, SQLFetch(m_hstmt));
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_STRING_CONVERSION_ERROR));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_STRING_CONVERSION_ERROR));
 }
 
 TEST_F(TestSQLExecDirect, Success_100) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     int limit = 100;
-    test_string query =
-        CREATE_STRING("SELECT * FROM ODBCTest.IoT LIMIT ") + to_test_string(std::to_string(limit));
+    test_string query = CREATE_STRING("SELECT * FROM ODBCTest.IoT LIMIT ")
+                        + to_test_string(std::to_string(limit));
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     ASSERT_EQ(SQL_SUCCESS, ret);
     int cnt = 0;
@@ -587,12 +517,9 @@ TEST_F(TestSQLExecDirect, Success_100) {
 }
 
 TEST_F(TestSQLExecDirect, Success_400) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     int limit = 400;
-    test_string query =
-        CREATE_STRING("SELECT * FROM ODBCTest.IoT LIMIT ")+ to_test_string(std::to_string(limit));
+    test_string query = CREATE_STRING("SELECT * FROM ODBCTest.IoT LIMIT ")
+                        + to_test_string(std::to_string(limit));
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     ASSERT_EQ(SQL_SUCCESS, ret);
     int cnt = 0;
@@ -606,12 +533,9 @@ TEST_F(TestSQLExecDirect, Success_400) {
 }
 
 TEST_F(TestSQLExecDirect, Success_5000) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     int limit = 5000;
-    test_string query =
-        CREATE_STRING("SELECT * FROM ODBCTest.IoT LIMIT ")+ to_test_string(std::to_string(limit));
+    test_string query = CREATE_STRING("SELECT * FROM ODBCTest.IoT LIMIT ")
+                        + to_test_string(std::to_string(limit));
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     ASSERT_EQ(SQL_SUCCESS, ret);
     int cnt = 0;
@@ -625,12 +549,9 @@ TEST_F(TestSQLExecDirect, Success_5000) {
 }
 
 TEST_F(TestSQLExecDirect, Success_10000) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     int limit = 10000;
-    test_string query =
-        CREATE_STRING("SELECT * FROM ODBCTest.IoT LIMIT ")+ to_test_string(std::to_string(limit));
+    test_string query = CREATE_STRING("SELECT * FROM ODBCTest.IoT LIMIT ")
+                        + to_test_string(std::to_string(limit));
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     ASSERT_EQ(SQL_SUCCESS, ret);
     int cnt = 0;
@@ -644,18 +565,12 @@ TEST_F(TestSQLExecDirect, Success_10000) {
 }
 
 TEST_F(TestSQLExecDirect, NullQueryError) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     SQLRETURN ret = SQLExecDirect(m_hstmt, NULL, SQL_NTS);
     EXPECT_EQ(SQL_ERROR, ret);
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
 TEST_F(TestSQLSetCursorName, Success) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     SQLRETURN ret =
         SQLSetCursorName(m_hstmt, AS_SQLTCHAR(m_cursor_name.c_str()), SQL_NTS);
     EXPECT_EQ(SQL_SUCCESS, ret);
@@ -663,9 +578,6 @@ TEST_F(TestSQLSetCursorName, Success) {
 }
 
 TEST_F(TestSQLGetCursorName, Success) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     SQLRETURN ret =
         SQLGetCursorName(m_hstmt, m_cursor_name_buf,
                          IT_SIZEOF(m_cursor_name_buf), &m_cursor_name_length);
@@ -676,9 +588,6 @@ TEST_F(TestSQLGetCursorName, Success) {
 }
 
 TEST_F(TestSQLGetCursorName, WrongLengthForCursorName) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     SQLRETURN ret =
         SQLGetCursorName(m_hstmt, m_cursor_name_buf, m_wrong_buffer_length,
                          &m_cursor_name_length);
@@ -689,20 +598,14 @@ TEST_F(TestSQLGetCursorName, WrongLengthForCursorName) {
 }
 
 TEST_F(TestSQLCancel, NULLHandle) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     SQLRETURN ret_exec = SQLCancel(NULL);
     EXPECT_EQ(ret_exec, SQL_INVALID_HANDLE);
 }
 
 TEST_F(TestSQLCancel, QueryInProgress) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     int limit = 32925;
-    test_string query =
-        CREATE_STRING("SELECT * FROM ODBCTest.IoT LIMIT ")+ to_test_string(std::to_string(limit));
+    test_string query = CREATE_STRING("SELECT * FROM ODBCTest.IoT LIMIT ")
+                        + to_test_string(std::to_string(limit));
     SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     ASSERT_EQ(SQL_SUCCESS, ret);
     ret = SQLCancel(m_hstmt);
@@ -719,11 +622,7 @@ TEST_F(TestSQLCancel, QueryInProgress) {
 }
 
 TEST_F(TestSQLCancel, QueryInProgressMultithread) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    test_string query =
-        CREATE_STRING("SELECT * FROM ODBCTest.IoT");
+    test_string query = CREATE_STRING("SELECT * FROM ODBCTest.IoT");
     std::thread th1([&]() {
         auto ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
         EXPECT_EQ(SQL_ERROR, ret);
@@ -739,29 +638,22 @@ TEST_F(TestSQLCancel, QueryInProgressMultithread) {
     th1.join();
     SQLRETURN ret = SQLFetch(m_hstmt);
     EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
-        SQLSTATE_INVALID_CURSUR_STATE));
+    EXPECT_TRUE(
+        CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_INVALID_CURSUR_STATE));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
     Sleep(1000);
 }
 
 TEST_F(TestSQLCancel, QueryNotSent) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     SQLRETURN ret_exec = SQLCancel(m_hstmt);
     EXPECT_EQ(ret_exec, SQL_SUCCESS);
 }
 
 TEST_F(TestSQLCancel, QueryFinished) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     int limit = 10000;
-    test_string query =
-        CREATE_STRING("SELECT * FROM ODBCTest.IoT LIMIT ") + to_test_string(std::to_string(limit));
-    SQLRETURN ret =
-        SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    test_string query = CREATE_STRING("SELECT * FROM ODBCTest.IoT LIMIT ")
+                        + to_test_string(std::to_string(limit));
+    SQLRETURN ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
     ASSERT_EQ(ret, SQL_SUCCESS);
     int cnt = 0;
     while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {
@@ -775,9 +667,6 @@ TEST_F(TestSQLCancel, QueryFinished) {
 }
 
 TEST_F(TestSQLEndTran, NOT_SUPPORTED) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     SQLRETURN ret = SQLEndTran(SQL_HANDLE_DBC, m_conn, SQL_COMMIT);
     EXPECT_EQ(ret, SQL_ERROR);
     EXPECT_TRUE(
@@ -786,9 +675,6 @@ TEST_F(TestSQLEndTran, NOT_SUPPORTED) {
 }
 
 TEST_F(TestSQLTransact, NOT_SUPPORTED) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     SQLRETURN ret = SQLTransact(m_env, m_conn, SQL_COMMIT);
     EXPECT_EQ(ret, SQL_ERROR);
     EXPECT_TRUE(
@@ -797,9 +683,6 @@ TEST_F(TestSQLTransact, NOT_SUPPORTED) {
 }
 
 TEST_F(TestSQLNativeSql, SUCCESS) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     test_string query = CREATE_STRING("SELECT * FROM ODBCTest.IoT LIMIT 1");
     SQLTCHAR out_query[1024] = {0};
     SQLINTEGER out_length = 0;
@@ -809,9 +692,6 @@ TEST_F(TestSQLNativeSql, SUCCESS) {
 }
 
 TEST_F(TestSQLParamData, NOT_SUPPORTED) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     SQLRETURN ret = SQLParamData(m_hstmt, NULL);
     EXPECT_EQ(ret, SQL_ERROR);
     EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
@@ -820,9 +700,6 @@ TEST_F(TestSQLParamData, NOT_SUPPORTED) {
 }
 
 TEST_F(TestSQLPutData, NOT_SUPPORTED) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     SQLCHAR data;
     SQLRETURN ret = SQLPutData(m_hstmt, &data, SQL_NULL_DATA);
     EXPECT_EQ(ret, SQL_ERROR);
@@ -832,10 +709,7 @@ TEST_F(TestSQLPutData, NOT_SUPPORTED) {
 }
 
 TEST_F(TestSQLBindParameter, NOT_SUPPORTED) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    SQLCHAR data[1024];  
+    SQLCHAR data[1024];
     SQLLEN indicator;
     SQLRETURN ret = SQLBindParameter(m_hstmt, 1, SQL_PARAM_INPUT, SQL_C_CHAR,
                                      SQL_CHAR, 1024, 0, data, 0, &indicator);
@@ -846,9 +720,6 @@ TEST_F(TestSQLBindParameter, NOT_SUPPORTED) {
 }
 
 TEST_F(TestSQLBulkOperations, NOT_SUPPORTED) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     SQLRETURN ret = SQLBulkOperations(m_hstmt, SQL_ADD);
     EXPECT_EQ(ret, SQL_ERROR);
     EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
@@ -857,9 +728,6 @@ TEST_F(TestSQLBulkOperations, NOT_SUPPORTED) {
 }
 
 TEST_F(TestSQLSetPos, NOT_SUPPORTED) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     SQLRETURN ret = SQLSetPos(m_hstmt, 0, SQL_POSITION, SQL_LOCK_NO_CHANGE);
     EXPECT_EQ(ret, SQL_ERROR);
     EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,

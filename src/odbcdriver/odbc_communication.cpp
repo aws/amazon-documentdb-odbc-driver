@@ -35,67 +35,73 @@
 // clang-format on
 
 namespace {
-    /**
-     * A helper class to initialize/shutdown AWS API once per DLL load/unload.
-     */
-    class AwsSdkHelper {
-      public:
-        AwsSdkHelper() :
-          m_reference_count(0) {
-        }
+/**
+ * A helper class to initialize/shutdown AWS API once per DLL load/unload.
+ */
+class AwsSdkHelper {
+   public:
+    AwsSdkHelper() : m_reference_count(0) {
+    }
 
-        AwsSdkHelper& operator++() {
-          if (1 == ++m_reference_count) {
-            std::lock_guard<std::mutex> lock(m_mutex);
+    AwsSdkHelper& operator++() {
+        if (1 == ++m_reference_count) {
+            std::lock_guard< std::mutex > lock(m_mutex);
             Aws::InitAPI(m_sdk_options);
-          }
-          return *this;
         }
+        return *this;
+    }
 
-        AwsSdkHelper& operator--() {
-          if (0 == --m_reference_count) {
-            std::lock_guard<std::mutex> lock(m_mutex);
+    AwsSdkHelper& operator--() {
+        if (0 == --m_reference_count) {
+            std::lock_guard< std::mutex > lock(m_mutex);
             Aws::ShutdownAPI(m_sdk_options);
-          }
-          return *this;
         }
+        return *this;
+    }
 
-        Aws::SDKOptions m_sdk_options;
-        std::atomic<int> m_reference_count;
-        std::mutex m_mutex;
+    Aws::SDKOptions m_sdk_options;
+    std::atomic< int > m_reference_count;
+    std::mutex m_mutex;
+};
+
+AwsSdkHelper AWS_SDK_HELPER;
+
+const std::string UA_ID_PREFIX = std::string("db-odbc.");
+const std::string DEFAULT_CREATOR_TYPE = "DEFAULT";
+
+typedef std::function< std::unique_ptr< DatabaseQueryClient >(
+    const runtime_options& options,
+    const Aws::Client::ClientConfiguration& config) >
+    QueryClientCreator;
+
+// TODO: if new authentication method added, create a new QueryClientCreator
+// e.g. QueryClientCreator newauthtype = [](...){...};
+QueryClientCreator default_creator =
+    [](const runtime_options&, const Aws::Client::ClientConfiguration& config) {
+        return std::unique_ptr< DatabaseQueryClient >(
+            new DatabaseQueryClient(config));
     };
 
-    AwsSdkHelper AWS_SDK_HELPER;
-
-    const std::string UA_ID_PREFIX = std::string("db-odbc.");
-    const std::string DEFAULT_CREATOR_TYPE = "DEFAULT";
-
-    typedef std::function< std::unique_ptr< DatabaseQueryClient >(
-        const runtime_options& options,
-        const Aws::Client::ClientConfiguration& config) > QueryClientCreator;
-
-    QueryClientCreator default_creator =
-        [](const runtime_options& ,
-           const Aws::Client::ClientConfiguration& config) {
-            return std::unique_ptr< DatabaseQueryClient >(new DatabaseQueryClient(config));
-        };
-
-    std::unordered_map< std::string, QueryClientCreator > creators = {
-        {DEFAULT_CREATOR_TYPE, default_creator}
-    };
-}
+// TODO: If new authentication method added, update creators below
+// e.g. add {AUTHTYPE_NEWAUTHTYPE, newauthtype} below
+std::unordered_map< std::string, QueryClientCreator > creators = {
+    {DEFAULT_CREATOR_TYPE, default_creator}};
+}  // namespace
 
 DBCommunication::DBCommunication() {
-  ++AWS_SDK_HELPER;
+    ++AWS_SDK_HELPER;
 }
 
 DBCommunication::~DBCommunication() {
-  --AWS_SDK_HELPER;
+    --AWS_SDK_HELPER;
 }
 
 bool DBCommunication::Validate(const runtime_options& options) {
+    // TODO: If authentication methods are updated or new ones created, update
+    // validation checks below accordingly
     if (options.auth.auth_type != AUTHTYPE_DEFAULT) {
-        throw std::invalid_argument("Unknown authentication type: \"" + options.auth.auth_type + "\".");
+        throw std::invalid_argument("Unknown authentication type: \""
+                                    + options.auth.auth_type + "\".");
     }
     if (options.auth.uid.empty()) {
         throw std::invalid_argument("UID cannot be empty.");
@@ -109,7 +115,8 @@ bool DBCommunication::Validate(const runtime_options& options) {
     return true;
 }
 
-std::unique_ptr< DatabaseQueryClient > DBCommunication::CreateQueryClient(const runtime_options& options) {
+std::unique_ptr< DatabaseQueryClient > DBCommunication::CreateQueryClient(
+    const runtime_options& options) {
     Aws::Client::ClientConfiguration config;
     config.userAgent = GetUserAgent();
 
@@ -149,7 +156,7 @@ std::unique_ptr< DatabaseQueryClient > DBCommunication::CreateQueryClient(const 
     if (options.auth.auth_type == AUTHTYPE_DEFAULT) {
         creator_type = DEFAULT_CREATOR_TYPE;
     }
-   
+
     auto creator = creators.find(creator_type);
     if (creator == creators.end()) {
         throw std::runtime_error("Unknown auth type: "
@@ -174,6 +181,13 @@ bool DBCommunication::TestQueryClient() {
 }
 
 bool DBCommunication::Connect(const runtime_options& options) {
+    // Connect to a fake database
+    if (std::getenv("FAKE_CONNECTION")) {
+        LogMsg(LOG_DEBUG, "Connection Established.");
+        return true;
+    }
+
+    // Connect to a real database
     m_client = CreateQueryClient(options);
     if (m_client == nullptr) {
         throw std::runtime_error("Unable to create DatabaseQueryClient.");
@@ -183,6 +197,15 @@ bool DBCommunication::Connect(const runtime_options& options) {
 
 void DBCommunication::Disconnect() {
     LogMsg(LOG_DEBUG, "Disconnecting Database connection.");
+
+    // Disconnect from fake database
+    if (std::getenv("FAKE_CONNECTION")) {
+        LogMsg(LOG_DEBUG, "Disconnecting Database connection.");
+        m_status = ConnStatusType::CONNECTION_BAD;
+        return;
+    }
+
+    // Disconnect from real database
     if (m_client) {
         m_client.reset();
     }
@@ -204,7 +227,8 @@ void DBCommunication::StopResultRetrieval(StatementClass* stmt) {
     // Call Cancel logic
     CancelQuery(stmt);
     // Clean the queue
-    if (stmt != nullptr && prefetch_queues_map.find(stmt) != prefetch_queues_map.end()) {
+    if (stmt != nullptr
+        && prefetch_queues_map.find(stmt) != prefetch_queues_map.end()) {
         prefetch_queues_map[stmt]->Reset();
     }
 }
@@ -212,7 +236,8 @@ void DBCommunication::StopResultRetrieval(StatementClass* stmt) {
 std::string DBCommunication::GetUserAgent() {
     std::string program_name(GetExeProgramName());
     std::string name_suffix = " [" + program_name + "]";
-    std::string msg = "Name of the application using the driver: " + name_suffix;
+    std::string msg =
+        "Name of the application using the driver: " + name_suffix;
     LogMsg(LOG_INFO, msg.c_str());
     return UA_ID_PREFIX + GetVersion() + name_suffix;
 }
@@ -227,7 +252,10 @@ class Context : public Aws::Client::AsyncCallerContext {
      * Parameterized constructor for the context
      */
     Context(PrefetchQueue* q, StatementClass* s, std::promise< QueryOutcome > p)
-        : Aws::Client::AsyncCallerContext(), queue_(q), stmt_(s), promise_(std::move(p)) {
+        : Aws::Client::AsyncCallerContext(),
+          queue_(q),
+          stmt_(s),
+          promise_(std::move(p)) {
     }
     /**
      * Get the prefetch queue
@@ -250,6 +278,7 @@ class Context : public Aws::Client::AsyncCallerContext {
     void MakePromise(const QueryOutcome& outcome) {
         promise_.set_value(outcome);
     }
+
    private:
     /**
      * PrefetchQueue pointer
@@ -268,8 +297,7 @@ class Context : public Aws::Client::AsyncCallerContext {
 
 // Callback function of QueryAsync operation by aws-sdk-cpp database-query
 void QueryCallback(
-    const DatabaseQueryClient* client,
-    const QueryRequest& request,
+    const DatabaseQueryClient* client, const QueryRequest& request,
     const QueryOutcome& outcome,
     const std::shared_ptr< const Aws::Client::AsyncCallerContext >& context) {
     auto ctxt = (std::static_pointer_cast< const Context >(context));
@@ -279,21 +307,28 @@ void QueryCallback(
         sc = p->GetStatement();
     }
     if (p != nullptr && sc != nullptr) {
-        if (outcome.IsSuccess() && !outcome.GetResult().GetNextToken().empty()) {
+        if (outcome.IsSuccess()
+            && !outcome.GetResult().GetNextToken().empty()) {
             // Update the query id in statement class if different
             if (sc->query_id == NULL
-                || strcmp(sc->query_id, outcome.GetResult().GetQueryId().c_str()) != 0) {
+                || strcmp(sc->query_id,
+                          outcome.GetResult().GetQueryId().c_str())
+                       != 0) {
                 SC_UnsetQueryId(sc);
                 sc->query_id = strdup(outcome.GetResult().GetQueryId().c_str());
             }
             QueryRequest next_request(request);
-            std::promise<QueryOutcome > next_promise;
-            auto success = p->GetPrefetchQueue()->Push(next_promise.get_future());
+            std::promise< QueryOutcome > next_promise;
+            auto success =
+                p->GetPrefetchQueue()->Push(next_promise.get_future());
             if (success) {
                 // Issue next request
-                client->QueryAsync(next_request.WithNextToken(outcome.GetResult().GetNextToken()),
-                    QueryCallback,
-                    std::make_shared< Context >(p->GetPrefetchQueue(), p->GetStatement(), std::move(next_promise)));
+                client->QueryAsync(next_request.WithNextToken(
+                                       outcome.GetResult().GetNextToken()),
+                                   QueryCallback,
+                                   std::make_shared< Context >(
+                                       p->GetPrefetchQueue(), p->GetStatement(),
+                                       std::move(next_promise)));
             }
         } else {
             // End of query
@@ -311,7 +346,7 @@ bool DBCommunication::ExecDirect(StatementClass* sc, const char* query) {
     std::string msg = "Attempting to execute a query \"" + statement + "\"";
     LogMsg(LOG_DEBUG, msg.c_str());
     if (prefetch_queues_map.find(sc) == prefetch_queues_map.end()) {
-        prefetch_queues_map[sc] = std::make_shared<PrefetchQueue>();
+        prefetch_queues_map[sc] = std::make_shared< PrefetchQueue >();
     }
     PrefetchQueue* pPrefetchQueue = prefetch_queues_map[sc].get();
     pPrefetchQueue->Reset();
@@ -323,14 +358,21 @@ bool DBCommunication::ExecDirect(StatementClass* sc, const char* query) {
     pPrefetchQueue->SetRetrieving(true);
     auto success = pPrefetchQueue->Push(promise.get_future());
     if (success) {
+        // Connected to fake database
+        if (std::getenv("FAKE_CONNECTION")) {
+            SC_set_error(sc, STMT_OPERATION_CANCELLED,
+                         "No data available to query", func);
+            return false;
+        }
+
+        // Connected to a real database
         m_client->QueryAsync(request, QueryCallback,
                              std::make_shared< Context >(pPrefetchQueue, sc,
                                                          std::move(promise)));
         return true;
     } else {
         // Has been cancelled
-        SC_set_error(sc, STMT_OPERATION_CANCELLED, "Operation cancelled",
-                     func);
+        SC_set_error(sc, STMT_OPERATION_CANCELLED, "Operation cancelled", func);
         return false;
     }
 }
@@ -354,8 +396,8 @@ bool DBCommunication::CancelQuery(StatementClass* stmt) {
                 + outcome.GetResult().GetCancellationMessage();
             LogMsg(LOG_DEBUG, message.c_str());
         } else {
-            std::string message =
-                "Query ID: " + cancel_request.GetQueryId() + "can't cancel. "
+            std::string message = "Query ID: " + cancel_request.GetQueryId()
+                                  + "can't cancel. "
                                   + outcome.GetError().GetMessage();
             LogMsg(LOG_DEBUG, message.c_str());
         }
