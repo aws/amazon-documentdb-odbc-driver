@@ -17,6 +17,7 @@ env:
   ODBC_BUILD_PATH: "./build/odbc/build"
   AWS_SDK_INSTALL_PATH: "./build/aws-sdk/install"
   NOT_CONNECTED: 1
+  FAKE_CONNECTION: 1
 
 jobs:
   build-windows32:
