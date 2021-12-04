@@ -16,6 +16,10 @@ jobs:
   build-mac:
     runs-on: macos-latest
     steps:
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v1.11
+        with:
+            cmake-version: '3.21.4'
       - uses: actions/checkout@v2
       - name: run-cppcheck
         run: |
@@ -31,7 +35,6 @@ jobs:
         run: |
           brew unlink unixodbc
           brew install curl
-          brew install cmake
           brew install libiodbc
       - name: configure-and-build-driver
         run: |

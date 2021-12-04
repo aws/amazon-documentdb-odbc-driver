@@ -27,20 +27,17 @@
 #endif /* _HANDLE_ENLIST_IN_DTC_ */
 #include <ShlObj_core.h>
 
-#define AUTHMODE_CNT 1
+#define AUTHMODE_CNT 1  // TODO: update if new authentication method is added
 #define LOGLEVEL_CNT 8
 extern HINSTANCE s_hModule;
 
-int loglevels[LOGLEVEL_CNT] = {
-    {IDS_LOGTYPE_OFF},
-    {IDS_LOGTYPE_FATAL},
-    {IDS_LOGTYPE_ERROR},
-    {IDS_LOGTYPE_WARNING},
-    {IDS_LOGTYPE_INFO},
-    {IDS_LOGTYPE_DEBUG}, 
-    {IDS_LOGTYPE_TRACE},
-    {IDS_LOGTYPE_ALL}};
+int loglevels[LOGLEVEL_CNT] = {{IDS_LOGTYPE_OFF},   {IDS_LOGTYPE_FATAL},
+                               {IDS_LOGTYPE_ERROR}, {IDS_LOGTYPE_WARNING},
+                               {IDS_LOGTYPE_INFO},  {IDS_LOGTYPE_DEBUG},
+                               {IDS_LOGTYPE_TRACE}, {IDS_LOGTYPE_ALL}};
 
+// TODO: If new authentication method added, update authmodes array below
+// Create new macro "IDS_AUTHTYPE_NEWAUTHTYPE" for new auth method in resource.h
 static const struct authmode authmodes[AUTHMODE_CNT] = {
     {IDS_AUTHTYPE_DEFAULT, AUTHTYPE_DEFAULT}};
 
@@ -88,6 +85,8 @@ void SetLoggingVisibility(HWND hdlg, int logLevel) {
     }
 }
 
+// TODO: If connection string has been modified (e.g. new authentication method)
+// Update SetAuthenticationVisibility accordingly (add else if statement)
 void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
     if (strcmp(am->authtype_str, AUTHTYPE_DEFAULT) == 0) {
         ShowWindow(GetDlgItem(hdlg, IDC_USER), TRUE);
@@ -97,7 +96,7 @@ void SetAuthenticationVisibility(HWND hdlg, const struct authmode *am) {
 
 void SetDlgStuff(HWND hdlg, const ConnInfo *ci) {
     // Connection
-    SetDlgItemText(hdlg, IDC_DRIVER_VERSION, "V."DATABASEDRIVERVERSION);
+    SetDlgItemText(hdlg, IDC_DRIVER_VERSION, "V." DATABASEDRIVERVERSION);
     SetDlgItemText(hdlg, IDC_DSNAME, ci->dsn);
 
     // Authentication
@@ -116,6 +115,9 @@ void SetDlgStuff(HWND hdlg, const ConnInfo *ci) {
     SendDlgItemMessage(hdlg, IDC_AUTHTYPE, CB_SETCURSEL,
                        ams[authtype_selection_idx].authtype_id, (WPARAM)0);
     SetAuthenticationVisibility(hdlg, &ams[authtype_selection_idx]);
+
+    // TODO: If connection string has been modified (e.g. new authentication
+    // method) Update code below accordingly (add else if statement)
     if (strcmp(ci->authtype, AUTHTYPE_DEFAULT) == 0) {
         SetDlgItemText(hdlg, IDC_USER, ci->uid);
         SetDlgItemText(hdlg, IDC_PASSWORD, SAFE_NAME(ci->pwd));
@@ -135,6 +137,9 @@ void GetDlgStuff(HWND hdlg, ConnInfo *ci) {
     const struct authmode *am = GetCurrentAuthMode(hdlg);
     SetAuthenticationVisibility(hdlg, am);
     STRCPY_FIXED(ci->authtype, am->authtype_str);
+
+    // TODO: If connection string has been modified (e.g. new authentication
+    // method) Update code below accordingly (add else if statement)
     if (strcmp(ci->authtype, AUTHTYPE_DEFAULT) == 0) {
         GetDlgItemText(hdlg, IDC_USER, ci->uid, sizeof(ci->uid));
         GetNameField(hdlg, IDC_PASSWORD, &ci->pwd);
@@ -165,8 +170,10 @@ INT_PTR CALLBACK advancedOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
             SetWindowLongPtr(hdlg, DWLP_USER, lParam);
             ConnInfo *ci = (ConnInfo *)lParam;
             SetDlgItemText(hdlg, IDC_REQUEST_TIMEOUT, ci->request_timeout);
-            SetDlgItemText(hdlg, IDC_CONNECTION_TIMEOUT, ci->connection_timeout);
-            SetDlgItemText(hdlg, IDC_MAX_RETRY_COUNT_CLIENT, ci->max_retry_count_client);
+            SetDlgItemText(hdlg, IDC_CONNECTION_TIMEOUT,
+                           ci->connection_timeout);
+            SetDlgItemText(hdlg, IDC_MAX_RETRY_COUNT_CLIENT,
+                           ci->max_retry_count_client);
             SetDlgItemText(hdlg, IDC_MAX_CONNECTIONS, ci->max_connections);
             break;
         }
@@ -175,14 +182,18 @@ INT_PTR CALLBACK advancedOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
             ConnInfo *ci = (ConnInfo *)GetWindowLongPtr(hdlg, DWLP_USER);
             switch (GET_WM_COMMAND_ID(wParam, lParam)) {
                 case IDOK:
-                    // Get Dialog Values 
-                    GetDlgItemText(hdlg, IDC_REQUEST_TIMEOUT, ci->request_timeout,
+                    // Get Dialog Values
+                    GetDlgItemText(hdlg, IDC_REQUEST_TIMEOUT,
+                                   ci->request_timeout,
                                    sizeof(ci->request_timeout));
-                    GetDlgItemText(hdlg, IDC_CONNECTION_TIMEOUT, ci->connection_timeout,
+                    GetDlgItemText(hdlg, IDC_CONNECTION_TIMEOUT,
+                                   ci->connection_timeout,
                                    sizeof(ci->connection_timeout));
-                    GetDlgItemText(hdlg, IDC_MAX_RETRY_COUNT_CLIENT, ci->max_retry_count_client,
+                    GetDlgItemText(hdlg, IDC_MAX_RETRY_COUNT_CLIENT,
+                                   ci->max_retry_count_client,
                                    sizeof(ci->max_retry_count_client));
-                    GetDlgItemText(hdlg, IDC_MAX_CONNECTIONS, ci->max_connections,
+                    GetDlgItemText(hdlg, IDC_MAX_CONNECTIONS,
+                                   ci->max_connections,
                                    sizeof(ci->max_connections));
                 case IDCANCEL:
                     EndDialog(hdlg, FALSE);
@@ -194,7 +205,7 @@ INT_PTR CALLBACK advancedOptionsProc(HWND hdlg, UINT wMsg, WPARAM wParam,
 }
 
 static int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam,
-                                    LPARAM lpData) {
+                                       LPARAM lpData) {
     if (uMsg == BFFM_SETSELECTION) {
         UNUSED(lParam);
         LPCTSTR path = (LPCTSTR)lpData;

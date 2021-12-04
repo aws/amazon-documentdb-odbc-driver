@@ -91,23 +91,23 @@ typedef struct bind_info {
         }
         switch (target_type) {
             case SQL_C_CHAR:
-                return reinterpret_cast< char* >(data.data());
+                return reinterpret_cast< char * >(data.data());
                 break;
             case SQL_C_LONG:
                 return std::to_string(
-                    *reinterpret_cast< unsigned long* >(data.data()));
+                    *reinterpret_cast< unsigned long * >(data.data()));
                 break;
             case SQL_C_SLONG:
                 return std::to_string(
-                    *reinterpret_cast< signed long* >(data.data()));
+                    *reinterpret_cast< signed long * >(data.data()));
                 break;
             case SQL_C_SHORT:
                 return std::to_string(
-                    *reinterpret_cast< signed short* >(data.data()));
+                    *reinterpret_cast< signed short * >(data.data()));
                 break;
             case SQL_C_SSHORT:
                 return std::to_string(
-                    *reinterpret_cast< unsigned short* >(data.data()));
+                    *reinterpret_cast< unsigned short * >(data.data()));
                 break;
             default:
                 return "Unknown conversion type (" + std::to_string(target_type)
@@ -190,7 +190,7 @@ class TestSQLSpecialColumns : public Fixture {};
 class TestSQLStatistics : public Fixture {};
 
 //
-//class TestSQLCatalogKeys : public testing::Test {
+// class TestSQLCatalogKeys : public testing::Test {
 //   public:
 //    TestSQLCatalogKeys() {
 //    }
@@ -224,9 +224,6 @@ class TestSQLStatistics : public Fixture {};
  */
 
 TEST_F(TestSQLTables, TEST_ALL_NULL) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     SQLRETURN ret = SQL_ERROR;
     ret = SQLTables(m_hstmt, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -237,7 +234,7 @@ TEST_F(TestSQLTables, TEST_ALL_NULL) {
     for (int i = 1; i <= (int)column_count; i++) {
         binds.push_back(bind_info((SQLUSMALLINT)i, SQL_C_CHAR));
     }
-    for (auto& it : binds) {
+    for (auto &it : binds) {
         ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
                          it.buffer_len, &it.out_len);
         EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -260,9 +257,6 @@ TEST_F(TestSQLTables, TEST_ALL_NULL) {
 }
 
 TEST_F(TestSQLTables, TEST_LONG_TABLE_NAME) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret =
         SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("Lng%")), SQL_NTS, nullptr,
@@ -294,13 +288,11 @@ TEST_F(TestSQLTables, TEST_LONG_TABLE_NAME) {
 }
 
 TEST_F(TestSQLTables, TEST_ALL_DATABASES_EXCEL) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("%")), 1, 
-        AS_SQLTCHAR(CREATE_STRING("")), 0, AS_SQLTCHAR(CREATE_STRING("")), 0, 
-        AS_SQLTCHAR(CREATE_STRING("")), 0);
+    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("%")), 1,
+                    AS_SQLTCHAR(CREATE_STRING("")), 0,
+                    AS_SQLTCHAR(CREATE_STRING("")), 0,
+                    AS_SQLTCHAR(CREATE_STRING("")), 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -309,8 +301,9 @@ TEST_F(TestSQLTables, TEST_ALL_DATABASES_EXCEL) {
     for (int i = 1; i <= (int)column_count; i++) {
         binds.push_back(bind_info((SQLUSMALLINT)i, SQL_C_CHAR));
     }
-    for (auto& it : binds) {
-        ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target, it.buffer_len, &it.out_len);
+    for (auto &it : binds) {
+        ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
+                         it.buffer_len, &it.out_len);
         EXPECT_TRUE(SQL_SUCCEEDED(ret));
     }
     std::vector< std::vector< std::string > > result;
@@ -329,11 +322,9 @@ TEST_F(TestSQLTables, TEST_ALL_DATABASES_EXCEL) {
 }
 
 TEST_F(TestSQLTables, TEST_ALL_DATABASES_NULL) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("%")), SQL_NTS, nullptr, 0, nullptr, 0, nullptr, 0);
+    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("%")), SQL_NTS, nullptr,
+                    0, nullptr, 0, nullptr, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -342,7 +333,7 @@ TEST_F(TestSQLTables, TEST_ALL_DATABASES_NULL) {
     for (int i = 1; i <= (int)column_count; i++) {
         binds.push_back(bind_info((SQLUSMALLINT)i, SQL_C_CHAR));
     }
-    for (auto& it : binds) {
+    for (auto &it : binds) {
         ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
                          it.buffer_len, &it.out_len);
         EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -365,12 +356,11 @@ TEST_F(TestSQLTables, TEST_ALL_DATABASES_NULL) {
 }
 
 TEST_F(TestSQLTables, TEST_ALL_DATABASES_SEARCH_PATTERN) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("%BC%")), SQL_NTS, AS_SQLTCHAR(CREATE_STRING("")), 
-            SQL_NTS, AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS, AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS);
+    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("%BC%")), SQL_NTS,
+                    AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS,
+                    AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS,
+                    AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -379,7 +369,7 @@ TEST_F(TestSQLTables, TEST_ALL_DATABASES_SEARCH_PATTERN) {
     for (int i = 1; i <= (int)column_count; i++) {
         binds.push_back(bind_info((SQLUSMALLINT)i, SQL_C_CHAR));
     }
-    for (auto& it : binds) {
+    for (auto &it : binds) {
         ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
                          it.buffer_len, &it.out_len);
         EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -399,11 +389,9 @@ TEST_F(TestSQLTables, TEST_ALL_DATABASES_SEARCH_PATTERN) {
 }
 
 TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_BIND_EXCEL) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLTables(m_hstmt, nullptr, 0, nullptr, 0, nullptr, 0, AS_SQLTCHAR(CREATE_STRING("TABLE,VIEW")), 10);
+    ret = SQLTables(m_hstmt, nullptr, 0, nullptr, 0, nullptr, 0,
+                    AS_SQLTCHAR(CREATE_STRING("TABLE,VIEW")), 10);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -412,7 +400,7 @@ TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_BIND_EXCEL) {
     for (int i = 1; i <= (int)column_count; i++) {
         binds.push_back(bind_info((SQLUSMALLINT)i, SQL_C_CHAR));
     }
-    for (auto& it : binds) {
+    for (auto &it : binds) {
         ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
                          it.buffer_len, &it.out_len);
         EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -435,11 +423,9 @@ TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_BIND_EXCEL) {
 }
 
 TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_GETDATA) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLTables(m_hstmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS, AS_SQLTCHAR(CREATE_STRING("TABLE,VIEW")), SQL_NTS);
+    ret = SQLTables(m_hstmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr,
+                    SQL_NTS, AS_SQLTCHAR(CREATE_STRING("TABLE,VIEW")), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -450,7 +436,8 @@ TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_GETDATA) {
         for (int i = 1; i <= (int)column_count; i++) {
             SQLCHAR data[1024] = {0};
             SQLLEN indicator = 0;
-            ret = SQLGetData(m_hstmt, (SQLUSMALLINT)i, SQL_C_CHAR, data, 1024, &indicator);
+            ret = SQLGetData(m_hstmt, (SQLUSMALLINT)i, SQL_C_CHAR, data, 1024,
+                             &indicator);
             EXPECT_TRUE(SQL_SUCCEEDED(ret));
             std::string data_as_string;
             if (indicator != SQL_NULL_DATA) {
@@ -470,11 +457,9 @@ TEST_F(TestSQLTables, TEST_ALL_TABLES_VIEWS_TYPES_GETDATA) {
 }
 
 TEST_F(TestSQLTables, TEST_ALL_VIEWS_TYPES) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLTables(m_hstmt, nullptr, 0, nullptr, 0, nullptr, 0, AS_SQLTCHAR("VIEW"), SQL_NTS);
+    ret = SQLTables(m_hstmt, nullptr, 0, nullptr, 0, nullptr, 0,
+                    AS_SQLTCHAR("VIEW"), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -489,7 +474,7 @@ TEST_F(TestSQLTables, TEST_ALL_VIEWS_TYPES) {
                              &indicator);
             EXPECT_TRUE(SQL_SUCCEEDED(ret));
             std::string data_as_string;
-            data_as_string.assign((const char*)data, indicator);
+            data_as_string.assign((const char *)data, indicator);
             row.push_back(data_as_string);
         }
         result.push_back(row);
@@ -499,11 +484,9 @@ TEST_F(TestSQLTables, TEST_ALL_VIEWS_TYPES) {
 }
 
 TEST_F(TestSQLTables, TEST_ALL_TABLE_TYPES) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLTables(m_hstmt, nullptr, 0, nullptr, 0, nullptr, 0, AS_SQLTCHAR(CREATE_STRING("TABLE")), SQL_NTS);
+    ret = SQLTables(m_hstmt, nullptr, 0, nullptr, 0, nullptr, 0,
+                    AS_SQLTCHAR(CREATE_STRING("TABLE")), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -535,11 +518,9 @@ TEST_F(TestSQLTables, TEST_ALL_TABLE_TYPES) {
 }
 
 TEST_F(TestSQLTables, TEST_SQL_ALL_TABLE_TYPES) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLTables(m_hstmt, nullptr, 0, nullptr, 0, nullptr, 0, AS_SQLTCHAR(CREATE_STRING("%")), SQL_NTS);
+    ret = SQLTables(m_hstmt, nullptr, 0, nullptr, 0, nullptr, 0,
+                    AS_SQLTCHAR(CREATE_STRING("%")), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -571,11 +552,11 @@ TEST_F(TestSQLTables, TEST_SQL_ALL_TABLE_TYPES) {
 }
 
 TEST_F(TestSQLTables, TEST_SQL_ALL_TABLE_TYPES_OTHER_EMPTY) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("")), 0, AS_SQLTCHAR(CREATE_STRING("")), 0, AS_SQLTCHAR(CREATE_STRING("")), 0, AS_SQLTCHAR(CREATE_STRING("%")), SQL_NTS);
+    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("")), 0,
+                    AS_SQLTCHAR(CREATE_STRING("")), 0,
+                    AS_SQLTCHAR(CREATE_STRING("")), 0,
+                    AS_SQLTCHAR(CREATE_STRING("%")), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -603,11 +584,9 @@ TEST_F(TestSQLTables, TEST_SQL_ALL_TABLE_TYPES_OTHER_EMPTY) {
 }
 
 TEST_F(TestSQLTables, TEST_INVALID_TABLE_TYPES) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLTables(m_hstmt, nullptr, 0, nullptr, 0, nullptr, 0, AS_SQLTCHAR(CREATE_STRING("INVALID")), SQL_NTS);
+    ret = SQLTables(m_hstmt, nullptr, 0, nullptr, 0, nullptr, 0,
+                    AS_SQLTCHAR(CREATE_STRING("INVALID")), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -622,7 +601,7 @@ TEST_F(TestSQLTables, TEST_INVALID_TABLE_TYPES) {
                              &indicator);
             EXPECT_TRUE(SQL_SUCCEEDED(ret));
             std::string data_as_string;
-            data_as_string.assign((const char*)data, indicator);
+            data_as_string.assign((const char *)data, indicator);
             row.push_back(data_as_string);
         }
         result.push_back(row);
@@ -632,11 +611,10 @@ TEST_F(TestSQLTables, TEST_INVALID_TABLE_TYPES) {
 }
 
 TEST_F(TestSQLTables, TABLE_UNDER_DATABASE) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("%BCTes_")), SQL_NTS, nullptr, 0, AS_SQLTCHAR(CREATE_STRING("I_T")), SQL_NTS, AS_SQLTCHAR(CREATE_STRING("TABLE")), SQL_NTS);
+    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("%BCTes_")), SQL_NTS,
+                    nullptr, 0, AS_SQLTCHAR(CREATE_STRING("I_T")), SQL_NTS,
+                    AS_SQLTCHAR(CREATE_STRING("TABLE")), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -645,7 +623,7 @@ TEST_F(TestSQLTables, TABLE_UNDER_DATABASE) {
     for (int i = 1; i <= (int)column_count; i++) {
         binds.push_back(bind_info((SQLUSMALLINT)i, SQL_C_CHAR));
     }
-    for (auto& it : binds) {
+    for (auto &it : binds) {
         ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
                          it.buffer_len, &it.out_len);
         EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -664,14 +642,13 @@ TEST_F(TestSQLTables, TABLE_UNDER_DATABASE) {
 }
 
 TEST_F(TestSQLTables, EXACT_MATCH_META_DATA) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER)true, 0);
+    ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER) true, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("ODBCTest")), SQL_NTS, AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS,
-                    AS_SQLTCHAR(CREATE_STRING("IoT")), SQL_NTS, AS_SQLTCHAR(CREATE_STRING("%")), SQL_NTS);
+    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("ODBCTest")), SQL_NTS,
+                    AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS,
+                    AS_SQLTCHAR(CREATE_STRING("IoT")), SQL_NTS,
+                    AS_SQLTCHAR(CREATE_STRING("%")), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -699,15 +676,13 @@ TEST_F(TestSQLTables, EXACT_MATCH_META_DATA) {
 }
 
 TEST_F(TestSQLTables, EXACT_MATCH_META_DATA_CASE_INSENSITIVE) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER) true, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("odbctest")), SQL_NTS, AS_SQLTCHAR(CREATE_STRING("")),
-                    SQL_NTS, AS_SQLTCHAR(CREATE_STRING("iot")), SQL_NTS, AS_SQLTCHAR(CREATE_STRING("%")),
-                    SQL_NTS);
+    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("odbctest")), SQL_NTS,
+                    AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS,
+                    AS_SQLTCHAR(CREATE_STRING("iot")), SQL_NTS,
+                    AS_SQLTCHAR(CREATE_STRING("%")), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -735,14 +710,13 @@ TEST_F(TestSQLTables, EXACT_MATCH_META_DATA_CASE_INSENSITIVE) {
 }
 
 TEST_F(TestSQLTables, EXACT_MATCH_META_DATA_NOT_FOUND) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER) true, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("ODBC%est")), SQL_NTS, AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS,
-                    AS_SQLTCHAR(CREATE_STRING("I%T")), SQL_NTS, AS_SQLTCHAR(CREATE_STRING("%")), SQL_NTS);
+    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("ODBC%est")), SQL_NTS,
+                    AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS,
+                    AS_SQLTCHAR(CREATE_STRING("I%T")), SQL_NTS,
+                    AS_SQLTCHAR(CREATE_STRING("%")), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -769,42 +743,41 @@ TEST_F(TestSQLTables, EXACT_MATCH_META_DATA_NOT_FOUND) {
 }
 
 TEST_F(TestSQLTables, INVALID_USE_OF_NULLPTR_CATALOG) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER) true, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    ret = SQLTables(m_hstmt, (SQLTCHAR *)nullptr, 0, AS_SQLTCHAR(CREATE_STRING("")),
-                    SQL_NTS, AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS, AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS);
+    ret = SQLTables(m_hstmt, (SQLTCHAR *)nullptr, 0,
+                    AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS,
+                    AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS,
+                    AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS);
     EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_INVALID_USE_OF_NULL_POINTER));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_INVALID_USE_OF_NULL_POINTER));
 }
 
 TEST_F(TestSQLTables, INVALID_USE_OF_NULLPTR_SCHEMAS) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER) true, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS, (SQLTCHAR *)nullptr, 0,
-                    AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS, AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS);
+    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS,
+                    (SQLTCHAR *)nullptr, 0, AS_SQLTCHAR(CREATE_STRING("")),
+                    SQL_NTS, AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS);
     EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_INVALID_USE_OF_NULL_POINTER));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_INVALID_USE_OF_NULL_POINTER));
 }
 
 TEST_F(TestSQLTables, INVALID_USE_OF_NULLPTR_TABLE_NAME) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER) true, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    ret = SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS, AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS,
-                    (SQLTCHAR *)nullptr, 0, AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS);
+    ret =
+        SQLTables(m_hstmt, AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS,
+                  AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS, (SQLTCHAR *)nullptr,
+                  0, AS_SQLTCHAR(CREATE_STRING("")), SQL_NTS);
     EXPECT_EQ(SQL_ERROR, ret);
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt, SQLSTATE_INVALID_USE_OF_NULL_POINTER));
+    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_STMT, m_hstmt,
+                              SQLSTATE_INVALID_USE_OF_NULL_POINTER));
 }
 
 void PopulateSQLColumnsBinds(std::vector< bind_info > &binds) {
@@ -840,12 +813,9 @@ void PopulateSQLColumnsBinds(std::vector< bind_info > &binds) {
  */
 
 TEST_F(TestSQLColumns, ISQL_WORKFLOW) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLColumns(m_hstmt, nullptr, 0,
-                     nullptr, 0, (SQLTCHAR *)CREATE_STRING("DevOps"), SQL_NTS, nullptr, 0);
+    ret = SQLColumns(m_hstmt, nullptr, 0, nullptr, 0,
+                     (SQLTCHAR *)CREATE_STRING("DevOps"), SQL_NTS, nullptr, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -870,10 +840,10 @@ TEST_F(TestSQLColumns, ISQL_WORKFLOW) {
     std::string timestamp_type = std::to_string(GetTimestampType(m_hstmt));
 
     std::vector< std::vector< std::string > > expected{
-        {"ODBCTest", "", "DevOps", "hostname", varchar_type, DB_TYPE_NAME_VARCHAR,
-         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
-         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
-         varchar_buffer_len, "1", "YES"},
+        {"ODBCTest", "", "DevOps", "hostname", varchar_type,
+         DB_TYPE_NAME_VARCHAR, std::to_string(VARCHAR_COLUMN_SIZE),
+         varchar_buffer_len, "", "", std::to_string(SQL_NULLABLE), "", "",
+         varchar_type, "", varchar_buffer_len, "1", "YES"},
         {"ODBCTest", "", "DevOps", "az", varchar_type, DB_TYPE_NAME_VARCHAR,
          std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
          std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
@@ -886,18 +856,19 @@ TEST_F(TestSQLColumns, ISQL_WORKFLOW) {
          std::to_string(SQL_DOUBLE), DB_TYPE_NAME_DOUBLE, "15",
          std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
          "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
-        {"ODBCTest", "", "DevOps", "measure_name", varchar_type, DB_TYPE_NAME_VARCHAR,
-         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
-         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
-         varchar_buffer_len, "5", "YES"},
+        {"ODBCTest", "", "DevOps", "measure_name", varchar_type,
+         DB_TYPE_NAME_VARCHAR, std::to_string(VARCHAR_COLUMN_SIZE),
+         varchar_buffer_len, "", "", std::to_string(SQL_NULLABLE), "", "",
+         varchar_type, "", varchar_buffer_len, "5", "YES"},
         {"ODBCTest", "", "DevOps", "time", timestamp_type,
          DB_TYPE_NAME_TIMESTAMP, "29", std::to_string(sizeof(TIMESTAMP_STRUCT)),
-         "9", "", std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
-         std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"},
-        {"sampleDB", "", "DevOps", "hostname", varchar_type, DB_TYPE_NAME_VARCHAR,
-         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
-         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
-         varchar_buffer_len, "1", "YES"},
+         "9", "", std::to_string(SQL_NULLABLE), "", "",
+         std::to_string(SQL_DATETIME), std::to_string(SQL_CODE_TIMESTAMP), "",
+         "6", "YES"},
+        {"sampleDB", "", "DevOps", "hostname", varchar_type,
+         DB_TYPE_NAME_VARCHAR, std::to_string(VARCHAR_COLUMN_SIZE),
+         varchar_buffer_len, "", "", std::to_string(SQL_NULLABLE), "", "",
+         varchar_type, "", varchar_buffer_len, "1", "YES"},
         {"sampleDB", "", "DevOps", "az", varchar_type, DB_TYPE_NAME_VARCHAR,
          std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
          std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
@@ -910,24 +881,23 @@ TEST_F(TestSQLColumns, ISQL_WORKFLOW) {
          std::to_string(SQL_DOUBLE), DB_TYPE_NAME_DOUBLE, "15",
          std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
          "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
-        {"sampleDB", "", "DevOps", "measure_name", varchar_type, DB_TYPE_NAME_VARCHAR,
-         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
-         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
-         varchar_buffer_len, "5", "YES"},
+        {"sampleDB", "", "DevOps", "measure_name", varchar_type,
+         DB_TYPE_NAME_VARCHAR, std::to_string(VARCHAR_COLUMN_SIZE),
+         varchar_buffer_len, "", "", std::to_string(SQL_NULLABLE), "", "",
+         varchar_type, "", varchar_buffer_len, "5", "YES"},
         {"sampleDB", "", "DevOps", "time", timestamp_type,
          DB_TYPE_NAME_TIMESTAMP, "29", std::to_string(sizeof(TIMESTAMP_STRUCT)),
-         "9", "", std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
-         std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"}};
+         "9", "", std::to_string(SQL_NULLABLE), "", "",
+         std::to_string(SQL_DATETIME), std::to_string(SQL_CODE_TIMESTAMP), "",
+         "6", "YES"}};
     CheckSQLColumnsRows(expected, result);
 }
 
 TEST_F(TestSQLColumns, EXACT_MATCH_ONE_COLUMN) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLColumns(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS, nullptr, 0,
-                     (SQLTCHAR*)CREATE_STRING("IoT"), SQL_NTS, (SQLTCHAR*)CREATE_STRING("time"), SQL_NTS);
+    ret = SQLColumns(m_hstmt, (SQLTCHAR *)CREATE_STRING("ODBCTest"), SQL_NTS,
+                     nullptr, 0, (SQLTCHAR *)CREATE_STRING("IoT"), SQL_NTS,
+                     (SQLTCHAR *)CREATE_STRING("time"), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -935,7 +905,7 @@ TEST_F(TestSQLColumns, EXACT_MATCH_ONE_COLUMN) {
     EXPECT_EQ(18, (int)column_count);
     std::vector< bind_info > binds;
     PopulateSQLColumnsBinds(binds);
-    for (auto& it : binds) {
+    for (auto &it : binds) {
         ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
                          it.buffer_len, &it.out_len);
         EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -960,12 +930,10 @@ TEST_F(TestSQLColumns, EXACT_MATCH_ONE_COLUMN) {
 }
 
 TEST_F(TestSQLColumns, EXACT_MATCH_ALL_COLUMNS) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLColumns(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS, nullptr, 0,
-                     (SQLTCHAR*)CREATE_STRING("DevOps"), SQL_NTS, nullptr, 0);
+    ret = SQLColumns(m_hstmt, (SQLTCHAR *)CREATE_STRING("ODBCTest"), SQL_NTS,
+                     nullptr, 0, (SQLTCHAR *)CREATE_STRING("DevOps"), SQL_NTS,
+                     nullptr, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -973,7 +941,7 @@ TEST_F(TestSQLColumns, EXACT_MATCH_ALL_COLUMNS) {
     EXPECT_EQ(18, (int)column_count);
     std::vector< bind_info > binds;
     PopulateSQLColumnsBinds(binds);
-    for (auto& it : binds) {
+    for (auto &it : binds) {
         ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
                          it.buffer_len, &it.out_len);
         EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -990,10 +958,10 @@ TEST_F(TestSQLColumns, EXACT_MATCH_ALL_COLUMNS) {
     std::string timestamp_type = std::to_string(GetTimestampType(m_hstmt));
 
     std::vector< std::vector< std::string > > expected{
-        {"ODBCTest", "", "DevOps", "hostname", varchar_type, DB_TYPE_NAME_VARCHAR,
-         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
-         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
-         varchar_buffer_len, "1", "YES"},
+        {"ODBCTest", "", "DevOps", "hostname", varchar_type,
+         DB_TYPE_NAME_VARCHAR, std::to_string(VARCHAR_COLUMN_SIZE),
+         varchar_buffer_len, "", "", std::to_string(SQL_NULLABLE), "", "",
+         varchar_type, "", varchar_buffer_len, "1", "YES"},
         {"ODBCTest", "", "DevOps", "az", varchar_type, DB_TYPE_NAME_VARCHAR,
          std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
          std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
@@ -1006,24 +974,23 @@ TEST_F(TestSQLColumns, EXACT_MATCH_ALL_COLUMNS) {
          std::to_string(SQL_DOUBLE), DB_TYPE_NAME_DOUBLE, "15",
          std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
          "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
-        {"ODBCTest", "", "DevOps", "measure_name", varchar_type, DB_TYPE_NAME_VARCHAR,
-         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
-         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
-         varchar_buffer_len, "5", "YES"},
+        {"ODBCTest", "", "DevOps", "measure_name", varchar_type,
+         DB_TYPE_NAME_VARCHAR, std::to_string(VARCHAR_COLUMN_SIZE),
+         varchar_buffer_len, "", "", std::to_string(SQL_NULLABLE), "", "",
+         varchar_type, "", varchar_buffer_len, "5", "YES"},
         {"ODBCTest", "", "DevOps", "time", timestamp_type,
-         DB_TYPE_NAME_TIMESTAMP, "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
-         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
-         std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"}};
+         DB_TYPE_NAME_TIMESTAMP, "29", std::to_string(sizeof(TIMESTAMP_STRUCT)),
+         "9", "", std::to_string(SQL_NULLABLE), "", "",
+         std::to_string(SQL_DATETIME), std::to_string(SQL_CODE_TIMESTAMP), "",
+         "6", "YES"}};
     CheckSQLColumnsRows(expected, result);
 }
 
 TEST_F(TestSQLColumns, SEARCH_PATTERN_ALL_COLUMNS) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLColumns(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS, nullptr, 0,
-                     (SQLTCHAR*)CREATE_STRING("DevOps"), SQL_NTS, (SQLTCHAR*)CREATE_STRING("%"), SQL_NTS);
+    ret = SQLColumns(m_hstmt, (SQLTCHAR *)CREATE_STRING("ODBCTest"), SQL_NTS,
+                     nullptr, 0, (SQLTCHAR *)CREATE_STRING("DevOps"), SQL_NTS,
+                     (SQLTCHAR *)CREATE_STRING("%"), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -1031,7 +998,7 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_ALL_COLUMNS) {
     EXPECT_EQ(18, (int)column_count);
     std::vector< bind_info > binds;
     PopulateSQLColumnsBinds(binds);
-    for (auto& it : binds) {
+    for (auto &it : binds) {
         ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
                          it.buffer_len, &it.out_len);
         EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -1048,14 +1015,14 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_ALL_COLUMNS) {
     std::string timestamp_type = std::to_string(GetTimestampType(m_hstmt));
 
     std::vector< std::vector< std::string > > expected{
-        {"ODBCTest", "", "DevOps", "hostname", varchar_type, DB_TYPE_NAME_VARCHAR,
-         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
-         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
-         varchar_buffer_len, "1", "YES"},
+        {"ODBCTest", "", "DevOps", "hostname", varchar_type,
+         DB_TYPE_NAME_VARCHAR, std::to_string(VARCHAR_COLUMN_SIZE),
+         varchar_buffer_len, "", "", std::to_string(SQL_NULLABLE), "", "",
+         varchar_type, "", varchar_buffer_len, "1", "YES"},
         {"ODBCTest", "", "DevOps", "az", varchar_type, DB_TYPE_NAME_VARCHAR,
          std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
-         std::to_string(SQL_NULLABLE),
-         "", "", varchar_type, "", varchar_buffer_len, "2", "YES"},
+         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
+         varchar_buffer_len, "2", "YES"},
         {"ODBCTest", "", "DevOps", "region", varchar_type, DB_TYPE_NAME_VARCHAR,
          std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
          std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
@@ -1064,25 +1031,23 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_ALL_COLUMNS) {
          std::to_string(SQL_DOUBLE), DB_TYPE_NAME_DOUBLE, "15",
          std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
          "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
-        {"ODBCTest", "", "DevOps", "measure_name", varchar_type, DB_TYPE_NAME_VARCHAR,
-         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
-         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
-         varchar_buffer_len, "5", "YES"},
+        {"ODBCTest", "", "DevOps", "measure_name", varchar_type,
+         DB_TYPE_NAME_VARCHAR, std::to_string(VARCHAR_COLUMN_SIZE),
+         varchar_buffer_len, "", "", std::to_string(SQL_NULLABLE), "", "",
+         varchar_type, "", varchar_buffer_len, "5", "YES"},
         {"ODBCTest", "", "DevOps", "time", timestamp_type,
-         DB_TYPE_NAME_TIMESTAMP, "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
-         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
-         std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"}};
+         DB_TYPE_NAME_TIMESTAMP, "29", std::to_string(sizeof(TIMESTAMP_STRUCT)),
+         "9", "", std::to_string(SQL_NULLABLE), "", "",
+         std::to_string(SQL_DATETIME), std::to_string(SQL_CODE_TIMESTAMP), "",
+         "6", "YES"}};
     CheckSQLColumnsRows(expected, result);
 }
 
 TEST_F(TestSQLColumns, SEARCH_PATTERN_SOME_COLUMNS) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLColumns(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS, nullptr, 0,
-                     (SQLTCHAR*)CREATE_STRING("DevOps"), SQL_NTS, (SQLTCHAR*)CREATE_STRING("measure%"),
-                     SQL_NTS);
+    ret = SQLColumns(m_hstmt, (SQLTCHAR *)CREATE_STRING("ODBCTest"), SQL_NTS,
+                     nullptr, 0, (SQLTCHAR *)CREATE_STRING("DevOps"), SQL_NTS,
+                     (SQLTCHAR *)CREATE_STRING("measure%"), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -1090,7 +1055,7 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_SOME_COLUMNS) {
     EXPECT_EQ(18, (int)column_count);
     std::vector< bind_info > binds;
     PopulateSQLColumnsBinds(binds);
-    for (auto& it : binds) {
+    for (auto &it : binds) {
         ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
                          it.buffer_len, &it.out_len);
         EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -1108,20 +1073,18 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_SOME_COLUMNS) {
          std::to_string(SQL_DOUBLE), DB_TYPE_NAME_DOUBLE, "15",
          std::to_string(sizeof(double)), "", "10", std::to_string(SQL_NULLABLE),
          "", "", std::to_string(SQL_DOUBLE), "", "", "4", "YES"},
-        {"ODBCTest", "", "DevOps", "measure_name", varchar_type, DB_TYPE_NAME_VARCHAR,
-         std::to_string(VARCHAR_COLUMN_SIZE), varchar_buffer_len, "", "",
-         std::to_string(SQL_NULLABLE), "", "", varchar_type, "",
-         varchar_buffer_len, "5", "YES"}};
+        {"ODBCTest", "", "DevOps", "measure_name", varchar_type,
+         DB_TYPE_NAME_VARCHAR, std::to_string(VARCHAR_COLUMN_SIZE),
+         varchar_buffer_len, "", "", std::to_string(SQL_NULLABLE), "", "",
+         varchar_type, "", varchar_buffer_len, "5", "YES"}};
     CheckSQLColumnsRows(expected, result);
 }
 
 TEST_F(TestSQLColumns, SEARCH_PATTERN_MULTI_TABLES_COLUMNS) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLColumns(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS, nullptr, 0,
-                     (SQLTCHAR*)CREATE_STRING("%"), SQL_NTS, (SQLTCHAR*)CREATE_STRING("tim_"), SQL_NTS);
+    ret = SQLColumns(m_hstmt, (SQLTCHAR *)CREATE_STRING("ODBCTest"), SQL_NTS,
+                     nullptr, 0, (SQLTCHAR *)CREATE_STRING("%"), SQL_NTS,
+                     (SQLTCHAR *)CREATE_STRING("tim_"), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -1129,7 +1092,7 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_MULTI_TABLES_COLUMNS) {
     EXPECT_EQ(18, (int)column_count);
     std::vector< bind_info > binds;
     PopulateSQLColumnsBinds(binds);
-    for (auto& it : binds) {
+    for (auto &it : binds) {
         ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
                          it.buffer_len, &it.out_len);
         EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -1147,26 +1110,25 @@ TEST_F(TestSQLColumns, SEARCH_PATTERN_MULTI_TABLES_COLUMNS) {
 
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "time", timestamp_type,
-         DB_TYPE_NAME_TIMESTAMP, "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
-         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
-         std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"},
-        {"ODBCTest", "", "IoT", "time", timestamp_type,
-         DB_TYPE_NAME_TIMESTAMP, "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
+         DB_TYPE_NAME_TIMESTAMP, "29", std::to_string(sizeof(TIMESTAMP_STRUCT)),
+         "9", "", std::to_string(SQL_NULLABLE), "", "",
+         std::to_string(SQL_DATETIME), std::to_string(SQL_CODE_TIMESTAMP), "",
+         "6", "YES"},
+        {"ODBCTest", "", "IoT", "time", timestamp_type, DB_TYPE_NAME_TIMESTAMP,
+         "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
          std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
          std::to_string(SQL_CODE_TIMESTAMP), "", "36", "YES"}};
     CheckSQLColumnsRows(expected, result);
 }
 
 TEST_F(TestSQLColumns, META_DATA_CASE_INSENSITIVE) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER) true, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    ret = SQLColumns(m_hstmt, (SQLTCHAR*)CREATE_STRING("odbctest"), SQL_NTS, (SQLTCHAR*)CREATE_STRING(""),
-                     SQL_NTS, (SQLTCHAR*)CREATE_STRING("devops"), SQL_NTS, (SQLTCHAR*)CREATE_STRING("TIME"),
-                     SQL_NTS);
+    ret = SQLColumns(m_hstmt, (SQLTCHAR *)CREATE_STRING("odbctest"), SQL_NTS,
+                     (SQLTCHAR *)CREATE_STRING(""), SQL_NTS,
+                     (SQLTCHAR *)CREATE_STRING("devops"), SQL_NTS,
+                     (SQLTCHAR *)CREATE_STRING("TIME"), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -1174,7 +1136,7 @@ TEST_F(TestSQLColumns, META_DATA_CASE_INSENSITIVE) {
     EXPECT_EQ(18, (int)column_count);
     std::vector< bind_info > binds;
     PopulateSQLColumnsBinds(binds);
-    for (auto& it : binds) {
+    for (auto &it : binds) {
         ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
                          it.buffer_len, &it.out_len);
         EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -1192,22 +1154,21 @@ TEST_F(TestSQLColumns, META_DATA_CASE_INSENSITIVE) {
 
     std::vector< std::vector< std::string > > expected{
         {"ODBCTest", "", "DevOps", "time", timestamp_type,
-         DB_TYPE_NAME_TIMESTAMP, "29", std::to_string(sizeof(TIMESTAMP_STRUCT)), "9", "",
-         std::to_string(SQL_NULLABLE), "", "", std::to_string(SQL_DATETIME),
-         std::to_string(SQL_CODE_TIMESTAMP), "", "6", "YES"}};
+         DB_TYPE_NAME_TIMESTAMP, "29", std::to_string(sizeof(TIMESTAMP_STRUCT)),
+         "9", "", std::to_string(SQL_NULLABLE), "", "",
+         std::to_string(SQL_DATETIME), std::to_string(SQL_CODE_TIMESTAMP), "",
+         "6", "YES"}};
     CheckSQLColumnsRows(expected, result);
 }
 
 TEST_F(TestSQLColumns, META_DATA_CASE_INSENSITIVE_NOT_FOUND) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLSetStmtAttr(m_hstmt, SQL_ATTR_METADATA_ID, (SQLPOINTER) true, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-    ret = SQLColumns(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS, (SQLTCHAR*)CREATE_STRING(""),
-                     SQL_NTS, (SQLTCHAR*)CREATE_STRING("DevOps"), SQL_NTS, (SQLTCHAR*)CREATE_STRING("%"),
-                     SQL_NTS);
+    ret = SQLColumns(m_hstmt, (SQLTCHAR *)CREATE_STRING("ODBCTest"), SQL_NTS,
+                     (SQLTCHAR *)CREATE_STRING(""), SQL_NTS,
+                     (SQLTCHAR *)CREATE_STRING("DevOps"), SQL_NTS,
+                     (SQLTCHAR *)CREATE_STRING("%"), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLSMALLINT column_count = 0;
     ret = SQLNumResultCols(m_hstmt, &column_count);
@@ -1215,7 +1176,7 @@ TEST_F(TestSQLColumns, META_DATA_CASE_INSENSITIVE_NOT_FOUND) {
     EXPECT_EQ(18, (int)column_count);
     std::vector< bind_info > binds;
     PopulateSQLColumnsBinds(binds);
-    for (auto& it : binds) {
+    for (auto &it : binds) {
         ret = SQLBindCol(m_hstmt, it.ordinal, it.target_type, it.target,
                          it.buffer_len, &it.out_len);
         EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -1233,9 +1194,6 @@ TEST_F(TestSQLColumns, META_DATA_CASE_INSENSITIVE_NOT_FOUND) {
 }
 
 TEST_F(TestSQLColumns, LONG_COLUMN_NAME) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLColumns(m_hstmt, nullptr, 0, (SQLTCHAR *)CREATE_STRING(""),
                      SQL_NTS, (SQLTCHAR *)CREATE_STRING("%"), SQL_NTS,
@@ -1271,11 +1229,9 @@ TEST_F(TestSQLColumns, LONG_COLUMN_NAME) {
 }
 
 TEST_F(TestSQLColAttribute, SQL_DESC_CONCISE_TYPE) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    test_string query = CREATE_STRING("SELECT INTEGER \'1\' from ODBCTest.IoT LIMIT 1");
+    test_string query =
+        CREATE_STRING("SELECT INTEGER \'1\' from ODBCTest.IoT LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLLEN numeric_attr = 0;
@@ -1288,12 +1244,10 @@ TEST_F(TestSQLColAttribute, SQL_DESC_CONCISE_TYPE) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, INTEGER_COLUMN) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    test_string query = CREATE_STRING("SELECT INTEGER \'1\' from ODBCTest.IoT LIMIT 1");
-    ret = SQLPrepare(m_hstmt, (SQLTCHAR*)query.c_str(), SQL_NTS);
+    test_string query =
+        CREATE_STRING("SELECT INTEGER \'1\' from ODBCTest.IoT LIMIT 1");
+    ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLTCHAR column_name[60];
     SQLSMALLINT column_name_length;
@@ -1314,11 +1268,9 @@ TEST_F(TestCatalogSQLDescribeCol, INTEGER_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, DOUBLE_COLUMN) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    test_string query = CREATE_STRING("SELECT DOUBLE \'1.0\' from ODBCTest.IoT LIMIT 1");
+    test_string query =
+        CREATE_STRING("SELECT DOUBLE \'1.0\' from ODBCTest.IoT LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLTCHAR column_name[60];
@@ -1340,11 +1292,9 @@ TEST_F(TestCatalogSQLDescribeCol, DOUBLE_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, BIGINT_COLUMN) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    test_string query = CREATE_STRING("SELECT BIGINT \'2147483648\' from ODBCTest.IoT LIMIT 1");
+    test_string query =
+        CREATE_STRING("SELECT BIGINT \'2147483648\' from ODBCTest.IoT LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLTCHAR column_name[60];
@@ -1356,7 +1306,7 @@ TEST_F(TestCatalogSQLDescribeCol, BIGINT_COLUMN) {
     ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
                          &data_type, &column_size, &decimal_digits, &nullable);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-     std::string expected_column_name = "_col0";
+    std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_BIGINT, data_type);
     EXPECT_EQ((SQLULEN)20, column_size);
@@ -1366,12 +1316,8 @@ TEST_F(TestCatalogSQLDescribeCol, BIGINT_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, BOOLEAN_COLUMN) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    test_string query =
-        CREATE_STRING("SELECT true from ODBCTest.IoT LIMIT 1");
+    test_string query = CREATE_STRING("SELECT true from ODBCTest.IoT LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLTCHAR column_name[60];
@@ -1393,11 +1339,9 @@ TEST_F(TestCatalogSQLDescribeCol, BOOLEAN_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, VARCHAR_COLUMN) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    test_string query = CREATE_STRING("SELECT VARCHAR\'ABCDEFG\' from ODBCTest.IoT LIMIT 1");
+    test_string query =
+        CREATE_STRING("SELECT VARCHAR\'ABCDEFG\' from ODBCTest.IoT LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLTCHAR column_name[60];
@@ -1419,18 +1363,15 @@ TEST_F(TestCatalogSQLDescribeCol, VARCHAR_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, TIMESERIES_COLUMN) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    test_string query =
-        CREATE_STRING("WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 "
-                      "14:18:30.123456789' AS binned_timestamp, ROW(null, "
-                      "ARRAY[ARRAY[ROW(12345, ARRAY[1, 2, 3])]]) "
-                      "AS data FROM ODBCTest.IoT LIMIT "
-                      "1), interpolated_timeseries AS(SELECT "
-                      "CREATE_TIME_SERIES(binned_timestamp, data) FROM binned_timeseries) "
-                      "SELECT *FROM interpolated_timeseries");
+    test_string query = CREATE_STRING(
+        "WITH binned_timeseries AS(SELECT TIMESTAMP'2021-03-05 "
+        "14:18:30.123456789' AS binned_timestamp, ROW(null, "
+        "ARRAY[ARRAY[ROW(12345, ARRAY[1, 2, 3])]]) "
+        "AS data FROM ODBCTest.IoT LIMIT "
+        "1), interpolated_timeseries AS(SELECT "
+        "CREATE_TIME_SERIES(binned_timestamp, data) FROM binned_timeseries) "
+        "SELECT *FROM interpolated_timeseries");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
     ASSERT_TRUE(SQL_SUCCEEDED(ret));
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
@@ -1443,7 +1384,7 @@ TEST_F(TestCatalogSQLDescribeCol, TIMESERIES_COLUMN) {
     ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
                          &data_type, &column_size, &decimal_digits, &nullable);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-     std::string expected_column_name = "_col0";
+    std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
     EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
@@ -1453,14 +1394,11 @@ TEST_F(TestCatalogSQLDescribeCol, TIMESERIES_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, ARRAY_COLUMN) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    test_string query =
-        CREATE_STRING("SELECT ARRAY[ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]], "
-                      "ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]]] from ODBCTest.IoT "
-                      "LIMIT 1");
+    test_string query = CREATE_STRING(
+        "SELECT ARRAY[ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]], "
+        "ARRAY[ARRAY[ARRAY[1.1, 2.3], ARRAY[1.1, 2.3]]]] from ODBCTest.IoT "
+        "LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLTCHAR column_name[60];
@@ -1472,7 +1410,7 @@ TEST_F(TestCatalogSQLDescribeCol, ARRAY_COLUMN) {
     ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
                          &data_type, &column_size, &decimal_digits, &nullable);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-     std::string expected_column_name = "_col0";
+    std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
     EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
@@ -1482,14 +1420,11 @@ TEST_F(TestCatalogSQLDescribeCol, ARRAY_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, ROW_COLUMN) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    test_string query =
-        CREATE_STRING("SELECT ROW(ROW(ROW(INTEGER '03', BIGINT '10', true), "
-                      "ARRAY[ARRAY[1,2],ARRAY[1.1,2.2]])) from ODBCTest.IoT "
-                      "LIMIT 1");
+    test_string query = CREATE_STRING(
+        "SELECT ROW(ROW(ROW(INTEGER '03', BIGINT '10', true), "
+        "ARRAY[ARRAY[1,2],ARRAY[1.1,2.2]])) from ODBCTest.IoT "
+        "LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLTCHAR column_name[60];
@@ -1501,7 +1436,7 @@ TEST_F(TestCatalogSQLDescribeCol, ROW_COLUMN) {
     ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
                          &data_type, &column_size, &decimal_digits, &nullable);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-     std::string expected_column_name = "_col0";
+    std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
     EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
@@ -1511,9 +1446,6 @@ TEST_F(TestCatalogSQLDescribeCol, ROW_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, NULL_COLUMN) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query = CREATE_STRING("SELECT null from ODBCTest.IoT LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
@@ -1527,7 +1459,7 @@ TEST_F(TestCatalogSQLDescribeCol, NULL_COLUMN) {
     ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
                          &data_type, &column_size, &decimal_digits, &nullable);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-     std::string expected_column_name = "_col0";
+    std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
     EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
@@ -1537,13 +1469,10 @@ TEST_F(TestCatalogSQLDescribeCol, NULL_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, TIMESTAMP_COLUMN) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    test_string query =
-        CREATE_STRING("SELECT TIMESTAMP \'2021-01-02 18:01:13.000000000\' from ODBCTest.IoT "
-                      "LIMIT 1");
+    test_string query = CREATE_STRING(
+        "SELECT TIMESTAMP \'2021-01-02 18:01:13.000000000\' from ODBCTest.IoT "
+        "LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLTCHAR column_name[60];
@@ -1569,9 +1498,6 @@ TEST_F(TestCatalogSQLDescribeCol, TIMESTAMP_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, DATE_COLUMN) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query =
         CREATE_STRING("SELECT DATE \'2021-01-02\' from ODBCTest.IoT LIMIT 1");
@@ -1600,12 +1526,9 @@ TEST_F(TestCatalogSQLDescribeCol, DATE_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, TIME_COLUMN) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    test_string query =
-        CREATE_STRING("SELECT TIME \'06:39:45.123456789\' from ODBCTest.IoT LIMIT 1");
+    test_string query = CREATE_STRING(
+        "SELECT TIME \'06:39:45.123456789\' from ODBCTest.IoT LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     SQLTCHAR column_name[60];
@@ -1631,9 +1554,6 @@ TEST_F(TestCatalogSQLDescribeCol, TIME_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, INTERVAL_YEAR_TO_MONTH_COLUMN) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query = CREATE_STRING("SELECT 1year from ODBCTest.IoT LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
@@ -1647,7 +1567,7 @@ TEST_F(TestCatalogSQLDescribeCol, INTERVAL_YEAR_TO_MONTH_COLUMN) {
     ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
                          &data_type, &column_size, &decimal_digits, &nullable);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-     std::string expected_column_name = "_col0";
+    std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
     EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
@@ -1657,9 +1577,6 @@ TEST_F(TestCatalogSQLDescribeCol, INTERVAL_YEAR_TO_MONTH_COLUMN) {
 }
 
 TEST_F(TestCatalogSQLDescribeCol, INTERVAL_DAY_TO_SECOND_COLUMN) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     test_string query = CREATE_STRING("SELECT 1d from ODBCTest.IoT LIMIT 1");
     ret = SQLPrepare(m_hstmt, (SQLTCHAR *)query.c_str(), SQL_NTS);
@@ -1673,7 +1590,7 @@ TEST_F(TestCatalogSQLDescribeCol, INTERVAL_DAY_TO_SECOND_COLUMN) {
     ret = SQLDescribeCol(m_hstmt, 1, column_name, 60, &column_name_length,
                          &data_type, &column_size, &decimal_digits, &nullable);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
-     std::string expected_column_name = "_col0";
+    std::string expected_column_name = "_col0";
     EXPECT_EQ(expected_column_name, tchar_to_string(column_name));
     EXPECT_EQ(SQL_WVARCHAR, data_type);
     EXPECT_EQ((SQLULEN)VARCHAR_COLUMN_SIZE, column_size);
@@ -1682,11 +1599,7 @@ TEST_F(TestCatalogSQLDescribeCol, INTERVAL_DAY_TO_SECOND_COLUMN) {
     LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
 }
 
-
 TEST_F(TestSQLGetTypeInfo, TEST_SQL_ALL_TYPES) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetTypeInfo(m_hstmt, SQL_ALL_TYPES);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -1699,7 +1612,8 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_ALL_TYPES) {
         for (int i = 1; i <= (int)column_count; i++) {
             SQLCHAR data[1024] = {0};
             SQLLEN indicator = 0;
-            ret = SQLGetData(m_hstmt, (SQLUSMALLINT)i, SQL_C_CHAR, data, 1024, &indicator);
+            ret = SQLGetData(m_hstmt, (SQLUSMALLINT)i, SQL_C_CHAR, data, 1024,
+                             &indicator);
             EXPECT_TRUE(SQL_SUCCEEDED(ret));
             std::string data_as_string;
             if (indicator != SQL_NULL_DATA) {
@@ -1715,55 +1629,50 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_ALL_TYPES) {
     std::string timestamp_type = std::to_string(GetTimestampType(m_hstmt));
 
     std::vector< std::vector< std::string > > expected{
-        {DB_TYPE_NAME_VARCHAR, varchar_type, std::to_string(VARCHAR_COLUMN_SIZE),
-         "VARCHAR '", "'", "", "1", "1", "3", "", "0", "0", "", "", "",
-         varchar_type, "", "", "0"},
+        {DB_TYPE_NAME_VARCHAR, varchar_type,
+         std::to_string(VARCHAR_COLUMN_SIZE), "VARCHAR '", "'", "", "1", "1",
+         "3", "", "0", "0", "", "", "", varchar_type, "", "", "0"},
         {DB_TYPE_NAME_ARRAY, varchar_type, std::to_string(VARCHAR_COLUMN_SIZE),
          "ARRAY [", "]", "", "1", "0", "3", "", "0", "0", "", "", "",
          varchar_type, "", "", "0"},
         {DB_TYPE_NAME_INTERVAL_DAY_TO_SECOND, varchar_type,
-         std::to_string(VARCHAR_COLUMN_SIZE), "", "", "", "1", "0", "3",
-         "", "0", "0", "", "", "", varchar_type, "", "", "0"},
+         std::to_string(VARCHAR_COLUMN_SIZE), "", "", "", "1", "0", "3", "",
+         "0", "0", "", "", "", varchar_type, "", "", "0"},
         {DB_TYPE_NAME_INTERVAL_YEAR_TO_MONTH, varchar_type,
          std::to_string(VARCHAR_COLUMN_SIZE), "", "", "", "1", "0", "3", "",
          "0", "0", "", "", "", varchar_type, "", "", "0"},
         {DB_TYPE_NAME_ROW, varchar_type, std::to_string(VARCHAR_COLUMN_SIZE),
-         "ROW (", ")", "", "1", "0", "3", "", "0", "0", "",
-         "", "", varchar_type, "", "", "0"},
+         "ROW (", ")", "", "1", "0", "3", "", "0", "0", "", "", "",
+         varchar_type, "", "", "0"},
         {DB_TYPE_NAME_TIMESERIES, varchar_type,
          std::to_string(VARCHAR_COLUMN_SIZE), "", "", "", "1", "0", "3", "",
          "0", "0", "", "", "", varchar_type, "", "", "0"},
-        {DB_TYPE_NAME_UNKNOWN, varchar_type, std::to_string(VARCHAR_COLUMN_SIZE), "", "",
-         "", "1", "0", "3", "", "0", "0", "", "", "", varchar_type, "", "", "0"},
-        {DB_TYPE_NAME_BOOLEAN, std::to_string(SQL_BIT), "1", "BOOLEAN '",
-         "'", "", "1", "0", "3", "1", "0", "0", "", "", "",
-         std::to_string(SQL_BIT), "", "", "0"},
-        {DB_TYPE_NAME_BIGINT, std::to_string(SQL_BIGINT), "20", "BIGINT '",
-         "'", "", "1", "0", "3", "0", "0", "0", "", "", "",
+        {DB_TYPE_NAME_UNKNOWN, varchar_type,
+         std::to_string(VARCHAR_COLUMN_SIZE), "", "", "", "1", "0", "3", "",
+         "0", "0", "", "", "", varchar_type, "", "", "0"},
+        {DB_TYPE_NAME_BOOLEAN, std::to_string(SQL_BIT), "1", "BOOLEAN '", "'",
+         "", "1", "0", "3", "1", "0", "0", "", "", "", std::to_string(SQL_BIT),
+         "", "", "0"},
+        {DB_TYPE_NAME_BIGINT, std::to_string(SQL_BIGINT), "20", "BIGINT '", "'",
+         "", "1", "0", "3", "0", "0", "0", "", "", "",
          std::to_string(SQL_BIGINT), "", "10", "0"},
         {DB_TYPE_NAME_INTEGER, std::to_string(SQL_INTEGER), "11", "INTEGER '",
          "'", "", "1", "0", "3", "0", "0", "0", "", "", "",
          std::to_string(SQL_INTEGER), "", "10", "0"},
-        {DB_TYPE_NAME_DOUBLE, std::to_string(SQL_DOUBLE), "15", "DOUBLE '",
-         "'", "", "1", "0", "3", "0", "0", "0", "", "", "",
+        {DB_TYPE_NAME_DOUBLE, std::to_string(SQL_DOUBLE), "15", "DOUBLE '", "'",
+         "", "1", "0", "3", "0", "0", "0", "", "", "",
          std::to_string(SQL_DOUBLE), "", "10", "0"},
-        {DB_TYPE_NAME_DATE, date_type, "10", "DATE '",
-         "'", "", "1", "0", "3", "", "0", "0", "", "", "",
-         date_type, "1", "", "0"},
-        {DB_TYPE_NAME_TIME, time_type, "18", "TIME '",
-         "'", "", "1", "0", "3", "", "0", "0", "", "9", "9",
-         time_type, "2", "", "0"},
-        {DB_TYPE_NAME_TIMESTAMP, timestamp_type, "29", "TIMESTAMP '",
-         "'", "", "1", "0", "3", "", "0", "0", "", "9", "9",
-         timestamp_type, "3", "", "0"}
-    };
+        {DB_TYPE_NAME_DATE, date_type, "10", "DATE '", "'", "", "1", "0", "3",
+         "", "0", "0", "", "", "", date_type, "1", "", "0"},
+        {DB_TYPE_NAME_TIME, time_type, "18", "TIME '", "'", "", "1", "0", "3",
+         "", "0", "0", "", "9", "9", time_type, "2", "", "0"},
+        {DB_TYPE_NAME_TIMESTAMP, timestamp_type, "29", "TIMESTAMP '", "'", "",
+         "1", "0", "3", "", "0", "0", "", "9", "9", timestamp_type, "3", "",
+         "0"}};
     CheckRows(expected, result);
 }
 
 TEST_F(TestSQLGetTypeInfo, TEST_SQL_WVARCHAR) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetTypeInfo(m_hstmt, SQL_WVARCHAR);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -1788,9 +1697,9 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_WVARCHAR) {
         result.push_back(row);
     }
     std::vector< std::vector< std::string > > expected{
-        {DB_TYPE_NAME_VARCHAR, varchar_type, std::to_string(VARCHAR_COLUMN_SIZE),
-         "VARCHAR '", "'", "", "1", "1", "3", "", "0", "0", "", "", "",
-         varchar_type, "", "", "0"},
+        {DB_TYPE_NAME_VARCHAR, varchar_type,
+         std::to_string(VARCHAR_COLUMN_SIZE), "VARCHAR '", "'", "", "1", "1",
+         "3", "", "0", "0", "", "", "", varchar_type, "", "", "0"},
         {DB_TYPE_NAME_ARRAY, varchar_type, std::to_string(VARCHAR_COLUMN_SIZE),
          "ARRAY [", "]", "", "1", "0", "3", "", "0", "0", "", "", "",
          varchar_type, "", "", "0"},
@@ -1806,17 +1715,13 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_WVARCHAR) {
         {DB_TYPE_NAME_TIMESERIES, varchar_type,
          std::to_string(VARCHAR_COLUMN_SIZE), "", "", "", "1", "0", "3", "",
          "0", "0", "", "", "", varchar_type, "", "", "0"},
-        {"unknown", varchar_type, std::to_string(VARCHAR_COLUMN_SIZE), "",
-         "", "", "1", "0", "3", "", "0", "0", "", "", "",
-         varchar_type, "", "", "0"}
-    };
+        {"unknown", varchar_type, std::to_string(VARCHAR_COLUMN_SIZE), "", "",
+         "", "1", "0", "3", "", "0", "0", "", "", "", varchar_type, "", "",
+         "0"}};
     CheckRows(expected, result);
 }
 
 TEST_F(TestSQLGetTypeInfo, TEST_SQL_BIT) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetTypeInfo(m_hstmt, SQL_BIT);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -1841,16 +1746,13 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_BIT) {
         result.push_back(row);
     }
     std::vector< std::vector< std::string > > expected{
-        {DB_TYPE_NAME_BOOLEAN, std::to_string(SQL_BIT), "1", "BOOLEAN '", "'", "", "1", 
-         "0", "3", "1", "0", "0", "", "", "", std::to_string(SQL_BIT), "", "", "0"}
-    };
+        {DB_TYPE_NAME_BOOLEAN, std::to_string(SQL_BIT), "1", "BOOLEAN '", "'",
+         "", "1", "0", "3", "1", "0", "0", "", "", "", std::to_string(SQL_BIT),
+         "", "", "0"}};
     CheckRows(expected, result);
 }
 
 TEST_F(TestSQLGetTypeInfo, TEST_SQL_DECIMAL) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLGetTypeInfo(m_hstmt, SQL_DECIMAL);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -1879,9 +1781,6 @@ TEST_F(TestSQLGetTypeInfo, TEST_SQL_DECIMAL) {
 }
 
 TEST_F(TestSQLColumnPrivileges, EMPTY) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLColumnPrivileges(m_hstmt, (SQLTCHAR *)CREATE_STRING("ODBCTest"),
                               SQL_NTS, (SQLTCHAR *)CREATE_STRING(""), SQL_NTS,
@@ -1892,9 +1791,6 @@ TEST_F(TestSQLColumnPrivileges, EMPTY) {
 }
 
 TEST_F(TestSQLTablePrivileges, EMPTY) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLTablePrivileges(m_hstmt, (SQLTCHAR *)CREATE_STRING("ODBCTest"),
                              SQL_NTS, (SQLTCHAR *)CREATE_STRING(""), SQL_NTS,
@@ -1906,31 +1802,22 @@ TEST_F(TestSQLTablePrivileges, EMPTY) {
 // We expect an empty result set for PrimaryKeys and ForeignKeys
 // Tableau specified catalog, table and NULL args
 TEST_F(TestSQLPrimaryKeys, EMPTY_RESULT_SET_WITH_CATALOG) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLPrimaryKeys(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS,
-                         NULL, 0, NULL, 0);
+    ret = SQLPrimaryKeys(m_hstmt, (SQLTCHAR *)CREATE_STRING("ODBCTest"),
+                         SQL_NTS, NULL, 0, NULL, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     CheckForEmptyResultSet(m_hstmt, NUM_OF_PKS_FIELDS);
 }
 
 TEST_F(TestSQLPrimaryKeys, EMPTY_RESULT_SET_WITH_TABLE) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLPrimaryKeys(m_hstmt, NULL, 0, NULL, 0,
-                         (SQLTCHAR*)CREATE_STRING("DevOps"), SQL_NTS);
+                         (SQLTCHAR *)CREATE_STRING("DevOps"), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     CheckForEmptyResultSet(m_hstmt, NUM_OF_PKS_FIELDS);
 }
 
 TEST_F(TestSQLPrimaryKeys, EMPTY_RESULT_SET_WITH_NULL) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLPrimaryKeys(m_hstmt, NULL, 0, NULL, 0, NULL, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
@@ -1938,31 +1825,23 @@ TEST_F(TestSQLPrimaryKeys, EMPTY_RESULT_SET_WITH_NULL) {
 }
 
 TEST_F(TestSQLForeignKeys, EMPTY_RESULT_SET_WITH_CATALOG) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLForeignKeys(m_hstmt, NULL, 0, NULL, 0, NULL, 0, NULL, 0,
-                         (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS, NULL, 0);
+    ret =
+        SQLForeignKeys(m_hstmt, NULL, 0, NULL, 0, NULL, 0, NULL, 0,
+                       (SQLTCHAR *)CREATE_STRING("ODBCTest"), SQL_NTS, NULL, 0);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     CheckForEmptyResultSet(m_hstmt, NUM_OF_FKS_FIELDS);
 }
 
 TEST_F(TestSQLForeignKeys, EMPTY_RESULT_SET_WITH_TABLE) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLForeignKeys(m_hstmt, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0,
-                         (SQLTCHAR*)CREATE_STRING("DevOps"), SQL_NTS);
+                         (SQLTCHAR *)CREATE_STRING("DevOps"), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     CheckForEmptyResultSet(m_hstmt, NUM_OF_FKS_FIELDS);
 }
 
 TEST_F(TestSQLForeignKeys, EMPTY_RESULT_SET_WITH_NULL) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLForeignKeys(m_hstmt, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0,
                          NULL, 0);
@@ -1971,49 +1850,37 @@ TEST_F(TestSQLForeignKeys, EMPTY_RESULT_SET_WITH_NULL) {
 }
 
 TEST_F(TestSQLProcedureColumns, EMPTY) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLProcedureColumns(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"),
-                              SQL_NTS, NULL, 0, (SQLTCHAR*)CREATE_STRING("%"),
-                              SQL_NTS, (SQLTCHAR*)CREATE_STRING("%"), SQL_NTS);
+    ret = SQLProcedureColumns(m_hstmt, (SQLTCHAR *)CREATE_STRING("ODBCTest"),
+                              SQL_NTS, NULL, 0, (SQLTCHAR *)CREATE_STRING("%"),
+                              SQL_NTS, (SQLTCHAR *)CREATE_STRING("%"), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     CheckForEmptyResultSet(m_hstmt, NUM_OF_PROCOLS_FIELDS);
 }
 
 TEST_F(TestSQLProcedures, EMPTY) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLProcedures(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS,
-                        (SQLTCHAR*)CREATE_STRING("%"), SQL_NTS,
-                        (SQLTCHAR*)CREATE_STRING("%"), SQL_NTS);
+    ret = SQLProcedures(m_hstmt, (SQLTCHAR *)CREATE_STRING("ODBCTest"), SQL_NTS,
+                        (SQLTCHAR *)CREATE_STRING("%"), SQL_NTS,
+                        (SQLTCHAR *)CREATE_STRING("%"), SQL_NTS);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     CheckForEmptyResultSet(m_hstmt, NUM_OF_PRO_FIELDS);
 }
 
 TEST_F(TestSQLSpecialColumns, EMPTY) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
     ret = SQLSpecialColumns(m_hstmt, SQL_BEST_ROWID,
-                            (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS, NULL,
-                            0, (SQLTCHAR*)CREATE_STRING("%"), SQL_NTS,
+                            (SQLTCHAR *)CREATE_STRING("ODBCTest"), SQL_NTS,
+                            NULL, 0, (SQLTCHAR *)CREATE_STRING("%"), SQL_NTS,
                             SQL_SCOPE_CURROW, SQL_NULLABLE);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     CheckForEmptyResultSet(m_hstmt, NUM_OF_SPECOLS_FIELDS);
 }
 
 TEST_F(TestSQLStatistics, EMPTY) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    } 
     SQLRETURN ret = SQL_ERROR;
-    ret = SQLStatistics(m_hstmt, (SQLTCHAR*)CREATE_STRING("ODBCTest"), SQL_NTS,
-                        NULL, 0, (SQLTCHAR*)CREATE_STRING("%"), SQL_NTS,
+    ret = SQLStatistics(m_hstmt, (SQLTCHAR *)CREATE_STRING("ODBCTest"), SQL_NTS,
+                        NULL, 0, (SQLTCHAR *)CREATE_STRING("%"), SQL_NTS,
                         SQL_INDEX_ALL, SQL_ENSURE);
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     CheckForEmptyResultSet(m_hstmt, NUM_OF_STATS_FIELDS);

@@ -27,16 +27,16 @@
     } while (0);
 
 #ifdef __linux__
-    test_string to_test_string(const std::string& src) {
-        return std::wstring_convert< std::codecvt_utf8_utf16< char16_t >,
-                                     char16_t >{}
-            .from_bytes(src);
-    }
+test_string to_test_string(const std::string& src) {
+    return std::wstring_convert< std::codecvt_utf8_utf16< char16_t >,
+                                 char16_t >{}
+        .from_bytes(src);
+}
 #else
-    test_string to_test_string(const std::string& src) {
-        return std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >{}
-            .from_bytes(src);
-    }
+test_string to_test_string(const std::string& src) {
+    return std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >{}
+        .from_bytes(src);
+}
 #endif
 
 void AllocConnection(SQLHENV* db_environment, SQLHDBC* db_connection,
@@ -130,7 +130,8 @@ void LogAnyDiagnostics(SQLSMALLINT handle_type, SQLHANDLE handle, SQLRETURN ret,
             handle_type, handle, rec_number, sqlstate, &native_error_code,
             msg_return == NULL ? diag_message : msg_return,
             msg_return == NULL ? IT_SIZEOF(diag_message) : sz, &message_length);
-        std::string diag_str = tchar_to_string((msg_return == NULL) ? diag_message : msg_return);
+        std::string diag_str =
+            tchar_to_string((msg_return == NULL) ? diag_message : msg_return);
         std::string state_str = tchar_to_string(sqlstate);
         if (diag_ret == SQL_INVALID_HANDLE)
             printf("Invalid handle\n");
@@ -179,15 +180,16 @@ bool CheckSQLSTATE(SQLSMALLINT handle_type, SQLHANDLE handle,
     return CheckSQLSTATE(handle_type, handle, expected_sqlstate, false);
 }
 
-test_string QueryBuilder(const test_string& column,
-                          const test_string& dataset,
-                          const test_string& count) {
-    return CREATE_STRING("SELECT ") + column + CREATE_STRING(" FROM ") + dataset + CREATE_STRING(" LIMIT ") + count;
+test_string QueryBuilder(const test_string& column, const test_string& dataset,
+                         const test_string& count) {
+    return CREATE_STRING("SELECT ") + column + CREATE_STRING(" FROM ") + dataset
+           + CREATE_STRING(" LIMIT ") + count;
 }
 
 test_string QueryBuilder(const test_string& column,
-                          const test_string& dataset) {
-    return CREATE_STRING("SELECT ") + column + CREATE_STRING(" FROM ") + dataset;
+                         const test_string& dataset) {
+    return CREATE_STRING("SELECT ") + column + CREATE_STRING(" FROM ")
+           + dataset;
 }
 
 void CloseCursor(SQLHSTMT* h_statement, bool throw_on_error, bool log_diag) {
@@ -198,8 +200,8 @@ void CloseCursor(SQLHSTMT* h_statement, bool throw_on_error, bool log_diag) {
 }
 
 std::string wstring_to_string(const std::wstring& src) {
-    return std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>
-        {}.to_bytes(src);
+    return std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >{}
+        .to_bytes(src);
 }
 
 std::string u16string_to_string(const std::u16string& src) {
@@ -209,8 +211,7 @@ std::string u16string_to_string(const std::u16string& src) {
 }
 
 std::string u32string_to_string(const std::u32string& src) {
-    return std::wstring_convert< std::codecvt_utf8< char32_t >,
-                                 char32_t >{}
+    return std::wstring_convert< std::codecvt_utf8< char32_t >, char32_t >{}
         .to_bytes(src);
 }
 
@@ -221,26 +222,26 @@ std::u16string string_to_u16string(const std::string& src) {
 }
 
 std::string tchar_to_string(const SQLTCHAR* tchar) {
-    if constexpr(sizeof(SQLTCHAR) == 2) {
-        std::u16string temp((const char16_t*) tchar);
+    if constexpr (sizeof(SQLTCHAR) == 2) {
+        std::u16string temp((const char16_t*)tchar);
         return u16string_to_string(temp);
-    } else if constexpr(sizeof(SQLTCHAR) == 4) {
-        std::u32string temp((const char32_t*) tchar);
+    } else if constexpr (sizeof(SQLTCHAR) == 4) {
+        std::u32string temp((const char32_t*)tchar);
         return u32string_to_string(temp);
     } else {
-        return std::string((const char*) tchar);
+        return std::string((const char*)tchar);
     }
 }
 
 std::string wchar_to_string(const SQLWCHAR* tchar) {
-    if constexpr(sizeof(SQLWCHAR) == 2) {
-        std::u16string temp((const char16_t*) tchar);
+    if constexpr (sizeof(SQLWCHAR) == 2) {
+        std::u16string temp((const char16_t*)tchar);
         return u16string_to_string(temp);
-    } else if constexpr(sizeof(SQLWCHAR) == 4) {
-        std::u32string temp((const char32_t*) tchar);
+    } else if constexpr (sizeof(SQLWCHAR) == 4) {
+        std::u32string temp((const char32_t*)tchar);
         return u32string_to_string(temp);
     } else {
-        return std::string((const char*) tchar);
+        return std::string((const char*)tchar);
     }
 }
 
@@ -265,13 +266,13 @@ void CheckTextLenRet(const test_string& expected, const SQLINTEGER text_length,
 }
 
 void CompareStrNumBytes(const test_string& expected, const SQLLEN indicator,
-                 const SQLWCHAR* data, const SQLRETURN ret) {
+                        const SQLWCHAR* data, const SQLRETURN ret) {
     CheckIndicatorRet(expected, indicator, ret, true);
     EXPECT_EQ(expected, to_test_string(wchar_to_string(data)));
 }
 
 void CompareStrNumBytes(const test_string& expected, const SQLLEN indicator,
-                 const SQLCHAR* data, const SQLRETURN ret) {
+                        const SQLCHAR* data, const SQLRETURN ret) {
     CheckIndicatorRet(expected, indicator, ret, false);
     EXPECT_EQ(expected, to_test_string(std::string((char*)data)));
 }
@@ -285,21 +286,26 @@ void CompareStrNumChar(const test_string& expected, const SQLINTEGER num_chars,
 test_string conn_string() {
     std::vector< std::pair< test_string, test_string > > conn_str_pair = {
         {IT_DRIVER, CREATE_STRING("databaseodbc")},
+        {IT_UID, CREATE_STRING("conn-user")},
+        {IT_PWD, CREATE_STRING("conn-pass")},
         {IT_AUTH, CREATE_STRING("DEFAULT")},
-        {IT_LOGLEVEL, CREATE_STRING("5")}}; // DEBUG level logging
+        {IT_LOGLEVEL, CREATE_STRING("5")}};  // DEBUG level logging
 
     test_string temp;
     for (auto it : conn_str_pair)
         temp += it.first + CREATE_STRING("=") + it.second + CREATE_STRING(";");
     char dir[1024];
     if (getLogDir(dir, sizeof(dir)) > 0)
-        temp += IT_LOGOUTPUT CREATE_STRING("=") + to_test_string(dir) + CREATE_STRING(";");
+        temp += IT_LOGOUTPUT CREATE_STRING("=") + to_test_string(dir)
+                + CREATE_STRING(";");
     return temp;
 }
 
 test_string perf_conn_string() {
     std::vector< std::pair< test_string, test_string > > conn_str_pair = {
         {IT_DRIVER, CREATE_STRING("databaseodbc")},
+        {IT_UID, CREATE_STRING("perf-conn-user")},
+        {IT_PWD, CREATE_STRING("perf-conn-pass")},
         {IT_AUTH, CREATE_STRING("DEFAULT")},
         {IT_LOGLEVEL, CREATE_STRING("0")}};
 

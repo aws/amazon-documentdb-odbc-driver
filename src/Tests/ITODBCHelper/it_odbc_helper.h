@@ -29,7 +29,6 @@
 #include <sql.h>
 #include <sqlext.h>
 
-
 #include <codecvt>
 #include <iostream>
 #include <locale>
@@ -39,7 +38,8 @@
 #include "gtest/gtest.h"
 #include "unit_test_helper.h"
 
-#define AS_SQLTCHAR(str) const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(str))
+#define AS_SQLTCHAR(str) \
+    const_cast< SQLTCHAR* >(reinterpret_cast< const SQLTCHAR* >(str))
 
 #ifdef __linux__
 typedef std::u16string test_string;
@@ -58,8 +58,10 @@ test_string to_test_string(const std::string& src);
 #define SQLSTATE_INVALID_DESCRIPTOR_INDEX (SQLWCHAR*)CREATE_STRING("07009")
 #define SQLSTATE_GENERAL_ERROR (SQLWCHAR*)CREATE_STRING("HY000")
 #define SQLSTATE_MEMORY_ALLOCATION_ERROR (SQLWCHAR*)CREATE_STRING("HY001")
-#define SQLSTATE_INVALID_STRING_OR_BUFFER_LENGTH (SQLWCHAR*)CREATE_STRING("HY090")
-#define SQLSTATE_INVALID_DESCRIPTOR_FIELD_IDENTIFIER (SQLWCHAR*)CREATE_STRING("HY091")
+#define SQLSTATE_INVALID_STRING_OR_BUFFER_LENGTH \
+    (SQLWCHAR*)CREATE_STRING("HY090")
+#define SQLSTATE_INVALID_DESCRIPTOR_FIELD_IDENTIFIER \
+    (SQLWCHAR*)CREATE_STRING("HY091")
 #define SQLSTATE_NUMERIC_VALUE_OUT_OF_RANGE (SQLWCHAR*)CREATE_STRING("HY019")
 #define SQLSTATE_NOT_IMPLEMENTED_ERROR (SQLWCHAR*)CREATE_STRING("HYC00")
 #define SQLSTATE_STRING_CONVERSION_ERROR (SQLWCHAR*)CREATE_STRING("22018")
@@ -73,8 +75,8 @@ test_string to_test_string(const std::string& src);
 #define IT_SIZEOF(x) (NULL == (x) ? 0 : (sizeof((x)) / sizeof((x)[0])))
 
 #define IT_DRIVER CREATE_STRING("Driver")
-#define IT_ACCESSKEYID CREATE_STRING("AccessKeyId")
-#define IT_SECRETACCESSKEY CREATE_STRING"SecretAccessKey")
+#define IT_UID CREATE_STRING("UID")
+#define IT_PWD CREATE_STRING("PWD")
 #define IT_AUTH CREATE_STRING("Auth")
 #define IT_LOGLEVEL CREATE_STRING("LogLevel")
 #define IT_LOGOUTPUT CREATE_STRING("LogOutput")
@@ -93,11 +95,9 @@ bool CheckSQLSTATE(SQLSMALLINT handle_type, SQLHANDLE handle,
                    SQLWCHAR* expected_sqlstate, bool log_message);
 bool CheckSQLSTATE(SQLSMALLINT handle_type, SQLHANDLE handle,
                    SQLWCHAR* expected_sqlstate);
-test_string QueryBuilder(const test_string& column,
-                          const test_string& dataset,
-                          const test_string& count);
-test_string QueryBuilder(const test_string& column,
-                          const test_string& dataset);
+test_string QueryBuilder(const test_string& column, const test_string& dataset,
+                         const test_string& count);
+test_string QueryBuilder(const test_string& column, const test_string& dataset);
 void CloseCursor(SQLHSTMT* h_statement, bool throw_on_error, bool log_diag);
 std::string wstring_to_string(const std::wstring& src);
 std::string u16string_to_string(const std::u16string& src);
@@ -126,6 +126,9 @@ class Fixture : public testing::Test {
                                        &m_env, &m_conn, &m_hstmt, true, true));
     }
     void TearDown() override {
+        if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+        }
         if (SQL_NULL_HSTMT != m_hstmt) {
             ASSERT_NO_THROW(CloseCursor(&m_hstmt, true, true));
             SQLFreeHandle(SQL_HANDLE_STMT, m_hstmt);
