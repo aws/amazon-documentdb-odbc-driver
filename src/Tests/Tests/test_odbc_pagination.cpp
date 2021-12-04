@@ -60,8 +60,8 @@ TEST_F(TestPagination, DatabaseSampleDatabase_IoT_SQLGetData) {
             for (SQLUSMALLINT i = 0; i < column_count; i++) {
                 SQLCHAR data[BIND_SIZE] = {0};
                 SQLLEN indicator = 0;
-                ret = SQLGetData(m_hstmt, i+1, SQL_C_CHAR, data, BIND_SIZE,
-                    &indicator);
+                ret = SQLGetData(m_hstmt, i + 1, SQL_C_CHAR, data, BIND_SIZE,
+                                 &indicator);
                 EXPECT_TRUE(SQL_SUCCEEDED(ret));
             }
             count++;
@@ -82,7 +82,8 @@ TEST_F(TestPagination, DatabaseSampleDatabase_IoT_SQLBindCol) {
     int expected_count = NUM_ROWS_IOT;
     std::vector< Cell > row(column_count);
     for (SQLUSMALLINT i = 0; i < row.size(); i++) {
-        ret = SQLBindCol(m_hstmt, i + 1, SQL_C_CHAR, row[i].data, BIND_SIZE, &row[i].len);
+        ret = SQLBindCol(m_hstmt, i + 1, SQL_C_CHAR, row[i].data, BIND_SIZE,
+                         &row[i].len);
         EXPECT_TRUE(SQL_SUCCEEDED(ret));
     }
     while ((ret = SQLFetch(m_hstmt)) != SQL_NO_DATA) {

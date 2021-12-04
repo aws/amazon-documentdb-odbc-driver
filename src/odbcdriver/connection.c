@@ -132,9 +132,8 @@ RETCODE SQL_API API_Connect(HDBC hdbc, const SQLCHAR *szDSN,
         free(tmpstr);
     }
 
-    MYLOG(LOG_DEBUG, "conn = %p (DSN='%s', UID='%s', PWD='%s', TOKEN='%s')",
-          conn, ci->dsn, ci->uid, NAME_IS_VALID(ci->pwd) ? "xxxxx" : "",
-          "xxxxx");
+    MYLOG(LOG_DEBUG, "conn = %p (DSN='%s', UID='%s', PWD='%s')",
+          conn, ci->dsn, ci->uid, NAME_IS_VALID(ci->pwd) ? "xxxxx" : "");
 
     if ((fchar = CC_connect(conn)) <= 0) {
         /* Error messages are filled in */

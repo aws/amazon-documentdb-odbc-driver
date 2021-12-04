@@ -30,8 +30,8 @@ const test_string single_row = CREATE_STRING("1");
 const uint64_t multi_row_cnt = 25;
 const uint64_t multi_col_cnt = 7;
 const uint64_t single_col_cnt = 1;
-const test_string multi_col =
-    CREATE_STRING("null, 1, VARCHAR '2', DOUBLE '3.3', true, date '2021-01-01', 1d");
+const test_string multi_col = CREATE_STRING(
+    "null, 1, VARCHAR '2', DOUBLE '3.3', true, date '2021-01-01', 1d");
 
 namespace {
 inline void ExecuteQuery(const test_string& column, const test_string& table,
@@ -42,7 +42,7 @@ inline void ExecuteQuery(const test_string& column, const test_string& table,
     LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
     ASSERT_TRUE(SQL_SUCCEEDED(ret));
 }
-}
+}  // namespace
 
 class TestSQLSetDescRec : public Fixture {};
 
@@ -51,10 +51,8 @@ class TestSQLGetDescRec : public Fixture {};
 class TestSQLCopyDesc : public Fixture {};
 
 TEST_F(TestSQLCopyDesc, ARD_TO_ARD) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
+    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt),
+                 &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_ROW_DESC, &ard, 0, NULL)));
@@ -78,10 +76,8 @@ TEST_F(TestSQLCopyDesc, ARD_TO_ARD) {
 }
 
 TEST_F(TestSQLCopyDesc, ARD_TO_APD) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
+    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt),
+                 &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_ROW_DESC, &ard, 0, NULL)));
@@ -96,10 +92,8 @@ TEST_F(TestSQLCopyDesc, ARD_TO_APD) {
 }
 
 TEST_F(TestSQLCopyDesc, ARD_TO_IPD) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
+    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt),
+                 &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_ROW_DESC, &ard, 0, NULL)));
@@ -114,10 +108,8 @@ TEST_F(TestSQLCopyDesc, ARD_TO_IPD) {
 }
 
 TEST_F(TestSQLCopyDesc, ARD_TO_IRD) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
+    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt),
+                 &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_ROW_DESC, &ard, 0, NULL)));
@@ -128,14 +120,13 @@ TEST_F(TestSQLCopyDesc, ARD_TO_IRD) {
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(another_stmt, SQL_ATTR_IMP_ROW_DESC, &copy, 0, NULL)));
     EXPECT_EQ(SQL_ERROR, SQLCopyDesc(ard, copy));
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_CANNOT_MODIFY_IRD));
+    EXPECT_TRUE(
+        CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_CANNOT_MODIFY_IRD));
 }
 
 TEST_F(TestSQLCopyDesc, IRD_TO_IRD) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
+    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt),
+                 &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_IMP_ROW_DESC, &ard, 0, NULL)));
@@ -146,14 +137,13 @@ TEST_F(TestSQLCopyDesc, IRD_TO_IRD) {
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(another_stmt, SQL_ATTR_IMP_ROW_DESC, &copy, 0, NULL)));
     EXPECT_EQ(SQL_ERROR, SQLCopyDesc(ard, copy));
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_CANNOT_MODIFY_IRD));
+    EXPECT_TRUE(
+        CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_CANNOT_MODIFY_IRD));
 }
 
 TEST_F(TestSQLCopyDesc, IRD_TO_ARD) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
+    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt),
+                 &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_IMP_ROW_DESC, &ard, 0, NULL)));
@@ -168,10 +158,8 @@ TEST_F(TestSQLCopyDesc, IRD_TO_ARD) {
 }
 
 TEST_F(TestSQLCopyDesc, IRD_TO_APD) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
+    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt),
+                 &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_IMP_ROW_DESC, &ard, 0, NULL)));
@@ -186,10 +174,8 @@ TEST_F(TestSQLCopyDesc, IRD_TO_APD) {
 }
 
 TEST_F(TestSQLCopyDesc, IRD_TO_IPD) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
+    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt),
+                 &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_IMP_ROW_DESC, &ard, 0, NULL)));
@@ -204,10 +190,8 @@ TEST_F(TestSQLCopyDesc, IRD_TO_IPD) {
 }
 
 TEST_F(TestSQLCopyDesc, APD_TO_APD) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
+    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt),
+                 &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_PARAM_DESC, &ard, 0, NULL)));
@@ -221,10 +205,8 @@ TEST_F(TestSQLCopyDesc, APD_TO_APD) {
 }
 
 TEST_F(TestSQLCopyDesc, APD_TO_ARD) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
+    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt),
+                 &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_PARAM_DESC, &ard, 0, NULL)));
@@ -239,10 +221,8 @@ TEST_F(TestSQLCopyDesc, APD_TO_ARD) {
 }
 
 TEST_F(TestSQLCopyDesc, APD_TO_IPD) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
+    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt),
+                 &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_PARAM_DESC, &ard, 0, NULL)));
@@ -257,10 +237,8 @@ TEST_F(TestSQLCopyDesc, APD_TO_IPD) {
 }
 
 TEST_F(TestSQLCopyDesc, APD_TO_IRD) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
+    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt),
+                 &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_ROW_DESC, &ard, 0, NULL)));
@@ -271,14 +249,13 @@ TEST_F(TestSQLCopyDesc, APD_TO_IRD) {
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(another_stmt, SQL_ATTR_IMP_ROW_DESC, &copy, 0, NULL)));
     EXPECT_EQ(SQL_ERROR, SQLCopyDesc(ard, copy));
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_CANNOT_MODIFY_IRD));
+    EXPECT_TRUE(
+        CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_CANNOT_MODIFY_IRD));
 }
 
 TEST_F(TestSQLCopyDesc, IPD_TO_IPD) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
+    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt),
+                 &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_IMP_PARAM_DESC, &ard, 0, NULL)));
@@ -292,10 +269,8 @@ TEST_F(TestSQLCopyDesc, IPD_TO_IPD) {
 }
 
 TEST_F(TestSQLCopyDesc, IPD_TO_ARD) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
+    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt),
+                 &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_IMP_PARAM_DESC, &ard, 0, NULL)));
@@ -310,10 +285,8 @@ TEST_F(TestSQLCopyDesc, IPD_TO_ARD) {
 }
 
 TEST_F(TestSQLCopyDesc, IPD_TO_ARP) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
+    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt),
+                 &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_IMP_PARAM_DESC, &ard, 0, NULL)));
@@ -328,10 +301,8 @@ TEST_F(TestSQLCopyDesc, IPD_TO_ARP) {
 }
 
 TEST_F(TestSQLCopyDesc, IPD_TO_IRD) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
-    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt), &m_hstmt);
+    ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt),
+                 &m_hstmt);
     SQLHDESC ard = SQL_NULL_HDESC;
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_IMP_PARAM_DESC, &ard, 0, NULL)));
@@ -342,7 +313,8 @@ TEST_F(TestSQLCopyDesc, IPD_TO_IRD) {
     ASSERT_TRUE(SQL_SUCCEEDED(
         SQLGetStmtAttr(another_stmt, SQL_ATTR_IMP_ROW_DESC, &copy, 0, NULL)));
     EXPECT_EQ(SQL_ERROR, SQLCopyDesc(ard, copy));
-    EXPECT_TRUE(CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_CANNOT_MODIFY_IRD));
+    EXPECT_TRUE(
+        CheckSQLSTATE(SQL_HANDLE_DESC, copy, SQLSTATE_CANNOT_MODIFY_IRD));
 }
 
 class TestSQLSetDescField : public testing::Test {
@@ -387,8 +359,8 @@ class TestSQLSetDescField : public testing::Test {
                                 value_ptr_assignment, expected_val, hdesc,     \
                                 check_state)                                   \
     TEST_F(TestSQLSetDescField, test_name) {                                   \
-        ExecuteQuery(multi_col, data_set, convert_to_test_string(multi_row_cnt),      \
-                     &m_hstmt);                                                \
+        ExecuteQuery(multi_col, data_set,                                      \
+                     convert_to_test_string(multi_row_cnt), &m_hstmt);         \
         m_field_identifier = identifier;                                       \
         m_buffer_length = buffer_length;                                       \
         m_rec_number = rec_num;                                                \
@@ -414,7 +386,7 @@ class TestSQLSetDescField : public testing::Test {
 #elif defined(__linux__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
-#endif // WIN32 / __APPLE__ / __linux__
+#endif  // WIN32 / __APPLE__ / __linux__
 
 // Descriptor Header Fields Tests
 TEST_SQL_SET_DESC_FIELD(Test_SQL_DESC_ALLOC_TYPE, SQL_DESC_ALLOC_TYPE,
@@ -614,9 +586,9 @@ TEST_SQL_SET_DESC_FIELD(TestUndefinedError_SQL_DESC_UPDATABLE,
 class TestSQLGetDescField : public testing::Test {
    public:
     void SetUp() {
-            if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
+        if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+        }
         AllocStatement((SQLTCHAR*)(conn_string().c_str()), &m_env, &m_conn,
                        &m_hstmt, true, true);
         SQLGetStmtAttr(m_hstmt, SQL_ATTR_APP_ROW_DESC, &m_ard_hdesc, 0, NULL);
@@ -626,9 +598,9 @@ class TestSQLGetDescField : public testing::Test {
     }
 
     void TearDown() {
-            if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
+        if (std::getenv("NOT_CONNECTED")) {
+            GTEST_SKIP();
+        }
         if (m_ard_hdesc != SQL_NULL_HDESC) {
             SQLFreeHandle(SQL_HANDLE_DESC, m_ard_hdesc);
         }
@@ -652,9 +624,6 @@ class TestSQLGetDescField : public testing::Test {
 
 // Descriptor Header Fields Tests
 TEST_F(TestSQLGetDescField, Test_SQL_DESC_ALLOC_TYPE) {
-    if (std::getenv("NOT_CONNECTED")) {
-        GTEST_SKIP();
-    }
     SQLSMALLINT m_value_ptr = 0;
     ASSERT_TRUE(
         SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 0, SQL_DESC_ALLOC_TYPE,
@@ -724,7 +693,8 @@ TEST_F(TestSQLGetDescField, Test_SQL_DESC_BASE_COLUMN_NAME) {
     EXPECT_TRUE(SQL_SUCCEEDED(
         SQLGetDescField(m_ird_hdesc, 1, SQL_DESC_BASE_COLUMN_NAME, &m_value_ptr,
                         255, &m_string_length_ptr)));
-    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("_col0")), tchar_to_string(m_value_ptr));
+    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("_col0")),
+              tchar_to_string(m_value_ptr));
 }
 
 TEST_F(TestSQLGetDescField, Test_SQL_DESC_BASE_TABLE_NAME) {
@@ -732,14 +702,15 @@ TEST_F(TestSQLGetDescField, Test_SQL_DESC_BASE_TABLE_NAME) {
     EXPECT_TRUE(SQL_SUCCEEDED(
         SQLGetDescField(m_ird_hdesc, 1, SQL_DESC_BASE_TABLE_NAME, &m_value_ptr,
                         255, &m_string_length_ptr)));
-    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("")), tchar_to_string(m_value_ptr));
+    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("")),
+              tchar_to_string(m_value_ptr));
 }
 
 TEST_F(TestSQLGetDescField, Test_SQL_DESC_CASE_SENSITIVE) {
     SQLINTEGER m_value_ptr;
-    EXPECT_TRUE(SQL_SUCCEEDED(
-        SQLGetDescField(m_ird_hdesc, 1, SQL_DESC_CASE_SENSITIVE, &m_value_ptr,
-                        0, &m_string_length_ptr)));
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 1, SQL_DESC_CASE_SENSITIVE,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
     EXPECT_EQ((uint64_t)SQL_TRUE, (uint64_t)m_value_ptr);
 }
 
@@ -748,22 +719,23 @@ TEST_F(TestSQLGetDescField, Test_SQL_DESC_CATALOG_NAME) {
     EXPECT_TRUE(SQL_SUCCEEDED(
         SQLGetDescField(m_ird_hdesc, 1, SQL_DESC_CATALOG_NAME, &m_value_ptr,
                         255, &m_string_length_ptr)));
-    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("")), tchar_to_string(m_value_ptr));
+    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("")),
+              tchar_to_string(m_value_ptr));
 }
 
 TEST_F(TestSQLGetDescField, Test_SQL_DESC_CONCISE_TYPE) {
     SQLSMALLINT m_value_ptr;
-    EXPECT_TRUE(SQL_SUCCEEDED(
-        SQLGetDescField(m_ird_hdesc, 6, SQL_DESC_CONCISE_TYPE, &m_value_ptr,
-                        0, &m_string_length_ptr)));
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 6, SQL_DESC_CONCISE_TYPE,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
     EXPECT_EQ((uint64_t)SQL_TYPE_DATE, (uint64_t)m_value_ptr);
 }
 
 TEST_F(TestSQLGetDescField, Test_SQL_DESC_DATA_PTR) {
     SQLPOINTER m_value_ptr;
-    EXPECT_TRUE(SQL_SUCCEEDED(SQLGetDescField(m_ard_hdesc, 1, SQL_DESC_DATA_PTR,
-                                              &m_value_ptr,
-                        0, &m_string_length_ptr)));
+    EXPECT_TRUE(
+        SQL_SUCCEEDED(SQLGetDescField(m_ard_hdesc, 1, SQL_DESC_DATA_PTR,
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
     EXPECT_EQ(nullptr, m_value_ptr);
 }
 
@@ -796,7 +768,7 @@ TEST_F(TestSQLGetDescField, Test_SQL_DESC_DISPLAY_SIZE) {
     // Column 4 with type Double
     EXPECT_TRUE(
         SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 4, SQL_DESC_DISPLAY_SIZE,
-                        &m_value_ptr, 0, &m_string_length_ptr)));
+                                      &m_value_ptr, 0, &m_string_length_ptr)));
     EXPECT_EQ((uint64_t)24, (uint64_t)m_value_ptr);
 }
 
@@ -822,7 +794,8 @@ TEST_F(TestSQLGetDescField, Test_SQL_DESC_LABEL) {
     EXPECT_TRUE(SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 1, SQL_DESC_LABEL,
                                               &m_value_ptr, 255,
                                               &m_string_length_ptr)));
-    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("_col0")), tchar_to_string(m_value_ptr));
+    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("_col0")),
+              tchar_to_string(m_value_ptr));
 }
 
 TEST_F(TestSQLGetDescField, Test_SQL_DESC_LENGTH) {
@@ -831,17 +804,17 @@ TEST_F(TestSQLGetDescField, Test_SQL_DESC_LENGTH) {
     EXPECT_TRUE(
         SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 6, SQL_DESC_LENGTH,
                                       &m_value_ptr, 0, &m_string_length_ptr)));
-    EXPECT_EQ((uint64_t) 10, (uint64_t)m_value_ptr);
+    EXPECT_EQ((uint64_t)10, (uint64_t)m_value_ptr);
 }
 
 TEST_F(TestSQLGetDescField, Test_SQL_DESC_LITERAL_PREFIX) {
     SQLTCHAR m_value_ptr[255];
     // Column 4 with type Double
     EXPECT_TRUE(SQL_SUCCEEDED(
-        SQLGetDescField(m_ird_hdesc, 4, SQL_DESC_LITERAL_PREFIX,
-                                              &m_value_ptr, 255,
-                                              &m_string_length_ptr)));
-    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("DOUBLE '")), tchar_to_string(m_value_ptr));
+        SQLGetDescField(m_ird_hdesc, 4, SQL_DESC_LITERAL_PREFIX, &m_value_ptr,
+                        255, &m_string_length_ptr)));
+    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("DOUBLE '")),
+              tchar_to_string(m_value_ptr));
 }
 
 TEST_F(TestSQLGetDescField, Test_SQL_DESC_LITERAL_SUFFIX) {
@@ -850,7 +823,8 @@ TEST_F(TestSQLGetDescField, Test_SQL_DESC_LITERAL_SUFFIX) {
     EXPECT_TRUE(SQL_SUCCEEDED(
         SQLGetDescField(m_ird_hdesc, 4, SQL_DESC_LITERAL_SUFFIX, &m_value_ptr,
                         255, &m_string_length_ptr)));
-    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("'")), tchar_to_string(m_value_ptr));
+    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("'")),
+              tchar_to_string(m_value_ptr));
 }
 
 TEST_F(TestSQLGetDescField, Test_SQL_DESC_LOCAL_TYPE_NAME) {
@@ -859,16 +833,18 @@ TEST_F(TestSQLGetDescField, Test_SQL_DESC_LOCAL_TYPE_NAME) {
     EXPECT_TRUE(SQL_SUCCEEDED(
         SQLGetDescField(m_ird_hdesc, 4, SQL_DESC_LOCAL_TYPE_NAME, &m_value_ptr,
                         255, &m_string_length_ptr)));
-    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("double")), tchar_to_string(m_value_ptr));
+    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("double")),
+              tchar_to_string(m_value_ptr));
 }
 
 TEST_F(TestSQLGetDescField, Test_SQL_DESC_NAME) {
     SQLTCHAR m_value_ptr[255];
     // Column 1 with name "_col0"
     EXPECT_TRUE(SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 1, SQL_DESC_NAME,
-                                              &m_value_ptr,
-                        255, &m_string_length_ptr)));
-    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("_col0")), tchar_to_string(m_value_ptr));
+                                              &m_value_ptr, 255,
+                                              &m_string_length_ptr)));
+    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("_col0")),
+              tchar_to_string(m_value_ptr));
 }
 
 TEST_F(TestSQLGetDescField, Test_SQL_DESC_NULLABLE) {
@@ -944,9 +920,10 @@ TEST_F(TestSQLGetDescField, Test_SQL_DESC_SCHEMA_NAME) {
     SQLTCHAR m_value_ptr[255];
     // Column 4 with type Double
     EXPECT_TRUE(SQL_SUCCEEDED(
-        SQLGetDescField(m_ird_hdesc, 4, SQL_DESC_SCHEMA_NAME, &m_value_ptr,
-                        255, &m_string_length_ptr)));
-    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("")), tchar_to_string(m_value_ptr));
+        SQLGetDescField(m_ird_hdesc, 4, SQL_DESC_SCHEMA_NAME, &m_value_ptr, 255,
+                        &m_string_length_ptr)));
+    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("")),
+              tchar_to_string(m_value_ptr));
 }
 
 TEST_F(TestSQLGetDescField, Test_SQL_DESC_SEARCHABLE) {
@@ -962,7 +939,8 @@ TEST_F(TestSQLGetDescField, Test_SQL_DESC_TABLE_NAME) {
     EXPECT_TRUE(SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 1,
                                               SQL_DESC_TABLE_NAME, &m_value_ptr,
                                               255, &m_string_length_ptr)));
-    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("")), tchar_to_string(m_value_ptr));
+    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("")),
+              tchar_to_string(m_value_ptr));
 }
 
 TEST_F(TestSQLGetDescField, Test_SQL_DESC_TYPE) {
@@ -979,7 +957,8 @@ TEST_F(TestSQLGetDescField, Test_SQL_DESC_TYPE_NAME) {
     EXPECT_TRUE(SQL_SUCCEEDED(SQLGetDescField(m_ird_hdesc, 6,
                                               SQL_DESC_TYPE_NAME, &m_value_ptr,
                                               255, &m_string_length_ptr)));
-    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("date")), tchar_to_string(m_value_ptr));
+    EXPECT_EQ(tchar_to_string((SQLTCHAR*)CREATE_STRING("date")),
+              tchar_to_string(m_value_ptr));
 }
 TEST_F(TestSQLSetDescRec, APP_PARAM_SET) {
     SQLHDESC hdesc;
@@ -1068,7 +1047,7 @@ TEST_F(TestSQLGetDescRec, IMP_ROW_GET) {
     EXPECT_TRUE(SQL_SUCCEEDED(ret));
     test_string column_name = CREATE_STRING("column_name");
     ret = SQLGetDescRec(hdesc, 1, (SQLTCHAR*)column_name.c_str(),
-                             (SQLSMALLINT)column_name.size(), NULL, NULL, NULL,
-                             NULL, NULL, NULL, NULL);
+                        (SQLSMALLINT)column_name.size(), NULL, NULL, NULL, NULL,
+                        NULL, NULL, NULL);
     EXPECT_EQ(SQL_ERROR, ret);
 }

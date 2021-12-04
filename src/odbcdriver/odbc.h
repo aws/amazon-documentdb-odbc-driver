@@ -212,11 +212,11 @@ typedef long ssize_t;
 #define SIZEOF_VOID_P 8
 #elif __linux__
 #if __x86_64__
-#define SIZEOF_VOID_P 8 
-#else 
+#define SIZEOF_VOID_P 8
+#else
 #define SIZEOF_VOID_P 4
 #endif
-#else // __APPLE__ / __linux__
+#else  // __APPLE__ / __linux__
 #error "SIZEOF_VOID_P must be defined"
 #endif  // __APPLE__ / __linux__
 #endif  // SIZEOF_VOID_P
@@ -227,10 +227,10 @@ typedef long ssize_t;
 #elif __linux__
 #if __x86_64__
 #define SIZEOF_LONG 8
-#else 
+#else
 #define SIZEOF_LONG 4
-#endif // __x86_64__
-#else // __APPLE__ / __linux__
+#endif  // __x86_64__
+#else   // __APPLE__ / __linux__
 #error "SIZEOF_LONG must be defined"
 #endif  // __APPLE__ / __linux__
 #endif  // SIZEOF_LONG
@@ -568,9 +568,8 @@ typedef struct {
 ErrorInfo *ER_Constructor(SDWORD errornumber, const char *errormsg);
 ErrorInfo *ER_Dup(const ErrorInfo *from);
 void ER_Destructor(ErrorInfo *);
-RETCODE SQL_API ER_ReturnError(ErrorInfo *, SQLSMALLINT, UCHAR *,
-                               SQLINTEGER *, UCHAR *, SQLSMALLINT,
-                               SQLSMALLINT *, UWORD);
+RETCODE SQL_API ER_ReturnError(ErrorInfo *, SQLSMALLINT, UCHAR *, SQLINTEGER *,
+                               UCHAR *, SQLSMALLINT, SQLSMALLINT *, UWORD);
 
 void logs_on_off(int cnopen, int);
 
@@ -600,10 +599,10 @@ void logs_on_off(int cnopen, int);
 #define ES_REAL_DIGITS 9
 #define TS_DOUBLE_DIGITS 17
 
-#define INFO_INQUIRY_LEN                                                  \
-    8192                             /* this seems sufficiently big for \ \
-                                      * queries used in info.c inoue    \ \
-                                      * 2001/05/17 */
+#define INFO_INQUIRY_LEN                      \
+    8192 /* this seems sufficiently big for \ \
+          * queries used in info.c inoue    \ \
+          * 2001/05/17 */
 #define LENADDR_SHIFT(x, sft) ((x) ? (SQLLEN *)((char *)(x) + (sft)) : NULL)
 
 /*	Structure to hold all the connection attributes for a specific
@@ -619,6 +618,7 @@ typedef struct {
     char max_connections[SMALL_REGISTRY_LEN];
 
     // Authentication
+    // TODO: add new authentication parameters/connection string options below
     char authtype[MEDIUM_REGISTRY_LEN];
     char uid[MEDIUM_REGISTRY_LEN];
     esNAME pwd;

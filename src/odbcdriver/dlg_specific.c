@@ -43,11 +43,13 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
 #ifdef _HANDLE_ENLIST_IN_DTC_
     char xaOptStr[16];
 #endif
-    ssize_t hlen, nlen, olen=-1;
+    ssize_t hlen, nlen, olen = -1;
 
     /* fundamental info */
     nlen = MAX_CONNECT_STRING;
 
+    // TODO: For each new authentication method, add else if statement for
+    // AUTHTYPE and define respective connection string
     if (strcmp(ci->authtype, AUTHTYPE_DEFAULT) == 0) {
         olen = snprintf(
             connect_string, nlen,
@@ -72,7 +74,6 @@ void makeConnectString(char *connect_string, const ConnInfo *ci, UWORD len) {
             ci->max_retry_count_client,
             ci->max_connections);
     }
-
 
     if (olen < 0 || olen >= nlen) {
         connect_string[0] = '\0';
@@ -107,6 +108,8 @@ BOOL get_DSN_or_Driver(ConnInfo *ci, const char *attribute, const char *value) {
     return found;
 }
 
+// TODO: If connection string has been modified (e.g. new authentication method)
+// Update copyConnAttributes accordingly
 BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
                         const char *value) {
     BOOL found = TRUE, printed = FALSE;
@@ -145,6 +148,8 @@ BOOL copyConnAttributes(ConnInfo *ci, const char *attribute,
     return found;
 }
 
+// TODO: If connection string has been modified (e.g. new authentication method)
+// Update getCiDefaults accordingly
 static void getCiDefaults(ConnInfo *ci) {
     strncpy(ci->drivername, DEFAULT_DRIVERNAME, MEDIUM_REGISTRY_LEN);
     strncpy(ci->request_timeout, DEFAULT_REQUEST_TIMEOUT_STR,
@@ -228,23 +233,25 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
     if (DSN[0] == '\0')
         return;
 
-    /* Proceed with getting info for the given DSN. */
+        /* Proceed with getting info for the given DSN. */
 #ifdef __linux
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waddress"
 #endif
+    // TODO: If connection string has been modified (e.g. new authentication
+    // method) Update code below accordingly
     if (SQLGetPrivateProfileString(DSN, INI_AUTH_MODE, NULL_STRING, temp,
                                    sizeof(temp), ODBC_INI)
         > 0)
         STRCPY_FIXED(ci->authtype, temp);
     if (strcmp(ci->authtype, AUTHTYPE_DEFAULT) == 0) {
-        if (SQLGetPrivateProfileString(DSN, INI_UID, NULL_STRING, temp, 
+        if (SQLGetPrivateProfileString(DSN, INI_UID, NULL_STRING, temp,
                                        sizeof(temp), ODBC_INI)
             > 0)
             STRCPY_FIXED(ci->uid, temp);
         if (SQLGetPrivateProfileString(DSN, INI_PWD, NULL_STRING, temp,
                                        sizeof(temp), ODBC_INI)
-                 
+
             > 0)
             STR_TO_NAME(ci->pwd, temp);
     }
@@ -260,8 +267,8 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
                                    sizeof(temp), ODBC_INI)
         > 0)
         STRCPY_FIXED(ci->request_timeout, temp);
-    if (SQLGetPrivateProfileString(DSN, INI_CONNECTION_TIMEOUT, NULL_STRING, temp,
-                                   sizeof(temp), ODBC_INI)
+    if (SQLGetPrivateProfileString(DSN, INI_CONNECTION_TIMEOUT, NULL_STRING,
+                                   temp, sizeof(temp), ODBC_INI)
         > 0)
         STRCPY_FIXED(ci->connection_timeout, temp);
     if (SQLGetPrivateProfileString(DSN, INI_MAX_RETRY_COUNT_CLIENT, NULL_STRING,
@@ -272,7 +279,6 @@ void getDSNinfo(ConnInfo *ci, const char *configDrvrname) {
                                    sizeof(temp), ODBC_INI)
         > 0)
         STRCPY_FIXED(ci->max_connections, temp);
-   
 
     STR_TO_NAME(ci->drivers.drivername, drivername);
 
@@ -297,6 +303,8 @@ int writeDriversDefaults(const char *drivername, const GLOBAL_VALUES *comval) {
 }
 
 /*	This is for datasource based options only */
+// TODO: If connection string has been modified (e.g. new authentication method)
+// Update writeDSNinfo accordingly
 void writeDSNinfo(const ConnInfo *ci) {
     const char *DSN = ci->dsn;
     char temp[SMALL_REGISTRY_LEN];
@@ -310,10 +318,10 @@ void writeDSNinfo(const ConnInfo *ci) {
                                  ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_REQUEST_TIMEOUT, ci->request_timeout,
                                  ODBC_INI);
-    SQLWritePrivateProfileString(DSN, INI_CONNECTION_TIMEOUT, ci->connection_timeout,
-                                 ODBC_INI);
-    SQLWritePrivateProfileString(DSN, INI_MAX_RETRY_COUNT_CLIENT, ci->max_retry_count_client,
-                                 ODBC_INI);
+    SQLWritePrivateProfileString(DSN, INI_CONNECTION_TIMEOUT,
+                                 ci->connection_timeout, ODBC_INI);
+    SQLWritePrivateProfileString(DSN, INI_MAX_RETRY_COUNT_CLIENT,
+                                 ci->max_retry_count_client, ODBC_INI);
     SQLWritePrivateProfileString(DSN, INI_MAX_CONNECTIONS, ci->max_connections,
                                  ODBC_INI);
 }
@@ -323,6 +331,8 @@ void CC_conninfo_release(ConnInfo *conninfo) {
     finalize_globals(&conninfo->drivers);
 }
 
+// TODO: If connection string has been modified (e.g. new authentication method)
+// Update CC_conninfo_init accordingly
 void CC_conninfo_init(ConnInfo *conninfo, UInt4 option) {
     MYLOG(LOG_TRACE, "entering opt=%d", option);
 
@@ -336,8 +346,7 @@ void CC_conninfo_init(ConnInfo *conninfo, UInt4 option) {
             SMALL_REGISTRY_LEN);
     strncpy(conninfo->connection_timeout, DEFAULT_CONNECTION_TIMEOUT_STR,
             SMALL_REGISTRY_LEN);
-    strncpy(conninfo->max_retry_count_client, DEFAULT_NONE,
-            SMALL_REGISTRY_LEN);
+    strncpy(conninfo->max_retry_count_client, DEFAULT_NONE, SMALL_REGISTRY_LEN);
     strncpy(conninfo->max_connections, DEFAULT_MAX_CONNECTIONS_STR,
             SMALL_REGISTRY_LEN);
     strncpy(conninfo->authtype, DEFAULT_AUTHTYPE, MEDIUM_REGISTRY_LEN);
@@ -374,6 +383,8 @@ void finalize_globals(GLOBAL_VALUES *glbv) {
 #define CORR_STRCPY(item) strncpy_null(ci->item, sci->item, sizeof(ci->item))
 #define CORR_VALCPY(item) (ci->item = sci->item)
 
+// TODO: If connection string has been modified (e.g. new authentication method)
+// Update CC_copy_conninfo accordingly
 void CC_copy_conninfo(ConnInfo *ci, const ConnInfo *sci) {
     memset(ci, 0, sizeof(ConnInfo));
     CORR_STRCPY(dsn);
