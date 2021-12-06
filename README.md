@@ -1,4 +1,4 @@
-# Database ODBC Driver
+# Amazon DocumentDB ODBC Driver
 
 DatabaseODBC is a read-only ODBC driver for Windows, Mac and Linux for connecting to Amazon DocumentDB.
 
