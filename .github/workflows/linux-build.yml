@@ -104,90 +104,90 @@ jobs:
       with:
         name: linux64-deb-installer
         path: deb-installer
-  build-linux32:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Get Java distribution
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-        architecture: x86
-    - name: Setup cmake
-      uses: jwlawson/actions-setup-cmake@v1.11
-      with:
-        cmake-version: '3.21.4'
-    - uses: actions/checkout@v2
-    - name: run-cppcheck
-      run: |
-        sudo apt install cppcheck
-        sh run_cppcheck.sh
-    - name: upload-cppcheck-results
-      if: failure()
-      uses: actions/upload-artifact@v2
-      with:
-        name: cppcheck-results
-        path: cppcheck-results.log
-    - name: get-dependencies
-      if: success()
-      run: |
-        # Need to install i386 versions
-        sudo dpkg --add-architecture i386
-        sudo apt update
-        sudo apt install unixodbc:i386 unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386 zlib1g-dev:i386 linux-headers-$(uname -r) gcc-multilib:i386 g++-multilib:i386 g++-9:i386 gcc-9:i386 gcc-9-multilib:i386 g++-9-multilib:i386 binutils:i386 make:i386
-    - name: prepare-dsn
-      if: success()
-      run: |
-        sudo cp ./src/Tests/Tests/odbc-linux32.ini /etc/odbc.ini
-        sudo cp ./src/Tests/Tests/odbcinst-linux32.ini /etc/odbcinst.ini
-        mkdir -p ${{ github.workspace }}/odbc-logs
-        export ODBCSYSINI=/etc/
-        export ODBCINSTINI=odbcinst.ini
-        export ODBCINI=/etc/odbc.ini
-    - name: configure-and-build-driver
-      if: success()
-      run: |
-        ./build_linux_release32_deb.sh
-    - name: run-tests
-      if: success()
-      run: |
-        ./build/odbc/bin/tests --gtest_output="xml:report.xml"
-    - name: prepare-test-results
-      if: always()
-      run: |
-        cp ${{ github.workspace }}/report.xml ${{ github.workspace }}/odbc-logs/
-    - name: upload-test-report
-      if: failure()
-      uses: actions/upload-artifact@v2
-      with:
-        name: test-results-linux32
-        path: ${{ github.workspace }}/report.xml
-    - name: build-deb-installer
-      if: success()
-      run: |
-        cd cmake-build32
-        cmake ../src
-        make -j4
-        cpack .
-        cd ..
-    - name: create-output
-      if: success()
-      run: |
-        mkdir deb-installer
-        mkdir build-output
-        mkdir test-output
-        cp -v ./build/odbc/lib/*.a build-output/
-        cp -v ./build/odbc/lib/*.so build-output/
-        cp -v ./cmake-build32/*.deb deb-installer/
-    - name: upload-build
-      if: success()
-      uses: actions/upload-artifact@v2
-      with:
-        name: linux32-build
-        path: build-output
-    - name: upload-linux32-deb-installer
-      if: success()
-      uses: actions/upload-artifact@v2
-      with:
-        name: linux32-deb-installer
-        path: deb-installer
+  #build-linux32:
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #  - name: Get Java distribution
+  #    uses: actions/setup-java@v2
+  #    with:
+  #      distribution: 'temurin'
+  #      java-version: '17'
+  #      architecture: x86
+  #  - name: Setup cmake
+  #    uses: jwlawson/actions-setup-cmake@v1.11
+  #    with:
+  #      cmake-version: '3.21.4'
+  #  - uses: actions/checkout@v2
+  #  - name: run-cppcheck
+  #    run: |
+  #      sudo apt install cppcheck
+  #      sh run_cppcheck.sh
+  #  - name: upload-cppcheck-results
+  #    if: failure()
+  #    uses: actions/upload-artifact@v2
+  #    with:
+  #      name: cppcheck-results
+  #      path: cppcheck-results.log
+  #  - name: get-dependencies
+  #    if: success()
+  #    run: |
+  #      # Need to install i386 versions
+  #      sudo dpkg --add-architecture i386
+  #      sudo apt update
+  #      sudo apt install unixodbc:i386 unixodbc-dev:i386 odbcinst1debian2:i386 libodbc1:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 uuid-dev:i386 cpp:i386 cpp-9:i386 gcc:i386 g++:i386 zlib1g-dev:i386 linux-headers-$(uname -r) gcc-multilib:i386 g++-multilib:i386 g++-9:i386 gcc-9:i386 gcc-9-multilib:i386 g++-9-multilib:i386 binutils:i386 make:i386
+  #  - name: prepare-dsn
+  #    if: success()
+  #    run: |
+  #      sudo cp ./src/Tests/Tests/odbc-linux32.ini /etc/odbc.ini
+  #      sudo cp ./src/Tests/Tests/odbcinst-linux32.ini /etc/odbcinst.ini
+  #      mkdir -p ${{ github.workspace }}/odbc-logs
+  #      export ODBCSYSINI=/etc/
+  #      export ODBCINSTINI=odbcinst.ini
+  #      export ODBCINI=/etc/odbc.ini
+  #  - name: configure-and-build-driver
+  #    if: success()
+  #    run: |
+  #      ./build_linux_release32_deb.sh
+  #  - name: run-tests
+  #    if: success()
+  #    run: |
+  #      ./build/odbc/bin/tests --gtest_output="xml:report.xml"
+  #  - name: prepare-test-results
+  #    if: always()
+  #    run: |
+  #      cp ${{ github.workspace }}/report.xml ${{ github.workspace }}/odbc-logs/
+  #  - name: upload-test-report
+  #    if: failure()
+  #    uses: actions/upload-artifact@v2
+  #    with:
+  #      name: test-results-linux32
+  #      path: ${{ github.workspace }}/report.xml
+  #  - name: build-deb-installer
+  #    if: success()
+  #    run: |
+  #      cd cmake-build32
+  #      cmake ../src
+  #      make -j4
+  #      cpack .
+  #      cd ..
+  #  - name: create-output
+  #    if: success()
+  #    run: |
+  #      mkdir deb-installer
+  #      mkdir build-output
+  #      mkdir test-output
+  #      cp -v ./build/odbc/lib/*.a build-output/
+  #      cp -v ./build/odbc/lib/*.so build-output/
+  #      cp -v ./cmake-build32/*.deb deb-installer/
+  #  - name: upload-build
+  #    if: success()
+  #    uses: actions/upload-artifact@v2
+  #    with:
+  #      name: linux32-build
+  #      path: build-output
+  #  - name: upload-linux32-deb-installer
+  #    if: success()
+  #    uses: actions/upload-artifact@v2
+  #    with:
+  #      name: linux32-deb-installer
+  #      path: deb-installer
