@@ -19,6 +19,11 @@ jobs:
       NOT_CONNETECD: 1
       FAKE_CONNECTION: 1
     steps:
+    - name: Get Java distribution
+      uses: joschi/setup-jdk@v2
+      with:
+        java-version: '17'
+        architecture: x64
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.11
       with:

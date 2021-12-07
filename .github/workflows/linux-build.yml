@@ -23,6 +23,11 @@ jobs:
   build-linux64:
     runs-on: ubuntu-latest
     steps:
+    - name: Get Java distribution
+      uses: joschi/setup-jdk@v2
+      with:
+        java-version: '17'
+        architecture: x64
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.11
       with:
@@ -101,6 +106,11 @@ jobs:
   build-linux32:
     runs-on: ubuntu-latest
     steps:
+    - name: Get Java distribution
+      uses: joschi/setup-jdk@v2
+      with:
+        java-version: '17'
+        architecture: x86
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.11
       with:

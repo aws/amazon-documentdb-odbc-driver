@@ -15,6 +15,12 @@
 
 project(odbcdriver)
 
+# JNI requirements
+find_package(Java REQUIRED)
+find_package(JNI REQUIRED)
+include(UseJava)
+include_directories(${JNI_INCLUDE_DIRS} ${JAVA_INCLUDE_PATH2} ${JAVA_INCLUDE_PATH})
+
 # Source files for odbcdriver
 set(C_SOURCE_FILES	bind.c
 					columninfoclass.c
@@ -72,6 +78,12 @@ set(CPP_SOURCE_FILES	communication.cpp
 						Row.cpp
 						ScalarType.cpp
 						Type.cpp
+						jni/JniEnv.cpp
+						jni/Connection.cpp
+						jni/ConnectionProperties.cpp
+						jni/JniEnv.h
+						jni/Connection.h
+						jni/ConnectionProperties.h
 						)
 						
 if(WIN32)
@@ -151,13 +163,16 @@ if(WIN32)
 	target_link_libraries(odbcdriver wsock32 ws2_32 winmm user32 gdi32 legacy_stdio_definitions aws-cpp-sdk-core aws-cpp-sdk-sts kernel32 advapi32 secur32 XOleHlp Wldap32 crypt32 Normaliz odbccp32 odbc32)
 	target_link_libraries(odbcdriver debug msvcrtd)
 	target_link_libraries(odbcdriver optimized msvcrt)
+	target_link_libraries(odbcdriver ${JNI_LIBRARIES})
 elseif(APPLE)
 	# Apple specific
 	target_link_libraries(odbcdriver iodbc iodbcinst aws-cpp-sdk-core aws-cpp-sdk-sts )
+	target_link_libraries(odbcdriver ${JNI_LIBRARIES})
 elseif(UNIX)
 	# Unix specific
 	include_directories(/usr/src/linux-headers-5.0.0-27/include)
 	target_link_libraries(odbcdriver aws-cpp-sdk-core aws-cpp-sdk-sts odbc odbcinst)
+	target_link_libraries(odbcdriver ${JNI_LIBRARIES})
 	if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9))
 		if (Boost_FOUND)
 			include_directories(${Boost_INCLUDE_DIRS})
