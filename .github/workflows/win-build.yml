@@ -20,63 +20,63 @@ env:
   FAKE_CONNECTION: 1
 
 jobs:
-  build-windows32:
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Get Java distribution
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-        architecture: x86
-    - name: Get specific version CMake, v3.20.1
-      uses: lukka/get-cmake@v3.20.1
-    - name: add-msbuild-to-path
-      uses: microsoft/setup-msbuild@v1.0.2
-    - name: configure-and-build-driver
-      run: |
-        .\build_win_release32.ps1
-    - name: import-registry
-      run: |
-        reg import .\src\Tests\Tests\AWSProfileRegistry_Win32.reg
-        reg import .\src\Tests\Tests\IAMRegistry_Win32.reg
-        mkdir ${{ github.workspace }}\odbc-logs
-    - name: run-tests
-      run: |
-        .\build\odbc\bin\Release\tests.exe --gtest_output="xml:report.xml"
-    - name: upload-test-report
-      if: failure()
-      uses: actions/upload-artifact@v2
-      with:
-        name: test-logs-win32
-        path: ${{ github.workspace }}\report.xml
-    - name: build-installer
-      if: success()
-      run: |
-        .\scripts\build_installer.ps1 Release Win32 .\src $Env:ODBC_BUILD_PATH $Env:AWS_SDK_INSTALL_PATH
-    - name: prepare-output
-      if: success()
-      run: |
-        .\scripts\prepare_ci_output.ps1 $Env:ODBC_BIN_PATH $Env:ODBC_LIB_PATH $Env:ODBC_BUILD_PATH
-    - name: upload-build
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: windows32-build
-        path: ci-output/build
-    - name: upload-installer
-      if: success()
-      uses: actions/upload-artifact@v2
-      with:
-        name: windows32-installer
-        path: ci-output/installer
-    - name: upload-test-results
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: windows-test-results
-        path: $CI_OUTPUT_PATH/test
+  #build-windows32:
+  #  runs-on: windows-latest
+  #  steps:
+  #  - uses: actions/checkout@v2
+  #  - name: Get Java distribution
+  #    uses: actions/setup-java@v2
+  #    with:
+  #      distribution: 'temurin'
+  #      java-version: '17'
+  #      architecture: x86
+  #  - name: Get specific version CMake, v3.20.1
+  #    uses: lukka/get-cmake@v3.20.1
+  #  - name: add-msbuild-to-path
+  #    uses: microsoft/setup-msbuild@v1.0.2
+  #  - name: configure-and-build-driver
+  #    run: |
+  #      .\build_win_release32.ps1
+  #  - name: import-registry
+  #    run: |
+  #      reg import .\src\Tests\Tests\AWSProfileRegistry_Win32.reg
+  #      reg import .\src\Tests\Tests\IAMRegistry_Win32.reg
+  #      mkdir ${{ github.workspace }}\odbc-logs
+  #  - name: run-tests
+  #    run: |
+  #      .\build\odbc\bin\Release\tests.exe --gtest_output="xml:report.xml"
+  #  - name: upload-test-report
+  #    if: failure()
+  #    uses: actions/upload-artifact@v2
+  #    with:
+  #      name: test-logs-win32
+  #      path: ${{ github.workspace }}\report.xml
+  #  - name: build-installer
+  #    if: success()
+  #    run: |
+  #      .\scripts\build_installer.ps1 Release Win32 .\src $Env:ODBC_BUILD_PATH $Env:AWS_SDK_INSTALL_PATH
+  #  - name: prepare-output
+  #    if: success()
+  #    run: |
+  #      .\scripts\prepare_ci_output.ps1 $Env:ODBC_BIN_PATH $Env:ODBC_LIB_PATH $Env:ODBC_BUILD_PATH
+  #  - name: upload-build
+  #    if: always()
+  #    uses: actions/upload-artifact@v2
+  #    with:
+  #      name: windows32-build
+  #      path: ci-output/build
+  #  - name: upload-installer
+  #    if: success()
+  #    uses: actions/upload-artifact@v2
+  #    with:
+  #      name: windows32-installer
+  #      path: ci-output/installer
+  #  - name: upload-test-results
+  #    if: always()
+  #    uses: actions/upload-artifact@v2
+  #    with:
+  #      name: windows-test-results
+  #      path: $CI_OUTPUT_PATH/test
   build-windows64:
     runs-on: windows-latest
     steps:
@@ -132,6 +132,12 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Get Java distribution
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        architecture: x64
     - name: Get specific version CMake, v3.20.1
       uses: lukka/get-cmake@v3.20.1
     - name: add-msbuild-to-path
