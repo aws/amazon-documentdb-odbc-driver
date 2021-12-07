@@ -20,8 +20,9 @@ jobs:
       FAKE_CONNECTION: 1
     steps:
     - name: Get Java distribution
-      uses: joschi/setup-jdk@v2
+      uses: actions/setup-java@v2
       with:
+        distribution: 'temurin'
         java-version: '17'
         architecture: x64
     - name: Setup cmake

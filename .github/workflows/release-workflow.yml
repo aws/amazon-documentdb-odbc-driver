@@ -17,8 +17,9 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Get Java distribution
-        uses: joschi/setup-jdk@v2
+        uses: actions/setup-java@v2
         with:
+          distribution: 'temurin'
           java-version: '17'
           architecture: x64
       - name: Setup cmake
@@ -78,8 +79,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Get Java distribution
-        uses: joschi/setup-jdk@v2
+        uses: actions/setup-java@v2
         with:
+          distribution: 'temurin'
           java-version: '17'
           architecture: x32
       - name: Get specific version CMake, v3.18.3
@@ -114,8 +116,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Get Java distribution
-        uses: joschi/setup-jdk@v2
+        uses: actions/setup-java@v2
         with:
+          distribution: 'temurin'
           java-version: '17'
           architecture: x64
       - name: Get specific version CMake, v3.18.3
