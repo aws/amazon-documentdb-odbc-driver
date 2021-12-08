@@ -23,17 +23,17 @@ jobs:
   build-mac:
     runs-on: macos-latest
     steps:
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v1.9
+      with:
+        cmake-version: '3.21.4'
+    - uses: actions/checkout@v2
     - name: Get Java distribution
       uses: actions/setup-java@v2
       with:
         distribution: 'temurin'
         java-version: '17'
         architecture: x64
-    - name: Setup cmake
-      uses: jwlawson/actions-setup-cmake@v1.9
-      with:
-        cmake-version: '3.21.4'
-    - uses: actions/checkout@v2
     - name: run-cppcheck
       run: |
         brew install cppcheck
