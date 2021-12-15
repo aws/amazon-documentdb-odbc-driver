@@ -27,7 +27,7 @@ class JniEnv {
    public:
     JniEnv();
     void CreateJavaVM();
-    inline JNIEnv* const GetJniEnv() {
+    inline JNIEnv* GetJniEnv() {
         return env_;
     };
     inline ~JniEnv() {
