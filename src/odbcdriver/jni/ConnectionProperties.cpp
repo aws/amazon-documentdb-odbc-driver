@@ -16,12 +16,14 @@
 
 #include <jni.h>
 #include <iostream>
+#include <memory>
 #include "ConnectionProperties.h"
+
 using namespace std;
 
 namespace jni {
 
-ConnectionProperties* ConnectionProperties::GetPropertiesFromConnectionString(
+std::shared_ptr< ConnectionProperties > ConnectionProperties::GetPropertiesFromConnectionString(
     JniEnv* const jni_env_, const std::string connectionString) {
     jni_env_->CreateJavaVM();
     JNIEnv* const env = jni_env_->GetJniEnv();
@@ -58,10 +60,9 @@ ConnectionProperties* ConnectionProperties::GetPropertiesFromConnectionString(
         const char* message = env->GetStringUTFChars(o_message, &isCopy);
         env->ReleaseStringUTFChars(o_message, message);
         throw runtime_error(message);
-        return nullptr;
     }
 
-    return new ConnectionProperties(connection_properties);
+    return std::make_shared<ConnectionProperties>(connection_properties);
 }
 
 jmethodID ConnectionProperties::GetMethodGetPropertiesFromConnectionString(

@@ -38,15 +38,17 @@ void JniEnv::CreateJavaVM() {
     JavaVMOption *options =
         new JavaVMOption[numOfOptions];  // JVM invocation options
 
+    // where to find java .class
     options[0].optionString =
-        (char *)"-Djava.class.path=./documentdb-jdbc-1.0.0-all.jar";  // where to find
-                                                              // java .class
+        (char *)"-Djava.class.path=./documentdb-jdbc-1.0.0-all.jar";
     options[0].extraInfo = nullptr;
-    vm_args.version = JNI_VERSION_1_8;  // minimum Java version
-    vm_args.nOptions = numOfOptions;    // number of options
+    // minimum Java version
+    vm_args.version = JNI_VERSION_1_8;
+    // number of options
+    vm_args.nOptions = numOfOptions;
     vm_args.options = options;
-    vm_args.ignoreUnrecognized =
-        false;  // invalid options make the JVM init fail
+    // invalid options make the JVM init fail
+    vm_args.ignoreUnrecognized = false;
 
     //=============== load and initialize
     // Java VM and JNI interface =============

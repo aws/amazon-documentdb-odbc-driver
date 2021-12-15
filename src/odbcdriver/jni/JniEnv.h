@@ -27,13 +27,14 @@ class JniEnv {
    public:
     JniEnv();
     void CreateJavaVM();
-    inline JNIEnv* GetJniEnv() {
+    inline JNIEnv* const GetJniEnv() {
         return env_;
     };
     inline ~JniEnv() {
         if (jvm_ != nullptr) {
             jvm_->DestroyJavaVM();
             jvm_ = nullptr;
+            env_ = nullptr;
         }
     }
 };

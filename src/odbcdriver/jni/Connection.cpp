@@ -37,10 +37,10 @@ void Connection::Connect() {
     }
     cout << "DocumentDbConnection class found." << endl;
 
-    static jmethodID m_dcoumentdb_constructor = env->GetMethodID(
+    static jmethodID m_documentdb_constructor = env->GetMethodID(
         cls_documentdb_connection, "<init>",
         "(Lsoftware/amazon/documentdb/jdbc/DocumentDbConnectionProperties;)V");
-    if (m_dcoumentdb_constructor == nullptr) {
+    if (m_documentdb_constructor == nullptr) {
         throw runtime_error(
             "ERROR: constructor DocumentDbConnection(connectionProperties) not "
             "found!");
@@ -48,7 +48,7 @@ void Connection::Connect() {
     cout << "DocumentDbConnection constructor found." << endl;
 
     connection_ =
-        env->NewObject(cls_documentdb_connection, m_dcoumentdb_constructor,
+        env->NewObject(cls_documentdb_connection, m_documentdb_constructor,
                        connection_properties_.GetHandle());
     if (connection_ == nullptr) {
         throw runtime_error("Unable to construct DocumentDbConnection");
@@ -76,7 +76,9 @@ Connection::~Connection() {
             return;
         }
         env->CallVoidMethod(connection_, m_dcoumentdb_close);
+        // Ensure all member Java object are set to null.
         connection_ = nullptr;
+        jni_env_ = nullptr;
     }
 }
 

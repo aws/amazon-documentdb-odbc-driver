@@ -24,7 +24,7 @@
 namespace jni {
 class Connection {
    private:
-    JniEnv* const jni_env_;
+    JniEnv* jni_env_;
     ConnectionProperties connection_properties_;
     jobject connection_;
 
