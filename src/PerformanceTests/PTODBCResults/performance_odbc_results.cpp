@@ -21,14 +21,15 @@
 #include "chrono"
 #include <vector>
 #include <numeric>
+#include <iostream>
+#include <fstream>
+#include "../../CSVparser/csv_parser/csv_parser.h"
+#include <string_view>
+#include <cstdlib>
+
 // clang-format on
 
-#define BIND_SIZE 255
-#define ROWSET_SIZE_5 5
-#define ROWSET_SIZE_50 50
-#define SINGLE_ROW 1
-#define ITERATION_COUNT 10
-
+#define IT_SIZEOF(x) (NULL == (x) ? 0 : (sizeof((x)) / sizeof((x)[0])))
 #ifndef WIN32
 typedef SQLULEN SQLROWCOUNT;
 typedef SQLULEN SQLROWSETSIZE;
@@ -36,23 +37,337 @@ typedef SQLULEN SQLTRANSID;
 typedef SQLLEN SQLROWOFFSET;
 #endif
 
-const test_string m_query =
-    CREATE_STRING("SELECT * FROM ODBCPerfTest.DevOps LIMIT 10000");
+/******************************************
+ * Global Constants
+ *****************************************/
 
+#define BIND_SIZE 255
+#define ROWSET_SIZE_5 5
+#define ROWSET_SIZE_50 50
+#define SINGLE_ROW 1
+#define ITERATION_COUNT 10
+
+// Header definitions (input csv file must match)
+#define QUERY_HEADER "query"
+#define LIMIT_HEADER "limit"
+#define TEST_NAME_HEADER "test_name"
+#define ITERATION_COUNT_HEADER "loop_count"
+#define SKIP_TEST_HEADER "skip_test"
+#define AVG_TIME_MS_HEADER "result"
+
+// Ensure DSN is setup on machine before running test
+const std::string input_file = "Performance_Test_Plan.csv";
+const std::string output_file = "Performance_Test_Results.csv";
+const test_string dsn_conn_string = CREATE_STRING("DSN=documentdb-perf-test");
+
+// Constants used for ReportTime function
+const std::string sync_start = "%%__PARSE__SYNC__START__%%";
+const std::string sync_query = "%%__QUERY__%%";
+const std::string sync_case = "%%__CASE__%%";
+const std::string sync_min = "%%__MIN__%%";
+const std::string sync_max = "%%__MAX__%%";
+const std::string sync_mean = "%%__MEAN__%%";
+const std::string sync_stdev = "%%__STDEV__%%";
+const std::string sync_median = "%%__MEDIAN__%%";
+const std::string sync_end = "%%__PARSE__SYNC__END__%%";
+
+/******************************************
+ * Define Data Structures
+ *****************************************/
 typedef struct Col {
     SQLLEN data_len;
     SQLCHAR data_dat[BIND_SIZE];
 } Col;
 
-test_string perf_conn_string();
+struct CSVHeaders {
+    int idx_query = -1;
+    int idx_limit = -1;
+    int idx_skip_test = -1;
+    int idx_test_name = -1;
+    int idx_iteration_count = -1;
+    int idx_avg_time_ms = -1;
+};
 
-auto RecordBindingFetching = [](SQLHSTMT& hstmt,
-                                std::vector< long long >& times,
-                                const test_string& query) {
+struct StatisticalInfo {
+    long long avg;
+    long long min;
+    long long max;
+    long long median;
+    long long stdev;
+};
+
+struct TestCase {
+    int test_case_num;
+    std::string test_name;
+    std::string query;
+    int limit;
+    int num_iterations;
+    std::vector< long long > time_ms;
+    StatisticalInfo stat_info;
+};
+
+/******************************************
+ * Define Helper Functions
+ *****************************************/
+
+// Calculate statistical info from data vector
+void calcStats(TestCase& test_case) {
+    size_t size = test_case.time_ms.size();
+
+    // calculate max and min
+    test_case.stat_info.max =
+        *std::max_element(test_case.time_ms.begin(), test_case.time_ms.end());
+    test_case.stat_info.min =
+        *std::min_element(test_case.time_ms.begin(), test_case.time_ms.end());
+
+    // calculate average
+    test_case.stat_info.avg = std::accumulate(std::begin(test_case.time_ms),
+                                              std::end(test_case.time_ms), 0ll)
+                              / size;
+
+    // calculate median
+    test_case.stat_info.median =
+        (size % 2)
+            ? test_case.time_ms[size / 2]
+            : ((test_case.time_ms[(size / 2) - 1] + test_case.time_ms[size / 2])
+               / 2);
+
+    // calculate standard deviation
+    // TODO: calculate stdev from vector of data
+    // e.g. test_case.stat_info.stdev = stdev;
+}
+
+// Checks header values in CSV file
+// Sets column index of each header in CSVHeaders struct
+void extractCSVHeaders(
+    CSVHeaders& headers,
+    std::vector< std::vector< Csv::CellReference > >& cell_refs) {
+    std::string header_value;
+
+    // set column index in CSVHeaders structure
+    for (std::size_t column = 0; column < cell_refs.size(); ++column) {
+        const auto& cell = cell_refs[column][0];
+        if (cell.getType() == Csv::CellType::String) {
+            header_value = cell.getOriginalStringView(false).value();
+            if (header_value.compare(QUERY_HEADER) == 0) {
+                headers.idx_query = static_cast< int >(column);
+            } else if ((header_value.compare(LIMIT_HEADER)) == 0) {
+                headers.idx_limit = static_cast< int >(column);
+            } else if ((header_value.compare(TEST_NAME_HEADER)) == 0) {
+                headers.idx_test_name = static_cast< int >(column);
+            } else if ((header_value.compare(ITERATION_COUNT_HEADER)) == 0) {
+                headers.idx_iteration_count = static_cast< int >(column);
+            } else if ((header_value.compare(SKIP_TEST_HEADER)) == 0) {
+                headers.idx_skip_test = static_cast< int >(column);
+            } else if ((header_value.compare(AVG_TIME_MS_HEADER)) == 0) {
+                headers.idx_avg_time_ms = static_cast< int >(column);
+            }
+        } else {
+            throw std::runtime_error(
+                "Header values must be of string type in csv file: "
+                + input_file);
+        }
+    }
+
+    // Check that all headers have been found
+    if (headers.idx_query < 0 || headers.idx_limit < 0
+        || headers.idx_test_name < 0 || headers.idx_iteration_count < 0
+        || headers.idx_skip_test < 0 || headers.idx_avg_time_ms < 0) {
+        throw std::runtime_error("Header value(s) missing in csv file: "
+                                 + input_file);
+    }
+}
+
+// Returns true if test should be skipped, otherwise false
+bool skipTest(const Csv::CellReference& cell_skip_test) {
+    bool skip_test;
+    std::string skip_test_str;
+    std::string skip_test_header = SKIP_TEST_HEADER;
+
+    // cell value should be string = "TRUE" or "FALSE"
+    if (cell_skip_test.getType() == Csv::CellType::String) {
+        skip_test_str = cell_skip_test.getCleanString().value();
+        if (skip_test_str.compare("TRUE") == 0) {
+            skip_test = true;
+        } else if (skip_test_str.compare("FALSE") == 0) {
+            skip_test = false;
+        } else {
+            throw std::runtime_error(
+                "Incorrect \"" + skip_test_header
+                + "\" field (must be TRUE or FALSE) for test case ");
+        }
+    } else {
+        throw std::runtime_error("Incorrect \"" + skip_test_header
+                                 + "\" field type for test case ");
+    }
+    return skip_test;
+}
+
+// Returns query string from csv data
+std::string getQueryString(const Csv::CellReference& cell_query) {
+    std::string query;
+    std::string query_header = QUERY_HEADER;
+
+    // cell value for query should be String type
+    if (cell_query.getType() == Csv::CellType::String) {
+        query = cell_query.getCleanString().value();
+    } else {
+        throw std::runtime_error("Incorrect \"" + query_header
+                                 + "\" field type for test case ");
+    }
+    return query;
+}
+
+// Return limit from csv data
+int getLimit(const Csv::CellReference& cell_limit) {
+    double limit_dbl;
+    int limit_int;
+    std::string limit_header = LIMIT_HEADER;
+
+    // cell value for limit should be Double type
+    if (cell_limit.getType() == Csv::CellType::Double) {
+        limit_dbl = cell_limit.getDouble().value();
+        limit_dbl = limit_dbl + 0.5;  // convert double to int (truncation)
+        limit_int = (int)limit_dbl;
+        if (limit_int < 1) {
+            throw std::runtime_error("Incorrect \"" + limit_header
+                                     + "\" field (must be > 0) for test case ");
+        }
+    } else {
+        throw std::runtime_error("Incorrect \"" + limit_header
+                                 + "\" field type for test case ");
+    }
+    return limit_int;
+}
+
+// Returns test name string
+std::string getTestName(const Csv::CellReference& cell_test_name) {
+    std::string test_name;
+    std::string test_name_header = TEST_NAME_HEADER;
+
+    // cell value for query should be String type
+    if (cell_test_name.getType() == Csv::CellType::String) {
+        test_name = cell_test_name.getCleanString().value();
+    } else {
+        throw std::runtime_error("Incorrect \"" + test_name_header
+                                 + "\" field for test case ");
+    }
+    return test_name;
+}
+
+// Returns iteration/loop count
+int getIterationCount(const Csv::CellReference& cell_iteration_count) {
+    double iteration_count_dbl;
+    int iteration_count_int;
+    std::string iteration_count_header = ITERATION_COUNT_HEADER;
+
+    // cell value for iteration count should be Double type
+    if (cell_iteration_count.getType() == Csv::CellType::Double) {
+        iteration_count_dbl = cell_iteration_count.getDouble().value();
+        iteration_count_dbl =
+            iteration_count_dbl + 0.5;  // convert double to int (truncation)
+        iteration_count_int = (int)iteration_count_dbl;
+        if (iteration_count_int < 1) {
+            throw std::runtime_error("Incorrect \"" + iteration_count_header
+                                     + "\" field (must be > 0) for test case ");
+        }
+    } else {
+        throw std::runtime_error("Incorrect \"" + iteration_count_header
+                                 + "\" field type for test case ");
+    }
+    return iteration_count_int;
+}
+
+// Returns true if string has comma or newline
+bool hasCommaOrNewLine(const std::string str) {
+    std::size_t comma_pos, newline_pos;
+    comma_pos = str.find(',');
+    newline_pos = str.find('\n');
+    if (comma_pos != std::string::npos || newline_pos != std::string::npos) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// Read csv data from input_file (performance test plan)
+std::string readPerformanceTestPlan() {
+    // Read the file to string
+    std::ifstream ifs(input_file, std::ios::binary);
+
+    if (!ifs.is_open()) {
+        throw std::runtime_error("Failed to open input file " + input_file);
+    }
+
+    std::string csv_data((std::istreambuf_iterator< char >(ifs)),
+                         (std::istreambuf_iterator< char >()));
+
+    ifs.close();  // close csv file
+    if (ifs.is_open()) {
+        throw std::runtime_error("Failed to close input file " + input_file);
+    }
+    return csv_data;
+}
+
+// Output headers to output file
+// col 1 = test #
+// col 2 = test name
+// col 3 = query
+// col 4 = limit
+// col 5 = iteration count
+// col 6 = avg time
+// col 7 = max time
+// col 8 = min time
+// col 9 = median time
+void outputHeaders(std::ofstream& ofs) {
+    std::string test_name, query, limit, iter;
+    test_name = TEST_NAME_HEADER;
+    query = QUERY_HEADER;
+    limit = LIMIT_HEADER;
+    iter = ITERATION_COUNT_HEADER;
+    std::string header_str = "Test #," + test_name + "," + query + "," + limit + "," + iter + ",Average Time (ms),Max Time (ms),Min Time (ms),Median Time (ms)\n";
+
+    ofs << header_str;
+}
+
+// Output test case to output file
+void outputTestCase(std::ofstream& ofs, TestCase& test_case) {
+    // col 1 = test #
+    ofs << test_case.test_case_num << ",";
+
+    // col 2 = test name
+    if (hasCommaOrNewLine(test_case.test_name)) {
+        ofs << "\"" << test_case.test_name << "\"" << ",";
+    } else {
+        ofs << test_case.test_name << ",";
+    }
+
+    // col 3 = query
+    if (hasCommaOrNewLine(test_case.query)) {
+        ofs << "\"" << test_case.query << "\""
+            << ",";
+    } else {
+        ofs << test_case.query << ",";
+    }
+
+    // col 4 - 9
+    ofs << test_case.limit << ",";
+    ofs << test_case.num_iterations << ",";
+    ofs << test_case.stat_info.avg << ",";
+    //ofs << test_case.stat_info.stdev << ",";
+    ofs << test_case.stat_info.max << ",";
+    ofs << test_case.stat_info.min << ",";
+    ofs << test_case.stat_info.median << "\n";
+}
+
+// Record times_ms for exec->bind->fetch
+auto RecordBindingFetching = [](SQLHSTMT& hstmt, TestCase& test_case) {
     SQLSMALLINT total_columns = 0;
     int row_count = 0;
+    std::string temp_str = test_case.query + "\nLIMIT " + std::to_string(test_case.limit);
+    test_string query = CREATE_STRING(temp_str);
 
-    for (size_t iter = 0; iter < ITERATION_COUNT; iter++) {
+    for (size_t iter = 0; iter < test_case.num_iterations; iter++) {
         row_count = 0;
         // Execute query
         auto start = std::chrono::steady_clock::now();
@@ -65,723 +380,167 @@ auto RecordBindingFetching = [](SQLHSTMT& hstmt,
         std::vector< std::vector< Col > > cols(total_columns);
         // std::cout << "Total columns: " << total_columns << std::endl;
         for (size_t i = 0; i < cols.size(); i++)
-            cols[i].resize(SINGLE_ROW);
-
-        // Bind and fetch
-        for (size_t i = 0; i < cols.size(); i++)
             ret = SQLBindCol(hstmt, static_cast< SQLUSMALLINT >(i + 1),
                              SQL_C_CHAR,
                              static_cast< SQLPOINTER >(&cols[i][0].data_dat[i]),
-                             255, &cols[i][0].data_len);
+                             BIND_SIZE, &cols[i][0].data_len);
+
         while (SQLFetch(hstmt) == SQL_SUCCESS)
             row_count++;
         auto end = std::chrono::steady_clock::now();
         std::cout << "Total rows: " << row_count << std::endl;
         ASSERT_TRUE(SQL_SUCCEEDED(SQLCloseCursor(hstmt)));
-        times.push_back(
+        test_case.time_ms.push_back(
             std::chrono::duration_cast< std::chrono::milliseconds >(end - start)
                 .count());
         LogAnyDiagnostics(SQL_HANDLE_STMT, hstmt, ret);
     }
 };
 
-// Test template for Amazon queries
-#define TEST_PERF_TEST(test_name, query)                           \
-    TEST_F(TestPerformance, test_name) {                           \
-        std::vector< long long > times;                            \
-        RecordBindingFetching(m_hstmt, times, test_string(query)); \
-        ReportTime(#test_name, times, test_string(query));         \
-    }
-
-class TestPerformance : public Fixture {
-   public:
-    void SetUp() override {
-        if (std::getenv("NOT_CONNECTED")) {
-            GTEST_SKIP();
-        }
-        m_env = SQL_NULL_HENV;
-        m_conn = SQL_NULL_HDBC;
-        m_hstmt = SQL_NULL_HSTMT;
-        ASSERT_NO_THROW(AllocStatement(AS_SQLTCHAR(perf_conn_string().c_str()),
-                                       &m_env, &m_conn, &m_hstmt, true, true));
-    }
-};
-
-const std::string sync_start = "%%__PARSE__SYNC__START__%%";
-const std::string sync_query = "%%__QUERY__%%";
-const std::string sync_case = "%%__CASE__%%";
-const std::string sync_min = "%%__MIN__%%";
-const std::string sync_max = "%%__MAX__%%";
-const std::string sync_mean = "%%__MEAN__%%";
-const std::string sync_median = "%%__MEDIAN__%%";
-const std::string sync_end = "%%__PARSE__SYNC__END__%%";
-
-void ReportTime(const std::string& test_case, std::vector< long long > data,
-                const test_string& query) {
-    size_t size = data.size();
-    ASSERT_EQ(size, (size_t)ITERATION_COUNT);
-
-    // Get max and min
-    long long time_max = *std::max_element(data.begin(), data.end());
-    long long time_min = *std::min_element(data.begin(), data.end());
-
-    // Get median
-    long long time_mean =
-        std::accumulate(std::begin(data), std::end(data), 0ll) / data.size();
-
-    // Get median
-    std::sort(data.begin(), data.end());
-    long long time_median = (size % 2)
-                                ? data[size / 2]
-                                : ((data[(size / 2) - 1] + data[size / 2]) / 2);
-
+// ReportTime
+void ReportTime(const TestCase& test_case) {
     // Output results
     std::cout << sync_start << std::endl;
     std::cout << sync_query;
-    std::cout << tchar_to_string(AS_SQLTCHAR(query.c_str())) << std::endl;
-    std::cout << sync_case << test_case << std::endl;
-    std::cout << sync_min << time_min << " ms" << std::endl;
-    std::cout << sync_max << time_max << " ms" << std::endl;
-    std::cout << sync_mean << time_mean << " ms" << std::endl;
-    std::cout << sync_median << time_median << " ms" << std::endl;
+    std::cout << tchar_to_string(AS_SQLTCHAR(test_case.query.c_str()))
+              << std::endl;
+    std::cout << sync_case << test_case.test_case_num << ": " << test_case.test_name
+              << std::endl;
+    std::cout << sync_min << test_case.stat_info.min << " ms" << std::endl;
+    std::cout << sync_max << test_case.stat_info.max << " ms" << std::endl;
+    std::cout << sync_mean << test_case.stat_info.avg << " ms" << std::endl;
+    // std::cout << sync_stdev << test_case.stat_info.stdev << " ms" <<
+    // std::endl;
+    std::cout << sync_median << test_case.stat_info.median << " ms"
+              << std::endl;
     std::cout << sync_end << std::endl;
 
     std::cout << "Time dump: ";
-    for (size_t i = 0; i < data.size(); i++) {
-        std::cout << data[i] << " ms";
-        if (i != (data.size() - 1))
+    for (size_t i = 0; i < test_case.time_ms.size(); i++) {
+        std::cout << test_case.time_ms[i] << " ms";
+        if (i != (test_case.time_ms.size() - 1))
             std::cout << ", ";
     }
     std::cout << std::endl;
 }
 
-TEST_F(TestPerformance, Time_Execute) {
-    // Execute a query just to wake the server up in case it has been sleeping
-    // for a while
-    SQLRETURN ret =
-        SQLExecDirect(m_hstmt, AS_SQLTCHAR(m_query.c_str()), SQL_NTS);
-    ASSERT_TRUE(SQL_SUCCEEDED(ret));
-    ASSERT_TRUE(SQL_SUCCEEDED(SQLCloseCursor(m_hstmt)));
+/******************************************
+ * Google Test
+ *****************************************/
 
-    std::vector< long long > times;
-    for (size_t iter = 0; iter < ITERATION_COUNT; iter++) {
-        auto start = std::chrono::steady_clock::now();
-        ret = SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query.c_str(), SQL_NTS);
-        auto end = std::chrono::steady_clock::now();
-        LogAnyDiagnostics(SQL_HANDLE_STMT, m_hstmt, ret);
-        ASSERT_TRUE(SQL_SUCCEEDED(ret));
-        ASSERT_TRUE(SQL_SUCCEEDED(SQLCloseCursor(m_hstmt)));
-        times.push_back(
-            std::chrono::duration_cast< std::chrono::milliseconds >(end - start)
-                .count());
-    }
-    ReportTime("Execute Query", times, m_query);
-}
-
-TEST_PERF_TEST(Time_BindColumn_FetchSingleRow, m_query)
-
-TEST_F(TestPerformance, Time_BindColumn_Fetch5Rows) {
-    SQLROWSETSIZE row_count = 0;
-    SQLSMALLINT total_columns = 0;
-    SQLROWSETSIZE rows_fetched = 0;
-    SQLUSMALLINT row_status[ROWSET_SIZE_5];
-    SQLSetStmtAttr(m_hstmt, SQL_ROWSET_SIZE, (void*)ROWSET_SIZE_5, 0);
-
-    std::vector< long long > times;
-    for (size_t iter = 0; iter < ITERATION_COUNT; iter++) {
-        // Execute query
-        SQLRETURN ret =
-            SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query.c_str(), SQL_NTS);
-        ASSERT_TRUE(SQL_SUCCEEDED(ret));
-
-        // Get column count
-        SQLNumResultCols(m_hstmt, &total_columns);
-        std::vector< std::vector< Col > > cols(total_columns);
-        for (size_t i = 0; i < cols.size(); i++)
-            cols[i].resize(ROWSET_SIZE_5);
-
-        // Bind and fetch
-        auto start = std::chrono::steady_clock::now();
-        for (size_t i = 0; i < cols.size(); i++)
-            ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)i + 1, SQL_C_CHAR,
-                             (SQLPOINTER)&cols[i][0].data_dat[i], BIND_SIZE,
-                             &cols[i][0].data_len);
-        while (SQLExtendedFetch(m_hstmt, SQL_FETCH_NEXT, 0, &rows_fetched,
-                                row_status)
-               == SQL_SUCCESS) {
-            row_count += rows_fetched;
-            if (rows_fetched < ROWSET_SIZE_5)
-                break;
+class TestPerformance : public Fixture {
+   public:
+    void SetUp() override {
+        if (std::getenv("NOT_CONNECTED")) {
+            // GTEST_SKIP();
         }
-        auto end = std::chrono::steady_clock::now();
-        ASSERT_TRUE(SQL_SUCCEEDED(SQLCloseCursor(m_hstmt)));
-        times.push_back(
-            std::chrono::duration_cast< std::chrono::milliseconds >(end - start)
-                .count());
+        m_env = SQL_NULL_HENV;
+        m_conn = SQL_NULL_HDBC;
+        m_hstmt = SQL_NULL_HSTMT;
+
+        ASSERT_NO_THROW(AllocStatement(AS_SQLTCHAR(dsn_conn_string().c_str()),
+                                      &m_env, &m_conn, &m_hstmt, true, true));
     }
-    ReportTime("Bind and (5 row) Fetch", times, m_query);
-}
+};
 
-TEST_F(TestPerformance, Time_BindColumn_Fetch50Rows) {
-    SQLROWSETSIZE row_count = 0;
-    SQLSMALLINT total_columns = 0;
-    SQLROWSETSIZE rows_fetched = 0;
-    SQLUSMALLINT row_status[ROWSET_SIZE_50];
-    SQLSetStmtAttr(m_hstmt, SQL_ROWSET_SIZE, (void*)ROWSET_SIZE_50, 0);
+// Run performance test plan
+TEST_F(TestPerformance, PERFORMANCE_TEST_PLAN) {
+    // read test plan to string
+    std::string csv_data = readPerformanceTestPlan();
 
-    std::vector< long long > times;
-    for (size_t iter = 0; iter < ITERATION_COUNT; iter++) {
-        // Execute query
-        SQLRETURN ret =
-            SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query.c_str(), SQL_NTS);
-        ASSERT_TRUE(SQL_SUCCEEDED(ret));
+    // Let "cell_refs" be a vector of columns.
+    // After parsing, each element will contain std::string_view referencing a
+    // part of the original data. Note: CellReference must NOT outlive csv_data.
+    // If it has to, use CellValue class instead.
+    std::vector< std::vector< Csv::CellReference > > cell_refs;
+    CSVHeaders csv_headers;
+    std::size_t num_test_cases;
+    bool skip_test = true;
+    TestCase test_case;
+    std::vector< TestCase > results;
+    std::string query;
+    std::string test_name;
+    int iteration_count;
+    int limit;
+    std::ofstream ofs;
+    std::size_t comma_pos;
 
-        // Get column count
-        SQLNumResultCols(m_hstmt, &total_columns);
-        std::vector< std::vector< Col > > cols(total_columns);
-        for (size_t i = 0; i < cols.size(); i++)
-            cols[i].resize(ROWSET_SIZE_50);
+    try {
+        Csv::Parser parser;
 
-        // Bind and fetch
-        auto start = std::chrono::steady_clock::now();
-        for (size_t i = 0; i < cols.size(); i++)
-            ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)i + 1, SQL_C_CHAR,
-                             (SQLPOINTER)&cols[i][0].data_dat[i], BIND_SIZE,
-                             &cols[i][0].data_len);
-        while (SQLExtendedFetch(m_hstmt, SQL_FETCH_NEXT, 0, &rows_fetched,
-                                row_status)
-               == SQL_SUCCESS) {
-            row_count += rows_fetched;
-            if (rows_fetched < ROWSET_SIZE_50)
-                break;
+        // parse data into cell_refs and check headers
+        parser.parseTo(csv_data, cell_refs);
+        extractCSVHeaders(csv_headers, cell_refs);
+
+        // Setup output file
+        ofs.open(output_file);
+        if (!ofs.is_open()) {
+            throw std::runtime_error("Failed to open output file "
+                                     + output_file);
         }
+        outputHeaders(ofs);
 
-        auto end = std::chrono::steady_clock::now();
-        ASSERT_TRUE(SQL_SUCCEEDED(SQLCloseCursor(m_hstmt)));
-        times.push_back(
-            std::chrono::duration_cast< std::chrono::milliseconds >(end - start)
-                .count());
+        // iterate through each test case and output results
+        num_test_cases = cell_refs[csv_headers.idx_query].size();
+        for (std::size_t row = 1; row < num_test_cases; ++row) {
+            try {
+                // check skip_test field
+                const auto& cell_skip_test =
+                    cell_refs[csv_headers.idx_skip_test][row];
+                skip_test = skipTest(cell_skip_test);
+                if (skip_test) {
+                    continue;  // skip test case
+                }
+
+                const auto& cell_query = cell_refs[csv_headers.idx_query][row];
+                const auto& cell_limit = cell_refs[csv_headers.idx_limit][row];
+                const auto& cell_test_name =
+                    cell_refs[csv_headers.idx_test_name][row];
+                const auto& cell_iteration_count =
+                    cell_refs[csv_headers.idx_iteration_count][row];
+
+                query = getQueryString(cell_query);
+                limit = getLimit(cell_limit);
+                test_name = getTestName(cell_test_name);
+                iteration_count = getIterationCount(cell_iteration_count);
+            } catch (std::runtime_error& err) {
+                throw std::runtime_error(err.what() + std::to_string(row));
+            }
+
+            // Store test case info
+            test_case.test_case_num = row;
+            test_case.test_name = test_name;
+            test_case.query = query;
+            test_case.limit = limit;
+            test_case.num_iterations = iteration_count;
+
+            // Exec -> Bind -> Fetch (record time)
+            RecordBindingFetching(m_hstmt, test_case);
+
+            // Calcualte stats for recorded time vs iterations
+            calcStats(test_case);
+            ReportTime(test_case);
+            // Output results to csv file
+            outputTestCase(ofs, test_case);
+            results.push_back(test_case);
+
+            // Reset test_case variable
+            test_case.query.clear();
+            test_case.test_name.clear();
+            test_case.time_ms.clear();
+        }
+        ofs.close();
+    } catch (std::exception e) {
+        if (ofs.is_open()) {
+            ofs.close();
+        }
+        throw e;
     }
-    ReportTime("Bind and (50 row) Fetch", times, m_query);
 }
 
-TEST_F(TestPerformance, Time_Execute_FetchSingleRow) {
-    SQLSMALLINT total_columns = 0;
-    int row_count = 0;
-
-    std::vector< long long > times;
-    for (size_t iter = 0; iter < ITERATION_COUNT; iter++) {
-        // Execute query
-        auto start = std::chrono::steady_clock::now();
-        SQLRETURN ret =
-            SQLExecDirect(m_hstmt, (SQLTCHAR*)m_query.c_str(), SQL_NTS);
-        ASSERT_TRUE(SQL_SUCCEEDED(ret));
-
-        // Get column count
-        SQLNumResultCols(m_hstmt, &total_columns);
-        std::vector< std::vector< Col > > cols(total_columns);
-        for (size_t i = 0; i < cols.size(); i++)
-            cols[i].resize(SINGLE_ROW);
-
-        // Bind and fetch
-        for (size_t i = 0; i < cols.size(); i++)
-            ret = SQLBindCol(m_hstmt, (SQLUSMALLINT)i + 1, SQL_C_CHAR,
-                             (SQLPOINTER)&cols[i][0].data_dat[i], BIND_SIZE,
-                             &cols[i][0].data_len);
-        while (SQLFetch(m_hstmt) == SQL_SUCCESS)
-            row_count++;
-
-        auto end = std::chrono::steady_clock::now();
-        ASSERT_TRUE(SQL_SUCCEEDED(SQLCloseCursor(m_hstmt)));
-        times.push_back(
-            std::chrono::duration_cast< std::chrono::milliseconds >(end - start)
-                .count());
-    }
-    ReportTime("Execute Query, Bind and (1 row) Fetch", times, m_query);
-}
-
-TEST_PERF_TEST(
-    Q1_EXPECT_4_OR_5_ROWS,
-    CREATE_STRING(
-        "SELECT BIN(time, 1m) AS time_bin, AVG(measure_value::double) AS "
-        "avg_cpu FROM perfdb_hcltps.perftable_hcltps WHERE time BETWEEN now() "
-        "- 1h AND now() AND measure_name = 'cpu_user' AND region = 'us-east-1' "
-        "AND cell = 'us-east-1-cell-1' AND silo = 'us-east-1-cell-1-silo-1' "
-        "AND availability_zone = 'us-east-1-1' AND microservice_name = "
-        "'apollo' AND instance_type = 'r5.4xlarge' AND os_version = 'AL2' AND "
-        "instance_name = 'i-AUa00Zt2-apollo-0003.amazonaws.com' GROUP BY "
-        "BIN(time, 1m) ORDER BY time_bin desc"))
-
-TEST_PERF_TEST(
-    Q2_EXPECT_1_ROW,
-    CREATE_STRING(
-        "SELECT * FROM perfdb_hcltps.perftable_hcltps WHERE time BETWEEN now() "
-        "- 1h AND now() AND measure_name = 'memory_free' AND region = "
-        "'us-east-1' AND cell = 'us-east-1-cell-1' AND silo = "
-        "'us-east-1-cell-1-silo-1' AND availability_zone = 'us-east-1-1' AND "
-        "microservice_name = 'apollo' AND instance_name = "
-        "'i-AUa00Zt2-apollo-0003.amazonaws.com' AND process_name = 'server' "
-        "AND jdk_version = 'JDK_11' ORDER BY time DESC LIMIT 1"))
-TEST_PERF_TEST(
-    Q3_EXPECT_25_ROWS,
-    CREATE_STRING(
-        "SELECT BIN(time, 1h) AS hour, COUNT(*) AS num_samples, "
-        "ROUND(AVG(measure_value::bigint), 2) AS avg_value, "
-        "ROUND(APPROX_PERCENTILE(measure_value::bigint, 0.9), 2) AS p90_value, "
-        "ROUND(APPROX_PERCENTILE(measure_value::bigint, 0.95), 2) AS "
-        "p95_value, ROUND(APPROX_PERCENTILE(measure_value::bigint, 0.99), 2) "
-        "AS p99_value FROM perfdb_hcltps.perftable_hcltps WHERE time BETWEEN "
-        "now() - 1h AND now() AND measure_name = 'task_completed' AND region = "
-        "'us-east-1' AND cell = 'us-east-1-cell-1' AND silo = "
-        "'us-east-1-cell-1-silo-1' AND availability_zone = 'us-east-1-1' AND "
-        "microservice_name = 'apollo' AND instance_type = 'r5.4xlarge' AND "
-        "os_version = 'AL2' AND instance_name = "
-        "'i-AUa00Zt2-apollo-0003.amazonaws.com' GROUP BY BIN(time, 1h) ORDER "
-        "BY hour desc"))
-TEST_PERF_TEST(
-    Q4_EXPECT_1_ROW,
-    CREATE_STRING(
-        "WITH gc_timeseries AS ( SELECT region, cell, silo, availability_zone, "
-        "microservice_name, instance_name, process_name, jdk_version, "
-        "CREATE_TIME_SERIES(time, measure_value::double) AS gc_reclaimed, "
-        "MIN(time) AS min_time, MAX(time) AS max_time FROM "
-        "perfdb_hcltps.perftable_hcltps WHERE time BETWEEN now() - 1h AND "
-        "now() AND measure_name = 'gc_reclaimed' AND region = 'us-east-1' AND "
-        "cell = 'us-east-1-cell-1' AND silo = 'us-east-1-cell-1-silo-1' AND "
-        "availability_zone = 'us-east-1-1' AND microservice_name = 'apollo' "
-        "AND instance_name = 'i-AUa00Zt2-apollo-0003.amazonaws.com' AND "
-        "process_name = 'server' AND jdk_version = 'JDK_11' GROUP BY region, "
-        "cell, silo, availability_zone, microservice_name, instance_name, "
-        "process_name, jdk_version), interpolated_ts AS ( SELECT "
-        "INTERPOLATE_LOCF(gc_reclaimed, SEQUENCE(min_time, max_time, 1s)) AS "
-        "interpolated_gc_reclaimed FROM gc_timeseries) SELECT "
-        "FILTER(interpolated_gc_reclaimed, x -> x.value > 50) AS "
-        "gc_reclaimed_above_threshold, ROUND(REDUCE(interpolated_gc_reclaimed, "
-        "CAST(ROW(0, 0) AS ROW(count_high BIGINT, count_total BIGINT)), (s, x) "
-        "-> CAST(ROW(s.count_high + IF(x.value > 50, 1, 0), s.count_total + 1) "
-        "AS ROW(count_high BIGINT, count_total BIGINT)), s -> IF(s.count_total "
-        "= 0, NULL, CAST(s.count_high AS DOUBLE) / s.count_total)), 4) AS "
-        "fraction_gc_reclaimed_threshold FROM interpolated_ts"))
-TEST_PERF_TEST(
-    Q5_EXPECT_25_ROWS,
-    CREATE_STRING(
-        "SELECT instance_name, BIN(time, 1h) AS time_bin, COUNT(*) AS "
-        "num_samples, AVG(measure_value::double) AS avg_memory_free, "
-        "ROUND(APPROX_PERCENTILE(measure_value::double, 0.9), 2) AS "
-        "p90_memory_free, ROUND(APPROX_PERCENTILE(measure_value::double, "
-        "0.95), 2) AS p95_memory_free, "
-        "ROUND(APPROX_PERCENTILE(measure_value::double, 0.99), 2) AS "
-        "p99_memory_free FROM perfdb_hcltps.perftable_hcltps WHERE time "
-        "BETWEEN now() - 1h AND now() AND measure_name = 'memory_free' AND "
-        "region = 'us-east-1' AND cell = 'us-east-1-cell-1' AND silo = "
-        "'us-east-1-cell-1-silo-1' AND availability_zone = 'us-east-1-1' AND "
-        "microservice_name = 'apollo' AND instance_name = "
-        "'i-AUa00Zt2-apollo-0003.amazonaws.com' AND process_name = 'server' "
-        "AND jdk_version = 'JDK_11' GROUP BY instance_name, BIN(time, 1h)"))
-TEST_PERF_TEST(
-    Q6_EXPECT_1_ROW,
-    CREATE_STRING(
-        "WITH event_interval AS ( SELECT instance_name, process_name, "
-        "jdk_version, to_milliseconds(time - LAG(time, 1) OVER (ORDER BY time "
-        "ASC)) AS interval FROM perfdb_hcltps.perftable_hcltps WHERE time "
-        "BETWEEN now() - 1h AND now() AND measure_name = 'gc_reclaimed' AND "
-        "region = 'us-east-1' AND cell = 'us-east-1-cell-1' AND silo = "
-        "'us-east-1-cell-1-silo-1' AND availability_zone = 'us-east-1-1' AND "
-        "microservice_name = 'apollo' AND instance_name = "
-        "'i-AUa00Zt2-apollo-0003.amazonaws.com' AND process_name = 'server' "
-        "AND jdk_version = 'JDK_11') SELECT instance_name, process_name, "
-        "jdk_version, COUNT(*) AS num_events, ROUND(MIN(interval), 2) AS "
-        "min_interval, ROUND(AVG(interval), 2) AS avg_interval, "
-        "ROUND(MAX(interval), 2) AS max_interval, "
-        "ROUND(APPROX_PERCENTILE(interval, 0.5), 2) AS p50_interval, "
-        "ROUND(APPROX_PERCENTILE(interval, 0.9), 2) AS p90_interval, "
-        "ROUND(APPROX_PERCENTILE(interval, 0.99), 2) AS p99_interval FROM "
-        "event_interval WHERE interval IS NOT NULL GROUP BY instance_name, "
-        "process_name, jdk_version"))
-TEST_PERF_TEST(
-    Q7_EXPECT_4_OR_5_ROWS,
-    CREATE_STRING(
-        "SELECT BIN(time, 1m) AS time_bin, AVG(CASE WHEN measure_name = "
-        "'cpu_user' THEN measure_value::double ELSE NULL END) AS avg_cpu_user, "
-        "AVG(CASE WHEN measure_name = 'cpu_system' THEN measure_value::double "
-        "ELSE NULL END) AS avg_cpu_system, AVG(CASE WHEN measure_name = "
-        "'cpu_idle' THEN measure_value::double ELSE NULL END) AS avg_cpu_idle, "
-        "AVG(CASE WHEN measure_name = 'cpu_iowait' THEN measure_value::double "
-        "ELSE NULL END) AS avg_cpu_iowait, AVG(CASE WHEN measure_name = "
-        "'cpu_steal' THEN measure_value::double ELSE NULL END) AS "
-        "avg_cpu_steal, AVG(CASE WHEN measure_name = 'cpu_nice' THEN "
-        "measure_value::double ELSE NULL END) AS avg_cpu_nice, AVG(CASE WHEN "
-        "measure_name = 'cpu_si' THEN measure_value::double ELSE NULL END) AS "
-        "avg_cpu_si, AVG(CASE WHEN measure_name = 'cpu_hi' THEN "
-        "measure_value::double ELSE NULL END) AS avg_cpu_hi FROM "
-        "perfdb_hcltps.perftable_hcltps WHERE time BETWEEN now() - 1h AND "
-        "now() AND measure_name IN ( 'cpu_user', 'cpu_system', 'cpu_idle', "
-        "'cpu_iowait', 'cpu_steal', 'cpu_nice', 'cpu_si', 'cpu_hi') AND region "
-        "= 'us-east-1' AND cell = 'us-east-1-cell-1' AND silo = "
-        "'us-east-1-cell-1-silo-1' AND availability_zone = 'us-east-1-1' AND "
-        "microservice_name = 'apollo' AND instance_type = 'r5.4xlarge' AND "
-        "os_version = 'AL2' AND instance_name = "
-        "'i-AUa00Zt2-apollo-0003.amazonaws.com' GROUP BY BIN(time, 1m) ORDER "
-        "BY time_bin desc"))
-TEST_PERF_TEST(
-    Q8_EXPECT_4_OR_5_ROWS,
-    CREATE_STRING(
-        "WITH cpu_user AS ( SELECT BIN(time, 1m) AS time_bin, "
-        "AVG(measure_value::double) AS cpu_used FROM "
-        "perfdb_hcltps.perftable_hcltps WHERE time BETWEEN now() - 1h AND "
-        "now() AND measure_name = 'cpu_user' AND region = 'us-east-1' AND cell "
-        "= 'us-east-1-cell-1' AND silo = 'us-east-1-cell-1-silo-1' AND "
-        "availability_zone = 'us-east-1-1' AND microservice_name = 'apollo' "
-        "AND instance_type = 'r5.4xlarge' AND os_version = 'AL2' AND "
-        "instance_name = 'i-AUa00Zt2-apollo-0003.amazonaws.com' GROUP BY "
-        "BIN(time, 1m)), memory_used AS ( SELECT BIN(time, 1m) AS time_bin, "
-        "AVG(measure_value::double) AS mem_used FROM "
-        "perfdb_hcltps.perftable_hcltps WHERE time BETWEEN now() - 1h AND "
-        "now() AND measure_name = 'memory_used' AND region = 'us-east-1' AND "
-        "cell = 'us-east-1-cell-1' AND silo = 'us-east-1-cell-1-silo-1' AND "
-        "availability_zone = 'us-east-1-1' AND microservice_name = 'apollo' "
-        "AND instance_type = 'r5.4xlarge' AND os_version = 'AL2' AND "
-        "instance_name = 'i-AUa00Zt2-apollo-0003.amazonaws.com' GROUP BY "
-        "BIN(time, 1m)) SELECT mu.time_bin, IF(mu.mem_used > cu.cpu_used, "
-        "'memory', 'cpu') AS bottleneck_resource FROM memory_used mu INNER "
-        "JOIN cpu_user cu ON mu.time_bin = cu.time_bin ORDER BY mu.time_bin "
-        "DESC"))
-TEST_PERF_TEST(
-    Q9_EXPECT_25_ROWS,
-    CREATE_STRING(
-        "SELECT BIN(time, 1h) AS hour, COUNT(CASE WHEN measure_name = "
-        "'cpu_user' THEN measure_value::double ELSE NULL END) AS "
-        "num_cpu_user_samples, ROUND(AVG(CASE WHEN measure_name = 'cpu_user' "
-        "THEN measure_value::double ELSE NULL END), 2) AS avg_cpu_user, "
-        "ROUND(APPROX_PERCENTILE(CASE WHEN measure_name = 'cpu_user' THEN "
-        "measure_value::double ELSE NULL END, 0.9), 2) AS p90_cpu_user, "
-        "ROUND(APPROX_PERCENTILE(CASE WHEN measure_name = 'cpu_user' THEN "
-        "measure_value::double ELSE NULL END, 0.95), 2) AS p95_cpu_user, "
-        "ROUND(APPROX_PERCENTILE(CASE WHEN measure_name = 'cpu_user' THEN "
-        "measure_value::double ELSE NULL END, 0.99), 2) AS p99_cpu_user, "
-        "COUNT(CASE WHEN measure_name = 'cpu_system' THEN "
-        "measure_value::double ELSE NULL END) AS num_cpu_system_samples, "
-        "ROUND(AVG(CASE WHEN measure_name = 'cpu_system' THEN "
-        "measure_value::double ELSE NULL END), 2) AS avg_cpu_system, "
-        "ROUND(APPROX_PERCENTILE(CASE WHEN measure_name = 'cpu_system' THEN "
-        "measure_value::double ELSE NULL END, 0.9), 2) AS p90_cpu_system, "
-        "ROUND(APPROX_PERCENTILE(CASE WHEN measure_name = 'cpu_system' THEN "
-        "measure_value::double ELSE NULL END, 0.95), 2) AS p95_cpu_system, "
-        "ROUND(APPROX_PERCENTILE(CASE WHEN measure_name = 'cpu_system' THEN "
-        "measure_value::double ELSE NULL END, 0.99), 2) AS p99_cpu_system, "
-        "COUNT(CASE WHEN measure_name = 'memory_used' THEN "
-        "measure_value::double ELSE NULL END) AS num_memory_used_samples, "
-        "ROUND(AVG(CASE WHEN measure_name = 'memory_used' THEN "
-        "measure_value::double ELSE NULL END), 2) AS avg_memory_used, "
-        "ROUND(APPROX_PERCENTILE(CASE WHEN measure_name = 'memory_used' THEN "
-        "measure_value::double ELSE NULL END, 0.9), 2) AS p90_memory_used, "
-        "ROUND(APPROX_PERCENTILE(CASE WHEN measure_name = 'memory_used' THEN "
-        "measure_value::double ELSE NULL END, 0.95), 2) AS p95_memory_used, "
-        "ROUND(APPROX_PERCENTILE(CASE WHEN measure_name = 'memory_used' THEN "
-        "measure_value::double ELSE NULL END, 0.99), 2) AS p99_memory_used, "
-        "COUNT(CASE WHEN measure_name = 'disk_io_reads' THEN "
-        "measure_value::bigint ELSE NULL END) AS num_disk_io_reads_samples, "
-        "ROUND(AVG(CASE WHEN measure_name = 'disk_io_reads' THEN "
-        "measure_value::bigint ELSE NULL END), 2) AS avg_disk_io_reads, "
-        "ROUND(APPROX_PERCENTILE(CASE WHEN measure_name = 'disk_io_reads' THEN "
-        "measure_value::bigint ELSE NULL END, 0.9), 2) AS p90_disk_io_reads, "
-        "ROUND(APPROX_PERCENTILE(CASE WHEN measure_name = 'disk_io_reads' THEN "
-        "measure_value::bigint ELSE NULL END, 0.95), 2) AS p95_disk_io_reads, "
-        "ROUND(APPROX_PERCENTILE(CASE WHEN measure_name = 'disk_io_reads' THEN "
-        "measure_value::bigint ELSE NULL END, 0.99), 2) AS p99_disk_io_reads, "
-        "COUNT(CASE WHEN measure_name = 'disk_io_writes' THEN "
-        "measure_value::bigint ELSE NULL END) AS num_disk_io_writes_samples, "
-        "ROUND(AVG(CASE WHEN measure_name = 'disk_io_writes' THEN "
-        "measure_value::bigint ELSE NULL END), 2) AS avg_disk_io_writes, "
-        "ROUND(APPROX_PERCENTILE(CASE WHEN measure_name = 'disk_io_writes' "
-        "THEN measure_value::bigint ELSE NULL END, 0.9), 2) AS "
-        "p90_disk_io_writes, ROUND(APPROX_PERCENTILE(CASE WHEN measure_name = "
-        "'disk_io_writes' THEN measure_value::bigint ELSE NULL END, 0.95), 2) "
-        "AS p95_disk_io_writes, ROUND(APPROX_PERCENTILE(CASE WHEN measure_name "
-        "= 'disk_io_writes' THEN measure_value::bigint ELSE NULL END, 0.99), "
-        "2) AS p99_disk_io_writes FROM perfdb_hcltps.perftable_hcltps WHERE "
-        "time BETWEEN now() - 1h AND now() AND measure_name IN ( 'cpu_user', "
-        "'cpu_system', 'memory_used', 'disk_io_reads', 'disk_io_writes') AND "
-        "region = 'us-east-1' AND cell = 'us-east-1-cell-1' AND silo = "
-        "'us-east-1-cell-1-silo-1' AND availability_zone = 'us-east-1-1' AND "
-        "microservice_name = 'apollo' AND instance_type = 'r5.4xlarge' AND "
-        "os_version = 'AL2' AND instance_name = "
-        "'i-AUa00Zt2-apollo-0003.amazonaws.com' GROUP BY BIN(time, 1h) ORDER "
-        "BY hour DESC"))
-TEST_PERF_TEST(
-    Q10_EXPECT_0_TO_3_ROWS,
-    CREATE_STRING(
-        "WITH cpu_user AS ( SELECT instance_name, time, measure_value::double "
-        "AS cpu_user FROM perfdb_hcltps.perftable_hcltps WHERE time BETWEEN "
-        "now() - 1h AND now() AND measure_name = 'cpu_user' AND region = "
-        "'us-east-1' AND cell = 'us-east-1-cell-1' AND silo = "
-        "'us-east-1-cell-1-silo-1' AND availability_zone = 'us-east-1-1' AND "
-        "microservice_name = 'apollo' AND instance_type = 'r5.4xlarge' AND "
-        "os_version = 'AL2' AND instance_name = "
-        "'i-AUa00Zt2-apollo-0003.amazonaws.com'), cpu_system AS ( SELECT "
-        "instance_name, time, measure_value::double AS cpu_system FROM "
-        "perfdb_hcltps.perftable_hcltps WHERE time BETWEEN now() - 1h AND "
-        "now() AND measure_name = 'cpu_system' AND region = 'us-east-1' AND "
-        "cell = 'us-east-1-cell-1' AND silo = 'us-east-1-cell-1-silo-1' AND "
-        "availability_zone = 'us-east-1-1' AND microservice_name = 'apollo' "
-        "AND instance_type = 'r5.4xlarge' AND os_version = 'AL2' AND "
-        "instance_name = 'i-AUa00Zt2-apollo-0003.amazonaws.com'), memory_used "
-        "AS ( SELECT instance_name, time, measure_value::double AS memory_used "
-        "FROM perfdb_hcltps.perftable_hcltps WHERE time BETWEEN now() - 1h AND "
-        "now() AND measure_name = 'memory_used' AND region = 'us-east-1' AND "
-        "cell = 'us-east-1-cell-1' AND silo = 'us-east-1-cell-1-silo-1' AND "
-        "availability_zone = 'us-east-1-1' AND microservice_name = 'apollo' "
-        "AND instance_type = 'r5.4xlarge' AND os_version = 'AL2' AND "
-        "instance_name = 'i-AUa00Zt2-apollo-0003.amazonaws.com'), "
-        "gc_reclaimed_bins AS ( SELECT instance_name, BIN(time, 1h) AS "
-        "time_bin, AVG(measure_value::double) AS gc_reclaimed FROM "
-        "perfdb_hcltps.perftable_hcltps WHERE time BETWEEN now() - 1h AND "
-        "now() AND measure_name = 'gc_reclaimed' AND region = 'us-east-1' AND "
-        "cell = 'us-east-1-cell-1' AND silo = 'us-east-1-cell-1-silo-1' AND "
-        "availability_zone = 'us-east-1-1' AND microservice_name = 'apollo' "
-        "AND instance_name = 'i-AUa00Zt2-apollo-0003.amazonaws.com' AND "
-        "process_name = 'server' AND jdk_version = 'JDK_11' GROUP BY "
-        "instance_name, BIN(time, 1h)), high_utilization_bins AS ( SELECT "
-        "cu.instance_name, BIN(cu.time, 1h) AS time_bin, avg(cpu_user + "
-        "cpu_system) AS avg_cpu, max(cpu_user + cpu_system) AS max_cpu, "
-        "avg(memory_used) AS avg_memory, max(memory_used) AS max_memory FROM "
-        "cpu_user cu INNER JOIN cpu_system cs ON cu.instance_name = "
-        "cs.instance_name AND cu.time = cs.time INNER JOIN memory_used mu ON "
-        "mu.instance_name = cs.instance_name AND mu.time = cs.time WHERE "
-        "cpu_user + cpu_system > 0 AND memory_used > 0 GROUP BY "
-        "cu.instance_name, BIN(cu.time, 1h)) SELECT hu.time_bin, gc_reclaimed, "
-        "avg_cpu, max_cpu, avg_memory, max_memory FROM gc_reclaimed_bins gc "
-        "INNER JOIN high_utilization_bins hu ON gc.instance_name = "
-        "hu.instance_name AND gc.time_bin = hu.time_bin ORDER BY hu.time_bin "
-        "DESC"))
-TEST_PERF_TEST(
-    Q11_EXPECT_24_TO_51_ROWS,
-    CREATE_STRING(
-        "SELECT region, cell, silo, availability_zone, microservice_name, "
-        "BIN(time, 1m) AS time_bin, COUNT(DISTINCT instance_name) AS "
-        "num_hosts, ROUND(AVG(measure_value::double), 2) AS avg_value, "
-        "ROUND(APPROX_PERCENTILE(measure_value::double, 0.9), 2) AS p90_value, "
-        "ROUND(APPROX_PERCENTILE(measure_value::double, 0.95), 2) AS "
-        "p95_value, ROUND(APPROX_PERCENTILE(measure_value::double, 0.99), 2) "
-        "AS p99_value FROM perfdb_hcltps.perftable_hcltps WHERE time BETWEEN "
-        "now() - 1h AND now() AND measure_name = 'cpu_user' AND region = "
-        "'us-east-1' AND cell = 'us-east-1-cell-1' AND microservice_name = "
-        "'apollo' GROUP BY region, cell, silo, availability_zone, "
-        "microservice_name, BIN(time, 1m) ORDER BY p99_value DESC"))
-TEST_PERF_TEST(
-    Q12_EXPECT_799_ROWS,
-    CREATE_STRING(
-        "SELECT region, cell, microservice_name, BIN(time, 1h) AS hour, "
-        "COUNT(DISTINCT instance_name) AS num_hosts, "
-        "ROUND(AVG(measure_value::double), 2) AS avg_value, "
-        "ROUND(APPROX_PERCENTILE(measure_value::double, 0.9), 2) AS p90_value, "
-        "ROUND(APPROX_PERCENTILE(measure_value::double, 0.95), 2) AS "
-        "p95_value, ROUND(APPROX_PERCENTILE(measure_value::double, 0.99), 2) "
-        "AS p99_value FROM perfdb_hcltps.perftable_hcltps WHERE time BETWEEN "
-        "now() - 1h AND now() AND measure_name = 'cpu_user' GROUP BY region, "
-        "cell, microservice_name, BIN(time, 1h) ORDER BY p99_value DESC"))
-TEST_PERF_TEST(
-    Q13_EXPECT_IN_THE_HIGH_HUNDREDS_OF_ROWS,
-    CREATE_STRING(
-        "SELECT region, cell, silo, availability_zone, microservice_name, "
-        "BIN(time, 1m) AS time_bin, COUNT(DISTINCT instance_name) AS "
-        "num_hosts, ROUND(AVG(measure_value::double), 2) AS avg_value, "
-        "ROUND(APPROX_PERCENTILE(measure_value::double, 0.9), 2) AS p90_value, "
-        "ROUND(APPROX_PERCENTILE(measure_value::double, 0.95), 2) AS "
-        "p95_value, ROUND(APPROX_PERCENTILE(measure_value::double, 0.99), 2) "
-        "AS p99_value FROM perfdb_hcltps.perftable_hcltps WHERE time BETWEEN "
-        "now() - 1h AND now() AND measure_name = 'cpu_user' AND region = "
-        "'us-east-1' AND cell = 'us-east-1-cell-1' AND microservice_name = "
-        "'apollo' GROUP BY region, cell, silo, availability_zone, "
-        "microservice_name, BIN(time, 1m) ORDER BY p99_value DESC"))
-TEST_PERF_TEST(
-    Q14_EXPECT_125_ROWS,
-    CREATE_STRING(
-        "WITH per_host_timeseries AS ( SELECT region, cell, silo, "
-        "availability_zone, microservice_name, instance_name, process_name, "
-        "jdk_version, CREATE_TIME_SERIES(time, measure_value::double) AS "
-        "memory_free, MIN(time) AS min_time, MAX(time) AS max_time FROM "
-        "perfdb_hcltps.perftable_hcltps WHERE time BETWEEN now() - 1h AND "
-        "now() AND measure_name = 'memory_free' AND region = 'us-east-1' AND "
-        "cell = 'us-east-1-cell-1' AND process_name IS NOT NULL GROUP BY "
-        "region, cell, silo, availability_zone, microservice_name, "
-        "instance_name, process_name, jdk_version), overall_min_max AS ( "
-        "SELECT MAX(min_time) AS min_time, MIN(max_time) AS max_time FROM "
-        "per_host_timeseries), interpolated_timeseries AS ( SELECT region, "
-        "cell, microservice_name, INTERPOLATE_LINEAR(memory_free, "
-        "SEQUENCE(o.min_time, o.max_time, 15s)) AS interpolated_memory_free "
-        "FROM per_host_timeseries p CROSS JOIN overall_min_max o) SELECT "
-        "region, cell, microservice_name, BIN(time, 1h) AS time_bin, "
-        "COUNT(memory_free) AS num_samples, AVG(memory_free) AS "
-        "avg_memory_free, ROUND(APPROX_PERCENTILE(memory_free, 0.9), 2) AS "
-        "p90_memory_free, ROUND(APPROX_PERCENTILE(memory_free, 0.95), 2) AS "
-        "p95_memory_free, ROUND(APPROX_PERCENTILE(memory_free, 0.99), 2) AS "
-        "p99_memory_free FROM interpolated_timeseries CROSS JOIN "
-        "UNNEST(interpolated_memory_free) AS t(time, memory_free) GROUP BY "
-        "region, cell, microservice_name, BIN(time, 1h) ORDER BY "
-        "p95_memory_free DESC"))
-TEST_PERF_TEST(
-    Q15_EXPECT_IN_THE_THOUSANDS_OF_ROWS,
-    CREATE_STRING(
-        "WITH microservice_cell_avg AS ( SELECT region, cell, "
-        "microservice_name, AVG(measure_value::double) AS "
-        "microservice_avg_metric FROM perfdb_hcltps.perftable_hcltps WHERE "
-        "time BETWEEN now() - 1h AND now() AND measure_name = 'cpu_user' AND "
-        "microservice_name = 'apollo' GROUP BY region, cell, "
-        "microservice_name), instance_avg AS ( SELECT region, cell, silo, "
-        "availability_zone, microservice_name, instance_name, "
-        "AVG(measure_value::double) AS instance_avg_metric FROM "
-        "perfdb_hcltps.perftable_hcltps WHERE time BETWEEN now() - 1h AND "
-        "now() AND measure_name = 'cpu_user' AND microservice_name = 'apollo' "
-        "GROUP BY region, cell, silo, availability_zone, microservice_name, "
-        "instance_name) SELECT i.*, m.microservice_avg_metric FROM "
-        "microservice_cell_avg m INNER JOIN instance_avg i ON i.region = "
-        "m.region AND i.cell = m.cell AND i.microservice_name = "
-        "m.microservice_name WHERE i.instance_avg_metric > (1 + 0) * "
-        "m.microservice_avg_metric ORDER BY i.instance_avg_metric DESC"))
-TEST_PERF_TEST(
-    Q16,
-    CREATE_STRING(
-        "WITH per_instance_max_use AS ( SELECT region, cell, silo, "
-        "availability_zone, microservice_name, instance_name, BIN(time, 15m) "
-        "AS time_bin, MAX(CASE WHEN measure_name = 'cpu_user' THEN "
-        "measure_value::double ELSE NULL END) AS max_cpu_user, MAX(CASE WHEN "
-        "measure_name = 'memory_used' THEN measure_value::double ELSE NULL "
-        "END) AS max_memory_used FROM perfdb_hcltps.perftable_hcltps WHERE "
-        "time BETWEEN now() - 1h AND now() AND measure_name IN ('cpu_user', "
-        "'memory_used') GROUP BY region, cell, silo, availability_zone, "
-        "microservice_name, instance_name, BIN(time, 15m)) SELECT region, "
-        "cell, silo, microservice_name, BIN(time_bin, 1d) AS day, "
-        "COUNT(max_cpu_user) AS num_samples, MIN(max_cpu_user) AS min_max_cpu, "
-        "AVG(max_cpu_user) AS avg_max_cpu, MAX(max_cpu_user) AS max_max_cpu, "
-        "ROUND(ROUND(APPROX_PERCENTILE(max_cpu_user, 0.25), 2)) AS "
-        "p25_max_cpu, ROUND(ROUND(APPROX_PERCENTILE(max_cpu_user, 0.50), 2)) "
-        "AS p50_max_cpu, ROUND(ROUND(APPROX_PERCENTILE(max_cpu_user, 0.75), "
-        "2)) AS p75_max_cpu, ROUND(ROUND(APPROX_PERCENTILE(max_cpu_user, "
-        "0.95), 2)) AS p95_max_cpu, "
-        "ROUND(ROUND(APPROX_PERCENTILE(max_cpu_user, 0.99), 2)) AS "
-        "p99_max_cpu, MIN(max_memory_used) AS min_max_memory, "
-        "AVG(max_memory_used) AS avg_max_memory, MAX(max_memory_used) AS "
-        "max_max_memory, ROUND(ROUND(APPROX_PERCENTILE(max_memory_used, 0.25), "
-        "2)) AS p25_max_memory, ROUND(ROUND(APPROX_PERCENTILE(max_memory_used, "
-        "0.50), 2)) AS p50_max_memory, "
-        "ROUND(ROUND(APPROX_PERCENTILE(max_memory_used, 0.75), 2)) AS "
-        "p75_max_memory, ROUND(ROUND(APPROX_PERCENTILE(max_memory_used, 0.95), "
-        "2)) AS p95_max_memory, ROUND(ROUND(APPROX_PERCENTILE(max_memory_used, "
-        "0.99), 2)) AS p99_max_memory FROM per_instance_max_use GROUP BY "
-        "region, cell, silo, microservice_name, BIN(time_bin, 1d) ORDER BY "
-        "p95_max_cpu DESC"))
-TEST_PERF_TEST(
-    Q17_EXPECT_0_ROW,
-    CREATE_STRING(
-        "WITH per_instance_memory_used AS ( SELECT region, cell, silo, "
-        "availability_zone, microservice_name, instance_name, BIN(time, 5m) "
-        "AS time_bin, MAX(measure_value::double) AS max_memory FROM "
-        "perfdb_hcltps.perftable_hcltps WHERE time BETWEEN now() - 1h AND "
-        "now() AND measure_name = 'memory_used' GROUP BY region, cell, silo, "
-        "availability_zone, microservice_name, instance_name, BIN(time, 5m)), "
-        "per_microservice_memory AS ( SELECT region, cell, silo, "
-        "microservice_name, APPROX_PERCENTILE(max_memory, 0.95) AS "
-        "p95_max_memory FROM per_instance_memory_used GROUP BY region, cell, "
-        "silo, microservice_name), per_silo_ranked AS ( SELECT region, cell, "
-        "silo, microservice_name, DENSE_RANK() OVER (PARTITION BY region, "
-        "cell, silo ORDER BY p95_max_memory DESC) AS rank FROM "
-        "per_microservice_memory), instances_with_high_memory AS ( SELECT "
-        "r.region, r.cell, r.silo, r.microservice_name, m.instance_name, "
-        "APPROX_PERCENTILE(max_memory, 0.95) AS p95_max_memory FROM "
-        "per_silo_ranked r INNER JOIN per_instance_memory_used m ON r.region "
-        "= m.region AND r.cell = m.cell AND r.silo = m.silo AND "
-        "r.microservice_name = m.microservice_name WHERE r.rank = 1 GROUP BY "
-        "r.region, r.cell, r.silo, r.microservice_name, m.instance_name), "
-        "ranked_instances AS ( SELECT region, cell, silo, microservice_name, "
-        "instance_name, DENSE_RANK() OVER (PARTITION BY region, cell, silo, "
-        "microservice_name ORDER BY p95_max_memory DESC) AS rank FROM "
-        "instances_with_high_memory) SELECT t.region, t.cell, t.silo, "
-        "t.microservice_name, t.instance_name, t.process_name, t.jdk_version, "
-        "COUNT(*) AS num_samples, MIN(measure_value::double) AS min_gc_pause, "
-        "ROUND(AVG(measure_value::double), 2) AS avg_gc_pause, "
-        "ROUND(STDDEV(measure_value::double), 2) AS stddev_gc_pause, "
-        "ROUND(APPROX_PERCENTILE(measure_value::double, 0.5), 2) AS "
-        "p50_gc_pause, ROUND(APPROX_PERCENTILE(measure_value::double, 0.9), "
-        "2) AS p90_gc_pause, ROUND(APPROX_PERCENTILE(measure_value::double, "
-        "0.99), 2) AS p99_gc_pause FROM ranked_instances r INNER JOIN "
-        "perfdb_hcltps.perftable_hcltps t ON r.region = t.region AND r.cell = "
-        "t.cell AND r.silo = t.silo AND r.microservice_name = "
-        "t.microservice_name AND r.instance_name = t.instance_name WHERE time "
-        "BETWEEN now() - 1h AND now() AND measure_name = 'gc_pause' AND rank "
-        "<= 10 GROUP BY t.region, t.cell, t.silo, t.microservice_name, "
-        "t.instance_name, t.process_name, t.jdk_version"))
-TEST_PERF_TEST(
-    Q18_EXPECT_1025_ROWS,
-    CREATE_STRING(
-        "WITH per_instance_cpu_used AS ( SELECT region, cell, silo, "
-        "availability_zone, microservice_name, instance_name, BIN(time, 5m) AS "
-        "time_bin, AVG(measure_value::double) AS avg_cpu FROM "
-        "perfdb_hcltps.perftable_hcltps WHERE time BETWEEN now() - 1h AND "
-        "now() AND measure_name = 'cpu_user' GROUP BY region, cell, silo, "
-        "availability_zone, microservice_name, instance_name, BIN(time, 5m)), "
-        "per_microservice_cpu AS ( SELECT region, cell, microservice_name, "
-        "BIN(time_bin, 1h) AS hour, APPROX_PERCENTILE(avg_cpu, 0.95) AS "
-        "p95_avg_cpu FROM per_instance_cpu_used GROUP BY region, cell, "
-        "microservice_name, BIN(time_bin, 1h)), per_microservice_ranked AS ( "
-        "SELECT region, cell, microservice_name, hour, p95_avg_cpu, "
-        "DENSE_RANK() OVER (PARTITION BY region, cell, microservice_name ORDER "
-        "BY p95_avg_cpu DESC) AS rank FROM per_microservice_cpu) SELECT "
-        "region, cell, microservice_name, hour AS hour, p95_avg_cpu FROM "
-        "per_microservice_ranked WHERE rank <= 5 ORDER BY region, cell, "
-        "microservice_name, rank ASC"))
-TEST_PERF_TEST(
-    Q19_EXPECT_MORE_THAN_5_MILLION_ROWS,
-    CREATE_STRING(
-        "WITH task_completed AS ( SELECT region, cell, silo, "
-        "availability_zone, microservice_name, instance_name, process_name, "
-        "jdk_version, time, measure_value::bigint AS task_completed FROM "
-        "perfdb_hcltps.perftable_hcltps WHERE time BETWEEN now() - 1h AND "
-        "now() AND measure_name = 'task_completed'), task_end_states AS ( "
-        "SELECT region, cell, silo, availability_zone, microservice_name, "
-        "instance_name, process_name, jdk_version, time, "
-        "measure_value::varchar AS task_end_state FROM "
-        "perfdb_hcltps.perftable_hcltps WHERE time BETWEEN now() - 1h AND "
-        "now() AND measure_name = 'task_end_state') SELECT tc.region, "
-        "tc.cell, tc.silo, tc.microservice_name, tes.task_end_state, "
-        "COUNT(task_completed) AS num_tasks, MIN(task_completed) AS "
-        "min_task_completed, ROUND(AVG(task_completed), 2) AS "
-        "avg_task_completed, MAX(task_completed) AS max_task_completed, "
-        "ROUND(APPROX_PERCENTILE(task_completed, 0.5), 2) AS "
-        "p50_task_completed, ROUND(APPROX_PERCENTILE(task_completed, 0.9), 2) "
-        "AS p90_task_completed, ROUND(APPROX_PERCENTILE(task_completed, "
-        "0.99), 2) AS p99_task_completed FROM task_completed tc INNER JOIN "
-        "task_end_states tes ON tc.region = tes.region AND tc.cell = tes.cell "
-        "AND tc.silo = tes.silo AND tc.availability_zone = "
-        "tes.availability_zone AND tc.microservice_name = "
-        "tes.microservice_name AND tc.instance_name = tes.instance_name AND "
-        "tc.process_name = tes.process_name AND tc.jdk_version = "
-        "tes.jdk_version AND tc.time = tes.time GROUP BY tc.region, tc.cell, "
-        "tc.silo, tc.microservice_name, tes.task_end_state ORDER BY "
-        "tc.region, tc.cell, tc.silo, tc.microservice_name, "
-        "tes.task_end_state"))
-TEST_PERF_TEST(
-    Q20_EXPECT_3000_ROWS,
-    CREATE_STRING(
-        "WITH microservice_cell_avg AS ( SELECT region, cell, "
-        "microservice_name, AVG(measure_value::double) AS "
-        "microservice_avg_metric FROM perfdb_hcltps.perftable_hcltps WHERE "
-        "time BETWEEN now() - 1h AND now() AND measure_name = 'cpu_user' AND "
-        "microservice_name = 'apollo' GROUP BY region, cell, "
-        "microservice_name), instance_avg AS ( SELECT region, cell, silo, "
-        "availability_zone, microservice_name, instance_name, "
-        "AVG(measure_value::double) AS instance_avg_metric FROM "
-        "perfdb_hcltps.perftable_hcltps WHERE time BETWEEN now() - 1h AND "
-        "now() "
-        "AND "
-        "measure_name = 'cpu_user' AND microservice_name = 'apollo' GROUP BY "
-        "region, cell, silo, availability_zone, microservice_name, "
-        "instance_name) SELECT i.*, m.microservice_avg_metric FROM "
-        "microservice_cell_avg m INNER JOIN instance_avg i ON i.region = "
-        "m.region AND i.cell = m.cell AND i.microservice_name = "
-        "m.microservice_name WHERE i.instance_avg_metric > (1 + 0) * "
-        "m.microservice_avg_metric ORDER BY i.instance_avg_metric DESC"))
-
+/******************************************
+ * Main
+ *****************************************/
 int main(int argc, char** argv) {
 #ifdef WIN32
     // Enable CRT for detecting memory leaks
@@ -795,8 +554,14 @@ int main(int argc, char** argv) {
 #endif
     testing::internal::CaptureStdout();
     ::testing::InitGoogleTest(&argc, argv);
-
-    int failures = RUN_ALL_TESTS();
+    
+    int failures;
+    try {
+        int failures = RUN_ALL_TESTS();
+    } catch (const std::exception& error) {
+        std::cerr << error.what() << std::endl;
+        return EXIT_FAILURE;
+    }
 
     std::string output = testing::internal::GetCapturedStdout();
     std::cout << output << std::endl;

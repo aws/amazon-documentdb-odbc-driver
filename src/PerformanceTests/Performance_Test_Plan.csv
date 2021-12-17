@@ -1,0 +1,136 @@
+query,limit,result,test_name,skip_test,loop_count
+SELECT * from performance.employer_employees,10000,,WARMING UP,FALSE,1
+"select employer__id,name,sector,createDate,location from performance.employer",10000,,"select employer__id,name,sector,createDate,location from performance.employer;",TRUE,10
+"select employer__id,name,sector,createDate from performance.employer",10000,,"select employer__id,name,sector,createDate from performance.employer;",TRUE,10
+"select employer__id,name,sector from performance.employer",10000,,"select employer__id,name,sector from performance.employer;",TRUE,10
+"select employer__id,name from performance.employer",10000,,"select employer__id,name from performance.employer;",TRUE,10
+"select employer__id, createDate from performance.employer",10000,,"select employer__id, createDate from performance.employer",TRUE,10
+"select employer__id, sector from performance.employer",10000,,"select employer__id, sector from performance.employer",TRUE,10
+"select employer__id, location from performance.employer",10000,,"select employer__id, location from performance.employer",TRUE,10
+"select employer__id, employer__id from performance.employer",10000,,"select employer__id, employer__id from performance.employer",TRUE,10
+select employer__id from performance.employer,10000,,select employer__id from performance.employer;,TRUE,10
+select name from performance.employer,10000,,select name from performance.employer,TRUE,10
+"SELECT name, sector FROM performance.employer",10000,,"SELECT name, sector FROM performance.employer",TRUE,10
+"SELECT name, createDate FROM performance.employer",10000,,"SELECT name, createDate FROM performance.employer",TRUE,10
+"SELECT name, location FROM performance.employer",10000,,"SELECT name, location FROM performance.employer",TRUE,10
+select sector from performance.employer,10000,,select sector from performance.employer,TRUE,10
+select createDate from performance.employer,10000,,select createDate from performance.employer,TRUE,10
+select location from performance.employer,10000,,select location from performance.employer,TRUE,10
+"SELECT name, type FROM performance.employer_employees",10000,,"SELECT field1,field2 VIRTUAL TABLE",TRUE,10
+SELECT * FROM performance.employer,10000,,SELECT * TABLE,TRUE,10
+SELECT * FROM performance.employer_employees,10000,,SELECT * VIRTUAL TABLE,TRUE,10
+"select * 
+from performance.employer_employees employer_employees,
+         performance.employer employer
+where employer_employees.employer__id = employer.employer__id
+",10000,,SELECT * WHERE,TRUE,10
+"SELECT *
+FROM performance.employer_employees employer_employees  LEFT JOIN performance.employer employer ON (employer_employees.employer__id = employer.employer__id)    ",10000,,SELECT * LEFT JOIN,TRUE,10
+"SELECT DATE_ADD(createDate, INTERVAL 1 DAY) FROM performance.employer_employees",10000,,DATE_ADD,TRUE,10
+SELECT LAST_DAY(createDate) FROM performance.employer_employees,10000,,LAST_DAY,TRUE,10
+"SELECT DATEDIFF(createDate, createDate) FROM performance.employer_employees",10000,,DATEDIFF,TRUE,10
+"SELECT PERIOD_DIFF(createDate, createDate) FROM performance.employer_employees",10000,,PERIOD_DIFF,TRUE,10
+SELECT YEAR(createDate) FROM performance.employer   ,10000,,SELECT YEAR FROM,TRUE,10
+"SELECT YEAR(createDate),name,sector,createDate,emplyer__id FROM performance.employer   ",10000,,"SELECT YEAR(createDate),name,sector,createDate,emplyer__id FROM performance.employer   ",TRUE,10
+SELECT YEAR(createDate) FROM performance.employer GROUP BY YEAR(createDate)    ,10000,,SELECT YEAR FROM GROUP BY YEAR,TRUE,10
+SELECT MONTH(createDate) FROM performance.employer   ,10000,,SELECT MONTH FROM,TRUE,10
+SELECT MONTH(createDate) FROM performance.employer GROUP BY MONTH(createDate)    ,10000,,SELECT MONTH FROM GROUP BY MONTH,TRUE,10
+SELECT WEEK(createDate) FROM performance.employer,10000,,SELECT WEEK FROM,TRUE,10
+SELECT WEEK(createDate) FROM performance.employer GROUP BY WEEK(createDate)    ,10000,,SELECT WEEK FROM GROUP BY WEEK,TRUE,10
+SELECT DAYOFMONTH(createDate) FROM performance.employer    ,10000,,SELECT DAYOFMONTH FROM,TRUE,10
+SELECT DAYOFMONTH(createDate) FROM performance.employer GROUP BY DAYOFMONTH(createDate)    ,10000,,SELECT DAYOFMONTH FROM GROUP BY DAYOFMONTH,TRUE,10
+SELECT DAYOFWEEK(createDate) FROM performance.employer   ,10000,,SELECT DAYOFWEEK FROM,TRUE,10
+SELECT DAYOFWEEK(createDate) FROM performance.employer GROUP BY DAYOFWEEK(createDate)     ,10000,,SELECT DAYOFWEEK FROM GROUP BY DAYOFWEEK,TRUE,10
+SELECT DAYOFYEAR(createDate) FROM performance.employer  ,10000,,SELECT DAYOFYEAR FROM,TRUE,10
+SELECT DAYOFYEAR(createDate) FROM performance.employer GROUP BY DAYOFYEAR(createDate)    ,10000,,SELECT DAYOFYEAR FROM GROUP BY DAYOFYEAR,TRUE,10
+SELECT HOUR(createDate) FROM performance.employer   ,10000,,SELECT HOUR FROM,TRUE,10
+SELECT HOUR(createDate) FROM performance.employer GROUP BY HOUR(createDate)    ,10000,,SELECT HOUR FROM GROUP BY HOUR,TRUE,10
+SELECT MINUTE(createDate) FROM performance.employer     ,10000,,SELECT MINUTE FROM,TRUE,10
+SELECT MINUTE(createDate) FROM performance.employer GROUP BY MINUTE(createDate)    ,10000,,SELECT MINUTE FROM GROUP BY MINUTE,TRUE,10
+SELECT SECOND(createDate) FROM performance.employer ,10000,,SELECT SECOND FROM,TRUE,10
+SELECT SECOND(createDate) FROM performance.employer GROUP BY SECOND(createDate)    ,10000,,SELECT SECOND FROM GROUP BY SECOND,TRUE,10
+SELECT QUARTER(createDate) FROM performance.employer   ,10000,,SELECT QUARTER FROM,TRUE,10
+SELECT QUARTER(createDate) FROM performance.employer GROUP BY QUARTER(createDate)    ,10000,,SELECT QUARTER FROM GROUP BY QUARTER,TRUE,10
+SELECT DAYNAME(createDate) FROM performance.employer   ,10000,,SELECT DAYNAME FROM,TRUE,10
+SELECT DAYNAME(createDate) FROM performance.employer GROUP BY DAYNAME(createDate)    ,10000,,SELECNT DAYNAME FROM GROUP BY DAYNAME,TRUE,10
+SELECT MONTHNAME(createDate) FROM performance.employer ,10000,,SELECT MONTHNAME FROM,TRUE,10
+SELECT MONTHNAME(createDate) FROM performance.employer GROUP BY MONTHNAME(createDate)    ,10000,,SELECT MONTHNAME FROM GROUP BY MONTHNAME,TRUE,10
+"SELECT CURRENT_TIMESTAMP,name FROM performance.employer   ",10000,,SELECT CURRENT_TIMESTAMP FROM,TRUE,10
+"SELECT name FROM performance.employer
+where createDate < CURRENT_TIMESTAMP    
+",10000,,SELECT FROM WHERE CURRENT_TIMESTAMP,TRUE,10
+"SELECT CURRENT_DATE,name FROM performance.employer   ",10000,,SELECT CURRENT_DATE FROM,TRUE,10
+SELECT name FROM performance.employer WHERE createDate < CURRENT_DATE    ,10000,,SELECT FROM WHERE CURRENT_DATE,TRUE,10
+select UCASE(name) FROM performance.employer   ,10000,,SELECT UCASE FROM,TRUE,10
+select UCASE(name) from performance.employer where UCASE(name) = 'FAY-FAY'    ,10000,,SELECT FROM WHERE UCASE,TRUE,10
+select LCASE(name) FROM performance.employer employer    ,10000,,SELECT LCASE FROM,TRUE,10
+select LCASE(name) from  performance.employer where LCASE(name) =  'fay-fay'   ,10000,,SELECT FROM WHERE LCASE,TRUE,10
+"select SUBSTRING(name,1,3) from performance.employer",10000,,SELECT MID/SUBSTRING FROM,TRUE,10
+"select SUBSTRING(name,1,3) from performance.employer_employees where SUBSTRING(name,1,3) = 'Fay'",10000,,SELECT FROM WHERE MID/SUBSTRING,TRUE,10
+select LENGTH(name) from performance.employer   ,10000,,SELECT LENGHT FROM,TRUE,10
+select LENGTH(name) from performance.employer where LENGTH(name)>0,10000,,SELECT FROM WHERE LENGHT,TRUE,10
+"select ROUND(salary, 2) from performance.employer_employees employer_employees",10000,,SELECT ROUND FROM,TRUE,10
+"select ROUND(salary, 2) from performance.employer_employees employer_employees where ROUND(salary,2)> 0",10000,,SELECT ROUND FROM WHERE ROUND,TRUE,10
+Select AVG(salary) from performance.employer_employees employer_employees    ,10000,,SELECT AVG FROM ,TRUE,10
+Select AVG(salary) from performance.employer_employees employer_employees group by type    ,10000,,SELECT AVG FROM GROUP BY TYPE,TRUE,10
+Select AVG(salary) from performance.employer_employees employer_employees group by type having  AVG(salary)>1,10000,,SELECT AVG FROM GROUP BY HAVING AVG,TRUE,10
+select Count(name) from performance.employer _employees ,10000,,SELECT COUNT FROM,TRUE,10
+select Count(name) from performance.employer_employees group by type    ,10000,,SELECT COUNT FROM GROUP BY,TRUE,10
+select Count(name) from performance.employer_employees group by type having count(name)>1,10000,,SELECT COUNT FROM GROUP BY HAVING COUNT,TRUE,10
+select MAX(salary) from performance.employer_employees employer_employees    ,10000,,SELECT MAX FROM,TRUE,10
+select MAX(salary) from performance.employer_employees employer_employees group by type    ,10000,,SELECT MAX FROM GROUP BY,TRUE,10
+select MAX(salary) from performance.employer_employees employer_employees group by type having max(salary)>1,10000,,SELECT MAX FROM GROUP BY HAVING MAX,TRUE,10
+select MIN(salary) from performance.employer_employees employer_employees    ,10000,,SELECT MIN FROM,TRUE,10
+select MIN(salary) from performance.employer_employees employer_employees group by type    ,10000,,SELECT MIN FROM GROUP BY,TRUE,10
+select MIN(salary) from performance.employer_employees employer_employees group by type having min(salary)>1,10000,,SELECT MIN FROM GROUP BY HAVING MIN,TRUE,10
+select SUM(salary) from performance.employer_employees employer_employees    ,10000,,SELECT SUM FROM,TRUE,10
+select SUM(salary) from performance.employer_employees employer_employees group by type,10000,,SELECT SUM FROM GROUP BY,TRUE,10
+select SUM(salary) from performance.employer_employees employer_employees group by type having SUM(salary)>1,10000,,SELECT SUM FROM GROUP BY HAVING SUM,TRUE,10
+"SELECT name, salary,
+CASE
+    WHEN salary > 10000 THEN 'Greater than 10000'
+    WHEN salary = 10000 THEN 'Equal to 10000'
+    ELSE 'Less than 10000'
+END AS SalaryText
+FROM performance.employer_employees",10000,,SELECT CASE FROM,TRUE,10
+"SELECT name, salary,type
+FROM performance.employer_employees
+ORDER BY
+(CASE
+    WHEN salary > 10000 THEN name
+    ELSE type
+END)",10000,,SELECT FROM ORDER BY CASE,TRUE,10
+"SELECT COUNT(*), AVG(employer_employees.salary), employer_employees.type, employer.name
+FROM performance.employer_employees employer_employees,
+     performance.employer employer
+WHERE employer_employees.employer__id = employer.employer__id
+  AND employer_employees.createDate < CURRENT_TIMESTAMP
+GROUP BY type
+ORDER BY
+(CASE
+    WHEN salary > 10000 THEN name
+    ELSE type
+END)",10000,,COMPLEX CASE,FALSE,10
+"SELECT COUNT(*), AVG(employer_employees.salary), employer_employees.type, employer.name
+FROM performance.employer_employees employer_employees,
+     performance.employer employer
+WHERE employer_employees.employer__id = employer.employer__id
+  AND employer_employees.createDate < CURRENT_TIMESTAMP
+GROUP BY type, employer.name
+ORDER BY type",10000,,COMPLEX,FALSE,10
+"SELECT employer_employees.type, employer.name
+FROM performance.employer_employees employer_employees,
+     performance.employer employer
+WHERE employer_employees.employer__id = employer.employer__id
+  AND employer_employees.createDate < CURRENT_TIMESTAMP",10000,,"SELECT FROM TABLE, VIRTUAL WHERE ID and DATE",FALSE,10
+"SELECT COUNT(*) FROM performance.employer_employees employer_employees,
+     performance.employer employer
+WHERE employer_employees.employer__id = employer.employer__id
+  AND employer_employees.createDate < CURRENT_TIMESTAMP
+GROUP BY type, employer.name
+ORDER BY type",10000,,COMPLEX Select 1,FALSE,10
+SELECT * FROM performance.employer,1,,Rows retrieved 1,TRUE,10
+SELECT * FROM performance.employer,10,,Rows retrieved 10,TRUE,10
+SELECT * FROM performance.employer,10000,,Rows retrieved 10000,TRUE,10
+SELECT * FROM performance.employer,1000,,Rows retrieved 1000,TRUE,10
+SELECT * FROM performance.employer,10000,,Rows retrieved 10000,TRUE,10
