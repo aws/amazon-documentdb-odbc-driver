@@ -143,6 +143,7 @@ endif()
 add_subdirectory(${ODBC_SRC})
 add_subdirectory(${ENLIST_SRC})
 add_subdirectory(${INSTALL_SRC})
+add_subdirectory(${CSV_PARSER_SRC})
 
 # Only build & package DSN installer for Mac platforms
 if(APPLE)
