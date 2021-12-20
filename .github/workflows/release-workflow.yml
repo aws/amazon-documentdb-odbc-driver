@@ -21,6 +21,12 @@ jobs:
         with:
             cmake-version: '3.21.4'
       - uses: actions/checkout@v2
+      - name: Get Java distribution
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          architecture: x64
       - name: run-cppcheck
         run: |
           brew install cppcheck
@@ -72,6 +78,15 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Get Java distribution
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          architecture: x32
+      - name: "Update path for Java"
+        run: |
+          echo "${{ env.JAVA_HOME }}\bin\server" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append      - name: Get specific version CMake, v3.18.3
       - name: Get specific version CMake, v3.18.3
         uses: lukka/get-cmake@v3.18.3
       - name: add-msbuild-to-path
@@ -103,7 +118,15 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Get specific version CMake, v3.18.3
+      - name: Get Java distribution
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          architecture: x64
+      - name: "Update path for Java"
+        run: |
+          echo "${{ env.JAVA_HOME }}\bin\server" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append      - name: Get specific version CMake, v3.18.3
         uses: lukka/get-cmake@v3.18.3
       - name: add-msbuild-to-path
         uses: microsoft/setup-msbuild@v1.0.2
