@@ -19,12 +19,11 @@ project(performance_execution)
 set(SOURCE_FILES performance_odbc_execution.cpp)
 include_directories(${UT_HELPER}
 					${IT_HELPER}
-					${ODBC_SRC}
-					${CSV_PARSER_SRC})
+					${ODBC_SRC})
 
 # Generate executable
 add_executable(performance_execution ${SOURCE_FILES})
 
 # Library dependencies
-target_link_libraries(performance_execution odbcdriver itodbc_helper ut_helper csv-parser)
+target_link_libraries(performance_execution odbcdriver itodbc_helper ut_helper)
 target_compile_definitions(performance_execution PUBLIC _UNICODE UNICODE)

@@ -23,7 +23,7 @@
 #include <numeric>
 #include <iostream>
 #include <fstream>
-#include "../../CSVparser/csv_parser/csv_parser.h"
+#include "csv_parser.h"
 #include <string_view>
 #include <cstdlib>
 

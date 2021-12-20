@@ -70,7 +70,6 @@ add_compile_definitions( ODBC_VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSI
                          ODBC_DRVFILE_VERSION=${VERSION_MAJOR},${VERSION_MINOR},${VERSION_PATCH} )
 
 # Extensions of base directories
-set(CSV_PARSER_SRC "${CMAKE_CURRENT_SOURCE_DIR}/CSVparser")
 set(PERFORMANCE_TESTS "${CMAKE_CURRENT_SOURCE_DIR}/PerformanceTests")
 set(UT_HELPER "${TESTS}/UTHelper")
 set(IT_HELPER "${TESTS}/ITODBCHelper")
@@ -143,7 +142,6 @@ endif()
 add_subdirectory(${ODBC_SRC})
 add_subdirectory(${ENLIST_SRC})
 add_subdirectory(${INSTALL_SRC})
-add_subdirectory(${CSV_PARSER_SRC})
 
 # Only build & package DSN installer for Mac platforms
 if(APPLE)
