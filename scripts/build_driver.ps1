@@ -9,7 +9,10 @@ cmake -S $SRC_DIR `
     -A $WIN_ARCH `
     -D CMAKE_BUILD_TYPE=$CONFIGURATION `
     -D CMAKE_INSTALL_PREFIX=$INSTALL_DIR `
-    -D BUILD_WITH_TESTS=ON
+    -D WITH_TESTS=OFF `
+    -D WITH_CORE=OFF `
+    -D WITH_ODBC=ON `
+    -D WITH_ODBC_MSI=ON
 
 # # Build Project
-cmake --build $BUILD_DIR --config $CONFIGURATION --parallel 4 
+cmake --build $BUILD_DIR --target install --config $CONFIGURATION --parallel 4 

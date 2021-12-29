@@ -1,154 +1,106 @@
 #
-#   Copyright <2021> Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#
-#   Licensed under the Apache License, Version 2.0 (the "License").
-#   You may not use this file except in compliance with the License.
-#   A copy of the License is located at
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
 #
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
-#   or in the "license" file accompanying this file. This file is distributed
-#   on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-#   express or implied. See the License for the specific language governing
-#   permissions and limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
-cmake_minimum_required(VERSION 3.16) 
+cmake_minimum_required(VERSION 3.6)
+project(Ignite.C++ VERSION 2.13.0.58917)
 
-project(global_make_list)
+set(CMAKE_CXX_STANDARD 98)
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/modules/code-coverage.cmake")
-add_code_coverage_all_targets(EXCLUDE libraries aws-cpp-sdk googletest Tests)
+set(CMAKE_PROJECT_VERSION ${PROJECT_VERSION})
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DIGNITE_IMPL -DIGNITE_FRIEND -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS")
 
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-	set(BITNESS 64)
-	set(BITNESS_NAME "x64")
-elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-	set(BITNESS 32)
-	set(BITNESS_NAME "x86")
-endif()
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../build/odbc/lib")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../build/odbc/lib")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../build/odbc/bin")
+list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
 
-set(CMAKE_CXX_STANDARD 17)
-# This wasn't being picked up on mac, causes some symbol errors
-if(APPLE)
-	add_definitions(-DHAVE_STRLCAT)
-	option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-else()
-	option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-endif()
-# Set BUILD_WITH_TESTS to OFF before building installer package for size optimization.
-option(BUILD_WITH_TESTS "Enable testing" ON)
-
-# Do not under any circumstance reduce or remove the compiler warning flags.
-# These are our (best) friends.
-if(MSVC)
-  add_compile_options(/W4 /WX)
-else()
-  add_compile_options(-Wall -Wextra -pedantic -fPIC -Werror)
-endif()
-
-# Base directories
-set(PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/..")
-set(ODBC_SRC "${CMAKE_CURRENT_SOURCE_DIR}/odbcdriver")
-set(ENLIST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/odbcdriverenlist")
-set(TESTS "${CMAKE_CURRENT_SOURCE_DIR}/Tests")
-set(TESTS_INI "${TESTS}/Tests")
-set(INSTALL_SRC "${CMAKE_CURRENT_SOURCE_DIR}/installer")
-set(DSN_INSTALLER_SRC "${CMAKE_CURRENT_SOURCE_DIR}/DSNInstaller")
-
-# ODBC Driver version
-set(VERSION_MAJOR 1)
-set(VERSION_MINOR 0)
-set(VERSION_PATCH 3)
-
-add_compile_definitions( ODBC_VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
-                         # Comma separated version is required for odbc administrator's driver file.
-                         ODBC_DRVFILE_VERSION=${VERSION_MAJOR},${VERSION_MINOR},${VERSION_PATCH} )
-
-# Extensions of base directories
-set(PERFORMANCE_TESTS "${CMAKE_CURRENT_SOURCE_DIR}/PerformanceTests")
-set(UT_HELPER "${TESTS}/UTHelper")
-set(IT_HELPER "${TESTS}/ITODBCHelper")
-
-# Without this symbols will be exporting to Unix but not Windows
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+if("${isSystemDir}" STREQUAL "-1")
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+endif("${isSystemDir}" STREQUAL "-1")
 
 if (WIN32)
-    find_package(AWSSDK REQUIRED core sts )
-else()
-    find_package(AWSSDK REQUIRED COMPONENTS core sts PATHS aws-sdk-cpp/install NO_DEFAULT_PATH)
-    # Require at least gcc 4.9 for regex support
-    if((NOT APPLE) AND ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9))
-        find_package(Boost)
+    add_definitions(-DUNICODE=1)
+
+    set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+    set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+endif()
+
+if (MSVC)
+    add_compile_options(/source-charset:utf-8 /execution-charset:utf-8)
+
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
+endif()
+
+option (WITH_CORE ON)
+option (WITH_ODBC OFF)
+option (WITH_ODBC_MSI OFF)
+option (WITH_THIN_CLIENT OFF)
+option (WITH_TESTS OFF)
+option (WARNINGS_AS_ERRORS OFF)
+
+if (${WITH_CORE} OR ${WITH_TESTS})
+    find_package(Java 1.8 REQUIRED)
+    find_package(JNI REQUIRED)
+endif()
+
+if (${WARNINGS_AS_ERRORS})
+    if (MSVC)
+        add_compile_options(/WX)
+    else()
+        add_compile_options(-Wall -Wextra -Werror -Wno-variadic-macros)
     endif()
 endif()
 
-# General compiler definitions
-add_compile_definitions		(	_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING
-								UNICODE_SUPPORT
-								DYNAMIC_LOAD
-								_MBCS
-								_CRT_SECURE_NO_DEPRECATE
-								_USRDLL
-								_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
-								_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
-							)
+add_subdirectory(common)
+add_subdirectory(binary)
 
-# Platform specific compiler definitions
-if (WIN32 AND BITNESS EQUAL 64)
-	# Windows specific
-	add_compile_definitions	(	_WINDLL
-								_WIN64
-								_WINDOWS
-								WIN_EXPORT
-							)
-elseif (WIN32 AND BITNESS EQUAL 32)
-	# Windows specific
-	add_compile_definitions	(	_WINDLL
-								_WIN32
-								_WINDOWS
-								WIN_EXPORT
-							)
-elseif(APPLE)
-	# macOS specific
-	add_compile_definitions	(	WITH_IODBC
-								SQLCOLATTRIBUTE_SQLLEN
-							)
-	# iODBC includes
-	include_directories(/usr/local/include)
-elseif(UNIX)
-	# Unix specific
-	set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
-	add_compile_definitions	(	WITH_UNIXODBC
-								SQLCOLATTRIBUTE_SQLLEN
-							)
+if (${WITH_CORE} OR ${WITH_TESTS})
+    add_subdirectory(core)
+    add_subdirectory(ignite)
 endif()
 
-if(BUILD_WITH_TESTS STREQUAL ON)
-	# GTest import
-	include(gtest/googletest.cmake)
-	fetch_googletest(
-		${PROJECT_SOURCE_DIR}/gtest
-		${PROJECT_BINARY_DIR}/googletest
-		)
-	enable_testing()
+if (${WITH_TESTS})
+    enable_testing()
+
+    if (EXISTS ${CMAKE_SOURCE_DIR}/core-test)
+        add_subdirectory(core-test)
+    endif()
 endif()
 
-# Projects to build
-add_subdirectory(${ODBC_SRC})
-add_subdirectory(${ENLIST_SRC})
-add_subdirectory(${INSTALL_SRC})
-
-# Only build & package DSN installer for Mac platforms
-if(APPLE)
-	add_subdirectory(${DSN_INSTALLER_SRC})
+if (${WITH_THIN_CLIENT} OR ${WITH_ODBC})
+    add_subdirectory(network)
 endif()
 
-if(BUILD_WITH_TESTS STREQUAL ON)
-	add_subdirectory(${TESTS})
-	add_subdirectory(${PERFORMANCE_TESTS})
+if (${WITH_THIN_CLIENT})
+    add_subdirectory(thin-client)
+
+    if (${WITH_TESTS} AND EXISTS ${CMAKE_SOURCE_DIR}/thin-client-test)
+        add_subdirectory(thin-client-test)
+    endif()
+endif()
+
+if (${WITH_ODBC})
+    add_subdirectory(odbc)
+
+    if (${WITH_TESTS} AND EXISTS ${CMAKE_SOURCE_DIR}/odbc-test)
+        add_subdirectory(odbc-test)
+    endif()
 endif()

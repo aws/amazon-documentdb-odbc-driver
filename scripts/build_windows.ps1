@@ -15,16 +15,6 @@ $BUILD_DIR = "${WORKING_DIR}\build"
 # $BUILD_DIR = "${WORKING_DIR}\build\${CONFIGURATION}${BITNESS}"
 New-Item -Path $BUILD_DIR -ItemType Directory -Force | Out-Null
 
-# Build AWS SDK CPP
-$SDK_SOURCE_DIR = "${WORKING_DIR}\src\aws-sdk-cpp"
-$SDK_BUILD_DIR = "${BUILD_DIR}\aws-sdk\build"
-$SDK_INSTALL_DIR = "${BUILD_DIR}\aws-sdk\install"
-
-.\scripts\build_aws-sdk-cpp.ps1 `
-    $CONFIGURATION $WIN_ARCH `
-    $SDK_SOURCE_DIR $SDK_BUILD_DIR $SDK_INSTALL_DIR 
-Set-Location $CURRENT_DIR
-
 # Build driver
 $DRIVER_SOURCE_DIR = "${WORKING_DIR}\src"
 $DRIVER_BUILD_DIR = "${BUILD_DIR}\odbc\cmake"
@@ -38,5 +28,4 @@ Set-Location $CURRENT_DIR
 $DRIVER_BIN_DIR = "$DRIVER_BUILD_DIR\..\bin\$CONFIGURATION"
 New-Item -Path $DRIVER_BIN_DIR -ItemType Directory -Force | Out-Null
 
-Copy-Item $SDK_BUILD_DIR\bin\$CONFIGURATION\* $DRIVER_BIN_DIR
-Copy-Item $DRIVER_BUILD_DIR\bin\$CONFIGURATION\* $DRIVER_BIN_DIR
+Copy-Item $DRIVER_BUILD_DIR\$CONFIGURATION\* $DRIVER_BIN_DIR
