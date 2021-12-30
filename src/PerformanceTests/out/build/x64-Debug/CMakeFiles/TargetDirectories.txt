@@ -1,8 +1,0 @@
-C:/Users/GaryAtwal/source/repos/aws/amazon-documentdb-odbc-driver/src/PerformanceTests/out/build/x64-Debug/CMakeFiles/edit_cache.dir
-C:/Users/GaryAtwal/source/repos/aws/amazon-documentdb-odbc-driver/src/PerformanceTests/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
-C:/Users/GaryAtwal/source/repos/aws/amazon-documentdb-odbc-driver/src/PerformanceTests/out/build/x64-Debug/PTODBCResults/CMakeFiles/performance_results.dir
-C:/Users/GaryAtwal/source/repos/aws/amazon-documentdb-odbc-driver/src/PerformanceTests/out/build/x64-Debug/PTODBCResults/CMakeFiles/edit_cache.dir
-C:/Users/GaryAtwal/source/repos/aws/amazon-documentdb-odbc-driver/src/PerformanceTests/out/build/x64-Debug/PTODBCResults/CMakeFiles/rebuild_cache.dir
-C:/Users/GaryAtwal/source/repos/aws/amazon-documentdb-odbc-driver/src/PerformanceTests/out/build/x64-Debug/PTODBCExecution/CMakeFiles/performance_execution.dir
-C:/Users/GaryAtwal/source/repos/aws/amazon-documentdb-odbc-driver/src/PerformanceTests/out/build/x64-Debug/PTODBCExecution/CMakeFiles/edit_cache.dir
-C:/Users/GaryAtwal/source/repos/aws/amazon-documentdb-odbc-driver/src/PerformanceTests/out/build/x64-Debug/PTODBCExecution/CMakeFiles/rebuild_cache.dir

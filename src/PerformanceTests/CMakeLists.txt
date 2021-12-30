@@ -15,10 +15,7 @@
 
 project(performance_tests)
 
-set(RESULTS_PTESTS "${CMAKE_CURRENT_SOURCE_DIR}/PTODBCResults")
-set(EXECUTION_PTESTS "${CMAKE_CURRENT_SOURCE_DIR}/PTODBCExecution")
+set(PERFORMANCE "${CMAKE_CURRENT_SOURCE_DIR}/performance")
 
 # Projects to build
-add_subdirectory(${RESULTS_PTESTS})
-add_subdirectory(${EXECUTION_PTESTS})
-
+add_subdirectory(${PERFORMANCE})
