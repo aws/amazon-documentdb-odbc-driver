@@ -42,7 +42,7 @@ jobs:
     - name: add-msbuild-to-path
       uses: microsoft/setup-msbuild@v1.0.2
     - name: Install dependencies Windows
-      run: vcpkg integrate install; vcpkg install openssl:x86-windows boost:x86-windows-static
+      run: vcpkg integrate install; vcpkg install openssl:x86-windows
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - name: configure-and-build-driver
@@ -111,7 +111,7 @@ jobs:
     - name: add-msbuild-to-path
       uses: microsoft/setup-msbuild@v1.0.2
     - name: Install dependencies Windows
-      run: vcpkg integrate install; vcpkg install openssl:x64-windows boost:x64-windows-static
+      run: vcpkg integrate install; vcpkg install openssl:x64-windows
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - name: configure-and-build-driver
