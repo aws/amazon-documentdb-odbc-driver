@@ -23,9 +23,9 @@
 
 #ifdef WIN32
 #include <Windows.h>
+#pragma comment(lib, "odbc32.lib")
 #endif
 
-#pragma comment(lib, "odbc32.lib")
 
 #ifndef ODBCVER
 #define ODBCVER 0x0351
