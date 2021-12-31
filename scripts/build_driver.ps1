@@ -4,11 +4,17 @@ $SRC_DIR = $args[2]
 $BUILD_DIR = $args[3]
 $INSTALL_DIR = $args[4]
 
-if ($WIN_ARCH = "x64") {
+if ($WIN_ARCH -eq "x64") {
     $VCPKG_TARGET_TRIPLET="x64-windows"
 } else {
     $VCPKG_TARGET_TRIPLET="x86-windows"
 }
+
+if ($null -eq $env:VCPKG_ROOT) {
+    $env:VCPKG_ROOT = 'c:/vcpgk'
+}
+
+$CMAKE_TOOLCHAIN_FILE = -join($env:VCPKG_ROOT, "/scripts/buildsystems/vcpkg.cmake")
 
 cmake -S $SRC_DIR `
     -B $BUILD_DIR `
@@ -20,7 +26,7 @@ cmake -S $SRC_DIR `
     -D WITH_ODBC=ON `
     -D WITH_ODBC_MSI=ON `
     -D VCPKG_TARGET_TRIPLET=$VCPKG_TARGET_TRIPLET `
-    -D CMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+    -D CMAKE_TOOLCHAIN_FILE=$CMAKE_TOOLCHAIN_FILE
 
 if ($?) {
     # # Build Project

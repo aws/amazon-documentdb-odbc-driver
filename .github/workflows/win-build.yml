@@ -18,6 +18,7 @@ env:
   AWS_SDK_INSTALL_PATH: "./build/aws-sdk/install"
   NOT_CONNECTED: 1
   FAKE_CONNECTION: 1
+  VCPKG_ROOT: "./vcpkg"
 
 jobs:
   build-windows32:
@@ -43,12 +44,12 @@ jobs:
     - name: Install dependencies Windows
       run: vcpkg integrate install; vcpkg install openssl:x86-windows boost:x86-windows-static
       env:
-        VCPKG_ROOT: 'C:\vcpkg'
+        VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - name: configure-and-build-driver
       run: |
         .\build_win_release32.ps1
       env:
-        OPENSSL_ROOT_DIR: 'C:/vcpkg/packages/openssl_x86-windows'
+        OPENSSL_ROOT_DIR: '${{ env.VCPKG_ROOT }}/packages/openssl_x86-windows'
     # - name: import-registry
     #   run: |
     #     reg import .\src\Tests\Tests\AWSProfileRegistry_Win32.reg
@@ -112,12 +113,12 @@ jobs:
     - name: Install dependencies Windows
       run: vcpkg integrate install; vcpkg install openssl:x64-windows boost:x64-windows-static
       env:
-        VCPKG_ROOT: 'C:\vcpkg'
+        VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - name: configure-and-build-driver
       run: |
         .\build_win_release64.ps1
       env:
-        OPENSSL_ROOT_DIR: 'C:/vcpkg/packages/openssl_x64-windows'
+        OPENSSL_ROOT_DIR: '${{ env.VCPKG_ROOT }}/packages/openssl_x64-windows'
   #   - name: import-registry
   #     run: |
   #       reg import .\src\Tests\Tests\AWSProfileRegistry.reg
