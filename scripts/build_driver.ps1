@@ -11,7 +11,7 @@ if ($WIN_ARCH -eq "x64") {
 }
 
 if ($null -eq $env:VCPKG_ROOT) {
-    $env:VCPKG_ROOT = 'c:/vcpgk'
+    $env:VCPKG_ROOT = 'c:/vcpkg'
 }
 
 $CMAKE_TOOLCHAIN_FILE = -join($env:VCPKG_ROOT, "/scripts/buildsystems/vcpkg.cmake")
