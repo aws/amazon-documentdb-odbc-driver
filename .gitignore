@@ -23,6 +23,7 @@ include/*
 packages/*
 # Visual Studio 
 .vs/*
+src/.vs/*
 # Visual Studio Code
 .vscode/*
 src/psqlodbc/psqlodbcBuilder/x64_*
