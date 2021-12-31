@@ -37,65 +37,6 @@ test_string to_test_string(const std::string& src) {
 }
 #endif
 
-void AllocConnection(SQLHENV* db_environment, SQLHDBC* db_connection,
-                     bool throw_on_error, bool log_diag) {
-  SQLRETURN ret_code;
-  EXECUTION_HANDLER(
-      throw_on_error, log_diag, SQL_HANDLE_ENV, *db_environment, ret_code,
-      SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, db_environment),
-      "Failed to allocate handle for environment.");
-  EXECUTION_HANDLER(throw_on_error, log_diag, SQL_ATTR_ODBC_VERSION,
-                    *db_environment, ret_code,
-                    SQLSetEnvAttr(*db_environment, SQL_ATTR_ODBC_VERSION,
-                                  (void*)SQL_OV_ODBC3, 0),
-                    "Failed to set attributes for environment.");
-  EXECUTION_HANDLER(
-      throw_on_error, log_diag, SQL_HANDLE_DBC, *db_connection, ret_code,
-      SQLAllocHandle(SQL_HANDLE_DBC, *db_environment, db_connection),
-      "Failed to allocate handle for db connection.");
-}
-
-void ITDriverConnect(SQLTCHAR* connection_string, SQLHENV* db_environment,
-                     SQLHDBC* db_connection, bool throw_on_error,
-                     bool log_diag) {
-  SQLRETURN ret_code;
-  EXECUTION_HANDLER(
-      throw_on_error, log_diag, SQL_HANDLE_ENV, *db_environment, ret_code,
-      SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, db_environment),
-      "Failed to allocate handle for environment.");
-  EXECUTION_HANDLER(throw_on_error, log_diag, SQL_ATTR_ODBC_VERSION,
-                    *db_environment, ret_code,
-                    SQLSetEnvAttr(*db_environment, SQL_ATTR_ODBC_VERSION,
-                                  (void*)SQL_OV_ODBC3, 0),
-                    "Failed to set attributes for environment.");
-  EXECUTION_HANDLER(
-      throw_on_error, log_diag, SQL_HANDLE_DBC, *db_connection, ret_code,
-      SQLAllocHandle(SQL_HANDLE_DBC, *db_environment, db_connection),
-      "Failed to allocate handle for db connection.");
-
-  SQLTCHAR out_conn_string[1024];
-  SQLSMALLINT out_conn_string_length;
-
-  EXECUTION_HANDLER(
-      throw_on_error, log_diag, SQL_HANDLE_DBC, *db_connection, ret_code,
-      SQLDriverConnect(*db_connection, NULL, connection_string, SQL_NTS,
-                       out_conn_string, IT_SIZEOF(out_conn_string),
-                       &out_conn_string_length, SQL_DRIVER_COMPLETE),
-      "Failed to connect to driver.");
-}
-
-void AllocStatement(SQLTCHAR* connection_string, SQLHENV* db_environment,
-                    SQLHDBC* db_connection, SQLHSTMT* h_statement,
-                    bool throw_on_error, bool log_diag) {
-  SQLRETURN ret_code;
-  ITDriverConnect(connection_string, db_environment, db_connection,
-                  throw_on_error, log_diag);
-  EXECUTION_HANDLER(
-      throw_on_error, log_diag, SQL_HANDLE_STMT, h_statement, ret_code,
-      SQLAllocHandle(SQL_HANDLE_STMT, *db_connection, h_statement),
-      "Failed to allocate handle for statement.");
-}
-
 void LogAnyDiagnostics(SQLSMALLINT handle_type, SQLHANDLE handle, SQLRETURN ret,
                        SQLTCHAR* msg_return, const SQLSMALLINT sz) {
   if (handle == NULL) {
@@ -139,54 +80,6 @@ void LogAnyDiagnostics(SQLSMALLINT handle_type, SQLHANDLE handle, SQLRETURN ret,
 
   if (diag_ret == SQL_NO_DATA && rec_number == 1)
     printf("No error information\n");
-}
-
-bool CheckSQLSTATE(SQLSMALLINT handle_type, SQLHANDLE handle,
-                   SQLWCHAR* expected_sqlstate, bool log_message) {
-  (void)log_message;
-
-  SQLWCHAR sqlstate[6] = {0};
-  SQLINTEGER native_diag_code;
-  SQLWCHAR diag_message[SQL_MAX_MESSAGE_LENGTH] = {0};
-  SQLSMALLINT message_length;
-
-  SQLSMALLINT record_number = 0;
-  SQLRETURN diag_ret;
-  do {
-    record_number++;
-    diag_ret = SQLGetDiagRec(handle_type, handle, record_number, sqlstate,
-                             &native_diag_code, diag_message,
-                             IT_SIZEOF(diag_message), &message_length);
-
-    if (1) {
-      std::wcout << "SQLState " << sqlstate << ": " << diag_message
-                 << std::endl;
-    }
-    // Only return if this SQLSTATE is the expected state, otherwise keep
-    // checking
-    if (!memcmp(sqlstate, expected_sqlstate, 6 * sizeof(SQLWCHAR))) {
-      return true;
-    }
-  } while (diag_ret == SQL_SUCCESS);
-
-  // Could not find expected SQLSTATE in available diagnostic records
-  return false;
-}
-
-bool CheckSQLSTATE(SQLSMALLINT handle_type, SQLHANDLE handle,
-                   SQLWCHAR* expected_sqlstate) {
-  return CheckSQLSTATE(handle_type, handle, expected_sqlstate, false);
-}
-
-test_string QueryBuilder(const test_string& column, const test_string& dataset,
-                         const test_string& count) {
-  return CREATE_STRING("SELECT ") + column + CREATE_STRING(" FROM ") + dataset +
-         CREATE_STRING(" LIMIT ") + count;
-}
-
-test_string QueryBuilder(const test_string& column,
-                         const test_string& dataset) {
-  return CREATE_STRING("SELECT ") + column + CREATE_STRING(" FROM ") + dataset;
 }
 
 void CloseCursor(SQLHSTMT* h_statement, bool throw_on_error, bool log_diag) {
@@ -238,14 +131,4 @@ std::string wchar_to_string(const SQLWCHAR* tchar) {
   } else {
     return std::string((const char*)tchar);
   }
-}
-
-void WriteFileIfSpecified(char** begin, char** end, const std::string& option,
-                          std::string& output) {
-  char** itr = std::find(begin, end, option);
-  if (itr != end && ++itr != end) {
-    std::ofstream out_file(*itr);
-    if (out_file.good()) out_file << output;
-  }
-  return;
 }

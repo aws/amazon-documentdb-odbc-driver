@@ -81,23 +81,8 @@ test_string to_test_string(const std::string& src);
 
 #define IT_SIZEOF(x) (NULL == (x) ? 0 : (sizeof((x)) / sizeof((x)[0])))
 
-void AllocConnection(SQLHENV* db_environment, SQLHDBC* db_connection,
-                     bool throw_on_error, bool log_diag);
-void ITDriverConnect(SQLTCHAR* connection_string, SQLHENV* db_environment,
-                     SQLHDBC* db_connection, bool throw_on_error,
-                     bool log_diag);
-void AllocStatement(SQLTCHAR* connection_string, SQLHENV* db_environment,
-                    SQLHDBC* db_connection, SQLHSTMT* h_statement,
-                    bool throw_on_error, bool log_diag);
 void LogAnyDiagnostics(SQLSMALLINT handle_type, SQLHANDLE handle, SQLRETURN ret,
                        SQLTCHAR* msg_return = NULL, const SQLSMALLINT sz = 0);
-bool CheckSQLSTATE(SQLSMALLINT handle_type, SQLHANDLE handle,
-                   SQLWCHAR* expected_sqlstate, bool log_message);
-bool CheckSQLSTATE(SQLSMALLINT handle_type, SQLHANDLE handle,
-                   SQLWCHAR* expected_sqlstate);
-test_string QueryBuilder(const test_string& column, const test_string& dataset,
-                         const test_string& count);
-test_string QueryBuilder(const test_string& column, const test_string& dataset);
 void CloseCursor(SQLHSTMT* h_statement, bool throw_on_error, bool log_diag);
 std::string wstring_to_string(const std::wstring& src);
 std::string u16string_to_string(const std::u16string& src);
@@ -105,7 +90,5 @@ std::string u32string_to_string(const std::u32string& src);
 std::u16string string_to_u16string(const std::string& src);
 std::string tchar_to_string(const SQLTCHAR* tchar);
 std::string wchar_to_string(const SQLWCHAR* tchar);
-void WriteFileIfSpecified(char** begin, char** end, const std::string& option,
-                          std::string& output);
 
 #endif
