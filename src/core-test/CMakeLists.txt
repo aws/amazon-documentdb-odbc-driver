@@ -71,6 +71,8 @@ if (NOT WIN32)
     add_definitions(-DBOOST_TEST_DYN_LINK)
 
     target_link_libraries(${TARGET} -rdynamic)
+else()
+    target_link_libraries(${TARGET} -static)
 endif()
 
 set(TEST_TARGET IgniteCoreTest)

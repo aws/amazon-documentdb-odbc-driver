@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.20)
 project(Ignite.C++ VERSION 2.13.0.58917)
 
 set(CMAKE_CXX_STANDARD 98)
