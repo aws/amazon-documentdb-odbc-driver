@@ -366,7 +366,7 @@ void performance::PerformanceTestRunner::recordExecBindFetch(
   test_string query = converter.from_bytes(temp_str);
 
   // Iterate and execute query -> bind and fetch results
-  for (size_t iter = 0; iter < test_case.num_iterations; iter++) {
+  for (int iter = 0; iter < test_case.num_iterations; iter++) {
     row_count = 0;
 
     // Execute query
