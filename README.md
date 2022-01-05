@@ -31,6 +31,7 @@
 1. Install deppendencies
    1. brew install cmake
    2. brew install openssl
+   3. brew install unixodbc
 2. Run one of build scripts to create an initial compilation.
    1. E.g.: `./buid_mac_release64.sh`
    2. Navigate to the `build/odbc/lib` folder to use the generated files.
