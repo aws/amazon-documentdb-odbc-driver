@@ -28,6 +28,7 @@
 
 using ignite::odbc::config::Configuration;
 
+#ifdef _WIN32
 bool DisplayConnectionWindow(void* windowParent, Configuration& config)
 {
     using namespace ignite::odbc::system::ui;
@@ -65,6 +66,7 @@ bool DisplayConnectionWindow(void* windowParent, Configuration& config)
 
     return false;
 }
+#endif
 
 /**
  * Register DSN with specified configuration.
@@ -167,8 +169,11 @@ BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver, LPCSTR attribut
         {
             LOG_MSG("ODBC_ADD_DSN");
 
+#ifdef _WIN32
             if (!DisplayConnectionWindow(hwndParent, config))
                 return FALSE;
+#endif  // _WIN32
+
 
             if (!RegisterDsn(config, driver))
                 return FALSE;
@@ -186,8 +191,10 @@ BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver, LPCSTR attribut
 
             ReadDsnConfiguration(dsn.c_str(), loaded, &diag);
 
+#ifdef _WIN32
             if (!DisplayConnectionWindow(hwndParent, loaded))
                 return FALSE;
+#endif  // _WIN32
 
             if (!RegisterDsn(loaded, driver))
                 return FALSE;

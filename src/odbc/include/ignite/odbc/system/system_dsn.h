@@ -31,6 +31,7 @@ namespace ignite
     }
 }
 
+#ifdef _WIN32
 /**
  * Display connection window for user to configure connection parameters.
  *
@@ -39,5 +40,6 @@ namespace ignite
  * @return True on success and false on fail.
  */
 bool DisplayConnectionWindow(void* windowParent, ignite::odbc::config::Configuration& config);
+#endif
 
 #endif //_IGNITE_ODBC_SYSTEM_SYSTEM_DSN

@@ -115,6 +115,7 @@ namespace ignite
             config::ConnectionStringParser parser(config);
             parser.ParseConnectionString(connectStr, &GetDiagnosticRecords());
 
+#ifdef _WIN32
             if (parentWindow)
             {
                 LOG_MSG("Parent window is passed. Creating configuration window.");
@@ -125,6 +126,7 @@ namespace ignite
                     return SqlResult::AI_ERROR;
                 }
             }
+#endif  // _WIN32
 
             if (config.IsDsnSet())
             {
