@@ -28,8 +28,9 @@
 
 ### MacOS
 
-1. Install CMAKE
+1. Install deppendencies
    1. brew install cmake
+   2. brew install openssl
 2. Run one of build scripts to create an initial compilation.
    1. E.g.: `./buid_mac_release64.sh`
    2. Navigate to the `build/odbc/lib` folder to use the generated files.

@@ -19,6 +19,24 @@ project(ignite-network)
 
 set(TARGET ${PROJECT_NAME})
 
+# On macOS, search Homebrew for keg-only versions of OpenSSL
+# equivalent of # -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl/ -DOPENSSL_CRYPTO_LIBRARY=/usr/local/opt/openssl/lib/
+if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
+    execute_process(
+            COMMAND brew --prefix OpenSSL
+            RESULT_VARIABLE BREW_OPENSSL
+            OUTPUT_VARIABLE BREW_OPENSSL_PREFIX
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (BREW_OPENSSL EQUAL 0 AND EXISTS "${BREW_OPENSSL_PREFIX}")
+        message(STATUS "Found OpenSSL keg installed by Homebrew at ${BREW_OPENSSL_PREFIX}")
+        set(OPENSSL_ROOT_DIR "${BREW_OPENSSL_PREFIX}/")
+        set(OPENSSL_INCLUDE_DIR "${BREW_OPENSSL_PREFIX}/include")
+        set(OPENSSL_LIBRARIES "${BREW_OPENSSL_PREFIX}/lib")
+        set(OPENSSL_CRYPTO_LIBRARY "${BREW_OPENSSL_PREFIX}/lib/libcrypto.dylib")
+    endif()
+endif()
+
 find_package(OpenSSL REQUIRED)
 
 include_directories(include src ${OPENSSL_INCLUDE_DIR})
