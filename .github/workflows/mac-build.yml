@@ -43,6 +43,7 @@ jobs:
     - name: get-dependencies
       run: |
         brew install cmake
+        brew install openssl
     - name: configure-and-build-driver
       run: |
         ./build_mac_release64.sh
