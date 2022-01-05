@@ -45,6 +45,7 @@ jobs:
         brew install cmake
         brew install openssl
         export OPENSSL_ROOT_DIR=`brew --prefix openssl`
+        export OPENSSL_INCLUDE_DIR=$OPENSSL_ROOT_DIR/include/openssl
     - name: configure-and-build-driver
       run: |
         ./build_mac_release64.sh
