@@ -20,7 +20,6 @@ project(ignite)
 find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
 include(UseJava)
-#find_library(JVM_LIBRARY jvm ${JAVA_JVM_LIBRARY_DIRECTORIES})
 
 include_directories(SYSTEM ${JNI_INCLUDE_DIRS})
 include_directories(include)
