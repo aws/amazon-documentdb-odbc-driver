@@ -17,7 +17,10 @@
 
 project(ignite)
 
-find_library(JVM_LIBRARY jvm ${JAVA_JVM_LIBRARY_DIRECTORIES})
+find_package(Java REQUIRED)
+find_package(JNI REQUIRED)
+include(UseJava)
+#find_library(JVM_LIBRARY jvm ${JAVA_JVM_LIBRARY_DIRECTORIES})
 
 include_directories(SYSTEM ${JNI_INCLUDE_DIRS})
 include_directories(include)
@@ -62,7 +65,7 @@ add_library(${TARGET} SHARED ${SOURCES})
 
 set_target_properties(${TARGET} PROPERTIES VERSION ${CMAKE_PROJECT_VERSION})
 
-target_link_libraries(${TARGET} ignite-binary ${JVM_LIBRARY})
+target_link_libraries(${TARGET} ignite-binary ${JNI_LIBRARIES})
 
 if (WIN32)
     target_link_libraries(${TARGET} delayimp)
