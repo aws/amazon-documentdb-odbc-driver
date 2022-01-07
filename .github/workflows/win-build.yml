@@ -15,9 +15,6 @@ env:
   ODBC_LIB_PATH: "./build/odbc/lib"
   ODBC_BIN_PATH: "./build/odbc/bin"
   ODBC_BUILD_PATH: "./build/odbc/build"
-  AWS_SDK_INSTALL_PATH: "./build/aws-sdk/install"
-  NOT_CONNECTED: 1
-  FAKE_CONNECTION: 1
   VCPKG_ROOT: "c:/vcpkg"
 
 jobs:
@@ -55,9 +52,9 @@ jobs:
     #     reg import .\src\Tests\Tests\AWSProfileRegistry_Win32.reg
     #     reg import .\src\Tests\Tests\IAMRegistry_Win32.reg
     #     mkdir ${{ github.workspace }}\odbc-logs
-    # - name: run-tests
-    #   run: |
-    #     .\build\odbc\bin\Release\tests.exe --gtest_output="xml:report.xml"
+    - name: run-tests
+      run: |
+        ./build/odbc/bin/ignite-odbc-tests
     # - name: upload-test-report
     #   if: failure()
     #   uses: actions/upload-artifact@v2
