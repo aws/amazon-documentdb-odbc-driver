@@ -54,7 +54,7 @@ jobs:
     #     sudo cp ./src/Tests/Tests/odbc-mac.ini /Library/ODBC/odbc.ini
     #     sudo cp ./src/Tests/Tests/odbcinst-mac.ini /Library/ODBC/odbcinst.ini
     #     mkdir ${{ github.workspace }}/odbc-logs
-    # - name: run-tests
+    - name: run-tests
       run: |
         ./build/odbc/bin/ignite-odbc-tests"
     # - name: upload-test-report
