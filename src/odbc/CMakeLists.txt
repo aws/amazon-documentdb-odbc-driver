@@ -20,14 +20,18 @@ project(ignite-odbc)
 set(TARGET ${PROJECT_NAME})
 
 find_package(ODBC REQUIRED)
+find_package(Java REQUIRED)
+find_package(JNI REQUIRED)
+include(UseJava)
 
-include_directories(SYSTEM ${ODBC_INCLUDE_DIRS})
+include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS})
 include_directories(include)
 
 set(SOURCES src/app/application_data_buffer.cpp
         src/app/parameter.cpp
         src/app/parameter_set.cpp
         src/common_types.cpp
+        src/common/concurrent.cpp
         src/config/config_tools.cpp
         src/config/configuration.cpp
         src/config/connection_info.cpp
@@ -37,6 +41,7 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/diagnostic/diagnosable_adapter.cpp
         src/diagnostic/diagnostic_record.cpp
         src/diagnostic/diagnostic_record_storage.cpp
+        src/documentdb/jni/java.cpp
         src/environment.cpp
         src/meta/column_meta.cpp
         src/meta/table_meta.cpp
@@ -71,20 +76,37 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/log.cpp)
 
 if (WIN32)
-    include_directories(os/win/include)
+    set(OS_INCLUDE os/win/include)
 
-    list(APPEND SOURCES os/win/src/system_dsn.cpp
+    list(APPEND SOURCES 
+            os/win/src/system_dsn.cpp
             os/win/src/system/ui/custom_window.cpp
             os/win/src/system/ui/dsn_configuration_window.cpp
             os/win/src/system/ui/window.cpp
-            module.def)
+            os/win/src/common/concurrent_os.cpp
+            os/win/src/common/platform_utils.cpp
+            src/documentdb/jni/os/win/utils.cpp
+            module.def
+    )
+else()
+    set(OS_INCLUDE os/linux/include)
+
+    list(APPEND SOURCES 
+            os/linux/src/common/concurrent_os.cpp
+            os/linux/src/common/platform_utils.cpp
+            src/documentdb/jni/os/linux/utils.cpp
+    )
 endif ()
+
+include_directories(${OS_INCLUDE})
+
 
 add_library(${TARGET} SHARED ${SOURCES})
 
 set_target_properties(${TARGET} PROPERTIES VERSION ${CMAKE_PROJECT_VERSION})
 
 target_link_libraries(${TARGET} ${ODBC_LIBRARIES})
+target_link_libraries(${TARGET} ${JNI_LIBRARIES})
 
 if (WIN32)
     target_link_libraries(${TARGET} ignite-common-objlib ignite-binary-objlib ignite-network-objlib odbccp32 shlwapi)
