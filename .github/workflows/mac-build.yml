@@ -56,7 +56,7 @@ jobs:
     #     mkdir ${{ github.workspace }}/odbc-logs
     - name: run-tests
       run: |
-        ./build/odbc/bin/ignite-odbc-tests"
+        ./build/odbc/bin/ignite-odbc-tests
     # - name: upload-test-report
     #   if: failure()
     #   uses: actions/upload-artifact@v2
