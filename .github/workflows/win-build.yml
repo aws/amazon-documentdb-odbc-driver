@@ -13,8 +13,8 @@ on:
 env:
   CI_OUTPUT_PATH: "ci-output"
   ODBC_LIB_PATH: "./build/odbc/lib"
-  ODBC_BIN_PATH: "./build/odbc/bin"
-  ODBC_BUILD_PATH: "./build/odbc/build"
+  ODBC_BIN_PATH: "./build/odbc/bin/Release"
+  ODBC_BUILD_PATH: "./build/odbc/cmake"
   VCPKG_ROOT: "c:/vcpkg"
 
 jobs:
@@ -54,7 +54,7 @@ jobs:
     #     mkdir ${{ github.workspace }}\odbc-logs
     - name: run-tests
       run: |
-        ./build/odbc/bin/ignite-odbc-tests
+        ${{ env.ODBC_BIN_PATH }}/ignite-odbc-tests.exe
     # - name: upload-test-report
     #   if: failure()
     #   uses: actions/upload-artifact@v2
@@ -121,9 +121,9 @@ jobs:
   #       reg import .\src\Tests\Tests\AWSProfileRegistry.reg
   #       reg import .\src\Tests\Tests\IAMRegistry.reg
   #       mkdir ${{ github.workspace }}\odbc-logs
-  #   - name: run-tests
-  #     run: |
-  #       .\build\odbc\bin\Release\tests.exe --gtest_output="xml:report.xml"
+    - name: run-tests
+      run: |
+        ${{ env.ODBC_BIN_PATH }}/ignite-odbc-tests.exe
   #   - name: upload-test-report
   #     if: failure()
   #     uses: actions/upload-artifact@v2
