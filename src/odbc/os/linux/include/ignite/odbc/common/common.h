@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef _IGNITE_COMMON_COMMON
-#define _IGNITE_COMMON_COMMON
+#ifndef _IGNITE_ODBC_COMMON_COMMON
+#define _IGNITE_ODBC_COMMON_COMMON
 
 #ifndef __has_attribute
 #   define __has_attribute(x) 0
@@ -53,4 +53,4 @@
     cls(const cls& src); \
     cls& operator= (const cls& other)
 
-#endif //_IGNITE_COMMON_COMMON
+#endif //_IGNITE_ODBC_COMMON_COMMON

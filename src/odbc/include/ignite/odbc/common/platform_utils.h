@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef _IGNITE_COMMON_PLATFORM_UTILS
-#define _IGNITE_COMMON_PLATFORM_UTILS
+#ifndef _IGNITE_ODBC_COMMON_PLATFORM_UTILS
+#define _IGNITE_ODBC_COMMON_PLATFORM_UTILS
 
 #include <iostream>
-#include <ignite/odbc/common/common.h>
+#include "ignite/odbc/common/common.h"
 
 namespace ignite
 {
@@ -123,4 +123,4 @@ namespace ignite
     }
 }
 
-#endif //_IGNITE_COMMON_PLATFORM_UTILS
+#endif //_IGNITE_ODBC_COMMON_PLATFORM_UTILS

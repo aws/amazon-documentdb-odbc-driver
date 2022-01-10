@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef _IGNITE_COMMON_CONCURRENT
-#define _IGNITE_COMMON_CONCURRENT
+#ifndef _IGNITE_ODBC_COMMON_CONCURRENT
+#define _IGNITE_ODBC_COMMON_CONCURRENT
 
 #include <cassert>
 #include <utility>
@@ -602,4 +602,4 @@ namespace ignite
     }  // namespace odbc
 } // namespace ignite
 
-#endif //_IGNITE_COMMON_CONCURRENT
+#endif //_IGNITE_ODBC_COMMON_CONCURRENT

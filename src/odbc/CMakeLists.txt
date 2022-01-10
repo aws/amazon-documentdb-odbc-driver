@@ -32,6 +32,7 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/app/parameter_set.cpp
         src/common_types.cpp
         src/common/concurrent.cpp
+        src/common/utils.cpp
         src/config/config_tools.cpp
         src/config/configuration.cpp
         src/config/connection_info.cpp
@@ -41,7 +42,7 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/diagnostic/diagnosable_adapter.cpp
         src/diagnostic/diagnostic_record.cpp
         src/diagnostic/diagnostic_record_storage.cpp
-        src/documentdb/jni/java.cpp
+        src/jni/java.cpp
         src/environment.cpp
         src/meta/column_meta.cpp
         src/meta/table_meta.cpp
@@ -85,7 +86,7 @@ if (WIN32)
             os/win/src/system/ui/window.cpp
             os/win/src/common/concurrent_os.cpp
             os/win/src/common/platform_utils.cpp
-            src/documentdb/jni/os/win/utils.cpp
+            src/jni/os/win/utils.cpp
             module.def
     )
 else()
@@ -94,7 +95,7 @@ else()
     list(APPEND SOURCES 
             os/linux/src/common/concurrent_os.cpp
             os/linux/src/common/platform_utils.cpp
-            src/documentdb/jni/os/linux/utils.cpp
+            src/jni/os/linux/utils.cpp
     )
 endif ()
 
