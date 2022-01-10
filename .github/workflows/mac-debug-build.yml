@@ -1,0 +1,66 @@
+name: ODBC Driver for Mac (Debug)
+
+on:
+  workflow_dispatch:
+
+env:
+  CI_OUTPUT_PATH: "ci-output"
+  ODBC_LIB_PATH: "./build/odbc/lib"
+  ODBC_BIN_PATH: "./build/odbc/bin"
+  ODBC_BUILD_PATH: "./build/odbc/build"
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+    env: 
+      NOT_CONNETECD: 1
+    steps:
+    - uses: actions/checkout@v2
+    # - name: run-cppcheck
+    #   run: |
+    #     brew install cppcheck
+    #     sh run_cppcheck.sh
+    # - name: upload-cppcheck-results
+    #   if: failure()
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: cppcheck-results
+    #     path: cppcheck-results.log
+    - name: get-dependencies
+      run: |
+        brew install unixodbc
+        brew install cmake
+        brew install openssl
+        brew install boost
+    - name: set-PATH
+      run: |
+        export PATH=/Library/Developer/CommandLineTools/usr/bin:$PATH
+    - name: configure-and-build-driver
+      run: |
+        ./build_mac_debug64.sh
+    # - name: prepare-dsn
+    #   run: |
+    #     sudo mkdir /Library/ODBC
+    #     sudo mv ./src/Tests/Tests/odbc.ini /Library/ODBC
+    #     mkdir ${{ github.workspace }}/odbc-logs
+    # - name: run-tests
+    #   run: |
+    #     ./build/odbc/bin/tests --gtest_output="xml:report.xml"
+    # - name: upload-test-report
+    #   if: failure()
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: test-result-macos
+    #     path: ${{ github.workspace }}\report.xml
+    # - name: print-memory-leak-logs
+    #   if: always()
+    #   run: |
+    #     cat ./leaks_*
+    # - name: upload-test-logs
+    #   if: always()
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: test-logs-mac64
+    #     path: |
+    #       ${{ github.workspace }}/odbc-logs/
+    #       ${{ github.workspace }}/leaks_
