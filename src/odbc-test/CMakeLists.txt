@@ -32,6 +32,7 @@ include_directories(include ../odbc/include ../network/include)
 
 set(SOURCES 
          src/dummy_test.cpp
+# TODO uncomment/rework the tests after get some connectivity and functionalities working.
 #        src/teamcity/teamcity_boost.cpp
 #        src/teamcity/teamcity_messages.cpp
 #        src/parser_test.cpp
