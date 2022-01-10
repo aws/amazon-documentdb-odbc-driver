@@ -18,6 +18,9 @@
 cmake_minimum_required(VERSION 3.20)
 project(Ignite.C++ VERSION 2.13.0.58917)
 
+include("${CMAKE_CURRENT_SOURCE_DIR}/modules/code-coverage.cmake")
+add_code_coverage_all_targets(EXCLUDE odbc-test)
+
 set(CMAKE_CXX_STANDARD 98)
 
 set(CMAKE_PROJECT_VERSION ${PROJECT_VERSION})
@@ -63,6 +66,7 @@ option (WARNINGS_AS_ERRORS OFF)
 if (${WITH_CORE} OR ${WITH_TESTS})
     find_package(Java 1.8 REQUIRED)
     find_package(JNI REQUIRED)
+    include(UseJava)
 endif()
 
 if (${WARNINGS_AS_ERRORS})
