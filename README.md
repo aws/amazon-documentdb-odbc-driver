@@ -38,12 +38,13 @@
    4. `brew install boost`
    5. Install Java **JDK** (version 8+ - 17 recommended)  
       - This can be done through Homebrew using `brew install --cask temurin<version>`. 
-      - Ensure to set `JAVA_HOME`. 
+      - Ensure to set `JAVA_HOME`.  
+   6. If creating a debug build (`./build_mac_debug64.sh`), install LLVM. 
+      - To ensure LLVM and CMake are compatible, use the LLVM included with XCode by modifying the PATH with `export PATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/:$PATH`.
 2. Run one of the build scripts to create an initial compilation.
    1. E.g.: `./build_mac_release64.sh`
    2. Navigate to the `build/odbc/lib` folder to use the generated files.
-3. Use Microsoft VS Code to work on source code development and testing.
-4. More details in `src\DEVNOTES.txt`.
+3. More details in `src\DEVNOTES.txt`.
 
 ### Linux
 
