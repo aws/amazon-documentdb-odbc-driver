@@ -40,7 +40,7 @@ namespace ignite
             const char* JAVA_DLL1 = "\\jre\\bin\\server\\jvm.dll";
             const char* JAVA_DLL2 = "\\bin\\server\\jvm.dll";
 
-            const char* IGNITE_HOME = "IGNITE_HOME";
+            const char* DOCUMENTDB_HOME = "DOCUMENTDB_HOME";
 
             const char* IGNITE_NATIVE_TEST_CLASSPATH = "IGNITE_NATIVE_TEST_CLASSPATH";
 
@@ -242,7 +242,7 @@ namespace ignite
                 return res;
             }
 
-            std::string CreateIgniteHomeClasspath(const std::string& home, bool forceTest)
+            std::string CreateDocumentDbHomeClasspath(const std::string& home, bool forceTest)
             {
                 std::string res;
 
@@ -353,7 +353,7 @@ namespace ignite
                 // 2. Append home classpath if home is defined.
                 if (home)
                 {
-                    std::string homeCp = CreateIgniteHomeClasspath(*home, forceTest);
+                    std::string homeCp = CreateDocumentDbHomeClasspath(*home, forceTest);
 
                     cp.append(homeCp);
                 }
@@ -375,7 +375,7 @@ namespace ignite
                 return usrCp + ';';
             }
 
-            std::string CreateIgniteClasspath(const std::string& usrCp, const std::string& home)
+            std::string CreateDocumentDbClasspath(const std::string& usrCp, const std::string& home)
             {
                 // 1. Append user classpath if it exists.
                 std::string cp = NormalizeClasspath(usrCp);
@@ -387,7 +387,7 @@ namespace ignite
 
                     bool forceTest = ToLower(env) == "true";
 
-                    std::string homeCp = CreateIgniteHomeClasspath(home, forceTest);
+                    std::string homeCp = CreateDocumentDbHomeClasspath(home, forceTest);
 
                     cp.append(homeCp);
                 }
@@ -396,14 +396,14 @@ namespace ignite
                 return cp;
             }
 
-            std::string ResolveIgniteHome(const std::string& path)
+            std::string ResolveDocumentDbHome(const std::string& path)
             {
                 // 1. Check passed argument.
                 if (IsValidDirectory(path))
                     return path;
 
                 // 2. Check environment variable.
-                std::string home = GetEnv(IGNITE_HOME);
+                std::string home = GetEnv(DOCUMENTDB_HOME);
 
                 if (IsValidDirectory(home))
                     return home;

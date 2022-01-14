@@ -16,6 +16,7 @@ env:
   ODBC_BIN_PATH: "./build/odbc/bin/Release"
   ODBC_BUILD_PATH: "./build/odbc/cmake"
   VCPKG_ROOT: "c:/vcpkg"
+  DOCUMENTDB_HOME: "./build/odbc/bin/Release/libs"
 
 jobs:
   build-windows32:

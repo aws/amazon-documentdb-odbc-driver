@@ -19,7 +19,6 @@
 #define _IGNITE_ODBC_ODBC
 
 #include "ignite/odbc/system/odbc_constants.h"
-#include "ignite/odbc/jni/java.h"
 
 /**
  * @file odbc.h
@@ -35,8 +34,6 @@
 
 namespace ignite
 {
-    using ignite::odbc::jni::java::JniContext;
-
     SQLRETURN SQLGetInfo(SQLHDBC        conn,
                          SQLUSMALLINT   infoType,
                          SQLPOINTER     infoValue,

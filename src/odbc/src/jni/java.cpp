@@ -23,11 +23,12 @@
 #include <algorithm>
 #include <stdexcept>
 
+
+#include <ignite/odbc/ignite_error.h>
 #include <ignite/odbc/jni/utils.h>
 #include <ignite/odbc/jni/java.h>
 #include <ignite/odbc/common/concurrent.h>
 #include <ignite/odbc/common/utils.h>
-#include <ignite/ignite_error.h>
 
 #ifndef JNI_VERSION_9
 #define JNI_VERSION_9 0x00090000
@@ -91,7 +92,7 @@
     }\
 }
 
-using namespace ignite::java;
+using namespace ignite::odbc::java;
 
 namespace ignite
 {
@@ -101,7 +102,7 @@ namespace ignite
         {
             namespace java
             {
-                namespace icc = ignite::odbc::common::concurrent;
+                namespace iocc = ignite::odbc::common::concurrent;
 
                 bool IGNITE_IMPORT_EXPORT IsJava9OrLater()
                 {
@@ -204,46 +205,30 @@ namespace ignite
                 const char* C_CLASS = "java/lang/Class";
                 JniMethod M_CLASS_GET_NAME = JniMethod("getName", "()Ljava/lang/String;", false);
 
-                const char* C_IGNITE_EXCEPTION = "org/apache/ignite/IgniteException";
+                const char* C_DOCUMENTDB_CONNECTION_PROPERTIES =
+                    "software/amazon/documentdb/jdbc/DocumentDbConnectionProperties";
+                JniMethod M_DOCUMENTDB_CONNECTION_PROPERTIES_GET_PROPERTIES_FROM_CONNECTION_STRING =
+                        JniMethod(
+                            "getPropertiesFromConnectionString",
+                            "(Ljava/lang/String;)Lsoftware/amazon/documentdb/jdbc/DocumentDbConnectionProperties;",
+                            true);
 
-                const char* C_PLATFORM_NO_CALLBACK_EXCEPTION = "org/apache/ignite/internal/processors/platform/PlatformNoCallbackException";
+                const char* C_DOCUMENTDB_CONNECTION = "software/amazon/documentdb/jdbc/DocumentDbConnectionProperties";
 
-                const char* C_PLATFORM_TARGET = "org/apache/ignite/internal/processors/platform/PlatformTargetProxy";
-                JniMethod M_PLATFORM_TARGET_IN_LONG_OUT_LONG = JniMethod("inLongOutLong", "(IJ)J", false);
-                JniMethod M_PLATFORM_TARGET_IN_STREAM_OUT_LONG = JniMethod("inStreamOutLong", "(IJ)J", false);
-                JniMethod M_PLATFORM_TARGET_IN_STREAM_OUT_OBJECT = JniMethod("inStreamOutObject", "(IJ)Ljava/lang/Object;", false);
-                JniMethod M_PLATFORM_TARGET_IN_STREAM_OUT_STREAM = JniMethod("inStreamOutStream", "(IJJ)V", false);
-                JniMethod M_PLATFORM_TARGET_IN_OBJECT_STREAM_OUT_OBJECT_STREAM = JniMethod("inObjectStreamOutObjectStream", "(ILjava/lang/Object;JJ)Ljava/lang/Object;", false);
-                JniMethod M_PLATFORM_TARGET_OUT_STREAM = JniMethod("outStream", "(IJ)V", false);
-                JniMethod M_PLATFORM_TARGET_OUT_OBJECT = JniMethod("outObject", "(I)Ljava/lang/Object;", false);
-                JniMethod M_PLATFORM_TARGET_IN_STREAM_ASYNC = JniMethod("inStreamAsync", "(IJ)V", false);
-                JniMethod M_PLATFORM_TARGET_IN_STREAM_OUT_OBJECT_ASYNC = JniMethod("inStreamOutObjectAsync", "(IJ)Ljava/lang/Object;", false);
+                const char* C_DRIVERMANAGER = "java/sql/DriverManager";
+                JniMethod M_DRIVERMANAGER_GET_CONNECTION = 
+                  JniMethod("getConnection", "(Ljava/lang/String;)Ljava/sql/Connection;", true);
 
-                const char* C_PLATFORM_CALLBACK_UTILS = "org/apache/ignite/internal/processors/platform/callback/PlatformCallbackUtils";
+                const char* C_JAVA_SQL_CONNECTION = "java/sql/Connection";
+                JniMethod M_JAVA_SQL_CONNECTION_CLOSE = JniMethod("close", "()V", false);
 
-                JniMethod M_PLATFORM_CALLBACK_UTILS_LOGGER_LOG = JniMethod("loggerLog", "(JILjava/lang/String;Ljava/lang/String;Ljava/lang/String;J)V", true);
-                JniMethod M_PLATFORM_CALLBACK_UTILS_LOGGER_IS_LEVEL_ENABLED = JniMethod("loggerIsLevelEnabled", "(JI)Z", true);
+                // TODO: Provide a "getFullStackTrace" from DocumentDB
+                //JniMethod M_PLATFORM_UTILS_GET_FULL_STACK_TRACE = JniMethod("getFullStackTrace", "(Ljava/lang/Throwable;)Ljava/lang/String;", true);
 
-                JniMethod M_PLATFORM_CALLBACK_UTILS_CONSOLE_WRITE = JniMethod("consoleWrite", "(Ljava/lang/String;Z)V", true);
-
-                JniMethod M_PLATFORM_CALLBACK_UTILS_IN_LONG_OUT_LONG = JniMethod("inLongOutLong", "(JIJ)J", true);
-                JniMethod M_PLATFORM_CALLBACK_UTILS_IN_LONG_LONG_LONG_OBJECT_OUT_LONG = JniMethod("inLongLongLongObjectOutLong", "(JIJJJLjava/lang/Object;)J", true);
-
-                const char* C_PLATFORM_UTILS = "org/apache/ignite/internal/processors/platform/utils/PlatformUtils";
-                JniMethod M_PLATFORM_UTILS_REALLOC = JniMethod("reallocate", "(JI)V", true);
-                JniMethod M_PLATFORM_UTILS_ERR_DATA = JniMethod("errorData", "(Ljava/lang/Throwable;)[B", true);
-                JniMethod M_PLATFORM_UTILS_GET_FULL_STACK_TRACE = JniMethod("getFullStackTrace", "(Ljava/lang/Throwable;)Ljava/lang/String;", true);
-
-                const char* C_PLATFORM_IGNITION = "org/apache/ignite/internal/processors/platform/PlatformIgnition";
-                JniMethod M_PLATFORM_IGNITION_START = JniMethod("start", "(Ljava/lang/String;Ljava/lang/String;IJJ)V", true);
-                JniMethod M_PLATFORM_IGNITION_INSTANCE = JniMethod("instance", "(Ljava/lang/String;)Lorg/apache/ignite/internal/processors/platform/PlatformProcessor;", true);
-                JniMethod M_PLATFORM_IGNITION_ENVIRONMENT_POINTER = JniMethod("environmentPointer", "(Ljava/lang/String;)J", true);
-                JniMethod M_PLATFORM_IGNITION_STOP = JniMethod("stop", "(Ljava/lang/String;Z)Z", true);
-                JniMethod M_PLATFORM_IGNITION_STOP_ALL = JniMethod("stopAll", "(Z)V", true);
 
                 /* STATIC STATE. */
-                icc::CriticalSection JVM_LOCK;
-                icc::CriticalSection CONSOLE_LOCK;
+                iocc::CriticalSection JVM_LOCK;
+                iocc::CriticalSection CONSOLE_LOCK;
                 JniJvm JVM;
                 bool PRINT_EXCEPTION = false;
                 std::vector<ConsoleWriteHandler> consoleWriteHandlers;
@@ -260,9 +245,9 @@ namespace ignite
                   */
                 int ThrowOnMissingHandler(JNIEnv* env)
                 {
-                    jclass cls = env->FindClass(C_PLATFORM_NO_CALLBACK_EXCEPTION);
+                    //jclass cls = env->FindClass(C_PLATFORM_NO_CALLBACK_EXCEPTION);
 
-                    env->ThrowNew(cls, "Callback handler is not set in native platform.");
+                    //env->ThrowNew(cls, "Callback handler is not set in native platform.");
 
                     return 0;
                 }
@@ -277,9 +262,9 @@ namespace ignite
                   */
                 void ThrowToJava(JNIEnv* env, const char* msg)
                 {
-                    jclass cls = env->FindClass(C_IGNITE_EXCEPTION);
+                    //jclass cls = env->FindClass(C_IGNITE_EXCEPTION);
 
-                    env->ThrowNew(cls, msg);
+                    //env->ThrowNew(cls, msg);
                 }
 
                 char* StringToChars(JNIEnv* env, jstring str, int* len) {
@@ -346,13 +331,26 @@ namespace ignite
                 }
 
                 jmethodID FindMethod(JNIEnv* env, jclass cls, JniMethod mthd) {
-                    jmethodID mthd0 = mthd.isStatic ?
-                        env->GetStaticMethodID(cls, mthd.name, mthd.sign) : env->GetMethodID(cls, mthd.name, mthd.sign);
+                    jmethodID mthd0 = mthd.isStatic
+                        ? env->GetStaticMethodID(cls, mthd.name, mthd.sign)
+                        : env->GetMethodID(cls, mthd.name, mthd.sign);
 
                     if (!mthd0)
                         throw JvmException();
 
                     return mthd0;
+                }
+
+                jobject NewObject(JNIEnv* env, jclass clazz, jmethodID constructor, ...) {
+                    va_list args;
+                    va_start(args, constructor);
+                    jobject result = env->NewObject(clazz, constructor, args);
+                    va_end(args);
+
+                    if (!result)
+                        throw JvmException();
+
+                    return result;
                 }
 
                 void AddNativeMethod(JNINativeMethod* mthd, JniMethod jniMthd, void* fnPtr) {
@@ -369,8 +367,8 @@ namespace ignite
                     m_Throwable_getMessage = FindMethod(env, c_Throwable, M_THROWABLE_GET_MESSAGE);
                     m_Throwable_printStackTrace = FindMethod(env, c_Throwable, M_THROWABLE_PRINT_STACK_TRACE);
 
-                    c_PlatformUtils = FindClass(env, C_PLATFORM_UTILS);
-                    m_PlatformUtils_getFullStackTrace = FindMethod(env, c_PlatformUtils, M_PLATFORM_UTILS_GET_FULL_STACK_TRACE);
+                    // TODO: Provide "getFullStackTrace" in DocumentDB
+                    //m_PlatformUtils_getFullStackTrace = FindMethod(env, c_PlatformUtils, M_PLATFORM_UTILS_GET_FULL_STACK_TRACE);
                 }
 
                 void JniJavaMembers::Destroy(JNIEnv* env) {
@@ -425,32 +423,18 @@ namespace ignite
                 }
 
                 void JniMembers::Initialize(JNIEnv* env) {
-                    c_IgniteException = FindClass(env, C_IGNITE_EXCEPTION);
+                    c_DocumentDbConnectionProperties = FindClass(env, C_DOCUMENTDB_CONNECTION_PROPERTIES);
+                    m_DocumentDbConnectionPropertiesGetPropertiesFromConnectionString =
+                        FindMethod(env, c_DocumentDbConnectionProperties, M_DOCUMENTDB_CONNECTION_PROPERTIES_GET_PROPERTIES_FROM_CONNECTION_STRING);
 
-                    c_PlatformIgnition = FindClass(env, C_PLATFORM_IGNITION);
-                    m_PlatformIgnition_start = FindMethod(env, c_PlatformIgnition, M_PLATFORM_IGNITION_START);
-                    m_PlatformIgnition_instance = FindMethod(env, c_PlatformIgnition, M_PLATFORM_IGNITION_INSTANCE);
-                    m_PlatformIgnition_environmentPointer = FindMethod(env, c_PlatformIgnition, M_PLATFORM_IGNITION_ENVIRONMENT_POINTER);
-                    m_PlatformIgnition_stop = FindMethod(env, c_PlatformIgnition, M_PLATFORM_IGNITION_STOP);
-                    m_PlatformIgnition_stopAll = FindMethod(env, c_PlatformIgnition, M_PLATFORM_IGNITION_STOP_ALL);
+                    c_DocumentDbConnection = FindClass(env, C_DOCUMENTDB_CONNECTION);
+                    //m_DocumentDbConnectionInit = FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_PROPERTIES_INIT);
 
-                    c_PlatformTarget = FindClass(env, C_PLATFORM_TARGET);
-                    m_PlatformTarget_inLongOutLong = FindMethod(env, c_PlatformTarget, M_PLATFORM_TARGET_IN_LONG_OUT_LONG);
-                    m_PlatformTarget_inStreamOutLong = FindMethod(env, c_PlatformTarget, M_PLATFORM_TARGET_IN_STREAM_OUT_LONG);
-                    m_PlatformTarget_inStreamOutObject = FindMethod(env, c_PlatformTarget, M_PLATFORM_TARGET_IN_STREAM_OUT_OBJECT);
-                    m_PlatformTarget_outStream = FindMethod(env, c_PlatformTarget, M_PLATFORM_TARGET_OUT_STREAM);
-                    m_PlatformTarget_outObject = FindMethod(env, c_PlatformTarget, M_PLATFORM_TARGET_OUT_OBJECT);
-                    m_PlatformTarget_inStreamOutStream = FindMethod(env, c_PlatformTarget, M_PLATFORM_TARGET_IN_STREAM_OUT_STREAM);
-                    m_PlatformTarget_inObjectStreamOutObjectStream = FindMethod(env, c_PlatformTarget, M_PLATFORM_TARGET_IN_OBJECT_STREAM_OUT_OBJECT_STREAM);
-                    m_PlatformTarget_inStreamAsync = FindMethod(env, c_PlatformTarget, M_PLATFORM_TARGET_IN_STREAM_ASYNC);
-                    m_PlatformTarget_inStreamOutObjectAsync = FindMethod(env, c_PlatformTarget, M_PLATFORM_TARGET_IN_STREAM_OUT_OBJECT_ASYNC);
+                    c_DriverManager = FindClass(env, C_DRIVERMANAGER);
+                    m_DriverManagerGetConnection = FindMethod(env, c_DriverManager, M_DRIVERMANAGER_GET_CONNECTION);
 
-                    c_PlatformUtils = FindClass(env, C_PLATFORM_UTILS);
-                    m_PlatformUtils_reallocate = FindMethod(env, c_PlatformUtils, M_PLATFORM_UTILS_REALLOC);
-                    m_PlatformUtils_errData = FindMethod(env, c_PlatformUtils, M_PLATFORM_UTILS_ERR_DATA);
-
-                    // Find utility classes which are not used from context, but are still required in other places.
-                    CheckClass(env, C_PLATFORM_NO_CALLBACK_EXCEPTION);
+                    c_JavaSqlConnection = FindClass(env, C_JAVA_SQL_CONNECTION);
+                    m_JavaSqlConnectionClose = FindMethod(env, c_JavaSqlConnection, M_JAVA_SQL_CONNECTION_CLOSE);
                 }
 
                 void JniMembers::Destroy(JNIEnv* env) {
@@ -489,20 +473,36 @@ namespace ignite
                 /**
                   * Create JVM.
                   */
-                jint CreateJvm(char** opts, int optsLen, JavaVM** jvm, JNIEnv** env) {
+                jint GetOrCreateJvm(char** opts, int optsLen, JavaVM** jvm, JNIEnv** env) {
+                    // Check to see if a VM is already created
+                    const jsize nJvms = 1;
+                    jsize nJvmsAvailable = 0;
+                    JavaVM* availableJvms[nJvms];
+                    jint res = JNI_GetCreatedJavaVMs(&availableJvms[0], nJvms,
+                                                     &nJvmsAvailable);
+                    if (res == JNI_OK && nJvmsAvailable >= 1) {
+                        *jvm = availableJvms[0];
+                        res = (*jvm)->GetEnv(reinterpret_cast< void** >(env),
+                                             JNI_VERSION_1_8);
+                        if (res == JNI_OK) {
+                            return res;
+                        }
+                    }
+
+                    // Otherwise, create a VM
                     JavaVMOption* opts0 = new JavaVMOption[optsLen];
 
                     for (int i = 0; i < optsLen; i++)
                         opts0[i].optionString = *(opts + i);
 
-                    JavaVMInitArgs args;
+                    JavaVMInitArgs args{
+                        args.version = JNI_VERSION_1_8,
+                        args.nOptions = optsLen,
+                        args.options = opts0,
+                        args.ignoreUnrecognized = 0
+                    };
 
-                    args.version = JNI_VERSION_1_6;
-                    args.nOptions = optsLen;
-                    args.options = opts0;
-                    args.ignoreUnrecognized = 0;
-
-                    jint res = JNI_CreateJavaVM(jvm, reinterpret_cast<void**>(env), &args);
+                    res = JNI_CreateJavaVM(jvm, reinterpret_cast<void**>(env), &args);
 
                     delete[] opts0;
 
@@ -515,18 +515,17 @@ namespace ignite
 
                         int idx = 0;
 
-                        AddNativeMethod(methods + idx++, M_PLATFORM_CALLBACK_UTILS_CONSOLE_WRITE, reinterpret_cast<void*>(JniConsoleWrite));
+                        // TODO: Investigate registering callbacks to get console and logging streams.
 
-                        AddNativeMethod(methods + idx++, M_PLATFORM_CALLBACK_UTILS_LOGGER_LOG, reinterpret_cast<void*>(JniLoggerLog));
-                        AddNativeMethod(methods + idx++, M_PLATFORM_CALLBACK_UTILS_LOGGER_IS_LEVEL_ENABLED, reinterpret_cast<void*>(JniLoggerIsLevelEnabled));
+                        //AddNativeMethod(methods + idx++, M_PLATFORM_CALLBACK_UTILS_CONSOLE_WRITE, reinterpret_cast<void*>(JniConsoleWrite));
 
-                        AddNativeMethod(methods + idx++, M_PLATFORM_CALLBACK_UTILS_IN_LONG_OUT_LONG, reinterpret_cast<void*>(JniInLongOutLong));
-                        AddNativeMethod(methods + idx++, M_PLATFORM_CALLBACK_UTILS_IN_LONG_LONG_LONG_OBJECT_OUT_LONG, reinterpret_cast<void*>(JniInLongLongLongObjectOutLong));
+                        //AddNativeMethod(methods + idx++, M_PLATFORM_CALLBACK_UTILS_LOGGER_LOG, reinterpret_cast<void*>(JniLoggerLog));
+                        //AddNativeMethod(methods + idx++, M_PLATFORM_CALLBACK_UTILS_LOGGER_IS_LEVEL_ENABLED, reinterpret_cast<void*>(JniLoggerIsLevelEnabled));
 
-                        jint res = env->RegisterNatives(FindClass(env, C_PLATFORM_CALLBACK_UTILS), methods, idx);
+                        //jint res = env->RegisterNatives(FindClass(env, C_PLATFORM_CALLBACK_UTILS), methods, idx);
 
-                        if (res != JNI_OK)
-                            throw JvmException();
+                        //if (res != JNI_OK)
+                        //    throw JvmException();
                     }
                 }
 
@@ -600,7 +599,7 @@ namespace ignite
                         if (!JVM.GetJvm())
                         {
                             // 1. Create JVM itself.
-                            jint res = CreateJvm(opts, optsLen, &jvm, &env);
+                            jint res = GetOrCreateJvm(opts, optsLen, &jvm, &env);
 
                             if (res == JNI_OK)
                             {
@@ -712,7 +711,7 @@ namespace ignite
                 }
 
                 void JniContext::Detach() {
-                    icc::Memory::Fence();
+                    iocc::Memory::Fence();
 
                     if (JVM.GetJvm()) {
                         JNIEnv* env;
@@ -722,6 +721,28 @@ namespace ignite
                         if (env)
                             JVM.GetJvm()->DetachCurrentThread();
                     }
+                }
+
+                jobject JniContext::DocumentDbConnect(const char* connectionString,
+                                                   JniErrorInfo* errInfo) {
+                    JNIEnv* env = Attach();
+                    jstring jConnectionString =
+                        env->NewStringUTF(connectionString);
+                    jobject connection = env->CallStaticObjectMethod(
+                        jvm->GetMembers().c_DriverManager,
+                        jvm->GetMembers().m_DriverManagerGetConnection, jConnectionString);
+                    ExceptionCheck(env, errInfo);
+                    return connection;
+                }
+
+                void JniContext::DocumentDbDisconnect(const jobject connection, JniErrorInfo* errInfo) {
+                    if (!connection) {
+                        return;
+                    }
+                    JNIEnv* env = Attach();
+                    env->CallVoidMethod(connection, jvm->GetMembers().m_JavaSqlConnectionClose);
+                    ExceptionCheck(env, errInfo);
+                    env->DeleteLocalRef(connection);
                 }
 
                 void JniContext::IgnitionStart(char* cfgPath, char* name, int factoryId, int64_t dataPtr) {
@@ -1021,7 +1042,21 @@ namespace ignite
 
                         jstring clsName = static_cast<jstring>(env->CallObjectMethod(cls, jvm->GetJavaMembers().m_Class_getName));
                         jstring msg = static_cast<jstring>(env->CallObjectMethod(err, jvm->GetJavaMembers().m_Throwable_getMessage));
-                        jstring trace = static_cast<jstring>(env->CallStaticObjectMethod(jvm->GetJavaMembers().c_PlatformUtils, jvm->GetJavaMembers().m_PlatformUtils_getFullStackTrace, err));
+                        int traceLen = 0;
+                        std::string trace0 = ""; 
+                        if (jvm->GetJavaMembers().c_PlatformUtils
+                            && jvm->GetJavaMembers()
+                                   .m_PlatformUtils_getFullStackTrace) {
+                            jstring trace = static_cast< jstring >(
+                                env->CallStaticObjectMethod(
+                                    jvm->GetJavaMembers().c_PlatformUtils,
+                                    jvm->GetJavaMembers()
+                                        .m_PlatformUtils_getFullStackTrace,
+                                    err));
+ 
+                            trace0 =
+                                JavaStringToCString(env, trace, &traceLen);
+                        }
 
                         env->DeleteLocalRef(cls);
 
@@ -1031,9 +1066,6 @@ namespace ignite
                         int msgLen;
                         std::string msg0 = JavaStringToCString(env, msg, &msgLen);
 
-                        int traceLen;
-                        std::string trace0 = JavaStringToCString(env, trace, &traceLen);
-
                         if (errInfo)
                         {
                             JniErrorInfo errInfo0(IGNITE_JNI_ERR_GENERIC, clsName0.c_str(), msg0.c_str());
@@ -1042,8 +1074,15 @@ namespace ignite
                         }
 
                         // Get error additional data (if any).
-                        jbyteArray errData = static_cast<jbyteArray>(env->CallStaticObjectMethod(
-                            jvm->GetMembers().c_PlatformUtils, jvm->GetMembers().m_PlatformUtils_errData, err));
+                        jbyteArray errData = nullptr;
+                        if (jvm->GetMembers().c_PlatformUtils
+                            && jvm->GetMembers().m_PlatformUtils_errData) {
+                            errData = static_cast< jbyteArray >(
+                                env->CallStaticObjectMethod(
+                                    jvm->GetMembers().c_PlatformUtils,
+                                    jvm->GetMembers().m_PlatformUtils_errData,
+                                    err));
+                        }
 
                         if (errData)
                         {

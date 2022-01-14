@@ -242,6 +242,19 @@ namespace ignite {
                * JNI members.
                */
               struct JniMembers {
+                  jclass c_DocumentDbConnectionProperties;
+                  jmethodID m_DocumentDbConnectionPropertiesGetPropertiesFromConnectionString;
+
+                  jclass c_DocumentDbConnection;
+                  jmethodID m_DocumentDbConnectionInit;
+                  jmethodID m_DocumentDbClose;
+
+                  jclass c_DriverManager;
+                  jmethodID m_DriverManagerGetConnection;
+
+                  jclass c_JavaSqlConnection;
+                  jmethodID m_JavaSqlConnectionClose;
+
                   jclass c_IgniteException;
 
                   jclass c_PlatformIgnition;
@@ -384,6 +397,11 @@ namespace ignite {
                   static void Release(jobject obj);
                   static void SetConsoleHandler(ConsoleWriteHandler consoleHandler);
                   static int RemoveConsoleHandler(ConsoleWriteHandler consoleHandler);
+
+                  jobject DocumentDbConnect(const char* connectionString,
+                                         JniErrorInfo* errInfo);
+
+                  void DocumentDbDisconnect(const jobject connection, JniErrorInfo* errInfo);
 
                   void IgnitionStart(char* cfgPath, char* name, int factoryId,
                                      int64_t dataPtr);

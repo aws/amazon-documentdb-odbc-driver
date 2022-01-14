@@ -31,7 +31,11 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/app/parameter.cpp
         src/app/parameter_set.cpp
         src/common_types.cpp
+        src/common/big_integer.cpp
+        src/common/bits.cpp
         src/common/concurrent.cpp
+        src/common/decimal.cpp
+        src/ignite_error.cpp
         src/common/utils.cpp
         src/config/config_tools.cpp
         src/config/configuration.cpp

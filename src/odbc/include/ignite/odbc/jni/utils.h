@@ -161,7 +161,7 @@ namespace ignite
               * @param forceTest Force test classpath.
               * @return Classpath.
               */
-            IGNITE_IMPORT_EXPORT std::string CreateIgniteHomeClasspath(const std::string& home, bool forceTest);
+            IGNITE_IMPORT_EXPORT std::string CreateDocumentDbHomeClasspath(const std::string& home, bool forceTest);
 
             /**
               * Create Ignite classpath based on user input and home directory.
@@ -170,10 +170,10 @@ namespace ignite
               * @param home Ignite home directory.
               * @return Classpath.
               */
-            IGNITE_IMPORT_EXPORT std::string CreateIgniteClasspath(const std::string& usrCp, const std::string& home);
+            IGNITE_IMPORT_EXPORT std::string CreateDocumentDbClasspath(const std::string& usrCp, const std::string& home);
 
             /**
-              * Resolve IGNITE_HOME directory. Resolution is performed in several
+              * Resolve DOCUMENTDB_HOME directory. Resolution is performed in several
               * steps:
               * 1) Check for path provided as argument.
               * 2) Check for environment variable.
@@ -185,7 +185,7 @@ namespace ignite
               * @param path Optional path to evaluate.
               * @return Resolved Ignite home.
               */
-            IGNITE_IMPORT_EXPORT std::string ResolveIgniteHome(const std::string& path = "");
+            IGNITE_IMPORT_EXPORT std::string ResolveDocumentDbHome(const std::string& path = "");
         }
     }
 }

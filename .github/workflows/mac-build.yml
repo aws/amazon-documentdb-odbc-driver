@@ -15,6 +15,7 @@ env:
   ODBC_LIB_PATH: "./build/odbc/lib"
   ODBC_BIN_PATH: "./build/odbc/bin"
   ODBC_BUILD_PATH: "./build/odbc/build"
+  DOCUMENTDB_HOME: "./build/odbc/bin/libs"
 
 jobs:
   build-mac:

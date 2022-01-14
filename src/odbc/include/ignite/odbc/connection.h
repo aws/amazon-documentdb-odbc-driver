@@ -30,6 +30,7 @@
 #include "ignite/odbc/diagnostic/diagnosable_adapter.h"
 #include "ignite/odbc/streaming/streaming_context.h"
 #include "ignite/odbc/odbc_error.h"
+#include "ignite/odbc/jni/java.h"
 
 namespace ignite
 {
@@ -227,7 +228,7 @@ namespace ignite
                 if (!success)
                     return false;
 
-                parser.Decode(rsp, tempBuffer);
+                //parser.Decode(rsp, tempBuffer);
 
                 return true;
             }
@@ -488,7 +489,23 @@ namespace ignite
              * @throw IgniteError on failure.
              * @return @c true on success and @c false otherwise.
              */
-            bool TryRestoreConnection();
+            bool TryRestoreConnection(IgniteError& err);
+
+            /**
+             * Formats the JDBC connection string from configuration values.
+             * @return the JDBC connection string.
+             */
+            std::string FormatJdbcConnectionString();
+
+            /** 
+             * Creates JVM options
+             */
+            void Connection::SetJvmOptions(const std::string& cp);
+
+            /**
+             * De-initializes the JVM options
+             */
+            void Connection::Deinit();
 
             /**
              * Collect all addresses from config.
@@ -514,9 +531,6 @@ namespace ignite
             /** Parent. */
             Environment* env;
 
-            /** Client Socket. */
-            std::auto_ptr<network::SocketClient> socket;
-
             /** Connection timeout in seconds. */
             int32_t timeout;
 
@@ -534,6 +548,12 @@ namespace ignite
 
             /** Connection info. */
             config::ConnectionInfo info;
+
+            /** Java connection object */
+            jobject connection;
+
+            /** JVM options */
+            std::vector< char* > opts;
 
             /** Streaming context. */
             streaming::StreamingContext streamingContext;

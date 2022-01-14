@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-#include "test_server.h"
 #ifdef _WIN32
 #   include <windows.h>
 #endif
@@ -27,14 +26,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "ignite/ignite.h"
-#include "ignite/ignition.h"
-
 #include "test_utils.h"
 #include "odbc_test_suite.h"
 
 using namespace ignite;
-using namespace ignite::common;
 using namespace ignite_test;
 
 using namespace boost::unit_test;
@@ -51,14 +46,6 @@ struct ConnectionTestSuiteFixture: odbc::OdbcTestSuite
         OdbcTestSuite()
     {
         // No-op.
-    }
-
-    /**
-     * Start a node.
-     */
-    void StartNode()
-    {
-        StartTestNode("queries-test.xml", "NodeMain");
     }
 
     /**
@@ -96,6 +83,20 @@ struct ConnectionTestSuiteFixture: odbc::OdbcTestSuite
         return code;
     }
 
+    static void SetConnectionString(std::string& connectionString) {
+        std::string user = common::GetEnv("DOC_DB_USER_NAME", "documentdb");
+        std::string password = common::GetEnv("DOC_DB_PASSWORD", "");
+        std::string host = "localhost";
+        std::string port = common::GetEnv("DOC_DB_LOCAL_PORT", "27017");
+
+        connectionString =
+        "DRIVER={Apache Ignite};"
+        "ADDRESS=" + host + ":" + port + ";"
+        "SCHEMA=test;"
+        "USER=" + user + ";"
+        "PASSWORD=" + password + ";";
+    }
+
     /**
      * Destructor.
      */
@@ -105,42 +106,42 @@ struct ConnectionTestSuiteFixture: odbc::OdbcTestSuite
     }
 };
 
+
 BOOST_FIXTURE_TEST_SUITE(ConnectionTestSuite, ConnectionTestSuiteFixture)
 
 BOOST_AUTO_TEST_CASE(TestConnectionRestore)
 {
-    StartNode();
+    std::string connectionString;
+    SetConnectionString(connectionString);
 
-    Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
+    Connect(connectionString);
+    Disconnect();
 
-    // Check that query was successfully executed.
-    BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "");
+    // TODO: Re-enable when querying is supported.
 
-    // Stop node.
-    Ignition::StopAll(true);
+    //// Check that query was successfully executed.
+    //BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "");
 
-    // Query execution should throw ODBC error.
-    BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "08S01");
+    //// Query execution should throw ODBC error.
+    //BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "08S01");
 
-    // Reusing a closed connection should not crash an application.
-    BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "08001");
+    //// Reusing a closed connection should not crash an application.
+    //BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "08001");
 
-    StartNode();
+    //// Check that connection was restored.
+    //BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "");
 
-    // Check that connection was restored.
-    BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "");
 }
 
 BOOST_AUTO_TEST_CASE(TestConnectionMemoryLeak)
 {
-    TestServer testServer(11100);
+    std::string connectionString;
+    SetConnectionString(connectionString);
 
-    testServer.PushHandshakeResponse(true);
-    testServer.Start();
+    Connect(connectionString);
 
-    Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11100;SCHEMA=cache");
-
-    ExecQuery("Select * from Test");
+    // TODO: Re-enable when support for queries is available
+    //ExecQuery("Select * from Test");
 
     Disconnect();
     Disconnect();
