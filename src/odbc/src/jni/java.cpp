@@ -495,12 +495,11 @@ namespace ignite
                     for (int i = 0; i < optsLen; i++)
                         opts0[i].optionString = *(opts + i);
 
-                    JavaVMInitArgs args{
-                        args.version = JNI_VERSION_1_8,
-                        args.nOptions = optsLen,
-                        args.options = opts0,
-                        args.ignoreUnrecognized = 0
-                    };
+                    JavaVMInitArgs args;
+                    args.version = JNI_VERSION_1_8;
+                    args.nOptions = optsLen;
+                    args.options = opts0;
+                    args.ignoreUnrecognized = 0;
 
                     res = JNI_CreateJavaVM(jvm, reinterpret_cast<void**>(env), &args);
 
