@@ -17,6 +17,16 @@ env:
   ODBC_BUILD_PATH: "./build/odbc/cmake"
   VCPKG_ROOT: "c:/vcpkg"
   DOCUMENTDB_HOME: "./build/odbc/bin/Release"
+  DOC_DB_KEYPAIR: ${{secrets.DOC_DB_KEYPAIR}}
+  DOC_DB_USER_NAME: ${{secrets.DOC_DB_USER_NAME}}
+  DOC_DB_PASSWORD: ${{secrets.DOC_DB_PASSWORD}}
+  DOC_DB_USER: ${{secrets.DOC_DB_USER}}
+  DOC_DB_HOST: ${{secrets.DOC_DB_HOST}}
+  OMIT_DOCUMENTDB: ${{ github.event.inputs.testWithoutDocumnetDb || '0' }}
+  RUN_REMOTE_INTEGRATION_TESTS: ${{ github.event.inputs.testWithoutDocumnetDb && 'false' || 'true' }}
+  DOC_DB_LOCAL_PORT: 27019
+  DOC_DB_REMOTE_PORT: 27017
+  DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
 
 jobs:
   build-windows32:
@@ -56,6 +66,15 @@ jobs:
     - name: register-driver
       run: |
         .\src\odbc\install\install_x86.cmd ${{ env.ODBC_BIN_PATH }}\ignite.odbc.dll
+    - name: Extract key-pair into file
+      run: |
+        mkdir -p ~/certs
+        echo "$DOC_DB_KEYPAIR" > ~/certs/docdb-sshtunnel.pem
+        chmod 400 ~/certs/docdb-sshtunnel.pem
+    - name: Run SSH tunnel to DocumentDB server
+      if: ${{ env.OMIT_DOCUMENTDB == '0' }}
+      run: |
+        ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/certs/docdb-sshtunnel.pem -L $DOC_DB_LOCAL_PORT:${{secrets.DOC_DB_HOST}}:$DOC_DB_REMOTE_PORT ${{secrets.DOC_DB_USER}}
     - name: run-tests
       run: |
         ${{ env.ODBC_BIN_PATH }}/ignite-odbc-tests.exe
@@ -128,6 +147,15 @@ jobs:
     - name: register-driver
       run: |
         .\src\odbc\install\install_amd64.cmd ${{ env.ODBC_BIN_PATH }}\ignite.odbc.dll
+    - name: Extract key-pair into file
+      run: |
+        mkdir -p ~/certs
+        echo "$DOC_DB_KEYPAIR" > ~/certs/docdb-sshtunnel.pem
+        chmod 400 ~/certs/docdb-sshtunnel.pem
+    - name: Run SSH tunnel to DocumentDB server
+      if: ${{ env.OMIT_DOCUMENTDB == '0' }}
+      run: |
+        ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/certs/docdb-sshtunnel.pem -L $DOC_DB_LOCAL_PORT:${{secrets.DOC_DB_HOST}}:$DOC_DB_REMOTE_PORT ${{secrets.DOC_DB_USER}}
     - name: run-tests
       run: |
         ${{ env.ODBC_BIN_PATH }}/ignite-odbc-tests.exe
