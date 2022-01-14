@@ -49,3 +49,15 @@
 ### Linux
 
 TBD
+
+### Troubleshooting 
+
+#### Issue: MacOS build fails with error about iODBC header
+##### Example error message  
+```
+/Library/Frameworks/iODBC.framework/Headers/sqlext.h:82:10: fatal error: 'iODBC/sql.h' file not found
+#include <iODBC/sql.h>
+     ^~~~~~~~~~~~~ 
+``` 
+##### Fix 
+If you have installed the iODBC Driver Manager, the headers installed with it might be used instead of those from `unixodbc`. You may need to uninstall this driver manager and remove the `/Library/Frameworks/iODBC.framework/` directory. 
