@@ -62,7 +62,7 @@ jobs:
 
     - name: Run SSH tunnel to DocumentDB server
       run: |
-        ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/certs/docdb-sshtunnel.pem -L $DOC_DB_LOCAL_PORT:${{secrets.DOC_DB_HOST}}:$DOC_DB_REMOTE_PORT ${{secrets.DOC_DB_USER}}
+        ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/certs/docdb-sshtunnel.pem -L ${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
 
     - name: Install dependencies Windows
       run: vcpkg integrate install; vcpkg install openssl:x86-windows boost-test:x86-windows boost-asio:x86-windows boost-chrono:x86-windows boost-interprocess:x86-windows boost-regex:x86-windows boost-system:x86-windows boost-thread:x86-windows
@@ -148,7 +148,7 @@ jobs:
 
     - name: Run SSH tunnel to DocumentDB server
       run: |
-        ssh -f -N -L -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/certs/docdb-sshtunnel.pem -L $DOC_DB_LOCAL_PORT:${{secrets.DOC_DB_HOST}}:$DOC_DB_REMOTE_PORT ${{secrets.DOC_DB_USER}}
+        ssh -f -N -L -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/certs/docdb-sshtunnel.pem -L ${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
 
     - name: Install dependencies Windows
       run: vcpkg integrate install; vcpkg install openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
