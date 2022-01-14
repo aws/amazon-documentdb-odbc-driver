@@ -32,47 +32,53 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
+
     - name: Get Java distribution
       uses: actions/setup-java@v2
       with:
         distribution: 'temurin'
         java-version: '17'
         architecture: x86
+
     - name: "Update path for Java"
       run: |
         echo "${{ env.JAVA_HOME }}\bin\server" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
     - name: "Update path for WIX Toolset"
       run: |
         echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
     - name: Get specific version CMake, v3.20.1
       uses: lukka/get-cmake@v3.20.1
+
     - name: add-msbuild-to-path
       uses: microsoft/setup-msbuild@v1.0.2
-    - name: Install dependencies Windows
-      run: vcpkg integrate install; vcpkg install openssl:x86-windows boost-test:x86-windows boost-asio:x86-windows boost-chrono:x86-windows boost-interprocess:x86-windows boost-regex:x86-windows boost-system:x86-windows boost-thread:x86-windows
-      env:
-        VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
-    - name: configure-and-build-driver
-      run: |
-        .\build_win_release32.ps1
-      env:
-        OPENSSL_ROOT_DIR: '${{ env.VCPKG_ROOT }}/packages/openssl_x86-windows'
-    # - name: import-registry
-    #   run: |
-    #     reg import .\src\Tests\Tests\AWSProfileRegistry_Win32.reg
-    #     reg import .\src\Tests\Tests\IAMRegistry_Win32.reg
-    #     mkdir ${{ github.workspace }}\odbc-logs
-    - name: register-driver
-      run: |
-        .\src\odbc\install\install_x86.cmd ${{ env.ODBC_BIN_PATH }}\ignite.odbc.dll
+
     - name: Extract key-pair into file
       run: |
         mkdir -p ~/certs
         echo "$DOC_DB_KEYPAIR" > ~/certs/docdb-sshtunnel.pem
         chmod 400 ~/certs/docdb-sshtunnel.pem
+
     - name: Run SSH tunnel to DocumentDB server
       run: |
         ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/certs/docdb-sshtunnel.pem -L $DOC_DB_LOCAL_PORT:${{secrets.DOC_DB_HOST}}:$DOC_DB_REMOTE_PORT ${{secrets.DOC_DB_USER}}
+
+    - name: Install dependencies Windows
+      run: vcpkg integrate install; vcpkg install openssl:x86-windows boost-test:x86-windows boost-asio:x86-windows boost-chrono:x86-windows boost-interprocess:x86-windows boost-regex:x86-windows boost-system:x86-windows boost-thread:x86-windows
+      env:
+        VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
+
+    - name: configure-and-build-driver
+      run: |
+        .\build_win_release32.ps1
+      env:
+        OPENSSL_ROOT_DIR: '${{ env.VCPKG_ROOT }}/packages/openssl_x86-windows'
+
+    - name: register-driver
+      run: |
+        .\src\odbc\install\install_x86.cmd ${{ env.ODBC_BIN_PATH }}\ignite.odbc.dll
+
     - name: run-tests
       run: |
         ${{ env.ODBC_BIN_PATH }}/ignite-odbc-tests.exe
@@ -112,47 +118,53 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
+
     - name: Get Java distribution
       uses: actions/setup-java@v2
       with:
         distribution: 'temurin'
         java-version: '17'
         architecture: x64
+
     - name: "Update path for Java"
       run: |
         echo "${{ env.JAVA_HOME }}\bin\server" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
     - name: "Update path for WIX Toolset"
       run: |
         echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
     - name: Get specific version CMake, v3.20.1
       uses: lukka/get-cmake@v3.20.1
+
     - name: add-msbuild-to-path
       uses: microsoft/setup-msbuild@v1.0.2
-    - name: Install dependencies Windows
-      run: vcpkg integrate install; vcpkg install openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
-      env:
-        VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
-    - name: configure-and-build-driver
-      run: |
-        .\build_win_release64.ps1
-      env:
-        OPENSSL_ROOT_DIR: '${{ env.VCPKG_ROOT }}/packages/openssl_x64-windows'
-  #   - name: import-registry
-  #     run: |
-  #       reg import .\src\Tests\Tests\AWSProfileRegistry.reg
-  #       reg import .\src\Tests\Tests\IAMRegistry.reg
-  #       mkdir ${{ github.workspace }}\odbc-logs
-    - name: register-driver
-      run: |
-        .\src\odbc\install\install_amd64.cmd ${{ env.ODBC_BIN_PATH }}\ignite.odbc.dll
+
     - name: Extract key-pair into file
       run: |
         mkdir -p ~/certs
         echo "$DOC_DB_KEYPAIR" > ~/certs/docdb-sshtunnel.pem
         chmod 400 ~/certs/docdb-sshtunnel.pem
+
     - name: Run SSH tunnel to DocumentDB server
       run: |
-        ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/certs/docdb-sshtunnel.pem -L $DOC_DB_LOCAL_PORT:${{secrets.DOC_DB_HOST}}:$DOC_DB_REMOTE_PORT ${{secrets.DOC_DB_USER}}
+        ssh -f -N -L -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/certs/docdb-sshtunnel.pem -L $DOC_DB_LOCAL_PORT:${{secrets.DOC_DB_HOST}}:$DOC_DB_REMOTE_PORT ${{secrets.DOC_DB_USER}}
+
+    - name: Install dependencies Windows
+      run: vcpkg integrate install; vcpkg install openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
+      env:
+        VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
+
+    - name: configure-and-build-driver
+      run: |
+        .\build_win_release64.ps1
+      env:
+        OPENSSL_ROOT_DIR: '${{ env.VCPKG_ROOT }}/packages/openssl_x64-windows'
+
+    - name: register-driver
+      run: |
+        .\src\odbc\install\install_amd64.cmd ${{ env.ODBC_BIN_PATH }}\ignite.odbc.dll
+
     - name: run-tests
       run: |
         ${{ env.ODBC_BIN_PATH }}/ignite-odbc-tests.exe
