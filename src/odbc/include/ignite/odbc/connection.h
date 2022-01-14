@@ -500,12 +500,12 @@ namespace ignite
             /** 
              * Creates JVM options
              */
-            void Connection::SetJvmOptions(const std::string& cp);
+            void SetJvmOptions(const std::string& cp);
 
             /**
              * De-initializes the JVM options
              */
-            void Connection::Deinit();
+            void Deinit();
 
             /**
              * Collect all addresses from config.
