@@ -53,6 +53,9 @@ jobs:
     #     reg import .\src\Tests\Tests\AWSProfileRegistry_Win32.reg
     #     reg import .\src\Tests\Tests\IAMRegistry_Win32.reg
     #     mkdir ${{ github.workspace }}\odbc-logs
+    - name: register-driver
+      run: |
+        .\src\odbc\install\install_x86.cmd
     - name: run-tests
       run: |
         ${{ env.ODBC_BIN_PATH }}/ignite-odbc-tests.exe
@@ -122,6 +125,9 @@ jobs:
   #       reg import .\src\Tests\Tests\AWSProfileRegistry.reg
   #       reg import .\src\Tests\Tests\IAMRegistry.reg
   #       mkdir ${{ github.workspace }}\odbc-logs
+    - name: register-driver
+      run: |
+        .\src\odbc\install\install_amd64.cmd
     - name: run-tests
       run: |
         ${{ env.ODBC_BIN_PATH }}/ignite-odbc-tests.exe
