@@ -13,8 +13,8 @@
    6. Wix Toolset v4 Schemas for Visual Studio
    7. WiX Toolset Visual Studio 2019 Extension
 2. OpenSSL (full)
-   1. Installed via [Chocolatey](https://community.chocolatey.org/packages/openssl).
-   2. Or installed via [VCPKG](https://vcpkg.io/en/getting-started.html) (`.\vcpkg install openssl`).
+   1. Installed via [VCPKG](https://vcpkg.io/en/getting-started.html) (`.\vcpkg install openssl`).
+   2. Or installed via [Chocolatey](https://community.chocolatey.org/packages/openssl). 
    3. Ensure to set the OPENSSL_ROOT_DIR.
 3. [WiX Installer (3.11)](https://wixtoolset.org/releases/)
    1. Ensure to add path to WiX executables (e.g. `C:\Program Files (x86)\WiX Toolset v3.11\bin`)
