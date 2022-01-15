@@ -59,10 +59,13 @@ jobs:
         mkdir -p ~/certs
         echo "${{env.DOC_DB_KEYPAIR}}" > ~/certs/docdb-sshtunnel.pem
         chmod 400 ~/certs/docdb-sshtunnel.pem
+        mkdir -p ~/.ssh
+        copy ./src/odbc-test/config/known_hosts ~/.ssh/known_hosts
+        chmod 400 ~/.ssh/known_hosts
 
     - name: Run SSH tunnel to DocumentDB server
       run: |
-        ssh.exe -f -N -o UserKnownHostsFile=NUL -o StrictHostKeyChecking=no -i ~/certs/docdb-sshtunnel.pem -L ${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
+        ssh.exe -f -N -i ~/certs/docdb-sshtunnel.pem -L ${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
 
     - name: Install dependencies Windows
       run: vcpkg integrate install; vcpkg install openssl:x86-windows boost-test:x86-windows boost-asio:x86-windows boost-chrono:x86-windows boost-interprocess:x86-windows boost-regex:x86-windows boost-system:x86-windows boost-thread:x86-windows
@@ -145,10 +148,13 @@ jobs:
         mkdir -p ~/certs
         echo "${{env.DOC_DB_KEYPAIR}}" > ~/certs/docdb-sshtunnel.pem
         chmod 400 ~/certs/docdb-sshtunnel.pem
+        mkdir -p ~/.ssh
+        copy ./src/odbc-test/config/known_hosts ~/.ssh/known_hosts
+        chmod 400 ~/.ssh/known_hosts
 
     - name: Run SSH tunnel to DocumentDB server
       run: |
-        ssh.exe -f -N -o UserKnownHostsFile=NUL -o StrictHostKeyChecking=no -i ~/certs/docdb-sshtunnel.pem -L ${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
+        ssh.exe -f -N ~/certs/docdb-sshtunnel.pem -L ${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
 
     - name: Install dependencies Windows
       run: vcpkg integrate install; vcpkg install openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
