@@ -60,8 +60,7 @@ jobs:
         echo "${{env.DOC_DB_KEYPAIR}}" > ~/certs/docdb-sshtunnel.pem
         chmod 400 ~/certs/docdb-sshtunnel.pem
         mkdir -p ~/.ssh
-        copy ./src/odbc-test/config/known_hosts ~/.ssh/known_hosts
-        chmod 400 ~/.ssh/known_hosts
+        copy ./src/odbc-test/config/ssh_config ~/.ssh/config
 
     - name: Run SSH tunnel to DocumentDB server
       run: |
@@ -149,8 +148,7 @@ jobs:
         echo "${{env.DOC_DB_KEYPAIR}}" > ~/certs/docdb-sshtunnel.pem
         chmod 400 ~/certs/docdb-sshtunnel.pem
         mkdir -p ~/.ssh
-        copy ./src/odbc-test/config/known_hosts ~/.ssh/known_hosts
-        chmod 400 ~/.ssh/known_hosts
+        copy ./src/odbc-test/config/ssh_config ~/.ssh/config
 
     - name: Run SSH tunnel to DocumentDB server
       run: |
