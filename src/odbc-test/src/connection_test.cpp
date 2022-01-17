@@ -84,10 +84,11 @@ struct ConnectionTestSuiteFixture: odbc::OdbcTestSuite
     }
 
     static void SetConnectionString(std::string& connectionString) {
+        // NOTE: Assuming we are using internal SSH tunnel
         std::string user = common::GetEnv("DOC_DB_USER_NAME", "documentdb");
         std::string password = common::GetEnv("DOC_DB_PASSWORD", "");
-        std::string host = "localhost";
-        std::string port = common::GetEnv("DOC_DB_LOCAL_PORT", "27017");
+        std::string host = common::GetEnv("DOC_DB_HOST", "");
+        std::string port = "27017";
 
         connectionString =
         "DRIVER={Apache Ignite};"
