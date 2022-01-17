@@ -20,6 +20,8 @@ project(ignite-odbc)
 set(TARGET ${PROJECT_NAME})
 
 find_package(ODBC REQUIRED)
+find_package(mongocxx REQUIRED)
+find_package(bsoncxx REQUIRED)
 
 include_directories(SYSTEM ${ODBC_INCLUDE_DIRS})
 include_directories(include)
@@ -84,7 +86,8 @@ add_library(${TARGET} SHARED ${SOURCES})
 
 set_target_properties(${TARGET} PROPERTIES VERSION ${CMAKE_PROJECT_VERSION})
 
-target_link_libraries(${TARGET} ${ODBC_LIBRARIES})
+target_link_libraries(${TARGET} ${ODBC_LIBRARIES} mongo::mongocxx_shared) 
+
 
 if (WIN32)
     target_link_libraries(${TARGET} ignite-common-objlib ignite-binary-objlib ignite-network-objlib odbccp32 shlwapi)
@@ -164,4 +167,17 @@ install(TARGETS ${TARGET}
 
 if (WIN32 AND ${WITH_ODBC_MSI})
    install(FILES ${WIX_INSTALLER_PREFIX}.msi DESTINATION bin)
+endif()
+
+
+# Sanity-check that static library macros are not set when building against the shared library.
+# Users don't need to include this section in their projects.
+get_target_property(LIBMONGOCXX_DEFINITIONS mongo::mongocxx_shared INTERFACE_COMPILE_DEFINITIONS)
+list(FIND LIBMONGOCXX_DEFINITIONS "BSONCXX_STATIC" LIST_IDX)
+if (${LIST_IDX} GREATER -1)
+    message(FATAL_ERROR "Expected BSONCXX_STATIC to not be defined")
+endif()
+list(FIND LIBMONGOCXX_DEFINITIONS "MONGOCXX_STATIC" LIST_IDX)
+if (${LIST_IDX} GREATER -1)
+    message(FATAL_ERROR "Expected MONGOCXX_STATIC to not be defined")
 endif()

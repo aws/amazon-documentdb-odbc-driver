@@ -17,6 +17,20 @@
 
 project(ignite-odbc-tests)
 
+if(POLICY CMP0025)
+    cmake_policy(SET CMP0025 NEW)
+endif()
+
+# Enforce the C++ standard, and disable extensions.
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 11)
+endif()
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror")
+endif()
+
 set(TARGET ${PROJECT_NAME})
 
 if (WIN32)
@@ -26,12 +40,25 @@ endif()
 find_package(Boost 1.53 REQUIRED COMPONENTS unit_test_framework chrono thread system regex)
 
 find_package(ODBC REQUIRED)
+find_package(mongocxx REQUIRED)
+find_package(bsoncxx REQUIRED)
 
 include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS})
 include_directories(include ../odbc/include ../network/include)
 
+# Visual Studio pre 2017 requires boost polyfill.
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND CMAKE_CXX_STANDARD LESS 17)
+  find_package(Boost 1.56.0 REQUIRED)
+  if (CMAKE_VERSION VERSION_LESS 3.15.0)
+    target_include_directories(hello_mongocxx PRIVATE ${Boost_INCLUDE_DIRS})
+  else()
+    target_link_libraries(hello_mongocxx PRIVATE Boost::boost)
+  endif()
+endif()
+
 set(SOURCES 
          src/dummy_test.cpp
+         src/mongo_cxx_driver_test.cpp
 # TODO uncomment/rework the tests after get some connectivity and functionalities working.
 #        src/teamcity/teamcity_boost.cpp
 #        src/teamcity/teamcity_messages.cpp
@@ -96,7 +123,7 @@ set(SOURCES
 
 add_executable(${TARGET} ${SOURCES})
 
-target_link_libraries(${TARGET} ${Boost_LIBRARIES} ignite ${ODBC_LIBRARY})
+target_link_libraries(${TARGET} ${Boost_LIBRARIES} ignite ${ODBC_LIBRARY} mongo::mongocxx_shared)
 target_code_coverage(${TARGET}  PUBLIC AUTO ALL)
 
 if (WIN32)
