@@ -18,7 +18,7 @@ export DOCUMENTDB_HOME="$DRIVER_BIN_DIR"
 if [ ! -f "$JDBC_DRIVER_FULLPATH" ]; then
     mkdir "$PROJECT_DIR/libs"
     echo "Downloading version $JDBC_DRIVER_VERSION of JDBC driver..."
-    curl -o "$JDBC_DRIVER_FULLPATH" https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v$JDBC_DRIVER_VERSION/$JDBC_DRIVER_FILENAME
+    curl -v -o "$JDBC_DRIVER_FULLPATH" -L https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v$(JDBC_DRIVER_VERSION)/$(JDBC_DRIVER_FILENAME)
     echo "Download complete." 
 fi
 
