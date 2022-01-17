@@ -12,9 +12,9 @@ on:
 
 env:
   CI_OUTPUT_PATH: "ci-output"
-  ODBC_LIB_PATH: "./build/odbc/lib"
-  ODBC_BIN_PATH: "./build/odbc/bin"
-  ODBC_BUILD_PATH: "./build/odbc/build"
+  ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"
+  ODBC_BIN_PATH: "${{github.workspace}}/build/odbc/bin"
+  ODBC_BUILD_PATH: "${{github.workspace}}/build/odbc/build"
   DOCUMENTDB_HOME: "${{github.workspace}}/build/odbc/bin"
 
 jobs:
@@ -55,6 +55,15 @@ jobs:
     #     sudo cp ./src/Tests/Tests/odbc-mac.ini /Library/ODBC/odbc.ini
     #     sudo cp ./src/Tests/Tests/odbcinst-mac.ini /Library/ODBC/odbcinst.ini
     #     mkdir ${{ github.workspace }}/odbc-logs
+    - name: register-odbc-driver
+      run: |
+        echo "[Apache Ignite]"                                      > "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
+        echo "Description=Apache Ignite"                           >> "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
+        echo "Driver=${{env.ODBC_LIB_PATH}}/libignite-odbc.dylib"  >> "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
+        echo "Setup=${{env.ODBC_LIB_PATH}}/libignite-odbc.dylib"   >> "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
+        echo "DriverODBCVer=03.00"                                 >> "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
+        echo "FileUsage=0"                                         >> "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
+        odbcinst -i -d -f "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
     - name: run-tests
       run: |
         ./build/odbc/bin/ignite-odbc-tests
