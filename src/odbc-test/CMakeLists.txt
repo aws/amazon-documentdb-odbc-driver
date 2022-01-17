@@ -40,32 +40,23 @@ endif()
 find_package(Boost 1.53 REQUIRED COMPONENTS unit_test_framework chrono thread system regex)
 
 find_package(ODBC REQUIRED)
-find_package(mongocxx REQUIRED)
-find_package(bsoncxx REQUIRED)
 
 include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS})
 include_directories(include ../odbc/include ../network/include)
 
-# Visual Studio pre 2017 requires boost polyfill.
-if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND CMAKE_CXX_STANDARD LESS 17)
-  find_package(Boost 1.56.0 REQUIRED)
-  if (CMAKE_VERSION VERSION_LESS 3.15.0)
-    target_include_directories(hello_mongocxx PRIVATE ${Boost_INCLUDE_DIRS})
-  else()
-    target_link_libraries(hello_mongocxx PRIVATE Boost::boost)
-  endif()
-endif()
+
 
 set(SOURCES 
-         src/dummy_test.cpp
-         src/mongo_cxx_driver_test.cpp
+#        ../mongotest/hello_mongocxx.cpp
+#         src/dummy_test.cpp
+#         src/mongo_cxx_driver_test.cpp
 # TODO uncomment/rework the tests after get some connectivity and functionalities working.
 #        src/teamcity/teamcity_boost.cpp
 #        src/teamcity/teamcity_messages.cpp
 #        src/parser_test.cpp
 #        src/cursor_test.cpp
 #        src/connection_info_test.cpp
-#        src/connection_test.cpp
+        src/connection_test.cpp
 #        src/application_data_buffer_test.cpp
 #        src/column_test.cpp
 #        src/configuration_test.cpp
@@ -123,8 +114,8 @@ set(SOURCES
 
 add_executable(${TARGET} ${SOURCES})
 
-target_link_libraries(${TARGET} ${Boost_LIBRARIES} ignite ${ODBC_LIBRARY} mongo::mongocxx_shared)
-target_code_coverage(${TARGET}  PUBLIC AUTO ALL)
+target_link_libraries(${TARGET} ${Boost_LIBRARIES} ignite ${ODBC_LIBRARY})
+#target_code_coverage(${TARGET}  PUBLIC AUTO ALL)
 
 if (WIN32)
     remove_definitions(-DUNICODE=1)

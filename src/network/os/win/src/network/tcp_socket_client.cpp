@@ -25,6 +25,12 @@
 
 #include "network/tcp_socket_client.h"
 
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+#include <mongocxx/uri.hpp>
+
 namespace ignite
 {
     namespace network
@@ -251,6 +257,43 @@ namespace ignite
         int TcpSocketClient::WaitOnSocket(int32_t timeout, bool rd)
         {
             return sockets::WaitOnSocket(socketHandle, timeout, rd);
+        }
+
+        void TcpSocketClient::ConnectCPPDocumentDB() 
+        {
+            /*
+            using bsoncxx::builder::basic::kvp;
+            using bsoncxx::builder::basic::make_document;
+
+            // The mongocxx::instance constructor and destructor initialize and
+            // shut down the driver, respectively. Therefore, a
+            // mongocxx::instance must be created before using the driver and
+            // must remain alive for as long as the driver is in use.
+            mongocxx::instance inst;
+
+            try {
+                const auto uri = mongocxx::uri{
+                    "mongodb://documentdb:bqdocumentdblab@127.0.0.1:27019/"
+                    "?tls=true&tlsCAFile=C:\\Users\\affon\\.ssh\\rds-ca-2019-"
+                    "root.pem&tlsAllowInvalidHostnames=true"};
+
+                auto client = mongocxx::client{uri};
+                auto database = client["test"];
+                auto collection = database["test"];
+                mongocxx::cursor cursor = collection.find({});
+                for (auto doc : cursor) {
+                    std::cout << bsoncxx::to_json(doc) << "\n";
+                }
+                // auto result = test.run_command(make_document(kvp("isMaster",
+                // 1))); std::cout << bsoncxx::to_json(result) << std::endl;
+
+                // return EXIT_SUCCESS;
+            } catch (const std::exception& xcp) {
+                std::cout << "connection failed: " << xcp.what() << std::endl;
+                // return EXIT_FAILURE;
+            }
+            */
+        
         }
     }
 }

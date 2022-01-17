@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-#define BOOST_TEST_MODULE MongoCXXDriverTest
 #include <boost/test/unit_test.hpp>
 #include <cstdlib>
 #include <iostream>
@@ -29,6 +28,7 @@
 #define BOOST_TEST_MODULE MongoCXXDriverTest
 #include <boost/test/unit_test.hpp>
 
+
 BOOST_AUTO_TEST_CASE( mongo_cxx_driver_connect_test )
 {
     using bsoncxx::builder::basic::kvp;
@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE( mongo_cxx_driver_connect_test )
     mongocxx::instance inst;
 
     try {
-        const auto uri = mongocxx::uri{"mongodb://documentdb:bqdocumentdblab@127.0.0.1:27017/?tls=true&tlsCAFile=~/.ssh/rds-combined-ca-bundle.pem&tlsAllowInvalidHostnames=true"};
+        const auto uri = mongocxx::uri{"mongodb://documentdb:bqdocumentdblab@127.0.0.1:27019/?tls=true&tlsCAFile=~/.ssh/rds-combined-ca-bundle.pem&tlsAllowInvalidHostnames=true"};
 
         auto client = mongocxx::client{uri};
         auto database = client["test"];
@@ -52,10 +52,10 @@ BOOST_AUTO_TEST_CASE( mongo_cxx_driver_connect_test )
         // auto result = test.run_command(make_document(kvp("isMaster", 1)));
         // std::cout << bsoncxx::to_json(result) << std::endl;
 
-        return EXIT_SUCCESS;
+        //return EXIT_SUCCESS;
     } catch (const std::exception& xcp) {
         std::cout << "connection failed: " << xcp.what() << std::endl;
-        return EXIT_FAILURE;
+        //return EXIT_FAILURE;
     }
 }
 

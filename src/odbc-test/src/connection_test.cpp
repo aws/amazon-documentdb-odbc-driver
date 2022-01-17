@@ -146,4 +146,10 @@ BOOST_AUTO_TEST_CASE(TestConnectionMemoryLeak)
     Disconnect();
 }
 
+BOOST_AUTO_TEST_CASE(TestMongoCPPConnection) {
+
+    ConnectCPPDocumentDB();
+
+}
+
 BOOST_AUTO_TEST_SUITE_END()

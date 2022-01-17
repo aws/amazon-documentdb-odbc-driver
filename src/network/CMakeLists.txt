@@ -38,8 +38,10 @@ if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
 endif()
 
 find_package(OpenSSL REQUIRED)
+find_package(mongocxx REQUIRED)
+find_package(bsoncxx REQUIRED)
 
-include_directories(include src ${OPENSSL_INCLUDE_DIR})
+include_directories(include src ${OPENSSL_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIRS} ${BSONCXX_INCLUDE_DIRS})
 
 set(SOURCES src/network/network.cpp
         src/network/ssl/secure_socket_client.cpp
@@ -78,9 +80,9 @@ foreach(_target_lib IN LISTS _target_libs)
     if (${_target_lib} STREQUAL ${TARGET}-objlib)
         set_target_properties(${_target_lib} PROPERTIES POSITION_INDEPENDENT_CODE 1)
 
-        target_link_libraries(${_target_lib} ignite-common-objlib)
+        target_link_libraries(${_target_lib} ignite-common-objlib mongo::mongocxx_shared)
     else()
-        target_link_libraries(${_target_lib} ignite-common)
+        target_link_libraries(${_target_lib} ignite-common mongo::mongocxx_shared)
     endif()
 
     if (WIN32)

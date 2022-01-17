@@ -98,6 +98,8 @@ namespace ignite
              */
             virtual bool IsBlocking() const;
 
+            void ConnectCPPDocumentDB();
+
         private:
             /**
              * Close established connection.
