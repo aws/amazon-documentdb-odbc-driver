@@ -63,6 +63,9 @@ jobs:
         ./build_mac_release64.sh
       env:
         OPENSSL_ROOT_DIR: /usr/local/opt/openssl
+    - name: code-review
+      uses: ZedThree/clang-tidy-review@v0.7.0
+      id: code-review
     # - name: prepare-dsn
     #   run: |
     #     sudo mkdir /Library/ODBC
