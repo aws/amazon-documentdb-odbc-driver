@@ -63,6 +63,7 @@ namespace ignite
                             PROTOCOL_VERSION_COMBO_BOX,
                             NESTED_TX_MODE_LABEL,
                             NESTED_TX_MODE_COMBO_BOX,
+                            TLS_CHECK_BOX,
                             SSL_MODE_LABEL,
                             SSL_MODE_COMBO_BOX,
                             SSL_KEY_FILE_LABEL,
@@ -277,6 +278,9 @@ namespace ignite
 
                     /** Cancel button. */
                     std::auto_ptr<Window> cancelButton;
+
+                    /** TLS Encryption CheckBox. */
+                    std::auto_ptr< Window > tlsCheckBox;
 
                     /** SSL Mode label. */
                     std::auto_ptr<Window> sslModeLabel;

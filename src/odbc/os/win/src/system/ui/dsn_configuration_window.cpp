@@ -32,15 +32,16 @@ namespace ignite
         namespace system
         {
             namespace ui
-            {
+            {   // -AL- the constructor. No-op means no operation I think? 
                 DsnConfigurationWindow::DsnConfigurationWindow(Window* parent, config::Configuration& config):
                     CustomWindow(parent, "IgniteConfigureDsn", "Configure Amazon DocumentDB DSN Latest"),
                     width(360),
                     height(600),
                     connectionSettingsGroupBox(),
-                    sslSettingsGroupBox(),
+                    sslSettingsGroupBox(), // has a create... function defined 
+                    tlsCheckBox(), 
                     authSettingsGroupBox(),
-                    additionalSettingsGroupBox(),
+                    // additionalSettingsGroupBox(),
                     nameLabel(),
                     nameEdit(),
                     addressLabel(),
@@ -52,7 +53,8 @@ namespace ignite
                     distributedJoinsCheckBox(),
                     enforceJoinOrderCheckBox(),
                     replicatedOnlyCheckBox(),
-                    collocatedCheckBox(),
+                    // collocatedCheckBox(), // -AL- after commenting this out, the checkbox is intact?
+                    // checkbox is created in function DsnConfigurationWindow::CreateAdditionalSettingsGroup
                     protocolVersionLabel(),
                     protocolVersionComboBox(),
                     userLabel(),
@@ -98,7 +100,7 @@ namespace ignite
                         throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, buf.str().c_str());
                     }
                 }
-
+                // the function that actually creates the UI -AL-
                 void DsnConfigurationWindow::OnCreate()
                 {
                     int groupPosY = MARGIN;
@@ -108,6 +110,8 @@ namespace ignite
                     groupPosY += INTERVAL + CreateAuthSettingsGroup(MARGIN, groupPosY, groupSizeY);
                     groupPosY += INTERVAL + CreateSslSettingsGroup(MARGIN, groupPosY, groupSizeY);
                     groupPosY += INTERVAL + CreateAdditionalSettingsGroup(MARGIN, groupPosY, groupSizeY);
+                    // test: if above code is commented out, additional settings shouldn't appear in config window. Result: Yes test success. 
+                    // what happens here is the height of each subgroup is calculated and appended to the y position of the buttons
 
                     int cancelPosX = width - MARGIN - BUTTON_WIDTH;
                     int okPosX = cancelPosX - INTERVAL - BUTTON_WIDTH;
@@ -216,7 +220,7 @@ namespace ignite
                 }
 
                 int DsnConfigurationWindow::CreateSslSettingsGroup(int posX, int posY, int sizeX)
-                {
+                {   // TODO: rename function name from Ssl to TLS after UI works
                     using ssl::SslMode;
 
                     enum { LABEL_WIDTH = 120 };
@@ -228,59 +232,66 @@ namespace ignite
 
                     int rowPos = posY + 2 * INTERVAL;
 
-                    SslMode::Type sslMode = ssl::SslMode::REQUIRE;
-                    std::string sslModeStr = SslMode::ToString(sslMode);
+                    int checkBoxSize = (sizeX - 3 * INTERVAL) / 2;
 
-                    const char* val = sslModeStr.c_str();
-
-                    sslModeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "SSL Mode:", ChildId::SSL_MODE_LABEL);
-                    sslModeComboBox = CreateComboBox(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                        "", ChildId::SSL_MODE_COMBO_BOX);
-
-                    sslModeComboBox->AddString("disable");
-                    sslModeComboBox->AddString("require");
-
-                    sslModeComboBox->SetSelection(sslMode);
+                    tlsCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
+                        "TLS", ChildId::DISTRIBUTED_JOINS_CHECK_BOX, true);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    val = config.GetTlsCaFile().c_str();
-                    sslKeyFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "SSL Private Key:", ChildId::SSL_KEY_FILE_LABEL);
-                    sslKeyFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                        val, ChildId::SSL_KEY_FILE_EDIT);
+                    //SslMode::Type sslMode = ssl::SslMode::REQUIRE;
+                    //std::string sslModeStr = SslMode::ToString(sslMode);
 
-                    SHAutoComplete(sslKeyFileEdit->GetHandle(), SHACF_DEFAULT);
+                    //const char* val = sslModeStr.c_str();
 
-                    rowPos += INTERVAL + ROW_HEIGHT;
+                    //sslModeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                    //    "SSL Mode:", ChildId::SSL_MODE_LABEL);
+                    //sslModeComboBox = CreateComboBox(editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                    //    "", ChildId::SSL_MODE_COMBO_BOX);
 
-                    val = config.GetTlsCaFile().c_str();
-                    sslCertFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "SSL Certificate:", ChildId::SSL_CERT_FILE_LABEL);
-                    sslCertFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                        val, ChildId::SSL_CERT_FILE_EDIT);
+                    //sslModeComboBox->AddString("disable");
+                    //sslModeComboBox->AddString("require");
 
-                    SHAutoComplete(sslCertFileEdit->GetHandle(), SHACF_DEFAULT);
+                    //sslModeComboBox->SetSelection(sslMode); // set default value to require -AL-
 
-                    rowPos += INTERVAL + ROW_HEIGHT;
+                    //rowPos += INTERVAL + ROW_HEIGHT; // used to add row hight I believe
 
-                    val = config.GetTlsCaFile().c_str();
-                    sslCaFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "SSL Certificate Authority:", ChildId::SSL_CA_FILE_LABEL);
-                    sslCaFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                        val, ChildId::SSL_CA_FILE_EDIT);
+                    //val = config.GetTlsCaFile().c_str();
+                    //sslKeyFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                    //    "SSL Private Key:", ChildId::SSL_KEY_FILE_LABEL);
+                    //sslKeyFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                    //    val, ChildId::SSL_KEY_FILE_EDIT);
 
-                    SHAutoComplete(sslCaFileEdit->GetHandle(), SHACF_DEFAULT);
+                    //SHAutoComplete(sslKeyFileEdit->GetHandle(), SHACF_DEFAULT);
 
-                    rowPos += INTERVAL + ROW_HEIGHT;
+                    //rowPos += INTERVAL + ROW_HEIGHT;
+
+                    //val = config.GetTlsCaFile().c_str();
+                    //sslCertFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                    //    "SSL Certificate:", ChildId::SSL_CERT_FILE_LABEL);
+                    //sslCertFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                    //    val, ChildId::SSL_CERT_FILE_EDIT);
+
+                    //SHAutoComplete(sslCertFileEdit->GetHandle(), SHACF_DEFAULT);
+
+                    // rowPos += INTERVAL + ROW_HEIGHT;
+
+                    //val = config.GetTlsCaFile().c_str();
+                    //sslCaFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                    //    "SSL Certificate Authority:", ChildId::SSL_CA_FILE_LABEL);
+                    //sslCaFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                    //    val, ChildId::SSL_CA_FILE_EDIT);
+
+                    //SHAutoComplete(sslCaFileEdit->GetHandle(), SHACF_DEFAULT);
+
+                    // rowPos += INTERVAL + ROW_HEIGHT;
 
                     sslSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
                         "SSL settings", ChildId::SSL_SETTINGS_GROUP_BOX);
 
-                    sslKeyFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
-                    sslCertFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
-                    sslCaFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
+                    //sslKeyFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
+                    //sslCertFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
+                    //sslCaFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
 
                     return rowPos - posY;
                 }
@@ -371,7 +382,7 @@ namespace ignite
 
                     return rowPos - posY;
                 }
-
+                // -AL- I'm not changing this one yet. 
                 bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam)
                 {
                     switch (msg)
@@ -461,7 +472,13 @@ namespace ignite
                                     break;
                                 }
 
-                                case ChildId::SSL_MODE_COMBO_BOX:
+                                case ChildId::TLS_CHECK_BOX: {
+                                    tlsCheckBox->SetChecked(!tlsCheckBox->IsChecked());
+
+                                    break;
+                                }
+
+                                case ChildId::SSL_MODE_COMBO_BOX: //-AL- may need to remove this later
                                 {
                                     using ssl::SslMode;
 
@@ -607,6 +624,7 @@ namespace ignite
 
                     nestedTxModeComboBox->GetText(nestedTxModeStr);
 
+                    // unnecessary code is commented out -AL- 
                     //NestedTxMode::Type mode = NestedTxMode::FromString(nestedTxModeStr, config.GetNestedTxMode());
 
                     //bool distributedJoins = distributedJoinsCheckBox->IsChecked();
