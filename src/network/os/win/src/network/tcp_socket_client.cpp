@@ -15,10 +15,6 @@
  * limitations under the License.
  */
 
-// On Windows, min() and max() are defined macro. This causes a colision with MONGOCXX library.
-// See: http://www.suodenjoki.dk/us/archive/2010/min-max.htm
-#define NOMINMAX
-
 #include "network/sockets.h"
 
 #include <sstream>

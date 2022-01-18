@@ -48,6 +48,12 @@ set(SOURCES src/network/network.cpp
         src/network/ssl/ssl_gateway.cpp)
 
 if (WIN32)
+    if (MSVC)
+        # On Windows, min() and max() are defined macro. This causes a colision with MONGOCXX library.
+        # See: http://www.suodenjoki.dk/us/archive/2010/min-max.htm
+        add_definitions(-DNOMINMAX)
+    endif()
+
     include_directories(os/win/src)
 
     list(APPEND SOURCES os/win/src/network/tcp_socket_client.cpp
