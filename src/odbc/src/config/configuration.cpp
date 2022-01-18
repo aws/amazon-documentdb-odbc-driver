@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+// configures for what is defined in .h .h has a lot of setable values, replaces with DocumentDB properties. 
 #include <string>
 #include <sstream>
 #include <iterator>
@@ -33,25 +33,25 @@ namespace ignite
 
             const std::string Configuration::DefaultValue::dsn = "Apache Ignite DSN";
             const std::string Configuration::DefaultValue::driver = "Apache Ignite";
-            const std::string Configuration::DefaultValue::database = "";
+            const std::string Configuration::DefaultValue::database = ""; // renamed from Schema
             const std::string Configuration::DefaultValue::address = ""; // remove
             const std::string Configuration::DefaultValue::hostname = "";
             const uint16_t Configuration::DefaultValue::port = 27017;
             const std::string Configuration::DefaultValue::user = "";
             const std::string Configuration::DefaultValue::password = "";
             
-            // SSL/TLS options
-            const bool Configuration::DefaultValue::tls = true;
-            const bool Configuration::DefaultValue::tlsAllowInvalidHostnames = false;
-            const std::string Configuration::DefaultValue::tlsCaFile = "";
+            // SSL/TLS options. Use checkboxes for boolean variables // need to add to UI
+            const bool Configuration::DefaultValue::tls = true; // changed instead of SSL mode; tls is TLS Encryption 
+            const bool Configuration::DefaultValue::tlsAllowInvalidHostnames = false; // needs to be set to true for SSH; TLS Allow Invalid Hostnames
+            const std::string Configuration::DefaultValue::tlsCaFile = ""; //renamed from SSL CA file
            
-            // Schema Generation and Discovery options
+            // Schema Generation and Discovery options // need to add to UI
             const std::string Configuration::DefaultValue::scanMethod = "random";
             const int32_t Configuration::DefaultValue::scanLimit = 1000;
             const std::string Configuration::DefaultValue::schemaName = "_default";
             const bool Configuration::DefaultValue::refreshSchema = false;
 
-            // Internal SSH Tunnel options
+            // Internal SSH Tunnel options // need to add to UI
             const std::string Configuration::DefaultValue::sshUser = "";
             const std::string Configuration::DefaultValue::sshHost = "";
             const std::string Configuration::DefaultValue::sshPrivateKeyFile = "";
@@ -59,7 +59,7 @@ namespace ignite
             const bool Configuration::DefaultValue::sshStrictHostKeyChecking = true;
             const std::string Configuration::DefaultValue::sshKnownHostsFile = "";
             
-            // Additional options
+            // Additional options // // need to add to UI
             const std::string Configuration::DefaultValue::appName = "Amazon DocumentDB ODBC Driver";
             const int32_t Configuration::DefaultValue::loginTimeoutSec = 0;
             const std::string Configuration::DefaultValue::readPreference = "";
