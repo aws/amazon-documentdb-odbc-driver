@@ -212,11 +212,11 @@ namespace ignite
         void Connection::Close()
         {
             if (connection) {
-                // TODO: Close connection via JDBC
                 using namespace jni::java;
                 using namespace common::concurrent;
-                SharedPointer< JniContext > ctx(JniContext::Create(&opts[0], opts.size(), JniHandlers()));
+                SharedPointer< JniContext > ctx(JniContext::Create(&opts[0], static_cast<int>(opts.size()), JniHandlers()));
                 JniErrorInfo errInfo;
+                // NOTE: DocumentDbDisconnect will notify JNI connection is no longer used - must set to nullptr.
                 ctx.Get()->DocumentDbDisconnect(connection, &errInfo);
                 if (errInfo.code != java::IGNITE_JNI_ERR_SUCCESS) {
                     // TODO: Determine if we need to error check the close.
@@ -639,10 +639,9 @@ namespace ignite
 
             SetJvmOptions(cp);
             
-            SharedPointer< JniContext > ctx(JniContext::Create(&opts[0], opts.size(), JniHandlers(), &errInfo));
-            jobject result;
+            SharedPointer< JniContext > ctx(JniContext::Create(&opts[0], static_cast<int>(opts.size()), JniHandlers(), &errInfo));
             if (ctx.Get()) {
-                result = ctx.Get()->DocumentDbConnect(
+                jobject result = ctx.Get()->DocumentDbConnect(
                     connectionString.c_str(), &errInfo);
                 connected = (result && errInfo.code == java::IGNITE_JNI_ERR_SUCCESS);
                 if (!connected) {
@@ -651,18 +650,19 @@ namespace ignite
                         err.GetText());
                     Close();
                 }
+                connection = result;
             } else {
                 err = odbc::IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_INIT, "Unable to get initialized JVM.");
+                connection = nullptr;
             }
 
-            connection = result;
             return connected;
         }
 
-        std::string Connection::FormatJdbcConnectionString() {
+        std::string Connection::FormatJdbcConnectionString() const {
             std::string host = "localhost";
             std::string port = "27017";
-            if (config.GetAddresses().size() > 0) {
+            if (!config.GetAddresses().empty()) {
                 host = config.GetAddresses()[0].host;
                 port = std::to_string(config.GetAddresses()[0].port);
             }
@@ -763,9 +763,7 @@ namespace ignite
          */
         void Connection::Deinit() {
             using namespace common;
-            for (size_t i = 0; i < opts.size(); ++i)
-                ReleaseChars(opts[i]);
-
+            std::for_each(opts.begin(), opts.end(), ReleaseChars);
             opts.clear();
         }
         

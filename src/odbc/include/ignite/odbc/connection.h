@@ -228,8 +228,6 @@ namespace ignite
                 if (!success)
                     return false;
 
-                //parser.Decode(rsp, tempBuffer);
-
                 return true;
             }
 
@@ -495,7 +493,7 @@ namespace ignite
              * Formats the JDBC connection string from configuration values.
              * @return the JDBC connection string.
              */
-            std::string FormatJdbcConnectionString();
+            std::string FormatJdbcConnectionString() const;
 
             /** 
              * Creates JVM options

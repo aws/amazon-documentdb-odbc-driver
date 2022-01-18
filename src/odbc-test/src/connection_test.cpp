@@ -118,7 +118,8 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestore)
     Connect(connectionString);
     Disconnect();
 
-    // TODO: Re-enable when querying is supported.
+    // TODO: [AD-507] Re-enable when querying is supported.
+    // https://bitquill.atlassian.net/browse/AD-507
 
     //// Check that query was successfully executed.
     //BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "");
@@ -141,10 +142,10 @@ BOOST_AUTO_TEST_CASE(TestConnectionMemoryLeak)
 
     Connect(connectionString);
 
-    // TODO: Re-enable when support for queries is available
-    //ExecQuery("Select * from Test");
+    // TODO: [AD-507] Re-enable when querying is supported.
+    // https://bitquill.atlassian.net/browse/AD-507
+    // ExecQuery("Select * from Test");
 
-    Disconnect();
     Disconnect();
 }
 
