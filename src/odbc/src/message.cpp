@@ -62,14 +62,14 @@ namespace ignite
         {
             writer.WriteInt8(RequestType::HANDSHAKE);
 
-            ProtocolVersion version = config.GetProtocolVersion();
+            ProtocolVersion version = ProtocolVersion::GetCurrent();
             writer.WriteInt16(version.GetMajor());
             writer.WriteInt16(version.GetMinor());
             writer.WriteInt16(version.GetMaintenance());
 
             writer.WriteInt8(ClientType::ODBC);
 
-            writer.WriteBool(config.IsDistributedJoins());
+            /*writer.WriteBool(config.IsDistributedJoins());
             writer.WriteBool(config.IsEnforceJoinOrder());
             writer.WriteBool(config.IsReplicatedOnly());
             writer.WriteBool(config.IsCollocated());
@@ -87,7 +87,7 @@ namespace ignite
             }
 
             if (version >= ProtocolVersion::VERSION_2_7_0)
-                writer.WriteInt8(config.GetNestedTxMode());
+                writer.WriteInt8(config.GetNestedTxMode());*/
         }
 
         QueryExecuteRequest::QueryExecuteRequest(const std::string& schema, const std::string& sql,

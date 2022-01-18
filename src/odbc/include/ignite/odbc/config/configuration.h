@@ -53,16 +53,79 @@ namespace ignite
                     static const std::string driver;
 
                     /** Default value for schema attribute. */
-                    static const std::string schema;
+                    static const std::string database;
 
                     /** Default value for address attribute. */
                     static const std::string address;
 
                     /** Default value for server attribute. */
-                    static const std::string server;
+                    static const std::string hostname;
+
+                    /** Default value for port attribute. */
+                    static const uint16_t port;
+
+                    /** Default value for user attribute. */
+                    static const std::string user;
+
+                    /** Default value for password attribute. */
+                    static const std::string password;
+
+                    /** Default value for appName attribute. */
+                    static const std::string appName;
+
+                    /** Default value for loginTimeoutSec attribute. */
+                    static const int32_t loginTimeoutSec;
+
+                    /** Default value for readPreference attribute. */
+                    static const std::string readPreference;
+
+                    /** Default value for replicaSet attribute. */
+                    static const std::string replicaSet;
+
+                    /** Default value for retryReads attribute. */
+                    static const bool retryReads;
 
                     /** Default value for sslMode attribute. */
                     static const ssl::SslMode::Type sslMode;
+
+                    /** Default value for tls attribute. */
+                    static const bool tls;
+
+                    /** Default value for tlsAllowInvalidHostnames attribute. */
+                    static const bool tlsAllowInvalidHostnames;
+
+                    /** Default value for tlsCaFile attribute. */
+                    static const std::string tlsCaFile;
+
+                    /** Default value for sshUser attribute. */
+                    static const std::string sshUser;
+
+                    /** Default value for sshHost attribute. */
+                    static const std::string sshHost;
+
+                    /** Default value for sshPrivateKeyFile attribute. */
+                    static const std::string sshPrivateKeyFile;
+
+                    /** Default value for sshPrivateKeyPassphrase attribute. */
+                    static const std::string sshPrivateKeyPassphrase;
+
+                    /** Default value for sshStrictHostKeyChecking attribute. */
+                    static const bool sshStrictHostKeyChecking;
+
+                    /** Default value for sshKnownHostsFile attribute. */
+                    static const std::string sshKnownHostsFile;
+
+                    /** Default value for scanMethod attribute. */
+                    static const std::string scanMethod;
+
+                    /** Default value for scanLimit attribute. */
+                    static const int32_t scanLimit;
+
+                    /** Default value for schemaName attribute. */
+                    static const std::string schemaName;
+
+                    /** Default value for refreshSchema attribute. */
+                    static const bool refreshSchema;
 
                     /** Default value for sslKeyFile attribute. */
                     static const std::string sslKeyFile;
@@ -70,41 +133,11 @@ namespace ignite
                     /** Default value for sslCertFile attribute. */
                     static const std::string sslCertFile;
 
-                    /** Default value for sslCaFile attribute. */
-                    static const std::string sslCaFile;
-
                     /** Default value for protocol version. */
-                    static const ProtocolVersion& protocolVersion;
-
-                    /** Default value for port attribute. */
-                    static const uint16_t port;
+                   // static const ProtocolVersion& protocolVersion;
 
                     /** Default value for fetch results page size attribute. */
-                    static const int32_t pageSize;
-
-                    /** Default value for distributed joins attribute. */
-                    static const bool distributedJoins;
-
-                    /** Default value for enforce join order attribute. */
-                    static const bool enforceJoinOrder;
-
-                    /** Default value for replicated only attribute. */
-                    static const bool replicatedOnly;
-
-                    /** Default value for collocated attribute. */
-                    static const bool collocated;
-
-                    /** Default value for lazy attribute. */
-                    static const bool lazy;
-
-                    /** Default value for skipReducerOnUpdate attribute. */
-                    static const bool skipReducerOnUpdate;
-
-                    /** Default value for user attribute. */
-                    static const std::string user;
-
-                    /** Default value for password attribute. */
-                    static const std::string password;
+                    static const int32_t defaultFetchSize;
 
                     /** Default value for nestedTxMode attribute. */
                     static const NestedTxMode::Type nestedTxMode;
@@ -126,27 +159,6 @@ namespace ignite
                  * @return Connect string.
                  */
                 std::string ToConnectString() const;
-
-                /**
-                 * Get server port.
-                 *
-                 * @return Server port.
-                 */
-                uint16_t GetTcpPort() const;
-
-                /**
-                 * Set server port.
-                 *
-                 * @param port Server port.
-                 */
-                void SetTcpPort(uint16_t port);
-
-                /**
-                 * Check if the value set.
-                 *
-                 * @return @true if the value set.
-                 */
-                bool IsTcpPortSet() const;
 
                 /**
                  * Get DSN.
@@ -188,315 +200,63 @@ namespace ignite
                  *
                  * @return Server host.
                  */
-                const std::string& GetHost() const;
+                const std::string& GetHostname() const;
 
                 /**
                  * Set server host.
                  *
                  * @param server Server host.
                  */
-                void SetHost(const std::string& server);
+                void SetHostname(const std::string& host);
 
                 /**
                  * Check if the value set.
                  *
                  * @return @true if the value set.
                  */
-                bool IsHostSet() const;
+                bool IsHostnameSet() const;
+
+                /**
+                 * Get server port.
+                 *
+                 * @return Server port.
+                 */
+                uint16_t GetTcpPort() const;
+
+                /**
+                 * Set server port.
+                 *
+                 * @param port Server port.
+                 */
+                void SetTcpPort(uint16_t port);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsTcpPortSet() const;
 
                 /**
                  * Get schema.
                  *
                  * @return Schema.
                  */
-                const std::string& GetSchema() const;
+                const std::string& GetDatabase() const;
 
                 /**
                  * Set schema.
                  *
                  * @param schema Schema name.
                  */
-                void SetSchema(const std::string& schema);
+                void SetDatabase(const std::string& schema);
 
                 /**
                  * Check if the value set.
                  *
                  * @return @true if the value set.
                  */
-                bool IsSchemaSet() const;
-
-                /**
-                 * Get addresses.
-                 *
-                 * @return Addresses.
-                 */
-                const std::vector<EndPoint>& GetAddresses() const;
-
-                /**
-                 * Set addresses to connect to.
-                 *
-                 * @param endPoints Addresses.
-                 */
-                void SetAddresses(const std::vector<EndPoint>& endPoints);
-
-                /**
-                 * Check if the value set.
-                 *
-                 * @return @true if the value set.
-                 */
-                bool IsAddressesSet() const;
-
-                /**
-                 * Get SSL mode.
-                 *
-                 * @return SSL mode.
-                 */
-                ssl::SslMode::Type GetSslMode() const;
-
-                /**
-                 * Set SSL mode.
-                 *
-                 * @param sslMode SSL mode.
-                 */
-                void SetSslMode(ssl::SslMode::Type sslMode);
-
-                /**
-                 * Check if the value set.
-                 *
-                 * @return @true if the value set.
-                 */
-                bool IsSslModeSet() const;
-
-                /**
-                 * Get SSL key file path.
-                 *
-                 * @return SSL key file path.
-                 */
-                const std::string& GetSslKeyFile() const;
-
-                /**
-                 * Set SSL key file path.
-                 *
-                 * @param sslKeyFile SSL key file path.
-                 */
-                void SetSslKeyFile(const std::string& sslKeyFile);
-
-                /**
-                 * Check if the value set.
-                 *
-                 * @return @true if the value set.
-                 */
-                bool IsSslKeyFileSet() const;
-
-                /**
-                 * Get SSL certificate file path.
-                 *
-                 * @return SSL certificate file path.
-                 */
-                const std::string& GetSslCertFile() const;
-
-                /**
-                 * Set SSL certificate file path.
-                 *
-                 * @param sslCertFile SSL certificate file path.
-                 */
-                void SetSslCertFile(const std::string& sslCertFile);
-
-                /**
-                 * Check if the value set.
-                 *
-                 * @return @true if the value set.
-                 */
-                bool IsSslCertFileSet() const;
-
-                /**
-                 * Get SSL certificate authority file path.
-                 *
-                 * @return SSL certificate authority file path.
-                 */
-                const std::string& GetSslCaFile() const;
-
-                /**
-                 * Set SSL certificate authority file path.
-                 *
-                 * @param sslCaFile SSL certificate authority file path.
-                 */
-                void SetSslCaFile(const std::string& sslCaFile);
-
-                /**
-                 * Check if the value set.
-                 *
-                 * @return @true if the value set.
-                 */
-                bool IsSslCaFileSet() const;
-
-                /**
-                 * Check distributed joins flag.
-                 *
-                 * @return True if distributed joins are enabled.
-                 */
-                bool IsDistributedJoins() const;
-
-                /**
-                 * Set distributed joins.
-                 *
-                 * @param val Value to set.
-                 */
-                void SetDistributedJoins(bool val);
-
-                /**
-                 * Check if the value set.
-                 *
-                 * @return @true if the value set.
-                 */
-                bool IsDistributedJoinsSet() const;
-
-                /**
-                 * Check enforce join order flag.
-                 *
-                 * @return True if enforcing of join order is enabled.
-                 */
-                bool IsEnforceJoinOrder() const;
-
-                /**
-                 * Set enforce joins.
-                 *
-                 * @param val Value to set.
-                 */
-                void SetEnforceJoinOrder(bool val);
-
-                /**
-                 * Check if the value set.
-                 *
-                 * @return @true if the value set.
-                 */
-                bool IsEnforceJoinOrderSet() const;
-
-                /**
-                 * Check replicated only flag.
-                 *
-                 * @return True if replicated only is enabled.
-                 */
-                bool IsReplicatedOnly() const;
-
-                /**
-                 * Set replicated only flag.
-                 *
-                 * @param val Value to set.
-                 */
-                void SetReplicatedOnly(bool val);
-
-                /**
-                 * Check if the value set.
-                 *
-                 * @return @true if the value set.
-                 */
-                bool IsReplicatedOnlySet() const;
-
-                /**
-                 * Check collocated flag.
-                 *
-                 * @return True if collocated is enabled.
-                 */
-                bool IsCollocated() const;
-
-                /**
-                 * Set collocated.
-                 *
-                 * @param val Value to set.
-                 */
-                void SetCollocated(bool val);
-
-                /**
-                 * Check if the value set.
-                 *
-                 * @return @true if the value set.
-                 */
-                bool IsCollocatedSet() const;
-
-                /**
-                 * Check lazy flag.
-                 *
-                 * @return True if lazy is enabled.
-                 */
-                bool IsLazy() const;
-
-                /**
-                 * Set lazy.
-                 *
-                 * @param val Value to set.
-                 */
-                void SetLazy(bool val);
-
-                /**
-                 * Check if the value set.
-                 *
-                 * @return @true if the value set.
-                 */
-                bool IsLazySet() const;
-
-                /**
-                 * Check update on server flag.
-                 *
-                 * @return True if update on server.
-                 */
-                bool IsSkipReducerOnUpdate() const;
-
-                /**
-                 * Set update on server.
-                 *
-                 * @param val Value to set.
-                 */
-                void SetSkipReducerOnUpdate(bool val);
-
-                /**
-                 * Check if the value set.
-                 *
-                 * @return @true if the value set.
-                 */
-                bool IsSkipReducerOnUpdateSet() const;
-
-                /**
-                 * Get protocol version.
-                 *
-                 * @return Protocol version.
-                 */
-                ProtocolVersion GetProtocolVersion() const;
-
-                /**
-                 * Set protocol version.
-                 *
-                 * @param version Version to set.
-                 */
-                void SetProtocolVersion(const ProtocolVersion& version);
-
-                /**
-                 * Check if the value set.
-                 *
-                 * @return @true if the value set.
-                 */
-                bool IsProtocolVersionSet() const;
-
-                /**
-                 * Get fetch results page size.
-                 *
-                 * @return Fetch results page size.
-                 */
-                int32_t GetPageSize() const;
-
-                /**
-                 * Set fetch results page size.
-                 *
-                 * @param size Fetch results page size.
-                 */
-                void SetPageSize(int32_t size);
-
-                /**
-                 * Check if the value set.
-                 *
-                 * @return @true if the value set.
-                 */
-                bool IsPageSizeSet() const;
+                bool IsDatabaseSet() const;
 
                 /**
                  * Get user.
@@ -541,25 +301,423 @@ namespace ignite
                 bool IsPasswordSet() const;
 
                 /**
-                 * Get nested transaction mode.
+                 * Get password.
                  *
-                 * @return Nested transaction mode.
+                 * @return Password.
                  */
-                NestedTxMode::Type GetNestedTxMode() const;
+                const std::string& GetApplicationName() const;
 
                 /**
-                 * Set nested transaction mode.
+                 * Set password.
                  *
-                 * @param mode Nested transaction mode.
+                 * @param pass Password.
                  */
-                void SetNestedTxMode(NestedTxMode::Type mode);
+                void SetApplicationName(const std::string& name);
 
                 /**
                  * Check if the value set.
                  *
                  * @return @true if the value set.
                  */
-                bool IsNestedTxModeSet() const;
+                bool IsApplicationNameSet() const;
+
+                /**
+                 * Get fetch results page size. 
+                 *
+                 * @return Fetch results page size.
+                 */
+                int32_t GetLoginTimeoutSeconds() const;
+
+                /**
+                 * Set fetch results page size.
+                 *
+                 * @param size Fetch results page size.
+                 */
+                void SetLoginTimeoutSeconds(int32_t seconds);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsLoginTimeoutSecondsSet() const;
+
+                /**
+                 * Get password.
+                 *
+                 * @return Password.
+                 */
+                const std::string& GetReadPreference() const;
+
+                /**
+                 * Set password.
+                 *
+                 * @param pass Password.
+                 */
+                void SetReadPreference(const std::string& preference);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsReadPreferenceSet() const;
+                /**
+                 * Get password.
+                 *
+                 * @return Password.
+                 */
+                const std::string& GetReplicaSet() const;
+
+                /**
+                 * Set password.
+                 *
+                 * @param pass Password.
+                 */
+                void SetReplicaSet(const std::string& name);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsReplicaSetSet() const;
+
+                /**
+                 * Get password.
+                 *
+                 * @return Password.
+                 */
+                bool IsRetryReads() const;
+
+                /**
+                 * Set password.
+                 *
+                 * @param pass Password.
+                 */
+                void SetRetryReads(bool val);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsRetryReadsSet() const;
+
+                /**
+                 * Get password.
+                 *
+                 * @return Password.
+                 */
+                bool IsTls() const;
+
+                /**
+                 * Set password.
+                 *
+                 * @param pass Password.
+                 */
+                void SetTls(bool val);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsTlsSet() const;
+
+                /**
+                 * Get password.
+                 *
+                 * @return Password.
+                 */
+                bool IsTlsAllowInvalidHostnames() const;
+
+                /**
+                 * Set password.
+                 *
+                 * @param pass Password.
+                 */
+                void SetTlsAllowInvalidHostnames(bool val);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsTlsAllowInvalidHostnamesSet() const;
+                
+                /**
+                 * Get password.
+                 *
+                 * @return Password.
+                 */
+                const std::string& GetTlsCaFile() const;
+
+                /**
+                 * Set password.
+                 *
+                 * @param pass Password.
+                 */
+                void SetTlsCaFile(const std::string& path);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsTlsCaFileSet() const;
+
+                /**
+                 * Get password.
+                 *
+                 * @return Password.
+                 */
+                const std::string& GetSshUser() const;
+
+                /**
+                 * Set password.
+                 *
+                 * @param pass Password.
+                 */
+                void SetSshUser(const std::string& user);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsSshUserSet() const;
+
+                /**
+                 * Get password.
+                 *
+                 * @return Password.
+                 */
+                const std::string& GetSshHost() const;
+
+                /**
+                 * Set password.
+                 *
+                 * @param pass Password.
+                 */
+                void SetSshHost(const std::string& host);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsSshHostSet() const;
+
+                /**
+                 * Get password.
+                 *
+                 * @return Password.
+                 */
+                const std::string& GetSshPrivateKeyFile () const;
+
+                /**
+                 * Set password.
+                 *
+                 * @param pass Password.
+                 */
+                void SetSshPrivateKeyFile(const std::string& path);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsSshPrivateKeyFileSet() const;
+
+                /**
+                 * Get password.
+                 *
+                 * @return Password.
+                 */
+                const std::string& GetSshPrivateKeyPassphrase() const;
+
+                /**
+                 * Set password.
+                 *
+                 * @param pass Password.
+                 */
+                void SetSshPrivateKeyPassphrase(const std::string& passphrase);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsSshPrivateKeyPassphraseSet() const;
+
+                /**
+                 * Get password.
+                 *
+                 * @return Password.
+                 */
+                bool IsSshStrictHostKeyChecking() const;
+
+                /**
+                 * Set password.
+                 *
+                 * @param pass Password.
+                 */
+                void SetSshStrictHostKeyChecking(bool val);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsSshStrictHostKeyCheckingSet() const;
+
+                /**
+                 * Get password.
+                 *
+                 * @return Password.
+                 */
+                const std::string& GetSshKnownHostsFile() const;
+
+                /**
+                 * Set password.
+                 *
+                 * @param pass Password.
+                 */
+                void SetSshKnownHostsFile(const std::string& path);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsSshKnownHostsFileSet() const;
+
+                /**
+                  * Get password.
+                  *
+                  * @return Password.
+                  */
+                const std::string& GetScanMethod() const;
+
+                /**
+                 * Set password.
+                 *
+                 * @param pass Password.
+                 */
+                void SetScanMethod(const std::string& method);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsScanMethodSet() const;
+
+                /**
+                 * Get fetch results page size.
+                 *
+                 * @return Fetch results page size.
+                 */
+                int32_t GetScanLimit() const;
+
+                /**
+                 * Set fetch results page size.
+                 *
+                 * @param size Fetch results page size.
+                 */
+                void SetScanLimit(int32_t limit);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsScanLimitSet() const;
+
+                /**
+                  * Get password.
+                  *
+                  * @return Password.
+                  */
+                const std::string& GetSchemaName() const;
+
+                /**
+                 * Set password.
+                 *
+                 * @param pass Password.
+                 */
+                void SetSchemaName(const std::string& method);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsSchemaNameSet() const;
+
+                /**
+                 * Get password.
+                 *
+                 * @return Password.
+                 */
+                bool IsSchemaRefresh() const;
+
+                /**
+                 * Set password.
+                 *
+                 * @param pass Password.
+                 */
+                void SetSchemaRefresh(bool val);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsSchemaRefreshSet() const;
+
+                /**
+                 * Get addresses.
+                 *
+                 * @return Addresses.
+                 */
+                const std::vector<EndPoint>& GetAddresses() const;
+
+                /**
+                 * Set addresses to connect to.
+                 *
+                 * @param endPoints Addresses.
+                 */
+                void SetAddresses(const std::vector<EndPoint>& endPoints);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsAddressesSet() const;
+
+                /**
+                 * Get fetch results page size.
+                 *
+                 * @return Fetch results page size.
+                 */
+                int32_t GetDefaultFetchSize() const;
+
+                /**
+                 * Set fetch results page size.
+                 *
+                 * @param size Fetch results page size.
+                 */
+                void SetDefaultFetchSize(int32_t size);
+
+                /**
+                 * Check if the value set.
+                 *
+                 * @return @true if the value set.
+                 */
+                bool IsDefaultFetchSizeSet() const;
 
                 /**
                  * Get argument map.
@@ -586,52 +744,13 @@ namespace ignite
                 SettableValue<std::string> driver;
 
                 /** Schema. */
-                SettableValue<std::string> schema;
+                SettableValue<std::string> database;
 
                 /** Server. Deprecated. */
-                SettableValue<std::string> server;
+                SettableValue<std::string> hostname;
 
                 /** TCP port. Deprecated. */
                 SettableValue<uint16_t> port;
-
-                /** Request and response page size. */
-                SettableValue<int32_t> pageSize;
-
-                /** Distributed joins flag. */
-                SettableValue<bool> distributedJoins;
-
-                /** Enforce join order flag. */
-                SettableValue<bool> enforceJoinOrder;
-
-                /** Replicated only flag. */
-                SettableValue<bool> replicatedOnly;
-
-                /** Collocated flag. */
-                SettableValue<bool> collocated;
-
-                /** Lazy flag. */
-                SettableValue<bool> lazy;
-
-                /** Skip reducer on update flag. */
-                SettableValue<bool> skipReducerOnUpdate;
-
-                /** Protocol version. */
-                SettableValue<ProtocolVersion> protocolVersion;
-
-                /** Connection end-points. */
-                SettableValue< std::vector<EndPoint> > endPoints;
-
-                /** SSL Mode. */
-                SettableValue<ssl::SslMode::Type> sslMode;
-
-                /** SSL private key file path. */
-                SettableValue<std::string> sslKeyFile;
-
-                /** SSL certificate file path. */
-                SettableValue<std::string> sslCertFile;
-
-                /** SSL certificate authority file path. */
-                SettableValue<std::string> sslCaFile;
 
                 /** User. */
                 SettableValue<std::string> user;
@@ -639,8 +758,65 @@ namespace ignite
                 /** Password. */
                 SettableValue<std::string> password;
 
-                /** Nested transaction mode. */
-                SettableValue<NestedTxMode::Type> nestedTxMode;
+                /** Application name. */
+                SettableValue<std::string> appName;
+
+                /** Login timeout in seconds.  */
+                SettableValue<int32_t> loginTimeoutSec;
+
+                /** Read pereference. */
+                SettableValue<std::string> readPreference;
+
+                /** Replica set name. */
+                SettableValue<std::string> replicaSet;
+
+                /** Retry reads flag. */
+                SettableValue<bool> retryReads;
+
+                /** Connection end-points. */
+                SettableValue< std::vector<EndPoint> > endPoints; // Remove in favor of deprecated one
+
+                /** Enable SSL/TLS. */
+                SettableValue<bool> tls;
+
+                /** Flag for if invalid hostnames for the TLS certificate are allowed. */
+                SettableValue<bool> tlsAllowInvalidHostnames;
+
+                /** SSL/TLS certificate authority file path. */
+                SettableValue<std::string> tlsCaFile;
+
+                /** The SSH host username for the internal SSH tunnel. */
+                SettableValue<std::string> sshUser;
+
+                /** The SSH host host name for the internal SSH tunnel. */
+                SettableValue<std::string> sshHost;
+
+                /** The SSH host private key file path for the internal SSH tunnel. */
+                SettableValue<std::string> sshPrivateKeyFile;
+
+                /** The SSH host private key file passphrase for the internal SSH tunnel. */
+                SettableValue<std::string> sshPrivateKeyPassphrase;
+
+                /** Strict host key checking flag for the internal SSH tunnel. */
+                SettableValue<bool> sshStrictHostKeyChecking;
+
+                /** The known hosts file path for the internal SSH tunnel. */
+                SettableValue<std::string> sshKnownHostsFile;
+
+                /** Scan method. */ 
+                SettableValue<std::string> scanMethod;
+
+                /** Scan limit. */
+                SettableValue<int32_t> scanLimit;
+
+                /** Schema name. */
+                SettableValue<std::string> schemaName;
+
+                /** Refresh schema flag. */
+                SettableValue<bool> refreshSchema;
+
+                /** Request and response page size. */
+                SettableValue<int32_t> defaultFetchSize;
             };
 
             template<>

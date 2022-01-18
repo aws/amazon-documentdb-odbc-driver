@@ -45,7 +45,7 @@ namespace ignite
                     static const std::string driver;
 
                     /** Connection attribute keyword for schema attribute. */
-                    static const std::string schema;
+                    static const std::string database;
 
                     /** Connection attribute keyword for address attribute. */
                     static const std::string address;
@@ -56,29 +56,71 @@ namespace ignite
                     /** Connection attribute keyword for port attribute. */
                     static const std::string port;
 
-                    /** Connection attribute keyword for distributed joins attribute. */
-                    static const std::string distributedJoins;
+                    /** Connection attribute keyword for username attribute. */
+                    static const std::string user;
 
-                    /** Connection attribute keyword for enforce join order attribute. */
-                    static const std::string enforceJoinOrder;
+                    /** Connection attribute keyword for password attribute. */
+                    static const std::string password;
+
+                    /** Connection attribute keyword for username attribute. */
+                    static const std::string appName;
+
+                    /** Connection attribute keyword for password attribute. */
+                    static const std::string loginTimeoutSec;
+
+                    /** Connection attribute keyword for username attribute. */
+                    static const std::string readPreference;
+
+                    /** Connection attribute keyword for password attribute. */
+                    static const std::string replicaSet;
+
+                    /** Connection attribute keyword for username attribute. */
+                    static const std::string retryReads;
+
+                    /** Connection attribute keyword for password attribute. */
+                    static const std::string tls;
+
+                    /** Connection attribute keyword for password attribute. */
+                    static const std::string tlsAllowInvalidHostnames;
+
+                    /** Connection attribute keyword for password attribute. */
+                    static const std::string tlsCaFile;
+
+                    /** Connection attribute keyword for password attribute. */
+                    static const std::string sshUser;
+
+                    /** Connection attribute keyword for password attribute. */
+                    static const std::string sshHost;
+
+                    /** Connection attribute keyword for password attribute. */
+                    static const std::string sshPrivateKeyFile;
+
+                    /** Connection attribute keyword for password attribute. */
+                    static const std::string sshPrivateKeyPassphrase;
+
+                    /** Connection attribute keyword for password attribute. */
+                    static const std::string sshStrictHostKeyChecking;
+
+                    /** Connection attribute keyword for password attribute. */
+                    static const std::string sshKnownHostsFile;
+
+                    /** Connection attribute keyword for password attribute. */
+                    static const std::string scanMethod;
+
+                    /** Connection attribute keyword for password attribute. */
+                    static const std::string scanLimit;
+
+                    /** Connection attribute keyword for password attribute. */
+                    static const std::string schemaName;
+
+                    /** Connection attribute keyword for password attribute. */
+                    static const std::string refreshSchema;
 
                     /** Connection attribute keyword for protocol version attribute. */
                     static const std::string protocolVersion;
 
                     /** Connection attribute keyword for fetch results page size attribute. */
-                    static const std::string pageSize;
-
-                    /** Connection attribute keyword for replicated only attribute. */
-                    static const std::string replicatedOnly;
-
-                    /** Connection attribute keyword for collocated attribute. */
-                    static const std::string collocated;
-
-                    /** Connection attribute keyword for lazy attribute. */
-                    static const std::string lazy;
-
-                    /** Connection attribute keyword for skipReducerOnUpdate attribute. */
-                    static const std::string skipReducerOnUpdate;
+                    static const std::string defaultFetchSize;
 
                     /** Connection attribute keyword for sslMode attribute. */
                     static const std::string sslMode;

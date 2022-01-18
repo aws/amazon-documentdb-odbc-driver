@@ -145,7 +145,8 @@ namespace ignite
 
         SqlResult::Type Connection::InitSocket()
         {
-            ssl::SslMode::Type sslMode = config.GetSslMode();
+            // Removed SSL Mode in DSN. Replaced this with REQUIRE for now.
+            ssl::SslMode::Type sslMode = ssl::SslMode::REQUIRE;
 
             if (sslMode == ssl::SslMode::DISABLE)
             {
@@ -167,8 +168,9 @@ namespace ignite
                 return SqlResult::AI_ERROR;
             }
 
+            // Removed SSL key and cert files from DSN. Replaced with empty string for now.
             socket.reset(network::ssl::MakeSecureSocketClient(
-                config.GetSslCertFile(), config.GetSslKeyFile(), config.GetSslCaFile()));
+                "", "", config.GetTlsCaFile()));
 
             return SqlResult::AI_SUCCESS;
         }
@@ -186,7 +188,7 @@ namespace ignite
                 return SqlResult::AI_ERROR;
             }
 
-            if (!config.IsHostSet() && config.IsAddressesSet() && config.GetAddresses().empty())
+            if (!config.IsHostnameSet() && config.IsAddressesSet() && config.GetAddresses().empty())
             {
                 AddStatusRecord("No valid address to connect.");
 
@@ -392,7 +394,7 @@ namespace ignite
 
         const std::string& Connection::GetSchema() const
         {
-            return config.GetSchema();
+            return config.GetDatabase();
         }
 
         const config::Configuration& Connection::GetConfiguration() const
@@ -418,7 +420,7 @@ namespace ignite
 
         SqlResult::Type Connection::InternalTransactionCommit()
         {
-            std::string schema = config.GetSchema();
+            std::string schema = config.GetDatabase();
 
             app::ParameterSet empty;
 
@@ -459,7 +461,7 @@ namespace ignite
 
         SqlResult::Type Connection::InternalTransactionRollback()
         {
-            std::string schema = config.GetSchema();
+            std::string schema = config.GetDatabase();
 
             app::ParameterSet empty;
 
@@ -636,7 +638,7 @@ namespace ignite
 
         SqlResult::Type Connection::MakeRequestHandshake()
         {
-            ProtocolVersion protocolVersion = config.GetProtocolVersion();
+            /* ProtocolVersion protocolVersion = config.GetProtocolVersion();
 
             if (!protocolVersion.IsSupported())
             {
@@ -653,6 +655,7 @@ namespace ignite
 
                 return SqlResult::AI_ERROR;
             }
+            */
 
             HandshakeRequest req(config);
             HandshakeResponse rsp;
@@ -695,10 +698,12 @@ namespace ignite
                 if (!rsp.GetError().empty())
                     constructor << "Additional info: " << rsp.GetError() << " ";
 
-                constructor << "Current version of the protocol, used by the server node is "
+                /* constructor
+                    << "Current version of the protocol, used by the server "
+                       "node is "
                             << rsp.GetCurrentVer().ToString() << ", "
                             << "driver protocol version introduced in version "
-                            << protocolVersion.ToString() << ".";
+                            << protocolVersion.ToString() << "."; */
 
                 AddStatusRecord(SqlState::S08004_CONNECTION_REJECTED, constructor.str());
 
@@ -767,8 +772,6 @@ namespace ignite
 
             if (!connected)
                 Close();
-            else
-                parser.SetProtocolVersion(config.GetProtocolVersion());
 
             return connected;
         }
@@ -781,7 +784,7 @@ namespace ignite
             {
                 LOG_MSG("'Address' is not set. Using legacy connection method.");
 
-                endPoints.push_back(EndPoint(cfg.GetHost(), cfg.GetTcpPort()));
+                endPoints.push_back(EndPoint(cfg.GetHostname(), cfg.GetTcpPort()));
 
                 return;
             }

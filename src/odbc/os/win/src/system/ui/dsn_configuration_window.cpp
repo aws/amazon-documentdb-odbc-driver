@@ -34,7 +34,7 @@ namespace ignite
             namespace ui
             {
                 DsnConfigurationWindow::DsnConfigurationWindow(Window* parent, config::Configuration& config):
-                    CustomWindow(parent, "IgniteConfigureDsn", "Configure Apache Ignite DSN"),
+                    CustomWindow(parent, "IgniteConfigureDsn", "Configure Amazon DocumentDB DSN Latest"),
                     width(360),
                     height(600),
                     connectionSettingsGroupBox(),
@@ -144,7 +144,7 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    val = config.GetSchema().c_str();
+                    val = config.GetDatabase().c_str();
                     schemaLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                         "Schema name:", ChildId::SCHEMA_LABEL);
                     schemaEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::SCHEMA_EDIT);
@@ -160,7 +160,7 @@ namespace ignite
 
                     const ProtocolVersion::VersionSet& supported = ProtocolVersion::GetSupported();
 
-                    ProtocolVersion version = config.GetProtocolVersion();
+                    ProtocolVersion version = ProtocolVersion::GetCurrent();
 
                     if (!version.IsSupported())
                         version = ProtocolVersion::GetCurrent();
@@ -228,7 +228,7 @@ namespace ignite
 
                     int rowPos = posY + 2 * INTERVAL;
 
-                    SslMode::Type sslMode = config.GetSslMode();
+                    SslMode::Type sslMode = ssl::SslMode::REQUIRE;
                     std::string sslModeStr = SslMode::ToString(sslMode);
 
                     const char* val = sslModeStr.c_str();
@@ -245,7 +245,7 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    val = config.GetSslKeyFile().c_str();
+                    val = config.GetTlsCaFile().c_str();
                     sslKeyFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                         "SSL Private Key:", ChildId::SSL_KEY_FILE_LABEL);
                     sslKeyFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
@@ -255,7 +255,7 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    val = config.GetSslCertFile().c_str();
+                    val = config.GetTlsCaFile().c_str();
                     sslCertFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                         "SSL Certificate:", ChildId::SSL_CERT_FILE_LABEL);
                     sslCertFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
@@ -265,7 +265,7 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    val = config.GetSslCaFile().c_str();
+                    val = config.GetTlsCaFile().c_str();
                     sslCaFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                         "SSL Certificate Authority:", ChildId::SSL_CA_FILE_LABEL);
                     sslCaFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
@@ -296,14 +296,14 @@ namespace ignite
 
                     int checkBoxSize = (sizeX - 3 * INTERVAL) / 2;
 
-                    ProtocolVersion version = config.GetProtocolVersion();
+                    ProtocolVersion version = ProtocolVersion::GetCurrent();
 
                     if (!version.IsSupported())
                         version = ProtocolVersion::GetCurrent();
 
                     int rowPos = posY + 2 * INTERVAL;
 
-                    std::string tmp = common::LexicalCast<std::string>(config.GetPageSize());
+                    std::string tmp = common::LexicalCast<std::string>(1000);
                     const char* val = tmp.c_str();
                     pageSizeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH,
                         ROW_HEIGHT, "Page size:", ChildId::PAGE_SIZE_LABEL);
@@ -326,8 +326,8 @@ namespace ignite
                     {
                         nestedTxModeComboBox->AddString(NestedTxMode::ToString(*it));
 
-                        if (*it == config.GetNestedTxMode())
-                            nestedTxModeComboBox->SetSelection(id);
+                        /* if (*it == config.GetNestedTxMode())
+                            nestedTxModeComboBox->SetSelection(id); */
 
                         ++id;
                     }
@@ -337,30 +337,30 @@ namespace ignite
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     distributedJoinsCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                        "Distributed Joins", ChildId::DISTRIBUTED_JOINS_CHECK_BOX, config.IsDistributedJoins());
+                        "Distributed Joins", ChildId::DISTRIBUTED_JOINS_CHECK_BOX, false);
 
                     enforceJoinOrderCheckBox = CreateCheckBox(labelPosX + checkBoxSize + INTERVAL,
                         rowPos, checkBoxSize, ROW_HEIGHT, "Enforce Join Order",
-                        ChildId::ENFORCE_JOIN_ORDER_CHECK_BOX, config.IsEnforceJoinOrder());
+                        ChildId::ENFORCE_JOIN_ORDER_CHECK_BOX, false);
 
                     rowPos += ROW_HEIGHT;
 
                     replicatedOnlyCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                        "Replicated Only", ChildId::REPLICATED_ONLY_CHECK_BOX, config.IsReplicatedOnly());
-
+                        "Replicated Only", ChildId::REPLICATED_ONLY_CHECK_BOX, false);
+                    
                     collocatedCheckBox = CreateCheckBox(labelPosX + checkBoxSize + INTERVAL, rowPos, checkBoxSize,
-                        ROW_HEIGHT, "Collocated", ChildId::COLLOCATED_CHECK_BOX, config.IsCollocated());
+                        ROW_HEIGHT, "Collocated", ChildId::COLLOCATED_CHECK_BOX, false);
 
                     rowPos += ROW_HEIGHT;
 
                     lazyCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                        "Lazy", ChildId::LAZY_CHECK_BOX, config.IsLazy());
+                        "Lazy", ChildId::LAZY_CHECK_BOX, false);
 
                     lazyCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_1_5);
 
                     skipReducerOnUpdateCheckBox = CreateCheckBox(labelPosX + checkBoxSize + INTERVAL, rowPos,
                         checkBoxSize, ROW_HEIGHT, "Skip reducer on update", ChildId::SKIP_REDUCER_ON_UPDATE_CHECK_BOX,
-                        config.IsSkipReducerOnUpdate());
+                        false);
 
                     skipReducerOnUpdateCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_3_0);
 
@@ -550,8 +550,8 @@ namespace ignite
 
                     cfg.SetDsn(dsnStr);
                     cfg.SetAddresses(addresses);
-                    cfg.SetSchema(schemaStr);
-                    cfg.SetProtocolVersion(version);
+                    cfg.SetDatabase(schemaStr);
+                    //cfg.SetProtocolVersion(version);
                 }
 
                 void DsnConfigurationWindow::RetrieveAuthParameters(config::Configuration& cfg) const
@@ -586,10 +586,10 @@ namespace ignite
 
                     ssl::SslMode::Type sslMode = ssl::SslMode::FromString(sslModeStr, ssl::SslMode::DISABLE);
 
-                    cfg.SetSslMode(sslMode);
-                    cfg.SetSslKeyFile(sslKeyStr);
-                    cfg.SetSslCertFile(sslCertStr);
-                    cfg.SetSslCaFile(sslCaStr);
+                    //cfg.SetSslMode(sslMode);
+                    //cfg.SetSslKeyFile(sslKeyStr);
+                    //cfg.SetSslCertFile(sslCertStr);
+                    cfg.SetTlsCaFile(sslCaStr);
                 }
 
                 void DsnConfigurationWindow::RetrieveAdditionalParameters(config::Configuration& cfg) const
@@ -601,39 +601,39 @@ namespace ignite
                     int32_t pageSize = common::LexicalCast<int32_t>(pageSizeStr);
 
                     if (pageSize <= 0)
-                        pageSize = config.GetPageSize();
-
+                        pageSize = config.GetDefaultFetchSize();
+                    
                     std::string nestedTxModeStr;
 
                     nestedTxModeComboBox->GetText(nestedTxModeStr);
 
-                    NestedTxMode::Type mode = NestedTxMode::FromString(nestedTxModeStr, config.GetNestedTxMode());
+                    //NestedTxMode::Type mode = NestedTxMode::FromString(nestedTxModeStr, config.GetNestedTxMode());
 
-                    bool distributedJoins = distributedJoinsCheckBox->IsChecked();
-                    bool enforceJoinOrder = enforceJoinOrderCheckBox->IsChecked();
-                    bool replicatedOnly = replicatedOnlyCheckBox->IsChecked();
-                    bool collocated = collocatedCheckBox->IsChecked();
-                    bool lazy = lazyCheckBox->IsChecked();
-                    bool skipReducerOnUpdate = skipReducerOnUpdateCheckBox->IsChecked();
+                    //bool distributedJoins = distributedJoinsCheckBox->IsChecked();
+                    //bool enforceJoinOrder = enforceJoinOrderCheckBox->IsChecked();
+                    //bool replicatedOnly = replicatedOnlyCheckBox->IsChecked();
+                    //bool collocated = collocatedCheckBox->IsChecked();
+                    //bool lazy = lazyCheckBox->IsChecked();
+                    //bool skipReducerOnUpdate = skipReducerOnUpdateCheckBox->IsChecked();
 
                     LOG_MSG("Retrieving arguments:");
                     LOG_MSG("Page size:              " << pageSize);
-                    LOG_MSG("Nested TX Mode:         " << NestedTxMode::ToString(mode));
-                    LOG_MSG("Distributed Joins:      " << (distributedJoins ? "true" : "false"));
-                    LOG_MSG("Enforce Join Order:     " << (enforceJoinOrder ? "true" : "false"));
-                    LOG_MSG("Replicated only:        " << (replicatedOnly ? "true" : "false"));
-                    LOG_MSG("Collocated:             " << (collocated ? "true" : "false"));
-                    LOG_MSG("Lazy:                   " << (lazy ? "true" : "false"));
-                    LOG_MSG("Skip reducer on update: " << (skipReducerOnUpdate ? "true" : "false"));
+                    //LOG_MSG("Nested TX Mode:         " << NestedTxMode::ToString(mode));
+                    //LOG_MSG("Distributed Joins:      " << (distributedJoins ? "true" : "false"));
+                    //LOG_MSG("Enforce Join Order:     " << (enforceJoinOrder ? "true" : "false"));
+                    //LOG_MSG("Replicated only:        " << (replicatedOnly ? "true" : "false"));
+                    //LOG_MSG("Collocated:             " << (collocated ? "true" : "false"));
+                    //LOG_MSG("Lazy:                   " << (lazy ? "true" : "false"));
+                    //LOG_MSG("Skip reducer on update: " << (skipReducerOnUpdate ? "true" : "false"));
 
-                    cfg.SetPageSize(pageSize);
-                    cfg.SetNestedTxMode(mode);
-                    cfg.SetDistributedJoins(distributedJoins);
-                    cfg.SetEnforceJoinOrder(enforceJoinOrder);
-                    cfg.SetReplicatedOnly(replicatedOnly);
-                    cfg.SetCollocated(collocated);
-                    cfg.SetLazy(lazy);
-                    cfg.SetSkipReducerOnUpdate(skipReducerOnUpdate);
+                    cfg.SetDefaultFetchSize(pageSize);
+                    //cfg.SetNestedTxMode(mode);
+                    //cfg.SetDistributedJoins(distributedJoins);
+                    //cfg.SetEnforceJoinOrder(enforceJoinOrder);
+                    //cfg.SetReplicatedOnly(replicatedOnly);
+                    //cfg.SetCollocated(collocated);
+                    //cfg.SetLazy(lazy);
+                    //cfg.SetSkipReducerOnUpdate(skipReducerOnUpdate);
                 }
             }
         }
