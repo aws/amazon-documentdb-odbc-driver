@@ -63,9 +63,6 @@ jobs:
         ./build_mac_release64.sh
       env:
         OPENSSL_ROOT_DIR: /usr/local/opt/openssl
-    - name: code-review
-      uses: ZedThree/clang-tidy-review@v0.7.0
-      id: code-review
     # - name: prepare-dsn
     #   run: |
     #     sudo mkdir /Library/ODBC
@@ -80,7 +77,7 @@ jobs:
         echo "Setup=${{env.ODBC_LIB_PATH}}/libignite-odbc.dylib"   >> "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
         echo "DriverODBCVer=03.00"                                 >> "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
         echo "FileUsage=0"                                         >> "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
-        odbcinst -i -d -f "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
+        odbcinst -i -d                                             -f "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
     - name: run-tests
       run: |
         ./build/odbc/bin/ignite-odbc-tests
