@@ -88,6 +88,20 @@ set_target_properties(${TARGET} PROPERTIES VERSION ${CMAKE_PROJECT_VERSION})
 
 target_link_libraries(${TARGET} ${ODBC_LIBRARIES} mongo::mongocxx_shared) 
 
+if(POLICY CMP0025)
+    cmake_policy(SET CMP0025 NEW)
+endif()
+
+# Enforce the C++ standard, and disable extensions.
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 11)
+endif()
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror")
+endif()
+
 
 if (WIN32)
     if (MSVC)
@@ -108,7 +122,6 @@ if (WIN32)
                 
     set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME "ignite.odbc")
 else()
-    add_definitions(-DBSONCXX_POLY_USE_MNMLSTC=1)
     target_link_libraries(${TARGET} ignite-common ignite-binary ignite-network)
 endif()
 

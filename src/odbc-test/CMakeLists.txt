@@ -115,7 +115,7 @@ set(SOURCES
 add_executable(${TARGET} ${SOURCES})
 
 target_link_libraries(${TARGET} ${Boost_LIBRARIES} ignite ${ODBC_LIBRARY})
-#target_code_coverage(${TARGET}  PUBLIC AUTO ALL)
+target_code_coverage(${TARGET}  PUBLIC AUTO ALL)
 
 if (WIN32)
     remove_definitions(-DUNICODE=1)
