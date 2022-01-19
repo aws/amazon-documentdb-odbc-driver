@@ -41,19 +41,25 @@ namespace ignite
                     sslSettingsGroupBox(), // has a create... function defined 
                     tlsCheckBox(), 
                     authSettingsGroupBox(),
-                    // additionalSettingsGroupBox(),
+                    additionalSettingsGroupBox(),
                     nameLabel(),
                     nameEdit(),
                     addressLabel(),
                     addressEdit(),
                     schemaLabel(),
                     schemaEdit(),
-                    pageSizeLabel(),
-                    pageSizeEdit(),
-                    distributedJoinsCheckBox(),
-                    enforceJoinOrderCheckBox(),
-                    replicatedOnlyCheckBox(),
-                    // collocatedCheckBox(), // -AL- after commenting this out, the checkbox is intact?
+                    appNameLabel(),
+                    appNameEdit(),
+                    readPreferenceLabel(),
+                    readPreferenceEdit(),
+                    fetchSizeLabel(),
+                    fetchSizeEdit(),
+                    // pageSizeLabel(),
+                    // pageSizeEdit(),
+                    //distributedJoinsCheckBox(),
+                    //enforceJoinOrderCheckBox(),
+                    //replicatedOnlyCheckBox(),
+                    //collocatedCheckBox(), // -AL- after commenting this out, the checkbox is intact?
                     // checkbox is created in function DsnConfigurationWindow::CreateAdditionalSettingsGroup
                     protocolVersionLabel(),
                     protocolVersionComboBox(),
@@ -61,7 +67,7 @@ namespace ignite
                     userEdit(),
                     passwordLabel(),
                     passwordEdit(),
-                    nestedTxModeComboBox(),
+                    //nestedTxModeComboBox(),
                     okButton(),
                     cancelButton(),
                     config(config),
@@ -314,7 +320,7 @@ namespace ignite
 
                 int DsnConfigurationWindow::CreateAdditionalSettingsGroup(int posX, int posY, int sizeX)
                 {
-                    enum { LABEL_WIDTH = 130 };
+                    enum { LABEL_WIDTH = 130 }; // -AL- different definition from above. I can also change it to the same
 
                     int labelPosX = posX + INTERVAL;
 
@@ -323,28 +329,69 @@ namespace ignite
 
                     int checkBoxSize = (sizeX - 3 * INTERVAL) / 2;
 
-                    ProtocolVersion version = ProtocolVersion::GetCurrent();
+                    //ProtocolVersion version = ProtocolVersion::GetCurrent();
 
-                    if (!version.IsSupported())
-                        version = ProtocolVersion::GetCurrent();
+                    //if (!version.IsSupported())
+                    //    version = ProtocolVersion::GetCurrent();
 
                     int rowPos = posY + 2 * INTERVAL;
 
-                    std::string tmp = common::LexicalCast<std::string>(1000);
-                    const char* val = tmp.c_str();
-                    pageSizeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH,
-                        ROW_HEIGHT, "Page size:", ChildId::PAGE_SIZE_LABEL);
+                    const char* val = config.GetApplicationName().c_str();
 
-                    pageSizeEdit = CreateEdit(editPosX, rowPos, editSizeX,
-                        ROW_HEIGHT, val, ChildId::PAGE_SIZE_EDIT, ES_NUMBER);
+                    appNameLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH,
+                        ROW_HEIGHT, "Application Name:", ChildId::APP_NAME_LABEL);
+                    appNameEdit = CreateEdit(editPosX, rowPos, editSizeX,
+                        ROW_HEIGHT, val, ChildId::APP_NAME_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    nestedTxModeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Nested Transaction Mode:", ChildId::NESTED_TX_MODE_LABEL);
-                    nestedTxModeComboBox = CreateComboBox(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                        "", ChildId::NESTED_TX_MODE_COMBO_BOX);
+                    std::string tmp = common::LexicalCast< std::string >(config.GetLoginTimeoutSeconds());  
+                    val = tmp.c_str(); 
+                    loginTimeoutSecLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH,
+                        ROW_HEIGHT, "Login Timeout (s):", ChildId::LOGIN_TIMEOUT_SEC_LABEL);
 
+                    loginTimeoutSecEdit = CreateEdit(editPosX, rowPos, editSizeX,
+                        ROW_HEIGHT, val, ChildId::LOGIN_TIMEOUT_SEC_EDIT, ES_NUMBER);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    val = config.GetReadPreference().c_str();
+
+                    readPreferenceLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Read preference:", ChildId::READ_PREFERENCE_LABEL);
+                    readPreferenceEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+                                   ChildId::READ_PREFERENCE_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    tmp = common::LexicalCast<std::string>(config.GetFetchSize());
+                    val = tmp.c_str();
+                    fetchSizeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH,
+                        ROW_HEIGHT, "Fetch size:", ChildId::FETCH_SIZE_LABEL);
+
+                    fetchSizeEdit = CreateEdit(editPosX, rowPos, editSizeX,
+                        ROW_HEIGHT, val, ChildId::FETCH_SIZE_EDIT, ES_NUMBER);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    //std::string tmp = common::LexicalCast< std::string >(1000);
+                    //const char* val = tmp.c_str();
+                    //pageSizeLabel =
+                    //    CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                    //                "Page size:", ChildId::PAGE_SIZE_LABEL);
+
+                    //pageSizeEdit =
+                    //    CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+                    //               ChildId::PAGE_SIZE_EDIT, ES_NUMBER);
+
+                    //rowPos += INTERVAL + ROW_HEIGHT;
+
+                    //nestedTxModeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                    //    "Nested Transaction Mode:", ChildId::NESTED_TX_MODE_LABEL);
+                    //nestedTxModeComboBox = CreateComboBox(editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                    //    "", ChildId::NESTED_TX_MODE_COMBO_BOX);
+
+                    /*
                     int id = 0;
 
                     const NestedTxMode::ModeSet& supported = NestedTxMode::GetValidValues();
@@ -353,52 +400,52 @@ namespace ignite
                     {
                         nestedTxModeComboBox->AddString(NestedTxMode::ToString(*it));
 
-                        /* if (*it == config.GetNestedTxMode())
-                            nestedTxModeComboBox->SetSelection(id); */
+                        if (*it == config.GetNestedTxMode())
+                            nestedTxModeComboBox->SetSelection(id); 
 
-                        ++id;
-                    }
+                    //    ++id;
+                    //}
+                    //*/
+                    //nestedTxModeComboBox->SetEnabled(version >= ProtocolVersion::VERSION_2_5_0);
 
-                    nestedTxModeComboBox->SetEnabled(version >= ProtocolVersion::VERSION_2_5_0);
+                    //rowPos += INTERVAL + ROW_HEIGHT;
 
-                    rowPos += INTERVAL + ROW_HEIGHT;
+                    //distributedJoinsCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
+                    //    "Distributed Joins", ChildId::DISTRIBUTED_JOINS_CHECK_BOX, false);
 
-                    distributedJoinsCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                        "Distributed Joins", ChildId::DISTRIBUTED_JOINS_CHECK_BOX, false);
+                    //enforceJoinOrderCheckBox = CreateCheckBox(labelPosX + checkBoxSize + INTERVAL,
+                    //    rowPos, checkBoxSize, ROW_HEIGHT, "Enforce Join Order",
+                    //    ChildId::ENFORCE_JOIN_ORDER_CHECK_BOX, false);
 
-                    enforceJoinOrderCheckBox = CreateCheckBox(labelPosX + checkBoxSize + INTERVAL,
-                        rowPos, checkBoxSize, ROW_HEIGHT, "Enforce Join Order",
-                        ChildId::ENFORCE_JOIN_ORDER_CHECK_BOX, false);
+                    //rowPos += ROW_HEIGHT;
 
-                    rowPos += ROW_HEIGHT;
+                    //replicatedOnlyCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
+                    //    "Replicated Only", ChildId::REPLICATED_ONLY_CHECK_BOX, false);
+                    //
+                    //collocatedCheckBox = CreateCheckBox(labelPosX + checkBoxSize + INTERVAL, rowPos, checkBoxSize,
+                    //    ROW_HEIGHT, "Collocated", ChildId::COLLOCATED_CHECK_BOX, false);
 
-                    replicatedOnlyCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                        "Replicated Only", ChildId::REPLICATED_ONLY_CHECK_BOX, false);
-                    
-                    collocatedCheckBox = CreateCheckBox(labelPosX + checkBoxSize + INTERVAL, rowPos, checkBoxSize,
-                        ROW_HEIGHT, "Collocated", ChildId::COLLOCATED_CHECK_BOX, false);
+                    //rowPos += ROW_HEIGHT;
 
-                    rowPos += ROW_HEIGHT;
+                    //lazyCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
+                    //    "Lazy", ChildId::LAZY_CHECK_BOX, false);
 
-                    lazyCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                        "Lazy", ChildId::LAZY_CHECK_BOX, false);
+                    ////lazyCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_1_5);
 
-                    lazyCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_1_5);
+                    //skipReducerOnUpdateCheckBox = CreateCheckBox(labelPosX + checkBoxSize + INTERVAL, rowPos,
+                    //    checkBoxSize, ROW_HEIGHT, "Skip reducer on update", ChildId::SKIP_REDUCER_ON_UPDATE_CHECK_BOX,
+                    //    false);
 
-                    skipReducerOnUpdateCheckBox = CreateCheckBox(labelPosX + checkBoxSize + INTERVAL, rowPos,
-                        checkBoxSize, ROW_HEIGHT, "Skip reducer on update", ChildId::SKIP_REDUCER_ON_UPDATE_CHECK_BOX,
-                        false);
+                    //skipReducerOnUpdateCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_3_0);
 
-                    skipReducerOnUpdateCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_3_0);
-
-                    rowPos += ROW_HEIGHT + INTERVAL;
+                    //rowPos += ROW_HEIGHT + INTERVAL;
 
                     additionalSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
                         "Additional settings", ChildId::ADDITIONAL_SETTINGS_GROUP_BOX);
 
                     return rowPos - posY;
                 }
-                // -AL- I'm not changing this one yet. 
+                
                 bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam)
                 {
                     switch (msg)
@@ -433,60 +480,60 @@ namespace ignite
                                     break;
                                 }
 
-                                case ChildId::DISTRIBUTED_JOINS_CHECK_BOX:
-                                {
-                                    distributedJoinsCheckBox->SetChecked(!distributedJoinsCheckBox->IsChecked());
+                                //case ChildId::DISTRIBUTED_JOINS_CHECK_BOX:
+                                //{
+                                //    distributedJoinsCheckBox->SetChecked(!distributedJoinsCheckBox->IsChecked());
 
-                                    break;
-                                }
+                                //    break;
+                                //}
 
-                                case ChildId::ENFORCE_JOIN_ORDER_CHECK_BOX:
-                                {
-                                    enforceJoinOrderCheckBox->SetChecked(!enforceJoinOrderCheckBox->IsChecked());
+                                //case ChildId::ENFORCE_JOIN_ORDER_CHECK_BOX:
+                                //{
+                                //    enforceJoinOrderCheckBox->SetChecked(!enforceJoinOrderCheckBox->IsChecked());
 
-                                    break;
-                                }
+                                //    break;
+                                //}
 
-                                case ChildId::REPLICATED_ONLY_CHECK_BOX:
-                                {
-                                    replicatedOnlyCheckBox->SetChecked(!replicatedOnlyCheckBox->IsChecked());
+                                //case ChildId::REPLICATED_ONLY_CHECK_BOX:
+                                //{
+                                //    replicatedOnlyCheckBox->SetChecked(!replicatedOnlyCheckBox->IsChecked());
 
-                                    break;
-                                }
+                                //    break;
+                                //}
 
-                                case ChildId::COLLOCATED_CHECK_BOX:
-                                {
-                                    collocatedCheckBox->SetChecked(!collocatedCheckBox->IsChecked());
+                                //case ChildId::COLLOCATED_CHECK_BOX:
+                                //{
+                                //    collocatedCheckBox->SetChecked(!collocatedCheckBox->IsChecked());
 
-                                    break;
-                                }
+                                //    break;
+                                //}
 
-                                case ChildId::LAZY_CHECK_BOX:
-                                {
-                                    lazyCheckBox->SetChecked(!lazyCheckBox->IsChecked());
+                                //case ChildId::LAZY_CHECK_BOX:
+                                //{
+                                //    lazyCheckBox->SetChecked(!lazyCheckBox->IsChecked());
 
-                                    break;
-                                }
+                                //    break;
+                                //}
 
-                                case ChildId::SKIP_REDUCER_ON_UPDATE_CHECK_BOX:
-                                {
-                                    skipReducerOnUpdateCheckBox->SetChecked(!skipReducerOnUpdateCheckBox->IsChecked());
+                                //case ChildId::SKIP_REDUCER_ON_UPDATE_CHECK_BOX:
+                                //{
+                                //    skipReducerOnUpdateCheckBox->SetChecked(!skipReducerOnUpdateCheckBox->IsChecked());
 
-                                    break;
-                                }
+                                //    break;
+                                //}
 
-                                case ChildId::PROTOCOL_VERSION_COMBO_BOX:
-                                {
-                                    std::string versionStr;
-                                    protocolVersionComboBox->GetText(versionStr);
+                                //case ChildId::PROTOCOL_VERSION_COMBO_BOX:
+                                //{
+                                //    std::string versionStr;
+                                //    protocolVersionComboBox->GetText(versionStr);
 
-                                    ProtocolVersion version = ProtocolVersion::FromString(versionStr);
-                                    lazyCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_1_5);
-                                    skipReducerOnUpdateCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_3_0);
-                                    nestedTxModeComboBox->SetEnabled(version >= ProtocolVersion::VERSION_2_5_0);
+                                //    ProtocolVersion version = ProtocolVersion::FromString(versionStr);
+                                //    lazyCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_1_5);
+                                //    skipReducerOnUpdateCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_3_0);
+                                //    nestedTxModeComboBox->SetEnabled(version >= ProtocolVersion::VERSION_2_5_0);
 
-                                    break;
-                                }
+                                //    break;
+                                //}
 
                                 case ChildId::TLS_CHECK_BOX: 
                                 {
@@ -618,9 +665,9 @@ namespace ignite
 
                     tlsCaFileEdit->GetText(tlsCaStr);
 
-                    LOG_MSG("TLS/SSL Encryption:      " << (tls ? "true" : "false"));
-                    LOG_MSG("tls Allow Invalid Hostnames:      " << (tlsAllowInvalidHostnames ? "true" : "false"));
-                    LOG_MSG("TLS CA:             " << tlsCaStr);
+                    LOG_MSG("TLS/SSL Encryption:          " << (tls ? "true" : "false"));
+                    LOG_MSG("tls Allow Invalid Hostnames: " << (tlsAllowInvalidHostnames ? "true" : "false"));
+                    LOG_MSG("TLS CA:                      " << tlsCaStr);
 
                     cfg.SetTls(tls);
                     cfg.SetTlsAllowInvalidHostnames(tlsAllowInvalidHostnames);
@@ -652,18 +699,45 @@ namespace ignite
 
                 void DsnConfigurationWindow::RetrieveAdditionalParameters(config::Configuration& cfg) const
                 {
-                    std::string pageSizeStr;
 
-                    pageSizeEdit->GetText(pageSizeStr);
+                    std::string appNameStr;
+                    std::string readPreferenceStr;
 
-                    int32_t pageSize = common::LexicalCast<int32_t>(pageSizeStr);
+                    appNameEdit->GetText(appNameStr);
+                    readPreferenceEdit->GetText(readPreferenceStr);
 
-                    if (pageSize <= 0)
-                        pageSize = config.GetDefaultFetchSize();
+                    std::string loginTimeoutSecStr;
+
+                    loginTimeoutSecEdit->GetText(loginTimeoutSecStr);
+
+                    int32_t loginTimeoutSec =
+                        common::LexicalCast< int32_t >(loginTimeoutSecStr);
+
+                    if (loginTimeoutSec <= 0)
+                        loginTimeoutSec = config.GetLoginTimeoutSeconds();
+
+                    std::string fetchSizeStr;
+
+                    fetchSizeEdit->GetText(fetchSizeStr);
+
+                    int32_t fetchSize =
+                        common::LexicalCast< int32_t >(fetchSizeStr);
+
+                    if (fetchSize <= 0)
+                        fetchSize = config.GetFetchSize();
+
+                    //std::string pageSizeStr;
+
+                    //pageSizeEdit->GetText(pageSizeStr);
+
+                    //int32_t pageSize = common::LexicalCast<int32_t>(pageSizeStr);
+
+                    //if (pageSize <= 0)
+                    //    pageSize = config.GetPageSize();
                     
-                    std::string nestedTxModeStr;
+                    //std::string nestedTxModeStr;
 
-                    nestedTxModeComboBox->GetText(nestedTxModeStr);
+                    //nestedTxModeComboBox->GetText(nestedTxModeStr);
 
                     // unnecessary code is commented out -AL- 
                     //NestedTxMode::Type mode = NestedTxMode::FromString(nestedTxModeStr, config.GetNestedTxMode());
@@ -676,7 +750,10 @@ namespace ignite
                     //bool skipReducerOnUpdate = skipReducerOnUpdateCheckBox->IsChecked();
 
                     LOG_MSG("Retrieving arguments:");
-                    LOG_MSG("Page size:              " << pageSize);
+                    LOG_MSG("App name:                " << appNameStr);
+                    LOG_MSG("Login timeout (seconds): " << loginTimeoutSecStr);
+                    LOG_MSG("Read preference:         " << readPreferenceStr);
+                    LOG_MSG("Fetch size:              " << fetchSize);
                     //LOG_MSG("Nested TX Mode:         " << NestedTxMode::ToString(mode));
                     //LOG_MSG("Distributed Joins:      " << (distributedJoins ? "true" : "false"));
                     //LOG_MSG("Enforce Join Order:     " << (enforceJoinOrder ? "true" : "false"));
@@ -685,7 +762,9 @@ namespace ignite
                     //LOG_MSG("Lazy:                   " << (lazy ? "true" : "false"));
                     //LOG_MSG("Skip reducer on update: " << (skipReducerOnUpdate ? "true" : "false"));
 
-                    cfg.SetDefaultFetchSize(pageSize);
+                    cfg.SetApplicationName(appNameStr);
+                    cfg.SetLoginTimeoutSeconds(loginTimeoutSec);
+                    cfg.SetFetchSize(fetchSize);
                     //cfg.SetNestedTxMode(mode);
                     //cfg.SetDistributedJoins(distributedJoins);
                     //cfg.SetEnforceJoinOrder(enforceJoinOrder);
