@@ -18,7 +18,7 @@
 #include <time.h>
 #include <vector>
 
-#include <windows.h>
+#include <Windows.h>
 
 #include <ignite/odbc/common/platform_utils.h>
 
@@ -101,15 +101,15 @@ namespace ignite {
                 path0.push_back('\0');
 
                 SHFILEOPSTRUCT fileop;
-                fileop.hwnd = NULL;
+                fileop.hwnd = nullptr;
                 fileop.wFunc = FO_DELETE;
                 fileop.pFrom = &path0[0];
-                fileop.pTo = NULL;
+                fileop.pTo = nullptr;
                 fileop.fFlags = FOF_NOCONFIRMATION | FOF_SILENT;
 
                 fileop.fAnyOperationsAborted = FALSE;
-                fileop.lpszProgressTitle = NULL;
-                fileop.hNameMappings = NULL;
+                fileop.lpszProgressTitle = nullptr;
+                fileop.hNameMappings = nullptr;
 
                 int ret = SHFileOperation(&fileop);
 
@@ -133,7 +133,7 @@ namespace ignite {
 
             IGNITE_IMPORT_EXPORT unsigned GetRandSeed()
             {
-                return static_cast<unsigned>(GetTickCount() ^ GetCurrentProcessId());
+                return static_cast<unsigned>(GetTickCount64() ^ GetCurrentProcessId());
             }
         }
     }

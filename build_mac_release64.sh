@@ -17,9 +17,9 @@ JDBC_DRIVER_FILENAME="documentdb-jdbc-$JDBC_DRIVER_VERSION-all.jar"
 JDBC_DRIVER_FULLPATH="$DRIVER_BIN_DIR/libs/$JDBC_DRIVER_FILENAME"
 export DOCUMENTDB_HOME="$DRIVER_BIN_DIR"
 if [ ! -f "$JDBC_DRIVER_FULLPATH" ]; then
-    mkdir "$PROJECT_DIR/libs"
+    mkdir "$DRIVER_BIN_DIR/libs"
     echo "Downloading version $JDBC_DRIVER_VERSION of JDBC driver..."
-    curl -o "$DRIVER_BIN_DIR/libs" -L https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v$JDBC_DRIVER_VERSION/$JDBC_DRIVER_FILENAME
+    curl -o "$DRIVER_BIN_DIR/libs/$JDBC_DRIVER_FILENAME" -L https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v$JDBC_DRIVER_VERSION/$JDBC_DRIVER_FILENAME
     echo "Download complete." 
 fi
 

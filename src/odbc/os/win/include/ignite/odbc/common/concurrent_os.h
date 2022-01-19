@@ -146,7 +146,7 @@ namespace ignite
                     void Await();
                 private:
                     /** Handle. */
-                    HANDLE hnd;
+                    HANDLE hnd = CreateEvent(nullptr, TRUE, FALSE, nullptr);
 
                     IGNITE_NO_COPY_ASSIGNMENT(SingleLatch)
                 };

@@ -383,7 +383,7 @@ namespace ignite
                 // Reading number itself.
                 while (is && isdigit(c))
                 {
-                    part = part * 10 + (c - '0');
+                    part = part * 10 + (static_cast<unsigned long long>(c) - '0');
                     ++partDigits;
 
                     if (part >= 1000000000000000000U)

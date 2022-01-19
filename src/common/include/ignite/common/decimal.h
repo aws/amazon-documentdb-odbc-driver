@@ -326,7 +326,7 @@ namespace ignite
                         os << '0';
                     }
 
-                    os.write(&magStr[magBegin], lastNonZero - magBegin + 1);
+                    os.write(&magStr[magBegin], static_cast<std::streamsize>(lastNonZero) - magBegin + 1);
                 }
                 else
                 {
@@ -340,7 +340,7 @@ namespace ignite
                     {
                         os << '.';
 
-                        os.write(&magStr[magBegin + dotPos], afterDot);
+                        os.write(&magStr[static_cast<std::basic_string<char, std::char_traits<char>, std::allocator<char>>::size_type>(magBegin) + dotPos], afterDot);
                     }
                 }
 
@@ -395,7 +395,7 @@ namespace ignite
                 {
                     if (isdigit(c))
                     {
-                        part = part * 10 + (c - '0');
+                        part = part * 10 + (static_cast<unsigned long long>(c) - '0');
                         ++partDigits;
                     }
                     else if (c == '.' && scale < 0)

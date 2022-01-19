@@ -328,7 +328,7 @@ namespace ignite
                             os << '0';
                         }
 
-                        os.write(&magStr[magBegin], lastNonZero - magBegin + 1);
+                        os.write(&magStr[magBegin], static_cast<std::streamsize>(lastNonZero) - magBegin + 1);
                     }
                     else
                     {

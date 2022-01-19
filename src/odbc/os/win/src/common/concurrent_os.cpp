@@ -42,10 +42,7 @@ namespace ignite
                     Memory::Fence();
                 }
 
-                CriticalSection::~CriticalSection()
-                {
-                    // No-op.
-                }
+                CriticalSection::~CriticalSection() = default;
 
                 void CriticalSection::Enter()
                 {
@@ -69,10 +66,7 @@ namespace ignite
                     Memory::Fence();
                 }
 
-                ReadWriteLock::~ReadWriteLock()
-                {
-                    // No-op.
-                }
+                ReadWriteLock::~ReadWriteLock() = default;
 
                 void ReadWriteLock::LockExclusive()
                 {
@@ -94,8 +88,7 @@ namespace ignite
                     ReleaseSRWLockShared(&lock);
                 }
 
-                SingleLatch::SingleLatch() :
-                    hnd(CreateEvent(NULL, TRUE, FALSE, NULL))
+                SingleLatch::SingleLatch()
                 {
                     Memory::Fence();
                 }
@@ -144,13 +137,13 @@ namespace ignite
 
                 int64_t Atomics::CompareAndSet64Val(int64_t* ptr, int64_t expVal, int64_t newVal)
                 {
-                    return _InterlockedCompareExchange64(reinterpret_cast<LONG64*>(ptr), newVal, expVal);
+                    return _InterlockedCompareExchange64(ptr, newVal, expVal);
                 }
 
                 int64_t Atomics::IncrementAndGet64(int64_t* ptr)
                 {
     #ifdef _WIN64
-                    return InterlockedIncrement64(reinterpret_cast<LONG64*>(ptr));
+                    return InterlockedIncrement64(ptr);
     #else
                     while (true)
                     {
@@ -166,7 +159,7 @@ namespace ignite
                 int64_t Atomics::DecrementAndGet64(int64_t* ptr)
                 {
     #ifdef _WIN64
-                    return InterlockedDecrement64(reinterpret_cast<LONG64*>(ptr));
+                    return InterlockedDecrement64(ptr);
     #else
                     while (true)
                     {
