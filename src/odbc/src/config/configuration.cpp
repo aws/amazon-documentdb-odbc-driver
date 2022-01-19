@@ -65,7 +65,7 @@ namespace ignite
             const std::string Configuration::DefaultValue::readPreference = "";
             const std::string Configuration::DefaultValue::replicaSet = "";
             const bool Configuration::DefaultValue::retryReads = true;
-            const int32_t Configuration::DefaultValue::defaultFetchSize = 2000;
+            const int32_t Configuration::DefaultValue::fetchSize = 2000;
 
             const NestedTxMode::Type Configuration::DefaultValue::nestedTxMode = NestedTxMode::AI_ERROR; // remove
 
@@ -96,7 +96,7 @@ namespace ignite
                 scanLimit(DefaultValue::scanLimit),
                 schemaName(DefaultValue::schemaName),
                 refreshSchema(DefaultValue::refreshSchema),
-                defaultFetchSize(DefaultValue::defaultFetchSize)
+                fetchSize(DefaultValue::fetchSize)
             {
                 // No-op.
             }
@@ -519,19 +519,19 @@ namespace ignite
                 return password.IsSet();
             }
 
-            int32_t Configuration::GetDefaultFetchSize() const
+            int32_t Configuration::GetFetchSize() const
             {
-                return defaultFetchSize.GetValue();
+                return fetchSize.GetValue();
             }
 
-            void Configuration::SetDefaultFetchSize(int32_t size)
+            void Configuration::SetFetchSize(int32_t size)
             {
-                this->defaultFetchSize.SetValue(size);
+                this->fetchSize.SetValue(size);
             }
 
-            bool Configuration::IsDefaultFetchSizeSet() const
+            bool Configuration::IsFetchSizeSet() const
             {
-                return defaultFetchSize.IsSet();
+                return fetchSize.IsSet();
             }
 
             void Configuration::ToMap(ArgumentMap& res) const
@@ -563,7 +563,7 @@ namespace ignite
                 AddToMap(res, ConnectionStringParser::Key::scanLimit, scanLimit);
                 AddToMap(res, ConnectionStringParser::Key::schemaName, schemaName);
                 AddToMap(res, ConnectionStringParser::Key::refreshSchema, refreshSchema);
-                AddToMap(res, ConnectionStringParser::Key::defaultFetchSize, defaultFetchSize);
+                AddToMap(res, ConnectionStringParser::Key::fetchSize, fetchSize);
             }
 
             template<>

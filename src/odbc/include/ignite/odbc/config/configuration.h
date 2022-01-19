@@ -137,7 +137,7 @@ namespace ignite
                    // static const ProtocolVersion& protocolVersion;
 
                     /** Default value for fetch results page size attribute. */
-                    static const int32_t defaultFetchSize;
+                    static const int32_t fetchSize;
 
                     /** Default value for nestedTxMode attribute. */
                     static const NestedTxMode::Type nestedTxMode;
@@ -703,21 +703,21 @@ namespace ignite
                  *
                  * @return Fetch results page size.
                  */
-                int32_t GetDefaultFetchSize() const;
+                int32_t GetFetchSize() const;
 
                 /**
                  * Set fetch results page size.
                  *
                  * @param size Fetch results page size.
                  */
-                void SetDefaultFetchSize(int32_t size);
+                void SetFetchSize(int32_t size);
 
                 /**
                  * Check if the value set.
                  *
                  * @return @true if the value set.
                  */
-                bool IsDefaultFetchSizeSet() const;
+                bool IsFetchSizeSet() const;
 
                 /**
                  * Get argument map.
@@ -816,7 +816,7 @@ namespace ignite
                 SettableValue<bool> refreshSchema;
 
                 /** Request and response page size. */
-                SettableValue<int32_t> defaultFetchSize;
+                SettableValue<int32_t> fetchSize;
             };
 
             template<>
