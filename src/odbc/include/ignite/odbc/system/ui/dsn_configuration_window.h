@@ -64,14 +64,14 @@ namespace ignite
                             NESTED_TX_MODE_LABEL,
                             NESTED_TX_MODE_COMBO_BOX,
                             TLS_CHECK_BOX,
-                            SSL_MODE_LABEL,
-                            SSL_MODE_COMBO_BOX,
-                            SSL_KEY_FILE_LABEL,
-                            SSL_KEY_FILE_EDIT,
-                            SSL_CERT_FILE_LABEL,
-                            SSL_CERT_FILE_EDIT,
-                            SSL_CA_FILE_LABEL,
-                            SSL_CA_FILE_EDIT,
+                            //SSL_MODE_LABEL,
+                            //SSL_MODE_COMBO_BOX,
+                            //SSL_KEY_FILE_LABEL,
+                            //SSL_KEY_FILE_EDIT,
+                            //SSL_CERT_FILE_LABEL,
+                            //SSL_CERT_FILE_EDIT,
+                            //SSL_CA_FILE_LABEL,
+                            //SSL_CA_FILE_EDIT,
                             USER_LABEL,
                             USER_EDIT,
                             PASSWORD_LABEL,
@@ -280,31 +280,34 @@ namespace ignite
                     std::auto_ptr<Window> cancelButton;
 
                     /** TLS Encryption CheckBox. */
-                    std::auto_ptr< Window > tlsCheckBox;
+                    std::auto_ptr<Window> tlsCheckBox;
 
-                    /** SSL Mode label. */
-                    std::auto_ptr<Window> sslModeLabel;
 
-                    /** SSL Mode ComboBox. */
-                    std::auto_ptr<Window> sslModeComboBox;
 
-                    /** SSL Private Key File label. */
-                    std::auto_ptr<Window> sslKeyFileLabel;
 
-                    /** SSL Private Key File edit. */
-                    std::auto_ptr<Window> sslKeyFileEdit;
+                    ///** SSL Mode label. */
+                    //std::auto_ptr<Window> sslModeLabel;
 
-                    /** SSL Certificate File label. */
-                    std::auto_ptr<Window> sslCertFileLabel;
+                    ///** SSL Mode ComboBox. */
+                    //std::auto_ptr<Window> sslModeComboBox;
 
-                    /** SSL Certificate File edit. */
-                    std::auto_ptr<Window> sslCertFileEdit;
+                    ///** SSL Private Key File label. */
+                    //std::auto_ptr<Window> sslKeyFileLabel;
 
-                    /** SSL Certificate Authority File label. */
-                    std::auto_ptr<Window> sslCaFileLabel;
+                    ///** SSL Private Key File edit. */
+                    //std::auto_ptr<Window> sslKeyFileEdit;
 
-                    /** SSL Certificate Authority File edit. */
-                    std::auto_ptr<Window> sslCaFileEdit;
+                    ///** SSL Certificate File label. */
+                    //std::auto_ptr<Window> sslCertFileLabel;
+
+                    ///** SSL Certificate File edit. */
+                    //std::auto_ptr<Window> sslCertFileEdit;
+
+                    ///** SSL Certificate Authority File label. */
+                    //std::auto_ptr<Window> sslCaFileLabel;
+
+                    ///** SSL Certificate Authority File edit. */
+                    //std::auto_ptr<Window> sslCaFileEdit;
 
                     /** User label. */
                     std::auto_ptr<Window> userLabel;

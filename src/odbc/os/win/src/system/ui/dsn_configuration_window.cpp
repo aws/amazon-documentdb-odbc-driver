@@ -221,7 +221,7 @@ namespace ignite
 
                 int DsnConfigurationWindow::CreateSslSettingsGroup(int posX, int posY, int sizeX)
                 {   // TODO: rename function name from Ssl to TLS after UI works
-                    using ssl::SslMode;
+                    //using ssl::SslMode;
 
                     enum { LABEL_WIDTH = 120 };
 
@@ -235,7 +235,7 @@ namespace ignite
                     int checkBoxSize = (sizeX - 3 * INTERVAL) / 2;
 
                     tlsCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                        "TLS", ChildId::DISTRIBUTED_JOINS_CHECK_BOX, true);
+                        "TLS", ChildId::TLS_CHECK_BOX, true);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -472,7 +472,8 @@ namespace ignite
                                     break;
                                 }
 
-                                case ChildId::TLS_CHECK_BOX: {
+                                case ChildId::TLS_CHECK_BOX: 
+                                {
                                     tlsCheckBox->SetChecked(!tlsCheckBox->IsChecked());
 
                                     break;
@@ -485,14 +486,21 @@ namespace ignite
                                     std::string sslModeStr;
                                     sslModeComboBox->GetText(sslModeStr);
 
-                                    SslMode::Type sslMode = SslMode::FromString(sslModeStr, SslMode::DISABLE);
+                                //case ChildId::SSL_MODE_COMBO_BOX: //-AL- may need to remove this later
+                                //{
+                                //    using ssl::SslMode;
 
-                                    sslKeyFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
-                                    sslCertFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
-                                    sslCaFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
+                                //    std::string sslModeStr;
+                                //    sslModeComboBox->GetText(sslModeStr);
 
-                                    break;
-                                }
+                                //    SslMode::Type sslMode = SslMode::FromString(sslModeStr, SslMode::DISABLE);
+
+                                //    sslKeyFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
+                                //    sslCertFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
+                                //    sslCaFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
+
+                                //    break;
+                                //}
 
                                 default:
                                     return false;
@@ -585,28 +593,36 @@ namespace ignite
 
                 void DsnConfigurationWindow::RetrieveSslParameters(config::Configuration& cfg) const
                 {
-                    std::string sslModeStr;
-                    std::string sslKeyStr;
-                    std::string sslCertStr;
-                    std::string sslCaStr;
 
-                    sslModeComboBox->GetText(sslModeStr);
-                    sslKeyFileEdit->GetText(sslKeyStr);
-                    sslCertFileEdit->GetText(sslCertStr);
-                    sslCaFileEdit->GetText(sslCaStr);
+                    bool tls = tlsCheckBox->IsChecked();
 
-                    LOG_MSG("Retrieving arguments:");
-                    LOG_MSG("SSL Mode:           " << sslModeStr);
-                    LOG_MSG("SSL Key:            " << sslKeyStr);
-                    LOG_MSG("SSL Certificate:    " << sslCertStr);
-                    LOG_MSG("SSL CA:             " << sslCaStr);
 
-                    ssl::SslMode::Type sslMode = ssl::SslMode::FromString(sslModeStr, ssl::SslMode::DISABLE);
+                    LOG_MSG("TLS/SSL Encryption:      " << (tls ? "true" : "false"));
+
+                    cfg.SetTls(tls);
+
+                    //std::string sslModeStr;
+                    //std::string sslKeyStr;
+                    //std::string sslCertStr;
+                    //std::string sslCaStr;
+
+                    ////sslModeComboBox->GetText(sslModeStr);
+                    ////sslKeyFileEdit->GetText(sslKeyStr);
+                    ////sslCertFileEdit->GetText(sslCertStr);
+                    ////sslCaFileEdit->GetText(sslCaStr);
+
+                    //LOG_MSG("Retrieving arguments:");
+                    //LOG_MSG("SSL Mode:           " << sslModeStr);
+                    //LOG_MSG("SSL Key:            " << sslKeyStr);
+                    //LOG_MSG("SSL Certificate:    " << sslCertStr);
+                    //LOG_MSG("SSL CA:             " << sslCaStr);
+
+                    //ssl::SslMode::Type sslMode = ssl::SslMode::FromString(sslModeStr, ssl::SslMode::DISABLE);
 
                     //cfg.SetSslMode(sslMode);
                     //cfg.SetSslKeyFile(sslKeyStr);
                     //cfg.SetSslCertFile(sslCertStr);
-                    cfg.SetTlsCaFile(sslCaStr);
+                    //cfg.SetTlsCaFile(sslCaStr);
                 }
 
                 void DsnConfigurationWindow::RetrieveAdditionalParameters(config::Configuration& cfg) const
