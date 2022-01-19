@@ -346,8 +346,8 @@ namespace ignite {
                */
               struct IGNITE_IMPORT_EXPORT JniErrorInfo {
                   int code;
-                  char* errCls;
-                  char* errMsg;
+                  char* errCls = nullptr;
+                  char* errMsg = nullptr;
 
                   /**
                    * Default constructor. Creates empty error info.
@@ -402,17 +402,6 @@ namespace ignite {
                                          JniErrorInfo* errInfo);
 
                   void DocumentDbDisconnect(const jobject connection, JniErrorInfo* errInfo);
-
-                  void IgnitionStart(char* cfgPath, char* name, int factoryId,
-                                     int64_t dataPtr);
-                  void IgnitionStart(char* cfgPath, char* name, int factoryId,
-                                     int64_t dataPtr, JniErrorInfo* errInfo);
-                  int64_t IgnitionEnvironmentPointer(char* name);
-                  int64_t IgnitionEnvironmentPointer(char* name, JniErrorInfo* errInfo);
-                  bool IgnitionStop(char* name, bool cancel);
-                  bool IgnitionStop(char* name, bool cancel, JniErrorInfo* errInfo);
-                  void IgnitionStopAll(bool cancel);
-                  void IgnitionStopAll(bool cancel, JniErrorInfo* errInfo);
 
                   int64_t TargetInLongOutLong(jobject obj, int type, int64_t memPtr,
                                               JniErrorInfo* errInfo = NULL);

@@ -23,7 +23,6 @@
 #include <algorithm>
 #include <stdexcept>
 
-
 #include <ignite/odbc/ignite_error.h>
 #include <ignite/odbc/jni/utils.h>
 #include <ignite/odbc/jni/java.h>
@@ -126,14 +125,14 @@ namespace ignite
                     char* sign;
                     bool isStatic;
 
-                    JniMethod(const char* name, const char* sign, bool isStatic) {
-                        this->name = const_cast<char*>(name);
-                        this->sign = const_cast<char*>(sign);
-                        this->isStatic = isStatic;
+                    JniMethod(const char* name, const char* sign, bool isStatic)
+                        : name(const_cast< char* >(name)),
+                          sign(const_cast< char* >(sign)),
+                          isStatic(isStatic) {
                     }
                 };
 
-                JniErrorInfo::JniErrorInfo() : code(IGNITE_JNI_ERR_SUCCESS), errCls(NULL), errMsg(NULL)
+                JniErrorInfo::JniErrorInfo() : code(IGNITE_JNI_ERR_SUCCESS)
                 {
                     // No-op.
                 }
@@ -742,83 +741,6 @@ namespace ignite
                     env->CallVoidMethod(connection, jvm->GetMembers().m_JavaSqlConnectionClose);
                     ExceptionCheck(env, errInfo);
                     env->DeleteLocalRef(connection);
-                }
-
-                void JniContext::IgnitionStart(char* cfgPath, char* name, int factoryId, int64_t dataPtr) {
-                    return IgnitionStart(cfgPath, name, factoryId, dataPtr, NULL);
-                }
-
-                void JniContext::IgnitionStart(char* cfgPath, char* name, int factoryId, int64_t dataPtr, JniErrorInfo* errInfo)
-                {
-                    JNIEnv* env = Attach();
-
-                    jstring cfgPath0 = env->NewStringUTF(cfgPath);
-                    jstring name0 = env->NewStringUTF(name);
-
-                    env->CallStaticVoidMethod(
-                        jvm->GetMembers().c_PlatformIgnition,
-                        jvm->GetMembers().m_PlatformIgnition_start,
-                        cfgPath0,
-                        name0,
-                        factoryId,
-                        reinterpret_cast<int64_t>(&hnds),
-                        dataPtr
-                    );
-
-                    ExceptionCheck(env, errInfo);
-                }
-            
-                int64_t JniContext::IgnitionEnvironmentPointer(char* name)
-                {
-                    return IgnitionEnvironmentPointer(name, NULL);
-                }
-
-                int64_t JniContext::IgnitionEnvironmentPointer(char* name, JniErrorInfo* errInfo)
-                {
-                    JNIEnv* env = Attach();
-
-                    jstring name0 = env->NewStringUTF(name);
-
-                    int64_t res = env->CallStaticLongMethod(jvm->GetMembers().c_PlatformIgnition,
-                        jvm->GetMembers().m_PlatformIgnition_environmentPointer, name0);
-
-                    ExceptionCheck(env, errInfo);
-
-                    return res;
-                }
-
-                bool JniContext::IgnitionStop(char* name, bool cancel)
-                {
-                    return IgnitionStop(name, cancel, NULL);
-                }
-
-                bool JniContext::IgnitionStop(char* name, bool cancel, JniErrorInfo* errInfo)
-                {
-                    JNIEnv* env = Attach();
-
-                    jstring name0 = env->NewStringUTF(name);
-
-                    jboolean res = env->CallStaticBooleanMethod(jvm->GetMembers().c_PlatformIgnition,
-                        jvm->GetMembers().m_PlatformIgnition_stop, name0, cancel);
-
-                    ExceptionCheck(env, errInfo);
-
-                    return res != 0;
-                }
-
-                void JniContext::IgnitionStopAll(bool cancel)
-                {
-                    return IgnitionStopAll(cancel, NULL);
-                }
-
-                void JniContext::IgnitionStopAll(bool cancel, JniErrorInfo* errInfo)
-                {
-                    JNIEnv* env = Attach();
-
-                    env->CallStaticVoidMethod(jvm->GetMembers().c_PlatformIgnition,
-                        jvm->GetMembers().m_PlatformIgnition_stopAll, cancel);
-
-                    ExceptionCheck(env, errInfo);
                 }
 
                 int64_t JniContext::TargetInLongOutLong(jobject obj, int opType, int64_t val, JniErrorInfo* err) {
