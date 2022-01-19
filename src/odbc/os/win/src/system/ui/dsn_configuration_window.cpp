@@ -235,12 +235,13 @@ namespace ignite
                     int checkBoxSize = (sizeX - 3 * INTERVAL) / 2;
 
                     tlsCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                        "TLS", ChildId::TLS_CHECK_BOX, true);
+                        "TLS", ChildId::TLS_CHECK_BOX, config.IsTls());
 
                     tlsAllowInvalidHostnamesCheckBox = CreateCheckBox(
                         labelPosX + checkBoxSize + INTERVAL, rowPos,
                         checkBoxSize, ROW_HEIGHT, "TLS Allow Invalid Hostnames",
-                        ChildId::TLS_ALLOW_INVALID_HOSTNAMES_CHECK_BOX, false);
+                        ChildId::TLS_ALLOW_INVALID_HOSTNAMES_CHECK_BOX,
+                        config.IsTlsAllowInvalidHostnames());
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
