@@ -39,7 +39,7 @@ jobs:
     - name: add-msbuild-to-path
       uses: microsoft/setup-msbuild@v1.0.2
     - name: Install dependencies Windows
-      run: vcpkg integrate install; vcpkg install mongo-cxx-driver openssl:x86-windows boost-test:x86-windows boost-asio:x86-windows boost-chrono:x86-windows boost-interprocess:x86-windows boost-regex:x86-windows boost-system:x86-windows boost-thread:x86-windows
+      run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x86-winodws openssl:x86-windows boost-test:x86-windows boost-asio:x86-windows boost-chrono:x86-windows boost-interprocess:x86-windows boost-regex:x86-windows boost-system:x86-windows boost-thread:x86-windows
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - name: configure-and-build-driver
@@ -108,7 +108,7 @@ jobs:
     - name: add-msbuild-to-path
       uses: microsoft/setup-msbuild@v1.0.2
     - name: Install dependencies Windows
-      run: vcpkg integrate install; vcpkg install mongo-cxx-driver openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
+      run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x64-windows openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - name: configure-and-build-driver

@@ -38,8 +38,6 @@ if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
 endif()
 
 find_package(OpenSSL REQUIRED)
-find_package(mongocxx REQUIRED)
-find_package(bsoncxx REQUIRED)
 
 include_directories(include src ${OPENSSL_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIRS} ${BSONCXX_INCLUDE_DIRS})
 
@@ -48,12 +46,6 @@ set(SOURCES src/network/network.cpp
         src/network/ssl/ssl_gateway.cpp)
 
 if (WIN32)
-    if (MSVC)
-        # On Windows, min() and max() are defined macro. This causes a colision with MONGOCXX library.
-        # See: http://www.suodenjoki.dk/us/archive/2010/min-max.htm
-        add_definitions(-DNOMINMAX)
-    endif()
-
     include_directories(os/win/src)
 
     list(APPEND SOURCES os/win/src/network/tcp_socket_client.cpp
@@ -86,9 +78,9 @@ foreach(_target_lib IN LISTS _target_libs)
     if (${_target_lib} STREQUAL ${TARGET}-objlib)
         set_target_properties(${_target_lib} PROPERTIES POSITION_INDEPENDENT_CODE 1)
 
-        target_link_libraries(${_target_lib} ignite-common-objlib mongo::mongocxx_shared)
+        target_link_libraries(${_target_lib} ignite-common-objlib)
     else()
-        target_link_libraries(${_target_lib} ignite-common mongo::mongocxx_shared)
+        target_link_libraries(${_target_lib} ignite-common)
     endif()
 
     if (WIN32)

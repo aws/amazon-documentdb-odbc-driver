@@ -37,6 +37,12 @@
 #include "ignite/odbc/config/connection_string_parser.h"
 #include "ignite/odbc/system/system_dsn.h"
 
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+#include <mongocxx/uri.hpp>
+
 // Uncomment for per-byte debug.
 //#define PER_BYTE_DEBUG
 
@@ -106,7 +112,8 @@ namespace ignite
 
         void Connection::Establish(const std::string& connectStr, void* parentWindow)
         {
-            IGNITE_ODBC_API_CALL(InternalEstablish(connectStr, parentWindow));
+            //IGNITE_ODBC_API_CALL(InternalEstablish(connectStr, parentWindow));
+            ConnectCPPDocumentDB();
         }
 
         SqlResult::Type Connection::InternalEstablish(const std::string& connectStr, void* parentWindow)
@@ -815,6 +822,43 @@ namespace ignite
             }
 
             return static_cast<int32_t>(uTimeout);
+        }
+
+        void Connection::ConnectCPPDocumentDB() 
+        {
+            using bsoncxx::builder::basic::kvp;
+            using bsoncxx::builder::basic::make_document;
+
+            // The mongocxx::instance constructor and destructor initialize and
+            // shut down the driver, respectively. Therefore, a
+            // mongocxx::instance must be created before using the driver and
+            // must remain alive for as long as the driver is in use.
+            mongocxx::instance inst;
+
+            try {
+                const auto uri = mongocxx::uri{
+                    "mongodb://documentdb:bqdocumentdblab@127.0.0.1:27019/"
+                    "?tls=true&tlsCAFile=C:\\Users\\affon\\.ssh\\rds-ca-2019-"
+                    "root.pem&tlsAllowInvalidHostnames=true"};
+
+                auto client = mongocxx::client{uri};
+                auto database = client["test"];
+                auto collection = database["test"];
+                mongocxx::cursor cursor = collection.find({});
+                for (auto doc : cursor) {
+                    std::cout << bsoncxx::to_json(doc) << "\n";
+                }
+                // auto result = test.run_command(make_document(kvp("isMaster",
+                // 1))); std::cout << bsoncxx::to_json(result) << std::endl;
+
+                // return EXIT_SUCCESS;
+                //throw std::runtime_error("connection established");
+            } catch (const std::exception& xcp) {
+                std::cout << "connection failed: " << xcp.what() << std::endl;
+                //throw std::runtime_error("connection failed");
+                // return EXIT_FAILURE;
+            }
+        
         }
     }
 }

@@ -107,49 +107,49 @@ struct ConnectionTestSuiteFixture: odbc::OdbcTestSuite
 
 BOOST_FIXTURE_TEST_SUITE(ConnectionTestSuite, ConnectionTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestConnectionRestore)
+BOOST_AUTO_TEST_CASE(TestConnection)
 {
-    StartNode();
-
+    //StartNode();
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
-
-    // Check that query was successfully executed.
-    BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "");
-
-    // Stop node.
-    Ignition::StopAll(true);
-
-    // Query execution should throw ODBC error.
-    BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "08S01");
-
-    // Reusing a closed connection should not crash an application.
-    BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "08001");
-
-    StartNode();
-
-    // Check that connection was restored.
-    BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "");
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionMemoryLeak)
-{
-    TestServer testServer(11100);
+// BOOST_AUTO_TEST_CASE(TestConnectionRestore)
+// {
+//     StartNode();
 
-    testServer.PushHandshakeResponse(true);
-    testServer.Start();
+//     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-    Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11100;SCHEMA=cache");
+//     // Check that query was successfully executed.
+//     BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "");
 
-    ExecQuery("Select * from Test");
+//     // Stop node.
+//     Ignition::StopAll(true);
 
-    Disconnect();
-    Disconnect();
-}
+//     // Query execution should throw ODBC error.
+//     BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "08S01");
 
-BOOST_AUTO_TEST_CASE(TestMongoCPPConnection) {
+//     // Reusing a closed connection should not crash an application.
+//     BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "08001");
 
-    ConnectCPPDocumentDB();
+//     StartNode();
 
-}
+//     // Check that connection was restored.
+//     BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "");
+// }
+
+// BOOST_AUTO_TEST_CASE(TestConnectionMemoryLeak)
+// {
+//     TestServer testServer(11100);
+
+//     testServer.PushHandshakeResponse(true);
+//     testServer.Start();
+
+//     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11100;SCHEMA=cache");
+
+//     ExecQuery("Select * from Test");
+
+//     Disconnect();
+//     Disconnect();
+// }
 
 BOOST_AUTO_TEST_SUITE_END()

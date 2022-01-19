@@ -23,7 +23,7 @@ find_package(ODBC REQUIRED)
 find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
 
-include_directories(SYSTEM ${ODBC_INCLUDE_DIRS})
+include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS} ${BSONCXX_INCLUDE_DIRS})
 include_directories(include)
 
 set(SOURCES src/app/application_data_buffer.cpp
@@ -90,6 +90,12 @@ target_link_libraries(${TARGET} ${ODBC_LIBRARIES} mongo::mongocxx_shared)
 
 
 if (WIN32)
+    if (MSVC)
+        # On Windows, min() and max() are defined macro. This causes a colision with MONGOCXX library.
+        # See: http://www.suodenjoki.dk/us/archive/2010/min-max.htm
+        add_definitions(-DNOMINMAX)
+    endif()
+
     target_link_libraries(${TARGET} ignite-common-objlib ignite-binary-objlib ignite-network-objlib odbccp32 shlwapi)
 
     remove_definitions(-DUNICODE=1)

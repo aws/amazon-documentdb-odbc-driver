@@ -94,6 +94,8 @@ namespace ignite
              */
             void Establish(const std::string& connectStr, void* parentWindow);
 
+            void ConnectCPPDocumentDB();
+
             /**
              * Establish connection to ODBC server.
              *
