@@ -340,7 +340,7 @@ namespace ignite
                     {
                         os << '.';
 
-                        os.write(&magStr[static_cast<std::basic_string<char, std::char_traits<char>, std::allocator<char>>::size_type>(magBegin) + dotPos], afterDot);
+                        os.write(&magStr[static_cast< std::basic_string< char, std::char_traits< char >, std::allocator< char > >::size_type >(magBegin) + dotPos], afterDot);
                     }
                 }
 
