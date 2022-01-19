@@ -108,6 +108,7 @@ if (WIN32)
                 
     set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME "ignite.odbc")
 else()
+    add_definitions(-DBSONCXX_POLY_USE_MNMLSTC=1)
     target_link_libraries(${TARGET} ignite-common ignite-binary ignite-network)
 endif()
 
