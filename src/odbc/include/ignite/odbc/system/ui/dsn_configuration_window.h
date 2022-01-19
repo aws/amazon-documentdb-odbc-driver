@@ -64,6 +64,9 @@ namespace ignite
                             NESTED_TX_MODE_LABEL,
                             NESTED_TX_MODE_COMBO_BOX,
                             TLS_CHECK_BOX,
+                            TLS_ALLOW_INVALID_HOSTNAMES_CHECK_BOX,
+                            TLS_CA_FILE_LABEL,
+                            TLS_CA_FILE_EDIT,
                             //SSL_MODE_LABEL,
                             //SSL_MODE_COMBO_BOX,
                             //SSL_KEY_FILE_LABEL,
@@ -282,8 +285,14 @@ namespace ignite
                     /** TLS Encryption CheckBox. */
                     std::auto_ptr<Window> tlsCheckBox;
 
+                    /** TLS Allow Invalid Hostnames CheckBox. */
+                    std::auto_ptr< Window > tlsAllowInvalidHostnamesCheckBox;
 
+                    /** TLS Certificate Authority File label. */
+                    std::auto_ptr<Window> tlsCaFileLabel;
 
+                    /** TLS Certificate Authority File edit. */
+                    std::auto_ptr<Window> tlsCaFileEdit;
 
                     ///** SSL Mode label. */
                     //std::auto_ptr<Window> sslModeLabel;

@@ -237,6 +237,19 @@ namespace ignite
                     tlsCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
                         "TLS", ChildId::TLS_CHECK_BOX, true);
 
+                    tlsAllowInvalidHostnamesCheckBox = CreateCheckBox(
+                        labelPosX + checkBoxSize + INTERVAL, rowPos,
+                        checkBoxSize, ROW_HEIGHT, "TLS Allow Invalid Hostnames",
+                        ChildId::TLS_ALLOW_INVALID_HOSTNAMES_CHECK_BOX, false);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    const char* val = config.GetTlsCaFile().c_str();
+                    tlsCaFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                    "TLS Certificate Authority:", ChildId::TLS_CA_FILE_LABEL);
+                    tlsCaFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+                                   ChildId::TLS_CA_FILE_EDIT);
+
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     //SslMode::Type sslMode = ssl::SslMode::REQUIRE;
@@ -287,7 +300,9 @@ namespace ignite
                     // rowPos += INTERVAL + ROW_HEIGHT;
 
                     sslSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
-                        "SSL settings", ChildId::SSL_SETTINGS_GROUP_BOX);
+                        "TLS/SSL settings", ChildId::SSL_SETTINGS_GROUP_BOX);
+
+                    tlsCaFileEdit->SetEnabled(tlsCheckBox->IsChecked());
 
                     //sslKeyFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
                     //sslCertFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
@@ -475,16 +490,18 @@ namespace ignite
                                 case ChildId::TLS_CHECK_BOX: 
                                 {
                                     tlsCheckBox->SetChecked(!tlsCheckBox->IsChecked());
+                                    tlsCaFileEdit->SetEnabled(tlsCheckBox->IsChecked());
 
                                     break;
                                 }
 
-                                case ChildId::SSL_MODE_COMBO_BOX: //-AL- may need to remove this later
-                                {
-                                    using ssl::SslMode;
 
-                                    std::string sslModeStr;
-                                    sslModeComboBox->GetText(sslModeStr);
+                                case ChildId::TLS_ALLOW_INVALID_HOSTNAMES_CHECK_BOX:
+                                {
+                                    tlsAllowInvalidHostnamesCheckBox->SetChecked(!tlsAllowInvalidHostnamesCheckBox->IsChecked());
+
+                                    break;
+                                }
 
                                 //case ChildId::SSL_MODE_COMBO_BOX: //-AL- may need to remove this later
                                 //{
@@ -595,11 +612,18 @@ namespace ignite
                 {
 
                     bool tls = tlsCheckBox->IsChecked();
+                    bool tlsAllowInvalidHostnames = tlsAllowInvalidHostnamesCheckBox->IsChecked();
+                    std::string tlsCaStr;
 
+                    tlsCaFileEdit->GetText(tlsCaStr);
 
                     LOG_MSG("TLS/SSL Encryption:      " << (tls ? "true" : "false"));
+                    LOG_MSG("tls Allow Invalid Hostnames:      " << (tlsAllowInvalidHostnames ? "true" : "false"));
+                    LOG_MSG("TLS CA:             " << tlsCaStr);
 
                     cfg.SetTls(tls);
+                    cfg.SetTlsAllowInvalidHostnames(tlsAllowInvalidHostnames);
+                    cfg.SetTlsCaFile(tlsCaStr);
 
                     //std::string sslModeStr;
                     //std::string sslKeyStr;
