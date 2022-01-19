@@ -764,6 +764,7 @@ namespace ignite
 
                     cfg.SetApplicationName(appNameStr);
                     cfg.SetLoginTimeoutSeconds(loginTimeoutSec);
+                    cfg.SetReadPreference(readPreferenceStr);
                     cfg.SetFetchSize(fetchSize);
                     //cfg.SetNestedTxMode(mode);
                     //cfg.SetDistributedJoins(distributedJoins);
