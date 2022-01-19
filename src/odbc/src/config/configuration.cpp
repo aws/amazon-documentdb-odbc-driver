@@ -45,7 +45,7 @@ namespace ignite
             const bool Configuration::DefaultValue::tlsAllowInvalidHostnames = false; // needs to be set to true for SSH; TLS Allow Invalid Hostnames
             const std::string Configuration::DefaultValue::tlsCaFile = ""; //renamed from SSL CA file
            
-            // Schema Generation and Discovery options // need to add to UI
+            // Schema Generation and Discovery options // need to add to UI // I think I need a new group setting thing
             const std::string Configuration::DefaultValue::scanMethod = "random";
             const int32_t Configuration::DefaultValue::scanLimit = 1000;
             const std::string Configuration::DefaultValue::schemaName = "_default";
