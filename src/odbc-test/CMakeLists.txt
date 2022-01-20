@@ -33,6 +33,18 @@ include_directories(include ../odbc/include ../network/include)
 set(SOURCES 
          src/dummy_test.cpp
 		 src/configuration_test.cpp
+         ../odbc/src/config/config_tools.cpp
+         ../odbc/src/config/configuration.cpp
+         ../odbc/src/config/connection_info.cpp
+         ../odbc/src/config/connection_string_parser.cpp
+         ../odbc/src/scan_method.cpp
+         ../odbc/src/read_preference.cpp
+         ../odbc/src/diagnostic/diagnostic_record.cpp
+         ../odbc/src/diagnostic/diagnostic_record_storage.cpp
+         ../odbc/src/utility.cpp
+         ../odbc/src/common_types.cpp
+         ../odbc/src/app/application_data_buffer.cpp
+         ../odbc/src/log.cpp
 # TODO uncomment/rework the tests after get some connectivity and functionalities working.
 #        src/teamcity/teamcity_boost.cpp
 #        src/teamcity/teamcity_messages.cpp
@@ -72,27 +84,27 @@ set(SOURCES
 #        src/streaming_test.cpp
 #        src/cursor_binding_test.cpp
 #        src/test_server.cpp
-        ../odbc/src/log.cpp
-        ../odbc/src/cursor.cpp
-        ../odbc/src/diagnostic/diagnostic_record.cpp
-        ../odbc/src/diagnostic/diagnostic_record_storage.cpp
-        ../odbc/src/config/config_tools.cpp
-        ../odbc/src/config/configuration.cpp
-        ../odbc/src/config/connection_info.cpp
-        ../odbc/src/config/connection_string_parser.cpp
-        ../odbc/src/app/application_data_buffer.cpp
-        ../odbc/src/ssl_mode.cpp
-        ../odbc/src/sql/sql_parser.cpp
-       ../odbc/src/sql/sql_lexer.cpp
-       ../odbc/src/sql/sql_set_streaming_command.cpp
-       ../odbc/src/sql/sql_utils.cpp
-       ../odbc/src/row.cpp
-      ../odbc/src/protocol_version.cpp
-        ../odbc/src/column.cpp
-        ../odbc/src/common_types.cpp
-        ../odbc/src/utility.cpp
-        ../odbc/src/result_page.cpp
-        ../odbc/src/nested_tx_mode.cpp
+#        ../odbc/src/log.cpp
+#        ../odbc/src/cursor.cpp
+#        ../odbc/src/diagnostic/diagnostic_record.cpp
+#        ../odbc/src/diagnostic/diagnostic_record_storage.cpp
+#        ../odbc/src/config/config_tools.cpp
+#        ../odbc/src/config/configuration.cpp
+#        ../odbc/src/config/connection_info.cpp
+#        ../odbc/src/config/connection_string_parser.cpp
+#        ../odbc/src/app/application_data_buffer.cpp
+#        ../odbc/src/ssl_mode.cpp
+#        ../odbc/src/sql/sql_parser.cpp
+#        ../odbc/src/sql/sql_lexer.cpp
+#        ../odbc/src/sql/sql_set_streaming_command.cpp
+#        ../odbc/src/sql/sql_utils.cpp
+#        ../odbc/src/row.cpp
+#        ../odbc/src/protocol_version.cpp
+#        ../odbc/src/column.cpp
+#        ../odbc/src/common_types.cpp
+#        ../odbc/src/utility.cpp
+#        ../odbc/src/result_page.cpp
+#        ../odbc/src/nested_tx_mode.cpp
         )
 
 add_executable(${TARGET} ${SOURCES})

@@ -32,7 +32,7 @@ namespace ignite
         {
 
             const std::string Configuration::DefaultValue::dsn = "DocumentDB DSN";
-            const std::string Configuration::DefaultValue::driver = "Amazon DocumentDB Driver"; // remove
+            const std::string Configuration::DefaultValue::driver = "Amazon DocumentDB Driver";
             const std::string Configuration::DefaultValue::database = "";
             const std::string Configuration::DefaultValue::hostname = "";
             const uint16_t Configuration::DefaultValue::port = 27017;
@@ -45,7 +45,7 @@ namespace ignite
             const std::string Configuration::DefaultValue::tlsCaFile = "";
            
             // Schema Generation and Discovery options
-            const std::string Configuration::DefaultValue::scanMethod = "random";
+            const ScanMethod::Type Configuration::DefaultValue::scanMethod = ScanMethod::Type::RANDOM;
             const int32_t Configuration::DefaultValue::scanLimit = 1000;
             const std::string Configuration::DefaultValue::schemaName = "_default";
             const bool Configuration::DefaultValue::refreshSchema = false;
@@ -61,7 +61,7 @@ namespace ignite
             // Additional options
             const std::string Configuration::DefaultValue::appName = "Amazon DocumentDB ODBC Driver";
             const int32_t Configuration::DefaultValue::loginTimeoutSec = 0;
-            const std::string Configuration::DefaultValue::readPreference = "primary";
+            const ReadPreference::Type Configuration::DefaultValue::readPreference = ReadPreference::Type::PRIMARY;
             const std::string Configuration::DefaultValue::replicaSet = "";
             const bool Configuration::DefaultValue::retryReads = true;
             const int32_t Configuration::DefaultValue::defaultFetchSize = 2000;
@@ -132,9 +132,9 @@ namespace ignite
                 return port.GetValue();
             }
 
-            void Configuration::SetTcpPort(uint16_t port)
+            void Configuration::SetTcpPort(uint16_t portNumber)
             {
-                this->port.SetValue(port);
+                this->port.SetValue(portNumber);
             }
 
             bool Configuration::IsTcpPortSet() const
@@ -155,9 +155,9 @@ namespace ignite
                 return dsn.IsSet();
             }
 
-            void Configuration::SetDsn(const std::string& dsn)
+            void Configuration::SetDsn(const std::string& dsnName)
             {
-                this->dsn.SetValue(dsn);
+                this->dsn.SetValue(dsnName);
             }
 
             const std::string& Configuration::GetDriver() const
@@ -165,9 +165,9 @@ namespace ignite
                 return driver.GetValue();
             }
 
-            void Configuration::SetDriver(const std::string& driver)
+            void Configuration::SetDriver(const std::string& driverName)
             {
-                this->driver.SetValue(driver);
+                this->driver.SetValue(driverName);
             }
 
             const std::string& Configuration::GetHostname() const
@@ -230,12 +230,12 @@ namespace ignite
                 return loginTimeoutSec.IsSet();
             }
 
-            const std::string& Configuration::GetReadPreference() const
+            ReadPreference::Type Configuration::GetReadPreference() const
             {
                 return readPreference.GetValue();
             }
 
-            void Configuration::SetReadPreference(const std::string& preference)
+            void Configuration::SetReadPreference(const ReadPreference::Type preference)
             {
                 this->readPreference.SetValue(preference);
             }
@@ -340,9 +340,9 @@ namespace ignite
                 return sshHost.GetValue();
             }
 
-            void Configuration::SetSshHost(const std::string& hostname)
+            void Configuration::SetSshHost(const std::string& host)
             {
-                this->sshHost.SetValue(hostname);
+                this->sshHost.SetValue(host);
             }
 
             bool Configuration::IsSshHostSet() const
@@ -410,12 +410,12 @@ namespace ignite
                 return sshKnownHostsFile.IsSet();
             }
 
-            const std::string& Configuration::GetScanMethod() const
+            ScanMethod::Type Configuration::GetScanMethod() const
             {
                 return scanMethod.GetValue();
             }
 
-            void Configuration::SetScanMethod(const std::string& method)
+            void Configuration::SetScanMethod(const ScanMethod::Type method)
             {
                 this->scanMethod.SetValue(method);
             }
@@ -455,17 +455,17 @@ namespace ignite
                 return schemaName.IsSet();
             }
 
-            bool Configuration::IsSchemaRefresh() const
+            bool Configuration::IsRefreshSchema() const
             {
                 return refreshSchema.GetValue();
             }
 
-            void Configuration::SetSchemaRefresh(bool val)
+            void Configuration::SetRefreshSchema(bool val)
             {
                 this->refreshSchema.SetValue(val);
             }
 
-            bool Configuration::IsSchemaRefreshSet() const
+            bool Configuration::IsRefreshSchemaSet() const
             {
                 return refreshSchema.IsSet();
             }
@@ -475,9 +475,9 @@ namespace ignite
                 return user.GetValue();
             }
 
-            void Configuration::SetUser(const std::string& user)
+            void Configuration::SetUser(const std::string& username)
             {
-                this->user.SetValue(user);
+                this->user.SetValue(username);
             }
 
             bool Configuration::IsUserSet() const
@@ -517,7 +517,6 @@ namespace ignite
 
             void Configuration::ToMap(ArgumentMap& res) const
             {
-                // Need to add properties here!!
                 AddToMap(res, ConnectionStringParser::Key::dsn, dsn);
                 AddToMap(res, ConnectionStringParser::Key::driver, driver);
                 AddToMap(res, ConnectionStringParser::Key::database, database);
@@ -578,35 +577,20 @@ namespace ignite
 
             template<>
             void Configuration::AddToMap(ArgumentMap& map, const std::string& key,
-                const SettableValue<ProtocolVersion>& value)
+                const SettableValue<ReadPreference::Type>& value)
             {
                 if (value.IsSet())
-                    map[key] = value.GetValue().ToString();
+                    map[key] = ReadPreference::ToString(value.GetValue());
             }
 
             template<>
             void Configuration::AddToMap(ArgumentMap& map, const std::string& key,
-                const SettableValue< std::vector<EndPoint> >& value)
+                const SettableValue<ScanMethod::Type>& value)
             {
                 if (value.IsSet())
-                    map[key] = AddressesToString(value.GetValue());
+                    map[key] = ScanMethod::ToString(value.GetValue());
             }
 
-            template<>
-            void Configuration::AddToMap(ArgumentMap& map, const std::string& key,
-                const SettableValue<ssl::SslMode::Type>& value)
-            {
-                if (value.IsSet())
-                    map[key] = ssl::SslMode::ToString(value.GetValue());
-            }
-
-            template<>
-            void Configuration::AddToMap(ArgumentMap& map, const std::string& key,
-                const SettableValue<NestedTxMode::Type>& value)
-            {
-                if (value.IsSet())
-                    map[key] = NestedTxMode::ToString(value.GetValue());
-            }
         }
     }
 }

@@ -41,7 +41,7 @@ namespace
     const std::string testPassword = "testPassword";
     const std::string testAppName = "testAppName";
     const int32_t testLoginTimeoutSec = 3000;
-    const std::string testReadPreference = "primaryPreferred";
+    const ReadPreference::Type testReadPreference = ReadPreference::Type::PRIMARY_PREFERRED;
     const std::string testReplicaSet = "rs0";
     const bool testRetryReads = false;
     const bool testTlsFlag = false;
@@ -53,7 +53,7 @@ namespace
     const std::string testSshPrivateKeyPassphrase = "testPassphrase";
     const bool testSshStrictHostKeyCheckingFlag = false;
     const std::string testSshKnownHostsFile = "/path/to/knownhostsfile";
-    const std::string testScanMethod = "idForward";
+    const ScanMethod::Type testScanMethod =ScanMethod::Type::ID_FORWARD;
     const int32_t testScanLimit = 3000;
     const std::string testSchemaName = "testSchemaName";
     const bool testRefreshSchemaFlag = true;
@@ -115,31 +115,42 @@ void CheckValidAddress(const char* connectStr, const EndPoint& endPoint)
     BOOST_CHECK_EQUAL(cfg.GetTcpPort(), endPoint.port);
 }
 
-void CheckValidProtocolVersion(const char* connectStr, ProtocolVersion version)
+void CheckValidScanMethod(const char* connectStr, ScanMethod::Type scanMethod)
 {
     Configuration cfg;
 
     ParseValidConnectString(connectStr, cfg);
 
-    //BOOST_CHECK(cfg.GetProtocolVersion() == version);
+    BOOST_CHECK(cfg.GetScanMethod() == scanMethod);
 }
 
-void CheckSupportedProtocolVersion(const char* connectStr)
-{
-    Configuration cfg;
 
-    ParseValidConnectString(connectStr, cfg);
-
-    //BOOST_CHECK(cfg.GetProtocolVersion().IsSupported());
-}
-
-void CheckInvalidProtocolVersion(const char* connectStr)
+void CheckInvalidScanMethod(const char* connectStr)
 {
     Configuration cfg;
 
     ParseConnectStringWithError(connectStr, cfg);
 
-    //BOOST_CHECK(cfg.GetProtocolVersion() == Configuration::DefaultValue::protocolVersion);
+    BOOST_CHECK(cfg.GetScanMethod() == Configuration::DefaultValue::scanMethod);
+}
+
+void CheckValidReadPreference(const char* connectStr, ReadPreference::Type preference)
+{
+    Configuration cfg;
+
+    ParseValidConnectString(connectStr, cfg);
+
+    BOOST_CHECK(cfg.GetReadPreference() == preference);
+}
+
+
+void CheckInvalidReadPreference(const char* connectStr)
+{
+    Configuration cfg;
+
+    ParseConnectStringWithError(connectStr, cfg);
+
+    BOOST_CHECK(cfg.GetReadPreference() == Configuration::DefaultValue::readPreference);
 }
 
 void CheckValidBoolValue(const std::string& connectStr, const std::string& key, bool val)
@@ -178,7 +189,6 @@ void CheckConnectionConfig(const Configuration& cfg)
     BOOST_CHECK_EQUAL(cfg.GetPassword(), testPassword);
     BOOST_CHECK_EQUAL(cfg.GetApplicationName(), testAppName);
     BOOST_CHECK_EQUAL(cfg.GetLoginTimeoutSeconds(), testLoginTimeoutSec);
-    BOOST_CHECK_EQUAL(cfg.GetReadPreference(), testReadPreference);
     BOOST_CHECK_EQUAL(cfg.GetReplicaSet(), testReplicaSet);
     BOOST_CHECK_EQUAL(cfg.IsRetryReads(), testRetryReads);
     BOOST_CHECK_EQUAL(cfg.IsTls(), testTlsFlag);
@@ -190,13 +200,13 @@ void CheckConnectionConfig(const Configuration& cfg)
     BOOST_CHECK_EQUAL(cfg.GetSshPrivateKeyPassphrase(), testSshPrivateKeyPassphrase);
     BOOST_CHECK_EQUAL(cfg.IsSshStrictHostKeyChecking(), testSshStrictHostKeyCheckingFlag);
     BOOST_CHECK_EQUAL(cfg.GetSshKnownHostsFile(), testSshKnownHostsFile);
-    BOOST_CHECK_EQUAL(cfg.GetScanMethod(), testScanMethod);
     BOOST_CHECK_EQUAL(cfg.GetScanLimit(), testScanLimit);
     BOOST_CHECK_EQUAL(cfg.GetSchemaName(), testSchemaName);
-    BOOST_CHECK_EQUAL(cfg.IsSchemaRefresh(), testRefreshSchemaFlag);
+    BOOST_CHECK_EQUAL(cfg.IsRefreshSchema(), testRefreshSchemaFlag);
     BOOST_CHECK_EQUAL(cfg.GetDefaultFetchSize(), testDefaultFetchSize);
-
     BOOST_CHECK(!cfg.IsDsnSet());
+    BOOST_CHECK(cfg.GetReadPreference() == testReadPreference);
+    BOOST_CHECK(cfg.GetScanMethod() == testScanMethod);
 
     std::stringstream constructor;
 
@@ -208,12 +218,12 @@ void CheckConnectionConfig(const Configuration& cfg)
                 << "login_timeout_sec=" << testLoginTimeoutSec << ';'
                 << "password=" << testPassword << ';'
                 << "port=" << testServerPort << ';'
-                << "read_preference=" << testReadPreference << ';'
+                << "read_preference=" << ReadPreference::ToString(testReadPreference) << ';'
                 << "refresh_schema=" << BoolToStr(testRefreshSchemaFlag) << ';'
                 << "replica_set=" << testReplicaSet << ';'
                 << "retry_reads=" << BoolToStr(testRetryReads) << ';'
                 << "scan_limit=" << testScanLimit << ';'
-                << "scan_method=" << testScanMethod << ';'
+                << "scan_method=" << ScanMethod::ToString(testScanMethod) << ';'
                 << "schema_name=" << testSchemaName << ';'
                 << "ssh_host=" << testSshHost << ';'
                 << "ssh_known_hosts_file=" << testSshKnownHostsFile << ';'
@@ -242,7 +252,6 @@ void CheckDsnConfig(const Configuration& cfg)
     BOOST_CHECK_EQUAL(cfg.GetPassword(), Configuration::DefaultValue::password);
     BOOST_CHECK_EQUAL(cfg.GetApplicationName(), Configuration::DefaultValue::appName);
     BOOST_CHECK_EQUAL(cfg.GetLoginTimeoutSeconds(), Configuration::DefaultValue::loginTimeoutSec);
-    BOOST_CHECK_EQUAL(cfg.GetReadPreference(), Configuration::DefaultValue::readPreference);
     BOOST_CHECK_EQUAL(cfg.GetReplicaSet(), Configuration::DefaultValue::replicaSet);
     BOOST_CHECK_EQUAL(cfg.IsRetryReads(), Configuration::DefaultValue::retryReads);
     BOOST_CHECK_EQUAL(cfg.IsTls(), Configuration::DefaultValue::tls);
@@ -254,11 +263,12 @@ void CheckDsnConfig(const Configuration& cfg)
     BOOST_CHECK_EQUAL(cfg.GetSshPrivateKeyPassphrase(), Configuration::DefaultValue::sshPrivateKeyPassphrase);
     BOOST_CHECK_EQUAL(cfg.IsSshStrictHostKeyChecking(), Configuration::DefaultValue::sshStrictHostKeyChecking);
     BOOST_CHECK_EQUAL(cfg.GetSshKnownHostsFile(), Configuration::DefaultValue::sshKnownHostsFile);
-    BOOST_CHECK_EQUAL(cfg.GetScanMethod(), Configuration::DefaultValue::scanMethod);
     BOOST_CHECK_EQUAL(cfg.GetScanLimit(), Configuration::DefaultValue::scanLimit);
     BOOST_CHECK_EQUAL(cfg.GetSchemaName(), Configuration::DefaultValue::schemaName);
-    BOOST_CHECK_EQUAL(cfg.IsSchemaRefresh(), Configuration::DefaultValue::refreshSchema);
+    BOOST_CHECK_EQUAL(cfg.IsRefreshSchema(), Configuration::DefaultValue::refreshSchema);
     BOOST_CHECK_EQUAL(cfg.GetDefaultFetchSize(), Configuration::DefaultValue::defaultFetchSize);
+    BOOST_CHECK(cfg.GetReadPreference() == Configuration::DefaultValue::readPreference);
+    BOOST_CHECK(cfg.GetScanMethod() == Configuration::DefaultValue::scanMethod);
 }
 
 BOOST_AUTO_TEST_SUITE(ConfigurationTestSuite)
@@ -274,7 +284,6 @@ BOOST_AUTO_TEST_CASE(CheckTestValuesNotEqualDefault)
     BOOST_CHECK_NE(testPassword, Configuration::DefaultValue::password);
     BOOST_CHECK_NE(testAppName, Configuration::DefaultValue::appName);
     BOOST_CHECK_NE(testLoginTimeoutSec, Configuration::DefaultValue::loginTimeoutSec);
-    BOOST_CHECK_NE(testReadPreference, Configuration::DefaultValue::readPreference);
     BOOST_CHECK_NE(testReplicaSet, Configuration::DefaultValue::replicaSet);
     BOOST_CHECK_NE(testRetryReads, Configuration::DefaultValue::retryReads);
     BOOST_CHECK_NE(testTlsFlag, Configuration::DefaultValue::tls);
@@ -286,11 +295,12 @@ BOOST_AUTO_TEST_CASE(CheckTestValuesNotEqualDefault)
     BOOST_CHECK_NE(testSshPrivateKeyPassphrase, Configuration::DefaultValue::sshPrivateKeyPassphrase);
     BOOST_CHECK_NE(testSshStrictHostKeyCheckingFlag, Configuration::DefaultValue::sshStrictHostKeyChecking);
     BOOST_CHECK_NE(testSshKnownHostsFile, Configuration::DefaultValue::sshKnownHostsFile);
-    BOOST_CHECK_NE(testScanMethod, Configuration::DefaultValue::scanMethod);
     BOOST_CHECK_NE(testScanLimit, Configuration::DefaultValue::scanLimit);
     BOOST_CHECK_NE(testSchemaName, Configuration::DefaultValue::schemaName);
     BOOST_CHECK_NE(testRefreshSchemaFlag, Configuration::DefaultValue::refreshSchema);
     BOOST_CHECK_NE(testDefaultFetchSize, Configuration::DefaultValue::defaultFetchSize);
+    BOOST_CHECK(testReadPreference != Configuration::DefaultValue::readPreference);
+    BOOST_CHECK(testScanMethod != Configuration::DefaultValue::scanMethod);
 }
 
 BOOST_AUTO_TEST_CASE(TestConnectStringUppercase)
@@ -306,7 +316,7 @@ BOOST_AUTO_TEST_CASE(TestConnectStringUppercase)
                 << "PASSWORD=" << testPassword << ';'
                 << "APP_NAME=" << testAppName << ';'
                 << "LOGIN_TIMEOUT_SEC=" << testLoginTimeoutSec << ';'
-                << "READ_PREFERENCE=" << testReadPreference << ';'
+                << "READ_PREFERENCE=" << ReadPreference::ToString(testReadPreference) << ';'
                 << "REPLICA_SET=" << testReplicaSet << ';'
                 << "RETRY_READS=" << BoolToStr(testRetryReads) << ';'
                 << "TLS=" << BoolToStr(testTlsFlag) << ';'
@@ -318,7 +328,7 @@ BOOST_AUTO_TEST_CASE(TestConnectStringUppercase)
                 << "SSH_PRIVATE_KEY_PASSPHRASE=" << testSshPrivateKeyPassphrase << ';'
                 << "SSH_STRICT_HOST_KEY_CHECKING=" << BoolToStr(testSshStrictHostKeyCheckingFlag) << ';'
                 << "SSH_KNOWN_HOSTS_FILE=" << testSshKnownHostsFile << ';'
-                << "SCAN_METHOD=" << testScanMethod << ';'
+                << "SCAN_METHOD=" << ScanMethod::ToString(testScanMethod) << ';'
                 << "SCAN_LIMIT=" << testScanLimit << ';'
                 << "SCHEMA_NAME=" << testSchemaName << ';'
                 << "REFRESH_SCHEMA=" << BoolToStr(testRefreshSchemaFlag) << ';'
@@ -345,7 +355,7 @@ BOOST_AUTO_TEST_CASE(TestConnectStringLowercase)
                 << "password=" << testPassword << ';'
                 << "app_name=" << testAppName << ';'
                 << "login_timeout_sec=" << testLoginTimeoutSec << ';'
-                << "read_preference=" << testReadPreference << ';'
+                << "read_preference=" << ReadPreference::ToString(testReadPreference) << ';'
                 << "replica_set=" << testReplicaSet << ';'
                 << "retry_reads=" << BoolToStr(testRetryReads) << ';'
                 << "tls=" << BoolToStr(testTlsFlag) << ';'
@@ -357,7 +367,7 @@ BOOST_AUTO_TEST_CASE(TestConnectStringLowercase)
                 << "ssh_private_key_passphrase=" << testSshPrivateKeyPassphrase << ';'
                 << "ssh_strict_host_key_checking=" << BoolToStr(testSshStrictHostKeyCheckingFlag) << ';'
                 << "ssh_known_hosts_file=" << testSshKnownHostsFile << ';'
-                << "scan_method=" << testScanMethod << ';'
+                << "scan_method=" << ScanMethod::ToString(testScanMethod) << ';'
                 << "scan_limit=" << testScanLimit << ';'
                 << "schema_name=" << testSchemaName << ';'
                 << "refresh_schema=" << BoolToStr(testRefreshSchemaFlag) << ';'
@@ -384,7 +394,7 @@ BOOST_AUTO_TEST_CASE(TestConnectStringZeroTerminated)
                 << "password=" << testPassword << ';'
                 << "app_name=" << testAppName << ';'
                 << "login_timeout_sec=" << testLoginTimeoutSec << ';'
-                << "read_preference=" << testReadPreference << ';'
+                << "read_preference=" << ReadPreference::ToString(testReadPreference) << ';'
                 << "replica_set=" << testReplicaSet << ';'
                 << "retry_reads=" << BoolToStr(testRetryReads) << ';'
                 << "tls=" << BoolToStr(testTlsFlag) << ';'
@@ -396,7 +406,7 @@ BOOST_AUTO_TEST_CASE(TestConnectStringZeroTerminated)
                 << "ssh_private_key_passphrase=" << testSshPrivateKeyPassphrase << ';'
                 << "ssh_strict_host_key_checking=" << BoolToStr(testSshStrictHostKeyCheckingFlag) << ';'
                 << "ssh_known_hosts_file=" << testSshKnownHostsFile << ';'
-                << "scan_method=" << testScanMethod << ';'
+                << "scan_method=" << ScanMethod::ToString(testScanMethod) << ';'
                 << "scan_limit=" << testScanLimit << ';'
                 << "schema_name=" << testSchemaName << ';'
                 << "refresh_schema=" << BoolToStr(testRefreshSchemaFlag) << ';'
@@ -425,7 +435,7 @@ BOOST_AUTO_TEST_CASE(TestConnectStringMixed)
                 << "Password=" << testPassword << ';'
                 << "App_Name=" << testAppName << ';'
                 << "Login_Timeout_Sec=" << testLoginTimeoutSec << ';'
-                << "Read_Preference=" << testReadPreference << ';'
+                << "Read_Preference=" << ReadPreference::ToString(testReadPreference) << ';'
                 << "Replica_Set=" << testReplicaSet << ';'
                 << "Retry_Reads=" << BoolToStr(testRetryReads) << ';'
                 << "Tls=" << BoolToStr(testTlsFlag) << ';'
@@ -437,7 +447,7 @@ BOOST_AUTO_TEST_CASE(TestConnectStringMixed)
                 << "Ssh_Private_Key_Passphrase=" << testSshPrivateKeyPassphrase << ';'
                 << "Ssh_Strict_Host_Key_Checking=" << BoolToStr(testSshStrictHostKeyCheckingFlag) << ';'
                 << "Ssh_Known_Hosts_File=" << testSshKnownHostsFile << ';'
-                << "Scan_Method=" << testScanMethod << ';'
+                << "Scan_Method=" << ScanMethod::ToString(testScanMethod) << ';'
                 << "Scan_Limit=" << testScanLimit << ';'
                 << "Schema_Name=" << testSchemaName << ';'
                 << "Refresh_Schema=" << BoolToStr(testRefreshSchemaFlag) << ';'
@@ -464,7 +474,7 @@ BOOST_AUTO_TEST_CASE(TestConnectStringWhitepaces)
                 << "PASSWORD=" << testPassword << ';'
                 << "APP_NAME=" << testAppName << ';'
                 << "LOGIN_TIMEOUT_SEC=" << testLoginTimeoutSec << ';'
-                << "READ_PREFERENCE=" << testReadPreference << ';'
+                << "READ_PREFERENCE=" << ReadPreference::ToString(testReadPreference) << ';'
                 << " REPLICA_SET=" << testReplicaSet << ';'
                 << "RETRY_READS=" << BoolToStr(testRetryReads) << ';'
                 << "TLS =" << BoolToStr(testTlsFlag) << ';'
@@ -476,7 +486,7 @@ BOOST_AUTO_TEST_CASE(TestConnectStringWhitepaces)
                 << " SSH_PRIVATE_KEY_PASSPHRASE= " << testSshPrivateKeyPassphrase << ';'
                 << "  SSH_STRICT_HOST_KEY_CHECKING= " << BoolToStr(testSshStrictHostKeyCheckingFlag) << ';'
                 << " SSH_KNOWN_HOSTS_FILE = " << testSshKnownHostsFile << ';'
-                << "  SCAN_METHOD  =  " << testScanMethod << ';'
+                << "  SCAN_METHOD  =  " << ScanMethod::ToString(testScanMethod) << ';'
                 << " SCAN_LIMIT= " << testScanLimit << ';'
                 << "SCHEMA_NAME=" << testSchemaName << " ;              "
                 << " REFRESH_SCHEMA=" << BoolToStr(testRefreshSchemaFlag) << ';'
@@ -513,28 +523,34 @@ BOOST_AUTO_TEST_CASE(TestConnectStringValidAddress)
     CheckValidAddress("hostname=example.com:1000..1010;", EndPoint("example.com", 1000, 10));
 }
 
-/*BOOST_AUTO_TEST_CASE(TestConnectStringInvalidVersion)
+BOOST_AUTO_TEST_CASE(TestConnectStringInvalidScanMethod)
 {
-    CheckInvalidProtocolVersion("Protocol_Version=0;");
-    CheckInvalidProtocolVersion("Protocol_Version=1;");
-    CheckInvalidProtocolVersion("Protocol_Version=2;");
-    CheckInvalidProtocolVersion("Protocol_Version=2.1;");
+    CheckInvalidScanMethod("scan_method=forward;");
+    CheckInvalidScanMethod("scan_method=id_random;");
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectStringUnsupportedVersion)
+BOOST_AUTO_TEST_CASE(TestConnectStringValidScanMethod)
 {
-    CheckInvalidProtocolVersion("Protocol_Version=1.6.1;");
-    CheckInvalidProtocolVersion("Protocol_Version=1.7.0;");
-    CheckInvalidProtocolVersion("Protocol_Version=1.8.1;");
+    CheckValidScanMethod("scan_method=all;", ScanMethod::Type::ALL);
+    CheckValidScanMethod("scan_method=id_forward;", ScanMethod::Type::ID_FORWARD);
+    CheckValidScanMethod("scan_method=id_reverse;", ScanMethod::Type::ID_REVERSE);
+    CheckValidScanMethod("scan_method=random;", ScanMethod::Type::RANDOM);
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectStringSupportedVersion)
+BOOST_AUTO_TEST_CASE(TestConnectStringInvalidReadPreference)
 {
-    CheckSupportedProtocolVersion("Protocol_Version=2.1.0;");
-    CheckSupportedProtocolVersion("Protocol_Version=2.1.5;");
-    CheckSupportedProtocolVersion("Protocol_Version=2.3.0;");
-    CheckSupportedProtocolVersion("Protocol_Version=2.3.2;");
-}*/
+    CheckInvalidReadPreference("read_preference=primary_nearest;");
+    CheckInvalidReadPreference("read_preference=nearest_preferred;");
+}
+
+BOOST_AUTO_TEST_CASE(TestConnectStringValidReadPreference)
+{
+    CheckValidReadPreference("read_preference=primary;", ReadPreference::Type::PRIMARY);
+    CheckValidReadPreference("read_preference=primary_preferred;", ReadPreference::Type::PRIMARY_PREFERRED);
+    CheckValidReadPreference("read_preference=secondary;", ReadPreference::Type::SECONDARY);
+    CheckValidReadPreference("read_preference=secondary_preferred;", ReadPreference::Type::SECONDARY_PREFERRED);
+    CheckValidReadPreference("read_preference=nearest;", ReadPreference::Type::NEAREST);
+}
 
 BOOST_AUTO_TEST_CASE(TestConnectStringInvalidBoolKeys)
 {

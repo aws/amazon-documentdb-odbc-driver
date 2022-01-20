@@ -27,6 +27,8 @@
 #include "ignite/odbc/ssl_mode.h"
 #include "ignite/odbc/end_point.h"
 #include "ignite/odbc/nested_tx_mode.h"
+#include "ignite/odbc/read_preference.h"
+#include "ignite/odbc/scan_method.h"
 
 namespace ignite
 {
@@ -74,7 +76,7 @@ namespace ignite
                     static const int32_t loginTimeoutSec;
 
                     /** Default value for readPreference attribute. */
-                    static const std::string readPreference;
+                    static const ReadPreference::Type readPreference;
 
                     /** Default value for replicaSet attribute. */
                     static const std::string replicaSet;
@@ -110,7 +112,7 @@ namespace ignite
                     static const std::string sshKnownHostsFile;
 
                     /** Default value for scanMethod attribute. */
-                    static const std::string scanMethod;
+                    static const ScanMethod::Type scanMethod;
 
                     /** Default value for scanLimit attribute. */
                     static const int32_t scanLimit;
@@ -167,7 +169,7 @@ namespace ignite
                  *
                  * @param dsn Data Source Name.
                  */
-                void SetDsn(const std::string& dsn);
+                void SetDsn(const std::string& dsnName);
 
                 /**
                  * Get Driver.
@@ -181,7 +183,7 @@ namespace ignite
                  *
                  * @param driver Driver.
                  */
-                void SetDriver(const std::string& driver);
+                void SetDriver(const std::string& driverName);
 
                 /**
                  * Get server host.
@@ -214,9 +216,9 @@ namespace ignite
                 /**
                  * Set server port.
                  *
-                 * @param port Server port.
+                 * @param portNumber Server port.
                  */
-                void SetTcpPort(uint16_t port);
+                void SetTcpPort(uint16_t portNumber);
 
                 /**
                  * Check if the value set.
@@ -226,18 +228,18 @@ namespace ignite
                 bool IsTcpPortSet() const;
 
                 /**
-                 * Get schema.
+                 * Get database.
                  *
-                 * @return Schema.
+                 * @return Database.
                  */
                 const std::string& GetDatabase() const;
 
                 /**
                  * Set schema.
                  *
-                 * @param schema Schema name.
+                 * @param database Database name.
                  */
-                void SetDatabase(const std::string& schema);
+                void SetDatabase(const std::string& databaseName);
 
                 /**
                  * Check if the value set.
@@ -258,7 +260,7 @@ namespace ignite
                  *
                  * @param user User.
                  */
-                void SetUser(const std::string& user);
+                void SetUser(const std::string& username);
 
                 /**
                  * Check if the value set.
@@ -289,16 +291,16 @@ namespace ignite
                 bool IsPasswordSet() const;
 
                 /**
-                 * Get password.
+                 * Get application name.
                  *
-                 * @return Password.
+                 * @return Application name.
                  */
                 const std::string& GetApplicationName() const;
 
                 /**
-                 * Set password.
+                 * Set application name.
                  *
-                 * @param pass Password.
+                 * @param name Application name.
                  */
                 void SetApplicationName(const std::string& name);
 
@@ -310,16 +312,16 @@ namespace ignite
                 bool IsApplicationNameSet() const;
 
                 /**
-                 * Get fetch results page size. 
+                 * Get login timeout in seconds. 
                  *
-                 * @return Fetch results page size.
+                 * @return Login timeout in seconds.
                  */
                 int32_t GetLoginTimeoutSeconds() const;
 
                 /**
-                 * Set fetch results page size.
+                 * Set login timeout in seconds.
                  *
-                 * @param size Fetch results page size.
+                 * @param seconds Login timeout in seconds.
                  */
                 void SetLoginTimeoutSeconds(int32_t seconds);
 
@@ -331,18 +333,18 @@ namespace ignite
                 bool IsLoginTimeoutSecondsSet() const;
 
                 /**
-                 * Get password.
+                 * Get read preference.
                  *
-                 * @return Password.
+                 * @return Read preference.
                  */
-                const std::string& GetReadPreference() const;
+                ReadPreference::Type GetReadPreference() const;
 
                 /**
-                 * Set password.
+                 * Set read preference.
                  *
-                 * @param pass Password.
+                 * @param preference Read preference.
                  */
-                void SetReadPreference(const std::string& preference);
+                void SetReadPreference(const ReadPreference::Type preference);
 
                 /**
                  * Check if the value set.
@@ -350,17 +352,18 @@ namespace ignite
                  * @return @true if the value set.
                  */
                 bool IsReadPreferenceSet() const;
+                
                 /**
-                 * Get password.
+                 * Get replica set name.
                  *
-                 * @return Password.
+                 * @return Replica set name.
                  */
                 const std::string& GetReplicaSet() const;
 
                 /**
-                 * Set password.
+                 * Set replica set name.
                  *
-                 * @param pass Password.
+                 * @param name Replica set name.
                  */
                 void SetReplicaSet(const std::string& name);
 
@@ -372,16 +375,16 @@ namespace ignite
                 bool IsReplicaSetSet() const;
 
                 /**
-                 * Get password.
+                 * Get retry reads flag.
                  *
-                 * @return Password.
+                 * @return @true if retry reads enabled.
                  */
                 bool IsRetryReads() const;
 
                 /**
-                 * Set password.
+                 * Set retry reads.
                  *
-                 * @param pass Password.
+                 * @param val Value to set.
                  */
                 void SetRetryReads(bool val);
 
@@ -393,16 +396,16 @@ namespace ignite
                 bool IsRetryReadsSet() const;
 
                 /**
-                 * Get password.
+                 * Get TLS flag.
                  *
-                 * @return Password.
+                 * @return @true if TLS is enabled.
                  */
                 bool IsTls() const;
 
                 /**
-                 * Set password.
+                 * Set TLS flag.
                  *
-                 * @param pass Password.
+                 * @param val Value to set.
                  */
                 void SetTls(bool val);
 
@@ -414,16 +417,16 @@ namespace ignite
                 bool IsTlsSet() const;
 
                 /**
-                 * Get password.
+                 * Get TLS allow invalid hostnames flag.
                  *
-                 * @return Password.
+                 * @return @true if invalid hostnames are allowed with TLS.
                  */
                 bool IsTlsAllowInvalidHostnames() const;
 
                 /**
-                 * Set password.
+                 * Set TLS allow invaid hostnames flag.
                  *
-                 * @param pass Password.
+                 * @param val Value to set.
                  */
                 void SetTlsAllowInvalidHostnames(bool val);
 
@@ -435,16 +438,16 @@ namespace ignite
                 bool IsTlsAllowInvalidHostnamesSet() const;
                 
                 /**
-                 * Get password.
+                 * Get path to TLS CA file.
                  *
-                 * @return Password.
+                 * @return path to TLS CA file.
                  */
                 const std::string& GetTlsCaFile() const;
 
                 /**
-                 * Set password.
+                 * Set path to TLS CA file.
                  *
-                 * @param pass Password.
+                 * @param path Path to TLS CA file.
                  */
                 void SetTlsCaFile(const std::string& path);
 
@@ -456,18 +459,18 @@ namespace ignite
                 bool IsTlsCaFileSet() const;
 
                 /**
-                 * Get password.
+                 * Get username for SSH host.
                  *
-                 * @return Password.
+                 * @return SSH username.
                  */
                 const std::string& GetSshUser() const;
 
                 /**
-                 * Set password.
+                 * Set username for SSH host.
                  *
-                 * @param pass Password.
+                 * @param username SSH username.
                  */
-                void SetSshUser(const std::string& user);
+                void SetSshUser(const std::string& username);
 
                 /**
                  * Check if the value set.
@@ -477,16 +480,16 @@ namespace ignite
                 bool IsSshUserSet() const;
 
                 /**
-                 * Get password.
+                 * Get hostname for SSH host.
                  *
-                 * @return Password.
+                 * @return SSH hostname.
                  */
                 const std::string& GetSshHost() const;
 
                 /**
-                 * Set password.
+                 * Set SSH hostname.
                  *
-                 * @param pass Password.
+                 * @param host SSH hostname.
                  */
                 void SetSshHost(const std::string& host);
 
@@ -498,16 +501,16 @@ namespace ignite
                 bool IsSshHostSet() const;
 
                 /**
-                 * Get password.
+                 * Get path to private key file for SSH host.
                  *
-                 * @return Password.
+                 * @return Path to private key file for SSH host.
                  */
                 const std::string& GetSshPrivateKeyFile () const;
 
                 /**
-                 * Set password.
+                 * Set path to private key file.
                  *
-                 * @param pass Password.
+                 * @param path Path to private key file for SSH host.
                  */
                 void SetSshPrivateKeyFile(const std::string& path);
 
@@ -519,16 +522,16 @@ namespace ignite
                 bool IsSshPrivateKeyFileSet() const;
 
                 /**
-                 * Get password.
+                 * Get SSH private key passphrase.
                  *
-                 * @return Password.
+                 * @return SSH private key passphrase.
                  */
                 const std::string& GetSshPrivateKeyPassphrase() const;
 
                 /**
-                 * Set password.
+                 * Set SSH private key file passphrase.
                  *
-                 * @param pass Password.
+                 * @param passphrase SSH private key file passphrase.
                  */
                 void SetSshPrivateKeyPassphrase(const std::string& passphrase);
 
@@ -540,16 +543,16 @@ namespace ignite
                 bool IsSshPrivateKeyPassphraseSet() const;
 
                 /**
-                 * Get password.
+                 * Get SSH strict host key checking flag.
                  *
-                 * @return Password.
+                 * @return @true if strict host key checking is enabled.
                  */
                 bool IsSshStrictHostKeyChecking() const;
 
                 /**
-                 * Set password.
+                 * Set strict host key checking flag.
                  *
-                 * @param pass Password.
+                 * @param val Value to set.
                  */
                 void SetSshStrictHostKeyChecking(bool val);
 
@@ -561,16 +564,16 @@ namespace ignite
                 bool IsSshStrictHostKeyCheckingSet() const;
 
                 /**
-                 * Get password.
+                 * Get path to SSH known hosts file.
                  *
-                 * @return Password.
+                 * @return Path to SSH known hosts file.
                  */
                 const std::string& GetSshKnownHostsFile() const;
 
                 /**
-                 * Set password.
+                 * Set path to SSH known hosts file.
                  *
-                 * @param pass Password.
+                 * @param path Path to SSH known hosts file.
                  */
                 void SetSshKnownHostsFile(const std::string& path);
 
@@ -582,18 +585,18 @@ namespace ignite
                 bool IsSshKnownHostsFileSet() const;
 
                 /**
-                  * Get password.
+                  * Get scan method.
                   *
-                  * @return Password.
+                  * @return Scan method.
                   */
-                const std::string& GetScanMethod() const;
+                ScanMethod::Type GetScanMethod() const;
 
                 /**
-                 * Set password.
+                 * Set scan method.
                  *
-                 * @param pass Password.
+                 * @param method Scan method.
                  */
-                void SetScanMethod(const std::string& method);
+                void SetScanMethod(const ScanMethod::Type method);
 
                 /**
                  * Check if the value set.
@@ -603,16 +606,16 @@ namespace ignite
                 bool IsScanMethodSet() const;
 
                 /**
-                 * Get fetch results page size.
+                 * Get scan limit in # of documents.
                  *
-                 * @return Fetch results page size.
+                 * @return Scan limit.
                  */
                 int32_t GetScanLimit() const;
 
                 /**
-                 * Set fetch results page size.
+                 * Set scan limit in # of documents.
                  *
-                 * @param size Fetch results page size.
+                 * @param limit Scan limit in # of documents.
                  */
                 void SetScanLimit(int32_t limit);
 
@@ -624,18 +627,18 @@ namespace ignite
                 bool IsScanLimitSet() const;
 
                 /**
-                  * Get password.
+                  * Get schema name to save.
                   *
-                  * @return Password.
+                  * @return Schema name.
                   */
                 const std::string& GetSchemaName() const;
 
                 /**
-                 * Set password.
+                 * Set schema name to save.
                  *
-                 * @param pass Password.
+                 * @param name Schema name.
                  */
-                void SetSchemaName(const std::string& method);
+                void SetSchemaName(const std::string& name);
 
                 /**
                  * Check if the value set.
@@ -645,37 +648,37 @@ namespace ignite
                 bool IsSchemaNameSet() const;
 
                 /**
-                 * Get password.
+                 * Get refresh schema flag.
                  *
                  * @return Password.
                  */
-                bool IsSchemaRefresh() const;
+                bool IsRefreshSchema() const;
 
                 /**
-                 * Set password.
+                 * Set refresh schema flag.
                  *
-                 * @param pass Password.
+                 * @return @true if the value set.
                  */
-                void SetSchemaRefresh(bool val);
+                void SetRefreshSchema(bool val);
 
                 /**
                  * Check if the value set.
                  *
                  * @return @true if the value set.
                  */
-                bool IsSchemaRefreshSet() const;
+                bool IsRefreshSchemaSet() const;
 
                 /**
-                 * Get fetch results page size.
+                 * Get default fetch size.
                  *
-                 * @return Fetch results page size.
+                 * @return Default fetch size.
                  */
                 int32_t GetDefaultFetchSize() const;
 
                 /**
-                 * Set fetch results page size.
+                 * Set default fetch size.
                  *
-                 * @param size Fetch results page size.
+                 * @param size Default fetch size.
                  */
                 void SetDefaultFetchSize(int32_t size);
 
@@ -713,10 +716,10 @@ namespace ignite
                 /** Schema. */
                 SettableValue<std::string> database;
 
-                /** Server. Deprecated. */
+                /** Hostname. */
                 SettableValue<std::string> hostname;
 
-                /** TCP port. Deprecated. */
+                /** Port. */
                 SettableValue<uint16_t> port;
 
                 /** User. */
@@ -732,7 +735,7 @@ namespace ignite
                 SettableValue<int32_t> loginTimeoutSec;
 
                 /** Read pereference. */
-                SettableValue<std::string> readPreference;
+                SettableValue<ReadPreference::Type> readPreference;
 
                 /** Replica set name. */
                 SettableValue<std::string> replicaSet;
@@ -768,7 +771,7 @@ namespace ignite
                 SettableValue<std::string> sshKnownHostsFile;
 
                 /** Scan method. */ 
-                SettableValue<std::string> scanMethod;
+                SettableValue<ScanMethod::Type> scanMethod;
 
                 /** Scan limit. */
                 SettableValue<int32_t> scanLimit;
@@ -800,20 +803,12 @@ namespace ignite
                 const SettableValue<bool>& value);
 
             template<>
-            void Configuration::AddToMap<ProtocolVersion>(ArgumentMap& map, const std::string& key,
-                const SettableValue<ProtocolVersion>& value);
+            void Configuration::AddToMap<ReadPreference::Type>(ArgumentMap& map, const std::string& key,
+                const SettableValue<ReadPreference::Type>& value);
 
             template<>
-            void Configuration::AddToMap< std::vector<EndPoint> >(ArgumentMap& map, const std::string& key,
-                const SettableValue< std::vector<EndPoint> >& value);
-
-            template<>
-            void Configuration::AddToMap<ssl::SslMode::Type>(ArgumentMap& map, const std::string& key,
-                const SettableValue<ssl::SslMode::Type>& value);
-
-            template<>
-            void Configuration::AddToMap<NestedTxMode::Type>(ArgumentMap& map, const std::string& key,
-                const SettableValue<NestedTxMode::Type>& value);
+            void Configuration::AddToMap<ScanMethod::Type>(ArgumentMap& map, const std::string& key,
+                const SettableValue<ScanMethod::Type>& value);
         }
     }
 }

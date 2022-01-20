@@ -258,7 +258,20 @@ namespace ignite
                 }
                 else if (lKey == Key::readPreference)
                 {
-                    cfg.SetReadPreference(value);
+                    ReadPreference::Type preference = ReadPreference::FromString(value);
+
+                    if (preference == ReadPreference::Type::UNKNOWN)
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                "Specified read preference is not supported. Default value used ('primary').");
+                        }
+
+                        return;
+                    }
+
+                    cfg.SetReadPreference(preference);
                 }
                 else if (lKey == Key::replicaSet)
                 {
@@ -358,7 +371,20 @@ namespace ignite
                 }
                 else if (lKey == Key::scanMethod)
                 {
-                    cfg.SetScanMethod(value);
+                    ScanMethod::Type method = ScanMethod::FromString(value);
+                    
+                    if (method == ScanMethod::Type::UNKNOWN)
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                "Specified scan method is not supported. Default value used ('random').");
+                        }
+
+                        return;
+                    }
+
+                    cfg.SetScanMethod(method);
                 }
                 else if (lKey == Key::scanLimit)
                 {
@@ -413,7 +439,7 @@ namespace ignite
                         return;
                     }
 
-                    cfg.SetSchemaRefresh(res == BoolParseResult::AI_TRUE);
+                    cfg.SetRefreshSchema(res == BoolParseResult::AI_TRUE);
                 }
                 else if (lKey == Key::defaultFetchSize)
                 {
