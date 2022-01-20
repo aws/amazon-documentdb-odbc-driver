@@ -26,16 +26,16 @@
  * - test results file = Performance_Test_Results.csv
  *
  * 1 command line argument
- * - argv[1] = data source name (dsn)
+ * - argv[1] string = data source name (dsn)
  *
  * 2 command line arguments
- * - argv[1] - test plan input csv file
- * - argv[2] - test results output csv file
+ * - argv[1] string = test plan input csv file
+ * - argv[2] string = test results output csv file
  *
  * 3 command line arguments
- * - argv[1] - test plan input csv file
- * - argv[2] - test results output csv file
- * - argv[3] = data source name (dsn)
+ * - argv[1] string = test plan input csv file
+ * - argv[2] string = test results output csv file
+ * - argv[3] string = data source name (dsn)
  *****************************************/
 
 int main(int argc, char* argv[]) {
@@ -88,23 +88,12 @@ int main(int argc, char* argv[]) {
     try {
         // Initialize performance test runner
         performance::PerformanceTestRunner performanceTest(
-            test_plan_file, test_results_file, data_source_name);
+            test_plan_file, test_results_file, data_source_name, 0);
 
-        // Connect to test data source name
-        if (!performanceTest.setupConnection()) {
-            throw std::runtime_error(performanceTest.getErrorMsg());
-        }
-
-        // Read test plan csv file
-        if (!performanceTest.readPerformanceTestPlan()) {
-            throw std::runtime_error(performanceTest.getErrorMsg());
-        }
-
-        // Run performance test
-        if (!performanceTest.runPerformanceTestPlan()) {
-            throw std::runtime_error(performanceTest.getErrorMsg());
-        }
-    } catch (const std::runtime_error err) {
+        performanceTest.setupConnection();
+        performanceTest.readPerformanceTestPlan();
+        performanceTest.runPerformanceTestPlan();
+    } catch (const std::runtime_error& err) {
         std::cerr << err.what() << std::endl;
     }
 

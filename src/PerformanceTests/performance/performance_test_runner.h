@@ -40,9 +40,11 @@ typedef SQLLEN SQLROWOFFSET;
 
 // Ensure DSN is setup on machine before running test
 // DSN name should be "documentdb-perf-test"
-const std::string input_file = "..\\..\\cmake\\PerformanceTests\\performance\\Performance_Test_Plan.csv";
+const std::string input_file =
+    "..\\..\\cmake\\PerformanceTests\\performance\\Performance_Test_Plan.csv";
 const std::string output_file =
-    "..\\..\\cmake\\PerformanceTests\\performance\\Performance_Test_Results.csv";
+    "..\\..\\cmake\\PerformanceTests\\performance\\Performance_Test_Results."
+    "csv";
 const std::string dsn_default = "documentdb-perf-test";
 const std::string test_query =
     "SELECT * from performance.employer_employees LIMIT 10000";
@@ -61,47 +63,43 @@ const std::string sync_end = "%%__PARSE__SYNC__END__%% ";
 
 // DATA STRUCTURES
 
-enum testCaseStatus {
-    success,
-    error,
-    skip
-};
+enum testCaseStatus { success, error, skip };
 
 typedef struct Col {
-  SQLLEN data_len;
-  SQLCHAR data_dat[BIND_SIZE];
+    SQLLEN data_len;
+    SQLCHAR data_dat[BIND_SIZE];
 } Col;
 
 struct CsvHeaders {
-  int idx_query = -1;
-  int idx_limit = -1;
-  int idx_skip_test = -1;
-  int idx_test_name = -1;
-  int idx_iteration_count = -1;
+    int idx_query = -1;
+    int idx_limit = -1;
+    int idx_skip_test = -1;
+    int idx_test_name = -1;
+    int idx_iteration_count = -1;
 };
 
 struct StatisticalInfo {
-  long long avg = 0;
-  long long min = 0;
-  long long max = 0;
-  long long median = 0;
-  long long stdev = 0;
+    long long avg = 0;
+    long long min = 0;
+    long long max = 0;
+    long long median = 0;
+    long long stdev = 0;
 };
 
 struct TestCase {
-  testCaseStatus status;
-  std::string err_msg = "";
-  int test_case_num = 0;
-  std::string test_name = "";
-  std::string query = "";
-  int limit = 0;
-  int num_iterations = 0;
-  std::vector<long long> time_ms;
-  std::vector<long long> time_exec_ms;
-  std::vector<long long> time_bind_fetch_ms;
-  StatisticalInfo stat_info;
-  StatisticalInfo stat_info_exec;
-  StatisticalInfo stat_info_bind_fetch;
+    testCaseStatus status;
+    std::string err_msg = "";
+    int test_case_num = 0;
+    std::string test_name = "";
+    std::string query = "";
+    int limit = 0;
+    int num_iterations = 0;
+    std::vector< long long > time_ms;
+    std::vector< long long > time_exec_ms;
+    std::vector< long long > time_bind_fetch_ms;
+    StatisticalInfo stat_info;
+    StatisticalInfo stat_info_exec;
+    StatisticalInfo stat_info_bind_fetch;
 };
 
 // CLASS DEFINITION
@@ -110,168 +108,171 @@ struct TestCase {
 namespace performance {
 
 class PerformanceTestRunner {
- private:
-  // DATA MEMBERS
+   private:
+    // DATA MEMBERS
 
-  SQLRETURN _current_retcode = SQL_ERROR;
-  SQLHENV _env = SQL_NULL_HENV;
-  SQLHDBC _conn = SQL_NULL_HDBC;
-  SQLHSTMT _hstmt = SQL_NULL_HSTMT;
-  std::string _dsn = dsn_default;
+    SQLHENV _env = SQL_NULL_HENV;
+    SQLHDBC _conn = SQL_NULL_HDBC;
+    SQLHSTMT _hstmt = SQL_NULL_HSTMT;
+    std::string _dsn = dsn_default;
 
-  std::vector<std::vector<Csv::CellReference> > _cell_refs; // references _csv_data
-  std::string _input_file = input_file;    // input test plan csv file
-  std::string _output_file = output_file;  // output test results csv file
-  std::string _csv_data = "";
-  CsvHeaders _headers;  // col index of headers
-  std::vector<TestCase> _results;
+    std::vector< std::vector< Csv::CellReference > >
+        _cell_refs;                          // references _csv_data
+    std::string _input_file = input_file;    // input test plan csv file
+    std::string _output_file = output_file;  // output test results csv file
+    std::string _csv_data = "";
+    CsvHeaders _headers;  // col index of headers
+    std::vector< TestCase > _results;
 
-  std::string _error_msg = "";
+    // _output_mode = 0 - output time for exec/bind/fetch
+    // _output_mode = 1 - output time for exec only
+    // _output_mode = 2 - output time for bind and fetch only
+    // _output_mode = 3 - output all above
+    int _output_mode = 0;
 
-  // _output_mode = 0 - output time for exec/bind/fetch
-  // _output_mode = 1 - output time for exec only
-  // _output_mode = 2 - output time for bind and fetch only
-  // _output_mode = 3 - output all above
-  int _output_mode = 0;
+    // HELPER FUNCTIONS
 
-  // HELPER FUNCTIONS
+    // return true if filename has extension = ".xxx"
+    void checkFileExtension(const std::string filename,
+                            const std::string extension);
 
-  // return true if filename has extension = ".xxx"
-  bool checkFileExtension(const std::string filename,
-                          const std::string extension);
+    // return true if DSN matches any data sources installed
+    void checkDSN(const std::string dsn);
 
-  // return true if DSN matches any data sources installed
-  bool checkDSN(const std::string dsn);
+    // return true if output mode = 0, 1, 2 or 3
+    void checkOutputMode(const int output_mode);
 
-  // get csv input file header col index
-  bool checkCSVHeaders();
+    // get csv input file header col index
+    void checkCSVHeaders();
 
-  // Output headers to output file
-  // col 1 = test #
-  // col 2 = test name
-  // col 3 = status
-  // col 4 = query
-  // col 5 = limit
-  // col 6 = iteration count
-  // col 7 = avg time
-  // col 8 = max time
-  // col 9 = min time
-  // col 10 = median time
-  void outputHeaders(std::ofstream& ofs) const;
+    // Output headers to output file
+    // col 1 = test #
+    // col 2 = test name
+    // col 3 = status
+    // col 4 = query
+    // col 5 = limit
+    // col 6 = iteration count
+    // col 7 = avg time
+    // col 8 = max time
+    // col 9 = min time
+    // col 10 = median time
+    void outputHeaders(std::ofstream& ofs) const;
 
-  // Returns true if test should be skipped, otherwise false
-  bool skipTest(const Csv::CellReference& cell_skip_test) const;
+    // Returns true if test should be skipped, otherwise false
+    bool skipTest(const Csv::CellReference& cell_skip_test) const;
 
-  // Returns query string from current test case csv data
-  std::string getQueryString(const Csv::CellReference& cell_query) const;
+    // Returns query string from current test case csv data
+    std::string getQueryString(const Csv::CellReference& cell_query) const;
 
-  // Return limit from current test case csv data
-  int getLimit(const Csv::CellReference& cell_limit) const;
+    // Return limit from current test case csv data
+    int getLimit(const Csv::CellReference& cell_limit) const;
 
-  // Returns test name string from current test case csv data
-  std::string getTestName(const Csv::CellReference& cell_test_name) const;
+    // Returns test name string from current test case csv data
+    std::string getTestName(const Csv::CellReference& cell_test_name) const;
 
-  // Returns iteration/loop count from current test case csv data
-  int getIterationCount(const Csv::CellReference& cell_iteration_count) const;
+    // Returns iteration/loop count from current test case csv data
+    int getIterationCount(const Csv::CellReference& cell_iteration_count) const;
 
-  // Returns true if string has comma or newline
-  bool hasCommaOrNewLine(const std::string str) const;
+    // Returns true if string has comma or newline
+    bool hasCommaOrNewLine(const std::string str) const;
 
-  // Calculate statistical info from current test case
-  void calcStats(TestCase& test_case);
+    // Calculate statistical info from current test case
+    void calcStats(TestCase& test_case);
 
-  // Output test case to output file
-  void outputTestCase(std::ofstream& ofs, const TestCase& test_case) const;
+    // Output test case to output file
+    void outputTestCase(std::ofstream& ofs, const TestCase& test_case) const;
 
-  // Record time_ms for current test case: exec->bind->fetch
-  void recordExecBindFetch(SQLHSTMT* hstmt, TestCase& test_case);
+    // Record time_ms for current test case: exec->bind->fetch
+    void recordExecBindFetch(SQLHSTMT* hstmt, TestCase& test_case);
 
-  // ReportTime for current test case
-  void reportTime(const TestCase& test_case);
+    // ReportTime for current test case
+    void reportTime(const TestCase& test_case);
 
- public:
-  // STATIC METHODS
+   public:
+    // STATIC METHODS
 
-  static void ListDriversInstalled();
-  static void ListDataSourcesInstalled();
+    static void ListDriversInstalled();
+    static void ListDataSourcesInstalled();
 
-  // Test if connection to test database DSN=documentdb-perf-test can be
-  // established and if query "SELECT * from performance.employer_employees
-  // LIMIT 10000" can be executed
-  static SQLRETURN testDefaultDSN();
+    // Test if connection to test database DSN=documentdb-perf-test can be
+    // established and if query "SELECT * from performance.employer_employees
+    // LIMIT 10000" can be executed
+    static SQLRETURN testDefaultDSN();
 
-  // CONSTRUCTORS AND DESTRUCTOR
+    // CONSTRUCTORS AND DESTRUCTOR
 
-  // Default constructor
-  PerformanceTestRunner();
+    // Default constructor
+    PerformanceTestRunner();
 
-  // Specify input (test plan) csv file, output (results) csv file and dsn
-  // connection string to test database
-  PerformanceTestRunner(const std::string test_plan_csv,
-                        const std::string output_file_csv,
-                        const std::string dsn);
+    // Specify input (test plan) csv file, output (results) csv file and dsn
+    // connection string to test database
+    PerformanceTestRunner(const std::string test_plan_csv,
+                          const std::string output_file_csv,
+                          const std::string dsn, const int output_mode = 0);
 
-  // Destructor
-  virtual ~PerformanceTestRunner();
+    // Destructor
+    virtual ~PerformanceTestRunner();
 
-  // SETTERS AND GETTERS
+    // SETTERS AND GETTERS
 
-  // get input test plan csv file
-  inline std::string getInputTestPlanCsvFile() const { return _input_file; }
+    // get input test plan csv file
+    inline std::string getInputTestPlanCsvFile() const {
+        return _input_file;
+    }
 
-  // set input test plan csv file
-  inline void setInputTestPlanCsvFile(const std::string filename) {
-    _input_file = filename;
-  }
+    // set input test plan csv file
+    inline void setInputTestPlanCsvFile(const std::string filename) {
+        _input_file = filename;
+    }
 
-  // get output results csv file
-  inline std::string getOutputResultsCsvFile() const { return _output_file; }
+    // get output results csv file
+    inline std::string getOutputResultsCsvFile() const {
+        return _output_file;
+    }
 
-  // set output results csv file
-  inline void setOutputResultsCsvFile(const std::string filename) {
-    _output_file = filename;
-  }
+    // set output results csv file
+    inline void setOutputResultsCsvFile(const std::string filename) {
+        _output_file = filename;
+    }
 
-  // get data source name
-  inline std::string getDSN() const { return _dsn; }
+    // get data source name
+    inline std::string getDSN() const {
+        return _dsn;
+    }
 
-  // set data source name
-  void setDSN(const std::string dsn);
+    // set data source name
+    void setDSN(const std::string dsn);
 
-  // get results
-  inline std::vector<TestCase> getTestResults() const { return _results; }
+    // get results
+    inline std::vector< TestCase > getTestResults() const {
+        return _results;
+    }
 
-  // get error message
-  // not empty if readPerformanceTestPlan, setupConnection or
-  // runPerformanceTestPlan return false
-  inline std::string getErrorMsg() const { return _error_msg; }
+    // get output mode
+    inline int getOutputMode() const {
+        return _output_mode;
+    }
 
-  // get output mode
-  inline int getOutputMode() const { return _output_mode; }
+    // set output mode (must = 0, 1, 2 or 3)
+    void setOutputMode(const int output_mode);
 
-  // set output mode (must = 0, 1, 2 or 3)
-  void setOutputMode(const int output_mode);
+    // METHODS TO RUN PEFORMANCE TEST PLAN
 
-  // METHODS TO RUN PEFORMANCE TEST PLAN
+    // read input test plan csv file
+    // assumptions:
+    //  1. csv file contains following headers (order does not matter):
+    //     "query" : string (can contain new lines and commas)
+    //     "limit" : integer (limit number of rows returned)
+    //     "test_name" : string (can contain new lines and commas)
+    //     "loop_count" : integer (number of iterations to execute query)
+    //     "skip_test" : string (must be "TRUE" or "FALSE")
+    void readPerformanceTestPlan();
 
-  // read input test plan csv file
-  // assumptions:
-  //  1. csv file contains following headers (order does not matter):
-  //     "query" : string (can contain new lines and commas)
-  //     "limit" : integer (limit number of rows returned)
-  //     "test_name" : string (can contain new lines and commas)
-  //     "loop_count" : integer (number of iterations to execute query)
-  //     "skip_test" : string (must be "TRUE" or "FALSE")
-  // returns true if successful, otherwise false (see getErrorMsg for more info)
-  bool readPerformanceTestPlan();
+    // allocate env, conn and stmt
+    void setupConnection();
 
-  // allocate env, conn and stmt
-  // returns true if successful, otherwise false (see getErrorMsg for more info)
-  bool setupConnection();
-
-  // run performance test plan and record results to output file
-  // returns true if successful, otherwise false (see getErrorMsg for more info)
-  bool runPerformanceTestPlan();
+    // run performance test plan and record results to output file
+    void runPerformanceTestPlan();
 };
 
 }  // namespace performance
