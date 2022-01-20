@@ -57,6 +57,9 @@ namespace ignite
                             LOGIN_TIMEOUT_SEC_LABEL,
                             READ_PREFERENCE_EDIT,
                             READ_PREFERENCE_LABEL,
+                            REPLICA_SET_EDIT,
+                            REPLICA_SET_LABEL,
+                            RETRY_READS_CHECK_BOX,
                             FETCH_SIZE_EDIT,
                             FETCH_SIZE_LABEL,
                             PROTOCOL_VERSION_LABEL,
@@ -256,12 +259,20 @@ namespace ignite
                     /** Read preference label. */
                      std::auto_ptr<Window> readPreferenceLabel;
 
+                    /** Replica Set edit. */
+                     std::auto_ptr< Window > replicaSetEdit;
 
-                    ///** Enforce join order CheckBox. */
-                    //std::auto_ptr<Window> enforceJoinOrderCheckBox;
+                    /** Replica Set label. */
+                     std::auto_ptr< Window > replicaSetLabel;
 
+                    /** Retry reads CheckBox. */
+                     std::auto_ptr<Window> retryReadsCheckBox;
 
+                    /** Fetch size edit. */
+                     std::auto_ptr<Window> fetchSizeEdit;
 
+                    /** Fetch size label. */
+                     std::auto_ptr<Window> fetchSizeLabel;
 
                     /** Protocol version edit field. */
                     std::auto_ptr<Window> protocolVersionLabel;

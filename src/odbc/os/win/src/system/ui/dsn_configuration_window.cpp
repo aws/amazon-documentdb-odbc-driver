@@ -52,6 +52,9 @@ namespace ignite
                     appNameEdit(),
                     readPreferenceLabel(),
                     readPreferenceEdit(),
+                    replicaSetLabel(),
+                    replicaSetEdit(),
+                    retryReadsCheckBox(),
                     fetchSizeLabel(),
                     fetchSizeEdit(),
                     protocolVersionLabel(),
@@ -299,6 +302,20 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
+                    val = config.GetReplicaSet().c_str();
+
+                    replicaSetLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Replica Set:", ChildId::REPLICA_SET_LABEL);
+                    replicaSetEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+                                   ChildId::REPLICA_SET_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    retryReadsCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
+                        "Retry Reads", ChildId::RETRY_READS_CHECK_BOX, config.IsRetryReads());
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
                     tmp = common::LexicalCast<std::string>(config.GetFetchSize());
                     val = tmp.c_str();
                     fetchSizeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH,
@@ -365,6 +382,9 @@ namespace ignite
                                     break;
                                 }
 
+                                case ChildId::RETRY_READS_CHECK_BOX:
+                                {
+                                    retryReadsCheckBox->SetChecked(!retryReadsCheckBox->IsChecked());
 
                                     break;
                                 }
@@ -482,9 +502,13 @@ namespace ignite
 
                     std::string appNameStr;
                     std::string readPreferenceStr;
+                    std::string replicaSetStr;
 
                     appNameEdit->GetText(appNameStr);
                     readPreferenceEdit->GetText(readPreferenceStr);
+                    replicaSetEdit->GetText(replicaSetStr);
+
+                    bool retryReads = retryReadsCheckBox->IsChecked();
 
                     std::string loginTimeoutSecStr;
 
@@ -510,11 +534,15 @@ namespace ignite
                     LOG_MSG("App name:                 " << appNameStr);
                     LOG_MSG("Login timeout (seconds):  " << loginTimeoutSecStr);
                     LOG_MSG("Read preference:          " << readPreferenceStr);
+                    LOG_MSG("Replica Set:              " << replicaSetStr);
+                    LOG_MSG("Retry reads:              " << (retryReads ? "true" : "false"));
                     LOG_MSG("Fetch size:               " << fetchSize);
 
                     cfg.SetApplicationName(appNameStr);
                     cfg.SetLoginTimeoutSeconds(loginTimeoutSec);
                     cfg.SetReadPreference(readPreferenceStr);
+                    cfg.SetReplicaSet(replicaSetStr);
+                    cfg.SetRetryReads(retryReads);
                     cfg.SetFetchSize(fetchSize);
 
                 }
