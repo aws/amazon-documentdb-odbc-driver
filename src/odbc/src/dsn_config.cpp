@@ -219,7 +219,7 @@ namespace ignite
 
             if (scanLimit.IsSet() && !config.IsScanLimitSet()
                 && scanLimit.GetValue() > 0)
-                config.SetDefaultFetchSize(scanLimit.GetValue());
+                config.SetFetchSize(scanLimit.GetValue());
 
             SettableValue<std::string> schemaName = ReadDsnString(dsn, ConnectionStringParser::Key::schemaName);
 
@@ -231,11 +231,11 @@ namespace ignite
             if (refreshSchema.IsSet() && !config.IsSchemaRefreshSet())
                 config.SetSchemaRefresh(refreshSchema.GetValue());
 
-            SettableValue<int32_t> defaultFetchSize = ReadDsnInt(dsn, ConnectionStringParser::Key::defaultFetchSize);
+            SettableValue<int32_t> fetchSize = ReadDsnInt(dsn, ConnectionStringParser::Key::fetchSize);
 
-            if (defaultFetchSize.IsSet() && !config.IsDefaultFetchSizeSet()
-                   && defaultFetchSize.GetValue() > 0)
-                config.SetDefaultFetchSize(defaultFetchSize.GetValue()); 
+            if (fetchSize.IsSet() && !config.IsFetchSizeSet()
+                   && fetchSize.GetValue() > 0)
+                config.SetFetchSize(fetchSize.GetValue()); 
         }
     }
 }
