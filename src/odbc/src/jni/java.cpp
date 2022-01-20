@@ -476,7 +476,7 @@ namespace ignite
                     // Check to see if a VM is already created
                     const jsize nJvms = 1;
                     jsize nJvmsAvailable = 0;
-                    JavaVM* availableJvms[nJvms];
+                    JavaVM* availableJvms[nJvms]{};
                     jint res = JNI_GetCreatedJavaVMs(&availableJvms[0], nJvms,
                                                      &nJvmsAvailable);
                     if (res == JNI_OK && nJvmsAvailable >= 1) {
@@ -494,7 +494,7 @@ namespace ignite
                     for (int i = 0; i < optsLen; i++)
                         opts0[i].optionString = *(opts + i);
 
-                    JavaVMInitArgs args;
+                    JavaVMInitArgs args{};
                     args.version = JNI_VERSION_1_8;
                     args.nOptions = optsLen;
                     args.options = opts0;
