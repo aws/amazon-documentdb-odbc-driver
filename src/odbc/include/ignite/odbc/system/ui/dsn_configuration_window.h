@@ -42,6 +42,7 @@ namespace ignite
                         enum Type
                         {
                             CONNECTION_SETTINGS_GROUP_BOX = 100,
+                            SSH_SETTINGS_GROUP_BOX,
                             SSL_SETTINGS_GROUP_BOX,
                             ADDITIONAL_SETTINGS_GROUP_BOX,
                             AUTH_SETTINGS_GROUP_BOX,
@@ -51,6 +52,17 @@ namespace ignite
                             ADDRESS_LABEL,
                             SCHEMA_EDIT,
                             SCHEMA_LABEL,
+                            SSH_USER_EDIT,
+                            SSH_USER_LABEL,
+                            SSH_HOST_EDIT,
+                            SSH_HOST_LABEL,
+                            SSH_PRIVATE_KEY_FILE_EDIT,
+                            SSH_PRIVATE_KEY_FILE_LABEL,
+                            SSH_PRIVATE_KEY_PASSPHRASE_EDIT,
+                            SSH_PRIVATE_KEY_PASSPHRASE_LABEL,
+                            SSH_STRICT_HOST_KEY_CHECKING_CHECK_BOX,
+                            SSH_KNOWN_HOSTS_FILE_EDIT,
+                            SSH_KNOWN_HOSTS_FILE_LABEL,
                             APP_NAME_EDIT,
                             APP_NAME_LABEL,
                             LOGIN_TIMEOUT_SEC_EDIT,
@@ -185,6 +197,16 @@ namespace ignite
                      */
                     int CreateAuthSettingsGroup(int posX, int posY, int sizeX);
 
+                     /**
+                     * Create internal SSH tunnel settings group box.
+                     *
+                     * @param posX X position.
+                     * @param posY Y position.
+                     * @param sizeX Width.
+                     * @return Size by Y.
+                     */
+                    int CreateSshSettingsGroup(int posX, int posY, int sizeX);
+
                     /**
                      * Create SSL settings group box.
                      *
@@ -214,6 +236,9 @@ namespace ignite
                     /** Connection settings group box. */
                     std::auto_ptr<Window> connectionSettingsGroupBox;
 
+                    /** SSH settings group box. */
+                    std::auto_ptr<Window> sshSettingsGroupBox;
+
                     /** SSL settings group box. */
                     std::auto_ptr<Window> sslSettingsGroupBox;
 
@@ -241,6 +266,39 @@ namespace ignite
                     /** DSN schema edit field. */
                     std::auto_ptr<Window> schemaEdit;
 
+                    /** SSH user edit. */
+                    std::auto_ptr<Window> sshUserEdit;
+
+                    /** SSH user label. */
+                    std::auto_ptr<Window> sshUserLabel;
+
+                    /** SSH host edit. */
+                    std::auto_ptr<Window> sshHostEdit;
+
+                    /** SSH host label. */
+                    std::auto_ptr<Window> sshHostLabel;
+
+                    /** SSH private key file edit. */
+                    std::auto_ptr<Window> sshPrivateKeyFileEdit;
+
+                    /** SSH private key file label. */
+                    std::auto_ptr<Window> sshPrivateKeyFileLabel;
+
+                    /** SSH private key passphrase edit. */
+                    std::auto_ptr<Window> sshPrivateKeyPassphraseEdit;
+
+                    /** SSH private key passphrase label. */
+                    std::auto_ptr<Window> sshPrivateKeyPassphraseLabel;
+
+                    /** SSH strict host key checking checkBox. */
+                    std::auto_ptr<Window> sshStrictHostKeyCheckingCheckBox;
+
+                    /** SSH known host file edit. */
+                    std::auto_ptr<Window> sshKnownHostsFileEdit;
+
+                    /** SSH know host file label. */
+                    std::auto_ptr<Window> sshKnownHostsFileLabel;
+
                     /** Application name edit. */
                     std::auto_ptr<Window> appNameEdit;
 
@@ -260,10 +318,10 @@ namespace ignite
                     std::auto_ptr<Window> readPreferenceLabel;
 
                     /** Replica set edit. */
-                    std::auto_ptr< Window > replicaSetEdit;
+                    std::auto_ptr<Window> replicaSetEdit;
 
                     /** Replica set label. */
-                    std::auto_ptr< Window > replicaSetLabel;
+                    std::auto_ptr<Window> replicaSetLabel;
 
                     /** Retry reads checkBox. */
                     std::auto_ptr<Window> retryReadsCheckBox;

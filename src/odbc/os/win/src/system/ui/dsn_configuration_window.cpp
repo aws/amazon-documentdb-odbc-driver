@@ -48,6 +48,19 @@ namespace ignite
                     addressEdit(),
                     schemaLabel(),
                     schemaEdit(),
+                    // internal SSH tunnel vars
+                    sshUserLabel(),
+                    sshUserEdit(),
+                    sshHostLabel(),
+                    sshHostEdit(),
+                    sshPrivateKeyFileLabel(),
+                    sshPrivateKeyFileEdit(),
+                    sshPrivateKeyPassphraseLabel(),
+                    sshPrivateKeyPassphraseEdit(),
+                    sshStrictHostKeyCheckingCheckBox(),
+                    sshKnownHostsFileLabel(),
+                    sshKnownHostsFileEdit(),
+                    // end of SSH vars
                     appNameLabel(),
                     appNameEdit(),
                     readPreferenceLabel(),
@@ -109,6 +122,7 @@ namespace ignite
 
                     groupPosY += INTERVAL + CreateConnectionSettingsGroup(MARGIN, groupPosY, groupSizeY);
                     groupPosY += INTERVAL + CreateAuthSettingsGroup(MARGIN, groupPosY, groupSizeY);
+                    groupPosY += INTERVAL + CreateSshSettingsGroup(MARGIN, groupPosY, groupSizeY);
                     groupPosY += INTERVAL + CreateSslSettingsGroup(MARGIN, groupPosY, groupSizeY);
                     groupPosY += INTERVAL + CreateAdditionalSettingsGroup(MARGIN, groupPosY, groupSizeY);
                     // test: if above code is commented out, additional settings shouldn't appear in config window. Result: Yes test success. 
@@ -218,6 +232,10 @@ namespace ignite
                         "Authentication settings", ChildId::AUTH_SETTINGS_GROUP_BOX);
 
                     return rowPos - posY;
+                }
+
+                int DsnConfigurationWindow::CreateSshSettingsGroup(int posX, int posY, int sizeX) 
+                {
                 }
 
                 int DsnConfigurationWindow::CreateSslSettingsGroup(int posX, int posY, int sizeX)
