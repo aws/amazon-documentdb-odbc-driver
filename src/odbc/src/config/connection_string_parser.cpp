@@ -35,7 +35,7 @@ namespace ignite
             const std::string ConnectionStringParser::Key::driver                   = "driver";
             const std::string ConnectionStringParser::Key::database                 = "database";
             const std::string ConnectionStringParser::Key::address                  = "address";
-            const std::string ConnectionStringParser::Key::server                   = "server";
+            const std::string ConnectionStringParser::Key::server                   = "hostname";
             const std::string ConnectionStringParser::Key::port                     = "port";
             const std::string ConnectionStringParser::Key::user                     = "user";
             const std::string ConnectionStringParser::Key::password                 = "password";
@@ -151,17 +151,16 @@ namespace ignite
                 {
                     cfg.SetDatabase(value);
                 }
-                else if (lKey == Key::address)
-                {
-                    std::vector<EndPoint> endPoints;
-
-                    ParseAddress(value, endPoints, diag);
-
-                    cfg.SetAddresses(endPoints);
-                }
                 else if (lKey == Key::server)
                 {
-                    cfg.SetHostname(value);
+                    EndPoint endpoint;
+
+                    ParseSingleAddress(value, endpoint, diag);
+
+                    cfg.SetHostname(endpoint.host);
+                    
+                    if (!cfg.IsTcpPortSet()) 
+                        cfg.SetTcpPort(endpoint.port);
                 }
                 else if (lKey == Key::port)
                 {
@@ -255,7 +254,7 @@ namespace ignite
                         return;
                     }
 
-                    cfg.SetScanLimit(static_cast<int32_t>(numValue));
+                    cfg.SetLoginTimeoutSeconds(static_cast<int32_t>(numValue));
                 }
                 else if (lKey == Key::readPreference)
                 {
@@ -264,6 +263,23 @@ namespace ignite
                 else if (lKey == Key::replicaSet)
                 {
                     cfg.SetReplicaSet(value);
+                }
+                else if (lKey == Key::retryReads)
+                {
+                    BoolParseResult::Type res = StringToBool(value);
+
+                    if (res == BoolParseResult::AI_UNRECOGNIZED)
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                MakeErrorMessage("Unrecognized bool value. Using default value.", key, value));
+                        }
+
+                        return;
+                    }
+
+                    cfg.SetRetryReads(res == BoolParseResult::AI_TRUE);
                 }
                 else if (lKey == Key::tls)
                 {
@@ -397,7 +413,7 @@ namespace ignite
                         return;
                     }
 
-                    cfg.SetTls(res == BoolParseResult::AI_TRUE);
+                    cfg.SetSchemaRefresh(res == BoolParseResult::AI_TRUE);
                 }
                 else if (lKey == Key::defaultFetchSize)
                 {

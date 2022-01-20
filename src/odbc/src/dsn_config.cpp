@@ -104,17 +104,6 @@ namespace ignite
 
         void ReadDsnConfiguration(const char* dsn, Configuration& config, diagnostic::DiagnosticRecordStorage* diag)
         {
-            SettableValue<std::string> address = ReadDsnString(dsn, ConnectionStringParser::Key::address);
-
-            if (address.IsSet() && !config.IsAddressesSet())
-            {
-                std::vector<EndPoint> endPoints;
-
-                ParseAddress(address.GetValue(), endPoints, diag);
-
-                config.SetAddresses(endPoints);
-            }
-
             SettableValue<std::string> server = ReadDsnString(dsn, ConnectionStringParser::Key::server);
 
             if (server.IsSet() && !config.IsHostnameSet())

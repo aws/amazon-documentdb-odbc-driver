@@ -52,13 +52,10 @@ namespace ignite
                     /** Default value for Driver attribute. */
                     static const std::string driver;
 
-                    /** Default value for schema attribute. */
+                    /** Default value for database attribute. */
                     static const std::string database;
 
-                    /** Default value for address attribute. */
-                    static const std::string address;
-
-                    /** Default value for server attribute. */
+                    /** Default value for hostname attribute. */
                     static const std::string hostname;
 
                     /** Default value for port attribute. */
@@ -84,9 +81,6 @@ namespace ignite
 
                     /** Default value for retryReads attribute. */
                     static const bool retryReads;
-
-                    /** Default value for sslMode attribute. */
-                    static const ssl::SslMode::Type sslMode;
 
                     /** Default value for tls attribute. */
                     static const bool tls;
@@ -133,14 +127,8 @@ namespace ignite
                     /** Default value for sslCertFile attribute. */
                     static const std::string sslCertFile;
 
-                    /** Default value for protocol version. */
-                   // static const ProtocolVersion& protocolVersion;
-
-                    /** Default value for fetch results page size attribute. */
+                    /** Default value for defaultFetchSize attribute. */
                     static const int32_t defaultFetchSize;
-
-                    /** Default value for nestedTxMode attribute. */
-                    static const NestedTxMode::Type nestedTxMode;
                 };
 
                 /**
@@ -678,27 +666,6 @@ namespace ignite
                 bool IsSchemaRefreshSet() const;
 
                 /**
-                 * Get addresses.
-                 *
-                 * @return Addresses.
-                 */
-                const std::vector<EndPoint>& GetAddresses() const;
-
-                /**
-                 * Set addresses to connect to.
-                 *
-                 * @param endPoints Addresses.
-                 */
-                void SetAddresses(const std::vector<EndPoint>& endPoints);
-
-                /**
-                 * Check if the value set.
-                 *
-                 * @return @true if the value set.
-                 */
-                bool IsAddressesSet() const;
-
-                /**
                  * Get fetch results page size.
                  *
                  * @return Fetch results page size.
@@ -772,9 +739,6 @@ namespace ignite
 
                 /** Retry reads flag. */
                 SettableValue<bool> retryReads;
-
-                /** Connection end-points. */
-                SettableValue< std::vector<EndPoint> > endPoints; // Remove in favor of deprecated one
 
                 /** Enable SSL/TLS. */
                 SettableValue<bool> tls;

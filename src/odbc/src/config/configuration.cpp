@@ -31,10 +31,9 @@ namespace ignite
         namespace config
         {
 
-            const std::string Configuration::DefaultValue::dsn = "Apache Ignite DSN";
-            const std::string Configuration::DefaultValue::driver = "Apache Ignite";
+            const std::string Configuration::DefaultValue::dsn = "DocumentDB DSN";
+            const std::string Configuration::DefaultValue::driver = "Amazon DocumentDB Driver"; // remove
             const std::string Configuration::DefaultValue::database = "";
-            const std::string Configuration::DefaultValue::address = ""; // remove
             const std::string Configuration::DefaultValue::hostname = "";
             const uint16_t Configuration::DefaultValue::port = 27017;
             const std::string Configuration::DefaultValue::user = "";
@@ -62,12 +61,10 @@ namespace ignite
             // Additional options
             const std::string Configuration::DefaultValue::appName = "Amazon DocumentDB ODBC Driver";
             const int32_t Configuration::DefaultValue::loginTimeoutSec = 0;
-            const std::string Configuration::DefaultValue::readPreference = "";
+            const std::string Configuration::DefaultValue::readPreference = "primary";
             const std::string Configuration::DefaultValue::replicaSet = "";
             const bool Configuration::DefaultValue::retryReads = true;
             const int32_t Configuration::DefaultValue::defaultFetchSize = 2000;
-
-            const NestedTxMode::Type Configuration::DefaultValue::nestedTxMode = NestedTxMode::AI_ERROR; // remove
 
             Configuration::Configuration() :
                 dsn(DefaultValue::dsn),
@@ -77,7 +74,6 @@ namespace ignite
                 port(DefaultValue::port),
                 user(DefaultValue::user),
                 password(DefaultValue::password),
-                endPoints(std::vector<EndPoint>()),
                 appName(DefaultValue::appName),
                 loginTimeoutSec(DefaultValue::loginTimeoutSec),
                 readPreference(DefaultValue::readPreference),
@@ -202,21 +198,6 @@ namespace ignite
             bool Configuration::IsDatabaseSet() const
             {
                 return database.IsSet();
-            }
-
-            const std::vector<EndPoint>& Configuration::GetAddresses() const
-            {
-                return endPoints.GetValue();
-            }
-
-            void Configuration::SetAddresses(const std::vector<EndPoint>& endPoints)
-            {
-                this->endPoints.SetValue(endPoints);
-            }
-
-            bool Configuration::IsAddressesSet() const
-            {
-                return endPoints.IsSet();
             }
 
             const std::string& Configuration::GetApplicationName() const
@@ -540,7 +521,6 @@ namespace ignite
                 AddToMap(res, ConnectionStringParser::Key::dsn, dsn);
                 AddToMap(res, ConnectionStringParser::Key::driver, driver);
                 AddToMap(res, ConnectionStringParser::Key::database, database);
-                AddToMap(res, ConnectionStringParser::Key::address, endPoints);
                 AddToMap(res, ConnectionStringParser::Key::server, hostname);
                 AddToMap(res, ConnectionStringParser::Key::port, port);
                 AddToMap(res, ConnectionStringParser::Key::user, user);
