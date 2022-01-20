@@ -279,7 +279,7 @@ namespace ignite
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     sshSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
-                                       "Internal SSH Tunnel settings",
+                                       "Internal SSH tunnel settings",
                                        ChildId::SSH_SETTINGS_GROUP_BOX);
 
                     return rowPos - posY;
@@ -321,6 +321,7 @@ namespace ignite
                     sslSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
                         "TLS/SSL settings", ChildId::SSL_SETTINGS_GROUP_BOX);
 
+                    tlsCheckBox->SetEnabled(tlsCheckBox->IsChecked());
                     tlsCaFileEdit->SetEnabled(tlsCheckBox->IsChecked());
 
                     return rowPos - posY;
@@ -434,6 +435,8 @@ namespace ignite
                                 case ChildId::TLS_CHECK_BOX: 
                                 {
                                     tlsCheckBox->SetChecked(!tlsCheckBox->IsChecked());
+                                    tlsAllowInvalidHostnamesCheckBox
+                                        ->SetEnabled(tlsCheckBox->IsChecked());
                                     tlsCaFileEdit->SetEnabled(tlsCheckBox->IsChecked());
 
                                     break;
