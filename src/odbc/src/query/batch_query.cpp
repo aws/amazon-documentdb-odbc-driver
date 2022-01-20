@@ -52,7 +52,7 @@ namespace ignite
                 if (executed)
                     Close();
 
-                int32_t maxPageSize = connection.GetConfiguration().GetFetchSize();
+                int32_t maxPageSize = connection.GetConfiguration().GetDefaultFetchSize();
                 int32_t rowNum = params.GetParamSetSize();
                 SqlResult::Type res;
 

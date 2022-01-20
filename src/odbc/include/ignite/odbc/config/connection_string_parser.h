@@ -120,7 +120,7 @@ namespace ignite
                     static const std::string protocolVersion;
 
                     /** Connection attribute keyword for fetch results page size attribute. */
-                    static const std::string fetchSize;
+                    static const std::string defaultFetchSize;
 
                     /** Connection attribute keyword for sslMode attribute. */
                     static const std::string sslMode;
