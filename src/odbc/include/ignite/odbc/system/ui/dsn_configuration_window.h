@@ -242,37 +242,37 @@ namespace ignite
                     std::auto_ptr<Window> schemaEdit;
 
                     /** Application name edit. */
-                     std::auto_ptr<Window> appNameEdit;
+                    std::auto_ptr<Window> appNameEdit;
 
                     /** Application name label. */
-                     std::auto_ptr<Window> appNameLabel;
+                    std::auto_ptr<Window> appNameLabel;
 
                     /** Login Timeout (seconds) edit. */
-                     std::auto_ptr<Window> loginTimeoutSecEdit;
+                    std::auto_ptr<Window> loginTimeoutSecEdit;
 
                     /** Login Timeout (seconds) label. */
-                     std::auto_ptr<Window> loginTimeoutSecLabel;
+                    std::auto_ptr<Window> loginTimeoutSecLabel;
 
                     /** Read preference edit. */
-                     std::auto_ptr<Window> readPreferenceEdit;
+                    std::auto_ptr<Window> readPreferenceEdit;
 
                     /** Read preference label. */
-                     std::auto_ptr<Window> readPreferenceLabel;
+                    std::auto_ptr<Window> readPreferenceLabel;
 
                     /** Replica Set edit. */
-                     std::auto_ptr< Window > replicaSetEdit;
+                    std::auto_ptr< Window > replicaSetEdit;
 
                     /** Replica Set label. */
-                     std::auto_ptr< Window > replicaSetLabel;
+                    std::auto_ptr< Window > replicaSetLabel;
 
                     /** Retry reads CheckBox. */
-                     std::auto_ptr<Window> retryReadsCheckBox;
+                    std::auto_ptr<Window> retryReadsCheckBox;
 
                     /** Fetch size edit. */
-                     std::auto_ptr<Window> fetchSizeEdit;
+                    std::auto_ptr<Window> fetchSizeEdit;
 
                     /** Fetch size label. */
-                     std::auto_ptr<Window> fetchSizeLabel;
+                    std::auto_ptr<Window> fetchSizeLabel;
 
                     /** Protocol version edit field. */
                     std::auto_ptr<Window> protocolVersionLabel;
