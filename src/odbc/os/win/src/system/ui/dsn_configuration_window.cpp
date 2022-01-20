@@ -236,6 +236,53 @@ namespace ignite
 
                 int DsnConfigurationWindow::CreateSshSettingsGroup(int posX, int posY, int sizeX) 
                 {
+                    enum { LABEL_WIDTH = 120 }; // -AL- copied from above function
+
+                    int labelPosX = posX + INTERVAL;
+
+                    int editSizeX = sizeX - LABEL_WIDTH - 3 * INTERVAL;
+                    int editPosX = labelPosX + LABEL_WIDTH + INTERVAL;
+
+                    int rowPos = posY + 2 * INTERVAL;
+
+                    int checkBoxSize = (sizeX - 3 * INTERVAL) / 2;
+
+                    const char* val = config.GetSshUser().c_str();
+
+                    sshUserLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, "SSH user :", ChildId::SSH_USER_LABEL);
+                    sshUserEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::SSH_USER_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+                    
+                    val = config.GetSshHost().c_str();
+
+                    sshHostLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                    "SSH host :", ChildId::SSH_HOST_LABEL);
+                    sshHostEdit = CreateEdit(editPosX, rowPos, editSizeX,
+                                          ROW_HEIGHT, val, ChildId::SSH_HOST_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    sshStrictHostKeyCheckingCheckBox = CreateCheckBox(
+                        labelPosX, rowPos, checkBoxSize, ROW_HEIGHT, "SSH strict host key checking",
+                        ChildId::SSH_STRICT_HOST_KEY_CHECKING_CHECK_BOX, config.IsSshStrictHostKeyChecking());
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    val = config.GetSshKnownHostsFile().c_str();
+
+                    sshKnownHostsFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                    "SSH known hosts:", ChildId::SSH_KNOWN_HOSTS_FILE_LABEL);
+                    sshKnownHostsFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+                                   ChildId::SSH_KNOWN_HOST_FILE_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    sshSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
+                                       "Internal SSH Tunnel settings",
+                                       ChildId::SSH_SETTINGS_GROUP_BOX);
+
+                    return rowPos - posY;
                 }
 
                 int DsnConfigurationWindow::CreateSslSettingsGroup(int posX, int posY, int sizeX)
