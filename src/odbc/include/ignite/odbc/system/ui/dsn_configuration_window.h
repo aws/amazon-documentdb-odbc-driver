@@ -176,7 +176,7 @@ namespace ignite
                     int CreateConnectionSettingsGroup(int posX, int posY, int sizeX);
 
                     /**
-                     * Create aythentication settings group box.
+                     * Create authentication settings group box.
                      *
                      * @param posX X position.
                      * @param posY Y position.
@@ -259,13 +259,13 @@ namespace ignite
                     /** Read preference label. */
                     std::auto_ptr<Window> readPreferenceLabel;
 
-                    /** Replica Set edit. */
+                    /** Replica set edit. */
                     std::auto_ptr< Window > replicaSetEdit;
 
-                    /** Replica Set label. */
+                    /** Replica set label. */
                     std::auto_ptr< Window > replicaSetLabel;
 
-                    /** Retry reads CheckBox. */
+                    /** Retry reads checkBox. */
                     std::auto_ptr<Window> retryReadsCheckBox;
 
                     /** Fetch size edit. */
@@ -286,16 +286,16 @@ namespace ignite
                     /** Cancel button. */
                     std::auto_ptr<Window> cancelButton;
 
-                    /** TLS Encryption CheckBox. */
+                    /** TLS encryption checkBox. */
                     std::auto_ptr<Window> tlsCheckBox;
 
-                    /** TLS Allow Invalid Hostnames CheckBox. */
+                    /** TLS allow invalid hostnames checkBox. */
                     std::auto_ptr<Window> tlsAllowInvalidHostnamesCheckBox;
 
-                    /** TLS Certificate Authority File label. */
+                    /** TLS certificate authority file label. */
                     std::auto_ptr<Window> tlsCaFileLabel;
 
-                    /** TLS Certificate Authority File edit. */
+                    /** TLS certificate authority file edit. */
                     std::auto_ptr<Window> tlsCaFileEdit;
 
                     /** User label. */
