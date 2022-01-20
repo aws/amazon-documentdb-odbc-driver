@@ -21,7 +21,7 @@ namespace ignite
 {
     namespace odbc
     {
-		/** Read Preference enum. */
+        /** Read Preference enum. */
         struct ReadPreference
         {
             enum class Type
@@ -38,24 +38,24 @@ namespace ignite
 
                 UNKNOWN
             };
-	
-        /**
-         * Convert preference from string. 
-         *
-		 * @param val String value.
-		 * @param dflt Default value to return on error.
-		 * @return Corresponding enum value.
-		 */
-        static Type FromString(const std::string& val, Type dflt = Type::UNKNOWN);
+    
+            /**
+             * Convert preference from string. 
+             *
+             * @param val String value.
+             * @param dflt Default value to return on error.
+             * @return Corresponding enum value.
+             */
+            static Type FromString(const std::string& val, Type dflt = Type::UNKNOWN);
 
-		/**
-         * Convert mode to string. 
-         *
-	     * @param val Value to convert.
-         * @return String value.
-         */
-        static std::string ToString(Type val);
+            /**
+             * Convert mode to string. 
+             *
+             * @param val Value to convert.
+             * @return String value.
+             */
+            static std::string ToString(Type val);
         
-		};
+        };
     }
 }

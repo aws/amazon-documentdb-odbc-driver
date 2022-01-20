@@ -32,7 +32,7 @@ include_directories(include ../odbc/include ../network/include)
 
 set(SOURCES 
          src/dummy_test.cpp
-		 src/configuration_test.cpp
+         src/configuration_test.cpp
          ../odbc/src/config/config_tools.cpp
          ../odbc/src/config/configuration.cpp
          ../odbc/src/config/connection_info.cpp

@@ -142,7 +142,7 @@ namespace ignite
                 diagnostic::DiagnosticRecordStorage* diag)
             {
                 std::string lKey = common::ToLower(key);
-                
+
                 if (lKey == Key::dsn)
                 {
                     cfg.SetDsn(value);

@@ -119,7 +119,7 @@ namespace ignite
                     /** Connection attribute keyword for protocol version attribute. */
                     static const std::string protocolVersion;
 
-                    /** Connection attribute keyword for fetch results page size attribute. */
+                    /** Connection attribute keyword for defaultFetchSize attribute. */
                     static const std::string defaultFetchSize;
 
                     /** Connection attribute keyword for sslMode attribute. */
@@ -135,19 +135,10 @@ namespace ignite
                     static const std::string sslCaFile;
 
                     /** Connection attribute keyword for username attribute. */
-                    static const std::string user;
-
-                    /** Connection attribute keyword for password attribute. */
-                    static const std::string password;
-
-                    /** Connection attribute keyword for username attribute. */
                     static const std::string uid;
 
                     /** Connection attribute keyword for password attribute. */
                     static const std::string pwd;
-
-                    /** Connection attribute keyword for nestedTxMode attribute. */
-                    static const std::string nestedTxMode;
                 };
 
                 /**

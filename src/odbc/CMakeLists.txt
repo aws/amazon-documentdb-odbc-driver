@@ -70,7 +70,7 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/utility.cpp
         src/log.cpp
         src/read_preference.cpp
-		src/scan_method.cpp)
+        src/scan_method.cpp)
 
 if (WIN32)
     include_directories(os/win/include)

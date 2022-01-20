@@ -21,7 +21,7 @@ namespace ignite
 {
     namespace odbc
     {
-		/** Scan method enum. */
+        /** Scan method enum. */
         struct ScanMethod
         {
             enum class Type
@@ -36,24 +36,24 @@ namespace ignite
 
                 UNKNOWN
             };
-	
-        /**
-         * Convert preference from string. 
-         *
-		 * @param val String value.
-		 * @param dflt Default value to return on error.
-		 * @return Corresponding enum value.
-		 */
-        static Type FromString(const std::string& val, Type dflt = Type::UNKNOWN);
+    
+            /**
+             * Convert scan method from string. 
+             *
+             * @param val String value.
+             * @param dflt Default value to return on error.
+             * @return Corresponding enum value.
+             */
+            static Type FromString(const std::string& val, Type dflt = Type::UNKNOWN);
 
-		/**
-         * Convert mode to string. 
-         *
-	     * @param val Value to convert.
-         * @return String value.
-         */
-        static std::string ToString(Type val);
+            /**
+             * Convert method to string. 
+             *
+             * @param val Value to convert.
+             * @return String value.
+             */
+            static std::string ToString(Type val);
         
-		};
+        };
     }
 }
