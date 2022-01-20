@@ -68,8 +68,8 @@ namespace ignite
                     replicaSetLabel(),
                     replicaSetEdit(),
                     retryReadsCheckBox(),
-                    fetchSizeLabel(),
-                    fetchSizeEdit(),
+                    defaultFetchSizeLabel(),
+                    defaultFetchSizeEdit(),
                     protocolVersionLabel(),
                     protocolVersionComboBox(),
                     userLabel(),
@@ -274,7 +274,7 @@ namespace ignite
                     sshKnownHostsFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                                     "SSH known hosts:", ChildId::SSH_KNOWN_HOSTS_FILE_LABEL);
                     sshKnownHostsFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
-                                   ChildId::SSH_KNOWN_HOST_FILE_EDIT);
+                                   ChildId::SSH_KNOWN_HOSTS_FILE_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -381,13 +381,13 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    tmp = common::LexicalCast<std::string>(config.GetFetchSize());
+                    tmp = common::LexicalCast<std::string>(config.GetDefaultFetchSize());
                     val = tmp.c_str();
-                    fetchSizeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH,
-                        ROW_HEIGHT, "Fetch size:", ChildId::FETCH_SIZE_LABEL);
+                    defaultFetchSizeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH,
+                        ROW_HEIGHT, "Fetch size:", ChildId::DEFAULT_FETCH_SIZE_LABEL);
 
-                    fetchSizeEdit = CreateEdit(editPosX, rowPos, editSizeX,
-                        ROW_HEIGHT, val, ChildId::FETCH_SIZE_EDIT, ES_NUMBER);
+                    defaultFetchSizeEdit = CreateEdit(editPosX, rowPos, editSizeX,
+                        ROW_HEIGHT, val, ChildId::DEFAULT_FETCH_SIZE_EDIT, ES_NUMBER);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -587,13 +587,13 @@ namespace ignite
 
                     std::string fetchSizeStr;
 
-                    fetchSizeEdit->GetText(fetchSizeStr);
+                    defaultFetchSizeEdit->GetText(fetchSizeStr);
 
                     int32_t fetchSize =
                         common::LexicalCast< int32_t >(fetchSizeStr);
 
                     if (fetchSize <= 0)
-                        fetchSize = config.GetFetchSize();
+                        fetchSize = config.GetDefaultFetchSize();
 
                     LOG_MSG("Retrieving arguments:");
                     LOG_MSG("App name:                 " << appNameStr);
@@ -608,7 +608,7 @@ namespace ignite
                     cfg.SetReadPreference(readPreferenceStr);
                     cfg.SetReplicaSet(replicaSetStr);
                     cfg.SetRetryReads(retryReads);
-                    cfg.SetFetchSize(fetchSize);
+                    cfg.SetDefaultFetchSize(fetchSize);
 
                 }
             }

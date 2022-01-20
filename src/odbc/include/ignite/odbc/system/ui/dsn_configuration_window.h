@@ -72,8 +72,8 @@ namespace ignite
                             REPLICA_SET_EDIT,
                             REPLICA_SET_LABEL,
                             RETRY_READS_CHECK_BOX,
-                            FETCH_SIZE_EDIT,
-                            FETCH_SIZE_LABEL,
+                            DEFAULT_FETCH_SIZE_EDIT,
+                            DEFAULT_FETCH_SIZE_LABEL,
                             PROTOCOL_VERSION_LABEL,
                             PROTOCOL_VERSION_COMBO_BOX,
                             NESTED_TX_MODE_LABEL,
@@ -326,11 +326,11 @@ namespace ignite
                     /** Retry reads checkBox. */
                     std::auto_ptr<Window> retryReadsCheckBox;
 
-                    /** Fetch size edit. */
-                    std::auto_ptr<Window> fetchSizeEdit;
+                    /** Default fetch size edit. */
+                    std::auto_ptr<Window> defaultFetchSizeEdit;
 
-                    /** Fetch size label. */
-                    std::auto_ptr<Window> fetchSizeLabel;
+                    /** Default fetch size label. */
+                    std::auto_ptr<Window> defaultFetchSizeLabel;
 
                     /** Protocol version edit field. */
                     std::auto_ptr<Window> protocolVersionLabel;
