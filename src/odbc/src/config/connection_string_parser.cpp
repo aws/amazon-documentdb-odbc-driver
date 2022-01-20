@@ -57,7 +57,7 @@ namespace ignite
             const std::string ConnectionStringParser::Key::scanLimit                = "scan_limit";
             const std::string ConnectionStringParser::Key::schemaName               = "schema_name";
             const std::string ConnectionStringParser::Key::refreshSchema            = "refresh_schema";
-            const std::string ConnectionStringParser::Key::fetchSize                = "fetch_size";
+            const std::string ConnectionStringParser::Key::defaultFetchSize         = "default_fetch_size";
             const std::string ConnectionStringParser::Key::uid                      = "uid";
             const std::string ConnectionStringParser::Key::pwd                      = "pwd";
 
@@ -399,7 +399,7 @@ namespace ignite
 
                     cfg.SetTls(res == BoolParseResult::AI_TRUE);
                 }
-                else if (lKey == Key::fetchSize)
+                else if (lKey == Key::defaultFetchSize)
                 {
                     if (!common::AllDigits(value))
                     {
@@ -443,7 +443,7 @@ namespace ignite
                         return;
                     }
 
-                    cfg.SetFetchSize(static_cast<int32_t>(numValue));
+                    cfg.SetDefaultFetchSize(static_cast<int32_t>(numValue));
                 } 
                 else if (lKey == Key::tlsCaFile)
                 {
