@@ -54,20 +54,12 @@ namespace ignite
                     readPreferenceEdit(),
                     fetchSizeLabel(),
                     fetchSizeEdit(),
-                    // pageSizeLabel(),
-                    // pageSizeEdit(),
-                    //distributedJoinsCheckBox(),
-                    //enforceJoinOrderCheckBox(),
-                    //replicatedOnlyCheckBox(),
-                    //collocatedCheckBox(), // -AL- after commenting this out, the checkbox is intact?
-                    // checkbox is created in function DsnConfigurationWindow::CreateAdditionalSettingsGroup
                     protocolVersionLabel(),
                     protocolVersionComboBox(),
                     userLabel(),
                     userEdit(),
                     passwordLabel(),
                     passwordEdit(),
-                    //nestedTxModeComboBox(),
                     okButton(),
                     cancelButton(),
                     config(config),
@@ -227,8 +219,7 @@ namespace ignite
 
                 int DsnConfigurationWindow::CreateSslSettingsGroup(int posX, int posY, int sizeX)
                 {   // TODO: rename function name from Ssl to TLS after UI works
-                    //using ssl::SslMode;
-
+                  
                     enum { LABEL_WIDTH = 120 };
 
                     int labelPosX = posX + INTERVAL;
@@ -259,61 +250,10 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    //SslMode::Type sslMode = ssl::SslMode::REQUIRE;
-                    //std::string sslModeStr = SslMode::ToString(sslMode);
-
-                    //const char* val = sslModeStr.c_str();
-
-                    //sslModeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                    //    "SSL Mode:", ChildId::SSL_MODE_LABEL);
-                    //sslModeComboBox = CreateComboBox(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                    //    "", ChildId::SSL_MODE_COMBO_BOX);
-
-                    //sslModeComboBox->AddString("disable");
-                    //sslModeComboBox->AddString("require");
-
-                    //sslModeComboBox->SetSelection(sslMode); // set default value to require -AL-
-
-                    //rowPos += INTERVAL + ROW_HEIGHT; // used to add row hight I believe
-
-                    //val = config.GetTlsCaFile().c_str();
-                    //sslKeyFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                    //    "SSL Private Key:", ChildId::SSL_KEY_FILE_LABEL);
-                    //sslKeyFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                    //    val, ChildId::SSL_KEY_FILE_EDIT);
-
-                    //SHAutoComplete(sslKeyFileEdit->GetHandle(), SHACF_DEFAULT);
-
-                    //rowPos += INTERVAL + ROW_HEIGHT;
-
-                    //val = config.GetTlsCaFile().c_str();
-                    //sslCertFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                    //    "SSL Certificate:", ChildId::SSL_CERT_FILE_LABEL);
-                    //sslCertFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                    //    val, ChildId::SSL_CERT_FILE_EDIT);
-
-                    //SHAutoComplete(sslCertFileEdit->GetHandle(), SHACF_DEFAULT);
-
-                    // rowPos += INTERVAL + ROW_HEIGHT;
-
-                    //val = config.GetTlsCaFile().c_str();
-                    //sslCaFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                    //    "SSL Certificate Authority:", ChildId::SSL_CA_FILE_LABEL);
-                    //sslCaFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                    //    val, ChildId::SSL_CA_FILE_EDIT);
-
-                    //SHAutoComplete(sslCaFileEdit->GetHandle(), SHACF_DEFAULT);
-
-                    // rowPos += INTERVAL + ROW_HEIGHT;
-
                     sslSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
                         "TLS/SSL settings", ChildId::SSL_SETTINGS_GROUP_BOX);
 
                     tlsCaFileEdit->SetEnabled(tlsCheckBox->IsChecked());
-
-                    //sslKeyFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
-                    //sslCertFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
-                    //sslCaFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
 
                     return rowPos - posY;
                 }
@@ -328,11 +268,6 @@ namespace ignite
                     int editPosX = labelPosX + LABEL_WIDTH + INTERVAL;
 
                     int checkBoxSize = (sizeX - 3 * INTERVAL) / 2;
-
-                    //ProtocolVersion version = ProtocolVersion::GetCurrent();
-
-                    //if (!version.IsSupported())
-                    //    version = ProtocolVersion::GetCurrent();
 
                     int rowPos = posY + 2 * INTERVAL;
 
@@ -374,72 +309,6 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    //std::string tmp = common::LexicalCast< std::string >(1000);
-                    //const char* val = tmp.c_str();
-                    //pageSizeLabel =
-                    //    CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                    //                "Page size:", ChildId::PAGE_SIZE_LABEL);
-
-                    //pageSizeEdit =
-                    //    CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
-                    //               ChildId::PAGE_SIZE_EDIT, ES_NUMBER);
-
-                    //rowPos += INTERVAL + ROW_HEIGHT;
-
-                    //nestedTxModeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                    //    "Nested Transaction Mode:", ChildId::NESTED_TX_MODE_LABEL);
-                    //nestedTxModeComboBox = CreateComboBox(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                    //    "", ChildId::NESTED_TX_MODE_COMBO_BOX);
-
-                    /*
-                    int id = 0;
-
-                    const NestedTxMode::ModeSet& supported = NestedTxMode::GetValidValues();
-
-                    for (NestedTxMode::ModeSet::const_iterator it = supported.begin(); it != supported.end(); ++it)
-                    {
-                        nestedTxModeComboBox->AddString(NestedTxMode::ToString(*it));
-
-                        if (*it == config.GetNestedTxMode())
-                            nestedTxModeComboBox->SetSelection(id); 
-
-                    //    ++id;
-                    //}
-                    //*/
-                    //nestedTxModeComboBox->SetEnabled(version >= ProtocolVersion::VERSION_2_5_0);
-
-                    //rowPos += INTERVAL + ROW_HEIGHT;
-
-                    //distributedJoinsCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                    //    "Distributed Joins", ChildId::DISTRIBUTED_JOINS_CHECK_BOX, false);
-
-                    //enforceJoinOrderCheckBox = CreateCheckBox(labelPosX + checkBoxSize + INTERVAL,
-                    //    rowPos, checkBoxSize, ROW_HEIGHT, "Enforce Join Order",
-                    //    ChildId::ENFORCE_JOIN_ORDER_CHECK_BOX, false);
-
-                    //rowPos += ROW_HEIGHT;
-
-                    //replicatedOnlyCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                    //    "Replicated Only", ChildId::REPLICATED_ONLY_CHECK_BOX, false);
-                    //
-                    //collocatedCheckBox = CreateCheckBox(labelPosX + checkBoxSize + INTERVAL, rowPos, checkBoxSize,
-                    //    ROW_HEIGHT, "Collocated", ChildId::COLLOCATED_CHECK_BOX, false);
-
-                    //rowPos += ROW_HEIGHT;
-
-                    //lazyCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                    //    "Lazy", ChildId::LAZY_CHECK_BOX, false);
-
-                    ////lazyCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_1_5);
-
-                    //skipReducerOnUpdateCheckBox = CreateCheckBox(labelPosX + checkBoxSize + INTERVAL, rowPos,
-                    //    checkBoxSize, ROW_HEIGHT, "Skip reducer on update", ChildId::SKIP_REDUCER_ON_UPDATE_CHECK_BOX,
-                    //    false);
-
-                    //skipReducerOnUpdateCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_3_0);
-
-                    //rowPos += ROW_HEIGHT + INTERVAL;
-
                     additionalSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
                         "Additional settings", ChildId::ADDITIONAL_SETTINGS_GROUP_BOX);
 
@@ -480,61 +349,6 @@ namespace ignite
                                     break;
                                 }
 
-                                //case ChildId::DISTRIBUTED_JOINS_CHECK_BOX:
-                                //{
-                                //    distributedJoinsCheckBox->SetChecked(!distributedJoinsCheckBox->IsChecked());
-
-                                //    break;
-                                //}
-
-                                //case ChildId::ENFORCE_JOIN_ORDER_CHECK_BOX:
-                                //{
-                                //    enforceJoinOrderCheckBox->SetChecked(!enforceJoinOrderCheckBox->IsChecked());
-
-                                //    break;
-                                //}
-
-                                //case ChildId::REPLICATED_ONLY_CHECK_BOX:
-                                //{
-                                //    replicatedOnlyCheckBox->SetChecked(!replicatedOnlyCheckBox->IsChecked());
-
-                                //    break;
-                                //}
-
-                                //case ChildId::COLLOCATED_CHECK_BOX:
-                                //{
-                                //    collocatedCheckBox->SetChecked(!collocatedCheckBox->IsChecked());
-
-                                //    break;
-                                //}
-
-                                //case ChildId::LAZY_CHECK_BOX:
-                                //{
-                                //    lazyCheckBox->SetChecked(!lazyCheckBox->IsChecked());
-
-                                //    break;
-                                //}
-
-                                //case ChildId::SKIP_REDUCER_ON_UPDATE_CHECK_BOX:
-                                //{
-                                //    skipReducerOnUpdateCheckBox->SetChecked(!skipReducerOnUpdateCheckBox->IsChecked());
-
-                                //    break;
-                                //}
-
-                                //case ChildId::PROTOCOL_VERSION_COMBO_BOX:
-                                //{
-                                //    std::string versionStr;
-                                //    protocolVersionComboBox->GetText(versionStr);
-
-                                //    ProtocolVersion version = ProtocolVersion::FromString(versionStr);
-                                //    lazyCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_1_5);
-                                //    skipReducerOnUpdateCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_3_0);
-                                //    nestedTxModeComboBox->SetEnabled(version >= ProtocolVersion::VERSION_2_5_0);
-
-                                //    break;
-                                //}
-
                                 case ChildId::TLS_CHECK_BOX: 
                                 {
                                     tlsCheckBox->SetChecked(!tlsCheckBox->IsChecked());
@@ -551,21 +365,9 @@ namespace ignite
                                     break;
                                 }
 
-                                //case ChildId::SSL_MODE_COMBO_BOX: //-AL- may need to remove this later
-                                //{
-                                //    using ssl::SslMode;
 
-                                //    std::string sslModeStr;
-                                //    sslModeComboBox->GetText(sslModeStr);
-
-                                //    SslMode::Type sslMode = SslMode::FromString(sslModeStr, SslMode::DISABLE);
-
-                                //    sslKeyFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
-                                //    sslCertFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
-                                //    sslCaFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
-
-                                //    break;
-                                //}
+                                    break;
+                                }
 
                                 default:
                                     return false;
@@ -673,28 +475,6 @@ namespace ignite
                     cfg.SetTlsAllowInvalidHostnames(tlsAllowInvalidHostnames);
                     cfg.SetTlsCaFile(tlsCaStr);
 
-                    //std::string sslModeStr;
-                    //std::string sslKeyStr;
-                    //std::string sslCertStr;
-                    //std::string sslCaStr;
-
-                    ////sslModeComboBox->GetText(sslModeStr);
-                    ////sslKeyFileEdit->GetText(sslKeyStr);
-                    ////sslCertFileEdit->GetText(sslCertStr);
-                    ////sslCaFileEdit->GetText(sslCaStr);
-
-                    //LOG_MSG("Retrieving arguments:");
-                    //LOG_MSG("SSL Mode:           " << sslModeStr);
-                    //LOG_MSG("SSL Key:            " << sslKeyStr);
-                    //LOG_MSG("SSL Certificate:    " << sslCertStr);
-                    //LOG_MSG("SSL CA:             " << sslCaStr);
-
-                    //ssl::SslMode::Type sslMode = ssl::SslMode::FromString(sslModeStr, ssl::SslMode::DISABLE);
-
-                    //cfg.SetSslMode(sslMode);
-                    //cfg.SetSslKeyFile(sslKeyStr);
-                    //cfg.SetSslCertFile(sslCertStr);
-                    //cfg.SetTlsCaFile(sslCaStr);
                 }
 
                 void DsnConfigurationWindow::RetrieveAdditionalParameters(config::Configuration& cfg) const
@@ -726,53 +506,17 @@ namespace ignite
                     if (fetchSize <= 0)
                         fetchSize = config.GetFetchSize();
 
-                    //std::string pageSizeStr;
-
-                    //pageSizeEdit->GetText(pageSizeStr);
-
-                    //int32_t pageSize = common::LexicalCast<int32_t>(pageSizeStr);
-
-                    //if (pageSize <= 0)
-                    //    pageSize = config.GetPageSize();
-                    
-                    //std::string nestedTxModeStr;
-
-                    //nestedTxModeComboBox->GetText(nestedTxModeStr);
-
-                    // unnecessary code is commented out -AL- 
-                    //NestedTxMode::Type mode = NestedTxMode::FromString(nestedTxModeStr, config.GetNestedTxMode());
-
-                    //bool distributedJoins = distributedJoinsCheckBox->IsChecked();
-                    //bool enforceJoinOrder = enforceJoinOrderCheckBox->IsChecked();
-                    //bool replicatedOnly = replicatedOnlyCheckBox->IsChecked();
-                    //bool collocated = collocatedCheckBox->IsChecked();
-                    //bool lazy = lazyCheckBox->IsChecked();
-                    //bool skipReducerOnUpdate = skipReducerOnUpdateCheckBox->IsChecked();
-
                     LOG_MSG("Retrieving arguments:");
-                    LOG_MSG("App name:                " << appNameStr);
-                    LOG_MSG("Login timeout (seconds): " << loginTimeoutSecStr);
-                    LOG_MSG("Read preference:         " << readPreferenceStr);
-                    LOG_MSG("Fetch size:              " << fetchSize);
-                    //LOG_MSG("Nested TX Mode:         " << NestedTxMode::ToString(mode));
-                    //LOG_MSG("Distributed Joins:      " << (distributedJoins ? "true" : "false"));
-                    //LOG_MSG("Enforce Join Order:     " << (enforceJoinOrder ? "true" : "false"));
-                    //LOG_MSG("Replicated only:        " << (replicatedOnly ? "true" : "false"));
-                    //LOG_MSG("Collocated:             " << (collocated ? "true" : "false"));
-                    //LOG_MSG("Lazy:                   " << (lazy ? "true" : "false"));
-                    //LOG_MSG("Skip reducer on update: " << (skipReducerOnUpdate ? "true" : "false"));
+                    LOG_MSG("App name:                 " << appNameStr);
+                    LOG_MSG("Login timeout (seconds):  " << loginTimeoutSecStr);
+                    LOG_MSG("Read preference:          " << readPreferenceStr);
+                    LOG_MSG("Fetch size:               " << fetchSize);
 
                     cfg.SetApplicationName(appNameStr);
                     cfg.SetLoginTimeoutSeconds(loginTimeoutSec);
                     cfg.SetReadPreference(readPreferenceStr);
                     cfg.SetFetchSize(fetchSize);
-                    //cfg.SetNestedTxMode(mode);
-                    //cfg.SetDistributedJoins(distributedJoins);
-                    //cfg.SetEnforceJoinOrder(enforceJoinOrder);
-                    //cfg.SetReplicatedOnly(replicatedOnly);
-                    //cfg.SetCollocated(collocated);
-                    //cfg.SetLazy(lazy);
-                    //cfg.SetSkipReducerOnUpdate(skipReducerOnUpdate);
+
                 }
             }
         }

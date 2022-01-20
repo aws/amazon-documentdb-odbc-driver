@@ -53,20 +53,12 @@ namespace ignite
                             SCHEMA_LABEL,
                             APP_NAME_EDIT,
                             APP_NAME_LABEL,
-                            FETCH_SIZE_EDIT,
-                            FETCH_SIZE_LABEL,
-                            READ_PREFERENCE_EDIT,
-                            READ_PREFERENCE_LABEL,
                             LOGIN_TIMEOUT_SEC_EDIT,
                             LOGIN_TIMEOUT_SEC_LABEL,
-                            //PAGE_SIZE_EDIT,
-                            //PAGE_SIZE_LABEL,
-                            //DISTRIBUTED_JOINS_CHECK_BOX,
-                            //ENFORCE_JOIN_ORDER_CHECK_BOX,
-                            //REPLICATED_ONLY_CHECK_BOX,
-                            //COLLOCATED_CHECK_BOX,
-                            //LAZY_CHECK_BOX,
-                            //SKIP_REDUCER_ON_UPDATE_CHECK_BOX,
+                            READ_PREFERENCE_EDIT,
+                            READ_PREFERENCE_LABEL,
+                            FETCH_SIZE_EDIT,
+                            FETCH_SIZE_LABEL,
                             PROTOCOL_VERSION_LABEL,
                             PROTOCOL_VERSION_COMBO_BOX,
                             NESTED_TX_MODE_LABEL,
@@ -75,14 +67,6 @@ namespace ignite
                             TLS_ALLOW_INVALID_HOSTNAMES_CHECK_BOX,
                             TLS_CA_FILE_EDIT,
                             TLS_CA_FILE_LABEL,
-                            //SSL_MODE_LABEL,
-                            //SSL_MODE_COMBO_BOX,
-                            //SSL_KEY_FILE_LABEL,
-                            //SSL_KEY_FILE_EDIT,
-                            //SSL_CERT_FILE_LABEL,
-                            //SSL_CERT_FILE_EDIT,
-                            //SSL_CA_FILE_LABEL,
-                            //SSL_CA_FILE_EDIT,
                             USER_LABEL,
                             USER_EDIT,
                             PASSWORD_LABEL,
@@ -263,44 +247,21 @@ namespace ignite
                     /** Login Timeout (seconds) edit. */
                      std::auto_ptr<Window> loginTimeoutSecEdit;
 
-                     /** Login Timeout (seconds) label. */
+                    /** Login Timeout (seconds) label. */
                      std::auto_ptr<Window> loginTimeoutSecLabel;
 
                     /** Read preference edit. */
                      std::auto_ptr<Window> readPreferenceEdit;
 
                     /** Read preference label. */
-                     std::auto_ptr< Window > readPreferenceLabel;
+                     std::auto_ptr<Window> readPreferenceLabel;
 
-                    /** Fetch size edit. */
-                     std::auto_ptr<Window> fetchSizeEdit;
-
-                     /** Fetch size label. */
-                     std::auto_ptr<Window> fetchSizeLabel;
-
-                    ///** DSN fetch page size edit field label. */
-                    //std::auto_ptr<Window> pageSizeLabel;
-
-                    ///** DSN fetch page size edit field. */
-                    //std::auto_ptr<Window> pageSizeEdit;
-
-                    ///** Distributed joins CheckBox. */
-                    //std::auto_ptr<Window> distributedJoinsCheckBox;
 
                     ///** Enforce join order CheckBox. */
                     //std::auto_ptr<Window> enforceJoinOrderCheckBox;
 
-                    ///** Replicated only CheckBox. */
-                    //std::auto_ptr<Window> replicatedOnlyCheckBox;
 
-                    ///** Collocated CheckBox. */
-                    //std::auto_ptr<Window> collocatedCheckBox;
 
-                    ///** Lazy CheckBox. */
-                    //std::auto_ptr<Window> lazyCheckBox;
-
-                    ///** Update on server CheckBox. */
-                    //std::auto_ptr<Window> skipReducerOnUpdateCheckBox;
 
                     /** Protocol version edit field. */
                     std::auto_ptr<Window> protocolVersionLabel;
@@ -318,37 +279,13 @@ namespace ignite
                     std::auto_ptr<Window> tlsCheckBox;
 
                     /** TLS Allow Invalid Hostnames CheckBox. */
-                    std::auto_ptr< Window > tlsAllowInvalidHostnamesCheckBox;
+                    std::auto_ptr<Window> tlsAllowInvalidHostnamesCheckBox;
 
                     /** TLS Certificate Authority File label. */
                     std::auto_ptr<Window> tlsCaFileLabel;
 
                     /** TLS Certificate Authority File edit. */
                     std::auto_ptr<Window> tlsCaFileEdit;
-
-                    ///** SSL Mode label. */
-                    //std::auto_ptr<Window> sslModeLabel;
-
-                    ///** SSL Mode ComboBox. */
-                    //std::auto_ptr<Window> sslModeComboBox;
-
-                    ///** SSL Private Key File label. */
-                    //std::auto_ptr<Window> sslKeyFileLabel;
-
-                    ///** SSL Private Key File edit. */
-                    //std::auto_ptr<Window> sslKeyFileEdit;
-
-                    ///** SSL Certificate File label. */
-                    //std::auto_ptr<Window> sslCertFileLabel;
-
-                    ///** SSL Certificate File edit. */
-                    //std::auto_ptr<Window> sslCertFileEdit;
-
-                    ///** SSL Certificate Authority File label. */
-                    //std::auto_ptr<Window> sslCaFileLabel;
-
-                    ///** SSL Certificate Authority File edit. */
-                    //std::auto_ptr<Window> sslCaFileEdit;
 
                     /** User label. */
                     std::auto_ptr<Window> userLabel;
@@ -361,12 +298,6 @@ namespace ignite
 
                     /** Password edit. */
                     std::auto_ptr<Window> passwordEdit;
-
-                    ///** Nested transaction mode label. */
-                    //std::auto_ptr<Window> nestedTxModeLabel;
-
-                    ///** Nested transaction mode combo box. */
-                    //std::auto_ptr<Window> nestedTxModeComboBox;
 
                     /** Configuration. */
                     config::Configuration& config;
