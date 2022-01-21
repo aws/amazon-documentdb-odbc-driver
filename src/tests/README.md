@@ -22,6 +22,6 @@ Following headers are required:
 1. Run CMake command: `cmake -S . -B out\build\ -G "Visual Studio 16 2019"`
 1. Build project (F7) 
 1. If no command line arguments are passed, by default:
-   1. input-file = build\odbc\cmake\PerformanceTests\performance\Performance_Test_Plan.csv
-   1. output-file = build\odbc\cmake\PerformanceTests\performance\Performance_Test_Results.csv
+   1. input-file = build\odbc\cmake\tests\performance\Performance_Test_Plan.csv
+   1. output-file = build\odbc\cmake\tests\performance\Performance_Test_Results.csv
    1. dsn-name = documentdb-perf-test

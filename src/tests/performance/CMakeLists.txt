@@ -40,10 +40,10 @@ add_custom_command(
 	TARGET performance POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy
 			${CMAKE_CURRENT_SOURCE_DIR}/Performance_Test_Plan.csv
-			${CMAKE_SOURCE_DIR}/../build/odbc/cmake/PerformanceTests/performance/Performance_Test_Plan.csv)
+			${CMAKE_SOURCE_DIR}/../build/odbc/cmake/tests/performance/Performance_Test_Plan.csv)
 
 			add_custom_command(
 	TARGET performance POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy
 			${CMAKE_CURRENT_SOURCE_DIR}/Performance_Test_Results.csv
-			${CMAKE_SOURCE_DIR}/../build//odbc/cmake/PerformanceTests/performance/Performance_Test_Results.csv)
+			${CMAKE_SOURCE_DIR}/../build//odbc/cmake/tests/performance/Performance_Test_Results.csv)
