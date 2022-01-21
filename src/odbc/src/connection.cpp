@@ -171,7 +171,10 @@ namespace ignite
 
             if (!connected)
             {
-                AddStatusRecord(SqlState::S08001_CANNOT_CONNECT, "Failed to establish connection with the host.");
+                std::string errMessage = "Failed to establish connection with the host.\n";
+                errMessage.append(err.GetText());
+                AddStatusRecord(
+                    SqlState::S08001_CANNOT_CONNECT, errMessage);
 
                 return SqlResult::AI_ERROR;
             }
@@ -645,7 +648,7 @@ namespace ignite
                 if (!connected) {
                     err = odbc::IgniteError(
                         odbc::IgniteError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
-                        err.GetText());
+                        errInfo.errMsg);
                     Close();
                 }
                 connection = result;

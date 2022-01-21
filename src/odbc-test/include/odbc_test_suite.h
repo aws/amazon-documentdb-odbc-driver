@@ -75,7 +75,9 @@ namespace ignite
              * @param connectStr Connection string.
              * @return SQL State.
              */
-            std::string ExpectConnectionReject(const std::string& connectStr);
+            std::string ExpectConnectionReject(
+                const std::string& connectStr,
+                const std::string& expectedError = "08001: Failed to establish connection with the host.");
 
             /**
              * Disconnect.

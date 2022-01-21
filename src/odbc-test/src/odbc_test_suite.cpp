@@ -102,7 +102,9 @@ namespace ignite
             BOOST_REQUIRE(stmt != NULL);
         }
 
-        std::string OdbcTestSuite::ExpectConnectionReject(const std::string& connectStr)
+        std::string OdbcTestSuite::ExpectConnectionReject(
+            const std::string& connectStr,
+            const std::string& expectedError)
         {
             Prepare();
 
@@ -117,6 +119,9 @@ namespace ignite
                 outstr, sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
 
             BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
+            BOOST_REQUIRE_EQUAL(expectedError,
+                                GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc)
+                                    .substr(0, expectedError.size()));
 
             return GetOdbcErrorState(SQL_HANDLE_DBC, dbc);
         }
