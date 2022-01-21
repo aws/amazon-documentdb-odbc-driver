@@ -31,14 +31,7 @@
 #define ODBCVER 0x0351
 #endif
 
-#if defined(_WIN64)
 #include <odbcinst.h>
-#elif defined(_WIN32)
-#include <odbcinst.h>
-#else
-/* Not Windows */
-#endif
-
 #include <sql.h>
 #include <sqlext.h>
 
