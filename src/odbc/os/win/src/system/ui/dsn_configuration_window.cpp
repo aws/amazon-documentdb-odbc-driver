@@ -145,7 +145,7 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    std::string addr = config::AddressesToString(config.GetAddresses());
+                    std::string addr = config.GetHostname();
 
                     val = addr.c_str();
                     addressLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
@@ -639,7 +639,7 @@ namespace ignite
                         throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, "Protocol version is not supported.");
 
                     cfg.SetDsn(dsnStr);
-                    cfg.SetAddresses(addresses);
+                    //cfg.SetAddresses(addresses);
                     cfg.SetDatabase(schemaStr);
                     //cfg.SetProtocolVersion(version);
                 }

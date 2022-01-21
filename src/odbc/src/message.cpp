@@ -68,26 +68,6 @@ namespace ignite
             writer.WriteInt16(version.GetMaintenance());
 
             writer.WriteInt8(ClientType::ODBC);
-
-            /*writer.WriteBool(config.IsDistributedJoins());
-            writer.WriteBool(config.IsEnforceJoinOrder());
-            writer.WriteBool(config.IsReplicatedOnly());
-            writer.WriteBool(config.IsCollocated());
-
-            if (version >= ProtocolVersion::VERSION_2_1_5)
-                writer.WriteBool(config.IsLazy());
-
-            if (version >= ProtocolVersion::VERSION_2_3_0)
-                writer.WriteBool(config.IsSkipReducerOnUpdate());
-
-            if (version >= ProtocolVersion::VERSION_2_5_0)
-            {
-                utility::WriteString(writer, config.GetUser());
-                utility::WriteString(writer, config.GetPassword());
-            }
-
-            if (version >= ProtocolVersion::VERSION_2_7_0)
-                writer.WriteInt8(config.GetNestedTxMode());*/
         }
 
         QueryExecuteRequest::QueryExecuteRequest(const std::string& schema, const std::string& sql,
