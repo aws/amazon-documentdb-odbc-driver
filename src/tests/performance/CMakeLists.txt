@@ -33,6 +33,7 @@ add_executable (performance "performance.cpp"
 							"performance_test_runner.h")
 
 target_compile_definitions(performance PUBLIC _UNICODE UNICODE)
+target_link_libraries(performance ${ODBC_LIBRARY})
 set_target_properties(performance PROPERTIES CXX_STANDARD 17)
 
 add_custom_command(

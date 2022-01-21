@@ -21,10 +21,10 @@
 #include <climits>
 #endif
 
-#ifdef WIN32
-#include <Windows.h>
-#pragma comment(lib, "odbc32.lib")
-#endif
+//#ifdef WIN32
+//#include <Windows.h>
+//#pragma comment(lib, "odbc32.lib")
+//#endif
 
 
 #ifndef ODBCVER
