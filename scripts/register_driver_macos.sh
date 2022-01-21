@@ -1,11 +1,12 @@
 
-SOURCE=${BASH_SOURCE[0]}
+SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
-  SOURCE=$(readlink "$SOURCE")
-  [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 done
-SCRIPT_DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+
+SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
 PROJECT_DIR="$SCRIPT_DIR/.."
 ODBC_LIB_PATH="$PROJECT_DIR/build/odbc/lib"
@@ -13,8 +14,8 @@ ODBC_LIB_FILENAME="$ODBC_LIB_PATH/libignite-odbc.dylib"
 
 if [ ! -f "$ODBC_LIB_FILENAME" ]
 then
-	echo "Cannot find ODBC library file: $ODBC_LIB_FILENAME"
-	exit 1
+  echo "Cannot find ODBC library file: $ODBC_LIB_FILENAME"
+  exit 1
 fi
 
 echo "[Apache Ignite]"            > "$ODBC_LIB_PATH/ignite-odbc-install.ini"
