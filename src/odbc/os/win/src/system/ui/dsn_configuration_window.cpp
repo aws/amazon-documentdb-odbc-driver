@@ -35,8 +35,11 @@ namespace ignite
             {   // -AL- the constructor. No-op means no operation I think? 
                 DsnConfigurationWindow::DsnConfigurationWindow(Window* parent, config::Configuration& config):
                     CustomWindow(parent, "IgniteConfigureDsn", "Configure Amazon DocumentDB DSN Latest"),
-                    width(360),
-                    height(600),
+                    //width(360), // original width:360.
+                    height(600), // original height:600
+                    width(730), // double the original width
+                    //width(360),
+                    //height(800),
                     connectionSettingsGroupBox(),
                     sslSettingsGroupBox(), // has a create... function defined 
                     tlsCheckBox(), 
@@ -117,23 +120,33 @@ namespace ignite
                 // the function that actually creates the UI -AL-
                 void DsnConfigurationWindow::OnCreate()
                 {
-                    int groupPosY = MARGIN;
-                    int groupSizeY = width - 2 * MARGIN;
+                    int groupPosYLeft = MARGIN;
+                    //int groupSizeY = width - 2 * MARGIN; // original 
+                    int groupSizeY = (width - 2 * MARGIN) / 2;
+                    int posXRight = MARGIN + (width - MARGIN) / 2;
+                    int groupPosYRight = MARGIN;
 
-                    groupPosY += INTERVAL + CreateConnectionSettingsGroup(MARGIN, groupPosY, groupSizeY);
-                    groupPosY += INTERVAL + CreateAuthSettingsGroup(MARGIN, groupPosY, groupSizeY);
-                    groupPosY += INTERVAL + CreateSshSettingsGroup(MARGIN, groupPosY, groupSizeY);
-                    groupPosY += INTERVAL + CreateSslSettingsGroup(MARGIN, groupPosY, groupSizeY);
-                    groupPosY += INTERVAL + CreateAdditionalSettingsGroup(MARGIN, groupPosY, groupSizeY);
+                    groupPosYLeft += INTERVAL + CreateConnectionSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
+                    groupPosYLeft += INTERVAL + CreateAuthSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
+                    groupPosYLeft += INTERVAL + CreateSshSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
+                    groupPosYRight += INTERVAL + CreateSslSettingsGroup(posXRight, groupPosYRight, groupSizeY);
+                    groupPosYRight += INTERVAL + CreateAdditionalSettingsGroup(posXRight, groupPosYRight, groupSizeY);
+                    //groupPosY += INTERVAL + CreateSslSettingsGroup(MARGIN, groupPosY, groupSizeY);
+                    //groupPosY += INTERVAL + CreateAdditionalSettingsGroup(MARGIN, groupPosY, groupSizeY);
                     // test: if above code is commented out, additional settings shouldn't appear in config window. Result: Yes test success. 
                     // what happens here is the height of each subgroup is calculated and appended to the y position of the buttons
 
                     int cancelPosX = width - MARGIN - BUTTON_WIDTH;
                     int okPosX = cancelPosX - INTERVAL - BUTTON_WIDTH;
 
-                    okButton = CreateButton(okPosX, groupPosY, BUTTON_WIDTH, BUTTON_HEIGHT, "Ok", ChildId::OK_BUTTON);
-                    cancelButton = CreateButton(cancelPosX, groupPosY, BUTTON_WIDTH, BUTTON_HEIGHT,
+                    okButton = CreateButton(okPosX, groupPosYRight, BUTTON_WIDTH, BUTTON_HEIGHT, "Ok", ChildId::OK_BUTTON);
+                    cancelButton = CreateButton(cancelPosX, groupPosYRight, BUTTON_WIDTH, BUTTON_HEIGHT,
                         "Cancel", ChildId::CANCEL_BUTTON);
+
+                    // original code by Ignite
+                    //okButton = CreateButton(okPosX, groupPosY, BUTTON_WIDTH, BUTTON_HEIGHT, "Ok", ChildId::OK_BUTTON);
+                    //cancelButton = CreateButton(cancelPosX, groupPosY, BUTTON_WIDTH, BUTTON_HEIGHT,
+                    //    "Cancel", ChildId::CANCEL_BUTTON);
                 }
 
                 int DsnConfigurationWindow::CreateConnectionSettingsGroup(int posX, int posY, int sizeX)
@@ -285,6 +298,8 @@ namespace ignite
                     return rowPos - posY;
                 }
 
+                // old SSL settings group code for 1 column config window
+                /*
                 int DsnConfigurationWindow::CreateSslSettingsGroup(int posX, int posY, int sizeX)
                 {   // TODO: rename function name from Ssl to TLS after UI works
                   
@@ -326,7 +341,52 @@ namespace ignite
 
                     return rowPos - posY;
                 }
+                */
 
+                int DsnConfigurationWindow::CreateSslSettingsGroup(int posX, int posY, int sizeX)
+                {   // TODO: rename function name from Ssl to TLS after UI works
+                  
+                    enum { LABEL_WIDTH = 120 };
+
+                    int labelPosX = posX + INTERVAL;
+
+                    int editSizeX = sizeX - LABEL_WIDTH - 3 * INTERVAL;
+                    int editPosX = labelPosX + LABEL_WIDTH + INTERVAL;
+
+                    int rowPos = posY + 2 * INTERVAL;
+
+                    int checkBoxSize = (sizeX - 3 * INTERVAL) / 2;
+
+                    tlsCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
+                        "TLS", ChildId::TLS_CHECK_BOX, config.IsTls());
+
+                    tlsAllowInvalidHostnamesCheckBox = CreateCheckBox(
+                        labelPosX + checkBoxSize + INTERVAL, rowPos,
+                        checkBoxSize, ROW_HEIGHT, "TLS Allow Invalid Hostnames",
+                        ChildId::TLS_ALLOW_INVALID_HOSTNAMES_CHECK_BOX,
+                        config.IsTlsAllowInvalidHostnames());
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    const char* val = config.GetTlsCaFile().c_str();
+                    tlsCaFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                    "TLS Certificate Authority:", ChildId::TLS_CA_FILE_LABEL);
+                    tlsCaFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+                                   ChildId::TLS_CA_FILE_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    sslSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
+                        "TLS/SSL settings", ChildId::SSL_SETTINGS_GROUP_BOX);
+
+                    tlsAllowInvalidHostnamesCheckBox->SetEnabled(tlsCheckBox->IsChecked());
+                    tlsCaFileEdit->SetEnabled(tlsCheckBox->IsChecked());
+
+                    return rowPos - posY;
+                }
+
+                // old additional settings group code for 1 column window
+                /*
                 int DsnConfigurationWindow::CreateAdditionalSettingsGroup(int posX, int posY, int sizeX)
                 {
                     enum { LABEL_WIDTH = 130 }; // -AL- different definition from above. I can also change it to the same
@@ -358,6 +418,25 @@ namespace ignite
                         ROW_HEIGHT, val, ChildId::LOGIN_TIMEOUT_SEC_EDIT, ES_NUMBER);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
+
+                    // useful draft code for changing read preference into a mode (check JDBC page for available options)
+                    // const char* val = sslModeStr.c_str();
+
+                    // sslModeLabel = CreateLabel(labelPosX, rowPos,
+                    // LABEL_WIDTH, ROW_HEIGHT,
+                    //    "SSL Mode:", ChildId::SSL_MODE_LABEL);
+                    // sslModeComboBox = CreateComboBox(editPosX, rowPos,
+                    // editSizeX, ROW_HEIGHT,
+                    //    "", ChildId::SSL_MODE_COMBO_BOX);
+
+                    // sslModeComboBox->AddString("disable");
+                    // sslModeComboBox->AddString("require");
+
+                    // sslModeComboBox->SetSelection(sslMode); // set default
+                    // value to require -AL-
+
+                    // rowPos += INTERVAL + ROW_HEIGHT; // used to add row hight
+                    // I believe
 
                     val = config.GetReadPreference().c_str();
 
@@ -397,7 +476,117 @@ namespace ignite
 
                     return rowPos - posY;
                 }
-                
+                */
+
+                int DsnConfigurationWindow::CreateAdditionalSettingsGroup(int posX, int posY, int sizeX) {
+                    enum { LABEL_WIDTH = 130 };  // -AL- different definition from above. I can also
+                        // change it to the same
+
+                    int labelPosX = posX + INTERVAL;
+
+                    int editSizeX = sizeX - LABEL_WIDTH - 3 * INTERVAL;
+                    int editPosX = labelPosX + LABEL_WIDTH + INTERVAL;
+
+                    int checkBoxSize = (sizeX - 3 * INTERVAL) / 2;
+
+                    int rowPos = posY + 2 * INTERVAL;
+
+                    const char* val = config.GetApplicationName().c_str();
+
+                    appNameLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Application Name:", ChildId::APP_NAME_LABEL);
+                    appNameEdit =
+                        CreateEdit(editPosX, rowPos, editSizeX,
+                                   ROW_HEIGHT, val,
+                                   ChildId::APP_NAME_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    std::string tmp = common::LexicalCast< std::string >(
+                        config.GetLoginTimeoutSeconds());
+                    val = tmp.c_str();
+                    loginTimeoutSecLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Login Timeout (s):", ChildId::LOGIN_TIMEOUT_SEC_LABEL);
+
+                    loginTimeoutSecEdit = CreateEdit(
+                        editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                        val, ChildId::LOGIN_TIMEOUT_SEC_EDIT, ES_NUMBER);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    // useful draft code for changing read preference into a
+                    // mode (check JDBC page for available options) const char*
+                    // val = sslModeStr.c_str();
+
+                    // sslModeLabel = CreateLabel(labelPosX, rowPos,
+                    // LABEL_WIDTH, ROW_HEIGHT,
+                    //    "SSL Mode:", ChildId::SSL_MODE_LABEL);
+                    // sslModeComboBox = CreateComboBox(editPosX, rowPos,
+                    // editSizeX, ROW_HEIGHT,
+                    //    "", ChildId::SSL_MODE_COMBO_BOX);
+
+                    // sslModeComboBox->AddString("disable");
+                    // sslModeComboBox->AddString("require");
+
+                    // sslModeComboBox->SetSelection(sslMode); // set default
+                    // value to require -AL-
+
+                    // rowPos += INTERVAL + ROW_HEIGHT; // used to add row hight
+                    // I believe
+
+                    val = config.GetReadPreference().c_str();
+
+                    readPreferenceLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Read preference:", ChildId::READ_PREFERENCE_LABEL);
+                    readPreferenceEdit = CreateEdit(
+                        editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                        val, ChildId::READ_PREFERENCE_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    val = config.GetReplicaSet().c_str();
+
+                    replicaSetLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                    "Replica Set:", ChildId::REPLICA_SET_LABEL);
+                    replicaSetEdit =
+                        CreateEdit(editPosX, rowPos, editSizeX,
+                                   ROW_HEIGHT, val,
+                                   ChildId::REPLICA_SET_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    retryReadsCheckBox = CreateCheckBox(
+                        labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
+                        "Retry Reads", ChildId::RETRY_READS_CHECK_BOX,
+                        config.IsRetryReads());
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    tmp = common::LexicalCast< std::string >(
+                        config.GetDefaultFetchSize());
+                    val = tmp.c_str();
+                    defaultFetchSizeLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Fetch size:", ChildId::DEFAULT_FETCH_SIZE_LABEL);
+
+                    defaultFetchSizeEdit = CreateEdit(
+                        editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                        val, ChildId::DEFAULT_FETCH_SIZE_EDIT, ES_NUMBER);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    additionalSettingsGroupBox = CreateGroupBox(posX, posY, sizeX,
+                                       rowPos - posY, "Additional settings",
+                        ChildId::ADDITIONAL_SETTINGS_GROUP_BOX);
+
+                    return rowPos - posY;
+                }
+
+
                 bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam)
                 {
                     switch (msg)
@@ -429,6 +618,13 @@ namespace ignite
                                 {
                                     PostMessage(GetHandle(), WM_CLOSE, 0, 0);
 
+                                    break;
+                                }
+
+                                case ChildId::SSH_STRICT_HOST_KEY_CHECKING_CHECK_BOX:
+                                {
+                                    sshStrictHostKeyCheckingCheckBox
+                                        ->SetChecked(!sshStrictHostKeyCheckingCheckBox->IsChecked());
                                     break;
                                 }
 
@@ -546,6 +742,34 @@ namespace ignite
                     cfg.SetPassword(password);
                 }
 
+                void DsnConfigurationWindow::RetrieveSshParameters(config::Configuration& cfg) const
+                {
+                    std::string sshUserStr;
+                    std::string sshHostStr;
+                    std::string sshPrivateKeyFileStr;
+                    std::string sshPrivateKeyPassphraseStr;
+                    std::string sshKnownHostsFileStr;
+
+                    sshUserEdit->GetText(sshUserStr);
+                    sshHostEdit->GetText(sshHostStr);
+                    //sshPrivateKeyFileEdit->GetText(sshPrivateKeyFileStr);
+                    //sshPrivateKeyPassphraseEdit->GetText(sshPrivateKeyPassphraseStr);
+                    sshKnownHostsFileEdit->GetText(sshKnownHostsFileStr);
+
+                    bool sshStrictHostKeyChecking = sshStrictHostKeyCheckingCheckBox->IsChecked();
+
+                    LOG_MSG("SSH user:                      " << sshUserStr);
+                    LOG_MSG("SSH host:                      " << sshHostStr);
+                    LOG_MSG("SSH known hosts file:          " << sshKnownHostsFileStr);
+                    LOG_MSG("SSH strict host key checking:  " << (sshStrictHostKeyChecking ? "true" : "false"));
+
+                    cfg.SetSshUser(sshUserStr);
+                    cfg.SetSshHost(sshHostStr);
+                    cfg.SetSshKnownHostsFile(sshKnownHostsFileStr);
+                    cfg.SetSshStrictHostKeyChecking(sshStrictHostKeyChecking);
+
+                }
+
                 void DsnConfigurationWindow::RetrieveSslParameters(config::Configuration& cfg) const
                 {
 
@@ -557,7 +781,7 @@ namespace ignite
 
                     LOG_MSG("TLS/SSL Encryption:          " << (tls ? "true" : "false"));
                     LOG_MSG("tls Allow Invalid Hostnames: " << (tlsAllowInvalidHostnames ? "true" : "false"));
-                    LOG_MSG("TLS CA:                      " << tlsCaStr);
+                    LOG_MSG("TLS CA (Certificate Authority):                      " << tlsCaStr);
 
                     cfg.SetTls(tls);
                     cfg.SetTlsAllowInvalidHostnames(tlsAllowInvalidHostnames);

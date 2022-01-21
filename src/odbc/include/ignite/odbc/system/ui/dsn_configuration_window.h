@@ -162,6 +162,14 @@ namespace ignite
                     void RetrieveAuthParameters(config::Configuration& cfg) const;
 
                     /**
+                     * Retrieves current values from the SSH tunnel UI group and
+                     * stores them to the specified configuration.
+                     *
+                     * @param cfg Configuration.
+                     */
+                    void RetrieveSshParameters(config::Configuration& cfg) const;
+
+                    /**
                      * Retrieves current values from the SSL UI group and
                      * stores them to the specified configuration.
                      *
