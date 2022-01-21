@@ -52,7 +52,7 @@ namespace ignite
             const bool Configuration::DefaultValue::refreshSchema = false;
 
             // Internal SSH Tunnel options // need to add to UI
-            // const bool Configuration::DefaultValue::sshEnable = false;
+             const bool Configuration::DefaultValue::sshEnable = false;
             const std::string Configuration::DefaultValue::sshUser = "";
             const std::string Configuration::DefaultValue::sshHost = "";
             const std::string Configuration::DefaultValue::sshPrivateKeyFile = "";
@@ -87,6 +87,7 @@ namespace ignite
                 tls(DefaultValue::tls),
                 tlsAllowInvalidHostnames(DefaultValue::tlsAllowInvalidHostnames),
                 tlsCaFile(DefaultValue::tlsCaFile),
+                sshEnable(DefaultValue::sshEnable),
                 sshUser(DefaultValue::sshUser),
                 sshHost(DefaultValue::sshHost),
                 sshPrivateKeyFile(DefaultValue::sshPrivateKeyFile),
@@ -338,6 +339,18 @@ namespace ignite
             bool Configuration::IsTlsCaFileSet() const
             {
                 return tlsCaFile.IsSet();
+            }
+
+            bool Configuration::GetSshEnable() const {
+                return sshEnable.GetValue();
+            }
+
+            void Configuration::SetSshEnable(bool val) {
+                this->sshEnable.SetValue(val);
+            }
+
+            bool Configuration::IsSshEnableSet() const {
+                return sshEnable.IsSet();
             }
 
             const std::string& Configuration::GetSshUser() const

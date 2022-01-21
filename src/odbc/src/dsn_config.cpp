@@ -180,6 +180,11 @@ namespace ignite
             if (tlsCaFile.IsSet() && !config.IsTlsCaFileSet())
                 config.SetTlsCaFile(tlsCaFile.GetValue());
 
+            SettableValue<bool> sshEnable = ReadDsnBool(dsn, ConnectionStringParser::Key::sshEnable);
+
+            if (sshEnable.IsSet() && !config.IsSshEnableSet())
+                config.SetSshEnable(sshEnable.GetValue());
+
             SettableValue<std::string> sshUser = ReadDsnString(dsn, ConnectionStringParser::Key::sshUser);
 
             if (sshUser.IsSet() && !config.IsSshUserSet())

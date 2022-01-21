@@ -97,6 +97,9 @@ namespace ignite
                     /** Default value for tlsCaFile attribute. */
                     static const std::string tlsCaFile;
 
+                    /** Default value for sshEnable attribute. */
+                    static const bool sshEnable;
+
                     /** Default value for sshUser attribute. */
                     static const std::string sshUser;
 
@@ -468,6 +471,27 @@ namespace ignite
                 bool IsTlsCaFileSet() const;
 
                 /**
+                 * Get ssh enable.
+                 *
+                 * @return sshEnable.
+                 */
+                bool GetSshEnable() const;
+
+                /**
+                 * Set ssh enable.
+                 *
+                 * @param bool ssh enable.
+                 */
+                void SetSshEnable(bool sshEnable);
+
+                /**
+                 * Check if the ssh enable value set.
+                 *
+                 * @return @true if the ssh enable value set.
+                 */
+                bool IsSshEnableSet() const;
+
+                /**
                  * Get password.
                  *
                  * @return Password.
@@ -784,6 +808,9 @@ namespace ignite
 
                 /** SSL/TLS certificate authority file path. */
                 SettableValue<std::string> tlsCaFile;
+
+                /** The SSH enable option for the internal SSH tunnel. */
+                SettableValue<bool> sshEnable;
 
                 /** The SSH host username for the internal SSH tunnel. */
                 SettableValue<std::string> sshUser;
