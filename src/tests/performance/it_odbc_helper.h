@@ -31,7 +31,11 @@
 #define ODBCVER 0x0351
 #endif
 
+#ifdef __APPLE__
+#include <iODBCinst/iodbcinst.h>
+#else
 #include <odbcinst.h>
+#endif
 #include <sql.h>
 #include <sqlext.h>
 
