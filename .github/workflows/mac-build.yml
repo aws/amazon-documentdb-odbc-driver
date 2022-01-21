@@ -72,7 +72,8 @@ jobs:
     #     mkdir ${{ github.workspace }}/odbc-logs
     - name: register-odbc-driver
       run: |
-        scripts/register_driver_macos.sh
+        chmod +x scripts/register_driver_macos.sh
+        ./scripts/register_driver_macos.sh
     - name: run-tests
       run: |
         ./build/odbc/bin/ignite-odbc-tests
