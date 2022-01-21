@@ -32,6 +32,7 @@ include_directories(include ../odbc/include ../network/include)
 if (WIN32)
     include_directories(../odbc/os/win/include)
 else ()
+    # TODO: Ensure MacOS is portable. https://bitquill.atlassian.net/browse/AD-525
     include_directories(../odbc/os/linux/include)
 endif()
 
@@ -109,6 +110,7 @@ if (WIN32)
         ../odbc/src/jni/os/win/utils.cpp
     )
 else()
+    # TODO: Ensure MacOS is portable. https://bitquill.atlassian.net/browse/AD-525
     list(APPEND SOURCES
         ../odbc/os/linux/src/common/concurrent_os.cpp
         ../odbc/os/linux/src/common/platform_utils.cpp

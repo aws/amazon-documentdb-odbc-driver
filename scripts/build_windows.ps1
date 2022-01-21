@@ -29,7 +29,7 @@ $DRIVER_BIN_DIR = "$DRIVER_BUILD_DIR\..\bin\$CONFIGURATION"
 New-Item -Path $DRIVER_BIN_DIR -ItemType Directory -Force | Out-Null
 
 # Download the JDBC driver
-$JDBC_DRIVER_VERSION = "1.1.0"
+$JDBC_DRIVER_VERSION = if ($JDBC_DRIVER_VERSION -eq $null) { "1.1.0" } else { $JDBC_DRIVER_VERSION }
 $JDBC_DRIVER_FILENAME = "documentdb-jdbc-$JDBC_DRIVER_VERSION-all.jar"
 $JDBC_DRIVER_FULLPATH = "$DRIVER_BIN_DIR\libs\$JDBC_DRIVER_FILENAME"
 if (-not (Test-Path -Path $JDBC_DRIVER_FULLPATH -PathType Leaf)) {

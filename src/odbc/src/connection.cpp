@@ -751,8 +751,6 @@ namespace ignite
                     "--add-exports=java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED"));
                 opts.push_back(CopyChars(
                   "--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED"));
-                opts.push_back(CopyChars(
-                  "--illegal-access=permit"));
             }
         }
 
