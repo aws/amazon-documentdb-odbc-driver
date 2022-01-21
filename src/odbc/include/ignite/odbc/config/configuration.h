@@ -647,7 +647,7 @@ namespace ignite
                 /**
                  * Get refresh schema flag.
                  *
-                 * @return Password.
+                 * @return @true if refreshing schema is enabled.
                  */
                 bool IsRefreshSchema() const;
 
