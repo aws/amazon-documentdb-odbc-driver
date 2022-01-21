@@ -19,6 +19,8 @@ cmake_minimum_required (VERSION 3.8)
 
 project(performance)
 
+include_directories(SYSTEM ${ODBC_INCLUDE_DIRS})
+
 # Add source to this project's executable.
 add_executable (performance "performance.cpp"
 							"csv_cell.h"
