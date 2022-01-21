@@ -34,8 +34,7 @@ namespace ignite
             const std::string ConnectionStringParser::Key::dsn                      = "dsn";
             const std::string ConnectionStringParser::Key::driver                   = "driver";
             const std::string ConnectionStringParser::Key::database                 = "database";
-            const std::string ConnectionStringParser::Key::address                  = "address";
-            const std::string ConnectionStringParser::Key::server                   = "hostname";
+            const std::string ConnectionStringParser::Key::hostname                 = "hostname";
             const std::string ConnectionStringParser::Key::port                     = "port";
             const std::string ConnectionStringParser::Key::user                     = "user";
             const std::string ConnectionStringParser::Key::password                 = "password";
@@ -151,7 +150,7 @@ namespace ignite
                 {
                     cfg.SetDatabase(value);
                 }
-                else if (lKey == Key::server)
+                else if (lKey == Key::hostname)
                 {
                     EndPoint endpoint;
 

@@ -32,7 +32,7 @@ namespace ignite
         {
 
             const std::string Configuration::DefaultValue::dsn = "DocumentDB DSN";
-            const std::string Configuration::DefaultValue::driver = "Amazon DocumentDB Driver";
+            const std::string Configuration::DefaultValue::driver = "Amazon DocumentDB ODBC Driver";
             const std::string Configuration::DefaultValue::database = "";
             const std::string Configuration::DefaultValue::hostname = "";
             const uint16_t Configuration::DefaultValue::port = 27017;
@@ -520,7 +520,7 @@ namespace ignite
                 AddToMap(res, ConnectionStringParser::Key::dsn, dsn);
                 AddToMap(res, ConnectionStringParser::Key::driver, driver);
                 AddToMap(res, ConnectionStringParser::Key::database, database);
-                AddToMap(res, ConnectionStringParser::Key::server, hostname);
+                AddToMap(res, ConnectionStringParser::Key::hostname, hostname);
                 AddToMap(res, ConnectionStringParser::Key::port, port);
                 AddToMap(res, ConnectionStringParser::Key::user, user);
                 AddToMap(res, ConnectionStringParser::Key::password, password);

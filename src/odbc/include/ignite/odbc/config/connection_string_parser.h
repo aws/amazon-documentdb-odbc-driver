@@ -47,11 +47,8 @@ namespace ignite
                     /** Connection attribute keyword for schema attribute. */
                     static const std::string database;
 
-                    /** Connection attribute keyword for address attribute. */
-                    static const std::string address;
-
-                    /** Connection attribute keyword for server attribute. */
-                    static const std::string server;
+                    /** Connection attribute keyword for hostname attribute. */
+                    static const std::string hostname;
 
                     /** Connection attribute keyword for port attribute. */
                     static const std::string port;
@@ -115,9 +112,6 @@ namespace ignite
 
                     /** Connection attribute keyword for password attribute. */
                     static const std::string refreshSchema;
-
-                    /** Connection attribute keyword for protocol version attribute. */
-                    static const std::string protocolVersion;
 
                     /** Connection attribute keyword for defaultFetchSize attribute. */
                     static const std::string defaultFetchSize;
