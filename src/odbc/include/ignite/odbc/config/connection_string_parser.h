@@ -44,7 +44,7 @@ namespace ignite
                     /** Connection attribute keyword for Driver attribute. */
                     static const std::string driver;
 
-                    /** Connection attribute keyword for schema attribute. */
+                    /** Connection attribute keyword for database attribute. */
                     static const std::string database;
 
                     /** Connection attribute keyword for hostname attribute. */
@@ -59,58 +59,58 @@ namespace ignite
                     /** Connection attribute keyword for password attribute. */
                     static const std::string password;
 
-                    /** Connection attribute keyword for username attribute. */
+                    /** Connection attribute keyword for appName attribute. */
                     static const std::string appName;
 
-                    /** Connection attribute keyword for password attribute. */
+                    /** Connection attribute keyword for loginTimeoutSec attribute. */
                     static const std::string loginTimeoutSec;
 
-                    /** Connection attribute keyword for username attribute. */
+                    /** Connection attribute keyword for readPreference attribute. */
                     static const std::string readPreference;
 
-                    /** Connection attribute keyword for password attribute. */
+                    /** Connection attribute keyword for replicaSet attribute. */
                     static const std::string replicaSet;
 
-                    /** Connection attribute keyword for username attribute. */
+                    /** Connection attribute keyword for retryReads attribute. */
                     static const std::string retryReads;
 
-                    /** Connection attribute keyword for password attribute. */
+                    /** Connection attribute keyword for tls attribute. */
                     static const std::string tls;
 
-                    /** Connection attribute keyword for password attribute. */
+                    /** Connection attribute keyword for tlsAllowInvalidHostnames attribute. */
                     static const std::string tlsAllowInvalidHostnames;
 
-                    /** Connection attribute keyword for password attribute. */
+                    /** Connection attribute keyword for tlsCaFile attribute. */
                     static const std::string tlsCaFile;
 
-                    /** Connection attribute keyword for password attribute. */
+                    /** Connection attribute keyword for sshUser attribute. */
                     static const std::string sshUser;
 
-                    /** Connection attribute keyword for password attribute. */
+                    /** Connection attribute keyword for sshHost attribute. */
                     static const std::string sshHost;
 
-                    /** Connection attribute keyword for password attribute. */
+                    /** Connection attribute keyword for sshPrivateKeyFile attribute. */
                     static const std::string sshPrivateKeyFile;
 
-                    /** Connection attribute keyword for password attribute. */
+                    /** Connection attribute keyword for sshPrivateKeyPassphrase attribute. */
                     static const std::string sshPrivateKeyPassphrase;
 
-                    /** Connection attribute keyword for password attribute. */
+                    /** Connection attribute keyword for sshStrictHostKeyChecking attribute. */
                     static const std::string sshStrictHostKeyChecking;
 
-                    /** Connection attribute keyword for password attribute. */
+                    /** Connection attribute keyword for sshKnownHostsFile attribute. */
                     static const std::string sshKnownHostsFile;
 
-                    /** Connection attribute keyword for password attribute. */
+                    /** Connection attribute keyword for scanMethod attribute. */
                     static const std::string scanMethod;
 
-                    /** Connection attribute keyword for password attribute. */
+                    /** Connection attribute keyword for scanLimit attribute. */
                     static const std::string scanLimit;
 
-                    /** Connection attribute keyword for password attribute. */
+                    /** Connection attribute keyword for schemaName attribute. */
                     static const std::string schemaName;
 
-                    /** Connection attribute keyword for password attribute. */
+                    /** Connection attribute keyword for refreshSchema attribute. */
                     static const std::string refreshSchema;
 
                     /** Connection attribute keyword for defaultFetchSize attribute. */
