@@ -21,8 +21,6 @@
 #include <sstream>
 #include <algorithm>
 
-//#include <ignite/common/fixed_size_array.h>
-
 #include <ignite/odbc/ignite_error.h>
 #include <ignite/network/network.h>
 
