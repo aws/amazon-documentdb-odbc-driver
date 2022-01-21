@@ -112,7 +112,11 @@ namespace ignite
 
         void Connection::Establish(const std::string& connectStr, void* parentWindow)
         {
-            //IGNITE_ODBC_API_CALL(InternalEstablish(connectStr, parentWindow));
+            if (false)
+            {
+IGNITE_ODBC_API_CALL(InternalEstablish(connectStr, parentWindow));
+            }
+            
             ConnectCPPDocumentDB();
         }
 
@@ -122,6 +126,10 @@ namespace ignite
             config::ConnectionStringParser parser(config);
             parser.ParseConnectionString(connectStr, &GetDiagnosticRecords());
 
+            if (parentWindow)
+            {
+                
+            }
 #ifdef _WIN32
             if (parentWindow)
             {
