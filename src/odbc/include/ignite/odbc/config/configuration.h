@@ -22,11 +22,8 @@
 #include <string>
 #include <map>
 
-#include "ignite/odbc/protocol_version.h"
 #include "ignite/odbc/config/settable_value.h"
-#include "ignite/odbc/ssl_mode.h"
-#include "ignite/odbc/end_point.h"
-#include "ignite/odbc/nested_tx_mode.h"
+#include "ignite/odbc/diagnostic/diagnosable.h"
 #include "ignite/odbc/read_preference.h"
 #include "ignite/odbc/scan_method.h"
 
