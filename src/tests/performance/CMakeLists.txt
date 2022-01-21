@@ -19,6 +19,7 @@ cmake_minimum_required (VERSION 3.8)
 
 project(performance)
 
+find_package(ODBC REQUIRED)
 include_directories(SYSTEM ${ODBC_INCLUDE_DIRS})
 
 # Add source to this project's executable.
