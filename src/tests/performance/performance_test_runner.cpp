@@ -177,12 +177,14 @@ void performance::PerformanceTestRunner::checkOutputMode(
 
 void performance::PerformanceTestRunner::checkCSVHeaders() {
     std::string header_value, error_msg;
+    bool has_escaped_quotes = false;
 
     // set column index in CSVHeaders structure
     for (std::size_t column = 0; column < _cell_refs.size(); ++column) {
         const auto& cell = _cell_refs[column][0];
         if (cell.getType() == Csv::CellType::String) {
-            header_value = cell.getOriginalStringView(false).value();
+            header_value =
+                cell.getOriginalStringView(&has_escaped_quotes).value();
             if (header_value.compare(QUERY_HEADER) == 0) {
                 _headers.idx_query = static_cast< int >(column);
             } else if ((header_value.compare(LIMIT_HEADER)) == 0) {
