@@ -31,7 +31,7 @@
 #define ODBCVER 0x0351
 #endif
 
-#include <odbc_constants.h>
+#include <odbcinst.h>
 #include <sql.h>
 #include <sqlext.h>
 
