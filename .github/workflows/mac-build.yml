@@ -72,13 +72,7 @@ jobs:
     #     mkdir ${{ github.workspace }}/odbc-logs
     - name: register-odbc-driver
       run: |
-        echo "[Apache Ignite]"                                      > "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
-        echo "Description=Apache Ignite"                           >> "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
-        echo "Driver=${{env.ODBC_LIB_PATH}}/libignite-odbc.dylib"  >> "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
-        echo "Setup=${{env.ODBC_LIB_PATH}}/libignite-odbc.dylib"   >> "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
-        echo "DriverODBCVer=03.00"                                 >> "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
-        echo "FileUsage=0"                                         >> "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
-        odbcinst -i -d                                             -f "${{env.ODBC_LIB_PATH}}/ignite-odbc-install.ini"
+        src/scripts/register_driver_macos.sh
     - name: run-tests
       run: |
         ./build/odbc/bin/ignite-odbc-tests
