@@ -20,8 +20,10 @@ project(Ignite.C++ VERSION 2.13.0.58917)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/modules/code-coverage.cmake")
 add_code_coverage_all_targets(EXCLUDE odbc-test)
-
-set(CMAKE_CXX_STANDARD 98)
+if (NOT "$ENV{BOOST_ROOT}" STREQUAL "")
+    set(BOOST_ROOT "$ENV{BOOST_ROOT}")
+endif()
+set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_PROJECT_VERSION ${PROJECT_VERSION})
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")

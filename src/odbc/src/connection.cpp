@@ -188,7 +188,7 @@ namespace ignite
                 return SqlResult::AI_ERROR;
             }
 
-            if (!config.IsHostnameSet() && config.IsAddressesSet() && config.GetAddresses().empty())
+            if (!config.IsHostnameSet())
             {
                 AddStatusRecord("No valid address to connect.");
 
@@ -780,7 +780,12 @@ namespace ignite
         {
             endPoints.clear();
 
-            if (!cfg.IsAddressesSet())
+            // DocumentDB driver is currently not supporting list of addresses. Always use this 'legacy' method.
+            LOG_MSG("'Address' is not set. Using legacy connection method.");
+            endPoints.push_back(EndPoint(cfg.GetHostname(), cfg.GetTcpPort()));
+            return;
+
+            /*if (!cfg.IsAddressesSet())
             {
                 LOG_MSG("'Address' is not set. Using legacy connection method.");
 
@@ -790,8 +795,10 @@ namespace ignite
             }
 
             endPoints = cfg.GetAddresses();
+            
 
             std::random_shuffle(endPoints.begin(), endPoints.end());
+            */
         }
 
         int32_t Connection::RetrieveTimeout(void* value)

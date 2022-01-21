@@ -20,10 +20,10 @@
 #include "ignite/common/utils.h"
 
 #include "ignite/odbc/utility.h"
-#include "ignite/odbc/ssl_mode.h"
+//#include "ignite/odbc/ssl_mode.h"
 #include "ignite/odbc/config/connection_string_parser.h"
 #include "ignite/odbc/config/config_tools.h"
-#include "ignite/odbc/nested_tx_mode.h"
+//#include "ignite/odbc/nested_tx_mode.h"
 
 namespace ignite
 {
@@ -34,8 +34,7 @@ namespace ignite
             const std::string ConnectionStringParser::Key::dsn                      = "dsn";
             const std::string ConnectionStringParser::Key::driver                   = "driver";
             const std::string ConnectionStringParser::Key::database                 = "database";
-            const std::string ConnectionStringParser::Key::address                  = "address";
-            const std::string ConnectionStringParser::Key::server                   = "server";
+            const std::string ConnectionStringParser::Key::hostname                 = "hostname";
             const std::string ConnectionStringParser::Key::port                     = "port";
             const std::string ConnectionStringParser::Key::user                     = "user";
             const std::string ConnectionStringParser::Key::password                 = "password";
@@ -143,7 +142,7 @@ namespace ignite
                 diagnostic::DiagnosticRecordStorage* diag)
             {
                 std::string lKey = common::ToLower(key);
-                
+
                 if (lKey == Key::dsn)
                 {
                     cfg.SetDsn(value);
@@ -152,17 +151,16 @@ namespace ignite
                 {
                     cfg.SetDatabase(value);
                 }
-                else if (lKey == Key::address)
+                else if (lKey == Key::hostname)
                 {
-                    std::vector<EndPoint> endPoints;
+                    EndPoint endpoint;
 
-                    ParseAddress(value, endPoints, diag);
+                    ParseSingleAddress(value, endpoint, diag);
 
-                    cfg.SetAddresses(endPoints);
-                }
-                else if (lKey == Key::server)
-                {
-                    cfg.SetHostname(value);
+                    cfg.SetHostname(endpoint.host);
+                    
+                    if (!cfg.IsTcpPortSet()) 
+                        cfg.SetTcpPort(endpoint.port);
                 }
                 else if (lKey == Key::port)
                 {
@@ -256,15 +254,45 @@ namespace ignite
                         return;
                     }
 
-                    cfg.SetScanLimit(static_cast<int32_t>(numValue));
+                    cfg.SetLoginTimeoutSeconds(static_cast<int32_t>(numValue));
                 }
                 else if (lKey == Key::readPreference)
                 {
-                    cfg.SetReadPreference(value);
+                    ReadPreference::Type preference = ReadPreference::FromString(value);
+
+                    if (preference == ReadPreference::Type::UNKNOWN)
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                "Specified read preference is not supported. Default value used ('primary').");
+                        }
+
+                        return;
+                    }
+
+                    cfg.SetReadPreference(preference);
                 }
                 else if (lKey == Key::replicaSet)
                 {
                     cfg.SetReplicaSet(value);
+                }
+                else if (lKey == Key::retryReads)
+                {
+                    BoolParseResult::Type res = StringToBool(value);
+
+                    if (res == BoolParseResult::AI_UNRECOGNIZED)
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                MakeErrorMessage("Unrecognized bool value. Using default value.", key, value));
+                        }
+
+                        return;
+                    }
+
+                    cfg.SetRetryReads(res == BoolParseResult::AI_TRUE);
                 }
                 else if (lKey == Key::tls)
                 {
@@ -362,7 +390,20 @@ namespace ignite
                 }
                 else if (lKey == Key::scanMethod)
                 {
-                    cfg.SetScanMethod(value);
+                    ScanMethod::Type method = ScanMethod::FromString(value);
+                    
+                    if (method == ScanMethod::Type::UNKNOWN)
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                "Specified scan method is not supported. Default value used ('random').");
+                        }
+
+                        return;
+                    }
+
+                    cfg.SetScanMethod(method);
                 }
                 else if (lKey == Key::scanLimit)
                 {
@@ -417,7 +458,7 @@ namespace ignite
                         return;
                     }
 
-                    cfg.SetTls(res == BoolParseResult::AI_TRUE);
+                    cfg.SetRefreshSchema(res == BoolParseResult::AI_TRUE);
                 }
                 else if (lKey == Key::defaultFetchSize)
                 {

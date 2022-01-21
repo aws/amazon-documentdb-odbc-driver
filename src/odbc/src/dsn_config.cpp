@@ -104,21 +104,10 @@ namespace ignite
 
         void ReadDsnConfiguration(const char* dsn, Configuration& config, diagnostic::DiagnosticRecordStorage* diag)
         {
-            SettableValue<std::string> address = ReadDsnString(dsn, ConnectionStringParser::Key::address);
+            SettableValue<std::string> hostname = ReadDsnString(dsn, ConnectionStringParser::Key::hostname);
 
-            if (address.IsSet() && !config.IsAddressesSet())
-            {
-                std::vector<EndPoint> endPoints;
-
-                ParseAddress(address.GetValue(), endPoints, diag);
-
-                config.SetAddresses(endPoints);
-            }
-
-            SettableValue<std::string> server = ReadDsnString(dsn, ConnectionStringParser::Key::server);
-
-            if (server.IsSet() && !config.IsHostnameSet())
-                config.SetHostname(server.GetValue());
+            if (hostname.IsSet() && !config.IsHostnameSet())
+                config.SetHostname(hostname.GetValue());
 
             SettableValue<int32_t> port = ReadDsnInt(dsn, ConnectionStringParser::Key::port);
 
@@ -153,7 +142,10 @@ namespace ignite
             SettableValue<std::string> readPreference = ReadDsnString(dsn, ConnectionStringParser::Key::readPreference);
 
             if (readPreference.IsSet() && !config.IsReadPreferenceSet())
-                config.SetReadPreference(readPreference.GetValue());
+            {
+                ReadPreference::Type preference = ReadPreference::FromString(readPreference.GetValue(), ReadPreference::Type::PRIMARY);
+                config.SetReadPreference(preference);
+            }
 
             SettableValue<std::string> replicaSet = ReadDsnString(dsn, ConnectionStringParser::Key::replicaSet);
 
@@ -218,7 +210,10 @@ namespace ignite
             SettableValue<std::string> scanMethod = ReadDsnString(dsn, ConnectionStringParser::Key::scanMethod);
 
             if (scanMethod.IsSet() && !config.IsScanMethodSet())
-                config.SetScanMethod(scanMethod.GetValue());
+            {
+                ScanMethod::Type method = ScanMethod::FromString(scanMethod.GetValue(), ScanMethod::Type::RANDOM);
+                config.SetScanMethod(method);
+            }
 
             SettableValue<int32_t> scanLimit = ReadDsnInt(dsn, ConnectionStringParser::Key::scanLimit);
 
@@ -233,8 +228,8 @@ namespace ignite
 
             SettableValue<bool> refreshSchema = ReadDsnBool(dsn, ConnectionStringParser::Key::refreshSchema);
 
-            if (refreshSchema.IsSet() && !config.IsSchemaRefreshSet())
-                config.SetSchemaRefresh(refreshSchema.GetValue());
+            if (refreshSchema.IsSet() && !config.IsRefreshSchemaSet())
+                config.SetRefreshSchema(refreshSchema.GetValue());
 
             SettableValue<int32_t> defaultFetchSize = ReadDsnInt(dsn, ConnectionStringParser::Key::defaultFetchSize);
 
