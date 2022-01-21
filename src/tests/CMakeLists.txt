@@ -13,7 +13,7 @@
 #   permissions and limitations under the License.
 #
 
-project(performance_tests)
+project(tests)
 
 set(PERFORMANCE "${CMAKE_CURRENT_SOURCE_DIR}/performance")
 
