@@ -322,7 +322,7 @@ namespace ignite
                 return tlsCaFile.IsSet();
             }
 
-            bool Configuration::GetSshEnable() const {
+            bool Configuration::IsSshEnable() const {
                 return sshEnable.GetValue();
             }
 

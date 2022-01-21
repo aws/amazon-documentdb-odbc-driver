@@ -459,11 +459,11 @@ namespace ignite
                 bool IsTlsCaFileSet() const;
 
                 /**
-                 * Get ssh enable.
+                 * Get SSH enable flag.
                  *
-                 * @return sshEnable.
+                 * @return @true if SSH is enabled.
                  */
-                bool GetSshEnable() const;
+                bool IsSshEnable() const;
 
                 /**
                  * Set ssh enable.
