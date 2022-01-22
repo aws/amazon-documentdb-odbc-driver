@@ -22,8 +22,8 @@
 #include <sstream>
 #include <fstream>
 
-#include "ignite/common/common.h"
-#include "ignite/common/concurrent.h"
+#include "ignite/odbc/common/common.h"
+#include "ignite/odbc/common/concurrent.h"
 
 #   define LOG_MSG(param)                                      \
     if (ignite::odbc::Logger* p = ignite::odbc::Logger::Get()) \
@@ -112,7 +112,7 @@ namespace ignite
             IGNITE_NO_COPY_ASSIGNMENT(Logger);
 
             /** Mutex for writes synchronization. */
-            ignite::common::concurrent::CriticalSection mutex;
+            odbc::common::concurrent::CriticalSection mutex;
 
             /** File stream. */
             std::ofstream stream;

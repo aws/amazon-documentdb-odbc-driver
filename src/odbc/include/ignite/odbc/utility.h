@@ -26,8 +26,8 @@
 
 #include <string>
 
-#include <ignite/common/utils.h>
-#include <ignite/common/decimal.h>
+#include <ignite/odbc/common/utils.h>
+#include <ignite/odbc/common/decimal.h>
 
 #include "ignite/impl/binary/binary_reader_impl.h"
 #include "ignite/impl/binary/binary_writer_impl.h"
@@ -83,7 +83,7 @@ namespace ignite
          * @param reader Reader.
          * @param decimal Decimal value.
          */
-        void ReadDecimal(impl::binary::BinaryReaderImpl& reader, common::Decimal& decimal);
+        void ReadDecimal(impl::binary::BinaryReaderImpl& reader, odbc::common::Decimal& decimal);
 
         /**
          * Write decimal value using writer.
@@ -91,7 +91,7 @@ namespace ignite
          * @param writer Writer.
          * @param decimal Decimal value.
          */
-        void WriteDecimal(impl::binary::BinaryWriterImpl& writer, const common::Decimal& decimal);
+        void WriteDecimal(impl::binary::BinaryWriterImpl& writer, const odbc::common::Decimal& decimal);
 
         /**
          * Convert SQL string buffer to std::string.
