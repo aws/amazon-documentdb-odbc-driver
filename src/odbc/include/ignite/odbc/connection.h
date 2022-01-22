@@ -95,8 +95,6 @@ namespace ignite
              */
             void Establish(const std::string& connectStr, void* parentWindow);
 
-            void ConnectCPPDocumentDB();
-
             /**
              * Establish connection to ODBC server.
              *
@@ -490,6 +488,21 @@ namespace ignite
              * @return @c true on success and @c false otherwise.
              */
             bool TryRestoreConnection(IgniteError& err);
+
+            /**
+             * Connect to DocumentDB using Mongo cxx driver
+             *
+             * @param mongoConnectionString Mongo Connection String.
+             * @return @c true on success and @c false otherwise.
+             */
+            bool ConnectCPPDocumentDB(std::string mongoConnectionString);
+
+            /**
+             * Formats the Mongo connection string from configuration values.
+             *
+             *  @return the JDBC connection string.
+             */
+            std::string FormatMongoCppConnectionString() const;
 
             /**
              * Formats the JDBC connection string from configuration values.

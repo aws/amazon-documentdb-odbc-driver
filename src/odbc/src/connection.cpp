@@ -115,12 +115,7 @@ namespace ignite
 
         void Connection::Establish(const std::string& connectStr, void* parentWindow)
         {
-            if (false)
-            {
-IGNITE_ODBC_API_CALL(InternalEstablish(connectStr, parentWindow));
-            }
-            
-            ConnectCPPDocumentDB();
+            IGNITE_ODBC_API_CALL(InternalEstablish(connectStr, parentWindow));  
         }
 
         SqlResult::Type Connection::InternalEstablish(const std::string& connectStr, void* parentWindow)
@@ -672,7 +667,35 @@ IGNITE_ODBC_API_CALL(InternalEstablish(connectStr, parentWindow));
                 connection = nullptr;
             }
 
+            std::string mongoCPPConnectionString = FormatMongoCppConnectionString();
+            bool cppConnected = ConnectCPPDocumentDB(mongoCPPConnectionString);
+
             return connected;
+        }
+
+        std::string Connection::FormatMongoCppConnectionString() const {
+            /*
+            "mongodb://documentdb:bqdocumentdblab@127.0.0.1:27019/"
+                    "?tls=true&tlsCAFile=C:\\Users\\affon\\.ssh\\rds-ca-2019-"
+                    "root.pem&tlsAllowInvalidHostnames=true"
+            */
+            std::string host = "localhost";
+            std::string port = "27017";
+            if (!config.GetAddresses().empty()) {
+                host = config.GetAddresses()[0].host;
+                port = std::to_string(config.GetAddresses()[0].port);
+            }
+            std::string mongoConnectionString;
+
+            mongoConnectionString = "mongodb:";
+            mongoConnectionString.append("//" + config.GetUser());
+            mongoConnectionString.append(":" + config.GetPassword());
+            mongoConnectionString.append("@" + host);
+            mongoConnectionString.append(":" + port);
+            mongoConnectionString.append("/" + config.GetSchema());
+            mongoConnectionString.append("?tlsAllowInvalidHostnames=true");    
+
+            return mongoConnectionString;
         }
 
         std::string Connection::FormatJdbcConnectionString() const {
@@ -817,7 +840,7 @@ IGNITE_ODBC_API_CALL(InternalEstablish(connectStr, parentWindow));
             return static_cast<int32_t>(uTimeout);
         }
 
-        void Connection::ConnectCPPDocumentDB() 
+        bool Connection::ConnectCPPDocumentDB(std::string mongoConnectionString) 
         {
             using bsoncxx::builder::basic::kvp;
             using bsoncxx::builder::basic::make_document;
@@ -829,27 +852,30 @@ IGNITE_ODBC_API_CALL(InternalEstablish(connectStr, parentWindow));
             mongocxx::instance inst;
 
             try {
-                const auto uri = mongocxx::uri{
-                    "mongodb://documentdb:bqdocumentdblab@127.0.0.1:27019/"
-                    "?tls=true&tlsCAFile=C:\\Users\\affon\\.ssh\\rds-ca-2019-"
-                    "root.pem&tlsAllowInvalidHostnames=true"};
+                const auto uri = mongocxx::uri{mongoConnectionString};
 
                 auto client = mongocxx::client{uri};
-                auto database = client["test"];
-                auto collection = database["test"];
-                mongocxx::cursor cursor = collection.find({});
-                for (auto doc : cursor) {
-                    std::cout << bsoncxx::to_json(doc) << "\n";
+
+                bsoncxx::builder::stream::document ping;
+                ping << "ping" << 1;
+                auto db = (**client)[database];
+                auto result = db.run_command(ping.view());
+
+                if (result.view()["ok"].get_double() != 1)
+                {
+                    log.e() << "Ping to database failed: "
+                      << uri << " : " << database << std::endl;
+                      return false;
                 }
                 // auto result = test.run_command(make_document(kvp("isMaster",
                 // 1))); std::cout << bsoncxx::to_json(result) << std::endl;
 
-                // return EXIT_SUCCESS;
+                return true;
                 //throw std::runtime_error("connection established");
             } catch (const std::exception& xcp) {
                 std::cout << "connection failed: " << xcp.what() << std::endl;
                 //throw std::runtime_error("connection failed");
-                // return EXIT_FAILURE;
+                return false;
             }
         
         }

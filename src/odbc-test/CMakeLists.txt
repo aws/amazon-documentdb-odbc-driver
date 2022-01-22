@@ -44,7 +44,6 @@ endif()
 
 set(SOURCES 
          src/connection_test.cpp
-         src/dummy_test.cpp
          src/odbc_test_suite.cpp
          src/test_utils.cpp
          ../odbc/src/common/concurrent.cpp
