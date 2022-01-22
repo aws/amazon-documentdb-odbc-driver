@@ -42,6 +42,9 @@
 
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
+#include <bsoncxx/builder/stream/array.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/builder/stream/helpers.hpp>
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
 #include <mongocxx/uri.hpp>
@@ -856,15 +859,15 @@ namespace ignite
 
                 auto client = mongocxx::client{uri};
 
+                std::string database = "admin";
                 bsoncxx::builder::stream::document ping;
                 ping << "ping" << 1;
-                auto db = (**client)[database];
+                auto db = client[database];
                 auto result = db.run_command(ping.view());
 
                 if (result.view()["ok"].get_double() != 1)
                 {
-                    log.e() << "Ping to database failed: "
-                      << uri << " : " << database << std::endl;
+                    throw std::runtime_error ("Ping to database failed");
                       return false;
                 }
                 // auto result = test.run_command(make_document(kvp("isMaster",
