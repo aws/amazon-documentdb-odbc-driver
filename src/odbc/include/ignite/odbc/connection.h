@@ -502,7 +502,7 @@ namespace ignite
              *
              *  @return the JDBC connection string.
              */
-            std::string FormatMongoCppConnectionString() const;
+            std::string FormatMongoCppConnectionString(int sshTunnelPort = 27017) const;
 
             /**
              * Formats the JDBC connection string from configuration values.

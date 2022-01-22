@@ -676,7 +676,7 @@ namespace ignite
             return connected;
         }
 
-        std::string Connection::FormatMongoCppConnectionString() const {
+        std::string Connection::FormatMongoCppConnectionString(int sshTunnelPort) const {
             /*
             "mongodb://documentdb:bqdocumentdblab@127.0.0.1:27019/"
                     "?tls=true&tlsCAFile=C:\\Users\\affon\\.ssh\\rds-ca-2019-"
@@ -687,6 +687,8 @@ namespace ignite
             if (!config.GetAddresses().empty()) {
                 host = config.GetAddresses()[0].host;
                 port = std::to_string(config.GetAddresses()[0].port);
+                // TODO Check if SSH tunnel is enabled and set the portß
+                port = sshTunnelPort;
             }
             std::string mongoConnectionString;
 
