@@ -26,7 +26,7 @@
 #include <ignite/date.h>
 #include <ignite/timestamp.h>
 #include <ignite/time.h>
-#include <ignite/common/decimal.h>
+#include <ignite/odbc/common/decimal.h>
 
 #include "ignite/odbc/common_types.h"
 #include "ignite/odbc/type_traits.h"
