@@ -40,7 +40,7 @@ namespace ignite
                 /**
                  * Default constructor.
                  */
-                PrimaryKeyMeta()
+                PrimaryKeyMeta() : keySeq(0)
                 {
                     // No-op.
                 }
