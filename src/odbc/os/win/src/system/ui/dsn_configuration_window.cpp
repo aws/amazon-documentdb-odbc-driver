@@ -19,7 +19,7 @@
 #include <Shlwapi.h>
 
 #include "ignite/odbc/log.h"
-//#include "ignite/odbc/read_preference.h" // causes build errors, comment out momentarily 
+#include "ignite/odbc/read_preference.h" // causes build errors, comment out momentarily 
 // #include "ignite/odbc/ssl_mode.h" //TODO remove later
 
 #include "ignite/odbc/system/ui/dsn_configuration_window.h"
@@ -69,6 +69,7 @@ namespace ignite
                     appNameLabel(),
                     appNameEdit(),
                     readPreferenceLabel(),
+                    readPreferenceComboBox(),
                     //readPreferenceEdit(),
                     replicaSetLabel(),
                     replicaSetEdit(),
@@ -572,10 +573,11 @@ namespace ignite
                     // rowPos += INTERVAL + ROW_HEIGHT; // used to add row hight
                     // I believe
 
-                    /* //TODO readPreference
-                    val = config.GetReadPreference().c_str();
+                    /*//TODO readPreference
+                    ReadPreference::Type readPreference = config.GetReadPreference();
+                    std::string readPreferenceStr = ReadPreference::ToString(readPreference);
 
-                    val = 
+                    const char* val = readPreferenceStr.c_str();
 
                     readPreferenceLabel = CreateLabel(
                         labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
@@ -583,6 +585,11 @@ namespace ignite
                     readPreferenceComboBox = CreateComboBox(
                         editPosX, rowPos, editSizeX, ROW_HEIGHT,
                                        "", ChildId::READ_PREFERENCE_COMBO_BOX);
+
+                    readPreferenceComboBox->AddString("disable");
+                    sslModeComboBox->AddString("require");
+
+                    sslModeComboBox->SetSelection(sslMode); // set default
 
                     rowPos += INTERVAL + ROW_HEIGHT;
                     */

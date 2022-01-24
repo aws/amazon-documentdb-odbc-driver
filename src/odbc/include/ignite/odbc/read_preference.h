@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 
+#ifndef _IGNITE_ODBC_READ_PREFERENCE
+#define _IGNITE_ODBC_READ_PREFERENCE
+
 #include <string>
 
 namespace ignite
@@ -24,7 +27,7 @@ namespace ignite
         /** Read Preference enum. */
         struct ReadPreference
         {
-            enum class Type
+            enum Type
             {
                 PRIMARY,
 
@@ -59,3 +62,5 @@ namespace ignite
         };
     }
 }
+
+#endif //_IGNITE_ODBC_READ_PREFERENCE
