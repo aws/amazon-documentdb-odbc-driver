@@ -97,7 +97,7 @@ struct ConnectionTestSuiteFixture: odbc::OdbcTestSuite
         connectionString =
             "DRIVER={Apache Ignite};"
             "HOSTNAME=" + host + ":" + port + ";"
-            "SCHEMA=test;"
+            "DATABASE=test;"
             "USER=" + user + ";"
             "PASSWORD=" + password + ";";
     }
