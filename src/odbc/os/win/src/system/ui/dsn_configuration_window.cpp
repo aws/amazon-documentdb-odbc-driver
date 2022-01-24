@@ -125,8 +125,9 @@ namespace ignite
                 {
                     int groupPosYLeft = MARGIN;
                     //int groupSizeY = width - 2 * MARGIN; // original 
-                    int groupSizeY = (width - 2 * MARGIN) / 2;
+                    int groupSizeY = width / 2 - 2 * MARGIN;
                     int posXRight = MARGIN + (width - MARGIN) / 2;
+                    //int posXRight = MARGIN + groupSizeY;
                     int groupPosYRight = MARGIN;
 
                     // create left column group settings
@@ -183,15 +184,15 @@ namespace ignite
 
                     val = config.GetDatabase().c_str();
                     schemaLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Schema name:", ChildId::SCHEMA_LABEL);
+                        "Schema Name:", ChildId::SCHEMA_LABEL);
                     schemaEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::SCHEMA_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     protocolVersionLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Protocol version:", ChildId::PROTOCOL_VERSION_LABEL);
+                        "Protocol Version:", ChildId::PROTOCOL_VERSION_LABEL);
                     protocolVersionComboBox = CreateComboBox(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                        "Protocol version", ChildId::PROTOCOL_VERSION_COMBO_BOX);
+                        "Protocol Version", ChildId::PROTOCOL_VERSION_COMBO_BOX);
 
                     int id = 0;
 
@@ -215,7 +216,7 @@ namespace ignite
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     connectionSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
-                        "Connection settings", ChildId::CONNECTION_SETTINGS_GROUP_BOX);
+                        "Connection Settings", ChildId::CONNECTION_SETTINGS_GROUP_BOX);
 
                     return rowPos - posY;
                 }
@@ -232,7 +233,6 @@ namespace ignite
                     int rowPos = posY + 2 * INTERVAL;
 
                     const char* val = config.GetUser().c_str();
-
                     userLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, "User :", ChildId::USER_LABEL);
                     userEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::USER_EDIT);
 
@@ -247,7 +247,7 @@ namespace ignite
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     authSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
-                        "Authentication settings", ChildId::AUTH_SETTINGS_GROUP_BOX);
+                        "Authentication Settings", ChildId::AUTH_SETTINGS_GROUP_BOX);
 
                     return rowPos - posY;
                 }
@@ -263,7 +263,8 @@ namespace ignite
 
                     int rowPos = posY + 2 * INTERVAL;
 
-                    int checkBoxSize = (sizeX - 3 * INTERVAL) / 2;
+                    //int checkBoxSize = (sizeX - 3 * INTERVAL) / 2; // original
+                    int checkBoxSize = sizeX - 2 * MARGIN;
 
                     sshEnableCheckBox = CreateCheckBox(
                         labelPosX, rowPos, checkBoxSize, ROW_HEIGHT, "Enable SSH Tunnel",
@@ -272,65 +273,60 @@ namespace ignite
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     const char* val = config.GetSshUser().c_str();
-
-                    sshUserLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, "SSH user :", ChildId::SSH_USER_LABEL);
+                    sshUserLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, "SSH User :", ChildId::SSH_USER_LABEL);
                     sshUserEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::SSH_USER_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
                     
                     val = config.GetSshHost().c_str();
-
                     sshHostLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                                    "SSH host :", ChildId::SSH_HOST_LABEL);
+                                    "SSH Hostname :", ChildId::SSH_HOST_LABEL);
                     sshHostEdit = CreateEdit(editPosX, rowPos, editSizeX,
                                           ROW_HEIGHT, val, ChildId::SSH_HOST_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     val = config.GetSshPrivateKeyFile().c_str();
-
                     sshPrivateKeyFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                                    "SSH private key file :", ChildId::SSH_PRIVATE_KEY_FILE_LABEL);
+                                    "SSH Private Key File :", ChildId::SSH_PRIVATE_KEY_FILE_LABEL);
                     sshPrivateKeyFileEdit = CreateEdit(editPosX, rowPos, editSizeX,
                                           ROW_HEIGHT, val, ChildId::SSH_PRIVATE_KEY_FILE_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     val = config.GetSshPrivateKeyPassphrase().c_str();
-
                     // ssh private key passphrase label requires double the row height due to the long label.
                     sshPrivateKeyPassphraseLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT * 2,
-                                    "SSH private key passphrase :", ChildId::SSH_PRIVATE_KEY_PASSPHRASE_LABEL);
+                                    "SSH Private Key Passphrase :", ChildId::SSH_PRIVATE_KEY_PASSPHRASE_LABEL);
                     sshPrivateKeyPassphraseEdit = CreateEdit(editPosX, rowPos, editSizeX,
                                           ROW_HEIGHT * 2, val, ChildId::SSH_PRIVATE_KEY_PASSPHRASE_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT * 2;
 
-                    sshStrictHostKeyCheckingCheckBox = CreateCheckBox(
-                        labelPosX, rowPos, checkBoxSize, ROW_HEIGHT, "SSH strict host key checking",
-                        ChildId::SSH_STRICT_HOST_KEY_CHECKING_CHECK_BOX, config.IsSshStrictHostKeyChecking());
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
                     val = config.GetSshKnownHostsFile().c_str();
-
                     sshKnownHostsFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                                    "SSH known hosts:", ChildId::SSH_KNOWN_HOSTS_FILE_LABEL);
+                                    "SSH Known Hosts:", ChildId::SSH_KNOWN_HOSTS_FILE_LABEL);
                     sshKnownHostsFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
                                    ChildId::SSH_KNOWN_HOSTS_FILE_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
+                    // SSH Strict Host Key Check check box needs to have editSizeX as size because the string is long
+                    sshStrictHostKeyCheckingCheckBox = CreateCheckBox(
+                        labelPosX, rowPos, checkBoxSize, ROW_HEIGHT, "SSH Strict Host Key Check (disabling option is less secure)",
+                        ChildId::SSH_STRICT_HOST_KEY_CHECKING_CHECK_BOX, config.IsSshStrictHostKeyChecking());
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
 
                     sshSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
-                                       "Internal SSH tunnel settings",
+                                       "Internal SSH Tunnel Settings",
                                        ChildId::SSH_SETTINGS_GROUP_BOX);
 
                     sshUserEdit->SetEnabled(sshEnableCheckBox->IsChecked());
                     sshHostEdit->SetEnabled(sshEnableCheckBox->IsChecked());
                     sshPrivateKeyFileEdit->SetEnabled( sshEnableCheckBox->IsChecked());
                     sshPrivateKeyPassphraseEdit->SetEnabled(sshEnableCheckBox->IsChecked());
-                    sshStrictHostKeyCheckingCheckBox->SetEnabled(sshEnableCheckBox->IsChecked());
                     sshKnownHostsFileEdit->SetEnabled(sshEnableCheckBox->IsChecked());
+                    sshStrictHostKeyCheckingCheckBox->SetEnabled(sshEnableCheckBox->IsChecked());
 
                     return rowPos - posY;
                 }
@@ -392,14 +388,16 @@ namespace ignite
 
                     int rowPos = posY + 2 * INTERVAL;
 
-                    int checkBoxSize = (sizeX - 3 * INTERVAL) / 2;
+                    //int checkBoxSize = (sizeX - 3 * INTERVAL) / 2; // original
+                    int checkBoxSize = sizeX - 2 * MARGIN;
 
                     tlsCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                        "TLS", ChildId::TLS_CHECK_BOX, config.IsTls());
+                        "Enable TLS", ChildId::TLS_CHECK_BOX, config.IsTls());
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
 
                     tlsAllowInvalidHostnamesCheckBox = CreateCheckBox(
-                        labelPosX + checkBoxSize + INTERVAL, rowPos,
-                        checkBoxSize, ROW_HEIGHT, "TLS Allow Invalid Hostnames",
+                        labelPosX, rowPos, checkBoxSize, ROW_HEIGHT, "Allow Invalid Hostnames (enabling option is less secure)",
                         ChildId::TLS_ALLOW_INVALID_HOSTNAMES_CHECK_BOX,
                         config.IsTlsAllowInvalidHostnames());
 
@@ -414,7 +412,7 @@ namespace ignite
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     sslSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
-                        "TLS/SSL settings", ChildId::SSL_SETTINGS_GROUP_BOX);
+                        "TLS/SSL Settings", ChildId::SSL_SETTINGS_GROUP_BOX);
 
                     tlsAllowInvalidHostnamesCheckBox->SetEnabled(tlsCheckBox->IsChecked());
                     tlsCaFileEdit->SetEnabled(tlsCheckBox->IsChecked());
@@ -528,28 +526,10 @@ namespace ignite
 
                     int rowPos = posY + 2 * INTERVAL;
 
-                    const char* val = config.GetApplicationName().c_str();
-
-                    appNameLabel = CreateLabel(
-                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Application Name:", ChildId::APP_NAME_LABEL);
-                    appNameEdit =
-                        CreateEdit(editPosX, rowPos, editSizeX,
-                                   ROW_HEIGHT, val,
-                                   ChildId::APP_NAME_EDIT);
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
-                    std::string tmp = common::LexicalCast< std::string >(
-                        config.GetLoginTimeoutSeconds());
-                    val = tmp.c_str();
-                    loginTimeoutSecLabel = CreateLabel(
-                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Login Timeout (s):", ChildId::LOGIN_TIMEOUT_SEC_LABEL);
-
-                    loginTimeoutSecEdit = CreateEdit(
-                        editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                        val, ChildId::LOGIN_TIMEOUT_SEC_EDIT, ES_NUMBER);
+                    retryReadsCheckBox = CreateCheckBox(
+                        labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
+                        "Retry Reads", ChildId::RETRY_READS_CHECK_BOX,
+                        config.IsRetryReads());
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -593,8 +573,31 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
                     */
-                    val = config.GetReplicaSet().c_str();
 
+                    const char* val = config.GetApplicationName().c_str();
+                    appNameLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Application Name:", ChildId::APP_NAME_LABEL);
+                    appNameEdit =
+                        CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+                                   ChildId::APP_NAME_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    std::string tmp = common::LexicalCast< std::string >(
+                        config.GetLoginTimeoutSeconds());
+                    val = tmp.c_str();
+                    loginTimeoutSecLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Login Timeout (s):", ChildId::LOGIN_TIMEOUT_SEC_LABEL);
+
+                    loginTimeoutSecEdit =
+                        CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+                                   ChildId::LOGIN_TIMEOUT_SEC_EDIT, ES_NUMBER);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    val = config.GetReplicaSet().c_str();
                     replicaSetLabel = CreateLabel(
                         labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                                     "Replica Set:", ChildId::REPLICA_SET_LABEL);
@@ -605,19 +608,12 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    retryReadsCheckBox = CreateCheckBox(
-                        labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                        "Retry Reads", ChildId::RETRY_READS_CHECK_BOX,
-                        config.IsRetryReads());
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
                     tmp = common::LexicalCast< std::string >(
                         config.GetDefaultFetchSize());
                     val = tmp.c_str();
                     defaultFetchSizeLabel = CreateLabel(
                         labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Fetch size:", ChildId::DEFAULT_FETCH_SIZE_LABEL);
+                        "Fetch Size:", ChildId::DEFAULT_FETCH_SIZE_LABEL);
 
                     defaultFetchSizeEdit = CreateEdit(
                         editPosX, rowPos, editSizeX, ROW_HEIGHT,
@@ -626,7 +622,7 @@ namespace ignite
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     additionalSettingsGroupBox = CreateGroupBox(posX, posY, sizeX,
-                                       rowPos - posY, "Additional settings",
+                                       rowPos - posY, "Additional Settings",
                         ChildId::ADDITIONAL_SETTINGS_GROUP_BOX);
 
                     return rowPos - posY;
