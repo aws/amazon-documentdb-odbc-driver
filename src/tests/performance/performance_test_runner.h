@@ -41,9 +41,9 @@ typedef SQLLEN SQLROWOFFSET;
 // Ensure DSN is setup on machine before running test
 // DSN name should be "documentdb-perf-test"
 const std::string input_file =
-    "..\\..\\cmake\\PerformanceTests\\performance\\Performance_Test_Plan.csv";
+    "..\\..\\cmake\\tests\\performance\\Performance_Test_Plan.csv";
 const std::string output_file =
-    "..\\..\\cmake\\PerformanceTests\\performance\\Performance_Test_Results."
+    "..\\..\\cmake\\tests\\performance\\Performance_Test_Results."
     "csv";
 const std::string dsn_default = "documentdb-perf-test";
 const std::string test_query =
