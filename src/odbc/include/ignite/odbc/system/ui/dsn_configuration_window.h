@@ -71,8 +71,8 @@ namespace ignite
                             APP_NAME_LABEL,
                             LOGIN_TIMEOUT_SEC_EDIT,
                             LOGIN_TIMEOUT_SEC_LABEL,
-                            READ_PREFERENCE_EDIT,
                             READ_PREFERENCE_LABEL,
+                            READ_PREFERENCE_COMBO_BOX,
                             REPLICA_SET_EDIT,
                             REPLICA_SET_LABEL,
                             RETRY_READS_CHECK_BOX,
@@ -80,8 +80,8 @@ namespace ignite
                             DEFAULT_FETCH_SIZE_LABEL,
                             PROTOCOL_VERSION_LABEL,
                             PROTOCOL_VERSION_COMBO_BOX,
-                            NESTED_TX_MODE_LABEL,
-                            NESTED_TX_MODE_COMBO_BOX,
+                            //NESTED_TX_MODE_LABEL,
+                            //NESTED_TX_MODE_COMBO_BOX,
                             TLS_CHECK_BOX,
                             TLS_ALLOW_INVALID_HOSTNAMES_CHECK_BOX,
                             TLS_CA_FILE_EDIT,
@@ -323,8 +323,12 @@ namespace ignite
                     /** Login Timeout (seconds) label. */
                     std::auto_ptr<Window> loginTimeoutSecLabel;
 
-                    /** Read preference edit. */
-                    std::auto_ptr<Window> readPreferenceEdit;
+                    /** Nested Read Preference ComboBox **/
+                    std::auto_ptr<Window> readPreferenceComboBox;
+
+                    // -AL- remove later
+                    ///** Read preference edit. */
+                    //std::auto_ptr<Window> readPreferenceEdit;
 
                     /** Read preference label. */
                     std::auto_ptr<Window> readPreferenceLabel;

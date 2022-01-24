@@ -19,7 +19,8 @@
 #include <Shlwapi.h>
 
 #include "ignite/odbc/log.h"
-#include "ignite/odbc/ssl_mode.h"
+//#include "ignite/odbc/read_preference.h" // causes build errors, comment out momentarily 
+// #include "ignite/odbc/ssl_mode.h" //TODO remove later
 
 #include "ignite/odbc/system/ui/dsn_configuration_window.h"
 #include "ignite/odbc/config/config_tools.h"
@@ -67,7 +68,7 @@ namespace ignite
                     appNameLabel(),
                     appNameEdit(),
                     readPreferenceLabel(),
-                    readPreferenceEdit(),
+                    //readPreferenceEdit(),
                     replicaSetLabel(),
                     replicaSetEdit(),
                     retryReadsCheckBox(),
@@ -536,17 +537,20 @@ namespace ignite
                     // rowPos += INTERVAL + ROW_HEIGHT; // used to add row hight
                     // I believe
 
+                    /* //TODO readPreference
                     val = config.GetReadPreference().c_str();
+
+                    val = 
 
                     readPreferenceLabel = CreateLabel(
                         labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                         "Read preference:", ChildId::READ_PREFERENCE_LABEL);
-                    readPreferenceEdit = CreateEdit(
+                    readPreferenceComboBox = CreateComboBox(
                         editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                        val, ChildId::READ_PREFERENCE_EDIT);
+                                       "", ChildId::READ_PREFERENCE_COMBO_BOX);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
-
+                    */
                     val = config.GetReplicaSet().c_str();
 
                     replicaSetLabel = CreateLabel(
@@ -797,7 +801,7 @@ namespace ignite
                     std::string replicaSetStr;
 
                     appNameEdit->GetText(appNameStr);
-                    readPreferenceEdit->GetText(readPreferenceStr);
+                    //readPreferenceEdit->GetText(readPreferenceStr);
                     replicaSetEdit->GetText(replicaSetStr);
 
                     bool retryReads = retryReadsCheckBox->IsChecked();
@@ -832,7 +836,7 @@ namespace ignite
 
                     cfg.SetApplicationName(appNameStr);
                     cfg.SetLoginTimeoutSeconds(loginTimeoutSec);
-                    cfg.SetReadPreference(readPreferenceStr);
+                    //cfg.SetReadPreference(readPreferenceStr);
                     cfg.SetReplicaSet(replicaSetStr);
                     cfg.SetRetryReads(retryReads);
                     cfg.SetDefaultFetchSize(fetchSize);
