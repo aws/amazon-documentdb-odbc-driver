@@ -112,7 +112,7 @@ void CheckValidAddress(const char* connectStr, const EndPoint& endPoint)
     ParseValidConnectString(connectStr, cfg);
 
     BOOST_CHECK_EQUAL(cfg.GetHostname(), endPoint.host);
-    BOOST_CHECK_EQUAL(cfg.GetTcpPort(), endPoint.port);
+    BOOST_CHECK_EQUAL(cfg.GetPort(), endPoint.port);
 }
 
 void CheckValidScanMethod(const char* connectStr, ScanMethod::Type scanMethod)
@@ -184,7 +184,7 @@ void CheckConnectionConfig(const Configuration& cfg)
     BOOST_CHECK_EQUAL(cfg.GetDriver(), testDriverName);
     BOOST_CHECK_EQUAL(cfg.GetDatabase(), testDatabaseName);
     BOOST_CHECK_EQUAL(cfg.GetHostname(), testHostname);
-    BOOST_CHECK_EQUAL(cfg.GetTcpPort(), testServerPort);
+    BOOST_CHECK_EQUAL(cfg.GetPort(), testServerPort);
     BOOST_CHECK_EQUAL(cfg.GetUser(), testUsername);
     BOOST_CHECK_EQUAL(cfg.GetPassword(), testPassword);
     BOOST_CHECK_EQUAL(cfg.GetApplicationName(), testAppName);
@@ -247,7 +247,7 @@ void CheckDsnConfig(const Configuration& cfg)
     BOOST_CHECK_EQUAL(cfg.GetDsn(), testDsn);
     BOOST_CHECK_EQUAL(cfg.GetDatabase(), Configuration::DefaultValue::database);
     BOOST_CHECK_EQUAL(cfg.GetHostname(), Configuration::DefaultValue::hostname);
-    BOOST_CHECK_EQUAL(cfg.GetTcpPort(), Configuration::DefaultValue::port);
+    BOOST_CHECK_EQUAL(cfg.GetPort(), Configuration::DefaultValue::port);
     BOOST_CHECK_EQUAL(cfg.GetUser(), Configuration::DefaultValue::user);
     BOOST_CHECK_EQUAL(cfg.GetPassword(), Configuration::DefaultValue::password);
     BOOST_CHECK_EQUAL(cfg.GetApplicationName(), Configuration::DefaultValue::appName);
@@ -554,17 +554,17 @@ BOOST_AUTO_TEST_CASE(TestConnectStringValidReadPreference)
 
 BOOST_AUTO_TEST_CASE(TestConnectStringInvalidBoolKeys)
 {
-    typedef std::set<std::string> Set;
+    using Set = std::set<std::string, std::less<>>;
 
     Set keys;
 
-    keys.insert("retry_reads");
-    keys.insert("tls");
-    keys.insert("tls_allow_invalid_hostnames");
-    keys.insert("ssh_strict_host_key_checking");
-    keys.insert("refresh_schema");
+    keys.emplace("retry_reads");
+    keys.emplace("tls");
+    keys.emplace("tls_allow_invalid_hostnames");
+    keys.emplace("ssh_strict_host_key_checking");
+    keys.emplace("refresh_schema");
 
-    for (Set::const_iterator it = keys.begin(); it != keys.end(); ++it)
+    for (auto it = keys.begin(); it != keys.end(); ++it)
     {
         const std::string& key = *it;
 
@@ -581,17 +581,17 @@ BOOST_AUTO_TEST_CASE(TestConnectStringInvalidBoolKeys)
 
 BOOST_AUTO_TEST_CASE(TestConnectStringValidBoolKeys)
 {
-    typedef std::set<std::string> Set;
+    using Set = std::set<std::string, std::less<>>;
 
     Set keys;
 
-    keys.insert("retry_reads");
-    keys.insert("tls");
-    keys.insert("tls_allow_invalid_hostnames");
-    keys.insert("ssh_strict_host_key_checking");
-    keys.insert("refresh_schema");
+    keys.emplace("retry_reads");
+    keys.emplace("tls");
+    keys.emplace("tls_allow_invalid_hostnames");
+    keys.emplace("ssh_strict_host_key_checking");
+    keys.emplace("refresh_schema");
 
-    for (Set::const_iterator it = keys.begin(); it != keys.end(); ++it)
+    for (auto it = keys.begin(); it != keys.end(); ++it)
     {
         const std::string& key = *it;
 

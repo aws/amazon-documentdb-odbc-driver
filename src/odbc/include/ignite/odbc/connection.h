@@ -31,6 +31,7 @@
 #include "ignite/odbc/streaming/streaming_context.h"
 #include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/jni/java.h"
+#include "ignite/odbc/end_point.h"
 
 namespace ignite
 {

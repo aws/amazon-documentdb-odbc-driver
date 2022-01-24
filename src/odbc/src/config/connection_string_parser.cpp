@@ -20,10 +20,8 @@
 #include "ignite/common/utils.h"
 
 #include "ignite/odbc/utility.h"
-//#include "ignite/odbc/ssl_mode.h"
 #include "ignite/odbc/config/connection_string_parser.h"
 #include "ignite/odbc/config/config_tools.h"
-//#include "ignite/odbc/nested_tx_mode.h"
 
 namespace ignite
 {
@@ -62,11 +60,6 @@ namespace ignite
 
             ConnectionStringParser::ConnectionStringParser(Configuration& cfg):
                 cfg(cfg)
-            {
-                // No-op.
-            }
-
-            ConnectionStringParser::~ConnectionStringParser()
             {
                 // No-op.
             }
@@ -158,8 +151,8 @@ namespace ignite
 
                     cfg.SetHostname(endpoint.host);
                     
-                    if (!cfg.IsTcpPortSet()) 
-                        cfg.SetTcpPort(endpoint.port);
+                    if (!cfg.IsPortSet()) 
+                        cfg.SetPort(endpoint.port);
                 }
                 else if (lKey == Key::port)
                 {
@@ -203,7 +196,7 @@ namespace ignite
                     conv << value;
                     conv >> numValue;
 
-                    if (numValue <= 0 || numValue > 0xFFFF)
+                    if (numValue <= 0 || numValue > UINT16_MAX)
                     {
                         if (diag)
                         {
@@ -215,7 +208,7 @@ namespace ignite
                         return;
                     }
 
-                    cfg.SetTcpPort(static_cast<uint16_t>(numValue));
+                    cfg.SetPort(static_cast<uint16_t>(numValue));
                 }
                 else if (lKey == Key::appName)
                 {
@@ -235,13 +228,24 @@ namespace ignite
                         return;
                     }
 
+                    if (value.size() >= sizeof("4294967295"))
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                MakeErrorMessage("Login timeout seconds attribute value is too large. Using default value.", key, value));
+                        }
+
+                        return;
+                    }
+
                     int64_t numValue = 0;
                     std::stringstream conv;
 
                     conv << value;
                     conv >> numValue;
 
-                    if (numValue <= 0 || numValue > 0xFFFFFFFFL)
+                    if (numValue <= 0 || numValue > UINT32_MAX)
                     {
                         if (diag)
                         {
@@ -280,7 +284,7 @@ namespace ignite
                 {
                     BoolParseResult::Type res = StringToBool(value);
 
-                    if (res == BoolParseResult::AI_UNRECOGNIZED)
+                    if (res == BoolParseResult::Type::AI_UNRECOGNIZED)
                     {
                         if (diag)
                         {
@@ -291,13 +295,13 @@ namespace ignite
                         return;
                     }
 
-                    cfg.SetRetryReads(res == BoolParseResult::AI_TRUE);
+                    cfg.SetRetryReads(res == BoolParseResult::Type::AI_TRUE);
                 }
                 else if (lKey == Key::tls)
                 {
                     BoolParseResult::Type res = StringToBool(value);
 
-                    if (res == BoolParseResult::AI_UNRECOGNIZED)
+                    if (res == BoolParseResult::Type::AI_UNRECOGNIZED)
                     {
                         if (diag)
                         {
@@ -308,13 +312,13 @@ namespace ignite
                         return;
                     }
 
-                    cfg.SetTls(res == BoolParseResult::AI_TRUE);
+                    cfg.SetTls(res == BoolParseResult::Type::AI_TRUE);
                 }
                 else if (lKey == Key::tlsAllowInvalidHostnames)
                 {
                     BoolParseResult::Type res = StringToBool(value);
 
-                    if (res == BoolParseResult::AI_UNRECOGNIZED)
+                    if (res == BoolParseResult::Type::AI_UNRECOGNIZED)
                     {
                         if (diag)
                         {
@@ -325,7 +329,7 @@ namespace ignite
                         return;
                     }
 
-                    cfg.SetTlsAllowInvalidHostnames(res == BoolParseResult::AI_TRUE);
+                    cfg.SetTlsAllowInvalidHostnames(res == BoolParseResult::Type::AI_TRUE);
                 }
                 else if (lKey == Key::tlsCaFile)
                 {
@@ -351,7 +355,7 @@ namespace ignite
                 {
                     BoolParseResult::Type res = StringToBool(value);
 
-                    if (res == BoolParseResult::AI_UNRECOGNIZED)
+                    if (res == BoolParseResult::Type::AI_UNRECOGNIZED)
                     {
                         if (diag)
                         {
@@ -362,7 +366,7 @@ namespace ignite
                         return;
                     }
 
-                    cfg.SetSshStrictHostKeyChecking(res == BoolParseResult::AI_TRUE);
+                    cfg.SetSshStrictHostKeyChecking(res == BoolParseResult::Type::AI_TRUE);
                 }
                 else if (lKey == Key::sshKnownHostsFile)
                 {
@@ -399,13 +403,25 @@ namespace ignite
                         return;
                     }
 
+                    if (value.size() >= sizeof("4294967295"))
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                MakeErrorMessage("Default fetch size attribute value is too large."
+                                    " Using default value.", key, value));
+                        }
+
+                        return;
+                    }
+
                     int64_t numValue = 0;
                     std::stringstream conv;
 
                     conv << value;
                     conv >> numValue;
 
-                    if (numValue <= 0 || numValue > 0xFFFFFFFFL)
+                    if (numValue <= 0 || numValue > UINT32_MAX)
                     {
                         if (diag)
                         {
@@ -427,7 +443,7 @@ namespace ignite
                 {
                     BoolParseResult::Type res = StringToBool(value);
 
-                    if (res == BoolParseResult::AI_UNRECOGNIZED)
+                    if (res == BoolParseResult::Type::AI_UNRECOGNIZED)
                     {
                         if (diag)
                         {
@@ -438,7 +454,7 @@ namespace ignite
                         return;
                     }
 
-                    cfg.SetRefreshSchema(res == BoolParseResult::AI_TRUE);
+                    cfg.SetRefreshSchema(res == BoolParseResult::Type::AI_TRUE);
                 }
                 else if (lKey == Key::defaultFetchSize)
                 {
@@ -459,7 +475,7 @@ namespace ignite
                         if (diag)
                         {
                             diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
-                                MakeErrorMessage("Page size attribute value is too large."
+                                MakeErrorMessage("Default fetch size attribute value is too large."
                                     " Using default value.", key, value));
                         }
 
@@ -472,12 +488,12 @@ namespace ignite
                     conv << value;
                     conv >> numValue;
 
-                    if (numValue <= 0 || numValue > 0xFFFFFFFFL)
+                    if (numValue <= 0 || numValue > UINT32_MAX)
                     {
                         if (diag)
                         {
                             diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
-                                MakeErrorMessage("Page size attribute value is out of range."
+                                MakeErrorMessage("Default fetch size attribute value is out of range."
                                     " Using default value.", key, value));
                         }
 
@@ -486,10 +502,6 @@ namespace ignite
 
                     cfg.SetDefaultFetchSize(static_cast<int32_t>(numValue));
                 } 
-                else if (lKey == Key::tlsCaFile)
-                {
-                    cfg.SetTlsCaFile(value);
-                }
                 else if (lKey == Key::driver)
                 {
                     cfg.SetDriver(value);
@@ -529,12 +541,12 @@ namespace ignite
                 std::string lower = common::ToLower(value);
 
                 if (lower == "true")
-                    return BoolParseResult::AI_TRUE;
+                    return BoolParseResult::Type::AI_TRUE;
 
                 if (lower == "false")
-                    return BoolParseResult::AI_FALSE;
+                    return BoolParseResult::Type::AI_FALSE;
 
-                return BoolParseResult::AI_UNRECOGNIZED;
+                return BoolParseResult::Type::AI_UNRECOGNIZED;
             }
 
             std::string ConnectionStringParser::MakeErrorMessage(const std::string& msg, const std::string& key,

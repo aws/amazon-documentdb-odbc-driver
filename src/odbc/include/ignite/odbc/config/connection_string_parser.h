@@ -145,7 +145,7 @@ namespace ignite
                 /**
                  * Destructor.
                  */
-                ~ConnectionStringParser();
+                ~ConnectionStringParser() = default;
 
                 /**
                  * Parse connect string.
@@ -180,7 +180,7 @@ namespace ignite
                  */
                 struct BoolParseResult
                 {
-                    enum Type
+                    enum class Type
                     {
                         AI_FALSE,
 
