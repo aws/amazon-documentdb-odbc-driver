@@ -470,7 +470,7 @@ namespace ignite
                  *
                  * @param bool ssh enable.
                  */
-                void SetSshEnable(bool sshEnable);
+                void SetSshEnable(bool val);
 
                 /**
                  * Check if the ssh enable value set.

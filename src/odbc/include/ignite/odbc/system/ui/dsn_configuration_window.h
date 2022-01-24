@@ -56,6 +56,7 @@ namespace ignite
                             ADDRESS_LABEL,
                             SCHEMA_EDIT,
                             SCHEMA_LABEL,
+                            SSH_ENABLE_CHECK_BOX,
                             SSH_USER_EDIT,
                             SSH_USER_LABEL,
                             SSH_HOST_EDIT,
@@ -277,6 +278,9 @@ namespace ignite
 
                     /** DSN schema edit field. */
                     std::auto_ptr<Window> schemaEdit;
+
+                    /** SSH enable checkBox. */
+                    std::auto_ptr<Window> sshEnableCheckBox;
 
                     /** SSH user edit. */
                     std::auto_ptr<Window> sshUserEdit;

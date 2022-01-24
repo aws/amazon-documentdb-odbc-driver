@@ -51,7 +51,7 @@ namespace ignite
             const bool Configuration::DefaultValue::refreshSchema = false;
 
             // Internal SSH Tunnel options // need to add to UI
-             const bool Configuration::DefaultValue::sshEnable = false;
+            const bool Configuration::DefaultValue::sshEnable = false;
             const std::string Configuration::DefaultValue::sshUser = "";
             const std::string Configuration::DefaultValue::sshHost = "";
             const std::string Configuration::DefaultValue::sshPrivateKeyFile = "";
@@ -322,15 +322,18 @@ namespace ignite
                 return tlsCaFile.IsSet();
             }
 
-            bool Configuration::IsSshEnable() const {
+            bool Configuration::IsSshEnable() const 
+            {
                 return sshEnable.GetValue();
             }
 
-            void Configuration::SetSshEnable(bool val) {
+            void Configuration::SetSshEnable(bool val) 
+            {
                 this->sshEnable.SetValue(val);
             }
 
-            bool Configuration::IsSshEnableSet() const {
+            bool Configuration::IsSshEnableSet() const 
+            {
                 return sshEnable.IsSet();
             }
 
@@ -546,6 +549,7 @@ namespace ignite
                 AddToMap(res, ConnectionStringParser::Key::tls, tls);
                 AddToMap(res, ConnectionStringParser::Key::tlsAllowInvalidHostnames, tlsAllowInvalidHostnames);
                 AddToMap(res, ConnectionStringParser::Key::tlsCaFile, tlsCaFile);
+                AddToMap(res, ConnectionStringParser::Key::sshEnable, sshEnable);
                 AddToMap(res, ConnectionStringParser::Key::sshUser, sshUser);
                 AddToMap(res, ConnectionStringParser::Key::sshHost, sshHost);
                 AddToMap(res, ConnectionStringParser::Key::sshPrivateKeyFile, sshPrivateKeyFile);

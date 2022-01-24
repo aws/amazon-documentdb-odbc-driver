@@ -53,6 +53,7 @@ namespace ignite
                     schemaLabel(),
                     schemaEdit(),
                     // internal SSH tunnel vars
+                    sshEnableCheckBox(),
                     sshUserLabel(),
                     sshUserEdit(),
                     sshHostLabel(),
@@ -127,10 +128,12 @@ namespace ignite
                     int posXRight = MARGIN + (width - MARGIN) / 2;
                     int groupPosYRight = MARGIN;
 
+                    // create left column group settings
                     groupPosYLeft += INTERVAL + CreateConnectionSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
                     groupPosYLeft += INTERVAL + CreateAuthSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
-                    groupPosYLeft += INTERVAL + CreateSshSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
-                    groupPosYRight += INTERVAL + CreateSslSettingsGroup(posXRight, groupPosYRight, groupSizeY);
+                    groupPosYLeft += INTERVAL + CreateSslSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
+                    // create right column group settings 
+                    groupPosYRight += INTERVAL + CreateSshSettingsGroup(posXRight, groupPosYRight, groupSizeY);
                     groupPosYRight += INTERVAL + CreateAdditionalSettingsGroup(posXRight, groupPosYRight, groupSizeY);
                     //groupPosY += INTERVAL + CreateSslSettingsGroup(MARGIN, groupPosY, groupSizeY);
                     //groupPosY += INTERVAL + CreateAdditionalSettingsGroup(MARGIN, groupPosY, groupSizeY);
@@ -261,6 +264,12 @@ namespace ignite
 
                     int checkBoxSize = (sizeX - 3 * INTERVAL) / 2;
 
+                    sshEnableCheckBox = CreateCheckBox(
+                        labelPosX, rowPos, checkBoxSize, ROW_HEIGHT, "Enable SSH Tunnel",
+                        ChildId::SSH_ENABLE_CHECK_BOX, config.IsSshEnable());
+                   
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
                     const char* val = config.GetSshUser().c_str();
 
                     sshUserLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, "SSH user :", ChildId::SSH_USER_LABEL);
@@ -276,6 +285,25 @@ namespace ignite
                                           ROW_HEIGHT, val, ChildId::SSH_HOST_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
+
+                    val = config.GetSshPrivateKeyFile().c_str();
+
+                    sshPrivateKeyFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                    "SSH private key file :", ChildId::SSH_PRIVATE_KEY_FILE_LABEL);
+                    sshPrivateKeyFileEdit = CreateEdit(editPosX, rowPos, editSizeX,
+                                          ROW_HEIGHT, val, ChildId::SSH_PRIVATE_KEY_FILE_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    val = config.GetSshPrivateKeyPassphrase().c_str();
+
+                    // ssh private key passphrase label requires double the row height due to the long label.
+                    sshPrivateKeyPassphraseLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT * 2,
+                                    "SSH private key passphrase :", ChildId::SSH_PRIVATE_KEY_PASSPHRASE_LABEL);
+                    sshPrivateKeyPassphraseEdit = CreateEdit(editPosX, rowPos, editSizeX,
+                                          ROW_HEIGHT * 2, val, ChildId::SSH_PRIVATE_KEY_PASSPHRASE_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT * 2;
 
                     sshStrictHostKeyCheckingCheckBox = CreateCheckBox(
                         labelPosX, rowPos, checkBoxSize, ROW_HEIGHT, "SSH strict host key checking",
@@ -295,6 +323,13 @@ namespace ignite
                     sshSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
                                        "Internal SSH tunnel settings",
                                        ChildId::SSH_SETTINGS_GROUP_BOX);
+
+                    sshUserEdit->SetEnabled(sshEnableCheckBox->IsChecked());
+                    sshHostEdit->SetEnabled(sshEnableCheckBox->IsChecked());
+                    sshPrivateKeyFileEdit->SetEnabled( sshEnableCheckBox->IsChecked());
+                    sshPrivateKeyPassphraseEdit->SetEnabled(sshEnableCheckBox->IsChecked());
+                    sshStrictHostKeyCheckingCheckBox->SetEnabled(sshEnableCheckBox->IsChecked());
+                    sshKnownHostsFileEdit->SetEnabled(sshEnableCheckBox->IsChecked());
 
                     return rowPos - posY;
                 }
@@ -625,6 +660,25 @@ namespace ignite
                                     break;
                                 }
 
+                                case ChildId::SSH_ENABLE_CHECK_BOX: 
+                                {
+                                    sshEnableCheckBox->SetChecked(!sshEnableCheckBox->IsChecked());
+                                    sshUserEdit->SetEnabled(
+                                        sshEnableCheckBox->IsChecked());
+                                    sshHostEdit->SetEnabled(sshEnableCheckBox->IsChecked());
+                                    sshPrivateKeyFileEdit->SetEnabled(
+                                        sshEnableCheckBox->IsChecked());
+                                    sshPrivateKeyPassphraseEdit->SetEnabled(
+                                        sshEnableCheckBox->IsChecked());
+                                    sshStrictHostKeyCheckingCheckBox
+                                        ->SetEnabled(
+                                            sshEnableCheckBox->IsChecked());
+                                    sshKnownHostsFileEdit->SetEnabled(
+                                        sshEnableCheckBox->IsChecked());
+
+                                    break;
+                                }
+
                                 case ChildId::SSH_STRICT_HOST_KEY_CHECKING_CHECK_BOX:
                                 {
                                     sshStrictHostKeyCheckingCheckBox
@@ -682,6 +736,7 @@ namespace ignite
                 {
                     RetrieveConnectionParameters(cfg);
                     RetrieveAuthParameters(cfg);
+                    RetrieveSshParameters(cfg);
                     RetrieveSslParameters(cfg);
                     RetrieveAdditionalParameters(cfg);
                 }
@@ -748,6 +803,9 @@ namespace ignite
 
                 void DsnConfigurationWindow::RetrieveSshParameters(config::Configuration& cfg) const
                 {
+                    bool sshEnable = sshEnableCheckBox->IsChecked();
+                    bool sshStrictHostKeyChecking = sshStrictHostKeyCheckingCheckBox->IsChecked();
+
                     std::string sshUserStr;
                     std::string sshHostStr;
                     std::string sshPrivateKeyFileStr;
@@ -756,19 +814,24 @@ namespace ignite
 
                     sshUserEdit->GetText(sshUserStr);
                     sshHostEdit->GetText(sshHostStr);
-                    //sshPrivateKeyFileEdit->GetText(sshPrivateKeyFileStr);
-                    //sshPrivateKeyPassphraseEdit->GetText(sshPrivateKeyPassphraseStr);
+                    sshPrivateKeyFileEdit->GetText(sshPrivateKeyFileStr);
+                    sshPrivateKeyPassphraseEdit->GetText(sshPrivateKeyPassphraseStr);
                     sshKnownHostsFileEdit->GetText(sshKnownHostsFileStr);
 
-                    bool sshStrictHostKeyChecking = sshStrictHostKeyCheckingCheckBox->IsChecked();
-
+                    LOG_MSG("Retrieving arguments:");
+                    LOG_MSG("SSH enable:                    " << (sshEnable ? "true" : "false"));
                     LOG_MSG("SSH user:                      " << sshUserStr);
                     LOG_MSG("SSH host:                      " << sshHostStr);
+                    LOG_MSG("SSH private key file:          " << sshPrivateKeyFileStr);
+                    LOG_MSG("SSH private key passphrase:    " << sshPrivateKeyPassphraseStr);
                     LOG_MSG("SSH known hosts file:          " << sshKnownHostsFileStr);
                     LOG_MSG("SSH strict host key checking:  " << (sshStrictHostKeyChecking ? "true" : "false"));
 
+                    cfg.SetSshEnable(sshEnable);
                     cfg.SetSshUser(sshUserStr);
                     cfg.SetSshHost(sshHostStr);
+                    cfg.SetSshPrivateKeyFile(sshPrivateKeyFileStr);
+                    cfg.SetSshPrivateKeyPassphrase(sshPrivateKeyPassphraseStr);
                     cfg.SetSshKnownHostsFile(sshKnownHostsFileStr);
                     cfg.SetSshStrictHostKeyChecking(sshStrictHostKeyChecking);
 
