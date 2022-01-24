@@ -554,7 +554,7 @@ BOOST_AUTO_TEST_CASE(TestConnectStringValidReadPreference)
 
 BOOST_AUTO_TEST_CASE(TestConnectStringInvalidBoolKeys)
 {
-    using Set = std::set<std::string, std::less<>>;
+    typedef std::set<std::string> Set;
 
     Set keys;
 
@@ -581,7 +581,7 @@ BOOST_AUTO_TEST_CASE(TestConnectStringInvalidBoolKeys)
 
 BOOST_AUTO_TEST_CASE(TestConnectStringValidBoolKeys)
 {
-    using Set = std::set<std::string, std::less<>>;
+    typedef std::set<std::string> Set;
 
     Set keys;
 
