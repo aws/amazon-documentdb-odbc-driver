@@ -43,7 +43,7 @@ namespace ignite
                     connectionSettingsGroupBox(),
                     sslSettingsGroupBox(), // has a create... function defined 
                     tlsCheckBox(), 
-                    authSettingsGroupBox(),
+                    //authSettingsGroupBox(),
                     additionalSettingsGroupBox(),
                     nameLabel(),
                     nameEdit(),
@@ -141,8 +141,8 @@ namespace ignite
 
                     // create left column group settings
                     groupPosYLeft += INTERVAL + CreateConnectionSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
-                    groupPosYLeft += INTERVAL + CreateAuthSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
                     groupPosYLeft += INTERVAL + CreateSslSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
+                    //groupPosYLeft += INTERVAL + CreateAuthSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
                     // create right column group settings 
                     groupPosYRight += INTERVAL + CreateSshSettingsGroup(posXRight, groupPosYRight, groupSizeY);
                     groupPosYRight += INTERVAL + CreateAdditionalSettingsGroup(posXRight, groupPosYRight, groupSizeY);
@@ -189,6 +189,49 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
+                    val = config.GetHostname().c_str();
+                    hostnameLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, 
+                        "Hostname :", ChildId::HOST_NAME_LABEL);
+                    hostnameEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, 
+                        val, ChildId::HOST_NAME_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    std::string tmp = common::LexicalCast<std::string>(config.GetTcpPort());
+                    val = tmp.c_str();
+                    portLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Port:", ChildId::PORT_LABEL);
+                    portEdit = CreateEdit(
+                        editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                        val, ChildId::PORT_EDIT, ES_NUMBER);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    val = config.GetDatabase().c_str();
+                    databaseLabel =
+                        CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                    "Database :", ChildId::DATABASE_LABEL);
+                    databaseEdit = CreateEdit(editPosX, rowPos, editSizeX,
+                                          ROW_HEIGHT, val, ChildId::DATABASE_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    val = config.GetUser().c_str();
+                    userLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, "User :", ChildId::USER_LABEL);
+                    userEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::USER_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    val = config.GetPassword().c_str();
+                    passwordLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Password:", ChildId::PASSWORD_LABEL);
+                    passwordEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                        val, ChildId::USER_EDIT, ES_PASSWORD);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    /* // original code for hostname
                     std::string addr = config.GetHostname();
 
                     val = addr.c_str();
@@ -197,6 +240,7 @@ namespace ignite
                     addressEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::ADDRESS_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
+                    */
 
                     val = config.GetDatabase().c_str();
                     schemaLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
@@ -237,6 +281,8 @@ namespace ignite
                     return rowPos - posY;
                 }
 
+                // comment out authSettingsGroup because they are no longer needed 
+                /* 
                 int DsnConfigurationWindow::CreateAuthSettingsGroup(int posX, int posY, int sizeX)
                 {
                     enum { LABEL_WIDTH = 120 };
@@ -295,6 +341,7 @@ namespace ignite
 
                     return rowPos - posY;
                 }
+                */
 
                 int DsnConfigurationWindow::CreateSshSettingsGroup(int posX, int posY, int sizeX) 
                 {
@@ -804,7 +851,7 @@ namespace ignite
                 void DsnConfigurationWindow::RetrieveParameters(config::Configuration& cfg) const
                 {
                     RetrieveConnectionParameters(cfg);
-                    RetrieveAuthParameters(cfg);
+                    //RetrieveAuthParameters(cfg);
                     RetrieveSshParameters(cfg);
                     RetrieveSslParameters(cfg);
                     RetrieveAdditionalParameters(cfg);
@@ -817,6 +864,12 @@ namespace ignite
                     std::string schemaStr;
                     std::string versionStr;
 
+                    std::string hostnameStr;
+                    std::string portStr;
+                    std::string databaseStr;
+                    std::string userStr;
+                    std::string passwordStr;
+
                     nameEdit->GetText(dsnStr);
                     addressEdit->GetText(addressStr);
                     schemaEdit->GetText(schemaStr);
@@ -826,11 +879,24 @@ namespace ignite
                     common::StripSurroundingWhitespaces(dsnStr);
                     // Stripping of whitespaces off the schema skipped intentionally
 
+                    hostnameEdit->GetText(hostnameStr);
+                    portEdit->GetText(portStr);
+                    databaseEdit->GetText(databaseStr);
+                    userEdit->GetText(userStr);
+                    passwordEdit->GetText(passwordStr);
+
+                    int16_t port = common::LexicalCast< int16_t >(portStr);
+
+                    if (port <= 0)
+                        port = config.GetTcpPort();
+
                     LOG_MSG("Retrieving arguments:");
                     LOG_MSG("DSN:                " << dsnStr);
                     LOG_MSG("Address:            " << addressStr);
                     LOG_MSG("Schema:             " << schemaStr);
                     LOG_MSG("Protocol version:   " << versionStr);
+
+                    // username and password intentionally not logged for security reasons
 
                     if (dsnStr.empty())
                         throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, "DSN name can not be empty.");
@@ -856,8 +922,16 @@ namespace ignite
                     //cfg.SetAddresses(addresses);
                     cfg.SetDatabase(schemaStr);
                     //cfg.SetProtocolVersion(version);
+
+                    cfg.SetTcpPort(port);
+                    cfg.SetHostname(hostnameStr);
+                    cfg.SetDatabase(databaseStr);
+                    cfg.SetUser(userStr);
+                    cfg.SetPassword(passwordStr);
                 }
 
+                // comment out because no longer needed
+                /*
                 void DsnConfigurationWindow::RetrieveAuthParameters(config::Configuration& cfg) const
                 {
                     std::string hostnameStr;
@@ -884,6 +958,7 @@ namespace ignite
                     cfg.SetUser(userStr);
                     cfg.SetPassword(passwordStr);
                 }
+                */
 
                 void DsnConfigurationWindow::RetrieveSshParameters(config::Configuration& cfg) const
                 {

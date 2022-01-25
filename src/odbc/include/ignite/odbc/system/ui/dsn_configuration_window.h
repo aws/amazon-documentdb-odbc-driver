@@ -49,7 +49,7 @@ namespace ignite
                             SSH_SETTINGS_GROUP_BOX,
                             SSL_SETTINGS_GROUP_BOX,
                             ADDITIONAL_SETTINGS_GROUP_BOX,
-                            AUTH_SETTINGS_GROUP_BOX,
+                            //AUTH_SETTINGS_GROUP_BOX,
                             NAME_EDIT,
                             NAME_LABEL,
                             ADDRESS_EDIT,
@@ -172,7 +172,7 @@ namespace ignite
                      *
                      * @param cfg Configuration.
                      */
-                    void RetrieveAuthParameters(config::Configuration& cfg) const;
+                    //void RetrieveAuthParameters(config::Configuration& cfg) const;
 
                     /**
                      * Retrieves current values from the SSH tunnel UI group and
@@ -216,7 +216,7 @@ namespace ignite
                      * @param sizeX Width.
                      * @return Size by Y.
                      */
-                    int CreateAuthSettingsGroup(int posX, int posY, int sizeX);
+                    //int CreateAuthSettingsGroup(int posX, int posY, int sizeX);
 
                      /**
                      * Create internal SSH tunnel settings group box.
@@ -263,8 +263,8 @@ namespace ignite
                     /** SSL settings group box. */
                     std::auto_ptr<Window> sslSettingsGroupBox;
 
-                    /** Authentication settings group box. */
-                    std::auto_ptr<Window> authSettingsGroupBox;
+                    ///** Authentication settings group box. */
+                    //std::auto_ptr<Window> authSettingsGroupBox;
 
                     /** Additional settings group box. */
                     std::auto_ptr<Window> additionalSettingsGroupBox;
