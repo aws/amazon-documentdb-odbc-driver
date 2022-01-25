@@ -860,7 +860,7 @@ namespace ignite
                 void DsnConfigurationWindow::RetrieveConnectionParameters(config::Configuration& cfg) const
                 {
                     std::string dsnStr;
-                    std::string addressStr;
+                    //std::string addressStr;
                     std::string schemaStr;
                     std::string versionStr;
 
@@ -871,11 +871,11 @@ namespace ignite
                     std::string passwordStr;
 
                     nameEdit->GetText(dsnStr);
-                    addressEdit->GetText(addressStr);
+                    //addressEdit->GetText(addressStr);
                     schemaEdit->GetText(schemaStr);
                     protocolVersionComboBox->GetText(versionStr);
 
-                    common::StripSurroundingWhitespaces(addressStr);
+                    //common::StripSurroundingWhitespaces(addressStr);
                     common::StripSurroundingWhitespaces(dsnStr);
                     // Stripping of whitespaces off the schema skipped intentionally
 
@@ -892,7 +892,7 @@ namespace ignite
 
                     LOG_MSG("Retrieving arguments:");
                     LOG_MSG("DSN:                " << dsnStr);
-                    LOG_MSG("Address:            " << addressStr);
+                    //LOG_MSG("Address:            " << addressStr);
                     LOG_MSG("Schema:             " << schemaStr);
                     LOG_MSG("Protocol version:   " << versionStr);
 
@@ -905,7 +905,7 @@ namespace ignite
 
                     std::vector<EndPoint> addresses;
 
-                    config::ParseAddress(addressStr, addresses, &diag);
+                    //config::ParseAddress(addressStr, addresses, &diag);
 
                     if (diag.GetStatusRecordsNumber() > 0)
                     {
