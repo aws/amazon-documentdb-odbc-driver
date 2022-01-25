@@ -20,10 +20,6 @@
 
 #include "ignite/odbc/config/configuration.h"
 #include "ignite/odbc/system/ui/custom_window.h"
-// TODO: Removed these from configuration.h since no longer used. Moved here since they are still referenced. Remove when no longer needed.
-//#include "ignite/odbc/nested_tx_mode.h"
-//#include "ignite/odbc/protocol_version.h"
-//#include "ignite/odbc/ssl_mode.h"
 
 namespace ignite
 {
@@ -49,11 +45,8 @@ namespace ignite
                             SSH_SETTINGS_GROUP_BOX,
                             TLS_SETTINGS_GROUP_BOX,
                             ADDITIONAL_SETTINGS_GROUP_BOX,
-                            //AUTH_SETTINGS_GROUP_BOX,
                             NAME_EDIT,
                             NAME_LABEL,
-                            //ADDRESS_EDIT,
-                            //ADDRESS_LABEL,
                             SCHEMA_EDIT,
                             SCHEMA_LABEL,
                             SSH_ENABLE_CHECK_BOX,
@@ -79,10 +72,6 @@ namespace ignite
                             RETRY_READS_CHECK_BOX,
                             DEFAULT_FETCH_SIZE_EDIT,
                             DEFAULT_FETCH_SIZE_LABEL,
-                            //PROTOCOL_VERSION_LABEL,
-                            //PROTOCOL_VERSION_COMBO_BOX,
-                            //NESTED_TX_MODE_LABEL,
-                            //NESTED_TX_MODE_COMBO_BOX,
                             TLS_CHECK_BOX,
                             TLS_ALLOW_INVALID_HOSTNAMES_CHECK_BOX,
                             TLS_CA_FILE_EDIT,
@@ -167,14 +156,6 @@ namespace ignite
                     void RetrieveConnectionParameters(config::Configuration& cfg) const;
 
                     /**
-                     * Retrieves current values from the Authentication UI group and
-                     * stores them to the specified configuration.
-                     *
-                     * @param cfg Configuration.
-                     */
-                    //void RetrieveAuthParameters(config::Configuration& cfg) const;
-
-                    /**
                      * Retrieves current values from the SSH tunnel UI group and
                      * stores them to the specified configuration.
                      *
@@ -207,16 +188,6 @@ namespace ignite
                      * @return Size by Y.
                      */
                     int CreateConnectionSettingsGroup(int posX, int posY, int sizeX);
-
-                    /**
-                     * Create authentication settings group box.
-                     *
-                     * @param posX X position.
-                     * @param posY Y position.
-                     * @param sizeX Width.
-                     * @return Size by Y.
-                     */
-                    //int CreateAuthSettingsGroup(int posX, int posY, int sizeX);
 
                      /**
                      * Create internal SSH tunnel settings group box.
@@ -338,10 +309,6 @@ namespace ignite
                     /** Nested Read Preference ComboBox **/
                     std::auto_ptr<Window> readPreferenceComboBox;
 
-                    // -AL- remove later
-                    ///** Read preference edit. */
-                    //std::auto_ptr<Window> readPreferenceEdit;
-
                     /** Read preference label. */
                     std::auto_ptr<Window> readPreferenceLabel;
 
@@ -360,12 +327,6 @@ namespace ignite
                     /** Default fetch size label. */
                     std::auto_ptr<Window> defaultFetchSizeLabel;
 
-                    ///** Protocol version edit field. */
-                    //std::auto_ptr<Window> protocolVersionLabel;
-
-                    ///** Protocol verion ComboBox. */
-                    //std::auto_ptr<Window> protocolVersionComboBox;
-
                     /** Ok button. */
                     std::auto_ptr<Window> okButton;
 
@@ -383,12 +344,6 @@ namespace ignite
 
                     /** TLS certificate authority file edit. */
                     std::auto_ptr<Window> tlsCaFileEdit;
-
-                    ///** Driver label. */
-                    //std::auto_ptr<Window> driverLabel;
-
-                    ///** Driver edit. */
-                    //std::auto_ptr<Window> driverEdit;
 
                     /** Database label. */
                     std::auto_ptr<Window> databaseLabel;

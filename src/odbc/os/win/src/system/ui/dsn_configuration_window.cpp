@@ -43,7 +43,6 @@ namespace ignite
                     connectionSettingsGroupBox(),
                     tlsSettingsGroupBox(), // has a create... function defined 
                     tlsCheckBox(), 
-                    //authSettingsGroupBox(),
                     additionalSettingsGroupBox(),
                     nameLabel(),
                     nameEdit(),
@@ -74,10 +73,6 @@ namespace ignite
                     retryReadsCheckBox(),
                     defaultFetchSizeLabel(),
                     defaultFetchSizeEdit(),
-                    //protocolVersionLabel(),
-                    //protocolVersionComboBox(),
-                    //driverLabel(),
-                    //driverEdit(),
                     databaseLabel(),
                     databaseEdit(),
                     hostnameLabel(),
@@ -231,17 +226,6 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    /* // original code for hostname
-                    std::string addr = config.GetHostname();
-
-                    val = addr.c_str();
-                    addressLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Address:", ChildId::ADDRESS_LABEL);
-                    addressEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::ADDRESS_EDIT);
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-                    */
-
                     val = config.GetDatabase().c_str();
                     schemaLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                         "Schema Name:", ChildId::SCHEMA_LABEL);
@@ -249,99 +233,11 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    //protocolVersionLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                    //    "Protocol Version:", ChildId::PROTOCOL_VERSION_LABEL);
-                    //protocolVersionComboBox = CreateComboBox(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                    //    "Protocol Version", ChildId::PROTOCOL_VERSION_COMBO_BOX);
-
-                    //int id = 0;
-
-                    //const ProtocolVersion::VersionSet& supported = ProtocolVersion::GetSupported();
-
-                    //ProtocolVersion version = ProtocolVersion::GetCurrent();
-
-                    //if (!version.IsSupported())
-                    //    version = ProtocolVersion::GetCurrent();
-
-                    //for (ProtocolVersion::VersionSet::const_iterator it = supported.begin(); it != supported.end(); ++it)
-                    //{
-                    //    protocolVersionComboBox->AddString(it->ToString());
-
-                    //    if (*it == version)
-                    //        protocolVersionComboBox->SetSelection(id);
-
-                    //    ++id;
-                    //}
-
-                    //rowPos += INTERVAL + ROW_HEIGHT;
-
                     connectionSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
                         "Connection Settings", ChildId::CONNECTION_SETTINGS_GROUP_BOX);
 
                     return rowPos - posY;
                 }
-
-                // comment out authSettingsGroup because they are no longer needed 
-                /* 
-                int DsnConfigurationWindow::CreateAuthSettingsGroup(int posX, int posY, int sizeX)
-                {
-                    enum { LABEL_WIDTH = 120 };
-
-                    int labelPosX = posX + INTERVAL;
-
-                    int editSizeX = sizeX - LABEL_WIDTH - 3 * INTERVAL;
-                    int editPosX = labelPosX + LABEL_WIDTH + INTERVAL;
-
-                    int rowPos = posY + 2 * INTERVAL;
-
-                    const char* val = config.GetHostname().c_str();
-                    hostnameLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, 
-                        "Hostname :", ChildId::HOST_NAME_LABEL);
-                    hostnameEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, 
-                        val, ChildId::HOST_NAME_EDIT);
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
-                    std::string tmp = common::LexicalCast<std::string>(config.GetTcpPort());
-                    val = tmp.c_str();
-                    portLabel = CreateLabel(
-                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Port:", ChildId::PORT_LABEL);
-                    portEdit = CreateEdit(
-                        editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                        val, ChildId::PORT_EDIT, ES_NUMBER);
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
-                    val = config.GetDatabase().c_str();
-                    databaseLabel =
-                        CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                                    "Database :", ChildId::DATABASE_LABEL);
-                    databaseEdit = CreateEdit(editPosX, rowPos, editSizeX,
-                                          ROW_HEIGHT, val, ChildId::DATABASE_EDIT);
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
-                    val = config.GetUser().c_str();
-                    userLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, "User :", ChildId::USER_LABEL);
-                    userEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::USER_EDIT);
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
-                    val = config.GetPassword().c_str();
-                    passwordLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Password:", ChildId::PASSWORD_LABEL);
-                    passwordEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                        val, ChildId::USER_EDIT, ES_PASSWORD);
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
-                    authSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
-                        "Authentication Settings", ChildId::AUTH_SETTINGS_GROUP_BOX);
-
-                    return rowPos - posY;
-                }
-                */
 
                 int DsnConfigurationWindow::CreateSshSettingsGroup(int posX, int posY, int sizeX) 
                 {
@@ -425,51 +321,6 @@ namespace ignite
                     return rowPos - posY;
                 }
 
-                // old SSL settings group code for 1 column config window
-                /*
-                int DsnConfigurationWindow::CreateSslSettingsGroup(int posX, int posY, int sizeX)
-                {   // TODO: rename function name from Ssl to TLS after UI works
-                  
-                    enum { LABEL_WIDTH = 120 };
-
-                    int labelPosX = posX + INTERVAL;
-
-                    int editSizeX = sizeX - LABEL_WIDTH - 3 * INTERVAL;
-                    int editPosX = labelPosX + LABEL_WIDTH + INTERVAL;
-
-                    int rowPos = posY + 2 * INTERVAL;
-
-                    int checkBoxSize = (sizeX - 3 * INTERVAL) / 2;
-
-                    tlsCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                        "TLS", ChildId::TLS_CHECK_BOX, config.IsTls());
-
-                    tlsAllowInvalidHostnamesCheckBox = CreateCheckBox(
-                        labelPosX + checkBoxSize + INTERVAL, rowPos,
-                        checkBoxSize, ROW_HEIGHT, "TLS Allow Invalid Hostnames",
-                        ChildId::TLS_ALLOW_INVALID_HOSTNAMES_CHECK_BOX,
-                        config.IsTlsAllowInvalidHostnames());
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
-                    const char* val = config.GetTlsCaFile().c_str();
-                    tlsCaFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                                    "TLS Certificate Authority:", ChildId::TLS_CA_FILE_LABEL);
-                    tlsCaFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
-                                   ChildId::TLS_CA_FILE_EDIT);
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
-                    sslSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
-                        "TLS/SSL settings", ChildId::SSL_SETTINGS_GROUP_BOX);
-
-                    tlsCheckBox->SetEnabled(tlsCheckBox->IsChecked());
-                    tlsCaFileEdit->SetEnabled(tlsCheckBox->IsChecked());
-
-                    return rowPos - posY;
-                }
-                */
-
                 int DsnConfigurationWindow::CreateTlsSettingsGroup(int posX, int posY, int sizeX)
                 {   // TODO: rename function name from Ssl to TLS after UI works
 
@@ -513,99 +364,6 @@ namespace ignite
 
                     return rowPos - posY;
                 }
-
-                // old additional settings group code for 1 column window
-                /*
-                int DsnConfigurationWindow::CreateAdditionalSettingsGroup(int posX, int posY, int sizeX)
-                {
-                    enum { LABEL_WIDTH = 130 }; // -AL- different definition from above. I can also change it to the same
-
-                    int labelPosX = posX + INTERVAL;
-
-                    int editSizeX = sizeX - LABEL_WIDTH - 3 * INTERVAL;
-                    int editPosX = labelPosX + LABEL_WIDTH + INTERVAL;
-
-                    int checkBoxSize = (sizeX - 3 * INTERVAL) / 2;
-
-                    int rowPos = posY + 2 * INTERVAL;
-
-                    const char* val = config.GetApplicationName().c_str();
-
-                    appNameLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH,
-                        ROW_HEIGHT, "Application Name:", ChildId::APP_NAME_LABEL);
-                    appNameEdit = CreateEdit(editPosX, rowPos, editSizeX,
-                        ROW_HEIGHT, val, ChildId::APP_NAME_EDIT);
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
-                    std::string tmp = common::LexicalCast< std::string >(config.GetLoginTimeoutSeconds());  
-                    val = tmp.c_str(); 
-                    loginTimeoutSecLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH,
-                        ROW_HEIGHT, "Login Timeout (s):", ChildId::LOGIN_TIMEOUT_SEC_LABEL);
-
-                    loginTimeoutSecEdit = CreateEdit(editPosX, rowPos, editSizeX,
-                        ROW_HEIGHT, val, ChildId::LOGIN_TIMEOUT_SEC_EDIT, ES_NUMBER);
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
-                    // useful draft code for changing read preference into a mode (check JDBC page for available options)
-                    // const char* val = sslModeStr.c_str();
-
-                    // sslModeLabel = CreateLabel(labelPosX, rowPos,
-                    // LABEL_WIDTH, ROW_HEIGHT,
-                    //    "SSL Mode:", ChildId::SSL_MODE_LABEL);
-                    // sslModeComboBox = CreateComboBox(editPosX, rowPos,
-                    // editSizeX, ROW_HEIGHT,
-                    //    "", ChildId::SSL_MODE_COMBO_BOX);
-
-                    // sslModeComboBox->AddString("disable");
-                    // sslModeComboBox->AddString("require");
-
-                    // sslModeComboBox->SetSelection(sslMode); // set default
-                    // value to require -AL-
-
-                    // rowPos += INTERVAL + ROW_HEIGHT; // used to add row hight
-                    // I believe
-
-                    val = config.GetReadPreference().c_str();
-
-                    readPreferenceLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Read preference:", ChildId::READ_PREFERENCE_LABEL);
-                    readPreferenceEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
-                                   ChildId::READ_PREFERENCE_EDIT);
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
-                    val = config.GetReplicaSet().c_str();
-
-                    replicaSetLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Replica Set:", ChildId::REPLICA_SET_LABEL);
-                    replicaSetEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
-                                   ChildId::REPLICA_SET_EDIT);
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
-                    retryReadsCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                        "Retry Reads", ChildId::RETRY_READS_CHECK_BOX, config.IsRetryReads());
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
-                    tmp = common::LexicalCast<std::string>(config.GetDefaultFetchSize());
-                    val = tmp.c_str();
-                    defaultFetchSizeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH,
-                        ROW_HEIGHT, "Fetch size:", ChildId::DEFAULT_FETCH_SIZE_LABEL);
-
-                    defaultFetchSizeEdit = CreateEdit(editPosX, rowPos, editSizeX,
-                        ROW_HEIGHT, val, ChildId::DEFAULT_FETCH_SIZE_EDIT, ES_NUMBER);
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
-                    additionalSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
-                        "Additional settings", ChildId::ADDITIONAL_SETTINGS_GROUP_BOX);
-
-                    return rowPos - posY;
-                }
-                */
 
                 int DsnConfigurationWindow::CreateAdditionalSettingsGroup(int posX, int posY, int sizeX) 
                 {
@@ -858,7 +616,6 @@ namespace ignite
                 void DsnConfigurationWindow::RetrieveParameters(config::Configuration& cfg) const
                 {
                     RetrieveConnectionParameters(cfg);
-                    //RetrieveAuthParameters(cfg);
                     RetrieveSshParameters(cfg);
                     RetrieveTlsParameters(cfg);
                     RetrieveAdditionalParameters(cfg);
@@ -867,10 +624,7 @@ namespace ignite
                 void DsnConfigurationWindow::RetrieveConnectionParameters(config::Configuration& cfg) const
                 {
                     std::string dsnStr;
-                    //std::string addressStr;
                     std::string schemaStr;
-                    //std::string versionStr;
-
                     std::string hostnameStr;
                     std::string portStr;
                     std::string databaseStr;
@@ -878,11 +632,8 @@ namespace ignite
                     std::string passwordStr;
 
                     nameEdit->GetText(dsnStr);
-                    //addressEdit->GetText(addressStr);
                     schemaEdit->GetText(schemaStr);
-                    //protocolVersionComboBox->GetText(versionStr);
 
-                    //common::StripSurroundingWhitespaces(addressStr);
                     common::StripSurroundingWhitespaces(dsnStr);
                     // Stripping of whitespaces off the schema skipped intentionally
 
@@ -899,9 +650,7 @@ namespace ignite
 
                     LOG_MSG("Retrieving arguments:");
                     LOG_MSG("DSN:                " << dsnStr);
-                    //LOG_MSG("Address:            " << addressStr);
                     LOG_MSG("Schema:             " << schemaStr);
-                    //LOG_MSG("Protocol version:   " << versionStr);
 
                     // username and password intentionally not logged for security reasons
 
@@ -910,62 +659,20 @@ namespace ignite
 
                     diagnostic::DiagnosticRecordStorage diag;
 
-                    std::vector<EndPoint> addresses;
-
-                    //config::ParseAddress(addressStr, addresses, &diag);
-
                     if (diag.GetStatusRecordsNumber() > 0)
                     {
                         throw IgniteError(IgniteError::IGNITE_ERR_GENERIC,
                             diag.GetStatusRecord(1).GetMessageText().c_str());
                     }
 
-                    //ProtocolVersion version = ProtocolVersion::FromString(versionStr);
-
-                    /*if (!version.IsSupported())
-                        throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, "Protocol version is not supported.");*/
-
                     cfg.SetDsn(dsnStr);
-                    //cfg.SetAddresses(addresses);
                     cfg.SetDatabase(schemaStr);
-                    //cfg.SetProtocolVersion(version);
-
                     cfg.SetTcpPort(port);
                     cfg.SetHostname(hostnameStr);
                     cfg.SetDatabase(databaseStr);
                     cfg.SetUser(userStr);
                     cfg.SetPassword(passwordStr);
                 }
-
-                // comment out because no longer needed
-                /*
-                void DsnConfigurationWindow::RetrieveAuthParameters(config::Configuration& cfg) const
-                {
-                    std::string hostnameStr;
-                    std::string portStr;
-                    std::string databaseStr;
-                    std::string userStr;
-                    std::string passwordStr;
-
-                    hostnameEdit->GetText(hostnameStr);
-                    portEdit->GetText(portStr);
-                    databaseEdit->GetText(databaseStr);
-                    userEdit->GetText(userStr);
-                    passwordEdit->GetText(passwordStr);
-
-                    int16_t port =
-                        common::LexicalCast<int16_t>(portStr);
-
-                    if (port <= 0)
-                        port = config.GetTcpPort();
-
-                    cfg.SetTcpPort(port);
-                    cfg.SetHostname(hostnameStr);
-                    cfg.SetDatabase(databaseStr);
-                    cfg.SetUser(userStr);
-                    cfg.SetPassword(passwordStr);
-                }
-                */
 
                 void DsnConfigurationWindow::RetrieveSshParameters(config::Configuration& cfg) const
                 {
