@@ -76,6 +76,14 @@ namespace ignite
                     defaultFetchSizeEdit(),
                     protocolVersionLabel(),
                     protocolVersionComboBox(),
+                    //driverLabel(),
+                    //driverEdit(),
+                    databaseLabel(),
+                    databaseEdit(),
+                    hostnameLabel(),
+                    hostnameEdit(),
+                    portLabel(),
+                    portEdit(),
                     userLabel(),
                     userEdit(),
                     passwordLabel(),
@@ -83,7 +91,8 @@ namespace ignite
                     okButton(),
                     cancelButton(),
                     config(config),
-                    accepted(false)
+                    accepted(false),
+                    created(false)
                 {
                     // No-op.
                 }
@@ -148,6 +157,13 @@ namespace ignite
                     okButton = CreateButton(okPosX, groupPosYRight, BUTTON_WIDTH, BUTTON_HEIGHT, "Ok", ChildId::OK_BUTTON);
                     cancelButton = CreateButton(cancelPosX, groupPosYRight, BUTTON_WIDTH, BUTTON_HEIGHT,
                         "Cancel", ChildId::CANCEL_BUTTON);
+
+                    // check whether the required fields are filled. If not, Ok button is disabled.
+                    created = true;
+                    okButton->SetEnabled(
+                        userEdit->HasText() && passwordEdit->HasText()
+                        && databaseEdit->HasText() && hostnameEdit->HasText()
+                        && portEdit->HasText());
 
                     // original code by Ignite
                     //okButton = CreateButton(okPosX, groupPosY, BUTTON_WIDTH, BUTTON_HEIGHT, "Ok", ChildId::OK_BUTTON);
@@ -232,7 +248,35 @@ namespace ignite
 
                     int rowPos = posY + 2 * INTERVAL;
 
-                    const char* val = config.GetUser().c_str();
+                    const char* val = config.GetHostname().c_str();
+                    hostnameLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, 
+                        "Hostname :", ChildId::HOST_NAME_LABEL);
+                    hostnameEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, 
+                        val, ChildId::HOST_NAME_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    std::string tmp = common::LexicalCast<std::string>(config.GetTcpPort());
+                    val = tmp.c_str();
+                    portLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Port:", ChildId::PORT_LABEL);
+                    portEdit = CreateEdit(
+                        editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                        val, ChildId::PORT_EDIT, ES_NUMBER);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    val = config.GetDatabase().c_str();
+                    databaseLabel =
+                        CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                    "Database :", ChildId::DATABASE_LABEL);
+                    databaseEdit = CreateEdit(editPosX, rowPos, editSizeX,
+                                          ROW_HEIGHT, val, ChildId::DATABASE_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    val = config.GetUser().c_str();
                     userLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, "User :", ChildId::USER_LABEL);
                     userEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::USER_EDIT);
 
@@ -554,7 +598,6 @@ namespace ignite
                     // rowPos += INTERVAL + ROW_HEIGHT; // used to add row hight
                     // I believe
 
-                    //TODO readPreference
                     ReadPreference::Type readPreference = config.GetReadPreference();
                     std::string readPreferenceStr = ReadPreference::ToString(readPreference);
 
@@ -666,6 +709,25 @@ namespace ignite
 
                                     break;
                                 }
+
+                                case ChildId::HOST_NAME_EDIT:
+                                case ChildId::PORT_EDIT:
+                                case ChildId::DATABASE_EDIT:
+                                case ChildId::USER_EDIT:
+                                case ChildId::PASSWORD_EDIT:
+                                { 
+                                    // if window has been created. Check
+                                    if (created) {
+                                        okButton->SetEnabled(
+                                            userEdit->HasText() 
+                                            && passwordEdit->HasText() 
+                                            && databaseEdit->HasText() 
+                                            && hostnameEdit->HasText() 
+                                            && portEdit->HasText());                                   
+                                    }
+                                    break;
+                                }
+
 
                                 case ChildId::SSH_ENABLE_CHECK_BOX: 
                                 {
@@ -798,14 +860,29 @@ namespace ignite
 
                 void DsnConfigurationWindow::RetrieveAuthParameters(config::Configuration& cfg) const
                 {
-                    std::string user;
-                    std::string password;
+                    std::string hostnameStr;
+                    std::string portStr;
+                    std::string databaseStr;
+                    std::string userStr;
+                    std::string passwordStr;
 
-                    userEdit->GetText(user);
-                    passwordEdit->GetText(password);
+                    hostnameEdit->GetText(hostnameStr);
+                    portEdit->GetText(portStr);
+                    databaseEdit->GetText(databaseStr);
+                    userEdit->GetText(userStr);
+                    passwordEdit->GetText(passwordStr);
 
-                    cfg.SetUser(user);
-                    cfg.SetPassword(password);
+                    int16_t port =
+                        common::LexicalCast<int16_t>(portStr);
+
+                    if (port <= 0)
+                        port = config.GetTcpPort();
+
+                    cfg.SetTcpPort(port);
+                    cfg.SetHostname(hostnameStr);
+                    cfg.SetDatabase(databaseStr);
+                    cfg.SetUser(userStr);
+                    cfg.SetPassword(passwordStr);
                 }
 
                 void DsnConfigurationWindow::RetrieveSshParameters(config::Configuration& cfg) const

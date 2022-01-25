@@ -87,6 +87,14 @@ namespace ignite
                             TLS_ALLOW_INVALID_HOSTNAMES_CHECK_BOX,
                             TLS_CA_FILE_EDIT,
                             TLS_CA_FILE_LABEL,
+                            DRIVER_LABEL,
+                            DRIVER_EDIT,
+                            DATABASE_LABEL,
+                            DATABASE_EDIT,
+                            HOST_NAME_LABEL,
+                            HOST_NAME_EDIT,
+                            PORT_LABEL,
+                            PORT_EDIT,
                             USER_LABEL,
                             USER_EDIT,
                             PASSWORD_LABEL,
@@ -376,6 +384,30 @@ namespace ignite
                     /** TLS certificate authority file edit. */
                     std::auto_ptr<Window> tlsCaFileEdit;
 
+                    ///** Driver label. */
+                    //std::auto_ptr<Window> driverLabel;
+
+                    ///** Driver edit. */
+                    //std::auto_ptr<Window> driverEdit;
+
+                    /** Database label. */
+                    std::auto_ptr<Window> databaseLabel;
+
+                    /** Database edit. */
+                    std::auto_ptr<Window> databaseEdit;
+
+                    /** Hostname label. */
+                    std::auto_ptr<Window> hostnameLabel;
+
+                    /** Hostname edit. */
+                    std::auto_ptr<Window> hostnameEdit;
+
+                    /** Port label. */
+                    std::auto_ptr<Window> portLabel;
+
+                    /** Port edit. */
+                    std::auto_ptr<Window> portEdit;
+
                     /** User label. */
                     std::auto_ptr<Window> userLabel;
 
@@ -393,6 +425,9 @@ namespace ignite
 
                     /** Flag indicating whether OK option was selected. */
                     bool accepted;
+
+                    /** Flag indicating whether the configuration window has been created. */
+                    bool created;
                 };
             }
         }
