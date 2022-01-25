@@ -930,9 +930,9 @@ namespace ignite
 
                     tlsCaFileEdit->GetText(tlsCaStr);
 
-                    LOG_MSG("TLS/SSL Encryption:          " << (tls ? "true" : "false"));
-                    LOG_MSG("tls Allow Invalid Hostnames: " << (tlsAllowInvalidHostnames ? "true" : "false"));
-                    LOG_MSG("TLS CA (Certificate Authority):                      " << tlsCaStr);
+                    LOG_MSG("TLS/SSL Encryption:                       " << (tls ? "true" : "false"));
+                    LOG_MSG("tls Allow Invalid Hostnames:              " << (tlsAllowInvalidHostnames ? "true" : "false"));
+                    LOG_MSG("TLS CA (Certificate Authority) File name: " << tlsCaStr);
 
                     cfg.SetTls(tls);
                     cfg.SetTlsAllowInvalidHostnames(tlsAllowInvalidHostnames);
