@@ -160,17 +160,18 @@ namespace ignite
                 }
 
                 bool Window::HasText() const {
-                    if (!IsEnabled()) {
-                        return false;
-                    }
+                    return IsEnabled() && GetWindowTextLength(handle) > 0;
+                    //if (!IsEnabled()) {
+                    //    return false;
+                    //}
 
-                    int len = GetWindowTextLength(handle);
+                    //int len = GetWindowTextLength(handle);
 
-                    if (len <= 0) {
-                        return false;
-                    }
+                    //if (len <= 0) {
+                    //    return false;
+                    //}
 
-                    return true;
+                    //return true;
                 }
 
                 bool Window::IsChecked() const
