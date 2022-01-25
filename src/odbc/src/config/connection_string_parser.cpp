@@ -20,10 +20,8 @@
 #include "ignite/common/utils.h"
 
 #include "ignite/odbc/utility.h"
-//#include "ignite/odbc/ssl_mode.h"
 #include "ignite/odbc/config/connection_string_parser.h"
 #include "ignite/odbc/config/config_tools.h"
-//#include "ignite/odbc/nested_tx_mode.h"
 
 namespace ignite
 {
