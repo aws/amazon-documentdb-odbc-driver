@@ -22,7 +22,7 @@
 #include "ignite/odbc/system/ui/custom_window.h"
 // TODO: Removed these from configuration.h since no longer used. Moved here since they are still referenced. Remove when no longer needed.
 #include "ignite/odbc/nested_tx_mode.h"
-#include "ignite/odbc/protocol_version.h"
+//#include "ignite/odbc/protocol_version.h"
 #include "ignite/odbc/ssl_mode.h"
 
 namespace ignite
@@ -52,8 +52,8 @@ namespace ignite
                             //AUTH_SETTINGS_GROUP_BOX,
                             NAME_EDIT,
                             NAME_LABEL,
-                            ADDRESS_EDIT,
-                            ADDRESS_LABEL,
+                            //ADDRESS_EDIT,
+                            //ADDRESS_LABEL,
                             SCHEMA_EDIT,
                             SCHEMA_LABEL,
                             SSH_ENABLE_CHECK_BOX,
@@ -79,8 +79,8 @@ namespace ignite
                             RETRY_READS_CHECK_BOX,
                             DEFAULT_FETCH_SIZE_EDIT,
                             DEFAULT_FETCH_SIZE_LABEL,
-                            PROTOCOL_VERSION_LABEL,
-                            PROTOCOL_VERSION_COMBO_BOX,
+                            //PROTOCOL_VERSION_LABEL,
+                            //PROTOCOL_VERSION_COMBO_BOX,
                             //NESTED_TX_MODE_LABEL,
                             //NESTED_TX_MODE_COMBO_BOX,
                             TLS_CHECK_BOX,
@@ -360,11 +360,11 @@ namespace ignite
                     /** Default fetch size label. */
                     std::auto_ptr<Window> defaultFetchSizeLabel;
 
-                    /** Protocol version edit field. */
-                    std::auto_ptr<Window> protocolVersionLabel;
+                    ///** Protocol version edit field. */
+                    //std::auto_ptr<Window> protocolVersionLabel;
 
-                    /** Protocol verion ComboBox. */
-                    std::auto_ptr<Window> protocolVersionComboBox;
+                    ///** Protocol verion ComboBox. */
+                    //std::auto_ptr<Window> protocolVersionComboBox;
 
                     /** Ok button. */
                     std::auto_ptr<Window> okButton;

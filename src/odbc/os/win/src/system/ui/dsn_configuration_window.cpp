@@ -74,8 +74,8 @@ namespace ignite
                     retryReadsCheckBox(),
                     defaultFetchSizeLabel(),
                     defaultFetchSizeEdit(),
-                    protocolVersionLabel(),
-                    protocolVersionComboBox(),
+                    //protocolVersionLabel(),
+                    //protocolVersionComboBox(),
                     //driverLabel(),
                     //driverEdit(),
                     databaseLabel(),
@@ -249,31 +249,31 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    protocolVersionLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Protocol Version:", ChildId::PROTOCOL_VERSION_LABEL);
-                    protocolVersionComboBox = CreateComboBox(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                        "Protocol Version", ChildId::PROTOCOL_VERSION_COMBO_BOX);
+                    //protocolVersionLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                    //    "Protocol Version:", ChildId::PROTOCOL_VERSION_LABEL);
+                    //protocolVersionComboBox = CreateComboBox(editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                    //    "Protocol Version", ChildId::PROTOCOL_VERSION_COMBO_BOX);
 
-                    int id = 0;
+                    //int id = 0;
 
-                    const ProtocolVersion::VersionSet& supported = ProtocolVersion::GetSupported();
+                    //const ProtocolVersion::VersionSet& supported = ProtocolVersion::GetSupported();
 
-                    ProtocolVersion version = ProtocolVersion::GetCurrent();
+                    //ProtocolVersion version = ProtocolVersion::GetCurrent();
 
-                    if (!version.IsSupported())
-                        version = ProtocolVersion::GetCurrent();
+                    //if (!version.IsSupported())
+                    //    version = ProtocolVersion::GetCurrent();
 
-                    for (ProtocolVersion::VersionSet::const_iterator it = supported.begin(); it != supported.end(); ++it)
-                    {
-                        protocolVersionComboBox->AddString(it->ToString());
+                    //for (ProtocolVersion::VersionSet::const_iterator it = supported.begin(); it != supported.end(); ++it)
+                    //{
+                    //    protocolVersionComboBox->AddString(it->ToString());
 
-                        if (*it == version)
-                            protocolVersionComboBox->SetSelection(id);
+                    //    if (*it == version)
+                    //        protocolVersionComboBox->SetSelection(id);
 
-                        ++id;
-                    }
+                    //    ++id;
+                    //}
 
-                    rowPos += INTERVAL + ROW_HEIGHT;
+                    //rowPos += INTERVAL + ROW_HEIGHT;
 
                     connectionSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
                         "Connection Settings", ChildId::CONNECTION_SETTINGS_GROUP_BOX);
@@ -862,7 +862,7 @@ namespace ignite
                     std::string dsnStr;
                     //std::string addressStr;
                     std::string schemaStr;
-                    std::string versionStr;
+                    //std::string versionStr;
 
                     std::string hostnameStr;
                     std::string portStr;
@@ -873,7 +873,7 @@ namespace ignite
                     nameEdit->GetText(dsnStr);
                     //addressEdit->GetText(addressStr);
                     schemaEdit->GetText(schemaStr);
-                    protocolVersionComboBox->GetText(versionStr);
+                    //protocolVersionComboBox->GetText(versionStr);
 
                     //common::StripSurroundingWhitespaces(addressStr);
                     common::StripSurroundingWhitespaces(dsnStr);
@@ -894,7 +894,7 @@ namespace ignite
                     LOG_MSG("DSN:                " << dsnStr);
                     //LOG_MSG("Address:            " << addressStr);
                     LOG_MSG("Schema:             " << schemaStr);
-                    LOG_MSG("Protocol version:   " << versionStr);
+                    //LOG_MSG("Protocol version:   " << versionStr);
 
                     // username and password intentionally not logged for security reasons
 
@@ -913,10 +913,10 @@ namespace ignite
                             diag.GetStatusRecord(1).GetMessageText().c_str());
                     }
 
-                    ProtocolVersion version = ProtocolVersion::FromString(versionStr);
+                    //ProtocolVersion version = ProtocolVersion::FromString(versionStr);
 
-                    if (!version.IsSupported())
-                        throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, "Protocol version is not supported.");
+                    /*if (!version.IsSupported())
+                        throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, "Protocol version is not supported.");*/
 
                     cfg.SetDsn(dsnStr);
                     //cfg.SetAddresses(addresses);
