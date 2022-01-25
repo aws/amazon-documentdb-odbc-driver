@@ -408,7 +408,7 @@ namespace ignite
                         if (diag)
                         {
                             diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
-                                MakeErrorMessage("Default fetch size attribute value is too large."
+                                MakeErrorMessage("Scan limit size attribute value is too large."
                                     " Using default value.", key, value));
                         }
 

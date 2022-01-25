@@ -684,7 +684,7 @@ namespace ignite
             return jdbConnectionString;
         }
 
-         /**
+        /**
          * Create JVM options from configuration.
          *
          * @param cfg Configuration.
