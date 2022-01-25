@@ -422,8 +422,8 @@ namespace ignite
 
                 int DsnConfigurationWindow::CreateSslSettingsGroup(int posX, int posY, int sizeX)
                 {   // TODO: rename function name from Ssl to TLS after UI works
-                  
-                    enum { LABEL_WIDTH = 120 };
+
+                    enum { LABEL_WIDTH = 100 };
 
                     int labelPosX = posX + INTERVAL;
 
@@ -449,7 +449,7 @@ namespace ignite
 
                     const char* val = config.GetTlsCaFile().c_str();
                     tlsCaFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                                    "TLS Certificate Authority:", ChildId::TLS_CA_FILE_LABEL);
+                                    "TLS CA File:", ChildId::TLS_CA_FILE_LABEL);
                     tlsCaFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
                                    ChildId::TLS_CA_FILE_EDIT);
 
