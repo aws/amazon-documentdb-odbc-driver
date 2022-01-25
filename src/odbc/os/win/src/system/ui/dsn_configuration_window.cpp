@@ -124,8 +124,10 @@ namespace ignite
                     int groupPosYLeft = MARGIN;
                     //int groupSizeY = width - 2 * MARGIN; // original 
                     int groupSizeY = width / 2 - 2 * MARGIN;
-                    int posXRight = MARGIN + (width - MARGIN) / 2;
+                    int posXRight = width / 2 + MARGIN;
+                    //int posXRight = MARGIN + (width - MARGIN) / 2;
                     //int posXRight = MARGIN + groupSizeY;
+                    //int posXRight = 2 * MARGIN + groupSizeY;
                     int groupPosYRight = MARGIN;
 
                     // create left column group settings
