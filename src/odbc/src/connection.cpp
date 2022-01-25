@@ -639,7 +639,7 @@ namespace ignite
 
         std::string Connection::FormatJdbcConnectionString() const {
             std::string host = "localhost";
-            uint16_t port = 27017;
+            std::string port = "27017";
             std::string jdbConnectionString;
 
             if (config.IsHostnameSet()) {
@@ -647,7 +647,7 @@ namespace ignite
             }
 
             if (config.IsPortSet()) {
-                port = config.GetPort();
+                port = std::to_string(config.GetPort());
             }
 
             jdbConnectionString = "jdbc:documentdb:";
