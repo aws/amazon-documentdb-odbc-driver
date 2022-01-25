@@ -243,12 +243,6 @@ namespace ignite
                     /** DSN name edit field. */
                     std::auto_ptr<Window> nameEdit;
 
-                    /** DSN address edit field label. */
-                    std::auto_ptr<Window> addressLabel;
-
-                    /** DSN address edit field. */
-                    std::auto_ptr<Window> addressEdit;
-
                     /** DSN schema edit field label. */
                     std::auto_ptr<Window> schemaLabel;
 
