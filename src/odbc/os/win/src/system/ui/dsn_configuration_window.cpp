@@ -46,8 +46,6 @@ namespace ignite
                     additionalSettingsGroupBox(),
                     nameLabel(),
                     nameEdit(),
-                    addressLabel(),
-                    addressEdit(),
                     schemaLabel(),
                     schemaEdit(),
                     // internal SSH tunnel vars
