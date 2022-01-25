@@ -204,8 +204,8 @@ namespace ignite
 
             SettableValue<std::string> sshKnownHostsFile = ReadDsnString(dsn, ConnectionStringParser::Key::sshKnownHostsFile);
 
-            if (sshKnownHostsFile.IsSet() && !config.IsSshStrictHostKeyCheckingSet())
-                config.SetSshStrictHostKeyChecking(sshStrictHostKeyChecking.GetValue());
+            if (sshKnownHostsFile.IsSet() && !config.IsSshKnownHostsFileSet())
+                config.SetSshKnownHostsFile(sshKnownHostsFile.GetValue());
 
             SettableValue<std::string> scanMethod = ReadDsnString(dsn, ConnectionStringParser::Key::scanMethod);
 
