@@ -506,7 +506,7 @@ namespace ignite
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     tlsSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
-                        "TLS/SSL Settings", ChildId::SSL_SETTINGS_GROUP_BOX);
+                        "TLS/SSL Settings", ChildId::TLS_SETTINGS_GROUP_BOX);
 
                     tlsAllowInvalidHostnamesCheckBox->SetEnabled(tlsCheckBox->IsChecked());
                     tlsCaFileEdit->SetEnabled(tlsCheckBox->IsChecked());

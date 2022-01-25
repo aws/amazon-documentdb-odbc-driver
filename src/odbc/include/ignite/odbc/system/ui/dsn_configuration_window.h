@@ -47,7 +47,7 @@ namespace ignite
                         {
                             CONNECTION_SETTINGS_GROUP_BOX = 100,
                             SSH_SETTINGS_GROUP_BOX,
-                            SSL_SETTINGS_GROUP_BOX,
+                            TLS_SETTINGS_GROUP_BOX,
                             ADDITIONAL_SETTINGS_GROUP_BOX,
                             //AUTH_SETTINGS_GROUP_BOX,
                             NAME_EDIT,
@@ -183,7 +183,7 @@ namespace ignite
                     void RetrieveSshParameters(config::Configuration& cfg) const;
 
                     /**
-                     * Retrieves current values from the SSL UI group and
+                     * Retrieves current values from the TLS/SSL UI group and
                      * stores them to the specified configuration.
                      *
                      * @param cfg Configuration.
@@ -229,7 +229,7 @@ namespace ignite
                     int CreateSshSettingsGroup(int posX, int posY, int sizeX);
 
                     /**
-                     * Create SSL settings group box.
+                     * Create TLS/SSL settings group box.
                      *
                      * @param posX X position.
                      * @param posY Y position.
