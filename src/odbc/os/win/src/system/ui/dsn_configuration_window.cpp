@@ -349,7 +349,7 @@ namespace ignite
 
                     val = config.GetSshKnownHostsFile().c_str();
                     sshKnownHostsFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                                    "SSH Known Hosts:", ChildId::SSH_KNOWN_HOSTS_FILE_LABEL);
+                                    "SSH Known Hosts File:", ChildId::SSH_KNOWN_HOSTS_FILE_LABEL);
                     sshKnownHostsFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
                                    ChildId::SSH_KNOWN_HOSTS_FILE_EDIT);
 
