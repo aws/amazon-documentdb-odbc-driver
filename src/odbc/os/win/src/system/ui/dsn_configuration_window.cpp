@@ -19,8 +19,7 @@
 #include <Shlwapi.h>
 
 #include "ignite/odbc/log.h"
-#include "ignite/odbc/read_preference.h" // causes build errors, comment out momentarily 
-// #include "ignite/odbc/ssl_mode.h" //TODO remove later
+#include "ignite/odbc/read_preference.h"
 
 #include "ignite/odbc/system/ui/dsn_configuration_window.h"
 #include "ignite/odbc/config/config_tools.h"
@@ -512,7 +511,8 @@ namespace ignite
                 }
                 */
 
-                int DsnConfigurationWindow::CreateAdditionalSettingsGroup(int posX, int posY, int sizeX) {
+                int DsnConfigurationWindow::CreateAdditionalSettingsGroup(int posX, int posY, int sizeX) 
+                {
                     enum { LABEL_WIDTH = 130 };  // -AL- different definition from above. I can also
                         // change it to the same
 
@@ -879,7 +879,7 @@ namespace ignite
                     loginTimeoutSecEdit->GetText(loginTimeoutSecStr);
 
                     int32_t loginTimeoutSec =
-                        common::LexicalCast< int32_t >(loginTimeoutSecStr);
+                        common::LexicalCast<int32_t>(loginTimeoutSecStr);
 
                     if (loginTimeoutSec <= 0)
                         loginTimeoutSec = config.GetLoginTimeoutSeconds();
@@ -889,7 +889,7 @@ namespace ignite
                     defaultFetchSizeEdit->GetText(fetchSizeStr);
 
                     int32_t fetchSize =
-                        common::LexicalCast< int32_t >(fetchSizeStr);
+                        common::LexicalCast<int32_t>(fetchSizeStr);
 
                     if (fetchSize <= 0)
                         fetchSize = config.GetDefaultFetchSize();
