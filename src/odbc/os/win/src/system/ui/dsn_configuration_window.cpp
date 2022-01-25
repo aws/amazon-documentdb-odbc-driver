@@ -41,7 +41,7 @@ namespace ignite
                     //width(360),
                     //height(800),
                     connectionSettingsGroupBox(),
-                    sslSettingsGroupBox(), // has a create... function defined 
+                    tlsSettingsGroupBox(), // has a create... function defined 
                     tlsCheckBox(), 
                     //authSettingsGroupBox(),
                     additionalSettingsGroupBox(),
@@ -141,8 +141,8 @@ namespace ignite
 
                     // create left column group settings
                     groupPosYLeft += INTERVAL + CreateConnectionSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
-                    groupPosYLeft += INTERVAL + CreateSslSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
                     //groupPosYLeft += INTERVAL + CreateAuthSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
+                    groupPosYLeft += INTERVAL + CreateTlsSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
                     // create right column group settings 
                     groupPosYRight += INTERVAL + CreateSshSettingsGroup(posXRight, groupPosYRight, groupSizeY);
                     groupPosYRight += INTERVAL + CreateAdditionalSettingsGroup(posXRight, groupPosYRight, groupSizeY);
@@ -467,7 +467,7 @@ namespace ignite
                 }
                 */
 
-                int DsnConfigurationWindow::CreateSslSettingsGroup(int posX, int posY, int sizeX)
+                int DsnConfigurationWindow::CreateTlsSettingsGroup(int posX, int posY, int sizeX)
                 {   // TODO: rename function name from Ssl to TLS after UI works
 
                     enum { LABEL_WIDTH = 100 };
@@ -502,7 +502,7 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    sslSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
+                    tlsSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
                         "TLS/SSL Settings", ChildId::SSL_SETTINGS_GROUP_BOX);
 
                     tlsAllowInvalidHostnamesCheckBox->SetEnabled(tlsCheckBox->IsChecked());
@@ -853,7 +853,7 @@ namespace ignite
                     RetrieveConnectionParameters(cfg);
                     //RetrieveAuthParameters(cfg);
                     RetrieveSshParameters(cfg);
-                    RetrieveSslParameters(cfg);
+                    RetrieveTlsParameters(cfg);
                     RetrieveAdditionalParameters(cfg);
                 }
 
@@ -996,7 +996,7 @@ namespace ignite
 
                 }
 
-                void DsnConfigurationWindow::RetrieveSslParameters(config::Configuration& cfg) const
+                void DsnConfigurationWindow::RetrieveTlsParameters(config::Configuration& cfg) const
                 {
 
                     bool tls = tlsCheckBox->IsChecked();

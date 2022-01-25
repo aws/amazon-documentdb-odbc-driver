@@ -30,7 +30,7 @@ namespace ignite
     {
         namespace config
         {
-
+            // Connection Settings
             const std::string Configuration::DefaultValue::dsn = "DocumentDB DSN";
             const std::string Configuration::DefaultValue::driver = "Amazon DocumentDB ODBC Driver";
             const std::string Configuration::DefaultValue::database = "";

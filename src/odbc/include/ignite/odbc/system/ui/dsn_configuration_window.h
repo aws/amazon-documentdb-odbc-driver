@@ -188,7 +188,7 @@ namespace ignite
                      *
                      * @param cfg Configuration.
                      */
-                    void RetrieveSslParameters(config::Configuration& cfg) const;
+                    void RetrieveTlsParameters(config::Configuration& cfg) const;
 
                     /**
                      * Retrieves current values from the additional UI group and
@@ -236,7 +236,7 @@ namespace ignite
                      * @param sizeX Width.
                      * @return Size by Y.
                      */
-                    int CreateSslSettingsGroup(int posX, int posY, int sizeX);
+                    int CreateTlsSettingsGroup(int posX, int posY, int sizeX);
 
                     /**
                      * Create additional settings group box.
@@ -260,8 +260,8 @@ namespace ignite
                     /** SSH settings group box. */
                     std::auto_ptr<Window> sshSettingsGroupBox;
 
-                    /** SSL settings group box. */
-                    std::auto_ptr<Window> sslSettingsGroupBox;
+                    /** TLS settings group box. */
+                    std::auto_ptr<Window> tlsSettingsGroupBox;
 
                     ///** Authentication settings group box. */
                     //std::auto_ptr<Window> authSettingsGroupBox;
