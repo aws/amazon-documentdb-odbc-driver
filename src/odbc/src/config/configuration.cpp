@@ -63,7 +63,7 @@ namespace ignite
             const std::string Configuration::DefaultValue::appName = "Amazon DocumentDB ODBC Driver";
             const int32_t Configuration::DefaultValue::loginTimeoutSec = 0;
             const ReadPreference::Type Configuration::DefaultValue::readPreference = ReadPreference::Type::PRIMARY;
-            const std::string Configuration::DefaultValue::replicaSet = "";
+            const std::string Configuration::DefaultValue::replicaSet = "rs0";
             const bool Configuration::DefaultValue::retryReads = true;
             const int32_t Configuration::DefaultValue::defaultFetchSize = 2000;
 
