@@ -29,6 +29,8 @@ namespace ignite
 
             common::StripSurroundingWhitespaces(lowerVal);
 
+            common::SpaceToUnderscore(lowerVal);
+
             if (lowerVal == "primary")
                 return ReadPreference::Type::PRIMARY;
 

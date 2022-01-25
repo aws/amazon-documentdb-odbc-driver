@@ -70,7 +70,6 @@ namespace ignite
                     appNameEdit(),
                     readPreferenceLabel(),
                     readPreferenceComboBox(),
-                    //readPreferenceEdit(),
                     replicaSetLabel(),
                     replicaSetEdit(),
                     retryReadsCheckBox(),
@@ -553,7 +552,7 @@ namespace ignite
                     // rowPos += INTERVAL + ROW_HEIGHT; // used to add row hight
                     // I believe
 
-                    /*//TODO readPreference
+                    //TODO readPreference
                     ReadPreference::Type readPreference = config.GetReadPreference();
                     std::string readPreferenceStr = ReadPreference::ToString(readPreference);
 
@@ -566,15 +565,18 @@ namespace ignite
                         editPosX, rowPos, editSizeX, ROW_HEIGHT,
                                        "", ChildId::READ_PREFERENCE_COMBO_BOX);
 
-                    readPreferenceComboBox->AddString("disable");
-                    sslModeComboBox->AddString("require");
+		            readPreferenceComboBox->AddString("Primary");
+                    readPreferenceComboBox->AddString("Primary Preferred");
+                    readPreferenceComboBox->AddString("Secondary");
+                    readPreferenceComboBox->AddString("Secondary Preferred");
+                    readPreferenceComboBox->AddString("Nearest");
 
-                    sslModeComboBox->SetSelection(sslMode); // set default
+                    readPreferenceComboBox->SetSelection(readPreference); // set default
 
                     rowPos += INTERVAL + ROW_HEIGHT;
-                    */
+                    
 
-                    const char* val = config.GetApplicationName().c_str();
+                    val = config.GetApplicationName().c_str();
                     appNameLabel = CreateLabel(
                         labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                         "Application Name:", ChildId::APP_NAME_LABEL);
@@ -862,12 +864,12 @@ namespace ignite
                 void DsnConfigurationWindow::RetrieveAdditionalParameters(config::Configuration& cfg) const
                 {
 
-                    std::string appNameStr;
                     std::string readPreferenceStr;
+                    std::string appNameStr;
                     std::string replicaSetStr;
 
+                    readPreferenceComboBox->GetText(readPreferenceStr);
                     appNameEdit->GetText(appNameStr);
-                    //readPreferenceEdit->GetText(readPreferenceStr);
                     replicaSetEdit->GetText(replicaSetStr);
 
                     bool retryReads = retryReadsCheckBox->IsChecked();
@@ -893,18 +895,21 @@ namespace ignite
                         fetchSize = config.GetDefaultFetchSize();
 
                     LOG_MSG("Retrieving arguments:");
+                    LOG_MSG("Retry reads:              " << (retryReads ? "true" : "false"));
+                    LOG_MSG("Read preference:          " << readPreferenceStr);
                     LOG_MSG("App name:                 " << appNameStr);
                     LOG_MSG("Login timeout (seconds):  " << loginTimeoutSecStr);
-                    LOG_MSG("Read preference:          " << readPreferenceStr);
                     LOG_MSG("Replica Set:              " << replicaSetStr);
-                    LOG_MSG("Retry reads:              " << (retryReads ? "true" : "false"));
                     LOG_MSG("Fetch size:               " << fetchSize);
 
+                    ReadPreference::Type readPreference = ReadPreference::FromString(
+                            readPreferenceStr, ReadPreference::Type::PRIMARY);
+
+                    cfg.SetReadPreference(readPreference);
+                    cfg.SetRetryReads(retryReads);
                     cfg.SetApplicationName(appNameStr);
                     cfg.SetLoginTimeoutSeconds(loginTimeoutSec);
-                    //cfg.SetReadPreference(readPreferenceStr);
                     cfg.SetReplicaSet(replicaSetStr);
-                    cfg.SetRetryReads(retryReads);
                     cfg.SetDefaultFetchSize(fetchSize);
 
                 }
