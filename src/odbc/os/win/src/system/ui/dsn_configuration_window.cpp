@@ -629,8 +629,8 @@ namespace ignite
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     // useful draft code for changing read preference into a
-                    // mode (check JDBC page for available options) const char*
-                    // val = sslModeStr.c_str();
+                    // mode (check JDBC page for available options) 
+                    // const char* val = sslModeStr.c_str();
 
                     // sslModeLabel = CreateLabel(labelPosX, rowPos,
                     // LABEL_WIDTH, ROW_HEIGHT,

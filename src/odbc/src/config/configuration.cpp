@@ -32,10 +32,11 @@ namespace ignite
         {
             // Connection Settings
             const std::string Configuration::DefaultValue::dsn = "DocumentDB DSN";
-            const std::string Configuration::DefaultValue::driver = "Amazon DocumentDB ODBC Driver";
-            const std::string Configuration::DefaultValue::database = "";
-            const std::string Configuration::DefaultValue::hostname = "";
-            const uint16_t Configuration::DefaultValue::port = 27017;
+            const std::string Configuration::DefaultValue::driver = "Amazon DocumentDB ODBC Driver"; // -AL- add (= need to add to UI)
+            // driver does not need to be added in config window since it is chosen at the Data Source Administrator
+            const std::string Configuration::DefaultValue::database = "";  // -AL- add
+            const std::string Configuration::DefaultValue::hostname = ""; // -AL- add
+            const uint16_t Configuration::DefaultValue::port = 27017;  // -AL- add
             const std::string Configuration::DefaultValue::user = "";
             const std::string Configuration::DefaultValue::password = "";
             
