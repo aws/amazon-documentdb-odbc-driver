@@ -234,9 +234,6 @@ namespace ignite
                     /** TLS settings group box. */
                     std::auto_ptr<Window> tlsSettingsGroupBox;
 
-                    ///** Authentication settings group box. */
-                    //std::auto_ptr<Window> authSettingsGroupBox;
-
                     /** Additional settings group box. */
                     std::auto_ptr<Window> additionalSettingsGroupBox;
 
