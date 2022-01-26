@@ -21,8 +21,7 @@
 #include <sstream>
 #include <algorithm>
 
-#include <ignite/common/fixed_size_array.h>
-
+#include <ignite/odbc/ignite_error.h>
 #include <ignite/network/network.h>
 
 #include "ignite/odbc/log.h"
@@ -36,6 +35,10 @@
 #include "ignite/odbc/config/configuration.h"
 #include "ignite/odbc/config/connection_string_parser.h"
 #include "ignite/odbc/system/system_dsn.h"
+#include "ignite/odbc/jni/java.h"
+#include "ignite/odbc/jni/utils.h"
+#include "ignite/odbc/common/concurrent.h"
+#include "ignite/odbc/common/utils.h"
 
 // Uncomment for per-byte debug.
 //#define PER_BYTE_DEBUG
@@ -57,16 +60,16 @@ namespace ignite
     {
         Connection::Connection(Environment* env) :
             env(env),
-            socket(),
             timeout(0),
             loginTimeout(DEFAULT_CONNECT_TIMEOUT),
             autoCommit(true),
             parser(),
             config(),
             info(config),
-            streamingContext()
+            connection(),
+            opts()
         {
-            streamingContext.SetConnection(*this);
+            // No-op
         }
 
         Connection::~Connection()
@@ -143,47 +146,15 @@ namespace ignite
             IGNITE_ODBC_API_CALL(InternalEstablish(cfg));
         }
 
-        SqlResult::Type Connection::InitSocket()
-        {
-            // Removed SSL Mode in DSN. Replaced this with REQUIRE for now.
-            ssl::SslMode::Type sslMode = ssl::SslMode::REQUIRE;
-
-            if (sslMode == ssl::SslMode::DISABLE)
-            {
-                socket.reset(network::ssl::MakeTcpSocketClient());
-
-                return SqlResult::AI_SUCCESS;
-            }
-
-            try
-            {
-                network::ssl::EnsureSslLoaded();
-            }
-            catch (const IgniteError &err)
-            {
-                LOG_MSG("Can not load OpenSSL library: " << err.GetText());
-
-                AddStatusRecord("Can not load OpenSSL library (did you set OPENSSL_HOME environment variable?)");
-
-                return SqlResult::AI_ERROR;
-            }
-
-            // Removed SSL key and cert files from DSN. Replaced with empty string for now.
-            socket.reset(network::ssl::MakeSecureSocketClient(
-                "", "", config.GetTlsCaFile()));
-
-            return SqlResult::AI_SUCCESS;
-        }
-
         SqlResult::Type Connection::InternalEstablish(const config::Configuration& cfg)
         {
             using ssl::SslMode;
 
             config = cfg;
 
-            if (socket.get() != 0)
-            {
-                AddStatusRecord(SqlState::S08002_ALREADY_CONNECTED, "Already connected.");
+            if (connection) {
+                AddStatusRecord(SqlState::S08002_ALREADY_CONNECTED,
+                                "Already connected.");
 
                 return SqlResult::AI_ERROR;
             }
@@ -195,11 +166,15 @@ namespace ignite
                 return SqlResult::AI_ERROR;
             }
 
-            bool connected = TryRestoreConnection();
+            odbc::IgniteError err;
+            bool connected = TryRestoreConnection(err);
 
             if (!connected)
             {
-                AddStatusRecord(SqlState::S08001_CANNOT_CONNECT, "Failed to establish connection with the host.");
+                std::string errMessage = "Failed to establish connection with the host.\n";
+                errMessage.append(err.GetText());
+                AddStatusRecord(
+                    SqlState::S08001_CANNOT_CONNECT, errMessage);
 
                 return SqlResult::AI_ERROR;
             }
@@ -221,7 +196,7 @@ namespace ignite
 
         SqlResult::Type Connection::InternalRelease()
         {
-            if (socket.get() == 0)
+            if (!connection)
             {
                 AddStatusRecord(SqlState::S08003_NOT_CONNECTED, "Connection is not open.");
 
@@ -237,12 +212,19 @@ namespace ignite
 
         void Connection::Close()
         {
-            if (socket.get() != 0)
-            {
-                socket->Close();
-
-                socket.reset();
+            if (connection) {
+                using namespace jni::java;
+                using namespace common::concurrent;
+                SharedPointer< JniContext > ctx(JniContext::Create(&opts[0], static_cast<int>(opts.size()), JniHandlers()));
+                JniErrorInfo errInfo;
+                // NOTE: DocumentDbDisconnect will notify JNI connection is no longer used - must set to nullptr.
+                ctx.Get()->DocumentDbDisconnect(connection, &errInfo);
+                if (errInfo.code != java::IGNITE_JNI_ERR_SUCCESS) {
+                    // TODO: Determine if we need to error check the close.
+                }
+                connection = nullptr;
             }
+            Deinit();
         }
 
         Statement* Connection::CreateStatement()
@@ -270,125 +252,26 @@ namespace ignite
 
         bool Connection::Send(const int8_t* data, size_t len, int32_t timeout)
         {
-            if (socket.get() == 0)
-                throw OdbcError(SqlState::S08003_NOT_CONNECTED, "Connection is not established");
-
-            int32_t newLen = static_cast<int32_t>(len + sizeof(OdbcProtocolHeader));
-
-            common::FixedSizeArray<int8_t> msg(newLen);
-
-            OdbcProtocolHeader *hdr = reinterpret_cast<OdbcProtocolHeader*>(msg.GetData());
-
-            hdr->len = static_cast<int32_t>(len);
-
-            memcpy(msg.GetData() + sizeof(OdbcProtocolHeader), data, len);
-
-            OperationResult::T res = SendAll(msg.GetData(), msg.GetSize(), timeout);
-
-            if (res == OperationResult::TIMEOUT)
-                return false;
-
-            if (res == OperationResult::FAIL)
-                throw OdbcError(SqlState::S08S01_LINK_FAILURE, "Can not send message due to connection failure");
-
-#ifdef PER_BYTE_DEBUG
-            LOG_MSG("message sent: (" <<  msg.GetSize() << " bytes)" << utility::HexDump(msg.GetData(), msg.GetSize()));
-#endif //PER_BYTE_DEBUG
-
+            // TODO: Remove if unnecessary
             return true;
         }
 
         Connection::OperationResult::T Connection::SendAll(const int8_t* data, size_t len, int32_t timeout)
         {
-            int sent = 0;
-
-            while (sent != static_cast<int64_t>(len))
-            {
-                int res = socket->Send(data + sent, len - sent, timeout);
-
-                LOG_MSG("Sent: " << res);
-
-                if (res < 0 || res == network::SocketClient::WaitResult::TIMEOUT)
-                {
-                    Close();
-
-                    return res < 0 ? OperationResult::FAIL : OperationResult::TIMEOUT;
-                }
-
-                sent += res;
-            }
-
-            assert(static_cast<size_t>(sent) == len);
-
+            // TODO: Remove if unnecessary.
+            // No-op
             return OperationResult::SUCCESS;
         }
 
         bool Connection::Receive(std::vector<int8_t>& msg, int32_t timeout)
         {
-            if (socket.get() == 0)
-                throw OdbcError(SqlState::S08003_NOT_CONNECTED, "Connection is not established");
-
-            msg.clear();
-
-            OdbcProtocolHeader hdr;
-
-            OperationResult::T res = ReceiveAll(reinterpret_cast<int8_t*>(&hdr), sizeof(hdr), timeout);
-
-            if (res == OperationResult::TIMEOUT)
-                return false;
-
-            if (res == OperationResult::FAIL)
-                throw OdbcError(SqlState::S08S01_LINK_FAILURE, "Can not receive message header");
-
-            if (hdr.len < 0)
-            {
-                Close();
-
-                throw OdbcError(SqlState::SHY000_GENERAL_ERROR, "Protocol error: Message length is negative");
-            }
-
-            if (hdr.len == 0)
-                return false;
-
-            msg.resize(hdr.len);
-
-            res = ReceiveAll(&msg[0], hdr.len, timeout);
-
-            if (res == OperationResult::TIMEOUT)
-                return false;
-
-            if (res == OperationResult::FAIL)
-                throw OdbcError(SqlState::S08S01_LINK_FAILURE, "Can not receive message body");
-
-#ifdef PER_BYTE_DEBUG
-            LOG_MSG("Message received: " << utility::HexDump(&msg[0], msg.size()));
-#endif //PER_BYTE_DEBUG
-
+            // TODO: Remove if unnecessary.
             return true;
         }
 
         Connection::OperationResult::T Connection::ReceiveAll(void* dst, size_t len, int32_t timeout)
         {
-            size_t remain = len;
-            int8_t* buffer = reinterpret_cast<int8_t*>(dst);
-
-            while (remain)
-            {
-                size_t received = len - remain;
-
-                int res = socket->Receive(buffer + received, remain, timeout);
-                LOG_MSG("Receive res: " << res << " remain: " << remain);
-
-                if (res < 0 || res == network::SocketClient::WaitResult::TIMEOUT)
-                {
-                    Close();
-
-                    return res < 0 ? OperationResult::FAIL : OperationResult::TIMEOUT;
-                }
-
-                remain -= static_cast<size_t>(res);
-            }
-
+            // TODO: Remove if unnecessary.
             return OperationResult::SUCCESS;
         }
 
@@ -444,7 +327,7 @@ namespace ignite
 
                 return SqlResult::AI_ERROR;
             }
-            catch (const IgniteError& err)
+            catch (const odbc::IgniteError& err)
             {
                 AddStatusRecord(err.GetText());
 
@@ -485,7 +368,7 @@ namespace ignite
 
                 return SqlResult::AI_ERROR;
             }
-            catch (const IgniteError& err)
+            catch (const odbc::IgniteError& err)
             {
                 AddStatusRecord(err.GetText());
 
@@ -515,7 +398,7 @@ namespace ignite
                 {
                     SQLUINTEGER *val = reinterpret_cast<SQLUINTEGER*>(buf);
 
-                    *val = socket.get() != 0 ? SQL_CD_FALSE : SQL_CD_TRUE;
+                    *val = connection ? SQL_CD_FALSE : SQL_CD_TRUE;
 
                     if (valueLen)
                         *valueLen = SQL_IS_INTEGER;
@@ -680,7 +563,7 @@ namespace ignite
 
                 return SqlResult::AI_ERROR;
             }
-            catch (const IgniteError& err)
+            catch (const odbc::IgniteError& err)
             {
                 AddStatusRecord(SqlState::S08004_CONNECTION_REJECTED, err.GetText());
 
@@ -715,67 +598,177 @@ namespace ignite
 
         void Connection::EnsureConnected()
         {
-            if (socket.get() != 0)
+            if (connection)
                 return;
 
-            bool success = TryRestoreConnection();
+            odbc::IgniteError err;
+            bool success = TryRestoreConnection(err);
 
             if (!success)
                 throw OdbcError(SqlState::S08001_CANNOT_CONNECT,
                     "Failed to establish connection with any provided hosts");
         }
 
-        bool Connection::TryRestoreConnection()
+        bool Connection::TryRestoreConnection(odbc::IgniteError& err)
         {
-            std::vector<EndPoint> addrs;
-
-            CollectAddresses(config, addrs);
-
-            if (socket.get() == 0)
-            {
-                SqlResult::Type res = InitSocket();
-
-                if (res != SqlResult::AI_SUCCESS)
-                    return false;
-            }
-
             bool connected = false;
 
-            while (!addrs.empty() && !connected)
-            {
-                const EndPoint& addr = addrs.back();
+            using namespace jni::java;
+            using namespace common::concurrent;
 
-                for (uint16_t port = addr.port; port <= addr.port + addr.range; ++port)
-                {
-                    try
-                    {
-                        connected = socket->Connect(addr.host.c_str(), port, loginTimeout);
-                    }
-                    catch (const IgniteError& err)
-                    {
-                        LOG_MSG("Error while trying connect to " << addr.host << ":" << addr.port <<", " << err.GetText());
-                    }
-
-                    if (connected)
-                    {
-                        SqlResult::Type res = MakeRequestHandshake();
-
-                        connected = res != SqlResult::AI_ERROR;
-
-                        if (connected)
-                            break;
-                    }
-                }
-
-                addrs.pop_back();
+            if (connection) {
+                return true;
             }
 
-            if (!connected)
-                Close();
+            std::string connectionString = FormatJdbcConnectionString();
+            JniErrorInfo errInfo;
+
+            std::string docdb_home = common::GetEnv("DOCUMENTDB_HOME")
+                                     + "\\documentdb-jdbc-1.1.0-all.jar";
+            
+            // 2. Resolve DOCUMENTDB_HOME.
+            std::string home = jni::ResolveDocumentDbHome();
+
+            // 3. Create classpath.
+            std::string cp = jni::CreateDocumentDbClasspath(std::string(), home);
+
+            if (cp.empty()) {
+                err =
+                    odbc::IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_NO_CLASSPATH,
+                                  "Java classpath is empty (did you set "
+                                  "DOCUMENTDB_HOME environment variable?)");
+
+                return false;
+            }
+
+            SetJvmOptions(cp);
+            
+            SharedPointer< JniContext > ctx(JniContext::Create(&opts[0], static_cast<int>(opts.size()), JniHandlers(), &errInfo));
+            if (ctx.Get()) {
+                jobject result = ctx.Get()->DocumentDbConnect(
+                    connectionString.c_str(), &errInfo);
+                connected = (result && errInfo.code == java::IGNITE_JNI_ERR_SUCCESS);
+                if (!connected) {
+                    err = odbc::IgniteError(
+                        odbc::IgniteError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
+                        errInfo.errMsg);
+                    Close();
+                }
+                connection = result;
+            } else {
+                err = odbc::IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_INIT, "Unable to get initialized JVM.");
+                connection = nullptr;
+            }
 
             return connected;
         }
 
+        std::string Connection::FormatJdbcConnectionString() const {
+            std::string host = "localhost";
+            std::string port = "27017";
+            if (!config.GetAddresses().empty()) {
+                host = config.GetAddresses()[0].host;
+                port = std::to_string(config.GetAddresses()[0].port);
+            }
+            std::string jdbConnectionString;
+
+            jdbConnectionString = "jdbc:documentdb:";
+            jdbConnectionString.append("//" + config.GetUser());
+            jdbConnectionString.append(":" + config.GetPassword());
+            jdbConnectionString.append("@" + host);
+            jdbConnectionString.append(":" + port);
+            jdbConnectionString.append("/" + config.GetSchema());
+            jdbConnectionString.append("?tlsAllowInvalidHostnames=true");
+
+            // Check if internal SSH tunnel should be enabled.
+            // TODO: Remove use of environment variables and use DSN properties
+            std::string sshUserAtHost = common::GetEnv("DOC_DB_USER", "");
+            std::string sshRemoteHost = common::GetEnv("DOC_DB_HOST", "");
+            std::string sshPrivKeyFile = common::GetEnv("DOC_DB_PRIV_KEY_FILE", "");
+            std::string sshUser;
+            std::string sshTunnelHost;
+            size_t indexOfAt = sshUserAtHost.find_first_of('@');
+            if (indexOfAt >= 0 && sshUserAtHost.size() > (indexOfAt + 1)) {
+                sshUser = sshUserAtHost.substr(0, indexOfAt);
+                sshTunnelHost = sshUserAtHost.substr(indexOfAt + 1);
+            }
+            if (!sshUserAtHost.empty()
+                && !sshRemoteHost.empty()
+                && !sshPrivKeyFile.empty()
+                && !sshUser.empty()
+                && !sshTunnelHost.empty()) {
+                jdbConnectionString.append("&sshUser=" + sshUser);
+                jdbConnectionString.append("&sshHost=" + sshTunnelHost);
+                jdbConnectionString.append("&sshPrivateKeyFile=" + sshPrivKeyFile);
+                jdbConnectionString.append("&sshStrictHostKeyChecking=false");
+            }
+
+            return jdbConnectionString;
+        }
+
+                /**
+         * Create JVM options from configuration.
+         *
+         * @param cfg Configuration.
+         * @param home Optional GG home.
+         * @param cp Classpath.
+         */
+        void Connection::SetJvmOptions(const std::string& cp) {
+            using namespace common;
+            Deinit();
+
+            const size_t REQ_OPTS_CNT = 4;
+            const size_t JAVA9_OPTS_CNT = 6;
+
+            opts.reserve(REQ_OPTS_CNT + JAVA9_OPTS_CNT);
+
+            // 1. Set classpath.
+            std::string cpFull = "-Djava.class.path=" + cp;
+
+            opts.push_back(CopyChars(cpFull.c_str()));
+
+            // 3. Set Xms, Xmx.
+            std::string xmsStr = "-Xms" + std::to_string(256) + "m";
+            std::string xmxStr = "-Xmx" + std::to_string(1024) + "m";
+
+            opts.push_back(CopyChars(xmsStr.c_str()));
+            opts.push_back(CopyChars(xmxStr.c_str()));
+
+            // 4. Optional debug arguments
+            //std::string debugStr = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005";
+            //opts.push_back(CopyChars(debugStr.c_str()));
+
+            // 5. Set file.encoding.
+            std::string fileEncParam = "-Dfile.encoding=";
+            std::string fileEncFull = fileEncParam + "UTF-8";
+            opts.push_back(CopyChars(fileEncFull.c_str()));
+
+            // Adding options for Java 9 or later
+            if (jni::java::IsJava9OrLater()) {
+                opts.push_back(CopyChars(
+                    "--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED"));
+                opts.push_back(CopyChars(
+                    "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"));
+                opts.push_back(CopyChars(
+                  "--add-exports=java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED"));
+                opts.push_back(CopyChars(
+                  "--add-exports=jdk.internal.jvmstat/sun.jvmstat.monitor=ALL-UNNAMED"));
+                opts.push_back(CopyChars(
+                    "--add-exports=java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED"));
+                opts.push_back(CopyChars(
+                  "--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED"));
+            }
+        }
+
+        /**
+         * Deallocates all allocated data.
+         */
+        void Connection::Deinit() {
+            using namespace common;
+            std::for_each(opts.begin(), opts.end(), ReleaseChars);
+            opts.clear();
+        }
+        
         void Connection::CollectAddresses(const config::Configuration& cfg, std::vector<EndPoint>& endPoints)
         {
             endPoints.clear();
@@ -804,14 +797,6 @@ namespace ignite
         int32_t Connection::RetrieveTimeout(void* value)
         {
             SQLUINTEGER uTimeout = static_cast<SQLUINTEGER>(reinterpret_cast<ptrdiff_t>(value));
-
-            if (uTimeout != 0 && socket.get() != 0 && socket->IsBlocking())
-            {
-                AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED, "Can not set timeout, because can not "
-                    "enable non-blocking mode on TCP connection. Setting to 0.");
-
-                return 0;
-            }
 
             if (uTimeout > INT32_MAX)
             {

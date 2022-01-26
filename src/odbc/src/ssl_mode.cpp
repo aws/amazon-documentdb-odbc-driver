@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include <ignite/common/utils.h>
+#include <ignite/odbc/common/utils.h>
 
 #include "ignite/odbc/ssl_mode.h"
 
