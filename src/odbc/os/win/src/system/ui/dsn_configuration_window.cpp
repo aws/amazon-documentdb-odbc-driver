@@ -20,6 +20,7 @@
 
 #include "ignite/odbc/log.h"
 #include "ignite/odbc/read_preference.h"
+#include "ignite/odbc/scan_method.h"
 
 #include "ignite/odbc/system/ui/dsn_configuration_window.h"
 #include "ignite/odbc/config/config_tools.h"

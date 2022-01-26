@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 
+#ifndef _IGNITE_ODBC_SCAN_METHOD
+#define _IGNITE_ODBC_SCAN_METHOD
+
 #include <string>
 
 namespace ignite
@@ -24,7 +27,7 @@ namespace ignite
         /** Scan method enum. */
         struct ScanMethod
         {
-            enum class Type
+            enum Type
             {
                 RANDOM,
 
@@ -56,4 +59,5 @@ namespace ignite
         
         };
     }
-}
+}   // namespace ignite
+#endif  //_IGNITE_ODBC_SCAN_METHOD

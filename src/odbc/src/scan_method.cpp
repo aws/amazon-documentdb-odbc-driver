@@ -29,6 +29,8 @@ namespace ignite
 
             common::StripSurroundingWhitespaces(lowerVal);
 
+            common::SpaceToUnderscore(lowerVal);
+
             if (lowerVal == "random")
                 return ScanMethod::Type::RANDOM;
 
