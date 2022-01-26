@@ -37,10 +37,10 @@ namespace ignite
                 DsnConfigurationWindow::DsnConfigurationWindow(Window* parent, config::Configuration& config):
                     CustomWindow(parent, "IgniteConfigureDsn", "Configure Amazon DocumentDB DSN Latest"),
                     //width(360), // original width:360.
-                    height(600), // original height:600
+                    //height(600), // original height:600
                     width(730), // double the original width
                     //width(360),
-                    //height(800),
+                    height(515),
                     connectionSettingsGroupBox(),
                     tlsSettingsGroupBox(),
                     tlsCheckBox(), 
@@ -434,7 +434,8 @@ namespace ignite
 
                 int DsnConfigurationWindow::CreateAdditionalSettingsGroup(int posX, int posY, int sizeX) 
                 {
-                    enum { LABEL_WIDTH = 130 };  // -AL- different definition from above. I can also
+                    enum { LABEL_WIDTH = 120 }; // same as SSH settings
+                    //enum { LABEL_WIDTH = 130 };  // -AL- different definition from above. I can also
                         // change it to the same
 
                     int labelPosX = posX + INTERVAL;
