@@ -629,7 +629,7 @@ namespace ignite
             if (connection) {
                 return true;
             }
-
+/*
             std::string connectionString = FormatJdbcConnectionString();
             JniErrorInfo errInfo;
 
@@ -669,7 +669,7 @@ namespace ignite
                 err = odbc::IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_INIT, "Unable to get initialized JVM.");
                 connection = nullptr;
             }
-
+*/
             std::string mongoCPPConnectionString = FormatMongoCppConnectionString();
             bool cppConnected = ConnectCPPDocumentDB(mongoCPPConnectionString);
 
@@ -684,12 +684,14 @@ namespace ignite
             */
             std::string host = "localhost";
             std::string port = "27017";
+            /*
             if (!config.GetAddresses().empty()) {
                 host = config.GetAddresses()[0].host;
                 port = std::to_string(config.GetAddresses()[0].port);
                 // TODO Check if SSH tunnel is enabled and set the portß
                 port = sshTunnelPort;
             }
+            */
             std::string mongoConnectionString;
 
             mongoConnectionString = "mongodb:";
@@ -857,11 +859,16 @@ namespace ignite
             mongocxx::instance inst;
 
             try {
-                const auto uri = mongocxx::uri{mongoConnectionString};
+                const auto uri = mongocxx::uri{
+            "mongodb://documentdb:bqdocumentdblab@127.0.0.1:27017/"
+                    "?tls=true&tlsCAFile=~/.ssh/rds-ca-2019-"
+                    "root.pem&tlsAllowInvalidHostnames=true"
+                };
 
+std::cout << mongoConnectionString << std::endl;
                 auto client = mongocxx::client{uri};
 
-                std::string database = "admin";
+                std::string database = "test";
                 bsoncxx::builder::stream::document ping;
                 ping << "ping" << 1;
                 auto db = client[database];
