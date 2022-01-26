@@ -297,7 +297,7 @@ namespace ignite
                     /** Login Timeout (seconds) label. */
                     std::auto_ptr<Window> loginTimeoutSecLabel;
 
-                    /** Nested Read Preference ComboBox **/
+                    /** Read Preference ComboBox **/
                     std::auto_ptr<Window> readPreferenceComboBox;
 
                     /** Read preference label. */

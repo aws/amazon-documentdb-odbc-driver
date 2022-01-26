@@ -320,7 +320,7 @@ namespace ignite
                 }
 
                 int DsnConfigurationWindow::CreateTlsSettingsGroup(int posX, int posY, int sizeX)
-                {   // TODO: rename function name from Ssl to TLS after UI works
+                { 
 
                     enum { LABEL_WIDTH = 100 };
 
@@ -331,7 +331,6 @@ namespace ignite
 
                     int rowPos = posY + 2 * INTERVAL;
 
-                    //int checkBoxSize = (sizeX - 3 * INTERVAL) / 2; // original
                     int checkBoxSize = sizeX - 2 * MARGIN;
 
                     tlsCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
@@ -480,7 +479,6 @@ namespace ignite
 
                     return rowPos - posY;
                 }
-
 
                 bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam)
                 {
@@ -705,12 +703,10 @@ namespace ignite
                     cfg.SetSshPrivateKeyPassphrase(sshPrivateKeyPassphraseStr);
                     cfg.SetSshStrictHostKeyChecking(sshStrictHostKeyChecking);
                     cfg.SetSshKnownHostsFile(sshKnownHostsFileStr);
-
                 }
 
                 void DsnConfigurationWindow::RetrieveTlsParameters(config::Configuration& cfg) const
                 {
-
                     bool tls = tlsCheckBox->IsChecked();
                     bool tlsAllowInvalidHostnames = tlsAllowInvalidHostnamesCheckBox->IsChecked();
                     std::string tlsCaStr;
@@ -729,7 +725,6 @@ namespace ignite
 
                 void DsnConfigurationWindow::RetrieveAdditionalParameters(config::Configuration& cfg) const
                 {
-
                     std::string readPreferenceStr;
                     std::string appNameStr;
                     std::string replicaSetStr;
@@ -777,7 +772,6 @@ namespace ignite
                     cfg.SetLoginTimeoutSeconds(loginTimeoutSec);
                     cfg.SetReplicaSet(replicaSetStr);
                     cfg.SetDefaultFetchSize(fetchSize);
-
                 }
             }
         }
