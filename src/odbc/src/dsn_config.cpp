@@ -219,7 +219,7 @@ namespace ignite
 
             if (scanLimit.IsSet() && !config.IsScanLimitSet()
                 && scanLimit.GetValue() > 0)
-                config.SetDefaultFetchSize(scanLimit.GetValue());
+                config.SetScanLimit(scanLimit.GetValue());
 
             SettableValue<std::string> schemaName = ReadDsnString(dsn, ConnectionStringParser::Key::schemaName);
 

@@ -47,8 +47,13 @@ namespace ignite
                     additionalSettingsGroupBox(),
                     nameLabel(),
                     nameEdit(),
+                    scanMethodLabel(),
+                    scanMethodComboBox(),
+                    scanLimitLabel(),
+                    scanLimitEdit(),
                     schemaLabel(),
                     schemaEdit(),
+                    refreshSchemaCheckBox(),
                     // internal SSH tunnel vars
                     sshEnableCheckBox(),
                     sshUserLabel(),
@@ -137,6 +142,7 @@ namespace ignite
                     groupPosYLeft += INTERVAL + CreateConnectionSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
                     //groupPosYLeft += INTERVAL + CreateAuthSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
                     groupPosYLeft += INTERVAL + CreateTlsSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
+                    groupPosYLeft += INTERVAL + CreateSchemaSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
                     // create right column group settings 
                     groupPosYRight += INTERVAL + CreateSshSettingsGroup(posXRight, groupPosYRight, groupSizeY);
                     groupPosYRight += INTERVAL + CreateAdditionalSettingsGroup(posXRight, groupPosYRight, groupSizeY);
@@ -222,13 +228,6 @@ namespace ignite
                         "Password:", ChildId::PASSWORD_LABEL);
                     passwordEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
                         val, ChildId::USER_EDIT, ES_PASSWORD);
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
-                    val = config.GetDatabase().c_str();
-                    schemaLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Schema Name:", ChildId::SCHEMA_LABEL);
-                    schemaEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::SCHEMA_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -359,6 +358,77 @@ namespace ignite
 
                     tlsAllowInvalidHostnamesCheckBox->SetEnabled(tlsCheckBox->IsChecked());
                     tlsCaFileEdit->SetEnabled(tlsCheckBox->IsChecked());
+
+                    return rowPos - posY;
+                }
+
+                int DsnConfigurationWindow::CreateSchemaSettingsGroup(int posX, int posY, int sizeX)
+                {   
+
+                    enum { LABEL_WIDTH = 100 };
+
+                    int labelPosX = posX + INTERVAL;
+
+                    int editSizeX = sizeX - LABEL_WIDTH - 3 * INTERVAL;
+                    int editPosX = labelPosX + LABEL_WIDTH + INTERVAL;
+
+                    int rowPos = posY + 2 * INTERVAL;
+                    
+                    int checkBoxSize = sizeX - 2 * MARGIN;
+
+                    ScanMethod::Type scanMethod = config.GetScanMethod();
+
+                    scanMethodLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Scan Method:", ChildId::SCAN_METHOD_LABEL);
+                    scanMethodComboBox = CreateComboBox(
+                        editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                                       "", ChildId::SCAN_METHOD_COMBO_BOX);
+
+		            scanMethodComboBox->AddString("Random");
+                    scanMethodComboBox->AddString("ID Forward");
+                    scanMethodComboBox->AddString("ID Reverse");
+                    scanMethodComboBox->AddString("All");
+
+                    scanMethodComboBox->SetSelection(scanMethod); // set default
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    std::string tmp = common::LexicalCast<std::string>(config.GetScanLimit());
+                    const char* val = tmp.c_str();
+                    scanLimitLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Scan Limit:", ChildId::SCAN_LIMIT_LABEL);
+                    scanLimitEdit = CreateEdit(
+                        editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                        val, ChildId::SCAN_LIMIT_EDIT, ES_NUMBER);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    val = config.GetDatabase().c_str();
+                    schemaLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Schema Name:", ChildId::SCHEMA_LABEL);
+                    schemaEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::SCHEMA_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    refreshSchemaCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
+                        "Refresh Schema", ChildId::REFRESH_SCHEMA_CHECK_BOX, config.IsRefreshSchema());
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    schemaSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
+                        "Schema Generation Settings", ChildId::SCHEMA_SETTINGS_GROUP_BOX);
+
+                    std::string scanMethodStr;
+                    scanMethodComboBox->GetText(scanMethodStr);
+                    if (ScanMethod::FromString(scanMethodStr,
+                                               ScanMethod::UNKNOWN)
+                        == ScanMethod::ALL) {
+                        scanLimitEdit->SetEnabled(false);
+                    } else {
+                        scanLimitEdit->SetEnabled(true);
+                    }
 
                     return rowPos - posY;
                 }
@@ -582,6 +652,29 @@ namespace ignite
                                     break;
                                 }
 
+                                case ChildId::SCAN_METHOD_COMBO_BOX:
+                                {
+                                    std::string scanMethodStr;
+                                    scanMethodComboBox->GetText(scanMethodStr);
+                                    if (ScanMethod::FromString(
+                                                scanMethodStr, ScanMethod::UNKNOWN)
+                                        == ScanMethod::ALL) 
+                                    {
+                                        scanLimitEdit->SetEnabled(false);
+                                    } 
+                                    else 
+                                    {
+                                        scanLimitEdit->SetEnabled(true);
+                                    }
+                                    break;
+                                }
+
+                                case ChildId::REFRESH_SCHEMA_CHECK_BOX:
+                                {
+                                    refreshSchemaCheckBox->SetChecked(!refreshSchemaCheckBox->IsChecked());
+                                    break;
+                                }
+
                                 case ChildId::RETRY_READS_CHECK_BOX:
                                 {
                                     retryReadsCheckBox->SetChecked(!retryReadsCheckBox->IsChecked());
@@ -615,13 +708,13 @@ namespace ignite
                     RetrieveConnectionParameters(cfg);
                     RetrieveSshParameters(cfg);
                     RetrieveTlsParameters(cfg);
+                    RetrieveSchemaParameters(cfg);
                     RetrieveAdditionalParameters(cfg);
                 }
 
                 void DsnConfigurationWindow::RetrieveConnectionParameters(config::Configuration& cfg) const
                 {
                     std::string dsnStr;
-                    std::string schemaStr;
                     std::string hostnameStr;
                     std::string portStr;
                     std::string databaseStr;
@@ -629,7 +722,6 @@ namespace ignite
                     std::string passwordStr;
 
                     nameEdit->GetText(dsnStr);
-                    schemaEdit->GetText(schemaStr);
 
                     common::StripSurroundingWhitespaces(dsnStr);
                     // Stripping of whitespaces off the schema skipped intentionally
@@ -646,8 +738,10 @@ namespace ignite
                         port = config.GetTcpPort();
 
                     LOG_MSG("Retrieving arguments:");
-                    LOG_MSG("DSN:                " << dsnStr);
-                    LOG_MSG("Schema:             " << schemaStr);
+                    LOG_MSG("DSN:      " << dsnStr);
+                    LOG_MSG("Hostname: " << hostnameStr);
+                    LOG_MSG("Port:     " << portStr);
+                    LOG_MSG("Database: " << databaseStr);
 
                     // username and password intentionally not logged for security reasons
 
@@ -663,7 +757,6 @@ namespace ignite
                     }
 
                     cfg.SetDsn(dsnStr);
-                    cfg.SetDatabase(schemaStr);
                     cfg.SetTcpPort(port);
                     cfg.SetHostname(hostnameStr);
                     cfg.SetDatabase(databaseStr);
@@ -721,7 +814,37 @@ namespace ignite
                     cfg.SetTls(tls);
                     cfg.SetTlsAllowInvalidHostnames(tlsAllowInvalidHostnames);
                     cfg.SetTlsCaFile(tlsCaStr);
+                }
 
+                void DsnConfigurationWindow::RetrieveSchemaParameters(config::Configuration& cfg) const
+                {
+                    std::string scanMethodStr;
+                    std::string scanLimitStr;
+                    std::string schemaStr;
+                    bool refreshSchema = refreshSchemaCheckBox->IsChecked();
+
+                    scanMethodComboBox->GetText(scanMethodStr);
+                    scanLimitEdit->GetText(scanLimitStr);
+                    schemaEdit->GetText(schemaStr);
+
+                    int32_t scanLimit =
+                        common::LexicalCast<int32_t>(scanLimitStr);
+
+                    if (scanLimit <= 0)
+                        scanLimit = config.GetScanLimit();
+                    
+                    LOG_MSG("Scan method:    " << scanMethodStr);
+                    LOG_MSG("Scan limit      " << scanLimit);
+                    LOG_MSG("Schema:         " << schemaStr);
+                    LOG_MSG("Refresh schema: " << (refreshSchema ? "true" : "false"));
+
+                    ScanMethod::Type scanMethod =
+                        ScanMethod::FromString(scanMethodStr, ScanMethod::UNKNOWN);
+
+                    cfg.SetScanMethod(scanMethod);
+                    cfg.SetSchemaName(schemaStr);
+                    cfg.SetScanLimit(scanLimit);
+                    cfg.SetRefreshSchema(refreshSchema);
                 }
 
                 void DsnConfigurationWindow::RetrieveAdditionalParameters(config::Configuration& cfg) const

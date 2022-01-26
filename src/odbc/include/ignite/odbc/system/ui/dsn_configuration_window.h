@@ -44,11 +44,10 @@ namespace ignite
                             CONNECTION_SETTINGS_GROUP_BOX = 100,
                             SSH_SETTINGS_GROUP_BOX,
                             TLS_SETTINGS_GROUP_BOX,
+                            SCHEMA_SETTINGS_GROUP_BOX,
                             ADDITIONAL_SETTINGS_GROUP_BOX,
                             NAME_EDIT,
                             NAME_LABEL,
-                            SCHEMA_EDIT,
-                            SCHEMA_LABEL,
                             SSH_ENABLE_CHECK_BOX,
                             SSH_USER_EDIT,
                             SSH_USER_LABEL,
@@ -72,6 +71,13 @@ namespace ignite
                             RETRY_READS_CHECK_BOX,
                             DEFAULT_FETCH_SIZE_EDIT,
                             DEFAULT_FETCH_SIZE_LABEL,
+                            SCAN_METHOD_COMBO_BOX,
+                            SCAN_METHOD_LABEL,
+                            SCAN_LIMIT_EDIT,
+                            SCAN_LIMIT_LABEL,
+                            SCHEMA_EDIT,
+                            SCHEMA_LABEL,
+                            REFRESH_SCHEMA_CHECK_BOX,
                             TLS_CHECK_BOX,
                             TLS_ALLOW_INVALID_HOSTNAMES_CHECK_BOX,
                             TLS_CA_FILE_EDIT,
@@ -172,6 +178,14 @@ namespace ignite
                     void RetrieveTlsParameters(config::Configuration& cfg) const;
 
                     /**
+                     * Retrieves current values from the schema generation UI group and
+                     * stores them to the specified configuration.
+                     *
+                     * @param cfg Configuration.
+                     */
+                    void RetrieveSchemaParameters(config::Configuration& cfg) const;
+
+                    /**
                      * Retrieves current values from the additional UI group and
                      * stores them to the specified configuration.
                      *
@@ -210,6 +224,16 @@ namespace ignite
                     int CreateTlsSettingsGroup(int posX, int posY, int sizeX);
 
                     /**
+                     * Create schema generation settings group box.
+                     *
+                     * @param posX X position.
+                     * @param posY Y position.
+                     * @param sizeX Width.
+                     * @return Size by Y.
+                     */
+                    int CreateSchemaSettingsGroup(int posX, int posY, int sizeX);
+
+                    /**
                      * Create additional settings group box.
                      *
                      * @param posX X position.
@@ -234,6 +258,9 @@ namespace ignite
                     /** TLS settings group box. */
                     std::auto_ptr<Window> tlsSettingsGroupBox;
 
+                    /** Schema generation and discovery settings group box. */
+                    std::auto_ptr< Window > schemaSettingsGroupBox;
+
                     /** Additional settings group box. */
                     std::auto_ptr<Window> additionalSettingsGroupBox;
 
@@ -243,11 +270,26 @@ namespace ignite
                     /** DSN name edit field. */
                     std::auto_ptr<Window> nameEdit;
 
+                    /** Scan method ComboBox **/
+                    std::auto_ptr<Window> scanMethodComboBox;
+
+                    /** Scan method label. */
+                    std::auto_ptr<Window> scanMethodLabel;
+
+                    /** Scan limit field label. */
+                    std::auto_ptr<Window> scanLimitLabel;
+
+                    /** Scan limit field. */
+                    std::auto_ptr<Window> scanLimitEdit;
+
                     /** DSN schema edit field label. */
                     std::auto_ptr<Window> schemaLabel;
 
                     /** DSN schema edit field. */
                     std::auto_ptr<Window> schemaEdit;
+
+                    /** Refresh DSN schema checkBox. */
+                    std::auto_ptr<Window> refreshSchemaCheckBox;
 
                     /** SSH enable checkBox. */
                     std::auto_ptr<Window> sshEnableCheckBox;
