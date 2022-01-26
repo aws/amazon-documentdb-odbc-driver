@@ -24,7 +24,6 @@
 
 #include "ignite/odbc/system/ui/dsn_configuration_window.h"
 #include "ignite/odbc/config/config_tools.h"
-#include "ignite/odbc/diagnostic/diagnosable_adapter.h"
 
 namespace ignite
 {
@@ -36,10 +35,7 @@ namespace ignite
             {   
                 DsnConfigurationWindow::DsnConfigurationWindow(Window* parent, config::Configuration& config):
                     CustomWindow(parent, "IgniteConfigureDsn", "Configure Amazon DocumentDB DSN Latest"),
-                    //width(360), // original width:360.
-                    //height(600), // original height:600
-                    width(730), // double the original width
-                    //width(360),
+                    width(730),
                     height(515),
                     connectionSettingsGroupBox(),
                     tlsSettingsGroupBox(),
@@ -130,26 +126,17 @@ namespace ignite
                 void DsnConfigurationWindow::OnCreate()
                 {
                     int groupPosYLeft = MARGIN;
-                    //int groupSizeY = width - 2 * MARGIN; // original 
                     int groupSizeY = width / 2 - 2 * MARGIN;
                     int posXRight = width / 2 + MARGIN;
-                    //int posXRight = MARGIN + (width - MARGIN) / 2;
-                    //int posXRight = MARGIN + groupSizeY;
-                    //int posXRight = 2 * MARGIN + groupSizeY;
                     int groupPosYRight = MARGIN;
 
                     // create left column group settings
                     groupPosYLeft += INTERVAL + CreateConnectionSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
-                    //groupPosYLeft += INTERVAL + CreateAuthSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
                     groupPosYLeft += INTERVAL + CreateTlsSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
                     groupPosYLeft += INTERVAL + CreateSchemaSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
                     // create right column group settings 
                     groupPosYRight += INTERVAL + CreateSshSettingsGroup(posXRight, groupPosYRight, groupSizeY);
                     groupPosYRight += INTERVAL + CreateAdditionalSettingsGroup(posXRight, groupPosYRight, groupSizeY);
-                    //groupPosY += INTERVAL + CreateSslSettingsGroup(MARGIN, groupPosY, groupSizeY);
-                    //groupPosY += INTERVAL + CreateAdditionalSettingsGroup(MARGIN, groupPosY, groupSizeY);
-                    // test: if above code is commented out, additional settings shouldn't appear in config window. Result: Yes test success. 
-                    // what happens here is the height of each subgroup is calculated and appended to the y position of the buttons
 
                     int cancelPosX = width - MARGIN - BUTTON_WIDTH;
                     int okPosX = cancelPosX - INTERVAL - BUTTON_WIDTH;
@@ -161,14 +148,9 @@ namespace ignite
                     // check whether the required fields are filled. If not, Ok button is disabled.
                     created = true;
                     okButton->SetEnabled(
-                        userEdit->HasText() && passwordEdit->HasText()
-                        && databaseEdit->HasText() && hostnameEdit->HasText()
-                        && portEdit->HasText());
-
-                    // original code by Ignite
-                    //okButton = CreateButton(okPosX, groupPosY, BUTTON_WIDTH, BUTTON_HEIGHT, "Ok", ChildId::OK_BUTTON);
-                    //cancelButton = CreateButton(cancelPosX, groupPosY, BUTTON_WIDTH, BUTTON_HEIGHT,
-                    //    "Cancel", ChildId::CANCEL_BUTTON);
+                        nameEdit->HasText() && userEdit->HasText() 
+                        && passwordEdit->HasText() && databaseEdit->HasText() 
+                        && hostnameEdit->HasText() && portEdit->HasText());
                 }
 
                 int DsnConfigurationWindow::CreateConnectionSettingsGroup(int posX, int posY, int sizeX)
@@ -184,14 +166,14 @@ namespace ignite
 
                     const char* val = config.GetDsn().c_str();
                     nameLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Data Source Name:", ChildId::NAME_LABEL);
+                        "Data Source Name*:", ChildId::NAME_LABEL);
                     nameEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::NAME_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     val = config.GetHostname().c_str();
                     hostnameLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, 
-                        "Hostname :", ChildId::HOST_NAME_LABEL);
+                        "Hostname*:", ChildId::HOST_NAME_LABEL);
                     hostnameEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, 
                         val, ChildId::HOST_NAME_EDIT);
 
@@ -201,7 +183,7 @@ namespace ignite
                     val = tmp.c_str();
                     portLabel = CreateLabel(
                         labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Port:", ChildId::PORT_LABEL);
+                        "Port*:", ChildId::PORT_LABEL);
                     portEdit = CreateEdit(
                         editPosX, rowPos, editSizeX, ROW_HEIGHT,
                         val, ChildId::PORT_EDIT, ES_NUMBER);
@@ -211,21 +193,21 @@ namespace ignite
                     val = config.GetDatabase().c_str();
                     databaseLabel =
                         CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                                    "Database :", ChildId::DATABASE_LABEL);
+                                    "Database*:", ChildId::DATABASE_LABEL);
                     databaseEdit = CreateEdit(editPosX, rowPos, editSizeX,
                                           ROW_HEIGHT, val, ChildId::DATABASE_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     val = config.GetUser().c_str();
-                    userLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, "User :", ChildId::USER_LABEL);
+                    userLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, "User* :", ChildId::USER_LABEL);
                     userEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::USER_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     val = config.GetPassword().c_str();
                     passwordLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Password:", ChildId::PASSWORD_LABEL);
+                        "Password*:", ChildId::PASSWORD_LABEL);
                     passwordEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
                         val, ChildId::USER_EDIT, ES_PASSWORD);
 
@@ -257,14 +239,14 @@ namespace ignite
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     const char* val = config.GetSshUser().c_str();
-                    sshUserLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, "SSH User :", ChildId::SSH_USER_LABEL);
+                    sshUserLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, "SSH User:", ChildId::SSH_USER_LABEL);
                     sshUserEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::SSH_USER_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
                     
                     val = config.GetSshHost().c_str();
                     sshHostLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                                    "SSH Hostname :", ChildId::SSH_HOST_LABEL);
+                                    "SSH Hostname:", ChildId::SSH_HOST_LABEL);
                     sshHostEdit = CreateEdit(editPosX, rowPos, editSizeX,
                                           ROW_HEIGHT, val, ChildId::SSH_HOST_EDIT);
 
@@ -272,7 +254,7 @@ namespace ignite
 
                     val = config.GetSshPrivateKeyFile().c_str();
                     sshPrivateKeyFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                                    "SSH Private Key File :", ChildId::SSH_PRIVATE_KEY_FILE_LABEL);
+                                    "SSH Private Key File:", ChildId::SSH_PRIVATE_KEY_FILE_LABEL);
                     sshPrivateKeyFileEdit = CreateEdit(editPosX, rowPos, editSizeX,
                                           ROW_HEIGHT, val, ChildId::SSH_PRIVATE_KEY_FILE_EDIT);
 
@@ -281,7 +263,7 @@ namespace ignite
                     val = config.GetSshPrivateKeyPassphrase().c_str();
                     // ssh private key passphrase label requires double the row height due to the long label.
                     sshPrivateKeyPassphraseLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT * 2,
-                                    "SSH Private Key Passphrase :", ChildId::SSH_PRIVATE_KEY_PASSPHRASE_LABEL);
+                                    "SSH Private Key Passphrase:", ChildId::SSH_PRIVATE_KEY_PASSPHRASE_LABEL);
                     sshPrivateKeyPassphraseEdit = CreateEdit(editPosX, rowPos, editSizeX,
                                           ROW_HEIGHT * 2, val, ChildId::SSH_PRIVATE_KEY_PASSPHRASE_EDIT);
 
@@ -561,6 +543,7 @@ namespace ignite
                                     break;
                                 }
 
+                                case ChildId::NAME_EDIT:
                                 case ChildId::HOST_NAME_EDIT:
                                 case ChildId::PORT_EDIT:
                                 case ChildId::DATABASE_EDIT:
@@ -570,11 +553,12 @@ namespace ignite
                                     // if window has been created. Check
                                     if (created) {
                                         okButton->SetEnabled(
-                                            userEdit->HasText() 
-                                            && passwordEdit->HasText() 
-                                            && databaseEdit->HasText() 
-                                            && hostnameEdit->HasText() 
-                                            && portEdit->HasText());                                   
+                                            nameEdit->HasText()
+                                            && userEdit->HasText()
+                                            && passwordEdit->HasText()
+                                            && databaseEdit->HasText()
+                                            && hostnameEdit->HasText()
+                                            && portEdit->HasText());                                 
                                     }
                                     break;
                                 }
@@ -720,17 +704,6 @@ namespace ignite
                     LOG_MSG("Database: " << databaseStr);
 
                     // username and password intentionally not logged for security reasons
-
-                    if (dsnStr.empty())
-                        throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, "DSN name can not be empty.");
-
-                    diagnostic::DiagnosticRecordStorage diag;
-
-                    if (diag.GetStatusRecordsNumber() > 0)
-                    {
-                        throw IgniteError(IgniteError::IGNITE_ERR_GENERIC,
-                            diag.GetStatusRecord(1).GetMessageText().c_str());
-                    }
 
                     cfg.SetDsn(dsnStr);
                     cfg.SetTcpPort(port);
