@@ -17,7 +17,7 @@
 
 #include <sstream>
 
-#include <ignite/odbc/ignite_error.h>
+#include <ignite/ignite_error.h>
 
 #include "ignite/odbc/protocol_version.h"
 #include "ignite/odbc/utility.h"

@@ -29,27 +29,29 @@ find_package(ODBC REQUIRED)
 
 include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS})
 include_directories(include ../odbc/include ../network/include)
-if (WIN32)
-    include_directories(../odbc/os/win/include)
-else ()
-    # TODO: Ensure MacOS is portable. https://bitquill.atlassian.net/browse/AD-525
-    include_directories(../odbc/os/linux/include)
-endif()
 
 set(SOURCES 
-         src/connection_test.cpp
          src/dummy_test.cpp
-         src/odbc_test_suite.cpp
-         src/test_utils.cpp
-         ../odbc/src/common/concurrent.cpp
-         ../odbc/src/common/utils.cpp
-         ../odbc/src/jni/java.cpp
+         src/configuration_test.cpp
+         ../odbc/src/config/config_tools.cpp
+         ../odbc/src/config/configuration.cpp
+         ../odbc/src/config/connection_info.cpp
+         ../odbc/src/config/connection_string_parser.cpp
+         ../odbc/src/scan_method.cpp
+         ../odbc/src/read_preference.cpp
+         ../odbc/src/diagnostic/diagnostic_record.cpp
+         ../odbc/src/diagnostic/diagnostic_record_storage.cpp
+         ../odbc/src/utility.cpp
+         ../odbc/src/common_types.cpp
+         ../odbc/src/app/application_data_buffer.cpp
+         ../odbc/src/log.cpp
 # TODO uncomment/rework the tests after get some connectivity and functionalities working.
 #        src/teamcity/teamcity_boost.cpp
 #        src/teamcity/teamcity_messages.cpp
 #        src/parser_test.cpp
 #        src/cursor_test.cpp
 #        src/connection_info_test.cpp
+#        src/connection_test.cpp
 #        src/application_data_buffer_test.cpp
 #        src/column_test.cpp
 #        src/configuration_test.cpp
@@ -58,6 +60,7 @@ set(SOURCES
 #        src/utility_test.cpp
 #        src/queries_test.cpp
 #        src/queries_ssl_test.cpp
+#        src/test_utils.cpp
 #        src/sql_test_suite_fixture.cpp
 #        src/sql_string_functions_test.cpp
 #        src/sql_numeric_functions_test.cpp
@@ -73,6 +76,7 @@ set(SOURCES
 #        src/api_robustness_test.cpp
 #        src/attributes_test.cpp
 #        src/errors_test.cpp
+#        src/odbc_test_suite.cpp
 #        src/types_test.cpp
 #        src/transaction_test.cpp
 #        src/authentication_test.cpp
@@ -102,21 +106,6 @@ set(SOURCES
 #        ../odbc/src/result_page.cpp
 #        ../odbc/src/nested_tx_mode.cpp
         )
-
-if (WIN32)
-    list(APPEND SOURCES
-        ../odbc/os/win/src/common/concurrent_os.cpp
-        ../odbc/os/win/src/common/platform_utils.cpp
-        ../odbc/src/jni/os/win/utils.cpp
-    )
-else()
-    # TODO: Ensure MacOS is portable. https://bitquill.atlassian.net/browse/AD-525
-    list(APPEND SOURCES
-        ../odbc/os/linux/src/common/concurrent_os.cpp
-        ../odbc/os/linux/src/common/platform_utils.cpp
-        ../odbc/src/jni/os/linux/utils.cpp
-    )
-endif()
 
 add_executable(${TARGET} ${SOURCES})
 

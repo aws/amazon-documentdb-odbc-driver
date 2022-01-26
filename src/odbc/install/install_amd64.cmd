@@ -29,7 +29,7 @@ if exist %ODBC_AMD64% (
 if [%ODBC_X86%] == [] (
 	echo warning: 32-bit driver is not specified. If you want to install 32-bit driver please specify path to it as a second argument.
 	pause
-	exit /b 0
+	exit /b 1
 )
 
 if exist %ODBC_X86% (
@@ -44,6 +44,5 @@ if exist %ODBC_X86% (
 	reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\ODBC\ODBCINST.INI\ODBC Drivers" /v "Apache Ignite" /t REG_SZ /d "Installed" /f    
 ) else (
 	echo warning: 32-bit driver can not be found: %ODBC_X86%
-	exit /b 1
 )
 

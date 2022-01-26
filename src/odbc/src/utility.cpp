@@ -67,7 +67,7 @@ namespace ignite
             writer.WriteString(str.data(), static_cast<int32_t>(str.size()));
         }
 
-        void ReadDecimal(ignite::impl::binary::BinaryReaderImpl& reader, odbc::common::Decimal& decimal)
+        void ReadDecimal(ignite::impl::binary::BinaryReaderImpl& reader, common::Decimal& decimal)
         {
             int8_t hdr = reader.ReadInt8();
 
@@ -94,20 +94,20 @@ namespace ignite
                 sign = -1;
             }
 
-            odbc::common::Decimal res(mag.data(), static_cast<int32_t>(mag.size()), scale, sign);
+            common::Decimal res(mag.data(), static_cast<int32_t>(mag.size()), scale, sign);
 
             decimal.Swap(res);
         }
 
-        void WriteDecimal(ignite::impl::binary::BinaryWriterImpl& writer, const odbc::common::Decimal& decimal)
+        void WriteDecimal(ignite::impl::binary::BinaryWriterImpl& writer, const common::Decimal& decimal)
         {
             writer.WriteInt8(ignite::impl::binary::IGNITE_TYPE_DECIMAL);
 
-            const odbc::common::BigInteger &unscaled = decimal.GetUnscaledValue();
+            const common::BigInteger &unscaled = decimal.GetUnscaledValue();
 
             writer.WriteInt32(decimal.GetScale());
 
-            odbc::common::FixedSizeArray<int8_t> magnitude;
+            common::FixedSizeArray<int8_t> magnitude;
 
             unscaled.MagnitudeToBytes(magnitude);
 

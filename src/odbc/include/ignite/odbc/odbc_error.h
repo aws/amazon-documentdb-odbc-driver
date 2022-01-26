@@ -21,7 +21,7 @@
 #include <string>
 
 #include <ignite/odbc/common_types.h>
-#include <ignite/odbc/common/expected.h>
+#include <ignite/common/expected.h>
 
 namespace ignite
 {
@@ -102,13 +102,13 @@ namespace ignite
             std::string errMessage;
         };
 
-        typedef odbc::common::Unexpected<OdbcError> OdbcUnexpected;
+        typedef common::Unexpected<OdbcError> OdbcUnexpected;
 
         /**
          * Expected specialization for OdbcError.
          */
         template<typename R>
-        struct OdbcExpected : odbc::common::Expected<R, OdbcError>
+        struct OdbcExpected : common::Expected<R, OdbcError>
         {
             OdbcExpected(const R& res)
                 : common::Expected<R, OdbcError>(res)

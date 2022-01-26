@@ -75,7 +75,7 @@ namespace ignite
                 /**
                  * Default constructor.
                  */
-                ColumnMeta() : dataType(), nullability(), precision(), scale()
+                ColumnMeta()
                 {
                     // No-op.
                 }

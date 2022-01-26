@@ -67,7 +67,7 @@ namespace ignite
         {
             if (IsEnabled())
             {
-                common::concurrent::CsLockGuard guard(mutex);
+                ignite::common::concurrent::CsLockGuard guard(mutex);
                 stream << message << std::endl;
             }
         }

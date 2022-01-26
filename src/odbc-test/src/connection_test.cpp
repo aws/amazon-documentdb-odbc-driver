@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include "test_server.h"
 #ifdef _WIN32
 #   include <windows.h>
 #endif
@@ -26,10 +27,14 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "ignite/ignite.h"
+#include "ignite/ignition.h"
+
 #include "test_utils.h"
 #include "odbc_test_suite.h"
 
 using namespace ignite;
+using namespace ignite::common;
 using namespace ignite_test;
 
 using namespace boost::unit_test;
@@ -46,6 +51,14 @@ struct ConnectionTestSuiteFixture: odbc::OdbcTestSuite
         OdbcTestSuite()
     {
         // No-op.
+    }
+
+    /**
+     * Start a node.
+     */
+    void StartNode()
+    {
+        StartTestNode("queries-test.xml", "NodeMain");
     }
 
     /**
@@ -83,25 +96,6 @@ struct ConnectionTestSuiteFixture: odbc::OdbcTestSuite
         return code;
     }
 
-    static void SetConnectionString(std::string& connectionString,
-                                    const std::string& username = std::string()) {
-        // NOTE: Assuming we are using internal SSH tunnel
-        std::string user = common::GetEnv("DOC_DB_USER_NAME", "documentdb");
-        std::string password = common::GetEnv("DOC_DB_PASSWORD", "");
-        std::string host = common::GetEnv("DOC_DB_HOST", "");
-        std::string port = "27017";
-        if (!username.empty()) {
-            user = username;
-        }
-
-        connectionString =
-            "DRIVER={Apache Ignite};"
-            "ADDRESS=" + host + ":" + port + ";"
-            "SCHEMA=test;"
-            "USER=" + user + ";"
-            "PASSWORD=" + password + ";";
-    }
-
     /**
      * Destructor.
      */
@@ -111,60 +105,44 @@ struct ConnectionTestSuiteFixture: odbc::OdbcTestSuite
     }
 };
 
-
 BOOST_FIXTURE_TEST_SUITE(ConnectionTestSuite, ConnectionTestSuiteFixture)
 
 BOOST_AUTO_TEST_CASE(TestConnectionRestore)
 {
-    std::string connectionString;
-    SetConnectionString(connectionString);
+    StartNode();
 
-    Connect(connectionString);
-    Disconnect();
+    Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-    // TODO: [AD-507] Re-enable when querying is supported.
-    // https://bitquill.atlassian.net/browse/AD-507
+    // Check that query was successfully executed.
+    BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "");
 
-    //// Check that query was successfully executed.
-    //BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "");
+    // Stop node.
+    Ignition::StopAll(true);
 
-    //// Query execution should throw ODBC error.
-    //BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "08S01");
+    // Query execution should throw ODBC error.
+    BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "08S01");
 
-    //// Reusing a closed connection should not crash an application.
-    //BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "08001");
+    // Reusing a closed connection should not crash an application.
+    BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "08001");
 
-    //// Check that connection was restored.
-    //BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "");
+    StartNode();
 
+    // Check that connection was restored.
+    BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "");
 }
 
 BOOST_AUTO_TEST_CASE(TestConnectionMemoryLeak)
 {
-    std::string connectionString;
-    SetConnectionString(connectionString);
+    TestServer testServer(11100);
 
-    Connect(connectionString);
+    testServer.PushHandshakeResponse(true);
+    testServer.Start();
 
-    // TODO: [AD-507] Re-enable when querying is supported.
-    // https://bitquill.atlassian.net/browse/AD-507
-    // ExecQuery("Select * from Test");
+    Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11100;SCHEMA=cache");
+
+    ExecQuery("Select * from Test");
 
     Disconnect();
-}
-
-BOOST_AUTO_TEST_CASE(TestConnectionInvalidUser) {
-    std::string connectionString;
-    SetConnectionString(connectionString, "invaliduser");
-
-    ExpectConnectionReject(connectionString, "08001: Failed to establish connection with the host.\n"
-      "Invalid username or password or user is not authorized on database 'test'. "
-      "Please check your settings. Authorization failed for user 'invaliduser' on database 'admin' with mechanism");
-
-    // TODO: [AD-507] Re-enable when querying is supported.
-    // https://bitquill.atlassian.net/browse/AD-507
-    // ExecQuery("Select * from Test");
-
     Disconnect();
 }
 
