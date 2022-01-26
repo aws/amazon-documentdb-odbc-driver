@@ -33,7 +33,7 @@ namespace ignite
         namespace system
         {
             namespace ui
-            {   // -AL- the constructor. No-op means no operation I think? 
+            {   
                 DsnConfigurationWindow::DsnConfigurationWindow(Window* parent, config::Configuration& config):
                     CustomWindow(parent, "IgniteConfigureDsn", "Configure Amazon DocumentDB DSN Latest"),
                     //width(360), // original width:360.
@@ -42,7 +42,7 @@ namespace ignite
                     //width(360),
                     //height(800),
                     connectionSettingsGroupBox(),
-                    tlsSettingsGroupBox(), // has a create... function defined 
+                    tlsSettingsGroupBox(),
                     tlsCheckBox(), 
                     additionalSettingsGroupBox(),
                     nameLabel(),
@@ -126,7 +126,7 @@ namespace ignite
                         throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, buf.str().c_str());
                     }
                 }
-                // the function that actually creates the UI -AL-
+                
                 void DsnConfigurationWindow::OnCreate()
                 {
                     int groupPosYLeft = MARGIN;
@@ -239,7 +239,7 @@ namespace ignite
 
                 int DsnConfigurationWindow::CreateSshSettingsGroup(int posX, int posY, int sizeX) 
                 {
-                    enum { LABEL_WIDTH = 120 }; // -AL- copied from above function
+                    enum { LABEL_WIDTH = 120 }; 
 
                     int labelPosX = posX + INTERVAL;
 
@@ -248,7 +248,6 @@ namespace ignite
 
                     int rowPos = posY + 2 * INTERVAL;
 
-                    //int checkBoxSize = (sizeX - 3 * INTERVAL) / 2; // original
                     int checkBoxSize = sizeX - 2 * MARGIN;
 
                     sshEnableCheckBox = CreateCheckBox(

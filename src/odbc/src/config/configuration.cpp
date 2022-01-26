@@ -32,18 +32,18 @@ namespace ignite
         {
             // Connection Settings
             const std::string Configuration::DefaultValue::dsn = "DocumentDB DSN";
-            const std::string Configuration::DefaultValue::driver = "Amazon DocumentDB ODBC Driver"; // -AL- add (= need to add to UI)
+            const std::string Configuration::DefaultValue::driver = "Amazon DocumentDB ODBC Driver";
             // driver does not need to be added in config window since it is chosen at the Data Source Administrator
-            const std::string Configuration::DefaultValue::database = "";  // -AL- add
-            const std::string Configuration::DefaultValue::hostname = ""; // -AL- add
-            const uint16_t Configuration::DefaultValue::port = 27017;  // -AL- add
+            const std::string Configuration::DefaultValue::database = "";
+            const std::string Configuration::DefaultValue::hostname = "";
+            const uint16_t Configuration::DefaultValue::port = 27017;
             const std::string Configuration::DefaultValue::user = "";
             const std::string Configuration::DefaultValue::password = "";
             
-            // SSL/TLS options. Use checkboxes for boolean variables // need to add to UI
-            const bool Configuration::DefaultValue::tls = true; // changed instead of SSL mode; tls is TLS Encryption 
+            // SSL/TLS options. Use checkboxes for boolean variables
+            const bool Configuration::DefaultValue::tls = true;
             const bool Configuration::DefaultValue::tlsAllowInvalidHostnames = false; // needs to be set to true for SSH; TLS Allow Invalid Hostnames
-            const std::string Configuration::DefaultValue::tlsCaFile = ""; //renamed from SSL CA file
+            const std::string Configuration::DefaultValue::tlsCaFile = "";
            
             // Schema Generation and Discovery options
             const ScanMethod::Type Configuration::DefaultValue::scanMethod = ScanMethod::Type::RANDOM;
