@@ -454,30 +454,7 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    // useful draft code for changing read preference into a
-                    // mode (check JDBC page for available options) 
-                    // const char* val = sslModeStr.c_str();
-
-                    // sslModeLabel = CreateLabel(labelPosX, rowPos,
-                    // LABEL_WIDTH, ROW_HEIGHT,
-                    //    "SSL Mode:", ChildId::SSL_MODE_LABEL);
-                    // sslModeComboBox = CreateComboBox(editPosX, rowPos,
-                    // editSizeX, ROW_HEIGHT,
-                    //    "", ChildId::SSL_MODE_COMBO_BOX);
-
-                    // sslModeComboBox->AddString("disable");
-                    // sslModeComboBox->AddString("require");
-
-                    // sslModeComboBox->SetSelection(sslMode); // set default
-                    // value to require -AL-
-
-                    // rowPos += INTERVAL + ROW_HEIGHT; // used to add row hight
-                    // I believe
-
                     ReadPreference::Type readPreference = config.GetReadPreference();
-                    std::string readPreferenceStr = ReadPreference::ToString(readPreference);
-
-                    const char* val = readPreferenceStr.c_str();
 
                     readPreferenceLabel = CreateLabel(
                         labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
@@ -496,8 +473,7 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
                     
-
-                    val = config.GetApplicationName().c_str();
+                    const char* val = config.GetApplicationName().c_str();
                     appNameLabel = CreateLabel(
                         labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                         "Application Name:", ChildId::APP_NAME_LABEL);
@@ -888,7 +864,7 @@ namespace ignite
                     LOG_MSG("Fetch size:               " << fetchSize);
 
                     ReadPreference::Type readPreference = ReadPreference::FromString(
-                            readPreferenceStr, ReadPreference::Type::PRIMARY);
+                            readPreferenceStr, ReadPreference::Type::UNKNOWN);
 
                     cfg.SetReadPreference(readPreference);
                     cfg.SetRetryReads(retryReads);
