@@ -87,7 +87,7 @@ struct StatisticalInfo {
 };
 
 struct TestCase {
-    testCaseStatus status;
+    testCaseStatus status; // PASS/SKIP/ERROR
     std::string err_msg = "";
     int test_case_num = 0;
     std::string test_name = "";
@@ -262,9 +262,9 @@ class PerformanceTestRunner {
     // assumptions:
     //  1. csv file contains following headers (order does not matter):
     //     "query" : string (can contain new lines and commas)
-    //     "limit" : integer (limit number of rows returned)
+    //     "limit" : integer (limit number of rows returned in query)
     //     "test_name" : string (can contain new lines and commas)
-    //     "loop_count" : integer (number of iterations to execute query)
+    //     "loop_count" : integer (number of times to execute query)
     //     "skip_test" : string (must be "TRUE" or "FALSE")
     void readPerformanceTestPlan();
 
