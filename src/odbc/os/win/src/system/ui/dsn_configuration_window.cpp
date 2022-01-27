@@ -50,7 +50,6 @@ namespace ignite
                     schemaLabel(),
                     schemaEdit(),
                     refreshSchemaCheckBox(),
-                    // internal SSH tunnel vars
                     sshEnableCheckBox(),
                     sshUserLabel(),
                     sshUserEdit(),
@@ -63,7 +62,6 @@ namespace ignite
                     sshStrictHostKeyCheckingCheckBox(),
                     sshKnownHostsFileLabel(),
                     sshKnownHostsFileEdit(),
-                    // end of SSH vars
                     appNameLabel(),
                     appNameEdit(),
                     readPreferenceLabel(),
@@ -179,7 +177,7 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    std::string tmp = common::LexicalCast<std::string>(config.GetTcpPort());
+                    std::string tmp = common::LexicalCast<std::string>(config.GetPort());
                     val = tmp.c_str();
                     portLabel = CreateLabel(
                         labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
@@ -263,9 +261,9 @@ namespace ignite
                     val = config.GetSshPrivateKeyPassphrase().c_str();
                     // ssh private key passphrase label requires double the row height due to the long label.
                     sshPrivateKeyPassphraseLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT * 2,
-                                    "SSH Private Key Passphrase:", ChildId::SSH_PRIVATE_KEY_PASSPHRASE_LABEL);
+                                    "SSH Private Key File Passphrase:", ChildId::SSH_PRIVATE_KEY_PASSPHRASE_LABEL);
                     sshPrivateKeyPassphraseEdit = CreateEdit(editPosX, rowPos, editSizeX,
-                                          ROW_HEIGHT * 2, val, ChildId::SSH_PRIVATE_KEY_PASSPHRASE_EDIT);
+                                          ROW_HEIGHT, val, ChildId::SSH_PRIVATE_KEY_PASSPHRASE_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT * 2;
 
@@ -394,7 +392,7 @@ namespace ignite
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     refreshSchemaCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                        "Refresh Schema", ChildId::REFRESH_SCHEMA_CHECK_BOX, config.IsRefreshSchema());
+                        "Refresh Schema (Caution: use only when necessary to update schema)", ChildId::REFRESH_SCHEMA_CHECK_BOX, config.IsRefreshSchema());
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -693,7 +691,7 @@ namespace ignite
                     int16_t port = common::LexicalCast< int16_t >(portStr);
 
                     if (port <= 0)
-                        port = config.GetTcpPort();
+                        port = config.GetPort();
 
                     LOG_MSG("Retrieving arguments:");
                     LOG_MSG("DSN:      " << dsnStr);
@@ -704,7 +702,7 @@ namespace ignite
                     // username and password intentionally not logged for security reasons
 
                     cfg.SetDsn(dsnStr);
-                    cfg.SetTcpPort(port);
+                    cfg.SetPort(port);
                     cfg.SetHostname(hostnameStr);
                     cfg.SetDatabase(databaseStr);
                     cfg.SetUser(userStr);

@@ -775,7 +775,7 @@ namespace ignite
                 SettableValue<std::string> tlsCaFile = DefaultValue::tlsCaFile;
 
                 /** The SSH enable option for the internal SSH tunnel. */
-                SettableValue<bool> sshEnable;
+                SettableValue<bool> sshEnable = DefaultValue::sshEnable;
 
                 /** The SSH host username for the internal SSH tunnel. */
                 SettableValue<std::string> sshUser = DefaultValue::sshUser;
