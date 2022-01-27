@@ -679,7 +679,7 @@ namespace ignite
         std::string Connection::FormatMongoCppConnectionString(int sshTunnelPort) const {
 
             std::string host = "localhost";
-            std::string port = "27017";
+            std::string port = "27019";
 
             std::string mongoConnectionString;
 
