@@ -75,6 +75,9 @@ jobs:
       run: |
         chmod +x scripts/register_driver_macos.sh
         ./scripts/register_driver_macos.sh
+    - name: Run SSH tunnel to DocumentDB server
+      run: |
+        ssh.exe -f -N -i ~/certs/docdb-sshtunnel.pem -L ${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
     - name: run-tests
       run: |
         ./build/odbc/bin/ignite-odbc-tests

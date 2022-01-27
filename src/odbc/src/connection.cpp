@@ -671,27 +671,16 @@ namespace ignite
             }
 */
             std::string mongoCPPConnectionString = FormatMongoCppConnectionString();
-            bool cppConnected = ConnectCPPDocumentDB(mongoCPPConnectionString);
+            connected = ConnectCPPDocumentDB(mongoCPPConnectionString);
 
             return connected;
         }
 
         std::string Connection::FormatMongoCppConnectionString(int sshTunnelPort) const {
-            /*
-            "mongodb://documentdb:bqdocumentdblab@127.0.0.1:27019/"
-                    "?tls=true&tlsCAFile=C:\\Users\\affon\\.ssh\\rds-ca-2019-"
-                    "root.pem&tlsAllowInvalidHostnames=true"
-            */
+
             std::string host = "localhost";
             std::string port = "27017";
-            /*
-            if (!config.GetAddresses().empty()) {
-                host = config.GetAddresses()[0].host;
-                port = std::to_string(config.GetAddresses()[0].port);
-                // TODO Check if SSH tunnel is enabled and set the portß
-                port = sshTunnelPort;
-            }
-            */
+
             std::string mongoConnectionString;
 
             mongoConnectionString = "mongodb:";
@@ -859,13 +848,8 @@ namespace ignite
             mongocxx::instance inst;
 
             try {
-                const auto uri = mongocxx::uri{
-            "mongodb://documentdb:bqdocumentdblab@127.0.0.1:27017/"
-                    "?tls=true&tlsCAFile=~/.ssh/rds-ca-2019-"
-                    "root.pem&tlsAllowInvalidHostnames=true"
-                };
-
-std::cout << mongoConnectionString << std::endl;
+                const auto uri = mongocxx::uri{mongoConnectionString};
+                
                 auto client = mongocxx::client{uri};
 
                 std::string database = "test";
