@@ -183,7 +183,7 @@ namespace ignite
                  */
                 struct BoolParseResult
                 {
-                    enum class Type
+                    enum Type
                     {
                         AI_FALSE,
 
