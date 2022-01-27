@@ -522,24 +522,6 @@ namespace ignite
 
         SqlResult::Type Connection::MakeRequestHandshake()
         {
-            /* ProtocolVersion protocolVersion = config.GetProtocolVersion();
-
-            if (!protocolVersion.IsSupported())
-            {
-                AddStatusRecord(SqlState::S01S00_INVALID_CONNECTION_STRING_ATTRIBUTE,
-                    "Protocol version is not supported: " + protocolVersion.ToString());
-
-                return SqlResult::AI_ERROR;
-            }
-
-            if (protocolVersion < ProtocolVersion::VERSION_2_5_0 && !config.GetUser().empty())
-            {
-                AddStatusRecord(SqlState::S01S00_INVALID_CONNECTION_STRING_ATTRIBUTE,
-                    "Authentication is not allowed for protocol version below 2.5.0");
-
-                return SqlResult::AI_ERROR;
-            }
-            */
 
             HandshakeRequest req(config);
             HandshakeResponse rsp;
@@ -581,13 +563,6 @@ namespace ignite
 
                 if (!rsp.GetError().empty())
                     constructor << "Additional info: " << rsp.GetError() << " ";
-
-                /* constructor
-                    << "Current version of the protocol, used by the server "
-                       "node is "
-                            << rsp.GetCurrentVer().ToString() << ", "
-                            << "driver protocol version introduced in version "
-                            << protocolVersion.ToString() << "."; */
 
                 AddStatusRecord(SqlState::S08004_CONNECTION_REJECTED, constructor.str());
 
@@ -667,9 +642,9 @@ namespace ignite
         std::string Connection::FormatJdbcConnectionString() const {
             std::string host = "localhost";
             std::string port = "27017";
-            if (!config.GetAddresses().empty()) {
-                host = config.GetAddresses()[0].host;
-                port = std::to_string(config.GetAddresses()[0].port);
+            if (!config.GetHostname().empty()) {
+                host = config.GetHostname();
+                port = std::to_string(config.GetTcpPort());
             }
             std::string jdbConnectionString;
 
@@ -678,7 +653,7 @@ namespace ignite
             jdbConnectionString.append(":" + config.GetPassword());
             jdbConnectionString.append("@" + host);
             jdbConnectionString.append(":" + port);
-            jdbConnectionString.append("/" + config.GetSchema());
+            jdbConnectionString.append("/" + config.GetSchemaName());
             jdbConnectionString.append("?tlsAllowInvalidHostnames=true");
 
             // Check if internal SSH tunnel should be enabled.
@@ -778,21 +753,6 @@ namespace ignite
             LOG_MSG("'Address' is not set. Using legacy connection method.");
             endPoints.push_back(EndPoint(cfg.GetHostname(), cfg.GetTcpPort()));
             return;
-
-            /*if (!cfg.IsAddressesSet())
-            {
-                LOG_MSG("'Address' is not set. Using legacy connection method.");
-
-                endPoints.push_back(EndPoint(cfg.GetHostname(), cfg.GetTcpPort()));
-
-                return;
-            }
-
-            endPoints = cfg.GetAddresses();
-            
-
-            std::random_shuffle(endPoints.begin(), endPoints.end());
-            */
         }
 
         int32_t Connection::RetrieveTimeout(void* value)

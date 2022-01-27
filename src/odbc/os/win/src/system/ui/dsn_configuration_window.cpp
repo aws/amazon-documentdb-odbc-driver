@@ -221,7 +221,7 @@ namespace ignite
 
                 int DsnConfigurationWindow::CreateSshSettingsGroup(int posX, int posY, int sizeX) 
                 {
-                    enum { LABEL_WIDTH = 120 }; 
+                    enum { LABEL_WIDTH = 120 };
 
                     int labelPosX = posX + INTERVAL;
 
@@ -417,8 +417,6 @@ namespace ignite
                 int DsnConfigurationWindow::CreateAdditionalSettingsGroup(int posX, int posY, int sizeX) 
                 {
                     enum { LABEL_WIDTH = 120 }; // same as SSH settings
-                    //enum { LABEL_WIDTH = 130 };  // -AL- different definition from above. I can also
-                        // change it to the same
 
                     int labelPosX = posX + INTERVAL;
 
