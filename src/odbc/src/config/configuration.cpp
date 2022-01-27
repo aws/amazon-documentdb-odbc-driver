@@ -68,43 +68,6 @@ namespace ignite
             const bool Configuration::DefaultValue::retryReads = true;
             const int32_t Configuration::DefaultValue::defaultFetchSize = 2000;
 
-            Configuration::Configuration() :
-                dsn(DefaultValue::dsn),
-                driver(DefaultValue::driver),
-                database(DefaultValue::database),
-                hostname(DefaultValue::hostname),
-                port(DefaultValue::port),
-                user(DefaultValue::user),
-                password(DefaultValue::password),
-                appName(DefaultValue::appName),
-                loginTimeoutSec(DefaultValue::loginTimeoutSec),
-                readPreference(DefaultValue::readPreference),
-                replicaSet(DefaultValue::replicaSet),
-                retryReads(DefaultValue::retryReads),
-                tls(DefaultValue::tls),
-                tlsAllowInvalidHostnames(DefaultValue::tlsAllowInvalidHostnames),
-                tlsCaFile(DefaultValue::tlsCaFile),
-                sshEnable(DefaultValue::sshEnable),
-                sshUser(DefaultValue::sshUser),
-                sshHost(DefaultValue::sshHost),
-                sshPrivateKeyFile(DefaultValue::sshPrivateKeyFile),
-                sshPrivateKeyPassphrase(DefaultValue::sshPrivateKeyPassphrase),
-                sshStrictHostKeyChecking(DefaultValue::sshStrictHostKeyChecking),
-                sshKnownHostsFile(DefaultValue::sshKnownHostsFile),
-                scanMethod(DefaultValue::scanMethod),
-                scanLimit(DefaultValue::scanLimit),
-                schemaName(DefaultValue::schemaName),
-                refreshSchema(DefaultValue::refreshSchema),
-                defaultFetchSize(DefaultValue::defaultFetchSize)
-            {
-                // No-op.
-            }
-
-            Configuration::~Configuration()
-            {
-                // No-op.
-            }
-
             std::string Configuration::ToConnectString() const
             {
                 ArgumentMap arguments;
@@ -130,17 +93,17 @@ namespace ignite
                 return connect_string_buffer.str();
             }
 
-            uint16_t Configuration::GetTcpPort() const
+            uint16_t Configuration::GetPort() const
             {
                 return port.GetValue();
             }
 
-            void Configuration::SetTcpPort(uint16_t portNumber)
+            void Configuration::SetPort(uint16_t portNumber)
             {
                 this->port.SetValue(portNumber);
             }
 
-            bool Configuration::IsTcpPortSet() const
+            bool Configuration::IsPortSet() const
             {
                 return port.IsSet();
             }

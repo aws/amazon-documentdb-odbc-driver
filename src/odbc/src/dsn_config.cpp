@@ -111,8 +111,8 @@ namespace ignite
 
             SettableValue<int32_t> port = ReadDsnInt(dsn, ConnectionStringParser::Key::port);
 
-            if (port.IsSet() && !config.IsTcpPortSet())
-                config.SetTcpPort(static_cast<uint16_t>(port.GetValue()));
+            if (port.IsSet() && !config.IsPortSet())
+                config.SetPort(static_cast<uint16_t>(port.GetValue()));
 
             SettableValue<std::string> database = ReadDsnString(dsn, ConnectionStringParser::Key::database);
 

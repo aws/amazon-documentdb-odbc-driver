@@ -136,12 +136,12 @@ namespace ignite
                 /**
                  * Default constructor.
                  */
-                Configuration();
+                Configuration() = default;
 
                 /**
                  * Destructor.
                  */
-                ~Configuration();
+                ~Configuration() = default;
 
                 /**
                  * Convert configure to connect string.
@@ -211,21 +211,21 @@ namespace ignite
                  *
                  * @return Server port.
                  */
-                uint16_t GetTcpPort() const;
+                uint16_t GetPort() const;
 
                 /**
                  * Set server port.
                  *
                  * @param portNumber Server port.
                  */
-                void SetTcpPort(uint16_t portNumber);
+                void SetPort(uint16_t portNumber);
 
                 /**
                  * Check if the value set.
                  *
                  * @return @true if the value set.
                  */
-                bool IsTcpPortSet() const;
+                bool IsPortSet() const;
 
                 /**
                  * Get database.
@@ -730,85 +730,85 @@ namespace ignite
                 static void AddToMap(ArgumentMap& map, const std::string& key, const SettableValue<T>& value);
 
                 /** DSN. */
-                SettableValue<std::string> dsn;
+                SettableValue<std::string> dsn = DefaultValue::dsn;
 
                 /** Driver name. */
-                SettableValue<std::string> driver;
+                SettableValue<std::string> driver = DefaultValue::driver;
 
                 /** Schema. */
-                SettableValue<std::string> database;
+                SettableValue<std::string> database = DefaultValue::database;
 
                 /** Hostname. */
-                SettableValue<std::string> hostname;
+                SettableValue<std::string> hostname = DefaultValue::hostname;
 
                 /** Port. */
-                SettableValue<uint16_t> port;
+                SettableValue<uint16_t> port = DefaultValue::port;
 
                 /** User. */
-                SettableValue<std::string> user;
+                SettableValue<std::string> user = DefaultValue::user;
 
                 /** Password. */
-                SettableValue<std::string> password;
+                SettableValue<std::string> password = DefaultValue::password;
 
                 /** Application name. */
-                SettableValue<std::string> appName;
+                SettableValue<std::string> appName = DefaultValue::appName;
 
                 /** Login timeout in seconds.  */
-                SettableValue<int32_t> loginTimeoutSec;
+                SettableValue<int32_t> loginTimeoutSec = DefaultValue::loginTimeoutSec;
 
                 /** Read pereference. */
-                SettableValue<ReadPreference::Type> readPreference;
+                SettableValue<ReadPreference::Type> readPreference = DefaultValue::readPreference;
 
                 /** Replica set name. */
-                SettableValue<std::string> replicaSet;
+                SettableValue<std::string> replicaSet = DefaultValue::replicaSet;
 
                 /** Retry reads flag. */
-                SettableValue<bool> retryReads;
+                SettableValue<bool> retryReads = DefaultValue::retryReads;
 
                 /** Enable SSL/TLS. */
-                SettableValue<bool> tls;
+                SettableValue<bool> tls = DefaultValue::tls;
 
                 /** Flag for if invalid hostnames for the TLS certificate are allowed. */
-                SettableValue<bool> tlsAllowInvalidHostnames;
+                SettableValue<bool> tlsAllowInvalidHostnames = DefaultValue::tlsAllowInvalidHostnames;
 
                 /** SSL/TLS certificate authority file path. */
-                SettableValue<std::string> tlsCaFile;
+                SettableValue<std::string> tlsCaFile = DefaultValue::tlsCaFile;
 
                 /** The SSH enable option for the internal SSH tunnel. */
                 SettableValue<bool> sshEnable;
 
                 /** The SSH host username for the internal SSH tunnel. */
-                SettableValue<std::string> sshUser;
+                SettableValue<std::string> sshUser = DefaultValue::sshUser;
 
                 /** The SSH host host name for the internal SSH tunnel. */
-                SettableValue<std::string> sshHost;
+                SettableValue<std::string> sshHost = DefaultValue::sshHost;
 
                 /** The SSH host private key file path for the internal SSH tunnel. */
-                SettableValue<std::string> sshPrivateKeyFile;
+                SettableValue<std::string> sshPrivateKeyFile = DefaultValue::sshPrivateKeyFile;
 
                 /** The SSH host private key file passphrase for the internal SSH tunnel. */
-                SettableValue<std::string> sshPrivateKeyPassphrase;
+                SettableValue<std::string> sshPrivateKeyPassphrase = DefaultValue::sshPrivateKeyPassphrase;
 
                 /** Strict host key checking flag for the internal SSH tunnel. */
-                SettableValue<bool> sshStrictHostKeyChecking;
+                SettableValue<bool> sshStrictHostKeyChecking = DefaultValue::sshStrictHostKeyChecking;
 
                 /** The known hosts file path for the internal SSH tunnel. */
-                SettableValue<std::string> sshKnownHostsFile;
+                SettableValue<std::string> sshKnownHostsFile = DefaultValue::sshKnownHostsFile;
 
                 /** Scan method. */ 
-                SettableValue<ScanMethod::Type> scanMethod;
+                SettableValue<ScanMethod::Type> scanMethod = DefaultValue::scanMethod;
 
                 /** Scan limit. */
-                SettableValue<int32_t> scanLimit;
+                SettableValue<int32_t> scanLimit = DefaultValue::scanLimit;
 
                 /** Schema name. */
-                SettableValue<std::string> schemaName;
+                SettableValue<std::string> schemaName = DefaultValue::schemaName;
 
                 /** Refresh schema flag. */
-                SettableValue<bool> refreshSchema;
+                SettableValue<bool> refreshSchema = DefaultValue::refreshSchema;
 
-                /** Request and response page size. */
-                SettableValue<int32_t> defaultFetchSize;
+                /** Default fetch size. */
+                SettableValue<int32_t> defaultFetchSize = DefaultValue::defaultFetchSize;
             };
 
             template<>

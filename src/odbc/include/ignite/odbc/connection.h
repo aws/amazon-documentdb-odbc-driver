@@ -28,10 +28,10 @@
 #include "ignite/odbc/config/connection_info.h"
 #include "ignite/odbc/config/configuration.h"
 #include "ignite/odbc/diagnostic/diagnosable_adapter.h"
-#include "ignite/odbc/end_point.h"
 #include "ignite/odbc/streaming/streaming_context.h"
 #include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/jni/java.h"
+#include "ignite/odbc/end_point.h"
 
 namespace ignite
 {

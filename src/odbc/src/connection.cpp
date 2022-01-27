@@ -522,7 +522,6 @@ namespace ignite
 
         SqlResult::Type Connection::MakeRequestHandshake()
         {
-
             HandshakeRequest req(config);
             HandshakeResponse rsp;
 
@@ -642,18 +641,22 @@ namespace ignite
         std::string Connection::FormatJdbcConnectionString() const {
             std::string host = "localhost";
             std::string port = "27017";
-            if (!config.GetHostname().empty()) {
-                host = config.GetHostname();
-                port = std::to_string(config.GetTcpPort());
-            }
             std::string jdbConnectionString;
+
+            if (config.IsHostnameSet()) {
+                host = config.GetHostname();
+            }
+
+            if (config.IsPortSet()) {
+                port = std::to_string(config.GetPort());
+            }
 
             jdbConnectionString = "jdbc:documentdb:";
             jdbConnectionString.append("//" + config.GetUser());
             jdbConnectionString.append(":" + config.GetPassword());
             jdbConnectionString.append("@" + host);
             jdbConnectionString.append(":" + port);
-            jdbConnectionString.append("/" + config.GetSchemaName());
+            jdbConnectionString.append("/" + config.GetDatabase());
             jdbConnectionString.append("?tlsAllowInvalidHostnames=true");
 
             // Check if internal SSH tunnel should be enabled.
@@ -682,7 +685,7 @@ namespace ignite
             return jdbConnectionString;
         }
 
-                /**
+        /**
          * Create JVM options from configuration.
          *
          * @param cfg Configuration.
@@ -749,9 +752,9 @@ namespace ignite
         {
             endPoints.clear();
 
-            // DocumentDB driver is currently not supporting list of addresses. Always use this 'legacy' method.
+            // DocumentDB driver is currently not supporting list of addresses. Return vector with the one address for now.
             LOG_MSG("'Address' is not set. Using legacy connection method.");
-            endPoints.push_back(EndPoint(cfg.GetHostname(), cfg.GetTcpPort()));
+            endPoints.push_back(EndPoint(cfg.GetHostname(), cfg.GetPort()));
             return;
         }
 
