@@ -84,7 +84,6 @@ jobs:
 
     - name: register-driver
       run: |
-        run: |
         .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
 
     - name: run-tests

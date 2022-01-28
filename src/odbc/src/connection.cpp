@@ -694,6 +694,8 @@ namespace ignite
             mongoConnectionString.append("?tlsCAFile="
                                          + common::GetEnv("DOC_DB_CA_FILE", ""));
 
+            std::cout << mongoConnectionString << std::endl;
+
             return mongoConnectionString;
         }
 
