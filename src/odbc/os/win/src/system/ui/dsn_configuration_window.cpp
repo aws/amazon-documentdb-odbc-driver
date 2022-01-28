@@ -265,7 +265,7 @@ namespace ignite
                     sshPrivateKeyPassphraseEdit = CreateEdit(editPosX, rowPos, editSizeX,
                                           ROW_HEIGHT, val, ChildId::SSH_PRIVATE_KEY_PASSPHRASE_EDIT, ES_PASSWORD);
 
-                    rowPos += INTERVAL + ROW_HEIGHT * 2;
+                    rowPos += INTERVAL + ROW_HEIGHT;
 
                     // SSH Strict Host Key Check check box needs to have editSizeX as size because the string is long
                     sshStrictHostKeyCheckingCheckBox = CreateCheckBox(
