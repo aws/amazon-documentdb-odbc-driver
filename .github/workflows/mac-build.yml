@@ -24,6 +24,8 @@ env:
   DOC_DB_LOCAL_PORT: 27019
   DOC_DB_REMOTE_PORT: 27017
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
+  DOC_DB_CA: ${{secrets.DOC_DB_CA}}
+  DOC_DB_CA_FILE: ~/certs/CAFile.pem
   JDBC_DRIVER_VERSION: "1.1.0"
 
 jobs:
@@ -52,6 +54,8 @@ jobs:
         mkdir ~/certs
         echo "${{env.DOC_DB_KEYPAIR}}" > ${{env.DOC_DB_PRIV_KEY_FILE}}
         chmod 400 ${{env.DOC_DB_PRIV_KEY_FILE}}
+        echo "${{env.DOC_DB_CA}}" > ${{env.DOC_DB_CA_FILE}}
+        chmod 400 ${{env.DOC_DB_CA_FILE}}
 
     - name: get-dependencies
       run: |
