@@ -179,7 +179,7 @@ namespace ignite
                         return;
                     }
 
-                    if (value.size() >= sizeof("65535"))
+                    if (value.size() >= sizeof(std::to_string(UINT16_MAX)))
                     {
                         if (diag)
                         {
@@ -228,7 +228,7 @@ namespace ignite
                         return;
                     }
 
-                    if (value.size() >= sizeof("4294967295"))
+                    if (value.size() >= sizeof(std::to_string(UINT32_MAX)))
                     {
                         if (diag)
                         {
@@ -403,7 +403,7 @@ namespace ignite
                         return;
                     }
 
-                    if (value.size() >= sizeof("4294967295"))
+                    if (value.size() >= sizeof(std::to_string(UINT32_MAX)))
                     {
                         if (diag)
                         {
@@ -470,7 +470,7 @@ namespace ignite
                         return;
                     }
 
-                    if (value.size() >= sizeof("4294967295"))
+                    if (value.size() >= sizeof(std::to_string(UINT32_MAX)))
                     {
                         if (diag)
                         {

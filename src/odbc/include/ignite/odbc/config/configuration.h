@@ -120,12 +120,6 @@ namespace ignite
                     /** Default value for refreshSchema attribute. */
                     static const bool refreshSchema;
 
-                    /** Default value for sslKeyFile attribute. */
-                    static const std::string sslKeyFile;
-
-                    /** Default value for sslCertFile attribute. */
-                    static const std::string sslCertFile;
-
                     /** Default value for defaultFetchSize attribute. */
                     static const int32_t defaultFetchSize;
                 };

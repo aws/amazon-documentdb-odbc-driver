@@ -326,9 +326,6 @@ namespace ignite
                     {
                         nestedTxModeComboBox->AddString(NestedTxMode::ToString(*it));
 
-                        /* if (*it == config.GetNestedTxMode())
-                            nestedTxModeComboBox->SetSelection(id); */
-
                         ++id;
                     }
 
@@ -549,9 +546,7 @@ namespace ignite
                         throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, "Protocol version is not supported.");
 
                     cfg.SetDsn(dsnStr);
-                    //cfg.SetAddresses(addresses);
                     cfg.SetDatabase(schemaStr);
-                    //cfg.SetProtocolVersion(version);
                 }
 
                 void DsnConfigurationWindow::RetrieveAuthParameters(config::Configuration& cfg) const
@@ -586,9 +581,6 @@ namespace ignite
 
                     ssl::SslMode::Type sslMode = ssl::SslMode::FromString(sslModeStr, ssl::SslMode::DISABLE);
 
-                    //cfg.SetSslMode(sslMode);
-                    //cfg.SetSslKeyFile(sslKeyStr);
-                    //cfg.SetSslCertFile(sslCertStr);
                     cfg.SetTlsCaFile(sslCaStr);
                 }
 
@@ -606,34 +598,9 @@ namespace ignite
                     std::string nestedTxModeStr;
 
                     nestedTxModeComboBox->GetText(nestedTxModeStr);
-
-                    //NestedTxMode::Type mode = NestedTxMode::FromString(nestedTxModeStr, config.GetNestedTxMode());
-
-                    //bool distributedJoins = distributedJoinsCheckBox->IsChecked();
-                    //bool enforceJoinOrder = enforceJoinOrderCheckBox->IsChecked();
-                    //bool replicatedOnly = replicatedOnlyCheckBox->IsChecked();
-                    //bool collocated = collocatedCheckBox->IsChecked();
-                    //bool lazy = lazyCheckBox->IsChecked();
-                    //bool skipReducerOnUpdate = skipReducerOnUpdateCheckBox->IsChecked();
-
                     LOG_MSG("Retrieving arguments:");
                     LOG_MSG("Page size:              " << pageSize);
-                    //LOG_MSG("Nested TX Mode:         " << NestedTxMode::ToString(mode));
-                    //LOG_MSG("Distributed Joins:      " << (distributedJoins ? "true" : "false"));
-                    //LOG_MSG("Enforce Join Order:     " << (enforceJoinOrder ? "true" : "false"));
-                    //LOG_MSG("Replicated only:        " << (replicatedOnly ? "true" : "false"));
-                    //LOG_MSG("Collocated:             " << (collocated ? "true" : "false"));
-                    //LOG_MSG("Lazy:                   " << (lazy ? "true" : "false"));
-                    //LOG_MSG("Skip reducer on update: " << (skipReducerOnUpdate ? "true" : "false"));
-
                     cfg.SetDefaultFetchSize(pageSize);
-                    //cfg.SetNestedTxMode(mode);
-                    //cfg.SetDistributedJoins(distributedJoins);
-                    //cfg.SetEnforceJoinOrder(enforceJoinOrder);
-                    //cfg.SetReplicatedOnly(replicatedOnly);
-                    //cfg.SetCollocated(collocated);
-                    //cfg.SetLazy(lazy);
-                    //cfg.SetSkipReducerOnUpdate(skipReducerOnUpdate);
                 }
             }
         }
