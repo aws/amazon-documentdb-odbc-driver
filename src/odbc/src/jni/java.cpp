@@ -210,13 +210,22 @@ namespace ignite
                         JniMethod(
                             "getPropertiesFromConnectionString",
                             "(Ljava/lang/String;)Lsoftware/amazon/documentdb/jdbc/DocumentDbConnectionProperties;",
-                            true);
+                            true); 
+
+                // todo code draft -AL-. After constants all defined, work on the JNI wrappers with Bruce
+                //const char* C_DOCUMENTDB_CONNECTION =
+                //    "software/amazon/documentdb/jdbc/DocumentDbConnectionProperties";
+                //JniMethod M_DOCUMENTDB_CONNECTION_PROPERTIES_GET_PROPERTIES_FROM_CONNECTION_STRING =
+                //        JniMethod(
+                //            "getPropertiesFromConnectionString",
+                //            "(Ljava/lang/String;)Lsoftware/amazon/documentdb/jdbc/DocumentDbConnectionProperties;",
+                //            true); 
 
                 const char* C_DOCUMENTDB_CONNECTION = "software/amazon/documentdb/jdbc/DocumentDbConnectionProperties";
 
                 const char* C_DRIVERMANAGER = "java/sql/DriverManager";
                 JniMethod M_DRIVERMANAGER_GET_CONNECTION = 
-                  JniMethod("getConnection", "(Ljava/lang/String;)Ljava/sql/Connection;", true);
+                  JniMethod("getConnection", "(Ljava/lang/String;)Ljava/sql/Connection;", true); // true/false defines whether it is true -> static/instance
 
                 const char* C_JAVA_SQL_CONNECTION = "java/sql/Connection";
                 JniMethod M_JAVA_SQL_CONNECTION_CLOSE = JniMethod("close", "()V", false);
