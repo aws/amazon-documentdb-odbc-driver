@@ -690,6 +690,7 @@ namespace ignite
             mongoConnectionString.append(":" + port);
             mongoConnectionString.append("/" + config.GetSchema());
             mongoConnectionString.append("?tlsAllowInvalidHostnames=true");
+            mongoConnectionString.append("?tls=true");
             mongoConnectionString.append("?tlsCAFile="
                                          + common::GetEnv("DOC_DB_CA_FILE", ""));
 
