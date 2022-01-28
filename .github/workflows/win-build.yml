@@ -65,7 +65,7 @@ jobs:
 
     - name: Run SSH tunnel to DocumentDB server
       run: |
-        ssh.exe -f -N -i ~/certs/docdb-sshtunnel.pem -L ${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}} &
+        ssh.exe -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/certs/${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
 
     - name: Install dependencies Windows
       run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x86-windows openssl:x86-windows boost-test:x86-windows boost-asio:x86-windows boost-chrono:x86-windows boost-interprocess:x86-windows boost-regex:x86-windows boost-system:x86-windows boost-thread:x86-windows
