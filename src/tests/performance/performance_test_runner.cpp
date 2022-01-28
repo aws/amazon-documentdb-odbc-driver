@@ -49,6 +49,10 @@ void performance::PerformanceTestRunner::ListDriversInstalled() {
             printf("\tdata truncation\n");
     }
     printf("\n");
+
+    if (SQL_NULL_HENV != env) {
+        SQLFreeHandle(SQL_HANDLE_ENV, env);
+    }
 }
 
 void performance::PerformanceTestRunner::ListDataSourcesInstalled() {
@@ -75,6 +79,10 @@ void performance::PerformanceTestRunner::ListDataSourcesInstalled() {
             printf("\tdata truncation\n");
     }
     printf("\n");
+
+    if (SQL_NULL_HENV != env) {
+        SQLFreeHandle(SQL_HANDLE_ENV, env);
+    }
 }
 
 SQLRETURN performance::PerformanceTestRunner::testDefaultDSN() {
@@ -120,6 +128,18 @@ SQLRETURN performance::PerformanceTestRunner::testDefaultDSN() {
 
     ret = SQLExecDirect(hstmt, AS_SQLTCHAR(query.c_str()), SQL_NTS);
 
+    if (SQL_NULL_HSTMT != hstmt) {
+        CloseCursor(&hstmt, true, true);
+        SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+    }
+    if (SQL_NULL_HDBC != conn) {
+        SQLDisconnect(conn);
+        SQLFreeHandle(SQL_HANDLE_DBC, conn);
+    }
+    if (SQL_NULL_HENV != env) {
+        SQLFreeHandle(SQL_HANDLE_ENV, env);
+    }
+
     return ret;
 }
 
@@ -160,9 +180,17 @@ void performance::PerformanceTestRunner::checkDSN(const std::string dsn) {
                                               sizeof(desc), &desc_ret))) {
         dsn_str = wchar_to_string(dsn_wchar);
         if (dsn_str.compare(dsn) == 0) {
-            return;
+            if (SQL_NULL_HENV != env) {
+                SQLFreeHandle(SQL_HANDLE_ENV, env);
+            }
+            return; // DSN found
         }
         direction = SQL_FETCH_NEXT;
+    }
+
+    // DSN not found
+    if (SQL_NULL_HENV != env) {
+        SQLFreeHandle(SQL_HANDLE_ENV, env);
     }
     error_msg = "DSN ERROR: " + dsn + " is not installed.";
     throw std::runtime_error(error_msg);
