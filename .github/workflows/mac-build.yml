@@ -77,7 +77,7 @@ jobs:
         ./scripts/register_driver_macos.sh
     - name: Run SSH tunnel to DocumentDB server
       run: |
-        ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/certs/${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
+        ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
     - name: run-tests
       run: |
         ./build/odbc/bin/ignite-odbc-tests
