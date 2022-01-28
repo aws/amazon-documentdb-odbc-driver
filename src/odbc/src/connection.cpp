@@ -706,7 +706,6 @@ namespace ignite
                 host = config.GetAddresses()[0].host;
                 port = std::to_string(config.GetAddresses()[0].port);
             }
-            std::string jdbConnectionString;
 
             jdbConnectionString = "jdbc:documentdb:";
             jdbConnectionString.append("//" + config.GetUser());
