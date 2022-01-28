@@ -26,7 +26,13 @@
    1. E.g.: `.\build_win_debug64.ps1`
    2. Navigate to the `build\odbc\cmake` folder to use the generated solution file, `Ignite.C++.sln` to work on
    source code development and testing.
-7. More details in `src\DEVNOTES.txt`.
+7. Set the environment variable `DOCUMENTDB_HOME`. On a developer's machine, set it to `<repo-folder>\build\odbc\bin\Debug`. The 
+   build script run above, downloads it to the `<repo-folder>\build\odbc\bin\Debug\libs` folder.
+8. Open a **64-bit** command shell or **64-bit** PowerShell window, **as Administrator**, run the 
+   ```
+   <repo-folder>\src\odbc\src\install\install_amd64.cmd <repo-folder>\buildbuild\odbc\cmake\Debug\ignite.odbc.dll
+   ``` 
+8. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
 ### MacOS
 
@@ -46,7 +52,7 @@
 2. Run one of the build scripts to create an initial compilation.
    1. E.g.: `./build_mac_release64.sh`
    2. Navigate to the `build/odbc/lib` folder to use the generated files.
-3. More details in `src\DEVNOTES.txt`.
+3. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
 ### Linux
 

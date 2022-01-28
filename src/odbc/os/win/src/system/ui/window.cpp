@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include <Windowsx.h>
+#include <windowsx.h>
 
 #include "ignite/odbc/system/ui/window.h"
 
@@ -58,7 +58,7 @@ namespace ignite
                     title(),
                     handle(handle),
                     created(false),
-                    parent(0)
+                    parent(nullptr)
                 {
                     // No-op.
                 }
@@ -88,7 +88,7 @@ namespace ignite
                         posY,
                         width,
                         height,
-                        parent ? parent->GetHandle() : NULL,
+                        parent ? parent->GetHandle() : nullptr,
                         reinterpret_cast<HMENU>(static_cast<ptrdiff_t>(id)),
                         GetHInstance(),
                         this
@@ -125,7 +125,7 @@ namespace ignite
                     if (handle)
                         DestroyWindow(handle);
 
-                    handle = NULL;
+                    handle = nullptr;
                 }
 
                 void Window::GetText(std::string& text) const

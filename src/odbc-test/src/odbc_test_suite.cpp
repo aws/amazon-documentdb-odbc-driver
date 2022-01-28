@@ -24,10 +24,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "ignite/ignition.h"
-
 #include "test_utils.h"
 #include "odbc_test_suite.h"
+#include <ignite/odbc/common/fixed_size_array.h>
 
 using namespace ignite_test;
 using namespace boost::unit_test;
@@ -103,7 +102,9 @@ namespace ignite
             BOOST_REQUIRE(stmt != NULL);
         }
 
-        std::string OdbcTestSuite::ExpectConnectionReject(const std::string& connectStr)
+        std::string OdbcTestSuite::ExpectConnectionReject(
+            const std::string& connectStr,
+            const std::string& expectedError)
         {
             Prepare();
 
@@ -118,6 +119,9 @@ namespace ignite
                 outstr, sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
 
             BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
+            BOOST_REQUIRE_EQUAL(expectedError,
+                                GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc)
+                                    .substr(0, expectedError.size()));
 
             return GetOdbcErrorState(SQL_HANDLE_DBC, dbc);
         }
@@ -154,19 +158,6 @@ namespace ignite
             }
         }
 
-        Ignite OdbcTestSuite::StartTestNode(const char* cfg, const char* name)
-        {
-            std::string config(cfg);
-
-#ifdef IGNITE_TESTS_32
-            // Cutting off the ".xml" part.
-            config.resize(config.size() - 4);
-            config += "-32.xml";
-#endif //IGNITE_TESTS_32
-
-            return StartNode(config.c_str(), name);
-        }
-
         OdbcTestSuite::OdbcTestSuite():
             env(NULL),
             dbc(NULL),
@@ -178,8 +169,6 @@ namespace ignite
         OdbcTestSuite::~OdbcTestSuite()
         {
             CleanUp();
-
-            Ignition::StopAll(true);
         }
 
         int8_t OdbcTestSuite::GetTestI8Field(int64_t idx)
@@ -347,7 +336,7 @@ namespace ignite
         {
             BOOST_TEST_CONTEXT("Test index: " << idx)
             {
-                common::FixedSizeArray<int8_t> expected(static_cast<int32_t>(valLen));
+                odbc::common::FixedSizeArray<int8_t> expected(static_cast<int32_t>(valLen));
                 GetTestI8ArrayField(idx, expected.GetData(), expected.GetSize());
 
                 for (size_t j = 0; j < valLen; ++j)

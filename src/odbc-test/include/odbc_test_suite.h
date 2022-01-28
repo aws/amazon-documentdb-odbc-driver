@@ -75,7 +75,9 @@ namespace ignite
              * @param connectStr Connection string.
              * @return SQL State.
              */
-            std::string ExpectConnectionReject(const std::string& connectStr);
+            std::string ExpectConnectionReject(
+                const std::string& connectStr,
+                const std::string& expectedError = "08001: Failed to establish connection with the host.");
 
             /**
              * Disconnect.
@@ -86,14 +88,6 @@ namespace ignite
              * Clean up.
              */
             void CleanUp();
-
-            /**
-             * Start additional with the specified name and config.
-             *
-             * @param cfg Config path.
-             * @param name Instance name.
-             */
-            static Ignite StartTestNode(const char* cfg, const char* name);
 
             /**
              * Constructor.
