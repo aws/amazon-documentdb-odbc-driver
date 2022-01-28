@@ -263,7 +263,7 @@ namespace ignite
                     sshPrivateKeyPassphraseLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT * 2,
                                     "SSH Private Key File Passphrase:", ChildId::SSH_PRIVATE_KEY_PASSPHRASE_LABEL);
                     sshPrivateKeyPassphraseEdit = CreateEdit(editPosX, rowPos, editSizeX,
-                                          ROW_HEIGHT, val, ChildId::SSH_PRIVATE_KEY_PASSPHRASE_EDIT);
+                                          ROW_HEIGHT, val, ChildId::SSH_PRIVATE_KEY_PASSPHRASE_EDIT, ES_PASSWORD);
 
                     rowPos += INTERVAL + ROW_HEIGHT * 2;
 
@@ -392,7 +392,7 @@ namespace ignite
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     refreshSchemaCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                        "Refresh Schema (Caution: use only when necessary to update schema)", ChildId::REFRESH_SCHEMA_CHECK_BOX, config.IsRefreshSchema());
+                        "Refresh Schema (Caution: use temporarily to update schema)", ChildId::REFRESH_SCHEMA_CHECK_BOX, config.IsRefreshSchema());
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -731,7 +731,6 @@ namespace ignite
                     LOG_MSG("SSH user:                      " << sshUserStr);
                     LOG_MSG("SSH host:                      " << sshHostStr);
                     LOG_MSG("SSH private key file:          " << sshPrivateKeyFileStr);
-                    LOG_MSG("SSH private key passphrase:    " << sshPrivateKeyPassphraseStr);
                     LOG_MSG("SSH strict host key checking:  " << (sshStrictHostKeyChecking ? "true" : "false"));
                     LOG_MSG("SSH known hosts file:          " << sshKnownHostsFileStr);
 
