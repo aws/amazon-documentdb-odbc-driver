@@ -155,6 +155,7 @@ jobs:
         chmod 400 ~/certs/docdb-sshtunnel.pem
         echo "${{env.DOC_DB_CA}}" > ${{env.DOC_DB_CA_FILE}}
         chmod 400 ${{env.DOC_DB_CA_FILE}}
+        Import-Certificate -FilePath ${{env.DOC_DB_CA_FILE}} -CertStoreLocation  cert:\LocalMachine\Root
         mkdir -p ~/.ssh
         copy ./src/odbc-test/config/ssh_config ~/.ssh/config
 
