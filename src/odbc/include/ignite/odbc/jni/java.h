@@ -246,6 +246,7 @@ namespace ignite {
                   jmethodID m_DocumentDbConnectionPropertiesGetPropertiesFromConnectionString;
 
                   jclass c_DocumentDbConnection;
+                  jmethodID m_DocumentDbConnectionGetSshLocalPort;
                   jmethodID m_DocumentDbConnectionInit;
                   jmethodID m_DocumentDbClose;
 

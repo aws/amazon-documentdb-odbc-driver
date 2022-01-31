@@ -212,16 +212,12 @@ namespace ignite
                             "(Ljava/lang/String;)Lsoftware/amazon/documentdb/jdbc/DocumentDbConnectionProperties;",
                             true); 
 
-                // todo code draft -AL-. After constants all defined, work on the JNI wrappers with Bruce
-                //const char* C_DOCUMENTDB_CONNECTION =
-                //    "software/amazon/documentdb/jdbc/DocumentDbConnectionProperties";
-                //JniMethod M_DOCUMENTDB_CONNECTION_PROPERTIES_GET_PROPERTIES_FROM_CONNECTION_STRING =
-                //        JniMethod(
-                //            "getPropertiesFromConnectionString",
-                //            "(Ljava/lang/String;)Lsoftware/amazon/documentdb/jdbc/DocumentDbConnectionProperties;",
-                //            true); 
+                // todo code draft -AL-. After constants all defined (define constants here), work on the JNI wrappers with Bruce
+                const char* C_DOCUMENTDB_CONNECTION = "software/amazon/documentdb/jdbc/DocumentDbConnection";
+                JniMethod M_DOCUMENTDB_CONNECTION_GET_SSH_LOCAL_PORT =
+                        JniMethod("getSshLocalPort", "()I", false); 
 
-                const char* C_DOCUMENTDB_CONNECTION = "software/amazon/documentdb/jdbc/DocumentDbConnectionProperties";
+                // const char* C_DOCUMENTDB_CONNECTION = "software/amazon/documentdb/jdbc/DocumentDbConnectionProperties";
 
                 const char* C_DRIVERMANAGER = "java/sql/DriverManager";
                 JniMethod M_DRIVERMANAGER_GET_CONNECTION = 
@@ -437,6 +433,7 @@ namespace ignite
 
                     c_DocumentDbConnection = FindClass(env, C_DOCUMENTDB_CONNECTION);
                     //m_DocumentDbConnectionInit = FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_PROPERTIES_INIT);
+                    m_DocumentDbConnectionGetSshLocalPort = FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_GET_SSH_LOCAL_PORT);
 
                     c_DriverManager = FindClass(env, C_DRIVERMANAGER);
                     m_DriverManagerGetConnection = FindMethod(env, c_DriverManager, M_DRIVERMANAGER_GET_CONNECTION);
