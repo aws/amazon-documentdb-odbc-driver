@@ -118,7 +118,7 @@ namespace ignite
 
         void Connection::Establish(const std::string& connectStr, void* parentWindow)
         {
-            IGNITE_ODBC_API_CALL(InternalEstablish(connectStr, parentWindow));  
+            IGNITE_ODBC_API_CALL(InternalEstablish(connectStr, parentWindow));
         }
 
         SqlResult::Type Connection::InternalEstablish(const std::string& connectStr, void* parentWindow)
@@ -127,10 +127,6 @@ namespace ignite
             config::ConnectionStringParser parser(config);
             parser.ParseConnectionString(connectStr, &GetDiagnosticRecords());
 
-            if (parentWindow)
-            {
-                
-            }
 #ifdef _WIN32
             if (parentWindow)
             {
@@ -670,8 +666,12 @@ namespace ignite
                 connection = nullptr;
             }
 
+            if (!connected) {
+                return connected
+            }
+
             std::string mongoCPPConnectionString = FormatMongoCppConnectionString();
-            connected = connected && ConnectCPPDocumentDB(mongoCPPConnectionString);
+            connected = ConnectCPPDocumentDB(mongoCPPConnectionString);
 
             return connected;
         }
