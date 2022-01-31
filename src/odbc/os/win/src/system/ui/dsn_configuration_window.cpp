@@ -34,7 +34,7 @@ namespace ignite
             namespace ui
             {   
                 DsnConfigurationWindow::DsnConfigurationWindow(Window* parent, config::Configuration& config):
-                    CustomWindow(parent, "IgniteConfigureDsn", "Configure Amazon DocumentDB DSN Latest"),
+                    CustomWindow(parent, "IgniteConfigureDsn", "Configure Amazon DocumentDB DSN"),
                     width(730),
                     height(515),
                     connectionSettingsGroupBox(),
@@ -546,7 +546,7 @@ namespace ignite
                                 case ChildId::USER_EDIT:
                                 case ChildId::PASSWORD_EDIT:
                                 { 
-                                    // if window has been created. Check
+                                    // Check if window has been created. 
                                     if (created) {
                                         okButton->SetEnabled(
                                             nameEdit->HasText()
@@ -752,8 +752,8 @@ namespace ignite
                     tlsCaFileEdit->GetText(tlsCaStr);
 
                     LOG_MSG("TLS/SSL Encryption:                       " << (tls ? "true" : "false"));
-                    LOG_MSG("tls Allow Invalid Hostnames:              " << (tlsAllowInvalidHostnames ? "true" : "false"));
-                    LOG_MSG("TLS CA (Certificate Authority) File name: " << tlsCaStr);
+                    LOG_MSG("TLS Allow Invalid Hostnames:              " << (tlsAllowInvalidHostnames ? "true" : "false"));
+                    LOG_MSG("TLS CA (Certificate Authority) File: " << tlsCaStr);
 
                     cfg.SetTls(tls);
                     cfg.SetTlsAllowInvalidHostnames(tlsAllowInvalidHostnames);
