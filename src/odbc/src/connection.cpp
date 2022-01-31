@@ -629,7 +629,7 @@ namespace ignite
             if (connection) {
                 return true;
             }
-/*
+
             std::string connectionString = FormatJdbcConnectionString();
             JniErrorInfo errInfo;
 
@@ -669,9 +669,9 @@ namespace ignite
                 err = odbc::IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_INIT, "Unable to get initialized JVM.");
                 connection = nullptr;
             }
-*/
+
             std::string mongoCPPConnectionString = FormatMongoCppConnectionString();
-            connected = ConnectCPPDocumentDB(mongoCPPConnectionString);
+            connected = connected && ConnectCPPDocumentDB(mongoCPPConnectionString);
 
             return connected;
         }
