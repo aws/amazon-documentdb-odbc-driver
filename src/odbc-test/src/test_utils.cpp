@@ -19,9 +19,12 @@
 
 #include <cassert>
 
-#include <ignite/common/platform_utils.h>
+#include <ignite/odbc/common/platform_utils.h>
+#include "ignite/odbc/jni/utils.h"
+
 
 #include "test_utils.h"
+
 
 namespace ignite_test
 {
@@ -75,14 +78,14 @@ namespace ignite_test
 
     std::string GetTestConfigDir()
     {
-        using namespace ignite;
+        using namespace ignite::odbc;
 
         std::string cfgPath = common::GetEnv("IGNITE_NATIVE_TEST_ODBC_CONFIG_PATH");
 
         if (!cfgPath.empty())
             return cfgPath;
 
-        std::string home = jni::ResolveIgniteHome();
+        std::string home = jni::ResolveDocumentDbHome();
 
         if (home.empty())
             return home;
@@ -99,100 +102,20 @@ namespace ignite_test
         return path.str();
     }
 
-    void InitConfig(ignite::IgniteConfiguration& cfg, const char* cfgFile)
-    {
-        using namespace ignite;
-
-        assert(cfgFile != 0);
-
-        cfg.jvmOpts.push_back("-Xdebug");
-        cfg.jvmOpts.push_back("-Xnoagent");
-        cfg.jvmOpts.push_back("-Djava.compiler=NONE");
-        cfg.jvmOpts.push_back("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005");
-        cfg.jvmOpts.push_back("-XX:+HeapDumpOnOutOfMemoryError");
-        cfg.jvmOpts.push_back("-Duser.timezone=GMT");
-        cfg.jvmOpts.push_back("-DIGNITE_QUIET=false");
-        cfg.jvmOpts.push_back("-DIGNITE_CONSOLE_APPENDER=false");
-        cfg.jvmOpts.push_back("-DIGNITE_UPDATE_NOTIFIER=false");
-        cfg.jvmOpts.push_back("-DIGNITE_LOG_CLASSPATH_CONTENT_ON_STARTUP=false");
-        cfg.jvmOpts.push_back("-Duser.language=en");
-        // Un-comment to debug SSL
-        //cfg.jvmOpts.push_back("-Djavax.net.debug=ssl");
-
-        cfg.igniteHome = jni::ResolveIgniteHome();
-        cfg.jvmClassPath = jni::CreateIgniteHomeClasspath(cfg.igniteHome, true);
-
-#ifdef IGNITE_TESTS_32
-        cfg.jvmInitMem = 256;
-        cfg.jvmMaxMem = 768;
-#else
-        cfg.jvmInitMem = 1024;
-        cfg.jvmMaxMem = 4096;
-#endif
-
-        std::string cfgDir = GetTestConfigDir();
-
-        if (cfgDir.empty())
-            throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, "Failed to resolve test config directory");
-
-        std::stringstream path;
-
-        path << cfgDir << common::Fs << cfgFile;
-
-        cfg.springCfgPath = path.str();
-    }
-
-    ignite::Ignite StartNode(const char* cfgFile)
-    {
-        using namespace ignite;
-
-        IgniteConfiguration cfg;
-
-        InitConfig(cfg, cfgFile);
-
-        return Ignition::Start(cfg);
-    }
-
-    ignite::Ignite StartNode(const char* cfgFile, const char* name)
-    {
-        using namespace ignite;
-
-        assert(name != 0);
-
-        IgniteConfiguration cfg;
-
-        InitConfig(cfg, cfgFile);
-
-        return Ignition::Start(cfg, name);
-    }
-
-    ignite::Ignite StartPlatformNode(const char* cfg, const char* name)
-    {
-        std::string config(cfg);
-
-#ifdef IGNITE_TESTS_32
-        // Cutting off the ".xml" part.
-        config.resize(config.size() - 4);
-        config += "-32.xml";
-#endif //IGNITE_TESTS_32
-
-        return StartNode(config.c_str(), name);
-    }
-
     std::string AppendPath(const std::string& base, const std::string& toAdd)
     {
         std::stringstream stream;
 
-        stream << base << ignite::common::Fs << toAdd;
+        stream << base << ignite::odbc::common::Fs << toAdd;
 
         return stream.str();
     }
 
     void ClearLfs()
     {
-        std::string home = ignite::jni::ResolveIgniteHome();
+        std::string home = ignite::odbc::jni::ResolveDocumentDbHome();
         std::string workDir = AppendPath(home, "work");
 
-        ignite::common::DeletePath(workDir);
+        ignite::odbc::common::DeletePath(workDir);
     }
 }
