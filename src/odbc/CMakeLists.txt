@@ -28,8 +28,7 @@ include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS})
 include_directories(include)
 
 if(APPLE)
-    # do not include dsn_config.cpp due to build issues
-    set(SOURCES src/app/application_data_buffer.cpp
+set(SOURCES src/app/application_data_buffer.cpp
         src/app/parameter.cpp
         src/app/parameter_set.cpp
         src/common_types.cpp
@@ -54,6 +53,7 @@ if(APPLE)
         src/meta/table_meta.cpp
         src/odbc.cpp
         src/entry_points.cpp
+        src/dsn_config.cpp
         src/query/column_metadata_query.cpp
         src/query/data_query.cpp
         src/query/batch_query.cpp
@@ -81,7 +81,7 @@ if(APPLE)
         src/utility.cpp
         src/log.cpp)
 else
-    set(SOURCES src/app/application_data_buffer.cpp
+set(SOURCES src/app/application_data_buffer.cpp
         src/app/parameter.cpp
         src/app/parameter_set.cpp
         src/common_types.cpp
@@ -134,6 +134,7 @@ else
         src/utility.cpp
         src/log.cpp)
 endif()
+
 
 if (WIN32)
     set(OS_INCLUDE os/win/include)
