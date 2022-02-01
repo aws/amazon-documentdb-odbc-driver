@@ -128,7 +128,7 @@ if (WIN32)
     endif()
 
 else()
-    add_definitions(-DBOOST_TEST_DYN_LINK)]
+    add_definitions(-DBOOST_TEST_DYN_LINK)
     target_link_libraries(${TARGET} odbccp32)
 endif()
 
