@@ -956,9 +956,10 @@ namespace ignite
                     }
 
                     JNIEnv* env = Attach();
+                    jstring jColumnName = env->NewStringUTF(columnName.c_str());
                     jobject result = env->CallObjectMethod(
                         resultSet, jvm->GetMembers().m_ResultSetGetStringByName,
-                        columnName);
+                        jColumnName);
                     ExceptionCheck(env, errInfo);
 
                     if (errInfo->code == IGNITE_JNI_ERR_SUCCESS) {
@@ -1015,10 +1016,11 @@ namespace ignite
                     }
 
                     JNIEnv* env = Attach();
+                    jstring jColumnName = env->NewStringUTF(columnName.c_str());
                     jint result = env->CallIntMethod(
                         resultSet,
                         jvm->GetMembers().m_ResultSetGetIntegerByName,
-                        columnName);
+                        jColumnName);
                     ExceptionCheck(env, errInfo);
                     if (errInfo->code == IGNITE_JNI_ERR_SUCCESS) {
                         value = result;
