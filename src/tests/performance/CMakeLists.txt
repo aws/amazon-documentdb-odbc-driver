@@ -28,8 +28,8 @@ add_executable (performance "src/performance.cpp"
 							"lib/csv_cell.h"
 							"lib/csv_error.h"
 							"lib/csv_parser.h"
-							"src/it_odbc_helper.cpp"
-							"include/it_odbc_helper.h" 
+							"src/performance_odbc_helper.cpp"
+							"include/performance_odbc_helper.h" 
 							"src/performance_test_runner.cpp"
 							"include/performance_test_runner.h")
 

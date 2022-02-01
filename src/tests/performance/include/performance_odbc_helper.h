@@ -14,8 +14,8 @@
  *
  */
 
-#ifndef IT_ODBC_HELPER_H
-#define IT_ODBC_HELPER_H
+#ifndef PERFORMANCE_ODBC_HELPER_H
+#define PERFORMANCE_ODBC_HELPER_H
 
 #ifdef __linux__
 #include <climits>
@@ -91,4 +91,4 @@ std::u16string string_to_u16string(const std::string& src);
 std::string tchar_to_string(const SQLTCHAR* tchar);
 std::string wchar_to_string(const SQLWCHAR* tchar);
 
-#endif
+#endif // PERFORMANCE_ODBC_HELPER_H

@@ -18,7 +18,7 @@
 #define PERFORMANCE_TEST_RUNNER_H
 
 #include "csv_parser.h"
-#include "it_odbc_helper.h"
+#include "performance_odbc_helper.h"
 
 #ifndef WIN32
 typedef SQLULEN SQLROWCOUNT;

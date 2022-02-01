@@ -23,7 +23,7 @@
 
 // Implement PerformanceTestRunner class
 
-// CLASS STATIC METHODS
+// CLASS STATIC METHODS (NOT USED IN PERFORMANCE TEST)
 
 void performance::PerformanceTestRunner::ListDriversInstalled() {
     SQLHENV env;
@@ -795,8 +795,12 @@ performance::PerformanceTestRunner::PerformanceTestRunner(
 
 performance::PerformanceTestRunner::~PerformanceTestRunner() {
     if (SQL_NULL_HSTMT != _hstmt) {
-        CloseCursor(&_hstmt, true, true);
-        SQLFreeHandle(SQL_HANDLE_STMT, _hstmt);
+        try {
+            CloseCursor(&_hstmt, true, true);
+            SQLFreeHandle(SQL_HANDLE_STMT, _hstmt);
+        } catch (const std::exception& err) {
+            std::cout << err.what() << std::endl;
+        }
     }
     if (SQL_NULL_HDBC != _conn) {
         SQLDisconnect(_conn);
@@ -906,13 +910,7 @@ void performance::PerformanceTestRunner::setupConnection() {
         throw std::runtime_error(error_msg);
     }
 
-    ret = SQLAllocHandle(SQL_HANDLE_STMT, _conn, &_hstmt);
-    if (ret == SQL_INVALID_HANDLE || ret == SQL_ERROR) {
-        error_msg =
-            "SQLAllocHandle ERROR: failed to allocate connection statement "
-            "handle.";
-        throw std::runtime_error(error_msg);
-    }
+    // Statement handle is allocated when test case is run
 }
 
 void performance::PerformanceTestRunner::runPerformanceTestPlan() {
@@ -924,6 +922,7 @@ void performance::PerformanceTestRunner::runPerformanceTestPlan() {
     int iteration_count;
     int limit;
     std::string error_msg;
+    SQLRETURN ret;
 
     // setup output file
     std::ofstream ofs;
@@ -939,6 +938,16 @@ void performance::PerformanceTestRunner::runPerformanceTestPlan() {
     num_test_cases = _cell_refs[_headers.idx_query].size();
     for (std::size_t row = 1; row < num_test_cases; ++row) {
         try {
+            // allocate statement handle for test case
+            ret = SQLAllocHandle(SQL_HANDLE_STMT, _conn, &_hstmt);
+            if (ret == SQL_INVALID_HANDLE || ret == SQL_ERROR) {
+                error_msg =
+                    "SQLAllocHandle ERROR: failed to allocate connection "
+                    "statement "
+                    "handle.";
+                throw std::runtime_error(error_msg);
+            }
+
             // get test case fields
             const auto& cell_query = _cell_refs[_headers.idx_query][row];
             const auto& cell_limit = _cell_refs[_headers.idx_limit][row];
@@ -986,6 +995,12 @@ void performance::PerformanceTestRunner::runPerformanceTestPlan() {
             test_case.query.clear();
             test_case.test_name.clear();
             test_case.time_ms.clear();
+
+            // Deallocate Statement Handle
+            if (SQL_NULL_HSTMT != _hstmt) {
+                CloseCursor(&_hstmt, true, true);
+                SQLFreeHandle(SQL_HANDLE_STMT, _hstmt);
+            }
 
         } catch (std::runtime_error& err) {
             error_msg = "TESTCASE ERROR: " + (std::string)err.what()

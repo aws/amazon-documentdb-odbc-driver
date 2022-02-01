@@ -14,7 +14,7 @@
  *
  */
 
-#include "it_odbc_helper.h"
+#include "performance_odbc_helper.h"
 
 #define EXECUTION_HANDLER(throw_on_error, log_diag, handle_type, handle,    \
                           ret_code, statement, error_msg)                   \
