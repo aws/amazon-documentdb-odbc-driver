@@ -22,7 +22,7 @@
  * 0 command line arguments
  * - default mode:
  * - dsn = documentdb-perf-test
- * - test plan file = Performance_Test_Plan.csv
+ * - test plan file = \build\odbc\cmake\tests\performance\Performance_Test_Plan.csv
  * - test results file = Performance_Test_Results.csv
  *
  * 1 command line argument
