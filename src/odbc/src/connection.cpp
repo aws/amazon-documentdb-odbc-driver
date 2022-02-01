@@ -667,7 +667,7 @@ namespace ignite
             }
 
             if (!connected) {
-                return connected
+                return connected;
             }
 
             std::string mongoCPPConnectionString = FormatMongoCppConnectionString();
