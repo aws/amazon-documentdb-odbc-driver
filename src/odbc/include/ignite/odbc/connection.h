@@ -22,8 +22,6 @@
 
 #include <vector>
 
-#include <ignite/network/socket_client.h>
-
 #include "ignite/odbc/parser.h"
 #include "ignite/odbc/config/connection_info.h"
 #include "ignite/odbc/config/configuration.h"
@@ -31,6 +29,9 @@
 #include "ignite/odbc/streaming/streaming_context.h"
 #include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/jni/java.h"
+#include <ignite/odbc/common/concurrent.h>
+
+using ignite::odbc::jni::java::GlobalJObject;
 
 namespace ignite
 {
@@ -312,7 +313,14 @@ namespace ignite
              */
             void SetAttribute(int attr, void* value, SQLINTEGER valueLen);
 
-        private:
+            /**
+             * Formats the JDBC connection string from configuration values.
+             * @return the JDBC connection string.
+             */
+            static std::string FormatJdbcConnectionString(
+                const config::Configuration& config);
+
+           private:
             IGNITE_NO_COPY_ASSIGNMENT(Connection);
 
             /**
@@ -489,12 +497,6 @@ namespace ignite
              */
             bool TryRestoreConnection(IgniteError& err);
 
-            /**
-             * Formats the JDBC connection string from configuration values.
-             * @return the JDBC connection string.
-             */
-            std::string FormatJdbcConnectionString() const;
-
             /** 
              * Creates JVM options
              */
@@ -548,7 +550,7 @@ namespace ignite
             config::ConnectionInfo info;
 
             /** Java connection object */
-            jobject connection;
+            SharedPointer< GlobalJObject > connection;
 
             /** JVM options */
             std::vector< char* > opts;

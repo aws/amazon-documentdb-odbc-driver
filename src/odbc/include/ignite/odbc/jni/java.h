@@ -19,10 +19,14 @@
 #define _IGNITE_ODBC_JNI_JAVA
 
 #include <stdint.h>
+#include <vector>
 
 #include <jni.h>
 
 #include <ignite/odbc/common/common.h>
+#include <ignite/odbc/common/concurrent.h>
+
+using ignite::odbc::common::concurrent::SharedPointer;
 
 namespace ignite {
     namespace odbc {
@@ -191,6 +195,12 @@ namespace ignite {
                */
               bool IGNITE_IMPORT_EXPORT IsJava9OrLater();
 
+              /** 
+               * Builds the JVM options
+               */
+              void BuildJvmOptions(const std::string& cp,
+                                   std::vector< char* >& opts, int xms = 256,
+                                   int xmx = 1024);
               /**
                * JNI handlers holder.
                */
@@ -252,8 +262,20 @@ namespace ignite {
                   jclass c_DriverManager;
                   jmethodID m_DriverManagerGetConnection;
 
-                  jclass c_JavaSqlConnection;
-                  jmethodID m_JavaSqlConnectionClose;
+                  jclass c_Connection;
+                  jmethodID m_ConnectionClose;
+                  jmethodID m_ConnectionGetMetaData;
+
+                  jclass c_ResultSet;
+                  jmethodID m_ResultSetNext;
+                  jmethodID m_ResultSetGetStringByIndex;
+                  jmethodID m_ResultSetGetIntegerByIndex;
+                  jmethodID m_ResultSetGetStringByName;
+                  jmethodID m_ResultSetGetIntegerByName;
+                  jmethodID m_ResultSetWasNull;
+
+                  jclass c_DatabaseMetaData;
+                  jmethodID m_DatabaseMetaDataGetTables;
 
                   jclass c_IgniteException;
 
@@ -288,6 +310,27 @@ namespace ignite {
                    * Destroy members releasing all allocated classes.
                    */
                   void Destroy(JNIEnv* env);
+              };
+
+              /**
+               * Guard to ensure global reference cleanup.
+               */
+              class GlobalJObject {
+                 public:
+                  GlobalJObject(JNIEnv* e, jobject obj);
+
+                  ~GlobalJObject();
+
+                  jobject GetRef() const;
+
+                 private:
+                  /** Environment. */
+                  JNIEnv* env;
+
+                  /** Target reference. */
+                  jobject ref;
+
+                  IGNITE_NO_COPY_ASSIGNMENT(GlobalJObject);
               };
 
               /**
@@ -398,10 +441,19 @@ namespace ignite {
                   static void SetConsoleHandler(ConsoleWriteHandler consoleHandler);
                   static int RemoveConsoleHandler(ConsoleWriteHandler consoleHandler);
 
-                  jobject DocumentDbConnect(const char* connectionString,
-                                         JniErrorInfo* errInfo);
+                  bool DriverManagerGetConnection(const char* connectionString, SharedPointer< GlobalJObject >& connection, JniErrorInfo* errInfo);
+                  void ConnectionClose(const SharedPointer< GlobalJObject >& connection, JniErrorInfo* errInfo);
+                  bool ConnectionGetMetaData(const SharedPointer< GlobalJObject >& connection, SharedPointer< GlobalJObject>& databaseMetaData, JniErrorInfo* errInfo);
 
-                  void DocumentDbDisconnect(const jobject connection, JniErrorInfo* errInfo);
+                  bool DatabaseMetaDataGetTables(const SharedPointer< GlobalJObject >& databaseMetaData, SharedPointer< GlobalJObject >& resultSet, JniErrorInfo* errInfo);
+
+                  bool ResultSetNext(const SharedPointer< GlobalJObject >& resultSet, bool& hasNext,
+                                     JniErrorInfo* errInfo);
+                  bool ResultSetGetString(const jobject resultSet, int columnIndex, std::string& value, bool& wasNull, JniErrorInfo* errInfo);
+                  bool ResultSetGetString(const jobject resultSet, const std::string& columnName, std::string& value, bool& wasNull, JniErrorInfo* errInfo);
+                  bool ResultSetGetInteger(const jobject resultSet, int columnIndex, int& value, bool& wasNull, JniErrorInfo* errInfo);
+                  bool ResultSetGetInteger(const jobject resultSet, const std::string& columnName, int& value, bool& wasNull, JniErrorInfo* errInfo);
+                  bool ResultSetWasNull(const jobject resultSet, bool& value, JniErrorInfo* errInfo);
 
                   int64_t TargetInLongOutLong(jobject obj, int type, int64_t memPtr,
                                               JniErrorInfo* errInfo = NULL);

@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef _IGNITE_COMMON_COMMON
-#define _IGNITE_COMMON_COMMON
+#ifndef _IGNITE_ODBC_COMMON_COMMON
+#define _IGNITE_ODBC_COMMON_COMMON
 
 #define IGNITE_EXPORT __declspec(dllexport)
 #define IGNITE_IMPORT __declspec(dllimport)
@@ -43,4 +43,4 @@
 
 #define IGNITE_UNUSED(x) ((void) x)
 
-#endif //_IGNITE_COMMON_COMMON
+#endif //_IGNITE_ODBC_COMMON_COMMON

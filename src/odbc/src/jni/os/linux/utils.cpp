@@ -24,8 +24,8 @@
 #include <dlfcn.h>
 #include <unistd.h>
 
-#include "ignite/common/utils.h"
-#include "ignite/common/fixed_size_array.h"
+#include "ignite/odbc/common/utils.h"
+#include "ignite/odbc/common/fixed_size_array.h"
 
 #include "ignite/odbc/jni/utils.h"
 #include "ignite/odbc/jni/java.h"
