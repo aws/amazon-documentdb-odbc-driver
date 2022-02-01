@@ -19,7 +19,7 @@
 #include <string>
 #include <sstream>
 
-#include "ignite/common/bits.h"
+#include "ignite/odbc/common/bits.h"
 
 #include "ignite/impl/binary/binary_utils.h"
 

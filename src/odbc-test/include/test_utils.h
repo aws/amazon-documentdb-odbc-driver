@@ -27,7 +27,7 @@
 
 #include <string>
 
-#include "ignite/ignition.h"
+#include "ignite/odbc/common/utils.h"
 
 #define ODBC_THROW_ON_ERROR(ret, type, handle)          \
     if (!SQL_SUCCEEDED(ret))                            \
@@ -159,51 +159,6 @@ namespace ignite_test
      * @return Test config directory path.
      */
     std::string GetTestConfigDir();
-
-    /**
-     * Initialize configuration for a node.
-     *
-     * Inits Ignite node configuration from specified config file.
-     * Config file is searched in path specified by IGNITE_NATIVE_TEST_CPP_CONFIG_PATH
-     * environmental variable.
-     *
-     * @param cfg Ignite config.
-     * @param cfgFile Ignite node config file name without path.
-     */
-    void InitConfig(ignite::IgniteConfiguration& cfg, const char* cfgFile);
-
-    /**
-     * Start Ignite node.
-     *
-     * Starts new Ignite node from specified config file.
-     * Config file is searched in path specified by IGNITE_NATIVE_TEST_CPP_CONFIG_PATH
-     * environmental variable.
-     *
-     * @param cfgFile Ignite node config file name without path.
-     * @return New node.
-     */
-    ignite::Ignite StartNode(const char* cfgFile);
-
-    /**
-     * Start Ignite node.
-     *
-     * Starts new Ignite node with the specified name and from specified config file.
-     * Config file is searched in path specified by IGNITE_NATIVE_TEST_CPP_CONFIG_PATH
-     * environmental variable.
-     *
-     * @param cfgFile Ignite node config file name without path.
-     * @param name Node name.
-     * @return New node.
-     */
-    ignite::Ignite StartNode(const char* cfgFile, const char* name);
-
-    /**
-     * Start node with the config for the current platform.
-     *
-     * @param cfg Basic config path. Changed to platform config if needed.
-     * @param name Instance name.
-     */
-    ignite::Ignite StartPlatformNode(const char* cfg, const char* name);
 
     /**
      * Remove all the LFS artifacts.
