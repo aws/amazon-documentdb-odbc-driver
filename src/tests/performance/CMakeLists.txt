@@ -21,16 +21,17 @@ project(performance)
 
 find_package(ODBC REQUIRED)
 include_directories(SYSTEM ${ODBC_INCLUDE_DIRS})
+include_directories(lib include src)
 
 # Add source to this project's executable.
-add_executable (performance "performance.cpp"
-							"csv_cell.h"
-							"csv_error.h"
-							"csv_parser.h"
-							"it_odbc_helper.cpp"
-							"it_odbc_helper.h" 
-							"performance_test_runner.cpp"
-							"performance_test_runner.h")
+add_executable (performance "src/performance.cpp"
+							"lib/csv_cell.h"
+							"lib/csv_error.h"
+							"lib/csv_parser.h"
+							"src/it_odbc_helper.cpp"
+							"include/it_odbc_helper.h" 
+							"src/performance_test_runner.cpp"
+							"include/performance_test_runner.h")
 
 target_compile_definitions(performance PUBLIC _UNICODE UNICODE)
 target_link_libraries(performance ${ODBC_LIBRARY})
@@ -41,9 +42,3 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E copy
 			${CMAKE_CURRENT_SOURCE_DIR}/Performance_Test_Plan.csv
 			${CMAKE_SOURCE_DIR}/../build/odbc/cmake/tests/performance/Performance_Test_Plan.csv)
-
-			add_custom_command(
-	TARGET performance POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy
-			${CMAKE_CURRENT_SOURCE_DIR}/Performance_Test_Results.csv
-			${CMAKE_SOURCE_DIR}/../build//odbc/cmake/tests/performance/Performance_Test_Results.csv)
