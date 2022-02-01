@@ -52,7 +52,7 @@ jobs:
         echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
     - name: Get specific version CMake, v3.20.1
-      uses: lukka/get-cmake@v3.20.1
+      uses: lukka/get-cmake@latest
 
     - name: add-msbuild-to-path
       uses: microsoft/setup-msbuild@v1.0.2
