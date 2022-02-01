@@ -58,3 +58,4 @@ namespace ignite
 }
 
 #endif //_IGNITE_ODBC_READ_PREFERENCE
+

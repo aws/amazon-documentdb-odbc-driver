@@ -56,3 +56,4 @@ namespace ignite
     }
 }   // namespace ignite
 #endif  //_IGNITE_ODBC_SCAN_METHOD
+
