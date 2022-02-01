@@ -26,15 +26,10 @@ namespace ignite
             enum class Type
             {
                 PRIMARY,
-
                 PRIMARY_PREFERRED,
-
                 SECONDARY, 
-
                 SECONDARY_PREFERRED,
-
                 NEAREST, 
-
                 UNKNOWN
             };
     

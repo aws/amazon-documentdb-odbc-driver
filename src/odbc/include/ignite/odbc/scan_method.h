@@ -26,13 +26,9 @@ namespace ignite
             enum class Type
             {
                 RANDOM,
-
                 ID_FORWARD,
-
                 ID_REVERSE, 
-
                 ALL, 
-
                 UNKNOWN
             };
     
