@@ -19,6 +19,7 @@ $CMAKE_TOOLCHAIN_FILE = -join($env:VCPKG_ROOT, "/scripts/buildsystems/vcpkg.cmak
 cmake -S $SRC_DIR `
     -B $BUILD_DIR `
     -A $WIN_ARCH `
+    -G "Visual Studio 15 2017"
     -D CMAKE_BUILD_TYPE=$CONFIGURATION `
     -D CMAKE_INSTALL_PREFIX=$INSTALL_DIR `
     -D WITH_TESTS=ON `
