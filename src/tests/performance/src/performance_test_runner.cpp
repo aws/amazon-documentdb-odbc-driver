@@ -21,9 +21,11 @@
 #include <numeric>
 #include <stdexcept>
 
-// Implement PerformanceTestRunner class
+// Implement performance::PerformanceTestRunner class
 
-// CLASS STATIC METHODS (NOT USED IN PERFORMANCE TEST)
+/********************************************************
+ * CLASS STATIC METHODS (NOT USED IN PERFORMANCE TEST)
+ *******************************************************/
 
 void performance::PerformanceTestRunner::ListDriversInstalled() {
     SQLHENV env;
@@ -85,7 +87,7 @@ void performance::PerformanceTestRunner::ListDataSourcesInstalled() {
     }
 }
 
-SQLRETURN performance::PerformanceTestRunner::testDefaultDSN() {
+SQLRETURN performance::PerformanceTestRunner::TestDefaultDSN() {
     SQLRETURN ret;
     SQLHENV env = SQL_NULL_HENV;
     SQLHDBC conn = SQL_NULL_HDBC;
@@ -94,8 +96,8 @@ SQLRETURN performance::PerformanceTestRunner::testDefaultDSN() {
     SQLTCHAR out_conn_string[1024];
     SQLSMALLINT out_conn_string_length;
 
-    test_string dsn = to_test_string("DSN=" + dsn_default);
-    test_string query = to_test_string(test_query);
+    test_string dsn = to_test_string("DSN=" + kDsnDefault);
+    test_string query = to_test_string(kTestQuery);
 
     // SQLAllocHandle (env) -> SQLSetEnvAttr -> SQLAllocHandle (conn) ->
     // SQLDriverConnect (conn) -> SQLAllocHandle (statement) -> SQLExecDirec
@@ -143,10 +145,13 @@ SQLRETURN performance::PerformanceTestRunner::testDefaultDSN() {
     return ret;
 }
 
-// CLASS PRIVATE HELPER METHODS
+/********************************************************
+ * CLASS PRIVATE HELPER METHODS
+ *******************************************************/
 
-void performance::PerformanceTestRunner::checkFileExtension(
+void performance::PerformanceTestRunner::CheckFileExtension(
     const std::string filename, const std::string extension) {
+
     std::size_t input_length = filename.length();
     std::string error_msg;
 
@@ -159,7 +164,7 @@ void performance::PerformanceTestRunner::checkFileExtension(
     }
 }
 
-void performance::PerformanceTestRunner::checkDSN(const std::string dsn) {
+void performance::PerformanceTestRunner::CheckDSN(const std::string dsn) {
     SQLHENV env;
     SQLRETURN ret;
     SQLWCHAR dsn_wchar[256];
@@ -171,15 +176,18 @@ void performance::PerformanceTestRunner::checkDSN(const std::string dsn) {
     std::string dsn_str;
     std::string error_msg;
 
+    // Allocate environment handle
     SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
     SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
+    // List data sources via driver manager to see if DSN is installed
     direction = SQL_FETCH_FIRST;
     while (SQL_SUCCEEDED(ret = SQLDataSources(env, direction, dsn_wchar,
                                               sizeof(dsn_wchar), &dsn_ret, desc,
                                               sizeof(desc), &desc_ret))) {
         dsn_str = wchar_to_string(dsn_wchar);
         if (dsn_str.compare(dsn) == 0) {
+            // Deallocate environment handle
             if (SQL_NULL_HENV != env) {
                 SQLFreeHandle(SQL_HANDLE_ENV, env);
             }
@@ -188,7 +196,7 @@ void performance::PerformanceTestRunner::checkDSN(const std::string dsn) {
         direction = SQL_FETCH_NEXT;
     }
 
-    // DSN not found
+    // DSN not found; Deallocate environment handle
     if (SQL_NULL_HENV != env) {
         SQLFreeHandle(SQL_HANDLE_ENV, env);
     }
@@ -196,18 +204,18 @@ void performance::PerformanceTestRunner::checkDSN(const std::string dsn) {
     throw std::runtime_error(error_msg);
 }
 
-void performance::PerformanceTestRunner::checkOutputMode(
+void performance::PerformanceTestRunner::CheckOutputMode(
     const int output_mode) {
     if (output_mode < 0 || output_mode > 3) {
         throw std::invalid_argument("ERROR: output_mode must be 0, 1, 2 or 3.");
     }
 }
 
-void performance::PerformanceTestRunner::checkCSVHeaders() {
+void performance::PerformanceTestRunner::CheckCsvHeaders() {
     std::string header_value, error_msg;
     bool has_escaped_quotes = false;
 
-    // set column index in CSVHeaders structure
+    // set column index in CSVHeaders structure (_headers)
     for (std::size_t column = 0; column < _cell_refs.size(); ++column) {
         const auto& cell = _cell_refs[column][0];
         if (cell.getType() == Csv::CellType::String) {
@@ -244,7 +252,7 @@ void performance::PerformanceTestRunner::checkCSVHeaders() {
     }
 }
 
-void performance::PerformanceTestRunner::outputHeaders(
+void performance::PerformanceTestRunner::OutputHeaders(
     std::ofstream& ofs) const {
     std::string test_name, query, limit, iter;
     test_name = TEST_NAME_HEADER;
@@ -253,6 +261,7 @@ void performance::PerformanceTestRunner::outputHeaders(
     iter = ITERATION_COUNT_HEADER;
     std::string header_str;
 
+    // Output haders are different for each output mode
     if (_output_mode == 0) {
         header_str =
         "Test #," + test_name + "," + query + "," + limit + "," + iter +
@@ -277,7 +286,7 @@ void performance::PerformanceTestRunner::outputHeaders(
     ofs << header_str;
 }
 
-bool performance::PerformanceTestRunner::skipTest(
+bool performance::PerformanceTestRunner::SkipTest(
     const Csv::CellReference& cell_skip_test) const {
     bool skip_test;
     std::string skip_test_str;
@@ -302,7 +311,7 @@ bool performance::PerformanceTestRunner::skipTest(
     return skip_test;
 }
 
-std::string performance::PerformanceTestRunner::getQueryString(
+std::string performance::PerformanceTestRunner::GetQueryString(
     const Csv::CellReference& cell_query) const {
     std::string query;
     std::string query_header = QUERY_HEADER;
@@ -317,7 +326,7 @@ std::string performance::PerformanceTestRunner::getQueryString(
     return query;
 }
 
-int performance::PerformanceTestRunner::getLimit(
+int performance::PerformanceTestRunner::GetLimit(
     const Csv::CellReference& cell_limit) const {
     double limit_dbl;
     int limit_int;
@@ -339,7 +348,7 @@ int performance::PerformanceTestRunner::getLimit(
     return limit_int;
 }
 
-std::string performance::PerformanceTestRunner::getTestName(
+std::string performance::PerformanceTestRunner::GetTestName(
     const Csv::CellReference& cell_test_name) const {
     std::string test_name;
     std::string test_name_header = TEST_NAME_HEADER;
@@ -354,7 +363,7 @@ std::string performance::PerformanceTestRunner::getTestName(
     return test_name;
 }
 
-int performance::PerformanceTestRunner::getIterationCount(
+int performance::PerformanceTestRunner::GetIterationCount(
     const Csv::CellReference& cell_iteration_count) const {
     double iteration_count_dbl;
     int iteration_count_int;
@@ -377,7 +386,7 @@ int performance::PerformanceTestRunner::getIterationCount(
     return iteration_count_int;
 }
 
-bool performance::PerformanceTestRunner::hasCommaOrNewLine(
+bool performance::PerformanceTestRunner::HasCommaOrNewLine(
     const std::string str) const {
     std::size_t comma_pos, newline_pos;
     comma_pos = str.find(',');
@@ -389,7 +398,7 @@ bool performance::PerformanceTestRunner::hasCommaOrNewLine(
     }
 }
 
-void performance::PerformanceTestRunner::recordExecBindFetch(
+void performance::PerformanceTestRunner::RecordExecBindFetch(
     SQLHSTMT* hstmt, TestCase& test_case) {
     // Initialize variables
     SQLRETURN ret;
@@ -400,6 +409,7 @@ void performance::PerformanceTestRunner::recordExecBindFetch(
     long long time_exec_ms;
     long long time_bind_fetch_ms;
 
+    // Dynamic memory allocated
     row_status = new SQLUSMALLINT[test_case.limit];
 
     // Query
@@ -408,11 +418,11 @@ void performance::PerformanceTestRunner::recordExecBindFetch(
     std::wstring_convert< std::codecvt_utf8< wchar_t > > converter;
     test_string query = converter.from_bytes(temp_str);
 
-    // Iterate and execute query -> bind and fetch results
+    // Iterate and execute query -> bind -> fetch and record time
     for (int iter = 0; iter < test_case.num_iterations; iter++) {
         row_count = 0;
 
-        // Execute query
+        // Execute query and record time
         auto time_exec_start = std::chrono::steady_clock::now();
         ret = SQLExecDirect(*hstmt, AS_SQLTCHAR(query.c_str()), SQL_NTS);
         auto time_exec_end = std::chrono::steady_clock::now();
@@ -422,7 +432,7 @@ void performance::PerformanceTestRunner::recordExecBindFetch(
             LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
             test_case.status = error;
             test_case.err_msg = "SQLExecDirect failed";
-            return;
+            return; // continue to next test case
         }
 
         // Store execution time
@@ -439,7 +449,7 @@ void performance::PerformanceTestRunner::recordExecBindFetch(
             LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
             test_case.status = error;
             test_case.err_msg = "SQLNumResultCols failed";
-            return;
+            return; // continue to next test case
         }
 
         std::vector< std::vector< Col > > cols(total_columns);
@@ -447,7 +457,7 @@ void performance::PerformanceTestRunner::recordExecBindFetch(
             cols[i].resize(test_case.limit);
         }
 
-        // Bind and fetch
+        // Bind and fetch and record time
         auto time_bind_fetch_start = std::chrono::steady_clock::now();
         for (size_t i = 0; i < cols.size(); i++) {
             ret = SQLBindCol(*hstmt, static_cast< SQLUSMALLINT >(i + 1),
@@ -459,7 +469,7 @@ void performance::PerformanceTestRunner::recordExecBindFetch(
                 LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
                 test_case.status = error;
                 test_case.err_msg = "SQLBindCol failed";
-                return;
+                return; // continue to next test case
             }
         }
 
@@ -478,24 +488,15 @@ void performance::PerformanceTestRunner::recordExecBindFetch(
         test_case.time_bind_fetch_ms.push_back(time_bind_fetch_ms);
 
         test_case.time_ms.push_back(time_exec_ms + time_bind_fetch_ms);
-
-        // ret = SQLCloseCursor(*hstmt);
-        if (ret != SQL_SUCCESS) {
-            delete[] row_status;
-            LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
-            test_case.status = error;
-            test_case.err_msg = "SQLCloseCursor failed";
-            return;
-        }
     }
     delete[] row_status;
     test_case.status = success;
 }
 
-void performance::PerformanceTestRunner::calcStats(TestCase& test_case) {
+void performance::PerformanceTestRunner::CalcStats(TestCase& test_case) {
     size_t size = test_case.time_ms.size();
-    // check if there is any time recorded data
 
+    // check if there is any time recorded data
     if (test_case.status == error) {
         return;
     }
@@ -580,16 +581,32 @@ void performance::PerformanceTestRunner::calcStats(TestCase& test_case) {
                               / 2);
 
             // calculate standard deviation
-            // TODO: calculate stdev from vector of data
+            // TODO: calculate stdev and 95th percentile from vector of data
             // e.g. test_case.stat_info.stdev = stdev;
+            // e.g. test_case.stat_info.percentile_95 = percentile_95;
         }
     } catch (...) {
         throw std::runtime_error("could not calculate results for test case ");
     }
 }
 
-void performance::PerformanceTestRunner::reportTime(const TestCase& test_case) {
-    // Output results
+void performance::PerformanceTestRunner::ReportTime(const TestCase& test_case) {
+    // Constants used for ReportTime function
+    const std::string sync_start = "%%__PARSE__SYNC__START__%% ";
+    const std::string sync_query = "%%__QUERY__%% ";
+    const std::string sync_case = "%%__CASE__%% ";
+    const std::string sync_status = "%%__STATUS__%% ";
+    const std::string sync_min = "%%__MIN__%% ";
+    const std::string sync_max = "%%__MAX__%% ";
+    const std::string sync_mean = "%%__MEAN__%% ";
+    const std::string sync_stdev = "%%__STDEV__%% ";
+    const std::string sync_median = "%%__MEDIAN__%% ";
+    const std::string sync_95th_percentile = "%%__95TH PERCENTILE__%% ";
+    const std::string sync_end = "%%__PARSE__SYNC__END__%% ";
+    // TODO: calculate standard deviation and 95th percentile so it can be reported
+    // calculation to be done in CalcStats() function. Once calculated, output results as well.
+
+    // Output test case information
     std::cout << sync_start << std::endl;
     std::cout << sync_query;
     std::cout << test_case.query << " limit " << test_case.limit << std::endl;
@@ -608,6 +625,7 @@ void performance::PerformanceTestRunner::reportTime(const TestCase& test_case) {
 
     std::cout << sync_status << "Success" << std::endl;
 
+    // Output test case time results
     if (_output_mode == 0 || _output_mode == 3) {
         std::cout << sync_min << test_case.stat_info.min << " ms" << std::endl;
         std::cout << sync_max << test_case.stat_info.max << " ms" << std::endl;
@@ -671,13 +689,16 @@ void performance::PerformanceTestRunner::reportTime(const TestCase& test_case) {
     }
 }
 
-void performance::PerformanceTestRunner::outputTestCase(
+void performance::PerformanceTestRunner::OutputTestCase(
     std::ofstream& ofs, const TestCase& test_case) const {
+    // TODO: once standard deviation and 95th percentile is calculated, then
+    // output results to csv file as well
+    
     // col 1 = test #
     ofs << test_case.test_case_num << ",";
 
     // col 2 = test name
-    if (hasCommaOrNewLine(test_case.test_name)) {
+    if (HasCommaOrNewLine(test_case.test_name)) {
         ofs << "\"" << test_case.test_name << "\""
             << ",";
     } else {
@@ -685,7 +706,7 @@ void performance::PerformanceTestRunner::outputTestCase(
     }
 
     // col 3 = query
-    if (hasCommaOrNewLine(test_case.query)) {
+    if (HasCommaOrNewLine(test_case.query)) {
         ofs << "\"" << test_case.query << "\""
             << ",";
     } else {
@@ -709,6 +730,7 @@ void performance::PerformanceTestRunner::outputTestCase(
 
     // col 7+ = results
     if (_output_mode == 0) {
+        // Output total time exec->bind->fetch combined
         if (test_case.status != success) {
             ofs << ",,,\n";
             return;
@@ -719,6 +741,7 @@ void performance::PerformanceTestRunner::outputTestCase(
         ofs << test_case.stat_info.min << ",";
         ofs << test_case.stat_info.median << "\n";
     } else if (_output_mode == 1) {
+        // Output execution time only
         if (test_case.status != success) {
             ofs << ",,,\n";
             return;
@@ -729,6 +752,7 @@ void performance::PerformanceTestRunner::outputTestCase(
         ofs << test_case.stat_info_exec.min << ",";
         ofs << test_case.stat_info_exec.median << "\n";
     } else if (_output_mode == 2) {
+        // Output bind->fetch time only
         if (test_case.status != success) {
             ofs << ",,,\n";
             return;
@@ -743,18 +767,22 @@ void performance::PerformanceTestRunner::outputTestCase(
             ofs << ",,,,,,,,,,,\n";
             return;
         }
+
+        // Output total time exec->bind->fetch combined
         ofs << test_case.stat_info.avg << ",";
         // ofs << test_case.stat_info.stdev << ",";
         ofs << test_case.stat_info.max << ",";
         ofs << test_case.stat_info.min << ",";
         ofs << test_case.stat_info.median << ",";
 
+        // Output execution time
         ofs << test_case.stat_info_exec.avg << ",";
         // ofs << test_case.stat_info_exec.stdev << ",";
         ofs << test_case.stat_info_exec.max << ",";
         ofs << test_case.stat_info_exec.min << ",";
         ofs << test_case.stat_info_exec.median << ",";
 
+        // Output bind->fetch time 
         ofs << test_case.stat_info_bind_fetch.avg << ",";
         // ofs << test_case.stat_info_bind_fetch.stdev << ",";
         ofs << test_case.stat_info_bind_fetch.max << ",";
@@ -763,12 +791,14 @@ void performance::PerformanceTestRunner::outputTestCase(
     }
 }
 
-// CLASS CONSTRUCTORS AND DESTRUCTORS
+/********************************************************
+ * CLASS CONSTRUCTORS AND DESTRUCTORS
+ *******************************************************/
 
 performance::PerformanceTestRunner::PerformanceTestRunner() {
     // check if DSN is installed
     try {
-        checkDSN(dsn_default);
+        CheckDSN(kDsnDefault);
     } catch (...) {
         throw;
     }
@@ -779,10 +809,10 @@ performance::PerformanceTestRunner::PerformanceTestRunner(
     const std::string dsn, const int output_mode) {
     // check input arguments
     try {
-        checkFileExtension(test_plan_csv, ".csv");
-        checkFileExtension(output_file_csv, ".csv");
-        checkDSN(dsn);
-        checkOutputMode(output_mode);
+        CheckFileExtension(test_plan_csv, ".csv");
+        CheckFileExtension(output_file_csv, ".csv");
+        CheckDSN(dsn);
+        CheckOutputMode(output_mode);
     } catch (...) {
         throw;
     }
@@ -794,14 +824,8 @@ performance::PerformanceTestRunner::PerformanceTestRunner(
 }
 
 performance::PerformanceTestRunner::~PerformanceTestRunner() {
-    if (SQL_NULL_HSTMT != _hstmt) {
-        try {
-            CloseCursor(&_hstmt, true, true);
-            SQLFreeHandle(SQL_HANDLE_STMT, _hstmt);
-        } catch (const std::exception& err) {
-            std::cout << err.what() << std::endl;
-        }
-    }
+    // Statement handle is allocated and deallocated inside RunPerformanceTestPlan() function
+    // If SetupConnection() function is run, connection and environment handles are set
     if (SQL_NULL_HDBC != _conn) {
         SQLDisconnect(_conn);
         SQLFreeHandle(SQL_HANDLE_DBC, _conn);
@@ -811,29 +835,33 @@ performance::PerformanceTestRunner::~PerformanceTestRunner() {
     }
 }
 
-// CLASS SETTERS AND GETTERS
+/********************************************************
+ * CLASS SETTERS AND GETTERS
+ *******************************************************/
 
-void performance::PerformanceTestRunner::setDSN(const std::string dsn) {
+void performance::PerformanceTestRunner::SetDSN(const std::string dsn) {
     try {
-        checkDSN(dsn_default);
+        CheckDSN(dsn);
     } catch (...) {
         throw;
     }
     _dsn = dsn;
 }
 
-void performance::PerformanceTestRunner::setOutputMode(const int output_mode) {
+void performance::PerformanceTestRunner::SetOutputMode(const int output_mode) {
     try {
-        checkOutputMode(output_mode);
+        CheckOutputMode(output_mode);
     } catch (...) {
         throw;
     }
     _output_mode = output_mode;
 }
 
-// CLASS PUBLIC METHODS
+/********************************************************
+ * CLASS PUBLIC METHODS TO RUN PERFORMANCE TEST PLAN
+ *******************************************************/
 
-void performance::PerformanceTestRunner::readPerformanceTestPlan() {
+void performance::PerformanceTestRunner::ReadPerformanceTestPlan() {
     // Read input csv file to string
     std::ifstream ifs(_input_file, std::ios::binary);
     Csv::Parser parser;
@@ -861,13 +889,13 @@ void performance::PerformanceTestRunner::readPerformanceTestPlan() {
     parser.parseTo(_csv_data, _cell_refs);
 
     try {
-        checkCSVHeaders();
+        CheckCsvHeaders();
     } catch (...) {
         throw;
     }
 }
 
-void performance::PerformanceTestRunner::setupConnection() {
+void performance::PerformanceTestRunner::SetupConnection() {
     SQLTCHAR out_conn_string[1024];
     SQLSMALLINT out_conn_string_length;
     SQLRETURN ret;
@@ -909,11 +937,11 @@ void performance::PerformanceTestRunner::setupConnection() {
                     + _dsn + ".";
         throw std::runtime_error(error_msg);
     }
-
-    // Statement handle is allocated when test case is run
+    // Connection established: connection and environment handles are set
 }
 
-void performance::PerformanceTestRunner::runPerformanceTestPlan() {
+void performance::PerformanceTestRunner::RunPerformanceTestPlan() {
+    
     std::size_t num_test_cases;
     bool skip_test = true;
     TestCase test_case;
@@ -932,22 +960,12 @@ void performance::PerformanceTestRunner::runPerformanceTestPlan() {
                     + _output_file + ".";
         throw std::runtime_error(error_msg);
     }
-    outputHeaders(ofs);
+    OutputHeaders(ofs);
 
     // iterate through each test case and output results
     num_test_cases = _cell_refs[_headers.idx_query].size();
     for (std::size_t row = 1; row < num_test_cases; ++row) {
         try {
-            // allocate statement handle for test case
-            ret = SQLAllocHandle(SQL_HANDLE_STMT, _conn, &_hstmt);
-            if (ret == SQL_INVALID_HANDLE || ret == SQL_ERROR) {
-                error_msg =
-                    "SQLAllocHandle ERROR: failed to allocate connection "
-                    "statement "
-                    "handle.";
-                throw std::runtime_error(error_msg);
-            }
-
             // get test case fields
             const auto& cell_query = _cell_refs[_headers.idx_query][row];
             const auto& cell_limit = _cell_refs[_headers.idx_limit][row];
@@ -956,10 +974,10 @@ void performance::PerformanceTestRunner::runPerformanceTestPlan() {
             const auto& cell_iteration_count =
                 _cell_refs[_headers.idx_iteration_count][row];
 
-            query = getQueryString(cell_query);
-            limit = getLimit(cell_limit);
-            test_name = getTestName(cell_test_name);
-            iteration_count = getIterationCount(cell_iteration_count);
+            query = GetQueryString(cell_query);
+            limit = GetLimit(cell_limit);
+            test_name = GetTestName(cell_test_name);
+            iteration_count = GetIterationCount(cell_iteration_count);
 
             // Store test case info
             test_case.test_case_num = static_cast< int >(row);
@@ -971,24 +989,34 @@ void performance::PerformanceTestRunner::runPerformanceTestPlan() {
             // check skip_test field
             const auto& cell_skip_test =
                 _cell_refs[_headers.idx_skip_test][row];
-            skip_test = skipTest(cell_skip_test);
+            skip_test = SkipTest(cell_skip_test);
             if (skip_test) {
                 test_case.status = skip;
-                reportTime(test_case);  // reports that test was skipped
-                outputTestCase(ofs, test_case);
+                ReportTime(test_case);  // reports that test was skipped
+                OutputTestCase(ofs, test_case);
                 _results.push_back(test_case);
                 continue;  // skip test case
             }
 
-            // Exec -> Bind -> Fetch (record time)
-            recordExecBindFetch(&_hstmt, test_case);
+            // Allocate statement handle for test case
+            ret = SQLAllocHandle(SQL_HANDLE_STMT, _conn, &_hstmt);
+            if (ret == SQL_INVALID_HANDLE || ret == SQL_ERROR) {
+                error_msg =
+                    "SQLAllocHandle ERROR: failed to allocate connection "
+                    "statement "
+                    "handle.";
+                throw std::runtime_error(error_msg);
+            }
 
-            // Calcualte stats for recorded time
-            calcStats(test_case);
-            reportTime(test_case);
+            // Exec -> Bind -> Fetch (record time)
+            RecordExecBindFetch(&_hstmt, test_case);
+
+            // Calculate stats for recorded time
+            CalcStats(test_case);
+            ReportTime(test_case);
 
             // Output results to csv file
-            outputTestCase(ofs, test_case);
+            OutputTestCase(ofs, test_case);
             _results.push_back(test_case);  // store test case data
 
             // Reset test_case variable

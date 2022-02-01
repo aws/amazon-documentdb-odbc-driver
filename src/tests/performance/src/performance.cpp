@@ -49,16 +49,17 @@ int main(int argc, char* argv[]) {
     // Enable malloc logging for detecting memory leaks.
     system("export MallocStackLogging=1");
 #endif
-    // first argument is program name
 
     // Initialize variables
     std::string data_source_name, test_plan_file, test_results_file;
+    int output_mode = 0; // output time for exec/bind/fetch combined
 
+    // Check command line arguments
     if (argc == 1) {
         // default mode
-        data_source_name = dsn_default;
-        test_plan_file = input_file;
-        test_results_file = output_file;
+        data_source_name = kDsnDefault;
+        test_plan_file = kInputFile;
+        test_results_file = kOutputFile;
     } else {
         std::cout << "You have entered " << (argc - 1) << " arguments:\n";
         for (int i = 1; i < argc; i++) {
@@ -68,11 +69,11 @@ int main(int argc, char* argv[]) {
         if (argc == 2) {
             // dsn passed in
             data_source_name = argv[1];
-            test_plan_file = input_file;
-            test_results_file = output_file;
+            test_plan_file = kInputFile;
+            test_results_file = kOutputFile;
         } else if (argc == 3) {
             // input and output file passed in
-            data_source_name = dsn_default;
+            data_source_name = kDsnDefault;
             test_plan_file = argv[1];
             test_results_file = argv[2];
         } else if (argc == 4) {
@@ -85,14 +86,15 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    // Run performance test
     try {
         // Initialize performance test runner
         performance::PerformanceTestRunner performanceTest(
-            test_plan_file, test_results_file, data_source_name, 0);
+            test_plan_file, test_results_file, data_source_name, output_mode);
 
-        performanceTest.setupConnection();
-        performanceTest.readPerformanceTestPlan();
-        performanceTest.runPerformanceTestPlan();
+        performanceTest.SetupConnection();
+        performanceTest.ReadPerformanceTestPlan();
+        performanceTest.RunPerformanceTestPlan();
     } catch (const std::runtime_error& err) {
         std::cerr << err.what() << std::endl;
     }
