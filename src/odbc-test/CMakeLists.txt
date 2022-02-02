@@ -28,7 +28,7 @@ find_package(Boost 1.53 REQUIRED COMPONENTS unit_test_framework chrono thread sy
 find_package(ODBC REQUIRED)
 
 include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS})
-include_directories(include ../odbc/include)
+include_directories(include ../odbc/include ../network/include)
 if (WIN32)
     include_directories(../odbc/os/win/include)
 else ()
@@ -39,59 +39,68 @@ endif()
 set(SOURCES 
          src/connection_test.cpp
          src/dummy_test.cpp
-         src/java_test.cpp
          src/odbc_test_suite.cpp
          src/test_utils.cpp
-         ../odbc/src/app/application_data_buffer.cpp
-         ../odbc/src/app/parameter.cpp
-         ../odbc/src/app/parameter_set.cpp
-         ../odbc/src/column.cpp
-         ../odbc/src/common/big_integer.cpp
-         ../odbc/src/common/bits.cpp
          ../odbc/src/common/concurrent.cpp
-         ../odbc/src/common/decimal.cpp
          ../odbc/src/common/utils.cpp
-         ../odbc/src/common_types.cpp
-         ../odbc/src/config/configuration.cpp
-         ../odbc/src/config/config_tools.cpp
-         ../odbc/src/config/connection_info.cpp
-         ../odbc/src/config/connection_string_parser.cpp
-         ../odbc/src/connection.cpp
-         ../odbc/src/cursor.cpp
-         ../odbc/src/diagnostic/diagnosable_adapter.cpp
-         ../odbc/src/diagnostic/diagnostic_record_storage.cpp
-         ../odbc/src/diagnostic/diagnostic_record.cpp
-         ../odbc/src/dsn_config.cpp
-         ../odbc/src/environment.cpp
-         ../odbc/src/ignite_error.cpp
          ../odbc/src/jni/java.cpp
-         ../odbc/src/log.cpp
-         ../odbc/src/message.cpp
-         ../odbc/src/meta/column_meta.cpp
-         ../odbc/src/meta/table_meta.cpp
-         ../odbc/src/nested_tx_mode.cpp
-         ../odbc/src/protocol_version.cpp
-         ../odbc/src/query/batch_query.cpp
-         ../odbc/src/query/column_metadata_query.cpp
-         ../odbc/src/query/data_query.cpp
-         ../odbc/src/query/foreign_keys_query.cpp
-         ../odbc/src/query/primary_keys_query.cpp
-         ../odbc/src/query/special_columns_query.cpp
-         ../odbc/src/query/streaming_query.cpp
-         ../odbc/src/query/type_info_query.cpp
-         ../odbc/src/query/table_metadata_query.cpp
-         ../odbc/src/sql/sql_lexer.cpp
-         ../odbc/src/sql/sql_parser.cpp
-         ../odbc/src/sql/sql_set_streaming_command.cpp
-         ../odbc/src/sql/sql_utils.cpp
-         ../odbc/src/result_page.cpp
-         ../odbc/src/row.cpp
-         ../odbc/src/ssl_mode.cpp
-         ../odbc/src/statement.cpp
-         ../odbc/src/streaming/streaming_batch.cpp
-         ../odbc/src/streaming/streaming_context.cpp
-         ../odbc/src/type_traits.cpp
-         ../odbc/src/utility.cpp
+# TODO uncomment/rework the tests after get some connectivity and functionalities working.
+#        src/teamcity/teamcity_boost.cpp
+#        src/teamcity/teamcity_messages.cpp
+#        src/parser_test.cpp
+#        src/cursor_test.cpp
+#        src/connection_info_test.cpp
+#        src/application_data_buffer_test.cpp
+#        src/column_test.cpp
+#        src/configuration_test.cpp
+#        src/row_test.cpp
+#        src/meta_queries_test.cpp
+#        src/utility_test.cpp
+#        src/queries_test.cpp
+#        src/queries_ssl_test.cpp
+#        src/sql_test_suite_fixture.cpp
+#        src/sql_string_functions_test.cpp
+#        src/sql_numeric_functions_test.cpp
+#        src/sql_aggregate_functions_test.cpp
+#        src/sql_system_functions_test.cpp
+#        src/sql_esc_convert_function_test.cpp
+#        src/sql_operators_test.cpp
+#        src/sql_value_expressions_test.cpp
+#        src/sql_types_test.cpp
+#        src/sql_date_time_functions_test.cpp
+#        src/sql_outer_join_test.cpp
+#        src/sql_get_info_test.cpp
+#        src/api_robustness_test.cpp
+#        src/attributes_test.cpp
+#        src/errors_test.cpp
+#        src/types_test.cpp
+#        src/transaction_test.cpp
+#        src/authentication_test.cpp
+#        src/sql_parsing_test.cpp
+#        src/streaming_test.cpp
+#        src/cursor_binding_test.cpp
+#        src/test_server.cpp
+#        ../odbc/src/log.cpp
+#        ../odbc/src/cursor.cpp
+#        ../odbc/src/diagnostic/diagnostic_record.cpp
+#        ../odbc/src/diagnostic/diagnostic_record_storage.cpp
+#        ../odbc/src/config/config_tools.cpp
+#        ../odbc/src/config/configuration.cpp
+#        ../odbc/src/config/connection_info.cpp
+#        ../odbc/src/config/connection_string_parser.cpp
+#        ../odbc/src/app/application_data_buffer.cpp
+#        ../odbc/src/ssl_mode.cpp
+#        ../odbc/src/sql/sql_parser.cpp
+#        ../odbc/src/sql/sql_lexer.cpp
+#        ../odbc/src/sql/sql_set_streaming_command.cpp
+#        ../odbc/src/sql/sql_utils.cpp
+#        ../odbc/src/row.cpp
+#        ../odbc/src/protocol_version.cpp
+#        ../odbc/src/column.cpp
+#        ../odbc/src/common_types.cpp
+#        ../odbc/src/utility.cpp
+#        ../odbc/src/result_page.cpp
+#        ../odbc/src/nested_tx_mode.cpp
         )
 
 if (WIN32)
@@ -99,10 +108,6 @@ if (WIN32)
         ../odbc/os/win/src/common/concurrent_os.cpp
         ../odbc/os/win/src/common/platform_utils.cpp
         ../odbc/src/jni/os/win/utils.cpp
-        ../odbc/os/win/src/system_dsn.cpp
-        ../odbc/os/win/src/system/ui/custom_window.cpp
-        ../odbc/os/win/src/system/ui/dsn_configuration_window.cpp
-        ../odbc/os/win/src/system/ui/window.cpp
     )
 else()
     # TODO: Ensure MacOS is portable. https://bitquill.atlassian.net/browse/AD-525
@@ -115,8 +120,7 @@ endif()
 
 add_executable(${TARGET} ${SOURCES})
 
-target_link_libraries(${TARGET} ${ODBC_LIBRARIES})
-target_link_libraries(${TARGET} ${Boost_LIBRARIES} ignite)
+target_link_libraries(${TARGET} ${Boost_LIBRARIES} ignite ${ODBC_LIBRARY})
 target_code_coverage(${TARGET}  PUBLIC AUTO ALL)
 
 if (WIN32)
