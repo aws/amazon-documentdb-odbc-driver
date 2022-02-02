@@ -850,7 +850,7 @@ namespace ignite
 
             if (mongoInstance)
             {
-                mongoInstance =  bsoncxx::stdx::make_unique<mongocxx::instance>();
+                mongoInstance =  std::move(bsoncxx::stdx::make_unique<mongocxx::instance>());
             }
 
             try {
