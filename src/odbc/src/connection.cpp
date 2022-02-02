@@ -681,7 +681,7 @@ namespace ignite
 
         std::string Connection::FormatMongoCppConnectionString(int sshTunnelPort) const {
 
-            std::string host = "docdb-jdbc-literal-test.cluster-cjf6q8nxfefi.us-east-2.docdb.amazonaws.com";
+            std::string host = "localhost";
             std::string port = "27019";
 
             std::string mongoConnectionString;
