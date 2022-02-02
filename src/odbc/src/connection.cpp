@@ -48,6 +48,9 @@
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
 #include <mongocxx/uri.hpp>
+#include <bsoncxx/stdx/make_unique.hpp>
+#include <bsoncxx/stdx/optional.hpp>
+#include <bsoncxx/stdx/string_view.hpp>
 
 // Uncomment for per-byte debug.
 //#define PER_BYTE_DEBUG
@@ -678,7 +681,7 @@ namespace ignite
 
         std::string Connection::FormatMongoCppConnectionString(int sshTunnelPort) const {
 
-            std::string host = "localhost";
+            std::string host = "docdb-jdbc-literal-test.cluster-cjf6q8nxfefi.us-east-2.docdb.amazonaws.com";
             std::string port = "27019";
 
             std::string mongoConnectionString;
@@ -689,10 +692,10 @@ namespace ignite
             mongoConnectionString.append("@" + host);
             mongoConnectionString.append(":" + port);
             mongoConnectionString.append("/" + config.GetSchema());
-            mongoConnectionString.append("?tlsAllowInvalidHostnames=true");
-            mongoConnectionString.append("&tls=true");
-            mongoConnectionString.append("&tlsCAFile="
-                                         + common::GetEnv("DOC_DB_CA_FILE", ""));
+            mongoConnectionString.append("?");
+            //mongoConnectionString.append("?tlsAllowInvalidHostnames=true");
+            mongoConnectionString.append("tls=true");
+  
 
 
             return mongoConnectionString;
@@ -845,21 +848,29 @@ namespace ignite
             using bsoncxx::builder::basic::kvp;
             using bsoncxx::builder::basic::make_document;
 
-            // The mongocxx::instance constructor and destructor initialize and
-            // shut down the driver, respectively. Therefore, a
-            // mongocxx::instance must be created before using the driver and
-            // must remain alive for as long as the driver is in use.
-            mongocxx::instance inst;
+            if (mongoInstance)
+            {
+                mongoInstance =  bsoncxx::stdx::make_unique<mongocxx::instance>();
+            }
 
             try {
                 const auto uri = mongocxx::uri{mongoConnectionString};
-                
-                auto client = mongocxx::client{uri};
+                mongocxx::options::client client_options;
+                mongocxx::options::tls tls_options;
+
+                tls_options.ca_file(common::GetEnv("DOC_DB_CA_FILE", "" ));
+#ifdef __APPLE__
+                // If you want to disable certificate verification, you
+                // can set the `allow_invalid_certificates` option.
+                tls_options.allow_invalid_certificates(true);
+#endif
+                client_options.tls_opts(tls_options);
+                auto client1 = mongocxx::client{mongocxx::uri{mongoConnectionString}, client_options};
 
                 std::string database = "test";
                 bsoncxx::builder::stream::document ping;
                 ping << "ping" << 1;
-                auto db = client[database];
+                auto db = client1[database];
                 auto result = db.run_command(ping.view());
 
                 if (result.view()["ok"].get_double() != 1)

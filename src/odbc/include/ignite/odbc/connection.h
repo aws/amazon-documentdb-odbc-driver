@@ -32,6 +32,7 @@
 #include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/jni/java.h"
 
+#include <mongocxx/instance.hpp>
 namespace ignite
 {
     namespace odbc
@@ -570,6 +571,9 @@ namespace ignite
 
             /** Streaming context. */
             streaming::StreamingContext streamingContext;
+
+            /** Mongo driver instance*/
+            std::unique_ptr<mongocxx::instance> mongoInstance = nullptr;
         };
     }
 }

@@ -22,5 +22,5 @@ if [ ! -f "$JDBC_DRIVER_FULLPATH" ]; then
 fi
 
 cd cmake-build64
-make ccov-all -j 4
+make -j 4
 cd ..
