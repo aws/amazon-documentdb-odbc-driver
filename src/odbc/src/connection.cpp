@@ -858,7 +858,9 @@ namespace ignite
                 mongocxx::options::client client_options;
                 mongocxx::options::tls tls_options;
 
+#ifdef _WIN32
                 tls_options.ca_file(common::GetEnv("DOC_DB_CA_FILE", "" ));
+#endif
 #ifdef __APPLE__
                 // If you want to disable certificate verification, you
                 // can set the `allow_invalid_certificates` option.
