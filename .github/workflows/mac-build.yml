@@ -55,7 +55,7 @@ jobs:
         echo "${{env.DOC_DB_KEYPAIR}}" > ${{env.DOC_DB_PRIV_KEY_FILE}}
         chmod 400 ${{env.DOC_DB_PRIV_KEY_FILE}}
         echo "${{env.DOC_DB_CA}}" > ${{env.DOC_DB_CA_FILE}}
-        chmod 400 ${{env.DOC_DB_CA_FILE}}
+        chmod 404 ${{env.DOC_DB_CA_FILE}}
 
     - name: get-dependencies
       run: |
