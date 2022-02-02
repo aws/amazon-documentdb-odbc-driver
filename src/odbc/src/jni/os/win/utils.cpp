@@ -18,15 +18,15 @@
 #include <algorithm>
 #include <windows.h>
 
-#include "ignite/common/concurrent.h"
-#include "ignite/common/utils.h"
-#include "ignite/common/fixed_size_array.h"
+#include "ignite/odbc/common/concurrent.h"
+#include "ignite/odbc/common/utils.h"
+#include "ignite/odbc/common/fixed_size_array.h"
 
 #include "ignite/odbc/jni/utils.h"
 #include "ignite/odbc/jni/java.h"
 
-using namespace ignite::common;
-using namespace ignite::common::concurrent;
+using namespace ignite::odbc::common;
+using namespace ignite::odbc::common::concurrent;
 
 using namespace ignite::odbc::jni::java;
 
@@ -409,7 +409,7 @@ namespace ignite
                     return home;
 
                 // 3. Check current work dir.
-                DWORD curDirLen = GetCurrentDirectoryA(0, NULL);
+                DWORD curDirLen = GetCurrentDirectoryA(0, nullptr);
 
                 if (!curDirLen)
                     return std::string();
