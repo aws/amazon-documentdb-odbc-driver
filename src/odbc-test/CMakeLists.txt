@@ -128,7 +128,7 @@ if (WIN32)
 
 else()
     add_definitions(-DBOOST_TEST_DYN_LINK)
-    target_link_libraries(${TARGET} libodbcinst)
+    target_link_libraries(${TARGET} odbcinst)
 endif()
 
 set(TEST_TARGET IgniteOdbcTest)
