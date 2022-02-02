@@ -274,12 +274,8 @@ namespace ignite
                               false);
 
                 const char* const C_DOCUMENTDB_CONNECTION = "software/amazon/documentdb/jdbc/DocumentDbConnectionProperties";
-                // todo code draft -AL-. After constants all defined (define
-                // constants here), work on the JNI wrappers with Bruce
                 JniMethod const M_DOCUMENTDB_CONNECTION_GET_SSH_LOCAL_PORT =
-                    JniMethod("getSshLocalPort", "()Ljava/util/Optional;", false);
-//                     JniMethod("getSshLocalPort", "()Ljava/util/Optional<I>;", false);
-                // todo add call for isSshTunnelActive
+                    JniMethod("getSshLocalPort", "()I;", false);
                 JniMethod const M_DOCUMENTDB_CONNECTION_IS_SSH_TUNNEL_ACTIVE =
                     JniMethod("isSshTunnelActive", "()B", false);
 
