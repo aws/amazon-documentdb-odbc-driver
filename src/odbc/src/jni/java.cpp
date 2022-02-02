@@ -274,6 +274,14 @@ namespace ignite
                               false);
 
                 const char* const C_DOCUMENTDB_CONNECTION = "software/amazon/documentdb/jdbc/DocumentDbConnectionProperties";
+                // todo code draft -AL-. After constants all defined (define
+                // constants here), work on the JNI wrappers with Bruce
+                JniMethod const M_DOCUMENTDB_CONNECTION_GET_SSH_LOCAL_PORT =
+                    JniMethod("getSshLocalPort", "()Ljava/util/Optional;", false);
+//                     JniMethod("getSshLocalPort", "()Ljava/util/Optional<I>;", false);
+                // todo add call for isSshTunnelActive
+                JniMethod const M_DOCUMENTDB_CONNECTION_IS_SSH_TUNNEL_ACTIVE =
+                    JniMethod("isSshTunnelActive", "()B", false);
 
                 const char* const C_DRIVERMANAGER = "java/sql/DriverManager";
                 JniMethod const M_DRIVERMANAGER_GET_CONNECTION = 
@@ -492,6 +500,8 @@ namespace ignite
 
                     c_DocumentDbConnection = FindClass(env, C_DOCUMENTDB_CONNECTION);
                     //m_DocumentDbConnectionInit = FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_PROPERTIES_INIT);
+                    m_DocumentDbConnectionGetSshLocalPort = FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_GET_SSH_LOCAL_PORT);
+                    m_DocumentDbConnectionIsSshTunnelActive = FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_IS_SSH_TUNNEL_ACTIVE);
 
                     c_DriverManager = FindClass(env, C_DRIVERMANAGER);
                     m_DriverManagerGetConnection = FindMethod(env, c_DriverManager, M_DRIVERMANAGER_GET_CONNECTION);
@@ -822,6 +832,55 @@ namespace ignite
                     }
                     connection = SharedPointer< GlobalJObject >(new GlobalJObject(env, env->NewGlobalRef(result)));
                     return true;
+                }
+
+                // note to self: result is stored in bool poiner isActive, this is to be consistent with other functions that
+                // use CallBooleanMethod. -AL-
+                bool JniContext::DocumentDbIsSshTunnelActive(
+                    const SharedPointer< GlobalJObject >& connection,
+                    bool& isActive,
+                    JniErrorInfo* errInfo) {
+                    // to do implement -AL-
+                    if (!connection.Get()) {
+                        errInfo->code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo->errMsg = "Connection object must be set.";
+                        return false;
+                    }
+                    JNIEnv* env = Attach();
+                    jboolean res = env->CallBooleanMethod(
+                        jvm->GetMembers().c_DocumentDbConnection,
+                        jvm->GetMembers().m_DocumentDbConnectionIsSshTunnelActive);
+                    ExceptionCheck(env, errInfo);
+                    if (errInfo->code == IGNITE_JNI_ERR_SUCCESS) {
+                        isActive = res != JNI_TRUE;
+                    }
+                    return errInfo->code == IGNITE_JNI_ERR_SUCCESS;
+                    // return result;
+                }
+
+                int32_t JniContext::DocumentDbGetSshLocalPort(
+                    const SharedPointer< GlobalJObject >& connection,
+                    JniErrorInfo* errInfo) {
+                    if (!connection.Get()) {
+                        errInfo->code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo->errMsg = "Connection object must be set.";
+                        return false;
+                    }
+                    JNIEnv* env = Attach();
+                    int32_t result = env->CallIntMethod(
+                        jvm->GetMembers().c_DocumentDbConnection,
+                        jvm->GetMembers().m_DocumentDbConnectionGetSshLocalPort);
+                    //jobject result = env->CallObjectMethod(
+                    //    jvm->GetMembers().c_DocumentDbConnection,
+                    //    jvm->GetMembers().m_DocumentDbConnectionGetSshLocalPort);
+                    ExceptionCheck(env, errInfo);
+                    //if (!result) {
+                    //    // unable to return object
+                    //    return 0;
+                    //} else if (result.isPresent()) {
+                    //    return result.get().getInt();
+                    //}
+                     return result;
                 }
 
                 void JniContext::ConnectionClose(const SharedPointer< GlobalJObject >& connection, JniErrorInfo* errInfo) {
