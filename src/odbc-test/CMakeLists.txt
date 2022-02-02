@@ -116,7 +116,6 @@ endif()
 add_executable(${TARGET} ${SOURCES})
 
 target_link_libraries(${TARGET} ${ODBC_LIBRARIES})
-target_link_libraries(${TARGET} ${ODBC_LIBRARY})
 target_link_libraries(${TARGET} ${Boost_LIBRARIES} ignite)
 target_code_coverage(${TARGET}  PUBLIC AUTO ALL)
 
