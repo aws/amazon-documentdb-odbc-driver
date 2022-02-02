@@ -116,7 +116,7 @@ endif()
 add_executable(${TARGET} ${SOURCES})
 
 target_link_libraries(${TARGET} ${ODBC_LIBRARIES})
-target_link_libraries(${TARGET} ${Boost_LIBRARIES} ignite ${ODBC_LIBRARY})
+target_link_libraries(${TARGET} ${Boost_LIBRARIES} ignite)
 target_code_coverage(${TARGET}  PUBLIC AUTO ALL)
 
 if (WIN32)
@@ -125,9 +125,12 @@ if (WIN32)
     if (MSVC_VERSION GREATER_EQUAL 1900)
         target_link_libraries(${TARGET} legacy_stdio_definitions odbccp32 shlwapi)
     endif()
-
+elseif(APPLE)
+    add_definitions(-DBOOST_TEST_DYN_LINK)
+    target_link_libraries(${TARGET} iodbcinst)
 else()
     add_definitions(-DBOOST_TEST_DYN_LINK)
+    target_link_libraries(${TARGET} odbcinst)
 endif()
 
 set(TEST_TARGET IgniteOdbcTest)
