@@ -507,14 +507,6 @@ namespace ignite
             void Deinit();
 
             /**
-             * Collect all addresses from config.
-             *
-             * @param cfg Configuration.
-             * @param endPoints End points.
-             */
-            static void CollectAddresses(const config::Configuration& cfg, std::vector< EndPoint >& endPoints);
-
-            /**
              * Retrieve timeout from parameter.
              *
              * @param value Parameter.

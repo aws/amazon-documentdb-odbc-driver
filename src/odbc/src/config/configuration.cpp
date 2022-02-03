@@ -40,9 +40,9 @@ namespace ignite
             const std::string Configuration::DefaultValue::user = "";
             const std::string Configuration::DefaultValue::password = "";
             
-            // SSL/TLS options. Use checkboxes for boolean variables
+            // SSL/TLS options
             const bool Configuration::DefaultValue::tls = true;
-            const bool Configuration::DefaultValue::tlsAllowInvalidHostnames = false; // needs to be set to true for SSH; TLS Allow Invalid Hostnames
+            const bool Configuration::DefaultValue::tlsAllowInvalidHostnames = false;
             const std::string Configuration::DefaultValue::tlsCaFile = "";
            
             // Schema Generation and Discovery options
@@ -51,8 +51,7 @@ namespace ignite
             const std::string Configuration::DefaultValue::schemaName = "_default";
             const bool Configuration::DefaultValue::refreshSchema = false;
 
-            // Internal SSH Tunnel options // need to add to UI
-            const bool Configuration::DefaultValue::sshEnable = false;
+            // Internal SSH Tunnel options
             const std::string Configuration::DefaultValue::sshUser = "";
             const std::string Configuration::DefaultValue::sshHost = "";
             const std::string Configuration::DefaultValue::sshPrivateKeyFile = "";
@@ -60,7 +59,7 @@ namespace ignite
             const bool Configuration::DefaultValue::sshStrictHostKeyChecking = true;
             const std::string Configuration::DefaultValue::sshKnownHostsFile = "";
             
-            // Additional options // // need to add to UI
+            // Additional options
             const std::string Configuration::DefaultValue::appName = "Amazon DocumentDB ODBC Driver";
             const int32_t Configuration::DefaultValue::loginTimeoutSec = 0;
             const ReadPreference::Type Configuration::DefaultValue::readPreference = ReadPreference::Type::PRIMARY;

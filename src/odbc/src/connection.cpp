@@ -746,16 +746,6 @@ namespace ignite
             std::for_each(opts.begin(), opts.end(), ReleaseChars);
             opts.clear();
         }
-        
-        void Connection::CollectAddresses(const config::Configuration& cfg, std::vector<EndPoint>& endPoints)
-        {
-            endPoints.clear();
-
-            // DocumentDB driver is currently not supporting list of addresses. Return vector with the one address for now.
-            LOG_MSG("'Address' is not set. Using legacy connection method.");
-            endPoints.push_back(EndPoint(cfg.GetHostname(), cfg.GetPort()));
-            return;
-        }
 
         int32_t Connection::RetrieveTimeout(void* value)
         {
