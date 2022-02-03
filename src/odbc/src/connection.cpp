@@ -694,7 +694,7 @@ namespace ignite
             mongoConnectionString.append("/" + config.GetSchema());
             //mongoConnectionString.append("?");
             //mongoConnectionString.append("?tlsAllowInvalidHostnames=true");
-            mongoConnectionString.append("&tls=true");
+            //mongoConnectionString.append("&tls=true");
   
 
 
