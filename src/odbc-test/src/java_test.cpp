@@ -158,7 +158,8 @@ BOOST_AUTO_TEST_CASE(TestDriverManagerGetConnection)
     BOOST_REQUIRE(connection.Get());
 
     _ctx.Get()->ConnectionClose(connection, &errInfo);
-    connection = SharedPointer< GlobalJObject >(nullptr);
+    //connection = SharedPointer< GlobalJObject >(nullptr);
+    connection = nullptr; // attempt to fix read error -AL-
 }
 
 BOOST_AUTO_TEST_CASE(TestConnectionGetMetaData) {

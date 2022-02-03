@@ -836,7 +836,6 @@ namespace ignite
                     const SharedPointer< GlobalJObject >& connection,
                     bool& isActive,
                     JniErrorInfo* errInfo) {
-                    // to do implement -AL-
                     if (!connection.Get()) {
                         errInfo->code = IGNITE_JNI_ERR_GENERIC;
                         errInfo->errMsg = "Connection object must be set.";
@@ -860,7 +859,8 @@ namespace ignite
                     if (!connection.Get()) {
                         errInfo->code = IGNITE_JNI_ERR_GENERIC;
                         errInfo->errMsg = "Connection object must be set.";
-                        return false;
+                        return 0;
+                        // TODO double check with Bruce: should I just return 0 here?
                     }
                     JNIEnv* env = Attach();
                     int32_t result = env->CallIntMethod(
