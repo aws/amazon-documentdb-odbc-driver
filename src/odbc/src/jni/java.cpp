@@ -236,6 +236,8 @@ namespace ignite
                 const char* const C_CLASS = "java/lang/Class";
                 JniMethod const M_CLASS_GET_NAME = JniMethod("getName", "()Ljava/lang/String;", false);
 
+                const char* const C_STRING = "java/lang/String";
+
                 const char* const C_DOCUMENTDB_CONNECTION_PROPERTIES =
                     "software/amazon/documentdb/jdbc/DocumentDbConnectionProperties";
                 JniMethod const M_DOCUMENTDB_CONNECTION_PROPERTIES_GET_PROPERTIES_FROM_CONNECTION_STRING =
@@ -429,6 +431,8 @@ namespace ignite
                     c_Throwable = FindClass(env, C_THROWABLE);
                     m_Throwable_getMessage = FindMethod(env, c_Throwable, M_THROWABLE_GET_MESSAGE);
                     m_Throwable_printStackTrace = FindMethod(env, c_Throwable, M_THROWABLE_PRINT_STACK_TRACE);
+
+                    c_String = FindClass(env, C_STRING);
 
                     // TODO: Provide "getFullStackTrace" in DocumentDB
                     //m_PlatformUtils_getFullStackTrace = FindMethod(env, c_PlatformUtils, M_PLATFORM_UTILS_GET_FULL_STACK_TRACE);
@@ -864,6 +868,10 @@ namespace ignite
 
                 bool JniContext::DatabaseMetaDataGetTables(
                     const SharedPointer< GlobalJObject >& databaseMetaData,
+                    const std::string& catalog,
+                    const std::string& schemaPattern,
+                    const std::string& tableNamePattern,
+                    const std::vector< std::string >& types,
                     SharedPointer< GlobalJObject >& resultSet,
                     JniErrorInfo* errInfo) {
                     if (!databaseMetaData.Get()) {
@@ -873,13 +881,23 @@ namespace ignite
                     }
 
                     JNIEnv* env = Attach();
+                    jstring jCatalog = env->NewStringUTF(catalog.c_str());
+                    jstring jSchemaPattern = env->NewStringUTF(schemaPattern.c_str());
+                    jstring jTableNamePattern = env->NewStringUTF(tableNamePattern.c_str());
+                    jobjectArray jTypes = env->NewObjectArray(
+                        static_cast< jsize >(types.size()), jvm->GetJavaMembers().c_String, nullptr);
+                    for (int i = 0; i < types.size(); i++) {
+                        env->SetObjectArrayElement(
+                            jTypes, i, env->NewStringUTF(types[i].c_str()));
+                    }
+
                     jobject result = env->CallObjectMethod(
                         databaseMetaData.Get()->GetRef(),
                         jvm->GetMembers().m_DatabaseMetaDataGetTables,
-                        /* catalog */ nullptr,
-                        /* schemaPattern */ nullptr,
-                        /* tableNamePattern */ nullptr,
-                        /* types[]*/ nullptr);
+                        jCatalog,
+                        jSchemaPattern,
+                        jTableNamePattern,
+                        jTypes);
                     ExceptionCheck(env, errInfo);
 
                     if (!result || errInfo->code != IGNITE_JNI_ERR_SUCCESS) {
@@ -907,17 +925,16 @@ namespace ignite
                         jvm->GetMembers().m_ResultSetNext);
                     ExceptionCheck(env, errInfo);
                     if (errInfo->code == IGNITE_JNI_ERR_SUCCESS) {
-                        hasNext = res != JNI_TRUE;
+                        hasNext = res != JNI_FALSE;
                     }
                     return errInfo->code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
-                bool JniContext::ResultSetGetString(const jobject resultSet,
-                                                    int columnIndex,
-                                                    std::string& value,
-                                                    bool& wasNull,
-                                                    JniErrorInfo* errInfo) {
-                    if (!resultSet) {
+                bool JniContext::ResultSetGetString(
+                    const SharedPointer< GlobalJObject >& resultSet,
+                    int columnIndex, std::string& value, bool& wasNull,
+                    JniErrorInfo* errInfo) {
+                    if (!resultSet.Get()) {
                         errInfo->code = IGNITE_JNI_ERR_GENERIC;
                         errInfo->errMsg = "ResultSet object must be set.";
                         return false;
@@ -925,7 +942,8 @@ namespace ignite
 
                     JNIEnv* env = Attach();
                     jobject result = env->CallObjectMethod(
-                        resultSet, jvm->GetMembers().m_ResultSetGetStringByIndex,
+                        resultSet.Get()->GetRef(),
+                        jvm->GetMembers().m_ResultSetGetStringByIndex,
                         columnIndex);
                     ExceptionCheck(env, errInfo);
 

@@ -227,6 +227,8 @@ namespace ignite {
                   jmethodID m_Throwable_getMessage;
                   jmethodID m_Throwable_printStackTrace;
 
+                  jclass c_String;
+
                   jclass c_PlatformUtils;
                   jmethodID m_PlatformUtils_getFullStackTrace;
 
@@ -445,11 +447,18 @@ namespace ignite {
                   void ConnectionClose(const SharedPointer< GlobalJObject >& connection, JniErrorInfo* errInfo);
                   bool ConnectionGetMetaData(const SharedPointer< GlobalJObject >& connection, SharedPointer< GlobalJObject>& databaseMetaData, JniErrorInfo* errInfo);
 
-                  bool DatabaseMetaDataGetTables(const SharedPointer< GlobalJObject >& databaseMetaData, SharedPointer< GlobalJObject >& resultSet, JniErrorInfo* errInfo);
+                  bool DatabaseMetaDataGetTables(
+                      const SharedPointer< GlobalJObject >& databaseMetaData,
+                      const std::string& catalog,
+                      const std::string& schemaPattern,
+                      const std::string& tableNamePattern,
+                      const std::vector< std::string >& types,
+                      SharedPointer< GlobalJObject >& resultSet,
+                      JniErrorInfo* errInfo);
 
                   bool ResultSetNext(const SharedPointer< GlobalJObject >& resultSet, bool& hasNext,
                                      JniErrorInfo* errInfo);
-                  bool ResultSetGetString(const jobject resultSet, int columnIndex, std::string& value, bool& wasNull, JniErrorInfo* errInfo);
+                  bool ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, std::string& value, bool& wasNull, JniErrorInfo* errInfo);
                   bool ResultSetGetString(const jobject resultSet, const std::string& columnName, std::string& value, bool& wasNull, JniErrorInfo* errInfo);
                   bool ResultSetGetInteger(const jobject resultSet, int columnIndex, int& value, bool& wasNull, JniErrorInfo* errInfo);
                   bool ResultSetGetInteger(const jobject resultSet, const std::string& columnName, int& value, bool& wasNull, JniErrorInfo* errInfo);
