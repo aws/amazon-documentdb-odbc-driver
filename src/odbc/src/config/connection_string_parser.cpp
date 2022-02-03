@@ -20,10 +20,8 @@
 #include "ignite/common/utils.h"
 
 #include "ignite/odbc/utility.h"
-#include "ignite/odbc/ssl_mode.h"
 #include "ignite/odbc/config/connection_string_parser.h"
 #include "ignite/odbc/config/config_tools.h"
-#include "ignite/odbc/nested_tx_mode.h"
 
 namespace ignite
 {
@@ -31,37 +29,37 @@ namespace ignite
     {
         namespace config
         {
-            const std::string ConnectionStringParser::Key::dsn                    = "dsn";
-            const std::string ConnectionStringParser::Key::driver                 = "driver";
-            const std::string ConnectionStringParser::Key::schema                 = "schema";
-            const std::string ConnectionStringParser::Key::address                = "address";
-            const std::string ConnectionStringParser::Key::server                 = "server";
-            const std::string ConnectionStringParser::Key::port                   = "port";
-            const std::string ConnectionStringParser::Key::distributedJoins       = "distributed_joins";
-            const std::string ConnectionStringParser::Key::enforceJoinOrder       = "enforce_join_order";
-            const std::string ConnectionStringParser::Key::protocolVersion        = "protocol_version";
-            const std::string ConnectionStringParser::Key::pageSize               = "page_size";
-            const std::string ConnectionStringParser::Key::replicatedOnly         = "replicated_only";
-            const std::string ConnectionStringParser::Key::collocated             = "collocated";
-            const std::string ConnectionStringParser::Key::lazy                   = "lazy";
-            const std::string ConnectionStringParser::Key::skipReducerOnUpdate    = "skip_reducer_on_update";
-            const std::string ConnectionStringParser::Key::sslMode                = "ssl_mode";
-            const std::string ConnectionStringParser::Key::sslKeyFile             = "ssl_key_file";
-            const std::string ConnectionStringParser::Key::sslCertFile            = "ssl_cert_file";
-            const std::string ConnectionStringParser::Key::sslCaFile              = "ssl_ca_file";
-            const std::string ConnectionStringParser::Key::user                   = "user";
-            const std::string ConnectionStringParser::Key::password               = "password";
-            const std::string ConnectionStringParser::Key::uid                    = "uid";
-            const std::string ConnectionStringParser::Key::pwd                    = "pwd";
-            const std::string ConnectionStringParser::Key::nestedTxMode           = "nested_tx_mode";
+            const std::string ConnectionStringParser::Key::dsn                      = "dsn";
+            const std::string ConnectionStringParser::Key::driver                   = "driver";
+            const std::string ConnectionStringParser::Key::database                 = "database";
+            const std::string ConnectionStringParser::Key::hostname                 = "hostname";
+            const std::string ConnectionStringParser::Key::port                     = "port";
+            const std::string ConnectionStringParser::Key::user                     = "user";
+            const std::string ConnectionStringParser::Key::password                 = "password";
+            const std::string ConnectionStringParser::Key::appName                  = "app_name";
+            const std::string ConnectionStringParser::Key::loginTimeoutSec          = "login_timeout_sec";
+            const std::string ConnectionStringParser::Key::readPreference           = "read_preference";
+            const std::string ConnectionStringParser::Key::replicaSet               = "replica_set";
+            const std::string ConnectionStringParser::Key::retryReads               = "retry_reads";
+            const std::string ConnectionStringParser::Key::tls                      = "tls";
+            const std::string ConnectionStringParser::Key::tlsAllowInvalidHostnames = "tls_allow_invalid_hostnames";
+            const std::string ConnectionStringParser::Key::tlsCaFile                = "tls_ca_file";
+            const std::string ConnectionStringParser::Key::sshUser                  = "ssh_user";
+            const std::string ConnectionStringParser::Key::sshHost                  = "ssh_host";
+            const std::string ConnectionStringParser::Key::sshPrivateKeyFile        = "ssh_private_key_file";
+            const std::string ConnectionStringParser::Key::sshPrivateKeyPassphrase  = "ssh_private_key_passphrase";
+            const std::string ConnectionStringParser::Key::sshStrictHostKeyChecking = "ssh_strict_host_key_checking";
+            const std::string ConnectionStringParser::Key::sshKnownHostsFile        = "ssh_known_hosts_file";
+            const std::string ConnectionStringParser::Key::scanMethod               = "scan_method";
+            const std::string ConnectionStringParser::Key::scanLimit                = "scan_limit";
+            const std::string ConnectionStringParser::Key::schemaName               = "schema_name";
+            const std::string ConnectionStringParser::Key::refreshSchema            = "refresh_schema";
+            const std::string ConnectionStringParser::Key::defaultFetchSize         = "default_fetch_size";
+            const std::string ConnectionStringParser::Key::uid                      = "uid";
+            const std::string ConnectionStringParser::Key::pwd                      = "pwd";
 
             ConnectionStringParser::ConnectionStringParser(Configuration& cfg):
                 cfg(cfg)
-            {
-                // No-op.
-            }
-
-            ConnectionStringParser::~ConnectionStringParser()
             {
                 // No-op.
             }
@@ -141,21 +139,20 @@ namespace ignite
                 {
                     cfg.SetDsn(value);
                 }
-                else if (lKey == Key::schema)
+                else if (lKey == Key::database)
                 {
-                    cfg.SetSchema(value);
+                    cfg.SetDatabase(value);
                 }
-                else if (lKey == Key::address)
+                else if (lKey == Key::hostname)
                 {
-                    std::vector<EndPoint> endPoints;
+                    EndPoint endpoint;
 
-                    ParseAddress(value, endPoints, diag);
+                    ParseSingleAddress(value, endpoint, diag);
 
-                    cfg.SetAddresses(endPoints);
-                }
-                else if (lKey == Key::server)
-                {
-                    cfg.SetHost(value);
+                    cfg.SetHostname(endpoint.host);
+                    
+                    if (!cfg.IsPortSet()) 
+                        cfg.SetPort(endpoint.port);
                 }
                 else if (lKey == Key::port)
                 {
@@ -182,7 +179,7 @@ namespace ignite
                         return;
                     }
 
-                    if (value.size() >= sizeof("65535"))
+                    if (value.size() >= sizeof(std::to_string(UINT16_MAX)))
                     {
                         if (diag)
                         {
@@ -199,7 +196,7 @@ namespace ignite
                     conv << value;
                     conv >> numValue;
 
-                    if (numValue <= 0 || numValue > 0xFFFF)
+                    if (numValue <= 0 || numValue > UINT16_MAX)
                     {
                         if (diag)
                         {
@@ -211,87 +208,207 @@ namespace ignite
                         return;
                     }
 
-                    cfg.SetTcpPort(static_cast<uint16_t>(numValue));
+                    cfg.SetPort(static_cast<uint16_t>(numValue));
                 }
-                else if (lKey == Key::distributedJoins)
+                else if (lKey == Key::appName)
                 {
-                    BoolParseResult::Type res = StringToBool(value);
-
-                    if (res == BoolParseResult::AI_UNRECOGNIZED)
-                    {
-                        if (diag)
-                        {
-                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
-                                MakeErrorMessage("Unrecognized bool value. Using default value.", key, value));
-                        }
-
-                        return;
-                    }
-
-                    cfg.SetDistributedJoins(res == BoolParseResult::AI_TRUE);
+                    cfg.SetApplicationName(value);
                 }
-                else if (lKey == Key::enforceJoinOrder)
-                {
-                    BoolParseResult::Type res = StringToBool(value);
-
-                    if (res == BoolParseResult::AI_UNRECOGNIZED)
-                    {
-                        if (diag)
-                        {
-                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
-                                MakeErrorMessage("Unrecognized bool value. Using default value.", key, value));
-                        }
-
-                        return;
-                    }
-
-                    cfg.SetEnforceJoinOrder(res == BoolParseResult::AI_TRUE);
-                }
-                else if (lKey == Key::protocolVersion)
-                {
-                    try
-                    {
-                        ProtocolVersion version = ProtocolVersion::FromString(value);
-
-                        if (!version.IsSupported())
-                        {
-                            if (diag)
-                            {
-                                diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
-                                    "Specified version is not supported. Default value used.");
-                            }
-
-                            return;
-                        }
-
-                        cfg.SetProtocolVersion(version);
-                    }
-                    catch (IgniteError& err)
-                    {
-                        if (diag)
-                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED, err.GetText());
-                    }
-                }
-                else if (lKey == Key::pageSize)
+                else if (lKey == Key::loginTimeoutSec)
                 {
                     if (!common::AllDigits(value))
                     {
                         if (diag)
                         {
                             diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
-                                MakeErrorMessage("Page size attribute value contains unexpected characters."
+                                MakeErrorMessage("Login timeout seconds attribute value contains unexpected characters."
                                     " Using default value.", key, value));
                         }
 
                         return;
                     }
 
-                    if (value.size() >= sizeof("4294967295"))
+                    if (value.size() >= sizeof(std::to_string(UINT32_MAX)))
                     {
                         if (diag)
                         {
                             diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
-                                MakeErrorMessage("Page size attribute value is too large."
+                                MakeErrorMessage("Login timeout seconds attribute value is too large. Using default value.", key, value));
+                        }
+
+                        return;
+                    }
+
+                    int64_t numValue = 0;
+                    std::stringstream conv;
+
+                    conv << value;
+                    conv >> numValue;
+
+                    if (numValue <= 0 || numValue > UINT32_MAX)
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                MakeErrorMessage("Login timeout seconds attribute value is out of range."
+                                    " Using default value.", key, value));
+                        }
+
+                        return;
+                    }
+
+                    cfg.SetLoginTimeoutSeconds(static_cast<int32_t>(numValue));
+                }
+                else if (lKey == Key::readPreference)
+                {
+                    ReadPreference::Type preference = ReadPreference::FromString(value);
+
+                    if (preference == ReadPreference::Type::UNKNOWN)
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                "Specified read preference is not supported. Default value used ('primary').");
+                        }
+
+                        return;
+                    }
+
+                    cfg.SetReadPreference(preference);
+                }
+                else if (lKey == Key::replicaSet)
+                {
+                    cfg.SetReplicaSet(value);
+                }
+                else if (lKey == Key::retryReads)
+                {
+                    BoolParseResult::Type res = StringToBool(value);
+
+                    if (res == BoolParseResult::Type::AI_UNRECOGNIZED)
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                MakeErrorMessage("Unrecognized bool value. Using default value.", key, value));
+                        }
+
+                        return;
+                    }
+
+                    cfg.SetRetryReads(res == BoolParseResult::Type::AI_TRUE);
+                }
+                else if (lKey == Key::tls)
+                {
+                    BoolParseResult::Type res = StringToBool(value);
+
+                    if (res == BoolParseResult::Type::AI_UNRECOGNIZED)
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                MakeErrorMessage("Unrecognized bool value. Using default value.", key, value));
+                        }
+
+                        return;
+                    }
+
+                    cfg.SetTls(res == BoolParseResult::Type::AI_TRUE);
+                }
+                else if (lKey == Key::tlsAllowInvalidHostnames)
+                {
+                    BoolParseResult::Type res = StringToBool(value);
+
+                    if (res == BoolParseResult::Type::AI_UNRECOGNIZED)
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                MakeErrorMessage("Unrecognized bool value. Using default value.", key, value));
+                        }
+
+                        return;
+                    }
+
+                    cfg.SetTlsAllowInvalidHostnames(res == BoolParseResult::Type::AI_TRUE);
+                }
+                else if (lKey == Key::tlsCaFile)
+                {
+                    cfg.SetTlsCaFile(value);
+                }
+                else if (lKey == Key::sshUser)
+                {
+                    cfg.SetSshUser(value);
+                }
+                else if (lKey == Key::sshHost)
+                {
+                    cfg.SetSshHost(value);
+                }
+                else if (lKey == Key::sshPrivateKeyFile)
+                {
+                    cfg.SetSshPrivateKeyFile(value);
+                }
+                else if (lKey == Key::sshPrivateKeyPassphrase)
+                {
+                    cfg.SetSshPrivateKeyPassphrase(value);
+                }
+                else if (lKey == Key::sshStrictHostKeyChecking)
+                {
+                    BoolParseResult::Type res = StringToBool(value);
+
+                    if (res == BoolParseResult::Type::AI_UNRECOGNIZED)
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                MakeErrorMessage("Unrecognized bool value. Using default value.", key, value));
+                        }
+
+                        return;
+                    }
+
+                    cfg.SetSshStrictHostKeyChecking(res == BoolParseResult::Type::AI_TRUE);
+                }
+                else if (lKey == Key::sshKnownHostsFile)
+                {
+                    cfg.SetSshKnownHostsFile(value);
+                }
+                else if (lKey == Key::scanMethod)
+                {
+                    ScanMethod::Type method = ScanMethod::FromString(value);
+                    
+                    if (method == ScanMethod::Type::UNKNOWN)
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                "Specified scan method is not supported. Default value used ('random').");
+                        }
+
+                        return;
+                    }
+
+                    cfg.SetScanMethod(method);
+                }
+                else if (lKey == Key::scanLimit)
+                {
+                    if (!common::AllDigits(value))
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                MakeErrorMessage("Scan limit attribute value contains unexpected characters."
+                                    " Using default value.", key, value));
+                        }
+
+                        return;
+                    }
+
+                    if (value.size() >= sizeof(std::to_string(UINT32_MAX)))
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                MakeErrorMessage("Scan limit size attribute value is too large."
                                     " Using default value.", key, value));
                         }
 
@@ -304,25 +421,29 @@ namespace ignite
                     conv << value;
                     conv >> numValue;
 
-                    if (numValue <= 0 || numValue > 0xFFFFFFFFL)
+                    if (numValue <= 0 || numValue > UINT32_MAX)
                     {
                         if (diag)
                         {
                             diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
-                                MakeErrorMessage("Page size attribute value is out of range."
+                                MakeErrorMessage("Scan limit attribute value is out of range."
                                     " Using default value.", key, value));
                         }
 
                         return;
                     }
 
-                    cfg.SetPageSize(static_cast<int32_t>(numValue));
+                    cfg.SetScanLimit(static_cast<int32_t>(numValue));
                 }
-                else if (lKey == Key::replicatedOnly)
+                else if (lKey == Key::schemaName)
+                {
+                    cfg.SetSchemaName(value);
+                }
+                else if (lKey == Key::refreshSchema)
                 {
                     BoolParseResult::Type res = StringToBool(value);
 
-                    if (res == BoolParseResult::AI_UNRECOGNIZED)
+                    if (res == BoolParseResult::Type::AI_UNRECOGNIZED)
                     {
                         if (diag)
                         {
@@ -333,88 +454,54 @@ namespace ignite
                         return;
                     }
 
-                    cfg.SetReplicatedOnly(res == BoolParseResult::AI_TRUE);
+                    cfg.SetRefreshSchema(res == BoolParseResult::Type::AI_TRUE);
                 }
-                else if (lKey == Key::collocated)
+                else if (lKey == Key::defaultFetchSize)
                 {
-                    BoolParseResult::Type res = StringToBool(value);
-
-                    if (res == BoolParseResult::AI_UNRECOGNIZED)
+                    if (!common::AllDigits(value))
                     {
                         if (diag)
                         {
                             diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
-                                MakeErrorMessage("Unrecognized bool value. Using default value.", key, value));
+                                MakeErrorMessage("Default fetch size attribute value contains unexpected characters."
+                                    " Using default value.", key, value));
                         }
 
                         return;
                     }
 
-                    cfg.SetCollocated(res == BoolParseResult::AI_TRUE);
-                }
-                else if (lKey == Key::lazy)
-                {
-                    BoolParseResult::Type res = StringToBool(value);
-
-                    if (res == BoolParseResult::AI_UNRECOGNIZED)
+                    if (value.size() >= sizeof(std::to_string(UINT32_MAX)))
                     {
                         if (diag)
                         {
                             diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
-                                MakeErrorMessage("Unrecognized bool value. Defaulting to 'false'.", key, value));
+                                MakeErrorMessage("Default fetch size attribute value is too large."
+                                    " Using default value.", key, value));
                         }
 
                         return;
                     }
 
-                    cfg.SetLazy(res == BoolParseResult::AI_TRUE);
-                }
-                else if (lKey == Key::skipReducerOnUpdate)
-                {
-                    BoolParseResult::Type res = StringToBool(value);
+                    int64_t numValue = 0;
+                    std::stringstream conv;
 
-                    if (res == BoolParseResult::AI_UNRECOGNIZED)
+                    conv << value;
+                    conv >> numValue;
+
+                    if (numValue <= 0 || numValue > UINT32_MAX)
                     {
                         if (diag)
                         {
                             diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
-                                MakeErrorMessage("Unrecognized bool value. Defaulting to 'false'.", key, value));
+                                MakeErrorMessage("Default fetch size attribute value is out of range."
+                                    " Using default value.", key, value));
                         }
 
                         return;
                     }
 
-                    cfg.SetSkipReducerOnUpdate(res == BoolParseResult::AI_TRUE);
-                }
-                else if (lKey == Key::sslMode)
-                {
-                    ssl::SslMode::Type mode = ssl::SslMode::FromString(value);
-
-                    if (mode == ssl::SslMode::UNKNOWN)
-                    {
-                        if (diag)
-                        {
-                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
-                                "Specified SSL mode is not supported. Default value used ('disable').");
-                        }
-
-                        return;
-                    }
-
-                    cfg.SetSslMode(mode);
-                }
-                else if (lKey == Key::sslKeyFile)
-                {
-                    cfg.SetSslKeyFile(value);
-                }
-                else if (lKey == Key::sslCertFile)
-                {
-                    cfg.SetSslCertFile(value);
-                }
-                else if (lKey == Key::sslCaFile)
-                {
-                    cfg.SetSslCaFile(value);
-                }
+                    cfg.SetDefaultFetchSize(static_cast<int32_t>(numValue));
+                } 
                 else if (lKey == Key::driver)
                 {
                     cfg.SetDriver(value);
@@ -439,23 +526,6 @@ namespace ignite
 
                     cfg.SetPassword(value);
                 }
-                else if (lKey == Key::nestedTxMode)
-                {
-                    NestedTxMode::Type mode = NestedTxMode::FromString(value);
-
-                    if (mode == NestedTxMode::AI_UNKNOWN)
-                    {
-                        if (diag)
-                        {
-                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
-                                "Specified nested transaction mode is not supported. Default value used ('error').");
-                        }
-
-                        return;
-                    }
-
-                    cfg.SetNestedTxMode(mode);
-                }
                 else if (diag)
                 {
                     std::stringstream stream;
@@ -471,12 +541,12 @@ namespace ignite
                 std::string lower = common::ToLower(value);
 
                 if (lower == "true")
-                    return BoolParseResult::AI_TRUE;
+                    return BoolParseResult::Type::AI_TRUE;
 
                 if (lower == "false")
-                    return BoolParseResult::AI_FALSE;
+                    return BoolParseResult::Type::AI_FALSE;
 
-                return BoolParseResult::AI_UNRECOGNIZED;
+                return BoolParseResult::Type::AI_UNRECOGNIZED;
             }
 
             std::string ConnectionStringParser::MakeErrorMessage(const std::string& msg, const std::string& key,
