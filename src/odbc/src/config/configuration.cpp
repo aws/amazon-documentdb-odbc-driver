@@ -52,6 +52,7 @@ namespace ignite
             const bool Configuration::DefaultValue::refreshSchema = false;
 
             // Internal SSH Tunnel options
+            const bool Configuration::DefaultValue::sshEnable = false;
             const std::string Configuration::DefaultValue::sshUser = "";
             const std::string Configuration::DefaultValue::sshHost = "";
             const std::string Configuration::DefaultValue::sshPrivateKeyFile = "";

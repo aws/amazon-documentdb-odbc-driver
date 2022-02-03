@@ -338,23 +338,21 @@ namespace ignite
                 }
                 else if (lKey == Key::sshEnable)
                 {
-
                     BoolParseResult::Type res = StringToBool(value);
 
-                    if (res == BoolParseResult::AI_UNRECOGNIZED) {
-                        if (diag) {
-                            diag->AddStatusRecord(
-                                SqlState::S01S02_OPTION_VALUE_CHANGED,
-                                MakeErrorMessage("Unrecognized bool value. "
-                                                 "Using default value.",
-                                                 key, value));
+                    if (res == BoolParseResult::Type::AI_UNRECOGNIZED)
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                MakeErrorMessage("Unrecognized bool value. Using default value.", key, value));
                         }
 
                         return;
                     }
 
-                    cfg.SetSshEnable(res == BoolParseResult::AI_TRUE);
-                }
+                    cfg.SetSshEnable(res == BoolParseResult::Type::AI_TRUE);
+                }               
                 else if (lKey == Key::sshUser)
                 {
                     cfg.SetSshUser(value);

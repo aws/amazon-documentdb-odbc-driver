@@ -384,7 +384,7 @@ namespace ignite
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    val = config.GetDatabase().c_str();
+                    val = config.GetSchemaName().c_str();
                     schemaLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                         "Schema Name:", ChildId::SCHEMA_LABEL);
                     schemaEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::SCHEMA_EDIT);
