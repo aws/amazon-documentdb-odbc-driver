@@ -692,9 +692,9 @@ namespace ignite
             mongoConnectionString.append("@" + host);
             mongoConnectionString.append(":" + port);
             mongoConnectionString.append("/" + config.GetSchema());
-            mongoConnectionString.append("?");
+            //mongoConnectionString.append("?");
             //mongoConnectionString.append("?tlsAllowInvalidHostnames=true");
-            mongoConnectionString.append("tls=true");
+            mongoConnectionString.append("&tls=true");
   
 
 
@@ -850,22 +850,21 @@ namespace ignite
 
             if (mongoInstance)
             {
-                mongoInstance =  std::move(bsoncxx::stdx::make_unique<mongocxx::instance>());
+                //auto instance =
+                //    bsoncxx::stdx::make_unique< mongocxx::instance >();
+                //std::unique_ptr<mongocxx::instance> instance(new mongocxx::instance());
+                //mongoInstance = std::move(instance);
+                //mongoInstance =  bsoncxx::stdx::make_unique<mongocxx::instance>();
             }
 
+            mongocxx::instance instance{};  // This should be done only once. 
             try {
                 const auto uri = mongocxx::uri{mongoConnectionString};
                 mongocxx::options::client client_options;
                 mongocxx::options::tls tls_options;
 
-#ifdef _WIN32
-                tls_options.ca_file(common::GetEnv("DOC_DB_CA_FILE", "" ));
-#endif
-#ifdef __APPLE__
-                // If you want to disable certificate verification, you
-                // can set the `allow_invalid_certificates` option.
                 tls_options.allow_invalid_certificates(true);
-#endif
+
                 client_options.tls_opts(tls_options);
                 auto client1 = mongocxx::client{mongocxx::uri{mongoConnectionString}, client_options};
 
