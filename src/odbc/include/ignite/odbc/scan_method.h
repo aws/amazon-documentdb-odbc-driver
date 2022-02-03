@@ -26,7 +26,7 @@ namespace ignite
         /** Scan method enum. */
         struct ScanMethod
         {
-            enum Type
+            enum class Type
             {
                 RANDOM,
                 ID_FORWARD,

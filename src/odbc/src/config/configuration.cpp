@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// configures for what is defined in .h .h has a lot of setable values, replaces with DocumentDB properties. 
 #include <string>
 #include <sstream>
 #include <iterator>
@@ -33,7 +32,6 @@ namespace ignite
             // Connection Settings
             const std::string Configuration::DefaultValue::dsn = "DocumentDB DSN";
             const std::string Configuration::DefaultValue::driver = "Amazon DocumentDB ODBC Driver";
-            // driver does not need to be added in config window since it is chosen at the Data Source Administrator
             const std::string Configuration::DefaultValue::database = "";
             const std::string Configuration::DefaultValue::hostname = "";
             const uint16_t Configuration::DefaultValue::port = 27017;

@@ -369,7 +369,7 @@ namespace ignite
                     scanMethodComboBox->AddString("ID Reverse");
                     scanMethodComboBox->AddString("All");
 
-                    scanMethodComboBox->SetSelection(scanMethod); // set default
+                    scanMethodComboBox->SetSelection(static_cast<int>(scanMethod)); // set default
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -402,8 +402,8 @@ namespace ignite
                     std::string scanMethodStr;
                     scanMethodComboBox->GetText(scanMethodStr);
                     if (ScanMethod::FromString(scanMethodStr,
-                                               ScanMethod::UNKNOWN)
-                        == ScanMethod::ALL) {
+                                               ScanMethod::Type::UNKNOWN)
+                        == ScanMethod::Type::ALL) {
                         scanLimitEdit->SetEnabled(false);
                     } else {
                         scanLimitEdit->SetEnabled(true);
@@ -447,7 +447,7 @@ namespace ignite
                     readPreferenceComboBox->AddString("Secondary Preferred");
                     readPreferenceComboBox->AddString("Nearest");
 
-                    readPreferenceComboBox->SetSelection(readPreference); // set default
+                    readPreferenceComboBox->SetSelection(static_cast<int>(readPreference)); // set default
 
                     rowPos += INTERVAL + ROW_HEIGHT;
                     
@@ -613,8 +613,8 @@ namespace ignite
                                     std::string scanMethodStr;
                                     scanMethodComboBox->GetText(scanMethodStr);
                                     if (ScanMethod::FromString(
-                                                scanMethodStr, ScanMethod::UNKNOWN)
-                                        == ScanMethod::ALL) 
+                                                scanMethodStr, ScanMethod::Type::UNKNOWN)
+                                        == ScanMethod::Type::ALL) 
                                     {
                                         scanLimitEdit->SetEnabled(false);
                                     } 
@@ -783,7 +783,7 @@ namespace ignite
                     LOG_MSG("Refresh schema: " << (refreshSchema ? "true" : "false"));
 
                     ScanMethod::Type scanMethod =
-                        ScanMethod::FromString(scanMethodStr, ScanMethod::UNKNOWN);
+                        ScanMethod::FromString(scanMethodStr, ScanMethod::Type::UNKNOWN);
 
                     cfg.SetScanMethod(scanMethod);
                     cfg.SetSchemaName(schemaStr);

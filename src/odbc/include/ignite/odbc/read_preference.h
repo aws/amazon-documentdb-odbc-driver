@@ -26,7 +26,7 @@ namespace ignite
         /** Read Preference enum. */
         struct ReadPreference
         {
-            enum Type
+            enum class Type
             {
                 PRIMARY,
                 PRIMARY_PREFERRED,
