@@ -159,6 +159,11 @@ namespace ignite
                     SNDMSG(handle, WM_SETTEXT, 0, reinterpret_cast<LPARAM>(text.c_str()));
                 }
 
+                bool Window::HasText() const 
+                {
+                    return IsEnabled() && GetWindowTextLength(handle) > 0;
+                }
+
                 bool Window::IsChecked() const
                 {
                     return IsEnabled() && Button_GetCheck(handle) == BST_CHECKED;
