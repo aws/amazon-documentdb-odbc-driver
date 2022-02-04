@@ -116,7 +116,7 @@ SQLRETURN performance::PerformanceTestRunner::TestDefaultDSN() {
         return ret;
     }
 
-    ret = SQLDriverConnect(conn, NULL, (SQLTCHAR*)dsn.c_str(), SQL_NTS,
+    ret = SQLDriverConnect(conn, nullptr, (SQLTCHAR*)dsn.c_str(), SQL_NTS,
                            out_conn_string, IT_SIZEOF(out_conn_string),
                            &out_conn_string_length, SQL_DRIVER_COMPLETE);
     if (ret != SQL_SUCCESS) {
@@ -260,6 +260,8 @@ void performance::PerformanceTestRunner::OutputHeaders(
     limit = LIMIT_HEADER;
     iter = ITERATION_COUNT_HEADER;
     std::string header_str;
+    // TODO: once standard deviation and 95th percentile are calculated, 
+    // update output headers to include columns for both
 
     // Output haders are different for each output mode
     if (_output_mode == 0) {
@@ -509,84 +511,80 @@ void performance::PerformanceTestRunner::CalcStats(TestCase& test_case) {
             "failed for test case ");
     }
 
-    try {
-        if (size == 1) {
-            test_case.stat_info.max = test_case.time_ms[0];
-            test_case.stat_info.min = test_case.time_ms[0];
-            test_case.stat_info.avg = test_case.time_ms[0];
-            test_case.stat_info.median = test_case.time_ms[0];
-            test_case.stat_info_exec.max = test_case.time_exec_ms[0];
-            test_case.stat_info_exec.min = test_case.time_exec_ms[0];
-            test_case.stat_info_exec.avg = test_case.time_exec_ms[0];
-            test_case.stat_info_exec.median = test_case.time_exec_ms[0];
-            test_case.stat_info_exec.max = test_case.time_bind_fetch_ms[0];
-            test_case.stat_info_exec.min = test_case.time_bind_fetch_ms[0];
-            test_case.stat_info_exec.avg = test_case.time_bind_fetch_ms[0];
-            test_case.stat_info_exec.median = test_case.time_bind_fetch_ms[0];
+    if (size == 1) {
+        test_case.stat_info.max = test_case.time_ms[0];
+        test_case.stat_info.min = test_case.time_ms[0];
+        test_case.stat_info.avg = test_case.time_ms[0];
+        test_case.stat_info.median = test_case.time_ms[0];
+        test_case.stat_info_exec.max = test_case.time_exec_ms[0];
+        test_case.stat_info_exec.min = test_case.time_exec_ms[0];
+        test_case.stat_info_exec.avg = test_case.time_exec_ms[0];
+        test_case.stat_info_exec.median = test_case.time_exec_ms[0];
+        test_case.stat_info_exec.max = test_case.time_bind_fetch_ms[0];
+        test_case.stat_info_exec.min = test_case.time_bind_fetch_ms[0];
+        test_case.stat_info_exec.avg = test_case.time_bind_fetch_ms[0];
+        test_case.stat_info_exec.median = test_case.time_bind_fetch_ms[0];
 
-        } else {
-            // calculate max and min
-            test_case.stat_info.max = *std::max_element(
-                test_case.time_ms.begin(), test_case.time_ms.end());
-            test_case.stat_info.min = *std::min_element(
-                test_case.time_ms.begin(), test_case.time_ms.end());
-            test_case.stat_info_exec.max = *std::max_element(
-                test_case.time_exec_ms.begin(), test_case.time_exec_ms.end());
-            test_case.stat_info_exec.min = *std::min_element(
-                test_case.time_exec_ms.begin(), test_case.time_exec_ms.end());
-            test_case.stat_info_bind_fetch.max =
-                *std::max_element(test_case.time_bind_fetch_ms.begin(),
-                                  test_case.time_bind_fetch_ms.end());
-            test_case.stat_info_bind_fetch.min =
-                *std::min_element(test_case.time_bind_fetch_ms.begin(),
-                                  test_case.time_bind_fetch_ms.end());
+    } else {
+        // calculate max and min
+        test_case.stat_info.max = *std::max_element(
+            test_case.time_ms.begin(), test_case.time_ms.end());
+        test_case.stat_info.min = *std::min_element(
+            test_case.time_ms.begin(), test_case.time_ms.end());
+        test_case.stat_info_exec.max = *std::max_element(
+            test_case.time_exec_ms.begin(), test_case.time_exec_ms.end());
+        test_case.stat_info_exec.min = *std::min_element(
+            test_case.time_exec_ms.begin(), test_case.time_exec_ms.end());
+        test_case.stat_info_bind_fetch.max =
+            *std::max_element(test_case.time_bind_fetch_ms.begin(),
+                                test_case.time_bind_fetch_ms.end());
+        test_case.stat_info_bind_fetch.min =
+            *std::min_element(test_case.time_bind_fetch_ms.begin(),
+                                test_case.time_bind_fetch_ms.end());
 
-            // calculate average
-            test_case.stat_info.avg =
-                std::accumulate(std::begin(test_case.time_ms),
-                                std::end(test_case.time_ms), 0ll)
-                / size;
+        // calculate average
+        test_case.stat_info.avg =
+            std::accumulate(std::begin(test_case.time_ms),
+                            std::end(test_case.time_ms), 0LL)
+            / size;
 
-            test_case.stat_info_exec.avg =
-                std::accumulate(std::begin(test_case.time_exec_ms),
-                                std::end(test_case.time_exec_ms), 0ll)
-                / size;
+        test_case.stat_info_exec.avg =
+            std::accumulate(std::begin(test_case.time_exec_ms),
+                            std::end(test_case.time_exec_ms), 0LL)
+            / size;
 
-            test_case.stat_info_bind_fetch.avg =
-                std::accumulate(std::begin(test_case.time_bind_fetch_ms),
-                                std::end(test_case.time_bind_fetch_ms), 0ll)
-                / size;
+        test_case.stat_info_bind_fetch.avg =
+            std::accumulate(std::begin(test_case.time_bind_fetch_ms),
+                            std::end(test_case.time_bind_fetch_ms), 0LL)
+            / size;
 
-            // calculate median
-            std::sort(test_case.time_ms.begin(), test_case.time_ms.end());
-            std::sort(test_case.time_exec_ms.begin(),
-                      test_case.time_exec_ms.end());
-            std::sort(test_case.time_bind_fetch_ms.begin(),
-                      test_case.time_bind_fetch_ms.end());
+        // calculate median
+        std::sort(test_case.time_ms.begin(), test_case.time_ms.end());
+        std::sort(test_case.time_exec_ms.begin(),
+                    test_case.time_exec_ms.end());
+        std::sort(test_case.time_bind_fetch_ms.begin(),
+                    test_case.time_bind_fetch_ms.end());
 
-            test_case.stat_info.median =
-                (size % 2) ? test_case.time_ms[size / 2]
-                           : ((test_case.time_ms[(size / 2) - 1]
-                               + test_case.time_ms[size / 2])
-                              / 2);
-            test_case.stat_info_exec.median =
-                (size % 2) ? test_case.time_exec_ms[size / 2]
-                           : ((test_case.time_exec_ms[(size / 2) - 1]
-                               + test_case.time_exec_ms[size / 2])
-                              / 2);
-            test_case.stat_info_bind_fetch.median =
-                (size % 2) ? test_case.time_bind_fetch_ms[size / 2]
-                           : ((test_case.time_bind_fetch_ms[(size / 2) - 1]
-                               + test_case.time_bind_fetch_ms[size / 2])
-                              / 2);
+        test_case.stat_info.median =
+            (size % 2) ? test_case.time_ms[size / 2]
+                        : ((test_case.time_ms[(size / 2) - 1]
+                            + test_case.time_ms[size / 2])
+                            / 2);
+        test_case.stat_info_exec.median =
+            (size % 2) ? test_case.time_exec_ms[size / 2]
+                        : ((test_case.time_exec_ms[(size / 2) - 1]
+                            + test_case.time_exec_ms[size / 2])
+                            / 2);
+        test_case.stat_info_bind_fetch.median =
+            (size % 2) ? test_case.time_bind_fetch_ms[size / 2]
+                        : ((test_case.time_bind_fetch_ms[(size / 2) - 1]
+                            + test_case.time_bind_fetch_ms[size / 2])
+                            / 2);
 
-            // calculate standard deviation
-            // TODO: calculate stdev and 95th percentile from vector of data
-            // e.g. test_case.stat_info.stdev = stdev;
-            // e.g. test_case.stat_info.percentile_95 = percentile_95;
-        }
-    } catch (...) {
-        throw std::runtime_error("could not calculate results for test case ");
+        // calculate standard deviation
+        // TODO: calculate stdev and 95th percentile from vector of data
+        // e.g. test_case.stat_info.stdev = stdev;
+        // e.g. test_case.stat_info.percentile_95 = percentile_95;
     }
 }
 
@@ -797,25 +795,17 @@ void performance::PerformanceTestRunner::OutputTestCase(
 
 performance::PerformanceTestRunner::PerformanceTestRunner() {
     // check if DSN is installed
-    try {
-        CheckDSN(kDsnDefault);
-    } catch (...) {
-        throw;
-    }
+    CheckDSN(kDsnDefault);
 }
 
 performance::PerformanceTestRunner::PerformanceTestRunner(
     const std::string test_plan_csv, const std::string output_file_csv,
     const std::string dsn, const int output_mode) {
     // check input arguments
-    try {
-        CheckFileExtension(test_plan_csv, ".csv");
-        CheckFileExtension(output_file_csv, ".csv");
-        CheckDSN(dsn);
-        CheckOutputMode(output_mode);
-    } catch (...) {
-        throw;
-    }
+    CheckFileExtension(test_plan_csv, ".csv");
+    CheckFileExtension(output_file_csv, ".csv");
+    CheckDSN(dsn);
+    CheckOutputMode(output_mode);
 
     _input_file = test_plan_csv;
     _output_file = output_file_csv;
@@ -840,20 +830,12 @@ performance::PerformanceTestRunner::~PerformanceTestRunner() {
  *******************************************************/
 
 void performance::PerformanceTestRunner::SetDSN(const std::string dsn) {
-    try {
-        CheckDSN(dsn);
-    } catch (...) {
-        throw;
-    }
+    CheckDSN(dsn);
     _dsn = dsn;
 }
 
 void performance::PerformanceTestRunner::SetOutputMode(const int output_mode) {
-    try {
-        CheckOutputMode(output_mode);
-    } catch (...) {
-        throw;
-    }
+    CheckOutputMode(output_mode);
     _output_mode = output_mode;
 }
 
@@ -888,11 +870,7 @@ void performance::PerformanceTestRunner::ReadPerformanceTestPlan() {
     // parse data into _cell_refs and check headers
     parser.parseTo(_csv_data, _cell_refs);
 
-    try {
-        CheckCsvHeaders();
-    } catch (...) {
-        throw;
-    }
+    CheckCsvHeaders();
 }
 
 void performance::PerformanceTestRunner::SetupConnection() {
