@@ -801,8 +801,9 @@ namespace ignite
 
             connectionString =
             "DRIVER={Apache Ignite};"
-            "ADDRESS=" + host + ":" + port + ";"
-            "SCHEMA=test;"
+            "HOSTNAME=" + host + ";"
+            "PORT=" + port + ";"
+            "DATABASE=test;"
             "USER=" + user + ";"
             "PASSWORD=" + password + ";";
         }

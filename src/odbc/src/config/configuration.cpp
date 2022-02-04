@@ -30,64 +30,41 @@ namespace ignite
     {
         namespace config
         {
-            const std::string Configuration::DefaultValue::dsn = "Apache Ignite DSN";
-            const std::string Configuration::DefaultValue::driver = "Apache Ignite";
-            const std::string Configuration::DefaultValue::schema = "PUBLIC";
-            const std::string Configuration::DefaultValue::address = "";
-            const std::string Configuration::DefaultValue::server = "";
 
-            const uint16_t Configuration::DefaultValue::port = 10800;
-            const int32_t Configuration::DefaultValue::pageSize = 1024;
-
-            const bool Configuration::DefaultValue::distributedJoins = false;
-            const bool Configuration::DefaultValue::enforceJoinOrder = false;
-            const bool Configuration::DefaultValue::replicatedOnly = false;
-            const bool Configuration::DefaultValue::collocated = false;
-            const bool Configuration::DefaultValue::lazy = false;
-            const bool Configuration::DefaultValue::skipReducerOnUpdate = false;
-
-            const ProtocolVersion& Configuration::DefaultValue::protocolVersion = ProtocolVersion::GetCurrent();
-
-            const ssl::SslMode::Type Configuration::DefaultValue::sslMode = ssl::SslMode::DISABLE;
-            const std::string Configuration::DefaultValue::sslKeyFile = "";
-            const std::string Configuration::DefaultValue::sslCertFile = "";
-            const std::string Configuration::DefaultValue::sslCaFile = "";
-
+            const std::string Configuration::DefaultValue::dsn = "DocumentDB DSN";
+            const std::string Configuration::DefaultValue::driver = "Amazon DocumentDB ODBC Driver";
+            const std::string Configuration::DefaultValue::database = "";
+            const std::string Configuration::DefaultValue::hostname = "";
+            const uint16_t Configuration::DefaultValue::port = 27017;
             const std::string Configuration::DefaultValue::user = "";
             const std::string Configuration::DefaultValue::password = "";
+            
+            // SSL/TLS options
+            const bool Configuration::DefaultValue::tls = true;
+            const bool Configuration::DefaultValue::tlsAllowInvalidHostnames = false;
+            const std::string Configuration::DefaultValue::tlsCaFile = "";
+           
+            // Schema Generation and Discovery options
+            const ScanMethod::Type Configuration::DefaultValue::scanMethod = ScanMethod::Type::RANDOM;
+            const int32_t Configuration::DefaultValue::scanLimit = 1000;
+            const std::string Configuration::DefaultValue::schemaName = "_default";
+            const bool Configuration::DefaultValue::refreshSchema = false;
 
-            const NestedTxMode::Type Configuration::DefaultValue::nestedTxMode = NestedTxMode::AI_ERROR;
-
-            Configuration::Configuration() :
-                dsn(DefaultValue::dsn),
-                driver(DefaultValue::driver),
-                schema(DefaultValue::schema),
-                server(DefaultValue::server),
-                port(DefaultValue::port),
-                pageSize(DefaultValue::pageSize),
-                distributedJoins(DefaultValue::distributedJoins),
-                enforceJoinOrder(DefaultValue::enforceJoinOrder),
-                replicatedOnly(DefaultValue::replicatedOnly),
-                collocated(DefaultValue::collocated),
-                lazy(DefaultValue::lazy),
-                skipReducerOnUpdate(DefaultValue::skipReducerOnUpdate),
-                protocolVersion(DefaultValue::protocolVersion),
-                endPoints(std::vector<EndPoint>()),
-                sslMode(DefaultValue::sslMode),
-                sslKeyFile(DefaultValue::sslKeyFile),
-                sslCertFile(DefaultValue::sslCertFile),
-                sslCaFile(DefaultValue::sslCaFile),
-                user(DefaultValue::user),
-                password(DefaultValue::password),
-                nestedTxMode(DefaultValue::nestedTxMode)
-            {
-                // No-op.
-            }
-
-            Configuration::~Configuration()
-            {
-                // No-op.
-            }
+            // Internal SSH Tunnel options
+            const std::string Configuration::DefaultValue::sshUser = "";
+            const std::string Configuration::DefaultValue::sshHost = "";
+            const std::string Configuration::DefaultValue::sshPrivateKeyFile = "";
+            const std::string Configuration::DefaultValue::sshPrivateKeyPassphrase = "";
+            const bool Configuration::DefaultValue::sshStrictHostKeyChecking = true;
+            const std::string Configuration::DefaultValue::sshKnownHostsFile = "";
+            
+            // Additional options
+            const std::string Configuration::DefaultValue::appName = "Amazon DocumentDB ODBC Driver";
+            const int32_t Configuration::DefaultValue::loginTimeoutSec = 0;
+            const ReadPreference::Type Configuration::DefaultValue::readPreference = ReadPreference::Type::PRIMARY;
+            const std::string Configuration::DefaultValue::replicaSet = "";
+            const bool Configuration::DefaultValue::retryReads = true;
+            const int32_t Configuration::DefaultValue::defaultFetchSize = 2000;
 
             std::string Configuration::ToConnectString() const
             {
@@ -114,17 +91,17 @@ namespace ignite
                 return connect_string_buffer.str();
             }
 
-            uint16_t Configuration::GetTcpPort() const
+            uint16_t Configuration::GetPort() const
             {
                 return port.GetValue();
             }
 
-            void Configuration::SetTcpPort(uint16_t port)
+            void Configuration::SetPort(uint16_t portNumber)
             {
-                this->port.SetValue(port);
+                this->port.SetValue(portNumber);
             }
 
-            bool Configuration::IsTcpPortSet() const
+            bool Configuration::IsPortSet() const
             {
                 return port.IsSet();
             }
@@ -142,9 +119,9 @@ namespace ignite
                 return dsn.IsSet();
             }
 
-            void Configuration::SetDsn(const std::string& dsn)
+            void Configuration::SetDsn(const std::string& dsnName)
             {
-                this->dsn.SetValue(dsn);
+                this->dsn.SetValue(dsnName);
             }
 
             const std::string& Configuration::GetDriver() const
@@ -152,229 +129,309 @@ namespace ignite
                 return driver.GetValue();
             }
 
-            void Configuration::SetDriver(const std::string& driver)
+            void Configuration::SetDriver(const std::string& driverName)
             {
-                this->driver.SetValue(driver);
+                this->driver.SetValue(driverName);
             }
 
-            const std::string& Configuration::GetHost() const
+            const std::string& Configuration::GetHostname() const
             {
-                return server.GetValue();
+                return hostname.GetValue();
             }
 
-            void Configuration::SetHost(const std::string& server)
+            void Configuration::SetHostname(const std::string& host)
             {
-                this->server.SetValue(server);
+                this->hostname.SetValue(host);
             }
 
-            bool Configuration::IsHostSet() const
+            bool Configuration::IsHostnameSet() const
             {
-                return server.IsSet();
+                return hostname.IsSet();
             }
 
-            const std::string& Configuration::GetSchema() const
+            const std::string& Configuration::GetDatabase() const
             {
-                return schema.GetValue();
+                return database.GetValue();
             }
 
-            void Configuration::SetSchema(const std::string& schema)
+            void Configuration::SetDatabase(const std::string& schema)
             {
-                this->schema.SetValue(schema);
+                this->database.SetValue(schema);
             }
 
-            bool Configuration::IsSchemaSet() const
+            bool Configuration::IsDatabaseSet() const
             {
-                return schema.IsSet();
+                return database.IsSet();
             }
 
-            const std::vector<EndPoint>& Configuration::GetAddresses() const
+            const std::string& Configuration::GetApplicationName() const
             {
-                return endPoints.GetValue();
+                return appName.GetValue();
             }
 
-            void Configuration::SetAddresses(const std::vector<EndPoint>& endPoints)
+            void Configuration::SetApplicationName(const std::string& name)
             {
-                this->endPoints.SetValue(endPoints);
+                this->appName.SetValue(name);
             }
 
-            bool Configuration::IsAddressesSet() const
+            bool Configuration::IsApplicationNameSet() const
             {
-                return endPoints.IsSet();
+                return appName.IsSet();
             }
 
-            ssl::SslMode::Type Configuration::GetSslMode() const
+            int32_t Configuration::GetLoginTimeoutSeconds() const
             {
-                return sslMode.GetValue();
+                return loginTimeoutSec.GetValue();
             }
 
-            void Configuration::SetSslMode(ssl::SslMode::Type sslMode)
+            void Configuration::SetLoginTimeoutSeconds(int32_t seconds)
             {
-                this->sslMode.SetValue(sslMode);
+                this->loginTimeoutSec.SetValue(seconds);
             }
 
-            bool Configuration::IsSslModeSet() const
+            bool Configuration::IsLoginTimeoutSecondsSet() const
             {
-                return sslMode.IsSet();
+                return loginTimeoutSec.IsSet();
             }
 
-            const std::string& Configuration::GetSslKeyFile() const
+            ReadPreference::Type Configuration::GetReadPreference() const
             {
-                return sslKeyFile.GetValue();
+                return readPreference.GetValue();
             }
 
-            void Configuration::SetSslKeyFile(const std::string& sslKeyFile)
+            void Configuration::SetReadPreference(const ReadPreference::Type preference)
             {
-                this->sslKeyFile.SetValue(sslKeyFile);
+                this->readPreference.SetValue(preference);
             }
 
-            bool Configuration::IsSslKeyFileSet() const
+            bool Configuration::IsReadPreferenceSet() const
             {
-                return sslKeyFile.IsSet();
+                return readPreference.IsSet();
             }
 
-            const std::string& Configuration::GetSslCertFile() const
+            const std::string& Configuration::GetReplicaSet() const
             {
-                return sslCertFile.GetValue();
+                return replicaSet.GetValue();
             }
 
-            void Configuration::SetSslCertFile(const std::string& sslCertFile)
+            void Configuration::SetReplicaSet(const std::string& name)
             {
-                this->sslCertFile.SetValue(sslCertFile);
+                this->replicaSet.SetValue(name);
             }
 
-            bool Configuration::IsSslCertFileSet() const
+            bool Configuration::IsReplicaSetSet() const
             {
-                return sslCertFile.IsSet();
+                return replicaSet.IsSet();
             }
 
-            const std::string& Configuration::GetSslCaFile() const
+            bool Configuration::IsRetryReads() const
             {
-                return sslCaFile.GetValue();
+                return retryReads.GetValue();
             }
 
-            void Configuration::SetSslCaFile(const std::string& sslCaFile)
+            void Configuration::SetRetryReads(bool val)
             {
-                this->sslCaFile.SetValue(sslCaFile);
+                this->retryReads.SetValue(val);
             }
 
-            bool Configuration::IsSslCaFileSet() const
+            bool Configuration::IsRetryReadsSet() const
             {
-                return sslCaFile.IsSet();
+                return retryReads.IsSet();
             }
 
-            bool Configuration::IsDistributedJoins() const
+            bool Configuration::IsTls() const
             {
-                return distributedJoins.GetValue();
+                return tls.GetValue();
             }
 
-            void Configuration::SetDistributedJoins(bool val)
+            void Configuration::SetTls(bool val)
             {
-                this->distributedJoins.SetValue(val);
+                this->tls.SetValue(val);
             }
 
-            bool Configuration::IsDistributedJoinsSet() const
+            bool Configuration::IsTlsSet() const
             {
-                return distributedJoins.IsSet();
+                return tls.IsSet();
             }
 
-            bool Configuration::IsEnforceJoinOrder() const
+            bool Configuration::IsTlsAllowInvalidHostnames() const
             {
-                return enforceJoinOrder.GetValue();
+                return tlsAllowInvalidHostnames.GetValue();
             }
 
-            void Configuration::SetEnforceJoinOrder(bool val)
+            void Configuration::SetTlsAllowInvalidHostnames(bool val)
             {
-                this->enforceJoinOrder.SetValue(val);
+                this->tlsAllowInvalidHostnames.SetValue(val);
             }
 
-            bool Configuration::IsEnforceJoinOrderSet() const
+            bool Configuration::IsTlsAllowInvalidHostnamesSet() const
             {
-                return enforceJoinOrder.IsSet();
+                return tlsAllowInvalidHostnames.IsSet();
             }
 
-            bool Configuration::IsReplicatedOnly() const
+            const std::string& Configuration::GetTlsCaFile() const
             {
-                return replicatedOnly.GetValue();
+                return tlsCaFile.GetValue();
             }
 
-            void Configuration::SetReplicatedOnly(bool val)
+            void Configuration::SetTlsCaFile(const std::string& path)
             {
-                this->replicatedOnly.SetValue(val);
+                this->tlsCaFile.SetValue(path);
             }
 
-            bool Configuration::IsReplicatedOnlySet() const
+            bool Configuration::IsTlsCaFileSet() const
             {
-                return replicatedOnly.IsSet();
+                return tlsCaFile.IsSet();
             }
 
-            bool Configuration::IsCollocated() const
+            const std::string& Configuration::GetSshUser() const
             {
-                return collocated.GetValue();
+                return sshUser.GetValue();
             }
 
-            void Configuration::SetCollocated(bool val)
+            void Configuration::SetSshUser(const std::string& username)
             {
-                this->collocated.SetValue(val);
+                this->sshUser.SetValue(username);
             }
 
-            bool Configuration::IsCollocatedSet() const
+            bool Configuration::IsSshUserSet() const
             {
-                return collocated.IsSet();
+                return sshUser.IsSet();
             }
 
-            bool Configuration::IsLazy() const
+            const std::string& Configuration::GetSshHost() const
             {
-                return lazy.GetValue();
+                return sshHost.GetValue();
             }
 
-            void Configuration::SetLazy(bool val)
+            void Configuration::SetSshHost(const std::string& host)
             {
-                this->lazy.SetValue(val);
+                this->sshHost.SetValue(host);
             }
 
-            bool Configuration::IsLazySet() const
+            bool Configuration::IsSshHostSet() const
             {
-                return lazy.IsSet();
+                return sshHost.IsSet();
             }
 
-            bool Configuration::IsSkipReducerOnUpdate() const
+            const std::string& Configuration::GetSshPrivateKeyFile() const
             {
-                return skipReducerOnUpdate.GetValue();
+                return sshPrivateKeyFile.GetValue();
             }
 
-            void Configuration::SetSkipReducerOnUpdate(bool val)
+            void Configuration::SetSshPrivateKeyFile(const std::string& path)
             {
-                this->skipReducerOnUpdate.SetValue(val);
+                this->sshPrivateKeyFile.SetValue(path);
             }
 
-            bool Configuration::IsSkipReducerOnUpdateSet() const
+            bool Configuration::IsSshPrivateKeyFileSet() const
             {
-                return skipReducerOnUpdate.IsSet();
+                return sshPrivateKeyFile.IsSet();
             }
 
-            ProtocolVersion Configuration::GetProtocolVersion() const
+            const std::string& Configuration::GetSshPrivateKeyPassphrase() const
             {
-                return protocolVersion.GetValue();
+                return sshPrivateKeyPassphrase.GetValue();
             }
 
-            void Configuration::SetProtocolVersion(const ProtocolVersion& version)
+            void Configuration::SetSshPrivateKeyPassphrase(const std::string& passphrase)
             {
-                this->protocolVersion.SetValue(version);
+                this->sshPrivateKeyPassphrase.SetValue(passphrase);
             }
 
-            bool Configuration::IsProtocolVersionSet() const
+            bool Configuration::IsSshPrivateKeyPassphraseSet() const
             {
-                return protocolVersion.IsSet();
+                return sshPrivateKeyPassphrase.IsSet();
             }
 
-            void Configuration::SetPageSize(int32_t size)
+            bool Configuration::IsSshStrictHostKeyChecking() const
             {
-                this->pageSize.SetValue(size);
+                return sshStrictHostKeyChecking.GetValue();
             }
 
-            bool Configuration::IsPageSizeSet() const
+            void Configuration::SetSshStrictHostKeyChecking(bool val)
             {
-                return pageSize.IsSet();
+                this->sshStrictHostKeyChecking.SetValue(val);
+            }
+
+            bool Configuration::IsSshStrictHostKeyCheckingSet() const
+            {
+                return sshStrictHostKeyChecking.IsSet();
+            }
+
+            const std::string& Configuration::GetSshKnownHostsFile() const
+            {
+                return sshKnownHostsFile.GetValue();
+            }
+
+            void Configuration::SetSshKnownHostsFile(const std::string& path)
+            {
+                this->sshKnownHostsFile.SetValue(path);
+            }
+
+            bool Configuration::IsSshKnownHostsFileSet() const
+            {
+                return sshKnownHostsFile.IsSet();
+            }
+
+            ScanMethod::Type Configuration::GetScanMethod() const
+            {
+                return scanMethod.GetValue();
+            }
+
+            void Configuration::SetScanMethod(const ScanMethod::Type method)
+            {
+                this->scanMethod.SetValue(method);
+            }
+
+            bool Configuration::IsScanMethodSet() const
+            {
+                return scanMethod.IsSet();
+            }
+
+            int32_t Configuration::GetScanLimit() const
+            {
+                return scanLimit.GetValue();
+            }
+
+            void Configuration::SetScanLimit(int32_t limit)
+            {
+                this->scanLimit.SetValue(limit);
+            }
+
+            bool Configuration::IsScanLimitSet() const
+            {
+                return scanLimit.IsSet();
+            }
+
+            const std::string& Configuration::GetSchemaName() const
+            {
+                return schemaName.GetValue();
+            }
+
+            void Configuration::SetSchemaName(const std::string& name)
+            {
+                this->schemaName.SetValue(name);
+            }
+
+            bool Configuration::IsSchemaNameSet() const
+            {
+                return schemaName.IsSet();
+            }
+
+            bool Configuration::IsRefreshSchema() const
+            {
+                return refreshSchema.GetValue();
+            }
+
+            void Configuration::SetRefreshSchema(bool val)
+            {
+                this->refreshSchema.SetValue(val);
+            }
+
+            bool Configuration::IsRefreshSchemaSet() const
+            {
+                return refreshSchema.IsSet();
             }
 
             const std::string& Configuration::GetUser() const
@@ -382,9 +439,9 @@ namespace ignite
                 return user.GetValue();
             }
 
-            void Configuration::SetUser(const std::string& user)
+            void Configuration::SetUser(const std::string& username)
             {
-                this->user.SetValue(user);
+                this->user.SetValue(username);
             }
 
             bool Configuration::IsUserSet() const
@@ -407,49 +464,49 @@ namespace ignite
                 return password.IsSet();
             }
 
-            NestedTxMode::Type Configuration::GetNestedTxMode() const
+            int32_t Configuration::GetDefaultFetchSize() const
             {
-                return nestedTxMode.GetValue();
+                return defaultFetchSize.GetValue();
             }
 
-            void Configuration::SetNestedTxMode(NestedTxMode::Type mode)
+            void Configuration::SetDefaultFetchSize(int32_t size)
             {
-                this->nestedTxMode.SetValue(mode);
+                this->defaultFetchSize.SetValue(size);
             }
 
-            bool Configuration::IsNestedTxModeSet() const
+            bool Configuration::IsDefaultFetchSizeSet() const
             {
-                return nestedTxMode.IsSet();
-            }
-
-            int32_t Configuration::GetPageSize() const
-            {
-                return pageSize.GetValue();
+                return defaultFetchSize.IsSet();
             }
 
             void Configuration::ToMap(ArgumentMap& res) const
             {
                 AddToMap(res, ConnectionStringParser::Key::dsn, dsn);
                 AddToMap(res, ConnectionStringParser::Key::driver, driver);
-                AddToMap(res, ConnectionStringParser::Key::schema, schema);
-                AddToMap(res, ConnectionStringParser::Key::address, endPoints);
-                AddToMap(res, ConnectionStringParser::Key::server, server);
+                AddToMap(res, ConnectionStringParser::Key::database, database);
+                AddToMap(res, ConnectionStringParser::Key::hostname, hostname);
                 AddToMap(res, ConnectionStringParser::Key::port, port);
-                AddToMap(res, ConnectionStringParser::Key::distributedJoins, distributedJoins);
-                AddToMap(res, ConnectionStringParser::Key::enforceJoinOrder, enforceJoinOrder);
-                AddToMap(res, ConnectionStringParser::Key::protocolVersion, protocolVersion);
-                AddToMap(res, ConnectionStringParser::Key::pageSize, pageSize);
-                AddToMap(res, ConnectionStringParser::Key::replicatedOnly, replicatedOnly);
-                AddToMap(res, ConnectionStringParser::Key::collocated, collocated);
-                AddToMap(res, ConnectionStringParser::Key::lazy, lazy);
-                AddToMap(res, ConnectionStringParser::Key::skipReducerOnUpdate, skipReducerOnUpdate);
-                AddToMap(res, ConnectionStringParser::Key::sslMode, sslMode);
-                AddToMap(res, ConnectionStringParser::Key::sslKeyFile, sslKeyFile);
-                AddToMap(res, ConnectionStringParser::Key::sslCertFile, sslCertFile);
-                AddToMap(res, ConnectionStringParser::Key::sslCaFile, sslCaFile);
                 AddToMap(res, ConnectionStringParser::Key::user, user);
                 AddToMap(res, ConnectionStringParser::Key::password, password);
-                AddToMap(res, ConnectionStringParser::Key::nestedTxMode, nestedTxMode);
+                AddToMap(res, ConnectionStringParser::Key::appName, appName);
+                AddToMap(res, ConnectionStringParser::Key::loginTimeoutSec, loginTimeoutSec);
+                AddToMap(res, ConnectionStringParser::Key::readPreference, readPreference);
+                AddToMap(res, ConnectionStringParser::Key::replicaSet, replicaSet);
+                AddToMap(res, ConnectionStringParser::Key::retryReads, retryReads);
+                AddToMap(res, ConnectionStringParser::Key::tls, tls);
+                AddToMap(res, ConnectionStringParser::Key::tlsAllowInvalidHostnames, tlsAllowInvalidHostnames);
+                AddToMap(res, ConnectionStringParser::Key::tlsCaFile, tlsCaFile);
+                AddToMap(res, ConnectionStringParser::Key::sshUser, sshUser);
+                AddToMap(res, ConnectionStringParser::Key::sshHost, sshHost);
+                AddToMap(res, ConnectionStringParser::Key::sshPrivateKeyFile, sshPrivateKeyFile);
+                AddToMap(res, ConnectionStringParser::Key::sshPrivateKeyPassphrase, sshPrivateKeyPassphrase);
+                AddToMap(res, ConnectionStringParser::Key::sshStrictHostKeyChecking, sshStrictHostKeyChecking);
+                AddToMap(res, ConnectionStringParser::Key::sshKnownHostsFile, sshKnownHostsFile);
+                AddToMap(res, ConnectionStringParser::Key::scanMethod, scanMethod);
+                AddToMap(res, ConnectionStringParser::Key::scanLimit, scanLimit);
+                AddToMap(res, ConnectionStringParser::Key::schemaName, schemaName);
+                AddToMap(res, ConnectionStringParser::Key::refreshSchema, refreshSchema);
+                AddToMap(res, ConnectionStringParser::Key::defaultFetchSize, defaultFetchSize);
             }
 
             template<>
@@ -484,35 +541,20 @@ namespace ignite
 
             template<>
             void Configuration::AddToMap(ArgumentMap& map, const std::string& key,
-                const SettableValue<ProtocolVersion>& value)
+                const SettableValue<ReadPreference::Type>& value)
             {
                 if (value.IsSet())
-                    map[key] = value.GetValue().ToString();
+                    map[key] = ReadPreference::ToString(value.GetValue());
             }
 
             template<>
             void Configuration::AddToMap(ArgumentMap& map, const std::string& key,
-                const SettableValue< std::vector<EndPoint> >& value)
+                const SettableValue<ScanMethod::Type>& value)
             {
                 if (value.IsSet())
-                    map[key] = AddressesToString(value.GetValue());
+                    map[key] = ScanMethod::ToString(value.GetValue());
             }
 
-            template<>
-            void Configuration::AddToMap(ArgumentMap& map, const std::string& key,
-                const SettableValue<ssl::SslMode::Type>& value)
-            {
-                if (value.IsSet())
-                    map[key] = ssl::SslMode::ToString(value.GetValue());
-            }
-
-            template<>
-            void Configuration::AddToMap(ArgumentMap& map, const std::string& key,
-                const SettableValue<NestedTxMode::Type>& value)
-            {
-                if (value.IsSet())
-                    map[key] = NestedTxMode::ToString(value.GetValue());
-            }
         }
     }
 }

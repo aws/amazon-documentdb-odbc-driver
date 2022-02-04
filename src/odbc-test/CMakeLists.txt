@@ -37,11 +37,16 @@ else ()
 endif()
 
 set(SOURCES 
+         src/configuration_test.cpp
          src/connection_test.cpp
          src/dummy_test.cpp
          src/java_test.cpp
          src/odbc_test_suite.cpp
-         src/test_utils.cpp
+         src/test_utils.cpp     
+         ../odbc/src/app/application_data_buffer.cpp
+         ../odbc/src/common_types.cpp
+         ../odbc/src/common/big_integer.cpp
+         ../odbc/src/common/bits.cpp
          ../odbc/src/app/application_data_buffer.cpp
          ../odbc/src/app/parameter.cpp
          ../odbc/src/app/parameter_set.cpp
@@ -84,8 +89,10 @@ set(SOURCES
          ../odbc/src/sql/sql_parser.cpp
          ../odbc/src/sql/sql_set_streaming_command.cpp
          ../odbc/src/sql/sql_utils.cpp
+         ../odbc/src/read_preference.cpp
          ../odbc/src/result_page.cpp
          ../odbc/src/row.cpp
+         ../odbc/src/scan_method.cpp
          ../odbc/src/ssl_mode.cpp
          ../odbc/src/statement.cpp
          ../odbc/src/streaming/streaming_batch.cpp
