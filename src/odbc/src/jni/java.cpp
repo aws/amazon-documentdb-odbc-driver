@@ -834,8 +834,6 @@ namespace ignite
                     return true;
                 }
 
-                // note to self: result is stored in bool poiner isActive, this is to be consistent with other functions that
-                // use CallBooleanMethod. -AL-
                 bool JniContext::DocumentDbConnectionIsSshTunnelActive(
                     const SharedPointer< GlobalJObject >& connection,
                     bool& isActive,
@@ -856,7 +854,6 @@ namespace ignite
                     return errInfo->code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
-                // use a reference variable to return a value, return a boolean to indicate whether it is successful or not -AL-
                 bool JniContext::DocumentDbConnectionGetSshLocalPort(
                     const SharedPointer< GlobalJObject >& connection,
                     int32_t& result,
