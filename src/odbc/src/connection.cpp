@@ -693,7 +693,7 @@ namespace ignite
             mongoConnectionString.append(":" + port);
             mongoConnectionString.append("/" + config.GetSchema());
             //mongoConnectionString.append("?");
-            //mongoConnectionString.append("?tlsAllowInvalidHostnames=true");
+            mongoConnectionString.append("?tlsAllowInvalidHostnames=true");
             //mongoConnectionString.append("&tls=true");
   
 
@@ -848,16 +848,16 @@ namespace ignite
             using bsoncxx::builder::basic::kvp;
             using bsoncxx::builder::basic::make_document;
 
-            if (mongoInstance)
+            if (mongoInstance == nullptr)
             {
                 //auto instance =
                 //    bsoncxx::stdx::make_unique< mongocxx::instance >();
                 //std::unique_ptr<mongocxx::instance> instance(new mongocxx::instance());
                 //mongoInstance = std::move(instance);
-                //mongoInstance =  bsoncxx::stdx::make_unique<mongocxx::instance>();
+                mongoInstance =  bsoncxx::stdx::make_unique<mongocxx::instance>();
             }
 
-            mongocxx::instance instance{};  // This should be done only once. 
+            //mongocxx::instance instance{};  // This should be done only once. 
             try {
                 const auto uri = mongocxx::uri{mongoConnectionString};
                 mongocxx::options::client client_options;
