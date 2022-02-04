@@ -104,102 +104,20 @@ namespace ignite
 
         void ReadDsnConfiguration(const char* dsn, Configuration& config, diagnostic::DiagnosticRecordStorage* diag)
         {
-            SettableValue<std::string> address = ReadDsnString(dsn, ConnectionStringParser::Key::address);
+            SettableValue<std::string> hostname = ReadDsnString(dsn, ConnectionStringParser::Key::hostname);
 
-            if (address.IsSet() && !config.IsAddressesSet())
-            {
-                std::vector<EndPoint> endPoints;
-
-                ParseAddress(address.GetValue(), endPoints, diag);
-
-                config.SetAddresses(endPoints);
-            }
-
-            SettableValue<std::string> server = ReadDsnString(dsn, ConnectionStringParser::Key::server);
-
-            if (server.IsSet() && !config.IsHostSet())
-                config.SetHost(server.GetValue());
+            if (hostname.IsSet() && !config.IsHostnameSet())
+                config.SetHostname(hostname.GetValue());
 
             SettableValue<int32_t> port = ReadDsnInt(dsn, ConnectionStringParser::Key::port);
 
-            if (port.IsSet() && !config.IsTcpPortSet())
-                config.SetTcpPort(static_cast<uint16_t>(port.GetValue()));
+            if (port.IsSet() && !config.IsPortSet())
+                config.SetPort(static_cast<uint16_t>(port.GetValue()));
 
-            SettableValue<std::string> schema = ReadDsnString(dsn, ConnectionStringParser::Key::schema);
+            SettableValue<std::string> database = ReadDsnString(dsn, ConnectionStringParser::Key::database);
 
-            if (schema.IsSet() && !config.IsSchemaSet())
-                config.SetSchema(schema.GetValue());
-
-            SettableValue<bool> distributedJoins = ReadDsnBool(dsn, ConnectionStringParser::Key::distributedJoins);
-
-            if (distributedJoins.IsSet() && !config.IsDistributedJoinsSet())
-                config.SetDistributedJoins(distributedJoins.GetValue());
-
-            SettableValue<bool> enforceJoinOrder = ReadDsnBool(dsn, ConnectionStringParser::Key::enforceJoinOrder);
-
-            if (enforceJoinOrder.IsSet() && !config.IsEnforceJoinOrderSet())
-                config.SetEnforceJoinOrder(enforceJoinOrder.GetValue());
-
-            SettableValue<bool> replicatedOnly = ReadDsnBool(dsn, ConnectionStringParser::Key::replicatedOnly);
-
-            if (replicatedOnly.IsSet() && !config.IsReplicatedOnlySet())
-                config.SetReplicatedOnly(replicatedOnly.GetValue());
-
-            SettableValue<bool> collocated = ReadDsnBool(dsn, ConnectionStringParser::Key::collocated);
-
-            if (collocated.IsSet() && !config.IsCollocatedSet())
-                config.SetCollocated(collocated.GetValue());
-
-            SettableValue<bool> lazy = ReadDsnBool(dsn, ConnectionStringParser::Key::lazy);
-
-            if (lazy.IsSet() && !config.IsLazySet())
-                config.SetLazy(lazy.GetValue());
-
-            SettableValue<bool> skipReducerOnUpdate = ReadDsnBool(dsn, ConnectionStringParser::Key::skipReducerOnUpdate);
-
-            if (skipReducerOnUpdate.IsSet() && !config.IsSkipReducerOnUpdateSet())
-                config.SetSkipReducerOnUpdate(skipReducerOnUpdate.GetValue());
-
-            SettableValue<std::string> versionStr = ReadDsnString(dsn, ConnectionStringParser::Key::protocolVersion);
-
-            if (versionStr.IsSet() && !config.IsProtocolVersionSet())
-            {
-                ProtocolVersion version = ProtocolVersion::FromString(versionStr.GetValue());
-
-                if (!version.IsSupported())
-                    version = Configuration::DefaultValue::protocolVersion;
-
-                config.SetProtocolVersion(version);
-            }
-
-            SettableValue<int32_t> pageSize = ReadDsnInt(dsn, ConnectionStringParser::Key::pageSize);
-
-            if (pageSize.IsSet() && !config.IsPageSizeSet() && pageSize.GetValue() > 0)
-                config.SetPageSize(pageSize.GetValue());
-
-            SettableValue<std::string> sslModeStr = ReadDsnString(dsn, ConnectionStringParser::Key::sslMode);
-
-            if (sslModeStr.IsSet() && !config.IsSslModeSet())
-            {
-                ssl::SslMode::Type sslMode = ssl::SslMode::FromString(sslModeStr.GetValue(), ssl::SslMode::DISABLE);
-
-                config.SetSslMode(sslMode);
-            }
-
-            SettableValue<std::string> sslKeyFile = ReadDsnString(dsn, ConnectionStringParser::Key::sslKeyFile);
-
-            if (sslKeyFile.IsSet() && !config.IsSslKeyFileSet())
-                config.SetSslKeyFile(sslKeyFile.GetValue());
-
-            SettableValue<std::string> sslCertFile = ReadDsnString(dsn, ConnectionStringParser::Key::sslCertFile);
-
-            if (sslCertFile.IsSet() && !config.IsSslCertFileSet())
-                config.SetSslCertFile(sslCertFile.GetValue());
-
-            SettableValue<std::string> sslCaFile = ReadDsnString(dsn, ConnectionStringParser::Key::sslCaFile);
-
-            if (sslCaFile.IsSet() && !config.IsSslCaFileSet())
-                config.SetSslCaFile(sslCaFile.GetValue());
+            if (database.IsSet() && !config.IsDatabaseSet())
+                config.SetDatabase(database.GetValue());
 
             SettableValue<std::string> user = ReadDsnString(dsn, ConnectionStringParser::Key::user);
 
@@ -211,10 +129,113 @@ namespace ignite
             if (password.IsSet() && !config.IsPasswordSet())
                 config.SetPassword(password.GetValue());
 
-            SettableValue<std::string> nestedTxModeStr = ReadDsnString(dsn, ConnectionStringParser::Key::nestedTxMode);
+            SettableValue<std::string> appName = ReadDsnString(dsn, ConnectionStringParser::Key::appName);
 
-            if (nestedTxModeStr.IsSet() && !config.IsNestedTxModeSet())
-                config.SetNestedTxMode(NestedTxMode::FromString(nestedTxModeStr.GetValue(), config.GetNestedTxMode()));
+            if (appName.IsSet() && !config.IsApplicationNameSet())
+                config.SetApplicationName(appName.GetValue());
+
+            SettableValue<int32_t> loginTimeoutSec = ReadDsnInt(dsn, ConnectionStringParser::Key::loginTimeoutSec);
+
+            if (loginTimeoutSec.IsSet() && !config.IsLoginTimeoutSecondsSet())
+                config.SetLoginTimeoutSeconds(loginTimeoutSec.GetValue());
+
+            SettableValue<std::string> readPreference = ReadDsnString(dsn, ConnectionStringParser::Key::readPreference);
+
+            if (readPreference.IsSet() && !config.IsReadPreferenceSet())
+            {
+                ReadPreference::Type preference = ReadPreference::FromString(readPreference.GetValue(), ReadPreference::Type::PRIMARY);
+                config.SetReadPreference(preference);
+            }
+
+            SettableValue<std::string> replicaSet = ReadDsnString(dsn, ConnectionStringParser::Key::replicaSet);
+
+            if (replicaSet.IsSet() && !config.IsReplicaSetSet())
+                config.SetReplicaSet(replicaSet.GetValue());
+
+            SettableValue<bool> retryReads = ReadDsnBool(dsn, ConnectionStringParser::Key::retryReads);
+
+            if (retryReads.IsSet() && !config.IsRetryReadsSet())
+                config.SetRetryReads(retryReads.GetValue());
+
+            SettableValue<bool> tls = ReadDsnBool(dsn, ConnectionStringParser::Key::tls);
+
+            if (tls.IsSet() && !config.IsTlsSet())
+                config.SetTls(tls.GetValue());
+
+            SettableValue<bool> tlsAllowInvalidHostnames = ReadDsnBool(dsn, ConnectionStringParser::Key::tlsAllowInvalidHostnames);
+
+            if (tlsAllowInvalidHostnames.IsSet() && !config.IsTlsAllowInvalidHostnamesSet())
+                config.SetTlsAllowInvalidHostnames(tlsAllowInvalidHostnames.GetValue());
+
+            SettableValue<std::string> tlsCaFile = ReadDsnString(dsn, ConnectionStringParser::Key::tlsCaFile);
+
+            if (tlsCaFile.IsSet() && !config.IsTlsCaFileSet())
+                config.SetTlsCaFile(tlsCaFile.GetValue());
+
+            SettableValue<bool> sshEnable = ReadDsnBool(dsn, ConnectionStringParser::Key::sshEnable);
+
+            if (sshEnable.IsSet() && !config.IsSshEnableSet())
+                config.SetSshEnable(sshEnable.GetValue());
+
+            SettableValue<std::string> sshUser = ReadDsnString(dsn, ConnectionStringParser::Key::sshUser);
+
+            if (sshUser.IsSet() && !config.IsSshUserSet())
+                config.SetSshUser(sshUser.GetValue());
+
+            SettableValue<std::string> sshHost = ReadDsnString(dsn, ConnectionStringParser::Key::sshHost);
+
+            if (sshHost.IsSet() && !config.IsSshHostSet())
+                config.SetSshHost(sshHost.GetValue());
+
+            SettableValue<std::string> sshPrivateKeyFile = ReadDsnString(dsn, ConnectionStringParser::Key::sshPrivateKeyFile);
+
+            if (sshPrivateKeyFile.IsSet() && !config.IsSshPrivateKeyFileSet())
+                config.SetSshPrivateKeyFile(sshPrivateKeyFile.GetValue());
+
+            SettableValue<std::string> sshPrivateKeyPassphrase = ReadDsnString(dsn, ConnectionStringParser::Key::sshPrivateKeyPassphrase);
+
+            if (sshPrivateKeyPassphrase.IsSet() && !config.IsSshPrivateKeyPassphraseSet())
+                config.SetSshPrivateKeyPassphrase(sshPrivateKeyPassphrase.GetValue());
+            
+            SettableValue<bool> sshStrictHostKeyChecking = ReadDsnBool(dsn, ConnectionStringParser::Key::sshStrictHostKeyChecking);
+
+            if (sshStrictHostKeyChecking.IsSet() && !config.IsSshStrictHostKeyCheckingSet())
+                config.SetSshStrictHostKeyChecking(sshStrictHostKeyChecking.GetValue());
+
+            SettableValue<std::string> sshKnownHostsFile = ReadDsnString(dsn, ConnectionStringParser::Key::sshKnownHostsFile);
+
+            if (sshKnownHostsFile.IsSet() && !config.IsSshKnownHostsFileSet())
+                config.SetSshKnownHostsFile(sshKnownHostsFile.GetValue());
+
+            SettableValue<std::string> scanMethod = ReadDsnString(dsn, ConnectionStringParser::Key::scanMethod);
+
+            if (scanMethod.IsSet() && !config.IsScanMethodSet())
+            {
+                ScanMethod::Type method = ScanMethod::FromString(scanMethod.GetValue(), ScanMethod::Type::RANDOM);
+                config.SetScanMethod(method);
+            }
+
+            SettableValue<int32_t> scanLimit = ReadDsnInt(dsn, ConnectionStringParser::Key::scanLimit);
+
+            if (scanLimit.IsSet() && !config.IsScanLimitSet()
+                && scanLimit.GetValue() > 0)
+                config.SetScanLimit(scanLimit.GetValue());
+
+            SettableValue<std::string> schemaName = ReadDsnString(dsn, ConnectionStringParser::Key::schemaName);
+
+            if (schemaName.IsSet() && !config.IsSchemaNameSet())
+                config.SetSchemaName(schemaName.GetValue());
+
+            SettableValue<bool> refreshSchema = ReadDsnBool(dsn, ConnectionStringParser::Key::refreshSchema);
+
+            if (refreshSchema.IsSet() && !config.IsRefreshSchemaSet())
+                config.SetRefreshSchema(refreshSchema.GetValue());
+
+            SettableValue<int32_t> defaultFetchSize = ReadDsnInt(dsn, ConnectionStringParser::Key::defaultFetchSize);
+
+            if (defaultFetchSize.IsSet() && !config.IsDefaultFetchSizeSet()
+                   && defaultFetchSize.GetValue() > 0)
+                config.SetDefaultFetchSize(defaultFetchSize.GetValue()); 
         }
     }
 }

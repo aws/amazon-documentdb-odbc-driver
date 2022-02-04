@@ -37,13 +37,30 @@ else ()
 endif()
 
 set(SOURCES 
+         src/configuration_test.cpp
          src/connection_test.cpp
          src/dummy_test.cpp
          src/odbc_test_suite.cpp
-         src/test_utils.cpp
+         src/test_utils.cpp     
+         ../odbc/src/app/application_data_buffer.cpp
+         ../odbc/src/common_types.cpp
+         ../odbc/src/common/big_integer.cpp
+         ../odbc/src/common/bits.cpp
          ../odbc/src/common/concurrent.cpp
+         ../odbc/src/common/decimal.cpp
          ../odbc/src/common/utils.cpp
-         ../odbc/src/jni/java.cpp
+         ../odbc/src/config/config_tools.cpp
+         ../odbc/src/config/configuration.cpp
+         ../odbc/src/config/connection_info.cpp
+         ../odbc/src/config/connection_string_parser.cpp
+         ../odbc/src/diagnostic/diagnostic_record.cpp
+         ../odbc/src/diagnostic/diagnostic_record_storage.cpp
+         ../odbc/src/ignite_error.cpp
+         ../odbc/src/jni/java.cpp         
+         ../odbc/src/log.cpp
+         ../odbc/src/read_preference.cpp
+         ../odbc/src/scan_method.cpp
+         ../odbc/src/utility.cpp           
 # TODO uncomment/rework the tests after get some connectivity and functionalities working.
 #        src/teamcity/teamcity_boost.cpp
 #        src/teamcity/teamcity_messages.cpp
