@@ -14,6 +14,9 @@
  *
  */
 
+#ifndef _IGNITE_ODBC_SCAN_METHOD
+#define _IGNITE_ODBC_SCAN_METHOD
+
 #include <string>
 
 namespace ignite
@@ -27,8 +30,8 @@ namespace ignite
             {
                 RANDOM,
                 ID_FORWARD,
-                ID_REVERSE, 
-                ALL, 
+                ID_REVERSE,
+                ALL,
                 UNKNOWN
             };
     
@@ -51,4 +54,6 @@ namespace ignite
         
         };
     }
-}
+}   // namespace ignite
+#endif  //_IGNITE_ODBC_SCAN_METHOD
+
