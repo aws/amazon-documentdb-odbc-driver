@@ -223,6 +223,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
     }
     BOOST_REQUIRE(resultSet.Get());
 
+    // Get first
     bool hasNext;
     if (!_ctx.Get()->ResultSetNext(resultSet, hasNext, &errInfo)) {
         std::string errMsg = errInfo.errMsg;
@@ -231,85 +232,95 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
     }
     BOOST_REQUIRE(hasNext);
 
-    bool wasNull;
-    std::string value;
-    // TABLE_CAT (i.e., catalog - always NULL in our case)
-    if (!_ctx.Get()->ResultSetGetString(resultSet, 1, value, wasNull,
-                                        &errInfo)) {
-        std::string errMsg = errInfo.errMsg;
-        _ctx.Get()->ConnectionClose(connection, &errInfo);
-        BOOST_FAIL(errMsg);
-    }
-    BOOST_REQUIRE(wasNull);
+    while (hasNext) {
 
-    // TABLE_CAT (i.e., catalog - always NULL in our case)
-    if (!_ctx.Get()->ResultSetGetString(resultSet, "TABLE_CAT", value, wasNull,
-                                        &errInfo)) {
-        std::string errMsg = errInfo.errMsg;
-        _ctx.Get()->ConnectionClose(connection, &errInfo);
-        BOOST_FAIL(errMsg);
-    }
-    BOOST_REQUIRE(wasNull);
+        bool wasNull;
+        std::string value;
+        // TABLE_CAT (i.e., catalog - always NULL in our case)
+        if (!_ctx.Get()->ResultSetGetString(resultSet, 1, value, wasNull,
+                                            &errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            _ctx.Get()->ConnectionClose(connection, &errInfo);
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(wasNull);
 
-    // TABLE_SCHEM (i.e., database)
-    if (!_ctx.Get()->ResultSetGetString(resultSet, 2, value, wasNull,
-                                        &errInfo)) {
-        std::string errMsg = errInfo.errMsg;
-        _ctx.Get()->ConnectionClose(connection, &errInfo);
-        BOOST_FAIL(errMsg);
-    }
-    BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value == "test");
+        // TABLE_CAT (i.e., catalog - always NULL in our case)
+        if (!_ctx.Get()->ResultSetGetString(resultSet, "TABLE_CAT", value, wasNull,
+                                            &errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            _ctx.Get()->ConnectionClose(connection, &errInfo);
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(wasNull);
 
-    // TABLE_SCHEM (i.e., database)
-    if (!_ctx.Get()->ResultSetGetString(resultSet, "TABLE_SCHEM", value, wasNull,
-                                        &errInfo)) {
-        std::string errMsg = errInfo.errMsg;
-        _ctx.Get()->ConnectionClose(connection, &errInfo);
-        BOOST_FAIL(errMsg);
-    }
-    BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value == "test");
+        // TABLE_SCHEM (i.e., database)
+        if (!_ctx.Get()->ResultSetGetString(resultSet, 2, value, wasNull,
+                                            &errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            _ctx.Get()->ConnectionClose(connection, &errInfo);
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(!wasNull);
+        BOOST_REQUIRE(value == "test");
 
-    // TABLE_NAME
-    if (!_ctx.Get()->ResultSetGetString(resultSet, 3, value, wasNull,
-                                        &errInfo)) {
-        std::string errMsg = errInfo.errMsg;
-        _ctx.Get()->ConnectionClose(connection, &errInfo);
-        BOOST_FAIL(errMsg);
-    }
-    BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value.size() > 0);
+        // TABLE_SCHEM (i.e., database)
+        if (!_ctx.Get()->ResultSetGetString(resultSet, "TABLE_SCHEM", value, wasNull,
+                                            &errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            _ctx.Get()->ConnectionClose(connection, &errInfo);
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(!wasNull);
+        BOOST_REQUIRE(value == "test");
 
-    // TABLE_NAME
-    if (!_ctx.Get()->ResultSetGetString(resultSet, "TABLE_NAME", value, wasNull,
-                                        &errInfo)) {
-        std::string errMsg = errInfo.errMsg;
-        _ctx.Get()->ConnectionClose(connection, &errInfo);
-        BOOST_FAIL(errMsg);
-    }
-    BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value.size() > 0);
+        // TABLE_NAME
+        if (!_ctx.Get()->ResultSetGetString(resultSet, 3, value, wasNull,
+                                            &errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            _ctx.Get()->ConnectionClose(connection, &errInfo);
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(!wasNull);
+        BOOST_REQUIRE(value.size() > 0);
 
-    // TABLE_TYPE
-    if (!_ctx.Get()->ResultSetGetString(resultSet, 4, value, wasNull,
-                                        &errInfo)) {
-        std::string errMsg = errInfo.errMsg;
-        _ctx.Get()->ConnectionClose(connection, &errInfo);
-        BOOST_FAIL(errMsg);
-    }
-    BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value == "TABLE");
+        // TABLE_NAME
+        if (!_ctx.Get()->ResultSetGetString(resultSet, "TABLE_NAME", value, wasNull,
+                                            &errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            _ctx.Get()->ConnectionClose(connection, &errInfo);
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(!wasNull);
+        BOOST_REQUIRE(value.size() > 0);
 
-    // TABLE_TYPE
-    if (!_ctx.Get()->ResultSetGetString(resultSet, "TABLE_TYPE", value, wasNull,
-                                        &errInfo)) {
-        std::string errMsg = errInfo.errMsg;
-        _ctx.Get()->ConnectionClose(connection, &errInfo);
-        BOOST_FAIL(errMsg);
+        // TABLE_TYPE
+        if (!_ctx.Get()->ResultSetGetString(resultSet, 4, value, wasNull,
+                                            &errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            _ctx.Get()->ConnectionClose(connection, &errInfo);
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(!wasNull);
+        BOOST_REQUIRE(value == "TABLE");
+
+        // TABLE_TYPE
+        if (!_ctx.Get()->ResultSetGetString(resultSet, "TABLE_TYPE", value, wasNull,
+                                            &errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            _ctx.Get()->ConnectionClose(connection, &errInfo);
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(!wasNull);
+        BOOST_REQUIRE(value == "TABLE");
+
+        // Get next
+        if (!_ctx.Get()->ResultSetNext(resultSet, hasNext, &errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            _ctx.Get()->ConnectionClose(connection, &errInfo);
+            BOOST_FAIL(errMsg);
+        }
     }
-    BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value == "TABLE");
 
     _ctx.Get()->ConnectionClose(connection, &errInfo);
     connection = nullptr;
