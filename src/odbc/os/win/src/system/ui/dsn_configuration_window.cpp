@@ -19,11 +19,11 @@
 #include <Shlwapi.h>
 
 #include "ignite/odbc/log.h"
-#include "ignite/odbc/ssl_mode.h"
+#include "ignite/odbc/read_preference.h"
+#include "ignite/odbc/scan_method.h"
 
 #include "ignite/odbc/system/ui/dsn_configuration_window.h"
 #include "ignite/odbc/config/config_tools.h"
-#include "ignite/odbc/diagnostic/diagnosable_adapter.h"
 
 namespace ignite
 {
@@ -32,38 +32,60 @@ namespace ignite
         namespace system
         {
             namespace ui
-            {
+            {   
                 DsnConfigurationWindow::DsnConfigurationWindow(Window* parent, config::Configuration& config):
-                    CustomWindow(parent, "IgniteConfigureDsn", "Configure Apache Ignite DSN"),
-                    width(360),
-                    height(600),
+                    CustomWindow(parent, "IgniteConfigureDsn", "Configure Amazon DocumentDB DSN"),
+                    width(730),
+                    height(515),
                     connectionSettingsGroupBox(),
-                    sslSettingsGroupBox(),
-                    authSettingsGroupBox(),
+                    tlsSettingsGroupBox(),
+                    tlsCheckBox(), 
                     additionalSettingsGroupBox(),
                     nameLabel(),
                     nameEdit(),
-                    addressLabel(),
-                    addressEdit(),
+                    scanMethodLabel(),
+                    scanMethodComboBox(),
+                    scanLimitLabel(),
+                    scanLimitEdit(),
                     schemaLabel(),
                     schemaEdit(),
-                    pageSizeLabel(),
-                    pageSizeEdit(),
-                    distributedJoinsCheckBox(),
-                    enforceJoinOrderCheckBox(),
-                    replicatedOnlyCheckBox(),
-                    collocatedCheckBox(),
-                    protocolVersionLabel(),
-                    protocolVersionComboBox(),
+                    refreshSchemaCheckBox(),
+                    sshEnableCheckBox(),
+                    sshUserLabel(),
+                    sshUserEdit(),
+                    sshHostLabel(),
+                    sshHostEdit(),
+                    sshPrivateKeyFileLabel(),
+                    sshPrivateKeyFileEdit(),
+                    sshPrivateKeyPassphraseLabel(),
+                    sshPrivateKeyPassphraseEdit(),
+                    sshStrictHostKeyCheckingCheckBox(),
+                    sshKnownHostsFileLabel(),
+                    sshKnownHostsFileEdit(),
+                    appNameLabel(),
+                    appNameEdit(),
+                    readPreferenceLabel(),
+                    readPreferenceComboBox(),
+                    replicaSetLabel(),
+                    replicaSetEdit(),
+                    retryReadsCheckBox(),
+                    defaultFetchSizeLabel(),
+                    defaultFetchSizeEdit(),
+                    databaseLabel(),
+                    databaseEdit(),
+                    hostnameLabel(),
+                    hostnameEdit(),
+                    portLabel(),
+                    portEdit(),
                     userLabel(),
                     userEdit(),
                     passwordLabel(),
                     passwordEdit(),
-                    nestedTxModeComboBox(),
                     okButton(),
                     cancelButton(),
                     config(config),
-                    accepted(false)
+                    accepted(false),
+                    created(false)
                 {
                     // No-op.
                 }
@@ -98,23 +120,35 @@ namespace ignite
                         throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, buf.str().c_str());
                     }
                 }
-
+                
                 void DsnConfigurationWindow::OnCreate()
                 {
-                    int groupPosY = MARGIN;
-                    int groupSizeY = width - 2 * MARGIN;
+                    int groupPosYLeft = MARGIN;
+                    int groupSizeY = width / 2 - 2 * MARGIN;
+                    int posXRight = width / 2 + MARGIN;
+                    int groupPosYRight = MARGIN;
 
-                    groupPosY += INTERVAL + CreateConnectionSettingsGroup(MARGIN, groupPosY, groupSizeY);
-                    groupPosY += INTERVAL + CreateAuthSettingsGroup(MARGIN, groupPosY, groupSizeY);
-                    groupPosY += INTERVAL + CreateSslSettingsGroup(MARGIN, groupPosY, groupSizeY);
-                    groupPosY += INTERVAL + CreateAdditionalSettingsGroup(MARGIN, groupPosY, groupSizeY);
+                    // create left column group settings
+                    groupPosYLeft += INTERVAL + CreateConnectionSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
+                    groupPosYLeft += INTERVAL + CreateTlsSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
+                    groupPosYLeft += INTERVAL + CreateSchemaSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
+                    // create right column group settings 
+                    groupPosYRight += INTERVAL + CreateSshSettingsGroup(posXRight, groupPosYRight, groupSizeY);
+                    groupPosYRight += INTERVAL + CreateAdditionalSettingsGroup(posXRight, groupPosYRight, groupSizeY);
 
                     int cancelPosX = width - MARGIN - BUTTON_WIDTH;
                     int okPosX = cancelPosX - INTERVAL - BUTTON_WIDTH;
 
-                    okButton = CreateButton(okPosX, groupPosY, BUTTON_WIDTH, BUTTON_HEIGHT, "Ok", ChildId::OK_BUTTON);
-                    cancelButton = CreateButton(cancelPosX, groupPosY, BUTTON_WIDTH, BUTTON_HEIGHT,
+                    okButton = CreateButton(okPosX, groupPosYRight, BUTTON_WIDTH, BUTTON_HEIGHT, "Ok", ChildId::OK_BUTTON);
+                    cancelButton = CreateButton(cancelPosX, groupPosYRight, BUTTON_WIDTH, BUTTON_HEIGHT,
                         "Cancel", ChildId::CANCEL_BUTTON);
+
+                    // check whether the required fields are filled. If not, Ok button is disabled.
+                    created = true;
+                    okButton->SetEnabled(
+                        nameEdit->HasText() && userEdit->HasText() 
+                        && passwordEdit->HasText() && databaseEdit->HasText() 
+                        && hostnameEdit->HasText() && portEdit->HasText());
                 }
 
                 int DsnConfigurationWindow::CreateConnectionSettingsGroup(int posX, int posY, int sizeX)
@@ -130,95 +164,61 @@ namespace ignite
 
                     const char* val = config.GetDsn().c_str();
                     nameLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Data Source Name:", ChildId::NAME_LABEL);
+                        "Data Source Name*:", ChildId::NAME_LABEL);
                     nameEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::NAME_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    std::string addr = config::AddressesToString(config.GetAddresses());
-
-                    val = addr.c_str();
-                    addressLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Address:", ChildId::ADDRESS_LABEL);
-                    addressEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::ADDRESS_EDIT);
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
-                    val = config.GetSchema().c_str();
-                    schemaLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Schema name:", ChildId::SCHEMA_LABEL);
-                    schemaEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::SCHEMA_EDIT);
+                    val = config.GetHostname().c_str();
+                    hostnameLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, 
+                        "Hostname*:", ChildId::HOST_NAME_LABEL);
+                    hostnameEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, 
+                        val, ChildId::HOST_NAME_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    protocolVersionLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Protocol version:", ChildId::PROTOCOL_VERSION_LABEL);
-                    protocolVersionComboBox = CreateComboBox(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                        "Protocol version", ChildId::PROTOCOL_VERSION_COMBO_BOX);
-
-                    int id = 0;
-
-                    const ProtocolVersion::VersionSet& supported = ProtocolVersion::GetSupported();
-
-                    ProtocolVersion version = config.GetProtocolVersion();
-
-                    if (!version.IsSupported())
-                        version = ProtocolVersion::GetCurrent();
-
-                    for (ProtocolVersion::VersionSet::const_iterator it = supported.begin(); it != supported.end(); ++it)
-                    {
-                        protocolVersionComboBox->AddString(it->ToString());
-
-                        if (*it == version)
-                            protocolVersionComboBox->SetSelection(id);
-
-                        ++id;
-                    }
+                    std::string tmp = common::LexicalCast<std::string>(config.GetPort());
+                    val = tmp.c_str();
+                    portLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Port*:", ChildId::PORT_LABEL);
+                    portEdit = CreateEdit(
+                        editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                        val, ChildId::PORT_EDIT, ES_NUMBER);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    connectionSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
-                        "Connection settings", ChildId::CONNECTION_SETTINGS_GROUP_BOX);
+                    val = config.GetDatabase().c_str();
+                    databaseLabel =
+                        CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                    "Database*:", ChildId::DATABASE_LABEL);
+                    databaseEdit = CreateEdit(editPosX, rowPos, editSizeX,
+                                          ROW_HEIGHT, val, ChildId::DATABASE_EDIT);
 
-                    return rowPos - posY;
-                }
+                    rowPos += INTERVAL + ROW_HEIGHT;
 
-                int DsnConfigurationWindow::CreateAuthSettingsGroup(int posX, int posY, int sizeX)
-                {
-                    enum { LABEL_WIDTH = 120 };
-
-                    int labelPosX = posX + INTERVAL;
-
-                    int editSizeX = sizeX - LABEL_WIDTH - 3 * INTERVAL;
-                    int editPosX = labelPosX + LABEL_WIDTH + INTERVAL;
-
-                    int rowPos = posY + 2 * INTERVAL;
-
-                    const char* val = config.GetUser().c_str();
-
-                    userLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, "User :", ChildId::USER_LABEL);
+                    val = config.GetUser().c_str();
+                    userLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, "User* :", ChildId::USER_LABEL);
                     userEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::USER_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
                     val = config.GetPassword().c_str();
                     passwordLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Password:", ChildId::PASSWORD_LABEL);
+                        "Password*:", ChildId::PASSWORD_LABEL);
                     passwordEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
                         val, ChildId::USER_EDIT, ES_PASSWORD);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    authSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
-                        "Authentication settings", ChildId::AUTH_SETTINGS_GROUP_BOX);
+                    connectionSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
+                        "Connection Settings", ChildId::CONNECTION_SETTINGS_GROUP_BOX);
 
                     return rowPos - posY;
                 }
 
-                int DsnConfigurationWindow::CreateSslSettingsGroup(int posX, int posY, int sizeX)
+                int DsnConfigurationWindow::CreateSshSettingsGroup(int posX, int posY, int sizeX) 
                 {
-                    using ssl::SslMode;
-
                     enum { LABEL_WIDTH = 120 };
 
                     int labelPosX = posX + INTERVAL;
@@ -228,66 +228,193 @@ namespace ignite
 
                     int rowPos = posY + 2 * INTERVAL;
 
-                    SslMode::Type sslMode = config.GetSslMode();
-                    std::string sslModeStr = SslMode::ToString(sslMode);
+                    int checkBoxSize = sizeX - 2 * MARGIN;
 
-                    const char* val = sslModeStr.c_str();
+                    sshEnableCheckBox = CreateCheckBox(
+                        labelPosX, rowPos, checkBoxSize, ROW_HEIGHT, "Enable SSH Tunnel",
+                        ChildId::SSH_ENABLE_CHECK_BOX, config.IsSshEnable());
+                   
+                    rowPos += INTERVAL + ROW_HEIGHT;
 
-                    sslModeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "SSL Mode:", ChildId::SSL_MODE_LABEL);
-                    sslModeComboBox = CreateComboBox(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                        "", ChildId::SSL_MODE_COMBO_BOX);
+                    const char* val = config.GetSshUser().c_str();
+                    sshUserLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, "SSH User:", ChildId::SSH_USER_LABEL);
+                    sshUserEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::SSH_USER_EDIT);
 
-                    sslModeComboBox->AddString("disable");
-                    sslModeComboBox->AddString("require");
-
-                    sslModeComboBox->SetSelection(sslMode);
+                    rowPos += INTERVAL + ROW_HEIGHT;
+                    
+                    val = config.GetSshHost().c_str();
+                    sshHostLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                    "SSH Hostname:", ChildId::SSH_HOST_LABEL);
+                    sshHostEdit = CreateEdit(editPosX, rowPos, editSizeX,
+                                          ROW_HEIGHT, val, ChildId::SSH_HOST_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    val = config.GetSslKeyFile().c_str();
-                    sslKeyFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "SSL Private Key:", ChildId::SSL_KEY_FILE_LABEL);
-                    sslKeyFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                        val, ChildId::SSL_KEY_FILE_EDIT);
-
-                    SHAutoComplete(sslKeyFileEdit->GetHandle(), SHACF_DEFAULT);
+                    val = config.GetSshPrivateKeyFile().c_str();
+                    sshPrivateKeyFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                    "SSH Private Key File:", ChildId::SSH_PRIVATE_KEY_FILE_LABEL);
+                    sshPrivateKeyFileEdit = CreateEdit(editPosX, rowPos, editSizeX,
+                                          ROW_HEIGHT, val, ChildId::SSH_PRIVATE_KEY_FILE_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    val = config.GetSslCertFile().c_str();
-                    sslCertFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "SSL Certificate:", ChildId::SSL_CERT_FILE_LABEL);
-                    sslCertFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                        val, ChildId::SSL_CERT_FILE_EDIT);
-
-                    SHAutoComplete(sslCertFileEdit->GetHandle(), SHACF_DEFAULT);
-
-                    rowPos += INTERVAL + ROW_HEIGHT;
-
-                    val = config.GetSslCaFile().c_str();
-                    sslCaFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "SSL Certificate Authority:", ChildId::SSL_CA_FILE_LABEL);
-                    sslCaFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                        val, ChildId::SSL_CA_FILE_EDIT);
-
-                    SHAutoComplete(sslCaFileEdit->GetHandle(), SHACF_DEFAULT);
+                    val = config.GetSshPrivateKeyPassphrase().c_str();
+                    // ssh private key passphrase label requires double the row height due to the long label.
+                    sshPrivateKeyPassphraseLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT * 2,
+                                    "SSH Private Key File Passphrase:", ChildId::SSH_PRIVATE_KEY_PASSPHRASE_LABEL);
+                    sshPrivateKeyPassphraseEdit = CreateEdit(editPosX, rowPos, editSizeX,
+                                          ROW_HEIGHT, val, ChildId::SSH_PRIVATE_KEY_PASSPHRASE_EDIT, ES_PASSWORD);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    sslSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
-                        "SSL settings", ChildId::SSL_SETTINGS_GROUP_BOX);
+                    // SSH Strict Host Key Check check box needs to have editSizeX as size because the string is long
+                    sshStrictHostKeyCheckingCheckBox = CreateCheckBox(
+                        labelPosX, rowPos, checkBoxSize, ROW_HEIGHT, "SSH Strict Host Key Check (disabling option is less secure)",
+                        ChildId::SSH_STRICT_HOST_KEY_CHECKING_CHECK_BOX, config.IsSshStrictHostKeyChecking());
 
-                    sslKeyFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
-                    sslCertFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
-                    sslCaFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    val = config.GetSshKnownHostsFile().c_str();
+                    sshKnownHostsFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                    "SSH Known Hosts File:", ChildId::SSH_KNOWN_HOSTS_FILE_LABEL);
+                    sshKnownHostsFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+                                   ChildId::SSH_KNOWN_HOSTS_FILE_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    sshSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
+                                       "Internal SSH Tunnel Settings",
+                                       ChildId::SSH_SETTINGS_GROUP_BOX);
+
+                    sshUserEdit->SetEnabled(sshEnableCheckBox->IsChecked());
+                    sshHostEdit->SetEnabled(sshEnableCheckBox->IsChecked());
+                    sshPrivateKeyFileEdit->SetEnabled( sshEnableCheckBox->IsChecked());
+                    sshPrivateKeyPassphraseEdit->SetEnabled(sshEnableCheckBox->IsChecked());
+                    sshStrictHostKeyCheckingCheckBox->SetEnabled(sshEnableCheckBox->IsChecked());
+                    sshKnownHostsFileEdit->SetEnabled(
+                        sshEnableCheckBox->IsChecked()
+                        && sshStrictHostKeyCheckingCheckBox->IsChecked());
 
                     return rowPos - posY;
                 }
 
-                int DsnConfigurationWindow::CreateAdditionalSettingsGroup(int posX, int posY, int sizeX)
+                int DsnConfigurationWindow::CreateTlsSettingsGroup(int posX, int posY, int sizeX)
+                { 
+
+                    enum { LABEL_WIDTH = 100 };
+
+                    int labelPosX = posX + INTERVAL;
+
+                    int editSizeX = sizeX - LABEL_WIDTH - 3 * INTERVAL;
+                    int editPosX = labelPosX + LABEL_WIDTH + INTERVAL;
+
+                    int rowPos = posY + 2 * INTERVAL;
+
+                    int checkBoxSize = sizeX - 2 * MARGIN;
+
+                    tlsCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
+                        "Enable TLS", ChildId::TLS_CHECK_BOX, config.IsTls());
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    tlsAllowInvalidHostnamesCheckBox = CreateCheckBox(
+                        labelPosX, rowPos, checkBoxSize, ROW_HEIGHT, "Allow Invalid Hostnames (enabling option is less secure)",
+                        ChildId::TLS_ALLOW_INVALID_HOSTNAMES_CHECK_BOX,
+                        config.IsTlsAllowInvalidHostnames());
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    const char* val = config.GetTlsCaFile().c_str();
+                    tlsCaFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                    "TLS CA File:", ChildId::TLS_CA_FILE_LABEL);
+                    tlsCaFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+                                   ChildId::TLS_CA_FILE_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    tlsSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
+                        "TLS/SSL Settings", ChildId::TLS_SETTINGS_GROUP_BOX);
+
+                    tlsAllowInvalidHostnamesCheckBox->SetEnabled(tlsCheckBox->IsChecked());
+                    tlsCaFileEdit->SetEnabled(tlsCheckBox->IsChecked());
+
+                    return rowPos - posY;
+                }
+
+                int DsnConfigurationWindow::CreateSchemaSettingsGroup(int posX, int posY, int sizeX)
+                {   
+
+                    enum { LABEL_WIDTH = 100 };
+
+                    int labelPosX = posX + INTERVAL;
+
+                    int editSizeX = sizeX - LABEL_WIDTH - 3 * INTERVAL;
+                    int editPosX = labelPosX + LABEL_WIDTH + INTERVAL;
+
+                    int rowPos = posY + 2 * INTERVAL;
+                    
+                    int checkBoxSize = sizeX - 2 * MARGIN;
+
+                    ScanMethod::Type scanMethod = config.GetScanMethod();
+
+                    scanMethodLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Scan Method:", ChildId::SCAN_METHOD_LABEL);
+                    scanMethodComboBox = CreateComboBox(
+                        editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                                       "", ChildId::SCAN_METHOD_COMBO_BOX);
+
+		            scanMethodComboBox->AddString("Random");
+                    scanMethodComboBox->AddString("ID Forward");
+                    scanMethodComboBox->AddString("ID Reverse");
+                    scanMethodComboBox->AddString("All");
+
+                    scanMethodComboBox->SetSelection(static_cast<int>(scanMethod)); // set default
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    std::string tmp = common::LexicalCast<std::string>(config.GetScanLimit());
+                    const char* val = tmp.c_str();
+                    scanLimitLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Scan Limit:", ChildId::SCAN_LIMIT_LABEL);
+                    scanLimitEdit = CreateEdit(
+                        editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                        val, ChildId::SCAN_LIMIT_EDIT, ES_NUMBER);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    val = config.GetSchemaName().c_str();
+                    schemaLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Schema Name:", ChildId::SCHEMA_LABEL);
+                    schemaEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val, ChildId::SCHEMA_EDIT);
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    refreshSchemaCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
+                        "Refresh Schema (Caution: use temporarily to update schema)", ChildId::REFRESH_SCHEMA_CHECK_BOX, config.IsRefreshSchema());
+
+                    rowPos += INTERVAL + ROW_HEIGHT;
+
+                    schemaSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
+                        "Schema Generation Settings", ChildId::SCHEMA_SETTINGS_GROUP_BOX);
+
+                    std::string scanMethodStr;
+                    scanMethodComboBox->GetText(scanMethodStr);
+                    if (ScanMethod::FromString(scanMethodStr,
+                                               ScanMethod::Type::UNKNOWN)
+                        == ScanMethod::Type::ALL) {
+                        scanLimitEdit->SetEnabled(false);
+                    } else {
+                        scanLimitEdit->SetEnabled(true);
+                    }
+
+                    return rowPos - posY;
+                }
+
+                int DsnConfigurationWindow::CreateAdditionalSettingsGroup(int posX, int posY, int sizeX) 
                 {
-                    enum { LABEL_WIDTH = 130 };
+                    enum { LABEL_WIDTH = 120 }; // same as SSH settings
 
                     int labelPosX = posX + INTERVAL;
 
@@ -296,78 +423,84 @@ namespace ignite
 
                     int checkBoxSize = (sizeX - 3 * INTERVAL) / 2;
 
-                    ProtocolVersion version = config.GetProtocolVersion();
-
-                    if (!version.IsSupported())
-                        version = ProtocolVersion::GetCurrent();
-
                     int rowPos = posY + 2 * INTERVAL;
 
-                    std::string tmp = common::LexicalCast<std::string>(config.GetPageSize());
-                    const char* val = tmp.c_str();
-                    pageSizeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH,
-                        ROW_HEIGHT, "Page size:", ChildId::PAGE_SIZE_LABEL);
-
-                    pageSizeEdit = CreateEdit(editPosX, rowPos, editSizeX,
-                        ROW_HEIGHT, val, ChildId::PAGE_SIZE_EDIT, ES_NUMBER);
+                    retryReadsCheckBox = CreateCheckBox(
+                        labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
+                        "Retry Reads", ChildId::RETRY_READS_CHECK_BOX,
+                        config.IsRetryReads());
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    nestedTxModeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                        "Nested Transaction Mode:", ChildId::NESTED_TX_MODE_LABEL);
-                    nestedTxModeComboBox = CreateComboBox(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                        "", ChildId::NESTED_TX_MODE_COMBO_BOX);
+                    ReadPreference::Type readPreference = config.GetReadPreference();
 
-                    int id = 0;
+                    readPreferenceLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Read preference:", ChildId::READ_PREFERENCE_LABEL);
+                    readPreferenceComboBox = CreateComboBox(
+                        editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                                       "", ChildId::READ_PREFERENCE_COMBO_BOX);
 
-                    const NestedTxMode::ModeSet& supported = NestedTxMode::GetValidValues();
+		            readPreferenceComboBox->AddString("Primary");
+                    readPreferenceComboBox->AddString("Primary Preferred");
+                    readPreferenceComboBox->AddString("Secondary");
+                    readPreferenceComboBox->AddString("Secondary Preferred");
+                    readPreferenceComboBox->AddString("Nearest");
 
-                    for (NestedTxMode::ModeSet::const_iterator it = supported.begin(); it != supported.end(); ++it)
-                    {
-                        nestedTxModeComboBox->AddString(NestedTxMode::ToString(*it));
+                    readPreferenceComboBox->SetSelection(static_cast<int>(readPreference)); // set default
 
-                        if (*it == config.GetNestedTxMode())
-                            nestedTxModeComboBox->SetSelection(id);
-
-                        ++id;
-                    }
-
-                    nestedTxModeComboBox->SetEnabled(version >= ProtocolVersion::VERSION_2_5_0);
+                    rowPos += INTERVAL + ROW_HEIGHT;
+                    
+                    const char* val = config.GetApplicationName().c_str();
+                    appNameLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Application Name:", ChildId::APP_NAME_LABEL);
+                    appNameEdit =
+                        CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+                                   ChildId::APP_NAME_EDIT);
 
                     rowPos += INTERVAL + ROW_HEIGHT;
 
-                    distributedJoinsCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                        "Distributed Joins", ChildId::DISTRIBUTED_JOINS_CHECK_BOX, config.IsDistributedJoins());
+                    std::string tmp = common::LexicalCast< std::string >(
+                        config.GetLoginTimeoutSeconds());
+                    val = tmp.c_str();
+                    loginTimeoutSecLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Login Timeout (s):", ChildId::LOGIN_TIMEOUT_SEC_LABEL);
 
-                    enforceJoinOrderCheckBox = CreateCheckBox(labelPosX + checkBoxSize + INTERVAL,
-                        rowPos, checkBoxSize, ROW_HEIGHT, "Enforce Join Order",
-                        ChildId::ENFORCE_JOIN_ORDER_CHECK_BOX, config.IsEnforceJoinOrder());
+                    loginTimeoutSecEdit =
+                        CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+                                   ChildId::LOGIN_TIMEOUT_SEC_EDIT, ES_NUMBER);
 
-                    rowPos += ROW_HEIGHT;
+                    rowPos += INTERVAL + ROW_HEIGHT;
 
-                    replicatedOnlyCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                        "Replicated Only", ChildId::REPLICATED_ONLY_CHECK_BOX, config.IsReplicatedOnly());
+                    val = config.GetReplicaSet().c_str();
+                    replicaSetLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                    "Replica Set:", ChildId::REPLICA_SET_LABEL);
+                    replicaSetEdit =
+                        CreateEdit(editPosX, rowPos, editSizeX,
+                                   ROW_HEIGHT, val,
+                                   ChildId::REPLICA_SET_EDIT);
 
-                    collocatedCheckBox = CreateCheckBox(labelPosX + checkBoxSize + INTERVAL, rowPos, checkBoxSize,
-                        ROW_HEIGHT, "Collocated", ChildId::COLLOCATED_CHECK_BOX, config.IsCollocated());
+                    rowPos += INTERVAL + ROW_HEIGHT;
 
-                    rowPos += ROW_HEIGHT;
+                    tmp = common::LexicalCast< std::string >(
+                        config.GetDefaultFetchSize());
+                    val = tmp.c_str();
+                    defaultFetchSizeLabel = CreateLabel(
+                        labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                        "Fetch Size:", ChildId::DEFAULT_FETCH_SIZE_LABEL);
 
-                    lazyCheckBox = CreateCheckBox(labelPosX, rowPos, checkBoxSize, ROW_HEIGHT,
-                        "Lazy", ChildId::LAZY_CHECK_BOX, config.IsLazy());
+                    defaultFetchSizeEdit = CreateEdit(
+                        editPosX, rowPos, editSizeX, ROW_HEIGHT,
+                        val, ChildId::DEFAULT_FETCH_SIZE_EDIT, ES_NUMBER);
 
-                    lazyCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_1_5);
+                    rowPos += INTERVAL + ROW_HEIGHT;
 
-                    skipReducerOnUpdateCheckBox = CreateCheckBox(labelPosX + checkBoxSize + INTERVAL, rowPos,
-                        checkBoxSize, ROW_HEIGHT, "Skip reducer on update", ChildId::SKIP_REDUCER_ON_UPDATE_CHECK_BOX,
-                        config.IsSkipReducerOnUpdate());
-
-                    skipReducerOnUpdateCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_3_0);
-
-                    rowPos += ROW_HEIGHT + INTERVAL;
-
-                    additionalSettingsGroupBox = CreateGroupBox(posX, posY, sizeX, rowPos - posY,
-                        "Additional settings", ChildId::ADDITIONAL_SETTINGS_GROUP_BOX);
+                    additionalSettingsGroupBox = CreateGroupBox(posX, posY, sizeX,
+                                       rowPos - posY, "Additional Settings",
+                        ChildId::ADDITIONAL_SETTINGS_GROUP_BOX);
 
                     return rowPos - posY;
                 }
@@ -406,73 +539,101 @@ namespace ignite
                                     break;
                                 }
 
-                                case ChildId::DISTRIBUTED_JOINS_CHECK_BOX:
+                                case ChildId::NAME_EDIT:
+                                case ChildId::HOST_NAME_EDIT:
+                                case ChildId::PORT_EDIT:
+                                case ChildId::DATABASE_EDIT:
+                                case ChildId::USER_EDIT:
+                                case ChildId::PASSWORD_EDIT:
+                                { 
+                                    // Check if window has been created. 
+                                    if (created) {
+                                        okButton->SetEnabled(
+                                            nameEdit->HasText()
+                                            && userEdit->HasText()
+                                            && passwordEdit->HasText()
+                                            && databaseEdit->HasText()
+                                            && hostnameEdit->HasText()
+                                            && portEdit->HasText());                                 
+                                    }
+                                    break;
+                                }
+
+
+                                case ChildId::SSH_ENABLE_CHECK_BOX: 
                                 {
-                                    distributedJoinsCheckBox->SetChecked(!distributedJoinsCheckBox->IsChecked());
+                                    sshEnableCheckBox->SetChecked(!sshEnableCheckBox->IsChecked());
+                                    sshUserEdit->SetEnabled(
+                                        sshEnableCheckBox->IsChecked());
+                                    sshHostEdit->SetEnabled(sshEnableCheckBox->IsChecked());
+                                    sshPrivateKeyFileEdit->SetEnabled(
+                                        sshEnableCheckBox->IsChecked());
+                                    sshPrivateKeyPassphraseEdit->SetEnabled(
+                                        sshEnableCheckBox->IsChecked());
+                                    sshStrictHostKeyCheckingCheckBox
+                                        ->SetEnabled(
+                                            sshEnableCheckBox->IsChecked());
+                                    sshKnownHostsFileEdit->SetEnabled(
+                                        sshEnableCheckBox->IsChecked() 
+                                        && sshStrictHostKeyCheckingCheckBox->IsChecked());
 
                                     break;
                                 }
 
-                                case ChildId::ENFORCE_JOIN_ORDER_CHECK_BOX:
+                                case ChildId::SSH_STRICT_HOST_KEY_CHECKING_CHECK_BOX:
                                 {
-                                    enforceJoinOrderCheckBox->SetChecked(!enforceJoinOrderCheckBox->IsChecked());
+                                    sshStrictHostKeyCheckingCheckBox
+                                        ->SetChecked(!sshStrictHostKeyCheckingCheckBox->IsChecked());
+                                    sshKnownHostsFileEdit->SetEnabled(
+                                        sshEnableCheckBox->IsChecked()
+                                        && sshStrictHostKeyCheckingCheckBox->IsChecked());
+                                    break;
+                                }
+
+                                case ChildId::TLS_CHECK_BOX: 
+                                {
+                                    tlsCheckBox->SetChecked(!tlsCheckBox->IsChecked());
+                                    tlsAllowInvalidHostnamesCheckBox
+                                        ->SetEnabled(tlsCheckBox->IsChecked());
+                                    tlsCaFileEdit->SetEnabled(tlsCheckBox->IsChecked());
 
                                     break;
                                 }
 
-                                case ChildId::REPLICATED_ONLY_CHECK_BOX:
+
+                                case ChildId::TLS_ALLOW_INVALID_HOSTNAMES_CHECK_BOX:
                                 {
-                                    replicatedOnlyCheckBox->SetChecked(!replicatedOnlyCheckBox->IsChecked());
+                                    tlsAllowInvalidHostnamesCheckBox->SetChecked(!tlsAllowInvalidHostnamesCheckBox->IsChecked());
 
                                     break;
                                 }
 
-                                case ChildId::COLLOCATED_CHECK_BOX:
+                                case ChildId::SCAN_METHOD_COMBO_BOX:
                                 {
-                                    collocatedCheckBox->SetChecked(!collocatedCheckBox->IsChecked());
-
+                                    std::string scanMethodStr;
+                                    scanMethodComboBox->GetText(scanMethodStr);
+                                    if (ScanMethod::FromString(
+                                                scanMethodStr, ScanMethod::Type::UNKNOWN)
+                                        == ScanMethod::Type::ALL) 
+                                    {
+                                        scanLimitEdit->SetEnabled(false);
+                                    } 
+                                    else 
+                                    {
+                                        scanLimitEdit->SetEnabled(true);
+                                    }
                                     break;
                                 }
 
-                                case ChildId::LAZY_CHECK_BOX:
+                                case ChildId::REFRESH_SCHEMA_CHECK_BOX:
                                 {
-                                    lazyCheckBox->SetChecked(!lazyCheckBox->IsChecked());
-
+                                    refreshSchemaCheckBox->SetChecked(!refreshSchemaCheckBox->IsChecked());
                                     break;
                                 }
 
-                                case ChildId::SKIP_REDUCER_ON_UPDATE_CHECK_BOX:
+                                case ChildId::RETRY_READS_CHECK_BOX:
                                 {
-                                    skipReducerOnUpdateCheckBox->SetChecked(!skipReducerOnUpdateCheckBox->IsChecked());
-
-                                    break;
-                                }
-
-                                case ChildId::PROTOCOL_VERSION_COMBO_BOX:
-                                {
-                                    std::string versionStr;
-                                    protocolVersionComboBox->GetText(versionStr);
-
-                                    ProtocolVersion version = ProtocolVersion::FromString(versionStr);
-                                    lazyCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_1_5);
-                                    skipReducerOnUpdateCheckBox->SetEnabled(version >= ProtocolVersion::VERSION_2_3_0);
-                                    nestedTxModeComboBox->SetEnabled(version >= ProtocolVersion::VERSION_2_5_0);
-
-                                    break;
-                                }
-
-                                case ChildId::SSL_MODE_COMBO_BOX:
-                                {
-                                    using ssl::SslMode;
-
-                                    std::string sslModeStr;
-                                    sslModeComboBox->GetText(sslModeStr);
-
-                                    SslMode::Type sslMode = SslMode::FromString(sslModeStr, SslMode::DISABLE);
-
-                                    sslKeyFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
-                                    sslCertFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
-                                    sslCaFileEdit->SetEnabled(sslMode != SslMode::DISABLE);
+                                    retryReadsCheckBox->SetChecked(!retryReadsCheckBox->IsChecked());
 
                                     break;
                                 }
@@ -501,139 +662,184 @@ namespace ignite
                 void DsnConfigurationWindow::RetrieveParameters(config::Configuration& cfg) const
                 {
                     RetrieveConnectionParameters(cfg);
-                    RetrieveAuthParameters(cfg);
-                    RetrieveSslParameters(cfg);
+                    RetrieveSshParameters(cfg);
+                    RetrieveTlsParameters(cfg);
+                    RetrieveSchemaParameters(cfg);
                     RetrieveAdditionalParameters(cfg);
                 }
 
                 void DsnConfigurationWindow::RetrieveConnectionParameters(config::Configuration& cfg) const
                 {
                     std::string dsnStr;
-                    std::string addressStr;
-                    std::string schemaStr;
-                    std::string versionStr;
+                    std::string hostnameStr;
+                    std::string portStr;
+                    std::string databaseStr;
+                    std::string userStr;
+                    std::string passwordStr;
 
                     nameEdit->GetText(dsnStr);
-                    addressEdit->GetText(addressStr);
-                    schemaEdit->GetText(schemaStr);
-                    protocolVersionComboBox->GetText(versionStr);
 
-                    common::StripSurroundingWhitespaces(addressStr);
                     common::StripSurroundingWhitespaces(dsnStr);
                     // Stripping of whitespaces off the schema skipped intentionally
 
+                    hostnameEdit->GetText(hostnameStr);
+                    portEdit->GetText(portStr);
+                    databaseEdit->GetText(databaseStr);
+                    userEdit->GetText(userStr);
+                    passwordEdit->GetText(passwordStr);
+
+                    int16_t port = common::LexicalCast< int16_t >(portStr);
+
+                    if (port <= 0)
+                        port = config.GetPort();
+
                     LOG_MSG("Retrieving arguments:");
-                    LOG_MSG("DSN:                " << dsnStr);
-                    LOG_MSG("Address:            " << addressStr);
-                    LOG_MSG("Schema:             " << schemaStr);
-                    LOG_MSG("Protocol version:   " << versionStr);
+                    LOG_MSG("DSN:      " << dsnStr);
+                    LOG_MSG("Hostname: " << hostnameStr);
+                    LOG_MSG("Port:     " << portStr);
+                    LOG_MSG("Database: " << databaseStr);
 
-                    if (dsnStr.empty())
-                        throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, "DSN name can not be empty.");
-
-                    diagnostic::DiagnosticRecordStorage diag;
-
-                    std::vector<EndPoint> addresses;
-
-                    config::ParseAddress(addressStr, addresses, &diag);
-
-                    if (diag.GetStatusRecordsNumber() > 0)
-                    {
-                        throw IgniteError(IgniteError::IGNITE_ERR_GENERIC,
-                            diag.GetStatusRecord(1).GetMessageText().c_str());
-                    }
-
-                    ProtocolVersion version = ProtocolVersion::FromString(versionStr);
-
-                    if (!version.IsSupported())
-                        throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, "Protocol version is not supported.");
+                    // username and password intentionally not logged for security reasons
 
                     cfg.SetDsn(dsnStr);
-                    cfg.SetAddresses(addresses);
-                    cfg.SetSchema(schemaStr);
-                    cfg.SetProtocolVersion(version);
+                    cfg.SetPort(port);
+                    cfg.SetHostname(hostnameStr);
+                    cfg.SetDatabase(databaseStr);
+                    cfg.SetUser(userStr);
+                    cfg.SetPassword(passwordStr);
                 }
 
-                void DsnConfigurationWindow::RetrieveAuthParameters(config::Configuration& cfg) const
+                void DsnConfigurationWindow::RetrieveSshParameters(config::Configuration& cfg) const
                 {
-                    std::string user;
-                    std::string password;
+                    bool sshEnable = sshEnableCheckBox->IsChecked();
+                    bool sshStrictHostKeyChecking = sshStrictHostKeyCheckingCheckBox->IsChecked();
 
-                    userEdit->GetText(user);
-                    passwordEdit->GetText(password);
+                    std::string sshUserStr;
+                    std::string sshHostStr;
+                    std::string sshPrivateKeyFileStr;
+                    std::string sshPrivateKeyPassphraseStr;
+                    std::string sshKnownHostsFileStr;
 
-                    cfg.SetUser(user);
-                    cfg.SetPassword(password);
-                }
-
-                void DsnConfigurationWindow::RetrieveSslParameters(config::Configuration& cfg) const
-                {
-                    std::string sslModeStr;
-                    std::string sslKeyStr;
-                    std::string sslCertStr;
-                    std::string sslCaStr;
-
-                    sslModeComboBox->GetText(sslModeStr);
-                    sslKeyFileEdit->GetText(sslKeyStr);
-                    sslCertFileEdit->GetText(sslCertStr);
-                    sslCaFileEdit->GetText(sslCaStr);
+                    sshUserEdit->GetText(sshUserStr);
+                    sshHostEdit->GetText(sshHostStr);
+                    sshPrivateKeyFileEdit->GetText(sshPrivateKeyFileStr);
+                    sshPrivateKeyPassphraseEdit->GetText(sshPrivateKeyPassphraseStr);
+                    sshKnownHostsFileEdit->GetText(sshKnownHostsFileStr);
 
                     LOG_MSG("Retrieving arguments:");
-                    LOG_MSG("SSL Mode:           " << sslModeStr);
-                    LOG_MSG("SSL Key:            " << sslKeyStr);
-                    LOG_MSG("SSL Certificate:    " << sslCertStr);
-                    LOG_MSG("SSL CA:             " << sslCaStr);
+                    LOG_MSG("SSH enable:                    " << (sshEnable ? "true" : "false"));
+                    LOG_MSG("SSH user:                      " << sshUserStr);
+                    LOG_MSG("SSH host:                      " << sshHostStr);
+                    LOG_MSG("SSH private key file:          " << sshPrivateKeyFileStr);
+                    LOG_MSG("SSH strict host key checking:  " << (sshStrictHostKeyChecking ? "true" : "false"));
+                    LOG_MSG("SSH known hosts file:          " << sshKnownHostsFileStr);
 
-                    ssl::SslMode::Type sslMode = ssl::SslMode::FromString(sslModeStr, ssl::SslMode::DISABLE);
+                    cfg.SetSshEnable(sshEnable);
+                    cfg.SetSshUser(sshUserStr);
+                    cfg.SetSshHost(sshHostStr);
+                    cfg.SetSshPrivateKeyFile(sshPrivateKeyFileStr);
+                    cfg.SetSshPrivateKeyPassphrase(sshPrivateKeyPassphraseStr);
+                    cfg.SetSshStrictHostKeyChecking(sshStrictHostKeyChecking);
+                    cfg.SetSshKnownHostsFile(sshKnownHostsFileStr);
+                }
 
-                    cfg.SetSslMode(sslMode);
-                    cfg.SetSslKeyFile(sslKeyStr);
-                    cfg.SetSslCertFile(sslCertStr);
-                    cfg.SetSslCaFile(sslCaStr);
+                void DsnConfigurationWindow::RetrieveTlsParameters(config::Configuration& cfg) const
+                {
+                    bool tls = tlsCheckBox->IsChecked();
+                    bool tlsAllowInvalidHostnames = tlsAllowInvalidHostnamesCheckBox->IsChecked();
+                    std::string tlsCaStr;
+
+                    tlsCaFileEdit->GetText(tlsCaStr);
+
+                    LOG_MSG("TLS/SSL Encryption:                       " << (tls ? "true" : "false"));
+                    LOG_MSG("TLS Allow Invalid Hostnames:              " << (tlsAllowInvalidHostnames ? "true" : "false"));
+                    LOG_MSG("TLS CA (Certificate Authority) File: " << tlsCaStr);
+
+                    cfg.SetTls(tls);
+                    cfg.SetTlsAllowInvalidHostnames(tlsAllowInvalidHostnames);
+                    cfg.SetTlsCaFile(tlsCaStr);
+                }
+
+                void DsnConfigurationWindow::RetrieveSchemaParameters(config::Configuration& cfg) const
+                {
+                    std::string scanMethodStr;
+                    std::string scanLimitStr;
+                    std::string schemaStr;
+                    bool refreshSchema = refreshSchemaCheckBox->IsChecked();
+
+                    scanMethodComboBox->GetText(scanMethodStr);
+                    scanLimitEdit->GetText(scanLimitStr);
+                    schemaEdit->GetText(schemaStr);
+
+                    int32_t scanLimit =
+                        common::LexicalCast<int32_t>(scanLimitStr);
+
+                    if (scanLimit <= 0)
+                        scanLimit = config.GetScanLimit();
+                    
+                    LOG_MSG("Scan method:    " << scanMethodStr);
+                    LOG_MSG("Scan limit      " << scanLimit);
+                    LOG_MSG("Schema:         " << schemaStr);
+                    LOG_MSG("Refresh schema: " << (refreshSchema ? "true" : "false"));
+
+                    ScanMethod::Type scanMethod =
+                        ScanMethod::FromString(scanMethodStr, ScanMethod::Type::UNKNOWN);
+
+                    cfg.SetScanMethod(scanMethod);
+                    cfg.SetSchemaName(schemaStr);
+                    cfg.SetScanLimit(scanLimit);
+                    cfg.SetRefreshSchema(refreshSchema);
                 }
 
                 void DsnConfigurationWindow::RetrieveAdditionalParameters(config::Configuration& cfg) const
                 {
-                    std::string pageSizeStr;
+                    std::string readPreferenceStr;
+                    std::string appNameStr;
+                    std::string replicaSetStr;
 
-                    pageSizeEdit->GetText(pageSizeStr);
+                    readPreferenceComboBox->GetText(readPreferenceStr);
+                    appNameEdit->GetText(appNameStr);
+                    replicaSetEdit->GetText(replicaSetStr);
 
-                    int32_t pageSize = common::LexicalCast<int32_t>(pageSizeStr);
+                    bool retryReads = retryReadsCheckBox->IsChecked();
 
-                    if (pageSize <= 0)
-                        pageSize = config.GetPageSize();
+                    std::string loginTimeoutSecStr;
 
-                    std::string nestedTxModeStr;
+                    loginTimeoutSecEdit->GetText(loginTimeoutSecStr);
 
-                    nestedTxModeComboBox->GetText(nestedTxModeStr);
+                    int32_t loginTimeoutSec =
+                        common::LexicalCast<int32_t>(loginTimeoutSecStr);
 
-                    NestedTxMode::Type mode = NestedTxMode::FromString(nestedTxModeStr, config.GetNestedTxMode());
+                    if (loginTimeoutSec <= 0)
+                        loginTimeoutSec = config.GetLoginTimeoutSeconds();
 
-                    bool distributedJoins = distributedJoinsCheckBox->IsChecked();
-                    bool enforceJoinOrder = enforceJoinOrderCheckBox->IsChecked();
-                    bool replicatedOnly = replicatedOnlyCheckBox->IsChecked();
-                    bool collocated = collocatedCheckBox->IsChecked();
-                    bool lazy = lazyCheckBox->IsChecked();
-                    bool skipReducerOnUpdate = skipReducerOnUpdateCheckBox->IsChecked();
+                    std::string fetchSizeStr;
+
+                    defaultFetchSizeEdit->GetText(fetchSizeStr);
+
+                    int32_t fetchSize =
+                        common::LexicalCast<int32_t>(fetchSizeStr);
+
+                    if (fetchSize <= 0)
+                        fetchSize = config.GetDefaultFetchSize();
 
                     LOG_MSG("Retrieving arguments:");
-                    LOG_MSG("Page size:              " << pageSize);
-                    LOG_MSG("Nested TX Mode:         " << NestedTxMode::ToString(mode));
-                    LOG_MSG("Distributed Joins:      " << (distributedJoins ? "true" : "false"));
-                    LOG_MSG("Enforce Join Order:     " << (enforceJoinOrder ? "true" : "false"));
-                    LOG_MSG("Replicated only:        " << (replicatedOnly ? "true" : "false"));
-                    LOG_MSG("Collocated:             " << (collocated ? "true" : "false"));
-                    LOG_MSG("Lazy:                   " << (lazy ? "true" : "false"));
-                    LOG_MSG("Skip reducer on update: " << (skipReducerOnUpdate ? "true" : "false"));
+                    LOG_MSG("Retry reads:              " << (retryReads ? "true" : "false"));
+                    LOG_MSG("Read preference:          " << readPreferenceStr);
+                    LOG_MSG("App name:                 " << appNameStr);
+                    LOG_MSG("Login timeout (seconds):  " << loginTimeoutSecStr);
+                    LOG_MSG("Replica Set:              " << replicaSetStr);
+                    LOG_MSG("Fetch size:               " << fetchSize);
 
-                    cfg.SetPageSize(pageSize);
-                    cfg.SetNestedTxMode(mode);
-                    cfg.SetDistributedJoins(distributedJoins);
-                    cfg.SetEnforceJoinOrder(enforceJoinOrder);
-                    cfg.SetReplicatedOnly(replicatedOnly);
-                    cfg.SetCollocated(collocated);
-                    cfg.SetLazy(lazy);
-                    cfg.SetSkipReducerOnUpdate(skipReducerOnUpdate);
+                    ReadPreference::Type readPreference = ReadPreference::FromString(
+                            readPreferenceStr, ReadPreference::Type::UNKNOWN);
+
+                    cfg.SetReadPreference(readPreference);
+                    cfg.SetRetryReads(retryReads);
+                    cfg.SetApplicationName(appNameStr);
+                    cfg.SetLoginTimeoutSeconds(loginTimeoutSec);
+                    cfg.SetReplicaSet(replicaSetStr);
+                    cfg.SetDefaultFetchSize(fetchSize);
                 }
             }
         }

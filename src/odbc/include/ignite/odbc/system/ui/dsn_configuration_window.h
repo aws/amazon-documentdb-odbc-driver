@@ -42,35 +42,54 @@ namespace ignite
                         enum Type
                         {
                             CONNECTION_SETTINGS_GROUP_BOX = 100,
-                            SSL_SETTINGS_GROUP_BOX,
+                            SSH_SETTINGS_GROUP_BOX,
+                            TLS_SETTINGS_GROUP_BOX,
+                            SCHEMA_SETTINGS_GROUP_BOX,
                             ADDITIONAL_SETTINGS_GROUP_BOX,
-                            AUTH_SETTINGS_GROUP_BOX,
                             NAME_EDIT,
                             NAME_LABEL,
-                            ADDRESS_EDIT,
-                            ADDRESS_LABEL,
+                            SSH_ENABLE_CHECK_BOX,
+                            SSH_USER_EDIT,
+                            SSH_USER_LABEL,
+                            SSH_HOST_EDIT,
+                            SSH_HOST_LABEL,
+                            SSH_PRIVATE_KEY_FILE_EDIT,
+                            SSH_PRIVATE_KEY_FILE_LABEL,
+                            SSH_PRIVATE_KEY_PASSPHRASE_EDIT,
+                            SSH_PRIVATE_KEY_PASSPHRASE_LABEL,
+                            SSH_STRICT_HOST_KEY_CHECKING_CHECK_BOX,
+                            SSH_KNOWN_HOSTS_FILE_EDIT,
+                            SSH_KNOWN_HOSTS_FILE_LABEL,
+                            APP_NAME_EDIT,
+                            APP_NAME_LABEL,
+                            LOGIN_TIMEOUT_SEC_EDIT,
+                            LOGIN_TIMEOUT_SEC_LABEL,
+                            READ_PREFERENCE_LABEL,
+                            READ_PREFERENCE_COMBO_BOX,
+                            REPLICA_SET_EDIT,
+                            REPLICA_SET_LABEL,
+                            RETRY_READS_CHECK_BOX,
+                            DEFAULT_FETCH_SIZE_EDIT,
+                            DEFAULT_FETCH_SIZE_LABEL,
+                            SCAN_METHOD_COMBO_BOX,
+                            SCAN_METHOD_LABEL,
+                            SCAN_LIMIT_EDIT,
+                            SCAN_LIMIT_LABEL,
                             SCHEMA_EDIT,
                             SCHEMA_LABEL,
-                            PAGE_SIZE_EDIT,
-                            PAGE_SIZE_LABEL,
-                            DISTRIBUTED_JOINS_CHECK_BOX,
-                            ENFORCE_JOIN_ORDER_CHECK_BOX,
-                            REPLICATED_ONLY_CHECK_BOX,
-                            COLLOCATED_CHECK_BOX,
-                            LAZY_CHECK_BOX,
-                            SKIP_REDUCER_ON_UPDATE_CHECK_BOX,
-                            PROTOCOL_VERSION_LABEL,
-                            PROTOCOL_VERSION_COMBO_BOX,
-                            NESTED_TX_MODE_LABEL,
-                            NESTED_TX_MODE_COMBO_BOX,
-                            SSL_MODE_LABEL,
-                            SSL_MODE_COMBO_BOX,
-                            SSL_KEY_FILE_LABEL,
-                            SSL_KEY_FILE_EDIT,
-                            SSL_CERT_FILE_LABEL,
-                            SSL_CERT_FILE_EDIT,
-                            SSL_CA_FILE_LABEL,
-                            SSL_CA_FILE_EDIT,
+                            REFRESH_SCHEMA_CHECK_BOX,
+                            TLS_CHECK_BOX,
+                            TLS_ALLOW_INVALID_HOSTNAMES_CHECK_BOX,
+                            TLS_CA_FILE_EDIT,
+                            TLS_CA_FILE_LABEL,
+                            DRIVER_LABEL,
+                            DRIVER_EDIT,
+                            DATABASE_LABEL,
+                            DATABASE_EDIT,
+                            HOST_NAME_LABEL,
+                            HOST_NAME_EDIT,
+                            PORT_LABEL,
+                            PORT_EDIT,
                             USER_LABEL,
                             USER_EDIT,
                             PASSWORD_LABEL,
@@ -143,20 +162,28 @@ namespace ignite
                     void RetrieveConnectionParameters(config::Configuration& cfg) const;
 
                     /**
-                     * Retrieves current values from the Authentication UI group and
+                     * Retrieves current values from the SSH tunnel UI group and
                      * stores them to the specified configuration.
                      *
                      * @param cfg Configuration.
                      */
-                    void RetrieveAuthParameters(config::Configuration& cfg) const;
+                    void RetrieveSshParameters(config::Configuration& cfg) const;
 
                     /**
-                     * Retrieves current values from the SSL UI group and
+                     * Retrieves current values from the TLS/SSL UI group and
                      * stores them to the specified configuration.
                      *
                      * @param cfg Configuration.
                      */
-                    void RetrieveSslParameters(config::Configuration& cfg) const;
+                    void RetrieveTlsParameters(config::Configuration& cfg) const;
+
+                    /**
+                     * Retrieves current values from the schema generation UI group and
+                     * stores them to the specified configuration.
+                     *
+                     * @param cfg Configuration.
+                     */
+                    void RetrieveSchemaParameters(config::Configuration& cfg) const;
 
                     /**
                      * Retrieves current values from the additional UI group and
@@ -176,25 +203,35 @@ namespace ignite
                      */
                     int CreateConnectionSettingsGroup(int posX, int posY, int sizeX);
 
-                    /**
-                     * Create aythentication settings group box.
+                     /**
+                     * Create internal SSH tunnel settings group box.
                      *
                      * @param posX X position.
                      * @param posY Y position.
                      * @param sizeX Width.
                      * @return Size by Y.
                      */
-                    int CreateAuthSettingsGroup(int posX, int posY, int sizeX);
+                    int CreateSshSettingsGroup(int posX, int posY, int sizeX);
 
                     /**
-                     * Create SSL settings group box.
+                     * Create TLS/SSL settings group box.
                      *
                      * @param posX X position.
                      * @param posY Y position.
                      * @param sizeX Width.
                      * @return Size by Y.
                      */
-                    int CreateSslSettingsGroup(int posX, int posY, int sizeX);
+                    int CreateTlsSettingsGroup(int posX, int posY, int sizeX);
+
+                    /**
+                     * Create schema generation settings group box.
+                     *
+                     * @param posX X position.
+                     * @param posY Y position.
+                     * @param sizeX Width.
+                     * @return Size by Y.
+                     */
+                    int CreateSchemaSettingsGroup(int posX, int posY, int sizeX);
 
                     /**
                      * Create additional settings group box.
@@ -215,11 +252,14 @@ namespace ignite
                     /** Connection settings group box. */
                     std::auto_ptr<Window> connectionSettingsGroupBox;
 
-                    /** SSL settings group box. */
-                    std::auto_ptr<Window> sslSettingsGroupBox;
+                    /** SSH settings group box. */
+                    std::auto_ptr<Window> sshSettingsGroupBox;
 
-                    /** Authentication settings group box. */
-                    std::auto_ptr<Window> authSettingsGroupBox;
+                    /** TLS settings group box. */
+                    std::auto_ptr<Window> tlsSettingsGroupBox;
+
+                    /** Schema generation and discovery settings group box. */
+                    std::auto_ptr< Window > schemaSettingsGroupBox;
 
                     /** Additional settings group box. */
                     std::auto_ptr<Window> additionalSettingsGroupBox;
@@ -230,11 +270,17 @@ namespace ignite
                     /** DSN name edit field. */
                     std::auto_ptr<Window> nameEdit;
 
-                    /** DSN address edit field label. */
-                    std::auto_ptr<Window> addressLabel;
+                    /** Scan method ComboBox **/
+                    std::auto_ptr<Window> scanMethodComboBox;
 
-                    /** DSN address edit field. */
-                    std::auto_ptr<Window> addressEdit;
+                    /** Scan method label. */
+                    std::auto_ptr<Window> scanMethodLabel;
+
+                    /** Scan limit field label. */
+                    std::auto_ptr<Window> scanLimitLabel;
+
+                    /** Scan limit field. */
+                    std::auto_ptr<Window> scanLimitEdit;
 
                     /** DSN schema edit field label. */
                     std::auto_ptr<Window> schemaLabel;
@@ -242,35 +288,77 @@ namespace ignite
                     /** DSN schema edit field. */
                     std::auto_ptr<Window> schemaEdit;
 
-                    /** DSN fetch page size edit field label. */
-                    std::auto_ptr<Window> pageSizeLabel;
+                    /** Refresh DSN schema checkBox. */
+                    std::auto_ptr<Window> refreshSchemaCheckBox;
 
-                    /** DSN fetch page size edit field. */
-                    std::auto_ptr<Window> pageSizeEdit;
+                    /** SSH enable checkBox. */
+                    std::auto_ptr<Window> sshEnableCheckBox;
 
-                    /** Distributed joins CheckBox. */
-                    std::auto_ptr<Window> distributedJoinsCheckBox;
+                    /** SSH user edit. */
+                    std::auto_ptr<Window> sshUserEdit;
 
-                    /** Enforce join order CheckBox. */
-                    std::auto_ptr<Window> enforceJoinOrderCheckBox;
+                    /** SSH user label. */
+                    std::auto_ptr<Window> sshUserLabel;
 
-                    /** Replicated only CheckBox. */
-                    std::auto_ptr<Window> replicatedOnlyCheckBox;
+                    /** SSH host edit. */
+                    std::auto_ptr<Window> sshHostEdit;
 
-                    /** Collocated CheckBox. */
-                    std::auto_ptr<Window> collocatedCheckBox;
+                    /** SSH host label. */
+                    std::auto_ptr<Window> sshHostLabel;
 
-                    /** Lazy CheckBox. */
-                    std::auto_ptr<Window> lazyCheckBox;
+                    /** SSH private key file edit. */
+                    std::auto_ptr<Window> sshPrivateKeyFileEdit;
 
-                    /** Update on server CheckBox. */
-                    std::auto_ptr<Window> skipReducerOnUpdateCheckBox;
+                    /** SSH private key file label. */
+                    std::auto_ptr<Window> sshPrivateKeyFileLabel;
 
-                    /** Protocol version edit field. */
-                    std::auto_ptr<Window> protocolVersionLabel;
+                    /** SSH private key passphrase edit. */
+                    std::auto_ptr<Window> sshPrivateKeyPassphraseEdit;
 
-                    /** Protocol verion ComboBox. */
-                    std::auto_ptr<Window> protocolVersionComboBox;
+                    /** SSH private key passphrase label. */
+                    std::auto_ptr<Window> sshPrivateKeyPassphraseLabel;
+
+                    /** SSH strict host key checking checkBox. */
+                    std::auto_ptr<Window> sshStrictHostKeyCheckingCheckBox;
+
+                    /** SSH known host file edit. */
+                    std::auto_ptr<Window> sshKnownHostsFileEdit;
+
+                    /** SSH know host file label. */
+                    std::auto_ptr<Window> sshKnownHostsFileLabel;
+
+                    /** Application name edit. */
+                    std::auto_ptr<Window> appNameEdit;
+
+                    /** Application name label. */
+                    std::auto_ptr<Window> appNameLabel;
+
+                    /** Login Timeout (seconds) edit. */
+                    std::auto_ptr<Window> loginTimeoutSecEdit;
+
+                    /** Login Timeout (seconds) label. */
+                    std::auto_ptr<Window> loginTimeoutSecLabel;
+
+                    /** Read Preference ComboBox **/
+                    std::auto_ptr<Window> readPreferenceComboBox;
+
+                    /** Read preference label. */
+                    std::auto_ptr<Window> readPreferenceLabel;
+
+                    /** Replica set edit. */
+                    std::auto_ptr<Window> replicaSetEdit;
+
+                    /** Replica set label. */
+                    std::auto_ptr<Window> replicaSetLabel;
+
+                    /** Retry reads checkBox. */
+                    std::auto_ptr<Window> retryReadsCheckBox;
+
+                    /** Default fetch size edit. */
+                    std::auto_ptr<Window> defaultFetchSizeEdit;
+
+                    /** Default fetch size label. */
+                    std::auto_ptr<Window> defaultFetchSizeLabel;
 
                     /** Ok button. */
                     std::auto_ptr<Window> okButton;
@@ -278,29 +366,35 @@ namespace ignite
                     /** Cancel button. */
                     std::auto_ptr<Window> cancelButton;
 
-                    /** SSL Mode label. */
-                    std::auto_ptr<Window> sslModeLabel;
+                    /** TLS encryption checkBox. */
+                    std::auto_ptr<Window> tlsCheckBox;
 
-                    /** SSL Mode ComboBox. */
-                    std::auto_ptr<Window> sslModeComboBox;
+                    /** TLS allow invalid hostnames checkBox. */
+                    std::auto_ptr<Window> tlsAllowInvalidHostnamesCheckBox;
 
-                    /** SSL Private Key File label. */
-                    std::auto_ptr<Window> sslKeyFileLabel;
+                    /** TLS certificate authority file label. */
+                    std::auto_ptr<Window> tlsCaFileLabel;
 
-                    /** SSL Private Key File edit. */
-                    std::auto_ptr<Window> sslKeyFileEdit;
+                    /** TLS certificate authority file edit. */
+                    std::auto_ptr<Window> tlsCaFileEdit;
 
-                    /** SSL Certificate File label. */
-                    std::auto_ptr<Window> sslCertFileLabel;
+                    /** Database label. */
+                    std::auto_ptr<Window> databaseLabel;
 
-                    /** SSL Certificate File edit. */
-                    std::auto_ptr<Window> sslCertFileEdit;
+                    /** Database edit. */
+                    std::auto_ptr<Window> databaseEdit;
 
-                    /** SSL Certificate Authority File label. */
-                    std::auto_ptr<Window> sslCaFileLabel;
+                    /** Hostname label. */
+                    std::auto_ptr<Window> hostnameLabel;
 
-                    /** SSL Certificate Authority File edit. */
-                    std::auto_ptr<Window> sslCaFileEdit;
+                    /** Hostname edit. */
+                    std::auto_ptr<Window> hostnameEdit;
+
+                    /** Port label. */
+                    std::auto_ptr<Window> portLabel;
+
+                    /** Port edit. */
+                    std::auto_ptr<Window> portEdit;
 
                     /** User label. */
                     std::auto_ptr<Window> userLabel;
@@ -314,17 +408,14 @@ namespace ignite
                     /** Password edit. */
                     std::auto_ptr<Window> passwordEdit;
 
-                    /** Nested transaction mode label. */
-                    std::auto_ptr<Window> nestedTxModeLabel;
-
-                    /** Nested transaction mode combo box. */
-                    std::auto_ptr<Window> nestedTxModeComboBox;
-
                     /** Configuration. */
                     config::Configuration& config;
 
                     /** Flag indicating whether OK option was selected. */
                     bool accepted;
+
+                    /** Flag indicating whether the configuration window has been created. */
+                    bool created;
                 };
             }
         }
