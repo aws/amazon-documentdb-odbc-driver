@@ -273,11 +273,11 @@ namespace ignite
                               "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)Ljava/sql/ResultSet;",
                               false);
 
-                const char* const C_DOCUMENTDB_CONNECTION = "software/amazon/documentdb/jdbc/DocumentDbConnectionProperties";
+                const char* const C_DOCUMENTDB_CONNECTION = "software/amazon/documentdb/jdbc/DocumentDbConnection";
                 JniMethod const M_DOCUMENTDB_CONNECTION_GET_SSH_LOCAL_PORT =
-                    JniMethod("getSshLocalPort", "()I;", false);
+                    JniMethod("getSshLocalPort", "()I", false);
                 JniMethod const M_DOCUMENTDB_CONNECTION_IS_SSH_TUNNEL_ACTIVE =
-                    JniMethod("isSshTunnelActive", "()B", false);
+                    JniMethod("isSshTunnelActive", "()Z", false);
 
                 const char* const C_DRIVERMANAGER = "java/sql/DriverManager";
                 JniMethod const M_DRIVERMANAGER_GET_CONNECTION = 
@@ -832,7 +832,7 @@ namespace ignite
 
                 // note to self: result is stored in bool poiner isActive, this is to be consistent with other functions that
                 // use CallBooleanMethod. -AL-
-                bool JniContext::DocumentDbIsSshTunnelActive(
+                bool JniContext::DocumentDbConnectionIsSshTunnelActive(
                     const SharedPointer< GlobalJObject >& connection,
                     bool& isActive,
                     JniErrorInfo* errInfo) {
@@ -843,40 +843,31 @@ namespace ignite
                     }
                     JNIEnv* env = Attach();
                     jboolean res = env->CallBooleanMethod(
-                        jvm->GetMembers().c_DocumentDbConnection,
+                        connection.Get()->GetRef(),
                         jvm->GetMembers().m_DocumentDbConnectionIsSshTunnelActive);
                     ExceptionCheck(env, errInfo);
                     if (errInfo->code == IGNITE_JNI_ERR_SUCCESS) {
-                        isActive = res != JNI_TRUE;
+                        isActive = res != JNI_FALSE;
                     }
                     return errInfo->code == IGNITE_JNI_ERR_SUCCESS;
-                    // return result;
                 }
 
-                int32_t JniContext::DocumentDbGetSshLocalPort(
+                // use a reference variable to return a value, return a boolean to indicate whether it is successful or not -AL-
+                bool JniContext::DocumentDbConnectionGetSshLocalPort(
                     const SharedPointer< GlobalJObject >& connection,
+                    int32_t& result,
                     JniErrorInfo* errInfo) {
                     if (!connection.Get()) {
                         errInfo->code = IGNITE_JNI_ERR_GENERIC;
                         errInfo->errMsg = "Connection object must be set.";
-                        return 0;
-                        // TODO double check with Bruce: should I just return 0 here?
+                        return false;
                     }
                     JNIEnv* env = Attach();
-                    int32_t result = env->CallIntMethod(
-                        jvm->GetMembers().c_DocumentDbConnection,
+                    result = env->CallIntMethod(
+                        connection.Get()->GetRef(),
                         jvm->GetMembers().m_DocumentDbConnectionGetSshLocalPort);
-                    //jobject result = env->CallObjectMethod(
-                    //    jvm->GetMembers().c_DocumentDbConnection,
-                    //    jvm->GetMembers().m_DocumentDbConnectionGetSshLocalPort);
                     ExceptionCheck(env, errInfo);
-                    //if (!result) {
-                    //    // unable to return object
-                    //    return 0;
-                    //} else if (result.isPresent()) {
-                    //    return result.get().getInt();
-                    //}
-                     return result;
+                    return errInfo->code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
                 void JniContext::ConnectionClose(const SharedPointer< GlobalJObject >& connection, JniErrorInfo* errInfo) {
