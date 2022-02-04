@@ -116,6 +116,13 @@ namespace ignite
                     void SetText(const std::string& text) const;
 
                     /**
+                     * Check if the window has text.
+                     *
+                     * @return True if has text.
+                     */
+                    bool HasText() const;
+
+                    /**
                      * Get CheckBox state.
                      *
                      * @param True if checked.
