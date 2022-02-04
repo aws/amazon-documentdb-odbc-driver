@@ -459,10 +459,10 @@ namespace ignite {
                   bool ResultSetNext(const SharedPointer< GlobalJObject >& resultSet, bool& hasNext,
                                      JniErrorInfo* errInfo);
                   bool ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, std::string& value, bool& wasNull, JniErrorInfo* errInfo);
-                  bool ResultSetGetString(const jobject resultSet, const std::string& columnName, std::string& value, bool& wasNull, JniErrorInfo* errInfo);
-                  bool ResultSetGetInteger(const jobject resultSet, int columnIndex, int& value, bool& wasNull, JniErrorInfo* errInfo);
-                  bool ResultSetGetInteger(const jobject resultSet, const std::string& columnName, int& value, bool& wasNull, JniErrorInfo* errInfo);
-                  bool ResultSetWasNull(const jobject resultSet, bool& value, JniErrorInfo* errInfo);
+                  bool ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, std::string& value, bool& wasNull, JniErrorInfo* errInfo);
+                  bool ResultSetGetInteger(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, int& value, bool& wasNull, JniErrorInfo* errInfo);
+                  bool ResultSetGetInteger(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, int& value, bool& wasNull,JniErrorInfo* errInfo);
+                  bool ResultSetWasNull(const SharedPointer< GlobalJObject >& resultSet, bool& value, JniErrorInfo* errInfo);
 
                   int64_t TargetInLongOutLong(jobject obj, int type, int64_t memPtr,
                                               JniErrorInfo* errInfo = NULL);

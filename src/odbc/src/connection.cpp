@@ -155,7 +155,7 @@ namespace ignite
 
             config = cfg;
 
-            if (connection.Get()) {
+            if (connection.Get() != nullptr) {
                 AddStatusRecord(SqlState::S08002_ALREADY_CONNECTED,
                                 "Already connected.");
 
@@ -199,7 +199,7 @@ namespace ignite
 
         SqlResult::Type Connection::InternalRelease()
         {
-            if (!connection.Get())
+            if (connection.Get() == nullptr)
             {
                 AddStatusRecord(SqlState::S08003_NOT_CONNECTED, "Connection is not open.");
 
@@ -215,7 +215,7 @@ namespace ignite
 
         void Connection::Close()
         {
-            if (connection.Get()) {
+            if (connection.Get() != nullptr) {
                 SharedPointer< JniContext > ctx(JniContext::Create(&opts[0], static_cast<int>(opts.size()), JniHandlers()));
                 JniErrorInfo errInfo;
                 ctx.Get()->ConnectionClose(connection, &errInfo);
@@ -572,7 +572,7 @@ namespace ignite
 
         void Connection::EnsureConnected()
         {
-            if (connection.Get())
+            if (connection.Get() != nullptr)
                 return;
 
             odbc::IgniteError err;
@@ -587,7 +587,7 @@ namespace ignite
         {
             bool connected = false;
 
-            if (connection.Get()) {
+            if (connection.Get() != nullptr) {
                 return true;
             }
 
@@ -615,7 +615,7 @@ namespace ignite
                 IgniteError::SetError(errInfo.code, errInfo.errCls, errInfo.errMsg, err);
                 return false;
             }
-            if (ctx.Get()) {
+            if (ctx.Get() != nullptr) {
                 SharedPointer< GlobalJObject > result;
                 bool success = ctx.Get()->DriverManagerGetConnection(
                     connectionString.c_str(), result, &errInfo);
