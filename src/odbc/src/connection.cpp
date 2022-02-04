@@ -597,9 +597,6 @@ namespace ignite
             std::string connectionString = FormatJdbcConnectionString();
             JniErrorInfo errInfo;
 
-            std::string docdb_home = common::GetEnv("DOCUMENTDB_HOME")
-                                     + "\\documentdb-jdbc-1.1.0-all.jar";
-            
             // 2. Resolve DOCUMENTDB_HOME.
             std::string home = jni::ResolveDocumentDbHome();
 
