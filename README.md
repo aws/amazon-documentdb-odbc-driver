@@ -2,6 +2,17 @@
 
 ## Development Environment
 
+### Environment Variables for Testing Accounts/Secrets
+
+The enable the test environment to run the tests against a live DocumentDB system,
+set the follwoing environment variables
+
+1. `DOC_DB_HOST=<remote_documentdb_host>` (e.g.: `docdb-host.cluster-cjf6q8nxfefi.us-east-2.docdb.amazonaws.com`)
+2. `DOC_DB_PRIV_KEY_FILE=<path_to_ssh_host_private_key_file>` (e.g.: `~/.ssh/ssh_host.pem`)
+3. `DOC_DB_PASSWORD=<password>`
+4. `DOC_DB_USER=<ssh_user@ssh_host>` (e.g., ec2-user@3.139.97.218)
+5. `DOC_DB_USER_NAME=<user_name>`
+
 ### Windows
 
 1. Microsoft Visual Studio (Community 2019 Verified)

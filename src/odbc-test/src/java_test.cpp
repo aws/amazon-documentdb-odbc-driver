@@ -92,7 +92,7 @@ struct JavaTestSuiteFixture: odbc::OdbcTestSuite
 
         SharedPointer< JniContext > ctx(JniContext::Create(
             &opts[0], static_cast< int >(opts.size()), JniHandlers()));
-        BOOST_CHECK(ctx.Get());
+        BOOST_CHECK(ctx.Get() != nullptr);
         return ctx;
     }
 
@@ -304,14 +304,49 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
     }
     BOOST_REQUIRE(databaseMetaData.Get());
 
+    std::string catalog;
+    std::string schemaPattern;
+    std::string tableNamePattern;
+    std::vector< std::string > types({"TABLE"}); // Need to specify this to get result.
     SharedPointer< GlobalJObject > resultSet;
-    if (!_ctx.Get()->DatabaseMetaDataGetTables(databaseMetaData, resultSet,
-                                               &errInfo)) {
+    if (!_ctx.Get()->DatabaseMetaDataGetTables(databaseMetaData, catalog,
+                                               schemaPattern, tableNamePattern,
+                                               types, resultSet, &errInfo)) {
         std::string errMsg = errInfo.errMsg;
         _ctx.Get()->ConnectionClose(connection, &errInfo);
         BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(resultSet.Get());
+
+    bool hasNext;
+    if (!_ctx.Get()->ResultSetNext(resultSet, hasNext, &errInfo)) {
+        std::string errMsg = errInfo.errMsg;
+        _ctx.Get()->ConnectionClose(connection, &errInfo);
+        BOOST_FAIL(errMsg);
+    }
+    BOOST_REQUIRE(hasNext);
+
+    bool wasNull;
+    std::string value;
+    // TABLE_SCHEM (i.e., database)
+    if (!_ctx.Get()->ResultSetGetString(resultSet, 2, value, wasNull,
+                                        &errInfo)) {
+        std::string errMsg = errInfo.errMsg;
+        _ctx.Get()->ConnectionClose(connection, &errInfo);
+        BOOST_FAIL(errMsg);
+    }
+    BOOST_REQUIRE(!wasNull);
+    BOOST_REQUIRE(value == "test");
+
+    // TABLE_NAME
+    if (!_ctx.Get()->ResultSetGetString(resultSet, 3, value, wasNull,
+                                        &errInfo)) {
+        std::string errMsg = errInfo.errMsg;
+        _ctx.Get()->ConnectionClose(connection, &errInfo);
+        BOOST_FAIL(errMsg);
+    }
+    BOOST_REQUIRE(!wasNull);
+    BOOST_REQUIRE(value.size() > 0);
 
     _ctx.Get()->ConnectionClose(connection, &errInfo);
     connection = nullptr;

@@ -30,6 +30,7 @@
 #include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/jni/java.h"
 #include <ignite/odbc/common/concurrent.h>
+#include "ignite/odbc/end_point.h"
 
 using ignite::odbc::jni::java::GlobalJObject;
 
@@ -506,14 +507,6 @@ namespace ignite
              * De-initializes the JVM options
              */
             void Deinit();
-
-            /**
-             * Collect all addresses from config.
-             *
-             * @param cfg Configuration.
-             * @param endPoints End points.
-             */
-            static void CollectAddresses(const config::Configuration& cfg, std::vector<EndPoint>& endPoints);
 
             /**
              * Retrieve timeout from parameter.

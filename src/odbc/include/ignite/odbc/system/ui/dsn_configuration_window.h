@@ -20,6 +20,10 @@
 
 #include "ignite/odbc/config/configuration.h"
 #include "ignite/odbc/system/ui/custom_window.h"
+// TODO: Removed these from configuration.h since no longer used. Moved here since they are still referenced. Remove when no longer needed.
+#include "ignite/odbc/nested_tx_mode.h"
+#include "ignite/odbc/protocol_version.h"
+#include "ignite/odbc/ssl_mode.h"
 
 namespace ignite
 {
