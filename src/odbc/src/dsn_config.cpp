@@ -172,6 +172,11 @@ namespace ignite
             if (tlsCaFile.IsSet() && !config.IsTlsCaFileSet())
                 config.SetTlsCaFile(tlsCaFile.GetValue());
 
+            SettableValue<bool> sshEnable = ReadDsnBool(dsn, ConnectionStringParser::Key::sshEnable);
+
+            if (sshEnable.IsSet() && !config.IsSshEnableSet())
+                config.SetSshEnable(sshEnable.GetValue());
+
             SettableValue<std::string> sshUser = ReadDsnString(dsn, ConnectionStringParser::Key::sshUser);
 
             if (sshUser.IsSet() && !config.IsSshUserSet())
@@ -199,8 +204,8 @@ namespace ignite
 
             SettableValue<std::string> sshKnownHostsFile = ReadDsnString(dsn, ConnectionStringParser::Key::sshKnownHostsFile);
 
-            if (sshKnownHostsFile.IsSet() && !config.IsSshStrictHostKeyCheckingSet())
-                config.SetSshStrictHostKeyChecking(sshStrictHostKeyChecking.GetValue());
+            if (sshKnownHostsFile.IsSet() && !config.IsSshKnownHostsFileSet())
+                config.SetSshKnownHostsFile(sshKnownHostsFile.GetValue());
 
             SettableValue<std::string> scanMethod = ReadDsnString(dsn, ConnectionStringParser::Key::scanMethod);
 
@@ -214,7 +219,7 @@ namespace ignite
 
             if (scanLimit.IsSet() && !config.IsScanLimitSet()
                 && scanLimit.GetValue() > 0)
-                config.SetDefaultFetchSize(scanLimit.GetValue());
+                config.SetScanLimit(scanLimit.GetValue());
 
             SettableValue<std::string> schemaName = ReadDsnString(dsn, ConnectionStringParser::Key::schemaName);
 

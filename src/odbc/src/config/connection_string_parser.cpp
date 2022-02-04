@@ -44,6 +44,7 @@ namespace ignite
             const std::string ConnectionStringParser::Key::tls                      = "tls";
             const std::string ConnectionStringParser::Key::tlsAllowInvalidHostnames = "tls_allow_invalid_hostnames";
             const std::string ConnectionStringParser::Key::tlsCaFile                = "tls_ca_file";
+            const std::string ConnectionStringParser::Key::sshEnable                = "ssh_enable";
             const std::string ConnectionStringParser::Key::sshUser                  = "ssh_user";
             const std::string ConnectionStringParser::Key::sshHost                  = "ssh_host";
             const std::string ConnectionStringParser::Key::sshPrivateKeyFile        = "ssh_private_key_file";
@@ -335,6 +336,23 @@ namespace ignite
                 {
                     cfg.SetTlsCaFile(value);
                 }
+                else if (lKey == Key::sshEnable)
+                {
+                    BoolParseResult::Type res = StringToBool(value);
+
+                    if (res == BoolParseResult::Type::AI_UNRECOGNIZED)
+                    {
+                        if (diag)
+                        {
+                            diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                                MakeErrorMessage("Unrecognized bool value. Using default value.", key, value));
+                        }
+
+                        return;
+                    }
+
+                    cfg.SetSshEnable(res == BoolParseResult::Type::AI_TRUE);
+                }               
                 else if (lKey == Key::sshUser)
                 {
                     cfg.SetSshUser(value);
