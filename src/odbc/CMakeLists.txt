@@ -193,3 +193,13 @@ install(TARGETS ${TARGET}
 if (WIN32 AND ${WITH_ODBC_MSI})
    install(FILES ${WIX_INSTALLER_PREFIX}.msi DESTINATION bin)
 endif()
+
+if (WIN32)
+    if (MSVC_VERSION GREATER_EQUAL 1900)
+        target_link_libraries(${TARGET} legacy_stdio_definitions odbccp32 shlwapi)
+    endif()
+elseif(APPLE)
+    target_link_libraries(${TARGET} iodbcinst)
+else()
+    target_link_libraries(${TARGET} odbcinst)
+endif()
