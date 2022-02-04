@@ -668,7 +668,7 @@ namespace ignite
             mongoConnectionString.append(":" + config.GetPassword());
             mongoConnectionString.append("@" + host);
             mongoConnectionString.append(":" + port);
-            mongoConnectionString.append("/" + config.GetSchema());
+            mongoConnectionString.append("/" + config.GetDatabase());
             //mongoConnectionString.append("?");
             mongoConnectionString.append("?tlsAllowInvalidHostnames=true");
             //mongoConnectionString.append("&tls=true");
