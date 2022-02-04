@@ -14,6 +14,9 @@
  *
  */
 
+#ifndef _IGNITE_ODBC_READ_PREFERENCE
+#define _IGNITE_ODBC_READ_PREFERENCE
+
 #include <string>
 
 namespace ignite
@@ -27,9 +30,9 @@ namespace ignite
             {
                 PRIMARY,
                 PRIMARY_PREFERRED,
-                SECONDARY, 
+                SECONDARY,
                 SECONDARY_PREFERRED,
-                NEAREST, 
+                NEAREST,
                 UNKNOWN
             };
     
@@ -53,3 +56,6 @@ namespace ignite
         };
     }
 }
+
+#endif //_IGNITE_ODBC_READ_PREFERENCE
+

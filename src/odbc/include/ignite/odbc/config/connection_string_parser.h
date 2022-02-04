@@ -83,6 +83,9 @@ namespace ignite
                     /** Connection attribute keyword for tlsCaFile attribute. */
                     static const std::string tlsCaFile;
 
+                    /** Connection attribute keyword for sshEnable attribute. */
+                    static const std::string sshEnable;
+
                     /** Connection attribute keyword for sshUser attribute. */
                     static const std::string sshUser;
 

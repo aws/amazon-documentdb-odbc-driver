@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include <string>
 #include <sstream>
 #include <iterator>
@@ -30,7 +29,7 @@ namespace ignite
     {
         namespace config
         {
-
+            // Connection Settings
             const std::string Configuration::DefaultValue::dsn = "DocumentDB DSN";
             const std::string Configuration::DefaultValue::driver = "Amazon DocumentDB ODBC Driver";
             const std::string Configuration::DefaultValue::database = "";
@@ -51,6 +50,7 @@ namespace ignite
             const bool Configuration::DefaultValue::refreshSchema = false;
 
             // Internal SSH Tunnel options
+            const bool Configuration::DefaultValue::sshEnable = false;
             const std::string Configuration::DefaultValue::sshUser = "";
             const std::string Configuration::DefaultValue::sshHost = "";
             const std::string Configuration::DefaultValue::sshPrivateKeyFile = "";
@@ -284,6 +284,21 @@ namespace ignite
                 return tlsCaFile.IsSet();
             }
 
+            bool Configuration::IsSshEnable() const 
+            {
+                return sshEnable.GetValue();
+            }
+
+            void Configuration::SetSshEnable(bool val) 
+            {
+                this->sshEnable.SetValue(val);
+            }
+
+            bool Configuration::IsSshEnableSet() const 
+            {
+                return sshEnable.IsSet();
+            }
+
             const std::string& Configuration::GetSshUser() const
             {
                 return sshUser.GetValue();
@@ -496,6 +511,7 @@ namespace ignite
                 AddToMap(res, ConnectionStringParser::Key::tls, tls);
                 AddToMap(res, ConnectionStringParser::Key::tlsAllowInvalidHostnames, tlsAllowInvalidHostnames);
                 AddToMap(res, ConnectionStringParser::Key::tlsCaFile, tlsCaFile);
+                AddToMap(res, ConnectionStringParser::Key::sshEnable, sshEnable);
                 AddToMap(res, ConnectionStringParser::Key::sshUser, sshUser);
                 AddToMap(res, ConnectionStringParser::Key::sshHost, sshHost);
                 AddToMap(res, ConnectionStringParser::Key::sshPrivateKeyFile, sshPrivateKeyFile);
