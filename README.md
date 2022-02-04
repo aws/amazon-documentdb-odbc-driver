@@ -2,6 +2,18 @@
 
 ## Development Environment
 
+### Environment Variables for Testing Accounts/Secrets 
+To enable the test environment to run the tests against a live DocumentDB system, set the following environment variables on your development machine.
+
+DocumentDB cluster credentials
+1. `DOC_DB_HOST`=`<remote_documentdb_host>`(e.g.:`docdb-host.us-east-2.docdb.amazonaws.com`)
+2. `DOC_DB_PASSWORD`=`<documentdb_user_password>`
+3. `DOC_DB_USER_NAME`=`<documentdb_user_name>`
+
+SSH host credentials 
+1. `DOC_DB_USER`=`<ssh_user>`(e.g.:`ec2-user@ec2-instance.us-east-2.compute.amazonaws.com`)
+2. `DOC_DB_PRIV_KEY_FILE`=`<path_to_ssh_host_private_key_file>`(e.g.:`~/.ssh/ssh_host.pem`)
+
 ### Windows
 
 1. Microsoft Visual Studio (Community 2019 Verified)
@@ -19,6 +31,7 @@
    1. Ensure to add path to WiX executables (e.g. `C:\Program Files (x86)\WiX Toolset v3.11\bin`)
 4. Java **JDK** (version 8+ - 17 recommended)
    1. Ensure to set `JAVA_HOME`. 
+   2. Ensure to save Java `\bin` and `\server` directories to the User `PATH` variable. 
 5. Boost Test Framework 
    1. Install via [VCPKG](https://vcpkg.io/en/getting-started.html) using `.\vcpkg install openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows`
 6. Run one of the build scripts to create an initial compilation.
@@ -43,7 +56,8 @@
    4. `brew install boost`
    5. Install Java **JDK** (version 8+ - 17 recommended)  
       - This can be done through Homebrew using `brew install --cask temurin<version>`. 
-      - Ensure to set `JAVA_HOME`.  
+      - Ensure to set `JAVA_HOME`.
+      - Ensure to save Java `/bin` and `/server` directories to the User `PATH` variable.  
    6. If creating a debug build (`./build_mac_debug64.sh`), LLVM is required.
       - If you only have XCode Command Line Tools, use the LLVM included with XCode by modifying the PATH with `export PATH=/Library/Developer/CommandLineTools/usr/bin/:$PATH`. Ensure this XCode path comes first in $PATH. If error occurs, check that clang and llvm are under folder Library/Developer/CommandLineTools/usr/bin.
       - If you have XCode application, to ensure LLVM and CMake are compatible, use the LLVM included with XCode by modifying the PATH with `export PATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/:$PATH`.

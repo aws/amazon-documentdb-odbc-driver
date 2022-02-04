@@ -66,6 +66,16 @@ namespace ignite
         }
 
         /**
+         * Replaces whitespaces in string with underscores. 
+         *
+         * @param str String to be transformed.
+         */
+        inline void SpaceToUnderscore(std::string& str)
+        {
+            std::replace(str.begin(), str.end(), ' ', '_');
+        }
+
+        /**
          * Strips leading and trailing whitespaces from string.
          *
          * @param str String to be transformed.
