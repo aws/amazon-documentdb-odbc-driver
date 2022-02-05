@@ -27,6 +27,7 @@ include(UseJava)
 include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS})
 include_directories(include)
 
+
 set(SOURCES src/app/application_data_buffer.cpp
         src/app/parameter.cpp
         src/app/parameter_set.cpp
@@ -193,4 +194,14 @@ install(TARGETS ${TARGET}
 
 if (WIN32 AND ${WITH_ODBC_MSI})
    install(FILES ${WIX_INSTALLER_PREFIX}.msi DESTINATION bin)
+endif()
+
+if (WIN32)
+    if (MSVC_VERSION GREATER_EQUAL 1900)
+        target_link_libraries(${TARGET} legacy_stdio_definitions odbccp32 shlwapi)
+    endif()
+elseif(APPLE)
+    target_link_libraries(${TARGET} iodbcinst)
+else()
+    target_link_libraries(${TARGET} odbcinst)
 endif()

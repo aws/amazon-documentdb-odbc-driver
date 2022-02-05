@@ -29,9 +29,9 @@ SSH host credentials
    3. Ensure to set the OPENSSL_ROOT_DIR.
 3. [WiX Installer (3.11)](https://wixtoolset.org/releases/)
    1. Ensure to add path to WiX executables (e.g. `C:\Program Files (x86)\WiX Toolset v3.11\bin`)
-4. Java **JDK** (version 8+ - 17 recommended)
-   1. Ensure to set `JAVA_HOME`. 
-   2. Ensure to save Java `\bin` and `\server` directories to the User `PATH` variable. 
+4. [Java](https://www.oracle.com/java/technologies/downloads/) **JDK** (version 8+ - 17 recommended)
+   1. Ensure to set `JAVA_HOME`. (e.g. C:\Program Files\Java\jdk-17.0.2)
+   2. Ensure to save Java `\bin` and `\server` directories to the User `PATH` variable. (e.g. C:\Program Files\Java\jdk1.8.0_321\jre\bin\server)
 5. Boost Test Framework 
    1. Install via [VCPKG](https://vcpkg.io/en/getting-started.html) using `.\vcpkg install openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows`
 6. Run one of the build scripts to create an initial compilation.
