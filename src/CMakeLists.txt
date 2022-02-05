@@ -93,6 +93,10 @@ if (${WITH_TESTS})
     if (EXISTS ${CMAKE_SOURCE_DIR}/core-test)
         add_subdirectory(core-test)
     endif()
+
+    if (EXISTS ${CMAKE_SOURCE_DIR}/tests)
+        add_subdirectory(tests)
+    endif()
 endif()
 
 if (${WITH_THIN_CLIENT} OR ${WITH_ODBC})
