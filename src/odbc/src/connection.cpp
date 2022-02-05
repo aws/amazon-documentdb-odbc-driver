@@ -235,6 +235,7 @@ namespace ignite
                     // TODO: Determine if we need to error check the close.
                 }
                 connection = nullptr;
+                mongoInstance = nullptr;
             }
             Deinit();
         }
@@ -650,8 +651,7 @@ namespace ignite
                 return connected;
             }
 
-            std::string mongoCPPConnectionString = FormatMongoCppConnectionString();
-            connected = ConnectCPPDocumentDB(mongoCPPConnectionString);
+            connected = ConnectCPPDocumentDB();
 
             return connected;
         }
@@ -806,30 +806,29 @@ namespace ignite
             return static_cast<int32_t>(uTimeout);
         }
 
-        bool Connection::ConnectCPPDocumentDB(std::string mongoConnectionString) 
+        bool Connection::ConnectCPPDocumentDB() 
         {
             using bsoncxx::builder::basic::kvp;
             using bsoncxx::builder::basic::make_document;
 
             if (mongoInstance == nullptr)
             {
-                //auto instance =
-                //    bsoncxx::stdx::make_unique< mongocxx::instance >();
-                //std::unique_ptr<mongocxx::instance> instance(new mongocxx::instance());
-                //mongoInstance = std::move(instance);
                 mongoInstance =  bsoncxx::stdx::make_unique<mongocxx::instance>();
             }
 
-            //mongocxx::instance instance{};  // This should be done only once. 
             try {
-                const auto uri = mongocxx::uri{mongoConnectionString};
+                std::string mongoCPPConnectionString =
+                    FormatMongoCppConnectionString();
+                const auto uri = mongocxx::uri{mongoCPPConnectionString};
                 mongocxx::options::client client_options;
                 mongocxx::options::tls tls_options;
 
+                //TO-DO Adapt to use certificates
                 tls_options.allow_invalid_certificates(true);
 
                 client_options.tls_opts(tls_options);
-                auto client1 = mongocxx::client{mongocxx::uri{mongoConnectionString}, client_options};
+                auto client1 = mongocxx::client{
+                    mongocxx::uri{mongoCPPConnectionString}, client_options};
 
                 std::string database = "test";
                 bsoncxx::builder::stream::document ping;
@@ -846,10 +845,7 @@ namespace ignite
                 // 1))); std::cout << bsoncxx::to_json(result) << std::endl;
 
                 return true;
-                //throw std::runtime_error("connection established");
             } catch (const std::exception& xcp) {
-                std::cout << "connection failed: " << xcp.what() << std::endl;
-                //throw std::runtime_error("connection failed");
                 return false;
             }
         

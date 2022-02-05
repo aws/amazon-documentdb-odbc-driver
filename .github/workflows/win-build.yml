@@ -26,8 +26,6 @@ env:
   DOC_DB_LOCAL_PORT: 27019
   DOC_DB_REMOTE_PORT: 27017
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
-  DOC_DB_CA: ${{secrets.DOC_DB_CA}}
-  DOC_DB_CA_FILE: ~/certs/CAFile.pem
   JDBC_DRIVER_VERSION: "1.1.0"
 
 jobs:
@@ -62,9 +60,6 @@ jobs:
         mkdir -p ~/certs
         echo "${{env.DOC_DB_KEYPAIR}}" > ~/certs/docdb-sshtunnel.pem
         chmod 400 ~/certs/docdb-sshtunnel.pem
-        echo "${{env.DOC_DB_CA}}" > ${{env.DOC_DB_CA_FILE}}
-        chmod 400 ${{env.DOC_DB_CA_FILE}}
-        Import-Certificate -FilePath ${{env.DOC_DB_CA_FILE}} -CertStoreLocation  cert:\LocalMachine\Root
         mkdir -p ~/.ssh
         copy ./src/odbc-test/config/ssh_config ~/.ssh/config
 
@@ -154,9 +149,6 @@ jobs:
         mkdir -p ~/certs
         echo "${{env.DOC_DB_KEYPAIR}}" > ~/certs/docdb-sshtunnel.pem
         chmod 400 ~/certs/docdb-sshtunnel.pem
-        echo "${{env.DOC_DB_CA}}" > ${{env.DOC_DB_CA_FILE}}
-        chmod 400 ${{env.DOC_DB_CA_FILE}}
-        Import-Certificate -FilePath ${{env.DOC_DB_CA_FILE}} -CertStoreLocation  cert:\LocalMachine\Root
         mkdir -p ~/.ssh
         copy ./src/odbc-test/config/ssh_config ~/.ssh/config
 

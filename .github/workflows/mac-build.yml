@@ -24,8 +24,6 @@ env:
   DOC_DB_LOCAL_PORT: 27019
   DOC_DB_REMOTE_PORT: 27017
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
-  DOC_DB_CA: ${{secrets.DOC_DB_CA}}
-  DOC_DB_CA_FILE: ~/certs/CAFile.pem
   JDBC_DRIVER_VERSION: "1.1.0"
 
 jobs:
@@ -54,8 +52,6 @@ jobs:
         mkdir ~/certs
         echo "${{env.DOC_DB_KEYPAIR}}" > ${{env.DOC_DB_PRIV_KEY_FILE}}
         chmod 400 ${{env.DOC_DB_PRIV_KEY_FILE}}
-        echo "${{env.DOC_DB_CA}}" > ${{env.DOC_DB_CA_FILE}}
-        chmod 404 ${{env.DOC_DB_CA_FILE}}
 
     - name: get-dependencies
       run: |
@@ -85,7 +81,6 @@ jobs:
     - name: run-tests
       run: |
         ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
-        ls ~/certs
         ./build/odbc/bin/ignite-odbc-tests
     # - name: upload-test-report
     #   if: failure()
