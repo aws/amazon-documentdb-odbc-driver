@@ -283,6 +283,33 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPortSshTunnelNotActive,
     connection = nullptr;
 }
 
+BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetMetaData) {
+    PrepareContext();
+
+    // get Driver manager connection
+    JniErrorInfo errInfo;
+    SharedPointer< GlobalJObject > connection;
+    bool success = _ctx.Get()->DriverManagerGetConnection(
+        _jdbcConnectionString.c_str(), connection, &errInfo);
+    if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+        BOOST_FAIL(errInfo.errMsg);
+    }
+    BOOST_REQUIRE(connection.Get());
+
+    // get metadata
+    SharedPointer< GlobalJObject > databaseMetaData;
+    if (!_ctx.Get()->ConnectionGetMetaData(connection, databaseMetaData,
+                                           &errInfo)) {
+        std::string errMsg = errInfo.errMsg;
+        _ctx.Get()->ConnectionClose(connection, &errInfo);
+        BOOST_FAIL(errMsg);
+    }
+    BOOST_REQUIRE(databaseMetaData.Get());
+
+    _ctx.Get()->ConnectionClose(connection, &errInfo);
+    connection = nullptr;
+}
+
 BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
     PrepareContext();
 
