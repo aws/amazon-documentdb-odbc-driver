@@ -2,16 +2,17 @@
 
 ## Development Environment
 
-### Environment Variables for Testing Accounts/Secrets
+### Environment Variables for Testing Accounts/Secrets 
+To enable the test environment to run the tests against a live DocumentDB system, set the following environment variables on your development machine.
 
-The enable the test environment to run the tests against a live DocumentDB system,
-set the follwoing environment variables
+DocumentDB cluster credentials
+1. `DOC_DB_HOST`=`<remote_documentdb_host>`(e.g.:`docdb-host.us-east-2.docdb.amazonaws.com`)
+2. `DOC_DB_PASSWORD`=`<documentdb_user_password>`
+3. `DOC_DB_USER_NAME`=`<documentdb_user_name>`
 
-1. `DOC_DB_HOST=<remote_documentdb_host>` (e.g.: `docdb-host.cluster-cjf6q8nxfefi.us-east-2.docdb.amazonaws.com`)
-2. `DOC_DB_PRIV_KEY_FILE=<path_to_ssh_host_private_key_file>` (e.g.: `~/.ssh/ssh_host.pem`)
-3. `DOC_DB_PASSWORD=<password>`
-4. `DOC_DB_USER=<ssh_user@ssh_host>` (e.g., ec2-user@3.139.97.218)
-5. `DOC_DB_USER_NAME=<user_name>`
+SSH host credentials 
+1. `DOC_DB_USER`=`<ssh_user>`(e.g.:`ec2-user@ec2-instance.us-east-2.compute.amazonaws.com`)
+2. `DOC_DB_PRIV_KEY_FILE`=`<path_to_ssh_host_private_key_file>`(e.g.:`~/.ssh/ssh_host.pem`)
 
 ### Windows
 
@@ -28,9 +29,9 @@ set the follwoing environment variables
    3. Ensure to set the OPENSSL_ROOT_DIR.
 3. [WiX Installer (3.11)](https://wixtoolset.org/releases/)
    1. Ensure to add path to WiX executables (e.g. `C:\Program Files (x86)\WiX Toolset v3.11\bin`)
-4. Java **JDK** (version 8+ - 17 recommended)
-   1. Ensure to set `JAVA_HOME`. 
-   2. Ensure to save Java `\bin` and `\server` directories to the User `PATH` variable. 
+4. [Java](https://www.oracle.com/java/technologies/downloads/) **JDK** (version 8+ - 17 recommended)
+   1. Ensure to set `JAVA_HOME`. (e.g. C:\Program Files\Java\jdk-17.0.2)
+   2. Ensure to save Java `\bin` and `\server` directories to the User `PATH` variable. (e.g. C:\Program Files\Java\jdk1.8.0_321\jre\bin\server)
 5. Boost Test Framework 
    1. Install via [VCPKG](https://vcpkg.io/en/getting-started.html) using `.\vcpkg install openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows`
 6. Run one of the build scripts to create an initial compilation.
