@@ -260,6 +260,7 @@ namespace ignite {
                   jclass c_DocumentDbConnection;
                   jmethodID m_DocumentDbConnectionGetSshLocalPort;
                   jmethodID m_DocumentDbConnectionIsSshTunnelActive;
+                  jmethodID m_DocumentDbConnectionGetDatabaseMetadata;
                   jmethodID m_DocumentDbConnectionInit;
                   jmethodID m_DocumentDbClose;
 
@@ -451,6 +452,7 @@ namespace ignite {
 
                   bool DocumentDbConnectionIsSshTunnelActive(const SharedPointer< GlobalJObject >& connection, bool& isActive, JniErrorInfo* errInfo);
                   bool DocumentDbConnectionGetSshLocalPort(const SharedPointer< GlobalJObject >& connection, int32_t& result, JniErrorInfo* errInfo);
+                  bool DocumentDbConnectionGetMetaData(const SharedPointer< GlobalJObject >& connection, SharedPointer< GlobalJObject >& metaData, JniErrorInfo* errInfo);
 
                   bool DatabaseMetaDataGetTables(const SharedPointer< GlobalJObject >& databaseMetaData, SharedPointer< GlobalJObject >& resultSet, JniErrorInfo* errInfo);
                   bool DatabaseMetaDataGetTables(

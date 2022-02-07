@@ -280,6 +280,8 @@ namespace ignite
                     JniMethod("getSshLocalPort", "()I", false);
                 JniMethod const M_DOCUMENTDB_CONNECTION_IS_SSH_TUNNEL_ACTIVE =
                     JniMethod("isSshTunnelActive", "()Z", false);
+                JniMethod const M_DOCUMENTDB_CONNECTION_GET_DATABASE_METADATA =
+                    JniMethod("getDatabaseMetadata", "()Lsoftware/amazon/documentdb/jdbc/metadata/DocumentDbDatabaseSchemaMetadata;", false); // TODO -AL- not done
 
                 const char* const C_DRIVERMANAGER = "java/sql/DriverManager";
                 JniMethod const M_DRIVERMANAGER_GET_CONNECTION = 
@@ -502,6 +504,7 @@ namespace ignite
                     //m_DocumentDbConnectionInit = FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_PROPERTIES_INIT);
                     m_DocumentDbConnectionGetSshLocalPort = FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_GET_SSH_LOCAL_PORT);
                     m_DocumentDbConnectionIsSshTunnelActive = FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_IS_SSH_TUNNEL_ACTIVE);
+                    m_DocumentDbConnectionGetDatabaseMetadata = FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_GET_DATABASE_METADATA);
 
                     c_DriverManager = FindClass(env, C_DRIVERMANAGER);
                     m_DriverManagerGetConnection = FindMethod(env, c_DriverManager, M_DRIVERMANAGER_GET_CONNECTION);
@@ -868,6 +871,32 @@ namespace ignite
                         connection.Get()->GetRef(),
                         jvm->GetMembers().m_DocumentDbConnectionGetSshLocalPort);
                     ExceptionCheck(env, errInfo);
+                    return errInfo->code == IGNITE_JNI_ERR_SUCCESS;
+                }
+
+                bool JniContext::DocumentDbConnectionGetMetaData(
+                    const SharedPointer< GlobalJObject >& connection,
+                    SharedPointer< GlobalJObject >& metaData,
+                    JniErrorInfo* errInfo) {
+                    if (!connection.Get()) {
+                        errInfo->code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo->errMsg = "Connection object must be set.";
+                        return false;
+                    }
+                    JNIEnv* env = Attach();
+                    jobject result = env->CallObjectMethod(
+                        connection.Get()->GetRef(),
+                        jvm->GetMembers().m_DocumentDbConnectionGetDatabaseMetadata);
+                    ExceptionCheck(env, errInfo);
+
+                    if (!result || errInfo->code != IGNITE_JNI_ERR_SUCCESS) {
+                        metaData =
+                            SharedPointer< GlobalJObject >(nullptr);
+                        return false;
+                    }
+
+                    metaData = SharedPointer< GlobalJObject >(
+                        new GlobalJObject(env, env->NewGlobalRef(result)));
                     return errInfo->code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
