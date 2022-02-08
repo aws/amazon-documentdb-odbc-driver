@@ -16,7 +16,7 @@
  */
 
 #ifdef _WIN32
-#   include <windows.h>
+#   include <Windows.h>
 #endif
 
 #include <sql.h>
@@ -39,14 +39,7 @@ using namespace boost::unit_test;
  */
 struct ConnectionTestSuiteFixture: odbc::OdbcTestSuite
 {
-    /**
-     * Constructor.
-     */
-    ConnectionTestSuiteFixture() :
-        OdbcTestSuite()
-    {
-        // No-op.
-    }
+    using odbc::OdbcTestSuite::OdbcTestSuite;
 
     /**
      * Execute the query and return an error code.
@@ -83,32 +76,10 @@ struct ConnectionTestSuiteFixture: odbc::OdbcTestSuite
         return code;
     }
 
-    static void SetConnectionString(std::string& connectionString,
-                                    const std::string& username = std::string()) {
-        // NOTE: Assuming we are using internal SSH tunnel
-        std::string user = common::GetEnv("DOC_DB_USER_NAME", "documentdb");
-        std::string password = common::GetEnv("DOC_DB_PASSWORD", "");
-        std::string host = common::GetEnv("DOC_DB_HOST", "");
-        std::string port = "27017";
-        if (!username.empty()) {
-            user = username;
-        }
-
-        connectionString =
-            "DRIVER={Apache Ignite};"
-            "HOSTNAME=" + host + ":" + port + ";"
-            "DATABASE=test;"
-            "USER=" + user + ";"
-            "PASSWORD=" + password + ";";
-    }
-
     /**
      * Destructor.
      */
-    ~ConnectionTestSuiteFixture()
-    {
-        // No-op.
-    }
+    ~ConnectionTestSuiteFixture() override = default;
 };
 
 
@@ -117,53 +88,19 @@ BOOST_FIXTURE_TEST_SUITE(ConnectionTestSuite, ConnectionTestSuiteFixture)
 BOOST_AUTO_TEST_CASE(TestConnectionRestore)
 {
     std::string connectionString;
-    SetConnectionString(connectionString);
+    CreateDsnConnectionString(connectionString);
 
     Connect(connectionString);
-    Disconnect();
-
-    // TODO: [AD-507] Re-enable when querying is supported.
-    // https://bitquill.atlassian.net/browse/AD-507
-
-    //// Check that query was successfully executed.
-    //BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "");
-
-    //// Query execution should throw ODBC error.
-    //BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "08S01");
-
-    //// Reusing a closed connection should not crash an application.
-    //BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "08001");
-
-    //// Check that connection was restored.
-    //BOOST_CHECK_EQUAL(ExecQueryAndReturnError(), "");
-
-}
-
-BOOST_AUTO_TEST_CASE(TestConnectionMemoryLeak)
-{
-    std::string connectionString;
-    SetConnectionString(connectionString);
-
-    Connect(connectionString);
-
-    // TODO: [AD-507] Re-enable when querying is supported.
-    // https://bitquill.atlassian.net/browse/AD-507
-    // ExecQuery("Select * from Test");
-
     Disconnect();
 }
 
 BOOST_AUTO_TEST_CASE(TestConnectionInvalidUser) {
     std::string connectionString;
-    SetConnectionString(connectionString, "invaliduser");
+    CreateDsnConnectionString(connectionString, "invaliduser");
 
     ExpectConnectionReject(connectionString, "08001: Failed to establish connection with the host.\n"
       "Invalid username or password or user is not authorized on database 'test'. "
       "Please check your settings. Authorization failed for user 'invaliduser' on database 'admin' with mechanism");
-
-    // TODO: [AD-507] Re-enable when querying is supported.
-    // https://bitquill.atlassian.net/browse/AD-507
-    // ExecQuery("Select * from Test");
 
     Disconnect();
 }
