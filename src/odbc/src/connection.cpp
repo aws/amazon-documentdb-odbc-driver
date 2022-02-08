@@ -218,7 +218,7 @@ namespace ignite
             if (connection.Get() != nullptr) {
                 SharedPointer< JniContext > ctx(JniContext::Create(&opts[0], static_cast<int>(opts.size()), JniHandlers()));
                 JniErrorInfo errInfo;
-                ctx.Get()->ConnectionClose(connection, &errInfo);
+                ctx.Get()->ConnectionClose(connection, errInfo);
                 if (errInfo.code != java::IGNITE_JNI_ERR_SUCCESS) {
                     // TODO: Determine if we need to error check the close.
                 }
@@ -618,7 +618,7 @@ namespace ignite
             if (ctx.Get() != nullptr) {
                 SharedPointer< GlobalJObject > result;
                 bool success = ctx.Get()->DriverManagerGetConnection(
-                    connectionString.c_str(), result, &errInfo);
+                    connectionString.c_str(), result, errInfo);
                 connected = (success && result.Get()
                              && errInfo.code == java::IGNITE_JNI_ERR_SUCCESS);
                 if (!connected) {

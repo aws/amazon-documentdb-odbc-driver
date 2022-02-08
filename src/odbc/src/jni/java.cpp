@@ -790,41 +790,41 @@ namespace ignite
                 bool JniContext::DriverManagerGetConnection(
                     const char* connectionString,
                     SharedPointer< GlobalJObject >& connection,
-                    JniErrorInfo* errInfo) {
+                    JniErrorInfo& errInfo) {
                     JNIEnv* env = Attach();
                     jstring jConnectionString = env->NewStringUTF(connectionString);
                     jobject result = env->CallStaticObjectMethod(
                         jvm->GetMembers().c_DriverManager,
                         jvm->GetMembers().m_DriverManagerGetConnection,
                         jConnectionString);
-                    ExceptionCheck(env, errInfo);
-                    if (!result) {
-                        connection = SharedPointer< GlobalJObject >(nullptr);
+                    ExceptionCheck(env, &errInfo);
+                    if (!result || errInfo.code != IGNITE_JNI_ERR_SUCCESS) {
+                        connection = nullptr;
                         return false;
                     }
                     connection = SharedPointer< GlobalJObject >(new GlobalJObject(env, env->NewGlobalRef(result)));
-                    return true;
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
-                void JniContext::ConnectionClose(const SharedPointer< GlobalJObject >& connection, JniErrorInfo* errInfo) {
+                void JniContext::ConnectionClose(const SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo) {
                     if (connection.Get() == nullptr) {
-                        errInfo->code = IGNITE_JNI_ERR_GENERIC;
-                        errInfo->errMsg = "Connection object must be set.";
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "Connection object must be set.";
                         return;
                     }
                     JNIEnv* env = Attach();
                     env->CallVoidMethod(connection.Get()->GetRef(),
                                         jvm->GetMembers().m_ConnectionClose);
-                    ExceptionCheck(env, errInfo);
+                    ExceptionCheck(env, &errInfo);
                 }
 
                 bool JniContext::ConnectionGetMetaData(
                     const SharedPointer< GlobalJObject >& connection,
                     SharedPointer< GlobalJObject >& databaseMetaData,
-                    JniErrorInfo* errInfo) {
+                    JniErrorInfo& errInfo) {
                     if (connection.Get() == nullptr) {
-                        errInfo->code = IGNITE_JNI_ERR_GENERIC;
-                        errInfo->errMsg = "Connection object must be set.";
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "Connection object must be set.";
                         return false;
                     }
 
@@ -832,16 +832,16 @@ namespace ignite
                     jobject result = env->CallObjectMethod(
                         connection.Get()->GetRef(),
                         jvm->GetMembers().m_ConnectionGetMetaData);
-                    ExceptionCheck(env, errInfo);
+                    ExceptionCheck(env, &errInfo);
 
-                    if (!result || errInfo->code != IGNITE_JNI_ERR_SUCCESS) {
-                        databaseMetaData = SharedPointer< GlobalJObject >(nullptr);
+                    if (!result || errInfo.code != IGNITE_JNI_ERR_SUCCESS) {
+                        databaseMetaData = nullptr;
                         return false;
                     }
 
                     databaseMetaData = SharedPointer< GlobalJObject >(
                         new GlobalJObject(env, env->NewGlobalRef(result)));
-                    return true;
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
                 bool JniContext::DatabaseMetaDataGetTables(
@@ -851,10 +851,10 @@ namespace ignite
                     const std::string& tableNamePattern,
                     const std::vector< std::string >& types,
                     SharedPointer< GlobalJObject >& resultSet,
-                    JniErrorInfo* errInfo) {
+                    JniErrorInfo& errInfo) {
                     if (databaseMetaData.Get() == nullptr) {
-                        errInfo->code = IGNITE_JNI_ERR_GENERIC;
-                        errInfo->errMsg = "DatabaseMetaData object must be set.";
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "DatabaseMetaData object must be set.";
                         return false;
                     }
 
@@ -876,24 +876,24 @@ namespace ignite
                         jSchemaPattern,
                         jTableNamePattern,
                         jTypes);
-                    ExceptionCheck(env, errInfo);
+                    ExceptionCheck(env, &errInfo);
 
-                    if (!result || errInfo->code != IGNITE_JNI_ERR_SUCCESS) {
+                    if (!result || errInfo.code != IGNITE_JNI_ERR_SUCCESS) {
                         resultSet = SharedPointer< GlobalJObject >(nullptr);
                         return false;
                     }
 
                     resultSet = SharedPointer< GlobalJObject >(
                         new GlobalJObject(env, env->NewGlobalRef(result)));
-                    return true;
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
                 bool JniContext::ResultSetNext(
                     const SharedPointer< GlobalJObject >& resultSet,
-                    bool& hasNext, JniErrorInfo* errInfo) {
+                    bool& hasNext, JniErrorInfo& errInfo) {
                     if (resultSet.Get() == nullptr) {
-                        errInfo->code = IGNITE_JNI_ERR_GENERIC;
-                        errInfo->errMsg = "ResultSet object must be set.";
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "ResultSet object must be set.";
                         return false;
                     }
 
@@ -901,20 +901,20 @@ namespace ignite
                     jboolean res = env->CallBooleanMethod(
                         resultSet.Get()->GetRef(),
                         jvm->GetMembers().m_ResultSetNext);
-                    ExceptionCheck(env, errInfo);
-                    if (errInfo->code == IGNITE_JNI_ERR_SUCCESS) {
+                    ExceptionCheck(env, &errInfo);
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
                         hasNext = res != JNI_FALSE;
                     }
-                    return errInfo->code == IGNITE_JNI_ERR_SUCCESS;
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
                 bool JniContext::ResultSetGetString(
                     const SharedPointer< GlobalJObject >& resultSet,
                     int columnIndex, std::string& value, bool& wasNull,
-                    JniErrorInfo* errInfo) {
+                    JniErrorInfo& errInfo) {
                     if (resultSet.Get() == nullptr) {
-                        errInfo->code = IGNITE_JNI_ERR_GENERIC;
-                        errInfo->errMsg = "ResultSet object must be set.";
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "ResultSet object must be set.";
                         return false;
                     }
 
@@ -923,9 +923,9 @@ namespace ignite
                         resultSet.Get()->GetRef(),
                         jvm->GetMembers().m_ResultSetGetStringByIndex,
                         columnIndex);
-                    ExceptionCheck(env, errInfo);
+                    ExceptionCheck(env, &errInfo);
 
-                    if (errInfo->code == IGNITE_JNI_ERR_SUCCESS) {
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
                         wasNull = !result;
                         if (result != nullptr) {
                             jboolean isCopy;
@@ -937,17 +937,17 @@ namespace ignite
                         }
                     }
 
-                    return errInfo->code == IGNITE_JNI_ERR_SUCCESS;
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
                 bool JniContext::ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet,
                                                     const std::string& columnName,
                                                     std::string& value,
                                                     bool& wasNull,
-                                                    JniErrorInfo* errInfo) {
+                                                    JniErrorInfo& errInfo) {
                     if (resultSet.Get() == nullptr) {
-                        errInfo->code = IGNITE_JNI_ERR_GENERIC;
-                        errInfo->errMsg = "ResultSet object must be set.";
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "ResultSet object must be set.";
                         return false;
                     }
 
@@ -957,9 +957,9 @@ namespace ignite
                         resultSet.Get()->GetRef(),
                         jvm->GetMembers().m_ResultSetGetStringByName,
                         jColumnName);
-                    ExceptionCheck(env, errInfo);
+                    ExceptionCheck(env, &errInfo);
 
-                    if (errInfo->code == IGNITE_JNI_ERR_SUCCESS) {
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
                         wasNull = !result;
                         if (result != nullptr) {
                             jboolean isCopy;
@@ -971,18 +971,18 @@ namespace ignite
                         }
                     }
 
-                    return errInfo->code == IGNITE_JNI_ERR_SUCCESS;
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
                 bool JniContext::ResultSetGetInteger(const SharedPointer< GlobalJObject >& resultSet,
                                                      int columnIndex,
                                                      int& value,
                                                      bool& wasNull,
-                                                     JniErrorInfo* errInfo) {
+                                                     JniErrorInfo& errInfo) {
 
                     if (resultSet.Get() == nullptr) {
-                        errInfo->code = IGNITE_JNI_ERR_GENERIC;
-                        errInfo->errMsg = "ResultSet object must be set.";
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "ResultSet object must be set.";
                         return false;
                     }
 
@@ -991,24 +991,24 @@ namespace ignite
                         resultSet.Get()->GetRef(),
                         jvm->GetMembers().m_ResultSetGetIntegerByIndex,
                         columnIndex);
-                    ExceptionCheck(env, errInfo);
+                    ExceptionCheck(env, &errInfo);
 
-                    if (errInfo->code == IGNITE_JNI_ERR_SUCCESS) {
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
                         value = result;
                         return ResultSetWasNull(resultSet, wasNull, errInfo);
                     }
 
-                    return errInfo->code == IGNITE_JNI_ERR_SUCCESS;
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
                 bool JniContext::ResultSetGetInteger(const SharedPointer< GlobalJObject >& resultSet,
                                                      const std::string& columnName,
                                                      int& value,
                                                      bool& wasNull,
-                                                     JniErrorInfo* errInfo) {
-                    if (resultSet.Get() != nullptr) {
-                        errInfo->code = IGNITE_JNI_ERR_GENERIC;
-                        errInfo->errMsg = "ResultSet object must be set.";
+                                                     JniErrorInfo& errInfo) {
+                    if (resultSet.Get() == nullptr) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "ResultSet object must be set.";
                         return false;
                     }
 
@@ -1018,20 +1018,20 @@ namespace ignite
                         resultSet.Get()->GetRef(),
                         jvm->GetMembers().m_ResultSetGetIntegerByName,
                         jColumnName);
-                    ExceptionCheck(env, errInfo);
-                    if (errInfo->code == IGNITE_JNI_ERR_SUCCESS) {
+                    ExceptionCheck(env, &errInfo);
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
                         value = result;
                         return ResultSetWasNull(resultSet, wasNull, errInfo);
                     }
-                    return errInfo->code == IGNITE_JNI_ERR_SUCCESS;
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
                 bool JniContext::ResultSetWasNull(const SharedPointer< GlobalJObject >& resultSet,
                                                   bool& value,
-                                                  JniErrorInfo* errInfo) {
+                                                  JniErrorInfo& errInfo) {
                     if (resultSet.Get() == nullptr) {
-                        errInfo->code = IGNITE_JNI_ERR_GENERIC;
-                        errInfo->errMsg = "ResultSet object must be set.";
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "ResultSet object must be set.";
                         return false;
                     }
 
@@ -1039,11 +1039,11 @@ namespace ignite
                     jboolean res = env->CallBooleanMethod(
                         resultSet.Get()->GetRef(),
                         jvm->GetMembers().m_ResultSetWasNull);
-                    ExceptionCheck(env, errInfo);
-                    if (errInfo->code == IGNITE_JNI_ERR_SUCCESS) {
+                    ExceptionCheck(env, &errInfo);
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
                         value = res != JNI_FALSE;
                     }
-                    return errInfo->code == IGNITE_JNI_ERR_SUCCESS;
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
                 int64_t JniContext::TargetInLongOutLong(jobject obj, int opType,
