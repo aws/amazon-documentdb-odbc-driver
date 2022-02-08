@@ -307,7 +307,8 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetMetaData) {
     BOOST_REQUIRE(databaseMetaData.Get());
 }
 
-BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetMetaData) {
+// steps: check not null, then check schema name -AL- draft comment
+BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseSchemaMetadataGetSchemaName) { 
     PrepareContext();
 
     // get Driver manager connection
@@ -321,6 +322,8 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetMetaData) {
     BOOST_REQUIRE(connection.Get());
 
     // get metadata
+}
+
 BOOST_AUTO_TEST_CASE(TestConnectionGetMetaData) {
     PrepareContext();
     BOOST_REQUIRE(_ctx.Get() != nullptr);
