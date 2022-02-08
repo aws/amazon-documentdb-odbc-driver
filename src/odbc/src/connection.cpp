@@ -39,6 +39,7 @@
 #include "ignite/odbc/jni/utils.h"
 #include "ignite/odbc/common/concurrent.h"
 #include "ignite/odbc/common/utils.h"
+#include "ignite/odbc/mongoInstance.h"
 
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
@@ -235,7 +236,6 @@ namespace ignite
                     // TODO: Determine if we need to error check the close.
                 }
                 connection = nullptr;
-                mongoInstance = nullptr;
             }
             Deinit();
         }
@@ -807,15 +807,11 @@ namespace ignite
         }
 
         bool Connection::ConnectCPPDocumentDB() 
-        {
+        {           
             using bsoncxx::builder::basic::kvp;
             using bsoncxx::builder::basic::make_document;
 
-            if (mongoInstance == nullptr)
-            {
-                mongoInstance =  bsoncxx::stdx::make_unique<mongocxx::instance>();
-            }
-
+            MongoInstance::instance().initializeInstance();
             try {
                 std::string mongoCPPConnectionString =
                     FormatMongoCppConnectionString();
@@ -848,8 +844,8 @@ namespace ignite
             } catch (const std::exception& xcp) {
                 return false;
             }
+            
         
         }
     }
 }
-

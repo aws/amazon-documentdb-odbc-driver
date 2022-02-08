@@ -114,7 +114,7 @@ struct ConnectionTestSuiteFixture: odbc::OdbcTestSuite
 
 BOOST_FIXTURE_TEST_SUITE(ConnectionTestSuite, ConnectionTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestConnection)
+BOOST_AUTO_TEST_CASE(TestConnectionRestore)
 {
     std::string connectionString;
     SetConnectionString(connectionString);
