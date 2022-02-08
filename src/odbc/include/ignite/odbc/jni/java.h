@@ -446,12 +446,12 @@ namespace ignite {
                   static void SetConsoleHandler(ConsoleWriteHandler consoleHandler);
                   static int RemoveConsoleHandler(ConsoleWriteHandler consoleHandler);
 
-                  bool DocumentDbConnectionIsSshTunnelActive(const SharedPointer< GlobalJObject >& connection, bool& isActive, JniErrorInfo* errInfo);
-                  bool DocumentDbConnectionGetSshLocalPort(const SharedPointer< GlobalJObject >& connection, int32_t& result, JniErrorInfo* errInfo);
-
                   bool DriverManagerGetConnection(const char* connectionString, SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo);
                   void ConnectionClose(const SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo);
                   bool ConnectionGetMetaData(const SharedPointer< GlobalJObject >& connection, SharedPointer< GlobalJObject>& databaseMetaData, JniErrorInfo& errInfo);
+
+                  bool DocumentDbConnectionIsSshTunnelActive(const SharedPointer< GlobalJObject >& connection, bool& isActive, JniErrorInfo& errInfo);
+                  bool DocumentDbConnectionGetSshLocalPort(const SharedPointer< GlobalJObject >& connection, int32_t& result, JniErrorInfo& errInfo);
 
                   bool DatabaseMetaDataGetTables(
                       const SharedPointer< GlobalJObject >& databaseMetaData,

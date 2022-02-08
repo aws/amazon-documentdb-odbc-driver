@@ -832,39 +832,39 @@ namespace ignite
                 bool JniContext::DocumentDbConnectionIsSshTunnelActive(
                     const SharedPointer< GlobalJObject >& connection,
                     bool& isActive,
-                    JniErrorInfo* errInfo) {
+                    JniErrorInfo& errInfo) {
                     if (!connection.Get()) {
-                        errInfo->code = IGNITE_JNI_ERR_GENERIC;
-                        errInfo->errMsg = "Connection object must be set.";
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "Connection object must be set.";
                         return false;
                     }
                     JNIEnv* env = Attach();
                     jboolean res = env->CallBooleanMethod(
                         connection.Get()->GetRef(),
                         jvm->GetMembers().m_DocumentDbConnectionIsSshTunnelActive);
-                    ExceptionCheck(env, errInfo);
-                    if (errInfo->code == IGNITE_JNI_ERR_SUCCESS) {
+                    ExceptionCheck(env, &errInfo);
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
                         isActive = res != JNI_FALSE;
                     }
-                    return errInfo->code == IGNITE_JNI_ERR_SUCCESS;
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
                 bool JniContext::DocumentDbConnectionGetSshLocalPort(
                     const SharedPointer< GlobalJObject >& connection,
                     int32_t& result,
-                    JniErrorInfo* errInfo) {
+                    JniErrorInfo& errInfo) {
                     if (!connection.Get()) {
-                        errInfo->code = IGNITE_JNI_ERR_GENERIC;
-                        errInfo->errMsg = "Connection object must be set.";
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "Connection object must be set.";
                         return false;
                     }
                     JNIEnv* env = Attach();
                     result = env->CallIntMethod(
                         connection.Get()->GetRef(),
                         jvm->GetMembers().m_DocumentDbConnectionGetSshLocalPort);
-                    ExceptionCheck(env, errInfo);
-                    return errInfo->code == IGNITE_JNI_ERR_SUCCESS;
-                }                
+                    ExceptionCheck(env, &errInfo);
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
 
                 bool JniContext::ConnectionGetMetaData(
                     const SharedPointer< GlobalJObject >& connection,
