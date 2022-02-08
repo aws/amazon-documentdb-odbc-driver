@@ -28,6 +28,7 @@
 #include <boost/test/unit_test.hpp>
 #include <ignite/odbc/jni/java.h>
 #include <ignite/odbc/jni/utils.h>
+#include <ignite/odbc/common/common.h>
 #include <ignite/odbc/common/concurrent.h>
 #include <ignite/odbc/config/connection_string_parser.h>
 #include <ignite/odbc/connection.h>
@@ -142,50 +143,70 @@ struct JavaTestSuiteFixture: odbc::OdbcTestSuite
     SharedPointer< JniContext > _ctx;
 };
 
+struct AutoCloseConnection {
+   public:
+    AutoCloseConnection(SharedPointer< JniContext > ctx,
+                        SharedPointer< GlobalJObject > connection)
+        : _ctx(ctx), _connection(connection) {
+    }
+
+    ~AutoCloseConnection() {
+        if (_ctx.Get() != nullptr && _connection.Get() != nullptr) {
+            JniErrorInfo errInfo;
+            _ctx.Get()->ConnectionClose(_connection, errInfo);
+        }
+        _connection = nullptr;
+        _ctx = nullptr;
+    }
+
+   private:
+    SharedPointer< JniContext > _ctx;
+    SharedPointer< GlobalJObject > _connection;
+    IGNITE_NO_COPY_ASSIGNMENT(AutoCloseConnection);
+};
+
+struct AutoCloseResultSet {
+   public:
+    AutoCloseResultSet(SharedPointer< JniContext > ctx,
+                        SharedPointer< GlobalJObject > resultSet)
+        : _ctx(ctx), _resultSet(resultSet) {
+    }
+
+    ~AutoCloseResultSet() {
+        if (_ctx.Get() != nullptr && _resultSet.Get() != nullptr) {
+            JniErrorInfo errInfo;
+            _ctx.Get()->ResultSetClose(_resultSet, errInfo);
+        }
+        _resultSet = nullptr;
+        _ctx = nullptr;
+    }
+
+   private:
+    SharedPointer< JniContext > _ctx;
+    SharedPointer< GlobalJObject > _resultSet;
+    IGNITE_NO_COPY_ASSIGNMENT(AutoCloseResultSet);
+};
 
 BOOST_FIXTURE_TEST_SUITE(JavaTestSuite, JavaTestSuiteFixture)
 
 BOOST_AUTO_TEST_CASE(TestDriverManagerGetConnection)
 {
     PrepareContext();
+    BOOST_REQUIRE(_ctx.Get() != nullptr);
 
     JniErrorInfo errInfo;
     SharedPointer< GlobalJObject > connection;
-    bool success = _ctx.Get()->DriverManagerGetConnection(_jdbcConnectionString.c_str(), connection, &errInfo);
+    bool success = _ctx.Get()->DriverManagerGetConnection(_jdbcConnectionString.c_str(), connection, errInfo);
     if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
         BOOST_FAIL(errInfo.errMsg);
     }
-    BOOST_REQUIRE(connection.Get());
+    BOOST_REQUIRE(connection.Get() != nullptr);
 
-    _ctx.Get()->ConnectionClose(connection, &errInfo);
-    connection = nullptr;
+    _ctx.Get()->ConnectionClose(connection, errInfo);
+    connection = SharedPointer< GlobalJObject >(nullptr);
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionGetMetaData) {
-    PrepareContext();
-
-    JniErrorInfo errInfo;
-    SharedPointer< GlobalJObject > connection;
-    bool success = _ctx.Get()->DriverManagerGetConnection(
-        _jdbcConnectionString.c_str(), connection, &errInfo);
-    if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
-        BOOST_FAIL(errInfo.errMsg);
-    }
-    BOOST_REQUIRE(connection.Get());
-
-    SharedPointer< GlobalJObject > databaseMetaData;
-    if (!_ctx.Get()->ConnectionGetMetaData(connection, databaseMetaData,
-                                           &errInfo)) {
-        std::string errMsg = errInfo.errMsg;
-        _ctx.Get()->ConnectionClose(connection, &errInfo);
-        BOOST_FAIL(errMsg);
-    }
-    BOOST_REQUIRE(databaseMetaData.Get());
-
-    _ctx.Get()->ConnectionClose(connection, &errInfo);
-    connection = nullptr;
-}
-
+// TODO change and add calls to AutoConnectionClose -AL-
 BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPort) {
     PrepareContext();
 
@@ -283,22 +304,46 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPortSshTunnelNotActive,
     connection = nullptr;
 }
 
-BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
+BOOST_AUTO_TEST_CASE(TestConnectionGetMetaData) {
     PrepareContext();
+    BOOST_REQUIRE(_ctx.Get() != nullptr);
 
     JniErrorInfo errInfo;
     SharedPointer< GlobalJObject > connection;
     bool success = _ctx.Get()->DriverManagerGetConnection(
-        _jdbcConnectionString.c_str(), connection, &errInfo);
+        _jdbcConnectionString.c_str(), connection, errInfo);
+    if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+        BOOST_FAIL(errInfo.errMsg);
+    }
+    BOOST_REQUIRE(connection.Get() != nullptr);
+    AutoCloseConnection autoCloseConnection(_ctx, connection);
+
+    SharedPointer< GlobalJObject > databaseMetaData;
+    if (!_ctx.Get()->ConnectionGetMetaData(connection, databaseMetaData,
+                                           errInfo)) {
+        std::string errMsg = errInfo.errMsg;
+        BOOST_FAIL(errMsg);
+    }
+    BOOST_REQUIRE(databaseMetaData.Get() != nullptr);
+}
+
+BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
+    PrepareContext();
+    BOOST_REQUIRE(_ctx.Get() != nullptr);
+
+    JniErrorInfo errInfo;
+    SharedPointer< GlobalJObject > connection;
+    bool success = _ctx.Get()->DriverManagerGetConnection(
+        _jdbcConnectionString.c_str(), connection, errInfo);
     if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
         BOOST_FAIL(errInfo.errMsg);
     }
     BOOST_REQUIRE(connection.Get());
+    AutoCloseConnection autoCloseConnection(_ctx, connection);
 
     SharedPointer< GlobalJObject > databaseMetaData;
-    if (!_ctx.Get()->ConnectionGetMetaData(connection, databaseMetaData, &errInfo)) {
+    if (!_ctx.Get()->ConnectionGetMetaData(connection, databaseMetaData, errInfo)) {
         std::string errMsg = errInfo.errMsg;
-        _ctx.Get()->ConnectionClose(connection, &errInfo);
         BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(databaseMetaData.Get());
@@ -310,45 +355,101 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
     SharedPointer< GlobalJObject > resultSet;
     if (!_ctx.Get()->DatabaseMetaDataGetTables(databaseMetaData, catalog,
                                                schemaPattern, tableNamePattern,
-                                               types, resultSet, &errInfo)) {
+                                               types, resultSet, errInfo)) {
         std::string errMsg = errInfo.errMsg;
-        _ctx.Get()->ConnectionClose(connection, &errInfo);
         BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(resultSet.Get());
+    AutoCloseResultSet autoCloseResultSet(_ctx, resultSet);
 
+    // Get first
     bool hasNext;
-    if (!_ctx.Get()->ResultSetNext(resultSet, hasNext, &errInfo)) {
+    if (!_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)) {
         std::string errMsg = errInfo.errMsg;
-        _ctx.Get()->ConnectionClose(connection, &errInfo);
         BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(hasNext);
 
-    bool wasNull;
-    std::string value;
-    // TABLE_SCHEM (i.e., database)
-    if (!_ctx.Get()->ResultSetGetString(resultSet, 2, value, wasNull,
-                                        &errInfo)) {
-        std::string errMsg = errInfo.errMsg;
-        _ctx.Get()->ConnectionClose(connection, &errInfo);
-        BOOST_FAIL(errMsg);
-    }
-    BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value == "test");
+    while (hasNext) {
 
-    // TABLE_NAME
-    if (!_ctx.Get()->ResultSetGetString(resultSet, 3, value, wasNull,
-                                        &errInfo)) {
-        std::string errMsg = errInfo.errMsg;
-        _ctx.Get()->ConnectionClose(connection, &errInfo);
-        BOOST_FAIL(errMsg);
-    }
-    BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value.size() > 0);
+        bool wasNull;
+        std::string value;
+        // TABLE_CAT (i.e., catalog - always NULL in our case)
+        if (!_ctx.Get()->ResultSetGetString(resultSet, 1, value, wasNull,
+                                            errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(wasNull);
 
-    _ctx.Get()->ConnectionClose(connection, &errInfo);
-    connection = nullptr;
+        // TABLE_CAT (i.e., catalog - always NULL in our case)
+        if (!_ctx.Get()->ResultSetGetString(resultSet, "TABLE_CAT", value, wasNull,
+                                            errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(wasNull);
+
+        // TABLE_SCHEM (i.e., database)
+        if (!_ctx.Get()->ResultSetGetString(resultSet, 2, value, wasNull,
+                                            errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(!wasNull);
+        BOOST_REQUIRE(value == "test");
+
+        // TABLE_SCHEM (i.e., database)
+        if (!_ctx.Get()->ResultSetGetString(resultSet, "TABLE_SCHEM", value, wasNull,
+                                            errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(!wasNull);
+        BOOST_REQUIRE(value == "test");
+
+        // TABLE_NAME
+        if (!_ctx.Get()->ResultSetGetString(resultSet, 3, value, wasNull,
+                                            errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(!wasNull);
+        BOOST_REQUIRE(value.size() > 0);
+
+        // TABLE_NAME
+        if (!_ctx.Get()->ResultSetGetString(resultSet, "TABLE_NAME", value, wasNull,
+                                            errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(!wasNull);
+        BOOST_REQUIRE(value.size() > 0);
+
+        // TABLE_TYPE
+        if (!_ctx.Get()->ResultSetGetString(resultSet, 4, value, wasNull,
+                                            errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(!wasNull);
+        BOOST_REQUIRE(value == "TABLE");
+
+        // TABLE_TYPE
+        if (!_ctx.Get()->ResultSetGetString(resultSet, "TABLE_TYPE", value, wasNull,
+                                            errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(!wasNull);
+        BOOST_REQUIRE(value == "TABLE");
+
+        // Get next
+        if (!_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            BOOST_FAIL(errMsg);
+        }
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
