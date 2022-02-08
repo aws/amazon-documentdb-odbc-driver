@@ -132,7 +132,7 @@ namespace ignite
             {
                 // Releasing statement handle.
                 SQLFreeHandle(SQL_HANDLE_STMT, stmt);
-                stmt = NULL;
+                stmt = nullptr;
             }
 
             if (dbc)
@@ -142,7 +142,7 @@ namespace ignite
 
                 // Releasing allocated handles.
                 SQLFreeHandle(SQL_HANDLE_DBC, dbc);
-                dbc = NULL;
+                dbc = nullptr;
             }
         }
 
@@ -221,7 +221,7 @@ namespace ignite
 
         float OdbcTestSuite::GetTestFloatField(int64_t idx)
         {
-            return static_cast<float>(idx * 0.5f);
+            return static_cast<float>(idx) * 0.5f;
         }
 
         void OdbcTestSuite::CheckTestFloatValue(int idx, float value)
@@ -232,7 +232,7 @@ namespace ignite
 
         double OdbcTestSuite::GetTestDoubleField(int64_t idx)
         {
-            return static_cast<double>(idx * 0.25f);
+            return static_cast<double>(idx) * 0.25f;
         }
 
         void OdbcTestSuite::CheckTestDoubleValue(int idx, double value)
@@ -243,7 +243,7 @@ namespace ignite
 
         bool OdbcTestSuite::GetTestBoolField(int64_t idx)
         {
-            return static_cast<bool>(idx % 2 == 0);
+            return ((idx % 2) == 0);
         }
 
         void OdbcTestSuite::CheckTestBoolValue(int idx, bool value)
@@ -420,7 +420,7 @@ namespace ignite
             // Inserting values.
             for (SQLSMALLINT i = 0; i < recordsNum; ++i)
             {
-                key = i + 1;
+                key = static_cast<int64_t>(i) + 1;
                 std::string val = GetTestString(i);
 
                 CopyStringToBuffer(strField, val, sizeof(strField));
@@ -787,5 +787,27 @@ namespace ignite
 
             BOOST_CHECK_EQUAL(recordsNum, selectedRecordsNum);
         }
+
+        void OdbcTestSuite::CreateDsnConnectionString(std::string& connectionString,
+            const std::string& username) const {
+            // NOTE: Assuming we are using internal SSH tunnel
+            std::string user = common::GetEnv("DOC_DB_USER_NAME", "documentdb");
+            std::string password = common::GetEnv("DOC_DB_PASSWORD", "");
+            std::string host = common::GetEnv("DOC_DB_HOST", "");
+            std::string port = "27017";
+            if (!username.empty()) {
+                user = username;
+            }
+
+            connectionString =
+            "DRIVER={Apache Ignite};"
+            "HOSTNAME=" + host + ";"
+            "PORT=" + port + ";"
+            "DATABASE=test;"
+            "USER=" + user + ";"
+            "PASSWORD=" + password + ";";
+        }
+
+
     }
 }
