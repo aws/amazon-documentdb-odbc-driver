@@ -307,21 +307,39 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetMetaData) {
     BOOST_REQUIRE(databaseMetaData.Get());
 }
 
-// steps: check not null, then check schema name -AL- draft comment
 BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseSchemaMetadataGetSchemaName) { 
     PrepareContext();
+    BOOST_REQUIRE(_ctx.Get() != nullptr);
 
     // get Driver manager connection
     JniErrorInfo errInfo;
     SharedPointer< GlobalJObject > connection;
     bool success = _ctx.Get()->DriverManagerGetConnection(
-        _jdbcConnectionString.c_str(), connection, &errInfo);
+        _jdbcConnectionString.c_str(), connection, errInfo);
     if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
         BOOST_FAIL(errInfo.errMsg);
     }
     BOOST_REQUIRE(connection.Get());
+    AutoCloseConnection autoCloseConnection(_ctx, connection);
 
     // get metadata
+    SharedPointer< GlobalJObject > databaseMetaData;
+    if (!_ctx.Get()->DocumentDbConnectionGetMetaData(
+            connection, databaseMetaData, errInfo)) {
+        BOOST_FAIL(errInfo.errMsg);
+    }
+    BOOST_REQUIRE(databaseMetaData.Get());
+
+    std::string schemaName;
+    bool wasNull;
+    success = _ctx.Get()->DocumentDbDatabaseSchemaMetadataGetSchemaName(
+        databaseMetaData, schemaName, wasNull, errInfo); 
+    if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+        BOOST_FAIL(errInfo.errMsg);
+    }
+
+    BOOST_CHECK(!wasNull);
+    BOOST_CHECK_EQUAL(schemaName, "_default");
 }
 
 BOOST_AUTO_TEST_CASE(TestConnectionGetMetaData) {
