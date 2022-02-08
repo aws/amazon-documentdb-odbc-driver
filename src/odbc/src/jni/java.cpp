@@ -247,7 +247,10 @@ namespace ignite
                             true);
 
                 const char* const C_RECORD_SET = "java/sql/ResultSet";
-                JniMethod const M_RECORD_SET_NEXT = JniMethod("next", "()Z", false);
+                JniMethod const M_RECORD_SET_CLOSE =
+                    JniMethod("close", "()V", false);
+                JniMethod const M_RECORD_SET_NEXT =
+                    JniMethod("next", "()Z", false);
                 JniMethod const M_RECORD_SET_GET_STRING_BY_INDEX =
                     JniMethod(
                         "getString",
@@ -489,6 +492,7 @@ namespace ignite
                     m_DriverManagerGetConnection = FindMethod(env, c_DriverManager, M_DRIVERMANAGER_GET_CONNECTION);
 
                     c_ResultSet = FindClass(env, C_RECORD_SET);
+                    m_ResultSetClose = FindMethod(env, c_ResultSet, M_RECORD_SET_CLOSE);
                     m_ResultSetNext = FindMethod(env, c_ResultSet, M_RECORD_SET_NEXT);
                     m_ResultSetGetStringByIndex = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_STRING_BY_INDEX);
                     m_ResultSetGetStringByName = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_STRING_BY_NAME);
@@ -885,6 +889,23 @@ namespace ignite
 
                     resultSet = SharedPointer< GlobalJObject >(
                         new GlobalJObject(env, env->NewGlobalRef(result)));
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
+
+                bool JniContext::ResultSetClose(
+                    const SharedPointer< GlobalJObject >& resultSet,
+                    JniErrorInfo& errInfo) {
+                    if (resultSet.Get() == nullptr) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "ResultSet object must be set.";
+                        return false;
+                    }
+
+                    JNIEnv* env = Attach();
+                    env->CallVoidMethod(
+                        resultSet.Get()->GetRef(),
+                        jvm->GetMembers().m_ResultSetClose);
+                    ExceptionCheck(env, &errInfo);
                     return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 

@@ -165,6 +165,27 @@ struct AutoCloseConnection {
     IGNITE_NO_COPY_ASSIGNMENT(AutoCloseConnection);
 };
 
+struct AutoCloseResultSet {
+   public:
+    AutoCloseResultSet(SharedPointer< JniContext > ctx,
+                        SharedPointer< GlobalJObject > resultSet)
+        : _ctx(ctx), _resultSet(resultSet) {
+    }
+
+    ~AutoCloseResultSet() {
+        if (_ctx.Get() != nullptr && _resultSet.Get() != nullptr) {
+            JniErrorInfo errInfo;
+            _ctx.Get()->ResultSetClose(_resultSet, errInfo);
+        }
+        _resultSet = nullptr;
+        _ctx = nullptr;
+    }
+
+   private:
+    SharedPointer< JniContext > _ctx;
+    SharedPointer< GlobalJObject > _resultSet;
+    IGNITE_NO_COPY_ASSIGNMENT(AutoCloseResultSet);
+};
 
 BOOST_FIXTURE_TEST_SUITE(JavaTestSuite, JavaTestSuiteFixture)
 
@@ -203,13 +224,9 @@ BOOST_AUTO_TEST_CASE(TestConnectionGetMetaData) {
     if (!_ctx.Get()->ConnectionGetMetaData(connection, databaseMetaData,
                                            errInfo)) {
         std::string errMsg = errInfo.errMsg;
-        _ctx.Get()->ConnectionClose(connection, errInfo);
         BOOST_FAIL(errMsg);
     }
-    if (databaseMetaData.Get() == nullptr) {
-        _ctx.Get()->ConnectionClose(connection, errInfo);
-        BOOST_REQUIRE(databaseMetaData.Get() != nullptr);
-    }
+    BOOST_REQUIRE(databaseMetaData.Get() != nullptr);
 }
 
 BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
@@ -245,6 +262,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
         BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(resultSet.Get());
+    AutoCloseResultSet autoCloseResultSet(_ctx, resultSet);
 
     // Get first
     bool hasNext;

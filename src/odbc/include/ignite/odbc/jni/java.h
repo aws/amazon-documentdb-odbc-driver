@@ -269,6 +269,7 @@ namespace ignite {
                   jmethodID m_ConnectionGetMetaData;
 
                   jclass c_ResultSet;
+                  jmethodID m_ResultSetClose;
                   jmethodID m_ResultSetNext;
                   jmethodID m_ResultSetGetStringByIndex;
                   jmethodID m_ResultSetGetIntegerByIndex;
@@ -456,8 +457,8 @@ namespace ignite {
                       SharedPointer< GlobalJObject >& resultSet,
                       JniErrorInfo& errInfo);
 
-                  bool ResultSetNext(const SharedPointer< GlobalJObject >& resultSet, bool& hasNext,
-                                     JniErrorInfo& errInfo);
+                  bool ResultSetClose(const SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo);
+                  bool ResultSetNext(const SharedPointer< GlobalJObject >& resultSet, bool& hasNext, JniErrorInfo& errInfo);
                   bool ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, std::string& value, bool& wasNull, JniErrorInfo& errInfo);
                   bool ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, std::string& value, bool& wasNull, JniErrorInfo& errInfo);
                   bool ResultSetGetInteger(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, int& value, bool& wasNull, JniErrorInfo& errInfo);
