@@ -864,8 +864,8 @@ namespace ignite
                     result = env->CallIntMethod(
                         connection.Get()->GetRef(),
                         jvm->GetMembers().m_DocumentDbConnectionGetSshLocalPort);
-                    ExceptionCheck(env, errInfo);
-                    return errInfo->code == IGNITE_JNI_ERR_SUCCESS;
+                    ExceptionCheck(env, &errInfo);
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
                 bool JniContext::DocumentDbConnectionGetMetaData(
