@@ -93,7 +93,6 @@ set(SOURCES
          ../odbc/src/result_page.cpp
          ../odbc/src/row.cpp
          ../odbc/src/scan_method.cpp
-         ../odbc/src/ssl_mode.cpp
          ../odbc/src/statement.cpp
          ../odbc/src/streaming/streaming_batch.cpp
          ../odbc/src/streaming/streaming_context.cpp

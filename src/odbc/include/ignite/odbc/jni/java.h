@@ -272,6 +272,7 @@ namespace ignite {
                   jmethodID m_ConnectionGetMetaData;
 
                   jclass c_ResultSet;
+                  jmethodID m_ResultSetClose;
                   jmethodID m_ResultSetNext;
                   jmethodID m_ResultSetGetStringByIndex;
                   jmethodID m_ResultSetGetIntegerByIndex;
@@ -446,15 +447,14 @@ namespace ignite {
                   static void SetConsoleHandler(ConsoleWriteHandler consoleHandler);
                   static int RemoveConsoleHandler(ConsoleWriteHandler consoleHandler);
 
-                  bool DriverManagerGetConnection(const char* connectionString, SharedPointer< GlobalJObject >& connection, JniErrorInfo* errInfo);
-                  void ConnectionClose(const SharedPointer< GlobalJObject >& connection, JniErrorInfo* errInfo);
-                  bool ConnectionGetMetaData(const SharedPointer< GlobalJObject >& connection, SharedPointer< GlobalJObject>& databaseMetaData, JniErrorInfo* errInfo);
+                  bool DriverManagerGetConnection(const char* connectionString, SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo);
+                  void ConnectionClose(const SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo);
+                  bool ConnectionGetMetaData(const SharedPointer< GlobalJObject >& connection, SharedPointer< GlobalJObject>& databaseMetaData, JniErrorInfo& errInfo);
 
-                  bool DocumentDbConnectionIsSshTunnelActive(const SharedPointer< GlobalJObject >& connection, bool& isActive, JniErrorInfo* errInfo);
-                  bool DocumentDbConnectionGetSshLocalPort(const SharedPointer< GlobalJObject >& connection, int32_t& result, JniErrorInfo* errInfo);
+                  bool DocumentDbConnectionIsSshTunnelActive(const SharedPointer< GlobalJObject >& connection, bool& isActive, JniErrorInfo& errInfo);
+                  bool DocumentDbConnectionGetSshLocalPort(const SharedPointer< GlobalJObject >& connection, int32_t& result, JniErrorInfo& errInfo);
                   bool DocumentDbConnectionGetMetaData(const SharedPointer< GlobalJObject >& connection, SharedPointer< GlobalJObject >& metaData, JniErrorInfo* errInfo);
 
-                  bool DatabaseMetaDataGetTables(const SharedPointer< GlobalJObject >& databaseMetaData, SharedPointer< GlobalJObject >& resultSet, JniErrorInfo* errInfo);
                   bool DatabaseMetaDataGetTables(
                       const SharedPointer< GlobalJObject >& databaseMetaData,
                       const std::string& catalog,
@@ -462,15 +462,15 @@ namespace ignite {
                       const std::string& tableNamePattern,
                       const std::vector< std::string >& types,
                       SharedPointer< GlobalJObject >& resultSet,
-                      JniErrorInfo* errInfo);
+                      JniErrorInfo& errInfo);
 
-                  bool ResultSetNext(const SharedPointer< GlobalJObject >& resultSet, bool& hasNext,
-                                     JniErrorInfo* errInfo);
-                  bool ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, std::string& value, bool& wasNull, JniErrorInfo* errInfo);
-                  bool ResultSetGetString(const jobject resultSet, const std::string& columnName, std::string& value, bool& wasNull, JniErrorInfo* errInfo);
-                  bool ResultSetGetInteger(const jobject resultSet, int columnIndex, int& value, bool& wasNull, JniErrorInfo* errInfo);
-                  bool ResultSetGetInteger(const jobject resultSet, const std::string& columnName, int& value, bool& wasNull, JniErrorInfo* errInfo);
-                  bool ResultSetWasNull(const jobject resultSet, bool& value, JniErrorInfo* errInfo);
+                  bool ResultSetClose(const SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo);
+                  bool ResultSetNext(const SharedPointer< GlobalJObject >& resultSet, bool& hasNext, JniErrorInfo& errInfo);
+                  bool ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, std::string& value, bool& wasNull, JniErrorInfo& errInfo);
+                  bool ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, std::string& value, bool& wasNull, JniErrorInfo& errInfo);
+                  bool ResultSetGetInteger(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, int& value, bool& wasNull, JniErrorInfo& errInfo);
+                  bool ResultSetGetInteger(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, int& value, bool& wasNull,JniErrorInfo& errInfo);
+                  bool ResultSetWasNull(const SharedPointer< GlobalJObject >& resultSet, bool& value, JniErrorInfo& errInfo);
 
                   int64_t TargetInLongOutLong(jobject obj, int type, int64_t memPtr,
                                               JniErrorInfo* errInfo = NULL);
