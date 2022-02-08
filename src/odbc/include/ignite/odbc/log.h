@@ -25,12 +25,12 @@
 #include "ignite/odbc/common/common.h"
 #include "ignite/odbc/common/concurrent.h"
 
-#   define LOG_MSG(param)                                      \
-    if (ignite::odbc::Logger* p = ignite::odbc::Logger::Get()) \
-    {                                                          \
-        ignite::odbc::LogStream lstream(p);                    \
-        lstream << __FUNCTION__ << ": " << param;              \
-    }
+#define LOG_MSG(param)                                           \
+    if (ignite::odbc::Logger* p = ignite::odbc::Logger::Get()) { \
+        ignite::odbc::LogStream lstream(p);                      \
+        lstream << __FUNCTION__ << ": " << param;                \
+    }                                                            \
+    static_assert(true, "")                                      \
 
 namespace ignite
 {

@@ -23,11 +23,13 @@
 #include <algorithm>
 #include <stdexcept>
 
+#include <ignite/odbc/common/common.h>
 #include <ignite/odbc/ignite_error.h>
+#include <ignite/odbc/common/utils.h>
 #include <ignite/odbc/jni/utils.h>
 #include <ignite/odbc/jni/java.h>
-#include <ignite/odbc/common/concurrent.h>
-#include <ignite/odbc/common/utils.h>
+
+using namespace ignite::odbc::common::concurrent;
 
 #ifndef JNI_VERSION_9
 #define JNI_VERSION_9 0x00090000
@@ -114,6 +116,61 @@ namespace ignite
                     return JNI_GetDefaultJavaVMInitArgs(&args) == JNI_OK;
                 }
 
+                void BuildJvmOptions(
+                    const std::string& cp, std::vector< char* >& opts,
+                    int xms, int xmx) {
+                    using namespace common;
+
+                    const size_t REQ_OPTS_CNT = 4;
+                    const size_t JAVA9_OPTS_CNT = 6;
+
+                    opts.reserve(REQ_OPTS_CNT + JAVA9_OPTS_CNT);
+
+                    // 1. Set classpath.
+                    std::string cpFull = "-Djava.class.path=" + cp;
+
+                    opts.push_back(CopyChars(cpFull.c_str()));
+
+                    // 3. Set Xms, Xmx.
+                    std::string xmsStr = "-Xms" + std::to_string(xms) + "m";
+                    std::string xmxStr = "-Xmx" + std::to_string(xmx) + "m";
+
+                    opts.push_back(CopyChars(xmsStr.c_str()));
+                    opts.push_back(CopyChars(xmxStr.c_str()));
+
+                    // 4. Optional debug arguments
+                    // std::string debugStr =
+                    // "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005";
+                    // opts.push_back(CopyChars(debugStr.c_str()));
+
+                    // 5. Set file.encoding.
+                    std::string fileEncParam = "-Dfile.encoding=";
+                    std::string fileEncFull = fileEncParam + "UTF-8";
+                    opts.push_back(CopyChars(fileEncFull.c_str()));
+
+                    // Adding options for Java 9 or later
+                    if (jni::java::IsJava9OrLater()) {
+                        opts.push_back(
+                            CopyChars("--add-exports=java.base/"
+                                      "jdk.internal.misc=ALL-UNNAMED"));
+                        opts.push_back(CopyChars(
+                            "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"));
+                        opts.push_back(
+                            CopyChars("--add-exports=java.management/"
+                                      "com.sun.jmx.mbeanserver=ALL-UNNAMED"));
+                        opts.push_back(
+                            CopyChars("--add-exports=jdk.internal.jvmstat/"
+                                      "sun.jvmstat.monitor=ALL-UNNAMED"));
+                        opts.push_back(
+                            CopyChars("--add-exports=java.base/"
+                                      "sun.reflect.generics.reflectiveObjects="
+                                      "ALL-UNNAMED"));
+                        opts.push_back(CopyChars(
+                            "--add-opens=jdk.management/"
+                            "com.sun.management.internal=ALL-UNNAMED"));
+                    }
+                }
+
                 /* --- Startup exception. --- */
                 class JvmException : public std::exception {
                     // No-op.
@@ -171,55 +228,67 @@ namespace ignite
                     delete[] errMsg;
                 }
 
-                /**
-                  * Guard to ensure global reference cleanup.
-                  */
-                class JniGlobalRefGuard
-                {
-                public:
-                    JniGlobalRefGuard(JNIEnv *e, jobject obj) : env(e), ref(obj)
-                    {
-                        // No-op.
-                    }
+                // Classes and method definitions.
+                const char* const C_THROWABLE = "java/lang/Throwable";
+                JniMethod const M_THROWABLE_GET_MESSAGE = JniMethod("getMessage", "()Ljava/lang/String;", false);
+                JniMethod const M_THROWABLE_PRINT_STACK_TRACE = JniMethod("printStackTrace", "()V", false);
 
-                    ~JniGlobalRefGuard()
-                    {
-                        env->DeleteGlobalRef(ref);
-                    }
+                const char* const C_CLASS = "java/lang/Class";
+                JniMethod const M_CLASS_GET_NAME = JniMethod("getName", "()Ljava/lang/String;", false);
 
-                private:
-                    /** Environment. */
-                    JNIEnv* env;
+                const char* const C_STRING = "java/lang/String";
 
-                    /** Target reference. */
-                    jobject ref;
-
-                    IGNITE_NO_COPY_ASSIGNMENT(JniGlobalRefGuard);
-                };
-
-                const char* C_THROWABLE = "java/lang/Throwable";
-                JniMethod M_THROWABLE_GET_MESSAGE = JniMethod("getMessage", "()Ljava/lang/String;", false);
-                JniMethod M_THROWABLE_PRINT_STACK_TRACE = JniMethod("printStackTrace", "()V", false);
-
-                const char* C_CLASS = "java/lang/Class";
-                JniMethod M_CLASS_GET_NAME = JniMethod("getName", "()Ljava/lang/String;", false);
-
-                const char* C_DOCUMENTDB_CONNECTION_PROPERTIES =
+                const char* const C_DOCUMENTDB_CONNECTION_PROPERTIES =
                     "software/amazon/documentdb/jdbc/DocumentDbConnectionProperties";
-                JniMethod M_DOCUMENTDB_CONNECTION_PROPERTIES_GET_PROPERTIES_FROM_CONNECTION_STRING =
+                JniMethod const M_DOCUMENTDB_CONNECTION_PROPERTIES_GET_PROPERTIES_FROM_CONNECTION_STRING =
                         JniMethod(
                             "getPropertiesFromConnectionString",
                             "(Ljava/lang/String;)Lsoftware/amazon/documentdb/jdbc/DocumentDbConnectionProperties;",
                             true);
 
-                const char* C_DOCUMENTDB_CONNECTION = "software/amazon/documentdb/jdbc/DocumentDbConnectionProperties";
+                const char* const C_RECORD_SET = "java/sql/ResultSet";
+                JniMethod const M_RECORD_SET_CLOSE =
+                    JniMethod("close", "()V", false);
+                JniMethod const M_RECORD_SET_NEXT =
+                    JniMethod("next", "()Z", false);
+                JniMethod const M_RECORD_SET_GET_STRING_BY_INDEX =
+                    JniMethod(
+                        "getString",
+                        "(I)Ljava/lang/String;", false);
+                JniMethod const M_RECORD_SET_GET_STRING_BY_NAME =
+                    JniMethod(
+                        "getString",
+                        "(Ljava/lang/String;)Ljava/lang/String;", false);
+                JniMethod const M_RECORD_SET_GET_INTEGER_BY_INDEX =
+                    JniMethod(
+                        "getInt",
+                        "(I)I", false);
+                JniMethod const M_RECORD_SET_GET_INTEGER_BY_NAME =
+                    JniMethod(
+                        "getInt",
+                        "(Ljava/lang/String;)I", false);
+                JniMethod const M_RECORD_SET_WAS_NULL =
+                    JniMethod(
+                        "wasNull",
+                        "()Z", false);
 
-                const char* C_DRIVERMANAGER = "java/sql/DriverManager";
-                JniMethod M_DRIVERMANAGER_GET_CONNECTION = 
-                  JniMethod("getConnection", "(Ljava/lang/String;)Ljava/sql/Connection;", true);
+                const char* const C_DATABASE_META_DATA = "java/sql/DatabaseMetaData";
+                JniMethod const M_DATABASE_META_DATA_GET_TABLES =
+                    JniMethod("getTables",
+                              "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)Ljava/sql/ResultSet;",
+                              false);
 
-                const char* C_JAVA_SQL_CONNECTION = "java/sql/Connection";
-                JniMethod M_JAVA_SQL_CONNECTION_CLOSE = JniMethod("close", "()V", false);
+                const char* const C_DOCUMENTDB_CONNECTION = "software/amazon/documentdb/jdbc/DocumentDbConnectionProperties";
+
+                const char* const C_DRIVERMANAGER = "java/sql/DriverManager";
+                JniMethod const M_DRIVERMANAGER_GET_CONNECTION = 
+                    JniMethod("getConnection", "(Ljava/lang/String;)Ljava/sql/Connection;", true);
+
+                const char* const C_JAVA_SQL_CONNECTION = "java/sql/Connection";
+                JniMethod const M_JAVA_SQL_CONNECTION_CLOSE = JniMethod("close", "()V", false);
+                JniMethod const M_JAVA_SQL_CONNECTION_GET_META_DATA =
+                    JniMethod("getMetaData",
+                              "()Ljava/sql/DatabaseMetaData;", false);
 
                 // TODO: Provide a "getFullStackTrace" from DocumentDB
                 //JniMethod M_PLATFORM_UTILS_GET_FULL_STACK_TRACE = JniMethod("getFullStackTrace", "(Ljava/lang/Throwable;)Ljava/lang/String;", true);
@@ -340,18 +409,6 @@ namespace ignite
                     return mthd0;
                 }
 
-                jobject NewObject(JNIEnv* env, jclass clazz, jmethodID constructor, ...) {
-                    va_list args;
-                    va_start(args, constructor);
-                    jobject result = env->NewObject(clazz, constructor, args);
-                    va_end(args);
-
-                    if (!result)
-                        throw JvmException();
-
-                    return result;
-                }
-
                 void AddNativeMethod(JNINativeMethod* mthd, JniMethod jniMthd, void* fnPtr) {
                     mthd->name = jniMthd.name;
                     mthd->signature = jniMthd.sign;
@@ -365,6 +422,8 @@ namespace ignite
                     c_Throwable = FindClass(env, C_THROWABLE);
                     m_Throwable_getMessage = FindMethod(env, c_Throwable, M_THROWABLE_GET_MESSAGE);
                     m_Throwable_printStackTrace = FindMethod(env, c_Throwable, M_THROWABLE_PRINT_STACK_TRACE);
+
+                    c_String = FindClass(env, C_STRING);
 
                     // TODO: Provide "getFullStackTrace" in DocumentDB
                     //m_PlatformUtils_getFullStackTrace = FindMethod(env, c_PlatformUtils, M_PLATFORM_UTILS_GET_FULL_STACK_TRACE);
@@ -432,8 +491,21 @@ namespace ignite
                     c_DriverManager = FindClass(env, C_DRIVERMANAGER);
                     m_DriverManagerGetConnection = FindMethod(env, c_DriverManager, M_DRIVERMANAGER_GET_CONNECTION);
 
-                    c_JavaSqlConnection = FindClass(env, C_JAVA_SQL_CONNECTION);
-                    m_JavaSqlConnectionClose = FindMethod(env, c_JavaSqlConnection, M_JAVA_SQL_CONNECTION_CLOSE);
+                    c_ResultSet = FindClass(env, C_RECORD_SET);
+                    m_ResultSetClose = FindMethod(env, c_ResultSet, M_RECORD_SET_CLOSE);
+                    m_ResultSetNext = FindMethod(env, c_ResultSet, M_RECORD_SET_NEXT);
+                    m_ResultSetGetStringByIndex = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_STRING_BY_INDEX);
+                    m_ResultSetGetStringByName = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_STRING_BY_NAME);
+                    m_ResultSetGetIntegerByIndex = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_INTEGER_BY_INDEX);
+                    m_ResultSetGetIntegerByName = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_INTEGER_BY_NAME);
+                    m_ResultSetWasNull = FindMethod(env, c_ResultSet, M_RECORD_SET_WAS_NULL);
+
+                    c_DatabaseMetaData = FindClass(env, C_DATABASE_META_DATA);
+                    m_DatabaseMetaDataGetTables = FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_TABLES);
+
+                    c_Connection = FindClass(env, C_JAVA_SQL_CONNECTION);
+                    m_ConnectionClose = FindMethod(env, c_Connection, M_JAVA_SQL_CONNECTION_CLOSE);
+                    m_ConnectionGetMetaData = FindMethod(env, c_Connection, M_JAVA_SQL_CONNECTION_GET_META_DATA);
                 }
 
                 void JniMembers::Destroy(JNIEnv* env) {
@@ -468,6 +540,19 @@ namespace ignite
                 {
                     return members;
                 }
+
+                GlobalJObject::GlobalJObject(JNIEnv* e, jobject obj) : env(e), ref(obj) {
+                    // No-op.
+                }
+
+                GlobalJObject::~GlobalJObject() {
+                    env->DeleteGlobalRef(ref);
+                }
+
+                jobject GlobalJObject::GetRef() const {
+                    return ref;
+                }
+
 
                 /**
                   * Create JVM.
@@ -508,23 +593,8 @@ namespace ignite
                 }
 
                 void RegisterNatives(JNIEnv* env) {
-                    {
-                        JNINativeMethod methods[5];
-
-                        int idx = 0;
-
-                        // TODO: Investigate registering callbacks to get console and logging streams.
-
-                        //AddNativeMethod(methods + idx++, M_PLATFORM_CALLBACK_UTILS_CONSOLE_WRITE, reinterpret_cast<void*>(JniConsoleWrite));
-
-                        //AddNativeMethod(methods + idx++, M_PLATFORM_CALLBACK_UTILS_LOGGER_LOG, reinterpret_cast<void*>(JniLoggerLog));
-                        //AddNativeMethod(methods + idx++, M_PLATFORM_CALLBACK_UTILS_LOGGER_IS_LEVEL_ENABLED, reinterpret_cast<void*>(JniLoggerIsLevelEnabled));
-
-                        //jint res = env->RegisterNatives(FindClass(env, C_PLATFORM_CALLBACK_UTILS), methods, idx);
-
-                        //if (res != JNI_OK)
-                        //    throw JvmException();
-                    }
+                    IGNITE_UNUSED(env);
+                    // TODO: Investigate registering callbacks to get console and logging streams.
                 }
 
                 JniContext::JniContext(JniJvm* jvm, JniHandlers hnds) : jvm(jvm), hnds(hnds) {
@@ -596,19 +666,19 @@ namespace ignite
                     try {
                         if (!JVM.GetJvm())
                         {
-                            // 1. Create JVM itself.
+                            // Create JVM itself.
                             jint res = GetOrCreateJvm(opts, optsLen, &jvm, &env);
 
                             if (res == JNI_OK)
                             {
-                                // 2. Populate members;
+                                // Populate members.
                                 javaMembers.Initialize(env);
                                 members.Initialize(env);
 
-                                // 3. Register native functions.
+                                // Register native functions.
                                 RegisterNatives(env);
 
-                                // 4. Create JNI JVM.
+                                // Create JNI JVM.
                                 JVM = JniJvm(jvm, javaMembers, members);
 
                                 char* printStack = getenv("IGNITE_CPP_PRINT_STACK");
@@ -721,29 +791,285 @@ namespace ignite
                     }
                 }
 
-                jobject JniContext::DocumentDbConnect(const char* connectionString,
-                                                   JniErrorInfo* errInfo) {
+                bool JniContext::DriverManagerGetConnection(
+                    const char* connectionString,
+                    SharedPointer< GlobalJObject >& connection,
+                    JniErrorInfo& errInfo) {
                     JNIEnv* env = Attach();
-                    jstring jConnectionString =
-                        env->NewStringUTF(connectionString);
-                    jobject connection = env->CallStaticObjectMethod(
+                    jstring jConnectionString = env->NewStringUTF(connectionString);
+                    jobject result = env->CallStaticObjectMethod(
                         jvm->GetMembers().c_DriverManager,
-                        jvm->GetMembers().m_DriverManagerGetConnection, jConnectionString);
-                    ExceptionCheck(env, errInfo);
-                    return connection;
+                        jvm->GetMembers().m_DriverManagerGetConnection,
+                        jConnectionString);
+                    ExceptionCheck(env, &errInfo);
+                    if (!result || errInfo.code != IGNITE_JNI_ERR_SUCCESS) {
+                        connection = nullptr;
+                        return false;
+                    }
+                    connection = SharedPointer< GlobalJObject >(new GlobalJObject(env, env->NewGlobalRef(result)));
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
-                void JniContext::DocumentDbDisconnect(const jobject connection, JniErrorInfo* errInfo) {
-                    if (!connection) {
+                void JniContext::ConnectionClose(const SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo) {
+                    if (connection.Get() == nullptr) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "Connection object must be set.";
                         return;
                     }
                     JNIEnv* env = Attach();
-                    env->CallVoidMethod(connection, jvm->GetMembers().m_JavaSqlConnectionClose);
-                    ExceptionCheck(env, errInfo);
-                    env->DeleteLocalRef(connection);
+                    env->CallVoidMethod(connection.Get()->GetRef(),
+                                        jvm->GetMembers().m_ConnectionClose);
+                    ExceptionCheck(env, &errInfo);
                 }
 
-                int64_t JniContext::TargetInLongOutLong(jobject obj, int opType, int64_t val, JniErrorInfo* err) {
+                bool JniContext::ConnectionGetMetaData(
+                    const SharedPointer< GlobalJObject >& connection,
+                    SharedPointer< GlobalJObject >& databaseMetaData,
+                    JniErrorInfo& errInfo) {
+                    if (connection.Get() == nullptr) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "Connection object must be set.";
+                        return false;
+                    }
+
+                    JNIEnv* env = Attach();
+                    jobject result = env->CallObjectMethod(
+                        connection.Get()->GetRef(),
+                        jvm->GetMembers().m_ConnectionGetMetaData);
+                    ExceptionCheck(env, &errInfo);
+
+                    if (!result || errInfo.code != IGNITE_JNI_ERR_SUCCESS) {
+                        databaseMetaData = nullptr;
+                        return false;
+                    }
+
+                    databaseMetaData = SharedPointer< GlobalJObject >(
+                        new GlobalJObject(env, env->NewGlobalRef(result)));
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
+
+                bool JniContext::DatabaseMetaDataGetTables(
+                    const SharedPointer< GlobalJObject >& databaseMetaData,
+                    const std::string& catalog,
+                    const std::string& schemaPattern,
+                    const std::string& tableNamePattern,
+                    const std::vector< std::string >& types,
+                    SharedPointer< GlobalJObject >& resultSet,
+                    JniErrorInfo& errInfo) {
+                    if (databaseMetaData.Get() == nullptr) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "DatabaseMetaData object must be set.";
+                        return false;
+                    }
+
+                    JNIEnv* env = Attach();
+                    jstring jCatalog = env->NewStringUTF(catalog.c_str());
+                    jstring jSchemaPattern = env->NewStringUTF(schemaPattern.c_str());
+                    jstring jTableNamePattern = env->NewStringUTF(tableNamePattern.c_str());
+                    jobjectArray jTypes = env->NewObjectArray(
+                        static_cast< jsize >(types.size()), jvm->GetJavaMembers().c_String, nullptr);
+                    for (int i = 0; i < types.size(); i++) {
+                        env->SetObjectArrayElement(
+                            jTypes, i, env->NewStringUTF(types[i].c_str()));
+                    }
+
+                    jobject result = env->CallObjectMethod(
+                        databaseMetaData.Get()->GetRef(),
+                        jvm->GetMembers().m_DatabaseMetaDataGetTables,
+                        jCatalog,
+                        jSchemaPattern,
+                        jTableNamePattern,
+                        jTypes);
+                    ExceptionCheck(env, &errInfo);
+
+                    if (!result || errInfo.code != IGNITE_JNI_ERR_SUCCESS) {
+                        resultSet = SharedPointer< GlobalJObject >(nullptr);
+                        return false;
+                    }
+
+                    resultSet = SharedPointer< GlobalJObject >(
+                        new GlobalJObject(env, env->NewGlobalRef(result)));
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
+
+                bool JniContext::ResultSetClose(
+                    const SharedPointer< GlobalJObject >& resultSet,
+                    JniErrorInfo& errInfo) {
+                    if (resultSet.Get() == nullptr) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "ResultSet object must be set.";
+                        return false;
+                    }
+
+                    JNIEnv* env = Attach();
+                    env->CallVoidMethod(
+                        resultSet.Get()->GetRef(),
+                        jvm->GetMembers().m_ResultSetClose);
+                    ExceptionCheck(env, &errInfo);
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
+
+                bool JniContext::ResultSetNext(
+                    const SharedPointer< GlobalJObject >& resultSet,
+                    bool& hasNext, JniErrorInfo& errInfo) {
+                    if (resultSet.Get() == nullptr) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "ResultSet object must be set.";
+                        return false;
+                    }
+
+                    JNIEnv* env = Attach();
+                    jboolean res = env->CallBooleanMethod(
+                        resultSet.Get()->GetRef(),
+                        jvm->GetMembers().m_ResultSetNext);
+                    ExceptionCheck(env, &errInfo);
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
+                        hasNext = res != JNI_FALSE;
+                    }
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
+
+                bool JniContext::ResultSetGetString(
+                    const SharedPointer< GlobalJObject >& resultSet,
+                    int columnIndex, std::string& value, bool& wasNull,
+                    JniErrorInfo& errInfo) {
+                    if (resultSet.Get() == nullptr) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "ResultSet object must be set.";
+                        return false;
+                    }
+
+                    JNIEnv* env = Attach();
+                    jobject result = env->CallObjectMethod(
+                        resultSet.Get()->GetRef(),
+                        jvm->GetMembers().m_ResultSetGetStringByIndex,
+                        columnIndex);
+                    ExceptionCheck(env, &errInfo);
+
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
+                        wasNull = !result;
+                        if (result != nullptr) {
+                            jboolean isCopy;
+                            const char* utfChars = env->GetStringUTFChars(
+                                (jstring)result, &isCopy);
+                            value = std::string(utfChars);
+                            env->ReleaseStringUTFChars((jstring)result,
+                                                       utfChars);
+                        }
+                    }
+
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
+
+                bool JniContext::ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet,
+                                                    const std::string& columnName,
+                                                    std::string& value,
+                                                    bool& wasNull,
+                                                    JniErrorInfo& errInfo) {
+                    if (resultSet.Get() == nullptr) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "ResultSet object must be set.";
+                        return false;
+                    }
+
+                    JNIEnv* env = Attach();
+                    jstring jColumnName = env->NewStringUTF(columnName.c_str());
+                    jobject result = env->CallObjectMethod(
+                        resultSet.Get()->GetRef(),
+                        jvm->GetMembers().m_ResultSetGetStringByName,
+                        jColumnName);
+                    ExceptionCheck(env, &errInfo);
+
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
+                        wasNull = !result;
+                        if (result != nullptr) {
+                            jboolean isCopy;
+                            const char* utfChars = env->GetStringUTFChars(
+                                (jstring)result, &isCopy);
+                            value = std::string(utfChars);
+                            env->ReleaseStringUTFChars((jstring)result,
+                                                       utfChars);
+                        }
+                    }
+
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
+
+                bool JniContext::ResultSetGetInteger(const SharedPointer< GlobalJObject >& resultSet,
+                                                     int columnIndex,
+                                                     int& value,
+                                                     bool& wasNull,
+                                                     JniErrorInfo& errInfo) {
+
+                    if (resultSet.Get() == nullptr) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "ResultSet object must be set.";
+                        return false;
+                    }
+
+                    JNIEnv* env = Attach();
+                    jint result = env->CallIntMethod(
+                        resultSet.Get()->GetRef(),
+                        jvm->GetMembers().m_ResultSetGetIntegerByIndex,
+                        columnIndex);
+                    ExceptionCheck(env, &errInfo);
+
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
+                        value = result;
+                        return ResultSetWasNull(resultSet, wasNull, errInfo);
+                    }
+
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
+
+                bool JniContext::ResultSetGetInteger(const SharedPointer< GlobalJObject >& resultSet,
+                                                     const std::string& columnName,
+                                                     int& value,
+                                                     bool& wasNull,
+                                                     JniErrorInfo& errInfo) {
+                    if (resultSet.Get() == nullptr) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "ResultSet object must be set.";
+                        return false;
+                    }
+
+                    JNIEnv* env = Attach();
+                    jstring jColumnName = env->NewStringUTF(columnName.c_str());
+                    jint result = env->CallIntMethod(
+                        resultSet.Get()->GetRef(),
+                        jvm->GetMembers().m_ResultSetGetIntegerByName,
+                        jColumnName);
+                    ExceptionCheck(env, &errInfo);
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
+                        value = result;
+                        return ResultSetWasNull(resultSet, wasNull, errInfo);
+                    }
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
+
+                bool JniContext::ResultSetWasNull(const SharedPointer< GlobalJObject >& resultSet,
+                                                  bool& value,
+                                                  JniErrorInfo& errInfo) {
+                    if (resultSet.Get() == nullptr) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "ResultSet object must be set.";
+                        return false;
+                    }
+
+                    JNIEnv* env = Attach();
+                    jboolean res = env->CallBooleanMethod(
+                        resultSet.Get()->GetRef(),
+                        jvm->GetMembers().m_ResultSetWasNull);
+                    ExceptionCheck(env, &errInfo);
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
+                        value = res != JNI_FALSE;
+                    }
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
+
+                int64_t JniContext::TargetInLongOutLong(jobject obj, int opType,
+                                                        int64_t val,
+                                                        JniErrorInfo* err) {
                     JNIEnv* env = Attach();
 
                     int64_t res = env->CallLongMethod(obj, jvm->GetMembers().m_PlatformTarget_inLongOutLong, opType, val);
