@@ -828,7 +828,6 @@ namespace ignite
                     ExceptionCheck(env, &errInfo);
                 }
 
-                // -AL- todo changes are needed because & errInfo should be returned instead
                 bool JniContext::DocumentDbConnectionIsSshTunnelActive(
                     const SharedPointer< GlobalJObject >& connection,
                     bool& isActive,
