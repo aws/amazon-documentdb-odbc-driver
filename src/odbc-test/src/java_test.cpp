@@ -282,6 +282,45 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPortSshTunnelNotActive,
     BOOST_CHECK_EQUAL(port, 0);
 }
 
+BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetMetaData) {
+    PrepareContext();
+    BOOST_REQUIRE(_ctx.Get() != nullptr);
+
+    // get Driver manager connection
+    JniErrorInfo errInfo;
+    SharedPointer< GlobalJObject > connection;
+    bool success = _ctx.Get()->DriverManagerGetConnection(
+        _jdbcConnectionString.c_str(), connection, errInfo);
+    if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+        BOOST_FAIL(errInfo.errMsg);
+    }
+    BOOST_REQUIRE(connection.Get());
+    AutoCloseConnection autoCloseConnection(_ctx, connection);
+
+    // get metadata
+    SharedPointer< GlobalJObject > databaseMetaData;
+    if (!_ctx.Get()->DocumentDbConnectionGetMetaData(
+            connection, databaseMetaData,
+                                           errInfo)) {
+        BOOST_FAIL(errInfo.errMsg);
+    }
+    BOOST_REQUIRE(databaseMetaData.Get());
+}
+
+BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetMetaData) {
+    PrepareContext();
+
+    // get Driver manager connection
+    JniErrorInfo errInfo;
+    SharedPointer< GlobalJObject > connection;
+    bool success = _ctx.Get()->DriverManagerGetConnection(
+        _jdbcConnectionString.c_str(), connection, &errInfo);
+    if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+        BOOST_FAIL(errInfo.errMsg);
+    }
+    BOOST_REQUIRE(connection.Get());
+
+    // get metadata
 BOOST_AUTO_TEST_CASE(TestConnectionGetMetaData) {
     PrepareContext();
     BOOST_REQUIRE(_ctx.Get() != nullptr);
@@ -303,33 +342,6 @@ BOOST_AUTO_TEST_CASE(TestConnectionGetMetaData) {
         BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(databaseMetaData.Get() != nullptr);
-}
-
-BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetMetaData) {
-    PrepareContext();
-
-    // get Driver manager connection
-    JniErrorInfo errInfo;
-    SharedPointer< GlobalJObject > connection;
-    bool success = _ctx.Get()->DriverManagerGetConnection(
-        _jdbcConnectionString.c_str(), connection, &errInfo);
-    if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
-        BOOST_FAIL(errInfo.errMsg);
-    }
-    BOOST_REQUIRE(connection.Get());
-
-    // get metadata
-    SharedPointer< GlobalJObject > databaseMetaData;
-    if (!_ctx.Get()->ConnectionGetMetaData(connection, databaseMetaData,
-                                           &errInfo)) {
-        std::string errMsg = errInfo.errMsg;
-        _ctx.Get()->ConnectionClose(connection, &errInfo);
-        BOOST_FAIL(errMsg);
-    }
-    BOOST_REQUIRE(databaseMetaData.Get());
-
-    _ctx.Get()->ConnectionClose(connection, &errInfo);
-    connection = nullptr;
 }
 
 BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
