@@ -271,6 +271,7 @@ namespace ignite
                     JniMethod(
                         "wasNull",
                         "()Z", false);
+                // -AL- todo implement resultSet get short for ORDINAL_POSITION
 
                 const char* const C_DATABASE_META_DATA = "java/sql/DatabaseMetaData";
                 JniMethod const M_DATABASE_META_DATA_GET_TABLES =
