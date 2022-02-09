@@ -525,6 +525,75 @@ namespace ignite
                 AddToMap(res, ConnectionStringParser::Key::defaultFetchSize, defaultFetchSize);
             }
 
+            bool Configuration::IsValid(diagnostic::DiagnosticRecordStorage* diag) const {
+                // Validate minimum required properties.
+                if (!IsHostnameSet() || !IsUserSet() || !IsPasswordSet() || !IsDatabaseSet()) {
+                    if (diag)
+                        diag->AddStatusRecord(SqlState::S01S00_INVALID_CONNECTION_STRING_ATTRIBUTE, 
+                            "Hostname, username, password, and database are required to connect.");
+                    return false;
+                }
+
+                // Validate required SSH tunnel properties if needed.
+                boolean sshTunnel = IsSshEnable() || IsSshHostSet() || IsSshUserSet() || IsSshPrivateKeyFileSet();
+                if (sshTunnel && (!IsSshHostSet() || !IsSshUserSet() || !IsSshPrivateKeyFileSet())) {
+                    if (diag)
+                        diag->AddStatusRecord(SqlState::S01S00_INVALID_CONNECTION_STRING_ATTRIBUTE,
+                            "If using an internal SSH tunnel, all of ssh_host, ssh_user, ssh_private_key_file are required to connect.");
+                    return false;
+                }
+
+                return true;
+            }
+
+            std::string Configuration::ToJdbcConnectionString() const {
+                std::string jdbcConnectionString;
+                jdbcConnectionString = "jdbc:documentdb:";
+                jdbcConnectionString.append("//" + GetUser());
+                jdbcConnectionString.append(":" + GetPassword());
+                jdbcConnectionString.append("@" + GetPort());
+                jdbcConnectionString.append(":" + GetHostname());
+                jdbcConnectionString.append("/" + GetDatabase());
+                // Always pass application name even when unset to override the JDBC default application name.
+                jdbcConnectionString.append("?applicationName=" + GetApplicationName());
+
+                config::Configuration::ArgumentMap arguments;
+                ToJdbcOptionsMap(arguments);
+                std::stringstream options;
+                for (config::Configuration::ArgumentMap::const_iterator it = arguments.begin(); it != arguments.end(); ++it)
+                {
+                    const std::string& key = it->first;
+                    const std::string& value = it->second;
+                    if (!value.empty())
+                        options << '&' << key << '=' << value;
+                }
+                jdbcConnectionString.append(options.str());
+
+                return jdbcConnectionString;
+            }
+
+            void Configuration::ToJdbcOptionsMap(ArgumentMap& res) const
+            {
+                AddToMap(res, "loginTimeoutSec", loginTimeoutSec);
+                AddToMap(res, "readPreference", readPreference, true);
+                AddToMap(res, "replicaSet", replicaSet);
+                AddToMap(res, "retryReads", retryReads);
+                AddToMap(res, "tls", tls);
+                AddToMap(res, "tlsAllowInvalidHostnames", tlsAllowInvalidHostnames);
+                AddToMap(res, "tlsCaFile", tlsCaFile);
+                AddToMap(res, "sshUser", sshUser);
+                AddToMap(res, "sshHost", sshHost);
+                AddToMap(res, "sshPrivateKeyFile", sshPrivateKeyFile);
+                AddToMap(res, "sshPrivateKeyPassphrase", sshPrivateKeyPassphrase);
+                AddToMap(res, "sshStrictHostKeyChecking", sshStrictHostKeyChecking);
+                AddToMap(res, "sshKnownHostsFile", sshKnownHostsFile);
+                AddToMap(res, "scanMethod", scanMethod, true);
+                AddToMap(res, "scanLimit", scanLimit);
+                AddToMap(res, "schemaName", schemaName);
+                AddToMap(res, "refreshSchema", refreshSchema);
+                AddToMap(res, "defaultFetchSize", defaultFetchSize);
+            }
+
             template<>
             void Configuration::AddToMap(ArgumentMap& map, const std::string& key, const SettableValue<uint16_t>& value)
             {
@@ -557,18 +626,18 @@ namespace ignite
 
             template<>
             void Configuration::AddToMap(ArgumentMap& map, const std::string& key,
-                const SettableValue<ReadPreference::Type>& value)
+                const SettableValue<ReadPreference::Type>& value, boolean isJdbcFormat)
             {
                 if (value.IsSet())
-                    map[key] = ReadPreference::ToString(value.GetValue());
+                    map[key] = isJdbcFormat ? ReadPreference::ToJdbcString(value.GetValue()) : ReadPreference::ToString(value.GetValue());
             }
 
             template<>
             void Configuration::AddToMap(ArgumentMap& map, const std::string& key,
-                const SettableValue<ScanMethod::Type>& value)
+                const SettableValue<ScanMethod::Type>& value, boolean isJdbcFormat)
             {
                 if (value.IsSet())
-                    map[key] = ScanMethod::ToString(value.GetValue());
+                    map[key] = isJdbcFormat? ScanMethod::ToJdbcString(value.GetValue()) : ScanMethod::ToString(value.GetValue());
             }
 
         }

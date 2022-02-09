@@ -490,12 +490,6 @@ namespace ignite
              */
             bool TryRestoreConnection(IgniteError& err);
 
-            /**
-             * Formats the JDBC connection string from configuration values.
-             * @return the JDBC connection string.
-             */
-            std::string FormatJdbcConnectionString() const;
-
             /** 
              * Creates JVM options
              */
@@ -548,6 +542,8 @@ namespace ignite
 
             /** Streaming context. */
             streaming::StreamingContext streamingContext;
+
+
         };
     }
 }

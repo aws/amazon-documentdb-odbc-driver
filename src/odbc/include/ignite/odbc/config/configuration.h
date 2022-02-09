@@ -712,6 +712,18 @@ namespace ignite
                  */
                 void ToMap(ArgumentMap& res) const;
 
+                /**
+                 * Checks that a valid JDBC connection string with all the required properties can be built
+                 * from the configuration.
+                 * @return @c true on valid set and @c false otherwise.
+                 */
+                bool IsValid(diagnostic::DiagnosticRecordStorage* diag) const;
+
+                /**
+                 * Formats the JDBC connection string from configuration values.
+                 * @return the JDBC connection string.
+                 */
+                std::string ToJdbcConnectionString() const;
             private:
                 /**
                  * Add key and value to the argument map.
@@ -721,7 +733,17 @@ namespace ignite
                  * @param value Value.
                  */
                 template<typename T>
-                static void AddToMap(ArgumentMap& map, const std::string& key, const SettableValue<T>& value);
+                static void AddToMap(ArgumentMap& map, const std::string& key, const SettableValue<T>& value); 
+
+                template<typename T>
+                static void AddToMap(ArgumentMap& map, const std::string& key, const SettableValue<T>& value, boolean isJdbcFormat);
+
+                /**
+                * Get argument map.
+                *
+                * @param res Resulting argument map.
+                */
+                void ToJdbcOptionsMap(ArgumentMap& res) const;
 
                 /** DSN. */
                 SettableValue<std::string> dsn = DefaultValue::dsn;
@@ -823,11 +845,11 @@ namespace ignite
 
             template<>
             void Configuration::AddToMap<ReadPreference::Type>(ArgumentMap& map, const std::string& key,
-                const SettableValue<ReadPreference::Type>& value);
+                const SettableValue<ReadPreference::Type>& value, boolean isJdbcFormat);
 
             template<>
             void Configuration::AddToMap<ScanMethod::Type>(ArgumentMap& map, const std::string& key,
-                const SettableValue<ScanMethod::Type>& value);
+                const SettableValue<ScanMethod::Type>& value, boolean isJdbcFormat);       
         }
     }
 }

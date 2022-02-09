@@ -71,5 +71,26 @@ namespace ignite
                     return "unknown";
             }
         }
+
+        std::string ReadPreference::ToJdbcString(Type val)
+        {
+            switch (val)
+            {
+            case ReadPreference::Type::PRIMARY_PREFERRED:
+                return "primaryPreferred";
+
+            case ReadPreference::Type::SECONDARY:
+                return "secondary";
+
+            case ReadPreference::Type::SECONDARY_PREFERRED:
+                return "secondaryPreferred";
+
+            case ReadPreference::Type::NEAREST:
+                return "nearest";
+
+            default:
+                return "primary";
+            }
+        }
     }
 }

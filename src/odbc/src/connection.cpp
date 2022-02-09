@@ -154,15 +154,13 @@ namespace ignite
 
             if (connection) {
                 AddStatusRecord(SqlState::S08002_ALREADY_CONNECTED,
-                                "Already connected.");
+                    "Already connected.");
 
                 return SqlResult::AI_ERROR;
             }
 
-            if (!config.IsHostnameSet())
+            if (!config.IsValid(&GetDiagnosticRecords()))
             {
-                AddStatusRecord("No valid address to connect.");
-
                 return SqlResult::AI_ERROR;
             }
 
@@ -394,61 +392,61 @@ namespace ignite
 
             switch (attr)
             {
-                case SQL_ATTR_CONNECTION_DEAD:
-                {
-                    SQLUINTEGER *val = reinterpret_cast<SQLUINTEGER*>(buf);
+            case SQL_ATTR_CONNECTION_DEAD:
+            {
+                SQLUINTEGER* val = reinterpret_cast<SQLUINTEGER*>(buf);
 
-                    *val = connection ? SQL_CD_FALSE : SQL_CD_TRUE;
+                *val = connection ? SQL_CD_FALSE : SQL_CD_TRUE;
 
-                    if (valueLen)
-                        *valueLen = SQL_IS_INTEGER;
+                if (valueLen)
+                    *valueLen = SQL_IS_INTEGER;
 
-                    break;
-                }
+                break;
+            }
 
-                case SQL_ATTR_CONNECTION_TIMEOUT:
-                {
-                    SQLUINTEGER *val = reinterpret_cast<SQLUINTEGER*>(buf);
+            case SQL_ATTR_CONNECTION_TIMEOUT:
+            {
+                SQLUINTEGER* val = reinterpret_cast<SQLUINTEGER*>(buf);
 
-                    *val = static_cast<SQLUINTEGER>(timeout);
+                *val = static_cast<SQLUINTEGER>(timeout);
 
-                    if (valueLen)
-                        *valueLen = SQL_IS_INTEGER;
+                if (valueLen)
+                    *valueLen = SQL_IS_INTEGER;
 
-                    break;
-                }
+                break;
+            }
 
-                case SQL_ATTR_LOGIN_TIMEOUT:
-                {
-                    SQLUINTEGER *val = reinterpret_cast<SQLUINTEGER*>(buf);
+            case SQL_ATTR_LOGIN_TIMEOUT:
+            {
+                SQLUINTEGER* val = reinterpret_cast<SQLUINTEGER*>(buf);
 
-                    *val = static_cast<SQLUINTEGER>(loginTimeout);
+                *val = static_cast<SQLUINTEGER>(loginTimeout);
 
-                    if (valueLen)
-                        *valueLen = SQL_IS_INTEGER;
+                if (valueLen)
+                    *valueLen = SQL_IS_INTEGER;
 
-                    break;
-                }
+                break;
+            }
 
-                case SQL_ATTR_AUTOCOMMIT:
-                {
-                    SQLUINTEGER *val = reinterpret_cast<SQLUINTEGER*>(buf);
+            case SQL_ATTR_AUTOCOMMIT:
+            {
+                SQLUINTEGER* val = reinterpret_cast<SQLUINTEGER*>(buf);
 
-                    *val = autoCommit ? SQL_AUTOCOMMIT_ON : SQL_AUTOCOMMIT_OFF;
+                *val = autoCommit ? SQL_AUTOCOMMIT_ON : SQL_AUTOCOMMIT_OFF;
 
-                    if (valueLen)
-                        *valueLen = SQL_IS_INTEGER;
+                if (valueLen)
+                    *valueLen = SQL_IS_INTEGER;
 
-                    break;
-                }
+                break;
+            }
 
-                default:
-                {
-                    AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
-                        "Specified attribute is not supported.");
+            default:
+            {
+                AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
+                    "Specified attribute is not supported.");
 
-                    return SqlResult::AI_ERROR;
-                }
+                return SqlResult::AI_ERROR;
+            }
             }
 
             return SqlResult::AI_SUCCESS;
@@ -463,57 +461,57 @@ namespace ignite
         {
             switch (attr)
             {
-                case SQL_ATTR_CONNECTION_DEAD:
-                {
-                    AddStatusRecord(SqlState::SHY092_OPTION_TYPE_OUT_OF_RANGE, "Attribute is read only.");
+            case SQL_ATTR_CONNECTION_DEAD:
+            {
+                AddStatusRecord(SqlState::SHY092_OPTION_TYPE_OUT_OF_RANGE, "Attribute is read only.");
 
-                    return SqlResult::AI_ERROR;
-                }
+                return SqlResult::AI_ERROR;
+            }
 
-                case SQL_ATTR_CONNECTION_TIMEOUT:
-                {
-                    timeout = RetrieveTimeout(value);
+            case SQL_ATTR_CONNECTION_TIMEOUT:
+            {
+                timeout = RetrieveTimeout(value);
 
-                    if (GetDiagnosticRecords().GetStatusRecordsNumber() != 0)
-                        return SqlResult::AI_SUCCESS_WITH_INFO;
+                if (GetDiagnosticRecords().GetStatusRecordsNumber() != 0)
+                    return SqlResult::AI_SUCCESS_WITH_INFO;
 
-                    break;
-                }
+                break;
+            }
 
-                case SQL_ATTR_LOGIN_TIMEOUT:
-                {
-                    loginTimeout = RetrieveTimeout(value);
+            case SQL_ATTR_LOGIN_TIMEOUT:
+            {
+                loginTimeout = RetrieveTimeout(value);
 
-                    if (GetDiagnosticRecords().GetStatusRecordsNumber() != 0)
-                        return SqlResult::AI_SUCCESS_WITH_INFO;
+                if (GetDiagnosticRecords().GetStatusRecordsNumber() != 0)
+                    return SqlResult::AI_SUCCESS_WITH_INFO;
 
-                    break;
-                }
+                break;
+            }
 
-                case SQL_ATTR_AUTOCOMMIT:
-                {
-                    SQLUINTEGER mode = static_cast<SQLUINTEGER>(reinterpret_cast<ptrdiff_t>(value));
+            case SQL_ATTR_AUTOCOMMIT:
+            {
+                SQLUINTEGER mode = static_cast<SQLUINTEGER>(reinterpret_cast<ptrdiff_t>(value));
 
-                    if (mode != SQL_AUTOCOMMIT_ON && mode != SQL_AUTOCOMMIT_OFF)
-                    {
-                        AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
-                            "Specified attribute is not supported.");
-
-                        return SqlResult::AI_ERROR;
-                    }
-
-                    autoCommit = mode == SQL_AUTOCOMMIT_ON;
-
-                    break;
-                }
-
-                default:
+                if (mode != SQL_AUTOCOMMIT_ON && mode != SQL_AUTOCOMMIT_OFF)
                 {
                     AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
                         "Specified attribute is not supported.");
 
                     return SqlResult::AI_ERROR;
                 }
+
+                autoCommit = mode == SQL_AUTOCOMMIT_ON;
+
+                break;
+            }
+
+            default:
+            {
+                AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
+                    "Specified attribute is not supported.");
+
+                return SqlResult::AI_ERROR;
+            }
             }
 
             return SqlResult::AI_SUCCESS;
@@ -594,7 +592,7 @@ namespace ignite
                 return true;
             }
 
-            std::string connectionString = FormatJdbcConnectionString();
+            std::string connectionString = config.ToJdbcConnectionString();
             JniErrorInfo errInfo;
 
             // 2. Resolve DOCUMENTDB_HOME.
@@ -606,14 +604,14 @@ namespace ignite
             if (cp.empty()) {
                 err =
                     odbc::IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_NO_CLASSPATH,
-                                  "Java classpath is empty (did you set "
-                                  "DOCUMENTDB_HOME environment variable?)");
+                        "Java classpath is empty (did you set "
+                        "DOCUMENTDB_HOME environment variable?)");
 
                 return false;
             }
 
             SetJvmOptions(cp);
-            
+
             SharedPointer< JniContext > ctx(JniContext::Create(&opts[0], static_cast<int>(opts.size()), JniHandlers(), &errInfo));
             if (ctx.Get()) {
                 jobject result = ctx.Get()->DocumentDbConnect(
@@ -626,59 +624,13 @@ namespace ignite
                     Close();
                 }
                 connection = result;
-            } else {
+            }
+            else {
                 err = odbc::IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_INIT, "Unable to get initialized JVM.");
                 connection = nullptr;
             }
 
             return connected;
-        }
-
-        std::string Connection::FormatJdbcConnectionString() const {
-            std::string host = "localhost";
-            std::string port = "27017";
-            std::string jdbConnectionString;
-
-            if (config.IsHostnameSet()) {
-                host = config.GetHostname();
-            }
-
-            if (config.IsPortSet()) {
-                port = std::to_string(config.GetPort());
-            }
-
-            jdbConnectionString = "jdbc:documentdb:";
-            jdbConnectionString.append("//" + config.GetUser());
-            jdbConnectionString.append(":" + config.GetPassword());
-            jdbConnectionString.append("@" + host);
-            jdbConnectionString.append(":" + port);
-            jdbConnectionString.append("/" + config.GetDatabase());
-            jdbConnectionString.append("?tlsAllowInvalidHostnames=true");
-
-            // Check if internal SSH tunnel should be enabled.
-            // TODO: Remove use of environment variables and use DSN properties
-            std::string sshUserAtHost = common::GetEnv("DOC_DB_USER", "");
-            std::string sshRemoteHost = common::GetEnv("DOC_DB_HOST", "");
-            std::string sshPrivKeyFile = common::GetEnv("DOC_DB_PRIV_KEY_FILE", "");
-            std::string sshUser;
-            std::string sshTunnelHost;
-            size_t indexOfAt = sshUserAtHost.find_first_of('@');
-            if (indexOfAt >= 0 && sshUserAtHost.size() > (indexOfAt + 1)) {
-                sshUser = sshUserAtHost.substr(0, indexOfAt);
-                sshTunnelHost = sshUserAtHost.substr(indexOfAt + 1);
-            }
-            if (!sshUserAtHost.empty()
-                && !sshRemoteHost.empty()
-                && !sshPrivKeyFile.empty()
-                && !sshUser.empty()
-                && !sshTunnelHost.empty()) {
-                jdbConnectionString.append("&sshUser=" + sshUser);
-                jdbConnectionString.append("&sshHost=" + sshTunnelHost);
-                jdbConnectionString.append("&sshPrivateKeyFile=" + sshPrivKeyFile);
-                jdbConnectionString.append("&sshStrictHostKeyChecking=false");
-            }
-
-            return jdbConnectionString;
         }
 
         /**
