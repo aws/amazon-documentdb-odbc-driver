@@ -39,7 +39,7 @@ endif()
 
 find_package(OpenSSL REQUIRED)
 
-include_directories(include src ${OPENSSL_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIRS} ${BSONCXX_INCLUDE_DIRS})
+include_directories(include src ${OPENSSL_INCLUDE_DIR})
 
 set(SOURCES src/network/network.cpp
         src/network/ssl/secure_socket_client.cpp
