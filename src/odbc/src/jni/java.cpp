@@ -877,7 +877,7 @@ namespace ignite
                     return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
-                bool JniContext::DocumentDbConnectionGetMetaData(
+                bool JniContext::DocumentDbConnectionGetDatabaseMetaData(
                     const SharedPointer< GlobalJObject >& connection,
                     SharedPointer< GlobalJObject >& metaData,
                     JniErrorInfo& errInfo) {
