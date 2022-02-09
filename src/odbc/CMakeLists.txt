@@ -22,13 +22,11 @@ set(TARGET ${PROJECT_NAME})
 find_package(ODBC REQUIRED)
 find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
-
-include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS} ${BSONCXX_INCLUDE_DIRS})
 find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
 include(UseJava)
 
-include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS})
+include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS} ${BSONCXX_INCLUDE_DIRS})
 include_directories(include)
 
 set(SOURCES src/app/application_data_buffer.cpp

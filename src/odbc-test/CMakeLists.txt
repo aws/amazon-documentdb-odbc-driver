@@ -17,10 +17,6 @@
 
 project(ignite-odbc-tests)
 
-if(POLICY CMP0025)
-    cmake_policy(SET CMP0025 NEW)
-endif()
-
 set(TARGET ${PROJECT_NAME})
 
 if (WIN32)
@@ -39,8 +35,6 @@ else ()
     # TODO: Ensure MacOS is portable. https://bitquill.atlassian.net/browse/AD-525
     include_directories(../odbc/os/linux/include)
 endif()
-
-
 
 set(SOURCES 
          src/configuration_test.cpp
