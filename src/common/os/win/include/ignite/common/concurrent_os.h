@@ -32,6 +32,9 @@ namespace ignite
     {
         namespace concurrent
         {
+            // Forward declaration
+            class ConditionVariable;
+
             /**
              * Static class to manage memory visibility semantics.
              */

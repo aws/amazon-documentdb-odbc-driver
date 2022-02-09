@@ -37,8 +37,6 @@
 
 #include <string>
 
-#include "ignite/ignite.h"
-
 namespace ignite
 {
     namespace odbc
@@ -351,6 +349,12 @@ namespace ignite
              * @return Result.
              */
             SQLRETURN PrepareQuery(const std::string& qry);
+
+            /** 
+             * Creates the standard DSN connection string.
+             */
+            void CreateDsnConnectionString(std::string& connectionString,
+                const std::string& username = std::string()) const;
 
             /** ODBC Environment. */
             SQLHENV env;
