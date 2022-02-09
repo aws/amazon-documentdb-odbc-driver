@@ -22,7 +22,6 @@
 #include <algorithm>
 
 #include <ignite/odbc/ignite_error.h>
-#include <ignite/network/network.h>
 
 #include "ignite/odbc/log.h"
 #include "ignite/odbc/utility.h"
@@ -52,6 +51,10 @@
 #include <bsoncxx/stdx/make_unique.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <bsoncxx/stdx/string_view.hpp>
+
+using namespace ignite::odbc::jni::java;
+using namespace ignite::odbc::common;
+using namespace ignite::odbc::common::concurrent;
 
 // Uncomment for per-byte debug.
 //#define PER_BYTE_DEBUG
@@ -165,7 +168,7 @@ namespace ignite
 
             config = cfg;
 
-            if (connection) {
+            if (connection.Get() != nullptr) {
                 AddStatusRecord(SqlState::S08002_ALREADY_CONNECTED,
                                 "Already connected.");
 
@@ -209,7 +212,7 @@ namespace ignite
 
         SqlResult::Type Connection::InternalRelease()
         {
-            if (!connection)
+            if (connection.Get() == nullptr)
             {
                 AddStatusRecord(SqlState::S08003_NOT_CONNECTED, "Connection is not open.");
 
@@ -225,13 +228,10 @@ namespace ignite
 
         void Connection::Close()
         {
-            if (connection) {
-                using namespace jni::java;
-                using namespace common::concurrent;
+            if (connection.Get() != nullptr) {
                 SharedPointer< JniContext > ctx(JniContext::Create(&opts[0], static_cast<int>(opts.size()), JniHandlers()));
                 JniErrorInfo errInfo;
-                // NOTE: DocumentDbDisconnect will notify JNI connection is no longer used - must set to nullptr.
-                ctx.Get()->DocumentDbDisconnect(connection, &errInfo);
+                ctx.Get()->ConnectionClose(connection, errInfo);
                 if (errInfo.code != java::IGNITE_JNI_ERR_SUCCESS) {
                     // TODO: Determine if we need to error check the close.
                 }
@@ -411,7 +411,7 @@ namespace ignite
                 {
                     SQLUINTEGER *val = reinterpret_cast<SQLUINTEGER*>(buf);
 
-                    *val = connection ? SQL_CD_FALSE : SQL_CD_TRUE;
+                    *val = connection.Get() ? SQL_CD_FALSE : SQL_CD_TRUE;
 
                     if (valueLen)
                         *valueLen = SQL_IS_INTEGER;
@@ -585,7 +585,7 @@ namespace ignite
 
         void Connection::EnsureConnected()
         {
-            if (connection)
+            if (connection.Get() != nullptr)
                 return;
 
             odbc::IgniteError err;
@@ -600,14 +600,11 @@ namespace ignite
         {
             bool connected = false;
 
-            using namespace jni::java;
-            using namespace common::concurrent;
-
-            if (connection) {
+            if (connection.Get() != nullptr) {
                 return true;
             }
 
-            std::string connectionString = FormatJdbcConnectionString();
+            std::string connectionString = FormatJdbcConnectionString(config);
             JniErrorInfo errInfo;
 
             // 2. Resolve DOCUMENTDB_HOME.
@@ -615,7 +612,6 @@ namespace ignite
 
             // 3. Create classpath.
             std::string cp = jni::CreateDocumentDbClasspath(std::string(), home);
-
             if (cp.empty()) {
                 err =
                     odbc::IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_NO_CLASSPATH,
@@ -628,10 +624,16 @@ namespace ignite
             SetJvmOptions(cp);
             
             SharedPointer< JniContext > ctx(JniContext::Create(&opts[0], static_cast<int>(opts.size()), JniHandlers(), &errInfo));
-            if (ctx.Get()) {
-                jobject result = ctx.Get()->DocumentDbConnect(
-                    connectionString.c_str(), &errInfo);
-                connected = (result && errInfo.code == java::IGNITE_JNI_ERR_SUCCESS);
+            if (errInfo.code != java::IGNITE_JNI_ERR_SUCCESS) {
+                IgniteError::SetError(errInfo.code, errInfo.errCls, errInfo.errMsg, err);
+                return false;
+            }
+            if (ctx.Get() != nullptr) {
+                SharedPointer< GlobalJObject > result;
+                bool success = ctx.Get()->DriverManagerGetConnection(
+                    connectionString.c_str(), result, errInfo);
+                connected = (success && result.Get()
+                             && errInfo.code == java::IGNITE_JNI_ERR_SUCCESS);
                 if (!connected) {
                     err = odbc::IgniteError(
                         odbc::IgniteError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
@@ -675,7 +677,8 @@ namespace ignite
             return mongoConnectionString;
         }
 
-        std::string Connection::FormatJdbcConnectionString() const {
+        std::string Connection::FormatJdbcConnectionString(
+            const config::Configuration& config) {
             std::string host = "localhost";
             std::string port = "27017";
             std::string jdbConnectionString;
@@ -730,57 +733,14 @@ namespace ignite
          * @param cp Classpath.
          */
         void Connection::SetJvmOptions(const std::string& cp) {
-            using namespace common;
             Deinit();
-
-            const size_t REQ_OPTS_CNT = 4;
-            const size_t JAVA9_OPTS_CNT = 6;
-
-            opts.reserve(REQ_OPTS_CNT + JAVA9_OPTS_CNT);
-
-            // 1. Set classpath.
-            std::string cpFull = "-Djava.class.path=" + cp;
-
-            opts.push_back(CopyChars(cpFull.c_str()));
-
-            // 3. Set Xms, Xmx.
-            std::string xmsStr = "-Xms" + std::to_string(256) + "m";
-            std::string xmxStr = "-Xmx" + std::to_string(1024) + "m";
-
-            opts.push_back(CopyChars(xmsStr.c_str()));
-            opts.push_back(CopyChars(xmxStr.c_str()));
-
-            // 4. Optional debug arguments
-            //std::string debugStr = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005";
-            //opts.push_back(CopyChars(debugStr.c_str()));
-
-            // 5. Set file.encoding.
-            std::string fileEncParam = "-Dfile.encoding=";
-            std::string fileEncFull = fileEncParam + "UTF-8";
-            opts.push_back(CopyChars(fileEncFull.c_str()));
-
-            // Adding options for Java 9 or later
-            if (jni::java::IsJava9OrLater()) {
-                opts.push_back(CopyChars(
-                    "--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED"));
-                opts.push_back(CopyChars(
-                    "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"));
-                opts.push_back(CopyChars(
-                  "--add-exports=java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED"));
-                opts.push_back(CopyChars(
-                  "--add-exports=jdk.internal.jvmstat/sun.jvmstat.monitor=ALL-UNNAMED"));
-                opts.push_back(CopyChars(
-                    "--add-exports=java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED"));
-                opts.push_back(CopyChars(
-                  "--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED"));
-            }
+            BuildJvmOptions(cp, opts);
         }
 
         /**
          * Deallocates all allocated data.
          */
         void Connection::Deinit() {
-            using namespace common;
             std::for_each(opts.begin(), opts.end(), ReleaseChars);
             opts.clear();
         }

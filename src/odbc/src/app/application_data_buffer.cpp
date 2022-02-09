@@ -21,8 +21,6 @@
 
 #include "ignite/odbc/common/bits.h"
 
-#include "ignite/impl/binary/binary_utils.h"
-
 #include "ignite/odbc/system/odbc_constants.h"
 #include "ignite/odbc/app/application_data_buffer.h"
 #include "ignite/odbc/utility.h"
