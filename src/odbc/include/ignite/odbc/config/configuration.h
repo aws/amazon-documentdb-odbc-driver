@@ -713,11 +713,11 @@ namespace ignite
                 void ToMap(ArgumentMap& res) const;
 
                 /**
-                 * Checks that a valid JDBC connection string with all the required properties can be built
-                 * from the configuration.
+                 * Checks that a valid JDBC connection string with all the required properties can be built from the configuration.
+                 * @param err string for error message.
                  * @return @c true on valid set and @c false otherwise.
                  */
-                bool IsValid(diagnostic::DiagnosticRecordStorage* diag) const;
+                bool Validate(std::string& err) const;
 
                 /**
                  * Formats the JDBC connection string from configuration values.

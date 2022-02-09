@@ -18,6 +18,7 @@
 #include <sstream>
 #include <iterator>
 
+#include "ignite/common/utils.h"
 #include "ignite/odbc/utility.h"
 #include "ignite/odbc/config/configuration.h"
 #include "ignite/odbc/config/connection_string_parser.h"
@@ -505,7 +506,7 @@ namespace ignite
                 AddToMap(res, ConnectionStringParser::Key::password, password);
                 AddToMap(res, ConnectionStringParser::Key::appName, appName);
                 AddToMap(res, ConnectionStringParser::Key::loginTimeoutSec, loginTimeoutSec);
-                AddToMap(res, ConnectionStringParser::Key::readPreference, readPreference);
+                AddToMap(res, ConnectionStringParser::Key::readPreference, readPreference, false);
                 AddToMap(res, ConnectionStringParser::Key::replicaSet, replicaSet);
                 AddToMap(res, ConnectionStringParser::Key::retryReads, retryReads);
                 AddToMap(res, ConnectionStringParser::Key::tls, tls);
@@ -518,28 +519,24 @@ namespace ignite
                 AddToMap(res, ConnectionStringParser::Key::sshPrivateKeyPassphrase, sshPrivateKeyPassphrase);
                 AddToMap(res, ConnectionStringParser::Key::sshStrictHostKeyChecking, sshStrictHostKeyChecking);
                 AddToMap(res, ConnectionStringParser::Key::sshKnownHostsFile, sshKnownHostsFile);
-                AddToMap(res, ConnectionStringParser::Key::scanMethod, scanMethod);
+                AddToMap(res, ConnectionStringParser::Key::scanMethod, scanMethod, false);
                 AddToMap(res, ConnectionStringParser::Key::scanLimit, scanLimit);
                 AddToMap(res, ConnectionStringParser::Key::schemaName, schemaName);
                 AddToMap(res, ConnectionStringParser::Key::refreshSchema, refreshSchema);
                 AddToMap(res, ConnectionStringParser::Key::defaultFetchSize, defaultFetchSize);
             }
 
-            bool Configuration::IsValid(diagnostic::DiagnosticRecordStorage* diag) const {
+            bool Configuration::Validate(std::string& err) const {
                 // Validate minimum required properties.
                 if (!IsHostnameSet() || !IsUserSet() || !IsPasswordSet() || !IsDatabaseSet()) {
-                    if (diag)
-                        diag->AddStatusRecord(SqlState::S01S00_INVALID_CONNECTION_STRING_ATTRIBUTE, 
-                            "Hostname, username, password, and database are required to connect.");
+                    err = "Hostname, username, password, and database are required to connect.";
                     return false;
                 }
 
                 // Validate required SSH tunnel properties if needed.
                 boolean sshTunnel = IsSshEnable() || IsSshHostSet() || IsSshUserSet() || IsSshPrivateKeyFileSet();
                 if (sshTunnel && (!IsSshHostSet() || !IsSshUserSet() || !IsSshPrivateKeyFileSet())) {
-                    if (diag)
-                        diag->AddStatusRecord(SqlState::S01S00_INVALID_CONNECTION_STRING_ATTRIBUTE,
-                            "If using an internal SSH tunnel, all of ssh_host, ssh_user, ssh_private_key_file are required to connect.");
+                    err = "If using an internal SSH tunnel, all of ssh_host, ssh_user, ssh_private_key_file are required to connect.";
                     return false;
                 }
 
@@ -549,13 +546,13 @@ namespace ignite
             std::string Configuration::ToJdbcConnectionString() const {
                 std::string jdbcConnectionString;
                 jdbcConnectionString = "jdbc:documentdb:";
-                jdbcConnectionString.append("//" + GetUser());
-                jdbcConnectionString.append(":" + GetPassword());
-                jdbcConnectionString.append("@" + GetPort());
-                jdbcConnectionString.append(":" + GetHostname());
+                jdbcConnectionString.append("//" + ignite::common::EncodeURIComponent(GetUser()));
+                jdbcConnectionString.append(":" + ignite::common::EncodeURIComponent(GetPassword()));
+                jdbcConnectionString.append("@" + GetHostname());
+                jdbcConnectionString.append(":" + common::LexicalCast<std::string>(GetPort()));
                 jdbcConnectionString.append("/" + GetDatabase());
                 // Always pass application name even when unset to override the JDBC default application name.
-                jdbcConnectionString.append("?applicationName=" + GetApplicationName());
+                jdbcConnectionString.append("?appName=" + ignite::common::EncodeURIComponent(GetApplicationName()));
 
                 config::Configuration::ArgumentMap arguments;
                 ToJdbcOptionsMap(arguments);

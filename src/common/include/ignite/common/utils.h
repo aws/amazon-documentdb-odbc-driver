@@ -75,6 +75,24 @@ namespace ignite
             std::replace(str.begin(), str.end(), ' ', '_');
         }
 
+        inline std::string EncodeURIComponent(std::string unencoded)
+        {
+            std::ostringstream oss;
+
+            for (char& c : unencoded)
+            {
+                if (std::isalnum(c) || c == '-' || c == '_' || c == '~')
+                {
+                    oss << c;
+                }
+                else
+                {
+                    oss << "%" << std::uppercase << std::hex << (0xff & c);
+                }
+            }
+            return oss.str();
+        }
+
         /**
          * Strips leading and trailing whitespaces from string.
          *

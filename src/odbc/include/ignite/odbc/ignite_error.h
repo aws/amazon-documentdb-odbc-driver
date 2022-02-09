@@ -216,7 +216,6 @@ namespace ignite
             /** Generic transaction error. */
             static const int IGNITE_ERR_TX = 2028;
         
-        
             /** Unknown error. */
             static const int IGNITE_ERR_UNKNOWN = -1;
 

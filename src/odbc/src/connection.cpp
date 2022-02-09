@@ -159,8 +159,11 @@ namespace ignite
                 return SqlResult::AI_ERROR;
             }
 
-            if (!config.IsValid(&GetDiagnosticRecords()))
+            std::string validationErr;
+            bool isValidationSuccess = config.Validate(validationErr);
+            if (!isValidationSuccess)
             {
+                AddStatusRecord(SqlState::S01S00_INVALID_CONNECTION_STRING_ATTRIBUTE, validationErr);
                 return SqlResult::AI_ERROR;
             }
 
