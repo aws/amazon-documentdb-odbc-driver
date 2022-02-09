@@ -277,6 +277,11 @@ namespace ignite
                     JniMethod("getTables",
                               "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)Ljava/sql/ResultSet;",
                               false);
+                JniMethod const M_DATABASE_META_DATA_GET_COLUMNS =
+                    JniMethod("getColumns",
+                              "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/"
+                              "String;Ljava/lang/String;)Ljava/sql/ResultSet;",
+                              false);
 
                 const char* const C_DOCUMENTDB_CONNECTION = "software/amazon/documentdb/jdbc/DocumentDbConnection";
                 JniMethod const M_DOCUMENTDB_CONNECTION_GET_SSH_LOCAL_PORT =
@@ -508,6 +513,7 @@ namespace ignite
 
                     c_DatabaseMetaData = FindClass(env, C_DATABASE_META_DATA);
                     m_DatabaseMetaDataGetTables = FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_TABLES);
+                    m_DatabaseMetaDataGetColumns = FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_COLUMNS);
 
                     c_Connection = FindClass(env, C_JAVA_SQL_CONNECTION);
                     m_ConnectionClose = FindMethod(env, c_Connection, M_JAVA_SQL_CONNECTION_CLOSE);
@@ -934,6 +940,46 @@ namespace ignite
                         new GlobalJObject(env, env->NewGlobalRef(result)));
                     return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
+                
+                bool JniContext::DatabaseMetaDataGetColumns(
+                    const SharedPointer< GlobalJObject >& databaseMetaData,
+                    const std::string& catalog,
+                    const std::string& schemaPattern,
+                    const std::string& tableNamePattern,
+                    const std::string& columnNamePattern,
+                    SharedPointer< GlobalJObject >& resultSet,
+                    JniErrorInfo& errInfo) {
+                    if (databaseMetaData.Get() == nullptr) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "DatabaseMetaData object must be set.";
+                        return false;
+                    }
+
+                    JNIEnv* env = Attach();
+                    jstring jCatalog = env->NewStringUTF(catalog.c_str());
+                    jstring jSchemaPattern =
+                        env->NewStringUTF(schemaPattern.c_str());
+                    jstring jTableNamePattern =
+                        env->NewStringUTF(tableNamePattern.c_str());
+                    jstring jColumnNamePattern =
+                        env->NewStringUTF(columnNamePattern.c_str());
+
+                    jobject result = env->CallObjectMethod(
+                        databaseMetaData.Get()->GetRef(),
+                        jvm->GetMembers().m_DatabaseMetaDataGetColumns, jCatalog,
+                        jSchemaPattern, jTableNamePattern, jColumnNamePattern);
+                    ExceptionCheck(env, &errInfo);
+
+                    if (!result || errInfo.code != IGNITE_JNI_ERR_SUCCESS) {
+                        resultSet = SharedPointer< GlobalJObject >(nullptr);
+                        return false;
+                    }
+
+                    resultSet = SharedPointer< GlobalJObject >(
+                        new GlobalJObject(env, env->NewGlobalRef(result)));
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
+
 
                 bool JniContext::ResultSetClose(
                     const SharedPointer< GlobalJObject >& resultSet,

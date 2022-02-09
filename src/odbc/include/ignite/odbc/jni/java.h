@@ -281,6 +281,7 @@ namespace ignite {
 
                   jclass c_DatabaseMetaData;
                   jmethodID m_DatabaseMetaDataGetTables;
+                  jmethodID m_DatabaseMetaDataGetColumns;
 
                   jclass c_IgniteException;
 
@@ -459,6 +460,14 @@ namespace ignite {
                       const std::string& schemaPattern,
                       const std::string& tableNamePattern,
                       const std::vector< std::string >& types,
+                      SharedPointer< GlobalJObject >& resultSet,
+                      JniErrorInfo& errInfo);
+                  bool DatabaseMetaDataGetColumns(
+                      const SharedPointer< GlobalJObject >& databaseMetaData,
+                      const std::string& catalog,
+                      const std::string& schemaPattern,
+                      const std::string& columnNamePattern,
+                      const std::string& types,
                       SharedPointer< GlobalJObject >& resultSet,
                       JniErrorInfo& errInfo);
 
