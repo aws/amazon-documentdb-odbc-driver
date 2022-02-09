@@ -278,7 +278,11 @@ namespace ignite
                               "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)Ljava/sql/ResultSet;",
                               false);
 
-                const char* const C_DOCUMENTDB_CONNECTION = "software/amazon/documentdb/jdbc/DocumentDbConnectionProperties";
+                const char* const C_DOCUMENTDB_CONNECTION = "software/amazon/documentdb/jdbc/DocumentDbConnection";
+                JniMethod const M_DOCUMENTDB_CONNECTION_GET_SSH_LOCAL_PORT =
+                    JniMethod("getSshLocalPort", "()I", false);
+                JniMethod const M_DOCUMENTDB_CONNECTION_IS_SSH_TUNNEL_ACTIVE =
+                    JniMethod("isSshTunnelActive", "()Z", false);
 
                 const char* const C_DRIVERMANAGER = "java/sql/DriverManager";
                 JniMethod const M_DRIVERMANAGER_GET_CONNECTION = 
@@ -487,6 +491,8 @@ namespace ignite
 
                     c_DocumentDbConnection = FindClass(env, C_DOCUMENTDB_CONNECTION);
                     //m_DocumentDbConnectionInit = FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_PROPERTIES_INIT);
+                    m_DocumentDbConnectionGetSshLocalPort = FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_GET_SSH_LOCAL_PORT);
+                    m_DocumentDbConnectionIsSshTunnelActive = FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_IS_SSH_TUNNEL_ACTIVE);
 
                     c_DriverManager = FindClass(env, C_DRIVERMANAGER);
                     m_DriverManagerGetConnection = FindMethod(env, c_DriverManager, M_DRIVERMANAGER_GET_CONNECTION);
@@ -820,6 +826,43 @@ namespace ignite
                     env->CallVoidMethod(connection.Get()->GetRef(),
                                         jvm->GetMembers().m_ConnectionClose);
                     ExceptionCheck(env, &errInfo);
+                }
+
+                bool JniContext::DocumentDbConnectionIsSshTunnelActive(
+                    const SharedPointer< GlobalJObject >& connection,
+                    bool& isActive,
+                    JniErrorInfo& errInfo) {
+                    if (!connection.Get()) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "Connection object must be set.";
+                        return false;
+                    }
+                    JNIEnv* env = Attach();
+                    jboolean res = env->CallBooleanMethod(
+                        connection.Get()->GetRef(),
+                        jvm->GetMembers().m_DocumentDbConnectionIsSshTunnelActive);
+                    ExceptionCheck(env, &errInfo);
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
+                        isActive = res != JNI_FALSE;
+                    }
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
+
+                bool JniContext::DocumentDbConnectionGetSshLocalPort(
+                    const SharedPointer< GlobalJObject >& connection,
+                    int32_t& result,
+                    JniErrorInfo& errInfo) {
+                    if (!connection.Get()) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "Connection object must be set.";
+                        return false;
+                    }
+                    JNIEnv* env = Attach();
+                    result = env->CallIntMethod(
+                        connection.Get()->GetRef(),
+                        jvm->GetMembers().m_DocumentDbConnectionGetSshLocalPort);
+                    ExceptionCheck(env, &errInfo);
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
                 bool JniContext::ConnectionGetMetaData(
