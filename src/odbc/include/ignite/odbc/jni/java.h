@@ -258,6 +258,8 @@ namespace ignite {
                   jmethodID m_DocumentDbConnectionPropertiesGetPropertiesFromConnectionString;
 
                   jclass c_DocumentDbConnection;
+                  jmethodID m_DocumentDbConnectionGetSshLocalPort;
+                  jmethodID m_DocumentDbConnectionIsSshTunnelActive;
                   jmethodID m_DocumentDbConnectionInit;
                   jmethodID m_DocumentDbClose;
 
@@ -447,6 +449,9 @@ namespace ignite {
                   bool DriverManagerGetConnection(const char* connectionString, SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo);
                   void ConnectionClose(const SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo);
                   bool ConnectionGetMetaData(const SharedPointer< GlobalJObject >& connection, SharedPointer< GlobalJObject>& databaseMetaData, JniErrorInfo& errInfo);
+
+                  bool DocumentDbConnectionIsSshTunnelActive(const SharedPointer< GlobalJObject >& connection, bool& isActive, JniErrorInfo& errInfo);
+                  bool DocumentDbConnectionGetSshLocalPort(const SharedPointer< GlobalJObject >& connection, int32_t& result, JniErrorInfo& errInfo);
 
                   bool DatabaseMetaDataGetTables(
                       const SharedPointer< GlobalJObject >& databaseMetaData,
@@ -699,5 +704,5 @@ namespace ignite {
         }  // namespace jni
     }  // namespace odbc
 }  // namespace ignite
-
 #endif //_IGNITE_ODBC_JNI_JAVA
+
