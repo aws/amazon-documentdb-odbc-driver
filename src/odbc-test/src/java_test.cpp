@@ -206,6 +206,82 @@ BOOST_AUTO_TEST_CASE(TestDriverManagerGetConnection)
     connection = SharedPointer< GlobalJObject >(nullptr);
 }
 
+BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPort) {
+    PrepareContext();
+    BOOST_REQUIRE(_ctx.Get() != nullptr);
+
+    // get Driver manager connection
+    JniErrorInfo errInfo;
+    SharedPointer< GlobalJObject > connection;
+    bool success = _ctx.Get()->DriverManagerGetConnection(_jdbcConnectionString.c_str(), connection, errInfo);
+    if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+        BOOST_FAIL(errInfo.errMsg);
+    }
+    BOOST_REQUIRE(connection.Get());
+    AutoCloseConnection autoCloseConnection(_ctx, connection);
+
+    // see if SSH tunnel is active
+    bool isActive;
+    success = _ctx.Get()->DocumentDbConnectionIsSshTunnelActive(connection, isActive, errInfo);
+    // if tunnel is not shown as active, or operation not successful, BOOST FAIL
+    if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+        BOOST_FAIL(errInfo.errMsg);
+    }
+    BOOST_CHECK(isActive);
+
+    // SSH tunnel confirmed to be active, get SSH tunnel local port
+    int32_t port;
+    success = _ctx.Get()->DocumentDbConnectionGetSshLocalPort(connection, port, errInfo);
+    if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+        std::string errMsg = errInfo.errMsg;
+        BOOST_FAIL(errMsg);
+    }
+    
+    // if connection successful, port should be a positive number
+    BOOST_CHECK(port > 0);
+}
+
+// TODO Enable when we can get external SSH tunnel working
+BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPortSshTunnelNotActive,  * disabled()) {
+//BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPortSshTunnelNotActive) {
+    // test when SSH tunnel is not active, the SSH tunnel port should be 0
+    // TODO do things so SSH tunnel is not active, but connection is open
+    PrepareContext();
+    BOOST_REQUIRE(_ctx.Get() != nullptr);
+
+    // get Driver manager connection
+    JniErrorInfo errInfo;
+    SharedPointer< GlobalJObject > connection;
+    bool success = _ctx.Get()->DriverManagerGetConnection(
+        _jdbcConnectionString.c_str(), connection, errInfo);
+    if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+        BOOST_FAIL(errInfo.errMsg);
+    }
+    BOOST_REQUIRE(connection.Get());
+    AutoCloseConnection autoCloseConnection(_ctx, connection);
+
+    // check if SSH tunnel is not active
+    bool isActive;
+    success = _ctx.Get()->DocumentDbConnectionIsSshTunnelActive(connection, isActive, errInfo);
+    // if SSH tunnel is active, or operation not successful, BOOST FAIL
+    if (isActive || !success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+        BOOST_FAIL(errInfo.errMsg);
+    }
+
+    BOOST_CHECK(!isActive);
+
+    // SSH tunnel confirmed to be not active, get SSH tunnel local port
+    int32_t port;
+    success = _ctx.Get()->DocumentDbConnectionGetSshLocalPort(connection, port, errInfo);
+    if (errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+        std::string errMsg = errInfo.errMsg;
+        BOOST_FAIL(errMsg);
+    }
+
+    // if SSH tunnel not active, SSH local port number should be 0
+    BOOST_CHECK_EQUAL(port, 0);
+}
+
 BOOST_AUTO_TEST_CASE(TestConnectionGetMetaData) {
     PrepareContext();
     BOOST_REQUIRE(_ctx.Get() != nullptr);
