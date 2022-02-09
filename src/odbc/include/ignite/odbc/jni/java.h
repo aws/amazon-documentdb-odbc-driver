@@ -456,7 +456,7 @@ namespace ignite {
 
                   bool DocumentDbConnectionIsSshTunnelActive(const SharedPointer< GlobalJObject >& connection, bool& isActive, JniErrorInfo& errInfo);
                   bool DocumentDbConnectionGetSshLocalPort(const SharedPointer< GlobalJObject >& connection, int32_t& result, JniErrorInfo& errInfo);
-                  bool DocumentDbConnectionGetDatabaseMetaData(const SharedPointer< GlobalJObject >& connection, SharedPointer< GlobalJObject >& metaData, JniErrorInfo& errInfo);
+                  bool DocumentDbConnectionGetDatabaseMetadata(const SharedPointer< GlobalJObject >& connection, SharedPointer< GlobalJObject >& metaData, JniErrorInfo& errInfo);
 
                   bool DocumentDbDatabaseSchemaMetadataGetSchemaName(const SharedPointer< GlobalJObject >& databaseMetaData, std::string& value, bool& wasNull, JniErrorInfo& errInfo);
 

@@ -282,7 +282,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPortSshTunnelNotActive,
     BOOST_CHECK_EQUAL(port, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetDatabaseMetaData) {
+BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetDatabaseMetadata) {
     PrepareContext();
     BOOST_REQUIRE(_ctx.Get() != nullptr);
 
@@ -299,7 +299,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetDatabaseMetaData) {
 
     // get metadata
     SharedPointer< GlobalJObject > databaseMetaData;
-    if (!_ctx.Get()->DocumentDbConnectionGetDatabaseMetaData(
+    if (!_ctx.Get()->DocumentDbConnectionGetDatabaseMetadata(
             connection, databaseMetaData,
                                            errInfo)) {
         BOOST_FAIL(errInfo.errMsg);
@@ -324,7 +324,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseSchemaMetadataGetSchemaName) {
 
     // get metadata
     SharedPointer< GlobalJObject > databaseMetaData;
-    if (!_ctx.Get()->DocumentDbConnectionGetDatabaseMetaData(
+    if (!_ctx.Get()->DocumentDbConnectionGetDatabaseMetadata(
             connection, databaseMetaData, errInfo)) {
         BOOST_FAIL(errInfo.errMsg);
     }

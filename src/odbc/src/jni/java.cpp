@@ -877,7 +877,7 @@ namespace ignite
                     return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
-                bool JniContext::DocumentDbConnectionGetDatabaseMetaData(
+                bool JniContext::DocumentDbConnectionGetDatabaseMetadata(
                     const SharedPointer< GlobalJObject >& connection,
                     SharedPointer< GlobalJObject >& metaData,
                     JniErrorInfo& errInfo) {
@@ -903,17 +903,17 @@ namespace ignite
                 }
 
                 bool JniContext::DocumentDbDatabaseSchemaMetadataGetSchemaName(
-                    const SharedPointer< GlobalJObject >& databaseMetaData,
+                    const SharedPointer< GlobalJObject >& databaseMetadata,
                     std::string& value, bool& wasNull, JniErrorInfo& errInfo)
                 {
-                    if (!databaseMetaData.Get()) {
+                    if (!databaseMetadata.Get()) {
                         errInfo.code = IGNITE_JNI_ERR_GENERIC;
-                        errInfo.errMsg = "DatabaseMetaData object must be set.";
+                        errInfo.errMsg = "DatabaseMetadata object must be set.";
                         return false;
                     }
                     JNIEnv* env = Attach();
                     jobject result = env->CallObjectMethod(
-                        databaseMetaData.Get()->GetRef(),
+                        databaseMetadata.Get()->GetRef(),
                         jvm->GetMembers().m_DocumentDbDatabaseSchemaMetadataGetSchemaName);
                     ExceptionCheck(env, &errInfo);
 
