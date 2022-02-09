@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPort) {
     BOOST_REQUIRE(connection.Get());
     AutoCloseConnection autoCloseConnection(_ctx, connection);
 
-    // see if ssh tunnel is active
+    // see if SSH tunnel is active
     bool isActive;
     success = _ctx.Get()->DocumentDbConnectionIsSshTunnelActive(connection, isActive, errInfo);
     // if tunnel is not shown as active, or operation not successful, BOOST FAIL
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPort) {
     }
     BOOST_CHECK(isActive);
 
-    // ssh tunnel confirmed to be active, get ssh tunnel local port
+    // SSH tunnel confirmed to be active, get SSH tunnel local port
     int32_t port;
     success = _ctx.Get()->DocumentDbConnectionGetSshLocalPort(connection, port, errInfo);
     if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPort) {
 // TODO Enable when we can get external SSH tunnel working
 BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPortSshTunnelNotActive,  * disabled()) {
 //BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPortSshTunnelNotActive) {
-    // test when SSH tunnel is not active, the ssh tunnel port should be 0
+    // test when SSH tunnel is not active, the SSH tunnel port should be 0
     // TODO do things so SSH tunnel is not active, but connection is open
     PrepareContext();
     BOOST_REQUIRE(_ctx.Get() != nullptr);
@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPortSshTunnelNotActive,
     BOOST_REQUIRE(connection.Get());
     AutoCloseConnection autoCloseConnection(_ctx, connection);
 
-    // check if ssh tunnel is not active
+    // check if SSH tunnel is not active
     bool isActive;
     success = _ctx.Get()->DocumentDbConnectionIsSshTunnelActive(connection, isActive, errInfo);
     // if SSH tunnel is active, or operation not successful, BOOST FAIL
@@ -270,7 +270,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPortSshTunnelNotActive,
 
     BOOST_CHECK(!isActive);
 
-    // ssh tunnel confirmed to be not active, get ssh tunnel local port
+    // SSH tunnel confirmed to be not active, get SSH tunnel local port
     int32_t port;
     success = _ctx.Get()->DocumentDbConnectionGetSshLocalPort(connection, port, errInfo);
     if (errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
@@ -278,7 +278,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPortSshTunnelNotActive,
         BOOST_FAIL(errMsg);
     }
 
-    // if SSH tunnel not active, ssh local port number should be 0
+    // if SSH tunnel not active, SSH local port number should be 0
     BOOST_CHECK_EQUAL(port, 0);
 }
 
