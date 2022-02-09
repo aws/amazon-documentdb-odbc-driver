@@ -44,8 +44,7 @@ set(SOURCES
          src/java_test.cpp
          src/odbc_test_suite.cpp
          src/test_utils.cpp
-         src/teamcity/teamcity_boost.cpp
-         src/teamcity/teamcity_messages.cpp    
+         src/dummy_test.cpp
          ../odbc/src/app/application_data_buffer.cpp
          ../odbc/src/common_types.cpp
          ../odbc/src/common/big_integer.cpp
@@ -125,7 +124,7 @@ endif()
 add_executable(${TARGET} ${SOURCES})
 
 target_link_libraries(${TARGET} ${ODBC_LIBRARIES})
-target_link_libraries(${TARGET} ${Boost_LIBRARIES} ignite mongo::mongocxx_shared)
+target_link_libraries(${TARGET} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} ignite mongo::mongocxx_shared)
 target_code_coverage(${TARGET}  PUBLIC AUTO ALL)
 
 if (WIN32)
