@@ -649,11 +649,23 @@ namespace ignite
             if (!connected) {
                 return connected;
             }
+
+            int32_t localSSHTunnelPort = 0;
+            if (!GetInternalSSHTunnelPort(err, localSSHTunnelPort, ctx)) {
+                return false;
+            }       
             
-            
+            connected = ConnectCPPDocumentDB(err, localSSHTunnelPort);
+
+            return connected;
+        }
+
+        bool Connection::GetInternalSSHTunnelPort(odbc::IgniteError& err, int32_t& localSSHTunnelPort, SharedPointer< JniContext > ctx) {
             bool isSSHTunnelActive;
+            JniErrorInfo errInfo;
             bool success = ctx.Get()->DocumentDbConnectionIsSshTunnelActive(
                 connection, isSSHTunnelActive, errInfo);
+
             if (!success
                 || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
                 std::string errMsg = errInfo.errMsg;
@@ -661,7 +673,8 @@ namespace ignite
                     errInfo.errMsg);
                 return false;
             }
-            int32_t localSSHTunnelPort = 0;
+
+            
             if (isSSHTunnelActive) {
                 bool success = ctx.Get()->DocumentDbConnectionGetSshLocalPort(
                     connection, localSSHTunnelPort, errInfo);  
@@ -674,9 +687,8 @@ namespace ignite
                     return false;
                 }
             }
-            connected = ConnectCPPDocumentDB(err, localSSHTunnelPort);
 
-            return connected;
+            return true;
         }
 
         std::string Connection::FormatMongoCppConnectionString(
@@ -699,9 +711,8 @@ namespace ignite
             mongoConnectionString.append(":" + port);
             mongoConnectionString.append("/" + config.GetDatabase());
             mongoConnectionString.append("?tlsAllowInvalidHostnames=true");
-            //mongoConnectionString.append("&tls=true");
-  
-
+            //tls configuration is handled using tls_options in connectionCPP
+            //TODO handle the other DSN configuration
 
             return mongoConnectionString;
         }
@@ -813,7 +824,7 @@ namespace ignite
                 auto client1 = mongocxx::client{
                     mongocxx::uri{mongoCPPConnectionString}, client_options};
 
-                std::string database = "test";
+                std::string database = config.GetDatabase();
                 bsoncxx::builder::stream::document ping;
                 ping << "ping" << 1;
                 auto db = client1[database];

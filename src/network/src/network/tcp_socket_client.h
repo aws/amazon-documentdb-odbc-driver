@@ -97,6 +97,7 @@ namespace ignite
              * @return @c true if the socket is blocking and false otherwise.
              */
             virtual bool IsBlocking() const;
+
         private:
             /**
              * Close established connection.

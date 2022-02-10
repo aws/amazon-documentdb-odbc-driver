@@ -514,6 +514,14 @@ namespace ignite
             std::string FormatMongoCppConnectionString(
                 int32_t localSSHTunnelPort) const;
 
+            /**
+             * Helper function to get internall SSH tunnel Port
+             * 
+             * @param err 
+             * @return int32_t 
+             */
+            bool GetInternalSSHTunnelPort (IgniteError& err, int32_t& localSSHTunnelPort, SharedPointer< jni::java::JniContext > ctx);
+
             /** 
              * Creates JVM options
              */
