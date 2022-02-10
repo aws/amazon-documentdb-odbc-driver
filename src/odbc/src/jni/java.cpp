@@ -293,6 +293,14 @@ namespace ignite
                     JniMethod("getSshLocalPort", "()I", false);
                 JniMethod const M_DOCUMENTDB_CONNECTION_IS_SSH_TUNNEL_ACTIVE =
                     JniMethod("isSshTunnelActive", "()Z", false);
+                JniMethod const M_DOCUMENTDB_CONNECTION_GET_DATABASE_METADATA =
+                    JniMethod("getDatabaseMetadata", "()Lsoftware/amazon/documentdb/jdbc/metadata/DocumentDbDatabaseSchemaMetadata;", false); 
+
+                const char* const C_DOCUMENTDB_DATABASE_SCHEMA_METADATA =
+                    "software/amazon/documentdb/jdbc/metadata/DocumentDbDatabaseSchemaMetadata";
+                JniMethod const M_DOCUMENTDB_DATABASE_SCHEMA_METADATA_GET_SCHEMA_NAME =
+                        JniMethod("getSchemaName", "()Ljava/lang/String;", false);
+
 
                 const char* const C_DRIVERMANAGER = "java/sql/DriverManager";
                 JniMethod const M_DRIVERMANAGER_GET_CONNECTION = 
@@ -503,6 +511,10 @@ namespace ignite
                     //m_DocumentDbConnectionInit = FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_PROPERTIES_INIT);
                     m_DocumentDbConnectionGetSshLocalPort = FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_GET_SSH_LOCAL_PORT);
                     m_DocumentDbConnectionIsSshTunnelActive = FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_IS_SSH_TUNNEL_ACTIVE);
+                    m_DocumentDbConnectionGetDatabaseMetadata = FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_GET_DATABASE_METADATA);
+
+                    c_DocumentDbDatabaseSchemaMetadata = FindClass(env, C_DOCUMENTDB_DATABASE_SCHEMA_METADATA);
+                    m_DocumentDbDatabaseSchemaMetadataGetSchemaName = FindMethod(env, c_DocumentDbDatabaseSchemaMetadata, M_DOCUMENTDB_DATABASE_SCHEMA_METADATA_GET_SCHEMA_NAME);
 
                     c_DriverManager = FindClass(env, C_DRIVERMANAGER);
                     m_DriverManagerGetConnection = FindMethod(env, c_DriverManager, M_DRIVERMANAGER_GET_CONNECTION);
@@ -875,6 +887,61 @@ namespace ignite
                         connection.Get()->GetRef(),
                         jvm->GetMembers().m_DocumentDbConnectionGetSshLocalPort);
                     ExceptionCheck(env, &errInfo);
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
+
+                bool JniContext::DocumentDbConnectionGetDatabaseMetadata(
+                    const SharedPointer< GlobalJObject >& connection,
+                    SharedPointer< GlobalJObject >& metadata,
+                    JniErrorInfo& errInfo) {
+                    if (!connection.Get()) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "Connection object must be set.";
+                        return false;
+                    }
+                    JNIEnv* env = Attach();
+                    jobject result = env->CallObjectMethod(
+                        connection.Get()->GetRef(),
+                        jvm->GetMembers().m_DocumentDbConnectionGetDatabaseMetadata);
+                    ExceptionCheck(env, &errInfo);
+
+                    if (!result || errInfo.code != IGNITE_JNI_ERR_SUCCESS) {
+                        metadata = nullptr;
+                        return false;
+                    }
+
+                    metadata = SharedPointer< GlobalJObject >(
+                        new GlobalJObject(env, env->NewGlobalRef(result)));
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
+
+                bool JniContext::DocumentDbDatabaseSchemaMetadataGetSchemaName(
+                    const SharedPointer< GlobalJObject >& databaseMetadata,
+                    std::string& value, bool& wasNull, JniErrorInfo& errInfo)
+                {
+                    if (!databaseMetadata.Get()) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "DatabaseMetadata object must be set.";
+                        return false;
+                    }
+                    JNIEnv* env = Attach();
+                    jobject result = env->CallObjectMethod(
+                        databaseMetadata.Get()->GetRef(),
+                        jvm->GetMembers().m_DocumentDbDatabaseSchemaMetadataGetSchemaName);
+                    ExceptionCheck(env, &errInfo);
+
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
+                        wasNull = !result;
+                        if (result != nullptr) {
+                            jboolean isCopy;
+                            const char* utfChars = env->GetStringUTFChars(
+                                (jstring)result, &isCopy);
+                            value = std::string(utfChars);
+                            env->ReleaseStringUTFChars((jstring)result,
+                                                       utfChars);
+                        }
+                    }
+
                     return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
