@@ -267,6 +267,10 @@ namespace ignite
                     JniMethod(
                         "getInt",
                         "(Ljava/lang/String;)I", false);
+                JniMethod const M_RECORD_SET_GET_SHORT_BY_INDEX =
+                    JniMethod("getShort", "(I)S", false);
+                JniMethod const M_RECORD_SET_GET_SHORT_BY_NAME =
+                    JniMethod("getShort", "(Ljava/lang/String;)S", false);
                 JniMethod const M_RECORD_SET_WAS_NULL =
                     JniMethod(
                         "wasNull",
@@ -510,6 +514,8 @@ namespace ignite
                     m_ResultSetGetStringByName = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_STRING_BY_NAME);
                     m_ResultSetGetIntegerByIndex = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_INTEGER_BY_INDEX);
                     m_ResultSetGetIntegerByName = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_INTEGER_BY_NAME);
+                    m_ResultSetGetShortByIndex = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_SHORT_BY_INDEX);
+                    m_ResultSetGetShortByName = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_SHORT_BY_NAME);
                     m_ResultSetWasNull = FindMethod(env, c_ResultSet, M_RECORD_SET_WAS_NULL);
 
                     c_DatabaseMetaData = FindClass(env, C_DATABASE_META_DATA);
@@ -1128,6 +1134,55 @@ namespace ignite
                     jint result = env->CallIntMethod(
                         resultSet.Get()->GetRef(),
                         jvm->GetMembers().m_ResultSetGetIntegerByName,
+                        jColumnName);
+                    ExceptionCheck(env, &errInfo);
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
+                        value = result;
+                        return ResultSetWasNull(resultSet, wasNull, errInfo);
+                    }
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
+                
+                bool JniContext::ResultSetGetShort(
+                    const SharedPointer< GlobalJObject >& resultSet,
+                    int columnIndex, short& value, bool& wasNull,
+                    JniErrorInfo& errInfo) {
+                    if (resultSet.Get() == nullptr) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "ResultSet object must be set.";
+                        return false;
+                    }
+
+                    JNIEnv* env = Attach();
+                    jshort result = env->CallShortMethod(
+                        resultSet.Get()->GetRef(),
+                        jvm->GetMembers().m_ResultSetGetShortByIndex,
+                        columnIndex);
+                    ExceptionCheck(env, &errInfo);
+
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
+                        value = result;
+                        return ResultSetWasNull(resultSet, wasNull, errInfo);
+                    }
+
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
+
+                bool JniContext::ResultSetGetShort(
+                    const SharedPointer< GlobalJObject >& resultSet,
+                    const std::string& columnName, short& value, bool& wasNull,
+                    JniErrorInfo& errInfo) {
+                    if (resultSet.Get() == nullptr) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "ResultSet object must be set.";
+                        return false;
+                    }
+
+                    JNIEnv* env = Attach();
+                    jstring jColumnName = env->NewStringUTF(columnName.c_str());
+                    jint result = env->CallShortMethod(
+                        resultSet.Get()->GetRef(),
+                        jvm->GetMembers().m_ResultSetGetShortByName,
                         jColumnName);
                     ExceptionCheck(env, &errInfo);
                     if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
