@@ -879,7 +879,7 @@ namespace ignite
 
                 bool JniContext::DocumentDbConnectionGetDatabaseMetadata(
                     const SharedPointer< GlobalJObject >& connection,
-                    SharedPointer< GlobalJObject >& metaData,
+                    SharedPointer< GlobalJObject >& metadata,
                     JniErrorInfo& errInfo) {
                     if (!connection.Get()) {
                         errInfo.code = IGNITE_JNI_ERR_GENERIC;
@@ -893,11 +893,11 @@ namespace ignite
                     ExceptionCheck(env, &errInfo);
 
                     if (!result || errInfo.code != IGNITE_JNI_ERR_SUCCESS) {
-                        metaData = nullptr;
+                        metadata = nullptr;
                         return false;
                     }
 
-                    metaData = SharedPointer< GlobalJObject >(
+                    metadata = SharedPointer< GlobalJObject >(
                         new GlobalJObject(env, env->NewGlobalRef(result)));
                     return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }

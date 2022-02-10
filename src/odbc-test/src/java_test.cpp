@@ -298,13 +298,13 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetDatabaseMetadata) {
     AutoCloseConnection autoCloseConnection(_ctx, connection);
 
     // get metadata
-    SharedPointer< GlobalJObject > databaseMetaData;
+    SharedPointer< GlobalJObject > databaseMetadata;
     if (!_ctx.Get()->DocumentDbConnectionGetDatabaseMetadata(
-            connection, databaseMetaData,
+            connection, databaseMetadata,
                                            errInfo)) {
         BOOST_FAIL(errInfo.errMsg);
     }
-    BOOST_REQUIRE(databaseMetaData.Get());
+    BOOST_REQUIRE(databaseMetadata.Get());
 }
 
 BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseSchemaMetadataGetSchemaName) { 
@@ -323,17 +323,17 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseSchemaMetadataGetSchemaName) {
     AutoCloseConnection autoCloseConnection(_ctx, connection);
 
     // get metadata
-    SharedPointer< GlobalJObject > databaseMetaData;
+    SharedPointer< GlobalJObject > databaseMetadata;
     if (!_ctx.Get()->DocumentDbConnectionGetDatabaseMetadata(
-            connection, databaseMetaData, errInfo)) {
+            connection, databaseMetadata, errInfo)) {
         BOOST_FAIL(errInfo.errMsg);
     }
-    BOOST_REQUIRE(databaseMetaData.Get());
+    BOOST_REQUIRE(databaseMetadata.Get());
 
     std::string schemaName;
     bool wasNull;
     success = _ctx.Get()->DocumentDbDatabaseSchemaMetadataGetSchemaName(
-        databaseMetaData, schemaName, wasNull, errInfo); 
+        databaseMetadata, schemaName, wasNull, errInfo); 
     if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
         BOOST_FAIL(errInfo.errMsg);
     }
