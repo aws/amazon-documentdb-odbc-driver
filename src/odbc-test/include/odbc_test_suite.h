@@ -354,7 +354,7 @@ namespace ignite
              * Creates the standard DSN connection string.
              */
             void CreateDsnConnectionString(std::string& connectionString,
-                const std::string& username = std::string()) const;
+                const std::string& username = std::string(), boolean sshTunnel = true) const;
 
             /** ODBC Environment. */
             SQLHENV env;

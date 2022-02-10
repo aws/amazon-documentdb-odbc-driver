@@ -789,25 +789,47 @@ namespace ignite
         }
 
         void OdbcTestSuite::CreateDsnConnectionString(std::string& connectionString,
-            const std::string& username) const {
-            // NOTE: Assuming we are using internal SSH tunnel
+            const std::string& username, boolean sshTunnel) const {
             std::string user = common::GetEnv("DOC_DB_USER_NAME", "documentdb");
             std::string password = common::GetEnv("DOC_DB_PASSWORD", "");
             std::string host = common::GetEnv("DOC_DB_HOST", "");
+            std::string sshUserAtHost = common::GetEnv("DOC_DB_USER", "");
+            std::string sshRemoteHost = common::GetEnv("DOC_DB_HOST", "");
+            std::string sshPrivKeyFile = common::GetEnv("DOC_DB_PRIV_KEY_FILE", "");
             std::string port = "27017";
+
             if (!username.empty()) {
                 user = username;
             }
 
-            connectionString =
-            "DRIVER={Apache Ignite};"
-            "HOSTNAME=" + host + ";"
-            "PORT=" + port + ";"
-            "DATABASE=test;"
-            "USER=" + user + ";"
-            "PASSWORD=" + password + ";";
-        }
+            std::string sshUser;
+            std::string sshTunnelHost;
+            size_t indexOfAt = sshUserAtHost.find_first_of('@');
+            if (indexOfAt != std::string::npos && sshUserAtHost.size() > (indexOfAt + 1)) {
+                sshUser = sshUserAtHost.substr(0, indexOfAt);
+                sshTunnelHost = sshUserAtHost.substr(indexOfAt + 1);
+            }
 
+            connectionString =
+                "DRIVER={Apache Ignite};"
+                "HOSTNAME=" + host + ":" + port + ";"
+                "DATABASE=test;"
+                "USER=" + user + ";"
+                "PASSWORD=" + password + ";"
+                "TLS_ALLOW_INVALID_HOSTNAMES=true;";
+
+            if (sshTunnel
+                && !sshUserAtHost.empty()
+                && !sshRemoteHost.empty()
+                && !sshPrivKeyFile.empty()
+                && !sshUser.empty()
+                && !sshTunnelHost.empty()) {
+                connectionString.append("SSH_USER=" + sshUser + ';');
+                connectionString.append("SSH_HOST=" + sshTunnelHost + ';');
+                connectionString.append("SSH_PRIVATE_KEY_FILE=" + sshPrivKeyFile + ';');
+                connectionString.append("SSH_STRICT_HOST_KEY_CHECKING=false;");
+            }
+        }
 
     }
 }

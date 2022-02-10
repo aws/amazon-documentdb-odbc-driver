@@ -104,8 +104,7 @@ struct JavaTestSuiteFixture: odbc::OdbcTestSuite
         Configuration config;
         ConnectionStringParser parser(config);
         parser.ParseConnectionString(dsnConnectionString, nullptr);
-        std::string jdbcConnectionString =
-            Connection::FormatJdbcConnectionString(config);
+        std::string jdbcConnectionString = config.ToJdbcConnectionString();
         return jdbcConnectionString;
     }
 
