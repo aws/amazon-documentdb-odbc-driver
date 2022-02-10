@@ -50,7 +50,9 @@ class MongoInstance {
     }
 
    private:
-    MongoInstance() = default;
+    MongoInstance() {
+        initializeInstance();
+    }
 
     std::unique_ptr<mongocxx::instance> _instance = nullptr;
 };

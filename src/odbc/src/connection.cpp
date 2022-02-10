@@ -649,17 +649,47 @@ namespace ignite
             if (!connected) {
                 return connected;
             }
-
-            connected = ConnectCPPDocumentDB();
+            
+            
+            bool isSSHTunnelActive;
+            bool success = ctx.Get()->DocumentDbConnectionIsSshTunnelActive(
+                connection, isSSHTunnelActive, errInfo);
+            if (!success
+                || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+                std::string errMsg = errInfo.errMsg;
+                err = odbc::IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_INIT,
+                    errInfo.errMsg);
+                return false;
+            }
+            int32_t localSSHTunnelPort = 0;
+            if (isSSHTunnelActive) {
+                bool success = ctx.Get()->DocumentDbConnectionGetSshLocalPort(
+                    connection, localSSHTunnelPort, errInfo);  
+                if (!success
+                    || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+                    std::string errMsg = errInfo.errMsg;
+                    err = odbc::IgniteError(
+                        odbc::IgniteError::IGNITE_ERR_JVM_INIT,
+                        errInfo.errMsg);
+                    return false;
+                }
+            }
+            connected = ConnectCPPDocumentDB(err, localSSHTunnelPort);
 
             return connected;
         }
 
-        std::string Connection::FormatMongoCppConnectionString(int sshTunnelPort) const {
+        std::string Connection::FormatMongoCppConnectionString(
+            int32_t localSSHTunnelPort) const {
 
             std::string host = "localhost";
-            std::string port = "27019";
+            std::string port = std::to_string(localSSHTunnelPort);
 
+            // localSSHTunnelPort == 0 means that internal SSH tunnel option was not set
+            if (localSSHTunnelPort == 0) {
+                host = config.GetHostname();
+                port = config.GetPort();
+            }
             std::string mongoConnectionString;
 
             mongoConnectionString = "mongodb:";
@@ -668,7 +698,6 @@ namespace ignite
             mongoConnectionString.append("@" + host);
             mongoConnectionString.append(":" + port);
             mongoConnectionString.append("/" + config.GetDatabase());
-            //mongoConnectionString.append("?");
             mongoConnectionString.append("?tlsAllowInvalidHostnames=true");
             //mongoConnectionString.append("&tls=true");
   
@@ -763,15 +792,16 @@ namespace ignite
             return static_cast<int32_t>(uTimeout);
         }
 
-        bool Connection::ConnectCPPDocumentDB() 
+        bool Connection::ConnectCPPDocumentDB(odbc::IgniteError& err,
+                                              int32_t localSSHTunnelPort) 
         {           
             using bsoncxx::builder::basic::kvp;
             using bsoncxx::builder::basic::make_document;
 
-            MongoInstance::instance().initializeInstance();
+            MongoInstance::instance();
             try {
                 std::string mongoCPPConnectionString =
-                    FormatMongoCppConnectionString();
+                    FormatMongoCppConnectionString(localSSHTunnelPort);
                 const auto uri = mongocxx::uri{mongoCPPConnectionString};
                 mongocxx::options::client client_options;
                 mongocxx::options::tls tls_options;
@@ -791,14 +821,17 @@ namespace ignite
 
                 if (result.view()["ok"].get_double() != 1)
                 {
-                    throw std::runtime_error ("Ping to database failed");
-                      return false;
+                    err = odbc::IgniteError(
+                        odbc::IgniteError::IGNITE_ERR_NETWORK_FAILURE,
+                        "Unable to ping DocumentDB.");
+                    return false;
                 }
-                // auto result = test.run_command(make_document(kvp("isMaster",
-                // 1))); std::cout << bsoncxx::to_json(result) << std::endl;
 
                 return true;
             } catch (const std::exception& xcp) {
+                err = odbc::IgniteError(
+                    odbc::IgniteError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
+                    "Unable to establish connection with DocumentDB.");
                 return false;
             }
             

@@ -503,14 +503,16 @@ namespace ignite
              *
              * @return @c true on success and @c false otherwise.
              */
-            bool ConnectCPPDocumentDB();
+            bool ConnectCPPDocumentDB(IgniteError& err,
+                                      int32_t localSSHTunnelPort);
 
             /**
              * Formats the Mongo connection string from configuration values.
              *
              *  @return the JDBC connection string.
              */
-            std::string FormatMongoCppConnectionString(int sshTunnelPort = 27017) const;
+            std::string FormatMongoCppConnectionString(
+                int32_t localSSHTunnelPort) const;
 
             /** 
              * Creates JVM options
