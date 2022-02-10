@@ -819,8 +819,7 @@ namespace ignite
                 auto db = client1[database];
                 auto result = db.run_command(ping.view());
 
-                if (result.view()["ok"].get_double() != 1)
-                {
+                if (result.view()["ok"].get_double() != 1) {
                     err = odbc::IgniteError(
                         odbc::IgniteError::IGNITE_ERR_NETWORK_FAILURE,
                         "Unable to ping DocumentDB.");
