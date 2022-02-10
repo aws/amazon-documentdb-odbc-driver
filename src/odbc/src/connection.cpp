@@ -843,9 +843,7 @@ namespace ignite
                     odbc::IgniteError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
                     "Unable to establish connection with DocumentDB.");
                 return false;
-            }
-            
-        
+            }          
         }
     }
 }
