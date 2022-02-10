@@ -271,11 +271,12 @@ namespace ignite
                     JniMethod("getShort", "(I)S", false);
                 JniMethod const M_RECORD_SET_GET_SHORT_BY_NAME =
                     JniMethod("getShort", "(Ljava/lang/String;)S", false);
+                JniMethod const M_RECORD_SET_GET_ROW =
+                    JniMethod("getRow", "()I", false);
                 JniMethod const M_RECORD_SET_WAS_NULL =
                     JniMethod(
                         "wasNull",
                         "()Z", false);
-                // -AL- todo implement resultSet get short for ORDINAL_POSITION
 
                 const char* const C_DATABASE_META_DATA = "java/sql/DatabaseMetaData";
                 JniMethod const M_DATABASE_META_DATA_GET_TABLES =
@@ -528,6 +529,7 @@ namespace ignite
                     m_ResultSetGetIntegerByName = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_INTEGER_BY_NAME);
                     m_ResultSetGetShortByIndex = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_SHORT_BY_INDEX);
                     m_ResultSetGetShortByName = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_SHORT_BY_NAME);
+                    m_ResultSetGetRow = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_ROW);
                     m_ResultSetWasNull = FindMethod(env, c_ResultSet, M_RECORD_SET_WAS_NULL);
 
                     c_DatabaseMetaData = FindClass(env, C_DATABASE_META_DATA);
@@ -1251,6 +1253,27 @@ namespace ignite
                         resultSet.Get()->GetRef(),
                         jvm->GetMembers().m_ResultSetGetShortByName,
                         jColumnName);
+                    ExceptionCheck(env, &errInfo);
+                    if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
+                        value = result;
+                        return ResultSetWasNull(resultSet, wasNull, errInfo);
+                    }
+                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                }
+
+                bool JniContext::ResultSetGetRow(
+                    const SharedPointer< GlobalJObject >& resultSet, int& value,
+                    bool& wasNull, JniErrorInfo& errInfo) {
+                    if (resultSet.Get() == nullptr) {
+                        errInfo.code = IGNITE_JNI_ERR_GENERIC;
+                        errInfo.errMsg = "ResultSet object must be set.";
+                        return false;
+                    }
+
+                    JNIEnv* env = Attach();
+                    jint result = env->CallIntMethod(
+                        resultSet.Get()->GetRef(),
+                        jvm->GetMembers().m_ResultSetGetRow);
                     ExceptionCheck(env, &errInfo);
                     if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {
                         value = result;

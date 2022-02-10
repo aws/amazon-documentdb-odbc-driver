@@ -408,6 +408,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
     }
     BOOST_REQUIRE(hasNext);
 
+    int i = 1;
     while (hasNext) {
 
         bool wasNull;
@@ -482,11 +483,22 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
         BOOST_REQUIRE(!wasNull);
         BOOST_REQUIRE(value == "TABLE");
 
+        // check getRow
+        int val;
+        if (!_ctx.Get()->ResultSetGetRow(resultSet, val, wasNull, errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(!wasNull);
+        BOOST_CHECK_EQUAL(val, i);
+
         // Get next
         if (!_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)) {
             std::string errMsg = errInfo.errMsg;
             BOOST_FAIL(errMsg);
         }
+
+        i++;
     }
 }
 
@@ -536,6 +548,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
     }
     BOOST_REQUIRE(hasNext);
 
+    int i = 1;
     while (hasNext) {
         bool wasNull;
         std::string value;
@@ -630,11 +643,21 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
         BOOST_REQUIRE(!wasNull);
         BOOST_REQUIRE(val > 0);
 
+        // check getRow
+        if (!_ctx.Get()->ResultSetGetRow(resultSet, val, wasNull, errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            BOOST_FAIL(errMsg);
+        }
+        BOOST_REQUIRE(!wasNull);
+        BOOST_CHECK_EQUAL(val, i);
+
         // Get next
         if (!_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)) {
             std::string errMsg = errInfo.errMsg;
             BOOST_FAIL(errMsg);
         }
+
+        i++;
     }
 }
 

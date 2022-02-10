@@ -283,6 +283,7 @@ namespace ignite {
                   jmethodID m_ResultSetGetStringByName;
                   jmethodID m_ResultSetGetIntegerByName;
                   jmethodID m_ResultSetGetShortByName;
+                  jmethodID m_ResultSetGetRow;
                   jmethodID m_ResultSetWasNull;
 
                   jclass c_DatabaseMetaData;
@@ -488,6 +489,7 @@ namespace ignite {
                   bool ResultSetGetInteger(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, int& value, bool& wasNull,JniErrorInfo& errInfo);
                   bool ResultSetGetShort(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, short& value, bool& wasNull, JniErrorInfo& errInfo);
                   bool ResultSetGetShort(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, short& value, bool& wasNull,JniErrorInfo& errInfo);
+                  bool ResultSetGetRow(const SharedPointer< GlobalJObject >& resultSet, int& value, bool& wasNull, JniErrorInfo& errInfo);
                   bool ResultSetWasNull(const SharedPointer< GlobalJObject >& resultSet, bool& value, JniErrorInfo& errInfo);
 
                   int64_t TargetInLongOutLong(jobject obj, int type, int64_t memPtr,
