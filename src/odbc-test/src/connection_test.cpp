@@ -28,6 +28,9 @@
 
 #include "test_utils.h"
 #include "odbc_test_suite.h"
+#include "ignite/odbc/common/concurrent.h"
+#include "ignite/odbc/connection.h"
+#include "ignite/odbc/jni/database_metadata.h"
 
 using namespace ignite;
 using namespace ignite_test;
@@ -91,6 +94,17 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestore)
     CreateDsnConnectionString(connectionString);
 
     Connect(connectionString);
+    auto connection = static_cast<odbc::Connection*>(dbc);
+    ignite::IgniteError error;
+
+    SharedPointer< DatabaseMetaData > databaseMetaData;
+    auto config = connection->GetConfiguration();
+    databaseMetaData = connection->GetMetaData(error);
+    //if (error.GetCode() != IgniteError::IGNITE_SUCCESS) {
+    //    Disconnect();
+    //    BOOST_FAIL(error.GetText());
+    //}
+    //BOOST_CHECK(databaseMetaData.IsValid());
     Disconnect();
 }
 

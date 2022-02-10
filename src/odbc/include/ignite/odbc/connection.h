@@ -28,11 +28,15 @@
 #include "ignite/odbc/diagnostic/diagnosable_adapter.h"
 #include "ignite/odbc/streaming/streaming_context.h"
 #include "ignite/odbc/odbc_error.h"
+#include "ignite/odbc/jni/database_metadata.h"
 #include "ignite/odbc/jni/java.h"
 #include <ignite/odbc/common/concurrent.h>
 #include "ignite/odbc/end_point.h"
 
+using ignite::odbc::common::concurrent::SharedPointer;
 using ignite::odbc::jni::java::GlobalJObject;
+using ignite::odbc::jni::java::JniContext;
+using ignite::odbc::jni::DatabaseMetaData;
 
 namespace ignite
 {
@@ -123,40 +127,12 @@ namespace ignite
              */
             Statement* CreateStatement();
 
-            /**
-             * Send data by established connection.
-             * Uses connection timeout.
-             *
-             * @param data Data buffer.
-             * @param len Data length.
-             * @return @c true on success, @c false on timeout.
-             * @throw OdbcError on error.
+            /** 
+             * Gets the database metadata for the connection.
+             * 
+             * @return SharedPointer to DatabaseMetaData.
              */
-            bool Send(const int8_t* data, size_t len)
-            {
-                return Send(data, len, timeout);
-            }
-
-            /**
-             * Send data by established connection.
-             *
-             * @param data Data buffer.
-             * @param len Data length.
-             * @param timeout Timeout.
-             * @return @c true on success, @c false on timeout.
-             * @throw OdbcError on error.
-             */
-            bool Send(const int8_t* data, size_t len, int32_t timeout);
-
-            /**
-             * Receive next message.
-             *
-             * @param msg Buffer for message.
-             * @param timeout Timeout.
-             * @return @c true on success, @c false on timeout.
-             * @throw OdbcError on error.
-             */
-            bool Receive(std::vector<int8_t>& msg, int32_t timeout);
+            SharedPointer< DatabaseMetaData > GetMetaData(IgniteError& err);
 
             /**
              * Get name of the assotiated schema.
@@ -214,22 +190,7 @@ namespace ignite
             template<typename ReqT, typename RspT>
             bool SyncMessage(const ReqT& req, RspT& rsp, int32_t timeout)
             {
-                EnsureConnected();
-
-                std::vector<int8_t> tempBuffer;
-
-                parser.Encode(req, tempBuffer);
-
-                bool success = Send(tempBuffer.data(), tempBuffer.size(), timeout);
-
-                if (!success)
-                    return false;
-
-                success = Receive(tempBuffer, timeout);
-
-                if (!success)
-                    return false;
-
+                // TODO: Remove when unnecessary.
                 return true;
             }
 
@@ -244,23 +205,7 @@ namespace ignite
             template<typename ReqT, typename RspT>
             void SyncMessage(const ReqT& req, RspT& rsp)
             {
-                EnsureConnected();
-
-                std::vector<int8_t> tempBuffer;
-
-                parser.Encode(req, tempBuffer);
-
-                bool success = Send(tempBuffer.data(), tempBuffer.size(), timeout);
-
-                if (!success)
-                    throw OdbcError(SqlState::SHYT01_CONNECTION_TIMEOUT, "Send operation timed out");
-
-                success = Receive(tempBuffer, timeout);
-
-                if (!success)
-                    throw OdbcError(SqlState::SHYT01_CONNECTION_TIMEOUT, "Receive operation timed out");
-
-                parser.Decode(rsp, tempBuffer);
+                // TODO: Remove when unnecessary.
             }
 
             /**
@@ -273,16 +218,7 @@ namespace ignite
             template<typename ReqT>
             void SendRequest(const ReqT& req)
             {
-                EnsureConnected();
-
-                std::vector<int8_t> tempBuffer;
-
-                parser.Encode(req, tempBuffer);
-
-                bool success = Send(tempBuffer.data(), tempBuffer.size(), timeout);
-
-                if (!success)
-                    throw OdbcError(SqlState::SHYT01_CONNECTION_TIMEOUT, "Send operation timed out");
+                // TODO: Remove when unnecessary.
             }
 
             /**
@@ -345,22 +281,7 @@ namespace ignite
             template<typename ReqT, typename RspT>
             bool InternalSyncMessage(const ReqT& req, RspT& rsp, int32_t timeout)
             {
-                std::vector<int8_t> tempBuffer;
-
-                parser.Encode(req, tempBuffer);
-
-                bool success = Send(tempBuffer.data(), tempBuffer.size(), timeout);
-
-                if (!success)
-                    return false;
-
-                success = Receive(tempBuffer, timeout);
-
-                if (!success)
-                    return false;
-
-                parser.Decode(rsp, tempBuffer);
-
+                // TODO: Remove when unnecessary.
                 return true;
             }
 
@@ -457,26 +378,6 @@ namespace ignite
             SqlResult::Type InternalSetAttribute(int attr, void* value, SQLINTEGER valueLen);
 
             /**
-             * Receive specified number of bytes.
-             *
-             * @param dst Buffer for data.
-             * @param len Number of bytes to receive.
-             * @param timeout Timeout.
-             * @return Operation result.
-             */
-            OperationResult::T ReceiveAll(void* dst, size_t len, int32_t timeout);
-
-            /**
-             * Send specified number of bytes.
-             *
-             * @param data Data buffer.
-             * @param len Data length.
-             * @param timeout Timeout.
-             * @return Operation result.
-             */
-            OperationResult::T SendAll(const int8_t* data, size_t len, int32_t timeout);
-
-            /**
              * Perform handshake request.
              *
              * @return Operation result.
@@ -504,6 +405,13 @@ namespace ignite
             void SetJvmOptions(const std::string& cp);
 
             /**
+             * Get the singleton instance of the JNI context for the connection.
+             *
+             * @return JNI context.
+             */
+            SharedPointer< JniContext > GetJniContext();
+
+            /**
              * De-initializes the JVM options
              */
             void Deinit();
@@ -525,16 +433,13 @@ namespace ignite
             Environment* env;
 
             /** Connection timeout in seconds. */
-            int32_t timeout;
+            int32_t timeout = 0;
 
             /** Login timeout in seconds. */
-            int32_t loginTimeout;
+            int32_t loginTimeout = DEFAULT_CONNECT_TIMEOUT;
 
             /** Autocommit flag. */
-            bool autoCommit;
-
-            /** Message parser. */
-            Parser parser;
+            bool autoCommit = true;
 
             /** Configuration. */
             config::Configuration config;
@@ -543,7 +448,9 @@ namespace ignite
             config::ConnectionInfo info;
 
             /** Java connection object */
-            SharedPointer< GlobalJObject > connection;
+            SharedPointer< GlobalJObject > _connection;
+
+            SharedPointer< JniContext > _jniContext;
 
             /** JVM options */
             std::vector< char* > opts;

@@ -63,21 +63,16 @@ namespace ignite
     {
         Connection::Connection(Environment* env) :
             env(env),
-            timeout(0),
-            loginTimeout(DEFAULT_CONNECT_TIMEOUT),
-            autoCommit(true),
-            parser(),
-            config(),
-            info(config),
-            connection(),
-            opts()
+            info(config)
         {
             // No-op
         }
 
         Connection::~Connection()
         {
-            // No-op.
+            Close();
+            _jniContext = nullptr;
+            Deinit();
         }
 
         const config::ConnectionInfo& Connection::GetInfo() const
@@ -155,7 +150,7 @@ namespace ignite
 
             config = cfg;
 
-            if (connection.Get() != nullptr) {
+            if (_connection.Get() != nullptr) {
                 AddStatusRecord(SqlState::S08002_ALREADY_CONNECTED,
                                 "Already connected.");
 
@@ -199,7 +194,7 @@ namespace ignite
 
         SqlResult::Type Connection::InternalRelease()
         {
-            if (connection.Get() == nullptr)
+            if (_connection.Get() == nullptr)
             {
                 AddStatusRecord(SqlState::S08003_NOT_CONNECTED, "Connection is not open.");
 
@@ -215,16 +210,14 @@ namespace ignite
 
         void Connection::Close()
         {
-            if (connection.Get() != nullptr) {
-                SharedPointer< JniContext > ctx(JniContext::Create(&opts[0], static_cast<int>(opts.size()), JniHandlers()));
+            if (_jniContext.Get() != nullptr && _connection.Get() != nullptr) {
                 JniErrorInfo errInfo;
-                ctx.Get()->ConnectionClose(connection, errInfo);
+                _jniContext.Get()->ConnectionClose(_connection, errInfo);
                 if (errInfo.code != java::IGNITE_JNI_ERR_SUCCESS) {
                     // TODO: Determine if we need to error check the close.
                 }
-                connection = nullptr;
+                _connection = nullptr;
             }
-            Deinit();
         }
 
         Statement* Connection::CreateStatement()
@@ -234,6 +227,25 @@ namespace ignite
             IGNITE_ODBC_API_CALL(InternalCreateStatement(statement));
 
             return statement;
+        }
+
+        SharedPointer< DatabaseMetaData > Connection::GetMetaData(
+            IgniteError& err) {
+            auto jniContext = GetJniContext();
+            SharedPointer< GlobalJObject > databaseMetaData;
+            JniErrorInfo errInfo;
+            bool success = jniContext.Get()->ConnectionGetMetaData(_connection,
+                                                    databaseMetaData, errInfo);
+            if (!success) {
+                std::string errMessage = "Unable to retrieve database metadata.\n";
+                errMessage.append(errInfo.errMsg);
+                err = IgniteError(
+                    odbc::IgniteError::IGNITE_ERR_JNI_GET_DATABASE_METADATA,
+                    errMessage.c_str());
+                return nullptr;
+            }
+
+            return new DatabaseMetaData(jniContext, databaseMetaData);
         }
 
         SqlResult::Type Connection::InternalCreateStatement(Statement*& statement)
@@ -248,31 +260,6 @@ namespace ignite
             }
 
             return SqlResult::AI_SUCCESS;
-        }
-
-        bool Connection::Send(const int8_t* data, size_t len, int32_t timeout)
-        {
-            // TODO: Remove if unnecessary
-            return true;
-        }
-
-        Connection::OperationResult::T Connection::SendAll(const int8_t* data, size_t len, int32_t timeout)
-        {
-            // TODO: Remove if unnecessary.
-            // No-op
-            return OperationResult::SUCCESS;
-        }
-
-        bool Connection::Receive(std::vector<int8_t>& msg, int32_t timeout)
-        {
-            // TODO: Remove if unnecessary.
-            return true;
-        }
-
-        Connection::OperationResult::T Connection::ReceiveAll(void* dst, size_t len, int32_t timeout)
-        {
-            // TODO: Remove if unnecessary.
-            return OperationResult::SUCCESS;
         }
 
         const std::string& Connection::GetSchema() const
@@ -398,7 +385,7 @@ namespace ignite
                 {
                     SQLUINTEGER *val = reinterpret_cast<SQLUINTEGER*>(buf);
 
-                    *val = connection.Get() ? SQL_CD_FALSE : SQL_CD_TRUE;
+                    *val = _connection.Get() ? SQL_CD_FALSE : SQL_CD_TRUE;
 
                     if (valueLen)
                         *valueLen = SQL_IS_INTEGER;
@@ -572,49 +559,33 @@ namespace ignite
 
         void Connection::EnsureConnected()
         {
-            if (connection.Get() != nullptr)
+            if (_connection.Get() != nullptr)
                 return;
 
             odbc::IgniteError err;
             bool success = TryRestoreConnection(err);
 
-            if (!success)
-                throw OdbcError(SqlState::S08001_CANNOT_CONNECT,
-                    "Failed to establish connection with any provided hosts");
+            if (!success) {
+                std::string errMessage =
+                    "Failed to establish connection with any provided hosts\n";
+                errMessage.append(err.GetText());
+                AddStatusRecord(SqlState::S08001_CANNOT_CONNECT, errMessage);
+                throw OdbcError(SqlState::S08001_CANNOT_CONNECT, errMessage);
+            }
         }
 
         bool Connection::TryRestoreConnection(odbc::IgniteError& err)
         {
             bool connected = false;
 
-            if (connection.Get() != nullptr) {
+            if (_connection.Get() != nullptr) {
                 return true;
             }
 
             std::string connectionString = FormatJdbcConnectionString(config);
             JniErrorInfo errInfo;
 
-            // 2. Resolve DOCUMENTDB_HOME.
-            std::string home = jni::ResolveDocumentDbHome();
-
-            // 3. Create classpath.
-            std::string cp = jni::CreateDocumentDbClasspath(std::string(), home);
-            if (cp.empty()) {
-                err =
-                    odbc::IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_NO_CLASSPATH,
-                                  "Java classpath is empty (did you set "
-                                  "DOCUMENTDB_HOME environment variable?)");
-
-                return false;
-            }
-
-            SetJvmOptions(cp);
-            
-            SharedPointer< JniContext > ctx(JniContext::Create(&opts[0], static_cast<int>(opts.size()), JniHandlers(), &errInfo));
-            if (errInfo.code != java::IGNITE_JNI_ERR_SUCCESS) {
-                IgniteError::SetError(errInfo.code, errInfo.errCls, errInfo.errMsg, err);
-                return false;
-            }
+            auto ctx = GetJniContext();
             if (ctx.Get() != nullptr) {
                 SharedPointer< GlobalJObject > result;
                 bool success = ctx.Get()->DriverManagerGetConnection(
@@ -627,10 +598,10 @@ namespace ignite
                         errInfo.errMsg);
                     Close();
                 }
-                connection = result;
+                _connection = result;
             } else {
                 err = odbc::IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_INIT, "Unable to get initialized JVM.");
-                connection = nullptr;
+                _connection = nullptr;
             }
 
             return connected;
@@ -682,6 +653,29 @@ namespace ignite
             }
 
             return jdbConnectionString;
+        }
+
+        SharedPointer< JniContext > Connection::GetJniContext() {
+            if (_jniContext.Get() == nullptr) {
+                // Resolve DOCUMENTDB_HOME.
+                std::string home = jni::ResolveDocumentDbHome();
+
+                // Create classpath.
+                std::string cp =
+                    jni::CreateDocumentDbClasspath(std::string(), home);
+                if (cp.empty()) {
+                    return nullptr;
+                }
+
+                // Set the JVM options.
+                SetJvmOptions(cp);
+
+                // Create the context
+                SharedPointer< JniContext > ctx(JniContext::Create(
+                    &opts[0], static_cast< int >(opts.size()), JniHandlers()));
+                _jniContext = ctx;
+            }
+            return _jniContext;
         }
 
         /**

@@ -19,10 +19,15 @@
 
 #include "ignite/odbc/type_traits.h"
 #include "ignite/odbc/connection.h"
+#include "ignite/odbc/jni/java.h"
 #include "ignite/odbc/message.h"
 #include "ignite/odbc/log.h"
 #include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/query/table_metadata_query.h"
+
+using ignite::odbc::common::concurrent::SharedPointer;
+using ignite::odbc::jni::java::JniContext;
+using ignite::odbc::jni::java::JniHandlers;
 
 namespace
 {

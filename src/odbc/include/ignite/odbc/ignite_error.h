@@ -120,6 +120,9 @@ namespace ignite
             /** JVM error: no such method. */
             static const int IGNITE_ERR_JVM_NO_SUCH_METHOD = 7;
 
+            /** JNI error: getting database metadata */
+            static const int IGNITE_ERR_JNI_GET_DATABASE_METADATA = 101;
+
             /** Memory operation error. */
             static const int IGNITE_ERR_MEMORY = 1001;
 

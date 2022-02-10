@@ -69,7 +69,9 @@ set(SOURCES
          ../odbc/src/dsn_config.cpp
          ../odbc/src/environment.cpp
          ../odbc/src/ignite_error.cpp
+         ../odbc/src/jni/database_metadata.cpp
          ../odbc/src/jni/java.cpp
+         ../odbc/src/jni/result_set.cpp
          ../odbc/src/log.cpp
          ../odbc/src/message.cpp
          ../odbc/src/meta/column_meta.cpp
