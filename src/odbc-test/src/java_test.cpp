@@ -489,7 +489,6 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
             std::string errMsg = errInfo.errMsg;
             BOOST_FAIL(errMsg);
         }
-        BOOST_REQUIRE(!wasNull);
         BOOST_CHECK_EQUAL(val, i);
 
         // Get next
@@ -502,6 +501,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
     }
 }
 
+// note: might need to add some values to test in the future?
 BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
     PrepareContext();
     BOOST_REQUIRE(_ctx.Get() != nullptr);
@@ -643,12 +643,28 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
         BOOST_REQUIRE(!wasNull);
         BOOST_REQUIRE(val > 0);
 
+        
+        // todo test getShort, just check for errors because it could be null -AL-
+        // SOURCE_DATA_TYPE
+        short valShort;
+        if (!_ctx.Get()->ResultSetGetShort(resultSet, 22, valShort, wasNull,
+                                             errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            BOOST_FAIL(errMsg);
+        }
+
+        // SOURCE_DATA_TYPE
+        if (!_ctx.Get()->ResultSetGetShort(resultSet, "SOURCE_DATA_TYPE",
+                                           valShort, wasNull, errInfo)) {
+            std::string errMsg = errInfo.errMsg;
+            BOOST_FAIL(errMsg);
+        }
+
         // check getRow
         if (!_ctx.Get()->ResultSetGetRow(resultSet, val, wasNull, errInfo)) {
             std::string errMsg = errInfo.errMsg;
             BOOST_FAIL(errMsg);
         }
-        BOOST_REQUIRE(!wasNull);
         BOOST_CHECK_EQUAL(val, i);
 
         // Get next
