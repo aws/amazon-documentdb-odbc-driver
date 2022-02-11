@@ -90,9 +90,13 @@ SqlLen Nullability::ToSql(int32_t nullability) {
   return SQL_NULLABLE_UNKNOWN;
 }
 
-void ColumnMeta::Read(ignite::impl::binary::BinaryReaderImpl& reader,
-                      const ProtocolVersion& ver) {
-  utility::ReadString(reader, schemaName);
+void ColumnMeta::Read(
+    ignite::impl::binary::BinaryReaderImpl& reader,
+    const ProtocolVersion&
+        ver) {  // taking the source and assigning to the variables.
+  utility::ReadString(
+      reader,
+      schemaName);  // class variable, accessed by SQL columns over the fetch
   utility::ReadString(reader, tableName);
   utility::ReadString(reader, columnName);
 
