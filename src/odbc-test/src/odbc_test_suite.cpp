@@ -792,11 +792,11 @@ namespace ignite
             const std::string& username, boolean sshTunnel) const {
             std::string user = common::GetEnv("DOC_DB_USER_NAME", "documentdb");
             std::string password = common::GetEnv("DOC_DB_PASSWORD", "");
-            std::string host = common::GetEnv("DOC_DB_HOST", "");
+            std::string host = sshTunnel ? common::GetEnv("DOC_DB_HOST", "") : "localhost";
             std::string sshUserAtHost = common::GetEnv("DOC_DB_USER", "");
-            std::string sshRemoteHost = common::GetEnv("DOC_DB_HOST", "");
             std::string sshPrivKeyFile = common::GetEnv("DOC_DB_PRIV_KEY_FILE", "");
-            std::string port = "27017";
+            std::string port = sshTunnel 
+                ? common::GetEnv("DOC_DB_REMOTE_PORT", "27017") : common::GetEnv("DOC_DB_LOCAL_PORT", "27019");
 
             if (!username.empty()) {
                 user = username;
@@ -820,7 +820,6 @@ namespace ignite
 
             if (sshTunnel
                 && !sshUserAtHost.empty()
-                && !sshRemoteHost.empty()
                 && !sshPrivKeyFile.empty()
                 && !sshUser.empty()
                 && !sshTunnelHost.empty()) {
@@ -830,6 +829,6 @@ namespace ignite
                 connectionString.append("SSH_STRICT_HOST_KEY_CHECKING=false;");
             }
         }
-
     }
+
 }

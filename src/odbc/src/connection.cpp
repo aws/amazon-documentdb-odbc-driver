@@ -701,7 +701,7 @@ namespace ignite
             // localSSHTunnelPort == 0 means that internal SSH tunnel option was not set
             if (localSSHTunnelPort == 0) {
                 host = config.GetHostname();
-                port = config.GetPort();
+                port = common::LexicalCast<std::string>(config.GetPort());
             }
             std::string mongoConnectionString;
 
