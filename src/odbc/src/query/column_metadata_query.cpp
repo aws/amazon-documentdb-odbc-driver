@@ -60,11 +60,47 @@ namespace
             /** Precision. */
             NUM_PREC_RADIX,
 
-            /** Nullability of the data in column. */
+            /** Nullability of the data in column (int). */
             NULLABLE,
 
             /** A description of the column. */
-            REMARKS
+            REMARKS,
+            // the start of my added values -AL-
+            /** Default value for the column. May be null. */
+            COLUMN_DEF,
+
+            /** SQL data type. */
+            SQL_DATA_TYPE,
+
+            /** Subtype code for datetime and interval data types. */
+            SQL_DATETIME_SUB,
+
+            /** Maximum length in bytes of a character or binary data type column. NULL for other data types. */
+            CHAR_OCTET_LENGTH,
+
+            /** Index of column in table (starting at 1) */
+            ORDINAL_POSITION,
+
+            /** Nullability of data in column (String). */
+            IS_NULLABLE,
+
+            /** Catalog of table that is the scope of a reference attribute. NULL if DATA_TYPE isn't REF. */
+            SCOPE_CATALOG,
+
+            /** Schema of table that is the scope of a reference attribute. NULL if DATA_TYPE isn't REF. */
+            SCOPE_SCHEMA,
+
+            /** Table name that is the scope of a reference attribute. NULL if DATA_TYPE isn't REF. */
+            SCOPE_TABLE,
+
+            /** Source type. NULL if DATA_TYPE isn't DISTINCT or user-generated REF. */
+            SOURCE_DATA_TYPE,
+
+            /** Whether column is auto incremented. */
+            IS_AUTOINCREMENT,
+
+            /** Whether column is generated. */
+            IS_GENERATEDCOLUMN
         };
     };
 }
