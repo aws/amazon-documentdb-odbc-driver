@@ -771,13 +771,15 @@ namespace ignite
             return SqlResult::AI_SUCCESS;
         }
 
-        void Statement::ExecuteGetColumnsMetaQuery(const std::string& schema,
-            const std::string& table, const std::string& column)
+        void Statement::ExecuteGetColumnsMetaQuery(const std::string& catalog,
+            const std::string& schema, const std::string& table,
+            const std::string& column)
         {
-            IGNITE_ODBC_API_CALL(InternalExecuteGetColumnsMetaQuery(schema, table, column));
+            IGNITE_ODBC_API_CALL(InternalExecuteGetColumnsMetaQuery(catalog, schema, table, column));
         }
 
-        SqlResult::Type Statement::InternalExecuteGetColumnsMetaQuery(const std::string& schema,
+        SqlResult::Type Statement::InternalExecuteGetColumnsMetaQuery(
+            const std::string& catalog,const std::string& schema,
             const std::string& table, const std::string& column)
         {
             if (currentQuery.get())
@@ -788,8 +790,11 @@ namespace ignite
             if (schema0.empty())
                 schema0 = connection.GetSchema();
 
-            currentQuery.reset(new query::ColumnMetadataQuery(*this,
-                connection, schema, table, column));
+            // old ignite code // todo remove -AL-
+            //currentQuery.reset(new query::ColumnMetadataQuery(*this,
+            //    connection, catalog, schema, table, column));
+            currentQuery.reset(new query::ColumnMetadataQuery(
+                *this, columnsResultSet, catalog, schema, table, column));
 
             return currentQuery->Execute();
         }

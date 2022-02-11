@@ -20,6 +20,7 @@
 
 #include "ignite/odbc/query/query.h"
 #include "ignite/odbc/meta/column_meta.h"
+#include "ignite/odbc/jni/java.h"
 
 namespace ignite {
 namespace odbc {
@@ -42,7 +43,9 @@ class ColumnMetadataQuery : public Query {
    * @param column Column search pattern.
    */
   ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
-                      Connection& connection, const std::string& schema,
+                      // Connection& connection, const std::string& schema,
+                      SharedPointer< GlobalJObject > connection,
+                      const std::string& catalog, const std::string& schema,
                       const std::string& table, const std::string& column);
 
   /**
@@ -120,7 +123,12 @@ class ColumnMetadataQuery : public Query {
   SqlResult::Type MakeRequestGetColumnsMeta();
 
   /** Connection associated with the statement. */
-  Connection& connection;
+  // Connection& connection; // TODO: use Bruce's code for creating connection
+  // to the database
+  SharedPointer< GlobalJObject > connection;
+
+  /** Catalog search pattern. */
+  std::string catalog;
 
   /** Schema search pattern. */
   std::string schema;

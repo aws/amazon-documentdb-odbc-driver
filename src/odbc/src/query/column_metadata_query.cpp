@@ -112,13 +112,14 @@ struct ResultColumn {
 namespace ignite {
 namespace odbc {
 namespace query {
-ColumnMetadataQuery::ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
-                                         Connection& connection,
-                                         const std::string& schema,
-                                         const std::string& table,
-                                         const std::string& column)
+ColumnMetadataQuery::ColumnMetadataQuery(
+    diagnostic::DiagnosableAdapter& diag,
+    SharedPointer< GlobalJObject > connection, const std::string& catalog,
+    const std::string& schema, const std::string& table,
+    const std::string& column)
     : Query(diag, QueryType::COLUMN_METADATA),
       connection(connection),
+      catalog(catalog),
       schema(schema),
       table(table),
       column(column),
