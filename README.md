@@ -2,6 +2,13 @@
 
 ## Development Environment
 
+### C/C++ Formatting
+
+- This project uses [Google's C++ Style Guide](https://google.github.io/styleguide/cppguide.htm) as a basis for 
+C/C++ usage and formatting.
+- Some formatting is set using the .clang-format file at the base of repository. Other options for Visual Studio can be imported from the 
+`VS-C++-Settings-Export.vssettings` file alsof found at root of repository.
+
 ### Environment Variables for Testing Accounts/Secrets 
 To enable the test environment to run the tests against a live DocumentDB system, set the following environment variables on your development machine.
 
