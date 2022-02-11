@@ -29,6 +29,7 @@
 #include "ignite/odbc/streaming/streaming_context.h"
 #include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/jni/database_metadata.h"
+#include "ignite/odbc/jni/documentdb_connection.h"
 #include "ignite/odbc/jni/java.h"
 #include <ignite/odbc/common/concurrent.h>
 #include "ignite/odbc/end_point.h"
@@ -36,6 +37,7 @@
 using ignite::odbc::common::concurrent::SharedPointer;
 using ignite::odbc::jni::java::GlobalJObject;
 using ignite::odbc::jni::java::JniContext;
+using ignite::odbc::jni::DocumentDbConnection;
 using ignite::odbc::jni::DatabaseMetaData;
 
 namespace ignite
@@ -448,7 +450,7 @@ namespace ignite
             config::ConnectionInfo info;
 
             /** Java connection object */
-            SharedPointer< GlobalJObject > _connection;
+            SharedPointer< DocumentDbConnection > _connection;
 
             SharedPointer< JniContext > _jniContext;
 

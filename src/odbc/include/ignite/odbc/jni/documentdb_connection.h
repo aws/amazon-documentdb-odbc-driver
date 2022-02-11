@@ -15,27 +15,53 @@
  * limitations under the License.
  */
 
+#include <ignite/odbc/common/concurrent.h>
+#include <ignite/odbc/config/configuration.h>
+#include <ignite/odbc/jni/java.h>
+#include <ignite/odbc/jni/database_metadata.h>
+
 #ifndef _IGNITE_ODBC_JNI_DOCUMENTDB_CONNECTION
 #define _IGNITE_ODBC_JNI_DOCUMENTDB_CONNECTION
 
-#include <ignite/odbc/common/concurrent.h>
-#include <ignite/odbc/jni/java.h>
-
 using ignite::odbc::common::concurrent::SharedPointer;
+using ignite::odbc::config::Configuration;
 using ignite::odbc::jni::java::JniContext;
 using ignite::odbc::jni::java::GlobalJObject;
+using ignite::odbc::jni::java::JniErrorInfo;
 
 namespace ignite {
     namespace odbc {
         namespace jni {
             class DocumentDbConnection {
                public:
-                DocumentDbConnection(SharedPointer< JniContext > jniContext, SharedPointer< GlobalJObject > connection);
+                DocumentDbConnection(SharedPointer< JniContext > jniContext)
+                    : _jniContext(jniContext) {
+                }
+
                 ~DocumentDbConnection();
 
+                bool Open(const Configuration& config, JniErrorInfo& errInfo);
+
+                bool Close(JniErrorInfo& errInfo);
+
+                bool IsOpen() {
+                    return _connection.IsValid();
+                }
+
+                SharedPointer< DatabaseMetaData > GetMetaData(
+                    JniErrorInfo& errInfo);
+
                private:
+                SharedPointer< JniContext > GetJniContext() {
+                    return _jniContext;
+                };
+                static std::string FormatJdbcConnectionString(
+                    const config::Configuration& config);
+
                 SharedPointer< JniContext > _jniContext;
                 SharedPointer< GlobalJObject > _connection;
+
+                IGNITE_NO_COPY_ASSIGNMENT(DocumentDbConnection);
             };
         }  // namespace jni
     }  // namespace odbc

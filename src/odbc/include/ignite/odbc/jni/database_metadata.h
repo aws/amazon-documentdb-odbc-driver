@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-#ifndef _IGNITE_ODBC_JNI_DATABASE_METADATA
-#define _IGNITE_ODBC_JNI_DATABASE_METADATA
-
 #include <string>
 #include <ignite/odbc/common/concurrent.h>
 #include <ignite/odbc/jni/java.h>
 #include <ignite/odbc/jni/result_set.h>
+
+#ifndef _IGNITE_ODBC_JNI_DATABASE_METADATA
+#define _IGNITE_ODBC_JNI_DATABASE_METADATA
 
 using ignite::odbc::common::concurrent::SharedPointer;
 using ignite::odbc::jni::java::GlobalJObject;
@@ -29,27 +29,33 @@ using ignite::odbc::jni::java::JniContext;
 using ignite::odbc::jni::java::JniErrorInfo;
 
 namespace ignite {
-namespace odbc {
-namespace jni {
-class DatabaseMetaData {
-   public:
-    DatabaseMetaData(SharedPointer< JniContext > jniContext,
-                     SharedPointer< GlobalJObject > connection);
-    ~DatabaseMetaData() = default;
+    namespace odbc {
+        namespace jni {
+            class DatabaseMetaData {
+                friend class DocumentDbConnection;
+               public:
+                ~DatabaseMetaData() = default;
 
-    SharedPointer< ResultSet > GetTables(
-        const std::string& catalog,
-        const std::string& schemaPattern,
-        const std::string& tableNamePattern,
-        const std::vector< std::string >& types,
-        JniErrorInfo& errInfo);
+                SharedPointer< ResultSet > GetTables(
+                    const std::string& catalog,
+                    const std::string& schemaPattern,
+                    const std::string& tableNamePattern,
+                    const std::vector< std::string >& types,
+                    JniErrorInfo& errInfo);
 
-   private:
-    SharedPointer< JniContext > _jniContext;
-    SharedPointer< GlobalJObject > _connection;
-};
-}  // namespace
-}  // namespace odbc
+               private:
+                DatabaseMetaData(
+                    SharedPointer< JniContext >& jniContext,
+                    SharedPointer< GlobalJObject >& databaseMetaData)
+                    : _jniContext(jniContext),
+                      _databaseMetaData(databaseMetaData) {
+                }
+
+                const SharedPointer< JniContext > _jniContext;
+                const SharedPointer< GlobalJObject > _databaseMetaData;
+            };
+        }  // namespace
+    }  // namespace odbc
 }  // namespace ignite
 
 #endif // _IGNITE_ODBC_JNI_DATABASE_METADATA

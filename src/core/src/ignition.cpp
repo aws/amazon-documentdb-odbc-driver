@@ -250,7 +250,7 @@ namespace ignite
             return Ignite();
         }
 
-        // 4. Resolving spring config path
+        // 4. Resolving spring _config path
         std::string springCfgPath0;
 
         if (!cfg.springCfgPath.empty())

@@ -18,19 +18,17 @@
 #include <ignite/odbc/jni/database_metadata.h>
 
 namespace ignite {
-namespace odbc {
-namespace jni {
-DatabaseMetaData::DatabaseMetaData(SharedPointer< JniContext > jniContext,
-                                   SharedPointer< GlobalJObject > connection)
-    : _jniContext(jniContext), _connection(connection) {
-}
-SharedPointer< ResultSet > DatabaseMetaData::GetTables(const std::string& catalog,
-                                     const std::string& schemaPattern,
-                                     const std::string& tableNamePattern,
-                                     const std::vector< std::string >& types, JniErrorInfo& errInfo) {
-    return nullptr;
-}
-
-}  // namespace
-}  // namespace odbc
+    namespace odbc {
+        namespace jni {
+            SharedPointer< ResultSet > DatabaseMetaData::GetTables(
+                    const std::string& catalog,
+                    const std::string& schemaPattern,
+                    const std::string& tableNamePattern,
+                    const std::vector< std::string >& types,
+                    JniErrorInfo& errInfo) {
+                
+                return nullptr;
+            }
+        }  // namespace
+    }  // namespace odbc
 }  // namespace ignite

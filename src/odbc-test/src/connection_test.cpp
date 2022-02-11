@@ -28,21 +28,16 @@
 
 #include "test_utils.h"
 #include "odbc_test_suite.h"
-#include "ignite/odbc/common/concurrent.h"
-#include "ignite/odbc/connection.h"
-#include "ignite/odbc/jni/database_metadata.h"
 
-using namespace ignite;
-using namespace ignite_test;
-
-using namespace boost::unit_test;
+using ignite::odbc::OdbcTestSuite;
+using ignite_test::GetOdbcErrorMessage;
 
 /**
  * Test setup fixture.
  */
-struct ConnectionTestSuiteFixture: odbc::OdbcTestSuite
+struct ConnectionTestSuiteFixture: OdbcTestSuite
 {
-    using odbc::OdbcTestSuite::OdbcTestSuite;
+    using OdbcTestSuite::OdbcTestSuite;
 
     /**
      * Execute the query and return an error code.
@@ -92,19 +87,7 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestore)
 {
     std::string connectionString;
     CreateDsnConnectionString(connectionString);
-
     Connect(connectionString);
-    auto connection = static_cast<odbc::Connection*>(dbc);
-    ignite::IgniteError error;
-
-    SharedPointer< DatabaseMetaData > databaseMetaData;
-    auto config = connection->GetConfiguration();
-    databaseMetaData = connection->GetMetaData(error);
-    //if (error.GetCode() != IgniteError::IGNITE_SUCCESS) {
-    //    Disconnect();
-    //    BOOST_FAIL(error.GetText());
-    //}
-    //BOOST_CHECK(databaseMetaData.IsValid());
     Disconnect();
 }
 

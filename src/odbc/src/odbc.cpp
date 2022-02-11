@@ -37,7 +37,7 @@
 /**
  * Handle window handle.
  * @param windowHandle Window handle.
- * @param config Configuration.
+ * @param _config Configuration.
  * @return @c true on success and @c false otherwise.
  */
 bool HandleParentWindow(SQLHWND windowHandle, ignite::odbc::config::Configuration &config)

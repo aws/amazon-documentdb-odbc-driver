@@ -38,10 +38,15 @@
 #include "ignite/odbc/jni/utils.h"
 #include "ignite/odbc/common/concurrent.h"
 #include "ignite/odbc/common/utils.h"
+#include "ignite/odbc/jni/documentdb_connection.h"
+#include "ignite/odbc/jni/database_metadata.h"
 
 using namespace ignite::odbc::jni::java;
 using namespace ignite::odbc::common;
 using namespace ignite::odbc::common::concurrent;
+using ignite::odbc::IgniteError;
+using ignite::odbc::jni::DocumentDbConnection;
+using ignite::odbc::jni::DatabaseMetaData;
 
 // Uncomment for per-byte debug.
 //#define PER_BYTE_DEBUG
@@ -150,7 +155,7 @@ namespace ignite
 
             config = cfg;
 
-            if (_connection.Get() != nullptr) {
+            if (_connection.IsValid()) {
                 AddStatusRecord(SqlState::S08002_ALREADY_CONNECTED,
                                 "Already connected.");
 
@@ -164,7 +169,7 @@ namespace ignite
                 return SqlResult::AI_ERROR;
             }
 
-            odbc::IgniteError err;
+            IgniteError err;
             bool connected = TryRestoreConnection(err);
 
             if (!connected)
@@ -194,7 +199,7 @@ namespace ignite
 
         SqlResult::Type Connection::InternalRelease()
         {
-            if (_connection.Get() == nullptr)
+            if (!_connection.IsValid())
             {
                 AddStatusRecord(SqlState::S08003_NOT_CONNECTED, "Connection is not open.");
 
@@ -210,13 +215,15 @@ namespace ignite
 
         void Connection::Close()
         {
-            if (_jniContext.Get() != nullptr && _connection.Get() != nullptr) {
-                JniErrorInfo errInfo;
-                _jniContext.Get()->ConnectionClose(_connection, errInfo);
-                if (errInfo.code != java::IGNITE_JNI_ERR_SUCCESS) {
-                    // TODO: Determine if we need to error check the close.
+            if (_jniContext.IsValid()) {
+                if (_connection.IsValid()) {
+                    JniErrorInfo errInfo;
+                    _connection.Get()->Close(errInfo);
+                    if (errInfo.code != java::IGNITE_JNI_ERR_SUCCESS) {
+                        // TODO: Determine if we need to error check the close.
+                    }
+                    _connection = nullptr;
                 }
-                _connection = nullptr;
             }
         }
 
@@ -231,21 +238,20 @@ namespace ignite
 
         SharedPointer< DatabaseMetaData > Connection::GetMetaData(
             IgniteError& err) {
-            auto jniContext = GetJniContext();
-            SharedPointer< GlobalJObject > databaseMetaData;
-            JniErrorInfo errInfo;
-            bool success = jniContext.Get()->ConnectionGetMetaData(_connection,
-                                                    databaseMetaData, errInfo);
-            if (!success) {
-                std::string errMessage = "Unable to retrieve database metadata.\n";
-                errMessage.append(errInfo.errMsg);
-                err = IgniteError(
-                    odbc::IgniteError::IGNITE_ERR_JNI_GET_DATABASE_METADATA,
-                    errMessage.c_str());
+            if (!_connection.IsValid()) {
+                err = IgniteError(IgniteError::IGNITE_ERR_ILLEGAL_STATE,
+                                  "Must be connected.");
                 return nullptr;
             }
-
-            return new DatabaseMetaData(jniContext, databaseMetaData);
+            JniErrorInfo errInfo;
+            auto databaseMetaData = _connection.Get()->GetMetaData(errInfo);
+            if (!databaseMetaData.IsValid()) {
+                std::string message = errInfo.errMsg ? errInfo.errMsg : "";
+                err = IgniteError(IgniteError::IGNITE_ERR_JNI_GET_DATABASE_METADATA,
+                                  message.c_str());
+                return nullptr;
+            }
+            return databaseMetaData;
         }
 
         SqlResult::Type Connection::InternalCreateStatement(Statement*& statement)
@@ -314,7 +320,7 @@ namespace ignite
 
                 return SqlResult::AI_ERROR;
             }
-            catch (const odbc::IgniteError& err)
+            catch (const IgniteError& err)
             {
                 AddStatusRecord(err.GetText());
 
@@ -355,7 +361,7 @@ namespace ignite
 
                 return SqlResult::AI_ERROR;
             }
-            catch (const odbc::IgniteError& err)
+            catch (const IgniteError& err)
             {
                 AddStatusRecord(err.GetText());
 
@@ -531,7 +537,7 @@ namespace ignite
 
                 return SqlResult::AI_ERROR;
             }
-            catch (const odbc::IgniteError& err)
+            catch (const IgniteError& err)
             {
                 AddStatusRecord(SqlState::S08004_CONNECTION_REJECTED, err.GetText());
 
@@ -562,7 +568,7 @@ namespace ignite
             if (_connection.Get() != nullptr)
                 return;
 
-            odbc::IgniteError err;
+            IgniteError err;
             bool success = TryRestoreConnection(err);
 
             if (!success) {
@@ -574,37 +580,25 @@ namespace ignite
             }
         }
 
-        bool Connection::TryRestoreConnection(odbc::IgniteError& err)
+        bool Connection::TryRestoreConnection(IgniteError& err)
         {
-            bool connected = false;
-
             if (_connection.Get() != nullptr) {
                 return true;
             }
 
             std::string connectionString = FormatJdbcConnectionString(config);
             JniErrorInfo errInfo;
-
             auto ctx = GetJniContext();
-            if (ctx.Get() != nullptr) {
-                SharedPointer< GlobalJObject > result;
-                bool success = ctx.Get()->DriverManagerGetConnection(
-                    connectionString.c_str(), result, errInfo);
-                connected = (success && result.Get()
-                             && errInfo.code == java::IGNITE_JNI_ERR_SUCCESS);
-                if (!connected) {
-                    err = odbc::IgniteError(
-                        odbc::IgniteError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
-                        errInfo.errMsg);
-                    Close();
-                }
-                _connection = result;
-            } else {
-                err = odbc::IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_INIT, "Unable to get initialized JVM.");
-                _connection = nullptr;
+            SharedPointer< DocumentDbConnection > conn = new DocumentDbConnection(ctx);
+            if (!conn.IsValid() || !conn.Get()->Open(config, errInfo)) {
+                std::string message = errInfo.errMsg ? errInfo.errMsg : "Unable to open connection.";
+                err = IgniteError(
+                    IgniteError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
+                    message.c_str());
             }
-
-            return connected;
+            _connection = conn;
+            return _connection.IsValid() && _connection.Get()->IsOpen()
+                   && errInfo.code == java::IGNITE_JNI_ERR_SUCCESS;
         }
 
         std::string Connection::FormatJdbcConnectionString(
@@ -637,7 +631,7 @@ namespace ignite
             std::string sshUser;
             std::string sshTunnelHost;
             size_t indexOfAt = sshUserAtHost.find_first_of('@');
-            if (indexOfAt >= 0 && sshUserAtHost.size() > (indexOfAt + 1)) {
+            if (indexOfAt != std::string::npos && sshUserAtHost.size() > (indexOfAt + 1)) {
                 sshUser = sshUserAtHost.substr(0, indexOfAt);
                 sshTunnelHost = sshUserAtHost.substr(indexOfAt + 1);
             }

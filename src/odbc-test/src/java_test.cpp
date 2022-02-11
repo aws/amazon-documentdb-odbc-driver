@@ -50,7 +50,7 @@ using namespace odbc::common::concurrent;
 /**
  * Test setup fixture.
  */
-struct JavaTestSuiteFixture: odbc::OdbcTestSuite
+struct JniTestSuiteFixture: odbc::OdbcTestSuite
 {
     using odbc::OdbcTestSuite::OdbcTestSuite;
 
@@ -130,7 +130,7 @@ struct JavaTestSuiteFixture: odbc::OdbcTestSuite
     /**
      * Destructor.
      */
-    ~JavaTestSuiteFixture() override {
+    ~JniTestSuiteFixture() override {
         CleanUpContext();
     }
 
@@ -187,7 +187,7 @@ struct AutoCloseResultSet {
     IGNITE_NO_COPY_ASSIGNMENT(AutoCloseResultSet);
 };
 
-BOOST_FIXTURE_TEST_SUITE(JavaTestSuite, JavaTestSuiteFixture)
+BOOST_FIXTURE_TEST_SUITE(JavaTestSuite, JniTestSuiteFixture)
 
 BOOST_AUTO_TEST_CASE(TestDriverManagerGetConnection)
 {

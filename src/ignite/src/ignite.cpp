@@ -35,7 +35,7 @@ namespace config
     /** Command line argument: Ignite home. */
     const std::string CmdIgniteHome = ToLower("-IgniteHome=");
     
-    /** Command line argument: Spring config URL. */
+    /** Command line argument: Spring _config URL. */
     const std::string CmdSpringCfgUrl = ToLower("-SpringConfigUrl=");
 
     /** Command line argument: Path to JVM library. */
