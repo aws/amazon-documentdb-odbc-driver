@@ -16,5 +16,4 @@
 @alexey-temnikov
 @andiem-bq
 @birschick-bq
-@garya-bitquill
 <!-- Any additional reviewers -->
