@@ -520,7 +520,7 @@ namespace ignite
              * @param err 
              * @return int32_t 
              */
-            bool GetInternalSSHTunnelPort (IgniteError& err, int32_t& localSSHTunnelPort, SharedPointer< jni::java::JniContext > ctx);
+            bool GetInternalSSHTunnelPort (int32_t& localSSHTunnelPort, SharedPointer< jni::java::JniContext > ctx, IgniteError& err,);
 
             /** 
              * Creates JVM options
