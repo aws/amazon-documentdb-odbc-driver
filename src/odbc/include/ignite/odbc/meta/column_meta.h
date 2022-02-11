@@ -26,6 +26,9 @@
 #include "ignite/odbc/protocol_version.h"
 #include "ignite/odbc/common_types.h"
 #include "ignite/odbc/utility.h"
+#include "ignite/odbc/jni/java.h"
+
+using ignite::odbc::jni::java::GlobalJObject;
 
 namespace ignite {
 namespace odbc {
@@ -238,14 +241,24 @@ class ColumnMeta {
 /** Column metadata vector alias. */
 typedef std::vector< ColumnMeta > ColumnMetaVector;
 
+// -AL- todo delete later. No longer needed
 /**
  * Read columns metadata collection.
  * @param reader Reader.
  * @param meta Collection.
  * @param ver Server protocol version.
  */
-void ReadColumnMetaVector(ignite::impl::binary::BinaryReaderImpl& reader,
-                          ColumnMetaVector& meta, const ProtocolVersion& ver);
+// void ReadColumnMetaVector(ignite::impl::binary::BinaryReaderImpl& reader,
+// ColumnMetaVector& meta,
+//        const ProtocolVersion& ver);
+
+/**
+ * Read columns metadata collection.
+ * @param resultSet ReseultSet.
+ * @param meta Collection.
+ */
+void ReadColumnMetaVector(SharedPointer< GlobalJObject > resultSet,
+                          ColumnMetaVector& meta);
 }  // namespace meta
 }  // namespace odbc
 }  // namespace ignite
