@@ -17,6 +17,7 @@
 
 #include <ignite/impl/binary/binary_common.h>
 
+#include "ignite/odbc/jni/java.h"
 #include "ignite/odbc/type_traits.h"
 #include "ignite/odbc/connection.h"
 #include "ignite/odbc/message.h"
@@ -24,86 +25,89 @@
 #include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/query/column_metadata_query.h"
 
-namespace
-{
-    struct ResultColumn
-    {
-        enum Type
-        {
-            /** Catalog name. NULL if not applicable to the data source. */
-            TABLE_CAT = 1,
+namespace {
+struct ResultColumn {
+    enum Type {
+        /** Catalog name. NULL if not applicable to the data source. */
+        TABLE_CAT = 1,
 
-            /** Schema name. NULL if not applicable to the data source. */
-            TABLE_SCHEM,
+        /** Schema name. NULL if not applicable to the data source. */
+        TABLE_SCHEM,
 
-            /** Table name. */
-            TABLE_NAME,
+        /** Table name. */
+        TABLE_NAME,
 
-            /** Column name. */
-            COLUMN_NAME,
+        /** Column name. */
+        COLUMN_NAME,
 
-            /** SQL data type. */
-            DATA_TYPE,
+        /** SQL data type. */
+        DATA_TYPE,
 
-            /** Data source-dependent data type name. */
-            TYPE_NAME,
+        /** Data source-dependent data type name. */
+        TYPE_NAME,
 
-            /** Column size. */
-            COLUMN_SIZE,
+        /** Column size. */
+        COLUMN_SIZE,
 
-            /** The length in bytes of data transferred on fetch. */
-            BUFFER_LENGTH,
+        /** The length in bytes of data transferred on fetch. */
+        BUFFER_LENGTH,
 
-            /** The total number of significant digits to the right of the decimal point. */
-            DECIMAL_DIGITS,
+        /** The total number of significant digits to the right of the decimal
+           point. */
+        DECIMAL_DIGITS,
 
-            /** Precision. */
-            NUM_PREC_RADIX,
+        /** Precision. */
+        NUM_PREC_RADIX,
 
-            /** Nullability of the data in column (int). */
-            NULLABLE,
+        /** Nullability of the data in column (int). */
+        NULLABLE,
 
-            /** A description of the column. */
-            REMARKS,
-            // the start of my added values -AL-
-            /** Default value for the column. May be null. */
-            COLUMN_DEF,
+        /** A description of the column. */
+        REMARKS,
+        // the start of my added values -AL-
+        /** Default value for the column. May be null. */
+        COLUMN_DEF,
 
-            /** SQL data type. */
-            SQL_DATA_TYPE,
+        /** SQL data type. */
+        SQL_DATA_TYPE,
 
-            /** Subtype code for datetime and interval data types. */
-            SQL_DATETIME_SUB,
+        /** Subtype code for datetime and interval data types. */
+        SQL_DATETIME_SUB,
 
-            /** Maximum length in bytes of a character or binary data type column. NULL for other data types. */
-            CHAR_OCTET_LENGTH,
+        /** Maximum length in bytes of a character or binary data type column.
+           NULL for other data types. */
+        CHAR_OCTET_LENGTH,
 
-            /** Index of column in table (starting at 1) */
-            ORDINAL_POSITION,
+        /** Index of column in table (starting at 1) */
+        ORDINAL_POSITION,
 
-            /** Nullability of data in column (String). */
-            IS_NULLABLE,
+        /** Nullability of data in column (String). */
+        IS_NULLABLE,
 
-            /** Catalog of table that is the scope of a reference attribute. NULL if DATA_TYPE isn't REF. */
-            SCOPE_CATALOG,
+        /** Catalog of table that is the scope of a reference attribute. NULL if
+           DATA_TYPE isn't REF. */
+        SCOPE_CATALOG,
 
-            /** Schema of table that is the scope of a reference attribute. NULL if DATA_TYPE isn't REF. */
-            SCOPE_SCHEMA,
+        /** Schema of table that is the scope of a reference attribute. NULL if
+           DATA_TYPE isn't REF. */
+        SCOPE_SCHEMA,
 
-            /** Table name that is the scope of a reference attribute. NULL if DATA_TYPE isn't REF. */
-            SCOPE_TABLE,
+        /** Table name that is the scope of a reference attribute. NULL if
+           DATA_TYPE isn't REF. */
+        SCOPE_TABLE,
 
-            /** Source type. NULL if DATA_TYPE isn't DISTINCT or user-generated REF. */
-            SOURCE_DATA_TYPE,
+        /** Source type. NULL if DATA_TYPE isn't DISTINCT or user-generated REF.
+         */
+        SOURCE_DATA_TYPE,
 
-            /** Whether column is auto incremented. */
-            IS_AUTOINCREMENT,
+        /** Whether column is auto incremented. */
+        IS_AUTOINCREMENT,
 
-            /** Whether column is generated. */
-            IS_GENERATEDCOLUMN
-        };
+        /** Whether column is generated. */
+        IS_GENERATEDCOLUMN
     };
-}
+};
+}  // namespace
 
 namespace ignite {
 namespace odbc {
@@ -151,164 +155,169 @@ ColumnMetadataQuery::ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
 }
 
 ColumnMetadataQuery::~ColumnMetadataQuery() {
-  // No-op.
+    // No-op.
 }
 
-SqlResult::Type ColumnMetadataQuery::Execute() {
-  if (executed)
-    Close();
+SqlResult::Type
+ColumnMetadataQuery::Execute() {  // place to plug in new code -AL-
+    if (executed)
+        Close();
 
-  SqlResult::Type result = MakeRequestGetColumnsMeta();
+    SqlResult::Type result = MakeRequestGetColumnsMeta();
 
-  if (result == SqlResult::AI_SUCCESS) {
-    executed = true;
-    fetched = false;
+    if (result == SqlResult::AI_SUCCESS) {
+        executed = true;
+        fetched = false;
 
-    cursor = meta.begin();
-  }
+        cursor = meta.begin();
+    }
 
-  return result;
+    return result;
 }
 
 const meta::ColumnMetaVector* ColumnMetadataQuery::GetMeta() {
-  return &columnsMeta;
+    return &columnsMeta;
 }
 
 SqlResult::Type ColumnMetadataQuery::FetchNextRow(
     app::ColumnBindingMap& columnBindings) {
-  if (!executed) {
-    diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
-                         "Query was not executed.");
+    if (!executed) {
+        diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
+                             "Query was not executed.");
 
-    return SqlResult::AI_ERROR;
-  }
+        return SqlResult::AI_ERROR;
+    }
 
-  if (!fetched)
-    fetched = true;
-  else
-    ++cursor;
+    if (!fetched)
+        fetched = true;
+    else
+        ++cursor;
 
-  if (cursor == meta.end())
-    return SqlResult::AI_NO_DATA;
+    if (cursor == meta.end())
+        return SqlResult::AI_NO_DATA;
 
-  app::ColumnBindingMap::iterator it;
+    app::ColumnBindingMap::iterator it;
 
-  for (it = columnBindings.begin(); it != columnBindings.end(); ++it)
-    GetColumn(it->first, it->second);
+    for (it = columnBindings.begin(); it != columnBindings.end(); ++it)
+        GetColumn(it->first, it->second);
 
-  return SqlResult::AI_SUCCESS;
+    return SqlResult::AI_SUCCESS;
 }
 
 SqlResult::Type ColumnMetadataQuery::GetColumn(
-    uint16_t columnIdx, app::ApplicationDataBuffer& buffer) {
-  if (!executed) {
-    diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
-                         "Query was not executed.");
+    uint16_t columnIdx,
+    app::ApplicationDataBuffer&
+        buffer) {  // -AL- I need to change this code to match resultSet return
+                   // values. todo (I might be wrong tho)
+    if (!executed) {
+        diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
+                             "Query was not executed.");
 
-    return SqlResult::AI_ERROR;
-  }
-
-  if (cursor == meta.end()) {
-    diag.AddStatusRecord(SqlState::S24000_INVALID_CURSOR_STATE,
-                         "Cursor has reached end of the result set.");
-
-    return SqlResult::AI_ERROR;
-  }
-
-  const meta::ColumnMeta& currentColumn = *cursor;
-  uint8_t columnType = currentColumn.GetDataType();
-
-  switch (columnIdx) {
-    case ResultColumn::TABLE_CAT: {
-      buffer.PutNull();
-      break;
+        return SqlResult::AI_ERROR;
     }
 
-    case ResultColumn::TABLE_SCHEM: {
-      buffer.PutString(currentColumn.GetSchemaName());
-      break;
+    if (cursor == meta.end()) {
+        diag.AddStatusRecord(SqlState::S24000_INVALID_CURSOR_STATE,
+                             "Cursor has reached end of the result set.");
+
+        return SqlResult::AI_ERROR;
     }
 
-    case ResultColumn::TABLE_NAME: {
-      buffer.PutString(currentColumn.GetTableName());
-      break;
+    const meta::ColumnMeta& currentColumn = *cursor;
+    uint8_t columnType = currentColumn.GetDataType();
+
+    switch (columnIdx) {
+        case ResultColumn::TABLE_CAT: {
+            buffer.PutNull();
+            break;
+        }
+
+        case ResultColumn::TABLE_SCHEM: {
+            buffer.PutString(currentColumn.GetSchemaName());
+            break;
+        }
+
+        case ResultColumn::TABLE_NAME: {
+            buffer.PutString(currentColumn.GetTableName());
+            break;
+        }
+
+        case ResultColumn::COLUMN_NAME: {
+            buffer.PutString(currentColumn.GetColumnName());
+            break;
+        }
+
+        case ResultColumn::DATA_TYPE: {
+            buffer.PutInt16(type_traits::BinaryToSqlType(columnType));
+            break;
+        }
+
+        case ResultColumn::TYPE_NAME: {
+            buffer.PutString(type_traits::BinaryTypeToSqlTypeName(
+                currentColumn.GetDataType()));
+            break;
+        }
+
+        case ResultColumn::COLUMN_SIZE: {
+            buffer.PutInt16(type_traits::BinaryTypeColumnSize(columnType));
+            break;
+        }
+
+        case ResultColumn::BUFFER_LENGTH: {
+            buffer.PutInt16(type_traits::BinaryTypeTransferLength(columnType));
+            break;
+        }
+
+        case ResultColumn::DECIMAL_DIGITS: {
+            int32_t decDigits =
+                type_traits::BinaryTypeDecimalDigits(columnType);
+            if (decDigits < 0)
+                buffer.PutNull();
+            else
+                buffer.PutInt16(static_cast< int16_t >(decDigits));
+            break;
+        }
+
+        case ResultColumn::NUM_PREC_RADIX: {
+            buffer.PutInt16(type_traits::BinaryTypeNumPrecRadix(columnType));
+            break;
+        }
+
+        case ResultColumn::NULLABLE: {
+            buffer.PutInt16(type_traits::BinaryTypeNullability(columnType));
+            break;
+        }
+
+        case ResultColumn::REMARKS: {
+            buffer.PutNull();
+            break;
+        }
+
+        default:
+            break;
     }
 
-    case ResultColumn::COLUMN_NAME: {
-      buffer.PutString(currentColumn.GetColumnName());
-      break;
-    }
-
-    case ResultColumn::DATA_TYPE: {
-      buffer.PutInt16(type_traits::BinaryToSqlType(columnType));
-      break;
-    }
-
-    case ResultColumn::TYPE_NAME: {
-      buffer.PutString(
-          type_traits::BinaryTypeToSqlTypeName(currentColumn.GetDataType()));
-      break;
-    }
-
-    case ResultColumn::COLUMN_SIZE: {
-      buffer.PutInt16(type_traits::BinaryTypeColumnSize(columnType));
-      break;
-    }
-
-    case ResultColumn::BUFFER_LENGTH: {
-      buffer.PutInt16(type_traits::BinaryTypeTransferLength(columnType));
-      break;
-    }
-
-    case ResultColumn::DECIMAL_DIGITS: {
-      int32_t decDigits = type_traits::BinaryTypeDecimalDigits(columnType);
-      if (decDigits < 0)
-        buffer.PutNull();
-      else
-        buffer.PutInt16(static_cast< int16_t >(decDigits));
-      break;
-    }
-
-    case ResultColumn::NUM_PREC_RADIX: {
-      buffer.PutInt16(type_traits::BinaryTypeNumPrecRadix(columnType));
-      break;
-    }
-
-    case ResultColumn::NULLABLE: {
-      buffer.PutInt16(type_traits::BinaryTypeNullability(columnType));
-      break;
-    }
-
-    case ResultColumn::REMARKS: {
-      buffer.PutNull();
-      break;
-    }
-
-    default:
-      break;
-  }
-
-  return SqlResult::AI_SUCCESS;
+    return SqlResult::AI_SUCCESS;
 }
 
 SqlResult::Type ColumnMetadataQuery::Close() {
-  meta.clear();
+    meta.clear();
 
-  executed = false;
+    executed = false;
 
-  return SqlResult::AI_SUCCESS;
+    return SqlResult::AI_SUCCESS;
 }
 
 bool ColumnMetadataQuery::DataAvailable() const {
-  return cursor != meta.end();
+    return cursor != meta.end();
 }
 
 int64_t ColumnMetadataQuery::AffectedRows() const {
-  return 0;
+    return 0;
 }
 
 SqlResult::Type ColumnMetadataQuery::NextResultSet() {
-  return SqlResult::AI_NO_DATA;
+    return SqlResult::AI_NO_DATA;
 }
 
 SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
@@ -346,7 +355,7 @@ SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
                   << static_cast< int32_t >(meta[i].GetDataType()));
   }
 
-  return SqlResult::AI_SUCCESS;
+    return SqlResult::AI_SUCCESS;
 }
 }  // namespace query
 }  // namespace odbc
