@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef _DOCUMENTDB_ODBC_MONGO_INSTANCE
-#define _DOCUMENTDB_ODBC_MONGO_INSTANCE
+#ifndef _DOCUMENTDB_ODBC_DRIVER_INSTANCE
+#define _DOCUMENTDB_ODBC_DRIVER_INSTANCE
 
 #include <cstdlib>
 #include <memory>
@@ -29,10 +29,10 @@
 #include <mongocxx/logger.hpp>
 
 
-class MongoInstance {
+class DriverInstance {
    public:
-    static MongoInstance& instance() {
-        static MongoInstance instance;
+    static DriverInstance& instance() {
+        static DriverInstance instance;
         return instance;
     }
 
@@ -50,11 +50,11 @@ class MongoInstance {
     }
 
    private:
-    MongoInstance() {
+    DriverInstance() {
         initializeInstance();
     }
 
     std::unique_ptr<mongocxx::instance> _instance = nullptr;
 };
 
-#endif //_DOCUMENTDB_ODBC_MONGO_INSTANCE
+#endif //_DOCUMENTDB_ODBC_DRIVER_INSTANCE

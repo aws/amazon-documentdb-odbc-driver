@@ -38,7 +38,7 @@
 #include "ignite/odbc/jni/utils.h"
 #include "ignite/odbc/common/concurrent.h"
 #include "ignite/odbc/common/utils.h"
-#include "ignite/odbc/mongoInstance.h"
+#include "ignite/odbc/DriverInstance.h"
 
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
@@ -651,11 +651,11 @@ namespace ignite
             }
 
             int32_t localSSHTunnelPort = 0;
-            if (!GetInternalSSHTunnelPort(err, localSSHTunnelPort, ctx)) {
+            if (!GetInternalSSHTunnelPort(localSSHTunnelPort, ctx, err)) {
                 return false;
             }       
             
-            connected = ConnectCPPDocumentDB(err, localSSHTunnelPort);
+            connected = ConnectCPPDocumentDB(localSSHTunnelPort, err);
 
             return connected;
         }
@@ -802,13 +802,13 @@ namespace ignite
             return static_cast<int32_t>(uTimeout);
         }
 
-        bool Connection::ConnectCPPDocumentDB(odbc::IgniteError& err,
-                                              int32_t localSSHTunnelPort) 
+        bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
+                                              odbc::IgniteError& err) 
         {           
             using bsoncxx::builder::basic::kvp;
             using bsoncxx::builder::basic::make_document;
 
-            MongoInstance::instance();
+            DriverInstance::instance();
             try {
                 std::string mongoCPPConnectionString =
                     FormatMongoCppConnectionString(localSSHTunnelPort);
