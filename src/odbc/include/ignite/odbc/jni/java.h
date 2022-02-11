@@ -279,10 +279,8 @@ namespace ignite {
                   jmethodID m_ResultSetNext;
                   jmethodID m_ResultSetGetStringByIndex;
                   jmethodID m_ResultSetGetIntegerByIndex;
-                  jmethodID m_ResultSetGetShortByIndex;
                   jmethodID m_ResultSetGetStringByName;
                   jmethodID m_ResultSetGetIntegerByName;
-                  jmethodID m_ResultSetGetShortByName;
                   jmethodID m_ResultSetGetRow;
                   jmethodID m_ResultSetWasNull;
 
@@ -487,8 +485,6 @@ namespace ignite {
                   bool ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, std::string& value, bool& wasNull, JniErrorInfo& errInfo);
                   bool ResultSetGetInteger(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, int& value, bool& wasNull, JniErrorInfo& errInfo);
                   bool ResultSetGetInteger(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, int& value, bool& wasNull,JniErrorInfo& errInfo);
-                  bool ResultSetGetShort(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, short& value, bool& wasNull, JniErrorInfo& errInfo);
-                  bool ResultSetGetShort(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, short& value, bool& wasNull,JniErrorInfo& errInfo);
                   bool ResultSetGetRow(const SharedPointer< GlobalJObject >& resultSet, int& value, bool& wasNull, JniErrorInfo& errInfo);
                   bool ResultSetWasNull(const SharedPointer< GlobalJObject >& resultSet, bool& value, JniErrorInfo& errInfo);
 
