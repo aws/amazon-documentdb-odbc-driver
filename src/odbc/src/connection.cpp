@@ -38,6 +38,19 @@
 #include "ignite/odbc/jni/utils.h"
 #include "ignite/odbc/common/concurrent.h"
 #include "ignite/odbc/common/utils.h"
+#include "ignite/odbc/mongoInstance.h"
+
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/builder/stream/array.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/builder/stream/helpers.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+#include <mongocxx/uri.hpp>
+#include <bsoncxx/stdx/make_unique.hpp>
+#include <bsoncxx/stdx/optional.hpp>
+#include <bsoncxx/stdx/string_view.hpp>
 
 using namespace ignite::odbc::jni::java;
 using namespace ignite::odbc::common;
@@ -634,8 +647,77 @@ namespace ignite
                 connection = nullptr;
             }
 
+            if (!connected) {
+                return connected;
+            }
+
+            int32_t localSSHTunnelPort = 0;
+            if (!GetInternalSSHTunnelPort(err, localSSHTunnelPort, ctx)) {
+                return false;
+            }       
+            
+            connected = ConnectCPPDocumentDB(err, localSSHTunnelPort);
+
             return connected;
         }
+
+        bool Connection::GetInternalSSHTunnelPort(odbc::IgniteError& err, int32_t& localSSHTunnelPort, SharedPointer< JniContext > ctx) {
+            bool isSSHTunnelActive;
+            JniErrorInfo errInfo;
+            bool success = ctx.Get()->DocumentDbConnectionIsSshTunnelActive(
+                connection, isSSHTunnelActive, errInfo);
+
+            if (!success
+                || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+                std::string errMsg = errInfo.errMsg;
+                err = odbc::IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_INIT,
+                    errInfo.errMsg);
+                return false;
+            }
+
+            
+            if (isSSHTunnelActive) {
+                bool success = ctx.Get()->DocumentDbConnectionGetSshLocalPort(
+                    connection, localSSHTunnelPort, errInfo);  
+                if (!success
+                    || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+                    std::string errMsg = errInfo.errMsg;
+                    err = odbc::IgniteError(
+                        odbc::IgniteError::IGNITE_ERR_JVM_INIT,
+                        errInfo.errMsg);
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        std::string Connection::FormatMongoCppConnectionString(
+            int32_t localSSHTunnelPort) const {
+
+            std::string host = "localhost";
+            std::string port = std::to_string(localSSHTunnelPort);
+
+            // localSSHTunnelPort == 0 means that internal SSH tunnel option was not set
+            if (localSSHTunnelPort == 0) {
+                host = config.GetHostname();
+                port = config.GetPort();
+            }
+            std::string mongoConnectionString;
+
+            mongoConnectionString = "mongodb:";
+            mongoConnectionString.append("//" + config.GetUser());
+            mongoConnectionString.append(":" + config.GetPassword());
+            mongoConnectionString.append("@" + host);
+            mongoConnectionString.append(":" + port);
+            mongoConnectionString.append("/" + config.GetDatabase());
+            mongoConnectionString.append("?tlsAllowInvalidHostnames=true");
+            //tls configuration is handled using tls_options in connectionCPP
+            //TODO handle the other DSN configuration
+
+            return mongoConnectionString;
+        }
+
 
         /**
          * Create JVM options from configuration.
@@ -674,6 +756,48 @@ namespace ignite
 
             return static_cast<int32_t>(uTimeout);
         }
+
+        bool Connection::ConnectCPPDocumentDB(odbc::IgniteError& err,
+                                              int32_t localSSHTunnelPort) 
+        {           
+            using bsoncxx::builder::basic::kvp;
+            using bsoncxx::builder::basic::make_document;
+
+            MongoInstance::instance();
+            try {
+                std::string mongoCPPConnectionString =
+                    FormatMongoCppConnectionString(localSSHTunnelPort);
+                const auto uri = mongocxx::uri{mongoCPPConnectionString};
+                mongocxx::options::client client_options;
+                mongocxx::options::tls tls_options;
+
+                //TO-DO Adapt to use certificates
+                tls_options.allow_invalid_certificates(true);
+
+                client_options.tls_opts(tls_options);
+                auto client1 = mongocxx::client{
+                    mongocxx::uri{mongoCPPConnectionString}, client_options};
+
+                std::string database = config.GetDatabase();
+                bsoncxx::builder::stream::document ping;
+                ping << "ping" << 1;
+                auto db = client1[database];
+                auto result = db.run_command(ping.view());
+
+                if (result.view()["ok"].get_double() != 1) {
+                    err = odbc::IgniteError(
+                        odbc::IgniteError::IGNITE_ERR_NETWORK_FAILURE,
+                        "Unable to ping DocumentDB.");
+                    return false;
+                }
+
+                return true;
+            } catch (const std::exception& xcp) {
+                err = odbc::IgniteError(
+                    odbc::IgniteError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
+                    "Unable to establish connection with DocumentDB.");
+                return false;
+            }          
+        }
     }
 }
-

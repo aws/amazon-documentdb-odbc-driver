@@ -498,6 +498,30 @@ namespace ignite
              */
             bool TryRestoreConnection(IgniteError& err);
 
+            /**
+             * Connect to DocumentDB using Mongo cxx driver
+             *
+             * @return @c true on success and @c false otherwise.
+             */
+            bool ConnectCPPDocumentDB(IgniteError& err,
+                                      int32_t localSSHTunnelPort);
+
+            /**
+             * Formats the Mongo connection string from configuration values.
+             *
+             *  @return the JDBC connection string.
+             */
+            std::string FormatMongoCppConnectionString(
+                int32_t localSSHTunnelPort) const;
+
+            /**
+             * Helper function to get internall SSH tunnel Port
+             * 
+             * @param err 
+             * @return int32_t 
+             */
+            bool GetInternalSSHTunnelPort (IgniteError& err, int32_t& localSSHTunnelPort, SharedPointer< jni::java::JniContext > ctx);
+
             /** 
              * Creates JVM options
              */
@@ -550,7 +574,6 @@ namespace ignite
 
             /** Streaming context. */
             streaming::StreamingContext streamingContext;
-
 
         };
     }
