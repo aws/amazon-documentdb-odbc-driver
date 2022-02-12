@@ -71,7 +71,7 @@ bool DisplayConnectionWindow(void* windowParent, Configuration& config)
 /**
  * Register DSN with specified configuration.
  *
- * @param _config Configuration.
+ * @param config Configuration.
  * @param driver Driver.
  * @return True on success and false on fail.
  */
