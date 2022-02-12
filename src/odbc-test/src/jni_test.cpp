@@ -19,82 +19,52 @@
 #include <Windows.h>
 #endif
 
+#include <sql.h>
+#include <sqlext.h>
+#include <string>
+#include <vector>
+
+#include <boost/test/unit_test.hpp>
 #include <ignite/odbc/common/common.h>
 #include <ignite/odbc/common/concurrent.h>
 #include <ignite/odbc/config/connection_string_parser.h>
 #include <ignite/odbc/connection.h>
 #include <ignite/odbc/dsn_config.h>
 #include <ignite/odbc/ignite_error.h>
+#include <ignite/odbc/jni/database_metadata.h>
+#include <ignite/odbc/jni/documentdb_connection.h>
 #include <ignite/odbc/jni/java.h>
+#include <ignite/odbc/jni/result_set.h>
 #include <ignite/odbc/jni/utils.h>
-#include <sql.h>
-#include <sqlext.h>
-
-#include <boost/test/unit_test.hpp>
-#include <string>
-#include <vector>
 
 #include "odbc_test_suite.h"
 #include "test_utils.h"
 
-//using namespace ignite;
-using namespace ignite_test;
 using namespace boost::unit_test;
-//using namespace odbc;
-//using namespace odbc::_config;
-//using namespace odbc::jni;
-//using namespace odbc::jni::java;
 
-using ignite::odbc::config::Configuration;
-using ignite::odbc::config::ConnectionStringParser;
-using ignite::odbc::common::ReleaseChars;
-using ignite::odbc::common::concurrent::SharedPointer;
 using ignite::odbc::OdbcTestSuite;
 using ignite_test::GetOdbcErrorMessage;
+
+using ignite::odbc::Connection;
+using ignite::odbc::common::ReleaseChars;
+using ignite::odbc::common::concurrent::SharedPointer;
+using ignite::odbc::config::Configuration;
+using ignite::odbc::config::ConnectionStringParser;
 using ignite::odbc::java::IGNITE_JNI_ERR_SUCCESS;
+using ignite::odbc::jni::FormatJdbcConnectionString;
 using ignite::odbc::jni::ResolveDocumentDbHome;
+using ignite::odbc::jni::DatabaseMetaData;
+using ignite::odbc::jni::DocumentDbConnection;
+using ignite::odbc::jni::ResultSet;
 using ignite::odbc::jni::java::BuildJvmOptions;
 using ignite::odbc::jni::java::JniHandlers;
-using ignite::odbc::Connection;
+using ignite::odbc::jni::java::JniErrorInfo;
 
 /**
  * Test setup fixture.
  */
 struct JniTestSuiteFixture : OdbcTestSuite {
     using OdbcTestSuite::OdbcTestSuite;
-
-    /**
-     * Execute the query and return an error code.
-     */
-    std::string ExecQueryAndReturnError() {
-        SQLCHAR selectReq[] = "select count(*) from TestType";
-
-        SQLRETURN ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
-
-        std::string err;
-
-        if (!SQL_SUCCEEDED(ret))
-            err = ExtractErrorCode(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-        return err;
-    }
-
-    /**
-     * Extract code from ODBC error message.
-     *
-     * @param err Error message.
-     * @return Error code.
-     */
-    static std::string ExtractErrorCode(const std::string& err) {
-        std::string code;
-
-        size_t idx = err.find(':');
-
-        if ((idx != std::string::npos) && (idx > 0))
-            code = err.substr(0, idx);
-
-        return code;
-    }
 
     SharedPointer< JniContext > GetJniContext(
         std::vector< char* >& opts) const {
@@ -104,7 +74,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
         return ctx;
     }
 
-    std::string GetJdbcConnectionString() {
+    std::string GetJdbcConnectionString() const {
         std::string dsnConnectionString;
         CreateDsnConnectionString(dsnConnectionString);
 
@@ -112,7 +82,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
         ConnectionStringParser parser(config);
         parser.ParseConnectionString(dsnConnectionString, nullptr);
         std::string jdbcConnectionString =
-            Connection::FormatJdbcConnectionString(config);
+            FormatJdbcConnectionString(config);
         return jdbcConnectionString;
     }
 
@@ -189,6 +159,85 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionClose) {
         BOOST_FAIL(errInfo.errMsg);
     }
     BOOST_CHECK(dbConnection.IsOpen());
+
+    if (!dbConnection.Close(errInfo)) {
+        BOOST_FAIL(errInfo.errMsg);
+    }
+    BOOST_CHECK(!dbConnection.IsOpen());
+}
+
+BOOST_AUTO_TEST_CASE(TestDocumentDatabaseMetaDataGetTables) {
+    PrepareContext();
+    BOOST_REQUIRE(_ctx.Get() != nullptr);
+
+    std::string dsnConnectionString;
+    CreateDsnConnectionString(dsnConnectionString);
+
+    Configuration config;
+    ConnectionStringParser parser(config);
+    parser.ParseConnectionString(dsnConnectionString, nullptr);
+    JniErrorInfo errInfo;
+    DocumentDbConnection dbConnection(_ctx);
+
+    BOOST_CHECK(!dbConnection.IsOpen());
+    if (!dbConnection.Open(config, errInfo)) {
+        BOOST_FAIL(errInfo.errMsg);
+    }
+    BOOST_CHECK(dbConnection.IsOpen());
+
+    SharedPointer< DatabaseMetaData > databaseMetaData = dbConnection.GetMetaData(errInfo);
+    BOOST_REQUIRE(databaseMetaData.IsValid());
+
+    std::string catalog;
+    std::string schemaPattern;
+    std::string tablePattern;
+    std::vector< std::string > types = {"TABLE"};
+    SharedPointer< ResultSet > resultSet = databaseMetaData.Get()->GetTables(catalog, schemaPattern, tablePattern, types, errInfo);
+    BOOST_CHECK(resultSet.IsValid());
+    BOOST_CHECK(resultSet.Get()->IsOpen());
+
+    // Loop the result set records
+    bool hasNext = false;
+    do {
+        resultSet.Get()->Next(hasNext, errInfo);
+        if (!hasNext) {
+            break;
+        }
+
+        std::string value;
+        bool wasNull;
+
+        resultSet.Get()->GetString(1, value, wasNull, errInfo);
+        BOOST_CHECK(wasNull);
+        resultSet.Get()->GetString("TABLE_CAT", value, wasNull, errInfo);
+        BOOST_CHECK(wasNull);
+
+        resultSet.Get()->GetString(2, value, wasNull, errInfo);
+        BOOST_CHECK(!wasNull);
+        resultSet.Get()->GetString("TABLE_SCHEM", value, wasNull, errInfo);
+        BOOST_CHECK(!wasNull);
+        BOOST_CHECK("test" == value);
+
+        resultSet.Get()->GetString(3, value, wasNull, errInfo);
+        BOOST_CHECK(!wasNull);
+        BOOST_CHECK(!value.empty());
+        resultSet.Get()->GetString("TABLE_NAME", value, wasNull, errInfo);
+        BOOST_CHECK(!wasNull);
+        BOOST_CHECK(!value.empty());
+
+        resultSet.Get()->GetString(4, value, wasNull, errInfo);
+        BOOST_CHECK(!wasNull);
+        BOOST_CHECK("TABLE" == value);
+        resultSet.Get()->GetString("TABLE_TYPE", value, wasNull, errInfo);
+        BOOST_CHECK(!wasNull);
+        BOOST_CHECK("TABLE"  == value);
+
+    } while (hasNext);
+
+    if (!resultSet.Get()->Close(errInfo)) {
+        BOOST_FAIL(errInfo.errMsg);
+    }
+    BOOST_CHECK(!resultSet.Get()->IsOpen());
 
     if (!dbConnection.Close(errInfo)) {
         BOOST_FAIL(errInfo.errMsg);

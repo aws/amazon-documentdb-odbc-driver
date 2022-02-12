@@ -55,8 +55,6 @@ namespace ignite {
                 SharedPointer< JniContext > GetJniContext() {
                     return _jniContext;
                 };
-                static std::string FormatJdbcConnectionString(
-                    const config::Configuration& config);
 
                 SharedPointer< JniContext > _jniContext;
                 SharedPointer< GlobalJObject > _connection;

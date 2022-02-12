@@ -15,7 +15,18 @@
  * limitations under the License.
  */
 
+#include <ignite/odbc/ignite_error.h>
+#include <ignite/odbc/common/concurrent.h>
 #include <ignite/odbc/jni/database_metadata.h>
+#include <ignite/odbc/jni/java.h>
+
+using ignite::odbc::common::concurrent::SharedPointer;
+using ignite::odbc::jni::java::GlobalJObject;
+using ignite::odbc::jni::java::JniContext;
+using ignite::odbc::jni::java::JniErrorInfo;
+using ignite::odbc::jni::ResultSet;
+using ignite::odbc::java::IGNITE_JNI_ERR_SUCCESS;
+
 
 namespace ignite {
     namespace odbc {
@@ -26,8 +37,14 @@ namespace ignite {
                     const std::string& tableNamePattern,
                     const std::vector< std::string >& types,
                     JniErrorInfo& errInfo) {
-                
-                return nullptr;
+                SharedPointer< GlobalJObject > resultSet;
+                bool success = _jniContext.Get()->DatabaseMetaDataGetTables(
+                    _databaseMetaData, catalog, schemaPattern, tableNamePattern,
+                    types, resultSet, errInfo);
+                if (!success || errInfo.code != IGNITE_JNI_ERR_SUCCESS) {
+                    return nullptr;
+                }
+                return new ResultSet(_jniContext, resultSet);
             }
         }  // namespace
     }  // namespace odbc

@@ -19,6 +19,7 @@
 
 #include <string>
 
+#include <ignite/odbc/config/configuration.h>
 #include <ignite/odbc/common/common.h>
 #include <ignite/odbc/common/concurrent.h>
 #include <ignite/odbc/jni/java.h>
@@ -171,6 +172,13 @@ namespace ignite
               * @return Classpath.
               */
             IGNITE_IMPORT_EXPORT std::string CreateDocumentDbClasspath(const std::string& usrCp, const std::string& home);
+
+            /**
+             * Formats the JDBC connection string from configuration values.
+             * @return the JDBC connection string.
+             */
+            IGNITE_IMPORT_EXPORT std::string FormatJdbcConnectionString(
+                const config::Configuration& config);
 
             /**
               * Resolve DOCUMENTDB_HOME directory. Resolution is performed in several

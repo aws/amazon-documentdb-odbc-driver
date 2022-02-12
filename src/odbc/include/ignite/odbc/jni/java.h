@@ -272,9 +272,9 @@ namespace ignite {
                   jmethodID m_ResultSetClose;
                   jmethodID m_ResultSetNext;
                   jmethodID m_ResultSetGetStringByIndex;
-                  jmethodID m_ResultSetGetIntegerByIndex;
+                  jmethodID m_ResultSetGetIntByIndex;
                   jmethodID m_ResultSetGetStringByName;
-                  jmethodID m_ResultSetGetIntegerByName;
+                  jmethodID m_ResultSetGetIntByName;
                   jmethodID m_ResultSetWasNull;
 
                   jclass c_DatabaseMetaData;
@@ -461,8 +461,8 @@ namespace ignite {
                   bool ResultSetNext(const SharedPointer< GlobalJObject >& resultSet, bool& hasNext, JniErrorInfo& errInfo);
                   bool ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, std::string& value, bool& wasNull, JniErrorInfo& errInfo);
                   bool ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, std::string& value, bool& wasNull, JniErrorInfo& errInfo);
-                  bool ResultSetGetInteger(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, int& value, bool& wasNull, JniErrorInfo& errInfo);
-                  bool ResultSetGetInteger(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, int& value, bool& wasNull,JniErrorInfo& errInfo);
+                  bool ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, int& value, bool& wasNull, JniErrorInfo& errInfo);
+                  bool ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, int& value, bool& wasNull,JniErrorInfo& errInfo);
                   bool ResultSetWasNull(const SharedPointer< GlobalJObject >& resultSet, bool& value, JniErrorInfo& errInfo);
 
                   int64_t TargetInLongOutLong(jobject obj, int type, int64_t memPtr,

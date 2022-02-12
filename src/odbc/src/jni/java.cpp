@@ -259,11 +259,11 @@ namespace ignite
                     JniMethod(
                         "getString",
                         "(Ljava/lang/String;)Ljava/lang/String;", false);
-                JniMethod const M_RECORD_SET_GET_INTEGER_BY_INDEX =
+                JniMethod const M_RECORD_SET_GET_INT_BY_INDEX =
                     JniMethod(
                         "getInt",
                         "(I)I", false);
-                JniMethod const M_RECORD_SET_GET_INTEGER_BY_NAME =
+                JniMethod const M_RECORD_SET_GET_INT_BY_NAME =
                     JniMethod(
                         "getInt",
                         "(Ljava/lang/String;)I", false);
@@ -496,8 +496,8 @@ namespace ignite
                     m_ResultSetNext = FindMethod(env, c_ResultSet, M_RECORD_SET_NEXT);
                     m_ResultSetGetStringByIndex = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_STRING_BY_INDEX);
                     m_ResultSetGetStringByName = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_STRING_BY_NAME);
-                    m_ResultSetGetIntegerByIndex = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_INTEGER_BY_INDEX);
-                    m_ResultSetGetIntegerByName = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_INTEGER_BY_NAME);
+                    m_ResultSetGetIntByIndex = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_INT_BY_INDEX);
+                    m_ResultSetGetIntByName = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_INT_BY_NAME);
                     m_ResultSetWasNull = FindMethod(env, c_ResultSet, M_RECORD_SET_WAS_NULL);
 
                     c_DatabaseMetaData = FindClass(env, C_DATABASE_META_DATA);
@@ -995,7 +995,7 @@ namespace ignite
                     return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
-                bool JniContext::ResultSetGetInteger(const SharedPointer< GlobalJObject >& resultSet,
+                bool JniContext::ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet,
                                                      int columnIndex,
                                                      int& value,
                                                      bool& wasNull,
@@ -1010,7 +1010,7 @@ namespace ignite
                     JNIEnv* env = Attach();
                     jint result = env->CallIntMethod(
                         resultSet.Get()->GetRef(),
-                        jvm->GetMembers().m_ResultSetGetIntegerByIndex,
+                        jvm->GetMembers().m_ResultSetGetIntByIndex,
                         columnIndex);
                     ExceptionCheck(env, &errInfo);
 
@@ -1022,7 +1022,7 @@ namespace ignite
                     return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
                 }
 
-                bool JniContext::ResultSetGetInteger(const SharedPointer< GlobalJObject >& resultSet,
+                bool JniContext::ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet,
                                                      const std::string& columnName,
                                                      int& value,
                                                      bool& wasNull,
@@ -1037,7 +1037,7 @@ namespace ignite
                     jstring jColumnName = env->NewStringUTF(columnName.c_str());
                     jint result = env->CallIntMethod(
                         resultSet.Get()->GetRef(),
-                        jvm->GetMembers().m_ResultSetGetIntegerByName,
+                        jvm->GetMembers().m_ResultSetGetIntByName,
                         jColumnName);
                     ExceptionCheck(env, &errInfo);
                     if (errInfo.code == IGNITE_JNI_ERR_SUCCESS) {

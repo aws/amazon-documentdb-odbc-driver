@@ -38,56 +38,23 @@
 #include "test_utils.h"
 #include "odbc_test_suite.h"
 
-using namespace ignite;
-using namespace ignite_test;
+using ignite::odbc::OdbcTestSuite;
 using namespace boost::unit_test;
-using namespace odbc;
-using namespace odbc::config;
-using namespace odbc::jni;
-using namespace odbc::jni::java;
-using namespace odbc::common::concurrent;
+
+using ignite::odbc::common::ReleaseChars;
+using ignite::odbc::config::ConnectionStringParser;
+using ignite::odbc::java::IGNITE_JNI_ERR_SUCCESS;
+using ignite::odbc::jni::FormatJdbcConnectionString;
+using ignite::odbc::jni::ResolveDocumentDbHome;
+using ignite::odbc::jni::java::BuildJvmOptions;
+using ignite::odbc::jni::java::JniHandlers;
 
 /**
  * Test setup fixture.
  */
-struct JniTestSuiteFixture: odbc::OdbcTestSuite
+struct JniTestSuiteFixture: OdbcTestSuite
 {
-    using odbc::OdbcTestSuite::OdbcTestSuite;
-
-    /**
-     * Execute the query and return an error code.
-     */
-    std::string ExecQueryAndReturnError()
-    {
-        SQLCHAR selectReq[] = "select count(*) from TestType";
-
-        SQLRETURN ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
-
-        std::string err;
-
-        if (!SQL_SUCCEEDED(ret))
-            err = ExtractErrorCode(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-        return err;
-    }
-
-    /**
-     * Extract code from ODBC error message.
-     *
-     * @param err Error message.
-     * @return Error code.
-     */
-    static std::string ExtractErrorCode(const std::string& err)
-    {
-        std::string code;
-
-        size_t idx = err.find(':');
-
-        if ((idx != std::string::npos) && (idx > 0))
-            code = err.substr(0, idx);
-
-        return code;
-    }
+    using OdbcTestSuite::OdbcTestSuite;
 
     SharedPointer< JniContext > GetJniContext(std::vector< char* >& opts) const {
 
@@ -104,8 +71,7 @@ struct JniTestSuiteFixture: odbc::OdbcTestSuite
         Configuration config;
         ConnectionStringParser parser(config);
         parser.ParseConnectionString(dsnConnectionString, nullptr);
-        std::string jdbcConnectionString =
-            Connection::FormatJdbcConnectionString(config);
+        std::string jdbcConnectionString = FormatJdbcConnectionString(config);
         return jdbcConnectionString;
     }
 
@@ -120,7 +86,6 @@ struct JniTestSuiteFixture: odbc::OdbcTestSuite
     }
 
     void CleanUpContext() {
-        using namespace odbc::common;
         std::for_each(_opts.begin(), _opts.end(), ReleaseChars);
         _opts.clear();
         _ctx = nullptr;
@@ -197,7 +162,7 @@ BOOST_AUTO_TEST_CASE(TestDriverManagerGetConnection)
     JniErrorInfo errInfo;
     SharedPointer< GlobalJObject > connection;
     bool success = _ctx.Get()->DriverManagerGetConnection(_jdbcConnectionString.c_str(), connection, errInfo);
-    if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+    if (!success || errInfo.code != IGNITE_JNI_ERR_SUCCESS) {
         BOOST_FAIL(errInfo.errMsg);
     }
     BOOST_REQUIRE(connection.Get() != nullptr);
@@ -214,7 +179,7 @@ BOOST_AUTO_TEST_CASE(TestConnectionGetMetaData) {
     SharedPointer< GlobalJObject > connection;
     bool success = _ctx.Get()->DriverManagerGetConnection(
         _jdbcConnectionString.c_str(), connection, errInfo);
-    if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+    if (!success || errInfo.code != IGNITE_JNI_ERR_SUCCESS) {
         BOOST_FAIL(errInfo.errMsg);
     }
     BOOST_REQUIRE(connection.Get() != nullptr);
@@ -237,7 +202,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
     SharedPointer< GlobalJObject > connection;
     bool success = _ctx.Get()->DriverManagerGetConnection(
         _jdbcConnectionString.c_str(), connection, errInfo);
-    if (!success || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+    if (!success || errInfo.code != IGNITE_JNI_ERR_SUCCESS) {
         BOOST_FAIL(errInfo.errMsg);
     }
     BOOST_REQUIRE(connection.Get());

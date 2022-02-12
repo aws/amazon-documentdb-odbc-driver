@@ -27,6 +27,7 @@ using ignite::odbc::common::concurrent::SharedPointer;
 using ignite::odbc::jni::java::GlobalJObject;
 using ignite::odbc::jni::java::JniContext;
 using ignite::odbc::jni::java::JniErrorInfo;
+using ignite::odbc::jni::ResultSet;
 
 namespace ignite {
     namespace odbc {
@@ -51,8 +52,8 @@ namespace ignite {
                       _databaseMetaData(databaseMetaData) {
                 }
 
-                const SharedPointer< JniContext > _jniContext;
-                const SharedPointer< GlobalJObject > _databaseMetaData;
+                SharedPointer< JniContext > _jniContext;
+                SharedPointer< GlobalJObject > _databaseMetaData;
             };
         }  // namespace
     }  // namespace odbc

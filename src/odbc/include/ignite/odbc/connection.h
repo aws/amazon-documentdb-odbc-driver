@@ -252,13 +252,6 @@ namespace ignite
              */
             void SetAttribute(int attr, void* value, SQLINTEGER valueLen);
 
-            /**
-             * Formats the JDBC connection string from configuration values.
-             * @return the JDBC connection string.
-             */
-            static std::string FormatJdbcConnectionString(
-                const config::Configuration& config);
-
            private:
             IGNITE_NO_COPY_ASSIGNMENT(Connection);
 

@@ -24,52 +24,61 @@ using ignite::odbc::jni::java::GlobalJObject;
 using ignite::odbc::jni::java::JniContext;
 using ignite::odbc::jni::java::JniErrorInfo;
 
-namespace ignite 
-{
-    namespace odbc 
-    {
-        namespace jni 
-        {
+namespace ignite {
+    namespace odbc {
+        namespace jni {
             ResultSet::ResultSet(SharedPointer< JniContext > jniContext,
                                 SharedPointer< GlobalJObject > resultSet)
-            : _jniContext(jniContext), _resultSet(resultSet) {
+                : _jniContext(jniContext), _resultSet(resultSet) {
             }
 
             ResultSet::~ResultSet() {
-                if (_jniContext.Get() != nullptr) {
-                    if (_resultSet.Get() != nullptr) {
-                        JniErrorInfo errInfo;
-                        _jniContext.Get()->ResultSetClose(_resultSet, errInfo);
-                        _resultSet = nullptr;
-                    }
+                JniErrorInfo errInfo;
+                Close(errInfo);
+                if (_jniContext.IsValid()) {
                     _jniContext = nullptr;
                 }
             }
 
-            bool Next(bool& hasNext, JniErrorInfo& errInfo) {
-                return false;
+            bool ResultSet::Close(JniErrorInfo& errInfo) {
+                if (_jniContext.IsValid() && _resultSet.IsValid()) {
+                    bool success =
+                        _jniContext.Get()->ResultSetClose(_resultSet, errInfo);
+                    _resultSet = nullptr;
+                    return success;
+                }
+                return true;
+            }
+            
+            bool ResultSet::Next(bool& hasNext, JniErrorInfo& errInfo) {
+                return _jniContext.Get()->ResultSetNext(_resultSet, hasNext, errInfo);
             }
 
-            bool GetString(const int columnIndex, std::string& value,
+            bool ResultSet::GetString(const int columnIndex, std::string& value,
+                                      bool& wasNull, JniErrorInfo& errInfo) {
+                return _jniContext.Get()->ResultSetGetString(
+                    _resultSet, columnIndex, value, wasNull, errInfo);
+            }
+
+            bool ResultSet::GetString(const std::string& columnName,
+                                      std::string& value,
                            bool& wasNull, JniErrorInfo& errInfo) {
-                return false;
+                return _jniContext.Get()->ResultSetGetString(
+                    _resultSet, columnName, value, wasNull, errInfo);
             }
 
-            bool GetString(const std::string& columnName, std::string& value,
-                           bool& wasNull, JniErrorInfo& errInfo) {
-                return false;
-            }
-
-            bool GetInt(const int columnIndex, int& value, bool& wasNull,
+            bool ResultSet::GetInt(const int columnIndex, int& value,
+                                   bool& wasNull,
                         JniErrorInfo& errInfo) {
-                return false;
+                return _jniContext.Get()->ResultSetGetInt(
+                    _resultSet, columnIndex, value, wasNull, errInfo);
             }
 
-            bool GetInt(const std::string& columnName, int& value,
+            bool ResultSet::GetInt(const std::string& columnName, int& value,
                         bool& wasNull, JniErrorInfo& errInfo) {
-                return false;
+                return _jniContext.Get()->ResultSetGetInt(
+                    _resultSet, columnName, value, wasNull, errInfo);
             }
-
         }  // namespace jni
     }  // namespace odbc
 }  // namespace ignite
