@@ -259,8 +259,14 @@ namespace ignite {
                   jmethodID m_DocumentDbConnectionPropertiesGetPropertiesFromConnectionString;
 
                   jclass c_DocumentDbConnection;
+                  jmethodID m_DocumentDbConnectionGetSshLocalPort;
+                  jmethodID m_DocumentDbConnectionIsSshTunnelActive;
+                  jmethodID m_DocumentDbConnectionGetDatabaseMetadata;
                   jmethodID m_DocumentDbConnectionInit;
                   jmethodID m_DocumentDbClose;
+
+                  jclass c_DocumentDbDatabaseSchemaMetadata;
+                  jmethodID m_DocumentDbDatabaseSchemaMetadataGetSchemaName;
 
                   jclass c_DriverManager;
                   jmethodID m_DriverManagerGetConnection;
@@ -450,6 +456,12 @@ namespace ignite {
                   JniErrorCode DriverManagerGetConnection(const char* connectionString, SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo);
                   JniErrorCode ConnectionClose(const SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo);
                   JniErrorCode ConnectionGetMetaData(const SharedPointer< GlobalJObject >& connection, SharedPointer< GlobalJObject>& databaseMetaData, JniErrorInfo& errInfo);
+
+                  JniErrorCode DocumentDbConnectionIsSshTunnelActive(const SharedPointer< GlobalJObject >& connection, bool& isActive, JniErrorInfo& errInfo);
+                  JniErrorCode DocumentDbConnectionGetSshLocalPort(const SharedPointer< GlobalJObject >& connection, int32_t& result, JniErrorInfo& errInfo);
+                  JniErrorCode DocumentDbConnectionGetDatabaseMetadata(const SharedPointer< GlobalJObject >& connection, SharedPointer< GlobalJObject >& metadata, JniErrorInfo& errInfo);
+
+                  JniErrorCode DocumentDbDatabaseSchemaMetadataGetSchemaName(const SharedPointer< GlobalJObject >& databaseMetadata, std::string& value, bool& wasNull, JniErrorInfo& errInfo);
 
                   JniErrorCode DatabaseMetaDataGetTables(
                       const SharedPointer< GlobalJObject >& databaseMetaData,
