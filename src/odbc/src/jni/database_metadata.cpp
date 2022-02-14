@@ -25,7 +25,7 @@ using ignite::odbc::jni::java::GlobalJObject;
 using ignite::odbc::jni::java::JniContext;
 using ignite::odbc::jni::java::JniErrorInfo;
 using ignite::odbc::jni::ResultSet;
-using ignite::odbc::java::IGNITE_JNI_ERR_SUCCESS;
+using namespace ignite::odbc::jni::java;
 
 
 namespace ignite {
@@ -38,10 +38,10 @@ namespace ignite {
                     const std::vector< std::string >& types,
                     JniErrorInfo& errInfo) {
                 SharedPointer< GlobalJObject > resultSet;
-                bool success = _jniContext.Get()->DatabaseMetaDataGetTables(
+                JniErrorCode success = _jniContext.Get()->DatabaseMetaDataGetTables(
                     _databaseMetaData, catalog, schemaPattern, tableNamePattern,
                     types, resultSet, errInfo);
-                if (!success || errInfo.code != IGNITE_JNI_ERR_SUCCESS) {
+                if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
                     return nullptr;
                 }
                 return new ResultSet(_jniContext, resultSet);

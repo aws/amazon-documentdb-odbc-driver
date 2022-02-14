@@ -45,12 +45,12 @@ using namespace boost::unit_test;
 using ignite::odbc::OdbcTestSuite;
 using ignite_test::GetOdbcErrorMessage;
 
+using namespace ignite::odbc::jni::java;
 using ignite::odbc::Connection;
 using ignite::odbc::common::ReleaseChars;
 using ignite::odbc::common::concurrent::SharedPointer;
 using ignite::odbc::config::Configuration;
 using ignite::odbc::config::ConnectionStringParser;
-using ignite::odbc::java::IGNITE_JNI_ERR_SUCCESS;
 using ignite::odbc::jni::FormatJdbcConnectionString;
 using ignite::odbc::jni::ResolveDocumentDbHome;
 using ignite::odbc::jni::DatabaseMetaData;
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionOpen) {
 
     DocumentDbConnection dbConnection(_ctx);
     BOOST_CHECK(!dbConnection.IsOpen());
-    if (!dbConnection.Open(config, errInfo)) {
+    if (dbConnection.Open(config, errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
         BOOST_FAIL(errInfo.errMsg);
     }
     BOOST_CHECK(dbConnection.IsOpen());
@@ -155,12 +155,12 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionClose) {
     DocumentDbConnection dbConnection(_ctx);
 
     BOOST_CHECK(!dbConnection.IsOpen());
-    if (!dbConnection.Open(config, errInfo)) {
+    if (dbConnection.Open(config, errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
         BOOST_FAIL(errInfo.errMsg);
     }
     BOOST_CHECK(dbConnection.IsOpen());
 
-    if (!dbConnection.Close(errInfo)) {
+    if (dbConnection.Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
         BOOST_FAIL(errInfo.errMsg);
     }
     BOOST_CHECK(!dbConnection.IsOpen());
@@ -180,7 +180,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDatabaseMetaDataGetTables) {
     DocumentDbConnection dbConnection(_ctx);
 
     BOOST_CHECK(!dbConnection.IsOpen());
-    if (!dbConnection.Open(config, errInfo)) {
+    if (dbConnection.Open(config, errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
         BOOST_FAIL(errInfo.errMsg);
     }
     BOOST_CHECK(dbConnection.IsOpen());
@@ -234,12 +234,12 @@ BOOST_AUTO_TEST_CASE(TestDocumentDatabaseMetaDataGetTables) {
 
     } while (hasNext);
 
-    if (!resultSet.Get()->Close(errInfo)) {
+    if (resultSet.Get()->Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
         BOOST_FAIL(errInfo.errMsg);
     }
     BOOST_CHECK(!resultSet.Get()->IsOpen());
 
-    if (!dbConnection.Close(errInfo)) {
+    if (dbConnection.Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
         BOOST_FAIL(errInfo.errMsg);
     }
     BOOST_CHECK(!dbConnection.IsOpen());

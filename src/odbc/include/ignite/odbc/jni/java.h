@@ -23,6 +23,7 @@
 
 #include <jni.h>
 
+#include <ignite/odbc/ignite_error.h>
 #include <ignite/odbc/common/common.h>
 #include <ignite/odbc/common/concurrent.h>
 
@@ -142,7 +143,7 @@ namespace ignite {
 
               typedef void(JNICALL* OnStartHandler)(void* target, void* proc, int64_t memPtr);
               typedef void(JNICALL* OnStopHandler)(void* target);
-              typedef void(JNICALL* ErrorHandler)(void* target, int errCode,
+              typedef void(JNICALL* ErrorHandler)(void* target, JniErrorCode errCode,
                                                   const char* errClsChars, int errClsCharsLen,
                                                   const char* errMsgChars, int errMsgCharsLen,
                                                   const char* stackTraceChars,
@@ -391,9 +392,9 @@ namespace ignite {
                * JNI error information.
                */
               struct IGNITE_IMPORT_EXPORT JniErrorInfo {
-                  int code;
-                  char* errCls = nullptr;
-                  char* errMsg = nullptr;
+                  JniErrorCode code;
+                  std::string errCls;
+                  std::string errMsg;
 
                   /**
                    * Default constructor. Creates empty error info.
@@ -407,7 +408,9 @@ namespace ignite {
                    * @param errCls Error class.
                    * @param errMsg Error message.
                    */
-                  JniErrorInfo(int code, const char* errCls, const char* errMsg);
+                  JniErrorInfo(JniErrorCode code,
+                               const char* errCls,
+                               const char* errMsg);
 
                   /**
                    * Copy constructor.
@@ -427,7 +430,7 @@ namespace ignite {
                   /**
                    * Destructor.
                    */
-                  ~JniErrorInfo();
+                  ~JniErrorInfo() = default;
               };
 
               /**
@@ -444,11 +447,11 @@ namespace ignite {
                   static void SetConsoleHandler(ConsoleWriteHandler consoleHandler);
                   static int RemoveConsoleHandler(ConsoleWriteHandler consoleHandler);
 
-                  bool DriverManagerGetConnection(const char* connectionString, SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo);
-                  void ConnectionClose(const SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo);
-                  bool ConnectionGetMetaData(const SharedPointer< GlobalJObject >& connection, SharedPointer< GlobalJObject>& databaseMetaData, JniErrorInfo& errInfo);
+                  JniErrorCode DriverManagerGetConnection(const char* connectionString, SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo);
+                  JniErrorCode ConnectionClose(const SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo);
+                  JniErrorCode ConnectionGetMetaData(const SharedPointer< GlobalJObject >& connection, SharedPointer< GlobalJObject>& databaseMetaData, JniErrorInfo& errInfo);
 
-                  bool DatabaseMetaDataGetTables(
+                  JniErrorCode DatabaseMetaDataGetTables(
                       const SharedPointer< GlobalJObject >& databaseMetaData,
                       const std::string& catalog,
                       const std::string& schemaPattern,
@@ -457,13 +460,13 @@ namespace ignite {
                       SharedPointer< GlobalJObject >& resultSet,
                       JniErrorInfo& errInfo);
 
-                  bool ResultSetClose(const SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo);
-                  bool ResultSetNext(const SharedPointer< GlobalJObject >& resultSet, bool& hasNext, JniErrorInfo& errInfo);
-                  bool ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, std::string& value, bool& wasNull, JniErrorInfo& errInfo);
-                  bool ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, std::string& value, bool& wasNull, JniErrorInfo& errInfo);
-                  bool ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, int& value, bool& wasNull, JniErrorInfo& errInfo);
-                  bool ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, int& value, bool& wasNull,JniErrorInfo& errInfo);
-                  bool ResultSetWasNull(const SharedPointer< GlobalJObject >& resultSet, bool& value, JniErrorInfo& errInfo);
+                  JniErrorCode ResultSetClose(const SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo);
+                  JniErrorCode ResultSetNext(const SharedPointer< GlobalJObject >& resultSet, bool& hasNext, JniErrorInfo& errInfo);
+                  JniErrorCode ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, std::string& value, bool& wasNull, JniErrorInfo& errInfo);
+                  JniErrorCode ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, std::string& value, bool& wasNull, JniErrorInfo& errInfo);
+                  JniErrorCode ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, int& value, bool& wasNull, JniErrorInfo& errInfo);
+                  JniErrorCode ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, int& value, bool& wasNull,JniErrorInfo& errInfo);
+                  JniErrorCode ResultSetWasNull(const SharedPointer< GlobalJObject >& resultSet, bool& value, JniErrorInfo& errInfo);
 
                   int64_t TargetInLongOutLong(jobject obj, int type, int64_t memPtr,
                                               JniErrorInfo* errInfo = NULL);

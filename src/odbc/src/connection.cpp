@@ -219,7 +219,7 @@ namespace ignite
                 if (_connection.IsValid()) {
                     JniErrorInfo errInfo;
                     _connection.Get()->Close(errInfo);
-                    if (errInfo.code != java::IGNITE_JNI_ERR_SUCCESS) {
+                    if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
                         // TODO: Determine if we need to error check the close.
                     }
                     _connection = nullptr;
@@ -246,7 +246,7 @@ namespace ignite
             JniErrorInfo errInfo;
             auto databaseMetaData = _connection.Get()->GetMetaData(errInfo);
             if (!databaseMetaData.IsValid()) {
-                std::string message = errInfo.errMsg ? errInfo.errMsg : "";
+                std::string message = errInfo.errMsg;
                 err = IgniteError(IgniteError::IGNITE_ERR_JNI_GET_DATABASE_METADATA,
                                   message.c_str());
                 return nullptr;
@@ -589,15 +589,15 @@ namespace ignite
             JniErrorInfo errInfo;
             auto ctx = GetJniContext();
             SharedPointer< DocumentDbConnection > conn = new DocumentDbConnection(ctx);
-            if (!conn.IsValid() || !conn.Get()->Open(config, errInfo)) {
-                std::string message = errInfo.errMsg ? errInfo.errMsg : "Unable to open connection.";
+            if (!conn.IsValid() || conn.Get()->Open(config, errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+                std::string message = errInfo.errMsg;
                 err = IgniteError(
                     IgniteError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
                     message.c_str());
             }
             _connection = conn;
             return _connection.IsValid() && _connection.Get()->IsOpen()
-                   && errInfo.code == java::IGNITE_JNI_ERR_SUCCESS;
+                   && errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
         }
 
         SharedPointer< JniContext > Connection::GetJniContext() {

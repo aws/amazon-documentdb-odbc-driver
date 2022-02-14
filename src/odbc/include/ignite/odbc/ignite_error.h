@@ -81,14 +81,19 @@ namespace ignite
 {
     namespace odbc
     {
-        namespace java
+        namespace jni
         {
-            /* JNI error constants. */
-            const int IGNITE_JNI_ERR_SUCCESS = 0;
-            const int IGNITE_JNI_ERR_GENERIC = 1;
-            const int IGNITE_JNI_ERR_JVM_INIT = 2;
-            const int IGNITE_JNI_ERR_JVM_ATTACH = 3;
-        }
+            namespace java
+            {
+                enum class JniErrorCode {
+                    /* JNI error constants. */
+                    IGNITE_JNI_ERR_SUCCESS = 0,
+                    IGNITE_JNI_ERR_GENERIC = 1,
+                    IGNITE_JNI_ERR_JVM_INIT = 2,
+                    IGNITE_JNI_ERR_JVM_ATTACH = 3
+                };
+            }  // namespace java
+        }  // namespace jni
 
         /**
          * %Ignite error information.
@@ -301,7 +306,7 @@ namespace ignite
              * @param jniMsg Error message.
              * @param err Error. Can not be NULL.
              */
-            static void SetError(const int jniCode, const char* jniCls, const char* jniMsg, IgniteError& err);
+            static void SetError(const ignite::odbc::jni::java::JniErrorCode jniCode, const char* jniCls, const char* jniMsg, IgniteError& err);
         private:
             /** Error code. */
             int32_t code;    

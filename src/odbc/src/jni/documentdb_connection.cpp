@@ -20,54 +20,51 @@
 #include <ignite/odbc/jni/documentdb_connection.h>
 #include <ignite/odbc/jni/utils.h>
 
+using namespace ignite::odbc::jni::java;
 using ignite::odbc::common::GetEnv;
-using ignite::odbc::java::IGNITE_JNI_ERR_SUCCESS;
-using ignite::odbc::java::IGNITE_JNI_ERR_JVM_INIT;
 using ignite::odbc::jni::java::JniErrorInfo;
 using ignite::odbc::jni::FormatJdbcConnectionString;
 
 namespace ignite {
     namespace odbc {
         namespace jni {
-            bool DocumentDbConnection::Open(const Configuration& config,
+            JniErrorCode DocumentDbConnection::Open(const Configuration& config,
                                             JniErrorInfo& errInfo) {
                 bool connected = false;
 
                 if (_connection.IsValid()) {
-                    return true;
+                    return JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
                 }
 
                 std::string connectionString = FormatJdbcConnectionString(config);
 
-                auto ctx = GetJniContext();
-                if (!ctx.IsValid()) {
+                if (!_jniContext.IsValid()) {
                     errInfo.errMsg = new char[]{"Unable to get initialized JVM."};
-                    errInfo.code = IGNITE_JNI_ERR_JVM_INIT;
-                    return false;
+                    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_JVM_INIT;
+                    return errInfo.code;
                 }
      
                 SharedPointer< GlobalJObject > result;
-                bool success = ctx.Get()->DriverManagerGetConnection(
+                JniErrorCode success = _jniContext.Get()->DriverManagerGetConnection(
                     connectionString.c_str(), result, errInfo);
-                connected =
-                    (success && result.Get() && errInfo.code == IGNITE_JNI_ERR_SUCCESS);
+                connected = (success == JniErrorCode::IGNITE_JNI_ERR_SUCCESS);
                 if (!connected) {
                     JniErrorInfo closeErrInfo;
                     Close(closeErrInfo);
-                    return false;
+                    return success;
                 }
                 _connection = result;
 
-                return connected;
+                return success;
             }
 
-            bool DocumentDbConnection::Close(JniErrorInfo& errInfo) {
+            JniErrorCode DocumentDbConnection::Close(JniErrorInfo& errInfo) {
                 if (_connection.Get() != nullptr) {
                     _jniContext.Get()->ConnectionClose(_connection, errInfo);
                     _connection = nullptr;
-                    return errInfo.code == IGNITE_JNI_ERR_SUCCESS;
+                    return errInfo.code;
                 }
-                return true;
+                return JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
             }
 
             DocumentDbConnection::~DocumentDbConnection() {
@@ -80,17 +77,16 @@ namespace ignite {
 
             SharedPointer< DatabaseMetaData > DocumentDbConnection::GetMetaData(
                 JniErrorInfo& errInfo){
-                auto jniContext = GetJniContext();
                 if (!_connection.IsValid()) {
                     return nullptr;
                 }
                 SharedPointer< GlobalJObject > databaseMetaData;
-                bool success = jniContext.Get()->ConnectionGetMetaData(
+                JniErrorCode success = _jniContext.Get()->ConnectionGetMetaData(
                     _connection, databaseMetaData, errInfo);
-                if (!success) {
+                if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
                     return nullptr;
                 }
-                return new DatabaseMetaData(jniContext, databaseMetaData);
+                return new DatabaseMetaData(_jniContext, databaseMetaData);
             }
         }  // namespace jni
     }  // namespace odbc

@@ -26,41 +26,104 @@ using ignite::odbc::common::concurrent::SharedPointer;
 using ignite::odbc::jni::java::GlobalJObject;
 using ignite::odbc::jni::java::JniContext;
 using ignite::odbc::jni::java::JniErrorInfo;
+using namespace ignite::odbc::jni::java;
 
 namespace ignite {
     namespace odbc {
         namespace jni {
+            /**
+             * A wrapper class for the ResultSet java class.
+             */
             class ResultSet {
                 friend class DatabaseMetaData;
                public:
+                /**
+                 * Destructs the current object.
+                 */
                 ~ResultSet();
 
-                bool Close(JniErrorInfo& errInfo);
+                /**
+                 * Closes the current ResultSet object.
+                 *
+                 * @returns a JniErrorCode indicating success or failure.
+                 */
+                JniErrorCode Close(JniErrorInfo& errInfo);
 
+                /**
+                 * Gets an indicator of whether the ResultSet is open.
+                 *
+                 * @returns true if open, false, otherwise.
+                 */
                 bool IsOpen() {
                     return _resultSet.IsValid();
                 }
 
-                bool Next(bool& hasNext, JniErrorInfo& errInfo);
+                /**
+                 * Attempts to position the cursor to the next record in the result set.
+                 * If the cursor moves, the hasNext variable will be true, false, otherwise.
+                 *
+                 * @returns a JniErrorCode indicating success or failure.
+                 */
+                JniErrorCode Next(bool& hasNext, JniErrorInfo& errInfo);
 
-                bool GetString(const int columnIndex, std::string& value, bool& wasNull,
+                /**
+                 * Gets a value on the current row of the result set for the
+                 * given columnIndex (1-indexed). If a value exists, the value
+                 * is set. If the value is null, the wasNull will be set to
+                 * true, false, otherwise.
+                 *
+                 * @returns a JniErrorCode indicating success or failure.
+                 */
+                JniErrorCode GetString(const int columnIndex,
+                                       std::string& value, bool& wasNull,
                                JniErrorInfo& errInfo);
 
-                bool GetString(const std::string& columnName, std::string& value, bool& wasNull,
+                /**
+                 * Gets a value on the current row of the result set for the
+                 * given columnName. If a value exists, the value
+                 * is set. If the value is null, the wasNull will be set to
+                 * true, false, otherwise.
+                 *
+                 * @returns a JniErrorCode indicating success or failure.
+                 */
+                JniErrorCode GetString(const std::string& columnName,
+                                       std::string& value, bool& wasNull,
                                JniErrorInfo& errInfo);
 
-                bool GetInt(const int columnIndex, int& value, bool& wasNull,
+                /**
+                 * Gets a value on the current row of the result set for the
+                 * given columnIndex (1-indexed). If a value exists, the value
+                 * is set. If the value is null, the wasNull will be set to
+                 * true, false, otherwise.
+                 *
+                 * @returns a JniErrorCode indicating success or failure.
+                 */
+                JniErrorCode GetInt(const int columnIndex, int& value,
+                                    bool& wasNull,
                                JniErrorInfo& errInfo);
 
-                bool GetInt(const std::string& columnName, int& value,
+                /**
+                 * Gets a value on the current row of the result set for the
+                 * given columnName. If a value exists, the value
+                 * is set. If the value is null, the wasNull will be set to
+                 * true, false, otherwise.
+                 *
+                 * @returns a JniErrorCode indicating success or failure.
+                 */
+                JniErrorCode GetInt(const std::string& columnName, int& value,
                                bool& wasNull, JniErrorInfo& errInfo);
 
                private:
+                /**
+                 * Constructs a new instancee of ResultSet.
+                 */
                 ResultSet(SharedPointer< JniContext > jniContext,
                           SharedPointer< GlobalJObject > resultSet);
 
+                /** The JNI context */
                 SharedPointer< JniContext > _jniContext;
 
+                /** The ResultSet Java object */
                 SharedPointer< GlobalJObject > _resultSet;
             };
         }  // namespace jni

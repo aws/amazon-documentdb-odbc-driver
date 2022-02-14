@@ -32,11 +32,19 @@ using ignite::odbc::jni::ResultSet;
 namespace ignite {
     namespace odbc {
         namespace jni {
+            /**
+             * Wrapper for the the JDBC DatabaseMetaData.
+             */
             class DatabaseMetaData {
                 friend class DocumentDbConnection;
                public:
                 ~DatabaseMetaData() = default;
 
+                /**
+                 * Query the tables in the database according to the given search 
+                 * critera in catalog (not supported), schemaPattern, tablePattern
+                 * and types of tables.
+                 */
                 SharedPointer< ResultSet > GetTables(
                     const std::string& catalog,
                     const std::string& schemaPattern,
@@ -45,6 +53,9 @@ namespace ignite {
                     JniErrorInfo& errInfo);
 
                private:
+                /**
+                 * Constructs an instance of the DatabaseMetaData class.
+                 */
                 DatabaseMetaData(
                     SharedPointer< JniContext >& jniContext,
                     SharedPointer< GlobalJObject >& databaseMetaData)
@@ -52,7 +63,10 @@ namespace ignite {
                       _databaseMetaData(databaseMetaData) {
                 }
 
+                /** The JNI context */
                 SharedPointer< JniContext > _jniContext;
+
+                /** The DatabaseMetaData Java object  */
                 SharedPointer< GlobalJObject > _databaseMetaData;
             };
         }  // namespace

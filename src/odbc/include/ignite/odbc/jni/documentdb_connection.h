@@ -32,31 +32,56 @@ using ignite::odbc::jni::java::JniErrorInfo;
 namespace ignite {
     namespace odbc {
         namespace jni {
+            /** 
+             * A wrapper class for the DocumentDbConnection Java class
+             */
             class DocumentDbConnection {
                public:
+                /** 
+                 * Creates a new instance of the DocumentDbConnection class.
+                 */
                 DocumentDbConnection(SharedPointer< JniContext > jniContext)
                     : _jniContext(jniContext) {
                 }
 
+                /** 
+                 * Destructs the current instance.
+                 */
                 ~DocumentDbConnection();
 
-                bool Open(const Configuration& config, JniErrorInfo& errInfo);
+                /** 
+                 * Opens a DocumentDbConnection object given the configuration.
+                 * 
+                 * @returns a JniErrorCode indicating success or failure.
+                 */
+                JniErrorCode Open(const Configuration& config,
+                                  JniErrorInfo& errInfo);
 
-                bool Close(JniErrorInfo& errInfo);
+                /**
+                 * Closes the current DocumentDbConnection object.
+                 *
+                 * @returns a JniErrorCode indicating success or failure.
+                 */
+                JniErrorCode Close(JniErrorInfo& errInfo);
 
                 bool IsOpen() {
                     return _connection.IsValid();
                 }
 
+                /**
+                 * Gets the DatbaseMetaData for this connection.
+                 *
+                 * @returns a JniErrorCode indicating success or failure.
+                 */
                 SharedPointer< DatabaseMetaData > GetMetaData(
                     JniErrorInfo& errInfo);
 
                private:
-                SharedPointer< JniContext > GetJniContext() {
-                    return _jniContext;
-                };
 
+                /** The JNI context */
                 SharedPointer< JniContext > _jniContext;
+
+                /** The DocumentDbConnection Java object */
                 SharedPointer< GlobalJObject > _connection;
 
                 IGNITE_NO_COPY_ASSIGNMENT(DocumentDbConnection);

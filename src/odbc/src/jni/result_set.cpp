@@ -40,42 +40,45 @@ namespace ignite {
                 }
             }
 
-            bool ResultSet::Close(JniErrorInfo& errInfo) {
+            JniErrorCode ResultSet::Close(JniErrorInfo& errInfo) {
                 if (_jniContext.IsValid() && _resultSet.IsValid()) {
-                    bool success =
+                    JniErrorCode success =
                         _jniContext.Get()->ResultSetClose(_resultSet, errInfo);
                     _resultSet = nullptr;
                     return success;
                 }
-                return true;
+                return JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
             }
             
-            bool ResultSet::Next(bool& hasNext, JniErrorInfo& errInfo) {
-                return _jniContext.Get()->ResultSetNext(_resultSet, hasNext, errInfo);
+            JniErrorCode ResultSet::Next(bool& hasNext, JniErrorInfo& errInfo) {
+                return _jniContext.Get()->ResultSetNext(_resultSet, hasNext,
+                                                        errInfo);
             }
 
-            bool ResultSet::GetString(const int columnIndex, std::string& value,
-                                      bool& wasNull, JniErrorInfo& errInfo) {
+            JniErrorCode ResultSet::GetString(const int columnIndex,
+                                              std::string& value, bool& wasNull,
+                                              JniErrorInfo& errInfo) {
                 return _jniContext.Get()->ResultSetGetString(
                     _resultSet, columnIndex, value, wasNull, errInfo);
             }
 
-            bool ResultSet::GetString(const std::string& columnName,
-                                      std::string& value,
-                           bool& wasNull, JniErrorInfo& errInfo) {
+            JniErrorCode ResultSet::GetString(const std::string& columnName,
+                                              std::string& value, bool& wasNull,
+                                              JniErrorInfo& errInfo) {
                 return _jniContext.Get()->ResultSetGetString(
                     _resultSet, columnName, value, wasNull, errInfo);
             }
 
-            bool ResultSet::GetInt(const int columnIndex, int& value,
-                                   bool& wasNull,
-                        JniErrorInfo& errInfo) {
+            JniErrorCode ResultSet::GetInt(const int columnIndex, int& value,
+                                           bool& wasNull,
+                                           JniErrorInfo& errInfo) {
                 return _jniContext.Get()->ResultSetGetInt(
                     _resultSet, columnIndex, value, wasNull, errInfo);
             }
 
-            bool ResultSet::GetInt(const std::string& columnName, int& value,
-                        bool& wasNull, JniErrorInfo& errInfo) {
+            JniErrorCode ResultSet::GetInt(const std::string& columnName,
+                                           int& value, bool& wasNull,
+                                           JniErrorInfo& errInfo) {
                 return _jniContext.Get()->ResultSetGetInt(
                     _resultSet, columnName, value, wasNull, errInfo);
             }
