@@ -52,7 +52,7 @@ using ignite::odbc::jni::java::JniHandlers;
 /**
  * Test setup fixture.
  */
-struct JniTestSuiteFixture: OdbcTestSuite
+struct JavaTestSuiteFixture: OdbcTestSuite
 {
     using OdbcTestSuite::OdbcTestSuite;
 
@@ -95,7 +95,7 @@ struct JniTestSuiteFixture: OdbcTestSuite
     /**
      * Destructor.
      */
-    ~JniTestSuiteFixture() override {
+    ~JavaTestSuiteFixture() override {
         CleanUpContext();
     }
 
@@ -107,7 +107,7 @@ struct JniTestSuiteFixture: OdbcTestSuite
 
     SharedPointer< JniContext > _ctx;
 
-    JniTestSuiteFixture& operator=(const JniTestSuiteFixture& other) = delete;
+    JavaTestSuiteFixture& operator=(const JavaTestSuiteFixture& other) = delete;
 };
 
 struct AutoCloseConnection {
@@ -154,7 +154,7 @@ struct AutoCloseResultSet {
     IGNITE_NO_COPY_ASSIGNMENT(AutoCloseResultSet);
 };
 
-BOOST_FIXTURE_TEST_SUITE(JavaTestSuite, JniTestSuiteFixture)
+BOOST_FIXTURE_TEST_SUITE(JavaTestSuite, JavaTestSuiteFixture)
 
 BOOST_AUTO_TEST_CASE(TestDriverManagerGetConnection)
 {
