@@ -270,6 +270,41 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
 
     case ResultColumn::REMARKS: {
       buffer.PutNull();
+      // buffer.PutString(); // todo, it should be string not null. 
+      // It seems that I might need to create a currentColumn.GetRemarks() function
+      // -AL-
+      break;
+    }
+    // -AL- start of my added values
+
+    case ResultColumn::COLUMN_DEF: {
+      buffer.PutNull();
+      // buffer.PutString(); // todo, it should be string not null.
+      // It seems that I might need to create a currentColumn.getColumnDef()
+      // function -AL-
+      break;
+    } 
+
+    case ResultColumn::SQL_DATA_TYPE: {
+      buffer.PutInt16(type_traits::BinaryToSqlType(columnType));
+      break;
+    }
+
+    case ResultColumn::SQL_DATETIME_SUB: {
+      buffer.PutNull(); // note: this is okay since JDBC does not use this value. -AL- 
+      break;
+    }
+
+    case ResultColumn::CHAR_OCTET_LENGTH: {
+      buffer.PutInt32(type_traits::BinaryToSqlType(columnType));
+      break;
+    }
+ 
+    case ResultColumn::IS_NULLABLE: {
+      buffer.PutNull(); 
+      // buffer.PutString(); // todo, it should be string not null.
+      // It seems that I might need to create a currentColumn.get isNullable()
+      // function -AL-
       break;
     }
 
