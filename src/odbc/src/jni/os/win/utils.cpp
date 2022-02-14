@@ -424,57 +424,7 @@ namespace ignite
                 std::string curDirStr(curDir.GetData());
 
                 return ResolveIgniteHome0(curDirStr);
-            }
-            
-            std::string FormatJdbcConnectionString(
-                const config::Configuration& config) {
-                std::string host = "localhost";
-                std::string port = "27017";
-                std::string jdbConnectionString;
-
-                if (config.IsHostnameSet()) {
-                    host = config.GetHostname();
-                }
-
-                if (config.IsPortSet()) {
-                    port = std::to_string(config.GetPort());
-                }
-
-                jdbConnectionString = "jdbc:documentdb:";
-                jdbConnectionString.append("//" + config.GetUser());
-                jdbConnectionString.append(":" + config.GetPassword());
-                jdbConnectionString.append("@" + host);
-                jdbConnectionString.append(":" + port);
-                jdbConnectionString.append("/" + config.GetDatabase());
-                jdbConnectionString.append("?tlsAllowInvalidHostnames=true");
-
-                // Check if internal SSH tunnel should be enabled.
-                // TODO: Remove use of environment variables and use DSN
-                // properties
-                std::string sshUserAtHost = GetEnv("DOC_DB_USER", "");
-                std::string sshRemoteHost = GetEnv("DOC_DB_HOST", "");
-                std::string sshPrivKeyFile = GetEnv("DOC_DB_PRIV_KEY_FILE", "");
-                std::string sshUser;
-                std::string sshTunnelHost;
-                size_t indexOfAt = sshUserAtHost.find_first_of('@');
-                if (indexOfAt != std::string::npos
-                    && sshUserAtHost.size() > (indexOfAt + 1)) {
-                    sshUser = sshUserAtHost.substr(0, indexOfAt);
-                    sshTunnelHost = sshUserAtHost.substr(indexOfAt + 1);
-                }
-                if (!sshUserAtHost.empty() && !sshRemoteHost.empty()
-                    && !sshPrivKeyFile.empty() && !sshUser.empty()
-                    && !sshTunnelHost.empty()) {
-                    jdbConnectionString.append("&sshUser=" + sshUser);
-                    jdbConnectionString.append("&sshHost=" + sshTunnelHost);
-                    jdbConnectionString.append("&sshPrivateKeyFile="
-                                               + sshPrivKeyFile);
-                    jdbConnectionString.append(
-                        "&sshStrictHostKeyChecking=false");
-                }
-
-                return jdbConnectionString;
-            }
+            }            
         } // jni
     } // odbc
 } // ignite
