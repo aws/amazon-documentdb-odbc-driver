@@ -134,6 +134,13 @@ namespace ignite
             config::ConnectionStringParser parser(config);
             parser.ParseConnectionString(connectStr, &GetDiagnosticRecords());
 
+            if (config.IsDsnSet())
+            {
+                std::string dsn = config.GetDsn();
+
+                ReadDsnConfiguration(dsn.c_str(), config, &GetDiagnosticRecords());
+            }
+
 #ifdef _WIN32
             if (parentWindow)
             {
@@ -146,13 +153,6 @@ namespace ignite
                 }
             }
 #endif  // _WIN32
-
-            if (config.IsDsnSet())
-            {
-                std::string dsn = config.GetDsn();
-
-                ReadDsnConfiguration(dsn.c_str(), config, &GetDiagnosticRecords());
-            }
 
             return InternalEstablish(config);
         }
@@ -170,7 +170,7 @@ namespace ignite
 
             if (connection.Get() != nullptr) {
                 AddStatusRecord(SqlState::S08002_ALREADY_CONNECTED,
-                    "Already connected.");
+                                "Already connected.");
 
                 return SqlResult::AI_ERROR;
             }
@@ -453,13 +453,13 @@ namespace ignite
                     if (valueLen)
                         *valueLen = SQL_IS_INTEGER;
 
-                break;
-            }
+                    break;
+                }
 
-            default:
-            {
-                AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
-                    "Specified attribute is not supported.");
+                default:
+                {
+                    AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
+                        "Specified attribute is not supported.");
 
                     return SqlResult::AI_ERROR;
                 }

@@ -811,12 +811,12 @@ namespace ignite
             }
 
             connectionString =
-                "DRIVER={Apache Ignite};"
-                "HOSTNAME=" + host + ":" + port + ";"
-                "DATABASE=test;"
-                "USER=" + user + ";"
-                "PASSWORD=" + password + ";"
-                "TLS_ALLOW_INVALID_HOSTNAMES=true;";
+            "DRIVER={Apache Ignite};"
+            "HOSTNAME=" + host + ":" + port + ";"
+            "DATABASE=test;"
+            "USER=" + user + ";"
+            "PASSWORD=" + password + ";"
+            "TLS_ALLOW_INVALID_HOSTNAMES=true;";
 
             if (sshTunnel
                 && !sshUserAtHost.empty()
@@ -830,5 +830,4 @@ namespace ignite
             }
         }
     }
-
 }

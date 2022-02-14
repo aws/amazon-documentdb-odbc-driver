@@ -75,6 +75,12 @@ namespace ignite
             std::replace(str.begin(), str.end(), ' ', '_');
         }
 
+        /**
+         * Replaces illegal URI characters in string with %-encoded characters.
+         *
+         * @param str String to be transformed. 
+         * @return str New string with replaced characters.
+         */
         inline std::string EncodeURIComponent(std::string unencoded)
         {
             std::ostringstream oss;

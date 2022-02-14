@@ -238,27 +238,27 @@ void CheckConnectionConfig(const Configuration& cfg)
 
     std::stringstream jdbcConstructor;
     jdbcConstructor << "jdbc:documentdb://" << testUsername << ":" << testPassword
-        << "@" << testHostname << ':' << testServerPort
-        << "/" << testDatabaseName << '?'
-        << "appName=" << testAppName
-        << "&defaultFetchSize=" << testDefaultFetchSize
-        << "&loginTimeoutSec=" << testLoginTimeoutSec
-        << "&readPreference=" << ReadPreference::ToJdbcString(testReadPreference)
-        << "&refreshSchema=" << BoolToStr(testRefreshSchemaFlag)
-        << "&replicaSet=" << testReplicaSet
-        << "&retryReads=" << BoolToStr(testRetryReads)
-        << "&scanLimit=" << testScanLimit
-        << "&scanMethod=" << ScanMethod::ToJdbcString(testScanMethod)
-        << "&schemaName=" << testSchemaName
-        << "&sshHost=" << testSshHost
-        << "&sshKnownHostsFile=" << testSshKnownHostsFile
-        << "&sshPrivateKeyFile=" << testSshPrivateKeyFile
-        << "&sshPrivateKeyPassphrase=" << testSshPrivateKeyPassphrase
-        << "&sshStrictHostKeyChecking=" << BoolToStr(testSshStrictHostKeyCheckingFlag)
-        << "&sshUser=" << testSshUser
-        << "&tls=" << BoolToStr(testTlsFlag)
-        << "&tlsAllowInvalidHostnames=" << BoolToStr(testTlsAllowInvalidHostnamesFlag)
-        << "&tlsCaFile=" << testTlsCaFile;
+                    << "@" << testHostname << ':' << testServerPort
+                    << "/" << testDatabaseName << '?'
+                    << "appName=" << testAppName
+                    << "&defaultFetchSize=" << testDefaultFetchSize
+                    << "&loginTimeoutSec=" << testLoginTimeoutSec
+                    << "&readPreference=" << ReadPreference::ToJdbcString(testReadPreference)
+                    << "&refreshSchema=" << BoolToStr(testRefreshSchemaFlag)
+                    << "&replicaSet=" << testReplicaSet
+                    << "&retryReads=" << BoolToStr(testRetryReads)
+                    << "&scanLimit=" << testScanLimit
+                    << "&scanMethod=" << ScanMethod::ToJdbcString(testScanMethod)
+                    << "&schemaName=" << testSchemaName
+                    << "&sshHost=" << testSshHost
+                    << "&sshKnownHostsFile=" << testSshKnownHostsFile
+                    << "&sshPrivateKeyFile=" << testSshPrivateKeyFile
+                    << "&sshPrivateKeyPassphrase=" << testSshPrivateKeyPassphrase
+                    << "&sshStrictHostKeyChecking=" << BoolToStr(testSshStrictHostKeyCheckingFlag)
+                    << "&sshUser=" << testSshUser
+                    << "&tls=" << BoolToStr(testTlsFlag)
+                    << "&tlsAllowInvalidHostnames=" << BoolToStr(testTlsAllowInvalidHostnamesFlag)
+                    << "&tlsCaFile=" << testTlsCaFile;
     const std::string& expectedJdbcStr = jdbcConstructor.str();
 
     BOOST_CHECK_EQUAL(ignite::common::ToLower(cfg.ToConnectString()), ignite::common::ToLower(expectedStr));

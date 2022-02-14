@@ -735,6 +735,14 @@ namespace ignite
                 template<typename T>
                 static void AddToMap(ArgumentMap& map, const std::string& key, const SettableValue<T>& value); 
 
+                /**
+                 * Add key and value to the argument map.
+                 *
+                 * @param map Map.
+                 * @param key Key.
+                 * @param value Value.
+                 * @param isJdbcFormat @c true if value should be added in format expected by JDBC connection string.
+                 */
                 template<typename T>
                 static void AddToMap(ArgumentMap& map, const std::string& key, const SettableValue<T>& value, boolean isJdbcFormat);
 
@@ -849,7 +857,7 @@ namespace ignite
 
             template<>
             void Configuration::AddToMap<ScanMethod::Type>(ArgumentMap& map, const std::string& key,
-                const SettableValue<ScanMethod::Type>& value, boolean isJdbcFormat);       
+                const SettableValue<ScanMethod::Type>& value, boolean isJdbcFormat);
         }
     }
 }
