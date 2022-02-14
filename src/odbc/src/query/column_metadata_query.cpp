@@ -110,7 +110,7 @@ ColumnMetadataQuery::ColumnMetadataQuery(
 
   using meta::ColumnMeta;
 
-  columnsMeta.reserve(12);
+  columnsMeta.reserve(12);  // -AL- todo add to 24 or something
 
   const std::string sch;
   const std::string tbl;
@@ -134,169 +134,170 @@ ColumnMetadataQuery::ColumnMetadataQuery(
 }
 
 ColumnMetadataQuery::~ColumnMetadataQuery() {
-    // No-op.
+  // No-op.
 }
 
 SqlResult::Type
 ColumnMetadataQuery::Execute() {  // place to plug in new code -AL-
-    if (executed)
-        Close();
+  if (executed)
+    Close();
 
-    SqlResult::Type result = MakeRequestGetColumnsMeta();
+  SqlResult::Type result = MakeRequestGetColumnsMeta();
 
-    if (result == SqlResult::AI_SUCCESS) {
-        executed = true;
-        fetched = false;
+  if (result == SqlResult::AI_SUCCESS) {
+    executed = true;
+    fetched = false;
 
-        cursor = meta.begin();
-    }
+    cursor = meta.begin();
+  }
 
-    return result;
+  return result;
 }
 
 const meta::ColumnMetaVector* ColumnMetadataQuery::GetMeta() {
-    return &columnsMeta;
+  return &columnsMeta;
 }
 
 SqlResult::Type ColumnMetadataQuery::FetchNextRow(
     app::ColumnBindingMap& columnBindings) {
-    if (!executed) {
-        diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
-                             "Query was not executed.");
+  if (!executed) {
+    diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
+                         "Query was not executed.");
 
-        return SqlResult::AI_ERROR;
-    }
+    return SqlResult::AI_ERROR;
+  }
 
-    if (!fetched)
-        fetched = true;
-    else
-        ++cursor;
+  if (!fetched)
+    fetched = true;
+  else
+    ++cursor;
 
-    if (cursor == meta.end())
-        return SqlResult::AI_NO_DATA;
+  if (cursor == meta.end())
+    return SqlResult::AI_NO_DATA;
 
-    app::ColumnBindingMap::iterator it;
+  app::ColumnBindingMap::iterator it;
 
-    for (it = columnBindings.begin(); it != columnBindings.end(); ++it)
-        GetColumn(it->first, it->second);
+  for (it = columnBindings.begin(); it != columnBindings.end(); ++it)
+    GetColumn(it->first, it->second);
 
-    return SqlResult::AI_SUCCESS;
+  return SqlResult::AI_SUCCESS;
 }
 
 SqlResult::Type ColumnMetadataQuery::GetColumn(
     uint16_t columnIdx,
     app::ApplicationDataBuffer&
         buffer) {  // -AL- I need to change this code to match resultSet return
-                   // values. todo (I might be wrong tho)
-    if (!executed) {
-        diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
-                             "Query was not executed.");
+                   // values. todo
+  // this place has BinaryTypeToSqlTypeName, and other mentioned method names to
+  // adapt
+  if (!executed) {
+    diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
+                         "Query was not executed.");
 
-        return SqlResult::AI_ERROR;
+    return SqlResult::AI_ERROR;
+  }
+
+  if (cursor == meta.end()) {
+    diag.AddStatusRecord(SqlState::S24000_INVALID_CURSOR_STATE,
+                         "Cursor has reached end of the result set.");
+
+    return SqlResult::AI_ERROR;
+  }
+
+  const meta::ColumnMeta& currentColumn = *cursor;
+  uint8_t columnType = currentColumn.GetDataType();
+
+  switch (columnIdx) {
+    case ResultColumn::TABLE_CAT: {
+      buffer.PutNull();
+      break;
     }
 
-    if (cursor == meta.end()) {
-        diag.AddStatusRecord(SqlState::S24000_INVALID_CURSOR_STATE,
-                             "Cursor has reached end of the result set.");
-
-        return SqlResult::AI_ERROR;
+    case ResultColumn::TABLE_SCHEM: {
+      buffer.PutString(currentColumn.GetSchemaName());
+      break;
     }
 
-    const meta::ColumnMeta& currentColumn = *cursor;
-    uint8_t columnType = currentColumn.GetDataType();
-
-    switch (columnIdx) {
-        case ResultColumn::TABLE_CAT: {
-            buffer.PutNull();
-            break;
-        }
-
-        case ResultColumn::TABLE_SCHEM: {
-            buffer.PutString(currentColumn.GetSchemaName());
-            break;
-        }
-
-        case ResultColumn::TABLE_NAME: {
-            buffer.PutString(currentColumn.GetTableName());
-            break;
-        }
-
-        case ResultColumn::COLUMN_NAME: {
-            buffer.PutString(currentColumn.GetColumnName());
-            break;
-        }
-
-        case ResultColumn::DATA_TYPE: {
-            buffer.PutInt16(type_traits::BinaryToSqlType(columnType));
-            break;
-        }
-
-        case ResultColumn::TYPE_NAME: {
-            buffer.PutString(type_traits::BinaryTypeToSqlTypeName(
-                currentColumn.GetDataType()));
-            break;
-        }
-
-        case ResultColumn::COLUMN_SIZE: {
-            buffer.PutInt16(type_traits::BinaryTypeColumnSize(columnType));
-            break;
-        }
-
-        case ResultColumn::BUFFER_LENGTH: {
-            buffer.PutInt16(type_traits::BinaryTypeTransferLength(columnType));
-            break;
-        }
-
-        case ResultColumn::DECIMAL_DIGITS: {
-            int32_t decDigits =
-                type_traits::BinaryTypeDecimalDigits(columnType);
-            if (decDigits < 0)
-                buffer.PutNull();
-            else
-                buffer.PutInt16(static_cast< int16_t >(decDigits));
-            break;
-        }
-
-        case ResultColumn::NUM_PREC_RADIX: {
-            buffer.PutInt16(type_traits::BinaryTypeNumPrecRadix(columnType));
-            break;
-        }
-
-        case ResultColumn::NULLABLE: {
-            buffer.PutInt16(type_traits::BinaryTypeNullability(columnType));
-            break;
-        }
-
-        case ResultColumn::REMARKS: {
-            buffer.PutNull();
-            break;
-        }
-
-        default:
-            break;
+    case ResultColumn::TABLE_NAME: {
+      buffer.PutString(currentColumn.GetTableName());
+      break;
     }
 
-    return SqlResult::AI_SUCCESS;
+    case ResultColumn::COLUMN_NAME: {
+      buffer.PutString(currentColumn.GetColumnName());
+      break;
+    }
+
+    case ResultColumn::DATA_TYPE: {
+      buffer.PutInt16(type_traits::BinaryToSqlType(columnType));
+      break;
+    }
+
+    case ResultColumn::TYPE_NAME: {
+      buffer.PutString(
+          type_traits::BinaryTypeToSqlTypeName(currentColumn.GetDataType()));
+      break;
+    }
+
+    case ResultColumn::COLUMN_SIZE: {
+      buffer.PutInt32(type_traits::BinaryTypeColumnSize(columnType));
+      break;
+    }
+
+    case ResultColumn::BUFFER_LENGTH: {
+      buffer.PutInt32(type_traits::BinaryTypeTransferLength(columnType));
+      break;
+    }
+
+    case ResultColumn::DECIMAL_DIGITS: {
+      int32_t decDigits = type_traits::BinaryTypeDecimalDigits(columnType);
+      if (decDigits < 0)
+        buffer.PutNull();
+      else
+        buffer.PutInt16(static_cast< int16_t >(decDigits));
+      break;
+    }
+
+    case ResultColumn::NUM_PREC_RADIX: {
+      buffer.PutInt16(type_traits::BinaryTypeNumPrecRadix(columnType));
+      break;
+    }
+
+    case ResultColumn::NULLABLE: {
+      buffer.PutInt16(type_traits::BinaryTypeNullability(columnType));
+      break;
+    }
+
+    case ResultColumn::REMARKS: {
+      buffer.PutNull();
+      break;
+    }
+
+    default:
+      break;
+  }
+
+  return SqlResult::AI_SUCCESS;
 }
 
 SqlResult::Type ColumnMetadataQuery::Close() {
-    meta.clear();
+  meta.clear();
 
-    executed = false;
+  executed = false;
 
-    return SqlResult::AI_SUCCESS;
+  return SqlResult::AI_SUCCESS;
 }
 
 bool ColumnMetadataQuery::DataAvailable() const {
-    return cursor != meta.end();
+  return cursor != meta.end();
 }
 
 int64_t ColumnMetadataQuery::AffectedRows() const {
-    return 0;
+  return 0;
 }
 
 SqlResult::Type ColumnMetadataQuery::NextResultSet() {
-    return SqlResult::AI_NO_DATA;
+  return SqlResult::AI_NO_DATA;
 }
 
 SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
@@ -334,7 +335,7 @@ SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
                   << static_cast< int32_t >(meta[i].GetDataType()));
   }
 
-    return SqlResult::AI_SUCCESS;
+  return SqlResult::AI_SUCCESS;
 }
 }  // namespace query
 }  // namespace odbc
