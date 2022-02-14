@@ -565,7 +565,7 @@ namespace ignite
 
         void Connection::EnsureConnected()
         {
-            if (_connection.Get() != nullptr)
+            if (_connection.IsValid())
                 return;
 
             IgniteError err;
@@ -582,7 +582,7 @@ namespace ignite
 
         bool Connection::TryRestoreConnection(IgniteError& err)
         {
-            if (_connection.Get() != nullptr) {
+            if (_connection.IsValid()) {
                 return true;
             }
 
@@ -601,7 +601,7 @@ namespace ignite
         }
 
         SharedPointer< JniContext > Connection::GetJniContext() {
-            if (_jniContext.Get() == nullptr) {
+            if (!_jniContext.IsValid()) {
                 // Resolve DOCUMENTDB_HOME.
                 std::string home = jni::ResolveDocumentDbHome();
 

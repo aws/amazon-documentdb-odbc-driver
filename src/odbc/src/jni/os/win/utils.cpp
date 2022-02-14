@@ -424,7 +424,7 @@ namespace ignite
                 std::string curDirStr(curDir.GetData());
 
                 return ResolveIgniteHome0(curDirStr);
-            }            
+            }
         } // jni
     } // odbc
 } // ignite
