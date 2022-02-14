@@ -82,29 +82,7 @@ struct ResultColumn {
         ORDINAL_POSITION,
 
         /** Nullability of data in column (String). */
-        IS_NULLABLE,
-
-        /** Catalog of table that is the scope of a reference attribute. NULL if
-           DATA_TYPE isn't REF. */
-        SCOPE_CATALOG,
-
-        /** Schema of table that is the scope of a reference attribute. NULL if
-           DATA_TYPE isn't REF. */
-        SCOPE_SCHEMA,
-
-        /** Table name that is the scope of a reference attribute. NULL if
-           DATA_TYPE isn't REF. */
-        SCOPE_TABLE,
-
-        /** Source type. NULL if DATA_TYPE isn't DISTINCT or user-generated REF.
-         */
-        SOURCE_DATA_TYPE,
-
-        /** Whether column is auto incremented. */
-        IS_AUTOINCREMENT,
-
-        /** Whether column is generated. */
-        IS_GENERATEDCOLUMN
+        IS_NULLABLE
     };
 };
 }  // namespace
