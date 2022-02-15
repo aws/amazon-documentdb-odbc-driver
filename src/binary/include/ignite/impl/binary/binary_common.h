@@ -73,6 +73,107 @@ namespace ignite
 
             /** Type: optimized marshaller. */
             const int8_t IGNITE_TYPE_OPTM_MARSH = -2;
+            // JDBC types. // TODO if possible, use a enum
+            /** Type: bit. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_BIT = -7;
+
+            /** Type: tinyint. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_TINYINT = -6;
+
+            /** Type: snallint. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_SMALLINT = 5;
+
+            /** Type: int. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_INT = 4;
+
+            /** Type: bigint. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_BIGINT = -5;
+
+            /** Type: float. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_FLOAT = 6;
+
+            /** Type: real. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_REAL = 7;
+
+            /** Type: double. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_DOUBLE = 8;
+
+            /** Type: numeric. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_NUMERIC = 2;
+
+            /** Type: decimal. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_DECIMAL = 3;
+
+            /** Type: char. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_CHAR = 1;
+
+            /** Type: varchar. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_VARCHAR = 12;
+
+            /** Type: longvarchar. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_LONGVARCHAR = -1;
+
+            /** Type: date. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_DATE = 91;
+
+            /** Type: time. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_TIME = 92;
+
+            /** Type: timestamp. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_TIMESTAMP = 93;
+
+            /** Type: binary. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_BINARY = -2;
+
+            /** Type: varbinary. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_VARBINARY = -3;
+
+            /** Type: long varbinary. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_LONGVARBINARY = -4;
+
+            /** Type: blob. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_BLOB = 2004;
+
+            /** Type: clob. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_CLOB = 2005;
+
+            /** Type: boolean. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_BOOLEAN = 16;
+
+            /** Type: array. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_ARRAY = 2003;
+
+            /** Type: struct. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_STRUCT = 2002;
+
+            /** Type: java object. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_JAVA_OBJECT = 2000;
+
+            /** Type: rowid. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_ROWID = -8;
+
+            /** Type: nchar. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_NCHAR = -15;
+
+            /** Type: nvarchar. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_NVARCHAR = -9;
+
+            /** Type: longnvarchar. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_LONGNVARCHAR = -16;
+
+            /** Type: nclob. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_NCLOB = 2011;
+
+            /** Type: sqlxml. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_SQLXML = 2009;
+
+            /** Type: ref cursor. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_REF_CURSOR = 2012;
+
+            /** Type: null. */
+            const int8_t DOCUMENTDB_JDBC_TYPE_NULL = 0;
+
+            // Ignite enum types
 
             /** Type: unsigned byte. */
             const int8_t IGNITE_TYPE_BYTE = 1;
