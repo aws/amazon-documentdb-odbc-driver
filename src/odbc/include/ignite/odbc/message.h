@@ -706,11 +706,17 @@ namespace ignite
             }
 
         private:
-            /**
+            /** // old ignite code
              * Read response using provided reader.
              * @param reader Reader.
              */
-            virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader, const ProtocolVersion& ver);
+            // virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader, const ProtocolVersion& ver);
+
+            /**
+              * Read response using provided resultSet
+              * @param resultSet ResultSet
+              */
+             virtual void ReadOnSuccess(SharedPointer< GlobalJObject > resultSet);
 
             /** Query ID. */
             int64_t queryId;
@@ -910,11 +916,17 @@ namespace ignite
             }
 
         private:
-            /**
+            /** // original ignite code
              * Read response using provided reader.
              * @param reader Reader.
              */
-            virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader, const ProtocolVersion&);
+            // virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader, const ProtocolVersion&);
+
+            /**
+             * Read response using provided resultSet
+             * @param resultSet ResultSet
+             */
+            virtual void ReadOnSuccess(SharedPointer< GlobalJObject > resultSet);
 
             /** Columns metadata. */
             meta::ColumnMetaVector meta;
@@ -946,11 +958,17 @@ namespace ignite
             }
 
         private:
-            /**
+            /** // old ignite code
              * Read response using provided reader.
              * @param reader Reader.
              */
-            virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader, const ProtocolVersion&);
+            //virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader, const ProtocolVersion&);
+
+            /**
+              * Read response using provided resultSet
+              * @param resultSet ResultSet
+              */
+             virtual void ReadOnSuccess(SharedPointer< GlobalJObject > resultSet);
 
             /** Columns metadata. */
             meta::ColumnMetaVector meta;
