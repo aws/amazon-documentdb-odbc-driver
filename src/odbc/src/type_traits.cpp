@@ -104,7 +104,8 @@ namespace ignite
 #undef DBG_STR_CASE
 #endif // _DEBUG
 
-            const std::string& BinaryTypeToSqlTypeName(int8_t binaryType)
+            //const std::string& BinaryTypeToSqlTypeName(int8_t binaryType)
+            const std::string& BinaryTypeToSqlTypeName(int16_t binaryType)
             {
                 using namespace ignite::impl::binary;
 

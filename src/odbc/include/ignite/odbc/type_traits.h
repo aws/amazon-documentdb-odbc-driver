@@ -167,7 +167,8 @@ namespace ignite
              * @param binaryType Binary type.
              * @return Corresponding SQL type name.
              */
-            const std::string& BinaryTypeToSqlTypeName(int8_t binaryType);
+            //const std::string& BinaryTypeToSqlTypeName(int8_t binaryType);
+            const std::string& BinaryTypeToSqlTypeName(int16_t binaryType);
 
             /**
              * Check if the C type supported by the current implementation.
