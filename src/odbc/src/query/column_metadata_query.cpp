@@ -336,10 +336,24 @@ SqlResult::Type ColumnMetadataQuery::NextResultSet() {
 }
 
 SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
-  QueryGetColumnsMetaRequest req(schema, table, column);
   QueryGetColumnsMetaResponse rsp;
+  SharedPointer< GlobalJObject > resultSet;
 
+  // option 2
   try {
+    /* // temp comment out -AL-
+    success = _ctx.Get()->DatabaseMetaDataGetColumns(
+        databaseMetadata, catalog, schema,
+        table, column, resultSet,
+        errInfo);
+        */
+    // connection.SyncMessage(req, rsp);
+    // what happens on Ignite [I might be wrong]: when syncMessage is
+    // succssessful, call ReadOnSuccess, which then calls
+    // meta::ReadColumnMetaVector(reader, meta, ver);.
+
+    // getTables here -AL- Actually nvm, I think getColumns make more sense
+    // here... dunno why I wrote getTables
   } catch (const OdbcError& err) {
     diag.AddStatusRecord(err);
 
@@ -350,15 +364,15 @@ SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
     return SqlResult::AI_ERROR;
   }
 
-  if (rsp.GetStatus() != ResponseStatus::SUCCESS) {
-    LOG_MSG("Error: " << rsp.GetError());
-    diag.AddStatusRecord(ResponseStatusToSqlState(rsp.GetStatus()),
-                         rsp.GetError());
+  /*
 
     return SqlResult::AI_ERROR;
   }
+  */
 
-  meta = rsp.GetMeta();
+  meta::ColumnMetaVector meta;
+  ReadColumnMetaVector(resultSet, meta);
+
 
   for (size_t i = 0; i < meta.size(); ++i) {
     LOG_MSG("\n[" << i << "] SchemaName:     " << meta[i].GetSchemaName()
