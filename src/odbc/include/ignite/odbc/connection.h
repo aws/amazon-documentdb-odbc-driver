@@ -550,8 +550,6 @@ namespace ignite
 
             /** Streaming context. */
             streaming::StreamingContext streamingContext;
-
-
         };
     }
 }

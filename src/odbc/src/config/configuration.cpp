@@ -623,7 +623,7 @@ namespace ignite
 
             template<>
             void Configuration::AddToMap(ArgumentMap& map, const std::string& key,
-                const SettableValue<ReadPreference::Type>& value, boolean isJdbcFormat)
+                const SettableValue<ReadPreference::Type>& value, bool isJdbcFormat)
             {
                 if (value.IsSet())
                     map[key] = isJdbcFormat ? ReadPreference::ToJdbcString(value.GetValue()) : ReadPreference::ToString(value.GetValue());
@@ -631,7 +631,7 @@ namespace ignite
 
             template<>
             void Configuration::AddToMap(ArgumentMap& map, const std::string& key,
-                const SettableValue<ScanMethod::Type>& value, boolean isJdbcFormat)
+                const SettableValue<ScanMethod::Type>& value, bool isJdbcFormat)
             {
                 if (value.IsSet())
                     map[key] = isJdbcFormat? ScanMethod::ToJdbcString(value.GetValue()) : ScanMethod::ToString(value.GetValue());

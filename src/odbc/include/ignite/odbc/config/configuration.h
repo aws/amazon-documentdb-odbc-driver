@@ -744,7 +744,7 @@ namespace ignite
                  * @param isJdbcFormat @c true if value should be added in format expected by JDBC connection string.
                  */
                 template<typename T>
-                static void AddToMap(ArgumentMap& map, const std::string& key, const SettableValue<T>& value, boolean isJdbcFormat);
+                static void AddToMap(ArgumentMap& map, const std::string& key, const SettableValue<T>& value, bool isJdbcFormat);
 
                 /**
                 * Get argument map.
@@ -853,11 +853,11 @@ namespace ignite
 
             template<>
             void Configuration::AddToMap<ReadPreference::Type>(ArgumentMap& map, const std::string& key,
-                const SettableValue<ReadPreference::Type>& value, boolean isJdbcFormat);
+                const SettableValue<ReadPreference::Type>& value, bool isJdbcFormat);
 
             template<>
             void Configuration::AddToMap<ScanMethod::Type>(ArgumentMap& map, const std::string& key,
-                const SettableValue<ScanMethod::Type>& value, boolean isJdbcFormat);
+                const SettableValue<ScanMethod::Type>& value, bool isJdbcFormat);
         }
     }
 }
