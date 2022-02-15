@@ -708,6 +708,7 @@ namespace ignite
 
                     case SQL_BIT:
                     case SQL_TINYINT:
+                    case SQL_TYPE_NULL:
                         return 1;
 
                     case SQL_SMALLINT:
