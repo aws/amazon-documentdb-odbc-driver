@@ -38,7 +38,7 @@
 #include "ignite/odbc/jni/utils.h"
 #include "ignite/odbc/common/concurrent.h"
 #include "ignite/odbc/common/utils.h"
-#include "ignite/odbc/DriverInstance.h"
+#include "ignite/odbc/mongoInstance.h"
 
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
@@ -652,16 +652,16 @@ namespace ignite
             }
 
             int32_t localSSHTunnelPort = 0;
-            if (!GetInternalSSHTunnelPort(localSSHTunnelPort, ctx, err)) {
+            if (!GetInternalSSHTunnelPort(err, localSSHTunnelPort, ctx)) {
                 return false;
             }       
             
-            connected = ConnectCPPDocumentDB(localSSHTunnelPort, err);
+            connected = ConnectCPPDocumentDB(err, localSSHTunnelPort);
 
             return connected;
         }
 
-        bool Connection::GetInternalSSHTunnelPort(int32_t& localSSHTunnelPort, SharedPointer< JniContext > ctx, odbc::IgniteError& err) {
+        bool Connection::GetInternalSSHTunnelPort(odbc::IgniteError& err, int32_t& localSSHTunnelPort, SharedPointer< JniContext > ctx) {
             bool isSSHTunnelActive;
             JniErrorInfo errInfo;
             bool success = ctx.Get()->DocumentDbConnectionIsSshTunnelActive(
@@ -669,6 +669,7 @@ namespace ignite
 
             if (!success
                 || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+                std::string errMsg = errInfo.errMsg;
                 err = odbc::IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_INIT,
                     errInfo.errMsg);
                 return false;
@@ -680,6 +681,7 @@ namespace ignite
                     connection, localSSHTunnelPort, errInfo);  
                 if (!success
                     || errInfo.code != odbc::java::IGNITE_JNI_ERR_SUCCESS) {
+                    std::string errMsg = errInfo.errMsg;
                     err = odbc::IgniteError(
                         odbc::IgniteError::IGNITE_ERR_JVM_INIT,
                         errInfo.errMsg);
@@ -712,7 +714,6 @@ namespace ignite
             mongoConnectionString.append("?tlsAllowInvalidHostnames=true");
             //tls configuration is handled using tls_options in connectionCPP
             //TODO handle the other DSN configuration
-            //https://bitquill.atlassian.net/browse/AD-599
 
             return mongoConnectionString;
         }
@@ -756,13 +757,13 @@ namespace ignite
             return static_cast<int32_t>(uTimeout);
         }
 
-        bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
-                                              odbc::IgniteError& err) 
+        bool Connection::ConnectCPPDocumentDB(odbc::IgniteError& err,
+                                              int32_t localSSHTunnelPort) 
         {           
             using bsoncxx::builder::basic::kvp;
             using bsoncxx::builder::basic::make_document;
 
-            DriverInstance::instance();
+            MongoInstance::instance();
             try {
                 std::string mongoCPPConnectionString =
                     FormatMongoCppConnectionString(localSSHTunnelPort);
@@ -771,7 +772,6 @@ namespace ignite
                 mongocxx::options::tls tls_options;
 
                 //TO-DO Adapt to use certificates
-                //https://bitquill.atlassian.net/browse/AD-598
                 tls_options.allow_invalid_certificates(true);
 
                 client_options.tls_opts(tls_options);
