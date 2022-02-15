@@ -384,6 +384,7 @@ namespace ignite
             // No-op.
         }
 
+        /*
         void QueryExecuteResponse::ReadOnSuccess(impl::binary::BinaryReaderImpl& reader, const ProtocolVersion& ver)
         {
             queryId = reader.ReadInt64();
@@ -392,6 +393,7 @@ namespace ignite
 
             ReadAffectedRows(reader, ver, affectedRows);
         }
+        */
 
         QueryExecuteBatchResponse::QueryExecuteBatchResponse() :
             affectedRows(0),
@@ -475,7 +477,7 @@ namespace ignite
         void QueryGetColumnsMetaResponse::ReadOnSuccess(impl::binary::BinaryReaderImpl& reader,
             const ProtocolVersion& ver)
         {
-            meta::ReadColumnMetaVector(reader, meta, ver);
+            meta::ReadColumnMetaVector(resultSet, meta);
         }
 
         QueryGetResultsetMetaResponse::QueryGetResultsetMetaResponse()
@@ -490,7 +492,7 @@ namespace ignite
 
         void QueryGetResultsetMetaResponse::ReadOnSuccess(impl::binary::BinaryReaderImpl &reader, const ProtocolVersion& ver)
         {
-            meta::ReadColumnMetaVector(reader, meta, ver);
+            meta::ReadColumnMetaVector(resultSet, meta);
         }
 
         QueryGetTablesMetaResponse::QueryGetTablesMetaResponse()

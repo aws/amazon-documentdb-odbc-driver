@@ -340,7 +340,6 @@ SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
   QueryGetColumnsMetaResponse rsp;
 
   try {
-    connection.SyncMessage(req, rsp);
   } catch (const OdbcError& err) {
     diag.AddStatusRecord(err);
 
