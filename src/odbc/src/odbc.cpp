@@ -595,7 +595,7 @@ namespace ignite
         LOG_MSG("table: " << table);
         LOG_MSG("column: " << column);
 
-        statement->ExecuteGetColumnsMetaQuery(schema, table, column);
+        statement->ExecuteGetColumnsMetaQuery(catalog, schema, table, column);
 
         return statement->GetDiagnosticRecords().GetReturnCode();
     }
