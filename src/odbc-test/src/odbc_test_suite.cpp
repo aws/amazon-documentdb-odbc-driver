@@ -789,7 +789,7 @@ namespace ignite
         }
 
         void OdbcTestSuite::CreateDsnConnectionString(std::string& connectionString,
-            const std::string& username, boolean sshTunnel) const {
+            const std::string& username, boolean sshTunnel, const std::string& miscOptions) const {
             std::string user = common::GetEnv("DOC_DB_USER_NAME", "documentdb");
             std::string password = common::GetEnv("DOC_DB_PASSWORD", "");
             std::string host = sshTunnel ? common::GetEnv("DOC_DB_HOST", "") : "localhost";
@@ -828,6 +828,9 @@ namespace ignite
                 connectionString.append("SSH_PRIVATE_KEY_FILE=" + sshPrivKeyFile + ';');
                 connectionString.append("SSH_STRICT_HOST_KEY_CHECKING=false;");
             }
+
+            if (!miscOptions.empty())
+                connectionString.append(miscOptions);
         }
     }
 }
