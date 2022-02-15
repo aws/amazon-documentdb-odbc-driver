@@ -582,6 +582,7 @@ namespace ignite
                         return SQL_NO_TOTAL;
 
                     case SQL_BIT:
+                    case SQL_TYPE_NULL:
                         return 1;
 
                     case SQL_TINYINT:
