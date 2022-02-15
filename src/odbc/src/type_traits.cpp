@@ -366,65 +366,114 @@ namespace ignite
             {
                 using namespace ignite::impl::binary;
                 switch (binaryType)
-                {
-                    case IGNITE_TYPE_BYTE:
-                    case IGNITE_TYPE_CHAR:
-                        return SQL_TINYINT;
+                { // -AL- here, we need to pass in DOCUMENTDB_JDBC type (so not really IGNITE_TYPE)
+                  // TODO remove commented out code
 
-                    case IGNITE_TYPE_SHORT:
-                        return SQL_SMALLINT;
-
-                    case IGNITE_TYPE_INT:
-                        return SQL_INTEGER;
-
-                    case IGNITE_TYPE_LONG:
-                        return SQL_BIGINT;
-
-                    case IGNITE_TYPE_FLOAT:
-                        return SQL_FLOAT;
-
-                    case IGNITE_TYPE_DOUBLE:
-                        return SQL_DOUBLE;
-
-                    case IGNITE_TYPE_BOOL:
+                    // case IGNITE_TYPE_BOOL:
+                    case DOCUMENTDB_JDBC_TYPE_BIT:
+                    case DOCUMENTDB_JDBC_TYPE_BOOLEAN:
                         return SQL_BIT;
 
-                    case IGNITE_TYPE_DECIMAL:
+                    //case IGNITE_TYPE_BYTE:
+                    //case IGNITE_TYPE_CHAR:
+                    case DOCUMENTDB_JDBC_TYPE_TINYINT:
+                        return SQL_TINYINT;
+
+                    //case IGNITE_TYPE_SHORT:
+                    case DOCUMENTDB_JDBC_TYPE_SMALLINT:
+                        return SQL_SMALLINT;
+
+                    //case IGNITE_TYPE_INT:
+                    case DOCUMENTDB_JDBC_TYPE_INT:
+                        return SQL_INTEGER;
+
+                    //case IGNITE_TYPE_LONG:
+                    case DOCUMENTDB_JDBC_TYPE_BIGINT:
+                        return SQL_BIGINT;
+
+                    //case IGNITE_TYPE_FLOAT:
+                    case DOCUMENTDB_JDBC_TYPE_FLOAT:
+                        return SQL_FLOAT;
+
+                    case DOCUMENTDB_JDBC_TYPE_REAL:
+                        return SQL_REAL;
+
+                    //case IGNITE_TYPE_DOUBLE:
+                    case DOCUMENTDB_JDBC_TYPE_DOUBLE:
+                        return SQL_DOUBLE;
+
+                    //case IGNITE_TYPE_DECIMAL:
+                    case DOCUMENTDB_JDBC_TYPE_DECIMAL:
                         return SQL_DECIMAL;
 
-                    case IGNITE_TYPE_STRING:
+                    case DOCUMENTDB_JDBC_TYPE_CHAR:
+                    case DOCUMENTDB_JDBC_TYPE_NCHAR:
+                        return SQL_CHAR;
+
+                    // case IGNITE_TYPE_STRING:
+                    case DOCUMENTDB_JDBC_TYPE_VARCHAR:
+                    case DOCUMENTDB_JDBC_TYPE_NVARCHAR:
                         return SQL_VARCHAR;
 
-                    case IGNITE_TYPE_UUID:
-                        return SQL_GUID;
+                    case DOCUMENTDB_JDBC_TYPE_LONGVARCHAR:
+                    case DOCUMENTDB_JDBC_TYPE_LONGNVARCHAR:
+                        return SQL_LONGVARCHAR;
 
-                    case IGNITE_TYPE_DATE:
+                    // we don't have UUID on DOCUMENTDB_JDBC side
+                    //case IGNITE_TYPE_UUID:
+                        //return SQL_GUID;
+
+                    //case IGNITE_TYPE_DATE:
+                    case DOCUMENTDB_JDBC_TYPE_DATE:
                         return SQL_TYPE_DATE;
 
-                    case IGNITE_TYPE_TIMESTAMP:
-                        return SQL_TYPE_TIMESTAMP;
-
-                    case IGNITE_TYPE_TIME:
+                    // case IGNITE_TYPE_TIME:
+                    case DOCUMENTDB_JDBC_TYPE_TIME:
                         return SQL_TYPE_TIME;
 
-                    case IGNITE_TYPE_ARRAY_BYTE:
-                    case IGNITE_TYPE_ARRAY_SHORT:
-                    case IGNITE_TYPE_ARRAY_INT:
-                    case IGNITE_TYPE_ARRAY_LONG:
-                    case IGNITE_TYPE_ARRAY_FLOAT:
-                    case IGNITE_TYPE_ARRAY_DOUBLE:
-                    case IGNITE_TYPE_ARRAY_CHAR:
-                    case IGNITE_TYPE_ARRAY_BOOL:
-                    case IGNITE_TYPE_ARRAY_DECIMAL:
-                    case IGNITE_TYPE_ARRAY_STRING:
-                    case IGNITE_TYPE_ARRAY_UUID:
-                    case IGNITE_TYPE_ARRAY_DATE:
-                    case IGNITE_TYPE_ARRAY:
-                    case IGNITE_TYPE_COLLECTION:
-                    case IGNITE_TYPE_MAP:
-                    case IGNITE_TYPE_MAP_ENTRY:
-                    case IGNITE_TYPE_BINARY:
-                    case IGNITE_TYPE_OBJECT:
+                    //case IGNITE_TYPE_TIMESTAMP:
+                    case DOCUMENTDB_JDBC_TYPE_TIMESTAMP:
+                        return SQL_TYPE_TIMESTAMP;
+
+                    case DOCUMENTDB_JDBC_TYPE_VARBINARY:
+                        return SQL_VARBINARY;
+
+                    case DOCUMENTDB_JDBC_TYPE_LONGVARBINARY:
+                        return SQL_LONGVARBINARY;
+
+                    case DOCUMENTDB_JDBC_TYPE_ROWID:
+                        return SQL_BEST_ROWID;
+
+                    case DOCUMENTDB_JDBC_TYPE_NULL:
+                        return SQL_TYPE_NULL;
+
+                    //case IGNITE_TYPE_ARRAY_BYTE:
+                    //case IGNITE_TYPE_ARRAY_SHORT:
+                    //case IGNITE_TYPE_ARRAY_INT:
+                    //case IGNITE_TYPE_ARRAY_LONG:
+                    //case IGNITE_TYPE_ARRAY_FLOAT:
+                    //case IGNITE_TYPE_ARRAY_DOUBLE:
+                    //case IGNITE_TYPE_ARRAY_CHAR:
+                    //case IGNITE_TYPE_ARRAY_BOOL:
+                    //case IGNITE_TYPE_ARRAY_DECIMAL:
+                    //case IGNITE_TYPE_ARRAY_STRING:
+                    //case IGNITE_TYPE_ARRAY_UUID:
+                    //case IGNITE_TYPE_ARRAY_DATE:
+                    //case IGNITE_TYPE_ARRAY:
+                    //case IGNITE_TYPE_COLLECTION:
+                    //case IGNITE_TYPE_MAP:
+                    //case IGNITE_TYPE_MAP_ENTRY:
+                    //case IGNITE_TYPE_BINARY:
+                    //case IGNITE_TYPE_OBJECT:
+                    case DOCUMENTDB_JDBC_TYPE_BINARY:
+                    case DOCUMENTDB_JDBC_TYPE_BLOB:
+                    case DOCUMENTDB_JDBC_TYPE_CLOB:
+                    case DOCUMENTDB_JDBC_TYPE_ARRAY:
+                    case DOCUMENTDB_JDBC_TYPE_STRUCT:
+                    case DOCUMENTDB_JDBC_TYPE_JAVA_OBJECT:
+                    case DOCUMENTDB_JDBC_TYPE_NCLOB:
+                    case DOCUMENTDB_JDBC_TYPE_SQLXML:
+                    case DOCUMENTDB_JDBC_TYPE_REF_CURSOR:
                     default:
                         return SQL_BINARY;
                 }
