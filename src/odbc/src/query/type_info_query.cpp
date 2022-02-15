@@ -136,41 +136,41 @@ namespace ignite
                 const std::string sch;
                 const std::string tbl;
 
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "TYPE_NAME",          IGNITE_TYPE_STRING));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "DATA_TYPE",          IGNITE_TYPE_SHORT));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_SIZE",        IGNITE_TYPE_INT));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "LITERAL_PREFIX",     IGNITE_TYPE_STRING));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "LITERAL_SUFFIX",     IGNITE_TYPE_STRING));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "CREATE_PARAMS",      IGNITE_TYPE_STRING));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "NULLABLE",           IGNITE_TYPE_SHORT));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "CASE_SENSITIVE",     IGNITE_TYPE_SHORT));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "SEARCHABLE",         IGNITE_TYPE_SHORT));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "UNSIGNED_ATTRIBUTE", IGNITE_TYPE_SHORT));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "FIXED_PREC_SCALE",   IGNITE_TYPE_SHORT));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "AUTO_UNIQUE_VALUE",  IGNITE_TYPE_SHORT));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "LOCAL_TYPE_NAME",    IGNITE_TYPE_STRING));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "MINIMUM_SCALE",      IGNITE_TYPE_SHORT));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "MAXIMUM_SCALE",      IGNITE_TYPE_SHORT));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATA_TYPE",      IGNITE_TYPE_SHORT));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATETIME_SUB",   IGNITE_TYPE_SHORT));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "NUM_PREC_RADIX",     IGNITE_TYPE_INT));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "INTERVAL_PRECISION", IGNITE_TYPE_SHORT));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "TYPE_NAME",          DOCUMENTDB_JDBC_TYPE_VARCHAR));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "DATA_TYPE",          DOCUMENTDB_JDBC_TYPE_SMALLINT));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_SIZE",        DOCUMENTDB_JDBC_TYPE_INTEGER));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "LITERAL_PREFIX",     DOCUMENTDB_JDBC_TYPE_VARCHAR));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "LITERAL_SUFFIX",     DOCUMENTDB_JDBC_TYPE_VARCHAR));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "CREATE_PARAMS",      DOCUMENTDB_JDBC_TYPE_VARCHAR));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "NULLABLE",           DOCUMENTDB_JDBC_TYPE_SMALLINT));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "CASE_SENSITIVE",     DOCUMENTDB_JDBC_TYPE_SMALLINT));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "SEARCHABLE",         DOCUMENTDB_JDBC_TYPE_SMALLINT));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "UNSIGNED_ATTRIBUTE", DOCUMENTDB_JDBC_TYPE_SMALLINT));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "FIXED_PREC_SCALE",   DOCUMENTDB_JDBC_TYPE_SMALLINT));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "AUTO_UNIQUE_VALUE",  DOCUMENTDB_JDBC_TYPE_SMALLINT));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "LOCAL_TYPE_NAME",    DOCUMENTDB_JDBC_TYPE_VARCHAR));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "MINIMUM_SCALE",      DOCUMENTDB_JDBC_TYPE_SMALLINT));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "MAXIMUM_SCALE",      DOCUMENTDB_JDBC_TYPE_SMALLINT));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATA_TYPE",      DOCUMENTDB_JDBC_TYPE_SMALLINT));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATETIME_SUB",   DOCUMENTDB_JDBC_TYPE_SMALLINT));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "NUM_PREC_RADIX",     DOCUMENTDB_JDBC_TYPE_INTEGER));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "INTERVAL_PRECISION", DOCUMENTDB_JDBC_TYPE_SMALLINT));
 
                 assert(IsSqlTypeSupported(sqlType) || sqlType == SQL_ALL_TYPES);
 
                 if (sqlType == SQL_ALL_TYPES)
                 {
-                    types.push_back(IGNITE_TYPE_STRING);
-                    types.push_back(IGNITE_TYPE_SHORT);
-                    types.push_back(IGNITE_TYPE_INT);
-                    types.push_back(IGNITE_TYPE_DECIMAL);
-                    types.push_back(IGNITE_TYPE_FLOAT);
-                    types.push_back(IGNITE_TYPE_DOUBLE);
-                    types.push_back(IGNITE_TYPE_BOOL);
-                    types.push_back(IGNITE_TYPE_BYTE);
-                    types.push_back(IGNITE_TYPE_LONG);
-                    types.push_back(IGNITE_TYPE_UUID);
-                    types.push_back(IGNITE_TYPE_BINARY);
+                    types.push_back(DOCUMENTDB_JDBC_TYPE_VARCHAR);
+                    types.push_back(DOCUMENTDB_JDBC_TYPE_SMALLINT);
+                    types.push_back(DOCUMENTDB_JDBC_TYPE_INTEGER);
+                    types.push_back(DOCUMENTDB_JDBC_TYPE_DECIMAL);
+                    types.push_back(DOCUMENTDB_JDBC_TYPE_FLOAT);
+                    types.push_back(DOCUMENTDB_JDBC_TYPE_DOUBLE);
+                    types.push_back(DOCUMENTDB_JDBC_TYPE_BOOLEAN);
+                    types.push_back(DOCUMENTDB_JDBC_TYPE_TINYINT); 
+                    // -AL- documentDB jdbc does not have type byte
+                    types.push_back(DOCUMENTDB_JDBC_TYPE_BIGINT);
+                    types.push_back(DOCUMENTDB_JDBC_TYPE_BINARY);
                 }
                 else
                     types.push_back(SqlTypeToBinary(sqlType));
@@ -268,7 +268,7 @@ namespace ignite
 
                     case ResultColumn::LITERAL_PREFIX:
                     {
-                        if (currentType == IGNITE_TYPE_STRING)
+                        if (currentType == DOCUMENTDB_JDBC_TYPE_VARCHAR)
                             buffer.PutString("'");
                         else if (currentType == IGNITE_TYPE_BINARY)
                             buffer.PutString("0x");
@@ -280,7 +280,7 @@ namespace ignite
 
                     case ResultColumn::LITERAL_SUFFIX:
                     {
-                        if (currentType == IGNITE_TYPE_STRING)
+                        if (currentType == DOCUMENTDB_JDBC_TYPE_VARCHAR)
                             buffer.PutString("'");
                         else
                             buffer.PutNull();
@@ -304,7 +304,7 @@ namespace ignite
 
                     case ResultColumn::CASE_SENSITIVE:
                     {
-                        if (currentType == IGNITE_TYPE_STRING)
+                        if (currentType == DOCUMENTDB_JDBC_TYPE_VARCHAR)
                             buffer.PutInt16(SQL_TRUE);
                         else
                             buffer.PutInt16(SQL_FALSE);
