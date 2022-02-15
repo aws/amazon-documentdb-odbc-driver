@@ -208,7 +208,8 @@ namespace ignite
              * @param binaryType Binary data type.
              * @return SQL data type.
              */
-            int16_t BinaryToSqlType(int8_t binaryType);
+            //int16_t BinaryToSqlType(int8_t binaryType); // todo remove -al-
+            int16_t BinaryToSqlType(int16_t binaryType);
 
             /**
              * Get binary type SQL nullability.
