@@ -118,9 +118,6 @@ namespace ignite
             class SqlTypeName
             {
             public:
-                /** VARCHAR SQL type name constant. */
-                static const std::string VARCHAR;
-
                 /** SMALLINT SQL type name constant. */
                 static const std::string SMALLINT;
 
@@ -133,8 +130,14 @@ namespace ignite
                 /** FLOAT SQL type name constant. */
                 static const std::string FLOAT;
 
+                /** REAL SQL type name constant. */
+                static const std::string REAL;
+
                 /** DOUBLE SQL type name constant. */
                 static const std::string DOUBLE;
+
+                /** NUMERIC SQL type name constant. */
+                static const std::string NUMERIC;
 
                 /** BIT SQL type name constant. */
                 static const std::string BIT;
@@ -145,8 +148,17 @@ namespace ignite
                 /** BIGINT SQL type name constant. */
                 static const std::string BIGINT;
 
+                /** VARCHAR SQL type name constant. */
+                static const std::string VARCHAR;
+
+                /** LONGVARCHAR SQL type name constant. */
+                static const std::string LONGVARCHAR;
+
                 /** BINARY SQL type name constant. */
                 static const std::string BINARY;
+
+                /** LONGVARBINARY SQL type name constant. */
+                static const std::string LONGVARBINARY;
 
                 /** DATE SQL type name constant. */
                 static const std::string DATE;
@@ -159,6 +171,9 @@ namespace ignite
 
                 /** GUID SQL type name constant. */
                 static const std::string GUID;
+
+                /** NULL SQL type name constant. */
+                static const std::string SQL_NULL;
             };
 
             /**

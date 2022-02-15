@@ -26,8 +26,6 @@ namespace ignite
     {
         namespace type_traits
         {
-            const std::string SqlTypeName::VARCHAR("VARCHAR");
-
             const std::string SqlTypeName::SMALLINT("SMALLINT");
 
             const std::string SqlTypeName::INTEGER("INTEGER");
@@ -36,7 +34,11 @@ namespace ignite
 
             const std::string SqlTypeName::FLOAT("FLOAT");
 
+            const std::string SqlTypeName::REAL("REAL");
+
             const std::string SqlTypeName::DOUBLE("DOUBLE");
+
+            const std::string SqlTypeName::NUMERIC("NUMERIC");
 
             const std::string SqlTypeName::BIT("BIT");
 
@@ -44,7 +46,13 @@ namespace ignite
 
             const std::string SqlTypeName::BIGINT("BIGINT");
 
+            const std::string SqlTypeName::VARCHAR("VARCHAR");
+
+            const std::string SqlTypeName::LONGVARCHAR("LONGVARCHAR");
+
             const std::string SqlTypeName::BINARY("VARBINARY");
+
+            const std::string SqlTypeName::LONGVARBINARY("LONGVARBINARY");
 
             const std::string SqlTypeName::DATE("DATE");
 
@@ -53,6 +61,8 @@ namespace ignite
             const std::string SqlTypeName::TIME("TIME");
 
             const std::string SqlTypeName::GUID("GUID");
+
+            const std::string SqlTypeName::SQL_NULL("NULL");
 
 #ifdef _DEBUG
 
