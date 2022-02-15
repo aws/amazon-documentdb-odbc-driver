@@ -513,9 +513,6 @@ namespace ignite
                     case DOCUMENTDB_JDBC_TYPE_TIMESTAMP:
                         return SQL_TYPE_TIMESTAMP;
 
-                    case DOCUMENTDB_JDBC_TYPE_VARBINARY:
-                        return SQL_VARBINARY;
-
                     case DOCUMENTDB_JDBC_TYPE_LONGVARBINARY:
                         return SQL_LONGVARBINARY;
 
@@ -541,6 +538,7 @@ namespace ignite
                     //case IGNITE_TYPE_BINARY:
                     //case IGNITE_TYPE_OBJECT:
                     case DOCUMENTDB_JDBC_TYPE_BINARY:
+                    case DOCUMENTDB_JDBC_TYPE_VARBINARY: // todo -AL- explain on Confluence page: because ignite has varbinary as string for binary
                     case DOCUMENTDB_JDBC_TYPE_BLOB:
                     case DOCUMENTDB_JDBC_TYPE_CLOB:
                     case DOCUMENTDB_JDBC_TYPE_ARRAY:
