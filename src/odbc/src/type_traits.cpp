@@ -280,10 +280,6 @@ namespace ignite
                         return DOCUMENTDB_JDBC_TYPE_LONGVARCHAR;
 
 
-
-
-
-
                     case SQL_TYPE_DATE:
                         //return IGNITE_TYPE_DATE;
                         return DOCUMENTDB_JDBC_TYPE_DATE;
@@ -313,7 +309,6 @@ namespace ignite
 
                     case SQL_TYPE_NULL:
                         return DOCUMENTDB_JDBC_TYPE_NULL;
-
 
                     default:
                         return DOCUMENTDB_JDBC_TYPE_BINARY;
@@ -436,6 +431,9 @@ namespace ignite
                     case DOCUMENTDB_JDBC_TYPE_DOUBLE:
                         return SQL_DOUBLE;
 
+                    case DOCUMENTDB_JDBC_TYPE_NUMERIC:
+                        return SQL_NUMERIC;
+
                     //case IGNITE_TYPE_DECIMAL:
                     case DOCUMENTDB_JDBC_TYPE_DECIMAL:
                         return SQL_DECIMAL;
@@ -475,9 +473,6 @@ namespace ignite
                     case DOCUMENTDB_JDBC_TYPE_LONGVARBINARY:
                         return SQL_LONGVARBINARY;
 
-                    case DOCUMENTDB_JDBC_TYPE_ROWID:
-                        return SQL_BEST_ROWID;
-
                     case DOCUMENTDB_JDBC_TYPE_NULL:
                         return SQL_TYPE_NULL;
 
@@ -505,6 +500,7 @@ namespace ignite
                     case DOCUMENTDB_JDBC_TYPE_ARRAY:
                     case DOCUMENTDB_JDBC_TYPE_STRUCT:
                     case DOCUMENTDB_JDBC_TYPE_JAVA_OBJECT:
+                    case DOCUMENTDB_JDBC_TYPE_ROWID:
                     case DOCUMENTDB_JDBC_TYPE_NCLOB:
                     case DOCUMENTDB_JDBC_TYPE_SQLXML:
                     case DOCUMENTDB_JDBC_TYPE_REF_CURSOR:
