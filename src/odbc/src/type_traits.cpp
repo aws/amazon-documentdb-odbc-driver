@@ -228,8 +228,9 @@ namespace ignite
                 }
             }
 
-            int8_t SqlTypeToBinary(int16_t sqlType)
-            {
+            //int8_t SqlTypeToBinary(int16_t sqlType)
+            int16_t SqlTypeToBinary(int16_t sqlType)
+            { // TODO make them return JDBC types instead of Ignite types
                 using namespace ignite::impl::binary;
 
                 switch (sqlType)
