@@ -59,7 +59,6 @@ jobs:
         brew install cmake
         brew install openssl
         brew install boost
-        brew install mongo-cxx-driver
     - name: configure-and-build-driver
       run: |
         ./build_mac_release64.sh
@@ -77,7 +76,6 @@ jobs:
         ./scripts/register_driver_macos.sh
     - name: run-tests
       run: |
-        ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
         ./build/odbc/bin/ignite-odbc-tests
     # - name: upload-test-report
     #   if: failure()

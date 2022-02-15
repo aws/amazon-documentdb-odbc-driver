@@ -63,8 +63,12 @@ jobs:
         mkdir -p ~/.ssh
         copy ./src/odbc-test/config/ssh_config ~/.ssh/config
 
+    #- name: Run SSH tunnel to DocumentDB server
+    #  run: |
+    #    ssh.exe -f -N -i ~/certs/docdb-sshtunnel.pem -L ${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
+
     - name: Install dependencies Windows
-      run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x86-windows openssl:x86-windows boost-test:x86-windows boost-asio:x86-windows boost-chrono:x86-windows boost-interprocess:x86-windows boost-regex:x86-windows boost-system:x86-windows boost-thread:x86-windows
+      run: vcpkg integrate install; vcpkg install openssl:x86-windows boost-test:x86-windows boost-asio:x86-windows boost-chrono:x86-windows boost-interprocess:x86-windows boost-regex:x86-windows boost-system:x86-windows boost-thread:x86-windows
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
 
@@ -80,7 +84,6 @@ jobs:
 
     - name: run-tests
       run: |
-        Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
         ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
     # - name: upload-test-report
     #   if: failure()
@@ -148,8 +151,12 @@ jobs:
         mkdir -p ~/.ssh
         copy ./src/odbc-test/config/ssh_config ~/.ssh/config
 
+    #- name: Run SSH tunnel to DocumentDB server
+    #  run: |
+    #    ssh.exe -f -N -i ~/certs/docdb-sshtunnel.pem -L ${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
+
     - name: Install dependencies Windows
-      run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x64-windows openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
+      run: vcpkg integrate install; vcpkg install openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
       env:
         VCPKG_ROOT: ${{env.VCPKG_ROOT}}
 
@@ -165,7 +172,6 @@ jobs:
 
     - name: run-tests
       run: |
-        Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
         ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
   #   - name: upload-test-report
   #     if: failure()
