@@ -106,15 +106,15 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestoreExternalSSHTunnel)
 BOOST_AUTO_TEST_CASE(TestConnectionRestoreMiscOptionsSet)
 {
     const std::string miscOptions = 
-        "APP_NAME=TestAppName;"
-        "LOGIN_TIMEOUT_SEC=30;"
-        "READ_PREFERENCE=primary_preferred;"
-        "RETRY_READS=false;"
-        "SCAN_METHOD=id_forward;"
-        "SCAN_LIMIT=100;"
-        "SCHEMA_NAME=test;"
-        "REFRESH_SCHEMA=true;"
-        "DEFAULT_FETCH_SIZE=1000;";
+    "APP_NAME=TestAppName;"
+    "LOGIN_TIMEOUT_SEC=30;"
+    "READ_PREFERENCE=primary_preferred;"
+    "RETRY_READS=false;"
+    "SCAN_METHOD=id_forward;"
+    "SCAN_LIMIT=100;"
+    "SCHEMA_NAME=test;"
+    "REFRESH_SCHEMA=true;"
+    "DEFAULT_FETCH_SIZE=1000;";
     std::string connectionString;
     CreateDsnConnectionString(connectionString, std::string(), true, miscOptions);
 
@@ -122,12 +122,12 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestoreMiscOptionsSet)
     Disconnect();
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionInvalidTLSOption) {
+BOOST_AUTO_TEST_CASE(TestConnectionIncorrectTLSOption) {
     std::string connectionString;
     CreateDsnConnectionString(connectionString, std::string(), true, "TLS=false;");
 
     ExpectConnectionReject(connectionString, "08001: Failed to establish connection with the host.\n"
-        "Timed out after 30000 ms while waiting to connect.");
+      "Timed out after 30000 ms while waiting to connect.");
 
     Disconnect();
 }
