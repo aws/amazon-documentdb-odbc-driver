@@ -111,65 +111,108 @@ namespace ignite
 
                 switch (binaryType)
                 {
-                case IGNITE_TYPE_STRING:
-                    return SqlTypeName::VARCHAR;
-
-                case IGNITE_TYPE_SHORT:
-                    return SqlTypeName::SMALLINT;
-
-                case IGNITE_TYPE_INT:
-                    return SqlTypeName::INTEGER;
-
-                case IGNITE_TYPE_DECIMAL:
-                    return SqlTypeName::DECIMAL;
-
-                case IGNITE_TYPE_FLOAT:
-                    return SqlTypeName::FLOAT;
-
-                case IGNITE_TYPE_DOUBLE:
-                    return SqlTypeName::DOUBLE;
-
-                case IGNITE_TYPE_BOOL:
+                case DOCUMENTDB_JDBC_TYPE_BIT:
+                case DOCUMENTDB_JDBC_TYPE_BOOLEAN:
+                //case IGNITE_TYPE_BOOL:
                     return SqlTypeName::BIT;
 
-                case IGNITE_TYPE_BYTE:
-                case IGNITE_TYPE_CHAR:
+                //case IGNITE_TYPE_SHORT:
+                case DOCUMENTDB_JDBC_TYPE_SMALLINT:
+                    return SqlTypeName::SMALLINT;
+
+                case DOCUMENTDB_JDBC_TYPE_TINYINT:
+                //case IGNITE_TYPE_BYTE:
+                //case IGNITE_TYPE_CHAR:
                     return SqlTypeName::TINYINT;
 
-                case IGNITE_TYPE_LONG:
+                case DOCUMENTDB_JDBC_TYPE_INTEGER:
+                //case IGNITE_TYPE_INT:
+                    return SqlTypeName::INTEGER;
+
+                case DOCUMENTDB_JDBC_TYPE_BIGINT:
+                //case IGNITE_TYPE_LONG:
                     return SqlTypeName::BIGINT;
 
-                case IGNITE_TYPE_UUID:
-                    return SqlTypeName::GUID;
+                case DOCUMENTDB_JDBC_TYPE_FLOAT:
+                //case IGNITE_TYPE_FLOAT:
+                    return SqlTypeName::FLOAT;
 
-                case IGNITE_TYPE_DATE:
+                case DOCUMENTDB_JDBC_TYPE_REAL:
+                    return SqlTypeName::REAL;
+
+                case DOCUMENTDB_JDBC_TYPE_DOUBLE:
+                //case IGNITE_TYPE_DOUBLE:
+                    return SqlTypeName::DOUBLE;
+
+                case DOCUMENTDB_JDBC_TYPE_NUMERIC:
+                    return SqlTypeName::NUMERIC;
+
+                case DOCUMENTDB_JDBC_TYPE_DECIMAL:
+                //case IGNITE_TYPE_DECIMAL:
+                    return SqlTypeName::DECIMAL;
+
+                case DOCUMENTDB_JDBC_TYPE_VARCHAR:
+                case DOCUMENTDB_JDBC_TYPE_NVARCHAR:
+                //case IGNITE_TYPE_STRING:
+                    return SqlTypeName::VARCHAR;
+
+                case DOCUMENTDB_JDBC_TYPE_LONGVARCHAR:
+                case DOCUMENTDB_JDBC_TYPE_LONGNVARCHAR:
+                    return SqlTypeName::LONGVARCHAR;
+
+                //case IGNITE_TYPE_UUID:
+                //    return SqlTypeName::GUID;
+
+                // case IGNITE_TYPE_DATE:
+                case DOCUMENTDB_JDBC_TYPE_DATE:
                     return SqlTypeName::DATE;
 
-                case IGNITE_TYPE_TIMESTAMP:
-                    return SqlTypeName::TIMESTAMP;
-
-                case IGNITE_TYPE_TIME:
+                // case IGNITE_TYPE_TIME:
+                case DOCUMENTDB_JDBC_TYPE_TIME:
                     return SqlTypeName::TIME;
 
-                case IGNITE_TYPE_OBJECT:
-                case IGNITE_TYPE_ARRAY_BYTE:
-                case IGNITE_TYPE_ARRAY_SHORT:
-                case IGNITE_TYPE_ARRAY_INT:
-                case IGNITE_TYPE_ARRAY_LONG:
-                case IGNITE_TYPE_ARRAY_FLOAT:
-                case IGNITE_TYPE_ARRAY_DOUBLE:
-                case IGNITE_TYPE_ARRAY_CHAR:
-                case IGNITE_TYPE_ARRAY_BOOL:
-                case IGNITE_TYPE_ARRAY_DECIMAL:
-                case IGNITE_TYPE_ARRAY_STRING:
-                case IGNITE_TYPE_ARRAY_UUID:
-                case IGNITE_TYPE_ARRAY_DATE:
-                case IGNITE_TYPE_ARRAY_TIMESTAMP:
-                case IGNITE_TYPE_ARRAY:
-                case IGNITE_TYPE_COLLECTION:
-                case IGNITE_TYPE_MAP:
-                case IGNITE_TYPE_MAP_ENTRY:
-                case IGNITE_TYPE_BINARY:
+                // case IGNITE_TYPE_TIMESTAMP:
+                case DOCUMENTDB_JDBC_TYPE_TIMESTAMP:
+                    return SqlTypeName::TIMESTAMP;
+
+                // todo -AL- add SqlTypeName to return here
+
+                case DOCUMENTDB_JDBC_TYPE_LONGVARBINARY:
+                    return SqlTypeName::LONGVARBINARY;
+
+                case DOCUMENTDB_JDBC_TYPE_NULL:
+                    return SqlTypeName::SQL_NULL;
+
+                //case IGNITE_TYPE_OBJECT:
+                //case IGNITE_TYPE_ARRAY_BYTE:
+                //case IGNITE_TYPE_ARRAY_SHORT:
+                //case IGNITE_TYPE_ARRAY_INT:
+                //case IGNITE_TYPE_ARRAY_LONG:
+                //case IGNITE_TYPE_ARRAY_FLOAT:
+                //case IGNITE_TYPE_ARRAY_DOUBLE:
+                //case IGNITE_TYPE_ARRAY_CHAR:
+                //case IGNITE_TYPE_ARRAY_BOOL:
+                //case IGNITE_TYPE_ARRAY_DECIMAL:
+                //case IGNITE_TYPE_ARRAY_STRING:
+                //case IGNITE_TYPE_ARRAY_UUID:
+                //case IGNITE_TYPE_ARRAY_DATE:
+                //case IGNITE_TYPE_ARRAY_TIMESTAMP:
+                //case IGNITE_TYPE_ARRAY:
+                //case IGNITE_TYPE_COLLECTION:
+                //case IGNITE_TYPE_MAP:
+                //case IGNITE_TYPE_MAP_ENTRY:
+                //case IGNITE_TYPE_BINARY:
+                case DOCUMENTDB_JDBC_TYPE_BINARY:
+                case DOCUMENTDB_JDBC_TYPE_VARBINARY:
+                case DOCUMENTDB_JDBC_TYPE_BLOB:
+                case DOCUMENTDB_JDBC_TYPE_CLOB:
+                case DOCUMENTDB_JDBC_TYPE_ARRAY:
+                case DOCUMENTDB_JDBC_TYPE_STRUCT:
+                case DOCUMENTDB_JDBC_TYPE_JAVA_OBJECT:
+                case DOCUMENTDB_JDBC_TYPE_ROWID:
+                case DOCUMENTDB_JDBC_TYPE_NCLOB:
+                case DOCUMENTDB_JDBC_TYPE_SQLXML:
+                case DOCUMENTDB_JDBC_TYPE_REF_CURSOR:
                 default:
                     return SqlTypeName::BINARY;
                 }
