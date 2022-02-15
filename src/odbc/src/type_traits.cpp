@@ -226,8 +226,6 @@ namespace ignite
                 default:
                     return SqlTypeName::BINARY;
                 }
-
-                return SqlTypeName::BINARY;
             }
 
             bool IsApplicationTypeSupported(int16_t type)
