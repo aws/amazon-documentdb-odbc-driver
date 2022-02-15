@@ -534,7 +534,7 @@ namespace ignite
                 }
 
                 // Validate required SSH tunnel properties if needed.
-                boolean sshTunnel = IsSshEnable() || IsSshHostSet() || IsSshUserSet() || IsSshPrivateKeyFileSet();
+                bool sshTunnel = IsSshEnable() || IsSshHostSet() || IsSshUserSet() || IsSshPrivateKeyFileSet();
                 if (sshTunnel && (!IsSshHostSet() || !IsSshUserSet() || !IsSshPrivateKeyFileSet())) {
                     err = "If using an internal SSH tunnel, all of ssh_host, ssh_user, ssh_private_key_file are required to connect.";
                     return false;
