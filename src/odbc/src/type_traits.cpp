@@ -235,57 +235,89 @@ namespace ignite
 
                 switch (sqlType)
                 {
-                    case SQL_CHAR:
-                    case SQL_VARCHAR:
-                    case SQL_LONGVARCHAR:
-                        return IGNITE_TYPE_STRING;
+                    case SQL_TINYINT:
+                        //return IGNITE_TYPE_BYTE;
+                        return DOCUMENTDB_JDBC_TYPE_TINYINT;
 
                     case SQL_SMALLINT:
-                        return IGNITE_TYPE_SHORT;
-
-                    case SQL_TINYINT:
-                        return IGNITE_TYPE_BYTE;
+                        // return IGNITE_TYPE_SHORT;
+                        return DOCUMENTDB_JDBC_TYPE_SMALLINT;
 
                     case SQL_INTEGER:
-                        return IGNITE_TYPE_INT;
+                        // return IGNITE_TYPE_INT;
+                        return DOCUMENTDB_JDBC_TYPE_INTEGER;
 
                     case SQL_BIGINT:
-                        return IGNITE_TYPE_LONG;
+                        //return IGNITE_TYPE_LONG;
+                        return DOCUMENTDB_JDBC_TYPE_BIGINT;
 
                     case SQL_FLOAT:
-                        return IGNITE_TYPE_FLOAT;
+                        //return IGNITE_TYPE_FLOAT;
+                        return DOCUMENTDB_JDBC_TYPE_FLOAT;
+
+                    case SQL_REAL:
+                        return DOCUMENTDB_JDBC_TYPE_REAL;
 
                     case SQL_DOUBLE:
-                        return IGNITE_TYPE_DOUBLE;
+                        //return IGNITE_TYPE_DOUBLE;
+                        return DOCUMENTDB_JDBC_TYPE_DOUBLE;
 
-                    case SQL_BIT:
-                        return IGNITE_TYPE_BOOL;
-
-                    case SQL_BINARY:
-                    case SQL_VARBINARY:
-                    case SQL_LONGVARBINARY:
-                        return IGNITE_TYPE_BINARY;
+                    case SQL_NUMERIC:
+                        return DOCUMENTDB_JDBC_TYPE_NUMERIC;
+                        // last changed. Feb14, 5:07pm. Note: look at confluence page for this.
 
                     case SQL_DECIMAL:
-                        return IGNITE_TYPE_DECIMAL;
+                        return DOCUMENTDB_JDBC_TYPE_DECIMAL;
 
-                    case SQL_GUID:
-                        return IGNITE_TYPE_UUID;
+                    case SQL_CHAR:
+                        return DOCUMENTDB_JDBC_TYPE_CHAR;
+
+                    case SQL_VARCHAR:
+                        return DOCUMENTDB_JDBC_TYPE_VARCHAR;
+
+                    case SQL_LONGVARCHAR:
+                        // return IGNITE_TYPE_STRING;
+                        return DOCUMENTDB_JDBC_TYPE_LONGVARCHAR;
+
+
+
+
+
 
                     case SQL_TYPE_DATE:
-                        return IGNITE_TYPE_DATE;
-
-                    case SQL_TYPE_TIMESTAMP:
-                        return IGNITE_TYPE_TIMESTAMP;
+                        //return IGNITE_TYPE_DATE;
+                        return DOCUMENTDB_JDBC_TYPE_DATE;
 
                     case SQL_TYPE_TIME:
-                        return IGNITE_TYPE_TIME;
+                        // return IGNITE_TYPE_TIME;
+                        return DOCUMENTDB_JDBC_TYPE_TIME;
+
+
+                    case SQL_TYPE_TIMESTAMP:
+                        //return IGNITE_TYPE_TIMESTAMP;
+                        return DOCUMENTDB_JDBC_TYPE_TIMESTAMP;
+
+                    case SQL_BINARY:
+                        return DOCUMENTDB_JDBC_TYPE_BINARY;
+
+                    case SQL_VARBINARY:
+                        return DOCUMENTDB_JDBC_TYPE_VARBINARY;
+
+                    case SQL_LONGVARBINARY:
+                        return DOCUMENTDB_JDBC_TYPE_LONGVARBINARY;
+                        // return IGNITE_TYPE_BINARY;
+
+                    case SQL_BIT:
+                        // return IGNITE_TYPE_BOOL;
+                        return DOCUMENTDB_JDBC_TYPE_BOOLEAN;
+
+                    case SQL_TYPE_NULL:
+                        return DOCUMENTDB_JDBC_TYPE_NULL;
+
 
                     default:
-                        break;
+                        return DOCUMENTDB_JDBC_TYPE_BINARY;
                 }
-
-                return -1;
             }
 
             OdbcNativeType::Type ToDriverType(int16_t type)
