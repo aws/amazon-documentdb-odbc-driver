@@ -323,10 +323,10 @@ namespace ignite
                         return DOCUMENTDB_JDBC_TYPE_CHAR;
 
                     case SQL_VARCHAR:
+                        // return IGNITE_TYPE_STRING;
                         return DOCUMENTDB_JDBC_TYPE_VARCHAR;
 
                     case SQL_LONGVARCHAR:
-                        // return IGNITE_TYPE_STRING;
                         return DOCUMENTDB_JDBC_TYPE_LONGVARCHAR;
 
 
