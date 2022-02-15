@@ -362,7 +362,8 @@ namespace ignite
                 }
             }
 
-            int16_t BinaryToSqlType(int8_t binaryType)
+            //int16_t BinaryToSqlType(int8_t binaryType)
+            int16_t BinaryToSqlType(int16_t binaryType)
             {
                 using namespace ignite::impl::binary;
                 switch (binaryType)
@@ -384,7 +385,7 @@ namespace ignite
                         return SQL_SMALLINT;
 
                     //case IGNITE_TYPE_INT:
-                    case DOCUMENTDB_JDBC_TYPE_INT:
+                    case DOCUMENTDB_JDBC_TYPE_INTEGER:
                         return SQL_INTEGER;
 
                     //case IGNITE_TYPE_LONG:

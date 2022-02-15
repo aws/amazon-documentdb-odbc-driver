@@ -191,7 +191,8 @@ namespace ignite
              * @param sqlType SQL type.
              * @return Binary type.
              */
-            int8_t SqlTypeToBinary(int16_t sqlType);
+            //int8_t SqlTypeToBinary(int16_t sqlType); // todo remove -al-
+            int16_t SqlTypeToBinary(int16_t sqlType);
 
             /**
              * Convert ODBC type to driver type alias.
