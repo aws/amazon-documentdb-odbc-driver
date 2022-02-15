@@ -64,6 +64,7 @@ set(SOURCES
          ../odbc/src/config/connection_info.cpp
          ../odbc/src/config/connection_string_parser.cpp
          ../odbc/src/connection.cpp
+         ../odbc/src/driverInstance.cpp
          ../odbc/src/cursor.cpp
          ../odbc/src/diagnostic/diagnosable_adapter.cpp
          ../odbc/src/diagnostic/diagnostic_record_storage.cpp

@@ -46,9 +46,7 @@
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/builder/stream/helpers.hpp>
 #include <mongocxx/client.hpp>
-#include <mongocxx/instance.hpp>
 #include <mongocxx/uri.hpp>
-#include <bsoncxx/stdx/make_unique.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <bsoncxx/stdx/string_view.hpp>
 
@@ -235,7 +233,7 @@ namespace ignite
                 if (errInfo.code != java::IGNITE_JNI_ERR_SUCCESS) {
                     // TODO: Determine if we need to error check the close.
                 }
-                connection = nullptr;
+                connection = nullptr; 
             }
             Deinit();
         }
@@ -808,7 +806,8 @@ namespace ignite
             using bsoncxx::builder::basic::kvp;
             using bsoncxx::builder::basic::make_document;
 
-            DriverInstance::instance();
+            //Make sure that the DriverInstance is initialize
+            DriverInstance::getInstance().initialize();
             try {
                 std::string mongoCPPConnectionString =
                     FormatMongoCppConnectionString(localSSHTunnelPort);

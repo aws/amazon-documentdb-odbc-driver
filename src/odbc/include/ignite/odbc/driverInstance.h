@@ -18,43 +18,14 @@
 #ifndef _DOCUMENTDB_ODBC_DRIVER_INSTANCE
 #define _DOCUMENTDB_ODBC_DRIVER_INSTANCE
 
-#include <cstdlib>
-#include <memory>
-
-#include <bsoncxx/stdx/make_unique.hpp>
-#include <bsoncxx/stdx/optional.hpp>
-#include <bsoncxx/stdx/string_view.hpp>
-
-#include <mongocxx/instance.hpp>
-#include <mongocxx/logger.hpp>
-
-
 class DriverInstance {
    public:
-    static DriverInstance& instance() {
-        static DriverInstance instance;
-        return instance;
-    }
+    static DriverInstance& getInstance();
 
-    void initializeInstance() {
-        if (_instance == nullptr) {
-
-            class noop_logger : public mongocxx::logger {
-                public:
-                    virtual void operator()(mongocxx::log_level,
-                                            bsoncxx::stdx::string_view,
-                                            bsoncxx::stdx::string_view) noexcept {}
-            };
-            _instance = bsoncxx::stdx::make_unique<mongocxx::instance>(bsoncxx::stdx::make_unique<noop_logger>());
-        }
-    }
+    void initialize();
 
    private:
-    DriverInstance() {
-        initializeInstance();
-    }
-
-    std::unique_ptr<mongocxx::instance> _instance = nullptr;
+    DriverInstance() = default;
 };
 
 #endif //_DOCUMENTDB_ODBC_DRIVER_INSTANCE

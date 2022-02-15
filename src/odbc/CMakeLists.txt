@@ -45,6 +45,7 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/config/connection_info.cpp
         src/config/connection_string_parser.cpp
         src/connection.cpp
+        src/driverInstance.cpp
         src/cursor.cpp
         src/diagnostic/diagnosable_adapter.cpp
         src/diagnostic/diagnostic_record.cpp
