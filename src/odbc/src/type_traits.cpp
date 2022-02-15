@@ -185,31 +185,33 @@ namespace ignite
             {
                 switch (type)
                 {
+
+                    case SQL_BIT:
+                    case SQL_TINYINT:
+                    case SQL_SMALLINT:
+                    case SQL_BIGINT:
+                    case SQL_INTEGER:
+                    case SQL_FLOAT:
+                    case SQL_REAL:
+                    case SQL_DOUBLE:
+                    case SQL_NUMERIC:
+                    case SQL_DECIMAL:
                     case SQL_CHAR:
                     case SQL_VARCHAR:
                     case SQL_LONGVARCHAR:
-                    case SQL_SMALLINT:
-                    case SQL_INTEGER:
-                    case SQL_FLOAT:
-                    case SQL_DOUBLE:
-                    case SQL_BIT:
-                    case SQL_TINYINT:
-                    case SQL_BIGINT:
-                    case SQL_BINARY:
-                    case SQL_VARBINARY:
-                    case SQL_LONGVARBINARY:
-                    case SQL_GUID:
-                    case SQL_DECIMAL:
                     case SQL_TYPE_DATE:
                     case SQL_TYPE_TIMESTAMP:
                     case SQL_TYPE_TIME:
+                    case SQL_BINARY:
+                    case SQL_VARBINARY:
+                    case SQL_LONGVARBINARY:
+                    case SQL_TYPE_NULL:
                         return true;
 
                     case SQL_WCHAR:
                     case SQL_WVARCHAR:
                     case SQL_WLONGVARCHAR:
-                    case SQL_REAL:
-                    case SQL_NUMERIC:
+                    case SQL_GUID:
                     case SQL_INTERVAL_MONTH:
                     case SQL_INTERVAL_YEAR:
                     case SQL_INTERVAL_YEAR_TO_MONTH:
@@ -235,6 +237,10 @@ namespace ignite
 
                 switch (sqlType)
                 {
+                    case SQL_BIT:
+                        // return IGNITE_TYPE_BOOL;
+                        return DOCUMENTDB_JDBC_TYPE_BOOLEAN;
+
                     case SQL_TINYINT:
                         //return IGNITE_TYPE_BYTE;
                         return DOCUMENTDB_JDBC_TYPE_TINYINT;
@@ -302,10 +308,6 @@ namespace ignite
                     case SQL_LONGVARBINARY:
                         return DOCUMENTDB_JDBC_TYPE_LONGVARBINARY;
                         // return IGNITE_TYPE_BINARY;
-
-                    case SQL_BIT:
-                        // return IGNITE_TYPE_BOOL;
-                        return DOCUMENTDB_JDBC_TYPE_BOOLEAN;
 
                     case SQL_TYPE_NULL:
                         return DOCUMENTDB_JDBC_TYPE_NULL;
