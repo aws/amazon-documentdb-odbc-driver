@@ -33,6 +33,7 @@ jobs:
         brew install cmake
         brew install openssl
         brew install boost
+        brew install mongo-cxx-driver
     - name: set-PATH
       run: |
         export PATH=/Library/Developer/CommandLineTools/usr/bin:$PATH
