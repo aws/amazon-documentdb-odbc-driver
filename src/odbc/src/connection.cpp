@@ -41,12 +41,14 @@
 #include "ignite/odbc/jni/documentdb_connection.h"
 #include "ignite/odbc/jni/database_metadata.h"
 
-using namespace ignite::odbc::jni::java;
 using namespace ignite::odbc::common;
 using namespace ignite::odbc::common::concurrent;
 using ignite::odbc::IgniteError;
 using ignite::odbc::jni::DocumentDbConnection;
 using ignite::odbc::jni::DatabaseMetaData;
+using ignite::odbc::jni::java::BuildJvmOptions;
+using ignite::odbc::jni::java::JniErrorCode;
+using ignite::odbc::jni::java::JniHandlers;
 
 // Uncomment for per-byte debug.
 //#define PER_BYTE_DEBUG

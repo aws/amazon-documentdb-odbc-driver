@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
+#include <ignite/odbc/log.h>
 #include <ignite/odbc/common/platform_utils.h>
 #include <ignite/odbc/ignite_error.h>
 #include <ignite/odbc/jni/documentdb_connection.h>
 #include <ignite/odbc/jni/utils.h>
 
-using namespace ignite::odbc::jni::java;
+using ignite::odbc::jni::java::JniErrorCode;
 using ignite::odbc::common::GetEnv;
 using ignite::odbc::jni::java::JniErrorInfo;
 using ignite::odbc::jni::FormatJdbcConnectionString;
@@ -32,18 +33,19 @@ namespace ignite {
                                             JniErrorInfo& errInfo) {
                 bool connected = false;
 
+                if (!_jniContext.IsValid()) {
+                    errInfo.errMsg =
+                        new char[]{"Unable to get initialized JVM."};
+                    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_JVM_INIT;
+                    return errInfo.code;
+                }
                 if (_connection.IsValid()) {
                     return JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
                 }
 
-                std::string connectionString = FormatJdbcConnectionString(config);
+                std::string connectionString =
+                    FormatJdbcConnectionString(config);
 
-                if (!_jniContext.IsValid()) {
-                    errInfo.errMsg = new char[]{"Unable to get initialized JVM."};
-                    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_JVM_INIT;
-                    return errInfo.code;
-                }
-     
                 SharedPointer< GlobalJObject > result;
                 JniErrorCode success = _jniContext.Get()->DriverManagerGetConnection(
                     connectionString.c_str(), result, errInfo);
@@ -61,6 +63,9 @@ namespace ignite {
             JniErrorCode DocumentDbConnection::Close(JniErrorInfo& errInfo) {
                 if (_connection.Get() != nullptr) {
                     _jniContext.Get()->ConnectionClose(_connection, errInfo);
+                    if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+                        LOG_MSG(errInfo.errMsg);
+                    }
                     _connection = nullptr;
                     return errInfo.code;
                 }
