@@ -1027,17 +1027,17 @@ namespace ignite
 
                     JNIEnv* env = Attach();
                     jstring jCatalog = env->NewStringUTF(catalog.c_str());
-                    jstring jSchemaPattern =
-                        env->NewStringUTF(schemaPattern.c_str());
-                    jstring jTableNamePattern =
-                        env->NewStringUTF(tableNamePattern.c_str());
-                    jstring jColumnNamePattern =
-                        env->NewStringUTF(columnNamePattern.c_str());
+                    jstring jSchemaPattern = env->NewStringUTF(schemaPattern.c_str());
+                    jstring jTableNamePattern = env->NewStringUTF(tableNamePattern.c_str());
+                    jstring jColumnNamePattern = env->NewStringUTF(columnNamePattern.c_str());
 
                     jobject result = env->CallObjectMethod(
                         databaseMetaData.Get()->GetRef(),
-                        jvm->GetMembers().m_DatabaseMetaDataGetColumns, jCatalog,
-                        jSchemaPattern, jTableNamePattern, jColumnNamePattern);
+                        jvm->GetMembers().m_DatabaseMetaDataGetColumns,
+                        jCatalog,
+                        jSchemaPattern,
+                        jTableNamePattern,
+                        jColumnNamePattern);
                     ExceptionCheck(env, &errInfo);
 
                     if (!result 
