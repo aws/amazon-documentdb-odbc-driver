@@ -24,10 +24,12 @@ if (WIN32)
 endif()
 
 find_package(Boost 1.53 REQUIRED COMPONENTS unit_test_framework chrono thread system regex)
+find_package(mongocxx REQUIRED)
+find_package(bsoncxx REQUIRED)
 
 find_package(ODBC REQUIRED)
 
-include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS})
+include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS} ${BSONCXX_INCLUDE_DIRS})
 include_directories(include ../odbc/include)
 if (WIN32)
     include_directories(../odbc/os/win/include)
@@ -39,11 +41,11 @@ endif()
 set(SOURCES 
          src/configuration_test.cpp
          src/connection_test.cpp
-         src/dummy_test.cpp
          src/java_test.cpp
          src/jni_test.cpp
          src/odbc_test_suite.cpp
-         src/test_utils.cpp     
+         src/test_utils.cpp
+         src/dummy_test.cpp
          ../odbc/src/app/application_data_buffer.cpp
          ../odbc/src/common_types.cpp
          ../odbc/src/common/big_integer.cpp
@@ -63,6 +65,7 @@ set(SOURCES
          ../odbc/src/config/connection_info.cpp
          ../odbc/src/config/connection_string_parser.cpp
          ../odbc/src/connection.cpp
+         ../odbc/src/driverInstance.cpp
          ../odbc/src/cursor.cpp
          ../odbc/src/diagnostic/diagnosable_adapter.cpp
          ../odbc/src/diagnostic/diagnostic_record_storage.cpp
@@ -126,10 +129,15 @@ endif()
 add_executable(${TARGET} ${SOURCES})
 
 target_link_libraries(${TARGET} ${ODBC_LIBRARIES})
-target_link_libraries(${TARGET} ${Boost_LIBRARIES} ignite)
+target_link_libraries(${TARGET} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} ignite mongo::mongocxx_shared)
 target_code_coverage(${TARGET}  PUBLIC AUTO ALL)
 
 if (WIN32)
+    if (MSVC)
+        # On Windows, min() and max() are defined macro. This causes a colision with MONGOCXX library.
+        # See: http://www.suodenjoki.dk/us/archive/2010/min-max.htm
+        add_definitions(-DNOMINMAX)
+    endif()
     remove_definitions(-DUNICODE=1)
     add_definitions(-DTARGET_MODULE_FULL_NAME="$<TARGET_FILE_NAME:${TARGET}>")
     if (MSVC_VERSION GREATER_EQUAL 1900)
