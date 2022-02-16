@@ -101,9 +101,8 @@ namespace ignite
 
                 /**
                  * Read using reader.
-                 * @param reader Reader.
+                 * @param resultSet SharedPointer< ResultSet >.
                  */
-                void Read(ignite::impl::binary::BinaryReaderImpl& reader);
                 void Read(SharedPointer< ResultSet >& resultSet, JniErrorInfo& errInfo);
 
                 /**
@@ -172,10 +171,9 @@ namespace ignite
 
             /**
              * Read tables metadata collection.
-             * @param reader Reader.
+             * @param resultSet SharedPointer< ResultSet >.
              * @param meta Collection.
              */
-            void ReadTableMetaVector(ignite::impl::binary::BinaryReaderImpl& reader, TableMetaVector& meta);
             void ReadTableMetaVector(
                 SharedPointer< ResultSet >& resultSet,
                 TableMetaVector& meta);
