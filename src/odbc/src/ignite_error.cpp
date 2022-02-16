@@ -20,7 +20,7 @@
 #include <ignite/odbc/common/utils.h>
 
 using namespace ignite::odbc::common;
-using namespace ignite::odbc::java;
+using namespace ignite::odbc::jni::java;
 
 namespace ignite
 {
@@ -28,7 +28,7 @@ namespace ignite
     {
         void IgniteError::ThrowIfNeeded(const IgniteError& err)
         {
-            if (err.code != IGNITE_SUCCESS)
+        if (err.code != IGNITE_SUCCESS)
                 throw err;
         }
 
@@ -97,11 +97,11 @@ namespace ignite
             return GetText();
         }
 
-        void IgniteError::SetError(const int jniCode, const char* jniCls, const char* jniMsg, IgniteError& err)
+        void IgniteError::SetError(const JniErrorCode jniCode, const char* jniCls, const char* jniMsg, IgniteError& err)
         {
-            if (jniCode == IGNITE_JNI_ERR_SUCCESS)
+            if (jniCode == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
                 err = IgniteError();
-            else if (jniCode == IGNITE_JNI_ERR_GENERIC)
+            else if (jniCode == JniErrorCode::IGNITE_JNI_ERR_GENERIC)
             {
                 // The most common case when we have Java exception "in hands" and must map it to respective code.
                 if (jniCls)
@@ -197,9 +197,7 @@ namespace ignite
                     // JNI class name is not available. Something really weird.
                     err = IgniteError(IGNITE_ERR_UNKNOWN);
                 }
-            }
-            else if (jniCode == IGNITE_JNI_ERR_JVM_INIT)
-            {
+            } else if (jniCode == JniErrorCode::IGNITE_JNI_ERR_JVM_INIT) {
                 std::stringstream stream;
 
                 stream << "Failed to initialize JVM [errCls=";
@@ -219,9 +217,10 @@ namespace ignite
                 stream << "]";
 
                 err = IgniteError(IGNITE_ERR_JVM_INIT, stream.str().c_str());
+            } else if (jniCode == JniErrorCode::IGNITE_JNI_ERR_JVM_ATTACH) {
+                err = IgniteError(IGNITE_ERR_JVM_ATTACH,
+                                  "Failed to attach to JVM.");
             }
-            else if (jniCode == IGNITE_JNI_ERR_JVM_ATTACH)
-                err = IgniteError(IGNITE_ERR_JVM_ATTACH, "Failed to attach to JVM.");
         }
     }
 }

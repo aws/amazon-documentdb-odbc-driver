@@ -42,6 +42,7 @@ set(SOURCES
          src/configuration_test.cpp
          src/connection_test.cpp
          src/java_test.cpp
+         src/jni_test.cpp
          src/odbc_test_suite.cpp
          src/test_utils.cpp
          src/dummy_test.cpp
@@ -72,7 +73,10 @@ set(SOURCES
          ../odbc/src/dsn_config.cpp
          ../odbc/src/environment.cpp
          ../odbc/src/ignite_error.cpp
+         ../odbc/src/jni/database_metadata.cpp
+         ../odbc/src/jni/documentdb_connection.cpp
          ../odbc/src/jni/java.cpp
+         ../odbc/src/jni/result_set.cpp
          ../odbc/src/log.cpp
          ../odbc/src/message.cpp
          ../odbc/src/meta/column_meta.cpp
