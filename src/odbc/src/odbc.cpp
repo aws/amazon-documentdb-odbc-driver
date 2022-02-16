@@ -165,7 +165,7 @@ namespace ignite
 
         *stmt = SQL_NULL_HDBC;
 
-        Connection *connection = reinterpret_cast<Connection*>(conn);
+        auto connection = static_cast<Connection*>(conn);
 
         if (!connection)
             return SQL_INVALID_HANDLE;
