@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include <ignite/odbc/log.h>
 #include <ignite/odbc/common/concurrent.h>
 #include <ignite/odbc/jni/java.h>
 #include <ignite/odbc/jni/result_set.h>
@@ -44,6 +45,9 @@ namespace ignite {
                 if (_jniContext.IsValid() && _resultSet.IsValid()) {
                     JniErrorCode success =
                         _jniContext.Get()->ResultSetClose(_resultSet, errInfo);
+                    if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+                        LOG_MSG(errInfo.errMsg);
+                    }
                     _resultSet = nullptr;
                     return success;
                 }

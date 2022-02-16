@@ -25,7 +25,7 @@ using ignite::odbc::jni::java::GlobalJObject;
 using ignite::odbc::jni::java::JniContext;
 using ignite::odbc::jni::java::JniErrorInfo;
 using ignite::odbc::jni::ResultSet;
-using namespace ignite::odbc::jni::java;
+using ignite::odbc::jni::java::JniErrorCode;
 
 
 namespace ignite {

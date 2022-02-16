@@ -45,7 +45,6 @@ using namespace boost::unit_test;
 using ignite::odbc::OdbcTestSuite;
 using ignite_test::GetOdbcErrorMessage;
 
-using namespace ignite::odbc::jni::java;
 using ignite::odbc::Connection;
 using ignite::odbc::common::ReleaseChars;
 using ignite::odbc::common::concurrent::SharedPointer;
@@ -58,6 +57,7 @@ using ignite::odbc::jni::DocumentDbConnection;
 using ignite::odbc::jni::ResultSet;
 using ignite::odbc::jni::java::BuildJvmOptions;
 using ignite::odbc::jni::java::JniHandlers;
+using ignite::odbc::jni::java::JniErrorCode;
 using ignite::odbc::jni::java::JniErrorInfo;
 
 /**

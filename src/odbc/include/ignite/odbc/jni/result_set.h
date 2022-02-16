@@ -26,7 +26,7 @@ using ignite::odbc::common::concurrent::SharedPointer;
 using ignite::odbc::jni::java::GlobalJObject;
 using ignite::odbc::jni::java::JniContext;
 using ignite::odbc::jni::java::JniErrorInfo;
-using namespace ignite::odbc::jni::java;
+using ignite::odbc::jni::java::JniErrorCode;
 
 namespace ignite {
     namespace odbc {
