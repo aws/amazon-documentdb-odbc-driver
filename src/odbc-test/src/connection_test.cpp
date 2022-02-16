@@ -29,17 +29,15 @@
 #include "test_utils.h"
 #include "odbc_test_suite.h"
 
-using namespace ignite;
-using namespace ignite_test;
-
-using namespace boost::unit_test;
+using ignite::odbc::OdbcTestSuite;
+using ignite_test::GetOdbcErrorMessage;
 
 /**
  * Test setup fixture.
  */
-struct ConnectionTestSuiteFixture: odbc::OdbcTestSuite
+struct ConnectionTestSuiteFixture: OdbcTestSuite
 {
-    using odbc::OdbcTestSuite::OdbcTestSuite;
+    using OdbcTestSuite::OdbcTestSuite;
 
     /**
      * Execute the query and return an error code.
@@ -89,7 +87,6 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestore)
 {
     std::string connectionString;
     CreateDsnConnectionString(connectionString);
-
     Connect(connectionString);
     Disconnect();
 }

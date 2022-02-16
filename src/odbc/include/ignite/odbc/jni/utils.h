@@ -19,8 +19,10 @@
 
 #include <string>
 
+#include <ignite/odbc/config/configuration.h>
 #include <ignite/odbc/common/common.h>
 #include <ignite/odbc/common/concurrent.h>
+#include <ignite/odbc/common/platform_utils.h>
 #include <ignite/odbc/jni/java.h>
 
 namespace ignite
@@ -171,6 +173,60 @@ namespace ignite
               * @return Classpath.
               */
             IGNITE_IMPORT_EXPORT std::string CreateDocumentDbClasspath(const std::string& usrCp, const std::string& home);
+
+            /**
+             * Formats the JDBC connection string from configuration values.
+             * @return the JDBC connection string.
+             */
+            inline std::string FormatJdbcConnectionString(
+                const config::Configuration& config) {
+                std::string host = "localhost";
+                std::string port = "27017";
+                std::string jdbConnectionString;
+
+                if (config.IsHostnameSet()) {
+                    host = config.GetHostname();
+                }
+
+                if (config.IsPortSet()) {
+                    port = std::to_string(config.GetPort());
+                }
+
+                jdbConnectionString = "jdbc:documentdb:";
+                jdbConnectionString.append("//" + config.GetUser());
+                jdbConnectionString.append(":" + config.GetPassword());
+                jdbConnectionString.append("@" + host);
+                jdbConnectionString.append(":" + port);
+                jdbConnectionString.append("/" + config.GetDatabase());
+                jdbConnectionString.append("?tlsAllowInvalidHostnames=true");
+
+                // Check if internal SSH tunnel should be enabled.
+                // TODO: Remove use of environment variables and use DSN
+                // properties
+                std::string sshUserAtHost = common::GetEnv("DOC_DB_USER", "");
+                std::string sshRemoteHost = common::GetEnv("DOC_DB_HOST", "");
+                std::string sshPrivKeyFile = common::GetEnv("DOC_DB_PRIV_KEY_FILE", "");
+                std::string sshUser;
+                std::string sshTunnelHost;
+                size_t indexOfAt = sshUserAtHost.find_first_of('@');
+                if (indexOfAt != std::string::npos
+                    && sshUserAtHost.size() > (indexOfAt + 1)) {
+                    sshUser = sshUserAtHost.substr(0, indexOfAt);
+                    sshTunnelHost = sshUserAtHost.substr(indexOfAt + 1);
+                }
+                if (!sshUserAtHost.empty() && !sshRemoteHost.empty()
+                    && !sshPrivKeyFile.empty() && !sshUser.empty()
+                    && !sshTunnelHost.empty()) {
+                    jdbConnectionString.append("&sshUser=" + sshUser);
+                    jdbConnectionString.append("&sshHost=" + sshTunnelHost);
+                    jdbConnectionString.append("&sshPrivateKeyFile="
+                                               + sshPrivKeyFile);
+                    jdbConnectionString.append(
+                        "&sshStrictHostKeyChecking=false");
+                }
+
+                return jdbConnectionString;
+            }
 
             /**
               * Resolve DOCUMENTDB_HOME directory. Resolution is performed in several
