@@ -20,6 +20,8 @@
 #include "ignite/odbc/system/odbc_constants.h"
 #include "ignite/odbc/type_traits.h"
 
+using namespace ignite::impl::binary;
+
 namespace ignite
 {
     namespace odbc
@@ -117,8 +119,6 @@ namespace ignite
             //const std::string& BinaryTypeToSqlTypeName(int8_t binaryType)
             const std::string& BinaryTypeToSqlTypeName(int16_t binaryType)
             {
-                using namespace ignite::impl::binary;
-
                 switch (binaryType)
                 {
                 case DOCUMENTDB_JDBC_TYPE_BIT:
@@ -284,9 +284,7 @@ namespace ignite
 
             //int8_t SqlTypeToBinary(int16_t sqlType)
             int16_t SqlTypeToBinary(int16_t sqlType)
-            { // TODO make them return JDBC types instead of Ignite types
-                using namespace ignite::impl::binary;
-
+            {
                 switch (sqlType)
                 {
                     case SQL_BIT:
@@ -337,6 +335,9 @@ namespace ignite
                     case SQL_LONGVARCHAR:
                         return DOCUMENTDB_JDBC_TYPE_LONGVARCHAR;
 
+                    // SQL_GUID not implemented in sqltypetoBinary function
+                    //case SQL_GUID:
+                    //    return IGNITE_TYPE_UUID;
 
                     case SQL_TYPE_DATE:
                         //return IGNITE_TYPE_DATE;
@@ -447,7 +448,6 @@ namespace ignite
             //int16_t BinaryToSqlType(int8_t binaryType)
             int16_t BinaryToSqlType(int16_t binaryType)
             {
-                using namespace ignite::impl::binary;
                 switch (binaryType)
                 { // -AL- here, we need to pass in DOCUMENTDB_JDBC type (so not really IGNITE_TYPE)
                   // TODO remove commented out code
@@ -693,7 +693,6 @@ namespace ignite
             int32_t BinaryTypeColumnSize(int16_t type) {
                 
                 switch (type) {
-                    // todo add column_size map to here -AL-
                     case DOCUMENTDB_JDBC_TYPE_DECIMAL:
                     case DOCUMENTDB_JDBC_TYPE_NUMERIC:
                         return 646456995;
