@@ -268,7 +268,8 @@ namespace ignite
              * @param type Binary type.
              * @return Column size.
              */
-            int32_t BinaryTypeColumnSize(int8_t type);
+            /*int32_t BinaryTypeColumnSize(int8_t type);*/
+            int32_t BinaryTypeColumnSize(int16_t type);
 
             /**
              * Get SQL type transfer octet length.

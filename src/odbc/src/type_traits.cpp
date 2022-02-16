@@ -683,11 +683,45 @@ namespace ignite
                 }
             }
 
-            int32_t BinaryTypeColumnSize(int8_t type)
-            {
-                int16_t sqlType = BinaryToSqlType(type);
+            //int32_t BinaryTypeColumnSize(int8_t type)
+            //{
+            //    int16_t sqlType = BinaryToSqlType(type);
 
-                return SqlTypeColumnSize(sqlType);
+            //    return SqlTypeColumnSize(sqlType);
+            //}
+
+            int32_t BinaryTypeColumnSize(int16_t type) {
+                
+                switch (type) {
+                    // todo add column_size map to here -AL-
+                    case DOCUMENTDB_JDBC_TYPE_DECIMAL:
+                    case DOCUMENTDB_JDBC_TYPE_NUMERIC:
+                        return 646456995;
+
+                    case DOCUMENTDB_JDBC_TYPE_FLOAT:
+                    case DOCUMENTDB_JDBC_TYPE_REAL:
+                    case DOCUMENTDB_JDBC_TYPE_DOUBLE:
+                        return 23;
+
+                    case DOCUMENTDB_JDBC_TYPE_BIGINT:
+                        return 20;
+
+                    case DOCUMENTDB_JDBC_TYPE_INTEGER:
+                        return 11;
+
+                    case DOCUMENTDB_JDBC_TYPE_SMALLINT:
+                        return 6;
+
+                    case DOCUMENTDB_JDBC_TYPE_TINYINT:
+                        return 4;
+
+                    case DOCUMENTDB_JDBC_TYPE_VARBINARY:
+                    case DOCUMENTDB_JDBC_TYPE_VARCHAR:
+                        return 65536;
+
+                    default:
+                        return 0;
+                }
             }
 
             int32_t SqlTypeTransferLength(int16_t type)
