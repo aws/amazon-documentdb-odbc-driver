@@ -45,14 +45,14 @@ namespace ignite {
                 /**
                  * Closes the current ResultSet object.
                  *
-                 * @returns a JniErrorCode indicating success or failure.
+                 * @return a JniErrorCode indicating success or failure.
                  */
                 JniErrorCode Close(JniErrorInfo& errInfo);
 
                 /**
                  * Gets an indicator of whether the ResultSet is open.
                  *
-                 * @returns true if open, false, otherwise.
+                 * @return true if open, false, otherwise.
                  */
                 bool IsOpen() {
                     return _resultSet.IsValid();
@@ -62,7 +62,7 @@ namespace ignite {
                  * Attempts to position the cursor to the next record in the result set.
                  * If the cursor moves, the hasNext variable will be true, false, otherwise.
                  *
-                 * @returns a JniErrorCode indicating success or failure.
+                 * @return a JniErrorCode indicating success or failure.
                  */
                 JniErrorCode Next(bool& hasNext, JniErrorInfo& errInfo);
 
@@ -72,7 +72,7 @@ namespace ignite {
                  * is set. If the value is null, the wasNull will be set to
                  * true, false, otherwise.
                  *
-                 * @returns a JniErrorCode indicating success or failure.
+                 * @return a JniErrorCode indicating success or failure.
                  */
                 JniErrorCode GetString(const int columnIndex,
                                        std::string& value, bool& wasNull,
@@ -84,7 +84,7 @@ namespace ignite {
                  * is set. If the value is null, the wasNull will be set to
                  * true, false, otherwise.
                  *
-                 * @returns a JniErrorCode indicating success or failure.
+                 * @return a JniErrorCode indicating success or failure.
                  */
                 JniErrorCode GetString(const std::string& columnName,
                                        std::string& value, bool& wasNull,
@@ -96,7 +96,7 @@ namespace ignite {
                  * is set. If the value is null, the wasNull will be set to
                  * true, false, otherwise.
                  *
-                 * @returns a JniErrorCode indicating success or failure.
+                 * @return a JniErrorCode indicating success or failure.
                  */
                 JniErrorCode GetInt(const int columnIndex, int& value,
                                     bool& wasNull,
@@ -108,7 +108,7 @@ namespace ignite {
                  * is set. If the value is null, the wasNull will be set to
                  * true, false, otherwise.
                  *
-                 * @returns a JniErrorCode indicating success or failure.
+                 * @return a JniErrorCode indicating success or failure.
                  */
                 JniErrorCode GetInt(const std::string& columnName, int& value,
                                bool& wasNull, JniErrorInfo& errInfo);
@@ -117,8 +117,8 @@ namespace ignite {
                 /**
                  * Constructs a new instancee of ResultSet.
                  */
-                ResultSet(SharedPointer< JniContext > jniContext,
-                          SharedPointer< GlobalJObject > resultSet);
+                ResultSet(SharedPointer< JniContext >& jniContext,
+                          SharedPointer< GlobalJObject >& resultSet);
 
                 /** The JNI context */
                 SharedPointer< JniContext > _jniContext;

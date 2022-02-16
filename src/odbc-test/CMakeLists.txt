@@ -42,6 +42,7 @@ set(SOURCES
          src/dummy_test.cpp
          src/java_test.cpp
          src/jni_test.cpp
+         src/meta_queries_test.cpp
          src/odbc_test_suite.cpp
          src/test_utils.cpp     
          ../odbc/src/app/application_data_buffer.cpp

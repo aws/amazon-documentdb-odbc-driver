@@ -55,16 +55,6 @@ using namespace boost::unit_test;
 struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite
 {
     /**
-     * Start additional node with the specified name.
-     *
-     * @param name Node name.
-     */
-    static Ignite StartAdditionalNode(const char* name)
-    {
-        return StartPlatformNode("queries-test.xml", name);
-    }
-
-    /**
      * Checks single row result set for correct work with SQLGetData.
      *
      * @param stmt Statement.
@@ -125,10 +115,6 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite
         cache1(0),
         cache2(0)
     {
-        grid = StartPlatformNode("queries-test.xml", "NodeMain");
-
-        cache1 = grid.GetCache<int64_t, TestType>("cache");
-        cache2 = grid.GetCache<int64_t, ComplexType>("cache2");
     }
 
     /**
@@ -357,8 +343,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite
 
 BOOST_FIXTURE_TEST_SUITE(MetaQueriesTestSuite, MetaQueriesTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestGetTypeInfoAllTypes)
-{
+BOOST_AUTO_TEST_CASE(TestGetTypeInfoAllTypes, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
     SQLRETURN ret = SQLGetTypeInfo(stmt, SQL_ALL_TYPES);
@@ -367,8 +352,7 @@ BOOST_AUTO_TEST_CASE(TestGetTypeInfoAllTypes)
         BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 }
 
-BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeCurdate)
-{
+BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeCurdate, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
     SQLCHAR req[] = "select CURDATE()";
@@ -384,8 +368,7 @@ BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeCurdate)
     BOOST_CHECK_EQUAL(intVal, SQL_TYPE_DATE);
 }
 
-BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeLiteral)
-{
+BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeLiteral, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
     SQLCHAR req[] = "select DATE '2020-10-25'";
@@ -401,8 +384,7 @@ BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeLiteral)
     BOOST_CHECK_EQUAL(intVal, SQL_TYPE_DATE);
 }
 
-BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeField)
-{
+BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeField, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
     SQLCHAR req[] = "select CAST (dateField as DATE) from TestType";
@@ -418,8 +400,7 @@ BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeField)
     BOOST_CHECK_EQUAL(intVal, SQL_TYPE_DATE);
 }
 
-BOOST_AUTO_TEST_CASE(TestTimeTypeColumnAttributeLiteral)
-{
+BOOST_AUTO_TEST_CASE(TestTimeTypeColumnAttributeLiteral, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
     SQLCHAR req[] = "select TIME '12:42:13'";
@@ -435,8 +416,7 @@ BOOST_AUTO_TEST_CASE(TestTimeTypeColumnAttributeLiteral)
     BOOST_CHECK_EQUAL(intVal, SQL_TYPE_TIME);
 }
 
-BOOST_AUTO_TEST_CASE(TestTimeTypeColumnAttributeField)
-{
+BOOST_AUTO_TEST_CASE(TestTimeTypeColumnAttributeField, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
     SQLCHAR req[] = "select timeField from TestType";
@@ -452,8 +432,7 @@ BOOST_AUTO_TEST_CASE(TestTimeTypeColumnAttributeField)
     BOOST_CHECK_EQUAL(intVal, SQL_TYPE_TIME);
 }
 
-BOOST_AUTO_TEST_CASE(TestColAttributesColumnLength)
-{
+BOOST_AUTO_TEST_CASE(TestColAttributesColumnLength, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
     SQLCHAR req[] = "select strField from TestType";
@@ -471,8 +450,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnLength)
     BOOST_CHECK_EQUAL(intVal, 60);
 }
 
-BOOST_AUTO_TEST_CASE(TestColAttributesColumnPresicion)
-{
+BOOST_AUTO_TEST_CASE(TestColAttributesColumnPresicion, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
     SQLCHAR req[] = "select strField from TestType";
@@ -490,8 +468,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnPresicion)
     BOOST_CHECK_EQUAL(intVal, 60);
 }
 
-BOOST_AUTO_TEST_CASE(TestColAttributesColumnScale)
-{
+BOOST_AUTO_TEST_CASE(TestColAttributesColumnScale, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
     SQLCHAR req[] = "select strField from TestType";
@@ -507,10 +484,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnScale)
         BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 }
 
-BOOST_AUTO_TEST_CASE(TestColAttributesColumnLengthPrepare)
-{
-    StartAdditionalNode("Node2");
-
+BOOST_AUTO_TEST_CASE(TestColAttributesColumnLengthPrepare, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
     InsertTestStrings(1);
@@ -540,10 +514,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnLengthPrepare)
     BOOST_CHECK_EQUAL(intVal, 60);
 }
 
-BOOST_AUTO_TEST_CASE(TestColAttributesColumnPresicionPrepare)
-{
-    StartAdditionalNode("Node2");
-
+BOOST_AUTO_TEST_CASE(TestColAttributesColumnPresicionPrepare, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
     InsertTestStrings(1);
@@ -573,9 +544,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnPresicionPrepare)
     BOOST_CHECK_EQUAL(intVal, 60);
 }
 
-BOOST_AUTO_TEST_CASE(TestColAttributesColumnScalePrepare)
-{
-    StartAdditionalNode("Node2");
+BOOST_AUTO_TEST_CASE(TestColAttributesColumnScalePrepare, *disabled()) {
 
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
@@ -602,8 +571,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnScalePrepare)
         BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 }
 
-BOOST_AUTO_TEST_CASE(TestGetDataWithGetTypeInfo)
-{
+BOOST_AUTO_TEST_CASE(TestGetDataWithGetTypeInfo, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
     SQLRETURN ret = SQLGetTypeInfo(stmt, SQL_VARCHAR);
@@ -616,10 +584,13 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithGetTypeInfo)
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTables)
 {
-    Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
+    std::string dsnConnectionString;
+    CreateDsnConnectionString(dsnConnectionString);
+
+    Connect(dsnConnectionString);
 
     SQLCHAR empty[] = "";
-    SQLCHAR table[] = "TestType";
+    SQLCHAR table[] = "test";
 
     SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, table, SQL_NTS, empty, SQL_NTS);
 
@@ -629,8 +600,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTables)
     CheckSingleRowResultSetWithGetData(stmt);
 }
 
-BOOST_AUTO_TEST_CASE(TestGetDataWithColumns)
-{
+BOOST_AUTO_TEST_CASE(TestGetDataWithColumns, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
     SQLCHAR empty[] = "";
@@ -645,8 +615,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumns)
     CheckSingleRowResultSetWithGetData(stmt);
 }
 
-BOOST_AUTO_TEST_CASE(TestGetDataWithSelectQuery)
-{
+BOOST_AUTO_TEST_CASE(TestGetDataWithSelectQuery, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
     SQLCHAR insertReq[] = "insert into TestType(_key, strField) VALUES(1, 'Lorem ipsum')";
@@ -664,8 +633,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithSelectQuery)
     CheckSingleRowResultSetWithGetData(stmt);
 }
 
-BOOST_AUTO_TEST_CASE(TestInsertTooLongValueFail)
-{
+BOOST_AUTO_TEST_CASE(TestInsertTooLongValueFail, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
     SQLCHAR insertReq[] =
@@ -677,8 +645,7 @@ BOOST_AUTO_TEST_CASE(TestInsertTooLongValueFail)
         BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 }
 
-BOOST_AUTO_TEST_CASE(TestGetInfoScrollOptions)
-{
+BOOST_AUTO_TEST_CASE(TestGetInfoScrollOptions, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
     SQLUINTEGER val = 0;
@@ -690,8 +657,7 @@ BOOST_AUTO_TEST_CASE(TestGetInfoScrollOptions)
     BOOST_CHECK_NE(val, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestDdlTablesMeta)
-{
+BOOST_AUTO_TEST_CASE(TestDdlTablesMeta, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
 
     SQLCHAR createTable[] = "create table TestTable(id int primary key, testColumn varchar)";
@@ -723,8 +689,7 @@ BOOST_AUTO_TEST_CASE(TestDdlTablesMeta)
     BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 }
 
-BOOST_AUTO_TEST_CASE(TestDdlTablesMetaTableTypeList)
-{
+BOOST_AUTO_TEST_CASE(TestDdlTablesMetaTableTypeList, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
 
     SQLCHAR createTable[] = "create table TestTable(id int primary key, testColumn varchar)";
@@ -757,8 +722,7 @@ BOOST_AUTO_TEST_CASE(TestDdlTablesMetaTableTypeList)
     BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 }
 
-BOOST_AUTO_TEST_CASE(TestDdlColumnsMeta)
-{
+BOOST_AUTO_TEST_CASE(TestDdlColumnsMeta, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
 
     SQLCHAR createTable[] = "create table TestTable(id int primary key, testColumn varchar)";
@@ -800,8 +764,7 @@ BOOST_AUTO_TEST_CASE(TestDdlColumnsMeta)
     BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 }
 
-BOOST_AUTO_TEST_CASE(TestDdlColumnsMetaEscaped)
-{
+BOOST_AUTO_TEST_CASE(TestDdlColumnsMetaEscaped, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
 
     SQLCHAR createTable[] = "create table ESG_FOCUS(id int primary key, TEST_COLUMN varchar)";
@@ -843,10 +806,7 @@ BOOST_AUTO_TEST_CASE(TestDdlColumnsMetaEscaped)
     BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLNumResultColsAfterSQLPrepare)
-{
-    StartAdditionalNode("Node2");
-
+BOOST_AUTO_TEST_CASE(TestSQLNumResultColsAfterSQLPrepare, *disabled()) {
     Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
 
     SQLRETURN ret = ExecQuery("create table TestSqlPrepare(id int primary key, test1 varchar, test2 long, test3 varchar)");
@@ -885,8 +845,8 @@ BOOST_AUTO_TEST_CASE(TestSQLNumResultColsAfterSQLPrepare)
  * 4. Prepare statement.
  * 5. Check precision and scale of every column using SQLDescribeCol.
  */
-BOOST_AUTO_TEST_CASE(TestSQLDescribeColPrecisionAndScaleAfterPrepare)
-{
+BOOST_AUTO_TEST_CASE(TestSQLDescribeColPrecisionAndScaleAfterPrepare,
+                     *disabled()) {
     CheckSQLDescribeColPrecisionAndScale(&OdbcTestSuite::PrepareQuery);
 }
 
@@ -898,8 +858,8 @@ BOOST_AUTO_TEST_CASE(TestSQLDescribeColPrecisionAndScaleAfterPrepare)
  * 3. Create table with decimal and char columns with specified size and scale.
  * 4. Execute statement.
  * 5. Check precision and scale of every column using SQLDescribeCol. */
-BOOST_AUTO_TEST_CASE(TestSQLDescribeColPrecisionAndScaleAfterExec)
-{
+BOOST_AUTO_TEST_CASE(TestSQLDescribeColPrecisionAndScaleAfterExec,
+                     *disabled()) {
     CheckSQLDescribeColPrecisionAndScale(&OdbcTestSuite::ExecQuery);
 }
 
@@ -912,8 +872,8 @@ BOOST_AUTO_TEST_CASE(TestSQLDescribeColPrecisionAndScaleAfterExec)
  * 4. Prepare statement.
  * 5. Check precision and scale of every column using SQLColAttribute.
  */
-BOOST_AUTO_TEST_CASE(TestSQLColAttributePrecisionAndScaleAfterPrepare)
-{
+BOOST_AUTO_TEST_CASE(TestSQLColAttributePrecisionAndScaleAfterPrepare,
+                     *disabled()) {
     CheckSQLColAttributePrecisionAndScale(&OdbcTestSuite::PrepareQuery);
 }
 
@@ -925,8 +885,8 @@ BOOST_AUTO_TEST_CASE(TestSQLColAttributePrecisionAndScaleAfterPrepare)
  * 3. Create table with decimal and char columns with specified size and scale.
  * 4. Execute statement.
  * 5. Check precision and scale of every column using SQLColAttribute. */
-BOOST_AUTO_TEST_CASE(TestSQLColAttributePrecisionAndScaleAfterExec)
-{
+BOOST_AUTO_TEST_CASE(TestSQLColAttributePrecisionAndScaleAfterExec,
+                     *disabled()) {
     CheckSQLColAttributePrecisionAndScale(&OdbcTestSuite::ExecQuery);
 }
 

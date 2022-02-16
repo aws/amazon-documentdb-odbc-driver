@@ -27,8 +27,8 @@ using ignite::odbc::jni::java::JniErrorInfo;
 namespace ignite {
     namespace odbc {
         namespace jni {
-            ResultSet::ResultSet(SharedPointer< JniContext > jniContext,
-                                SharedPointer< GlobalJObject > resultSet)
+            ResultSet::ResultSet(SharedPointer< JniContext >& jniContext,
+                                SharedPointer< GlobalJObject >& resultSet)
                 : _jniContext(jniContext), _resultSet(resultSet) {
             }
 

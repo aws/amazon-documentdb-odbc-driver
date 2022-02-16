@@ -52,7 +52,7 @@ namespace ignite {
                 /** 
                  * Opens a DocumentDbConnection object given the configuration.
                  * 
-                 * @returns a JniErrorCode indicating success or failure.
+                 * @return a JniErrorCode indicating success or failure.
                  */
                 JniErrorCode Open(const Configuration& config,
                                   JniErrorInfo& errInfo);
@@ -60,7 +60,7 @@ namespace ignite {
                 /**
                  * Closes the current DocumentDbConnection object.
                  *
-                 * @returns a JniErrorCode indicating success or failure.
+                 * @return a JniErrorCode indicating success or failure.
                  */
                 JniErrorCode Close(JniErrorInfo& errInfo);
 
@@ -71,7 +71,7 @@ namespace ignite {
                 /**
                  * Gets the DatbaseMetaData for this connection.
                  *
-                 * @returns a JniErrorCode indicating success or failure.
+                 * @return a JniErrorCode indicating success or failure.
                  */
                 SharedPointer< DatabaseMetaData > GetMetaData(
                     JniErrorInfo& errInfo);
