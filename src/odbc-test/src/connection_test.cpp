@@ -94,6 +94,14 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestore)
     Disconnect();
 }
 
+BOOST_AUTO_TEST_CASE(TestConnectionRestore2) {
+    std::string connectionString;
+    CreateDsnConnectionString(connectionString);
+
+    Connect(connectionString);
+    Disconnect();
+}
+
 BOOST_AUTO_TEST_CASE(TestConnectionInvalidUser) {
     std::string connectionString;
     CreateDsnConnectionString(connectionString, "invaliduser");
