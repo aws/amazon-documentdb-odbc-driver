@@ -473,7 +473,7 @@ namespace ignite {
                       const std::vector< std::string >& types,
                       SharedPointer< GlobalJObject >& resultSet,
                       JniErrorInfo& errInfo);
-                  bool DatabaseMetaDataGetColumns(
+                  JniErrorCode DatabaseMetaDataGetColumns(
                       const SharedPointer< GlobalJObject >& databaseMetaData,
                       const std::string& catalog,
                       const std::string& schemaPattern,
@@ -488,7 +488,7 @@ namespace ignite {
                   JniErrorCode ResultSetGetString(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, std::string& value, bool& wasNull, JniErrorInfo& errInfo);
                   JniErrorCode ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet, int columnIndex, int& value, bool& wasNull, JniErrorInfo& errInfo);
                   JniErrorCode ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet, const std::string& columnName, int& value, bool& wasNull,JniErrorInfo& errInfo);
-                  bool ResultSetGetRow(const SharedPointer< GlobalJObject >& resultSet, int& value, bool& wasNull, JniErrorInfo& errInfo); // todo -AL- update
+                  JniErrorCode ResultSetGetRow(const SharedPointer< GlobalJObject >& resultSet, int& value, bool& wasNull, JniErrorInfo& errInfo); 
                   JniErrorCode ResultSetWasNull(const SharedPointer< GlobalJObject >& resultSet, bool& value, JniErrorInfo& errInfo);
 
                   int64_t TargetInLongOutLong(jobject obj, int type, int64_t memPtr,
