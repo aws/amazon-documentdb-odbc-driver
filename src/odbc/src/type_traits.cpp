@@ -115,7 +115,10 @@ namespace ignite
 
 #undef DBG_STR_CASE
 #endif // _DEBUG
-
+            /**
+             * Warning: if any JDBC Type is added or becomes deprecated on the JDBC side, 
+             * the change should be reflected under this function as well.
+             */
             //const std::string& BinaryTypeToSqlTypeName(int8_t binaryType)
             const std::string& BinaryTypeToSqlTypeName(int16_t binaryType)
             {
@@ -282,6 +285,11 @@ namespace ignite
                 }
             }
 
+            /**
+             * Warning: if any JDBC Type is added or becomes deprecated on the
+             * JDBC side, the change should be reflected under this function as
+             * well.
+             */
             //int8_t SqlTypeToBinary(int16_t sqlType)
             int16_t SqlTypeToBinary(int16_t sqlType)
             {
@@ -445,6 +453,11 @@ namespace ignite
                 }
             }
 
+            /**
+             * Warning: if any JDBC Type is added or becomes deprecated on the
+             * JDBC side, the change should be reflected under this function as
+             * well.
+             */
             //int16_t BinaryToSqlType(int8_t binaryType)
             int16_t BinaryToSqlType(int16_t binaryType)
             {
@@ -689,7 +702,11 @@ namespace ignite
 
             //    return SqlTypeColumnSize(sqlType);
             //}
-
+            /**
+             * Warning: if any JDBC Type mapping to column size is added or 
+             * becomes deprecated on the JDBC side, the change should be 
+             * reflected under this function as well.
+             */
             int32_t BinaryTypeColumnSize(int16_t type) {
                 
                 switch (type) {
