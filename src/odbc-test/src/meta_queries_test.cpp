@@ -59,7 +59,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite
      *
      * @param stmt Statement.
      */
-    void CheckSingleRowResultSetWithGetData(SQLHSTMT stmt)
+    void CheckSingleRowResultSetWithGetData(SQLHSTMT stmt, SQLUSMALLINT columnIndex = 1, const char* expectedValue = nullptr) const
     {
         SQLRETURN ret = SQLFetch(stmt);
 
@@ -69,10 +69,20 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite
         char buf[1024];
         SQLLEN bufLen = sizeof(buf);
 
-        ret = SQLGetData(stmt, 1, SQL_C_CHAR, buf, sizeof(buf), &bufLen);
+        columnIndex = columnIndex >= 1 ? columnIndex : 1;
+        for (int i = 1; i <= columnIndex; i++) {
+            ret = SQLGetData(stmt, columnIndex, SQL_C_CHAR, buf, sizeof(buf),
+                             &bufLen);
 
-        if (!SQL_SUCCEEDED(ret))
-            BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+            if (!SQL_SUCCEEDED(ret))
+                BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+            if (i == columnIndex && expectedValue != nullptr) {
+                std::string actualValueStr = buf;
+                std::string expectedValueStr = expectedValue;
+                BOOST_CHECK(expectedValueStr == actualValueStr);
+            }
+        }
 
         ret = SQLFetch(stmt);
 
@@ -582,7 +592,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithGetTypeInfo, *disabled()) {
     CheckSingleRowResultSetWithGetData(stmt);
 }
 
-BOOST_AUTO_TEST_CASE(TestGetDataWithTables)
+BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOne)
 {
     std::string dsnConnectionString;
     CreateDsnConnectionString(dsnConnectionString);
@@ -597,7 +607,51 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTables)
     if (!SQL_SUCCEEDED(ret))
         BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-    CheckSingleRowResultSetWithGetData(stmt);
+    CheckSingleRowResultSetWithGetData(stmt, 2, "test");
+}
+
+BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsNone) {
+    std::string dsnConnectionString;
+    CreateDsnConnectionString(dsnConnectionString);
+
+    Connect(dsnConnectionString);
+
+    SQLCHAR empty[] = "";
+    SQLCHAR table[] = "nonexistent";
+
+    SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
+                              SQL_NTS, empty, SQL_NTS);
+
+    if (!SQL_SUCCEEDED(ret))
+        BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+    ret = SQLFetch(stmt);
+
+    BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+}
+
+BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsMany) {
+    std::string dsnConnectionString;
+    CreateDsnConnectionString(dsnConnectionString);
+
+    Connect(dsnConnectionString);
+
+    SQLCHAR empty[] = "";
+
+    SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, empty,
+                              SQL_NTS, empty, SQL_NTS);
+
+    if (!SQL_SUCCEEDED(ret))
+        BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+    int count = 0;
+    do {
+        ret = SQLFetch(stmt);
+        count++;
+    } while (SQL_SUCCEEDED(ret));
+    BOOST_CHECK(count > 1);
+
+    BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithColumns, *disabled()) {
