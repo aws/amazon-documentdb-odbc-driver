@@ -93,6 +93,21 @@ namespace ignite {
                 }
                 return new DatabaseMetaData(_jniContext, databaseMetaData);
             }
+
+            JniErrorCode DocumentDbConnection::IsSshTunnelActive(
+                bool& isActive, JniErrorInfo& errInfo) {
+                JniErrorCode success =
+                    _jniContext.Get()->DocumentDbConnectionIsSshTunnelActive(
+                        _connection, isActive, errInfo);
+                return success;
+            }
+
+            JniErrorCode DocumentDbConnection::GetSshLocalPort(int32_t& localPort, JniErrorInfo& errInfo) {
+                JniErrorCode success =
+                    _jniContext.Get()->DocumentDbConnectionGetSshLocalPort(
+                        _connection, localPort, errInfo);
+                return success;
+            }
         }  // namespace jni
     }  // namespace odbc
 }  // namespace ignite

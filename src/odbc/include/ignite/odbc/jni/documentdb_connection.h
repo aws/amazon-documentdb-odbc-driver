@@ -76,6 +76,23 @@ namespace ignite {
                 SharedPointer< DatabaseMetaData > GetMetaData(
                     JniErrorInfo& errInfo);
 
+                /** 
+                 * Gets indicator of whether an SSH tunnel is active.
+                 * 
+                 * @return true if active, false, otherwise.
+                 */
+                JniErrorCode IsSshTunnelActive(bool& isActive,
+                                               JniErrorInfo& errInfo);
+
+                /**
+                 * Gets indicator of whether an SSH tunnel is active.
+                 *
+                 * @return If IGNITE_JNI_ERR_SUCCESS is returned, then localPort is updated with the 
+                 * value of the local port of SSH tunnel.
+                 */
+                JniErrorCode GetSshLocalPort(int32_t& localPort,
+                                             JniErrorInfo& errInfo);
+
                private:
 
                 /** The JNI context */
