@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionClose) {
     BOOST_CHECK(!dbConnection.IsOpen());
 }
 
-BOOST_AUTO_TEST_CASE(TestDocumentDatabaseMetaDataGetTables) {
+BOOST_AUTO_TEST_CASE(TestDocumentDatabaseDbMetaDataGetTables) {
     PrepareContext();
     BOOST_REQUIRE(_ctx.Get() != nullptr);
 
