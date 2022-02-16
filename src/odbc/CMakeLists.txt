@@ -50,7 +50,10 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/diagnostic/diagnosable_adapter.cpp
         src/diagnostic/diagnostic_record.cpp
         src/diagnostic/diagnostic_record_storage.cpp
+        src/jni/database_metadata.cpp
+        src/jni/documentdb_connection.cpp
         src/jni/java.cpp
+        src/jni/result_set.cpp
         src/environment.cpp
         src/meta/column_meta.cpp
         src/meta/table_meta.cpp
