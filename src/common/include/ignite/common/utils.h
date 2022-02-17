@@ -87,7 +87,7 @@ namespace ignite
 
             for (char& c : unencoded)
             {
-                if (std::isalnum(c) || c == '-' || c == '_' || c == '~')
+                if (std::isalnum(c) || c == '-' || c == '_' || c == '~'|| c == '.' || c == '*' || c == '!' || c == '(' || c == ')')
                 {
                     oss << c;
                 }

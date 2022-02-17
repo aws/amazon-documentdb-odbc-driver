@@ -24,6 +24,8 @@
 #include "ignite/odbc/config/connection_string_parser.h"
 #include "ignite/odbc/config/config_tools.h"
 
+using ignite::common::EncodeURIComponent;
+
 namespace ignite
 {
     namespace odbc
@@ -544,13 +546,13 @@ namespace ignite
             std::string Configuration::ToJdbcConnectionString() const {
                 std::string jdbcConnectionString;
                 jdbcConnectionString = "jdbc:documentdb:";
-                jdbcConnectionString.append("//" + ignite::common::EncodeURIComponent(GetUser()));
-                jdbcConnectionString.append(":" + ignite::common::EncodeURIComponent(GetPassword()));
+                jdbcConnectionString.append("//" + EncodeURIComponent(GetUser()));
+                jdbcConnectionString.append(":" + EncodeURIComponent(GetPassword()));
                 jdbcConnectionString.append("@" + GetHostname());
                 jdbcConnectionString.append(":" + common::LexicalCast<std::string>(GetPort()));
-                jdbcConnectionString.append("/" + ignite::common::EncodeURIComponent(GetDatabase()));
+                jdbcConnectionString.append("/" + EncodeURIComponent(GetDatabase()));
                 // Always pass application name even when unset to override the JDBC default application name.
-                jdbcConnectionString.append("?appName=" + ignite::common::EncodeURIComponent(GetApplicationName()));
+                jdbcConnectionString.append("?appName=" + EncodeURIComponent(GetApplicationName()));
 
                 config::Configuration::ArgumentMap arguments;
                 ToJdbcOptionsMap(arguments);
@@ -560,7 +562,7 @@ namespace ignite
                     const std::string& key = it->first;
                     const std::string& value = it->second;
                     if (!value.empty())
-                        options << '&' << key << '=' << ignite::common::EncodeURIComponent(value);
+                        options << '&' << key << '=' << EncodeURIComponent(value);
                 }
                 jdbcConnectionString.append(options.str());
 

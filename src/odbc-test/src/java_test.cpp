@@ -44,7 +44,6 @@ using namespace boost::unit_test;
 using ignite::odbc::common::ReleaseChars;
 using ignite::odbc::config::ConnectionStringParser;
 using ignite::odbc::jni::java::JniErrorCode;
-using ignite::odbc::jni::FormatJdbcConnectionString;
 using ignite::odbc::jni::ResolveDocumentDbHome;
 using ignite::odbc::jni::java::BuildJvmOptions;
 using ignite::odbc::jni::java::JniHandlers;

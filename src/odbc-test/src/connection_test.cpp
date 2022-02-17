@@ -103,15 +103,15 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestoreExternalSSHTunnel)
 BOOST_AUTO_TEST_CASE(TestConnectionRestoreMiscOptionsSet)
 {
     const std::string miscOptions = 
-    "APP_NAME=TestAppName;"
-    "LOGIN_TIMEOUT_SEC=30;"
-    "READ_PREFERENCE=primary_preferred;"
-    "RETRY_READS=false;"
-    "SCAN_METHOD=id_forward;"
-    "SCAN_LIMIT=100;"
-    "SCHEMA_NAME=test;"
-    "REFRESH_SCHEMA=true;"
-    "DEFAULT_FETCH_SIZE=1000;";
+        "APP_NAME=TestAppName;"
+        "LOGIN_TIMEOUT_SEC=30;"
+        "READ_PREFERENCE=primary_preferred;"
+        "RETRY_READS=false;"
+        "SCAN_METHOD=id_forward;"
+        "SCAN_LIMIT=100;"
+        "SCHEMA_NAME=test;"
+        "REFRESH_SCHEMA=true;"
+        "DEFAULT_FETCH_SIZE=1000;";
     std::string connectionString;
     CreateDsnConnectionString(connectionString, std::string(), true, miscOptions);
 
@@ -119,12 +119,29 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestoreMiscOptionsSet)
     Disconnect();
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionIncorrectTLSOption) {
-    std::string connectionString;
-    CreateDsnConnectionString(connectionString, std::string(), true, "TLS=false;");
+BOOST_AUTO_TEST_CASE(TestConnectionIncompleteBasicProperties) {
+    std::string connectionString =
+        "DRIVER={Apache Ignite};"
+        "HOSTNAME=localhost;"
+        "USER=user;"
+        "PASSWORD=password;";
 
-    ExpectConnectionReject(connectionString, "08001: Failed to establish connection with the host.\n"
-      "Timed out after 30000 ms while waiting to connect.");
+    ExpectConnectionReject(connectionString, "01S00: Hostname, username, password, and database are required to connect.");
+
+    Disconnect();
+}
+
+BOOST_AUTO_TEST_CASE(TestConnectionIncompleteSSHTunnelProperties) {
+    std::string connectionString =
+        "DRIVER={Apache Ignite};"
+        "HOSTNAME=host.com;"
+        "DATABASE=test;"
+        "USER=user;"
+        "PASSWORD=password;"
+        "SSH_USER=sshUser;"
+        "SSH_HOST=sshHost;";
+
+    ExpectConnectionReject(connectionString, "01S00: If using an internal SSH tunnel, all of ssh_host, ssh_user, ssh_private_key_file are required to connect.");
 
     Disconnect();
 }

@@ -251,14 +251,14 @@ void CheckConnectionConfig(const Configuration& cfg)
                     << "&scanMethod=" << ScanMethod::ToJdbcString(testScanMethod)
                     << "&schemaName=" << testSchemaName
                     << "&sshHost=" << testSshHost
-                    << "&sshKnownHostsFile=" << testSshKnownHostsFile
-                    << "&sshPrivateKeyFile=" << testSshPrivateKeyFile
+                    << "&sshKnownHostsFile=" << ignite::common::EncodeURIComponent(testSshKnownHostsFile)
+                    << "&sshPrivateKeyFile=" << ignite::common::EncodeURIComponent(testSshPrivateKeyFile)
                     << "&sshPrivateKeyPassphrase=" << testSshPrivateKeyPassphrase
                     << "&sshStrictHostKeyChecking=" << BoolToStr(testSshStrictHostKeyCheckingFlag)
                     << "&sshUser=" << testSshUser
                     << "&tls=" << BoolToStr(testTlsFlag)
                     << "&tlsAllowInvalidHostnames=" << BoolToStr(testTlsAllowInvalidHostnamesFlag)
-                    << "&tlsCaFile=" << testTlsCaFile;
+                    << "&tlsCaFile=" << ignite::common::EncodeURIComponent(testTlsCaFile);
     const std::string& expectedJdbcStr = jdbcConstructor.str();
 
     BOOST_CHECK_EQUAL(ignite::common::ToLower(cfg.ToConnectString()), ignite::common::ToLower(expectedStr));
