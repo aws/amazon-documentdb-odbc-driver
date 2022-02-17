@@ -814,6 +814,7 @@ namespace ignite
                 switch (type)
                 {
                     case SQL_BIT:
+                    case SQL_TINYINT:
                     case SQL_SMALLINT:
                     case SQL_INTEGER:
                     case SQL_BIGINT:
@@ -822,7 +823,6 @@ namespace ignite
                     case SQL_DOUBLE:
                         return false;
 
-                    case SQL_TINYINT:
                     default:
                         return true;
                 }
