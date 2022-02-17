@@ -43,10 +43,9 @@ class ColumnMetadataQuery : public Query {
    * @param column Column search pattern.
    */
   ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
-                      // Connection& connection, const std::string& schema,
-                      SharedPointer< GlobalJObject > connection,
-                      const std::string& catalog, const std::string& schema,
-                      const std::string& table, const std::string& column);
+                      Connection& connection, const std::string& catalog,
+                      const std::string& schema, const std::string& table,
+                      const std::string& column);
 
   /**
    * Destructor.
