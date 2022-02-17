@@ -301,7 +301,6 @@ namespace ignite
                     case SQL_TYPE_TIME:
                         return DOCUMENTDB_JDBC_TYPE_TIME;
 
-
                     case SQL_TYPE_TIMESTAMP:
                         return DOCUMENTDB_JDBC_TYPE_TIMESTAMP;
 
@@ -405,9 +404,7 @@ namespace ignite
             int16_t BinaryToSqlType(int16_t binaryType)
             {
                 switch (binaryType)
-                { // -AL- here, we need to pass in DOCUMENTDB_JDBC type (so not really IGNITE_TYPE)
-                  // TODO remove commented out code
-
+                {
                     case DOCUMENTDB_JDBC_TYPE_BIT:
                     case DOCUMENTDB_JDBC_TYPE_BOOLEAN:
                         return SQL_BIT;

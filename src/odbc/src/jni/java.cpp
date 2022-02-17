@@ -1205,7 +1205,7 @@ namespace ignite
                     }
                     return errInfo.code;
                 }
-                // todo -AL- update
+                
                 JniErrorCode JniContext::ResultSetGetRow(
                     const SharedPointer< GlobalJObject >& resultSet, int& value,
                     bool& wasNull, JniErrorInfo& errInfo) {
