@@ -119,76 +119,57 @@ namespace ignite
              * Warning: if any JDBC Type is added or becomes deprecated on the JDBC side, 
              * the change should be reflected under this function as well.
              */
-            //const std::string& BinaryTypeToSqlTypeName(int8_t binaryType)
             const std::string& BinaryTypeToSqlTypeName(int16_t binaryType)
             {
                 switch (binaryType)
                 {
                 case DOCUMENTDB_JDBC_TYPE_BIT:
                 case DOCUMENTDB_JDBC_TYPE_BOOLEAN:
-                //case IGNITE_TYPE_BOOL:
                     return SqlTypeName::BIT;
 
-                //case IGNITE_TYPE_SHORT:
                 case DOCUMENTDB_JDBC_TYPE_SMALLINT:
                     return SqlTypeName::SMALLINT;
 
                 case DOCUMENTDB_JDBC_TYPE_TINYINT:
-                //case IGNITE_TYPE_BYTE:
-                //case IGNITE_TYPE_CHAR:
                     return SqlTypeName::TINYINT;
 
                 case DOCUMENTDB_JDBC_TYPE_INTEGER:
-                //case IGNITE_TYPE_INT:
                     return SqlTypeName::INTEGER;
 
                 case DOCUMENTDB_JDBC_TYPE_BIGINT:
-                //case IGNITE_TYPE_LONG:
                     return SqlTypeName::BIGINT;
 
                 case DOCUMENTDB_JDBC_TYPE_FLOAT:
-                //case IGNITE_TYPE_FLOAT:
                     return SqlTypeName::FLOAT;
 
                 case DOCUMENTDB_JDBC_TYPE_REAL:
                     return SqlTypeName::REAL;
 
                 case DOCUMENTDB_JDBC_TYPE_DOUBLE:
-                //case IGNITE_TYPE_DOUBLE:
                     return SqlTypeName::DOUBLE;
 
                 case DOCUMENTDB_JDBC_TYPE_NUMERIC:
                     return SqlTypeName::NUMERIC;
 
                 case DOCUMENTDB_JDBC_TYPE_DECIMAL:
-                //case IGNITE_TYPE_DECIMAL:
                     return SqlTypeName::DECIMAL;
 
                 case DOCUMENTDB_JDBC_TYPE_VARCHAR:
                 case DOCUMENTDB_JDBC_TYPE_NVARCHAR:
-                //case IGNITE_TYPE_STRING:
                     return SqlTypeName::VARCHAR;
 
                 case DOCUMENTDB_JDBC_TYPE_LONGVARCHAR:
                 case DOCUMENTDB_JDBC_TYPE_LONGNVARCHAR:
                     return SqlTypeName::LONGVARCHAR;
 
-                //case IGNITE_TYPE_UUID:
-                //    return SqlTypeName::GUID;
-
-                // case IGNITE_TYPE_DATE:
                 case DOCUMENTDB_JDBC_TYPE_DATE:
                     return SqlTypeName::DATE;
 
-                // case IGNITE_TYPE_TIME:
                 case DOCUMENTDB_JDBC_TYPE_TIME:
                     return SqlTypeName::TIME;
 
-                // case IGNITE_TYPE_TIMESTAMP:
                 case DOCUMENTDB_JDBC_TYPE_TIMESTAMP:
                     return SqlTypeName::TIMESTAMP;
-
-                // todo -AL- add SqlTypeName to return here
 
                 case DOCUMENTDB_JDBC_TYPE_LONGVARBINARY:
                     return SqlTypeName::LONGVARBINARY;
@@ -196,25 +177,6 @@ namespace ignite
                 case DOCUMENTDB_JDBC_TYPE_NULL:
                     return SqlTypeName::SQL_NULL;
 
-                //case IGNITE_TYPE_OBJECT:
-                //case IGNITE_TYPE_ARRAY_BYTE:
-                //case IGNITE_TYPE_ARRAY_SHORT:
-                //case IGNITE_TYPE_ARRAY_INT:
-                //case IGNITE_TYPE_ARRAY_LONG:
-                //case IGNITE_TYPE_ARRAY_FLOAT:
-                //case IGNITE_TYPE_ARRAY_DOUBLE:
-                //case IGNITE_TYPE_ARRAY_CHAR:
-                //case IGNITE_TYPE_ARRAY_BOOL:
-                //case IGNITE_TYPE_ARRAY_DECIMAL:
-                //case IGNITE_TYPE_ARRAY_STRING:
-                //case IGNITE_TYPE_ARRAY_UUID:
-                //case IGNITE_TYPE_ARRAY_DATE:
-                //case IGNITE_TYPE_ARRAY_TIMESTAMP:
-                //case IGNITE_TYPE_ARRAY:
-                //case IGNITE_TYPE_COLLECTION:
-                //case IGNITE_TYPE_MAP:
-                //case IGNITE_TYPE_MAP_ENTRY:
-                //case IGNITE_TYPE_BINARY:
                 case DOCUMENTDB_JDBC_TYPE_BINARY:
                 case DOCUMENTDB_JDBC_TYPE_VARBINARY:
                 case DOCUMENTDB_JDBC_TYPE_BLOB:
@@ -290,45 +252,36 @@ namespace ignite
              * JDBC side, the change should be reflected under this function as
              * well.
              */
-            //int8_t SqlTypeToBinary(int16_t sqlType)
             int16_t SqlTypeToBinary(int16_t sqlType)
             {
                 switch (sqlType)
                 {
                     case SQL_BIT:
-                        // return IGNITE_TYPE_BOOL;
                         return DOCUMENTDB_JDBC_TYPE_BOOLEAN;
 
                     case SQL_TINYINT:
-                        //return IGNITE_TYPE_BYTE;
                         return DOCUMENTDB_JDBC_TYPE_TINYINT;
 
                     case SQL_SMALLINT:
-                        // return IGNITE_TYPE_SHORT;
                         return DOCUMENTDB_JDBC_TYPE_SMALLINT;
 
                     case SQL_INTEGER:
-                        // return IGNITE_TYPE_INT;
                         return DOCUMENTDB_JDBC_TYPE_INTEGER;
 
                     case SQL_BIGINT:
-                        //return IGNITE_TYPE_LONG;
                         return DOCUMENTDB_JDBC_TYPE_BIGINT;
 
                     case SQL_FLOAT:
-                        //return IGNITE_TYPE_FLOAT;
                         return DOCUMENTDB_JDBC_TYPE_FLOAT;
 
                     case SQL_REAL:
                         return DOCUMENTDB_JDBC_TYPE_REAL;
 
                     case SQL_DOUBLE:
-                        //return IGNITE_TYPE_DOUBLE;
                         return DOCUMENTDB_JDBC_TYPE_DOUBLE;
 
                     case SQL_NUMERIC:
                         return DOCUMENTDB_JDBC_TYPE_NUMERIC;
-                        // last changed. Feb14, 5:07pm. Note: look at confluence page for this.
 
                     case SQL_DECIMAL:
                         return DOCUMENTDB_JDBC_TYPE_DECIMAL;
@@ -337,27 +290,19 @@ namespace ignite
                         return DOCUMENTDB_JDBC_TYPE_CHAR;
 
                     case SQL_VARCHAR:
-                        // return IGNITE_TYPE_STRING;
                         return DOCUMENTDB_JDBC_TYPE_VARCHAR;
 
                     case SQL_LONGVARCHAR:
                         return DOCUMENTDB_JDBC_TYPE_LONGVARCHAR;
 
-                    // SQL_GUID not implemented in sqltypetoBinary function
-                    //case SQL_GUID:
-                    //    return IGNITE_TYPE_UUID;
-
                     case SQL_TYPE_DATE:
-                        //return IGNITE_TYPE_DATE;
                         return DOCUMENTDB_JDBC_TYPE_DATE;
 
                     case SQL_TYPE_TIME:
-                        // return IGNITE_TYPE_TIME;
                         return DOCUMENTDB_JDBC_TYPE_TIME;
 
 
                     case SQL_TYPE_TIMESTAMP:
-                        //return IGNITE_TYPE_TIMESTAMP;
                         return DOCUMENTDB_JDBC_TYPE_TIMESTAMP;
 
                     case SQL_BINARY:
@@ -368,7 +313,6 @@ namespace ignite
 
                     case SQL_LONGVARBINARY:
                         return DOCUMENTDB_JDBC_TYPE_LONGVARBINARY;
-                        // return IGNITE_TYPE_BINARY;
 
                     case SQL_TYPE_NULL:
                         return DOCUMENTDB_JDBC_TYPE_NULL;
@@ -458,50 +402,40 @@ namespace ignite
              * JDBC side, the change should be reflected under this function as
              * well.
              */
-            //int16_t BinaryToSqlType(int8_t binaryType)
             int16_t BinaryToSqlType(int16_t binaryType)
             {
                 switch (binaryType)
                 { // -AL- here, we need to pass in DOCUMENTDB_JDBC type (so not really IGNITE_TYPE)
                   // TODO remove commented out code
 
-                    // case IGNITE_TYPE_BOOL:
                     case DOCUMENTDB_JDBC_TYPE_BIT:
                     case DOCUMENTDB_JDBC_TYPE_BOOLEAN:
                         return SQL_BIT;
 
-                    //case IGNITE_TYPE_BYTE:
-                    //case IGNITE_TYPE_CHAR:
                     case DOCUMENTDB_JDBC_TYPE_TINYINT:
                         return SQL_TINYINT;
 
-                    //case IGNITE_TYPE_SHORT:
                     case DOCUMENTDB_JDBC_TYPE_SMALLINT:
                         return SQL_SMALLINT;
 
-                    //case IGNITE_TYPE_INT:
                     case DOCUMENTDB_JDBC_TYPE_INTEGER:
                         return SQL_INTEGER;
 
-                    //case IGNITE_TYPE_LONG:
                     case DOCUMENTDB_JDBC_TYPE_BIGINT:
                         return SQL_BIGINT;
 
-                    //case IGNITE_TYPE_FLOAT:
                     case DOCUMENTDB_JDBC_TYPE_FLOAT:
                         return SQL_FLOAT;
 
                     case DOCUMENTDB_JDBC_TYPE_REAL:
                         return SQL_REAL;
 
-                    //case IGNITE_TYPE_DOUBLE:
                     case DOCUMENTDB_JDBC_TYPE_DOUBLE:
                         return SQL_DOUBLE;
 
                     case DOCUMENTDB_JDBC_TYPE_NUMERIC:
                         return SQL_NUMERIC;
 
-                    //case IGNITE_TYPE_DECIMAL:
                     case DOCUMENTDB_JDBC_TYPE_DECIMAL:
                         return SQL_DECIMAL;
 
@@ -509,7 +443,6 @@ namespace ignite
                     case DOCUMENTDB_JDBC_TYPE_NCHAR:
                         return SQL_CHAR;
 
-                    // case IGNITE_TYPE_STRING:
                     case DOCUMENTDB_JDBC_TYPE_VARCHAR:
                     case DOCUMENTDB_JDBC_TYPE_NVARCHAR:
                         return SQL_VARCHAR;
@@ -518,19 +451,12 @@ namespace ignite
                     case DOCUMENTDB_JDBC_TYPE_LONGNVARCHAR:
                         return SQL_LONGVARCHAR;
 
-                    // we don't have UUID on DOCUMENTDB_JDBC side
-                    //case IGNITE_TYPE_UUID:
-                        //return SQL_GUID;
-
-                    //case IGNITE_TYPE_DATE:
                     case DOCUMENTDB_JDBC_TYPE_DATE:
                         return SQL_TYPE_DATE;
 
-                    // case IGNITE_TYPE_TIME:
                     case DOCUMENTDB_JDBC_TYPE_TIME:
                         return SQL_TYPE_TIME;
 
-                    //case IGNITE_TYPE_TIMESTAMP:
                     case DOCUMENTDB_JDBC_TYPE_TIMESTAMP:
                         return SQL_TYPE_TIMESTAMP;
 
@@ -540,26 +466,8 @@ namespace ignite
                     case DOCUMENTDB_JDBC_TYPE_NULL:
                         return SQL_TYPE_NULL;
 
-                    //case IGNITE_TYPE_ARRAY_BYTE:
-                    //case IGNITE_TYPE_ARRAY_SHORT:
-                    //case IGNITE_TYPE_ARRAY_INT:
-                    //case IGNITE_TYPE_ARRAY_LONG:
-                    //case IGNITE_TYPE_ARRAY_FLOAT:
-                    //case IGNITE_TYPE_ARRAY_DOUBLE:
-                    //case IGNITE_TYPE_ARRAY_CHAR:
-                    //case IGNITE_TYPE_ARRAY_BOOL:
-                    //case IGNITE_TYPE_ARRAY_DECIMAL:
-                    //case IGNITE_TYPE_ARRAY_STRING:
-                    //case IGNITE_TYPE_ARRAY_UUID:
-                    //case IGNITE_TYPE_ARRAY_DATE:
-                    //case IGNITE_TYPE_ARRAY:
-                    //case IGNITE_TYPE_COLLECTION:
-                    //case IGNITE_TYPE_MAP:
-                    //case IGNITE_TYPE_MAP_ENTRY:
-                    //case IGNITE_TYPE_BINARY:
-                    //case IGNITE_TYPE_OBJECT:
                     case DOCUMENTDB_JDBC_TYPE_BINARY:
-                    case DOCUMENTDB_JDBC_TYPE_VARBINARY: // todo -AL- explain on Confluence page: because ignite has varbinary as string for binary
+                    case DOCUMENTDB_JDBC_TYPE_VARBINARY:
                     case DOCUMENTDB_JDBC_TYPE_BLOB:
                     case DOCUMENTDB_JDBC_TYPE_CLOB:
                     case DOCUMENTDB_JDBC_TYPE_ARRAY:
@@ -649,10 +557,6 @@ namespace ignite
                     case SQL_CHAR:
                     case SQL_WCHAR:
                     case SQL_LONGVARCHAR:
-                        // return SQL_DESC_LENGTH;
-                        // todo -AL- double check needed. If our driver cannot
-                        // determien the column or parameter length,
-                        // SQL_NO_TOTAL should be returned instead [check on slack]
                     case SQL_LONGVARBINARY:
                     case SQL_BINARY:
                     case SQL_VARBINARY:
@@ -715,9 +619,6 @@ namespace ignite
                     case SQL_CHAR:
                     case SQL_WCHAR:
                     case SQL_LONGVARCHAR:
-                    //    return SQL_DESC_OCTET_LENGTH; // todo -AL- double check needed. If our driver cannot determien the 
-                        // column or parameter length, SQL_NO_TOTAL should be returned instead
-
                     case SQL_LONGVARBINARY:
                     case SQL_BINARY:
                     case SQL_VARBINARY:
