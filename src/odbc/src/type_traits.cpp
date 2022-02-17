@@ -484,6 +484,21 @@ namespace ignite
                 return SQL_NULLABLE_UNKNOWN;
             }
 
+            const std::string NullabiltyToIsNullable(int16_t nullability)
+            {
+                switch (nullability)
+                {
+                    case SQL_NO_NULLS:
+                        return "NO";
+
+                    case SQL_NULLABLE:
+                        return "YES";
+
+                    default: 
+                        return "";
+                }
+            }
+
             int32_t SqlTypeDisplaySize(int16_t type)
             {
                 switch (type)

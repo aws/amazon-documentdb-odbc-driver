@@ -236,6 +236,17 @@ namespace ignite
             int16_t BinaryTypeNullability(int16_t binaryType);
 
             /**
+             * Get binary type SQL nullability.
+             *
+             * @param binaryType Binary data type.
+             * @return "NO" if the column does not include NULLs.
+             *         "YES" if the column could include NULLs.
+             *         zero-length string if it is not known whether the
+             *         column accepts NULL values.
+             */
+            const std::string NullabiltyToIsNullable(int16_t nullability);
+
+            /**
              * Get SQL type display size.
              *
              * @param type SQL type.

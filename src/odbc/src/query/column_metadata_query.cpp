@@ -275,7 +275,7 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::NULLABLE: {
-      buffer.PutInt16(type_traits::BinaryTypeNullability(columnType));
+      buffer.PutInt16(currentColumn.GetNullability());
       break;
     }
 
@@ -312,10 +312,7 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
  
     case ResultColumn::IS_NULLABLE: {
-      buffer.PutNull(); 
-      // buffer.PutString(); // todo, it should be string not null.
-      // It seems that I might need to create a currentColumn.get isNullable()
-      // function -AL-
+      buffer.PutString(type_traits::NullabiltyToIsNullable(currentColumn.GetNullability()));
       break;
     }
 
