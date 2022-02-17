@@ -517,21 +517,6 @@ namespace ignite
             meta::ReadColumnMetaVector(resultSet, meta);
         }
 
-        QueryGetTablesMetaResponse::QueryGetTablesMetaResponse()
-        {
-            // No-op.
-        }
-
-        QueryGetTablesMetaResponse::~QueryGetTablesMetaResponse()
-        {
-            // No-op.
-        }
-
-        void QueryGetTablesMetaResponse::ReadOnSuccess(impl::binary::BinaryReaderImpl& reader, const ProtocolVersion&)
-        {
-            meta::ReadTableMetaVector(reader, meta);
-        }
-
         QueryGetParamsMetaResponse::QueryGetParamsMetaResponse()
         {
             // No-op.
