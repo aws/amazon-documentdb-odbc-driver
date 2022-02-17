@@ -648,6 +648,7 @@ namespace ignite
                     case SQL_VARCHAR:
                     case SQL_CHAR:
                     case SQL_WCHAR:
+                        return SQL_DESC_LENGTH;
                     case SQL_LONGVARBINARY:
                     case SQL_BINARY:
                     case SQL_VARBINARY:
@@ -696,48 +697,11 @@ namespace ignite
                 }
             }
 
-            //int32_t BinaryTypeColumnSize(int8_t type)
-            //{
-            //    int16_t sqlType = BinaryToSqlType(type);
+            int32_t BinaryTypeColumnSize(int16_t type)
+            {
+                int16_t sqlType = BinaryToSqlType(type);
 
-            //    return SqlTypeColumnSize(sqlType);
-            //}
-            /**
-             * Warning: if any JDBC Type mapping to column size is added or 
-             * becomes deprecated on the JDBC side, the change should be 
-             * reflected under this function as well.
-             */
-            int32_t BinaryTypeColumnSize(int16_t type) {
-                
-                switch (type) {
-                    case DOCUMENTDB_JDBC_TYPE_DECIMAL:
-                    case DOCUMENTDB_JDBC_TYPE_NUMERIC:
-                        return 646456995;
-
-                    case DOCUMENTDB_JDBC_TYPE_FLOAT:
-                    case DOCUMENTDB_JDBC_TYPE_REAL:
-                    case DOCUMENTDB_JDBC_TYPE_DOUBLE:
-                        return 23;
-
-                    case DOCUMENTDB_JDBC_TYPE_BIGINT:
-                        return 20;
-
-                    case DOCUMENTDB_JDBC_TYPE_INTEGER:
-                        return 11;
-
-                    case DOCUMENTDB_JDBC_TYPE_SMALLINT:
-                        return 6;
-
-                    case DOCUMENTDB_JDBC_TYPE_TINYINT:
-                        return 4;
-
-                    case DOCUMENTDB_JDBC_TYPE_VARBINARY:
-                    case DOCUMENTDB_JDBC_TYPE_VARCHAR:
-                        return 65536;
-
-                    default:
-                        return 0;
-                }
+                return SqlTypeColumnSize(sqlType);
             }
 
             int32_t SqlTypeTransferLength(int16_t type)
