@@ -86,7 +86,7 @@ class ColumnMeta {
    * @param dataType Data type.
    */
   ColumnMeta(const std::string& schemaName, const std::string& tableName,
-             const std::string& columnName, int8_t dataType)
+             const std::string& columnName, int16_t dataType)
       : schemaName(schemaName),
         tableName(tableName),
         columnName(columnName),
