@@ -26,9 +26,10 @@
 #include "ignite/odbc/protocol_version.h"
 #include "ignite/odbc/common_types.h"
 #include "ignite/odbc/utility.h"
-#include "ignite/odbc/jni/java.h"
+#include "ignite/odbc/jni/result_set.h"
 
-using ignite::odbc::jni::java::GlobalJObject;
+using ignite::odbc::jni::ResultSet;
+using ignite::odbc::jni::java::JniErrorInfo;
 
 namespace ignite {
 namespace odbc {

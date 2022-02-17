@@ -15,8 +15,10 @@
  * limitations under the License.
  */
 
-#include <ignite/impl/binary/binary_common.h>
 
+#include <vector>
+
+#include <ignite/impl/binary/binary_common.h>
 #include "ignite/odbc/jni/java.h"
 #include "ignite/odbc/type_traits.h"
 #include "ignite/odbc/connection.h"
@@ -24,6 +26,15 @@
 #include "ignite/odbc/log.h"
 #include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/query/column_metadata_query.h"
+#include "ignite/odbc/jni/database_metadata.h"
+#include "ignite/odbc/jni/result_set.h"
+#include "ignite/odbc/ignite_error.h"
+#include "ignite/odbc/common/concurrent.h"
+
+using ignite::odbc::IgniteError;
+using ignite::odbc::common::concurrent::SharedPointer;
+using ignite::odbc::jni::DatabaseMetaData;
+using ignite::odbc::jni::java::JniErrorInfo; 
 
 namespace {
 struct ResultColumn {
