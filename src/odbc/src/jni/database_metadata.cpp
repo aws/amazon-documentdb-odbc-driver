@@ -46,6 +46,21 @@ namespace ignite {
                 }
                 return new ResultSet(_jniContext, resultSet);
             }
+
+            SharedPointer< ResultSet > DatabaseMetaData::GetColumns(
+                    const std::string& catalog, const std::string& schemaPattern,
+                    const std::string& tableNamePattern,
+                    const std::string& column,
+                    JniErrorInfo& errInfo) {
+                SharedPointer< GlobalJObject > resultSet;
+                JniErrorCode success =_jniContext.Get()->DatabaseMetaDataGetColumns(
+                     _databaseMetadata, catalog, schemaPattern,
+                     tableNamePattern, column, resultSet, errInfo);
+                if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+                    return nullptr;
+                }
+                return new ResultSet(_jniContext, resultSet);
+            }
         }  // namespace
     }  // namespace odbc
 }  // namespace ignite

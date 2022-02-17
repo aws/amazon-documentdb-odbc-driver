@@ -52,6 +52,13 @@ namespace ignite {
                     const std::vector< std::string >& types,
                     JniErrorInfo& errInfo);
 
+                SharedPointer< ResultSet > GetColumns(
+                    const std::string& catalog,
+                    const std::string& schemaPattern,
+                    const std::string& tableNamePattern,
+                    const std::string& column, 
+                    JniErrorInfo& errInfo);
+
                private:
                 /**
                  * Constructs an instance of the DatabaseMetaData class.

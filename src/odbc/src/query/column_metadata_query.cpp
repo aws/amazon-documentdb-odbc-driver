@@ -336,44 +336,101 @@ SqlResult::Type ColumnMetadataQuery::NextResultSet() {
 }
 
 SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
-  QueryGetColumnsMetaResponse rsp;
-  SharedPointer< GlobalJObject > resultSet;
 
-  // option 2
-  try {
-    /* // temp comment out -AL-
-    success = _ctx.Get()->DatabaseMetaDataGetColumns(
-        databaseMetadata, catalog, schema,
-        table, column, resultSet,
-        errInfo);
-        */
-    // connection.SyncMessage(req, rsp);
-    // what happens on Ignite [I might be wrong]: when syncMessage is
-    // succssessful, call ReadOnSuccess, which then calls
-    // meta::ReadColumnMetaVector(reader, meta, ver);.
+  // replace req, rsp with JDBC call. catalog = null is to be passed
+  // QueryGetColumnsMetaRequest req(schema, table, column);
+  //QueryGetColumnsMetaResponse rsp;  // has the result of the req. Our result
+                                    // is the result set from getColumns.
 
-    // getTables here -AL- Actually nvm, I think getColumns make more sense
-    // here... dunno why I wrote getTables
-  } catch (const OdbcError& err) {
-    diag.AddStatusRecord(err);
+  // TODO update after Bruce's connection code is done
 
-    return SqlResult::AI_ERROR;
-  } catch (const IgniteError& err) {
-    diag.AddStatusRecord(err.GetText());
-
-    return SqlResult::AI_ERROR;
+  IgniteError error;
+  SharedPointer< DatabaseMetaData > databaseMetaData =
+      connection.GetMetaData(error);
+  if (!databaseMetaData.IsValid()
+      || error.GetCode() != IgniteError::IGNITE_SUCCESS) {
+      diag.AddStatusRecord(error.GetText());
+      return SqlResult::AI_ERROR;
   }
 
-  /*
+  JniErrorInfo errInfo;
+  SharedPointer< ResultSet > resultSet =
+      databaseMetaData.Get()->GetColumns(catalog, schema, table, column, errInfo);
+  if (!resultSet.IsValid()
+      || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      diag.AddStatusRecord(errInfo.errMsg);
+      return SqlResult::AI_ERROR;
+  }
 
-    return SqlResult::AI_ERROR;
+  meta::ReadTableMetaVector(resultSet, meta);
+  /*// temp comment out -AL-
+  bool success;
+  JniErrorInfo errInfo;
+  SharedPointer< GlobalJObject > databaseMetadata;
+  _ctx.Get()->ConnectionGetMetaData(connection, databaseMetadata, errInfo);
+  */
+
+  //SharedPointer< GlobalJObject > resultSet;
+
+  // option 1 // this one makes more sense since the function doesn't throw
+  // exceptions
+  /*// temp comment out -AL-
+  if (!_ctx.Get()->DatabaseMetaDataGetColumns(
+          databaseMetadata, catalog, schema,
+          table, column, resultSet,
+          errInfo)) {
+      LOG_MSG("Error: " << errInfo.errMsg);
+      return SqlResult::AI_ERROR;
   }
   */
 
-  meta::ColumnMetaVector meta;
-  ReadColumnMetaVector(resultSet, meta);
+  // option 2
+  //try {
+  //  /* // temp comment out -AL-
+  //  success = _ctx.Get()->DatabaseMetaDataGetColumns(
+  //      databaseMetadata, catalog, schema,
+  //      table, column, resultSet,
+  //      errInfo);
+  //      */
+  //  // connection.SyncMessage(req, rsp);
+  //  // what happens on Ignite [I might be wrong]: when syncMessage is
+  //  // succssessful, call ReadOnSuccess, which then calls
+  //  // meta::ReadColumnMetaVector(reader, meta, ver);.
 
+  //  // getTables here -AL- Actually nvm, I think getColumns make more sense
+  //  // here... dunno why I wrote getTables
+  //} catch (const OdbcError& err) {
+  //  diag.AddStatusRecord(err);
 
+  //  return SqlResult::AI_ERROR;
+  //} catch (const IgniteError& err) {
+  //  diag.AddStatusRecord(err.GetText());
+
+  //  return SqlResult::AI_ERROR;
+  //}
+
+  // orig ignite code
+  /*
+  if (rsp.GetStatus() != ResponseStatus::SUCCESS)
+  {
+      LOG_MSG("Error: " << rsp.GetError());
+      diag.AddStatusRecord(ResponseStatusToSqlState(rsp.GetStatus()),
+  rsp.GetError());
+
+      return SqlResult::AI_ERROR;
+  }
+  */
+  // ----- code before Bruce's branch is merged
+  //meta::ColumnMetaVector meta;
+  //ReadColumnMetaVector(resultSet, meta);
+  //-----
+  // meta = rsp.GetMeta();  // ignite uses reponse object to reap the results
+  // into a meta object
+  // ignite sets meta object in rsp, and also calls the construct vector
+  // method in rsp.
+
+  // us: write a function that takes the resultSet from getTables and produce
+  // a meta vector
   for (size_t i = 0; i < meta.size(); ++i) {
     LOG_MSG("\n[" << i << "] SchemaName:     " << meta[i].GetSchemaName()
                   << "\n[" << i

@@ -123,9 +123,7 @@ class ColumnMetadataQuery : public Query {
   SqlResult::Type MakeRequestGetColumnsMeta();
 
   /** Connection associated with the statement. */
-  // Connection& connection; // TODO: use Bruce's code for creating connection
-  // to the database
-  SharedPointer< GlobalJObject > connection;
+  Connection& connection;
 
   /** Catalog search pattern. */
   std::string catalog;
