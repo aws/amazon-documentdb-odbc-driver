@@ -113,23 +113,24 @@ ColumnMetadataQuery::ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
 
   const std::string sch;
   const std::string tbl;
-
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", IGNITE_TYPE_STRING));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", DOCUMENTDB_JDBC_TYPE_VARCHAR));
   columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "TABLE_SCHEM", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", IGNITE_TYPE_STRING));
+      ColumnMeta(sch, tbl, "TABLE_SCHEM", DOCUMENTDB_JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", DOCUMENTDB_JDBC_TYPE_VARCHAR));
   columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "COLUMN_NAME", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "DATA_TYPE", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TYPE_NAME", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_SIZE", IGNITE_TYPE_INT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "BUFFER_LENGTH", IGNITE_TYPE_INT));
+      ColumnMeta(sch, tbl, "COLUMN_NAME", DOCUMENTDB_JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "DATA_TYPE", DOCUMENTDB_JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TYPE_NAME", DOCUMENTDB_JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_SIZE", DOCUMENTDB_JDBC_TYPE_INTEGER));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "BUFFER_LENGTH", DOCUMENTDB_JDBC_TYPE_INTEGER));
   columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "DECIMAL_DIGITS", IGNITE_TYPE_SHORT));
+      ColumnMeta(sch, tbl, "DECIMAL_DIGITS", DOCUMENTDB_JDBC_TYPE_SMALLINT));
   columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "NUM_PREC_RADIX", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "NULLABLE", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS", IGNITE_TYPE_STRING));
+      ColumnMeta(sch, tbl, "NUM_PREC_RADIX", DOCUMENTDB_JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "NULLABLE", DOCUMENTDB_JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "ORDINAL_POSITION", DOCUMENTDB_JDBC_TYPE_INTEGER));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS", DOCUMENTDB_JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "IS_NULLABLE", DOCUMENTDB_JDBC_TYPE_VARCHAR));
 }
 
 ColumnMetadataQuery::~ColumnMetadataQuery() {
