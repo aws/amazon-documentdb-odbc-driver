@@ -23,27 +23,51 @@ namespace ignite
     {
         namespace meta
         {
-            void TableMeta::Read(ignite::impl::binary::BinaryReaderImpl & reader)
-            {
-                utility::ReadString(reader, catalogName);
-                utility::ReadString(reader, schemaName);
-                utility::ReadString(reader, tableName);
-                utility::ReadString(reader, tableType);
+            const std::string TABLE_CAT = "TABLE_CAT";
+            const std::string TABLE_SCHEM = "TABLE_SCHEM";
+            const std::string TABLE_NAME = "TABLE_NAME";
+            const std::string TABLE_TYPE = "TABLE_TYPE";
+            const std::string REMARKS = "REMARKS";
+
+            void TableMeta::Read(SharedPointer< ResultSet >& resultSet,
+                                 JniErrorInfo& errInfo) {
+                bool wasNull;
+                catalogName = "";
+                schemaName = "";
+                tableName = "";
+                tableType = "";
+                resultSet.Get()->GetString(TABLE_CAT, catalogName, wasNull,
+                                           errInfo);
+                resultSet.Get()->GetString(TABLE_SCHEM, schemaName, wasNull,
+                                           errInfo);
+                resultSet.Get()->GetString(TABLE_NAME, tableName, wasNull,
+                                           errInfo);
+                resultSet.Get()->GetString(TABLE_TYPE, tableType, wasNull,
+                                           errInfo);
+                resultSet.Get()->GetString(REMARKS, remarks, wasNull,
+                                           errInfo);
             }
 
-            void ReadTableMetaVector(ignite::impl::binary::BinaryReaderImpl& reader, TableMetaVector& meta)
-            {
-                int32_t metaNum = reader.ReadInt32();
-
+            void ReadTableMetaVector(SharedPointer< ResultSet >& resultSet,
+                                     TableMetaVector& meta) {
                 meta.clear();
-                meta.reserve(static_cast<size_t>(metaNum));
-
-                for (int32_t i = 0; i < metaNum; ++i)
-                {
-                    meta.push_back(TableMeta());
-
-                    meta.back().Read(reader);
+                if (!resultSet.IsValid()) {
+                    return;
                 }
+
+                JniErrorInfo errInfo;
+                bool hasNext = false;
+                JniErrorCode errCode;
+                do {
+                    errCode = resultSet.Get()->Next(hasNext, errInfo);
+                    if (!hasNext
+                        || errCode != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+                        break;
+                    }
+
+                    meta.emplace_back(TableMeta());
+                    meta.back().Read(resultSet, errInfo);
+                } while (hasNext);
             }
         }
     }

@@ -24,6 +24,10 @@
 #include "ignite/impl/binary/binary_reader_impl.h"
 
 #include "ignite/odbc/utility.h"
+#include "ignite/odbc/jni/result_set.h"
+
+using ignite::odbc::jni::ResultSet;
+using ignite::odbc::jni::java::JniErrorInfo;
 
 namespace ignite
 {
@@ -72,12 +76,12 @@ namespace ignite
                 /**
                  * Copy constructor.
                  */
-                TableMeta(const TableMeta& other) :
-                    catalogName(other.catalogName),
-                    schemaName(other.schemaName),
-                    tableName(other.tableName),
-                    tableType(other.tableType)
-                {
+                TableMeta(const TableMeta& other)
+                    : catalogName(other.catalogName),
+                      schemaName(other.schemaName),
+                      tableName(other.tableName),
+                      tableType(other.tableType),
+                      remarks(other.remarks) {
                     // No-op.
                 }
 
@@ -90,15 +94,16 @@ namespace ignite
                     schemaName = other.schemaName;
                     tableName = other.tableName;
                     tableType = other.tableType;
+                    remarks = other.remarks;
 
                     return *this;
                 }
 
                 /**
                  * Read using reader.
-                 * @param reader Reader.
+                 * @param resultSet SharedPointer< ResultSet >.
                  */
-                void Read(ignite::impl::binary::BinaryReaderImpl& reader);
+                void Read(SharedPointer< ResultSet >& resultSet, JniErrorInfo& errInfo);
 
                 /**
                  * Get catalog name.
@@ -136,6 +141,14 @@ namespace ignite
                     return tableType;
                 }
 
+                /** 
+                 * Get the remarks.
+                 * @return Remarks.
+                 */
+                const std::string& GetRemarks() const {
+                    return remarks;
+                }
+
             private:
                 /** Catalog name. */
                 std::string catalogName;
@@ -148,6 +161,9 @@ namespace ignite
 
                 /** Table type. */
                 std::string tableType;
+
+                /** Remarks */
+                std::string remarks;
             };
 
             /** Table metadata vector alias. */
@@ -155,11 +171,13 @@ namespace ignite
 
             /**
              * Read tables metadata collection.
-             * @param reader Reader.
+             * @param resultSet SharedPointer< ResultSet >.
              * @param meta Collection.
              */
-            void ReadTableMetaVector(ignite::impl::binary::BinaryReaderImpl& reader, TableMetaVector& meta);
-        }
+            void ReadTableMetaVector(
+                SharedPointer< ResultSet >& resultSet,
+                TableMetaVector& meta);
+            }
     }
 }
 
