@@ -586,10 +586,10 @@ namespace ignite
                     case SQL_VARCHAR:
                     case SQL_CHAR:
                     case SQL_WCHAR:
+                    case SQL_LONGVARCHAR:
                     case SQL_LONGVARBINARY:
                     case SQL_BINARY:
                     case SQL_VARBINARY:
-                    case SQL_LONGVARCHAR:
                     case SQL_DECIMAL:
                     case SQL_NUMERIC:
                         return SQL_NO_TOTAL;
