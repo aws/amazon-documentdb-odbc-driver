@@ -24,6 +24,7 @@
 
 #include "ignite/odbc/config/settable_value.h"
 #include "ignite/odbc/diagnostic/diagnosable.h"
+#include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/read_preference.h"
 #include "ignite/odbc/scan_method.h"
 
@@ -714,10 +715,9 @@ namespace ignite
 
                 /**
                  * Checks that a valid JDBC connection string with all the required properties can be built from the configuration.
-                 * @param err string for error message.
-                 * @return @c true on valid set and @c false otherwise.
+                 * Throws error on incomplete properties.
                  */
-                bool Validate(std::string& err) const;
+                void Validate() const;
 
                 /**
                  * Formats the JDBC connection string from configuration values.

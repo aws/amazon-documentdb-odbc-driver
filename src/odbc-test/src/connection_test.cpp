@@ -91,14 +91,6 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestoreInternalSSHTunnel)
     Disconnect();
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionRestore2) {
-    std::string connectionString;
-    CreateDsnConnectionString(connectionString);
-
-    Connect(connectionString);
-    Disconnect();
-}
-
 BOOST_AUTO_TEST_CASE(TestConnectionRestoreExternalSSHTunnel)
 {
     std::string connectionString;
