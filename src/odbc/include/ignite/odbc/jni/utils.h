@@ -174,7 +174,6 @@ namespace ignite
               */
             IGNITE_IMPORT_EXPORT std::string CreateDocumentDbClasspath(const std::string& usrCp, const std::string& home);
 
-
             /**
               * Resolve DOCUMENTDB_HOME directory. Resolution is performed in several
               * steps:

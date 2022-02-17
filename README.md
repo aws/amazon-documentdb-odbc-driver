@@ -14,6 +14,16 @@ SSH host credentials
 1. `DOC_DB_USER`=`<ssh_user>`(e.g.:`ec2-user@ec2-instance.us-east-2.compute.amazonaws.com`)
 2. `DOC_DB_PRIV_KEY_FILE`=`<path_to_ssh_host_private_key_file>`(e.g.:`~/.ssh/ssh_host.pem`)
 
+### Running an SSH tunnel for Testing
+To run tests that require an external SSH tunnel, you will need to start an SSH tunnel using the same values as the environment variables set in the previous section. 
+If the local port is a value other than 27019, set `DOC_DB_LOCAL_PORT` to that value. 
+If the remote port is a value other than 27017, set `DOC_DB_REMOTE_PORT` to that value. 
+
+Example:
+```
+ ssh -i $DOC_DB_PRIV_KEY_FILE -N -L $DOC_DB_LOCAL_PORT:$DOC_DB_HOST:$DOC_DB_REMOTE_PORT $DOC_DB_USER
+```
+
 ### Windows
 
 1. Microsoft Visual Studio (Community 2019 Verified)
