@@ -479,7 +479,7 @@ namespace ignite
                 }
             }
 
-            int16_t BinaryTypeNullability(int8_t)
+            int16_t BinaryTypeNullability(int16_t)
             {
                 return SQL_NULLABLE_UNKNOWN;
             }
@@ -539,7 +539,7 @@ namespace ignite
                 }
             }
 
-            int32_t BinaryTypeDisplaySize(int8_t type)
+            int32_t BinaryTypeDisplaySize(int16_t type)
             {
                 int16_t sqlType = BinaryToSqlType(type);
 
@@ -659,7 +659,7 @@ namespace ignite
                 }
             }
 
-            int32_t BinaryTypeTransferLength(int8_t type)
+            int32_t BinaryTypeTransferLength(int16_t type)
             {
                 int16_t sqlType = BinaryToSqlType(type);
 
@@ -687,7 +687,7 @@ namespace ignite
                 }
             }
 
-            int32_t BinaryTypeNumPrecRadix(int8_t type)
+            int32_t BinaryTypeNumPrecRadix(int16_t type)
             {
                 int16_t sqlType = BinaryToSqlType(type);
 
@@ -700,7 +700,7 @@ namespace ignite
                 return -1;
             }
 
-            int32_t BinaryTypeDecimalDigits(int8_t type)
+            int32_t BinaryTypeDecimalDigits(int16_t type)
             {
                 int16_t sqlType = BinaryToSqlType(type);
 

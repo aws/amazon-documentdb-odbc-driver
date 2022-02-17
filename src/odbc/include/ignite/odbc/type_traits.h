@@ -182,7 +182,6 @@ namespace ignite
              * @param binaryType Binary type.
              * @return Corresponding SQL type name.
              */
-            //const std::string& BinaryTypeToSqlTypeName(int8_t binaryType);
             const std::string& BinaryTypeToSqlTypeName(int16_t binaryType);
 
             /**
@@ -207,7 +206,6 @@ namespace ignite
              * @param sqlType SQL type.
              * @return Binary type.
              */
-            //int8_t SqlTypeToBinary(int16_t sqlType); // todo remove -al-
             int16_t SqlTypeToBinary(int16_t sqlType);
 
             /**
@@ -224,7 +222,6 @@ namespace ignite
              * @param binaryType Binary data type.
              * @return SQL data type.
              */
-            //int16_t BinaryToSqlType(int8_t binaryType); // todo remove -al-
             int16_t BinaryToSqlType(int16_t binaryType);
 
             /**
@@ -236,7 +233,7 @@ namespace ignite
              *         SQL_NULLABLE_UNKNOWN if it is not known whether the 
              *         column accepts NULL values.
              */
-            int16_t BinaryTypeNullability(int8_t binaryType);
+            int16_t BinaryTypeNullability(int16_t binaryType);
 
             /**
              * Get SQL type display size.
@@ -252,7 +249,7 @@ namespace ignite
              * @param type Binary type.
              * @return Display size.
              */
-            int32_t BinaryTypeDisplaySize(int8_t type);
+            int32_t BinaryTypeDisplaySize(int16_t type);
 
             /**
              * Get SQL type column size.
@@ -268,7 +265,6 @@ namespace ignite
              * @param type Binary type.
              * @return Column size.
              */
-            /*int32_t BinaryTypeColumnSize(int8_t type);*/
             int32_t BinaryTypeColumnSize(int16_t type);
 
             /**
@@ -285,7 +281,7 @@ namespace ignite
              * @param type Binary type.
              * @return Transfer octet length.
              */
-            int32_t BinaryTypeTransferLength(int8_t type);
+            int32_t BinaryTypeTransferLength(int16_t type);
 
             /**
              * Get SQL type numeric precision radix.
@@ -293,7 +289,7 @@ namespace ignite
              * @param type SQL type.
              * @return Numeric precision radix.
              */
-            int32_t SqlTypeNumPrecRadix(int8_t type);
+            int32_t SqlTypeNumPrecRadix(int16_t type);
 
             /**
              * Get binary type numeric precision radix.
@@ -301,7 +297,7 @@ namespace ignite
              * @param type Binary type.
              * @return Numeric precision radix.
              */
-            int32_t BinaryTypeNumPrecRadix(int8_t type);
+            int32_t BinaryTypeNumPrecRadix(int16_t type);
 
             /**
              * Get SQL type decimal digits.
@@ -317,7 +313,7 @@ namespace ignite
              * @param type Binary type.
              * @return Decimal digits.
              */
-            int32_t BinaryTypeDecimalDigits(int8_t type);
+            int32_t BinaryTypeDecimalDigits(int16_t type);
 
             /**
              * Checks if the SQL type is unsigned.
