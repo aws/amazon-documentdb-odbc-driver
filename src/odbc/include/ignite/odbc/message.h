@@ -957,42 +957,6 @@ namespace ignite
         };
 
         /**
-         * Query get table metadata response.
-         */
-        class QueryGetTablesMetaResponse : public Response
-        {
-        public:
-            /**
-             * Constructor.
-             */
-            QueryGetTablesMetaResponse();
-
-            /**
-             * Destructor.
-             */
-            virtual ~QueryGetTablesMetaResponse();
-
-            /**
-             * Get column metadata.
-             * @return Column metadata.
-             */
-            const meta::TableMetaVector& GetMeta() const
-            {
-                return meta;
-            }
-
-        private:
-            /**
-             * Read response using provided reader.
-             * @param reader Reader.
-             */
-            virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader, const ProtocolVersion&);
-
-            /** Columns metadata. */
-            meta::TableMetaVector meta;
-        };
-
-        /**
          * Get params metadata response.
          */
         class QueryGetParamsMetaResponse : public Response
