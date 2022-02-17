@@ -648,11 +648,14 @@ namespace ignite
                     case SQL_VARCHAR:
                     case SQL_CHAR:
                     case SQL_WCHAR:
-                        return SQL_DESC_LENGTH;
+                    case SQL_LONGVARCHAR:
+                        // return SQL_DESC_LENGTH;
+                        // todo -AL- double check needed. If our driver cannot
+                        // determien the column or parameter length,
+                        // SQL_NO_TOTAL should be returned instead [check on slack]
                     case SQL_LONGVARBINARY:
                     case SQL_BINARY:
                     case SQL_VARBINARY:
-                    case SQL_LONGVARCHAR:
                     case SQL_DECIMAL:
                     case SQL_NUMERIC:
                         return SQL_NO_TOTAL;
@@ -711,10 +714,13 @@ namespace ignite
                     case SQL_VARCHAR:
                     case SQL_CHAR:
                     case SQL_WCHAR:
+                    case SQL_LONGVARCHAR:
+                    //    return SQL_DESC_OCTET_LENGTH; // todo -AL- double check needed. If our driver cannot determien the 
+                        // column or parameter length, SQL_NO_TOTAL should be returned instead
+
                     case SQL_LONGVARBINARY:
                     case SQL_BINARY:
                     case SQL_VARBINARY:
-                    case SQL_LONGVARCHAR:
                     case SQL_DECIMAL:
                     case SQL_NUMERIC:
                         return SQL_NO_TOTAL;
@@ -734,9 +740,9 @@ namespace ignite
                         return 8;
 
                     case SQL_REAL:
-                    case SQL_FLOAT:
                         return 4;
 
+                    case SQL_FLOAT:
                     case SQL_DOUBLE:
                         return 8;
 
