@@ -333,7 +333,7 @@ namespace ignite
              * @param type Binary type.
              * @return True if unsigned or non-numeric.
              */
-            bool BinaryTypeUnsigned(int8_t type);
+            bool BinaryTypeUnsigned(int16_t type);
         }
     }
 }

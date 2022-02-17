@@ -828,7 +828,7 @@ namespace ignite
                 }
             }
 
-            bool BinaryTypeUnsigned(int8_t type)
+            bool BinaryTypeUnsigned(int16_t type)
             {
                 int16_t sqlType = BinaryToSqlType(type);
 
