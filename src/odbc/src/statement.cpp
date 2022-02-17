@@ -791,10 +791,10 @@ namespace ignite
                 schema0 = connection.GetSchema();
 
             // old ignite code // todo remove -AL-
-            //currentQuery.reset(new query::ColumnMetadataQuery(*this,
-            //    connection, catalog, schema, table, column));
-            currentQuery.reset(new query::ColumnMetadataQuery(
-                *this, columnsResultSet, catalog, schema, table, column));
+            currentQuery.reset(new query::ColumnMetadataQuery(*this,
+                connection, catalog, schema, table, column));
+            //currentQuery.reset(new query::ColumnMetadataQuery(
+            //    *this, columnsResultSet, catalog, schema, table, column));
 
             return currentQuery->Execute();
         }

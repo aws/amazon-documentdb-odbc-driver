@@ -715,7 +715,6 @@ class Statement : public diagnostic::DiagnosableAdapter {
 
   /** Connection associated with the statement. */
   Connection& connection;
-  SharedPointer< GlobalJObject > columnsResultSet;
 
   /** Column bindings. */
   app::ColumnBindingMap columnBindings;
