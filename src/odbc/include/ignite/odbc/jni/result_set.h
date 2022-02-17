@@ -117,8 +117,8 @@ namespace ignite {
                 /**
                  * Constructs a new instancee of ResultSet.
                  */
-                ResultSet(SharedPointer< JniContext > jniContext,
-                          SharedPointer< GlobalJObject > resultSet);
+                ResultSet(SharedPointer< JniContext >& jniContext,
+                          SharedPointer< GlobalJObject >& resultSet);
 
                 /** The JNI context */
                 SharedPointer< JniContext > _jniContext;
