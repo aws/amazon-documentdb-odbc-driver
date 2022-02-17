@@ -384,27 +384,6 @@ namespace ignite
             // No-op.
         }
 
-        void QueryExecuteResponse::ReadOnSuccess(SharedPointer< GlobalJObject > resultSet)
-        {
-            //queryId = reader.ReadInt64();
-
-            meta::ReadColumnMetaVector(resultSet, meta);
-
-            // -AL- ReadAffectedRows used to be called by ignite, it has to do with protocol version and reader. 
-            // I'm not calling it
-        }
-
-        /*
-        void QueryExecuteResponse::ReadOnSuccess(impl::binary::BinaryReaderImpl& reader, const ProtocolVersion& ver)
-        {
-            queryId = reader.ReadInt64();
-
-            meta::ReadColumnMetaVector(reader, meta, ver);
-
-            ReadAffectedRows(reader, ver, affectedRows);
-        }
-        */
-
         QueryExecuteBatchResponse::QueryExecuteBatchResponse() :
             affectedRows(0),
             errorMessage(),
@@ -474,28 +453,6 @@ namespace ignite
             resultPage.Read(reader);
         }
 
-        QueryGetColumnsMetaResponse::QueryGetColumnsMetaResponse()
-        {
-            // No-op.
-        }
-
-        QueryGetColumnsMetaResponse::~QueryGetColumnsMetaResponse()
-        {
-            // No-op.
-        }
-
-        // old ignite code
-        //void QueryGetColumnsMetaResponse::ReadOnSuccess(impl::binary::BinaryReaderImpl& reader,
-        //    const ProtocolVersion& ver)
-        //{
-        //    meta::ReadColumnMetaVector(reader, meta, ver);
-        //}
-
-        void QueryGetColumnsMetaResponse::ReadOnSuccess(SharedPointer< GlobalJObject > resultSet)
-        {
-            meta::ReadColumnMetaVector(resultSet, meta);
-        }
-
         QueryGetResultsetMetaResponse::QueryGetResultsetMetaResponse()
         {
             // No-op.
@@ -504,17 +461,6 @@ namespace ignite
         QueryGetResultsetMetaResponse::~QueryGetResultsetMetaResponse()
         {
             // No-op.
-        }
-
-        // old ignite code
-        //void QueryGetResultsetMetaResponse::ReadOnSuccess(impl::binary::BinaryReaderImpl &reader, const ProtocolVersion& ver)
-        //{
-        //    meta::ReadColumnMetaVector(reader, meta, ver);
-        //}
-
-        void QueryGetResultsetMetaResponse::ReadOnSuccess(SharedPointer< GlobalJObject > resultSet)
-        {
-            meta::ReadColumnMetaVector(resultSet, meta);
         }
 
         QueryGetParamsMetaResponse::QueryGetParamsMetaResponse()
