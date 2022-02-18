@@ -238,7 +238,7 @@ class ColumnMeta {
   std::string remarks;
 
   /** Data type. */
-  int8_t dataType;
+  int16_t dataType;
 
   /** Column precision. */
   int32_t precision;
