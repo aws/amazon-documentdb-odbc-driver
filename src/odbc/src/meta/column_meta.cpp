@@ -91,37 +91,6 @@ SqlLen Nullability::ToSql(int32_t nullability) {
   return SQL_NULLABLE_UNKNOWN;
 }
 
-// -AL-: the original function called in column_vector
-// should define this function to get values from the column
-/*
-void ColumnMeta::Read(
-    ignite::impl::binary::BinaryReaderImpl& reader,
-    const ProtocolVersion&
-        ver) {  // taking the source and assigning to the variables.
-  utility::ReadString(
-      reader,
-      schemaName);  // class variable, accessed by SQL columns over the fetch
-  utility::ReadString(reader, tableName);
-  utility::ReadString(reader, columnName);
-
-  dataType = reader.ReadInt8();
-
-  if (ver >= ProtocolVersion::VERSION_2_7_0) {
-    precision = reader.ReadInt32();
-    scale = reader.ReadInt32();
-  }
-
-  if (ver >= ProtocolVersion::VERSION_2_8_0)
-    nullability = reader.ReadInt8();
-}
-*/
-
-// newly added constants -AL-
-// todo finish the rest of constants (no need to read for unused constants)
-// todo check - how to determine which values to store? Can I go with the previous plan
-// and read everything that is in both JDBC and SQLColumns?
-
-// the constants should match JDBC column entry constants
 const std::string TABLE_CAT = "TABLE_CAT";
 const std::string TABLE_SCHEM = "TABLE_SCHEM";
 const std::string TABLE_NAME = "TABLE_NAME";
@@ -132,7 +101,6 @@ const std::string COLUMN_DEF = "COLUMN_DEF";
 const std::string NULLABLE = "NULLABLE";
 const std::string ORDINAL_POSITION = "ORDINAL_POSITION";
 
-// -AL- new read function
 void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet, int32_t& prevPosition,
                      JniErrorInfo& errInfo) {
     bool wasNull;
