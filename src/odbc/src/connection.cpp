@@ -135,6 +135,13 @@ namespace ignite
             config::ConnectionStringParser parser(config);
             parser.ParseConnectionString(connectStr, &GetDiagnosticRecords());
 
+            if (config.IsDsnSet())
+            {
+                std::string dsn = config.GetDsn();
+
+                ReadDsnConfiguration(dsn.c_str(), config, &GetDiagnosticRecords());
+            }
+
 #ifdef _WIN32
             if (parentWindow)
             {
@@ -147,13 +154,6 @@ namespace ignite
                 }
             }
 #endif  // _WIN32
-
-            if (config.IsDsnSet())
-            {
-                std::string dsn = config.GetDsn();
-
-                ReadDsnConfiguration(dsn.c_str(), config, &GetDiagnosticRecords());
-            }
 
             return InternalEstablish(config);
         }
@@ -176,10 +176,11 @@ namespace ignite
                 return SqlResult::AI_ERROR;
             }
 
-            if (!config.IsHostnameSet())
-            {
-                AddStatusRecord("No valid address to connect.");
-
+            try {
+                config.Validate();
+            }
+            catch (const OdbcError& err) {
+                AddStatusRecord(err);
                 return SqlResult::AI_ERROR;
             }
 
@@ -661,7 +662,7 @@ namespace ignite
             // localSSHTunnelPort == 0 means that internal SSH tunnel option was not set
             if (localSSHTunnelPort == 0) {
                 host = config.GetHostname();
-                port = config.GetPort();
+                port = common::LexicalCast<std::string>(config.GetPort());
             }
             std::string mongoConnectionString;
 

@@ -83,7 +83,7 @@ struct ConnectionTestSuiteFixture: OdbcTestSuite
 
 BOOST_FIXTURE_TEST_SUITE(ConnectionTestSuite, ConnectionTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestConnectionRestore)
+BOOST_AUTO_TEST_CASE(TestConnectionRestoreInternalSSHTunnel)
 {
     std::string connectionString;
     CreateDsnConnectionString(connectionString);
@@ -91,11 +91,58 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestore)
     Disconnect();
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionRestore2) {
+BOOST_AUTO_TEST_CASE(TestConnectionRestoreExternalSSHTunnel)
+{
     std::string connectionString;
-    CreateDsnConnectionString(connectionString);
+    CreateDsnConnectionString(connectionString, std::string(), false);
 
     Connect(connectionString);
+    Disconnect();
+}
+
+BOOST_AUTO_TEST_CASE(TestConnectionRestoreMiscOptionsSet)
+{
+    const std::string miscOptions = 
+        "APP_NAME=TestAppName;"
+        "LOGIN_TIMEOUT_SEC=30;"
+        "READ_PREFERENCE=primary_preferred;"
+        "RETRY_READS=false;"
+        "SCAN_METHOD=id_forward;"
+        "SCAN_LIMIT=100;"
+        "SCHEMA_NAME=test;"
+        "REFRESH_SCHEMA=true;"
+        "DEFAULT_FETCH_SIZE=1000;";
+    std::string connectionString;
+    CreateDsnConnectionString(connectionString, std::string(), true, miscOptions);
+
+    Connect(connectionString);
+    Disconnect();
+}
+
+BOOST_AUTO_TEST_CASE(TestConnectionIncompleteBasicProperties) {
+    std::string connectionString =
+        "DRIVER={Apache Ignite};"
+        "HOSTNAME=localhost;"
+        "USER=user;"
+        "PASSWORD=password;";
+
+    ExpectConnectionReject(connectionString, "01S00: Hostname, username, password, and database are required to connect.");
+
+    Disconnect();
+}
+
+BOOST_AUTO_TEST_CASE(TestConnectionIncompleteSSHTunnelProperties) {
+    std::string connectionString =
+        "DRIVER={Apache Ignite};"
+        "HOSTNAME=host.com;"
+        "DATABASE=test;"
+        "USER=user;"
+        "PASSWORD=password;"
+        "SSH_USER=sshUser;"
+        "SSH_HOST=sshHost;";
+
+    ExpectConnectionReject(connectionString, "01S00: If using an internal SSH tunnel, all of ssh_host, ssh_user, ssh_private_key_file are required to connect.");
+
     Disconnect();
 }
 
