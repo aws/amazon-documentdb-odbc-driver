@@ -29,6 +29,7 @@
 
 using namespace ignite::odbc;
 using namespace ignite::odbc::config;
+using ignite::common::EncodeURIComponent;
 
 namespace
 {
@@ -251,14 +252,14 @@ void CheckConnectionConfig(const Configuration& cfg)
                     << "&scanMethod=" << ScanMethod::ToJdbcString(testScanMethod)
                     << "&schemaName=" << testSchemaName
                     << "&sshHost=" << testSshHost
-                    << "&sshKnownHostsFile=" << ignite::common::EncodeURIComponent(testSshKnownHostsFile)
-                    << "&sshPrivateKeyFile=" << ignite::common::EncodeURIComponent(testSshPrivateKeyFile)
+                    << "&sshKnownHostsFile=" << EncodeURIComponent(testSshKnownHostsFile)
+                    << "&sshPrivateKeyFile=" << EncodeURIComponent(testSshPrivateKeyFile)
                     << "&sshPrivateKeyPassphrase=" << testSshPrivateKeyPassphrase
                     << "&sshStrictHostKeyChecking=" << BoolToStr(testSshStrictHostKeyCheckingFlag)
                     << "&sshUser=" << testSshUser
                     << "&tls=" << BoolToStr(testTlsFlag)
                     << "&tlsAllowInvalidHostnames=" << BoolToStr(testTlsAllowInvalidHostnamesFlag)
-                    << "&tlsCaFile=" << ignite::common::EncodeURIComponent(testTlsCaFile);
+                    << "&tlsCaFile=" << EncodeURIComponent(testTlsCaFile);
     const std::string& expectedJdbcStr = jdbcConstructor.str();
 
     BOOST_CHECK_EQUAL(ignite::common::ToLower(cfg.ToConnectString()), ignite::common::ToLower(expectedStr));
