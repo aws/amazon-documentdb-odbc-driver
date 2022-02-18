@@ -299,7 +299,9 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::SQL_DATETIME_SUB: {
-      buffer.PutNull(); // todo implement the function for getting the datetime sub code 
+      buffer.PutNull(); 
+      // todo implement the function for getting the datetime sub code:
+      // https://bitquill.atlassian.net/browse/AD-609
       break;
     }
 
