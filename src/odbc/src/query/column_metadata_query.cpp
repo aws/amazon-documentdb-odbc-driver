@@ -197,10 +197,7 @@ SqlResult::Type ColumnMetadataQuery::FetchNextRow(
 SqlResult::Type ColumnMetadataQuery::GetColumn(
     uint16_t columnIdx,
     app::ApplicationDataBuffer&
-        buffer) {  // -AL- I need to change this code to match resultSet return
-                   // values. todo
-  // this place has BinaryTypeToSqlTypeName, and other mentioned method names to
-  // adapt
+        buffer) {
   if (!executed) {
     diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
                          "Query was not executed.");
