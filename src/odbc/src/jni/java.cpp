@@ -1533,6 +1533,12 @@ namespace ignite
                         }
 
                         env->DeleteLocalRef(err);
+                    } else {
+                        if (errInfo) {
+                            JniErrorInfo errInfo0(
+                                JniErrorCode::IGNITE_JNI_ERR_SUCCESS, "", "");
+                            *errInfo = errInfo0;
+                        }
                     }
                 }
 

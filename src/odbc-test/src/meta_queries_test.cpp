@@ -654,19 +654,21 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsMany) {
     BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 }
 
-BOOST_AUTO_TEST_CASE(TestGetDataWithColumns, *disabled()) {
-    Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
+BOOST_AUTO_TEST_CASE(TestGetDataWithColumns) {
+    std::string dsnConnectionString;
+    CreateDsnConnectionString(dsnConnectionString);
+    Connect(dsnConnectionString);
 
     SQLCHAR empty[] = "";
-    SQLCHAR table[] = "TestType";
-    SQLCHAR column[] = "strField";
+    SQLCHAR table[] = "test";
+    SQLCHAR column[] = "test__id";
 
     SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, table, SQL_NTS, column, SQL_NTS);
 
     if (!SQL_SUCCEEDED(ret))
         BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-    CheckSingleRowResultSetWithGetData(stmt);
+    CheckSingleRowResultSetWithGetData(stmt, 4, "test__id");
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithSelectQuery, *disabled()) {
