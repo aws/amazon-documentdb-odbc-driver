@@ -288,10 +288,7 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     // -AL- start of my added values
 
     case ResultColumn::COLUMN_DEF: {
-      buffer.PutNull();
-      // buffer.PutString(); // todo, it should be string not null.
-      // It seems that I might need to create a currentColumn.getColumnDef()
-      // function -AL-
+      buffer.PutString(currentColumn.GetColumnDef());
       break;
     } 
 

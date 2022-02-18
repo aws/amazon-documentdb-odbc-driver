@@ -186,6 +186,14 @@ class ColumnMeta {
   }
 
   /**
+   * Get the column default value.
+   * @return Column default value.
+   */
+  const std::string& GetColumnDef() const {
+      return columnDef;
+  }
+
+  /**
    * Get data type.
    * @return Data type.
    */
@@ -258,6 +266,9 @@ class ColumnMeta {
 
   /** Remarks */
   std::string remarks;
+
+  /** Column default value */
+  std::string columnDef;
 
   /** Data type. */
   int16_t dataType;

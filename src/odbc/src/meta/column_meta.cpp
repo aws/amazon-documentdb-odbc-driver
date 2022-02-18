@@ -128,6 +128,7 @@ const std::string TABLE_NAME = "TABLE_NAME";
 const std::string COLUMN_NAME = "COLUMN_NAME";
 const std::string DATA_TYPE = "DATA_TYPE";
 const std::string REMARKS = "REMARKS";
+const std::string COLUMN_DEF = "COLUMN_DEF";
 const std::string NULLABLE = "NULLABLE";
 const std::string ORDINAL_POSITION = "ORDINAL_POSITION";
 
@@ -140,11 +141,13 @@ void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet, int32_t& prevPositi
     tableName = "";
     columnName = "";
     remarks = "";
+    columnDef = "";
     resultSet.Get()->GetString(TABLE_CAT, catalogName, wasNull, errInfo);
     resultSet.Get()->GetString(TABLE_SCHEM, schemaName, wasNull, errInfo);
     resultSet.Get()->GetString(TABLE_NAME, tableName, wasNull, errInfo);
     resultSet.Get()->GetString(COLUMN_NAME, columnName, wasNull, errInfo);
     resultSet.Get()->GetString(REMARKS, remarks, wasNull, errInfo);
+    resultSet.Get()->GetString(COLUMN_DEF, columnDef, wasNull, errInfo);
     resultSet.Get()->GetInt(NULLABLE, nullability, wasNull, errInfo);
     resultSet.Get()->GetInt(ORDINAL_POSITION, ordinalPosition, wasNull, errInfo);
     if (wasNull) {
