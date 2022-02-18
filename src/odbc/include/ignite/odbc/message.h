@@ -706,18 +706,6 @@ namespace ignite
             }
 
         private:
-            /** // old ignite code
-             * Read response using provided reader.
-             * @param reader Reader.
-             */
-            // virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader, const ProtocolVersion& ver);
-
-            /**
-              * Read response using provided resultSet
-              * @param resultSet ResultSet
-              */
-             virtual void ReadOnSuccess(SharedPointer< GlobalJObject > resultSet);
-
             /** Query ID. */
             int64_t queryId;
 
