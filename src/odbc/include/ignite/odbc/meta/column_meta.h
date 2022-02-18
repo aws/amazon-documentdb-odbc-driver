@@ -296,5 +296,4 @@ void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
 }  // namespace meta
 }  // namespace odbc
 }  // namespace ignite
-
 #endif //_IGNITE_ODBC_META_COLUMN_META
