@@ -1,4 +1,3 @@
-
 BUILD_DIR=cmake-build64
 BUILD_TYPE=Release
 PROJECT_DIR=$(pwd)

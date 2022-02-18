@@ -81,14 +81,19 @@ namespace ignite
 {
     namespace odbc
     {
-        namespace java
+        namespace jni
         {
-            /* JNI error constants. */
-            const int IGNITE_JNI_ERR_SUCCESS = 0;
-            const int IGNITE_JNI_ERR_GENERIC = 1;
-            const int IGNITE_JNI_ERR_JVM_INIT = 2;
-            const int IGNITE_JNI_ERR_JVM_ATTACH = 3;
-        }
+            namespace java
+            {
+                enum class JniErrorCode {
+                    /* JNI error constants. */
+                    IGNITE_JNI_ERR_SUCCESS = 0,
+                    IGNITE_JNI_ERR_GENERIC = 1,
+                    IGNITE_JNI_ERR_JVM_INIT = 2,
+                    IGNITE_JNI_ERR_JVM_ATTACH = 3
+                };
+            }  // namespace java
+        }  // namespace jni
 
         /**
          * %Ignite error information.
@@ -119,6 +124,9 @@ namespace ignite
 
             /** JVM error: no such method. */
             static const int IGNITE_ERR_JVM_NO_SUCH_METHOD = 7;
+
+            /** JNI error: getting database metadata */
+            static const int IGNITE_ERR_JNI_GET_DATABASE_METADATA = 101;
 
             /** Memory operation error. */
             static const int IGNITE_ERR_MEMORY = 1001;
@@ -298,8 +306,9 @@ namespace ignite
              * @param jniMsg Error message.
              * @param err Error. Can not be NULL.
              */
-            static void SetError(const int jniCode, const char* jniCls, const char* jniMsg, IgniteError& err);
-        private:
+            static void SetError(const jni::java::JniErrorCode jniCode, const char* jniCls, const char* jniMsg, IgniteError& err);
+
+           private:
             /** Error code. */
             int32_t code;    
         
