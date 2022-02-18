@@ -303,26 +303,6 @@ typedef std::vector< ColumnMeta > ColumnMetaVector;
 void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
                          ColumnMetaVector& meta);
 
-
-// -AL- todo delete later. No longer needed
-/**
- * Read columns metadata collection.
- * @param reader Reader.
- * @param meta Collection.
- * @param ver Server protocol version.
- */
-// void ReadColumnMetaVector(ignite::impl::binary::BinaryReaderImpl& reader,
-// ColumnMetaVector& meta,
-//        const ProtocolVersion& ver);
-
-/**
- * Read columns metadata collection.
- * @param resultSet ReseultSet.
- * @param meta Collection.
- */
-//void ReadColumnMetaVector(SharedPointer< ResultSet > resultSet,
-//                          ColumnMetaVector& meta);
-
 }  // namespace meta
 }  // namespace odbc
 }  // namespace ignite

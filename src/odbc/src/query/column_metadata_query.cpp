@@ -101,10 +101,6 @@ struct ResultColumn {
 namespace ignite {
 namespace odbc {
 namespace query {
-    // -AL- this function is called in InternalExecuteGetColumnsMetaQuery, which is called by 
-    // ExecuteGetColumnsMetaQuery, which is called in SQLColumns (odbc.cpp)
-    //  currentQuery->Execute(), where currentQuery is a ColumnMetadataQuery, is called.
-    // thus, Execute() function is called, and readMetaVector is eventually called as well. 
 ColumnMetadataQuery::ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
                                           Connection& connection, const std::string& catalog,
                                           const std::string& schema, const std::string& table,
@@ -128,12 +124,6 @@ ColumnMetadataQuery::ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
 
   const std::string sch;
   const std::string tbl;
-  // todo: first, understand what is going on, then add the missing types if needed
-  // my understanding: since GetColumn gets value based on 'data_type' value, each column
-  // should have about the same set of entry as addColumnEntry in Jdbc.
-
-  // this is simply metadata for the column metadata. Just populate it and make sure I have all 
-  // values in GetColumns here
 
   columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", DOCUMENTDB_JDBC_TYPE_VARCHAR));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_SCHEM", DOCUMENTDB_JDBC_TYPE_VARCHAR));
