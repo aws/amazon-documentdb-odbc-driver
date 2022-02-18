@@ -52,11 +52,16 @@ namespace ignite {
                     const std::vector< std::string >& types,
                     JniErrorInfo& errInfo);
 
+                /**
+                 * Query the columns in the database according to the given
+                 * search critera in catalog (not supported), schemaPattern,
+                 * tablePattern and columnPattern.
+                 */
                 SharedPointer< ResultSet > GetColumns(
                     const std::string& catalog,
                     const std::string& schemaPattern,
                     const std::string& tableNamePattern,
-                    const std::string& column, 
+                    const std::string& columnNamePattern,
                     JniErrorInfo& errInfo);
 
                private:

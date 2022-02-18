@@ -48,14 +48,17 @@ namespace ignite {
             }
 
             SharedPointer< ResultSet > DatabaseMetaData::GetColumns(
-                    const std::string& catalog, const std::string& schemaPattern,
+                    const std::string& catalog,
+                    const std::string& schemaPattern,
                     const std::string& tableNamePattern,
-                    const std::string& column,
+                    const std::string& columnNamePattern,
                     JniErrorInfo& errInfo) {
                 SharedPointer< GlobalJObject > resultSet;
+                const std::vector< std::string > types;
                 JniErrorCode success =_jniContext.Get()->DatabaseMetaDataGetColumns(
-                     _databaseMetadata, catalog, schemaPattern,
-                     tableNamePattern, column, resultSet, errInfo);
+                     _databaseMetaData, catalog, schemaPattern,
+                        tableNamePattern, columnNamePattern, resultSet,
+                        errInfo);
                 if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
                     return nullptr;
                 }
