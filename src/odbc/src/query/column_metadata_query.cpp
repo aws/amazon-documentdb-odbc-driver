@@ -306,6 +306,11 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     case ResultColumn::CHAR_OCTET_LENGTH: {
       buffer.PutInt32(type_traits::BinaryTypeCharOctetLength(columnType));
       break;
+    }
+
+    case ResultColumn::ORDINAL_POSITION: {
+        // TODO -al- read JDBC column, if null, use previous read value + 1. original_position = ++ row;
+      buffer.PutInt32(currentColumn.GetOrdinalPosition());
       break;
     }
  

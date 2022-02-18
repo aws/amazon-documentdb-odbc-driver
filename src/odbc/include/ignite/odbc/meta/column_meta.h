@@ -140,7 +140,8 @@ class ColumnMeta {
    * Read using reader.
    * @param resultSet SharedPointer< ResultSet >.
    */
-  void Read(SharedPointer< ResultSet >& resultSet, JniErrorInfo& errInfo);
+  void Read(SharedPointer< ResultSet >& resultSet, int32_t& prevPosition,
+            JniErrorInfo& errInfo);
 
   /**
    * Get schema name.
@@ -207,6 +208,14 @@ class ColumnMeta {
   }
 
   /**
+   * Get column ordinal position.
+   * @return Column ordinal position.
+   */
+  int32_t GetOrdinalPosition() const {
+      return ordinalPosition;
+  }
+
+  /**
    * Try to get attribute of a string type.
    *
    * @param fieldId Field ID.
@@ -248,6 +257,9 @@ class ColumnMeta {
 
   /** Column nullability. */
   int32_t nullability;
+
+  /** Column ordinal position. */
+  int32_t ordinalPosition;
 };
 
 /** Column metadata vector alias. */

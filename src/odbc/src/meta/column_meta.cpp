@@ -129,9 +129,10 @@ const std::string COLUMN_NAME = "COLUMN_NAME";
 const std::string DATA_TYPE = "DATA_TYPE";
 const std::string REMARKS = "REMARKS";
 const std::string NULLABLE = "NULLABLE";
+const std::string ORDINAL_POSITION = "ORDINAL_POSITION";
 
 // -AL- new read function
-void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
+void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet, int32_t& prevPosition,
                      JniErrorInfo& errInfo) {
     bool wasNull;
     schemaName = "";
@@ -142,6 +143,12 @@ void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
     resultSet.Get()->GetString(COLUMN_NAME, columnName, wasNull, errInfo);
     resultSet.Get()->GetString(REMARKS, remarks, wasNull, errInfo);
     resultSet.Get()->GetInt(NULLABLE, nullability, wasNull, errInfo);
+    resultSet.Get()->GetInt(ORDINAL_POSITION, ordinalPosition, wasNull, errInfo);
+    if (wasNull) {
+        ordinalPosition = ++prevPosition;
+    } else {
+        prevPosition = ordinalPosition;
+    }
 }
 
 bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
@@ -363,6 +370,7 @@ void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
 
   JniErrorInfo errInfo;
   bool hasNext = false;
+  int32_t prevPosition = 0;
   JniErrorCode errCode;
   do {
       errCode = resultSet.Get()->Next(hasNext, errInfo);
@@ -371,7 +379,7 @@ void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
       }
 
       meta.emplace_back(ColumnMeta());
-      meta.back().Read(resultSet, errInfo);
+      meta.back().Read(resultSet, prevPosition, errInfo);
   } while (hasNext);
 
   // old code, no longer used
