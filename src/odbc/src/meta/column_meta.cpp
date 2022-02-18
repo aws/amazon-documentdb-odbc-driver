@@ -91,57 +91,38 @@ SqlLen Nullability::ToSql(int32_t nullability) {
   return SQL_NULLABLE_UNKNOWN;
 }
 
-// -AL-: the original function called in column_vector
-// should define this function to get values from the column
-/*
-void ColumnMeta::Read(
-    ignite::impl::binary::BinaryReaderImpl& reader,
-    const ProtocolVersion&
-        ver) {  // taking the source and assigning to the variables.
-  utility::ReadString(
-      reader,
-      schemaName);  // class variable, accessed by SQL columns over the fetch
-  utility::ReadString(reader, tableName);
-  utility::ReadString(reader, columnName);
-
-  dataType = reader.ReadInt8();
-
-  if (ver >= ProtocolVersion::VERSION_2_7_0) {
-    precision = reader.ReadInt32();
-    scale = reader.ReadInt32();
-  }
-
-  if (ver >= ProtocolVersion::VERSION_2_8_0)
-    nullability = reader.ReadInt8();
-}
-*/
-
-// newly added constants -AL-
-// todo finish the rest of constants (no need to read for unused constants)
-// todo check - how to determine which values to store? Can I go with the previous plan
-// and read everything that is in both JDBC and SQLColumns?
-
-// the constants should match JDBC column entry constants
 const std::string TABLE_CAT = "TABLE_CAT";
 const std::string TABLE_SCHEM = "TABLE_SCHEM";
 const std::string TABLE_NAME = "TABLE_NAME";
 const std::string COLUMN_NAME = "COLUMN_NAME";
 const std::string DATA_TYPE = "DATA_TYPE";
 const std::string REMARKS = "REMARKS";
+const std::string COLUMN_DEF = "COLUMN_DEF";
 const std::string NULLABLE = "NULLABLE";
+const std::string ORDINAL_POSITION = "ORDINAL_POSITION";
 
-// -AL- new read function
-void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
+void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet, int32_t& prevPosition,
                      JniErrorInfo& errInfo) {
     bool wasNull;
+    catalogName = "";
     schemaName = "";
     tableName = "";
     columnName = "";
+    remarks = "";
+    columnDef = "";
+    resultSet.Get()->GetString(TABLE_CAT, catalogName, wasNull, errInfo);
     resultSet.Get()->GetString(TABLE_SCHEM, schemaName, wasNull, errInfo);
     resultSet.Get()->GetString(TABLE_NAME, tableName, wasNull, errInfo);
     resultSet.Get()->GetString(COLUMN_NAME, columnName, wasNull, errInfo);
     resultSet.Get()->GetString(REMARKS, remarks, wasNull, errInfo);
+    resultSet.Get()->GetString(COLUMN_DEF, columnDef, wasNull, errInfo);
     resultSet.Get()->GetInt(NULLABLE, nullability, wasNull, errInfo);
+    resultSet.Get()->GetInt(ORDINAL_POSITION, ordinalPosition, wasNull, errInfo);
+    if (wasNull) {
+        ordinalPosition = ++prevPosition;
+    } else {
+        prevPosition = ordinalPosition;
+    }
 }
 
 bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
@@ -338,23 +319,8 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
   return true;
 }
 
-// where meta is set
-// void ReadColumnMetaVector(ignite::impl::binary::BinaryReaderImpl& reader,
-// ColumnMetaVector& meta,
-//    const ProtocolVersion& ver)
 void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
                           ColumnMetaVector& meta) {
-  // int32_t metaNum = reader.ReadInt32(); // number of records
-
-  /* // temporarily comment out -AL-
-  // get to the last row of resultSet
-  resultSet.absolute(-1);
-  // get number of rows in the resultSet
-  int32_t metaNum = resultSet.getRow();
-  // get back to row 1
-  resultSet.absolute(1);
-  */
-
   meta.clear();
 
   if (!resultSet.IsValid()) {
@@ -363,6 +329,7 @@ void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
 
   JniErrorInfo errInfo;
   bool hasNext = false;
+  int32_t prevPosition = 0;
   JniErrorCode errCode;
   do {
       errCode = resultSet.Get()->Next(hasNext, errInfo);
@@ -371,80 +338,10 @@ void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
       }
 
       meta.emplace_back(ColumnMeta());
-      meta.back().Read(resultSet, errInfo);
+      meta.back().Read(resultSet, prevPosition, errInfo);
   } while (hasNext);
-
-  // old code, no longer used
-  /*
-  // for rows of each column
-  for (int32_t i = 0; i < metaNum; ++i) {
-    meta.push_back(ColumnMeta());  // create an empty instance
-
-    // meta.back().Read(reader, ver); // reads from the reader, not needed
-    // for us. temporarily comment out -AL- get column meta
-
-    // ^ for each row in the result set (represent a column), it will have a
-    // column, in each column, there is information need to map column
-    // properties into column meta
-    //
-    //
-    // resultSet has many columns, which have their own columns
-
-    // TODO put in the copy from resultSet into meta
-  }
-  */
 }
 
-// original ignite code
-/*
-void ReadColumnMetaVector(ignite::impl::binary::BinaryReaderImpl&
- reader, ColumnMetaVector& meta,
-    const ProtocolVersion& ver) {
-    int32_t metaNum = reader.ReadInt32();  // number of records
-
-    meta.clear();
-    meta.reserve(static_cast< size_t >(metaNum));
-
-    // for rows of each column
-    for (int32_t i = 0; i < metaNum; ++i) {
-        meta.push_back(ColumnMeta());  // create an empty instance
-
-        meta.back().Read(
-            reader,
-            ver);  // reads from the reader, not needed for us.
-        // get column meta
-
-        // ^ for each row in the result set (represent a column), it
-        // will have a column, in each column, there is information
-        // need to map column properties into column meta
-        //
-        //
-        // resultSet has many columns, which have their own columns
-
-        // TODO put in the copy from resultSet into meta
-    }
-
-    default:
-      return false;
-  }
-}
-*/
-
-/*
-void ReadColumnMetaVector(ignite::impl::binary::BinaryReaderImpl& reader,
-                          ColumnMetaVector& meta, const ProtocolVersion& ver) {
-  int32_t metaNum = reader.ReadInt32();
-
-  meta.clear();
-  meta.reserve(static_cast< size_t >(metaNum));
-
-  for (int32_t i = 0; i < metaNum; ++i) {
-    meta.push_back(ColumnMeta());
-
-    meta.back().Read(reader, ver);
-  }
-}
-*/
 }  // namespace meta
 }  // namespace odbc
 }  // namespace ignite

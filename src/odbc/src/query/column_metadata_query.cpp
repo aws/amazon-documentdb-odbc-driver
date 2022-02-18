@@ -120,27 +120,28 @@ ColumnMetadataQuery::ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
 
   using meta::ColumnMeta;
 
-  columnsMeta.reserve(12);  // -AL- todo add to 24 or something
+  columnsMeta.reserve(18);
 
   const std::string sch;
   const std::string tbl;
+
   columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", DOCUMENTDB_JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "TABLE_SCHEM", DOCUMENTDB_JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_SCHEM", DOCUMENTDB_JDBC_TYPE_VARCHAR));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", DOCUMENTDB_JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "COLUMN_NAME", DOCUMENTDB_JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_NAME", DOCUMENTDB_JDBC_TYPE_VARCHAR));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "DATA_TYPE", DOCUMENTDB_JDBC_TYPE_SMALLINT));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "TYPE_NAME", DOCUMENTDB_JDBC_TYPE_VARCHAR));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_SIZE", DOCUMENTDB_JDBC_TYPE_INTEGER));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "BUFFER_LENGTH", DOCUMENTDB_JDBC_TYPE_INTEGER));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "DECIMAL_DIGITS", DOCUMENTDB_JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "NUM_PREC_RADIX", DOCUMENTDB_JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "DECIMAL_DIGITS", DOCUMENTDB_JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "NUM_PREC_RADIX", DOCUMENTDB_JDBC_TYPE_SMALLINT));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "NULLABLE", DOCUMENTDB_JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "ORDINAL_POSITION", DOCUMENTDB_JDBC_TYPE_INTEGER));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS", DOCUMENTDB_JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_DEF", DOCUMENTDB_JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATA_TYPE", DOCUMENTDB_JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATETIME_SUB", DOCUMENTDB_JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "CHAR_OCTET_LENGTH", DOCUMENTDB_JDBC_TYPE_INTEGER));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "ORDINAL_POSITION", DOCUMENTDB_JDBC_TYPE_INTEGER));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "IS_NULLABLE", DOCUMENTDB_JDBC_TYPE_VARCHAR));
 }
 
@@ -149,7 +150,7 @@ ColumnMetadataQuery::~ColumnMetadataQuery() {
 }
 
 SqlResult::Type
-ColumnMetadataQuery::Execute() {  // place to plug in new code -AL-
+ColumnMetadataQuery::Execute() {
   if (executed)
     Close();
 
@@ -169,6 +170,8 @@ const meta::ColumnMetaVector* ColumnMetadataQuery::GetMeta() {
   return &columnsMeta;
 }
 
+// -AL- the function where GetColumn is called
+// this function is called in statement.cpp: currentQuery->FetchNextRow(columnBindings);
 SqlResult::Type ColumnMetadataQuery::FetchNextRow(
     app::ColumnBindingMap& columnBindings) {
   if (!executed) {
@@ -193,14 +196,14 @@ SqlResult::Type ColumnMetadataQuery::FetchNextRow(
 
   return SqlResult::AI_SUCCESS;
 }
+// -AL- the idea behind GetColumn: get the values that are not stored in currentColumn
+// commit comment: on Read() call for each column, the ODBC reads [ (see Read function in column_meta)] from the ResultSet,
+// and converts rest of values from Jdbc to Sql values
 
 SqlResult::Type ColumnMetadataQuery::GetColumn(
     uint16_t columnIdx,
     app::ApplicationDataBuffer&
-        buffer) {  // -AL- I need to change this code to match resultSet return
-                   // values. todo
-  // this place has BinaryTypeToSqlTypeName, and other mentioned method names to
-  // adapt
+        buffer) {
   if (!executed) {
     diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
                          "Query was not executed.");
@@ -220,7 +223,7 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
 
   switch (columnIdx) {
     case ResultColumn::TABLE_CAT: {
-      buffer.PutNull();
+      buffer.PutString(currentColumn.GetCatalogName());
       break;
     }
 
@@ -261,6 +264,8 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::DECIMAL_DIGITS: {
+      // todo implement the function for getting the decimal digits:
+      // https://bitquill.atlassian.net/browse/AD-615
       int32_t decDigits = type_traits::BinaryTypeDecimalDigits(columnType);
       if (decDigits < 0)
         buffer.PutNull();
@@ -283,13 +288,9 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
       buffer.PutString(currentColumn.GetRemarks());
       break;
     }
-    // -AL- start of my added values
 
     case ResultColumn::COLUMN_DEF: {
-      buffer.PutNull();
-      // buffer.PutString(); // todo, it should be string not null.
-      // It seems that I might need to create a currentColumn.getColumnDef()
-      // function -AL-
+      buffer.PutString(currentColumn.GetColumnDef());
       break;
     } 
 
@@ -299,13 +300,19 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::SQL_DATETIME_SUB: {
-      buffer.PutNull(); // note: this is okay since JDBC does not use this value. -AL- 
+      buffer.PutNull(); 
+      // todo implement the function for getting the datetime sub code:
+      // https://bitquill.atlassian.net/browse/AD-609
       break;
     }
 
     case ResultColumn::CHAR_OCTET_LENGTH: {
       buffer.PutInt32(type_traits::BinaryTypeCharOctetLength(columnType));
       break;
+    }
+
+    case ResultColumn::ORDINAL_POSITION: {
+      buffer.PutInt32(currentColumn.GetOrdinalPosition());
       break;
     }
  
@@ -361,6 +368,7 @@ SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
   }
 
   meta::ReadColumnMetaVector(resultSet, meta);
+
   for (size_t i = 0; i < meta.size(); ++i) {
     LOG_MSG("\n[" << i << "] SchemaName:     " << meta[i].GetSchemaName()
                   << "\n[" << i

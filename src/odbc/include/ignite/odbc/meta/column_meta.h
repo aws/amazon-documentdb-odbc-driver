@@ -109,14 +109,17 @@ class ColumnMeta {
    * Copy constructor.
    */
   ColumnMeta(const ColumnMeta& other)
-      : schemaName(other.schemaName),
+      : catalogName(other.catalogName),
+        schemaName(other.schemaName),
         tableName(other.tableName),
         columnName(other.columnName),
         remarks(other.remarks),
+        columnDef(other.columnDef),
         dataType(other.dataType),
         precision(other.precision),
         scale(other.scale),
-        nullability(other.nullability) {
+        nullability(other.nullability),
+        ordinalPosition(other.ordinalPosition) {
     // No-op.
   }
 
@@ -124,14 +127,17 @@ class ColumnMeta {
    * Copy operator.
    */
   ColumnMeta& operator=(const ColumnMeta& other) {
+    catalogName = other.catalogName;
     schemaName = other.schemaName;
     tableName = other.tableName;
     columnName = other.columnName;
     remarks = other.remarks;
+    columnDef = other.columnDef;
     dataType = other.dataType;
     precision = other.precision;
     scale = other.scale;
     nullability = other.nullability;
+    ordinalPosition = other.ordinalPosition;
 
     return *this;
   }
@@ -139,8 +145,19 @@ class ColumnMeta {
    /**
    * Read using reader.
    * @param resultSet SharedPointer< ResultSet >.
+   * @param prevPosition the ordinal position of the previous column. 
+   * @paran errInfo JniErrorInfo.
    */
-  void Read(SharedPointer< ResultSet >& resultSet, JniErrorInfo& errInfo);
+  void Read(SharedPointer< ResultSet >& resultSet, int32_t& prevPosition,
+            JniErrorInfo& errInfo);
+
+  /**
+   * Get catalog name.
+   * @return Catalog name.
+   */
+  const std::string& GetCatalogName() const {
+      return catalogName;
+  }
 
   /**
    * Get schema name.
@@ -172,6 +189,14 @@ class ColumnMeta {
    */
   const std::string& GetRemarks() const {
       return remarks;
+  }
+
+  /**
+   * Get the column default value.
+   * @return Column default value.
+   */
+  const std::string& GetColumnDef() const {
+      return columnDef;
   }
 
   /**
@@ -207,6 +232,14 @@ class ColumnMeta {
   }
 
   /**
+   * Get column ordinal position.
+   * @return Column ordinal position.
+   */
+  int32_t GetOrdinalPosition() const {
+      return ordinalPosition;
+  }
+
+  /**
    * Try to get attribute of a string type.
    *
    * @param fieldId Field ID.
@@ -225,6 +258,9 @@ class ColumnMeta {
   bool GetAttribute(uint16_t fieldId, SqlLen& value) const;
 
  private:
+  /** Catalog name. */
+  std::string catalogName;
+
   /** Schema name. */
   std::string schemaName;
 
@@ -237,6 +273,9 @@ class ColumnMeta {
   /** Remarks */
   std::string remarks;
 
+  /** Column default value */
+  std::string columnDef;
+
   /** Data type. */
   int16_t dataType;
 
@@ -248,6 +287,9 @@ class ColumnMeta {
 
   /** Column nullability. */
   int32_t nullability;
+
+  /** Column ordinal position. */
+  int32_t ordinalPosition;
 };
 
 /** Column metadata vector alias. */
@@ -261,28 +303,7 @@ typedef std::vector< ColumnMeta > ColumnMetaVector;
 void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
                          ColumnMetaVector& meta);
 
-
-// -AL- todo delete later. No longer needed
-/**
- * Read columns metadata collection.
- * @param reader Reader.
- * @param meta Collection.
- * @param ver Server protocol version.
- */
-// void ReadColumnMetaVector(ignite::impl::binary::BinaryReaderImpl& reader,
-// ColumnMetaVector& meta,
-//        const ProtocolVersion& ver);
-
-/**
- * Read columns metadata collection.
- * @param resultSet ReseultSet.
- * @param meta Collection.
- */
-//void ReadColumnMetaVector(SharedPointer< ResultSet > resultSet,
-//                          ColumnMetaVector& meta);
-
 }  // namespace meta
 }  // namespace odbc
 }  // namespace ignite
-
 #endif //_IGNITE_ODBC_META_COLUMN_META

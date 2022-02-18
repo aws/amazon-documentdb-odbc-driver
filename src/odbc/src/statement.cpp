@@ -790,13 +790,10 @@ namespace ignite
             if (schema0.empty())
                 schema0 = connection.GetSchema();
 
-            // old ignite code // todo remove -AL-
             currentQuery.reset(new query::ColumnMetadataQuery(*this,
                 connection, catalog, schema, table, column));
-            //currentQuery.reset(new query::ColumnMetadataQuery(
-            //    *this, columnsResultSet, catalog, schema, table, column));
 
-            return currentQuery->Execute();
+            return currentQuery->Execute(); // on the execute, check ColumnMetadataQuery function definition -AL-
         }
 
         void Statement::ExecuteGetTablesMetaQuery(const std::string& catalog,

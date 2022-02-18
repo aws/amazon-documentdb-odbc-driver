@@ -878,49 +878,6 @@ namespace ignite
             ResultPage& resultPage;
         };
 
-        // -AL- FEB-17, 1pm, comment out following code because AD-542 has them removed 
-        //*
-        // * Query get column metadata response.
-        // 
-        //class QueryGetColumnsMetaResponse : public Response
-        //{
-        //public:
-        //    /**
-        //     * Constructor.
-        //     */
-        //    QueryGetColumnsMetaResponse();
-
-        //    /**
-        //     * Destructor.
-        //     */
-        //    virtual ~QueryGetColumnsMetaResponse();
-
-        //    /**
-        //     * Get column metadata.
-        //     * @return Column metadata.
-        //     */
-        //    const meta::ColumnMetaVector& GetMeta() const
-        //    {
-        //        return meta;
-        //    }
-
-        //private:
-        //    /** // original ignite code
-        //     * Read response using provided reader.
-        //     * @param reader Reader.
-        //     */
-        //    // virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader, const ProtocolVersion&);
-
-        //    /**
-        //     * Read response using provided resultSet
-        //     * @param resultSet ResultSet
-        //     */
-        //    virtual void ReadOnSuccess(SharedPointer< GlobalJObject > resultSet);
-
-        //    /** Columns metadata. */
-        //    meta::ColumnMetaVector meta;
-        //};
-
         /**
          * Query get resultset metadata response.
          */
