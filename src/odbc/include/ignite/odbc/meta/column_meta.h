@@ -112,6 +112,7 @@ class ColumnMeta {
       : schemaName(other.schemaName),
         tableName(other.tableName),
         columnName(other.columnName),
+        remarks(other.remarks),
         dataType(other.dataType),
         precision(other.precision),
         scale(other.scale),
@@ -126,6 +127,7 @@ class ColumnMeta {
     schemaName = other.schemaName;
     tableName = other.tableName;
     columnName = other.columnName;
+    remarks = other.remarks;
     dataType = other.dataType;
     precision = other.precision;
     scale = other.scale;
@@ -164,6 +166,14 @@ class ColumnMeta {
    */
   const std::string& GetColumnName() const {
     return columnName;
+  }
+
+  /**
+   * Get the remarks.
+   * @return Remarks.
+   */
+  const std::string& GetRemarks() const {
+      return remarks;
   }
 
   /**
@@ -225,6 +235,9 @@ class ColumnMeta {
 
   /** Column name. */
   std::string columnName;
+
+  /** Remarks */
+  std::string remarks;
 
   /** Data type. */
   int8_t dataType;

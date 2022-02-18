@@ -280,10 +280,7 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::REMARKS: {
-      buffer.PutNull();
-      // buffer.PutString(); // todo, it should be string not null. 
-      // It seems that I might need to create a currentColumn.GetRemarks() function
-      // -AL-
+      buffer.PutString(currentColumn.GetRemarks());
       break;
     }
     // -AL- start of my added values
