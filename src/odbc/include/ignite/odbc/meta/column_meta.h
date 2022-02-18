@@ -139,6 +139,8 @@ class ColumnMeta {
    /**
    * Read using reader.
    * @param resultSet SharedPointer< ResultSet >.
+   * @param prevPosition the ordinal position of the previous column. 
+   * @paran errInfo JniErrorInfo.
    */
   void Read(SharedPointer< ResultSet >& resultSet, int32_t& prevPosition,
             JniErrorInfo& errInfo);
