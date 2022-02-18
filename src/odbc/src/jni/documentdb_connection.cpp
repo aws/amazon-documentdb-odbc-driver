@@ -24,7 +24,6 @@
 using ignite::odbc::jni::java::JniErrorCode;
 using ignite::odbc::common::GetEnv;
 using ignite::odbc::jni::java::JniErrorInfo;
-using ignite::odbc::jni::FormatJdbcConnectionString;
 
 namespace ignite {
     namespace odbc {
@@ -43,8 +42,7 @@ namespace ignite {
                     return JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
                 }
 
-                std::string connectionString =
-                    FormatJdbcConnectionString(config);
+                std::string connectionString = config.ToJdbcConnectionString();
 
                 SharedPointer< GlobalJObject > result;
                 JniErrorCode success = _jniContext.Get()->DriverManagerGetConnection(
