@@ -722,6 +722,29 @@ namespace ignite
                 return SqlTypeDecimalDigits(sqlType);
             }
 
+            int32_t SqlTypeCharOctetLength(int16_t type)
+            {
+                switch (type)
+                {
+                    case SQL_CHAR:
+                    case SQL_VARCHAR:
+                    case SQL_LONGVARCHAR:
+                    case SQL_BINARY:
+                    case SQL_LONGVARBINARY:                       
+                        return SQL_NO_TOTAL;
+
+                    default:
+                        return 0;
+                }
+            }
+
+            int32_t BinaryTypeCharOctetLength(int16_t type)
+            {
+                int16_t sqlType = BinaryToSqlType(type);
+
+                return SqlTypeCharOctetLength(sqlType);
+            }
+
             bool SqlTypeUnsigned(int16_t type)
             {
                 switch (type)

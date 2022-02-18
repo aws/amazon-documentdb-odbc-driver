@@ -307,7 +307,8 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::CHAR_OCTET_LENGTH: {
-      buffer.PutInt32(type_traits::BinaryToSqlType(columnType));
+      buffer.PutInt32(type_traits::BinaryTypeCharOctetLength(columnType));
+      break;
       break;
     }
  

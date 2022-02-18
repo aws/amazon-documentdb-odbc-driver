@@ -327,6 +327,22 @@ namespace ignite
             int32_t BinaryTypeDecimalDigits(int16_t type);
 
             /**
+             * Get SQL type char octet length.
+             *
+             * @param type SQL type.
+             * @return Char octet length.
+             */
+            int32_t SqlTypeCharOctetLength(int16_t type);
+
+            /**
+             * Get binary type char octet length.
+             *
+             * @param type Binary type.
+             * @return Char octet length.
+             */
+            int32_t BinaryTypeCharOctetLength(int16_t type);
+
+            /**
              * Checks if the SQL type is unsigned.
              *
              * @param type SQL type.
