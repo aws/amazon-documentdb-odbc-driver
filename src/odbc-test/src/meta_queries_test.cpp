@@ -654,6 +654,51 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsMany) {
     BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 }
 
+BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsNone) {
+    std::string dsnConnectionString;
+    CreateDsnConnectionString(dsnConnectionString);
+
+    Connect(dsnConnectionString);
+
+    SQLCHAR empty[] = "";
+    SQLCHAR table[] = "nonexistent";
+    SQLCHAR column[] = "nonexistent_column";
+
+    SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
+                               SQL_NTS, column, SQL_NTS);
+
+    if (!SQL_SUCCEEDED(ret))
+        BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+    ret = SQLFetch(stmt);
+
+    BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+}
+
+BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsMany) {
+    std::string dsnConnectionString;
+    CreateDsnConnectionString(dsnConnectionString);
+
+    Connect(dsnConnectionString);
+
+    SQLCHAR empty[] = "";
+
+    SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, empty,
+                               SQL_NTS, empty, SQL_NTS);
+
+    if (!SQL_SUCCEEDED(ret))
+        BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+    int count = 0;
+    do {
+        ret = SQLFetch(stmt);
+        count++;
+    } while (SQL_SUCCEEDED(ret));
+    BOOST_CHECK(count > 1);
+
+    BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+}
+
 BOOST_AUTO_TEST_CASE(TestGetDataWithColumns) {
     std::string dsnConnectionString;
     CreateDsnConnectionString(dsnConnectionString);
