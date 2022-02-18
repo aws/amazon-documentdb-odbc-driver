@@ -120,27 +120,27 @@ ColumnMetadataQuery::ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
 
   using meta::ColumnMeta;
 
-  columnsMeta.reserve(12);  // -AL- todo add to 24 or something
+  columnsMeta.reserve(18);
 
   const std::string sch;
   const std::string tbl;
   columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", DOCUMENTDB_JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "TABLE_SCHEM", DOCUMENTDB_JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_SCHEM", DOCUMENTDB_JDBC_TYPE_VARCHAR));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", DOCUMENTDB_JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "COLUMN_NAME", DOCUMENTDB_JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_NAME", DOCUMENTDB_JDBC_TYPE_VARCHAR));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "DATA_TYPE", DOCUMENTDB_JDBC_TYPE_SMALLINT));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "TYPE_NAME", DOCUMENTDB_JDBC_TYPE_VARCHAR));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_SIZE", DOCUMENTDB_JDBC_TYPE_INTEGER));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "BUFFER_LENGTH", DOCUMENTDB_JDBC_TYPE_INTEGER));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "DECIMAL_DIGITS", DOCUMENTDB_JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "NUM_PREC_RADIX", DOCUMENTDB_JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "DECIMAL_DIGITS", DOCUMENTDB_JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "NUM_PREC_RADIX", DOCUMENTDB_JDBC_TYPE_SMALLINT));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "NULLABLE", DOCUMENTDB_JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "ORDINAL_POSITION", DOCUMENTDB_JDBC_TYPE_INTEGER));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS", DOCUMENTDB_JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_DEF", DOCUMENTDB_JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATA_TYPE", DOCUMENTDB_JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATETIME_SUB", DOCUMENTDB_JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "CHAR_OCTET_LENGTH", DOCUMENTDB_JDBC_TYPE_INTEGER));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "ORDINAL_POSITION", DOCUMENTDB_JDBC_TYPE_INTEGER));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "IS_NULLABLE", DOCUMENTDB_JDBC_TYPE_VARCHAR));
 }
 
