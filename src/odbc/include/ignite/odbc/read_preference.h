@@ -46,13 +46,21 @@ namespace ignite
             static Type FromString(const std::string& val, Type dflt = Type::UNKNOWN);
 
             /**
-             * Convert mode to string. 
+             * Convert preference to string. 
              *
              * @param val Value to convert.
              * @return String value.
              */
             static std::string ToString(Type val);
-        
+
+            /**
+             * Convert preference to string in JDBC format.
+             *
+             * @param val Value to convert.
+             * @return String value in expected format for JDBC connection string.
+             */
+            static std::string ToJdbcString(Type val);
+
         };
     }
 }

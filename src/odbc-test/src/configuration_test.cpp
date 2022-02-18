@@ -209,7 +209,6 @@ void CheckConnectionConfig(const Configuration& cfg)
     BOOST_CHECK(cfg.GetScanMethod() == testScanMethod);
 
     std::stringstream constructor;
-
     constructor << "app_name=" << testAppName << ';'
                 << "database=" << testDatabaseName << ';'
                 << "default_fetch_size=" << testDefaultFetchSize << ';'
@@ -235,10 +234,35 @@ void CheckConnectionConfig(const Configuration& cfg)
                 << "tls_allow_invalid_hostnames=" << BoolToStr(testTlsAllowInvalidHostnamesFlag) << ';'
                 << "tls_ca_file=" << testTlsCaFile << ';'
                 << "user=" << testUsername << ';';
-
     const std::string& expectedStr = constructor.str();
 
+    std::stringstream jdbcConstructor;
+    jdbcConstructor << "jdbc:documentdb://" << testUsername << ":" << testPassword
+                    << "@" << testHostname << ':' << testServerPort
+                    << "/" << testDatabaseName << '?'
+                    << "appName=" << testAppName
+                    << "&defaultFetchSize=" << testDefaultFetchSize
+                    << "&loginTimeoutSec=" << testLoginTimeoutSec
+                    << "&readPreference=" << ReadPreference::ToJdbcString(testReadPreference)
+                    << "&refreshSchema=" << BoolToStr(testRefreshSchemaFlag)
+                    << "&replicaSet=" << testReplicaSet
+                    << "&retryReads=" << BoolToStr(testRetryReads)
+                    << "&scanLimit=" << testScanLimit
+                    << "&scanMethod=" << ScanMethod::ToJdbcString(testScanMethod)
+                    << "&schemaName=" << testSchemaName
+                    << "&sshHost=" << testSshHost
+                    << "&sshKnownHostsFile=" << ignite::common::EncodeURIComponent(testSshKnownHostsFile)
+                    << "&sshPrivateKeyFile=" << ignite::common::EncodeURIComponent(testSshPrivateKeyFile)
+                    << "&sshPrivateKeyPassphrase=" << testSshPrivateKeyPassphrase
+                    << "&sshStrictHostKeyChecking=" << BoolToStr(testSshStrictHostKeyCheckingFlag)
+                    << "&sshUser=" << testSshUser
+                    << "&tls=" << BoolToStr(testTlsFlag)
+                    << "&tlsAllowInvalidHostnames=" << BoolToStr(testTlsAllowInvalidHostnamesFlag)
+                    << "&tlsCaFile=" << ignite::common::EncodeURIComponent(testTlsCaFile);
+    const std::string& expectedJdbcStr = jdbcConstructor.str();
+
     BOOST_CHECK_EQUAL(ignite::common::ToLower(cfg.ToConnectString()), ignite::common::ToLower(expectedStr));
+    BOOST_CHECK_EQUAL(cfg.ToJdbcConnectionString(), expectedJdbcStr);
 }
 
 void CheckDsnConfig(const Configuration& cfg)
