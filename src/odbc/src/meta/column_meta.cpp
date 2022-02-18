@@ -309,7 +309,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
 // void ReadColumnMetaVector(ignite::impl::binary::BinaryReaderImpl& reader,
 // ColumnMetaVector& meta,
 //    const ProtocolVersion& ver)
-void ReadColumnMetaVector(SharedPointer< ResultSet > resultSet,
+void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
                           ColumnMetaVector& meta) {
   // int32_t metaNum = reader.ReadInt32(); // number of records
 
