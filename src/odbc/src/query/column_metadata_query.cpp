@@ -299,7 +299,7 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::SQL_DATETIME_SUB: {
-      buffer.PutNull(); // note: this is okay since JDBC does not use this value. -AL- 
+      buffer.PutNull(); // todo implement the function for getting the datetime sub code 
       break;
     }
 
