@@ -242,6 +242,15 @@ class ColumnMeta {
 /** Column metadata vector alias. */
 typedef std::vector< ColumnMeta > ColumnMetaVector;
 
+/**
+ * Read columns metadata collection.
+ * @param resultSet SharedPointer< ResultSet >.
+ * @param meta Collection.
+ */
+void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
+                         ColumnMetaVector& meta);
+
+
 // -AL- todo delete later. No longer needed
 /**
  * Read columns metadata collection.
@@ -258,8 +267,9 @@ typedef std::vector< ColumnMeta > ColumnMetaVector;
  * @param resultSet ReseultSet.
  * @param meta Collection.
  */
-void ReadColumnMetaVector(SharedPointer< GlobalJObject > resultSet,
-                          ColumnMetaVector& meta);
+//void ReadColumnMetaVector(SharedPointer< ResultSet > resultSet,
+//                          ColumnMetaVector& meta);
+
 }  // namespace meta
 }  // namespace odbc
 }  // namespace ignite

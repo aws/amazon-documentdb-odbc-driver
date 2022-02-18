@@ -309,7 +309,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
 // void ReadColumnMetaVector(ignite::impl::binary::BinaryReaderImpl& reader,
 // ColumnMetaVector& meta,
 //    const ProtocolVersion& ver)
-void ReadColumnMetaVector(SharedPointer< GlobalJObject > resultSet,
+void ReadColumnMetaVector(SharedPointer< ResultSet > resultSet,
                           ColumnMetaVector& meta) {
   // int32_t metaNum = reader.ReadInt32(); // number of records
 
@@ -323,9 +323,26 @@ void ReadColumnMetaVector(SharedPointer< GlobalJObject > resultSet,
   */
 
   meta.clear();
-  int32_t metaNum = 1000000;  // temp code to build for test -AL-
-  meta.reserve(static_cast< size_t >(metaNum));  // number of rows in the
 
+  if (!resultSet.IsValid()) {
+      return;
+  }
+
+  JniErrorInfo errInfo;
+  bool hasNext = false;
+  JniErrorCode errCode;
+  do {
+      errCode = resultSet.Get()->Next(hasNext, errInfo);
+      if (!hasNext || errCode != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+          break;
+      }
+
+      meta.emplace_back(ColumnMeta());
+      meta.back().Read(resultSet, errInfo);
+  } while (hasNext);
+
+  // old code, no longer used
+  /*
   // for rows of each column
   for (int32_t i = 0; i < metaNum; ++i) {
     meta.push_back(ColumnMeta());  // create an empty instance
@@ -342,6 +359,7 @@ void ReadColumnMetaVector(SharedPointer< GlobalJObject > resultSet,
 
     // TODO put in the copy from resultSet into meta
   }
+  */
 }
 
 // original ignite code

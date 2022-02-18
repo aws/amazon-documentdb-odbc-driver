@@ -362,7 +362,7 @@ SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
       return SqlResult::AI_ERROR;
   }
 
-  meta::ReadTableMetaVector(resultSet, meta);
+  meta::ReadColumnMetaVector(resultSet, meta);
   for (size_t i = 0; i < meta.size(); ++i) {
     LOG_MSG("\n[" << i << "] SchemaName:     " << meta[i].GetSchemaName()
                   << "\n[" << i
