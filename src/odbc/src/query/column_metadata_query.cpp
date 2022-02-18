@@ -149,7 +149,7 @@ ColumnMetadataQuery::~ColumnMetadataQuery() {
 }
 
 SqlResult::Type
-ColumnMetadataQuery::Execute() {  // place to plug in new code -AL-
+ColumnMetadataQuery::Execute() {
   if (executed)
     Close();
 
@@ -282,7 +282,6 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
       buffer.PutString(currentColumn.GetRemarks());
       break;
     }
-    // -AL- start of my added values
 
     case ResultColumn::COLUMN_DEF: {
       buffer.PutString(currentColumn.GetColumnDef());

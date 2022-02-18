@@ -319,23 +319,8 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
   return true;
 }
 
-// where meta is set
-// void ReadColumnMetaVector(ignite::impl::binary::BinaryReaderImpl& reader,
-// ColumnMetaVector& meta,
-//    const ProtocolVersion& ver)
 void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
                           ColumnMetaVector& meta) {
-  // int32_t metaNum = reader.ReadInt32(); // number of records
-
-  /* // temporarily comment out -AL-
-  // get to the last row of resultSet
-  resultSet.absolute(-1);
-  // get number of rows in the resultSet
-  int32_t metaNum = resultSet.getRow();
-  // get back to row 1
-  resultSet.absolute(1);
-  */
-
   meta.clear();
 
   if (!resultSet.IsValid()) {
@@ -355,78 +340,8 @@ void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
       meta.emplace_back(ColumnMeta());
       meta.back().Read(resultSet, prevPosition, errInfo);
   } while (hasNext);
-
-  // old code, no longer used
-  /*
-  // for rows of each column
-  for (int32_t i = 0; i < metaNum; ++i) {
-    meta.push_back(ColumnMeta());  // create an empty instance
-
-    // meta.back().Read(reader, ver); // reads from the reader, not needed
-    // for us. temporarily comment out -AL- get column meta
-
-    // ^ for each row in the result set (represent a column), it will have a
-    // column, in each column, there is information need to map column
-    // properties into column meta
-    //
-    //
-    // resultSet has many columns, which have their own columns
-
-    // TODO put in the copy from resultSet into meta
-  }
-  */
 }
 
-// original ignite code
-/*
-void ReadColumnMetaVector(ignite::impl::binary::BinaryReaderImpl&
- reader, ColumnMetaVector& meta,
-    const ProtocolVersion& ver) {
-    int32_t metaNum = reader.ReadInt32();  // number of records
-
-    meta.clear();
-    meta.reserve(static_cast< size_t >(metaNum));
-
-    // for rows of each column
-    for (int32_t i = 0; i < metaNum; ++i) {
-        meta.push_back(ColumnMeta());  // create an empty instance
-
-        meta.back().Read(
-            reader,
-            ver);  // reads from the reader, not needed for us.
-        // get column meta
-
-        // ^ for each row in the result set (represent a column), it
-        // will have a column, in each column, there is information
-        // need to map column properties into column meta
-        //
-        //
-        // resultSet has many columns, which have their own columns
-
-        // TODO put in the copy from resultSet into meta
-    }
-
-    default:
-      return false;
-  }
-}
-*/
-
-/*
-void ReadColumnMetaVector(ignite::impl::binary::BinaryReaderImpl& reader,
-                          ColumnMetaVector& meta, const ProtocolVersion& ver) {
-  int32_t metaNum = reader.ReadInt32();
-
-  meta.clear();
-  meta.reserve(static_cast< size_t >(metaNum));
-
-  for (int32_t i = 0; i < metaNum; ++i) {
-    meta.push_back(ColumnMeta());
-
-    meta.back().Read(reader, ver);
-  }
-}
-*/
 }  // namespace meta
 }  // namespace odbc
 }  // namespace ignite
