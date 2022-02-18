@@ -167,7 +167,7 @@ namespace ignite
                     types.push_back(DOCUMENTDB_JDBC_TYPE_FLOAT);
                     types.push_back(DOCUMENTDB_JDBC_TYPE_DOUBLE);
                     types.push_back(DOCUMENTDB_JDBC_TYPE_BOOLEAN);
-                    types.push_back(DOCUMENTDB_JDBC_TYPE_TINYINT); 
+                    types.push_back(DOCUMENTDB_JDBC_TYPE_TINYINT);
                     types.push_back(DOCUMENTDB_JDBC_TYPE_BIGINT);
                     types.push_back(DOCUMENTDB_JDBC_TYPE_BINARY);
                 }
