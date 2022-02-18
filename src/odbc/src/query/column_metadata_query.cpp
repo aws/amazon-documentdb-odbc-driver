@@ -220,7 +220,7 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
 
   switch (columnIdx) {
     case ResultColumn::TABLE_CAT: {
-      buffer.PutNull();
+      buffer.PutString(currentColumn.GetCatalogName());
       break;
     }
 

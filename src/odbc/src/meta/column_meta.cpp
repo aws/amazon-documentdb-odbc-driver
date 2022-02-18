@@ -135,9 +135,12 @@ const std::string ORDINAL_POSITION = "ORDINAL_POSITION";
 void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet, int32_t& prevPosition,
                      JniErrorInfo& errInfo) {
     bool wasNull;
+    catalogName = "";
     schemaName = "";
     tableName = "";
     columnName = "";
+    remarks = "";
+    resultSet.Get()->GetString(TABLE_CAT, catalogName, wasNull, errInfo);
     resultSet.Get()->GetString(TABLE_SCHEM, schemaName, wasNull, errInfo);
     resultSet.Get()->GetString(TABLE_NAME, tableName, wasNull, errInfo);
     resultSet.Get()->GetString(COLUMN_NAME, columnName, wasNull, errInfo);

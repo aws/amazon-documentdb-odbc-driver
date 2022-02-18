@@ -144,6 +144,14 @@ class ColumnMeta {
             JniErrorInfo& errInfo);
 
   /**
+   * Get catalog name.
+   * @return Catalog name.
+   */
+  const std::string& GetCatalogName() const {
+      return catalogName;
+  }
+
+  /**
    * Get schema name.
    * @return Schema name.
    */
@@ -234,6 +242,9 @@ class ColumnMeta {
   bool GetAttribute(uint16_t fieldId, SqlLen& value) const;
 
  private:
+  /** Catalog name. */
+  std::string catalogName;
+
   /** Schema name. */
   std::string schemaName;
 
