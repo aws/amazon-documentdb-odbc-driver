@@ -50,7 +50,6 @@ using ignite::odbc::common::ReleaseChars;
 using ignite::odbc::common::concurrent::SharedPointer;
 using ignite::odbc::config::Configuration;
 using ignite::odbc::config::ConnectionStringParser;
-using ignite::odbc::jni::FormatJdbcConnectionString;
 using ignite::odbc::jni::ResolveDocumentDbHome;
 using ignite::odbc::jni::DatabaseMetaData;
 using ignite::odbc::jni::DocumentDbConnection;
@@ -81,8 +80,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
         Configuration config;
         ConnectionStringParser parser(config);
         parser.ParseConnectionString(dsnConnectionString, nullptr);
-        std::string jdbcConnectionString =
-            FormatJdbcConnectionString(config);
+        std::string jdbcConnectionString = config.ToJdbcConnectionString();
         return jdbcConnectionString;
     }
 

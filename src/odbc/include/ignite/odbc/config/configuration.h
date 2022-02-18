@@ -24,6 +24,7 @@
 
 #include "ignite/odbc/config/settable_value.h"
 #include "ignite/odbc/diagnostic/diagnosable.h"
+#include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/read_preference.h"
 #include "ignite/odbc/scan_method.h"
 
@@ -712,6 +713,17 @@ namespace ignite
                  */
                 void ToMap(ArgumentMap& res) const;
 
+                /**
+                 * Checks that a valid JDBC connection string with all the required properties can be built from the configuration.
+                 * Throws error on incomplete properties.
+                 */
+                void Validate() const;
+
+                /**
+                 * Formats the JDBC connection string from configuration values.
+                 * @return the JDBC connection string.
+                 */
+                std::string ToJdbcConnectionString() const;
             private:
                 /**
                  * Add key and value to the argument map.
@@ -721,7 +733,25 @@ namespace ignite
                  * @param value Value.
                  */
                 template<typename T>
-                static void AddToMap(ArgumentMap& map, const std::string& key, const SettableValue<T>& value);
+                static void AddToMap(ArgumentMap& map, const std::string& key, const SettableValue<T>& value); 
+
+                /**
+                 * Add key and value to the argument map.
+                 *
+                 * @param map Map.
+                 * @param key Key.
+                 * @param value Value.
+                 * @param isJdbcFormat @c true if value should be added in format expected by JDBC connection string.
+                 */
+                template<typename T>
+                static void AddToMap(ArgumentMap& map, const std::string& key, const SettableValue<T>& value, bool isJdbcFormat);
+
+                /**
+                * Get argument map.
+                *
+                * @param res Resulting argument map.
+                */
+                void ToJdbcOptionsMap(ArgumentMap& res) const;
 
                 /** DSN. */
                 SettableValue<std::string> dsn = DefaultValue::dsn;
@@ -823,11 +853,11 @@ namespace ignite
 
             template<>
             void Configuration::AddToMap<ReadPreference::Type>(ArgumentMap& map, const std::string& key,
-                const SettableValue<ReadPreference::Type>& value);
+                const SettableValue<ReadPreference::Type>& value, bool isJdbcFormat);
 
             template<>
             void Configuration::AddToMap<ScanMethod::Type>(ArgumentMap& map, const std::string& key,
-                const SettableValue<ScanMethod::Type>& value);
+                const SettableValue<ScanMethod::Type>& value, bool isJdbcFormat);
         }
     }
 }
