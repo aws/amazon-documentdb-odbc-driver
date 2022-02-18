@@ -136,6 +136,7 @@ namespace ignite
                 const std::string sch;
                 const std::string tbl;
 
+                // note: I replaced with DOCDB values -AL-
                 columnsMeta.push_back(ColumnMeta(sch, tbl, "TYPE_NAME",          DOCUMENTDB_JDBC_TYPE_VARCHAR));
                 columnsMeta.push_back(ColumnMeta(sch, tbl, "DATA_TYPE",          DOCUMENTDB_JDBC_TYPE_SMALLINT));
                 columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_SIZE",        DOCUMENTDB_JDBC_TYPE_INTEGER));

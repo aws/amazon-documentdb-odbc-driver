@@ -793,7 +793,7 @@ namespace ignite
             currentQuery.reset(new query::ColumnMetadataQuery(*this,
                 connection, catalog, schema, table, column));
 
-            return currentQuery->Execute();
+            return currentQuery->Execute(); // on the execute, check ColumnMetadataQuery function definition -AL-
         }
 
         void Statement::ExecuteGetTablesMetaQuery(const std::string& catalog,

@@ -286,7 +286,7 @@ namespace ignite
              * @param schema Schema name.
              * @param table Table name.
              * @param column Column name.
-             */
+             */ // schema name is a search pattern. formatted into request paket and sent to server -AL-
             QueryGetColumnsMetaRequest(const std::string& schema, const std::string& table, const std::string& column);
 
             /**
