@@ -109,14 +109,17 @@ class ColumnMeta {
    * Copy constructor.
    */
   ColumnMeta(const ColumnMeta& other)
-      : schemaName(other.schemaName),
+      : catalogName(other.catalogName),
+        schemaName(other.schemaName),
         tableName(other.tableName),
         columnName(other.columnName),
         remarks(other.remarks),
+        columnDef(other.columnDef),
         dataType(other.dataType),
         precision(other.precision),
         scale(other.scale),
-        nullability(other.nullability) {
+        nullability(other.nullability),
+        ordinalPosition(other.ordinalPosition) {
     // No-op.
   }
 
@@ -124,14 +127,17 @@ class ColumnMeta {
    * Copy operator.
    */
   ColumnMeta& operator=(const ColumnMeta& other) {
+    catalogName = other.catalogName;
     schemaName = other.schemaName;
     tableName = other.tableName;
     columnName = other.columnName;
     remarks = other.remarks;
+    columnDef = other.columnDef;
     dataType = other.dataType;
     precision = other.precision;
     scale = other.scale;
     nullability = other.nullability;
+    ordinalPosition = other.ordinalPosition;
 
     return *this;
   }
