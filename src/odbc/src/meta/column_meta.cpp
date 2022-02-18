@@ -91,6 +91,9 @@ SqlLen Nullability::ToSql(int32_t nullability) {
   return SQL_NULLABLE_UNKNOWN;
 }
 
+// -AL-: the original function called in column_vector
+// should define this function to get values from the column
+/*
 void ColumnMeta::Read(
     ignite::impl::binary::BinaryReaderImpl& reader,
     const ProtocolVersion&
@@ -110,6 +113,35 @@ void ColumnMeta::Read(
 
   if (ver >= ProtocolVersion::VERSION_2_8_0)
     nullability = reader.ReadInt8();
+}
+*/
+
+// newly added constants -AL-
+// todo finish the rest of constants (no need to read for unused constants)
+// todo check - how to determine which values to store? Can I go with the previous plan
+// and read everything that is in both JDBC and SQLColumns?
+
+// the constants should match JDBC column entry constants
+const std::string TABLE_CAT = "TABLE_CAT";
+const std::string TABLE_SCHEM = "TABLE_SCHEM";
+const std::string TABLE_NAME = "TABLE_NAME";
+const std::string COLUMN_NAME = "COLUMN_NAME";
+const std::string DATA_TYPE = "DATA_TYPE";
+const std::string REMARKS = "REMARKS";
+const std::string NULLABLE = "NULLABLE";
+
+// -AL- new read function
+void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
+                     JniErrorInfo& errInfo) {
+    bool wasNull;
+    schemaName = "";
+    tableName = "";
+    columnName = "";
+    resultSet.Get()->GetString(TABLE_SCHEM, schemaName, wasNull, errInfo);
+    resultSet.Get()->GetString(TABLE_NAME, tableName, wasNull, errInfo);
+    resultSet.Get()->GetString(COLUMN_NAME, columnName, wasNull, errInfo);
+    resultSet.Get()->GetString(REMARKS, remarks, wasNull, errInfo);
+    resultSet.Get()->GetInt(NULLABLE, nullability, wasNull, errInfo);
 }
 
 bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
@@ -305,6 +337,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
 
   return true;
 }
+
 // where meta is set
 // void ReadColumnMetaVector(ignite::impl::binary::BinaryReaderImpl& reader,
 // ColumnMetaVector& meta,

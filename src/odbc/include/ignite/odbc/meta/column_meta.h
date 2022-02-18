@@ -136,13 +136,11 @@ class ColumnMeta {
     return *this;
   }
 
-  /**
+   /**
    * Read using reader.
-   * @param reader Reader.
-   * @param ver Server version.
+   * @param resultSet SharedPointer< ResultSet >.
    */
-  void Read(ignite::impl::binary::BinaryReaderImpl& reader,
-            const ProtocolVersion& ver);
+  void Read(SharedPointer< ResultSet >& resultSet, JniErrorInfo& errInfo);
 
   /**
    * Get schema name.
