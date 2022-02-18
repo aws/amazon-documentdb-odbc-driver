@@ -170,8 +170,6 @@ const meta::ColumnMetaVector* ColumnMetadataQuery::GetMeta() {
   return &columnsMeta;
 }
 
-// -AL- the function where GetColumn is called
-// this function is called in statement.cpp: currentQuery->FetchNextRow(columnBindings);
 SqlResult::Type ColumnMetadataQuery::FetchNextRow(
     app::ColumnBindingMap& columnBindings) {
   if (!executed) {
@@ -196,9 +194,6 @@ SqlResult::Type ColumnMetadataQuery::FetchNextRow(
 
   return SqlResult::AI_SUCCESS;
 }
-// -AL- the idea behind GetColumn: get the values that are not stored in currentColumn
-// commit comment: on Read() call for each column, the ODBC reads [ (see Read function in column_meta)] from the ResultSet,
-// and converts rest of values from Jdbc to Sql values
 
 SqlResult::Type ColumnMetadataQuery::GetColumn(
     uint16_t columnIdx,

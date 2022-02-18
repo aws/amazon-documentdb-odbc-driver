@@ -119,8 +119,6 @@ namespace ignite
              * Warning: if any JDBC Type is added or becomes deprecated on the JDBC side, 
              * the change should be reflected under this function as well.
              */
-            // -AL- add this on PR as comment: "some Jdbc Type (e.g., Boolean) is not supported in Odbc, so a conversion from Jdbc Type to
-            // Sql type is used. See SQL data types: https://docs.microsoft.com/en-us/sql/odbc/reference/appendixes/sql-data-types?view=sql-server-ver15" 
             const std::string& BinaryTypeToSqlTypeName(int16_t binaryType)
             {
                 switch (binaryType)
