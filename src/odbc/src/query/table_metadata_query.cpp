@@ -88,11 +88,11 @@ namespace ignite
                 const std::string sch("");
                 const std::string tbl("");
 
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT",   IGNITE_TYPE_STRING));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_SCHEM", IGNITE_TYPE_STRING));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME",  IGNITE_TYPE_STRING));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_TYPE",  IGNITE_TYPE_STRING));
-                columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS",     IGNITE_TYPE_STRING));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT",   DOCUMENTDB_JDBC_TYPE_VARCHAR));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_SCHEM", DOCUMENTDB_JDBC_TYPE_VARCHAR));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME",  DOCUMENTDB_JDBC_TYPE_VARCHAR));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_TYPE",  DOCUMENTDB_JDBC_TYPE_VARCHAR));
+                columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS",     DOCUMENTDB_JDBC_TYPE_VARCHAR));
             }
 
             TableMetadataQuery::~TableMetadataQuery()
