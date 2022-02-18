@@ -947,18 +947,6 @@ namespace ignite
             }
 
         private:
-            /** // old ignite code
-             * Read response using provided reader.
-             * @param reader Reader.
-             */
-            //virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader, const ProtocolVersion&);
-
-            /**
-              * Read response using provided resultSet
-              * @param resultSet ResultSet
-              */
-             virtual void ReadOnSuccess(SharedPointer< GlobalJObject > resultSet);
-
             /** Columns metadata. */
             meta::ColumnMetaVector meta;
         };
