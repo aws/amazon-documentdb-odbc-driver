@@ -261,6 +261,8 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::DECIMAL_DIGITS: {
+      // todo implement the function for getting the decimal digits:
+      // https://bitquill.atlassian.net/browse/AD-615
       int32_t decDigits = type_traits::BinaryTypeDecimalDigits(columnType);
       if (decDigits < 0)
         buffer.PutNull();
@@ -311,7 +313,6 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::ORDINAL_POSITION: {
-        // TODO -al- read JDBC column, if null, use previous read value + 1. original_position = ++ row;
       buffer.PutInt32(currentColumn.GetOrdinalPosition());
       break;
     }
