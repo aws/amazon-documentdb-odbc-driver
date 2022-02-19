@@ -720,7 +720,8 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumns) {
     SQLLEN bufLen = sizeof(buf);
     SQLSMALLINT bufSmallInt;
     SQLINTEGER bufInt;
-    for (int columnIndex = 1; columnIndex <= 18; columnIndex++) {
+    bool errorExpected = false;
+    for (int columnIndex = 1; columnIndex <= 19; columnIndex++) {
         switch (columnIndex) {
             case 1:
             case 2:
@@ -750,15 +751,18 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumns) {
                                  sizeof(bufInt), &bufLen);
                 break;
             default:
-                BOOST_FAIL("Unexpected column index encountered.");
+                // Test "out-of-bounds" condition.
+                ret = SQLGetData(stmt, columnIndex, SQL_C_LONG, &bufInt,
+                                 sizeof(bufInt), &bufLen);
+                BOOST_CHECK(!SQL_SUCCEEDED(ret));
+                BOOST_CHECK_EQUAL("07009: Invalid index.",
+                                   GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+                errorExpected = true;
                 break;
         }
-        if (ret == SQL_NO_DATA) {
-            break;
-        }
-
-        if (!SQL_SUCCEEDED(ret))
+        if (!SQL_SUCCEEDED(ret) && !errorExpected) {
             BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+        }
 
         bool wasNull = bufLen == SQL_NULL_DATA;
 
@@ -818,7 +822,6 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumns) {
                 BOOST_CHECK_EQUAL("NO" , buf);  // IS_NULLABLE
                 break;
             default:
-                BOOST_FAIL("Unexpected column index encountered.");
                 break;
         }
     }

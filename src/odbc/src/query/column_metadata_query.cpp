@@ -316,8 +316,12 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
       break;
     }
 
-    default:
-      break;
+    default: {
+        diag.AddStatusRecord(SqlState::S07009_INVALID_DESCRIPTOR_INDEX,
+                             "Invalid index.");
+        return SqlResult::AI_ERROR;
+        break;
+    }
   }
 
   return SqlResult::AI_SUCCESS;
