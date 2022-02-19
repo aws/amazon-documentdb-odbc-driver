@@ -664,11 +664,126 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumns) {
     SQLCHAR column[] = "test__id";
 
     SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, table, SQL_NTS, column, SQL_NTS);
-
+    if (!SQL_SUCCEEDED(ret))
+        BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+    
+    ret = SQLFetch(stmt);
     if (!SQL_SUCCEEDED(ret))
         BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-    CheckSingleRowResultSetWithGetData(stmt, 4, "test__id");
+    char buf[1024]{};
+    SQLLEN bufLen = sizeof(buf);
+    SQLSMALLINT bufSmallInt;
+    SQLINTEGER bufInt;
+    for (int columnIndex = 1; columnIndex <= 18; columnIndex++) {
+        switch (columnIndex) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 6:
+            case 12:
+            case 13:
+            case 18:
+                ret = SQLGetData(stmt, columnIndex, SQL_C_CHAR, buf,
+                                 sizeof(buf), &bufLen);
+                break;
+            case 5:
+            case 9:
+            case 10:
+            case 11:
+            case 14:
+            case 15:
+                ret = SQLGetData(stmt, columnIndex, SQL_C_SHORT, &bufSmallInt,
+                                 sizeof(bufSmallInt), &bufLen);
+                break;
+            case 7:
+            case 8:
+            case 16:
+            case 17:
+                ret = SQLGetData(stmt, columnIndex, SQL_C_LONG, &bufInt,
+                                 sizeof(bufInt), &bufLen);
+                break;
+            default:
+                BOOST_FAIL("Unexpected column index encountered.");
+                break;
+        }
+        if (ret == SQL_NO_DATA) {
+            break;
+        }
+
+        if (!SQL_SUCCEEDED(ret))
+            BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+        bool wasNull = bufLen == SQL_NULL_DATA;
+
+        switch (columnIndex) {
+            case 1:
+                BOOST_CHECK_EQUAL("", buf);  // TABLE_CAT
+                break;
+            case 2:
+                BOOST_CHECK_EQUAL("test", buf);  // TABLE_SCHEM
+                break;
+            case 3:
+                BOOST_CHECK_EQUAL("test", buf);  // TABLE_NAME
+                break;
+            case 4:
+                BOOST_CHECK_EQUAL("test__id", buf);  // COLUMN_NAME
+                break;
+            case 5:
+                BOOST_CHECK_EQUAL(0, bufSmallInt);  // DATA_TYPE
+                break;
+            case 6:
+                BOOST_CHECK_EQUAL("NULL", buf);  // TYPE_NAME
+                break;
+            case 7:
+                BOOST_CHECK_EQUAL(1, bufInt);  // COLUMN_SIZE
+                break;
+            case 8:
+                BOOST_CHECK_EQUAL(1, bufInt);  // BUFFER_LENGTH
+                break;
+            case 9:
+                BOOST_CHECK_EQUAL(0, bufSmallInt);  // DECIMAL_DIGITS
+                break;
+            case 10:
+                BOOST_CHECK_EQUAL(0, bufSmallInt);  // NUM_PREC_RADIX
+                break;
+            case 11:
+                BOOST_CHECK_EQUAL(0, bufSmallInt);  // NULLABLE
+                break;
+            case 12:
+                BOOST_CHECK_EQUAL("", buf);  // REMARKS
+                break;
+            case 13:
+                BOOST_CHECK_EQUAL("", buf);  // COLUMN_DEF
+                break;
+            case 14:
+                BOOST_CHECK_EQUAL(0, bufSmallInt);  // SQL_DATA_TYPE
+                break;
+            case 15:
+                BOOST_CHECK_EQUAL(0, bufSmallInt);  // SQL_DATETIME_SUB
+                break;
+            case 16:
+                BOOST_CHECK_EQUAL(0, bufInt);  // CHAR_OCTET_LENGTH
+                break;
+            case 17:
+                BOOST_CHECK_EQUAL(1, bufInt);  // ORDINAL_POSITION
+                break;
+            case 18:
+                BOOST_CHECK_EQUAL("NO" , buf);  // IS_NULLABLE
+                break;
+            default:
+                BOOST_FAIL("Unexpected column index encountered.");
+                break;
+        }
+    }
+
+    ret = SQLFetch(stmt);
+    BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+
+    ret = SQLGetData(stmt, 1, SQL_C_CHAR, buf, sizeof(buf), &bufLen);
+    BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
+    BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_STMT, stmt), "24000");
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithSelectQuery, *disabled()) {
