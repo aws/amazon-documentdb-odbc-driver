@@ -708,127 +708,135 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumns) {
     SQLCHAR table[] = "test";
     SQLCHAR column[] = "test__id";
 
-    SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, table, SQL_NTS, column, SQL_NTS);
+    SQLRETURN ret = SQL_SUCCESS;
+    const SQLLEN C_STR_LEN_DEFAULT = 1024;
+
+    char table_cat[C_STR_LEN_DEFAULT]{};
+    SQLLEN table_cat_len = sizeof(table_cat);
+    char table_schem[C_STR_LEN_DEFAULT]{};
+    SQLLEN table_schem_len = sizeof(table_schem);
+    char table_name[C_STR_LEN_DEFAULT]{};
+    SQLLEN table_name_len = sizeof(table_name);
+    char column_name[C_STR_LEN_DEFAULT]{};
+    SQLLEN column_name_len = sizeof(column_name);
+    SQLSMALLINT data_type = 0;
+    SQLLEN data_type_len = sizeof(data_type);
+    char type_name[C_STR_LEN_DEFAULT]{};
+    SQLLEN type_name_len = sizeof(type_name);
+    SQLINTEGER column_size = 0;
+    SQLLEN column_size_len = sizeof(column_size);
+    SQLINTEGER buffer_length = 0;
+    SQLLEN buffer_length_len = sizeof(buffer_length);
+    SQLSMALLINT decimal_digits = 0;
+    SQLLEN decimal_digits_len = sizeof(decimal_digits);
+    SQLSMALLINT num_prec_radix = 0;
+    SQLLEN num_prec_radix_len = sizeof(num_prec_radix);
+    SQLSMALLINT nullable = 0;
+    SQLLEN nullable_len = sizeof(nullable);
+    char remarks[C_STR_LEN_DEFAULT]{};
+    SQLLEN remarks_len = sizeof(remarks);
+    char column_def[C_STR_LEN_DEFAULT]{};
+    SQLLEN column_def_len = sizeof(column_def);
+    SQLSMALLINT sql_data_type = 0;
+    SQLLEN sql_data_type_len = sizeof(sql_data_type);
+    SQLSMALLINT sql_datetime_sub = 0;
+    SQLLEN sql_datetime_sub_len = sizeof(sql_datetime_sub);
+    SQLINTEGER char_octet_length = 0;
+    SQLLEN char_octet_length_len = sizeof(char_octet_length);
+    SQLINTEGER ordinal_position = 0;
+    SQLLEN ordinal_position_len = sizeof(ordinal_position);
+    char is_nullable[C_STR_LEN_DEFAULT]{};
+    SQLLEN is_nullable_len = sizeof(is_nullable);
+
+    ret = SQLBindCol(stmt, 1, SQL_C_CHAR, table_cat, sizeof(table_cat),
+                     &table_cat_len);
+    ret = SQLBindCol(stmt, 2, SQL_C_CHAR, table_schem, sizeof(table_schem),
+                     &table_schem_len);
+    ret = SQLBindCol(stmt, 3, SQL_C_CHAR, table_name, sizeof(table_name),
+                     &table_name_len);
+    ret = SQLBindCol(stmt, 4, SQL_C_CHAR, column_name, sizeof(column_name),
+                     &column_name_len);
+    ret = SQLBindCol(stmt, 5, SQL_SMALLINT, &data_type, sizeof(data_type),
+                     &data_type_len);
+    ret = SQLBindCol(stmt, 6, SQL_C_CHAR, type_name, sizeof(type_name),
+                     &type_name_len);
+    ret = SQLBindCol(stmt, 7, SQL_INTEGER, &column_size, sizeof(column_size),
+                     &column_size_len);
+    ret = SQLBindCol(stmt, 8, SQL_C_CHAR, &buffer_length, sizeof(buffer_length),
+                     &buffer_length_len);
+    ret = SQLBindCol(stmt, 9, SQL_SMALLINT, &decimal_digits,
+                     sizeof(decimal_digits), &decimal_digits_len);
+    ret = SQLBindCol(stmt, 10, SQL_SMALLINT, &num_prec_radix,
+                     sizeof(num_prec_radix), &num_prec_radix_len);
+    ret = SQLBindCol(stmt, 11, SQL_SMALLINT, &nullable, sizeof(nullable),
+                     &nullable_len);
+    ret = SQLBindCol(stmt, 12, SQL_C_CHAR, remarks, sizeof(remarks),
+                     &remarks_len);
+    ret = SQLBindCol(stmt, 13, SQL_C_CHAR, column_def, sizeof(column_def),
+                     &column_def_len);
+    ret = SQLBindCol(stmt, 14, SQL_SMALLINT, &sql_data_type,
+                     sizeof(sql_data_type), &sql_data_type_len);
+    ret = SQLBindCol(stmt, 15, SQL_SMALLINT, &sql_datetime_sub,
+                     sizeof(sql_datetime_sub), &sql_datetime_sub_len);
+    ret = SQLBindCol(stmt, 16, SQL_INTEGER, &char_octet_length,
+                     sizeof(char_octet_length), &char_octet_length_len);
+    ret = SQLBindCol(stmt, 17, SQL_INTEGER, &ordinal_position,
+                     sizeof(ordinal_position), &ordinal_position_len);
+    ret = SQLBindCol(stmt, 18, SQL_C_CHAR, is_nullable, sizeof(is_nullable),
+                     &is_nullable_len);
+
+    ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, table, SQL_NTS,
+                     column, SQL_NTS);
     if (!SQL_SUCCEEDED(ret))
         BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-    
+
     ret = SQLFetch(stmt);
     if (!SQL_SUCCEEDED(ret))
         BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-    char buf[1024]{};
-    SQLLEN bufLen = sizeof(buf);
-    SQLSMALLINT bufSmallInt;
-    SQLINTEGER bufInt;
     bool errorExpected = false;
-    for (int columnIndex = 1; columnIndex <= 19; columnIndex++) {
-        switch (columnIndex) {
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 6:
-            case 12:
-            case 13:
-            case 18:
-                ret = SQLGetData(stmt, columnIndex, SQL_C_CHAR, buf,
-                                 sizeof(buf), &bufLen);
-                break;
-            case 5:
-            case 9:
-            case 10:
-            case 11:
-            case 14:
-            case 15:
-                ret = SQLGetData(stmt, columnIndex, SQL_C_SHORT, &bufSmallInt,
-                                 sizeof(bufSmallInt), &bufLen);
-                break;
-            case 7:
-            case 8:
-            case 16:
-            case 17:
-                ret = SQLGetData(stmt, columnIndex, SQL_C_LONG, &bufInt,
-                                 sizeof(bufInt), &bufLen);
-                break;
-            default:
-                // Test "out-of-bounds" condition.
-                ret = SQLGetData(stmt, columnIndex, SQL_C_LONG, &bufInt,
-                                 sizeof(bufInt), &bufLen);
-                BOOST_CHECK(!SQL_SUCCEEDED(ret));
-                BOOST_CHECK_EQUAL("07009: Invalid index.",
-                                   GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-                errorExpected = true;
-                break;
-        }
-        if (!SQL_SUCCEEDED(ret) && !errorExpected) {
-            BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-        }
-
-        bool wasNull = bufLen == SQL_NULL_DATA;
-
-        switch (columnIndex) {
-            case 1:
-                BOOST_CHECK_EQUAL("", buf);  // TABLE_CAT
-                break;
-            case 2:
-                BOOST_CHECK_EQUAL("test", buf);  // TABLE_SCHEM
-                break;
-            case 3:
-                BOOST_CHECK_EQUAL("test", buf);  // TABLE_NAME
-                break;
-            case 4:
-                BOOST_CHECK_EQUAL("test__id", buf);  // COLUMN_NAME
-                break;
-            case 5:
-                BOOST_CHECK_EQUAL(0, bufSmallInt);  // DATA_TYPE
-                break;
-            case 6:
-                BOOST_CHECK_EQUAL("NULL", buf);  // TYPE_NAME
-                break;
-            case 7:
-                BOOST_CHECK_EQUAL(1, bufInt);  // COLUMN_SIZE
-                break;
-            case 8:
-                BOOST_CHECK_EQUAL(1, bufInt);  // BUFFER_LENGTH
-                break;
-            case 9:
-                BOOST_CHECK_EQUAL(0, bufSmallInt);  // DECIMAL_DIGITS
-                break;
-            case 10:
-                BOOST_CHECK_EQUAL(0, bufSmallInt);  // NUM_PREC_RADIX
-                break;
-            case 11:
-                BOOST_CHECK_EQUAL(0, bufSmallInt);  // NULLABLE
-                break;
-            case 12:
-                BOOST_CHECK_EQUAL("", buf);  // REMARKS
-                break;
-            case 13:
-                BOOST_CHECK_EQUAL("", buf);  // COLUMN_DEF
-                break;
-            case 14:
-                BOOST_CHECK_EQUAL(0, bufSmallInt);  // SQL_DATA_TYPE
-                break;
-            case 15:
-                BOOST_CHECK_EQUAL(0, bufSmallInt);  // SQL_DATETIME_SUB
-                break;
-            case 16:
-                BOOST_CHECK_EQUAL(0, bufInt);  // CHAR_OCTET_LENGTH
-                break;
-            case 17:
-                BOOST_CHECK_EQUAL(1, bufInt);  // ORDINAL_POSITION
-                break;
-            case 18:
-                BOOST_CHECK_EQUAL("NO" , buf);  // IS_NULLABLE
-                break;
-            default:
-                break;
-        }
-    }
+    BOOST_CHECK_EQUAL(false, table_cat_len == SQL_NULL_DATA);  // TODO: change to true when nullable
+    BOOST_CHECK_EQUAL("", table_cat);                   // TABLE_CAT
+    BOOST_CHECK_EQUAL(false, table_schem_len == SQL_NULL_DATA);
+    BOOST_CHECK_EQUAL("test", table_schem);  // TABLE_SCHEM
+    BOOST_CHECK_EQUAL(false, table_name_len == SQL_NULL_DATA);
+    BOOST_CHECK_EQUAL("test", table_name);  // TABLE_NAME
+    BOOST_CHECK_EQUAL(false, column_name_len == SQL_NULL_DATA);
+    BOOST_CHECK_EQUAL("test__id", column_name);  // COLUMN_NAME
+    BOOST_CHECK_EQUAL(false, data_type_len == SQL_NULL_DATA);
+    BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);  // DATA_TYPE
+    BOOST_CHECK_EQUAL(false, type_name_len == SQL_NULL_DATA);
+    BOOST_CHECK_EQUAL("VARCHAR", type_name);  // TYPE_NAME
+    BOOST_CHECK_EQUAL(false, column_size_len == SQL_NULL_DATA);
+    BOOST_CHECK_EQUAL(65536, column_size);  // COLUMN_SIZE
+    BOOST_CHECK_EQUAL(false, buffer_length_len == SQL_NULL_DATA);  // TODO: change to true whan nullable supported
+    BOOST_CHECK_EQUAL(0, buffer_length);  // BUFFER_LENGTH
+    BOOST_CHECK_EQUAL(true, decimal_digits_len == SQL_NULL_DATA);
+    BOOST_CHECK_EQUAL(0, decimal_digits);  // DECIMAL_DIGITS
+    BOOST_CHECK_EQUAL(true, num_prec_radix_len == SQL_NULL_DATA);
+    BOOST_CHECK_EQUAL(0, num_prec_radix);  // NUM_PREC_RADIX
+    BOOST_CHECK_EQUAL(false, nullable_len == SQL_NULL_DATA);
+    BOOST_CHECK_EQUAL(0, nullable);  // NULLABLE
+    BOOST_CHECK_EQUAL(false, remarks_len == SQL_NULL_DATA);  // TODO: change to true whan nullable supported
+    BOOST_CHECK_EQUAL("", remarks);  // REMARKS
+    BOOST_CHECK_EQUAL(false, column_def_len == SQL_NULL_DATA);  // TODO: change to true whan nullable supported
+    BOOST_CHECK_EQUAL("", column_def);  // COLUMN_DEF
+    BOOST_CHECK_EQUAL(false, sql_data_type_len == SQL_NULL_DATA);
+    BOOST_CHECK_EQUAL(0, sql_data_type);  // SQL_DATA_TYPE
+    BOOST_CHECK_EQUAL(true, sql_datetime_sub_len == SQL_NULL_DATA);
+    BOOST_CHECK_EQUAL(0, sql_datetime_sub);  // SQL_DATETIME_SUB
+    BOOST_CHECK_EQUAL(false, char_octet_length_len == SQL_NULL_DATA);
+    BOOST_CHECK_EQUAL((65536 * 4), char_octet_length);  // CHAR_OCTET_LENGTH
+    BOOST_CHECK_EQUAL(false, ordinal_position_len == SQL_NULL_DATA);
+    BOOST_CHECK_EQUAL(1, ordinal_position);  // ORDINAL_POSITION
+    BOOST_CHECK_EQUAL(false, is_nullable_len == SQL_NULL_DATA);
+    BOOST_CHECK_EQUAL("NO", is_nullable);  // IS_NULLABLE
 
     ret = SQLFetch(stmt);
     BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 
+    char buf[1024]{};
+    SQLLEN bufLen = sizeof(buf);
     ret = SQLGetData(stmt, 1, SQL_C_CHAR, buf, sizeof(buf), &bufLen);
     BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
     BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_STMT, stmt), "24000");

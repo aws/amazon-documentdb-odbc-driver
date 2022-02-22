@@ -41,6 +41,7 @@
 #include "test_utils.h"
 
 using namespace boost::unit_test;
+using namespace ignite::impl::binary;
 
 using ignite::odbc::OdbcTestSuite;
 using ignite_test::GetOdbcErrorMessage;
@@ -330,6 +331,17 @@ BOOST_AUTO_TEST_CASE(TestDocumentDatabaseDbMetaDataGetColumns) {
         BOOST_CHECK(!wasNull);
         resultSet.Get()->GetInt("DATA_TYPE", intValue, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
+        switch (columnIndex) {
+            case 1:
+                BOOST_CHECK_EQUAL(DOCUMENTDB_JDBC_TYPE_VARCHAR, intValue);
+                break;
+            case 2:
+                BOOST_CHECK_EQUAL(DOCUMENTDB_JDBC_TYPE_DOUBLE, intValue);
+                break;
+            default:
+                BOOST_FAIL("Unexpected column index.");
+                break;
+        }
 
         resultSet.Get()->GetString(6, value, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
@@ -340,6 +352,14 @@ BOOST_AUTO_TEST_CASE(TestDocumentDatabaseDbMetaDataGetColumns) {
         BOOST_CHECK(!wasNull);
         resultSet.Get()->GetInt("COLUMN_SIZE", intValue, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
+        switch (columnIndex) {
+            case 1:
+                BOOST_CHECK_EQUAL(65536, intValue);
+                break;
+            case 2:
+                BOOST_CHECK_EQUAL(23, intValue);
+                break;
+        }
 
         resultSet.Get()->GetInt(8, intValue, wasNull, errInfo);
         BOOST_CHECK(wasNull);
@@ -385,6 +405,14 @@ BOOST_AUTO_TEST_CASE(TestDocumentDatabaseDbMetaDataGetColumns) {
         BOOST_CHECK(!wasNull || wasNull);
         resultSet.Get()->GetInt("CHAR_OCTET_LENGTH", intValue, wasNull, errInfo);
         BOOST_CHECK(!wasNull || wasNull);
+        switch (columnIndex) {
+            case 1:
+                BOOST_CHECK_EQUAL(262144, intValue);
+                break;
+            case 2:
+                BOOST_CHECK_EQUAL(0, intValue);
+                break;
+        }
 
         resultSet.Get()->GetInt(17, intValue, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
