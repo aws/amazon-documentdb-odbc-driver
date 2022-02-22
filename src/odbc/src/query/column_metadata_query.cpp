@@ -75,7 +75,7 @@ struct ResultColumn {
 
         /** A description of the column. */
         REMARKS,
-        // the start of my added values -AL-
+
         /** Default value for the column. May be null. */
         COLUMN_DEF,
 
