@@ -898,12 +898,12 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   BOOST_CHECK_EQUAL(false, WasNull(type_name_len));
   BOOST_CHECK_EQUAL("VARCHAR", type_name);  // TYPE_NAME
   BOOST_CHECK_EQUAL(false, WasNull(column_size_len));
-  BOOST_CHECK_EQUAL(65536, column_size);  // COLUMN_SIZE
+  BOOST_CHECK_EQUAL(SQL_NO_TOTAL, column_size);  // COLUMN_SIZE
   BOOST_CHECK_EQUAL(
       false,
       WasNull(
           buffer_length_len));  // TODO: change to true whan nullable supported
-  BOOST_CHECK_EQUAL(0, buffer_length);  // BUFFER_LENGTH
+  BOOST_CHECK_EQUAL(SQL_NO_TOTAL, buffer_length);  // BUFFER_LENGTH
   BOOST_CHECK_EQUAL(true, WasNull(decimal_digits_len));
   BOOST_CHECK_EQUAL(0, decimal_digits);  // DECIMAL_DIGITS
   BOOST_CHECK_EQUAL(true, WasNull(num_prec_radix_len));
@@ -923,7 +923,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   BOOST_CHECK_EQUAL(true, WasNull(sql_datetime_sub_len));
   BOOST_CHECK_EQUAL(0, sql_datetime_sub);  // SQL_DATETIME_SUB
   BOOST_CHECK_EQUAL(false, WasNull(char_octet_length_len));
-  BOOST_CHECK_EQUAL((65536 * 4), char_octet_length);  // CHAR_OCTET_LENGTH
+  BOOST_CHECK_EQUAL(SQL_NO_TOTAL, char_octet_length);  // CHAR_OCTET_LENGTH
   BOOST_CHECK_EQUAL(false, WasNull(ordinal_position_len));
   BOOST_CHECK_EQUAL(1, ordinal_position);  // ORDINAL_POSITION
   BOOST_CHECK_EQUAL(false, WasNull(is_nullable_len));
