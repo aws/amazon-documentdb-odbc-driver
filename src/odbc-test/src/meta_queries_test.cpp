@@ -164,7 +164,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     ret = SQLBindCol(stmt, 7, SQL_INTEGER, &column_size, sizeof(column_size),
                      &column_size_len);
     BOOST_CHECK(SQL_SUCCEEDED(ret));
-    ret = SQLBindCol(stmt, 8, SQL_C_CHAR, &buffer_length, C_STR_LEN_DEFAULT,
+    ret = SQLBindCol(stmt, 8, SQL_INTEGER, &buffer_length, sizeof(buffer_length),
                      &buffer_length_len);
     BOOST_CHECK(SQL_SUCCEEDED(ret));
     ret = SQLBindCol(stmt, 9, SQL_SMALLINT, &decimal_digits,
@@ -919,7 +919,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
       WasNull(column_def_len));  // TODO: change to true whan nullable supported
   BOOST_CHECK_EQUAL("", column_def);  // COLUMN_DEF
   BOOST_CHECK_EQUAL(false, WasNull(sql_data_type_len));
-  BOOST_CHECK_EQUAL(0, sql_data_type);  // SQL_DATA_TYPE
+  BOOST_CHECK_EQUAL(SQL_VARCHAR, sql_data_type);  // SQL_DATA_TYPE
   BOOST_CHECK_EQUAL(true, WasNull(sql_datetime_sub_len));
   BOOST_CHECK_EQUAL(0, sql_datetime_sub);  // SQL_DATETIME_SUB
   BOOST_CHECK_EQUAL(false, WasNull(char_octet_length_len));
