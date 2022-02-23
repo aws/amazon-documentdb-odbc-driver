@@ -270,7 +270,11 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::NUM_PREC_RADIX: {
-      buffer.PutInt16(type_traits::BinaryTypeNumPrecRadix(columnType));
+      int32_t numPrecRadix = type_traits::BinaryTypeNumPrecRadix(columnType);
+      if (numPrecRadix < 0)
+          buffer.PutNull();
+      else
+          buffer.PutInt16(static_cast< int16_t >(numPrecRadix));
       break;
     }
 

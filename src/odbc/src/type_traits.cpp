@@ -698,7 +698,7 @@ namespace ignite
                         return 10;
 
                     default:
-                        return 0;
+                        return -1;
                 }
             }
 
