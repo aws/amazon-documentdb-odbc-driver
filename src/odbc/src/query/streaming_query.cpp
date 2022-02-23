@@ -15,77 +15,64 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/connection.h"
-#include "ignite/odbc/message.h"
-#include "ignite/odbc/log.h"
 #include "ignite/odbc/query/streaming_query.h"
+
+#include "ignite/odbc/connection.h"
+#include "ignite/odbc/log.h"
+#include "ignite/odbc/message.h"
 #include "ignite/odbc/sql/sql_set_streaming_command.h"
 
-
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace query
-        {
-            StreamingQuery::StreamingQuery(
-                diagnostic::DiagnosableAdapter& diag,
-                Connection& connection,
-                const app::ParameterSet& params) :
-                Query(diag, QueryType::STREAMING),
-                connection(connection),
-                params(params)
-            {
-                // No-op.
-            }
-
-            StreamingQuery::~StreamingQuery()
-            {
-                // No-op.
-            }
-
-            SqlResult::Type StreamingQuery::Execute()
-            {
-                return connection.GetStreamingContext().Execute(sql, params);
-            }
-
-            const meta::ColumnMetaVector* StreamingQuery::GetMeta()
-            {
-                return 0;
-            }
-
-            SqlResult::Type StreamingQuery::FetchNextRow(app::ColumnBindingMap&)
-            {
-                return SqlResult::AI_NO_DATA;
-            }
-
-            SqlResult::Type StreamingQuery::GetColumn(uint16_t, app::ApplicationDataBuffer&)
-            {
-                diag.AddStatusRecord(SqlState::S24000_INVALID_CURSOR_STATE, "Column is not available.");
-
-                return SqlResult::AI_ERROR;
-            }
-
-            SqlResult::Type StreamingQuery::Close()
-            {
-                return SqlResult::AI_SUCCESS;
-            }
-
-            bool StreamingQuery::DataAvailable() const
-            {
-                return false;
-            }
-
-            int64_t StreamingQuery::AffectedRows() const
-            {
-                return 0;
-            }
-
-            SqlResult::Type StreamingQuery::NextResultSet()
-            {
-                return SqlResult::AI_NO_DATA;
-            }
-        }
-    }
+namespace ignite {
+namespace odbc {
+namespace query {
+StreamingQuery::StreamingQuery(diagnostic::DiagnosableAdapter& diag,
+                               Connection& connection,
+                               const app::ParameterSet& params)
+    : Query(diag, QueryType::STREAMING),
+      connection(connection),
+      params(params) {
+  // No-op.
 }
 
+StreamingQuery::~StreamingQuery() {
+  // No-op.
+}
+
+SqlResult::Type StreamingQuery::Execute() {
+  return connection.GetStreamingContext().Execute(sql, params);
+}
+
+const meta::ColumnMetaVector* StreamingQuery::GetMeta() {
+  return 0;
+}
+
+SqlResult::Type StreamingQuery::FetchNextRow(app::ColumnBindingMap&) {
+  return SqlResult::AI_NO_DATA;
+}
+
+SqlResult::Type StreamingQuery::GetColumn(uint16_t,
+                                          app::ApplicationDataBuffer&) {
+  diag.AddStatusRecord(SqlState::S24000_INVALID_CURSOR_STATE,
+                       "Column is not available.");
+
+  return SqlResult::AI_ERROR;
+}
+
+SqlResult::Type StreamingQuery::Close() {
+  return SqlResult::AI_SUCCESS;
+}
+
+bool StreamingQuery::DataAvailable() const {
+  return false;
+}
+
+int64_t StreamingQuery::AffectedRows() const {
+  return 0;
+}
+
+SqlResult::Type StreamingQuery::NextResultSet() {
+  return SqlResult::AI_NO_DATA;
+}
+}  // namespace query
+}  // namespace odbc
+}  // namespace ignite

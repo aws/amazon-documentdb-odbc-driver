@@ -16,15 +16,16 @@
  */
 
 #include "ignite/odbc/driverInstance.h"
+
 #include <mongocxx/instance.hpp>
 
 DriverInstance& DriverInstance::getInstance() {
-    static DriverInstance driverInstance;
-    return driverInstance;
+  static DriverInstance driverInstance;
+  return driverInstance;
 }
 
 void DriverInstance::initialize() {
-    //Using current, current will get an existing instance or will create a new one.
-    //Maybe in future we will need to change this to use a custom logger.
-    mongocxx::instance::current();
+  // Using current, current will get an existing instance or will create a new
+  // one. Maybe in future we will need to change this to use a custom logger.
+  mongocxx::instance::current();
 }
