@@ -24,18 +24,18 @@
 #include <windows.h>
 
 #ifdef min
-#   undef min
-#endif // min
+#undef min
+#endif  // min
 
-#endif //_WIN32
+#endif  //_WIN32
 
 #define ODBCVER 0x0380
 
-#include <sqlext.h>
 #include <odbcinst.h>
+#include <sqlext.h>
 
 #ifndef UNREFERENCED_PARAMETER
 #define UNREFERENCED_PARAMETER(x) (void)(x)
-#endif // UNREFERENCED_PARAMETER
+#endif  // UNREFERENCED_PARAMETER
 
-#endif //_IGNITE_ODBC_SYSTEM_ODBC_CONSTANTS
+#endif  //_IGNITE_ODBC_SYSTEM_ODBC_CONSTANTS

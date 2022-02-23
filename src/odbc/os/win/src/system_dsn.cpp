@@ -15,56 +15,51 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/utility.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/system/odbc_constants.h"
-
-#include "ignite/odbc/dsn_config.h"
-#include "ignite/odbc/system/ui/window.h"
-#include "ignite/odbc/system/ui/dsn_configuration_window.h"
 #include "ignite/odbc/config/connection_string_parser.h"
 #include "ignite/odbc/diagnostic/diagnosable_adapter.h"
+#include "ignite/odbc/dsn_config.h"
+#include "ignite/odbc/log.h"
 #include "ignite/odbc/odbc_error.h"
+#include "ignite/odbc/system/odbc_constants.h"
+#include "ignite/odbc/system/ui/dsn_configuration_window.h"
+#include "ignite/odbc/system/ui/window.h"
+#include "ignite/odbc/utility.h"
 
 using ignite::odbc::config::Configuration;
 
 #ifdef _WIN32
-bool DisplayConnectionWindow(void* windowParent, Configuration& config)
-{
-    using namespace ignite::odbc::system::ui;
+bool DisplayConnectionWindow(void* windowParent, Configuration& config) {
+  using namespace ignite::odbc::system::ui;
 
-    HWND hwndParent = (HWND) windowParent;
+  HWND hwndParent = (HWND)windowParent;
 
-    if (!hwndParent)
-        return true;
+  if (!hwndParent)
+    return true;
 
-    try
-    {
-        Window parent(hwndParent);
+  try {
+    Window parent(hwndParent);
 
-        DsnConfigurationWindow window(&parent, config);
+    DsnConfigurationWindow window(&parent, config);
 
-        window.Create();
+    window.Create();
 
-        window.Show();
-        window.Update();
+    window.Show();
+    window.Update();
 
-        return ProcessMessages(window) == Result::OK;
-    }
-    catch (const ignite::IgniteError& err)
-    {
-        std::stringstream buf;
+    return ProcessMessages(window) == Result::OK;
+  } catch (const ignite::IgniteError& err) {
+    std::stringstream buf;
 
-        buf << "Message: " << err.GetText() << ", Code: " << err.GetCode();
+    buf << "Message: " << err.GetText() << ", Code: " << err.GetCode();
 
-        std::string message = buf.str();
+    std::string message = buf.str();
 
-        MessageBox(NULL, message.c_str(), "Error!", MB_ICONEXCLAMATION | MB_OK);
+    MessageBox(NULL, message.c_str(), "Error!", MB_ICONEXCLAMATION | MB_OK);
 
-        SQLPostInstallerError(err.GetCode(), err.GetText());
-    }
+    SQLPostInstallerError(err.GetCode(), err.GetText());
+  }
 
-    return false;
+  return false;
 }
 #endif
 
@@ -75,45 +70,40 @@ bool DisplayConnectionWindow(void* windowParent, Configuration& config)
  * @param driver Driver.
  * @return True on success and false on fail.
  */
-bool RegisterDsn(const Configuration& config, LPCSTR driver)
-{
-    using namespace ignite::odbc::config;
-    using ignite::common::LexicalCast;
+bool RegisterDsn(const Configuration& config, LPCSTR driver) {
+  using namespace ignite::odbc::config;
+  using ignite::common::LexicalCast;
 
-    typedef Configuration::ArgumentMap ArgMap;
+  typedef Configuration::ArgumentMap ArgMap;
 
-    const char* dsn = config.GetDsn().c_str();
+  const char* dsn = config.GetDsn().c_str();
 
-    try
-    {
-        if (!SQLWriteDSNToIni(dsn, driver))
-            ignite::odbc::ThrowLastSetupError();
+  try {
+    if (!SQLWriteDSNToIni(dsn, driver))
+      ignite::odbc::ThrowLastSetupError();
 
-        ArgMap map;
-        
-        config.ToMap(map);
+    ArgMap map;
 
-        map.erase(ConnectionStringParser::Key::dsn);
-        map.erase(ConnectionStringParser::Key::driver);
+    config.ToMap(map);
 
-        for (ArgMap::const_iterator it = map.begin(); it != map.end(); ++it)
-        {
-            const std::string& key = it->first;
-            const std::string& value = it->second;
+    map.erase(ConnectionStringParser::Key::dsn);
+    map.erase(ConnectionStringParser::Key::driver);
 
-            ignite::odbc::WriteDsnString(dsn, key.c_str(), value.c_str());
-        }
+    for (ArgMap::const_iterator it = map.begin(); it != map.end(); ++it) {
+      const std::string& key = it->first;
+      const std::string& value = it->second;
 
-        return true;
-    }
-    catch (ignite::IgniteError& err)
-    {
-        MessageBox(NULL, err.GetText(), "Error!", MB_ICONEXCLAMATION | MB_OK);
-
-        SQLPostInstallerError(err.GetCode(), err.GetText());
+      ignite::odbc::WriteDsnString(dsn, key.c_str(), value.c_str());
     }
 
-    return false;
+    return true;
+  } catch (ignite::IgniteError& err) {
+    MessageBox(NULL, err.GetText(), "Error!", MB_ICONEXCLAMATION | MB_OK);
+
+    SQLPostInstallerError(err.GetCode(), err.GetText());
+  }
+
+  return false;
 }
 
 /**
@@ -122,102 +112,93 @@ bool RegisterDsn(const Configuration& config, LPCSTR driver)
  * @param dsn DSN name.
  * @return True on success and false on fail.
  */
-bool UnregisterDsn(const char* dsn)
-{
-    try
-    {
-        if (!SQLRemoveDSNFromIni(dsn))
-            ignite::odbc::ThrowLastSetupError();
+bool UnregisterDsn(const char* dsn) {
+  try {
+    if (!SQLRemoveDSNFromIni(dsn))
+      ignite::odbc::ThrowLastSetupError();
 
-        return true;
-    }
-    catch (ignite::IgniteError& err)
-    {
-        MessageBox(NULL, err.GetText(), "Error!", MB_ICONEXCLAMATION | MB_OK);
+    return true;
+  } catch (ignite::IgniteError& err) {
+    MessageBox(NULL, err.GetText(), "Error!", MB_ICONEXCLAMATION | MB_OK);
 
-        SQLPostInstallerError(err.GetCode(), err.GetText());
-    }
+    SQLPostInstallerError(err.GetCode(), err.GetText());
+  }
 
-    return false;
+  return false;
 }
 
-BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver, LPCSTR attributes)
-{
-    using namespace ignite::odbc;
+BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver,
+                       LPCSTR attributes) {
+  using namespace ignite::odbc;
 
-    LOG_MSG("ConfigDSN called");
+  LOG_MSG("ConfigDSN called");
 
-    Configuration config;
+  Configuration config;
 
-    LOG_MSG("Attributes: " << attributes);
+  LOG_MSG("Attributes: " << attributes);
 
-    config::ConnectionStringParser parser(config);
+  config::ConnectionStringParser parser(config);
 
-    diagnostic::DiagnosticRecordStorage diag;
+  diagnostic::DiagnosticRecordStorage diag;
 
-    parser.ParseConfigAttributes(attributes, &diag);
+  parser.ParseConfigAttributes(attributes, &diag);
 
-    if (!SQLValidDSN(config.GetDsn().c_str()))
+  if (!SQLValidDSN(config.GetDsn().c_str()))
+    return FALSE;
+
+  LOG_MSG("Driver: " << driver);
+  LOG_MSG("DSN: " << config.GetDsn());
+
+  switch (req) {
+    case ODBC_ADD_DSN: {
+      LOG_MSG("ODBC_ADD_DSN");
+
+#ifdef _WIN32
+      if (!DisplayConnectionWindow(hwndParent, config))
+        return FALSE;
+#endif  // _WIN32
+
+      if (!RegisterDsn(config, driver))
         return FALSE;
 
-    LOG_MSG("Driver: " << driver);
-    LOG_MSG("DSN: " << config.GetDsn());
-
-    switch (req)
-    {
-        case ODBC_ADD_DSN:
-        {
-            LOG_MSG("ODBC_ADD_DSN");
-
-#ifdef _WIN32
-            if (!DisplayConnectionWindow(hwndParent, config))
-                return FALSE;
-#endif  // _WIN32
-
-
-            if (!RegisterDsn(config, driver))
-                return FALSE;
-
-            break;
-        }
-
-        case ODBC_CONFIG_DSN:
-        {
-            LOG_MSG("ODBC_CONFIG_DSN");
-
-            std::string dsn = config.GetDsn();
-
-            Configuration loaded(config);
-
-            ReadDsnConfiguration(dsn.c_str(), loaded, &diag);
-
-#ifdef _WIN32
-            if (!DisplayConnectionWindow(hwndParent, loaded))
-                return FALSE;
-#endif  // _WIN32
-
-            if (!RegisterDsn(loaded, driver))
-                return FALSE;
-
-            if (loaded.GetDsn() != dsn && !UnregisterDsn(dsn.c_str()))
-                return FALSE;
-
-            break;
-        }
-
-        case ODBC_REMOVE_DSN:
-        {
-            LOG_MSG("ODBC_REMOVE_DSN");
-
-            if (!UnregisterDsn(config.GetDsn().c_str()))
-                return FALSE;
-
-            break;
-        }
-
-        default:
-            return FALSE;
+      break;
     }
 
-    return TRUE;
+    case ODBC_CONFIG_DSN: {
+      LOG_MSG("ODBC_CONFIG_DSN");
+
+      std::string dsn = config.GetDsn();
+
+      Configuration loaded(config);
+
+      ReadDsnConfiguration(dsn.c_str(), loaded, &diag);
+
+#ifdef _WIN32
+      if (!DisplayConnectionWindow(hwndParent, loaded))
+        return FALSE;
+#endif  // _WIN32
+
+      if (!RegisterDsn(loaded, driver))
+        return FALSE;
+
+      if (loaded.GetDsn() != dsn && !UnregisterDsn(dsn.c_str()))
+        return FALSE;
+
+      break;
+    }
+
+    case ODBC_REMOVE_DSN: {
+      LOG_MSG("ODBC_REMOVE_DSN");
+
+      if (!UnregisterDsn(config.GetDsn().c_str()))
+        return FALSE;
+
+      break;
+    }
+
+    default:
+      return FALSE;
+  }
+
+  return TRUE;
 }

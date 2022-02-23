@@ -23,99 +23,96 @@
 #include <map>
 #include <memory>
 
-#include "ignite/odbc/result_page.h"
 #include "ignite/odbc/common_types.h"
+#include "ignite/odbc/result_page.h"
 #include "ignite/odbc/row.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        /**
-         * Query result cursor.
-         */
-        class Cursor
-        {
-        public:
-            /**
-             * Constructor.
-             * @param queryId ID of the executed query.
-             */
-            Cursor(int64_t queryId);
+namespace ignite {
+namespace odbc {
+/**
+ * Query result cursor.
+ */
+class Cursor {
+ public:
+  /**
+   * Constructor.
+   * @param queryId ID of the executed query.
+   */
+  Cursor(int64_t queryId);
 
-            /**
-             * Destructor.
-             */
-            ~Cursor();
+  /**
+   * Destructor.
+   */
+  ~Cursor();
 
-            /**
-             * Move cursor to the next result row.
-             *
-             * @return False if data update required or no more data.
-             */
-            bool Increment();
+  /**
+   * Move cursor to the next result row.
+   *
+   * @return False if data update required or no more data.
+   */
+  bool Increment();
 
-            /**
-             * Check if the cursor needs data update.
-             *
-             * @return True if the cursor needs data update.
-             */
-            bool NeedDataUpdate() const;
+  /**
+   * Check if the cursor needs data update.
+   *
+   * @return True if the cursor needs data update.
+   */
+  bool NeedDataUpdate() const;
 
-            /**
-             * Check if the cursor has data.
-             *
-             * @return True if the cursor has data.
-             */
-            bool HasData() const;
+  /**
+   * Check if the cursor has data.
+   *
+   * @return True if the cursor has data.
+   */
+  bool HasData() const;
 
-            /**
-             * Check whether cursor closed remotely.
-             *
-             * @return true, if the cursor closed remotely.
-             */
-            bool IsClosedRemotely() const;
+  /**
+   * Check whether cursor closed remotely.
+   *
+   * @return true, if the cursor closed remotely.
+   */
+  bool IsClosedRemotely() const;
 
-            /**
-             * Get query ID.
-             *
-             * @return Query ID.
-             */
-            int64_t GetQueryId() const
-            {
-                return queryId;
-            }
+  /**
+   * Get query ID.
+   *
+   * @return Query ID.
+   */
+  int64_t GetQueryId() const {
+    return queryId;
+  }
 
-            /**
-             * Update current cursor page data.
-             *
-             * @param newPage New result page.
-             */
-            void UpdateData(std::auto_ptr<ResultPage>& newPage);
+  /**
+   * Update current cursor page data.
+   *
+   * @param newPage New result page.
+   */
+  void UpdateData(std::auto_ptr< ResultPage >& newPage);
 
-            /**
-             * Get current row.
-             *
-             * @return Current row. Returns zero if cursor needs data update or has no more data.
-             */
-            Row* GetRow();
+  /**
+   * Get current row.
+   *
+   * @return Current row. Returns zero if cursor needs data update or has no
+   * more data.
+   */
+  Row* GetRow();
 
-        private:
-            IGNITE_NO_COPY_ASSIGNMENT(Cursor);
+ private:
+  IGNITE_NO_COPY_ASSIGNMENT(Cursor);
 
-            /** Cursor id. */
-            int64_t queryId;
+  /** Cursor id. */
+  int64_t queryId;
 
-            /** Current page. */
-            std::auto_ptr<ResultPage> currentPage;
+  /** Current page. */
+  std::auto_ptr< ResultPage > currentPage;
 
-            /** Row position in current page. */
-            int32_t currentPagePos;
+  /** Row position in current page. */
+  int32_t currentPagePos;
 
-            /** Current row. */
-            std::auto_ptr<Row> currentRow;
-        };
-    }
-}
+  /** Current row. */
+  std::auto_ptr< Row > currentRow;
+};
+}  // namespace odbc
+}  // namespace ignite
 
-#endif //_IGNITE_ODBC_CURSOR
+#endif  //_IGNITE_ODBC_CURSOR

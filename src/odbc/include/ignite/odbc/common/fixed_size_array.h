@@ -17,246 +17,244 @@
 #ifndef _IGNITE_ODBC_COMMON_FIXED_SIZE_ARRAY
 #define _IGNITE_ODBC_COMMON_FIXED_SIZE_ARRAY
 
-#include <stdint.h>
-#include <cstring>
-#include <cassert>
-
-#include <utility>
-#include <algorithm>
-
 #include <ignite/odbc/common/common.h>
+#include <stdint.h>
 
-namespace ignite
-{
-    namespace odbc {
-        namespace common {
-            /**
-             * Fixed size array is safe array abstraction with a fixed size.
-             * The size can be set during runtime though once array is created
-             * its size can not be changed without resetting arrays content.
-             */
-            template < typename T >
-            class IGNITE_IMPORT_EXPORT FixedSizeArray {
-               public:
-                typedef int32_t SizeType;
+#include <algorithm>
+#include <cassert>
+#include <cstring>
+#include <utility>
 
-                /**
-                 * Default constructor.
-                 *
-                 * Constructs zero-size array.
-                 */
-                FixedSizeArray() : size(0), data(0) {
-                    // No-op.
-                }
+namespace ignite {
+namespace odbc {
+namespace common {
+/**
+ * Fixed size array is safe array abstraction with a fixed size.
+ * The size can be set during runtime though once array is created
+ * its size can not be changed without resetting arrays content.
+ */
+template < typename T >
+class IGNITE_IMPORT_EXPORT FixedSizeArray {
+ public:
+  typedef int32_t SizeType;
 
-                /**
-                 * Constructor.
-                 * Constructs default-initialized array of the specified length.
-                 * Array zeroed if T is a POD type.
-                 *
-                 * @param len Array length.
-                 */
-                FixedSizeArray(SizeType len)
-                    : size(len),
-                      // Brackets are here for a purpose - this way allocated
-                      // array is zeroed if T is POD type.
-                      data(new T[size]()) {
-                    // No-op.
-                }
+  /**
+   * Default constructor.
+   *
+   * Constructs zero-size array.
+   */
+  FixedSizeArray() : size(0), data(0) {
+    // No-op.
+  }
 
-                /**
-                 * Copy constructor.
-                 *
-                 * @param other Other instance.
-                 */
-                FixedSizeArray(const FixedSizeArray< T >& other)
-                    : size(other.size), data(new T[size]) {
-                    Assign(other);
-                }
+  /**
+   * Constructor.
+   * Constructs default-initialized array of the specified length.
+   * Array zeroed if T is a POD type.
+   *
+   * @param len Array length.
+   */
+  FixedSizeArray(SizeType len)
+      : size(len),
+        // Brackets are here for a purpose - this way allocated
+        // array is zeroed if T is POD type.
+        data(new T[size]()) {
+    // No-op.
+  }
 
-                /**
-                 * Raw array constructor.
-                 *
-                 * @param arr Raw array.
-                 * @param len Array length in elements.
-                 */
-                FixedSizeArray(const T* arr, SizeType len) : size(len), data(new T[size]) {
-                    Assign(arr, len);
-                }
+  /**
+   * Copy constructor.
+   *
+   * @param other Other instance.
+   */
+  FixedSizeArray(const FixedSizeArray< T >& other)
+      : size(other.size), data(new T[size]) {
+    Assign(other);
+  }
 
-                /**
-                 * Assignment operator.
-                 *
-                 * @param other Other instance.
-                 * @return Reference to this instance.
-                 */
-                FixedSizeArray< T >& operator=(const FixedSizeArray< T >& other) {
-                    Assign(other);
+  /**
+   * Raw array constructor.
+   *
+   * @param arr Raw array.
+   * @param len Array length in elements.
+   */
+  FixedSizeArray(const T* arr, SizeType len) : size(len), data(new T[size]) {
+    Assign(arr, len);
+  }
 
-                    return *this;
-                }
+  /**
+   * Assignment operator.
+   *
+   * @param other Other instance.
+   * @return Reference to this instance.
+   */
+  FixedSizeArray< T >& operator=(const FixedSizeArray< T >& other) {
+    Assign(other);
 
-                /**
-                 * Assign new value to the array.
-                 *
-                 * @param other Another array instance.
-                 */
-                void Assign(const FixedSizeArray< T >& other) {
-                    if (this != &other)
-                        Assign(other.GetData(), other.GetSize());
-                }
+    return *this;
+  }
 
-                /**
-                 * Assign new value to the array.
-                 *
-                 * @param src Raw array.
-                 * @param len Array length in elements.
-                 */
-                void Assign(const T* src, SizeType len) {
-                    // In case we would not need to clean anything
-                    // its okay to call delete[] on 0.
-                    T* toClean = 0;
+  /**
+   * Assign new value to the array.
+   *
+   * @param other Another array instance.
+   */
+  void Assign(const FixedSizeArray< T >& other) {
+    if (this != &other)
+      Assign(other.GetData(), other.GetSize());
+  }
 
-                    if (len != size) {
-                        // Do not clean just yet in case the part of the
-                        // array is being assigned to the array.
-                        toClean = data;
+  /**
+   * Assign new value to the array.
+   *
+   * @param src Raw array.
+   * @param len Array length in elements.
+   */
+  void Assign(const T* src, SizeType len) {
+    // In case we would not need to clean anything
+    // its okay to call delete[] on 0.
+    T* toClean = 0;
 
-                        size = len;
-                        data = new T[size];
-                    }
+    if (len != size) {
+      // Do not clean just yet in case the part of the
+      // array is being assigned to the array.
+      toClean = data;
 
-                    for (SizeType i = 0; i < len; ++i)
-                        data[i] = src[i];
+      size = len;
+      data = new T[size];
+    }
 
-                    delete[] toClean;
-                }
+    for (SizeType i = 0; i < len; ++i)
+      data[i] = src[i];
 
-                /**
-                 * Swap contents of the array with another instance.
-                 *
-                 * @param other Instance to swap with.
-                 */
-                void Swap(FixedSizeArray< T >& other) {
-                    if (this != &other) {
-                        std::swap(size, other.size);
-                        std::swap(data, other.data);
-                    }
-                }
+    delete[] toClean;
+  }
 
-                /**
-                 * Destructor.
-                 */
-                ~FixedSizeArray() {
-                    // Not a bug. Delete works just fine on null pointers.
-                    delete[] data;
-                }
+  /**
+   * Swap contents of the array with another instance.
+   *
+   * @param other Instance to swap with.
+   */
+  void Swap(FixedSizeArray< T >& other) {
+    if (this != &other) {
+      std::swap(size, other.size);
+      std::swap(data, other.data);
+    }
+  }
 
-                /**
-                 * Get data pointer.
-                 *
-                 * @return Data pointer.
-                 */
-                T* GetData() {
-                    return data;
-                }
+  /**
+   * Destructor.
+   */
+  ~FixedSizeArray() {
+    // Not a bug. Delete works just fine on null pointers.
+    delete[] data;
+  }
 
-                /**
-                 * Get data pointer.
-                 *
-                 * @return Data pointer.
-                 */
-                const T* GetData() const {
-                    return data;
-                }
+  /**
+   * Get data pointer.
+   *
+   * @return Data pointer.
+   */
+  T* GetData() {
+    return data;
+  }
 
-                /**
-                 * Get array size.
-                 *
-                 * @return Array size.
-                 */
-                SizeType GetSize() const {
-                    return size;
-                }
+  /**
+   * Get data pointer.
+   *
+   * @return Data pointer.
+   */
+  const T* GetData() const {
+    return data;
+  }
 
-                /**
-                 * Copy part of the array and place in another array.
-                 * Contents of the provided array gets swapped with the copy of the
-                 * specified array part.
-                 *
-                 * @param pos Start position.
-                 * @param n Number of elements to copy.
-                 * @param result Instance of an array where result should be placed.
-                 */
-                void CopyPart(SizeType pos, SizeType n, FixedSizeArray< T >& result) const {
-                    assert(pos < size);
-                    assert(pos + n <= size);
+  /**
+   * Get array size.
+   *
+   * @return Array size.
+   */
+  SizeType GetSize() const {
+    return size;
+  }
 
-                    result.Assign(data + pos, n);
-                }
+  /**
+   * Copy part of the array and place in another array.
+   * Contents of the provided array gets swapped with the copy of the
+   * specified array part.
+   *
+   * @param pos Start position.
+   * @param n Number of elements to copy.
+   * @param result Instance of an array where result should be placed.
+   */
+  void CopyPart(SizeType pos, SizeType n, FixedSizeArray< T >& result) const {
+    assert(pos < size);
+    assert(pos + n <= size);
 
-                /**
-                 * Element access operator.
-                 *
-                 * @param idx Element index.
-                 * @return Element reference.
-                 */
-                T& operator[](SizeType idx) {
-                    assert(idx < size);
+    result.Assign(data + pos, n);
+  }
 
-                    return data[idx];
-                }
+  /**
+   * Element access operator.
+   *
+   * @param idx Element index.
+   * @return Element reference.
+   */
+  T& operator[](SizeType idx) {
+    assert(idx < size);
 
-                /**
-                 * Element access operator.
-                 *
-                 * @param idx Element index.
-                 * @return Element reference.
-                 */
-                const T& operator[](SizeType idx) const {
-                    assert(idx < size);
+    return data[idx];
+  }
 
-                    return data[idx];
-                }
+  /**
+   * Element access operator.
+   *
+   * @param idx Element index.
+   * @return Element reference.
+   */
+  const T& operator[](SizeType idx) const {
+    assert(idx < size);
 
-                /**
-                 * Check if the array is empty.
-                 *
-                 * @return True if the array is empty.
-                 */
-                bool IsEmpty() const {
-                    return size == 0;
-                }
+    return data[idx];
+  }
 
-                /**
-                 * Resets the state of the array setting it to the specified size
-                 * and erasing its content.
-                 *
-                 * @param newSize New array size.
-                 */
-                void Reset(SizeType newSize = 0) {
-                    if (size != newSize) {
-                        delete[] data;
+  /**
+   * Check if the array is empty.
+   *
+   * @return True if the array is empty.
+   */
+  bool IsEmpty() const {
+    return size == 0;
+  }
 
-                        if (newSize)
-                            data = new T[newSize]();
-                        else
-                            data = 0;
+  /**
+   * Resets the state of the array setting it to the specified size
+   * and erasing its content.
+   *
+   * @param newSize New array size.
+   */
+  void Reset(SizeType newSize = 0) {
+    if (size != newSize) {
+      delete[] data;
 
-                        size = newSize;
-                    } else
-                        std::fill(data, data + size, T());
-                }
+      if (newSize)
+        data = new T[newSize]();
+      else
+        data = 0;
 
-               private:
-                /** Array size. */
-                SizeType size;
+      size = newSize;
+    } else
+      std::fill(data, data + size, T());
+  }
 
-                /** Target array. */
-                T* data;
-            };
-        }  // namespace common
-    }  // namespace odbc
-}
+ private:
+  /** Array size. */
+  SizeType size;
 
-#endif // _IGNITE_ODBC_COMMON_FIXED_SIZE_ARRAY
+  /** Target array. */
+  T* data;
+};
+}  // namespace common
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  // _IGNITE_ODBC_COMMON_FIXED_SIZE_ARRAY

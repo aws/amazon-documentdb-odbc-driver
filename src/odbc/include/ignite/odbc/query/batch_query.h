@@ -18,151 +18,149 @@
 #ifndef _IGNITE_ODBC_QUERY_BATCH_QUERY
 #define _IGNITE_ODBC_QUERY_BATCH_QUERY
 
-#include "ignite/odbc/query/query.h"
 #include "ignite/odbc/app/parameter_set.h"
 #include "ignite/odbc/cursor.h"
+#include "ignite/odbc/query/query.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        /** Connection forward-declaration. */
-        class Connection;
+namespace ignite {
+namespace odbc {
+/** Connection forward-declaration. */
+class Connection;
 
-        namespace query
-        {
-            /**
-             * Query.
-             */
-            class BatchQuery : public Query
-            {
-            public:
-                /**
-                 * Constructor.
-                 *
-                 * @param diag Diagnostics collector.
-                 * @param connection Associated connection.
-                 * @param sql SQL query string.
-                 * @param params SQL params.
-                 * @param timeout Timeout in seconds.
-                 */
-                BatchQuery(diagnostic::DiagnosableAdapter& diag, Connection& connection, const std::string& sql,
-                    const app::ParameterSet& params, int32_t& timeout);
+namespace query {
+/**
+ * Query.
+ */
+class BatchQuery : public Query {
+ public:
+  /**
+   * Constructor.
+   *
+   * @param diag Diagnostics collector.
+   * @param connection Associated connection.
+   * @param sql SQL query string.
+   * @param params SQL params.
+   * @param timeout Timeout in seconds.
+   */
+  BatchQuery(diagnostic::DiagnosableAdapter& diag, Connection& connection,
+             const std::string& sql, const app::ParameterSet& params,
+             int32_t& timeout);
 
-                /**
-                 * Destructor.
-                 */
-                virtual ~BatchQuery();
+  /**
+   * Destructor.
+   */
+  virtual ~BatchQuery();
 
-                /**
-                 * Execute query.
-                 *
-                 * @return True on success.
-                 */
-                virtual SqlResult::Type Execute();
+  /**
+   * Execute query.
+   *
+   * @return True on success.
+   */
+  virtual SqlResult::Type Execute();
 
-                /**
-                 * Get column metadata.
-                 *
-                 * @return Column metadata.
-                 */
-                virtual const meta::ColumnMetaVector* GetMeta();
+  /**
+   * Get column metadata.
+   *
+   * @return Column metadata.
+   */
+  virtual const meta::ColumnMetaVector* GetMeta();
 
-                /**
-                 * Fetch next result row to application buffers.
-                 *
-                 * @param columnBindings Application buffers to put data to.
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type FetchNextRow(app::ColumnBindingMap& columnBindings);
-                
-                /**
-                 * Get data of the specified column in the result set.
-                 *
-                 * @param columnIdx Column index.
-                 * @param buffer Buffer to put column data to.
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type GetColumn(uint16_t columnIdx, app::ApplicationDataBuffer& buffer);
+  /**
+   * Fetch next result row to application buffers.
+   *
+   * @param columnBindings Application buffers to put data to.
+   * @return Operation result.
+   */
+  virtual SqlResult::Type FetchNextRow(app::ColumnBindingMap& columnBindings);
 
-                /**
-                 * Close query.
-                 *
-                 * @return Result.
-                 */
-                virtual SqlResult::Type Close();
+  /**
+   * Get data of the specified column in the result set.
+   *
+   * @param columnIdx Column index.
+   * @param buffer Buffer to put column data to.
+   * @return Operation result.
+   */
+  virtual SqlResult::Type GetColumn(uint16_t columnIdx,
+                                    app::ApplicationDataBuffer& buffer);
 
-                /**
-                 * Check if data is available.
-                 *
-                 * @return True if data is available.
-                 */
-                virtual bool DataAvailable() const;
+  /**
+   * Close query.
+   *
+   * @return Result.
+   */
+  virtual SqlResult::Type Close();
 
-                /**
-                 * Get number of rows affected by the statement.
-                 *
-                 * @return Number of rows affected by the statement.
-                 */
-                virtual int64_t AffectedRows() const;
+  /**
+   * Check if data is available.
+   *
+   * @return True if data is available.
+   */
+  virtual bool DataAvailable() const;
 
-                /**
-                 * Move to the next result set.
-                 * 
-                 * @return Operaion result.
-                 */
-                virtual SqlResult::Type NextResultSet();
+  /**
+   * Get number of rows affected by the statement.
+   *
+   * @return Number of rows affected by the statement.
+   */
+  virtual int64_t AffectedRows() const;
 
-                /**
-                 * Get SQL query string.
-                 *
-                 * @return SQL query string.
-                 */
-                const std::string& GetSql() const
-                {
-                    return sql;
-                }
+  /**
+   * Move to the next result set.
+   *
+   * @return Operaion result.
+   */
+  virtual SqlResult::Type NextResultSet();
 
-            private:
-                IGNITE_NO_COPY_ASSIGNMENT(BatchQuery);
+  /**
+   * Get SQL query string.
+   *
+   * @return SQL query string.
+   */
+  const std::string& GetSql() const {
+    return sql;
+  }
 
-                /**
-                 * Make query execute request and use response to set internal
-                 * state.
-                 *
-                 * @param begin Paramset interval beginning.
-                 * @param end Paramset interval end.
-                 * @param last Last page flag.
-                 * @return Result.
-                 */
-                SqlResult::Type MakeRequestExecuteBatch(SqlUlen begin, SqlUlen end, bool last);
+ private:
+  IGNITE_NO_COPY_ASSIGNMENT(BatchQuery);
 
-                /** Connection associated with the statement. */
-                Connection& connection;
+  /**
+   * Make query execute request and use response to set internal
+   * state.
+   *
+   * @param begin Paramset interval beginning.
+   * @param end Paramset interval end.
+   * @param last Last page flag.
+   * @return Result.
+   */
+  SqlResult::Type MakeRequestExecuteBatch(SqlUlen begin, SqlUlen end,
+                                          bool last);
 
-                /** SQL Query. */
-                std::string sql;
+  /** Connection associated with the statement. */
+  Connection& connection;
 
-                /** Parameter bindings. */
-                const app::ParameterSet& params;
+  /** SQL Query. */
+  std::string sql;
 
-                /** Columns metadata. */
-                meta::ColumnMetaVector resultMeta;
+  /** Parameter bindings. */
+  const app::ParameterSet& params;
 
-                /** Number of rows affected. */
-                std::vector<int64_t> rowsAffected;
+  /** Columns metadata. */
+  meta::ColumnMetaVector resultMeta;
 
-                /** Rows affected index. */
-                size_t rowsAffectedIdx;
+  /** Number of rows affected. */
+  std::vector< int64_t > rowsAffected;
 
-                /** Query executed. */
-                bool executed;
+  /** Rows affected index. */
+  size_t rowsAffectedIdx;
 
-                /** Timeout. */
-                int32_t& timeout;
-            };
-        }
-    }
-}
+  /** Query executed. */
+  bool executed;
 
-#endif //_IGNITE_ODBC_QUERY_BATCH_QUERY
+  /** Timeout. */
+  int32_t& timeout;
+};
+}  // namespace query
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_QUERY_BATCH_QUERY

@@ -14,83 +14,77 @@
  *
  */
 
-#include <ignite/common/utils.h>
-
 #include "ignite/odbc/read_preference.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        ReadPreference::Type ReadPreference::FromString(const std::string& val, Type dflt)
-        {
-            std::string lowerVal = common::ToLower(val);
+#include <ignite/common/utils.h>
 
-            common::StripSurroundingWhitespaces(lowerVal);
+namespace ignite {
+namespace odbc {
+ReadPreference::Type ReadPreference::FromString(const std::string& val,
+                                                Type dflt) {
+  std::string lowerVal = common::ToLower(val);
 
-            common::SpaceToUnderscore(lowerVal);
+  common::StripSurroundingWhitespaces(lowerVal);
 
-            if (lowerVal == "primary")
-                return ReadPreference::Type::PRIMARY;
+  common::SpaceToUnderscore(lowerVal);
 
-            if (lowerVal == "primary_preferred")
-                return ReadPreference::Type::PRIMARY_PREFERRED;
+  if (lowerVal == "primary")
+    return ReadPreference::Type::PRIMARY;
 
-            if (lowerVal == "secondary")
-                return ReadPreference::Type::SECONDARY;
+  if (lowerVal == "primary_preferred")
+    return ReadPreference::Type::PRIMARY_PREFERRED;
 
-            if (lowerVal == "secondary_preferred")
-                return ReadPreference::Type::SECONDARY_PREFERRED;
+  if (lowerVal == "secondary")
+    return ReadPreference::Type::SECONDARY;
 
-            if (lowerVal == "nearest")
-                return ReadPreference::Type::NEAREST;
+  if (lowerVal == "secondary_preferred")
+    return ReadPreference::Type::SECONDARY_PREFERRED;
 
-            return dflt;
-        }
+  if (lowerVal == "nearest")
+    return ReadPreference::Type::NEAREST;
 
-        std::string ReadPreference::ToString(Type val)
-        {
-            switch (val)
-            {
-                case ReadPreference::Type::PRIMARY:
-                    return "primary";
-
-                case ReadPreference::Type::PRIMARY_PREFERRED:
-                    return "primary_preferred";
-
-                case ReadPreference::Type::SECONDARY:
-                    return "secondary";
-
-                case ReadPreference::Type::SECONDARY_PREFERRED:
-                    return "secondary_preferred";
-
-                case ReadPreference::Type::NEAREST:
-                    return "nearest";
-
-                default:
-                    return "unknown";
-            }
-        }
-
-        std::string ReadPreference::ToJdbcString(Type val)
-        {
-            switch (val)
-            {
-            case ReadPreference::Type::PRIMARY_PREFERRED:
-                return "primaryPreferred";
-
-            case ReadPreference::Type::SECONDARY:
-                return "secondary";
-
-            case ReadPreference::Type::SECONDARY_PREFERRED:
-                return "secondaryPreferred";
-
-            case ReadPreference::Type::NEAREST:
-                return "nearest";
-
-            default:
-                return "primary";
-            }
-        }
-    }
+  return dflt;
 }
+
+std::string ReadPreference::ToString(Type val) {
+  switch (val) {
+    case ReadPreference::Type::PRIMARY:
+      return "primary";
+
+    case ReadPreference::Type::PRIMARY_PREFERRED:
+      return "primary_preferred";
+
+    case ReadPreference::Type::SECONDARY:
+      return "secondary";
+
+    case ReadPreference::Type::SECONDARY_PREFERRED:
+      return "secondary_preferred";
+
+    case ReadPreference::Type::NEAREST:
+      return "nearest";
+
+    default:
+      return "unknown";
+  }
+}
+
+std::string ReadPreference::ToJdbcString(Type val) {
+  switch (val) {
+    case ReadPreference::Type::PRIMARY_PREFERRED:
+      return "primaryPreferred";
+
+    case ReadPreference::Type::SECONDARY:
+      return "secondary";
+
+    case ReadPreference::Type::SECONDARY_PREFERRED:
+      return "secondaryPreferred";
+
+    case ReadPreference::Type::NEAREST:
+      return "nearest";
+
+    default:
+      return "primary";
+  }
+}
+}  // namespace odbc
+}  // namespace ignite

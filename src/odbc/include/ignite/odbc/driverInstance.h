@@ -19,13 +19,13 @@
 #define _DOCUMENTDB_ODBC_DRIVER_INSTANCE
 
 class DriverInstance {
-   public:
-    static DriverInstance& getInstance();
+ public:
+  static DriverInstance& getInstance();
 
-    void initialize();
+  void initialize();
 
-   private:
-    DriverInstance() = default;
+ private:
+  DriverInstance() = default;
 };
 
-#endif //_DOCUMENTDB_ODBC_DRIVER_INSTANCE
+#endif  //_DOCUMENTDB_ODBC_DRIVER_INSTANCE

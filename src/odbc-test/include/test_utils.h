@@ -19,7 +19,7 @@
 #define _IGNITE_ODBC_TEST_TEST_UTILS
 
 #ifdef _WIN32
-#   include <windows.h>
+#include <windows.h>
 #endif
 
 #include <sql.h>
@@ -29,33 +29,31 @@
 
 #include "ignite/odbc/common/utils.h"
 
-#define ODBC_THROW_ON_ERROR(ret, type, handle)          \
-    if (!SQL_SUCCEEDED(ret))                            \
-    {                                                   \
-        throw ignite_test::GetOdbcError(type, handle);  \
-    }
+#define ODBC_THROW_ON_ERROR(ret, type, handle)     \
+  if (!SQL_SUCCEEDED(ret)) {                       \
+    throw ignite_test::GetOdbcError(type, handle); \
+  }
 
-#define ODBC_FAIL_ON_ERROR(ret, type, handle)                       \
-    if (!SQL_SUCCEEDED(ret))                                        \
-    {                                                               \
-        Ignition::StopAll(true);                                    \
-        BOOST_FAIL(ignite_test::GetOdbcErrorMessage(type, handle)); \
-    }
+#define ODBC_FAIL_ON_ERROR(ret, type, handle)                   \
+  if (!SQL_SUCCEEDED(ret)) {                                    \
+    Ignition::StopAll(true);                                    \
+    BOOST_FAIL(ignite_test::GetOdbcErrorMessage(type, handle)); \
+  }
 
-#define ODBC_FAIL_ON_ERROR1(ret, type, handle, msg)                                    \
-    if (!SQL_SUCCEEDED(ret))                                                           \
-    {                                                                                  \
-        Ignition::StopAll(true);                                                       \
-        BOOST_FAIL(ignite_test::GetOdbcErrorMessage(type, handle) + ", msg = " + msg); \
-    }
+#define ODBC_FAIL_ON_ERROR1(ret, type, handle, msg)           \
+  if (!SQL_SUCCEEDED(ret)) {                                  \
+    Ignition::StopAll(true);                                  \
+    BOOST_FAIL(ignite_test::GetOdbcErrorMessage(type, handle) \
+               + ", msg = " + msg);                           \
+  }
 
-#define MUTE_TEST_FOR_TEAMCITY \
-    if (jetbrains::teamcity::underTeamcity()) \
-    { \
-        BOOST_TEST_MESSAGE("Muted on TeamCity because of periodical non-critical failures"); \
-        BOOST_CHECK(jetbrains::teamcity::underTeamcity()); \
-        return; \
-    }
+#define MUTE_TEST_FOR_TEAMCITY                                            \
+  if (jetbrains::teamcity::underTeamcity()) {                             \
+    BOOST_TEST_MESSAGE(                                                   \
+        "Muted on TeamCity because of periodical non-critical failures"); \
+    BOOST_CHECK(jetbrains::teamcity::underTeamcity());                    \
+    return;                                                               \
+  }
 
 /**
  * Copy std::string to buffer.
@@ -64,106 +62,102 @@
  * @param src Source std::string.
  * @param n Copy at most n bytes of src.
  */
-inline void CopyStringToBuffer(char *dst, const std::string& src, size_t n) {
-    if (n == 0) {
-        return;
-    }
+inline void CopyStringToBuffer(char* dst, const std::string& src, size_t n) {
+  if (n == 0) {
+    return;
+  }
 
-    using std::min;
-    size_t size = min(src.size(), n - 1);
+  using std::min;
+  size_t size = min(src.size(), n - 1);
 
-    memset(dst + size, '\0', n - size);
-    memcpy(dst, src.c_str(), size);
+  memset(dst + size, '\0', n - size);
+  memcpy(dst, src.c_str(), size);
 }
 
 /**
  * Client ODBC erorr.
  */
-class OdbcClientError : public std::exception
-{
-public:
-    /**
-     * Constructor
-     *
-     * @param sqlstate SQL state.
-     * @param message Error message.
-     */
-    OdbcClientError(const std::string& sqlstate, const std::string& message) :
-        sqlstate(sqlstate),
-        message(message)
-    {
-        // No-op.
-    }
+class OdbcClientError : public std::exception {
+ public:
+  /**
+   * Constructor
+   *
+   * @param sqlstate SQL state.
+   * @param message Error message.
+   */
+  OdbcClientError(const std::string& sqlstate, const std::string& message)
+      : sqlstate(sqlstate), message(message) {
+    // No-op.
+  }
 
-    /**
-     * Destructor.
-     */
-    virtual ~OdbcClientError() IGNITE_NO_THROW
-    {
-         // No-op.
-    }
+  /**
+   * Destructor.
+   */
+  virtual ~OdbcClientError() IGNITE_NO_THROW {
+    // No-op.
+  }
 
-    /**
-     * Implementation of the standard std::exception::what() method.
-     * Synonym for GetText() method.
-     *
-     * @return Error message string.
-     */
-    virtual const char* what() const IGNITE_NO_THROW
-    {
-        return message.c_str();
-    }
+  /**
+   * Implementation of the standard std::exception::what() method.
+   * Synonym for GetText() method.
+   *
+   * @return Error message string.
+   */
+  virtual const char* what() const IGNITE_NO_THROW {
+    return message.c_str();
+  }
 
-    /** SQL state. */
-    std::string sqlstate;
+  /** SQL state. */
+  std::string sqlstate;
 
-    /** Error message. */
-    std::string message;
+  /** Error message. */
+  std::string message;
 };
 
-namespace ignite_test
-{
-    /** Read buffer size. */
-    enum { ODBC_BUFFER_SIZE = 1024 };
+namespace ignite_test {
+/** Read buffer size. */
+enum { ODBC_BUFFER_SIZE = 1024 };
 
-    /**
-     * Extract error.
-     *
-     * @param handleType Type of the handle.
-     * @param handle Handle.
-     * @return Error.
-     */
-    OdbcClientError GetOdbcError(SQLSMALLINT handleType, SQLHANDLE handle);
+/**
+ * Extract error.
+ *
+ * @param handleType Type of the handle.
+ * @param handle Handle.
+ * @return Error.
+ */
+OdbcClientError GetOdbcError(SQLSMALLINT handleType, SQLHANDLE handle);
 
-    /**
-     * Extract error state.
-     *
-     * @param handleType Type of the handle.
-     * @param handle Handle.
-     * @param idx Error record index.
-     * @return Error state.
-     */
-    std::string GetOdbcErrorState(SQLSMALLINT handleType, SQLHANDLE handle, int idx = 1);
+/**
+ * Extract error state.
+ *
+ * @param handleType Type of the handle.
+ * @param handle Handle.
+ * @param idx Error record index.
+ * @return Error state.
+ */
+std::string GetOdbcErrorState(SQLSMALLINT handleType, SQLHANDLE handle,
+                              int idx = 1);
 
-    /**
-     * Extract error message.
-     *
-     * @param handleType Type of the handle.
-     * @param handle Handle.
-     * @param idx Error record index.
-     * @return Error message.
-     */
-    std::string GetOdbcErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle, int idx = 1);
+/**
+ * Extract error message.
+ *
+ * @param handleType Type of the handle.
+ * @param handle Handle.
+ * @param idx Error record index.
+ * @return Error message.
+ */
+std::string GetOdbcErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle,
+                                int idx = 1);
 
-    /**
-     * @return Test config directory path.
-     */
-    std::string GetTestConfigDir();
+/**
+ * @return Test config directory path.
+ */
+std::string GetTestConfigDir();
 
-    /**
-     * Remove all the LFS artifacts.
-     */
-    void ClearLfs();
-}
+/**
+ * Remove all the LFS artifacts.
+ */
+void ClearLfs();
+}  // namespace ignite_test
 
-#endif // _IGNITE_ODBC_TEST_TEST_UTILS
+#endif  // _IGNITE_ODBC_TEST_TEST_UTILS

@@ -18,143 +18,141 @@
 #ifndef _IGNITE_ODBC_QUERY_TABLE_METADATA_QUERY
 #define _IGNITE_ODBC_QUERY_TABLE_METADATA_QUERY
 
-#include "ignite/odbc/query/query.h"
 #include "ignite/odbc/meta/table_meta.h"
+#include "ignite/odbc/query/query.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        /** Connection forward-declaration. */
-        class Connection;
+namespace ignite {
+namespace odbc {
+/** Connection forward-declaration. */
+class Connection;
 
-        namespace query
-        {
-            /**
-             * Query.
-             */
-            class TableMetadataQuery : public Query
-            {
-            public:
-                /**
-                 * Constructor.
-                 *
-                 * @param diag Diagnostics collector.
-                 * @param connection Associated connection.
-                 * @param catalog Catalog search pattern.
-                 * @param schema Schema search pattern.
-                 * @param table Table search pattern.
-                 * @param tableType Table type search pattern.
-                 */
-                TableMetadataQuery(diagnostic::DiagnosableAdapter& diag, Connection& connection,
-                    const std::string& catalog, const std::string& schema,
-                    const std::string& table, const std::string& tableType);
+namespace query {
+/**
+ * Query.
+ */
+class TableMetadataQuery : public Query {
+ public:
+  /**
+   * Constructor.
+   *
+   * @param diag Diagnostics collector.
+   * @param connection Associated connection.
+   * @param catalog Catalog search pattern.
+   * @param schema Schema search pattern.
+   * @param table Table search pattern.
+   * @param tableType Table type search pattern.
+   */
+  TableMetadataQuery(diagnostic::DiagnosableAdapter& diag,
+                     Connection& connection, const std::string& catalog,
+                     const std::string& schema, const std::string& table,
+                     const std::string& tableType);
 
-                /**
-                 * Destructor.
-                 */
-                virtual ~TableMetadataQuery();
+  /**
+   * Destructor.
+   */
+  virtual ~TableMetadataQuery();
 
-                /**
-                 * Execute query.
-                 *
-                 * @return True on success.
-                 */
-                virtual SqlResult::Type Execute();
+  /**
+   * Execute query.
+   *
+   * @return True on success.
+   */
+  virtual SqlResult::Type Execute();
 
-                /**
-                 * Get column metadata.
-                 *
-                 * @return Column metadata.
-                 */
-                virtual const meta::ColumnMetaVector* GetMeta();
+  /**
+   * Get column metadata.
+   *
+   * @return Column metadata.
+   */
+  virtual const meta::ColumnMetaVector* GetMeta();
 
-                /**
-                 * Fetch next result row to application buffers.
-                 *
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type FetchNextRow(app::ColumnBindingMap& columnBindings);
+  /**
+   * Fetch next result row to application buffers.
+   *
+   * @return Operation result.
+   */
+  virtual SqlResult::Type FetchNextRow(app::ColumnBindingMap& columnBindings);
 
-                /**
-                 * Get data of the specified column in the result set.
-                 *
-                 * @param columnIdx Column index.
-                 * @param buffer Buffer to put column data to.
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type GetColumn(uint16_t columnIdx, app::ApplicationDataBuffer& buffer);
+  /**
+   * Get data of the specified column in the result set.
+   *
+   * @param columnIdx Column index.
+   * @param buffer Buffer to put column data to.
+   * @return Operation result.
+   */
+  virtual SqlResult::Type GetColumn(uint16_t columnIdx,
+                                    app::ApplicationDataBuffer& buffer);
 
-                /**
-                 * Close query.
-                 *
-                 * @return True on success.
-                 */
-                virtual SqlResult::Type Close();
+  /**
+   * Close query.
+   *
+   * @return True on success.
+   */
+  virtual SqlResult::Type Close();
 
-                /**
-                 * Check if data is available.
-                 *
-                 * @return True if data is available.
-                 */
-                virtual bool DataAvailable() const;
-                
-                /**
-                 * Get number of rows affected by the statement.
-                 *
-                 * @return Number of rows affected by the statement.
-                 */
-                virtual int64_t AffectedRows() const;
+  /**
+   * Check if data is available.
+   *
+   * @return True if data is available.
+   */
+  virtual bool DataAvailable() const;
 
-                /**
-                 * Move to the next result set.
-                 *
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type NextResultSet();
+  /**
+   * Get number of rows affected by the statement.
+   *
+   * @return Number of rows affected by the statement.
+   */
+  virtual int64_t AffectedRows() const;
 
-            private:
-                IGNITE_NO_COPY_ASSIGNMENT(TableMetadataQuery);
+  /**
+   * Move to the next result set.
+   *
+   * @return Operation result.
+   */
+  virtual SqlResult::Type NextResultSet();
 
-                /**
-                 * Make get columns metadata requets and use response to set internal state.
-                 *
-                 * @return True on success.
-                 */
-                SqlResult::Type MakeRequestGetTablesMeta();
+ private:
+  IGNITE_NO_COPY_ASSIGNMENT(TableMetadataQuery);
 
-                /** Connection associated with the statement. */
-                Connection& connection;
+  /**
+   * Make get columns metadata requets and use response to set internal state.
+   *
+   * @return True on success.
+   */
+  SqlResult::Type MakeRequestGetTablesMeta();
 
-                /** Catalog search pattern. */
-                std::string catalog;
+  /** Connection associated with the statement. */
+  Connection& connection;
 
-                /** Schema search pattern. */
-                std::string schema;
+  /** Catalog search pattern. */
+  std::string catalog;
 
-                /** Table search pattern. */
-                std::string table;
+  /** Schema search pattern. */
+  std::string schema;
 
-                /** Table type search pattern. */
-                std::string tableType;
+  /** Table search pattern. */
+  std::string table;
 
-                /** Query executed. */
-                bool executed;
+  /** Table type search pattern. */
+  std::string tableType;
 
-                /** Fetched flag. */
-                bool fetched;
+  /** Query executed. */
+  bool executed;
 
-                /** Fetched metadata. */
-                meta::TableMetaVector meta;
+  /** Fetched flag. */
+  bool fetched;
 
-                /** Metadata cursor. */
-                meta::TableMetaVector::iterator cursor;
+  /** Fetched metadata. */
+  meta::TableMetaVector meta;
 
-                /** Columns metadata. */
-                meta::ColumnMetaVector columnsMeta;
-            };
-        }
-    }
-}
+  /** Metadata cursor. */
+  meta::TableMetaVector::iterator cursor;
 
-#endif //_IGNITE_ODBC_QUERY_TABLE_METADATA_QUERY
+  /** Columns metadata. */
+  meta::ColumnMetaVector columnsMeta;
+};
+}  // namespace query
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_QUERY_TABLE_METADATA_QUERY
