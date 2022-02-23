@@ -781,7 +781,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsMany) {
     BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 }
 
-BOOST_AUTO_TEST_CASE(TestGetDataWithColumns) {
+BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
     std::string dsnConnectionString;
     CreateDsnConnectionString(dsnConnectionString);
     Connect(dsnConnectionString);
@@ -877,7 +877,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumns) {
     BOOST_CHECK_EQUAL(true, WasNull(num_prec_radix_len));
     BOOST_CHECK_EQUAL(0, num_prec_radix);  // NUM_PREC_RADIX
     BOOST_CHECK_EQUAL(false, WasNull(nullable_len));
-    BOOST_CHECK_EQUAL(0, nullable);  // NULLABLE
+    BOOST_CHECK_EQUAL(SQL_NO_NULLS, nullable);  // NULLABLE
     BOOST_CHECK_EQUAL(false, WasNull(remarks_len));  // TODO: change to true whan nullable supported
     BOOST_CHECK_EQUAL("", remarks);  // REMARKS
     BOOST_CHECK_EQUAL(false, WasNull(column_def_len));  // TODO: change to true whan nullable supported
@@ -893,14 +893,20 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumns) {
     BOOST_CHECK_EQUAL(false, WasNull(is_nullable_len));
     BOOST_CHECK_EQUAL("NO", is_nullable);  // IS_NULLABLE
 
+    // Check that we can get an attribute on the columns metadata.
+    char attrColumnName[C_STR_LEN_DEFAULT];
+    SQLSMALLINT attrColumnNameLen = 0;
+    ret = SQLColAttribute(stmt, 2, SQL_DESC_NAME, attrColumnName,
+                          sizeof(attrColumnName), &attrColumnNameLen,
+                          nullptr);  // COLUMN_NAME, NOT NULL
+    if (!SQL_SUCCEEDED(ret)) {
+        BOOST_ERROR(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+    }
+    BOOST_CHECK_EQUAL("TABLE_SCHEM", attrColumnName);
+
+    // Test that the next fetch will have no data.
     ret = SQLFetch(stmt);
     BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
-
-    char buf[1024]{};
-    SQLLEN bufLen = sizeof(buf);
-    ret = SQLGetData(stmt, 1, SQL_C_CHAR, buf, sizeof(buf), &bufLen);
-    BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
-    BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_STMT, stmt), "24000");
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithSelectQuery, *disabled()) {
