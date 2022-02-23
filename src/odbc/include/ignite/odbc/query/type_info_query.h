@@ -20,109 +20,106 @@
 
 #include "ignite/odbc/query/query.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace query
-        {
-            /**
-             * Type info query.
-             */
-            class TypeInfoQuery : public Query
-            {
-            public:
-                /**
-                 * Constructor.
-                 *
-                 * @param diag Diagnostics collector.
-                 * @param sqlType SQL type.
-                 */
-                TypeInfoQuery(diagnostic::DiagnosableAdapter& diag, int16_t sqlType);
+namespace ignite {
+namespace odbc {
+namespace query {
+/**
+ * Type info query.
+ */
+class TypeInfoQuery : public Query {
+ public:
+  /**
+   * Constructor.
+   *
+   * @param diag Diagnostics collector.
+   * @param sqlType SQL type.
+   */
+  TypeInfoQuery(diagnostic::DiagnosableAdapter& diag, int16_t sqlType);
 
-                /**
-                 * Destructor.
-                 */
-                virtual ~TypeInfoQuery();
+  /**
+   * Destructor.
+   */
+  virtual ~TypeInfoQuery();
 
-                /**
-                 * Execute query.
-                 *
-                 * @return True on success.
-                 */
-                virtual SqlResult::Type Execute();
+  /**
+   * Execute query.
+   *
+   * @return True on success.
+   */
+  virtual SqlResult::Type Execute();
 
-                /**
-                 * Get column metadata.
-                 *
-                 * @return Column metadata.
-                 */
-                virtual const meta::ColumnMetaVector* GetMeta();
+  /**
+   * Get column metadata.
+   *
+   * @return Column metadata.
+   */
+  virtual const meta::ColumnMetaVector* GetMeta();
 
-                /**
-                 * Fetch next result row to application buffers.
-                 *
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type FetchNextRow(app::ColumnBindingMap& columnBindings);
+  /**
+   * Fetch next result row to application buffers.
+   *
+   * @return Operation result.
+   */
+  virtual SqlResult::Type FetchNextRow(app::ColumnBindingMap& columnBindings);
 
-                /**
-                 * Get data of the specified column in the result set.
-                 *
-                 * @param columnIdx Column index.
-                 * @param buffer Buffer to put column data to.
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type GetColumn(uint16_t columnIdx, app::ApplicationDataBuffer& buffer);
+  /**
+   * Get data of the specified column in the result set.
+   *
+   * @param columnIdx Column index.
+   * @param buffer Buffer to put column data to.
+   * @return Operation result.
+   */
+  virtual SqlResult::Type GetColumn(uint16_t columnIdx,
+                                    app::ApplicationDataBuffer& buffer);
 
-                /**
-                 * Close query.
-                 *
-                 * @return True on success.
-                 */
-                virtual SqlResult::Type Close();
+  /**
+   * Close query.
+   *
+   * @return True on success.
+   */
+  virtual SqlResult::Type Close();
 
-                /**
-                 * Check if data is available.
-                 *
-                 * @return True if data is available.
-                 */
-                virtual bool DataAvailable() const;
+  /**
+   * Check if data is available.
+   *
+   * @return True if data is available.
+   */
+  virtual bool DataAvailable() const;
 
-                /**
-                 * Get number of rows affected by the statement.
-                 *
-                 * @return Number of rows affected by the statement.
-                 */
-                virtual int64_t AffectedRows() const;
+  /**
+   * Get number of rows affected by the statement.
+   *
+   * @return Number of rows affected by the statement.
+   */
+  virtual int64_t AffectedRows() const;
 
-                /**
-                 * Move to the next result set.
-                 *
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type NextResultSet();
+  /**
+   * Move to the next result set.
+   *
+   * @return Operation result.
+   */
+  virtual SqlResult::Type NextResultSet();
 
-            private:
-                IGNITE_NO_COPY_ASSIGNMENT(TypeInfoQuery);
+ private:
+  IGNITE_NO_COPY_ASSIGNMENT(TypeInfoQuery);
 
-                /** Columns metadata. */
-                meta::ColumnMetaVector columnsMeta;
+  /** Columns metadata. */
+  meta::ColumnMetaVector columnsMeta;
 
-                /** Executed flag. */
-                bool executed;
+  /** Executed flag. */
+  bool executed;
 
-                /** Fetched flag. */
-                bool fetched;
+  /** Fetched flag. */
+  bool fetched;
 
-                /** Requested types. */
-                std::vector<int8_t> types;
+  /** Requested types. */
+  std::vector< int8_t > types;
 
-                /** Query cursor. */
-                std::vector<int8_t>::const_iterator cursor;
-            };
-        }
-    }
-}
+  /** Query cursor. */
+  std::vector< int8_t >::const_iterator cursor;
+};
+}  // namespace query
+}  // namespace odbc
+}  // namespace ignite
 
-#endif //_IGNITE_ODBC_QUERY_TYPE_INFO_QUERY
+#endif  //_IGNITE_ODBC_QUERY_TYPE_INFO_QUERY

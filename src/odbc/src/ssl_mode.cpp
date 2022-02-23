@@ -15,46 +15,40 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/utils.h>
-
 #include "ignite/odbc/ssl_mode.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace ssl
-        {
-            SslMode::Type SslMode::FromString(const std::string& val, Type dflt)
-            {
-                std::string lowerVal = common::ToLower(val);
+#include <ignite/odbc/common/utils.h>
 
-                common::StripSurroundingWhitespaces(lowerVal);
+namespace ignite {
+namespace odbc {
+namespace ssl {
+SslMode::Type SslMode::FromString(const std::string& val, Type dflt) {
+  std::string lowerVal = common::ToLower(val);
 
-                if (lowerVal == "disable")
-                    return SslMode::DISABLE;
+  common::StripSurroundingWhitespaces(lowerVal);
 
-                if (lowerVal == "require")
-                    return SslMode::REQUIRE;
+  if (lowerVal == "disable")
+    return SslMode::DISABLE;
 
-                return dflt;
-            }
+  if (lowerVal == "require")
+    return SslMode::REQUIRE;
 
-            std::string SslMode::ToString(Type val)
-            {
-                switch (val)
-                {
-                    case SslMode::DISABLE:
-                        return "disable";
-
-                    case SslMode::REQUIRE:
-                        return "require";
-
-                    case SslMode::UNKNOWN:
-                    default:
-                        return "unknown";
-                }
-            }
-        }
-    }
+  return dflt;
 }
+
+std::string SslMode::ToString(Type val) {
+  switch (val) {
+    case SslMode::DISABLE:
+      return "disable";
+
+    case SslMode::REQUIRE:
+      return "require";
+
+    case SslMode::UNKNOWN:
+    default:
+      return "unknown";
+  }
+}
+}  // namespace ssl
+}  // namespace odbc
+}  // namespace ignite

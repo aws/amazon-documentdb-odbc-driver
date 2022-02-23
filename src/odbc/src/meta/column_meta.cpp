@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-#include "ignite/common/utils.h"
-
-#include "ignite/odbc/system/odbc_constants.h"
 #include "ignite/odbc/meta/column_meta.h"
-#include "ignite/odbc/type_traits.h"
+
+#include "ignite/common/utils.h"
 #include "ignite/odbc/common_types.h"
-#include "ignite/odbc/log.h"
 #include "ignite/odbc/jni/java.h"
+#include "ignite/odbc/log.h"
+#include "ignite/odbc/system/odbc_constants.h"
+#include "ignite/odbc/type_traits.h"
 
 namespace ignite {
 namespace odbc {
@@ -101,31 +101,31 @@ const std::string COLUMN_DEF = "COLUMN_DEF";
 const std::string NULLABLE = "NULLABLE";
 const std::string ORDINAL_POSITION = "ORDINAL_POSITION";
 
-void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet, int32_t& prevPosition,
-                     JniErrorInfo& errInfo) {
-    bool wasNull;
-    int intDataType;
-    catalogName = "";
-    schemaName = "";
-    tableName = "";
-    columnName = "";
-    remarks = "";
-    columnDef = "";
-    resultSet.Get()->GetString(TABLE_CAT, catalogName, wasNull, errInfo);
-    resultSet.Get()->GetString(TABLE_SCHEM, schemaName, wasNull, errInfo);
-    resultSet.Get()->GetString(TABLE_NAME, tableName, wasNull, errInfo);
-    resultSet.Get()->GetString(COLUMN_NAME, columnName, wasNull, errInfo);
-    resultSet.Get()->GetInt(DATA_TYPE, intDataType, wasNull, errInfo);
-    dataType = static_cast< int16_t >(intDataType);
-    resultSet.Get()->GetString(REMARKS, remarks, wasNull, errInfo);
-    resultSet.Get()->GetString(COLUMN_DEF, columnDef, wasNull, errInfo);
-    resultSet.Get()->GetInt(NULLABLE, nullability, wasNull, errInfo);
-    resultSet.Get()->GetInt(ORDINAL_POSITION, ordinalPosition, wasNull, errInfo);
-    if (wasNull) {
-        ordinalPosition = ++prevPosition;
-    } else {
-        prevPosition = ordinalPosition;
-    }
+void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
+                      int32_t& prevPosition, JniErrorInfo& errInfo) {
+  bool wasNull;
+  int intDataType;
+  catalogName = "";
+  schemaName = "";
+  tableName = "";
+  columnName = "";
+  remarks = "";
+  columnDef = "";
+  resultSet.Get()->GetString(TABLE_CAT, catalogName, wasNull, errInfo);
+  resultSet.Get()->GetString(TABLE_SCHEM, schemaName, wasNull, errInfo);
+  resultSet.Get()->GetString(TABLE_NAME, tableName, wasNull, errInfo);
+  resultSet.Get()->GetString(COLUMN_NAME, columnName, wasNull, errInfo);
+  resultSet.Get()->GetInt(DATA_TYPE, intDataType, wasNull, errInfo);
+  dataType = static_cast< int16_t >(intDataType);
+  resultSet.Get()->GetString(REMARKS, remarks, wasNull, errInfo);
+  resultSet.Get()->GetString(COLUMN_DEF, columnDef, wasNull, errInfo);
+  resultSet.Get()->GetInt(NULLABLE, nullability, wasNull, errInfo);
+  resultSet.Get()->GetInt(ORDINAL_POSITION, ordinalPosition, wasNull, errInfo);
+  if (wasNull) {
+    ordinalPosition = ++prevPosition;
+  } else {
+    prevPosition = ordinalPosition;
+  }
 }
 
 bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
@@ -327,7 +327,7 @@ void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
   meta.clear();
 
   if (!resultSet.IsValid()) {
-      return;
+    return;
   }
 
   JniErrorInfo errInfo;
@@ -335,13 +335,13 @@ void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
   int32_t prevPosition = 0;
   JniErrorCode errCode;
   do {
-      errCode = resultSet.Get()->Next(hasNext, errInfo);
-      if (!hasNext || errCode != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-          break;
-      }
+    errCode = resultSet.Get()->Next(hasNext, errInfo);
+    if (!hasNext || errCode != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      break;
+    }
 
-      meta.emplace_back(ColumnMeta());
-      meta.back().Read(resultSet, prevPosition, errInfo);
+    meta.emplace_back(ColumnMeta());
+    meta.back().Read(resultSet, prevPosition, errInfo);
   } while (hasNext);
 }
 

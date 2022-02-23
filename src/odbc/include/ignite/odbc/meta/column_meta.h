@@ -19,14 +19,14 @@
 #define _IGNITE_ODBC_META_COLUMN_META
 
 #include <stdint.h>
+
 #include <string>
 
 #include "ignite/impl/binary/binary_reader_impl.h"
-
-#include "ignite/odbc/protocol_version.h"
 #include "ignite/odbc/common_types.h"
-#include "ignite/odbc/utility.h"
 #include "ignite/odbc/jni/result_set.h"
+#include "ignite/odbc/protocol_version.h"
+#include "ignite/odbc/utility.h"
 
 using ignite::odbc::jni::ResultSet;
 using ignite::odbc::jni::java::JniErrorInfo;
@@ -142,10 +142,10 @@ class ColumnMeta {
     return *this;
   }
 
-   /**
+  /**
    * Read using reader.
    * @param resultSet SharedPointer< ResultSet >.
-   * @param prevPosition the ordinal position of the previous column. 
+   * @param prevPosition the ordinal position of the previous column.
    * @paran errInfo JniErrorInfo.
    */
   void Read(SharedPointer< ResultSet >& resultSet, int32_t& prevPosition,
@@ -156,7 +156,7 @@ class ColumnMeta {
    * @return Catalog name.
    */
   const std::string& GetCatalogName() const {
-      return catalogName;
+    return catalogName;
   }
 
   /**
@@ -188,7 +188,7 @@ class ColumnMeta {
    * @return Remarks.
    */
   const std::string& GetRemarks() const {
-      return remarks;
+    return remarks;
   }
 
   /**
@@ -196,7 +196,7 @@ class ColumnMeta {
    * @return Column default value.
    */
   const std::string& GetColumnDef() const {
-      return columnDef;
+    return columnDef;
   }
 
   /**
@@ -236,7 +236,7 @@ class ColumnMeta {
    * @return Column ordinal position.
    */
   int32_t GetOrdinalPosition() const {
-      return ordinalPosition;
+    return ordinalPosition;
   }
 
   /**
@@ -301,9 +301,9 @@ typedef std::vector< ColumnMeta > ColumnMetaVector;
  * @param meta Collection.
  */
 void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
-                         ColumnMetaVector& meta);
+                          ColumnMetaVector& meta);
 
 }  // namespace meta
 }  // namespace odbc
 }  // namespace ignite
-#endif //_IGNITE_ODBC_META_COLUMN_META
+#endif  //_IGNITE_ODBC_META_COLUMN_META

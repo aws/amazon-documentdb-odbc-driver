@@ -18,51 +18,48 @@
 #ifndef _IGNITE_ODBC_SQL_SQL_PARSER
 #define _IGNITE_ODBC_SQL_SQL_PARSER
 
-#include <string>
-#include <memory>
-
-#include <ignite/odbc/sql/sql_lexer.h>
 #include <ignite/odbc/sql/sql_command.h>
+#include <ignite/odbc/sql/sql_lexer.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        /**
-         * SQL parser.
-         */
-        class SqlParser
-        {
-        public:
-            /**
-             * Default constructor.
-             *
-             * @param sql SQL request.
-             */
-            SqlParser(const std::string& sql);
+#include <memory>
+#include <string>
 
-            /**
-             * Destructor.
-             */
-            ~SqlParser();
+namespace ignite {
+namespace odbc {
+/**
+ * SQL parser.
+ */
+class SqlParser {
+ public:
+  /**
+   * Default constructor.
+   *
+   * @param sql SQL request.
+   */
+  SqlParser(const std::string& sql);
 
-            /**
-             * Get next command.
-             *
-             * @return Parsed command on success and null on failure.
-             */
-            std::auto_ptr<SqlCommand> GetNextCommand();
+  /**
+   * Destructor.
+   */
+  ~SqlParser();
 
-        private:
-            /**
-             * 
-             */
-            std::auto_ptr<SqlCommand> ProcessCommand();
+  /**
+   * Get next command.
+   *
+   * @return Parsed command on success and null on failure.
+   */
+  std::auto_ptr< SqlCommand > GetNextCommand();
 
-            /** SQL lexer. */
-            SqlLexer lexer;
-        };
-    }
-}
+ private:
+  /**
+   *
+   */
+  std::auto_ptr< SqlCommand > ProcessCommand();
 
-#endif //_IGNITE_ODBC_SQL_SQL_PARSER
+  /** SQL lexer. */
+  SqlLexer lexer;
+};
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_SQL_SQL_PARSER

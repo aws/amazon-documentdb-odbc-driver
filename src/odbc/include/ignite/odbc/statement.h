@@ -23,12 +23,12 @@
 #include <map>
 #include <memory>
 
-#include "ignite/odbc/meta/column_meta.h"
-#include "ignite/odbc/query/query.h"
 #include "ignite/odbc/app/application_data_buffer.h"
 #include "ignite/odbc/app/parameter_set.h"
-#include "ignite/odbc/diagnostic/diagnosable_adapter.h"
 #include "ignite/odbc/common_types.h"
+#include "ignite/odbc/diagnostic/diagnosable_adapter.h"
+#include "ignite/odbc/meta/column_meta.h"
+#include "ignite/odbc/query/query.h"
 #include "sql/sql_set_streaming_command.h"
 
 namespace ignite {
@@ -743,4 +743,4 @@ class Statement : public diagnostic::DiagnosableAdapter {
 }  // namespace odbc
 }  // namespace ignite
 
-#endif //_IGNITE_ODBC_STATEMENT
+#endif  //_IGNITE_ODBC_STATEMENT

@@ -15,101 +15,96 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/utility.h"
 #include "ignite/odbc/row.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        Row::Row(ignite::impl::interop::InteropUnpooledMemory& pageData) :
-            rowBeginPos(0), pos(rowBeginPos), size(0), pageData(pageData),
-            stream(&pageData), reader(&stream), columns()
-        {
-            if (pageData.Length() >= 4)
-            {
-                Reinit();
-            }
-        }
+#include "ignite/odbc/utility.h"
 
-        Row::~Row()
-        {
-            // No-op.
-        }
-
-        bool Row::EnsureColumnDiscovered(uint16_t columnIdx)
-        {
-            if (columns.size() >= columnIdx)
-                return true;
-
-            if (columnIdx > GetSize() || columnIdx < 1)
-                return false;
-
-            if (columns.empty())
-            {
-                Column newColumn(reader);
-
-                if (!newColumn.IsValid())
-                    return false;
-
-                columns.push_back(newColumn);
-            }
-
-            while (columns.size() < columnIdx)
-            {
-                Column& column = columns.back();
-
-                stream.Position(column.GetEndPosition());
-
-                Column newColumn(reader);
-
-                if (!newColumn.IsValid())
-                    return false;
-
-                columns.push_back(newColumn);
-            }
-
-            return true;
-        }
-
-        app::ConversionResult::Type Row::ReadColumnToBuffer(uint16_t columnIdx, app::ApplicationDataBuffer& dataBuf)
-        {
-            if (!EnsureColumnDiscovered(columnIdx))
-                return app::ConversionResult::AI_FAILURE;
-
-            Column& column = GetColumn(columnIdx);
-
-            return column.ReadToBuffer(reader, dataBuf);
-        }
-
-        bool Row::MoveToNext()
-        {
-            int32_t lastColumnIdx = GetSize();
-
-            if (!EnsureColumnDiscovered(lastColumnIdx))
-                return false;
-
-            Column& lastColumn = GetColumn(lastColumnIdx);
-
-            stream.Position(lastColumn.GetEndPosition());
-
-            Reinit();
-
-            return true;
-        }
-
-        void Row::Reinit()
-        {
-            size = stream.ReadInt32();
-
-            rowBeginPos = stream.Position();
-
-            columns.clear();
-
-            columns.reserve(size);
-
-            pos = 0;
-        }
-    }
+namespace ignite {
+namespace odbc {
+Row::Row(ignite::impl::interop::InteropUnpooledMemory& pageData)
+    : rowBeginPos(0),
+      pos(rowBeginPos),
+      size(0),
+      pageData(pageData),
+      stream(&pageData),
+      reader(&stream),
+      columns() {
+  if (pageData.Length() >= 4) {
+    Reinit();
+  }
 }
 
+Row::~Row() {
+  // No-op.
+}
+
+bool Row::EnsureColumnDiscovered(uint16_t columnIdx) {
+  if (columns.size() >= columnIdx)
+    return true;
+
+  if (columnIdx > GetSize() || columnIdx < 1)
+    return false;
+
+  if (columns.empty()) {
+    Column newColumn(reader);
+
+    if (!newColumn.IsValid())
+      return false;
+
+    columns.push_back(newColumn);
+  }
+
+  while (columns.size() < columnIdx) {
+    Column& column = columns.back();
+
+    stream.Position(column.GetEndPosition());
+
+    Column newColumn(reader);
+
+    if (!newColumn.IsValid())
+      return false;
+
+    columns.push_back(newColumn);
+  }
+
+  return true;
+}
+
+app::ConversionResult::Type Row::ReadColumnToBuffer(
+    uint16_t columnIdx, app::ApplicationDataBuffer& dataBuf) {
+  if (!EnsureColumnDiscovered(columnIdx))
+    return app::ConversionResult::AI_FAILURE;
+
+  Column& column = GetColumn(columnIdx);
+
+  return column.ReadToBuffer(reader, dataBuf);
+}
+
+bool Row::MoveToNext() {
+  int32_t lastColumnIdx = GetSize();
+
+  if (!EnsureColumnDiscovered(lastColumnIdx))
+    return false;
+
+  Column& lastColumn = GetColumn(lastColumnIdx);
+
+  stream.Position(lastColumn.GetEndPosition());
+
+  Reinit();
+
+  return true;
+}
+
+void Row::Reinit() {
+  size = stream.ReadInt32();
+
+  rowBeginPos = stream.Position();
+
+  columns.clear();
+
+  columns.reserve(size);
+
+  pos = 0;
+}
+}  // namespace odbc
+}  // namespace ignite

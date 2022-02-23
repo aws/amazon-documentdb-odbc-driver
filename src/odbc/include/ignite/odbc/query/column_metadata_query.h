@@ -18,9 +18,9 @@
 #ifndef _IGNITE_ODBC_QUERY_COLUMN_METADATA_QUERY
 #define _IGNITE_ODBC_QUERY_COLUMN_METADATA_QUERY
 
-#include "ignite/odbc/query/query.h"
-#include "ignite/odbc/meta/column_meta.h"
 #include "ignite/odbc/jni/java.h"
+#include "ignite/odbc/meta/column_meta.h"
+#include "ignite/odbc/query/query.h"
 
 namespace ignite {
 namespace odbc {
@@ -155,4 +155,4 @@ class ColumnMetadataQuery : public Query {
 }  // namespace odbc
 }  // namespace ignite
 
-#endif //_IGNITE_ODBC_QUERY_COLUMN_METADATA_QUERY
+#endif  //_IGNITE_ODBC_QUERY_COLUMN_METADATA_QUERY

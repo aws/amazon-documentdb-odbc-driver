@@ -15,86 +15,87 @@
  * limitations under the License.
  */
 
+#include "ignite/odbc/query/column_metadata_query.h"
+
+#include <ignite/impl/binary/binary_common.h>
 
 #include <vector>
 
-#include <ignite/impl/binary/binary_common.h>
-#include "ignite/odbc/jni/java.h"
-#include "ignite/odbc/type_traits.h"
-#include "ignite/odbc/connection.h"
-#include "ignite/odbc/message.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/odbc_error.h"
-#include "ignite/odbc/query/column_metadata_query.h"
-#include "ignite/odbc/jni/database_metadata.h"
-#include "ignite/odbc/jni/result_set.h"
-#include "ignite/odbc/ignite_error.h"
 #include "ignite/odbc/common/concurrent.h"
+#include "ignite/odbc/connection.h"
+#include "ignite/odbc/ignite_error.h"
+#include "ignite/odbc/jni/database_metadata.h"
+#include "ignite/odbc/jni/java.h"
+#include "ignite/odbc/jni/result_set.h"
+#include "ignite/odbc/log.h"
+#include "ignite/odbc/message.h"
+#include "ignite/odbc/odbc_error.h"
+#include "ignite/odbc/type_traits.h"
 
 using ignite::odbc::IgniteError;
 using ignite::odbc::common::concurrent::SharedPointer;
 using ignite::odbc::jni::DatabaseMetaData;
-using ignite::odbc::jni::java::JniErrorInfo; 
+using ignite::odbc::jni::java::JniErrorInfo;
 
 namespace {
 struct ResultColumn {
-    enum Type {
-        /** Catalog name. NULL if not applicable to the data source. */
-        TABLE_CAT = 1,
+  enum Type {
+    /** Catalog name. NULL if not applicable to the data source. */
+    TABLE_CAT = 1,
 
-        /** Schema name. NULL if not applicable to the data source. */
-        TABLE_SCHEM,
+    /** Schema name. NULL if not applicable to the data source. */
+    TABLE_SCHEM,
 
-        /** Table name. */
-        TABLE_NAME,
+    /** Table name. */
+    TABLE_NAME,
 
-        /** Column name. */
-        COLUMN_NAME,
+    /** Column name. */
+    COLUMN_NAME,
 
-        /** SQL data type. */
-        DATA_TYPE,
+    /** SQL data type. */
+    DATA_TYPE,
 
-        /** Data source-dependent data type name. */
-        TYPE_NAME,
+    /** Data source-dependent data type name. */
+    TYPE_NAME,
 
-        /** Column size. */
-        COLUMN_SIZE,
+    /** Column size. */
+    COLUMN_SIZE,
 
-        /** The length in bytes of data transferred on fetch. */
-        BUFFER_LENGTH,
+    /** The length in bytes of data transferred on fetch. */
+    BUFFER_LENGTH,
 
-        /** The total number of significant digits to the right of the decimal
-           point. */
-        DECIMAL_DIGITS,
+    /** The total number of significant digits to the right of the decimal
+       point. */
+    DECIMAL_DIGITS,
 
-        /** Precision. */
-        NUM_PREC_RADIX,
+    /** Precision. */
+    NUM_PREC_RADIX,
 
-        /** Nullability of the data in column (int). */
-        NULLABLE,
+    /** Nullability of the data in column (int). */
+    NULLABLE,
 
-        /** A description of the column. */
-        REMARKS,
+    /** A description of the column. */
+    REMARKS,
 
-        /** Default value for the column. May be null. */
-        COLUMN_DEF,
+    /** Default value for the column. May be null. */
+    COLUMN_DEF,
 
-        /** SQL data type. */
-        SQL_DATA_TYPE,
+    /** SQL data type. */
+    SQL_DATA_TYPE,
 
-        /** Subtype code for datetime and interval data types. */
-        SQL_DATETIME_SUB,
+    /** Subtype code for datetime and interval data types. */
+    SQL_DATETIME_SUB,
 
-        /** Maximum length in bytes of a character or binary data type column.
-           NULL for other data types. */
-        CHAR_OCTET_LENGTH,
+    /** Maximum length in bytes of a character or binary data type column.
+       NULL for other data types. */
+    CHAR_OCTET_LENGTH,
 
-        /** Index of column in table (starting at 1) */
-        ORDINAL_POSITION,
+    /** Index of column in table (starting at 1) */
+    ORDINAL_POSITION,
 
-        /** Nullability of data in column (String). */
-        IS_NULLABLE
-    };
+    /** Nullability of data in column (String). */
+    IS_NULLABLE
+  };
 };
 }  // namespace
 
@@ -102,10 +103,12 @@ namespace ignite {
 namespace odbc {
 namespace query {
 ColumnMetadataQuery::ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
-                                          Connection& connection, const std::string& catalog,
-                                          const std::string& schema, const std::string& table,
-                                          const std::string& column) : 
-      Query(diag, QueryType::COLUMN_METADATA),
+                                         Connection& connection,
+                                         const std::string& catalog,
+                                         const std::string& schema,
+                                         const std::string& table,
+                                         const std::string& column)
+    : Query(diag, QueryType::COLUMN_METADATA),
       connection(connection),
       catalog(catalog),
       schema(schema),
@@ -132,16 +135,23 @@ ColumnMetadataQuery::ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
   columnsMeta.push_back(ColumnMeta(sch, tbl, "DATA_TYPE", JDBC_TYPE_SMALLINT));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "TYPE_NAME", JDBC_TYPE_VARCHAR));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_SIZE", JDBC_TYPE_INTEGER));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "BUFFER_LENGTH", JDBC_TYPE_INTEGER));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "DECIMAL_DIGITS", JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "NUM_PREC_RADIX", JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "BUFFER_LENGTH", JDBC_TYPE_INTEGER));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "DECIMAL_DIGITS", JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "NUM_PREC_RADIX", JDBC_TYPE_SMALLINT));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "NULLABLE", JDBC_TYPE_SMALLINT));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS", JDBC_TYPE_VARCHAR));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_DEF", JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATA_TYPE", JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATETIME_SUB", JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "CHAR_OCTET_LENGTH", JDBC_TYPE_INTEGER));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "ORDINAL_POSITION", JDBC_TYPE_INTEGER));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "SQL_DATA_TYPE", JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "SQL_DATETIME_SUB", JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "CHAR_OCTET_LENGTH", JDBC_TYPE_INTEGER));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "ORDINAL_POSITION", JDBC_TYPE_INTEGER));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "IS_NULLABLE", JDBC_TYPE_VARCHAR));
 }
 
@@ -149,8 +159,7 @@ ColumnMetadataQuery::~ColumnMetadataQuery() {
   // No-op.
 }
 
-SqlResult::Type
-ColumnMetadataQuery::Execute() {
+SqlResult::Type ColumnMetadataQuery::Execute() {
   if (executed)
     Close();
 
@@ -196,9 +205,7 @@ SqlResult::Type ColumnMetadataQuery::FetchNextRow(
 }
 
 SqlResult::Type ColumnMetadataQuery::GetColumn(
-    uint16_t columnIdx,
-    app::ApplicationDataBuffer&
-        buffer) {
+    uint16_t columnIdx, app::ApplicationDataBuffer& buffer) {
   if (!executed) {
     diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
                          "Query was not executed.");
@@ -272,9 +279,9 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     case ResultColumn::NUM_PREC_RADIX: {
       int32_t numPrecRadix = type_traits::BinaryTypeNumPrecRadix(columnType);
       if (numPrecRadix < 0)
-          buffer.PutNull();
+        buffer.PutNull();
       else
-          buffer.PutInt16(static_cast< int16_t >(numPrecRadix));
+        buffer.PutInt16(static_cast< int16_t >(numPrecRadix));
       break;
     }
 
@@ -291,7 +298,7 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     case ResultColumn::COLUMN_DEF: {
       buffer.PutString(currentColumn.GetColumnDef());
       break;
-    } 
+    }
 
     case ResultColumn::SQL_DATA_TYPE: {
       buffer.PutInt16(type_traits::BinaryToSqlType(columnType));
@@ -299,7 +306,7 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::SQL_DATETIME_SUB: {
-      buffer.PutNull(); 
+      buffer.PutNull();
       // todo implement the function for getting the datetime sub code:
       // https://bitquill.atlassian.net/browse/AD-609
       break;
@@ -314,17 +321,18 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
       buffer.PutInt32(currentColumn.GetOrdinalPosition());
       break;
     }
- 
+
     case ResultColumn::IS_NULLABLE: {
-      buffer.PutString(type_traits::NullabiltyToIsNullable(currentColumn.GetNullability()));
+      buffer.PutString(
+          type_traits::NullabiltyToIsNullable(currentColumn.GetNullability()));
       break;
     }
 
     default: {
-        diag.AddStatusRecord(SqlState::S07009_INVALID_DESCRIPTOR_INDEX,
-                             "Invalid index.");
-        return SqlResult::AI_ERROR;
-        break;
+      diag.AddStatusRecord(SqlState::S07009_INVALID_DESCRIPTOR_INDEX,
+                           "Invalid index.");
+      return SqlResult::AI_ERROR;
+      break;
     }
   }
 
@@ -357,17 +365,17 @@ SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
       connection.GetMetaData(error);
   if (!databaseMetaData.IsValid()
       || error.GetCode() != IgniteError::IGNITE_SUCCESS) {
-      diag.AddStatusRecord(error.GetText());
-      return SqlResult::AI_ERROR;
+    diag.AddStatusRecord(error.GetText());
+    return SqlResult::AI_ERROR;
   }
 
   JniErrorInfo errInfo;
-  SharedPointer< ResultSet > resultSet =
-      databaseMetaData.Get()->GetColumns(catalog, schema, table, column, errInfo);
+  SharedPointer< ResultSet > resultSet = databaseMetaData.Get()->GetColumns(
+      catalog, schema, table, column, errInfo);
   if (!resultSet.IsValid()
       || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-      diag.AddStatusRecord(errInfo.errMsg);
-      return SqlResult::AI_ERROR;
+    diag.AddStatusRecord(errInfo.errMsg);
+    return SqlResult::AI_ERROR;
   }
 
   meta::ReadColumnMetaVector(resultSet, meta);
@@ -385,5 +393,4 @@ SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
 }
 }  // namespace query
 }  // namespace odbc
-}
-
+}  // namespace ignite
