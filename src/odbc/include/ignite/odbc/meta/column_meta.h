@@ -73,7 +73,7 @@ class ColumnMeta {
   /**
    * Default constructor.
    */
-  ColumnMeta() : dataType(), nullability(), precision(), scale() {
+  ColumnMeta() : dataType(), nullability(), precision(), scale(), ordinalPosition() {
     // No-op.
   }
 
@@ -94,7 +94,8 @@ class ColumnMeta {
         dataType(dataType),
         precision(-1),
         scale(-1),
-        nullability(Nullability::NULLABILITY_UNKNOWN) {
+        nullability(Nullability::NULLABILITY_UNKNOWN),
+        ordinalPosition(-1) {
     // No-op.
   }
 
