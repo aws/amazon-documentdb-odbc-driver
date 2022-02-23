@@ -125,24 +125,24 @@ ColumnMetadataQuery::ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
   const std::string sch;
   const std::string tbl;
 
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", DOCUMENTDB_JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_SCHEM", DOCUMENTDB_JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", DOCUMENTDB_JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_NAME", DOCUMENTDB_JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "DATA_TYPE", DOCUMENTDB_JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TYPE_NAME", DOCUMENTDB_JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_SIZE", DOCUMENTDB_JDBC_TYPE_INTEGER));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "BUFFER_LENGTH", DOCUMENTDB_JDBC_TYPE_INTEGER));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "DECIMAL_DIGITS", DOCUMENTDB_JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "NUM_PREC_RADIX", DOCUMENTDB_JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "NULLABLE", DOCUMENTDB_JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS", DOCUMENTDB_JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_DEF", DOCUMENTDB_JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATA_TYPE", DOCUMENTDB_JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATETIME_SUB", DOCUMENTDB_JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "CHAR_OCTET_LENGTH", DOCUMENTDB_JDBC_TYPE_INTEGER));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "ORDINAL_POSITION", DOCUMENTDB_JDBC_TYPE_INTEGER));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "IS_NULLABLE", DOCUMENTDB_JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_SCHEM", JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_NAME", JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "DATA_TYPE", JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TYPE_NAME", JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_SIZE", JDBC_TYPE_INTEGER));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "BUFFER_LENGTH", JDBC_TYPE_INTEGER));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "DECIMAL_DIGITS", JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "NUM_PREC_RADIX", JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "NULLABLE", JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS", JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_DEF", JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATA_TYPE", JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATETIME_SUB", JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "CHAR_OCTET_LENGTH", JDBC_TYPE_INTEGER));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "ORDINAL_POSITION", JDBC_TYPE_INTEGER));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "IS_NULLABLE", JDBC_TYPE_VARCHAR));
 }
 
 ColumnMetadataQuery::~ColumnMetadataQuery() {

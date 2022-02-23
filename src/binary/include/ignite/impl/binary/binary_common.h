@@ -77,103 +77,103 @@ namespace ignite
             // DocumentDB JDBC types. 
 
             /** Type: bit. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_BIT = -7;
+            const int16_t JDBC_TYPE_BIT = -7;
 
             /** Type: tinyint. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_TINYINT = -6;
+            const int16_t JDBC_TYPE_TINYINT = -6;
 
             /** Type: snallint. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_SMALLINT = 5;
+            const int16_t JDBC_TYPE_SMALLINT = 5;
 
             /** Type: integer. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_INTEGER = 4;
+            const int16_t JDBC_TYPE_INTEGER = 4;
 
             /** Type: bigint. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_BIGINT = -5;
+            const int16_t JDBC_TYPE_BIGINT = -5;
 
             /** Type: float. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_FLOAT = 6;
+            const int16_t JDBC_TYPE_FLOAT = 6;
 
             /** Type: real. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_REAL = 7;
+            const int16_t JDBC_TYPE_REAL = 7;
 
             /** Type: double. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_DOUBLE = 8;
+            const int16_t JDBC_TYPE_DOUBLE = 8;
 
             /** Type: numeric. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_NUMERIC = 2;
+            const int16_t JDBC_TYPE_NUMERIC = 2;
 
             /** Type: decimal. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_DECIMAL = 3;
+            const int16_t JDBC_TYPE_DECIMAL = 3;
 
             /** Type: char. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_CHAR = 1;
+            const int16_t JDBC_TYPE_CHAR = 1;
 
             /** Type: varchar. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_VARCHAR = 12;
+            const int16_t JDBC_TYPE_VARCHAR = 12;
 
             /** Type: longvarchar. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_LONGVARCHAR = -1;
+            const int16_t JDBC_TYPE_LONGVARCHAR = -1;
 
             /** Type: date. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_DATE = 91;
+            const int16_t JDBC_TYPE_DATE = 91;
 
             /** Type: time. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_TIME = 92;
+            const int16_t JDBC_TYPE_TIME = 92;
 
             /** Type: timestamp. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_TIMESTAMP = 93;
+            const int16_t JDBC_TYPE_TIMESTAMP = 93;
 
             /** Type: binary. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_BINARY = -2;
+            const int16_t JDBC_TYPE_BINARY = -2;
 
             /** Type: varbinary. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_VARBINARY = -3;
+            const int16_t JDBC_TYPE_VARBINARY = -3;
 
             /** Type: long varbinary. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_LONGVARBINARY = -4;
+            const int16_t JDBC_TYPE_LONGVARBINARY = -4;
 
             /** Type: blob. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_BLOB = 2004;
+            const int16_t JDBC_TYPE_BLOB = 2004;
 
             /** Type: clob. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_CLOB = 2005;
+            const int16_t JDBC_TYPE_CLOB = 2005;
 
             /** Type: boolean. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_BOOLEAN = 16;
+            const int16_t JDBC_TYPE_BOOLEAN = 16;
 
             /** Type: array. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_ARRAY = 2003;
+            const int16_t JDBC_TYPE_ARRAY = 2003;
 
             /** Type: struct. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_STRUCT = 2002;
+            const int16_t JDBC_TYPE_STRUCT = 2002;
 
             /** Type: java object. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_JAVA_OBJECT = 2000;
+            const int16_t JDBC_TYPE_JAVA_OBJECT = 2000;
 
             /** Type: rowid. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_ROWID = -8;
+            const int16_t JDBC_TYPE_ROWID = -8;
 
             /** Type: nchar. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_NCHAR = -15;
+            const int16_t JDBC_TYPE_NCHAR = -15;
 
             /** Type: nvarchar. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_NVARCHAR = -9;
+            const int16_t JDBC_TYPE_NVARCHAR = -9;
 
             /** Type: longnvarchar. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_LONGNVARCHAR = -16;
+            const int16_t JDBC_TYPE_LONGNVARCHAR = -16;
 
             /** Type: nclob. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_NCLOB = 2011;
+            const int16_t JDBC_TYPE_NCLOB = 2011;
 
             /** Type: sqlxml. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_SQLXML = 2009;
+            const int16_t JDBC_TYPE_SQLXML = 2009;
 
             /** Type: ref cursor. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_REF_CURSOR = 2012;
+            const int16_t JDBC_TYPE_REF_CURSOR = 2012;
 
             /** Type: null. */
-            const int16_t DOCUMENTDB_JDBC_TYPE_NULL = 0;
+            const int16_t JDBC_TYPE_NULL = 0;
 
             // Ignite enum types
 

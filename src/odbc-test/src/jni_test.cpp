@@ -333,10 +333,10 @@ BOOST_AUTO_TEST_CASE(TestDocumentDatabaseDbMetaDataGetColumns) {
         BOOST_CHECK(!wasNull);
         switch (columnIndex) {
             case 1:
-                BOOST_CHECK_EQUAL(DOCUMENTDB_JDBC_TYPE_VARCHAR, intValue);
+                BOOST_CHECK_EQUAL(JDBC_TYPE_VARCHAR, intValue);
                 break;
             case 2:
-                BOOST_CHECK_EQUAL(DOCUMENTDB_JDBC_TYPE_DOUBLE, intValue);
+                BOOST_CHECK_EQUAL(JDBC_TYPE_DOUBLE, intValue);
                 break;
             default:
                 BOOST_FAIL("Unexpected column index.");

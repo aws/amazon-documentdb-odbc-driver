@@ -682,7 +682,7 @@ namespace ignite
 
         SharedPointer< JniContext > Connection::GetJniContext() {
             if (!_jniContext.IsValid()) {
-                // Resolve DOCUMENTDB_HOME.
+                // Resolve HOME.
                 std::string home = jni::ResolveDocumentDbHome();
 
                 // Create classpath.

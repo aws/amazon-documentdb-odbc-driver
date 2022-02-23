@@ -123,71 +123,71 @@ namespace ignite
             {
                 switch (binaryType)
                 {
-                case DOCUMENTDB_JDBC_TYPE_BIT:
-                case DOCUMENTDB_JDBC_TYPE_BOOLEAN:
+                case JDBC_TYPE_BIT:
+                case JDBC_TYPE_BOOLEAN:
                     return SqlTypeName::BIT;
 
-                case DOCUMENTDB_JDBC_TYPE_SMALLINT:
+                case JDBC_TYPE_SMALLINT:
                     return SqlTypeName::SMALLINT;
 
-                case DOCUMENTDB_JDBC_TYPE_TINYINT:
+                case JDBC_TYPE_TINYINT:
                     return SqlTypeName::TINYINT;
 
-                case DOCUMENTDB_JDBC_TYPE_INTEGER:
+                case JDBC_TYPE_INTEGER:
                     return SqlTypeName::INTEGER;
 
-                case DOCUMENTDB_JDBC_TYPE_BIGINT:
+                case JDBC_TYPE_BIGINT:
                     return SqlTypeName::BIGINT;
 
-                case DOCUMENTDB_JDBC_TYPE_FLOAT:
+                case JDBC_TYPE_FLOAT:
                     return SqlTypeName::FLOAT;
 
-                case DOCUMENTDB_JDBC_TYPE_REAL:
+                case JDBC_TYPE_REAL:
                     return SqlTypeName::REAL;
 
-                case DOCUMENTDB_JDBC_TYPE_DOUBLE:
+                case JDBC_TYPE_DOUBLE:
                     return SqlTypeName::DOUBLE;
 
-                case DOCUMENTDB_JDBC_TYPE_NUMERIC:
+                case JDBC_TYPE_NUMERIC:
                     return SqlTypeName::NUMERIC;
 
-                case DOCUMENTDB_JDBC_TYPE_DECIMAL:
+                case JDBC_TYPE_DECIMAL:
                     return SqlTypeName::DECIMAL;
 
-                case DOCUMENTDB_JDBC_TYPE_VARCHAR:
-                case DOCUMENTDB_JDBC_TYPE_NVARCHAR:
+                case JDBC_TYPE_VARCHAR:
+                case JDBC_TYPE_NVARCHAR:
                     return SqlTypeName::VARCHAR;
 
-                case DOCUMENTDB_JDBC_TYPE_LONGVARCHAR:
-                case DOCUMENTDB_JDBC_TYPE_LONGNVARCHAR:
+                case JDBC_TYPE_LONGVARCHAR:
+                case JDBC_TYPE_LONGNVARCHAR:
                     return SqlTypeName::LONGVARCHAR;
 
-                case DOCUMENTDB_JDBC_TYPE_DATE:
+                case JDBC_TYPE_DATE:
                     return SqlTypeName::DATE;
 
-                case DOCUMENTDB_JDBC_TYPE_TIME:
+                case JDBC_TYPE_TIME:
                     return SqlTypeName::TIME;
 
-                case DOCUMENTDB_JDBC_TYPE_TIMESTAMP:
+                case JDBC_TYPE_TIMESTAMP:
                     return SqlTypeName::TIMESTAMP;
 
-                case DOCUMENTDB_JDBC_TYPE_LONGVARBINARY:
+                case JDBC_TYPE_LONGVARBINARY:
                     return SqlTypeName::LONGVARBINARY;
 
-                case DOCUMENTDB_JDBC_TYPE_NULL:
+                case JDBC_TYPE_NULL:
                     return SqlTypeName::SQL_NULL;
 
-                case DOCUMENTDB_JDBC_TYPE_BINARY:
-                case DOCUMENTDB_JDBC_TYPE_VARBINARY:
-                case DOCUMENTDB_JDBC_TYPE_BLOB:
-                case DOCUMENTDB_JDBC_TYPE_CLOB:
-                case DOCUMENTDB_JDBC_TYPE_ARRAY:
-                case DOCUMENTDB_JDBC_TYPE_STRUCT:
-                case DOCUMENTDB_JDBC_TYPE_JAVA_OBJECT:
-                case DOCUMENTDB_JDBC_TYPE_ROWID:
-                case DOCUMENTDB_JDBC_TYPE_NCLOB:
-                case DOCUMENTDB_JDBC_TYPE_SQLXML:
-                case DOCUMENTDB_JDBC_TYPE_REF_CURSOR:
+                case JDBC_TYPE_BINARY:
+                case JDBC_TYPE_VARBINARY:
+                case JDBC_TYPE_BLOB:
+                case JDBC_TYPE_CLOB:
+                case JDBC_TYPE_ARRAY:
+                case JDBC_TYPE_STRUCT:
+                case JDBC_TYPE_JAVA_OBJECT:
+                case JDBC_TYPE_ROWID:
+                case JDBC_TYPE_NCLOB:
+                case JDBC_TYPE_SQLXML:
+                case JDBC_TYPE_REF_CURSOR:
                 default:
                     return SqlTypeName::BINARY;
                 }
@@ -257,67 +257,67 @@ namespace ignite
                 switch (sqlType)
                 {
                     case SQL_BIT:
-                        return DOCUMENTDB_JDBC_TYPE_BOOLEAN;
+                        return JDBC_TYPE_BOOLEAN;
 
                     case SQL_TINYINT:
-                        return DOCUMENTDB_JDBC_TYPE_TINYINT;
+                        return JDBC_TYPE_TINYINT;
 
                     case SQL_SMALLINT:
-                        return DOCUMENTDB_JDBC_TYPE_SMALLINT;
+                        return JDBC_TYPE_SMALLINT;
 
                     case SQL_INTEGER:
-                        return DOCUMENTDB_JDBC_TYPE_INTEGER;
+                        return JDBC_TYPE_INTEGER;
 
                     case SQL_BIGINT:
-                        return DOCUMENTDB_JDBC_TYPE_BIGINT;
+                        return JDBC_TYPE_BIGINT;
 
                     case SQL_FLOAT:
-                        return DOCUMENTDB_JDBC_TYPE_FLOAT;
+                        return JDBC_TYPE_FLOAT;
 
                     case SQL_REAL:
-                        return DOCUMENTDB_JDBC_TYPE_REAL;
+                        return JDBC_TYPE_REAL;
 
                     case SQL_DOUBLE:
-                        return DOCUMENTDB_JDBC_TYPE_DOUBLE;
+                        return JDBC_TYPE_DOUBLE;
 
                     case SQL_NUMERIC:
-                        return DOCUMENTDB_JDBC_TYPE_NUMERIC;
+                        return JDBC_TYPE_NUMERIC;
 
                     case SQL_DECIMAL:
-                        return DOCUMENTDB_JDBC_TYPE_DECIMAL;
+                        return JDBC_TYPE_DECIMAL;
 
                     case SQL_CHAR:
-                        return DOCUMENTDB_JDBC_TYPE_CHAR;
+                        return JDBC_TYPE_CHAR;
 
                     case SQL_VARCHAR:
-                        return DOCUMENTDB_JDBC_TYPE_VARCHAR;
+                        return JDBC_TYPE_VARCHAR;
 
                     case SQL_LONGVARCHAR:
-                        return DOCUMENTDB_JDBC_TYPE_LONGVARCHAR;
+                        return JDBC_TYPE_LONGVARCHAR;
 
                     case SQL_TYPE_DATE:
-                        return DOCUMENTDB_JDBC_TYPE_DATE;
+                        return JDBC_TYPE_DATE;
 
                     case SQL_TYPE_TIME:
-                        return DOCUMENTDB_JDBC_TYPE_TIME;
+                        return JDBC_TYPE_TIME;
 
                     case SQL_TYPE_TIMESTAMP:
-                        return DOCUMENTDB_JDBC_TYPE_TIMESTAMP;
+                        return JDBC_TYPE_TIMESTAMP;
 
                     case SQL_BINARY:
-                        return DOCUMENTDB_JDBC_TYPE_BINARY;
+                        return JDBC_TYPE_BINARY;
 
                     case SQL_VARBINARY:
-                        return DOCUMENTDB_JDBC_TYPE_VARBINARY;
+                        return JDBC_TYPE_VARBINARY;
 
                     case SQL_LONGVARBINARY:
-                        return DOCUMENTDB_JDBC_TYPE_LONGVARBINARY;
+                        return JDBC_TYPE_LONGVARBINARY;
 
                     case SQL_TYPE_NULL:
-                        return DOCUMENTDB_JDBC_TYPE_NULL;
+                        return JDBC_TYPE_NULL;
 
                     default:
-                        return DOCUMENTDB_JDBC_TYPE_BINARY;
+                        return JDBC_TYPE_BINARY;
                 }
             }
 
@@ -405,75 +405,75 @@ namespace ignite
             {
                 switch (binaryType)
                 {
-                    case DOCUMENTDB_JDBC_TYPE_BIT:
-                    case DOCUMENTDB_JDBC_TYPE_BOOLEAN:
+                    case JDBC_TYPE_BIT:
+                    case JDBC_TYPE_BOOLEAN:
                         return SQL_BIT;
 
-                    case DOCUMENTDB_JDBC_TYPE_TINYINT:
+                    case JDBC_TYPE_TINYINT:
                         return SQL_TINYINT;
 
-                    case DOCUMENTDB_JDBC_TYPE_SMALLINT:
+                    case JDBC_TYPE_SMALLINT:
                         return SQL_SMALLINT;
 
-                    case DOCUMENTDB_JDBC_TYPE_INTEGER:
+                    case JDBC_TYPE_INTEGER:
                         return SQL_INTEGER;
 
-                    case DOCUMENTDB_JDBC_TYPE_BIGINT:
+                    case JDBC_TYPE_BIGINT:
                         return SQL_BIGINT;
 
-                    case DOCUMENTDB_JDBC_TYPE_FLOAT:
+                    case JDBC_TYPE_FLOAT:
                         return SQL_FLOAT;
 
-                    case DOCUMENTDB_JDBC_TYPE_REAL:
+                    case JDBC_TYPE_REAL:
                         return SQL_REAL;
 
-                    case DOCUMENTDB_JDBC_TYPE_DOUBLE:
+                    case JDBC_TYPE_DOUBLE:
                         return SQL_DOUBLE;
 
-                    case DOCUMENTDB_JDBC_TYPE_NUMERIC:
+                    case JDBC_TYPE_NUMERIC:
                         return SQL_NUMERIC;
 
-                    case DOCUMENTDB_JDBC_TYPE_DECIMAL:
+                    case JDBC_TYPE_DECIMAL:
                         return SQL_DECIMAL;
 
-                    case DOCUMENTDB_JDBC_TYPE_CHAR:
-                    case DOCUMENTDB_JDBC_TYPE_NCHAR:
+                    case JDBC_TYPE_CHAR:
+                    case JDBC_TYPE_NCHAR:
                         return SQL_CHAR;
 
-                    case DOCUMENTDB_JDBC_TYPE_VARCHAR:
-                    case DOCUMENTDB_JDBC_TYPE_NVARCHAR:
+                    case JDBC_TYPE_VARCHAR:
+                    case JDBC_TYPE_NVARCHAR:
                         return SQL_VARCHAR;
 
-                    case DOCUMENTDB_JDBC_TYPE_LONGVARCHAR:
-                    case DOCUMENTDB_JDBC_TYPE_LONGNVARCHAR:
+                    case JDBC_TYPE_LONGVARCHAR:
+                    case JDBC_TYPE_LONGNVARCHAR:
                         return SQL_LONGVARCHAR;
 
-                    case DOCUMENTDB_JDBC_TYPE_DATE:
+                    case JDBC_TYPE_DATE:
                         return SQL_TYPE_DATE;
 
-                    case DOCUMENTDB_JDBC_TYPE_TIME:
+                    case JDBC_TYPE_TIME:
                         return SQL_TYPE_TIME;
 
-                    case DOCUMENTDB_JDBC_TYPE_TIMESTAMP:
+                    case JDBC_TYPE_TIMESTAMP:
                         return SQL_TYPE_TIMESTAMP;
 
-                    case DOCUMENTDB_JDBC_TYPE_LONGVARBINARY:
+                    case JDBC_TYPE_LONGVARBINARY:
                         return SQL_LONGVARBINARY;
 
-                    case DOCUMENTDB_JDBC_TYPE_NULL:
+                    case JDBC_TYPE_NULL:
                         return SQL_TYPE_NULL;
 
-                    case DOCUMENTDB_JDBC_TYPE_BINARY:
-                    case DOCUMENTDB_JDBC_TYPE_VARBINARY:
-                    case DOCUMENTDB_JDBC_TYPE_BLOB:
-                    case DOCUMENTDB_JDBC_TYPE_CLOB:
-                    case DOCUMENTDB_JDBC_TYPE_ARRAY:
-                    case DOCUMENTDB_JDBC_TYPE_STRUCT:
-                    case DOCUMENTDB_JDBC_TYPE_JAVA_OBJECT:
-                    case DOCUMENTDB_JDBC_TYPE_ROWID:
-                    case DOCUMENTDB_JDBC_TYPE_NCLOB:
-                    case DOCUMENTDB_JDBC_TYPE_SQLXML:
-                    case DOCUMENTDB_JDBC_TYPE_REF_CURSOR:
+                    case JDBC_TYPE_BINARY:
+                    case JDBC_TYPE_VARBINARY:
+                    case JDBC_TYPE_BLOB:
+                    case JDBC_TYPE_CLOB:
+                    case JDBC_TYPE_ARRAY:
+                    case JDBC_TYPE_STRUCT:
+                    case JDBC_TYPE_JAVA_OBJECT:
+                    case JDBC_TYPE_ROWID:
+                    case JDBC_TYPE_NCLOB:
+                    case JDBC_TYPE_SQLXML:
+                    case JDBC_TYPE_REF_CURSOR:
                     default:
                         return SQL_BINARY;
                 }
