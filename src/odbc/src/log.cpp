@@ -15,69 +15,51 @@
  * limitations under the License.
  */
 
-#include <cstdlib>
-
 #include "ignite/odbc/log.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        LogStream::LogStream(Logger* parent) :
-            std::basic_ostream<char>(0),
-            strbuf(),
-            logger(parent)
-        {
-            init(&strbuf);
-        }
+#include <cstdlib>
 
-        bool LogStream::operator()()
-        {
-            return logger != 0;
-        }
-
-        LogStream::~LogStream()
-        {
-            if (logger)
-            {
-                logger->WriteMessage(strbuf.str());
-            }
-        }
-
-        Logger::Logger(const char* path) :
-            mutex(),
-            stream()
-        {
-            if (path)
-            {
-                stream.open(path);
-            }
-        }
-
-        Logger::~Logger()
-        {
-        }
-
-        bool Logger::IsEnabled() const
-        {
-            return stream.is_open();
-        }
-
-        void Logger::WriteMessage(std::string const& message)
-        {
-            if (IsEnabled())
-            {
-                common::concurrent::CsLockGuard guard(mutex);
-                stream << message << std::endl;
-            }
-        }
-
-        Logger* Logger::Get()
-        {
-            const char* envVarName = "IGNITE_ODBC_LOG_PATH";
-            static Logger logger(getenv(envVarName));
-            return logger.IsEnabled() ? &logger : 0;
-        }
-    }
+namespace ignite {
+namespace odbc {
+LogStream::LogStream(Logger* parent)
+    : std::basic_ostream< char >(0), strbuf(), logger(parent) {
+  init(&strbuf);
 }
 
+bool LogStream::operator()() {
+  return logger != 0;
+}
+
+LogStream::~LogStream() {
+  if (logger) {
+    logger->WriteMessage(strbuf.str());
+  }
+}
+
+Logger::Logger(const char* path) : mutex(), stream() {
+  if (path) {
+    stream.open(path);
+  }
+}
+
+Logger::~Logger() {
+}
+
+bool Logger::IsEnabled() const {
+  return stream.is_open();
+}
+
+void Logger::WriteMessage(std::string const& message) {
+  if (IsEnabled()) {
+    common::concurrent::CsLockGuard guard(mutex);
+    stream << message << std::endl;
+  }
+}
+
+Logger* Logger::Get() {
+  const char* envVarName = "IGNITE_ODBC_LOG_PATH";
+  static Logger logger(getenv(envVarName));
+  return logger.IsEnabled() ? &logger : 0;
+}
+}  // namespace odbc
+}  // namespace ignite

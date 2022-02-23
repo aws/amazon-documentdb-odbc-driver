@@ -18,26 +18,23 @@
 #define _USE_MATH_DEFINES
 
 #ifdef _WIN32
-#   include <windows.h>
+#include <windows.h>
 #endif
 
 #include <sql.h>
 #include <sqlext.h>
 
-#include <cmath>
-
-#include <vector>
-#include <string>
-
 #include <boost/test/unit_test.hpp>
+#include <cmath>
+#include <string>
+#include <vector>
 
 #include "ignite/ignite.h"
 #include "ignite/ignition.h"
 #include "ignite/impl/binary/binary_utils.h"
-
+#include "sql_test_suite_fixture.h"
 #include "test_type.h"
 #include "test_utils.h"
-#include "sql_test_suite_fixture.h"
 
 using namespace ignite;
 using namespace ignite::cache;
@@ -49,198 +46,191 @@ using namespace boost::unit_test;
 
 using ignite::impl::binary::BinaryUtils;
 
-BOOST_FIXTURE_TEST_SUITE(SqlAggregateFunctionTestSuite, ignite::SqlTestSuiteFixture)
+BOOST_FIXTURE_TEST_SUITE(SqlAggregateFunctionTestSuite,
+                         ignite::SqlTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestAggregateFunctionAvgInt)
-{
-    std::vector<TestType> in(3);
+BOOST_AUTO_TEST_CASE(TestAggregateFunctionAvgInt) {
+  std::vector< TestType > in(3);
 
-    in[0].i32Field = 43;
-    in[1].i32Field = 311;
-    in[2].i32Field = 7;
+  in[0].i32Field = 43;
+  in[1].i32Field = 311;
+  in[2].i32Field = 7;
 
-    int32_t avg = 0;
+  int32_t avg = 0;
 
-    for (int32_t i = 0; i < static_cast<int32_t>(in.size()); ++i)
-    {
-        testCache.Put(i, in[i]);
+  for (int32_t i = 0; i < static_cast< int32_t >(in.size()); ++i) {
+    testCache.Put(i, in[i]);
 
-        avg += in[i].i32Field;
-    }
+    avg += in[i].i32Field;
+  }
 
-    avg /= static_cast<int32_t>(in.size());
+  avg /= static_cast< int32_t >(in.size());
 
-    CheckSingleResult<SQLBIGINT>("SELECT {fn AVG(i32Field)} FROM TestType", avg);
+  CheckSingleResult< SQLBIGINT >("SELECT {fn AVG(i32Field)} FROM TestType",
+                                 avg);
 }
 
-BOOST_AUTO_TEST_CASE(TestAggregateFunctionAvgIntDistinct)
-{
-    std::vector<TestType> in(3);
+BOOST_AUTO_TEST_CASE(TestAggregateFunctionAvgIntDistinct) {
+  std::vector< TestType > in(3);
 
-    in[0].i32Field = 43;
-    in[1].i32Field = 311;
-    in[2].i32Field = 7;
+  in[0].i32Field = 43;
+  in[1].i32Field = 311;
+  in[2].i32Field = 7;
 
-    int32_t avg = 0;
+  int32_t avg = 0;
 
-    for (int32_t i = 0; i < static_cast<int32_t>(in.size()); ++i)
-    {
-        testCache.Put(i, in[i]);
+  for (int32_t i = 0; i < static_cast< int32_t >(in.size()); ++i) {
+    testCache.Put(i, in[i]);
 
-        avg += in[i].i32Field;
-    }
+    avg += in[i].i32Field;
+  }
 
-    avg /= static_cast<int32_t>(in.size());
+  avg /= static_cast< int32_t >(in.size());
 
-    testCache.Put(in.size() + 10, in[0]);
+  testCache.Put(in.size() + 10, in[0]);
 
-    CheckSingleResult<SQLBIGINT>("SELECT {fn AVG(DISTINCT i32Field)} FROM TestType", avg);
+  CheckSingleResult< SQLBIGINT >(
+      "SELECT {fn AVG(DISTINCT i32Field)} FROM TestType", avg);
 }
 
-BOOST_AUTO_TEST_CASE(TestAggregateFunctionAvgFloat)
-{
-    std::vector<TestType> in(3);
+BOOST_AUTO_TEST_CASE(TestAggregateFunctionAvgFloat) {
+  std::vector< TestType > in(3);
 
-    in[0].floatField = 43.0;
-    in[1].floatField = 311.0;
-    in[2].floatField = 7.0;
+  in[0].floatField = 43.0;
+  in[1].floatField = 311.0;
+  in[2].floatField = 7.0;
 
-    float avg = 0;
+  float avg = 0;
 
-    for (int32_t i = 0; i < static_cast<int32_t>(in.size()); ++i)
-    {
-        testCache.Put(i, in[i]);
+  for (int32_t i = 0; i < static_cast< int32_t >(in.size()); ++i) {
+    testCache.Put(i, in[i]);
 
-        avg += in[i].floatField;
-    }
+    avg += in[i].floatField;
+  }
 
-    avg /= in.size();
+  avg /= in.size();
 
-    CheckSingleResult<float>("SELECT {fn AVG(floatField)} FROM TestType", avg);
+  CheckSingleResult< float >("SELECT {fn AVG(floatField)} FROM TestType", avg);
 }
 
-BOOST_AUTO_TEST_CASE(TestAggregateFunctionAvgFloatDistinct)
-{
-    std::vector<TestType> in(3);
+BOOST_AUTO_TEST_CASE(TestAggregateFunctionAvgFloatDistinct) {
+  std::vector< TestType > in(3);
 
-    in[0].floatField = 43.0;
-    in[1].floatField = 311.0;
-    in[2].floatField = 7.0;
+  in[0].floatField = 43.0;
+  in[1].floatField = 311.0;
+  in[2].floatField = 7.0;
 
-    float avg = 0;
+  float avg = 0;
 
-    for (int32_t i = 0; i < static_cast<int32_t>(in.size()); ++i)
-    {
-        testCache.Put(i, in[i]);
+  for (int32_t i = 0; i < static_cast< int32_t >(in.size()); ++i) {
+    testCache.Put(i, in[i]);
 
-        avg += in[i].floatField;
-    }
+    avg += in[i].floatField;
+  }
 
-    avg /= in.size();
+  avg /= in.size();
 
-    testCache.Put(in.size() + 10, in[0]);
+  testCache.Put(in.size() + 10, in[0]);
 
-    CheckSingleResult<float>("SELECT {fn AVG(DISTINCT floatField)} FROM TestType", avg);
+  CheckSingleResult< float >(
+      "SELECT {fn AVG(DISTINCT floatField)} FROM TestType", avg);
 }
 
-BOOST_AUTO_TEST_CASE(TestAggregateFunctionCount)
-{
-    std::vector<TestType> in(8);
+BOOST_AUTO_TEST_CASE(TestAggregateFunctionCount) {
+  std::vector< TestType > in(8);
 
-    for (int32_t i = 0; i < static_cast<int32_t>(in.size()); ++i)
-        testCache.Put(i, in[i]);
+  for (int32_t i = 0; i < static_cast< int32_t >(in.size()); ++i)
+    testCache.Put(i, in[i]);
 
-    CheckSingleResult<SQLBIGINT>("SELECT {fn COUNT(*)} FROM TestType", in.size());
+  CheckSingleResult< SQLBIGINT >("SELECT {fn COUNT(*)} FROM TestType",
+                                 in.size());
 }
 
-BOOST_AUTO_TEST_CASE(TestAggregateFunctionCountDistinct)
-{
-    std::vector<TestType> in(8);
+BOOST_AUTO_TEST_CASE(TestAggregateFunctionCountDistinct) {
+  std::vector< TestType > in(8);
 
-    for (int32_t i = 0; i < static_cast<int32_t>(in.size()); ++i)
-    {
-        in[i].i32Field = i;
+  for (int32_t i = 0; i < static_cast< int32_t >(in.size()); ++i) {
+    in[i].i32Field = i;
 
-        testCache.Put(i, in[i]);
-    }
+    testCache.Put(i, in[i]);
+  }
 
-    testCache.Put(in.size() + 10, in[0]);
+  testCache.Put(in.size() + 10, in[0]);
 
-    CheckSingleResult<SQLBIGINT>("SELECT {fn COUNT(DISTINCT i32Field)} FROM TestType", in.size());
+  CheckSingleResult< SQLBIGINT >(
+      "SELECT {fn COUNT(DISTINCT i32Field)} FROM TestType", in.size());
 }
 
-BOOST_AUTO_TEST_CASE(TestAggregateFunctionMax)
-{
-    std::vector<TestType> in(4);
+BOOST_AUTO_TEST_CASE(TestAggregateFunctionMax) {
+  std::vector< TestType > in(4);
 
-    in[0].i32Field = 121;
-    in[1].i32Field = 17;
-    in[2].i32Field = 314041;
-    in[3].i32Field = 9410;
+  in[0].i32Field = 121;
+  in[1].i32Field = 17;
+  in[2].i32Field = 314041;
+  in[3].i32Field = 9410;
 
-    for (int32_t i = 0; i < static_cast<int32_t>(in.size()); ++i)
-        testCache.Put(i, in[i]);
+  for (int32_t i = 0; i < static_cast< int32_t >(in.size()); ++i)
+    testCache.Put(i, in[i]);
 
-    CheckSingleResult<SQLBIGINT>("SELECT {fn MAX(i32Field)} FROM TestType", in[2].i32Field);
+  CheckSingleResult< SQLBIGINT >("SELECT {fn MAX(i32Field)} FROM TestType",
+                                 in[2].i32Field);
 }
 
-BOOST_AUTO_TEST_CASE(TestAggregateFunctionMin)
-{
-    std::vector<TestType> in(4);
+BOOST_AUTO_TEST_CASE(TestAggregateFunctionMin) {
+  std::vector< TestType > in(4);
 
-    in[0].i32Field = 121;
-    in[1].i32Field = 17;
-    in[2].i32Field = 314041;
-    in[3].i32Field = 9410;
+  in[0].i32Field = 121;
+  in[1].i32Field = 17;
+  in[2].i32Field = 314041;
+  in[3].i32Field = 9410;
 
-    for (int32_t i = 0; i < static_cast<int32_t>(in.size()); ++i)
-        testCache.Put(i, in[i]);
+  for (int32_t i = 0; i < static_cast< int32_t >(in.size()); ++i)
+    testCache.Put(i, in[i]);
 
-    CheckSingleResult<SQLBIGINT>("SELECT {fn MIN(i32Field)} FROM TestType", in[1].i32Field);
+  CheckSingleResult< SQLBIGINT >("SELECT {fn MIN(i32Field)} FROM TestType",
+                                 in[1].i32Field);
 }
 
-BOOST_AUTO_TEST_CASE(TestAggregateFunctionSum)
-{
-    std::vector<TestType> in(4);
+BOOST_AUTO_TEST_CASE(TestAggregateFunctionSum) {
+  std::vector< TestType > in(4);
 
-    in[0].i32Field = 121;
-    in[1].i32Field = 17;
-    in[2].i32Field = 314041;
-    in[3].i32Field = 9410;
+  in[0].i32Field = 121;
+  in[1].i32Field = 17;
+  in[2].i32Field = 314041;
+  in[3].i32Field = 9410;
 
-    int64_t sum = 0;
+  int64_t sum = 0;
 
-    for (int32_t i = 0; i < static_cast<int32_t>(in.size()); ++i)
-    {
-        testCache.Put(i, in[i]);
+  for (int32_t i = 0; i < static_cast< int32_t >(in.size()); ++i) {
+    testCache.Put(i, in[i]);
 
-        sum += in[i].i32Field;
-    }
+    sum += in[i].i32Field;
+  }
 
-    CheckSingleResult<SQLBIGINT>("SELECT {fn SUM(i32Field)} FROM TestType", sum);
+  CheckSingleResult< SQLBIGINT >("SELECT {fn SUM(i32Field)} FROM TestType",
+                                 sum);
 }
 
-BOOST_AUTO_TEST_CASE(TestAggregateFunctionSumDistinct)
-{
-    std::vector<TestType> in(4);
+BOOST_AUTO_TEST_CASE(TestAggregateFunctionSumDistinct) {
+  std::vector< TestType > in(4);
 
-    in[0].i32Field = 121;
-    in[1].i32Field = 17;
-    in[2].i32Field = 314041;
-    in[3].i32Field = 9410;
+  in[0].i32Field = 121;
+  in[1].i32Field = 17;
+  in[2].i32Field = 314041;
+  in[3].i32Field = 9410;
 
-    int64_t sum = 0;
+  int64_t sum = 0;
 
-    for (int32_t i = 0; i < static_cast<int32_t>(in.size()); ++i)
-    {
-        testCache.Put(i, in[i]);
+  for (int32_t i = 0; i < static_cast< int32_t >(in.size()); ++i) {
+    testCache.Put(i, in[i]);
 
-        sum += in[i].i32Field;
-    }
+    sum += in[i].i32Field;
+  }
 
-    testCache.Put(in.size() + 10, in[0]);
+  testCache.Put(in.size() + 10, in[0]);
 
-    CheckSingleResult<SQLBIGINT>("SELECT {fn SUM(DISTINCT i32Field)} FROM TestType", sum);
+  CheckSingleResult< SQLBIGINT >(
+      "SELECT {fn SUM(DISTINCT i32Field)} FROM TestType", sum);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

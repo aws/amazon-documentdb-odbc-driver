@@ -18,286 +18,252 @@
 #ifndef _IGNITE_ODBC_COMMON_EXPECTED
 #define _IGNITE_ODBC_COMMON_EXPECTED
 
-#include <memory>
-
 #include <ignite/odbc/common/utils.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace common
-        {
-            /**
-             * Helper class to construct Expected class with error value.
-             */
-            template<typename E>
-            struct Unexpected
-            {
-                /** Value type. */
-                typedef E ValueType;
+#include <memory>
 
-                /**
-                 * Constructor.
-                 *
-                 * @param e Error value reference.
-                 */
-                Unexpected(const ValueType& e) : err(e)
-                {
-                    // No-op;
-                }
+namespace ignite {
+namespace odbc {
+namespace common {
+/**
+ * Helper class to construct Expected class with error value.
+ */
+template < typename E >
+struct Unexpected {
+  /** Value type. */
+  typedef E ValueType;
 
-                /** Error. */
-                const ValueType& err;
-            };
+  /**
+   * Constructor.
+   *
+   * @param e Error value reference.
+   */
+  Unexpected(const ValueType& e) : err(e) {
+    // No-op;
+  }
 
-            /**
-             * Operation result wrapper.
-             *
-             * Represents a type, which can accept one of two value types - expected
-             * result or error.
-             *
-             * @tparam R Result type.
-             * @tparam E Error type.
-             * @tparam AR Allocator type used for the Result type.
-             * @tparam AE Allocator type used for the Error type.
-             */
-            template<
-                typename R,
-                typename E,
-                typename AR = std::allocator<R>,
-                typename AE = std::allocator<E> >
-            class Expected
-            {
-            public:
-                /** Result type. */
-                typedef R ResultType;
+  /** Error. */
+  const ValueType& err;
+};
 
-                /** Error type. */
-                typedef E ErrorType;
+/**
+ * Operation result wrapper.
+ *
+ * Represents a type, which can accept one of two value types - expected
+ * result or error.
+ *
+ * @tparam R Result type.
+ * @tparam E Error type.
+ * @tparam AR Allocator type used for the Result type.
+ * @tparam AE Allocator type used for the Error type.
+ */
+template < typename R, typename E, typename AR = std::allocator< R >,
+           typename AE = std::allocator< E > >
+class Expected {
+ public:
+  /** Result type. */
+  typedef R ResultType;
 
-                /** Allocator type used for the ResultType. */
-                typedef AR ResultAllocatorType;
+  /** Error type. */
+  typedef E ErrorType;
 
-                /** Allocator type used for the ErrorType. */
-                typedef AE ErrorAllocatorType;
+  /** Allocator type used for the ResultType. */
+  typedef AR ResultAllocatorType;
 
-                /**
-                 * Constructor.
-                 *
-                 * Creates new instance, containing expected value.
-                 * @param res Result.
-                 */
-                Expected(const ResultType& res) :
-                    ok(true)
-                {
-                    ResultAllocatorType ral;
+  /** Allocator type used for the ErrorType. */
+  typedef AE ErrorAllocatorType;
 
-                    ral.construct(AsResult(), res);
-                }
+  /**
+   * Constructor.
+   *
+   * Creates new instance, containing expected value.
+   * @param res Result.
+   */
+  Expected(const ResultType& res) : ok(true) {
+    ResultAllocatorType ral;
 
-                /**
-                 * Constructor.
-                 *
-                 * Creates new instance, containing error.
-                 * @param err Result.
-                 */
-                explicit Expected(Unexpected<ErrorType> err) :
-                    ok(false)
-                {
-                    ErrorAllocatorType ral;
+    ral.construct(AsResult(), res);
+  }
 
-                    ral.construct(AsError(), err.err);
-                }
+  /**
+   * Constructor.
+   *
+   * Creates new instance, containing error.
+   * @param err Result.
+   */
+  explicit Expected(Unexpected< ErrorType > err) : ok(false) {
+    ErrorAllocatorType ral;
 
-                /**
-                 * Copy constructor.
-                 *
-                 * @param other Other.
-                 */
-                Expected(const Expected& other) :
-                    ok(other.ok)
-                {
-                    if (ok)
-                    {
-                        ResultAllocatorType ral;
+    ral.construct(AsError(), err.err);
+  }
 
-                        ral.construct(AsResult(), *other.AsResult());
-                    }
-                    else
-                    {
-                        ErrorAllocatorType ral;
+  /**
+   * Copy constructor.
+   *
+   * @param other Other.
+   */
+  Expected(const Expected& other) : ok(other.ok) {
+    if (ok) {
+      ResultAllocatorType ral;
 
-                        ral.construct(AsError(), *other.AsError());
-                    }
-                }
+      ral.construct(AsResult(), *other.AsResult());
+    } else {
+      ErrorAllocatorType ral;
 
-                /**
-                 * Destructor.
-                 */
-                ~Expected()
-                {
-                    if (ok)
-                    {
-                        ResultAllocatorType ral;
-
-                        ral.destroy(AsResult());
-                    }
-                    else
-                    {
-                        ErrorAllocatorType ral;
-
-                        ral.destroy(AsError());
-                    }
-                }
-
-                /**
-                 * Check if the value is OK.
-                 *
-                 * @return @c false if the value is an error and @c true otherwise.
-                 */
-                bool IsOk() const
-                {
-                    return ok;
-                }
-
-                /**
-                 * Get result. Constant accesser.
-                 *
-                 * @return Result if it was set before.
-                 * @throw ErrorType if there is no result.
-                 */
-                const ResultType& GetResult() const
-                {
-                    if (!ok)
-                        throw *AsError();
-
-                    return *AsResult();
-                }
-
-                /**
-                 * Get result.
-                 *
-                 * @return Result if it was set before.
-                 * @throw ErrorType if there is no result.
-                 */
-                ResultType& GetResult()
-                {
-                    if (!ok)
-                        throw *AsError();
-
-                    return *AsResult();
-                }
-
-                /**
-                 * Get result. Constant accesser.
-                 *
-                 * @return Result if it was set before.
-                 * @throw ErrorType if there is no result.
-                 */
-                const ResultType& operator*() const
-                {
-                    return GetResult();
-                }
-
-                /**
-                 * Get result.
-                 *
-                 * @return Result if it was set before.
-                 * @throw ErrorType if there is no result.
-                 */
-                ResultType& operator*()
-                {
-                    return GetResult();
-                }
-
-                /**
-                 * Get result. Constant accesser.
-                 *
-                 * @return Result if it was set before.
-                 * @throw ErrorType if there is no result.
-                 */
-                const ResultType& operator->() const
-                {
-                    return GetResult();
-                }
-
-                /**
-                 * Get result.
-                 *
-                 * @return Result if it was set before.
-                 * @throw ErrorType if there is no result.
-                 */
-                ResultType& operator->()
-                {
-                    return GetResult();
-                }
-
-                /**
-                 * Get error.
-                 *
-                 * @return Error if it was set before. If there is no error, default
-                 * constructed error is returned (which is expected to be "No error").
-                 */
-                const ErrorType& GetError() const
-                {
-                    static ErrorType noError;
-
-                    if (ok)
-                        return noError;
-
-                    return *AsError();
-                }
-
-            private:
-                /**
-                 * Get storage as an result.
-                 *
-                 * @return Storage pointer as an result pointer.
-                 */
-                ResultType* AsResult()
-                {
-                    return reinterpret_cast<ResultType*>(&storage);
-                }
-
-                /**
-                 * Get storage as an result.
-                 *
-                 * @return Storage pointer as an result pointer.
-                 */
-                const ResultType* AsResult() const
-                {
-                    return reinterpret_cast<const ResultType*>(&storage);
-                }
-
-                /**
-                 * Get storage as an error.
-                 *
-                 * @return Storage pointer as an error pointer.
-                 */
-                ErrorType* AsError()
-                {
-                    return reinterpret_cast<ErrorType*>(&storage);
-                }
-
-                /**
-                 * Get storage as an error.
-                 *
-                 * @return Storage pointer as an error pointer.
-                 */
-                const ErrorType* AsError() const
-                {
-                    return reinterpret_cast<const ErrorType*>(&storage);
-                }
-
-                /** Storage. */
-                int8_t storage[sizeof(typename Bigger<ResultType, ErrorType>::type)];
-
-                /** Result flag. Set to @c false if the value is an error. */
-                bool ok;
-            };
-        }
+      ral.construct(AsError(), *other.AsError());
     }
-}
+  }
 
-#endif // _IGNITE_ODBC_COMMON_EXPECTED
+  /**
+   * Destructor.
+   */
+  ~Expected() {
+    if (ok) {
+      ResultAllocatorType ral;
+
+      ral.destroy(AsResult());
+    } else {
+      ErrorAllocatorType ral;
+
+      ral.destroy(AsError());
+    }
+  }
+
+  /**
+   * Check if the value is OK.
+   *
+   * @return @c false if the value is an error and @c true otherwise.
+   */
+  bool IsOk() const {
+    return ok;
+  }
+
+  /**
+   * Get result. Constant accesser.
+   *
+   * @return Result if it was set before.
+   * @throw ErrorType if there is no result.
+   */
+  const ResultType& GetResult() const {
+    if (!ok)
+      throw *AsError();
+
+    return *AsResult();
+  }
+
+  /**
+   * Get result.
+   *
+   * @return Result if it was set before.
+   * @throw ErrorType if there is no result.
+   */
+  ResultType& GetResult() {
+    if (!ok)
+      throw *AsError();
+
+    return *AsResult();
+  }
+
+  /**
+   * Get result. Constant accesser.
+   *
+   * @return Result if it was set before.
+   * @throw ErrorType if there is no result.
+   */
+  const ResultType& operator*() const {
+    return GetResult();
+  }
+
+  /**
+   * Get result.
+   *
+   * @return Result if it was set before.
+   * @throw ErrorType if there is no result.
+   */
+  ResultType& operator*() {
+    return GetResult();
+  }
+
+  /**
+   * Get result. Constant accesser.
+   *
+   * @return Result if it was set before.
+   * @throw ErrorType if there is no result.
+   */
+  const ResultType& operator->() const {
+    return GetResult();
+  }
+
+  /**
+   * Get result.
+   *
+   * @return Result if it was set before.
+   * @throw ErrorType if there is no result.
+   */
+  ResultType& operator->() {
+    return GetResult();
+  }
+
+  /**
+   * Get error.
+   *
+   * @return Error if it was set before. If there is no error, default
+   * constructed error is returned (which is expected to be "No error").
+   */
+  const ErrorType& GetError() const {
+    static ErrorType noError;
+
+    if (ok)
+      return noError;
+
+    return *AsError();
+  }
+
+ private:
+  /**
+   * Get storage as an result.
+   *
+   * @return Storage pointer as an result pointer.
+   */
+  ResultType* AsResult() {
+    return reinterpret_cast< ResultType* >(&storage);
+  }
+
+  /**
+   * Get storage as an result.
+   *
+   * @return Storage pointer as an result pointer.
+   */
+  const ResultType* AsResult() const {
+    return reinterpret_cast< const ResultType* >(&storage);
+  }
+
+  /**
+   * Get storage as an error.
+   *
+   * @return Storage pointer as an error pointer.
+   */
+  ErrorType* AsError() {
+    return reinterpret_cast< ErrorType* >(&storage);
+  }
+
+  /**
+   * Get storage as an error.
+   *
+   * @return Storage pointer as an error pointer.
+   */
+  const ErrorType* AsError() const {
+    return reinterpret_cast< const ErrorType* >(&storage);
+  }
+
+  /** Storage. */
+  int8_t storage[sizeof(typename Bigger< ResultType, ErrorType >::type)];
+
+  /** Result flag. Set to @c false if the value is an error. */
+  bool ok;
+};
+}  // namespace common
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  // _IGNITE_ODBC_COMMON_EXPECTED

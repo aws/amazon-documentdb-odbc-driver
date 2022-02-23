@@ -23,69 +23,66 @@
 
 #include "ignite/odbc/end_point.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace diagnostic
-        {
-            // Forward declaration.
-            class DiagnosticRecordStorage;
-        }
+namespace ignite {
+namespace odbc {
+namespace diagnostic {
+// Forward declaration.
+class DiagnosticRecordStorage;
+}  // namespace diagnostic
 
-        namespace config
-        {
-            /**
-             * Convert address list to string.
-             *
-             * @param addresses Addresses.
-             * @return Resulting string.
-             */
-            std::string AddressesToString(const std::vector<EndPoint>& addresses);
+namespace config {
+/**
+ * Convert address list to string.
+ *
+ * @param addresses Addresses.
+ * @return Resulting string.
+ */
+std::string AddressesToString(const std::vector< EndPoint >& addresses);
 
-            /**
-             * Parse address.
-             *
-             * @param value String value to parse.
-             * @param endPoints End ponts list.
-             * @param diag Diagnostics collector.
-             */
-            void ParseAddress(const std::string& value, std::vector<EndPoint>& endPoints,
-                diagnostic::DiagnosticRecordStorage* diag);
+/**
+ * Parse address.
+ *
+ * @param value String value to parse.
+ * @param endPoints End ponts list.
+ * @param diag Diagnostics collector.
+ */
+void ParseAddress(const std::string& value, std::vector< EndPoint >& endPoints,
+                  diagnostic::DiagnosticRecordStorage* diag);
 
-            /**
-             * Parse single address.
-             *
-             * @param value String value to parse.
-             * @param endPoint End pont.
-             * @param diag Diagnostics collector.
-             * @return @c true, if parsed successfully, and @c false otherwise.
-             */
-            bool ParseSingleAddress(const std::string& value, EndPoint& endPoint,
-                diagnostic::DiagnosticRecordStorage* diag);
+/**
+ * Parse single address.
+ *
+ * @param value String value to parse.
+ * @param endPoint End pont.
+ * @param diag Diagnostics collector.
+ * @return @c true, if parsed successfully, and @c false otherwise.
+ */
+bool ParseSingleAddress(const std::string& value, EndPoint& endPoint,
+                        diagnostic::DiagnosticRecordStorage* diag);
 
-            /**
-             * Parse single network port.
-             *
-             * @param value String value to parse.
-             * @param port Port range begin.
-             * @param range Number of ports in range.
-             * @param diag Diagnostics collector.
-             * @return @c Port value on success and zero on failure.
-             */
-            bool ParsePortRange(const std::string& value, uint16_t& port, uint16_t& range,
-                diagnostic::DiagnosticRecordStorage* diag);
+/**
+ * Parse single network port.
+ *
+ * @param value String value to parse.
+ * @param port Port range begin.
+ * @param range Number of ports in range.
+ * @param diag Diagnostics collector.
+ * @return @c Port value on success and zero on failure.
+ */
+bool ParsePortRange(const std::string& value, uint16_t& port, uint16_t& range,
+                    diagnostic::DiagnosticRecordStorage* diag);
 
-            /**
-             * Parse single network port.
-             *
-             * @param value String value to parse.
-             * @param diag Diagnostics collector.
-             * @return @c Port value on success and zero on failure.
-             */
-            uint16_t ParsePort(const std::string& value, diagnostic::DiagnosticRecordStorage* diag);
-        }
-    }
-}
+/**
+ * Parse single network port.
+ *
+ * @param value String value to parse.
+ * @param diag Diagnostics collector.
+ * @return @c Port value on success and zero on failure.
+ */
+uint16_t ParsePort(const std::string& value,
+                   diagnostic::DiagnosticRecordStorage* diag);
+}  // namespace config
+}  // namespace odbc
+}  // namespace ignite
 
-#endif //_IGNITE_ODBC_CONFIG_CONFIG_TOOLS
+#endif  //_IGNITE_ODBC_CONFIG_CONFIG_TOOLS

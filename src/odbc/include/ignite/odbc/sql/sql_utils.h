@@ -18,45 +18,42 @@
 #ifndef _IGNITE_ODBC_SQL_SQL_UTILS
 #define _IGNITE_ODBC_SQL_SQL_UTILS
 
-#include <string>
-
 #include <ignite/odbc/odbc_error.h>
 #include <ignite/odbc/sql/sql_token.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace sql_utils
-        {
-            /**
-             * Parse token to boolean value.
-             *
-             * @return Boolean value.
-             */
-            inline OdbcExpected<bool> TokenToBoolean(const SqlToken& token)
-            {
-                std::string lower = token.ToLower();
+#include <string>
 
-                if (lower == "1" || lower == "on")
-                    return true;
+namespace ignite {
+namespace odbc {
+namespace sql_utils {
+/**
+ * Parse token to boolean value.
+ *
+ * @return Boolean value.
+ */
+inline OdbcExpected< bool > TokenToBoolean(const SqlToken& token) {
+  std::string lower = token.ToLower();
 
-                if (lower == "0" || lower == "off")
-                    return false;
+  if (lower == "1" || lower == "on")
+    return true;
 
-                return OdbcError(SqlState::S42000_SYNTAX_ERROR_OR_ACCESS_VIOLATION,
-                    "Unexpected token: '" + token.ToString() + "', ON, OFF, 1 or 0 expected.");
-            }
+  if (lower == "0" || lower == "off")
+    return false;
 
-            /**
-             * Check if the SQL is internal command.
-             *
-             * @param sql SQL request string.
-             * @return @c true if internal.
-             */
-            bool IsInternalCommand(const std::string& sql);
-        }
-    }
+  return OdbcError(SqlState::S42000_SYNTAX_ERROR_OR_ACCESS_VIOLATION,
+                   "Unexpected token: '" + token.ToString()
+                       + "', ON, OFF, 1 or 0 expected.");
 }
 
-#endif //_IGNITE_ODBC_SQL_SQL_UTILS
+/**
+ * Check if the SQL is internal command.
+ *
+ * @param sql SQL request string.
+ * @return @c true if internal.
+ */
+bool IsInternalCommand(const std::string& sql);
+}  // namespace sql_utils
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_SQL_SQL_UTILS

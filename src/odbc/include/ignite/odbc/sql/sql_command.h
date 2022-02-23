@@ -18,70 +18,59 @@
 #ifndef _IGNITE_ODBC_SQL_SQL_COMMAND
 #define _IGNITE_ODBC_SQL_SQL_COMMAND
 
-namespace ignite
-{
-    namespace odbc
-    {
-        class SqlLexer;
+namespace ignite {
+namespace odbc {
+class SqlLexer;
 
-        /**
-         * SQL command type.
-         */
-        struct SqlCommandType
-        {
-            enum Type
-            {
-                SET_STREAMING
-            };
-        };
+/**
+ * SQL command type.
+ */
+struct SqlCommandType {
+  enum Type { SET_STREAMING };
+};
 
-        /**
-         * SQL command.
-         */
-        class SqlCommand
-        {
-        public:
-            /**
-             * Constructor.
-             *
-             * @param typ Type.
-             */
-            SqlCommand(SqlCommandType::Type typ) :
-                typ(typ)
-            {
-                // No-op.
-            }
+/**
+ * SQL command.
+ */
+class SqlCommand {
+ public:
+  /**
+   * Constructor.
+   *
+   * @param typ Type.
+   */
+  SqlCommand(SqlCommandType::Type typ) : typ(typ) {
+    // No-op.
+  }
 
-            /**
-             * Destructor.
-             */
-            virtual ~SqlCommand()
-            {
-                // No-op.
-            }
+  /**
+   * Destructor.
+   */
+  virtual ~SqlCommand() {
+    // No-op.
+  }
 
-            /**
-             * Get type.
-             *
-             * @return Type.
-             */
-            SqlCommandType::Type GetType() const
-            {
-                return typ;
-            }
+  /**
+   * Get type.
+   *
+   * @return Type.
+   */
+  SqlCommandType::Type GetType() const {
+    return typ;
+  }
 
-            /**
-             * Parse from lexer.
-             *
-             * @param lexer Lexer.
-             */
-            virtual void Parse(SqlLexer& lexer) = 0;
+  /**
+   * Parse from lexer.
+   *
+   * @param lexer Lexer.
+   */
+  virtual void Parse(SqlLexer& lexer) = 0;
 
-        protected:
-            /** Type. */
-            SqlCommandType::Type typ;
-        };
-    }
-}
+ protected:
+  /** Type. */
+  SqlCommandType::Type typ;
+};
+}  // namespace odbc
+}  // namespace ignite
 
-#endif //_IGNITE_ODBC_SQL_SQL_COMMAND
+#endif  //_IGNITE_ODBC_SQL_SQL_COMMAND

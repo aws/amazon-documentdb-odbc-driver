@@ -19,170 +19,155 @@
 #define _IGNITE_ODBC_META_PRIMARY_KEY_META
 
 #include <stdint.h>
+
 #include <string>
 
 #include "ignite/impl/binary/binary_reader_impl.h"
-
 #include "ignite/odbc/utility.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace meta
-        {
-            /**
-             * Primary key metadata.
-             */
-            class PrimaryKeyMeta
-            {
-            public:
-                /**
-                 * Default constructor.
-                 */
-                PrimaryKeyMeta() : keySeq(0)
-                {
-                    // No-op.
-                }
-            
-                /**
-                 * Constructor.
-                 *
-                 * @param catalog Catalog name.
-                 * @param schema Schema name.
-                 * @param table Table name.
-                 * @param column Column name.
-                 * @param keySeq Column sequence number in key (starting with 1).
-                 * @param keyName Key name.
-                 */
-                PrimaryKeyMeta(const std::string& catalog, const std::string& schema,
-                    const std::string& table, const std::string& column, int16_t keySeq,
-                    const std::string& keyName) :
-                    catalog(catalog),
-                    schema(schema),
-                    table(table),
-                    column(column),
-                    keySeq(keySeq),
-                    keyName(keyName)
-                {
-                    // No-op.
-                }
+namespace ignite {
+namespace odbc {
+namespace meta {
+/**
+ * Primary key metadata.
+ */
+class PrimaryKeyMeta {
+ public:
+  /**
+   * Default constructor.
+   */
+  PrimaryKeyMeta() : keySeq(0) {
+    // No-op.
+  }
 
-                /**
-                 * Destructor.
-                 */
-                ~PrimaryKeyMeta()
-                {
-                    // No-op.
-                }
+  /**
+   * Constructor.
+   *
+   * @param catalog Catalog name.
+   * @param schema Schema name.
+   * @param table Table name.
+   * @param column Column name.
+   * @param keySeq Column sequence number in key (starting with 1).
+   * @param keyName Key name.
+   */
+  PrimaryKeyMeta(const std::string& catalog, const std::string& schema,
+                 const std::string& table, const std::string& column,
+                 int16_t keySeq, const std::string& keyName)
+      : catalog(catalog),
+        schema(schema),
+        table(table),
+        column(column),
+        keySeq(keySeq),
+        keyName(keyName) {
+    // No-op.
+  }
 
-                /**
-                 * Copy constructor.
-                 */
-                PrimaryKeyMeta(const PrimaryKeyMeta& other) :
-                    catalog(other.catalog),
-                    schema(other.schema),
-                    table(other.table),
-                    column(other.column),
-                    keySeq(other.keySeq),
-                    keyName(other.keyName)
-                {
-                    // No-op.
-                }
+  /**
+   * Destructor.
+   */
+  ~PrimaryKeyMeta() {
+    // No-op.
+  }
 
-                /**
-                 * Copy operator.
-                 */
-                PrimaryKeyMeta& operator=(const PrimaryKeyMeta& other)
-                {
-                    catalog = other.catalog;
-                    schema = other.schema;
-                    table = other.table;
-                    column = other.column;
-                    keySeq = other.keySeq;
-                    keyName = other.keyName;
+  /**
+   * Copy constructor.
+   */
+  PrimaryKeyMeta(const PrimaryKeyMeta& other)
+      : catalog(other.catalog),
+        schema(other.schema),
+        table(other.table),
+        column(other.column),
+        keySeq(other.keySeq),
+        keyName(other.keyName) {
+    // No-op.
+  }
 
-                    return *this;
-                }
+  /**
+   * Copy operator.
+   */
+  PrimaryKeyMeta& operator=(const PrimaryKeyMeta& other) {
+    catalog = other.catalog;
+    schema = other.schema;
+    table = other.table;
+    column = other.column;
+    keySeq = other.keySeq;
+    keyName = other.keyName;
 
-                /**
-                 * Get catalog name.
-                 * @return Catalog name.
-                 */
-                const std::string& GetCatalogName() const
-                {
-                    return catalog;
-                }
+    return *this;
+  }
 
-                /**
-                 * Get schema name.
-                 * @return Schema name.
-                 */
-                const std::string& GetSchemaName() const
-                {
-                    return schema;
-                }
+  /**
+   * Get catalog name.
+   * @return Catalog name.
+   */
+  const std::string& GetCatalogName() const {
+    return catalog;
+  }
 
-                /**
-                 * Get table name.
-                 * @return Table name.
-                 */
-                const std::string& GetTableName() const
-                {
-                    return table;
-                }
+  /**
+   * Get schema name.
+   * @return Schema name.
+   */
+  const std::string& GetSchemaName() const {
+    return schema;
+  }
 
-                /**
-                 * Get column name.
-                 * @return Column name.
-                 */
-                const std::string& GetColumnName() const
-                {
-                    return table;
-                }
+  /**
+   * Get table name.
+   * @return Table name.
+   */
+  const std::string& GetTableName() const {
+    return table;
+  }
 
-                /**
-                 * Get column sequence number in key.
-                 * @return Sequence number in key.
-                 */
-                int16_t GetKeySeq() const
-                {
-                    return keySeq;
-                }
+  /**
+   * Get column name.
+   * @return Column name.
+   */
+  const std::string& GetColumnName() const {
+    return table;
+  }
 
-                /**
-                 * Get key name.
-                 * @return Key name.
-                 */
-                const std::string& GetKeyName() const
-                {
-                    return keyName;
-                }
+  /**
+   * Get column sequence number in key.
+   * @return Sequence number in key.
+   */
+  int16_t GetKeySeq() const {
+    return keySeq;
+  }
 
-            private:
-                /** Catalog name. */
-                std::string catalog;
+  /**
+   * Get key name.
+   * @return Key name.
+   */
+  const std::string& GetKeyName() const {
+    return keyName;
+  }
 
-                /** Schema name. */
-                std::string schema;
+ private:
+  /** Catalog name. */
+  std::string catalog;
 
-                /** Table name. */
-                std::string table;
+  /** Schema name. */
+  std::string schema;
 
-                /** Collumn name. */
-                std::string column;
-                
-                /** Column sequence number in key. */
-                int16_t keySeq;
+  /** Table name. */
+  std::string table;
 
-                /** Key name. */
-                std::string keyName;
-            };
+  /** Collumn name. */
+  std::string column;
 
-            /** Table metadata vector alias. */
-            typedef std::vector<PrimaryKeyMeta> PrimaryKeyMetaVector;
-        }
-    }
-}
+  /** Column sequence number in key. */
+  int16_t keySeq;
 
-#endif //_IGNITE_ODBC_META_PRIMARY_KEY_META
+  /** Key name. */
+  std::string keyName;
+};
+
+/** Table metadata vector alias. */
+typedef std::vector< PrimaryKeyMeta > PrimaryKeyMetaVector;
+}  // namespace meta
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_META_PRIMARY_KEY_META

@@ -21,130 +21,130 @@
 #include "ignite/odbc/connection.h"
 #include "ignite/odbc/query/query.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace query
-        {
-            /**
-             * Foreign keys query.
-             */
-            class ForeignKeysQuery : public Query
-            {
-            public:
-                /**
-                 * Constructor.
-                 *
-                 * @param diag Diagnostics collector.
-                 * @param connection Statement-associated connection.
-                 * @param primaryCatalog Primary key catalog name.
-                 * @param primarySchema Primary key schema name.
-                 * @param primaryTable Primary key table name.
-                 * @param foreignCatalog Foreign key catalog name.
-                 * @param foreignSchema Foreign key schema name.
-                 * @param foreignTable Foreign key table name.
-                 */
-                ForeignKeysQuery(diagnostic::DiagnosableAdapter& diag, Connection& connection,
-                    const std::string& primaryCatalog, const std::string& primarySchema,
-                    const std::string& primaryTable, const std::string& foreignCatalog,
-                    const std::string& foreignSchema, const std::string& foreignTable);
+namespace ignite {
+namespace odbc {
+namespace query {
+/**
+ * Foreign keys query.
+ */
+class ForeignKeysQuery : public Query {
+ public:
+  /**
+   * Constructor.
+   *
+   * @param diag Diagnostics collector.
+   * @param connection Statement-associated connection.
+   * @param primaryCatalog Primary key catalog name.
+   * @param primarySchema Primary key schema name.
+   * @param primaryTable Primary key table name.
+   * @param foreignCatalog Foreign key catalog name.
+   * @param foreignSchema Foreign key schema name.
+   * @param foreignTable Foreign key table name.
+   */
+  ForeignKeysQuery(diagnostic::DiagnosableAdapter& diag, Connection& connection,
+                   const std::string& primaryCatalog,
+                   const std::string& primarySchema,
+                   const std::string& primaryTable,
+                   const std::string& foreignCatalog,
+                   const std::string& foreignSchema,
+                   const std::string& foreignTable);
 
-                /**
-                 * Destructor.
-                 */
-                virtual ~ForeignKeysQuery();
+  /**
+   * Destructor.
+   */
+  virtual ~ForeignKeysQuery();
 
-                /**
-                 * Execute query.
-                 *
-                 * @return True on success.
-                 */
-                virtual SqlResult::Type Execute();
+  /**
+   * Execute query.
+   *
+   * @return True on success.
+   */
+  virtual SqlResult::Type Execute();
 
-                /**
-                 * Get column metadata.
-                 *
-                 * @return Column metadata.
-                 */
-                virtual const meta::ColumnMetaVector* GetMeta();
+  /**
+   * Get column metadata.
+   *
+   * @return Column metadata.
+   */
+  virtual const meta::ColumnMetaVector* GetMeta();
 
-                /**
-                 * Fetch next result row to application buffers.
-                 *
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type FetchNextRow(app::ColumnBindingMap& columnBindings);
+  /**
+   * Fetch next result row to application buffers.
+   *
+   * @return Operation result.
+   */
+  virtual SqlResult::Type FetchNextRow(app::ColumnBindingMap& columnBindings);
 
-                /**
-                 * Get data of the specified column in the result set.
-                 *
-                 * @param columnIdx Column index.
-                 * @param buffer Buffer to put column data to.
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type GetColumn(uint16_t columnIdx, app::ApplicationDataBuffer& buffer);
+  /**
+   * Get data of the specified column in the result set.
+   *
+   * @param columnIdx Column index.
+   * @param buffer Buffer to put column data to.
+   * @return Operation result.
+   */
+  virtual SqlResult::Type GetColumn(uint16_t columnIdx,
+                                    app::ApplicationDataBuffer& buffer);
 
-                /**
-                 * Close query.
-                 *
-                 * @return True on success.
-                 */
-                virtual SqlResult::Type Close();
+  /**
+   * Close query.
+   *
+   * @return True on success.
+   */
+  virtual SqlResult::Type Close();
 
-                /**
-                 * Check if data is available.
-                 *
-                 * @return True if data is available.
-                 */
-                virtual bool DataAvailable() const;
+  /**
+   * Check if data is available.
+   *
+   * @return True if data is available.
+   */
+  virtual bool DataAvailable() const;
 
-                /**
-                 * Get number of rows affected by the statement.
-                 *
-                 * @return Number of rows affected by the statement.
-                 */
-                virtual int64_t AffectedRows() const;
+  /**
+   * Get number of rows affected by the statement.
+   *
+   * @return Number of rows affected by the statement.
+   */
+  virtual int64_t AffectedRows() const;
 
-                /**
-                 * Move to the next result set.
-                 *
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type NextResultSet();
-                
-            private:
-                IGNITE_NO_COPY_ASSIGNMENT(ForeignKeysQuery);
+  /**
+   * Move to the next result set.
+   *
+   * @return Operation result.
+   */
+  virtual SqlResult::Type NextResultSet();
 
-                /** Connection associated with the statement. */
-                Connection& connection;
+ private:
+  IGNITE_NO_COPY_ASSIGNMENT(ForeignKeysQuery);
 
-                /** Primary key catalog name. */
-                std::string primaryCatalog;
+  /** Connection associated with the statement. */
+  Connection& connection;
 
-                /** Primary key schema name. */
-                std::string primarySchema;
+  /** Primary key catalog name. */
+  std::string primaryCatalog;
 
-                /** Primary key table name. */
-                std::string primaryTable;
+  /** Primary key schema name. */
+  std::string primarySchema;
 
-                /** Foreign key catalog name. */
-                std::string foreignCatalog;
+  /** Primary key table name. */
+  std::string primaryTable;
 
-                /** Foreign key schema name. */
-                std::string foreignSchema;
+  /** Foreign key catalog name. */
+  std::string foreignCatalog;
 
-                /** Foreign key table name. */
-                std::string foreignTable;
+  /** Foreign key schema name. */
+  std::string foreignSchema;
 
-                /** Query executed. */
-                bool executed;
+  /** Foreign key table name. */
+  std::string foreignTable;
 
-                /** Columns metadata. */
-                meta::ColumnMetaVector columnsMeta;
-            };
-        }
-    }
-}
+  /** Query executed. */
+  bool executed;
 
-#endif //_IGNITE_ODBC_QUERY_FOREIGN_KEYS_QUERY
+  /** Columns metadata. */
+  meta::ColumnMetaVector columnsMeta;
+};
+}  // namespace query
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_QUERY_FOREIGN_KEYS_QUERY

@@ -17,76 +17,66 @@
 #ifndef _IGNITE_ODBC_COMMON_DEFAULT_ALLOCATOR
 #define _IGNITE_ODBC_COMMON_DEFAULT_ALLOCATOR
 
+#include <ignite/odbc/common/common.h>
 #include <stdint.h>
+
 #include <cassert>
 
-#include <ignite/odbc/common/common.h>
+namespace ignite {
+namespace odbc {
+namespace common {
+/**
+ * Allocator. Manages objects construction and destruction as well
+ * as a memory allocation.
+ */
+template < typename T >
+class IGNITE_IMPORT_EXPORT DefaultAllocator {
+ public:
+  typedef T ValueType;
+  typedef T* PointerType;
+  typedef T& ReferenceType;
+  typedef const T* ConstPointerType;
+  typedef const T& ConstReferenceType;
+  typedef int32_t SizeType;
+  typedef int32_t DifferenceType;
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace common
-        {
-            /**
-             * Allocator. Manages objects construction and destruction as well
-             * as a memory allocation.
-             */
-            template<typename T>
-            class IGNITE_IMPORT_EXPORT DefaultAllocator
-            {
-            public:
-                typedef T ValueType;
-                typedef T* PointerType;
-                typedef T& ReferenceType;
-                typedef const T* ConstPointerType;
-                typedef const T& ConstReferenceType;
-                typedef int32_t SizeType;
-                typedef int32_t DifferenceType;
+  template < class T2 >
+  struct Rebind {
+    typedef DefaultAllocator< T2 > other;
+  };
 
-                template <class T2> struct Rebind
-                {
-                    typedef DefaultAllocator<T2> other;
-                };
+  /**
+   * Default constructor.
+   */
+  DefaultAllocator() {
+    // No-op.
+  }
 
-                /**
-                 * Default constructor.
-                 */
-                DefaultAllocator()
-                {
-                    // No-op.
-                }
+  /**
+   * Destructor.
+   */
+  ~DefaultAllocator() {
+    // No-op.
+  }
 
-                /**
-                 * Destructor.
-                 */
-                ~DefaultAllocator()
-                {
-                    // No-op.
-                }
+  PointerType Allocate(SizeType len, void* = 0) {
+    return static_cast< PointerType >(::operator new(len * sizeof(ValueType)));
+  }
 
-                PointerType Allocate(SizeType len, void* = 0)
-                {
-                    return static_cast<PointerType>(::operator new(len * sizeof(ValueType)));
-                }
+  void Deallocate(PointerType ptr, SizeType) {
+    ::operator delete(ptr);
+  }
 
-                void Deallocate(PointerType ptr, SizeType)
-                {
-                    ::operator delete(ptr);
-                }
+  void Construct(PointerType p, ConstReferenceType val) {
+    new (p) ValueType(val);
+  }
 
-                void Construct(PointerType p, ConstReferenceType val)
-                {
-                    new (p) ValueType(val);
-                }
+  void Destruct(PointerType p) {
+    p->~ValueType();
+  }
+};
+}  // namespace common
+}  // namespace odbc
+}  // namespace ignite
 
-                void Destruct(PointerType p)
-                {
-                    p->~ValueType();
-                }
-            };
-        }
-    }
-}
-
-#endif // _IGNITE_ODBC_COMMON_DEFAULT_ALLOCATOR
+#endif  // _IGNITE_ODBC_COMMON_DEFAULT_ALLOCATOR

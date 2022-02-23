@@ -19,97 +19,97 @@
 #define _IGNITE_ODBC_UTILITY
 
 #ifdef min
-#   undef min
-#endif //min
+#undef min
+#endif  // min
 
+#include <ignite/odbc/common/decimal.h>
+#include <ignite/odbc/common/utils.h>
 #include <stdint.h>
 
 #include <string>
 
-#include <ignite/odbc/common/utils.h>
-#include <ignite/odbc/common/decimal.h>
-
 #include "ignite/impl/binary/binary_reader_impl.h"
 #include "ignite/impl/binary/binary_writer_impl.h"
 
-namespace ignite
-{
-    namespace utility
-    {
-        /** Using common version of the util. */
-        using common::IntoLower;
+namespace ignite {
+namespace utility {
+/** Using common version of the util. */
+using common::IntoLower;
 
-        template<typename T>
-        T* GetPointerWithOffset(T* ptr, size_t offset)
-        {
-            uint8_t* ptrBytes = (uint8_t*)ptr;
+template < typename T >
+T* GetPointerWithOffset(T* ptr, size_t offset) {
+  uint8_t* ptrBytes = (uint8_t*)ptr;
 
-            return (T*)(ptrBytes + offset);
-        }
-
-        /**
-         * Copy string to buffer of the specific length.
-         * @param str String to copy data from.
-         * @param buf Buffer to copy data to.
-         * @param buflen Length of the buffer.
-         * @return Length of the resulting string in buffer.
-         */
-        size_t CopyStringToBuffer(const std::string& str, char* buf, size_t buflen);
-
-        /**
-         * Read array from reader.
-         * @param reader Reader.
-         * @param res Resulting vector.
-         */
-        void ReadByteArray(impl::binary::BinaryReaderImpl& reader, std::vector<int8_t>& res);
-
-        /**
-         * Read string from reader.
-         * @param reader Reader.
-         * @param str String.
-         */
-        void ReadString(impl::binary::BinaryReaderImpl& reader, std::string& str);
-
-        /**
-         * Write string using writer.
-         * @param writer Writer.
-         * @param str String.
-         */
-        void WriteString(impl::binary::BinaryWriterImpl& writer, const std::string& str);
-
-        /**
-         * Read decimal value using reader.
-         *
-         * @param reader Reader.
-         * @param decimal Decimal value.
-         */
-        void ReadDecimal(impl::binary::BinaryReaderImpl& reader, odbc::common::Decimal& decimal);
-
-        /**
-         * Write decimal value using writer.
-         *
-         * @param writer Writer.
-         * @param decimal Decimal value.
-         */
-        void WriteDecimal(impl::binary::BinaryWriterImpl& writer, const odbc::common::Decimal& decimal);
-
-        /**
-         * Convert SQL string buffer to std::string.
-         *
-         * @param sqlStr SQL string buffer.
-         * @param sqlStrLen SQL string length.
-         * @return Standard string containing the same data.
-         */
-        std::string SqlStringToString(const unsigned char* sqlStr, int32_t sqlStrLen);
-
-        /**
-         * Convert binary data to hex dump form
-         * @param data  pointer to data
-         * @param count data length
-         * @return standard string containing the formated hex dump
-         */
-        std::string HexDump(const void* data, size_t count);
-    }
+  return (T*)(ptrBytes + offset);
 }
 
-#endif //_IGNITE_ODBC_UTILITY
+/**
+ * Copy string to buffer of the specific length.
+ * @param str String to copy data from.
+ * @param buf Buffer to copy data to.
+ * @param buflen Length of the buffer.
+ * @return Length of the resulting string in buffer.
+ */
+size_t CopyStringToBuffer(const std::string& str, char* buf, size_t buflen);
+
+/**
+ * Read array from reader.
+ * @param reader Reader.
+ * @param res Resulting vector.
+ */
+void ReadByteArray(impl::binary::BinaryReaderImpl& reader,
+                   std::vector< int8_t >& res);
+
+/**
+ * Read string from reader.
+ * @param reader Reader.
+ * @param str String.
+ */
+void ReadString(impl::binary::BinaryReaderImpl& reader, std::string& str);
+
+/**
+ * Write string using writer.
+ * @param writer Writer.
+ * @param str String.
+ */
+void WriteString(impl::binary::BinaryWriterImpl& writer,
+                 const std::string& str);
+
+/**
+ * Read decimal value using reader.
+ *
+ * @param reader Reader.
+ * @param decimal Decimal value.
+ */
+void ReadDecimal(impl::binary::BinaryReaderImpl& reader,
+                 odbc::common::Decimal& decimal);
+
+/**
+ * Write decimal value using writer.
+ *
+ * @param writer Writer.
+ * @param decimal Decimal value.
+ */
+void WriteDecimal(impl::binary::BinaryWriterImpl& writer,
+                  const odbc::common::Decimal& decimal);
+
+/**
+ * Convert SQL string buffer to std::string.
+ *
+ * @param sqlStr SQL string buffer.
+ * @param sqlStrLen SQL string length.
+ * @return Standard string containing the same data.
+ */
+std::string SqlStringToString(const unsigned char* sqlStr, int32_t sqlStrLen);
+
+/**
+ * Convert binary data to hex dump form
+ * @param data  pointer to data
+ * @param count data length
+ * @return standard string containing the formated hex dump
+ */
+std::string HexDump(const void* data, size_t count);
+}  // namespace utility
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_UTILITY
