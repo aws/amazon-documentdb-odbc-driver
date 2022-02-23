@@ -16,29 +16,27 @@
  */
 
 #ifdef _WIN32
-#   include <windows.h>
+#include <windows.h>
 #endif
 
 #include <sql.h>
 #include <sqlext.h>
 
-#include <vector>
-#include <string>
 #include <algorithm>
-
 #include <boost/regex.hpp>
 #include <boost/test/unit_test.hpp>
+#include <string>
+#include <vector>
 
-#include "ignite/ignite.h"
+#include "complex_type.h"
+#include "ignite/binary/binary_object.h"
 #include "ignite/common/fixed_size_array.h"
+#include "ignite/ignite.h"
 #include "ignite/ignition.h"
 #include "ignite/impl/binary/binary_utils.h"
-#include "ignite/binary/binary_object.h"
-
-#include "test_type.h"
-#include "complex_type.h"
-#include "test_utils.h"
 #include "odbc_test_suite.h"
+#include "test_type.h"
+#include "test_utils.h"
 
 using namespace ignite;
 using namespace ignite::cache;
@@ -56,152 +54,146 @@ using ignite::impl::binary::BinaryUtils;
 /**
  * Test setup fixture.
  */
-struct ErrorTestSuiteFixture : odbc::OdbcTestSuite
-{
-    static Ignite StartAdditionalNode(const char* name)
-    {
-        return StartPlatformNode("queries-test.xml", name);
-    }
+struct ErrorTestSuiteFixture : odbc::OdbcTestSuite {
+  static Ignite StartAdditionalNode(const char* name) {
+    return StartPlatformNode("queries-test.xml", name);
+  }
 
-    /**
-     * Constructor.
-     */
-    ErrorTestSuiteFixture() :
-        OdbcTestSuite()
-    {
-        // No-op.
-    }
+  /**
+   * Constructor.
+   */
+  ErrorTestSuiteFixture() : OdbcTestSuite() {
+    // No-op.
+  }
 
-    /**
-     * Destructor.
-     */
-    ~ErrorTestSuiteFixture()
-    {
-        // No-op.
-    }
+  /**
+   * Destructor.
+   */
+  ~ErrorTestSuiteFixture() {
+    // No-op.
+  }
 };
 
 BOOST_FIXTURE_TEST_SUITE(ErrorTestSuite, ErrorTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestConnectFail)
-{
-    // Allocate an environment handle
-    SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
+BOOST_AUTO_TEST_CASE(TestConnectFail) {
+  // Allocate an environment handle
+  SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
 
-    BOOST_REQUIRE(env != NULL);
+  BOOST_REQUIRE(env != NULL);
 
-    // We want ODBC 3 support
-    SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, reinterpret_cast<void*>(SQL_OV_ODBC3), 0);
+  // We want ODBC 3 support
+  SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION,
+                reinterpret_cast< void* >(SQL_OV_ODBC3), 0);
 
-    // Allocate a connection handle
-    SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
+  // Allocate a connection handle
+  SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
 
-    BOOST_REQUIRE(dbc != NULL);
+  BOOST_REQUIRE(dbc != NULL);
 
-    // Connect string
-    SQLCHAR connectStr[] = "DRIVER={Apache Ignite};ADDRESS=127.0.0.1:1111;SCHEMA=cache";
+  // Connect string
+  SQLCHAR connectStr[] =
+      "DRIVER={Apache Ignite};ADDRESS=127.0.0.1:1111;SCHEMA=cache";
 
-    SQLCHAR outstr[ODBC_BUFFER_SIZE];
-    SQLSMALLINT outstrlen;
+  SQLCHAR outstr[ODBC_BUFFER_SIZE];
+  SQLSMALLINT outstrlen;
 
-    // Connecting to ODBC server.
-    SQLRETURN ret = SQLDriverConnect(dbc, NULL, connectStr, SQL_NTS,
-        outstr, sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
+  // Connecting to ODBC server.
+  SQLRETURN ret =
+      SQLDriverConnect(dbc, NULL, connectStr, SQL_NTS, outstr, sizeof(outstr),
+                       &outstrlen, SQL_DRIVER_COMPLETE);
 
-    BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
-    BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_DBC, dbc), "08001");
+  BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
+  BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_DBC, dbc), "08001");
 }
 
-BOOST_AUTO_TEST_CASE(TestDuplicateKey)
-{
-    StartAdditionalNode("Node1");
+BOOST_AUTO_TEST_CASE(TestDuplicateKey) {
+  StartAdditionalNode("Node1");
 
-    Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
+  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-    SQLCHAR insertReq[] = "INSERT INTO TestType(_key, strField) VALUES(1, 'some')";
+  SQLCHAR insertReq[] =
+      "INSERT INTO TestType(_key, strField) VALUES(1, 'some')";
 
-    SQLRETURN ret;
+  SQLRETURN ret;
 
-    ret = SQLExecDirect(stmt, insertReq, SQL_NTS);
+  ret = SQLExecDirect(stmt, insertReq, SQL_NTS);
 
-    if (!SQL_SUCCEEDED(ret))
-        BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-    ret = SQLExecDirect(stmt, insertReq, SQL_NTS);
+  ret = SQLExecDirect(stmt, insertReq, SQL_NTS);
 
-    BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
-    BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_STMT, stmt), "23000");
+  BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
+  BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_STMT, stmt), "23000");
 }
 
-BOOST_AUTO_TEST_CASE(TestUpdateKey)
-{
-    StartAdditionalNode("Node1");
+BOOST_AUTO_TEST_CASE(TestUpdateKey) {
+  StartAdditionalNode("Node1");
 
-    Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
+  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-    SQLCHAR insertReq[] = "INSERT INTO TestType(_key, strField) VALUES(1, 'some')";
+  SQLCHAR insertReq[] =
+      "INSERT INTO TestType(_key, strField) VALUES(1, 'some')";
 
-    SQLRETURN ret;
+  SQLRETURN ret;
 
-    ret = SQLExecDirect(stmt, insertReq, SQL_NTS);
+  ret = SQLExecDirect(stmt, insertReq, SQL_NTS);
 
-    if (!SQL_SUCCEEDED(ret))
-        BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-    SQLCHAR updateReq[] = "UPDATE TestType SET _key=2 WHERE _key=1";
+  SQLCHAR updateReq[] = "UPDATE TestType SET _key=2 WHERE _key=1";
 
-    ret = SQLExecDirect(stmt, updateReq, SQL_NTS);
+  ret = SQLExecDirect(stmt, updateReq, SQL_NTS);
 
-    BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
-    BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_STMT, stmt), "42000");
+  BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
+  BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_STMT, stmt), "42000");
 }
 
-BOOST_AUTO_TEST_CASE(TestTableNotFound)
-{
-    StartAdditionalNode("Node1");
+BOOST_AUTO_TEST_CASE(TestTableNotFound) {
+  StartAdditionalNode("Node1");
 
-    Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
+  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
 
-    SQLCHAR req[] = "DROP TABLE Nonexisting";
+  SQLCHAR req[] = "DROP TABLE Nonexisting";
 
-    SQLRETURN ret;
+  SQLRETURN ret;
 
-    ret = SQLExecDirect(stmt, req, SQL_NTS);
+  ret = SQLExecDirect(stmt, req, SQL_NTS);
 
-    BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
-    BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_STMT, stmt), "42S02");
+  BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
+  BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_STMT, stmt), "42S02");
 }
 
-BOOST_AUTO_TEST_CASE(TestIndexNotFound)
-{
-    StartAdditionalNode("Node1");
+BOOST_AUTO_TEST_CASE(TestIndexNotFound) {
+  StartAdditionalNode("Node1");
 
-    Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
+  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
 
-    SQLCHAR req[] = "DROP INDEX Nonexisting";
+  SQLCHAR req[] = "DROP INDEX Nonexisting";
 
-    SQLRETURN ret;
+  SQLRETURN ret;
 
-    ret = SQLExecDirect(stmt, req, SQL_NTS);
+  ret = SQLExecDirect(stmt, req, SQL_NTS);
 
-    BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
-    BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_STMT, stmt), "42S12");
+  BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
+  BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_STMT, stmt), "42S12");
 }
 
-BOOST_AUTO_TEST_CASE(TestSyntaxError)
-{
-    StartAdditionalNode("Node1");
+BOOST_AUTO_TEST_CASE(TestSyntaxError) {
+  StartAdditionalNode("Node1");
 
-    Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
+  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
 
-    SQLCHAR req[] = "INSERT INTO TestType(_key, fasf) VALUES(1, 'some')";
+  SQLCHAR req[] = "INSERT INTO TestType(_key, fasf) VALUES(1, 'some')";
 
-    SQLRETURN ret;
+  SQLRETURN ret;
 
-    ret = SQLExecDirect(stmt, req, SQL_NTS);
+  ret = SQLExecDirect(stmt, req, SQL_NTS);
 
-    BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
-    BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_STMT, stmt), "42000");
+  BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
+  BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_STMT, stmt), "42000");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

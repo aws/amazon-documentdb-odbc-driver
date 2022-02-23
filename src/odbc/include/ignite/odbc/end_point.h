@@ -19,54 +19,46 @@
 #define _IGNITE_ODBC_END_POINT
 
 #include <stdint.h>
+
 #include <string>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        /**
-         * Connection end point structure.
-         */
-        struct EndPoint
-        {
-            /**
-             * Default constructor.
-             */
-            EndPoint() :
-                host(),
-                port(),
-                range()
-            {
-                // No-op.
-            }
+namespace ignite {
+namespace odbc {
+/**
+ * Connection end point structure.
+ */
+struct EndPoint {
+  /**
+   * Default constructor.
+   */
+  EndPoint() : host(), port(), range() {
+    // No-op.
+  }
 
-            /**
-             * Constructor.
-             *
-             * @param host Host.
-             * @param port Port.
-             * @param range Number of ports after the @c port that should be
-             *    tried if the previous are unavailable.
-             */
-            EndPoint(const std::string& host, uint16_t port, uint16_t range = 0) :
-                host(host),
-                port(port),
-                range(range)
-            {
-                // No-op.
-            }
+  /**
+   * Constructor.
+   *
+   * @param host Host.
+   * @param port Port.
+   * @param range Number of ports after the @c port that should be
+   *    tried if the previous are unavailable.
+   */
+  EndPoint(const std::string& host, uint16_t port, uint16_t range = 0)
+      : host(host), port(port), range(range) {
+    // No-op.
+  }
 
-            /** Remote host. */
-            std::string host;
+  /** Remote host. */
+  std::string host;
 
-            /** TCP port. */
-            uint16_t port;
+  /** TCP port. */
+  uint16_t port;
 
-            /** Number of ports after the port that should be tried if the previous are unavailable. */
-            uint16_t range;
-        };
-    }
-}
+  /** Number of ports after the port that should be tried if the previous are
+   * unavailable. */
+  uint16_t range;
+};
+}  // namespace odbc
+}  // namespace ignite
 
-#endif //_IGNITE_ODBC_END_POINT
+#endif  //_IGNITE_ODBC_END_POINT

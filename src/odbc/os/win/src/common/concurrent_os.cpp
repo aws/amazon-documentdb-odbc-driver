@@ -19,190 +19,159 @@
 
 #pragma intrinsic(_InterlockedCompareExchange64)
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace common
-        {
-            namespace concurrent
-            {
-                /** Thread-local index for Windows. */
-                DWORD winTlsIdx;
+namespace ignite {
+namespace odbc {
+namespace common {
+namespace concurrent {
+/** Thread-local index for Windows. */
+DWORD winTlsIdx;
 
-                void Memory::Fence() {
-                    MemoryBarrier();
-                }
-
-                CriticalSection::CriticalSection() :
-                    hnd()
-                {
-                    InitializeCriticalSection(&hnd);
-
-                    Memory::Fence();
-                }
-
-                CriticalSection::~CriticalSection() = default;
-
-                void CriticalSection::Enter()
-                {
-                    Memory::Fence();
-
-                    EnterCriticalSection(&hnd);
-                }
-
-                void CriticalSection::Leave()
-                {
-                    Memory::Fence();
-
-                    LeaveCriticalSection(&hnd);
-                }
-
-                ReadWriteLock::ReadWriteLock() :
-                    lock()
-                {
-                    InitializeSRWLock(&lock);
-
-                    Memory::Fence();
-                }
-
-                ReadWriteLock::~ReadWriteLock() = default;
-
-                void ReadWriteLock::LockExclusive()
-                {
-                    AcquireSRWLockExclusive(&lock);
-                }
-
-                void ReadWriteLock::ReleaseExclusive()
-                {
-                    ReleaseSRWLockExclusive(&lock);
-                }
-
-                void ReadWriteLock::LockShared()
-                {
-                    AcquireSRWLockShared(&lock);
-                }
-
-                void ReadWriteLock::ReleaseShared()
-                {
-                    ReleaseSRWLockShared(&lock);
-                }
-
-                SingleLatch::SingleLatch()
-                {
-                    Memory::Fence();
-                }
-
-                SingleLatch::~SingleLatch()
-                {
-                    Memory::Fence();
-
-                    CloseHandle(hnd);
-                }
-
-                void SingleLatch::CountDown()
-                {
-                    SetEvent(hnd);
-                }
-
-                void SingleLatch::Await()
-                {
-                    WaitForSingleObject(hnd, INFINITE);
-                }
-
-                bool Atomics::CompareAndSet32(int32_t* ptr, int32_t expVal, int32_t newVal)
-                {
-                    return CompareAndSet32Val(ptr, expVal, newVal) == expVal;
-                }
-
-                int32_t Atomics::CompareAndSet32Val(int32_t* ptr, int32_t expVal, int32_t newVal)
-                {
-                    return InterlockedCompareExchange(reinterpret_cast<LONG*>(ptr), newVal, expVal);
-                }
-
-                int32_t Atomics::IncrementAndGet32(int32_t* ptr)
-                {
-                    return InterlockedIncrement(reinterpret_cast<LONG*>(ptr));
-                }
-
-                int32_t Atomics::DecrementAndGet32(int32_t* ptr)
-                {
-                    return InterlockedDecrement(reinterpret_cast<LONG*>(ptr));
-                }
-
-                bool Atomics::CompareAndSet64(int64_t* ptr, int64_t expVal, int64_t newVal)
-                {
-                    return CompareAndSet64Val(ptr, expVal, newVal) == expVal;
-                }
-
-                int64_t Atomics::CompareAndSet64Val(int64_t* ptr, int64_t expVal, int64_t newVal)
-                {
-                    return _InterlockedCompareExchange64(ptr, newVal, expVal);
-                }
-
-                int64_t Atomics::IncrementAndGet64(int64_t* ptr)
-                {
-    #ifdef _WIN64
-                    return InterlockedIncrement64(ptr);
-    #else
-                    while (true)
-                    {
-                        int64_t expVal = *ptr;
-                        int64_t newVal = expVal + 1;
-
-                        if (CompareAndSet64(ptr, expVal, newVal))
-                            return newVal;
-                    }
-    #endif
-                }
-
-                int64_t Atomics::DecrementAndGet64(int64_t* ptr)
-                {
-    #ifdef _WIN64
-                    return InterlockedDecrement64(ptr);
-    #else
-                    while (true)
-                    {
-                        int64_t expVal = *ptr;
-                        int64_t newVal = expVal - 1;
-
-                        if (CompareAndSet64(ptr, expVal, newVal))
-                            return newVal;
-                    }
-    #endif
-                }
-
-                bool ThreadLocal::OnProcessAttach()
-                {
-                    return (winTlsIdx = TlsAlloc()) != TLS_OUT_OF_INDEXES;
-                }
-
-                void ThreadLocal::OnThreadDetach()
-                {
-                    if (winTlsIdx != TLS_OUT_OF_INDEXES)
-                    {
-                        void* mapPtr = Get0();
-
-                        Clear0(mapPtr);
-                    }
-                }
-
-                void ThreadLocal::OnProcessDetach()
-                {
-                    if (winTlsIdx != TLS_OUT_OF_INDEXES)
-                        TlsFree(winTlsIdx);
-                }
-
-                void* ThreadLocal::Get0()
-                {
-                    return TlsGetValue(winTlsIdx);
-                }
-
-                void ThreadLocal::Set0(void* ptr)
-                {
-                    TlsSetValue(winTlsIdx, ptr);
-                }
-            }
-        }
-    }
+void Memory::Fence() {
+  MemoryBarrier();
 }
+
+CriticalSection::CriticalSection() : hnd() {
+  InitializeCriticalSection(&hnd);
+
+  Memory::Fence();
+}
+
+CriticalSection::~CriticalSection() = default;
+
+void CriticalSection::Enter() {
+  Memory::Fence();
+
+  EnterCriticalSection(&hnd);
+}
+
+void CriticalSection::Leave() {
+  Memory::Fence();
+
+  LeaveCriticalSection(&hnd);
+}
+
+ReadWriteLock::ReadWriteLock() : lock() {
+  InitializeSRWLock(&lock);
+
+  Memory::Fence();
+}
+
+ReadWriteLock::~ReadWriteLock() = default;
+
+void ReadWriteLock::LockExclusive() {
+  AcquireSRWLockExclusive(&lock);
+}
+
+void ReadWriteLock::ReleaseExclusive() {
+  ReleaseSRWLockExclusive(&lock);
+}
+
+void ReadWriteLock::LockShared() {
+  AcquireSRWLockShared(&lock);
+}
+
+void ReadWriteLock::ReleaseShared() {
+  ReleaseSRWLockShared(&lock);
+}
+
+SingleLatch::SingleLatch() {
+  Memory::Fence();
+}
+
+SingleLatch::~SingleLatch() {
+  Memory::Fence();
+
+  CloseHandle(hnd);
+}
+
+void SingleLatch::CountDown() {
+  SetEvent(hnd);
+}
+
+void SingleLatch::Await() {
+  WaitForSingleObject(hnd, INFINITE);
+}
+
+bool Atomics::CompareAndSet32(int32_t* ptr, int32_t expVal, int32_t newVal) {
+  return CompareAndSet32Val(ptr, expVal, newVal) == expVal;
+}
+
+int32_t Atomics::CompareAndSet32Val(int32_t* ptr, int32_t expVal,
+                                    int32_t newVal) {
+  return InterlockedCompareExchange(reinterpret_cast< LONG* >(ptr), newVal,
+                                    expVal);
+}
+
+int32_t Atomics::IncrementAndGet32(int32_t* ptr) {
+  return InterlockedIncrement(reinterpret_cast< LONG* >(ptr));
+}
+
+int32_t Atomics::DecrementAndGet32(int32_t* ptr) {
+  return InterlockedDecrement(reinterpret_cast< LONG* >(ptr));
+}
+
+bool Atomics::CompareAndSet64(int64_t* ptr, int64_t expVal, int64_t newVal) {
+  return CompareAndSet64Val(ptr, expVal, newVal) == expVal;
+}
+
+int64_t Atomics::CompareAndSet64Val(int64_t* ptr, int64_t expVal,
+                                    int64_t newVal) {
+  return _InterlockedCompareExchange64(ptr, newVal, expVal);
+}
+
+int64_t Atomics::IncrementAndGet64(int64_t* ptr) {
+#ifdef _WIN64
+  return InterlockedIncrement64(ptr);
+#else
+  while (true) {
+    int64_t expVal = *ptr;
+    int64_t newVal = expVal + 1;
+
+    if (CompareAndSet64(ptr, expVal, newVal))
+      return newVal;
+  }
+#endif
+}
+
+int64_t Atomics::DecrementAndGet64(int64_t* ptr) {
+#ifdef _WIN64
+  return InterlockedDecrement64(ptr);
+#else
+  while (true) {
+    int64_t expVal = *ptr;
+    int64_t newVal = expVal - 1;
+
+    if (CompareAndSet64(ptr, expVal, newVal))
+      return newVal;
+  }
+#endif
+}
+
+bool ThreadLocal::OnProcessAttach() {
+  return (winTlsIdx = TlsAlloc()) != TLS_OUT_OF_INDEXES;
+}
+
+void ThreadLocal::OnThreadDetach() {
+  if (winTlsIdx != TLS_OUT_OF_INDEXES) {
+    void* mapPtr = Get0();
+
+    Clear0(mapPtr);
+  }
+}
+
+void ThreadLocal::OnProcessDetach() {
+  if (winTlsIdx != TLS_OUT_OF_INDEXES)
+    TlsFree(winTlsIdx);
+}
+
+void* ThreadLocal::Get0() {
+  return TlsGetValue(winTlsIdx);
+}
+
+void ThreadLocal::Set0(void* ptr) {
+  TlsSetValue(winTlsIdx, ptr);
+}
+}  // namespace concurrent
+}  // namespace common
+}  // namespace odbc
+}  // namespace ignite
