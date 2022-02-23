@@ -14,74 +14,67 @@
  *
  */
 
-#include <ignite/common/utils.h>
-
 #include "ignite/odbc/scan_method.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        ScanMethod::Type ScanMethod::FromString(const std::string& val, Type dflt)
-        {
-            std::string lowerVal = common::ToLower(val);
+#include <ignite/common/utils.h>
 
-            common::StripSurroundingWhitespaces(lowerVal);
+namespace ignite {
+namespace odbc {
+ScanMethod::Type ScanMethod::FromString(const std::string& val, Type dflt) {
+  std::string lowerVal = common::ToLower(val);
 
-            common::SpaceToUnderscore(lowerVal);
+  common::StripSurroundingWhitespaces(lowerVal);
 
-            if (lowerVal == "random")
-                return ScanMethod::Type::RANDOM;
+  common::SpaceToUnderscore(lowerVal);
 
-            if (lowerVal == "id_forward")
-                return ScanMethod::Type::ID_FORWARD;
+  if (lowerVal == "random")
+    return ScanMethod::Type::RANDOM;
 
-            if (lowerVal == "id_reverse")
-                return ScanMethod::Type::ID_REVERSE;
+  if (lowerVal == "id_forward")
+    return ScanMethod::Type::ID_FORWARD;
 
-            if (lowerVal == "all")
-                return ScanMethod::Type::ALL;
+  if (lowerVal == "id_reverse")
+    return ScanMethod::Type::ID_REVERSE;
 
-            return dflt;
-        }
+  if (lowerVal == "all")
+    return ScanMethod::Type::ALL;
 
-        std::string ScanMethod::ToString(Type val)
-        {
-            switch (val)
-            {
-                case ScanMethod::Type::ID_FORWARD:
-                    return "id_forward";
-
-                case ScanMethod::Type::ID_REVERSE:
-                    return "id_reverse";
-
-                case ScanMethod::Type::ALL:
-                    return "all";
-
-                case ScanMethod::Type::RANDOM:
-                    return "random";
-
-                default:
-                    return "unknown";
-            }
-        }
-
-        std::string ScanMethod::ToJdbcString(Type val)
-        {
-            switch (val)
-            {
-            case ScanMethod::Type::ID_FORWARD:
-                return "idForward";
-
-            case ScanMethod::Type::ID_REVERSE:
-                return "idReverse";
-
-            case ScanMethod::Type::ALL:
-                return "all";
-
-            default:
-                return "random";
-            }
-        }
-    }
+  return dflt;
 }
+
+std::string ScanMethod::ToString(Type val) {
+  switch (val) {
+    case ScanMethod::Type::ID_FORWARD:
+      return "id_forward";
+
+    case ScanMethod::Type::ID_REVERSE:
+      return "id_reverse";
+
+    case ScanMethod::Type::ALL:
+      return "all";
+
+    case ScanMethod::Type::RANDOM:
+      return "random";
+
+    default:
+      return "unknown";
+  }
+}
+
+std::string ScanMethod::ToJdbcString(Type val) {
+  switch (val) {
+    case ScanMethod::Type::ID_FORWARD:
+      return "idForward";
+
+    case ScanMethod::Type::ID_REVERSE:
+      return "idReverse";
+
+    case ScanMethod::Type::ALL:
+      return "all";
+
+    default:
+      return "random";
+  }
+}
+}  // namespace odbc
+}  // namespace ignite

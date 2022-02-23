@@ -20,130 +20,127 @@
 
 #include "ignite/odbc/query/query.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace query
-        {
-            /**
-             * Special columns query.
-             */
-            class SpecialColumnsQuery : public Query
-            {
-            public:
+namespace ignite {
+namespace odbc {
+namespace query {
+/**
+ * Special columns query.
+ */
+class SpecialColumnsQuery : public Query {
+ public:
+  /**
+   * Constructor.
+   *
+   * @param diag Diagnostics collector.
+   * @param catalog Catalog name.
+   * @param schema Schema name.
+   * @param table Table name.
+   * @param scope Minimum required scope of the rowid.
+   * @param nullable Determines whether to return special columns
+   *                 that can have a NULL value.
+   */
+  SpecialColumnsQuery(diagnostic::DiagnosableAdapter& diag, int16_t type,
+                      const std::string& catalog, const std::string& schema,
+                      const std::string& table, int16_t scope,
+                      int16_t nullable);
 
-                /**
-                 * Constructor.
-                 *
-                 * @param diag Diagnostics collector.
-                 * @param catalog Catalog name.
-                 * @param schema Schema name.
-                 * @param table Table name.
-                 * @param scope Minimum required scope of the rowid.
-                 * @param nullable Determines whether to return special columns
-                 *                 that can have a NULL value.
-                 */
-                SpecialColumnsQuery(diagnostic::DiagnosableAdapter& diag, int16_t type,
-                    const std::string& catalog, const std::string& schema,
-                    const std::string& table, int16_t scope, int16_t nullable);
+  /**
+   * Destructor.
+   */
+  virtual ~SpecialColumnsQuery();
 
-                /**
-                 * Destructor.
-                 */
-                virtual ~SpecialColumnsQuery();
+  /**
+   * Execute query.
+   *
+   * @return True on success.
+   */
+  virtual SqlResult::Type Execute();
 
-                /**
-                 * Execute query.
-                 *
-                 * @return True on success.
-                 */
-                virtual SqlResult::Type Execute();
+  /**
+   * Fetch next result row to application buffers.
+   *
+   * @param columnBindings Application buffers to put data to.
+   * @return Operation result.
+   */
+  virtual SqlResult::Type FetchNextRow(app::ColumnBindingMap& columnBindings);
 
-                /**
-                 * Fetch next result row to application buffers.
-                 *
-                 * @param columnBindings Application buffers to put data to.
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type FetchNextRow(app::ColumnBindingMap& columnBindings);
+  /**
+   * Get data of the specified column in the result set.
+   *
+   * @param columnIdx Column index.
+   * @param buffer Buffer to put column data to.
+   * @return Operation result.
+   */
+  virtual SqlResult::Type GetColumn(uint16_t columnIdx,
+                                    app::ApplicationDataBuffer& buffer);
 
-                /**
-                 * Get data of the specified column in the result set.
-                 *
-                 * @param columnIdx Column index.
-                 * @param buffer Buffer to put column data to.
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type GetColumn(uint16_t columnIdx, app::ApplicationDataBuffer& buffer);
+  /**
+   * Close query.
+   *
+   * @return True on success.
+   */
+  virtual SqlResult::Type Close();
 
-                /**
-                 * Close query.
-                 *
-                 * @return True on success.
-                 */
-                virtual SqlResult::Type Close();
+  /**
+   * Get column metadata.
+   *
+   * @return Column metadata.
+   */
+  virtual const meta::ColumnMetaVector* GetMeta();
 
-                /**
-                 * Get column metadata.
-                 *
-                 * @return Column metadata.
-                 */
-                virtual const meta::ColumnMetaVector* GetMeta();
+  /**
+   * Check if data is available.
+   *
+   * @return True if data is available.
+   */
+  virtual bool DataAvailable() const;
 
-                /**
-                 * Check if data is available.
-                 *
-                 * @return True if data is available.
-                 */
-                virtual bool DataAvailable() const;
+  /**
+   * Get number of rows affected by the statement.
+   *
+   * @return Number of rows affected by the statement.
+   */
+  virtual int64_t AffectedRows() const;
 
-                /**
-                 * Get number of rows affected by the statement.
-                 *
-                 * @return Number of rows affected by the statement.
-                 */
-                virtual int64_t AffectedRows() const;
+  /**
+   * Move to the next result set.
+   *
+   * @return Operation result.
+   */
+  virtual SqlResult::Type NextResultSet();
 
-                /**
-                 * Move to the next result set.
-                 *
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type NextResultSet();
+ private:
+  IGNITE_NO_COPY_ASSIGNMENT(SpecialColumnsQuery);
 
-            private:
-                IGNITE_NO_COPY_ASSIGNMENT(SpecialColumnsQuery);
+  /** Query type. */
+  int16_t type;
 
-                /** Query type. */
-                int16_t type;
+  /** Catalog name. */
+  std::string catalog;
 
-                /** Catalog name. */
-                std::string catalog;
+  /** Schema name. */
+  std::string schema;
 
-                /** Schema name. */
-                std::string schema;
+  /** Table name. */
+  std::string table;
 
-                /** Table name. */
-                std::string table;
+  /** Minimum required scope of the rowid. */
+  int16_t scope;
 
-                /** Minimum required scope of the rowid. */
-                int16_t scope;
+  /**
+   * Determines whether to return special columns that can have
+   * a NULL value.
+   */
+  int16_t nullable;
 
-                /**
-                 * Determines whether to return special columns that can have
-                 * a NULL value.
-                 */
-                int16_t nullable;
+  /** Query executed. */
+  bool executed;
 
-                /** Query executed. */
-                bool executed;
+  /** Columns metadata. */
+  meta::ColumnMetaVector columnsMeta;
+};
+}  // namespace query
+}  // namespace odbc
+}  // namespace ignite
 
-                /** Columns metadata. */
-                meta::ColumnMetaVector columnsMeta;
-            };
-        }
-    }
-}
-
-#endif //_IGNITE_ODBC_QUERY_SPECIAL_COLUMNS_QUERY
+#endif  //_IGNITE_ODBC_QUERY_SPECIAL_COLUMNS_QUERY

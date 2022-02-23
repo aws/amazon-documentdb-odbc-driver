@@ -19,49 +19,37 @@
 
 #include <string>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        /** Scan method enum. */
-        struct ScanMethod
-        {
-            enum class Type
-            {
-                RANDOM,
-                ID_FORWARD,
-                ID_REVERSE,
-                ALL,
-                UNKNOWN
-            };
-    
-            /**
-             * Convert scan method from string. 
-             *
-             * @param val String value.
-             * @param dflt Default value to return on error.
-             * @return Corresponding enum value.
-             */
-            static Type FromString(const std::string& val, Type dflt = Type::UNKNOWN);
+namespace ignite {
+namespace odbc {
+/** Scan method enum. */
+struct ScanMethod {
+  enum class Type { RANDOM, ID_FORWARD, ID_REVERSE, ALL, UNKNOWN };
 
-            /**
-             * Convert method to string. 
-             *
-             * @param val Value to convert.
-             * @return String value.
-             */
-            static std::string ToString(Type val);
+  /**
+   * Convert scan method from string.
+   *
+   * @param val String value.
+   * @param dflt Default value to return on error.
+   * @return Corresponding enum value.
+   */
+  static Type FromString(const std::string& val, Type dflt = Type::UNKNOWN);
 
-            /**
-             * Convert method to string in JDBC format.
-             *
-             * @param val Value to convert.
-             * @return String value in expected format for JDBC connection string.
-             */
-            static std::string ToJdbcString(Type val);
-        
-        };
-    }
-}   // namespace ignite
+  /**
+   * Convert method to string.
+   *
+   * @param val Value to convert.
+   * @return String value.
+   */
+  static std::string ToString(Type val);
+
+  /**
+   * Convert method to string in JDBC format.
+   *
+   * @param val Value to convert.
+   * @return String value in expected format for JDBC connection string.
+   */
+  static std::string ToJdbcString(Type val);
+};
+}  // namespace odbc
+}  // namespace ignite
 #endif  //_IGNITE_ODBC_SCAN_METHOD
-

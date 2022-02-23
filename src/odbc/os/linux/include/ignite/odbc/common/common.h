@@ -19,38 +19,40 @@
 #define _IGNITE_ODBC_COMMON_COMMON
 
 #ifndef __has_attribute
-#   define __has_attribute(x) 0
+#define __has_attribute(x) 0
 #endif
 
-#if (defined(__GNUC__) && ((__GNUC__ > 4) || (__GNUC__ == 4) && (__GNUC_MINOR__ > 2))) || __has_attribute(visibility)
-#   define IGNITE_EXPORT __attribute__((visibility("default")))
-#   define IGNITE_IMPORT __attribute__((visibility("default")))
+#if (defined(__GNUC__)                                               \
+     && ((__GNUC__ > 4) || (__GNUC__ == 4) && (__GNUC_MINOR__ > 2))) \
+    || __has_attribute(visibility)
+#define IGNITE_EXPORT __attribute__((visibility("default")))
+#define IGNITE_IMPORT __attribute__((visibility("default")))
 #else
-#   define IGNITE_EXPORT
-#   define IGNITE_IMPORT
+#define IGNITE_EXPORT
+#define IGNITE_IMPORT
 #endif
 
 #define IGNITE_CALL
 
 #ifdef IGNITE_IMPL
-#   define IGNITE_IMPORT_EXPORT IGNITE_EXPORT
+#define IGNITE_IMPORT_EXPORT IGNITE_EXPORT
 #else
-#   define IGNITE_IMPORT_EXPORT IGNITE_IMPORT
+#define IGNITE_IMPORT_EXPORT IGNITE_IMPORT
 #endif
 
 #if (__cplusplus >= 201103L)
-#   define IGNITE_NO_THROW noexcept
+#define IGNITE_NO_THROW noexcept
 #else
-#   define IGNITE_NO_THROW throw()
+#define IGNITE_NO_THROW throw()
 #endif
 
-#define IGNITE_UNUSED(x) ((void) x)
+#define IGNITE_UNUSED(x) ((void)x)
 
 /**
  * Common construction to disable copy constructor and assignment for class.
  */
 #define IGNITE_NO_COPY_ASSIGNMENT(cls) \
-    cls(const cls& src); \
-    cls& operator= (const cls& other)
+  cls(const cls& src);                 \
+  cls& operator=(const cls& other)
 
-#endif //_IGNITE_ODBC_COMMON_COMMON
+#endif  //_IGNITE_ODBC_COMMON_COMMON

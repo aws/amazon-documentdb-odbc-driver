@@ -22,166 +22,150 @@
 
 #include <map>
 
+#include "ignite/odbc/common_types.h"
 #include "ignite/odbc/diagnostic/diagnosable.h"
 #include "ignite/odbc/meta/column_meta.h"
-#include "ignite/odbc/common_types.h"
 #include "ignite/odbc/query/query.h"
 #include "ignite/odbc/sql/sql_command.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace query
-        {
-            /**
-             * Query.
-             */
-            class InternalQuery : public Query
-            {
-            public:
-                /**
-                 * Constructor.
-                 *
-                 * @param diag Diagnosable.
-                 * @param sql SQL query.
-                 * @param cmd Parsed command.
-                 */
-                InternalQuery(diagnostic::DiagnosableAdapter& diag, const std::string& sql, std::auto_ptr<SqlCommand> cmd) :
-                    Query(diag, QueryType::INTERNAL),
-                    sql(sql),
-                    cmd(cmd)
-                {
-                    // No-op.
-                }
+namespace ignite {
+namespace odbc {
+namespace query {
+/**
+ * Query.
+ */
+class InternalQuery : public Query {
+ public:
+  /**
+   * Constructor.
+   *
+   * @param diag Diagnosable.
+   * @param sql SQL query.
+   * @param cmd Parsed command.
+   */
+  InternalQuery(diagnostic::DiagnosableAdapter& diag, const std::string& sql,
+                std::auto_ptr< SqlCommand > cmd)
+      : Query(diag, QueryType::INTERNAL), sql(sql), cmd(cmd) {
+    // No-op.
+  }
 
-                /**
-                 * Destructor.
-                 */
-                virtual ~InternalQuery()
-                {
-                    // No-op.
-                }
+  /**
+   * Destructor.
+   */
+  virtual ~InternalQuery() {
+    // No-op.
+  }
 
-                /**
-                 * Execute query.
-                 *
-                 * @return True on success.
-                 */
-                virtual SqlResult::Type Execute()
-                {
-                    diag.AddStatusRecord("Internal error.");
+  /**
+   * Execute query.
+   *
+   * @return True on success.
+   */
+  virtual SqlResult::Type Execute() {
+    diag.AddStatusRecord("Internal error.");
 
-                    return SqlResult::AI_ERROR;
-                }
+    return SqlResult::AI_ERROR;
+  }
 
-                /**
-                 * Fetch next result row to application buffers.
-                 *
-                 * @param columnBindings Application buffers to put data to.
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type FetchNextRow(app::ColumnBindingMap& columnBindings)
-                {
-                   IGNITE_UNUSED(columnBindings);
+  /**
+   * Fetch next result row to application buffers.
+   *
+   * @param columnBindings Application buffers to put data to.
+   * @return Operation result.
+   */
+  virtual SqlResult::Type FetchNextRow(app::ColumnBindingMap& columnBindings) {
+    IGNITE_UNUSED(columnBindings);
 
-                    return SqlResult::AI_NO_DATA;
-                }
+    return SqlResult::AI_NO_DATA;
+  }
 
-                /**
-                 * Get data of the specified column in the result set.
-                 *
-                 * @param columnIdx Column index.
-                 * @param buffer Buffer to put column data to.
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type GetColumn(uint16_t columnIdx, app::ApplicationDataBuffer& buffer)
-                {
-                    IGNITE_UNUSED(columnIdx);
-                    IGNITE_UNUSED(buffer);
+  /**
+   * Get data of the specified column in the result set.
+   *
+   * @param columnIdx Column index.
+   * @param buffer Buffer to put column data to.
+   * @return Operation result.
+   */
+  virtual SqlResult::Type GetColumn(uint16_t columnIdx,
+                                    app::ApplicationDataBuffer& buffer) {
+    IGNITE_UNUSED(columnIdx);
+    IGNITE_UNUSED(buffer);
 
-                    return SqlResult::AI_NO_DATA;
-                }
+    return SqlResult::AI_NO_DATA;
+  }
 
-                /**
-                 * Close query.
-                 *
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type Close()
-                {
-                    return SqlResult::AI_SUCCESS;
-                }
+  /**
+   * Close query.
+   *
+   * @return Operation result.
+   */
+  virtual SqlResult::Type Close() {
+    return SqlResult::AI_SUCCESS;
+  }
 
-                /**
-                 * Get column metadata.
-                 *
-                 * @return Column metadata.
-                 */
-                virtual const meta::ColumnMetaVector* GetMeta()
-                {
-                    return 0;
-                }
+  /**
+   * Get column metadata.
+   *
+   * @return Column metadata.
+   */
+  virtual const meta::ColumnMetaVector* GetMeta() {
+    return 0;
+  }
 
-                /**
-                 * Check if data is available.
-                 *
-                 * @return True if data is available.
-                 */
-                virtual bool DataAvailable() const
-                {
-                    return false;
-                }
+  /**
+   * Check if data is available.
+   *
+   * @return True if data is available.
+   */
+  virtual bool DataAvailable() const {
+    return false;
+  }
 
-                /**
-                 * Get number of rows affected by the statement.
-                 *
-                 * @return Number of rows affected by the statement.
-                 */
-                virtual int64_t AffectedRows() const
-                {
-                    return 0;
-                }
+  /**
+   * Get number of rows affected by the statement.
+   *
+   * @return Number of rows affected by the statement.
+   */
+  virtual int64_t AffectedRows() const {
+    return 0;
+  }
 
-                /**
-                 * Move to the next result set.
-                 *
-                 * @return Operation result.
-                 */
-                virtual SqlResult::Type NextResultSet()
-                {
-                    return SqlResult::AI_NO_DATA;
-                }
+  /**
+   * Move to the next result set.
+   *
+   * @return Operation result.
+   */
+  virtual SqlResult::Type NextResultSet() {
+    return SqlResult::AI_NO_DATA;
+  }
 
-                /**
-                 * Get SQL query.
-                 *
-                 * @return SQL query.
-                 */
-                SqlCommand& GetCommand() const
-                {
-                    return *cmd;
-                }
+  /**
+   * Get SQL query.
+   *
+   * @return SQL query.
+   */
+  SqlCommand& GetCommand() const {
+    return *cmd;
+  }
 
-                /**
-                 * Get SQL query.
-                 *
-                 * @return SQL Query.
-                 */
-                const std::string& GetQuery() const
-                {
-                    return sql;
-                }
+  /**
+   * Get SQL query.
+   *
+   * @return SQL Query.
+   */
+  const std::string& GetQuery() const {
+    return sql;
+  }
 
-            protected:
-                /** SQL string*/
-                std::string sql;
+ protected:
+  /** SQL string*/
+  std::string sql;
 
-                /** SQL command. */
-                std::auto_ptr<SqlCommand> cmd;
-            };
-        }
-    }
-}
+  /** SQL command. */
+  std::auto_ptr< SqlCommand > cmd;
+};
+}  // namespace query
+}  // namespace odbc
+}  // namespace ignite
 
-#endif //_IGNITE_ODBC_QUERY_INTERNAL_QUERY
+#endif  //_IGNITE_ODBC_QUERY_INTERNAL_QUERY

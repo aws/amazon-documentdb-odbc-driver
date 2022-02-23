@@ -22,94 +22,85 @@
 
 #include "ignite/impl/interop/interop_memory.h"
 
+namespace ignite {
+namespace odbc {
+namespace app {
+// Forward declaration.
+class ParameterSet;
+}  // namespace app
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace app
-        {
-            // Forward declaration.
-            class ParameterSet;
-        }
-        
-        namespace streaming
-        {
-            /**
-             * Streaming batch.
-             *
-             * Accumulates data for streaming.
-             */
-            class StreamingBatch
-            {
-            public:
-                /**
-                 * Default constructor.
-                 */
-                StreamingBatch();
+namespace streaming {
+/**
+ * Streaming batch.
+ *
+ * Accumulates data for streaming.
+ */
+class StreamingBatch {
+ public:
+  /**
+   * Default constructor.
+   */
+  StreamingBatch();
 
-                /**
-                 * Destructor.
-                 */
-                ~StreamingBatch();
+  /**
+   * Destructor.
+   */
+  ~StreamingBatch();
 
-                /**
-                 * Add another row to a batch.
-                 *
-                 * @param sql Sql.
-                 * @param params Parameters.
-                 */
-                void AddRow(const std::string& sql, const app::ParameterSet& params);
+  /**
+   * Add another row to a batch.
+   *
+   * @param sql Sql.
+   * @param params Parameters.
+   */
+  void AddRow(const std::string& sql, const app::ParameterSet& params);
 
-                /**
-                 * Clear the batch data. 
-                 */
-                void Clear();
+  /**
+   * Clear the batch data.
+   */
+  void Clear();
 
-                /**
-                 * Get data.
-                 *
-                 * @return Data.
-                 */
-                const int8_t* GetData() const
-                {
-                    return data.Data();
-                }
+  /**
+   * Get data.
+   *
+   * @return Data.
+   */
+  const int8_t* GetData() const {
+    return data.Data();
+  }
 
-                /**
-                 * Get data length.
-                 *
-                 * @return Data length.
-                 */
-                int32_t GetDataLength() const
-                {
-                    return data.Length();
-                }
+  /**
+   * Get data length.
+   *
+   * @return Data length.
+   */
+  int32_t GetDataLength() const {
+    return data.Length();
+  }
 
-                /**
-                 * Get number of rows in batch.
-                 *
-                 * @return Number of rows in batch.
-                 */
-                int32_t GetSize() const
-                {
-                    return size;
-                }
+  /**
+   * Get number of rows in batch.
+   *
+   * @return Number of rows in batch.
+   */
+  int32_t GetSize() const {
+    return size;
+  }
 
-            private:
-                IGNITE_NO_COPY_ASSIGNMENT(StreamingBatch);
+ private:
+  IGNITE_NO_COPY_ASSIGNMENT(StreamingBatch);
 
-                /** Current SQL. */
-                std::string currentSql;
+  /** Current SQL. */
+  std::string currentSql;
 
-                /** Batch size in rows. */
-                int32_t size;
+  /** Batch size in rows. */
+  int32_t size;
 
-                /** Batch data. */
-                impl::interop::InteropUnpooledMemory data;
-            };
-        }
-    }
-}
+  /** Batch data. */
+  impl::interop::InteropUnpooledMemory data;
+};
+}  // namespace streaming
+}  // namespace odbc
+}  // namespace ignite
 
-#endif //_IGNITE_ODBC_STREAMING_STREAMING_BATCH
+#endif  //_IGNITE_ODBC_STREAMING_STREAMING_BATCH
