@@ -17,10 +17,9 @@
 
 #include "ignite/odbc/query/type_info_query.h"
 
-#include <ignite/impl/binary/binary_common.h>
-
 #include <cassert>
 
+#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/system/odbc_constants.h"
 #include "ignite/odbc/type_traits.h"
 
@@ -122,6 +121,7 @@ TypeInfoQuery::TypeInfoQuery(diagnostic::DiagnosableAdapter& diag,
       types(),
       cursor(types.end()) {
   using namespace ignite::impl::binary;
+  using namespace ignite::odbc::impl::binary;
   using namespace ignite::odbc::type_traits;
 
   using meta::ColumnMeta;
@@ -227,6 +227,7 @@ SqlResult::Type TypeInfoQuery::FetchNextRow(
 SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
                                          app::ApplicationDataBuffer& buffer) {
   using namespace ignite::impl::binary;
+  using namespace ignite::odbc::impl::binary;
 
   if (!executed) {
     diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,

@@ -17,11 +17,11 @@
 
 #include "ignite/odbc/type_traits.h"
 
-#include <ignite/impl/binary/binary_common.h>
+#include "ignite/odbc/impl/binary/binary_common.h"
 
 #include "ignite/odbc/system/odbc_constants.h"
 
-using namespace ignite::impl::binary;
+using namespace ignite::odbc::impl::binary;
 
 namespace ignite {
 namespace odbc {

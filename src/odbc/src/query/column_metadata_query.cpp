@@ -17,10 +17,9 @@
 
 #include "ignite/odbc/query/column_metadata_query.h"
 
-#include <ignite/impl/binary/binary_common.h>
-
 #include <vector>
 
+#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/common/concurrent.h"
 #include "ignite/odbc/connection.h"
 #include "ignite/odbc/ignite_error.h"
@@ -119,6 +118,7 @@ ColumnMetadataQuery::ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
       meta(),
       columnsMeta() {
   using namespace ignite::impl::binary;
+  using namespace ignite::odbc::impl::binary;
   using namespace ignite::odbc::type_traits;
 
   using meta::ColumnMeta;
