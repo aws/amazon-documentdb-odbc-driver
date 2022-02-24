@@ -32,8 +32,7 @@ namespace odbc {
 namespace config {
 // Connection Settings
 const std::string Configuration::DefaultValue::dsn = "DocumentDB DSN";
-const std::string Configuration::DefaultValue::driver =
-    "Amazon DocumentDB ODBC Driver";
+const std::string Configuration::DefaultValue::driver = "Amazon DocumentDB";
 const std::string Configuration::DefaultValue::database = "";
 const std::string Configuration::DefaultValue::hostname = "";
 const uint16_t Configuration::DefaultValue::port = 27017;
