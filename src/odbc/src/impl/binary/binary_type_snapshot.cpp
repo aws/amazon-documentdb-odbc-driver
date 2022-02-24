@@ -15,49 +15,45 @@
  * limitations under the License.
  */
 
-#include "ignite/impl/binary/binary_type_snapshot.h"
+#include "ignite/odbc/impl/binary/binary_type_snapshot.h"
 
-namespace ignite
-{    
-    namespace impl
-    {
-        namespace binary
-        {
-            IGNITE_IMPORT_EXPORT BinaryTypeSnapshot::BinaryTypeSnapshot(const std::string& typeName,
-                const std::string& affFieldName, int32_t typeId) :
-                typeName(typeName),
-                affFieldName(affFieldName),
-                typeId(typeId),
-                fieldIds(),
-                fields()
-            {
-                // No-op.
-            }
-
-            BinaryTypeSnapshot::BinaryTypeSnapshot(const BinaryTypeSnapshot& another) :
-                typeName(another.typeName),
-                affFieldName(another.affFieldName),
-                typeId(another.typeId),
-                fieldIds(another.fieldIds),
-                fields(another.fields)
-            {
-                // No-op.
-            }
-
-            IGNITE_IMPORT_EXPORT void BinaryTypeSnapshot::AddField(int32_t fieldId, const std::string& fieldName, int32_t fieldTypeId)
-            {
-                fieldIds.insert(fieldId);
-                fields[fieldName] = BinaryFieldMeta(fieldTypeId, fieldId);
-            }
-
-            void BinaryTypeSnapshot::CopyFieldsFrom(const BinaryTypeSnapshot* another)
-            {
-                if (another && another->HasFields())
-                {
-                    fieldIds.insert(another->fieldIds.begin(), another->fieldIds.end());
-                    fields.insert(another->fields.begin(), another->fields.end());
-                }
-            }
-        }
-    }
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace binary {
+IGNITE_IMPORT_EXPORT BinaryTypeSnapshot::BinaryTypeSnapshot(
+    const std::string& typeName, const std::string& affFieldName,
+    int32_t typeId)
+    : typeName(typeName),
+      affFieldName(affFieldName),
+      typeId(typeId),
+      fieldIds(),
+      fields() {
+  // No-op.
 }
+
+BinaryTypeSnapshot::BinaryTypeSnapshot(const BinaryTypeSnapshot& another)
+    : typeName(another.typeName),
+      affFieldName(another.affFieldName),
+      typeId(another.typeId),
+      fieldIds(another.fieldIds),
+      fields(another.fields) {
+  // No-op.
+}
+
+IGNITE_IMPORT_EXPORT void BinaryTypeSnapshot::AddField(
+    int32_t fieldId, const std::string& fieldName, int32_t fieldTypeId) {
+  fieldIds.insert(fieldId);
+  fields[fieldName] = BinaryFieldMeta(fieldTypeId, fieldId);
+}
+
+void BinaryTypeSnapshot::CopyFieldsFrom(const BinaryTypeSnapshot* another) {
+  if (another && another->HasFields()) {
+    fieldIds.insert(another->fieldIds.begin(), another->fieldIds.end());
+    fields.insert(another->fields.begin(), another->fields.end());
+  }
+}
+}  // namespace binary
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite

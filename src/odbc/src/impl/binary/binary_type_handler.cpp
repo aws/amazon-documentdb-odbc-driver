@@ -15,33 +15,28 @@
  * limitations under the License.
  */
 
-#include "ignite/impl/binary/binary_type_handler.h"
+#include "ignite/odbc/impl/binary/binary_type_handler.h"
 
 using namespace ignite::common::concurrent;
 
-namespace ignite
-{    
-    namespace impl
-    {
-        namespace binary
-        {
-            BinaryTypeHandler::BinaryTypeHandler(SPSnap snap) :
-                origin(snap),
-                updated()
-            {
-                // No-op.
-            }
-
-            void BinaryTypeHandler::OnFieldWritten(int32_t fieldId, std::string fieldName, int32_t fieldTypeId)
-            {
-                if (!origin.Get() || !origin.Get()->ContainsFieldId(fieldId))
-                {
-                    if (!updated.Get())
-                        updated = SPSnap(new Snap(*origin.Get()));
-
-                    updated.Get()->AddField(fieldId, fieldName, fieldTypeId);
-                }
-            }
-        }
-    }
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace binary {
+BinaryTypeHandler::BinaryTypeHandler(SPSnap snap) : origin(snap), updated() {
+  // No-op.
 }
+
+void BinaryTypeHandler::OnFieldWritten(int32_t fieldId, std::string fieldName,
+                                       int32_t fieldTypeId) {
+  if (!origin.Get() || !origin.Get()->ContainsFieldId(fieldId)) {
+    if (!updated.Get())
+      updated = SPSnap(new Snap(*origin.Get()));
+
+    updated.Get()->AddField(fieldId, fieldName, fieldTypeId);
+  }
+}
+}  // namespace binary
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite

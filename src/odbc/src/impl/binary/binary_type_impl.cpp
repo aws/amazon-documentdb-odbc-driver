@@ -15,47 +15,41 @@
  * limitations under the License.
  */
 
-#include <cstring>
-
 #include <ignite/binary/binary_reader.h>
 #include <ignite/binary/binary_writer.h>
-#include <ignite/impl/binary/binary_type_impl.h>
+#include <ignite/odbc/impl/binary/binary_type_impl.h>
 
-namespace ignite
-{
-    namespace binary
-    {
-        int32_t BinaryType<IgniteError>::GetTypeId()
-        {
-            return GetBinaryStringHashCode("IgniteError");
-        }
+#include <cstring>
 
-        int32_t BinaryType<IgniteError>::GetFieldId(const char* name)
-        {
-            return GetBinaryStringHashCode(name);
-        }
-
-        void BinaryType<IgniteError>::GetNull(IgniteError& dst)
-        {
-            dst = IgniteError(0, 0);
-        }
-
-        void BinaryType<IgniteError>::Write(BinaryWriter& writer, const IgniteError& obj)
-        {
-            BinaryRawWriter raw = writer.RawWriter();
-
-            raw.WriteInt32(obj.GetCode());
-            raw.WriteString(obj.GetText(), static_cast<int32_t>(strlen(obj.GetText())));
-        }
-
-        void BinaryType<IgniteError>::Read(BinaryReader& reader, IgniteError& dst)
-        {
-            BinaryRawReader raw = reader.RawReader();
-
-            int32_t code = raw.ReadInt32();
-            std::string msg = raw.ReadObject<std::string>();
-
-            dst = IgniteError(code, msg.c_str());
-        }
-    }
+namespace ignite {
+namespace binary {
+int32_t BinaryType< IgniteError >::GetTypeId() {
+  return GetBinaryStringHashCode("IgniteError");
 }
+
+int32_t BinaryType< IgniteError >::GetFieldId(const char* name) {
+  return GetBinaryStringHashCode(name);
+}
+
+void BinaryType< IgniteError >::GetNull(IgniteError& dst) {
+  dst = IgniteError(0, 0);
+}
+
+void BinaryType< IgniteError >::Write(BinaryWriter& writer,
+                                      const IgniteError& obj) {
+  BinaryRawWriter raw = writer.RawWriter();
+
+  raw.WriteInt32(obj.GetCode());
+  raw.WriteString(obj.GetText(), static_cast< int32_t >(strlen(obj.GetText())));
+}
+
+void BinaryType< IgniteError >::Read(BinaryReader& reader, IgniteError& dst) {
+  BinaryRawReader raw = reader.RawReader();
+
+  int32_t code = raw.ReadInt32();
+  std::string msg = raw.ReadObject< std::string >();
+
+  dst = IgniteError(code, msg.c_str());
+}
+}  // namespace binary
+}  // namespace ignite

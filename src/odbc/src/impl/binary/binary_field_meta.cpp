@@ -15,28 +15,26 @@
  * limitations under the License.
  */
 
- #include <ignite/binary/binary_raw_reader.h>
- #include <ignite/binary/binary_raw_writer.h>
+#include <ignite/binary/binary_raw_reader.h>
+#include <ignite/binary/binary_raw_writer.h>
+#include <ignite/odbc/impl/binary/binary_field_meta.h>
 
-#include <ignite/impl/binary/binary_field_meta.h>
-
-namespace ignite
-{
-    namespace impl
-    {
-        namespace binary
-        {
-            IGNITE_IMPORT_EXPORT void BinaryFieldMeta::Write(ignite::binary::BinaryRawWriter& writer) const
-            {
-                writer.WriteInt32(typeId);
-                writer.WriteInt32(fieldId);
-            }
-
-            IGNITE_IMPORT_EXPORT void BinaryFieldMeta::Read(ignite::binary::BinaryRawReader& reader)
-            {
-                typeId = reader.ReadInt32();
-                fieldId = reader.ReadInt32();
-            }
-        }
-    }
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace binary {
+IGNITE_IMPORT_EXPORT void BinaryFieldMeta::Write(
+    ignite::binary::BinaryRawWriter& writer) const {
+  writer.WriteInt32(typeId);
+  writer.WriteInt32(fieldId);
 }
+
+IGNITE_IMPORT_EXPORT void BinaryFieldMeta::Read(
+    ignite::binary::BinaryRawReader& reader) {
+  typeId = reader.ReadInt32();
+  fieldId = reader.ReadInt32();
+}
+}  // namespace binary
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite
