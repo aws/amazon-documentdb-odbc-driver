@@ -481,7 +481,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
   }
 }
 
-// note: might need to add some values to test in the future?
+// todo note: might need to add some values to test in the future?
 BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
   PrepareContext();
   BOOST_REQUIRE(_ctx.Get() != nullptr);

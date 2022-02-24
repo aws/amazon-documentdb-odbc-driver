@@ -238,7 +238,7 @@ int16_t BinaryTypeNullability(int16_t binaryType);
  *         zero-length string if it is not known whether the
  *         column accepts NULL values.
  */
-const std::string NullabiltyToIsNullable(int16_t nullability);
+std::string NullabilityToIsNullable(int16_t nullability);
 
 /**
  * Get SQL type display size.

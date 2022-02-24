@@ -74,7 +74,7 @@ namespace ignite
             /** Type: optimized marshaller. */
             const int8_t IGNITE_TYPE_OPTM_MARSH = -2;
 
-            // DocumentDB JDBC types. 
+            // JDBC types. 
 
             /** Type: bit. */
             const int16_t JDBC_TYPE_BIT = -7;

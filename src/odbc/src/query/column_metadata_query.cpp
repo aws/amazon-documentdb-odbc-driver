@@ -324,7 +324,7 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
 
     case ResultColumn::IS_NULLABLE: {
       buffer.PutString(
-          type_traits::NullabiltyToIsNullable(currentColumn.GetNullability()));
+          type_traits::NullabilityToIsNullable(currentColumn.GetNullability()));
       break;
     }
 

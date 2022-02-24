@@ -469,7 +469,7 @@ int16_t BinaryTypeNullability(int16_t) {
   return SQL_NULLABLE_UNKNOWN;
 }
 
-const std::string NullabiltyToIsNullable(int16_t nullability) {
+std::string NullabilityToIsNullable(int16_t nullability) {
   switch (nullability) {
     case SQL_NO_NULLS:
       return "NO";
