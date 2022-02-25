@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include <ignite/ignite_error.h>
+#include <ignite/odbc/ignite_error.h>
 #include <ignite/odbc/impl/binary/binary_object_header.h>
 #include <ignite/odbc/impl/binary/binary_utils.h>
 
