@@ -280,7 +280,7 @@ void BinaryWriterImpl::WriteGuidArray(const char* fieldName, const Guid* val,
     stream->WriteInt32(len);
 
     for (int i = 0; i < len; i++)
-      WriteTopObject0< ignite::binary::BinaryWriter >(val[i]);
+      WriteTopObject0< ignite::odbc::binary::BinaryWriter >(val[i]);
   } else {
     stream->WriteInt8(IGNITE_HDR_NULL);
   }
@@ -334,7 +334,7 @@ void BinaryWriterImpl::WriteDateArray(const char* fieldName, const Date* val,
     stream->WriteInt32(len);
 
     for (int i = 0; i < len; i++)
-      WriteTopObject0< ignite::binary::BinaryWriter >(val[i]);
+      WriteTopObject0< ignite::odbc::binary::BinaryWriter >(val[i]);
   } else
     stream->WriteInt8(IGNITE_HDR_NULL);
 }
@@ -390,7 +390,7 @@ void BinaryWriterImpl::WriteTimestampArray(const char* fieldName,
     stream->WriteInt32(len);
 
     for (int i = 0; i < len; i++)
-      WriteTopObject0< ignite::binary::BinaryWriter >(val[i]);
+      WriteTopObject0< ignite::odbc::binary::BinaryWriter >(val[i]);
   } else
     stream->WriteInt8(IGNITE_HDR_NULL);
 }
@@ -443,7 +443,7 @@ void BinaryWriterImpl::WriteTimeArray(const char* fieldName, const Time* val,
     stream->WriteInt32(len);
 
     for (int i = 0; i < len; i++)
-      WriteTopObject0< ignite::binary::BinaryWriter >(val[i]);
+      WriteTopObject0< ignite::odbc::binary::BinaryWriter >(val[i]);
   } else
     stream->WriteInt8(IGNITE_HDR_NULL);
 }
@@ -591,7 +591,7 @@ int32_t BinaryWriterImpl::WriteCollection(const char* fieldName,
   return elemId;
 }
 
-int32_t BinaryWriterImpl::WriteMap(ignite::binary::MapType::Type typ) {
+int32_t BinaryWriterImpl::WriteMap(ignite::odbc::binary::MapType::Type typ) {
   StartContainerSession(true);
 
   stream->WriteInt8(IGNITE_TYPE_MAP);
@@ -602,7 +602,7 @@ int32_t BinaryWriterImpl::WriteMap(ignite::binary::MapType::Type typ) {
 }
 
 int32_t BinaryWriterImpl::WriteMap(const char* fieldName,
-                                   ignite::binary::MapType::Type typ) {
+                                   ignite::odbc::binary::MapType::Type typ) {
   StartContainerSession(false);
 
   WriteFieldId(fieldName, IGNITE_TYPE_MAP);
@@ -746,80 +746,80 @@ void BinaryWriterImpl::WriteFieldId(const char* fieldName,
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, int8_t >(
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, int8_t >(
     const int8_t& obj) {
   WriteTopObject0< int8_t >(obj, BinaryUtils::WriteInt8, IGNITE_TYPE_BYTE);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, bool >(
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, bool >(
     const bool& obj) {
   WriteTopObject0< bool >(obj, BinaryUtils::WriteBool, IGNITE_TYPE_BOOL);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, int16_t >(
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, int16_t >(
     const int16_t& obj) {
   WriteTopObject0< int16_t >(obj, BinaryUtils::WriteInt16, IGNITE_TYPE_SHORT);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter,
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
                                         uint16_t >(const uint16_t& obj) {
   WriteTopObject0< uint16_t >(obj, BinaryUtils::WriteUInt16, IGNITE_TYPE_CHAR);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, int32_t >(
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, int32_t >(
     const int32_t& obj) {
   WriteTopObject0< int32_t >(obj, BinaryUtils::WriteInt32, IGNITE_TYPE_INT);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, int64_t >(
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, int64_t >(
     const int64_t& obj) {
   WriteTopObject0< int64_t >(obj, BinaryUtils::WriteInt64, IGNITE_TYPE_LONG);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, float >(
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, float >(
     const float& obj) {
   WriteTopObject0< float >(obj, BinaryUtils::WriteFloat, IGNITE_TYPE_FLOAT);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, double >(
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, double >(
     const double& obj) {
   WriteTopObject0< double >(obj, BinaryUtils::WriteDouble, IGNITE_TYPE_DOUBLE);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, Guid >(
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, Guid >(
     const Guid& obj) {
   WriteTopObject0< Guid >(obj, BinaryUtils::WriteGuid, IGNITE_TYPE_UUID);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, Date >(
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, Date >(
     const Date& obj) {
   WriteTopObject0< Date >(obj, BinaryUtils::WriteDate, IGNITE_TYPE_DATE);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter,
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
                                         Timestamp >(const Timestamp& obj) {
   WriteTopObject0< Timestamp >(obj, BinaryUtils::WriteTimestamp,
                                IGNITE_TYPE_TIMESTAMP);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, Time >(
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, Time >(
     const Time& obj) {
   WriteTopObject0< Time >(obj, BinaryUtils::WriteTime, IGNITE_TYPE_TIME);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter,
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
                                         std::string >(const std::string& obj) {
   const char* obj0 = obj.c_str();
 

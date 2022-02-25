@@ -17,7 +17,7 @@
 
 /**
  * @file
- * Declares ignite::binary::BinaryObject class.
+ * Declares ignite::odbc::binary::BinaryObject class.
  */
 
 #ifndef _IGNITE_ODBC_IMPL_BINARY_BINARY_OBJECT_IMPL
@@ -107,11 +107,11 @@ class IGNITE_IMPORT_EXPORT BinaryObjectImpl {
   template < typename T >
   T Deserialize() const {
     int32_t actualTypeId = GetTypeId();
-    int32_t requestedTypeId = ignite::binary::BinaryType< T >::GetTypeId();
+    int32_t requestedTypeId = ignite::odbc::binary::BinaryType< T >::GetTypeId();
 
     if (requestedTypeId != actualTypeId) {
       IGNITE_ERROR_FORMATTED_3(
-          ignite::IgniteError::IGNITE_ERR_BINARY,
+          ignite::odbc::IgniteError::IGNITE_ERR_BINARY,
           "Trying to deserialize binary object to a different type", "memPtr",
           mem->PointerLong(), "actualTypeId", actualTypeId, "requestedTypeId",
           requestedTypeId);
