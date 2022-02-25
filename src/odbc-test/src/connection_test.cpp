@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestoreMiscOptionsSet) {
 
 BOOST_AUTO_TEST_CASE(TestConnectionIncompleteBasicProperties) {
   std::string connectionString =
-      "DRIVER={Apache Ignite};"
+      "DRIVER={Amazon DocumentDB};"
       "HOSTNAME=localhost;"
       "USER=user;"
       "PASSWORD=password;";
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(TestConnectionIncompleteBasicProperties) {
 
 BOOST_AUTO_TEST_CASE(TestConnectionIncompleteSSHTunnelProperties) {
   std::string connectionString =
-      "DRIVER={Apache Ignite};"
+      "DRIVER={Amazon DocumentDB};"
       "HOSTNAME=host.com;"
       "DATABASE=test;"
       "USER=user;"
