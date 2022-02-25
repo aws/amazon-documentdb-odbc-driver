@@ -15,69 +15,58 @@
  * limitations under the License.
  */
 
-#include "ignite/time.h"
+#include "ignite/odbc/time.h"
 
-namespace ignite
-{
-    Time::Time() : milliseconds(0)
-    {
-        // No-op.
-    }
-
-    Time::Time(const Time& another) : milliseconds(another.milliseconds)
-    {
-        // No-op.
-    }
-
-    Time::Time(int64_t ms) : milliseconds(ms)
-    {
-        // No-op.
-    }
-
-    Time& Time::operator=(const Time& another)
-    {
-        milliseconds = another.milliseconds;
-
-        return *this;
-    }
-
-    int64_t Time::GetMilliseconds() const
-    {
-        return milliseconds;
-    }
-
-    int64_t Time::GetSeconds() const
-    {
-        return milliseconds / 1000;
-    }
-
-    bool operator==(const Time& val1, const Time& val2)
-    {
-        return val1.milliseconds == val2.milliseconds;
-    }
-
-    bool operator!=(const Time& val1, const Time& val2)
-    {
-        return val1.milliseconds != val2.milliseconds;
-    }
-
-    bool operator<(const Time& val1, const Time& val2)
-    {
-        return val1.milliseconds < val2.milliseconds;
-    }
-
-    bool operator<=(const Time& val1, const Time& val2)
-    {
-        return val1.milliseconds <= val2.milliseconds;
-    }
-
-    bool operator>(const Time& val1, const Time& val2)
-    {
-        return val1.milliseconds > val2.milliseconds;
-    }
-
-    bool operator>=(const Time& val1, const Time& val2)
-    {
-        return val1.milliseconds >= val2.milliseconds;
-    }
+namespace ignite {
+namespace odbc {
+Time::Time() : milliseconds(0) {
+  // No-op.
 }
+
+Time::Time(const Time& another) : milliseconds(another.milliseconds) {
+  // No-op.
+}
+
+Time::Time(int64_t ms) : milliseconds(ms) {
+  // No-op.
+}
+
+Time& Time::operator=(const Time& another) {
+  milliseconds = another.milliseconds;
+
+  return *this;
+}
+
+int64_t Time::GetMilliseconds() const {
+  return milliseconds;
+}
+
+int64_t Time::GetSeconds() const {
+  return milliseconds / 1000;
+}
+
+bool operator==(const Time& val1, const Time& val2) {
+  return val1.milliseconds == val2.milliseconds;
+}
+
+bool operator!=(const Time& val1, const Time& val2) {
+  return val1.milliseconds != val2.milliseconds;
+}
+
+bool operator<(const Time& val1, const Time& val2) {
+  return val1.milliseconds < val2.milliseconds;
+}
+
+bool operator<=(const Time& val1, const Time& val2) {
+  return val1.milliseconds <= val2.milliseconds;
+}
+
+bool operator>(const Time& val1, const Time& val2) {
+  return val1.milliseconds > val2.milliseconds;
+}
+
+bool operator>=(const Time& val1, const Time& val2) {
+  return val1.milliseconds >= val2.milliseconds;
+}
+}  // namespace odbc
+}  // namespace ignite

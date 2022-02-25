@@ -15,69 +15,58 @@
  * limitations under the License.
  */
 
-#include "ignite/date.h"
+#include "ignite/odbc/date.h"
 
-namespace ignite
-{
-    Date::Date() : milliseconds(0)
-    {
-        // No-op.
-    }
-
-    Date::Date(const Date& another) : milliseconds(another.milliseconds)
-    {
-        // No-op.
-    }
-
-    Date::Date(int64_t ms) : milliseconds(ms)
-    {
-        // No-op.
-    }
-
-    Date& Date::operator=(const Date& another)
-    {
-        milliseconds = another.milliseconds;
-
-        return *this;
-    }
-
-    int64_t Date::GetMilliseconds() const
-    {
-        return milliseconds;
-    }
-
-    int64_t Date::GetSeconds() const
-    {
-        return milliseconds / 1000;
-    }
-
-    bool operator==(const Date& val1, const Date& val2)
-    {
-        return val1.milliseconds == val2.milliseconds;
-    }
-
-    bool operator!=(const Date& val1, const Date& val2)
-    {
-        return val1.milliseconds != val2.milliseconds;
-    }
-
-    bool operator<(const Date& val1, const Date& val2)
-    {
-        return val1.milliseconds < val2.milliseconds;
-    }
-
-    bool operator<=(const Date& val1, const Date& val2)
-    {
-        return val1.milliseconds <= val2.milliseconds;
-    }
-
-    bool operator>(const Date& val1, const Date& val2)
-    {
-        return val1.milliseconds > val2.milliseconds;
-    }
-
-    bool operator>=(const Date& val1, const Date& val2)
-    {
-        return val1.milliseconds >= val2.milliseconds;
-    }
+namespace ignite {
+namespace odbc {
+Date::Date() : milliseconds(0) {
+  // No-op.
 }
+
+Date::Date(const Date& another) : milliseconds(another.milliseconds) {
+  // No-op.
+}
+
+Date::Date(int64_t ms) : milliseconds(ms) {
+  // No-op.
+}
+
+Date& Date::operator=(const Date& another) {
+  milliseconds = another.milliseconds;
+
+  return *this;
+}
+
+int64_t Date::GetMilliseconds() const {
+  return milliseconds;
+}
+
+int64_t Date::GetSeconds() const {
+  return milliseconds / 1000;
+}
+
+bool operator==(const Date& val1, const Date& val2) {
+  return val1.milliseconds == val2.milliseconds;
+}
+
+bool operator!=(const Date& val1, const Date& val2) {
+  return val1.milliseconds != val2.milliseconds;
+}
+
+bool operator<(const Date& val1, const Date& val2) {
+  return val1.milliseconds < val2.milliseconds;
+}
+
+bool operator<=(const Date& val1, const Date& val2) {
+  return val1.milliseconds <= val2.milliseconds;
+}
+
+bool operator>(const Date& val1, const Date& val2) {
+  return val1.milliseconds > val2.milliseconds;
+}
+
+bool operator>=(const Date& val1, const Date& val2) {
+  return val1.milliseconds >= val2.milliseconds;
+}
+}  // namespace odbc
+}  // namespace ignite

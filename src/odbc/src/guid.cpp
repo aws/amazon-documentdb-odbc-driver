@@ -15,84 +15,72 @@
  * limitations under the License.
  */
 
-#include "ignite/guid.h"
+#include "ignite/odbc/guid.h"
 
-namespace ignite
-{
-    Guid::Guid() : most(0), least(0)
-    {
-        // No-op.
-    }
-
-    Guid::Guid(int64_t most, int64_t least) : most(most), least(least)
-    {
-        // No-op.
-    }
-
-    int64_t Guid::GetMostSignificantBits() const
-    {
-        return most;
-    }
-
-    int64_t Guid::GetLeastSignificantBits() const
-    {
-        return least;
-    }
-
-    int32_t Guid::GetVersion() const
-    {
-        return static_cast<int32_t>((most >> 12) & 0x0f);
-    }
-
-    int32_t Guid::GetVariant() const
-    {
-        uint64_t least0 = static_cast<uint64_t>(least);
-
-        return static_cast<int32_t>((least0 >> (64 - (least0 >> 62))) & (least >> 63));
-    }
-
-    int32_t Guid::GetHashCode() const
-    {
-        int64_t hilo = most ^ least;
-
-        return static_cast<int32_t>(hilo >> 32) ^ static_cast<int32_t>(hilo);
-    }
-
-    int64_t Guid::Compare(const Guid& other) const
-    {
-        if (most != other.most)
-            return most - other.most;
-
-        return least - other.least;
-    }
-    
-    bool operator==(const Guid& val1, const Guid& val2)
-    {
-        return val1.Compare(val2) == 0;
-    }
-
-    bool operator!=(const Guid& val1, const Guid& val2)
-    {
-        return val1.Compare(val2) != 0;
-    }
-
-    bool operator<(const Guid& val1, const Guid& val2)
-    {
-        return val1.Compare(val2) < 0;
-    }
-
-    bool operator<=(const Guid& val1, const Guid& val2)
-    {
-        return val1.Compare(val2) <= 0;
-    }
-
-    bool operator>(const Guid& val1, const Guid& val2)
-    {
-        return val1.Compare(val2) > 0;
-    }
-
-    bool operator>=(const Guid& val1, const Guid& val2)
-    {
-        return val1.Compare(val2) >= 0;
-    }
+namespace ignite {
+namespace odbc {
+Guid::Guid() : most(0), least(0) {
+  // No-op.
 }
+
+Guid::Guid(int64_t most, int64_t least) : most(most), least(least) {
+  // No-op.
+}
+
+int64_t Guid::GetMostSignificantBits() const {
+  return most;
+}
+
+int64_t Guid::GetLeastSignificantBits() const {
+  return least;
+}
+
+int32_t Guid::GetVersion() const {
+  return static_cast< int32_t >((most >> 12) & 0x0f);
+}
+
+int32_t Guid::GetVariant() const {
+  uint64_t least0 = static_cast< uint64_t >(least);
+
+  return static_cast< int32_t >((least0 >> (64 - (least0 >> 62)))
+                                & (least >> 63));
+}
+
+int32_t Guid::GetHashCode() const {
+  int64_t hilo = most ^ least;
+
+  return static_cast< int32_t >(hilo >> 32) ^ static_cast< int32_t >(hilo);
+}
+
+int64_t Guid::Compare(const Guid& other) const {
+  if (most != other.most)
+    return most - other.most;
+
+  return least - other.least;
+}
+
+bool operator==(const Guid& val1, const Guid& val2) {
+  return val1.Compare(val2) == 0;
+}
+
+bool operator!=(const Guid& val1, const Guid& val2) {
+  return val1.Compare(val2) != 0;
+}
+
+bool operator<(const Guid& val1, const Guid& val2) {
+  return val1.Compare(val2) < 0;
+}
+
+bool operator<=(const Guid& val1, const Guid& val2) {
+  return val1.Compare(val2) <= 0;
+}
+
+bool operator>(const Guid& val1, const Guid& val2) {
+  return val1.Compare(val2) > 0;
+}
+
+bool operator>=(const Guid& val1, const Guid& val2) {
+  return val1.Compare(val2) >= 0;
+}
+}  // namespace odbc
+}  // namespace ignite
