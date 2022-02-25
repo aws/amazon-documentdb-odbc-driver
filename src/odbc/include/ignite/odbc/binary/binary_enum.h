@@ -21,184 +21,170 @@
  * to declare enum type specialization for user types.
  */
 
-#ifndef _IGNITE_BINARY_BINARY_ENUM
-#define _IGNITE_BINARY_BINARY_ENUM
+#ifndef _IGNITE_ODBC_BINARY_BINARY_ENUM
+#define _IGNITE_ODBC_BINARY_BINARY_ENUM
 
+#include <ignite/odbc/binary/binary_type.h>
+#include <ignite/odbc/common/common.h>
 #include <stdint.h>
 
-#include <ignite/common/common.h>
+namespace ignite {
+namespace odbc {
+namespace binary {
+/**
+ * Binary enum structure. Defines a set of functions required for enum type to
+ * be serialized and deserialized.
+ *
+ * Methods that should be defined:
+ *   static void GetTypeName(std::string& dst) - should place type name in @c
+ * dst parameter. This method should always return the same value. static
+ * int32_t GetTypeId() - should return Type ID. static int32_t GetOrdinal(T) -
+ * should return ordinal value for enum value. static T FromOrdinal(int32_t) -
+ * should return enum value for a given ordinal value. static bool IsNull(const
+ * T&) - check whether passed enum object should be interpreted as NULL. static
+ * void GetNull(T&) - get NULL value for the given enum type.
+ *
+ * It is recommended to use BinaryEnumDefault as a base class for default
+ * implementation of GetTypeId(), GetOrdinal() and FromOrdinal() methods for
+ * plain enum types. In this case, only GetTypeName() should be implemented by a
+ * user directly.
+ */
+template < typename T >
+struct BinaryEnum {};
 
-#include <ignite/binary/binary_type.h>
+/**
+ * Default implementations of BinaryEnum.
+ */
+template < typename T >
+struct BinaryEnumDefault {
+  /**
+   * Get type ID for the enum type.
+   *
+   * @return Type ID.
+   */
+  static int32_t GetTypeId() {
+    std::string typeName;
+    BinaryEnum< T >::GetTypeName(typeName);
 
-namespace ignite
-{
-    namespace binary
-    {
-        /**
-         * Binary enum structure. Defines a set of functions required for enum type to be serialized and deserialized.
-         *
-         * Methods that should be defined:
-         *   static void GetTypeName(std::string& dst) - should place type name in @c dst parameter. This method should
-         *     always return the same value.
-         *   static int32_t GetTypeId() - should return Type ID.
-         *   static int32_t GetOrdinal(T) - should return ordinal value for enum value.
-         *   static T FromOrdinal(int32_t) - should return enum value for a given ordinal value.
-         *   static bool IsNull(const T&) - check whether passed enum object should be interpreted as NULL.
-         *   static void GetNull(T&) - get NULL value for the given enum type.
-         *
-         * It is recommended to use BinaryEnumDefault as a base class for default implementation of GetTypeId(),
-         * GetOrdinal() and FromOrdinal() methods for plain enum types. In this case, only GetTypeName() should be
-         * implemented by a user directly.
-         */
-        template<typename T>
-        struct BinaryEnum { };
+    return GetBinaryStringHashCode(typeName.c_str());
+  }
 
-        /**
-         * Default implementations of BinaryEnum.
-         */
-        template<typename T>
-        struct BinaryEnumDefault
-        {
-            /**
-             * Get type ID for the enum type.
-             *
-             * @return Type ID.
-             */
-            static int32_t GetTypeId()
-            {
-                std::string typeName;
-                BinaryEnum<T>::GetTypeName(typeName);
+  /**
+   * Get enum type ordinal.
+   *
+   * @return Ordinal of the enum type.
+   */
+  static int32_t GetOrdinal(T value) {
+    return static_cast< int32_t >(value);
+  }
 
-                return GetBinaryStringHashCode(typeName.c_str());
-            }
+  /**
+   * Get enum value for the given ordinal value.
+   *
+   * @param ordinal Ordinal value of the enum.
+   */
+  static T FromOrdinal(int32_t ordinal) {
+    return static_cast< T >(ordinal);
+  }
+};
 
-            /**
-             * Get enum type ordinal.
-             *
-             * @return Ordinal of the enum type.
-             */
-            static int32_t GetOrdinal(T value)
-            {
-                return static_cast<int32_t>(value);
-            }
+/**
+ * Implementations of BinaryEnum nullability when INT32_MIN ordinal value used
+ * as a NULL indicator.
+ */
+template < typename T >
+struct BinaryEnumIntMinNull {
+  /**
+   * Check whether passed binary object should be interpreted as NULL.
+   *
+   * @return True if binary object should be interpreted as NULL.
+   */
+  static bool IsNull(const T& val) {
+    return val == BinaryEnum< T >::FromOrdinal(INT32_MIN);
+  }
 
-            /**
-             * Get enum value for the given ordinal value.
-             *
-             * @param ordinal Ordinal value of the enum.
-             */
-            static T FromOrdinal(int32_t ordinal)
-            {
-                return static_cast<T>(ordinal);
-            }
-        };
+  /**
+   * Get NULL value for the given binary type.
+   *
+   * @param dst Null value for the type.
+   */
+  static void GetNull(T& dst) {
+    dst = BinaryEnum< T >::FromOrdinal(INT32_MIN);
+  }
+};
 
-        /**
-         * Implementations of BinaryEnum nullability when INT32_MIN ordinal value used as a NULL indicator.
-         */
-        template<typename T>
-        struct BinaryEnumIntMinNull
-        {
-            /**
-             * Check whether passed binary object should be interpreted as NULL.
-             *
-             * @return True if binary object should be interpreted as NULL.
-             */
-            static bool IsNull(const T& val)
-            {
-                return val == BinaryEnum<T>::FromOrdinal(INT32_MIN);
-            }
+/**
+ * Default implementations of BinaryType hashing functions and non-null type
+ * behaviour.
+ */
+template < typename T >
+struct BinaryEnumDefaultAll : BinaryEnumDefault< T >,
+                              BinaryEnumIntMinNull< T > {};
 
-            /**
-             * Get NULL value for the given binary type.
-             *
-             * @param dst Null value for the type.
-             */
-            static void GetNull(T& dst)
-            {
-                dst = BinaryEnum<T>::FromOrdinal(INT32_MIN);
-            }
-        };
+/**
+ * BinaryEnum template specialization for pointers.
+ */
+template < typename T >
+struct BinaryEnum< T* > {
+  /** Actual type. */
+  typedef BinaryEnum< T > BinaryEnumDereferenced;
 
-        /**
-         * Default implementations of BinaryType hashing functions and non-null type behaviour.
-         */
-        template<typename T>
-        struct BinaryEnumDefaultAll :
-            BinaryEnumDefault<T>,
-            BinaryEnumIntMinNull<T> { };
+  /**
+   * Get binary object type ID.
+   *
+   * @return Type ID.
+   */
+  static int32_t GetTypeId() {
+    return BinaryEnumDereferenced::GetTypeId();
+  }
 
-        /**
-         * BinaryEnum template specialization for pointers.
-         */
-        template <typename T>
-        struct BinaryEnum<T*>
-        {
-            /** Actual type. */
-            typedef BinaryEnum<T> BinaryEnumDereferenced;
+  /**
+   * Get binary object type name.
+   *
+   * @param dst Output type name.
+   */
+  static void GetTypeName(std::string& dst) {
+    BinaryEnumDereferenced::GetTypeName(dst);
+  }
 
-            /**
-             * Get binary object type ID.
-             *
-             * @return Type ID.
-             */
-            static int32_t GetTypeId()
-            {
-                return BinaryEnumDereferenced::GetTypeId();
-            }
+  /**
+   * Get enum type ordinal.
+   *
+   * @return Ordinal of the enum type.
+   */
+  static int32_t GetOrdinal(T* value) {
+    return BinaryEnumDereferenced::GetOrdinal(*value);
+  }
 
-            /**
-             * Get binary object type name.
-             *
-             * @param dst Output type name.
-             */
-            static void GetTypeName(std::string& dst)
-            {
-                BinaryEnumDereferenced::GetTypeName(dst);
-            }
+  /**
+   * Get enum value for the given ordinal value.
+   *
+   * @param ordinal Ordinal value of the enum.
+   */
+  static T* FromOrdinal(int32_t ordinal) {
+    return new T(BinaryEnumDereferenced::FromOrdinal(ordinal));
+  }
 
-            /**
-             * Get enum type ordinal.
-             *
-             * @return Ordinal of the enum type.
-             */
-            static int32_t GetOrdinal(T* value)
-            {
-                return BinaryEnumDereferenced::GetOrdinal(*value);
-            }
+  /**
+   * Check whether passed enum should be interpreted as NULL.
+   *
+   * @param obj Enum value to test.
+   * @return True if enum value should be interpreted as NULL.
+   */
+  static bool IsNull(T* const& obj) {
+    return !obj || BinaryEnumDereferenced::IsNull(*obj);
+  }
 
-            /**
-             * Get enum value for the given ordinal value.
-             *
-             * @param ordinal Ordinal value of the enum.
-             */
-            static T* FromOrdinal(int32_t ordinal)
-            {
-                return new T(BinaryEnumDereferenced::FromOrdinal(ordinal));
-            }
-
-            /**
-             * Check whether passed enum should be interpreted as NULL.
-             *
-             * @param obj Enum value to test.
-             * @return True if enum value should be interpreted as NULL.
-             */
-            static bool IsNull(T* const& obj)
-            {
-                return !obj || BinaryEnumDereferenced::IsNull(*obj);
-            }
-
-            /**
-             * Get NULL value for the enum type.
-             *
-             * @param dst NULL value for the enum.
-             */
-            static void GetNull(T*& dst)
-            {
-                dst = 0;
-            }
-        };
-    }
-}
-
-#endif //_IGNITE_BINARY_BINARY_ENUM
+  /**
+   * Get NULL value for the enum type.
+   *
+   * @param dst NULL value for the enum.
+   */
+  static void GetNull(T*& dst) {
+    dst = 0;
+  }
+};
+}  // namespace binary
+}  // namespace odbc
+}  // namespace ignite
+#endif  //_IGNITE_ODBC_BINARY_BINARY_ENUM

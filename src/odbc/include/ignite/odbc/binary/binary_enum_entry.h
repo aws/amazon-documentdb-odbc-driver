@@ -20,88 +20,79 @@
  * Declares ignite::binary::BinaryEnumEntry class.
  */
 
-#ifndef _IGNITE_BINARY_BINARY_ENUM_ENTRY
-#define _IGNITE_BINARY_BINARY_ENUM_ENTRY
+#ifndef _IGNITE_ODBC_BINARY_BINARY_ENUM_ENTRY
+#define _IGNITE_ODBC_BINARY_BINARY_ENUM_ENTRY
 
+#include <ignite/odbc/common/common.h>
 #include <stdint.h>
 
-#include <ignite/common/common.h>
+namespace ignite {
+namespace odbc {
+namespace binary {
+/**
+ * Binary enum entry.
+ *
+ * Represents a single entry of enum in a binary form.
+ */
+class IGNITE_IMPORT_EXPORT BinaryEnumEntry {
+ public:
+  /**
+   * Default constructor.
+   */
+  BinaryEnumEntry() : typeId(0), ordinal(0) {
+    // No-op.
+  }
 
-namespace ignite
-{
-    namespace binary
-    {
-        /**
-         * Binary enum entry.
-         *
-         * Represents a single entry of enum in a binary form.
-         */
-        class IGNITE_IMPORT_EXPORT BinaryEnumEntry
-        {
-        public:
-            /**
-             * Default constructor.
-             */
-            BinaryEnumEntry() :
-                typeId(0),
-                ordinal(0)
-            {
-                // No-op.
-            }
+  /**
+   * Constructor.
+   *
+   * @param typeId Type ID of the enum.
+   * @param ordinal Ordinal of the enum value.
+   */
+  BinaryEnumEntry(int32_t typeId, int32_t ordinal)
+      : typeId(typeId), ordinal(ordinal) {
+    // No-op.
+  }
 
-            /**
-             * Constructor.
-             *
-             * @param typeId Type ID of the enum.
-             * @param ordinal Ordinal of the enum value.
-             */
-            BinaryEnumEntry(int32_t typeId, int32_t ordinal) :
-                typeId(typeId),
-                ordinal(ordinal)
-            {
-                // No-op.
-            }
+  /**
+   * Get type ID.
+   * Type ID can never equal zero. If the Type ID equals zero, the instance is
+   * not valid, and could only be acquired by manual construction or by reading
+   * NULL value.
+   *
+   * @return Type ID.
+   */
+  int32_t GetTypeId() const {
+    return typeId;
+  }
 
-            /**
-             * Get type ID.
-             * Type ID can never equal zero. If the Type ID equals zero, the instance is not valid, and could only be
-             * acquired by manual construction or by reading NULL value.
-             *
-             * @return Type ID.
-             */
-            int32_t GetTypeId() const
-            {
-                return typeId;
-            }
+  /**
+   * Get ordinal of the enum value.
+   *
+   * @return Ordinal.
+   */
+  int32_t GetOrdinal() const {
+    return ordinal;
+  }
 
-            /**
-             * Get ordinal of the enum value.
-             *
-             * @return Ordinal.
-             */
-            int32_t GetOrdinal() const
-            {
-                return ordinal;
-            }
+  /**
+   * Check whether value was acquired by reading a NULL value.
+   *
+   * @return @c true if acquired by reading a NULL value.
+   */
+  bool IsNull() const {
+    return typeId == 0;
+  }
 
-            /**
-             * Check whether value was acquired by reading a NULL value.
-             *
-             * @return @c true if acquired by reading a NULL value.
-             */
-            bool IsNull() const
-            {
-                return typeId == 0;
-            }
+ private:
+  /** Type ID. */
+  int32_t typeId;
 
-        private:
-            /** Type ID. */
-            int32_t typeId;
+  /** Ordinal value. */
+  int32_t ordinal;
+};
+}  // namespace binary
+}  // namespace odbc
+}  // namespace ignite
 
-            /** Ordinal value. */
-            int32_t ordinal;
-        };
-    }
-}
-
-#endif //_IGNITE_BINARY_BINARY_ENUM_ENTRY
+#endif  //_IGNITE_ODBC_BINARY_BINARY_ENUM_ENTRY
