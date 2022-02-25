@@ -28,8 +28,9 @@
 
 #include <string>
 
-#include "ignite/impl/binary/binary_reader_impl.h"
-#include "ignite/impl/binary/binary_writer_impl.h"
+#include "ignite/odbc/impl/binary/binary_reader_impl.h"
+#include "ignite/odbc/impl/binary/binary_writer_impl.h"
+
 
 namespace ignite {
 namespace utility {
@@ -57,7 +58,7 @@ size_t CopyStringToBuffer(const std::string& str, char* buf, size_t buflen);
  * @param reader Reader.
  * @param res Resulting vector.
  */
-void ReadByteArray(impl::binary::BinaryReaderImpl& reader,
+void ReadByteArray(odbc::impl::binary::BinaryReaderImpl& reader,
                    std::vector< int8_t >& res);
 
 /**
@@ -65,14 +66,14 @@ void ReadByteArray(impl::binary::BinaryReaderImpl& reader,
  * @param reader Reader.
  * @param str String.
  */
-void ReadString(impl::binary::BinaryReaderImpl& reader, std::string& str);
+void ReadString(odbc::impl::binary::BinaryReaderImpl& reader, std::string& str);
 
 /**
  * Write string using writer.
  * @param writer Writer.
  * @param str String.
  */
-void WriteString(impl::binary::BinaryWriterImpl& writer,
+void WriteString(odbc::impl::binary::BinaryWriterImpl& writer,
                  const std::string& str);
 
 /**
@@ -81,7 +82,7 @@ void WriteString(impl::binary::BinaryWriterImpl& writer,
  * @param reader Reader.
  * @param decimal Decimal value.
  */
-void ReadDecimal(impl::binary::BinaryReaderImpl& reader,
+void ReadDecimal(odbc::impl::binary::BinaryReaderImpl& reader,
                  odbc::common::Decimal& decimal);
 
 /**
@@ -90,7 +91,7 @@ void ReadDecimal(impl::binary::BinaryReaderImpl& reader,
  * @param writer Writer.
  * @param decimal Decimal value.
  */
-void WriteDecimal(impl::binary::BinaryWriterImpl& writer,
+void WriteDecimal(odbc::impl::binary::BinaryWriterImpl& writer,
                   const odbc::common::Decimal& decimal);
 
 /**

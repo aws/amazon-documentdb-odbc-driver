@@ -37,7 +37,7 @@ class Row {
    *
    * @param pageData Page data.
    */
-  Row(ignite::impl::interop::InteropUnpooledMemory& pageData);
+  Row(ignite::odbc::impl::interop::InteropUnpooledMemory& pageData);
 
   /**
    * Destructor.
@@ -114,13 +114,13 @@ class Row {
   int32_t size;
 
   /** Memory that contains current row data. */
-  ignite::impl::interop::InteropUnpooledMemory& pageData;
+  ignite::odbc::impl::interop::InteropUnpooledMemory& pageData;
 
   /** Page data input stream. */
-  ignite::impl::interop::InteropInputStream stream;
+  ignite::odbc::impl::interop::InteropInputStream stream;
 
   /** Data reader. */
-  ignite::impl::binary::BinaryReaderImpl reader;
+  ignite::odbc::impl::binary::BinaryReaderImpl reader;
 
   /** Columns. */
   std::vector< Column > columns;

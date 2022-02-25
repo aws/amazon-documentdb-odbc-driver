@@ -24,7 +24,7 @@ namespace {
 using namespace ignite;
 using namespace odbc;
 
-void ReadAffectedRows(impl::binary::BinaryReaderImpl& reader,
+void ReadAffectedRows(ignite::odbc::impl::binary::BinaryReaderImpl& reader,
                       const ProtocolVersion& protocolVersion,
                       std::vector< int64_t >& affectedRows) {
   affectedRows.clear();

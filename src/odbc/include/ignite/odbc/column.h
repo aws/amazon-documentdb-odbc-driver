@@ -60,7 +60,7 @@ class Column {
    *
    * @param reader Reader to be used to retrieve column data.
    */
-  Column(ignite::impl::binary::BinaryReaderImpl& reader);
+  Column(ignite::odbc::impl::binary::BinaryReaderImpl& reader);
 
   /**
    * Get column size in bytes.
@@ -79,7 +79,7 @@ class Column {
    * @return Operation result.
    */
   app::ConversionResult::Type ReadToBuffer(
-      ignite::impl::binary::BinaryReaderImpl& reader,
+      ignite::odbc::impl::binary::BinaryReaderImpl& reader,
       app::ApplicationDataBuffer& dataBuf);
 
   /**

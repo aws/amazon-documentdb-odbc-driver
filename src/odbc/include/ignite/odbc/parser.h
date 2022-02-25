@@ -18,10 +18,10 @@
 #ifndef _IGNITE_ODBC_PARSER
 #define _IGNITE_ODBC_PARSER
 
-#include <ignite/impl/binary/binary_reader_impl.h>
-#include <ignite/impl/binary/binary_writer_impl.h>
-#include <ignite/impl/interop/interop_input_stream.h>
-#include <ignite/impl/interop/interop_output_stream.h>
+#include "ignite/odbc/impl/binary/binary_reader_impl.h"
+#include "ignite/odbc/impl/binary/binary_writer_impl.h"
+#include "ignite/odbc/impl/interop/interop_input_stream.h"
+#include "ignite/odbc/impl/interop/interop_output_stream.h"
 #include <stdint.h>
 
 #include <vector>

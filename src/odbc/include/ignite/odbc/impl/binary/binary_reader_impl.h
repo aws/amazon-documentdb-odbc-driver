@@ -1545,7 +1545,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
    */
   template < typename T >
   T ReadTopObject0(const int8_t expHdr,
-                   T (*func)(ignite::impl::interop::InteropInputStream*));
+                   T (*func)(ignite::odbc::impl::interop::InteropInputStream*));
 };
 
 template <>
