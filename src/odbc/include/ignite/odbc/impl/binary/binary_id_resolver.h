@@ -20,8 +20,8 @@
 
 #include <map>
 
-#include "ignite/binary/binary_type.h"
-#include "ignite/common/concurrent.h"
+#include "ignite/odbc/binary/binary_type.h"
+#include "ignite/odbc/common/concurrent.h"
 #include "ignite/odbc/impl/binary/binary_type_handler.h"
 
 namespace ignite {

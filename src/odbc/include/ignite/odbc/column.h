@@ -18,7 +18,7 @@
 #ifndef _IGNITE_ODBC_COLUMN
 #define _IGNITE_ODBC_COLUMN
 
-#include <ignite/impl/binary/binary_reader_impl.h>
+#include <ignite/odbc/impl/binary/binary_reader_impl.h>
 #include <stdint.h>
 
 #include "ignite/odbc/app/application_data_buffer.h"
