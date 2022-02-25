@@ -33,11 +33,15 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    - name: run-cppcheck
+    - name: setup-cppcheck
       id: setup_cppcheck
       run: |
         choco install cppcheck -y
         echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
+        
+    - name: run-cppcheck
+      id: run-cppcheck
+      run: |
         .\run_cppcheck.ps1
     - name: upload-cppcheck-results
       if: failure()
@@ -134,6 +138,9 @@ jobs:
       run: |
         choco install cppcheck -y
         echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
+    - name: run-cppcheck
+      id: run-cppcheck
+      run: |
         .\run_cppcheck.ps1
     - name: upload-cppcheck-results
       if: failure()
