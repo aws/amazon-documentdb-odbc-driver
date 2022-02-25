@@ -18,7 +18,7 @@
 #ifndef _IGNITE_ODBC_IMPL_BINARY_BINARY_TYPE_HANDLER
 #define _IGNITE_ODBC_IMPL_BINARY_BINARY_TYPE_HANDLER
 
-#include <ignite/common/concurrent.h>
+#include <ignite/odbc/common/concurrent.h>
 
 #include "ignite/odbc/impl/binary/binary_type_snapshot.h"
 

@@ -18,7 +18,7 @@
 #ifndef _IGNITE_ODBC_IMPL_BINARY_BINARY_SCHEMA
 #define _IGNITE_ODBC_IMPL_BINARY_BINARY_SCHEMA
 
-#include <ignite/common/common.h>
+#include <ignite/odbc/common/common.h>
 #include <stdint.h>
 
 #include <vector>

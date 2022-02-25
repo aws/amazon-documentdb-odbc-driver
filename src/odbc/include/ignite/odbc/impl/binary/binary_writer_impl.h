@@ -18,17 +18,17 @@
 #ifndef _IGNITE_ODBC_IMPL_BINARY_BINARY_WRITER
 #define _IGNITE_ODBC_IMPL_BINARY_BINARY_WRITER
 
-#include <ignite/common/common.h>
-#include <ignite/common/concurrent.h>
+#include <ignite/odbc/common/common.h>
+#include <ignite/odbc/common/concurrent.h>
 #include <stdint.h>
 
 #include <cstring>
 #include <string>
 
-#include "ignite/binary/binary_consts.h"
-#include "ignite/binary/binary_type.h"
-#include "ignite/date.h"
-#include "ignite/guid.h"
+#include "ignite/odbc/binary/binary_consts.h"
+#include "ignite/odbc/binary/binary_type.h"
+#include "ignite/odbc/date.h"
+#include "ignite/odbc/guid.h"
 #include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/impl/binary/binary_id_resolver.h"
 #include "ignite/odbc/impl/binary/binary_object_impl.h"
@@ -36,12 +36,14 @@
 #include "ignite/odbc/impl/binary/binary_type_manager.h"
 #include "ignite/odbc/impl/binary/binary_utils.h"
 #include "ignite/odbc/impl/interop/interop_output_stream.h"
-#include "ignite/timestamp.h"
+#include "ignite/odbc/timestamp.h"
 
 namespace ignite {
+namespace odbc {
 namespace binary {
 class BinaryWriter;
 }
+}  // namespace odbc
 namespace odbc {
 namespace impl {
 namespace binary {

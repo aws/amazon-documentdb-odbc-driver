@@ -18,7 +18,7 @@
 #ifndef _IGNITE_ODBC_IMPL_BINARY_BINARY_TYPE_UPDATER
 #define _IGNITE_ODBC_IMPL_BINARY_BINARY_TYPE_UPDATER
 
-#include <ignite/ignite_error.h>
+#include <ignite/odbc/ignite_error.h>
 #include <ignite/odbc/impl/binary/binary_type_snapshot.h>
 
 namespace ignite {

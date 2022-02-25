@@ -18,7 +18,7 @@
 #ifndef _IGNITE_ODBC_IMPL_BINARY_BINARY_TYPE_MANAGER
 #define _IGNITE_ODBC_IMPL_BINARY_BINARY_TYPE_MANAGER
 
-#include <ignite/ignite_error.h>
+#include <ignite/odbc/ignite_error.h>
 
 #include <vector>
 

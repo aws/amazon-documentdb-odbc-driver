@@ -18,13 +18,13 @@
 #ifndef _IGNITE_ODBC_IMPL_BINARY_BINARY_UTILS
 #define _IGNITE_ODBC_IMPL_BINARY_BINARY_UTILS
 
-#include <ignite/binary/binary_enum_entry.h>
-#include <ignite/binary/binary_type.h>
-#include <ignite/common/utils.h>
-#include <ignite/date.h>
-#include <ignite/guid.h>
-#include <ignite/time.h>
-#include <ignite/timestamp.h>
+#include <ignite/odbc/binary/binary_enum_entry.h>
+#include <ignite/odbc/binary/binary_type.h>
+#include <ignite/odbc/common/utils.h>
+#include <ignite/odbc/date.h>
+#include <ignite/odbc/guid.h>
+#include <ignite/odbc/time.h>
+#include <ignite/odbc/timestamp.h>
 #include <stdint.h>
 
 namespace ignite {

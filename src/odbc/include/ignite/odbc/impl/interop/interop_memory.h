@@ -18,7 +18,7 @@
 #ifndef _IGNITE_ODBC_IMPL_INTEROP_INTEROP_MEMORY
 #define _IGNITE_ODBC_IMPL_INTEROP_INTEROP_MEMORY
 
-#include <ignite/common/common.h>
+#include <ignite/odbc/common/common.h>
 #include <stdint.h>
 
 namespace ignite {

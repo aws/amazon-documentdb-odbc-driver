@@ -25,20 +25,19 @@
 #include <string>
 #include <vector>
 
-// TODO -AL- copy the binary files
 #include "ignite/odbc/binary/binary_consts.h"
 #include "ignite/odbc/binary/binary_enum.h"
 #include "ignite/odbc/binary/binary_enum_entry.h"
 #include "ignite/odbc/binary/binary_type.h"
 #include "ignite/odbc/common/utils.h"
-#include "ignite/date.h"
-#include "ignite/guid.h"
+#include "ignite/odbc/date.h"
+#include "ignite/odbc/guid.h"
 #include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/impl/binary/binary_id_resolver.h"
 #include "ignite/odbc/impl/binary/binary_schema.h"
 #include "ignite/odbc/impl/interop/interop_input_stream.h"
-#include "ignite/time.h"
-#include "ignite/timestamp.h"
+#include "ignite/odbc/time.h"
+#include "ignite/odbc/timestamp.h"
 
 namespace ignite {
 namespace odbc {

@@ -18,8 +18,8 @@
 #ifndef _IGNITE_ODBC_IMPL_BINARY_BINARY_TYPE_SNAPSHOT
 #define _IGNITE_ODBC_IMPL_BINARY_BINARY_TYPE_SNAPSHOT
 
-#include <ignite/common/common.h>
-#include <ignite/common/concurrent.h>
+#include <ignite/odbc/common/common.h>
+#include <ignite/odbc/common/concurrent.h>
 #include <ignite/odbc/impl/binary/binary_field_meta.h>
 #include <stdint.h>
 
