@@ -155,7 +155,7 @@ jobs:
 
     - name: configure-and-build-driver
       run: |
-        .\build_win_debug64.ps1
+        .\build_win_release64.ps1
       env:
         OPENSSL_ROOT_DIR: '${{env.VCPKG_ROOT}}/packages/openssl_x64-windows'
 
@@ -239,7 +239,7 @@ jobs:
 
     - name: configure-and-build-driver
       run: |
-        .\build_win_release64.ps1
+        .\build_win_debug64.ps1
       env:
         OPENSSL_ROOT_DIR: '${{env.VCPKG_ROOT}}/packages/openssl_x64-windows'
 
