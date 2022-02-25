@@ -26,11 +26,11 @@
 #include <vector>
 
 // TODO -AL- copy the binary files
-#include "ignite/binary/binary_consts.h"
-#include "ignite/binary/binary_enum.h"
-#include "ignite/binary/binary_enum_entry.h"
-#include "ignite/binary/binary_type.h"
-#include "ignite/common/utils.h"
+#include "ignite/odbc/binary/binary_consts.h"
+#include "ignite/odbc/binary/binary_enum.h"
+#include "ignite/odbc/binary/binary_enum_entry.h"
+#include "ignite/odbc/binary/binary_type.h"
+#include "ignite/odbc/common/utils.h"
 #include "ignite/date.h"
 #include "ignite/guid.h"
 #include "ignite/odbc/impl/binary/binary_common.h"
