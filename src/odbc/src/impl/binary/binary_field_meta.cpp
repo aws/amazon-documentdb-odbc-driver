@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#include <ignite/binary/binary_raw_reader.h>
-#include <ignite/binary/binary_raw_writer.h>
+#include <ignite/odbc/binary/binary_raw_reader.h>
+#include <ignite/odbc/binary/binary_raw_writer.h>
 #include <ignite/odbc/impl/binary/binary_field_meta.h>
 
 namespace ignite {

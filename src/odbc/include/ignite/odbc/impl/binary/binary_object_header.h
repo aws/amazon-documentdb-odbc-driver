@@ -17,7 +17,7 @@
 
 /**
  * @file
- * Declares ignite::impl::binary::BinaryObjectHeader class.
+ * Declares ignite::odbc::impl::binary::BinaryObjectHeader class.
  */
 
 #ifndef _IGNITE_ODBC_IMPL_BINARY_BINARY_OBJECT_HEADER

@@ -20,631 +20,601 @@
  * Declares binary reader and writer types for the collections.
  */
 
-#ifndef _IGNITE_BINARY_BINARY_CONTAINERS
-#define _IGNITE_BINARY_BINARY_CONTAINERS
+#ifndef _IGNITE_ODBC_BINARY_BINARY_CONTAINERS
+#define _IGNITE_ODBC_BINARY_BINARY_CONTAINERS
 
 #include <stdint.h>
 
-#include <ignite/common/utils.h>
+#include <ignite/odbc/common/utils.h>
 
-#include "ignite/impl/binary/binary_writer_impl.h"
-#include "ignite/impl/binary/binary_reader_impl.h"
-#include "ignite/binary/binary_consts.h"
+#include "ignite/odbc/impl/binary/binary_writer_impl.h"
+#include "ignite/odbc/impl/binary/binary_reader_impl.h"
+#include "ignite/odbc/binary/binary_consts.h"
 
-namespace ignite
-{
-    namespace binary
-    {
-        /**
-         * Binary string array writer.
-         *
-         * Can be used to write array of strings one by one.
-         *
-         * Use Write() method to write array string by string, then finilize
-         * the writing by calling Close() method. Once the Close() method have
-         * been called, instance is not usable and will throw an IgniteError
-         * on any subsequent attempt to use it.
-         */
-        class IGNITE_IMPORT_EXPORT BinaryStringArrayWriter
-        {
-        public:
-            /**
-             * Constructor.
-             * Internal call. Should not be used by user.
-             *
-             * @param impl Writer implementation.
-             * @param id Identifier.
-             */
-            BinaryStringArrayWriter(impl::binary::BinaryWriterImpl* impl, int32_t id);
+namespace ignite {
+namespace odbc {
+namespace binary {
+/**
+ * Binary string array writer.
+ *
+ * Can be used to write array of strings one by one.
+ *
+ * Use Write() method to write array string by string, then finilize
+ * the writing by calling Close() method. Once the Close() method have
+ * been called, instance is not usable and will throw an IgniteError
+ * on any subsequent attempt to use it.
+ */
+class IGNITE_IMPORT_EXPORT BinaryStringArrayWriter {
+ public:
+  /**
+   * Constructor.
+   * Internal call. Should not be used by user.
+   *
+   * @param impl Writer implementation.
+   * @param id Identifier.
+   */
+  BinaryStringArrayWriter(impl::binary::BinaryWriterImpl* impl, int32_t id);
 
-            /**
-             * Write null-terminated string.
-             *
-             * @param val Null-terminated character sequence to write.
-             *
-             * @throw IgniteError if the writer instance is closed already.
-             */
-            void Write(const char* val);
+  /**
+   * Write null-terminated string.
+   *
+   * @param val Null-terminated character sequence to write.
+   *
+   * @throw IgniteError if the writer instance is closed already.
+   */
+  void Write(const char* val);
 
-            /**
-             * Write string.
-             *
-             * @param val String to write.
-             * @param len String length in bytes.
-             *
-             * @throw IgniteError if the writer instance is closed already.
-             */
-            void Write(const char* val, int32_t len);
+  /**
+   * Write string.
+   *
+   * @param val String to write.
+   * @param len String length in bytes.
+   *
+   * @throw IgniteError if the writer instance is closed already.
+   */
+  void Write(const char* val, int32_t len);
 
-            /**
-             * Write string.
-             *
-             * @param val String to write.
-             *
-             * @throw IgniteError if the writer instance is closed already.
-             */
-            void Write(const std::string& val)
-            {
-                Write(val.c_str());
-            }
+  /**
+   * Write string.
+   *
+   * @param val String to write.
+   *
+   * @throw IgniteError if the writer instance is closed already.
+   */
+  void Write(const std::string& val) {
+    Write(val.c_str());
+  }
 
-            /**
-             * Close the writer.
-             *
-             * This method should be called to finilize writing
-             * of the array.
-             *
-             * @throw IgniteError if the writer instance is closed already.
-             */
-            void Close();
+  /**
+   * Close the writer.
+   *
+   * This method should be called to finilize writing
+   * of the array.
+   *
+   * @throw IgniteError if the writer instance is closed already.
+   */
+  void Close();
 
-        private:
-            /** Implementation delegate. */
-            impl::binary::BinaryWriterImpl* impl; 
+ private:
+  /** Implementation delegate. */
+  impl::binary::BinaryWriterImpl* impl;
 
-            /** Identifier. */
-            const int32_t id;    
-        };
+  /** Identifier. */
+  const int32_t id;
+};
 
-        /**
-         * Binary array writer.
-         *
-         * Can be used to write array of values of the specific type one by
-         * one.
-         *
-         * Use Write() method to write array value by value, then finilize
-         * the writing by calling Close() method. Once the Close() method have
-         * been called, instance is not usable and will throw an IgniteError
-         * on any subsequent attempt to use it.
-         */
-        template<typename T>
-        class IGNITE_IMPORT_EXPORT BinaryArrayWriter
-        {
-        public:
-            /**
-             * Constructor.
-             * Internal call. Should not be used by user.
-             *
-             * @param impl Writer implementation.
-             * @param id Identifier.
-             */
-            BinaryArrayWriter(impl::binary::BinaryWriterImpl* impl, int32_t id) :
-                impl(impl), id(id)
-            {
-                // No-op.
-            }
+/**
+ * Binary array writer.
+ *
+ * Can be used to write array of values of the specific type one by
+ * one.
+ *
+ * Use Write() method to write array value by value, then finilize
+ * the writing by calling Close() method. Once the Close() method have
+ * been called, instance is not usable and will throw an IgniteError
+ * on any subsequent attempt to use it.
+ */
+template < typename T >
+class IGNITE_IMPORT_EXPORT BinaryArrayWriter {
+ public:
+  /**
+   * Constructor.
+   * Internal call. Should not be used by user.
+   *
+   * @param impl Writer implementation.
+   * @param id Identifier.
+   */
+  BinaryArrayWriter(impl::binary::BinaryWriterImpl* impl, int32_t id)
+      : impl(impl), id(id) {
+    // No-op.
+  }
 
-            /**
-             * Write a value.
-             *
-             * @param val Value to write.
-             *
-             * @throw IgniteError if the writer instance is closed already.
-             */
-            void Write(const T& val)
-            {
-                impl->WriteElement<T>(id, val);
-            }
+  /**
+   * Write a value.
+   *
+   * @param val Value to write.
+   *
+   * @throw IgniteError if the writer instance is closed already.
+   */
+  void Write(const T& val) {
+    impl->WriteElement< T >(id, val);
+  }
 
-            /**
-             * Close the writer.
-             *
-             * This method should be called to finilize writing
-             * of the array.
-             *
-             * @throw IgniteError if the writer instance is closed already.
-             */
-            void Close()
-            {
-                impl->CommitContainer(id);
-            }
+  /**
+   * Close the writer.
+   *
+   * This method should be called to finilize writing
+   * of the array.
+   *
+   * @throw IgniteError if the writer instance is closed already.
+   */
+  void Close() {
+    impl->CommitContainer(id);
+  }
 
-        private:
-            /** Implementation delegate. */
-            impl::binary::BinaryWriterImpl* impl; 
+ private:
+  /** Implementation delegate. */
+  impl::binary::BinaryWriterImpl* impl;
 
-            /** Idnetifier. */
-            const int32_t id;      
-        };
+  /** Idnetifier. */
+  const int32_t id;
+};
 
-        /**
-         * Binary collection writer.
-         *
-         * Can be used to write collection of values of the specific type one by
-         * one.
-         *
-         * Use Write() method to write collection value by value, then finilize
-         * the writing by calling Close() method. Once the Close() method have
-         * been called, instance is not usable and will throw an IgniteError
-         * on any subsequent attempt to use it.
-         */
-        template<typename T>
-        class IGNITE_IMPORT_EXPORT BinaryCollectionWriter
-        {
-        public:
-            /**
-             * Constructor.
-             * Internal call. Should not be used by user.
-             *
-             * @param impl Writer implementation.
-             * @param id Identifier.
-             */
-            BinaryCollectionWriter(impl::binary::BinaryWriterImpl* impl, int32_t id) :
-                impl(impl), id(id)
-            {
-                // No-op.
-            }
+/**
+ * Binary collection writer.
+ *
+ * Can be used to write collection of values of the specific type one by
+ * one.
+ *
+ * Use Write() method to write collection value by value, then finilize
+ * the writing by calling Close() method. Once the Close() method have
+ * been called, instance is not usable and will throw an IgniteError
+ * on any subsequent attempt to use it.
+ */
+template < typename T >
+class IGNITE_IMPORT_EXPORT BinaryCollectionWriter {
+ public:
+  /**
+   * Constructor.
+   * Internal call. Should not be used by user.
+   *
+   * @param impl Writer implementation.
+   * @param id Identifier.
+   */
+  BinaryCollectionWriter(impl::binary::BinaryWriterImpl* impl, int32_t id)
+      : impl(impl), id(id) {
+    // No-op.
+  }
 
-            /**
-             * Write a value.
-             *
-             * @param val Value to write.
-             *
-             * @throw IgniteError if the writer instance is closed already.
-             */
-            void Write(const T& val)
-            {
-                impl->WriteElement<T>(id, val);
-            }
+  /**
+   * Write a value.
+   *
+   * @param val Value to write.
+   *
+   * @throw IgniteError if the writer instance is closed already.
+   */
+  void Write(const T& val) {
+    impl->WriteElement< T >(id, val);
+  }
 
-            /**
-             * Close the writer.
-             *
-             * This method should be called to finilize writing
-             * of the collection.
-             *
-             * @throw IgniteError if the writer instance is closed already.
-             */
-            void Close()
-            {
-                impl->CommitContainer(id);
-            }
-        private:
-            /** Implementation delegate. */
-            impl::binary::BinaryWriterImpl* impl; 
+  /**
+   * Close the writer.
+   *
+   * This method should be called to finilize writing
+   * of the collection.
+   *
+   * @throw IgniteError if the writer instance is closed already.
+   */
+  void Close() {
+    impl->CommitContainer(id);
+  }
 
-            /** Identifier. */
-            const int32_t id;    
-        };
+ private:
+  /** Implementation delegate. */
+  impl::binary::BinaryWriterImpl* impl;
 
-        /**
-         * Binary map writer.
-         *
-         * Can be used to write map element by element.
-         *
-         * Use Write() method to write map value by value, then finilize
-         * the writing by calling Close() method. Once the Close() method have
-         * been called, instance is not usable and will throw an IgniteError
-         * on any subsequent attempt to use it.
-         */
-        template<typename K, typename V>
-        class IGNITE_IMPORT_EXPORT BinaryMapWriter
-        {
-        public:
-            /**
-             * Constructor.
-             * Internal call. Should not be used by user.
-             *
-             * @param impl Writer implementation.
-             * @param id Identifier.
-             */
-            BinaryMapWriter(impl::binary::BinaryWriterImpl* impl, int32_t id) :
-                impl(impl), id(id)
-            {
-                // No-op.
-            }
+  /** Identifier. */
+  const int32_t id;
+};
 
-            /**
-             * Write a map entry.
-             *
-             * @param key Key element of the map entry.
-             * @param val Value element of the map entry.
-             *
-             * @throw IgniteError if the writer instance is closed already.
-             */
-            void Write(const K& key, const V& val)
-            {
-                impl->WriteElement<K, V>(id, key, val);
-            }
+/**
+ * Binary map writer.
+ *
+ * Can be used to write map element by element.
+ *
+ * Use Write() method to write map value by value, then finilize
+ * the writing by calling Close() method. Once the Close() method have
+ * been called, instance is not usable and will throw an IgniteError
+ * on any subsequent attempt to use it.
+ */
+template < typename K, typename V >
+class IGNITE_IMPORT_EXPORT BinaryMapWriter {
+ public:
+  /**
+   * Constructor.
+   * Internal call. Should not be used by user.
+   *
+   * @param impl Writer implementation.
+   * @param id Identifier.
+   */
+  BinaryMapWriter(impl::binary::BinaryWriterImpl* impl, int32_t id)
+      : impl(impl), id(id) {
+    // No-op.
+  }
 
-            /**
-             * Close the writer.
-             *
-             * This method should be called to finilize writing of the map.
-             *
-             * @throw IgniteError if the writer instance is closed already.
-             */
-            void Close()
-            {
-                impl->CommitContainer(id);
-            }
-        private:
-            /** Implementation delegate. */
-            impl::binary::BinaryWriterImpl* impl; 
+  /**
+   * Write a map entry.
+   *
+   * @param key Key element of the map entry.
+   * @param val Value element of the map entry.
+   *
+   * @throw IgniteError if the writer instance is closed already.
+   */
+  void Write(const K& key, const V& val) {
+    impl->WriteElement< K, V >(id, key, val);
+  }
 
-            /** Identifier. */
-            const int32_t id;      
-        };
+  /**
+   * Close the writer.
+   *
+   * This method should be called to finilize writing of the map.
+   *
+   * @throw IgniteError if the writer instance is closed already.
+   */
+  void Close() {
+    impl->CommitContainer(id);
+  }
 
-        /**
-         * Binary string array reader.
-         *
-         * Can be used to read array of strings string by string.
-         *
-         * Use GetNext() method to read array value by value while HasNext()
-         * method returns true.
-         */
-        class IGNITE_IMPORT_EXPORT BinaryStringArrayReader
-        {
-        public:
-            /**
-             * Constructor.
-             * Internal call. Should not be used by user.
-             *
-             * @param impl Reader implementation.
-             * @param id Identifier.
-             * @param size Array size.
-             */
-            BinaryStringArrayReader(impl::binary::BinaryReaderImpl* impl, int32_t id, int32_t size);
+ private:
+  /** Implementation delegate. */
+  impl::binary::BinaryWriterImpl* impl;
 
-            /**
-             * Check whether next element is available for read.
-             *
-             * @return True if available.
-             */
-            bool HasNext();
+  /** Identifier. */
+  const int32_t id;
+};
 
-            /**
-             * Get next element.
-             *
-             * @param res Buffer to store data to. 
-             * @param len Expected length of string. NULL terminator will be set in case len is 
-             *     greater than real string length.
-             * @return Actual amount of elements read. If "len" argument is less than actual
-             *     array size or resulting array is set to null, nothing will be written
-             *     to resulting array and returned value will contain required array length.
-             *     -1 will be returned in case array in stream was null.
-             *
-             * @throw IgniteError if there is no element to read.
-             */
-            int32_t GetNext(char* res, int32_t len);
+/**
+ * Binary string array reader.
+ *
+ * Can be used to read array of strings string by string.
+ *
+ * Use GetNext() method to read array value by value while HasNext()
+ * method returns true.
+ */
+class IGNITE_IMPORT_EXPORT BinaryStringArrayReader {
+ public:
+  /**
+   * Constructor.
+   * Internal call. Should not be used by user.
+   *
+   * @param impl Reader implementation.
+   * @param id Identifier.
+   * @param size Array size.
+   */
+  BinaryStringArrayReader(impl::binary::BinaryReaderImpl* impl, int32_t id,
+                          int32_t size);
 
-            /**
-             * Get next element.
-             *
-             * @return String.
-             *
-             * @throw IgniteError if there is no element to read.
-             */
-            std::string GetNext()
-            {
-                int32_t len = GetNext(NULL, 0);
+  /**
+   * Check whether next element is available for read.
+   *
+   * @return True if available.
+   */
+  bool HasNext();
 
-                if (len != -1)
-                {
-                    ignite::common::FixedSizeArray<char> arr(len + 1);
+  /**
+   * Get next element.
+   *
+   * @param res Buffer to store data to.
+   * @param len Expected length of string. NULL terminator will be set in case
+   * len is greater than real string length.
+   * @return Actual amount of elements read. If "len" argument is less than
+   * actual array size or resulting array is set to null, nothing will be
+   * written to resulting array and returned value will contain required array
+   * length. -1 will be returned in case array in stream was null.
+   *
+   * @throw IgniteError if there is no element to read.
+   */
+  int32_t GetNext(char* res, int32_t len);
 
-                    GetNext(arr.GetData(), static_cast<int32_t>(arr.GetSize()));
+  /**
+   * Get next element.
+   *
+   * @return String.
+   *
+   * @throw IgniteError if there is no element to read.
+   */
+  std::string GetNext() {
+    int32_t len = GetNext(NULL, 0);
 
-                    return std::string(arr.GetData());
-                }
-                else
-                    return std::string();
-            }
+    if (len != -1) {
+      ignite::common::FixedSizeArray< char > arr(len + 1);
 
-            /**
-             * Get array size.
-             *
-             * @return Size or -1 if array is NULL.
-             */
-            int32_t GetSize() const;
+      GetNext(arr.GetData(), static_cast< int32_t >(arr.GetSize()));
 
-            /**
-             * Check whether array is NULL.
-             *
-             * @return True if the array is NULL.
-             */
-            bool IsNull() const;
+      return std::string(arr.GetData());
+    } else
+      return std::string();
+  }
 
-        private:
-            /** Implementation delegate. */
-            impl::binary::BinaryReaderImpl* impl;  
+  /**
+   * Get array size.
+   *
+   * @return Size or -1 if array is NULL.
+   */
+  int32_t GetSize() const;
 
-            /** Identifier. */
-            const int32_t id;
+  /**
+   * Check whether array is NULL.
+   *
+   * @return True if the array is NULL.
+   */
+  bool IsNull() const;
 
-            /** Size. */
-            const int32_t size;
-        };
+ private:
+  /** Implementation delegate. */
+  impl::binary::BinaryReaderImpl* impl;
 
-        /**
-         * Binary array reader.
-         *
-         * Can be used to read array of values of the specific type one by one.
-         *
-         * Use GetNext() method to read array value by value while HasNext()
-         * method returns true.
-         */
-        template<typename T>
-        class BinaryArrayReader
-        {
-        public:
-            /**
-             * Constructor.
-             * Internal call. Should not be used by user.
-             *
-             * @param impl Reader implementation.
-             * @param id Identifier.
-             * @param size Array size.
-             */
-            BinaryArrayReader(impl::binary::BinaryReaderImpl* impl, int32_t id, int32_t size) : 
-                impl(impl), id(id), size(size)
-            {
-                // No-op.
-            }
+  /** Identifier. */
+  const int32_t id;
 
-            /**
-             * Check whether next element is available for read.
-             *
-             * @return True if available.
-             */
-            bool HasNext()
-            {
-                return impl->HasNextElement(id);
-            }
+  /** Size. */
+  const int32_t size;
+};
 
-            /**
-             * Read next element.
-             *
-             * @return Next element.
-             *
-             * @throw IgniteError if there is no element to read.
-             */
-            T GetNext()
-            {
-                return impl->ReadElement<T>(id);
-            }
+/**
+ * Binary array reader.
+ *
+ * Can be used to read array of values of the specific type one by one.
+ *
+ * Use GetNext() method to read array value by value while HasNext()
+ * method returns true.
+ */
+template < typename T >
+class BinaryArrayReader {
+ public:
+  /**
+   * Constructor.
+   * Internal call. Should not be used by user.
+   *
+   * @param impl Reader implementation.
+   * @param id Identifier.
+   * @param size Array size.
+   */
+  BinaryArrayReader(impl::binary::BinaryReaderImpl* impl, int32_t id,
+                    int32_t size)
+      : impl(impl), id(id), size(size) {
+    // No-op.
+  }
 
-            /**
-             * Get array size.
-             *
-             * @return Size or -1 if array is NULL.
-             */
-            int32_t GetSize()
-            {
-                return size;
-            }
+  /**
+   * Check whether next element is available for read.
+   *
+   * @return True if available.
+   */
+  bool HasNext() {
+    return impl->HasNextElement(id);
+  }
 
-            /**
-             * Check whether array is NULL.
-             *
-             * @return True if the array is NULL.
-             */
-            bool IsNull()
-            {
-                return size == -1;
-            }
-        private:
-            /** Implementation delegate. */
-            impl::binary::BinaryReaderImpl* impl;
+  /**
+   * Read next element.
+   *
+   * @return Next element.
+   *
+   * @throw IgniteError if there is no element to read.
+   */
+  T GetNext() {
+    return impl->ReadElement< T >(id);
+  }
 
-            /** Identifier. */
-            const int32_t id;
+  /**
+   * Get array size.
+   *
+   * @return Size or -1 if array is NULL.
+   */
+  int32_t GetSize() {
+    return size;
+  }
 
-            /** Size. */
-            const int32_t size;
-        };
+  /**
+   * Check whether array is NULL.
+   *
+   * @return True if the array is NULL.
+   */
+  bool IsNull() {
+    return size == -1;
+  }
 
-        /**
-         * Binary collection reader.
-         *
-         * Can be used to read collection of values of the specific type
-         * one by one.
-         *
-         * Use GetNext() method to read array value by value while HasNext()
-         * method returns true.
-         */
-        template<typename T>
-        class BinaryCollectionReader
-        {
-        public:
-            /**
-             * Constructor.
-             * Internal call. Should not be used by user.
-             *
-             * @param impl Reader implementation.
-             * @param id Identifier.
-             * @param type Collection type.
-             * @param size Collection size.
-             */
-            BinaryCollectionReader(impl::binary::BinaryReaderImpl* impl, int32_t id, 
-                const CollectionType::Type type,  int32_t size) : impl(impl), id(id), type(type), size(size)
-            {
-                // No-op.
-            }
+ private:
+  /** Implementation delegate. */
+  impl::binary::BinaryReaderImpl* impl;
 
-            /**
-             * Check whether next element is available for read.
-             *
-             * @return True if available.
-             */
-            bool HasNext()
-            {
-                return impl->HasNextElement(id);
-            }
+  /** Identifier. */
+  const int32_t id;
 
-            /**
-             * Read next element.
-             *
-             * @return Next element.
-             *
-             * @throw IgniteError if there is no element to read.
-             */
-            T GetNext()
-            {
-                return impl->ReadElement<T>(id);
-            }
-            
-            /**
-             * Get collection type.
-             *
-             * @return Collection type. See CollectionType for the list of
-             *     available values and their description.
-             */
-            CollectionType::Type GetType()
-            {
-                return type;
-            }
+  /** Size. */
+  const int32_t size;
+};
 
-            /**
-             * Get collection size.
-             *
-             * @return Size or -1 if collection is NULL.
-             */
-            int32_t GetSize()
-            {
-                return size;
-            }
+/**
+ * Binary collection reader.
+ *
+ * Can be used to read collection of values of the specific type
+ * one by one.
+ *
+ * Use GetNext() method to read array value by value while HasNext()
+ * method returns true.
+ */
+template < typename T >
+class BinaryCollectionReader {
+ public:
+  /**
+   * Constructor.
+   * Internal call. Should not be used by user.
+   *
+   * @param impl Reader implementation.
+   * @param id Identifier.
+   * @param type Collection type.
+   * @param size Collection size.
+   */
+  BinaryCollectionReader(impl::binary::BinaryReaderImpl* impl, int32_t id,
+                         const CollectionType::Type type, int32_t size)
+      : impl(impl), id(id), type(type), size(size) {
+    // No-op.
+  }
 
-            /**
-             * Check whether collection is NULL.
-             *
-             * @return True if the collection is NULL.
-             */
-            bool IsNull()
-            {
-                return size == -1;
-            }
-        private:
-            /** Implementation delegate. */
-            impl::binary::BinaryReaderImpl* impl;  
+  /**
+   * Check whether next element is available for read.
+   *
+   * @return True if available.
+   */
+  bool HasNext() {
+    return impl->HasNextElement(id);
+  }
 
-            /** Identifier. */
-            const int32_t id;     
-            
-            /** Collection type. */
-            const CollectionType::Type type;  
+  /**
+   * Read next element.
+   *
+   * @return Next element.
+   *
+   * @throw IgniteError if there is no element to read.
+   */
+  T GetNext() {
+    return impl->ReadElement< T >(id);
+  }
 
-            /** Size. */
-            const int32_t size;                              
-        };    
+  /**
+   * Get collection type.
+   *
+   * @return Collection type. See CollectionType for the list of
+   *     available values and their description.
+   */
+  CollectionType::Type GetType() {
+    return type;
+  }
 
-        /**
-         * Binary map reader.
-         *
-         * Can be used to read map entry by entry.
-         *
-         * Use GetNext() method to read array value by value while HasNext()
-         * method returns true.
-         */
-        template<typename K, typename V>
-        class BinaryMapReader
-        {
-        public:
-            /**
-             * Constructor.
-             * Internal call. Should not be used by user.
-             *
-             * @param impl Reader implementation.
-             * @param id Identifier.
-             * @param type Map type.
-             * @param size Map size.
-            */
-            BinaryMapReader(impl::binary::BinaryReaderImpl* impl, int32_t id, MapType::Type type,
-                int32_t size) : impl(impl), id(id), type(type), size(size)
-            {
-                // No-op.
-            }
+  /**
+   * Get collection size.
+   *
+   * @return Size or -1 if collection is NULL.
+   */
+  int32_t GetSize() {
+    return size;
+  }
 
-            /**
-             * Check whether next element is available for read.
-             *
-             * @return True if available.
-             */
-            bool HasNext()
-            {
-                return impl->HasNextElement(id);
-            }
+  /**
+   * Check whether collection is NULL.
+   *
+   * @return True if the collection is NULL.
+   */
+  bool IsNull() {
+    return size == -1;
+  }
 
-            /**
-             * Read next element.
-             *
-             * @param key Pointer to buffer where key element should be stored.
-             *     Should not be null.
-             * @param val Pointer to buffer where value element should be
-             *     stored. Should not be null.
-             *
-             * @throw IgniteError if there is no element to read.
-             */
-            void GetNext(K& key, V& val)
-            {
-                return impl->ReadElement<K, V>(id, key, val);
-            }
+ private:
+  /** Implementation delegate. */
+  impl::binary::BinaryReaderImpl* impl;
 
-            /**
-             * Get map type.
-             *
-             * @return Map type. See MapType for the list of available values
-             *     and their description.
-             */
-            MapType::Type GetType()
-            {
-                return type;
-            }
+  /** Identifier. */
+  const int32_t id;
 
-            /**
-             * Get map size.
-             *
-             * @return Size or -1 if map is NULL.
-             */
-            int32_t GetSize()
-            {
-                return size;
-            }
+  /** Collection type. */
+  const CollectionType::Type type;
 
-            /**
-             * Check whether map is NULL.
-             *
-             * @return True if the map is NULL.
-             */
-            bool IsNull()
-            {
-                return size == -1;
-            }
-        private:
-            /** Implementation delegate. */
-            impl::binary::BinaryReaderImpl* impl;  
+  /** Size. */
+  const int32_t size;
+};
 
-            /** Identifier. */
-            const int32_t id;     
+/**
+ * Binary map reader.
+ *
+ * Can be used to read map entry by entry.
+ *
+ * Use GetNext() method to read array value by value while HasNext()
+ * method returns true.
+ */
+template < typename K, typename V >
+class BinaryMapReader {
+ public:
+  /**
+   * Constructor.
+   * Internal call. Should not be used by user.
+   *
+   * @param impl Reader implementation.
+   * @param id Identifier.
+   * @param type Map type.
+   * @param size Map size.
+   */
+  BinaryMapReader(impl::binary::BinaryReaderImpl* impl, int32_t id,
+                  MapType::Type type, int32_t size)
+      : impl(impl), id(id), type(type), size(size) {
+    // No-op.
+  }
 
-            /** Map type. */
-            const MapType::Type type;
+  /**
+   * Check whether next element is available for read.
+   *
+   * @return True if available.
+   */
+  bool HasNext() {
+    return impl->HasNextElement(id);
+  }
 
-            /** Size. */
-            const int32_t size;
-        };
-    }
-}
+  /**
+   * Read next element.
+   *
+   * @param key Pointer to buffer where key element should be stored.
+   *     Should not be null.
+   * @param val Pointer to buffer where value element should be
+   *     stored. Should not be null.
+   *
+   * @throw IgniteError if there is no element to read.
+   */
+  void GetNext(K& key, V& val) {
+    return impl->ReadElement< K, V >(id, key, val);
+  }
 
-#endif //_IGNITE_BINARY_BINARY_CONTAINERS
+  /**
+   * Get map type.
+   *
+   * @return Map type. See MapType for the list of available values
+   *     and their description.
+   */
+  MapType::Type GetType() {
+    return type;
+  }
+
+  /**
+   * Get map size.
+   *
+   * @return Size or -1 if map is NULL.
+   */
+  int32_t GetSize() {
+    return size;
+  }
+
+  /**
+   * Check whether map is NULL.
+   *
+   * @return True if the map is NULL.
+   */
+  bool IsNull() {
+    return size == -1;
+  }
+
+ private:
+  /** Implementation delegate. */
+  impl::binary::BinaryReaderImpl* impl;
+
+  /** Identifier. */
+  const int32_t id;
+
+  /** Map type. */
+  const MapType::Type type;
+
+  /** Size. */
+  const int32_t size;
+};
+}  // namespace binary
+}  // namespace odbc
+}  // namespace ignite
+#endif //_IGNITE_ODBC_BINARY_BINARY_CONTAINERS
