@@ -39,10 +39,8 @@
 
 #include "odbc_test_suite.h"
 #include "test_utils.h"
-#include "ignite/odbc/impl/binary/binary_common.h"
 
 using namespace boost::unit_test;
-using namespace ignite::impl::binary;
 using namespace ignite::odbc::impl::binary;
 
 using ignite::odbc::OdbcTestSuite;
