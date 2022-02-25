@@ -24,7 +24,11 @@
 #include "ignite/odbc/system/odbc_constants.h"
 
 namespace ignite {
+namespace odbc {
 namespace utility {
+using namespace odbc::impl::binary;
+using namespace odbc::common;
+
 size_t CopyStringToBuffer(const std::string& str, char* buf, size_t buflen) {
   if (!buf || !buflen)
     return 0;
@@ -37,7 +41,7 @@ size_t CopyStringToBuffer(const std::string& str, char* buf, size_t buflen) {
   return bytesToCopy;
 }
 
-void ReadString(ignite::odbc::impl::binary::BinaryReaderImpl& reader,
+void ReadString(BinaryReaderImpl& reader,
                 std::string& str) {
   int32_t strLen = reader.ReadString(0, 0);
 
@@ -56,16 +60,16 @@ void ReadString(ignite::odbc::impl::binary::BinaryReaderImpl& reader,
   }
 }
 
-void WriteString(ignite::odbc::impl::binary::BinaryWriterImpl& writer,
+void WriteString(BinaryWriterImpl& writer,
                  const std::string& str) {
   writer.WriteString(str.data(), static_cast< int32_t >(str.size()));
 }
 
-void ReadDecimal(ignite::odbc::impl::binary::BinaryReaderImpl& reader,
-                 odbc::common::Decimal& decimal) {
+void ReadDecimal(BinaryReaderImpl& reader,
+                 Decimal& decimal) {
   int8_t hdr = reader.ReadInt8();
 
-  assert(hdr == ignite::odbc::impl::binary::IGNITE_TYPE_DECIMAL);
+  assert(hdr == IGNITE_TYPE_DECIMAL);
 
   IGNITE_UNUSED(hdr);
 
@@ -77,8 +81,8 @@ void ReadDecimal(ignite::odbc::impl::binary::BinaryReaderImpl& reader,
 
   mag.resize(len);
 
-  odbc::impl::binary::BinaryUtils::ReadInt8Array(reader.GetStream(), mag.data(),
-                                           static_cast< int32_t >(mag.size()));
+  BinaryUtils::ReadInt8Array(
+      reader.GetStream(), mag.data(), static_cast< int32_t >(mag.size()));
 
   int32_t sign = 1;
 
@@ -88,21 +92,21 @@ void ReadDecimal(ignite::odbc::impl::binary::BinaryReaderImpl& reader,
     sign = -1;
   }
 
-  odbc::common::Decimal res(mag.data(), static_cast< int32_t >(mag.size()),
+  Decimal res(mag.data(), static_cast< int32_t >(mag.size()),
                             scale, sign);
 
   decimal.Swap(res);
 }
 
-void WriteDecimal(ignite::odbc::impl::binary::BinaryWriterImpl& writer,
-                  const odbc::common::Decimal& decimal) {
-  writer.WriteInt8(ignite::odbc::impl::binary::IGNITE_TYPE_DECIMAL);
+void WriteDecimal(BinaryWriterImpl& writer,
+                  const Decimal& decimal) {
+  writer.WriteInt8(IGNITE_TYPE_DECIMAL);
 
-  const odbc::common::BigInteger& unscaled = decimal.GetUnscaledValue();
+  const BigInteger& unscaled = decimal.GetUnscaledValue();
 
   writer.WriteInt32(decimal.GetScale());
 
-  odbc::common::FixedSizeArray< int8_t > magnitude;
+  FixedSizeArray< int8_t > magnitude;
 
   unscaled.MagnitudeToBytes(magnitude);
 
@@ -116,7 +120,7 @@ void WriteDecimal(ignite::odbc::impl::binary::BinaryWriterImpl& writer,
     magnitude[0] |= addBit;
   }
 
-  odbc::impl::binary::BinaryUtils::WriteInt8Array(
+  BinaryUtils::WriteInt8Array(
       writer.GetStream(), magnitude.GetData(), magnitude.GetSize());
 }
 
@@ -136,7 +140,7 @@ std::string SqlStringToString(const unsigned char* sqlStr, int32_t sqlStrLen) {
   return res;
 }
 
-void ReadByteArray(odbc::impl::binary::BinaryReaderImpl& reader,
+void ReadByteArray(BinaryReaderImpl& reader,
                    std::vector< int8_t >& res) {
   int32_t len = reader.ReadInt8Array(0, 0);
 
@@ -162,4 +166,5 @@ std::string HexDump(const void* data, size_t count) {
   return dump.str();
 }
 }  // namespace utility
+}  // namespace odbc
 }  // namespace ignite

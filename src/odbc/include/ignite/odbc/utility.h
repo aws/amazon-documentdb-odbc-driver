@@ -37,6 +37,8 @@ namespace odbc {
 namespace utility {
 /** Using common version of the util. */
 using common::IntoLower;
+using namespace odbc::impl::binary;
+using namespace odbc::common;
 
 template < typename T >
 T* GetPointerWithOffset(T* ptr, size_t offset) {
@@ -59,7 +61,7 @@ size_t CopyStringToBuffer(const std::string& str, char* buf, size_t buflen);
  * @param reader Reader.
  * @param res Resulting vector.
  */
-void ReadByteArray(odbc::impl::binary::BinaryReaderImpl& reader,
+void ReadByteArray(BinaryReaderImpl& reader,
                    std::vector< int8_t >& res);
 
 /**
@@ -67,14 +69,14 @@ void ReadByteArray(odbc::impl::binary::BinaryReaderImpl& reader,
  * @param reader Reader.
  * @param str String.
  */
-void ReadString(odbc::impl::binary::BinaryReaderImpl& reader, std::string& str);
+void ReadString(BinaryReaderImpl& reader, std::string& str);
 
 /**
  * Write string using writer.
  * @param writer Writer.
  * @param str String.
  */
-void WriteString(odbc::impl::binary::BinaryWriterImpl& writer,
+void WriteString(BinaryWriterImpl& writer,
                  const std::string& str);
 
 /**
@@ -83,8 +85,8 @@ void WriteString(odbc::impl::binary::BinaryWriterImpl& writer,
  * @param reader Reader.
  * @param decimal Decimal value.
  */
-void ReadDecimal(odbc::impl::binary::BinaryReaderImpl& reader,
-                 odbc::common::Decimal& decimal);
+void ReadDecimal(BinaryReaderImpl& reader,
+                 Decimal& decimal);
 
 /**
  * Write decimal value using writer.
@@ -92,8 +94,8 @@ void ReadDecimal(odbc::impl::binary::BinaryReaderImpl& reader,
  * @param writer Writer.
  * @param decimal Decimal value.
  */
-void WriteDecimal(odbc::impl::binary::BinaryWriterImpl& writer,
-                  const odbc::common::Decimal& decimal);
+void WriteDecimal(BinaryWriterImpl& writer,
+                  const Decimal& decimal);
 
 /**
  * Convert SQL string buffer to std::string.

@@ -33,28 +33,28 @@
   {                                                        \
     std::stringstream stream;                              \
     stream << (part1);                                     \
-    throw ignite::IgniteError(code, stream.str().c_str()); \
+    throw ignite::odbc::IgniteError(code, stream.str().c_str()); \
   }
 
 #define IGNITE_ERROR_2(code, part1, part2)                 \
   {                                                        \
     std::stringstream stream;                              \
     stream << (part1) << (part2);                          \
-    throw ignite::IgniteError(code, stream.str().c_str()); \
+    throw ignite::odbc::IgniteError(code, stream.str().c_str()); \
   }
 
 #define IGNITE_ERROR_3(code, part1, part2, part3)          \
   {                                                        \
     std::stringstream stream;                              \
     stream << (part1) << (part2) << (part3);               \
-    throw ignite::IgniteError(code, stream.str().c_str()); \
+    throw ignite::odbc::IgniteError(code, stream.str().c_str()); \
   }
 
 #define IGNITE_ERROR_FORMATTED_1(code, msg, key1, val1)    \
   {                                                        \
     std::stringstream stream;                              \
     stream << msg << " [" << key1 << "=" << (val1) << "]"; \
-    throw ignite::IgniteError(code, stream.str().c_str()); \
+    throw ignite::odbc::IgniteError(code, stream.str().c_str()); \
   }
 
 #define IGNITE_ERROR_FORMATTED_2(code, msg, key1, val1, key2, val2)       \
@@ -62,7 +62,7 @@
     std::stringstream stream;                                             \
     stream << msg << " [" << key1 << "=" << (val1) << ", " << key2 << "=" \
            << (val2) << "]";                                              \
-    throw ignite::IgniteError(code, stream.str().c_str());                \
+    throw ignite::odbc::IgniteError(code, stream.str().c_str());                \
   }
 
 #define IGNITE_ERROR_FORMATTED_3(code, msg, key1, val1, key2, val2, key3, \
@@ -71,7 +71,7 @@
     std::stringstream stream;                                             \
     stream << msg << " [" << key1 << "=" << (val1) << ", " << key2 << "=" \
            << (val2) << ", " << key3 << "=" << (val3) << "]";             \
-    throw ignite::IgniteError(code, stream.str().c_str());                \
+    throw ignite::odbc::IgniteError(code, stream.str().c_str());                \
   }
 
 #define IGNITE_ERROR_FORMATTED_4(code, msg, key1, val1, key2, val2, key3,    \
@@ -81,7 +81,7 @@
     stream << msg << " [" << key1 << "=" << (val1) << ", " << key2 << "="    \
            << (val2) << ", " << key3 << "=" << (val3) << ", " << key4 << "=" \
            << (val4) << "]";                                                 \
-    throw ignite::IgniteError(code, stream.str().c_str());                   \
+    throw ignite::odbc::IgniteError(code, stream.str().c_str());                   \
   }
 
 #ifdef _MSC_VER

@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/binary/binary_utils.h"
-
 #include <time.h>
 
 #include "ignite/odbc/ignite_error.h"
+
 #include "ignite/odbc/impl/interop/interop.h"
+#include "ignite/odbc/impl/binary/binary_utils.h"
 
 using namespace ignite::odbc::impl::interop;
 using namespace ignite::odbc::impl::binary;
