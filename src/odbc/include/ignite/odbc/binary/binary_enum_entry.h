@@ -17,7 +17,7 @@
 
 /**
  * @file
- * Declares ignite::binary::BinaryEnumEntry class.
+ * Declares ignite::odbc::binary::BinaryEnumEntry class.
  */
 
 #ifndef _IGNITE_ODBC_BINARY_BINARY_ENUM_ENTRY

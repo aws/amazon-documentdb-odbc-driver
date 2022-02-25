@@ -17,7 +17,7 @@
 
 /**
  * @file
- * Declares ignite::IgniteError class.
+ * Declares ignite::odbc::IgniteError class.
  */
 
 #ifndef _IGNITE_ODBC_IGNITE_ERROR

@@ -17,7 +17,7 @@
 
 /**
  * @file
- * Declares ignite::binary::BinaryEnum class template and helping classes
+ * Declares ignite::odbc::binary::BinaryEnum class template and helping classes
  * to declare enum type specialization for user types.
  */
 

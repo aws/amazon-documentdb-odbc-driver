@@ -17,7 +17,7 @@
 
 /**
  * @file
- * Declares ignite::binary::BinaryType class template and helping macros
+ * Declares ignite::odbc::binary::BinaryType class template and helping macros
  * to declare binary type specialization for user types.
  */
 
