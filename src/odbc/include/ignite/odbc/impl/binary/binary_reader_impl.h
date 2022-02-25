@@ -981,7 +981,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
       }
 
       case IGNITE_HDR_HND: {
-        IGNITE_ERROR_1(ignite::IgniteError::IGNITE_ERR_BINARY,
+        IGNITE_ERROR_1(ignite::odbc::IgniteError::IGNITE_ERR_BINARY,
                        "Circular references are not supported.");
       }
 
@@ -1008,14 +1008,14 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
         int8_t protoVer = stream->ReadInt8();
 
         if (protoVer != IGNITE_PROTO_VER) {
-          IGNITE_ERROR_2(ignite::IgniteError::IGNITE_ERR_BINARY,
+          IGNITE_ERROR_2(ignite::odbc::IgniteError::IGNITE_ERR_BINARY,
                          "Unsupported binary protocol version: ", protoVer);
         }
 
         int16_t flags = stream->ReadInt16();
 
         if (flags & IGNITE_BINARY_FLAG_COMPACT_FOOTER) {
-          IGNITE_ERROR_2(ignite::IgniteError::IGNITE_ERR_BINARY,
+          IGNITE_ERROR_2(ignite::odbc::IgniteError::IGNITE_ERR_BINARY,
                          "Unsupported binary protocol flag: "
                          "IGNITE_BINARY_FLAG_COMPACT_FOOTER: ",
                          IGNITE_BINARY_FLAG_COMPACT_FOOTER);
@@ -1077,7 +1077,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
       }
 
       default: {
-        IGNITE_ERROR_2(ignite::IgniteError::IGNITE_ERR_BINARY,
+        IGNITE_ERROR_2(ignite::odbc::IgniteError::IGNITE_ERR_BINARY,
                        "Unexpected header during deserialization: ",
                        static_cast< int >(hdr & 0xFF));
       }
@@ -1107,7 +1107,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
       }
 
       default: {
-        IGNITE_ERROR_2(ignite::IgniteError::IGNITE_ERR_BINARY,
+        IGNITE_ERROR_2(ignite::odbc::IgniteError::IGNITE_ERR_BINARY,
                        "Unexpected header during deserialization: ",
                        static_cast< int >(hdr & 0xFF));
       }
@@ -1204,7 +1204,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
 
     if (entry.GetTypeId() != TypeMeta::GetTypeId()) {
       IGNITE_ERROR_FORMATTED_2(
-          ignite::IgniteError::IGNITE_ERR_BINARY,
+          ignite::odbc::IgniteError::IGNITE_ERR_BINARY,
           "Unexpected type ID during deserialization of the enum: ", "expected",
           TypeMeta::GetTypeId(), "actual", entry.GetTypeId());
     }

@@ -18,8 +18,8 @@
 #ifndef _IGNITE_ODBC_IMPL_BINARY_BINARY_TYPE_IMPL
 #define _IGNITE_ODBC_IMPL_BINARY_BINARY_TYPE_IMPL
 
-#include <ignite/common/utils.h>
-#include <ignite/ignite_error.h>
+#include <ignite/odbc/common/utils.h>
+#include <ignite/odbc/ignite_error.h>
 #include <stdint.h>
 
 #include <memory>
@@ -46,10 +46,11 @@
                                                                                \
    public:                                                                     \
     const static bool value =                                                  \
-        (sizeof(helper< ignite::binary::BinaryType< T > >(0)) == sizeof(one)); \
+        (sizeof(helper< ignite::odbc::binary::BinaryType< T > >(0)) == sizeof(one)); \
   }
 
 namespace ignite {
+namespace odbc {
 namespace binary {
 class BinaryReader;
 class BinaryWriter;
@@ -78,7 +79,7 @@ struct IGNITE_IMPORT_EXPORT BinaryType< IgniteError > {
   static void Read(BinaryReader& reader, IgniteError& dst);
 };
 }  // namespace binary
-
+}  // namespace odbc
 namespace odbc {
 namespace impl {
 namespace binary {
@@ -89,7 +90,7 @@ template < typename T >
 struct WriteHelper {
   template < typename W >
   static void Write(W& writer, const T& val) {
-    writer.template WriteTopObject0< ignite::binary::BinaryWriter >(val);
+    writer.template WriteTopObject0< ignite::odbc::binary::BinaryWriter >(val);
   }
 };
 
@@ -103,7 +104,7 @@ struct WriteHelper< T* > {
     if (!val)
       writer.WriteNull0();
     else
-      writer.template WriteTopObject0< ignite::binary::BinaryWriter >(*val);
+      writer.template WriteTopObject0< ignite::odbc::binary::BinaryWriter >(*val);
   }
 };
 
@@ -123,7 +124,7 @@ struct ReadHelper {
 
   template < typename R >
   static void Read(R& reader, T& val) {
-    reader.template ReadTopObject0< ignite::binary::BinaryReader, T >(val);
+    reader.template ReadTopObject0< ignite::odbc::binary::BinaryReader, T >(val);
   }
 };
 
@@ -139,7 +140,7 @@ struct ReadHelper< T* > {
 
     std::auto_ptr< T > res(new T());
 
-    reader.template ReadTopObject0< ignite::binary::BinaryReader, T >(*res);
+    reader.template ReadTopObject0< ignite::odbc::binary::BinaryReader, T >(*res);
 
     return res.release();
   }
@@ -171,7 +172,7 @@ struct AffinityFieldNameGetterDefault {
 template < typename T >
 struct AffinityFieldNameGetterMethod {
   static void Get(std::string& affField) {
-    ignite::binary::BinaryType< T >::GetAffinityFieldName(affField);
+    ignite::odbc::binary::BinaryType< T >::GetAffinityFieldName(affField);
   }
 };
 
@@ -182,7 +183,7 @@ struct AffinityFieldNameGetterMethod {
 template < typename T >
 struct AffinityFieldNameGetterMethod< T* > {
   static void Get(std::string& affField) {
-    ignite::binary::BinaryType< T >::GetAffinityFieldName(affField);
+    ignite::odbc::binary::BinaryType< T >::GetAffinityFieldName(affField);
   }
 };
 

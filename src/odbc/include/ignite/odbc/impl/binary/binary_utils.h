@@ -468,7 +468,7 @@ class IGNITE_IMPORT_EXPORT BinaryUtils {
    * @param stream Stream.
    * @return Value.
    */
-  static ignite::binary::BinaryEnumEntry ReadBinaryEnumEntry(
+  static ignite::odbc::binary::BinaryEnumEntry ReadBinaryEnumEntry(
       interop::InteropInputStream* stream);
 
   /**
@@ -478,7 +478,7 @@ class IGNITE_IMPORT_EXPORT BinaryUtils {
    * @param val Value.
    */
   static void WriteBinaryEnumEntry(interop::InteropOutputStream* stream,
-                                   ignite::binary::BinaryEnumEntry val) {
+                                   ignite::odbc::binary::BinaryEnumEntry val) {
     WriteBinaryEnumEntry(stream, val.GetTypeId(), val.GetOrdinal());
   }
 
@@ -511,7 +511,7 @@ class IGNITE_IMPORT_EXPORT BinaryUtils {
   static T GetDefaultValue() {
     T res;
 
-    ignite::binary::BinaryType< T >::GetNull(res);
+    ignite::odbc::binary::BinaryType< T >::GetNull(res);
 
     return res;
   }
@@ -578,9 +578,9 @@ inline Time BinaryUtils::GetDefaultValue< Time >() {
 }
 
 template <>
-inline ignite::binary::BinaryEnumEntry
-BinaryUtils::GetDefaultValue< ignite::binary::BinaryEnumEntry >() {
-  return ignite::binary::BinaryEnumEntry();
+inline ignite::odbc::binary::BinaryEnumEntry
+BinaryUtils::GetDefaultValue< ignite::odbc::binary::BinaryEnumEntry >() {
+  return ignite::odbc::binary::BinaryEnumEntry();
 }
 
 template <>

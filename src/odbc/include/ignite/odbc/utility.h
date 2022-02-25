@@ -33,6 +33,7 @@
 
 
 namespace ignite {
+namespace odbc {
 namespace utility {
 /** Using common version of the util. */
 using common::IntoLower;
@@ -111,6 +112,6 @@ std::string SqlStringToString(const unsigned char* sqlStr, int32_t sqlStrLen);
  */
 std::string HexDump(const void* data, size_t count);
 }  // namespace utility
+}  // namespace odbc
 }  // namespace ignite
-
 #endif  //_IGNITE_ODBC_UTILITY
