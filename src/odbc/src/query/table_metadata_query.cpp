@@ -75,7 +75,6 @@ TableMetadataQuery::TableMetadataQuery(diagnostic::DiagnosableAdapter& diag,
       fetched(false),
       meta(),
       columnsMeta() {
-  using namespace ignite::impl::binary;
   using namespace ignite::odbc::impl::binary;
   using namespace ignite::odbc::type_traits;
 
