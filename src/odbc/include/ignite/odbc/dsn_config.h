@@ -20,43 +20,42 @@
 
 #include "ignite/odbc/config/configuration.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        /**
-         * Extract last setup error and throw it like IgniteError.
-         */
-        void ThrowLastSetupError();
+namespace ignite {
+namespace odbc {
+/**
+ * Extract last setup error and throw it like IgniteError.
+ */
+void ThrowLastSetupError();
 
-        /**
-         * Add new string to the DSN file.
-         *
-         * @param dsn DSN name.
-         * @param key Key.
-         * @param value Value.
-         */
-        void WriteDsnString(const char* dsn, const char* key, const char* value);
+/**
+ * Add new string to the DSN file.
+ *
+ * @param dsn DSN name.
+ * @param key Key.
+ * @param value Value.
+ */
+void WriteDsnString(const char* dsn, const char* key, const char* value);
 
-        /**
-         * Get string from the DSN file.
-         *
-         * @param dsn DSN name.
-         * @param key Key.
-         * @param dflt Default value.
-         * @return Value.
-         */
-        std::string ReadDsnString(const char* dsn, const char* key, const char* dflt);
+/**
+ * Get string from the DSN file.
+ *
+ * @param dsn DSN name.
+ * @param key Key.
+ * @param dflt Default value.
+ * @return Value.
+ */
+std::string ReadDsnString(const char* dsn, const char* key, const char* dflt);
 
-        /**
-         * Read DSN to fill the configuration.
-         *
-         * @param dsn DSN name.
-         * @param config Configuration.
-         * @param diag Diagnostic collector.
-         */
-        void ReadDsnConfiguration(const char* dsn, config::Configuration& config, diagnostic::DiagnosticRecordStorage *diag);
-    }
-}
+/**
+ * Read DSN to fill the configuration.
+ *
+ * @param dsn DSN name.
+ * @param config Configuration.
+ * @param diag Diagnostic collector.
+ */
+void ReadDsnConfiguration(const char* dsn, config::Configuration& config,
+                          diagnostic::DiagnosticRecordStorage* diag);
+}  // namespace odbc
+}  // namespace ignite
 
-#endif //_IGNITE_ODBC_DSN_CONFIG
+#endif  //_IGNITE_ODBC_DSN_CONFIG

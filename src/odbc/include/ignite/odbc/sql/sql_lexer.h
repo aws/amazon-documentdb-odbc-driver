@@ -18,100 +18,96 @@
 #ifndef _IGNITE_ODBC_SQL_SQL_LEXER
 #define _IGNITE_ODBC_SQL_SQL_LEXER
 
-#include <stdint.h>
-#include <string>
-
 #include <ignite/odbc/odbc_error.h>
 #include <ignite/odbc/sql/sql_token.h>
+#include <stdint.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        /**
-         * SQL lexer.
-         */
-        class SqlLexer
-        {
-        public:
-            /**
-             * Constructor.
-             *
-             * @param sql SQL string.
-             */
-            SqlLexer(const std::string& sql);
+#include <string>
 
-            /**
-             * Destructor.
-             */
-            ~SqlLexer();
+namespace ignite {
+namespace odbc {
+/**
+ * SQL lexer.
+ */
+class SqlLexer {
+ public:
+  /**
+   * Constructor.
+   *
+   * @param sql SQL string.
+   */
+  SqlLexer(const std::string& sql);
 
-            /**
-             * Move to the next token.
-             *
-             * @return @c true if next token was found and @c false otherwise.
-             */
-            OdbcExpected<bool> Shift();
+  /**
+   * Destructor.
+   */
+  ~SqlLexer();
 
-            /**
-             * Check that the following token is the expected one.
-             * Shifts to next token if possible.
-             *
-             * @param typ Token type.
-             * @param expected Expected token. Should be lowercase.
-             * @return @c true if the next token is expected and @c false otherwise.
-             */
-            bool ExpectNextToken(TokenType::Type typ, const char* expected);
+  /**
+   * Move to the next token.
+   *
+   * @return @c true if next token was found and @c false otherwise.
+   */
+  OdbcExpected< bool > Shift();
 
-            /**
-             * Check if the end of data reached.
-             *
-             * @return @c true if the end of data reached.
-             */
-            bool IsEod() const;
+  /**
+   * Check that the following token is the expected one.
+   * Shifts to next token if possible.
+   *
+   * @param typ Token type.
+   * @param expected Expected token. Should be lowercase.
+   * @return @c true if the next token is expected and @c false otherwise.
+   */
+  bool ExpectNextToken(TokenType::Type typ, const char* expected);
 
-            /**
-             * Get current token.
-             *
-             * @return Current token.
-             */
-            const SqlToken& GetCurrentToken() const
-            {
-                return currentToken;
-            }
+  /**
+   * Check if the end of data reached.
+   *
+   * @return @c true if the end of data reached.
+   */
+  bool IsEod() const;
 
-        private:
-            /**
-             * Set end of data state.
-             */
-            void SetEod();
+  /**
+   * Get current token.
+   *
+   * @return Current token.
+   */
+  const SqlToken& GetCurrentToken() const {
+    return currentToken;
+  }
 
-            /**
-             * Have enough data.
-             *
-             * @param num Number of chars we need.
-             * @return @c true if we have and false otherwise.
-             */
-            bool HaveData(int32_t num) const;
+ private:
+  /**
+   * Set end of data state.
+   */
+  void SetEod();
 
-            /**
-             * Check if the char is delimiter.
-             *
-             * @param c Character
-             * @return True if the character is delimiter.
-             */
-            static bool IsDelimiter(int c);
+  /**
+   * Have enough data.
+   *
+   * @param num Number of chars we need.
+   * @return @c true if we have and false otherwise.
+   */
+  bool HaveData(int32_t num) const;
 
-            /** SQL string. */
-            const std::string& sql;
+  /**
+   * Check if the char is delimiter.
+   *
+   * @param c Character
+   * @return True if the character is delimiter.
+   */
+  static bool IsDelimiter(int c);
 
-            /** Current lexer position in string. */
-            int32_t pos;
+  /** SQL string. */
+  const std::string& sql;
 
-            /** Current token. */
-            SqlToken currentToken;
-        };
-    }
-}
+  /** Current lexer position in string. */
+  int32_t pos;
 
-#endif //_IGNITE_ODBC_SQL_SQL_LEXER
+  /** Current token. */
+  SqlToken currentToken;
+};
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_SQL_SQL_LEXER

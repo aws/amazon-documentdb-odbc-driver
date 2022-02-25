@@ -32,14 +32,14 @@
 
         <Directory Id='TARGETDIR' Name='SourceDir'>
             <Directory Id='@WIX_PROGRAM_FILES_FOLDER_ID@' Name='ProgramFiles'>
-                <Directory Id='ApacheIgnite' Name='Apache Ignite'>
+                <Directory Id='AmazonDocumentDB' Name='Amazon DocumentDB'>
                     <Directory Id='INSTALLDIR' Name='ODBC Driver'>
                         <Component Id='Driver' Guid='@WIX_COMPONENT_ID@' Win64='@WIX_COMPONENT_IS_WIN64@'>
                             <File Id='IgniteOdbcDll' Name='ignite.odbc.dll' DiskId='1' Source='@WIX_ODBC_LIBRARY_PATH@' KeyPath='yes'/>
 
-                            <RegistryValue Root='HKLM' Key='Software\ODBC\ODBCINST.INI\ODBC Drivers' Name='Apache Ignite' Type='string' Value='Installed'/>
+                            <RegistryValue Root='HKLM' Key='Software\ODBC\ODBCINST.INI\ODBC Drivers' Name='Amazon DocumentDB' Type='string' Value='Installed'/>
 
-                            <RegistryKey Id='OdbcDriverRegInfo' Root='HKLM' Key='Software\ODBC\ODBCINST.INI\Apache Ignite' ForceCreateOnInstall='yes' ForceDeleteOnUninstall='yes'>
+                            <RegistryKey Id='OdbcDriverRegInfo' Root='HKLM' Key='Software\ODBC\ODBCINST.INI\Amazon DocumentDB' ForceCreateOnInstall='yes' ForceDeleteOnUninstall='yes'>
                                 <RegistryValue Type='string' Name='DriverODBCVer' Value='03.00'/>
                                 <RegistryValue Type='string' Name='Driver' Value='[#IgniteOdbcDll]'/>
                                 <RegistryValue Type='string' Name='Setup' Value='[#IgniteOdbcDll]'/>

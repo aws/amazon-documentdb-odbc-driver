@@ -19,12 +19,6 @@
 #include <Windows.h>
 #endif
 
-#include <sql.h>
-#include <sqlext.h>
-#include <string>
-#include <vector>
-
-#include <boost/test/unit_test.hpp>
 #include <ignite/odbc/common/common.h>
 #include <ignite/odbc/common/concurrent.h>
 #include <ignite/odbc/config/connection_string_parser.h>
@@ -36,6 +30,12 @@
 #include <ignite/odbc/jni/java.h>
 #include <ignite/odbc/jni/result_set.h>
 #include <ignite/odbc/jni/utils.h>
+#include <sql.h>
+#include <sqlext.h>
+
+#include <boost/test/unit_test.hpp>
+#include <string>
+#include <vector>
 
 #include "odbc_test_suite.h"
 #include "test_utils.h"
@@ -50,197 +50,201 @@ using ignite::odbc::common::ReleaseChars;
 using ignite::odbc::common::concurrent::SharedPointer;
 using ignite::odbc::config::Configuration;
 using ignite::odbc::config::ConnectionStringParser;
-using ignite::odbc::jni::ResolveDocumentDbHome;
 using ignite::odbc::jni::DatabaseMetaData;
 using ignite::odbc::jni::DocumentDbConnection;
+using ignite::odbc::jni::ResolveDocumentDbHome;
 using ignite::odbc::jni::ResultSet;
 using ignite::odbc::jni::java::BuildJvmOptions;
-using ignite::odbc::jni::java::JniHandlers;
 using ignite::odbc::jni::java::JniErrorCode;
 using ignite::odbc::jni::java::JniErrorInfo;
+using ignite::odbc::jni::java::JniHandlers;
 
 /**
  * Test setup fixture.
  */
 struct JniTestSuiteFixture : OdbcTestSuite {
-    using OdbcTestSuite::OdbcTestSuite;
+  using OdbcTestSuite::OdbcTestSuite;
 
-    SharedPointer< JniContext > GetJniContext(
-        std::vector< char* >& opts) const {
-        SharedPointer< JniContext > ctx(JniContext::Create(
-            &opts[0], static_cast< int >(opts.size()), JniHandlers()));
-        BOOST_CHECK(ctx.Get() != nullptr);
-        return ctx;
+  SharedPointer< JniContext > GetJniContext(std::vector< char* >& opts) const {
+    SharedPointer< JniContext > ctx(JniContext::Create(
+        &opts[0], static_cast< int >(opts.size()), JniHandlers()));
+    BOOST_CHECK(ctx.Get() != nullptr);
+    return ctx;
+  }
+
+  std::string GetJdbcConnectionString() const {
+    std::string dsnConnectionString;
+    CreateDsnConnectionString(dsnConnectionString);
+
+    Configuration config;
+    ConnectionStringParser parser(config);
+    parser.ParseConnectionString(dsnConnectionString, nullptr);
+    std::string jdbcConnectionString = config.ToJdbcConnectionString();
+    return jdbcConnectionString;
+  }
+
+  void PrepareContext() {
+    if (!_prepared) {
+      _jdbcConnectionString = GetJdbcConnectionString();
+      std::string cp = ResolveDocumentDbHome();
+      BuildJvmOptions(cp, _opts);
+      _ctx = GetJniContext(_opts);
+      _prepared = true;
     }
+  }
 
-    std::string GetJdbcConnectionString() const {
-        std::string dsnConnectionString;
-        CreateDsnConnectionString(dsnConnectionString);
+  void CleanUpContext() {
+    std::for_each(_opts.begin(), _opts.end(), ReleaseChars);
+    _opts.clear();
+    _ctx = nullptr;
+    _prepared = false;
+  }
 
-        Configuration config;
-        ConnectionStringParser parser(config);
-        parser.ParseConnectionString(dsnConnectionString, nullptr);
-        std::string jdbcConnectionString = config.ToJdbcConnectionString();
-        return jdbcConnectionString;
-    }
+  /**
+   * Destructor.
+   */
+  ~JniTestSuiteFixture() override {
+    CleanUpContext();
+  }
 
-    void PrepareContext() {
-        if (!_prepared) {
-            _jdbcConnectionString = GetJdbcConnectionString();
-            std::string cp = ResolveDocumentDbHome();
-            BuildJvmOptions(cp, _opts);
-            _ctx = GetJniContext(_opts);
-            _prepared = true;
-        }
-    }
+  bool _prepared = false;
 
-    void CleanUpContext() {
-        std::for_each(_opts.begin(), _opts.end(), ReleaseChars);
-        _opts.clear();
-        _ctx = nullptr;
-        _prepared = false;
-    }
+  std::string _jdbcConnectionString;
 
-    /**
-     * Destructor.
-     */
-    ~JniTestSuiteFixture() override {
-        CleanUpContext();
-    }
+  std::vector< char* > _opts;
 
-    bool _prepared = false;
-
-    std::string _jdbcConnectionString;
-
-    std::vector< char* > _opts;
-
-    SharedPointer< JniContext > _ctx;
+  SharedPointer< JniContext > _ctx;
 };
 
 BOOST_FIXTURE_TEST_SUITE(JniTestSuite, JniTestSuiteFixture)
 
 BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionOpen) {
-    PrepareContext();
-    BOOST_REQUIRE(_ctx.Get() != nullptr);
+  PrepareContext();
+  BOOST_REQUIRE(_ctx.Get() != nullptr);
 
-    std::string dsnConnectionString;
-    CreateDsnConnectionString(dsnConnectionString);
+  std::string dsnConnectionString;
+  CreateDsnConnectionString(dsnConnectionString);
 
-    Configuration config;
-    ConnectionStringParser parser(config);
-    parser.ParseConnectionString(dsnConnectionString, nullptr);
-    JniErrorInfo errInfo;
+  Configuration config;
+  ConnectionStringParser parser(config);
+  parser.ParseConnectionString(dsnConnectionString, nullptr);
+  JniErrorInfo errInfo;
 
-    DocumentDbConnection dbConnection(_ctx);
-    BOOST_CHECK(!dbConnection.IsOpen());
-    if (dbConnection.Open(config, errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-        BOOST_FAIL(errInfo.errMsg);
-    }
-    BOOST_CHECK(dbConnection.IsOpen());
+  DocumentDbConnection dbConnection(_ctx);
+  BOOST_CHECK(!dbConnection.IsOpen());
+  if (dbConnection.Open(config, errInfo)
+      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    BOOST_FAIL(errInfo.errMsg);
+  }
+  BOOST_CHECK(dbConnection.IsOpen());
 }
 
 BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionClose) {
-    PrepareContext();
-    BOOST_REQUIRE(_ctx.Get() != nullptr);
+  PrepareContext();
+  BOOST_REQUIRE(_ctx.Get() != nullptr);
 
-    std::string dsnConnectionString;
-    CreateDsnConnectionString(dsnConnectionString);
+  std::string dsnConnectionString;
+  CreateDsnConnectionString(dsnConnectionString);
 
-    Configuration config;
-    ConnectionStringParser parser(config);
-    parser.ParseConnectionString(dsnConnectionString, nullptr);
-    JniErrorInfo errInfo;
-    DocumentDbConnection dbConnection(_ctx);
+  Configuration config;
+  ConnectionStringParser parser(config);
+  parser.ParseConnectionString(dsnConnectionString, nullptr);
+  JniErrorInfo errInfo;
+  DocumentDbConnection dbConnection(_ctx);
 
-    BOOST_CHECK(!dbConnection.IsOpen());
-    if (dbConnection.Open(config, errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-        BOOST_FAIL(errInfo.errMsg);
-    }
-    BOOST_CHECK(dbConnection.IsOpen());
+  BOOST_CHECK(!dbConnection.IsOpen());
+  if (dbConnection.Open(config, errInfo)
+      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    BOOST_FAIL(errInfo.errMsg);
+  }
+  BOOST_CHECK(dbConnection.IsOpen());
 
-    if (dbConnection.Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-        BOOST_FAIL(errInfo.errMsg);
-    }
-    BOOST_CHECK(!dbConnection.IsOpen());
+  if (dbConnection.Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    BOOST_FAIL(errInfo.errMsg);
+  }
+  BOOST_CHECK(!dbConnection.IsOpen());
 }
 
 BOOST_AUTO_TEST_CASE(TestDocumentDatabaseDbMetaDataGetTables) {
-    PrepareContext();
-    BOOST_REQUIRE(_ctx.Get() != nullptr);
+  PrepareContext();
+  BOOST_REQUIRE(_ctx.Get() != nullptr);
 
-    std::string dsnConnectionString;
-    CreateDsnConnectionString(dsnConnectionString);
+  std::string dsnConnectionString;
+  CreateDsnConnectionString(dsnConnectionString);
 
-    Configuration config;
-    ConnectionStringParser parser(config);
-    parser.ParseConnectionString(dsnConnectionString, nullptr);
-    JniErrorInfo errInfo;
-    DocumentDbConnection dbConnection(_ctx);
+  Configuration config;
+  ConnectionStringParser parser(config);
+  parser.ParseConnectionString(dsnConnectionString, nullptr);
+  JniErrorInfo errInfo;
+  DocumentDbConnection dbConnection(_ctx);
 
-    BOOST_CHECK(!dbConnection.IsOpen());
-    if (dbConnection.Open(config, errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-        BOOST_FAIL(errInfo.errMsg);
+  BOOST_CHECK(!dbConnection.IsOpen());
+  if (dbConnection.Open(config, errInfo)
+      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    BOOST_FAIL(errInfo.errMsg);
+  }
+  BOOST_CHECK(dbConnection.IsOpen());
+
+  SharedPointer< DatabaseMetaData > databaseMetaData =
+      dbConnection.GetMetaData(errInfo);
+  BOOST_REQUIRE(databaseMetaData.IsValid());
+
+  std::string catalog;
+  std::string schemaPattern;
+  std::string tablePattern;
+  std::vector< std::string > types = {"TABLE"};
+  SharedPointer< ResultSet > resultSet = databaseMetaData.Get()->GetTables(
+      catalog, schemaPattern, tablePattern, types, errInfo);
+  BOOST_CHECK(resultSet.IsValid());
+  BOOST_CHECK(resultSet.Get()->IsOpen());
+
+  // Loop the result set records
+  bool hasNext = false;
+  do {
+    resultSet.Get()->Next(hasNext, errInfo);
+    if (!hasNext) {
+      break;
     }
-    BOOST_CHECK(dbConnection.IsOpen());
 
-    SharedPointer< DatabaseMetaData > databaseMetaData = dbConnection.GetMetaData(errInfo);
-    BOOST_REQUIRE(databaseMetaData.IsValid());
+    std::string value;
+    bool wasNull;
 
-    std::string catalog;
-    std::string schemaPattern;
-    std::string tablePattern;
-    std::vector< std::string > types = {"TABLE"};
-    SharedPointer< ResultSet > resultSet = databaseMetaData.Get()->GetTables(catalog, schemaPattern, tablePattern, types, errInfo);
-    BOOST_CHECK(resultSet.IsValid());
-    BOOST_CHECK(resultSet.Get()->IsOpen());
+    resultSet.Get()->GetString(1, value, wasNull, errInfo);
+    BOOST_CHECK(wasNull);
+    resultSet.Get()->GetString("TABLE_CAT", value, wasNull, errInfo);
+    BOOST_CHECK(wasNull);
 
-    // Loop the result set records
-    bool hasNext = false;
-    do {
-        resultSet.Get()->Next(hasNext, errInfo);
-        if (!hasNext) {
-            break;
-        }
+    resultSet.Get()->GetString(2, value, wasNull, errInfo);
+    BOOST_CHECK(!wasNull);
+    resultSet.Get()->GetString("TABLE_SCHEM", value, wasNull, errInfo);
+    BOOST_CHECK(!wasNull);
+    BOOST_CHECK("test" == value);
 
-        std::string value;
-        bool wasNull;
+    resultSet.Get()->GetString(3, value, wasNull, errInfo);
+    BOOST_CHECK(!wasNull);
+    BOOST_CHECK(!value.empty());
+    resultSet.Get()->GetString("TABLE_NAME", value, wasNull, errInfo);
+    BOOST_CHECK(!wasNull);
+    BOOST_CHECK(!value.empty());
 
-        resultSet.Get()->GetString(1, value, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
-        resultSet.Get()->GetString("TABLE_CAT", value, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
+    resultSet.Get()->GetString(4, value, wasNull, errInfo);
+    BOOST_CHECK(!wasNull);
+    BOOST_CHECK("TABLE" == value);
+    resultSet.Get()->GetString("TABLE_TYPE", value, wasNull, errInfo);
+    BOOST_CHECK(!wasNull);
+    BOOST_CHECK("TABLE" == value);
 
-        resultSet.Get()->GetString(2, value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        resultSet.Get()->GetString("TABLE_SCHEM", value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        BOOST_CHECK("test" == value);
+  } while (hasNext);
 
-        resultSet.Get()->GetString(3, value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        BOOST_CHECK(!value.empty());
-        resultSet.Get()->GetString("TABLE_NAME", value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        BOOST_CHECK(!value.empty());
+  if (resultSet.Get()->Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    BOOST_FAIL(errInfo.errMsg);
+  }
+  BOOST_CHECK(!resultSet.Get()->IsOpen());
 
-        resultSet.Get()->GetString(4, value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        BOOST_CHECK("TABLE" == value);
-        resultSet.Get()->GetString("TABLE_TYPE", value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        BOOST_CHECK("TABLE"  == value);
-
-    } while (hasNext);
-
-    if (resultSet.Get()->Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-        BOOST_FAIL(errInfo.errMsg);
-    }
-    BOOST_CHECK(!resultSet.Get()->IsOpen());
-
-    if (dbConnection.Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-        BOOST_FAIL(errInfo.errMsg);
-    }
-    BOOST_CHECK(!dbConnection.IsOpen());
+  if (dbConnection.Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    BOOST_FAIL(errInfo.errMsg);
+  }
+  BOOST_CHECK(!dbConnection.IsOpen());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

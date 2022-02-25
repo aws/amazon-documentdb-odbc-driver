@@ -16,18 +16,17 @@
  */
 
 #ifdef _WIN32
-#   include <Windows.h>
+#include <Windows.h>
 #endif
 
 #include <sql.h>
 #include <sqlext.h>
 
+#include <boost/test/unit_test.hpp>
 #include <string>
 
-#include <boost/test/unit_test.hpp>
-
-#include "test_utils.h"
 #include "odbc_test_suite.h"
+#include "test_utils.h"
 
 using ignite::odbc::OdbcTestSuite;
 using ignite_test::GetOdbcErrorMessage;
@@ -35,126 +34,128 @@ using ignite_test::GetOdbcErrorMessage;
 /**
  * Test setup fixture.
  */
-struct ConnectionTestSuiteFixture: OdbcTestSuite
-{
-    using OdbcTestSuite::OdbcTestSuite;
+struct ConnectionTestSuiteFixture : OdbcTestSuite {
+  using OdbcTestSuite::OdbcTestSuite;
 
-    /**
-     * Execute the query and return an error code.
-     */
-    std::string ExecQueryAndReturnError()
-    {
-        SQLCHAR selectReq[] = "select count(*) from TestType";
+  /**
+   * Execute the query and return an error code.
+   */
+  std::string ExecQueryAndReturnError() {
+    SQLCHAR selectReq[] = "select count(*) from TestType";
 
-        SQLRETURN ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
+    SQLRETURN ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
 
-        std::string err;
+    std::string err;
 
-        if (!SQL_SUCCEEDED(ret))
-            err = ExtractErrorCode(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+    if (!SQL_SUCCEEDED(ret))
+      err = ExtractErrorCode(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-        return err;
-    }
+    return err;
+  }
 
-    /**
-     * Extract code from ODBC error message.
-     *
-     * @param err Error message.
-     * @return Error code.
-     */
-    static std::string ExtractErrorCode(const std::string& err)
-    {
-        std::string code;
+  /**
+   * Extract code from ODBC error message.
+   *
+   * @param err Error message.
+   * @return Error code.
+   */
+  static std::string ExtractErrorCode(const std::string& err) {
+    std::string code;
 
-        size_t idx = err.find(':');
+    size_t idx = err.find(':');
 
-        if ((idx != std::string::npos) && (idx > 0))
-            code = err.substr(0, idx);
+    if ((idx != std::string::npos) && (idx > 0))
+      code = err.substr(0, idx);
 
-        return code;
-    }
+    return code;
+  }
 
-    /**
-     * Destructor.
-     */
-    ~ConnectionTestSuiteFixture() override = default;
+  /**
+   * Destructor.
+   */
+  ~ConnectionTestSuiteFixture() override = default;
 };
-
 
 BOOST_FIXTURE_TEST_SUITE(ConnectionTestSuite, ConnectionTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestConnectionRestoreInternalSSHTunnel)
-{
-    std::string connectionString;
-    CreateDsnConnectionString(connectionString);
-    Connect(connectionString);
-    Disconnect();
+BOOST_AUTO_TEST_CASE(TestConnectionRestoreInternalSSHTunnel) {
+  std::string connectionString;
+  CreateDsnConnectionString(connectionString);
+  Connect(connectionString);
+  Disconnect();
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionRestoreExternalSSHTunnel)
-{
-    std::string connectionString;
-    CreateDsnConnectionString(connectionString, std::string(), false);
+BOOST_AUTO_TEST_CASE(TestConnectionRestoreExternalSSHTunnel) {
+  std::string connectionString;
+  CreateDsnConnectionString(connectionString, std::string(), false);
 
-    Connect(connectionString);
-    Disconnect();
+  Connect(connectionString);
+  Disconnect();
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionRestoreMiscOptionsSet)
-{
-    const std::string miscOptions = 
-        "APP_NAME=TestAppName;"
-        "LOGIN_TIMEOUT_SEC=30;"
-        "READ_PREFERENCE=primary_preferred;"
-        "RETRY_READS=false;"
-        "SCAN_METHOD=id_forward;"
-        "SCAN_LIMIT=100;"
-        "SCHEMA_NAME=test;"
-        "REFRESH_SCHEMA=true;"
-        "DEFAULT_FETCH_SIZE=1000;";
-    std::string connectionString;
-    CreateDsnConnectionString(connectionString, std::string(), true, miscOptions);
+BOOST_AUTO_TEST_CASE(TestConnectionRestoreMiscOptionsSet) {
+  const std::string miscOptions =
+      "APP_NAME=TestAppName;"
+      "LOGIN_TIMEOUT_SEC=30;"
+      "READ_PREFERENCE=primary_preferred;"
+      "RETRY_READS=false;"
+      "SCAN_METHOD=id_forward;"
+      "SCAN_LIMIT=100;"
+      "SCHEMA_NAME=test;"
+      "REFRESH_SCHEMA=true;"
+      "DEFAULT_FETCH_SIZE=1000;";
+  std::string connectionString;
+  CreateDsnConnectionString(connectionString, std::string(), true, miscOptions);
 
-    Connect(connectionString);
-    Disconnect();
+  Connect(connectionString);
+  Disconnect();
 }
 
 BOOST_AUTO_TEST_CASE(TestConnectionIncompleteBasicProperties) {
-    std::string connectionString =
-        "DRIVER={Apache Ignite};"
-        "HOSTNAME=localhost;"
-        "USER=user;"
-        "PASSWORD=password;";
+  std::string connectionString =
+      "DRIVER={Amazon DocumentDB};"
+      "HOSTNAME=localhost;"
+      "USER=user;"
+      "PASSWORD=password;";
 
-    ExpectConnectionReject(connectionString, "01S00: Hostname, username, password, and database are required to connect.");
+  ExpectConnectionReject(connectionString,
+                         "01S00: Hostname, username, password, and database "
+                         "are required to connect.");
 
-    Disconnect();
+  Disconnect();
 }
 
 BOOST_AUTO_TEST_CASE(TestConnectionIncompleteSSHTunnelProperties) {
-    std::string connectionString =
-        "DRIVER={Apache Ignite};"
-        "HOSTNAME=host.com;"
-        "DATABASE=test;"
-        "USER=user;"
-        "PASSWORD=password;"
-        "SSH_USER=sshUser;"
-        "SSH_HOST=sshHost;";
+  std::string connectionString =
+      "DRIVER={Amazon DocumentDB};"
+      "HOSTNAME=host.com;"
+      "DATABASE=test;"
+      "USER=user;"
+      "PASSWORD=password;"
+      "SSH_USER=sshUser;"
+      "SSH_HOST=sshHost;";
 
-    ExpectConnectionReject(connectionString, "01S00: If using an internal SSH tunnel, all of ssh_host, ssh_user, ssh_private_key_file are required to connect.");
+  ExpectConnectionReject(
+      connectionString,
+      "01S00: If using an internal SSH tunnel, all of ssh_host, ssh_user, "
+      "ssh_private_key_file are required to connect.");
 
-    Disconnect();
+  Disconnect();
 }
 
 BOOST_AUTO_TEST_CASE(TestConnectionInvalidUser) {
-    std::string connectionString;
-    CreateDsnConnectionString(connectionString, "invaliduser");
+  std::string connectionString;
+  CreateDsnConnectionString(connectionString, "invaliduser");
 
-    ExpectConnectionReject(connectionString, "08001: Failed to establish connection with the host.\n"
-      "Invalid username or password or user is not authorized on database 'test'. "
-      "Please check your settings. Authorization failed for user 'invaliduser' on database 'admin' with mechanism");
+  ExpectConnectionReject(
+      connectionString,
+      "08001: Failed to establish connection with the host.\n"
+      "Invalid username or password or user is not authorized on database "
+      "'test'. "
+      "Please check your settings. Authorization failed for user 'invaliduser' "
+      "on database 'admin' with mechanism");
 
-    Disconnect();
+  Disconnect();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

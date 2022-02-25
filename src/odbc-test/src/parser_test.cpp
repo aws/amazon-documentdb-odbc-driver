@@ -15,69 +15,62 @@
  * limitations under the License.
  */
 
-#include <boost/test/unit_test.hpp>
-
 #include <ignite/odbc/parser.h>
+
+#include <boost/test/unit_test.hpp>
 
 using namespace ignite::odbc;
 
-struct TestMessage
-{
-    TestMessage() : a(0), b()
-    {
-        // No-op.
-    }
+struct TestMessage {
+  TestMessage() : a(0), b() {
+    // No-op.
+  }
 
-    TestMessage(int32_t a, const std::string& b) : a(a), b(b)
-    {
-        // No-op.
-    }
+  TestMessage(int32_t a, const std::string& b) : a(a), b(b) {
+    // No-op.
+  }
 
-    ~TestMessage()
-    {
-        // No-op.
-    }
+  ~TestMessage() {
+    // No-op.
+  }
 
-    void Write(ignite::impl::binary::BinaryWriterImpl& writer, const ProtocolVersion&) const
-    {
-        writer.WriteInt32(a);
-        writer.WriteString(b.data(), static_cast<int32_t>(b.size()));
-    }
+  void Write(ignite::impl::binary::BinaryWriterImpl& writer,
+             const ProtocolVersion&) const {
+    writer.WriteInt32(a);
+    writer.WriteString(b.data(), static_cast< int32_t >(b.size()));
+  }
 
-    void Read(ignite::impl::binary::BinaryReaderImpl& reader, const ProtocolVersion&)
-    {
-        a = reader.ReadInt32();
+  void Read(ignite::impl::binary::BinaryReaderImpl& reader,
+            const ProtocolVersion&) {
+    a = reader.ReadInt32();
 
-        b.resize(reader.ReadString(0, 0));
-        reader.ReadString(&b[0], static_cast<int32_t>(b.size()));
-    }
+    b.resize(reader.ReadString(0, 0));
+    reader.ReadString(&b[0], static_cast< int32_t >(b.size()));
+  }
 
-    int32_t a;
-    std::string b;
+  int32_t a;
+  std::string b;
 };
 
-bool operator==(const TestMessage& lhs, const TestMessage& rhs)
-{
-    return lhs.a == rhs.a &&
-           lhs.b == rhs.b;
+bool operator==(const TestMessage& lhs, const TestMessage& rhs) {
+  return lhs.a == rhs.a && lhs.b == rhs.b;
 }
 
 BOOST_AUTO_TEST_SUITE(ParserTestSuite)
 
-BOOST_AUTO_TEST_CASE(TestParserEncodeDecode)
-{
-    Parser parser;
+BOOST_AUTO_TEST_CASE(TestParserEncodeDecode) {
+  Parser parser;
 
-    std::vector<int8_t> buffer;
+  std::vector< int8_t > buffer;
 
-    TestMessage outMsg(42, "Test message");
-    TestMessage inMsg;
+  TestMessage outMsg(42, "Test message");
+  TestMessage inMsg;
 
-    parser.Encode(outMsg, buffer);
+  parser.Encode(outMsg, buffer);
 
-    parser.Decode(inMsg, buffer);
+  parser.Decode(inMsg, buffer);
 
-    BOOST_REQUIRE(outMsg == inMsg);
+  BOOST_REQUIRE(outMsg == inMsg);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -18,81 +18,74 @@
 #ifndef _IGNITE_ODBC_RESULT_PAGE
 #define _IGNITE_ODBC_RESULT_PAGE
 
-#include <stdint.h>
-
 #include <ignite/impl/binary/binary_reader_impl.h>
+#include <stdint.h>
 
 #include "ignite/odbc/app/application_data_buffer.h"
 #include "ignite/odbc/common_types.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        /**
-         * Query result page.
-         */
-        class ResultPage
-        {
-            enum { DEFAULT_ALLOCATED_MEMORY = 1024 };
+namespace ignite {
+namespace odbc {
+/**
+ * Query result page.
+ */
+class ResultPage {
+  enum { DEFAULT_ALLOCATED_MEMORY = 1024 };
 
-        public:
-            /**
-             * Constructor.
-             */
-            ResultPage();
+ public:
+  /**
+   * Constructor.
+   */
+  ResultPage();
 
-            /**
-             * Destructor.
-             */
-            ~ResultPage();
-            
-            /**
-             * Read result page using provided reader.
-             * @param reader Reader.
-             */
-            void Read(ignite::impl::binary::BinaryReaderImpl& reader);
+  /**
+   * Destructor.
+   */
+  ~ResultPage();
 
-            /**
-             * Get page size.
-             * @return Page size.
-             */
-            int32_t GetSize() const
-            {
-                return size;
-            }
+  /**
+   * Read result page using provided reader.
+   * @param reader Reader.
+   */
+  void Read(ignite::impl::binary::BinaryReaderImpl& reader);
 
-            /**
-             * Check if the page is last.
-             * @return True if the page is last.
-             */
-            bool IsLast() const
-            {
-                return last;
-            }
+  /**
+   * Get page size.
+   * @return Page size.
+   */
+  int32_t GetSize() const {
+    return size;
+  }
 
-            /**
-             * Get page data.
-             * @return Page data.
-             */
-            ignite::impl::interop::InteropUnpooledMemory& GetData()
-            {
-                return data;
-            }
+  /**
+   * Check if the page is last.
+   * @return True if the page is last.
+   */
+  bool IsLast() const {
+    return last;
+  }
 
-        private:
-            IGNITE_NO_COPY_ASSIGNMENT(ResultPage);
+  /**
+   * Get page data.
+   * @return Page data.
+   */
+  ignite::impl::interop::InteropUnpooledMemory& GetData() {
+    return data;
+  }
 
-            /** Last page flag. */
-            bool last;
+ private:
+  IGNITE_NO_COPY_ASSIGNMENT(ResultPage);
 
-            /** Page size in rows. */
-            int32_t size;
+  /** Last page flag. */
+  bool last;
 
-            /** Memory that contains current row page data. */
-            ignite::impl::interop::InteropUnpooledMemory data;
-        };
-    }
-}
+  /** Page size in rows. */
+  int32_t size;
 
-#endif //_IGNITE_ODBC_RESULT_PAGE
+  /** Memory that contains current row page data. */
+  ignite::impl::interop::InteropUnpooledMemory data;
+};
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_RESULT_PAGE

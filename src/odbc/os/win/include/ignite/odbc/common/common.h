@@ -25,22 +25,23 @@
 
 #include <iostream>
 
-#define IGNITE_TRACE_ALLOC(addr) \
-    std::cout << "ALLOC " << __FILE__ << "(" << __LINE__ << "): 0x" << (void*)addr << std::endl;
+#define IGNITE_TRACE_ALLOC(addr)                                  \
+  std::cout << "ALLOC " << __FILE__ << "(" << __LINE__ << "): 0x" \
+            << (void*)addr << std::endl;
 
 /**
  * Common construction to disable copy constructor and assignment for class.
  */
 #define IGNITE_NO_COPY_ASSIGNMENT(cls) \
-    cls(const cls& src); \
-    cls& operator= (const cls& other);
+  cls(const cls& src);                 \
+  cls& operator=(const cls& other);
 
 #if (__cplusplus >= 201103L)
-#   define IGNITE_NO_THROW noexcept
+#define IGNITE_NO_THROW noexcept
 #else
-#   define IGNITE_NO_THROW throw()
+#define IGNITE_NO_THROW throw()
 #endif
 
-#define IGNITE_UNUSED(x) ((void) x)
+#define IGNITE_UNUSED(x) ((void)x)
 
-#endif //_IGNITE_ODBC_COMMON_COMMON
+#endif  //_IGNITE_ODBC_COMMON_COMMON
