@@ -23,7 +23,7 @@
 #ifndef _IGNITE_ODBC_IMPL_BINARY_BINARY_OBJECT_HEADER
 #define _IGNITE_ODBC_IMPL_BINARY_BINARY_OBJECT_HEADER
 
-#include <ignite/common/common.h>
+#include <ignite/odbc/common/common.h>
 #include <ignite/odbc/impl/binary/binary_common.h>
 #include <ignite/odbc/impl/interop/interop_memory.h>
 #include <stdint.h>

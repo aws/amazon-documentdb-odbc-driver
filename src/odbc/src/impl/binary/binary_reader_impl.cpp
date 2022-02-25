@@ -17,9 +17,9 @@
 
 #include "ignite/odbc/impl/binary/binary_reader_impl.h"
 
-#include <ignite/ignite_error.h>
+#include <ignite/odbc/ignite_error.h>
 
-#include "ignite/binary/binary_type.h"
+#include "ignite/odbc/binary/binary_type.h"
 #include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/impl/binary/binary_id_resolver.h"
 #include "ignite/odbc/impl/binary/binary_utils.h"

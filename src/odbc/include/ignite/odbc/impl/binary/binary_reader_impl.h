@@ -18,13 +18,14 @@
 #ifndef _IGNITE_ODBC_IMPL_BINARY_BINARY_READER
 #define _IGNITE_ODBC_IMPL_BINARY_BINARY_READER
 
-#include <ignite/common/common.h>
-#include <ignite/common/fixed_size_array.h>
+#include <ignite/odbc/common/common.h>
+#include <ignite/odbc/common/fixed_size_array.h>
 #include <stdint.h>
 
 #include <string>
 #include <vector>
 
+// TODO -AL- copy the binary files
 #include "ignite/binary/binary_consts.h"
 #include "ignite/binary/binary_enum.h"
 #include "ignite/binary/binary_enum_entry.h"
@@ -40,9 +41,11 @@
 #include "ignite/timestamp.h"
 
 namespace ignite {
+namespace odbc {
 namespace binary {
 class BinaryReader;
 }
+}  // namespace odbc
 namespace odbc {
 namespace impl {
 namespace binary {

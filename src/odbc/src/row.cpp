@@ -21,7 +21,7 @@
 
 namespace ignite {
 namespace odbc {
-Row::Row(ignite::impl::interop::InteropUnpooledMemory& pageData)
+Row::Row(ignite::odbc::impl::interop::InteropUnpooledMemory& pageData)
     : rowBeginPos(0),
       pos(rowBeginPos),
       size(0),

@@ -23,7 +23,7 @@
 #ifndef _IGNITE_ODBC_IMPL_BINARY_BINARY_OBJECT_IMPL
 #define _IGNITE_ODBC_IMPL_BINARY_BINARY_OBJECT_IMPL
 
-#include <ignite/binary/binary_type.h>
+#include <ignite/odbc/binary/binary_type.h>
 #include <ignite/odbc/impl/binary/binary_reader_impl.h>
 #include <ignite/odbc/impl/binary/binary_type_manager.h>
 #include <ignite/odbc/impl/interop/interop_input_stream.h>
