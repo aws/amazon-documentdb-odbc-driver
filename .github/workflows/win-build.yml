@@ -14,6 +14,7 @@ env:
   CI_OUTPUT_PATH: "ci-output"
   ODBC_LIB_PATH: "./build/odbc/lib"
   ODBC_BIN_PATH: "./build/odbc/bin/Release"
+  ODBC_DEBUG_PATH: "./build/odbc/bin/Debug"
   ODBC_BUILD_PATH: "./build/odbc/cmake"
   VCPKG_ROOT: "c:/vcpkg"
   DOCUMENTDB_HOME: "./build/odbc/bin/Release"
@@ -245,7 +246,7 @@ jobs:
 
     - name: register-driver
       run: |
-        .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
+        .\src\odbc\install\install_amd64.cmd ${{env.ODBC_DEBUG_PATH}}\ignite.odbc.dll
 
     - name: run-tests
       run: |
