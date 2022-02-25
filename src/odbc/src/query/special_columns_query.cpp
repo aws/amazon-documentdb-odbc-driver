@@ -17,7 +17,7 @@
 
 #include "ignite/odbc/query/special_columns_query.h"
 
-#include <ignite/impl/binary/binary_common.h>
+#include "ignite/odbc/impl/binary/binary_common.h"
 
 #include "ignite/odbc/type_traits.h"
 
@@ -39,7 +39,7 @@ SpecialColumnsQuery::SpecialColumnsQuery(diagnostic::DiagnosableAdapter& diag,
       nullable(nullable),
       executed(false),
       columnsMeta() {
-  using namespace ignite::impl::binary;
+  using namespace ignite::odbc::impl::binary;
   using namespace ignite::odbc::type_traits;
 
   using meta::ColumnMeta;

@@ -17,7 +17,8 @@
 
 #include "ignite/odbc/meta/column_meta.h"
 
-#include "ignite/common/utils.h"
+#include "ignite/odbc/impl/binary/binary_common.h"
+#include "ignite/odbc/common/utils.h"
 #include "ignite/odbc/common_types.h"
 #include "ignite/odbc/jni/java.h"
 #include "ignite/odbc/log.h"
@@ -129,7 +130,7 @@ void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
 }
 
 bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
-  using namespace ignite::impl::binary;
+  using namespace ignite::odbc::impl::binary;
 
   switch (fieldId) {
     case SQL_DESC_LABEL:
@@ -203,7 +204,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
 }
 
 bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
-  using namespace ignite::impl::binary;
+  using namespace ignite::odbc::impl::binary;
 
   switch (fieldId) {
     case SQL_DESC_FIXED_PREC_SCALE: {
