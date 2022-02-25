@@ -70,3 +70,4 @@ bool operator>=(const Date& val1, const Date& val2) {
 }
 }  // namespace odbc
 }  // namespace ignite
+

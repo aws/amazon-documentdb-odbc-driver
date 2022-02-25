@@ -47,7 +47,7 @@ BinaryObjectImpl::BinaryObjectImpl(interop::InteropMemory& mem, int32_t start,
     this->start += portOff + 5;
   } else if (hdr != IGNITE_TYPE_OBJECT) {
     IGNITE_ERROR_FORMATTED_3(
-        ignite::IgniteError::IGNITE_ERR_BINARY,
+        IgniteError::IGNITE_ERR_BINARY,
         "Memory layuout does not look like a binary object", "memPtr",
         mem.Data(), "pos", start, "header", hdr);
   }
@@ -161,7 +161,7 @@ int32_t BinaryObjectImpl::FindField(const int32_t fieldId) const {
   int32_t footerEnd = footerBegin + header.GetFooterLength();
 
   if ((mem->Length() - start) < footerEnd) {
-    IGNITE_ERROR_FORMATTED_3(ignite::IgniteError::IGNITE_ERR_BINARY,
+    IGNITE_ERROR_FORMATTED_3(IgniteError::IGNITE_ERR_BINARY,
                              "Not enough data in the binary object", "memPtr",
                              mem->PointerLong(), "len", (mem->Length() - start),
                              "footerEnd", footerEnd);

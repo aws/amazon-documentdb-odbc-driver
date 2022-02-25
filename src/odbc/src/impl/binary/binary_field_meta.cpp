@@ -24,13 +24,13 @@ namespace odbc {
 namespace impl {
 namespace binary {
 IGNITE_IMPORT_EXPORT void BinaryFieldMeta::Write(
-    ignite::binary::BinaryRawWriter& writer) const {
+    BinaryRawWriter& writer) const {
   writer.WriteInt32(typeId);
   writer.WriteInt32(fieldId);
 }
 
 IGNITE_IMPORT_EXPORT void BinaryFieldMeta::Read(
-    ignite::binary::BinaryRawReader& reader) {
+    BinaryRawReader& reader) {
   typeId = reader.ReadInt32();
   fieldId = reader.ReadInt32();
 }

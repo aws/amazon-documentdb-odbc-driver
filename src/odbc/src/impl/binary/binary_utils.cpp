@@ -22,9 +22,10 @@
 #include "ignite/odbc/impl/interop/interop.h"
 #include "ignite/odbc/impl/binary/binary_utils.h"
 
+using namespace ignite::odbc;
+using namespace ignite::odbc::binary;
 using namespace ignite::odbc::impl::interop;
 using namespace ignite::odbc::impl::binary;
-using namespace ignite::odbc::binary;
 
 namespace {
 /**
@@ -37,7 +38,7 @@ namespace {
  */
 inline void CheckEnoughData(InteropMemory& mem, int32_t pos, int32_t len) {
   if (mem.Length() < (pos + len)) {
-    IGNITE_ERROR_FORMATTED_4(ignite::IgniteError::IGNITE_ERR_MEMORY,
+    IGNITE_ERROR_FORMATTED_4(IgniteError::IGNITE_ERR_MEMORY,
                              "Not enough data in "
                              "the binary object",
                              "memPtr", mem.PointerLong(), "len", mem.Length(),

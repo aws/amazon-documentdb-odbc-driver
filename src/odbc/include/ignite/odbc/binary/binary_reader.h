@@ -339,7 +339,7 @@ class IGNITE_IMPORT_EXPORT BinaryReader {
     int32_t len = ReadString(fieldName, NULL, 0);
 
     if (len != -1) {
-      ignite::common::FixedSizeArray< char > arr(len + 1);
+      ignite::odbc::common::FixedSizeArray< char > arr(len + 1);
 
       ReadString(fieldName, arr.GetData(),
                  static_cast< int32_t >(arr.GetSize()));
