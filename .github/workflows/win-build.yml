@@ -38,7 +38,7 @@ jobs:
       run: |
         choco install cppcheck -y
         echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
-        run_cppcheck.ps1
+        .\run_cppcheck.ps1
     - name: upload-cppcheck-results
       if: failure()
       uses: actions/upload-artifact@v2
@@ -134,7 +134,7 @@ jobs:
       run: |
         choco install cppcheck -y
         echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
-        run_cppcheck.ps1
+        .\run_cppcheck.ps1
     - name: upload-cppcheck-results
       if: failure()
       uses: actions/upload-artifact@v2
