@@ -17,13 +17,13 @@
 
 #include "ignite/odbc/impl/binary/binary_writer_impl.h"
 
-#include <ignite/ignite_error.h>
+#include <ignite/odbc/ignite_error.h>
 
 #include "ignite/odbc/impl/interop/interop_stream_position_guard.h"
 
 using namespace ignite::odbc::impl::interop;
 using namespace ignite::odbc::impl::binary;
-using namespace ignite::binary;
+using namespace ignite::odbc::binary;
 
 namespace ignite {
 namespace odbc {

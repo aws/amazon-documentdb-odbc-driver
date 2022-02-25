@@ -19,12 +19,12 @@
 
 #include <time.h>
 
-#include "ignite/ignite_error.h"
+#include "ignite/odbc/ignite_error.h"
 #include "ignite/odbc/impl/interop/interop.h"
 
 using namespace ignite::odbc::impl::interop;
 using namespace ignite::odbc::impl::binary;
-using namespace ignite::binary;
+using namespace ignite::odbc::binary;
 
 namespace {
 /**

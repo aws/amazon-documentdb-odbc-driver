@@ -17,13 +17,13 @@
 
 #include "ignite/odbc/impl/binary/binary_type_manager.h"
 
-#include <ignite/common/concurrent.h>
+#include <ignite/odbc/common/concurrent.h>
 
 #include <algorithm>
 #include <map>
 #include <vector>
 
-using namespace ignite::common::concurrent;
+using namespace ignite::odbc::common::concurrent;
 
 namespace ignite {
 namespace odbc {

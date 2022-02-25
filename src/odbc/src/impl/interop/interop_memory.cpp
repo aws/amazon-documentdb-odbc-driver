@@ -16,7 +16,7 @@
  */
 #include "ignite/odbc/impl/interop/interop_memory.h"
 
-#include <ignite/ignite_error.h>
+#include <ignite/odbc/ignite_error.h>
 
 #include <cstdlib>
 

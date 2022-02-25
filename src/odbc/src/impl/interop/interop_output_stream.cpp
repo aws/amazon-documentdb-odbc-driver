@@ -17,7 +17,7 @@
 
 #include "ignite/odbc/impl/interop//interop_output_stream.h"
 
-#include <ignite/ignite_error.h>
+#include <ignite/odbc/ignite_error.h>
 
 #include <cstring>
 

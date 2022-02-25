@@ -17,7 +17,7 @@
 
 #include "ignite/odbc/impl/binary/binary_type_handler.h"
 
-using namespace ignite::common::concurrent;
+using namespace ignite::odbc::common::concurrent;
 
 namespace ignite {
 namespace odbc {

@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-#include <ignite/binary/binary_reader.h>
-#include <ignite/binary/binary_writer.h>
+#include <ignite/odbc/binary/binary_reader.h>
+#include <ignite/odbc/binary/binary_writer.h>
 #include <ignite/odbc/impl/binary/binary_type_impl.h>
 
 #include <cstring>
 
 namespace ignite {
+namespace odbc {
 namespace binary {
 int32_t BinaryType< IgniteError >::GetTypeId() {
   return GetBinaryStringHashCode("IgniteError");
@@ -52,4 +53,6 @@ void BinaryType< IgniteError >::Read(BinaryReader& reader, IgniteError& dst) {
   dst = IgniteError(code, msg.c_str());
 }
 }  // namespace binary
+}  // namespace odbc
 }  // namespace ignite
+
