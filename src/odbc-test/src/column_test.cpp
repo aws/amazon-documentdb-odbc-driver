@@ -25,6 +25,7 @@
 #include "ignite/odbc/system/odbc_constants.h"
 
 using namespace ignite::odbc::impl::binary;
+using namespace ignite::odbc::impl::interop;
 using namespace ignite::odbc::app;
 using namespace ignite::odbc;
 
@@ -37,9 +38,9 @@ BOOST_AUTO_TEST_CASE(TestColumnDefaultConstruction) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColumnShort) {
-  ignite::odbc::impl::interop::InteropUnpooledMemory mem(4096);
-  ignite::odbc::impl::interop::InteropOutputStream outStream(&mem);
-  ignite::odbc::impl::binary::BinaryWriterImpl writer(&outStream, 0);
+  InteropUnpooledMemory mem(4096);
+  InteropOutputStream outStream(&mem);
+  BinaryWriterImpl writer(&outStream, 0);
 
   int16_t data = 42;
 
@@ -48,8 +49,8 @@ BOOST_AUTO_TEST_CASE(TestColumnShort) {
 
   outStream.Synchronize();
 
-  ignite::odbc::impl::interop::InteropInputStream inStream(&mem);
-  ignite::odbc::impl::binary::BinaryReaderImpl reader(&inStream);
+  InteropInputStream inStream(&mem);
+  BinaryReaderImpl reader(&inStream);
 
   Column column(reader);
 
@@ -87,9 +88,9 @@ BOOST_AUTO_TEST_CASE(TestColumnShort) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColumnString) {
-  ignite::odbc::impl::interop::InteropUnpooledMemory mem(4096);
-  ignite::odbc::impl::interop::InteropOutputStream outStream(&mem);
-  ignite::odbc::impl::binary::BinaryWriterImpl writer(&outStream, 0);
+  InteropUnpooledMemory mem(4096);
+  InteropOutputStream outStream(&mem);
+  BinaryWriterImpl writer(&outStream, 0);
 
   std::string data("Some test data.");
 
@@ -97,8 +98,8 @@ BOOST_AUTO_TEST_CASE(TestColumnString) {
 
   outStream.Synchronize();
 
-  ignite::odbc::impl::interop::InteropInputStream inStream(&mem);
-  ignite::odbc::impl::binary::BinaryReaderImpl reader(&inStream);
+  InteropInputStream inStream(&mem);
+  BinaryReaderImpl reader(&inStream);
 
   Column column(reader);
 
@@ -136,9 +137,9 @@ BOOST_AUTO_TEST_CASE(TestColumnString) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColumnStringSeveral) {
-  ignite::odbc::impl::interop::InteropUnpooledMemory mem(4096);
-  ignite::odbc::impl::interop::InteropOutputStream outStream(&mem);
-  ignite::odbc::impl::binary::BinaryWriterImpl writer(&outStream, 0);
+  InteropUnpooledMemory mem(4096);
+  InteropOutputStream outStream(&mem);
+  BinaryWriterImpl writer(&outStream, 0);
 
   std::string data("Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
 
@@ -146,8 +147,8 @@ BOOST_AUTO_TEST_CASE(TestColumnStringSeveral) {
 
   outStream.Synchronize();
 
-  ignite::odbc::impl::interop::InteropInputStream inStream(&mem);
-  ignite::odbc::impl::binary::BinaryReaderImpl reader(&inStream);
+  InteropInputStream inStream(&mem);
+  BinaryReaderImpl reader(&inStream);
 
   Column column(reader);
 
@@ -213,9 +214,9 @@ BOOST_AUTO_TEST_CASE(TestColumnStringSeveral) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColumnMultiString) {
-  ignite::odbc::impl::interop::InteropUnpooledMemory mem(4096);
-  ignite::odbc::impl::interop::InteropOutputStream outStream(&mem);
-  ignite::odbc::impl::binary::BinaryWriterImpl writer(&outStream, 0);
+  InteropUnpooledMemory mem(4096);
+  InteropOutputStream outStream(&mem);
+  BinaryWriterImpl writer(&outStream, 0);
 
   std::string data1("Some test data.");
   std::string data2("Other TEST DATA.");
@@ -225,8 +226,8 @@ BOOST_AUTO_TEST_CASE(TestColumnMultiString) {
 
   outStream.Synchronize();
 
-  ignite::odbc::impl::interop::InteropInputStream inStream(&mem);
-  ignite::odbc::impl::binary::BinaryReaderImpl reader(&inStream);
+  InteropInputStream inStream(&mem);
+  BinaryReaderImpl reader(&inStream);
 
   Column column1(reader);
 
@@ -294,9 +295,9 @@ BOOST_AUTO_TEST_CASE(TestColumnMultiString) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColumnByteArray) {
-  ignite::odbc::impl::interop::InteropUnpooledMemory mem(4096);
-  ignite::odbc::impl::interop::InteropOutputStream outStream(&mem);
-  ignite::odbc::impl::binary::BinaryWriterImpl writer(&outStream, 0);
+  InteropUnpooledMemory mem(4096);
+  InteropOutputStream outStream(&mem);
+  BinaryWriterImpl writer(&outStream, 0);
 
   const int8_t bytes[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
   std::vector< int8_t > data(bytes, bytes + sizeof(bytes) / sizeof(bytes[0]));
@@ -304,8 +305,8 @@ BOOST_AUTO_TEST_CASE(TestColumnByteArray) {
 
   outStream.Synchronize();
 
-  ignite::odbc::impl::interop::InteropInputStream inStream(&mem);
-  ignite::odbc::impl::binary::BinaryReaderImpl reader(&inStream);
+  InteropInputStream inStream(&mem);
+  BinaryReaderImpl reader(&inStream);
 
   Column column(reader);
 
@@ -344,9 +345,9 @@ BOOST_AUTO_TEST_CASE(TestColumnByteArray) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColumnByteArrayHalfBuffer) {
-  ignite::odbc::impl::interop::InteropUnpooledMemory mem(4096);
-  ignite::odbc::impl::interop::InteropOutputStream outStream(&mem);
-  ignite::odbc::impl::binary::BinaryWriterImpl writer(&outStream, 0);
+  InteropUnpooledMemory mem(4096);
+  InteropOutputStream outStream(&mem);
+  BinaryWriterImpl writer(&outStream, 0);
 
   const int8_t bytes[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
   std::vector< int8_t > data(bytes, bytes + sizeof(bytes) / sizeof(bytes[0]));
@@ -356,8 +357,8 @@ BOOST_AUTO_TEST_CASE(TestColumnByteArrayHalfBuffer) {
 
   outStream.Synchronize();
 
-  ignite::odbc::impl::interop::InteropInputStream inStream(&mem);
-  ignite::odbc::impl::binary::BinaryReaderImpl reader(&inStream);
+  InteropInputStream inStream(&mem);
+  BinaryReaderImpl reader(&inStream);
 
   Column column(reader);
 
@@ -411,9 +412,9 @@ BOOST_AUTO_TEST_CASE(TestColumnByteArrayHalfBuffer) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColumnByteArrayTwoColumns) {
-  ignite::odbc::impl::interop::InteropUnpooledMemory mem(4096);
-  ignite::odbc::impl::interop::InteropOutputStream outStream(&mem);
-  ignite::odbc::impl::binary::BinaryWriterImpl writer(&outStream, 0);
+  InteropUnpooledMemory mem(4096);
+  InteropOutputStream outStream(&mem);
+  BinaryWriterImpl writer(&outStream, 0);
 
   const int8_t bytes1[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
   const int8_t bytes2[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'};
@@ -426,8 +427,8 @@ BOOST_AUTO_TEST_CASE(TestColumnByteArrayTwoColumns) {
 
   outStream.Synchronize();
 
-  ignite::odbc::impl::interop::InteropInputStream inStream(&mem);
-  ignite::odbc::impl::binary::BinaryReaderImpl reader(&inStream);
+  InteropInputStream inStream(&mem);
+  BinaryReaderImpl reader(&inStream);
 
   Column column1(reader);
   inStream.Position(column1.GetEndPosition());
