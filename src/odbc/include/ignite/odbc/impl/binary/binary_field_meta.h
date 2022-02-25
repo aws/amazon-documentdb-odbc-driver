@@ -21,11 +21,13 @@
 #include <stdint.h>
 
 namespace ignite {
+namespace odbc {
 namespace binary {
 /* Forward declarations. */
 class BinaryRawWriter;
 class BinaryRawReader;
 }  // namespace binary
+}  // namespace odbc
 namespace odbc {
 namespace impl {
 namespace binary {
