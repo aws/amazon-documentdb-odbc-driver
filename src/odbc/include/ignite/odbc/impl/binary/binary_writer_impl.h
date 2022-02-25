@@ -538,7 +538,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
    *
    * @param entry Binary enum entry.
    */
-  void WriteBinaryEnum(ignite::binary::BinaryEnumEntry entry);
+  void WriteBinaryEnum(ignite::odbc::binary::BinaryEnumEntry entry);
 
   /**
    * Write binary enum entry.
@@ -547,7 +547,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
    * @param entry Binary enum entry.
    */
   void WriteBinaryEnum(const char* fieldName,
-                       ignite::binary::BinaryEnumEntry entry);
+                       ignite::odbc::binary::BinaryEnumEntry entry);
 
   /**
    * Write NULL value.
@@ -587,7 +587,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
    * @param typ Collection type.
    * @return Session ID.
    */
-  int32_t WriteCollection(ignite::binary::CollectionType::Type typ);
+  int32_t WriteCollection(ignite::odbc::binary::CollectionType::Type typ);
 
   /**
    * Start collection write.
@@ -597,7 +597,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
    * @return Session ID.
    */
   int32_t WriteCollection(const char* fieldName,
-                          ignite::binary::CollectionType::Type typ);
+                          ignite::odbc::binary::CollectionType::Type typ);
 
   /**
    * Write values in interval [first, last).
@@ -608,7 +608,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
    */
   template < typename InputIterator >
   void WriteCollection(InputIterator first, InputIterator last,
-                       ignite::binary::CollectionType::Type typ) {
+                       ignite::odbc::binary::CollectionType::Type typ) {
     StartContainerSession(true);
 
     WriteCollectionWithinSession(first, last, typ);
@@ -625,7 +625,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
   template < typename InputIterator >
   void WriteCollection(const char* fieldName, InputIterator first,
                        InputIterator last,
-                       ignite::binary::CollectionType::Type typ) {
+                       ignite::odbc::binary::CollectionType::Type typ) {
     StartContainerSession(false);
 
     WriteFieldId(fieldName, IGNITE_TYPE_COLLECTION);
@@ -639,7 +639,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
    * @param typ Map type.
    * @return Session ID.
    */
-  int32_t WriteMap(ignite::binary::MapType::Type typ);
+  int32_t WriteMap(ignite::odbc::binary::MapType::Type typ);
 
   /**
    * Start map write.
@@ -648,7 +648,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
    * @param typ Map type.
    * @return Session ID.
    */
-  int32_t WriteMap(const char* fieldName, ignite::binary::MapType::Type typ);
+  int32_t WriteMap(const char* fieldName, ignite::odbc::binary::MapType::Type typ);
 
   /**
    * Write collection element.
@@ -726,7 +726,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
    */
   template < typename T >
   void WriteEnum(T val) {
-    typedef ignite::binary::BinaryEnum< T > TypeMeta;
+    typedef ignite::odbc::binary::BinaryEnum< T > TypeMeta;
 
     if (TypeMeta::IsNull(val)) {
       WriteNull();
@@ -734,7 +734,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
       return;
     }
 
-    ignite::binary::BinaryEnumEntry entry(TypeMeta::GetTypeId(),
+    ignite::odbc::binary::BinaryEnumEntry entry(TypeMeta::GetTypeId(),
                                           TypeMeta::GetOrdinal(val));
 
     WriteBinaryEnum(entry);
@@ -751,7 +751,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
    */
   template < typename T >
   void WriteEnum(const char* fieldName, T val) {
-    typedef ignite::binary::BinaryEnum< T > TypeMeta;
+    typedef ignite::odbc::binary::BinaryEnum< T > TypeMeta;
 
     if (TypeMeta::IsNull(val)) {
       WriteNull(fieldName);
@@ -759,7 +759,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
       return;
     }
 
-    ignite::binary::BinaryEnumEntry entry(TypeMeta::GetTypeId(),
+    ignite::odbc::binary::BinaryEnumEntry entry(TypeMeta::GetTypeId(),
                                           TypeMeta::GetOrdinal(val));
 
     WriteBinaryEnum(fieldName, entry);
@@ -793,7 +793,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
    */
   template < typename W, typename T >
   void WriteTopObject0(const T& obj) {
-    typedef ignite::binary::BinaryType< T > BType;
+    typedef ignite::odbc::binary::BinaryType< T > BType;
 
     if (BType::IsNull(obj))
       stream->WriteInt8(IGNITE_HDR_NULL);
@@ -979,7 +979,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
    */
   template < typename InputIterator >
   void WriteCollectionWithinSession(InputIterator first, InputIterator last,
-                                    ignite::binary::CollectionType::Type typ) {
+                                    ignite::odbc::binary::CollectionType::Type typ) {
     stream->WriteInt8(IGNITE_TYPE_COLLECTION);
     stream->Position(stream->Position() + 4);
     stream->WriteInt8(typ);
@@ -1044,67 +1044,67 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, int8_t >(
+BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, int8_t >(
     const int8_t& obj);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, bool >(
+BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, bool >(
     const bool& obj);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, int16_t >(
+BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, int16_t >(
     const int16_t& obj);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, uint16_t >(
+BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, uint16_t >(
     const uint16_t& obj);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, int32_t >(
+BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, int32_t >(
     const int32_t& obj);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, int64_t >(
+BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, int64_t >(
     const int64_t& obj);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, float >(
+BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, float >(
     const float& obj);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, double >(
+BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, double >(
     const double& obj);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, Guid >(
+BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, Guid >(
     const Guid& obj);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, Date >(
+BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, Date >(
     const Date& obj);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, Timestamp >(
+BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, Timestamp >(
     const Timestamp& obj);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, Time >(
+BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, Time >(
     const Time& obj);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryWriterImpl::WriteTopObject0< ignite::binary::BinaryWriter, std::string >(
+BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, std::string >(
     const std::string& obj);
 }  // namespace binary
 }  // namespace impl

@@ -160,7 +160,7 @@ class BinaryTypeSnapshot {
 };
 
 typedef BinaryTypeSnapshot Snap;
-typedef ignite::common::concurrent::SharedPointer< Snap > SPSnap;
+typedef ignite::odbc::common::concurrent::SharedPointer< Snap > SPSnap;
 }  // namespace binary
 }  // namespace impl
 }  // namespace odbc

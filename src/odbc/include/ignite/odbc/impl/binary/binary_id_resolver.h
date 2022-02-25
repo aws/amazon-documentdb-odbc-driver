@@ -78,12 +78,12 @@ class TemplatedBinaryIdResolver : public BinaryIdResolver {
   }
 
   virtual int32_t GetTypeId() {
-    return ignite::binary::BinaryType< T >::GetTypeId();
+    return ignite::odbc::binary::BinaryType< T >::GetTypeId();
   }
 
   virtual int32_t GetFieldId(const int32_t typeId, const char* name) {
     if (name)
-      return ignite::binary::BinaryType< T >::GetFieldId(name);
+      return ignite::odbc::binary::BinaryType< T >::GetFieldId(name);
 
     IGNITE_ERROR_FORMATTED_1(IgniteError::IGNITE_ERR_BINARY,
                              "Field name cannot be NULL.", "typeId", typeId);
@@ -128,7 +128,7 @@ class MetadataBinaryIdResolver : public BinaryIdResolver {
     int32_t res = meta.Get()->GetFieldId(name);
 
     if (res == 0)
-      res = ignite::binary::GetBinaryStringHashCode(name);
+      res = ignite::odbc::binary::GetBinaryStringHashCode(name);
 
     if (res == 0) {
       IGNITE_ERROR_FORMATTED_2(

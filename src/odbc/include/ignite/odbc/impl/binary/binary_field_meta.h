@@ -78,14 +78,14 @@ class BinaryFieldMeta {
    * @param writer Writer.
    */
   IGNITE_IMPORT_EXPORT void Write(
-      ignite::binary::BinaryRawWriter& writer) const;
+      ignite::odbc::binary::BinaryRawWriter& writer) const;
 
   /**
    * Read from data stream.
    *
    * @param reader reader.
    */
-  IGNITE_IMPORT_EXPORT void Read(ignite::binary::BinaryRawReader& reader);
+  IGNITE_IMPORT_EXPORT void Read(ignite::odbc::binary::BinaryRawReader& reader);
 
  private:
   /** Type ID. */

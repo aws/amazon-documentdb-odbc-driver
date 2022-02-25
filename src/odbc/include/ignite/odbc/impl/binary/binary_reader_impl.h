@@ -573,7 +573,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
    *
    * @return Enum entry.
    */
-  ignite::binary::BinaryEnumEntry ReadBinaryEnum();
+  ignite::odbc::binary::BinaryEnumEntry ReadBinaryEnum();
 
   /**
    * Read enum entry.
@@ -581,7 +581,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
    * @param fieldName Field name.
    * @return Enum entry.
    */
-  ignite::binary::BinaryEnumEntry ReadBinaryEnum(const char* fieldName);
+  ignite::odbc::binary::BinaryEnumEntry ReadBinaryEnum(const char* fieldName);
 
   /**
    * Read string.
@@ -672,7 +672,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
    * @param size Collection size.
    * @return Read session ID.
    */
-  int32_t ReadCollection(ignite::binary::CollectionType::Type* typ,
+  int32_t ReadCollection(ignite::odbc::binary::CollectionType::Type* typ,
                          int32_t* size);
 
   /**
@@ -684,7 +684,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
    * @return Read session ID.
    */
   int32_t ReadCollection(const char* fieldName,
-                         ignite::binary::CollectionType::Type* typ,
+                         ignite::odbc::binary::CollectionType::Type* typ,
                          int32_t* size);
 
   /**
@@ -754,7 +754,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
    * @param size Map size.
    * @return Read session ID.
    */
-  int32_t ReadMap(ignite::binary::MapType::Type* typ, int32_t* size);
+  int32_t ReadMap(ignite::odbc::binary::MapType::Type* typ, int32_t* size);
 
   /**
    * Start map read.
@@ -764,7 +764,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
    * @param size Map size.
    * @return Read session ID.
    */
-  int32_t ReadMap(const char* fieldName, ignite::binary::MapType::Type* typ,
+  int32_t ReadMap(const char* fieldName, ignite::odbc::binary::MapType::Type* typ,
                   int32_t* size);
 
   /**
@@ -772,7 +772,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
    *
    * @return Collection type.
    */
-  ignite::binary::CollectionType::Type ReadCollectionType();
+  ignite::odbc::binary::CollectionType::Type ReadCollectionType();
 
   /**
    * Read type of the collection.
@@ -780,7 +780,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
    * @param fieldName Field name.
    * @return Collection type.
    */
-  ignite::binary::CollectionType::Type ReadCollectionType(
+  ignite::odbc::binary::CollectionType::Type ReadCollectionType(
       const char* fieldName);
 
   /**
@@ -899,7 +899,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
    */
   template < typename T >
   T ReadEnum() {
-    ignite::binary::BinaryEnumEntry entry = ReadBinaryEnum();
+    ignite::odbc::binary::BinaryEnumEntry entry = ReadBinaryEnum();
 
     return DeserializeEnumEntry< T >(entry);
   }
@@ -912,7 +912,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
    */
   template < typename T >
   T ReadEnum(const char* fieldName) {
-    ignite::binary::BinaryEnumEntry entry = ReadBinaryEnum(fieldName);
+    ignite::odbc::binary::BinaryEnumEntry entry = ReadBinaryEnum(fieldName);
 
     return DeserializeEnumEntry< T >(entry);
   }
@@ -1003,7 +1003,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
       }
 
       case IGNITE_HDR_FULL: {
-        typedef ignite::binary::BinaryType< T > BType;
+        typedef ignite::odbc::binary::BinaryType< T > BType;
 
         int8_t protoVer = stream->ReadInt8();
 
@@ -1121,7 +1121,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
   T GetNull() const {
     T res;
 
-    ignite::binary::BinaryType< T >::GetNull(res);
+    ignite::odbc::binary::BinaryType< T >::GetNull(res);
 
     return res;
   }
@@ -1191,8 +1191,8 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
    * @return User type value.
    */
   template < typename T >
-  T DeserializeEnumEntry(ignite::binary::BinaryEnumEntry entry) {
-    typedef ignite::binary::BinaryEnum< T > TypeMeta;
+  T DeserializeEnumEntry(ignite::odbc::binary::BinaryEnumEntry entry) {
+    typedef ignite::odbc::binary::BinaryEnum< T > TypeMeta;
 
     if (entry.IsNull()) {
       T res;
@@ -1514,7 +1514,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
    *
    * @return Enum entry.
    */
-  ignite::binary::BinaryEnumEntry ReadBinaryEnumInternal();
+  ignite::odbc::binary::BinaryEnumEntry ReadBinaryEnumInternal();
 
   /**
    * Internal string read routine.
@@ -1530,7 +1530,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
    *
    * @return Collection type.
    */
-  ignite::binary::CollectionType::Type ReadCollectionTypeUnprotected();
+  ignite::odbc::binary::CollectionType::Type ReadCollectionTypeUnprotected();
 
   /**
    * Read size of the collection. Do not preserve stream position.
@@ -1552,87 +1552,87 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryReaderImpl::ReadTopObject0< ignite::binary::BinaryReader, int8_t >(
+BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, int8_t >(
     int8_t& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryReaderImpl::ReadTopObject0< ignite::binary::BinaryReader, bool >(
+BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, bool >(
     bool& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryReaderImpl::ReadTopObject0< ignite::binary::BinaryReader, int16_t >(
+BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, int16_t >(
     int16_t& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryReaderImpl::ReadTopObject0< ignite::binary::BinaryReader, uint16_t >(
+BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, uint16_t >(
     uint16_t& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryReaderImpl::ReadTopObject0< ignite::binary::BinaryReader, int32_t >(
+BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, int32_t >(
     int32_t& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryReaderImpl::ReadTopObject0< ignite::binary::BinaryReader, int64_t >(
+BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, int64_t >(
     int64_t& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryReaderImpl::ReadTopObject0< ignite::binary::BinaryReader, float >(
+BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, float >(
     float& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryReaderImpl::ReadTopObject0< ignite::binary::BinaryReader, double >(
+BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, double >(
     double& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryReaderImpl::ReadTopObject0< ignite::binary::BinaryReader, Guid >(
+BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, Guid >(
     Guid& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryReaderImpl::ReadTopObject0< ignite::binary::BinaryReader, Date >(
+BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, Date >(
     Date& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryReaderImpl::ReadTopObject0< ignite::binary::BinaryReader, Timestamp >(
+BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, Timestamp >(
     Timestamp& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryReaderImpl::ReadTopObject0< ignite::binary::BinaryReader, Time >(
+BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, Time >(
     Time& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT
-BinaryReaderImpl::ReadTopObject0< ignite::binary::BinaryReader, std::string >(
+BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, std::string >(
     std::string& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
-    ignite::binary::BinaryReader, std::vector< int8_t > >(
+    ignite::odbc::binary::BinaryReader, std::vector< int8_t > >(
     std::vector< int8_t >& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
-    ignite::binary::BinaryReader, std::vector< int16_t > >(
+    ignite::odbc::binary::BinaryReader, std::vector< int16_t > >(
     std::vector< int16_t >& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
-    ignite::binary::BinaryReader, std::vector< int32_t > >(
+    ignite::odbc::binary::BinaryReader, std::vector< int32_t > >(
     std::vector< int32_t >& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
-    ignite::binary::BinaryReader, std::vector< int64_t > >(
+    ignite::odbc::binary::BinaryReader, std::vector< int64_t > >(
     std::vector< int64_t >& res);
 
 template <>
