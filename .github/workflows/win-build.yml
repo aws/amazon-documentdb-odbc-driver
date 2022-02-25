@@ -33,7 +33,18 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-
+    - name: run-cppcheck
+      id: setup_cppcheck
+      run: |
+        choco install cppcheck -y
+        echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
+        run_cppcheck.ps1
+    - name: upload-cppcheck-results
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: cppcheck-results
+        path: cppcheck-results.log 
     - name: Get Java distribution
       uses: actions/setup-java@v2
       with:
@@ -118,7 +129,18 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-
+    - name: run-cppcheck
+      id: setup_cppcheck
+      run: |
+        choco install cppcheck -y
+        echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
+        run_cppcheck.ps1
+    - name: upload-cppcheck-results
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: cppcheck-results
+        path: cppcheck-results.log 
     - name: Get Java distribution
       uses: actions/setup-java@v2
       with:
@@ -166,7 +188,7 @@ jobs:
     - name: run-tests
       run: |
         Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
-        ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
+        ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe   
   #   - name: upload-test-report
   #     if: failure()
   #     uses: actions/upload-artifact@v2
