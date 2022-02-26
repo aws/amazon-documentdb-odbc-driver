@@ -25,6 +25,7 @@
 
 namespace ignite {
 namespace odbc {
+using namespace ignite::odbc::impl::binary;
 /**
  * Result set column.
  */
@@ -60,7 +61,7 @@ class Column {
    *
    * @param reader Reader to be used to retrieve column data.
    */
-  Column(ignite::odbc::impl::binary::BinaryReaderImpl& reader);
+  Column(BinaryReaderImpl& reader);
 
   /**
    * Get column size in bytes.
@@ -79,7 +80,7 @@ class Column {
    * @return Operation result.
    */
   app::ConversionResult::Type ReadToBuffer(
-      ignite::odbc::impl::binary::BinaryReaderImpl& reader,
+      BinaryReaderImpl& reader,
       app::ApplicationDataBuffer& dataBuf);
 
   /**

@@ -19,9 +19,11 @@
 
 #include "ignite/odbc/utility.h"
 
+using namespace ignite::odbc::impl::interop;
+
 namespace ignite {
 namespace odbc {
-Row::Row(ignite::odbc::impl::interop::InteropUnpooledMemory& pageData)
+Row::Row(InteropUnpooledMemory& pageData)
     : rowBeginPos(0),
       pos(rowBeginPos),
       size(0),
