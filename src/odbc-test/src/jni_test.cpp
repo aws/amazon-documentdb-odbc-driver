@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionClose) {
   BOOST_CHECK(!dbConnection.IsOpen());
 }
 
-BOOST_AUTO_TEST_CASE(TestDocumentDatabaseDbMetaDataGetTables) {
+BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetTables) {
   PrepareContext();
   BOOST_REQUIRE(_ctx.Get() != nullptr);
 
@@ -248,7 +248,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDatabaseDbMetaDataGetTables) {
   BOOST_CHECK(!dbConnection.IsOpen());
 }
 
-BOOST_AUTO_TEST_CASE(TestDocumentDatabaseDbMetaDataGetColumns) {
+BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
     PrepareContext();
     BOOST_REQUIRE(_ctx.Get() != nullptr);
 
