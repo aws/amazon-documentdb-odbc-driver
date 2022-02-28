@@ -276,7 +276,6 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
     std::string schemaPattern = "test";
     std::string tablePattern = "test";
     std::string columnNamePattern;
-    std::vector< std::string > types = {"TABLE"};
     SharedPointer< ResultSet > resultSet = databaseMetaData.Get()->GetColumns(
         catalog, schemaPattern, tablePattern, columnNamePattern, errInfo);
     BOOST_CHECK(resultSet.IsValid());
