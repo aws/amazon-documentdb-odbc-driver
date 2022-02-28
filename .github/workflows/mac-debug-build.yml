@@ -48,12 +48,12 @@ jobs:
     # - name: run-tests
     #   run: |
     #     ./build/odbc/bin/tests --gtest_output="xml:report.xml"
-    # - name: upload-test-report
-    #   if: failure()
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: test-result-macos
-    #     path: ${{ github.workspace }}\report.xml
+    - name: upload-test-report
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-result-macos
+        path: ${{ github.workspace }}\report.xml
     # - name: print-memory-leak-logs
     #   if: always()
     #   run: |
