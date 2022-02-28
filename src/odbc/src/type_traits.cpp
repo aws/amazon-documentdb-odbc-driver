@@ -627,10 +627,10 @@ int32_t SqlTypeTransferLength(int16_t type) {
     case SQL_BIGINT:
       return 8;
 
+    case SQL_FLOAT:
     case SQL_REAL:
       return 4;
 
-    case SQL_FLOAT:
     case SQL_DOUBLE:
       return 8;
 
