@@ -530,6 +530,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
   }
   BOOST_REQUIRE(hasNext);
 
+  std::string databaseName = "test";
   int i = 1;
   while (hasNext) {
     bool wasNull;
@@ -560,7 +561,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value == "test");
+    BOOST_CHECK_EQUAL(databaseName, value);
 
     // TABLE_SCHEM (i.e., database)
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_SCHEM", value, wasNull,
@@ -570,7 +571,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value == "test");
+    BOOST_CHECK_EQUAL(databaseName, value);
 
     // TABLE_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 3, value, wasNull, errInfo)
