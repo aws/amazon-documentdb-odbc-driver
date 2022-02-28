@@ -28,9 +28,7 @@
 
 #include <iomanip>
 
-namespace ignite
-
-{
+namespace ignite {
 namespace odbc {
 /**
  * Global universally unique identifier (GUID).
@@ -240,4 +238,4 @@ template < typename C >
 }
 }  // namespace odbc
 }  // namespace ignite
-#endif //_IGNITE_ODBC_GUID
+#endif  //_IGNITE_ODBC_GUID
