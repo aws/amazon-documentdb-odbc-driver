@@ -998,7 +998,7 @@ JniErrorCode JniContext::DatabaseMetaDataGetColumns(
   ExceptionCheck(env, &errInfo);
 
   if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    resultSet = SharedPointer< GlobalJObject >(nullptr);
+    resultSet = nullptr;
     return errInfo.code;
   }
 
