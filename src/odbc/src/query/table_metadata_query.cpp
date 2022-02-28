@@ -79,17 +79,23 @@ TableMetadataQuery::TableMetadataQuery(diagnostic::DiagnosableAdapter& diag,
   using namespace ignite::odbc::type_traits;
 
   using meta::ColumnMeta;
+  using meta::Nullability;
 
   columnsMeta.reserve(5);
 
   const std::string sch("");
   const std::string tbl("");
 
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_SCHEM", JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_TYPE", JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS", JDBC_TYPE_VARCHAR));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABLE));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_SCHEM", JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABLE));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABLE));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_TYPE", JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABLE));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS", JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABLE));
 }
 
 TableMetadataQuery::~TableMetadataQuery() {

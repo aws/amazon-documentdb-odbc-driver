@@ -44,6 +44,7 @@ ForeignKeysQuery::ForeignKeysQuery(
   using namespace ignite::odbc::type_traits;
 
   using meta::ColumnMeta;
+  using meta::Nullability;
 
   columnsMeta.reserve(14);
 
@@ -51,28 +52,37 @@ ForeignKeysQuery::ForeignKeysQuery(
   const std::string tbl("");
 
   columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "PKTABLE_CAT", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "PKTABLE_SCHEM", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "PKTABLE_NAME", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "PKCOLUMN_NAME", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "FKTABLE_CAT", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "FKTABLE_SCHEM", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "FKTABLE_NAME", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "FKCOLUMN_NAME", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "KEY_SEQ", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "UPDATE_RULE", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "DELETE_RULE", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "FK_NAME", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "PK_NAME", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "DEFERRABILITY", IGNITE_TYPE_SHORT));
+      ColumnMeta(sch, tbl, "PKTABLE_CAT", IGNITE_TYPE_STRING, Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "PKTABLE_SCHEM",
+                                   IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "PKTABLE_NAME", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "PKCOLUMN_NAME",
+                                   IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "FKTABLE_CAT", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "FKTABLE_SCHEM",
+                                   IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "FKTABLE_NAME", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "FKCOLUMN_NAME",
+                                   IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "KEY_SEQ", IGNITE_TYPE_SHORT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "UPDATE_RULE", IGNITE_TYPE_SHORT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "DELETE_RULE", IGNITE_TYPE_SHORT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "FK_NAME", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "PK_NAME", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "DEFERRABILITY", IGNITE_TYPE_SHORT,
+                                   Nullability::NULLABILITY_UNKNOWN));
 }
 
 ForeignKeysQuery::~ForeignKeysQuery() {

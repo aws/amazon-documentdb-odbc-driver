@@ -65,20 +65,25 @@ PrimaryKeysQuery::PrimaryKeysQuery(diagnostic::DiagnosableAdapter& diag,
   using namespace ignite::odbc::type_traits;
 
   using meta::ColumnMeta;
+  using meta::Nullability;
 
   columnsMeta.reserve(6);
 
   const std::string sch("");
   const std::string tbl("");
 
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "TABLE_SCHEM", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "COLUMN_NAME", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "KEY_SEQ", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "PK_NAME", IGNITE_TYPE_STRING));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_SCHEM", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_NAME", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "KEY_SEQ", IGNITE_TYPE_SHORT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "PK_NAME", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
 }
 
 PrimaryKeysQuery::~PrimaryKeysQuery() {

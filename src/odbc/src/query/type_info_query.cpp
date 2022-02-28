@@ -125,45 +125,64 @@ TypeInfoQuery::TypeInfoQuery(diagnostic::DiagnosableAdapter& diag,
   using namespace ignite::odbc::type_traits;
 
   using meta::ColumnMeta;
+  using meta::Nullability;
 
   columnsMeta.reserve(19);
 
   const std::string sch;
   const std::string tbl;
 
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TYPE_NAME", JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "DATA_TYPE", JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_SIZE", JDBC_TYPE_INTEGER));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "LITERAL_PREFIX", JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "LITERAL_SUFFIX", JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "CREATE_PARAMS", JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "NULLABLE", JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "CASE_SENSITIVE", JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "SEARCHABLE", JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "UNSIGNED_ATTRIBUTE", JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "FIXED_PREC_SCALE", JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "AUTO_UNIQUE_VALUE", JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "LOCAL_TYPE_NAME", JDBC_TYPE_VARCHAR));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "MINIMUM_SCALE", JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "MAXIMUM_SCALE", JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "SQL_DATA_TYPE", JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "SQL_DATETIME_SUB", JDBC_TYPE_SMALLINT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "NUM_PREC_RADIX", JDBC_TYPE_INTEGER));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "INTERVAL_PRECISION", JDBC_TYPE_SMALLINT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TYPE_NAME", JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "DATA_TYPE", JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_SIZE", JDBC_TYPE_INTEGER,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "LITERAL_PREFIX",
+                                   JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "LITERAL_SUFFIX",
+                                   JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "CREATE_PARAMS", JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "NULLABLE", JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "CASE_SENSITIVE",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "SEARCHABLE", JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "UNSIGNED_ATTRIBUTE",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "FIXED_PREC_SCALE",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "AUTO_UNIQUE_VALUE",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "LOCAL_TYPE_NAME",
+                                   JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "MINIMUM_SCALE",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "MAXIMUM_SCALE",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATA_TYPE",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATETIME_SUB",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "NUM_PREC_RADIX",
+                                   JDBC_TYPE_INTEGER,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "INTERVAL_PRECISION",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
 
   assert(IsSqlTypeSupported(sqlType) || sqlType == SQL_ALL_TYPES);
 

@@ -87,14 +87,15 @@ class ColumnMeta {
    * @param dataType Data type.
    */
   ColumnMeta(const std::string& schemaName, const std::string& tableName,
-             const std::string& columnName, int16_t dataType)
+             const std::string& columnName, int16_t dataType,
+             Nullability::Type nullability)
       : schemaName(schemaName),
         tableName(tableName),
         columnName(columnName),
         dataType(dataType),
         precision(-1),
         scale(-1),
-        nullability(Nullability::NULLABILITY_UNKNOWN),
+        nullability(nullability),
         ordinalPosition(-1) {
     // No-op.
   }
