@@ -965,12 +965,11 @@ JniErrorCode JniContext::DatabaseMetaDataGetTables(
   ExceptionCheck(env, &errInfo);
 
   if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    resultSet = SharedPointer< GlobalJObject >(nullptr);
+    resultSet = nullptr;
     return errInfo.code;
   }
 
-  resultSet = SharedPointer< GlobalJObject >(
-      new GlobalJObject(env, env->NewGlobalRef(result)));
+  resultSet = new GlobalJObject(env, env->NewGlobalRef(result));
   return errInfo.code;
 }
 
@@ -1002,8 +1001,7 @@ JniErrorCode JniContext::DatabaseMetaDataGetColumns(
     return errInfo.code;
   }
 
-  resultSet = SharedPointer< GlobalJObject >(
-      new GlobalJObject(env, env->NewGlobalRef(result)));
+  resultSet = new GlobalJObject(env, env->NewGlobalRef(result));
   return errInfo.code;
 }
 
