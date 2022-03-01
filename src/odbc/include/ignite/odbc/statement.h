@@ -169,7 +169,8 @@ class Statement : public diagnostic::DiagnosableAdapter {
    * @param table Table search pattern.
    * @param column Column search pattern.
    */
-  void ExecuteGetColumnsMetaQuery(const std::string& schema,
+  void ExecuteGetColumnsMetaQuery(const std::string& catalog,
+                                  const std::string& schema,
                                   const std::string& table,
                                   const std::string& column);
 
@@ -552,12 +553,14 @@ class Statement : public diagnostic::DiagnosableAdapter {
   /**
    * Get columns metadata.
    *
+   * @param catalog Catalog search pattern.
    * @param schema Schema search pattern.
    * @param table Table search pattern.
    * @param column Column search pattern.
    * @return Operation result.
    */
-  SqlResult::Type InternalExecuteGetColumnsMetaQuery(const std::string& schema,
+  SqlResult::Type InternalExecuteGetColumnsMetaQuery(const std::string& catalog,
+                                                     const std::string& schema,
                                                      const std::string& table,
                                                      const std::string& column);
 

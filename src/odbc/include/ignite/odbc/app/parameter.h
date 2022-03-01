@@ -18,8 +18,8 @@
 #ifndef _IGNITE_ODBC_APP_PARAMETER
 #define _IGNITE_ODBC_APP_PARAMETER
 
-#include <ignite/impl/binary/binary_reader_impl.h>
-#include <ignite/impl/binary/binary_writer_impl.h>
+#include <ignite/odbc/impl/binary/binary_reader_impl.h>
+#include <ignite/odbc/impl/binary/binary_writer_impl.h>
 #include <stdint.h>
 
 #include <map>

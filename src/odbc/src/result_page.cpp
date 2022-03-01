@@ -17,9 +17,11 @@
 
 #include "ignite/odbc/result_page.h"
 
-#include <ignite/impl/interop/interop_input_stream.h>
+#include <ignite/odbc/impl/interop/interop_input_stream.h>
 
 #include "ignite/odbc/utility.h"
+
+using namespace ignite::odbc::impl::binary;
 
 namespace ignite {
 namespace odbc {
@@ -32,7 +34,7 @@ ResultPage::~ResultPage() {
   // No-op.
 }
 
-void ResultPage::Read(ignite::impl::binary::BinaryReaderImpl& reader) {
+void ResultPage::Read(BinaryReaderImpl& reader) {
   last = reader.ReadBool();
   size = reader.ReadInt32();
 
