@@ -49,7 +49,7 @@ jobs:
     #   run: |
     #     ./build/odbc/bin/tests --gtest_output="xml:report.xml"
     - name: upload-test-report
-      if: failure()
+      if: always()
       uses: actions/upload-artifact@v2
       with:
         name: test-result-macos
