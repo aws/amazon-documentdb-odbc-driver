@@ -17,15 +17,15 @@
 
 #include "ignite/odbc/type_traits.h"
 
-#include <ignite/impl/binary/binary_common.h>
+#include "ignite/odbc/impl/binary/binary_common.h"
 
 #include "ignite/odbc/system/odbc_constants.h"
+
+using namespace ignite::odbc::impl::binary;
 
 namespace ignite {
 namespace odbc {
 namespace type_traits {
-const std::string SqlTypeName::VARCHAR("VARCHAR");
-
 const std::string SqlTypeName::SMALLINT("SMALLINT");
 
 const std::string SqlTypeName::INTEGER("INTEGER");
@@ -34,7 +34,11 @@ const std::string SqlTypeName::DECIMAL("DECIMAL");
 
 const std::string SqlTypeName::FLOAT("FLOAT");
 
+const std::string SqlTypeName::REAL("REAL");
+
 const std::string SqlTypeName::DOUBLE("DOUBLE");
+
+const std::string SqlTypeName::NUMERIC("NUMERIC");
 
 const std::string SqlTypeName::BIT("BIT");
 
@@ -42,7 +46,13 @@ const std::string SqlTypeName::TINYINT("TINYINT");
 
 const std::string SqlTypeName::BIGINT("BIGINT");
 
+const std::string SqlTypeName::VARCHAR("VARCHAR");
+
+const std::string SqlTypeName::LONGVARCHAR("LONGVARCHAR");
+
 const std::string SqlTypeName::BINARY("VARBINARY");
+
+const std::string SqlTypeName::LONGVARBINARY("LONGVARBINARY");
 
 const std::string SqlTypeName::DATE("DATE");
 
@@ -51,6 +61,8 @@ const std::string SqlTypeName::TIMESTAMP("TIMESTAMP");
 const std::string SqlTypeName::TIME("TIME");
 
 const std::string SqlTypeName::GUID("GUID");
+
+const std::string SqlTypeName::SQL_NULL("NULL");
 
 #ifdef _DEBUG
 
@@ -101,75 +113,80 @@ const char* StatementAttrIdToString(long id) {
 
 #undef DBG_STR_CASE
 #endif  // _DEBUG
-
-const std::string& BinaryTypeToSqlTypeName(int8_t binaryType) {
-  using namespace ignite::impl::binary;
-
+/**
+ * Warning: if any JDBC Type is added or becomes deprecated on the JDBC side,
+ * the change should be reflected under this function as well.
+ */
+const std::string& BinaryTypeToSqlTypeName(int16_t binaryType) {
   switch (binaryType) {
-    case IGNITE_TYPE_STRING:
-      return SqlTypeName::VARCHAR;
-
-    case IGNITE_TYPE_SHORT:
-      return SqlTypeName::SMALLINT;
-
-    case IGNITE_TYPE_INT:
-      return SqlTypeName::INTEGER;
-
-    case IGNITE_TYPE_DECIMAL:
-      return SqlTypeName::DECIMAL;
-
-    case IGNITE_TYPE_FLOAT:
-      return SqlTypeName::FLOAT;
-
-    case IGNITE_TYPE_DOUBLE:
-      return SqlTypeName::DOUBLE;
-
-    case IGNITE_TYPE_BOOL:
+    case JDBC_TYPE_BIT:
+    case JDBC_TYPE_BOOLEAN:
       return SqlTypeName::BIT;
 
-    case IGNITE_TYPE_BYTE:
-    case IGNITE_TYPE_CHAR:
+    case JDBC_TYPE_SMALLINT:
+      return SqlTypeName::SMALLINT;
+
+    case JDBC_TYPE_TINYINT:
       return SqlTypeName::TINYINT;
 
-    case IGNITE_TYPE_LONG:
+    case JDBC_TYPE_INTEGER:
+      return SqlTypeName::INTEGER;
+
+    case JDBC_TYPE_BIGINT:
       return SqlTypeName::BIGINT;
 
-    case IGNITE_TYPE_UUID:
-      return SqlTypeName::GUID;
+    case JDBC_TYPE_FLOAT:
+      return SqlTypeName::FLOAT;
 
-    case IGNITE_TYPE_DATE:
+    case JDBC_TYPE_REAL:
+      return SqlTypeName::REAL;
+
+    case JDBC_TYPE_DOUBLE:
+      return SqlTypeName::DOUBLE;
+
+    case JDBC_TYPE_NUMERIC:
+      return SqlTypeName::NUMERIC;
+
+    case JDBC_TYPE_DECIMAL:
+      return SqlTypeName::DECIMAL;
+
+    case JDBC_TYPE_VARCHAR:
+    case JDBC_TYPE_NVARCHAR:
+      return SqlTypeName::VARCHAR;
+
+    case JDBC_TYPE_LONGVARCHAR:
+    case JDBC_TYPE_LONGNVARCHAR:
+      return SqlTypeName::LONGVARCHAR;
+
+    case JDBC_TYPE_DATE:
       return SqlTypeName::DATE;
 
-    case IGNITE_TYPE_TIMESTAMP:
-      return SqlTypeName::TIMESTAMP;
-
-    case IGNITE_TYPE_TIME:
+    case JDBC_TYPE_TIME:
       return SqlTypeName::TIME;
 
-    case IGNITE_TYPE_OBJECT:
-    case IGNITE_TYPE_ARRAY_BYTE:
-    case IGNITE_TYPE_ARRAY_SHORT:
-    case IGNITE_TYPE_ARRAY_INT:
-    case IGNITE_TYPE_ARRAY_LONG:
-    case IGNITE_TYPE_ARRAY_FLOAT:
-    case IGNITE_TYPE_ARRAY_DOUBLE:
-    case IGNITE_TYPE_ARRAY_CHAR:
-    case IGNITE_TYPE_ARRAY_BOOL:
-    case IGNITE_TYPE_ARRAY_DECIMAL:
-    case IGNITE_TYPE_ARRAY_STRING:
-    case IGNITE_TYPE_ARRAY_UUID:
-    case IGNITE_TYPE_ARRAY_DATE:
-    case IGNITE_TYPE_ARRAY_TIMESTAMP:
-    case IGNITE_TYPE_ARRAY:
-    case IGNITE_TYPE_COLLECTION:
-    case IGNITE_TYPE_MAP:
-    case IGNITE_TYPE_MAP_ENTRY:
-    case IGNITE_TYPE_BINARY:
+    case JDBC_TYPE_TIMESTAMP:
+      return SqlTypeName::TIMESTAMP;
+
+    case JDBC_TYPE_LONGVARBINARY:
+      return SqlTypeName::LONGVARBINARY;
+
+    case JDBC_TYPE_NULL:
+      return SqlTypeName::SQL_NULL;
+
+    case JDBC_TYPE_BINARY:
+    case JDBC_TYPE_VARBINARY:
+    case JDBC_TYPE_BLOB:
+    case JDBC_TYPE_CLOB:
+    case JDBC_TYPE_ARRAY:
+    case JDBC_TYPE_STRUCT:
+    case JDBC_TYPE_JAVA_OBJECT:
+    case JDBC_TYPE_ROWID:
+    case JDBC_TYPE_NCLOB:
+    case JDBC_TYPE_SQLXML:
+    case JDBC_TYPE_REF_CURSOR:
     default:
       return SqlTypeName::BINARY;
   }
-
-  return SqlTypeName::BINARY;
 }
 
 bool IsApplicationTypeSupported(int16_t type) {
@@ -178,31 +195,32 @@ bool IsApplicationTypeSupported(int16_t type) {
 
 bool IsSqlTypeSupported(int16_t type) {
   switch (type) {
+    case SQL_BIT:
+    case SQL_TINYINT:
+    case SQL_SMALLINT:
+    case SQL_BIGINT:
+    case SQL_INTEGER:
+    case SQL_FLOAT:
+    case SQL_REAL:
+    case SQL_DOUBLE:
+    case SQL_NUMERIC:
+    case SQL_DECIMAL:
     case SQL_CHAR:
     case SQL_VARCHAR:
     case SQL_LONGVARCHAR:
-    case SQL_SMALLINT:
-    case SQL_INTEGER:
-    case SQL_FLOAT:
-    case SQL_DOUBLE:
-    case SQL_BIT:
-    case SQL_TINYINT:
-    case SQL_BIGINT:
-    case SQL_BINARY:
-    case SQL_VARBINARY:
-    case SQL_LONGVARBINARY:
-    case SQL_GUID:
-    case SQL_DECIMAL:
     case SQL_TYPE_DATE:
     case SQL_TYPE_TIMESTAMP:
     case SQL_TYPE_TIME:
+    case SQL_BINARY:
+    case SQL_VARBINARY:
+    case SQL_LONGVARBINARY:
+    case SQL_TYPE_NULL:
       return true;
 
     case SQL_WCHAR:
     case SQL_WVARCHAR:
     case SQL_WLONGVARCHAR:
-    case SQL_REAL:
-    case SQL_NUMERIC:
+    case SQL_GUID:
     case SQL_INTERVAL_MONTH:
     case SQL_INTERVAL_YEAR:
     case SQL_INTERVAL_YEAR_TO_MONTH:
@@ -221,61 +239,76 @@ bool IsSqlTypeSupported(int16_t type) {
   }
 }
 
-int8_t SqlTypeToBinary(int16_t sqlType) {
-  using namespace ignite::impl::binary;
-
+/**
+ * Warning: if any JDBC Type is added or becomes deprecated on the
+ * JDBC side, the change should be reflected under this function as
+ * well.
+ */
+int16_t SqlTypeToBinary(int16_t sqlType) {
   switch (sqlType) {
-    case SQL_CHAR:
-    case SQL_VARCHAR:
-    case SQL_LONGVARCHAR:
-      return IGNITE_TYPE_STRING;
-
-    case SQL_SMALLINT:
-      return IGNITE_TYPE_SHORT;
+    case SQL_BIT:
+      return JDBC_TYPE_BOOLEAN;
 
     case SQL_TINYINT:
-      return IGNITE_TYPE_BYTE;
+      return JDBC_TYPE_TINYINT;
+
+    case SQL_SMALLINT:
+      return JDBC_TYPE_SMALLINT;
 
     case SQL_INTEGER:
-      return IGNITE_TYPE_INT;
+      return JDBC_TYPE_INTEGER;
 
     case SQL_BIGINT:
-      return IGNITE_TYPE_LONG;
+      return JDBC_TYPE_BIGINT;
 
     case SQL_FLOAT:
-      return IGNITE_TYPE_FLOAT;
+      return JDBC_TYPE_FLOAT;
+
+    case SQL_REAL:
+      return JDBC_TYPE_REAL;
 
     case SQL_DOUBLE:
-      return IGNITE_TYPE_DOUBLE;
+      return JDBC_TYPE_DOUBLE;
 
-    case SQL_BIT:
-      return IGNITE_TYPE_BOOL;
-
-    case SQL_BINARY:
-    case SQL_VARBINARY:
-    case SQL_LONGVARBINARY:
-      return IGNITE_TYPE_BINARY;
+    case SQL_NUMERIC:
+      return JDBC_TYPE_NUMERIC;
 
     case SQL_DECIMAL:
-      return IGNITE_TYPE_DECIMAL;
+      return JDBC_TYPE_DECIMAL;
 
-    case SQL_GUID:
-      return IGNITE_TYPE_UUID;
+    case SQL_CHAR:
+      return JDBC_TYPE_CHAR;
+
+    case SQL_VARCHAR:
+      return JDBC_TYPE_VARCHAR;
+
+    case SQL_LONGVARCHAR:
+      return JDBC_TYPE_LONGVARCHAR;
 
     case SQL_TYPE_DATE:
-      return IGNITE_TYPE_DATE;
-
-    case SQL_TYPE_TIMESTAMP:
-      return IGNITE_TYPE_TIMESTAMP;
+      return JDBC_TYPE_DATE;
 
     case SQL_TYPE_TIME:
-      return IGNITE_TYPE_TIME;
+      return JDBC_TYPE_TIME;
+
+    case SQL_TYPE_TIMESTAMP:
+      return JDBC_TYPE_TIMESTAMP;
+
+    case SQL_BINARY:
+      return JDBC_TYPE_BINARY;
+
+    case SQL_VARBINARY:
+      return JDBC_TYPE_VARBINARY;
+
+    case SQL_LONGVARBINARY:
+      return JDBC_TYPE_LONGVARBINARY;
+
+    case SQL_TYPE_NULL:
+      return JDBC_TYPE_NULL;
 
     default:
-      break;
+      return JDBC_TYPE_BINARY;
   }
-
-  return -1;
 }
 
 OdbcNativeType::Type ToDriverType(int16_t type) {
@@ -351,74 +384,102 @@ OdbcNativeType::Type ToDriverType(int16_t type) {
   }
 }
 
-int16_t BinaryToSqlType(int8_t binaryType) {
-  using namespace ignite::impl::binary;
+/**
+ * Warning: if any JDBC Type is added or becomes deprecated on the
+ * JDBC side, the change should be reflected under this function as
+ * well.
+ */
+int16_t BinaryToSqlType(int16_t binaryType) {
   switch (binaryType) {
-    case IGNITE_TYPE_BYTE:
-    case IGNITE_TYPE_CHAR:
-      return SQL_TINYINT;
-
-    case IGNITE_TYPE_SHORT:
-      return SQL_SMALLINT;
-
-    case IGNITE_TYPE_INT:
-      return SQL_INTEGER;
-
-    case IGNITE_TYPE_LONG:
-      return SQL_BIGINT;
-
-    case IGNITE_TYPE_FLOAT:
-      return SQL_FLOAT;
-
-    case IGNITE_TYPE_DOUBLE:
-      return SQL_DOUBLE;
-
-    case IGNITE_TYPE_BOOL:
+    case JDBC_TYPE_BIT:
+    case JDBC_TYPE_BOOLEAN:
       return SQL_BIT;
 
-    case IGNITE_TYPE_DECIMAL:
+    case JDBC_TYPE_TINYINT:
+      return SQL_TINYINT;
+
+    case JDBC_TYPE_SMALLINT:
+      return SQL_SMALLINT;
+
+    case JDBC_TYPE_INTEGER:
+      return SQL_INTEGER;
+
+    case JDBC_TYPE_BIGINT:
+      return SQL_BIGINT;
+
+    case JDBC_TYPE_FLOAT:
+      return SQL_FLOAT;
+
+    case JDBC_TYPE_REAL:
+      return SQL_REAL;
+
+    case JDBC_TYPE_DOUBLE:
+      return SQL_DOUBLE;
+
+    case JDBC_TYPE_NUMERIC:
+      return SQL_NUMERIC;
+
+    case JDBC_TYPE_DECIMAL:
       return SQL_DECIMAL;
 
-    case IGNITE_TYPE_STRING:
+    case JDBC_TYPE_CHAR:
+    case JDBC_TYPE_NCHAR:
+      return SQL_CHAR;
+
+    case JDBC_TYPE_VARCHAR:
+    case JDBC_TYPE_NVARCHAR:
       return SQL_VARCHAR;
 
-    case IGNITE_TYPE_UUID:
-      return SQL_GUID;
+    case JDBC_TYPE_LONGVARCHAR:
+    case JDBC_TYPE_LONGNVARCHAR:
+      return SQL_LONGVARCHAR;
 
-    case IGNITE_TYPE_DATE:
+    case JDBC_TYPE_DATE:
       return SQL_TYPE_DATE;
 
-    case IGNITE_TYPE_TIMESTAMP:
-      return SQL_TYPE_TIMESTAMP;
-
-    case IGNITE_TYPE_TIME:
+    case JDBC_TYPE_TIME:
       return SQL_TYPE_TIME;
 
-    case IGNITE_TYPE_ARRAY_BYTE:
-    case IGNITE_TYPE_ARRAY_SHORT:
-    case IGNITE_TYPE_ARRAY_INT:
-    case IGNITE_TYPE_ARRAY_LONG:
-    case IGNITE_TYPE_ARRAY_FLOAT:
-    case IGNITE_TYPE_ARRAY_DOUBLE:
-    case IGNITE_TYPE_ARRAY_CHAR:
-    case IGNITE_TYPE_ARRAY_BOOL:
-    case IGNITE_TYPE_ARRAY_DECIMAL:
-    case IGNITE_TYPE_ARRAY_STRING:
-    case IGNITE_TYPE_ARRAY_UUID:
-    case IGNITE_TYPE_ARRAY_DATE:
-    case IGNITE_TYPE_ARRAY:
-    case IGNITE_TYPE_COLLECTION:
-    case IGNITE_TYPE_MAP:
-    case IGNITE_TYPE_MAP_ENTRY:
-    case IGNITE_TYPE_BINARY:
-    case IGNITE_TYPE_OBJECT:
+    case JDBC_TYPE_TIMESTAMP:
+      return SQL_TYPE_TIMESTAMP;
+
+    case JDBC_TYPE_LONGVARBINARY:
+      return SQL_LONGVARBINARY;
+
+    case JDBC_TYPE_NULL:
+      return SQL_TYPE_NULL;
+
+    case JDBC_TYPE_BINARY:
+    case JDBC_TYPE_VARBINARY:
+    case JDBC_TYPE_BLOB:
+    case JDBC_TYPE_CLOB:
+    case JDBC_TYPE_ARRAY:
+    case JDBC_TYPE_STRUCT:
+    case JDBC_TYPE_JAVA_OBJECT:
+    case JDBC_TYPE_ROWID:
+    case JDBC_TYPE_NCLOB:
+    case JDBC_TYPE_SQLXML:
+    case JDBC_TYPE_REF_CURSOR:
     default:
       return SQL_BINARY;
   }
 }
 
-int16_t BinaryTypeNullability(int8_t) {
+int16_t BinaryTypeNullability(int16_t) {
   return SQL_NULLABLE_UNKNOWN;
+}
+
+std::string NullabilityToIsNullable(int16_t nullability) {
+  switch (nullability) {
+    case SQL_NO_NULLS:
+      return "NO";
+
+    case SQL_NULLABLE:
+      return "YES";
+
+    default:
+      return "";
+  }
 }
 
 int32_t SqlTypeDisplaySize(int16_t type) {
@@ -426,15 +487,16 @@ int32_t SqlTypeDisplaySize(int16_t type) {
     case SQL_VARCHAR:
     case SQL_CHAR:
     case SQL_WCHAR:
+    case SQL_LONGVARCHAR:
     case SQL_LONGVARBINARY:
     case SQL_BINARY:
     case SQL_VARBINARY:
-    case SQL_LONGVARCHAR:
     case SQL_DECIMAL:
     case SQL_NUMERIC:
       return SQL_NO_TOTAL;
 
     case SQL_BIT:
+    case SQL_TYPE_NULL:
       return 1;
 
     case SQL_TINYINT:
@@ -473,7 +535,7 @@ int32_t SqlTypeDisplaySize(int16_t type) {
   }
 }
 
-int32_t BinaryTypeDisplaySize(int8_t type) {
+int32_t BinaryTypeDisplaySize(int16_t type) {
   int16_t sqlType = BinaryToSqlType(type);
 
   return SqlTypeDisplaySize(sqlType);
@@ -484,15 +546,16 @@ int32_t SqlTypeColumnSize(int16_t type) {
     case SQL_VARCHAR:
     case SQL_CHAR:
     case SQL_WCHAR:
+    case SQL_LONGVARCHAR:
     case SQL_LONGVARBINARY:
     case SQL_BINARY:
     case SQL_VARBINARY:
-    case SQL_LONGVARCHAR:
     case SQL_DECIMAL:
     case SQL_NUMERIC:
       return SQL_NO_TOTAL;
 
     case SQL_BIT:
+    case SQL_TYPE_NULL:
       return 1;
 
     case SQL_TINYINT:
@@ -531,7 +594,7 @@ int32_t SqlTypeColumnSize(int16_t type) {
   }
 }
 
-int32_t BinaryTypeColumnSize(int8_t type) {
+int32_t BinaryTypeColumnSize(int16_t type) {
   int16_t sqlType = BinaryToSqlType(type);
 
   return SqlTypeColumnSize(sqlType);
@@ -542,16 +605,17 @@ int32_t SqlTypeTransferLength(int16_t type) {
     case SQL_VARCHAR:
     case SQL_CHAR:
     case SQL_WCHAR:
+    case SQL_LONGVARCHAR:
     case SQL_LONGVARBINARY:
     case SQL_BINARY:
     case SQL_VARBINARY:
-    case SQL_LONGVARCHAR:
     case SQL_DECIMAL:
     case SQL_NUMERIC:
       return SQL_NO_TOTAL;
 
     case SQL_BIT:
     case SQL_TINYINT:
+    case SQL_TYPE_NULL:
       return 1;
 
     case SQL_SMALLINT:
@@ -563,8 +627,8 @@ int32_t SqlTypeTransferLength(int16_t type) {
     case SQL_BIGINT:
       return 8;
 
-    case SQL_REAL:
     case SQL_FLOAT:
+    case SQL_REAL:
       return 4;
 
     case SQL_DOUBLE:
@@ -585,7 +649,7 @@ int32_t SqlTypeTransferLength(int16_t type) {
   }
 }
 
-int32_t BinaryTypeTransferLength(int8_t type) {
+int32_t BinaryTypeTransferLength(int16_t type) {
   int16_t sqlType = BinaryToSqlType(type);
 
   return SqlTypeTransferLength(sqlType);
@@ -606,11 +670,11 @@ int32_t SqlTypeNumPrecRadix(int16_t type) {
       return 10;
 
     default:
-      return 0;
+      return -1;
   }
 }
 
-int32_t BinaryTypeNumPrecRadix(int8_t type) {
+int32_t BinaryTypeNumPrecRadix(int16_t type) {
   int16_t sqlType = BinaryToSqlType(type);
 
   return SqlTypeNumPrecRadix(sqlType);
@@ -621,10 +685,30 @@ int32_t SqlTypeDecimalDigits(int16_t) {
   return -1;
 }
 
-int32_t BinaryTypeDecimalDigits(int8_t type) {
+int32_t BinaryTypeDecimalDigits(int16_t type) {
   int16_t sqlType = BinaryToSqlType(type);
 
   return SqlTypeDecimalDigits(sqlType);
+}
+
+int32_t SqlTypeCharOctetLength(int16_t type) {
+  switch (type) {
+    case SQL_CHAR:
+    case SQL_VARCHAR:
+    case SQL_LONGVARCHAR:
+    case SQL_BINARY:
+    case SQL_LONGVARBINARY:
+      return SQL_NO_TOTAL;
+
+    default:
+      return 0;
+  }
+}
+
+int32_t BinaryTypeCharOctetLength(int16_t type) {
+  int16_t sqlType = BinaryToSqlType(type);
+
+  return SqlTypeCharOctetLength(sqlType);
 }
 
 bool SqlTypeUnsigned(int16_t type) {
@@ -644,7 +728,7 @@ bool SqlTypeUnsigned(int16_t type) {
   }
 }
 
-bool BinaryTypeUnsigned(int8_t type) {
+bool BinaryTypeUnsigned(int16_t type) {
   int16_t sqlType = BinaryToSqlType(type);
 
   return SqlTypeUnsigned(sqlType);

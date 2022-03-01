@@ -14,6 +14,7 @@ env:
   CI_OUTPUT_PATH: "ci-output"
   ODBC_LIB_PATH: "./build/odbc/lib"
   ODBC_BIN_PATH: "./build/odbc/bin/Release"
+  ODBC_DEBUG_PATH: "./build/odbc/bin/Debug"
   ODBC_BUILD_PATH: "./build/odbc/cmake"
   VCPKG_ROOT: "c:/vcpkg"
   DOCUMENTDB_HOME: "./build/odbc/bin/Release"
@@ -33,7 +34,22 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-
+    - name: setup-cppcheck
+      id: setup_cppcheck
+      run: |
+        choco install cppcheck -y
+        echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
+        
+    - name: run-cppcheck
+      id: run-cppcheck
+      run: |
+        .\run_cppcheck.ps1
+    - name: upload-cppcheck-results
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: cppcheck-results
+        path: cppcheck-results.log 
     - name: Get Java distribution
       uses: actions/setup-java@v2
       with:
@@ -118,7 +134,21 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-
+    - name: run-cppcheck
+      id: setup_cppcheck
+      run: |
+        choco install cppcheck -y
+        echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
+    - name: run-cppcheck
+      id: run-cppcheck
+      run: |
+        .\run_cppcheck.ps1
+    - name: upload-cppcheck-results
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: cppcheck-results
+        path: cppcheck-results.log 
     - name: Get Java distribution
       uses: actions/setup-java@v2
       with:
@@ -193,44 +223,73 @@ jobs:
   #     with:
   #       name: windows64-installer
   #       path: ci-output/installer
-  # build-windows64_coverage:
-  #   runs-on: windows-latest
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - name: Get Java distribution
-  #     uses: actions/setup-java@v2
-  #     with:
-  #       distribution: 'temurin'
-  #       java-version: '17'
-  #       architecture: x64
-  #   - name: "Update path for Java"
-  #     run: |
-  #       echo "${{ env.JAVA_HOME }}\bin\server" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-  #   - name: Get latest version of Cmake
-  #     uses: lukka/get-cmake@latest
-  #   - name: add-msbuild-to-path
-  #     uses: microsoft/setup-msbuild@v1.0.2
-  #   - name: setup-opencppcoverage-and-add-to-path
-  #     id: setup_opencppcoverage
-  #     run: |
-  #       choco install OpenCppCoverage -y
-  #       echo "C:\Program Files\OpenCppCoverage" >> $env:GITHUB_PATH
-  #   - name: configure-and-build-driver
-  #     run: |
-  #       .\build_win_debug64.ps1
-  #   - name: import-registry
-  #     run: |
-  #       reg import .\src\Tests\Tests\AWSProfileRegistry.reg
-  #       reg import .\src\Tests\Tests\IAMRegistry.reg
-  #   - name: run-tests
-  #     run: |
-  #       opencppcoverage --sources src --excluded_modules ut_conn --excluded_modules ut_helper --excluded_modules gtest --excluded_modules aws --export_type cobertura:coverage.xml -- ${{ github.workspace }}\build\odbc\bin\Debug\tests.exe --gtest_output="xml:report.xml"
-  #   - name: upload-coverage
-  #     if: always()
-  #     uses: actions/upload-artifact@v2
-  #     with:
-  #       name: coverage.xml
-  #       path: ./coverage.xml
+  build-windows64_coverage:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Get Java distribution
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        architecture: x64
+
+    - name: "Update path for Java"
+      run: |
+        echo "${{env.JAVA_HOME}}\bin\server" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+    - name: "Update path for WIX Toolset"
+      run: |
+        echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+    - name: Get latest version of CMake
+      uses: lukka/get-cmake@latest
+
+    - name: add-msbuild-to-path
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Extract key-pair into file
+      run: |
+        mkdir -p ~/certs
+        echo "${{env.DOC_DB_KEYPAIR}}" > ~/certs/docdb-sshtunnel.pem
+        chmod 400 ~/certs/docdb-sshtunnel.pem
+        mkdir -p ~/.ssh
+        copy ./src/odbc-test/config/ssh_config ~/.ssh/config
+
+    - name: setup-opencppcoverage-and-add-to-path
+      id: setup_opencppcoverage
+      run: |
+        choco install OpenCppCoverage -y
+        echo "C:\Program Files\OpenCppCoverage" >> $env:GITHUB_PATH
+    - name: Install dependencies Windows
+      run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x64-windows openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
+      env:
+        VCPKG_ROOT: ${{env.VCPKG_ROOT}}
+
+    - name: configure-and-build-driver
+      run: |
+        .\build_win_debug64.ps1
+      env:
+        OPENSSL_ROOT_DIR: '${{env.VCPKG_ROOT}}/packages/openssl_x64-windows'
+
+    - name: register-driver
+      run: |
+        .\src\odbc\install\install_amd64.cmd ${{env.ODBC_DEBUG_PATH}}\ignite.odbc.dll
+
+    - name: run-tests
+      env:
+        DOCUMENTDB_HOME: "./build/odbc/bin/Debug"
+      run: |
+        Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
+        opencppcoverage --sources src --export_type html:coverage --excluded_modules boost_unit_test_framework --excluded_modules ignite-odbc-tests --excluded_modules mongoc --excluded_modules mongocxx --excluded_modules bson --excluded_modules bsoncxx --excluded_modules zlib -- ${{env.ODBC_DEBUG_PATH}}/ignite-odbc-tests.exe
+    - name: upload-coverage
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: code-coverage
+        path: coverage
+    # 
     # The step below should be uncommented after the codecov is setup
     # - name: Upload Report to Codecov
     #   if: always()

@@ -29,6 +29,7 @@
 
 using namespace ignite::odbc;
 using namespace ignite::odbc::config;
+using ignite::common::EncodeURIComponent;
 
 namespace {
 const std::string testDriverName = "Test Driver";
@@ -234,32 +235,28 @@ void CheckConnectionConfig(const Configuration& cfg) {
   const std::string& expectedStr = constructor.str();
 
   std::stringstream jdbcConstructor;
-  jdbcConstructor << "jdbc:documentdb://" << testUsername << ":" << testPassword
-                  << "@" << testHostname << ':' << testServerPort << "/"
-                  << testDatabaseName << '?' << "appName=" << testAppName
-                  << "&defaultFetchSize=" << testDefaultFetchSize
-                  << "&loginTimeoutSec=" << testLoginTimeoutSec
-                  << "&readPreference="
-                  << ReadPreference::ToJdbcString(testReadPreference)
-                  << "&refreshSchema=" << BoolToStr(testRefreshSchemaFlag)
-                  << "&replicaSet=" << testReplicaSet
-                  << "&retryReads=" << BoolToStr(testRetryReads)
-                  << "&scanLimit=" << testScanLimit
-                  << "&scanMethod=" << ScanMethod::ToJdbcString(testScanMethod)
-                  << "&schemaName=" << testSchemaName
-                  << "&sshHost=" << testSshHost << "&sshKnownHostsFile="
-                  << ignite::common::EncodeURIComponent(testSshKnownHostsFile)
-                  << "&sshPrivateKeyFile="
-                  << ignite::common::EncodeURIComponent(testSshPrivateKeyFile)
-                  << "&sshPrivateKeyPassphrase=" << testSshPrivateKeyPassphrase
-                  << "&sshStrictHostKeyChecking="
-                  << BoolToStr(testSshStrictHostKeyCheckingFlag)
-                  << "&sshUser=" << testSshUser
-                  << "&tls=" << BoolToStr(testTlsFlag)
-                  << "&tlsAllowInvalidHostnames="
-                  << BoolToStr(testTlsAllowInvalidHostnamesFlag)
-                  << "&tlsCaFile="
-                  << ignite::common::EncodeURIComponent(testTlsCaFile);
+  jdbcConstructor
+      << "jdbc:documentdb://" << testUsername << ":" << testPassword << "@"
+      << testHostname << ':' << testServerPort << "/" << testDatabaseName << '?'
+      << "appName=" << testAppName
+      << "&defaultFetchSize=" << testDefaultFetchSize
+      << "&loginTimeoutSec=" << testLoginTimeoutSec
+      << "&readPreference=" << ReadPreference::ToJdbcString(testReadPreference)
+      << "&refreshSchema=" << BoolToStr(testRefreshSchemaFlag)
+      << "&replicaSet=" << testReplicaSet
+      << "&retryReads=" << BoolToStr(testRetryReads)
+      << "&scanLimit=" << testScanLimit
+      << "&scanMethod=" << ScanMethod::ToJdbcString(testScanMethod)
+      << "&schemaName=" << testSchemaName << "&sshHost=" << testSshHost
+      << "&sshKnownHostsFile=" << EncodeURIComponent(testSshKnownHostsFile)
+      << "&sshPrivateKeyFile=" << EncodeURIComponent(testSshPrivateKeyFile)
+      << "&sshPrivateKeyPassphrase=" << testSshPrivateKeyPassphrase
+      << "&sshStrictHostKeyChecking="
+      << BoolToStr(testSshStrictHostKeyCheckingFlag)
+      << "&sshUser=" << testSshUser << "&tls=" << BoolToStr(testTlsFlag)
+      << "&tlsAllowInvalidHostnames="
+      << BoolToStr(testTlsAllowInvalidHostnamesFlag)
+      << "&tlsCaFile=" << EncodeURIComponent(testTlsCaFile);
   const std::string& expectedJdbcStr = jdbcConstructor.str();
 
   BOOST_CHECK_EQUAL(ignite::common::ToLower(cfg.ToConnectString()),

@@ -720,16 +720,17 @@ SqlResult::Type Statement::ProcessInternalQuery() {
   return SqlResult::AI_SUCCESS;
 }
 
-void Statement::ExecuteGetColumnsMetaQuery(const std::string& schema,
+void Statement::ExecuteGetColumnsMetaQuery(const std::string& catalog,
+                                           const std::string& schema,
                                            const std::string& table,
                                            const std::string& column) {
   IGNITE_ODBC_API_CALL(
-      InternalExecuteGetColumnsMetaQuery(schema, table, column));
+      InternalExecuteGetColumnsMetaQuery(catalog, schema, table, column));
 }
 
 SqlResult::Type Statement::InternalExecuteGetColumnsMetaQuery(
-    const std::string& schema, const std::string& table,
-    const std::string& column) {
+    const std::string& catalog, const std::string& schema,
+    const std::string& table, const std::string& column) {
   if (currentQuery.get())
     currentQuery->Close();
 
@@ -738,8 +739,8 @@ SqlResult::Type Statement::InternalExecuteGetColumnsMetaQuery(
   if (schema0.empty())
     schema0 = connection.GetSchema();
 
-  currentQuery.reset(
-      new query::ColumnMetadataQuery(*this, connection, schema, table, column));
+  currentQuery.reset(new query::ColumnMetadataQuery(*this, connection, catalog,
+                                                    schema, table, column));
 
   return currentQuery->Execute();
 }

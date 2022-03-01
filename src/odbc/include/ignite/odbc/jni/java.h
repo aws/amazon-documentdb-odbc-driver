@@ -280,10 +280,12 @@ struct JniMembers {
   jmethodID m_ResultSetGetIntByIndex;
   jmethodID m_ResultSetGetStringByName;
   jmethodID m_ResultSetGetIntByName;
+  jmethodID m_ResultSetGetRow;
   jmethodID m_ResultSetWasNull;
 
   jclass c_DatabaseMetaData;
   jmethodID m_DatabaseMetaDataGetTables;
+  jmethodID m_DatabaseMetaDataGetColumns;
 
   jclass c_IgniteException;
 
@@ -479,6 +481,12 @@ class IGNITE_IMPORT_EXPORT JniContext {
       const std::vector< std::string >& types,
       SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo);
 
+  JniErrorCode DatabaseMetaDataGetColumns(
+      const SharedPointer< GlobalJObject >& databaseMetaData,
+      const std::string& catalog, const std::string& schemaPattern,
+      const std::string& tableNamePattern, const std::string& columnNamePattern,
+      SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo);
+
   JniErrorCode ResultSetClose(const SharedPointer< GlobalJObject >& resultSet,
                               JniErrorInfo& errInfo);
   JniErrorCode ResultSetNext(const SharedPointer< GlobalJObject >& resultSet,
@@ -496,6 +504,9 @@ class IGNITE_IMPORT_EXPORT JniContext {
   JniErrorCode ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet,
                                const std::string& columnName, int& value,
                                bool& wasNull, JniErrorInfo& errInfo);
+  JniErrorCode ResultSetGetRow(const SharedPointer< GlobalJObject >& resultSet,
+                               int& value, bool& wasNull,
+                               JniErrorInfo& errInfo);
   JniErrorCode ResultSetWasNull(const SharedPointer< GlobalJObject >& resultSet,
                                 bool& value, JniErrorInfo& errInfo);
 

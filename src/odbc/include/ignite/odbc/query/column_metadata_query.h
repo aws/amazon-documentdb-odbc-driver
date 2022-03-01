@@ -18,6 +18,7 @@
 #ifndef _IGNITE_ODBC_QUERY_COLUMN_METADATA_QUERY
 #define _IGNITE_ODBC_QUERY_COLUMN_METADATA_QUERY
 
+#include "ignite/odbc/jni/java.h"
 #include "ignite/odbc/meta/column_meta.h"
 #include "ignite/odbc/query/query.h"
 
@@ -42,8 +43,9 @@ class ColumnMetadataQuery : public Query {
    * @param column Column search pattern.
    */
   ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
-                      Connection& connection, const std::string& schema,
-                      const std::string& table, const std::string& column);
+                      Connection& connection, const std::string& catalog,
+                      const std::string& schema, const std::string& table,
+                      const std::string& column);
 
   /**
    * Destructor.
@@ -121,6 +123,9 @@ class ColumnMetadataQuery : public Query {
 
   /** Connection associated with the statement. */
   Connection& connection;
+
+  /** Catalog search pattern. */
+  std::string catalog;
 
   /** Schema search pattern. */
   std::string schema;
