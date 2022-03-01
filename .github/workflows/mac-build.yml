@@ -81,10 +81,11 @@ jobs:
         ./build/odbc/bin/ignite-odbc-tests
     - name: upload-test-report
       if: always()
-      uses: actions/upload-artifact@v2
+    #  uses: actions/upload-artifact@v2 # todo remove later -AL-
+      uses: EnricoMi/publish-unit-test-result-action@v1.9
       with:
         name: test-result-macos
-        path: ${{ github.workspace }}/report.xml
+        path: ./build/odbc/cmake/odbc-test/*.xml
     # - name: print-memory-leak-logs
     #   if: always()
     #   run: |
