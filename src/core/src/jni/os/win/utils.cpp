@@ -41,6 +41,7 @@ namespace ignite
         const char* IGNITE_HOME = "IGNITE_HOME";
 
         const char* IGNITE_NATIVE_TEST_CLASSPATH = "IGNITE_NATIVE_TEST_CLASSPATH";
+        HMODULE mod;
 
         /** Excluded modules from test classpath. */
         const char* TEST_EXCLUDED_MODULES[] = { "rest-http" };
@@ -322,9 +323,13 @@ namespace ignite
 
         bool LoadJvmLibrary(const std::string& path)
         {
-            HMODULE mod = LoadLibraryA(path.c_str());
+            mod = LoadLibraryA(path.c_str());
 
             return mod != NULL;
+        }
+
+        void UnloadJvmLibrary() {
+            FreeLibrary(mod);
         }
 
         /**
