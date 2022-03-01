@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 ##################################################
 # Assumptions
@@ -25,10 +25,10 @@ docker exec -it "${CONTAINER_NAME}" \
 for FILENAME in ${TEST_INPUT_FOLDER}/*.json
 do
     # Collection will be named the same as the input file base name
-	COLLECTION_NAME=$"{FILENAME%.json}"
-	TEST_FILE_NAME="$(basename -- ${FILENAME})"
-	
-	docker exec -it "${CONTAINER_NAME}" \
+    COLLECTION_NAME="$(basename -- ${FILENAME%.json})"
+    TEST_FILE_NAME="$(basename -- ${FILENAME})"
+
+    docker exec -it "${CONTAINER_NAME}" \
         mongoimport --quiet -u="${MONGO_INITDB_ROOT_USERNAME}" -p="${MONGO_INITDB_ROOT_PASSWORD}" --authenticationDatabase=admin \
             -d="${DATABASE_NAME}" -c="${COLLECTION_NAME}" \
             --file="""${CONTAINER_INPUT_FOLDER}/input/${TEST_FILE_NAME}"""
