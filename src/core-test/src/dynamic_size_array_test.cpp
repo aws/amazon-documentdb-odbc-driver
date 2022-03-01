@@ -23,19 +23,19 @@ using namespace ignite;
 using namespace ignite::common;
 
 
-struct TestStruct
+struct DynamicSizeArrayTestStruct
 {
     int32_t one;
     int32_t two;
 
-    TestStruct() :
+    DynamicSizeArrayTestStruct() :
         one(1),
         two(2)
     {
         // No-op.
     }
 
-    TestStruct(int32_t a, int32_t b) :
+    DynamicSizeArrayTestStruct(int32_t a, int32_t b) :
         one(a),
         two(b)
     {
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(ResizeBool)
 
 BOOST_AUTO_TEST_CASE(ResizeStruct)
 {
-    DynamicSizeArray<TestStruct> test;
+    DynamicSizeArray<DynamicSizeArrayTestStruct> test;
 
     test.Resize(16);
 
@@ -115,12 +115,12 @@ BOOST_AUTO_TEST_CASE(PushBack)
 
 BOOST_AUTO_TEST_CASE(ResizeGrowing)
 {
-    DynamicSizeArray<TestStruct> test;
+    DynamicSizeArray<DynamicSizeArrayTestStruct> test;
 
-    test.PushBack(TestStruct(3, 7));
-    test.PushBack(TestStruct(5, 6));
-    test.PushBack(TestStruct(42, 55));
-    test.PushBack(TestStruct(47334, 3));
+    test.PushBack(DynamicSizeArrayTestStruct(3, 7));
+    test.PushBack(DynamicSizeArrayTestStruct(5, 6));
+    test.PushBack(DynamicSizeArrayTestStruct(42, 55));
+    test.PushBack(DynamicSizeArrayTestStruct(47334, 3));
 
     BOOST_CHECK_EQUAL(test.GetSize(), 4);
 
@@ -141,18 +141,18 @@ BOOST_AUTO_TEST_CASE(ResizeGrowing)
         BOOST_CHECK_EQUAL(test[i].one, 1);
         BOOST_CHECK_EQUAL(test[i].two, 2);
 
-        test[i] = TestStruct(i * 3, i * 32508 + i);
+        test[i] = DynamicSizeArrayTestStruct(i * 3, i * 32508 + i);
     }
 }
 
 BOOST_AUTO_TEST_CASE(ResizeShrinking)
 {
-    DynamicSizeArray<TestStruct> test;
+    DynamicSizeArray<DynamicSizeArrayTestStruct> test;
 
-    test.PushBack(TestStruct(3, 7));
-    test.PushBack(TestStruct(5, 6));
-    test.PushBack(TestStruct(42, 55));
-    test.PushBack(TestStruct(47334, 3));
+    test.PushBack(DynamicSizeArrayTestStruct(3, 7));
+    test.PushBack(DynamicSizeArrayTestStruct(5, 6));
+    test.PushBack(DynamicSizeArrayTestStruct(42, 55));
+    test.PushBack(DynamicSizeArrayTestStruct(47334, 3));
 
     BOOST_CHECK_EQUAL(test.GetSize(), 4);
 
@@ -169,12 +169,12 @@ BOOST_AUTO_TEST_CASE(ResizeShrinking)
 
 BOOST_AUTO_TEST_CASE(ResizeKeep)
 {
-    DynamicSizeArray<TestStruct> test;
+    DynamicSizeArray<DynamicSizeArrayTestStruct> test;
 
-    test.PushBack(TestStruct(3, 7));
-    test.PushBack(TestStruct(5, 6));
-    test.PushBack(TestStruct(42, 55));
-    test.PushBack(TestStruct(47334, 3));
+    test.PushBack(DynamicSizeArrayTestStruct(3, 7));
+    test.PushBack(DynamicSizeArrayTestStruct(5, 6));
+    test.PushBack(DynamicSizeArrayTestStruct(42, 55));
+    test.PushBack(DynamicSizeArrayTestStruct(47334, 3));
 
     BOOST_CHECK_EQUAL(test.GetSize(), 4);
 
@@ -193,12 +193,12 @@ BOOST_AUTO_TEST_CASE(ResizeKeep)
 
 BOOST_AUTO_TEST_CASE(ReserveMore)
 {
-    DynamicSizeArray<TestStruct> test;
+    DynamicSizeArray<DynamicSizeArrayTestStruct> test;
 
-    test.PushBack(TestStruct(3, 7));
-    test.PushBack(TestStruct(5, 6));
-    test.PushBack(TestStruct(42, 55));
-    test.PushBack(TestStruct(47334, 3));
+    test.PushBack(DynamicSizeArrayTestStruct(3, 7));
+    test.PushBack(DynamicSizeArrayTestStruct(5, 6));
+    test.PushBack(DynamicSizeArrayTestStruct(42, 55));
+    test.PushBack(DynamicSizeArrayTestStruct(47334, 3));
 
     BOOST_CHECK_EQUAL(test.GetSize(), 4);
 
@@ -223,12 +223,12 @@ BOOST_AUTO_TEST_CASE(ReserveMore)
 
 BOOST_AUTO_TEST_CASE(ReserveLess)
 {
-    DynamicSizeArray<TestStruct> test;
+    DynamicSizeArray<DynamicSizeArrayTestStruct> test;
 
-    test.PushBack(TestStruct(3, 7));
-    test.PushBack(TestStruct(5, 6));
-    test.PushBack(TestStruct(42, 55));
-    test.PushBack(TestStruct(47334, 3));
+    test.PushBack(DynamicSizeArrayTestStruct(3, 7));
+    test.PushBack(DynamicSizeArrayTestStruct(5, 6));
+    test.PushBack(DynamicSizeArrayTestStruct(42, 55));
+    test.PushBack(DynamicSizeArrayTestStruct(47334, 3));
 
     BOOST_CHECK_EQUAL(test.GetSize(), 4);
 
@@ -252,14 +252,14 @@ BOOST_AUTO_TEST_CASE(ReserveLess)
 
 BOOST_AUTO_TEST_CASE(Append)
 {
-    DynamicSizeArray<TestStruct> test1;
-    DynamicSizeArray<TestStruct> test2;
+    DynamicSizeArray<DynamicSizeArrayTestStruct> test1;
+    DynamicSizeArray<DynamicSizeArrayTestStruct> test2;
 
-    test1.PushBack(TestStruct(3, 7));
-    test1.PushBack(TestStruct(5, 6));
+    test1.PushBack(DynamicSizeArrayTestStruct(3, 7));
+    test1.PushBack(DynamicSizeArrayTestStruct(5, 6));
 
-    test2.PushBack(TestStruct(42, 55));
-    test2.PushBack(TestStruct(47334, 3));
+    test2.PushBack(DynamicSizeArrayTestStruct(42, 55));
+    test2.PushBack(DynamicSizeArrayTestStruct(47334, 3));
 
     BOOST_CHECK_EQUAL(test1.GetSize(), 2);
     BOOST_CHECK_EQUAL(test2.GetSize(), 2);
