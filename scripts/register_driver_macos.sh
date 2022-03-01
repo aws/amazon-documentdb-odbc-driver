@@ -18,8 +18,8 @@ then
   exit 1
 fi
 
-echo "[Apache Ignite]"            > "$ODBC_LIB_PATH/ignite-odbc-install.ini"
-echo "Description=Apache Ignite" >> "$ODBC_LIB_PATH/ignite-odbc-install.ini"
+echo "[Amazon DocumentDB]"            > "$ODBC_LIB_PATH/ignite-odbc-install.ini"
+echo "Description=Amazon DocumentDB" >> "$ODBC_LIB_PATH/ignite-odbc-install.ini"
 echo "Driver=$ODBC_LIB_FILENAME" >> "$ODBC_LIB_PATH/ignite-odbc-install.ini"
 echo "Setup=$ODBC_LIB_FILENAME"  >> "$ODBC_LIB_PATH/ignite-odbc-install.ini"
 echo "DriverODBCVer=03.00"       >> "$ODBC_LIB_PATH/ignite-odbc-install.ini"

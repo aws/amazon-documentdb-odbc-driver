@@ -99,16 +99,8 @@ if (${WITH_TESTS})
     endif()
 endif()
 
-if (${WITH_THIN_CLIENT} OR ${WITH_ODBC})
+if (${WITH_ODBC})
     add_subdirectory(network)
-endif()
-
-if (${WITH_THIN_CLIENT})
-    add_subdirectory(thin-client)
-
-    if (${WITH_TESTS} AND EXISTS ${CMAKE_SOURCE_DIR}/thin-client-test)
-        add_subdirectory(thin-client-test)
-    endif()
 endif()
 
 if (${WITH_ODBC})

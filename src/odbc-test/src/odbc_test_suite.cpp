@@ -802,7 +802,7 @@ void OdbcTestSuite::CreateDsnConnectionString(
   }
 
   connectionString =
-            "DRIVER={Apache Ignite};"
+            "DRIVER={Amazon DocumentDB};"
             "HOSTNAME=" + host + ":" + port + ";"
             "DATABASE=test;"
             "USER=" + user + ";"

@@ -745,12 +745,12 @@ BOOST_AUTO_TEST_CASE(TestGetIntFromBigint) {
 }
 
 BOOST_AUTO_TEST_CASE(TestGetIntWithOffset) {
-  struct TestStruct {
+  struct GetIntWithOffsetTestStruct {
     uint64_t val;
     SqlLen reslen;
   };
 
-  TestStruct buf[2] = {{12, sizeof(uint64_t)}, {42, sizeof(uint64_t)}};
+  GetIntWithOffsetTestStruct buf[2] = {{12, sizeof(uint64_t)}, {42, sizeof(uint64_t)}};
 
   ApplicationDataBuffer appBuf(OdbcNativeType::AI_UNSIGNED_BIGINT, &buf[0].val,
                                sizeof(buf[0].val), &buf[0].reslen);
@@ -759,7 +759,7 @@ BOOST_AUTO_TEST_CASE(TestGetIntWithOffset) {
 
   BOOST_CHECK(val == 12);
 
-  appBuf.SetByteOffset(sizeof(TestStruct));
+  appBuf.SetByteOffset(sizeof(GetIntWithOffsetTestStruct));
 
   val = appBuf.GetInt64();
 
@@ -773,12 +773,12 @@ BOOST_AUTO_TEST_CASE(TestGetIntWithOffset) {
 }
 
 BOOST_AUTO_TEST_CASE(TestSetStringWithOffset) {
-  struct TestStruct {
+  struct SetStringWithOffsetTestStruct {
     char val[64];
     SqlLen reslen;
   };
 
-  TestStruct buf[2] = {{"", 0}, {"", 0}};
+  SetStringWithOffsetTestStruct buf[2] = {{"", 0}, {"", 0}};
 
   ApplicationDataBuffer appBuf(OdbcNativeType::AI_CHAR, &buf[0].val,
                                sizeof(buf[0].val), &buf[0].reslen);
@@ -791,7 +791,7 @@ BOOST_AUTO_TEST_CASE(TestSetStringWithOffset) {
   BOOST_CHECK(res == "Hello Ignite!");
   BOOST_CHECK(res.size() == strlen("Hello Ignite!"));
 
-  appBuf.SetByteOffset(sizeof(TestStruct));
+  appBuf.SetByteOffset(sizeof(SetStringWithOffsetTestStruct));
 
   appBuf.PutString("Hello with offset!");
 
