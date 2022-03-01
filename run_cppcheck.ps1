@@ -18,6 +18,6 @@
 
 cppcheck --force --library=boost --library=documentdb .\src\ 2>  .\cppcheck-results.log
 If ((Get-Content "cppcheck-results.log") -eq $Null) {
-exit 0
+  exit 0
 }
 exit 1
