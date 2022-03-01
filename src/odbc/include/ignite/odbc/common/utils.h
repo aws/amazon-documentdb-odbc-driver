@@ -17,10 +17,10 @@
 #ifndef _IGNITE_ODBC_COMMON_UTILS
 #define _IGNITE_ODBC_COMMON_UTILS
 
-#include <ignite/date.h>
+#include <ignite/odbc/date.h>
 #include <ignite/odbc/common/common.h>
 #include <ignite/odbc/common/platform_utils.h>
-#include <ignite/timestamp.h>
+#include <ignite/odbc/timestamp.h>
 #include <stdint.h>
 
 #include <algorithm>
@@ -29,7 +29,7 @@
 #include <sstream>
 #include <string>
 
-#include "ignite/time.h"
+#include "ignite/odbc/time.h"
 
 #ifdef IGNITE_FRIEND
 #define IGNITE_FRIEND_EXPORT IGNITE_EXPORT

@@ -25,6 +25,9 @@
 #include "ignite/odbc/app/application_data_buffer.h"
 #include "ignite/odbc/column.h"
 
+using namespace ignite::odbc::impl::interop;
+using namespace ignite::odbc::impl::binary;
+
 namespace ignite {
 namespace odbc {
 /**
@@ -37,7 +40,7 @@ class Row {
    *
    * @param pageData Page data.
    */
-  Row(ignite::impl::interop::InteropUnpooledMemory& pageData);
+  Row(InteropUnpooledMemory& pageData);
 
   /**
    * Destructor.
@@ -114,13 +117,13 @@ class Row {
   int32_t size;
 
   /** Memory that contains current row data. */
-  ignite::impl::interop::InteropUnpooledMemory& pageData;
+  InteropUnpooledMemory& pageData;
 
   /** Page data input stream. */
-  ignite::impl::interop::InteropInputStream stream;
+  InteropInputStream stream;
 
   /** Data reader. */
-  ignite::impl::binary::BinaryReaderImpl reader;
+  BinaryReaderImpl reader;
 
   /** Columns. */
   std::vector< Column > columns;

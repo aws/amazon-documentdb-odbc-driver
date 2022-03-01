@@ -33,6 +33,12 @@ include_directories(include)
 set(SOURCES src/app/application_data_buffer.cpp
         src/app/parameter.cpp
         src/app/parameter_set.cpp
+        src/binary/binary_containers.cpp
+        src/binary/binary_raw_writer.cpp
+        src/binary/binary_writer.cpp
+        src/binary/binary_reader.cpp
+        src/binary/binary_type.cpp
+        src/binary/binary_raw_reader.cpp
         src/common_types.cpp
         src/common/big_integer.cpp
         src/common/bits.cpp
@@ -44,6 +50,20 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/config/configuration.cpp
         src/config/connection_info.cpp
         src/config/connection_string_parser.cpp
+        src/impl/binary/binary_type_manager.cpp
+        src/impl/binary/binary_type_impl.cpp
+        src/impl/binary/binary_utils.cpp
+        src/impl/binary/binary_reader_impl.cpp
+        src/impl/binary/binary_type_handler.cpp
+        src/impl/binary/binary_writer_impl.cpp
+        src/impl/binary/binary_schema.cpp
+        src/impl/binary/binary_type_snapshot.cpp
+        src/impl/binary/binary_object_header.cpp
+        src/impl/binary/binary_object_impl.cpp
+        src/impl/binary/binary_field_meta.cpp
+        src/impl/interop/interop_memory.cpp
+        src/impl/interop/interop_output_stream.cpp
+        src/impl/interop/interop_input_stream.cpp
         src/connection.cpp
         src/driverInstance.cpp
         src/cursor.cpp
@@ -87,7 +107,11 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/utility.cpp
         src/log.cpp
         src/read_preference.cpp
-        src/scan_method.cpp)
+        src/scan_method.cpp
+        src/date.cpp
+        src/guid.cpp
+        src/time.cpp
+        src/timestamp.cpp)
 
 if (WIN32)
     set(OS_INCLUDE os/win/include)

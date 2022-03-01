@@ -17,13 +17,13 @@
 
 #include "ignite/odbc/column.h"
 
-#include <ignite/impl/interop/interop_stream_position_guard.h>
+#include <ignite/odbc/impl/interop/interop_stream_position_guard.h>
 
 #include "ignite/odbc/utility.h"
 
 namespace {
-using namespace ignite::impl::interop;
-using namespace ignite::impl::binary;
+using namespace ignite::odbc::impl::interop;
+using namespace ignite::odbc::impl::binary;
 
 bool GetObjectLength(InteropInputStream& stream, int32_t& len) {
   InteropStreamPositionGuard< InteropInputStream > guard(stream);
@@ -63,7 +63,7 @@ bool GetObjectLength(InteropInputStream& stream, int32_t& len) {
  * @return Column type header.
  */
 int8_t ReadColumnHeader(InteropInputStream& stream) {
-  using namespace ignite::impl::binary;
+  using namespace ignite::odbc::impl::binary;
 
   int32_t headerPos = stream.Position();
 

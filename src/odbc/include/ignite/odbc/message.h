@@ -23,13 +23,15 @@
 #include <string>
 
 #include "config/configuration.h"
-#include "ignite/impl/binary/binary_reader_impl.h"
-#include "ignite/impl/binary/binary_writer_impl.h"
+#include "ignite/odbc/impl/binary/binary_reader_impl.h"
+#include "ignite/odbc/impl/binary/binary_writer_impl.h"
 #include "ignite/odbc/app/parameter_set.h"
 #include "ignite/odbc/meta/column_meta.h"
 #include "ignite/odbc/meta/table_meta.h"
 #include "ignite/odbc/protocol_version.h"
 #include "ignite/odbc/result_page.h"
+
+using namespace ignite::odbc::impl::binary;
 
 namespace ignite {
 namespace odbc {
@@ -89,7 +91,7 @@ class HandshakeRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(impl::binary::BinaryWriterImpl& writer,
+  void Write(BinaryWriterImpl& writer,
              const ProtocolVersion&) const;
 
  private:
@@ -125,7 +127,7 @@ class QueryExecuteRequest {
    * @param writer Writer.
    * @param ver Version.
    */
-  void Write(impl::binary::BinaryWriterImpl& writer,
+  void Write(BinaryWriterImpl& writer,
              const ProtocolVersion& ver) const;
 
  private:
@@ -176,7 +178,7 @@ class QueryExecuteBatchRequest {
    * @param writer Writer.
    * @param ver Version.
    */
-  void Write(impl::binary::BinaryWriterImpl& writer,
+  void Write(BinaryWriterImpl& writer,
              const ProtocolVersion& ver) const;
 
  private:
@@ -226,7 +228,7 @@ class QueryCloseRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(impl::binary::BinaryWriterImpl& writer,
+  void Write(BinaryWriterImpl& writer,
              const ProtocolVersion&) const;
 
  private:
@@ -256,7 +258,7 @@ class QueryFetchRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(impl::binary::BinaryWriterImpl& writer,
+  void Write(BinaryWriterImpl& writer,
              const ProtocolVersion&) const;
 
  private:
@@ -292,7 +294,7 @@ class QueryGetColumnsMetaRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(impl::binary::BinaryWriterImpl& writer,
+  void Write(BinaryWriterImpl& writer,
              const ProtocolVersion&) const;
 
  private:
@@ -329,7 +331,7 @@ class QueryGetResultsetMetaRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(impl::binary::BinaryWriterImpl& writer,
+  void Write(BinaryWriterImpl& writer,
              const ProtocolVersion&) const;
 
  private:
@@ -366,7 +368,7 @@ class QueryGetTablesMetaRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(impl::binary::BinaryWriterImpl& writer,
+  void Write(BinaryWriterImpl& writer,
              const ProtocolVersion&) const;
 
  private:
@@ -411,7 +413,7 @@ class QueryGetParamsMetaRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(impl::binary::BinaryWriterImpl& writer,
+  void Write(BinaryWriterImpl& writer,
              const ProtocolVersion&) const;
 
  private:
@@ -449,7 +451,7 @@ class QueryMoreResultsRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(impl::binary::BinaryWriterImpl& writer,
+  void Write(BinaryWriterImpl& writer,
              const ProtocolVersion&) const;
 
  private:
@@ -486,7 +488,7 @@ class StreamingBatchRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(impl::binary::BinaryWriterImpl& writer,
+  void Write(BinaryWriterImpl& writer,
              const ProtocolVersion&) const;
 
  private:
@@ -523,7 +525,7 @@ class Response {
    * @param reader Reader.
    * @param ver Protocol version.
    */
-  void Read(impl::binary::BinaryReaderImpl& reader, const ProtocolVersion& ver);
+  void Read(BinaryReaderImpl& reader, const ProtocolVersion& ver);
 
   /**
    * Get request processing status.
@@ -545,7 +547,7 @@ class Response {
   /**
    * Read data if response status is ResponseStatus::SUCCESS.
    */
-  virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl&,
+  virtual void ReadOnSuccess(BinaryReaderImpl&,
                              const ProtocolVersion&);
 
  private:
@@ -599,7 +601,7 @@ class HandshakeResponse {
    * Read response using provided reader.
    * @param reader Reader.
    */
-  void Read(impl::binary::BinaryReaderImpl& reader, const ProtocolVersion&);
+  void Read(BinaryReaderImpl& reader, const ProtocolVersion&);
 
  private:
   /** Handshake accepted. */
@@ -640,7 +642,7 @@ class QueryCloseResponse : public Response {
    * Read response using provided reader.
    * @param reader Reader.
    */
-  virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader,
+  virtual void ReadOnSuccess(BinaryReaderImpl& reader,
                              const ProtocolVersion&);
 
   /** Query ID. */
@@ -687,13 +689,6 @@ class QueryExecuteResponse : public Response {
   }
 
  private:
-  /**
-   * Read response using provided reader.
-   * @param reader Reader.
-   */
-  virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader,
-                             const ProtocolVersion& ver);
-
   /** Query ID. */
   int64_t queryId;
 
@@ -749,7 +744,7 @@ class QueryExecuteBatchResponse : public Response {
    * @param reader Reader.
    * @param ver Protocol version.
    */
-  virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader,
+  virtual void ReadOnSuccess(BinaryReaderImpl& reader,
                              const ProtocolVersion& ver);
 
   /** Affected rows. */
@@ -807,7 +802,7 @@ class StreamingBatchResponse : public Response {
    * @param reader Reader.
    * @param ver Protocol version.
    */
-  virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader,
+  virtual void ReadOnSuccess(BinaryReaderImpl& reader,
                              const ProtocolVersion& ver);
 
   /** Error message. */
@@ -849,7 +844,7 @@ class QueryFetchResponse : public Response {
    * Read response using provided reader.
    * @param reader Reader.
    */
-  virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader,
+  virtual void ReadOnSuccess(BinaryReaderImpl& reader,
                              const ProtocolVersion&);
 
   /** Query ID. */
@@ -857,41 +852,6 @@ class QueryFetchResponse : public Response {
 
   /** Result page. */
   ResultPage& resultPage;
-};
-
-/**
- * Query get column metadata response.
- */
-class QueryGetColumnsMetaResponse : public Response {
- public:
-  /**
-   * Constructor.
-   */
-  QueryGetColumnsMetaResponse();
-
-  /**
-   * Destructor.
-   */
-  virtual ~QueryGetColumnsMetaResponse();
-
-  /**
-   * Get column metadata.
-   * @return Column metadata.
-   */
-  const meta::ColumnMetaVector& GetMeta() const {
-    return meta;
-  }
-
- private:
-  /**
-   * Read response using provided reader.
-   * @param reader Reader.
-   */
-  virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader,
-                             const ProtocolVersion&);
-
-  /** Columns metadata. */
-  meta::ColumnMetaVector meta;
 };
 
 /**
@@ -918,13 +878,6 @@ class QueryGetResultsetMetaResponse : public Response {
   }
 
  private:
-  /**
-   * Read response using provided reader.
-   * @param reader Reader.
-   */
-  virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader,
-                             const ProtocolVersion&);
-
   /** Columns metadata. */
   meta::ColumnMetaVector meta;
 };
@@ -957,7 +910,7 @@ class QueryGetParamsMetaResponse : public Response {
    * Read response using provided reader.
    * @param reader Reader.
    */
-  virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader,
+  virtual void ReadOnSuccess(BinaryReaderImpl& reader,
                              const ProtocolVersion&);
 
   /** Columns metadata. */
@@ -993,7 +946,7 @@ class QueryMoreResultsResponse : public Response {
    * Read response using provided reader.
    * @param reader Reader.
    */
-  virtual void ReadOnSuccess(impl::binary::BinaryReaderImpl& reader,
+  virtual void ReadOnSuccess(BinaryReaderImpl& reader,
                              const ProtocolVersion&);
 
   /** Query ID. */
