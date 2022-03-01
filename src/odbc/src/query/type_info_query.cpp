@@ -17,10 +17,9 @@
 
 #include "ignite/odbc/query/type_info_query.h"
 
-#include <ignite/impl/binary/binary_common.h>
-
 #include <cassert>
 
+#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/system/odbc_constants.h"
 #include "ignite/odbc/type_traits.h"
 
@@ -122,63 +121,82 @@ TypeInfoQuery::TypeInfoQuery(diagnostic::DiagnosableAdapter& diag,
       types(),
       cursor(types.end()) {
   using namespace ignite::impl::binary;
+  using namespace ignite::odbc::impl::binary;
   using namespace ignite::odbc::type_traits;
 
   using meta::ColumnMeta;
+  using meta::Nullability;
 
   columnsMeta.reserve(19);
 
   const std::string sch;
   const std::string tbl;
 
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TYPE_NAME", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "DATA_TYPE", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_SIZE", IGNITE_TYPE_INT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "LITERAL_PREFIX", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "LITERAL_SUFFIX", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "CREATE_PARAMS", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "NULLABLE", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "CASE_SENSITIVE", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "SEARCHABLE", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "UNSIGNED_ATTRIBUTE", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "FIXED_PREC_SCALE", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "AUTO_UNIQUE_VALUE", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "LOCAL_TYPE_NAME", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "MINIMUM_SCALE", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "MAXIMUM_SCALE", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "SQL_DATA_TYPE", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "SQL_DATETIME_SUB", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "NUM_PREC_RADIX", IGNITE_TYPE_INT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "INTERVAL_PRECISION", IGNITE_TYPE_SHORT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TYPE_NAME", JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "DATA_TYPE", JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_SIZE", JDBC_TYPE_INTEGER,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "LITERAL_PREFIX",
+                                   JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "LITERAL_SUFFIX",
+                                   JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "CREATE_PARAMS", JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "NULLABLE", JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "CASE_SENSITIVE",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "SEARCHABLE", JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "UNSIGNED_ATTRIBUTE",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "FIXED_PREC_SCALE",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "AUTO_UNIQUE_VALUE",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "LOCAL_TYPE_NAME",
+                                   JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "MINIMUM_SCALE",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "MAXIMUM_SCALE",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATA_TYPE",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATETIME_SUB",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "NUM_PREC_RADIX",
+                                   JDBC_TYPE_INTEGER,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "INTERVAL_PRECISION",
+                                   JDBC_TYPE_SMALLINT,
+                                   Nullability::NULLABILITY_UNKNOWN));
 
   assert(IsSqlTypeSupported(sqlType) || sqlType == SQL_ALL_TYPES);
 
   if (sqlType == SQL_ALL_TYPES) {
-    types.push_back(IGNITE_TYPE_STRING);
-    types.push_back(IGNITE_TYPE_SHORT);
-    types.push_back(IGNITE_TYPE_INT);
-    types.push_back(IGNITE_TYPE_DECIMAL);
-    types.push_back(IGNITE_TYPE_FLOAT);
-    types.push_back(IGNITE_TYPE_DOUBLE);
-    types.push_back(IGNITE_TYPE_BOOL);
-    types.push_back(IGNITE_TYPE_BYTE);
-    types.push_back(IGNITE_TYPE_LONG);
-    types.push_back(IGNITE_TYPE_UUID);
-    types.push_back(IGNITE_TYPE_BINARY);
+    types.push_back(JDBC_TYPE_VARCHAR);
+    types.push_back(JDBC_TYPE_SMALLINT);
+    types.push_back(JDBC_TYPE_INTEGER);
+    types.push_back(JDBC_TYPE_DECIMAL);
+    types.push_back(JDBC_TYPE_FLOAT);
+    types.push_back(JDBC_TYPE_DOUBLE);
+    types.push_back(JDBC_TYPE_BOOLEAN);
+    types.push_back(JDBC_TYPE_TINYINT);
+    types.push_back(JDBC_TYPE_BIGINT);
+    types.push_back(JDBC_TYPE_BINARY);
   } else
     types.push_back(SqlTypeToBinary(sqlType));
 }
@@ -228,6 +246,7 @@ SqlResult::Type TypeInfoQuery::FetchNextRow(
 SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
                                          app::ApplicationDataBuffer& buffer) {
   using namespace ignite::impl::binary;
+  using namespace ignite::odbc::impl::binary;
 
   if (!executed) {
     diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
@@ -266,7 +285,7 @@ SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
     }
 
     case ResultColumn::LITERAL_PREFIX: {
-      if (currentType == IGNITE_TYPE_STRING)
+      if (currentType == JDBC_TYPE_VARCHAR)
         buffer.PutString("'");
       else if (currentType == IGNITE_TYPE_BINARY)
         buffer.PutString("0x");
@@ -277,7 +296,7 @@ SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
     }
 
     case ResultColumn::LITERAL_SUFFIX: {
-      if (currentType == IGNITE_TYPE_STRING)
+      if (currentType == JDBC_TYPE_VARCHAR)
         buffer.PutString("'");
       else
         buffer.PutNull();
@@ -298,7 +317,7 @@ SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
     }
 
     case ResultColumn::CASE_SENSITIVE: {
-      if (currentType == IGNITE_TYPE_STRING)
+      if (currentType == JDBC_TYPE_VARCHAR)
         buffer.PutInt16(SQL_TRUE);
       else
         buffer.PutInt16(SQL_FALSE);

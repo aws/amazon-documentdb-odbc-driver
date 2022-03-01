@@ -262,8 +262,8 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
 
   using odbc::Connection;
   using odbc::diagnostic::DiagnosticRecordStorage;
-  using utility::CopyStringToBuffer;
-  using utility::SqlStringToString;
+  using odbc::utility::CopyStringToBuffer;
+  using odbc::utility::SqlStringToString;
 
   LOG_MSG("SQLDriverConnect called");
   if (inConnectionString)
@@ -306,7 +306,7 @@ SQLRETURN SQLConnect(SQLHDBC conn, SQLCHAR* serverName,
 
   using odbc::Connection;
   using odbc::config::Configuration;
-  using utility::SqlStringToString;
+  using odbc::utility::SqlStringToString;
 
   LOG_MSG("SQLConnect called\n");
 
@@ -346,7 +346,7 @@ SQLRETURN SQLDisconnect(SQLHDBC conn) {
 
 SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLCHAR* query, SQLINTEGER queryLen) {
   using odbc::Statement;
-  using utility::SqlStringToString;
+  using odbc::utility::SqlStringToString;
 
   LOG_MSG("SQLPrepare called");
 
@@ -381,7 +381,7 @@ SQLRETURN SQLExecute(SQLHSTMT stmt) {
 
 SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLCHAR* query, SQLINTEGER queryLen) {
   using odbc::Statement;
-  using utility::SqlStringToString;
+  using odbc::utility::SqlStringToString;
 
   LOG_MSG("SQLExecDirect called");
 
@@ -502,7 +502,7 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLCHAR* catalogName,
                     SQLSMALLINT tableNameLen, SQLCHAR* tableType,
                     SQLSMALLINT tableTypeLen) {
   using odbc::Statement;
-  using utility::SqlStringToString;
+  using odbc::utility::SqlStringToString;
 
   LOG_MSG("SQLTables called");
 
@@ -532,7 +532,7 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLCHAR* catalogName,
                      SQLSMALLINT tableNameLen, SQLCHAR* columnName,
                      SQLSMALLINT columnNameLen) {
   using odbc::Statement;
-  using utility::SqlStringToString;
+  using odbc::utility::SqlStringToString;
 
   LOG_MSG("SQLColumns called");
 
@@ -551,7 +551,7 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLCHAR* catalogName,
   LOG_MSG("table: " << table);
   LOG_MSG("column: " << column);
 
-  statement->ExecuteGetColumnsMetaQuery(schema, table, column);
+  statement->ExecuteGetColumnsMetaQuery(catalog, schema, table, column);
 
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
@@ -597,7 +597,7 @@ SQLRETURN SQLNativeSql(SQLHDBC conn, SQLCHAR* inQuery, SQLINTEGER inQueryLen,
                        SQLINTEGER* outQueryLen) {
   IGNITE_UNUSED(conn);
 
-  using namespace utility;
+  using namespace odbc::utility;
 
   LOG_MSG("SQLNativeSql called");
 
@@ -735,7 +735,7 @@ SQLRETURN SQLForeignKeys(
     SQLSMALLINT foreignSchemaNameLen, SQLCHAR* foreignTableName,
     SQLSMALLINT foreignTableNameLen) {
   using odbc::Statement;
-  using utility::SqlStringToString;
+  using odbc::utility::SqlStringToString;
 
   LOG_MSG("SQLForeignKeys called");
 
@@ -820,7 +820,7 @@ SQLRETURN SQLPrimaryKeys(SQLHSTMT stmt, SQLCHAR* catalogName,
                          SQLSMALLINT schemaNameLen, SQLCHAR* tableName,
                          SQLSMALLINT tableNameLen) {
   using odbc::Statement;
-  using utility::SqlStringToString;
+  using odbc::utility::SqlStringToString;
 
   LOG_MSG("SQLPrimaryKeys called");
 
@@ -909,7 +909,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
                         SQLSMALLINT recNum, SQLCHAR* sqlState,
                         SQLINTEGER* nativeError, SQLCHAR* msgBuffer,
                         SQLSMALLINT msgBufferLen, SQLSMALLINT* msgLen) {
-  using namespace utility;
+  using namespace odbc::utility;
   using namespace odbc;
   using namespace odbc::diagnostic;
   using namespace odbc::type_traits;
@@ -1119,7 +1119,7 @@ SQLRETURN SQLSpecialColumns(SQLHSTMT stmt, SQLSMALLINT idType,
                             SQLSMALLINT scope, SQLSMALLINT nullable) {
   using namespace odbc;
 
-  using utility::SqlStringToString;
+  using odbc::utility::SqlStringToString;
 
   LOG_MSG("SQLSpecialColumns called");
 
@@ -1194,7 +1194,7 @@ SQLRETURN SQLDescribeParam(SQLHSTMT stmt, SQLUSMALLINT paramNum,
 SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLCHAR* state,
                    SQLINTEGER* error, SQLCHAR* msgBuf, SQLSMALLINT msgBufLen,
                    SQLSMALLINT* msgResLen) {
-  using namespace ignite::utility;
+  using namespace ignite::odbc::utility;
   using namespace ignite::odbc;
   using namespace ignite::odbc::diagnostic;
   using namespace ignite::odbc::type_traits;
