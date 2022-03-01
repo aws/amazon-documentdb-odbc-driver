@@ -24,8 +24,12 @@
 
 #include "ignite/impl/binary/binary_reader_impl.h"
 #include "ignite/odbc/common_types.h"
+#include "ignite/odbc/jni/result_set.h"
 #include "ignite/odbc/protocol_version.h"
 #include "ignite/odbc/utility.h"
+
+using ignite::odbc::jni::ResultSet;
+using ignite::odbc::jni::java::JniErrorInfo;
 
 namespace ignite {
 namespace odbc {
@@ -69,7 +73,7 @@ class ColumnMeta {
   /**
    * Default constructor.
    */
-  ColumnMeta() : dataType(), nullability(), precision(), scale() {
+  ColumnMeta() : dataType(), nullability(), precision(), scale(), ordinalPosition() {
     // No-op.
   }
 
@@ -83,14 +87,16 @@ class ColumnMeta {
    * @param dataType Data type.
    */
   ColumnMeta(const std::string& schemaName, const std::string& tableName,
-             const std::string& columnName, int8_t dataType)
+             const std::string& columnName, int16_t dataType,
+             Nullability::Type nullability)
       : schemaName(schemaName),
         tableName(tableName),
         columnName(columnName),
         dataType(dataType),
         precision(-1),
         scale(-1),
-        nullability(Nullability::NULLABILITY_UNKNOWN) {
+        nullability(nullability),
+        ordinalPosition(-1) {
     // No-op.
   }
 
@@ -105,13 +111,17 @@ class ColumnMeta {
    * Copy constructor.
    */
   ColumnMeta(const ColumnMeta& other)
-      : schemaName(other.schemaName),
+      : catalogName(other.catalogName),
+        schemaName(other.schemaName),
         tableName(other.tableName),
         columnName(other.columnName),
+        remarks(other.remarks),
+        columnDef(other.columnDef),
         dataType(other.dataType),
         precision(other.precision),
         scale(other.scale),
-        nullability(other.nullability) {
+        nullability(other.nullability),
+        ordinalPosition(other.ordinalPosition) {
     // No-op.
   }
 
@@ -119,24 +129,37 @@ class ColumnMeta {
    * Copy operator.
    */
   ColumnMeta& operator=(const ColumnMeta& other) {
+    catalogName = other.catalogName;
     schemaName = other.schemaName;
     tableName = other.tableName;
     columnName = other.columnName;
+    remarks = other.remarks;
+    columnDef = other.columnDef;
     dataType = other.dataType;
     precision = other.precision;
     scale = other.scale;
     nullability = other.nullability;
+    ordinalPosition = other.ordinalPosition;
 
     return *this;
   }
 
   /**
    * Read using reader.
-   * @param reader Reader.
-   * @param ver Server version.
+   * @param resultSet SharedPointer< ResultSet >.
+   * @param prevPosition the ordinal position of the previous column.
+   * @paran errInfo JniErrorInfo.
    */
-  void Read(ignite::impl::binary::BinaryReaderImpl& reader,
-            const ProtocolVersion& ver);
+  void Read(SharedPointer< ResultSet >& resultSet, int32_t& prevPosition,
+            JniErrorInfo& errInfo);
+
+  /**
+   * Get catalog name.
+   * @return Catalog name.
+   */
+  const std::string& GetCatalogName() const {
+    return catalogName;
+  }
 
   /**
    * Get schema name.
@@ -160,6 +183,22 @@ class ColumnMeta {
    */
   const std::string& GetColumnName() const {
     return columnName;
+  }
+
+  /**
+   * Get the remarks.
+   * @return Remarks.
+   */
+  const std::string& GetRemarks() const {
+    return remarks;
+  }
+
+  /**
+   * Get the column default value.
+   * @return Column default value.
+   */
+  const std::string& GetColumnDef() const {
+    return columnDef;
   }
 
   /**
@@ -195,6 +234,14 @@ class ColumnMeta {
   }
 
   /**
+   * Get column ordinal position.
+   * @return Column ordinal position.
+   */
+  int32_t GetOrdinalPosition() const {
+    return ordinalPosition;
+  }
+
+  /**
    * Try to get attribute of a string type.
    *
    * @param fieldId Field ID.
@@ -213,6 +260,9 @@ class ColumnMeta {
   bool GetAttribute(uint16_t fieldId, SqlLen& value) const;
 
  private:
+  /** Catalog name. */
+  std::string catalogName;
+
   /** Schema name. */
   std::string schemaName;
 
@@ -222,8 +272,14 @@ class ColumnMeta {
   /** Column name. */
   std::string columnName;
 
+  /** Remarks */
+  std::string remarks;
+
+  /** Column default value */
+  std::string columnDef;
+
   /** Data type. */
-  int8_t dataType;
+  int16_t dataType;
 
   /** Column precision. */
   int32_t precision;
@@ -233,6 +289,9 @@ class ColumnMeta {
 
   /** Column nullability. */
   int32_t nullability;
+
+  /** Column ordinal position. */
+  int32_t ordinalPosition;
 };
 
 /** Column metadata vector alias. */
@@ -240,14 +299,13 @@ typedef std::vector< ColumnMeta > ColumnMetaVector;
 
 /**
  * Read columns metadata collection.
- * @param reader Reader.
+ * @param resultSet SharedPointer< ResultSet >.
  * @param meta Collection.
- * @param ver Server protocol version.
  */
-void ReadColumnMetaVector(ignite::impl::binary::BinaryReaderImpl& reader,
-                          ColumnMetaVector& meta, const ProtocolVersion& ver);
+void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
+                          ColumnMetaVector& meta);
+
 }  // namespace meta
 }  // namespace odbc
 }  // namespace ignite
-
 #endif  //_IGNITE_ODBC_META_COLUMN_META

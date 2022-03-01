@@ -18,7 +18,7 @@
 #ifndef _IGNITE_ODBC_RESULT_PAGE
 #define _IGNITE_ODBC_RESULT_PAGE
 
-#include <ignite/impl/binary/binary_reader_impl.h>
+#include <ignite/odbc/impl/binary/binary_reader_impl.h>
 #include <stdint.h>
 
 #include "ignite/odbc/app/application_data_buffer.h"
@@ -47,7 +47,7 @@ class ResultPage {
    * Read result page using provided reader.
    * @param reader Reader.
    */
-  void Read(ignite::impl::binary::BinaryReaderImpl& reader);
+  void Read(ignite::odbc::impl::binary::BinaryReaderImpl& reader);
 
   /**
    * Get page size.
@@ -69,7 +69,7 @@ class ResultPage {
    * Get page data.
    * @return Page data.
    */
-  ignite::impl::interop::InteropUnpooledMemory& GetData() {
+  ignite::odbc::impl::interop::InteropUnpooledMemory& GetData() {
     return data;
   }
 
@@ -83,7 +83,7 @@ class ResultPage {
   int32_t size;
 
   /** Memory that contains current row page data. */
-  ignite::impl::interop::InteropUnpooledMemory data;
+  ignite::odbc::impl::interop::InteropUnpooledMemory data;
 };
 }  // namespace odbc
 }  // namespace ignite

@@ -17,10 +17,9 @@
 
 #include "ignite/odbc/query/table_metadata_query.h"
 
-#include <ignite/impl/binary/binary_common.h>
-
 #include <vector>
 
+#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/common/concurrent.h"
 #include "ignite/odbc/connection.h"
 #include "ignite/odbc/ignite_error.h"
@@ -76,22 +75,27 @@ TableMetadataQuery::TableMetadataQuery(diagnostic::DiagnosableAdapter& diag,
       fetched(false),
       meta(),
       columnsMeta() {
-  using namespace ignite::impl::binary;
+  using namespace ignite::odbc::impl::binary;
   using namespace ignite::odbc::type_traits;
 
   using meta::ColumnMeta;
+  using meta::Nullability;
 
   columnsMeta.reserve(5);
 
   const std::string sch("");
   const std::string tbl("");
 
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "TABLE_SCHEM", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_TYPE", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS", IGNITE_TYPE_STRING));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABLE));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_SCHEM", JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABLE));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", JDBC_TYPE_VARCHAR,
+                                   Nullability::NO_NULL));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_TYPE", JDBC_TYPE_VARCHAR,
+                                   Nullability::NO_NULL));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS", JDBC_TYPE_VARCHAR,
+                                   Nullability::NULLABLE));
 }
 
 TableMetadataQuery::~TableMetadataQuery() {

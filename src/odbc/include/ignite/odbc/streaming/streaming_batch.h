@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include "ignite/impl/interop/interop_memory.h"
+#include "ignite/odbc/impl/interop/interop_memory.h"
 
 namespace ignite {
 namespace odbc {
