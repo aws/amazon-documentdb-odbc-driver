@@ -820,5 +820,21 @@ void OdbcTestSuite::CreateDsnConnectionString(
   if (!miscOptions.empty())
     connectionString.append(miscOptions);
 }
+
+void OdbcTestSuite::CreateDsnConnectionStringForDocker(
+    std::string& connectionString, std::string& databaseName) const {
+  std::string user = common::GetEnv("MONGO_INITDB_ROOT_USERNAME", "documentdb");
+  std::string password = common::GetEnv("MONGO_INITDB_ROOT_PASSWORD", "");
+  std::string host = "localhost";
+  std::string port = "27017";
+
+  connectionString =
+    "DRIVER={Apache Ignite};"
+    "HOSTNAME=" + host + ":" + port + ";"
+    "DATABASE=" + databaseName + ";"
+    "USER=" + user + ";"
+    "PASSWORD=" + password + ";"
+    "TLS=false;";
+}
 }  // namespace odbc
 }  // namespace ignite

@@ -610,8 +610,12 @@ std::string Connection::FormatMongoCppConnectionString(
   mongoConnectionString.append(":" + config.GetPassword());
   mongoConnectionString.append("@" + host);
   mongoConnectionString.append(":" + port);
-  mongoConnectionString.append("/" + config.GetDatabase());
-  mongoConnectionString.append("?tlsAllowInvalidHostnames=true");
+  mongoConnectionString.append("/admin");
+  if (!config.IsTls()) {
+    mongoConnectionString.append("?tls=false");
+  } else {
+    mongoConnectionString.append("?tlsAllowInvalidHostnames=true");
+  }
   // tls configuration is handled using tls_options in connectionCPP
   // TODO handle the other DSN configuration
   // https://bitquill.atlassian.net/browse/AD-599
@@ -691,15 +695,16 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
         FormatMongoCppConnectionString(localSSHTunnelPort);
     const auto uri = mongocxx::uri{mongoCPPConnectionString};
     mongocxx::options::client client_options;
-    mongocxx::options::tls tls_options;
+    if (config.IsTls()) {
+      mongocxx::options::tls tls_options;
 
-    // TO-DO Adapt to use certificates
-    // https://bitquill.atlassian.net/browse/AD-598
-    tls_options.allow_invalid_certificates(true);
+      // TO-DO Adapt to use certificates
+      // https://bitquill.atlassian.net/browse/AD-598
+      tls_options.allow_invalid_certificates(true);
 
-    client_options.tls_opts(tls_options);
-    auto client1 = mongocxx::client{mongocxx::uri{mongoCPPConnectionString},
-                                    client_options};
+      client_options.tls_opts(tls_options);
+    }
+    auto client1 = mongocxx::client{uri, client_options};
 
     std::string database = config.GetDatabase();
     bsoncxx::builder::stream::document ping;

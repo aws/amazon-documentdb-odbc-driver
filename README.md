@@ -31,6 +31,18 @@ Example:
  ssh -i $DOC_DB_PRIV_KEY_FILE -N -L $DOC_DB_LOCAL_PORT:$DOC_DB_HOST:$DOC_DB_REMOTE_PORT $DOC_DB_USER
 ```
 
+### Running and Installing Test Data Using Docker Desktop 
+
+1. Install Docker Desktop for your platform
+2. Define the following two environment variables
+   1. `MONGO_INITDB_ROOT_USERNAME=<any-value>`
+   2. `MONGO_INITDB_ROOT_PASSWORD=<any-value>`
+3. Start/Run a new container called `mongo`.
+   1. `docker run --name mongo -e MONGO_INITDB_ROOT_USERNAME -e MONGO_INITDB_ROOT_PASSWORD -d -p 27017:27017 mongo:latest`
+4. Install the test data
+   1. `cd odbc-test\scripts`
+   2. `.\import_test_data.ps1` (Windows) or `./import_test_data.sh` (MacOS or Linux)
+
 ### Windows
 
 1. Microsoft Visual Studio (Community 2019 Verified)
