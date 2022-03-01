@@ -621,7 +621,7 @@ std::string Connection::FormatMongoCppConnectionString(
 
 SharedPointer< JniContext > Connection::GetJniContext() {
   if (!_jniContext.IsValid()) {
-    // Resolve HOME.
+    // Resolve DOCUMENTDB_HOME.
     std::string home = jni::ResolveDocumentDbHome();
 
     // Create classpath.
