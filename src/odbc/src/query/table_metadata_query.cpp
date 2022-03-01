@@ -91,9 +91,9 @@ TableMetadataQuery::TableMetadataQuery(diagnostic::DiagnosableAdapter& diag,
   columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_SCHEM", JDBC_TYPE_VARCHAR,
                                    Nullability::NULLABLE));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", JDBC_TYPE_VARCHAR,
-                                   Nullability::NULLABLE));
+                                   Nullability::NO_NULL));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_TYPE", JDBC_TYPE_VARCHAR,
-                                   Nullability::NULLABLE));
+                                   Nullability::NO_NULL));
   columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS", JDBC_TYPE_VARCHAR,
                                    Nullability::NULLABLE));
 }
