@@ -299,43 +299,6 @@ std::string FindJvmLibrary(const std::string& path) {
   return std::string();
 }
 
-bool LoadJvmLibrary(const std::string& path) {
-  HMODULE mod = LoadLibraryA(path.c_str());
-
-  return mod != NULL;
-}
-
-/**
- * Create Ignite classpath based on user input and home directory.
- *
- * @param usrCp User's classpath.
- * @param home Ignite home directory.
- * @param forceTest Whether test classpath must be used.
- * @return Classpath.
- */
-std::string CreateIgniteClasspath(const std::string& usrCp,
-                                  const std::string* home, bool forceTest) {
-  // 1. Append user classpath if it exists.
-  std::string cp;
-
-  if (!usrCp.empty()) {
-    cp.append(usrCp);
-
-    if (*cp.rbegin() != ';')
-      cp.push_back(';');
-  }
-
-  // 2. Append home classpath if home is defined.
-  if (home) {
-    std::string homeCp = CreateDocumentDbHomeClasspath(*home, forceTest);
-
-    cp.append(homeCp);
-  }
-
-  // 3. Return.
-  return cp;
-}
-
 /**
  * Adds semicolon at the end of the path if needed.
  * @param usrCp Classpath provided by user.

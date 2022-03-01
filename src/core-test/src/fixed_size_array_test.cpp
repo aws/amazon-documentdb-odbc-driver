@@ -23,12 +23,12 @@ using namespace ignite;
 using namespace ignite::common;
 
 
-struct TestStruct
+struct FixedSizeArrayTestStruct
 {
     int32_t one;
     int32_t two;
 
-    TestStruct() :
+    FixedSizeArrayTestStruct() :
         one(1),
         two(2)
     {
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(ConstructionBool)
 
 BOOST_AUTO_TEST_CASE(ConstructionStruct)
 {
-    FixedSizeArray<TestStruct> test(16);
+    FixedSizeArray<FixedSizeArrayTestStruct> test(16);
 
     for (int i = 0; i < test.GetSize(); ++i)
     {
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(ResetBool)
 
 BOOST_AUTO_TEST_CASE(ResetStruct)
 {
-    FixedSizeArray<TestStruct> test(16);
+    FixedSizeArray<FixedSizeArrayTestStruct> test(16);
 
     for (int i = 0; i < test.GetSize(); ++i)
         test[i].Clear();
