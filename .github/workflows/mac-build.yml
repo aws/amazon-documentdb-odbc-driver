@@ -37,16 +37,16 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
         architecture: x64
-    # - name: run-cppcheck
-    #   run: |
-    #     brew install cppcheck
-    #     sh run_cppcheck.sh
-    # - name: upload-cppcheck-results
-    #   if: failure()
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: cppcheck-results
-    #     path: cppcheck-results.log
+    - name: run-cppcheck
+      run: |
+        brew install cppcheck
+        sh run_cppcheck.sh
+    - name: upload-cppcheck-results
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: cppcheck-results
+        path: cppcheck-results.log
     - name: Extract key-pair into file
       run: |
         mkdir ~/certs
