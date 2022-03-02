@@ -32,7 +32,6 @@
 using namespace ignite_test;
 using namespace boost::unit_test;
 
-
 /**
  * Test setup config for test results
  */
