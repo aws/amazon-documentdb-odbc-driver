@@ -61,6 +61,7 @@ jobs:
         brew install boost
         brew install mongo-cxx-driver
         brew install --cask docker
+        open /Applications/Docker.app
     #- name: configure-and-build-driver
     #  run: |
     #    ./build_mac_release64.sh
