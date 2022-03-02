@@ -60,8 +60,7 @@ jobs:
         brew install openssl
         brew install boost
         brew install mongo-cxx-driver
-        brew install docker
-        open /Applications/Docker.app
+        brew cask install docker
     #- name: configure-and-build-driver
     #  run: |
     #    ./build_mac_release64.sh
@@ -79,6 +78,7 @@ jobs:
     #    ./scripts/register_driver_macos.sh
     - name: start-mongo-in-docker
       run: |
+        docker --version
         chmod +x ./src/odbc-test/scripts/start_docker.sh
         chmod +x ./src/odbc-test/scripts/import_test_data.sh
         ./src/odbc-test/scripts/start_docker.sh
