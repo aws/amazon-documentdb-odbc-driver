@@ -10,10 +10,8 @@
 CONTAINER_EXISTS=$(docker ps -q -f name=mongo -f status=exited -f status=running)
 echo "Container id: '${CONTAINER_EXISTS}'"
 
-if [ ${CONTAINER_EXISTS} -ne "" ]
+if [ -z ${CONTAINER_EXISTS} ]
 then
-    docker start mongo
-else
     export MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-adminuser}
     export MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-$(echo $RANDOM | md5sum | head -c 20)}
 
@@ -22,4 +20,6 @@ else
     then
         exit 1
     fi
+else
+    docker start mongo
 fi
