@@ -60,7 +60,7 @@ jobs:
         brew install openssl
         brew install boost
         brew install mongo-cxx-driver
-        brew cask install docker
+        brew install docker
     #- name: configure-and-build-driver
     #  run: |
     #    ./build_mac_release64.sh
