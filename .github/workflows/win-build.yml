@@ -100,10 +100,8 @@ jobs:
         ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
     - name: upload-test-report
       if: always()
-    #  uses: actions/upload-artifact@v2 # todo remove later -AL-
       uses: EnricoMi/publish-unit-test-result-action/composite@v1
       with:
-        # name: test-logs-win32
         path: ${{env.ODBC_BIN_PATH}}/*.xml
     # - name: build-installer
     #   if: success()
@@ -198,23 +196,11 @@ jobs:
       run: |
         Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
         ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe 
-    # -AL-: the local ignite-odbc-tests.exe file is inside C:\Users\AlinaLi\Desktop\DocumentDB ODBC Driver\amazon-documentdb-odbc-driver\build\odbc\bin\Debug
-    # the .xml file is generated after I ran the debug from VS Studio (originally in )
-    # GitHub Action is not able to find my file. could it be that the file is not generated on GitHub for some reason?
-    # reason: the run-test is AFTER this action. I need to modify. Do the same for macos also.
-    # ^ no, I was wrong. It is not that. run-tests is there. There is probably something wrong with my path. 
-    # does it make a difference  running ignite-odbc-tests.exe from Debug build vs. Release build?
-    # ^ probably not. REAL problem: running ./build/odbc/bin/Debug/ignite-odbc-tests.exe (probably the same from Release folder)  
-    # does not output the .xml file. 
-    # new file location: amazon-documentdb-odbc-driver\build\odbc\cmake\Debug:  after I move the struct code to odbc_test_suite.cpp
-    # .xml is ALSO generated inside bin/Debug folder AND cmake/Debug after I ran the  .\build_win_debug64.ps1 script
+
     - name: upload-test-report
       if: always()
-    #  uses: actions/upload-artifact@v2 # todo remove later -AL-
       uses: EnricoMi/publish-unit-test-result-action/composite@v1
       with:
-      #  name: test-logs-win64
-      # if .xml file is generated inside bin/Release after ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe is run, then I can use this. 
         files: ${{env.ODBC_BIN_PATH}}/*.xml
   #   - name: build-installer
   #     if: success()

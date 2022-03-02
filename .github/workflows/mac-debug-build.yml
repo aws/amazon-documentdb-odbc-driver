@@ -50,10 +50,8 @@ jobs:
     #     ./build/odbc/bin/tests --gtest_output="xml:report.xml"
     - name: upload-test-report
       if: always()
-    #  uses: actions/upload-artifact@v2 # todo remove later -AL-
       uses: EnricoMi/publish-unit-test-result-action/composite@v1
       with:
-      #  name: test-result-macos
         files: ${{env.ODBC_BIN_PATH}}/*.xml
     # - name: print-memory-leak-logs
     #   if: always()
