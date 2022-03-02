@@ -106,7 +106,7 @@ jobs:
       run: |
         mongosh --version
         mongoimport --version
-        mongosh "mongodb://${{env.MONGO_INITDB_ROOT_USERNAME}}:${{env.MONGO_INITDB_ROOT_PASSWORD}}@localhost:27017/admin" --eval "db.getCollectionNames()"
+        mongosh "mongodb://localhost:27017" --eval "db.getCollectionNames()"
 
     #- name: run-tests
     #  run: |
@@ -219,7 +219,7 @@ jobs:
       run: |
         mongosh --version
         mongoimport --version
-        mongosh "mongodb://${{env.MONGO_INITDB_ROOT_USERNAME}}:${{env.MONGO_INITDB_ROOT_PASSWORD}}@localhost:27017/admin" --eval "db.getCollectionNames()"
+        mongosh "mongodb://localhost:27017" --eval "db.getCollectionNames()"
 
     #- name: run-tests
     #  run: |
@@ -317,7 +317,7 @@ jobs:
       run: |
         mongosh --version
         mongoimport --version
-        mongosh "mongodb://${{env.MONGO_INITDB_ROOT_USERNAME}}:${{env.MONGO_INITDB_ROOT_PASSWORD}}@localhost:27017/admin" --eval "db.getCollectionNames()"
+        mongosh "mongodb://localhost:27017" --eval "db.getCollectionNames()"
 
     #- name: run-tests
     #  env:
