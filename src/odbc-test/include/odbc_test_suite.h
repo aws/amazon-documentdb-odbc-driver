@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-#define BOOST_TEST_MODULE ODBC Test
-
 #ifndef ODBC_TEST_ODBC_TEST_SUITE
 #define ODBC_TEST_ODBC_TEST_SUITE
 
