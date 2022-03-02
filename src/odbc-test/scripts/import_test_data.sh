@@ -13,11 +13,11 @@ DATABASE_NAME="odbc-test"
 CONTAINER_INPUT_FOLDER="/home/odbc-test"
 
 # Copy test files to docker and drop database.
-docker exec -it ${CONTAINER_NAME} bash -c "rm -fr ${CONTAINER_INPUT_FOLDER}"
-docker exec -it ${CONTAINER_NAME} bash -c "mkdir -p ${CONTAINER_INPUT_FOLDER}"
+docker exec ${CONTAINER_NAME} bash -c "rm -fr ${CONTAINER_INPUT_FOLDER}"
+docker exec ${CONTAINER_NAME} bash -c "mkdir -p ${CONTAINER_INPUT_FOLDER}"
 docker cp $TEST_INPUT_FOLDER "${CONTAINER_NAME}:${CONTAINER_INPUT_FOLDER}"
 # Clear the database so we don't have any existing data
-docker exec -it "${CONTAINER_NAME}" \
+docker exec "${CONTAINER_NAME}" \
     mongosh --quiet -u="${MONGO_INITDB_ROOT_USERNAME}" -p="${MONGO_INITDB_ROOT_PASSWORD}" --authenticationDatabase=admin \
         --eval "db.dropDatabase()" "${DATABASE_NAME}"
 
@@ -28,7 +28,7 @@ do
     COLLECTION_NAME="$(basename -- ${FILENAME%.json})"
     TEST_FILE_NAME="$(basename -- ${FILENAME})"
 
-    docker exec -it "${CONTAINER_NAME}" \
+    docker exec "${CONTAINER_NAME}" \
         mongoimport --quiet -u="${MONGO_INITDB_ROOT_USERNAME}" -p="${MONGO_INITDB_ROOT_PASSWORD}" --authenticationDatabase=admin \
             -d="${DATABASE_NAME}" -c="${COLLECTION_NAME}" \
             --file="""${CONTAINER_INPUT_FOLDER}/input/${TEST_FILE_NAME}"""

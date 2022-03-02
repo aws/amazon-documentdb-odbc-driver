@@ -10,11 +10,11 @@ $DATABASE_NAME   = "odbc-test"
 $CONTAINER_INPUT_FOLDER = "/home/odbc-test"
 
 # Copy test files to docker and drop database.
-docker exec -it $CONTAINER_NAME bash -c "rm -fr $CONTAINER_INPUT_FOLDER"
-docker exec -it $CONTAINER_NAME bash -c "mkdir -p $CONTAINER_INPUT_FOLDER"
+docker exec $CONTAINER_NAME bash -c "rm -fr $CONTAINER_INPUT_FOLDER"
+docker exec $CONTAINER_NAME bash -c "mkdir -p $CONTAINER_INPUT_FOLDER"
 docker cp $TEST_INPUT_FOLDER "$($CONTAINER_NAME):$($CONTAINER_INPUT_FOLDER)"
 # Clear the database so we don't have any existing data
-docker exec -it "$($CONTAINER_NAME)" `
+docker exec "$($CONTAINER_NAME)" `
     mongosh --quiet -u="$($env:MONGO_INITDB_ROOT_USERNAME)" -p="$($env:MONGO_INITDB_ROOT_PASSWORD)" --authenticationDatabase=admin `
         --eval "db.dropDatabase()" "$($DATABASE_NAME)"
 
@@ -26,12 +26,12 @@ Foreach-Object {
 	$TEST_FILE_NAME  = $_.Name
 
     # Log what input we're about to import
-	Write-Output "docker exec -it $($CONTAINER_NAME) `
+	Write-Output "docker exec $($CONTAINER_NAME) `
         mongoimport -u=$($env:MONGO_INITDB_ROOT_USERNAME) -p=... --authenticationDatabase=admin `
             -d=$($DATABASE_NAME) -c=$($COLLECTION_NAME) `
             --file=""$($CONTAINER_INPUT_FOLDER)/input/$($TEST_FILE_NAME)"""
     # Import the test input
-	docker exec -it "$($CONTAINER_NAME)" `
+	docker exec "$($CONTAINER_NAME)" `
         mongoimport --quiet -u="$($env:MONGO_INITDB_ROOT_USERNAME)" -p="$($env:MONGO_INITDB_ROOT_PASSWORD)" --authenticationDatabase=admin `
             -d="$($DATABASE_NAME)" -c="$($COLLECTION_NAME)" `
             --file="""$($CONTAINER_INPUT_FOLDER)/input/$($TEST_FILE_NAME)"""
