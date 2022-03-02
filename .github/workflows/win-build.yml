@@ -99,6 +99,10 @@ jobs:
       uses: ankane/setup-mongodb@v1
       with:
         mongodb-version: 5.0
+    - name: Install Mongo Shell and Tools
+      run: |
+        choco install mongodb-shell
+        choco install mongodb-database-tools
     - name: Test MongoSH
       run: |
         mongosh --version
@@ -208,6 +212,10 @@ jobs:
       uses: ankane/setup-mongodb@v1
       with:
         mongodb-version: 5.0
+    - name: Install Mongo Shell and Tools
+      run: |
+        choco install mongodb-shell
+        choco install mongodb-database-tools
     - name: Test MongoSH
       run: |
         mongosh --version
@@ -302,6 +310,10 @@ jobs:
       uses: ankane/setup-mongodb@v1
       with:
         mongodb-version: 5.0
+    - name: Install Mongo Shell and Tools
+      run: |
+        choco install mongodb-shell
+        choco install mongodb-database-tools
     - name: Test MongoSH
       run: |
         mongosh --version
