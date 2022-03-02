@@ -28,6 +28,8 @@ env:
   DOC_DB_REMOTE_PORT: 27017
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
   JDBC_DRIVER_VERSION: "1.1.1"
+  MONGO_INITDB_ROOT_USERNAME: ${{secrets.DOC_DB_USER_NAME}}
+  MONGO_INITDB_ROOT_PASSWORD: ${{secrets.DOC_DB_PASSWORD}}
 
 jobs:
   build-windows32:
@@ -93,21 +95,18 @@ jobs:
     #- name: register-driver
     #  run: |
     #    .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
-
-    - name: start-mongo-in-docker
-      run: |
-        ./src/odbc-test/scripts/start_docker.ps1
-        ./src/odbc-test/scripts/import_test_data.ps1
+    - name: Start MongoDB
+      uses: supercharge/mongodb-github-action@1.7.0
+      with:
+        mongodb-version: '4.2'
+        mongodb-username: ${{env.MONGO_INITDB_ROOT_USERNAME}}
+        mongodb-password: ${{env.MONGO_INITDB_ROOT_PASSWORD}}
+        mongodb-db: odbc-test
 
     #- name: run-tests
     #  run: |
     #    Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
     #    ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
-
-    - name: stop-mongo-in-docker
-      if: always()
-      run: |
-        ./src/odbc-test/scripts/stop_docker.ps1 -Remove $true
 
     # - name: upload-test-report
     #   if: failure()
