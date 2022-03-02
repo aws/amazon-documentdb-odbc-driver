@@ -362,8 +362,8 @@ struct OdbcTestSuite {
   /**
    * Creates the standard DSN connection string for use with Docker instance.
    */
-  void OdbcTestSuite::CreateDsnConnectionStringForDocker(
-      std::string& connectionString, std::string& databaseName) const;
+  void CreateDsnConnectionStringForDocker(
+      std::string& connectionString, const std::string& databaseName) const;
 
   /** ODBC Environment. */
   SQLHENV env;

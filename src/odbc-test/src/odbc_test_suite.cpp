@@ -822,7 +822,7 @@ void OdbcTestSuite::CreateDsnConnectionString(
 }
 
 void OdbcTestSuite::CreateDsnConnectionStringForDocker(
-    std::string& connectionString, std::string& databaseName) const {
+    std::string& connectionString, const std::string& databaseName) const {
   std::string user = common::GetEnv("MONGO_INITDB_ROOT_USERNAME", "documentdb");
   std::string password = common::GetEnv("MONGO_INITDB_ROOT_PASSWORD", "");
   std::string host = "localhost";
