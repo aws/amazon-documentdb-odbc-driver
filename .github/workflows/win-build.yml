@@ -98,11 +98,19 @@ jobs:
       run: |
         Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
         ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
+    # possible locations of ignite-odbc-tests.exe:
+    # .\build\odbc\cmake\Debug
+    # .\build\odbc\bin\Debug
+    # .\build\odbc\cmake\Release
+    # .\build\odbc\bin\Release
+
+# ODBC_BIN_PATH: "./build/odbc/bin/Release"
+# .xml is generated inside wherever ignite-odbc-tests.exe is called, NOT inside ${{env.ODBC_BIN_PATH}} necessarily. 
     - name: upload-test-report
       if: always()
       uses: EnricoMi/publish-unit-test-result-action/composite@v1
       with:
-        path: ${{env.ODBC_BIN_PATH}}/*.xml
+        files: ./*.xml
     # - name: build-installer
     #   if: success()
     #   run: |
@@ -201,7 +209,7 @@ jobs:
       if: always()
       uses: EnricoMi/publish-unit-test-result-action/composite@v1
       with:
-        files: ${{env.ODBC_BIN_PATH}}/*.xml
+        files: ./*.xml
   #   - name: build-installer
   #     if: success()
   #     run: |

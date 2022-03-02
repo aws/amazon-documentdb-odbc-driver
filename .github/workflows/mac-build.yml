@@ -83,7 +83,7 @@ jobs:
       if: always()
       uses: EnricoMi/publish-unit-test-result-action/composite@v1
       with:
-        files: ${{env.ODBC_BIN_PATH}}/*.xml
+        files: ./*.xml
     # - name: print-memory-leak-logs
     #   if: always()
     #   run: |
