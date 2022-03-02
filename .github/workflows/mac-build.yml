@@ -79,7 +79,6 @@ jobs:
     - name: start-mongo-in-docker
       run: |
         docker --version
-        sudo service docker start
         chmod +x ./src/odbc-test/scripts/start_docker.sh
         chmod +x ./src/odbc-test/scripts/import_test_data.sh
         ./src/odbc-test/scripts/start_docker.sh
