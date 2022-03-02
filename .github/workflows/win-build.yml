@@ -103,7 +103,7 @@ jobs:
       if: always()
       uses: EnricoMi/publish-unit-test-result-action/composite@v1
       with:
-        files: ./*.xml
+        files: ./odbc_test_result.xml
     # - name: build-installer
     #   if: success()
     #   run: |
@@ -202,7 +202,7 @@ jobs:
       if: always()
       uses: EnricoMi/publish-unit-test-result-action/composite@v1
       with:
-        files: ./*.xml
+        files: ./odbc_test_result.xml
   #   - name: build-installer
   #     if: success()
   #     run: |
