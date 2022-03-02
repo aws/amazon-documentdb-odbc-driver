@@ -85,7 +85,7 @@ jobs:
       uses: EnricoMi/publish-unit-test-result-action@v1.9
       with:
         name: test-result-macos
-        path: ./build/odbc/cmake/odbc-test/*.xml
+        files: ./build/odbc/cmake/odbc-test/*.xml
     # - name: print-memory-leak-logs
     #   if: always()
     #   run: |
