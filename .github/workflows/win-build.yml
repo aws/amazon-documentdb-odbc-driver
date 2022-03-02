@@ -101,9 +101,9 @@ jobs:
     - name: upload-test-report
       if: always()
     #  uses: actions/upload-artifact@v2 # todo remove later -AL-
-      uses: EnricoMi/publish-unit-test-result-action@v1.9
+      uses: EnricoMi/publish-unit-test-result-action/composite@v1
       with:
-        name: test-logs-win32
+        # name: test-logs-win32
         path: .\build\odbc\cmake\odbc-test\*.xml
     # - name: build-installer
     #   if: success()
