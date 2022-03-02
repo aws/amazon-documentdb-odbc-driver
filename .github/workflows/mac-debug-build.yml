@@ -51,9 +51,9 @@ jobs:
     - name: upload-test-report
       if: always()
     #  uses: actions/upload-artifact@v2 # todo remove later -AL-
-      uses: EnricoMi/publish-unit-test-result-action@v1.9
+      uses: EnricoMi/publish-unit-test-result-action/composite@v1
       with:
-        name: test-result-macos
+      #  name: test-result-macos
         files: ./build/odbc/cmake/odbc-test/*.xml
     # - name: print-memory-leak-logs
     #   if: always()
