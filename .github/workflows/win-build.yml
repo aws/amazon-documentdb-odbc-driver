@@ -94,10 +94,21 @@ jobs:
       run: |
         .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
 
+    - name: start-mongo-in-docker
+      run: |
+        ./src/odbc-test/scripts/start_docker.ps1
+        ./src/odbc-test/scripts/import_test_data.ps1
+
     - name: run-tests
       run: |
         Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
         ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
+
+    - name: stop-mongo-in-docker
+      if: always()
+      run: |
+        ./src/odbc-test/scripts/stop_docker.ps1 -Remove $true
+
     # - name: upload-test-report
     #   if: failure()
     #   uses: actions/upload-artifact@v2
@@ -193,10 +204,21 @@ jobs:
       run: |
         .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
 
+    - name: start-mongo-in-docker
+      run: |
+        ./src/odbc-test/scripts/start_docker.ps1
+        ./src/odbc-test/scripts/import_test_data.ps1
+
     - name: run-tests
       run: |
         Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
         ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
+
+    - name: stop-mongo-in-docker
+      if: always()
+      run: |
+        ./src/odbc-test/scripts/stop_docker.ps1 -Remove $true
+
   #   - name: upload-test-report
   #     if: failure()
   #     uses: actions/upload-artifact@v2
