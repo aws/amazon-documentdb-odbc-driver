@@ -47,115 +47,13 @@ set(SOURCES
          src/odbc_test_suite.cpp
          src/test_utils.cpp
          src/dummy_test.cpp
-         ../odbc/src/app/application_data_buffer.cpp
-         ../odbc/src/binary/binary_containers.cpp
-         ../odbc/src/binary/binary_raw_writer.cpp
-         ../odbc/src/binary/binary_writer.cpp
-         ../odbc/src/binary/binary_reader.cpp
-         ../odbc/src/binary/binary_type.cpp
-         ../odbc/src/binary/binary_raw_reader.cpp
-         ../odbc/src/common_types.cpp
-         ../odbc/src/common/big_integer.cpp
-         ../odbc/src/common/bits.cpp
-         ../odbc/src/app/application_data_buffer.cpp
-         ../odbc/src/app/parameter.cpp
-         ../odbc/src/app/parameter_set.cpp
-         ../odbc/src/column.cpp
-         ../odbc/src/common/big_integer.cpp
-         ../odbc/src/common/bits.cpp
-         ../odbc/src/common/concurrent.cpp
-         ../odbc/src/common/decimal.cpp
-         ../odbc/src/common/utils.cpp
-         ../odbc/src/common_types.cpp
-         ../odbc/src/config/configuration.cpp
-         ../odbc/src/config/config_tools.cpp
-         ../odbc/src/config/connection_info.cpp
-         ../odbc/src/config/connection_string_parser.cpp
-         ../odbc/src/impl/binary/binary_type_manager.cpp
-         ../odbc/src/impl/binary/binary_type_impl.cpp
-         ../odbc/src/impl/binary/binary_utils.cpp
-         ../odbc/src/impl/binary/binary_reader_impl.cpp
-         ../odbc/src/impl/binary/binary_type_handler.cpp
-         ../odbc/src/impl/binary/binary_writer_impl.cpp
-         ../odbc/src/impl/binary/binary_schema.cpp
-         ../odbc/src/impl/binary/binary_type_snapshot.cpp
-         ../odbc/src/impl/binary/binary_object_header.cpp
-         ../odbc/src/impl/binary/binary_object_impl.cpp
-         ../odbc/src/impl/binary/binary_field_meta.cpp
-         ../odbc/src/impl/interop/interop_memory.cpp
-         ../odbc/src/impl/interop/interop_output_stream.cpp
-         ../odbc/src/impl/interop/interop_input_stream.cpp
-         ../odbc/src/connection.cpp
-         ../odbc/src/driverInstance.cpp
-         ../odbc/src/cursor.cpp
-         ../odbc/src/diagnostic/diagnosable_adapter.cpp
-         ../odbc/src/diagnostic/diagnostic_record_storage.cpp
-         ../odbc/src/diagnostic/diagnostic_record.cpp
-         ../odbc/src/dsn_config.cpp
-         ../odbc/src/environment.cpp
-         ../odbc/src/ignite_error.cpp
-         ../odbc/src/jni/database_metadata.cpp
-         ../odbc/src/jni/documentdb_connection.cpp
-         ../odbc/src/jni/java.cpp
-         ../odbc/src/jni/result_set.cpp
-         ../odbc/src/log.cpp
-         ../odbc/src/message.cpp
-         ../odbc/src/meta/column_meta.cpp
-         ../odbc/src/meta/table_meta.cpp
-         ../odbc/src/nested_tx_mode.cpp
-         ../odbc/src/protocol_version.cpp
-         ../odbc/src/query/batch_query.cpp
-         ../odbc/src/query/column_metadata_query.cpp
-         ../odbc/src/query/data_query.cpp
-         ../odbc/src/query/foreign_keys_query.cpp
-         ../odbc/src/query/primary_keys_query.cpp
-         ../odbc/src/query/special_columns_query.cpp
-         ../odbc/src/query/streaming_query.cpp
-         ../odbc/src/query/type_info_query.cpp
-         ../odbc/src/query/table_metadata_query.cpp
-         ../odbc/src/sql/sql_lexer.cpp
-         ../odbc/src/sql/sql_parser.cpp
-         ../odbc/src/sql/sql_set_streaming_command.cpp
-         ../odbc/src/sql/sql_utils.cpp
-         ../odbc/src/read_preference.cpp
-         ../odbc/src/result_page.cpp
-         ../odbc/src/row.cpp
-         ../odbc/src/scan_method.cpp
-         ../odbc/src/statement.cpp
-         ../odbc/src/streaming/streaming_batch.cpp
-         ../odbc/src/streaming/streaming_context.cpp
-         ../odbc/src/type_traits.cpp
-         ../odbc/src/utility.cpp
-         ../odbc/src/scan_method.cpp
-         ../odbc/src/date.cpp
-         ../odbc/src/guid.cpp
-         ../odbc/src/time.cpp
-         ../odbc/src/timestamp.cpp
         )
 
-if (WIN32)
-    list(APPEND SOURCES
-        ../odbc/os/win/src/common/concurrent_os.cpp
-        ../odbc/os/win/src/common/platform_utils.cpp
-        ../odbc/src/jni/os/win/utils.cpp
-        ../odbc/os/win/src/system_dsn.cpp
-        ../odbc/os/win/src/system/ui/custom_window.cpp
-        ../odbc/os/win/src/system/ui/dsn_configuration_window.cpp
-        ../odbc/os/win/src/system/ui/window.cpp
-    )
-else()
-    # TODO: Ensure MacOS is portable. https://bitquill.atlassian.net/browse/AD-525
-    list(APPEND SOURCES
-        ../odbc/os/linux/src/common/concurrent_os.cpp
-        ../odbc/os/linux/src/common/platform_utils.cpp
-        ../odbc/src/jni/os/linux/utils.cpp
-    )
-endif()
 
 add_executable(${TARGET} ${SOURCES})
 
 target_link_libraries(${TARGET} ${ODBC_LIBRARIES})
-target_link_libraries(${TARGET} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} ignite mongo::mongocxx_shared)
+target_link_libraries(${TARGET} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} ignite ignite-odbc mongo::mongocxx_shared)
 target_code_coverage(${TARGET}  PUBLIC AUTO ALL)
 
 if (WIN32)
