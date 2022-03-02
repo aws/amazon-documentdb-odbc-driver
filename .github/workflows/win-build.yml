@@ -101,13 +101,12 @@ jobs:
         mongodb-version: 5.0
     - name: Install Mongo Shell and Tools
       run: |
-        choco install mongodb-shell
-        choco install mongodb-database-tools
+        choco install mongodb-shell mongodb-database-tools
     - name: Test MongoSH
       run: |
         mongosh --version
         mongoimport --version
-        mongosh -u ${{env.MONGO_INITDB_ROOT_USERNAME}} -p ${{env.MONGO_INITDB_ROOT_PASSWORD}} --authenticationDatabase=admin --eval "db.dropDatabase()" "odbc-test""
+        mongosh -u ${{env.MONGO_INITDB_ROOT_USERNAME}} -p ${{env.MONGO_INITDB_ROOT_PASSWORD}} --authenticationDatabase=admin --eval "db.dropDatabase()" "odbc-test"
 
     #- name: run-tests
     #  run: |
@@ -220,7 +219,7 @@ jobs:
       run: |
         mongosh --version
         mongoimport --version
-        mongosh -u ${{env.MONGO_INITDB_ROOT_USERNAME}} -p ${{env.MONGO_INITDB_ROOT_PASSWORD}} --authenticationDatabase=admin --eval "db.dropDatabase()" "odbc-test""
+        mongosh -u ${{env.MONGO_INITDB_ROOT_USERNAME}} -p ${{env.MONGO_INITDB_ROOT_PASSWORD}} --authenticationDatabase=admin --eval "db.dropDatabase()" "odbc-test"
 
     #- name: run-tests
     #  run: |
@@ -313,13 +312,12 @@ jobs:
         mongodb-version: 5.0
     - name: Install Mongo Shell and Tools
       run: |
-        choco install mongodb-shell
-        choco install mongodb-database-tools
+        choco install mongodb-shell mongodb-database-tools
     - name: Test MongoSH
       run: |
         mongosh --version
         mongoimport --version
-        mongosh -u ${{env.MONGO_INITDB_ROOT_USERNAME}} -p ${{env.MONGO_INITDB_ROOT_PASSWORD}} --authenticationDatabase=admin --eval "db.dropDatabase()" "odbc-test""
+        mongosh -u ${{env.MONGO_INITDB_ROOT_USERNAME}} -p ${{env.MONGO_INITDB_ROOT_PASSWORD}} --authenticationDatabase=admin --eval "db.dropDatabase()" "odbc-test"
 
     #- name: run-tests
     #  env:
