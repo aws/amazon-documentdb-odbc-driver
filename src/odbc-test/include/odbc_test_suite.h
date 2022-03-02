@@ -38,30 +38,6 @@
 #endif
 
 #include <string>
-#include <fstream> // -AL- to be tested => for std::ofstream
-
-using namespace boost::unit_test;
-
-/**
- * Test setup config
- */
-struct MyConfig {
-  MyConfig() : test_log("odbc_test_result.xml") { 
-      // I just don't know where they'll put the test result file. Could it be under the same 
-      // folder ? It is under folder ./build/odbc/cmake/odbc-test
-      // todo after determining which folder to put the file, modify github yml files also. [B]
-    unit_test_log.set_stream(test_log);
-    unit_test_log.set_format(OF_JUNIT);
-    // -AL- todo build and run Mar 01. [A-do this first]
-  }
-  ~MyConfig() {
-    unit_test_log.set_stream(std::cout);
-  }
-
-  std::ofstream test_log;
-};
-
-BOOST_GLOBAL_FIXTURE(MyConfig);  // -AL- test and see if this works
 
 namespace ignite {
 namespace odbc {
