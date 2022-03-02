@@ -101,9 +101,11 @@ jobs:
         mongodb-version: 5.0
     - name: Install Mongo Shell and Tools
       run: |
-        choco install mongodb-shell mongodb-database-tools mongodb
+        choco install mongodb-shell mongodb-database-tools
+        choco upgrade mongodb --force
     - name: Test MongoSH
       run: |
+        Restart-Service MongoDB -Force
         mongosh --version
         mongoimport --version
         mongosh "mongodb://localhost:27017" --eval "db.getCollectionNames()"
@@ -214,9 +216,11 @@ jobs:
         mongodb-version: 5.0
     - name: Install Mongo Shell and Tools
       run: |
-        choco install mongodb-shell mongodb-database-tools mongodb
+        choco install mongodb-shell mongodb-database-tools
+        choco upgrade mongodb --force
     - name: Test MongoSH
       run: |
+        Restart-Service MongoDB -Force
         mongosh --version
         mongoimport --version
         mongosh "mongodb://localhost:27017" --eval "db.getCollectionNames()"
@@ -312,9 +316,11 @@ jobs:
         mongodb-version: 5.0
     - name: Install Mongo Shell and Tools
       run: |
-        choco install mongodb-shell mongodb-database-tools mongodb
+        choco install mongodb-shell mongodb-database-tools
+        choco upgrade mongodb --force
     - name: Test MongoSH
       run: |
+        Restart-Service MongoDB -Force
         mongosh --version
         mongoimport --version
         mongosh "mongodb://localhost:27017" --eval "db.getCollectionNames()"
