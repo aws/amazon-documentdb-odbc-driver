@@ -99,6 +99,10 @@ jobs:
       uses: ankane/setup-mongodb@v1
       with:
         mongodb-version: 5.0
+    - name: Test MongoSH
+      run: |
+        mongosh --version
+        mongoimport --version
 
     #- name: run-tests
     #  run: |
@@ -204,6 +208,10 @@ jobs:
       uses: ankane/setup-mongodb@v1
       with:
         mongodb-version: 5.0
+    - name: Test MongoSH
+      run: |
+        mongosh --version
+        mongoimport --version
 
     #- name: run-tests
     #  run: |
@@ -294,6 +302,10 @@ jobs:
       uses: ankane/setup-mongodb@v1
       with:
         mongodb-version: 5.0
+    - name: Test MongoSH
+      run: |
+        mongosh --version
+        mongoimport --version
 
     #- name: run-tests
     #  env:
