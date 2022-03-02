@@ -101,7 +101,7 @@ jobs:
         mongodb-version: 5.0
     - name: Install Mongo Shell and Tools
       run: |
-        choco install mongodb-shell mongodb-database-tools
+        choco install mongodb-shell mongodb-database-tools mongodb
     - name: Test MongoSH
       run: |
         mongosh --version
@@ -214,7 +214,7 @@ jobs:
         mongodb-version: 5.0
     - name: Install Mongo Shell and Tools
       run: |
-        choco install mongodb-shell mongodb-database-tools
+        choco install mongodb-shell mongodb-database-tools mongodb
     - name: Test MongoSH
       run: |
         mongosh --version
@@ -312,7 +312,7 @@ jobs:
         mongodb-version: 5.0
     - name: Install Mongo Shell and Tools
       run: |
-        choco install mongodb-shell mongodb-database-tools
+        choco install mongodb-shell mongodb-database-tools mongodb
     - name: Test MongoSH
       run: |
         mongosh --version
