@@ -34,6 +34,7 @@
 #include <sqlext.h>
 
 #include <boost/test/unit_test.hpp>
+#include <boost/optional.hpp>
 #include <string>
 #include <vector>
 
