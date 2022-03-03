@@ -24,6 +24,7 @@
 #include <jni.h>
 #include <stdint.h>
 
+#include <boost/optional.hpp>
 #include <vector>
 
 using ignite::odbc::common::concurrent::SharedPointer;
@@ -493,11 +494,12 @@ class IGNITE_IMPORT_EXPORT JniContext {
                              bool& hasNext, JniErrorInfo& errInfo);
   JniErrorCode ResultSetGetString(
       const SharedPointer< GlobalJObject >& resultSet, int columnIndex,
-      std::string& value, bool& wasNull, JniErrorInfo& errInfo);
+      boost::optional< std::string >& value, bool& wasNull,
+      JniErrorInfo& errInfo);
   JniErrorCode ResultSetGetString(
       const SharedPointer< GlobalJObject >& resultSet,
-      const std::string& columnName, std::string& value, bool& wasNull,
-      JniErrorInfo& errInfo);
+      const std::string& columnName, boost::optional< std::string >& value,
+      bool& wasNull, JniErrorInfo& errInfo);
   JniErrorCode ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet,
                                int columnIndex, int& value, bool& wasNull,
                                JniErrorInfo& errInfo);

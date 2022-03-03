@@ -29,6 +29,9 @@
 #include <string>
 #include <vector>
 
+// Refactor boost::optional to std::optional after code base is migrated to
+// C++17 https://bitquill.atlassian.net/browse/AD-631
+
 using namespace ignite::odbc::common::concurrent;
 using namespace ignite::odbc::jni::java;
 
@@ -1041,13 +1044,15 @@ JniErrorCode JniContext::ResultSetNext(
 
 JniErrorCode JniContext::ResultSetGetString(
     const SharedPointer< GlobalJObject >& resultSet, int columnIndex,
-    std::string& value, bool& wasNull, JniErrorInfo& errInfo) {
+    boost::optional< std::string >& value, bool& wasNull,
+    JniErrorInfo& errInfo) {
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
     return errInfo.code;
   }
 
+  value = boost::none;
   JNIEnv* env = Attach();
   jobject result = env->CallObjectMethod(
       resultSet.Get()->GetRef(), jvm->GetMembers().m_ResultSetGetStringByIndex,
@@ -1068,14 +1073,14 @@ JniErrorCode JniContext::ResultSetGetString(
 
 JniErrorCode JniContext::ResultSetGetString(
     const SharedPointer< GlobalJObject >& resultSet,
-    const std::string& columnName, std::string& value, bool& wasNull,
-    JniErrorInfo& errInfo) {
+    const std::string& columnName, boost::optional< std::string >& value,
+    bool& wasNull, JniErrorInfo& errInfo) {
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
     return errInfo.code;
   }
-
+  value = boost::none;
   JNIEnv* env = Attach();
   jstring jColumnName = env->NewStringUTF(columnName.c_str());
   jobject result = env->CallObjectMethod(
