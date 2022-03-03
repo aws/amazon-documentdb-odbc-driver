@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetTables) {
       break;
     }
 
-    std::string value;
+    boost::optional<std::string> value;
     bool wasNull;
 
     resultSet.Get()->GetString(1, value, wasNull, errInfo);
@@ -219,21 +219,26 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetTables) {
     BOOST_CHECK(!wasNull);
     resultSet.Get()->GetString("TABLE_SCHEM", value, wasNull, errInfo);
     BOOST_CHECK(!wasNull);
-    BOOST_CHECK("test" == value);
+    BOOST_CHECK(value);
+    BOOST_CHECK("test" == *value);
 
     resultSet.Get()->GetString(3, value, wasNull, errInfo);
     BOOST_CHECK(!wasNull);
-    BOOST_CHECK(!value.empty());
+    BOOST_CHECK(value);
+    BOOST_CHECK(!value->empty());
     resultSet.Get()->GetString("TABLE_NAME", value, wasNull, errInfo);
     BOOST_CHECK(!wasNull);
-    BOOST_CHECK(!value.empty());
+    BOOST_CHECK(value);
+    BOOST_CHECK(!value->empty());
 
     resultSet.Get()->GetString(4, value, wasNull, errInfo);
     BOOST_CHECK(!wasNull);
-    BOOST_CHECK("TABLE" == value);
+    BOOST_CHECK(value);
+    BOOST_CHECK("TABLE" == *value);
     resultSet.Get()->GetString("TABLE_TYPE", value, wasNull, errInfo);
     BOOST_CHECK(!wasNull);
-    BOOST_CHECK("TABLE" == value);
+    BOOST_CHECK(value);
+    BOOST_CHECK("TABLE" == *value);
 
   } while (hasNext);
 
@@ -284,7 +289,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
     int columnIndex = 0;
     // Loop the result set records
     bool hasNext = false;
-    std::string value;
+    boost::optional<std::string> value;
     std::string columnName;
     int intValue;
     bool wasNull;
@@ -297,38 +302,47 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
 
         resultSet.Get()->GetString(1, value, wasNull, errInfo);
         BOOST_CHECK(wasNull);
+        BOOST_CHECK(!value);
+
         resultSet.Get()->GetString("TABLE_CAT", value, wasNull, errInfo);
         BOOST_CHECK(wasNull);
+        BOOST_CHECK(!value);
 
         resultSet.Get()->GetString(2, value, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
-        BOOST_CHECK_EQUAL("test", value);
+        BOOST_CHECK(value);
+        BOOST_CHECK_EQUAL("test", *value);
         resultSet.Get()->GetString("TABLE_SCHEM", value, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
-        BOOST_CHECK_EQUAL("test", value);
+        BOOST_CHECK(value);
+        BOOST_CHECK_EQUAL("test", *value);
 
         resultSet.Get()->GetString(3, value, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
-        BOOST_CHECK_EQUAL("test", value);
+        BOOST_CHECK(value);
+        BOOST_CHECK_EQUAL("test", *value);
         resultSet.Get()->GetString("TABLE_NAME", value, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
-        BOOST_CHECK_EQUAL("test", value);
+        BOOST_CHECK(value);
+        BOOST_CHECK_EQUAL("test", *value);
 
         resultSet.Get()->GetString(4, value, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
-        BOOST_CHECK(!value.empty());
+        BOOST_CHECK(value);
+        BOOST_CHECK(!value->empty());
         resultSet.Get()->GetString("COLUMN_NAME", value, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
-        BOOST_CHECK(!value.empty());
+        BOOST_CHECK(value);
+        BOOST_CHECK(!value->empty());
         switch (columnIndex) {
             case 1:
-                BOOST_CHECK_EQUAL("test__id", value);
+                BOOST_CHECK_EQUAL("test__id", *value);
                 break;
             case 2:
-                BOOST_CHECK_EQUAL("test", value);
+                BOOST_CHECK_EQUAL("test", *value);
                 break;
         }
-        columnName = value;
+        columnName = *value;
 
         resultSet.Get()->GetInt(5, intValue, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
@@ -348,8 +362,10 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
 
         resultSet.Get()->GetString(6, value, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
+        BOOST_CHECK(value);
         resultSet.Get()->GetString("TYPE_NAME",  value, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
+        BOOST_CHECK(value);
 
         resultSet.Get()->GetInt(7, intValue, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
@@ -386,13 +402,17 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
 
         resultSet.Get()->GetString(12, value, wasNull, errInfo);
         BOOST_CHECK(wasNull);
+        BOOST_CHECK(!value);
         resultSet.Get()->GetString("REMARKS", value, wasNull, errInfo);
         BOOST_CHECK(wasNull);
+        BOOST_CHECK(!value);
 
         resultSet.Get()->GetString(13, value, wasNull, errInfo);
         BOOST_CHECK(wasNull);
+        BOOST_CHECK(!value);
         resultSet.Get()->GetString("COLUMN_DEF", value, wasNull, errInfo);
         BOOST_CHECK(wasNull);
+        BOOST_CHECK(!value);
 
         resultSet.Get()->GetInt(14, intValue, wasNull, errInfo);
         BOOST_CHECK(wasNull);
@@ -426,23 +446,31 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
 
         resultSet.Get()->GetString(18, value, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
+        BOOST_CHECK(value);
         resultSet.Get()->GetString("IS_NULLABLE", value, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
+        BOOST_CHECK(value);
 
         resultSet.Get()->GetString(19, value, wasNull, errInfo);
         BOOST_CHECK(wasNull);
+        BOOST_CHECK(!value);
         resultSet.Get()->GetString("SCOPE_CATALOG", value, wasNull, errInfo);
         BOOST_CHECK(wasNull);
+        BOOST_CHECK(!value);
 
         resultSet.Get()->GetString(20, value, wasNull, errInfo);
         BOOST_CHECK(wasNull);
+        BOOST_CHECK(!value);
         resultSet.Get()->GetString("SCOPE_SCHEMA", value, wasNull, errInfo);
         BOOST_CHECK(wasNull);
+        BOOST_CHECK(!value);
 
         resultSet.Get()->GetString(21, value, wasNull, errInfo);
         BOOST_CHECK(wasNull);
+        BOOST_CHECK(!value);
         resultSet.Get()->GetString("SCOPE_TABLE", value, wasNull, errInfo);
         BOOST_CHECK(wasNull);
+        BOOST_CHECK(!value);
 
         resultSet.Get()->GetInt(22, intValue, wasNull, errInfo);
         BOOST_CHECK(wasNull);
@@ -451,13 +479,17 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
 
         resultSet.Get()->GetString(23, value, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
+        BOOST_CHECK(value);
         resultSet.Get()->GetString("IS_AUTOINCREMENT", value, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
+        BOOST_CHECK(value);
 
         resultSet.Get()->GetString(24, value, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
+        BOOST_CHECK(value);
         resultSet.Get()->GetString("IS_GENERATEDCOLUMN", value, wasNull, errInfo);
         BOOST_CHECK(!wasNull);
+        BOOST_CHECK(value);
     } while (hasNext);
     BOOST_CHECK_EQUAL(2, columnIndex);
 
