@@ -62,6 +62,7 @@ jobs:
         brew install openssl
         brew install boost
         brew install mongo-cxx-driver
+        brew tap homebrew/services
     #- name: configure-and-build-driver
     #  run: |
     #    ./build_mac_release64.sh
@@ -77,14 +78,12 @@ jobs:
     #  run: |
     #    chmod +x scripts/register_driver_macos.sh
     #    ./scripts/register_driver_macos.sh
-    - name: Start MongoDB
-      uses: ankane/setup-mongodb@v1
-      with:
-        mongodb-version: 5.0
     - name: Test MongoSH
       run: |
+        brew services list
         mongosh --version
         mongoimport --version
+        mongosh --eval "db.getCollections()" "admin"
     #- name: run-tests
     #  run: |
     #    ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}

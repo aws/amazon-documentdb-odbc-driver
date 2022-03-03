@@ -98,11 +98,9 @@ jobs:
     - name: Install MongoDB
       run: |
         ./src/odbc-test/scripts/reinstall_mongodb.ps1
-    - name: Test MongoSH
+    - name: Import test data
       run: |
-        mongosh --version
-        mongoimport --version
-        mongosh -u ${{env.DOC_DB_USER_NAME}} -p ${{env.DOC_DB_PASSWORD}} --eval "db.getCollectionNames()" "admin"
+        ./src/odbc-test/scripts/import_test_data.ps1
 
     #- name: run-tests
     #  run: |
@@ -207,11 +205,9 @@ jobs:
     - name: Install MongoDB
       run: |
         ./src/odbc-test/scripts/reinstall_mongodb.ps1
-    - name: Test MongoSH
+    - name: Import test data
       run: |
-        mongosh --version
-        mongoimport --version
-        mongosh -u ${{env.DOC_DB_USER_NAME}} -p ${{env.DOC_DB_PASSWORD}} --eval "db.getCollectionNames()" "admin"
+        ./src/odbc-test/scripts/import_test_data.ps1
 
     #- name: run-tests
     #  run: |
@@ -301,11 +297,9 @@ jobs:
     - name: Install MongoDB
       run: |
         ./src/odbc-test/scripts/reinstall_mongodb.ps1
-    - name: Test MongoSH
+    - name: Import test data
       run: |
-        mongosh --version
-        mongoimport --version
-        mongosh -u ${{env.DOC_DB_USER_NAME}} -p ${{env.DOC_DB_PASSWORD}} --eval "db.getCollectionNames()" "admin"
+        ./src/odbc-test/scripts/import_test_data.ps1
 
     #- name: run-tests
     #  env:
