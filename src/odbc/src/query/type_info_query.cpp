@@ -120,7 +120,7 @@ TypeInfoQuery::TypeInfoQuery(diagnostic::DiagnosableAdapter& diag,
       fetched(false),
       types(),
       cursor(types.end()) {
-  using namespace ignite::impl::binary;
+  using namespace ignite::odbc::impl::binary;
   using namespace ignite::odbc::impl::binary;
   using namespace ignite::odbc::type_traits;
 
@@ -245,7 +245,6 @@ SqlResult::Type TypeInfoQuery::FetchNextRow(
 
 SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
                                          app::ApplicationDataBuffer& buffer) {
-  using namespace ignite::impl::binary;
   using namespace ignite::odbc::impl::binary;
 
   if (!executed) {
