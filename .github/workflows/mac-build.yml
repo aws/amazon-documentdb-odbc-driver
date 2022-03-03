@@ -83,6 +83,7 @@ jobs:
       if: always()
       uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
       with:
+        check_name: "MacOS Build Unit Test Results"
         comment_title: "MacOS Build Unit Test Results"
         files: ./odbc_test_result.xml
     # - name: print-memory-leak-logs
