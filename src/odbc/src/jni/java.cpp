@@ -1485,8 +1485,8 @@ void JniContext::ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) {
 
     env->DeleteLocalRef(err);
   } else if (errInfo) {
-      JniErrorInfo errInfo0(JniErrorCode::IGNITE_JNI_ERR_SUCCESS, "", "");
-      *errInfo = errInfo0;
+    JniErrorInfo errInfo0(JniErrorCode::IGNITE_JNI_ERR_SUCCESS, "", "");
+    *errInfo = errInfo0;
   }
 }
 
