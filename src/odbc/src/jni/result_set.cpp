@@ -58,14 +58,14 @@ JniErrorCode ResultSet::Next(bool& hasNext, JniErrorInfo& errInfo) {
   return _jniContext.Get()->ResultSetNext(_resultSet, hasNext, errInfo);
 }
 
-JniErrorCode ResultSet::GetString(const int columnIndex, std::string& value,
+JniErrorCode ResultSet::GetString(const int columnIndex, boost::optional<std::string>& value,
                                   bool& wasNull, JniErrorInfo& errInfo) {
   return _jniContext.Get()->ResultSetGetString(_resultSet, columnIndex, value,
                                                wasNull, errInfo);
 }
 
 JniErrorCode ResultSet::GetString(const std::string& columnName,
-                                  std::string& value, bool& wasNull,
+                                  boost::optional<std::string>& value, bool& wasNull,
                                   JniErrorInfo& errInfo) {
   return _jniContext.Get()->ResultSetGetString(_resultSet, columnName, value,
                                                wasNull, errInfo);
