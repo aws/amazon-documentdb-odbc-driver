@@ -57,12 +57,12 @@ jobs:
 
     - name: get-dependencies
       run: |
-        brew install unixodbc
-        brew install cmake
-        brew install openssl
-        brew install boost
-        brew install mongo-cxx-driver
         brew tap homebrew/services
+        #brew install unixodbc
+        #brew install cmake
+        #brew install openssl
+        #brew install boost
+        #brew install mongo-cxx-driver
     #- name: configure-and-build-driver
     #  run: |
     #    ./build_mac_release64.sh

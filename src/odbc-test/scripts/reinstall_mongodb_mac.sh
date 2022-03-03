@@ -20,7 +20,7 @@ function update_mongod_config_authorization() {
             echo 'security:' >> "${MONGO_CONFIG_FILE}"
             echo "    authorization: \"${MONGO_ENABLED_DISABLED}\"" >> "${MONGO_CONFIG_FILE}"
         else
-            sed -i "s/^[ \t]*authorization:.*$/    authorization: \"${MONGO_ENABLED_DISABLED}\"/g" "${MONGO_CONFIG_FILE}"
+            sed --debug -i "s/^[ \t]*authorization:.*$/    authorization: \"${MONGO_ENABLED_DISABLED}\"/g" "${MONGO_CONFIG_FILE}"
         fi
     else 
         echo "Config file not found: \"${MONGO_CONFIG_FILE}\""
