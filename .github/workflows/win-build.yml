@@ -36,22 +36,22 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    #- name: setup-cppcheck
-    #  id: setup_cppcheck
-    #  run: |
-    #    choco install cppcheck -y
-    #    echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
+    - name: setup-cppcheck
+      id: setup_cppcheck
+      run: |
+        choco install cppcheck -y
+        echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
         
-    #- name: run-cppcheck
-    #  id: run-cppcheck
-    #  run: |
-    #    .\run_cppcheck.ps1
-    #- name: upload-cppcheck-results
-    #  if: failure()
-    #  uses: actions/upload-artifact@v2
-    #  with:
-    #    name: cppcheck-results
-    #    path: cppcheck-results.log 
+    - name: run-cppcheck
+      id: run-cppcheck
+      run: |
+        .\run_cppcheck.ps1
+    - name: upload-cppcheck-results
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: cppcheck-results
+        path: cppcheck-results.log 
     - name: Get Java distribution
       uses: actions/setup-java@v2
       with:
@@ -81,20 +81,21 @@ jobs:
         mkdir -p ~/.ssh
         copy ./src/odbc-test/config/ssh_config ~/.ssh/config
 
-    #- name: Install dependencies Windows
-    #  run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x86-windows openssl:x86-windows boost-test:x86-windows boost-asio:x86-windows boost-chrono:x86-windows boost-interprocess:x86-windows boost-regex:x86-windows boost-system:x86-windows boost-thread:x86-windows
-    #  env:
-    #    VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
+    - name: Install dependencies Windows
+      run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x86-windows openssl:x86-windows boost-test:x86-windows boost-asio:x86-windows boost-chrono:x86-windows boost-interprocess:x86-windows boost-regex:x86-windows boost-system:x86-windows boost-thread:x86-windows
+      env:
+        VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
 
-    #- name: configure-and-build-driver
-    #  run: |
-    #    .\build_win_release32.ps1
-    #  env:
-    #    OPENSSL_ROOT_DIR: '${{ env.VCPKG_ROOT }}/packages/openssl_x86-windows'
+    - name: configure-and-build-driver
+      run: |
+        .\build_win_release32.ps1
+      env:
+        OPENSSL_ROOT_DIR: '${{ env.VCPKG_ROOT }}/packages/openssl_x86-windows'
 
-    #- name: register-driver
-    #  run: |
-    #    .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
+    - name: register-driver
+      run: |
+        .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
+
     - name: Install MongoDB
       run: |
         ./src/odbc-test/scripts/reinstall_mongodb.ps1
@@ -102,10 +103,10 @@ jobs:
       run: |
         ./src/odbc-test/scripts/import_test_data.ps1
 
-    #- name: run-tests
-    #  run: |
-    #    Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
-    #    ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
+    - name: run-tests
+      run: |
+        Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
+        ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
 
     # - name: upload-test-report
     #   if: failure()
@@ -143,21 +144,21 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    #- name: run-cppcheck
-    #  id: setup_cppcheck
-    #  run: |
-    #    choco install cppcheck -y
-    #    echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
-    #- name: run-cppcheck
-    #  id: run-cppcheck
-    #  run: |
-    #    .\run_cppcheck.ps1
-    #- name: upload-cppcheck-results
-    #  if: failure()
-    #  uses: actions/upload-artifact@v2
-    #  with:
-    #    name: cppcheck-results
-    #    path: cppcheck-results.log 
+    - name: run-cppcheck
+      id: setup_cppcheck
+      run: |
+        choco install cppcheck -y
+        echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
+    - name: run-cppcheck
+      id: run-cppcheck
+      run: |
+        .\run_cppcheck.ps1
+    - name: upload-cppcheck-results
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: cppcheck-results
+        path: cppcheck-results.log 
     - name: Get Java distribution
       uses: actions/setup-java@v2
       with:
@@ -187,20 +188,20 @@ jobs:
         mkdir -p ~/.ssh
         copy ./src/odbc-test/config/ssh_config ~/.ssh/config
 
-    #- name: Install dependencies Windows
-    #  run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x64-windows openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
-    #  env:
-    #    VCPKG_ROOT: ${{env.VCPKG_ROOT}}
+    - name: Install dependencies Windows
+      run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x64-windows openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
+      env:
+        VCPKG_ROOT: ${{env.VCPKG_ROOT}}
 
-    #- name: configure-and-build-driver
-    #  run: |
-    #    .\build_win_release64.ps1
-    #  env:
-    #    OPENSSL_ROOT_DIR: '${{env.VCPKG_ROOT}}/packages/openssl_x64-windows'
+    - name: configure-and-build-driver
+      run: |
+        .\build_win_release64.ps1
+      env:
+        OPENSSL_ROOT_DIR: '${{env.VCPKG_ROOT}}/packages/openssl_x64-windows'
 
-    #- name: register-driver
-    #  run: |
-    #    .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
+    - name: register-driver
+      run: |
+        .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
 
     - name: Install MongoDB
       run: |
@@ -209,10 +210,10 @@ jobs:
       run: |
         ./src/odbc-test/scripts/import_test_data.ps1
 
-    #- name: run-tests
-    #  run: |
-    #    Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
-    #    ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
+    - name: run-tests
+      run: |
+        Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
+        ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
 
   #   - name: upload-test-report
   #     if: failure()
@@ -274,24 +275,24 @@ jobs:
         mkdir -p ~/.ssh
         copy ./src/odbc-test/config/ssh_config ~/.ssh/config
 
-    #- name: setup-opencppcoverage-and-add-to-path
-    #  id: setup_opencppcoverage
-    #  run: |
-    #    choco install OpenCppCoverage -y
-    #    echo "C:\Program Files\OpenCppCoverage" >> $env:GITHUB_PATH
-    #- name: Install dependencies Windows
-    #  run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x64-windows openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
-    #  env:
-    #    VCPKG_ROOT: ${{env.VCPKG_ROOT}}
+    - name: setup-opencppcoverage-and-add-to-path
+      id: setup_opencppcoverage
+      run: |
+        choco install OpenCppCoverage -y
+        echo "C:\Program Files\OpenCppCoverage" >> $env:GITHUB_PATH
+    - name: Install dependencies Windows
+      run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x64-windows openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
+      env:
+        VCPKG_ROOT: ${{env.VCPKG_ROOT}}
 
-    #- name: configure-and-build-driver
-    #  run: |
-    #    .\build_win_debug64.ps1
-    #  env:
-    #    OPENSSL_ROOT_DIR: '${{env.VCPKG_ROOT}}/packages/openssl_x64-windows'
+    - name: configure-and-build-driver
+      run: |
+        .\build_win_debug64.ps1
+      env:
+        OPENSSL_ROOT_DIR: '${{env.VCPKG_ROOT}}/packages/openssl_x64-windows'
 
-    #- name: register-driver
-    #  run: |
+    - name: register-driver
+      run: |
     #    .\src\odbc\install\install_amd64.cmd ${{env.ODBC_DEBUG_PATH}}\ignite.odbc.dll
 
     - name: Install MongoDB
@@ -301,12 +302,12 @@ jobs:
       run: |
         ./src/odbc-test/scripts/import_test_data.ps1
 
-    #- name: run-tests
-    #  env:
-    #    DOCUMENTDB_HOME: "./build/odbc/bin/Debug"
-    #  run: |
-    #    Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
-    #    opencppcoverage --sources src --export_type html:coverage --excluded_modules boost_unit_test_framework --excluded_modules ignite-odbc-tests --excluded_modules mongoc --excluded_modules mongocxx --excluded_modules bson --excluded_modules bsoncxx --excluded_modules zlib -- ${{env.ODBC_DEBUG_PATH}}/ignite-odbc-tests.exe
+    - name: run-tests
+      env:
+        DOCUMENTDB_HOME: "./build/odbc/bin/Debug"
+      run: |
+        Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
+        opencppcoverage --sources src --export_type html:coverage --excluded_modules boost_unit_test_framework --excluded_modules ignite-odbc-tests --excluded_modules mongoc --excluded_modules mongocxx --excluded_modules bson --excluded_modules bsoncxx --excluded_modules zlib -- ${{env.ODBC_DEBUG_PATH}}/ignite-odbc-tests.exe
 
     - name: upload-coverage
       if: always()
