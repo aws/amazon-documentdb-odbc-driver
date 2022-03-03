@@ -81,8 +81,9 @@ jobs:
         ./build/odbc/bin/ignite-odbc-tests
     - name: upload-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v1
+      uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
       with:
+        comment_title: "MacOS Build Unit Test Results"
         files: ./odbc_test_result.xml
     # - name: print-memory-leak-logs
     #   if: always()

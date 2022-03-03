@@ -101,8 +101,9 @@ jobs:
 
     - name: upload-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v1
+      uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
       with:
+        comment_title: "Windows x32 Build Unit Test Results"
         files: ./odbc_test_result.xml
     # - name: build-installer
     #   if: success()
@@ -200,8 +201,9 @@ jobs:
 
     - name: upload-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v1
+      uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
       with:
+        comment_title: "Windows x64 Build Unit Test Results"
         files: ./odbc_test_result.xml
   #   - name: build-installer
   #     if: success()

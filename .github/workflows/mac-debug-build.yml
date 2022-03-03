@@ -50,8 +50,9 @@ jobs:
     #     ./build/odbc/bin/tests --gtest_output="xml:report.xml"
     - name: upload-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v1
+      uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
       with:
+        comment_title: "MacOS Debug Build Unit Test Results"
         files: ./odbc_test_result.xml
     # - name: print-memory-leak-logs
     #   if: always()
