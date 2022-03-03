@@ -636,7 +636,7 @@ int OdbcTestSuite::InsertTestBatch(int from, int to, int expectedToAffect,
 }
 
 void OdbcTestSuite::InsertBatchSelect(int recordsNum) {
-  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
+  Connect("DRIVER={Amazon DocumentDB};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   // Inserting values.
   int inserted = InsertTestBatch(0, recordsNum, recordsNum);
@@ -695,7 +695,7 @@ void OdbcTestSuite::InsertBatchSelect(int recordsNum) {
 }
 
 void OdbcTestSuite::InsertNonFullBatchSelect(int recordsNum, int splitAt) {
-  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
+  Connect("DRIVER={Amazon DocumentDB};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   std::vector< SQLUSMALLINT > statuses(recordsNum, 42);
 
@@ -829,7 +829,7 @@ void OdbcTestSuite::CreateDsnConnectionStringForDocker(
   std::string port = "27017";
 
   connectionString =
-    "DRIVER={Apache Ignite};"
+    "DRIVER={Amazon DocumentDB};"
     "HOSTNAME=" + host + ":" + port + ";"
     "DATABASE=" + databaseName + ";"
     "USER=" + user + ";"
