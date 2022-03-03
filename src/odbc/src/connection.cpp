@@ -611,9 +611,7 @@ std::string Connection::FormatMongoCppConnectionString(
   mongoConnectionString.append("@" + host);
   mongoConnectionString.append(":" + port);
   mongoConnectionString.append("/admin");
-  if (!config.IsTls()) {
-    mongoConnectionString.append("?tls=false");
-  } else {
+  if (config.IsTls()) {
     mongoConnectionString.append("?tlsAllowInvalidHostnames=true");
   }
   // tls configuration is handled using tls_options in connectionCPP
@@ -695,8 +693,8 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
         FormatMongoCppConnectionString(localSSHTunnelPort);
     const auto uri = mongocxx::uri{mongoCPPConnectionString};
     mongocxx::options::client client_options;
+    mongocxx::options::tls tls_options;
     if (config.IsTls()) {
-      mongocxx::options::tls tls_options;
 
       // TO-DO Adapt to use certificates
       // https://bitquill.atlassian.net/browse/AD-598
