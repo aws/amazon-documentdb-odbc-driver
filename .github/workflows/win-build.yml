@@ -31,7 +31,7 @@ env:
 
 jobs:
   build-windows32:
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v2
     - name: setup-cppcheck
@@ -133,7 +133,7 @@ jobs:
     #     name: windows-test-results
     #     path: $CI_OUTPUT_PATH/test
   build-windows64:
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v2
     - name: run-cppcheck
@@ -228,7 +228,7 @@ jobs:
   #       name: windows64-installer
   #       path: ci-output/installer
   build-windows64_coverage:
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v2
 
