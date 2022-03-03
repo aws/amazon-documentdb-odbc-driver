@@ -37,8 +37,8 @@ brew services restart ${MONGODB_SERVICE_NAME}
 
 # By reinstalling, we've disabled authorization - so we can reset the authorization from scratch.
 mongosh --eval "db.dropAllUsers()" "admin"
-mongosh --eval "db.createUser({ user: '$env:DOC_DB_USER_NAME', pwd: '$env:DOC_DB_PASSWORD', roles: [ { role: 'root', db: 'admin' } ] })" "admin"
-mongosh --eval "db.createUser({ user: 'docDbRestricted', pwd: '$env:DOC_DB_PASSWORD', roles: [ { role: 'readAnyDatabase', db: 'admin' } ] })" "admin"
+mongosh --eval "db.createUser({ user: '${DOC_DB_USER_NAME}', pwd: '${DOC_DB_PASSWORD}', roles: [ { role: 'root', db: 'admin' } ] })" "admin"
+mongosh --eval "db.createUser({ user: 'docDbRestricted', pwd: '${DOC_DB_PASSWORD}', roles: [ { role: 'readAnyDatabase', db: 'admin' } ] })" "admin"
 
 update_mongod_config_authorization "enabled"
 brew services restart ${MONGODB_SERVICE_NAME}
