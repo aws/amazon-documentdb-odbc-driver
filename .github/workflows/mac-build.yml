@@ -81,8 +81,7 @@ jobs:
     - name: Test MongoSH
       run: |
         brew services list
-        mongosh --version
-        mongoimport --version
+        brew services start mongodb-community
         mongosh --eval "db.getCollections()" "admin"
     #- name: run-tests
     #  run: |
