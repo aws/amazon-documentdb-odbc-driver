@@ -36,22 +36,22 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    - name: setup-cppcheck
-      id: setup_cppcheck
-      run: |
-        choco install cppcheck -y
-        echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
+    #- name: setup-cppcheck
+    #  id: setup_cppcheck
+    #  run: |
+    #    choco install cppcheck -y
+    #    echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
         
-    - name: run-cppcheck
-      id: run-cppcheck
-      run: |
-        .\run_cppcheck.ps1
-    - name: upload-cppcheck-results
-      if: failure()
-      uses: actions/upload-artifact@v2
-      with:
-        name: cppcheck-results
-        path: cppcheck-results.log 
+    #- name: run-cppcheck
+    #  id: run-cppcheck
+    #  run: |
+    #    .\run_cppcheck.ps1
+    #- name: upload-cppcheck-results
+    #  if: failure()
+    #  uses: actions/upload-artifact@v2
+    #  with:
+    #    name: cppcheck-results
+    #    path: cppcheck-results.log 
     - name: Get Java distribution
       uses: actions/setup-java@v2
       with:
@@ -95,21 +95,14 @@ jobs:
     #- name: register-driver
     #  run: |
     #    .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
-    - name: Start MongoDB
-      uses: ankane/setup-mongodb@v1
-      with:
-        mongodb-version: 5.0
-    - name: Install Mongo Shell and Tools
+    - name: Install MongoDB
       run: |
-        choco install mongodb-shell mongodb-database-tools
-        choco upgrade mongodb --force
+        ./src/odbc-test/scripts/reinstall_mongodb.ps1
     - name: Test MongoSH
       run: |
-        Restart-Service MongoDB -Force
-        $(Get-Service -Name MongoDB).BinaryPathName
         mongosh --version
         mongoimport --version
-        mongosh "mongodb://localhost:27017" --eval "db.getCollectionNames()"
+        mongosh -u ${{env.DOC_DB_USER_NAME}} -p ${{env.DOC_DB_PASSWORD}} --eval "db.getCollectionNames()" "admin"
 
     #- name: run-tests
     #  run: |
@@ -152,21 +145,21 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    - name: run-cppcheck
-      id: setup_cppcheck
-      run: |
-        choco install cppcheck -y
-        echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
-    - name: run-cppcheck
-      id: run-cppcheck
-      run: |
-        .\run_cppcheck.ps1
-    - name: upload-cppcheck-results
-      if: failure()
-      uses: actions/upload-artifact@v2
-      with:
-        name: cppcheck-results
-        path: cppcheck-results.log 
+    #- name: run-cppcheck
+    #  id: setup_cppcheck
+    #  run: |
+    #    choco install cppcheck -y
+    #    echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
+    #- name: run-cppcheck
+    #  id: run-cppcheck
+    #  run: |
+    #    .\run_cppcheck.ps1
+    #- name: upload-cppcheck-results
+    #  if: failure()
+    #  uses: actions/upload-artifact@v2
+    #  with:
+    #    name: cppcheck-results
+    #    path: cppcheck-results.log 
     - name: Get Java distribution
       uses: actions/setup-java@v2
       with:
@@ -211,21 +204,14 @@ jobs:
     #  run: |
     #    .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
 
-    - name: Start MongoDB
-      uses: ankane/setup-mongodb@v1
-      with:
-        mongodb-version: 5.0
-    - name: Install Mongo Shell and Tools
+    - name: Install MongoDB
       run: |
-        choco install mongodb-shell mongodb-database-tools
-        choco upgrade mongodb --force
+        ./src/odbc-test/scripts/reinstall_mongodb.ps1
     - name: Test MongoSH
       run: |
-        Restart-Service MongoDB -Force
-        $(Get-Service -Name MongoDB).BinaryPathName
         mongosh --version
         mongoimport --version
-        mongosh "mongodb://localhost:27017" --eval "db.getCollectionNames()"
+        mongosh -u ${{env.DOC_DB_USER_NAME}} -p ${{env.DOC_DB_PASSWORD}} --eval "db.getCollectionNames()" "admin"
 
     #- name: run-tests
     #  run: |
@@ -312,21 +298,14 @@ jobs:
     #  run: |
     #    .\src\odbc\install\install_amd64.cmd ${{env.ODBC_DEBUG_PATH}}\ignite.odbc.dll
 
-    - name: Start MongoDB
-      uses: ankane/setup-mongodb@v1
-      with:
-        mongodb-version: 5.0
-    - name: Install Mongo Shell and Tools
+    - name: Install MongoDB
       run: |
-        choco install mongodb-shell mongodb-database-tools
-        choco upgrade mongodb --force
+        ./src/odbc-test/scripts/reinstall_mongodb.ps1
     - name: Test MongoSH
       run: |
-        Restart-Service MongoDB -Force
-        $(Get-Service -Name MongoDB).BinaryPathName
         mongosh --version
         mongoimport --version
-        mongosh "mongodb://localhost:27017" --eval "db.getCollectionNames()"
+        mongosh -u ${{env.DOC_DB_USER_NAME}} -p ${{env.DOC_DB_PASSWORD}} --eval "db.getCollectionNames()" "admin"
 
     #- name: run-tests
     #  env:
