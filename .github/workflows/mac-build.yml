@@ -78,10 +78,11 @@ jobs:
     #  run: |
     #    chmod +x scripts/register_driver_macos.sh
     #    ./scripts/register_driver_macos.sh
-    - name: Test MongoSH
+    - name: Setup MongoDB
       run: |
-        brew services start mongodb-community
-        mongosh --eval "db.getCollectionNames()" "admin"
+        chmod +x ./src/odbc-test/scripts/reinstall_mongodb_mac.sh
+        ./src/odbc-test/scripts/reinstall_mongodb_mac.sh
+        mongosh -u ${{env.DOC_DB_USER_NAME}} -p ${{env.DOC_DB_PASSWORD}} --authenticationDatabase=admin --eval "db.getCollectionNames()" "admin"
     #- name: run-tests
     #  run: |
     #    ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
