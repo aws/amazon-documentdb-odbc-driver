@@ -20,8 +20,8 @@
  * Declares ignite::IgniteError class.
  */
 
-#ifndef _IGNITE_IGNITE_ERROR
-#define _IGNITE_IGNITE_ERROR
+#ifndef _IGNITE_ODBC_IGNITE_ERROR
+#define _IGNITE_ODBC_IGNITE_ERROR
 
 #include <stdint.h>
 
@@ -310,4 +310,4 @@ namespace ignite
 #   pragma warning(pop)
 #endif //_MSC_VER
 
-#endif //_IGNITE_IGNITE_ERROR
+#endif //_IGNITE_ODBC_IGNITE_ERROR
