@@ -386,7 +386,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
   int i = 1;
   while (hasNext) {
     bool wasNull;
-    std::string value;
+    boost::optional<std::string> value;
     // TABLE_CAT (i.e., catalog - always NULL in our case)
     if (_ctx.Get()->ResultSetGetString(resultSet, 1, value, wasNull, errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
@@ -394,6 +394,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(wasNull);
+    BOOST_CHECK(!value);
 
     // TABLE_CAT (i.e., catalog - always NULL in our case)
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_CAT", value, wasNull,
@@ -403,6 +404,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(wasNull);
+    BOOST_CHECK(!value);
 
     // TABLE_SCHEM (i.e., database)
     if (_ctx.Get()->ResultSetGetString(resultSet, 2, value, wasNull, errInfo)
@@ -411,7 +413,8 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value == "test");
+    BOOST_REQUIRE(value);
+    BOOST_REQUIRE(*value == "test");
 
     // TABLE_SCHEM (i.e., database)
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_SCHEM", value, wasNull,
@@ -421,7 +424,8 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value == "test");
+    BOOST_REQUIRE(value);
+    BOOST_REQUIRE(*value == "test");
 
     // TABLE_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 3, value, wasNull, errInfo)
@@ -430,7 +434,8 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value.size() > 0);
+    BOOST_REQUIRE(value);
+    BOOST_REQUIRE(value->size() > 0);
 
     // TABLE_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_NAME", value, wasNull,
@@ -440,7 +445,8 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value.size() > 0);
+    BOOST_CHECK(value);
+    BOOST_REQUIRE(value->size() > 0);
 
     // TABLE_TYPE
     if (_ctx.Get()->ResultSetGetString(resultSet, 4, value, wasNull, errInfo)
@@ -449,7 +455,8 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value == "TABLE");
+    BOOST_REQUIRE(value);
+    BOOST_REQUIRE(*value == "TABLE");
 
     // TABLE_TYPE
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_TYPE", value, wasNull,
@@ -459,7 +466,8 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value == "TABLE");
+    BOOST_REQUIRE(value);
+    BOOST_REQUIRE(*value == "TABLE");
 
     // check getRow
     int val;
@@ -534,7 +542,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
   int i = 1;
   while (hasNext) {
     bool wasNull;
-    std::string value;
+    boost::optional<std::string> value;
     // TABLE_CAT (i.e., catalog - always NULL in our case)
     if (_ctx.Get()->ResultSetGetString(resultSet, 1, value, wasNull, errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
@@ -543,6 +551,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(wasNull);
+    BOOST_CHECK(!value);
 
     // TABLE_CAT (i.e., catalog - always NULL in our case)
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_CAT", value, wasNull,
@@ -553,6 +562,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(wasNull);
+    BOOST_CHECK(!value);
 
     // TABLE_SCHEM (i.e., database)
     if (_ctx.Get()->ResultSetGetString(resultSet, 2, value, wasNull, errInfo)
@@ -561,7 +571,8 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(!wasNull);
-    BOOST_CHECK_EQUAL(databaseName, value);
+    BOOST_CHECK(value);
+    BOOST_CHECK_EQUAL(databaseName, *value);
 
     // TABLE_SCHEM (i.e., database)
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_SCHEM", value, wasNull,
@@ -571,7 +582,8 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(!wasNull);
-    BOOST_CHECK_EQUAL(databaseName, value);
+    BOOST_CHECK(value);
+    BOOST_CHECK_EQUAL(databaseName, *value);
 
     // TABLE_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 3, value, wasNull, errInfo)
@@ -580,7 +592,8 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value.size() > 0);
+    BOOST_REQUIRE(value);
+    BOOST_REQUIRE(value->size() > 0);
 
     // TABLE_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_NAME", value, wasNull,
@@ -590,7 +603,8 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value.size() > 0);
+    BOOST_REQUIRE(value);
+    BOOST_REQUIRE(value->size() > 0);
 
     // COLUMN_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 4, value, wasNull, errInfo)
@@ -599,7 +613,8 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value.size() > 0);
+    BOOST_REQUIRE(value);
+    BOOST_REQUIRE(value->size() > 0);
 
     // COLUMN_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, "COLUMN_NAME", value, wasNull,
@@ -609,7 +624,8 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(value.size() > 0);
+    BOOST_REQUIRE(value);
+    BOOST_REQUIRE(value->size() > 0);
 
     // ORDINAL_POSITION
     int val;
