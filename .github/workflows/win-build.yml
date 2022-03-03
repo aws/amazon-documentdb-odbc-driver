@@ -103,8 +103,8 @@ jobs:
       if: always()
       uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
       with:
-        check_name: "Windows x32 Build Unit Test Results"
-        comment_title: "Windows x32 Build Unit Test Results"
+        check_name: "Windows x32 Build Unit Test Results Check"
+        comment_title: "Windows 2022 (x32) Build Unit Test Results"
         files: ./odbc_test_result.xml
     # - name: build-installer
     #   if: success()
@@ -204,8 +204,8 @@ jobs:
       if: always()
       uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
       with:
-        check_name: "Windows x64 Build Unit Test Results"
-        comment_title: "Windows x64 Build Unit Test Results"
+        check_name: "Windows 2022 (x64) Build Unit Test Results Check"
+        comment_title: "Windows 2022 (x64) Build Unit Test Results"
         files: ./odbc_test_result.xml
   #   - name: build-installer
   #     if: success()
