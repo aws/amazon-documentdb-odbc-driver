@@ -28,8 +28,6 @@ env:
   DOC_DB_REMOTE_PORT: 27017
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
   JDBC_DRIVER_VERSION: "1.1.1"
-  MONGO_INITDB_ROOT_USERNAME: ${{secrets.DOC_DB_USER_NAME}}
-  MONGO_INITDB_ROOT_PASSWORD: ${{secrets.DOC_DB_PASSWORD}}
 
 jobs:
   build-windows32:
@@ -96,7 +94,7 @@ jobs:
       run: |
         .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
 
-    - name: Install MongoDB
+    - name: Setup MongoDB
       run: |
         ./src/odbc-test/scripts/reinstall_mongodb.ps1
     - name: Import test data
@@ -203,7 +201,7 @@ jobs:
       run: |
         .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
 
-    - name: Install MongoDB
+    - name: Setup MongoDB
       run: |
         ./src/odbc-test/scripts/reinstall_mongodb.ps1
     - name: Import test data
@@ -293,9 +291,9 @@ jobs:
 
     - name: register-driver
       run: |
-    #    .\src\odbc\install\install_amd64.cmd ${{env.ODBC_DEBUG_PATH}}\ignite.odbc.dll
+        .\src\odbc\install\install_amd64.cmd ${{env.ODBC_DEBUG_PATH}}\ignite.odbc.dll
 
-    - name: Install MongoDB
+    - name: Setup MongoDB
       run: |
         ./src/odbc-test/scripts/reinstall_mongodb.ps1
     - name: Import test data
