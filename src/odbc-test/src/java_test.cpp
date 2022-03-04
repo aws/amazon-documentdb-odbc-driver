@@ -470,13 +470,14 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
     BOOST_REQUIRE(*value == "TABLE");
 
     // check getRow
-    int val;
+    boost::optional<int> val;
     if (_ctx.Get()->ResultSetGetRow(resultSet, val, wasNull, errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_CHECK_EQUAL(val, i);
+    BOOST_REQUIRE(val);
+    BOOST_CHECK_EQUAL(*val, i);
 
     // Get next
     if (_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)
@@ -628,14 +629,15 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
     BOOST_REQUIRE(value->size() > 0);
 
     // ORDINAL_POSITION
-    int val;
+    boost::optional< int > val;
     if (_ctx.Get()->ResultSetGetInt(resultSet, 17, val, wasNull, errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(val > 0);
+    BOOST_REQUIRE(val);
+    BOOST_REQUIRE(*val > 0);
 
     // ORDINAL_POSITION
     if (_ctx.Get()->ResultSetGetInt(resultSet, "ORDINAL_POSITION", val, wasNull,
@@ -645,7 +647,8 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(!wasNull);
-    BOOST_REQUIRE(val > 0);
+    BOOST_REQUIRE(val);
+    BOOST_REQUIRE(*val > 0);
 
     // check getRow
     if (_ctx.Get()->ResultSetGetRow(resultSet, val, wasNull, errInfo)
@@ -653,7 +656,8 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_CHECK_EQUAL(val, i);
+    BOOST_REQUIRE(val);
+    BOOST_CHECK_EQUAL(*val, i);
 
     // Get next
     if (_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)
