@@ -694,11 +694,9 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
     mongocxx::options::client client_options;
     mongocxx::options::tls tls_options;
     if (config.IsTls()) {
-
       // TO-DO Adapt to use certificates
       // https://bitquill.atlassian.net/browse/AD-598
       tls_options.allow_invalid_certificates(true);
-
       client_options.tls_opts(tls_options);
     }
     auto client1 = mongocxx::client{mongocxx::uri{mongoCPPConnectionString},
