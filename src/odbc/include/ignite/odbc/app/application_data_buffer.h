@@ -131,12 +131,28 @@ class ApplicationDataBuffer {
   ConversionResult::Type PutInt8(int8_t value);
 
   /**
+   * Put in buffer value of type optiona int16_t.
+   *
+   * @param value Value.
+   * @return Conversion result.
+   */
+  ConversionResult::Type PutOptInt16(boost::optional<int16_t> value);
+
+  /**
    * Put in buffer value of type int16_t.
    *
    * @param value Value.
    * @return Conversion result.
    */
   ConversionResult::Type PutInt16(int16_t value);
+
+  /**
+   * Put in buffer value of type optiona int32_t.
+   *
+   * @param value Value.
+   * @return Conversion result.
+   */
+  ConversionResult::Type PutOptInt32(boost::optional< int32_t > value);
 
   /**
    * Put in buffer value of type int32_t.
@@ -171,7 +187,7 @@ class ApplicationDataBuffer {
   ConversionResult::Type PutDouble(double value);
 
   /**
-   * Put in buffer value of type string.
+   * Put in buffer value of type optional string.
    *
    * @param optional value Value.
    * @return Conversion result.

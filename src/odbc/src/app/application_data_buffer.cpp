@@ -333,8 +333,24 @@ ConversionResult::Type ApplicationDataBuffer::PutInt8(int8_t value) {
   return PutNum(value);
 }
 
+ConversionResult::Type ApplicationDataBuffer::PutOptInt16(
+    boost::optional< int16_t > value) {
+  if (value)
+    return PutInt16(*value);
+  else
+    return PutNull();
+}
+
 ConversionResult::Type ApplicationDataBuffer::PutInt16(int16_t value) {
   return PutNum(value);
+}
+
+ConversionResult::Type ApplicationDataBuffer::PutOptInt32(
+    boost::optional< int32_t > value) {
+  if (value)
+    return PutInt32(*value);
+  else
+    return PutNull();
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutInt32(int32_t value) {
