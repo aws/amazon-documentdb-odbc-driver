@@ -726,13 +726,13 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOne) {
   CheckSingleRowResultSetWithGetData(stmt, 2, "test");
 }
 
-BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneFromDocker) {
+BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneFromLocalServer) {
   SQLCHAR empty[] = "";
   SQLCHAR table[] = "meta_queries_test_001";
 
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForDocker(dsnConnectionString, databaseName);
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
 
   Connect(dsnConnectionString);
 

@@ -2,7 +2,7 @@
 
 ##################################################
 # Assumptions
-# 1. Docker container 'mongo' is running and instance of mongo server and listening on port 27017
+# 1. Mongo server running and listening on port 27017
 # 2. Mongo started with the environment variables DOC_DB_USER_NAME and DOC_DB_PASSWORD
 ##################################################
 

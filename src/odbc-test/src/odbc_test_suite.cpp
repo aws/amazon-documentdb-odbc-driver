@@ -839,7 +839,7 @@ void OdbcTestSuite::CreateDsnConnectionString(
     connectionString.append(miscOptions);
 }
 
-void OdbcTestSuite::CreateDsnConnectionStringForDocker(
+void OdbcTestSuite::CreateDsnConnectionStringForLocalServer(
     std::string& connectionString, const std::string& databaseName) const {
   std::string user = common::GetEnv("DOC_DB_USER_NAME", "documentdb");
   std::string password = common::GetEnv("DOC_DB_PASSWORD", "");
