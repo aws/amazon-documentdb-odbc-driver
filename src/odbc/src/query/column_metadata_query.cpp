@@ -236,22 +236,22 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
 
   switch (columnIdx) {
     case ResultColumn::TABLE_CAT: {
-      buffer.PutString(currentColumn.GetCatalogName());
+      buffer.PutOptString(currentColumn.GetCatalogName());
       break;
     }
 
     case ResultColumn::TABLE_SCHEM: {
-      buffer.PutString(currentColumn.GetSchemaName());
+      buffer.PutOptString(currentColumn.GetSchemaName());
       break;
     }
 
     case ResultColumn::TABLE_NAME: {
-      buffer.PutString(currentColumn.GetTableName());
+      buffer.PutOptString(currentColumn.GetTableName());
       break;
     }
 
     case ResultColumn::COLUMN_NAME: {
-      buffer.PutString(currentColumn.GetColumnName());
+      buffer.PutOptString(currentColumn.GetColumnName());
       break;
     }
 
@@ -261,7 +261,7 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::TYPE_NAME: {
-      buffer.PutString(
+      buffer.PutOptString(
           type_traits::BinaryTypeToSqlTypeName(currentColumn.GetDataType()));
       break;
     }
@@ -302,12 +302,12 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::REMARKS: {
-      buffer.PutString(currentColumn.GetRemarks());
+      buffer.PutOptString(currentColumn.GetRemarks());
       break;
     }
 
     case ResultColumn::COLUMN_DEF: {
-      buffer.PutString(currentColumn.GetColumnDef());
+      buffer.PutOptString(currentColumn.GetColumnDef());
       break;
     }
 
@@ -334,7 +334,7 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::IS_NULLABLE: {
-      buffer.PutString(
+      buffer.PutOptString(
           type_traits::NullabilityToIsNullable(currentColumn.GetNullability()));
       break;
     }
