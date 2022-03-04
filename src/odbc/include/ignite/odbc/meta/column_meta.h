@@ -20,10 +20,9 @@
 
 #include <stdint.h>
 
-#include <string>
-
 #include <boost/optional.hpp>
 #include <boost/optional/optional_io.hpp>
+#include <string>
 
 #include "ignite/impl/binary/binary_reader_impl.h"
 #include "ignite/odbc/common_types.h"
@@ -76,7 +75,8 @@ class ColumnMeta {
   /**
    * Default constructor.
    */
-  ColumnMeta() : dataType(), nullability(), precision(), scale(), ordinalPosition() {
+  ColumnMeta()
+      : dataType(), nullability(), precision(), scale(), ordinalPosition() {
     // No-op.
   }
 
@@ -160,7 +160,7 @@ class ColumnMeta {
    * Get catalog name.
    * @return Catalog name.
    */
-  const boost::optional<std::string>& GetCatalogName() const {
+  const boost::optional< std::string >& GetCatalogName() const {
     return catalogName;
   }
 
@@ -168,7 +168,7 @@ class ColumnMeta {
    * Get schema name.
    * @return Schema name.
    */
-  const boost::optional<std::string>& GetSchemaName() const {
+  const boost::optional< std::string >& GetSchemaName() const {
     return schemaName;
   }
 
@@ -176,7 +176,7 @@ class ColumnMeta {
    * Get table name.
    * @return Table name.
    */
-  const boost::optional<std::string>& GetTableName() const {
+  const boost::optional< std::string >& GetTableName() const {
     return tableName;
   }
 
@@ -184,7 +184,7 @@ class ColumnMeta {
    * Get column name.
    * @return Column name.
    */
-  const boost::optional<std::string>& GetColumnName() const {
+  const boost::optional< std::string >& GetColumnName() const {
     return columnName;
   }
 
@@ -192,7 +192,7 @@ class ColumnMeta {
    * Get the remarks.
    * @return Remarks.
    */
-  const boost::optional<std::string>& GetRemarks() const {
+  const boost::optional< std::string >& GetRemarks() const {
     return remarks;
   }
 
@@ -200,7 +200,7 @@ class ColumnMeta {
    * Get the column default value.
    * @return Column default value.
    */
-  const boost::optional<std::string>& GetColumnDef() const {
+  const boost::optional< std::string >& GetColumnDef() const {
     return columnDef;
   }
 
@@ -264,22 +264,22 @@ class ColumnMeta {
 
  private:
   /** Catalog name. */
-  boost::optional<std::string> catalogName;
+  boost::optional< std::string > catalogName;
 
   /** Schema name. */
-  boost::optional<std::string> schemaName;
+  boost::optional< std::string > schemaName;
 
   /** Table name. */
-  boost::optional<std::string> tableName;
+  boost::optional< std::string > tableName;
 
   /** Column name. */
-  boost::optional<std::string> columnName;
+  boost::optional< std::string > columnName;
 
   /** Remarks */
-  boost::optional<std::string> remarks;
+  boost::optional< std::string > remarks;
 
   /** Column default value */
-  boost::optional<std::string> columnDef;
+  boost::optional< std::string > columnDef;
 
   /** Data type. */
   int16_t dataType;
