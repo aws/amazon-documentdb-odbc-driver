@@ -31,7 +31,7 @@ env:
 
 jobs:
   build-windows32:
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v2
     - name: setup-cppcheck
@@ -98,12 +98,14 @@ jobs:
       run: |
         Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
         ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
-    # - name: upload-test-report
-    #   if: failure()
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: test-logs-win32
-    #     path: ${{ github.workspace }}\report.xml
+
+    - name: upload-test-report
+      if: always()
+      uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
+      with:
+        check_name: "Windows x32 Build Unit Test Results Check"
+        comment_title: "Windows 2022 (x32) Build Unit Test Results"
+        files: ./odbc_test_result.xml
     # - name: build-installer
     #   if: success()
     #   run: |
@@ -131,7 +133,7 @@ jobs:
     #     name: windows-test-results
     #     path: $CI_OUTPUT_PATH/test
   build-windows64:
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v2
     - name: run-cppcheck
@@ -197,12 +199,14 @@ jobs:
       run: |
         Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
         ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
-  #   - name: upload-test-report
-  #     if: failure()
-  #     uses: actions/upload-artifact@v2
-  #     with:
-  #       name: test-logs-win64
-  #       path: ${{ github.workspace }}\report.xml
+
+    - name: upload-test-report
+      if: always()
+      uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
+      with:
+        check_name: "Windows 2022 (x64) Build Unit Test Results Check"
+        comment_title: "Windows 2022 (x64) Build Unit Test Results"
+        files: ./odbc_test_result.xml
   #   - name: build-installer
   #     if: success()
   #     run: |
@@ -224,7 +228,7 @@ jobs:
   #       name: windows64-installer
   #       path: ci-output/installer
   build-windows64_coverage:
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v2
 

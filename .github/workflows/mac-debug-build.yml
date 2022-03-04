@@ -12,7 +12,7 @@ env:
 
 jobs:
   build-mac:
-    runs-on: macos-latest
+    runs-on: macos-11
     env: 
       NOT_CONNETECD: 1
     steps:
@@ -48,12 +48,13 @@ jobs:
     # - name: run-tests
     #   run: |
     #     ./build/odbc/bin/tests --gtest_output="xml:report.xml"
-    # - name: upload-test-report
-    #   if: failure()
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: test-result-macos
-    #     path: ${{ github.workspace }}\report.xml
+    - name: upload-test-report
+      if: always()
+      uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
+      with:
+        check_name: "MacOS Big Sur 11 Debug Build Unit Test Results Check"
+        comment_title: "MacOS Big Sur 11 Debug Build Unit Test Results"
+        files: ./odbc_test_result.xml
     # - name: print-memory-leak-logs
     #   if: always()
     #   run: |
