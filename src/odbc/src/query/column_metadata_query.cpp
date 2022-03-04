@@ -393,12 +393,14 @@ SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
   meta::ReadColumnMetaVector(resultSet, meta);
 
   for (size_t i = 0; i < meta.size(); ++i) {
+    if (meta[i].GetSchemaName() && meta[i].GetTableName()
+        && meta[i].GetColumnName() && meta[i].GetDataType())
     LOG_MSG("\n[" << i << "] SchemaName:     " << meta[i].GetSchemaName()
                   << "\n[" << i
                   << "] TableName:      " << meta[i].GetTableName() << "\n["
                   << i << "] ColumnName:     " << meta[i].GetColumnName()
                   << "\n[" << i << "] ColumnType:     "
-                  << static_cast< int32_t >(meta[i].GetDataType()));
+                  << static_cast< int32_t >(*meta[i].GetDataType()));
   }
 
   return SqlResult::AI_SUCCESS;
