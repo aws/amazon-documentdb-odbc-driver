@@ -29,10 +29,6 @@ const std::string REMARKS = "REMARKS";
 void TableMeta::Read(SharedPointer< ResultSet >& resultSet,
                      JniErrorInfo& errInfo) {
   bool wasNull;
-  catalogName = "";
-  schemaName = "";
-  tableName = "";
-  tableType = "";
   resultSet.Get()->GetString(TABLE_CAT, catalogName, wasNull, errInfo);
   resultSet.Get()->GetString(TABLE_SCHEM, schemaName, wasNull, errInfo);
   resultSet.Get()->GetString(TABLE_NAME, tableName, wasNull, errInfo);

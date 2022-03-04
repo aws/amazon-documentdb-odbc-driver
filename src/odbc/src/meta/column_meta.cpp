@@ -106,12 +106,6 @@ void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
                       int32_t& prevPosition, JniErrorInfo& errInfo) {
   bool wasNull;
   int intDataType;
-  catalogName = "";
-  schemaName = "";
-  tableName = "";
-  columnName = "";
-  remarks = "";
-  columnDef = "";
   resultSet.Get()->GetString(TABLE_CAT, catalogName, wasNull, errInfo);
   resultSet.Get()->GetString(TABLE_SCHEM, schemaName, wasNull, errInfo);
   resultSet.Get()->GetString(TABLE_NAME, tableName, wasNull, errInfo);
