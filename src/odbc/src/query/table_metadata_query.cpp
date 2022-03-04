@@ -231,7 +231,14 @@ SqlResult::Type TableMetadataQuery::MakeRequestGetTablesMeta() {
   std::vector< std::string > types;
   if (tableType.empty()) {
     types.emplace_back("TABLE");
+  } else {
+    std::stringstream ss(tableType);
+    std::string singleTableType;
+    while (std::getline(ss, singleTableType, ',')) {
+      types.push_back(dequote(trim(singleTableType)));
+    }
   }
+
   JniErrorInfo errInfo;
   SharedPointer< ResultSet > resultSet =
       databaseMetaData.Get()->GetTables(catalog, schema, table, types, errInfo);
@@ -251,6 +258,35 @@ SqlResult::Type TableMetadataQuery::MakeRequestGetTablesMeta() {
   }
 
   return SqlResult::AI_SUCCESS;
+}
+
+  std::string TableMetadataQuery::ltrim(const std::string& s) {
+  return std::regex_replace(s, std::regex("^\\s+"), std::string(""));
+}
+
+std::string TableMetadataQuery::rtrim(const std::string& s) {
+  return std::regex_replace(s, std::regex("\\s+$"), std::string(""));
+}
+
+std::string TableMetadataQuery::trim(const std::string& s) {
+  return ltrim(rtrim(s));
+}
+
+std::string TableMetadataQuery::dequote(const std::string& s) {
+  std::regex openSingleQuoteEx("^['].*");
+  std::regex closeSingleQuoteEx(".*[']$");
+  std::regex openDoubleQuoteEx("^[\"].*");
+  std::regex closeDoubleQuoteEx(".*[\"]$");
+  bool openSingleQuoteMatch = std::regex_match(s, openSingleQuoteEx);
+  bool closeSingleQuoteMatch = std::regex_match(s, closeSingleQuoteEx);
+  bool openDoubleQuoteMatch = std::regex_match(s, openDoubleQuoteEx);
+  bool closeDoubleQuoteMatch = std::regex_match(s, closeDoubleQuoteEx);
+
+  if ((openSingleQuoteMatch && closeSingleQuoteMatch)
+      || (openDoubleQuoteMatch && closeDoubleQuoteMatch)) {
+    return s.substr(1, s.size() - 2);
+  }
+  return s;
 }
 }  // namespace query
 }  // namespace odbc
