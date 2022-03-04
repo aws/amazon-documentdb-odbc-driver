@@ -88,8 +88,8 @@ class ColumnMeta {
    * @param typeName Type name.
    * @param dataType Data type.
    */
-  ColumnMeta(const boost::optional<std::string>& schemaName, const boost::optional<std::string>& tableName,
-             const boost::optional<std::string>& columnName, int16_t dataType,
+  ColumnMeta(const std::string& schemaName, const std::string& tableName,
+             const std::string& columnName, int16_t dataType,
              Nullability::Type nullability)
       : schemaName(schemaName),
         tableName(tableName),
