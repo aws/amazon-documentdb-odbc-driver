@@ -17,6 +17,7 @@
 
 #include "ignite/odbc/query/table_metadata_query.h"
 
+#include <regex>
 #include <vector>
 
 #include "ignite/odbc/impl/binary/binary_common.h"

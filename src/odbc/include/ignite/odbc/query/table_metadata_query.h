@@ -18,8 +18,6 @@
 #ifndef _IGNITE_ODBC_QUERY_TABLE_METADATA_QUERY
 #define _IGNITE_ODBC_QUERY_TABLE_METADATA_QUERY
 
-#include <regex>
-
 #include "ignite/odbc/meta/table_meta.h"
 #include "ignite/odbc/query/query.h"
 
