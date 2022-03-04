@@ -885,7 +885,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
 
   bool errorExpected = false;
   BOOST_CHECK_EQUAL(
-      false, WasNull(table_cat_len));  // TODO: change to true when nullable
+      true, WasNull(table_cat_len));
   BOOST_CHECK_EQUAL("", table_cat);    // TABLE_CAT
   BOOST_CHECK_EQUAL(false, WasNull(table_schem_len));
   BOOST_CHECK_EQUAL("test", table_schem);  // TABLE_SCHEM
@@ -911,12 +911,12 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   BOOST_CHECK_EQUAL(false, WasNull(nullable_len));
   BOOST_CHECK_EQUAL(SQL_NO_NULLS, nullable);  // NULLABLE
   BOOST_CHECK_EQUAL(
-      false,
-      WasNull(remarks_len));  // TODO: change to true whan nullable supported
+      true,
+      WasNull(remarks_len));
   BOOST_CHECK_EQUAL("", remarks);  // REMARKS
   BOOST_CHECK_EQUAL(
-      false,
-      WasNull(column_def_len));  // TODO: change to true whan nullable supported
+      true,
+      WasNull(column_def_len));
   BOOST_CHECK_EQUAL("", column_def);  // COLUMN_DEF
   BOOST_CHECK_EQUAL(false, WasNull(sql_data_type_len));
   BOOST_CHECK_EQUAL(SQL_VARCHAR, sql_data_type);  // SQL_DATA_TYPE
