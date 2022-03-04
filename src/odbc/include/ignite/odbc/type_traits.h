@@ -242,7 +242,7 @@ int16_t BinaryTypeNullability(int16_t);
  *         zero-length string if it is not known whether the
  *         column accepts NULL values.
  */
-boost::optional<std::string> NullabilityToIsNullable(boost::optional<int16_t> nullability);
+boost::optional<std::string> NullabilityToIsNullable(boost::optional<int32_t> nullability);
 
 /**
  * Get SQL type display size.

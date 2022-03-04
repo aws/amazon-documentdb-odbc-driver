@@ -481,7 +481,7 @@ int16_t BinaryTypeNullability(int16_t) {
 }
 
 boost::optional< std::string > NullabilityToIsNullable(
-    boost::optional< int16_t > nullability) {
+    boost::optional< int32_t > nullability) {
   if (!nullability)
     return boost::none;
   switch (*nullability) {
