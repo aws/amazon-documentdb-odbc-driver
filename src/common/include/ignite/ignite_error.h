@@ -30,6 +30,10 @@
 
 #include <ignite/common/common.h>
 
+//Define can be removed once the duplicated code was removed
+#ifndef _IGNITE_ERROR_MACRO
+#define _IGNITE_ERROR_MACRO
+
 #define IGNITE_ERROR_1(code, part1) { \
     std::stringstream stream; \
     stream << (part1); \
@@ -71,6 +75,8 @@
     stream << msg << " [" << key1 << "=" << (val1) << ", " << key2 << "=" << (val2) << ", " << key3 << "=" << (val3) << ", " << key4 << "=" << (val4) << "]"; \
     throw ignite::IgniteError(code, stream.str().c_str()); \
 }
+
+#endif //_IGNITE_ERROR_MACRO
 
 #ifdef _MSC_VER
 #   pragma warning(push)
