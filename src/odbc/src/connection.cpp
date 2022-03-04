@@ -691,7 +691,6 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
   try {
     std::string mongoCPPConnectionString =
         FormatMongoCppConnectionString(localSSHTunnelPort);
-    const auto uri = mongocxx::uri{mongoCPPConnectionString};
     mongocxx::options::client client_options;
     mongocxx::options::tls tls_options;
     if (config.IsTls()) {
@@ -702,7 +701,8 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
 
       client_options.tls_opts(tls_options);
     }
-    auto client1 = mongocxx::client{uri, client_options};
+    auto client1 = mongocxx::client{mongocxx::uri{mongoCPPConnectionString},
+                                    client_options};
 
     std::string database = config.GetDatabase();
     bsoncxx::builder::stream::document ping;
