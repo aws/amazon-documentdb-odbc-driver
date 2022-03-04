@@ -106,7 +106,7 @@ class TableMeta {
    * Get catalog name.
    * @return Catalog name.
    */
-  const std::string& GetCatalogName() const {
+  const boost::optional<std::string>& GetCatalogName() const {
     return catalogName;
   }
 
@@ -114,7 +114,7 @@ class TableMeta {
    * Get schema name.
    * @return Schema name.
    */
-  const std::string& GetSchemaName() const {
+  const boost::optional<std::string>& GetSchemaName() const {
     return schemaName;
   }
 
@@ -122,7 +122,7 @@ class TableMeta {
    * Get table name.
    * @return Table name.
    */
-  const std::string& GetTableName() const {
+  const boost::optional<std::string>& GetTableName() const {
     return tableName;
   }
 
@@ -130,7 +130,7 @@ class TableMeta {
    * Get table type.
    * @return Table type.
    */
-  const std::string& GetTableType() const {
+  const boost::optional<std::string>& GetTableType() const {
     return tableType;
   }
 
@@ -138,25 +138,25 @@ class TableMeta {
    * Get the remarks.
    * @return Remarks.
    */
-  const std::string& GetRemarks() const {
+  const boost::optional<std::string>& GetRemarks() const {
     return remarks;
   }
 
  private:
   /** Catalog name. */
-  std::string catalogName;
+  boost::optional<std::string> catalogName;
 
   /** Schema name. */
-  std::string schemaName;
+  boost::optional<std::string> schemaName;
 
   /** Table name. */
-  std::string tableName;
+  boost::optional<std::string> tableName;
 
   /** Table type. */
-  std::string tableType;
+  boost::optional<std::string> tableType;
 
   /** Remarks */
-  std::string remarks;
+  boost::optional<std::string> remarks;
 };
 
 /** Table metadata vector alias. */
