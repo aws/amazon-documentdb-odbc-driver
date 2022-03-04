@@ -22,6 +22,8 @@
 
 #include <string>
 
+#include <boost/optional.hpp>
+
 namespace ignite {
 namespace odbc {
 namespace type_traits {
@@ -176,7 +178,8 @@ class SqlTypeName {
  * @param binaryType Binary type.
  * @return Corresponding SQL type name.
  */
-const std::string& BinaryTypeToSqlTypeName(int16_t binaryType);
+const const boost::optional< std::string >& BinaryTypeToSqlTypeName(
+    boost::optional< int16_t > binaryType);
 
 /**
  * Check if the C type supported by the current implementation.
@@ -184,7 +187,7 @@ const std::string& BinaryTypeToSqlTypeName(int16_t binaryType);
  * @param type Application type.
  * @return True if the type is supported.
  */
-bool IsApplicationTypeSupported(int16_t type);
+bool IsApplicationTypeSupported(boost::optional<int16_t> type);
 
 /**
  * Check if the SQL type supported by the current implementation.
@@ -192,7 +195,7 @@ bool IsApplicationTypeSupported(int16_t type);
  * @param type Application type.
  * @return True if the type is supported.
  */
-bool IsSqlTypeSupported(int16_t type);
+bool IsSqlTypeSupported(boost::optional<int16_t> type);
 
 /**
  * Get corresponding binary type for ODBC SQL type.
@@ -200,7 +203,7 @@ bool IsSqlTypeSupported(int16_t type);
  * @param sqlType SQL type.
  * @return Binary type.
  */
-int16_t SqlTypeToBinary(int16_t sqlType);
+boost::optional<int16_t> SqlTypeToBinary(boost::optional< int16_t > sqlType);
 
 /**
  * Convert ODBC type to driver type alias.
@@ -216,7 +219,8 @@ OdbcNativeType::Type ToDriverType(int16_t type);
  * @param binaryType Binary data type.
  * @return SQL data type.
  */
-int16_t BinaryToSqlType(int16_t binaryType);
+boost::optional< int16_t > BinaryToSqlType(
+    boost::optional< int16_t > binaryType);
 
 /**
  * Get binary type SQL nullability.
@@ -227,7 +231,7 @@ int16_t BinaryToSqlType(int16_t binaryType);
  *         SQL_NULLABLE_UNKNOWN if it is not known whether the
  *         column accepts NULL values.
  */
-int16_t BinaryTypeNullability(int16_t binaryType);
+int16_t BinaryTypeNullability(int16_t);
 
 /**
  * Get binary type SQL nullability.
@@ -238,7 +242,7 @@ int16_t BinaryTypeNullability(int16_t binaryType);
  *         zero-length string if it is not known whether the
  *         column accepts NULL values.
  */
-std::string NullabilityToIsNullable(int16_t nullability);
+boost::optional<std::string> NullabilityToIsNullable(boost::optional<int16_t> nullability);
 
 /**
  * Get SQL type display size.
@@ -246,7 +250,7 @@ std::string NullabilityToIsNullable(int16_t nullability);
  * @param type SQL type.
  * @return Display size.
  */
-int32_t SqlTypeDisplaySize(int16_t type);
+boost::optional<int32_t> SqlTypeDisplaySize(boost::optional<int16_t> type);
 
 /**
  * Get binary type display size.
@@ -254,7 +258,7 @@ int32_t SqlTypeDisplaySize(int16_t type);
  * @param type Binary type.
  * @return Display size.
  */
-int32_t BinaryTypeDisplaySize(int16_t type);
+boost::optional<int32_t> BinaryTypeDisplaySize(boost::optional<int16_t> type);
 
 /**
  * Get SQL type column size.
@@ -262,7 +266,7 @@ int32_t BinaryTypeDisplaySize(int16_t type);
  * @param type SQL type.
  * @return Column size.
  */
-int32_t SqlTypeColumnSize(int16_t type);
+boost::optional<int32_t> SqlTypeColumnSize(boost::optional<int16_t> type);
 
 /**
  * Get binary type column size.
@@ -270,7 +274,7 @@ int32_t SqlTypeColumnSize(int16_t type);
  * @param type Binary type.
  * @return Column size.
  */
-int32_t BinaryTypeColumnSize(int16_t type);
+boost::optional<int32_t> BinaryTypeColumnSize(boost::optional<int16_t> type);
 
 /**
  * Get SQL type transfer octet length.
@@ -278,7 +282,7 @@ int32_t BinaryTypeColumnSize(int16_t type);
  * @param type SQL type.
  * @return Transfer octet length.
  */
-int32_t SqlTypeTransferLength(int16_t type);
+boost::optional<int32_t> SqlTypeTransferLength(boost::optional<int16_t> type);
 
 /**
  * Get binary type transfer octet length.
@@ -286,7 +290,7 @@ int32_t SqlTypeTransferLength(int16_t type);
  * @param type Binary type.
  * @return Transfer octet length.
  */
-int32_t BinaryTypeTransferLength(int16_t type);
+boost::optional<int32_t> BinaryTypeTransferLength(boost::optional<int16_t> type);
 
 /**
  * Get SQL type numeric precision radix.
@@ -294,7 +298,7 @@ int32_t BinaryTypeTransferLength(int16_t type);
  * @param type SQL type.
  * @return Numeric precision radix.
  */
-int32_t SqlTypeNumPrecRadix(int16_t type);
+boost::optional<int32_t> SqlTypeNumPrecRadix(boost::optional<int16_t> type);
 
 /**
  * Get binary type numeric precision radix.
@@ -302,7 +306,7 @@ int32_t SqlTypeNumPrecRadix(int16_t type);
  * @param type Binary type.
  * @return Numeric precision radix.
  */
-int32_t BinaryTypeNumPrecRadix(int16_t type);
+boost::optional<int32_t> BinaryTypeNumPrecRadix(boost::optional<int16_t> type);
 
 /**
  * Get SQL type decimal digits.
@@ -310,7 +314,7 @@ int32_t BinaryTypeNumPrecRadix(int16_t type);
  * @param type SQL type.
  * @return Decimal digits.
  */
-int32_t SqlTypeDecimalDigits(int16_t type);
+boost::optional<int32_t> SqlTypeDecimalDigits(boost::optional<int16_t> type);
 
 /**
  * Get binary type decimal digits.
@@ -318,7 +322,7 @@ int32_t SqlTypeDecimalDigits(int16_t type);
  * @param type Binary type.
  * @return Decimal digits.
  */
-int32_t BinaryTypeDecimalDigits(int16_t type);
+boost::optional<int32_t> BinaryTypeDecimalDigits(boost::optional<int16_t> type);
 
 /**
  * Get SQL type char octet length.
@@ -326,7 +330,7 @@ int32_t BinaryTypeDecimalDigits(int16_t type);
  * @param type SQL type.
  * @return Char octet length.
  */
-int32_t SqlTypeCharOctetLength(int16_t type);
+boost::optional<int32_t> SqlTypeCharOctetLength(boost::optional<int16_t> type);
 
 /**
  * Get binary type char octet length.
@@ -334,7 +338,7 @@ int32_t SqlTypeCharOctetLength(int16_t type);
  * @param type Binary type.
  * @return Char octet length.
  */
-int32_t BinaryTypeCharOctetLength(int16_t type);
+boost::optional<int32_t> BinaryTypeCharOctetLength(boost::optional<int16_t> type);
 
 /**
  * Checks if the SQL type is unsigned.
@@ -342,7 +346,7 @@ int32_t BinaryTypeCharOctetLength(int16_t type);
  * @param type SQL type.
  * @return True if unsigned or non-numeric.
  */
-bool SqlTypeUnsigned(int16_t type);
+bool SqlTypeUnsigned(boost::optional<int16_t> type);
 
 /**
  * Checks if the binary type is unsigned.
@@ -350,7 +354,7 @@ bool SqlTypeUnsigned(int16_t type);
  * @param type Binary type.
  * @return True if unsigned or non-numeric.
  */
-bool BinaryTypeUnsigned(int16_t type);
+bool BinaryTypeUnsigned(boost::optional<int16_t> type);
 }  // namespace type_traits
 }  // namespace odbc
 }  // namespace ignite
