@@ -232,7 +232,7 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
   }
 
   const meta::ColumnMeta& currentColumn = *cursor;
-  uint8_t columnType = currentColumn.GetDataType();
+  boost::optional< int16_t > columnType = currentColumn.GetDataType();
 
   switch (columnIdx) {
     case ResultColumn::TABLE_CAT: {
@@ -256,48 +256,49 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::DATA_TYPE: {
-      buffer.PutInt16(type_traits::BinaryToSqlType(columnType));
+      buffer.PutOptInt16(type_traits::BinaryToSqlType(columnType));
       break;
     }
 
     case ResultColumn::TYPE_NAME: {
-      buffer.PutOptString(
-          type_traits::BinaryTypeToSqlTypeName(currentColumn.GetDataType()));
+        buffer.PutOptString(
+            type_traits::BinaryTypeToSqlTypeName(columnType));
       break;
     }
 
     case ResultColumn::COLUMN_SIZE: {
-      buffer.PutInt32(type_traits::BinaryTypeColumnSize(columnType));
+      buffer.PutOptInt32(type_traits::BinaryTypeColumnSize(columnType));
       break;
     }
 
     case ResultColumn::BUFFER_LENGTH: {
-      buffer.PutInt32(type_traits::BinaryTypeTransferLength(columnType));
+      buffer.PutOptInt32(type_traits::BinaryTypeTransferLength(columnType));
       break;
     }
 
     case ResultColumn::DECIMAL_DIGITS: {
       // todo implement the function for getting the decimal digits:
       // https://bitquill.atlassian.net/browse/AD-615
-      int32_t decDigits = type_traits::BinaryTypeDecimalDigits(columnType);
-      if (decDigits < 0)
+      boost::optional<int32_t> decDigits = type_traits::BinaryTypeDecimalDigits(columnType);
+      if (!decDigits || decDigits < 0)
         buffer.PutNull();
       else
-        buffer.PutInt16(static_cast< int16_t >(decDigits));
+        buffer.PutInt16(static_cast< int16_t >(*decDigits));
       break;
     }
 
     case ResultColumn::NUM_PREC_RADIX: {
-      int32_t numPrecRadix = type_traits::BinaryTypeNumPrecRadix(columnType);
-      if (numPrecRadix < 0)
+      boost::optional< int32_t > numPrecRadix =
+          type_traits::BinaryTypeNumPrecRadix(columnType);
+      if (!numPrecRadix || numPrecRadix < 0)
         buffer.PutNull();
       else
-        buffer.PutInt16(static_cast< int16_t >(numPrecRadix));
+        buffer.PutInt16(static_cast< int16_t >(*numPrecRadix));
       break;
     }
 
     case ResultColumn::NULLABLE: {
-      buffer.PutInt16(currentColumn.GetNullability());
+      buffer.PutOptInt32(currentColumn.GetNullability());
       break;
     }
 
@@ -312,7 +313,7 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::SQL_DATA_TYPE: {
-      buffer.PutInt16(type_traits::BinaryToSqlType(columnType));
+      buffer.PutOptInt16(type_traits::BinaryToSqlType(columnType));
       break;
     }
 
@@ -324,18 +325,18 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::CHAR_OCTET_LENGTH: {
-      buffer.PutInt32(type_traits::BinaryTypeCharOctetLength(columnType));
+      buffer.PutOptInt32(type_traits::BinaryTypeCharOctetLength(columnType));
       break;
     }
 
     case ResultColumn::ORDINAL_POSITION: {
-      buffer.PutInt32(currentColumn.GetOrdinalPosition());
+      buffer.PutOptInt32(currentColumn.GetOrdinalPosition());
       break;
     }
 
     case ResultColumn::IS_NULLABLE: {
-      buffer.PutOptString(
-          type_traits::NullabilityToIsNullable(currentColumn.GetNullability()));
+        buffer.PutOptString(type_traits::NullabilityToIsNullable(
+            currentColumn.GetNullability()));
       break;
     }
 

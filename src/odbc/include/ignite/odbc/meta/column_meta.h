@@ -54,7 +54,7 @@ struct Nullability {
    * @param nullability Nullability.
    * @return SQL constant.
    */
-  static SqlLen ToSql(int32_t nullability);
+  static SqlLen ToSql(boost::optional< int32_t > nullability);
 };
 
 using namespace ignite::odbc;
@@ -208,7 +208,7 @@ class ColumnMeta {
    * Get data type.
    * @return Data type.
    */
-  int8_t GetDataType() const {
+  boost::optional< int16_t > GetDataType() const {
     return dataType;
   }
 
@@ -216,7 +216,7 @@ class ColumnMeta {
    * Get column precision.
    * @return Column precision.
    */
-  int32_t GetPrecision() const {
+  boost::optional< int32_t > GetPrecision() const {
     return precision;
   }
 
@@ -224,7 +224,7 @@ class ColumnMeta {
    * Get column scale.
    * @return Column scale.
    */
-  int32_t GetScale() const {
+  boost::optional< int32_t > GetScale() const {
     return scale;
   }
 
@@ -232,7 +232,7 @@ class ColumnMeta {
    * Get column nullability.
    * @return Column nullability.
    */
-  int32_t GetNullability() const {
+  boost::optional< int32_t > GetNullability() const {
     return nullability;
   }
 
@@ -240,7 +240,7 @@ class ColumnMeta {
    * Get column ordinal position.
    * @return Column ordinal position.
    */
-  int32_t GetOrdinalPosition() const {
+  boost::optional< int32_t > GetOrdinalPosition() const {
     return ordinalPosition;
   }
 
@@ -282,19 +282,19 @@ class ColumnMeta {
   boost::optional< std::string > columnDef;
 
   /** Data type. */
-  int16_t dataType;
+  boost::optional< int16_t > dataType;
 
   /** Column precision. */
-  int32_t precision;
+  boost::optional< int32_t > precision;
 
   /** Column scale. */
-  int32_t scale;
+  boost::optional< int32_t > scale;
 
   /** Column nullability. */
-  int32_t nullability;
+  boost::optional< int32_t > nullability;
 
   /** Column ordinal position. */
-  int32_t ordinalPosition;
+  boost::optional< int32_t > ordinalPosition;
 };
 
 /** Column metadata vector alias. */
