@@ -94,6 +94,13 @@ jobs:
       run: |
         .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
 
+    - name: Setup MongoDB
+      run: |
+        ./src/odbc-test/scripts/reinstall_mongodb.ps1
+    - name: Import test data
+      run: |
+        ./src/odbc-test/scripts/import_test_data.ps1
+
     - name: run-tests
       run: |
         Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
@@ -195,6 +202,13 @@ jobs:
       run: |
         .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
 
+    - name: Setup MongoDB
+      run: |
+        ./src/odbc-test/scripts/reinstall_mongodb.ps1
+    - name: Import test data
+      run: |
+        ./src/odbc-test/scripts/import_test_data.ps1
+
     - name: run-tests
       run: |
         Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
@@ -281,12 +295,20 @@ jobs:
       run: |
         .\src\odbc\install\install_amd64.cmd ${{env.ODBC_DEBUG_PATH}}\ignite.odbc.dll
 
+    - name: Setup MongoDB
+      run: |
+        ./src/odbc-test/scripts/reinstall_mongodb.ps1
+    - name: Import test data
+      run: |
+        ./src/odbc-test/scripts/import_test_data.ps1
+
     - name: run-tests
       env:
         DOCUMENTDB_HOME: "./build/odbc/bin/Debug"
       run: |
         Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
         opencppcoverage --sources src --export_type html:coverage --excluded_modules boost_unit_test_framework --excluded_modules ignite-odbc-tests --excluded_modules mongoc --excluded_modules mongocxx --excluded_modules bson --excluded_modules bsoncxx --excluded_modules zlib -- ${{env.ODBC_DEBUG_PATH}}/ignite-odbc-tests.exe
+
     - name: upload-coverage
       if: always()
       uses: actions/upload-artifact@v2

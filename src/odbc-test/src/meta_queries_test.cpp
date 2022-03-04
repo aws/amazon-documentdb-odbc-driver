@@ -62,8 +62,14 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
       const char *expectedValue = nullptr) const {
     SQLRETURN ret = SQLFetch(stmt);
 
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+    if (!SQL_SUCCEEDED(ret)) {
+      BOOST_CHECK(ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO);
+      std::string sqlMessage = GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt);
+      if (sqlMessage.empty()) {
+        sqlMessage.append("SQLFetch returned: " + std::to_string(ret));
+      }
+      BOOST_FAIL(sqlMessage);
+    }
 
     char buf[1024];
     SQLLEN bufLen = sizeof(buf);
@@ -718,6 +724,25 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOne) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   CheckSingleRowResultSetWithGetData(stmt, 2, "test");
+}
+
+BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneFromLocalServer) {
+  SQLCHAR empty[] = "";
+  SQLCHAR table[] = "meta_queries_test_001";
+
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
+                            SQL_NTS, empty, SQL_NTS);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  CheckSingleRowResultSetWithGetData(stmt, 3, "meta_queries_test_001");
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsNone) {
