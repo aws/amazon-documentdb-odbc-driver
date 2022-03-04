@@ -24,6 +24,7 @@
 #include <ignite/odbc/time.h>
 #include <ignite/odbc/timestamp.h>
 #include <stdint.h>
+#include <boost/optional.hpp>
 
 #include <map>
 
@@ -168,6 +169,15 @@ class ApplicationDataBuffer {
    * @return Conversion result.
    */
   ConversionResult::Type PutDouble(double value);
+
+  /**
+   * Put in buffer value of type string.
+   *
+   * @param optional value Value.
+   * @return Conversion result.
+   */
+  ConversionResult::Type PutOptString(
+      const boost::optional< std::string >& value);
 
   /**
    * Put in buffer value of type string.

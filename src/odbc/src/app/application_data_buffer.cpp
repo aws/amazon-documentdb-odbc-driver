@@ -353,6 +353,15 @@ ConversionResult::Type ApplicationDataBuffer::PutDouble(double value) {
   return PutNum(value);
 }
 
+ConversionResult::Type ApplicationDataBuffer::PutOptString(
+    const boost::optional< std::string >& value) {
+  if (value)
+    return PutString(*value);
+  else
+    return PutNull();
+}
+
+
 ConversionResult::Type ApplicationDataBuffer::PutString(
     const std::string& value) {
   int32_t written = 0;
