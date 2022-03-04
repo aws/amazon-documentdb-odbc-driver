@@ -84,7 +84,6 @@ add_subdirectory(binary)
 
 if (${WITH_CORE} OR ${WITH_TESTS})
     add_subdirectory(core)
-    add_subdirectory(ignite)
 endif()
 
 if (${WITH_TESTS})
@@ -97,10 +96,6 @@ if (${WITH_TESTS})
     if (EXISTS ${CMAKE_SOURCE_DIR}/tests)
         add_subdirectory(tests)
     endif()
-endif()
-
-if (${WITH_ODBC})
-    add_subdirectory(network)
 endif()
 
 if (${WITH_ODBC})

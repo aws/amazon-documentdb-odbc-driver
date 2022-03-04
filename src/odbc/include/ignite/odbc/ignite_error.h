@@ -29,6 +29,10 @@
 #include <exception>
 #include <sstream>
 
+//Define can be removed once the duplicated code was removed
+#ifndef _IGNITE_ERROR_MACRO
+#define _IGNITE_ERROR_MACRO
+
 #define IGNITE_ERROR_1(code, part1)                        \
   {                                                        \
     std::stringstream stream;                              \
@@ -83,6 +87,8 @@
            << (val4) << "]";                                                 \
     throw IgniteError(code, stream.str().c_str());                   \
   }
+
+#endif //_IGNITE_ERROR_MACRO
 
 #ifdef _MSC_VER
 #pragma warning(push)
