@@ -17,8 +17,8 @@
 
 #include "ignite/odbc/streaming/streaming_batch.h"
 
-#include "ignite/impl/binary/binary_writer_impl.h"
-#include "ignite/impl/interop/interop_output_stream.h"
+#include "ignite/odbc/impl/binary/binary_writer_impl.h"
+#include "ignite/odbc/impl/interop/interop_output_stream.h"
 #include "ignite/odbc/app/parameter_set.h"
 
 namespace ignite {
