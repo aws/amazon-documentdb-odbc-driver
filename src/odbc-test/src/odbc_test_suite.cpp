@@ -22,6 +22,7 @@
 #include <ignite/odbc/common/fixed_size_array.h>
 #include <sql.h>
 #include <sqlext.h>
+#include <fstream>
 
 #include <boost/test/unit_test.hpp>
 
@@ -30,6 +31,23 @@
 
 using namespace ignite_test;
 using namespace boost::unit_test;
+
+/**
+ * Test setup config for test results
+ */
+struct OdbcConfig {
+  OdbcConfig() : test_log("odbc_test_result.xml") {
+    unit_test_log.set_stream(test_log);
+    unit_test_log.set_format(OF_JUNIT);
+  }
+  ~OdbcConfig() {
+    unit_test_log.set_stream(std::cout);
+  }
+
+  std::ofstream test_log;
+};
+
+BOOST_GLOBAL_FIXTURE(OdbcConfig);
 
 namespace ignite {
 namespace odbc {
