@@ -121,7 +121,6 @@ TypeInfoQuery::TypeInfoQuery(diagnostic::DiagnosableAdapter& diag,
       types(),
       cursor(types.end()) {
   using namespace ignite::odbc::impl::binary;
-  using namespace ignite::odbc::impl::binary;
   using namespace ignite::odbc::type_traits;
 
   using meta::ColumnMeta;

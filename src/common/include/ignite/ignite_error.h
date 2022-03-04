@@ -20,8 +20,8 @@
  * Declares ignite::IgniteError class.
  */
 
-#ifndef _IGNITE_ODBC_IGNITE_ERROR
-#define _IGNITE_ODBC_IGNITE_ERROR
+#ifndef _IGNITE_IGNITE_ERROR
+#define _IGNITE_IGNITE_ERROR
 
 #include <stdint.h>
 
@@ -29,6 +29,10 @@
 #include <sstream>
 
 #include <ignite/common/common.h>
+
+//Define can be removed once the duplicated code was removed
+#ifndef _IGNITE_ERROR_MACRO
+#define _IGNITE_ERROR_MACRO
 
 #define IGNITE_ERROR_1(code, part1) { \
     std::stringstream stream; \
@@ -71,6 +75,8 @@
     stream << msg << " [" << key1 << "=" << (val1) << ", " << key2 << "=" << (val2) << ", " << key3 << "=" << (val3) << ", " << key4 << "=" << (val4) << "]"; \
     throw ignite::IgniteError(code, stream.str().c_str()); \
 }
+
+#endif //_IGNITE_ERROR_MACRO
 
 #ifdef _MSC_VER
 #   pragma warning(push)
@@ -310,4 +316,4 @@ namespace ignite
 #   pragma warning(pop)
 #endif //_MSC_VER
 
-#endif //_IGNITE_ODBC_IGNITE_ERROR
+#endif //_IGNITE_IGNITE_ERROR
