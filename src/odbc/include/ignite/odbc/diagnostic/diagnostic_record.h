@@ -18,7 +18,7 @@
 #ifndef _IGNITE_ODBC_DIAGNOSTIC_DIAGNOSTIC_RECORD
 #define _IGNITE_ODBC_DIAGNOSTIC_DIAGNOSTIC_RECORD
 
-#include <ignite/common/common.h>
+#include <ignite/odbc/common/common.h>
 #include <stdint.h>
 
 #include <vector>
