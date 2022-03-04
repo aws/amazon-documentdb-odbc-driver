@@ -797,8 +797,7 @@ JniErrorCode JniContext::DriverManagerGetConnection(
     connection = nullptr;
     return errInfo.code;
   }
-  connection = SharedPointer< GlobalJObject >(
-      new GlobalJObject(env, env->NewGlobalRef(result)));
+  connection = new GlobalJObject(env, env->NewGlobalRef(result));
   return errInfo.code;
 }
 
@@ -870,8 +869,7 @@ JniErrorCode JniContext::DocumentDbConnectionGetDatabaseMetadata(
     return errInfo.code;
   }
 
-  metadata = SharedPointer< GlobalJObject >(
-      new GlobalJObject(env, env->NewGlobalRef(result)));
+  metadata = new GlobalJObject(env, env->NewGlobalRef(result));
   return errInfo.code;
 }
 
@@ -921,8 +919,7 @@ JniErrorCode JniContext::ConnectionGetMetaData(
     return errInfo.code;
   }
 
-  databaseMetaData = SharedPointer< GlobalJObject >(
-      new GlobalJObject(env, env->NewGlobalRef(result)));
+  databaseMetaData = new GlobalJObject(env, env->NewGlobalRef(result));
   return errInfo.code;
 }
 
@@ -956,12 +953,11 @@ JniErrorCode JniContext::DatabaseMetaDataGetTables(
   ExceptionCheck(env, &errInfo);
 
   if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    resultSet = SharedPointer< GlobalJObject >(nullptr);
+    resultSet = nullptr;
     return errInfo.code;
   }
 
-  resultSet = SharedPointer< GlobalJObject >(
-      new GlobalJObject(env, env->NewGlobalRef(result)));
+  resultSet = new GlobalJObject(env, env->NewGlobalRef(result));
   return errInfo.code;
 }
 
