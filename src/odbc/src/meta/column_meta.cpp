@@ -136,20 +136,20 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
     case SQL_DESC_LABEL:
     case SQL_DESC_BASE_COLUMN_NAME:
     case SQL_DESC_NAME: {
-      value = columnName;
+      value = *columnName;
 
       return true;
     }
 
     case SQL_DESC_TABLE_NAME:
     case SQL_DESC_BASE_TABLE_NAME: {
-      value = tableName;
+      value = *tableName;
 
       return true;
     }
 
     case SQL_DESC_SCHEMA_NAME: {
-      value = schemaName;
+      value = *schemaName;
 
       return true;
     }
@@ -297,7 +297,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     }
 
     case SQL_DESC_UNNAMED: {
-      value = columnName.empty() ? SQL_UNNAMED : SQL_NAMED;
+      value = columnName->empty() ? SQL_UNNAMED : SQL_NAMED;
 
       break;
     }
