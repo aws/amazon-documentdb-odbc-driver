@@ -62,8 +62,14 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
       const char *expectedValue = nullptr) const {
     SQLRETURN ret = SQLFetch(stmt);
 
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+    if (!SQL_SUCCEEDED(ret)) {
+      BOOST_CHECK(ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO);
+      std::string sqlMessage = GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt);
+      if (sqlMessage.empty()) {
+        sqlMessage.append("SQLFetch returned: " + std::to_string(ret));
+      }
+      BOOST_FAIL(sqlMessage);
+    }
 
     char buf[1024];
     SQLLEN bufLen = sizeof(buf);
