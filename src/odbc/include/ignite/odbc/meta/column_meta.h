@@ -23,7 +23,7 @@
 #include <string>
 
 #include <boost/optional.hpp>
-#include <boost/optional/optional_io.hpp >
+#include <boost/optional/optional_io.hpp>
 
 #include "ignite/impl/binary/binary_reader_impl.h"
 #include "ignite/odbc/common_types.h"
