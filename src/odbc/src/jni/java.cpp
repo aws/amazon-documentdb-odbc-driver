@@ -228,6 +228,7 @@ JniMethod const M_RECORD_SET_GET_INT_BY_INDEX =
     JniMethod("getInt", "(I)I", false);
 JniMethod const M_RECORD_SET_GET_INT_BY_NAME =
     JniMethod("getInt", "(Ljava/lang/String;)I", false);
+JniMethod const M_RECORD_SET_GET_ROW = JniMethod("getRow", "()I", false);
 JniMethod const M_RECORD_SET_WAS_NULL = JniMethod("wasNull", "()Z", false);
 
 const char* const C_DATABASE_META_DATA = "java/sql/DatabaseMetaData";
@@ -235,6 +236,11 @@ JniMethod const M_DATABASE_META_DATA_GET_TABLES =
     JniMethod("getTables",
               "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/"
               "lang/String;)Ljava/sql/ResultSet;",
+              false);
+JniMethod const M_DATABASE_META_DATA_GET_COLUMNS =
+    JniMethod("getColumns",
+              "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/"
+              "String;Ljava/lang/String;)Ljava/sql/ResultSet;",
               false);
 
 const char* const C_DOCUMENTDB_CONNECTION =
@@ -498,11 +504,14 @@ void JniMembers::Initialize(JNIEnv* env) {
       FindMethod(env, c_ResultSet, M_RECORD_SET_GET_INT_BY_INDEX);
   m_ResultSetGetIntByName =
       FindMethod(env, c_ResultSet, M_RECORD_SET_GET_INT_BY_NAME);
+  m_ResultSetGetRow = FindMethod(env, c_ResultSet, M_RECORD_SET_GET_ROW);
   m_ResultSetWasNull = FindMethod(env, c_ResultSet, M_RECORD_SET_WAS_NULL);
 
   c_DatabaseMetaData = FindClass(env, C_DATABASE_META_DATA);
   m_DatabaseMetaDataGetTables =
       FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_TABLES);
+  m_DatabaseMetaDataGetColumns =
+      FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_COLUMNS);
 
   c_Connection = FindClass(env, C_JAVA_SQL_CONNECTION);
   m_ConnectionClose =
@@ -961,6 +970,38 @@ JniErrorCode JniContext::DatabaseMetaDataGetTables(
   return errInfo.code;
 }
 
+JniErrorCode JniContext::DatabaseMetaDataGetColumns(
+    const SharedPointer< GlobalJObject >& databaseMetaData,
+    const std::string& catalog, const std::string& schemaPattern,
+    const std::string& tableNamePattern, const std::string& columnNamePattern,
+    SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo) {
+  if (databaseMetaData.Get() == nullptr) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "DatabaseMetaData object must be set.";
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  jstring jCatalog = env->NewStringUTF(catalog.c_str());
+  jstring jSchemaPattern = env->NewStringUTF(schemaPattern.c_str());
+  jstring jTableNamePattern = env->NewStringUTF(tableNamePattern.c_str());
+  jstring jColumnNamePattern = env->NewStringUTF(columnNamePattern.c_str());
+
+  jobject result = env->CallObjectMethod(
+      databaseMetaData.Get()->GetRef(),
+      jvm->GetMembers().m_DatabaseMetaDataGetColumns, jCatalog, jSchemaPattern,
+      jTableNamePattern, jColumnNamePattern);
+  ExceptionCheck(env, &errInfo);
+
+  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    resultSet = nullptr;
+    return errInfo.code;
+  }
+
+  resultSet = new GlobalJObject(env, env->NewGlobalRef(result));
+  return errInfo.code;
+}
+
 JniErrorCode JniContext::ResultSetClose(
     const SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo) {
   if (resultSet.Get() == nullptr) {
@@ -1090,6 +1131,26 @@ JniErrorCode JniContext::ResultSetGetInt(
   jint result = env->CallIntMethod(resultSet.Get()->GetRef(),
                                    jvm->GetMembers().m_ResultSetGetIntByName,
                                    jColumnName);
+  ExceptionCheck(env, &errInfo);
+  if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    value = result;
+    return ResultSetWasNull(resultSet, wasNull, errInfo);
+  }
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::ResultSetGetRow(
+    const SharedPointer< GlobalJObject >& resultSet, int& value, bool& wasNull,
+    JniErrorInfo& errInfo) {
+  if (resultSet.Get() == nullptr) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "ResultSet object must be set.";
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  jint result = env->CallIntMethod(resultSet.Get()->GetRef(),
+                                   jvm->GetMembers().m_ResultSetGetRow);
   ExceptionCheck(env, &errInfo);
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     value = result;
@@ -1420,6 +1481,9 @@ void JniContext::ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) {
     }
 
     env->DeleteLocalRef(err);
+  } else if (errInfo) {
+      JniErrorInfo errInfo0(JniErrorCode::IGNITE_JNI_ERR_SUCCESS, "", "");
+      *errInfo = errInfo0;
   }
 }
 

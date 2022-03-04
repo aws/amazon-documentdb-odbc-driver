@@ -48,6 +48,12 @@ set(SOURCES
          src/test_utils.cpp
          src/dummy_test.cpp
          ../odbc/src/app/application_data_buffer.cpp
+         ../odbc/src/binary/binary_containers.cpp
+         ../odbc/src/binary/binary_raw_writer.cpp
+         ../odbc/src/binary/binary_writer.cpp
+         ../odbc/src/binary/binary_reader.cpp
+         ../odbc/src/binary/binary_type.cpp
+         ../odbc/src/binary/binary_raw_reader.cpp
          ../odbc/src/common_types.cpp
          ../odbc/src/common/big_integer.cpp
          ../odbc/src/common/bits.cpp
@@ -65,6 +71,20 @@ set(SOURCES
          ../odbc/src/config/config_tools.cpp
          ../odbc/src/config/connection_info.cpp
          ../odbc/src/config/connection_string_parser.cpp
+         ../odbc/src/impl/binary/binary_type_manager.cpp
+         ../odbc/src/impl/binary/binary_type_impl.cpp
+         ../odbc/src/impl/binary/binary_utils.cpp
+         ../odbc/src/impl/binary/binary_reader_impl.cpp
+         ../odbc/src/impl/binary/binary_type_handler.cpp
+         ../odbc/src/impl/binary/binary_writer_impl.cpp
+         ../odbc/src/impl/binary/binary_schema.cpp
+         ../odbc/src/impl/binary/binary_type_snapshot.cpp
+         ../odbc/src/impl/binary/binary_object_header.cpp
+         ../odbc/src/impl/binary/binary_object_impl.cpp
+         ../odbc/src/impl/binary/binary_field_meta.cpp
+         ../odbc/src/impl/interop/interop_memory.cpp
+         ../odbc/src/impl/interop/interop_output_stream.cpp
+         ../odbc/src/impl/interop/interop_input_stream.cpp
          ../odbc/src/connection.cpp
          ../odbc/src/driverInstance.cpp
          ../odbc/src/cursor.cpp
@@ -106,6 +126,11 @@ set(SOURCES
          ../odbc/src/streaming/streaming_context.cpp
          ../odbc/src/type_traits.cpp
          ../odbc/src/utility.cpp
+         ../odbc/src/scan_method.cpp
+         ../odbc/src/date.cpp
+         ../odbc/src/guid.cpp
+         ../odbc/src/time.cpp
+         ../odbc/src/timestamp.cpp
         )
 
 if (WIN32)

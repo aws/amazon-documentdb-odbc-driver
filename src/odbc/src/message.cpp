@@ -24,7 +24,7 @@ namespace {
 using namespace ignite;
 using namespace odbc;
 
-void ReadAffectedRows(impl::binary::BinaryReaderImpl& reader,
+void ReadAffectedRows(ignite::odbc::impl::binary::BinaryReaderImpl& reader,
                       const ProtocolVersion& protocolVersion,
                       std::vector< int64_t >& affectedRows) {
   affectedRows.clear();
@@ -345,15 +345,6 @@ QueryExecuteResponse::~QueryExecuteResponse() {
   // No-op.
 }
 
-void QueryExecuteResponse::ReadOnSuccess(impl::binary::BinaryReaderImpl& reader,
-                                         const ProtocolVersion& ver) {
-  queryId = reader.ReadInt64();
-
-  meta::ReadColumnMetaVector(reader, meta, ver);
-
-  ReadAffectedRows(reader, ver, affectedRows);
-}
-
 QueryExecuteBatchResponse::QueryExecuteBatchResponse()
     : affectedRows(0), errorMessage(), errorCode(1) {
   // No-op.
@@ -411,30 +402,12 @@ void QueryFetchResponse::ReadOnSuccess(impl::binary::BinaryReaderImpl& reader,
   resultPage.Read(reader);
 }
 
-QueryGetColumnsMetaResponse::QueryGetColumnsMetaResponse() {
-  // No-op.
-}
-
-QueryGetColumnsMetaResponse::~QueryGetColumnsMetaResponse() {
-  // No-op.
-}
-
-void QueryGetColumnsMetaResponse::ReadOnSuccess(
-    impl::binary::BinaryReaderImpl& reader, const ProtocolVersion& ver) {
-  meta::ReadColumnMetaVector(reader, meta, ver);
-}
-
 QueryGetResultsetMetaResponse::QueryGetResultsetMetaResponse() {
   // No-op.
 }
 
 QueryGetResultsetMetaResponse::~QueryGetResultsetMetaResponse() {
   // No-op.
-}
-
-void QueryGetResultsetMetaResponse::ReadOnSuccess(
-    impl::binary::BinaryReaderImpl& reader, const ProtocolVersion& ver) {
-  meta::ReadColumnMetaVector(reader, meta, ver);
 }
 
 QueryGetParamsMetaResponse::QueryGetParamsMetaResponse() {

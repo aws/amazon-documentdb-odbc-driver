@@ -17,7 +17,7 @@
 
 #include "ignite/odbc/query/special_columns_query.h"
 
-#include <ignite/impl/binary/binary_common.h>
+#include "ignite/odbc/impl/binary/binary_common.h"
 
 #include "ignite/odbc/type_traits.h"
 
@@ -39,27 +39,34 @@ SpecialColumnsQuery::SpecialColumnsQuery(diagnostic::DiagnosableAdapter& diag,
       nullable(nullable),
       executed(false),
       columnsMeta() {
-  using namespace ignite::impl::binary;
+  using namespace ignite::odbc::impl::binary;
   using namespace ignite::odbc::type_traits;
 
   using meta::ColumnMeta;
+  using meta::Nullability;
 
   columnsMeta.reserve(8);
 
   const std::string sch("");
   const std::string tbl("");
 
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "SCOPE", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "COLUMN_NAME", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "DATA_TYPE", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TYPE_NAME", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_SIZE", IGNITE_TYPE_INT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "BUFFER_LENGTH", IGNITE_TYPE_INT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "DECIMAL_DIGITS", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "PSEUDO_COLUMN", IGNITE_TYPE_SHORT));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "SCOPE", IGNITE_TYPE_SHORT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_NAME", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "DATA_TYPE", IGNITE_TYPE_SHORT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TYPE_NAME", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_SIZE", IGNITE_TYPE_INT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "BUFFER_LENGTH", IGNITE_TYPE_INT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "DECIMAL_DIGITS",
+                                   IGNITE_TYPE_SHORT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "PSEUDO_COLUMN", IGNITE_TYPE_SHORT,
+                                   Nullability::NULLABILITY_UNKNOWN));
 }
 
 SpecialColumnsQuery::~SpecialColumnsQuery() {

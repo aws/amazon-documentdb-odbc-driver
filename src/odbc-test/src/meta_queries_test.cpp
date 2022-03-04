@@ -28,9 +28,9 @@
 #include <vector>
 
 #include "complex_type.h"
-#include "ignite/common/fixed_size_array.h"
+#include "ignite/odbc/common/fixed_size_array.h"
 #include "ignite/ignition.h"
-#include "ignite/impl/binary/binary_utils.h"
+#include "ignite/odbc/impl/binary/binary_utils.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"
 #include "test_utils.h"
@@ -38,11 +38,11 @@
 using namespace ignite;
 using namespace ignite::cache;
 using namespace ignite::cache::query;
-using namespace ignite::common;
+using namespace ignite::odbc::common;
 using namespace ignite_test;
-using namespace ignite::binary;
-using namespace ignite::impl::binary;
-using namespace ignite::impl::interop;
+using namespace ignite::odbc::binary;
+using namespace ignite::odbc::impl::binary;
+using namespace ignite::odbc::impl::interop;
 
 using namespace boost::unit_test;
 
@@ -50,6 +50,8 @@ using namespace boost::unit_test;
  * Test setup fixture.
  */
 struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
+  const static SQLLEN C_STR_LEN_DEFAULT = 1024;
+
   /**
    * Checks single row result set for correct work with SQLGetData.
    *
@@ -57,7 +59,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
    */
   void CheckSingleRowResultSetWithGetData(
       SQLHSTMT stmt, SQLUSMALLINT columnIndex = 1,
-      const char* expectedValue = nullptr) const {
+      const char *expectedValue = nullptr) const {
     SQLRETURN ret = SQLFetch(stmt);
 
     if (!SQL_SUCCEEDED(ret))
@@ -98,7 +100,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
    * @param colId Column ID to check.
    * @param value Expected value.
    */
-  void CheckStringColumn(SQLHSTMT stmt, int colId, const std::string& value) {
+  void CheckStringColumn(SQLHSTMT stmt, int colId, const std::string &value) {
     char buf[1024];
     SQLLEN bufLen = sizeof(buf);
 
@@ -120,6 +122,83 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
   MetaQueriesTestSuiteFixture() : grid(0), cache1(0), cache2(0) {
   }
 
+  bool WasNull(const SQLLEN length) {
+    return (length == SQL_NULL_DATA);
+  }
+
+  void SQLColumnsBindColumns(
+      SQLHSTMT stmt, char table_cat[], SQLLEN &table_cat_len,
+      char table_schem[], SQLLEN &table_schem_len, char table_name[],
+      SQLLEN &table_name_len, char column_name[], SQLLEN &column_name_len,
+      SQLSMALLINT &data_type, SQLLEN &data_type_len, char type_name[],
+      SQLLEN &type_name_len, SQLINTEGER &column_size, SQLLEN &column_size_len,
+      SQLINTEGER &buffer_length, SQLLEN &buffer_length_len,
+      SQLSMALLINT &decimal_digits, SQLLEN &decimal_digits_len,
+      SQLSMALLINT &num_prec_radix, SQLLEN &num_prec_radix_len,
+      SQLSMALLINT &nullable, SQLLEN &nullable_len, char remarks[],
+      SQLLEN &remarks_len, char column_def[], SQLLEN &column_def_len,
+      SQLSMALLINT &sql_data_type, SQLLEN &sql_data_type_len,
+      SQLSMALLINT &sql_datetime_sub, SQLLEN &sql_datetime_sub_len,
+      SQLINTEGER &char_octet_length, SQLLEN &char_octet_length_len,
+      SQLINTEGER &ordinal_position, SQLLEN &ordinal_position_len,
+      char is_nullable[], SQLLEN &is_nullable_len) {
+    SQLRETURN ret = SQL_SUCCESS;
+    ret = SQLBindCol(stmt, 1, SQL_C_CHAR, table_cat, C_STR_LEN_DEFAULT,
+                     &table_cat_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(stmt, 2, SQL_C_CHAR, table_schem, C_STR_LEN_DEFAULT,
+                     &table_schem_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(stmt, 3, SQL_C_CHAR, table_name, C_STR_LEN_DEFAULT,
+                     &table_name_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(stmt, 4, SQL_C_CHAR, column_name, C_STR_LEN_DEFAULT,
+                     &column_name_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(stmt, 5, SQL_SMALLINT, &data_type, sizeof(data_type),
+                     &data_type_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(stmt, 6, SQL_C_CHAR, type_name, C_STR_LEN_DEFAULT,
+                     &type_name_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(stmt, 7, SQL_INTEGER, &column_size, sizeof(column_size),
+                     &column_size_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(stmt, 8, SQL_INTEGER, &buffer_length, sizeof(buffer_length),
+                     &buffer_length_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(stmt, 9, SQL_SMALLINT, &decimal_digits,
+                     sizeof(decimal_digits), &decimal_digits_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(stmt, 10, SQL_SMALLINT, &num_prec_radix,
+                     sizeof(num_prec_radix), &num_prec_radix_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(stmt, 11, SQL_SMALLINT, &nullable, sizeof(nullable),
+                     &nullable_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(stmt, 12, SQL_C_CHAR, remarks, C_STR_LEN_DEFAULT,
+                     &remarks_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(stmt, 13, SQL_C_CHAR, column_def, C_STR_LEN_DEFAULT,
+                     &column_def_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(stmt, 14, SQL_SMALLINT, &sql_data_type,
+                     sizeof(sql_data_type), &sql_data_type_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(stmt, 15, SQL_SMALLINT, &sql_datetime_sub,
+                     sizeof(sql_datetime_sub), &sql_datetime_sub_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(stmt, 16, SQL_INTEGER, &char_octet_length,
+                     sizeof(char_octet_length), &char_octet_length_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(stmt, 17, SQL_INTEGER, &ordinal_position,
+                     sizeof(ordinal_position), &ordinal_position_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+    ret = SQLBindCol(stmt, 18, SQL_C_CHAR, is_nullable, C_STR_LEN_DEFAULT,
+                     &is_nullable_len);
+    BOOST_CHECK(SQL_SUCCEEDED(ret));
+  }
+
   /**
    * Check result set column metadata using SQLDescribeCol.
    *
@@ -132,7 +211,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
    * @param expNullability expected nullability.
    */
   void CheckColumnMetaWithSQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT idx,
-                                         const std::string& expName,
+                                         const std::string &expName,
                                          SQLSMALLINT expDataType,
                                          SQLULEN expSize, SQLSMALLINT expScale,
                                          SQLSMALLINT expNullability) {
@@ -245,7 +324,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
    * @param expNullability expected nullability.
    */
   void CheckColumnMetaWithSQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT idx,
-                                          const std::string& expName,
+                                          const std::string &expName,
                                           SQLLEN expDataType, SQLULEN expSize,
                                           SQLLEN expScale,
                                           SQLLEN expNullability) {
@@ -704,12 +783,15 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsMany) {
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 }
 
-BOOST_AUTO_TEST_CASE(TestGetDataWithColumns, *disabled()) {
-  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
+BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsNone) {
+  std::string dsnConnectionString;
+  CreateDsnConnectionString(dsnConnectionString);
+
+  Connect(dsnConnectionString);
 
   SQLCHAR empty[] = "";
-  SQLCHAR table[] = "TestType";
-  SQLCHAR column[] = "strField";
+  SQLCHAR table[] = "nonexistent";
+  SQLCHAR column[] = "nonexistent_column";
 
   SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
                              SQL_NTS, column, SQL_NTS);
@@ -717,7 +799,169 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumns, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  CheckSingleRowResultSetWithGetData(stmt);
+  ret = SQLFetch(stmt);
+
+  BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+}
+
+BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsMany) {
+  std::string dsnConnectionString;
+  CreateDsnConnectionString(dsnConnectionString);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR empty[] = "";
+
+  SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, empty,
+                             SQL_NTS, empty, SQL_NTS);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  int count = 0;
+  do {
+    ret = SQLFetch(stmt);
+    count++;
+  } while (SQL_SUCCEEDED(ret));
+  BOOST_CHECK(count > 1);
+
+  BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+}
+
+BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
+  std::string dsnConnectionString;
+  CreateDsnConnectionString(dsnConnectionString);
+  Connect(dsnConnectionString);
+
+  SQLCHAR empty[] = "";
+  SQLCHAR table[] = "test";
+  SQLCHAR column[] = "test__id";
+
+  SQLRETURN ret = SQL_SUCCESS;
+
+  char table_cat[C_STR_LEN_DEFAULT]{};
+  SQLLEN table_cat_len = sizeof(table_cat);
+  char table_schem[C_STR_LEN_DEFAULT]{};
+  SQLLEN table_schem_len = sizeof(table_schem);
+  char table_name[C_STR_LEN_DEFAULT]{};
+  SQLLEN table_name_len = sizeof(table_name);
+  char column_name[C_STR_LEN_DEFAULT]{};
+  SQLLEN column_name_len = sizeof(column_name);
+  SQLSMALLINT data_type = 0;
+  SQLLEN data_type_len = sizeof(data_type);
+  char type_name[C_STR_LEN_DEFAULT]{};
+  SQLLEN type_name_len = sizeof(type_name);
+  SQLINTEGER column_size = 0;
+  SQLLEN column_size_len = sizeof(column_size);
+  SQLINTEGER buffer_length = 0;
+  SQLLEN buffer_length_len = sizeof(buffer_length);
+  SQLSMALLINT decimal_digits = 0;
+  SQLLEN decimal_digits_len = sizeof(decimal_digits);
+  SQLSMALLINT num_prec_radix = 0;
+  SQLLEN num_prec_radix_len = sizeof(num_prec_radix);
+  SQLSMALLINT nullable = 0;
+  SQLLEN nullable_len = sizeof(nullable);
+  char remarks[C_STR_LEN_DEFAULT]{};
+  SQLLEN remarks_len = sizeof(remarks);
+  char column_def[C_STR_LEN_DEFAULT]{};
+  SQLLEN column_def_len = sizeof(column_def);
+  SQLSMALLINT sql_data_type = 0;
+  SQLLEN sql_data_type_len = sizeof(sql_data_type);
+  SQLSMALLINT sql_datetime_sub = 0;
+  SQLLEN sql_datetime_sub_len = sizeof(sql_datetime_sub);
+  SQLINTEGER char_octet_length = 0;
+  SQLLEN char_octet_length_len = sizeof(char_octet_length);
+  SQLINTEGER ordinal_position = 0;
+  SQLLEN ordinal_position_len = sizeof(ordinal_position);
+  char is_nullable[C_STR_LEN_DEFAULT]{};
+  SQLLEN is_nullable_len = sizeof(is_nullable);
+
+  SQLColumnsBindColumns(
+      stmt, table_cat, table_cat_len, table_schem, table_schem_len, table_name,
+      table_name_len, column_name, column_name_len, data_type, data_type_len,
+      type_name, type_name_len, column_size, column_size_len, buffer_length,
+      buffer_length_len, decimal_digits, decimal_digits_len, num_prec_radix,
+      num_prec_radix_len, nullable, nullable_len, remarks, remarks_len,
+      column_def, column_def_len, sql_data_type, sql_data_type_len,
+      sql_datetime_sub, sql_datetime_sub_len, char_octet_length,
+      char_octet_length_len, ordinal_position, ordinal_position_len,
+      is_nullable, is_nullable_len);
+
+  ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, table, SQL_NTS, column,
+                   SQL_NTS);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  SQLSMALLINT numResultCols = 0;
+  ret = SQLNumResultCols(stmt, &numResultCols);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  BOOST_CHECK_EQUAL(18, numResultCols);
+
+  ret = SQLFetch(stmt);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  bool errorExpected = false;
+  BOOST_CHECK_EQUAL(
+      false, WasNull(table_cat_len));  // TODO: change to true when nullable
+  BOOST_CHECK_EQUAL("", table_cat);    // TABLE_CAT
+  BOOST_CHECK_EQUAL(false, WasNull(table_schem_len));
+  BOOST_CHECK_EQUAL("test", table_schem);  // TABLE_SCHEM
+  BOOST_CHECK_EQUAL(false, WasNull(table_name_len));
+  BOOST_CHECK_EQUAL("test", table_name);  // TABLE_NAME
+  BOOST_CHECK_EQUAL(false, WasNull(column_name_len));
+  BOOST_CHECK_EQUAL("test__id", column_name);  // COLUMN_NAME
+  BOOST_CHECK_EQUAL(false, WasNull(data_type_len));
+  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);  // DATA_TYPE
+  BOOST_CHECK_EQUAL(false, WasNull(type_name_len));
+  BOOST_CHECK_EQUAL("VARCHAR", type_name);  // TYPE_NAME
+  BOOST_CHECK_EQUAL(false, WasNull(column_size_len));
+  BOOST_CHECK_EQUAL(SQL_NO_TOTAL, column_size);  // COLUMN_SIZE
+  BOOST_CHECK_EQUAL(
+      false,
+      WasNull(
+          buffer_length_len));  // TODO: change to true whan nullable supported
+  BOOST_CHECK_EQUAL(SQL_NO_TOTAL, buffer_length);  // BUFFER_LENGTH
+  BOOST_CHECK_EQUAL(true, WasNull(decimal_digits_len));
+  BOOST_CHECK_EQUAL(0, decimal_digits);  // DECIMAL_DIGITS
+  BOOST_CHECK_EQUAL(true, WasNull(num_prec_radix_len));
+  BOOST_CHECK_EQUAL(0, num_prec_radix);  // NUM_PREC_RADIX
+  BOOST_CHECK_EQUAL(false, WasNull(nullable_len));
+  BOOST_CHECK_EQUAL(SQL_NO_NULLS, nullable);  // NULLABLE
+  BOOST_CHECK_EQUAL(
+      false,
+      WasNull(remarks_len));  // TODO: change to true whan nullable supported
+  BOOST_CHECK_EQUAL("", remarks);  // REMARKS
+  BOOST_CHECK_EQUAL(
+      false,
+      WasNull(column_def_len));  // TODO: change to true whan nullable supported
+  BOOST_CHECK_EQUAL("", column_def);  // COLUMN_DEF
+  BOOST_CHECK_EQUAL(false, WasNull(sql_data_type_len));
+  BOOST_CHECK_EQUAL(SQL_VARCHAR, sql_data_type);  // SQL_DATA_TYPE
+  BOOST_CHECK_EQUAL(true, WasNull(sql_datetime_sub_len));
+  BOOST_CHECK_EQUAL(0, sql_datetime_sub);  // SQL_DATETIME_SUB
+  BOOST_CHECK_EQUAL(false, WasNull(char_octet_length_len));
+  BOOST_CHECK_EQUAL(SQL_NO_TOTAL, char_octet_length);  // CHAR_OCTET_LENGTH
+  BOOST_CHECK_EQUAL(false, WasNull(ordinal_position_len));
+  BOOST_CHECK_EQUAL(1, ordinal_position);  // ORDINAL_POSITION
+  BOOST_CHECK_EQUAL(false, WasNull(is_nullable_len));
+  BOOST_CHECK_EQUAL("NO", is_nullable);  // IS_NULLABLE
+
+  // Check that we can get an attribute on the columns metadata.
+  char attrColumnName[C_STR_LEN_DEFAULT];
+  SQLSMALLINT attrColumnNameLen = 0;
+  ret = SQLColAttribute(stmt, 2, SQL_DESC_NAME, attrColumnName,
+                        sizeof(attrColumnName), &attrColumnNameLen,
+                        nullptr);  // COLUMN_NAME, NOT NULL
+  if (!SQL_SUCCEEDED(ret)) {
+    BOOST_ERROR(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  }
+  BOOST_CHECK_EQUAL("TABLE_SCHEM", attrColumnName);
+
+  // Test that the next fetch will have no data.
+  ret = SQLFetch(stmt);
+  BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithSelectQuery, *disabled()) {

@@ -47,7 +47,7 @@ bool DisplayConnectionWindow(void* windowParent, Configuration& config) {
     window.Update();
 
     return ProcessMessages(window) == Result::OK;
-  } catch (const ignite::IgniteError& err) {
+  } catch (const ignite::odbc::IgniteError& err) {
     std::stringstream buf;
 
     buf << "Message: " << err.GetText() << ", Code: " << err.GetCode();
@@ -72,7 +72,7 @@ bool DisplayConnectionWindow(void* windowParent, Configuration& config) {
  */
 bool RegisterDsn(const Configuration& config, LPCSTR driver) {
   using namespace ignite::odbc::config;
-  using ignite::common::LexicalCast;
+  using ignite::odbc::common::LexicalCast;
 
   typedef Configuration::ArgumentMap ArgMap;
 
@@ -97,7 +97,7 @@ bool RegisterDsn(const Configuration& config, LPCSTR driver) {
     }
 
     return true;
-  } catch (ignite::IgniteError& err) {
+  } catch (ignite::odbc::IgniteError& err) {
     MessageBox(NULL, err.GetText(), "Error!", MB_ICONEXCLAMATION | MB_OK);
 
     SQLPostInstallerError(err.GetCode(), err.GetText());
@@ -118,7 +118,7 @@ bool UnregisterDsn(const char* dsn) {
       ignite::odbc::ThrowLastSetupError();
 
     return true;
-  } catch (ignite::IgniteError& err) {
+  } catch (ignite::odbc::IgniteError& err) {
     MessageBox(NULL, err.GetText(), "Error!", MB_ICONEXCLAMATION | MB_OK);
 
     SQLPostInstallerError(err.GetCode(), err.GetText());

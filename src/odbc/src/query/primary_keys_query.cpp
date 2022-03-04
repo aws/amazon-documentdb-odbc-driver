@@ -17,8 +17,7 @@
 
 #include "ignite/odbc/query/primary_keys_query.h"
 
-#include <ignite/impl/binary/binary_common.h>
-
+#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/connection.h"
 #include "ignite/odbc/message.h"
 #include "ignite/odbc/type_traits.h"
@@ -62,24 +61,29 @@ PrimaryKeysQuery::PrimaryKeysQuery(diagnostic::DiagnosableAdapter& diag,
       table(table),
       executed(false),
       columnsMeta() {
-  using namespace ignite::impl::binary;
+  using namespace ignite::odbc::impl::binary;
   using namespace ignite::odbc::type_traits;
 
   using meta::ColumnMeta;
+  using meta::Nullability;
 
   columnsMeta.reserve(6);
 
   const std::string sch("");
   const std::string tbl("");
 
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "TABLE_SCHEM", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(
-      ColumnMeta(sch, tbl, "COLUMN_NAME", IGNITE_TYPE_STRING));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "KEY_SEQ", IGNITE_TYPE_SHORT));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "PK_NAME", IGNITE_TYPE_STRING));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_SCHEM", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_NAME", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "KEY_SEQ", IGNITE_TYPE_SHORT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "PK_NAME", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
 }
 
 PrimaryKeysQuery::~PrimaryKeysQuery() {

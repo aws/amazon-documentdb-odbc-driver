@@ -17,8 +17,10 @@
 
 #include "ignite/odbc/meta/column_meta.h"
 
-#include "ignite/common/utils.h"
+#include "ignite/odbc/impl/binary/binary_common.h"
+#include "ignite/odbc/common/utils.h"
 #include "ignite/odbc/common_types.h"
+#include "ignite/odbc/jni/java.h"
 #include "ignite/odbc/log.h"
 #include "ignite/odbc/system/odbc_constants.h"
 #include "ignite/odbc/type_traits.h"
@@ -90,25 +92,45 @@ SqlLen Nullability::ToSql(int32_t nullability) {
   return SQL_NULLABLE_UNKNOWN;
 }
 
-void ColumnMeta::Read(ignite::impl::binary::BinaryReaderImpl& reader,
-                      const ProtocolVersion& ver) {
-  utility::ReadString(reader, schemaName);
-  utility::ReadString(reader, tableName);
-  utility::ReadString(reader, columnName);
+const std::string TABLE_CAT = "TABLE_CAT";
+const std::string TABLE_SCHEM = "TABLE_SCHEM";
+const std::string TABLE_NAME = "TABLE_NAME";
+const std::string COLUMN_NAME = "COLUMN_NAME";
+const std::string DATA_TYPE = "DATA_TYPE";
+const std::string REMARKS = "REMARKS";
+const std::string COLUMN_DEF = "COLUMN_DEF";
+const std::string NULLABLE = "NULLABLE";
+const std::string ORDINAL_POSITION = "ORDINAL_POSITION";
 
-  dataType = reader.ReadInt8();
-
-  if (ver >= ProtocolVersion::VERSION_2_7_0) {
-    precision = reader.ReadInt32();
-    scale = reader.ReadInt32();
+void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
+                      int32_t& prevPosition, JniErrorInfo& errInfo) {
+  bool wasNull;
+  int intDataType;
+  catalogName = "";
+  schemaName = "";
+  tableName = "";
+  columnName = "";
+  remarks = "";
+  columnDef = "";
+  resultSet.Get()->GetString(TABLE_CAT, catalogName, wasNull, errInfo);
+  resultSet.Get()->GetString(TABLE_SCHEM, schemaName, wasNull, errInfo);
+  resultSet.Get()->GetString(TABLE_NAME, tableName, wasNull, errInfo);
+  resultSet.Get()->GetString(COLUMN_NAME, columnName, wasNull, errInfo);
+  resultSet.Get()->GetInt(DATA_TYPE, intDataType, wasNull, errInfo);
+  dataType = static_cast< int16_t >(intDataType);
+  resultSet.Get()->GetString(REMARKS, remarks, wasNull, errInfo);
+  resultSet.Get()->GetString(COLUMN_DEF, columnDef, wasNull, errInfo);
+  resultSet.Get()->GetInt(NULLABLE, nullability, wasNull, errInfo);
+  resultSet.Get()->GetInt(ORDINAL_POSITION, ordinalPosition, wasNull, errInfo);
+  if (wasNull) {
+    ordinalPosition = ++prevPosition;
+  } else {
+    prevPosition = ordinalPosition;
   }
-
-  if (ver >= ProtocolVersion::VERSION_2_8_0)
-    nullability = reader.ReadInt8();
 }
 
 bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
-  using namespace ignite::impl::binary;
+  using namespace ignite::odbc::impl::binary;
 
   switch (fieldId) {
     case SQL_DESC_LABEL:
@@ -182,7 +204,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
 }
 
 bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
-  using namespace ignite::impl::binary;
+  using namespace ignite::odbc::impl::binary;
 
   switch (fieldId) {
     case SQL_DESC_FIXED_PREC_SCALE: {
@@ -301,19 +323,29 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
   return true;
 }
 
-void ReadColumnMetaVector(ignite::impl::binary::BinaryReaderImpl& reader,
-                          ColumnMetaVector& meta, const ProtocolVersion& ver) {
-  int32_t metaNum = reader.ReadInt32();
-
+void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
+                          ColumnMetaVector& meta) {
   meta.clear();
-  meta.reserve(static_cast< size_t >(metaNum));
 
-  for (int32_t i = 0; i < metaNum; ++i) {
-    meta.push_back(ColumnMeta());
-
-    meta.back().Read(reader, ver);
+  if (!resultSet.IsValid()) {
+    return;
   }
+
+  JniErrorInfo errInfo;
+  bool hasNext = false;
+  int32_t prevPosition = 0;
+  JniErrorCode errCode;
+  do {
+    errCode = resultSet.Get()->Next(hasNext, errInfo);
+    if (!hasNext || errCode != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      break;
+    }
+
+    meta.emplace_back(ColumnMeta());
+    meta.back().Read(resultSet, prevPosition, errInfo);
+  } while (hasNext);
 }
+
 }  // namespace meta
 }  // namespace odbc
 }  // namespace ignite
