@@ -29,8 +29,8 @@
 #include <string>
 #include <vector>
 
-// Refactor boost::optional to std::optional after code base is migrated to
-// C++17 https://bitquill.atlassian.net/browse/AD-631
+// Todo: Refactor boost::optional to std::optional after code base is migrated
+// to C++17 https://bitquill.atlassian.net/browse/AD-631
 
 using namespace ignite::odbc::common::concurrent;
 using namespace ignite::odbc::jni::java;
@@ -1103,13 +1103,14 @@ JniErrorCode JniContext::ResultSetGetString(
 
 JniErrorCode JniContext::ResultSetGetInt(
     const SharedPointer< GlobalJObject >& resultSet, int columnIndex,
-    int& value, bool& wasNull, JniErrorInfo& errInfo) {
+    boost::optional< int >& value, bool& wasNull, JniErrorInfo& errInfo) {
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
     return errInfo.code;
   }
 
+  value = boost::none;
   JNIEnv* env = Attach();
   jint result = env->CallIntMethod(resultSet.Get()->GetRef(),
                                    jvm->GetMembers().m_ResultSetGetIntByIndex,
@@ -1126,7 +1127,7 @@ JniErrorCode JniContext::ResultSetGetInt(
 
 JniErrorCode JniContext::ResultSetGetInt(
     const SharedPointer< GlobalJObject >& resultSet,
-    const std::string& columnName, int& value, bool& wasNull,
+    const std::string& columnName, boost::optional< int >& value, bool& wasNull,
     JniErrorInfo& errInfo) {
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
@@ -1134,6 +1135,7 @@ JniErrorCode JniContext::ResultSetGetInt(
     return errInfo.code;
   }
 
+  value = boost::none;
   JNIEnv* env = Attach();
   jstring jColumnName = env->NewStringUTF(columnName.c_str());
   jint result = env->CallIntMethod(resultSet.Get()->GetRef(),
@@ -1148,7 +1150,8 @@ JniErrorCode JniContext::ResultSetGetInt(
 }
 
 JniErrorCode JniContext::ResultSetGetRow(
-    const SharedPointer< GlobalJObject >& resultSet, int& value, bool& wasNull,
+    const SharedPointer< GlobalJObject >& resultSet,
+    boost::optional< int >& value, bool& wasNull,
     JniErrorInfo& errInfo) {
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
@@ -1156,6 +1159,7 @@ JniErrorCode JniContext::ResultSetGetRow(
     return errInfo.code;
   }
 
+  value = boost::none;
   JNIEnv* env = Attach();
   jint result = env->CallIntMethod(resultSet.Get()->GetRef(),
                                    jvm->GetMembers().m_ResultSetGetRow);

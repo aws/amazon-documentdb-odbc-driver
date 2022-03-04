@@ -501,13 +501,15 @@ class IGNITE_IMPORT_EXPORT JniContext {
       const std::string& columnName, boost::optional< std::string >& value,
       bool& wasNull, JniErrorInfo& errInfo);
   JniErrorCode ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet,
-                               int columnIndex, int& value, bool& wasNull,
+                               int columnIndex, boost::optional< int >& value,
+                               bool& wasNull,
                                JniErrorInfo& errInfo);
   JniErrorCode ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet,
-                               const std::string& columnName, int& value,
+                               const std::string& columnName,
+                               boost::optional< int >& value,
                                bool& wasNull, JniErrorInfo& errInfo);
   JniErrorCode ResultSetGetRow(const SharedPointer< GlobalJObject >& resultSet,
-                               int& value, bool& wasNull,
+                               boost::optional< int >& value, bool& wasNull,
                                JniErrorInfo& errInfo);
   JniErrorCode ResultSetWasNull(const SharedPointer< GlobalJObject >& resultSet,
                                 bool& value, JniErrorInfo& errInfo);
