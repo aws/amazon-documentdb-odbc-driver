@@ -98,7 +98,8 @@ class ResultSet {
    *
    * @return a JniErrorCode indicating success or failure.
    */
-  JniErrorCode GetInt(const int columnIndex, int& value, bool& wasNull,
+  JniErrorCode GetInt(const int columnIndex, boost::optional< int >& value,
+                      bool& wasNull,
                       JniErrorInfo& errInfo);
 
   /**
@@ -109,7 +110,8 @@ class ResultSet {
    *
    * @return a JniErrorCode indicating success or failure.
    */
-  JniErrorCode GetInt(const std::string& columnName, int& value, bool& wasNull,
+  JniErrorCode GetInt(const std::string& columnName,
+                      boost::optional< int >& value, bool& wasNull,
                       JniErrorInfo& errInfo);
 
  private:

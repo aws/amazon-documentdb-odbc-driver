@@ -71,13 +71,14 @@ JniErrorCode ResultSet::GetString(const std::string& columnName,
                                                wasNull, errInfo);
 }
 
-JniErrorCode ResultSet::GetInt(const int columnIndex, int& value, bool& wasNull,
+JniErrorCode ResultSet::GetInt(const int columnIndex, boost::optional<int>& value, bool& wasNull,
                                JniErrorInfo& errInfo) {
   return _jniContext.Get()->ResultSetGetInt(_resultSet, columnIndex, value,
                                             wasNull, errInfo);
 }
 
-JniErrorCode ResultSet::GetInt(const std::string& columnName, int& value,
+JniErrorCode ResultSet::GetInt(const std::string& columnName,
+                               boost::optional< int >& value,
                                bool& wasNull, JniErrorInfo& errInfo) {
   return _jniContext.Get()->ResultSetGetInt(_resultSet, columnName, value,
                                             wasNull, errInfo);
