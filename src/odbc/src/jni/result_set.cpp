@@ -59,29 +59,29 @@ JniErrorCode ResultSet::Next(bool& hasNext, JniErrorInfo& errInfo) {
 }
 
 JniErrorCode ResultSet::GetString(const int columnIndex, boost::optional<std::string>& value,
-                                  bool& wasNull, JniErrorInfo& errInfo) {
+                                   JniErrorInfo& errInfo) {
   return _jniContext.Get()->ResultSetGetString(_resultSet, columnIndex, value,
-                                               wasNull, errInfo);
+                                                errInfo);
 }
 
 JniErrorCode ResultSet::GetString(const std::string& columnName,
-                                  boost::optional<std::string>& value, bool& wasNull,
+                                  boost::optional<std::string>& value, 
                                   JniErrorInfo& errInfo) {
   return _jniContext.Get()->ResultSetGetString(_resultSet, columnName, value,
-                                               wasNull, errInfo);
+                                                errInfo);
 }
 
-JniErrorCode ResultSet::GetInt(const int columnIndex, boost::optional<int>& value, bool& wasNull,
+JniErrorCode ResultSet::GetInt(const int columnIndex, boost::optional<int>& value, 
                                JniErrorInfo& errInfo) {
   return _jniContext.Get()->ResultSetGetInt(_resultSet, columnIndex, value,
-                                            wasNull, errInfo);
+                                             errInfo);
 }
 
 JniErrorCode ResultSet::GetInt(const std::string& columnName,
                                boost::optional< int >& value,
-                               bool& wasNull, JniErrorInfo& errInfo) {
+                                JniErrorInfo& errInfo) {
   return _jniContext.Get()->ResultSetGetInt(_resultSet, columnName, value,
-                                            wasNull, errInfo);
+                                            errInfo);
 }
 }  // namespace jni
 }  // namespace odbc

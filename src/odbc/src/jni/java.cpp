@@ -895,6 +895,7 @@ JniErrorCode JniContext::DocumentDbDatabaseSchemaMetadataGetSchemaName(
     errInfo.errMsg = "DatabaseMetadata object must be set.";
     return errInfo.code;
   }
+
   JNIEnv* env = Attach();
   jobject result = env->CallObjectMethod(
       databaseMetadata.Get()->GetRef(),
@@ -1044,7 +1045,7 @@ JniErrorCode JniContext::ResultSetNext(
 
 JniErrorCode JniContext::ResultSetGetString(
     const SharedPointer< GlobalJObject >& resultSet, int columnIndex,
-    boost::optional< std::string >& value, bool& wasNull,
+    boost::optional< std::string >& value,
     JniErrorInfo& errInfo) {
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
@@ -1060,7 +1061,6 @@ JniErrorCode JniContext::ResultSetGetString(
   ExceptionCheck(env, &errInfo);
 
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    wasNull = !result;
     if (result != nullptr) {
       jboolean isCopy;
       const char* utfChars = env->GetStringUTFChars((jstring)result, &isCopy);
@@ -1074,7 +1074,7 @@ JniErrorCode JniContext::ResultSetGetString(
 JniErrorCode JniContext::ResultSetGetString(
     const SharedPointer< GlobalJObject >& resultSet,
     const std::string& columnName, boost::optional< std::string >& value,
-    bool& wasNull, JniErrorInfo& errInfo) {
+    JniErrorInfo& errInfo) {
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
@@ -1089,7 +1089,6 @@ JniErrorCode JniContext::ResultSetGetString(
   ExceptionCheck(env, &errInfo);
 
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    wasNull = !result;
     if (result != nullptr) {
       jboolean isCopy;
       const char* utfChars = env->GetStringUTFChars((jstring)result, &isCopy);
@@ -1103,7 +1102,7 @@ JniErrorCode JniContext::ResultSetGetString(
 
 JniErrorCode JniContext::ResultSetGetInt(
     const SharedPointer< GlobalJObject >& resultSet, int columnIndex,
-    boost::optional< int >& value, bool& wasNull, JniErrorInfo& errInfo) {
+    boost::optional< int >& value, JniErrorInfo& errInfo) {
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
@@ -1118,8 +1117,14 @@ JniErrorCode JniContext::ResultSetGetInt(
   ExceptionCheck(env, &errInfo);
 
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    value = result;
-    return ResultSetWasNull(resultSet, wasNull, errInfo);
+    // todo -AL- wasNull is to be removed since optional int is supported. Should I remvoe wasNull parameter 
+    // in ResultSetWasNull as well?
+    // should I no longer call the function since we know the nullability of the value
+    // or should I modify value to boost::none only if wasNull is false?
+    bool wasNull;
+    errInfo.code = ResultSetWasNull(resultSet, wasNull, errInfo);
+    if (!wasNull)
+      value = result;
   }
 
   return errInfo.code;
@@ -1127,7 +1132,7 @@ JniErrorCode JniContext::ResultSetGetInt(
 
 JniErrorCode JniContext::ResultSetGetInt(
     const SharedPointer< GlobalJObject >& resultSet,
-    const std::string& columnName, boost::optional< int >& value, bool& wasNull,
+    const std::string& columnName, boost::optional< int >& value,
     JniErrorInfo& errInfo) {
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
@@ -1143,15 +1148,17 @@ JniErrorCode JniContext::ResultSetGetInt(
                                    jColumnName);
   ExceptionCheck(env, &errInfo);
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    value = result;
-    return ResultSetWasNull(resultSet, wasNull, errInfo);
+    bool wasNull;
+    errInfo.code = ResultSetWasNull(resultSet, wasNull, errInfo);
+    if (!wasNull)
+      value = result;
   }
   return errInfo.code;
 }
 
 JniErrorCode JniContext::ResultSetGetRow(
     const SharedPointer< GlobalJObject >& resultSet,
-    boost::optional< int >& value, bool& wasNull,
+    boost::optional< int >& value,
     JniErrorInfo& errInfo) {
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
@@ -1166,7 +1173,10 @@ JniErrorCode JniContext::ResultSetGetRow(
   ExceptionCheck(env, &errInfo);
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     value = result;
-    return ResultSetWasNull(resultSet, wasNull, errInfo);
+    bool wasNull;
+    errInfo.code = ResultSetWasNull(resultSet, wasNull, errInfo);
+    if (!wasNull)
+      value = result;
   }
   return errInfo.code;
 }
