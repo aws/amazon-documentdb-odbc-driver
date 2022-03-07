@@ -178,7 +178,7 @@ class SqlTypeName {
  * @param binaryType Binary type.
  * @return Corresponding SQL type name.
  */
-const const boost::optional< std::string >& BinaryTypeToSqlTypeName(
+const boost::optional< std::string >& BinaryTypeToSqlTypeName(
     boost::optional< int16_t > binaryType);
 
 /**
