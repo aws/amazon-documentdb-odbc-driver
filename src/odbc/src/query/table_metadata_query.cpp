@@ -274,17 +274,9 @@ std::string TableMetadataQuery::trim(const std::string& s) {
 }
 
 std::string TableMetadataQuery::dequote(const std::string& s) {
-  std::regex openSingleQuoteEx("^['].*");
-  std::regex closeSingleQuoteEx(".*[']$");
-  std::regex openDoubleQuoteEx("^[\"].*");
-  std::regex closeDoubleQuoteEx(".*[\"]$");
-  bool openSingleQuoteMatch = std::regex_match(s, openSingleQuoteEx);
-  bool closeSingleQuoteMatch = std::regex_match(s, closeSingleQuoteEx);
-  bool openDoubleQuoteMatch = std::regex_match(s, openDoubleQuoteEx);
-  bool closeDoubleQuoteMatch = std::regex_match(s, closeDoubleQuoteEx);
-
-  if ((openSingleQuoteMatch && closeSingleQuoteMatch)
-      || (openDoubleQuoteMatch && closeDoubleQuoteMatch)) {
+  if (s.size() >= 2
+      && ((s.front() == '\'' && s.back() == '\'')
+          || (s.front() == '"' && s.back() == '"'))) {
     return s.substr(1, s.size() - 2);
   }
   return s;
