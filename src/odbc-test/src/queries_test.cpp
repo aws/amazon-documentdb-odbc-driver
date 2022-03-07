@@ -34,7 +34,6 @@
 #include "ignite/ignition.h"
 #include "ignite/impl/binary/binary_utils.h"
 #include "odbc_test_suite.h"
-#include "teamcity/teamcity_messages.h"
 #include "test_type.h"
 #include "test_utils.h"
 
@@ -59,10 +58,7 @@ struct QueriesTestSuiteFixture : odbc::OdbcTestSuite {
    * Constructor.
    */
   QueriesTestSuiteFixture() : cache1(0), cache2(0) {
-    grid = StartPlatformNode("queries-test.xml", "NodeMain");
-
-    cache1 = grid.GetCache< int64_t, TestType >("cache");
-    cache2 = grid.GetCache< int64_t, ComplexType >("cache2");
+      // No-op
   }
 
   /**
@@ -213,13 +209,6 @@ struct QueriesTestSuiteFixture : odbc::OdbcTestSuite {
     return res;
   }
 
-  static Ignite StartAdditionalNode(const char* name) {
-    return StartPlatformNode("queries-test.xml", name);
-  }
-
-  /** Node started during the test. */
-  Ignite grid;
-
   /** Frist cache instance. */
   Cache< int64_t, TestType > cache1;
 
@@ -229,39 +218,58 @@ struct QueriesTestSuiteFixture : odbc::OdbcTestSuite {
 
 BOOST_FIXTURE_TEST_SUITE(QueriesTestSuite, QueriesTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestTwoRowsInt8) {
+BOOST_AUTO_TEST_CASE(TestEmptyResult) {
+  std::string dsnConnectionString;
+  std::string databaseName = "queries_test_001";
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+  Connect(dsnConnectionString);
+  SQLRETURN ret;
+  char request[] =
+      "SELECT i8Field, i16Field, i32Field, i64Field, strField, floatField, "
+      "doubleField, boolField, guidField, dateField, timeField, "
+      "timestampField FROM TestType";
+
+  ret = SQLExecDirect(stmt, reinterpret_cast< SQLCHAR* >(request), SQL_NTS);
+  if (!SQL_SUCCEEDED(ret)) {
+    GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt);
+  }
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_NO_DATA, ret);
+}
+
+BOOST_AUTO_TEST_CASE(TestTwoRowsInt8, *disabled()) {
   CheckTwoRowsInt< signed char >(SQL_C_STINYINT);
 }
 
-BOOST_AUTO_TEST_CASE(TestTwoRowsUint8) {
+BOOST_AUTO_TEST_CASE(TestTwoRowsUint8, *disabled()) {
   CheckTwoRowsInt< unsigned char >(SQL_C_UTINYINT);
 }
 
-BOOST_AUTO_TEST_CASE(TestTwoRowsInt16) {
+BOOST_AUTO_TEST_CASE(TestTwoRowsInt16, *disabled()) {
   CheckTwoRowsInt< signed short >(SQL_C_SSHORT);
 }
 
-BOOST_AUTO_TEST_CASE(TestTwoRowsUint16) {
+BOOST_AUTO_TEST_CASE(TestTwoRowsUint16, *disabled()) {
   CheckTwoRowsInt< unsigned short >(SQL_C_USHORT);
 }
 
-BOOST_AUTO_TEST_CASE(TestTwoRowsInt32) {
+BOOST_AUTO_TEST_CASE(TestTwoRowsInt32, *disabled()) {
   CheckTwoRowsInt< SQLINTEGER >(SQL_C_SLONG);
 }
 
-BOOST_AUTO_TEST_CASE(TestTwoRowsUint32) {
+BOOST_AUTO_TEST_CASE(TestTwoRowsUint32, *disabled()) {
   CheckTwoRowsInt< SQLUINTEGER >(SQL_C_ULONG);
 }
 
-BOOST_AUTO_TEST_CASE(TestTwoRowsInt64) {
+BOOST_AUTO_TEST_CASE(TestTwoRowsInt64, *disabled()) {
   CheckTwoRowsInt< int64_t >(SQL_C_SBIGINT);
 }
 
-BOOST_AUTO_TEST_CASE(TestTwoRowsUint64) {
+BOOST_AUTO_TEST_CASE(TestTwoRowsUint64, *disabled()) {
   CheckTwoRowsInt< uint64_t >(SQL_C_UBIGINT);
 }
 
-BOOST_AUTO_TEST_CASE(TestTwoRowsString) {
+BOOST_AUTO_TEST_CASE(TestTwoRowsString, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLRETURN ret;
@@ -374,7 +382,7 @@ BOOST_AUTO_TEST_CASE(TestTwoRowsString) {
   BOOST_CHECK(ret == SQL_NO_DATA);
 }
 
-BOOST_AUTO_TEST_CASE(TestOneRowString) {
+BOOST_AUTO_TEST_CASE(TestOneRowString, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLRETURN ret;
@@ -448,7 +456,7 @@ BOOST_AUTO_TEST_CASE(TestOneRowString) {
   BOOST_CHECK(ret == SQL_NO_DATA);
 }
 
-BOOST_AUTO_TEST_CASE(TestOneRowStringLen) {
+BOOST_AUTO_TEST_CASE(TestOneRowStringLen, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLRETURN ret;
@@ -501,7 +509,7 @@ BOOST_AUTO_TEST_CASE(TestOneRowStringLen) {
   BOOST_CHECK(ret == SQL_NO_DATA);
 }
 
-BOOST_AUTO_TEST_CASE(TestOneRowObject) {
+BOOST_AUTO_TEST_CASE(TestOneRowObject, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache2");
 
   SQLRETURN ret;
@@ -557,7 +565,7 @@ BOOST_AUTO_TEST_CASE(TestOneRowObject) {
   BOOST_CHECK(ret == SQL_NO_DATA);
 }
 
-BOOST_AUTO_TEST_CASE(TestDataAtExecution) {
+BOOST_AUTO_TEST_CASE(TestDataAtExecution, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLRETURN ret;
@@ -694,7 +702,7 @@ BOOST_AUTO_TEST_CASE(TestDataAtExecution) {
   BOOST_CHECK(ret == SQL_NO_DATA);
 }
 
-BOOST_AUTO_TEST_CASE(TestNullFields) {
+BOOST_AUTO_TEST_CASE(TestNullFields, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLRETURN ret;
@@ -815,13 +823,7 @@ BOOST_AUTO_TEST_CASE(TestNullFields) {
   BOOST_CHECK(ret == SQL_NO_DATA);
 }
 
-BOOST_AUTO_TEST_CASE(TestDistributedJoins) {
-  MUTE_TEST_FOR_TEAMCITY;
-
-  // Starting additional node.
-  Ignite node1 = StartAdditionalNode("Node1");
-  Ignite node2 = StartAdditionalNode("Node2");
-
+BOOST_AUTO_TEST_CASE(TestDistributedJoins, *disabled()) {
   const int entriesNum = 1000;
 
   // Filling cache with data.
@@ -889,7 +891,7 @@ BOOST_AUTO_TEST_CASE(TestDistributedJoins) {
   BOOST_CHECK_EQUAL(rowsNum, entriesNum);
 }
 
-BOOST_AUTO_TEST_CASE(TestInsertSelect) {
+BOOST_AUTO_TEST_CASE(TestInsertSelect, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   const int recordsNum = 100;
@@ -948,7 +950,7 @@ BOOST_AUTO_TEST_CASE(TestInsertSelect) {
   BOOST_CHECK_EQUAL(recordsNum, selectedRecordsNum);
 }
 
-BOOST_AUTO_TEST_CASE(TestInsertUpdateSelect) {
+BOOST_AUTO_TEST_CASE(TestInsertUpdateSelect, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   const int recordsNum = 100;
@@ -1022,7 +1024,7 @@ BOOST_AUTO_TEST_CASE(TestInsertUpdateSelect) {
   BOOST_CHECK_EQUAL(recordsNum, selectedRecordsNum);
 }
 
-BOOST_AUTO_TEST_CASE(TestInsertDeleteSelect) {
+BOOST_AUTO_TEST_CASE(TestInsertDeleteSelect, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   const int recordsNum = 100;
@@ -1089,7 +1091,7 @@ BOOST_AUTO_TEST_CASE(TestInsertDeleteSelect) {
   BOOST_CHECK_EQUAL(recordsNum / 2, selectedRecordsNum);
 }
 
-BOOST_AUTO_TEST_CASE(TestInsertMergeSelect) {
+BOOST_AUTO_TEST_CASE(TestInsertMergeSelect, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   const int recordsNum = 100;
@@ -1151,59 +1153,59 @@ BOOST_AUTO_TEST_CASE(TestInsertMergeSelect) {
   BOOST_CHECK_EQUAL(recordsNum, selectedRecordsNum);
 }
 
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect2) {
+BOOST_AUTO_TEST_CASE(TestInsertBatchSelect2, *disabled()) {
   InsertBatchSelect(2);
 }
 
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect100) {
+BOOST_AUTO_TEST_CASE(TestInsertBatchSelect100, *disabled()) {
   InsertBatchSelect(100);
 }
 
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect1000) {
+BOOST_AUTO_TEST_CASE(TestInsertBatchSelect1000, *disabled()) {
   InsertBatchSelect(1000);
 }
 
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect1023) {
+BOOST_AUTO_TEST_CASE(TestInsertBatchSelect1023, *disabled()) {
   InsertBatchSelect(1023);
 }
 
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect1024) {
+BOOST_AUTO_TEST_CASE(TestInsertBatchSelect1024, *disabled()) {
   InsertBatchSelect(1024);
 }
 
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect1025) {
+BOOST_AUTO_TEST_CASE(TestInsertBatchSelect1025, *disabled()) {
   InsertBatchSelect(1025);
 }
 
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect2000) {
+BOOST_AUTO_TEST_CASE(TestInsertBatchSelect2000, *disabled()) {
   InsertBatchSelect(2000);
 }
 
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect2047) {
+BOOST_AUTO_TEST_CASE(TestInsertBatchSelect2047, *disabled()) {
   InsertBatchSelect(2047);
 }
 
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect2048) {
+BOOST_AUTO_TEST_CASE(TestInsertBatchSelect2048, *disabled()) {
   InsertBatchSelect(2048);
 }
 
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect2049) {
+BOOST_AUTO_TEST_CASE(TestInsertBatchSelect2049, *disabled()) {
   InsertBatchSelect(2049);
 }
 
-BOOST_AUTO_TEST_CASE(TestNotFullInsertBatchSelect900) {
+BOOST_AUTO_TEST_CASE(TestNotFullInsertBatchSelect900, *disabled()) {
   InsertNonFullBatchSelect(900, 42);
 }
 
-BOOST_AUTO_TEST_CASE(TestNotFullInsertBatchSelect1500) {
+BOOST_AUTO_TEST_CASE(TestNotFullInsertBatchSelect1500, *disabled()) {
   InsertNonFullBatchSelect(1500, 100);
 }
 
-BOOST_AUTO_TEST_CASE(TestNotFullInsertBatchSelect4500) {
+BOOST_AUTO_TEST_CASE(TestNotFullInsertBatchSelect4500, *disabled()) {
   InsertNonFullBatchSelect(4500, 1500);
 }
 
-BOOST_AUTO_TEST_CASE(TestNotFullInsertBatchSelect4096) {
+BOOST_AUTO_TEST_CASE(TestNotFullInsertBatchSelect4096, *disabled()) {
   InsertNonFullBatchSelect(4096, 1024);
 }
 
@@ -1227,7 +1229,7 @@ void CheckMeta(char columns[n][k], SQLLEN columnsLen[n]) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(TestTablesMeta) {
+BOOST_AUTO_TEST_CASE(TestTablesMeta, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache2");
 
   SQLRETURN ret;
@@ -1289,7 +1291,7 @@ void CheckObjectData(int8_t* data, int32_t len, T const& value) {
   BOOST_CHECK_EQUAL(value, actual);
 }
 
-BOOST_AUTO_TEST_CASE(TestKeyVal) {
+BOOST_AUTO_TEST_CASE(TestKeyVal, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache2");
 
   SQLRETURN ret;
@@ -1423,7 +1425,7 @@ BOOST_AUTO_TEST_CASE(TestKeyVal) {
   BOOST_CHECK(ret == SQL_NO_DATA);
 }
 
-BOOST_AUTO_TEST_CASE(TestParamsNum) {
+BOOST_AUTO_TEST_CASE(TestParamsNum, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   CheckParamsNum("SELECT * FROM TestType", 0);
@@ -1433,7 +1435,7 @@ BOOST_AUTO_TEST_CASE(TestParamsNum) {
   CheckParamsNum("INSERT INTO TestType(_key, strField) VALUES(?, ?)", 2);
 }
 
-BOOST_AUTO_TEST_CASE(TestExecuteAfterCursorClose) {
+BOOST_AUTO_TEST_CASE(TestExecuteAfterCursorClose, *disabled()) {
   TestType in(1, 2, 3, 4, "5", 6.0f, 7.0, true, Guid(8, 9),
               MakeDateGmt(1987, 6, 5), MakeTimeGmt(12, 48, 12),
               MakeTimestampGmt(1998, 12, 27, 1, 2, 3, 456));
@@ -1496,7 +1498,7 @@ BOOST_AUTO_TEST_CASE(TestExecuteAfterCursorClose) {
   BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
 }
 
-BOOST_AUTO_TEST_CASE(TestCloseNonFullFetch) {
+BOOST_AUTO_TEST_CASE(TestCloseNonFullFetch, *disabled()) {
   TestType in1;
   TestType in2;
 
@@ -1547,7 +1549,7 @@ BOOST_AUTO_TEST_CASE(TestCloseNonFullFetch) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 }
 
-BOOST_AUTO_TEST_CASE(TestBindNullParameter) {
+BOOST_AUTO_TEST_CASE(TestBindNullParameter, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLLEN paramInd = SQL_NULL_DATA;
@@ -1599,7 +1601,7 @@ BOOST_AUTO_TEST_CASE(TestBindNullParameter) {
   BOOST_CHECK_EQUAL(strFieldLen, SQL_NULL_DATA);
 }
 
-BOOST_AUTO_TEST_CASE(TestErrorMessage) {
+BOOST_AUTO_TEST_CASE(TestErrorMessage, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   // Just selecting everything to make sure everything is OK
@@ -1617,7 +1619,7 @@ BOOST_AUTO_TEST_CASE(TestErrorMessage) {
     BOOST_FAIL("'" + error + "' does not match '" + pattern + "'");
 }
 
-BOOST_AUTO_TEST_CASE(TestAffectedRows) {
+BOOST_AUTO_TEST_CASE(TestAffectedRows, *disabled()) {
   Connect(
       "DRIVER={Apache "
       "Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache;PAGE_SIZE=1024");
@@ -1666,7 +1668,7 @@ BOOST_AUTO_TEST_CASE(TestAffectedRows) {
   BOOST_CHECK_EQUAL(affected, 1024);
 }
 
-BOOST_AUTO_TEST_CASE(TestAffectedRowsOnSelect) {
+BOOST_AUTO_TEST_CASE(TestAffectedRowsOnSelect, *disabled()) {
   Connect(
       "DRIVER={Apache "
       "Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache;PAGE_SIZE=123");
@@ -1700,7 +1702,7 @@ BOOST_AUTO_TEST_CASE(TestAffectedRowsOnSelect) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(TestMultipleSelects) {
+BOOST_AUTO_TEST_CASE(TestMultipleSelects, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   const int stmtCnt = 10;
@@ -1748,7 +1750,7 @@ BOOST_AUTO_TEST_CASE(TestMultipleSelects) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(TestMultipleMixedStatements) {
+BOOST_AUTO_TEST_CASE(TestMultipleMixedStatements, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   const int stmtCnt = 10;
@@ -1814,7 +1816,7 @@ BOOST_AUTO_TEST_CASE(TestMultipleMixedStatements) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(TestMultipleMixedStatementsNoFetch) {
+BOOST_AUTO_TEST_CASE(TestMultipleMixedStatementsNoFetch, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   const int stmtCnt = 10;
@@ -1869,7 +1871,7 @@ BOOST_AUTO_TEST_CASE(TestMultipleMixedStatementsNoFetch) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(TestCloseAfterEmptyUpdate) {
+BOOST_AUTO_TEST_CASE(TestCloseAfterEmptyUpdate, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLCHAR query[] = "update TestType set strField='test' where _key=42";
@@ -1885,7 +1887,7 @@ BOOST_AUTO_TEST_CASE(TestCloseAfterEmptyUpdate) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 }
 
-BOOST_AUTO_TEST_CASE(TestLoginTimeout) {
+BOOST_AUTO_TEST_CASE(TestLoginTimeout, *disabled()) {
   Prepare();
 
   SQLRETURN ret = SQLSetConnectAttr(dbc, SQL_ATTR_LOGIN_TIMEOUT,
@@ -1908,7 +1910,7 @@ BOOST_AUTO_TEST_CASE(TestLoginTimeout) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc));
 }
 
-BOOST_AUTO_TEST_CASE(TestLoginTimeoutFail) {
+BOOST_AUTO_TEST_CASE(TestLoginTimeoutFail, *disabled()) {
   Prepare();
 
   SQLRETURN ret = SQLSetConnectAttr(dbc, SQL_ATTR_LOGIN_TIMEOUT,
@@ -1931,7 +1933,7 @@ BOOST_AUTO_TEST_CASE(TestLoginTimeoutFail) {
     BOOST_FAIL("Should timeout");
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionTimeoutQuery) {
+BOOST_AUTO_TEST_CASE(TestConnectionTimeoutQuery, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLRETURN ret = SQLSetConnectAttr(dbc, SQL_ATTR_CONNECTION_TIMEOUT,
@@ -1942,7 +1944,7 @@ BOOST_AUTO_TEST_CASE(TestConnectionTimeoutQuery) {
   InsertTestStrings(10, false);
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionTimeoutBatch) {
+BOOST_AUTO_TEST_CASE(TestConnectionTimeoutBatch, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLRETURN ret = SQLSetConnectAttr(dbc, SQL_ATTR_CONNECTION_TIMEOUT,
@@ -1953,7 +1955,7 @@ BOOST_AUTO_TEST_CASE(TestConnectionTimeoutBatch) {
   InsertTestBatch(11, 20, 9);
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionTimeoutBoth) {
+BOOST_AUTO_TEST_CASE(TestConnectionTimeoutBoth, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLRETURN ret = SQLSetConnectAttr(dbc, SQL_ATTR_CONNECTION_TIMEOUT,
@@ -1965,7 +1967,7 @@ BOOST_AUTO_TEST_CASE(TestConnectionTimeoutBoth) {
   InsertTestBatch(11, 20, 9);
 }
 
-BOOST_AUTO_TEST_CASE(TestQueryTimeoutQuery) {
+BOOST_AUTO_TEST_CASE(TestQueryTimeoutQuery, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLRETURN ret = SQLSetStmtAttr(stmt, SQL_ATTR_QUERY_TIMEOUT,
@@ -1976,7 +1978,7 @@ BOOST_AUTO_TEST_CASE(TestQueryTimeoutQuery) {
   InsertTestStrings(10, false);
 }
 
-BOOST_AUTO_TEST_CASE(TestQueryTimeoutBatch) {
+BOOST_AUTO_TEST_CASE(TestQueryTimeoutBatch, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLRETURN ret = SQLSetStmtAttr(stmt, SQL_ATTR_QUERY_TIMEOUT,
@@ -1987,7 +1989,7 @@ BOOST_AUTO_TEST_CASE(TestQueryTimeoutBatch) {
   InsertTestBatch(11, 20, 9);
 }
 
-BOOST_AUTO_TEST_CASE(TestQueryTimeoutBoth) {
+BOOST_AUTO_TEST_CASE(TestQueryTimeoutBoth, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLRETURN ret = SQLSetStmtAttr(stmt, SQL_ATTR_QUERY_TIMEOUT,
@@ -1999,7 +2001,7 @@ BOOST_AUTO_TEST_CASE(TestQueryTimeoutBoth) {
   InsertTestBatch(11, 20, 9);
 }
 
-BOOST_AUTO_TEST_CASE(TestQueryAndConnectionTimeoutQuery) {
+BOOST_AUTO_TEST_CASE(TestQueryAndConnectionTimeoutQuery, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLRETURN ret = SQLSetStmtAttr(stmt, SQL_ATTR_QUERY_TIMEOUT,
@@ -2015,7 +2017,7 @@ BOOST_AUTO_TEST_CASE(TestQueryAndConnectionTimeoutQuery) {
   InsertTestStrings(10, false);
 }
 
-BOOST_AUTO_TEST_CASE(TestQueryAndConnectionTimeoutBatch) {
+BOOST_AUTO_TEST_CASE(TestQueryAndConnectionTimeoutBatch, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLRETURN ret = SQLSetStmtAttr(stmt, SQL_ATTR_QUERY_TIMEOUT,
@@ -2031,7 +2033,7 @@ BOOST_AUTO_TEST_CASE(TestQueryAndConnectionTimeoutBatch) {
   InsertTestBatch(11, 20, 9);
 }
 
-BOOST_AUTO_TEST_CASE(TestQueryAndConnectionTimeoutBoth) {
+BOOST_AUTO_TEST_CASE(TestQueryAndConnectionTimeoutBoth, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLRETURN ret = SQLSetStmtAttr(stmt, SQL_ATTR_QUERY_TIMEOUT,
@@ -2048,7 +2050,7 @@ BOOST_AUTO_TEST_CASE(TestQueryAndConnectionTimeoutBoth) {
   InsertTestBatch(11, 20, 9);
 }
 
-BOOST_AUTO_TEST_CASE(TestSeveralInsertsWithoutClosing) {
+BOOST_AUTO_TEST_CASE(TestSeveralInsertsWithoutClosing, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLCHAR request[] = "INSERT INTO TestType(_key, i32Field) VALUES(?, ?)";
@@ -2083,7 +2085,7 @@ BOOST_AUTO_TEST_CASE(TestSeveralInsertsWithoutClosing) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(TestManyCursors) {
+BOOST_AUTO_TEST_CASE(TestManyCursors, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   for (int32_t i = 0; i < 1000; ++i) {
@@ -2101,7 +2103,7 @@ BOOST_AUTO_TEST_CASE(TestManyCursors) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(TestManyCursors2) {
+BOOST_AUTO_TEST_CASE(TestManyCursors2, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLRETURN ret = SQLFreeHandle(SQL_HANDLE_STMT, stmt);
@@ -2145,7 +2147,7 @@ BOOST_AUTO_TEST_CASE(TestManyCursors2) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(TestManyCursorsTwoSelects1) {
+BOOST_AUTO_TEST_CASE(TestManyCursorsTwoSelects1, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   for (int32_t i = 0; i < 1000; ++i) {
@@ -2163,7 +2165,7 @@ BOOST_AUTO_TEST_CASE(TestManyCursorsTwoSelects1) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(TestManyCursorsTwoSelects2) {
+BOOST_AUTO_TEST_CASE(TestManyCursorsTwoSelects2, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   for (int32_t i = 0; i < 1000; ++i) {
@@ -2186,7 +2188,7 @@ BOOST_AUTO_TEST_CASE(TestManyCursorsTwoSelects2) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(TestManyCursorsSelectMerge1) {
+BOOST_AUTO_TEST_CASE(TestManyCursorsSelectMerge1, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   for (int32_t i = 0; i < 1000; ++i) {
@@ -2204,7 +2206,7 @@ BOOST_AUTO_TEST_CASE(TestManyCursorsSelectMerge1) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(TestManyCursorsSelectMerge2) {
+BOOST_AUTO_TEST_CASE(TestManyCursorsSelectMerge2, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   for (int32_t i = 0; i < 1000; ++i) {
