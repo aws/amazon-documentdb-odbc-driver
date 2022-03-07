@@ -17,12 +17,13 @@
 
 #include "ignite/odbc/query/table_metadata_query.h"
 
+#include <regex>
 #include <vector>
 
-#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/common/concurrent.h"
 #include "ignite/odbc/connection.h"
 #include "ignite/odbc/ignite_error.h"
+#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/jni/database_metadata.h"
 #include "ignite/odbc/jni/result_set.h"
 #include "ignite/odbc/log.h"
@@ -231,7 +232,14 @@ SqlResult::Type TableMetadataQuery::MakeRequestGetTablesMeta() {
   std::vector< std::string > types;
   if (tableType.empty()) {
     types.emplace_back("TABLE");
+  } else {
+    std::stringstream ss(tableType);
+    std::string singleTableType;
+    while (std::getline(ss, singleTableType, ',')) {
+      types.push_back(dequote(trim(singleTableType)));
+    }
   }
+
   JniErrorInfo errInfo;
   SharedPointer< ResultSet > resultSet =
       databaseMetaData.Get()->GetTables(catalog, schema, table, types, errInfo);
@@ -251,6 +259,27 @@ SqlResult::Type TableMetadataQuery::MakeRequestGetTablesMeta() {
   }
 
   return SqlResult::AI_SUCCESS;
+}
+
+std::string TableMetadataQuery::ltrim(const std::string& s) {
+  return std::regex_replace(s, std::regex("^\\s+"), std::string(""));
+}
+
+std::string TableMetadataQuery::rtrim(const std::string& s) {
+  return std::regex_replace(s, std::regex("\\s+$"), std::string(""));
+}
+
+std::string TableMetadataQuery::trim(const std::string& s) {
+  return ltrim(rtrim(s));
+}
+
+std::string TableMetadataQuery::dequote(const std::string& s) {
+  if (s.size() >= 2
+      && ((s.front() == '\'' && s.back() == '\'')
+          || (s.front() == '"' && s.back() == '"'))) {
+    return s.substr(1, s.size() - 2);
+  }
+  return s;
 }
 }  // namespace query
 }  // namespace odbc
