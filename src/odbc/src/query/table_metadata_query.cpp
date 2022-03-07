@@ -20,10 +20,10 @@
 #include <regex>
 #include <vector>
 
-#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/common/concurrent.h"
 #include "ignite/odbc/connection.h"
 #include "ignite/odbc/ignite_error.h"
+#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/jni/database_metadata.h"
 #include "ignite/odbc/jni/result_set.h"
 #include "ignite/odbc/log.h"
@@ -261,7 +261,7 @@ SqlResult::Type TableMetadataQuery::MakeRequestGetTablesMeta() {
   return SqlResult::AI_SUCCESS;
 }
 
-  std::string TableMetadataQuery::ltrim(const std::string& s) {
+std::string TableMetadataQuery::ltrim(const std::string& s) {
   return std::regex_replace(s, std::regex("^\\s+"), std::string(""));
 }
 
