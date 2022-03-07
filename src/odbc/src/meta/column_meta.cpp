@@ -74,8 +74,10 @@ const char* ColumnMeta::AttrIdToString(uint16_t id) {
 #undef DBG_STR_CASE
 
 SqlLen Nullability::ToSql(boost::optional< int32_t > nullability) {
-  if (!nullability)
-    return;
+  if (!nullability) {
+    assert(false);
+    return SQL_NULLABLE_UNKNOWN;
+  }
   switch (*nullability) {
     case Nullability::NO_NULL:
       return SQL_NO_NULLS;
