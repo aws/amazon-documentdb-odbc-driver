@@ -224,10 +224,7 @@ BOOST_AUTO_TEST_CASE(TestEmptyResult) {
   CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
   Connect(dsnConnectionString);
   SQLRETURN ret;
-  char request[] =
-      "SELECT i8Field, i16Field, i32Field, i64Field, strField, floatField, "
-      "doubleField, boolField, guidField, dateField, timeField, "
-      "timestampField FROM TestType";
+  char request[] = "SELECT * FROM queries_test_001";
 
   ret = SQLExecDirect(stmt, reinterpret_cast< SQLCHAR* >(request), SQL_NTS);
   if (!SQL_SUCCEEDED(ret)) {
