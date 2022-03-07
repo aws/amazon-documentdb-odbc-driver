@@ -302,12 +302,14 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseSchemaMetadataGetSchemaName) {
   BOOST_REQUIRE(databaseMetadata.Get());
 
   std::string schemaName;
+  bool wasNull;
   success = _ctx.Get()->DocumentDbDatabaseSchemaMetadataGetSchemaName(
-      databaseMetadata, schemaName, errInfo);
+      databaseMetadata, schemaName, wasNull, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
 
+  BOOST_CHECK(!wasNull);
   BOOST_CHECK_EQUAL(schemaName, "_default");
 }
 

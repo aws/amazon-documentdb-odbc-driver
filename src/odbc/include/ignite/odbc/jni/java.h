@@ -473,7 +473,7 @@ class IGNITE_IMPORT_EXPORT JniContext {
 
   JniErrorCode DocumentDbDatabaseSchemaMetadataGetSchemaName(
       const SharedPointer< GlobalJObject >& databaseMetadata,
-      std::string& value, JniErrorInfo& errInfo);
+      std::string& value, bool& wasNull, JniErrorInfo& errInfo);
 
   JniErrorCode DatabaseMetaDataGetTables(
       const SharedPointer< GlobalJObject >& databaseMetaData,
