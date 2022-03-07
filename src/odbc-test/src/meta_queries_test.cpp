@@ -745,6 +745,66 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneFromLocalServer) {
   CheckSingleRowResultSetWithGetData(stmt, 3, "meta_queries_test_001");
 }
 
+BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneWithTableTypes) {
+  SQLCHAR empty[] = "";
+  SQLCHAR table[] = "meta_queries_test_001";
+  SQLCHAR tableTypes[] = "TABLE,VIEW"; // Test that VIEW type is ignored by JDBC
+
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
+                            SQL_NTS, tableTypes, SQL_NTS);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  CheckSingleRowResultSetWithGetData(stmt, 3, "meta_queries_test_001");
+}
+
+BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneForQuotedTypes) {
+  SQLCHAR empty[] = "";
+  SQLCHAR table[] = "meta_queries_test_001";
+  SQLCHAR tableTypes[] = "'TABLE' , 'VIEW'";  // Test that quoted values are handled
+
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
+                            SQL_NTS, tableTypes, SQL_NTS);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  CheckSingleRowResultSetWithGetData(stmt, 3, "meta_queries_test_001");
+}
+
+BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsNoneForUnsupportedTableType) {
+  SQLCHAR empty[] = "";
+  SQLCHAR table[] = "meta_queries_test_001";
+  SQLCHAR tableTypes[] = "VIEW";
+
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
+                            SQL_NTS, tableTypes, SQL_NTS);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_NO_DATA, ret);
+}
+
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsNone) {
   std::string dsnConnectionString;
   CreateDsnConnectionString(dsnConnectionString);
