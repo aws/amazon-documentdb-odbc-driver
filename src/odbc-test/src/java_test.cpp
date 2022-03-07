@@ -302,14 +302,12 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseSchemaMetadataGetSchemaName) {
   BOOST_REQUIRE(databaseMetadata.Get());
 
   std::string schemaName;
-  bool wasNull;
   success = _ctx.Get()->DocumentDbDatabaseSchemaMetadataGetSchemaName(
-      databaseMetadata, schemaName, wasNull, errInfo);
+      databaseMetadata, schemaName, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
 
-  BOOST_CHECK(!wasNull);
   BOOST_CHECK_EQUAL(schemaName, "_default");
 }
 
@@ -385,93 +383,84 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
 
   int i = 1;
   while (hasNext) {
-    bool wasNull;
     boost::optional<std::string> value;
     // TABLE_CAT (i.e., catalog - always NULL in our case)
-    if (_ctx.Get()->ResultSetGetString(resultSet, 1, value, wasNull, errInfo)
+    if (_ctx.Get()->ResultSetGetString(resultSet, 1, value,  errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(wasNull);
     BOOST_CHECK(!value);
 
     // TABLE_CAT (i.e., catalog - always NULL in our case)
-    if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_CAT", value, wasNull,
+    if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_CAT", value, 
                                        errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(wasNull);
     BOOST_CHECK(!value);
 
     // TABLE_SCHEM (i.e., database)
-    if (_ctx.Get()->ResultSetGetString(resultSet, 2, value, wasNull, errInfo)
+    if (_ctx.Get()->ResultSetGetString(resultSet, 2, value,  errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(!wasNull);
     BOOST_REQUIRE(value);
     BOOST_REQUIRE(*value == "test");
 
     // TABLE_SCHEM (i.e., database)
-    if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_SCHEM", value, wasNull,
+    if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_SCHEM", value, 
                                        errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(!wasNull);
     BOOST_REQUIRE(value);
     BOOST_REQUIRE(*value == "test");
 
     // TABLE_NAME
-    if (_ctx.Get()->ResultSetGetString(resultSet, 3, value, wasNull, errInfo)
+    if (_ctx.Get()->ResultSetGetString(resultSet, 3, value,  errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(!wasNull);
     BOOST_REQUIRE(value);
     BOOST_REQUIRE(value->size() > 0);
 
     // TABLE_NAME
-    if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_NAME", value, wasNull,
+    if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_NAME", value, 
                                        errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(!wasNull);
     BOOST_CHECK(value);
     BOOST_REQUIRE(value->size() > 0);
 
     // TABLE_TYPE
-    if (_ctx.Get()->ResultSetGetString(resultSet, 4, value, wasNull, errInfo)
+    if (_ctx.Get()->ResultSetGetString(resultSet, 4, value,  errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(!wasNull);
     BOOST_REQUIRE(value);
     BOOST_REQUIRE(*value == "TABLE");
 
     // TABLE_TYPE
-    if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_TYPE", value, wasNull,
+    if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_TYPE", value, 
                                        errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(!wasNull);
     BOOST_REQUIRE(value);
     BOOST_REQUIRE(*value == "TABLE");
 
     // check getRow
     boost::optional<int> val;
-    if (_ctx.Get()->ResultSetGetRow(resultSet, val, wasNull, errInfo)
+    if (_ctx.Get()->ResultSetGetRow(resultSet, val,  errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
@@ -542,116 +531,105 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
   std::string databaseName = "test";
   int i = 1;
   while (hasNext) {
-    bool wasNull;
     boost::optional<std::string> value;
     // TABLE_CAT (i.e., catalog - always NULL in our case)
-    if (_ctx.Get()->ResultSetGetString(resultSet, 1, value, wasNull, errInfo)
+    if (_ctx.Get()->ResultSetGetString(resultSet, 1, value,  errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       // grab string from first column
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(wasNull);
     BOOST_CHECK(!value);
 
     // TABLE_CAT (i.e., catalog - always NULL in our case)
-    if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_CAT", value, wasNull,
+    if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_CAT", value, 
                                        errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {  // grab string from first
                                                     // column by name
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(wasNull);
     BOOST_CHECK(!value);
 
     // TABLE_SCHEM (i.e., database)
-    if (_ctx.Get()->ResultSetGetString(resultSet, 2, value, wasNull, errInfo)
+    if (_ctx.Get()->ResultSetGetString(resultSet, 2, value,  errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(!wasNull);
     BOOST_CHECK(value);
     BOOST_CHECK_EQUAL(databaseName, *value);
 
     // TABLE_SCHEM (i.e., database)
-    if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_SCHEM", value, wasNull,
+    if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_SCHEM", value, 
                                        errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(!wasNull);
     BOOST_CHECK(value);
     BOOST_CHECK_EQUAL(databaseName, *value);
 
     // TABLE_NAME
-    if (_ctx.Get()->ResultSetGetString(resultSet, 3, value, wasNull, errInfo)
+    if (_ctx.Get()->ResultSetGetString(resultSet, 3, value,  errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(!wasNull);
     BOOST_REQUIRE(value);
     BOOST_REQUIRE(value->size() > 0);
 
     // TABLE_NAME
-    if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_NAME", value, wasNull,
+    if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_NAME", value, 
                                        errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(!wasNull);
     BOOST_REQUIRE(value);
     BOOST_REQUIRE(value->size() > 0);
 
     // COLUMN_NAME
-    if (_ctx.Get()->ResultSetGetString(resultSet, 4, value, wasNull, errInfo)
+    if (_ctx.Get()->ResultSetGetString(resultSet, 4, value,  errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(!wasNull);
     BOOST_REQUIRE(value);
     BOOST_REQUIRE(value->size() > 0);
 
     // COLUMN_NAME
-    if (_ctx.Get()->ResultSetGetString(resultSet, "COLUMN_NAME", value, wasNull,
+    if (_ctx.Get()->ResultSetGetString(resultSet, "COLUMN_NAME", value, 
                                        errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(!wasNull);
     BOOST_REQUIRE(value);
     BOOST_REQUIRE(value->size() > 0);
 
     // ORDINAL_POSITION
     boost::optional< int > val;
-    if (_ctx.Get()->ResultSetGetInt(resultSet, 17, val, wasNull, errInfo)
+    if (_ctx.Get()->ResultSetGetInt(resultSet, 17, val,  errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(!wasNull);
     BOOST_REQUIRE(val);
     BOOST_REQUIRE(*val > 0);
 
     // ORDINAL_POSITION
-    if (_ctx.Get()->ResultSetGetInt(resultSet, "ORDINAL_POSITION", val, wasNull,
+    if (_ctx.Get()->ResultSetGetInt(resultSet, "ORDINAL_POSITION", val, 
                                     errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-    BOOST_REQUIRE(!wasNull);
     BOOST_REQUIRE(val);
     BOOST_REQUIRE(*val > 0);
 
     // check getRow
-    if (_ctx.Get()->ResultSetGetRow(resultSet, val, wasNull, errInfo)
+    if (_ctx.Get()->ResultSetGetRow(resultSet, val,  errInfo)
         != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);

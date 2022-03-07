@@ -106,19 +106,18 @@ const std::string ORDINAL_POSITION = "ORDINAL_POSITION";
 
 void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
                       int32_t& prevPosition, JniErrorInfo& errInfo) {
-  bool wasNull;
   boost::optional< int > intDataType;
-  resultSet.Get()->GetString(TABLE_CAT, catalogName, wasNull, errInfo);
-  resultSet.Get()->GetString(TABLE_SCHEM, schemaName, wasNull, errInfo);
-  resultSet.Get()->GetString(TABLE_NAME, tableName, wasNull, errInfo);
-  resultSet.Get()->GetString(COLUMN_NAME, columnName, wasNull, errInfo);
-  resultSet.Get()->GetInt(DATA_TYPE, intDataType, wasNull, errInfo);
+  resultSet.Get()->GetString(TABLE_CAT, catalogName, errInfo);
+  resultSet.Get()->GetString(TABLE_SCHEM, schemaName, errInfo);
+  resultSet.Get()->GetString(TABLE_NAME, tableName, errInfo);
+  resultSet.Get()->GetString(COLUMN_NAME, columnName, errInfo);
+  resultSet.Get()->GetInt(DATA_TYPE, intDataType, errInfo);
   if (intDataType)
     dataType = static_cast< int16_t >(*intDataType);
-  resultSet.Get()->GetString(REMARKS, remarks, wasNull, errInfo);
-  resultSet.Get()->GetString(COLUMN_DEF, columnDef, wasNull, errInfo);
-  resultSet.Get()->GetInt(NULLABLE, nullability, wasNull, errInfo);
-  resultSet.Get()->GetInt(ORDINAL_POSITION, ordinalPosition, wasNull, errInfo);
+  resultSet.Get()->GetString(REMARKS, remarks, errInfo);
+  resultSet.Get()->GetString(COLUMN_DEF, columnDef, errInfo);
+  resultSet.Get()->GetInt(NULLABLE, nullability, errInfo);
+  resultSet.Get()->GetInt(ORDINAL_POSITION, ordinalPosition, errInfo);
   if (!ordinalPosition) {
     ordinalPosition = ++prevPosition;
   } else {

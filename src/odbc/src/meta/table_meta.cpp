@@ -28,12 +28,11 @@ const std::string REMARKS = "REMARKS";
 
 void TableMeta::Read(SharedPointer< ResultSet >& resultSet,
                      JniErrorInfo& errInfo) {
-  bool wasNull;
-  resultSet.Get()->GetString(TABLE_CAT, catalogName, wasNull, errInfo);
-  resultSet.Get()->GetString(TABLE_SCHEM, schemaName, wasNull, errInfo);
-  resultSet.Get()->GetString(TABLE_NAME, tableName, wasNull, errInfo);
-  resultSet.Get()->GetString(TABLE_TYPE, tableType, wasNull, errInfo);
-  resultSet.Get()->GetString(REMARKS, remarks, wasNull, errInfo);
+  resultSet.Get()->GetString(TABLE_CAT, catalogName, errInfo);
+  resultSet.Get()->GetString(TABLE_SCHEM, schemaName, errInfo);
+  resultSet.Get()->GetString(TABLE_NAME, tableName, errInfo);
+  resultSet.Get()->GetString(TABLE_TYPE, tableType, errInfo);
+  resultSet.Get()->GetString(REMARKS, remarks, errInfo);
 }
 
 void ReadTableMetaVector(SharedPointer< ResultSet >& resultSet,
