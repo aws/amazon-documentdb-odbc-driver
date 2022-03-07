@@ -296,7 +296,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     case SQL_DESC_SCALE:
     case SQL_COLUMN_SCALE: {
       if (dataType && (!scale || *scale == -1)) {
-        if (boost::optional< int > val =
+        if (boost::optional< int16_t > val =
                 type_traits::BinaryTypeDecimalDigits(dataType))
           value = *val;
         if (value < 0)

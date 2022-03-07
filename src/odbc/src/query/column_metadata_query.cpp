@@ -279,11 +279,11 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     case ResultColumn::DECIMAL_DIGITS: {
       // todo implement the function for getting the decimal digits:
       // https://bitquill.atlassian.net/browse/AD-615
-      boost::optional<int32_t> decDigits = type_traits::BinaryTypeDecimalDigits(columnType);
-      if (!decDigits || decDigits < 0)
+      boost::optional<int16_t> decDigits = type_traits::BinaryTypeDecimalDigits(columnType);
+      if (!decDigits || *decDigits < 0)
         buffer.PutNull();
       else
-        buffer.PutInt16(static_cast< int16_t >(*decDigits));
+        buffer.PutInt16(*decDigits);
       break;
     }
 

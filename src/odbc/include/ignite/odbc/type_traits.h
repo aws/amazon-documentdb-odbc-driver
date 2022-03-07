@@ -314,7 +314,7 @@ boost::optional<int32_t> BinaryTypeNumPrecRadix(boost::optional<int16_t> type);
  * @param type SQL type.
  * @return Decimal digits.
  */
-boost::optional<int32_t> SqlTypeDecimalDigits(boost::optional<int16_t> type);
+boost::optional<int16_t> SqlTypeDecimalDigits(boost::optional<int16_t> type);
 
 /**
  * Get binary type decimal digits.
@@ -322,7 +322,7 @@ boost::optional<int32_t> SqlTypeDecimalDigits(boost::optional<int16_t> type);
  * @param type Binary type.
  * @return Decimal digits.
  */
-boost::optional<int32_t> BinaryTypeDecimalDigits(boost::optional<int16_t> type);
+boost::optional<int16_t> BinaryTypeDecimalDigits(boost::optional<int16_t> type);
 
 /**
  * Get SQL type char octet length.

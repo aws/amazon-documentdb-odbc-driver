@@ -705,12 +705,12 @@ boost::optional< int32_t > BinaryTypeNumPrecRadix(
   return SqlTypeNumPrecRadix(sqlType);
 }
 
-boost::optional< int32_t > SqlTypeDecimalDigits(boost::optional< int16_t >) {
+boost::optional< int16_t > SqlTypeDecimalDigits(boost::optional< int16_t >) {
   // Not implemented for the NUMERIC and DECIMAL data types.
   return -1;
 }
 
-boost::optional< int32_t > BinaryTypeDecimalDigits(
+boost::optional< int16_t > BinaryTypeDecimalDigits(
     boost::optional< int16_t > type) {
   boost::optional< int16_t > sqlType = BinaryToSqlType(type);
 

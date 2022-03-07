@@ -1242,7 +1242,7 @@ SqlResult::Type Statement::InternalDescribeParam(int16_t paramNum,
   }
 
   if (decimalDigits) {
-    if (boost::optional< int32_t > decDigits =
+    if (boost::optional< int16_t > decDigits =
             type_traits::BinaryTypeDecimalDigits(type))
       *decimalDigits = *decDigits;
   }
