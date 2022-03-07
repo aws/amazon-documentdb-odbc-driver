@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#define BOOST_TEST_MODULE DocumentDBTest
 #ifdef _WIN32
 #include <Windows.h>
 #endif

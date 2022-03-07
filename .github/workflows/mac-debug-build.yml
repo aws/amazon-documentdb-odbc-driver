@@ -45,6 +45,18 @@ jobs:
     #     sudo mkdir /Library/ODBC
     #     sudo mv ./src/Tests/Tests/odbc.ini /Library/ODBC
     #     mkdir ${{ github.workspace }}/odbc-logs
+    - name: register-odbc-driver
+      run: |
+        chmod +x scripts/register_driver_macos.sh
+        ./scripts/register_driver_macos.sh
+    - name: Setup MongoDB
+      run: |
+        chmod +x ./src/odbc-test/scripts/reinstall_mongodb_mac.sh
+        ./src/odbc-test/scripts/reinstall_mongodb_mac.sh
+    - name: Import test data
+      run: |
+        chmod +x ./src/odbc-test/scripts/import_test_data.sh
+        ./src/odbc-test/scripts/import_test_data.sh
     # - name: run-tests
     #   run: |
     #     ./build/odbc/bin/tests --gtest_output="xml:report.xml"

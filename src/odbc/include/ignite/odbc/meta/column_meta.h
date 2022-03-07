@@ -24,7 +24,7 @@
 #include <boost/optional/optional_io.hpp>
 #include <string>
 
-#include "ignite/impl/binary/binary_reader_impl.h"
+#include "ignite/odbc/impl/binary/binary_reader_impl.h"
 #include "ignite/odbc/common_types.h"
 #include "ignite/odbc/jni/result_set.h"
 #include "ignite/odbc/protocol_version.h"

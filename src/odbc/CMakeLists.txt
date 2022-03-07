@@ -154,7 +154,7 @@ if (WIN32)
         add_definitions(-DNOMINMAX)
     endif()
 
-    target_link_libraries(${TARGET} ignite-common-objlib ignite-binary-objlib ignite-network-objlib odbccp32 shlwapi)
+    target_link_libraries(${TARGET} ignite-common-objlib odbccp32 shlwapi)
 
     remove_definitions(-DUNICODE=1)
 
@@ -166,7 +166,7 @@ if (WIN32)
                 
     set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME "ignite.odbc")
 else()
-    target_link_libraries(${TARGET} ignite-common ignite-binary ignite-network)
+    target_link_libraries(${TARGET} ignite-common)
 endif()
 
 if (WIN32 AND ${WITH_ODBC_MSI})

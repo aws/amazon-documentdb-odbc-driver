@@ -31,6 +31,15 @@ Example:
  ssh -i $DOC_DB_PRIV_KEY_FILE -N -L $DOC_DB_LOCAL_PORT:$DOC_DB_HOST:$DOC_DB_REMOTE_PORT $DOC_DB_USER
 ```
 
+### Running and Installing Local MongoDB Server 
+
+1. Run the following script to setup MongoDB server on your machine.
+   1. `cd odbc-test/scripts`
+   2. `.\reinstall_mongodb_.ps1` (Windows) or `./reinstall_mongodb_mac_.sh` (MacOS)
+2. Install the test data
+   1. `cd odbc-test/scripts`
+   2. `.\import_test_data.ps1` (Windows) or `./import_test_data.sh` (MacOS or Linux)
+
 ### Windows
 
 1. Microsoft Visual Studio (Community 2019 Verified)

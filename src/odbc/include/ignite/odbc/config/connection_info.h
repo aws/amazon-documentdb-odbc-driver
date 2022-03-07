@@ -18,7 +18,7 @@
 #ifndef _IGNITE_ODBC_CONFIG_CONNECTION_INFO
 #define _IGNITE_ODBC_CONFIG_CONNECTION_INFO
 
-#include <ignite/common/common.h>
+#include <ignite/odbc/common/common.h>
 #include <ignite/odbc/common_types.h>
 #include <ignite/odbc/config/configuration.h>
 #include <stdint.h>
