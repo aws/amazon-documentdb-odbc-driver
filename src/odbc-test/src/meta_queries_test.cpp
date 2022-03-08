@@ -927,7 +927,6 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   BOOST_CHECK_EQUAL(
       false,
       WasNull(
-          buffer_length_len));  // TODO: change to true whan nullable supported
   BOOST_CHECK_EQUAL(SQL_NO_TOTAL, buffer_length);  // BUFFER_LENGTH
   BOOST_CHECK_EQUAL(true, WasNull(decimal_digits_len));
   BOOST_CHECK_EQUAL(0, decimal_digits);  // DECIMAL_DIGITS
