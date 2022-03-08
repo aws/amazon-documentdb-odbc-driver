@@ -494,20 +494,19 @@ class IGNITE_IMPORT_EXPORT JniContext {
                              bool& hasNext, JniErrorInfo& errInfo);
   JniErrorCode ResultSetGetString(
       const SharedPointer< GlobalJObject >& resultSet, int columnIndex,
-      boost::optional< std::string >& value,
-      JniErrorInfo& errInfo);
+      boost::optional< std::string >& value, JniErrorInfo& errInfo);
   JniErrorCode ResultSetGetString(
       const SharedPointer< GlobalJObject >& resultSet,
       const std::string& columnName, boost::optional< std::string >& value,
-       JniErrorInfo& errInfo);
+      JniErrorInfo& errInfo);
   JniErrorCode ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet,
                                int columnIndex, boost::optional< int >& value,
-                               
+
                                JniErrorInfo& errInfo);
   JniErrorCode ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet,
                                const std::string& columnName,
                                boost::optional< int >& value,
-                                JniErrorInfo& errInfo);
+                               JniErrorInfo& errInfo);
   JniErrorCode ResultSetGetRow(const SharedPointer< GlobalJObject >& resultSet,
                                boost::optional< int >& value,
                                JniErrorInfo& errInfo);
