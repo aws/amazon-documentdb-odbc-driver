@@ -261,8 +261,7 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::TYPE_NAME: {
-       buffer.PutOptString(
-            type_traits::BinaryTypeToSqlTypeName(columnType));
+      buffer.PutOptString(type_traits::BinaryTypeToSqlTypeName(columnType));
       break;
     }
 
@@ -279,7 +278,8 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     case ResultColumn::DECIMAL_DIGITS: {
       // todo implement the function for getting the decimal digits:
       // https://bitquill.atlassian.net/browse/AD-615
-      boost::optional<int16_t> decDigits = type_traits::BinaryTypeDecimalDigits(columnType);
+      boost::optional< int16_t > decDigits =
+          type_traits::BinaryTypeDecimalDigits(columnType);
       if (!decDigits || *decDigits < 0)
         buffer.PutNull();
       else
@@ -335,8 +335,8 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::IS_NULLABLE: {
-        buffer.PutOptString(type_traits::NullabilityToIsNullable(
-            currentColumn.GetNullability()));
+      buffer.PutOptString(
+          type_traits::NullabilityToIsNullable(currentColumn.GetNullability()));
       break;
     }
 
@@ -395,12 +395,12 @@ SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
   for (size_t i = 0; i < meta.size(); ++i) {
     if (meta[i].GetSchemaName() && meta[i].GetTableName()
         && meta[i].GetColumnName() && meta[i].GetDataType())
-    LOG_MSG("\n[" << i << "] SchemaName:     " << meta[i].GetSchemaName()
-                  << "\n[" << i
-                  << "] TableName:      " << meta[i].GetTableName() << "\n["
-                  << i << "] ColumnName:     " << meta[i].GetColumnName()
-                  << "\n[" << i << "] ColumnType:     "
-                  << static_cast< int32_t >(*meta[i].GetDataType()));
+      LOG_MSG("\n[" << i << "] SchemaName:     " << meta[i].GetSchemaName()
+                    << "\n[" << i
+                    << "] TableName:      " << meta[i].GetTableName() << "\n["
+                    << i << "] ColumnName:     " << meta[i].GetColumnName()
+                    << "\n[" << i << "] ColumnType:     "
+                    << static_cast< int32_t >(*meta[i].GetDataType()));
   }
 
   return SqlResult::AI_SUCCESS;
