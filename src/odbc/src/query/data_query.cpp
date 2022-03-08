@@ -66,6 +66,10 @@ const meta::ColumnMetaVector* DataQuery::GetMeta() {
 }
 
 SqlResult::Type DataQuery::FetchNextRow(app::ColumnBindingMap& columnBindings) {
+  // TODO: AD-604 - MakeRequestExecute
+  // https://bitquill.atlassian.net/browse/AD-604
+  return SqlResult::AI_NO_DATA;
+
   if (!cursor.get()) {
     diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
                          "Query was not executed.");
@@ -207,198 +211,35 @@ bool DataQuery::IsClosedRemotely() const {
 }
 
 SqlResult::Type DataQuery::MakeRequestExecute() {
-  const std::string& schema = connection.GetSchema();
-
-  QueryExecuteRequest req(schema, sql, params, timeout,
-                          connection.IsAutoCommit());
-  QueryExecuteResponse rsp;
-
-  try {
-    // Setting connection timeout to 1 second more than query timeout itself.
-    int32_t connectionTimeout = timeout ? timeout + 1 : 0;
-
-    bool success = connection.SyncMessage(req, rsp, connectionTimeout);
-
-    if (!success) {
-      diag.AddStatusRecord(SqlState::SHYT00_TIMEOUT_EXPIRED,
-                           "Query timeout expired");
-
-      return SqlResult::AI_ERROR;
-    }
-  } catch (const OdbcError& err) {
-    diag.AddStatusRecord(err);
-
-    return SqlResult::AI_ERROR;
-  } catch (const IgniteError& err) {
-    diag.AddStatusRecord(err.GetText());
-
-    return SqlResult::AI_ERROR;
-  }
-
-  if (rsp.GetStatus() != ResponseStatus::SUCCESS) {
-    LOG_MSG("Error: " << rsp.GetError());
-
-    diag.AddStatusRecord(ResponseStatusToSqlState(rsp.GetStatus()),
-                         rsp.GetError());
-
-    return SqlResult::AI_ERROR;
-  }
-
-  rowsAffected = rsp.GetAffectedRows();
-  SetResultsetMeta(rsp.GetMeta());
-
-  LOG_MSG("Query id: " << rsp.GetQueryId());
-  LOG_MSG("Affected Rows list size: " << rowsAffected.size());
-
-  cursor.reset(new Cursor(rsp.GetQueryId()));
-
+  // TODO: AD-604 - MakeRequestExecute
+  // https://bitquill.atlassian.net/browse/AD-604
+  cursor.reset(new Cursor(0L));
   rowsAffectedIdx = 0;
 
   return SqlResult::AI_SUCCESS;
 }
 
 SqlResult::Type DataQuery::MakeRequestClose() {
-  QueryCloseRequest req(cursor->GetQueryId());
-  QueryCloseResponse rsp;
-
-  try {
-    connection.SyncMessage(req, rsp);
-  } catch (const OdbcError& err) {
-    diag.AddStatusRecord(err);
-
-    return SqlResult::AI_ERROR;
-  } catch (const IgniteError& err) {
-    diag.AddStatusRecord(err.GetText());
-
-    return SqlResult::AI_ERROR;
-  }
-
-  LOG_MSG("Query id: " << rsp.GetQueryId());
-
-  if (rsp.GetStatus() != ResponseStatus::SUCCESS) {
-    LOG_MSG("Error: " << rsp.GetError());
-
-    diag.AddStatusRecord(ResponseStatusToSqlState(rsp.GetStatus()),
-                         rsp.GetError());
-
-    return SqlResult::AI_ERROR;
-  }
-
+  // TODO: AD-604 - MakeRequestExecute
+  // https://bitquill.atlassian.net/browse/AD-604
   return SqlResult::AI_SUCCESS;
 }
 
 SqlResult::Type DataQuery::MakeRequestFetch() {
-  std::auto_ptr< ResultPage > resultPage(new ResultPage());
-
-  QueryFetchRequest req(cursor->GetQueryId(),
-                        connection.GetConfiguration().GetDefaultFetchSize());
-  QueryFetchResponse rsp(*resultPage);
-
-  try {
-    connection.SyncMessage(req, rsp);
-  } catch (const OdbcError& err) {
-    diag.AddStatusRecord(err);
-
-    return SqlResult::AI_ERROR;
-  } catch (const IgniteError& err) {
-    diag.AddStatusRecord(err.GetText());
-
-    return SqlResult::AI_ERROR;
-  }
-
-  if (rsp.GetStatus() != ResponseStatus::SUCCESS) {
-    LOG_MSG("Error: " << rsp.GetError());
-
-    diag.AddStatusRecord(ResponseStatusToSqlState(rsp.GetStatus()),
-                         rsp.GetError());
-
-    return SqlResult::AI_ERROR;
-  }
-
-  LOG_MSG("Page size:    " << resultPage->GetSize());
-  LOG_MSG("Page is last: " << resultPage->IsLast());
-
-  cursor->UpdateData(resultPage);
-
+  // TODO: AD-604 - MakeRequestExecute
+  // https://bitquill.atlassian.net/browse/AD-604
   return SqlResult::AI_SUCCESS;
 }
 
 SqlResult::Type DataQuery::MakeRequestMoreResults() {
-  std::auto_ptr< ResultPage > resultPage(new ResultPage());
-
-  QueryMoreResultsRequest req(
-      cursor->GetQueryId(),
-      connection.GetConfiguration().GetDefaultFetchSize());
-  QueryMoreResultsResponse rsp(*resultPage);
-
-  try {
-    connection.SyncMessage(req, rsp);
-  } catch (const OdbcError& err) {
-    diag.AddStatusRecord(err);
-
-    return SqlResult::AI_ERROR;
-  } catch (const IgniteError& err) {
-    diag.AddStatusRecord(err.GetText());
-
-    return SqlResult::AI_ERROR;
-  }
-
-  if (rsp.GetStatus() != ResponseStatus::SUCCESS) {
-    LOG_MSG("Error: " << rsp.GetError());
-
-    diag.AddStatusRecord(ResponseStatusToSqlState(rsp.GetStatus()),
-                         rsp.GetError());
-
-    return SqlResult::AI_ERROR;
-  }
-
-  LOG_MSG("Page size:    " << resultPage->GetSize());
-  LOG_MSG("Page is last: " << resultPage->IsLast());
-
-  cachedNextPage = resultPage;
-  cursor.reset(new Cursor(rsp.GetQueryId()));
-
+  // TODO: AD-604 - MakeRequestExecute
+  // https://bitquill.atlassian.net/browse/AD-604
   return SqlResult::AI_SUCCESS;
 }
 
 SqlResult::Type DataQuery::MakeRequestResultsetMeta() {
-  const std::string& schema = connection.GetSchema();
-
-  QueryGetResultsetMetaRequest req(schema, sql);
-  QueryGetResultsetMetaResponse rsp;
-
-  try {
-    // Setting connection timeout to 1 second more than query timeout itself.
-    int32_t connectionTimeout = timeout ? timeout + 1 : 0;
-    bool success = connection.SyncMessage(req, rsp, connectionTimeout);
-
-    if (!success) {
-      diag.AddStatusRecord(SqlState::SHYT00_TIMEOUT_EXPIRED,
-                           "Query timeout expired");
-
-      return SqlResult::AI_ERROR;
-    }
-  } catch (const OdbcError& err) {
-    diag.AddStatusRecord(err);
-
-    return SqlResult::AI_ERROR;
-  } catch (const IgniteError& err) {
-    diag.AddStatusRecord(err.GetText());
-
-    return SqlResult::AI_ERROR;
-  }
-
-  if (rsp.GetStatus() != ResponseStatus::SUCCESS) {
-    LOG_MSG("Error: " << rsp.GetError());
-
-    diag.AddStatusRecord(ResponseStatusToSqlState(rsp.GetStatus()),
-                         rsp.GetError());
-
-    return SqlResult::AI_ERROR;
-  }
-
-  SetResultsetMeta(rsp.GetMeta());
-
+  // TODO: AD-604 - MakeRequestExecute
+  // https://bitquill.atlassian.net/browse/AD-604
   return SqlResult::AI_SUCCESS;
 }
 
