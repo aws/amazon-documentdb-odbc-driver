@@ -261,17 +261,8 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::TYPE_NAME: {
-      boost::optional< std::string > temp;
-      type_traits::BinaryTypeToSqlTypeName(columnType, temp);
-     // const boost::optional< std::string > &temp = type_traits::BinaryTypeToSqlTypeName(
-      //    columnType);// unsuccessful boost::optional initialization. 
-      // temp would have "" even though BinaryTypeToSqlTypeName
-      // returns VARCHAR. I think boost::optional does copy "VARCHAR" string.
-      // but when jumping out of the return function, temp is not correctly 
-      // initiated. -AL- Mar 07.
-      buffer.PutOptString(temp);
-        //buffer.PutOptString(
-        //    type_traits::BinaryTypeToSqlTypeName(columnType));
+       buffer.PutOptString(
+            type_traits::BinaryTypeToSqlTypeName(columnType));
       break;
     }
 

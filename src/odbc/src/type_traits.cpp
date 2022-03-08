@@ -117,8 +117,8 @@ const char* StatementAttrIdToString(long id) {
  * Warning: if any JDBC Type is added or becomes deprecated on the JDBC side,
  * the change should be reflected under this function as well.
  */
-const boost::optional< std::string >& BinaryTypeToSqlTypeName(
-    boost::optional< int16_t > binaryType) { // -AL- warning C4172: returning address of local variable or temporary
+const boost::optional< std::string > BinaryTypeToSqlTypeName(
+    boost::optional< int16_t > binaryType) {
   if (!binaryType)
     return boost::none;
   switch (*binaryType) {
@@ -189,99 +189,6 @@ const boost::optional< std::string >& BinaryTypeToSqlTypeName(
     case JDBC_TYPE_REF_CURSOR:
     default:
       return SqlTypeName::BINARY;
-  }
-}
-
-void BinaryTypeToSqlTypeName(
-    boost::optional< int16_t > binaryType, boost::optional< std::string >& value) {
-  if (!binaryType)
-    value = boost::none;
-  switch (*binaryType) {
-    case JDBC_TYPE_BIT:
-    case JDBC_TYPE_BOOLEAN:
-      value = SqlTypeName::BIT;
-      break;
-
-    case JDBC_TYPE_SMALLINT:
-      value = SqlTypeName::SMALLINT;
-      break;
-
-    case JDBC_TYPE_TINYINT:
-      value = SqlTypeName::TINYINT;
-      break;
-
-    case JDBC_TYPE_INTEGER:
-      value = SqlTypeName::INTEGER;
-      break;
-
-    case JDBC_TYPE_BIGINT:
-      value = SqlTypeName::BIGINT;
-      break;
-
-    case JDBC_TYPE_FLOAT:
-      value = SqlTypeName::FLOAT;
-      break;
-
-    case JDBC_TYPE_REAL:
-      value = SqlTypeName::REAL;
-      break;
-
-    case JDBC_TYPE_DOUBLE:
-      value = SqlTypeName::DOUBLE;
-      break;
-
-    case JDBC_TYPE_NUMERIC:
-      value = SqlTypeName::NUMERIC;
-      break;
-
-    case JDBC_TYPE_DECIMAL:
-      value = SqlTypeName::DECIMAL;
-      break;
-
-    case JDBC_TYPE_VARCHAR:
-    case JDBC_TYPE_NVARCHAR:
-      value = SqlTypeName::VARCHAR;
-      break;
-
-    case JDBC_TYPE_LONGVARCHAR:
-    case JDBC_TYPE_LONGNVARCHAR:
-      value = SqlTypeName::LONGVARCHAR;
-      break;
-
-    case JDBC_TYPE_DATE:
-      value = SqlTypeName::DATE;
-      break;
-
-    case JDBC_TYPE_TIME:
-      value = SqlTypeName::TIME;
-      break;
-
-    case JDBC_TYPE_TIMESTAMP:
-      value = SqlTypeName::TIMESTAMP;
-      break;
-
-    case JDBC_TYPE_LONGVARBINARY:
-      value = SqlTypeName::LONGVARBINARY;
-      break;
-
-    case JDBC_TYPE_NULL:
-      value = SqlTypeName::SQL_NULL;
-      break;
-
-    case JDBC_TYPE_BINARY:
-    case JDBC_TYPE_VARBINARY:
-    case JDBC_TYPE_BLOB:
-    case JDBC_TYPE_CLOB:
-    case JDBC_TYPE_ARRAY:
-    case JDBC_TYPE_STRUCT:
-    case JDBC_TYPE_JAVA_OBJECT:
-    case JDBC_TYPE_ROWID:
-    case JDBC_TYPE_NCLOB:
-    case JDBC_TYPE_SQLXML:
-    case JDBC_TYPE_REF_CURSOR:
-    default:
-      value = SqlTypeName::BINARY;
-      break;
   }
 }
 
