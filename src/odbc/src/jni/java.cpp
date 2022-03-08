@@ -1114,10 +1114,6 @@ JniErrorCode JniContext::ResultSetGetInt(
   ExceptionCheck(env, &errInfo);
 
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    // todo -AL- wasNull is to be removed since optional int is supported. Should I remvoe wasNull parameter 
-    // in ResultSetWasNull as well?
-    // should I no longer call the function since we know the nullability of the value
-    // or should I modify value to boost::none only if wasNull is false?
     bool wasNull;
     errInfo.code = ResultSetWasNull(resultSet, wasNull, errInfo);
     if (!wasNull)
