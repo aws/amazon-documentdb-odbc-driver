@@ -211,31 +211,27 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetTables) {
     boost::optional<std::string> value;
 
     resultSet.Get()->GetString(1, value, errInfo);
-    BOOST_CHECK(value);
+    BOOST_CHECK(!value);
     resultSet.Get()->GetString("TABLE_CAT", value, errInfo);
-    BOOST_CHECK(value);
+    BOOST_CHECK(!value);
 
     resultSet.Get()->GetString(2, value, errInfo);
-    BOOST_CHECK(!value);
+    BOOST_CHECK(value);
     resultSet.Get()->GetString("TABLE_SCHEM", value, errInfo);
-    BOOST_CHECK(!value);
+    BOOST_CHECK(value);
     BOOST_CHECK("test" == *value);
 
     resultSet.Get()->GetString(3, value, errInfo);
     BOOST_CHECK(value);
     BOOST_CHECK(!value->empty());
     resultSet.Get()->GetString("TABLE_NAME", value, errInfo);
-    
     BOOST_CHECK(value);
     BOOST_CHECK(!value->empty());
 
     resultSet.Get()->GetString(4, value, errInfo);
-    
     BOOST_CHECK(value);
     BOOST_CHECK("TABLE" == *value);
-    resultSet.Get()->GetString("TABLE_TYPE", value, errInfo);
-    
-    BOOST_CHECK(value);
+    resultSet.Get()->GetString("TABLE_TYPE", value, errInfo);    BOOST_CHECK(value);
     BOOST_CHECK("TABLE" == *value);
 
   } while (hasNext);
@@ -413,15 +409,23 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
         BOOST_CHECK(!intValue);
 
         resultSet.Get()->GetInt(16, intValue, errInfo);
-        BOOST_CHECK(intValue);
+        switch (columnIndex) {
+          case 1:
+            BOOST_CHECK(intValue);
+            BOOST_CHECK_EQUAL(262144, intValue);
+            break;
+          case 2:
+            BOOST_CHECK(!intValue);
+            break;
+        }
         resultSet.Get()->GetInt("CHAR_OCTET_LENGTH", intValue, errInfo);
-        BOOST_CHECK(intValue);
         switch (columnIndex) {
             case 1:
+                BOOST_CHECK(intValue);
                 BOOST_CHECK_EQUAL(262144, intValue);
                 break;
             case 2:
-                BOOST_CHECK_EQUAL(0, intValue);
+                BOOST_CHECK(!intValue);
                 break;
         }
 
