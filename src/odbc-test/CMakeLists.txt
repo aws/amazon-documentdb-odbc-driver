@@ -39,6 +39,7 @@ else ()
 endif()
 
 set(SOURCES 
+         src/api_robustness_test.cpp
          src/configuration_test.cpp
          src/connection_test.cpp
          src/java_test.cpp

@@ -17,8 +17,8 @@
 
 #include "ignite/odbc/query/primary_keys_query.h"
 
-#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/connection.h"
+#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/message.h"
 #include "ignite/odbc/type_traits.h"
 
@@ -110,6 +110,10 @@ const meta::ColumnMetaVector* PrimaryKeysQuery::GetMeta() {
 
 SqlResult::Type PrimaryKeysQuery::FetchNextRow(
     app::ColumnBindingMap& columnBindings) {
+  // TODO: [AD-551] Adaptation SQLPrimaryKeys return tables PK
+  // https://bitquill.atlassian.net/browse/AD-551
+  return SqlResult::AI_NO_DATA;
+
   if (!executed) {
     diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
                          "Query was not executed.");
