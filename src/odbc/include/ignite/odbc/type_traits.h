@@ -180,6 +180,9 @@ class SqlTypeName {
  */
 const boost::optional< std::string >& BinaryTypeToSqlTypeName(
     boost::optional< int16_t > binaryType);
+// -AL- this is a temp function v. If works, consider replace above function with it 
+void BinaryTypeToSqlTypeName(boost::optional< int16_t > binaryType,
+                             boost::optional< std::string >& value);
 
 /**
  * Check if the C type supported by the current implementation.
