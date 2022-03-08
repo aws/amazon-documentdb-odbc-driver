@@ -377,7 +377,6 @@ ConversionResult::Type ApplicationDataBuffer::PutOptString(
     return PutNull();
 }
 
-
 ConversionResult::Type ApplicationDataBuffer::PutString(
     const std::string& value) {
   int32_t written = 0;
