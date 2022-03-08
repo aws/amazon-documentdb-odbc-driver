@@ -76,8 +76,9 @@ class ResultSet {
    *
    * @return a JniErrorCode indicating success or failure.
    */
-  JniErrorCode GetString(const int columnIndex, boost::optional<std::string>& value,
-                          JniErrorInfo& errInfo);
+  JniErrorCode GetString(const int columnIndex,
+                         boost::optional< std::string >& value,
+                         JniErrorInfo& errInfo);
 
   /**
    * Gets a value on the current row of the result set for the
@@ -87,8 +88,9 @@ class ResultSet {
    *
    * @return a JniErrorCode indicating success or failure.
    */
-  JniErrorCode GetString(const std::string& columnName, boost::optional<std::string>& value,
-                          JniErrorInfo& errInfo);
+  JniErrorCode GetString(const std::string& columnName,
+                         boost::optional< std::string >& value,
+                         JniErrorInfo& errInfo);
 
   /**
    * Gets a value on the current row of the result set for the
@@ -110,8 +112,7 @@ class ResultSet {
    * @return a JniErrorCode indicating success or failure.
    */
   JniErrorCode GetInt(const std::string& columnName,
-                      boost::optional< int >& value, 
-                      JniErrorInfo& errInfo);
+                      boost::optional< int >& value, JniErrorInfo& errInfo);
 
  private:
   /**
