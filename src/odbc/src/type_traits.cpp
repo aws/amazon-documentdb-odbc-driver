@@ -490,8 +490,7 @@ boost::optional< std::string > NullabilityToIsNullable(
       return std::string("NO");
 
     case SQL_NULLABLE:
-      return std::string("YES"); 
-      //- AL- this is causing build errors in mac... what to do?
+      return std::string("YES");
 
     default:
       return boost::none;
