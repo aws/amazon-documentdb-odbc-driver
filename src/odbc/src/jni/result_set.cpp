@@ -58,28 +58,30 @@ JniErrorCode ResultSet::Next(bool& hasNext, JniErrorInfo& errInfo) {
   return _jniContext.Get()->ResultSetNext(_resultSet, hasNext, errInfo);
 }
 
-JniErrorCode ResultSet::GetString(const int columnIndex, boost::optional<std::string>& value,
-                                   JniErrorInfo& errInfo) {
+JniErrorCode ResultSet::GetString(const int columnIndex,
+                                  boost::optional< std::string >& value,
+                                  JniErrorInfo& errInfo) {
   return _jniContext.Get()->ResultSetGetString(_resultSet, columnIndex, value,
-                                                errInfo);
+                                               errInfo);
 }
 
 JniErrorCode ResultSet::GetString(const std::string& columnName,
-                                  boost::optional<std::string>& value, 
+                                  boost::optional< std::string >& value,
                                   JniErrorInfo& errInfo) {
   return _jniContext.Get()->ResultSetGetString(_resultSet, columnName, value,
-                                                errInfo);
+                                               errInfo);
 }
 
-JniErrorCode ResultSet::GetInt(const int columnIndex, boost::optional<int>& value, 
+JniErrorCode ResultSet::GetInt(const int columnIndex,
+                               boost::optional< int >& value,
                                JniErrorInfo& errInfo) {
   return _jniContext.Get()->ResultSetGetInt(_resultSet, columnIndex, value,
-                                             errInfo);
+                                            errInfo);
 }
 
 JniErrorCode ResultSet::GetInt(const std::string& columnName,
                                boost::optional< int >& value,
-                                JniErrorInfo& errInfo) {
+                               JniErrorInfo& errInfo) {
   return _jniContext.Get()->ResultSetGetInt(_resultSet, columnName, value,
                                             errInfo);
 }
