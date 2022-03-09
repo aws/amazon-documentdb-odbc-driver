@@ -39,6 +39,8 @@ Example:
 2. Install the test data
    1. `cd src/odbc-test/scripts`
    2. `.\import_test_data.ps1` (Windows) or `./import_test_data.sh` (MacOS or Linux)
+   If receiving permission errors on MacOS while importing the test data, 
+   use `chmod +x ./reinstall_mongodb_mac.sh` and try again.
 
 ### Windows
 
@@ -60,17 +62,19 @@ Example:
    2. Ensure to save Java `\bin` and `\server` directories to the User `PATH` variable. (e.g. C:\Program Files\Java\jdk1.8.0_321\jre\bin\server)
 5. Boost Test Framework 
    1. Install via [VCPKG](https://vcpkg.io/en/getting-started.html) using `.\vcpkg install openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows`
-6. Run one of the build scripts to create an initial compilation.
+6. Mongo Driver
+   1. Install via [VCPKG](https://vcpkg.io/en/getting-started.html) using `vcpkg install mongo-cxx-driver:x86-windows`
+7. Run one of the build scripts to create an initial compilation.
    1. E.g.: `.\build_win_debug64.ps1`
    2. Navigate to the `build\odbc\cmake` folder to use the generated solution file, `Ignite.C++.sln` to work on
    source code development and testing.
-7. Set the environment variable `DOCUMENTDB_HOME`. On a developer's machine, set it to `<repo-folder>\build\odbc\bin\Debug`. The 
+8. Set the environment variable `DOCUMENTDB_HOME`. On a developer's machine, set it to `<repo-folder>\build\odbc\bin\Debug`. The 
    build script run above, downloads it to the `<repo-folder>\build\odbc\bin\Debug\libs` folder.
-8. Open a **64-bit** command shell or **64-bit** PowerShell window, **as Administrator**, run the 
+9. Open a **64-bit** command shell or **64-bit** PowerShell window, **as Administrator**, run the 
    ```
    <repo-folder>\src\odbc\src\install\install_amd64.cmd <repo-folder>\buildbuild\odbc\cmake\Debug\ignite.odbc.dll
    ``` 
-8. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
+10. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
 ### MacOS
 
@@ -80,11 +84,13 @@ Example:
    3. `brew install unixodbc`  
       - You may need to unlink `libiodbc` if you already have this installed. Use `brew unlink libiodbc`.
    4. `brew install boost`
-   5. Install Java **JDK** (version 8+ - 17 recommended)  
+   5. `brew install mongodb-community`
+   6. `brew install mongo-cxx-driver`
+   7. Install Java **JDK** (version 8+ - 17 recommended)  
       - This can be done through Homebrew using `brew install --cask temurin<version>`. 
       - Ensure to set `JAVA_HOME`.
       - Ensure to save Java `/bin` and `/server` directories to the User `PATH` variable.  
-   6. If creating a debug build (`./build_mac_debug64.sh`), LLVM is required.
+   8. If creating a debug build (`./build_mac_debug64.sh`), LLVM is required.
       - If you only have XCode Command Line Tools, use the LLVM included with XCode by modifying the PATH with `export PATH=/Library/Developer/CommandLineTools/usr/bin/:$PATH`. Ensure this XCode path comes first in $PATH. If error occurs, check that clang and llvm are under folder Library/Developer/CommandLineTools/usr/bin.
       - If you have XCode application, to ensure LLVM and CMake are compatible, use the LLVM included with XCode by modifying the PATH with `export PATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/:$PATH`.
 2. Run one of the build scripts to create an initial compilation.
