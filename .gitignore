@@ -21,6 +21,7 @@ lib64/*
 *.tlog
 include/*
 packages/*
+odbc_test_result.xml
 # Visual Studio 
 .vs/*
 src/.vs/*
