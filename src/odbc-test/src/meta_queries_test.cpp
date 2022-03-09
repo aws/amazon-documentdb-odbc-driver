@@ -849,6 +849,26 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsMany) {
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 }
 
+BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsOneFromLocalServer) {
+  SQLCHAR empty[] = "";
+  SQLCHAR table[] = "meta_queries_test_002";
+  SQLCHAR column[] = "fieldString";
+
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
+                            SQL_NTS, column, SQL_NTS);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  CheckSingleRowResultSetWithGetData(stmt, 4, "fieldString");
+}
+
 BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsNone) {
   std::string dsnConnectionString;
   CreateDsnConnectionString(dsnConnectionString);
