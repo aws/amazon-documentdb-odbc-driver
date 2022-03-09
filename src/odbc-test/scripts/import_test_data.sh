@@ -11,7 +11,7 @@ TEST_INPUT_FOLDER="${SCRIPT_DIR}/../input"
 DATABASE_NAME="odbc-test"
 
 # Clear the database so we don't have any existing data
-mongosh -u="${DOC_DB_USER_NAME}" -p="${DOC_DB_PASSWORD}" --authenticationDatabase=admin \
+mongosh --quiet -u="${DOC_DB_USER_NAME}" -p="${DOC_DB_PASSWORD}" --authenticationDatabase=admin \
     --eval "db.dropDatabase()" "${DATABASE_NAME}"
 
 # Load each test input file
