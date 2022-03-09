@@ -11,7 +11,7 @@ TEST_INPUT_FOLDER="${SCRIPT_DIR}/../input"
 DATABASE_NAME="odbc-test"
 
 # Clear the database so we don't have any existing data
-mongosh --quiet -u="${DOC_DB_USER_NAME}" -p="${DOC_DB_PASSWORD}" --authenticationDatabase=admin \
+mongosh -u="${DOC_DB_USER_NAME}" -p="${DOC_DB_PASSWORD}" --authenticationDatabase=admin \
     --eval "db.dropDatabase()" "${DATABASE_NAME}"
 
 # Load each test input file
@@ -21,7 +21,7 @@ do
     COLLECTION_NAME="$(basename -- ${FILENAME%.json})"
     TEST_FILE_NAME="$(basename -- ${FILENAME})"
 
-    mongoimport --quiet -u="${DOC_DB_USER_NAME}" -p="${DOC_DB_PASSWORD}" --authenticationDatabase=admin \
+    mongoimport -u="${DOC_DB_USER_NAME}" -p="${DOC_DB_PASSWORD}" --authenticationDatabase=admin \
         -d="${DATABASE_NAME}" -c="${COLLECTION_NAME}" \
         --file="""${TEST_INPUT_FOLDER}/${TEST_FILE_NAME}"""
     if [ $? -ne 0 ]
