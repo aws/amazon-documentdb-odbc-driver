@@ -114,24 +114,24 @@ SqlResult::Type PrimaryKeysQuery::FetchNextRow(
   // https://bitquill.atlassian.net/browse/AD-551
   return SqlResult::AI_NO_DATA;
 
-  if (!executed) {
-    diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
-                         "Query was not executed.");
+  //if (!executed) {
+  //  diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
+  //                       "Query was not executed.");
 
-    return SqlResult::AI_ERROR;
-  }
+  //  return SqlResult::AI_ERROR;
+  //}
 
-  if (cursor == meta.end())
-    return SqlResult::AI_NO_DATA;
+  //if (cursor == meta.end())
+  //  return SqlResult::AI_NO_DATA;
 
-  app::ColumnBindingMap::iterator it;
+  //app::ColumnBindingMap::iterator it;
 
-  for (it = columnBindings.begin(); it != columnBindings.end(); ++it)
-    GetColumn(it->first, it->second);
+  //for (it = columnBindings.begin(); it != columnBindings.end(); ++it)
+  //  GetColumn(it->first, it->second);
 
-  ++cursor;
+  //++cursor;
 
-  return SqlResult::AI_SUCCESS;
+  //return SqlResult::AI_SUCCESS;
 }
 
 SqlResult::Type PrimaryKeysQuery::GetColumn(
