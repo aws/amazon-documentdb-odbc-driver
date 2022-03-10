@@ -50,7 +50,9 @@ const std::string SqlTypeName::VARCHAR("VARCHAR");
 
 const std::string SqlTypeName::LONGVARCHAR("LONGVARCHAR");
 
-const std::string SqlTypeName::BINARY("VARBINARY");
+const std::string SqlTypeName::BINARY("BINARY");
+
+const std::string SqlTypeName::VARBINARY("VARBINARY");
 
 const std::string SqlTypeName::LONGVARBINARY("LONGVARBINARY");
 
@@ -173,8 +175,10 @@ const std::string& BinaryTypeToSqlTypeName(int16_t binaryType) {
     case JDBC_TYPE_NULL:
       return SqlTypeName::SQL_NULL;
 
-    case JDBC_TYPE_BINARY:
     case JDBC_TYPE_VARBINARY:
+      return SqlTypeName::VARBINARY;
+
+    case JDBC_TYPE_BINARY:
     case JDBC_TYPE_BLOB:
     case JDBC_TYPE_CLOB:
     case JDBC_TYPE_ARRAY:
@@ -449,8 +453,10 @@ int16_t BinaryToSqlType(int16_t binaryType) {
     case JDBC_TYPE_NULL:
       return SQL_TYPE_NULL;
 
-    case JDBC_TYPE_BINARY:
     case JDBC_TYPE_VARBINARY:
+      return SQL_VARBINARY;
+
+    case JDBC_TYPE_BINARY:
     case JDBC_TYPE_BLOB:
     case JDBC_TYPE_CLOB:
     case JDBC_TYPE_ARRAY:
