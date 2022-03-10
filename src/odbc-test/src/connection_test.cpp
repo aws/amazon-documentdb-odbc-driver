@@ -83,7 +83,6 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestoreInternalSSHTunnel) {
   std::string connectionString;
   CreateDsnConnectionString(connectionString);
   Connect(connectionString);
-  Disconnect();
 }
 
 BOOST_AUTO_TEST_CASE(TestConnectionRestoreExternalSSHTunnel) {
@@ -91,7 +90,6 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestoreExternalSSHTunnel) {
   CreateDsnConnectionString(connectionString, std::string(), false);
 
   Connect(connectionString);
-  Disconnect();
 }
 
 BOOST_AUTO_TEST_CASE(TestConnectionRestoreMiscOptionsSet) {
@@ -109,7 +107,6 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestoreMiscOptionsSet) {
   CreateDsnConnectionString(connectionString, std::string(), true, miscOptions);
 
   Connect(connectionString);
-  Disconnect();
 }
 
 BOOST_AUTO_TEST_CASE(TestConnectionIncompleteBasicProperties) {
@@ -123,7 +120,6 @@ BOOST_AUTO_TEST_CASE(TestConnectionIncompleteBasicProperties) {
                          "01S00: Hostname, username, password, and database "
                          "are required to connect.");
 
-  Disconnect();
 }
 
 BOOST_AUTO_TEST_CASE(TestConnectionIncompleteSSHTunnelProperties) {
@@ -141,7 +137,6 @@ BOOST_AUTO_TEST_CASE(TestConnectionIncompleteSSHTunnelProperties) {
       "01S00: If using an internal SSH tunnel, all of ssh_host, ssh_user, "
       "ssh_private_key_file are required to connect.");
 
-  Disconnect();
 }
 
 BOOST_AUTO_TEST_CASE(TestConnectionInvalidUser) {
@@ -156,7 +151,6 @@ BOOST_AUTO_TEST_CASE(TestConnectionInvalidUser) {
       "Please check your settings. Authorization failed for user 'invaliduser' "
       "on database 'admin' with mechanism");
 
-  Disconnect();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
