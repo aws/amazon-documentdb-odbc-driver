@@ -79,11 +79,11 @@ struct ConnectionTestSuiteFixture : OdbcTestSuite {
 
 BOOST_FIXTURE_TEST_SUITE(ConnectionTestSuite, ConnectionTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestConnectionRestoreInternalSSHTunnel) {
-  std::string connectionString;
-  CreateDsnConnectionString(connectionString);
-  Connect(connectionString);
-}
+//BOOST_AUTO_TEST_CASE(TestConnectionRestoreInternalSSHTunnel) {
+//  std::string connectionString;
+//  CreateDsnConnectionString(connectionString);
+//  Connect(connectionString);
+//}
 
 BOOST_AUTO_TEST_CASE(TestConnectionRestoreExternalSSHTunnel) {
   std::string connectionString;
