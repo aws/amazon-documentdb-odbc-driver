@@ -205,7 +205,7 @@ class ColumnMeta {
    * Get data type.
    * @return Data type.
    */
-  int8_t GetDataType() const {
+  int16_t GetDataType() const {
     return dataType;
   }
 
