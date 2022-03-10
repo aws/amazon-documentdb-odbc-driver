@@ -232,7 +232,7 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
   }
 
   const meta::ColumnMeta& currentColumn = *cursor;
-  int8_t columnType = currentColumn.GetDataType();
+  int16_t columnType = currentColumn.GetDataType();
 
   switch (columnIdx) {
     case ResultColumn::TABLE_CAT: {
@@ -262,7 +262,7 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
 
     case ResultColumn::TYPE_NAME: {
       buffer.PutString(
-          type_traits::BinaryTypeToSqlTypeName(currentColumn.GetDataType()));
+          type_traits::BinaryTypeToSqlTypeName(columnType));
       break;
     }
 
