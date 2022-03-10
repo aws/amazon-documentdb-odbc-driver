@@ -31,6 +31,7 @@
 #include "ignite/odbc/common/fixed_size_array.h"
 #include "ignite/ignition.h"
 #include "ignite/odbc/impl/binary/binary_utils.h"
+#include "ignite/odbc/type_traits.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"
 #include "test_utils.h"
@@ -763,6 +764,154 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneWithTableTypes) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   CheckSingleRowResultSetWithGetData(stmt, 3, "meta_queries_test_001");
+}
+
+BOOST_AUTO_TEST_CASE(TestDataTypes) {
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR table[] = "meta_queries_test_001";
+  SQLCHAR empty[] = "";
+  SQLCHAR *schemaName = (SQLCHAR *)databaseName.c_str();
+   
+
+  SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, schemaName, SQL_NTS, table,
+                             SQL_NTS, empty, SQL_NTS);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  char column_name[C_STR_LEN_DEFAULT]{};
+  SQLLEN column_name_len = sizeof(column_name);
+  SQLSMALLINT data_type = 0;
+  SQLLEN data_type_len = sizeof(data_type);
+  char type_name[C_STR_LEN_DEFAULT]{};
+  SQLLEN type_name_len = sizeof(type_name);
+
+  ret = SQLBindCol(stmt, 4, SQL_C_CHAR, column_name, C_STR_LEN_DEFAULT,
+                   &column_name_len);
+  BOOST_CHECK(SQL_SUCCEEDED(ret));
+  ret = SQLBindCol(stmt, 5, SQL_SMALLINT, &data_type, sizeof(data_type),
+                   &data_type_len);
+  BOOST_CHECK(SQL_SUCCEEDED(ret));
+  ret = SQLBindCol(stmt, 6, SQL_C_CHAR, type_name, C_STR_LEN_DEFAULT,
+                   &type_name_len);
+  BOOST_CHECK(SQL_SUCCEEDED(ret));
+
+  if (!SQL_SUCCEEDED(ret))
+   BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  ret = SQLFetch(stmt);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  using namespace ignite::odbc::type_traits;
+  BOOST_CHECK_EQUAL("meta_queries_test_001__id", column_name);  // COLUMN_NAME
+  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);                    // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);           // TYPE_NAME
+
+  ret = SQLFetch(stmt);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  BOOST_CHECK_EQUAL("fieldDecimal128", column_name);  // COLUMN_NAME
+  BOOST_CHECK_EQUAL(SQL_DECIMAL, data_type);          // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::DECIMAL, type_name);  // TYPE_NAME
+
+  ret = SQLFetch(stmt);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  BOOST_CHECK_EQUAL("fieldDouble", column_name);  // COLUMN_NAME
+  BOOST_CHECK_EQUAL(SQL_DOUBLE, data_type);       // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::DOUBLE, type_name);  // TYPE_NAME
+
+  ret = SQLFetch(stmt);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  BOOST_CHECK_EQUAL("fieldString", column_name);  // COLUMN_NAME
+  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);       // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
+
+  ret = SQLFetch(stmt);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  BOOST_CHECK_EQUAL("fieldObjectId", column_name);  // COLUMN_NAME
+  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);      // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
+
+  ret = SQLFetch(stmt);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  BOOST_CHECK_EQUAL("fieldBoolean", column_name);  // COLUMN_NAME
+  BOOST_CHECK_EQUAL(SQL_BIT, data_type);        // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::BIT, type_name);  // TYPE_NAME
+
+  ret = SQLFetch(stmt);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  BOOST_CHECK_EQUAL("fieldDate", column_name);  // COLUMN_NAME
+  BOOST_CHECK_EQUAL(SQL_TYPE_TIMESTAMP, data_type);           // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::TIMESTAMP, type_name);  // TYPE_NAME
+
+  ret = SQLFetch(stmt);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  BOOST_CHECK_EQUAL("fieldInt", column_name);   // COLUMN_NAME
+  BOOST_CHECK_EQUAL(SQL_INTEGER, data_type);  // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::INTEGER, type_name);  // TYPE_NAME
+
+  ret = SQLFetch(stmt);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  BOOST_CHECK_EQUAL("fieldLong", column_name);  // COLUMN_NAME
+  BOOST_CHECK_EQUAL(SQL_BIGINT, data_type);   // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::BIGINT, type_name);  // TYPE_NAME
+
+  ret = SQLFetch(stmt);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  BOOST_CHECK_EQUAL("fieldMaxKey", column_name);  // COLUMN_NAME
+  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);     // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
+
+  ret = SQLFetch(stmt);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  BOOST_CHECK_EQUAL("fieldMinKey", column_name);  // COLUMN_NAME
+  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);      // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
+
+  ret = SQLFetch(stmt);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  BOOST_CHECK_EQUAL("fieldNull", column_name);  // COLUMN_NAME
+  BOOST_CHECK_EQUAL(SQL_TYPE_NULL, data_type);         // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::SQL_NULL, type_name);  // TYPE_NAME
+
+  ret = SQLFetch(stmt);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  BOOST_CHECK_EQUAL("fieldBinary", column_name);  // COLUMN_NAME
+  BOOST_CHECK_EQUAL(SQL_VARBINARY, data_type);       // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::VARBINARY, type_name);  // TYPE_NAME
+
+  ret = SQLFetch(stmt);
+
+  BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA); 
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneForQuotedTypes) {
