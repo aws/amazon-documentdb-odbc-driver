@@ -96,7 +96,9 @@ Example:
 2. Run one of the build scripts to create an initial compilation.
    1. E.g.: `./build_mac_release64.sh`
    2. Navigate to the `build/odbc/lib` folder to use the generated files.
-3. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
+3. Run the following command to register the ODBC driver. 
+   `./scripts/register_driver_macos.sh`
+4. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
 ### Linux
 
