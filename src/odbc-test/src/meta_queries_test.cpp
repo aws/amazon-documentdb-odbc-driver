@@ -773,8 +773,12 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
 
   Connect(dsnConnectionString);
 
+  SQLCHAR table[] = "meta_queries_test_001";
   SQLCHAR empty[] = "";
-  SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, empty,
+  SQLCHAR *schemaName = (SQLCHAR *)databaseName.c_str();
+   
+
+  SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, schemaName, SQL_NTS, table,
                              SQL_NTS, empty, SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
