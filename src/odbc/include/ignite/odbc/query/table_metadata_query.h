@@ -121,6 +121,35 @@ class TableMetadataQuery : public Query {
    */
   SqlResult::Type MakeRequestGetTablesMeta();
 
+  /** 
+   * Trims leading space from a string.
+   * 
+   * @return the string with leading spaces trimmed.
+   */
+  std::string ltrim(const std::string& s);
+
+  /** 
+   * Trims trailing space from a string.
+   * 
+   * @return the string with trailing spaces trimmed.
+   */
+  std::string rtrim(const std::string& s);
+
+  /**
+   * Trims leading and trailing space from a string.
+   * 
+   * @return the string with leading and trailing spaces trimmed.
+   */
+  std::string trim(const std::string& s);
+
+  /** 
+   * Remove outer matching quotes from a string. They can be either single (') or double (") quotes.
+   * They must be the left- and right-most characters in the string.
+   * 
+   * @return the string with matched quotes removed.
+   */
+  std::string dequote(const std::string& s);
+
   /** Connection associated with the statement. */
   Connection& connection;
 
