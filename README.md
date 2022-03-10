@@ -61,21 +61,19 @@ Example:
    1. Ensure to set `JAVA_HOME`. (e.g. C:\Program Files\Java\jdk-17.0.2)
    2. Ensure to save Java `\bin` and `\server` directories to the User `PATH` variable. 
    Example: C:\Program Files\Java\jdk1.8.0_321\jre\bin\server
-5. Boost Test Framework 
-   1. Install via [VCPKG](https://vcpkg.io/en/getting-started.html) using `.\vcpkg install openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows`
-6. Mongo Driver
-   1. Install via [VCPKG](https://vcpkg.io/en/getting-started.html) using `vcpkg install mongo-cxx-driver:x86-windows`
-7. Run one of the build scripts to create an initial compilation.
+5. Boost Test Framework and Mondodb Driver
+   1. Install via [VCPKG](https://vcpkg.io/en/getting-started.html) using `.\vcpkg install openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows mongo-cxx-driver:x86-windows`
+6. Run one of the build scripts to create an initial compilation.
    1. E.g.: `.\build_win_debug64.ps1`
    2. Navigate to the `build\odbc\cmake` folder to use the generated solution file, `Ignite.C++.sln` to work on
    source code development and testing.
-8. Set the environment variable `DOCUMENTDB_HOME`. On a developer's machine, set it to `<repo-folder>\build\odbc\bin\Debug`. The 
+7. Set the environment variable `DOCUMENTDB_HOME`. On a developer's machine, set it to `<repo-folder>\build\odbc\bin\Debug`. The 
    build script run above, downloads it to the `<repo-folder>\build\odbc\bin\Debug\libs` folder.
-9. Open a **64-bit** command shell or **64-bit** PowerShell window, **as Administrator**, run the 
+8. Open a **64-bit** command shell or **64-bit** PowerShell window, **as Administrator**, run the 
    ```
    <repo-folder>\src\odbc\src\install\install_amd64.cmd <repo-folder>\buildbuild\odbc\cmake\Debug\ignite.odbc.dll
    ``` 
-10. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
+9. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
 ### MacOS
 
