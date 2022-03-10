@@ -1230,22 +1230,19 @@ SqlResult::Type Statement::InternalDescribeParam(int16_t paramNum,
     type = parameters.GetParamType(paramNum, impl::binary::IGNITE_HDR_NULL);
   }
 
-  if (dataType) {
-    if (boost::optional< int16_t > sqlType = type_traits::BinaryToSqlType(type))
+  boost::optional< int16_t > sqlType = type_traits::BinaryToSqlType(type);
+  if (dataType && sqlType)
       *dataType = *sqlType;
-  }
 
-  if (paramSize) {
-    if (boost::optional< int32_t > colSize =
-            type_traits::BinaryTypeColumnSize(type))
+  boost::optional< int32_t > colSize =
+            type_traits::BinaryTypeColumnSize(type);
+  if (paramSize && colSize)
       *paramSize = *colSize;
-  }
 
-  if (decimalDigits) {
-    if (boost::optional< int16_t > decDigits =
-            type_traits::BinaryTypeDecimalDigits(type))
+  boost::optional< int16_t > decDigits =
+            type_traits::BinaryTypeDecimalDigits(type);
+  if (decimalDigits && decDigits)
       *decimalDigits = *decDigits;
-  }
 
   if (nullable)
     *nullable = type_traits::BinaryTypeNullability(type);
