@@ -109,48 +109,48 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestoreMiscOptionsSet) {
   Connect(connectionString);
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionIncompleteBasicProperties) {
-  std::string connectionString =
-      "DRIVER={Amazon DocumentDB};"
-      "HOSTNAME=localhost;"
-      "USER=user;"
-      "PASSWORD=password;";
-
-  ExpectConnectionReject(connectionString,
-                         "01S00: Hostname, username, password, and database "
-                         "are required to connect.");
-
-}
-
-BOOST_AUTO_TEST_CASE(TestConnectionIncompleteSSHTunnelProperties) {
-  std::string connectionString =
-      "DRIVER={Amazon DocumentDB};"
-      "HOSTNAME=host.com;"
-      "DATABASE=test;"
-      "USER=user;"
-      "PASSWORD=password;"
-      "SSH_USER=sshUser;"
-      "SSH_HOST=sshHost;";
-
-  ExpectConnectionReject(
-      connectionString,
-      "01S00: If using an internal SSH tunnel, all of ssh_host, ssh_user, "
-      "ssh_private_key_file are required to connect.");
-
-}
-
-BOOST_AUTO_TEST_CASE(TestConnectionInvalidUser) {
-  std::string connectionString;
-  CreateDsnConnectionString(connectionString, "invaliduser");
-
-  ExpectConnectionReject(
-      connectionString,
-      "08001: Failed to establish connection with the host.\n"
-      "Invalid username or password or user is not authorized on database "
-      "'test'. "
-      "Please check your settings. Authorization failed for user 'invaliduser' "
-      "on database 'admin' with mechanism");
-
-}
+//BOOST_AUTO_TEST_CASE(TestConnectionIncompleteBasicProperties) {
+//  std::string connectionString =
+//      "DRIVER={Amazon DocumentDB};"
+//      "HOSTNAME=localhost;"
+//      "USER=user;"
+//      "PASSWORD=password;";
+//
+//  ExpectConnectionReject(connectionString,
+//                         "01S00: Hostname, username, password, and database "
+//                         "are required to connect.");
+//
+//}
+//
+//BOOST_AUTO_TEST_CASE(TestConnectionIncompleteSSHTunnelProperties) {
+//  std::string connectionString =
+//      "DRIVER={Amazon DocumentDB};"
+//      "HOSTNAME=host.com;"
+//      "DATABASE=test;"
+//      "USER=user;"
+//      "PASSWORD=password;"
+//      "SSH_USER=sshUser;"
+//      "SSH_HOST=sshHost;";
+//
+//  ExpectConnectionReject(
+//      connectionString,
+//      "01S00: If using an internal SSH tunnel, all of ssh_host, ssh_user, "
+//      "ssh_private_key_file are required to connect.");
+//
+//}
+//
+//BOOST_AUTO_TEST_CASE(TestConnectionInvalidUser) {
+//  std::string connectionString;
+//  CreateDsnConnectionString(connectionString, "invaliduser");
+//
+//  ExpectConnectionReject(
+//      connectionString,
+//      "08001: Failed to establish connection with the host.\n"
+//      "Invalid username or password or user is not authorized on database "
+//      "'test'. "
+//      "Please check your settings. Authorization failed for user 'invaliduser' "
+//      "on database 'admin' with mechanism");
+//
+//}
 
 BOOST_AUTO_TEST_SUITE_END()
