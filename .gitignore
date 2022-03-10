@@ -1,4 +1,5 @@
 *.aps
+*.DS_Store
 *.obj
 *.iobj
 *.ipdb
