@@ -153,6 +153,9 @@ class SqlTypeName {
   /** BINARY SQL type name constant. */
   static const std::string BINARY;
 
+  /** VARBINARY SQL type name constant. */
+  static const std::string VARBINARY;
+
   /** LONGVARBINARY SQL type name constant. */
   static const std::string LONGVARBINARY;
 
