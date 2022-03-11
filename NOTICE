@@ -15,7 +15,6 @@ https://github.com/aws/amazon-documentdb-odbc-driver.
 
 1) License Notice for the Boost library
 ---------------------------------------
-[Note: Boost is used for testing and the boost::optional library.]
 
 Copyright (c) 2003 - 2021 Boost Software
 
