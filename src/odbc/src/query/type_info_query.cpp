@@ -197,7 +197,7 @@ TypeInfoQuery::TypeInfoQuery(diagnostic::DiagnosableAdapter& diag,
     types.push_back(JDBC_TYPE_BIGINT);
     types.push_back(JDBC_TYPE_BINARY);
   } else
-    types.push_back(SqlTypeToBinary(sqlType));
+    types.push_back(*SqlTypeToBinary(sqlType));
 }
 
 TypeInfoQuery::~TypeInfoQuery() {
@@ -264,20 +264,20 @@ SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
 
   switch (columnIdx) {
     case ResultColumn::TYPE_NAME: {
-      buffer.PutString(type_traits::BinaryTypeToSqlTypeName(currentType));
+      buffer.PutOptString(type_traits::BinaryTypeToSqlTypeName(currentType));
 
       break;
     }
 
     case ResultColumn::DATA_TYPE:
     case ResultColumn::SQL_DATA_TYPE: {
-      buffer.PutInt16(type_traits::BinaryToSqlType(currentType));
+      buffer.PutOptInt16(type_traits::BinaryToSqlType(currentType));
 
       break;
     }
 
     case ResultColumn::COLUMN_SIZE: {
-      buffer.PutInt32(type_traits::BinaryTypeColumnSize(currentType));
+      buffer.PutOptInt32(type_traits::BinaryTypeColumnSize(currentType));
 
       break;
     }
@@ -350,7 +350,7 @@ SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
 
     case ResultColumn::MINIMUM_SCALE:
     case ResultColumn::MAXIMUM_SCALE: {
-      buffer.PutInt16(type_traits::BinaryTypeDecimalDigits(currentType));
+      buffer.PutOptInt16(type_traits::BinaryTypeDecimalDigits(currentType));
 
       break;
     }
@@ -362,7 +362,7 @@ SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
     }
 
     case ResultColumn::NUM_PREC_RADIX: {
-      buffer.PutInt32(type_traits::BinaryTypeNumPrecRadix(currentType));
+      buffer.PutOptInt32(type_traits::BinaryTypeNumPrecRadix(currentType));
 
       break;
     }

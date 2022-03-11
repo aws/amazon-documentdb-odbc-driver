@@ -29,6 +29,9 @@
 #include <string>
 #include <vector>
 
+// Todo: Refactor boost::optional to std::optional after code base is migrated
+// to C++17 https://bitquill.atlassian.net/browse/AD-631
+
 using namespace ignite::odbc::common::concurrent;
 using namespace ignite::odbc::jni::java;
 
@@ -890,6 +893,7 @@ JniErrorCode JniContext::DocumentDbDatabaseSchemaMetadataGetSchemaName(
     errInfo.errMsg = "DatabaseMetadata object must be set.";
     return errInfo.code;
   }
+
   JNIEnv* env = Attach();
   jobject result = env->CallObjectMethod(
       databaseMetadata.Get()->GetRef(),
@@ -1038,13 +1042,15 @@ JniErrorCode JniContext::ResultSetNext(
 
 JniErrorCode JniContext::ResultSetGetString(
     const SharedPointer< GlobalJObject >& resultSet, int columnIndex,
-    std::string& value, bool& wasNull, JniErrorInfo& errInfo) {
+    boost::optional< std::string >& value,
+    JniErrorInfo& errInfo) {
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
     return errInfo.code;
   }
 
+  value = boost::none;
   JNIEnv* env = Attach();
   jobject result = env->CallObjectMethod(
       resultSet.Get()->GetRef(), jvm->GetMembers().m_ResultSetGetStringByIndex,
@@ -1052,7 +1058,6 @@ JniErrorCode JniContext::ResultSetGetString(
   ExceptionCheck(env, &errInfo);
 
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    wasNull = !result;
     if (result != nullptr) {
       jboolean isCopy;
       const char* utfChars = env->GetStringUTFChars((jstring)result, &isCopy);
@@ -1065,14 +1070,14 @@ JniErrorCode JniContext::ResultSetGetString(
 
 JniErrorCode JniContext::ResultSetGetString(
     const SharedPointer< GlobalJObject >& resultSet,
-    const std::string& columnName, std::string& value, bool& wasNull,
+    const std::string& columnName, boost::optional< std::string >& value,
     JniErrorInfo& errInfo) {
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
     return errInfo.code;
   }
-
+  value = boost::none;
   JNIEnv* env = Attach();
   jstring jColumnName = env->NewStringUTF(columnName.c_str());
   jobject result = env->CallObjectMethod(
@@ -1081,7 +1086,6 @@ JniErrorCode JniContext::ResultSetGetString(
   ExceptionCheck(env, &errInfo);
 
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    wasNull = !result;
     if (result != nullptr) {
       jboolean isCopy;
       const char* utfChars = env->GetStringUTFChars((jstring)result, &isCopy);
@@ -1095,13 +1099,14 @@ JniErrorCode JniContext::ResultSetGetString(
 
 JniErrorCode JniContext::ResultSetGetInt(
     const SharedPointer< GlobalJObject >& resultSet, int columnIndex,
-    int& value, bool& wasNull, JniErrorInfo& errInfo) {
+    boost::optional< int >& value, JniErrorInfo& errInfo) {
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
     return errInfo.code;
   }
 
+  value = boost::none;
   JNIEnv* env = Attach();
   jint result = env->CallIntMethod(resultSet.Get()->GetRef(),
                                    jvm->GetMembers().m_ResultSetGetIntByIndex,
@@ -1109,8 +1114,10 @@ JniErrorCode JniContext::ResultSetGetInt(
   ExceptionCheck(env, &errInfo);
 
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    value = result;
-    return ResultSetWasNull(resultSet, wasNull, errInfo);
+    bool wasNull;
+    errInfo.code = ResultSetWasNull(resultSet, wasNull, errInfo);
+    if (!wasNull)
+      value = result;
   }
 
   return errInfo.code;
@@ -1118,7 +1125,7 @@ JniErrorCode JniContext::ResultSetGetInt(
 
 JniErrorCode JniContext::ResultSetGetInt(
     const SharedPointer< GlobalJObject >& resultSet,
-    const std::string& columnName, int& value, bool& wasNull,
+    const std::string& columnName, boost::optional< int >& value,
     JniErrorInfo& errInfo) {
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
@@ -1126,6 +1133,7 @@ JniErrorCode JniContext::ResultSetGetInt(
     return errInfo.code;
   }
 
+  value = boost::none;
   JNIEnv* env = Attach();
   jstring jColumnName = env->NewStringUTF(columnName.c_str());
   jint result = env->CallIntMethod(resultSet.Get()->GetRef(),
@@ -1133,14 +1141,17 @@ JniErrorCode JniContext::ResultSetGetInt(
                                    jColumnName);
   ExceptionCheck(env, &errInfo);
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    value = result;
-    return ResultSetWasNull(resultSet, wasNull, errInfo);
+    bool wasNull;
+    errInfo.code = ResultSetWasNull(resultSet, wasNull, errInfo);
+    if (!wasNull)
+      value = result;
   }
   return errInfo.code;
 }
 
 JniErrorCode JniContext::ResultSetGetRow(
-    const SharedPointer< GlobalJObject >& resultSet, int& value, bool& wasNull,
+    const SharedPointer< GlobalJObject >& resultSet,
+    boost::optional< int >& value,
     JniErrorInfo& errInfo) {
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
@@ -1148,13 +1159,17 @@ JniErrorCode JniContext::ResultSetGetRow(
     return errInfo.code;
   }
 
+  value = boost::none;
   JNIEnv* env = Attach();
   jint result = env->CallIntMethod(resultSet.Get()->GetRef(),
                                    jvm->GetMembers().m_ResultSetGetRow);
   ExceptionCheck(env, &errInfo);
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     value = result;
-    return ResultSetWasNull(resultSet, wasNull, errInfo);
+    bool wasNull;
+    errInfo.code = ResultSetWasNull(resultSet, wasNull, errInfo);
+    if (!wasNull)
+      value = result;
   }
   return errInfo.code;
 }
@@ -1482,8 +1497,8 @@ void JniContext::ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) {
 
     env->DeleteLocalRef(err);
   } else if (errInfo) {
-      JniErrorInfo errInfo0(JniErrorCode::IGNITE_JNI_ERR_SUCCESS, "", "");
-      *errInfo = errInfo0;
+    JniErrorInfo errInfo0(JniErrorCode::IGNITE_JNI_ERR_SUCCESS, "", "");
+    *errInfo = errInfo0;
   }
 }
 

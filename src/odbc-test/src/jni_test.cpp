@@ -34,6 +34,7 @@
 #include <sqlext.h>
 
 #include <boost/test/unit_test.hpp>
+#include <boost/optional.hpp>
 #include <string>
 #include <vector>
 
@@ -207,33 +208,31 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetTables) {
       break;
     }
 
-    std::string value;
-    bool wasNull;
+    boost::optional<std::string> value;
 
-    resultSet.Get()->GetString(1, value, wasNull, errInfo);
-    BOOST_CHECK(wasNull);
-    resultSet.Get()->GetString("TABLE_CAT", value, wasNull, errInfo);
-    BOOST_CHECK(wasNull);
+    resultSet.Get()->GetString(1, value, errInfo);
+    BOOST_CHECK(!value);
+    resultSet.Get()->GetString("TABLE_CAT", value, errInfo);
+    BOOST_CHECK(!value);
 
-    resultSet.Get()->GetString(2, value, wasNull, errInfo);
-    BOOST_CHECK(!wasNull);
-    resultSet.Get()->GetString("TABLE_SCHEM", value, wasNull, errInfo);
-    BOOST_CHECK(!wasNull);
-    BOOST_CHECK("test" == value);
+    resultSet.Get()->GetString(2, value, errInfo);
+    BOOST_CHECK(value);
+    resultSet.Get()->GetString("TABLE_SCHEM", value, errInfo);
+    BOOST_CHECK(value);
+    BOOST_CHECK("test" == *value);
 
-    resultSet.Get()->GetString(3, value, wasNull, errInfo);
-    BOOST_CHECK(!wasNull);
-    BOOST_CHECK(!value.empty());
-    resultSet.Get()->GetString("TABLE_NAME", value, wasNull, errInfo);
-    BOOST_CHECK(!wasNull);
-    BOOST_CHECK(!value.empty());
+    resultSet.Get()->GetString(3, value, errInfo);
+    BOOST_CHECK(value);
+    BOOST_CHECK(!value->empty());
+    resultSet.Get()->GetString("TABLE_NAME", value, errInfo);
+    BOOST_CHECK(value);
+    BOOST_CHECK(!value->empty());
 
-    resultSet.Get()->GetString(4, value, wasNull, errInfo);
-    BOOST_CHECK(!wasNull);
-    BOOST_CHECK("TABLE" == value);
-    resultSet.Get()->GetString("TABLE_TYPE", value, wasNull, errInfo);
-    BOOST_CHECK(!wasNull);
-    BOOST_CHECK("TABLE" == value);
+    resultSet.Get()->GetString(4, value, errInfo);
+    BOOST_CHECK(value);
+    BOOST_CHECK("TABLE" == *value);
+    resultSet.Get()->GetString("TABLE_TYPE", value, errInfo);    BOOST_CHECK(value);
+    BOOST_CHECK("TABLE" == *value);
 
   } while (hasNext);
 
@@ -284,10 +283,9 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
     int columnIndex = 0;
     // Loop the result set records
     bool hasNext = false;
-    std::string value;
+    boost::optional<std::string> value;
     std::string columnName;
-    int intValue;
-    bool wasNull;
+    boost::optional<int> intValue;
     do {
         resultSet.Get()->Next(hasNext, errInfo);
         if (!hasNext) {
@@ -295,169 +293,183 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
         }
         columnIndex++;
 
-        resultSet.Get()->GetString(1, value, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
-        resultSet.Get()->GetString("TABLE_CAT", value, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
+        resultSet.Get()->GetString(1, value, errInfo);
+        BOOST_CHECK(!value);
 
-        resultSet.Get()->GetString(2, value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        BOOST_CHECK_EQUAL("test", value);
-        resultSet.Get()->GetString("TABLE_SCHEM", value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        BOOST_CHECK_EQUAL("test", value);
+        resultSet.Get()->GetString("TABLE_CAT", value, errInfo);
+        BOOST_CHECK(!value);
 
-        resultSet.Get()->GetString(3, value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        BOOST_CHECK_EQUAL("test", value);
-        resultSet.Get()->GetString("TABLE_NAME", value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        BOOST_CHECK_EQUAL("test", value);
+        resultSet.Get()->GetString(2, value, errInfo);
+        
+        BOOST_CHECK(value);
+        BOOST_CHECK_EQUAL("test", *value);
+        resultSet.Get()->GetString("TABLE_SCHEM", value, errInfo);
+        
+        BOOST_CHECK(value);
+        BOOST_CHECK_EQUAL("test", *value);
 
-        resultSet.Get()->GetString(4, value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        BOOST_CHECK(!value.empty());
-        resultSet.Get()->GetString("COLUMN_NAME", value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        BOOST_CHECK(!value.empty());
+        resultSet.Get()->GetString(3, value, errInfo);
+        
+        BOOST_CHECK(value);
+        BOOST_CHECK_EQUAL("test", *value);
+        resultSet.Get()->GetString("TABLE_NAME", value, errInfo);
+        
+        BOOST_CHECK(value);
+        BOOST_CHECK_EQUAL("test", *value);
+
+        resultSet.Get()->GetString(4, value, errInfo);
+        
+        BOOST_CHECK(value);
+        BOOST_CHECK(!value->empty());
+        resultSet.Get()->GetString("COLUMN_NAME", value, errInfo);
+        
+        BOOST_CHECK(value);
+        BOOST_CHECK(!value->empty());
         switch (columnIndex) {
             case 1:
-                BOOST_CHECK_EQUAL("test__id", value);
+                BOOST_CHECK_EQUAL("test__id", *value);
                 break;
             case 2:
-                BOOST_CHECK_EQUAL("test", value);
+                BOOST_CHECK_EQUAL("test", *value);
                 break;
         }
-        columnName = value;
+        columnName = *value;
 
-        resultSet.Get()->GetInt(5, intValue, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        resultSet.Get()->GetInt("DATA_TYPE", intValue, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
+        resultSet.Get()->GetInt(5, intValue, errInfo);
+        BOOST_CHECK(intValue);
+        resultSet.Get()->GetInt("DATA_TYPE", intValue, errInfo);
+        BOOST_CHECK(intValue);
         switch (columnIndex) {
             case 1:
-                BOOST_CHECK_EQUAL(JDBC_TYPE_VARCHAR, intValue);
+                BOOST_CHECK_EQUAL(JDBC_TYPE_VARCHAR, *intValue);
                 break;
             case 2:
-                BOOST_CHECK_EQUAL(JDBC_TYPE_DOUBLE, intValue);
+                BOOST_CHECK_EQUAL(JDBC_TYPE_DOUBLE, *intValue);
                 break;
             default:
                 BOOST_FAIL("Unexpected column index.");
                 break;
         }
 
-        resultSet.Get()->GetString(6, value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        resultSet.Get()->GetString("TYPE_NAME",  value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
+        resultSet.Get()->GetString(6, value, errInfo);
+        BOOST_CHECK(value);
+        resultSet.Get()->GetString("TYPE_NAME",  value, errInfo);
+        BOOST_CHECK(value);
 
-        resultSet.Get()->GetInt(7, intValue, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        resultSet.Get()->GetInt("COLUMN_SIZE", intValue, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
+        resultSet.Get()->GetInt(7, intValue, errInfo);
+        resultSet.Get()->GetInt("COLUMN_SIZE", intValue, errInfo);
+        BOOST_CHECK(intValue);
         switch (columnIndex) {
             case 1:
-                BOOST_CHECK_EQUAL(65536, intValue);
+                BOOST_CHECK_EQUAL(65536, *intValue);
                 break;
             case 2:
-                BOOST_CHECK_EQUAL(23, intValue);
+                BOOST_CHECK_EQUAL(23, *intValue);
                 break;
         }
 
-        resultSet.Get()->GetInt(8, intValue, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
-        resultSet.Get()->GetInt("BUFFER_LENGTH", intValue, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
+        resultSet.Get()->GetInt(8, intValue, errInfo);
+        BOOST_CHECK(!intValue);
+        resultSet.Get()->GetInt("BUFFER_LENGTH", intValue, errInfo);
+        BOOST_CHECK(!intValue);
 
-        resultSet.Get()->GetInt(9, intValue, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
-        resultSet.Get()->GetInt("DECIMAL_DIGITS", intValue, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
+        resultSet.Get()->GetInt(9, intValue, errInfo);
+        BOOST_CHECK(!intValue);
+        resultSet.Get()->GetInt("DECIMAL_DIGITS", intValue, errInfo);
+        BOOST_CHECK(!intValue);
 
-        resultSet.Get()->GetInt(10, intValue, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
-        resultSet.Get()->GetInt("NUM_PREC_RADIX", intValue, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
+        resultSet.Get()->GetInt(10, intValue, errInfo);
+        BOOST_CHECK(!intValue);
+        resultSet.Get()->GetInt("NUM_PREC_RADIX", intValue, errInfo);
+        BOOST_CHECK(!intValue);
 
-        resultSet.Get()->GetInt(11, intValue, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        resultSet.Get()->GetInt("NULLABLE", intValue, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
+        resultSet.Get()->GetInt(11, intValue, errInfo);
+        BOOST_CHECK(intValue);
+        resultSet.Get()->GetInt("NULLABLE", intValue, errInfo);
+        BOOST_CHECK(intValue);
 
-        resultSet.Get()->GetString(12, value, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
-        resultSet.Get()->GetString("REMARKS", value, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
+        resultSet.Get()->GetString(12, value, errInfo);
+        BOOST_CHECK(!value);
+        resultSet.Get()->GetString("REMARKS", value, errInfo);
+        BOOST_CHECK(!value);
 
-        resultSet.Get()->GetString(13, value, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
-        resultSet.Get()->GetString("COLUMN_DEF", value, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
+        resultSet.Get()->GetString(13, value, errInfo);
+        BOOST_CHECK(!value);
+        resultSet.Get()->GetString("COLUMN_DEF", value, errInfo);
+        BOOST_CHECK(!value);
 
-        resultSet.Get()->GetInt(14, intValue, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
-        resultSet.Get()->GetInt("SQL_DATA_TYPE", intValue, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
+        resultSet.Get()->GetInt(14, intValue, errInfo);
+        BOOST_CHECK(!intValue);
+        resultSet.Get()->GetInt("SQL_DATA_TYPE", intValue, errInfo);
+        BOOST_CHECK(!intValue);
 
-        resultSet.Get()->GetInt(15, intValue, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
-        resultSet.Get()->GetInt("SQL_DATETIME_SUB", intValue, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
+        resultSet.Get()->GetInt(15, intValue, errInfo);
+        BOOST_CHECK(!intValue);
+        resultSet.Get()->GetInt("SQL_DATETIME_SUB", intValue, errInfo);
+        BOOST_CHECK(!intValue);
 
-        resultSet.Get()->GetInt(16, intValue, wasNull, errInfo);
-        BOOST_CHECK(!wasNull || wasNull);
-        resultSet.Get()->GetInt("CHAR_OCTET_LENGTH", intValue, wasNull, errInfo);
-        BOOST_CHECK(!wasNull || wasNull);
+        resultSet.Get()->GetInt(16, intValue, errInfo);
+        switch (columnIndex) {
+          case 1:
+            BOOST_CHECK(intValue);
+            BOOST_CHECK_EQUAL(262144, intValue);
+            break;
+          case 2:
+            BOOST_CHECK(!intValue);
+            break;
+        }
+        resultSet.Get()->GetInt("CHAR_OCTET_LENGTH", intValue, errInfo);
         switch (columnIndex) {
             case 1:
+                BOOST_CHECK(intValue);
                 BOOST_CHECK_EQUAL(262144, intValue);
                 break;
             case 2:
-                BOOST_CHECK_EQUAL(0, intValue);
+                BOOST_CHECK(!intValue);
                 break;
         }
 
-        resultSet.Get()->GetInt(17, intValue, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        resultSet.Get()->GetInt("ORDINAL_POSITION", intValue, wasNull,
+        resultSet.Get()->GetInt(17, intValue, errInfo);
+        BOOST_CHECK(intValue);
+        resultSet.Get()->GetInt("ORDINAL_POSITION", intValue,
                                 errInfo);
-        BOOST_CHECK(!wasNull);
+        BOOST_CHECK(intValue);
         BOOST_CHECK_EQUAL(columnIndex, intValue);
 
-        resultSet.Get()->GetString(18, value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        resultSet.Get()->GetString("IS_NULLABLE", value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
+        resultSet.Get()->GetString(18, value, errInfo);
+        BOOST_CHECK(value);
+        resultSet.Get()->GetString("IS_NULLABLE", value, errInfo);
+        BOOST_CHECK(value);
 
-        resultSet.Get()->GetString(19, value, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
-        resultSet.Get()->GetString("SCOPE_CATALOG", value, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
+        resultSet.Get()->GetString(19, value, errInfo);
+        BOOST_CHECK(!value);
+        resultSet.Get()->GetString("SCOPE_CATALOG", value, errInfo);
+        BOOST_CHECK(!value);
 
-        resultSet.Get()->GetString(20, value, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
-        resultSet.Get()->GetString("SCOPE_SCHEMA", value, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
+        resultSet.Get()->GetString(20, value, errInfo);
+        BOOST_CHECK(!value);
+        resultSet.Get()->GetString("SCOPE_SCHEMA", value, errInfo);
+        BOOST_CHECK(!value);
 
-        resultSet.Get()->GetString(21, value, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
-        resultSet.Get()->GetString("SCOPE_TABLE", value, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
+        resultSet.Get()->GetString(21, value, errInfo);
+        BOOST_CHECK(!value);
+        resultSet.Get()->GetString("SCOPE_TABLE", value, errInfo);
+        BOOST_CHECK(!value);
 
-        resultSet.Get()->GetInt(22, intValue, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
-        resultSet.Get()->GetInt("SOURCE_DATA_TYPE", intValue, wasNull, errInfo);
-        BOOST_CHECK(wasNull);
+        resultSet.Get()->GetInt(22, intValue, errInfo);
+        BOOST_CHECK(!intValue);
+        resultSet.Get()->GetInt("SOURCE_DATA_TYPE", intValue, errInfo);
+        BOOST_CHECK(!intValue);
 
-        resultSet.Get()->GetString(23, value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        resultSet.Get()->GetString("IS_AUTOINCREMENT", value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
+        resultSet.Get()->GetString(23, value, errInfo);
+        BOOST_CHECK(value);
+        resultSet.Get()->GetString("IS_AUTOINCREMENT", value, errInfo);
+        BOOST_CHECK(value);
 
-        resultSet.Get()->GetString(24, value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
-        resultSet.Get()->GetString("IS_GENERATEDCOLUMN", value, wasNull, errInfo);
-        BOOST_CHECK(!wasNull);
+        resultSet.Get()->GetString(24, value, errInfo);
+        BOOST_CHECK(value);
+        resultSet.Get()->GetString("IS_GENERATEDCOLUMN", value, errInfo);
+        BOOST_CHECK(value);
     } while (hasNext);
     BOOST_CHECK_EQUAL(2, columnIndex);
 
