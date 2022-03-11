@@ -307,13 +307,24 @@ void DataQuery::SetResultsetMeta(const meta::ColumnMetaVector& value) {
 
   for (size_t i = 0; i < resultMeta.size(); ++i) {
     meta::ColumnMeta& meta = resultMeta.at(i);
-    if (meta.GetSchemaName() && meta.GetTableName()
-        && meta.GetColumnName() && meta.GetDataType())
-    LOG_MSG("\n[" << i << "] SchemaName:     " << meta.GetSchemaName() << "\n["
-                  << i << "] TypeName:       " << meta.GetTableName() << "\n["
-                  << i << "] ColumnName:     " << meta.GetColumnName() << "\n["
-                  << i << "] ColumnType:     "
-                  << static_cast< int32_t >(*meta.GetDataType()));
+    if (meta.GetDataType()) {
+      LOG_MSG(
+          "\n[" << i << "] SchemaName:     "
+                << meta.GetSchemaName().get_value_or("") << "\n[" << i
+                << "] TypeName:       " << meta.GetTableName().get_value_or("")
+                << "\n[" << i
+                << "] ColumnName:     " << meta.GetColumnName().get_value_or("")
+                << "\n[" << i << "] ColumnType:     "
+                << static_cast< int32_t >(*meta.GetDataType()));
+    } else {
+      LOG_MSG(
+          "\n[" << i << "] SchemaName:     "
+                << meta.GetSchemaName().get_value_or("") << "\n[" << i
+                << "] TypeName:       " << meta.GetTableName().get_value_or("")
+                << "\n[" << i
+                << "] ColumnName:     " << meta.GetColumnName().get_value_or("")
+                << "\n[" << i << "] ColumnType: not available");
+    }
   }
 }
 }  // namespace query

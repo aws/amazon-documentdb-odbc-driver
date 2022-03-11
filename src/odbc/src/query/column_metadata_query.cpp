@@ -19,10 +19,10 @@
 
 #include <vector>
 
-#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/common/concurrent.h"
 #include "ignite/odbc/connection.h"
 #include "ignite/odbc/ignite_error.h"
+#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/jni/database_metadata.h"
 #include "ignite/odbc/jni/java.h"
 #include "ignite/odbc/jni/result_set.h"
@@ -393,14 +393,25 @@ SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
   meta::ReadColumnMetaVector(resultSet, meta);
 
   for (size_t i = 0; i < meta.size(); ++i) {
-    if (meta[i].GetSchemaName() && meta[i].GetTableName()
-        && meta[i].GetColumnName() && meta[i].GetDataType())
-      LOG_MSG("\n[" << i << "] SchemaName:     " << meta[i].GetSchemaName()
-                    << "\n[" << i
-                    << "] TableName:      " << meta[i].GetTableName() << "\n["
-                    << i << "] ColumnName:     " << meta[i].GetColumnName()
-                    << "\n[" << i << "] ColumnType:     "
+    if (meta[i].GetDataType()) {
+      LOG_MSG("\n[" << i << "] SchemaName:     "
+                    << meta[i].GetSchemaName().get_value_or("") << "\n[" << i
+                    << "] TableName:      "
+                    << meta[i].GetTableName().get_value_or("") << "\n[" << i
+                    << "] ColumnName:     "
+                    << meta[i].GetColumnName().get_value_or("") << "\n[" << i
+                    << "] ColumnType:     "
                     << static_cast< int32_t >(*meta[i].GetDataType()));
+    }
+    else {
+      LOG_MSG("\n[" << i << "] SchemaName:     "
+                    << meta[i].GetSchemaName().get_value_or("") << "\n[" << i
+                    << "] TableName:      "
+                    << meta[i].GetTableName().get_value_or("") << "\n[" << i
+                    << "] ColumnName:     "
+                    << meta[i].GetColumnName().get_value_or("") << "\n[" << i
+                    << "] ColumnType: not available");
+    }
   }
 
   return SqlResult::AI_SUCCESS;
