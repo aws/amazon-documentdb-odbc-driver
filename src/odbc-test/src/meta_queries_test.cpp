@@ -998,6 +998,26 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsMany) {
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 }
 
+BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsOneFromLocalServer) {
+  SQLCHAR empty[] = "";
+  SQLCHAR table[] = "meta_queries_test_002";
+  SQLCHAR column[] = "fieldString";
+
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
+                            SQL_NTS, column, SQL_NTS);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  CheckSingleRowResultSetWithGetData(stmt, 4, "fieldString");
+}
+
 BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsNone) {
   std::string dsnConnectionString;
   CreateDsnConnectionString(dsnConnectionString);
@@ -1119,7 +1139,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
 
   bool errorExpected = false;
   BOOST_CHECK_EQUAL(
-      false, WasNull(table_cat_len));  // TODO: change to true when nullable
+      true, WasNull(table_cat_len));
   BOOST_CHECK_EQUAL("", table_cat);    // TABLE_CAT
   BOOST_CHECK_EQUAL(false, WasNull(table_schem_len));
   BOOST_CHECK_EQUAL("test", table_schem);  // TABLE_SCHEM
@@ -1136,7 +1156,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   BOOST_CHECK_EQUAL(
       false,
       WasNull(
-          buffer_length_len));  // TODO: change to true whan nullable supported
+          buffer_length_len));
   BOOST_CHECK_EQUAL(SQL_NO_TOTAL, buffer_length);  // BUFFER_LENGTH
   BOOST_CHECK_EQUAL(true, WasNull(decimal_digits_len));
   BOOST_CHECK_EQUAL(0, decimal_digits);  // DECIMAL_DIGITS
@@ -1145,12 +1165,12 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   BOOST_CHECK_EQUAL(false, WasNull(nullable_len));
   BOOST_CHECK_EQUAL(SQL_NO_NULLS, nullable);  // NULLABLE
   BOOST_CHECK_EQUAL(
-      false,
-      WasNull(remarks_len));  // TODO: change to true whan nullable supported
+      true,
+      WasNull(remarks_len));
   BOOST_CHECK_EQUAL("", remarks);  // REMARKS
   BOOST_CHECK_EQUAL(
-      false,
-      WasNull(column_def_len));  // TODO: change to true whan nullable supported
+      true,
+      WasNull(column_def_len));
   BOOST_CHECK_EQUAL("", column_def);  // COLUMN_DEF
   BOOST_CHECK_EQUAL(false, WasNull(sql_data_type_len));
   BOOST_CHECK_EQUAL(SQL_VARCHAR, sql_data_type);  // SQL_DATA_TYPE

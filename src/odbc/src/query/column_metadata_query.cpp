@@ -19,10 +19,10 @@
 
 #include <vector>
 
-#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/common/concurrent.h"
 #include "ignite/odbc/connection.h"
 #include "ignite/odbc/ignite_error.h"
+#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/jni/database_metadata.h"
 #include "ignite/odbc/jni/java.h"
 #include "ignite/odbc/jni/result_set.h"
@@ -232,87 +232,88 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
   }
 
   const meta::ColumnMeta& currentColumn = *cursor;
-  int16_t columnType = currentColumn.GetDataType();
+  boost::optional< int16_t > columnType = currentColumn.GetDataType();
 
   switch (columnIdx) {
     case ResultColumn::TABLE_CAT: {
-      buffer.PutString(currentColumn.GetCatalogName());
+      buffer.PutOptString(currentColumn.GetCatalogName());
       break;
     }
 
     case ResultColumn::TABLE_SCHEM: {
-      buffer.PutString(currentColumn.GetSchemaName());
+      buffer.PutOptString(currentColumn.GetSchemaName());
       break;
     }
 
     case ResultColumn::TABLE_NAME: {
-      buffer.PutString(currentColumn.GetTableName());
+      buffer.PutOptString(currentColumn.GetTableName());
       break;
     }
 
     case ResultColumn::COLUMN_NAME: {
-      buffer.PutString(currentColumn.GetColumnName());
+      buffer.PutOptString(currentColumn.GetColumnName());
       break;
     }
 
     case ResultColumn::DATA_TYPE: {
-      buffer.PutInt16(type_traits::BinaryToSqlType(columnType));
+      buffer.PutOptInt16(type_traits::BinaryToSqlType(columnType));
       break;
     }
 
     case ResultColumn::TYPE_NAME: {
-      buffer.PutString(
-          type_traits::BinaryTypeToSqlTypeName(columnType));
+      buffer.PutOptString(type_traits::BinaryTypeToSqlTypeName(columnType));
       break;
     }
 
     case ResultColumn::COLUMN_SIZE: {
-      buffer.PutInt32(type_traits::BinaryTypeColumnSize(columnType));
+      buffer.PutOptInt32(type_traits::BinaryTypeColumnSize(columnType));
       break;
     }
 
     case ResultColumn::BUFFER_LENGTH: {
-      buffer.PutInt32(type_traits::BinaryTypeTransferLength(columnType));
+      buffer.PutOptInt32(type_traits::BinaryTypeTransferLength(columnType));
       break;
     }
 
     case ResultColumn::DECIMAL_DIGITS: {
       // todo implement the function for getting the decimal digits:
       // https://bitquill.atlassian.net/browse/AD-615
-      int32_t decDigits = type_traits::BinaryTypeDecimalDigits(columnType);
-      if (decDigits < 0)
+      boost::optional< int16_t > decDigits =
+          type_traits::BinaryTypeDecimalDigits(columnType);
+      if (!decDigits || *decDigits < 0)
         buffer.PutNull();
       else
-        buffer.PutInt16(static_cast< int16_t >(decDigits));
+        buffer.PutInt16(*decDigits);
       break;
     }
 
     case ResultColumn::NUM_PREC_RADIX: {
-      int32_t numPrecRadix = type_traits::BinaryTypeNumPrecRadix(columnType);
-      if (numPrecRadix < 0)
+      boost::optional< int32_t > numPrecRadix =
+          type_traits::BinaryTypeNumPrecRadix(columnType);
+      if (!numPrecRadix || numPrecRadix < 0)
         buffer.PutNull();
       else
-        buffer.PutInt16(static_cast< int16_t >(numPrecRadix));
+        buffer.PutInt16(static_cast< int16_t >(*numPrecRadix));
       break;
     }
 
     case ResultColumn::NULLABLE: {
-      buffer.PutInt16(currentColumn.GetNullability());
+      buffer.PutOptInt32(currentColumn.GetNullability());
       break;
     }
 
     case ResultColumn::REMARKS: {
-      buffer.PutString(currentColumn.GetRemarks());
+      buffer.PutOptString(currentColumn.GetRemarks());
       break;
     }
 
     case ResultColumn::COLUMN_DEF: {
-      buffer.PutString(currentColumn.GetColumnDef());
+      buffer.PutOptString(currentColumn.GetColumnDef());
       break;
     }
 
     case ResultColumn::SQL_DATA_TYPE: {
-      buffer.PutInt16(type_traits::BinaryToSqlType(columnType));
+      buffer.PutOptInt16(type_traits::BinaryToSqlType(columnType));
       break;
     }
 
@@ -324,17 +325,17 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::CHAR_OCTET_LENGTH: {
-      buffer.PutInt32(type_traits::BinaryTypeCharOctetLength(columnType));
+      buffer.PutOptInt32(type_traits::BinaryTypeCharOctetLength(columnType));
       break;
     }
 
     case ResultColumn::ORDINAL_POSITION: {
-      buffer.PutInt32(currentColumn.GetOrdinalPosition());
+      buffer.PutOptInt32(currentColumn.GetOrdinalPosition());
       break;
     }
 
     case ResultColumn::IS_NULLABLE: {
-      buffer.PutString(
+      buffer.PutOptString(
           type_traits::NullabilityToIsNullable(currentColumn.GetNullability()));
       break;
     }
@@ -392,12 +393,25 @@ SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
   meta::ReadColumnMetaVector(resultSet, meta);
 
   for (size_t i = 0; i < meta.size(); ++i) {
-    LOG_MSG("\n[" << i << "] SchemaName:     " << meta[i].GetSchemaName()
-                  << "\n[" << i
-                  << "] TableName:      " << meta[i].GetTableName() << "\n["
-                  << i << "] ColumnName:     " << meta[i].GetColumnName()
-                  << "\n[" << i << "] ColumnType:     "
-                  << static_cast< int32_t >(meta[i].GetDataType()));
+    if (meta[i].GetDataType()) {
+      LOG_MSG("\n[" << i << "] SchemaName:     "
+                    << meta[i].GetSchemaName().get_value_or("") << "\n[" << i
+                    << "] TableName:      "
+                    << meta[i].GetTableName().get_value_or("") << "\n[" << i
+                    << "] ColumnName:     "
+                    << meta[i].GetColumnName().get_value_or("") << "\n[" << i
+                    << "] ColumnType:     "
+                    << static_cast< int32_t >(*meta[i].GetDataType()));
+    }
+    else {
+      LOG_MSG("\n[" << i << "] SchemaName:     "
+                    << meta[i].GetSchemaName().get_value_or("") << "\n[" << i
+                    << "] TableName:      "
+                    << meta[i].GetTableName().get_value_or("") << "\n[" << i
+                    << "] ColumnName:     "
+                    << meta[i].GetColumnName().get_value_or("") << "\n[" << i
+                    << "] ColumnType: not available");
+    }
   }
 
   return SqlResult::AI_SUCCESS;
