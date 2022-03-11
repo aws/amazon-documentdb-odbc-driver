@@ -169,15 +169,15 @@ SqlResult::Type Connection::InternalEstablish(
 
   IgniteError err;
   bool connected = TryRestoreConnection(err);
-
+  std::cout << "InternalEstablish - line 171 pass\n";
   if (!connected) {
-    std::string errMessage = "Failed to establish connection with the host.\n";
-    errMessage.append(err.GetText());
-    AddStatusRecord(SqlState::S08001_CANNOT_CONNECT, errMessage);
-
+    std::string errMessage = "Failed to establish connection with the host.\n"; std::cout << "InternalEstablish - line 174 pass\n";
+    errMessage.append(err.GetText()); std::cout << "InternalEstablish - line 175 pass\n";
+    AddStatusRecord(SqlState::S08001_CANNOT_CONNECT, errMessage); std::cout << "InternalEstablish - line 176 pass\n";
+    
     return SqlResult::AI_ERROR;
   }
-
+  std::cout << "InternalEstablish - line 179 pass\n";
   bool errors = GetDiagnosticRecords().GetStatusRecordsNumber() > 0;
 
   return errors ? SqlResult::AI_SUCCESS_WITH_INFO : SqlResult::AI_SUCCESS;
@@ -523,7 +523,7 @@ void Connection::EnsureConnected() {
 
   IgniteError err;
   bool success = TryRestoreConnection(err);
-
+  std::cout << "EnsureConnected - line 526 pass\n";
   if (!success) {
     std::string errMessage =
         "Failed to establish connection with any provided hosts\n";
@@ -533,35 +533,46 @@ void Connection::EnsureConnected() {
   }
 }
 
-bool Connection::TryRestoreConnection(IgniteError& err) {
+bool Connection::TryRestoreConnection(IgniteError& err) { // error could be somewhere in here
+// SQLDriver connect calls this function
   if (_connection.IsValid()) {
     return true;
   }
-
+  std::cout << "TryRestoreConnection - line 540 pass\n";
   JniErrorInfo errInfo;
   auto ctx = GetJniContext();
   SharedPointer< DocumentDbConnection > conn = new DocumentDbConnection(ctx);
+  std::cout << "TryRestoreConnection - line 545 pass\n";
+  // if (!conn.IsValid()
+  //     || true) {
   if (!conn.IsValid()
       || conn.Get()->Open(config, errInfo)
-             != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    std::string message = errInfo.errMsg;
+             != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) { std::cout << "TryRestoreConnection - line 550 pass\n";                        
+    std::string message = errInfo.errMsg; std::cout << "TryRestoreConnection - line 551 pass\n";
     err = IgniteError(IgniteError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
-                      message.c_str());
+                      message.c_str()); 
+    std::cout << "TryRestoreConnection - line 552 pass\n";                  
   }
+  std::cout << "TryRestoreConnection - line 555 pass\n";
   _connection = conn;
   bool connected = _connection.IsValid() && _connection.Get()->IsOpen()
                    && errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
+  std::cout << "TryRestoreConnection - line 559 pass\n";
 
   if (!connected) {
+    std::cout << "TryRestoreConnection - line 562 pass\n";
     return connected;
   }
+  std::cout << "TryRestoreConnection - line 564 pass\n";
 
   int32_t localSSHTunnelPort = 0;
   if (!GetInternalSSHTunnelPort(localSSHTunnelPort, ctx, err)) {
     return false;
-  }
-
+  } // Bruce suggested that this function and the ConnectCPPDocumentDB
+  // could be where the errors are occuring. 
+  std::cout << "TryRestoreConnection - line 570 pass\n";
   connected = ConnectCPPDocumentDB(localSSHTunnelPort, err);
+  std::cout << "TryRestoreConnection - line 573 pass\n";
 
   return connected;
 }

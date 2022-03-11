@@ -16,7 +16,7 @@
  */
 
 #include "ignite/odbc/log.h"
-
+#include <iostream>
 #include <cstdlib>
 
 namespace ignite {
@@ -57,9 +57,9 @@ void Logger::WriteMessage(std::string const& message) {
 }
 
 Logger* Logger::Get() {
-  const char* envVarName = "IGNITE_ODBC_LOG_PATH";
-  static Logger logger(getenv(envVarName));
-  return logger.IsEnabled() ? &logger : 0;
+  const char* envVarName = "IGNITE_ODBC_LOG_PATH"; std::cout << "Get - line 60 pass\n";   
+  static Logger logger(getenv(envVarName)); std::cout << "Get - line 61 pass\n";   
+  return logger.IsEnabled() ? &logger : 0; // -AL-: this could cause segfault because 0 could be returned. 
 }
 }  // namespace odbc
 }  // namespace ignite

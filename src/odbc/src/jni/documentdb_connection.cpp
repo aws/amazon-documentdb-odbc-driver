@@ -31,13 +31,13 @@ namespace jni {
 JniErrorCode DocumentDbConnection::Open(const Configuration& config,
                                         JniErrorInfo& errInfo) {
   bool connected = false;
-
-  if (!_jniContext.IsValid()) {
+  std::cout << "Open - line 33 pass\n";   // if (!_jniContext.IsValid()) {  std::cout << "Open - line 35 pass\n";   
+  if (true) {  std::cout << "Open - line 35 pass\n";   
     errInfo.errMsg = new char[]{"Unable to get initialized JVM."};
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_JVM_INIT;
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_JVM_INIT; std::cout << "Open - line 37 pass\n";
     return errInfo.code;
   }
-  if (_connection.IsValid()) {
+  if (_connection.IsValid()) { std::cout << "Open - line 40 pass\n";
     return JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
   }
 
@@ -45,15 +45,15 @@ JniErrorCode DocumentDbConnection::Open(const Configuration& config,
 
   SharedPointer< GlobalJObject > result;
   JniErrorCode success = _jniContext.Get()->DriverManagerGetConnection(
-      connectionString.c_str(), result, errInfo);
+      connectionString.c_str(), result, errInfo); std::cout << "Open - line 47 pass\n";
   connected = (success == JniErrorCode::IGNITE_JNI_ERR_SUCCESS);
-  if (!connected) {
+  if (!connected) { std::cout << "Open - line 50 pass\n";
     JniErrorInfo closeErrInfo;
     Close(closeErrInfo);
     return success;
   }
   _connection = result;
-
+  std::cout << "Open - line 55 pass\n";
   return success;
 }
 
