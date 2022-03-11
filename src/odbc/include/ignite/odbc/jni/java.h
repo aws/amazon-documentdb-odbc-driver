@@ -24,6 +24,7 @@
 #include <jni.h>
 #include <stdint.h>
 
+#include <boost/optional.hpp>
 #include <vector>
 
 using ignite::odbc::common::concurrent::SharedPointer;
@@ -493,19 +494,21 @@ class IGNITE_IMPORT_EXPORT JniContext {
                              bool& hasNext, JniErrorInfo& errInfo);
   JniErrorCode ResultSetGetString(
       const SharedPointer< GlobalJObject >& resultSet, int columnIndex,
-      std::string& value, bool& wasNull, JniErrorInfo& errInfo);
+      boost::optional< std::string >& value, JniErrorInfo& errInfo);
   JniErrorCode ResultSetGetString(
       const SharedPointer< GlobalJObject >& resultSet,
-      const std::string& columnName, std::string& value, bool& wasNull,
+      const std::string& columnName, boost::optional< std::string >& value,
       JniErrorInfo& errInfo);
   JniErrorCode ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet,
-                               int columnIndex, int& value, bool& wasNull,
+                               int columnIndex, boost::optional< int >& value,
+
                                JniErrorInfo& errInfo);
   JniErrorCode ResultSetGetInt(const SharedPointer< GlobalJObject >& resultSet,
-                               const std::string& columnName, int& value,
-                               bool& wasNull, JniErrorInfo& errInfo);
+                               const std::string& columnName,
+                               boost::optional< int >& value,
+                               JniErrorInfo& errInfo);
   JniErrorCode ResultSetGetRow(const SharedPointer< GlobalJObject >& resultSet,
-                               int& value, bool& wasNull,
+                               boost::optional< int >& value,
                                JniErrorInfo& errInfo);
   JniErrorCode ResultSetWasNull(const SharedPointer< GlobalJObject >& resultSet,
                                 bool& value, JniErrorInfo& errInfo);
