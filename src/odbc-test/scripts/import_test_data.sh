@@ -21,7 +21,7 @@ do
     COLLECTION_NAME="$(basename -- ${FILENAME%.json})"
     TEST_FILE_NAME="$(basename -- ${FILENAME})"
 
-    mongoimport --quiet -u="${DOC_DB_USER_NAME}" -p="${DOC_DB_PASSWORD}" --authenticationDatabase=admin \
+    mongoimport -u="${DOC_DB_USER_NAME}" -p="${DOC_DB_PASSWORD}" --authenticationDatabase=admin \
         -d="${DATABASE_NAME}" -c="${COLLECTION_NAME}" \
         --file="""${TEST_INPUT_FOLDER}/${TEST_FILE_NAME}"""
     if [ $? -ne 0 ]
