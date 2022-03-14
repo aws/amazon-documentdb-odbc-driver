@@ -16,13 +16,17 @@
  */
 
 #include <ignite/odbc/common/concurrent.h>
+#include <ignite/odbc/jni/documentdb_connection_properties.h>
+#include <ignite/odbc/jni/documentdb_database_metadata.h>
+#include <ignite/odbc/jni/documentdb_mql_query_context.h>
 #include <ignite/odbc/jni/java.h>
 #include <ignite/odbc/jni/result_set.h>
 
 #include <string>
+#include <vector>
 
-#ifndef _IGNITE_ODBC_JNI_DATABASE_METADATA
-#define _IGNITE_ODBC_JNI_DATABASE_METADATA
+#ifndef _IGNITE_ODBC_JNI_DOCUMENTDB_QUERY_MAPPING_SERVICE
+#define _IGNITE_ODBC_JNI_DOCUMENTDB_QUERY_MAPPING_SERVICE
 
 using ignite::odbc::common::concurrent::SharedPointer;
 using ignite::odbc::jni::ResultSet;
@@ -36,52 +40,41 @@ namespace jni {
 /**
  * Wrapper for the the JDBC DatabaseMetaData.
  */
-class DatabaseMetaData {
+class DocumentDbQueryMappingService {
   friend class DocumentDbConnection;
-  friend class DocumentDbQueryMappingService;
 
  public:
-  ~DatabaseMetaData() = default;
+  ~DocumentDbQueryMappingService() = default;
 
-  /**
-   * Query the tables in the database according to the given search
-   * critera in catalog (not supported), schemaPattern, tablePattern
-   * and types of tables.
-   */
-  SharedPointer< ResultSet > GetTables(const std::string& catalog,
-                                       const std::string& schemaPattern,
-                                       const std::string& tableNamePattern,
-                                       const std::vector< std::string >& types,
-                                       JniErrorInfo& errInfo);
+  static SharedPointer< DocumentDbQueryMappingService > Create(
+      const SharedPointer< DocumentDbConnectionProperties >& connectionProperties,
+      const SharedPointer< DocumentDbDatabaseMetadata >& databaseMetadata, JniErrorInfo& errInfo);
 
-  /**
-   * Query the columns in the database according to the given
-   * search critera in catalog (not supported), schemaPattern,
-   * tablePattern and columnPattern.
-   */
-  SharedPointer< ResultSet > GetColumns(const std::string& catalog,
-                                        const std::string& schemaPattern,
-                                        const std::string& tableNamePattern,
-                                        const std::string& columnNamePattern,
-                                        JniErrorInfo& errInfo);
+  SharedPointer< DocumentDbMqlQueryContext > GetMqlQueryContext(
+      const std::string& sql, int maxRowCount, JniErrorInfo& errInfo);
 
  private:
   /**
    * Constructs an instance of the DatabaseMetaData class.
    */
-  DatabaseMetaData(SharedPointer< JniContext >& jniContext,
-                   SharedPointer< GlobalJObject >& databaseMetaData)
-      : _jniContext(jniContext), _databaseMetaData(databaseMetaData) {
+  DocumentDbQueryMappingService(SharedPointer< JniContext >& jniContext,
+                            SharedPointer< GlobalJObject >& queryMappingService)
+      : _jniContext(jniContext), _queryMappingService(queryMappingService) {
   }
+
+  bool DocumentDbQueryMappingService::ReadJdbcColumnMetadata(
+      SharedPointer< GlobalJObject >& columnMetadata, 
+      std::vector< JdbcColumnMetadata >& columnMetadataList,
+      JniErrorInfo& errInfo);
 
   /** The JNI context */
   SharedPointer< JniContext > _jniContext;
 
   /** The DatabaseMetaData Java object  */
-  SharedPointer< GlobalJObject > _databaseMetaData;
+  SharedPointer< GlobalJObject > _queryMappingService;
 };
 }  // namespace jni
 }  // namespace odbc
 }  // namespace ignite
 
-#endif  // _IGNITE_ODBC_JNI_DATABASE_METADATA
+#endif  // _IGNITE_ODBC_JNI_DOCUMENTDB_QUERY_MAPPING_SERVICE

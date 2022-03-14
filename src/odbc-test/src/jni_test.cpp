@@ -27,6 +27,10 @@
 #include <ignite/odbc/ignite_error.h>
 #include <ignite/odbc/jni/database_metadata.h>
 #include <ignite/odbc/jni/documentdb_connection.h>
+#include <ignite/odbc/jni/documentdb_connection_properties.h>
+#include <ignite/odbc/jni/documentdb_database_metadata.h>
+#include <ignite/odbc/jni/documentdb_mql_query_context.h>
+#include <ignite/odbc/jni/documentdb_query_mapping_service.h>
 #include <ignite/odbc/jni/java.h>
 #include <ignite/odbc/jni/result_set.h>
 #include <ignite/odbc/jni/utils.h>
@@ -35,8 +39,10 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/optional.hpp>
+#include <boost/algorithm/string.hpp>
 #include <string>
 #include <vector>
+#include <regex>
 
 #include "odbc_test_suite.h"
 #include "test_utils.h"
@@ -54,6 +60,10 @@ using ignite::odbc::config::Configuration;
 using ignite::odbc::config::ConnectionStringParser;
 using ignite::odbc::jni::DatabaseMetaData;
 using ignite::odbc::jni::DocumentDbConnection;
+using ignite::odbc::jni::DocumentDbConnectionProperties;
+using ignite::odbc::jni::DocumentDbDatabaseMetadata;
+using ignite::odbc::jni::DocumentDbMqlQueryContext;
+using ignite::odbc::jni::DocumentDbQueryMappingService;
 using ignite::odbc::jni::ResolveDocumentDbHome;
 using ignite::odbc::jni::ResultSet;
 using ignite::odbc::jni::java::BuildJvmOptions;
@@ -483,6 +493,62 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
         BOOST_FAIL(errInfo.errMsg);
     }
     BOOST_CHECK(!dbConnection.IsOpen());
+}
+
+BOOST_AUTO_TEST_CASE(TestDocumentDbGetMqlQueryContext) {
+  PrepareContext();
+  BOOST_REQUIRE(_ctx.Get() != nullptr);
+
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, "odbc-test");
+
+  Configuration config;
+  ConnectionStringParser parser(config);
+  parser.ParseConnectionString(dsnConnectionString, nullptr);
+  JniErrorInfo errInfo;
+  DocumentDbConnection dbConnection(_ctx);
+  dbConnection.Open(config, errInfo);
+  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS == errInfo.code);
+
+  SharedPointer< DocumentDbConnectionProperties > connectionProperties =
+      dbConnection.GetConnectionProperties(errInfo);
+  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS == errInfo.code);
+  BOOST_CHECK(connectionProperties.IsValid());
+
+  SharedPointer< DocumentDbDatabaseMetadata > databaseMetadata =
+      dbConnection.GetDatabaseMetadata(errInfo);
+  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS == errInfo.code);
+  BOOST_CHECK(databaseMetadata.IsValid());
+
+  SharedPointer< DocumentDbQueryMappingService > queryMappingService =
+      DocumentDbQueryMappingService::Create(connectionProperties,
+                                            databaseMetadata, errInfo);
+  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS == errInfo.code);
+  BOOST_CHECK(queryMappingService.IsValid());
+
+  SharedPointer< DocumentDbMqlQueryContext > queryContext =
+      queryMappingService.Get()->GetMqlQueryContext(
+          "SELECT * FROM \"meta_queries_test_001\"", 0, errInfo);
+  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS == errInfo.code);
+  BOOST_REQUIRE(queryContext.IsValid());
+  BOOST_CHECK_EQUAL(13, queryContext.Get()->GetColumnMetadata().size());
+  BOOST_REQUIRE(queryContext.Get()->GetColumnMetadata()[0].GetColumnName());
+  BOOST_CHECK_EQUAL(
+      "meta_queries_test_001__id",
+      *queryContext.Get()->GetColumnMetadata()[0].GetColumnName());
+
+  // Test invalid table name will produce error.
+  SharedPointer< DocumentDbMqlQueryContext > queryContext2 =
+      queryMappingService.Get()->GetMqlQueryContext(
+          "SELECT * FROM \"meta_queries_test_001_xxx\"", 0, errInfo);
+  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS != errInfo.code);
+  std::string modErrMsg = errInfo.errMsg;
+  boost::erase_all(modErrMsg, "\r");
+  boost::erase_all(modErrMsg, "\n");
+  BOOST_CHECK(std::regex_match(
+      modErrMsg, std::regex("^Unable to parse SQL.*"
+          "Object 'meta_queries_test_001_xxx' not found'$")));
+  BOOST_CHECK(!queryContext2.IsValid());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

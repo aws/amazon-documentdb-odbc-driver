@@ -96,6 +96,8 @@ set(SOURCES
          ../odbc/src/ignite_error.cpp
          ../odbc/src/jni/database_metadata.cpp
          ../odbc/src/jni/documentdb_connection.cpp
+         ../odbc/src/jni/documentdb_mql_query_context.cpp
+         ../odbc/src/jni/documentdb_query_mapping_service.cpp
          ../odbc/src/jni/java.cpp
          ../odbc/src/jni/result_set.cpp
          ../odbc/src/log.cpp
