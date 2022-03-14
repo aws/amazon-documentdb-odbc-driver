@@ -618,12 +618,7 @@ void JniMembers::Initialize(JNIEnv* env) {
 
   c_List = FindClass(env, C_LIST);
   m_ListSize = FindMethod(env, c_List, M_LIST_SIZE);
-  m_ListToArray = FindMethod(env, c_List, M_LIST_TO_ARRAY);
   m_ListGet = FindMethod(env, c_List, M_LIST_GET);
-
-  c_Iterator = FindClass(env, C_ITERATOR);
-  m_IteratorNext = FindMethod(env, c_Iterator, M_ITERATOR_NEXT);
-  m_IteratorHasNext = FindMethod(env, c_Iterator, M_ITERATOR_HAS_NEXT);
 
   c_DocumentDbMqlQueryContext = FindClass(env, C_DOCUMENTDB_MQL_QUERY_CONTEXT);
   m_DocumentDbMqlQueryContextGetAggregateOperationsAsStrings = FindMethod(
@@ -1410,27 +1405,6 @@ JniErrorCode JniContext::ListSize(const SharedPointer< GlobalJObject >& list,
   return errInfo.code;
 }
 
-JniErrorCode JniContext::ListToArray(const SharedPointer< GlobalJObject >& list,
-                         SharedPointer< GlobalJObject >& array,
-                                     JniErrorInfo& errInfo) {
-  if (!list.IsValid()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
-    errInfo.errMsg = "List object must be set.";
-    return errInfo.code;
-  }
-
-  JNIEnv* env = Attach();
-  jobject result = env->CallObjectMethod(list.Get()->GetRef(),
-                                         jvm->GetMembers().m_ListToArray);
-  ExceptionCheck(env, &errInfo);
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    array = nullptr;
-    return errInfo.code;
-  }
-  array = new GlobalJObject(env, env->NewGlobalRef(result));
-  return errInfo.code;
-}
-
 JniErrorCode JniContext::ListGet(const SharedPointer< GlobalJObject >& list,
                                  int32_t index,
                                  SharedPointer< GlobalJObject >& value,
@@ -1450,46 +1424,6 @@ JniErrorCode JniContext::ListGet(const SharedPointer< GlobalJObject >& list,
     return errInfo.code;
   }
   value = new GlobalJObject(env, env->NewGlobalRef(result));
-  return errInfo.code;
-}
-
-JniErrorCode JniContext::IteratorNext(
-    const SharedPointer< GlobalJObject >& iterator,
-    SharedPointer< GlobalJObject >& value, JniErrorInfo& errInfo) {
-  if (!iterator.IsValid()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
-    errInfo.errMsg = "Iterator object must be set.";
-    return errInfo.code;
-  }
-
-  JNIEnv* env = Attach();
-  jobject result = env->CallObjectMethod(iterator.Get()->GetRef(),
-                                         jvm->GetMembers().m_IteratorNext);
-  ExceptionCheck(env, &errInfo);
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    value = nullptr;
-    return errInfo.code;
-  }
-  value = new GlobalJObject(env, env->NewGlobalRef(result));
-  return errInfo.code;
-}
-
-JniErrorCode JniContext::IteratorHasNext(
-    const SharedPointer< GlobalJObject >& iterator, bool& hasNext,
-    JniErrorInfo& errInfo) {
-  if (!iterator.IsValid()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
-    errInfo.errMsg = "Iterator object must be set.";
-    return errInfo.code;
-  }
-
-  JNIEnv* env = Attach();
-  jboolean result = env->CallBooleanMethod(iterator.Get()->GetRef(),
-                                         jvm->GetMembers().m_IteratorHasNext);
-  ExceptionCheck(env, &errInfo);
-  if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    hasNext = result != JNI_FALSE;
-  }
   return errInfo.code;
 }
 

@@ -63,7 +63,7 @@ class DocumentDbQueryMappingService {
   }
 
   bool DocumentDbQueryMappingService::ReadJdbcColumnMetadata(
-      SharedPointer< GlobalJObject >& columnMetadata, 
+      SharedPointer< GlobalJObject > const& columnMetadata, 
       std::vector< JdbcColumnMetadata >& columnMetadataList,
       JniErrorInfo& errInfo);
 

@@ -69,7 +69,7 @@ bool CopyListOfString(SharedPointer< JniContext >& _jniContext,
     SharedPointer< GlobalJObject > operation;
     success = _jniContext.Get()->ListGet(sourceList, index, operation, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-      return nullptr;
+      return false;
     }
     std::string value =
         _jniContext.Get()->JavaStringToCppString(operation);
@@ -80,14 +80,14 @@ bool CopyListOfString(SharedPointer< JniContext >& _jniContext,
 }
 
 bool DocumentDbQueryMappingService::ReadJdbcColumnMetadata(
-    SharedPointer< GlobalJObject >& columnMetadata, 
+    SharedPointer< GlobalJObject > const& columnMetadata, 
     std::vector< JdbcColumnMetadata >& columnMetadataList,
     JniErrorInfo& errInfo) {
   JniErrorCode success;
   int32_t listSize;
   success = _jniContext.Get()->ListSize(columnMetadata, listSize, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    return nullptr;
+    return false;
   }
   for (int32_t index = 0; index < listSize; index++) {
     SharedPointer< GlobalJObject > jdbcColumnMetadata;

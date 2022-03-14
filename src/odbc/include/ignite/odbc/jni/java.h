@@ -291,12 +291,7 @@ struct JniMembers {
 
   jclass c_List;
   jmethodID m_ListSize;
-  jmethodID m_ListToArray;
   jmethodID m_ListGet;
-
-  jclass c_Iterator;
-  jmethodID m_IteratorNext;
-  jmethodID m_IteratorHasNext;
 
   jclass c_DocumentDbMqlQueryContext;
   jmethodID m_DocumentDbMqlQueryContextGetAggregateOperationsAsStrings;
