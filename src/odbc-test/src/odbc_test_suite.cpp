@@ -35,19 +35,19 @@ using namespace boost::unit_test;
 /**
  * Test setup config for test results
  */
-struct OdbcConfig {
-  OdbcConfig() : test_log("odbc_test_result.xml") {
-    unit_test_log.set_stream(test_log);
-    unit_test_log.set_format(OF_JUNIT);
-  }
-  ~OdbcConfig() {
-    unit_test_log.set_stream(std::cout);
-  }
+// struct OdbcConfig {
+//   OdbcConfig() : test_log("odbc_test_result.xml") {
+//     unit_test_log.set_stream(test_log);
+//     unit_test_log.set_format(OF_JUNIT);
+//   }
+//   ~OdbcConfig() {
+//     unit_test_log.set_stream(std::cout);
+//   }
 
-  std::ofstream test_log;
-};
+//   std::ofstream test_log;
+// };
 
-BOOST_GLOBAL_FIXTURE(OdbcConfig);
+// BOOST_GLOBAL_FIXTURE(OdbcConfig);
 
 namespace ignite {
 namespace odbc {
@@ -110,6 +110,7 @@ void OdbcTestSuite::Connect(const std::string& connectStr) {
       SQLDriverConnect(dbc, NULL, &connectStr0[0],
                        static_cast< SQLSMALLINT >(connectStr0.size()), outstr,
                        sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
+  // SQLRETURN ret = -1;
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc));
