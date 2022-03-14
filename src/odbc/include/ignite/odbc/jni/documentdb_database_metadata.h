@@ -41,6 +41,9 @@ class DocumentDbDatabaseMetadata {
   friend class DocumentDbQueryMappingService;
 
  public:
+  /**
+   * Desctructs a DocumentDbDatabaseMetadata instance.
+   */
   ~DocumentDbDatabaseMetadata() = default;
 
  private:

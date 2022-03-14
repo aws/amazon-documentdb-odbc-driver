@@ -41,15 +41,26 @@ namespace jni {
  * Wrapper for the the JDBC DatabaseMetaData.
  */
 class DocumentDbQueryMappingService {
-  friend class DocumentDbConnection;
-
  public:
+  /**
+   * Destructs DocumentDbQueryMappingService object.
+   */
   ~DocumentDbQueryMappingService() = default;
 
+  /** 
+   * Creates an instance of DocumentDbQueryMappingService from connection properties and database metadata.
+   * 
+   * @return an new instance of DocumentDbQueryMappingService.
+   */
   static SharedPointer< DocumentDbQueryMappingService > Create(
       const SharedPointer< DocumentDbConnectionProperties >& connectionProperties,
       const SharedPointer< DocumentDbDatabaseMetadata >& databaseMetadata, JniErrorInfo& errInfo);
 
+  /** 
+   * Getst the MQL query context for a SQL query.
+   * 
+   * @return a pointer to DocumentDbMqlQueryContext.
+   */
   SharedPointer< DocumentDbMqlQueryContext > GetMqlQueryContext(
       const std::string& sql, int maxRowCount, JniErrorInfo& errInfo);
 
@@ -62,6 +73,11 @@ class DocumentDbQueryMappingService {
       : _jniContext(jniContext), _queryMappingService(queryMappingService) {
   }
 
+  /**
+   * Reads the JDBC column metadata into a vector of JdbcColumnMetadata.
+   * 
+   * @return true if able to read the metadata, false, otherwise.
+   */
   bool DocumentDbQueryMappingService::ReadJdbcColumnMetadata(
       SharedPointer< GlobalJObject > const& columnMetadata, 
       std::vector< JdbcColumnMetadata >& columnMetadataList,

@@ -16,13 +16,13 @@
  */
 
 #include <ignite/odbc/common/concurrent.h>
-#include <ignite/odbc/jni/jdbc_column_metadata.h>
 #include <ignite/odbc/jni/java.h>
+#include <ignite/odbc/jni/jdbc_column_metadata.h>
 #include <ignite/odbc/jni/result_set.h>
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 #ifndef _IGNITE_ODBC_JNI_DOCUMENTDB_MQL_QUERY_CONTEXT
 #define _IGNITE_ODBC_JNI_DOCUMENTDB_MQL_QUERY_CONTEXT
@@ -44,20 +44,35 @@ class DocumentDbMqlQueryContext {
   friend class DocumentDbQueryMappingService;
 
  public:
+  /**
+   * Destructs a DocumentDbMqlQueryContext object.
+   */
   ~DocumentDbMqlQueryContext() = default;
 
+  /**
+   * Gets the collection name.
+   */
   const std::string GetCollectionName() {
     return _collectionName;
   }
 
-  std::vector< std::string >& GetAggregateOperationsAsStrings() {
+  /**
+   * Gets the list of aggregate operations
+   */
+  std::vector< std::string >& GetAggregateOperations() {
     return _aggregateOperations;
   }
 
+  /**
+   * Gets the column metadata for the query.
+   */
   std::vector< JdbcColumnMetadata >& GetColumnMetadata() {
     return _columnMetadata;
   }
 
+  /**
+   * Gets the DocumentDB paths in the document for each of the columns.
+   */
   std::vector< std::string >& GetPaths() {
     return _paths;
   }
@@ -71,11 +86,25 @@ class DocumentDbMqlQueryContext {
     // No-opt
   }
 
+  /**
+   * The collection name.
+   */
   const std::string _collectionName;
-  std::vector< std::string > _aggregateOperations;
-  std::vector< JdbcColumnMetadata > _columnMetadata;
-  std::vector< std::string > _paths;
 
+  /**
+   * The aggregate operations.
+   */
+  std::vector< std::string > _aggregateOperations;
+
+  /**
+   * The column metadata.
+   */
+  std::vector< JdbcColumnMetadata > _columnMetadata;
+
+  /**
+   * The DocumentDB paths in the document for each column.
+   */
+  std::vector< std::string > _paths;
 };
 }  // namespace jni
 }  // namespace odbc

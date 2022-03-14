@@ -399,7 +399,7 @@ class IGNITE_IMPORT_EXPORT JniJvm {
    * @param javaMembers Java members.
    * @param members Members.
    */
-  JniJvm(JavaVM* jvm, JniJavaMembers javaMembers, JniMembers members);
+  JniJvm(JavaVM* jvm, JniJavaMembers const& javaMembers, JniMembers const& members);
 
   /**
    * Get JVM.
@@ -481,7 +481,7 @@ struct IGNITE_IMPORT_EXPORT JniErrorInfo {
  */
 class IGNITE_IMPORT_EXPORT JniContext {
  public:
-  static JniContext* Create(char** opts, int optsLen, JniHandlers hnds);
+  static JniContext* Create(char** opts, int optsLen, JniHandlers const& hnds);
   static JniContext* Create(char** opts, int optsLen, JniHandlers hnds,
                             JniErrorInfo* errInfo);
   static int Reallocate(int64_t memPtr, int cap);
@@ -491,6 +491,7 @@ class IGNITE_IMPORT_EXPORT JniContext {
   static int RemoveConsoleHandler(ConsoleWriteHandler consoleHandler);
 
   std::string JavaStringToCppString(const SharedPointer< GlobalJObject >& jstring);
+
   JniErrorCode DriverManagerGetConnection(
       const char* connectionString, SharedPointer< GlobalJObject >& connection,
       JniErrorInfo& errInfo);
@@ -512,9 +513,6 @@ class IGNITE_IMPORT_EXPORT JniContext {
   JniErrorCode DocumentDbConnectionGetConnectionProperties(
       const SharedPointer< GlobalJObject >& connection,
       SharedPointer< GlobalJObject >& connectionProperties, JniErrorInfo& errInfo);
-  JniErrorCode DocumentDbConnectionGetConnectionProperties(
-      SharedPointer< GlobalJObject >& connectionProperties, bool& wasNull,
-      JniErrorInfo& errInfo);
 
   JniErrorCode DocumentDbDatabaseSchemaMetadataGetSchemaName(
       const SharedPointer< GlobalJObject >& databaseMetadata,
@@ -560,18 +558,9 @@ class IGNITE_IMPORT_EXPORT JniContext {
 
   JniErrorCode ListSize(const SharedPointer< GlobalJObject >& list, int32_t& size,
                         JniErrorInfo& errInfo);
-  JniErrorCode ListToArray(const SharedPointer< GlobalJObject >& list,
-                           SharedPointer< GlobalJObject >& array,
-                           JniErrorInfo& errInfo);
   JniErrorCode ListGet(const SharedPointer< GlobalJObject >& list,
                        int32_t index, SharedPointer< GlobalJObject >& array,
                        JniErrorInfo& errInfo);
-
-  JniErrorCode IteratorNext(const SharedPointer< GlobalJObject >& iterator,
-                            SharedPointer< GlobalJObject >& value,
-                            JniErrorInfo& errInfo);
-  JniErrorCode IteratorHasNext(const SharedPointer< GlobalJObject >& iterator,
-                               bool& hasNext, JniErrorInfo& errInfo);
 
   JniErrorCode DocumentdbMqlQueryContextGetAggregateOperationsAsStrings(
       const SharedPointer< GlobalJObject >& mqlQueryContext,
@@ -709,7 +698,7 @@ class IGNITE_IMPORT_EXPORT JniContext {
   JniJvm* jvm;
   JniHandlers hnds;
 
-  JniContext(JniJvm* jvm, JniHandlers hnds);
+  JniContext(JniJvm* jvm, JniHandlers const& hnds);
 
   JNIEnv* Attach();
   void ExceptionCheck(JNIEnv* env);

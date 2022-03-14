@@ -886,7 +886,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbGetMqlQueryContext) {
                     queryContext.Get()->GetCollectionName());
   BOOST_CHECK_EQUAL(13, queryContext.Get()->GetPaths().size());
   BOOST_CHECK_EQUAL(
-      1, queryContext.Get()->GetAggregateOperationsAsStrings().size());
+      1, queryContext.Get()->GetAggregateOperations().size());
   BOOST_CHECK_EQUAL(
       "{\"$project\": {"
       "\"meta_queries_test_001__id\": \"$_id\", "
@@ -903,7 +903,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbGetMqlQueryContext) {
       "\"fieldNull\": \"$fieldNull\", "
       "\"fieldBinary\": \"$fieldBinary\", "
       "\"_id\": {\"$numberInt\": \"0\"}}}",
-      queryContext.Get()->GetAggregateOperationsAsStrings()[0]);
+      queryContext.Get()->GetAggregateOperations()[0]);
 
   // Test invalid table name will produce error.
   SharedPointer< DocumentDbMqlQueryContext > queryContext2 =

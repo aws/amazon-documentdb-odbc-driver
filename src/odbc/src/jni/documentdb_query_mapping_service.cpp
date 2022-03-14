@@ -263,7 +263,7 @@ DocumentDbQueryMappingService::GetMqlQueryContext(const std::string& sql,
     return nullptr;
   }
   if (!CopyListOfString(_jniContext, aggregateOperations,
-          documentDbMqlQueryContext.Get()->GetAggregateOperationsAsStrings())) {
+          documentDbMqlQueryContext.Get()->GetAggregateOperations())) {
     return nullptr;
   }
 

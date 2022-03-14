@@ -416,10 +416,10 @@ char* StringToChars(JNIEnv* env, jstring str, int* len) {
     return nullptr;
   }
 
-  const char* strChars = env->GetStringUTFChars(str, 0);
+  const char* strChars = env->GetStringUTFChars(str, nullptr);
   const int strCharsLen = env->GetStringUTFLength(str);
 
-  char* strChars0 = new char[strCharsLen + 1];
+  auto* strChars0 = new char[strCharsLen + 1];
   std::strcpy(strChars0, strChars);
   *(strChars0 + strCharsLen) = 0;
 
@@ -435,7 +435,7 @@ std::string JavaStringToCString(JNIEnv* env, jstring str, int& len) {
   char* resChars = StringToChars(env, str, &len);
 
   if (resChars) {
-    std::string res = std::string(resChars, len);
+    std::string res(resChars, len);
 
     delete[] resChars;
 
@@ -450,7 +450,7 @@ jclass FindClass(JNIEnv* env, const char* name) {
   if (!res)
     throw JvmException();
 
-  jclass res0 = static_cast< jclass >(env->NewGlobalRef(res));
+  auto res0 = static_cast< jclass >(env->NewGlobalRef(res));
 
   env->DeleteLocalRef(res);
 
@@ -478,12 +478,6 @@ jmethodID FindMethod(JNIEnv* env, jclass cls, JniMethod mthd) {
     throw JvmException();
 
   return mthd0;
-}
-
-void AddNativeMethod(JNINativeMethod* mthd, JniMethod jniMthd, void* fnPtr) {
-  mthd->name = jniMthd.name;
-  mthd->signature = jniMthd.sign;
-  mthd->fnPtr = fnPtr;
 }
 
 void JniJavaMembers::Initialize(JNIEnv* env) {
@@ -521,15 +515,15 @@ bool JniJavaMembers::WriteErrorInfo(JNIEnv* env, char** errClsName,
 
       jclass errCls = env->GetObjectClass(err);
 
-      jstring clsName = static_cast< jstring >(
+      auto clsName = static_cast< jstring >(
           env->CallObjectMethod(errCls, m_Class_getName));
       *errClsName = StringToChars(env, clsName, errClsNameLen);
 
-      jstring msg = static_cast< jstring >(
+      auto msg = static_cast< jstring >(
           env->CallObjectMethod(err, m_Throwable_getMessage));
       *errMsg = StringToChars(env, msg, errMsgLen);
 
-      jstring trace = NULL;
+      jstring trace = nullptr;
 
       if (c_PlatformUtils && m_PlatformUtils_getFullStackTrace) {
         trace = static_cast< jstring >(env->CallStaticObjectMethod(
@@ -697,11 +691,11 @@ void JniMembers::Destroy(JNIEnv* env) {
 }
 
 JniJvm::JniJvm()
-    : jvm(NULL), javaMembers(JniJavaMembers()), members(JniMembers()) {
+    : jvm(nullptr), javaMembers(JniJavaMembers()), members(JniMembers()) {
   // No-op.
 }
 
-JniJvm::JniJvm(JavaVM* jvm, JniJavaMembers javaMembers, JniMembers members)
+JniJvm::JniJvm(JavaVM* jvm, JniJavaMembers const& javaMembers, JniMembers const& members)
     : jvm(jvm), javaMembers(javaMembers), members(members) {
   // No-op.
 }
@@ -748,7 +742,7 @@ jint GetOrCreateJvm(char** opts, int optsLen, JavaVM** jvm, JNIEnv** env) {
   }
 
   // Otherwise, create a VM
-  JavaVMOption* opts0 = new JavaVMOption[optsLen];
+  std::unique_ptr< JavaVMOption[] > opts0(std::make_unique<JavaVMOption[]>(optsLen));
 
   for (int i = 0; i < optsLen; i++)
     opts0[i].optionString = *(opts + i);
@@ -756,12 +750,10 @@ jint GetOrCreateJvm(char** opts, int optsLen, JavaVM** jvm, JNIEnv** env) {
   JavaVMInitArgs args{};
   args.version = JNI_VERSION_1_8;
   args.nOptions = optsLen;
-  args.options = opts0;
+  args.options = opts0.get();
   args.ignoreUnrecognized = 0;
 
   res = JNI_CreateJavaVM(jvm, reinterpret_cast< void** >(env), &args);
-
-  delete[] opts0;
 
   return res;
 }
@@ -771,12 +763,12 @@ void RegisterNatives(JNIEnv* env) {
   // TODO: Investigate registering callbacks to get console and logging streams.
 }
 
-JniContext::JniContext(JniJvm* jvm, JniHandlers hnds) : jvm(jvm), hnds(hnds) {
+JniContext::JniContext(JniJvm* jvm, JniHandlers const& hnds) : jvm(jvm), hnds(hnds) {
   // No-op.
 }
 
-JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers hnds) {
-  return Create(opts, optsLen, hnds, NULL);
+JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers const& hnds) {
+  return Create(opts, optsLen, hnds, nullptr);
 }
 
 void GetJniErrorMessage(std::string& errMsg, jint res) {
@@ -818,8 +810,8 @@ JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers hnds,
   JVM_LOCK.Enter();
 
   // Define local variables.
-  JavaVM* jvm = NULL;
-  JNIEnv* env = NULL;
+  JavaVM* jvm = nullptr;
+  JNIEnv* env = nullptr;
 
   JniJavaMembers javaMembers;
   memset(&javaMembers, 0, sizeof(javaMembers));
@@ -827,7 +819,7 @@ JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers hnds,
   JniMembers members;
   memset(&members, 0, sizeof(members));
 
-  JniContext* ctx = NULL;
+  JniContext* ctx = nullptr;
 
   std::string errClsName;
   int errClsNameLen = 0;
@@ -864,9 +856,9 @@ JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers hnds,
     if (JVM.GetJvm())
       ctx = new JniContext(&JVM, hnds);
   } catch (const JvmException&) {
-    char* errClsNameChars = NULL;
-    char* errMsgChars = NULL;
-    char* stackTraceChars = NULL;
+    char* errClsNameChars = nullptr;
+    char* errMsgChars = nullptr;
+    char* stackTraceChars = nullptr;
 
     // Read error info if possible.
     javaMembers.WriteErrorInfo(env, &errClsNameChars, &errClsNameLen,
@@ -917,7 +909,7 @@ JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers hnds,
     if (hnds.error)
       hnds.error(hnds.target, JniErrorCode::IGNITE_JNI_ERR_JVM_INIT,
                  errClsName.c_str(), errClsNameLen, errMsg.c_str(), errMsgLen,
-                 stackTrace.c_str(), stackTraceLen, NULL, 0);
+                 stackTrace.c_str(), stackTraceLen, nullptr, 0);
   }
 
   return ctx;
@@ -929,7 +921,7 @@ int JniContext::Reallocate(int64_t memPtr, int cap) {
   JNIEnv* env;
 
   int attachRes =
-      jvm->AttachCurrentThread(reinterpret_cast< void** >(&env), NULL);
+      jvm->AttachCurrentThread(reinterpret_cast< void** >(&env), nullptr);
 
   if (attachRes == JNI_OK)
     AttachHelper::OnThreadAttach();
@@ -966,7 +958,7 @@ std::string JniContext::JavaStringToCppString(
     const SharedPointer< GlobalJObject >& value) {
   int len;
   JNIEnv* env = Attach();
-  return ignite::odbc::jni::java::JavaStringToCString(env, static_cast< jstring >(value.Get()->GetRef()),
+  return JavaStringToCString(env, static_cast< jstring >(value.Get()->GetRef()),
                              len);
 }
 
@@ -1967,7 +1959,7 @@ jobject JniContext::Acquire(jobject obj) {
     return obj0;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 void JniContext::Release(jobject obj) {
@@ -1978,7 +1970,7 @@ void JniContext::Release(jobject obj) {
       JNIEnv* env;
 
       jint attachRes =
-          jvm->AttachCurrentThread(reinterpret_cast< void** >(&env), NULL);
+          jvm->AttachCurrentThread(reinterpret_cast< void** >(&env), nullptr);
 
       if (attachRes == JNI_OK) {
         AttachHelper::OnThreadAttach();
@@ -2036,21 +2028,21 @@ JNIEnv* JniContext::Attach() {
   JNIEnv* env;
 
   jint attachRes = jvm->GetJvm()->AttachCurrentThread(
-      reinterpret_cast< void** >(&env), NULL);
+      reinterpret_cast< void** >(&env), nullptr);
 
   if (attachRes == JNI_OK)
     AttachHelper::OnThreadAttach();
   else {
     if (hnds.error)
-      hnds.error(hnds.target, JniErrorCode::IGNITE_JNI_ERR_JVM_ATTACH, NULL, 0,
-                 NULL, 0, NULL, 0, NULL, 0);
+      hnds.error(hnds.target, JniErrorCode::IGNITE_JNI_ERR_JVM_ATTACH, nullptr, 0,
+                 nullptr, 0, nullptr, 0, nullptr, 0);
   }
 
   return env;
 }
 
 void JniContext::ExceptionCheck(JNIEnv* env) {
-  ExceptionCheck(env, NULL);
+  ExceptionCheck(env, nullptr);
 }
 
 void JniContext::ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) {
@@ -2106,7 +2098,7 @@ void JniContext::ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) {
     }
 
     if (errData) {
-      jbyte* errBytesNative = env->GetByteArrayElements(errData, NULL);
+      jbyte* errBytesNative = env->GetByteArrayElements(errData, nullptr);
 
       int errBytesLen = env->GetArrayLength(errData);
 
@@ -2120,7 +2112,7 @@ void JniContext::ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) {
       if (hnds.error)
         hnds.error(hnds.target, JniErrorCode::IGNITE_JNI_ERR_GENERIC,
                    clsName0.c_str(), clsNameLen, msg0.c_str(), msgLen,
-                   trace0.c_str(), traceLen, NULL, 0);
+                   trace0.c_str(), traceLen, nullptr, 0);
     }
 
     env->DeleteLocalRef(err);
@@ -2144,7 +2136,7 @@ jobject JniContext::LocalToGlobal(JNIEnv* env, jobject localRef) {
 
     return globalRef;
   } else
-    return NULL;
+    return nullptr;
 }
 
 JNIEXPORT void JNICALL JniConsoleWrite(JNIEnv* env, jclass, jstring str,
