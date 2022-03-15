@@ -20,6 +20,7 @@
 
 #include <cassert>
 #include <utility>
+#include <iostream>
 
 #include "ignite/odbc/common/concurrent_os.h"
 
@@ -260,7 +261,7 @@ class IGNITE_IMPORT_EXPORT SharedPointer {
    *
    * @return Raw pointer.
    */
-  T* Get() {
+  T* Get() { //std::cout << "concurrent get()- line 263 called\n";
     return ptr;
   }
 

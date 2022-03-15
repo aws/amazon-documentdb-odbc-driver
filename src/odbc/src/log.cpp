@@ -58,7 +58,7 @@ void Logger::WriteMessage(std::string const& message) {
 
 Logger* Logger::Get() {
   const char* envVarName = "IGNITE_ODBC_LOG_PATH";
-  static Logger logger(getenv(envVarName)); std::cout << "Logger Get - line 61 pass\n";   
+  static Logger logger(getenv(envVarName)); 
   return logger.IsEnabled() ? &logger : 0; // -AL-: this could cause segfault because 0 could be returned. 
 }
 }  // namespace odbc

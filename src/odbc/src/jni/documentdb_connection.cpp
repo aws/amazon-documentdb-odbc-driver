@@ -31,7 +31,7 @@ namespace jni {
 JniErrorCode DocumentDbConnection::Open(const Configuration& config,
                                         JniErrorInfo& errInfo) {
   bool connected = false;
-  std::cout << "Open - line 33 pass\n"; // std::cout << "_jniContext ptr: %p \n" << _jniContext.ptr; std::cout << "_jniContext ptr.jvm: %p \n" << _jniContext.ptr.jvm; 
+  std::cout << "Open - line 33 pass\n"; std::cout << "_jniContext.ptr: " << _jniContext.Get() << "\n"; // std::cout << "_jniContext ptr: %p \n" << _jniContext.ptr; std::cout << "_jniContext ptr.jvm: %p \n" << _jniContext.ptr.jvm; 
   if (!_jniContext.IsValid()) {  std::cout << "Open - line 35 pass\n";  // if (true) {  std::cout << "Open - line 35 pass\n";  // if (false) { 
     errInfo.errMsg = new char[]{"Unable to get initialized JVM."};
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_JVM_INIT; std::cout << "Open - line 37 pass\n";
@@ -69,7 +69,7 @@ JniErrorCode DocumentDbConnection::Close(JniErrorInfo& errInfo) {
   return JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
 }
 
-DocumentDbConnection::~DocumentDbConnection() {
+DocumentDbConnection::~DocumentDbConnection() { std::cout << "~DocumentDbConnection is called.\n";
   if (_jniContext.Get() != nullptr) {
     JniErrorInfo errInfo;
     Close(errInfo);

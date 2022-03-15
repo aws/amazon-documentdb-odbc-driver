@@ -28,6 +28,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <iostream>
 
 using namespace ignite::odbc::common::concurrent;
 using namespace ignite::odbc::jni::java;
@@ -795,18 +796,18 @@ void JniContext::Detach() {
 
 JniErrorCode JniContext::DriverManagerGetConnection(
     const char* connectionString, SharedPointer< GlobalJObject >& connection,
-    JniErrorInfo& errInfo) {
-  JNIEnv* env = Attach();
-  jstring jConnectionString = env->NewStringUTF(connectionString);
+    JniErrorInfo& errInfo) { std::cout << "DriverManagerGetConnection - line 798 pass\n"; 
+  JNIEnv* env = Attach(); std::cout << "DriverManagerGetConnection - line 800 pass\n";
+  jstring jConnectionString = env->NewStringUTF(connectionString); std::cout << "DriverManagerGetConnection - jvm: " << jvm << std::endl; std::cout << "DriverManagerGetConnection - jvm->GetMembers().m_DriverManagerGetConnection: " << jvm->GetMembers().m_DriverManagerGetConnection << std::endl; std::cout << "DriverManagerGetConnection - jvm->GetMembers().c_DriverManager: " << jvm->GetMembers().c_DriverManager << std::endl;
   jobject result = env->CallStaticObjectMethod(
       jvm->GetMembers().c_DriverManager,
-      jvm->GetMembers().m_DriverManagerGetConnection, jConnectionString);
-  ExceptionCheck(env, &errInfo);
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      jvm->GetMembers().m_DriverManagerGetConnection, jConnectionString); std::cout << "DriverManagerGetConnection - line 802 pass\n"; // the real line that causes errors to occur, jumping _jniContext prevented calling this function 
+  ExceptionCheck(env, &errInfo); std::cout << "DriverManagerGetConnection - line 805 pass\n"; 
+  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) { std::cout << "DriverManagerGetConnection - line 806 pass\n"; 
     connection = nullptr;
     return errInfo.code;
-  }
-  connection = new GlobalJObject(env, env->NewGlobalRef(result));
+  } std::cout << "DriverManagerGetConnection - line 808 pass\n"; 
+  connection = new GlobalJObject(env, env->NewGlobalRef(result)); std::cout << "DriverManagerGetConnection - line 809 pass\n"; 
   return errInfo.code;
 }
 
