@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <cstring>  // needed only on linux
 #include <exception>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
