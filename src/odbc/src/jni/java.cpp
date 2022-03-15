@@ -965,7 +965,7 @@ JniErrorCode JniContext::DriverManagerGetConnection(
       jvm->GetMembers().c_DriverManager,
       jvm->GetMembers().m_DriverManagerGetConnection, jConnectionString);
   ExceptionCheck(env, &errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     connection = nullptr;
   } else {
     connection = new GlobalJObject(env, env->NewGlobalRef(result));
