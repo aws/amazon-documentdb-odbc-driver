@@ -17,8 +17,8 @@
 
 #include <ignite/odbc/common/platform_utils.h>
 #include <ignite/odbc/ignite_error.h>
-#include <ignite/odbc/jni/documentdb_query_mapping_service.h>
 #include <ignite/odbc/jni/documentdb_mql_query_context.h>
+#include <ignite/odbc/jni/documentdb_query_mapping_service.h>
 #include <ignite/odbc/jni/utils.h>
 #include <ignite/odbc/log.h>
 
@@ -28,7 +28,7 @@ using ignite::odbc::common::GetEnv;
 using ignite::odbc::jni::java::JniErrorCode;
 using ignite::odbc::jni::java::JniErrorInfo;
 
- namespace ignite {
+namespace ignite {
 namespace odbc {
 namespace jni {
 SharedPointer< DocumentDbQueryMappingService >
@@ -41,6 +41,7 @@ DocumentDbQueryMappingService::Create(
                            "Connection and metadata must be set.");
     return nullptr;
   }
+
   SharedPointer< JniContext > jniContext =
       connectionProperties.Get()->_jniContext;
   SharedPointer< GlobalJObject > queryMappingService;
@@ -54,7 +55,7 @@ DocumentDbQueryMappingService::Create(
   return new DocumentDbQueryMappingService(jniContext, queryMappingService);
 }
 
-bool CopyListOfString(SharedPointer< JniContext >& _jniContext,
+bool ReadListOfString(SharedPointer< JniContext >& _jniContext,
                       const SharedPointer< GlobalJObject >& sourceList,
                       std::vector< std::string >& targetList) {
   JniErrorCode success;
@@ -65,22 +66,22 @@ bool CopyListOfString(SharedPointer< JniContext >& _jniContext,
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     return false;
   }
+
   for (int32_t index = 0; index < listSize; index++) {
     SharedPointer< GlobalJObject > operation;
     success = _jniContext.Get()->ListGet(sourceList, index, operation, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
-    std::string value =
-        _jniContext.Get()->JavaStringToCppString(operation);
-
+    std::string value = _jniContext.Get()->JavaStringToCppString(operation);
     targetList.push_back(value);
   }
+
   return true;
 }
 
 bool DocumentDbQueryMappingService::ReadJdbcColumnMetadata(
-    SharedPointer< GlobalJObject > const& columnMetadata, 
+    SharedPointer< GlobalJObject > const& columnMetadata,
     std::vector< JdbcColumnMetadata >& columnMetadataList,
     JniErrorInfo& errInfo) {
   JniErrorCode success;
@@ -89,6 +90,7 @@ bool DocumentDbQueryMappingService::ReadJdbcColumnMetadata(
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     return false;
   }
+
   for (int32_t index = 0; index < listSize; index++) {
     SharedPointer< GlobalJObject > jdbcColumnMetadata;
     success = _jniContext.Get()->ListGet(columnMetadata, index,
@@ -134,8 +136,8 @@ bool DocumentDbQueryMappingService::ReadJdbcColumnMetadata(
       return false;
     }
     bool isSigned;
-    success = _jniContext.Get()->JdbcColumnMetadataIsSigned(
-        jdbcColumnMetadata, isSigned, errInfo);
+    success = _jniContext.Get()->JdbcColumnMetadataIsSigned(jdbcColumnMetadata,
+                                                            isSigned, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
@@ -170,8 +172,8 @@ bool DocumentDbQueryMappingService::ReadJdbcColumnMetadata(
       return false;
     }
     int32_t scale;
-    success = _jniContext.Get()->JdbcColumnMetadataGetScale(
-        jdbcColumnMetadata, scale, errInfo);
+    success = _jniContext.Get()->JdbcColumnMetadataGetScale(jdbcColumnMetadata,
+                                                            scale, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
@@ -231,6 +233,7 @@ bool DocumentDbQueryMappingService::ReadJdbcColumnMetadata(
         readOnly, writable, definitelyWritable, columnClassName);
     columnMetadataList.push_back(columnMetadataNode);
   }
+
   return true;
 }
 
@@ -262,7 +265,8 @@ DocumentDbQueryMappingService::GetMqlQueryContext(const std::string& sql,
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     return nullptr;
   }
-  if (!CopyListOfString(_jniContext, aggregateOperations,
+  if (!ReadListOfString(
+          _jniContext, aggregateOperations,
           documentDbMqlQueryContext.Get()->GetAggregateOperations())) {
     return nullptr;
   }
@@ -273,7 +277,7 @@ DocumentDbQueryMappingService::GetMqlQueryContext(const std::string& sql,
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     return nullptr;
   }
-  if (!CopyListOfString(_jniContext, paths,
+  if (!ReadListOfString(_jniContext, paths,
                         documentDbMqlQueryContext.Get()->GetPaths())) {
     return nullptr;
   }

@@ -105,6 +105,7 @@ JniErrorCode DocumentDbConnection::GetSshLocalPort(int32_t& localPort,
       _connection, localPort, errInfo);
   return success;
 }
+
 SharedPointer< DocumentDbConnectionProperties >
 DocumentDbConnection::GetConnectionProperties(JniErrorInfo& errInfo) {
   if (!_connection.IsValid()) {
