@@ -24,7 +24,7 @@ env:
   DOC_DB_LOCAL_PORT: 27019
   DOC_DB_REMOTE_PORT: 27017
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
-  JDBC_DRIVER_VERSION: "1.1.1"
+  JDBC_DRIVER_VERSION: "1.2.0"
 
 jobs:
   build-mac:
