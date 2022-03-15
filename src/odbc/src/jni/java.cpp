@@ -25,7 +25,6 @@
 #include <algorithm>
 #include <cstring>  // needed only on linux
 #include <exception>
-#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -743,7 +742,7 @@ jint GetOrCreateJvm(char** opts, int optsLen, JavaVM** jvm, JNIEnv** env) {
   }
 
   // Otherwise, create a VM
-  std::unique_ptr< JavaVMOption[] > opts0(std::make_unique<JavaVMOption[]>(optsLen));
+  JavaVMOption* opts0 = new JavaVMOption[optsLen]{};
 
   for (int i = 0; i < optsLen; i++)
     opts0[i].optionString = *(opts + i);
@@ -751,10 +750,12 @@ jint GetOrCreateJvm(char** opts, int optsLen, JavaVM** jvm, JNIEnv** env) {
   JavaVMInitArgs args{};
   args.version = JNI_VERSION_1_8;
   args.nOptions = optsLen;
-  args.options = opts0.get();
+  args.options = opts0;
   args.ignoreUnrecognized = 0;
 
   res = JNI_CreateJavaVM(jvm, reinterpret_cast< void** >(env), &args);
+
+  delete[] opts0;
 
   return res;
 }
