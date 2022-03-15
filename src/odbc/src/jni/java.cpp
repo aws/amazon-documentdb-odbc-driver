@@ -769,10 +769,6 @@ JniContext::JniContext(JniJvm* jvm, JniHandlers const& hnds) : jvm(jvm), hnds(hn
   // No-op.
 }
 
-JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers const& hnds) {
-  return Create(opts, optsLen, hnds, nullptr);
-}
-
 void GetJniErrorMessage(std::string& errMsg, jint res) {
   switch (res) {
     case JNI_ERR:
@@ -806,8 +802,8 @@ void GetJniErrorMessage(std::string& errMsg, jint res) {
   }
 }
 
-JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers hnds,
-                               JniErrorInfo* errInfo) {
+JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers const& hnds,
+                               JniErrorInfo& errInfo) {
   // Acquire global lock to instantiate the JVM.
   JVM_LOCK.Enter();
 
@@ -901,12 +897,8 @@ JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers hnds,
 
   // Notify err callback if needed.
   if (!ctx) {
-    if (errInfo) {
-      JniErrorInfo errInfo0(JniErrorCode::IGNITE_JNI_ERR_JVM_INIT,
+      errInfo = JniErrorInfo(JniErrorCode::IGNITE_JNI_ERR_JVM_INIT,
                             errClsName.c_str(), errMsg.c_str());
-
-      *errInfo = errInfo0;
-    }
 
     if (hnds.error)
       hnds.error(hnds.target, JniErrorCode::IGNITE_JNI_ERR_JVM_INIT,

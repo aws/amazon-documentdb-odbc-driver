@@ -481,9 +481,7 @@ struct IGNITE_IMPORT_EXPORT JniErrorInfo {
  */
 class IGNITE_IMPORT_EXPORT JniContext {
  public:
-  static JniContext* Create(char** opts, int optsLen, JniHandlers const& hnds);
-  static JniContext* Create(char** opts, int optsLen, JniHandlers hnds,
-                            JniErrorInfo* errInfo);
+  static JniContext* Create(char** opts, int optsLen, JniHandlers const& hnds, JniErrorInfo& errInfo);
   static int Reallocate(int64_t memPtr, int cap);
   static void Detach();
   static void Release(jobject obj);
