@@ -34,7 +34,7 @@ namespace ignite {
 namespace odbc {
 namespace jni {
 /**
- * Wrapper for the the JDBC DatabaseMetaData.
+ * Wrapper for the the DocumentDB connection properties.
  */
 class DocumentDbConnectionProperties {
   friend class DocumentDbConnection;
@@ -45,7 +45,7 @@ class DocumentDbConnectionProperties {
 
  private:
   /**
-   * Constructs an instance of the DatabaseMetaData class.
+   * Constructs an instance of the DocumentDbConnectionProperties class.
    */
   DocumentDbConnectionProperties(
       SharedPointer< JniContext >& jniContext,
@@ -56,7 +56,7 @@ class DocumentDbConnectionProperties {
   /** The JNI context */
   SharedPointer< JniContext > _jniContext;
 
-  /** The DatabaseMetaData Java object  */
+  /** The DocumentDbConnectionProperties Java object  */
   SharedPointer< GlobalJObject > _connectionProperties;
 };
 }  // namespace jni

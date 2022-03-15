@@ -38,7 +38,7 @@ namespace ignite {
 namespace odbc {
 namespace jni {
 /**
- * Wrapper for the the JDBC DatabaseMetaData.
+ * Wrapper for the the DocumentDB query mapping service.
  */
 class DocumentDbQueryMappingService {
  public:
@@ -66,7 +66,7 @@ class DocumentDbQueryMappingService {
 
  private:
   /**
-   * Constructs an instance of the DatabaseMetaData class.
+   * Constructs an instance of the DocumentDbQueryMappingService class.
    */
   DocumentDbQueryMappingService(SharedPointer< JniContext >& jniContext,
                             SharedPointer< GlobalJObject >& queryMappingService)
@@ -86,7 +86,7 @@ class DocumentDbQueryMappingService {
   /** The JNI context */
   SharedPointer< JniContext > _jniContext;
 
-  /** The DatabaseMetaData Java object  */
+  /** The DocumentDbQueryMappingService Java object  */
   SharedPointer< GlobalJObject > _queryMappingService;
 };
 }  // namespace jni

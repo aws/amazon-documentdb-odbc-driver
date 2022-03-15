@@ -37,7 +37,7 @@ namespace ignite {
 namespace odbc {
 namespace jni {
 /**
- * Wrapper for the the JDBC DatabaseMetaData.
+ * Wrapper for the the JDBC column metadata.
  */
 class JdbcColumnMetadata {
   friend class DocumentDbConnection;
@@ -199,7 +199,7 @@ class JdbcColumnMetadata {
 
  private:
   /**
-   * Constructs an instance of the DatabaseMetaData class.
+   * Constructs an instance of the JdbcColumnMetadata class.
    */
   JdbcColumnMetadata(int32_t ordinal, bool autoIncrement, bool caseSensitive,
                      bool searchable, bool currency, int32_t nullable,
