@@ -168,27 +168,27 @@ SqlResult::Type TableMetadataQuery::GetColumn(
 
   switch (columnIdx) {
     case ResultColumn::TABLE_CAT: {
-      buffer.PutString(currentColumn.GetCatalogName());
+      buffer.PutOptString(currentColumn.GetCatalogName());
       break;
     }
 
     case ResultColumn::TABLE_SCHEM: {
-      buffer.PutString(currentColumn.GetSchemaName());
+      buffer.PutOptString(currentColumn.GetSchemaName());
       break;
     }
 
     case ResultColumn::TABLE_NAME: {
-      buffer.PutString(currentColumn.GetTableName());
+      buffer.PutOptString(currentColumn.GetTableName());
       break;
     }
 
     case ResultColumn::TABLE_TYPE: {
-      buffer.PutString(currentColumn.GetTableType());
+      buffer.PutOptString(currentColumn.GetTableType());
       break;
     }
 
     case ResultColumn::REMARKS: {
-      buffer.PutString(currentColumn.GetRemarks());
+      buffer.PutOptString(currentColumn.GetRemarks());
       break;
     }
 

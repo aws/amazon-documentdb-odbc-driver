@@ -73,8 +73,12 @@ const char* ColumnMeta::AttrIdToString(uint16_t id) {
 
 #undef DBG_STR_CASE
 
-SqlLen Nullability::ToSql(int32_t nullability) {
-  switch (nullability) {
+SqlLen Nullability::ToSql(boost::optional< int32_t > nullability) {
+  if (!nullability) {
+    assert(false);
+    return SQL_NULLABLE_UNKNOWN;
+  }
+  switch (*nullability) {
     case Nullability::NO_NULL:
       return SQL_NO_NULLS;
 
@@ -104,28 +108,22 @@ const std::string ORDINAL_POSITION = "ORDINAL_POSITION";
 
 void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
                       int32_t& prevPosition, JniErrorInfo& errInfo) {
-  bool wasNull;
-  int intDataType;
-  catalogName = "";
-  schemaName = "";
-  tableName = "";
-  columnName = "";
-  remarks = "";
-  columnDef = "";
-  resultSet.Get()->GetString(TABLE_CAT, catalogName, wasNull, errInfo);
-  resultSet.Get()->GetString(TABLE_SCHEM, schemaName, wasNull, errInfo);
-  resultSet.Get()->GetString(TABLE_NAME, tableName, wasNull, errInfo);
-  resultSet.Get()->GetString(COLUMN_NAME, columnName, wasNull, errInfo);
-  resultSet.Get()->GetInt(DATA_TYPE, intDataType, wasNull, errInfo);
-  dataType = static_cast< int16_t >(intDataType);
-  resultSet.Get()->GetString(REMARKS, remarks, wasNull, errInfo);
-  resultSet.Get()->GetString(COLUMN_DEF, columnDef, wasNull, errInfo);
-  resultSet.Get()->GetInt(NULLABLE, nullability, wasNull, errInfo);
-  resultSet.Get()->GetInt(ORDINAL_POSITION, ordinalPosition, wasNull, errInfo);
-  if (wasNull) {
+  boost::optional< int > intDataType;
+  resultSet.Get()->GetString(TABLE_CAT, catalogName, errInfo);
+  resultSet.Get()->GetString(TABLE_SCHEM, schemaName, errInfo);
+  resultSet.Get()->GetString(TABLE_NAME, tableName, errInfo);
+  resultSet.Get()->GetString(COLUMN_NAME, columnName, errInfo);
+  resultSet.Get()->GetInt(DATA_TYPE, intDataType, errInfo);
+  if (intDataType)
+    dataType = static_cast< int16_t >(*intDataType);
+  resultSet.Get()->GetString(REMARKS, remarks, errInfo);
+  resultSet.Get()->GetString(COLUMN_DEF, columnDef, errInfo);
+  resultSet.Get()->GetInt(NULLABLE, nullability, errInfo);
+  resultSet.Get()->GetInt(ORDINAL_POSITION, ordinalPosition, errInfo);
+  if (!ordinalPosition) {
     ordinalPosition = ++prevPosition;
   } else {
-    prevPosition = ordinalPosition;
+    prevPosition = *ordinalPosition;
   }
 }
 
@@ -136,20 +134,23 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
     case SQL_DESC_LABEL:
     case SQL_DESC_BASE_COLUMN_NAME:
     case SQL_DESC_NAME: {
-      value = columnName;
+      if (columnName)
+        value = *columnName;
 
       return true;
     }
 
     case SQL_DESC_TABLE_NAME:
     case SQL_DESC_BASE_TABLE_NAME: {
-      value = tableName;
+      if (tableName)
+        value = *tableName;
 
       return true;
     }
 
     case SQL_DESC_SCHEMA_NAME: {
-      value = schemaName;
+      if (schemaName)
+        value = *schemaName;
 
       return true;
     }
@@ -162,7 +163,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
 
     case SQL_DESC_LITERAL_PREFIX:
     case SQL_DESC_LITERAL_SUFFIX: {
-      if (dataType == IGNITE_TYPE_STRING)
+      if (dataType && (*dataType == JDBC_TYPE_VARCHAR))
         value = "'";
       else
         value.clear();
@@ -172,28 +173,31 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
 
     case SQL_DESC_TYPE_NAME:
     case SQL_DESC_LOCAL_TYPE_NAME: {
-      value = type_traits::BinaryTypeToSqlTypeName(dataType);
-
-      return true;
+      if (boost::optional< std::string > val =
+              type_traits::BinaryTypeToSqlTypeName(dataType))
+        value = *val;
+       else 
+        value.clear();
+        return true;
     }
 
     case SQL_DESC_PRECISION:
     case SQL_COLUMN_LENGTH:
     case SQL_COLUMN_PRECISION: {
-      if (precision == -1)
+      if (!precision || *precision == -1)
         return false;
 
-      value = common::LexicalCast< std::string >(precision);
+      value = common::LexicalCast< std::string >(*precision);
 
       return true;
     }
 
     case SQL_DESC_SCALE:
     case SQL_COLUMN_SCALE: {
-      if (scale == -1)
+      if (!scale || *scale == -1)
         return false;
 
-      value = common::LexicalCast< std::string >(scale);
+      value = common::LexicalCast< std::string >(*scale);
 
       return true;
     }
@@ -208,7 +212,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
 
   switch (fieldId) {
     case SQL_DESC_FIXED_PREC_SCALE: {
-      if (scale == -1)
+      if (!scale || scale == -1)
         value = SQL_FALSE;
       else
         value = SQL_TRUE;
@@ -223,7 +227,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     }
 
     case SQL_DESC_CASE_SENSITIVE: {
-      if (dataType == IGNITE_TYPE_STRING)
+      if (dataType && (*dataType == JDBC_TYPE_VARCHAR))
         value = SQL_TRUE;
       else
         value = SQL_FALSE;
@@ -233,13 +237,17 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
 
     case SQL_DESC_CONCISE_TYPE:
     case SQL_DESC_TYPE: {
-      value = type_traits::BinaryToSqlType(dataType);
-
+      if (boost::optional< int16_t > val =
+              type_traits::BinaryToSqlType(dataType))
+        value = *val;
+      
       break;
     }
 
     case SQL_DESC_DISPLAY_SIZE: {
-      value = type_traits::BinaryTypeDisplaySize(dataType);
+      if (boost::optional< int > val =
+              type_traits::BinaryTypeDisplaySize(dataType))
+        value = *val;
 
       break;
     }
@@ -247,10 +255,13 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     case SQL_DESC_LENGTH:
     case SQL_DESC_OCTET_LENGTH:
     case SQL_COLUMN_LENGTH: {
-      if (precision == -1)
-        value = type_traits::BinaryTypeTransferLength(dataType);
-      else
-        value = precision;
+      if (dataType && (!precision || *precision == -1)) {
+        if (boost::optional< int > val =
+                type_traits::BinaryTypeTransferLength(dataType))
+          value = *val;
+      }
+      else if (precision)
+        value = *precision;
 
       break;
     }
@@ -262,30 +273,36 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     }
 
     case SQL_DESC_NUM_PREC_RADIX: {
-      value = type_traits::BinaryTypeNumPrecRadix(dataType);
+      if (boost::optional< int > val =
+              type_traits::BinaryTypeNumPrecRadix(dataType))
+        value = *val;
 
       break;
     }
 
     case SQL_DESC_PRECISION:
     case SQL_COLUMN_PRECISION: {
-      if (precision == -1)
-        value = type_traits::BinaryTypeColumnSize(dataType);
-      else
-        value = precision;
+      if (dataType && (!precision || *precision == -1)) {
+        if (boost::optional< int > val =
+                type_traits::BinaryTypeColumnSize(dataType))
+          value = *val;
+      }
+      else if (precision)
+        value = *precision;
 
       break;
     }
 
     case SQL_DESC_SCALE:
     case SQL_COLUMN_SCALE: {
-      if (scale == -1) {
-        value = type_traits::BinaryTypeDecimalDigits(dataType);
-
+      if (dataType && (!scale || *scale == -1)) {
+        if (boost::optional< int16_t > val =
+                type_traits::BinaryTypeDecimalDigits(dataType))
+          value = *val;
         if (value < 0)
           value = 0;
-      } else
-        value = scale;
+      } else if (scale)
+        value = *scale;
 
       break;
     }
@@ -297,7 +314,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     }
 
     case SQL_DESC_UNNAMED: {
-      value = columnName.empty() ? SQL_UNNAMED : SQL_NAMED;
+      value = columnName ? SQL_UNNAMED : SQL_NAMED;
 
       break;
     }

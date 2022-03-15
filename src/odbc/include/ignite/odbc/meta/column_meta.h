@@ -20,6 +20,8 @@
 
 #include <stdint.h>
 
+#include <boost/optional.hpp>
+#include <boost/optional/optional_io.hpp>
 #include <string>
 
 #include "ignite/odbc/impl/binary/binary_reader_impl.h"
@@ -52,7 +54,7 @@ struct Nullability {
    * @param nullability Nullability.
    * @return SQL constant.
    */
-  static SqlLen ToSql(int32_t nullability);
+  static SqlLen ToSql(boost::optional< int32_t > nullability);
 };
 
 using namespace ignite::odbc;
@@ -73,7 +75,8 @@ class ColumnMeta {
   /**
    * Default constructor.
    */
-  ColumnMeta() : dataType(), nullability(), precision(), scale(), ordinalPosition() {
+  ColumnMeta()
+      : dataType(), nullability(), precision(), scale(), ordinalPosition() {
     // No-op.
   }
 
@@ -157,7 +160,7 @@ class ColumnMeta {
    * Get catalog name.
    * @return Catalog name.
    */
-  const std::string& GetCatalogName() const {
+  const boost::optional< std::string >& GetCatalogName() const {
     return catalogName;
   }
 
@@ -165,7 +168,7 @@ class ColumnMeta {
    * Get schema name.
    * @return Schema name.
    */
-  const std::string& GetSchemaName() const {
+  const boost::optional< std::string >& GetSchemaName() const {
     return schemaName;
   }
 
@@ -173,7 +176,7 @@ class ColumnMeta {
    * Get table name.
    * @return Table name.
    */
-  const std::string& GetTableName() const {
+  const boost::optional< std::string >& GetTableName() const {
     return tableName;
   }
 
@@ -181,7 +184,7 @@ class ColumnMeta {
    * Get column name.
    * @return Column name.
    */
-  const std::string& GetColumnName() const {
+  const boost::optional< std::string >& GetColumnName() const {
     return columnName;
   }
 
@@ -189,7 +192,7 @@ class ColumnMeta {
    * Get the remarks.
    * @return Remarks.
    */
-  const std::string& GetRemarks() const {
+  const boost::optional< std::string >& GetRemarks() const {
     return remarks;
   }
 
@@ -197,7 +200,7 @@ class ColumnMeta {
    * Get the column default value.
    * @return Column default value.
    */
-  const std::string& GetColumnDef() const {
+  const boost::optional< std::string >& GetColumnDef() const {
     return columnDef;
   }
 
@@ -205,7 +208,7 @@ class ColumnMeta {
    * Get data type.
    * @return Data type.
    */
-  int8_t GetDataType() const {
+  boost::optional< int16_t > GetDataType() const {
     return dataType;
   }
 
@@ -213,7 +216,7 @@ class ColumnMeta {
    * Get column precision.
    * @return Column precision.
    */
-  int32_t GetPrecision() const {
+  boost::optional< int32_t > GetPrecision() const {
     return precision;
   }
 
@@ -221,7 +224,7 @@ class ColumnMeta {
    * Get column scale.
    * @return Column scale.
    */
-  int32_t GetScale() const {
+  boost::optional< int32_t > GetScale() const {
     return scale;
   }
 
@@ -229,7 +232,7 @@ class ColumnMeta {
    * Get column nullability.
    * @return Column nullability.
    */
-  int32_t GetNullability() const {
+  boost::optional< int32_t > GetNullability() const {
     return nullability;
   }
 
@@ -237,7 +240,7 @@ class ColumnMeta {
    * Get column ordinal position.
    * @return Column ordinal position.
    */
-  int32_t GetOrdinalPosition() const {
+  boost::optional< int32_t > GetOrdinalPosition() const {
     return ordinalPosition;
   }
 
@@ -261,37 +264,37 @@ class ColumnMeta {
 
  private:
   /** Catalog name. */
-  std::string catalogName;
+  boost::optional< std::string > catalogName;
 
   /** Schema name. */
-  std::string schemaName;
+  boost::optional< std::string > schemaName;
 
   /** Table name. */
-  std::string tableName;
+  boost::optional< std::string > tableName;
 
   /** Column name. */
-  std::string columnName;
+  boost::optional< std::string > columnName;
 
   /** Remarks */
-  std::string remarks;
+  boost::optional< std::string > remarks;
 
   /** Column default value */
-  std::string columnDef;
+  boost::optional< std::string > columnDef;
 
   /** Data type. */
-  int16_t dataType;
+  boost::optional< int16_t > dataType;
 
   /** Column precision. */
-  int32_t precision;
+  boost::optional< int32_t > precision;
 
   /** Column scale. */
-  int32_t scale;
+  boost::optional< int32_t > scale;
 
   /** Column nullability. */
-  int32_t nullability;
+  boost::optional< int32_t > nullability;
 
   /** Column ordinal position. */
-  int32_t ordinalPosition;
+  boost::optional< int32_t > ordinalPosition;
 };
 
 /** Column metadata vector alias. */

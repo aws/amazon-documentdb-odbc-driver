@@ -21,8 +21,8 @@
 
 #include <string>
 
-#ifndef _IGNITE_ODBC_JNI_DATABASE_METADATA
-#define _IGNITE_ODBC_JNI_DATABASE_METADATA
+#ifndef _IGNITE_ODBC_JNI_DOCUMENTDB_DATABASE_METADATA
+#define _IGNITE_ODBC_JNI_DOCUMENTDB_DATABASE_METADATA
 
 using ignite::odbc::common::concurrent::SharedPointer;
 using ignite::odbc::jni::ResultSet;
@@ -36,52 +36,34 @@ namespace jni {
 /**
  * Wrapper for the the JDBC DatabaseMetaData.
  */
-class DatabaseMetaData {
+class DocumentDbDatabaseMetadata {
   friend class DocumentDbConnection;
   friend class DocumentDbQueryMappingService;
 
  public:
-  ~DatabaseMetaData() = default;
-
   /**
-   * Query the tables in the database according to the given search
-   * critera in catalog (not supported), schemaPattern, tablePattern
-   * and types of tables.
+   * Desctructs a DocumentDbDatabaseMetadata instance.
    */
-  SharedPointer< ResultSet > GetTables(const std::string& catalog,
-                                       const std::string& schemaPattern,
-                                       const std::string& tableNamePattern,
-                                       const std::vector< std::string >& types,
-                                       JniErrorInfo& errInfo);
-
-  /**
-   * Query the columns in the database according to the given
-   * search critera in catalog (not supported), schemaPattern,
-   * tablePattern and columnPattern.
-   */
-  SharedPointer< ResultSet > GetColumns(const std::string& catalog,
-                                        const std::string& schemaPattern,
-                                        const std::string& tableNamePattern,
-                                        const std::string& columnNamePattern,
-                                        JniErrorInfo& errInfo);
+  ~DocumentDbDatabaseMetadata() = default;
 
  private:
   /**
    * Constructs an instance of the DatabaseMetaData class.
    */
-  DatabaseMetaData(SharedPointer< JniContext >& jniContext,
-                   SharedPointer< GlobalJObject >& databaseMetaData)
-      : _jniContext(jniContext), _databaseMetaData(databaseMetaData) {
+  DocumentDbDatabaseMetadata(
+      SharedPointer< JniContext >& jniContext,
+      SharedPointer< GlobalJObject >& databaseMetadata)
+      : _jniContext(jniContext), _databaseMetadata(databaseMetadata) {
   }
 
   /** The JNI context */
   SharedPointer< JniContext > _jniContext;
 
   /** The DatabaseMetaData Java object  */
-  SharedPointer< GlobalJObject > _databaseMetaData;
+  SharedPointer< GlobalJObject > _databaseMetadata;
 };
 }  // namespace jni
 }  // namespace odbc
 }  // namespace ignite
 
-#endif  // _IGNITE_ODBC_JNI_DATABASE_METADATA
+#endif  // _IGNITE_ODBC_JNI_DOCUMENTDB_DATABASE_METADATA

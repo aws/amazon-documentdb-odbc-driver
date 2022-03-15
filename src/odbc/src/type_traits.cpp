@@ -50,7 +50,9 @@ const std::string SqlTypeName::VARCHAR("VARCHAR");
 
 const std::string SqlTypeName::LONGVARCHAR("LONGVARCHAR");
 
-const std::string SqlTypeName::BINARY("VARBINARY");
+const std::string SqlTypeName::BINARY("BINARY");
+
+const std::string SqlTypeName::VARBINARY("VARBINARY");
 
 const std::string SqlTypeName::LONGVARBINARY("LONGVARBINARY");
 
@@ -117,8 +119,11 @@ const char* StatementAttrIdToString(long id) {
  * Warning: if any JDBC Type is added or becomes deprecated on the JDBC side,
  * the change should be reflected under this function as well.
  */
-const std::string& BinaryTypeToSqlTypeName(int16_t binaryType) {
-  switch (binaryType) {
+const boost::optional< std::string > BinaryTypeToSqlTypeName(
+    boost::optional< int16_t > binaryType) {
+  if (!binaryType)
+    return boost::none;
+  switch (*binaryType) {
     case JDBC_TYPE_BIT:
     case JDBC_TYPE_BOOLEAN:
       return SqlTypeName::BIT;
@@ -173,8 +178,10 @@ const std::string& BinaryTypeToSqlTypeName(int16_t binaryType) {
     case JDBC_TYPE_NULL:
       return SqlTypeName::SQL_NULL;
 
-    case JDBC_TYPE_BINARY:
     case JDBC_TYPE_VARBINARY:
+      return SqlTypeName::VARBINARY;
+
+    case JDBC_TYPE_BINARY:
     case JDBC_TYPE_BLOB:
     case JDBC_TYPE_CLOB:
     case JDBC_TYPE_ARRAY:
@@ -189,12 +196,17 @@ const std::string& BinaryTypeToSqlTypeName(int16_t binaryType) {
   }
 }
 
-bool IsApplicationTypeSupported(int16_t type) {
-  return ToDriverType(type) != OdbcNativeType::AI_UNSUPPORTED;
+bool IsApplicationTypeSupported(boost::optional<int16_t> type) {
+  if (type)
+    return ToDriverType(*type) != OdbcNativeType::AI_UNSUPPORTED;
+  else
+    return false;
 }
 
-bool IsSqlTypeSupported(int16_t type) {
-  switch (type) {
+bool IsSqlTypeSupported(boost::optional< int16_t > type) {
+  if (!type)
+    return false;
+  switch (*type) {
     case SQL_BIT:
     case SQL_TINYINT:
     case SQL_SMALLINT:
@@ -244,8 +256,10 @@ bool IsSqlTypeSupported(int16_t type) {
  * JDBC side, the change should be reflected under this function as
  * well.
  */
-int16_t SqlTypeToBinary(int16_t sqlType) {
-  switch (sqlType) {
+boost::optional<int16_t> SqlTypeToBinary(boost::optional< int16_t > sqlType) {
+  if (!sqlType)
+    return boost::none;
+  switch (*sqlType) {
     case SQL_BIT:
       return JDBC_TYPE_BOOLEAN;
 
@@ -389,8 +403,10 @@ OdbcNativeType::Type ToDriverType(int16_t type) {
  * JDBC side, the change should be reflected under this function as
  * well.
  */
-int16_t BinaryToSqlType(int16_t binaryType) {
-  switch (binaryType) {
+boost::optional<int16_t> BinaryToSqlType(boost::optional<int16_t> binaryType) {
+  if (!binaryType)
+    return boost::none;
+  switch (*binaryType) {
     case JDBC_TYPE_BIT:
     case JDBC_TYPE_BOOLEAN:
       return SQL_BIT;
@@ -449,8 +465,10 @@ int16_t BinaryToSqlType(int16_t binaryType) {
     case JDBC_TYPE_NULL:
       return SQL_TYPE_NULL;
 
-    case JDBC_TYPE_BINARY:
     case JDBC_TYPE_VARBINARY:
+      return SQL_VARBINARY;
+
+    case JDBC_TYPE_BINARY:
     case JDBC_TYPE_BLOB:
     case JDBC_TYPE_CLOB:
     case JDBC_TYPE_ARRAY:
@@ -469,21 +487,26 @@ int16_t BinaryTypeNullability(int16_t) {
   return SQL_NULLABLE_UNKNOWN;
 }
 
-std::string NullabilityToIsNullable(int16_t nullability) {
-  switch (nullability) {
+boost::optional< std::string > NullabilityToIsNullable(
+    boost::optional< int32_t > nullability) {
+  if (!nullability)
+    return boost::none;
+  switch (*nullability) {
     case SQL_NO_NULLS:
-      return "NO";
+      return std::string("NO");
 
     case SQL_NULLABLE:
-      return "YES";
+      return std::string("YES");
 
     default:
-      return "";
+      return boost::none;
   }
 }
 
-int32_t SqlTypeDisplaySize(int16_t type) {
-  switch (type) {
+boost::optional<int32_t> SqlTypeDisplaySize(boost::optional<int16_t> type) {
+  if (!type)
+    return boost::none;
+  switch (*type) {
     case SQL_VARCHAR:
     case SQL_CHAR:
     case SQL_WCHAR:
@@ -535,14 +558,16 @@ int32_t SqlTypeDisplaySize(int16_t type) {
   }
 }
 
-int32_t BinaryTypeDisplaySize(int16_t type) {
-  int16_t sqlType = BinaryToSqlType(type);
+boost::optional<int32_t> BinaryTypeDisplaySize(boost::optional<int16_t> type) {
+  boost::optional< int16_t > sqlType = BinaryToSqlType(type);
 
   return SqlTypeDisplaySize(sqlType);
 }
 
-int32_t SqlTypeColumnSize(int16_t type) {
-  switch (type) {
+boost::optional< int32_t > SqlTypeColumnSize(boost::optional< int16_t > type) {
+  if (!type)
+    return boost::none;
+  switch (*type) {
     case SQL_VARCHAR:
     case SQL_CHAR:
     case SQL_WCHAR:
@@ -594,14 +619,16 @@ int32_t SqlTypeColumnSize(int16_t type) {
   }
 }
 
-int32_t BinaryTypeColumnSize(int16_t type) {
-  int16_t sqlType = BinaryToSqlType(type);
+boost::optional<int32_t> BinaryTypeColumnSize(boost::optional<int16_t> type) {
+  boost::optional< int16_t > sqlType = BinaryToSqlType(type);
 
   return SqlTypeColumnSize(sqlType);
 }
 
-int32_t SqlTypeTransferLength(int16_t type) {
-  switch (type) {
+boost::optional< int32_t > SqlTypeTransferLength(boost::optional< int16_t > type) {
+  if (!type)
+    return boost::none;
+  switch (*type) {
     case SQL_VARCHAR:
     case SQL_CHAR:
     case SQL_WCHAR:
@@ -649,14 +676,18 @@ int32_t SqlTypeTransferLength(int16_t type) {
   }
 }
 
-int32_t BinaryTypeTransferLength(int16_t type) {
-  int16_t sqlType = BinaryToSqlType(type);
+boost::optional< int32_t > BinaryTypeTransferLength(
+    boost::optional< int16_t > type) {
+  boost::optional< int16_t > sqlType = BinaryToSqlType(type);
 
   return SqlTypeTransferLength(sqlType);
 }
 
-int32_t SqlTypeNumPrecRadix(int16_t type) {
-  switch (type) {
+boost::optional< int32_t > SqlTypeNumPrecRadix(
+    boost::optional< int16_t > type) {
+  if (!type)
+    return boost::none;
+  switch (*type) {
     case SQL_REAL:
     case SQL_FLOAT:
     case SQL_DOUBLE:
@@ -674,25 +705,30 @@ int32_t SqlTypeNumPrecRadix(int16_t type) {
   }
 }
 
-int32_t BinaryTypeNumPrecRadix(int16_t type) {
-  int16_t sqlType = BinaryToSqlType(type);
+boost::optional< int32_t > BinaryTypeNumPrecRadix(
+    boost::optional< int16_t > type) {
+  boost::optional< int16_t > sqlType = BinaryToSqlType(type);
 
   return SqlTypeNumPrecRadix(sqlType);
 }
 
-int32_t SqlTypeDecimalDigits(int16_t) {
+boost::optional< int16_t > SqlTypeDecimalDigits(boost::optional< int16_t >) {
   // Not implemented for the NUMERIC and DECIMAL data types.
   return -1;
 }
 
-int32_t BinaryTypeDecimalDigits(int16_t type) {
-  int16_t sqlType = BinaryToSqlType(type);
+boost::optional< int16_t > BinaryTypeDecimalDigits(
+    boost::optional< int16_t > type) {
+  boost::optional< int16_t > sqlType = BinaryToSqlType(type);
 
   return SqlTypeDecimalDigits(sqlType);
 }
 
-int32_t SqlTypeCharOctetLength(int16_t type) {
-  switch (type) {
+boost::optional< int32_t > SqlTypeCharOctetLength(
+    boost::optional< int16_t > type) {
+  if (!type)
+    return boost::none;
+  switch (*type) {
     case SQL_CHAR:
     case SQL_VARCHAR:
     case SQL_LONGVARCHAR:
@@ -705,14 +741,17 @@ int32_t SqlTypeCharOctetLength(int16_t type) {
   }
 }
 
-int32_t BinaryTypeCharOctetLength(int16_t type) {
-  int16_t sqlType = BinaryToSqlType(type);
+boost::optional< int32_t > BinaryTypeCharOctetLength(
+    boost::optional< int16_t > type) {
+  boost::optional< int16_t > sqlType = BinaryToSqlType(type);
 
   return SqlTypeCharOctetLength(sqlType);
 }
 
-bool SqlTypeUnsigned(int16_t type) {
-  switch (type) {
+bool SqlTypeUnsigned(boost::optional<int16_t> type) {
+  if (!type)
+    return false;
+  switch (*type) {
     case SQL_BIT:
     case SQL_TINYINT:
     case SQL_SMALLINT:
@@ -728,8 +767,8 @@ bool SqlTypeUnsigned(int16_t type) {
   }
 }
 
-bool BinaryTypeUnsigned(int16_t type) {
-  int16_t sqlType = BinaryToSqlType(type);
+bool BinaryTypeUnsigned(boost::optional<int16_t> type) {
+  boost::optional< int16_t > sqlType = BinaryToSqlType(type);
 
   return SqlTypeUnsigned(sqlType);
 }
