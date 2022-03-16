@@ -844,7 +844,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns, *disabled()) {
     BOOST_CHECK(!dbConnection.IsOpen());
 }
 
-BOOST_AUTO_TEST_CASE(TestDocumentDbGetMqlQueryContext, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestDocumentDbGetMqlQueryContext) {
   PrepareContext();
   BOOST_REQUIRE(_ctx.Get() != nullptr);
 
