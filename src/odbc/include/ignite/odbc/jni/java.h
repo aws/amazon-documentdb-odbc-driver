@@ -491,9 +491,9 @@ class IGNITE_IMPORT_EXPORT JniContext {
 
   std::string JavaStringToCppString(const SharedPointer< GlobalJObject >& jstring);
 
-  JniErrorCode DriverManagerGetConnection(
-      const char* connectionString, SharedPointer< GlobalJObject >& connection,
-      JniErrorInfo& errInfo);
+  //JniErrorCode DriverManagerGetConnection(
+  //    const char* connectionString, SharedPointer< GlobalJObject >& connection,
+  //    JniErrorInfo& errInfo);
   JniErrorCode ConnectionClose(const SharedPointer< GlobalJObject >& connection,
                                JniErrorInfo& errInfo);
   JniErrorCode ConnectionGetMetaData(

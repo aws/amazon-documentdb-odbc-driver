@@ -969,22 +969,22 @@ std::string JniContext::JavaStringToCppString(
                              len);
 }
 
-JniErrorCode JniContext::DriverManagerGetConnection(
-    const char* connectionString, SharedPointer< GlobalJObject >& connection,
-    JniErrorInfo& errInfo) {
-  JNIEnv* env = Attach();
-  jstring jConnectionString = env->NewStringUTF(connectionString);
-  jobject result = env->CallStaticObjectMethod(
-      jvm->GetMembers().c_DriverManager,
-      jvm->GetMembers().m_DriverManagerGetConnection, jConnectionString);
-  ExceptionCheck(env, &errInfo);
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    connection = nullptr;
-  } else {
-    connection = new GlobalJObject(env, env->NewGlobalRef(result));
-  }
-  return errInfo.code;
-}
+//JniErrorCode JniContext::DriverManagerGetConnection(
+//    const char* connectionString, SharedPointer< GlobalJObject >& connection,
+//    JniErrorInfo& errInfo) {
+//  JNIEnv* env = Attach();
+//  jstring jConnectionString = env->NewStringUTF(connectionString);
+//  jobject result = env->CallStaticObjectMethod(
+//      jvm->GetMembers().c_DriverManager,
+//      jvm->GetMembers().m_DriverManagerGetConnection, jConnectionString);
+//  ExceptionCheck(env, &errInfo);
+//  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+//    connection = nullptr;
+//  } else {
+//    connection = new GlobalJObject(env, env->NewGlobalRef(result));
+//  }
+//  return errInfo.code;
+//}
 
 JniErrorCode JniContext::ConnectionClose(
     const SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo) {
