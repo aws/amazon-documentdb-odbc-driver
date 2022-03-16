@@ -263,6 +263,7 @@ struct JniMembers {
   jmethodID m_DocumentDbConnectionIsSshTunnelActive;
   jmethodID m_DocumentDbConnectionGetDatabaseMetadata;
   jmethodID m_DocumentDbConnectionGetConnectionProperties;
+  jmethodID m_DocumentDbConnectionCtor;
   jmethodID m_DocumentDbClose;
 
   jclass c_DocumentDbDatabaseSchemaMetadata;
@@ -511,6 +512,15 @@ class IGNITE_IMPORT_EXPORT JniContext {
   JniErrorCode DocumentDbConnectionGetConnectionProperties(
       const SharedPointer< GlobalJObject >& connection,
       SharedPointer< GlobalJObject >& connectionProperties, JniErrorInfo& errInfo);
+  JniErrorCode DocumentDbConnectionCtor(
+      const SharedPointer< GlobalJObject >& connectionProperties,
+          SharedPointer< GlobalJObject >& connection,
+      JniErrorInfo& errInfo);
+
+  JniErrorCode DocumentDbConnectionPropertiesGetPropertiesFromConnectionString(
+      const std::string& connectionString,
+      SharedPointer< GlobalJObject >& connectionProperties,
+      JniErrorInfo& errInfo);
 
   JniErrorCode DocumentDbDatabaseSchemaMetadataGetSchemaName(
       const SharedPointer< GlobalJObject >& databaseMetadata,
