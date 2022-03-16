@@ -262,13 +262,11 @@ struct JniMembers {
   jmethodID m_DocumentDbConnectionIsSshTunnelActive;
   jmethodID m_DocumentDbConnectionGetDatabaseMetadata;
   jmethodID m_DocumentDbConnectionInit;
+  jmethodID m_DocumentDbConnectionCtor;
   jmethodID m_DocumentDbClose;
 
   jclass c_DocumentDbDatabaseSchemaMetadata;
   jmethodID m_DocumentDbDatabaseSchemaMetadataGetSchemaName;
-
-  jclass c_DriverManager;
-  jmethodID m_DriverManagerGetConnection;
 
   jclass c_Connection;
   jmethodID m_ConnectionClose;
@@ -452,14 +450,19 @@ class IGNITE_IMPORT_EXPORT JniContext {
   static void SetConsoleHandler(ConsoleWriteHandler consoleHandler);
   static int RemoveConsoleHandler(ConsoleWriteHandler consoleHandler);
 
-  JniErrorCode DriverManagerGetConnection(
-      const char* connectionString, SharedPointer< GlobalJObject >& connection,
-      JniErrorInfo& errInfo);
   JniErrorCode ConnectionClose(const SharedPointer< GlobalJObject >& connection,
                                JniErrorInfo& errInfo);
   JniErrorCode ConnectionGetMetaData(
       const SharedPointer< GlobalJObject >& connection,
       SharedPointer< GlobalJObject >& databaseMetaData, JniErrorInfo& errInfo);
+  JniErrorCode DocumentDbConnectionCtor(
+      const SharedPointer< GlobalJObject >& connectionProperties,
+      SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo);
+
+  JniErrorCode DocumentDbConnectionPropertiesGetPropertiesFromConnectionString(
+      const std::string& connectionString,
+      SharedPointer< GlobalJObject >& connectionProperties,
+      JniErrorInfo& errInfo);
 
   JniErrorCode DocumentDbConnectionIsSshTunnelActive(
       const SharedPointer< GlobalJObject >& connection, bool& isActive,

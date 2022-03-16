@@ -43,17 +43,28 @@ JniErrorCode DocumentDbConnection::Open(const Configuration& config,
 
   std::string connectionString = config.ToJdbcConnectionString();
 
-  SharedPointer< GlobalJObject > result;
-  JniErrorCode success = _jniContext.Get()->DriverManagerGetConnection(
-      connectionString.c_str(), result, errInfo);
+  JniErrorCode success;
+  SharedPointer< GlobalJObject > connectionProperties;
+  success =
+      _jniContext.Get()
+          ->DocumentDbConnectionPropertiesGetPropertiesFromConnectionString(
+              connectionString, connectionProperties, errInfo);
+  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    JniErrorInfo closeErrInfo;
+    Close(closeErrInfo);
+    return success;
+  }
+
+  SharedPointer< GlobalJObject > connection;
+  success = _jniContext.Get()->DocumentDbConnectionCtor(connectionProperties,
+                                                        connection, errInfo);
   connected = (success == JniErrorCode::IGNITE_JNI_ERR_SUCCESS);
   if (!connected) {
     JniErrorInfo closeErrInfo;
     Close(closeErrInfo);
     return success;
   }
-  _connection = result;
-
+  _connection = connection;
   return success;
 }
 

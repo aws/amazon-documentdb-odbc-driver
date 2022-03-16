@@ -95,6 +95,24 @@ struct JavaTestSuiteFixture : OdbcTestSuite {
     CleanUpContext();
   }
 
+  JniErrorCode GetConnection(const std::string connectionString,
+                             SharedPointer< GlobalJObject >& connection,
+                             JniErrorInfo& errInfo) {
+    JniErrorCode success;
+    SharedPointer< GlobalJObject > connectionProperties;
+    success =
+        _ctx.Get()
+            ->DocumentDbConnectionPropertiesGetPropertiesFromConnectionString(
+                connectionString, connectionProperties, errInfo);
+    if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      return success;
+    }
+
+    success = _ctx.Get()->DocumentDbConnectionCtor(connectionProperties,
+                                                   connection, errInfo);
+    return success;
+  }
+
   bool _prepared = false;
 
   std::string _jdbcConnectionString;
@@ -152,14 +170,14 @@ struct AutoCloseResultSet {
 
 BOOST_FIXTURE_TEST_SUITE(JavaTestSuite, JavaTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestDriverManagerGetConnection) {
+BOOST_AUTO_TEST_CASE(TestGetConnection) {
   PrepareContext();
   BOOST_REQUIRE(_ctx.Get() != nullptr);
 
   JniErrorInfo errInfo;
   SharedPointer< GlobalJObject > connection;
-  JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
-      _jdbcConnectionString.c_str(), connection, errInfo);
+  JniErrorCode success =
+      GetConnection(_jdbcConnectionString, connection, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
@@ -173,11 +191,11 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPort) {
   PrepareContext();
   BOOST_REQUIRE(_ctx.Get() != nullptr);
 
-  // get Driver manager connection
+  // get connection
   JniErrorInfo errInfo;
   SharedPointer< GlobalJObject > connection;
-  JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
-      _jdbcConnectionString.c_str(), connection, errInfo);
+  JniErrorCode success =
+      GetConnection(_jdbcConnectionString, connection, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
@@ -217,11 +235,11 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPortSshTunnelNotActive,
   PrepareContext();
   BOOST_REQUIRE(_ctx.Get() != nullptr);
 
-  // get Driver manager connection
+  // get connection
   JniErrorInfo errInfo;
   SharedPointer< GlobalJObject > connection;
-  JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
-      _jdbcConnectionString.c_str(), connection, errInfo);
+  JniErrorCode success =
+      GetConnection(_jdbcConnectionString, connection, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
@@ -256,11 +274,11 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetDatabaseMetadata) {
   PrepareContext();
   BOOST_REQUIRE(_ctx.Get() != nullptr);
 
-  // get Driver manager connection
+  // get connection
   JniErrorInfo errInfo;
   SharedPointer< GlobalJObject > connection;
-  JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
-      _jdbcConnectionString.c_str(), connection, errInfo);
+  JniErrorCode success =
+      GetConnection(_jdbcConnectionString, connection, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
@@ -281,11 +299,11 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseSchemaMetadataGetSchemaName) {
   PrepareContext();
   BOOST_REQUIRE(_ctx.Get() != nullptr);
 
-  // get Driver manager connection
+  // get connection
   JniErrorInfo errInfo;
   SharedPointer< GlobalJObject > connection;
-  JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
-      _jdbcConnectionString.c_str(), connection, errInfo);
+  JniErrorCode success =
+      GetConnection(_jdbcConnectionString, connection, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
@@ -319,8 +337,8 @@ BOOST_AUTO_TEST_CASE(TestConnectionGetMetaData) {
 
   JniErrorInfo errInfo;
   SharedPointer< GlobalJObject > connection;
-  JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
-      _jdbcConnectionString.c_str(), connection, errInfo);
+  JniErrorCode success =
+      GetConnection(_jdbcConnectionString, connection, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
@@ -342,8 +360,8 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
 
   JniErrorInfo errInfo;
   SharedPointer< GlobalJObject > connection;
-  JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
-      _jdbcConnectionString.c_str(), connection, errInfo);
+  JniErrorCode success =
+      GetConnection(_jdbcConnectionString, connection, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
@@ -489,8 +507,8 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
   JniErrorInfo errInfo;
   SharedPointer< GlobalJObject > connection;
   // get connection
-  JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
-      _jdbcConnectionString.c_str(), connection, errInfo);
+  JniErrorCode success =
+      GetConnection(_jdbcConnectionString, connection, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }

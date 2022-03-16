@@ -215,10 +215,11 @@ const char* const C_DOCUMENTDB_CONNECTION_PROPERTIES =
     "software/amazon/documentdb/jdbc/DocumentDbConnectionProperties";
 JniMethod const
     M_DOCUMENTDB_CONNECTION_PROPERTIES_GET_PROPERTIES_FROM_CONNECTION_STRING =
-        JniMethod("getPropertiesFromConnectionString",
-                  "(Ljava/lang/String;)Lsoftware/amazon/documentdb/jdbc/"
-                  "DocumentDbConnectionProperties;",
-                  true);
+        JniMethod(
+            "getPropertiesFromConnectionString",
+            "(Ljava/lang/String;)"
+            "Lsoftware/amazon/documentdb/jdbc/DocumentDbConnectionProperties;",
+            true);
 
 const char* const C_RECORD_SET = "java/sql/ResultSet";
 JniMethod const M_RECORD_SET_CLOSE = JniMethod("close", "()V", false);
@@ -257,6 +258,10 @@ JniMethod const M_DOCUMENTDB_CONNECTION_GET_DATABASE_METADATA =
               "()Lsoftware/amazon/documentdb/jdbc/metadata/"
               "DocumentDbDatabaseSchemaMetadata;",
               false);
+JniMethod const M_DOCUMENTDB_CONNECTION_INIT = JniMethod(
+    "<init>",
+    "(Lsoftware/amazon/documentdb/jdbc/DocumentDbConnectionProperties;)V",
+    false);
 
 const char* const C_DOCUMENTDB_DATABASE_SCHEMA_METADATA =
     "software/amazon/documentdb/jdbc/metadata/DocumentDbDatabaseSchemaMetadata";
@@ -485,16 +490,20 @@ void JniMembers::Initialize(JNIEnv* env) {
   m_DocumentDbConnectionGetDatabaseMetadata =
       FindMethod(env, c_DocumentDbConnection,
                  M_DOCUMENTDB_CONNECTION_GET_DATABASE_METADATA);
+  m_DocumentDbConnectionCtor =
+      FindMethod(env, c_DocumentDbConnection, M_DOCUMENTDB_CONNECTION_INIT);
+
+  c_DocumentDbConnectionProperties =
+      FindClass(env, C_DOCUMENTDB_CONNECTION_PROPERTIES);
+  m_DocumentDbConnectionPropertiesGetPropertiesFromConnectionString = FindMethod(
+      env, c_DocumentDbConnectionProperties,
+      M_DOCUMENTDB_CONNECTION_PROPERTIES_GET_PROPERTIES_FROM_CONNECTION_STRING);
 
   c_DocumentDbDatabaseSchemaMetadata =
       FindClass(env, C_DOCUMENTDB_DATABASE_SCHEMA_METADATA);
   m_DocumentDbDatabaseSchemaMetadataGetSchemaName =
       FindMethod(env, c_DocumentDbDatabaseSchemaMetadata,
                  M_DOCUMENTDB_DATABASE_SCHEMA_METADATA_GET_SCHEMA_NAME);
-
-  c_DriverManager = FindClass(env, C_DRIVERMANAGER);
-  m_DriverManagerGetConnection =
-      FindMethod(env, c_DriverManager, M_DRIVERMANAGER_GET_CONNECTION);
 
   c_ResultSet = FindClass(env, C_RECORD_SET);
   m_ResultSetClose = FindMethod(env, c_ResultSet, M_RECORD_SET_CLOSE);
@@ -796,23 +805,6 @@ void JniContext::Detach() {
   }
 }
 
-JniErrorCode JniContext::DriverManagerGetConnection(
-    const char* connectionString, SharedPointer< GlobalJObject >& connection,
-    JniErrorInfo& errInfo) {
-  JNIEnv* env = Attach();
-  jstring jConnectionString = env->NewStringUTF(connectionString);
-  jobject result = env->CallStaticObjectMethod(
-      jvm->GetMembers().c_DriverManager,
-      jvm->GetMembers().m_DriverManagerGetConnection, jConnectionString);
-  ExceptionCheck(env, &errInfo);
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    connection = nullptr;
-    return errInfo.code;
-  }
-  connection = new GlobalJObject(env, env->NewGlobalRef(result));
-  return errInfo.code;
-}
-
 JniErrorCode JniContext::ConnectionClose(
     const SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo) {
   if (connection.Get() == nullptr) {
@@ -882,6 +874,50 @@ JniErrorCode JniContext::DocumentDbConnectionGetDatabaseMetadata(
   }
 
   metadata = new GlobalJObject(env, env->NewGlobalRef(result));
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::DocumentDbConnectionCtor(
+    const SharedPointer< GlobalJObject >& connectionProperties,
+    SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo) {
+  if (!connectionProperties.IsValid()) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg =
+        "Connection Properties and Database Metadata objects must be set.";
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  jobject result = env->NewObject(jvm->GetMembers().c_DocumentDbConnection,
+                                  jvm->GetMembers().m_DocumentDbConnectionCtor,
+                                  connectionProperties.Get()->GetRef());
+  ExceptionCheck(env, &errInfo);
+  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    connection = nullptr;
+    return errInfo.code;
+  }
+  connection = new GlobalJObject(env, env->NewGlobalRef(result));
+  return errInfo.code;
+}
+
+JniErrorCode
+JniContext::DocumentDbConnectionPropertiesGetPropertiesFromConnectionString(
+    const std::string& connectionString,
+    SharedPointer< GlobalJObject >& connectionProperties,
+    JniErrorInfo& errInfo) {
+  JNIEnv* env = Attach();
+  jstring jConnectionString = env->NewStringUTF(connectionString.c_str());
+  jobject result = env->CallStaticObjectMethod(
+      jvm->GetMembers().c_DocumentDbConnectionProperties,
+      jvm->GetMembers()
+          .m_DocumentDbConnectionPropertiesGetPropertiesFromConnectionString,
+      jConnectionString);
+  ExceptionCheck(env, &errInfo);
+  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    connectionProperties = nullptr;
+    return errInfo.code;
+  }
+  connectionProperties = new GlobalJObject(env, env->NewGlobalRef(result));
   return errInfo.code;
 }
 
