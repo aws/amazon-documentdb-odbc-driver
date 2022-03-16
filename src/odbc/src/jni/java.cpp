@@ -593,10 +593,6 @@ void JniMembers::Initialize(JNIEnv* env) {
       FindMethod(env, c_DocumentDbDatabaseSchemaMetadata,
                  M_DOCUMENTDB_DATABASE_SCHEMA_METADATA_GET_SCHEMA_NAME);
 
-  c_DriverManager = FindClass(env, C_DRIVERMANAGER);
-  m_DriverManagerGetConnection =
-      FindMethod(env, c_DriverManager, M_DRIVERMANAGER_GET_CONNECTION);
-
   c_ResultSet = FindClass(env, C_RECORD_SET);
   m_ResultSetClose = FindMethod(env, c_ResultSet, M_RECORD_SET_CLOSE);
   m_ResultSetNext = FindMethod(env, c_ResultSet, M_RECORD_SET_NEXT);
@@ -968,23 +964,6 @@ std::string JniContext::JavaStringToCppString(
   return JavaStringToCString(env, static_cast< jstring >(value.Get()->GetRef()),
                              len);
 }
-
-//JniErrorCode JniContext::DriverManagerGetConnection(
-//    const char* connectionString, SharedPointer< GlobalJObject >& connection,
-//    JniErrorInfo& errInfo) {
-//  JNIEnv* env = Attach();
-//  jstring jConnectionString = env->NewStringUTF(connectionString);
-//  jobject result = env->CallStaticObjectMethod(
-//      jvm->GetMembers().c_DriverManager,
-//      jvm->GetMembers().m_DriverManagerGetConnection, jConnectionString);
-//  ExceptionCheck(env, &errInfo);
-//  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-//    connection = nullptr;
-//  } else {
-//    connection = new GlobalJObject(env, env->NewGlobalRef(result));
-//  }
-//  return errInfo.code;
-//}
 
 JniErrorCode JniContext::ConnectionClose(
     const SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo) {

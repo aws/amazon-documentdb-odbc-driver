@@ -479,7 +479,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
 
 BOOST_FIXTURE_TEST_SUITE(JniTestSuite, JniTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionOpen, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionOpen) {
   PrepareContext();
   BOOST_REQUIRE(_ctx.Get() != nullptr);
 
@@ -500,7 +500,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionOpen, *disabled()) {
   BOOST_CHECK(dbConnection.IsOpen());
 }
 
-BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionClose, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionClose) {
   PrepareContext();
   BOOST_REQUIRE(_ctx.Get() != nullptr);
 
@@ -526,7 +526,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionClose, *disabled()) {
   BOOST_CHECK(!dbConnection.IsOpen());
 }
 
-BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetTables, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetTables) {
   PrepareContext();
   BOOST_REQUIRE(_ctx.Get() != nullptr);
 
