@@ -479,7 +479,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
 
 BOOST_FIXTURE_TEST_SUITE(JniTestSuite, JniTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionOpen) {
+BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionOpen, *disabled()) {
   PrepareContext();
   BOOST_REQUIRE(_ctx.Get() != nullptr);
 
@@ -500,7 +500,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionOpen) {
   BOOST_CHECK(dbConnection.IsOpen());
 }
 
-BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionClose) {
+BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionClose, *disabled()) {
   PrepareContext();
   BOOST_REQUIRE(_ctx.Get() != nullptr);
 
@@ -526,7 +526,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionClose) {
   BOOST_CHECK(!dbConnection.IsOpen());
 }
 
-BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetTables) {
+BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetTables, *disabled()) {
   PrepareContext();
   BOOST_REQUIRE(_ctx.Get() != nullptr);
 
@@ -606,7 +606,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetTables) {
   BOOST_CHECK(!dbConnection.IsOpen());
 }
 
-BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
+BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns, *disabled()) {
     PrepareContext();
     BOOST_REQUIRE(_ctx.Get() != nullptr);
 
@@ -844,7 +844,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
     BOOST_CHECK(!dbConnection.IsOpen());
 }
 
-BOOST_AUTO_TEST_CASE(TestDocumentDbGetMqlQueryContext) {
+BOOST_AUTO_TEST_CASE(TestDocumentDbGetMqlQueryContext, *disabled()) {
   PrepareContext();
   BOOST_REQUIRE(_ctx.Get() != nullptr);
 
