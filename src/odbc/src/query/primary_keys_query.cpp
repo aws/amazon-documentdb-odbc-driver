@@ -17,8 +17,8 @@
 
 #include "ignite/odbc/query/primary_keys_query.h"
 
-#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/connection.h"
+#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/message.h"
 #include "ignite/odbc/type_traits.h"
 
@@ -110,24 +110,28 @@ const meta::ColumnMetaVector* PrimaryKeysQuery::GetMeta() {
 
 SqlResult::Type PrimaryKeysQuery::FetchNextRow(
     app::ColumnBindingMap& columnBindings) {
-  if (!executed) {
-    diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
-                         "Query was not executed.");
+  // TODO: [AD-551] Adaptation SQLPrimaryKeys return tables PK
+  // https://bitquill.atlassian.net/browse/AD-551
+  return SqlResult::AI_NO_DATA;
 
-    return SqlResult::AI_ERROR;
-  }
+  //if (!executed) {
+  //  diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
+  //                       "Query was not executed.");
 
-  if (cursor == meta.end())
-    return SqlResult::AI_NO_DATA;
+  //  return SqlResult::AI_ERROR;
+  //}
 
-  app::ColumnBindingMap::iterator it;
+  //if (cursor == meta.end())
+  //  return SqlResult::AI_NO_DATA;
 
-  for (it = columnBindings.begin(); it != columnBindings.end(); ++it)
-    GetColumn(it->first, it->second);
+  //app::ColumnBindingMap::iterator it;
 
-  ++cursor;
+  //for (it = columnBindings.begin(); it != columnBindings.end(); ++it)
+  //  GetColumn(it->first, it->second);
 
-  return SqlResult::AI_SUCCESS;
+  //++cursor;
+
+  //return SqlResult::AI_SUCCESS;
 }
 
 SqlResult::Type PrimaryKeysQuery::GetColumn(
