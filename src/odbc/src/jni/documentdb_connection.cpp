@@ -116,6 +116,40 @@ JniErrorCode DocumentDbConnection::GetSshLocalPort(int32_t& localPort,
       _connection, localPort, errInfo);
   return success;
 }
+
+SharedPointer< DocumentDbConnectionProperties >
+DocumentDbConnection::GetConnectionProperties(JniErrorInfo& errInfo) {
+  if (!_connection.IsValid()) {
+    errInfo = JniErrorInfo(JniErrorCode::IGNITE_JNI_ERR_GENERIC, "",
+                           "Connection must be set.");
+    return nullptr;
+  }
+  SharedPointer< GlobalJObject > connectionProperties;
+  JniErrorCode success = _jniContext.Get()->DocumentDbConnectionGetConnectionProperties(
+          _connection, connectionProperties, errInfo);
+  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return nullptr;
+  }
+  return new DocumentDbConnectionProperties(_jniContext, connectionProperties);
+}
+
+SharedPointer< DocumentDbDatabaseMetadata >
+DocumentDbConnection::GetDatabaseMetadata(
+    JniErrorInfo& errInfo) {
+  if (!_connection.IsValid()) {
+    errInfo = JniErrorInfo(JniErrorCode::IGNITE_JNI_ERR_GENERIC, "",
+                           "Connection must be set.");
+    return nullptr;
+  }
+  SharedPointer< GlobalJObject > databaseMetadata;
+  JniErrorCode success =
+      _jniContext.Get()->DocumentDbConnectionGetDatabaseMetadata(
+          _connection, databaseMetadata, errInfo);
+  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return nullptr;
+  }
+  return new DocumentDbDatabaseMetadata(_jniContext, databaseMetadata);
+}
 }  // namespace jni
 }  // namespace odbc
 }  // namespace ignite
