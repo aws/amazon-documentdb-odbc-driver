@@ -345,9 +345,7 @@ BOOST_AUTO_TEST_CASE(TestSQLExtendedFetch, *disabled()) {
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLNumResultColsStub) {
-  // There are no checks because we do not really care what is the result of
-  // these calls as long as they do not cause segmentation fault.
-
+  // Test for stubbed functionality.
   std::string dsnConnectionString;
   std::string databaseName = "odbc-test";
   CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
