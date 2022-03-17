@@ -33,7 +33,7 @@
 #include <mongocxx/uri.hpp>
 #include <sstream>
 
-#include "ignite/odbc/driverInstance.h"
+#include "ignite/odbc/driver_instance.h"
 #include "ignite/odbc/common/concurrent.h"
 #include "ignite/odbc/common/utils.h"
 #include "ignite/odbc/config/configuration.h"
