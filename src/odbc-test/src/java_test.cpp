@@ -54,8 +54,9 @@ struct JavaTestSuiteFixture : OdbcTestSuite {
   using OdbcTestSuite::OdbcTestSuite;
 
   SharedPointer< JniContext > GetJniContext(std::vector< char* >& opts) const {
+    JniErrorInfo errInfo;
     SharedPointer< JniContext > ctx(JniContext::Create(
-        &opts[0], static_cast< int >(opts.size()), JniHandlers()));
+        &opts[0], static_cast< int >(opts.size()), JniHandlers(), errInfo));
     BOOST_CHECK(ctx.Get() != nullptr);
     return ctx;
   }
