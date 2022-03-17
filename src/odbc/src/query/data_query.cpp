@@ -59,7 +59,7 @@ const meta::ColumnMetaVector* DataQuery::GetMeta() {
     MakeRequestResultsetMeta();
 
     if (!resultMetaAvailable)
-      return 0;
+      return nullptr;
   }
 
   return &resultMeta;
@@ -240,6 +240,8 @@ SqlResult::Type DataQuery::MakeRequestMoreResults() {
 SqlResult::Type DataQuery::MakeRequestResultsetMeta() {
   // TODO: AD-604 - MakeRequestExecute
   // https://bitquill.atlassian.net/browse/AD-604
+  resultMeta.clear();
+  resultMetaAvailable = true;
   return SqlResult::AI_SUCCESS;
 }
 
