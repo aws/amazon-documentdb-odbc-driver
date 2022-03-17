@@ -539,7 +539,14 @@ bool Connection::TryRestoreConnection(IgniteError& err) {
   }
 
   JniErrorInfo errInfo;
-  auto ctx = GetJniContext();
+  auto ctx = GetJniContext(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    err = IgniteError(
+        static_cast< int32_t >(errInfo.code),
+        std::string(errInfo.errCls).append(": ").append(errInfo.errMsg).c_str());
+    return false;
+
+  }
   SharedPointer< DocumentDbConnection > conn = new DocumentDbConnection(ctx);
   if (!conn.IsValid()
       || conn.Get()->Open(config, errInfo)
@@ -621,7 +628,7 @@ std::string Connection::FormatMongoCppConnectionString(
   return mongoConnectionString;
 }
 
-SharedPointer< JniContext > Connection::GetJniContext() {
+SharedPointer< JniContext > Connection::GetJniContext(JniErrorInfo &errInfo) {
   if (!_jniContext.IsValid()) {
     // Resolve DOCUMENTDB_HOME.
     std::string home = jni::ResolveDocumentDbHome();
@@ -637,7 +644,7 @@ SharedPointer< JniContext > Connection::GetJniContext() {
 
     // Create the context
     SharedPointer< JniContext > ctx(JniContext::Create(
-        &opts[0], static_cast< int >(opts.size()), JniHandlers()));
+        &opts[0], static_cast< int >(opts.size()), JniHandlers(), errInfo));
     _jniContext = ctx;
   }
   return _jniContext;

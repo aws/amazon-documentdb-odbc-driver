@@ -423,7 +423,7 @@ class Connection : public diagnostic::DiagnosableAdapter {
    *
    * @return JNI context.
    */
-  SharedPointer< JniContext > GetJniContext();
+  SharedPointer< JniContext > GetJniContext(JniErrorInfo& errInfo);
 
   /**
    * De-initializes the JVM options

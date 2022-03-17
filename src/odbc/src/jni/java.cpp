@@ -257,6 +257,11 @@ JniMethod const M_DOCUMENTDB_CONNECTION_GET_DATABASE_METADATA =
               "()Lsoftware/amazon/documentdb/jdbc/metadata/"
               "DocumentDbDatabaseSchemaMetadata;",
               false);
+JniMethod const M_DOCUMENTDB_CONNECTION_GET_CONNECTION_PROPERTIES =
+    JniMethod("getConnectionProperties",
+              "()Lsoftware/amazon/documentdb/jdbc/"
+              "DocumentDbConnectionProperties;",
+              false);
 
 const char* const C_DOCUMENTDB_DATABASE_SCHEMA_METADATA =
     "software/amazon/documentdb/jdbc/metadata/DocumentDbDatabaseSchemaMetadata";
@@ -271,6 +276,90 @@ const char* const C_JAVA_SQL_CONNECTION = "java/sql/Connection";
 JniMethod const M_JAVA_SQL_CONNECTION_CLOSE = JniMethod("close", "()V", false);
 JniMethod const M_JAVA_SQL_CONNECTION_GET_META_DATA =
     JniMethod("getMetaData", "()Ljava/sql/DatabaseMetaData;", false);
+
+const char* const C_LIST = "java/util/List";
+JniMethod const M_LIST_SIZE = JniMethod("size", "()I", false);
+JniMethod const M_LIST_TO_ARRAY =
+    JniMethod("toArray", "()[Ljava/lang/Object;", false);
+JniMethod const M_LIST_GET = JniMethod("get", "(I)Ljava/lang/Object;", false);
+
+const char* const C_ITERATOR = "java/util/Iterator";
+JniMethod const M_ITERATOR_NEXT =
+    JniMethod("next", "()Ljava/lang/Object;", false);
+JniMethod const M_ITERATOR_HAS_NEXT = JniMethod("hasNext", "()Z", false);
+
+const char* const C_DOCUMENTDB_MQL_QUERY_CONTEXT =
+    "software/amazon/documentdb/jdbc/query/DocumentDbMqlQueryContext";
+JniMethod const
+    M_DOCUMENTDB_MQL_QUERY_CONTEXT_GET_AGGREGATE_OPERATIONS_AS_STRINGS =
+        JniMethod("getAggregateOperationsAsStrings", "()Ljava/util/List;",
+                  false);  // of String
+JniMethod const M_DOCUMENTDB_MQL_QUERY_CONTEXT_GET_COLUMN_METADATA = JniMethod(
+    "getColumnMetaData", "()Ljava/util/List;", false);  // of JdbcColumnMetaData
+JniMethod const M_DOCUMENTDB_MQL_QUERY_CONTEXT_GET_COLLECTION_NAME =
+    JniMethod("getCollectionName", "()Ljava/lang/String;", false);
+JniMethod const M_DOCUMENTDB_MQL_QUERY_CONTEXT_GET_PATHS =
+    JniMethod("getPaths", "()Ljava/util/List;", false);  // of String
+
+const char* const C_JDBC_COLUMN_METADATA =
+    "software/amazon/documentdb/jdbc/common/utilities/JdbcColumnMetaData";
+JniMethod const M_JDBC_COLUMN_METADATA_GET_ORDINAL =
+    JniMethod("getOrdinal", "()I", false);
+JniMethod const M_JDBC_COLUMN_METADATA_IS_AUTO_INCREMENT =
+    JniMethod("isAutoIncrement", "()Z", false);
+JniMethod const M_JDBC_COLUMN_METADATA_IS_CASE_SENSITIVE =
+    JniMethod("isCaseSensitive", "()Z", false);
+JniMethod const M_JDBC_COLUMN_METADATA_IS_SEARCHABLE =
+    JniMethod("isSearchable", "()Z", false);
+JniMethod const M_JDBC_COLUMN_METADATA_IS_CURRENCY =
+    JniMethod("isCurrency", "()Z", false);
+JniMethod const M_JDBC_COLUMN_METADATA_GET_NULLABLE =
+    JniMethod("getNullable", "()I", false);
+JniMethod const M_JDBC_COLUMN_METADATA_IS_SIGNED =
+    JniMethod("isSigned", "()Z", false);
+JniMethod const M_JDBC_COLUMN_METADATA_GET_COLUMN_DISPLAY_SIZE =
+    JniMethod("getColumnDisplaySize", "()I", false);
+JniMethod const M_JDBC_COLUMN_METADATA_GET_COLUMN_LABEL =
+    JniMethod("getColumnLabel", "()Ljava/lang/String;", false);
+JniMethod const M_JDBC_COLUMN_METADATA_GET_COLUMN_NAME =
+    JniMethod("getColumnName", "()Ljava/lang/String;", false);
+JniMethod const M_JDBC_COLUMN_METADATA_GET_SCHEMA_NAME =
+    JniMethod("getSchemaName", "()Ljava/lang/String;", false);
+JniMethod const M_JDBC_COLUMN_METADATA_GET_PRECISION =
+    JniMethod("getPrecision", "()I", false);
+JniMethod const M_JDBC_COLUMN_METADATA_GET_SCALE =
+    JniMethod("getScale", "()I", false);
+JniMethod const M_JDBC_COLUMN_METADATA_GET_TABLE_NAME =
+    JniMethod("getTableName", "()Ljava/lang/String;", false);
+JniMethod const M_JDBC_COLUMN_METADATA_GET_CATALOG_NAME =
+    JniMethod("getCatalogName", "()Ljava/lang/String;", false);
+JniMethod const M_JDBC_COLUMN_METADATA_GET_COLUMN_TYPE =
+    JniMethod("getColumnType", "()I", false);
+JniMethod const M_JDBC_COLUMN_METADATA_GET_COLUMN_TYPE_NAME =
+    JniMethod("getColumnTypeName", "()Ljava/lang/String;", false);
+JniMethod const M_JDBC_COLUMN_METADATA_IS_READ_ONLY =
+    JniMethod("isReadOnly", "()Z", false);
+JniMethod const M_JDBC_COLUMN_METADATA_IS_WRITABLE =
+    JniMethod("isWritable", "()Z", false);
+JniMethod const M_JDBC_COLUMN_METADATA_IS_DEFINITELY_WRITABLE =
+    JniMethod("isDefinitelyWritable", "()Z", false);
+JniMethod const M_JDBC_COLUMN_METADATA_GET_COLUMN_CLASS_NAME =
+    JniMethod("getColumnClassName", "()Ljava/lang/String;", false);
+
+const char* const C_DOCUMENTDB_QUERY_MAPPING_SERVICE =
+    "software/amazon/documentdb/jdbc/query/DocumentDbQueryMappingService";
+JniMethod const M_DOCUMENTDB_QUERY_MAPPING_SERVICE_INIT =
+    JniMethod("<init>",
+              "("
+              "Lsoftware/amazon/documentdb/jdbc/DocumentDbConnectionProperties;"
+              "Lsoftware/amazon/documentdb/jdbc/metadata/DocumentDbDatabaseSchemaMetadata;"
+              ")V",
+              false);
+JniMethod const M_DOCUMENTDB_QUERY_MAPPING_SERVICE_GET = JniMethod(
+    "get",
+    "(Ljava/lang/String;J)"
+    "Lsoftware/amazon/documentdb/jdbc/query/DocumentDbMqlQueryContext;",
+    false);
 
 // TODO: Provide a "getFullStackTrace" from DocumentDB
 // JniMethod M_PLATFORM_UTILS_GET_FULL_STACK_TRACE =
@@ -321,30 +410,32 @@ void ThrowToJava(JNIEnv* env, const char* msg) {
 
 char* StringToChars(JNIEnv* env, jstring str, int* len) {
   if (!str) {
-    *len = 0;
-    return NULL;
+    if (len) {
+      *len = 0;
+    }
+    return nullptr;
   }
 
-  const char* strChars = env->GetStringUTFChars(str, 0);
+  const char* strChars = env->GetStringUTFChars(str, nullptr);
   const int strCharsLen = env->GetStringUTFLength(str);
 
-  char* strChars0 = new char[strCharsLen + 1];
+  auto* strChars0 = new char[strCharsLen + 1];
   std::strcpy(strChars0, strChars);
   *(strChars0 + strCharsLen) = 0;
 
   env->ReleaseStringUTFChars(str, strChars);
-
-  if (len)
+  if (len) {
     *len = strCharsLen;
+  }
 
   return strChars0;
 }
 
-std::string JavaStringToCString(JNIEnv* env, jstring str, int* len) {
-  char* resChars = StringToChars(env, str, len);
+std::string JavaStringToCString(JNIEnv* env, jstring str, int& len) {
+  char* resChars = StringToChars(env, str, &len);
 
   if (resChars) {
-    std::string res = std::string(resChars, *len);
+    std::string res(resChars, len);
 
     delete[] resChars;
 
@@ -359,7 +450,7 @@ jclass FindClass(JNIEnv* env, const char* name) {
   if (!res)
     throw JvmException();
 
-  jclass res0 = static_cast< jclass >(env->NewGlobalRef(res));
+  auto res0 = static_cast< jclass >(env->NewGlobalRef(res));
 
   env->DeleteLocalRef(res);
 
@@ -387,12 +478,6 @@ jmethodID FindMethod(JNIEnv* env, jclass cls, JniMethod mthd) {
     throw JvmException();
 
   return mthd0;
-}
-
-void AddNativeMethod(JNINativeMethod* mthd, JniMethod jniMthd, void* fnPtr) {
-  mthd->name = jniMthd.name;
-  mthd->signature = jniMthd.sign;
-  mthd->fnPtr = fnPtr;
 }
 
 void JniJavaMembers::Initialize(JNIEnv* env) {
@@ -430,15 +515,15 @@ bool JniJavaMembers::WriteErrorInfo(JNIEnv* env, char** errClsName,
 
       jclass errCls = env->GetObjectClass(err);
 
-      jstring clsName = static_cast< jstring >(
+      auto clsName = static_cast< jstring >(
           env->CallObjectMethod(errCls, m_Class_getName));
       *errClsName = StringToChars(env, clsName, errClsNameLen);
 
-      jstring msg = static_cast< jstring >(
+      auto msg = static_cast< jstring >(
           env->CallObjectMethod(err, m_Throwable_getMessage));
       *errMsg = StringToChars(env, msg, errMsgLen);
 
-      jstring trace = NULL;
+      jstring trace = nullptr;
 
       if (c_PlatformUtils && m_PlatformUtils_getFullStackTrace) {
         trace = static_cast< jstring >(env->CallStaticObjectMethod(
@@ -485,6 +570,9 @@ void JniMembers::Initialize(JNIEnv* env) {
   m_DocumentDbConnectionGetDatabaseMetadata =
       FindMethod(env, c_DocumentDbConnection,
                  M_DOCUMENTDB_CONNECTION_GET_DATABASE_METADATA);
+  m_DocumentDbConnectionGetConnectionProperties =
+      FindMethod(env, c_DocumentDbConnection,
+                 M_DOCUMENTDB_CONNECTION_GET_CONNECTION_PROPERTIES);
 
   c_DocumentDbDatabaseSchemaMetadata =
       FindClass(env, C_DOCUMENTDB_DATABASE_SCHEMA_METADATA);
@@ -521,6 +609,78 @@ void JniMembers::Initialize(JNIEnv* env) {
       FindMethod(env, c_Connection, M_JAVA_SQL_CONNECTION_CLOSE);
   m_ConnectionGetMetaData =
       FindMethod(env, c_Connection, M_JAVA_SQL_CONNECTION_GET_META_DATA);
+
+  c_List = FindClass(env, C_LIST);
+  m_ListSize = FindMethod(env, c_List, M_LIST_SIZE);
+  m_ListGet = FindMethod(env, c_List, M_LIST_GET);
+
+  c_DocumentDbMqlQueryContext = FindClass(env, C_DOCUMENTDB_MQL_QUERY_CONTEXT);
+  m_DocumentDbMqlQueryContextGetAggregateOperationsAsStrings = FindMethod(
+      env, c_DocumentDbMqlQueryContext,
+      M_DOCUMENTDB_MQL_QUERY_CONTEXT_GET_AGGREGATE_OPERATIONS_AS_STRINGS);
+  m_DocumentDbMqlQueryContextGetColumnMetadata =
+      FindMethod(env, c_DocumentDbMqlQueryContext,
+                 M_DOCUMENTDB_MQL_QUERY_CONTEXT_GET_COLUMN_METADATA);
+  m_DocumentDbMqlQueryContextGetCollectionName =
+      FindMethod(env, c_DocumentDbMqlQueryContext,
+                 M_DOCUMENTDB_MQL_QUERY_CONTEXT_GET_COLLECTION_NAME);
+  m_DocumentDbMqlQueryContextGetPaths =
+      FindMethod(env, c_DocumentDbMqlQueryContext,
+                 M_DOCUMENTDB_MQL_QUERY_CONTEXT_GET_PATHS);
+
+  c_JdbcColumnMetadata = FindClass(env, C_JDBC_COLUMN_METADATA);
+  m_JdbcColumnMetadataGetOrdinal =
+      FindMethod(env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_GET_ORDINAL);
+  m_JdbcColumnMetadataIsAutoIncrement = FindMethod(
+      env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_IS_AUTO_INCREMENT);
+  m_JdbcColumnMetadataIsCaseSensitive = FindMethod(
+      env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_IS_CASE_SENSITIVE);
+  m_JdbcColumnMetadataIsSearchable = FindMethod(
+      env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_IS_SEARCHABLE);
+  m_JdbcColumnMetadataIsCurrency =
+      FindMethod(env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_IS_CURRENCY);
+  m_JdbcColumnMetadataGetNullable = FindMethod(
+      env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_GET_NULLABLE);
+  m_JdbcColumnMetadataIsSigned =
+      FindMethod(env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_IS_SIGNED);
+  m_JdbcColumnMetadataGetColumnDisplaySize =
+      FindMethod(env, c_JdbcColumnMetadata,
+                 M_JDBC_COLUMN_METADATA_GET_COLUMN_DISPLAY_SIZE);
+  m_JdbcColumnMetadataGetColumnLabel = FindMethod(
+      env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_GET_COLUMN_LABEL);
+  m_JdbcColumnMetadataGetColumnName = FindMethod(
+      env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_GET_COLUMN_NAME);
+  m_JdbcColumnMetadataGetSchemaName = FindMethod(
+      env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_GET_SCHEMA_NAME);
+  m_JdbcColumnMetadataGetPrecision = FindMethod(
+      env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_GET_PRECISION);
+  m_JdbcColumnMetadataGetScale =
+      FindMethod(env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_GET_SCALE);
+  m_JdbcColumnMetadataGetTableName = FindMethod(
+      env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_GET_TABLE_NAME);
+  m_JdbcColumnMetadataGetCatalogName = FindMethod(
+      env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_GET_CATALOG_NAME);
+  m_JdbcColumnMetadataGetColumnType = FindMethod(
+      env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_GET_COLUMN_TYPE);
+  m_JdbcColumnMetadataGetColumnTypeName = FindMethod(
+      env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_GET_COLUMN_TYPE_NAME);
+  m_JdbcColumnMetadataIsReadOnly = FindMethod(
+      env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_IS_READ_ONLY);
+  m_JdbcColumnMetadataIsWritable =
+      FindMethod(env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_IS_WRITABLE);
+  m_JdbcColumnMetadataIsDefinitelyWritable = FindMethod(
+      env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_IS_DEFINITELY_WRITABLE);
+  m_JdbcColumnMetadataGetColumnClassName = FindMethod(
+      env, c_JdbcColumnMetadata, M_JDBC_COLUMN_METADATA_GET_COLUMN_CLASS_NAME);
+
+  c_DocumentDbQueryMappingService =
+      FindClass(env, C_DOCUMENTDB_QUERY_MAPPING_SERVICE);
+  m_DocumentDbQueryMappingServiceCtor =
+      FindMethod(env, c_DocumentDbQueryMappingService,
+                 M_DOCUMENTDB_QUERY_MAPPING_SERVICE_INIT);
+  m_DocumentDbQueryMappingServiceGet =
+      FindMethod(env, c_DocumentDbQueryMappingService,
+                 M_DOCUMENTDB_QUERY_MAPPING_SERVICE_GET);
 }
 
 void JniMembers::Destroy(JNIEnv* env) {
@@ -531,11 +691,11 @@ void JniMembers::Destroy(JNIEnv* env) {
 }
 
 JniJvm::JniJvm()
-    : jvm(NULL), javaMembers(JniJavaMembers()), members(JniMembers()) {
+    : jvm(nullptr), javaMembers(JniJavaMembers()), members(JniMembers()) {
   // No-op.
 }
 
-JniJvm::JniJvm(JavaVM* jvm, JniJavaMembers javaMembers, JniMembers members)
+JniJvm::JniJvm(JavaVM* jvm, JniJavaMembers const& javaMembers, JniMembers const& members)
     : jvm(jvm), javaMembers(javaMembers), members(members) {
   // No-op.
 }
@@ -582,7 +742,7 @@ jint GetOrCreateJvm(char** opts, int optsLen, JavaVM** jvm, JNIEnv** env) {
   }
 
   // Otherwise, create a VM
-  JavaVMOption* opts0 = new JavaVMOption[optsLen];
+  JavaVMOption* opts0 = new JavaVMOption[optsLen]{};
 
   for (int i = 0; i < optsLen; i++)
     opts0[i].optionString = *(opts + i);
@@ -605,12 +765,8 @@ void RegisterNatives(JNIEnv* env) {
   // TODO: Investigate registering callbacks to get console and logging streams.
 }
 
-JniContext::JniContext(JniJvm* jvm, JniHandlers hnds) : jvm(jvm), hnds(hnds) {
+JniContext::JniContext(JniJvm* jvm, JniHandlers const& hnds) : jvm(jvm), hnds(hnds) {
   // No-op.
-}
-
-JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers hnds) {
-  return Create(opts, optsLen, hnds, NULL);
 }
 
 void GetJniErrorMessage(std::string& errMsg, jint res) {
@@ -646,14 +802,14 @@ void GetJniErrorMessage(std::string& errMsg, jint res) {
   }
 }
 
-JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers hnds,
-                               JniErrorInfo* errInfo) {
+JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers const& hnds,
+                               JniErrorInfo& errInfo) {
   // Acquire global lock to instantiate the JVM.
   JVM_LOCK.Enter();
 
   // Define local variables.
-  JavaVM* jvm = NULL;
-  JNIEnv* env = NULL;
+  JavaVM* jvm = nullptr;
+  JNIEnv* env = nullptr;
 
   JniJavaMembers javaMembers;
   memset(&javaMembers, 0, sizeof(javaMembers));
@@ -661,7 +817,7 @@ JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers hnds,
   JniMembers members;
   memset(&members, 0, sizeof(members));
 
-  JniContext* ctx = NULL;
+  JniContext* ctx = nullptr;
 
   std::string errClsName;
   int errClsNameLen = 0;
@@ -698,9 +854,9 @@ JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers hnds,
     if (JVM.GetJvm())
       ctx = new JniContext(&JVM, hnds);
   } catch (const JvmException&) {
-    char* errClsNameChars = NULL;
-    char* errMsgChars = NULL;
-    char* stackTraceChars = NULL;
+    char* errClsNameChars = nullptr;
+    char* errMsgChars = nullptr;
+    char* stackTraceChars = nullptr;
 
     // Read error info if possible.
     javaMembers.WriteErrorInfo(env, &errClsNameChars, &errClsNameLen,
@@ -741,17 +897,13 @@ JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers hnds,
 
   // Notify err callback if needed.
   if (!ctx) {
-    if (errInfo) {
-      JniErrorInfo errInfo0(JniErrorCode::IGNITE_JNI_ERR_JVM_INIT,
+      errInfo = JniErrorInfo(JniErrorCode::IGNITE_JNI_ERR_JVM_INIT,
                             errClsName.c_str(), errMsg.c_str());
-
-      *errInfo = errInfo0;
-    }
 
     if (hnds.error)
       hnds.error(hnds.target, JniErrorCode::IGNITE_JNI_ERR_JVM_INIT,
                  errClsName.c_str(), errClsNameLen, errMsg.c_str(), errMsgLen,
-                 stackTrace.c_str(), stackTraceLen, NULL, 0);
+                 stackTrace.c_str(), stackTraceLen, nullptr, 0);
   }
 
   return ctx;
@@ -763,7 +915,7 @@ int JniContext::Reallocate(int64_t memPtr, int cap) {
   JNIEnv* env;
 
   int attachRes =
-      jvm->AttachCurrentThread(reinterpret_cast< void** >(&env), NULL);
+      jvm->AttachCurrentThread(reinterpret_cast< void** >(&env), nullptr);
 
   if (attachRes == JNI_OK)
     AttachHelper::OnThreadAttach();
@@ -796,6 +948,14 @@ void JniContext::Detach() {
   }
 }
 
+std::string JniContext::JavaStringToCppString(
+    const SharedPointer< GlobalJObject >& value) {
+  int len;
+  JNIEnv* env = Attach();
+  return JavaStringToCString(env, static_cast< jstring >(value.Get()->GetRef()),
+                             len);
+}
+
 JniErrorCode JniContext::DriverManagerGetConnection(
     const char* connectionString, SharedPointer< GlobalJObject >& connection,
     JniErrorInfo& errInfo) {
@@ -807,9 +967,9 @@ JniErrorCode JniContext::DriverManagerGetConnection(
   ExceptionCheck(env, &errInfo);
   if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     connection = nullptr;
-    return errInfo.code;
+  } else {
+    connection = new GlobalJObject(env, env->NewGlobalRef(result));
   }
-  connection = new GlobalJObject(env, env->NewGlobalRef(result));
   return errInfo.code;
 }
 
@@ -882,6 +1042,30 @@ JniErrorCode JniContext::DocumentDbConnectionGetDatabaseMetadata(
   }
 
   metadata = new GlobalJObject(env, env->NewGlobalRef(result));
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::DocumentDbConnectionGetConnectionProperties(
+    const SharedPointer< GlobalJObject >& connection,
+    SharedPointer< GlobalJObject >& connectionProperties,
+    JniErrorInfo& errInfo) {
+  if (!connection.Get()) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "Connection object must be set.";
+    return errInfo.code;
+  }
+  JNIEnv* env = Attach();
+  jobject result = env->CallObjectMethod(
+      connection.Get()->GetRef(),
+      jvm->GetMembers().m_DocumentDbConnectionGetConnectionProperties);
+  ExceptionCheck(env, &errInfo);
+
+  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    connectionProperties = nullptr;
+    return errInfo.code;
+  }
+
+  connectionProperties = new GlobalJObject(env, env->NewGlobalRef(result));
   return errInfo.code;
 }
 
@@ -1193,6 +1377,440 @@ JniErrorCode JniContext::ResultSetWasNull(
   return errInfo.code;
 }
 
+JniErrorCode JniContext::ListSize(const SharedPointer< GlobalJObject >& list,
+                                  int32_t& size, JniErrorInfo& errInfo) {
+  if (!list.IsValid()) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "List object must be set.";
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  jint res =
+      env->CallIntMethod(list.Get()->GetRef(), jvm->GetMembers().m_ListSize);
+  ExceptionCheck(env, &errInfo);
+  if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    size = res;
+  }
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::ListGet(const SharedPointer< GlobalJObject >& list,
+                                 int32_t index,
+                                 SharedPointer< GlobalJObject >& value,
+                                 JniErrorInfo& errInfo) {
+  if (!list.IsValid()) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "List object must be set.";
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  jobject result = env->CallObjectMethod(list.Get()->GetRef(),
+                                         jvm->GetMembers().m_ListGet, index);
+  ExceptionCheck(env, &errInfo);
+  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    value = nullptr;
+    return errInfo.code;
+  }
+  value = new GlobalJObject(env, env->NewGlobalRef(result));
+  return errInfo.code;
+}
+
+JniErrorCode
+JniContext::DocumentdbMqlQueryContextGetAggregateOperationsAsStrings(
+    const SharedPointer< GlobalJObject >& mqlQueryContext,
+    SharedPointer< GlobalJObject >& list, JniErrorInfo& errInfo) {
+  if (!mqlQueryContext.IsValid()) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "MQL Query Context object must be set.";
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  jobject result = env->CallObjectMethod(mqlQueryContext.Get()->GetRef(),
+                                         jvm->GetMembers().m_DocumentDbMqlQueryContextGetAggregateOperationsAsStrings);
+  ExceptionCheck(env, &errInfo);
+  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    list = nullptr;
+    return errInfo.code;
+  }
+  list = new GlobalJObject(env, env->NewGlobalRef(result));
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::DocumentdbMqlQueryContextGetColumnMetadata(
+    const SharedPointer< GlobalJObject >& mqlQueryContext,
+    SharedPointer< GlobalJObject >& columnMetadata, JniErrorInfo& errInfo) {
+  if (!mqlQueryContext.IsValid()) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "MQL Query Context object must be set.";
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  jobject result = env->CallObjectMethod(
+      mqlQueryContext.Get()->GetRef(),
+      jvm->GetMembers()
+          .m_DocumentDbMqlQueryContextGetColumnMetadata);
+  ExceptionCheck(env, &errInfo);
+  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    columnMetadata = nullptr;
+    return errInfo.code;
+  }
+  columnMetadata = new GlobalJObject(env, env->NewGlobalRef(result));
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::DocumentdbMqlQueryContextGetCollectionName(
+    const SharedPointer< GlobalJObject >& mqlQueryContext,
+    std::string& collectionName, JniErrorInfo& errInfo) {
+  if (!mqlQueryContext.IsValid()) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "MQL Query Context object must be set.";
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  jstring result = static_cast< jstring >(env->CallObjectMethod(
+      mqlQueryContext.Get()->GetRef(),
+      jvm->GetMembers().m_DocumentDbMqlQueryContextGetCollectionName));
+  ExceptionCheck(env, &errInfo);
+  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    collectionName = "";
+    return errInfo.code;
+  }
+  int len;
+  collectionName = JavaStringToCString(env, result, len);
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::DocumentdbMqlQueryContextGetPaths(
+    const SharedPointer< GlobalJObject >& mqlQueryContext,
+    SharedPointer< GlobalJObject >& list, JniErrorInfo& errInfo) {
+  if (!mqlQueryContext.IsValid()) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "MQL Query Context object must be set.";
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  jobject result = env->CallObjectMethod(
+      mqlQueryContext.Get()->GetRef(),
+      jvm->GetMembers().m_DocumentDbMqlQueryContextGetPaths);
+  ExceptionCheck(env, &errInfo);
+  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    list = nullptr;
+    return errInfo.code;
+  }
+  list = new GlobalJObject(env, env->NewGlobalRef(result));
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::DocumentDbQueryMappingServiceCtor(
+    const SharedPointer< GlobalJObject >& connectionProperties,
+    const SharedPointer< GlobalJObject >& databaseMetadata,
+    SharedPointer< GlobalJObject >& queryMappingService,
+    JniErrorInfo& errInfo) {
+  if (!connectionProperties.IsValid() || !databaseMetadata.IsValid()) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "Connection Properties and Database Metadata objects must be set.";
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  jobject result = env->NewObject(
+      jvm->GetMembers().c_DocumentDbQueryMappingService,
+      jvm->GetMembers().m_DocumentDbQueryMappingServiceCtor,
+      connectionProperties.Get()->GetRef(), databaseMetadata.Get()->GetRef());
+  ExceptionCheck(env, &errInfo);
+  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    queryMappingService = nullptr;
+    return errInfo.code;
+  }
+  queryMappingService = new GlobalJObject(env, env->NewGlobalRef(result));
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::DocumentDbQueryMappingServiceGet(
+    const SharedPointer< GlobalJObject >& queryMappingService,
+    const std::string sql, int64_t maxRowCount,
+    SharedPointer< GlobalJObject >& mqlQueryContext, JniErrorInfo& errInfo) {
+  if (!queryMappingService.IsValid()) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "Query Mapping Service object must be set.";
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  jstring sqlString = env->NewStringUTF(sql.c_str());
+  jlong maxRowCountLong = maxRowCount;
+  jobject result = env->CallObjectMethod(
+      queryMappingService.Get()->GetRef(),
+      jvm->GetMembers().m_DocumentDbQueryMappingServiceGet, sqlString, maxRowCountLong);
+  env->DeleteLocalRef(sqlString);
+  ExceptionCheck(env, &errInfo);
+  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    mqlQueryContext = nullptr;
+    return errInfo.code;
+  }
+  mqlQueryContext = new GlobalJObject(env, env->NewGlobalRef(result));
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataGetOrdinal(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata, int32_t& ordinal,
+    JniErrorInfo& errInfo) {
+  if (!jdbcColumnMetadata.IsValid()) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "JDBC Column Metaata object must be set.";
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  jint result = env->CallIntMethod(jdbcColumnMetadata.Get()->GetRef(),
+      jvm->GetMembers().m_JdbcColumnMetadataGetOrdinal);
+  ExceptionCheck(env, &errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
+  ordinal = result;
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::CallBooleanMethod(
+    const SharedPointer< GlobalJObject >& object,
+    const jmethodID& method,
+    bool& value, JniErrorInfo& errInfo) {
+  if (!object.IsValid()) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "JDBC Column Metaata object must be set.";
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  jboolean result = env->CallBooleanMethod(
+      object.Get()->GetRef(),
+      method);
+  ExceptionCheck(env, &errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
+  value = result;
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::CallIntMethod(
+    const SharedPointer< GlobalJObject >& object, const jmethodID& method,
+    int32_t& value, JniErrorInfo& errInfo) {
+  if (!object.IsValid()) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "JDBC Column Metaata object must be set.";
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  jint result = env->CallIntMethod(object.Get()->GetRef(), method);
+  ExceptionCheck(env, &errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
+  value = result;
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::CallStringMethod(
+    const SharedPointer< GlobalJObject >& object, const jmethodID& method,
+    boost::optional< std::string >& value, JniErrorInfo& errInfo) {
+  if (!object.IsValid()) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "JDBC Column Metaata object must be set.";
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  auto result = static_cast< jstring >(
+      env->CallObjectMethod(object.Get()->GetRef(), method));
+  ExceptionCheck(env, &errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
+  if (result == nullptr) {
+    value = boost::none;
+  } else {
+      int len;
+      value = JavaStringToCString(env, result, len);
+  }
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataIsAutoIncrement(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
+    bool& autoIncrement, JniErrorInfo& errInfo){
+  return CallBooleanMethod(
+      jdbcColumnMetadata, jvm->GetMembers().m_JdbcColumnMetadataIsAutoIncrement,
+      autoIncrement, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataIsCaseSensitive(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
+    bool& caseSensitive, JniErrorInfo& errInfo){
+  return CallBooleanMethod(
+      jdbcColumnMetadata, jvm->GetMembers().m_JdbcColumnMetadataIsCaseSensitive,
+      caseSensitive, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataIsSearchable(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata, bool& searchable,
+    JniErrorInfo& errInfo){
+  return CallBooleanMethod(jdbcColumnMetadata,
+                           jvm->GetMembers().m_JdbcColumnMetadataIsSearchable,
+                           searchable, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataIsCurrency(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata, bool& currency,
+    JniErrorInfo& errInfo){
+  return CallBooleanMethod(jdbcColumnMetadata,
+                           jvm->GetMembers().m_JdbcColumnMetadataIsCurrency,
+                           currency, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataGetNullable(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata, int32_t& nullable,
+    JniErrorInfo& errInfo){
+  return CallIntMethod(jdbcColumnMetadata,
+                       jvm->GetMembers().m_JdbcColumnMetadataGetNullable,
+                       nullable, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataIsSigned(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata, bool& isSigned,
+    JniErrorInfo& errInfo){
+  return CallBooleanMethod(jdbcColumnMetadata,
+                           jvm->GetMembers().m_JdbcColumnMetadataIsSigned,
+                           isSigned, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataGetColumnDisplaySize(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
+    int32_t& columnDisplaySize, JniErrorInfo& errInfo){
+  return CallIntMethod(
+      jdbcColumnMetadata,
+      jvm->GetMembers().m_JdbcColumnMetadataGetColumnDisplaySize,
+      columnDisplaySize, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataGetColumnLabel(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
+    boost::optional< std::string >& columnLabel, JniErrorInfo& errInfo){
+  return CallStringMethod(jdbcColumnMetadata,
+                          jvm->GetMembers().m_JdbcColumnMetadataGetColumnLabel,
+                          columnLabel, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataGetColumnName(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
+    boost::optional< std::string >& columnName, JniErrorInfo& errInfo){
+  return CallStringMethod(jdbcColumnMetadata,
+                          jvm->GetMembers().m_JdbcColumnMetadataGetColumnName,
+                          columnName, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataGetSchemaName(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
+    boost::optional< std::string >& schemaName, JniErrorInfo& errInfo){
+  return CallStringMethod(jdbcColumnMetadata,
+                          jvm->GetMembers().m_JdbcColumnMetadataGetSchemaName,
+                          schemaName, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataGetPrecision(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
+    int32_t& precision, JniErrorInfo& errInfo){
+  return CallIntMethod(jdbcColumnMetadata,
+                       jvm->GetMembers().m_JdbcColumnMetadataGetPrecision,
+                       precision, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataGetScale(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata, int32_t& scale,
+    JniErrorInfo& errInfo){
+  return CallIntMethod(jdbcColumnMetadata,
+                       jvm->GetMembers().m_JdbcColumnMetadataGetScale, scale,
+                       errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataGetTableName(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
+    boost::optional< std::string >& tableName, JniErrorInfo& errInfo){
+  return CallStringMethod(jdbcColumnMetadata,
+                          jvm->GetMembers().m_JdbcColumnMetadataGetTableName,
+                          tableName, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataGetCatalogName(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
+    boost::optional< std::string >& catalogName, JniErrorInfo& errInfo){
+  return CallStringMethod(jdbcColumnMetadata,
+                          jvm->GetMembers().m_JdbcColumnMetadataGetCatalogName,
+                          catalogName, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataGetColumnType(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
+    int32_t& columnType, JniErrorInfo& errInfo){
+  return CallIntMethod(jdbcColumnMetadata,
+                       jvm->GetMembers().m_JdbcColumnMetadataGetColumnType,
+                       columnType, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataGetColumnTypeName(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
+    boost::optional< std::string >& columnTypeName, JniErrorInfo& errInfo){
+  return CallStringMethod(jdbcColumnMetadata,
+                          jvm->GetMembers().m_JdbcColumnMetadataGetColumnTypeName,
+                          columnTypeName, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataIsReadOnly(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata, bool& readOnly,
+    JniErrorInfo& errInfo){
+  return CallBooleanMethod(jdbcColumnMetadata,
+                           jvm->GetMembers().m_JdbcColumnMetadataIsReadOnly,
+                           readOnly, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataIsWritable(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata, bool& writable,
+    JniErrorInfo& errInfo){
+  return CallBooleanMethod(jdbcColumnMetadata,
+                           jvm->GetMembers().m_JdbcColumnMetadataIsWritable,
+                           writable, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataIsDefinitelyWritable(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
+    bool& definitelyWritable, JniErrorInfo& errInfo){
+  return CallBooleanMethod(
+      jdbcColumnMetadata,
+      jvm->GetMembers().m_JdbcColumnMetadataIsDefinitelyWritable,
+      definitelyWritable, errInfo);
+}
+
+JniErrorCode JniContext::JdbcColumnMetadataGetColumnClassName(
+    const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
+    boost::optional< std::string >& columnClassName, JniErrorInfo& errInfo){
+  return CallStringMethod(
+      jdbcColumnMetadata,
+      jvm->GetMembers().m_JdbcColumnMetadataGetColumnClassName, columnClassName,
+      errInfo);
+}
+
 int64_t JniContext::TargetInLongOutLong(jobject obj, int opType, int64_t val,
                                         JniErrorInfo* err) {
   JNIEnv* env = Attach();
@@ -1339,7 +1957,7 @@ jobject JniContext::Acquire(jobject obj) {
     return obj0;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 void JniContext::Release(jobject obj) {
@@ -1350,7 +1968,7 @@ void JniContext::Release(jobject obj) {
       JNIEnv* env;
 
       jint attachRes =
-          jvm->AttachCurrentThread(reinterpret_cast< void** >(&env), NULL);
+          jvm->AttachCurrentThread(reinterpret_cast< void** >(&env), nullptr);
 
       if (attachRes == JNI_OK) {
         AttachHelper::OnThreadAttach();
@@ -1408,21 +2026,21 @@ JNIEnv* JniContext::Attach() {
   JNIEnv* env;
 
   jint attachRes = jvm->GetJvm()->AttachCurrentThread(
-      reinterpret_cast< void** >(&env), NULL);
+      reinterpret_cast< void** >(&env), nullptr);
 
   if (attachRes == JNI_OK)
     AttachHelper::OnThreadAttach();
   else {
     if (hnds.error)
-      hnds.error(hnds.target, JniErrorCode::IGNITE_JNI_ERR_JVM_ATTACH, NULL, 0,
-                 NULL, 0, NULL, 0, NULL, 0);
+      hnds.error(hnds.target, JniErrorCode::IGNITE_JNI_ERR_JVM_ATTACH, nullptr, 0,
+                 nullptr, 0, nullptr, 0, nullptr, 0);
   }
 
   return env;
 }
 
 void JniContext::ExceptionCheck(JNIEnv* env) {
-  ExceptionCheck(env, NULL);
+  ExceptionCheck(env, nullptr);
 }
 
 void JniContext::ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) {
@@ -1450,16 +2068,16 @@ void JniContext::ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) {
           jvm->GetJavaMembers().c_PlatformUtils,
           jvm->GetJavaMembers().m_PlatformUtils_getFullStackTrace, err));
 
-      trace0 = JavaStringToCString(env, trace, &traceLen);
+      trace0 = JavaStringToCString(env, trace, traceLen);
     }
 
     env->DeleteLocalRef(cls);
 
     int clsNameLen;
-    std::string clsName0 = JavaStringToCString(env, clsName, &clsNameLen);
+    std::string clsName0 = JavaStringToCString(env, clsName, clsNameLen);
 
     int msgLen;
-    std::string msg0 = JavaStringToCString(env, msg, &msgLen);
+    std::string msg0 = JavaStringToCString(env, msg, msgLen);
 
     if (errInfo) {
       JniErrorInfo errInfo0(JniErrorCode::IGNITE_JNI_ERR_GENERIC,
@@ -1478,7 +2096,7 @@ void JniContext::ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) {
     }
 
     if (errData) {
-      jbyte* errBytesNative = env->GetByteArrayElements(errData, NULL);
+      jbyte* errBytesNative = env->GetByteArrayElements(errData, nullptr);
 
       int errBytesLen = env->GetArrayLength(errData);
 
@@ -1492,7 +2110,7 @@ void JniContext::ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) {
       if (hnds.error)
         hnds.error(hnds.target, JniErrorCode::IGNITE_JNI_ERR_GENERIC,
                    clsName0.c_str(), clsNameLen, msg0.c_str(), msgLen,
-                   trace0.c_str(), traceLen, NULL, 0);
+                   trace0.c_str(), traceLen, nullptr, 0);
     }
 
     env->DeleteLocalRef(err);
@@ -1516,7 +2134,7 @@ jobject JniContext::LocalToGlobal(JNIEnv* env, jobject localRef) {
 
     return globalRef;
   } else
-    return NULL;
+    return nullptr;
 }
 
 JNIEXPORT void JNICALL JniConsoleWrite(JNIEnv* env, jclass, jstring str,
