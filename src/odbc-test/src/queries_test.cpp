@@ -64,9 +64,7 @@ struct QueriesTestSuiteFixture : odbc::OdbcTestSuite {
   /**
    * Destructor.
    */
-  virtual ~QueriesTestSuiteFixture() {
-    // No-op.
-  }
+  ~QueriesTestSuiteFixture() override = default;
 
   template < typename T >
   void CheckTwoRowsInt(SQLSMALLINT type) {
@@ -93,7 +91,7 @@ struct QueriesTestSuiteFixture : odbc::OdbcTestSuite {
 
     // Binding columns.
     for (SQLSMALLINT i = 0; i < columnsCnt; ++i) {
-      ret = SQLBindCol(stmt, i + 1, type, &columns[i], sizeof(columns[i]), 0);
+      ret = SQLBindCol(stmt, i + 1, type, &columns[i], sizeof(columns[i]), nullptr);
 
       if (!SQL_SUCCEEDED(ret))
         BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));

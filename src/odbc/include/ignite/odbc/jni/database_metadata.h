@@ -38,6 +38,7 @@ namespace jni {
  */
 class DatabaseMetaData {
   friend class DocumentDbConnection;
+  friend class DocumentDbQueryMappingService;
 
  public:
   ~DatabaseMetaData() = default;
