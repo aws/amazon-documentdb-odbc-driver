@@ -533,6 +533,13 @@ void JniMembers::Initialize(JNIEnv* env) {
 }
 
 void JniMembers::Destroy(JNIEnv* env) {
+  DeleteClass(env, c_DocumentDbConnectionProperties);
+  DeleteClass(env, c_DocumentDbConnection);
+  DeleteClass(env, c_DocumentDbConnectionProperties);
+  DeleteClass(env, c_DocumentDbDatabaseSchemaMetadata);
+  DeleteClass(env, c_ResultSet);
+  DeleteClass(env, c_DatabaseMetaData);
+  DeleteClass(env, c_Connection);
   DeleteClass(env, c_IgniteException);
   DeleteClass(env, c_PlatformIgnition);
   DeleteClass(env, c_PlatformTarget);
@@ -566,7 +573,9 @@ GlobalJObject::GlobalJObject(JNIEnv* e, jobject obj) : env(e), ref(obj) {
 }
 
 GlobalJObject::~GlobalJObject() {
-  env->DeleteGlobalRef(ref);
+  if (env) {
+    env->DeleteGlobalRef(ref);
+  }
 }
 
 jobject GlobalJObject::GetRef() const {
@@ -883,7 +892,7 @@ JniErrorCode JniContext::DocumentDbConnectionCtor(
   if (!connectionProperties.IsValid()) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg =
-        "Connection Properties and Database Metadata objects must be set.";
+        "Connection Properties object must be set.";
     return errInfo.code;
   }
 
