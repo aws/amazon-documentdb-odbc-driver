@@ -18,6 +18,8 @@
 #include <ignite/odbc/common/concurrent.h>
 #include <ignite/odbc/config/configuration.h>
 #include <ignite/odbc/jni/database_metadata.h>
+#include <ignite/odbc/jni/documentdb_connection_properties.h>
+#include <ignite/odbc/jni/documentdb_database_metadata.h>
 #include <ignite/odbc/jni/java.h>
 
 #ifndef _IGNITE_ODBC_JNI_DOCUMENTDB_CONNECTION
@@ -88,6 +90,21 @@ class DocumentDbConnection {
    * with the value of the local port of SSH tunnel.
    */
   JniErrorCode GetSshLocalPort(int32_t& localPort, JniErrorInfo& errInfo);
+
+  /** 
+   * Gets the connection properties.
+   * 
+   * @return the connection properties
+   */
+  SharedPointer< DocumentDbConnectionProperties > GetConnectionProperties(JniErrorInfo& errInfo);
+
+  /** 
+   * Gets the DocumentDb Database Metadata (different from JDBC Database MetaData)
+   * 
+   * @return the DocumentDb database metadata.
+   */
+  SharedPointer< DocumentDbDatabaseMetadata > GetDatabaseMetadata(
+      JniErrorInfo& errInfo);
 
  private:
   /** The JNI context */

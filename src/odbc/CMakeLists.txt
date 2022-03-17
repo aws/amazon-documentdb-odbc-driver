@@ -72,6 +72,11 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/diagnostic/diagnostic_record_storage.cpp
         src/jni/database_metadata.cpp
         src/jni/documentdb_connection.cpp
+        src/jni/documentdb_connection_properties.cpp
+        src/jni/documentdb_database_metadata.cpp
+        src/jni/documentdb_mql_query_context.cpp
+        src/jni/documentdb_query_mapping_service.cpp
+        src/jni/jdbc_column_metadata.cpp
         src/jni/java.cpp
         src/jni/result_set.cpp
         src/environment.cpp

@@ -126,10 +126,9 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
   /**
    * Constructor.
    */
-  MetaQueriesTestSuiteFixture() : grid(0), cache1(0), cache2(0) {
-  }
+  MetaQueriesTestSuiteFixture() = default;
 
-  bool WasNull(const SQLLEN length) {
+  bool WasNull(const SQLLEN length) const {
     return (length == SQL_NULL_DATA);
   }
 
@@ -221,7 +220,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
                                          const std::string &expName,
                                          SQLSMALLINT expDataType,
                                          SQLULEN expSize, SQLSMALLINT expScale,
-                                         SQLSMALLINT expNullability) {
+                                         SQLSMALLINT expNullability) const {
     std::vector< SQLCHAR > name(ODBC_BUFFER_SIZE);
     SQLSMALLINT nameLen = 0;
     SQLSMALLINT dataType = 0;
@@ -343,7 +342,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     SQLLEN nullability;
 
     SQLRETURN ret = SQLColAttribute(stmt, idx, SQL_DESC_NAME, &name[0],
-                                    (SQLSMALLINT)name.size(), &nameLen, 0);
+                                    (SQLSMALLINT)name.size(), &nameLen, nullptr);
     ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
     ret = SQLColAttribute(stmt, idx, SQL_DESC_TYPE, 0, 0, 0, &dataType);
@@ -451,13 +450,13 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
   }
 
   /** Node started during the test. */
-  Ignite grid;
+  Ignite grid = nullptr;
 
   /** Frist cache instance. */
-  Cache< int64_t, TestType > cache1;
+  Cache< int64_t, TestType > cache1 = nullptr;
 
   /** Second cache instance. */
-  Cache< int64_t, ComplexType > cache2;
+  Cache< int64_t, ComplexType > cache2 = nullptr;
 };
 
 BOOST_FIXTURE_TEST_SUITE(MetaQueriesTestSuite, MetaQueriesTestSuiteFixture)

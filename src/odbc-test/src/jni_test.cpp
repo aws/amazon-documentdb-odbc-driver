@@ -27,6 +27,11 @@
 #include <ignite/odbc/ignite_error.h>
 #include <ignite/odbc/jni/database_metadata.h>
 #include <ignite/odbc/jni/documentdb_connection.h>
+#include <ignite/odbc/jni/documentdb_connection_properties.h>
+#include <ignite/odbc/jni/documentdb_database_metadata.h>
+#include <ignite/odbc/jni/documentdb_mql_query_context.h>
+#include <ignite/odbc/jni/documentdb_query_mapping_service.h>
+#include <ignite/odbc/jni/jdbc_column_metadata.h>
 #include <ignite/odbc/jni/java.h>
 #include <ignite/odbc/jni/result_set.h>
 #include <ignite/odbc/jni/utils.h>
@@ -35,8 +40,10 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/optional.hpp>
+#include <boost/algorithm/string.hpp>
 #include <string>
 #include <vector>
+#include <regex>
 
 #include "odbc_test_suite.h"
 #include "test_utils.h"
@@ -54,6 +61,11 @@ using ignite::odbc::config::Configuration;
 using ignite::odbc::config::ConnectionStringParser;
 using ignite::odbc::jni::DatabaseMetaData;
 using ignite::odbc::jni::DocumentDbConnection;
+using ignite::odbc::jni::DocumentDbConnectionProperties;
+using ignite::odbc::jni::DocumentDbDatabaseMetadata;
+using ignite::odbc::jni::DocumentDbMqlQueryContext;
+using ignite::odbc::jni::DocumentDbQueryMappingService;
+using ignite::odbc::jni::JdbcColumnMetadata;
 using ignite::odbc::jni::ResolveDocumentDbHome;
 using ignite::odbc::jni::ResultSet;
 using ignite::odbc::jni::java::BuildJvmOptions;
@@ -68,8 +80,9 @@ struct JniTestSuiteFixture : OdbcTestSuite {
   using OdbcTestSuite::OdbcTestSuite;
 
   SharedPointer< JniContext > GetJniContext(std::vector< char* >& opts) const {
+    JniErrorInfo errInfo;
     SharedPointer< JniContext > ctx(JniContext::Create(
-        &opts[0], static_cast< int >(opts.size()), JniHandlers()));
+        &opts[0], static_cast< int >(opts.size()), JniHandlers(), errInfo));
     BOOST_CHECK(ctx.Get() != nullptr);
     return ctx;
   }
@@ -109,6 +122,352 @@ struct JniTestSuiteFixture : OdbcTestSuite {
     CleanUpContext();
   }
 
+  void ValidateJdbcColumnMetadata(std::vector< JdbcColumnMetadata >& columnMetadata) const {
+    BOOST_CHECK_EQUAL(13, columnMetadata.size());
+    int32_t index = 0;
+    JdbcColumnMetadata columnMetadataItem = columnMetadata[index];
+    BOOST_CHECK_EQUAL(index, columnMetadataItem.GetOrdinal());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsAutoIncrement());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsCaseSensitive());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsSearchable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsCurrency());
+    BOOST_CHECK_EQUAL(SQL_NO_NULLS, columnMetadataItem.GetNullable());
+    // 'signed' is set to 'true', by default, in Calcite
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsSigned());
+    BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetColumnDisplaySize());
+    BOOST_CHECK_EQUAL("meta_queries_test_001__id", *columnMetadataItem.GetColumnLabel());
+    BOOST_CHECK_EQUAL("meta_queries_test_001__id",
+                      *columnMetadataItem.GetColumnName());
+    BOOST_CHECK_EQUAL("odbc-test", *columnMetadataItem.GetSchemaName());
+    BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetPrecision());
+    BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
+    BOOST_CHECK_EQUAL("meta_queries_test_001",
+                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK(!columnMetadataItem.GetCatalogName());
+    BOOST_CHECK_EQUAL(JDBC_TYPE_VARCHAR, columnMetadataItem.GetColumnType());
+    BOOST_CHECK_EQUAL("VARCHAR", *columnMetadataItem.GetColumnTypeName());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsReadOnly());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsWritable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsDefinitelyWritable());
+    BOOST_CHECK_EQUAL("java.lang.String", *columnMetadataItem.GetColumnClassName());
+
+    index = 1;
+    columnMetadataItem = columnMetadata[index];
+    BOOST_CHECK_EQUAL(index, columnMetadataItem.GetOrdinal());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsAutoIncrement());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsCaseSensitive());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsSearchable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsCurrency());
+    BOOST_CHECK_EQUAL(SQL_NULLABLE, columnMetadataItem.GetNullable());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsSigned());
+    BOOST_CHECK_EQUAL(19, columnMetadataItem.GetColumnDisplaySize());
+    BOOST_CHECK_EQUAL("fieldDecimal128",
+                      *columnMetadataItem.GetColumnLabel());
+    BOOST_CHECK_EQUAL("fieldDecimal128",
+                      *columnMetadataItem.GetColumnName());
+    BOOST_CHECK_EQUAL("odbc-test", *columnMetadataItem.GetSchemaName());
+    BOOST_CHECK_EQUAL(19, columnMetadataItem.GetPrecision());
+    BOOST_CHECK_EQUAL(19, columnMetadataItem.GetScale());
+    BOOST_CHECK_EQUAL("meta_queries_test_001",
+                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK(!columnMetadataItem.GetCatalogName());
+    BOOST_CHECK_EQUAL(JDBC_TYPE_DECIMAL, columnMetadataItem.GetColumnType());
+    BOOST_CHECK_EQUAL("DECIMAL", *columnMetadataItem.GetColumnTypeName());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsReadOnly());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsWritable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsDefinitelyWritable());
+    BOOST_CHECK_EQUAL("java.math.BigDecimal",
+                      *columnMetadataItem.GetColumnClassName());
+
+    index = 2;
+    columnMetadataItem = columnMetadata[index];
+    BOOST_CHECK_EQUAL(index, columnMetadataItem.GetOrdinal());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsAutoIncrement());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsCaseSensitive());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsSearchable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsCurrency());
+    BOOST_CHECK_EQUAL(SQL_NULLABLE, columnMetadataItem.GetNullable());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsSigned());
+    BOOST_CHECK_EQUAL(15, columnMetadataItem.GetColumnDisplaySize());
+    BOOST_CHECK_EQUAL("fieldDouble", *columnMetadataItem.GetColumnLabel());
+    BOOST_CHECK_EQUAL("fieldDouble", *columnMetadataItem.GetColumnName());
+    BOOST_CHECK_EQUAL("odbc-test", *columnMetadataItem.GetSchemaName());
+    BOOST_CHECK_EQUAL(15, columnMetadataItem.GetPrecision());
+    BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
+    BOOST_CHECK_EQUAL("meta_queries_test_001",
+                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK(!columnMetadataItem.GetCatalogName());
+    BOOST_CHECK_EQUAL(JDBC_TYPE_DOUBLE, columnMetadataItem.GetColumnType());
+    BOOST_CHECK_EQUAL("DOUBLE", *columnMetadataItem.GetColumnTypeName());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsReadOnly());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsWritable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsDefinitelyWritable());
+    BOOST_CHECK_EQUAL("java.lang.Double",
+                      *columnMetadataItem.GetColumnClassName());
+
+    index = 3;
+    columnMetadataItem = columnMetadata[index];
+    BOOST_CHECK_EQUAL(index, columnMetadataItem.GetOrdinal());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsAutoIncrement());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsCaseSensitive());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsSearchable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsCurrency());
+    BOOST_CHECK_EQUAL(SQL_NULLABLE, columnMetadataItem.GetNullable());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsSigned());
+    BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetColumnDisplaySize());
+    BOOST_CHECK_EQUAL("fieldString", *columnMetadataItem.GetColumnLabel());
+    BOOST_CHECK_EQUAL("fieldString", *columnMetadataItem.GetColumnName());
+    BOOST_CHECK_EQUAL("odbc-test", *columnMetadataItem.GetSchemaName());
+    BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetPrecision());
+    BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
+    BOOST_CHECK_EQUAL("meta_queries_test_001",
+                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK(!columnMetadataItem.GetCatalogName());
+    BOOST_CHECK_EQUAL(JDBC_TYPE_VARCHAR, columnMetadataItem.GetColumnType());
+    BOOST_CHECK_EQUAL("VARCHAR", *columnMetadataItem.GetColumnTypeName());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsReadOnly());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsWritable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsDefinitelyWritable());
+    BOOST_CHECK_EQUAL("java.lang.String",
+                      *columnMetadataItem.GetColumnClassName());
+
+    index = 4;
+    columnMetadataItem = columnMetadata[index];
+    BOOST_CHECK_EQUAL(index, columnMetadataItem.GetOrdinal());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsAutoIncrement());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsCaseSensitive());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsSearchable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsCurrency());
+    BOOST_CHECK_EQUAL(SQL_NULLABLE, columnMetadataItem.GetNullable());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsSigned());
+    BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetColumnDisplaySize());
+    BOOST_CHECK_EQUAL("fieldObjectId", *columnMetadataItem.GetColumnLabel());
+    BOOST_CHECK_EQUAL("fieldObjectId", *columnMetadataItem.GetColumnName());
+    BOOST_CHECK_EQUAL("odbc-test", *columnMetadataItem.GetSchemaName());
+    BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetPrecision());
+    BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
+    BOOST_CHECK_EQUAL("meta_queries_test_001",
+                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK(!columnMetadataItem.GetCatalogName());
+    BOOST_CHECK_EQUAL(JDBC_TYPE_VARCHAR, columnMetadataItem.GetColumnType());
+    BOOST_CHECK_EQUAL("VARCHAR", *columnMetadataItem.GetColumnTypeName());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsReadOnly());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsWritable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsDefinitelyWritable());
+    BOOST_CHECK_EQUAL("java.lang.String",
+                      *columnMetadataItem.GetColumnClassName());
+
+    index = 5;
+    columnMetadataItem = columnMetadata[index];
+    BOOST_CHECK_EQUAL(index, columnMetadataItem.GetOrdinal());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsAutoIncrement());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsCaseSensitive());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsSearchable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsCurrency());
+    BOOST_CHECK_EQUAL(SQL_NULLABLE, columnMetadataItem.GetNullable());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsSigned());
+    BOOST_CHECK_EQUAL(1, columnMetadataItem.GetColumnDisplaySize());
+    BOOST_CHECK_EQUAL("fieldBoolean", *columnMetadataItem.GetColumnLabel());
+    BOOST_CHECK_EQUAL("fieldBoolean", *columnMetadataItem.GetColumnName());
+    BOOST_CHECK_EQUAL("odbc-test", *columnMetadataItem.GetSchemaName());
+    BOOST_CHECK_EQUAL(1, columnMetadataItem.GetPrecision());
+    BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
+    BOOST_CHECK_EQUAL("meta_queries_test_001",
+                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK(!columnMetadataItem.GetCatalogName());
+    BOOST_CHECK_EQUAL(JDBC_TYPE_BOOLEAN, columnMetadataItem.GetColumnType());
+    BOOST_CHECK_EQUAL("BOOLEAN", *columnMetadataItem.GetColumnTypeName());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsReadOnly());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsWritable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsDefinitelyWritable());
+    BOOST_CHECK_EQUAL("java.lang.Boolean",
+                      *columnMetadataItem.GetColumnClassName());
+
+    index = 6;
+    columnMetadataItem = columnMetadata[index];
+    BOOST_CHECK_EQUAL(index, columnMetadataItem.GetOrdinal());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsAutoIncrement());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsCaseSensitive());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsSearchable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsCurrency());
+    BOOST_CHECK_EQUAL(SQL_NULLABLE, columnMetadataItem.GetNullable());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsSigned());
+    BOOST_CHECK_EQUAL(0, columnMetadataItem.GetColumnDisplaySize());
+    BOOST_CHECK_EQUAL("fieldDate", *columnMetadataItem.GetColumnLabel());
+    BOOST_CHECK_EQUAL("fieldDate", *columnMetadataItem.GetColumnName());
+    BOOST_CHECK_EQUAL("odbc-test", *columnMetadataItem.GetSchemaName());
+    BOOST_CHECK_EQUAL(0, columnMetadataItem.GetPrecision());
+    BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
+    BOOST_CHECK_EQUAL("meta_queries_test_001",
+                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK(!columnMetadataItem.GetCatalogName());
+    BOOST_CHECK_EQUAL(JDBC_TYPE_TIMESTAMP, columnMetadataItem.GetColumnType());
+    BOOST_CHECK_EQUAL("TIMESTAMP", *columnMetadataItem.GetColumnTypeName());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsReadOnly());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsWritable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsDefinitelyWritable());
+    BOOST_CHECK_EQUAL("java.sql.Timestamp",
+                      *columnMetadataItem.GetColumnClassName());
+
+    index = 7;
+    columnMetadataItem = columnMetadata[index];
+    BOOST_CHECK_EQUAL(index, columnMetadataItem.GetOrdinal());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsAutoIncrement());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsCaseSensitive());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsSearchable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsCurrency());
+    BOOST_CHECK_EQUAL(SQL_NULLABLE, columnMetadataItem.GetNullable());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsSigned());
+    BOOST_CHECK_EQUAL(10, columnMetadataItem.GetColumnDisplaySize());
+    BOOST_CHECK_EQUAL("fieldInt", *columnMetadataItem.GetColumnLabel());
+    BOOST_CHECK_EQUAL("fieldInt", *columnMetadataItem.GetColumnName());
+    BOOST_CHECK_EQUAL("odbc-test", *columnMetadataItem.GetSchemaName());
+    BOOST_CHECK_EQUAL(10, columnMetadataItem.GetPrecision());
+    BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
+    BOOST_CHECK_EQUAL("meta_queries_test_001",
+                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK(!columnMetadataItem.GetCatalogName());
+    BOOST_CHECK_EQUAL(JDBC_TYPE_INTEGER, columnMetadataItem.GetColumnType());
+    BOOST_CHECK_EQUAL("INTEGER", *columnMetadataItem.GetColumnTypeName());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsReadOnly());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsWritable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsDefinitelyWritable());
+    BOOST_CHECK_EQUAL("java.lang.Integer",
+                      *columnMetadataItem.GetColumnClassName());
+
+    index = 8;
+    columnMetadataItem = columnMetadata[index];
+    BOOST_CHECK_EQUAL(index, columnMetadataItem.GetOrdinal());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsAutoIncrement());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsCaseSensitive());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsSearchable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsCurrency());
+    BOOST_CHECK_EQUAL(SQL_NULLABLE, columnMetadataItem.GetNullable());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsSigned());
+    BOOST_CHECK_EQUAL(19, columnMetadataItem.GetColumnDisplaySize());
+    BOOST_CHECK_EQUAL("fieldLong", *columnMetadataItem.GetColumnLabel());
+    BOOST_CHECK_EQUAL("fieldLong", *columnMetadataItem.GetColumnName());
+    BOOST_CHECK_EQUAL("odbc-test", *columnMetadataItem.GetSchemaName());
+    BOOST_CHECK_EQUAL(19, columnMetadataItem.GetPrecision());
+    BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
+    BOOST_CHECK_EQUAL("meta_queries_test_001",
+                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK(!columnMetadataItem.GetCatalogName());
+    BOOST_CHECK_EQUAL(JDBC_TYPE_BIGINT, columnMetadataItem.GetColumnType());
+    BOOST_CHECK_EQUAL("BIGINT", *columnMetadataItem.GetColumnTypeName());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsReadOnly());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsWritable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsDefinitelyWritable());
+    BOOST_CHECK_EQUAL("java.lang.Long",
+                      *columnMetadataItem.GetColumnClassName());
+
+    index = 9;
+    columnMetadataItem = columnMetadata[index];
+    BOOST_CHECK_EQUAL(index, columnMetadataItem.GetOrdinal());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsAutoIncrement());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsCaseSensitive());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsSearchable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsCurrency());
+    BOOST_CHECK_EQUAL(SQL_NULLABLE, columnMetadataItem.GetNullable());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsSigned());
+    BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetColumnDisplaySize());
+    BOOST_CHECK_EQUAL("fieldMaxKey", *columnMetadataItem.GetColumnLabel());
+    BOOST_CHECK_EQUAL("fieldMaxKey", *columnMetadataItem.GetColumnName());
+    BOOST_CHECK_EQUAL("odbc-test", *columnMetadataItem.GetSchemaName());
+    BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetPrecision());
+    BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
+    BOOST_CHECK_EQUAL("meta_queries_test_001",
+                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK(!columnMetadataItem.GetCatalogName());
+    BOOST_CHECK_EQUAL(JDBC_TYPE_VARCHAR, columnMetadataItem.GetColumnType());
+    BOOST_CHECK_EQUAL("VARCHAR", *columnMetadataItem.GetColumnTypeName());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsReadOnly());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsWritable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsDefinitelyWritable());
+    BOOST_CHECK_EQUAL("java.lang.String",
+                      *columnMetadataItem.GetColumnClassName());
+
+    index = 10;
+    columnMetadataItem = columnMetadata[index];
+    BOOST_CHECK_EQUAL(index, columnMetadataItem.GetOrdinal());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsAutoIncrement());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsCaseSensitive());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsSearchable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsCurrency());
+    BOOST_CHECK_EQUAL(SQL_NULLABLE, columnMetadataItem.GetNullable());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsSigned());
+    BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetColumnDisplaySize());
+    BOOST_CHECK_EQUAL("fieldMinKey", *columnMetadataItem.GetColumnLabel());
+    BOOST_CHECK_EQUAL("fieldMinKey", *columnMetadataItem.GetColumnName());
+    BOOST_CHECK_EQUAL("odbc-test", *columnMetadataItem.GetSchemaName());
+    BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetPrecision());
+    BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
+    BOOST_CHECK_EQUAL("meta_queries_test_001",
+                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK(!columnMetadataItem.GetCatalogName());
+    BOOST_CHECK_EQUAL(JDBC_TYPE_VARCHAR, columnMetadataItem.GetColumnType());
+    BOOST_CHECK_EQUAL("VARCHAR", *columnMetadataItem.GetColumnTypeName());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsReadOnly());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsWritable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsDefinitelyWritable());
+    BOOST_CHECK_EQUAL("java.lang.String",
+                      *columnMetadataItem.GetColumnClassName());
+
+    index = 11;
+    columnMetadataItem = columnMetadata[index];
+    BOOST_CHECK_EQUAL(index, columnMetadataItem.GetOrdinal());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsAutoIncrement());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsCaseSensitive());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsSearchable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsCurrency());
+    BOOST_CHECK_EQUAL(SQL_NULLABLE, columnMetadataItem.GetNullable());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsSigned());
+    // This seems odd
+    BOOST_CHECK_EQUAL(-1, columnMetadataItem.GetColumnDisplaySize());
+    BOOST_CHECK_EQUAL("fieldNull", *columnMetadataItem.GetColumnLabel());
+    BOOST_CHECK_EQUAL("fieldNull", *columnMetadataItem.GetColumnName());
+    BOOST_CHECK_EQUAL("odbc-test", *columnMetadataItem.GetSchemaName());
+    BOOST_CHECK_EQUAL(0, columnMetadataItem.GetPrecision());
+    BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
+    BOOST_CHECK_EQUAL("meta_queries_test_001",
+                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK(!columnMetadataItem.GetCatalogName());
+    BOOST_CHECK_EQUAL(JDBC_TYPE_VARCHAR, columnMetadataItem.GetColumnType());
+    BOOST_CHECK_EQUAL("VARCHAR", *columnMetadataItem.GetColumnTypeName());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsReadOnly());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsWritable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsDefinitelyWritable());
+    BOOST_CHECK_EQUAL("java.lang.String",
+                      *columnMetadataItem.GetColumnClassName());
+
+    index = 12;
+    columnMetadataItem = columnMetadata[index];
+    BOOST_CHECK_EQUAL(index, columnMetadataItem.GetOrdinal());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsAutoIncrement());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsCaseSensitive());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsSearchable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsCurrency());
+    BOOST_CHECK_EQUAL(SQL_NULLABLE, columnMetadataItem.GetNullable());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsSigned());
+    // This seems odd
+    BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetColumnDisplaySize());
+    BOOST_CHECK_EQUAL("fieldBinary", *columnMetadataItem.GetColumnLabel());
+    BOOST_CHECK_EQUAL("fieldBinary", *columnMetadataItem.GetColumnName());
+    BOOST_CHECK_EQUAL("odbc-test", *columnMetadataItem.GetSchemaName());
+    BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetPrecision());
+    BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
+    BOOST_CHECK_EQUAL("meta_queries_test_001",
+                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK(!columnMetadataItem.GetCatalogName());
+    BOOST_CHECK_EQUAL(JDBC_TYPE_VARBINARY, columnMetadataItem.GetColumnType());
+    BOOST_CHECK_EQUAL("VARBINARY", *columnMetadataItem.GetColumnTypeName());
+    BOOST_CHECK_EQUAL(true, columnMetadataItem.IsReadOnly());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsWritable());
+    BOOST_CHECK_EQUAL(false, columnMetadataItem.IsDefinitelyWritable());
+    BOOST_CHECK_EQUAL("[B",
+                      *columnMetadataItem.GetColumnClassName());
+  }
+  
   bool _prepared = false;
 
   std::string _jdbcConnectionString;
@@ -483,6 +842,82 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
         BOOST_FAIL(errInfo.errMsg);
     }
     BOOST_CHECK(!dbConnection.IsOpen());
+}
+
+BOOST_AUTO_TEST_CASE(TestDocumentDbGetMqlQueryContext) {
+  PrepareContext();
+  BOOST_REQUIRE(_ctx.Get() != nullptr);
+
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, "odbc-test");
+
+  Configuration config;
+  ConnectionStringParser parser(config);
+  parser.ParseConnectionString(dsnConnectionString, nullptr);
+  JniErrorInfo errInfo;
+  DocumentDbConnection dbConnection(_ctx);
+  dbConnection.Open(config, errInfo);
+  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS == errInfo.code);
+
+  SharedPointer< DocumentDbConnectionProperties > connectionProperties =
+      dbConnection.GetConnectionProperties(errInfo);
+  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS == errInfo.code);
+  BOOST_CHECK(connectionProperties.IsValid());
+
+  SharedPointer< DocumentDbDatabaseMetadata > databaseMetadata =
+      dbConnection.GetDatabaseMetadata(errInfo);
+  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS == errInfo.code);
+  BOOST_CHECK(databaseMetadata.IsValid());
+
+  SharedPointer< DocumentDbQueryMappingService > queryMappingService =
+      DocumentDbQueryMappingService::Create(connectionProperties,
+                                            databaseMetadata, errInfo);
+  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS == errInfo.code);
+  BOOST_CHECK(queryMappingService.IsValid());
+
+  SharedPointer< DocumentDbMqlQueryContext > queryContext =
+      queryMappingService.Get()->GetMqlQueryContext(
+          "SELECT * FROM \"meta_queries_test_001\"", 0, errInfo);
+  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS == errInfo.code);
+  BOOST_REQUIRE(queryContext.IsValid());
+  std::vector< JdbcColumnMetadata > columnMetadata =
+      queryContext.Get()->GetColumnMetadata();
+  ValidateJdbcColumnMetadata(columnMetadata);
+  BOOST_CHECK_EQUAL("meta_queries_test_001",
+                    queryContext.Get()->GetCollectionName());
+  BOOST_CHECK_EQUAL(13, queryContext.Get()->GetPaths().size());
+  BOOST_CHECK_EQUAL(
+      1, queryContext.Get()->GetAggregateOperations().size());
+  BOOST_CHECK_EQUAL(
+      "{\"$project\": {"
+      "\"meta_queries_test_001__id\": \"$_id\", "
+      "\"fieldDecimal128\": \"$fieldDecimal128\", "
+      "\"fieldDouble\": \"$fieldDouble\", "
+      "\"fieldString\": \"$fieldString\", "
+      "\"fieldObjectId\": \"$fieldObjectId\", "
+      "\"fieldBoolean\": \"$fieldBoolean\", "
+      "\"fieldDate\": \"$fieldDate\", "
+      "\"fieldInt\": \"$fieldInt\", "
+      "\"fieldLong\": \"$fieldLong\", "
+      "\"fieldMaxKey\": \"$fieldMaxKey\", "
+      "\"fieldMinKey\": \"$fieldMinKey\", "
+      "\"fieldNull\": \"$fieldNull\", "
+      "\"fieldBinary\": \"$fieldBinary\", "
+      "\"_id\": {\"$numberInt\": \"0\"}}}",
+      queryContext.Get()->GetAggregateOperations()[0]);
+
+  // Test invalid table name will produce error.
+  SharedPointer< DocumentDbMqlQueryContext > queryContext2 =
+      queryMappingService.Get()->GetMqlQueryContext(
+          "SELECT * FROM \"meta_queries_test_001_xxx\"", 0, errInfo);
+  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS != errInfo.code);
+  std::string modErrMsg = errInfo.errMsg;
+  boost::erase_all(modErrMsg, "\r");
+  boost::erase_all(modErrMsg, "\n");
+  BOOST_CHECK(std::regex_match(
+      modErrMsg, std::regex("^Unable to parse SQL.*"
+                            "Object 'meta_queries_test_001_xxx' not found'$")));
+  BOOST_CHECK(!queryContext2.IsValid());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
