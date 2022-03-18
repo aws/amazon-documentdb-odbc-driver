@@ -65,7 +65,7 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/impl/interop/interop_output_stream.cpp
         src/impl/interop/interop_input_stream.cpp
         src/connection.cpp
-        src/driverInstance.cpp
+        src/driver_instance.cpp
         src/cursor.cpp
         src/diagnostic/diagnosable_adapter.cpp
         src/diagnostic/diagnostic_record.cpp
