@@ -87,7 +87,7 @@ set(SOURCES
          ../odbc/src/impl/interop/interop_output_stream.cpp
          ../odbc/src/impl/interop/interop_input_stream.cpp
          ../odbc/src/connection.cpp
-         ../odbc/src/driverInstance.cpp
+         ../odbc/src/driver_instance.cpp
          ../odbc/src/cursor.cpp
          ../odbc/src/diagnostic/diagnosable_adapter.cpp
          ../odbc/src/diagnostic/diagnostic_record_storage.cpp
