@@ -637,7 +637,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
 
   std::string catalog;
   std::string schemaPattern = DATABASE_NAME;
-  std::string tablePattern = "jni\\_test\\_001";
+  std::string tablePattern = "jni_test_001";
   std::string columnNamePattern;
   SharedPointer< ResultSet > resultSet = databaseMetaData.Get()->GetColumns(
       catalog, schemaPattern, tablePattern, columnNamePattern, errInfo);
