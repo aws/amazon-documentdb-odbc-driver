@@ -29,6 +29,8 @@
 #include "ignite/odbc/end_point.h"
 #include "ignite/odbc/jni/database_metadata.h"
 #include "ignite/odbc/jni/documentdb_connection.h"
+#include "ignite/odbc/jni/documentdb_connection_properties.h"
+#include "ignite/odbc/jni/documentdb_database_metadata.h"
 #include "ignite/odbc/jni/java.h"
 #include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/parser.h"
@@ -37,6 +39,8 @@
 using ignite::odbc::common::concurrent::SharedPointer;
 using ignite::odbc::jni::DatabaseMetaData;
 using ignite::odbc::jni::DocumentDbConnection;
+using ignite::odbc::jni::DocumentDbConnectionProperties;
+using ignite::odbc::jni::DocumentDbDatabaseMetadata;
 using ignite::odbc::jni::java::GlobalJObject;
 using ignite::odbc::jni::java::JniContext;
 
@@ -125,6 +129,21 @@ class Connection : public diagnostic::DiagnosableAdapter {
    * @return SharedPointer to DatabaseMetaData.
    */
   SharedPointer< DatabaseMetaData > GetMetaData(IgniteError& err);
+
+  /**
+   * Gets the DocumentDB database metadata for the connection.
+   *
+   * @return SharedPointer to DocumentDbDatabaseMetadata.
+   */
+  SharedPointer< DocumentDbDatabaseMetadata > GetDatabaseMetadata(IgniteError& err);
+
+  /**
+   * Gets the DocumentDB connection properties.
+   *
+   * @return SharedPointer to DocumentDbConnectionProperties.
+   */
+  SharedPointer< DocumentDbConnectionProperties > GetConnectionProperties(
+      IgniteError& err);
 
   /**
    * Get name of the assotiated schema.

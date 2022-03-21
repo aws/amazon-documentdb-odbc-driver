@@ -21,6 +21,9 @@
 #include "ignite/odbc/app/parameter_set.h"
 #include "ignite/odbc/cursor.h"
 #include "ignite/odbc/query/query.h"
+#include "ignite/odbc/jni/documentdb_mql_query_context.h"
+
+using ignite::odbc::jni::DocumentDbMqlQueryContext;
 
 namespace ignite {
 namespace odbc {
@@ -159,6 +162,16 @@ class DataQuery : public Query {
    * @return Result.
    */
   SqlResult::Type MakeRequestFetch();
+
+
+  /**
+   * Gets the MQL query context.
+   *
+   * @return Result.
+   */
+  SqlResult::Type GetMqlQueryContext(
+      SharedPointer< DocumentDbMqlQueryContext >& mqlQueryContext,
+      IgniteError& error);
 
   /**
    * Make next result set request and use response to set internal state.
