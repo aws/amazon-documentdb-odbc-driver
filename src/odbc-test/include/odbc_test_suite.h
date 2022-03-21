@@ -24,8 +24,10 @@
 
 #include <sql.h>
 #include <sqlext.h>
-
+#include <string>
 #include <boost/test/unit_test.hpp>
+
+#include <ignite/odbc/common/platform_utils.h>
 
 #ifndef BOOST_TEST_CONTEXT
 #define BOOST_TEST_CONTEXT(...)
@@ -35,7 +37,8 @@
 #define BOOST_TEST_INFO(...)
 #endif
 
-#include <string>
+using ignite::odbc::common::GetEnv;
+using boost::unit_test::test_unit_id;
 
 namespace ignite {
 namespace odbc {
@@ -354,16 +357,19 @@ struct OdbcTestSuite {
   /**
    * Creates the standard DSN connection string.
    */
-  void CreateDsnConnectionString(
-      std::string& connectionString,
-      const std::string& username = std::string(), bool sshTunnel = true,
+  void CreateDsnConnectionStringForRemoteServer(
+      std::string& connectionString, bool sshTunnel = true,
+      const std::string& username = std::string(),
       const std::string& miscOptions = std::string()) const;
 
   /**
    * Creates the standard DSN connection string for use with local instance.
    */
   void CreateDsnConnectionStringForLocalServer(
-      std::string& connectionString, const std::string& databaseName) const;
+      std::string& connectionString, 
+      const std::string& databaseName = "",
+      const std::string& userName = "",
+      const std::string& miscOptions = "") const;
 
   /** ODBC Environment. */
   SQLHENV env;
@@ -373,6 +379,20 @@ struct OdbcTestSuite {
 
   /** ODBC Statement. */
   SQLHSTMT stmt;
+};
+
+struct if_integration {
+  const std::string DOCUMENTDB_ODBC_TEST_INTEGRATION =
+      "DOCUMENTDB_ODBC_TEST_INTEGRATION";
+  const std::string DOCUMENTDB_ODBC_TEST_INTEGRATION_OFF = "0";
+  const std::string DOCUMENTDB_ODBC_TEST_INTEGRATION_FALSE = "false";
+
+  boost::test_tools::assertion_result operator()(test_unit_id) const {
+    std::string runIntegrationTests = GetEnv(
+        DOCUMENTDB_ODBC_TEST_INTEGRATION, DOCUMENTDB_ODBC_TEST_INTEGRATION_OFF);
+    return runIntegrationTests != DOCUMENTDB_ODBC_TEST_INTEGRATION_OFF
+           && runIntegrationTests != DOCUMENTDB_ODBC_TEST_INTEGRATION_FALSE;
+  }
 };
 }  // namespace odbc
 }  // namespace ignite
