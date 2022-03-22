@@ -794,8 +794,8 @@ void OdbcTestSuite::InsertNonFullBatchSelect(int recordsNum, int splitAt) {
   BOOST_CHECK_EQUAL(recordsNum, selectedRecordsNum);
 }
 
-void OdbcTestSuite::CreateDsnConnectionString(
-    std::string& connectionString, const std::string& username, bool sshTunnel,
+void OdbcTestSuite::CreateDsnConnectionStringForRemoteServer(
+    std::string& connectionString, bool sshTunnel, const std::string& username,
     const std::string& miscOptions) const {
   std::string user = common::GetEnv("DOC_DB_USER_NAME", "documentdb");
   std::string password = common::GetEnv("DOC_DB_PASSWORD", "");
@@ -840,19 +840,28 @@ void OdbcTestSuite::CreateDsnConnectionString(
 }
 
 void OdbcTestSuite::CreateDsnConnectionStringForLocalServer(
-    std::string& connectionString, const std::string& databaseName) const {
-  std::string user = common::GetEnv("DOC_DB_USER_NAME", "documentdb");
+    std::string& connectionString, const std::string& databaseName,
+    const std::string& userName, const std::string& miscOptions) const {
+  std::string user = userName.size() > 0
+                         ? userName
+                         : common::GetEnv("DOC_DB_USER_NAME", "documentdb");
   std::string password = common::GetEnv("DOC_DB_PASSWORD", "");
   std::string host = "localhost";
   std::string port = "27017";
+  std::string database =
+      databaseName.size() > 0 ? databaseName : "odbc-test";
 
   connectionString =
     "DRIVER={Amazon DocumentDB};"
     "HOSTNAME=" + host + ":" + port + ";"
-    "DATABASE=" + databaseName + ";"
+    "DATABASE=" + database + ";"
     "USER=" + user + ";"
     "PASSWORD=" + password + ";"
     "TLS=false;";
+
+  if (miscOptions.size() > 0) {
+    connectionString.append(miscOptions);
+  }
 }
 }  // namespace odbc
 }  // namespace ignite

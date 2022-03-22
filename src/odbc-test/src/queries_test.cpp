@@ -218,8 +218,7 @@ BOOST_FIXTURE_TEST_SUITE(QueriesTestSuite, QueriesTestSuiteFixture)
 
 BOOST_AUTO_TEST_CASE(TestEmptyResult) {
   std::string dsnConnectionString;
-  std::string databaseName = "odbc-test";
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
   Connect(dsnConnectionString);
   SQLRETURN ret;
   char request[] = "SELECT * FROM queries_test_001";
