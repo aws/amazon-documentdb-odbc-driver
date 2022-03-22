@@ -15,9 +15,11 @@
  * limitations under the License.
  */
 
-#include <mongocxx/options/aggregate.hpp>
+#include "ignite/odbc/query/data_query.h"
+
 #include <mongocxx/collection.hpp>
 #include <mongocxx/database.hpp>
+#include <mongocxx/options/aggregate.hpp>
 #include <mongocxx/pipeline.hpp>
 
 #include "ignite/odbc/connection.h"
@@ -27,7 +29,6 @@
 #include "ignite/odbc/message.h"
 #include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/query/batch_query.h"
-#include "ignite/odbc/query/data_query.h"
 
 using ignite::odbc::jni::DocumentDbConnectionProperties;
 using ignite::odbc::jni::DocumentDbDatabaseMetadata;
@@ -243,9 +244,9 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
   return SqlResult::AI_SUCCESS;
 }
 
- SqlResult::Type DataQuery::GetMqlQueryContext(
-    SharedPointer< DocumentDbMqlQueryContext >& mqlQueryContext, IgniteError& error) {
-
+SqlResult::Type DataQuery::GetMqlQueryContext(
+    SharedPointer< DocumentDbMqlQueryContext >& mqlQueryContext,
+    IgniteError& error) {
   SharedPointer< DocumentDbConnectionProperties > connectionProperties =
       connection.GetConnectionProperties(error);
   if (error.GetCode() != IgniteError::IGNITE_SUCCESS) {
@@ -273,8 +274,8 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
     return SqlResult::AI_ERROR;
   }
   return SqlResult::AI_SUCCESS;
- }
-    SqlResult::Type DataQuery::MakeRequestMoreResults() {
+}
+SqlResult::Type DataQuery::MakeRequestMoreResults() {
   // TODO: AD-604 - MakeRequestExecute
   // https://bitquill.atlassian.net/browse/AD-604
   return SqlResult::AI_SUCCESS;
