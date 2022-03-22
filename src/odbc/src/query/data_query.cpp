@@ -15,13 +15,24 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/query/data_query.h"
+#include <mongocxx/options/aggregate.hpp>
+#include <mongocxx/collection.hpp>
+#include <mongocxx/database.hpp>
+#include <mongocxx/pipeline.hpp>
 
 #include "ignite/odbc/connection.h"
+#include "ignite/odbc/jni/documentdb_mql_query_context.h"
+#include "ignite/odbc/jni/documentdb_query_mapping_service.h"
 #include "ignite/odbc/log.h"
 #include "ignite/odbc/message.h"
 #include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/query/batch_query.h"
+#include "ignite/odbc/query/data_query.h"
+
+using ignite::odbc::jni::DocumentDbConnectionProperties;
+using ignite::odbc::jni::DocumentDbDatabaseMetadata;
+using ignite::odbc::jni::DocumentDbMqlQueryContext;
+using ignite::odbc::jni::DocumentDbQueryMappingService;
 
 namespace ignite {
 namespace odbc {
@@ -228,10 +239,42 @@ SqlResult::Type DataQuery::MakeRequestClose() {
 SqlResult::Type DataQuery::MakeRequestFetch() {
   // TODO: AD-604 - MakeRequestExecute
   // https://bitquill.atlassian.net/browse/AD-604
+
   return SqlResult::AI_SUCCESS;
 }
 
-SqlResult::Type DataQuery::MakeRequestMoreResults() {
+ SqlResult::Type DataQuery::GetMqlQueryContext(
+    SharedPointer< DocumentDbMqlQueryContext >& mqlQueryContext, IgniteError& error) {
+
+  SharedPointer< DocumentDbConnectionProperties > connectionProperties =
+      connection.GetConnectionProperties(error);
+  if (error.GetCode() != IgniteError::IGNITE_SUCCESS) {
+    return SqlResult::AI_ERROR;
+  }
+  SharedPointer< DocumentDbDatabaseMetadata > databaseMetadata =
+      connection.GetDatabaseMetadata(error);
+  if (error.GetCode() != IgniteError::IGNITE_SUCCESS) {
+    return SqlResult::AI_ERROR;
+  }
+  JniErrorInfo errInfo;
+  SharedPointer< DocumentDbQueryMappingService > queryMappingService =
+      DocumentDbQueryMappingService::Create(connectionProperties,
+                                            databaseMetadata, errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    IgniteError::SetError(errInfo.code, errInfo.errCls.c_str(),
+                          errInfo.errMsg.c_str(), error);
+    return SqlResult::AI_ERROR;
+  }
+  mqlQueryContext =
+      queryMappingService.Get()->GetMqlQueryContext(sql, 0, errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    IgniteError::SetError(errInfo.code, errInfo.errCls.c_str(),
+                          errInfo.errMsg.c_str(), error);
+    return SqlResult::AI_ERROR;
+  }
+  return SqlResult::AI_SUCCESS;
+ }
+    SqlResult::Type DataQuery::MakeRequestMoreResults() {
   // TODO: AD-604 - MakeRequestExecute
   // https://bitquill.atlassian.net/browse/AD-604
   return SqlResult::AI_SUCCESS;
