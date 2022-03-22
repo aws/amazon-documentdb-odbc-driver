@@ -228,6 +228,56 @@ SqlResult::Type DataQuery::MakeRequestExecute() {
   // https://bitquill.atlassian.net/browse/AD-604
   cursor.reset(new Cursor(0L));
   rowsAffectedIdx = 0;
+  // SetResultsetMeta(rsp.GetMeta());// original ignite code
+  return SqlResult::AI_SUCCESS;
+
+  // -AL- original ignite code
+  const std::string& schema = connection.GetSchema();
+
+  QueryExecuteRequest req(schema, sql, params, timeout,
+                          connection.IsAutoCommit());
+  QueryExecuteResponse rsp;
+
+  try {
+    // Setting connection timeout to 1 second more than query timeout itself.
+    int32_t connectionTimeout = timeout ? timeout + 1 : 0;
+
+    bool success = connection.SyncMessage(req, rsp, connectionTimeout);
+
+    if (!success) {
+      diag.AddStatusRecord(SqlState::SHYT00_TIMEOUT_EXPIRED,
+                           "Query timeout expired");
+
+      return SqlResult::AI_ERROR;
+    }
+  } catch (const OdbcError& err) {
+    diag.AddStatusRecord(err);
+
+    return SqlResult::AI_ERROR;
+  } catch (const IgniteError& err) {
+    diag.AddStatusRecord(err.GetText());
+
+    return SqlResult::AI_ERROR;
+  }
+
+  if (rsp.GetStatus() != ResponseStatus::SUCCESS) {
+    LOG_MSG("Error: " << rsp.GetError());
+
+    diag.AddStatusRecord(ResponseStatusToSqlState(rsp.GetStatus()),
+                         rsp.GetError());
+
+    return SqlResult::AI_ERROR;
+  }
+
+  rowsAffected = rsp.GetAffectedRows();
+  SetResultsetMeta(rsp.GetMeta());
+
+  LOG_MSG("Query id: " << rsp.GetQueryId());
+  LOG_MSG("Affected Rows list size: " << rowsAffected.size());
+
+  cursor.reset(new Cursor(rsp.GetQueryId()));
+
+  rowsAffectedIdx = 0;
 
   return SqlResult::AI_SUCCESS;
 }
