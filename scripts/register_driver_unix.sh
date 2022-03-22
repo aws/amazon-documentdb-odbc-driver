@@ -14,6 +14,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   ODBC_LIB_FILENAME="$ODBC_LIB_PATH/libignite-odbc.so"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   ODBC_LIB_FILENAME="$ODBC_LIB_PATH/libignite-odbc.dylib"
+fi
 
 
 if [ ! -f "$ODBC_LIB_FILENAME" ]

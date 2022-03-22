@@ -76,7 +76,6 @@ jobs:
         sudo make install
         git clone https://github.com/mongodb/mongo-cxx-driver.git       --branch releases/stable --depth 1
         cd mongo-cxx-driver/build
-        apt-get install build-essential python
         cmake ..       -DCMAKE_BUILD_TYPE=Release       -DBSONCXX_POLY_USE_MNMLSTC=1  -DCMAKE_INSTALL_PREFIX=/usr/local
         sudo make install
 
