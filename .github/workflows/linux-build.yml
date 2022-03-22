@@ -85,7 +85,7 @@ jobs:
 
     - name: register-odbc-driver
       run: |
-        chmod +x scripts/register_driver_macos.sh
+        chmod +x scripts/register_driver_unix.sh
         ./scripts/register_driver_unix.sh
 
     - name: run-tests
