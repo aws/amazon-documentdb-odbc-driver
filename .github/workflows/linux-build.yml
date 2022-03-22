@@ -63,7 +63,7 @@ jobs:
       if: success()
       run: |
         sudo apt update
-        sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib linux-headers-$(uname -r) build-essential valgrind libboost-all-dev libmongoc-1.0-0 libbson-1.0-0 libsasl2-dev
+        sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib linux-headers-$(uname -r) build-essential valgrind libboost-all-dev libmongoc-1.0-0 libbson-1.0-0 libsasl2-dev lcov
 
     - name: build-and-install-mongocxx
       run: |
