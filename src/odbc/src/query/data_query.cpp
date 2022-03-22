@@ -228,6 +228,7 @@ SqlResult::Type DataQuery::MakeRequestExecute() {
   // https://bitquill.atlassian.net/browse/AD-604
   cursor.reset(new Cursor(0L));
   rowsAffectedIdx = 0;
+  MakeRequestResultsetMeta();
   // SetResultsetMeta(rsp.GetMeta());// original ignite code
   return SqlResult::AI_SUCCESS;
 
