@@ -26,12 +26,14 @@
 
 #include "ignite/odbc/impl/binary/binary_reader_impl.h"
 #include "ignite/odbc/common_types.h"
+#include "ignite/odbc/jni/jdbc_column_metadata.h"
 #include "ignite/odbc/jni/result_set.h"
 #include "ignite/odbc/protocol_version.h"
 #include "ignite/odbc/utility.h"
 
 using ignite::odbc::jni::ResultSet;
 using ignite::odbc::jni::java::JniErrorInfo;
+using ignite::odbc::jni::JdbcColumnMetadata;
 
 namespace ignite {
 namespace odbc {
@@ -155,6 +157,14 @@ class ColumnMeta {
    */
   void Read(SharedPointer< ResultSet >& resultSet, int32_t& prevPosition,
             JniErrorInfo& errInfo);
+
+  /**
+   * Read using reader.
+   * @param jdbcMetadata JdbcColumnMetadata.
+   * @param prevPosition the ordinal position of the previous column.
+   * @paran err IgniteError.
+   */
+  void ReadJdbcMetadata(JdbcColumnMetadata& jdbcMetadata, int32_t& prevPosition);
 
   /**
    * Get catalog name.

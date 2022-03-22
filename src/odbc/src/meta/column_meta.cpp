@@ -127,6 +127,22 @@ void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
   }
 }
 
+void ColumnMeta::ReadJdbcMetadata(JdbcColumnMetadata& jdbcMetadata,
+                              int32_t& prevPosition) {
+  catalogName = jdbcMetadata.GetCatalogName();
+  schemaName = jdbcMetadata.GetSchemaName();
+  tableName = jdbcMetadata.GetTableName();
+  columnName = jdbcMetadata.GetColumnName();
+  dataType = jdbcMetadata.GetColumnType();
+  nullability = jdbcMetadata.GetNullable();
+  ordinalPosition = jdbcMetadata.GetOrdinal();
+  if (!ordinalPosition) {
+    ordinalPosition = ++prevPosition;
+  } else {
+    prevPosition = *ordinalPosition;
+  }
+}
+
 bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
   using namespace ignite::odbc::impl::binary;
 
