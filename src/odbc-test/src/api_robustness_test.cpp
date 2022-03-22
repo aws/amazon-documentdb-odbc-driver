@@ -148,8 +148,7 @@ BOOST_FIXTURE_TEST_SUITE(ApiRobustnessTestSuite, ApiRobustnessTestSuiteFixture)
 
 BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeysEmpty) {
   std::string dsnConnectionString;
-  std::string databaseName = "odbc-test";
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
@@ -347,8 +346,7 @@ BOOST_AUTO_TEST_CASE(TestSQLExtendedFetch, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestSQLNumResultColsStub) {
   // Test for stubbed functionality.
   std::string dsnConnectionString;
-  std::string databaseName = "odbc-test";
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
