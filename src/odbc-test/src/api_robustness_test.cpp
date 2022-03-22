@@ -344,8 +344,7 @@ BOOST_AUTO_TEST_CASE(TestSQLExtendedFetch, *disabled()) {
   SQLExtendedFetch(stmt, SQL_FETCH_NEXT, 0, 0, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLNumResultColsStub) {
-  // Test for stubbed functionality.
+BOOST_AUTO_TEST_CASE(TestSQLNumResultCols) {
   std::string dsnConnectionString;
   std::string databaseName = "odbc-test";
   CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
@@ -363,9 +362,9 @@ BOOST_AUTO_TEST_CASE(TestSQLNumResultColsStub) {
   // Everything is ok.
   ret = SQLNumResultCols(stmt, &columnCount);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
-  BOOST_CHECK_EQUAL(0, columnCount);
+  BOOST_CHECK_EQUAL(13, columnCount);
 
-  // Column count is null.
+  // Column count is not null.
   SQLNumResultCols(stmt, 0);
 }
 
