@@ -212,7 +212,7 @@ class DataQuery : public Query {
    *
    * @param jdbcMetaVector JdbcColumnMetadata vector.
    */
-  void DataQuery::ReadJdbcColumnMetadataVector(
+  void ReadJdbcColumnMetadataVector(
       std::vector< JdbcColumnMetadata > jdbcVector);
 
   /**
