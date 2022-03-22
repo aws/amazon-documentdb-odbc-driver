@@ -372,9 +372,7 @@ SqlResult::Type DataQuery::MakeRequestResultsetMeta() {
 
 void DataQuery::ReadJdbcColumnMetadataVector(
     std::vector< JdbcColumnMetadata > jdbcVector) {
-    using ignite::odbc::meta::ColumnMeta;
-  resultMeta;  // do things with this var. Reference:
-               // column_meta::ReadColumnMetaVector -AL-
+  using ignite::odbc::meta::ColumnMeta;
   resultMeta.clear();
 
   if (jdbcVector.empty()) {
