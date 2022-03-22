@@ -34,6 +34,7 @@ using ignite::odbc::jni::DocumentDbConnectionProperties;
 using ignite::odbc::jni::DocumentDbDatabaseMetadata;
 using ignite::odbc::jni::DocumentDbMqlQueryContext;
 using ignite::odbc::jni::DocumentDbQueryMappingService;
+using ignite::odbc::jni::JdbcColumnMetadata;
 
 namespace ignite {
 namespace odbc {
@@ -284,9 +285,110 @@ SqlResult::Type DataQuery::MakeRequestMoreResults() {
 SqlResult::Type DataQuery::MakeRequestResultsetMeta() {
   // TODO: AD-604 - MakeRequestExecute
   // https://bitquill.atlassian.net/browse/AD-604
-  resultMeta.clear();
-  resultMetaAvailable = true;
+  IgniteError error;
+  SharedPointer< DocumentDbMqlQueryContext > mqlQueryContext;
+  SqlResult::Type sqlRes = GetMqlQueryContext(mqlQueryContext, error);
+  if (!mqlQueryContext.IsValid() || sqlRes != SqlResult::AI_SUCCESS) {
+    // todo: do something with IgniteError
+    diag.AddStatusRecord(error.GetText());
+    return sqlRes;
+  }
+
+  ReadJdbcColumnMetadataVector(mqlQueryContext.Get()->GetColumnMetadata());
+  // -AL-:
+  // plan: implement/find jni call that receive sql query to output metadata
+  // think I shouldn't need to implement more stuff:
+  // m_DocumentDbMqlQueryContextGetColumnMetadata might be the one in the
+  // current jni, we don't have sqlQuery but we do have mql query idea: call
+  // DocumentDbMqlQueryContext(sql string, maxRowCount (an int)) to get
+  // DocumentDbMqlQueryContext object Java doc: the DocumentDbMqlQueryContext
+  // object includes the target collection, aggregation stages, and result set
+  // metadata get resultset metadata from the DocumentDbMqlQueryContext object
+  // [jni: DocumentdbMqlQueryContextGetColumnMetadata], implemented in [AD-545]
+  // ^ .java: queryContext.getColumnMetaData() is enough.
+
+  /*
+  * old column_metadata code for reference
+  *
+  JniErrorInfo errInfo;
+  SharedPointer< ResultSet > resultSet = databaseMetaData.Get()->GetColumns(
+      catalog, schema, table, column, errInfo);
+  if (!resultSet.IsValid()
+      || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    diag.AddStatusRecord(errInfo.errMsg);
+    return SqlResult::AI_ERROR;
+  }
+  if (!resultSet.IsValid()
+      || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    diag.AddStatusRecord(errInfo.errMsg);
+    return SqlResult::AI_ERROR;
+  }
+
+  meta::ReadColumnMetaVector(resultSet, resultMeta);
+  */
+
   return SqlResult::AI_SUCCESS;
+
+  // original ignite code -AL-
+  const std::string& schema = connection.GetSchema();
+
+  QueryGetResultsetMetaRequest req(schema, sql);
+  QueryGetResultsetMetaResponse rsp;
+
+  try {
+    // Setting connection timeout to 1 second more than query timeout itself.
+    int32_t connectionTimeout = timeout ? timeout + 1 : 0;
+    bool success = connection.SyncMessage(req, rsp, connectionTimeout);
+
+    if (!success) {
+      diag.AddStatusRecord(SqlState::SHYT00_TIMEOUT_EXPIRED,
+                           "Query timeout expired");
+
+      return SqlResult::AI_ERROR;
+    }
+  } catch (const OdbcError& err) {
+    diag.AddStatusRecord(err);
+
+    return SqlResult::AI_ERROR;
+  } catch (const IgniteError& err) {
+    diag.AddStatusRecord(err.GetText());
+
+    return SqlResult::AI_ERROR;
+  }
+
+  if (rsp.GetStatus() != ResponseStatus::SUCCESS) {
+    LOG_MSG("Error: " << rsp.GetError());
+
+    diag.AddStatusRecord(ResponseStatusToSqlState(rsp.GetStatus()),
+                         rsp.GetError());
+
+    return SqlResult::AI_ERROR;
+  }
+
+  SetResultsetMeta(rsp.GetMeta());
+
+  return SqlResult::AI_SUCCESS;
+}
+
+void DataQuery::ReadJdbcColumnMetadataVector(
+    std::vector< JdbcColumnMetadata > jdbcVector) {
+    using ignite::odbc::meta::ColumnMeta;
+  resultMeta;  // do things with this var. Reference:
+               // column_meta::ReadColumnMetaVector -AL-
+  resultMeta.clear();
+
+  if (jdbcVector.empty()) {
+    return;
+  }
+
+  IgniteError error;
+  int32_t prevPosition = 0;
+  for (JdbcColumnMetadata jdbcMetadata : jdbcVector) {
+
+    resultMeta.emplace_back(ColumnMeta());
+    resultMeta.back().ReadJdbcMetadata(jdbcMetadata, prevPosition);
+  }
+  resultMetaAvailable = true;
 }
 
 SqlResult::Type DataQuery::ProcessConversionResult(

@@ -206,6 +206,15 @@ class DataQuery : public Query {
    */
   void SetResultsetMeta(const meta::ColumnMetaVector& value);
 
+
+  /**
+   * Set result set meta by reading Jdbc column metadata vector.
+   *
+   * @param jdbcMetaVector JdbcColumnMetadata vector.
+   */
+  void DataQuery::ReadJdbcColumnMetadataVector(
+      std::vector< JdbcColumnMetadata > jdbcVector);
+
   /**
    * Close query.
    *
