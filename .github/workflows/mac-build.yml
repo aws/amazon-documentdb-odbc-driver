@@ -74,8 +74,8 @@ jobs:
     #     mkdir ${{ github.workspace }}/odbc-logs
     - name: register-odbc-driver
       run: |
-        chmod +x scripts/register_driver_macos.sh
-        ./scripts/register_driver_macos.sh
+        chmod +x scripts/register_driver_unix.sh
+        ./scripts/register_driver_unix.sh
     - name: Setup MongoDB
       run: |
         chmod +x ./src/odbc-test/scripts/reinstall_mongodb_mac.sh
