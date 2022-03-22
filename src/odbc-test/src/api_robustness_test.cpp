@@ -368,7 +368,7 @@ BOOST_AUTO_TEST_CASE(TestSQLNumResultCols) {
   SQLNumResultCols(stmt, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLNumResultCols, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestIgniteSQLNumResultCols, *disabled()) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
