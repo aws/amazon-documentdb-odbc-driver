@@ -228,7 +228,16 @@ SqlResult::Type DataQuery::MakeRequestExecute() {
   // https://bitquill.atlassian.net/browse/AD-604
   cursor.reset(new Cursor(0L));
   rowsAffectedIdx = 0;
-  MakeRequestResultsetMeta();
+
+  IgniteError error;
+  SharedPointer< DocumentDbMqlQueryContext > mqlQueryContext;
+  SqlResult::Type sqlRes = GetMqlQueryContext(mqlQueryContext, error);
+  if (!mqlQueryContext.IsValid() || sqlRes != SqlResult::AI_SUCCESS) {
+    diag.AddStatusRecord(error.GetText());
+    return SqlResult::AI_ERROR;
+  }
+  ReadJdbcColumnMetadataVector(mqlQueryContext.Get()->GetColumnMetadata());
+
   return SqlResult::AI_SUCCESS;
 }
 
