@@ -340,9 +340,8 @@ SqlResult::Type DataQuery::MakeRequestResultsetMeta() {
   SharedPointer< DocumentDbMqlQueryContext > mqlQueryContext;
   SqlResult::Type sqlRes = GetMqlQueryContext(mqlQueryContext, error);
   if (!mqlQueryContext.IsValid() || sqlRes != SqlResult::AI_SUCCESS) {
-    // todo: do something with IgniteError
     diag.AddStatusRecord(error.GetText());
-    return sqlRes;
+    return SqlResult::AI_ERROR;
   }
 
   ReadJdbcColumnMetadataVector(mqlQueryContext.Get()->GetColumnMetadata());
