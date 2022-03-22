@@ -39,6 +39,7 @@
 
 using ignite::odbc::OdbcTestSuite;
 using namespace boost::unit_test;
+using ignite::odbc::if_integration;
 
 using ignite::odbc::common::ReleaseChars;
 using ignite::odbc::config::ConnectionStringParser;
@@ -53,6 +54,8 @@ using ignite::odbc::jni::java::JniHandlers;
 struct JavaTestSuiteFixture : OdbcTestSuite {
   using OdbcTestSuite::OdbcTestSuite;
 
+  const std::string DATABASE_NAME = "odbc-test";
+
   SharedPointer< JniContext > GetJniContext(std::vector< char* >& opts) const {
     JniErrorInfo errInfo;
     SharedPointer< JniContext > ctx(JniContext::Create(
@@ -61,9 +64,14 @@ struct JavaTestSuiteFixture : OdbcTestSuite {
     return ctx;
   }
 
-  std::string GetJdbcConnectionString() const {
+  std::string GetJdbcConnectionString(bool isIntegration,
+                                      bool isInternalSshTunnel) const {
     std::string dsnConnectionString;
-    CreateDsnConnectionString(dsnConnectionString);
+    if (isIntegration) {
+      CreateDsnConnectionStringForRemoteServer(dsnConnectionString, isInternalSshTunnel);
+    } else {
+      CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+    }
 
     Configuration config;
     ConnectionStringParser parser(config);
@@ -72,9 +80,9 @@ struct JavaTestSuiteFixture : OdbcTestSuite {
     return jdbcConnectionString;
   }
 
-  void PrepareContext() {
+  void PrepareContext(bool isIntegration = false, bool isInternalSshTunnel = false) {
     if (!_prepared) {
-      _jdbcConnectionString = GetJdbcConnectionString();
+      _jdbcConnectionString = GetJdbcConnectionString(isIntegration, isInternalSshTunnel);
       std::string cp = ResolveDocumentDbHome();
       BuildJvmOptions(cp, _opts);
       _ctx = GetJniContext(_opts);
@@ -170,8 +178,9 @@ BOOST_AUTO_TEST_CASE(TestDriverManagerGetConnection) {
   connection = SharedPointer< GlobalJObject >(nullptr);
 }
 
-BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPort) {
-  PrepareContext();
+BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPort,
+                     *precondition(if_integration())) {
+  PrepareContext(true, true);  // remote, internal SSH tunnel
   BOOST_REQUIRE(_ctx.Get() != nullptr);
 
   // get Driver manager connection
@@ -208,14 +217,9 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPort) {
   BOOST_CHECK(port > 0);
 }
 
-// TODO Enable when we can get external SSH tunnel working
 BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPortSshTunnelNotActive,
-                     *disabled()) {
-  // BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPortSshTunnelNotActive)
-  // {
-  // test when SSH tunnel is not active, the SSH tunnel port should be 0
-  // TODO do things so SSH tunnel is not active, but connection is open
-  PrepareContext();
+                     *precondition(if_integration())) {
+  PrepareContext(true, false);  // remote, external SSH tunnel
   BOOST_REQUIRE(_ctx.Get() != nullptr);
 
   // get Driver manager connection
@@ -411,7 +415,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(value);
-    BOOST_REQUIRE(*value == "test");
+    BOOST_REQUIRE(*value == DATABASE_NAME);
 
     // TABLE_SCHEM (i.e., database)
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_SCHEM", value, 
@@ -421,7 +425,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
       BOOST_FAIL(errMsg);
     }
     BOOST_REQUIRE(value);
-    BOOST_REQUIRE(*value == "test");
+    BOOST_REQUIRE(*value == DATABASE_NAME);
 
     // TABLE_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 3, value,  errInfo)
@@ -531,7 +535,6 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
   }
   BOOST_REQUIRE(hasNext);
 
-  std::string databaseName = "test";
   int i = 1;
   while (hasNext) {
     boost::optional<std::string> value;
@@ -561,7 +564,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
       BOOST_FAIL(errMsg);
     }
     BOOST_CHECK(value);
-    BOOST_CHECK_EQUAL(databaseName, *value);
+    BOOST_CHECK_EQUAL(DATABASE_NAME, *value);
 
     // TABLE_SCHEM (i.e., database)
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_SCHEM", value, 
@@ -571,7 +574,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
       BOOST_FAIL(errMsg);
     }
     BOOST_CHECK(value);
-    BOOST_CHECK_EQUAL(databaseName, *value);
+    BOOST_CHECK_EQUAL(DATABASE_NAME, *value);
 
     // TABLE_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 3, value,  errInfo)
