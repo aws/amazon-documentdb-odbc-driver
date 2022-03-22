@@ -229,57 +229,6 @@ SqlResult::Type DataQuery::MakeRequestExecute() {
   cursor.reset(new Cursor(0L));
   rowsAffectedIdx = 0;
   MakeRequestResultsetMeta();
-  // SetResultsetMeta(rsp.GetMeta());// original ignite code
-  return SqlResult::AI_SUCCESS;
-
-  // -AL- original ignite code
-  const std::string& schema = connection.GetSchema();
-
-  QueryExecuteRequest req(schema, sql, params, timeout,
-                          connection.IsAutoCommit());
-  QueryExecuteResponse rsp;
-
-  try {
-    // Setting connection timeout to 1 second more than query timeout itself.
-    int32_t connectionTimeout = timeout ? timeout + 1 : 0;
-
-    bool success = connection.SyncMessage(req, rsp, connectionTimeout);
-
-    if (!success) {
-      diag.AddStatusRecord(SqlState::SHYT00_TIMEOUT_EXPIRED,
-                           "Query timeout expired");
-
-      return SqlResult::AI_ERROR;
-    }
-  } catch (const OdbcError& err) {
-    diag.AddStatusRecord(err);
-
-    return SqlResult::AI_ERROR;
-  } catch (const IgniteError& err) {
-    diag.AddStatusRecord(err.GetText());
-
-    return SqlResult::AI_ERROR;
-  }
-
-  if (rsp.GetStatus() != ResponseStatus::SUCCESS) {
-    LOG_MSG("Error: " << rsp.GetError());
-
-    diag.AddStatusRecord(ResponseStatusToSqlState(rsp.GetStatus()),
-                         rsp.GetError());
-
-    return SqlResult::AI_ERROR;
-  }
-
-  rowsAffected = rsp.GetAffectedRows();
-  SetResultsetMeta(rsp.GetMeta());
-
-  LOG_MSG("Query id: " << rsp.GetQueryId());
-  LOG_MSG("Affected Rows list size: " << rowsAffected.size());
-
-  cursor.reset(new Cursor(rsp.GetQueryId()));
-
-  rowsAffectedIdx = 0;
-
   return SqlResult::AI_SUCCESS;
 }
 
@@ -343,80 +292,7 @@ SqlResult::Type DataQuery::MakeRequestResultsetMeta() {
     diag.AddStatusRecord(error.GetText());
     return SqlResult::AI_ERROR;
   }
-
   ReadJdbcColumnMetadataVector(mqlQueryContext.Get()->GetColumnMetadata());
-  // -AL-:
-  // plan: implement/find jni call that receive sql query to output metadata
-  // think I shouldn't need to implement more stuff:
-  // m_DocumentDbMqlQueryContextGetColumnMetadata might be the one in the
-  // current jni, we don't have sqlQuery but we do have mql query idea: call
-  // DocumentDbMqlQueryContext(sql string, maxRowCount (an int)) to get
-  // DocumentDbMqlQueryContext object Java doc: the DocumentDbMqlQueryContext
-  // object includes the target collection, aggregation stages, and result set
-  // metadata get resultset metadata from the DocumentDbMqlQueryContext object
-  // [jni: DocumentdbMqlQueryContextGetColumnMetadata], implemented in [AD-545]
-  // ^ .java: queryContext.getColumnMetaData() is enough.
-
-  /*
-  * old column_metadata code for reference
-  *
-  JniErrorInfo errInfo;
-  SharedPointer< ResultSet > resultSet = databaseMetaData.Get()->GetColumns(
-      catalog, schema, table, column, errInfo);
-  if (!resultSet.IsValid()
-      || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    diag.AddStatusRecord(errInfo.errMsg);
-    return SqlResult::AI_ERROR;
-  }
-  if (!resultSet.IsValid()
-      || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    diag.AddStatusRecord(errInfo.errMsg);
-    return SqlResult::AI_ERROR;
-  }
-
-  meta::ReadColumnMetaVector(resultSet, resultMeta);
-  */
-
-  return SqlResult::AI_SUCCESS;
-
-  // original ignite code -AL-
-  const std::string& schema = connection.GetSchema();
-
-  QueryGetResultsetMetaRequest req(schema, sql);
-  QueryGetResultsetMetaResponse rsp;
-
-  try {
-    // Setting connection timeout to 1 second more than query timeout itself.
-    int32_t connectionTimeout = timeout ? timeout + 1 : 0;
-    bool success = connection.SyncMessage(req, rsp, connectionTimeout);
-
-    if (!success) {
-      diag.AddStatusRecord(SqlState::SHYT00_TIMEOUT_EXPIRED,
-                           "Query timeout expired");
-
-      return SqlResult::AI_ERROR;
-    }
-  } catch (const OdbcError& err) {
-    diag.AddStatusRecord(err);
-
-    return SqlResult::AI_ERROR;
-  } catch (const IgniteError& err) {
-    diag.AddStatusRecord(err.GetText());
-
-    return SqlResult::AI_ERROR;
-  }
-
-  if (rsp.GetStatus() != ResponseStatus::SUCCESS) {
-    LOG_MSG("Error: " << rsp.GetError());
-
-    diag.AddStatusRecord(ResponseStatusToSqlState(rsp.GetStatus()),
-                         rsp.GetError());
-
-    return SqlResult::AI_ERROR;
-  }
-
-  SetResultsetMeta(rsp.GetMeta());
-
   return SqlResult::AI_SUCCESS;
 }
 
