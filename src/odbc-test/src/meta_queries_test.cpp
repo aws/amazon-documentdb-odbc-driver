@@ -710,12 +710,12 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithGetTypeInfo, *disabled()) {
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOne) {
   std::string dsnConnectionString;
-  CreateDsnConnectionString(dsnConnectionString);
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
   SQLCHAR empty[] = "";
-  SQLCHAR table[] = "test";
+  SQLCHAR table[] = "meta_queries_test_001";
 
   SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
                             SQL_NTS, empty, SQL_NTS);
@@ -723,7 +723,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOne) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  CheckSingleRowResultSetWithGetData(stmt, 2, "test");
+  CheckSingleRowResultSetWithGetData(stmt, 3, (const char*)table);
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneFromLocalServer) {
@@ -731,8 +731,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneFromLocalServer) {
   SQLCHAR table[] = "meta_queries_test_001";
 
   std::string dsnConnectionString;
-  std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
@@ -751,8 +750,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneWithTableTypes) {
   SQLCHAR tableTypes[] = "TABLE,VIEW"; // Test that VIEW type is ignored by JDBC
 
   std::string dsnConnectionString;
-  std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
@@ -919,8 +917,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneForQuotedTypes) {
   SQLCHAR tableTypes[] = "'TABLE' , 'VIEW'";  // Test that quoted values are handled
 
   std::string dsnConnectionString;
-  std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
@@ -939,8 +936,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsNoneForUnsupportedTableType) {
   SQLCHAR tableTypes[] = "VIEW";
 
   std::string dsnConnectionString;
-  std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
@@ -955,7 +951,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsNoneForUnsupportedTableType) {
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsNone) {
   std::string dsnConnectionString;
-  CreateDsnConnectionString(dsnConnectionString);
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
@@ -975,7 +971,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsNone) {
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsMany) {
   std::string dsnConnectionString;
-  CreateDsnConnectionString(dsnConnectionString);
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
@@ -1019,7 +1015,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsOneFromLocalServer) {
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsNone) {
   std::string dsnConnectionString;
-  CreateDsnConnectionString(dsnConnectionString);
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
@@ -1040,7 +1036,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsNone) {
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsMany) {
   std::string dsnConnectionString;
-  CreateDsnConnectionString(dsnConnectionString);
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
@@ -1064,12 +1060,12 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsMany) {
 
 BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   std::string dsnConnectionString;
-  CreateDsnConnectionString(dsnConnectionString);
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
   Connect(dsnConnectionString);
 
   SQLCHAR empty[] = "";
-  SQLCHAR table[] = "test";
-  SQLCHAR column[] = "test__id";
+  SQLCHAR table[] = "meta_queries_test_001";
+  SQLCHAR column[] = "meta_queries_test_001__id";
 
   SQLRETURN ret = SQL_SUCCESS;
 
@@ -1141,11 +1137,11 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
       true, WasNull(table_cat_len));
   BOOST_CHECK_EQUAL("", table_cat);    // TABLE_CAT
   BOOST_CHECK_EQUAL(false, WasNull(table_schem_len));
-  BOOST_CHECK_EQUAL("test", table_schem);  // TABLE_SCHEM
+  BOOST_CHECK_EQUAL("odbc-test", table_schem);  // TABLE_SCHEM
   BOOST_CHECK_EQUAL(false, WasNull(table_name_len));
-  BOOST_CHECK_EQUAL("test", table_name);  // TABLE_NAME
+  BOOST_CHECK_EQUAL("meta_queries_test_001", table_name);  // TABLE_NAME
   BOOST_CHECK_EQUAL(false, WasNull(column_name_len));
-  BOOST_CHECK_EQUAL("test__id", column_name);  // COLUMN_NAME
+  BOOST_CHECK_EQUAL("meta_queries_test_001__id", column_name);  // COLUMN_NAME
   BOOST_CHECK_EQUAL(false, WasNull(data_type_len));
   BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);  // DATA_TYPE
   BOOST_CHECK_EQUAL(false, WasNull(type_name_len));

@@ -22,6 +22,8 @@ SSH host credentials
 2. `DOC_DB_PRIV_KEY_FILE`=`<path_to_ssh_host_private_key_file>`(e.g.:`~/.ssh/ssh_host.pem`)
 
 ### Running an SSH tunnel for Testing
+By default, remote integration tests are not run. To enable remote integration tests, 
+set the environment variable `DOC_DB_ODBC_INTEGRATION_TEST=1`
 To run tests that require an external SSH tunnel, you will need to start an SSH tunnel using the same values as the environment variables set in the previous section. 
 If the local port is a value other than 27019, set `DOC_DB_LOCAL_PORT` to that value. 
 If the remote port is a value other than 27017, set `DOC_DB_REMOTE_PORT` to that value. 
