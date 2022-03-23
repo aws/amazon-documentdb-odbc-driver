@@ -85,6 +85,7 @@ jobs:
 
     - name: register-odbc-driver
       run: |
+        chmod +r -R ${{env.ODBC_LIB_PATH}}
         chmod +x scripts/register_driver_unix.sh
         ./scripts/register_driver_unix.sh
 
