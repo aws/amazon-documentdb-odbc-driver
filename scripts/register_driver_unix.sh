@@ -33,9 +33,9 @@ cat "$ODBC_LIB_PATH/ignite-odbc-install.ini"
 ls -lrt "$ODBC_LIB_PATH"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  sudo odbcinst -i -d                   -f "$ODBC_LIB_PATH/ignite-odbc-install.ini"
+  sudo odbcinst -i -d -f "$ODBC_LIB_PATH/ignite-odbc-install.ini"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-  odbcinst -i -d                   -f "$ODBC_LIB_PATH/ignite-odbc-install.ini"
+  odbcinst -i -d -f "$ODBC_LIB_PATH/ignite-odbc-install.ini"
 fi
 
 

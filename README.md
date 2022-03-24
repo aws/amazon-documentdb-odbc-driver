@@ -101,12 +101,29 @@ Example:
    2. Navigate to the `build/odbc/lib` folder to use the generated files.
 3. Set the environment variable `DOCUMENTDB_HOME`. On a developer's machine, set it to `<repo-folder>/build/odbc/bin`
 4. Run the following command to register the ODBC driver. 
-   `./scripts/register_driver_macos.sh`
+   `./scripts/register_driver_unix.sh`
 5. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
-### Linux
+### Linux (Ubuntu 64bit)
 
-TBD
+1. Build docker image
+   1. Navigate Dockerfile folder `cd docker/linux-enviroment`
+   2. Build the docker image E.g.: `docker build -t documentdb-dev-linux .`
+2. Ensure that you already have a mongoDB running Run mongoDB locally or run mongoDB in a container. E.g. `docker run --name mongo -e MONGO_INITDB_ROOT_USERNAME=$DOC_DB_USER_NAME -e MONGO_INITDB_ROOT_PASSWORD=$DOC_DB_PASSWORD -d -p 27017:27017 mongo:latest`
+3. Run docker container with interactive mode. If you are running mondoDB in the host `docker run --add-host host.docker.internal:host-gateway -v <local path of documentdb odbc repo>:/documentdb-odbc -it documentdb-dev-linux`
+4. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release64.sh`
+6. Run the following command to register the ODBC driver. 
+   `./scripts/register_driver_unix.sh`
+7. Copy from the host to the container the keys to access DocumentDB and ssh tunnel.
+   E.g. `docker cp ~/.ssh/rds-ca-2019-root.pem f3a1c14ea426:/root/.ssh/ds-ca-2019-root.pem`
+   E.g. `docker cp ~/.ssh/ssh-tunnel.pem f3a1c14ea426:/root/.ssh/ssh-tunnel.pem`
+7. Run local ssh tunnel.
+8. Set environment variables for testing.
+   1. set LOCAL_DATABASE_HOST with the ip of your local mongo
+      E.g. If is in another docker container `export LOCAL_DATABASE_HOST=<ip from the mongo docker container>` or if is your host machine `export LOCAL_DATABASE_HOST=host.docker.internal`
+9. You are ready to run the tests.
+   E.g. `/documentdb-odbc/build/odbc/bin/ignite-odbc-tests`
+10. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
 ### Troubleshooting 
 
