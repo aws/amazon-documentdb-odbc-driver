@@ -226,7 +226,7 @@ void Statement::SetAttribute(int attr, void* value, SQLINTEGER valueLen) {
 SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
                                                 SQLINTEGER) {
   switch (attr) {
-    case SQL_ATTR_ROW_ARRAY_SIZE: { // -AL- a place where row array size is obtained, and SQL_ATTR_ROW_ARRAY_SIZE is referenced
+    case SQL_ATTR_ROW_ARRAY_SIZE: {
       SqlUlen val = reinterpret_cast< SqlUlen >(value);
 
       LOG_MSG("SQL_ATTR_ROW_ARRAY_SIZE: " << val);
@@ -237,9 +237,9 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
 
         return SqlResult::AI_ERROR;
       }
-      LOG_MSG("\nstatement.cpp- val: " << val);
+
       rowArraySize = val;
-      LOG_MSG("\nstatement.cpp line 241- rowArraySize: " << rowArraySize);
+
       break;
     }
 
@@ -388,7 +388,7 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
       break;
     }
 
-    case SQL_ATTR_ROW_ARRAY_SIZE: { // -AL-  SQL_ATTR_ROW_ARRAY_SIZE referenced
+    case SQL_ATTR_ROW_ARRAY_SIZE: {
       SQLINTEGER* val = reinterpret_cast< SQLINTEGER* >(buf);
 
       *val = static_cast< SQLINTEGER >(rowArraySize); 
@@ -964,10 +964,8 @@ SqlResult::Type Statement::InternalFetchRow() {
 
   SQLINTEGER fetched = 0;
   SQLINTEGER errors = 0;
-  LOG_MSG("\nline 967- rowArraySize: " << rowArraySize);
-  for (SqlUlen i = 0; i < rowArraySize; ++i) { // rowArraySize is used, which Tableau setting this to a big number 
-      // it was messing things up, if rowArraySize is set as default, we're able to get the metadata, otherwise the driver will disconnect
-      // driver has run time exception
+
+  for (SqlUlen i = 0; i < rowArraySize; ++i) {
     for (app::ColumnBindingMap::iterator it = columnBindings.begin();
          it != columnBindings.end(); ++it)
       it->second.SetElementOffset(i);
