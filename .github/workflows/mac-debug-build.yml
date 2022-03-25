@@ -51,7 +51,7 @@ jobs:
       run: |
         mkdir -p cache/jar
         cd cache/jar
-        wget https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/vd{{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
+        wget https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
 
     - name: Install DocumentDB JDBC JAR
       run: |
