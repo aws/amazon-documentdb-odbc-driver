@@ -75,12 +75,12 @@ jobs:
         key: ${{ runner.os }}-build-and-install-mongocxx
 
     - name: build-and-install-mongocxx
-      if: steps.cache-build-and-install-mongocxx.outputs.cache-hit != 'true'
+      # if: steps.cache-build-and-install-mongocxx.outputs.cache-hit != 'true'
       run: |
         wget https://github.com/mongodb/mongo-c-driver/releases/download/1.21.1/mongo-c-driver-1.21.1.tar.gz
         tar xzf mongo-c-driver-1.21.1.tar.gz
         cd mongo-c-driver-1.21.1
-        mkdir cmake-build
+        mkdir -p cmake-build
         cd cmake-build
         cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
         sudo make install
@@ -90,14 +90,14 @@ jobs:
         cmake ..       -DCMAKE_BUILD_TYPE=Release       -DBSONCXX_POLY_USE_MNMLSTC=1  -DCMAKE_INSTALL_PREFIX=/usr/local
         sudo make install
     
-    - name: install-mongocxx
-      run: |
-        cd mongo-c-driver-1.21.1/cmake-build
-        sudo make install
-        cd ../../
-        cd mongo-cxx-driver/build
-        cmake ..       -DCMAKE_BUILD_TYPE=Release       -DBSONCXX_POLY_USE_MNMLSTC=1  -DCMAKE_INSTALL_PREFIX=/usr/local
-        sudo make install
+    # - name: install-mongocxx
+    #   run: |
+    #     cd mongo-c-driver-1.21.1/cmake-build
+    #     sudo make install
+    #     cd ../../
+    #     cd mongo-cxx-driver/build
+    #     cmake ..       -DCMAKE_BUILD_TYPE=Release       -DBSONCXX_POLY_USE_MNMLSTC=1  -DCMAKE_INSTALL_PREFIX=/usr/local
+    #     sudo make install
         
     - name: configure-and-build-driver
       run: |
