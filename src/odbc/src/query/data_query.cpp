@@ -20,6 +20,11 @@
 #include <mongocxx/database.hpp>
 #include <mongocxx/pipeline.hpp>
 
+#include <mongocxx/collection.hpp>
+#include <mongocxx/database.hpp>
+#include <mongocxx/options/aggregate.hpp>
+#include <mongocxx/pipeline.hpp>
+
 #include "ignite/odbc/connection.h"
 #include "ignite/odbc/jni/documentdb_mql_query_context.h"
 #include "ignite/odbc/jni/documentdb_query_mapping_service.h"
@@ -33,6 +38,7 @@ using ignite::odbc::jni::DocumentDbConnectionProperties;
 using ignite::odbc::jni::DocumentDbDatabaseMetadata;
 using ignite::odbc::jni::DocumentDbMqlQueryContext;
 using ignite::odbc::jni::DocumentDbQueryMappingService;
+using ignite::odbc::jni::JdbcColumnMetadata;
 
 namespace ignite {
 namespace odbc {
@@ -227,6 +233,16 @@ SqlResult::Type DataQuery::MakeRequestExecute() {
   cursor.reset(new Cursor(0L));
   rowsAffectedIdx = 0;
 
+  IgniteError error;
+  SharedPointer< DocumentDbMqlQueryContext > mqlQueryContext;
+  SqlResult::Type sqlRes = GetMqlQueryContext(mqlQueryContext, error);
+  if (!mqlQueryContext.IsValid() || sqlRes != SqlResult::AI_SUCCESS) {
+    diag.AddStatusRecord(error.GetText());
+    return SqlResult::AI_ERROR;
+  }
+
+  ReadJdbcColumnMetadataVector(mqlQueryContext.Get()->GetColumnMetadata());
+
   return SqlResult::AI_SUCCESS;
 }
 
@@ -243,9 +259,9 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
   return SqlResult::AI_SUCCESS;
 }
 
- SqlResult::Type DataQuery::GetMqlQueryContext(
-    SharedPointer< DocumentDbMqlQueryContext >& mqlQueryContext, IgniteError& error) {
-
+SqlResult::Type DataQuery::GetMqlQueryContext(
+    SharedPointer< DocumentDbMqlQueryContext >& mqlQueryContext,
+    IgniteError& error) {
   SharedPointer< DocumentDbConnectionProperties > connectionProperties =
       connection.GetConnectionProperties(error);
   if (error.GetCode() != IgniteError::IGNITE_SUCCESS) {
@@ -273,8 +289,8 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
     return SqlResult::AI_ERROR;
   }
   return SqlResult::AI_SUCCESS;
- }
-    SqlResult::Type DataQuery::MakeRequestMoreResults() {
+}
+SqlResult::Type DataQuery::MakeRequestMoreResults() {
   // TODO: AD-604 - MakeRequestExecute
   // https://bitquill.atlassian.net/browse/AD-604
   return SqlResult::AI_SUCCESS;
@@ -283,9 +299,34 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
 SqlResult::Type DataQuery::MakeRequestResultsetMeta() {
   // TODO: AD-604 - MakeRequestExecute
   // https://bitquill.atlassian.net/browse/AD-604
-  resultMeta.clear();
-  resultMetaAvailable = true;
+  IgniteError error;
+  SharedPointer< DocumentDbMqlQueryContext > mqlQueryContext;
+  SqlResult::Type sqlRes = GetMqlQueryContext(mqlQueryContext, error);
+  if (!mqlQueryContext.IsValid() || sqlRes != SqlResult::AI_SUCCESS) {
+    diag.AddStatusRecord(error.GetText());
+    return SqlResult::AI_ERROR;
+  }
+  ReadJdbcColumnMetadataVector(mqlQueryContext.Get()->GetColumnMetadata());
   return SqlResult::AI_SUCCESS;
+}
+
+void DataQuery::ReadJdbcColumnMetadataVector(
+    std::vector< JdbcColumnMetadata > jdbcVector) {
+  using ignite::odbc::meta::ColumnMeta;
+  resultMeta.clear();
+
+  if (jdbcVector.empty()) {
+    return;
+  }
+
+  IgniteError error;
+  int32_t prevPosition = 0;
+  for (JdbcColumnMetadata jdbcMetadata : jdbcVector) {
+
+    resultMeta.emplace_back(ColumnMeta());
+    resultMeta.back().ReadJdbcMetadata(jdbcMetadata, prevPosition);
+  }
+  resultMetaAvailable = true;
 }
 
 SqlResult::Type DataQuery::ProcessConversionResult(

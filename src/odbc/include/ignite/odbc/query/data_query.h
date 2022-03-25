@@ -200,14 +200,20 @@ class DataQuery : public Query {
   ;
 
   /**
-   * Process column conversion operation result.
+   * Set result set meta. 
    *
-   * @param convRes Conversion result.
-   * @param rowIdx Row index.
-   * @param columnIdx Column index.
-   * @return General SQL result.
+   * @param value Metadata value.
    */
   void SetResultsetMeta(const meta::ColumnMetaVector& value);
+
+
+  /**
+   * Set result set meta by reading Jdbc column metadata vector.
+   *
+   * @param jdbcMetaVector JdbcColumnMetadata vector.
+   */
+  void ReadJdbcColumnMetadataVector(
+      std::vector< JdbcColumnMetadata > jdbcVector);
 
   /**
    * Close query.

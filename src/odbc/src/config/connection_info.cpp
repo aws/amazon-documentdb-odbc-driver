@@ -616,7 +616,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // quoted (delimited) identifier in SQL statements. Identifiers passed as
   // arguments to ODBC functions do not have to be quoted. If the data source
   // does not support quoted identifiers, a blank is returned.
-  strParams[SQL_IDENTIFIER_QUOTE_CHAR] = "";
+  strParams[SQL_IDENTIFIER_QUOTE_CHAR] = "\"";
 #endif  // SQL_IDENTIFIER_QUOTE_CHAR
 
 #ifdef SQL_CATALOG_NAME_SEPARATOR

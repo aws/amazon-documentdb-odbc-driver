@@ -391,7 +391,7 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
     case SQL_ATTR_ROW_ARRAY_SIZE: {
       SQLINTEGER* val = reinterpret_cast< SQLINTEGER* >(buf);
 
-      *val = static_cast< SQLINTEGER >(1);
+      *val = static_cast< SQLINTEGER >(rowArraySize); 
 
       if (valueLen)
         *valueLen = SQL_IS_INTEGER;
