@@ -134,6 +134,8 @@ void ColumnMeta::ReadJdbcMetadata(JdbcColumnMetadata& jdbcMetadata,
   tableName = jdbcMetadata.GetTableName();
   columnName = jdbcMetadata.GetColumnName();
   dataType = jdbcMetadata.GetColumnType();
+  precision = jdbcMetadata.GetPrecision();
+  scale = jdbcMetadata.GetScale();
   nullability = jdbcMetadata.GetNullable();
   ordinalPosition = jdbcMetadata.GetOrdinal();
   if (!ordinalPosition) {
