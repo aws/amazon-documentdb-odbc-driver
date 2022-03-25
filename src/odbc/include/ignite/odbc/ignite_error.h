@@ -141,6 +141,15 @@ class IGNITE_IMPORT_EXPORT IgniteError : public std::exception {
   /** JNI error: getting database metadata */
   static const int IGNITE_ERR_JNI_GET_DATABASE_METADATA = 101;
 
+  /** JNI error: getting DocumentDB database metadata */
+  static const int IGNITE_ERR_JNI_GET_DOCUMENTDB_DATABASE_METADATA = 102;
+
+  /** JNI error: getting DocumentDB connection properties */
+  static const int IGNITE_ERR_JNI_GET_DOCUMENTDB_CONNECTION_PROPERTIES = 103;
+
+  /** JNI error: creating DocumentDB query mapping service */
+  static const int IGNITE_ERR_JNI_GET_DOCUMENTDB_QUERY_MAPPING_SERVICE = 104;
+
   /** Memory operation error. */
   static const int IGNITE_ERR_MEMORY = 1001;
 
