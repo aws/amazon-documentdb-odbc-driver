@@ -716,8 +716,7 @@ SqlResult::Type Statement::ProcessInternalQuery() {
   std::unique_ptr< query::Query > newQry(
       new query::StreamingQuery(*this, connection, parameters));
 
-  std::swap(currentQuery, newQry); 
-  // -AL- maybe I should change it to move? if compiler is fine then it should be ok?
+  std::swap(currentQuery, newQry);
 
   return SqlResult::AI_SUCCESS;
 }

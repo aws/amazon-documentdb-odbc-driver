@@ -110,8 +110,7 @@ class Cursor {
   int32_t currentPagePos;
 
   /** Current row. */
-  std::unique_ptr< Row > currentRow; 
-  // -AL- only resets for this variable, so it should be unique pointer?
+  std::unique_ptr< Row > currentRow;
 };
 }  // namespace odbc
 }  // namespace ignite
