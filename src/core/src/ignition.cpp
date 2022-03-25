@@ -278,7 +278,7 @@ namespace ignite
         // This is the instance with manual control over lifetime which is we
         // going to pass to Java if Java object is constructed and initialized
         // successfully.
-        std::auto_ptr< SharedPointer<IgniteEnvironment> > envGuard(new SharedPointer<IgniteEnvironment>(env));
+        std::unique_ptr< SharedPointer<IgniteEnvironment> > envGuard(new SharedPointer<IgniteEnvironment>(env));
 
         SharedPointer<JniContext> ctx(
             JniContext::Create(opts.GetOpts(), opts.GetSize(), env.Get()->GetJniHandlers(envGuard.get()), &jniErr));

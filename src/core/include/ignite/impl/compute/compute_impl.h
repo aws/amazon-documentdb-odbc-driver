@@ -409,7 +409,7 @@ namespace ignite
                     jobject target = InStreamOutObject(Operation::EXEC_ASYNC, *mem.Get(), err);
                     IgniteError::ThrowIfNeeded(err);
 
-                    std::auto_ptr<common::Cancelable> cancelable(new CancelableImpl(GetEnvironmentPointer(), target));
+                    std::shared_ptr<common::Cancelable> cancelable(new CancelableImpl(GetEnvironmentPointer(), target));
 
                     common::Promise<R>& promise = task.Get()->GetPromise();
                     promise.SetCancelTarget(cancelable);
@@ -444,7 +444,7 @@ namespace ignite
 
                     int64_t taskHandle = GetEnvironment().GetHandleRegistry().Allocate(task);
 
-                    std::auto_ptr<common::Cancelable> cancelable = PerformTask(operation, jobHandle, taskHandle, func);
+                    std::shared_ptr<common::Cancelable> cancelable = PerformTask(operation, jobHandle, taskHandle, func);
 
                     common::Promise<R>& promise = taskPtr->GetPromise();
                     promise.SetCancelTarget(cancelable);
@@ -465,7 +465,7 @@ namespace ignite
                  * @return Cancelable auto pointer.
                  */
                 template<typename F>
-                std::auto_ptr<common::Cancelable> PerformTask(Operation::Type operation, int64_t jobHandle,
+                std::shared_ptr<common::Cancelable> PerformTask(Operation::Type operation, int64_t jobHandle,
                     int64_t taskHandle, const F& func)
                 {
                     common::concurrent::SharedPointer<interop::InteropMemory> mem = GetEnvironment().AllocateMemory();
@@ -483,7 +483,7 @@ namespace ignite
                     jobject target = InStreamOutObject(operation, *mem.Get(), err);
                     IgniteError::ThrowIfNeeded(err);
 
-                    std::auto_ptr<common::Cancelable> cancelable(new CancelableImpl(GetEnvironmentPointer(), target));
+                    std::shared_ptr<common::Cancelable> cancelable(new CancelableImpl(GetEnvironmentPointer(), target));
 
                     return cancelable;
                 }
@@ -538,7 +538,7 @@ namespace ignite
                     jobject target = InStreamOutObject(opType, *mem.Get(), err);
                     IgniteError::ThrowIfNeeded(err);
 
-                    std::auto_ptr<common::Cancelable> cancelable(new CancelableImpl(GetEnvironmentPointer(), target));
+                    std::shared_ptr<common::Cancelable> cancelable(new CancelableImpl(GetEnvironmentPointer(), target));
 
                     common::Promise<R>& promise = taskPtr->GetPromise();
                     promise.SetCancelTarget(cancelable);

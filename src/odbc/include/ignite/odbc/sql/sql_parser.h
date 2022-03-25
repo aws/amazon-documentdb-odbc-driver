@@ -48,13 +48,13 @@ class SqlParser {
    *
    * @return Parsed command on success and null on failure.
    */
-  std::auto_ptr< SqlCommand > GetNextCommand();
+  std::shared_ptr< SqlCommand > GetNextCommand();
 
  private:
   /**
    *
    */
-  std::auto_ptr< SqlCommand > ProcessCommand();
+  std::shared_ptr< SqlCommand > ProcessCommand();
 
   /** SQL lexer. */
   SqlLexer lexer;

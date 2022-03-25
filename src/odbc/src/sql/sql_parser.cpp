@@ -34,10 +34,10 @@ SqlParser::~SqlParser() {
   // No-op.
 }
 
-std::auto_ptr< SqlCommand > SqlParser::GetNextCommand() {
+std::shared_ptr< SqlCommand > SqlParser::GetNextCommand() {
   while (true) {
     if (!*lexer.Shift())
-      return std::auto_ptr< SqlCommand >();
+      return std::shared_ptr< SqlCommand >();
 
     const SqlToken& token = lexer.GetCurrentToken();
 
@@ -63,13 +63,13 @@ std::auto_ptr< SqlCommand > SqlParser::GetNextCommand() {
   }
 }
 
-std::auto_ptr< SqlCommand > SqlParser::ProcessCommand() {
+std::shared_ptr< SqlCommand > SqlParser::ProcessCommand() {
   const SqlToken& token = lexer.GetCurrentToken();
 
   if (WORD_SET == token.ToLower() && *lexer.Shift()
       && token.GetType() == TokenType::WORD
       && WORD_STREAMING == token.ToLower()) {
-    std::auto_ptr< SqlCommand > cmd(new SqlSetStreamingCommand);
+    std::shared_ptr< SqlCommand > cmd(new SqlSetStreamingCommand);
 
     cmd->Parse(lexer);
 

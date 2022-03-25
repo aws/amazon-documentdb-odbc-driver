@@ -238,7 +238,7 @@ class DataQuery : public Query {
   meta::ColumnMetaVector resultMeta;
 
   /** Cursor. */
-  std::auto_ptr< Cursor > cursor;
+  std::unique_ptr< Cursor > cursor;
 
   /** Number of rows affected. */
   std::vector< int64_t > rowsAffected;
@@ -247,7 +247,7 @@ class DataQuery : public Query {
   size_t rowsAffectedIdx;
 
   /** Cached next result page. */
-  std::auto_ptr< ResultPage > cachedNextPage;
+  std::shared_ptr< ResultPage > cachedNextPage;
 
   /** Timeout. */
   int32_t& timeout;
