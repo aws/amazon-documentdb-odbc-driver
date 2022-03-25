@@ -62,13 +62,25 @@ jobs:
         brew install boost
         brew install mongo-cxx-driver
 
-    - name: Cache DocumentDB JDBC Jar
+    - name: Cache DocumentDB JDBC JAR
       id: cache-documentdb-jdbc-jar
       uses: actions/cache@v3
       with:
         path: | 
-          ${{ env.ODBC_BIN_PATH}}/libs/
-        key: ${{ runner.os }}-cache-documentdb-jdbc-jar-${{env.JDBC_DRIVER_VERSION}}
+          cache/jar
+        key: cache-documentdb-jdbc-jar-${{env.JDBC_DRIVER_VERSION}}
+
+    - name: Download DocumentDB JDBC JAR
+      if: steps.cache-documentdb-jdbc-jar.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p cache/jar
+        cd cache/jar
+        wget https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v1.2.0/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
+
+    - name: Install DocumentDB JDBC JAR
+      run: |
+        mkdir -p ${{env.ODBC_BIN_PATH}}/libs
+        cp documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
 
     - name: configure-and-build-driver
       run: |
