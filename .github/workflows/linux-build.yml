@@ -75,7 +75,7 @@ jobs:
         key: ${{ runner.os }}-build-and-install-mongocxx
 
     - name: build-and-install-mongocxx
-     if: steps.cache-build-and-install-mongocxx.outputs.cache-hit != 'true'
+      if: steps.cache-build-and-install-mongocxx.outputs.cache-hit != 'true'
       run: |
         wget https://github.com/mongodb/mongo-c-driver/releases/download/1.21.1/mongo-c-driver-1.21.1.tar.gz
         tar xzf mongo-c-driver-1.21.1.tar.gz
