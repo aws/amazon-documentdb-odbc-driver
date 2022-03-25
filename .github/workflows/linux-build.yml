@@ -90,6 +90,7 @@ jobs:
         ./scripts/register_driver_unix.sh
 
     - name: set-up-local-mongodb
+      run: |
         docker run --name mongo -e MONGO_INITDB_ROOT_USERNAME=${{env.DOC_DB_USER_NAME}} -e MONGO_INITDB_ROOT_PASSWORD=${{env.DOC_DB_PASSWORD}} -d -p 27017:27017 mongo:latest
         chmod +x ./src/odbc-test/scripts/import_test_data.sh
         ./src/odbc-test/scripts/import_test_data.sh

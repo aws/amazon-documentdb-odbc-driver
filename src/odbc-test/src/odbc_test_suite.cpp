@@ -825,6 +825,7 @@ void OdbcTestSuite::CreateDsnConnectionString(
             "DATABASE=test;"
             "USER=" + user + ";"
             "PASSWORD=" + password + ";"
+            "TLS=true;"
             "TLS_ALLOW_INVALID_HOSTNAMES=true;";
 
   if (sshTunnel && !sshUserAtHost.empty() && !sshPrivKeyFile.empty()
