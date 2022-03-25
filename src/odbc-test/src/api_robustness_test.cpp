@@ -343,8 +343,7 @@ BOOST_AUTO_TEST_CASE(TestSQLExtendedFetch, *disabled()) {
   SQLExtendedFetch(stmt, SQL_FETCH_NEXT, 0, 0, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLNumResultColsStub) {
-  // Test for stubbed functionality.
+BOOST_AUTO_TEST_CASE(TestSQLNumResultCols) {
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
@@ -361,41 +360,11 @@ BOOST_AUTO_TEST_CASE(TestSQLNumResultColsStub) {
   // Everything is ok.
   ret = SQLNumResultCols(stmt, &columnCount);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
-  BOOST_CHECK_EQUAL(0, columnCount);
+  BOOST_CHECK_EQUAL(13, columnCount);
 
-  // Column count is null.
-  SQLNumResultCols(stmt, 0);
-}
-
-BOOST_AUTO_TEST_CASE(TestSQLNumResultCols, *disabled()) {
-  // There are no checks because we do not really care what is the result of
-  // these calls as long as they do not cause segmentation fault.
-
-  for (int i = 0; i < 100; ++i) {
-    TestType obj;
-
-    obj.strField = LexicalCast< std::string >(i);
-
-    testCache.Put(i, obj);
-  }
-
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
-
-  SQLCHAR sql[] = "SELECT strField FROM TestType";
-
-  SQLRETURN ret = SQLExecDirect(stmt, sql, sizeof(sql));
-
+  // Test with column count is null.
+  ret = SQLNumResultCols(stmt, 0);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
-
-  SQLSMALLINT columnCount;
-
-  // Everything is ok.
-  ret = SQLNumResultCols(stmt, &columnCount);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
-
-  // Column count is null.
-  SQLNumResultCols(stmt, 0);
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLTables, *disabled()) {
