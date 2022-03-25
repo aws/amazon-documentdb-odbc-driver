@@ -18,7 +18,7 @@
 #include "ignite/odbc/query/special_columns_query.h"
 
 #include "ignite/odbc/impl/binary/binary_common.h"
-#include "ignite/odbc/log.h"
+
 #include "ignite/odbc/type_traits.h"
 
 namespace ignite {
@@ -84,7 +84,6 @@ const meta::ColumnMetaVector* SpecialColumnsQuery::GetMeta() {
 }
 
 SqlResult::Type SpecialColumnsQuery::FetchNextRow(app::ColumnBindingMap&) {
-  LOG_MSG("\nSpecialColumnsQuery::FetchNextRow is called");  // -AL-
   if (!executed) {
     diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
                          "Query was not executed.");

@@ -102,17 +102,14 @@ SqlResult::Type Statement::InternalBindColumn(uint16_t columnIdx,
 
 void Statement::SafeBindColumn(uint16_t columnIdx,
                                const app::ApplicationDataBuffer& buffer) {
-  LOG_MSG("\nStatement::SafeBindColumn is called"); // -AL-
   columnBindings[columnIdx] = buffer;
 }
 
 void Statement::SafeUnbindColumn(uint16_t columnIdx) {
-  LOG_MSG("\nStatement::SafeUnbindColumn is called");  // -AL-
   columnBindings.erase(columnIdx);
 }
 
 void Statement::SafeUnbindAllColumns() {
-  LOG_MSG("\nStatement::SafeUnbindAllColumns is called");  // -AL-
   columnBindings.clear();
 }
 
@@ -229,15 +226,10 @@ void Statement::SetAttribute(int attr, void* value, SQLINTEGER valueLen) {
 SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
                                                 SQLINTEGER) {
   switch (attr) {
-      // MAR-23: try commenting this part out to make it work [yes, it worked by
-      // commenting this out (Mar24)]
-    case SQL_ATTR_ROW_ARRAY_SIZE: {  // -AL- a place where row array size is
-                                     // obtained, and SQL_ATTR_ROW_ARRAY_SIZE is
-                                     // referenced
+    case SQL_ATTR_ROW_ARRAY_SIZE: {
       SqlUlen val = reinterpret_cast< SqlUlen >(value);
 
-      LOG_MSG("SQL_ATTR_ROW_ARRAY_SIZE (-AL-: sent from BI tool): "
-              << val);  // remove stuff in brackets later
+      LOG_MSG("SQL_ATTR_ROW_ARRAY_SIZE: " << val);
 
       if (val < 1) {
         AddStatusRecord(SqlState::SHY092_OPTION_TYPE_OUT_OF_RANGE,
@@ -245,13 +237,9 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
 
         return SqlResult::AI_ERROR;
       }
-      LOG_MSG("\nstatement.cpp- val: " << val);
-      rowArraySize = val; 
-      // -AL- before, I planned to comment this line out to see what PowerBI
-      // sends
-      // test2: Tableau is causing the error because SQL_ATTR_ROW_ARRAY_SIZE is supported
-      // test2 failed. Commenting out rowArraySize = val; DOES solve the metadata problem.
-      LOG_MSG("\nstatement.cpp line 241- rowArraySize: " << rowArraySize);
+
+      rowArraySize = val;
+
       break;
     }
 
@@ -400,12 +388,10 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
       break;
     }
 
-    case SQL_ATTR_ROW_ARRAY_SIZE: {  // -AL-  SQL_ATTR_ROW_ARRAY_SIZE referenced
+    case SQL_ATTR_ROW_ARRAY_SIZE: {
       SQLINTEGER* val = reinterpret_cast< SQLINTEGER* >(buf);
 
-      //*val = static_cast< SQLINTEGER >(1);
       *val = static_cast< SQLINTEGER >(rowArraySize); 
-      // test4: rowArraySize always passed as 1 even when reset by Tableau
 
       if (valueLen)
         *valueLen = SQL_IS_INTEGER;
@@ -978,46 +964,31 @@ SqlResult::Type Statement::InternalFetchRow() {
 
   SQLINTEGER fetched = 0;
   SQLINTEGER errors = 0;
-  LOG_MSG("\nline 967- rowArraySize: " << rowArraySize);
-  for (SqlUlen i = 0; i < rowArraySize; ++i) {
-    // rowArraySize is used, which Tableau setting this to a big number
-    // it was messing things up, if rowArraySize is set as default, we're able
-    // to get the metadata, otherwise the driver will disconnect driver has run
-    // time exception
 
-    // question: why would fetchrow require so much offsets?
+  for (SqlUlen i = 0; i < rowArraySize; ++i) {
     for (app::ColumnBindingMap::iterator it = columnBindings.begin();
-         it != columnBindings.end(); ++it) {
-      it->second.SetElementOffset(i); // test -AL- comment out columnbinding to see if it fixes Tableau (test1 log)
-      LOG_MSG("\nInternalFetchRow-line 978 pass with it->second.GetData()="
-              << it->second.GetData());
-    }
-    LOG_MSG("\n i=" << i << ", and columnBindings is over");
+         it != columnBindings.end(); ++it)
+      it->second.SetElementOffset(i);
+
     SqlResult::Type res = currentQuery->FetchNextRow(columnBindings);
 
     if (res == SqlResult::AI_SUCCESS || res == SqlResult::AI_SUCCESS_WITH_INFO)
       ++fetched;
     else if (res != SqlResult::AI_NO_DATA)
       ++errors;
-      //break; // -AL- bad practice for me to add a break here maybe. It should continue trying to retrieve if it fails on one run
-    // what happened: it was getting AI_NO_DATA, but the driver went on. Since NO_DATA is not error, errors var is not incremented.
-    // fetched value stayed as 0 as expected.
 
-    LOG_MSG("\n line 981-res=" << res);
     if (rowStatuses)
       rowStatuses[i] = SqlResultToRowResult(res);
-    LOG_MSG("\nInternalFetchRow-line 983 pass");
   }
 
   if (rowsFetched)
     *rowsFetched =
         fetched < 0 ? static_cast< SQLINTEGER >(rowArraySize) : fetched;
-  LOG_MSG("\nInternalFetchRow-line 988 pass. fetched =" << fetched << 
-      "\nerrors = " << errors);
+
   if (fetched > 0)
     return errors == 0 ? SqlResult::AI_SUCCESS
                        : SqlResult::AI_SUCCESS_WITH_INFO;
-  LOG_MSG("\nInternalFetchRow-line 993 pass");
+
   return errors == 0 ? SqlResult::AI_NO_DATA : SqlResult::AI_ERROR;
 }
 
@@ -1261,16 +1232,17 @@ SqlResult::Type Statement::InternalDescribeParam(int16_t paramNum,
 
   boost::optional< int16_t > sqlType = type_traits::BinaryToSqlType(type);
   if (dataType && sqlType)
-    *dataType = *sqlType;
+      *dataType = *sqlType;
 
-  boost::optional< int32_t > colSize = type_traits::BinaryTypeColumnSize(type);
+  boost::optional< int32_t > colSize =
+            type_traits::BinaryTypeColumnSize(type);
   if (paramSize && colSize)
-    *paramSize = *colSize;
+      *paramSize = *colSize;
 
   boost::optional< int16_t > decDigits =
-      type_traits::BinaryTypeDecimalDigits(type);
+            type_traits::BinaryTypeDecimalDigits(type);
   if (decimalDigits && decDigits)
-    *decimalDigits = *decDigits;
+      *decimalDigits = *decDigits;
 
   if (nullable)
     *nullable = type_traits::BinaryTypeNullability(type);
