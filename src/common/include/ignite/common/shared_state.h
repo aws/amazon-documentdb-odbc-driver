@@ -168,7 +168,7 @@ namespace ignite
             /**
              * Set cancel target.
              */
-            void SetCancelTarget(std::auto_ptr<Cancelable>& target)
+            void SetCancelTarget(std::shared_ptr<Cancelable>& target)
             {
                 concurrent::CsLockGuard guard(mutex);
 
@@ -190,7 +190,7 @@ namespace ignite
             IGNITE_NO_COPY_ASSIGNMENT(SharedState);
 
             /** Cancel target. */
-            std::auto_ptr<Cancelable> cancelTarget;
+            std::shared_ptr<Cancelable> cancelTarget;
 
             /** Value. */
             std::auto_ptr<ValueType> value;
