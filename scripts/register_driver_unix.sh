@@ -31,7 +31,7 @@ echo "DriverODBCVer=03.00"       >> "$ODBC_LIB_PATH/ignite-odbc-install.ini"
 echo "FileUsage=0"               >> "$ODBC_LIB_PATH/ignite-odbc-install.ini"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  sudo odbcinst -i -d -f "$ODBC_LIB_PATH/ignite-odbc-install.ini"
+  odbcinst -i -d -f "$ODBC_LIB_PATH/ignite-odbc-install.ini"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   odbcinst -i -d -f "$ODBC_LIB_PATH/ignite-odbc-install.ini"
 fi
