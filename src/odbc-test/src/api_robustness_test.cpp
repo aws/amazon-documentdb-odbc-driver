@@ -365,7 +365,8 @@ BOOST_AUTO_TEST_CASE(TestSQLNumResultCols) {
   BOOST_CHECK_EQUAL(13, columnCount);
 
   // Test with column count is null.
-  SQLNumResultCols(stmt, 0);
+  ret = SQLNumResultCols(stmt, 0);
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLTables, *disabled()) {
