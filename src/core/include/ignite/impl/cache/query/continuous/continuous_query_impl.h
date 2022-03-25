@@ -236,7 +236,9 @@ namespace ignite
                         int64_t timeInterval;
 
                         /** Cache entry event filter holder. */
-                        std::shared_ptr<event::CacheEntryEventFilterHolderBase> filterOp;
+                        std::unique_ptr<event::CacheEntryEventFilterHolderBase> filterOp;
+                         // -AL- I think this should be a unique pointer, although I could be wrong
+                         // not sure if constructor filterOp(param) makes it a shared pointer???
                     };
 
                     /**

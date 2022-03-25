@@ -21,6 +21,9 @@
 #include "ignite/odbc/app/parameter_set.h"
 #include "ignite/odbc/cursor.h"
 #include "ignite/odbc/query/query.h"
+#include "ignite/odbc/jni/documentdb_mql_query_context.h"
+
+using ignite::odbc::jni::DocumentDbMqlQueryContext;
 
 namespace ignite {
 namespace odbc {
@@ -160,6 +163,16 @@ class DataQuery : public Query {
    */
   SqlResult::Type MakeRequestFetch();
 
+
+  /**
+   * Gets the MQL query context.
+   *
+   * @return Result.
+   */
+  SqlResult::Type GetMqlQueryContext(
+      SharedPointer< DocumentDbMqlQueryContext >& mqlQueryContext,
+      IgniteError& error);
+
   /**
    * Make next result set request and use response to set internal state.
    *
@@ -187,14 +200,20 @@ class DataQuery : public Query {
   ;
 
   /**
-   * Process column conversion operation result.
+   * Set result set meta. 
    *
-   * @param convRes Conversion result.
-   * @param rowIdx Row index.
-   * @param columnIdx Column index.
-   * @return General SQL result.
+   * @param value Metadata value.
    */
   void SetResultsetMeta(const meta::ColumnMetaVector& value);
+
+
+  /**
+   * Set result set meta by reading Jdbc column metadata vector.
+   *
+   * @param jdbcMetaVector JdbcColumnMetadata vector.
+   */
+  void ReadJdbcColumnMetadataVector(
+      std::vector< JdbcColumnMetadata > jdbcVector);
 
   /**
    * Close query.
@@ -219,7 +238,7 @@ class DataQuery : public Query {
   meta::ColumnMetaVector resultMeta;
 
   /** Cursor. */
-  std::auto_ptr< Cursor > cursor;
+  std::unique_ptr< Cursor > cursor;
 
   /** Number of rows affected. */
   std::vector< int64_t > rowsAffected;
@@ -228,7 +247,7 @@ class DataQuery : public Query {
   size_t rowsAffectedIdx;
 
   /** Cached next result page. */
-  std::auto_ptr< ResultPage > cachedNextPage;
+  std::shared_ptr< ResultPage > cachedNextPage;
 
   /** Timeout. */
   int32_t& timeout;

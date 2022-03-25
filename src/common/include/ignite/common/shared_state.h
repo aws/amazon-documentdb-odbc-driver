@@ -75,7 +75,7 @@ namespace ignite
              * @throw IgniteError with IgniteError::IGNITE_ERR_FUTURE_STATE if error or value has been set already.
              * @param val Value to set.
              */
-            void SetValue(std::auto_ptr<ValueType> val)
+            void SetValue(std::shared_ptr<ValueType> val)
             {
                 concurrent::CsLockGuard guard(mutex);
 
@@ -193,7 +193,7 @@ namespace ignite
             std::shared_ptr<Cancelable> cancelTarget;
 
             /** Value. */
-            std::auto_ptr<ValueType> value;
+            std::shared_ptr<ValueType> value;
 
             /** Error. */
             IgniteError error;
@@ -340,7 +340,7 @@ namespace ignite
             /**
              * Set cancel target.
              */
-            void SetCancelTarget(std::auto_ptr<Cancelable>& target)
+            void SetCancelTarget(std::shared_ptr<Cancelable>& target)
             {
                 concurrent::CsLockGuard guard(mutex);
 
@@ -362,7 +362,7 @@ namespace ignite
             IGNITE_NO_COPY_ASSIGNMENT(SharedState);
 
             /** Cancel target. */
-            std::auto_ptr<Cancelable> cancelTarget;
+            std::shared_ptr<Cancelable> cancelTarget;
 
             /** Marker. */
             bool done;
