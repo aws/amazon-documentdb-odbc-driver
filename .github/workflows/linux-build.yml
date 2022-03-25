@@ -71,7 +71,7 @@ jobs:
       with:
         path: | 
           mongo-c-driver-1.21.1
-          mongo-cxx-driver/build
+          mongo-cxx-driver
         key: ${{ runner.os }}-build-and-install-mongocxx
 
     - name: build-and-install-mongocxx
