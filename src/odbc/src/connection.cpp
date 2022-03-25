@@ -244,6 +244,44 @@ SharedPointer< DatabaseMetaData > Connection::GetMetaData(IgniteError& err) {
   return databaseMetaData;
 }
 
+SharedPointer< DocumentDbDatabaseMetadata > Connection::GetDatabaseMetadata(
+    IgniteError& err) {
+  if (!_connection.IsValid()) {
+    err = IgniteError(IgniteError::IGNITE_ERR_ILLEGAL_STATE,
+                      "Must be connected.");
+    return nullptr;
+  }
+  JniErrorInfo errInfo;
+  auto documentDbDatabaseMetaData =
+      _connection.Get()->GetDatabaseMetadata(errInfo);
+  if (!documentDbDatabaseMetaData.IsValid()) {
+    std::string message = errInfo.errMsg;
+    err = IgniteError(IgniteError::IGNITE_ERR_JNI_GET_DOCUMENTDB_DATABASE_METADATA,
+                      message.c_str());
+    return nullptr;
+  }
+  return documentDbDatabaseMetaData;
+}
+
+SharedPointer< DocumentDbConnectionProperties > Connection::GetConnectionProperties(
+    IgniteError& err) {
+  if (!_connection.IsValid()) {
+    err = IgniteError(IgniteError::IGNITE_ERR_ILLEGAL_STATE,
+                      "Must be connected.");
+    return nullptr;
+  }
+  JniErrorInfo errInfo;
+  auto connectionProperties =
+      _connection.Get()->GetConnectionProperties(errInfo);
+  if (!connectionProperties.IsValid()) {
+    std::string message = errInfo.errMsg;
+    err = IgniteError(IgniteError::IGNITE_ERR_JNI_GET_DOCUMENTDB_CONNECTION_PROPERTIES,
+                      message.c_str());
+    return nullptr;
+  }
+  return connectionProperties;
+}
+
 SqlResult::Type Connection::InternalCreateStatement(Statement*& statement) {
   statement = new Statement(*this);
 
