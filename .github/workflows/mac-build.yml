@@ -75,12 +75,12 @@ jobs:
       run: |
         mkdir -p cache/jar
         cd cache/jar
-        wget https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v1.2.0/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
+        wget https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/vdocumentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
 
     - name: Install DocumentDB JDBC JAR
       run: |
         mkdir -p ${{env.ODBC_BIN_PATH}}/libs
-        cp documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
+        cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
 
     - name: configure-and-build-driver
       run: |

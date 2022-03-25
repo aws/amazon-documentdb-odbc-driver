@@ -34,7 +34,7 @@ jobs:
     - name: Get Java distribution
       run: | 
         sudo apt-get -y install software-properties-common
-        wget -O- https://apt.corretto.aws/corretto.key | apt-key add -
+        wget -O- https://apt.corretto.aws/corretto.key | sudo apt-key add -
         sudo apt-add-repository 'deb https://apt.corretto.aws stable main'
         sudo apt-get update
         sudo apt-get install -y java-17-amazon-corretto-jdk
@@ -89,12 +89,12 @@ jobs:
       run: |
         mkdir -p cache/jar
         cd cache/jar
-        wget https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v1.2.0/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
+        wgethttps://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/vdocumentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
 
     - name: Install DocumentDB JDBC JAR
       run: |
         mkdir -p ${{env.ODBC_BIN_PATH}}/libs
-        cp documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
+        cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
 
     - name: build-and-install-mongocxx
       # if: steps.cache-build-and-install-mongocxx.outputs.cache-hit != 'true'

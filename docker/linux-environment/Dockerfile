@@ -38,6 +38,7 @@ RUN apt-get -y update \
                           lcov \
                           git \
                           unixodbc-dev \
+                          gdb \
     && rm -r /var/lib/apt/lists/*
 
 # compile and install mongoc
