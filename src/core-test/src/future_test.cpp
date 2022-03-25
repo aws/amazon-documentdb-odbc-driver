@@ -24,15 +24,15 @@ using namespace ignite;
 using namespace ignite::common;
 
 /**
- * Utility to make auto pointer from value.
+ * Utility to make shared pointer from value.
  *
  * @param val Value.
  * @return Auto pointer.
  */
 template<typename T>
-std::auto_ptr<T> MakeAuto(const T& val)
+std::shared_ptr<T> MakeShared(const T& val)
 {
-    return std::auto_ptr<T>(new T(val));
+    return std::shared_ptr<T>(new T(val));
 }
 
 /**
