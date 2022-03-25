@@ -37,6 +37,15 @@ jobs:
     - name: set-PATH
       run: |
         export PATH=/Library/Developer/CommandLineTools/usr/bin:$PATH
+
+    - name: Cache DocumentDB JDBC Jar
+      id: cache-documentdb-jdbc-jar
+      uses: actions/cache@v3
+      with:
+        path: | 
+          ${{ env.ODBC_BIN_PATH}}/libs/
+        key: ${{ runner.os }}-cache-documentdb-jdbc-jar-${{env.JDBC_DRIVER_VERSION}}
+
     - name: configure-and-build-driver
       run: |
         ./build_mac_debug64.sh

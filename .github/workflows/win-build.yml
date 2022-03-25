@@ -27,7 +27,7 @@ env:
   DOC_DB_LOCAL_PORT: 27019
   DOC_DB_REMOTE_PORT: 27017
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
-  JDBC_DRIVER_VERSION: "1.1.1"
+  JDBC_DRIVER_VERSION: "1.2.0"
 
 jobs:
   build-windows32:
@@ -86,6 +86,14 @@ jobs:
         path: | 
           ${{ env.VCPKG_ROOT }}
         key: ${{ runner.os }}-cache-dependencies-windows-32-v1
+
+    - name: Cache DocumentDB JDBC Jar
+      id: cache-documentdb-jdbc-jar
+      uses: actions/cache@v3
+      with:
+        path: | 
+          ${{ env.ODBC_BIN_PATH}}/libs/
+        key: ${{ runner.os }}-cache-documentdb-jdbc-jar-${{env.JDBC_DRIVER_VERSION}}
 
     - name: Install dependencies Windows
       run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x86-windows openssl:x86-windows boost-test:x86-windows boost-asio:x86-windows boost-chrono:x86-windows boost-interprocess:x86-windows boost-regex:x86-windows boost-system:x86-windows boost-thread:x86-windows
@@ -202,6 +210,14 @@ jobs:
         path: | 
           ${{ env.VCPKG_ROOT }}
         key: ${{ runner.os }}-cache-dependencies-windows-64-v1
+
+    - name: Cache DocumentDB JDBC Jar
+      id: cache-documentdb-jdbc-jar
+      uses: actions/cache@v3
+      with:
+        path: | 
+          ${{ env.ODBC_BIN_PATH}}/libs/
+        key: ${{ runner.os }}-cache-documentdb-jdbc-jar-${{env.JDBC_DRIVER_VERSION}}
         
     - name: Install dependencies Windows
       run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x64-windows openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
@@ -304,6 +320,14 @@ jobs:
         path: | 
           ${{ env.VCPKG_ROOT }}
         key: ${{ runner.os }}-cache-dependencies-windows-64-v1
+    
+    - name: Cache DocumentDB JDBC Jar
+      id: cache-documentdb-jdbc-jar
+      uses: actions/cache@v3
+      with:
+        path: | 
+          ${{ env.ODBC_BIN_PATH}}/libs/
+        key: ${{ runner.os }}-cache-documentdb-jdbc-jar-${{env.JDBC_DRIVER_VERSION}}
   
     - name: Install dependencies Windows
       run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x64-windows openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows

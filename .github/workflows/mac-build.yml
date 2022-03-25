@@ -61,6 +61,15 @@ jobs:
         brew install openssl
         brew install boost
         brew install mongo-cxx-driver
+
+    - name: Cache DocumentDB JDBC Jar
+      id: cache-documentdb-jdbc-jar
+      uses: actions/cache@v3
+      with:
+        path: | 
+          ${{ env.ODBC_BIN_PATH}}/libs/
+        key: ${{ runner.os }}-cache-documentdb-jdbc-jar-${{env.JDBC_DRIVER_VERSION}}
+
     - name: configure-and-build-driver
       run: |
         ./build_mac_release64.sh
