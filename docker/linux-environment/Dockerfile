@@ -1,5 +1,9 @@
 FROM ubuntu:latest
-RUN 
+
+#set DEBIAN_FRONTEND=noninteractive to ignore user prompt
+ENV DEBIAN_FRONTEND=noninteractive
+
+# installing basic dependecies
 RUN apt-get -y update \
     && apt-get -y install wget \
                           curl \
@@ -15,7 +19,7 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.22.3/cmake-3.22.3
 
 ENV PATH="/usr/bin/cmake/bin:${PATH}"
 
-ENV DEBIAN_FRONTEND=noninteractive
+#installing dependicies for mongo-c mongo-cxx and documentdb-odbc
 RUN apt-get -y update \
     && apt-get -y install libcurl4-openssl-dev \
                           libssl-dev \
@@ -60,6 +64,7 @@ RUN cd /tmp \
     && make install \
     && rm -r /tmp/*
 
+#installing dependecies for JDK
 RUN apt-get -y update \
     && apt-get -y install software-properties-common \
     && rm -r /var/lib/apt/lists/*
