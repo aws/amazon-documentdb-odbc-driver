@@ -125,6 +125,7 @@ const meta::ColumnMetaVector* TableMetadataQuery::GetMeta() {
 
 SqlResult::Type TableMetadataQuery::FetchNextRow(
     app::ColumnBindingMap& columnBindings) {
+  LOG_MSG("\nTableMetadataQuery::FetchNextRow is called");  // -AL-
   if (!executed) {
     diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
                          "Query was not executed.");

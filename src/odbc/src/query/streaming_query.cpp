@@ -47,6 +47,7 @@ const meta::ColumnMetaVector* StreamingQuery::GetMeta() {
 }
 
 SqlResult::Type StreamingQuery::FetchNextRow(app::ColumnBindingMap&) {
+  LOG_MSG("\nStreamingQuery::FetchNextRow is called");  // -AL-
   return SqlResult::AI_NO_DATA;
 }
 

@@ -16,7 +16,7 @@
  */
 
 #include "ignite/odbc/query/foreign_keys_query.h"
-
+#include "ignite/odbc/log.h"
 #include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/connection.h"
 #include "ignite/odbc/message.h"
@@ -100,6 +100,7 @@ const meta::ColumnMetaVector* ForeignKeysQuery::GetMeta() {
 }
 
 SqlResult::Type ForeignKeysQuery::FetchNextRow(app::ColumnBindingMap&) {
+  LOG_MSG("\nForeignKeysQuery::FetchNextRow is called");  // -AL-
   if (!executed) {
     diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
                          "Query was not executed.");

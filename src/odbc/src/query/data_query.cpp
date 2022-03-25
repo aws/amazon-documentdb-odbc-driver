@@ -81,6 +81,7 @@ const meta::ColumnMetaVector* DataQuery::GetMeta() {
 SqlResult::Type DataQuery::FetchNextRow(app::ColumnBindingMap& columnBindings) {
   // TODO: AD-604 - MakeRequestExecute
   // https://bitquill.atlassian.net/browse/AD-604
+  LOG_MSG("\DataQuery::FetchNextRow is called");  // -AL-
   return SqlResult::AI_NO_DATA;
 
   if (!cursor.get()) {

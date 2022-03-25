@@ -74,6 +74,7 @@ class InternalQuery : public Query {
    * @return Operation result.
    */
   virtual SqlResult::Type FetchNextRow(app::ColumnBindingMap& columnBindings) {
+    LOG_MSG("\nInternal query FetchNextRow is called");  // -AL-
     IGNITE_UNUSED(columnBindings);
 
     return SqlResult::AI_NO_DATA;

@@ -79,6 +79,7 @@ const meta::ColumnMetaVector* BatchQuery::GetMeta() {
 }
 
 SqlResult::Type BatchQuery::FetchNextRow(app::ColumnBindingMap&) {
+  LOG_MSG("\nBatchQuery::FetchNextRow is called"); // -AL-
   if (!executed) {
     diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
                          "Query was not executed.");

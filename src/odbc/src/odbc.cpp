@@ -420,7 +420,7 @@ SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT colNum, SQLSMALLINT targetType,
 
   statement->BindColumn(colNum, targetType, targetValue, bufferLength,
                         strLengthOrIndicator);
-
+  LOG_MSG("line 423-SQLBindCol finished");
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 

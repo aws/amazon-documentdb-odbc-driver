@@ -18,7 +18,7 @@
 #include "ignite/odbc/query/type_info_query.h"
 
 #include <cassert>
-
+#include "ignite/odbc/log.h"
 #include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/system/odbc_constants.h"
 #include "ignite/odbc/type_traits.h"
@@ -219,6 +219,7 @@ const meta::ColumnMetaVector* TypeInfoQuery::GetMeta() {
 
 SqlResult::Type TypeInfoQuery::FetchNextRow(
     app::ColumnBindingMap& columnBindings) {
+  LOG_MSG("\nTypeInfoQuery::FetchNextRow is called.");  //-AL-
   if (!executed) {
     diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
                          "Query was not executed.");
