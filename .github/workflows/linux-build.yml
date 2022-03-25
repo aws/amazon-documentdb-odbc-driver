@@ -65,7 +65,17 @@ jobs:
         sudo apt update
         sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib linux-headers-$(uname -r) build-essential valgrind libboost-all-dev libbson-dev libsasl2-dev lcov
 
+    - name: cache-build-and-install-mongocxx
+      id: cache-build-and-install-mongocxx
+      uses: actions/cache@v3
+      with:
+        path: | 
+          mongo-c-driver-1.21.1
+          mongo-cxx-driver/build
+        key: ${{ runner.os }}-build-and-install-mongocxx
+
     - name: build-and-install-mongocxx
+      if: steps.ache-build-and-install-mongocxx.outputs.cache-hit != 'true'
       run: |
         wget https://github.com/mongodb/mongo-c-driver/releases/download/1.21.1/mongo-c-driver-1.21.1.tar.gz
         tar xzf mongo-c-driver-1.21.1.tar.gz
@@ -74,11 +84,20 @@ jobs:
         cd cmake-build
         cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
         sudo make install
+        cd ../..
         git clone https://github.com/mongodb/mongo-cxx-driver.git       --branch releases/stable --depth 1
         cd mongo-cxx-driver/build
         cmake ..       -DCMAKE_BUILD_TYPE=Release       -DBSONCXX_POLY_USE_MNMLSTC=1  -DCMAKE_INSTALL_PREFIX=/usr/local
         sudo make install
-
+    
+    - name: install-mongocxx
+      run: |
+        cd mongo-c-driver-1.21.1/cmake-build
+        sudo make install
+        cd ../../
+        cd mongo-cxx-driver/build
+        sudo make install
+        
     - name: configure-and-build-driver
       run: |
         ./build_linux_release64_deb.sh
