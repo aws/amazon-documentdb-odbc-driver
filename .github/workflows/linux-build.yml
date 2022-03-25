@@ -38,7 +38,7 @@ jobs:
         sudo apt-add-repository 'deb https://apt.corretto.aws stable main'
         sudo apt-get update
         sudo apt-get install -y java-17-amazon-corretto-jdk
-        $env:JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto/
+        $env.JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto/
         
     - name: Get latest version of CMake
       uses: lukka/get-cmake@latest
@@ -89,7 +89,7 @@ jobs:
       run: |
         mkdir -p cache/jar
         cd cache/jar
-        wgethttps://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/vdocumentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
+        wget https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/vd{{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
 
     - name: Install DocumentDB JDBC JAR
       run: |
