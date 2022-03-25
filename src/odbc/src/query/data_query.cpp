@@ -236,7 +236,6 @@ SqlResult::Type DataQuery::MakeRequestExecute() {
     diag.AddStatusRecord(error.GetText());
     return SqlResult::AI_ERROR;
   }
-  
   ReadJdbcColumnMetadataVector(mqlQueryContext.Get()->GetColumnMetadata());
 
   return SqlResult::AI_SUCCESS;
