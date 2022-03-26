@@ -25,7 +25,7 @@ env:
   DOC_DB_REMOTE_PORT: 27017
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
   JDBC_DRIVER_VERSION: "1.2.0"
-  JAVA_HOME: ""
+  JAVA_HOME: "/usr/lib/jvm/java-17-amazon-corretto/"
 
 jobs:
   build-linux64:
@@ -39,7 +39,6 @@ jobs:
         sudo apt-add-repository 'deb https://apt.corretto.aws stable main'
         sudo apt-get update
         sudo apt-get install -y java-17-amazon-corretto-jdk
-        echo "/usr/lib/jvm/java-17-amazon-corretto/" >> $env.JAVA_HOME
         
     - name: Get latest version of CMake
       uses: lukka/get-cmake@latest
