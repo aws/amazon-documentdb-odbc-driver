@@ -123,6 +123,14 @@ class ApplicationDataBuffer {
   }
 
   /**
+   * Put in buffer value of type optional int8_t.
+   *
+   * @param value Value.
+   * @return Conversion result.
+   */
+  ConversionResult::Type PutInt8(boost::optional< int8_t > value);
+
+  /**
    * Put in buffer value of type int8_t.
    *
    * @param value Value.
@@ -136,7 +144,7 @@ class ApplicationDataBuffer {
    * @param value Value.
    * @return Conversion result.
    */
-  ConversionResult::Type PutOptInt16(boost::optional<int16_t> value);
+  ConversionResult::Type PutInt16(boost::optional<int16_t> value);
 
   /**
    * Put in buffer value of type int16_t.
@@ -152,7 +160,7 @@ class ApplicationDataBuffer {
    * @param value Value.
    * @return Conversion result.
    */
-  ConversionResult::Type PutOptInt32(boost::optional< int32_t > value);
+  ConversionResult::Type PutInt32(boost::optional< int32_t > value);
 
   /**
    * Put in buffer value of type int32_t.
@@ -163,6 +171,14 @@ class ApplicationDataBuffer {
   ConversionResult::Type PutInt32(int32_t value);
 
   /**
+   * Put in buffer value of type optional int64_t.
+   *
+   * @param value Value.
+   * @return Conversion result.
+   */
+  ConversionResult::Type PutInt64(boost::optional< int64_t > value);
+
+  /**
    * Put in buffer value of type int64_t.
    *
    * @param value Value.
@@ -171,12 +187,28 @@ class ApplicationDataBuffer {
   ConversionResult::Type PutInt64(int64_t value);
 
   /**
+   * Put in buffer value of type optional float.
+   *
+   * @param value Value.
+   * @return Conversion result.
+   */
+  ConversionResult::Type PutFloat(boost::optional< float > value);
+
+  /**
    * Put in buffer value of type float.
    *
    * @param value Value.
    * @return Conversion result.
    */
   ConversionResult::Type PutFloat(float value);
+
+  /**
+   * Put in buffer value of type optional double.
+   *
+   * @param value Value.
+   * @return Conversion result.
+   */
+  ConversionResult::Type PutDouble(boost::optional< double > value);
 
   /**
    * Put in buffer value of type double.
@@ -192,7 +224,7 @@ class ApplicationDataBuffer {
    * @param optional value Value.
    * @return Conversion result.
    */
-  ConversionResult::Type PutOptString(
+  ConversionResult::Type PutString(
       const boost::optional< std::string >& value);
 
   /**
@@ -228,7 +260,7 @@ class ApplicationDataBuffer {
    * @param written Number of written characters.
    * @return Conversion result.
    */
-  ConversionResult::Type PutBinaryData(void* data, size_t len,
+  ConversionResult::Type PutBinaryData(const void* data, size_t len,
                                        int32_t& written);
 
   /**
@@ -236,6 +268,14 @@ class ApplicationDataBuffer {
    * @return Conversion result.
    */
   ConversionResult::Type PutNull();
+
+  /**
+   * Put decimal value to buffer.
+   *
+   * @param value Value to put.
+   * @return Conversion result.
+   */
+  ConversionResult::Type PutDecimal(const boost::optional< common::Decimal >& value);
 
   /**
    * Put decimal value to buffer.
@@ -251,7 +291,23 @@ class ApplicationDataBuffer {
    * @param value Value to put.
    * @return Conversion result.
    */
+  ConversionResult::Type PutDate(const boost::optional< Date >& value);
+
+  /**
+   * Put date to buffer.
+   *
+   * @param value Value to put.
+   * @return Conversion result.
+   */
   ConversionResult::Type PutDate(const Date& value);
+
+  /**
+   * Put optional timestamp to buffer.
+   *
+   * @param value Value to put.
+   * @return Conversion result.
+   */
+  ConversionResult::Type PutTimestamp(const boost::optional< Timestamp >& value);
 
   /**
    * Put timestamp to buffer.
@@ -260,6 +316,14 @@ class ApplicationDataBuffer {
    * @return Conversion result.
    */
   ConversionResult::Type PutTimestamp(const Timestamp& value);
+
+  /**
+   * Put optional time to buffer.
+   *
+   * @param value Value to put.
+   * @return Conversion result.
+   */
+  ConversionResult::Type PutTime(const boost::optional< Time >& value);
 
   /**
    * Put time to buffer.
@@ -487,7 +551,7 @@ class ApplicationDataBuffer {
    * @param written Number of characters written.
    * @return Conversion result.
    */
-  ConversionResult::Type PutRawDataToBuffer(void* data, size_t len,
+  ConversionResult::Type PutRawDataToBuffer(const void* data, size_t len,
                                             int32_t& written);
 
   /**

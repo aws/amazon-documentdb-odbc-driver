@@ -15,9 +15,11 @@
  * limitations under the License.
  */
 
+#include <bsoncxx/json.hpp>
 #include <mongocxx/options/aggregate.hpp>
 #include <mongocxx/collection.hpp>
 #include <mongocxx/database.hpp>
+#include <mongocxx/exception/exception.hpp>
 #include <mongocxx/pipeline.hpp>
 
 #include <mongocxx/collection.hpp>
@@ -30,6 +32,7 @@
 #include "ignite/odbc/jni/documentdb_query_mapping_service.h"
 #include "ignite/odbc/log.h"
 #include "ignite/odbc/message.h"
+#include "ignite/odbc/mongo_cursor.h"
 #include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/query/batch_query.h"
 #include "ignite/odbc/query/data_query.h"
@@ -47,15 +50,12 @@ DataQuery::DataQuery(diagnostic::DiagnosableAdapter& diag,
                      Connection& connection, const std::string& sql,
                      const app::ParameterSet& params, int32_t& timeout)
     : Query(diag, QueryType::DATA),
-      connection(connection),
-      sql(sql),
-      params(params),
+      _connection(connection),
+      _sql(sql),
+      _params(params),
       resultMetaAvailable(false),
-      resultMeta(),
-      cursor(),
-      rowsAffected(),
-      rowsAffectedIdx(0),
-      cachedNextPage(),
+      _resultMeta(),
+      _cursor(),
       timeout(timeout) {
   // No-op.
 }
@@ -65,7 +65,7 @@ DataQuery::~DataQuery() {
 }
 
 SqlResult::Type DataQuery::Execute() {
-  if (cursor.get())
+  if (_cursor.get())
     InternalClose();
 
   return MakeRequestExecute();
@@ -79,41 +79,24 @@ const meta::ColumnMetaVector* DataQuery::GetMeta() {
       return nullptr;
   }
 
-  return &resultMeta;
+  return &_resultMeta;
 }
 
 SqlResult::Type DataQuery::FetchNextRow(app::ColumnBindingMap& columnBindings) {
-  // TODO: AD-604 - MakeRequestExecute
-  // https://bitquill.atlassian.net/browse/AD-604
-  return SqlResult::AI_NO_DATA;
-
-  if (!cursor.get()) {
+  if (!_cursor.get()) {
     diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
                          "Query was not executed.");
 
     return SqlResult::AI_ERROR;
   }
 
-  if (!cursor->HasData())
+  if (!_cursor->HasData())
     return SqlResult::AI_NO_DATA;
 
-  cursor->Increment();
-
-  if (cursor->NeedDataUpdate()) {
-    if (cachedNextPage.get())
-      cursor->UpdateData(cachedNextPage);
-    else {
-      SqlResult::Type result = MakeRequestFetch();
-
-      if (result != SqlResult::AI_SUCCESS)
-        return result;
-    }
-  }
-
-  if (!cursor->HasData())
+  if (!_cursor->Increment())
     return SqlResult::AI_NO_DATA;
 
-  Row* row = cursor->GetRow();
+  MongoRow* row = _cursor->GetRow();
 
   if (!row) {
     diag.AddStatusRecord("Unknown error.");
@@ -121,7 +104,7 @@ SqlResult::Type DataQuery::FetchNextRow(app::ColumnBindingMap& columnBindings) {
     return SqlResult::AI_ERROR;
   }
 
-  for (int32_t i = 1; i < row->GetSize() + 1; ++i) {
+  for (uint16_t i = 1; i < row->GetSize() + 1; ++i) {
     app::ColumnBindingMap::iterator it = columnBindings.find(i);
 
     if (it == columnBindings.end())
@@ -141,14 +124,14 @@ SqlResult::Type DataQuery::FetchNextRow(app::ColumnBindingMap& columnBindings) {
 
 SqlResult::Type DataQuery::GetColumn(uint16_t columnIdx,
                                      app::ApplicationDataBuffer& buffer) {
-  if (!cursor.get()) {
+  if (!_cursor.get()) {
     diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
                          "Query was not executed.");
 
     return SqlResult::AI_ERROR;
   }
 
-  Row* row = cursor->GetRow();
+  MongoRow* row = _cursor->GetRow();
 
   if (!row) {
     diag.AddStatusRecord(SqlState::S24000_INVALID_CURSOR_STATE,
@@ -170,80 +153,33 @@ SqlResult::Type DataQuery::Close() {
 }
 
 SqlResult::Type DataQuery::InternalClose() {
-  if (!cursor.get())
+  if (!_cursor.get())
     return SqlResult::AI_SUCCESS;
 
-  SqlResult::Type result = SqlResult::AI_SUCCESS;
-
-  if (!IsClosedRemotely())
-    result = MakeRequestClose();
-
+  SqlResult::Type result = MakeRequestClose();
   if (result == SqlResult::AI_SUCCESS) {
-    cursor.reset();
-
-    rowsAffectedIdx = 0;
-
-    rowsAffected.clear();
+    _cursor.reset();
   }
 
   return result;
 }
 
 bool DataQuery::DataAvailable() const {
-  return cursor.get() && cursor->HasData();
+  return _cursor.get() && _cursor->HasData();
 }
 
 int64_t DataQuery::AffectedRows() const {
-  int64_t affected =
-      rowsAffectedIdx < rowsAffected.size() ? rowsAffected[rowsAffectedIdx] : 0;
-
-  if (affected >= 0)
-    return affected;
-
-  return connection.GetConfiguration().GetDefaultFetchSize();
+  return 0;
 }
 
 SqlResult::Type DataQuery::NextResultSet() {
-  if (rowsAffectedIdx + 1 >= rowsAffected.size()) {
     InternalClose();
-
     return SqlResult::AI_NO_DATA;
-  }
-
-  SqlResult::Type res = MakeRequestMoreResults();
-
-  if (res == SqlResult::AI_SUCCESS)
-    ++rowsAffectedIdx;
-
-  return res;
-}
-
-bool DataQuery::IsClosedRemotely() const {
-  for (size_t i = 0; i < rowsAffected.size(); ++i) {
-    if (rowsAffected[i] < 0)
-      return false;
-  }
-
-  return true;
 }
 
 SqlResult::Type DataQuery::MakeRequestExecute() {
-  // TODO: AD-604 - MakeRequestExecute
-  // https://bitquill.atlassian.net/browse/AD-604
-  cursor.reset(new Cursor(0L));
-  rowsAffectedIdx = 0;
-
-  IgniteError error;
-  SharedPointer< DocumentDbMqlQueryContext > mqlQueryContext;
-  SqlResult::Type sqlRes = GetMqlQueryContext(mqlQueryContext, error);
-  if (!mqlQueryContext.IsValid() || sqlRes != SqlResult::AI_SUCCESS) {
-    diag.AddStatusRecord(error.GetText());
-    return SqlResult::AI_ERROR;
-  }
-
-  ReadJdbcColumnMetadataVector(mqlQueryContext.Get()->GetColumnMetadata());
-
-  return SqlResult::AI_SUCCESS;
+  _cursor.reset();
+  return MakeRequestFetch();
 }
 
 SqlResult::Type DataQuery::MakeRequestClose() {
@@ -253,22 +189,61 @@ SqlResult::Type DataQuery::MakeRequestClose() {
 }
 
 SqlResult::Type DataQuery::MakeRequestFetch() {
-  // TODO: AD-604 - MakeRequestExecute
-  // https://bitquill.atlassian.net/browse/AD-604
+  try {
+    SharedPointer< DocumentDbMqlQueryContext > mqlQueryContext;
+    IgniteError error;
+
+    SqlResult::Type result = GetMqlQueryContext(mqlQueryContext, error);
+    if (result != SqlResult::AI_SUCCESS) {
+      diag.AddStatusRecord(error.GetText());
+      return result;
+    }
+
+    std::vector< std::string > const& aggregateOperations =
+        mqlQueryContext.Get()->GetAggregateOperations();
+    std::vector< JdbcColumnMetadata >& columnMetadata =
+        mqlQueryContext.Get()->GetColumnMetadata();
+    std::vector< std::string >& paths = mqlQueryContext.Get()->GetPaths();
+
+    ReadJdbcColumnMetadataVector(columnMetadata);
+
+    const config::Configuration& config = _connection.GetConfiguration();
+    std::shared_ptr< mongocxx::client > const& mongoClient = _connection.GetMongoClient();
+    mongocxx::database database = (*mongoClient.get())[config.GetDatabase()];
+    mongocxx::collection collection =
+        database[mqlQueryContext.Get()->GetCollectionName()];
+    auto pipeline = mongocxx::pipeline{};
+    for (auto const& stage : aggregateOperations) {
+      pipeline.append_stage(bsoncxx::from_json(stage));
+    }
+    mongocxx::cursor cursor1 = collection.aggregate(pipeline);
+    this->_cursor = std::make_unique< MongoCursor >(cursor1, columnMetadata, paths);
 
   return SqlResult::AI_SUCCESS;
+  } catch (mongocxx::exception const& xcp) {
+    std::stringstream message;
+    message << "Unable to establish connection with DocumentDB."
+            << " code: " << xcp.code().value()
+            << " messagge: " << xcp.code().message()
+            << " cause: " << xcp.what();
+    odbc::IgniteError error(
+        odbc::IgniteError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
+        message.str().c_str());
+    diag.AddStatusRecord(error.GetText());
+    return SqlResult::AI_ERROR;
+  }
 }
 
 SqlResult::Type DataQuery::GetMqlQueryContext(
     SharedPointer< DocumentDbMqlQueryContext >& mqlQueryContext,
     IgniteError& error) {
   SharedPointer< DocumentDbConnectionProperties > connectionProperties =
-      connection.GetConnectionProperties(error);
+      _connection.GetConnectionProperties(error);
   if (error.GetCode() != IgniteError::IGNITE_SUCCESS) {
     return SqlResult::AI_ERROR;
   }
   SharedPointer< DocumentDbDatabaseMetadata > databaseMetadata =
-      connection.GetDatabaseMetadata(error);
+      _connection.GetDatabaseMetadata(error);
   if (error.GetCode() != IgniteError::IGNITE_SUCCESS) {
     return SqlResult::AI_ERROR;
   }
@@ -282,7 +257,7 @@ SqlResult::Type DataQuery::GetMqlQueryContext(
     return SqlResult::AI_ERROR;
   }
   mqlQueryContext =
-      queryMappingService.Get()->GetMqlQueryContext(sql, 0, errInfo);
+      queryMappingService.Get()->GetMqlQueryContext(_sql, 0, errInfo);
   if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     IgniteError::SetError(errInfo.code, errInfo.errCls.c_str(),
                           errInfo.errMsg.c_str(), error);
@@ -290,6 +265,7 @@ SqlResult::Type DataQuery::GetMqlQueryContext(
   }
   return SqlResult::AI_SUCCESS;
 }
+
 SqlResult::Type DataQuery::MakeRequestMoreResults() {
   // TODO: AD-604 - MakeRequestExecute
   // https://bitquill.atlassian.net/browse/AD-604
@@ -297,8 +273,6 @@ SqlResult::Type DataQuery::MakeRequestMoreResults() {
 }
 
 SqlResult::Type DataQuery::MakeRequestResultsetMeta() {
-  // TODO: AD-604 - MakeRequestExecute
-  // https://bitquill.atlassian.net/browse/AD-604
   IgniteError error;
   SharedPointer< DocumentDbMqlQueryContext > mqlQueryContext;
   SqlResult::Type sqlRes = GetMqlQueryContext(mqlQueryContext, error);
@@ -313,7 +287,7 @@ SqlResult::Type DataQuery::MakeRequestResultsetMeta() {
 void DataQuery::ReadJdbcColumnMetadataVector(
     std::vector< JdbcColumnMetadata > jdbcVector) {
   using ignite::odbc::meta::ColumnMeta;
-  resultMeta.clear();
+  _resultMeta.clear();
 
   if (jdbcVector.empty()) {
     return;
@@ -323,8 +297,8 @@ void DataQuery::ReadJdbcColumnMetadataVector(
   int32_t prevPosition = 0;
   for (JdbcColumnMetadata jdbcMetadata : jdbcVector) {
 
-    resultMeta.emplace_back(ColumnMeta());
-    resultMeta.back().ReadJdbcMetadata(jdbcMetadata, prevPosition);
+    _resultMeta.emplace_back(ColumnMeta());
+    _resultMeta.back().ReadJdbcMetadata(jdbcMetadata, prevPosition);
   }
   resultMetaAvailable = true;
 }
@@ -388,11 +362,11 @@ SqlResult::Type DataQuery::ProcessConversionResult(
 }
 
 void DataQuery::SetResultsetMeta(const meta::ColumnMetaVector& value) {
-  resultMeta.assign(value.begin(), value.end());
+  _resultMeta.assign(value.begin(), value.end());
   resultMetaAvailable = true;
 
-  for (size_t i = 0; i < resultMeta.size(); ++i) {
-    meta::ColumnMeta& meta = resultMeta.at(i);
+  for (size_t i = 0; i < _resultMeta.size(); ++i) {
+    meta::ColumnMeta& meta = _resultMeta.at(i);
     if (meta.GetDataType()) {
       LOG_MSG(
           "\n[" << i << "] SchemaName:     "

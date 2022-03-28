@@ -35,6 +35,7 @@
 #include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/parser.h"
 #include "ignite/odbc/streaming/streaming_context.h"
+#include "mongocxx/client.hpp"
 
 using ignite::odbc::common::concurrent::SharedPointer;
 using ignite::odbc::jni::DatabaseMetaData;
@@ -258,6 +259,10 @@ class Connection : public diagnostic::DiagnosableAdapter {
    * @param valueLen Value length.
    */
   void SetAttribute(int attr, void* value, SQLINTEGER valueLen);
+
+  inline std::shared_ptr<mongocxx::client>& GetMongoClient() {
+    return _mongoClient;
+  }
 
  private:
   IGNITE_NO_COPY_ASSIGNMENT(Connection);
@@ -484,6 +489,8 @@ class Connection : public diagnostic::DiagnosableAdapter {
   SharedPointer< DocumentDbConnection > _connection;
 
   SharedPointer< JniContext > _jniContext;
+
+  std::shared_ptr< mongocxx::client > _mongoClient;
 
   /** JVM options */
   std::vector< char* > opts;

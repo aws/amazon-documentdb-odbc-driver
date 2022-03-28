@@ -19,7 +19,7 @@
 #define _IGNITE_ODBC_QUERY_DATA_QUERY
 
 #include "ignite/odbc/app/parameter_set.h"
-#include "ignite/odbc/cursor.h"
+#include "ignite/odbc/mongo_cursor.h"
 #include "ignite/odbc/query/query.h"
 #include "ignite/odbc/jni/documentdb_mql_query_context.h"
 
@@ -120,18 +120,11 @@ class DataQuery : public Query {
    * @return SQL query string.
    */
   const std::string& GetSql() const {
-    return sql;
+    return _sql;
   }
 
  private:
   IGNITE_NO_COPY_ASSIGNMENT(DataQuery);
-
-  /**
-   * Check whether all cursors are closed remotely.
-   *
-   * @return true, if all cursors closed remotely.
-   */
-  bool IsClosedRemotely() const;
 
   /**
    * Make query prepare request and use response to set internal
@@ -223,31 +216,22 @@ class DataQuery : public Query {
   SqlResult::Type InternalClose();
 
   /** Connection associated with the statement. */
-  Connection& connection;
+  Connection& _connection;
 
   /** SQL Query. */
-  std::string sql;
+  std::string _sql;
 
   /** Parameter bindings. */
-  const app::ParameterSet& params;
+  const app::ParameterSet& _params;
 
   /** Result set metadata is available */
   bool resultMetaAvailable;
 
   /** Result set metadata. */
-  meta::ColumnMetaVector resultMeta;
+  meta::ColumnMetaVector _resultMeta;
 
   /** Cursor. */
-  std::auto_ptr< Cursor > cursor;
-
-  /** Number of rows affected. */
-  std::vector< int64_t > rowsAffected;
-
-  /** Rows affected index. */
-  size_t rowsAffectedIdx;
-
-  /** Cached next result page. */
-  std::auto_ptr< ResultPage > cachedNextPage;
+  std::unique_ptr< MongoCursor > _cursor;
 
   /** Timeout. */
   int32_t& timeout;

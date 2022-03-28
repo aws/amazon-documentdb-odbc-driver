@@ -105,6 +105,9 @@ set(SOURCES
          ../odbc/src/message.cpp
          ../odbc/src/meta/column_meta.cpp
          ../odbc/src/meta/table_meta.cpp
+         ../odbc/src/mongo_column.cpp
+         ../odbc/src/mongo_cursor.cpp
+         ../odbc/src/mongo_row.cpp
          ../odbc/src/nested_tx_mode.cpp
          ../odbc/src/protocol_version.cpp
          ../odbc/src/query/batch_query.cpp

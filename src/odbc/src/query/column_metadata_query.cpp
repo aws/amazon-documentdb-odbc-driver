@@ -236,42 +236,42 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
 
   switch (columnIdx) {
     case ResultColumn::TABLE_CAT: {
-      buffer.PutOptString(currentColumn.GetCatalogName());
+      buffer.PutString(currentColumn.GetCatalogName());
       break;
     }
 
     case ResultColumn::TABLE_SCHEM: {
-      buffer.PutOptString(currentColumn.GetSchemaName());
+      buffer.PutString(currentColumn.GetSchemaName());
       break;
     }
 
     case ResultColumn::TABLE_NAME: {
-      buffer.PutOptString(currentColumn.GetTableName());
+      buffer.PutString(currentColumn.GetTableName());
       break;
     }
 
     case ResultColumn::COLUMN_NAME: {
-      buffer.PutOptString(currentColumn.GetColumnName());
+      buffer.PutString(currentColumn.GetColumnName());
       break;
     }
 
     case ResultColumn::DATA_TYPE: {
-      buffer.PutOptInt16(type_traits::BinaryToSqlType(columnType));
+      buffer.PutInt16(type_traits::BinaryToSqlType(columnType));
       break;
     }
 
     case ResultColumn::TYPE_NAME: {
-      buffer.PutOptString(type_traits::BinaryTypeToSqlTypeName(columnType));
+      buffer.PutString(type_traits::BinaryTypeToSqlTypeName(columnType));
       break;
     }
 
     case ResultColumn::COLUMN_SIZE: {
-      buffer.PutOptInt32(type_traits::BinaryTypeColumnSize(columnType));
+      buffer.PutInt32(type_traits::BinaryTypeColumnSize(columnType));
       break;
     }
 
     case ResultColumn::BUFFER_LENGTH: {
-      buffer.PutOptInt32(type_traits::BinaryTypeTransferLength(columnType));
+      buffer.PutInt32(type_traits::BinaryTypeTransferLength(columnType));
       break;
     }
 
@@ -298,22 +298,22 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::NULLABLE: {
-      buffer.PutOptInt32(currentColumn.GetNullability());
+      buffer.PutInt32(currentColumn.GetNullability());
       break;
     }
 
     case ResultColumn::REMARKS: {
-      buffer.PutOptString(currentColumn.GetRemarks());
+      buffer.PutString(currentColumn.GetRemarks());
       break;
     }
 
     case ResultColumn::COLUMN_DEF: {
-      buffer.PutOptString(currentColumn.GetColumnDef());
+      buffer.PutString(currentColumn.GetColumnDef());
       break;
     }
 
     case ResultColumn::SQL_DATA_TYPE: {
-      buffer.PutOptInt16(type_traits::BinaryToSqlType(columnType));
+      buffer.PutInt16(type_traits::BinaryToSqlType(columnType));
       break;
     }
 
@@ -325,17 +325,17 @@ SqlResult::Type ColumnMetadataQuery::GetColumn(
     }
 
     case ResultColumn::CHAR_OCTET_LENGTH: {
-      buffer.PutOptInt32(type_traits::BinaryTypeCharOctetLength(columnType));
+      buffer.PutInt32(type_traits::BinaryTypeCharOctetLength(columnType));
       break;
     }
 
     case ResultColumn::ORDINAL_POSITION: {
-      buffer.PutOptInt32(currentColumn.GetOrdinalPosition());
+      buffer.PutInt32(currentColumn.GetOrdinalPosition());
       break;
     }
 
     case ResultColumn::IS_NULLABLE: {
-      buffer.PutOptString(
+      buffer.PutString(
           type_traits::NullabilityToIsNullable(currentColumn.GetNullability()));
       break;
     }

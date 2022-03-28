@@ -713,8 +713,8 @@ SqlResult::Type Statement::ProcessInternalQuery() {
 
   connection.GetStreamingContext().Enable(cmd);
 
-  std::auto_ptr< query::Query > newQry(
-      new query::StreamingQuery(*this, connection, parameters));
+  std::unique_ptr< query::Query > newQry =
+      std::make_unique< query::StreamingQuery >(*this, connection, parameters);
 
   std::swap(currentQuery, newQry);
 

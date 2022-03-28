@@ -44,6 +44,9 @@ class JdbcColumnMetadata {
   friend class DocumentDbQueryMappingService;
 
  public:
+  /** Constructs a default instance */
+  JdbcColumnMetadata() = default;
+
   /**
    * Destructs the JdbcColumnMetadata object.
    */
@@ -52,147 +55,147 @@ class JdbcColumnMetadata {
   /**
    * Gets the (zero-indexed) ordinal of the column in the table.
    */
-  int32_t GetOrdinal() {
+  int32_t GetOrdinal() const {
     return _ordinal;
   }
 
   /**
    * Gets the indicator of whether the column is auto incremented.
    */
-  bool IsAutoIncrement() {
+  bool IsAutoIncrement() const {
     return _autoIncrement;
   }
 
   /**
    * Gets the indicator of whether the column is case sensitive.
    */
-  bool IsCaseSensitive() {
+  bool IsCaseSensitive() const {
     return _caseSensitive;
   }
 
   /**
    * Gets the indicator of whether the column is searchable.
    */
-  bool IsSearchable() {
+  bool IsSearchable() const {
     return _searchable;
   }
 
   /**
    * Gets the indicator of whether the column is a currency.
    */
-  bool IsCurrency() {
+  bool IsCurrency() const {
     return _currency;
   }
 
   /**
    * Gets the indicator of whether the column is nullable, non-nullable or unknown-nullable.
    */
-  int32_t GetNullable() {
+  int32_t GetNullable() const {
     return _nullable;
   }
 
   /**
    * Gets the indicator of whether the column is signed numeric value.
    */
-  bool IsSigned() {
+  bool IsSigned() const {
     return _signed;
   }
 
   /**
    * Gets the display size for the column.
    */
-  int32_t GetColumnDisplaySize() {
+  int32_t GetColumnDisplaySize() const {
     return _columnDisplaySize;
   }
 
   /**
    * Gets the label for the column.
    */
-  boost::optional< std::string > GetColumnLabel() {
+  boost::optional< std::string > GetColumnLabel() const {
     return _columnLabel;
   }
 
   /**
    * Gets the name of the column.
    */
-  boost::optional< std::string > GetColumnName() {
+  boost::optional< std::string > GetColumnName() const {
     return _columnName;
   }
 
   /**
    * Gets the schema name (if any) for the column.
    */
-  boost::optional< std::string > GetSchemaName() {
+  boost::optional< std::string > GetSchemaName() const {
     return _schemaName;
   }
 
   /**
    * Gets the precision (i.e. length) of the value.
    */
-  int32_t GetPrecision() {
+  int32_t GetPrecision() const {
     return _precision;
   }
 
   /**
    * Gets the scale of the numeric value.
    */
-  int32_t GetScale() {
+  int32_t GetScale() const {
     return _scale;
   }
 
   /**
    * Gets the name of the table the column belongs.
    */
-  boost::optional< std::string > GetTableName() {
+  boost::optional< std::string > GetTableName() const {
     return _tableName;
   }
 
   /**
    * Gets the name of the catalog (if any) the column belongs.
    */
-  boost::optional< std::string > GetCatalogName() {
+  boost::optional< std::string > GetCatalogName() const {
     return _catalogName;
   }
 
   /**
    * Gets the data type of the column. See JDBC_TYPE_*
    */
-  int32_t GetColumnType() {
+  int32_t GetColumnType() const {
     return _columnType;
   }
 
   /**
    * Gets the type name of the column.
    */
-  boost::optional< std::string > GetColumnTypeName() {
+  boost::optional< std::string > GetColumnTypeName() const {
     return _columnTypeName;
   }
 
   /**
    * Gets the indicator of whether the column is read only.
    */
-  bool IsReadOnly() {
+  bool IsReadOnly() const {
     return _readOnly;
   }
   
   /**
    * Gets the indicator of whether the column is writable.
    */
-  bool IsWritable() {
+  bool IsWritable() const {
     return _writable;
   }
 
   /**
    * Gets the indicator of whether the column is definitely writable.
    */
-  bool IsDefinitelyWritable() {
+  bool IsDefinitelyWritable() const {
     return _definitelyWritable;
   }
 
   /**
    * Gets the Java class name for the column.
    */
-  boost::optional< std::string > GetColumnClassName() {
+  boost::optional< std::string > GetColumnClassName() const {
     return _columnClassName;
   }
 

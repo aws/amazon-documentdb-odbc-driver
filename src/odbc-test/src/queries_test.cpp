@@ -54,6 +54,10 @@ using ignite::impl::binary::BinaryUtils;
  * Test setup fixture.
  */
 struct QueriesTestSuiteFixture : odbc::OdbcTestSuite {
+  const std::string DATABASE_NAME = "odbc-test";
+  const std::string TABLE_NAME = "queries_test_001";
+  const std::string TABLE_ID_COLUMN_NAME = "queries_test_001__id";
+
   /**
    * Constructor.
    */
@@ -216,17 +220,258 @@ struct QueriesTestSuiteFixture : odbc::OdbcTestSuite {
 
 BOOST_FIXTURE_TEST_SUITE(QueriesTestSuite, QueriesTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestEmptyResult) {
+BOOST_AUTO_TEST_CASE(TestSingleResultUsigGetData) {
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
   Connect(dsnConnectionString);
   SQLRETURN ret;
-  char request[] = "SELECT * FROM queries_test_001";
+  char request[] = "SELECT * FROM \"queries_test_001\"";
 
   ret = SQLExecDirect(stmt, reinterpret_cast< SQLCHAR* >(request), SQL_NTS);
   if (!SQL_SUCCEEDED(ret)) {
-    GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt);
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
+
+  const int32_t buf_size = 1024;
+  SQLCHAR id[buf_size]{};
+  SQLLEN id_len = 0;
+  //"\"fieldDecimal128\": \"$fieldDecimal128\", "
+  SQLCHAR fieldDecimal128[buf_size]{};
+  SQLLEN fieldDecimal128_len = 0;
+  //"\"fieldDouble\": \"$fieldDouble\", "
+  double fieldDouble = 0;
+  SQLLEN fieldDouble_len = 0;
+  //"\"fieldString\": \"$fieldString\", "
+  SQLCHAR fieldString[buf_size]{};
+  SQLLEN fieldString_len = 0;
+  //"\"fieldObjectId\": \"$fieldObjectId\", "
+  SQLCHAR fieldObjectId[buf_size]{};
+  SQLLEN fieldObjectId_len = 0;
+  //"\"fieldBoolean\": \"$fieldBoolean\", "
+  bool fieldBoolean = false;
+  SQLLEN fieldBoolean_len = 0;
+  //"\"fieldDate\": \"$fieldDate\", "
+  DATE_STRUCT fieldDate{};
+  SQLLEN fieldDate_len = 0;
+  //"\"fieldInt\": \"$fieldInt\", "
+  SQLINTEGER fieldInt;
+  SQLLEN fieldInt_len = 0;
+  //"\"fieldLong\": \"$fieldLong\", "
+  SQLBIGINT fieldLong;
+  SQLLEN fieldLong_len = 0;
+  //"\"fieldMaxKey\": \"$fieldMaxKey\", "
+  SQLCHAR fieldMaxKey[buf_size];
+  SQLLEN fieldMaxKey_len = 0;
+  //"\"fieldMinKey\": \"$fieldMinKey\", "
+  SQLCHAR fieldMinKey[buf_size];
+  SQLLEN fieldMinKey_len = 0;
+  //"\"fieldNull\": \"$fieldNull\", "
+  SQLCHAR fieldNull[buf_size];
+  SQLLEN fieldNull_len = 0;
+  //"\"fieldBinary\": \"$fieldBinary\", "
+  SQLCHAR fieldBinary[buf_size];
+  SQLLEN fieldBinary_len = 0;
+
+  // Fetch 1st row
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+
+  ret = SQLGetData(stmt, 1, SQL_C_CHAR, id, buf_size, &id_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 2, SQL_C_CHAR, fieldDecimal128, buf_size,
+                   &fieldDecimal128_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 3, SQL_C_DOUBLE, &fieldDouble, sizeof(fieldDouble),
+                   &fieldDouble_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret =
+      SQLGetData(stmt, 4, SQL_C_CHAR, fieldString, buf_size, &fieldString_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 5, SQL_C_CHAR, fieldObjectId, buf_size,
+                   &fieldObjectId_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 6, SQL_C_BIT, &fieldBoolean, sizeof(fieldBoolean),
+                   &fieldBoolean_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 7, SQL_C_TYPE_DATE, &fieldDate, sizeof(fieldDate),
+                   &fieldDate_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 8, SQL_C_SLONG, &fieldInt, sizeof(fieldInt),
+                   &fieldInt_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 9, SQL_C_SBIGINT, &fieldLong, sizeof(fieldLong),
+                   &fieldLong_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret =
+      SQLGetData(stmt, 10, SQL_C_CHAR, fieldMaxKey, buf_size, &fieldMaxKey_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret =
+      SQLGetData(stmt, 11, SQL_C_CHAR, fieldMinKey, buf_size, &fieldMinKey_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 12, SQL_C_CHAR, fieldNull, buf_size, &fieldNull_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 13, SQL_C_BINARY, fieldBinary, buf_size,
+                   &fieldBinary_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+
+  BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
+  BOOST_CHECK_EQUAL("62196dcc4d91892191475139", (char*)id);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldDecimal128_len);
+  BOOST_CHECK_EQUAL("340282350000000000000", (char*)fieldDecimal128);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldDouble_len);
+  BOOST_CHECK_EQUAL(1.7976931348623157e308, fieldDouble);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldString_len);
+  BOOST_CHECK_EQUAL("some Text", (char*)fieldString);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldObjectId_len);
+  BOOST_CHECK_EQUAL("62196dcc4d9189219147513a", (char*)fieldObjectId);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldBoolean_len);
+  BOOST_CHECK_EQUAL(true, fieldBoolean);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldDate_len);
+  BOOST_CHECK_EQUAL(2020, fieldDate.year);
+  BOOST_CHECK_EQUAL(1, fieldDate.month);
+  BOOST_CHECK_EQUAL(1, fieldDate.day);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldInt_len);
+  BOOST_CHECK_EQUAL(2147483647, fieldInt);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldLong_len);
+  BOOST_CHECK_EQUAL(9223372036854775807, fieldLong);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldMaxKey_len);
+  BOOST_CHECK_EQUAL("MAXKEY", (char*)fieldMaxKey);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldMinKey_len);
+  BOOST_CHECK_EQUAL("MINKEY", (char*)fieldMinKey);
+  BOOST_CHECK_EQUAL(SQL_NULL_DATA, fieldNull_len);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldBinary_len);
+  BOOST_CHECK_EQUAL(3, fieldBinary_len);
+  BOOST_CHECK_EQUAL(fieldBinary[0], 0);
+  BOOST_CHECK_EQUAL(fieldBinary[1], 1);
+  BOOST_CHECK_EQUAL(fieldBinary[2], 2);
+
+  // Fetch 2nd row - not exist
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_NO_DATA, ret);
+}
+
+BOOST_AUTO_TEST_CASE(TestSingleResultUsigBindCol) {
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+  Connect(dsnConnectionString);
+  SQLRETURN ret;
+  char request[] = "SELECT * FROM \"queries_test_001\"";
+
+  ret = SQLExecDirect(stmt, reinterpret_cast< SQLCHAR* >(request), SQL_NTS);
+  if (!SQL_SUCCEEDED(ret)) {
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  }
+  const int32_t buf_size = 1024;
+  SQLCHAR id[buf_size]{};
+  SQLLEN id_len = 0;
+  //"\"fieldDecimal128\": \"$fieldDecimal128\", "
+  SQLCHAR fieldDecimal128[buf_size]{};
+  SQLLEN fieldDecimal128_len = 0;
+  //"\"fieldDouble\": \"$fieldDouble\", "
+  double fieldDouble = 0;
+  SQLLEN fieldDouble_len = 0;
+  //"\"fieldString\": \"$fieldString\", "
+  SQLCHAR fieldString[buf_size]{};
+  SQLLEN fieldString_len = 0;
+      //"\"fieldObjectId\": \"$fieldObjectId\", "
+  SQLCHAR fieldObjectId[buf_size]{};
+  SQLLEN fieldObjectId_len = 0;
+      //"\"fieldBoolean\": \"$fieldBoolean\", "
+  bool fieldBoolean = false;
+  SQLLEN fieldBoolean_len = 0;
+      //"\"fieldDate\": \"$fieldDate\", "
+  DATE_STRUCT fieldDate{};
+  SQLLEN fieldDate_len = 0;
+      //"\"fieldInt\": \"$fieldInt\", "
+  SQLINTEGER fieldInt;
+  SQLLEN fieldInt_len = 0;
+  //"\"fieldLong\": \"$fieldLong\", "
+  SQLBIGINT fieldLong;
+  SQLLEN fieldLong_len = 0;
+  //"\"fieldMaxKey\": \"$fieldMaxKey\", "
+  SQLCHAR fieldMaxKey[buf_size];
+  SQLLEN fieldMaxKey_len = 0;
+  //"\"fieldMinKey\": \"$fieldMinKey\", "
+  SQLCHAR fieldMinKey[buf_size];
+  SQLLEN fieldMinKey_len = 0;
+  //"\"fieldNull\": \"$fieldNull\", "
+  SQLCHAR fieldNull[buf_size];
+  SQLLEN fieldNull_len = 0;
+  //"\"fieldBinary\": \"$fieldBinary\", "
+  SQLCHAR fieldBinary[buf_size];
+  SQLLEN fieldBinary_len = 0;
+
+  ret = SQLBindCol(stmt, 1, SQL_C_CHAR, id, buf_size, &id_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 2, SQL_C_CHAR, fieldDecimal128, buf_size, &fieldDecimal128_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 3, SQL_C_DOUBLE, &fieldDouble, sizeof(fieldDouble),
+                   &fieldDouble_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 4, SQL_C_CHAR, fieldString, buf_size,
+                   &fieldString_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 5, SQL_C_CHAR, fieldObjectId, buf_size,
+                   &fieldObjectId_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 6, SQL_C_BIT, &fieldBoolean, sizeof(fieldBoolean),
+                   &fieldBoolean_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 7, SQL_C_TYPE_DATE, &fieldDate, sizeof(fieldDate),
+                   &fieldDate_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 8, SQL_C_SLONG, &fieldInt, sizeof(fieldInt), &fieldInt_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 9, SQL_C_SBIGINT, &fieldLong, sizeof(fieldLong),
+                   &fieldLong_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret =
+      SQLBindCol(stmt, 10, SQL_C_CHAR, fieldMaxKey, buf_size, &fieldMaxKey_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret =
+      SQLBindCol(stmt, 11, SQL_C_CHAR, fieldMinKey, buf_size, &fieldMinKey_len);
+    BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 12, SQL_C_CHAR, fieldNull, buf_size, &fieldNull_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 13, SQL_C_BINARY, fieldBinary, buf_size, &fieldBinary_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+
+  // Fetch 1st row
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+
+  BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
+  BOOST_CHECK_EQUAL("62196dcc4d91892191475139", (char*)id);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldDecimal128_len);
+  BOOST_CHECK_EQUAL("340282350000000000000", (char*)fieldDecimal128);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldDouble_len);
+  BOOST_CHECK_EQUAL(1.7976931348623157e308, fieldDouble);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldString_len);
+  BOOST_CHECK_EQUAL("some Text", (char*)fieldString);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldObjectId_len);
+  BOOST_CHECK_EQUAL("62196dcc4d9189219147513a", (char*)fieldObjectId);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldBoolean_len);
+  BOOST_CHECK_EQUAL(true, fieldBoolean);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldDate_len);
+  BOOST_CHECK_EQUAL(2020, fieldDate.year);
+  BOOST_CHECK_EQUAL(1, fieldDate.month);
+  BOOST_CHECK_EQUAL(1, fieldDate.day);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldInt_len);
+  BOOST_CHECK_EQUAL(2147483647, fieldInt);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldLong_len);
+  BOOST_CHECK_EQUAL(9223372036854775807, fieldLong);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldMaxKey_len);
+  BOOST_CHECK_EQUAL("MAXKEY", (char*)fieldMaxKey);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldMinKey_len);
+  BOOST_CHECK_EQUAL("MINKEY", (char*)fieldMinKey);
+  BOOST_CHECK_EQUAL(SQL_NULL_DATA, fieldNull_len);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldBinary_len);
+  BOOST_CHECK_EQUAL(3, fieldBinary_len);
+  BOOST_CHECK_EQUAL(fieldBinary[0], 0);
+  BOOST_CHECK_EQUAL(fieldBinary[1], 1);
+  BOOST_CHECK_EQUAL(fieldBinary[2], 2);
+
+  // Fetch 2nd row - not exist
   ret = SQLFetch(stmt);
   BOOST_CHECK_EQUAL(SQL_NO_DATA, ret);
 }

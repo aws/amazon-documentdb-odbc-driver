@@ -30,6 +30,7 @@
 #include <cstddef>
 #include <cstring>
 #include <mongocxx/client.hpp>
+#include <mongocxx/exception/exception.hpp>
 #include <mongocxx/uri.hpp>
 #include <sstream>
 
@@ -744,13 +745,13 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
       tls_options.allow_invalid_certificates(true);
       client_options.tls_opts(tls_options);
     }
-    auto client1 = mongocxx::client{mongocxx::uri{mongoCPPConnectionString},
-                                    client_options};
-
+    
+    _mongoClient = std::make_shared< mongocxx::client >(
+        mongocxx::uri(mongoCPPConnectionString), client_options);
     std::string database = config.GetDatabase();
     bsoncxx::builder::stream::document ping;
     ping << "ping" << 1;
-    auto db = client1[database];
+    auto db = (*_mongoClient.get())[database];
     auto result = db.run_command(ping.view());
 
     if (result.view()["ok"].get_double() != 1) {
@@ -760,10 +761,15 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
     }
 
     return true;
-  } catch (const std::exception& xcp) {
+  } catch (const mongocxx::exception& xcp) {
+    std::stringstream message;
+    message << "Unable to establish connection with DocumentDB."
+              << " code: " << xcp.code().value()
+              << " messagge: " << xcp.code().message()
+              << " cause: " << xcp.what();
     err = odbc::IgniteError(
         odbc::IgniteError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
-        "Unable to establish connection with DocumentDB.");
+        message.str().c_str());
     return false;
   }
 }

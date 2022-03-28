@@ -2,11 +2,11 @@
    "_id":{
       "$oid":"62196dcc4d91892191475139"
    },
-   "fieldDecimal128":{
-      "$numberDecimal":"Infinity"
-   },
+  "fieldDecimal128": {
+    "$numberDecimal": "3.4028235e20"
+  },
    "fieldDouble":1.7976931348623157E308,
-   "fieldString":"新年快乐",
+   "fieldString":"some Text",
    "fieldObjectId":{
       "$oid":"62196dcc4d9189219147513a"
    },

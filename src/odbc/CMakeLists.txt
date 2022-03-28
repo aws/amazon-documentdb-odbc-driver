@@ -82,6 +82,9 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/environment.cpp
         src/meta/column_meta.cpp
         src/meta/table_meta.cpp
+        src/mongo_column.cpp
+        src/mongo_cursor.cpp
+        src/mongo_row.cpp
         src/odbc.cpp
         src/entry_points.cpp
         src/dsn_config.cpp
