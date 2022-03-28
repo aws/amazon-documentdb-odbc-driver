@@ -683,6 +683,11 @@ ConversionResult::Type MongoColumn::ReadToBuffer(
     return ConversionResult::AI_FAILURE;
 
   auto element = _document[_path];
+  // Invalid (or missing) element is null
+  if (!element) {
+    dataBuf.PutNull();
+    return ConversionResult::AI_SUCCESS;
+  }
   
   ConversionResult::Type convRes = ConversionResult::AI_SUCCESS;
 

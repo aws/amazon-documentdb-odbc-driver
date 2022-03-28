@@ -220,7 +220,7 @@ struct QueriesTestSuiteFixture : odbc::OdbcTestSuite {
 
 BOOST_FIXTURE_TEST_SUITE(QueriesTestSuite, QueriesTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestSingleResultUsigGetData) {
+BOOST_AUTO_TEST_CASE(TestSingleResultUsingGetData) {
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
   Connect(dsnConnectionString);
@@ -350,7 +350,7 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsigGetData) {
   BOOST_CHECK_EQUAL(SQL_NO_DATA, ret);
 }
 
-BOOST_AUTO_TEST_CASE(TestSingleResultUsigBindCol) {
+BOOST_AUTO_TEST_CASE(TestSingleResultUsingBindCol) {
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
   Connect(dsnConnectionString);
