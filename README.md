@@ -118,7 +118,7 @@ Example:
    E.g. `docker cp ~/.ssh/rds-ca-2019-root.pem f3a1c14ea426:/root/.ssh/ds-ca-2019-root.pem`
    E.g. `docker cp ~/.ssh/ssh-tunnel.pem f3a1c14ea426:/root/.ssh/ssh-tunnel.pem`
 7. Run local ssh tunnel.
-8. Set environment variables for testing.
+8. Set environment variables for testing and double-check if all dev environmnet variables are set running `scripts/env_variables_check.sh`.
    1. set LOCAL_DATABASE_HOST with the ip of your local mongo
       E.g. If is in another docker container `export LOCAL_DATABASE_HOST=<ip from the mongo docker container>` or if is your host machine `export LOCAL_DATABASE_HOST=host.docker.internal`
 9. You are ready to run the tests.
