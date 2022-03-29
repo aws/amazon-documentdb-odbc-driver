@@ -1,32 +1,34 @@
-{
-   "_id":{
-      "$oid":"62196dcc4d91892191475139"
-   },
-  "fieldDecimal128": {
-    "$numberDecimal": "3.4028235e20"
-  },
-   "fieldDouble":1.7976931348623157E308,
-   "fieldString":"some Text",
-   "fieldObjectId":{
-      "$oid":"62196dcc4d9189219147513a"
-   },
-   "fieldBoolean":true,
-   "fieldDate":{
-      "$date":"2020-01-01T00:00:00Z"
-   },
-   "fieldInt":2147483647,
-   "fieldLong":9223372036854775807,
-   "fieldMaxKey":{
-      "$maxKey":1
-   },
-   "fieldMinKey":{
-      "$minKey":1
-   },
-   "fieldNull":null,
-   "fieldBinary":{
-      "$binary":{
-         "base64":"AAEC",
-         "subType":"00"
+[
+  {
+    "_id": {
+      "$oid": "62196dcc4d91892191475139"
+    },
+    "fieldDecimal128": {
+      "$numberDecimal": "3.4028235e20"
+    },
+    "fieldDouble": 1.7976931348623157E308,
+    "fieldString": "some Text",
+    "fieldObjectId": {
+      "$oid": "62196dcc4d9189219147513a"
+    },
+    "fieldBoolean": true,
+    "fieldDate": {
+      "$date": "2020-01-01T00:00:00Z"
+    },
+    "fieldInt": 2147483647,
+    "fieldLong": 9223372036854775807,
+    "fieldMaxKey": {
+      "$maxKey": 1
+    },
+    "fieldMinKey": {
+      "$minKey": 1
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
       }
-   }
-}
+    }
+  }
+]

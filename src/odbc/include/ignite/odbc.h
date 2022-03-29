@@ -18,10 +18,6 @@
 #ifndef _IGNITE_ODBC_ODBC
 #define _IGNITE_ODBC_ODBC
 
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-
 #include "ignite/odbc/system/odbc_constants.h"
 
 /**
