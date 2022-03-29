@@ -205,21 +205,28 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
         mqlQueryContext.Get()->GetColumnMetadata();
     std::vector< std::string >& paths = mqlQueryContext.Get()->GetPaths();
 
-    ReadJdbcColumnMetadataVector(columnMetadata);
+    if (!resultMetaAvailable) {
+      ReadJdbcColumnMetadataVector(columnMetadata);
+    }
 
     const config::Configuration& config = _connection.GetConfiguration();
-    std::shared_ptr< mongocxx::client > const& mongoClient = _connection.GetMongoClient();
-    mongocxx::database database = (*mongoClient.get())[config.GetDatabase()];
-    mongocxx::collection collection =
-        database[mqlQueryContext.Get()->GetCollectionName()];
+    std::string databaseName = config.GetDatabase();
+    std::string collectionName = mqlQueryContext.Get()->GetCollectionName();
+
+    std::shared_ptr< mongocxx::client > const& mongoClient =
+        _connection.GetMongoClient();
+    mongocxx::database database = mongoClient.get()->database(databaseName);
+    mongocxx::collection collection = database[collectionName];
     auto pipeline = mongocxx::pipeline{};
     for (auto const& stage : aggregateOperations) {
       pipeline.append_stage(bsoncxx::from_json(stage));
     }
-    mongocxx::cursor cursor1 = collection.aggregate(pipeline);
-    this->_cursor = std::make_unique< MongoCursor >(cursor1, columnMetadata, paths);
+    mongocxx::cursor cursor = collection.aggregate(pipeline);
 
-  return SqlResult::AI_SUCCESS;
+    this->_cursor =
+        std::make_unique< MongoCursor >(cursor, columnMetadata, paths);
+
+    return SqlResult::AI_SUCCESS;
   } catch (mongocxx::exception const& xcp) {
     std::stringstream message;
     message << "Unable to establish connection with DocumentDB."
