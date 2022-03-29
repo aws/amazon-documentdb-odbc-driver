@@ -223,8 +223,7 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
     }
     mongocxx::cursor cursor = collection.aggregate(pipeline);
 
-    this->_cursor =
-        std::make_unique< MongoCursor >(cursor, columnMetadata, paths);
+    this->_cursor.reset(new MongoCursor(cursor, columnMetadata, paths));
 
     return SqlResult::AI_SUCCESS;
   } catch (mongocxx::exception const& xcp) {

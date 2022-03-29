@@ -39,7 +39,7 @@ bool MongoCursor::Increment() {
   bool hasData = HasData();
   if (hasData) {
     _currentRow.release();
-    _currentRow = std::make_unique< MongoRow >(_iterator, _iteratorEnd, _columnMetadata, _paths);
+    _currentRow.reset(new MongoRow(_iterator, _iteratorEnd, _columnMetadata, _paths));
     _iterator++;
   } else {
     _currentRow.reset();
