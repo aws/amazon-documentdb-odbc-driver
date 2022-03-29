@@ -225,16 +225,16 @@ class DataQuery : public Query {
   const app::ParameterSet& _params;
 
   /** Result set metadata is available */
-  bool resultMetaAvailable;
+  bool _resultMetaAvailable = false;
 
   /** Result set metadata. */
-  meta::ColumnMetaVector _resultMeta;
+  meta::ColumnMetaVector _resultMeta{};
 
   /** Cursor. */
-  std::unique_ptr< MongoCursor > _cursor;
+  std::unique_ptr< MongoCursor > _cursor{};
 
   /** Timeout. */
-  int32_t& timeout;
+  int32_t& _timeout;
 };
 }  // namespace query
 }  // namespace odbc

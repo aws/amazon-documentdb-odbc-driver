@@ -53,10 +53,7 @@ DataQuery::DataQuery(diagnostic::DiagnosableAdapter& diag,
       _connection(connection),
       _sql(sql),
       _params(params),
-      resultMetaAvailable(false),
-      _resultMeta(),
-      _cursor(),
-      timeout(timeout) {
+      _timeout(timeout) {
   // No-op.
 }
 
@@ -72,10 +69,10 @@ SqlResult::Type DataQuery::Execute() {
 }
 
 const meta::ColumnMetaVector* DataQuery::GetMeta() {
-  if (!resultMetaAvailable) {
+  if (!_resultMetaAvailable) {
     MakeRequestResultsetMeta();
 
-    if (!resultMetaAvailable)
+    if (!_resultMetaAvailable)
       return nullptr;
   }
 
@@ -205,7 +202,7 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
         mqlQueryContext.Get()->GetColumnMetadata();
     std::vector< std::string >& paths = mqlQueryContext.Get()->GetPaths();
 
-    if (!resultMetaAvailable) {
+    if (!_resultMetaAvailable) {
       ReadJdbcColumnMetadataVector(columnMetadata);
     }
 
@@ -306,7 +303,7 @@ void DataQuery::ReadJdbcColumnMetadataVector(
     _resultMeta.emplace_back(ColumnMeta());
     _resultMeta.back().ReadJdbcMetadata(jdbcMetadata, prevPosition);
   }
-  resultMetaAvailable = true;
+  _resultMetaAvailable = true;
 }
 
 SqlResult::Type DataQuery::ProcessConversionResult(
@@ -369,7 +366,7 @@ SqlResult::Type DataQuery::ProcessConversionResult(
 
 void DataQuery::SetResultsetMeta(const meta::ColumnMetaVector& value) {
   _resultMeta.assign(value.begin(), value.end());
-  resultMetaAvailable = true;
+  _resultMetaAvailable = true;
 
   for (size_t i = 0; i < _resultMeta.size(); ++i) {
     meta::ColumnMeta& meta = _resultMeta.at(i);
