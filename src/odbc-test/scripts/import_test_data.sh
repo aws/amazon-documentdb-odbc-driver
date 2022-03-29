@@ -22,8 +22,8 @@ do
     TEST_FILE_NAME="$(basename -- ${FILENAME})"
 
     mongoimport -u="${DOC_DB_USER_NAME}" -p="${DOC_DB_PASSWORD}" --authenticationDatabase=admin \
-        -d="${DATABASE_NAME}" -c="${COLLECTION_NAME}" \
-        --file="""${TEST_INPUT_FOLDER}/${TEST_FILE_NAME}"" --jsonArray"
+        -d="${DATABASE_NAME}" -c="${COLLECTION_NAME}" --jsonArray \
+        --file="""${TEST_INPUT_FOLDER}/${TEST_FILE_NAME}"""
     if [ $? -ne 0 ]
     then
         exit 1
