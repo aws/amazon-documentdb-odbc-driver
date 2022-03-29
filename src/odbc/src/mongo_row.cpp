@@ -70,17 +70,11 @@ bool MongoRow::EnsureColumnDiscovered(int16_t columnIdx) {
   while (columns.size() < columnIdx) {
     MongoColumn newColumn(_document, _columnMetadata[index], _paths[index]);
 
-    if (!newColumn.IsValid())
-      return false;
-
     columns.push_back(newColumn);
     index++;
   }
 
   return true;
-}
-
-void MongoRow::Reinit() {
 }
 }  // namespace odbc
 }  // namespace ignite

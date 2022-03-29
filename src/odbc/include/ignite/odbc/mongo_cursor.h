@@ -62,13 +62,6 @@ class MongoCursor {
   bool HasData() const;
 
   /**
-   * Check whether cursor closed remotely.
-   *
-   * @return true, if the cursor closed remotely.
-   */
-  bool IsClosedRemotely() const;
-
-  /**
    * Get current row.
    *
    * @return Current row. Returns zero if cursor needs data update or has no
@@ -79,16 +72,22 @@ class MongoCursor {
  private:
   IGNITE_NO_COPY_ASSIGNMENT(MongoCursor);
 
+  /** The resulting cursor to query/aggregate call */
   mongocxx::cursor _cursor;
 
+  /** The iterator to beginning of cursor */
   mongocxx::cursor::iterator _iterator;
 
+  /** The iterator to end of cursor */
   mongocxx::cursor::iterator _iteratorEnd;
 
+  /** The column metadata */
   std::vector< JdbcColumnMetadata > _columnMetadata;
 
+  /** The associated path in the resulting document for each column */
   std::vector< std::string > _paths;
 
+  /** The current row */
   std::unique_ptr< MongoRow > _currentRow;
 };
 }  // namespace odbc

@@ -38,7 +38,6 @@ MongoCursor::~MongoCursor() {
 bool MongoCursor::Increment() {
   bool hasData = HasData();
   if (hasData) {
-    _currentRow.release();
     _currentRow.reset(new MongoRow(_iterator, _iteratorEnd, _columnMetadata, _paths));
     _iterator++;
   } else {
@@ -48,10 +47,6 @@ bool MongoCursor::Increment() {
 }
 
 bool MongoCursor::HasData() const {
-  return _iterator != _iteratorEnd;
-}
-
-bool MongoCursor::IsClosedRemotely() const {
   return _iterator != _iteratorEnd;
 }
 

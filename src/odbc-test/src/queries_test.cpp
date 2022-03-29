@@ -54,10 +54,6 @@ using ignite::impl::binary::BinaryUtils;
  * Test setup fixture.
  */
 struct QueriesTestSuiteFixture : odbc::OdbcTestSuite {
-  const std::string DATABASE_NAME = "odbc-test";
-  const std::string TABLE_NAME = "queries_test_001";
-  const std::string TABLE_ID_COLUMN_NAME = "queries_test_001__id";
-
   /**
    * Constructor.
    */

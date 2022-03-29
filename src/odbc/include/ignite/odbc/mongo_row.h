@@ -84,12 +84,6 @@ class MongoRow {
   IGNITE_NO_COPY_ASSIGNMENT(MongoRow);
 
   /**
-   * Reinitialize row state using stream data.
-   * @note Stream must be positioned at the beginning of the row.
-   */
-  void Reinit();
-
-  /**
    * Get columns by its index.
    *
    * Column indexing starts at 1.
@@ -123,14 +117,19 @@ class MongoRow {
   /** Columns. */
   std::vector< MongoColumn > columns;
 
+  /** Current location of iterator */
   mongocxx::cursor::iterator _iterator;
 
+  /** The iterator end */
   mongocxx::cursor::iterator _iteratorEnd;
 
+  /** The current document */
   bsoncxx::document::view _document;
 
+  /** The column metadata */
   std::vector< JdbcColumnMetadata >& _columnMetadata;
 
+  /** The matching paths in the document for the columns */
   std::vector< std::string >& _paths;
 };
 }  // namespace odbc

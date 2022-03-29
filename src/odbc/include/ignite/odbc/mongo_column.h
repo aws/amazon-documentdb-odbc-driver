@@ -88,56 +88,53 @@ class MongoColumn {
   ConversionResult::Type ReadToBuffer(
       ApplicationDataBuffer& dataBuf) const;
 
-  /**
-   * Check if the column is in valid state.
-   *
-   * Invalid instance can be returned if some of the previous
-   * operations have resulted in a failure. For example invalid
-   * instance can be returned by not-throwing version of method
-   * in case of error. Invalid instances also often can be
-   * created using default constructor.
-   *
-   * @return True if valid.
-   */
-  bool IsValid() const {
-    return true;
-  }
-
  private:
 
+  /** Setter for int8 data type */
   ConversionResult::Type PutInt8(
       ApplicationDataBuffer& dataBuf,
       bsoncxx::document::element const& element) const;
+  /** Setter for int16 data type */
   ConversionResult::Type PutInt16(
       ApplicationDataBuffer& dataBuf,
       bsoncxx::document::element const& element) const;
+  /** Setter for int32 data type */
   ConversionResult::Type PutInt32(
       ApplicationDataBuffer& dataBuf,
       bsoncxx::document::element const& element) const;
+  /** Setter for int64 data type */
   ConversionResult::Type PutInt64(
       ApplicationDataBuffer& dataBuf,
       bsoncxx::document::element const& element) const;
+  /** Setter for float data type */
   ConversionResult::Type PutFloat(
       ApplicationDataBuffer& dataBuf,
       bsoncxx::document::element const& element) const;
+  /** Setter for double data type */
   ConversionResult::Type PutDouble(
       ApplicationDataBuffer& dataBuf,
       bsoncxx::document::element const& element) const;
+  /** Setter for string data type */
   ConversionResult::Type PutString(
       ApplicationDataBuffer& dataBuf,
       bsoncxx::document::element const& element) const;
+  /** Setter for decimal data type */
   ConversionResult::Type PutDecimal(
       ApplicationDataBuffer& dataBuf,
       bsoncxx::document::element const& element) const;
+  /** Setter for time data type */
   ConversionResult::Type PutTime(
       ApplicationDataBuffer& dataBuf,
       bsoncxx::document::element const& element) const;
+  /** Setter for date data type */
   ConversionResult::Type PutDate(
       ApplicationDataBuffer& dataBuf,
       bsoncxx::document::element const& element) const;
+  /** Setter for timestamp data type */
   ConversionResult::Type PutTimestamp(
       ApplicationDataBuffer& dataBuf,
       bsoncxx::document::element const& element) const;
+  /** Setter for binary data type */
   ConversionResult::Type PutBinaryData(
       ApplicationDataBuffer& dataBuf,
       bsoncxx::document::element const& element) const;

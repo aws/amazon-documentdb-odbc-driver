@@ -679,8 +679,6 @@ ConversionResult::Type MongoColumn::PutBinaryData(
 
 ConversionResult::Type MongoColumn::ReadToBuffer(
     ApplicationDataBuffer& dataBuf) const {
-  if (!IsValid())
-    return ConversionResult::AI_FAILURE;
 
   auto element = _document[_path];
   // Invalid (or missing) element is null
