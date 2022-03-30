@@ -1,17 +1,16 @@
-
 BUILD_DIR=cmake-build64
 BUILD_TYPE=Debug
 PROJECT_DIR=$(pwd)
 DRIVER_BIN_DIR="$PROJECT_DIR/build/odbc/bin"
 
-mkdir cmake-build64
-cd cmake-build64
+mkdir $BUILD_DIR
+cd $BUILD_DIR
 cmake ../src -DCMAKE_BUILD_TYPE="Debug" -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_CORE="OFF" -DWITH_ODBC="ON"
 cd ..
 
 # Download the DocumentDB JDBC Driver
-if [ -z "$JDBC_DRIVER_VERSION" ] then 
-JDBC_DRIVER_VERSION="1.2.0"
+if [ -z "$JDBC_DRIVER_VERSION" ]; then 
+    JDBC_DRIVER_VERSION="1.2.0"
 fi
 JDBC_DRIVER_FILENAME="documentdb-jdbc-$JDBC_DRIVER_VERSION-all.jar"
 JDBC_DRIVER_FULLPATH="$DRIVER_BIN_DIR/libs/$JDBC_DRIVER_FILENAME"
