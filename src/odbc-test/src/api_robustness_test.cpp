@@ -191,8 +191,7 @@ BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttrGetStmtAttr) {
 
     ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-    SQLINTEGER* bufferVal = buffer;
-    BOOST_CHECK_EQUAL(*bufferVal, val);
+    BOOST_CHECK_EQUAL(*buffer, val);
   }
 }
 
