@@ -52,7 +52,7 @@ struct ApiRobustnessTestSuiteFixture : public odbc::OdbcTestSuite {
    * Constructor.
    */
   ApiRobustnessTestSuiteFixture() : testCache(0) {
-      // No-op
+    // No-op
   }
 
   /**
@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttrGetStmtAttr) {
 
   Connect(dsnConnectionString);
 
-  SQLINTEGER buffer[ODBC_BUFFER_SIZE];
+  SQLINTEGER actual_row_array_size;
   SQLINTEGER resLen = 0;
 
   // repeat test for different values
@@ -186,12 +186,12 @@ BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttrGetStmtAttr) {
 
     ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-    ret = SQLGetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE, buffer, sizeof(buffer),
-                         &resLen);
+    ret = SQLGetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE, &actual_row_array_size,
+                         sizeof(actual_row_array_size), &resLen);
 
     ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-    BOOST_CHECK_EQUAL(*buffer, val);
+    BOOST_CHECK_EQUAL(actual_row_array_size, val);
   }
 }
 
