@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttrGetStmtAttr) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR buffer[ODBC_BUFFER_SIZE];
+  SQLINTEGER buffer[ODBC_BUFFER_SIZE];
   SQLINTEGER resLen = 0;
 
   // repeat test for different values
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttrGetStmtAttr) {
 
     ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-    SQLINTEGER* bufferVal = reinterpret_cast< SQLINTEGER* >(buffer);
+    SQLINTEGER* bufferVal = buffer;
     BOOST_CHECK_EQUAL(*bufferVal, val);
   }
 }
