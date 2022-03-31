@@ -24,6 +24,7 @@
 #include <sqlext.h>
 
 #include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 #include <string>
 
 #include "odbc_test_suite.h"

@@ -20,6 +20,7 @@
 #include <boost/test/execution_monitor.hpp>
 #include <boost/test/results_collector.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 #include <boost/test/unit_test_log.hpp>
 #include <boost/test/unit_test_log_formatter.hpp>
 #include <boost/test/utils/basic_cstring/io.hpp>

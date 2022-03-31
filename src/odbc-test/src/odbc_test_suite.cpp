@@ -25,6 +25,7 @@
 #include <fstream>
 
 #include <boost/test/unit_test.hpp>
+#include <odbcinst.h>
 
 #include "odbc_test_suite.h"
 #include "test_utils.h"
