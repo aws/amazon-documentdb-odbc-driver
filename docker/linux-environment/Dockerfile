@@ -42,8 +42,9 @@ RUN apt-get -y update \
     && rm -r /var/lib/apt/lists/*
 
 # compile and install mongoc
-RUN cd /tmp \
-    && curl -OL https://github.com/mongodb/mongo-c-driver/releases/download/1.21.1/mongo-c-driver-1.21.1.tar.gz \
+RUN MONGO_C_VERSION=1.21.1 \
+    cd /tmp \
+    && curl -OL https://github.com/mongodb/mongo-c-driver/releases/download/$MONGO_C_VERSION/mongo-c-driver-$MONGO_C_VERSION.tar.gz \
     && tar xzf mongo-c-driver-1.21.1.tar.gz \
     && rm mongo-c-driver-1.21.1.tar.gz \
     && cd mongo-c-driver-1.21.1 \
@@ -55,8 +56,9 @@ RUN cd /tmp \
     && rm -r /tmp/*
 
 # compile and install mongocxx
-RUN cd /tmp \
-    && curl -OL https://github.com/mongodb/mongo-cxx-driver/releases/download/r3.6.6/mongo-cxx-driver-r3.6.6.tar.gz \
+RUN MONGO_CXX_VERSION=3.6.6
+    cd /tmp \
+    && curl -OL https://github.com/mongodb/mongo-cxx-driver/releases/download/r$MONGO_CXX_VERSION=/mongo-cxx-driver-r$MONGO_CXX_VERSION=.tar.gz \
     && tar -xzf mongo-cxx-driver-r3.6.6.tar.gz \
     && rm mongo-cxx-driver-r3.6.6.tar.gz \
     && cd mongo-cxx-driver-r3.6.6/build \
@@ -79,6 +81,7 @@ RUN  wget -O- https://apt.corretto.aws/corretto.key | apt-key add - \
 
 ENV JAVA_HOME /usr/lib/jvm/java-17-amazon-corretto/
 ENV DOCUMENTDB_HOME /documentdb-odbc/build/odbc/bin/
+ENV ODBC_LIB_PATH /documentdb-odbc/build/odbc/lib/
 
 WORKDIR /documentdb-odbc
 
