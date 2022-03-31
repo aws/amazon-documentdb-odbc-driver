@@ -126,7 +126,7 @@ namespace ignite
                     if (err.GetCode() != IgniteError::IGNITE_SUCCESS)
                         promise.SetError(err);
                     else
-                        promise.SetValue(std::auto_ptr<ResultType>(new ResultType(res)));
+                        promise.SetValue(std::shared_ptr<ResultType>(new ResultType(res)));
                 }
 
                 /**

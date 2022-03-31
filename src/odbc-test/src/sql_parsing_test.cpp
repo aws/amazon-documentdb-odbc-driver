@@ -57,7 +57,7 @@ void CheckSetStreamingCommand(odbc::SqlParser& parser, bool enabled,
                               int32_t bufferSizePerNode,
                               int32_t parallelOperationsPerNode,
                               int64_t flushFrequency, bool ordered) {
-  std::auto_ptr< odbc::SqlCommand > cmd = parser.GetNextCommand();
+  std::unique_ptr< odbc::SqlCommand > cmd = parser.GetNextCommand();
 
   BOOST_REQUIRE(cmd.get() != 0);
   BOOST_REQUIRE_EQUAL(cmd->GetType(), odbc::SqlCommandType::SET_STREAMING);
@@ -88,7 +88,7 @@ void CheckSingleSetStreamingCommand(const std::string& sql, bool enabled,
                            bufferSizePerNode, parallelOperationsPerNode,
                            flushFrequency, ordered);
 
-  std::auto_ptr< odbc::SqlCommand > cmd = parser.GetNextCommand();
+  std::unique_ptr< odbc::SqlCommand > cmd = parser.GetNextCommand();
   BOOST_CHECK(cmd.get() == 0);
 }
 
@@ -298,7 +298,7 @@ BOOST_AUTO_TEST_CASE(ParserSetStreamingOnOff) {
   CheckSetStreamingCommand(parser, true, false, 2048, 0, 0, 0, false);
   CheckSetStreamingCommand(parser, false, false, 2048, 0, 0, 0, false);
 
-  std::auto_ptr< odbc::SqlCommand > cmd = parser.GetNextCommand();
+  std::unique_ptr< odbc::SqlCommand > cmd = parser.GetNextCommand();
 
   BOOST_CHECK(cmd.get() == 0);
 }
