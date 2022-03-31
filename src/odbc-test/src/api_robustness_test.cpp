@@ -52,7 +52,7 @@ struct ApiRobustnessTestSuiteFixture : public odbc::OdbcTestSuite {
    * Constructor.
    */
   ApiRobustnessTestSuiteFixture() : testCache(0) {
-      // No-op
+    // No-op
   }
 
   /**
@@ -148,8 +148,7 @@ BOOST_FIXTURE_TEST_SUITE(ApiRobustnessTestSuite, ApiRobustnessTestSuiteFixture)
 
 BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeysEmpty) {
   std::string dsnConnectionString;
-  std::string databaseName = "odbc-test";
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
@@ -165,6 +164,35 @@ BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeysEmpty) {
   }
   ret = SQLFetch(stmt);
   BOOST_CHECK_EQUAL(SQL_NO_DATA, ret);
+}
+
+BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttrGetStmtAttr) {
+  // check that statement array size is set correctly
+
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+
+  Connect(dsnConnectionString);
+
+  SQLINTEGER actual_row_array_size;
+  SQLINTEGER resLen = 0;
+
+  // repeat test for different values
+  SQLULEN valList[5] = {10, 52, 81, 103, 304};
+  for (SQLULEN val : valList) {
+    SQLRETURN ret =
+        SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE,
+                       reinterpret_cast< SQLPOINTER >(val), sizeof(val));
+
+    ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+    ret = SQLGetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE, &actual_row_array_size,
+                         sizeof(actual_row_array_size), &resLen);
+
+    ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+    BOOST_CHECK_EQUAL(actual_row_array_size, val);
+  }
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLDriverConnect, *disabled()) {
@@ -344,11 +372,9 @@ BOOST_AUTO_TEST_CASE(TestSQLExtendedFetch, *disabled()) {
   SQLExtendedFetch(stmt, SQL_FETCH_NEXT, 0, 0, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLNumResultColsStub) {
-  // Test for stubbed functionality.
+BOOST_AUTO_TEST_CASE(TestSQLNumResultCols) {
   std::string dsnConnectionString;
-  std::string databaseName = "odbc-test";
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
@@ -363,41 +389,11 @@ BOOST_AUTO_TEST_CASE(TestSQLNumResultColsStub) {
   // Everything is ok.
   ret = SQLNumResultCols(stmt, &columnCount);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
-  BOOST_CHECK_EQUAL(0, columnCount);
+  BOOST_CHECK_EQUAL(13, columnCount);
 
-  // Column count is null.
-  SQLNumResultCols(stmt, 0);
-}
-
-BOOST_AUTO_TEST_CASE(TestSQLNumResultCols, *disabled()) {
-  // There are no checks because we do not really care what is the result of
-  // these calls as long as they do not cause segmentation fault.
-
-  for (int i = 0; i < 100; ++i) {
-    TestType obj;
-
-    obj.strField = LexicalCast< std::string >(i);
-
-    testCache.Put(i, obj);
-  }
-
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
-
-  SQLCHAR sql[] = "SELECT strField FROM TestType";
-
-  SQLRETURN ret = SQLExecDirect(stmt, sql, sizeof(sql));
-
+  // Test with column count is null.
+  ret = SQLNumResultCols(stmt, 0);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
-
-  SQLSMALLINT columnCount;
-
-  // Everything is ok.
-  ret = SQLNumResultCols(stmt, &columnCount);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
-
-  // Column count is null.
-  SQLNumResultCols(stmt, 0);
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLTables, *disabled()) {

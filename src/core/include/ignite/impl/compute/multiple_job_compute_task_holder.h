@@ -198,7 +198,7 @@ namespace ignite
                 }
 
                 /** Result. */
-                std::auto_ptr< std::vector<ResultType> > result;
+                std::shared_ptr< std::vector<ResultType> > result;
 
                 /** Error. */
                 IgniteError error;

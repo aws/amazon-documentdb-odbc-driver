@@ -151,7 +151,7 @@ namespace ignite
                     if (reader.SkipIfNull())
                         return 0;
 
-                    std::auto_ptr<T> res(new T());
+                    std::unique_ptr<T> res(new T());
 
                     reader.template ReadTopObject0<ignite::binary::BinaryReader, T>(*res);
 

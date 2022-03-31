@@ -391,7 +391,7 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
     case SQL_ATTR_ROW_ARRAY_SIZE: {
       SQLINTEGER* val = reinterpret_cast< SQLINTEGER* >(buf);
 
-      *val = static_cast< SQLINTEGER >(1);
+      *val = static_cast< SQLINTEGER >(rowArraySize); 
 
       if (valueLen)
         *valueLen = SQL_IS_INTEGER;
@@ -565,7 +565,7 @@ SqlResult::Type Statement::ProcessInternalCommand(const std::string& query) {
   try {
     SqlParser parser(query);
 
-    std::auto_ptr< SqlCommand > cmd = parser.GetNextCommand();
+    std::shared_ptr< SqlCommand > cmd = parser.GetNextCommand();
 
     assert(cmd.get() != 0);
 
@@ -713,7 +713,7 @@ SqlResult::Type Statement::ProcessInternalQuery() {
 
   connection.GetStreamingContext().Enable(cmd);
 
-  std::auto_ptr< query::Query > newQry(
+  std::unique_ptr< query::Query > newQry(
       new query::StreamingQuery(*this, connection, parameters));
 
   std::swap(currentQuery, newQry);
