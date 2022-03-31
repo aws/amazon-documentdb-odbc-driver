@@ -23,35 +23,35 @@ namespace odbc {
 MongoCursor::MongoCursor(mongocxx::cursor& cursor,
     std::vector< JdbcColumnMetadata >& columnMetadata,
     std::vector< std::string >& paths)
-    : _cursor(std::move(cursor)),
-      _iterator(_cursor.begin()),
-      _iteratorEnd(_cursor.end()),
-      _columnMetadata(columnMetadata),
-      _paths(paths) {
+    : cursor_(std::move(cursor)),
+      iterator_(cursor_.begin()),
+      iteratorEnd_(cursor_.end()),
+      columnMetadata_(columnMetadata),
+      paths_(paths) {
   // No-op.
 }
 
 MongoCursor::~MongoCursor() {
-  _currentRow.release();
+  currentRow_.release();
 }
 
 bool MongoCursor::Increment() {
   bool hasData = HasData();
   if (hasData) {
-    _currentRow.reset(new MongoRow(_iterator, _iteratorEnd, _columnMetadata, _paths));
-    _iterator++;
+    currentRow_.reset(new MongoRow(iterator_, iteratorEnd_, columnMetadata_, paths_));
+    iterator_++;
   } else {
-    _currentRow.reset();
+    currentRow_.reset();
   }
   return hasData;
 }
 
 bool MongoCursor::HasData() const {
-  return _iterator != _iteratorEnd;
+  return iterator_ != iteratorEnd_;
 }
 
 MongoRow* MongoCursor::GetRow() {
-  return _currentRow.get();
+  return currentRow_.get();
 }
 }  // namespace odbc
 }  // namespace ignite

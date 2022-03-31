@@ -107,20 +107,20 @@ namespace ignite {
 namespace odbc {
 
 MongoColumn::MongoColumn(const MongoColumn& other)
-    : _document(other._document),
-      _columnMetadata(other._columnMetadata),
-      _path(other._path),
-      type(other.type),
-      size(other.size) {
+    : document_(other.document_),
+      columnMetadata_(other.columnMetadata_),
+      path_(other.path_),
+      type_(other.type_),
+      size_(other.size_) {
   // No-op.
 }
 
 MongoColumn& MongoColumn::operator=(const MongoColumn& other) {
-  _document = other._document;
-  _columnMetadata = other._columnMetadata;
-  _path = other._path;
-  type = other.type;
-  size = other.size;
+  document_ = other.document_;
+  columnMetadata_ = other.columnMetadata_;
+  path_ = other.path_;
+  type_ = other.type_;
+  size_ = other.size_;
 
   return *this;
 }
@@ -132,10 +132,10 @@ MongoColumn::~MongoColumn() {
 MongoColumn::MongoColumn(bsoncxx::document::view& document,
                          JdbcColumnMetadata& columnMetadata,
                          std::string& path)
-    : type(columnMetadata.GetColumnType()),
-      _document(document),
-      _columnMetadata(columnMetadata),
-      _path(path) {
+    : type_(columnMetadata.GetColumnType()),
+      document_(document),
+      columnMetadata_(columnMetadata),
+      path_(path) {
 }
 
 ConversionResult::Type MongoColumn::PutInt8(
@@ -680,7 +680,7 @@ ConversionResult::Type MongoColumn::PutBinaryData(
 ConversionResult::Type MongoColumn::ReadToBuffer(
     ApplicationDataBuffer& dataBuf) const {
 
-  auto element = _document[_path];
+  auto element = document_[path_];
   // Invalid (or missing) element is null
   if (!element) {
     dataBuf.PutNull();
@@ -689,7 +689,7 @@ ConversionResult::Type MongoColumn::ReadToBuffer(
   
   ConversionResult::Type convRes = ConversionResult::AI_SUCCESS;
 
-  switch (type) {
+  switch (type_) {
 
     case JDBC_TYPE_BOOLEAN:
     case JDBC_TYPE_SMALLINT: {

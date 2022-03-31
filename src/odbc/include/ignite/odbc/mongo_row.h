@@ -60,7 +60,7 @@ class MongoRow {
    * @return number of columns.
    */
   int32_t GetSize() const {
-    return _columnMetadata.size();
+    return columnMetadata_.size();
   }
 
   /**
@@ -96,7 +96,7 @@ class MongoRow {
    * @return Reference to specified column.
    */
   MongoColumn& GetColumn(uint16_t columnIdx) {
-    return columns[columnIdx - 1];
+    return columns_[columnIdx - 1];
   }
 
   /**
@@ -115,22 +115,22 @@ class MongoRow {
   int32_t size;
 
   /** Columns. */
-  std::vector< MongoColumn > columns;
+  std::vector< MongoColumn > columns_;
 
   /** Current location of iterator */
-  mongocxx::cursor::iterator _iterator;
+  mongocxx::cursor::iterator iterator_;
 
   /** The iterator end */
-  mongocxx::cursor::iterator _iteratorEnd;
+  mongocxx::cursor::iterator iteratorEnd_;
 
   /** The current document */
-  bsoncxx::document::view _document;
+  bsoncxx::document::view document_;
 
   /** The column metadata */
-  std::vector< JdbcColumnMetadata >& _columnMetadata;
+  std::vector< JdbcColumnMetadata >& columnMetadata_;
 
   /** The matching paths in the document for the columns */
-  std::vector< std::string >& _paths;
+  std::vector< std::string >& paths_;
 };
 }  // namespace odbc
 }  // namespace ignite

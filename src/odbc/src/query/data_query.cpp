@@ -50,9 +50,9 @@ DataQuery::DataQuery(diagnostic::DiagnosableAdapter& diag,
                      Connection& connection, const std::string& sql,
                      const app::ParameterSet& params, int32_t& timeout)
     : Query(diag, QueryType::DATA),
-      _connection(connection),
+      connection_(connection),
       _sql(sql),
-      _params(params),
+      params_(params),
       _timeout(timeout) {
   // No-op.
 }
@@ -62,38 +62,38 @@ DataQuery::~DataQuery() {
 }
 
 SqlResult::Type DataQuery::Execute() {
-  if (_cursor.get())
+  if (cursor_.get())
     InternalClose();
 
   return MakeRequestExecute();
 }
 
 const meta::ColumnMetaVector* DataQuery::GetMeta() {
-  if (!_resultMetaAvailable) {
+  if (!resultMetaAvailable_) {
     MakeRequestResultsetMeta();
 
-    if (!_resultMetaAvailable)
+    if (!resultMetaAvailable_)
       return nullptr;
   }
 
-  return &_resultMeta;
+  return &resultMeta_;
 }
 
 SqlResult::Type DataQuery::FetchNextRow(app::ColumnBindingMap& columnBindings) {
-  if (!_cursor.get()) {
+  if (!cursor_.get()) {
     diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
                          "Query was not executed.");
 
     return SqlResult::AI_ERROR;
   }
 
-  if (!_cursor->HasData())
+  if (!cursor_->HasData())
     return SqlResult::AI_NO_DATA;
 
-  if (!_cursor->Increment())
+  if (!cursor_->Increment())
     return SqlResult::AI_NO_DATA;
 
-  MongoRow* row = _cursor->GetRow();
+  MongoRow* row = cursor_->GetRow();
 
   if (!row) {
     diag.AddStatusRecord("Unknown error.");
@@ -121,14 +121,14 @@ SqlResult::Type DataQuery::FetchNextRow(app::ColumnBindingMap& columnBindings) {
 
 SqlResult::Type DataQuery::GetColumn(uint16_t columnIdx,
                                      app::ApplicationDataBuffer& buffer) {
-  if (!_cursor.get()) {
+  if (!cursor_.get()) {
     diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
                          "Query was not executed.");
 
     return SqlResult::AI_ERROR;
   }
 
-  MongoRow* row = _cursor->GetRow();
+  MongoRow* row = cursor_->GetRow();
 
   if (!row) {
     diag.AddStatusRecord(SqlState::S24000_INVALID_CURSOR_STATE,
@@ -150,19 +150,19 @@ SqlResult::Type DataQuery::Close() {
 }
 
 SqlResult::Type DataQuery::InternalClose() {
-  if (!_cursor.get())
+  if (!cursor_.get())
     return SqlResult::AI_SUCCESS;
 
   SqlResult::Type result = MakeRequestClose();
   if (result == SqlResult::AI_SUCCESS) {
-    _cursor.reset();
+    cursor_.reset();
   }
 
   return result;
 }
 
 bool DataQuery::DataAvailable() const {
-  return _cursor.get() && _cursor->HasData();
+  return cursor_.get() && cursor_->HasData();
 }
 
 int64_t DataQuery::AffectedRows() const {
@@ -175,7 +175,7 @@ SqlResult::Type DataQuery::NextResultSet() {
 }
 
 SqlResult::Type DataQuery::MakeRequestExecute() {
-  _cursor.reset();
+  cursor_.reset();
   return MakeRequestFetch();
 }
 
@@ -202,16 +202,16 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
         mqlQueryContext.Get()->GetColumnMetadata();
     std::vector< std::string >& paths = mqlQueryContext.Get()->GetPaths();
 
-    if (!_resultMetaAvailable) {
+    if (!resultMetaAvailable_) {
       ReadJdbcColumnMetadataVector(columnMetadata);
     }
 
-    const config::Configuration& config = _connection.GetConfiguration();
+    const config::Configuration& config = connection_.GetConfiguration();
     std::string databaseName = config.GetDatabase();
     std::string collectionName = mqlQueryContext.Get()->GetCollectionName();
 
     std::shared_ptr< mongocxx::client > const& mongoClient =
-        _connection.GetMongoClient();
+        connection_.GetMongoClient();
     mongocxx::database database = mongoClient.get()->database(databaseName);
     mongocxx::collection collection = database[collectionName];
     auto pipeline = mongocxx::pipeline{};
@@ -220,7 +220,7 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
     }
     mongocxx::cursor cursor = collection.aggregate(pipeline);
 
-    this->_cursor.reset(new MongoCursor(cursor, columnMetadata, paths));
+    this->cursor_.reset(new MongoCursor(cursor, columnMetadata, paths));
 
     return SqlResult::AI_SUCCESS;
   } catch (mongocxx::exception const& xcp) {
@@ -241,12 +241,12 @@ SqlResult::Type DataQuery::GetMqlQueryContext(
     SharedPointer< DocumentDbMqlQueryContext >& mqlQueryContext,
     IgniteError& error) {
   SharedPointer< DocumentDbConnectionProperties > connectionProperties =
-      _connection.GetConnectionProperties(error);
+      connection_.GetConnectionProperties(error);
   if (error.GetCode() != IgniteError::IGNITE_SUCCESS) {
     return SqlResult::AI_ERROR;
   }
   SharedPointer< DocumentDbDatabaseMetadata > databaseMetadata =
-      _connection.GetDatabaseMetadata(error);
+      connection_.GetDatabaseMetadata(error);
   if (error.GetCode() != IgniteError::IGNITE_SUCCESS) {
     return SqlResult::AI_ERROR;
   }
@@ -290,7 +290,7 @@ SqlResult::Type DataQuery::MakeRequestResultsetMeta() {
 void DataQuery::ReadJdbcColumnMetadataVector(
     std::vector< JdbcColumnMetadata > jdbcVector) {
   using ignite::odbc::meta::ColumnMeta;
-  _resultMeta.clear();
+  resultMeta_.clear();
 
   if (jdbcVector.empty()) {
     return;
@@ -300,10 +300,10 @@ void DataQuery::ReadJdbcColumnMetadataVector(
   int32_t prevPosition = 0;
   for (JdbcColumnMetadata jdbcMetadata : jdbcVector) {
 
-    _resultMeta.emplace_back(ColumnMeta());
-    _resultMeta.back().ReadJdbcMetadata(jdbcMetadata, prevPosition);
+    resultMeta_.emplace_back(ColumnMeta());
+    resultMeta_.back().ReadJdbcMetadata(jdbcMetadata, prevPosition);
   }
-  _resultMetaAvailable = true;
+  resultMetaAvailable_ = true;
 }
 
 SqlResult::Type DataQuery::ProcessConversionResult(
@@ -365,11 +365,11 @@ SqlResult::Type DataQuery::ProcessConversionResult(
 }
 
 void DataQuery::SetResultsetMeta(const meta::ColumnMetaVector& value) {
-  _resultMeta.assign(value.begin(), value.end());
-  _resultMetaAvailable = true;
+  resultMeta_.assign(value.begin(), value.end());
+  resultMetaAvailable_ = true;
 
-  for (size_t i = 0; i < _resultMeta.size(); ++i) {
-    meta::ColumnMeta& meta = _resultMeta.at(i);
+  for (size_t i = 0; i < resultMeta_.size(); ++i) {
+    meta::ColumnMeta& meta = resultMeta_.at(i);
     if (meta.GetDataType()) {
       LOG_MSG(
           "\n[" << i << "] SchemaName:     "

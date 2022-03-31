@@ -16,7 +16,6 @@
  */
 
 #include "ignite/odbc/jni/jdbc_column_metadata.h"
-#include "ignite/odbc/mongo_column.h"
 #include "ignite/odbc/mongo_row.h"
 #include "ignite/odbc/utility.h"
 #include "mongocxx/cursor.hpp"
@@ -33,12 +32,12 @@ MongoRow::MongoRow(mongocxx::cursor::iterator& iterator,
                    std::vector< std::string >& paths)
     : pos(0),
       size(columnMetadata.size()),
-      columns(),
-      _iterator(iterator),
-      _iteratorEnd(iteratorEnd),
-      _document(*iterator),
-      _columnMetadata(columnMetadata),
-      _paths(paths) {
+      columns_(),
+      iterator_(iterator),
+      iteratorEnd_(iteratorEnd),
+      document_(*iterator),
+      columnMetadata_(columnMetadata),
+      paths_(paths) {
 }
 
 MongoRow::~MongoRow() {
@@ -59,18 +58,18 @@ app::ConversionResult::Type MongoRow::ReadColumnToBuffer(
 }
 
 bool MongoRow::MoveToNext() {
-  return ++_iterator  != _iteratorEnd;
+  return ++iterator_  != iteratorEnd_;
 }
 
 bool MongoRow::EnsureColumnDiscovered(int16_t columnIdx) {
-  if (columns.size() == size)
+  if (columns_.size() == size)
     return true;
 
-  int64_t index = columns.size();
-  while (columns.size() < columnIdx) {
-    MongoColumn newColumn(_document, _columnMetadata[index], _paths[index]);
+  int64_t index = columns_.size();
+  while (columns_.size() < columnIdx) {
+    MongoColumn newColumn(document_, columnMetadata_[index], paths_[index]);
 
-    columns.push_back(newColumn);
+    columns_.push_back(newColumn);
     index++;
   }
 

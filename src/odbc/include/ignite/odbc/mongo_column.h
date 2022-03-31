@@ -75,7 +75,7 @@ class MongoColumn {
    * @return Column size.
    */
   int32_t GetSize() const {
-    return size;
+    return size_;
   }
 
   /**
@@ -140,16 +140,16 @@ class MongoColumn {
       bsoncxx::document::element const& element) const;
 
   /** Column type */
-  int32_t type;
+  int32_t type_;
 
   /** Column data size in bytes. */
-  int32_t size = 0;
+  int32_t size_ = 0;
 
-  bsoncxx::document::view& _document;
+  bsoncxx::document::view& document_;
 
-  JdbcColumnMetadata& _columnMetadata;
+  JdbcColumnMetadata& columnMetadata_;
 
-  std::string& _path;
+  std::string& path_;
 };
 }  // namespace odbc
 }  // namespace ignite

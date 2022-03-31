@@ -73,22 +73,22 @@ class MongoCursor {
   IGNITE_NO_COPY_ASSIGNMENT(MongoCursor);
 
   /** The resulting cursor to query/aggregate call */
-  mongocxx::cursor _cursor;
+  mongocxx::cursor cursor_;
 
   /** The iterator to beginning of cursor */
-  mongocxx::cursor::iterator _iterator;
+  mongocxx::cursor::iterator iterator_;
 
   /** The iterator to end of cursor */
-  mongocxx::cursor::iterator _iteratorEnd;
+  mongocxx::cursor::iterator iteratorEnd_;
 
   /** The column metadata */
-  std::vector< JdbcColumnMetadata > _columnMetadata;
+  std::vector< JdbcColumnMetadata > columnMetadata_;
 
   /** The associated path in the resulting document for each column */
-  std::vector< std::string > _paths;
+  std::vector< std::string > paths_;
 
   /** The current row */
-  std::unique_ptr< MongoRow > _currentRow;
+  std::unique_ptr< MongoRow > currentRow_;
 };
 }  // namespace odbc
 }  // namespace ignite

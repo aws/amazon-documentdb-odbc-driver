@@ -216,22 +216,22 @@ class DataQuery : public Query {
   SqlResult::Type InternalClose();
 
   /** Connection associated with the statement. */
-  Connection& _connection;
+  Connection& connection_;
 
   /** SQL Query. */
   std::string _sql;
 
   /** Parameter bindings. */
-  const app::ParameterSet& _params;
+  const app::ParameterSet& params_;
 
   /** Result set metadata is available */
-  bool _resultMetaAvailable = false;
+  bool resultMetaAvailable_ = false;
 
   /** Result set metadata. */
-  meta::ColumnMetaVector _resultMeta{};
+  meta::ColumnMetaVector resultMeta_{};
 
   /** Cursor. */
-  std::unique_ptr< MongoCursor > _cursor{};
+  std::unique_ptr< MongoCursor > cursor_{};
 
   /** Timeout. */
   int32_t& _timeout;
