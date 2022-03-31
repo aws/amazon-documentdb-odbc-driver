@@ -25,7 +25,7 @@ using namespace ignite::odbc;
 
 const int64_t testQueryId = 42;
 
-std::auto_ptr< ResultPage > CreateTestPage(bool last, int32_t size) {
+std::shared_ptr< ResultPage > CreateTestPage(bool last, int32_t size) {
   using namespace ignite::impl::binary;
   using namespace ignite::impl::interop;
 
@@ -52,7 +52,7 @@ std::auto_ptr< ResultPage > CreateTestPage(bool last, int32_t size) {
 
   outStream.Synchronize();
 
-  std::auto_ptr< ResultPage > res(new ResultPage());
+  std::shared_ptr< ResultPage > res(new ResultPage());
 
   InteropInputStream inStream(&mem);
   BinaryReaderImpl reader(&inStream);
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(TestCursorLast) {
 
   Cursor cursor(testQueryId);
 
-  std::auto_ptr< ResultPage > resultPage = CreateTestPage(true, pageSize);
+  std::shared_ptr< ResultPage > resultPage = CreateTestPage(true, pageSize);
 
   cursor.UpdateData(resultPage);
 
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(TestCursorUpdate) {
 
   Cursor cursor(testQueryId);
 
-  std::auto_ptr< ResultPage > resultPage = CreateTestPage(false, pageSize);
+  std::shared_ptr< ResultPage > resultPage = CreateTestPage(false, pageSize);
 
   cursor.UpdateData(resultPage);
 
@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(TestCursorUpdate) {
 BOOST_AUTO_TEST_CASE(TestCursorUpdateOneRow) {
   Cursor cursor(testQueryId);
 
-  std::auto_ptr< ResultPage > resultPage = CreateTestPage(false, 1);
+  std::shared_ptr< ResultPage > resultPage = CreateTestPage(false, 1);
 
   cursor.UpdateData(resultPage);
 

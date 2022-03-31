@@ -44,7 +44,7 @@ class InternalQuery : public Query {
    * @param cmd Parsed command.
    */
   InternalQuery(diagnostic::DiagnosableAdapter& diag, const std::string& sql,
-                std::auto_ptr< SqlCommand > cmd)
+                std::shared_ptr< SqlCommand > cmd)
       : Query(diag, QueryType::INTERNAL), sql(sql), cmd(cmd) {
     // No-op.
   }
@@ -162,7 +162,7 @@ class InternalQuery : public Query {
   std::string sql;
 
   /** SQL command. */
-  std::auto_ptr< SqlCommand > cmd;
+  std::shared_ptr< SqlCommand > cmd;
 };
 }  // namespace query
 }  // namespace odbc

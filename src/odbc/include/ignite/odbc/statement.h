@@ -720,7 +720,7 @@ class Statement : public diagnostic::DiagnosableAdapter {
   app::ColumnBindingMap columnBindings;
 
   /** Underlying query. */
-  std::auto_ptr< query::Query > currentQuery;
+  std::unique_ptr< query::Query > currentQuery;
 
   /** Buffer to store number of rows fetched by the last fetch. */
   SQLINTEGER* rowsFetched;

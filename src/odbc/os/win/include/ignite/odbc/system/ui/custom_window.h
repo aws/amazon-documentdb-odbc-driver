@@ -87,7 +87,7 @@ class CustomWindow : public Window {
    * @param id ID to be assigned to the created window.
    * @return Auto pointer containing new window.
    */
-  std::auto_ptr< Window > CreateGroupBox(int posX, int posY, int sizeX,
+  std::unique_ptr< Window > CreateGroupBox(int posX, int posY, int sizeX,
                                          int sizeY, const char* title, int id);
 
   /**
@@ -101,7 +101,7 @@ class CustomWindow : public Window {
    * @param id ID to be assigned to the created window.
    * @return Auto pointer containing new window.
    */
-  std::auto_ptr< Window > CreateLabel(int posX, int posY, int sizeX, int sizeY,
+  std::unique_ptr< Window > CreateLabel(int posX, int posY, int sizeX, int sizeY,
                                       const char* title, int id);
 
   /**
@@ -115,7 +115,7 @@ class CustomWindow : public Window {
    * @param id ID to be assigned to the created window.
    * @return Auto pointer containing new window.
    */
-  std::auto_ptr< Window > CreateEdit(int posX, int posY, int sizeX, int sizeY,
+  std::unique_ptr< Window > CreateEdit(int posX, int posY, int sizeX, int sizeY,
                                      const char* title, int id, int style = 0);
 
   /**
@@ -129,7 +129,7 @@ class CustomWindow : public Window {
    * @param id ID to be assigned to the created window.
    * @return Auto pointer containing new window.
    */
-  std::auto_ptr< Window > CreateButton(int posX, int posY, int sizeX, int sizeY,
+  std::unique_ptr< Window > CreateButton(int posX, int posY, int sizeX, int sizeY,
                                        const char* title, int id);
 
   /**
@@ -143,7 +143,7 @@ class CustomWindow : public Window {
    * @param id ID to be assigned to the created window.
    * @return Auto pointer containing new window.
    */
-  std::auto_ptr< Window > CreateCheckBox(int posX, int posY, int sizeX,
+  std::unique_ptr< Window > CreateCheckBox(int posX, int posY, int sizeX,
                                          int sizeY, const char* title, int id,
                                          bool state);
 
@@ -158,7 +158,7 @@ class CustomWindow : public Window {
    * @param id ID to be assigned to the created window.
    * @return Auto pointer containing new window.
    */
-  std::auto_ptr< Window > CreateComboBox(int posX, int posY, int sizeX,
+  std::unique_ptr< Window > CreateComboBox(int posX, int posY, int sizeX,
                                          int sizeY, const char* title, int id);
 
  private:
