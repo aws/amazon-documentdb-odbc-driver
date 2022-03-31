@@ -115,16 +115,6 @@ MongoColumn::MongoColumn(const MongoColumn& other)
   // No-op.
 }
 
-MongoColumn& MongoColumn::operator=(const MongoColumn& other) {
-  document_ = other.document_;
-  columnMetadata_ = other.columnMetadata_;
-  path_ = other.path_;
-  type_ = other.type_;
-  size_ = other.size_;
-
-  return *this;
-}
-
 MongoColumn::~MongoColumn() {
   // No-op.
 }

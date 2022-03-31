@@ -216,6 +216,53 @@ struct QueriesTestSuiteFixture : odbc::OdbcTestSuite {
 
 BOOST_FIXTURE_TEST_SUITE(QueriesTestSuite, QueriesTestSuiteFixture)
 
+// Re-enable to test large data set.
+BOOST_AUTO_TEST_CASE(TestMoviesCast, *disabled()) {
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForRemoteServer(dsnConnectionString, true, "", "",
+                                           "movies");
+  Connect(dsnConnectionString);
+  SQLRETURN ret;
+  char request[] = "SELECT * FROM \"movies_cast\"";
+
+  ret = SQLExecDirect(stmt, reinterpret_cast< SQLCHAR* >(request), SQL_NTS);
+  if (!SQL_SUCCEEDED(ret)) {
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  }
+
+  const int32_t buf_size = 1024;
+  SQLCHAR id[buf_size]{};
+  SQLLEN id_len = 0;
+  SQLBIGINT index = 0;
+  SQLLEN index_len = 0;
+  SQLCHAR value[buf_size]{};
+  SQLLEN value_len = 0;
+
+  // Fetch 1st row
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  while (SQL_SUCCEEDED(ret)) {
+
+    ret = SQLGetData(stmt, 1, SQL_C_CHAR, id, buf_size, &id_len);
+    BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+    ret = SQLGetData(stmt, 2, SQL_C_SBIGINT, &index, sizeof(index),
+                     &index_len);
+    BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+    ret = SQLGetData(stmt, 3, SQL_C_CHAR, value, buf_size,
+                     &value_len);
+    BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+
+    BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
+    BOOST_CHECK_NE(SQL_NULL_DATA, index_len);
+
+    ret = SQLFetch(stmt);
+  }
+
+  // Fetch 2nd row - not exist
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_NO_DATA, ret);
+}
+
 BOOST_AUTO_TEST_CASE(TestSingleResultUsingGetData) {
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);

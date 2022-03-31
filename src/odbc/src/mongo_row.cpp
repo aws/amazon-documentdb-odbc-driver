@@ -26,16 +26,13 @@ using ignite::odbc::jni::JdbcColumnMetadata;
 namespace ignite {
 namespace odbc {
 // ASSUMPTION: iterator is not at the end.
-MongoRow::MongoRow(mongocxx::cursor::iterator& iterator,
-                   mongocxx::cursor::iterator& iteratorEnd,
+MongoRow::MongoRow(bsoncxx::document::view const& document,
                    std::vector< JdbcColumnMetadata >& columnMetadata,
                    std::vector< std::string >& paths)
     : pos(0),
       size(columnMetadata.size()),
       columns_(),
-      iterator_(iterator),
-      iteratorEnd_(iteratorEnd),
-      document_(*iterator),
+      document_(document),
       columnMetadata_(columnMetadata),
       paths_(paths) {
 }
@@ -55,10 +52,6 @@ app::ConversionResult::Type MongoRow::ReadColumnToBuffer(
   MongoColumn& column = GetColumn(columnIdx);
 
   return column.ReadToBuffer(dataBuf);
-}
-
-bool MongoRow::MoveToNext() {
-  return ++iterator_  != iteratorEnd_;
 }
 
 bool MongoRow::EnsureColumnDiscovered(int16_t columnIdx) {

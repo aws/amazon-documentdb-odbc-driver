@@ -44,8 +44,7 @@ class MongoRow {
    *
    * @param pageData Page data.
    */
-  MongoRow(mongocxx::cursor::iterator& iterator,
-           mongocxx::cursor::iterator& iteratorEnd,
+  MongoRow(bsoncxx::document::view const& document,
            std::vector< JdbcColumnMetadata >& columnMetadata,
            std::vector< std::string >& paths);
 
@@ -72,13 +71,6 @@ class MongoRow {
    */
   app::ConversionResult::Type ReadColumnToBuffer(
       uint16_t columnIdx, app::ApplicationDataBuffer& dataBuf);
-
-  /**
-   * Move to next row.
-   *
-   * @return True on success.
-   */
-  bool MoveToNext();
 
  private:
   IGNITE_NO_COPY_ASSIGNMENT(MongoRow);
@@ -116,12 +108,6 @@ class MongoRow {
 
   /** Columns. */
   std::vector< MongoColumn > columns_;
-
-  /** Current location of iterator */
-  mongocxx::cursor::iterator iterator_;
-
-  /** The iterator end */
-  mongocxx::cursor::iterator iteratorEnd_;
 
   /** The current document */
   bsoncxx::document::view document_;

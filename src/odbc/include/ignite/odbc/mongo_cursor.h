@@ -89,6 +89,9 @@ class MongoCursor {
 
   /** The current row */
   std::unique_ptr< MongoRow > currentRow_;
+
+  // Is this the first row of the iterator?
+  bool isFirstRow_ = true;
 };
 }  // namespace odbc
 }  // namespace ignite

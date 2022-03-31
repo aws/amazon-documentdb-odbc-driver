@@ -54,7 +54,7 @@ class MongoColumn {
    * @param other Another instance.
    * @return This.
    */
-  MongoColumn& operator=(const MongoColumn& other);
+  MongoColumn& operator=(const MongoColumn& other) = delete;
 
   /**
    * Destructor.
@@ -145,7 +145,7 @@ class MongoColumn {
   /** Column data size in bytes. */
   int32_t size_ = 0;
 
-  bsoncxx::document::view& document_;
+  bsoncxx::document::view const& document_;
 
   JdbcColumnMetadata& columnMetadata_;
 

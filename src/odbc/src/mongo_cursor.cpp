@@ -38,8 +38,15 @@ MongoCursor::~MongoCursor() {
 bool MongoCursor::Increment() {
   bool hasData = HasData();
   if (hasData) {
-    currentRow_.reset(new MongoRow(iterator_, iteratorEnd_, columnMetadata_, paths_));
-    iterator_++;
+    if (!isFirstRow_) {
+      iterator_++;
+    } else {
+      isFirstRow_ = false;
+    }
+  }
+  hasData = HasData();
+  if (hasData) {
+    currentRow_.reset(new MongoRow(*iterator_, columnMetadata_, paths_));
   } else {
     currentRow_.reset();
   }
