@@ -24,15 +24,15 @@ using namespace ignite;
 using namespace ignite::common;
 
 /**
- * Utility to make auto pointer from value.
+ * Utility to make shared pointer from value.
  *
  * @param val Value.
  * @return Auto pointer.
  */
 template<typename T>
-std::auto_ptr<T> MakeAuto(const T& val)
+std::shared_ptr<T> MakeShared(const T& val)
 {
-    return std::auto_ptr<T>(new T(val));
+    return std::shared_ptr<T>(new T(val));
 }
 
 /**
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(SharedStateIntValue)
     bool set = sharedState.WaitFor(100);
     BOOST_CHECK(!set);
 
-    sharedState.SetValue(MakeAuto(expected));
+    sharedState.SetValue(MakeShared(expected));
 
     set = sharedState.WaitFor(100);
     BOOST_REQUIRE(set);
@@ -78,8 +78,8 @@ BOOST_AUTO_TEST_CASE(SharedStateIntValue)
 
     BOOST_CHECK_EQUAL(val2, expected);
 
-    BOOST_CHECK_EXCEPTION(sharedState.SetValue(MakeAuto(0)), IgniteError, IsFutureError);
-    BOOST_CHECK_EXCEPTION(sharedState.SetValue(MakeAuto(expected)), IgniteError, IsFutureError);
+    BOOST_CHECK_EXCEPTION(sharedState.SetValue(MakeShared(0)), IgniteError, IsFutureError);
+    BOOST_CHECK_EXCEPTION(sharedState.SetValue(MakeShared(expected)), IgniteError, IsFutureError);
     BOOST_CHECK_EXCEPTION(sharedState.SetError(IgniteError()), IgniteError, IsFutureError);
 }
 
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(SharedStateStringValue)
     bool ready = sharedState.WaitFor(100);
     BOOST_CHECK(!ready);
 
-    sharedState.SetValue(MakeAuto(expected));
+    sharedState.SetValue(MakeShared(expected));
 
     ready = sharedState.WaitFor(100);
     BOOST_REQUIRE(ready);
@@ -109,8 +109,8 @@ BOOST_AUTO_TEST_CASE(SharedStateStringValue)
     BOOST_CHECK_EQUAL(val2, expected);
 
     BOOST_CHECK_EXCEPTION(sharedState.SetError(IgniteError()), IgniteError, IsFutureError);
-    BOOST_CHECK_EXCEPTION(sharedState.SetValue(MakeAuto(expected)), IgniteError, IsFutureError);
-    BOOST_CHECK_EXCEPTION(sharedState.SetValue(MakeAuto(std::string("Hello world"))), IgniteError, IsFutureError);
+    BOOST_CHECK_EXCEPTION(sharedState.SetValue(MakeShared(expected)), IgniteError, IsFutureError);
+    BOOST_CHECK_EXCEPTION(sharedState.SetValue(MakeShared(std::string("Hello world"))), IgniteError, IsFutureError);
 }
 
 BOOST_AUTO_TEST_CASE(SharedStateVoidValue)
@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(SharedStateIntError)
 
     BOOST_CHECK_EXCEPTION(sharedState.GetValue(), IgniteError, IsUnknownError);
 
-    BOOST_CHECK_EXCEPTION(sharedState.SetValue(MakeAuto(42)), IgniteError, IsFutureError);
+    BOOST_CHECK_EXCEPTION(sharedState.SetValue(MakeShared(42)), IgniteError, IsFutureError);
     BOOST_CHECK_EXCEPTION(sharedState.SetError(IgniteError()), IgniteError, IsFutureError);
 }
 
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE(FutureIntValue)
     ready = future2.WaitFor(100);
     BOOST_CHECK(!ready);
 
-    promise.SetValue(MakeAuto(expected));
+    promise.SetValue(MakeShared(expected));
 
     ready = future1.WaitFor(100);
     BOOST_REQUIRE(ready);
@@ -228,8 +228,8 @@ BOOST_AUTO_TEST_CASE(FutureIntValue)
 
     BOOST_CHECK_EQUAL(val4, expected);
 
-    BOOST_CHECK_EXCEPTION(promise.SetValue(MakeAuto(0)), IgniteError, IsFutureError);
-    BOOST_CHECK_EXCEPTION(promise.SetValue(MakeAuto(expected)), IgniteError, IsFutureError);
+    BOOST_CHECK_EXCEPTION(promise.SetValue(MakeShared(0)), IgniteError, IsFutureError);
+    BOOST_CHECK_EXCEPTION(promise.SetValue(MakeShared(expected)), IgniteError, IsFutureError);
     BOOST_CHECK_EXCEPTION(promise.SetError(IgniteError()), IgniteError, IsFutureError);
 }
 
@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE(FutureStringValue)
     ready = future2.WaitFor(100);
     BOOST_CHECK(!ready);
 
-    promise.SetValue(MakeAuto(expected));
+    promise.SetValue(MakeShared(expected));
 
     ready = future1.WaitFor(100);
     BOOST_REQUIRE(ready);
@@ -280,8 +280,8 @@ BOOST_AUTO_TEST_CASE(FutureStringValue)
 
     BOOST_CHECK_EQUAL(val4, expected);
 
-    BOOST_CHECK_EXCEPTION(promise.SetValue(MakeAuto(std::string("Hello Ignite"))), IgniteError, IsFutureError);
-    BOOST_CHECK_EXCEPTION(promise.SetValue(MakeAuto(expected)), IgniteError, IsFutureError);
+    BOOST_CHECK_EXCEPTION(promise.SetValue(MakeShared(std::string("Hello Ignite"))), IgniteError, IsFutureError);
+    BOOST_CHECK_EXCEPTION(promise.SetValue(MakeShared(expected)), IgniteError, IsFutureError);
     BOOST_CHECK_EXCEPTION(promise.SetError(IgniteError()), IgniteError, IsFutureError);
 }
 
@@ -358,7 +358,7 @@ BOOST_AUTO_TEST_CASE(FutureIntError)
     BOOST_CHECK_EXCEPTION(future1.GetValue(), IgniteError, IsUnknownError);
     BOOST_CHECK_EXCEPTION(future2.GetValue(), IgniteError, IsUnknownError);
 
-    BOOST_CHECK_EXCEPTION(promise.SetValue(MakeAuto(42)), IgniteError, IsFutureError);
+    BOOST_CHECK_EXCEPTION(promise.SetValue(MakeShared(42)), IgniteError, IsFutureError);
     BOOST_CHECK_EXCEPTION(promise.SetError(IgniteError()), IgniteError, IsFutureError);
 }
 

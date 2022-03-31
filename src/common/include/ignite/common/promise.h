@@ -87,7 +87,7 @@ namespace ignite
              * @throw IgniteError with IgniteError::IGNITE_ERR_FUTURE_STATE if error or value has been set already.
              * @param val Value to set.
              */
-            void SetValue(std::auto_ptr<ValueType> val)
+            void SetValue(std::shared_ptr<ValueType> val)
             {
                 SharedState<ValueType>* state0 = state.Get();
 
@@ -114,7 +114,7 @@ namespace ignite
             /**
              * Set cancel target.
              */
-            void SetCancelTarget(std::auto_ptr<Cancelable>& target)
+            void SetCancelTarget(std::shared_ptr<Cancelable>& target)
             {
                 state.Get()->SetCancelTarget(target);
             }
@@ -202,7 +202,7 @@ namespace ignite
             /**
              * Set cancel target.
              */
-            void SetCancelTarget(std::auto_ptr<Cancelable>& target)
+            void SetCancelTarget(std::shared_ptr<Cancelable>& target)
             {
                 state.Get()->SetCancelTarget(target);
             }

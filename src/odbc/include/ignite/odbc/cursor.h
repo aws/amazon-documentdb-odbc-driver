@@ -87,7 +87,7 @@ class Cursor {
    *
    * @param newPage New result page.
    */
-  void UpdateData(std::auto_ptr< ResultPage >& newPage);
+  void UpdateData(std::shared_ptr< ResultPage >& newPage);
 
   /**
    * Get current row.
@@ -104,13 +104,13 @@ class Cursor {
   int64_t queryId;
 
   /** Current page. */
-  std::auto_ptr< ResultPage > currentPage;
+  std::shared_ptr< ResultPage > currentPage;
 
   /** Row position in current page. */
   int32_t currentPagePos;
 
   /** Current row. */
-  std::auto_ptr< Row > currentRow;
+  std::unique_ptr< Row > currentRow;
 };
 }  // namespace odbc
 }  // namespace ignite

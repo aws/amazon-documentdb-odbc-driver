@@ -1393,15 +1393,15 @@ BOOST_AUTO_TEST_CASE(TestPrimitivePointers)
 
     in.Position(IGNITE_DFLT_HDR_LEN);
 
-    std::auto_ptr<std::string> field1Res(rawReader.ReadObject<std::string*>());
+    std::unique_ptr<std::string> field1Res(rawReader.ReadObject<std::string*>());
     BOOST_REQUIRE(IsStreamPositionEqualOnSkip(in, IGNITE_DFLT_HDR_LEN));
 
     int32_t prevPos = in.Position();
-    std::auto_ptr<int8_t> fieldNullRes(rawReader.ReadObject<int8_t*>());
+    std::unique_ptr<int8_t> fieldNullRes(rawReader.ReadObject<int8_t*>());
     BOOST_REQUIRE(IsStreamPositionEqualOnSkip(in, prevPos));
 
     prevPos = in.Position();
-    std::auto_ptr<int32_t> field2Res(rawReader.ReadObject<int32_t*>());
+    std::unique_ptr<int32_t> field2Res(rawReader.ReadObject<int32_t*>());
     BOOST_REQUIRE(IsStreamPositionEqualOnSkip(in, prevPos));
 
     BOOST_CHECK_EQUAL(*field1Res, field1);
