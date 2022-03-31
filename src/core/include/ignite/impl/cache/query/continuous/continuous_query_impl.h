@@ -236,7 +236,7 @@ namespace ignite
                         int64_t timeInterval;
 
                         /** Cache entry event filter holder. */
-                        std::auto_ptr<event::CacheEntryEventFilterHolderBase> filterOp;
+                        std::unique_ptr<event::CacheEntryEventFilterHolderBase> filterOp;
                     };
 
                     /**
