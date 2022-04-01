@@ -153,8 +153,8 @@ There are two ways to fix the issue.
       1. Note that the command will need to be executed for all scripts that you will run in the container (register_driver_unix.sh,env_variables_check.sh and any other that you might need).
 #### Using Ubuntu 64bit
 
-1. Install all dependecies
-   1. Ubuntu dev depenndicies
+1. Install all dependencies
+   1. Ubuntu dev dependencies
       E.g. 
 ``` 
            apt-get -y update \
