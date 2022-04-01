@@ -29,8 +29,10 @@
 #include "odbc_test_suite.h"
 #include "test_utils.h"
 
+using boost::unit_test::precondition;
 using ignite::odbc::OdbcTestSuite;
 using ignite_test::GetOdbcErrorMessage;
+using ignite::odbc::if_integration;
 
 /**
  * Test setup fixture.
@@ -79,17 +81,25 @@ struct ConnectionTestSuiteFixture : OdbcTestSuite {
 
 BOOST_FIXTURE_TEST_SUITE(ConnectionTestSuite, ConnectionTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestConnectionRestoreInternalSSHTunnel) {
+BOOST_AUTO_TEST_CASE(TestConnectionRestoreInternalSSHTunnel,
+                     *precondition(if_integration())) {
   std::string connectionString;
-  CreateDsnConnectionString(connectionString);
+  CreateDsnConnectionStringForRemoteServer(connectionString);
   Connect(connectionString);
   Disconnect();
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionRestoreExternalSSHTunnel) {
+BOOST_AUTO_TEST_CASE(TestConnectionRestoreExternalSSHTunnel,
+                     *precondition(if_integration())) {
   std::string connectionString;
-  CreateDsnConnectionString(connectionString, std::string(), false);
+  CreateDsnConnectionStringForRemoteServer(connectionString, false);
+  Connect(connectionString);
+  Disconnect();
+}
 
+BOOST_AUTO_TEST_CASE(TestConnectionRestoreLocalServer) {
+  std::string connectionString;
+  CreateDsnConnectionStringForLocalServer(connectionString);
   Connect(connectionString);
   Disconnect();
 }
@@ -106,7 +116,8 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestoreMiscOptionsSet) {
       "REFRESH_SCHEMA=true;"
       "DEFAULT_FETCH_SIZE=1000;";
   std::string connectionString;
-  CreateDsnConnectionString(connectionString, std::string(), true, miscOptions);
+  CreateDsnConnectionStringForLocalServer(connectionString, "", "",
+                                          miscOptions);
 
   Connect(connectionString);
   Disconnect();
@@ -146,13 +157,13 @@ BOOST_AUTO_TEST_CASE(TestConnectionIncompleteSSHTunnelProperties) {
 
 BOOST_AUTO_TEST_CASE(TestConnectionInvalidUser) {
   std::string connectionString;
-  CreateDsnConnectionString(connectionString, "invaliduser");
+  CreateDsnConnectionStringForLocalServer(connectionString, "", "invaliduser");
 
   ExpectConnectionReject(
       connectionString,
       "08001: Failed to establish connection with the host.\n"
       "Invalid username or password or user is not authorized on database "
-      "'test'. "
+      "'odbc-test'. "
       "Please check your settings. Authorization failed for user 'invaliduser' "
       "on database 'admin' with mechanism");
 

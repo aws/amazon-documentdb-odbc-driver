@@ -244,163 +244,163 @@ class DsnConfigurationWindow : public CustomWindow {
   int height;
 
   /** Connection settings group box. */
-  std::auto_ptr< Window > connectionSettingsGroupBox;
+  std::unique_ptr< Window > connectionSettingsGroupBox;
 
   /** SSH settings group box. */
-  std::auto_ptr< Window > sshSettingsGroupBox;
+  std::unique_ptr< Window > sshSettingsGroupBox;
 
   /** TLS settings group box. */
-  std::auto_ptr< Window > tlsSettingsGroupBox;
+  std::unique_ptr< Window > tlsSettingsGroupBox;
 
   /** Schema generation and discovery settings group box. */
-  std::auto_ptr< Window > schemaSettingsGroupBox;
+  std::unique_ptr< Window > schemaSettingsGroupBox;
 
   /** Additional settings group box. */
-  std::auto_ptr< Window > additionalSettingsGroupBox;
+  std::unique_ptr< Window > additionalSettingsGroupBox;
 
   /** DSN name edit field label. */
-  std::auto_ptr< Window > nameLabel;
+  std::unique_ptr< Window > nameLabel;
 
   /** DSN name edit field. */
-  std::auto_ptr< Window > nameEdit;
+  std::unique_ptr< Window > nameEdit;
 
   /** Scan method ComboBox **/
-  std::auto_ptr< Window > scanMethodComboBox;
+  std::unique_ptr< Window > scanMethodComboBox;
 
   /** Scan method label. */
-  std::auto_ptr< Window > scanMethodLabel;
+  std::unique_ptr< Window > scanMethodLabel;
 
   /** Scan limit field label. */
-  std::auto_ptr< Window > scanLimitLabel;
+  std::unique_ptr< Window > scanLimitLabel;
 
   /** Scan limit field. */
-  std::auto_ptr< Window > scanLimitEdit;
+  std::unique_ptr< Window > scanLimitEdit;
 
   /** DSN schema edit field label. */
-  std::auto_ptr< Window > schemaLabel;
+  std::unique_ptr< Window > schemaLabel;
 
   /** DSN schema edit field. */
-  std::auto_ptr< Window > schemaEdit;
+  std::unique_ptr< Window > schemaEdit;
 
   /** Refresh DSN schema checkBox. */
-  std::auto_ptr< Window > refreshSchemaCheckBox;
+  std::unique_ptr< Window > refreshSchemaCheckBox;
 
   /** SSH enable checkBox. */
-  std::auto_ptr< Window > sshEnableCheckBox;
+  std::unique_ptr< Window > sshEnableCheckBox;
 
   /** SSH user edit. */
-  std::auto_ptr< Window > sshUserEdit;
+  std::unique_ptr< Window > sshUserEdit;
 
   /** SSH user label. */
-  std::auto_ptr< Window > sshUserLabel;
+  std::unique_ptr< Window > sshUserLabel;
 
   /** SSH host edit. */
-  std::auto_ptr< Window > sshHostEdit;
+  std::unique_ptr< Window > sshHostEdit;
 
   /** SSH host label. */
-  std::auto_ptr< Window > sshHostLabel;
+  std::unique_ptr< Window > sshHostLabel;
 
   /** SSH private key file edit. */
-  std::auto_ptr< Window > sshPrivateKeyFileEdit;
+  std::unique_ptr< Window > sshPrivateKeyFileEdit;
 
   /** SSH private key file label. */
-  std::auto_ptr< Window > sshPrivateKeyFileLabel;
+  std::unique_ptr< Window > sshPrivateKeyFileLabel;
 
   /** SSH private key passphrase edit. */
-  std::auto_ptr< Window > sshPrivateKeyPassphraseEdit;
+  std::unique_ptr< Window > sshPrivateKeyPassphraseEdit;
 
   /** SSH private key passphrase label. */
-  std::auto_ptr< Window > sshPrivateKeyPassphraseLabel;
+  std::unique_ptr< Window > sshPrivateKeyPassphraseLabel;
 
   /** SSH strict host key checking checkBox. */
-  std::auto_ptr< Window > sshStrictHostKeyCheckingCheckBox;
+  std::unique_ptr< Window > sshStrictHostKeyCheckingCheckBox;
 
   /** SSH known host file edit. */
-  std::auto_ptr< Window > sshKnownHostsFileEdit;
+  std::unique_ptr< Window > sshKnownHostsFileEdit;
 
   /** SSH know host file label. */
-  std::auto_ptr< Window > sshKnownHostsFileLabel;
+  std::unique_ptr< Window > sshKnownHostsFileLabel;
 
   /** Application name edit. */
-  std::auto_ptr< Window > appNameEdit;
+  std::unique_ptr< Window > appNameEdit;
 
   /** Application name label. */
-  std::auto_ptr< Window > appNameLabel;
+  std::unique_ptr< Window > appNameLabel;
 
   /** Login Timeout (seconds) edit. */
-  std::auto_ptr< Window > loginTimeoutSecEdit;
+  std::unique_ptr< Window > loginTimeoutSecEdit;
 
   /** Login Timeout (seconds) label. */
-  std::auto_ptr< Window > loginTimeoutSecLabel;
+  std::unique_ptr< Window > loginTimeoutSecLabel;
 
   /** Read Preference ComboBox **/
-  std::auto_ptr< Window > readPreferenceComboBox;
+  std::unique_ptr< Window > readPreferenceComboBox;
 
   /** Read preference label. */
-  std::auto_ptr< Window > readPreferenceLabel;
+  std::unique_ptr< Window > readPreferenceLabel;
 
   /** Replica set edit. */
-  std::auto_ptr< Window > replicaSetEdit;
+  std::unique_ptr< Window > replicaSetEdit;
 
   /** Replica set label. */
-  std::auto_ptr< Window > replicaSetLabel;
+  std::unique_ptr< Window > replicaSetLabel;
 
   /** Retry reads checkBox. */
-  std::auto_ptr< Window > retryReadsCheckBox;
+  std::unique_ptr< Window > retryReadsCheckBox;
 
   /** Default fetch size edit. */
-  std::auto_ptr< Window > defaultFetchSizeEdit;
+  std::unique_ptr< Window > defaultFetchSizeEdit;
 
   /** Default fetch size label. */
-  std::auto_ptr< Window > defaultFetchSizeLabel;
+  std::unique_ptr< Window > defaultFetchSizeLabel;
 
   /** Ok button. */
-  std::auto_ptr< Window > okButton;
+  std::unique_ptr< Window > okButton;
 
   /** Cancel button. */
-  std::auto_ptr< Window > cancelButton;
+  std::unique_ptr< Window > cancelButton;
 
   /** TLS encryption checkBox. */
-  std::auto_ptr< Window > tlsCheckBox;
+  std::unique_ptr< Window > tlsCheckBox;
 
   /** TLS allow invalid hostnames checkBox. */
-  std::auto_ptr< Window > tlsAllowInvalidHostnamesCheckBox;
+  std::unique_ptr< Window > tlsAllowInvalidHostnamesCheckBox;
 
   /** TLS certificate authority file label. */
-  std::auto_ptr< Window > tlsCaFileLabel;
+  std::unique_ptr< Window > tlsCaFileLabel;
 
   /** TLS certificate authority file edit. */
-  std::auto_ptr< Window > tlsCaFileEdit;
+  std::unique_ptr< Window > tlsCaFileEdit;
 
   /** Database label. */
-  std::auto_ptr< Window > databaseLabel;
+  std::unique_ptr< Window > databaseLabel;
 
   /** Database edit. */
-  std::auto_ptr< Window > databaseEdit;
+  std::unique_ptr< Window > databaseEdit;
 
   /** Hostname label. */
-  std::auto_ptr< Window > hostnameLabel;
+  std::unique_ptr< Window > hostnameLabel;
 
   /** Hostname edit. */
-  std::auto_ptr< Window > hostnameEdit;
+  std::unique_ptr< Window > hostnameEdit;
 
   /** Port label. */
-  std::auto_ptr< Window > portLabel;
+  std::unique_ptr< Window > portLabel;
 
   /** Port edit. */
-  std::auto_ptr< Window > portEdit;
+  std::unique_ptr< Window > portEdit;
 
   /** User label. */
-  std::auto_ptr< Window > userLabel;
+  std::unique_ptr< Window > userLabel;
 
   /** User edit. */
-  std::auto_ptr< Window > userEdit;
+  std::unique_ptr< Window > userEdit;
 
   /** Password label. */
-  std::auto_ptr< Window > passwordLabel;
+  std::unique_ptr< Window > passwordLabel;
 
   /** Password edit. */
-  std::auto_ptr< Window > passwordEdit;
+  std::unique_ptr< Window > passwordEdit;
 
   /** Configuration. */
   config::Configuration& config;

@@ -23,7 +23,7 @@ env:
   DOC_DB_PASSWORD: ${{secrets.DOC_DB_PASSWORD}}
   DOC_DB_USER: ${{secrets.DOC_DB_USER}}
   DOC_DB_HOST: ${{secrets.DOC_DB_HOST}}
-  RUN_REMOTE_INTEGRATION_TESTS: ${{ github.event.inputs.testWithoutDocumnetDb && 'false' || 'true' }}
+  DOC_DB_ODBC_INTEGRATION_TEST: 1
   DOC_DB_LOCAL_PORT: 27019
   DOC_DB_REMOTE_PORT: 27017
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
