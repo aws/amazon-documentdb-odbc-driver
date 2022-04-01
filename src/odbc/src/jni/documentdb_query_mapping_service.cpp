@@ -43,11 +43,11 @@ DocumentDbQueryMappingService::Create(
   }
 
   SharedPointer< JniContext > jniContext =
-      connectionProperties.Get()->_jniContext;
+      connectionProperties.Get()->jniContext_;
   SharedPointer< GlobalJObject > queryMappingService;
   JniErrorCode success = jniContext.Get()->DocumentDbQueryMappingServiceCtor(
-      connectionProperties.Get()->_connectionProperties,
-      databaseMetadata.Get()->_databaseMetadata, queryMappingService, errInfo);
+      connectionProperties.Get()->connectionProperties_,
+      databaseMetadata.Get()->databaseMetadata_, queryMappingService, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     return nullptr;
   }
@@ -86,141 +86,141 @@ bool DocumentDbQueryMappingService::ReadJdbcColumnMetadata(
     JniErrorInfo& errInfo) {
   JniErrorCode success;
   int32_t listSize;
-  success = _jniContext.Get()->ListSize(columnMetadata, listSize, errInfo);
+  success = jniContext_.Get()->ListSize(columnMetadata, listSize, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     return false;
   }
 
   for (int32_t index = 0; index < listSize; index++) {
     SharedPointer< GlobalJObject > jdbcColumnMetadata;
-    success = _jniContext.Get()->ListGet(columnMetadata, index,
+    success = jniContext_.Get()->ListGet(columnMetadata, index,
                                          jdbcColumnMetadata, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
 
     int32_t ordinal;
-    success = _jniContext.Get()->JdbcColumnMetadataGetOrdinal(
+    success = jniContext_.Get()->JdbcColumnMetadataGetOrdinal(
         jdbcColumnMetadata, ordinal, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     bool autoIncrement;
-    success = _jniContext.Get()->JdbcColumnMetadataIsAutoIncrement(
+    success = jniContext_.Get()->JdbcColumnMetadataIsAutoIncrement(
         jdbcColumnMetadata, autoIncrement, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     bool caseSensitive;
-    success = _jniContext.Get()->JdbcColumnMetadataIsCaseSensitive(
+    success = jniContext_.Get()->JdbcColumnMetadataIsCaseSensitive(
         jdbcColumnMetadata, caseSensitive, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     bool searchable;
-    success = _jniContext.Get()->JdbcColumnMetadataIsSearchable(
+    success = jniContext_.Get()->JdbcColumnMetadataIsSearchable(
         jdbcColumnMetadata, searchable, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     bool currency;
-    success = _jniContext.Get()->JdbcColumnMetadataIsCurrency(
+    success = jniContext_.Get()->JdbcColumnMetadataIsCurrency(
         jdbcColumnMetadata, currency, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     int32_t nullable;
-    success = _jniContext.Get()->JdbcColumnMetadataGetNullable(
+    success = jniContext_.Get()->JdbcColumnMetadataGetNullable(
         jdbcColumnMetadata, nullable, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     bool isSigned;
-    success = _jniContext.Get()->JdbcColumnMetadataIsSigned(jdbcColumnMetadata,
+    success = jniContext_.Get()->JdbcColumnMetadataIsSigned(jdbcColumnMetadata,
                                                             isSigned, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     int32_t columnDisplaySize;
-    success = _jniContext.Get()->JdbcColumnMetadataGetColumnDisplaySize(
+    success = jniContext_.Get()->JdbcColumnMetadataGetColumnDisplaySize(
         jdbcColumnMetadata, columnDisplaySize, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     boost::optional< std::string > columnLabel;
-    success = _jniContext.Get()->JdbcColumnMetadataGetColumnLabel(
+    success = jniContext_.Get()->JdbcColumnMetadataGetColumnLabel(
         jdbcColumnMetadata, columnLabel, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     boost::optional< std::string > columnName;
-    success = _jniContext.Get()->JdbcColumnMetadataGetColumnName(
+    success = jniContext_.Get()->JdbcColumnMetadataGetColumnName(
         jdbcColumnMetadata, columnName, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     boost::optional< std::string > schemaName;
-    success = _jniContext.Get()->JdbcColumnMetadataGetSchemaName(
+    success = jniContext_.Get()->JdbcColumnMetadataGetSchemaName(
         jdbcColumnMetadata, schemaName, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     int32_t precision;
-    success = _jniContext.Get()->JdbcColumnMetadataGetPrecision(
+    success = jniContext_.Get()->JdbcColumnMetadataGetPrecision(
         jdbcColumnMetadata, precision, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     int32_t scale;
-    success = _jniContext.Get()->JdbcColumnMetadataGetScale(jdbcColumnMetadata,
+    success = jniContext_.Get()->JdbcColumnMetadataGetScale(jdbcColumnMetadata,
                                                             scale, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     boost::optional< std::string > tableName;
-    success = _jniContext.Get()->JdbcColumnMetadataGetTableName(
+    success = jniContext_.Get()->JdbcColumnMetadataGetTableName(
         jdbcColumnMetadata, tableName, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     boost::optional< std::string > catalogName;
-    success = _jniContext.Get()->JdbcColumnMetadataGetCatalogName(
+    success = jniContext_.Get()->JdbcColumnMetadataGetCatalogName(
         jdbcColumnMetadata, catalogName, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     int32_t columnType;
-    success = _jniContext.Get()->JdbcColumnMetadataGetColumnType(
+    success = jniContext_.Get()->JdbcColumnMetadataGetColumnType(
         jdbcColumnMetadata, columnType, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     boost::optional< std::string > columnTypeName;
-    success = _jniContext.Get()->JdbcColumnMetadataGetColumnTypeName(
+    success = jniContext_.Get()->JdbcColumnMetadataGetColumnTypeName(
         jdbcColumnMetadata, columnTypeName, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     bool readOnly;
-    success = _jniContext.Get()->JdbcColumnMetadataIsReadOnly(
+    success = jniContext_.Get()->JdbcColumnMetadataIsReadOnly(
         jdbcColumnMetadata, readOnly, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     bool writable;
-    success = _jniContext.Get()->JdbcColumnMetadataIsWritable(
+    success = jniContext_.Get()->JdbcColumnMetadataIsWritable(
         jdbcColumnMetadata, writable, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     bool definitelyWritable;
-    success = _jniContext.Get()->JdbcColumnMetadataIsDefinitelyWritable(
+    success = jniContext_.Get()->JdbcColumnMetadataIsDefinitelyWritable(
         jdbcColumnMetadata, definitelyWritable, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
     boost::optional< std::string > columnClassName;
-    success = _jniContext.Get()->JdbcColumnMetadataGetColumnClassName(
+    success = jniContext_.Get()->JdbcColumnMetadataGetColumnClassName(
         jdbcColumnMetadata, columnClassName, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
@@ -242,14 +242,14 @@ DocumentDbQueryMappingService::GetMqlQueryContext(const std::string& sql,
                                                   int maxRowCount,
                                                   JniErrorInfo& errInfo) {
   SharedPointer< GlobalJObject > mqlQueryContext;
-  JniErrorCode success = _jniContext.Get()->DocumentDbQueryMappingServiceGet(
-      _queryMappingService, sql, maxRowCount, mqlQueryContext, errInfo);
+  JniErrorCode success = jniContext_.Get()->DocumentDbQueryMappingServiceGet(
+      queryMappingService_, sql, maxRowCount, mqlQueryContext, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     return nullptr;
   }
 
   std::string collectionName;
-  success = _jniContext.Get()->DocumentdbMqlQueryContextGetCollectionName(
+  success = jniContext_.Get()->DocumentdbMqlQueryContextGetCollectionName(
       mqlQueryContext, collectionName, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     return nullptr;
@@ -259,31 +259,31 @@ DocumentDbQueryMappingService::GetMqlQueryContext(const std::string& sql,
       new DocumentDbMqlQueryContext(collectionName);
 
   SharedPointer< GlobalJObject > aggregateOperations;
-  success = _jniContext.Get()
+  success = jniContext_.Get()
                 ->DocumentdbMqlQueryContextGetAggregateOperationsAsStrings(
                     mqlQueryContext, aggregateOperations, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     return nullptr;
   }
   if (!ReadListOfString(
-          _jniContext, aggregateOperations,
+          jniContext_, aggregateOperations,
           documentDbMqlQueryContext.Get()->GetAggregateOperations())) {
     return nullptr;
   }
 
   SharedPointer< GlobalJObject > paths;
-  success = _jniContext.Get()->DocumentdbMqlQueryContextGetPaths(
+  success = jniContext_.Get()->DocumentdbMqlQueryContextGetPaths(
       mqlQueryContext, paths, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     return nullptr;
   }
-  if (!ReadListOfString(_jniContext, paths,
+  if (!ReadListOfString(jniContext_, paths,
                         documentDbMqlQueryContext.Get()->GetPaths())) {
     return nullptr;
   }
 
   SharedPointer< GlobalJObject > columnMetadata;
-  success = _jniContext.Get()->DocumentdbMqlQueryContextGetColumnMetadata(
+  success = jniContext_.Get()->DocumentdbMqlQueryContextGetColumnMetadata(
       mqlQueryContext, columnMetadata, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     return nullptr;
