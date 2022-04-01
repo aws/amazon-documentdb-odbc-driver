@@ -139,7 +139,7 @@ Example:
    5. set LOCAL_DATABASE_HOST with the ip of your local mongo
       E.g. If is in another docker container `export LOCAL_DATABASE_HOST=<ip from the mongo docker container>` or if is your host machine `export LOCAL_DATABASE_HOST=host.docker.internal`
    6. You are ready to run the tests.
-   E.g. `./documentdb-odbc/build/odbc/bin/ignite-odbc-tests`
+   E.g. `cd /documentdb-odbc/build/odbc/bin/ && ./ignite-odbc-tests`
 3. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
 ##### Known issues
@@ -148,7 +148,7 @@ If a windows host machine is used, it is possible to have an issue with end of l
 There are two ways to fix the issue.
    1. Ensure that your github is checking out the files as Unix-style https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings
    2. Alternatively you can convert the end-of-line using the following command `tr -d '\015' < build_linux_debug64.sh > build_linux_debug64_lf.sh and run the build_linux_debug64_lf.sh`
-      1. Note that this needs to be done for all scripts that you will run in the container (register_driver_unix.sh,env_variables_check.sh and any other that you might need)
+      1. Note that the command will need to be executed for all scripts that you will run in the container (register_driver_unix.sh,env_variables_check.sh and any other that you might need).
 #### Using Ubuntu 64bit
 
 1. Install all dependecies
@@ -210,9 +210,9 @@ There are two ways to fix the issue.
    7. Run local ssh tunnel. Make sure to run as background process with '&' in the end of the command line.
    8. Set environment variables for testing and double-check if all dev environmnet variables are set running `scripts/env_variables_check.sh`.
    5. set LOCAL_DATABASE_HOST with the ip of your local mongo
-      E.g. If is in another docker container `export LOCAL_DATABASE_HOST=<ip from the mongo docker container>` or if is your host machine `export LOCAL_DATABASE_HOST=host.docker.internal`
+      E.g. If is in another docker container `export LOCAL_DATABASE_HOST=<ip from the mongo docker container>` or if is your host machine `export LOCAL_DATABASE_HOST=host.docker.internal`.
    9. You are ready to run the tests.
-      E.g. `/documentdb-odbc/build/odbc/bin/ignite-odbc-tests`
+      E.g. `/documentdb-odbc/build/odbc/bin/ignite-odbc-tests`.
 
 
 
