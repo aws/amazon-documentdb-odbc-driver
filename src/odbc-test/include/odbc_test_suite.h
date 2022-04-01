@@ -360,7 +360,8 @@ struct OdbcTestSuite {
   void CreateDsnConnectionStringForRemoteServer(
       std::string& connectionString, bool sshTunnel = true,
       const std::string& username = std::string(),
-      const std::string& miscOptions = std::string()) const;
+      const std::string& miscOptions = std::string(),
+      const std::string databasename = std::string()) const;
 
   /**
    * Creates the standard DSN connection string for use with local instance.

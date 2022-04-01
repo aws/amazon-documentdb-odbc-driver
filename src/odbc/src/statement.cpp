@@ -31,7 +31,6 @@
 #include "ignite/odbc/query/internal_query.h"
 #include "ignite/odbc/query/primary_keys_query.h"
 #include "ignite/odbc/query/special_columns_query.h"
-#include "ignite/odbc/query/streaming_query.h"
 #include "ignite/odbc/query/table_metadata_query.h"
 #include "ignite/odbc/query/type_info_query.h"
 #include "ignite/odbc/sql/sql_parser.h"
@@ -295,14 +294,6 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
 
     case SQL_ATTR_PARAMSET_SIZE: {
       SqlUlen size = reinterpret_cast< SqlUlen >(value);
-
-      if (size > 1 && IsStreamingActive()) {
-        AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
-                        "Batching is not supported in streaming mode.");
-
-        return SqlResult::AI_ERROR;
-      }
-
       parameters.SetParamSetSize(size);
 
       break;
@@ -581,29 +572,12 @@ SqlResult::Type Statement::ProcessInternalCommand(const std::string& query) {
   }
 }
 
-bool Statement::IsStreamingActive() const {
-  return connection.GetStreamingContext().IsEnabled();
-}
-
 SqlResult::Type Statement::InternalPrepareSqlQuery(const std::string& query) {
   if (sql_utils::IsInternalCommand(query))
     return ProcessInternalCommand(query);
 
   // Resetting parameters types as we are changing the query.
   parameters.Prepare();
-
-  if (IsStreamingActive()) {
-    if (!currentQuery.get())
-      currentQuery.reset(
-          new query::StreamingQuery(*this, connection, parameters));
-
-    query::StreamingQuery* currentQuery0 =
-        static_cast< query::StreamingQuery* >(currentQuery.get());
-
-    currentQuery0->PrepareQuery(query);
-
-    return SqlResult::AI_SUCCESS;
-  }
 
   if (currentQuery.get())
     currentQuery->Close();
@@ -636,12 +610,6 @@ SqlResult::Type Statement::InternalExecuteSqlQuery() {
     AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR, "Query is not prepared.");
 
     return SqlResult::AI_ERROR;
-  }
-
-  if (currentQuery->GetType() == query::QueryType::INTERNAL) {
-    ProcessInternalQuery();
-
-    return SqlResult::AI_SUCCESS;
   }
 
   if (parameters.GetParamSetSize() > 1
@@ -679,46 +647,6 @@ SqlResult::Type Statement::InternalExecuteSqlQuery() {
   }
 
   return currentQuery->Execute();
-}
-
-SqlResult::Type Statement::ProcessInternalQuery() {
-  assert(currentQuery->GetType() == query::QueryType::INTERNAL);
-
-  query::InternalQuery* qry =
-      static_cast< query::InternalQuery* >(currentQuery.get());
-
-  LOG_MSG("Processing internal query: " << qry->GetQuery());
-
-  assert(qry->GetCommand().GetType() == SqlCommandType::SET_STREAMING);
-
-  SqlSetStreamingCommand& cmd =
-      static_cast< SqlSetStreamingCommand& >(qry->GetCommand());
-
-  StopStreaming();
-
-  if (!cmd.IsEnabled())
-    return SqlResult::AI_SUCCESS;
-
-  LOG_MSG("Sending start streaming command");
-
-  query::DataQuery enablingQuery(*this, connection, qry->GetQuery(), parameters,
-                                 timeout);
-
-  SqlResult::Type res = enablingQuery.Execute();
-
-  if (res != SqlResult::AI_SUCCESS)
-    return res;
-
-  LOG_MSG("Preparing streaming context on client");
-
-  connection.GetStreamingContext().Enable(cmd);
-
-  std::unique_ptr< query::Query > newQry(
-      new query::StreamingQuery(*this, connection, parameters));
-
-  std::swap(currentQuery, newQry);
-
-  return SqlResult::AI_SUCCESS;
 }
 
 void Statement::ExecuteGetColumnsMetaQuery(const std::string& catalog,
@@ -908,17 +836,6 @@ SqlResult::Type Statement::InternalClose() {
     return SqlResult::AI_SUCCESS;
 
   SqlResult::Type result = currentQuery->Close();
-
-  return result;
-}
-
-SqlResult::Type Statement::StopStreaming() {
-  if (!IsStreamingActive())
-    return SqlResult::AI_SUCCESS;
-
-  LOG_MSG("Stopping streaming");
-
-  SqlResult::Type result = connection.GetStreamingContext().Disable();
 
   return result;
 }
