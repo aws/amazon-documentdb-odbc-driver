@@ -120,7 +120,7 @@ class DataQuery : public Query {
    * @return SQL query string.
    */
   const std::string& GetSql() const {
-    return _sql;
+    return sql_;
   }
 
  private:
@@ -219,7 +219,7 @@ class DataQuery : public Query {
   Connection& connection_;
 
   /** SQL Query. */
-  std::string _sql;
+  std::string sql_;
 
   /** Parameter bindings. */
   const app::ParameterSet& params_;
@@ -234,7 +234,7 @@ class DataQuery : public Query {
   std::unique_ptr< DocumentDbCursor > cursor_{};
 
   /** Timeout. */
-  int32_t& _timeout;
+  int32_t& timeout_;
 };
 }  // namespace query
 }  // namespace odbc

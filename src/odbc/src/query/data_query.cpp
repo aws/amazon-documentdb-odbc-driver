@@ -51,9 +51,9 @@ DataQuery::DataQuery(diagnostic::DiagnosableAdapter& diag,
                      const app::ParameterSet& params, int32_t& timeout)
     : Query(diag, QueryType::DATA),
       connection_(connection),
-      _sql(sql),
+      sql_(sql),
       params_(params),
-      _timeout(timeout) {
+      timeout_(timeout) {
   // No-op.
 }
 
@@ -258,7 +258,7 @@ SqlResult::Type DataQuery::GetMqlQueryContext(
     return SqlResult::AI_ERROR;
   }
   mqlQueryContext =
-      queryMappingService.Get()->GetMqlQueryContext(_sql, 0, errInfo);
+      queryMappingService.Get()->GetMqlQueryContext(sql_, 0, errInfo);
   if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     IgniteError::SetError(errInfo.code, errInfo.errCls.c_str(),
                           errInfo.errMsg.c_str(), error);
