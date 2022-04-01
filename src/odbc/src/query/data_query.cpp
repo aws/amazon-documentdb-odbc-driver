@@ -32,7 +32,7 @@
 #include "ignite/odbc/jni/documentdb_query_mapping_service.h"
 #include "ignite/odbc/log.h"
 #include "ignite/odbc/message.h"
-#include "ignite/odbc/mongo_cursor.h"
+#include "ignite/odbc/documentdb_cursor.h"
 #include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/query/batch_query.h"
 #include "ignite/odbc/query/data_query.h"
@@ -93,7 +93,7 @@ SqlResult::Type DataQuery::FetchNextRow(app::ColumnBindingMap& columnBindings) {
   if (!cursor_->Increment())
     return SqlResult::AI_NO_DATA;
 
-  MongoRow* row = cursor_->GetRow();
+  DocumentDbRow* row = cursor_->GetRow();
 
   if (!row) {
     diag.AddStatusRecord("Unknown error.");
@@ -101,7 +101,7 @@ SqlResult::Type DataQuery::FetchNextRow(app::ColumnBindingMap& columnBindings) {
     return SqlResult::AI_ERROR;
   }
 
-  for (uint16_t i = 1; i < row->GetSize() + 1; ++i) {
+  for (uint32_t i = 1; i < row->GetSize() + 1; ++i) {
     app::ColumnBindingMap::iterator it = columnBindings.find(i);
 
     if (it == columnBindings.end())
@@ -128,7 +128,7 @@ SqlResult::Type DataQuery::GetColumn(uint16_t columnIdx,
     return SqlResult::AI_ERROR;
   }
 
-  MongoRow* row = cursor_->GetRow();
+  DocumentDbRow* row = cursor_->GetRow();
 
   if (!row) {
     diag.AddStatusRecord(SqlState::S24000_INVALID_CURSOR_STATE,
@@ -218,7 +218,7 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
     }
     mongocxx::cursor cursor = collection.aggregate(pipeline);
 
-    this->cursor_.reset(new MongoCursor(cursor, columnMetadata, paths));
+    this->cursor_.reset(new DocumentDbCursor(cursor, columnMetadata, paths));
 
     return SqlResult::AI_SUCCESS;
   } catch (mongocxx::exception const& xcp) {

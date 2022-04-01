@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef _IGNITE_ODBC_MONGO_ROW
-#define _IGNITE_ODBC_MONGO_ROW
+#ifndef _IGNITE_ODBC_DOCUMENTDB_ROW
+#define _IGNITE_ODBC_DOCUMENTDB_ROW
 
 #include <stdint.h>
 
@@ -24,7 +24,7 @@
 
 #include "ignite/odbc/app/application_data_buffer.h"
 #include "ignite/odbc/jni/jdbc_column_metadata.h"
-#include "ignite/odbc/mongo_column.h"
+#include "ignite/odbc/documentdb_column.h"
 #include "bsoncxx/document/view.hpp"
 #include "mongocxx/cursor.hpp"
 
@@ -37,21 +37,21 @@ namespace odbc {
 /**
  * Query result row.
  */
-class MongoRow {
+class DocumentDbRow {
  public:
   /**
    * Constructor.
    *
    * @param pageData Page data.
    */
-  MongoRow(bsoncxx::document::view const& document,
+  DocumentDbRow(bsoncxx::document::view const& document,
            std::vector< JdbcColumnMetadata >& columnMetadata,
            std::vector< std::string >& paths);
 
   /**
    * Destructor.
    */
-  ~MongoRow();
+  ~DocumentDbRow();
 
   /**
    * Get row size in columns.
@@ -70,10 +70,10 @@ class MongoRow {
    * @return Conversion result.
    */
   app::ConversionResult::Type ReadColumnToBuffer(
-      uint16_t columnIdx, app::ApplicationDataBuffer& dataBuf);
+      uint32_t columnIdx, app::ApplicationDataBuffer& dataBuf);
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(MongoRow);
+  IGNITE_NO_COPY_ASSIGNMENT(DocumentDbRow);
 
   /**
    * Get columns by its index.
@@ -87,7 +87,7 @@ class MongoRow {
    * @param columnIdx Column index.
    * @return Reference to specified column.
    */
-  MongoColumn& GetColumn(uint16_t columnIdx) {
+  DocumentDbColumn& GetColumn(uint32_t columnIdx) {
     return columns_[columnIdx - 1];
   }
 
@@ -107,7 +107,7 @@ class MongoRow {
   int32_t size;
 
   /** Columns. */
-  std::vector< MongoColumn > columns_;
+  std::vector< DocumentDbColumn > columns_;
 
   /** The current document */
   bsoncxx::document::view document_;
@@ -121,4 +121,4 @@ class MongoRow {
 }  // namespace odbc
 }  // namespace ignite
 
-#endif  //_IGNITE_ODBC_MONGO_ROW
+#endif  //_IGNITE_ODBC_DOCUMENTDB_ROW

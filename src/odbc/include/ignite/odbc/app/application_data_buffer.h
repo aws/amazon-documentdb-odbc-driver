@@ -270,7 +270,7 @@ class ApplicationDataBuffer {
   ConversionResult::Type PutNull();
 
   /**
-   * Put decimal value to buffer.
+   * Put optional decimal value to buffer.
    *
    * @param value Value to put.
    * @return Conversion result.
@@ -286,7 +286,7 @@ class ApplicationDataBuffer {
   ConversionResult::Type PutDecimal(const common::Decimal& value);
 
   /**
-   * Put date to buffer.
+   * Put optional date to buffer.
    *
    * @param value Value to put.
    * @return Conversion result.

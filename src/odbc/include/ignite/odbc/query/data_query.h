@@ -19,7 +19,7 @@
 #define _IGNITE_ODBC_QUERY_DATA_QUERY
 
 #include "ignite/odbc/app/parameter_set.h"
-#include "ignite/odbc/mongo_cursor.h"
+#include "ignite/odbc/documentdb_cursor.h"
 #include "ignite/odbc/query/query.h"
 #include "ignite/odbc/jni/documentdb_mql_query_context.h"
 
@@ -231,7 +231,7 @@ class DataQuery : public Query {
   meta::ColumnMetaVector resultMeta_{};
 
   /** Cursor. */
-  std::unique_ptr< MongoCursor > cursor_{};
+  std::unique_ptr< DocumentDbCursor > cursor_{};
 
   /** Timeout. */
   int32_t& _timeout;

@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/mongo_cursor.h"
+#include "ignite/odbc/documentdb_cursor.h"
 #include "mongocxx/cursor.hpp"
 
 namespace ignite {
 namespace odbc {
-MongoCursor::MongoCursor(mongocxx::cursor& cursor,
+DocumentDbCursor::DocumentDbCursor(mongocxx::cursor& cursor,
     std::vector< JdbcColumnMetadata >& columnMetadata,
     std::vector< std::string >& paths)
     : cursor_(std::move(cursor)),
@@ -31,11 +31,11 @@ MongoCursor::MongoCursor(mongocxx::cursor& cursor,
   // No-op.
 }
 
-MongoCursor::~MongoCursor() {
+DocumentDbCursor::~DocumentDbCursor() {
   currentRow_.release();
 }
 
-bool MongoCursor::Increment() {
+bool DocumentDbCursor::Increment() {
   bool hasData = HasData();
   if (hasData) {
     if (!isFirstRow_) {
@@ -46,18 +46,18 @@ bool MongoCursor::Increment() {
   }
   hasData = HasData();
   if (hasData) {
-    currentRow_.reset(new MongoRow(*iterator_, columnMetadata_, paths_));
+    currentRow_.reset(new DocumentDbRow(*iterator_, columnMetadata_, paths_));
   } else {
     currentRow_.reset();
   }
   return hasData;
 }
 
-bool MongoCursor::HasData() const {
+bool DocumentDbCursor::HasData() const {
   return iterator_ != iteratorEnd_;
 }
 
-MongoRow* MongoCursor::GetRow() {
+DocumentDbRow* DocumentDbCursor::GetRow() {
   return currentRow_.get();
 }
 }  // namespace odbc

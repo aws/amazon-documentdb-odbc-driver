@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef _IGNITE_ODBC_MONGO_COLUMN
-#define _IGNITE_ODBC_MONGO_COLUMN
+#ifndef _IGNITE_ODBC_DOCUMENTDB_COLUMN
+#define _IGNITE_ODBC_DOCUMENTDB_COLUMN
 
 #include <stdint.h>
 #include <ignite/odbc/app/application_data_buffer.h>
@@ -34,19 +34,19 @@ namespace odbc {
 /**
  * Result set column.
  */
-class MongoColumn {
+class DocumentDbColumn {
  public:
   /**
    * Default constructor.
    */
-  MongoColumn() = delete;
+  DocumentDbColumn() = delete;
 
   /**
    * Copy constructor.
    *
    * @param other Another instance.
    */
-  MongoColumn(const MongoColumn& other);
+  DocumentDbColumn(const DocumentDbColumn& other);
 
   /**
    * Copy operator.
@@ -54,19 +54,19 @@ class MongoColumn {
    * @param other Another instance.
    * @return This.
    */
-  MongoColumn& operator=(const MongoColumn& other) = delete;
+  DocumentDbColumn& operator=(const DocumentDbColumn& other) = delete;
 
   /**
    * Destructor.
    */
-  ~MongoColumn();
+  ~DocumentDbColumn();
 
   /**
    * Constructor.
    *
    * @param reader Reader to be used to retrieve column data.
    */
-  MongoColumn(bsoncxx::document::view& document,
+  DocumentDbColumn(bsoncxx::document::view& document,
               JdbcColumnMetadata& columnMetadata, std::string& path);
 
   /**
@@ -154,4 +154,4 @@ class MongoColumn {
 }  // namespace odbc
 }  // namespace ignite
 
-#endif  //_IGNITE_ODBC_MONGO_COLUMN
+#endif  //_IGNITE_ODBC_DOCUMENTDB_COLUMN

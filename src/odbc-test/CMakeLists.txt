@@ -92,6 +92,9 @@ set(SOURCES
          ../odbc/src/diagnostic/diagnosable_adapter.cpp
          ../odbc/src/diagnostic/diagnostic_record_storage.cpp
          ../odbc/src/diagnostic/diagnostic_record.cpp
+         ../odbc/src/documentdb_column.cpp
+         ../odbc/src/documentdb_cursor.cpp
+         ../odbc/src/documentdb_row.cpp
          ../odbc/src/dsn_config.cpp
          ../odbc/src/environment.cpp
          ../odbc/src/ignite_error.cpp
@@ -105,9 +108,6 @@ set(SOURCES
          ../odbc/src/message.cpp
          ../odbc/src/meta/column_meta.cpp
          ../odbc/src/meta/table_meta.cpp
-         ../odbc/src/mongo_column.cpp
-         ../odbc/src/mongo_cursor.cpp
-         ../odbc/src/mongo_row.cpp
          ../odbc/src/nested_tx_mode.cpp
          ../odbc/src/protocol_version.cpp
          ../odbc/src/query/batch_query.cpp

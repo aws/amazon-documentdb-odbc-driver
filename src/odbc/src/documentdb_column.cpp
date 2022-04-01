@@ -17,7 +17,7 @@
 
 #include <chrono>
 #include <ctime>
-#include "ignite/odbc/mongo_column.h"
+#include "ignite/odbc/documentdb_column.h"
 #include <ignite/odbc/impl/interop/interop_stream_position_guard.h>
 #include "ignite/odbc/utility.h"
 #include "bsoncxx/types.hpp"
@@ -106,7 +106,7 @@ int8_t ReadColumnHeader(InteropInputStream& stream) {
 namespace ignite {
 namespace odbc {
 
-MongoColumn::MongoColumn(const MongoColumn& other)
+DocumentDbColumn::DocumentDbColumn(const DocumentDbColumn& other)
     : document_(other.document_),
       columnMetadata_(other.columnMetadata_),
       path_(other.path_),
@@ -115,11 +115,11 @@ MongoColumn::MongoColumn(const MongoColumn& other)
   // No-op.
 }
 
-MongoColumn::~MongoColumn() {
+DocumentDbColumn::~DocumentDbColumn() {
   // No-op.
 }
 
-MongoColumn::MongoColumn(bsoncxx::document::view& document,
+DocumentDbColumn::DocumentDbColumn(bsoncxx::document::view& document,
                          JdbcColumnMetadata& columnMetadata, std::string& path)
     : type_(columnMetadata.GetColumnType()),
       document_(document),
@@ -154,7 +154,7 @@ int64_t ToValidLong(std::string const& value, ConversionResult::Type& convRes,
   return intValue;
 }
 
-ConversionResult::Type MongoColumn::PutInt8(
+ConversionResult::Type DocumentDbColumn::PutInt8(
     ApplicationDataBuffer& dataBuf,
     bsoncxx::document::element const& element) const {
   ConversionResult::Type convRes = ConversionResult::Type::AI_SUCCESS;
@@ -200,7 +200,7 @@ ConversionResult::Type MongoColumn::PutInt8(
   return convRes;
 }
 
-ConversionResult::Type MongoColumn::PutInt16(
+ConversionResult::Type DocumentDbColumn::PutInt16(
     ApplicationDataBuffer& dataBuf,
     bsoncxx::document::element const& element) const {
   ConversionResult::Type convRes = ConversionResult::Type::AI_SUCCESS;
@@ -252,7 +252,7 @@ ConversionResult::Type MongoColumn::PutInt16(
   return convRes;
 }
 
-ConversionResult::Type MongoColumn::PutInt32(
+ConversionResult::Type DocumentDbColumn::PutInt32(
     ApplicationDataBuffer& dataBuf,
     bsoncxx::document::element const& element) const {
   ConversionResult::Type convRes = ConversionResult::Type::AI_SUCCESS;
@@ -303,7 +303,7 @@ ConversionResult::Type MongoColumn::PutInt32(
   return convRes;
 }
 
-ConversionResult::Type MongoColumn::PutInt64(
+ConversionResult::Type DocumentDbColumn::PutInt64(
     ApplicationDataBuffer& dataBuf,
     bsoncxx::document::element const& element) const {
   ConversionResult::Type convRes = ConversionResult::Type::AI_SUCCESS;
@@ -353,7 +353,7 @@ ConversionResult::Type MongoColumn::PutInt64(
   return convRes;
 }
 
-ConversionResult::Type MongoColumn::PutFloat(
+ConversionResult::Type DocumentDbColumn::PutFloat(
     ApplicationDataBuffer& dataBuf,
     bsoncxx::document::element const& element) const {
   ConversionResult::Type convRes = ConversionResult::Type::AI_SUCCESS;
@@ -396,7 +396,7 @@ ConversionResult::Type MongoColumn::PutFloat(
   return convRes;
 }
 
-ConversionResult::Type MongoColumn::PutDouble(
+ConversionResult::Type DocumentDbColumn::PutDouble(
     ApplicationDataBuffer& dataBuf,
     bsoncxx::document::element const& element) const {
   ConversionResult::Type convRes = ConversionResult::Type::AI_SUCCESS;
@@ -440,7 +440,7 @@ ConversionResult::Type MongoColumn::PutDouble(
 }
 
 ConversionResult::Type
-    MongoColumn::PutString(
+    DocumentDbColumn::PutString(
     ApplicationDataBuffer& dataBuf,
     bsoncxx::document::element const& element) const {
   ConversionResult::Type convRes = ConversionResult::AI_SUCCESS;  
@@ -512,7 +512,7 @@ ConversionResult::Type
   return convRes;
 }
 
-ConversionResult::Type MongoColumn::PutDecimal(
+ConversionResult::Type DocumentDbColumn::PutDecimal(
     ApplicationDataBuffer& dataBuf,
     bsoncxx::document::element const& element) const {
   ConversionResult::Type convRes = ConversionResult::Type::AI_SUCCESS;
@@ -547,7 +547,7 @@ ConversionResult::Type MongoColumn::PutDecimal(
   return convRes;
 }
 
-ConversionResult::Type MongoColumn::PutTime(
+ConversionResult::Type DocumentDbColumn::PutTime(
     ApplicationDataBuffer& dataBuf,
     bsoncxx::document::element const& element) const {
   ConversionResult::Type convRes = ConversionResult::Type::AI_SUCCESS;
@@ -580,7 +580,7 @@ ConversionResult::Type MongoColumn::PutTime(
   return convRes;
 }
 
-ConversionResult::Type MongoColumn::PutDate(
+ConversionResult::Type DocumentDbColumn::PutDate(
     ApplicationDataBuffer& dataBuf,
     bsoncxx::document::element const& element) const {
   ConversionResult::Type convRes = ConversionResult::Type::AI_SUCCESS;
@@ -614,7 +614,7 @@ ConversionResult::Type MongoColumn::PutDate(
   return convRes;
 }
 
-ConversionResult::Type MongoColumn::PutTimestamp(
+ConversionResult::Type DocumentDbColumn::PutTimestamp(
     ApplicationDataBuffer& dataBuf,
     bsoncxx::document::element const& element) const {
   ConversionResult::Type convRes = ConversionResult::Type::AI_SUCCESS;
@@ -647,7 +647,7 @@ ConversionResult::Type MongoColumn::PutTimestamp(
   return convRes;
 }
 
-ConversionResult::Type MongoColumn::PutBinaryData(
+ConversionResult::Type DocumentDbColumn::PutBinaryData(
     ApplicationDataBuffer& dataBuf,
     bsoncxx::document::element const& element) const {
   ConversionResult::Type convRes = ConversionResult::AI_SUCCESS;
@@ -684,7 +684,7 @@ ConversionResult::Type MongoColumn::PutBinaryData(
   return convRes;
 }
 
-ConversionResult::Type MongoColumn::ReadToBuffer(
+ConversionResult::Type DocumentDbColumn::ReadToBuffer(
     ApplicationDataBuffer& dataBuf) const {
 
   auto element = document_[path_];

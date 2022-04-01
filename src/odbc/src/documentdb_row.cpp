@@ -16,7 +16,7 @@
  */
 
 #include "ignite/odbc/jni/jdbc_column_metadata.h"
-#include "ignite/odbc/mongo_row.h"
+#include "ignite/odbc/documentdb_row.h"
 #include "ignite/odbc/utility.h"
 #include "mongocxx/cursor.hpp"
 
@@ -26,7 +26,7 @@ using ignite::odbc::jni::JdbcColumnMetadata;
 namespace ignite {
 namespace odbc {
 // ASSUMPTION: iterator is not at the end.
-MongoRow::MongoRow(bsoncxx::document::view const& document,
+DocumentDbRow::DocumentDbRow(bsoncxx::document::view const& document,
                    std::vector< JdbcColumnMetadata >& columnMetadata,
                    std::vector< std::string >& paths)
     : pos(0),
@@ -37,30 +37,30 @@ MongoRow::MongoRow(bsoncxx::document::view const& document,
       paths_(paths) {
 }
 
-MongoRow::~MongoRow() {
+DocumentDbRow::~DocumentDbRow() {
   // No-op.
 }
 
-app::ConversionResult::Type MongoRow::ReadColumnToBuffer(
-    uint16_t columnIdx, app::ApplicationDataBuffer& dataBuf) {
+app::ConversionResult::Type DocumentDbRow::ReadColumnToBuffer(
+    uint32_t columnIdx, app::ApplicationDataBuffer& dataBuf) {
   if (columnIdx > GetSize() || columnIdx < 1)
     return app::ConversionResult::AI_FAILURE;
 
   if (!EnsureColumnDiscovered(columnIdx))
     return app::ConversionResult::AI_FAILURE;
 
-  MongoColumn& column = GetColumn(columnIdx);
+  DocumentDbColumn const& column = GetColumn(columnIdx);
 
   return column.ReadToBuffer(dataBuf);
 }
 
-bool MongoRow::EnsureColumnDiscovered(int16_t columnIdx) {
+bool DocumentDbRow::EnsureColumnDiscovered(int16_t columnIdx) {
   if (columns_.size() == size)
     return true;
 
   int64_t index = columns_.size();
   while (columns_.size() < columnIdx) {
-    MongoColumn newColumn(document_, columnMetadata_[index], paths_[index]);
+    DocumentDbColumn newColumn(document_, columnMetadata_[index], paths_[index]);
 
     columns_.push_back(newColumn);
     index++;

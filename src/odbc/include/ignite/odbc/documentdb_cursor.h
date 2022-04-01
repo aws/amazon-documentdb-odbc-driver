@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef _IGNITE_ODBC_MONGO_CURSOR
-#define _IGNITE_ODBC_MONGO_CURSOR
+#ifndef _IGNITE_ODBC_DOCUMENTDB_CURSOR
+#define _IGNITE_ODBC_DOCUMENTDB_CURSOR
 
 #include <stdint.h>
 
@@ -25,7 +25,7 @@
 
 #include "ignite/odbc/common_types.h"
 #include "ignite/odbc/result_page.h"
-#include "ignite/odbc/mongo_row.h"
+#include "ignite/odbc/documentdb_row.h"
 #include "mongocxx/client.hpp"
 #include "mongocxx/cursor.hpp"
 
@@ -34,18 +34,18 @@ namespace odbc {
 /**
  * Query result cursor.
  */
-class MongoCursor {
+class DocumentDbCursor {
  public:
   /**
    * Constructor.
    * @param queryId ID of the executed query.
    */
-  MongoCursor(mongocxx::cursor& cursor, std::vector< JdbcColumnMetadata >& columnMetadata, std::vector< std::string >& paths);
+  DocumentDbCursor(mongocxx::cursor& cursor, std::vector< JdbcColumnMetadata >& columnMetadata, std::vector< std::string >& paths);
 
   /**
    * Destructor.
    */
-  ~MongoCursor();
+  ~DocumentDbCursor();
 
   /**
    * Move cursor to the next result row.
@@ -67,10 +67,10 @@ class MongoCursor {
    * @return Current row. Returns zero if cursor needs data update or has no
    * more data.
    */
-  MongoRow* GetRow();
+  DocumentDbRow* GetRow();
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(MongoCursor);
+  IGNITE_NO_COPY_ASSIGNMENT(DocumentDbCursor);
 
   /** The resulting cursor to query/aggregate call */
   mongocxx::cursor cursor_;
@@ -88,7 +88,7 @@ class MongoCursor {
   std::vector< std::string > paths_;
 
   /** The current row */
-  std::unique_ptr< MongoRow > currentRow_;
+  std::unique_ptr< DocumentDbRow > currentRow_;
 
   // Is this the first row of the iterator?
   bool isFirstRow_ = true;
@@ -96,4 +96,4 @@ class MongoCursor {
 }  // namespace odbc
 }  // namespace ignite
 
-#endif  //_IGNITE_ODBC_MONGO_CURSOR
+#endif  //_IGNITE_ODBC_DOCUMENTDB_CURSOR
