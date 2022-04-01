@@ -53,14 +53,14 @@ class DocumentDbDatabaseMetadata {
   DocumentDbDatabaseMetadata(
       SharedPointer< JniContext >& jniContext,
       SharedPointer< GlobalJObject >& databaseMetadata)
-      : _jniContext(jniContext), _databaseMetadata(databaseMetadata) {
+      : jniContext_(jniContext), databaseMetadata_(databaseMetadata) {
   }
 
   /** The JNI context */
-  SharedPointer< JniContext > _jniContext;
+  SharedPointer< JniContext > jniContext_;
 
   /** The DocumentDbDatabaseMetadata Java object  */
-  SharedPointer< GlobalJObject > _databaseMetadata;
+  SharedPointer< GlobalJObject > databaseMetadata_;
 };
 }  // namespace jni
 }  // namespace odbc

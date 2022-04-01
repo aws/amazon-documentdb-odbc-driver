@@ -50,14 +50,14 @@ class DocumentDbConnectionProperties {
   DocumentDbConnectionProperties(
       SharedPointer< JniContext >& jniContext,
       SharedPointer< GlobalJObject >& connectionProperties)
-      : _jniContext(jniContext), _connectionProperties(connectionProperties) {
+      : jniContext_(jniContext), connectionProperties_(connectionProperties) {
   }
 
   /** The JNI context */
-  SharedPointer< JniContext > _jniContext;
+  SharedPointer< JniContext > jniContext_;
 
   /** The DocumentDbConnectionProperties Java object  */
-  SharedPointer< GlobalJObject > _connectionProperties;
+  SharedPointer< GlobalJObject > connectionProperties_;
 };
 }  // namespace jni
 }  // namespace odbc

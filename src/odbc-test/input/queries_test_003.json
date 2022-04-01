@@ -1,0 +1,23 @@
+[
+  {
+    "_id": {
+      "$oid": "62196dcc4d91892191475139"
+    },
+    "fieldArrayOfString": [
+      "value1",
+      "value2",
+      "value3"
+    ],
+    "fieldArrayOfInt": [
+      1,
+      2,
+      3
+    ],
+    "fieldDocument": {
+      "field1": "field1 Value",
+      "subDoc": {
+        "field2": "field2 Value"
+      }
+    }
+  }
+]
