@@ -216,19 +216,424 @@ struct QueriesTestSuiteFixture : odbc::OdbcTestSuite {
 
 BOOST_FIXTURE_TEST_SUITE(QueriesTestSuite, QueriesTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestEmptyResult) {
+// Re-enable to test large data set.
+BOOST_AUTO_TEST_CASE(TestMoviesCast, *disabled()) {
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForRemoteServer(dsnConnectionString, true, "", "",
+                                           "movies");
+  Connect(dsnConnectionString);
+  SQLRETURN ret;
+  char request[] = "SELECT * FROM \"movies_cast\"";
+
+  ret = SQLExecDirect(stmt, reinterpret_cast< SQLCHAR* >(request), SQL_NTS);
+  if (!SQL_SUCCEEDED(ret)) {
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  }
+
+  const int32_t buf_size = 1024;
+  SQLCHAR id[buf_size]{};
+  SQLLEN id_len = 0;
+  SQLBIGINT index = 0;
+  SQLLEN index_len = 0;
+  SQLCHAR value[buf_size]{};
+  SQLLEN value_len = 0;
+
+  // Fetch 1st row
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  while (SQL_SUCCEEDED(ret)) {
+
+    ret = SQLGetData(stmt, 1, SQL_C_CHAR, id, buf_size, &id_len);
+    BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+    ret = SQLGetData(stmt, 2, SQL_C_SBIGINT, &index, sizeof(index),
+                     &index_len);
+    BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+    ret = SQLGetData(stmt, 3, SQL_C_CHAR, value, buf_size,
+                     &value_len);
+    BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+
+    BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
+    BOOST_CHECK_NE(SQL_NULL_DATA, index_len);
+
+    ret = SQLFetch(stmt);
+  }
+
+  // Fetch 2nd row - not exist
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_NO_DATA, ret);
+}
+
+BOOST_AUTO_TEST_CASE(TestSingleResultUsingGetData) {
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
   Connect(dsnConnectionString);
   SQLRETURN ret;
-  char request[] = "SELECT * FROM queries_test_001";
+  char request[] = "SELECT * FROM \"queries_test_001\"";
 
   ret = SQLExecDirect(stmt, reinterpret_cast< SQLCHAR* >(request), SQL_NTS);
   if (!SQL_SUCCEEDED(ret)) {
-    GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt);
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
+
+  const int32_t buf_size = 1024;
+  SQLCHAR id[buf_size]{};
+  SQLLEN id_len = 0;
+  SQLCHAR fieldDecimal128[buf_size]{};
+  SQLLEN fieldDecimal128_len = 0;
+  double fieldDouble = 0;
+  SQLLEN fieldDouble_len = 0;
+  SQLCHAR fieldString[buf_size]{};
+  SQLLEN fieldString_len = 0;
+  SQLCHAR fieldObjectId[buf_size]{};
+  SQLLEN fieldObjectId_len = 0;
+  bool fieldBoolean = false;
+  SQLLEN fieldBoolean_len = 0;
+  DATE_STRUCT fieldDate{};
+  SQLLEN fieldDate_len = 0;
+  SQLINTEGER fieldInt;
+  SQLLEN fieldInt_len = 0;
+  SQLBIGINT fieldLong;
+  SQLLEN fieldLong_len = 0;
+  SQLCHAR fieldMaxKey[buf_size];
+  SQLLEN fieldMaxKey_len = 0;
+  SQLCHAR fieldMinKey[buf_size];
+  SQLLEN fieldMinKey_len = 0;
+  SQLCHAR fieldNull[buf_size];
+  SQLLEN fieldNull_len = 0;
+  SQLCHAR fieldBinary[buf_size];
+  SQLLEN fieldBinary_len = 0;
+
+  // Fetch 1st row
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+
+  ret = SQLGetData(stmt, 1, SQL_C_CHAR, id, buf_size, &id_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 2, SQL_C_CHAR, fieldDecimal128, buf_size,
+                   &fieldDecimal128_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 3, SQL_C_DOUBLE, &fieldDouble, sizeof(fieldDouble),
+                   &fieldDouble_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret =
+      SQLGetData(stmt, 4, SQL_C_CHAR, fieldString, buf_size, &fieldString_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 5, SQL_C_CHAR, fieldObjectId, buf_size,
+                   &fieldObjectId_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 6, SQL_C_BIT, &fieldBoolean, sizeof(fieldBoolean),
+                   &fieldBoolean_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 7, SQL_C_TYPE_DATE, &fieldDate, sizeof(fieldDate),
+                   &fieldDate_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 8, SQL_C_SLONG, &fieldInt, sizeof(fieldInt),
+                   &fieldInt_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 9, SQL_C_SBIGINT, &fieldLong, sizeof(fieldLong),
+                   &fieldLong_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret =
+      SQLGetData(stmt, 10, SQL_C_CHAR, fieldMaxKey, buf_size, &fieldMaxKey_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret =
+      SQLGetData(stmt, 11, SQL_C_CHAR, fieldMinKey, buf_size, &fieldMinKey_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 12, SQL_C_CHAR, fieldNull, buf_size, &fieldNull_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 13, SQL_C_BINARY, fieldBinary, buf_size,
+                   &fieldBinary_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+
+  BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
+  BOOST_CHECK_EQUAL("62196dcc4d91892191475139", (char*)id);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldDecimal128_len);
+  BOOST_CHECK_EQUAL("340282350000000000000", (char*)fieldDecimal128);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldDouble_len);
+  BOOST_CHECK_EQUAL(1.7976931348623157e308, fieldDouble);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldString_len);
+  BOOST_CHECK_EQUAL("some Text", (char*)fieldString);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldObjectId_len);
+  BOOST_CHECK_EQUAL("62196dcc4d9189219147513a", (char*)fieldObjectId);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldBoolean_len);
+  BOOST_CHECK_EQUAL(true, fieldBoolean);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldDate_len);
+  BOOST_CHECK_EQUAL(2020, fieldDate.year);
+  BOOST_CHECK_EQUAL(1, fieldDate.month);
+  BOOST_CHECK_EQUAL(1, fieldDate.day);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldInt_len);
+  BOOST_CHECK_EQUAL(2147483647, fieldInt);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldLong_len);
+  BOOST_CHECK_EQUAL(9223372036854775807, fieldLong);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldMaxKey_len);
+  BOOST_CHECK_EQUAL("MAXKEY", (char*)fieldMaxKey);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldMinKey_len);
+  BOOST_CHECK_EQUAL("MINKEY", (char*)fieldMinKey);
+  BOOST_CHECK_EQUAL(SQL_NULL_DATA, fieldNull_len);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldBinary_len);
+  BOOST_CHECK_EQUAL(3, fieldBinary_len);
+  BOOST_CHECK_EQUAL(fieldBinary[0], 0);
+  BOOST_CHECK_EQUAL(fieldBinary[1], 1);
+  BOOST_CHECK_EQUAL(fieldBinary[2], 2);
+
+  // Fetch 2nd row - not exist
   ret = SQLFetch(stmt);
   BOOST_CHECK_EQUAL(SQL_NO_DATA, ret);
+}
+
+BOOST_AUTO_TEST_CASE(TestSingleResultUsingBindCol) {
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+  Connect(dsnConnectionString);
+  SQLRETURN ret;
+  char request[] = "SELECT * FROM \"queries_test_001\"";
+
+  ret = SQLExecDirect(stmt, reinterpret_cast< SQLCHAR* >(request), SQL_NTS);
+  if (!SQL_SUCCEEDED(ret)) {
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  }
+  const int32_t buf_size = 1024;
+  SQLCHAR id[buf_size]{};
+  SQLLEN id_len = 0;
+  SQLCHAR fieldDecimal128[buf_size]{};
+  SQLLEN fieldDecimal128_len = 0;
+  double fieldDouble = 0;
+  SQLLEN fieldDouble_len = 0;
+  SQLCHAR fieldString[buf_size]{};
+  SQLLEN fieldString_len = 0;
+  SQLCHAR fieldObjectId[buf_size]{};
+  SQLLEN fieldObjectId_len = 0;
+  bool fieldBoolean = false;
+  SQLLEN fieldBoolean_len = 0;
+  DATE_STRUCT fieldDate{};
+  SQLLEN fieldDate_len = 0;
+  SQLINTEGER fieldInt;
+  SQLLEN fieldInt_len = 0;
+  SQLBIGINT fieldLong;
+  SQLLEN fieldLong_len = 0;
+  SQLCHAR fieldMaxKey[buf_size];
+  SQLLEN fieldMaxKey_len = 0;
+  SQLCHAR fieldMinKey[buf_size];
+  SQLLEN fieldMinKey_len = 0;
+  SQLCHAR fieldNull[buf_size];
+  SQLLEN fieldNull_len = 0;
+  SQLCHAR fieldBinary[buf_size];
+  SQLLEN fieldBinary_len = 0;
+
+  ret = SQLBindCol(stmt, 1, SQL_C_CHAR, id, buf_size, &id_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 2, SQL_C_CHAR, fieldDecimal128, buf_size, &fieldDecimal128_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 3, SQL_C_DOUBLE, &fieldDouble, sizeof(fieldDouble),
+                   &fieldDouble_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 4, SQL_C_CHAR, fieldString, buf_size,
+                   &fieldString_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 5, SQL_C_CHAR, fieldObjectId, buf_size,
+                   &fieldObjectId_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 6, SQL_C_BIT, &fieldBoolean, sizeof(fieldBoolean),
+                   &fieldBoolean_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 7, SQL_C_TYPE_DATE, &fieldDate, sizeof(fieldDate),
+                   &fieldDate_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 8, SQL_C_SLONG, &fieldInt, sizeof(fieldInt), &fieldInt_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 9, SQL_C_SBIGINT, &fieldLong, sizeof(fieldLong),
+                   &fieldLong_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret =
+      SQLBindCol(stmt, 10, SQL_C_CHAR, fieldMaxKey, buf_size, &fieldMaxKey_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret =
+      SQLBindCol(stmt, 11, SQL_C_CHAR, fieldMinKey, buf_size, &fieldMinKey_len);
+    BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 12, SQL_C_CHAR, fieldNull, buf_size, &fieldNull_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 13, SQL_C_BINARY, fieldBinary, buf_size, &fieldBinary_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+
+  // Fetch 1st row
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+
+  BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
+  BOOST_CHECK_EQUAL("62196dcc4d91892191475139", (char*)id);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldDecimal128_len);
+  BOOST_CHECK_EQUAL("340282350000000000000", (char*)fieldDecimal128);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldDouble_len);
+  BOOST_CHECK_EQUAL(1.7976931348623157e308, fieldDouble);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldString_len);
+  BOOST_CHECK_EQUAL("some Text", (char*)fieldString);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldObjectId_len);
+  BOOST_CHECK_EQUAL("62196dcc4d9189219147513a", (char*)fieldObjectId);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldBoolean_len);
+  BOOST_CHECK_EQUAL(true, fieldBoolean);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldDate_len);
+  BOOST_CHECK_EQUAL(2020, fieldDate.year);
+  BOOST_CHECK_EQUAL(1, fieldDate.month);
+  BOOST_CHECK_EQUAL(1, fieldDate.day);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldInt_len);
+  BOOST_CHECK_EQUAL(2147483647, fieldInt);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldLong_len);
+  BOOST_CHECK_EQUAL(9223372036854775807, fieldLong);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldMaxKey_len);
+  BOOST_CHECK_EQUAL("MAXKEY", (char*)fieldMaxKey);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldMinKey_len);
+  BOOST_CHECK_EQUAL("MINKEY", (char*)fieldMinKey);
+  BOOST_CHECK_EQUAL(SQL_NULL_DATA, fieldNull_len);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldBinary_len);
+  BOOST_CHECK_EQUAL(3, fieldBinary_len);
+  BOOST_CHECK_EQUAL(fieldBinary[0], 0);
+  BOOST_CHECK_EQUAL(fieldBinary[1], 1);
+  BOOST_CHECK_EQUAL(fieldBinary[2], 2);
+
+  // Fetch 2nd row - not exist
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_NO_DATA, ret);
+}
+
+BOOST_AUTO_TEST_CASE(TestMultiLineResultUsingGetData) {
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+  Connect(dsnConnectionString);
+  SQLRETURN ret;
+  char request[] = "SELECT * FROM \"queries_test_002\" ORDER BY \"queries_test_002__id\"";
+
+  ret = SQLExecDirect(stmt, reinterpret_cast< SQLCHAR* >(request), SQL_NTS);
+  if (!SQL_SUCCEEDED(ret)) {
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  }
+
+  const int32_t buf_size = 1024;
+  SQLCHAR id[buf_size]{};
+  SQLLEN id_len = 0;
+  //"\"fieldDecimal128\": \"$fieldDecimal128\", "
+  SQLCHAR fieldDecimal128[buf_size]{};
+  SQLLEN fieldDecimal128_len = 0;
+
+  // Fetch 1st row
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+
+  ret = SQLGetData(stmt, 1, SQL_C_CHAR, id, buf_size, &id_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 2, SQL_C_CHAR, fieldDecimal128, buf_size,
+                   &fieldDecimal128_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+
+  BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
+  BOOST_CHECK_EQUAL("62196dcc4d91892191475139", (char*)id);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldDecimal128_len);
+  BOOST_CHECK_EQUAL("340282350000000000000", (char*)fieldDecimal128);
+
+  // Fetch 2nd row
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+
+  ret = SQLGetData(stmt, 1, SQL_C_CHAR, id, buf_size, &id_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 2, SQL_C_CHAR, fieldDecimal128, buf_size,
+                   &fieldDecimal128_len);
+
+  BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
+  BOOST_CHECK_EQUAL("62196dcc4d9189219147513a", (char*)id);
+  BOOST_CHECK_EQUAL(SQL_NULL_DATA, fieldDecimal128_len);
+
+  // Fetch 3rd row
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+
+  ret = SQLGetData(stmt, 1, SQL_C_CHAR, id, buf_size, &id_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 2, SQL_C_CHAR, fieldDecimal128, buf_size,
+                   &fieldDecimal128_len);
+
+  BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
+  BOOST_CHECK_EQUAL("62196dcc4d9189219147513b", (char*)id);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldDecimal128_len);
+  BOOST_CHECK_EQUAL("340282350000000000000", (char*)fieldDecimal128);
+
+  // Fetch 4th row - not exist
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_NO_DATA, ret);
+}
+
+BOOST_AUTO_TEST_CASE(TestArrayStructJoinUsingGetData) {
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+  Connect(dsnConnectionString);
+  SQLRETURN ret;
+  char request[] =
+      "SELECT q3.queries_test_003__id, \n"
+      "  \"a1\".\"value\", \n"
+      "  \"a2\".\"value\", \n"
+      "  \"d1\".\"field1\", \n"
+      "  \"d2\".\"field2\" \n"
+      " FROM queries_test_003 AS q3 \n"
+      " JOIN queries_test_003_fieldArrayOfInt AS a1 \n"
+      "  ON q3.queries_test_003__id = a1.queries_test_003__id \n"
+      " JOIN queries_test_003_fieldArrayOfString AS a2 \n"
+      "  ON a1.queries_test_003__id = a2.queries_test_003__id \n"
+      " JOIN queries_test_003_fieldDocument AS d1 \n"
+      "  ON a2.queries_test_003__id = d1.queries_test_003__id \n"
+      " JOIN queries_test_003_fieldDocument_subDoc AS d2 \n"
+      "  ON d1.queries_test_003__id = d2.queries_test_003__id";
+
+  ret = SQLExecDirect(stmt, reinterpret_cast< SQLCHAR* >(request), SQL_NTS);
+  if (!SQL_SUCCEEDED(ret)) {
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  }
+
+  const int32_t buf_size = 1024;
+  SQLCHAR id[buf_size]{};
+  SQLLEN id_len = 0;
+  SQLINTEGER a1_value = 0;
+  SQLLEN a1_value_len = 0;
+  SQLCHAR a2_value[buf_size]{};
+  SQLLEN a2_value_len = 0;
+  SQLCHAR d1_value[buf_size]{};
+  SQLLEN d1_value_len = 0;
+  SQLCHAR d2_value[buf_size]{};
+  SQLLEN d2_value_len = 0;
+
+  // Fetch 1st row
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+
+  ret = SQLGetData(stmt, 1, SQL_C_CHAR, id, buf_size, &id_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 2, SQL_C_SLONG, &a1_value, sizeof(a1_value), &a1_value_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 3, SQL_C_CHAR, a2_value, buf_size, &a2_value_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 4, SQL_C_CHAR, d1_value, buf_size, &d1_value_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 5, SQL_C_CHAR, d2_value, buf_size, &d2_value_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+
+  // Check the first row
+  BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
+  BOOST_CHECK_EQUAL("62196dcc4d91892191475139", (char*)id);
+  BOOST_CHECK_NE(SQL_NULL_DATA, a1_value_len);
+  BOOST_CHECK_EQUAL(1, a1_value);
+  BOOST_CHECK_NE(SQL_NULL_DATA, a2_value_len);
+  BOOST_CHECK_EQUAL("value1", (char*)a2_value);
+  BOOST_CHECK_NE(SQL_NULL_DATA, d1_value_len);
+  BOOST_CHECK_EQUAL("field1 Value", (char*)d1_value);
+  BOOST_CHECK_NE(SQL_NULL_DATA, d2_value_len);
+  BOOST_CHECK_EQUAL("field2 Value", (char*)d2_value);
+
+  // Count the rows
+  int32_t actual_rows = 0;
+  while (SQL_SUCCEEDED(ret)) {
+    actual_rows++;
+    ret = SQLFetch(stmt);
+  }
+  BOOST_CHECK_EQUAL(SQL_NO_DATA, ret);
+  BOOST_CHECK_EQUAL(9, actual_rows);
 }
 
 BOOST_AUTO_TEST_CASE(TestTwoRowsInt8, *disabled()) {
@@ -885,393 +1290,6 @@ BOOST_AUTO_TEST_CASE(TestDistributedJoins, *disabled()) {
   BOOST_CHECK_EQUAL(rowsNum, entriesNum);
 }
 
-BOOST_AUTO_TEST_CASE(TestInsertSelect, *disabled()) {
-  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
-
-  const int recordsNum = 100;
-
-  // Inserting values.
-  InsertTestStrings(recordsNum);
-
-  int64_t key = 0;
-  char strField[1024];
-  SQLLEN strFieldLen = 0;
-
-  // Binding columns.
-  SQLRETURN ret = SQLBindCol(stmt, 1, SQL_C_SLONG, &key, 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // Binding columns.
-  ret = SQLBindCol(stmt, 2, SQL_C_CHAR, &strField, sizeof(strField),
-                   &strFieldLen);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // Just selecting everything to make sure everything is OK
-  SQLCHAR selectReq[] = "SELECT _key, strField FROM TestType ORDER BY _key";
-
-  ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  int selectedRecordsNum = 0;
-
-  ret = SQL_SUCCESS;
-
-  while (ret == SQL_SUCCESS) {
-    ret = SQLFetch(stmt);
-
-    if (ret == SQL_NO_DATA)
-      break;
-
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-    std::string expectedStr = GetTestString(selectedRecordsNum);
-    int64_t expectedKey = selectedRecordsNum + 1;
-
-    BOOST_CHECK_EQUAL(key, expectedKey);
-
-    BOOST_CHECK_EQUAL(std::string(strField, strFieldLen), expectedStr);
-
-    ++selectedRecordsNum;
-  }
-
-  BOOST_CHECK_EQUAL(recordsNum, selectedRecordsNum);
-}
-
-BOOST_AUTO_TEST_CASE(TestInsertUpdateSelect, *disabled()) {
-  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
-
-  const int recordsNum = 100;
-
-  // Inserting values.
-  InsertTestStrings(recordsNum);
-
-  int64_t key = 0;
-  char strField[1024];
-  SQLLEN strFieldLen = 0;
-
-  SQLCHAR updateReq[] =
-      "UPDATE TestType SET strField = 'Updated value' WHERE _key = 42";
-
-  SQLRETURN ret = SQLExecDirect(stmt, updateReq, SQL_NTS);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  ret = SQLFreeStmt(stmt, SQL_CLOSE);
-
-  // Binding columns.
-  ret = SQLBindCol(stmt, 1, SQL_C_SLONG, &key, 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // Binding columns.
-  ret = SQLBindCol(stmt, 2, SQL_C_CHAR, &strField, sizeof(strField),
-                   &strFieldLen);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // Just selecting everything to make sure everything is OK
-  SQLCHAR selectReq[] = "SELECT _key, strField FROM TestType ORDER BY _key";
-
-  ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  int selectedRecordsNum = 0;
-
-  ret = SQL_SUCCESS;
-
-  while (ret == SQL_SUCCESS) {
-    ret = SQLFetch(stmt);
-
-    if (ret == SQL_NO_DATA)
-      break;
-
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-    int64_t expectedKey = selectedRecordsNum + 1;
-    std::string expectedStr;
-
-    BOOST_CHECK_EQUAL(key, expectedKey);
-
-    if (expectedKey == 42)
-      expectedStr = "Updated value";
-    else
-      expectedStr = GetTestString(selectedRecordsNum);
-
-    BOOST_CHECK_EQUAL(std::string(strField, strFieldLen), expectedStr);
-
-    ++selectedRecordsNum;
-  }
-
-  BOOST_CHECK_EQUAL(recordsNum, selectedRecordsNum);
-}
-
-BOOST_AUTO_TEST_CASE(TestInsertDeleteSelect, *disabled()) {
-  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
-
-  const int recordsNum = 100;
-
-  // Inserting values.
-  InsertTestStrings(recordsNum);
-
-  int64_t key = 0;
-  char strField[1024];
-  SQLLEN strFieldLen = 0;
-
-  SQLCHAR updateReq[] = "DELETE FROM TestType WHERE (_key % 2) = 1";
-
-  SQLRETURN ret = SQLExecDirect(stmt, updateReq, SQL_NTS);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  ret = SQLFreeStmt(stmt, SQL_CLOSE);
-
-  // Binding columns.
-  ret = SQLBindCol(stmt, 1, SQL_C_SLONG, &key, 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // Binding columns.
-  ret = SQLBindCol(stmt, 2, SQL_C_CHAR, &strField, sizeof(strField),
-                   &strFieldLen);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // Just selecting everything to make sure everything is OK
-  SQLCHAR selectReq[] = "SELECT _key, strField FROM TestType ORDER BY _key";
-
-  ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  int selectedRecordsNum = 0;
-
-  ret = SQL_SUCCESS;
-
-  while (ret == SQL_SUCCESS) {
-    ret = SQLFetch(stmt);
-
-    if (ret == SQL_NO_DATA)
-      break;
-
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-    int64_t expectedKey = (selectedRecordsNum + 1) * 2;
-    std::string expectedStr = GetTestString(expectedKey - 1);
-
-    BOOST_CHECK_EQUAL(key, expectedKey);
-    BOOST_CHECK_EQUAL(std::string(strField, strFieldLen), expectedStr);
-
-    ++selectedRecordsNum;
-  }
-
-  BOOST_CHECK_EQUAL(recordsNum / 2, selectedRecordsNum);
-}
-
-BOOST_AUTO_TEST_CASE(TestInsertMergeSelect, *disabled()) {
-  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
-
-  const int recordsNum = 100;
-
-  // Inserting values.
-  InsertTestStrings(recordsNum / 2);
-
-  // Merging values.
-  InsertTestStrings(recordsNum, true);
-
-  int64_t key = 0;
-  char strField[1024];
-  SQLLEN strFieldLen = 0;
-
-  // Binding columns.
-  SQLRETURN ret = SQLBindCol(stmt, 1, SQL_C_SLONG, &key, 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // Binding columns.
-  ret = SQLBindCol(stmt, 2, SQL_C_CHAR, &strField, sizeof(strField),
-                   &strFieldLen);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // Just selecting everything to make sure everything is OK
-  SQLCHAR selectReq[] = "SELECT _key, strField FROM TestType ORDER BY _key";
-
-  ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  int selectedRecordsNum = 0;
-
-  ret = SQL_SUCCESS;
-
-  while (ret == SQL_SUCCESS) {
-    ret = SQLFetch(stmt);
-
-    if (ret == SQL_NO_DATA)
-      break;
-
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-    std::string expectedStr = GetTestString(selectedRecordsNum);
-    int64_t expectedKey = selectedRecordsNum + 1;
-
-    BOOST_CHECK_EQUAL(key, expectedKey);
-
-    BOOST_CHECK_EQUAL(std::string(strField, strFieldLen), expectedStr);
-
-    ++selectedRecordsNum;
-  }
-
-  BOOST_CHECK_EQUAL(recordsNum, selectedRecordsNum);
-}
-
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect2, *disabled()) {
-  InsertBatchSelect(2);
-}
-
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect100, *disabled()) {
-  InsertBatchSelect(100);
-}
-
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect1000, *disabled()) {
-  InsertBatchSelect(1000);
-}
-
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect1023, *disabled()) {
-  InsertBatchSelect(1023);
-}
-
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect1024, *disabled()) {
-  InsertBatchSelect(1024);
-}
-
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect1025, *disabled()) {
-  InsertBatchSelect(1025);
-}
-
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect2000, *disabled()) {
-  InsertBatchSelect(2000);
-}
-
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect2047, *disabled()) {
-  InsertBatchSelect(2047);
-}
-
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect2048, *disabled()) {
-  InsertBatchSelect(2048);
-}
-
-BOOST_AUTO_TEST_CASE(TestInsertBatchSelect2049, *disabled()) {
-  InsertBatchSelect(2049);
-}
-
-BOOST_AUTO_TEST_CASE(TestNotFullInsertBatchSelect900, *disabled()) {
-  InsertNonFullBatchSelect(900, 42);
-}
-
-BOOST_AUTO_TEST_CASE(TestNotFullInsertBatchSelect1500, *disabled()) {
-  InsertNonFullBatchSelect(1500, 100);
-}
-
-BOOST_AUTO_TEST_CASE(TestNotFullInsertBatchSelect4500, *disabled()) {
-  InsertNonFullBatchSelect(4500, 1500);
-}
-
-BOOST_AUTO_TEST_CASE(TestNotFullInsertBatchSelect4096, *disabled()) {
-  InsertNonFullBatchSelect(4096, 1024);
-}
-
-template < size_t n, size_t k >
-void CheckMeta(char columns[n][k], SQLLEN columnsLen[n]) {
-  std::string catalog(columns[0], columnsLen[0]);
-  std::string schema(columns[1], columnsLen[1]);
-  std::string table(columns[2], columnsLen[2]);
-  std::string tableType(columns[3], columnsLen[3]);
-
-  BOOST_CHECK_EQUAL(catalog, std::string(""));
-  BOOST_CHECK_EQUAL(tableType, std::string("TABLE"));
-  BOOST_CHECK_EQUAL(columnsLen[4], SQL_NULL_DATA);
-
-  if (schema == "\"cache\"") {
-    BOOST_CHECK_EQUAL(table, std::string("TESTTYPE"));
-  } else if (schema == "\"cache2\"") {
-    BOOST_CHECK_EQUAL(table, std::string("COMPLEXTYPE"));
-  } else {
-    BOOST_FAIL("Unknown schema: " + schema);
-  }
-}
-
-BOOST_AUTO_TEST_CASE(TestTablesMeta, *disabled()) {
-  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache2");
-
-  SQLRETURN ret;
-
-  enum { COLUMNS_NUM = 5 };
-
-  // Five collumns: TABLE_CAT, TABLE_SCHEM, TABLE_NAME, TABLE_TYPE, REMARKS
-  char columns[COLUMNS_NUM][ODBC_BUFFER_SIZE];
-  SQLLEN columnsLen[COLUMNS_NUM];
-
-  // Binding columns.
-  for (size_t i = 0; i < COLUMNS_NUM; ++i) {
-    columnsLen[i] = ODBC_BUFFER_SIZE;
-
-    ret = SQLBindCol(stmt, static_cast< SQLSMALLINT >(i + 1), SQL_C_CHAR,
-                     columns[i], columnsLen[i], &columnsLen[i]);
-
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-  }
-
-  SQLCHAR catalogPattern[] = "";
-  SQLCHAR schemaPattern[] = "";
-  SQLCHAR tablePattern[] = "";
-  SQLCHAR tableTypePattern[] = "";
-
-  ret = SQLTables(stmt, catalogPattern, SQL_NTS, schemaPattern, SQL_NTS,
-                  tablePattern, SQL_NTS, tableTypePattern, SQL_NTS);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  ret = SQLFetch(stmt);
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  CheckMeta< COLUMNS_NUM, ODBC_BUFFER_SIZE >(columns, columnsLen);
-
-  ret = SQLFetch(stmt);
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  CheckMeta< COLUMNS_NUM, ODBC_BUFFER_SIZE >(columns, columnsLen);
-
-  ret = SQLFetch(stmt);
-  BOOST_CHECK(ret == SQL_NO_DATA);
-}
-
 template < typename T >
 void CheckObjectData(int8_t* data, int32_t len, T const& value) {
   InteropUnpooledMemory mem(len);
@@ -1611,274 +1629,6 @@ BOOST_AUTO_TEST_CASE(TestErrorMessage, *disabled()) {
 
   if (error.substr(0, pattern.size()) != pattern)
     BOOST_FAIL("'" + error + "' does not match '" + pattern + "'");
-}
-
-BOOST_AUTO_TEST_CASE(TestAffectedRows, *disabled()) {
-  Connect(
-      "DRIVER={Apache "
-      "Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache;PAGE_SIZE=1024");
-
-  const int recordsNum = 100;
-
-  // Inserting values.
-  InsertTestStrings(recordsNum);
-
-  SQLCHAR updateReq[] =
-      "UPDATE TestType SET strField = 'Updated value' WHERE _key > 20 AND _key "
-      "< 40";
-
-  SQLRETURN ret = SQLExecDirect(stmt, updateReq, SQL_NTS);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  SQLLEN affected = 0;
-  ret = SQLRowCount(stmt, &affected);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_CHECK_EQUAL(affected, 19);
-
-  ret = SQLFreeStmt(stmt, SQL_CLOSE);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // Just selecting everything to make sure everything is OK
-  SQLCHAR selectReq[] = "SELECT _key, strField FROM TestType ORDER BY _key";
-
-  ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  affected = -1;
-  ret = SQLRowCount(stmt, &affected);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_CHECK_EQUAL(affected, 1024);
-}
-
-BOOST_AUTO_TEST_CASE(TestAffectedRowsOnSelect, *disabled()) {
-  Connect(
-      "DRIVER={Apache "
-      "Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache;PAGE_SIZE=123");
-
-  const int recordsNum = 1000;
-
-  // Inserting values.
-  InsertTestStrings(recordsNum);
-
-  // Just selecting everything to make sure everything is OK
-  SQLCHAR selectReq[] = "SELECT _key, strField FROM TestType ORDER BY _key";
-
-  SQLRETURN ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  for (int i = 0; i < 200; ++i) {
-    SQLLEN affected = -1;
-    ret = SQLRowCount(stmt, &affected);
-
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-    BOOST_CHECK_EQUAL(affected, 123);
-
-    ret = SQLFetch(stmt);
-
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-  }
-}
-
-BOOST_AUTO_TEST_CASE(TestMultipleSelects, *disabled()) {
-  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
-
-  const int stmtCnt = 10;
-
-  std::stringstream stream;
-  for (int i = 0; i < stmtCnt; ++i)
-    stream << "select " << i << "; ";
-
-  stream << '\0';
-
-  std::string query0 = stream.str();
-  std::vector< SQLCHAR > query(query0.begin(), query0.end());
-
-  SQLRETURN ret = SQLExecDirect(stmt, &query[0], SQL_NTS);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  long res = 0;
-
-  BOOST_TEST_CHECKPOINT("Binding column");
-  ret = SQLBindCol(stmt, 1, SQL_C_SLONG, &res, 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  for (long i = 0; i < stmtCnt; ++i) {
-    ret = SQLFetch(stmt);
-
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-    BOOST_CHECK_EQUAL(res, i);
-
-    ret = SQLFetch(stmt);
-
-    BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
-
-    ret = SQLMoreResults(stmt);
-
-    if (i < stmtCnt - 1 && !SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-    else if (i == stmtCnt - 1)
-      BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
-  }
-}
-
-BOOST_AUTO_TEST_CASE(TestMultipleMixedStatements, *disabled()) {
-  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
-
-  const int stmtCnt = 10;
-
-  std::stringstream stream;
-  for (int i = 0; i < stmtCnt; ++i)
-    stream << "select " << i << "; insert into TestType(_key) values(" << i
-           << "); ";
-
-  stream << '\0';
-
-  std::string query0 = stream.str();
-  std::vector< SQLCHAR > query(query0.begin(), query0.end());
-
-  SQLRETURN ret = SQLExecDirect(stmt, &query[0], SQL_NTS);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  long res = 0;
-
-  BOOST_TEST_CHECKPOINT("Binding column");
-  ret = SQLBindCol(stmt, 1, SQL_C_SLONG, &res, 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  for (long i = 0; i < stmtCnt; ++i) {
-    ret = SQLFetch(stmt);
-
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-    BOOST_CHECK_EQUAL(res, i);
-
-    ret = SQLFetch(stmt);
-
-    BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
-
-    ret = SQLMoreResults(stmt);
-
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-    SQLLEN affected = 0;
-    ret = SQLRowCount(stmt, &affected);
-
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-    BOOST_CHECK_EQUAL(affected, 1);
-
-    ret = SQLFetch(stmt);
-
-    BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
-
-    ret = SQLMoreResults(stmt);
-
-    if (i < stmtCnt - 1 && !SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-    else if (i == stmtCnt - 1)
-      BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
-  }
-}
-
-BOOST_AUTO_TEST_CASE(TestMultipleMixedStatementsNoFetch, *disabled()) {
-  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
-
-  const int stmtCnt = 10;
-
-  std::stringstream stream;
-  for (int i = 0; i < stmtCnt; ++i)
-    stream << "select " << i << "; insert into TestType(_key) values(" << i
-           << "); ";
-
-  stream << '\0';
-
-  std::string query0 = stream.str();
-  std::vector< SQLCHAR > query(query0.begin(), query0.end());
-
-  SQLRETURN ret = SQLExecDirect(stmt, &query[0], SQL_NTS);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  long res = 0;
-
-  BOOST_TEST_CHECKPOINT("Binding column");
-  ret = SQLBindCol(stmt, 1, SQL_C_SLONG, &res, 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  for (long i = 0; i < stmtCnt; ++i) {
-    ret = SQLMoreResults(stmt);
-
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-    SQLLEN affected = 0;
-    ret = SQLRowCount(stmt, &affected);
-
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-    BOOST_CHECK_EQUAL(affected, 1);
-
-    ret = SQLFetch(stmt);
-
-    BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
-
-    ret = SQLMoreResults(stmt);
-
-    if (i < stmtCnt - 1 && !SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-    else if (i == stmtCnt - 1)
-      BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
-  }
-}
-
-BOOST_AUTO_TEST_CASE(TestCloseAfterEmptyUpdate, *disabled()) {
-  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
-
-  SQLCHAR query[] = "update TestType set strField='test' where _key=42";
-
-  SQLRETURN ret = SQLExecDirect(stmt, &query[0], SQL_NTS);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  ret = SQLFreeStmt(stmt, SQL_CLOSE);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 }
 
 BOOST_AUTO_TEST_CASE(TestLoginTimeout, *disabled()) {

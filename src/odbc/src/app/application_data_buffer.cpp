@@ -309,7 +309,7 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutRawDataToBuffer(
-    void* data, size_t len, int32_t& written) {
+    const void* data, size_t len, int32_t& written) {
   SqlLen iLen = static_cast< SqlLen >(len);
 
   SqlLen* resLenPtr = GetResLen();
@@ -329,11 +329,18 @@ ConversionResult::Type ApplicationDataBuffer::PutRawDataToBuffer(
                        : ConversionResult::AI_SUCCESS;
 }
 
+ConversionResult::Type ApplicationDataBuffer::PutInt8(boost::optional< int8_t > value) {
+  if (value)
+    return PutInt8(*value);
+  else
+    return PutNull();
+}
+
 ConversionResult::Type ApplicationDataBuffer::PutInt8(int8_t value) {
   return PutNum(value);
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutOptInt16(
+ConversionResult::Type ApplicationDataBuffer::PutInt16(
     boost::optional< int16_t > value) {
   if (value)
     return PutInt16(*value);
@@ -345,7 +352,7 @@ ConversionResult::Type ApplicationDataBuffer::PutInt16(int16_t value) {
   return PutNum(value);
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutOptInt32(
+ConversionResult::Type ApplicationDataBuffer::PutInt32(
     boost::optional< int32_t > value) {
   if (value)
     return PutInt32(*value);
@@ -357,19 +364,43 @@ ConversionResult::Type ApplicationDataBuffer::PutInt32(int32_t value) {
   return PutNum(value);
 }
 
+ConversionResult::Type ApplicationDataBuffer::PutInt64(
+    boost::optional< int64_t > value) {
+  if (value)
+    return PutInt64(*value);
+  else
+    return PutNull();
+}
+
 ConversionResult::Type ApplicationDataBuffer::PutInt64(int64_t value) {
   return PutNum(value);
+}
+
+ConversionResult::Type ApplicationDataBuffer::PutFloat(
+    boost::optional< float > value) {
+  if (value)
+    return PutFloat(*value);
+  else
+    return PutNull();
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutFloat(float value) {
   return PutNum(value);
 }
 
+ConversionResult::Type ApplicationDataBuffer::PutDouble(
+    boost::optional< double > value) {
+  if (value)
+    return PutDouble(*value);
+  else
+    return PutNull();
+}
+
 ConversionResult::Type ApplicationDataBuffer::PutDouble(double value) {
   return PutNum(value);
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutOptString(
+ConversionResult::Type ApplicationDataBuffer::PutString(
     const boost::optional< std::string >& value) {
   if (value)
     return PutString(*value);
@@ -490,7 +521,7 @@ ConversionResult::Type ApplicationDataBuffer::PutGuid(const Guid& value) {
   return ConversionResult::AI_UNSUPPORTED_CONVERSION;
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutBinaryData(void* data,
+ConversionResult::Type ApplicationDataBuffer::PutBinaryData(const void* data,
                                                             size_t len,
                                                             int32_t& written) {
   using namespace type_traits;
@@ -504,7 +535,7 @@ ConversionResult::Type ApplicationDataBuffer::PutBinaryData(void* data,
     case OdbcNativeType::AI_CHAR: {
       std::stringstream converter;
 
-      uint8_t* dataBytes = reinterpret_cast< uint8_t* >(data);
+      auto dataBytes = reinterpret_cast< const uint8_t* >(data);
 
       for (size_t i = 0; i < len; ++i) {
         converter << std::hex << std::setfill('0') << std::setw(2)
@@ -517,7 +548,7 @@ ConversionResult::Type ApplicationDataBuffer::PutBinaryData(void* data,
     case OdbcNativeType::AI_WCHAR: {
       std::wstringstream converter;
 
-      uint8_t* dataBytes = reinterpret_cast< uint8_t* >(data);
+      auto dataBytes = reinterpret_cast< const uint8_t* >(data);
 
       for (size_t i = 0; i < len; ++i) {
         converter << std::hex << std::setfill(L'0') << std::setw(2)
@@ -543,6 +574,14 @@ ConversionResult::Type ApplicationDataBuffer::PutNull() {
   *resLenPtr = SQL_NULL_DATA;
 
   return ConversionResult::AI_SUCCESS;
+}
+
+ConversionResult::Type ApplicationDataBuffer::PutDecimal(
+    const boost::optional< common::Decimal >& value) {
+  if (value)
+    return PutDecimal(*value);
+  else
+    return PutNull();
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutDecimal(
@@ -625,6 +664,14 @@ ConversionResult::Type ApplicationDataBuffer::PutDecimal(
   }
 
   return ConversionResult::AI_UNSUPPORTED_CONVERSION;
+}
+
+ConversionResult::Type ApplicationDataBuffer::PutDate(
+    const boost::optional< Date >& value) {
+  if (value)
+    return PutDate(*value);
+  else
+    return PutNull();
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutDate(const Date& value) {
@@ -741,6 +788,14 @@ ConversionResult::Type ApplicationDataBuffer::PutDate(const Date& value) {
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
+    const boost::optional< Timestamp >& value) {
+  if (value)
+    return PutTimestamp(*value);
+  else
+    return PutNull();
+}
+
+ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
     const Timestamp& value) {
   using namespace type_traits;
 
@@ -854,6 +909,13 @@ ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
   }
 
   return ConversionResult::AI_UNSUPPORTED_CONVERSION;
+}
+
+ConversionResult::Type ApplicationDataBuffer::PutTime(const boost::optional< Time >& value) {
+  if (value)
+    return PutTime(*value);
+  else
+    return PutNull();
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutTime(const Time& value) {

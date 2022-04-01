@@ -35,6 +35,7 @@
 #include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/parser.h"
 #include "ignite/odbc/streaming/streaming_context.h"
+#include "mongocxx/client.hpp"
 
 using ignite::odbc::common::concurrent::SharedPointer;
 using ignite::odbc::jni::DatabaseMetaData;
@@ -167,15 +168,6 @@ class Connection : public diagnostic::DiagnosableAdapter {
   bool IsAutoCommit() const;
 
   /**
-   * Get streaming context.
-   *
-   * @return Streaming context.
-   */
-  streaming::StreamingContext& GetStreamingContext() {
-    return streamingContext;
-  }
-
-  /**
    * Create diagnostic record associated with the Connection instance.
    *
    * @param sqlState SQL state.
@@ -258,6 +250,10 @@ class Connection : public diagnostic::DiagnosableAdapter {
    * @param valueLen Value length.
    */
   void SetAttribute(int attr, void* value, SQLINTEGER valueLen);
+
+  inline std::shared_ptr<mongocxx::client>& GetMongoClient() {
+    return mongoClient_;
+  }
 
  private:
   IGNITE_NO_COPY_ASSIGNMENT(Connection);
@@ -463,33 +459,32 @@ class Connection : public diagnostic::DiagnosableAdapter {
   Connection(Environment* env);
 
   /** Parent. */
-  Environment* env;
+  Environment* env_;
 
   /** Connection timeout in seconds. */
-  int32_t timeout = 0;
+  int32_t timeout_ = 0;
 
   /** Login timeout in seconds. */
-  int32_t loginTimeout = DEFAULT_CONNECT_TIMEOUT;
+  int32_t loginTimeout_ = DEFAULT_CONNECT_TIMEOUT;
 
   /** Autocommit flag. */
-  bool autoCommit = true;
+  bool autoCommit_ = true;
 
   /** Configuration. */
-  config::Configuration config;
+  config::Configuration config_;
 
   /** Connection info. */
-  config::ConnectionInfo info;
+  config::ConnectionInfo info_;
 
   /** Java connection object */
-  SharedPointer< DocumentDbConnection > _connection;
+  SharedPointer< DocumentDbConnection > connection_;
 
-  SharedPointer< JniContext > _jniContext;
+  SharedPointer< JniContext > jniContext_;
+
+  std::shared_ptr< mongocxx::client > mongoClient_;
 
   /** JVM options */
-  std::vector< char* > opts;
-
-  /** Streaming context. */
-  streaming::StreamingContext streamingContext;
+  std::vector< char* > opts_;
 };
 }  // namespace odbc
 }  // namespace ignite

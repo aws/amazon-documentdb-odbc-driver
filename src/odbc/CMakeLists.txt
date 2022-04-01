@@ -70,6 +70,9 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/diagnostic/diagnosable_adapter.cpp
         src/diagnostic/diagnostic_record.cpp
         src/diagnostic/diagnostic_record_storage.cpp
+        src/documentdb_column.cpp
+        src/documentdb_cursor.cpp
+        src/documentdb_row.cpp
         src/jni/database_metadata.cpp
         src/jni/documentdb_connection.cpp
         src/jni/documentdb_connection_properties.cpp
@@ -93,7 +96,6 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/query/table_metadata_query.cpp
         src/query/type_info_query.cpp
         src/query/special_columns_query.cpp
-        src/query/streaming_query.cpp
         src/sql/sql_parser.cpp
         src/sql/sql_lexer.cpp
         src/sql/sql_set_streaming_command.cpp

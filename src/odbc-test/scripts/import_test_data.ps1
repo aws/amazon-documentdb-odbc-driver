@@ -21,11 +21,11 @@ Foreach-Object {
     # Log what input we're about to import
     Write-Output `
         "mongoimport -u=$($env:DOC_DB_USER_NAME) -p=... --authenticationDatabase=admin `
-            -d=$($DATABASE_NAME) -c=$($COLLECTION_NAME) `
+            -d=$($DATABASE_NAME) -c=$($COLLECTION_NAME)  --jsonArray `
             --file=""$($TEST_INPUT_FOLDER)\$($TEST_FILE_NAME)"""
     # Import the test input
     mongoimport -u="$($env:DOC_DB_USER_NAME)" -p="$($env:DOC_DB_PASSWORD)" --authenticationDatabase=admin `
-        -d="$($DATABASE_NAME)" -c="$($COLLECTION_NAME)" `
+        -d="$($DATABASE_NAME)" -c="$($COLLECTION_NAME)" --jsonArray `
         --file="""$($TEST_INPUT_FOLDER)\$($TEST_FILE_NAME)"""
     if (!$?) {
         # If error detected stop the rest of the processing and exit

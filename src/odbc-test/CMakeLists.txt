@@ -92,6 +92,9 @@ set(SOURCES
          ../odbc/src/diagnostic/diagnosable_adapter.cpp
          ../odbc/src/diagnostic/diagnostic_record_storage.cpp
          ../odbc/src/diagnostic/diagnostic_record.cpp
+         ../odbc/src/documentdb_column.cpp
+         ../odbc/src/documentdb_cursor.cpp
+         ../odbc/src/documentdb_row.cpp
          ../odbc/src/dsn_config.cpp
          ../odbc/src/environment.cpp
          ../odbc/src/ignite_error.cpp
@@ -113,7 +116,6 @@ set(SOURCES
          ../odbc/src/query/foreign_keys_query.cpp
          ../odbc/src/query/primary_keys_query.cpp
          ../odbc/src/query/special_columns_query.cpp
-         ../odbc/src/query/streaming_query.cpp
          ../odbc/src/query/type_info_query.cpp
          ../odbc/src/query/table_metadata_query.cpp
          ../odbc/src/sql/sql_lexer.cpp
