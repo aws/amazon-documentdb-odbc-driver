@@ -120,12 +120,38 @@ MongoColumn::~MongoColumn() {
 }
 
 MongoColumn::MongoColumn(bsoncxx::document::view& document,
-                         JdbcColumnMetadata& columnMetadata,
-                         std::string& path)
+                         JdbcColumnMetadata& columnMetadata, std::string& path)
     : type_(columnMetadata.GetColumnType()),
       document_(document),
       columnMetadata_(columnMetadata),
       path_(path) {
+}
+
+int64_t ToValidLong(int64_t value, ConversionResult::Type& convRes, int64_t max,
+                    int64_t min) {
+  int64_t intValue = value;
+  if (intValue > max) {
+    intValue = max;
+    convRes = ConversionResult::AI_FAILURE;
+  } else if (intValue < min) {
+    intValue = min;
+    convRes = ConversionResult::AI_FAILURE;
+  }
+  return intValue;
+}
+
+int64_t ToValidLong(std::string const& value, ConversionResult::Type& convRes,
+               int64_t max, int64_t min) {
+  int64_t intValue = 0;
+  try {
+    intValue =
+        ToValidLong(std::stoll(value.c_str(), nullptr, 0), convRes, max, min);
+  } catch (std::invalid_argument const&) {
+    convRes = ConversionResult::AI_FAILURE;
+  } catch (std::out_of_range const&) {
+    convRes = ConversionResult::AI_FAILURE;
+  }
+  return intValue;
 }
 
 ConversionResult::Type MongoColumn::PutInt8(
@@ -136,20 +162,12 @@ ConversionResult::Type MongoColumn::PutInt8(
   boost::optional< int8_t > value{};
   switch (docType) {
     case bsoncxx::type::k_int32:
-      if (element.get_int32().value > INT8_MAX
-          || element.get_int32().value < INT8_MIN) {
-        convRes = ConversionResult::AI_FAILURE;
-      } else {
-        value = element.get_int32().value;
-      }
+      value =
+          ToValidLong(element.get_int32().value, convRes, INT8_MAX, INT8_MIN);
       break;
     case bsoncxx::type::k_int64:
-      if (element.get_int64().value > INT8_MAX
-          || element.get_int64().value < INT8_MIN) {
-        convRes = ConversionResult::AI_FAILURE;
-      } else {
-        value = element.get_int64().value != 0 ? 1 : 0;
-      }
+      value =
+          ToValidLong(element.get_int64().value, convRes, INT8_MAX, INT8_MIN);
       break;
     case bsoncxx::type::k_double:
       if (element.get_double().value > INT8_MAX
@@ -160,13 +178,12 @@ ConversionResult::Type MongoColumn::PutInt8(
       }
       break;
     case bsoncxx::type::k_decimal128:
-        // TODO: try to get the integer value.
-        value = element.get_decimal128().value != bsoncxx::decimal128() ? 1 : 0;
-        break;
+      value = ToValidLong(element.get_decimal128().value.to_string(), convRes,
+                     INT8_MAX, INT8_MIN);
+      break;
     case bsoncxx::type::k_utf8:
-      value = std::stoi(element.get_utf8().value.to_string(), nullptr, 0) != 0
-                  ? 1
-                  : 0;
+      value = ToValidLong(element.get_utf8().value.to_string(), convRes,
+                     INT8_MAX, INT8_MIN);
       break;
     case bsoncxx::type::k_bool:
       value = element.get_bool().value ? 1 : 0;
@@ -191,20 +208,12 @@ ConversionResult::Type MongoColumn::PutInt16(
   boost::optional< int16_t > value{};
   switch (docType) {
     case bsoncxx::type::k_int32:
-      if (element.get_int32().value > INT16_MAX
-          || element.get_int32().value < INT16_MIN) {
-        convRes = ConversionResult::AI_FAILURE;
-      } else {
-        value = element.get_int32().value;
-      }
+      value =
+          ToValidLong(element.get_int32().value, convRes, INT16_MAX, INT16_MIN);
       break;
     case bsoncxx::type::k_int64:
-      if (element.get_int64().value > INT16_MAX
-          || element.get_int64().value < INT16_MIN) {
-        convRes = ConversionResult::AI_FAILURE;
-      } else {
-        value = element.get_int64().value;
-      }
+      value =
+          ToValidLong(element.get_int64().value, convRes, INT16_MAX, INT16_MIN);
       break;
     case bsoncxx::type::k_double:
       if (element.get_double().value > INT16_MAX
@@ -215,10 +224,12 @@ ConversionResult::Type MongoColumn::PutInt16(
       }
       break;
     case bsoncxx::type::k_decimal128:
-      value = std::stoi(element.get_decimal128().value.to_string());
+      value = ToValidLong(element.get_decimal128().value.to_string(), convRes, INT16_MAX,
+                     INT16_MIN);
       break;
     case bsoncxx::type::k_utf8:
-      value = std::stoi(element.get_utf8().value.to_string(), nullptr, 0);
+      value = ToValidLong(element.get_utf8().value.to_string(), convRes,
+                     INT16_MAX, INT16_MIN);
       break;
     case bsoncxx::type::k_bool:
       value = element.get_bool().value ? 1 : 0;
@@ -252,12 +263,8 @@ ConversionResult::Type MongoColumn::PutInt32(
       value = element.get_int32().value;
       break;
     case bsoncxx::type::k_int64:
-      if (element.get_int64().value > INT32_MAX
-          || element.get_int64().value < INT32_MIN) {
-        convRes = ConversionResult::AI_FAILURE;
-      } else {
-        value = element.get_int64().value;
-      }
+      value =
+          ToValidLong(element.get_int64().value, convRes, INT32_MAX, INT32_MIN);
       break;
     case bsoncxx::type::k_double:
       if (element.get_double().value > INT32_MAX
@@ -268,10 +275,12 @@ ConversionResult::Type MongoColumn::PutInt32(
       }
       break;
     case bsoncxx::type::k_decimal128:
-      value = std::stoi(element.get_decimal128().value.to_string());
+      value = ToValidLong(element.get_decimal128().value.to_string(), convRes,
+                     INT32_MAX, INT32_MIN);
       break;
     case bsoncxx::type::k_utf8:
-      value = std::stoi(element.get_utf8().value.to_string(), nullptr, 0);
+      value = ToValidLong(element.get_utf8().value.to_string(), convRes,
+                     INT32_MAX, INT32_MIN);
       break;
     case bsoncxx::type::k_bool:
       value = element.get_bool().value ? 1 : 0;
@@ -308,18 +317,20 @@ ConversionResult::Type MongoColumn::PutInt64(
       value = element.get_int64().value;
       break;
     case bsoncxx::type::k_double:
-      if (element.get_double().value > INT32_MAX
-          || element.get_double().value < INT32_MIN) {
+      if (element.get_double().value > INT64_MAX
+          || element.get_double().value < INT64_MIN) {
         convRes = ConversionResult::AI_FAILURE;
       } else {
         value = element.get_double().value;
       }
       break;
     case bsoncxx::type::k_decimal128:
-      value = std::stol(element.get_decimal128().value.to_string());
+      value = ToValidLong(element.get_decimal128().value.to_string(), convRes,
+                     INT64_MAX, INT64_MIN);
       break;
     case bsoncxx::type::k_utf8:
-      value = std::stol(element.get_utf8().value.to_string(), nullptr, 0);
+      value = ToValidLong(element.get_utf8().value.to_string(), convRes,
+                     INT64_MAX, INT64_MIN);
       break;
     case bsoncxx::type::k_bool:
       value = element.get_bool().value ? 1 : 0;
@@ -359,10 +370,10 @@ ConversionResult::Type MongoColumn::PutFloat(
       value = element.get_double().value;
       break;
     case bsoncxx::type::k_decimal128:
-      value = std::stoi(element.get_decimal128().value.to_string());
+      value = std::stof(element.get_decimal128().value.to_string());
       break;
     case bsoncxx::type::k_utf8:
-      value = std::stoi(element.get_utf8().value.to_string(), nullptr, 0);
+      value = std::stof(element.get_utf8().value.to_string());
       break;
     case bsoncxx::type::k_bool:
       value = element.get_bool().value ? 1 : 0;
@@ -402,10 +413,10 @@ ConversionResult::Type MongoColumn::PutDouble(
       value = element.get_double().value;
       break;
     case bsoncxx::type::k_decimal128:
-      value = std::stoi(element.get_decimal128().value.to_string());
+      value = std::stod(element.get_decimal128().value.to_string());
       break;
     case bsoncxx::type::k_utf8:
-      value = std::stoi(element.get_utf8().value.to_string(), nullptr, 0);
+      value = std::stod(element.get_utf8().value.to_string());
       break;
     case bsoncxx::type::k_bool:
       value = element.get_bool().value ? 1 : 0;
@@ -551,10 +562,12 @@ ConversionResult::Type MongoColumn::PutTime(
       break;
     case bsoncxx::type::k_timestamp:
       // TODO: Determine if this is correct to milliseconds
+      // https://bitquill.atlassian.net/browse/AD-679
       value = Time(element.get_timestamp().timestamp);
       break;
     case bsoncxx::type::k_utf8:
-      // TODO: Determin if we could support reading data as string
+      // TODO: Determine if we could support reading data as string
+      // https://bitquill.atlassian.net/browse/AD-680
       convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
       break;
     default:
@@ -582,10 +595,12 @@ ConversionResult::Type MongoColumn::PutDate(
       break;
     case bsoncxx::type::k_timestamp:
       // TODO: Determine if this is correct to milliseconds
+      // https://bitquill.atlassian.net/browse/AD-679
       value = Date(element.get_timestamp().timestamp);
       break;
     case bsoncxx::type::k_utf8:
-        // TODO: Determin if we could support reading data as string
+      // TODO: Determine if we could support reading data as string
+      // https://bitquill.atlassian.net/browse/AD-680
       convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
       break;
     default:
@@ -607,17 +622,19 @@ ConversionResult::Type MongoColumn::PutTimestamp(
   boost::optional< Timestamp > value{};
   switch (docType) {
     case bsoncxx::type::k_int64:
-      break;
       value = Timestamp(element.get_int64().value);
+      break;
     case bsoncxx::type::k_date:
       value = Timestamp(element.get_date().value.count());
       break;
     case bsoncxx::type::k_timestamp:
       // TODO: Determine if this is correct to milliseconds
+      // https://bitquill.atlassian.net/browse/AD-679
       value = Timestamp(element.get_timestamp().timestamp);
       break;
     case bsoncxx::type::k_utf8:
-      // TODO: Determin if we could support reading data as string
+      // TODO: Determine if we could support reading data as string
+      // https://bitquill.atlassian.net/browse/AD-680
       convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
       break;
     default:
@@ -723,7 +740,6 @@ ConversionResult::Type MongoColumn::ReadToBuffer(
     }
 
     case JDBC_TYPE_NULL: {
-        // TODO: What to do here?
       convRes = dataBuf.PutNull();
       break;
     }
@@ -745,13 +761,11 @@ ConversionResult::Type MongoColumn::ReadToBuffer(
     }
 
     case JDBC_TYPE_TIMESTAMP: {
-      // TODO: ensure this is returning the correct value.
       convRes = PutTimestamp(dataBuf, element);
       break;
     }
 
     case JDBC_TYPE_TIME: {
-      // TODO: figure out conversion.
       convRes = PutTime(dataBuf, element);
       break;
     }

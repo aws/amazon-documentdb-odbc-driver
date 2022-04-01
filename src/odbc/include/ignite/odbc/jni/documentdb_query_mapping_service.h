@@ -70,7 +70,7 @@ class DocumentDbQueryMappingService {
    */
   DocumentDbQueryMappingService(SharedPointer< JniContext >& jniContext,
                             SharedPointer< GlobalJObject >& queryMappingService)
-      : _jniContext(jniContext), _queryMappingService(queryMappingService) {
+      : jniContext_(jniContext), queryMappingService_(queryMappingService) {
   }
 
   /**
@@ -84,10 +84,10 @@ class DocumentDbQueryMappingService {
       JniErrorInfo& errInfo);
 
   /** The JNI context */
-  SharedPointer< JniContext > _jniContext;
+  SharedPointer< JniContext > jniContext_;
 
   /** The DocumentDbQueryMappingService Java object  */
-  SharedPointer< GlobalJObject > _queryMappingService;
+  SharedPointer< GlobalJObject > queryMappingService_;
 };
 }  // namespace jni
 }  // namespace odbc

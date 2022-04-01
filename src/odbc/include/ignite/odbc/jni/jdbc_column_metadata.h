@@ -56,147 +56,147 @@ class JdbcColumnMetadata {
    * Gets the (zero-indexed) ordinal of the column in the table.
    */
   int32_t GetOrdinal() const {
-    return _ordinal;
+    return ordinal_;
   }
 
   /**
    * Gets the indicator of whether the column is auto incremented.
    */
   bool IsAutoIncrement() const {
-    return _autoIncrement;
+    return autoIncrement_;
   }
 
   /**
    * Gets the indicator of whether the column is case sensitive.
    */
   bool IsCaseSensitive() const {
-    return _caseSensitive;
+    return caseSensitive_;
   }
 
   /**
    * Gets the indicator of whether the column is searchable.
    */
   bool IsSearchable() const {
-    return _searchable;
+    return searchable_;
   }
 
   /**
    * Gets the indicator of whether the column is a currency.
    */
   bool IsCurrency() const {
-    return _currency;
+    return currency_;
   }
 
   /**
    * Gets the indicator of whether the column is nullable, non-nullable or unknown-nullable.
    */
   int32_t GetNullable() const {
-    return _nullable;
+    return nullable_;
   }
 
   /**
    * Gets the indicator of whether the column is signed numeric value.
    */
   bool IsSigned() const {
-    return _signed;
+    return signed_;
   }
 
   /**
    * Gets the display size for the column.
    */
   int32_t GetColumnDisplaySize() const {
-    return _columnDisplaySize;
+    return columnDisplaySize_;
   }
 
   /**
    * Gets the label for the column.
    */
   boost::optional< std::string > GetColumnLabel() const {
-    return _columnLabel;
+    return columnLabel_;
   }
 
   /**
    * Gets the name of the column.
    */
   boost::optional< std::string > GetColumnName() const {
-    return _columnName;
+    return columnName_;
   }
 
   /**
    * Gets the schema name (if any) for the column.
    */
   boost::optional< std::string > GetSchemaName() const {
-    return _schemaName;
+    return schemaName_;
   }
 
   /**
    * Gets the precision (i.e. length) of the value.
    */
   int32_t GetPrecision() const {
-    return _precision;
+    return precision_;
   }
 
   /**
    * Gets the scale of the numeric value.
    */
   int32_t GetScale() const {
-    return _scale;
+    return scale_;
   }
 
   /**
    * Gets the name of the table the column belongs.
    */
   boost::optional< std::string > GetTableName() const {
-    return _tableName;
+    return tableName_;
   }
 
   /**
    * Gets the name of the catalog (if any) the column belongs.
    */
   boost::optional< std::string > GetCatalogName() const {
-    return _catalogName;
+    return catalogName_;
   }
 
   /**
    * Gets the data type of the column. See JDBC_TYPE_*
    */
   int32_t GetColumnType() const {
-    return _columnType;
+    return columnType_;
   }
 
   /**
    * Gets the type name of the column.
    */
   boost::optional< std::string > GetColumnTypeName() const {
-    return _columnTypeName;
+    return columnTypeName_;
   }
 
   /**
    * Gets the indicator of whether the column is read only.
    */
   bool IsReadOnly() const {
-    return _readOnly;
+    return readOnly_;
   }
   
   /**
    * Gets the indicator of whether the column is writable.
    */
   bool IsWritable() const {
-    return _writable;
+    return writable_;
   }
 
   /**
    * Gets the indicator of whether the column is definitely writable.
    */
   bool IsDefinitelyWritable() const {
-    return _definitelyWritable;
+    return definitelyWritable_;
   }
 
   /**
    * Gets the Java class name for the column.
    */
   boost::optional< std::string > GetColumnClassName() const {
-    return _columnClassName;
+    return columnClassName_;
   }
 
 
@@ -217,51 +217,51 @@ class JdbcColumnMetadata {
                      boost::optional< std::string > columnTypeName,
                      bool readOnly, bool writable, bool definitelyWritable,
                      boost::optional< std::string > columnClassName)
-      : _ordinal(ordinal),
-        _autoIncrement(autoIncrement),
-        _caseSensitive(caseSensitive),
-        _searchable(searchable),
-        _currency(currency),
-        _nullable(nullable),
-        _signed(isSigned),
-        _columnDisplaySize(columnDisplaySize),
-        _columnLabel(columnLabel),
-        _columnName(columnName),
-        _schemaName(schemaName),
-        _precision(precision),
-        _scale(scale),
-        _tableName(tableName),
-        _catalogName(catalogName),
-        _columnType(columnType),
-        _columnTypeName(columnTypeName),
-        _readOnly(readOnly),
-        _writable(writable),
-        _definitelyWritable(definitelyWritable),
-        _columnClassName(columnClassName) {
+      : ordinal_(ordinal),
+        autoIncrement_(autoIncrement),
+        caseSensitive_(caseSensitive),
+        searchable_(searchable),
+        currency_(currency),
+        nullable_(nullable),
+        signed_(isSigned),
+        columnDisplaySize_(columnDisplaySize),
+        columnLabel_(columnLabel),
+        columnName_(columnName),
+        schemaName_(schemaName),
+        precision_(precision),
+        scale_(scale),
+        tableName_(tableName),
+        catalogName_(catalogName),
+        columnType_(columnType),
+        columnTypeName_(columnTypeName),
+        readOnly_(readOnly),
+        writable_(writable),
+        definitelyWritable_(definitelyWritable),
+        columnClassName_(columnClassName) {
       // No-op
   }
 
-  int32_t _ordinal;
-  bool _autoIncrement;
-  bool _caseSensitive;
-  bool _searchable;
-  bool _currency;
-  int32_t _nullable;
-  bool _signed;
-  int32_t _columnDisplaySize;
-  boost::optional< std::string > _columnLabel;
-  boost::optional< std::string > _columnName;
-  boost::optional< std::string > _schemaName;
-  int32_t _precision;
-  int32_t _scale;
-  boost::optional< std::string > _tableName;
-  boost::optional< std::string > _catalogName;
-  int32_t _columnType;
-  boost::optional< std::string > _columnTypeName;
-  bool _readOnly;
-  bool _writable;
-  bool _definitelyWritable;
-  boost::optional< std::string > _columnClassName;
+  int32_t ordinal_;
+  bool autoIncrement_;
+  bool caseSensitive_;
+  bool searchable_;
+  bool currency_;
+  int32_t nullable_;
+  bool signed_;
+  int32_t columnDisplaySize_;
+  boost::optional< std::string > columnLabel_;
+  boost::optional< std::string > columnName_;
+  boost::optional< std::string > schemaName_;
+  int32_t precision_;
+  int32_t scale_;
+  boost::optional< std::string > tableName_;
+  boost::optional< std::string > catalogName_;
+  int32_t columnType_;
+  boost::optional< std::string > columnTypeName_;
+  bool readOnly_;
+  bool writable_;
+  bool definitelyWritable_;
+  boost::optional< std::string > columnClassName_;
 };
 }  // namespace jni
 }  // namespace odbc

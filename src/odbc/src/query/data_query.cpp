@@ -180,8 +180,6 @@ SqlResult::Type DataQuery::MakeRequestExecute() {
 }
 
 SqlResult::Type DataQuery::MakeRequestClose() {
-  // TODO: AD-604 - MakeRequestExecute
-  // https://bitquill.atlassian.net/browse/AD-604
   return SqlResult::AI_SUCCESS;
 }
 
@@ -270,8 +268,6 @@ SqlResult::Type DataQuery::GetMqlQueryContext(
 }
 
 SqlResult::Type DataQuery::MakeRequestMoreResults() {
-  // TODO: AD-604 - MakeRequestExecute
-  // https://bitquill.atlassian.net/browse/AD-604
   return SqlResult::AI_SUCCESS;
 }
 

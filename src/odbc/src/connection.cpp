@@ -75,18 +75,18 @@ struct OdbcProtocolHeader {
 
 namespace ignite {
 namespace odbc {
-Connection::Connection(Environment* env) : env(env), info(config) {
+Connection::Connection(Environment* env) : env_(env), info_(config_) {
   // No-op
 }
 
 Connection::~Connection() {
   Close();
-  _jniContext = nullptr;
+  jniContext_ = nullptr;
   Deinit();
 }
 
 const config::ConnectionInfo& Connection::GetInfo() const {
-  return info;
+  return info_;
 }
 
 void Connection::GetInfo(config::ConnectionInfo::InfoType type, void* buf,
@@ -153,16 +153,16 @@ SqlResult::Type Connection::InternalEstablish(
     const config::Configuration& cfg) {
   using ssl::SslMode;
 
-  config = cfg;
+  config_ = cfg;
 
-  if (_connection.IsValid()) {
+  if (connection_.IsValid()) {
     AddStatusRecord(SqlState::S08002_ALREADY_CONNECTED, "Already connected.");
 
     return SqlResult::AI_ERROR;
   }
 
   try {
-    config.Validate();
+    config_.Validate();
   } catch (const OdbcError& err) {
     AddStatusRecord(err);
     return SqlResult::AI_ERROR;
@@ -189,11 +189,11 @@ void Connection::Release() {
 }
 
 void Connection::Deregister() {
-  env->DeregisterConnection(this);
+  env_->DeregisterConnection(this);
 }
 
 SqlResult::Type Connection::InternalRelease() {
-  if (!_connection.IsValid()) {
+  if (!connection_.IsValid()) {
     AddStatusRecord(SqlState::S08003_NOT_CONNECTED, "Connection is not open.");
 
     // It is important to return SUCCESS_WITH_INFO and not ERROR here, as if we
@@ -208,14 +208,14 @@ SqlResult::Type Connection::InternalRelease() {
 }
 
 void Connection::Close() {
-  if (_jniContext.IsValid()) {
-    if (_connection.IsValid()) {
+  if (jniContext_.IsValid()) {
+    if (connection_.IsValid()) {
       JniErrorInfo errInfo;
-      _connection.Get()->Close(errInfo);
+      connection_.Get()->Close(errInfo);
       if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
         // TODO: Determine if we need to error check the close.
       }
-      _connection = nullptr;
+      connection_ = nullptr;
     }
   }
 }
@@ -229,13 +229,13 @@ Statement* Connection::CreateStatement() {
 }
 
 SharedPointer< DatabaseMetaData > Connection::GetMetaData(IgniteError& err) {
-  if (!_connection.IsValid()) {
+  if (!connection_.IsValid()) {
     err = IgniteError(IgniteError::IGNITE_ERR_ILLEGAL_STATE,
                       "Must be connected.");
     return nullptr;
   }
   JniErrorInfo errInfo;
-  auto databaseMetaData = _connection.Get()->GetMetaData(errInfo);
+  auto databaseMetaData = connection_.Get()->GetMetaData(errInfo);
   if (!databaseMetaData.IsValid()) {
     std::string message = errInfo.errMsg;
     err = IgniteError(IgniteError::IGNITE_ERR_JNI_GET_DATABASE_METADATA,
@@ -247,14 +247,14 @@ SharedPointer< DatabaseMetaData > Connection::GetMetaData(IgniteError& err) {
 
 SharedPointer< DocumentDbDatabaseMetadata > Connection::GetDatabaseMetadata(
     IgniteError& err) {
-  if (!_connection.IsValid()) {
+  if (!connection_.IsValid()) {
     err = IgniteError(IgniteError::IGNITE_ERR_ILLEGAL_STATE,
                       "Must be connected.");
     return nullptr;
   }
   JniErrorInfo errInfo;
   auto documentDbDatabaseMetaData =
-      _connection.Get()->GetDatabaseMetadata(errInfo);
+      connection_.Get()->GetDatabaseMetadata(errInfo);
   if (!documentDbDatabaseMetaData.IsValid()) {
     std::string message = errInfo.errMsg;
     err = IgniteError(IgniteError::IGNITE_ERR_JNI_GET_DOCUMENTDB_DATABASE_METADATA,
@@ -266,14 +266,14 @@ SharedPointer< DocumentDbDatabaseMetadata > Connection::GetDatabaseMetadata(
 
 SharedPointer< DocumentDbConnectionProperties > Connection::GetConnectionProperties(
     IgniteError& err) {
-  if (!_connection.IsValid()) {
+  if (!connection_.IsValid()) {
     err = IgniteError(IgniteError::IGNITE_ERR_ILLEGAL_STATE,
                       "Must be connected.");
     return nullptr;
   }
   JniErrorInfo errInfo;
   auto connectionProperties =
-      _connection.Get()->GetConnectionProperties(errInfo);
+      connection_.Get()->GetConnectionProperties(errInfo);
   if (!connectionProperties.IsValid()) {
     std::string message = errInfo.errMsg;
     err = IgniteError(IgniteError::IGNITE_ERR_JNI_GET_DOCUMENTDB_CONNECTION_PROPERTIES,
@@ -296,15 +296,15 @@ SqlResult::Type Connection::InternalCreateStatement(Statement*& statement) {
 }
 
 const std::string& Connection::GetSchema() const {
-  return config.GetDatabase();
+  return config_.GetDatabase();
 }
 
 const config::Configuration& Connection::GetConfiguration() const {
-  return config;
+  return config_;
 }
 
 bool Connection::IsAutoCommit() const {
-  return autoCommit;
+  return autoCommit_;
 }
 
 diagnostic::DiagnosticRecord Connection::CreateStatusRecord(
@@ -319,15 +319,15 @@ void Connection::TransactionCommit() {
 }
 
 SqlResult::Type Connection::InternalTransactionCommit() {
-  std::string schema = config.GetDatabase();
+  std::string schema = config_.GetDatabase();
 
   app::ParameterSet empty;
 
-  QueryExecuteRequest req(schema, "COMMIT", empty, timeout, autoCommit);
+  QueryExecuteRequest req(schema, "COMMIT", empty, timeout_, autoCommit_);
   QueryExecuteResponse rsp;
 
   try {
-    bool sent = SyncMessage(req, rsp, timeout);
+    bool sent = SyncMessage(req, rsp, timeout_);
 
     if (!sent) {
       AddStatusRecord(SqlState::S08S01_LINK_FAILURE,
@@ -353,15 +353,15 @@ void Connection::TransactionRollback() {
 }
 
 SqlResult::Type Connection::InternalTransactionRollback() {
-  std::string schema = config.GetDatabase();
+  std::string schema = config_.GetDatabase();
 
   app::ParameterSet empty;
 
-  QueryExecuteRequest req(schema, "ROLLBACK", empty, timeout, autoCommit);
+  QueryExecuteRequest req(schema, "ROLLBACK", empty, timeout_, autoCommit_);
   QueryExecuteResponse rsp;
 
   try {
-    bool sent = SyncMessage(req, rsp, timeout);
+    bool sent = SyncMessage(req, rsp, timeout_);
 
     if (!sent) {
       AddStatusRecord(SqlState::S08S01_LINK_FAILURE,
@@ -401,7 +401,7 @@ SqlResult::Type Connection::InternalGetAttribute(int attr, void* buf,
     case SQL_ATTR_CONNECTION_DEAD: {
       SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
 
-      *val = _connection.Get() ? SQL_CD_FALSE : SQL_CD_TRUE;
+      *val = connection_.Get() ? SQL_CD_FALSE : SQL_CD_TRUE;
 
       if (valueLen)
         *valueLen = SQL_IS_INTEGER;
@@ -412,7 +412,7 @@ SqlResult::Type Connection::InternalGetAttribute(int attr, void* buf,
     case SQL_ATTR_CONNECTION_TIMEOUT: {
       SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
 
-      *val = static_cast< SQLUINTEGER >(timeout);
+      *val = static_cast< SQLUINTEGER >(timeout_);
 
       if (valueLen)
         *valueLen = SQL_IS_INTEGER;
@@ -423,7 +423,7 @@ SqlResult::Type Connection::InternalGetAttribute(int attr, void* buf,
     case SQL_ATTR_LOGIN_TIMEOUT: {
       SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
 
-      *val = static_cast< SQLUINTEGER >(loginTimeout);
+      *val = static_cast< SQLUINTEGER >(loginTimeout_);
 
       if (valueLen)
         *valueLen = SQL_IS_INTEGER;
@@ -434,7 +434,7 @@ SqlResult::Type Connection::InternalGetAttribute(int attr, void* buf,
     case SQL_ATTR_AUTOCOMMIT: {
       SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
 
-      *val = autoCommit ? SQL_AUTOCOMMIT_ON : SQL_AUTOCOMMIT_OFF;
+      *val = autoCommit_ ? SQL_AUTOCOMMIT_ON : SQL_AUTOCOMMIT_OFF;
 
       if (valueLen)
         *valueLen = SQL_IS_INTEGER;
@@ -468,7 +468,7 @@ SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
     }
 
     case SQL_ATTR_CONNECTION_TIMEOUT: {
-      timeout = RetrieveTimeout(value);
+      timeout_ = RetrieveTimeout(value);
 
       if (GetDiagnosticRecords().GetStatusRecordsNumber() != 0)
         return SqlResult::AI_SUCCESS_WITH_INFO;
@@ -477,7 +477,7 @@ SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
     }
 
     case SQL_ATTR_LOGIN_TIMEOUT: {
-      loginTimeout = RetrieveTimeout(value);
+      loginTimeout_ = RetrieveTimeout(value);
 
       if (GetDiagnosticRecords().GetStatusRecordsNumber() != 0)
         return SqlResult::AI_SUCCESS_WITH_INFO;
@@ -496,7 +496,7 @@ SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
         return SqlResult::AI_ERROR;
       }
 
-      autoCommit = mode == SQL_AUTOCOMMIT_ON;
+      autoCommit_ = mode == SQL_AUTOCOMMIT_ON;
 
       break;
     }
@@ -513,13 +513,13 @@ SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
 }
 
 SqlResult::Type Connection::MakeRequestHandshake() {
-  HandshakeRequest req(config);
+  HandshakeRequest req(config_);
   HandshakeResponse rsp;
 
   try {
     // Workaround for some Linux systems that report connection on non-blocking
     // sockets as successful but fail to establish real connection.
-    bool sent = InternalSyncMessage(req, rsp, loginTimeout);
+    bool sent = InternalSyncMessage(req, rsp, loginTimeout_);
 
     if (!sent) {
       AddStatusRecord(
@@ -557,7 +557,7 @@ SqlResult::Type Connection::MakeRequestHandshake() {
 }
 
 void Connection::EnsureConnected() {
-  if (_connection.IsValid())
+  if (connection_.IsValid())
     return;
 
   IgniteError err;
@@ -573,7 +573,7 @@ void Connection::EnsureConnected() {
 }
 
 bool Connection::TryRestoreConnection(IgniteError& err) {
-  if (_connection.IsValid()) {
+  if (connection_.IsValid()) {
     return true;
   }
 
@@ -588,14 +588,14 @@ bool Connection::TryRestoreConnection(IgniteError& err) {
   }
   SharedPointer< DocumentDbConnection > conn = new DocumentDbConnection(ctx);
   if (!conn.IsValid()
-      || conn.Get()->Open(config, errInfo)
+      || conn.Get()->Open(config_, errInfo)
              != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     std::string message = errInfo.errMsg;
     err = IgniteError(IgniteError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
                       message.c_str());
   }
-  _connection = conn;
-  bool connected = _connection.IsValid() && _connection.Get()->IsOpen()
+  connection_ = conn;
+  bool connected = connection_.IsValid() && connection_.Get()->IsOpen()
                    && errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
 
   if (!connected) {
@@ -618,7 +618,7 @@ bool Connection::GetInternalSSHTunnelPort(int32_t& localSSHTunnelPort,
   bool isSSHTunnelActive;
   JniErrorInfo errInfo;
   JniErrorCode success =
-      _connection.Get()->IsSshTunnelActive(isSSHTunnelActive, errInfo);
+      connection_.Get()->IsSshTunnelActive(isSSHTunnelActive, errInfo);
 
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     err = IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_INIT,
@@ -628,7 +628,7 @@ bool Connection::GetInternalSSHTunnelPort(int32_t& localSSHTunnelPort,
 
   if (isSSHTunnelActive) {
     JniErrorCode success =
-        _connection.Get()->GetSshLocalPort(localSSHTunnelPort, errInfo);
+        connection_.Get()->GetSshLocalPort(localSSHTunnelPort, errInfo);
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       err = IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_INIT,
                         errInfo.errMsg.c_str());
@@ -646,18 +646,18 @@ std::string Connection::FormatMongoCppConnectionString(
 
   // localSSHTunnelPort == 0 means that internal SSH tunnel option was not set
   if (localSSHTunnelPort == 0) {
-    host = config.GetHostname();
-    port = common::LexicalCast< std::string >(config.GetPort());
+    host = config_.GetHostname();
+    port = common::LexicalCast< std::string >(config_.GetPort());
   }
   std::string mongoConnectionString;
 
   mongoConnectionString = "mongodb:";
-  mongoConnectionString.append("//" + config.GetUser());
-  mongoConnectionString.append(":" + config.GetPassword());
+  mongoConnectionString.append("//" + config_.GetUser());
+  mongoConnectionString.append(":" + config_.GetPassword());
   mongoConnectionString.append("@" + host);
   mongoConnectionString.append(":" + port);
   mongoConnectionString.append("/admin");
-  if (config.IsTls()) {
+  if (config_.IsTls()) {
     mongoConnectionString.append("?tlsAllowInvalidHostnames=true");
   }
   // tls configuration is handled using tls_options in connectionCPP
@@ -668,7 +668,7 @@ std::string Connection::FormatMongoCppConnectionString(
 }
 
 SharedPointer< JniContext > Connection::GetJniContext(JniErrorInfo &errInfo) {
-  if (!_jniContext.IsValid()) {
+  if (!jniContext_.IsValid()) {
     // Resolve DOCUMENTDB_HOME.
     std::string home = jni::ResolveDocumentDbHome();
 
@@ -683,10 +683,10 @@ SharedPointer< JniContext > Connection::GetJniContext(JniErrorInfo &errInfo) {
 
     // Create the context
     SharedPointer< JniContext > ctx(JniContext::Create(
-        &opts[0], static_cast< int >(opts.size()), JniHandlers(), errInfo));
-    _jniContext = ctx;
+        &opts_[0], static_cast< int >(opts_.size()), JniHandlers(), errInfo));
+    jniContext_ = ctx;
   }
-  return _jniContext;
+  return jniContext_;
 }
 
 /**
@@ -698,15 +698,15 @@ SharedPointer< JniContext > Connection::GetJniContext(JniErrorInfo &errInfo) {
  */
 void Connection::SetJvmOptions(const std::string& cp) {
   Deinit();
-  BuildJvmOptions(cp, opts);
+  BuildJvmOptions(cp, opts_);
 }
 
 /**
  * Deallocates all allocated data.
  */
 void Connection::Deinit() {
-  std::for_each(opts.begin(), opts.end(), ReleaseChars);
-  opts.clear();
+  std::for_each(opts_.begin(), opts_.end(), ReleaseChars);
+  opts_.clear();
 }
 
 int32_t Connection::RetrieveTimeout(void* value) {
@@ -716,7 +716,7 @@ int32_t Connection::RetrieveTimeout(void* value) {
   if (uTimeout > INT32_MAX) {
     std::stringstream ss;
 
-    ss << "Value is too big: " << uTimeout << ", changing to " << timeout
+    ss << "Value is too big: " << uTimeout << ", changing to " << timeout_
        << ".";
 
     AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED, ss.str());
@@ -739,19 +739,19 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
         FormatMongoCppConnectionString(localSSHTunnelPort);
     mongocxx::options::client client_options;
     mongocxx::options::tls tls_options;
-    if (config.IsTls()) {
+    if (config_.IsTls()) {
       // TO-DO Adapt to use certificates
       // https://bitquill.atlassian.net/browse/AD-598
       tls_options.allow_invalid_certificates(true);
       client_options.tls_opts(tls_options);
     }
     
-    _mongoClient = std::make_shared< mongocxx::client >(
+    mongoClient_ = std::make_shared< mongocxx::client >(
         mongocxx::uri(mongoCPPConnectionString), client_options);
-    std::string database = config.GetDatabase();
+    std::string database = config_.GetDatabase();
     bsoncxx::builder::stream::document ping;
     ping << "ping" << 1;
-    auto db = (*_mongoClient.get())[database];
+    auto db = (*mongoClient_.get())[database];
     auto result = db.run_command(ping.view());
 
     if (result.view()["ok"].get_double() != 1) {

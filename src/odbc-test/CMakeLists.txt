@@ -116,7 +116,6 @@ set(SOURCES
          ../odbc/src/query/foreign_keys_query.cpp
          ../odbc/src/query/primary_keys_query.cpp
          ../odbc/src/query/special_columns_query.cpp
-         ../odbc/src/query/streaming_query.cpp
          ../odbc/src/query/type_info_query.cpp
          ../odbc/src/query/table_metadata_query.cpp
          ../odbc/src/sql/sql_lexer.cpp

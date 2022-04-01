@@ -96,7 +96,6 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/query/table_metadata_query.cpp
         src/query/type_info_query.cpp
         src/query/special_columns_query.cpp
-        src/query/streaming_query.cpp
         src/sql/sql_parser.cpp
         src/sql/sql_lexer.cpp
         src/sql/sql_set_streaming_command.cpp
