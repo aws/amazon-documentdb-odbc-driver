@@ -122,11 +122,11 @@ Example:
 2. Build docker image
    1. Navigate Dockerfile folder `cd docker/linux-environment`
    2. Build the docker image E.g.: `docker build -t documentdb-dev-linux .`   
-3. Copy necessary pem files to access DocumentDB and ssh tunnel to the root of your project.
-   E.g. `cp ~/.ssh/rds-ca-2019-root.pem <project-root-folder>`
-   E.g. `cp ~/.ssh/ssh-tunnel.pem <project-root-folder>`
-   Alternatively you can add -v in docker run command to mount your folder with the pem files
-   E.g. `-v <local path of pem folder file>:/<docker container path>` `
+3. If necessary to run the integrations tests, follow the next step.
+   1. Copy necessary pem files to access DocumentDB and ssh tunnel to the root of your project. See [Running an SSH Tunnel for testing](#running-an-ssh-tunnel-for-testing)
+      E.g. `cp ~/.ssh/ssh-tunnel.pem <project-root-folder>`
+      Alternatively you can add -v in docker run command to mount your folder with the pem files
+      E.g. `-v <local path of pem folder file>:/<docker container path>` `
 
 ##### Using the dev image
 
