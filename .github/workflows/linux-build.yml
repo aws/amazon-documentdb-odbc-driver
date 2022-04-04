@@ -154,7 +154,7 @@ jobs:
         files: ./odbc_test_result.xml
   
   build-linux-docker-image:
-  runs-on: ubuntu-20.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: build-image
