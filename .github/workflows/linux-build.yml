@@ -152,6 +152,16 @@ jobs:
         check_name: "Ubuntu 20.04 Build Unit Test Results Check"
         comment_title: "Ubuntu 20.04 Build Unit Test Results"
         files: ./odbc_test_result.xml
+  
+  build-linux-docker-image:
+  runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: build-image
+      run: |
+        cd docker/linux-environment
+        docker build -t documentdb-dev-linux . 
+
 
 # TODO Linux build enhacements 
 #https://bitquill.atlassian.net/browse/AD-688

@@ -43,11 +43,11 @@ RUN apt-get -y update \
 
 # compile and install mongoc
 RUN MONGO_C_VERSION=1.21.1 \
-    cd /tmp \
+    && cd /tmp \
     && curl -OL https://github.com/mongodb/mongo-c-driver/releases/download/$MONGO_C_VERSION/mongo-c-driver-$MONGO_C_VERSION.tar.gz \
-    && tar xzf mongo-c-driver-1.21.1.tar.gz \
-    && rm mongo-c-driver-1.21.1.tar.gz \
-    && cd mongo-c-driver-1.21.1 \
+    && tar xzf "mongo-c-driver-$MONGO_C_VERSION.tar.gz" \
+    && rm "mongo-c-driver-$MONGO_C_VERSION.tar.gz" \
+    && cd "mongo-c-driver-$MONGO_C_VERSION" \
     && mkdir cmake-build \
     && cd cmake-build \
     && cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. \
@@ -56,12 +56,12 @@ RUN MONGO_C_VERSION=1.21.1 \
     && rm -r /tmp/*
 
 # compile and install mongocxx
-RUN MONGO_CXX_VERSION=3.6.6
-    cd /tmp \
-    && curl -OL https://github.com/mongodb/mongo-cxx-driver/releases/download/r$MONGO_CXX_VERSION=/mongo-cxx-driver-r$MONGO_CXX_VERSION=.tar.gz \
-    && tar -xzf mongo-cxx-driver-r3.6.6.tar.gz \
-    && rm mongo-cxx-driver-r3.6.6.tar.gz \
-    && cd mongo-cxx-driver-r3.6.6/build \
+RUN MONGO_CXX_VERSION=3.6.6 \
+    && cd /tmp \
+    && curl -OL https://github.com/mongodb/mongo-cxx-driver/releases/download/r$MONGO_CXX_VERSION/mongo-cxx-driver-r$MONGO_CXX_VERSION.tar.gz \
+    && tar -xzf "mongo-cxx-driver-r$MONGO_CXX_VERSION.tar.gz" \
+    && rm "mongo-cxx-driver-r$MONGO_CXX_VERSION.tar.gz" \
+    && cd "mongo-cxx-driver-r$MONGO_CXX_VERSION/build" \
     && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=/usr/local -DBSONCXX_POLY_USE_MNMLSTC=1 .. \
     && make \
     && make install \
@@ -84,5 +84,3 @@ ENV DOCUMENTDB_HOME /documentdb-odbc/build/odbc/bin/
 ENV ODBC_LIB_PATH /documentdb-odbc/build/odbc/lib/
 
 WORKDIR /documentdb-odbc
-
-
