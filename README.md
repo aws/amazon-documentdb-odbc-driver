@@ -135,7 +135,7 @@ Example:
    1. Set environment variables for testing and double-check if all dev environmnet variables are set by running `scripts/env_variables_check.sh`. More info [Environment Variables for Testing Accounts/Secrets ](#environment-variables-for-testing-accounts/secrets)
       Note. Since the environment variables JAVA_HOME, DOCUMENTDB_HOME and ODBC_LIB_PATH are already set in the container, it is not recommended to change those.
    2. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_debug64.sh` or `./build_linux_release64_deb.sh`
-   3. Run local ssh tunnel. Make sure to run as background process with '&' in the end of the command line.
+   3. (Optional) Run local ssh tunnel. If the integration tests needed to be checked.
    4. Run the following command to register the ODBC driver. 
       `./scripts/register_driver_unix.sh`
    5. set LOCAL_DATABASE_HOST with the ip of your local mongo
