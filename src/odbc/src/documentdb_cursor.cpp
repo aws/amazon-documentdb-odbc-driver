@@ -46,7 +46,11 @@ bool DocumentDbCursor::Increment() {
   }
   hasData = HasData();
   if (hasData) {
-    currentRow_.reset(new DocumentDbRow(*iterator_, columnMetadata_, paths_));
+    if (currentRow_) {
+      (*currentRow_).Update(*iterator_);
+    } else {
+      currentRow_.reset(new DocumentDbRow(*iterator_, columnMetadata_, paths_));
+    }
   } else {
     currentRow_.reset();
   }

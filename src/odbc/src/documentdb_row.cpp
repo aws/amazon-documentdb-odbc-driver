@@ -37,8 +37,11 @@ DocumentDbRow::DocumentDbRow(bsoncxx::document::view const& document,
       paths_(paths) {
 }
 
-DocumentDbRow::~DocumentDbRow() {
-  // No-op.
+void DocumentDbRow::Update(bsoncxx::document::view const& document) {
+  document_ = document;
+  for (DocumentDbColumn& column : columns_) {
+    column.Update(document);
+  }
 }
 
 app::ConversionResult::Type DocumentDbRow::ReadColumnToBuffer(
@@ -54,7 +57,7 @@ app::ConversionResult::Type DocumentDbRow::ReadColumnToBuffer(
   return column.ReadToBuffer(dataBuf);
 }
 
-bool DocumentDbRow::EnsureColumnDiscovered(int16_t columnIdx) {
+bool DocumentDbRow::EnsureColumnDiscovered(uint32_t columnIdx) {
   if (columns_.size() == size)
     return true;
 
