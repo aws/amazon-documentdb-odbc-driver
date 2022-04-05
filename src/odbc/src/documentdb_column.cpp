@@ -23,100 +23,11 @@
 #include "bsoncxx/types.hpp"
 #include "bsoncxx/json.hpp"
 
-namespace {
-using ignite::odbc::app::ApplicationDataBuffer;
-using ignite::odbc::app::ConversionResult;
-using namespace ignite::odbc::impl::interop;
-using namespace ignite::odbc::impl::binary;
-using ignite::odbc::jni::JdbcColumnMetadata;
-
-bool GetObjectLength(InteropInputStream& stream, int32_t& len) {
-  InteropStreamPositionGuard< InteropInputStream > guard(stream);
-
-  int8_t hdr = stream.ReadInt8();
-
-  switch (hdr) {
-    case IGNITE_TYPE_BINARY: {
-      // Header field + Length field + Object itself + Offset field
-      len = 1 + 4 + stream.ReadInt32() + 4;
-
-      break;
-    }
-
-    case IGNITE_TYPE_OBJECT: {
-      int8_t protoVer = stream.ReadInt8();
-
-      if (protoVer != IGNITE_PROTO_VER)
-        return false;
-
-      // Skipping flags, typeId and hash code
-      len = stream.ReadInt32(stream.Position() + 2 + 4 + 4);
-
-      break;
-    }
-
-    default:
-      return false;
-  }
-
-  return true;
-}
-
-/**
- * Read column header and restores position if the column is of
- * complex type.
- * @return Column type header.
- */
-int8_t ReadColumnHeader(InteropInputStream& stream) {
-  using namespace ignite::odbc::impl::binary;
-
-  int32_t headerPos = stream.Position();
-
-  int8_t hdr = stream.ReadInt8();
-
-  // Check if we need to restore position - to read complex types
-  // stream should have unread header, but for primitive types it
-  // should not.
-  switch (hdr) {
-    case IGNITE_TYPE_BYTE:
-    case IGNITE_TYPE_SHORT:
-    case IGNITE_TYPE_CHAR:
-    case IGNITE_TYPE_INT:
-    case IGNITE_TYPE_LONG:
-    case IGNITE_TYPE_FLOAT:
-    case IGNITE_TYPE_DOUBLE:
-    case IGNITE_TYPE_BOOL:
-    case IGNITE_HDR_NULL:
-    case IGNITE_TYPE_ARRAY_BYTE: {
-      // No-op.
-      break;
-    }
-
-    default: {
-      // Restoring position.
-      stream.Position(headerPos);
-      break;
-    }
-  }
-
-  return hdr;
-}
-}  // namespace
-
 namespace ignite {
 namespace odbc {
 
-DocumentDbColumn::DocumentDbColumn(const DocumentDbColumn& other)
-    : document_(other.document_),
-      columnMetadata_(other.columnMetadata_),
-      path_(other.path_),
-      type_(other.type_),
-      size_(other.size_) {
-  // No-op.
-}
-
-DocumentDbColumn::~DocumentDbColumn() {
-  // No-op.
+void DocumentDbColumn::Update(bsoncxx::document::view const& document) {
+  document_ = document;
 }
 
 DocumentDbColumn::DocumentDbColumn(bsoncxx::document::view& document,
@@ -699,76 +610,63 @@ ConversionResult::Type DocumentDbColumn::ReadToBuffer(
   switch (type_) {
 
     case JDBC_TYPE_BOOLEAN:
-    case JDBC_TYPE_SMALLINT: {
+    case JDBC_TYPE_SMALLINT:
       convRes = PutInt8(dataBuf, element);
       break;
-    }
 
-    case JDBC_TYPE_TINYINT: {
+    case JDBC_TYPE_TINYINT:
       convRes = PutInt16(dataBuf, element);
       break;
-    }
 
-    case JDBC_TYPE_INTEGER: {
+    case JDBC_TYPE_INTEGER:
       convRes = PutInt32(dataBuf, element);
       break;
-    }
 
-    case JDBC_TYPE_BIGINT: {
+    case JDBC_TYPE_BIGINT:
       convRes = PutInt64(dataBuf, element);
       break;
-    }
 
-    case JDBC_TYPE_FLOAT: {
+    case JDBC_TYPE_FLOAT:
       convRes = PutFloat(dataBuf, element);
       break;
-    }
 
-    case JDBC_TYPE_DOUBLE: {
+    case JDBC_TYPE_DOUBLE:
       convRes = PutDouble(dataBuf, element);
       break;
-    }
 
     case JDBC_TYPE_VARCHAR:
     case JDBC_TYPE_CHAR:
     case JDBC_TYPE_NCHAR:
     case JDBC_TYPE_NVARCHAR:
     case JDBC_TYPE_LONGVARCHAR:
-    case JDBC_TYPE_LONGNVARCHAR: {
+    case JDBC_TYPE_LONGNVARCHAR:
       convRes = PutString(dataBuf, element);
       break;
-    }
 
-    case JDBC_TYPE_NULL: {
+    case JDBC_TYPE_NULL:
       convRes = dataBuf.PutNull();
       break;
-    }
 
     case JDBC_TYPE_BINARY:
-    case JDBC_TYPE_VARBINARY: {
+    case JDBC_TYPE_VARBINARY:
       convRes = PutBinaryData(dataBuf, element);
       break;
-    }
 
-    case JDBC_TYPE_DECIMAL: {
+    case JDBC_TYPE_DECIMAL:
       convRes = PutDecimal(dataBuf, element);
       break;
-    }
 
-    case JDBC_TYPE_DATE: {
+    case JDBC_TYPE_DATE:
       convRes = PutDate(dataBuf, element);
       break;
-    }
 
-    case JDBC_TYPE_TIMESTAMP: {
+    case JDBC_TYPE_TIMESTAMP:
       convRes = PutTimestamp(dataBuf, element);
       break;
-    }
 
-    case JDBC_TYPE_TIME: {
+    case JDBC_TYPE_TIME:
       convRes = PutTime(dataBuf, element);
       break;
-    }
     
     default:
       return ConversionResult::AI_UNSUPPORTED_CONVERSION;
