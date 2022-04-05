@@ -46,7 +46,7 @@ class DocumentDbColumn {
    *
    * @param other Another instance.
    */
-  DocumentDbColumn(const DocumentDbColumn& other);
+  DocumentDbColumn(const DocumentDbColumn& other) = default;
 
   /**
    * Copy operator.
@@ -56,10 +56,15 @@ class DocumentDbColumn {
    */
   DocumentDbColumn& operator=(const DocumentDbColumn& other) = delete;
 
+  /** 
+   * Updates the reference to the current document.
+   */
+  void Update(bsoncxx::document::view const& document);
+
   /**
    * Destructor.
    */
-  ~DocumentDbColumn();
+  ~DocumentDbColumn() = default;
 
   /**
    * Constructor.
@@ -145,7 +150,7 @@ class DocumentDbColumn {
   /** Column data size in bytes. */
   int32_t size_ = 0;
 
-  bsoncxx::document::view const& document_;
+  bsoncxx::document::view& document_;
 
   JdbcColumnMetadata& columnMetadata_;
 

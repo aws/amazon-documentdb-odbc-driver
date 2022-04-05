@@ -51,7 +51,7 @@ class DocumentDbRow {
   /**
    * Destructor.
    */
-  ~DocumentDbRow();
+  ~DocumentDbRow() = default;
 
   /**
    * Get row size in columns.
@@ -71,6 +71,11 @@ class DocumentDbRow {
    */
   app::ConversionResult::Type ReadColumnToBuffer(
       uint32_t columnIdx, app::ApplicationDataBuffer& dataBuf);
+
+  /** 
+   * Updates the row and columns with a new document.
+   */
+  void Update(bsoncxx::document::view const& document);
 
  private:
   IGNITE_NO_COPY_ASSIGNMENT(DocumentDbRow);
@@ -98,7 +103,7 @@ class DocumentDbRow {
    * @return True if the column is discovered and false if it can not
    * be discovered.
    */
-  bool EnsureColumnDiscovered(int16_t columnIdx);
+  bool EnsureColumnDiscovered(uint32_t columnIdx);
 
   /** Current position in row. */
   int32_t pos;
