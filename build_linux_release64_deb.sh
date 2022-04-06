@@ -9,8 +9,9 @@ cmake ../src -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCODE_COVERAGE="OFF" -DBUILD_SHARED
 cd ..
 
 # Download the DocumentDB JDBC Driver
-if [ -z "$JDBC_DRIVER_VERSION" ]; then 
-    JDBC_DRIVER_VERSION="1.2.0"
+if [ -z "$JDBC_DRIVER_VERSION" ]; then
+# Reminder: update Github action cache key as well
+    JDBC_DRIVER_VERSION="1.2.1"
 fi
 JDBC_DRIVER_FILENAME="documentdb-jdbc-$JDBC_DRIVER_VERSION-all.jar"
 JDBC_DRIVER_FULLPATH="$DRIVER_BIN_DIR/libs/$JDBC_DRIVER_FILENAME"
