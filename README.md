@@ -135,12 +135,11 @@ Example:
    1. Set environment variables for testing and double-check if all dev environmnet variables are set by running `scripts/env_variables_check.sh`. More info [Environment Variables for Testing Accounts/Secrets ](#environment-variables-for-testing-accounts/secrets)
       Note. Since the environment variables JAVA_HOME, DOCUMENTDB_HOME and ODBC_LIB_PATH are already set in the container, it is not recommended to change those.
    2. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_debug64.sh` or `./build_linux_release64_deb.sh`
-   3. (Optional) Run local ssh tunnel. If the integration tests needed to be checked.
-   4. Run the following command to register the ODBC driver. 
+   3. Run the following command to register the ODBC driver. 
       `./scripts/register_driver_unix.sh`
-   5. set LOCAL_DATABASE_HOST with the ip of your local mongo
+   4. set LOCAL_DATABASE_HOST with the ip of your local mongo
       E.g. If is in another docker container `export LOCAL_DATABASE_HOST=<ip from the mongo docker container>` or if is your host machine `export LOCAL_DATABASE_HOST=host.docker.internal`
-   6. You are ready to run the tests.
+   5. You are ready to run the tests.
    E.g. `cd /documentdb-odbc/build/odbc/bin/ && ./ignite-odbc-tests`
 3. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
@@ -209,9 +208,8 @@ There are two ways to fix the issue.
    5. Set all necessary environment variables and run the following command to register the ODBC driver. 
       `./scripts/register_driver_unix.sh`
    6. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release64.sh`
-   7. Run local ssh tunnel. Make sure to run as background process with '&' in the end of the command line.
-   8. Set environment variables for testing and double-check if all dev environmnet variables are set running `scripts/env_variables_check.sh`.
-   5. set LOCAL_DATABASE_HOST with the ip of your local mongo
+   7. Set environment variables for testing and double-check if all dev environmnet variables are set running `scripts/env_variables_check.sh`.
+   8. set LOCAL_DATABASE_HOST with the ip of your local mongo
       E.g. If is in another docker container `export LOCAL_DATABASE_HOST=<ip from the mongo docker container>` or if is your host machine `export LOCAL_DATABASE_HOST=host.docker.internal`.
    9. You are ready to run the tests.
       E.g. `/documentdb-odbc/build/odbc/bin/ignite-odbc-tests`.
