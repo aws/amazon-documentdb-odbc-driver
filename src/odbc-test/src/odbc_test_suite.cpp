@@ -796,7 +796,8 @@ void OdbcTestSuite::InsertNonFullBatchSelect(int recordsNum, int splitAt) {
 
 void OdbcTestSuite::CreateDsnConnectionStringForRemoteServer(
     std::string& connectionString, bool sshTunnel, const std::string& username,
-    const std::string& miscOptions) const {
+    const std::string& miscOptions,
+    const std::string databasename) const {
   std::string user = common::GetEnv("DOC_DB_USER_NAME", "documentdb");
   std::string password = common::GetEnv("DOC_DB_PASSWORD", "");
   std::string host =
@@ -808,6 +809,10 @@ void OdbcTestSuite::CreateDsnConnectionStringForRemoteServer(
 
   if (!username.empty()) {
     user = username;
+  }
+  std::string database = "test";
+  if (!databasename.empty()) {
+    database = databasename;
   }
 
   std::string sshUser;
@@ -822,7 +827,7 @@ void OdbcTestSuite::CreateDsnConnectionStringForRemoteServer(
   connectionString =
             "DRIVER={Amazon DocumentDB};"
             "HOSTNAME=" + host + ":" + port + ";"
-            "DATABASE=test;"
+            "DATABASE=" + database + ";"
             "USER=" + user + ";"
             "PASSWORD=" + password + ";"
             "TLS=true;"

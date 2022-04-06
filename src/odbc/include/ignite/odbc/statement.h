@@ -476,26 +476,12 @@ class Statement : public diagnostic::DiagnosableAdapter {
   SqlResult::Type InternalClose();
 
   /**
-   * Stop streaming.
-   *
-   * @return Operation result.
-   */
-  SqlResult::Type StopStreaming();
-
-  /**
    * Process internal SQL command.
    *
    * @param query SQL query.
    * @return Operation result.
    */
   SqlResult::Type ProcessInternalCommand(const std::string& query);
-
-  /**
-   * Check if the streaming is active currently.
-   *
-   * @return @c true, if the streaming is active.
-   */
-  bool IsStreamingActive() const;
 
   /**
    * Prepare SQL query.
@@ -519,13 +505,6 @@ class Statement : public diagnostic::DiagnosableAdapter {
    * @return Operation result.
    */
   SqlResult::Type InternalExecuteSqlQuery();
-
-  /**
-   * Process internal query.
-   *
-   * @return Operation result.
-   */
-  SqlResult::Type ProcessInternalQuery();
 
   /**
    * Fetch query result row with offset
