@@ -24,7 +24,7 @@ Foreach-Object {
             -d=$($DATABASE_NAME) -c=$($COLLECTION_NAME)  --jsonArray `
             --file=""$($TEST_INPUT_FOLDER)\$($TEST_FILE_NAME)"""
     # Import the test input
-    C:\ProgramData\chocolatey\lib\mongodb-database-tools\tools\mongodb-database-tools-windows-x86_64-100.5.2\bin\mongoimport -u="$($env:DOC_DB_USER_NAME)" -p="$($env:DOC_DB_PASSWORD)" --authenticationDatabase=admin `
+    C:\ProgramData\chocolatey\lib\mongodb-database-tools\tools\mongodb-database-tools-windows-x86_64-100.5.2\bin\mongoimport.exe -u="$($env:DOC_DB_USER_NAME)" -p="$($env:DOC_DB_PASSWORD)" --authenticationDatabase=admin `
         -d="$($DATABASE_NAME)" -c="$($COLLECTION_NAME)" --jsonArray `
         --file="""$($TEST_INPUT_FOLDER)\$($TEST_FILE_NAME)"""
     if (!$?) {
