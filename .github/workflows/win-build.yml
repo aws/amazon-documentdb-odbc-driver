@@ -28,7 +28,7 @@ env:
   DOC_DB_REMOTE_PORT: 27017
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
   JDBC_DRIVER_VERSION: "1.2.1"
-  MONGO_IMPORT_COMMAND: "C:\ProgramData\chocolatey\lib\mongodb-database-tools\tools\mongodb-database-tools-windows-x86_64-100.5.2binmongoimport.exe"
+  MONGO_IMPORT_COMMAND: "C:/ProgramData/chocolatey/lib/mongodb-database-tools/tools/mongodb-database-tools-windows-x86_64-100.5.2binmongoimport.exe"
 
 jobs:
   build-windows32:
