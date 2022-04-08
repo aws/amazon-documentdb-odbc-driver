@@ -24,7 +24,8 @@
 
 #include "ignite/odbc/common/common.h"
 #include "ignite/odbc/common/concurrent.h"
-
+// -AL- how LOG_MSG is defined in Ignite
+// would likely need to add log levels here too
 #define LOG_MSG(param)                                         \
   if (ignite::odbc::Logger* p = ignite::odbc::Logger::Get()) { \
     ignite::odbc::LogStream lstream(p);                        \
