@@ -122,6 +122,7 @@ set(SOURCES
          ../odbc/src/sql/sql_parser.cpp
          ../odbc/src/sql/sql_set_streaming_command.cpp
          ../odbc/src/sql/sql_utils.cpp
+         ../odbc/src/log_level.cpp
          ../odbc/src/read_preference.cpp
          ../odbc/src/result_page.cpp
          ../odbc/src/row.cpp
