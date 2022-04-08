@@ -40,7 +40,7 @@ Example:
 1. Run the following script to setup MongoDB server on your machine.
    1. `cd src/odbc-test/scripts`
    2. `.\reinstall_mongodb.ps1` (Windows) or `./reinstall_mongodb_mac.sh` (MacOS)
-   Alternativetly, you can run MongoDB in a docker container
+   Alternatively, you can run MongoDB in a docker container
    E.g. `docker run --name mongo -e MONGO_INITDB_ROOT_USERNAME=$DOC_DB_USER_NAME -e MONGO_INITDB_ROOT_PASSWORD=$DOC_DB_PASSWORD -d -p 27017:27017 mongo:latest`
 2. Install the test data
    1. `cd src/odbc-test/scripts`
@@ -178,7 +178,7 @@ There are two ways to fix the issue.
                                  unixodbc-dev \
                                  valgrind 
 ```
-   2. Compile and install mongoc
+   2. Compile and install mongo-cxx-driver
       E.g. 
 ```
            cd /tmp \
@@ -204,7 +204,7 @@ There are two ways to fix the issue.
           && sudo make \
           && sudo make install
 ```
-   4. Install Java if necessary ( correto 17 is recommended) Follow the link
+   4. Install Java if necessary ( correto 17 is recommended) Follow this (link)[https://docs.aws.amazon.com/corretto/latest/corretto-17-ug/generic-linux-install.html] for instructions.
    5. Set all necessary environment variables and run the following command to register the ODBC driver. 
       `./scripts/register_driver_unix.sh`
    6. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release64.sh`
@@ -213,7 +213,6 @@ There are two ways to fix the issue.
       E.g. If is in another docker container `export LOCAL_DATABASE_HOST=<ip from the mongo docker container>` or if is your host machine `export LOCAL_DATABASE_HOST=host.docker.internal`.
    9. You are ready to run the tests.
       E.g. `/documentdb-odbc/build/odbc/bin/ignite-odbc-tests`.
-
 
 
 ### Troubleshooting 

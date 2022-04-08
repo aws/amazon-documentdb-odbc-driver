@@ -26,6 +26,7 @@ env:
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
   JDBC_DRIVER_VERSION: "1.2.1"
   JAVA_HOME: "/usr/lib/jvm/java-17-amazon-corretto/"
+  MONGO_IMPORT_COMMAND: "C:\ProgramData\chocolatey\lib\mongodb-database-tools\tools\mongodb-database-tools-windows-x86_64-100.5.2binmongoimport.exe"
 
 jobs:
   build-linux64:
@@ -107,9 +108,9 @@ jobs:
         cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
         sudo make install
         cd ../..
-        git clone https://github.com/mongodb/mongo-cxx-driver.git       --branch releases/stable --depth 1
+        git clone https://github.com/mongodb/mongo-cxx-driver.git --branch releases/stable --depth 1
         cd mongo-cxx-driver/build
-        cmake ..       -DCMAKE_BUILD_TYPE=Release       -DBSONCXX_POLY_USE_MNMLSTC=1  -DCMAKE_INSTALL_PREFIX=/usr/local
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBSONCXX_POLY_USE_MNMLSTC=1 -DCMAKE_INSTALL_PREFIX=/usr/local
         sudo make install
     
     - name: install-mongocxx
@@ -120,7 +121,7 @@ jobs:
         sudo make install
         cd ../../
         cd mongo-cxx-driver/build
-        cmake ..       -DCMAKE_BUILD_TYPE=Release       -DBSONCXX_POLY_USE_MNMLSTC=1  -DCMAKE_INSTALL_PREFIX=/usr/local
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBSONCXX_POLY_USE_MNMLSTC=1 -DCMAKE_INSTALL_PREFIX=/usr/local
         sudo make
         sudo make install
         
