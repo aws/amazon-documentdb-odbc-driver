@@ -16,6 +16,7 @@
  */
 
 #include "ignite/odbc/log.h"
+#include "ignite/odbc/log_level.h"
 
 #include <cstdlib>
 
@@ -36,9 +37,13 @@ LogStream::~LogStream() {
   }
 }
 
-Logger::Logger(const char* path) : mutex(), stream() {
-  if (path) {
+Logger::Logger(const char* path, const char* level) : mutex(), stream(), logLevel() {
+  if ((std::string)level != "OFF" && path) {
     stream.open(path);
+  }
+  if (level) {
+    logLevel = LogLevel::FromString(level, LogLevel::Type::DEBUG_LEVEL); // -AL- draft code
+    // todo add default level here 
   }
 }
 
@@ -56,9 +61,22 @@ void Logger::WriteMessage(std::string const& message) {
   }
 }
 
+LogLevel::Type Logger::GetLogLevel() {
+  return logLevel;
+}
+
 Logger* Logger::Get() {
-  const char* envVarName = "IGNITE_ODBC_LOG_PATH";
-  static Logger logger(getenv(envVarName));
+  const char* envPathVarName = "DOC_DB_ODBC_LOG_PATH";
+  const char* envLvlVarName = "DOC_DB_LOG_LEVEL";
+  // -AL- note: after PATH variable is changed, need to reopen VS Code to run debug, but don't need to rebuild, I believe
+  // TODO retrieve logging level, only pass in logging level if it is provided 
+  /* static Logger logger(
+      getenv(envPathVarName),
+      getenv(envLvlVarName));  // TODO -AL- add default level here
+      */
+  // static Logger logger(getenv(envPathVarName), "INFO");  // -AL- for testing purpose. 
+  //static Logger logger(getenv(envPathVarName), "ERROR"); //  -AL- for testing purpose. 
+  static Logger logger(getenv(envPathVarName), "OFF"); //  -AL- for testing purpose. 
   return logger.IsEnabled() ? &logger : 0;
 }
 }  // namespace odbc

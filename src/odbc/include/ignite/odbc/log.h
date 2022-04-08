@@ -24,14 +24,61 @@
 
 #include "ignite/odbc/common/common.h"
 #include "ignite/odbc/common/concurrent.h"
+#include "ignite/odbc/log_level.h"
 // -AL- how LOG_MSG is defined in Ignite
 // would likely need to add log levels here too
+// this is a MACRO definition
+// @Deprecated // delete this function definition when all logs are replaced
 #define LOG_MSG(param)                                         \
   if (ignite::odbc::Logger* p = ignite::odbc::Logger::Get()) { \
     ignite::odbc::LogStream lstream(p);                        \
     lstream << __FUNCTION__ << ": " << param;                  \
   }                                                            \
   static_assert(true, "")
+// \ is used as line continuation here.
+// to debug the LOG_MSG macro functions, need to navigate to a place where it is used 
+// and use solar lint to check and make sure it doesn't have red squiggles 
+
+// todo remove extra "xxx msg" in front -AL- // the purpose of adding the 
+// "DEBUG MSG:" is for debugging my logging implementation. 
+#define LOG_DEBUG_MSG(param)                                               \
+  if (ignite::odbc::Logger* p = ignite::odbc::Logger::Get()) {             \
+    if (p->GetLogLevel() <= ignite::odbc::LogLevel::Type::DEBUG_LEVEL) {   \
+      ignite::odbc::LogStream lstream(p);                                  \
+      lstream << "DEBUG MSG: " << __FUNCTION__ << ": " << param;                            \
+    }                                                                      \
+  }                                                                        \
+  static_assert(true, "")
+
+// todo remove extra "xxx msg" in front -AL-
+#define LOG_INFO_MSG(param)                                               \
+  if (ignite::odbc::Logger* p = ignite::odbc::Logger::Get()) {            \
+    if (p->GetLogLevel() <= ignite::odbc::LogLevel::Type::INFO_LEVEL) {   \
+      ignite::odbc::LogStream lstream(p);                                 \
+      lstream << "INFO MSG: " << __FUNCTION__ << ": " << param;                           \
+    }                                                                     \
+  }                                                                       \
+  static_assert(true, "")
+
+// todo remove extra "xxx msg" in front -AL-
+#define LOG_ERROR_MSG(param)                                             \
+  if (ignite::odbc::Logger* p = ignite::odbc::Logger::Get()) {           \
+    if (p->GetLogLevel() <= ignite::odbc::LogLevel::Type::ERROR_LEVEL) { \
+      ignite::odbc::LogStream lstream(p);                                \
+      lstream << "ERROR MSG: " __FUNCTION__ << ": " << param;                          \
+    }                                                                    \
+  }                                                                      \
+  static_assert(true, "")
+
+// -AL- can define a function, ensure it works and Solar Lint says food, then copy it to macro definition
+/* void LG(std::string param) {
+  if (ignite::odbc::Logger* p = ignite::odbc::Logger::Get()) {
+    if (p->GetLogLevel() <= ignite::odbc::LogLevel::Type::DEBUG_LEVEL) {
+        ignite::odbc::LogStream lstream(p);
+        lstream << __FUNCTION__ << ": " << param;
+      }
+  }
+}*/
 
 namespace ignite {
 namespace odbc {
@@ -83,6 +130,12 @@ class Logger {
   static Logger* Get();
 
   /**
+   * Get the logger's set log level.
+   * @return logLevel.
+   */
+  LogLevel::Type GetLogLevel();
+
+  /**
    * Checks if logging is enabled.
    * @return True, if logging is enabled.
    */
@@ -99,7 +152,7 @@ class Logger {
    * Constructor.
    * @param path to log file.
    */
-  Logger(const char* path);
+  Logger(const char* path, const char* level);
 
   /**
    * Destructor.
@@ -113,6 +166,11 @@ class Logger {
 
   /** File stream. */
   std::ofstream stream;
+
+  // TODO -AL- the default logger level should be debug; 
+  // also... could be INFO for common sense, but for purpose of debugging it should be debug?
+  /** Log Level */
+  LogLevel::Type logLevel;
 };
 }  // namespace odbc
 }  // namespace ignite
