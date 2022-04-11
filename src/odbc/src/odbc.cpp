@@ -44,7 +44,7 @@ bool HandleParentWindow(SQLHWND windowHandle,
                         ignite::odbc::config::Configuration& config) {
 #ifdef _WIN32
   if (windowHandle) {
-    LOG_MSG("Parent window is passed. Creating configuration window.");
+    LOG_INFO_MSG("Parent window is passed. Creating configuration window.");
     return DisplayConnectionWindow(windowHandle, config);
   }
 #else
@@ -326,7 +326,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
 
   LOG_DEBUG_MSG("SQLDriverConnect called");
   if (inConnectionString)
-    LOG_MSG("Connection String: [" << inConnectionString << "]");
+    LOG_INFO_MSG("Connection String: [" << inConnectionString << "]");
 
   Connection* connection = reinterpret_cast< Connection* >(conn);
 
@@ -357,7 +357,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
     *outConnectionStringLen = static_cast< SQLSMALLINT >(reslen);
 
   if (outConnectionString)
-    LOG_MSG(outConnectionString);
+    LOG_INFO_MSG(outConnectionString);
 
   LOG_DEBUG_MSG("SQLDriverConnect exiting");
 
@@ -392,7 +392,7 @@ SQLRETURN SQLConnect(SQLHDBC conn, SQLCHAR* serverName,
 
   std::string dsn = SqlStringToString(serverName, serverNameLen);
 
-  LOG_MSG("DSN: " << dsn);
+  LOG_INFO_MSG("DSN: " << dsn);
 
   odbc::ReadDsnConfiguration(dsn.c_str(), config,
                              &connection->GetDiagnosticRecords());
@@ -442,7 +442,7 @@ SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLCHAR* query, SQLINTEGER queryLen) {
 
   std::string sql = SqlStringToString(query, queryLen);
 
-  LOG_MSG("SQL: " << sql);
+  LOG_INFO_MSG("SQL: " << sql);
 
   statement->PrepareSqlQuery(sql);
 
@@ -489,7 +489,7 @@ SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLCHAR* query, SQLINTEGER queryLen) {
 
   std::string sql = SqlStringToString(query, queryLen);
 
-  LOG_MSG("SQL: " << sql);
+  LOG_INFO_MSG("SQL: " << sql);
 
   statement->ExecuteSqlQuery(sql);
 
@@ -532,7 +532,6 @@ SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT colNum, SQLSMALLINT targetType,
 SQLRETURN SQLFetch(SQLHSTMT stmt) {
   using odbc::Statement;
 
-  // LOG_MSG("SQLFetch called");
   LOG_DEBUG_MSG("SQLFetch called");  // add "debug msg" temporarily
   LOG_INFO_MSG("SQLFetch called");   // -AL- remove later
   LOG_ERROR_MSG("SQLFetch called");  // -AL- remove after testing different log
@@ -559,7 +558,7 @@ SQLRETURN SQLFetchScroll(SQLHSTMT stmt, SQLSMALLINT orientation,
   using odbc::Statement;
 
   LOG_DEBUG_MSG("SQLFetchScroll called");
-  LOG_MSG("Orientation: " << orientation << " Offset: " << offset);
+  LOG_INFO_MSG("Orientation: " << orientation << " Offset: " << offset);
 
   Statement* statement = reinterpret_cast< Statement* >(stmt);
 
@@ -617,7 +616,7 @@ SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnNum) {
 
   if (columnNum) {
     *columnNum = static_cast< SQLSMALLINT >(res);
-    LOG_MSG("columnNum: " << *columnNum);
+    LOG_INFO_MSG("columnNum: " << *columnNum);
   }
 
   LOG_DEBUG_MSG("SQLNumResultCols exiting");
@@ -649,10 +648,10 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLCHAR* catalogName,
   std::string table = SqlStringToString(tableName, tableNameLen);
   std::string tableTypeStr = SqlStringToString(tableType, tableTypeLen);
 
-  LOG_MSG("catalog: " << catalog);
-  LOG_MSG("schema: " << schema);
-  LOG_MSG("table: " << table);
-  LOG_MSG("tableType: " << tableTypeStr);
+  LOG_INFO_MSG("catalog: " << catalog);
+  LOG_INFO_MSG("schema: " << schema);
+  LOG_INFO_MSG("table: " << table);
+  LOG_INFO_MSG("tableType: " << tableTypeStr);
 
   statement->ExecuteGetTablesMetaQuery(catalog, schema, table, tableTypeStr);
 
@@ -685,10 +684,10 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLCHAR* catalogName,
   std::string table = SqlStringToString(tableName, tableNameLen);
   std::string column = SqlStringToString(columnName, columnNameLen);
 
-  LOG_MSG("catalog: " << catalog);
-  LOG_MSG("schema: " << schema);
-  LOG_MSG("table: " << table);
-  LOG_MSG("column: " << column);
+  LOG_INFO_MSG("catalog: " << catalog);
+  LOG_INFO_MSG("schema: " << schema);
+  LOG_INFO_MSG("table: " << table);
+  LOG_INFO_MSG("column: " << column);
 
   statement->ExecuteGetColumnsMetaQuery(catalog, schema, table, column);
 
@@ -847,15 +846,15 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
   statement->GetColumnAttribute(columnNum, SQL_DESC_NULLABLE, 0, 0, 0,
                                 &nullableRes);
 
-  LOG_MSG("columnNum: " << columnNum);
-  LOG_MSG("dataTypeRes: " << dataTypeRes);
-  LOG_MSG("columnSizeRes: " << columnSizeRes);
-  LOG_MSG("decimalDigitsRes: " << decimalDigitsRes);
-  LOG_MSG("nullableRes: " << nullableRes);
-  LOG_MSG("columnNameBuf: "
+  LOG_INFO_MSG("columnNum: " << columnNum);
+  LOG_INFO_MSG("dataTypeRes: " << dataTypeRes);
+  LOG_INFO_MSG("columnSizeRes: " << columnSizeRes);
+  LOG_INFO_MSG("decimalDigitsRes: " << decimalDigitsRes);
+  LOG_INFO_MSG("nullableRes: " << nullableRes);
+  LOG_INFO_MSG("columnNameBuf: "
           << (columnNameBuf ? reinterpret_cast< const char* >(columnNameBuf)
                             : "<null>"));
-  LOG_MSG("columnNameLen: " << (columnNameLen ? *columnNameLen : -1));
+  LOG_INFO_MSG("columnNameLen: " << (columnNameLen ? *columnNameLen : -1));
 
   if (dataType)
     *dataType = static_cast< SQLSMALLINT >(dataTypeRes);
@@ -890,7 +889,7 @@ SQLRETURN SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCnt) {
 
   int64_t res = statement->AffectedRows();
 
-  LOG_MSG("Row count: " << res);
+  LOG_INFO_MSG("Row count: " << res);
 
   if (rowCnt)
     *rowCnt = static_cast< SQLLEN >(res);
@@ -935,12 +934,12 @@ SQLRETURN SQLForeignKeys(
   std::string foreignTable =
       SqlStringToString(foreignTableName, foreignTableNameLen);
 
-  LOG_MSG("primaryCatalog: " << primaryCatalog);
-  LOG_MSG("primarySchema: " << primarySchema);
-  LOG_MSG("primaryTable: " << primaryTable);
-  LOG_MSG("foreignCatalog: " << foreignCatalog);
-  LOG_MSG("foreignSchema: " << foreignSchema);
-  LOG_MSG("foreignTable: " << foreignTable);
+  LOG_INFO_MSG("primaryCatalog: " << primaryCatalog);
+  LOG_INFO_MSG("primarySchema: " << primarySchema);
+  LOG_INFO_MSG("primaryTable: " << primaryTable);
+  LOG_INFO_MSG("foreignCatalog: " << foreignCatalog);
+  LOG_INFO_MSG("foreignSchema: " << foreignSchema);
+  LOG_INFO_MSG("foreignTable: " << foreignTable);
 
   statement->ExecuteGetForeignKeysQuery(primaryCatalog, primarySchema,
                                         primaryTable, foreignCatalog,
@@ -1031,9 +1030,9 @@ SQLRETURN SQLPrimaryKeys(SQLHSTMT stmt, SQLCHAR* catalogName,
   std::string schema = SqlStringToString(schemaName, schemaNameLen);
   std::string table = SqlStringToString(tableName, tableNameLen);
 
-  LOG_MSG("catalog: " << catalog);
-  LOG_MSG("schema: " << schema);
-  LOG_MSG("table: " << table);
+  LOG_INFO_MSG("catalog: " << catalog);
+  LOG_INFO_MSG("schema: " << schema);
+  LOG_INFO_MSG("table: " << table);
 
   statement->ExecuteGetPrimaryKeysQuery(catalog, schema, table);
 
@@ -1331,7 +1330,7 @@ SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER value,
   using odbc::Environment;
 
   LOG_DEBUG_MSG("SQLSetEnvAttr called");
-  LOG_MSG("Attribute: " << attr << ", Value: " << (size_t)value);
+  LOG_INFO_MSG("Attribute: " << attr << ", Value: " << (size_t)value);
 
   Environment* environment = reinterpret_cast< Environment* >(env);
 
@@ -1402,9 +1401,9 @@ SQLRETURN SQLSpecialColumns(SQLHSTMT stmt, SQLSMALLINT idType,
   std::string schema = SqlStringToString(schemaName, schemaNameLen);
   std::string table = SqlStringToString(tableName, tableNameLen);
 
-  LOG_MSG("catalog: " << catalog);
-  LOG_MSG("schema: " << schema);
-  LOG_MSG("table: " << table);
+  LOG_INFO_MSG("catalog: " << catalog);
+  LOG_INFO_MSG("schema: " << schema);
+  LOG_INFO_MSG("table: " << table);
 
   statement->ExecuteSpecialColumnsQuery(idType, catalog, schema, table, scope,
                                         nullable);
