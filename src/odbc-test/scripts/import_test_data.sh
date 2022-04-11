@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ##################################################
 # Assumptions
@@ -6,7 +6,12 @@
 # 2. Mongo started with the environment variables DOC_DB_USER_NAME and DOC_DB_PASSWORD
 ##################################################
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  SCRIPT_DIR=$( cd -- "$( dirname -- $0 )"  && pwd )
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+fi
+
 TEST_INPUT_FOLDER="${SCRIPT_DIR}/../input"
 DATABASE_NAME="odbc-test"
 
