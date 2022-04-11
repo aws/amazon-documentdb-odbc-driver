@@ -430,7 +430,8 @@ SQLRETURN SQLFetch(SQLHSTMT stmt) {
   // LOG_MSG("SQLFetch called");
   LOG_DEBUG_MSG("SQLFetch called"); // add "debug msg" temporarily 
   LOG_INFO_MSG("SQLFetch called"); // -AL- remove later
-  LOG_ERROR_MSG("SQLFetch called"); // -AL- remove after testing different log levels complete
+  LOG_ERROR_MSG("SQLFetch called");  // -AL- remove after testing different log
+                                     // levels complete
 
   Statement* statement = reinterpret_cast< Statement* >(stmt);
 

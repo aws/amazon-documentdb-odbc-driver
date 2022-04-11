@@ -45,7 +45,7 @@
   if (ignite::odbc::Logger* p = ignite::odbc::Logger::Get()) {             \
     if (p->GetLogLevel() <= ignite::odbc::LogLevel::Type::DEBUG_LEVEL) {   \
       ignite::odbc::LogStream lstream(p);                                  \
-      lstream << "DEBUG MSG: " << __FUNCTION__ << ": " << param;                            \
+      lstream << "DEBUG MSG: " << __FUNCTION__ << ": " << param;           \
     }                                                                      \
   }                                                                        \
   static_assert(true, "")
@@ -55,7 +55,7 @@
   if (ignite::odbc::Logger* p = ignite::odbc::Logger::Get()) {            \
     if (p->GetLogLevel() <= ignite::odbc::LogLevel::Type::INFO_LEVEL) {   \
       ignite::odbc::LogStream lstream(p);                                 \
-      lstream << "INFO MSG: " << __FUNCTION__ << ": " << param;                           \
+      lstream << "INFO MSG: " << __FUNCTION__ << ": " << param;           \
     }                                                                     \
   }                                                                       \
   static_assert(true, "")
@@ -65,7 +65,7 @@
   if (ignite::odbc::Logger* p = ignite::odbc::Logger::Get()) {           \
     if (p->GetLogLevel() <= ignite::odbc::LogLevel::Type::ERROR_LEVEL) { \
       ignite::odbc::LogStream lstream(p);                                \
-      lstream << "ERROR MSG: " __FUNCTION__ << ": " << param;                          \
+      lstream << "ERROR MSG: " << __FUNCTION__ << ": " << param;            \
     }                                                                    \
   }                                                                      \
   static_assert(true, "")
