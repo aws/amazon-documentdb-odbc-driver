@@ -70,13 +70,13 @@ Logger* Logger::Get() {
   const char* envLvlVarName = "DOC_DB_LOG_LEVEL";
   // -AL- note: after PATH variable is changed, need to reopen VS Code to run debug, but don't need to rebuild, I believe
   // TODO retrieve logging level, only pass in logging level if it is provided 
-  /* static Logger logger(
+  static Logger logger(
       getenv(envPathVarName),
       getenv(envLvlVarName));  // TODO -AL- add default level here
-      */
+      
   // static Logger logger(getenv(envPathVarName), "INFO");  // -AL- for testing purpose. 
   //static Logger logger(getenv(envPathVarName), "ERROR"); //  -AL- for testing purpose. 
-  static Logger logger(getenv(envPathVarName), "OFF"); //  -AL- for testing purpose. 
+  // static Logger logger(getenv(envPathVarName), "OFF"); //  -AL- for testing purpose. 
   return logger.IsEnabled() ? &logger : 0;
 }
 }  // namespace odbc
