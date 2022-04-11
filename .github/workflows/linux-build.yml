@@ -1,4 +1,4 @@
-name: ODBC Driver for Mac
+name: ODBC Driver for Linux
 
 on:
   push:
@@ -24,30 +24,37 @@ env:
   DOC_DB_LOCAL_PORT: 27019
   DOC_DB_REMOTE_PORT: 27017
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
-  DOC_DB_ODBC_INTEGRATION_TEST: 1
   JDBC_DRIVER_VERSION: "1.2.1"
+  JAVA_HOME: "/usr/lib/jvm/java-17-amazon-corretto/"
 
 jobs:
-  build-mac:
-    runs-on: macos-11
+  build-linux64:
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: Get Java distribution
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-        architecture: x64
+      run: | 
+        sudo apt-get -y install software-properties-common
+        wget -O- https://apt.corretto.aws/corretto.key | sudo apt-key add -
+        sudo apt-add-repository 'deb https://apt.corretto.aws stable main'
+        sudo apt-get update
+        sudo apt-get install -y java-17-amazon-corretto-jdk
+        
+    - name: Get latest version of CMake
+      uses: lukka/get-cmake@latest
+    
     - name: run-cppcheck
       run: |
-        brew install cppcheck
+        sudo apt install cppcheck
         sh run_cppcheck.sh
+  
     - name: upload-cppcheck-results
       if: failure()
       uses: actions/upload-artifact@v2
       with:
         name: cppcheck-results
         path: cppcheck-results.log
+  
     - name: Extract key-pair into file
       run: |
         mkdir ~/certs
@@ -55,13 +62,10 @@ jobs:
         chmod 400 ${{env.DOC_DB_PRIV_KEY_FILE}}
 
     - name: get-dependencies
+      if: success()
       run: |
-        brew tap homebrew/services
-        brew install unixodbc
-        brew install cmake
-        brew install openssl
-        brew install boost
-        brew install mongo-cxx-driver
+        sudo apt update
+        sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib linux-headers-$(uname -r) build-essential valgrind libboost-all-dev libbson-dev libsasl2-dev lcov
 
     - name: Cache DocumentDB JDBC JAR
       id: cache-documentdb-jdbc-jar
@@ -83,87 +87,71 @@ jobs:
         mkdir -p ${{env.ODBC_BIN_PATH}}/libs
         cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
 
+    - name: build-and-install-mongocxx
+      run: |
+        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.21.1/mongo-c-driver-1.21.1.tar.gz
+        tar xzf mongo-c-driver-1.21.1.tar.gz
+        cd mongo-c-driver-1.21.1
+        mkdir -p cmake-build
+        cd cmake-build
+        cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
+        sudo make install
+        cd ../..
+        git clone https://github.com/mongodb/mongo-cxx-driver.git --branch releases/stable --depth 1
+        cd mongo-cxx-driver/build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBSONCXX_POLY_USE_MNMLSTC=1 -DCMAKE_INSTALL_PREFIX=/usr/local
+        sudo make install
+    
+    - name: install-mongocxx
+      run: |
+        cd mongo-c-driver-1.21.1/cmake-build
+        cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
+        sudo make
+        sudo make install
+        cd ../../
+        cd mongo-cxx-driver/build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBSONCXX_POLY_USE_MNMLSTC=1 -DCMAKE_INSTALL_PREFIX=/usr/local
+        sudo make
+        sudo make install
+        
     - name: configure-and-build-driver
       run: |
-        ./build_mac_release64.sh
-      env:
-        OPENSSL_ROOT_DIR: /usr/local/opt/openssl
-    # - name: prepare-dsn
-    #   run: |
-    #     sudo mkdir /Library/ODBC
-    #     sudo cp ./src/Tests/Tests/odbc-mac.ini /Library/ODBC/odbc.ini
-    #     sudo cp ./src/Tests/Tests/odbcinst-mac.ini /Library/ODBC/odbcinst.ini
-    #     mkdir ${{ github.workspace }}/odbc-logs
+        ./build_linux_release64_deb.sh
+
     - name: register-odbc-driver
       run: |
+        chmod +r -R ${{env.ODBC_LIB_PATH}}
         chmod +x scripts/register_driver_unix.sh
-        ./scripts/register_driver_unix.sh
-    - name: Setup MongoDB
+        sudo bash scripts/register_driver_unix.sh
+
+    - name: set-up-local-mongodb
       run: |
-        chmod +x ./src/odbc-test/scripts/reinstall_mongodb_mac.sh
-        ./src/odbc-test/scripts/reinstall_mongodb_mac.sh
-    - name: Import test data
-      run: |
+        docker run --name mongo -e MONGO_INITDB_ROOT_USERNAME=${{env.DOC_DB_USER_NAME}} -e MONGO_INITDB_ROOT_PASSWORD=${{env.DOC_DB_PASSWORD}} -d -p 27017:27017 mongo:latest
         chmod +x ./src/odbc-test/scripts/import_test_data.sh
         ./src/odbc-test/scripts/import_test_data.sh
+
     # - name: run-tests
     #   run: |
     #     ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
     #     ./build/odbc/bin/ignite-odbc-tests
+  
     - name: upload-test-report
       if: always()
       uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
       with:
-        check_name: "MacOS Big Sur 11 Build Unit Test Results Check"
-        comment_title: "MacOS Big Sur 11 Build Unit Test Results"
+        check_name: "Ubuntu 20.04 Build Unit Test Results Check"
+        comment_title: "Ubuntu 20.04 Build Unit Test Results"
         files: ./odbc_test_result.xml
-    # - name: print-memory-leak-logs
-    #   if: always()
-    #   run: |
-    #     cat ./leaks_*
-    # - name: upload-test-logs
-    #   if: failure()
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: test-logs-mac64
-    #     path: |
-    #       ${{ github.workspace }}/odbc-logs/
-    #       ${{ github.workspace }}/leaks_
-    # - name: test
-    #   run: |
-    #     bash ./run_test_runner.sh
-    # - name: build-installer
-    #   if: success()
-    #   run: |
-    #     cd cmake-build64
-    #     cmake ../src
-    #     make
-    #     cpack .
-    #     cd ..
-    # - name: create-output
-    #   if: success()
-    #   run: |
-    #     mkdir build-output
-    #     mkdir test-output
-    #     mkdir installer
-    #     cp ./build/odbc/lib/*.dylib build-output/
-    #     cp ./build/odbc/lib/*.a build-output/
-    #     cp ./cmake-build64/*.pkg installer/
-    # - name: upload-build
-    #   if: success()
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: mac64-build
-    #     path: build-output
-    # - name: upload-installer
-    #   if: success()
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: mac64-installer
-    #     path: installer
-    # - name: upload-test-results
-    #   if: success()
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: mac-test-results
-    #     path: test-output
+  
+  build-linux-docker-image:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: build-image
+      run: |
+        cd docker/linux-environment
+        docker build -t documentdb-dev-linux . 
+
+
+# TODO Linux build enhacements 
+#https://bitquill.atlassian.net/browse/AD-688

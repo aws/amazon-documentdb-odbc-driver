@@ -417,8 +417,7 @@ void performance::PerformanceTestRunner::RecordExecBindFetch(
     // Query
     std::string temp_str =
         test_case.query + " LIMIT " + std::to_string(test_case.limit);
-    std::wstring_convert< std::codecvt_utf8< wchar_t > > converter;
-    test_string query = converter.from_bytes(temp_str);
+    test_string query = to_test_string(temp_str);
 
     // Iterate and execute query -> bind -> fetch and record time
     for (int iter = 0; iter < test_case.num_iterations; iter++) {

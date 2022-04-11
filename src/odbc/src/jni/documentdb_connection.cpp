@@ -33,7 +33,7 @@ JniErrorCode DocumentDbConnection::Open(const Configuration& config,
   bool connected = false;
 
   if (!_jniContext.IsValid()) {
-    errInfo.errMsg = new char[]{"Unable to get initialized JVM."};
+    errInfo.errMsg = "Unable to get initialized JVM.";
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_JVM_INIT;
     return errInfo.code;
   }
