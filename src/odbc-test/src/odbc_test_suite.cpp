@@ -830,6 +830,7 @@ void OdbcTestSuite::CreateDsnConnectionStringForRemoteServer(
             "DATABASE=" + database + ";"
             "USER=" + user + ";"
             "PASSWORD=" + password + ";"
+            "TLS=true;"
             "TLS_ALLOW_INVALID_HOSTNAMES=true;";
 
   if (sshTunnel && !sshUserAtHost.empty() && !sshPrivKeyFile.empty()
@@ -851,7 +852,7 @@ void OdbcTestSuite::CreateDsnConnectionStringForLocalServer(
                          ? userName
                          : common::GetEnv("DOC_DB_USER_NAME", "documentdb");
   std::string password = common::GetEnv("DOC_DB_PASSWORD", "");
-  std::string host = "localhost";
+  std::string host = common::GetEnv("LOCAL_DATABASE_HOST", "localhost");
   std::string port = "27017";
   std::string database =
       databaseName.size() > 0 ? databaseName : "odbc-test";
