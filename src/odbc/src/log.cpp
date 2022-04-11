@@ -38,13 +38,15 @@ LogStream::~LogStream() {
 }
 
 Logger::Logger(const char* path, const char* level) : mutex(), stream(), logLevel() {
-  if ((std::string)level != "OFF" && path) {
+  if (level) {
+    logLevel = LogLevel::FromString(
+        level, LogLevel::Type::INFO_LEVEL);  // -AL- draft code
+    // todo add default level here // APR-11: for now, have INFO level
+  }
+  if (logLevel != LogLevel::Type::OFF && path) {
     stream.open(path);
   }
-  if (level) {
-    logLevel = LogLevel::FromString(level, LogLevel::Type::DEBUG_LEVEL); // -AL- draft code
-    // todo add default level here 
-  }
+
 }
 
 Logger::~Logger() {
