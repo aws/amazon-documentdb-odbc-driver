@@ -67,15 +67,6 @@ jobs:
         sudo apt update
         sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib linux-headers-$(uname -r) build-essential valgrind libboost-all-dev libbson-dev libsasl2-dev lcov
 
-    # - name: cache-build-and-install-mongocxx
-    #   id: cache-build-and-install-mongocxx
-    #   uses: actions/cache@v3
-    #   with:
-    #     path: | 
-    #       mongo-c-driver-1.21.1
-    #       mongo-cxx-driver
-    #     key: ${{ runner.os }}-build-and-install-mongocxx
-
     - name: Cache DocumentDB JDBC JAR
       id: cache-documentdb-jdbc-jar
       uses: actions/cache@v3
@@ -97,7 +88,6 @@ jobs:
         cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
 
     - name: build-and-install-mongocxx
-      # if: steps.cache-build-and-install-mongocxx.outputs.cache-hit != 'true'
       run: |
         wget https://github.com/mongodb/mongo-c-driver/releases/download/1.21.1/mongo-c-driver-1.21.1.tar.gz
         tar xzf mongo-c-driver-1.21.1.tar.gz
@@ -140,10 +130,10 @@ jobs:
         chmod +x ./src/odbc-test/scripts/import_test_data.sh
         ./src/odbc-test/scripts/import_test_data.sh
 
-    - name: run-tests
-      run: |
-        ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
-        ./build/odbc/bin/ignite-odbc-tests
+    # - name: run-tests
+    #   run: |
+    #     ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
+    #     ./build/odbc/bin/ignite-odbc-tests
   
     - name: upload-test-report
       if: always()
