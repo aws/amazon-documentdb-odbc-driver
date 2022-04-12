@@ -297,24 +297,24 @@ Column::Column(BinaryReaderImpl& reader)
 app::ConversionResult::Type Column::ReadToBuffer(
     BinaryReaderImpl& reader, app::ApplicationDataBuffer& dataBuf) {
   if (!IsValid())
-    return app::ConversionResult::AI_FAILURE;
+    return app::ConversionResult::Type::AI_FAILURE;
 
   if (GetUnreadDataLength() == 0) {
     dataBuf.PutNull();
 
-    return app::ConversionResult::AI_NO_DATA;
+    return app::ConversionResult::Type::AI_NO_DATA;
   }
 
   InteropInputStream* stream = reader.GetStream();
 
   if (!stream)
-    return app::ConversionResult::AI_FAILURE;
+    return app::ConversionResult::Type::AI_FAILURE;
 
   InteropStreamPositionGuard< InteropInputStream > guard(*stream);
 
   stream->Position(startPos);
 
-  app::ConversionResult::Type convRes = app::ConversionResult::AI_SUCCESS;
+  app::ConversionResult::Type convRes = app::ConversionResult::Type::AI_SUCCESS;
 
   switch (type) {
     case IGNITE_TYPE_BYTE: {
@@ -409,7 +409,7 @@ app::ConversionResult::Type Column::ReadToBuffer(
       int32_t len;
 
       if (!GetObjectLength(*stream, len))
-        return app::ConversionResult::AI_FAILURE;
+        return app::ConversionResult::Type::AI_FAILURE;
 
       std::vector< int8_t > data(len);
 
@@ -476,7 +476,7 @@ app::ConversionResult::Type Column::ReadToBuffer(
     }
 
     default:
-      return app::ConversionResult::AI_UNSUPPORTED_CONVERSION;
+      return app::ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
   }
 
   return convRes;
