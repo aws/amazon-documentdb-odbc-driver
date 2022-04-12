@@ -771,6 +771,7 @@ void RegisterNatives(JNIEnv* env) {
 JniContext::JniContext(JniJvm* jvm, JniHandlers const& hnds)
     : jvm(jvm), hnds(hnds) {
   // No-op.
+  LOG_DEBUG_MSG("JniContext constructor called, and exiting");
 }
 
 void GetJniErrorMessage(std::string& errMsg, jint res) {
