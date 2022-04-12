@@ -305,15 +305,15 @@ void DataQuery::ReadJdbcColumnMetadataVector(
 SqlResult::Type DataQuery::ProcessConversionResult(
     app::ConversionResult::Type convRes, int32_t rowIdx, int32_t columnIdx) {
   switch (convRes) {
-    case app::ConversionResult::AI_SUCCESS: {
+    case app::ConversionResult::Type::AI_SUCCESS : {
       return SqlResult::AI_SUCCESS;
     }
 
-    case app::ConversionResult::AI_NO_DATA: {
+    case app::ConversionResult::Type::AI_NO_DATA: {
       return SqlResult::AI_NO_DATA;
     }
 
-    case app::ConversionResult::AI_VARLEN_DATA_TRUNCATED: {
+    case app::ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED: {
       diag.AddStatusRecord(
           SqlState::S01004_DATA_TRUNCATED,
           "Buffer is too small for the column data. Truncated from the right.",
@@ -322,7 +322,7 @@ SqlResult::Type DataQuery::ProcessConversionResult(
       return SqlResult::AI_SUCCESS_WITH_INFO;
     }
 
-    case app::ConversionResult::AI_FRACTIONAL_TRUNCATED: {
+    case app::ConversionResult::Type::AI_FRACTIONAL_TRUNCATED: {
       diag.AddStatusRecord(
           SqlState::S01S07_FRACTIONAL_TRUNCATION,
           "Buffer is too small for the column data. Fraction truncated.",
@@ -331,7 +331,7 @@ SqlResult::Type DataQuery::ProcessConversionResult(
       return SqlResult::AI_SUCCESS_WITH_INFO;
     }
 
-    case app::ConversionResult::AI_INDICATOR_NEEDED: {
+    case app::ConversionResult::Type::AI_INDICATOR_NEEDED: {
       diag.AddStatusRecord(
           SqlState::S22002_INDICATOR_NEEDED,
           "Indicator is needed but not suplied for the column buffer.", rowIdx,
@@ -340,7 +340,7 @@ SqlResult::Type DataQuery::ProcessConversionResult(
       return SqlResult::AI_SUCCESS_WITH_INFO;
     }
 
-    case app::ConversionResult::AI_UNSUPPORTED_CONVERSION: {
+    case app::ConversionResult::Type::AI_UNSUPPORTED_CONVERSION: {
       diag.AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
                            "Data conversion is not supported.", rowIdx,
                            columnIdx);
@@ -348,7 +348,7 @@ SqlResult::Type DataQuery::ProcessConversionResult(
       return SqlResult::AI_SUCCESS_WITH_INFO;
     }
 
-    case app::ConversionResult::AI_FAILURE:
+    case app::ConversionResult::Type::AI_FAILURE:
     default: {
       diag.AddStatusRecord(SqlState::S01S01_ERROR_IN_ROW,
                            "Can not retrieve row column.", rowIdx, columnIdx);
