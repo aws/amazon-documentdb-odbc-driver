@@ -23,6 +23,7 @@ lib64/*
 include/*
 packages/*
 odbc_test_result.xml
+sample/build
 # Visual Studio 
 .vs/*
 src/.vs/*
