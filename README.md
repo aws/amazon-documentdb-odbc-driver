@@ -77,7 +77,7 @@ Example:
    build script run above, downloads it to the `<repo-folder>\build\odbc\bin\Debug\libs` folder.
 8. Open a **64-bit** command shell or **64-bit** PowerShell window, **as Administrator**, run the 
    ```
-   <repo-folder>\src\odbc\src\install\install_amd64.cmd <repo-folder>\buildbuild\odbc\cmake\Debug\ignite.odbc.dll
+   .\<repo-folder>\src\odbc\install\install_amd64.cmd <repo-folder>\build\odbc\cmake\Debug\ignite.odbc.dll
    ``` 
 9. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
