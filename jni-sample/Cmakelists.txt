@@ -15,32 +15,25 @@
 # limitations under the License.
 #
 
-project(sample-odbc)
-
-cmake_minimum_required(VERSION 3.20)
-
+project(jni-sample)
+cmake_minimum_required(VERSION 3.22)
 set(TARGET ${PROJECT_NAME})
 
-find_package(ODBC REQUIRED)
+find_package(Java REQUIRED)
+find_package(JNI REQUIRED)
+include(UseJava)
 
-include_directories(SYSTEM ${ODBC_INCLUDE_DIRS})
+include_directories(SYSTEM  ${JNI_INCLUDE_DIRS})
 include_directories(include)
 
-set(SOURCES odbc.cpp)
 
+set(SOURCES sample.cpp)
 add_executable(${TARGET} ${SOURCES})
+
 
 include_directories(${OS_INCLUDE})
 
-target_link_libraries(${TARGET} ${ODBC_LIBRARIES})
-target_link_libraries(${TARGET} dl)
+target_link_libraries(${TARGET} ${JNI_LIBRARIES})
 
-if (WIN32)
-    if (MSVC_VERSION GREATER_EQUAL 1900)
-        target_link_libraries(${TARGET} legacy_stdio_definitions odbccp32 shlwapi)
-    endif()
-elseif(APPLE)
-    target_link_libraries(${TARGET} iodbc iodbcinst)
-else()
-    target_link_libraries(${TARGET} odbcinst)
-endif()
+target_include_directories(${TARGET} INTERFACE include)
+

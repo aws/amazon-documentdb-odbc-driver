@@ -84,9 +84,16 @@ add_subdirectory(binary)
 
 if (${WITH_CORE} OR ${WITH_TESTS})
     add_subdirectory(core)
+
 endif()
 
 if (${WITH_TESTS})
+    #add_subdirectory(odbc-gtest)
+    include(gtest/googletest.cmake)
+    fetch_googletest(
+        ${PROJECT_SOURCE_DIR}/gtest
+        ${PROJECT_BINARY_DIR}/googletest
+        )
     enable_testing()
 
     if (EXISTS ${CMAKE_SOURCE_DIR}/core-test)

@@ -24,6 +24,9 @@ include/*
 packages/*
 odbc_test_result.xml
 sample/build
+jni-sample/build
+src/gtest 
+src/odbc-gtest
 # Visual Studio 
 .vs/*
 src/.vs/*
