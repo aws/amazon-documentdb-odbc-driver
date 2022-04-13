@@ -17,8 +17,11 @@
 
 #include "ignite/odbc/log.h"
 #include "ignite/odbc/log_level.h"
+#include "ignite/odbc/config/configuration.h"
 
 #include <cstdlib>
+
+using ignite::odbc::config::Configuration;
 
 namespace ignite {
 namespace odbc {
@@ -37,6 +40,24 @@ LogStream::~LogStream() {
   }
 }
 
+
+void Logger::SetLogPath(std::string path) {
+  logPath = path;
+}
+
+
+void Logger::SetLogLevel(LogLevel::Type level) {
+  logLevel = level;
+}
+
+Logger::Logger(std::string path, LogLevel::Type level)
+    : mutex(), stream(), logLevel(level) {
+  if (logLevel != LogLevel::Type::OFF && !path.empty()) {
+    stream.open(path);
+  }
+}
+
+// -AL- todo remove later
 Logger::Logger(const char* path, const char* level) : mutex(), stream(), logLevel() {
   if (level) {
     logLevel = LogLevel::FromString(
@@ -68,13 +89,29 @@ LogLevel::Type Logger::GetLogLevel() {
 }
 
 Logger* Logger::Get() {
+  // -AL- todo: get log path from DSN config
+
+  /*
+  // this works, but is wrong
+  LogLevel::Type logLevel1 = LogLevel::Type::UNKNOWN;
+  std::string logPath1 = "xx";
+  static Logger logger(logPath1, logLevel1);
+  */
+
+  /*config::Configuration config;  // -AL- todo find way to initialize config
+  // Think I probably need to get the connection string somehow?
+  // this config is the default config, filled with default values. 
+  static Logger logger(config.GetLogPath(), config.GetLogLevel());
+  */
+
+  
   const char* envPathVarName = "DOC_DB_ODBC_LOG_PATH";
   const char* envLvlVarName = "DOC_DB_LOG_LEVEL";
   // -AL- note: after PATH variable is changed, need to reopen VS Code to run debug, but don't need to rebuild, I believe
   // TODO retrieve logging level, only pass in logging level if it is provided 
   static Logger logger(
       getenv(envPathVarName),
-      getenv(envLvlVarName));  // TODO -AL- add default level here
+      getenv(envLvlVarName));
       
   // static Logger logger(getenv(envPathVarName), "INFO");  // -AL- for testing purpose. 
   //static Logger logger(getenv(envPathVarName), "ERROR"); //  -AL- for testing purpose. 

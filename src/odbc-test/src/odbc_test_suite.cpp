@@ -856,6 +856,8 @@ void OdbcTestSuite::CreateDsnConnectionStringForLocalServer(
   std::string port = "27017";
   std::string database =
       databaseName.size() > 0 ? databaseName : "odbc-test";
+  std::string logPath = common::GetEnv("DOC_DB_ODBC_LOG_PATH", ""); // -AL- todo need to delete log file later
+  std::string logLevel = common::GetEnv("DOC_DB_LOG_LEVEL", "");
 
   connectionString =
     "DRIVER={Amazon DocumentDB};"
@@ -863,7 +865,9 @@ void OdbcTestSuite::CreateDsnConnectionStringForLocalServer(
     "DATABASE=" + database + ";"
     "USER=" + user + ";"
     "PASSWORD=" + password + ";"
-    "TLS=false;";
+    "TLS=false;"
+    "LOG_PATH=" + logPath + ";"
+    "LOG_LEVEL=" + logLevel + ";";
 
   if (miscOptions.size() > 0) {
     connectionString.append(miscOptions);

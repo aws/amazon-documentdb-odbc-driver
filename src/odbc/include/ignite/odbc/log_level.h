@@ -28,7 +28,8 @@ struct LogLevel {
     INFO_LEVEL,
     ERROR_LEVEL,
     // -AL- referring by ERROR_LEVEL instad of ERROR becase ERROR causes a conflict of definition on Windows 
-    OFF
+    OFF,
+    UNKNOWN
   };
 
   /**
@@ -38,7 +39,7 @@ struct LogLevel {
    * @param dflt Default value to return on error.
    * @return Corresponding enum value.
    */
-  static Type FromString(const std::string& val, Type dflt = Type::INFO_LEVEL);
+  static Type FromString(const std::string& val, Type dflt = Type::UNKNOWN);
 
   /**
    * Convert log level to string.

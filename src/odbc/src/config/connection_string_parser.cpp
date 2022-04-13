@@ -55,6 +55,8 @@ const std::string ConnectionStringParser::Key::sshStrictHostKeyChecking =
     "ssh_strict_host_key_checking";
 const std::string ConnectionStringParser::Key::sshKnownHostsFile =
     "ssh_known_hosts_file";
+const std::string ConnectionStringParser::Key::logLevel = "log_level";
+const std::string ConnectionStringParser::Key::logPath = "log_path";
 const std::string ConnectionStringParser::Key::scanMethod = "scan_method";
 const std::string ConnectionStringParser::Key::scanLimit = "scan_limit";
 const std::string ConnectionStringParser::Key::schemaName = "schema_name";
@@ -358,6 +360,22 @@ void ConnectionStringParser::HandleAttributePair(
     cfg.SetSshStrictHostKeyChecking(res == BoolParseResult::Type::AI_TRUE);
   } else if (lKey == Key::sshKnownHostsFile) {
     cfg.SetSshKnownHostsFile(value);
+  } else if (lKey == Key::logLevel) {
+    LogLevel::Type level = LogLevel::FromString(value);
+
+    if (level == LogLevel::Type::UNKNOWN) {
+      if (diag) {
+        diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                              "Specified log level is not supported. "
+                              "Default value used ('info').");
+      }
+
+      return;
+    }
+
+    cfg.SetLogLevel(level);
+  } else if (lKey == Key::logPath) {
+    cfg.SetLogPath(value);
   } else if (lKey == Key::scanMethod) {
     ScanMethod::Type method = ScanMethod::FromString(value);
 

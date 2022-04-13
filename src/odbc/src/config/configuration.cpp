@@ -60,6 +60,20 @@ const std::string Configuration::DefaultValue::sshPrivateKeyPassphrase = "";
 const bool Configuration::DefaultValue::sshStrictHostKeyChecking = true;
 const std::string Configuration::DefaultValue::sshKnownHostsFile = "";
 
+// Logging Configuration options
+const LogLevel::Type Configuration::DefaultValue::logLevel =
+    LogLevel::Type::INFO_LEVEL;
+const std::string Configuration::DefaultValue::logPath = "C:\\Users\\AlinaLi\\Desktop\\DocumentDB ODBC Driver\\AD-685 notes\\odbc_log_default_path.txt";
+// todo -AL- update later
+/*
+// -AL- todo update default log path depending on OS
+#ifdef _WIN32
+  logPath = "C:\\tmp\\documentdb_odbc.log";
+#else
+  logPath = "tmp//documentdb_odbc.log ";
+#endif //_WIN32
+*/ 
+
 // Additional options
 const std::string Configuration::DefaultValue::appName =
     "Amazon DocumentDB ODBC Driver";
@@ -333,6 +347,30 @@ bool Configuration::IsSshKnownHostsFileSet() const {
   return sshKnownHostsFile.IsSet();
 }
 
+LogLevel::Type Configuration::GetLogLevel() const {
+  return logLevel.GetValue();
+}
+
+void Configuration::SetLogLevel(const LogLevel::Type level) {
+  this->logLevel.SetValue(level);
+}
+
+bool Configuration::IsLogLevelSet() const {
+  return logLevel.IsSet();
+}
+
+const std::string& Configuration::GetLogPath() const {
+  return logPath.GetValue();
+}
+
+void Configuration::SetLogPath(const std::string& path) {
+  this->logPath.SetValue(path);
+}
+
+bool Configuration::IsLogPathSet() const {
+  return logPath.IsSet();
+}
+
 ScanMethod::Type Configuration::GetScanMethod() const {
   return scanMethod.GetValue();
 }
@@ -446,6 +484,8 @@ void Configuration::ToMap(ArgumentMap& res) const {
            sshStrictHostKeyChecking);
   AddToMap(res, ConnectionStringParser::Key::sshKnownHostsFile,
            sshKnownHostsFile);
+  AddToMap(res, ConnectionStringParser::Key::logLevel, logLevel);
+  AddToMap(res, ConnectionStringParser::Key::logPath, logPath);
   AddToMap(res, ConnectionStringParser::Key::scanMethod, scanMethod, false);
   AddToMap(res, ConnectionStringParser::Key::scanLimit, scanLimit);
   AddToMap(res, ConnectionStringParser::Key::schemaName, schemaName);
@@ -518,6 +558,8 @@ void Configuration::ToJdbcOptionsMap(ArgumentMap& res) const {
   AddToMap(res, "sshPrivateKeyPassphrase", sshPrivateKeyPassphrase);
   AddToMap(res, "sshStrictHostKeyChecking", sshStrictHostKeyChecking);
   AddToMap(res, "sshKnownHostsFile", sshKnownHostsFile);
+  AddToMap(res, "logLevel", logLevel);
+  AddToMap(res, "logPath", logPath);
   AddToMap(res, "scanMethod", scanMethod, true);
   AddToMap(res, "scanLimit", scanLimit);
   AddToMap(res, "schemaName", schemaName);
@@ -560,6 +602,13 @@ void Configuration::AddToMap(ArgumentMap& map, const std::string& key,
   if (value.IsSet())
     map[key] = isJdbcFormat ? ReadPreference::ToJdbcString(value.GetValue())
                             : ReadPreference::ToString(value.GetValue());
+}
+
+template <>
+void Configuration::AddToMap(ArgumentMap& map, const std::string& key,
+                             const SettableValue< LogLevel::Type >& value) {
+  if (value.IsSet())
+    map[key] = LogLevel::ToString(value.GetValue());
 }
 
 template <>

@@ -124,6 +124,16 @@ class LogStream : public std::basic_ostream< char > {
 class Logger {
  public:
   /**
+   * Set the logger's set log path.
+   */
+  void SetLogPath(std::string path);
+
+  /**
+   * Set the logger's set log level.
+   */
+  void SetLogLevel(LogLevel::Type level);
+
+  /**
    * Get instance of Logger, if enabled.
    * @return Logger instance if logging is enabled. Null otherwise.
    */
@@ -152,7 +162,8 @@ class Logger {
    * Constructor.
    * @param path to log file.
    */
-  Logger(const char* path, const char* level);
+  Logger(const char* path, const char* level); // -AL- todo remove
+  Logger(std::string path, LogLevel::Type level);
 
   /**
    * Destructor.
@@ -166,6 +177,9 @@ class Logger {
 
   /** File stream. */
   std::ofstream stream;
+
+  /** Log path */
+  std::string logPath;
 
   // TODO -AL- the default logger level should be debug; 
   // also... could be INFO for common sense, but for purpose of debugging it should be debug?
