@@ -56,7 +56,7 @@ std::string LogLevel::ToString(Type val) {
       return "off";
 
     default:
-      return "info"; // -AL- todo discuss with team whether default should be info or off
+      return "info"; // -AL- todo discuss with team whether default should be info or error
   }
 }
 }  // namespace odbc

@@ -33,6 +33,8 @@
 // Todo: Refactor boost::optional to std::optional after code base is migrated
 // to C++17 https://bitquill.atlassian.net/browse/AD-631
 
+//TODO Alina -AL-: add more logs to functions in here
+
 using namespace ignite::odbc::common::concurrent;
 using namespace ignite::odbc::jni::java;
 
@@ -1175,6 +1177,9 @@ JniErrorCode JniContext::DocumentDbDatabaseSchemaMetadataGetSchemaName(
       env->ReleaseStringUTFChars((jstring)result, utfChars);
     }
   }
+  //-AL- todo? log the returned values ? If it is not parameters and not high
+  // level function (not directly related
+  // to entry_points functions), the values can be in debug_log.
   LOG_DEBUG_MSG("DocumentDbDatabaseSchemaMetadataGetSchemaName exiting");
 
   return errInfo.code;
