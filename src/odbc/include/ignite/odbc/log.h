@@ -168,7 +168,8 @@ class Logger {
   /**
    * Constructor.
    */
-  Logger():mutex(), stream(), logLevel(), logPath(){ 
+  Logger()
+      : mutex(), stream(), logLevel(), logPath(){ 
     // no-op
   }
 
