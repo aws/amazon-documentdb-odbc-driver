@@ -25,8 +25,7 @@ using ignite::odbc::config::Configuration;
 using ignite::odbc::Logger;
 
 // initalize pointer to NULL so that it can be initialized in first call to
-// getLoggerInstance // should I define it here? moving it here did not seem to solve the linker issue?
-// move here + clean solution solved the linker issue
+// getLoggerInstance
 Logger* Logger::_logger = NULL;
 
 namespace ignite {
@@ -108,37 +107,6 @@ LogLevel::Type Logger::getLogLevel() {
 std::string Logger::getLogPath() {
   return logPath;
 }
-
-//Logger* Logger::Get() {
-//  // -AL- todo: get log path from DSN config
-//
-//  /*
-//  // this works, but is wrong
-//  LogLevel::Type logLevel1 = LogLevel::Type::UNKNOWN;
-//  std::string logPath1 = "xx";
-//  static Logger logger(logPath1, logLevel1);
-//  */
-//
-//  /*config::Configuration config;  // -AL- todo find way to initialize config
-//  // Think I probably need to get the connection string somehow?
-//  // this config is the default config, filled with default values. 
-//  static Logger logger(config.GetLogPath(), config.GetLogLevel());
-//  */
-//
-//  
-//  const char* envPathVarName = "DOC_DB_ODBC_LOG_PATH";
-//  const char* envLvlVarName = "DOC_DB_LOG_LEVEL";
-//  // -AL- note: after PATH variable is changed, need to reopen VS Code to run debug, but don't need to rebuild, I believe
-//  // TODO retrieve logging level, only pass in logging level if it is provided 
-//  static Logger logger(
-//      getenv(envPathVarName),
-//      getenv(envLvlVarName));
-//      
-//  // static Logger logger(getenv(envPathVarName), "INFO");  // -AL- for testing purpose. 
-//  //static Logger logger(getenv(envPathVarName), "ERROR"); //  -AL- for testing purpose. 
-//  // static Logger logger(getenv(envPathVarName), "OFF"); //  -AL- for testing purpose. 
-//  return logger.IsEnabled() ? &logger : 0;
-//} 
 
 }  // namespace odbc
 }  // namespace ignite

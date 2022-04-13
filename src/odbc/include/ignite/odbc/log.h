@@ -165,16 +165,12 @@ class Logger {
  private:
   static Logger * _logger; // -AL- a singleton instance
 
+  /**
+   * Constructor.
+   */
   Logger():mutex(), stream(), logLevel(), logPath(){ 
     // no-op
   }
-
-  /**
-   * Constructor.
-   * @param path to log file.
-   */
-  //Logger(const char* path, const char* level); // -AL- todo remove
-  //Logger(std::string path, LogLevel::Type level);
 
   /**
    * Destructor.
@@ -200,16 +196,5 @@ class Logger {
 
 }  // namespace odbc
 }  // namespace ignite
-
-// -AL- can define a function, ensure it works and Solar Lint says food, then
-// copy it to macro definition
-//void LG(std::string param) { // if define before class def, then this code will not be recognized. 
-//  ignite::odbc::Logger* p = ignite::odbc::Logger::getLoggerInstance();
-//  if (p->IsEnabled()
-//      && p->getLogLevel() <= ignite::odbc::LogLevel::Type::DEBUG_LEVEL) {
-//    ignite::odbc::LogStream lstream(p);
-//    lstream << __FUNCTION__ << ": " << param;
-//  }
-//} 
 
 #endif  //_IGNITE_ODBC_LOG
