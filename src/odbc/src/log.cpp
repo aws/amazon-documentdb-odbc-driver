@@ -22,6 +22,12 @@
 #include <cstdlib>
 
 using ignite::odbc::config::Configuration;
+using ignite::odbc::Logger;
+
+// initalize pointer to NULL so that it can be initialized in first call to
+// getLoggerInstance // should I define it here? moving it here did not seem to solve the linker issue?
+// move here + clean solution solved the linker issue
+Logger* Logger::_logger = NULL;
 
 namespace ignite {
 namespace odbc {
@@ -40,16 +46,26 @@ LogStream::~LogStream() {
   }
 }
 
-
-void Logger::SetLogPath(std::string path) {
+// -AL- to do add: log error somehow when program is trying to set path TWICE or more
+void Logger::setLogPath(std::string path) {
   logPath = path;
+  if (!IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()) {
+    stream.open(logPath);
+  }
 }
 
 
-void Logger::SetLogLevel(LogLevel::Type level) {
+void Logger::setLogLevel(LogLevel::Type level) {
   logLevel = level;
+  if (!IsEnabled() && logLevel != LogLevel::Type::OFF
+      && !logPath.empty()) {
+    stream.open(logPath);
+  }
 }
 
+
+
+/*
 Logger::Logger(std::string path, LogLevel::Type level)
     : mutex(), stream(), logLevel(level) {
   if (logLevel != LogLevel::Type::OFF && !path.empty()) {
@@ -69,6 +85,7 @@ Logger::Logger(const char* path, const char* level) : mutex(), stream(), logLeve
   }
 
 }
+*/
 
 Logger::~Logger() {
 }
@@ -84,39 +101,44 @@ void Logger::WriteMessage(std::string const& message) {
   }
 }
 
-LogLevel::Type Logger::GetLogLevel() {
+LogLevel::Type Logger::getLogLevel() {
   return logLevel;
 }
 
-Logger* Logger::Get() {
-  // -AL- todo: get log path from DSN config
-
-  /*
-  // this works, but is wrong
-  LogLevel::Type logLevel1 = LogLevel::Type::UNKNOWN;
-  std::string logPath1 = "xx";
-  static Logger logger(logPath1, logLevel1);
-  */
-
-  /*config::Configuration config;  // -AL- todo find way to initialize config
-  // Think I probably need to get the connection string somehow?
-  // this config is the default config, filled with default values. 
-  static Logger logger(config.GetLogPath(), config.GetLogLevel());
-  */
-
-  
-  const char* envPathVarName = "DOC_DB_ODBC_LOG_PATH";
-  const char* envLvlVarName = "DOC_DB_LOG_LEVEL";
-  // -AL- note: after PATH variable is changed, need to reopen VS Code to run debug, but don't need to rebuild, I believe
-  // TODO retrieve logging level, only pass in logging level if it is provided 
-  static Logger logger(
-      getenv(envPathVarName),
-      getenv(envLvlVarName));
-      
-  // static Logger logger(getenv(envPathVarName), "INFO");  // -AL- for testing purpose. 
-  //static Logger logger(getenv(envPathVarName), "ERROR"); //  -AL- for testing purpose. 
-  // static Logger logger(getenv(envPathVarName), "OFF"); //  -AL- for testing purpose. 
-  return logger.IsEnabled() ? &logger : 0;
+std::string Logger::getLogPath() {
+  return logPath;
 }
+
+//Logger* Logger::Get() {
+//  // -AL- todo: get log path from DSN config
+//
+//  /*
+//  // this works, but is wrong
+//  LogLevel::Type logLevel1 = LogLevel::Type::UNKNOWN;
+//  std::string logPath1 = "xx";
+//  static Logger logger(logPath1, logLevel1);
+//  */
+//
+//  /*config::Configuration config;  // -AL- todo find way to initialize config
+//  // Think I probably need to get the connection string somehow?
+//  // this config is the default config, filled with default values. 
+//  static Logger logger(config.GetLogPath(), config.GetLogLevel());
+//  */
+//
+//  
+//  const char* envPathVarName = "DOC_DB_ODBC_LOG_PATH";
+//  const char* envLvlVarName = "DOC_DB_LOG_LEVEL";
+//  // -AL- note: after PATH variable is changed, need to reopen VS Code to run debug, but don't need to rebuild, I believe
+//  // TODO retrieve logging level, only pass in logging level if it is provided 
+//  static Logger logger(
+//      getenv(envPathVarName),
+//      getenv(envLvlVarName));
+//      
+//  // static Logger logger(getenv(envPathVarName), "INFO");  // -AL- for testing purpose. 
+//  //static Logger logger(getenv(envPathVarName), "ERROR"); //  -AL- for testing purpose. 
+//  // static Logger logger(getenv(envPathVarName), "OFF"); //  -AL- for testing purpose. 
+//  return logger.IsEnabled() ? &logger : 0;
+//} 
+
 }  // namespace odbc
 }  // namespace ignite

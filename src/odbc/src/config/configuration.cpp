@@ -24,6 +24,7 @@
 #include "ignite/odbc/config/config_tools.h"
 #include "ignite/odbc/config/connection_string_parser.h"
 #include "ignite/odbc/utility.h"
+#include "ignite/odbc/log.h"
 
 using ignite::common::EncodeURIComponent;
 
@@ -353,6 +354,7 @@ LogLevel::Type Configuration::GetLogLevel() const {
 
 void Configuration::SetLogLevel(const LogLevel::Type level) {
   this->logLevel.SetValue(level);
+  Logger::getLoggerInstance()->setLogLevel(level);
 }
 
 bool Configuration::IsLogLevelSet() const {
@@ -365,6 +367,7 @@ const std::string& Configuration::GetLogPath() const {
 
 void Configuration::SetLogPath(const std::string& path) {
   this->logPath.SetValue(path);
+  Logger::getLoggerInstance()->setLogPath(path);
 }
 
 bool Configuration::IsLogPathSet() const {

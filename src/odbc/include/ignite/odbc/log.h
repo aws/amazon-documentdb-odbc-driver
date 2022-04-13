@@ -29,56 +29,49 @@
 // would likely need to add log levels here too
 // this is a MACRO definition
 // @Deprecated // delete this function definition when all logs are replaced
-#define LOG_MSG(param)                                         \
-  if (ignite::odbc::Logger* p = ignite::odbc::Logger::Get()) { \
-    ignite::odbc::LogStream lstream(p);                        \
-    lstream << __FUNCTION__ << ": " << param;                  \
-  }                                                            \
-  static_assert(true, "")
+#define LOG_MSG(param) {                                                  \
+  ignite::odbc::Logger* p = ignite::odbc::Logger::getLoggerInstance();  \
+  if (p->IsEnabled()) {                                                 \
+    ignite::odbc::LogStream lstream(p);                                 \
+    lstream << __FUNCTION__ << ": " << param;                           \
+  }                                                                     \
+  static_assert(true, ""); }
 // \ is used as line continuation here.
 // to debug the LOG_MSG macro functions, need to navigate to a place where it is used 
 // and use solar lint to check and make sure it doesn't have red squiggles 
 
 // todo remove extra "xxx msg" in front -AL- // the purpose of adding the 
 // "DEBUG MSG:" is for debugging my logging implementation. 
-#define LOG_DEBUG_MSG(param)                                               \
-  if (ignite::odbc::Logger* p = ignite::odbc::Logger::Get()) {             \
-    if (p->GetLogLevel() <= ignite::odbc::LogLevel::Type::DEBUG_LEVEL) {   \
-      ignite::odbc::LogStream lstream(p);                                  \
-      lstream << "DEBUG MSG: " << __FUNCTION__ << ": " << param;           \
-    }                                                                      \
+#define LOG_DEBUG_MSG(param) {                                             \
+  ignite::odbc::Logger* p = ignite::odbc::Logger::getLoggerInstance();     \
+  if (p->IsEnabled()                                                       \
+    && p->getLogLevel() <= ignite::odbc::LogLevel::Type::DEBUG_LEVEL) {    \
+    ignite::odbc::LogStream lstream(p);                                    \
+    lstream << "DEBUG MSG: " << __FUNCTION__ << ": " << param;             \
   }                                                                        \
-  static_assert(true, "")
+  static_assert(true, ""); }
 
 // todo remove extra "xxx msg" in front -AL-
-#define LOG_INFO_MSG(param)                                               \
-  if (ignite::odbc::Logger* p = ignite::odbc::Logger::Get()) {            \
-    if (p->GetLogLevel() <= ignite::odbc::LogLevel::Type::INFO_LEVEL) {   \
-      ignite::odbc::LogStream lstream(p);                                 \
-      lstream << "INFO MSG: " << __FUNCTION__ << ": " << param;           \
-    }                                                                     \
+#define LOG_INFO_MSG(param) {                                             \
+  ignite::odbc::Logger* p = ignite::odbc::Logger::getLoggerInstance();    \
+  if (p->IsEnabled()                                                      \
+      && p->getLogLevel() <= ignite::odbc::LogLevel::Type::INFO_LEVEL) {  \
+    ignite::odbc::LogStream lstream(p);                                   \
+    lstream << "INFO MSG: " << __FUNCTION__ << ": " << param;             \
   }                                                                       \
-  static_assert(true, "")
+  static_assert(true, ""); }
 
 // todo remove extra "xxx msg" in front -AL-
-#define LOG_ERROR_MSG(param)                                             \
-  if (ignite::odbc::Logger* p = ignite::odbc::Logger::Get()) {           \
-    if (p->GetLogLevel() <= ignite::odbc::LogLevel::Type::ERROR_LEVEL) { \
-      ignite::odbc::LogStream lstream(p);                                \
-      lstream << "ERROR MSG: " << __FUNCTION__ << ": " << param;            \
-    }                                                                    \
-  }                                                                      \
-  static_assert(true, "")
+#define LOG_ERROR_MSG(param) {                                            \
+  ignite::odbc::Logger* p = ignite::odbc::Logger::getLoggerInstance();    \
+  if (p->IsEnabled()                                                      \
+      && p->getLogLevel() <= ignite::odbc::LogLevel::Type::ERROR_LEVEL) { \
+    ignite::odbc::LogStream lstream(p);                                   \
+    lstream << "ERROR MSG: " << __FUNCTION__ << ": " << param;            \
+  }                                                                       \
+  static_assert(true, ""); }
 
-// -AL- can define a function, ensure it works and Solar Lint says food, then copy it to macro definition
-/* void LG(std::string param) {
-  if (ignite::odbc::Logger* p = ignite::odbc::Logger::Get()) {
-    if (p->GetLogLevel() <= ignite::odbc::LogLevel::Type::DEBUG_LEVEL) {
-        ignite::odbc::LogStream lstream(p);
-        lstream << __FUNCTION__ << ": " << param;
-      }
-  }
-}*/
+
 
 namespace ignite {
 namespace odbc {
@@ -124,26 +117,38 @@ class LogStream : public std::basic_ostream< char > {
 class Logger {
  public:
   /**
-   * Set the logger's set log path.
-   */
-  void SetLogPath(std::string path);
-
-  /**
    * Set the logger's set log level.
    */
-  void SetLogLevel(LogLevel::Type level);
+  void setLogLevel(LogLevel::Type level);
+
+  /**
+   * Set the logger's set log path.
+   * Once a log path is set, it cannot be changed
+   */
+  void setLogPath(std::string path);
 
   /**
    * Get instance of Logger, if enabled.
    * @return Logger instance if logging is enabled. Null otherwise.
-   */
-  static Logger* Get();
+   */ // todo change doc
+  static Logger* getLoggerInstance() {
+      // -AL- Todo make jira ticket for adding locks for logger instance (or can do it myself if it is easy)
+    if (!_logger)
+      _logger = new Logger;
+    return _logger;
+  }
 
   /**
    * Get the logger's set log level.
    * @return logLevel.
    */
-  LogLevel::Type GetLogLevel();
+  LogLevel::Type getLogLevel();
+
+  /**
+   * Get the logger's set log path.
+   * @return logPath.
+   */
+  std::string getLogPath();
 
   /**
    * Checks if logging is enabled.
@@ -158,12 +163,18 @@ class Logger {
   void WriteMessage(std::string const& message);
 
  private:
+  static Logger * _logger; // -AL- a singleton instance
+
+  Logger():mutex(), stream(), logLevel(), logPath(){ 
+    // no-op
+  }
+
   /**
    * Constructor.
    * @param path to log file.
    */
-  Logger(const char* path, const char* level); // -AL- todo remove
-  Logger(std::string path, LogLevel::Type level);
+  //Logger(const char* path, const char* level); // -AL- todo remove
+  //Logger(std::string path, LogLevel::Type level);
 
   /**
    * Destructor.
@@ -186,7 +197,19 @@ class Logger {
   /** Log Level */
   LogLevel::Type logLevel;
 };
+
 }  // namespace odbc
 }  // namespace ignite
+
+// -AL- can define a function, ensure it works and Solar Lint says food, then
+// copy it to macro definition
+//void LG(std::string param) { // if define before class def, then this code will not be recognized. 
+//  ignite::odbc::Logger* p = ignite::odbc::Logger::getLoggerInstance();
+//  if (p->IsEnabled()
+//      && p->getLogLevel() <= ignite::odbc::LogLevel::Type::DEBUG_LEVEL) {
+//    ignite::odbc::LogStream lstream(p);
+//    lstream << __FUNCTION__ << ": " << param;
+//  }
+//} 
 
 #endif  //_IGNITE_ODBC_LOG
