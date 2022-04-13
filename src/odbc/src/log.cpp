@@ -16,13 +16,14 @@
  */
 
 #include "ignite/odbc/log.h"
-#include "ignite/odbc/log_level.h"
-#include "ignite/odbc/config/configuration.h"
 
 #include <cstdlib>
 
-using ignite::odbc::config::Configuration;
+#include "ignite/odbc/config/configuration.h"
+#include "ignite/odbc/log_level.h"
+
 using ignite::odbc::Logger;
+using ignite::odbc::config::Configuration;
 
 // initalize pointer to NULL so that it can be initialized in first call to
 // getLoggerInstance
@@ -45,24 +46,23 @@ LogStream::~LogStream() {
   }
 }
 
-// -AL- to do add: log error somehow when program is trying to set path TWICE or more
+// -AL- to do add: log error somehow when program is trying to set path TWICE or
+// more
 void Logger::setLogPath(std::string path) {
-  logPath = path;
+  logPath = path; // -AL- todo create function to deal with duplicate code???
   if (!IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()) {
     stream.open(logPath);
   }
 }
 
-
 void Logger::setLogLevel(LogLevel::Type level) {
   logLevel = level;
-  if (!IsEnabled() && logLevel != LogLevel::Type::OFF
-      && !logPath.empty()) {
+  if (!IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()) {
     stream.open(logPath);
+  } else if (IsEnabled() && logLevel == LogLevel::Type::OFF) {
+    stream.close();
   }
 }
-
-
 
 /*
 Logger::Logger(std::string path, LogLevel::Type level)
