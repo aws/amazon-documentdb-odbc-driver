@@ -26,10 +26,39 @@
 #include "ignite/odbc/common/common.h"
 #include "ignite/odbc/common/concurrent.h"
 #include "ignite/odbc/log_level.h"
-// -AL- how LOG_MSG is defined in Ignite
-// would likely need to add log levels here too
-// this is a MACRO definition
-// @Deprecated // delete this function definition when all logs are replaced
+
+// Todo: implement log file using user-provided log path
+// https://bitquill.atlassian.net/browse/AD-697
+
+// todo remove pre-fix when making PR ready for review
+#define WRITE_MSG(param, logLevel)                            \
+  {                                                           \
+    std::shared_ptr< ignite::odbc::Logger > p =               \
+        ignite::odbc::Logger::getLoggerInstance();            \
+    if (p->IsEnabled() && p->getLogLevel() <= logLevel) {     \
+      ignite::odbc::LogStream lstream(p.get());               \
+      std::string msg_prefix;                                 \
+      switch (logLevel) {                                     \
+        case ignite::odbc::LogLevel::Type::DEBUG_LEVEL:       \
+          msg_prefix = "DEBUG MSG: ";                         \
+          break;                                              \
+        case ignite::odbc::LogLevel::Type::INFO_LEVEL:        \
+          msg_prefix = "INFO MSG: ";                          \
+          break;                                              \
+        case ignite::odbc::LogLevel::Type::ERROR_LEVEL:       \
+          msg_prefix = "ERROR MSG: ";                         \
+          break;                                              \
+        default:                                              \
+          msg_prefix = "wrong level passed!!!!!!!";           \
+      }                                                       \
+      lstream << msg_prefix << __FUNCTION__ << ": " << param; \
+    }                                                         \
+    static_assert(true, "");                                  \
+  }
+
+// TODO replace and remove LOG_MSG
+// https://bitquill.atlassian.net/browse/AD-703
+// @Deprecated
 #define LOG_MSG(param) {                                                \
   std::shared_ptr< ignite::odbc::Logger > p =                           \
         ignite::odbc::Logger::getLoggerInstance();                      \
@@ -43,38 +72,17 @@
 // and use solar lint to check and make sure it doesn't have red squiggles 
 
 // todo remove extra "xxx msg" in front -AL- // the purpose of adding the 
-// "DEBUG MSG:" is for debugging my logging implementation. 
-#define LOG_DEBUG_MSG(param) {                                            \
-  std::shared_ptr< ignite::odbc::Logger > p =                             \
-        ignite::odbc::Logger::getLoggerInstance();                        \
-  if (p->IsEnabled()                                                      \
-      && p->getLogLevel() <= ignite::odbc::LogLevel::Type::DEBUG_LEVEL) { \
-    ignite::odbc::LogStream lstream(p.get());                             \
-    lstream << "DEBUG MSG: " << __FUNCTION__ << ": " << param;            \
-  }                                                                       \
-  static_assert(true, ""); }
+// "DEBUG MSG:" is for debugging my logging implementation.
+#define LOG_DEBUG_MSG(param) \
+  WRITE_MSG(param, ignite::odbc::LogLevel::Type::DEBUG_LEVEL)
 
 // todo remove extra "xxx msg" in front -AL-
-#define LOG_INFO_MSG(param) {                                             \
-  std::shared_ptr< ignite::odbc::Logger > p =                             \
-        ignite::odbc::Logger::getLoggerInstance();                        \
-  if (p->IsEnabled()                                                      \
-      && p->getLogLevel() <= ignite::odbc::LogLevel::Type::INFO_LEVEL) {  \
-    ignite::odbc::LogStream lstream(p.get());                             \
-    lstream << "INFO MSG: " << __FUNCTION__ << ": " << param;             \
-  }                                                                       \
-  static_assert(true, ""); }
+#define LOG_INFO_MSG(param) \
+  WRITE_MSG(param, ignite::odbc::LogLevel::Type::INFO_LEVEL)
 
 // todo remove extra "xxx msg" in front -AL-
-#define LOG_ERROR_MSG(param) {                                            \
-  std::shared_ptr< ignite::odbc::Logger > p =                             \
-        ignite::odbc::Logger::getLoggerInstance();                        \
-  if (p->IsEnabled()                                                      \
-      && p->getLogLevel() <= ignite::odbc::LogLevel::Type::ERROR_LEVEL) { \
-    ignite::odbc::LogStream lstream(p.get());                             \
-    lstream << "ERROR MSG: " << __FUNCTION__ << ": " << param;            \
-  }                                                                       \
-  static_assert(true, ""); }
+#define LOG_ERROR_MSG(param) \
+  WRITE_MSG(param, ignite::odbc::LogLevel::Type::ERROR_LEVEL)
 
 namespace ignite {
 namespace odbc {
@@ -172,7 +180,7 @@ class Logger {
   void WriteMessage(std::string const& message);
 
  private:
-  static std::shared_ptr< Logger > _logger;  // -AL- a singleton instance
+  static std::shared_ptr< Logger > _logger;  //a singleton instance
 
   /**
    * Constructor.
@@ -193,8 +201,6 @@ class Logger {
   /** Log path */
   std::string logPath;
 
-  // TODO -AL- the default logger level should be debug; 
-  // also... could be INFO for common sense, but for purpose of debugging it should be debug?
   /** Log Level */
   LogLevel::Type logLevel;
 };
