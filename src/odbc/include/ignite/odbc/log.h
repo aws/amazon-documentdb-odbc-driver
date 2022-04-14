@@ -144,9 +144,10 @@ class Logger {
   void setLogPath(std::string path);
 
   /**
-   * Get instance of Logger, if enabled.
-   * @return Logger instance if logging is enabled. Null otherwise.
-   */ // todo change doc
+   * Get singleton instance of Logger.
+   * If there is no instance, create new instance.
+   * @return Logger instance.
+   */
   static std::shared_ptr<Logger> getLoggerInstance() {
       // -AL- Todo make jira ticket for adding locks for logger instance (or can do it myself if it is easy)
     if (!_logger)

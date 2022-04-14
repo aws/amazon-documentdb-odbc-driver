@@ -48,9 +48,21 @@ LogStream::~LogStream() {
 // -AL- to do add: log error somehow when program is trying to set path TWICE or
 // more
 void Logger::setLogPath(std::string path) {
-  logPath = path; // -AL- todo create function to deal with duplicate code???
-  if (!IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()) {
-    stream.open(logPath);
+  if (logPath == path) {
+    LOG_DEBUG_MSG(
+        "WARNING: setLogPath is called again with the same path string. "
+        "setLogPath should only be called once");
+    return;
+  }
+  logPath = path;
+  if (!IsEnabled()) {
+    if (logLevel != LogLevel::Type::OFF && !logPath.empty()) {
+      stream.open(logPath);
+    }
+  } else {
+    LOG_ERROR_MSG(
+        "Error: trying to set log path when logging is already enabled set for this "
+        "connection");
   }
 }
 
