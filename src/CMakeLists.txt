@@ -79,6 +79,8 @@ if (${WARNINGS_AS_ERRORS})
     endif()
 endif()
 
+add_compile_options(-fsanitize=address)
+add_link_options(-fsanitize=address)
 add_subdirectory(common)
 add_subdirectory(binary)
 
@@ -88,13 +90,13 @@ if (${WITH_CORE} OR ${WITH_TESTS})
 endif()
 
 if (${WITH_TESTS})
-    #add_subdirectory(odbc-gtest)
-    include(gtest/googletest.cmake)
-    fetch_googletest(
-        ${PROJECT_SOURCE_DIR}/gtest
-        ${PROJECT_BINARY_DIR}/googletest
-        )
-    enable_testing()
+    # add_subdirectory(odbc-gtest)
+    # include(gtest/googletest.cmake)
+    # fetch_googletest(
+    #     ${PROJECT_SOURCE_DIR}/gtest
+    #     ${PROJECT_BINARY_DIR}/googletest
+    #     )
+    # enable_testing()
 
     if (EXISTS ${CMAKE_SOURCE_DIR}/core-test)
         add_subdirectory(core-test)
