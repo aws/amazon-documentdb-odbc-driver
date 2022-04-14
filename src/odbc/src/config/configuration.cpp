@@ -26,6 +26,16 @@
 #include "ignite/odbc/utility.h"
 #include "ignite/odbc/log.h"
 
+#if defined(_WIN32)
+    #define DEFAULT_LOG_PATH "C:\\tmp\\documentdb_odbc.log"; // Windows
+#elif defined(__APPLE__)
+    #define DEFAULT_LOG_PATH "~/Library/Logs/documentdb_odbc.log "; // Apple
+#elif defined(__linux__)
+    #define DEFAULT_LOG_PATH "~/var/log/documentdb_odbc.log ";  // Linux
+#else
+    #define DEFAULT_LOG_PATH "~/var/log/documentdb_odbc.log ";  //unix
+#endif
+
 using ignite::common::EncodeURIComponent;
 
 namespace ignite {
@@ -64,16 +74,7 @@ const std::string Configuration::DefaultValue::sshKnownHostsFile = "";
 // Logging Configuration options
 const LogLevel::Type Configuration::DefaultValue::logLevel =
     LogLevel::Type::INFO_LEVEL;
-const std::string Configuration::DefaultValue::logPath = "C:\\Users\\AlinaLi\\Desktop\\DocumentDB ODBC Driver\\AD-685 notes\\odbc_log_default_path.txt";
-// todo -AL- update later
-/*
-// -AL- todo update default log path depending on OS
-#ifdef _WIN32
-  logPath = "C:\\tmp\\documentdb_odbc.log";
-#else
-  logPath = "tmp//documentdb_odbc.log ";
-#endif //_WIN32
-*/ 
+const std::string Configuration::DefaultValue::logPath = DEFAULT_LOG_PATH;
 
 // Additional options
 const std::string Configuration::DefaultValue::appName =
