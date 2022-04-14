@@ -495,7 +495,7 @@ void DeleteClass(JNIEnv* env, jclass cls) {
   if (cls)
     env->DeleteGlobalRef(cls);
 
-  LOG_DEBUG_MSG("DeleteClass is called");
+  LOG_DEBUG_MSG("DeleteClass exiting");
 }
 
 void CheckClass(JNIEnv* env, const char* name) {
@@ -506,7 +506,7 @@ void CheckClass(JNIEnv* env, const char* name) {
   if (!res)
     throw JvmException();
 
-  LOG_DEBUG_MSG("CheckClass is called");
+  LOG_DEBUG_MSG("CheckClass exiting");
 }
 
 jmethodID FindMethod(JNIEnv* env, jclass cls, JniMethod mthd) {
@@ -519,7 +519,7 @@ jmethodID FindMethod(JNIEnv* env, jclass cls, JniMethod mthd) {
   if (!mthd0)
     throw JvmException();
 
-  LOG_DEBUG_MSG("FindMethod is called");
+  LOG_DEBUG_MSG("FindMethod exiting");
 
   return mthd0;
 }
