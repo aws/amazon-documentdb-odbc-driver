@@ -23,6 +23,11 @@ SSH host credentials
 1. `DOC_DB_USER`=`<ssh_user>`(e.g.:`ec2-user@ec2-instance.us-east-2.compute.amazonaws.com`)
 2. `DOC_DB_PRIV_KEY_FILE`=`<path_to_ssh_host_private_key_file>`(e.g.:`~/.ssh/ssh_host.pem`)
 
+Log configurations
+1. `DOC_DB_LOG_PATH`=`<path_to_log_file>`(e.g.:`"C:\\Users\\BQUser\\Desktop\\DocumentDB ODBC Driver\\odbc_log.txt"`)
+Please make sure that the folder in the path exists or else ODBC will not be able to create the log file. 
+2. `DOC_DB_LOG_LEVEL`=`<log_level>` (Choose from `debug`, `info`, `error`, `off`)
+
 #### Running an SSH tunnel for Testing
 By default, remote integration tests are not run. To enable remote integration tests, 
 set the environment variable `DOC_DB_ODBC_INTEGRATION_TEST=1`
