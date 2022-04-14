@@ -856,7 +856,7 @@ void OdbcTestSuite::CreateDsnConnectionStringForLocalServer(
   std::string port = "27017";
   std::string database =
       databaseName.size() > 0 ? databaseName : "odbc-test";
-  std::string logPath = common::GetEnv("DOC_DB_ODBC_LOG_PATH", ""); // -AL- todo need to delete log file later
+  std::string logPath = common::GetEnv("DOC_DB_LOG_PATH", ""); // -AL- todo need to delete log file later
   std::string logLevel = common::GetEnv("DOC_DB_LOG_LEVEL", "");
 
   connectionString =
