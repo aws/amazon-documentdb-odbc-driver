@@ -33,7 +33,7 @@
 // Todo: Refactor boost::optional to std::optional after code base is migrated
 // to C++17 https://bitquill.atlassian.net/browse/AD-631
 
-//TODO Alina -AL-: add more logs to functions in here
+// TODO Alina -AL-: add more debug logs to functions in here
 
 using namespace ignite::odbc::common::concurrent;
 using namespace ignite::odbc::jni::java;
@@ -96,17 +96,23 @@ namespace java {
 namespace iocc = ignite::odbc::common::concurrent;
 
 bool IGNITE_IMPORT_EXPORT IsJava9OrLater() {
+  LOG_DEBUG_MSG("IsJava9OrLater called");
+
   JavaVMInitArgs args;
 
   memset(&args, 0, sizeof(args));
 
   args.version = JNI_VERSION_9;
 
+  LOG_DEBUG_MSG("IsJava9OrLater exiting");
+
   return JNI_GetDefaultJavaVMInitArgs(&args) == JNI_OK;
 }
 
 void BuildJvmOptions(const std::string& cp, std::vector< char* >& opts, int xms,
                      int xmx) {
+  LOG_DEBUG_MSG("BuildJvmOptions is called");
+
   using namespace common;
 
   const size_t REQ_OPTS_CNT = 4;
@@ -156,6 +162,7 @@ void BuildJvmOptions(const std::string& cp, std::vector< char* >& opts, int xms,
         CopyChars("--add-opens=jdk.management/"
                   "com.sun.management.internal=ALL-UNNAMED"));
   }
+  LOG_DEBUG_MSG("BuildJvmOptions exiting");
 }
 
 /* --- Startup exception. --- */
@@ -188,6 +195,8 @@ JniErrorInfo::JniErrorInfo(JniErrorCode code, const char* errCls,
 JniErrorInfo::JniErrorInfo(const JniErrorInfo& other) = default;
 
 JniErrorInfo& JniErrorInfo::operator=(const JniErrorInfo& other) {
+  LOG_DEBUG_MSG("JniErrorInfo constructor is called");
+
   if (this != &other) {
     // 1. Create new instance, exception could occur at this point.
     JniErrorInfo tmp(other);
@@ -197,6 +206,8 @@ JniErrorInfo& JniErrorInfo::operator=(const JniErrorInfo& other) {
     std::swap(errCls, tmp.errCls);
     std::swap(errMsg, tmp.errMsg);
   }
+
+  LOG_DEBUG_MSG("JniErrorInfo constructor exiting");
 
   return *this;
 }
@@ -393,6 +404,7 @@ int ThrowOnMissingHandler(JNIEnv* env) {
   // jclass cls = env->FindClass(C_PLATFORM_NO_CALLBACK_EXCEPTION);
 
   // env->ThrowNew(cls, "Callback handler is not set in native platform.");
+  LOG_DEBUG_MSG("ThrowOnMissingHandler is called, and exiting");
 
   return 0;
 }
@@ -413,10 +425,14 @@ void ThrowToJava(JNIEnv* env, const char* msg) {
 }
 
 char* StringToChars(JNIEnv* env, jstring str, int* len) {
+  LOG_DEBUG_MSG("StringToChars is called");
+
   if (!str) {
     if (len) {
       *len = 0;
     }
+    LOG_DEBUG_MSG("StringToChars exiting with nullptr");
+
     return nullptr;
   }
 
@@ -431,11 +447,14 @@ char* StringToChars(JNIEnv* env, jstring str, int* len) {
   if (len) {
     *len = strCharsLen;
   }
+  LOG_DEBUG_MSG("StringToChars exiting");
 
   return strChars0;
 }
 
 std::string JavaStringToCString(JNIEnv* env, jstring str, int& len) {
+  LOG_DEBUG_MSG("JavaStringToCString is called");
+
   char* resChars = StringToChars(env, str, &len);
 
   if (resChars) {
@@ -443,12 +462,19 @@ std::string JavaStringToCString(JNIEnv* env, jstring str, int& len) {
 
     delete[] resChars;
 
+    LOG_DEBUG_MSG("JavaStringToCString exiting");
+
     return res;
-  } else
+  } else {
+    LOG_DEBUG_MSG("JavaStringToCString exiting with empty string");
+
     return std::string();
+  }
 }
 
 jclass FindClass(JNIEnv* env, const char* name) {
+  LOG_DEBUG_MSG("FindClass is called");
+
   jclass res = env->FindClass(name);
 
   if (!res)
@@ -458,22 +484,34 @@ jclass FindClass(JNIEnv* env, const char* name) {
 
   env->DeleteLocalRef(res);
 
+  LOG_DEBUG_MSG("FindClass exiting");
+
   return res0;
 }
 
 void DeleteClass(JNIEnv* env, jclass cls) {
+  LOG_DEBUG_MSG("DeleteClass is called");
+
   if (cls)
     env->DeleteGlobalRef(cls);
+
+  LOG_DEBUG_MSG("DeleteClass is called");
 }
 
 void CheckClass(JNIEnv* env, const char* name) {
+  LOG_DEBUG_MSG("CheckClass is called");
+
   jclass res = env->FindClass(name);
 
   if (!res)
     throw JvmException();
+
+  LOG_DEBUG_MSG("CheckClass is called");
 }
 
 jmethodID FindMethod(JNIEnv* env, jclass cls, JniMethod mthd) {
+  LOG_DEBUG_MSG("FindMethod is called");
+
   jmethodID mthd0 = mthd.isStatic
                         ? env->GetStaticMethodID(cls, mthd.name, mthd.sign)
                         : env->GetMethodID(cls, mthd.name, mthd.sign);
@@ -481,10 +519,14 @@ jmethodID FindMethod(JNIEnv* env, jclass cls, JniMethod mthd) {
   if (!mthd0)
     throw JvmException();
 
+  LOG_DEBUG_MSG("FindMethod is called");
+
   return mthd0;
 }
 
 void JniJavaMembers::Initialize(JNIEnv* env) {
+  LOG_DEBUG_MSG("Initialize is called");
+
   c_Class = FindClass(env, C_CLASS);
   m_Class_getName = FindMethod(env, c_Class, M_CLASS_GET_NAME);
 
@@ -499,18 +541,26 @@ void JniJavaMembers::Initialize(JNIEnv* env) {
   // TODO: Provide "getFullStackTrace" in DocumentDB
   // m_PlatformUtils_getFullStackTrace = FindMethod(env, c_PlatformUtils,
   // M_PLATFORM_UTILS_GET_FULL_STACK_TRACE);
+
+  LOG_DEBUG_MSG("Initialize exiting");
 }
 
 void JniJavaMembers::Destroy(JNIEnv* env) {
+  LOG_DEBUG_MSG("Destroy is called");
+
   DeleteClass(env, c_Class);
   DeleteClass(env, c_Throwable);
   DeleteClass(env, c_PlatformUtils);
+
+  LOG_DEBUG_MSG("Destroy exiting");
 }
 
 bool JniJavaMembers::WriteErrorInfo(JNIEnv* env, char** errClsName,
                                     int* errClsNameLen, char** errMsg,
                                     int* errMsgLen, char** stackTrace,
                                     int* stackTraceLen) {
+  LOG_DEBUG_MSG("WriteErrorInfo is called");
+
   if (env && env->ExceptionCheck()) {
     if (m_Class_getName && m_Throwable_getMessage) {
       jthrowable err = env->ExceptionOccurred();
@@ -547,16 +597,21 @@ bool JniJavaMembers::WriteErrorInfo(JNIEnv* env, char** errClsName,
       if (trace)
         env->DeleteLocalRef(trace);
 
+      LOG_DEBUG_MSG("WriteErrorInfo exiting with bool true");
+
       return true;
     } else {
       env->ExceptionClear();
     }
   }
+  LOG_DEBUG_MSG("WriteErrorInfo exiting with bool false");
 
   return false;
 }
 
 void JniMembers::Initialize(JNIEnv* env) {
+  LOG_DEBUG_MSG("Initialize is called");
+
   c_DocumentDbConnectionProperties =
       FindClass(env, C_DOCUMENTDB_CONNECTION_PROPERTIES);
   m_DocumentDbConnectionPropertiesGetPropertiesFromConnectionString = FindMethod(
@@ -685,47 +740,73 @@ void JniMembers::Initialize(JNIEnv* env) {
   m_DocumentDbQueryMappingServiceGet =
       FindMethod(env, c_DocumentDbQueryMappingService,
                  M_DOCUMENTDB_QUERY_MAPPING_SERVICE_GET);
+
+  LOG_DEBUG_MSG("Initialize exiting");
 }
 
 void JniMembers::Destroy(JNIEnv* env) {
+  LOG_DEBUG_MSG("Destroy is called");
+
   DeleteClass(env, c_IgniteException);
   DeleteClass(env, c_PlatformIgnition);
   DeleteClass(env, c_PlatformTarget);
   DeleteClass(env, c_PlatformUtils);
+
+  LOG_DEBUG_MSG("Destroy exiting");
 }
 
 JniJvm::JniJvm()
     : jvm(nullptr), javaMembers(JniJavaMembers()), members(JniMembers()) {
   // No-op.
+
+  LOG_DEBUG_MSG("JniJvm() is called, and exiting");
 }
 
 JniJvm::JniJvm(JavaVM* jvm, JniJavaMembers const& javaMembers,
                JniMembers const& members)
     : jvm(jvm), javaMembers(javaMembers), members(members) {
   // No-op.
+
+  LOG_DEBUG_MSG(
+      "JniJvm(JavaVM* jvm, JniJavaMembers const& javaMembers,  JniMembers "
+      "const& members) is called, and exiting ");
 }
 
 JavaVM* JniJvm::GetJvm() {
+  LOG_DEBUG_MSG("GetJvm is called, and exiting");
+
   return jvm;
 }
 
 JniJavaMembers& JniJvm::GetJavaMembers() {
+  LOG_DEBUG_MSG("GetJavaMembers is called, and exiting");
+
   return javaMembers;
 }
 
 JniMembers& JniJvm::GetMembers() {
+  LOG_DEBUG_MSG("GetMembers is called, and exiting");
+
   return members;
 }
 
 GlobalJObject::GlobalJObject(JNIEnv* e, jobject obj) : env(e), ref(obj) {
   // No-op.
+
+  LOG_DEBUG_MSG("GlobalJObject is called, and exiting");
 }
 
 GlobalJObject::~GlobalJObject() {
+  LOG_DEBUG_MSG("~GlobalJObject is called");
+
   env->DeleteGlobalRef(ref);
+
+  LOG_DEBUG_MSG("~GlobalJObject exiting");
 }
 
 jobject GlobalJObject::GetRef() const {
+  LOG_DEBUG_MSG("GetRef is called, and exiting");
+
   return ref;
 }
 
@@ -734,6 +815,8 @@ jobject GlobalJObject::GetRef() const {
  */
 jint GetOrCreateJvm(char** opts, int optsLen, JavaVM** jvm, JNIEnv** env) {
   // Check to see if a VM is already created
+  LOG_DEBUG_MSG("GetOrCreateJvm is called");
+
   const jsize nJvms = 1;
   jsize nJvmsAvailable = 0;
   JavaVM* availableJvms[nJvms]{};
@@ -742,6 +825,9 @@ jint GetOrCreateJvm(char** opts, int optsLen, JavaVM** jvm, JNIEnv** env) {
     *jvm = availableJvms[0];
     res = (*jvm)->GetEnv(reinterpret_cast< void** >(env), JNI_VERSION_1_8);
     if (res == JNI_OK) {
+      LOG_INFO_MSG("Jvm already created. Existing Jvm is used.");
+      LOG_DEBUG_MSG("GetOrCreateJvm exiting with JNI_OK");
+
       return res;
     }
   }
@@ -761,6 +847,9 @@ jint GetOrCreateJvm(char** opts, int optsLen, JavaVM** jvm, JNIEnv** env) {
   res = JNI_CreateJavaVM(jvm, reinterpret_cast< void** >(env), &args);
 
   delete[] opts0;
+
+  LOG_INFO_MSG("There is no previous Jvm created. Created new Jvm.");
+  LOG_DEBUG_MSG("GetOrCreateJvm exiting");
 
   return res;
 }
