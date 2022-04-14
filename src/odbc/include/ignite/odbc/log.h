@@ -21,6 +21,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <memory>
 
 #include "ignite/odbc/common/common.h"
 #include "ignite/odbc/common/concurrent.h"
