@@ -81,8 +81,8 @@ jobs:
         chmod +x ./src/odbc-test/scripts/import_test_data.sh
         ./src/odbc-test/scripts/import_test_data.sh
     - name: run-tests
-       run: |
-         ./build/odbc/bin/tests
+      run: |
+        ./build/odbc/bin/tests
     - name: upload-test-report
       if: always()
       uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
