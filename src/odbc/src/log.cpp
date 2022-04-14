@@ -25,9 +25,8 @@
 using ignite::odbc::Logger;
 using ignite::odbc::config::Configuration;
 
-// initalize pointer to NULL so that it can be initialized in first call to
-// getLoggerInstance
-Logger* Logger::_logger = NULL;
+// _logger pointer will  initialized in first call to getLoggerInstance
+std::shared_ptr< Logger > Logger::_logger;
 
 namespace ignite {
 namespace odbc {
@@ -63,28 +62,6 @@ void Logger::setLogLevel(LogLevel::Type level) {
     stream.close();
   }
 }
-
-/*
-Logger::Logger(std::string path, LogLevel::Type level)
-    : mutex(), stream(), logLevel(level) {
-  if (logLevel != LogLevel::Type::OFF && !path.empty()) {
-    stream.open(path);
-  }
-}
-
-// -AL- todo remove later
-Logger::Logger(const char* path, const char* level) : mutex(), stream(), logLevel() {
-  if (level) {
-    logLevel = LogLevel::FromString(
-        level, LogLevel::Type::INFO_LEVEL);  // -AL- draft code
-    // todo add default level here // APR-11: for now, have INFO level
-  }
-  if (logLevel != LogLevel::Type::OFF && path) {
-    stream.open(path);
-  }
-
-}
-*/
 
 Logger::~Logger() {
 }

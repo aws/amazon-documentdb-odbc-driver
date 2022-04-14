@@ -29,10 +29,11 @@
 // would likely need to add log levels here too
 // this is a MACRO definition
 // @Deprecated // delete this function definition when all logs are replaced
-#define LOG_MSG(param) {                                                  \
-  ignite::odbc::Logger* p = ignite::odbc::Logger::getLoggerInstance();  \
+#define LOG_MSG(param) {                                                \
+  std::shared_ptr< ignite::odbc::Logger > p =                           \
+        ignite::odbc::Logger::getLoggerInstance();                      \
   if (p->IsEnabled()) {                                                 \
-    ignite::odbc::LogStream lstream(p);                                 \
+    ignite::odbc::LogStream lstream(p.get());                           \
     lstream << __FUNCTION__ << ": " << param;                           \
   }                                                                     \
   static_assert(true, ""); }
@@ -42,36 +43,37 @@
 
 // todo remove extra "xxx msg" in front -AL- // the purpose of adding the 
 // "DEBUG MSG:" is for debugging my logging implementation. 
-#define LOG_DEBUG_MSG(param) {                                             \
-  ignite::odbc::Logger* p = ignite::odbc::Logger::getLoggerInstance();     \
-  if (p->IsEnabled()                                                       \
-    && p->getLogLevel() <= ignite::odbc::LogLevel::Type::DEBUG_LEVEL) {    \
-    ignite::odbc::LogStream lstream(p);                                    \
-    lstream << "DEBUG MSG: " << __FUNCTION__ << ": " << param;             \
-  }                                                                        \
+#define LOG_DEBUG_MSG(param) {                                            \
+  std::shared_ptr< ignite::odbc::Logger > p =                             \
+        ignite::odbc::Logger::getLoggerInstance();                        \
+  if (p->IsEnabled()                                                      \
+      && p->getLogLevel() <= ignite::odbc::LogLevel::Type::DEBUG_LEVEL) { \
+    ignite::odbc::LogStream lstream(p.get());                             \
+    lstream << "DEBUG MSG: " << __FUNCTION__ << ": " << param;            \
+  }                                                                       \
   static_assert(true, ""); }
 
 // todo remove extra "xxx msg" in front -AL-
 #define LOG_INFO_MSG(param) {                                             \
-  ignite::odbc::Logger* p = ignite::odbc::Logger::getLoggerInstance();    \
+  std::shared_ptr< ignite::odbc::Logger > p =                             \
+        ignite::odbc::Logger::getLoggerInstance();                        \
   if (p->IsEnabled()                                                      \
       && p->getLogLevel() <= ignite::odbc::LogLevel::Type::INFO_LEVEL) {  \
-    ignite::odbc::LogStream lstream(p);                                   \
+    ignite::odbc::LogStream lstream(p.get());                             \
     lstream << "INFO MSG: " << __FUNCTION__ << ": " << param;             \
   }                                                                       \
   static_assert(true, ""); }
 
 // todo remove extra "xxx msg" in front -AL-
 #define LOG_ERROR_MSG(param) {                                            \
-  ignite::odbc::Logger* p = ignite::odbc::Logger::getLoggerInstance();    \
+  std::shared_ptr< ignite::odbc::Logger > p =                             \
+        ignite::odbc::Logger::getLoggerInstance();                        \
   if (p->IsEnabled()                                                      \
       && p->getLogLevel() <= ignite::odbc::LogLevel::Type::ERROR_LEVEL) { \
-    ignite::odbc::LogStream lstream(p);                                   \
+    ignite::odbc::LogStream lstream(p.get());                             \
     lstream << "ERROR MSG: " << __FUNCTION__ << ": " << param;            \
   }                                                                       \
   static_assert(true, ""); }
-
-
 
 namespace ignite {
 namespace odbc {
@@ -117,6 +119,11 @@ class LogStream : public std::basic_ostream< char > {
 class Logger {
  public:
   /**
+   * Destructor. // -AL- made public so shared_ptr can remove the object when program exits
+   */
+  ~Logger();
+
+  /**
    * Set the logger's set log level.
    */
   void setLogLevel(LogLevel::Type level);
@@ -131,10 +138,11 @@ class Logger {
    * Get instance of Logger, if enabled.
    * @return Logger instance if logging is enabled. Null otherwise.
    */ // todo change doc
-  static Logger* getLoggerInstance() {
+  static std::shared_ptr<Logger> getLoggerInstance() {
       // -AL- Todo make jira ticket for adding locks for logger instance (or can do it myself if it is easy)
     if (!_logger)
-      _logger = new Logger;
+        _logger = std::shared_ptr< Logger >(new Logger());
+
     return _logger;
   }
 
@@ -163,7 +171,7 @@ class Logger {
   void WriteMessage(std::string const& message);
 
  private:
-  static Logger * _logger; // -AL- a singleton instance
+  static std::shared_ptr< Logger > _logger;  // -AL- a singleton instance
 
   /**
    * Constructor.
@@ -172,11 +180,6 @@ class Logger {
       : mutex(), stream(), logLevel(), logPath(){ 
     // no-op
   }
-
-  /**
-   * Destructor.
-   */
-  ~Logger();
 
   IGNITE_NO_COPY_ASSIGNMENT(Logger);
 
