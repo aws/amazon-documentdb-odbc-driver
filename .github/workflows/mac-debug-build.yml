@@ -82,7 +82,7 @@ jobs:
         ./src/odbc-test/scripts/import_test_data.sh
     - name: run-tests
        run: |
-         ./build/odbc/bin/tests --gtest_output="xml:report.xml"
+         ./build/odbc/bin/tests
     - name: upload-test-report
       if: always()
       uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
