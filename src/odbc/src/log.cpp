@@ -55,14 +55,15 @@ void Logger::setLogPath(std::string path) {
     return;
   }
   logPath = path;
-  if (!IsEnabled()) {
-    if (logLevel != LogLevel::Type::OFF && !logPath.empty()) {
+  if (logLevel != LogLevel::Type::OFF && !logPath.empty()) {
+    if (!IsEnabled()) {
+      stream.open(logPath);
+    } else {
+      LOG_ERROR_MSG(
+          "ERROR: reset log path: Log path is changed to " + logPath);
+      stream.close();
       stream.open(logPath);
     }
-  } else {
-    LOG_ERROR_MSG(
-        "Error: trying to set log path when logging is already enabled set for this "
-        "connection");
   }
 }
 
