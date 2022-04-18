@@ -27,7 +27,6 @@ struct LogLevel {
     DEBUG_LEVEL,
     INFO_LEVEL,
     ERROR_LEVEL,
-    // -AL- referring by ERROR_LEVEL instad of ERROR becase ERROR causes a conflict of definition on Windows 
     OFF,
     UNKNOWN
   };

@@ -45,8 +45,6 @@ LogStream::~LogStream() {
   }
 }
 
-// -AL- to do add: log error somehow when program is trying to set path TWICE or
-// more
 void Logger::setLogPath(std::string path) {
   if (logPath == path) {
     LOG_DEBUG_MSG(
@@ -96,7 +94,7 @@ LogLevel::Type Logger::getLogLevel() {
   return logLevel;
 }
 
-std::string Logger::getLogPath() {
+std::string& Logger::getLogPath() {
   return logPath;
 }
 

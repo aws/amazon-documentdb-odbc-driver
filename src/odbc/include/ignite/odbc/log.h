@@ -30,7 +30,6 @@
 // Todo: implement log file using user-provided log path
 // https://bitquill.atlassian.net/browse/AD-697
 
-// todo remove pre-fix when making PR ready for review
 #define WRITE_MSG(param, logLevel)                            \
   {                                                           \
     std::shared_ptr< ignite::odbc::Logger > p =               \
@@ -49,7 +48,7 @@
           msg_prefix = "ERROR MSG: ";                         \
           break;                                              \
         default:                                              \
-          msg_prefix = "wrong level passed!!!!!!!";           \
+          msg_prefix = "";                                    \
       }                                                       \
       lstream << msg_prefix << __FUNCTION__ << ": " << param; \
     }                                                         \
@@ -67,20 +66,16 @@
     lstream << __FUNCTION__ << ": " << param;                           \
   }                                                                     \
   static_assert(true, ""); }
-// \ is used as line continuation here.
-// to debug the LOG_MSG macro functions, need to navigate to a place where it is used 
-// and use solar lint to check and make sure it doesn't have red squiggles 
 
-// todo remove extra "xxx msg" in front -AL- // the purpose of adding the 
-// "DEBUG MSG:" is for debugging my logging implementation.
+// Debug messages are messages that are useful for debugging
 #define LOG_DEBUG_MSG(param) \
   WRITE_MSG(param, ignite::odbc::LogLevel::Type::DEBUG_LEVEL)
 
-// todo remove extra "xxx msg" in front -AL-
+// Info messages are messages that document the application flow
 #define LOG_INFO_MSG(param) \
   WRITE_MSG(param, ignite::odbc::LogLevel::Type::INFO_LEVEL)
 
-// todo remove extra "xxx msg" in front -AL-
+// Error messages display errors.
 #define LOG_ERROR_MSG(param) \
   WRITE_MSG(param, ignite::odbc::LogLevel::Type::ERROR_LEVEL)
 
@@ -128,7 +123,7 @@ class LogStream : public std::basic_ostream< char > {
 class Logger {
  public:
   /**
-   * Destructor. // -AL- made public so shared_ptr can remove the object when program exits
+   * Destructor.
    */
   ~Logger();
 
@@ -149,7 +144,6 @@ class Logger {
    * @return Logger instance.
    */
   static std::shared_ptr<Logger> getLoggerInstance() {
-      // -AL- Todo make jira ticket for adding locks for logger instance (or can do it myself if it is easy)
     if (!_logger)
         _logger = std::shared_ptr< Logger >(new Logger());
 
@@ -166,7 +160,7 @@ class Logger {
    * Get the logger's set log path.
    * @return logPath.
    */
-  std::string getLogPath();
+  std::string& getLogPath();
 
   /**
    * Checks if logging is enabled.

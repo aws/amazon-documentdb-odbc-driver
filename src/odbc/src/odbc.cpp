@@ -325,8 +325,12 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
   using odbc::utility::SqlStringToString;
 
   LOG_DEBUG_MSG("SQLDriverConnect called");
-  if (inConnectionString)
-    LOG_INFO_MSG("Connection String: [" << inConnectionString << "]");
+
+  // TODO enable logging connection string 
+  // https://bitquill.atlassian.net/browse/AD-702
+  
+  //if (inConnectionString)
+  //  LOG_INFO_MSG("Connection String: [" << inConnectionString << "]");
 
   Connection* connection = reinterpret_cast< Connection* >(conn);
 
@@ -356,8 +360,8 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
   if (outConnectionStringLen)
     *outConnectionStringLen = static_cast< SQLSMALLINT >(reslen);
 
-  if (outConnectionString)
-    LOG_INFO_MSG(outConnectionString);
+  //if (outConnectionString)
+  //  LOG_INFO_MSG(outConnectionString);
 
   LOG_DEBUG_MSG("SQLDriverConnect exiting");
 
@@ -532,10 +536,7 @@ SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT colNum, SQLSMALLINT targetType,
 SQLRETURN SQLFetch(SQLHSTMT stmt) {
   using odbc::Statement;
 
-  LOG_DEBUG_MSG("SQLFetch called");  // add "debug msg" temporarily
-  LOG_INFO_MSG("SQLFetch called");   // -AL- remove later
-  LOG_ERROR_MSG("SQLFetch called");  // -AL- remove after testing different log
-                                     // levels complete
+  LOG_DEBUG_MSG("SQLFetch called");
 
   Statement* statement = reinterpret_cast< Statement* >(stmt);
 
@@ -695,7 +696,7 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLCHAR* catalogName,
 
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
-// -AL- Apr11-2022 last checked - 12 pm
+
 SQLRETURN SQLMoreResults(SQLHSTMT stmt) {
   using odbc::Statement;
 
