@@ -54,15 +54,17 @@ void Logger::setLogPath(std::string path) {
         "setLogPath should only be called once");
     return;
   }
+  std::string oldLogPath = logPath;
   logPath = path;
   if (logLevel != LogLevel::Type::OFF && !logPath.empty()) {
     if (!IsEnabled()) {
       stream.open(logPath);
     } else {
-      LOG_ERROR_MSG(
-          "ERROR: reset log path: Log path is changed to " + logPath);
+      LOG_INFO_MSG(
+          "reset log path: Log path is changed to " + logPath);
       stream.close();
       stream.open(logPath);
+      LOG_INFO_MSG("Previously logged information is stored in log file " + oldLogPath);
     }
   }
 }
