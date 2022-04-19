@@ -74,7 +74,7 @@ const std::string Configuration::DefaultValue::sshKnownHostsFile = "";
 
 // Logging Configuration options
 const LogLevel::Type Configuration::DefaultValue::logLevel =
-    LogLevel::Type::INFO_LEVEL;
+    LogLevel::Type::ERROR_LEVEL;
 const std::string Configuration::DefaultValue::logPath = DEFAULT_LOG_PATH;
 
 // Additional options

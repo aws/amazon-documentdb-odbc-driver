@@ -27,7 +27,7 @@ There are the following levels of logging:
 
 | Property Name | Description | Platform | Default |
 |--------|-------------|--------|---------------|
-| `log_level` | The log level for all sources/appenders. | All Platforms | `INFO` |
+| `log_level` | The log level for all sources/appenders. | All Platforms | `ERROR` |
 | `log_path` | The location for file logging. | Windows | `%TEMP%/documentdb_odbc.log` |
 | `log_path` | The location for file logging. | MacOS | `~/Library/Logs/documentdb_odbc.log` |
 | `log_path` | The location for file logging. | Linux/Unix | `~/var/log/documentdb_odbc.log` |
