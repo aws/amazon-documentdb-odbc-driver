@@ -13,8 +13,6 @@ On Windows, you may change the default path in the DSN configuration window.
 In any platform, you may pass your log path / log level in the connection string.
 The keyword for log path is `log_path` and the keyword for log level is `log_level`. 
 
-Refer to the documentation of your tool of choice for similar instructions.
-
 ### Setting Logging Level and Location
 There are the following levels of logging:
 
