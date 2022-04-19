@@ -27,8 +27,6 @@
 #include <ignite/odbc/ignite_error.h>
 #include <ignite/odbc/jni/java.h>
 #include <ignite/odbc/jni/utils.h>
-#include <ignite/odbc/log_level.h>
-#include <ignite/odbc/log.h>
 #include <sql.h>
 #include <sqlext.h>
 
@@ -42,8 +40,6 @@
 using ignite::odbc::OdbcTestSuite;
 using namespace boost::unit_test;
 using ignite::odbc::if_integration;
-using ignite::odbc::LogLevel;
-using ignite::odbc::Logger;
 
 using ignite::odbc::common::ReleaseChars;
 using ignite::odbc::config::ConnectionStringParser;
@@ -177,27 +173,6 @@ BOOST_AUTO_TEST_CASE(TestDriverManagerGetConnection) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_REQUIRE(connection.Get() != nullptr);
-
-  std::string logPath = GetEnv("DOC_DB_LOG_PATH", "");
-  std::string logLevel = GetEnv("DOC_DB_LOG_LEVEL", "");
-  LogLevel::Type level = LogLevel::FromString(logLevel);
-
-  std::shared_ptr< Logger > logger = Logger::getLoggerInstance();
-
-  // check log level
-  LogLevel::Type loggerLogLevel = logger->getLogLevel();
-  BOOST_CHECK_EQUAL(static_cast< int >(level),
-                    static_cast< int >(loggerLogLevel));
-
-  // check log path
-  std::string loggerLogPath = logger->getLogPath();
-  BOOST_CHECK_EQUAL(logPath, loggerLogPath);
-
-  // check that the file stream is open
-  bool loggerEnabled = logger->IsEnabled();
-  BOOST_CHECK(loggerEnabled);
-
-  LOG_DEBUG_MSG("logger checks haved passed in java_test");
 
   _ctx.Get()->ConnectionClose(connection, errInfo);
   connection = SharedPointer< GlobalJObject >(nullptr);

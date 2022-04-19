@@ -56,12 +56,12 @@ void Logger::setLogPath(std::string path) {
   logPath = path;
   if (logLevel != LogLevel::Type::OFF && !logPath.empty()) {
     if (!IsEnabled()) {
-      stream.open(logPath, std::ios_base::app);
+      stream.open(logPath);
     } else {
       LOG_INFO_MSG(
           "reset log path: Log path is changed to " + logPath);
       stream.close();
-      stream.open(logPath, std::ios_base::app);
+      stream.open(logPath);
       LOG_INFO_MSG("Previously logged information is stored in log file " + oldLogPath);
     }
   }
@@ -70,7 +70,7 @@ void Logger::setLogPath(std::string path) {
 void Logger::setLogLevel(LogLevel::Type level) {
   logLevel = level;
   if (!IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()) {
-    stream.open(logPath, std::ios_base::app);
+    stream.open(logPath);
   } else if (IsEnabled() && logLevel == LogLevel::Type::OFF) {
     stream.close();
   }
