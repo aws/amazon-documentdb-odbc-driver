@@ -19,9 +19,9 @@
 #define _IGNITE_ODBC_LOG
 
 #include <fstream>
+#include <memory>
 #include <sstream>
 #include <string>
-#include <memory>
 
 #include "ignite/odbc/common/common.h"
 #include "ignite/odbc/common/concurrent.h"
@@ -153,9 +153,13 @@ class Logger {
    * If there is no instance, create new instance.
    * @return Logger instance.
    */
-  static std::shared_ptr<Logger> getLoggerInstance() {
+  static std::shared_ptr< Logger > getLoggerInstance() {
+    // TODO add locks to prevent 2 or more instances being
+    // created at once
+    // [AD-716](https://bitquill.atlassian.net/browse/AD-716)
+
     if (!_logger)
-        _logger = std::shared_ptr< Logger >(new Logger());
+      _logger = std::shared_ptr< Logger >(new Logger());
 
     return _logger;
   }
@@ -185,13 +189,12 @@ class Logger {
   void WriteMessage(std::string const& message);
 
  private:
-  static std::shared_ptr< Logger > _logger;  //a singleton instance
+  static std::shared_ptr< Logger > _logger;  // a singleton instance
 
   /**
    * Constructor.
    */
-  Logger()
-      : mutex(), stream(), logLevel(), logPath(){ 
+  Logger() : mutex(), stream(), logLevel(), logPath() {
     // no-op
   }
 
