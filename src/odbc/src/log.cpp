@@ -54,26 +54,18 @@ void Logger::setLogPath(std::string path) {
   }
   std::string oldLogPath = logPath;
   logPath = path;
-  if (logLevel != LogLevel::Type::OFF && !logPath.empty()) {
-    if (!IsEnabled()) {
-      stream.open(logPath, std::ios_base::app);
-    } else {
+  if (IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()) {
       LOG_INFO_MSG(
-          "reset log path: Log path is changed to " + logPath);
+          "Reset log path: Log path is changed to " + logPath);
       stream.close();
       stream.open(logPath, std::ios_base::app);
       LOG_INFO_MSG("Previously logged information is stored in log file " + oldLogPath);
-    }
+    
   }
 }
 
 void Logger::setLogLevel(LogLevel::Type level) {
   logLevel = level;
-  if (!IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()) {
-    stream.open(logPath, std::ios_base::app);
-  } else if (IsEnabled() && logLevel == LogLevel::Type::OFF) {
-    stream.close();
-  }
 }
 
 Logger::~Logger() {
@@ -83,6 +75,13 @@ bool Logger::IsEnabled() const {
   return stream.is_open();
 }
 
+bool Logger::EnableLog() {
+  if (!IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()) {
+    stream.open(logPath, std::ios_base::app);
+  }
+  return IsEnabled();
+}
+
 void Logger::WriteMessage(std::string const& message) {
   if (IsEnabled()) {
     common::concurrent::CsLockGuard guard(mutex);
@@ -90,7 +89,7 @@ void Logger::WriteMessage(std::string const& message) {
   }
 }
 
-LogLevel::Type Logger::getLogLevel() {
+LogLevel::Type Logger::getLogLevel() const {
   return logLevel;
 }
 

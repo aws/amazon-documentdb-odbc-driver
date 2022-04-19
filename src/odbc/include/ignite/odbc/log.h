@@ -35,7 +35,7 @@
   {                                                                                                                   \
     std::shared_ptr< ignite::odbc::Logger > p =                                                                       \
         ignite::odbc::Logger::getLoggerInstance();                                                                    \
-    if (p->IsEnabled() && p->getLogLevel() <= logLevel) {                                                             \
+    if ((p->IsEnabled() || p->EnableLog()) && p->getLogLevel() <= logLevel) {                                         \
       ignite::odbc::LogStream lstream(p.get());                                                                       \
       std::string msg_prefix;                                                                                         \
       switch (logLevel) {                                                                                             \
@@ -67,7 +67,7 @@
   {                                                                                                      \
     std::shared_ptr< ignite::odbc::Logger > p =                                                          \
         ignite::odbc::Logger::getLoggerInstance();                                                       \
-    if (p->IsEnabled()) {                                                                                \
+    if (p->IsEnabled() || p->EnableLog()) {                                                              \
       ignite::odbc::LogStream lstream(p.get());                                                          \
       char tStr[1000];                                                                                   \
       time_t curTime = time(NULL);                                                                       \
@@ -185,7 +185,7 @@ class Logger {
    * Get the logger's set log level.
    * @return logLevel.
    */
-  LogLevel::Type getLogLevel();
+  LogLevel::Type getLogLevel() const;
 
   /**
    * Get the logger's set log path.
@@ -198,6 +198,12 @@ class Logger {
    * @return True, if logging is enabled.
    */
   bool IsEnabled() const;
+
+  /**
+   * Enable logging if log path is set and log level is not off.
+   * @return True, if logging is enabled. False is logging cannot be enabled
+   */
+  bool EnableLog();
 
   /**
    * Outputs the message to log file
