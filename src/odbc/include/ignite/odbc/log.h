@@ -18,11 +18,14 @@
 #ifndef _IGNITE_ODBC_LOG
 #define _IGNITE_ODBC_LOG
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include <fstream>
 #include <memory>
 #include <sstream>
 #include <string>
-
 #include "ignite/odbc/common/common.h"
 #include "ignite/odbc/common/concurrent.h"
 #include "ignite/odbc/log_level.h"
@@ -30,52 +33,67 @@
 // Todo: implement log file using user-provided log path
 // https://bitquill.atlassian.net/browse/AD-697
 
-#define WRITE_MSG(param, logLevel)                                    \
-  {                                                                   \
-    std::shared_ptr< ignite::odbc::Logger > p =                       \
-        ignite::odbc::Logger::getLoggerInstance();                    \
-    if (p->IsEnabled() && p->getLogLevel() <= logLevel) {             \
-      ignite::odbc::LogStream lstream(p.get());                       \
-      std::string msg_prefix;                                         \
-      switch (logLevel) {                                             \
-        case ignite::odbc::LogLevel::Type::DEBUG_LEVEL:               \
-          msg_prefix = "DEBUG MSG: ";                                 \
-          break;                                                      \
-        case ignite::odbc::LogLevel::Type::INFO_LEVEL:                \
-          msg_prefix = "INFO MSG: ";                                  \
-          break;                                                      \
-        case ignite::odbc::LogLevel::Type::ERROR_LEVEL:               \
-          msg_prefix = "ERROR MSG: ";                                 \
-          break;                                                      \
-        default:                                                      \
-          msg_prefix = "";                                            \
-      }                                                               \
-      char tStr[1000];                                                \
-      time_t curTime = time(NULL);                                    \
-      struct tm* locTime = localtime(&curTime);                       \
-      strftime(tStr, 1000, "%T %x ", locTime);                        \
-      lstream << msg_prefix << tStr << __FUNCTION__ << ": " << param; \
-    }                                                                 \
-    static_assert(true, "");                                          \
+#define WRITE_MSG(param, logLevel)                                                                               \
+  {                                                                                                              \
+    std::shared_ptr< ignite::odbc::Logger > p =                                                                  \
+        ignite::odbc::Logger::getLoggerInstance();                                                               \
+    if (p->IsEnabled() && p->getLogLevel() <= logLevel) {                                                        \
+      ignite::odbc::LogStream lstream(p.get());                                                                  \
+      std::string msg_prefix;                                                                                    \
+      switch (logLevel) {                                                                                        \
+        case ignite::odbc::LogLevel::Type::DEBUG_LEVEL:                                                          \
+          msg_prefix = "DEBUG MSG: ";                                                                            \
+          break;                                                                                                 \
+        case ignite::odbc::LogLevel::Type::INFO_LEVEL:                                                           \
+          msg_prefix = "INFO MSG: ";                                                                             \
+          break;                                                                                                 \
+        case ignite::odbc::LogLevel::Type::ERROR_LEVEL:                                                          \
+          msg_prefix = "ERROR MSG: ";                                                                            \
+          break;                                                                                                 \
+        default:                                                                                                 \
+          msg_prefix = "";                                                                                       \
+      }                                                                                                          \
+      char tStr[1000];                                                                                           \
+      time_t curTime = time(NULL);                                                                               \
+      struct tm* locTime = localtime(&curTime);                                                                  \
+      strftime(tStr, 1000, "%T %x ", locTime);                                                                   \
+      lstream << "PID: " << GetCurrentProcessId() << " " << msg_prefix << tStr << __FUNCTION__ << ": " << param; \
+    }                                                                                                            \
+    static_assert(true, "");                                                                                     \
   }
 
 // TODO replace and remove LOG_MSG
 // https://bitquill.atlassian.net/browse/AD-703
 // @Deprecated
-#define LOG_MSG(param)                                  \
-  {                                                     \
-    std::shared_ptr< ignite::odbc::Logger > p =         \
-        ignite::odbc::Logger::getLoggerInstance();      \
-    if (p->IsEnabled()) {                               \
-      ignite::odbc::LogStream lstream(p.get());         \
-      char tStr[1000];                                  \
-      time_t curTime = time(NULL);                      \
-      struct tm* locTime = localtime(&curTime);         \
-      strftime(tStr, 1000, "%T %x ", locTime);          \
-      lstream << tStr << __FUNCTION__ << ": " << param; \
-    }                                                   \
-    static_assert(true, "");                            \
+#define LOG_MSG(param)                                                                              \
+  {                                                                                                 \
+    std::shared_ptr< ignite::odbc::Logger > p =                                                     \
+        ignite::odbc::Logger::getLoggerInstance();                                                  \
+    if (p->IsEnabled()) {                                                                           \
+      ignite::odbc::LogStream lstream(p.get());                                                     \
+      char tStr[1000];                                                                              \
+      time_t curTime = time(NULL);                                                                  \
+      struct tm* locTime = localtime(&curTime);                                                     \
+      strftime(tStr, 1000, "%T %x ", locTime);                                                      \
+      lstream << "PID: " << GetCurrentProcessId() << " " << tStr << __FUNCTION__ << ": " << param;  \
+    }                                                                                               \
+    static_assert(true, "");                                                                        \
   }
+
+//void test(std::string param)
+//  {                                                     
+//    std::shared_ptr< ignite::odbc::Logger > p =         
+//        ignite::odbc::Logger::getLoggerInstance();      
+//    if (p->IsEnabled()) {                               
+//      ignite::odbc::LogStream lstream(p.get());         
+//      char tStr[1000];                                  
+//      time_t curTime = time(NULL);                      
+//      struct tm* locTime = localtime(&curTime);         
+//      strftime(tStr, 1000, "%T %x ", locTime);          
+//      lstream << GetCurrentProcessId() << tStr << __FUNCTION__ << ": " << param; 
+//    }                                                   
+//    static_assert(true, "");                            
+//  }
 
 // Debug messages are messages that are useful for debugging
 #define LOG_DEBUG_MSG(param) \
