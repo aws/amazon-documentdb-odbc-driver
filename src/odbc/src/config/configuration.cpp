@@ -30,11 +30,11 @@
 #define DEFAULT_LOG_PATH \
   std::string(getenv("TEMP")) + "\\documentdb_odbc.log";  // Windows
 #elif defined(__APPLE__)
-#define DEFAULT_LOG_PATH "~/Library/Logs/documentdb_odbc.log ";  // Apple
+#define DEFAULT_LOG_PATH "~/Library/Logs/documentdb_odbc.log";  // Apple
 #elif defined(__linux__)
-#define DEFAULT_LOG_PATH "~/var/log/documentdb_odbc.log ";  // Linux
+#define DEFAULT_LOG_PATH "~/var/log/documentdb_odbc.log";  // Linux
 #else
-#define DEFAULT_LOG_PATH "~/var/log/documentdb_odbc.log ";  // unix
+#define DEFAULT_LOG_PATH "~/var/log/documentdb_odbc.log";  // unix
 #endif
 
 using ignite::common::EncodeURIComponent;
