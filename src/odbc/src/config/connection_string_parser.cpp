@@ -161,7 +161,6 @@ void ConnectionStringParser::HandleAttributePair(
                 "Port attribute value is empty. Using default value.", key,
                 value));
       }
-
       return;
     }
 
@@ -174,7 +173,6 @@ void ConnectionStringParser::HandleAttributePair(
                 " Using default value.",
                 key, value));
       }
-
       return;
     }
 
@@ -186,7 +184,6 @@ void ConnectionStringParser::HandleAttributePair(
                 "Port attribute value is too large. Using default value.", key,
                 value));
       }
-
       return;
     }
 
@@ -204,7 +201,6 @@ void ConnectionStringParser::HandleAttributePair(
                              "Using default value.",
                              key, value));
       }
-
       return;
     }
 
@@ -221,7 +217,6 @@ void ConnectionStringParser::HandleAttributePair(
                              " Using default value.",
                              key, value));
       }
-
       return;
     }
 
@@ -233,7 +228,6 @@ void ConnectionStringParser::HandleAttributePair(
                              "large. Using default value.",
                              key, value));
       }
-
       return;
     }
 
@@ -252,7 +246,6 @@ void ConnectionStringParser::HandleAttributePair(
                 " Using default value.",
                 key, value));
       }
-
       return;
     }
 
@@ -266,7 +259,6 @@ void ConnectionStringParser::HandleAttributePair(
                               "Specified read preference is not supported. "
                               "Default value used ('primary').");
       }
-
       return;
     }
 
@@ -283,7 +275,6 @@ void ConnectionStringParser::HandleAttributePair(
             MakeErrorMessage("Unrecognized bool value. Using default value.",
                              key, value));
       }
-
       return;
     }
 
@@ -298,7 +289,6 @@ void ConnectionStringParser::HandleAttributePair(
             MakeErrorMessage("Unrecognized bool value. Using default value.",
                              key, value));
       }
-
       return;
     }
 
@@ -313,7 +303,6 @@ void ConnectionStringParser::HandleAttributePair(
             MakeErrorMessage("Unrecognized bool value. Using default value.",
                              key, value));
       }
-
       return;
     }
 
@@ -330,7 +319,6 @@ void ConnectionStringParser::HandleAttributePair(
             MakeErrorMessage("Unrecognized bool value. Using default value.",
                              key, value));
       }
-
       return;
     }
 
@@ -353,7 +341,6 @@ void ConnectionStringParser::HandleAttributePair(
             MakeErrorMessage("Unrecognized bool value. Using default value.",
                              key, value));
       }
-
       return;
     }
 
@@ -369,7 +356,6 @@ void ConnectionStringParser::HandleAttributePair(
                               "Specified log level is not supported. "
                               "Default value used ('info').");
       }
-
       return;
     }
 
@@ -385,7 +371,6 @@ void ConnectionStringParser::HandleAttributePair(
                               "Specified scan method is not supported. Default "
                               "value used ('random').");
       }
-
       return;
     }
 
@@ -400,7 +385,6 @@ void ConnectionStringParser::HandleAttributePair(
                 " Using default value.",
                 key, value));
       }
-
       return;
     }
 
@@ -412,7 +396,6 @@ void ConnectionStringParser::HandleAttributePair(
                              " Using default value.",
                              key, value));
       }
-
       return;
     }
 
@@ -430,7 +413,6 @@ void ConnectionStringParser::HandleAttributePair(
                              " Using default value.",
                              key, value));
       }
-
       return;
     }
 
@@ -447,7 +429,6 @@ void ConnectionStringParser::HandleAttributePair(
             MakeErrorMessage("Unrecognized bool value. Using default value.",
                              key, value));
       }
-
       return;
     }
 
@@ -462,7 +443,6 @@ void ConnectionStringParser::HandleAttributePair(
                              " Using default value.",
                              key, value));
       }
-
       return;
     }
 
@@ -474,7 +454,6 @@ void ConnectionStringParser::HandleAttributePair(
                              " Using default value.",
                              key, value));
       }
-
       return;
     }
 
@@ -493,7 +472,6 @@ void ConnectionStringParser::HandleAttributePair(
                 " Using default value.",
                 key, value));
       }
-
       return;
     }
 
