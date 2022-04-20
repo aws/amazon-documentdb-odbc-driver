@@ -23,6 +23,7 @@
 #include <sstream>
 #include <string>
 #include <thread>
+
 #include "ignite/common/utils.h"
 #include "ignite/odbc/common/common.h"
 #include "ignite/odbc/common/concurrent.h"
@@ -42,33 +43,34 @@
 #define DEFAULT_LOG_PATH "~/var/log/documentdb_odbc.log";  // unix
 #endif
 
-#define WRITE_MSG(param, logLevel)                                                                                    \
-  {                                                                                                                   \
-    std::shared_ptr< ignite::odbc::Logger > p =                                                                       \
-        ignite::odbc::Logger::getLoggerInstance();                                                                    \
-    if ((p->IsEnabled() || p->EnableLog()) && p->getLogLevel() <= logLevel) {                                         \
-      ignite::odbc::LogStream lstream(p.get());                                                                       \
-      std::string msg_prefix;                                                                                         \
-      switch (logLevel) {                                                                                             \
-        case ignite::odbc::LogLevel::Type::DEBUG_LEVEL:                                                               \
-          msg_prefix = "DEBUG MSG: ";                                                                                 \
-          break;                                                                                                      \
-        case ignite::odbc::LogLevel::Type::INFO_LEVEL:                                                                \
-          msg_prefix = "INFO MSG: ";                                                                                  \
-          break;                                                                                                      \
-        case ignite::odbc::LogLevel::Type::ERROR_LEVEL:                                                               \
-          msg_prefix = "ERROR MSG: ";                                                                                 \
-          break;                                                                                                      \
-        default:                                                                                                      \
-          msg_prefix = "";                                                                                            \
-      }                                                                                                               \
-      char tStr[1000];                                                                                                \
-      time_t curTime = time(NULL);                                                                                    \
-      struct tm* locTime = localtime(&curTime);                                                                       \
-      strftime(tStr, 1000, "%T %x ", locTime);                                                                        \
-      lstream << "TID: " << std::this_thread::get_id() << " " << msg_prefix << tStr << __FUNCTION__ << ": " << param; \
-    }                                                                                                                 \
-    static_assert(true, "");                                                                                          \
+#define WRITE_MSG(param, logLevel)                                            \
+  {                                                                           \
+    std::shared_ptr< ignite::odbc::Logger > p =                               \
+        ignite::odbc::Logger::getLoggerInstance();                            \
+    if (p->getLogLevel() <= logLevel && (p->IsEnabled() || p->EnableLog())) { \
+      ignite::odbc::LogStream lstream(p.get());                               \
+      std::string msg_prefix;                                                 \
+      switch (logLevel) {                                                     \
+        case ignite::odbc::LogLevel::Type::DEBUG_LEVEL:                       \
+          msg_prefix = "DEBUG MSG: ";                                         \
+          break;                                                              \
+        case ignite::odbc::LogLevel::Type::INFO_LEVEL:                        \
+          msg_prefix = "INFO MSG: ";                                          \
+          break;                                                              \
+        case ignite::odbc::LogLevel::Type::ERROR_LEVEL:                       \
+          msg_prefix = "ERROR MSG: ";                                         \
+          break;                                                              \
+        default:                                                              \
+          msg_prefix = "";                                                    \
+      }                                                                       \
+      char tStr[1000];                                                        \
+      time_t curTime = time(NULL);                                            \
+      struct tm* locTime = localtime(&curTime);                               \
+      strftime(tStr, 1000, "%T %x ", locTime);                                \
+      lstream << "TID: " << std::this_thread::get_id() << " " << msg_prefix   \
+              << tStr << __FUNCTION__ << ": " << param;                       \
+    }                                                                         \
+    static_assert(true, "");                                                  \
   }
 
 // TODO replace and remove LOG_MSG
