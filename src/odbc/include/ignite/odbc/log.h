@@ -91,22 +91,6 @@
     static_assert(true, "");                                                                             \
   }
 
-//void test(std::string param)
-//  {                                                     
-//    std::shared_ptr< ignite::odbc::Logger > p =         
-//        ignite::odbc::Logger::getLoggerInstance();      
-//    if (p->IsEnabled()) {                               
-//      ignite::odbc::LogStream lstream(p.get());         
-//      char tStr[1000];                                  
-//      time_t curTime = time(NULL);                      
-//      struct tm* locTime = localtime(&curTime);         
-//      strftime(tStr, 1000, "%T %x ", locTime);
-//      std::thread::id;
-//      lstream << "TID: " << std::this_thread::get_id() << " " << tStr << __FUNCTION__ << ": " << param; 
-//    }                                                   
-//    static_assert(true, "");                            
-//  }
-
 // Debug messages are messages that are useful for debugging
 #define LOG_DEBUG_MSG(param) \
   WRITE_MSG(param, ignite::odbc::LogLevel::Type::DEBUG_LEVEL)
