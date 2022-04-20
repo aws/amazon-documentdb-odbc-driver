@@ -58,7 +58,6 @@ void Logger::setLogPath(std::string path) {
       LOG_INFO_MSG(
           "Reset log path: Log path is changed to " + logPath);
       stream.close();
-      stream.open(logPath, std::ios_base::app);
       LOG_INFO_MSG("Previously logged information is stored in log file " + oldLogPath);
     
   }
