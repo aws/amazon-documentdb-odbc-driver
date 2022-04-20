@@ -45,6 +45,17 @@ LogStream::~LogStream() {
   }
 }
 
+void Logger::CreateFileName(std::string& fileName) {
+  char tStr[1000];
+  time_t curTime = time(NULL);
+  struct tm* locTime = localtime(&curTime);
+  strftime(tStr, 1000, "%T_%x ", locTime); // TODO -AL- change to format YYYYMMDD_HHMMSS. 
+                                           // -AL- look at https://linux.die.net/man/3/strftime  for guidance
+  // could test on web C++
+  std::string dateTime(tStr, std::find(tStr, tStr + 1000, '\0'));
+  fileName = "docdb_odbc" + dateTime + ".log";
+}
+
 void Logger::setLogPath(std::string path) {
   if (logPath == path) {
     LOG_DEBUG_MSG(

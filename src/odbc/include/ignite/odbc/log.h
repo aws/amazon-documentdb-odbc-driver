@@ -218,6 +218,11 @@ class Logger {
     // no-op
   }
 
+  /**
+   * Creates the log file name based on date and time
+   */
+  void CreateFileName(std::string& fileName);
+
   IGNITE_NO_COPY_ASSIGNMENT(Logger);
 
   /** Mutex for writes synchronization. */
