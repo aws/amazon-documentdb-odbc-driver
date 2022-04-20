@@ -354,7 +354,7 @@ void ConnectionStringParser::HandleAttributePair(
       if (diag) {
         diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
                               "Specified log level is not supported. "
-                              "Default value used ('info').");
+                              "Default value used ('error').");
       }
       return;
     }
