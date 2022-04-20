@@ -24,7 +24,6 @@
 #include <sqlext.h>
 
 #include <boost/test/unit_test.hpp>
-#include <ignite/odbc/common/platform_utils.h>
 #include <ignite/odbc/log_level.h>
 #include <ignite/odbc/log.h>
 #include <string>
@@ -109,39 +108,6 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestoreLocalServer) {
   std::string connectionString;
   CreateDsnConnectionStringForLocalServer(connectionString);
   Connect(connectionString);
-  Disconnect();
-}
-
-// TODO enable the log file unit test after logging is properly 
-// supported in test suites
-// https://bitquill.atlassian.net/browse/AD-712
-BOOST_AUTO_TEST_CASE(TestLogFileCreatedWithConnection, *disabled()) {
-  std::string connectionString;
-  CreateDsnConnectionStringForLocalServer(connectionString);
-  Connect(connectionString);
-
-  LOG_DEBUG_MSG("TestLogFileCreatedWithConnection: Connected");
-
-  std::string logPath = GetEnv("DOC_DB_LOG_PATH", "");
-  std::string logLevel = GetEnv("DOC_DB_LOG_LEVEL", "");
-  LogLevel::Type level = LogLevel::FromString(logLevel);
-
-  std::shared_ptr< Logger > logger = Logger::getLoggerInstance();
-
-  // check log level
-  LogLevel::Type loggerLogLevel = logger->getLogLevel();
-  BOOST_CHECK_EQUAL(static_cast< int >(level),
-                    static_cast< int >(loggerLogLevel));
-
-  // check log path
-  std::string loggerLogPath = logger->getLogPath();
-  BOOST_CHECK_EQUAL(logPath,
-                    loggerLogPath);
-
-  // check that the file stream is open
-  bool loggerEnabled = logger->IsEnabled();
-  BOOST_CHECK(loggerEnabled);
-
   Disconnect();
 }
 

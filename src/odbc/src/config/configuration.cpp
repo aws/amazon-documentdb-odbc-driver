@@ -26,17 +26,6 @@
 #include "ignite/odbc/log.h"
 #include "ignite/odbc/utility.h"
 
-#if defined(_WIN32)
-#define DEFAULT_LOG_PATH \
-  std::string(getenv("TEMP")) + "\\documentdb_odbc.log";  // Windows
-#elif defined(__APPLE__)
-#define DEFAULT_LOG_PATH "~/Library/Logs/documentdb_odbc.log";  // Apple
-#elif defined(__linux__)
-#define DEFAULT_LOG_PATH "~/var/log/documentdb_odbc.log";  // Linux
-#else
-#define DEFAULT_LOG_PATH "~/var/log/documentdb_odbc.log";  // unix
-#endif
-
 using ignite::common::EncodeURIComponent;
 
 namespace ignite {
@@ -541,7 +530,7 @@ std::string Configuration::ToJdbcConnectionString() const {
        it != arguments.end(); ++it) {
     const std::string& key = it->first;
     const std::string& value = it->second;
-    if (!value.empty())
+    if (key != "logLevel" && key != "logPath" && !value.empty())
       options << '&' << key << '=' << EncodeURIComponent(value);
   }
   jdbcConnectionString.append(options.str());

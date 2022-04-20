@@ -44,6 +44,7 @@ set(SOURCES
          src/connection_test.cpp
          src/java_test.cpp
          src/jni_test.cpp
+         src/log_test.cpp
          src/meta_queries_test.cpp
          src/odbc_test_suite.cpp
          src/queries_test.cpp
