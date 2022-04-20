@@ -56,6 +56,38 @@ BOOST_AUTO_TEST_CASE(TestLogFileCreated) {
   bool loggerEnabled = logger->IsEnabled();
   BOOST_CHECK(loggerEnabled);
 }
+
+BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
+  std::string logPath = DEFAULT_LOG_PATH;
+  LogLevel::Type logLevel = LogLevel::Type::DEBUG_LEVEL;
+
+  std::shared_ptr< Logger > logger = Logger::getLoggerInstance();
+  // set log level and stream
+  logger->setLogLevel(logLevel);
+  logger->setLogPath(logPath);
+
+  // check log level
+  LogLevel::Type loggerLogLevel = logger->getLogLevel();
+  BOOST_CHECK(logLevel == loggerLogLevel);
+
+  // check log path
+  std::string loggerLogPath = logger->getLogPath();
+  BOOST_CHECK_EQUAL(logPath, loggerLogPath);
+
+  BOOST_CHECK(logger->IsEnabled());
+
+  std::stringstream stringStream;
+  std::string testData;
+  testData = "test" + std::to_string(std::rand());
+
+  // Write to log file.
+  LOG_DEBUG_MSG(testData);
+  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find_last_of(testData));
+
+  // Write to stream.
+  LOG_DEBUG_MSG_TO_STREAM(testData, &stringStream);
+  BOOST_CHECK_NE(std::string::npos, stringStream.str().find_last_of(testData));
+}
 // move out of connection test and into log_test.cpp
 // can test for setting log path and log level
 // can test unknown log level gives error level
