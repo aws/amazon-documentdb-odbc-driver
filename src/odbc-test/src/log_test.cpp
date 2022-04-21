@@ -53,6 +53,7 @@ BOOST_AUTO_TEST_CASE(TestLogFileCreated) {
   LOG_DEBUG_MSG("test");
 
   // check that the file stream is open
+  BOOST_CHECK(logger->IsFileStremOpen());
   bool loggerEnabled = logger->IsEnabled();
   BOOST_CHECK(loggerEnabled);
 }
@@ -74,6 +75,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   std::string loggerLogPath = logger->getLogPath();
   BOOST_CHECK_EQUAL(logPath, loggerLogPath);
 
+  BOOST_CHECK(logger->IsFileStremOpen());
   BOOST_CHECK(logger->IsEnabled());
 
   std::stringstream stringStream;

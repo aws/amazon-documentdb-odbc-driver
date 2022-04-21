@@ -227,6 +227,12 @@ class Logger {
   std::string& getLogPath();
 
   /**
+   * Checks if file stream is opened.
+   * @return True, if file stream is opened.
+   */
+  bool IsFileStremOpen() const
+
+  /**
    * Checks if logging is enabled.
    * @return True, if logging is enabled.
    */

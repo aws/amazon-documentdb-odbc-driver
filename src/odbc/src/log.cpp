@@ -83,6 +83,10 @@ void Logger::setLogLevel(LogLevel::Type level) {
   logLevel = level;
 }
 
+bool Logger::IsFileStremOpen() const {
+  return fileStream.is_open();
+}
+
 bool Logger::IsEnabled() const {
   return stream != nullptr && (stream != &fileStream || fileStream.is_open());
 }
