@@ -95,9 +95,10 @@ Example:
    3. `brew install unixodbc`  
       - You may need to unlink `libiodbc` if you already have this installed. Use `brew unlink libiodbc`.
    4. `brew install boost`
-   5. `brew install mongodb-community`
-   6. `brew install mongo-cxx-driver`
-   7. Install Java **JDK** (version 8+ - 17 recommended)  
+   5. `brew tap mongodb/brew`
+   6. `brew install mongodb-community`
+   7. `brew install mongo-cxx-driver`
+   8. Install Java **JDK** (version 8+ - 17 recommended)  
       - This can be done through Homebrew using `brew install --cask temurin<version>`. 
       - Ensure to set `JAVA_HOME`. Make sure it is set to temurin. Other JDK package may cause test errors 
       such as `Unable to get initialized JVM` at run time.  
@@ -105,7 +106,7 @@ Example:
       - Ensure to save Java `/bin` and `/server` directories to the User `PATH` variable.  
       Example: /Library/Java/JavaVirtualMachines/jdk-17.0.2.jdk/Contents/Home/lib/server/
       /Library/Java/JavaVirtualMachines/jdk-17.0.2.jdk/Contents/Home/bin/
-   8. If creating a debug build (`./build_mac_debug64.sh`), LLVM is required.
+   9. If creating a debug build (`./build_mac_debug64.sh`), LLVM is required.
       - If you only have XCode Command Line Tools, use the LLVM included with XCode by modifying the PATH with `export PATH=/Library/Developer/CommandLineTools/usr/bin/:$PATH`. Ensure this XCode path comes first in $PATH. If error occurs, check that clang and llvm are under folder Library/Developer/CommandLineTools/usr/bin.
       - If you have XCode application, to ensure LLVM and CMake are compatible, use the LLVM included with XCode by modifying the PATH with `export PATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/:$PATH`.
 2. Run one of the build scripts to create an initial compilation.
