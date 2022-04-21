@@ -56,9 +56,9 @@ using ignite::odbc::common::concurrent::CriticalSection;
       std::ostream* prevStream = p.get()->GetLogStream();                     \
       if (logStream != nullptr) {                                             \
         /* Override the stream temporarily */                                 \
-        p.get()->SetLogStream(logStream);                                    \
+        p.get()->SetLogStream(logStream);                                     \
       }                                                                       \
-      auto lstream = std::make_unique< ignite::odbc::LogStream >(p.get());    \
+      std::unique_ptr< ignite::odbc::LogStream > lstream(new ignite::odbc::LogStream(p.get()));    \
       std::string msg_prefix;                                                 \
       switch (logLevel) {                                                     \
         case ignite::odbc::LogLevel::Type::DEBUG_LEVEL:                       \
