@@ -24,6 +24,7 @@
 
 using ignite::odbc::Logger;
 using ignite::odbc::config::Configuration;
+using ignite::odbc::common::concurrent::CsLockGuard;
 
 // _logger pointer will  initialized in first call to getLoggerInstance
 std::shared_ptr< Logger > Logger::_logger;
@@ -56,7 +57,7 @@ void Logger::CreateFileName(std::string& fileName) {
   fileName = "docdb_odbc" + dateTime + ".log";
 }
 
-void Logger::setLogPath(std::string path) {
+void Logger::setLogPath(const std::string& path) {
   if (logPath == path) {
     LOG_DEBUG_MSG(
         "WARNING: setLogPath is called again with the same path string. "
@@ -68,34 +69,36 @@ void Logger::setLogPath(std::string path) {
   if (IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()) {
       LOG_INFO_MSG(
           "Reset log path: Log path is changed to " + logPath);
-      stream.close();
+      fileStream.close();
       LOG_INFO_MSG("Previously logged information is stored in log file " + oldLogPath);
-    
   }
+  SetLogStream(&fileStream);
+}
+
+void Logger::SetLogStream(std::ostream* logStream) {
+  stream = logStream;
 }
 
 void Logger::setLogLevel(LogLevel::Type level) {
   logLevel = level;
 }
 
-Logger::~Logger() {
-}
-
 bool Logger::IsEnabled() const {
-  return stream.is_open();
+  return stream != nullptr && (stream != &fileStream || fileStream.is_open());
 }
 
 bool Logger::EnableLog() {
-  if (!IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()) {
-    stream.open(logPath, std::ios_base::app);
+  if (!IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()
+      && stream == &fileStream) {
+    fileStream.open(logPath, std::ios_base::app);
   }
   return IsEnabled();
 }
 
 void Logger::WriteMessage(std::string const& message) {
   if (IsEnabled()) {
-    common::concurrent::CsLockGuard guard(mutex);
-    stream << message << std::endl;
+    CsLockGuard guard(mutex);
+    *stream << message << std::endl;
   }
 }
 

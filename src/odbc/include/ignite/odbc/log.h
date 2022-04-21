@@ -29,6 +29,8 @@
 #include "ignite/odbc/common/concurrent.h"
 #include "ignite/odbc/log_level.h"
 
+using ignite::odbc::common::concurrent::CriticalSection;
+
 // Todo: implement log file using user-provided log path
 // https://bitquill.atlassian.net/browse/AD-697
 
@@ -43,12 +45,20 @@
 #define DEFAULT_LOG_PATH "~/var/log/documentdb_odbc.log";  // unix
 #endif
 
-#define WRITE_MSG(param, logLevel)                                            \
+#define WRITE_MSG(param, logLevel) \
+  WRITE_MSG_TO_STREAM(param, logLevel, (std::ostream*)nullptr)
+
+#define WRITE_MSG_TO_STREAM(param, logLevel, logStream)                       \
   {                                                                           \
     std::shared_ptr< ignite::odbc::Logger > p =                               \
         ignite::odbc::Logger::getLoggerInstance();                            \
     if (p->getLogLevel() <= logLevel && (p->IsEnabled() || p->EnableLog())) { \
-      ignite::odbc::LogStream lstream(p.get());                               \
+      std::ostream* prevStream = p.get()->GetLogStream();                     \
+      if (logStream != nullptr) {                                             \
+        /* Override the stream temporarily */                                 \
+        p.get()->SetLogStream(logStream);                                    \
+      }                                                                       \
+      auto lstream = std::make_unique< ignite::odbc::LogStream >(p.get());    \
       std::string msg_prefix;                                                 \
       switch (logLevel) {                                                     \
         case ignite::odbc::LogLevel::Type::DEBUG_LEVEL:                       \
@@ -67,11 +77,17 @@
       time_t curTime = time(NULL);                                            \
       struct tm* locTime = localtime(&curTime);                               \
       strftime(tStr, 1000, "%T %x ", locTime);                                \
-      lstream << "TID: " << std::this_thread::get_id() << " " << msg_prefix   \
-              << tStr << __FUNCTION__ << ": " << param;                       \
+      /* Write the formatted message to the stream */                         \
+      *lstream << "TID: " << std::this_thread::get_id() << " " << msg_prefix  \
+               << tStr << __FUNCTION__ << ": " << param;                      \
+      /* This will trigger the write to stream */                             \
+      lstream = nullptr;                                                      \
+      if (logStream != nullptr) {                                             \
+        /* Restore the stream if it was set */                                \
+        p.get()->SetLogStream(prevStream);                                    \
+      }                                                                       \
     }                                                                         \
-    static_assert(true, "");                                                  \
-  }
+  }; static_assert(true, "")
 
 // TODO replace and remove LOG_MSG
 // https://bitquill.atlassian.net/browse/AD-703
@@ -88,20 +104,28 @@
       strftime(tStr, 1000, "%T %x ", locTime);                                                           \
       lstream << "TID: " << std::this_thread::get_id() << " " << tStr << __FUNCTION__ << ": " << param;  \
     }                                                                                                    \
-    static_assert(true, "");                                                                             \
-  }
+  }; static_assert(true, "")
 
 // Debug messages are messages that are useful for debugging
 #define LOG_DEBUG_MSG(param) \
   WRITE_MSG(param, ignite::odbc::LogLevel::Type::DEBUG_LEVEL)
 
+#define LOG_DEBUG_MSG_TO_STREAM(param, logStream) \
+  WRITE_MSG_TO_STREAM(param, ignite::odbc::LogLevel::Type::DEBUG_LEVEL, logStream)
+
 // Info messages are messages that document the application flow
 #define LOG_INFO_MSG(param) \
   WRITE_MSG(param, ignite::odbc::LogLevel::Type::INFO_LEVEL)
 
+#define LOG_INFO_MSG_TO_STREAM(param, logStream) \
+  WRITE_MSG_TO_STREAM(param, ignite::odbc::LogLevel::Type::INFO_LEVEL, logStream)
+
 // Error messages display errors.
 #define LOG_ERROR_MSG(param) \
   WRITE_MSG(param, ignite::odbc::LogLevel::Type::ERROR_LEVEL)
+
+#define LOG_ERROR_MSG_TO_STREAM(param) \
+  WRITE_MSG_TO_STREAM(param, ignite::odbc::LogLevel::Type::ERROR_LEVEL)
 
 namespace ignite {
 namespace odbc {
@@ -149,7 +173,7 @@ class Logger {
   /**
    * Destructor.
    */
-  ~Logger();
+  ~Logger() = default;
 
   /**
    * Set the logger's set log level.
@@ -160,7 +184,19 @@ class Logger {
    * Set the logger's set log path.
    * Once a log path is set, it cannot be changed
    */
-  void setLogPath(std::string path);
+  void setLogPath(const std::string& path);
+
+  /** 
+   * Sets the stream to use for logging.
+   */
+  void SetLogStream(std::ostream* stream);
+
+  /**
+   * Gets the current stream to use for logging.
+   */
+  std::ostream* GetLogStream() {
+    return stream;
+  }
 
   /**
    * Get singleton instance of Logger.
@@ -214,9 +250,7 @@ class Logger {
   /**
    * Constructor.
    */
-  Logger() : mutex(), stream(), logLevel(), logPath() {
-    // no-op
-  }
+  Logger() = default;
 
   /**
    * Creates the log file name based on date and time
@@ -226,16 +260,20 @@ class Logger {
   IGNITE_NO_COPY_ASSIGNMENT(Logger);
 
   /** Mutex for writes synchronization. */
-  odbc::common::concurrent::CriticalSection mutex;
+  CriticalSection mutex;
 
   /** File stream. */
-  std::ofstream stream;
+  std::ofstream fileStream;
+
+
+  /** Reference to logging stream */
+  std::ostream* stream = nullptr;
 
   /** Log path */
   std::string logPath;
 
   /** Log Level */
-  LogLevel::Type logLevel;
+  LogLevel::Type logLevel = LogLevel::Type::OFF;
 };
 
 }  // namespace odbc
