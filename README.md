@@ -50,7 +50,7 @@ Example:
    E.g. `docker run --name mongo -e MONGO_INITDB_ROOT_USERNAME=$DOC_DB_USER_NAME -e MONGO_INITDB_ROOT_PASSWORD=$DOC_DB_PASSWORD -d -p 27017:27017 mongo:latest`
 2. Install the test data
    1. `cd src/odbc-test/scripts`
-   2. `.\import_test_data.ps1` (Windows) or `./import_test_data.sh` (MacOS or Linux)
+   2. `.\import_test_data.ps1` (Windows) or `./import_test_data.sh` (MacOS or Linux).
    If receiving permission errors on MacOS while importing the test data, 
    use `chmod +x ./reinstall_mongodb_mac.sh` and try again.
 
