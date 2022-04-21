@@ -95,7 +95,7 @@ Example:
    3. `brew install unixodbc`  
       - You may need to unlink `libiodbc` if you already have this installed. Use `brew unlink libiodbc`.
    4. `brew install boost`
-   5. `brew tap mongodb/brew`
+   5. `brew tap mongodb/brew`. For more details, see [`MongoDB's Installation Guide for MongoDB Community Edition on macOS`](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-os-x/).
    6. `brew install mongodb-community`
    7. `brew install mongo-cxx-driver`
    8. Install Java **JDK** (version 8+ - 17 recommended)  
@@ -115,7 +115,8 @@ Example:
 3. Set the environment variable `DOCUMENTDB_HOME`. On a developer's machine, set it to `<repo-folder>/build/odbc/bin`
 4. Run the following command to register the ODBC driver. 
    `./scripts/register_driver_unix.sh`
-5. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
+5. Now you're ready to run the tests (e.g., `./build/odbc/bin/ignite-odbc-tests`).
+6. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
 ### Linux
 
