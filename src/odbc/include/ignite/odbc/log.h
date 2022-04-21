@@ -230,7 +230,7 @@ class Logger {
    * Checks if file stream is opened.
    * @return True, if file stream is opened.
    */
-  bool IsFileStremOpen() const
+  bool IsFileStremOpen() const;
 
   /**
    * Checks if logging is enabled.
