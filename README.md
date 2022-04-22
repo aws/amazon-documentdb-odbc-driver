@@ -61,8 +61,11 @@ Example:
    2. Visual Studio core editor
    3. C++ ATL for latest v142 build tools (x86 & x64)
    4. C++ MFC for latest v142 build tools (x86 & x64)
-   5. WiX Toolset v3 Schemas for Visual Studio
-   6. WiX Toolset Visual Studio 2019 Extension
+   5. [WiX Toolset v3 Schemas for Visual Studio](https://wixtoolset.org/releases/)
+      If encountering "wix toolset requires .net 3.5.1 to be enabled", follow the steps below.
+      1. Open Settings -> Apps -> Optional Features -> Under "Related Settings", click on "More Windows features", and select ".Net Framework 3.5".
+      ![Alt text](src/markdown/dotNet_screenshot.PNG "Example")
+   6. [WiX Toolset Visual Studio 2019 Extension](https://marketplace.visualstudio.com/items?itemName=WixToolset.WiXToolset)
 2. OpenSSL (full)
    1. Installed via [VCPKG](https://vcpkg.io/en/getting-started.html) (`.\vcpkg install openssl`).
    2. Or installed via [Chocolatey](https://community.chocolatey.org/packages/openssl). 
@@ -75,7 +78,7 @@ Example:
    Example: C:\Program Files\Java\jdk1.8.0_321\jre\bin\server
 5. Boost Test Framework and Mondodb Driver
    1. Install via [VCPKG](https://vcpkg.io/en/getting-started.html) using `.\vcpkg install openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows mongo-cxx-driver:x64-windows`
-6. Run one of the build scripts to create an initial compilation.
+6. On the Developer PowerShell, run one of the build scripts to create an initial compilation.
    1. E.g.: `.\build_win_debug64.ps1`
    2. Navigate to the `build\odbc\cmake` folder to use the generated solution file, `Ignite.C++.sln` to work on
    source code development and testing.
