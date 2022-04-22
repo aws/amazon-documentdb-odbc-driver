@@ -61,7 +61,7 @@ void Logger::setLogPath(const std::string& path) {
   if (logPath == path) {
     LOG_DEBUG_MSG(
         "WARNING: setLogPath is called again with the same path string. "
-        "setLogPath should only be called once");
+        "setLogPath should only be called once in normal circumstances aside from testing");
     return;
   }
   std::string oldLogPath = logPath;
@@ -94,6 +94,7 @@ bool Logger::IsEnabled() const {
 bool Logger::EnableLog() {
   if (!IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()
       && stream == &fileStream) {
+    //std::freopen(logPath.c_str(), "a+", fileStream);
     fileStream.open(logPath, std::ios_base::app);
   }
   return IsEnabled();
