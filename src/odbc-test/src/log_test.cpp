@@ -29,35 +29,11 @@ using ignite::odbc::OdbcTestSuite;
 using ignite::odbc::LogLevel;
 using ignite::odbc::Logger;
 
+// -AL- idea: duplicate the same tests for different log levels.
 
 // TODO enable the log file unit test after logging is properly
 // supported in test suites
 // https://bitquill.atlassian.net/browse/AD-712
-BOOST_AUTO_TEST_CASE(TestLogFileCreated) {
-  std::string logPath = DEFAULT_LOG_PATH;
-  LogLevel::Type logLevel = LogLevel::Type::DEBUG_LEVEL;
-
-  std::shared_ptr< Logger > logger = Logger::getLoggerInstance();
-  // set log level and log path
-  logger->setLogLevel(logLevel);
-  logger->setLogPath(logPath);
-
-  // check log level
-  LogLevel::Type loggerLogLevel = logger->getLogLevel();
-  BOOST_CHECK(logLevel == loggerLogLevel);
-
-  // check log path
-  std::string loggerLogPath = logger->getLogPath();
-  BOOST_CHECK_EQUAL(logPath, loggerLogPath);
-
-  LOG_DEBUG_MSG("test");
-
-  // check that the file stream is open
-  BOOST_CHECK(logger->IsFileStremOpen());
-  bool loggerEnabled = logger->IsEnabled();
-  BOOST_CHECK(loggerEnabled);
-}
-
 BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   std::string logPath = DEFAULT_LOG_PATH;
   LogLevel::Type logLevel = LogLevel::Type::DEBUG_LEVEL;
@@ -75,19 +51,23 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   std::string loggerLogPath = logger->getLogPath();
   BOOST_CHECK_EQUAL(logPath, loggerLogPath);
 
-  BOOST_CHECK(logger->IsFileStremOpen());
-  BOOST_CHECK(logger->IsEnabled());
-
   std::stringstream stringStream;
   std::string testData;
   testData = "test" + std::to_string(std::rand());
 
   // Write to log file.
   LOG_DEBUG_MSG(testData);
+
+  // Check that log file is working
+  BOOST_CHECK(logger->IsFileStremOpen());
+  BOOST_CHECK(logger->IsEnabled());
   BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find_last_of(testData));
 
   // Write to stream.
   LOG_DEBUG_MSG_TO_STREAM(testData, &stringStream);
+
+  // Chekc that logger is still enabled after writing to stream
+  BOOST_CHECK(logger->IsEnabled());
   BOOST_CHECK_NE(std::string::npos, stringStream.str().find_last_of(testData));
 }
 // move out of connection test and into log_test.cpp
