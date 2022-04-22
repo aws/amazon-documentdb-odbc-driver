@@ -61,7 +61,10 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   // Check that log file is working
   BOOST_CHECK(logger->IsFileStremOpen());
   BOOST_CHECK(logger->IsEnabled());
+
+  // this boost check means that testData is not in stringStream
   BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find_last_of(testData));
+  // find_last_of means finding the last instance of the string (param)
 
   // Write to stream.
   LOG_DEBUG_MSG_TO_STREAM(testData, &stringStream);
@@ -80,6 +83,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
 // but it is okay to write the file then look at it
 
 /*
+* // too much random string can create duplicates. 
 BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   LogLevel::Type logLevel = LogLevel::Type::INFO_LEVEL;
 

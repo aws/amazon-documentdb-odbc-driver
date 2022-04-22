@@ -78,8 +78,8 @@ using ignite::odbc::common::concurrent::CriticalSection;
       struct tm* locTime = localtime(&curTime);                               \
       strftime(tStr, 1000, "%T %x ", locTime);                                \
       /* Write the formatted message to the stream */                         \
-      *lstream << "TID: " << std::this_thread::get_id() << " " << msg_prefix  \
-               << tStr << __FUNCTION__ << ": " << param;                      \
+      *lstream << "TID: " << std::this_thread::get_id() << " "                \
+               << tStr << msg_prefix << __FUNCTION__ << ": " << param;        \
       /* This will trigger the write to stream */                             \
       lstream = nullptr;                                                      \
       if (logStream != nullptr) {                                             \
@@ -270,7 +270,6 @@ class Logger {
 
   /** File stream. */
   std::ofstream fileStream;
-
 
   /** Reference to logging stream */
   std::ostream* stream = nullptr;
