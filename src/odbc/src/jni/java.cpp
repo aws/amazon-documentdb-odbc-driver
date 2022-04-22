@@ -1084,6 +1084,8 @@ JniErrorCode JniContext::DriverManagerGetConnection(
     connection = new GlobalJObject(env, env->NewGlobalRef(result));
   }
 
+  env->DeleteLocalRef(jConnectionString);
+  
   LOG_DEBUG_MSG("DriverManagerGetConnection exiting");
 
   return errInfo.code;
@@ -1342,6 +1344,10 @@ JniErrorCode JniContext::DatabaseMetaDataGetTables(
       jvm->GetMembers().m_DatabaseMetaDataGetTables, jCatalog, jSchemaPattern,
       jTableNamePattern, jTypes);
   ExceptionCheck(env, &errInfo);
+  env->DeleteLocalRef(jCatalog);
+  env->DeleteLocalRef(jSchemaPattern);
+  env->DeleteLocalRef(jTableNamePattern);
+  env->DeleteLocalRef(jTypes);
 
   if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     resultSet = nullptr;
@@ -1387,6 +1393,11 @@ JniErrorCode JniContext::DatabaseMetaDataGetColumns(
       jvm->GetMembers().m_DatabaseMetaDataGetColumns, jCatalog, jSchemaPattern,
       jTableNamePattern, jColumnNamePattern);
   ExceptionCheck(env, &errInfo);
+
+  env->DeleteLocalRef(jCatalog);
+  env->DeleteLocalRef(jSchemaPattern);
+  env->DeleteLocalRef(jTableNamePattern);
+  env->DeleteLocalRef(jColumnNamePattern);
 
   if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     resultSet = nullptr;
@@ -1511,6 +1522,8 @@ JniErrorCode JniContext::ResultSetGetString(
       resultSet.Get()->GetRef(), jvm->GetMembers().m_ResultSetGetStringByName,
       jColumnName);
   ExceptionCheck(env, &errInfo);
+  
+  env->DeleteLocalRef(jColumnName);
 
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     if (result != nullptr) {
@@ -1581,6 +1594,9 @@ JniErrorCode JniContext::ResultSetGetInt(
                                    jvm->GetMembers().m_ResultSetGetIntByName,
                                    jColumnName);
   ExceptionCheck(env, &errInfo);
+
+  env->DeleteLocalRef(jColumnName);
+
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     bool wasNull;
     errInfo.code = ResultSetWasNull(resultSet, wasNull, errInfo);
