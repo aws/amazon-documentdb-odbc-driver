@@ -37,12 +37,8 @@ using ignite::odbc::common::concurrent::CriticalSection;
 #if defined(_WIN32)
 #define DEFAULT_LOG_PATH \
   std::string(getenv("TEMP")) + "\\documentdb_odbc.log";  // Windows
-#elif defined(__APPLE__)
-#define DEFAULT_LOG_PATH "~/Library/Logs/documentdb_odbc.log";  // Apple
-#elif defined(__linux__)
-#define DEFAULT_LOG_PATH "~/var/log/documentdb_odbc.log";  // Linux
 #else
-#define DEFAULT_LOG_PATH "~/var/log/documentdb_odbc.log";  // unix
+#define DEFAULT_LOG_PATH "./build/odbc/logs/documentdb_odbc.log";  // unix
 #endif
 
 #define WRITE_MSG(param, logLevel) \
