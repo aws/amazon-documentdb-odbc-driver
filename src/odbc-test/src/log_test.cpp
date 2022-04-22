@@ -68,6 +68,8 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
 
   // Chekc that logger is still enabled after writing to stream
   BOOST_CHECK(logger->IsEnabled());
+
+  // Check that log stream is working
   BOOST_CHECK_NE(std::string::npos, stringStream.str().find_last_of(testData));
 }
 // move out of connection test and into log_test.cpp
@@ -76,3 +78,55 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
 
 // try to swap out the file stream with in-memory stream (only for testing),
 // but it is okay to write the file then look at it
+
+/*
+BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
+  LogLevel::Type logLevel = LogLevel::Type::INFO_LEVEL;
+
+  std::shared_ptr< Logger > logger = Logger::getLoggerInstance();
+  // set log level and stream
+  logger->setLogLevel(logLevel);
+
+  // check log level
+  LogLevel::Type loggerLogLevel = logger->getLogLevel();
+  BOOST_CHECK(logLevel == loggerLogLevel);
+
+  std::stringstream stringStream;
+  std::string testData1;
+  testData1 = "test2" + std::to_string(std::rand());
+
+  // Write to log file.
+  LOG_INFO_MSG(testData1);
+
+  // Check that log file is working
+  BOOST_CHECK(logger->IsFileStremOpen());
+  BOOST_CHECK(logger->IsEnabled());
+  BOOST_CHECK_EQUAL(std::string::npos,
+                    stringStream.str().find_last_of(testData1));
+
+  // Attempt to write debug log to log file, which should fail
+  testData1 = "test3" + std::to_string(std::rand());
+  LOG_DEBUG_MSG(testData1);
+
+  // Check that the debug log is not logged
+  BOOST_CHECK_EQUAL(std::string::npos,
+                    stringStream.str().find_last_of(testData1));
+
+  testData1 = "test4" + std::to_string(std::rand());
+  // Write to stream.
+  LOG_INFO_MSG_TO_STREAM(testData1, &stringStream);
+
+  // Chekc that logger is still enabled after writing to stream
+  BOOST_CHECK(logger->IsEnabled());
+
+  // Check that log stream is working
+  BOOST_CHECK_NE(std::string::npos, stringStream.str().find_last_of(testData1));
+
+  // Attempt to write debug log to log stream, which should fail
+  testData1 = "test5" + std::to_string(std::rand());
+  LOG_DEBUG_MSG_TO_STREAM(testData1, &stringStream);
+
+  // Check that the debug log is not logged
+  BOOST_CHECK_NE(std::string::npos, stringStream.str().find_last_of(testData1));
+}
+*/
