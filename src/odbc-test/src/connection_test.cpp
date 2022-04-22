@@ -24,22 +24,15 @@
 #include <sqlext.h>
 
 #include <boost/test/unit_test.hpp>
-#include <ignite/odbc/log_level.h>
-#include <ignite/odbc/log.h>
 #include <string>
 
 #include "odbc_test_suite.h"
 #include "test_utils.h"
 
-using namespace ignite::odbc::common;
-using namespace boost::unit_test;
-
 using boost::unit_test::precondition;
 using ignite::odbc::OdbcTestSuite;
 using ignite_test::GetOdbcErrorMessage;
 using ignite::odbc::if_integration;
-using ignite::odbc::LogLevel;
-using ignite::odbc::Logger;
 
 /**
  * Test setup fixture.
