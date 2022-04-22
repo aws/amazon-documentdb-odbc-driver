@@ -27,7 +27,7 @@ env:
   DOC_DB_LOCAL_PORT: 27019
   DOC_DB_REMOTE_PORT: 27017
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
-  DOC_DB_LOG_PATH: "./build/odbc/lib/odbc_log.txt"
+  DOC_DB_LOG_PATH: "./build/odbc/logs/odbc_log.txt"
   DOC_DB_LOG_LEVEL: "debug"
   JDBC_DRIVER_VERSION: "1.2.1"
   MONGO_IMPORT_COMMAND: "C:/ProgramData/chocolatey/lib/mongodb-database-tools/tools/mongodb-database-tools-windows-x86_64-100.5.2binmongoimport.exe"
@@ -134,6 +134,7 @@ jobs:
 
     - name: run-tests
       run: |
+        mkdir -p "${{github.workspace}}/build/odbc/logs"
         Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
         ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
 

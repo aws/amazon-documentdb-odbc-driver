@@ -9,7 +9,7 @@ env:
   ODBC_BIN_PATH: "./build/odbc/bin"
   ODBC_BUILD_PATH: "./build/odbc/build"
   DOCUMENTDB_HOME: "./build/odbc/bin"
-  DOC_DB_LOG_PATH: "./build/odbc/lib/odbc_log.txt"
+  DOC_DB_LOG_PATH: "./build/odbc/logs/odbc_log.txt"
   DOC_DB_LOG_LEVEL: "debug"
 
 jobs:
@@ -82,6 +82,7 @@ jobs:
         ./src/odbc-test/scripts/import_test_data.sh
     - name: run-tests
       run: |
+        mkdir -p "${{github.workspace}}/build/odbc/logs"
         ./build/odbc/bin/tests
     - name: upload-test-report
       if: always()
