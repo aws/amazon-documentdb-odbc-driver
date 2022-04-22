@@ -118,7 +118,7 @@ Example:
 3. Set the environment variable `DOCUMENTDB_HOME`. On a developer's machine, set it to `<repo-folder>/build/odbc/bin`
 4. Run the following command to register the ODBC driver. 
    `./scripts/register_driver_unix.sh`
-5. Now you're ready to run the tests (e.g., `./build/odbc/bin/ignite-odbc-tests`).
+5. Now you're ready to run the tests (e.g., `./build/odbc/bin/ignite-odbc-tests  --catch_system_errors=false`).
 6. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
 ### Linux
@@ -151,7 +151,7 @@ Example:
    4. set LOCAL_DATABASE_HOST with the ip of your local mongo
       E.g. If is in another docker container `export LOCAL_DATABASE_HOST=<ip from the mongo docker container>` or if is your host machine `export LOCAL_DATABASE_HOST=host.docker.internal`
    5. You are ready to run the tests.
-   E.g. `cd /documentdb-odbc/build/odbc/bin/ && ./ignite-odbc-tests`
+   E.g. `cd /documentdb-odbc/build/odbc/bin/ && ./ignite-odbc-tests  --catch_system_errors=false`
 3. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
 ##### Known issues
@@ -223,7 +223,7 @@ There are two ways to fix the issue.
    8. set LOCAL_DATABASE_HOST with the ip of your local mongo
       E.g. If is in another docker container `export LOCAL_DATABASE_HOST=<ip from the mongo docker container>` or if is your host machine `export LOCAL_DATABASE_HOST=host.docker.internal`.
    9. You are ready to run the tests.
-      E.g. `/documentdb-odbc/build/odbc/bin/ignite-odbc-tests`.
+      E.g. `/documentdb-odbc/build/odbc/bin/ignite-odbc-tests --catch_system_errors=false`.
 
 
 ### Troubleshooting 
