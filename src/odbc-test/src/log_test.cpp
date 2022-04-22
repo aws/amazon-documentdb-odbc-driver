@@ -39,6 +39,10 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   LogLevel::Type logLevel = LogLevel::Type::DEBUG_LEVEL;
 
   std::shared_ptr< Logger > logger = Logger::getLoggerInstance();
+
+  // -TODO -AL- if the logger is enabled, save the original log path/level and change it back at the end of this test
+  // save the original log path / log level
+
   // set log level and stream
   logger->setLogLevel(logLevel);
   logger->setLogPath(logPath);
@@ -73,6 +77,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   BOOST_CHECK(logger->IsEnabled());
 
   // Check that log stream is working
+  // this boost check means that testData is in stringStream
   BOOST_CHECK_NE(std::string::npos, stringStream.str().find_last_of(testData));
 }
 // move out of connection test and into log_test.cpp
@@ -105,6 +110,8 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   // Check that log file is working
   BOOST_CHECK(logger->IsFileStremOpen());
   BOOST_CHECK(logger->IsEnabled());
+
+  //check that stringStream does not have testData1
   BOOST_CHECK_EQUAL(std::string::npos,
                     stringStream.str().find_last_of(testData1));
 
@@ -131,6 +138,6 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   LOG_DEBUG_MSG_TO_STREAM(testData1, &stringStream);
 
   // Check that the debug log is not logged
-  BOOST_CHECK_NE(std::string::npos, stringStream.str().find_last_of(testData1));
+  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find_last_of(testData1));
 }
 */
