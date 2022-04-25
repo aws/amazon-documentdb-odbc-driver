@@ -108,7 +108,6 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
 
   // Write to stream.
   LOG_DEBUG_MSG_TO_STREAM(testData, &stringStream);
-  std::cout << "defTestData: " << testData << std::endl;
 
   // Chekc that logger is still enabled after writing to stream
   BOOST_CHECK(logger->IsEnabled());
@@ -161,7 +160,6 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   LOG_INFO_MSG("TestLogStreamWithInfoLevel begins. Log path/level changes are expected.");
 
   LOG_INFO_MSG(testData);
-  std::cout << "infoLvlTestData (test1): " << testData << std::endl;
 
   // Check that log file is working
   BOOST_CHECK(logger->IsFileStremOpen());
@@ -173,7 +171,6 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
 
   // Attempt to write debug log to log file, which should fail
   testData = "infoLvlTest2" + std::to_string(randNum());
-  std::cout << "infoLvlTestData (test2): " << testData << std::endl;
   LOG_DEBUG_MSG(testData);
 
   // Check that the debug log is not logged
@@ -183,7 +180,6 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   testData = "infoLvlTest3" + std::to_string(randNum());
   // Write to stream.
   LOG_INFO_MSG_TO_STREAM(testData, &stringStream);
-  std::cout << "infoLvlTestData (test3): " << testData << std::endl;
 
   // Chekc that logger is still enabled after writing to stream
   BOOST_CHECK(logger->IsEnabled());
@@ -194,7 +190,6 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   // Attempt to write debug log to log stream, which should fail
   testData = "infoLvlTest4" + std::to_string(randNum());
   LOG_DEBUG_MSG_TO_STREAM(testData, &stringStream);
-  std::cout << "infoLvlTestData (test4): " << testData << std::endl; // -AL- todo delete those msg later
 
   // Check that the debug log is not logged
   BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
@@ -237,7 +232,6 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   LOG_ERROR_MSG("(Not an actual error, logged for clarity) TestLogStreamWithErrorLevel begins. Log path/level changes are expected.");
 
   LOG_ERROR_MSG(testData);
-  std::cout << "errLvlTestData (test1): " << testData << std::endl;
 
   // Check that log file is working
   BOOST_CHECK(logger->IsFileStremOpen());
@@ -248,7 +242,6 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
 
   // Attempt to write debug log to log file, which should fail
   testData = "errLvlTest2" + std::to_string(randNum());
-  std::cout << "errLvlTestData (test2): " << testData << std::endl;
   LOG_DEBUG_MSG(testData);
 
   // Check that the debug log is not logged
@@ -256,7 +249,6 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
 
   // Attempt to write info log to log file, which should fail
   testData = "errLvlTest3" + std::to_string(randNum());
-  std::cout << "errLvlTestData (test3): " << testData << std::endl;
   LOG_INFO_MSG(testData);
 
   // Check that the debug log is not logged
@@ -265,7 +257,6 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   testData = "errLvlTest4" + std::to_string(randNum());
   // Write to stream.
   LOG_ERROR_MSG_TO_STREAM(testData, &stringStream);
-  std::cout << "errLvlTestData (test4): " << testData << std::endl;
 
   // Chekc that logger is still enabled after writing to stream
   BOOST_CHECK(logger->IsEnabled());
@@ -276,7 +267,6 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   // Attempt to write debug log to log stream, which should fail
   testData = "errLvlTest5" + std::to_string(randNum());
   LOG_DEBUG_MSG_TO_STREAM(testData, &stringStream);
-  std::cout << "errLvlTestData (test5): " << testData << std::endl;
 
   // Check that the debug log is not logged
   BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
@@ -284,7 +274,6 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   // Attempt to write info log to log stream, which should fail
   testData = "errLvlTest6" + std::to_string(randNum());
   LOG_INFO_MSG_TO_STREAM(testData, &stringStream);
-  std::cout << "errLvlTestData (test6): " << testData << std::endl;
 
   // Check that the info log is not logged
   BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
