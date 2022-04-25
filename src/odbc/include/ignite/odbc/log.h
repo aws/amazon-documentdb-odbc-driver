@@ -45,7 +45,7 @@ using ignite::odbc::common::concurrent::CriticalSection;
 // It is expected for the user to enter a valid log path during DSN connection in unix platforms. 
 #endif
 
-#define WRITE_MSG(param, logLevel) \
+#define WRITE_LOG_MSG(param, logLevel) \
   WRITE_MSG_TO_STREAM(param, logLevel, (std::ostream*)nullptr)
 
 #define WRITE_MSG_TO_STREAM(param, logLevel, logStream)                       \
@@ -108,21 +108,21 @@ using ignite::odbc::common::concurrent::CriticalSection;
 
 // Debug messages are messages that are useful for debugging
 #define LOG_DEBUG_MSG(param) \
-  WRITE_MSG(param, ignite::odbc::LogLevel::Type::DEBUG_LEVEL)
+  WRITE_LOG_MSG(param, ignite::odbc::LogLevel::Type::DEBUG_LEVEL)
 
 #define LOG_DEBUG_MSG_TO_STREAM(param, logStream) \
   WRITE_MSG_TO_STREAM(param, ignite::odbc::LogLevel::Type::DEBUG_LEVEL, logStream)
 
 // Info messages are messages that document the application flow
 #define LOG_INFO_MSG(param) \
-  WRITE_MSG(param, ignite::odbc::LogLevel::Type::INFO_LEVEL)
+  WRITE_LOG_MSG(param, ignite::odbc::LogLevel::Type::INFO_LEVEL)
 
 #define LOG_INFO_MSG_TO_STREAM(param, logStream) \
   WRITE_MSG_TO_STREAM(param, ignite::odbc::LogLevel::Type::INFO_LEVEL, logStream)
 
 // Error messages display errors.
 #define LOG_ERROR_MSG(param) \
-  WRITE_MSG(param, ignite::odbc::LogLevel::Type::ERROR_LEVEL)
+  WRITE_LOG_MSG(param, ignite::odbc::LogLevel::Type::ERROR_LEVEL)
 
 #define LOG_ERROR_MSG_TO_STREAM(param, logStream) \
   WRITE_MSG_TO_STREAM(param, ignite::odbc::LogLevel::Type::ERROR_LEVEL, logStream)
@@ -280,7 +280,6 @@ class Logger {
   /** Log Level */
   LogLevel::Type logLevel = LogLevel::Type::OFF;
 };
-
 }  // namespace odbc
 }  // namespace ignite
 
