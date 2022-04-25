@@ -137,7 +137,7 @@ class LogStream : public std::basic_ostream< char > {
    * Conversion operator helpful to determine if log is enabled
    * @return True if logger is enabled
    */
-  bool operator()();
+  bool operator()() const;
 
   /**
    * Destructor.

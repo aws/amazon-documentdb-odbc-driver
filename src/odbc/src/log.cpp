@@ -36,7 +36,7 @@ LogStream::LogStream(Logger* parent)
   init(&strbuf);
 }
 
-bool LogStream::operator()() {
+bool LogStream::operator()() const{
   return logger != 0;
 }
 
