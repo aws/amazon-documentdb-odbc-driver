@@ -120,8 +120,8 @@ using ignite::odbc::common::concurrent::CriticalSection;
 #define LOG_ERROR_MSG(param) \
   WRITE_MSG(param, ignite::odbc::LogLevel::Type::ERROR_LEVEL)
 
-#define LOG_ERROR_MSG_TO_STREAM(param) \
-  WRITE_MSG_TO_STREAM(param, ignite::odbc::LogLevel::Type::ERROR_LEVEL)
+#define LOG_ERROR_MSG_TO_STREAM(param, logStream) \
+  WRITE_MSG_TO_STREAM(param, ignite::odbc::LogLevel::Type::ERROR_LEVEL, logStream)
 
 namespace ignite {
 namespace odbc {
