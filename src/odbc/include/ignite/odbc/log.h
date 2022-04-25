@@ -35,14 +35,14 @@ using ignite::odbc::common::concurrent::CriticalSection;
 // https://bitquill.atlassian.net/browse/AD-697
 
 #if defined(_WIN32)
-#define DEFAULT_LOG_PATH \
-  std::string(getenv("TEMP")) // Windows
-// In Windows, DEFAULT_LOG_PATH is used to pre-populate the log path field in 
-// the DSN Configuration Window. 
+#define DEFAULT_LOG_PATH std::string(getenv("TEMP"))  // Windows
+// In Windows, DEFAULT_LOG_PATH is used to pre-populate the log path field in
+// the DSN Configuration Window.
 #else
 #define DEFAULT_LOG_PATH "."  // unix
-// In the ODBC driver, DEFAULT_LOG_PATH is only used for testing in unix platforms.
-// It is expected for the user to enter a valid log path during DSN connection in unix platforms. 
+// In the ODBC driver, DEFAULT_LOG_PATH should only be used for testing in unix
+// platforms. It is expected for the user to enter a valid log path during DSN
+// connection in unix platforms.
 #endif
 
 #define WRITE_LOG_MSG(param, logLevel) \
@@ -58,7 +58,8 @@ using ignite::odbc::common::concurrent::CriticalSection;
         /* Override the stream temporarily */                                 \
         p.get()->SetLogStream(logStream);                                     \
       }                                                                       \
-      std::unique_ptr< ignite::odbc::LogStream > lstream(new ignite::odbc::LogStream(p.get()));    \
+      std::unique_ptr< ignite::odbc::LogStream > lstream(                     \
+          new ignite::odbc::LogStream(p.get()));                              \
       std::string msg_prefix;                                                 \
       switch (logLevel) {                                                     \
         case ignite::odbc::LogLevel::Type::DEBUG_LEVEL:                       \
@@ -78,8 +79,8 @@ using ignite::odbc::common::concurrent::CriticalSection;
       struct tm* locTime = localtime(&curTime);                               \
       strftime(tStr, 1000, "%T %x ", locTime);                                \
       /* Write the formatted message to the stream */                         \
-      *lstream << "TID: " << std::this_thread::get_id() << " "                \
-               << tStr << msg_prefix << __FUNCTION__ << ": " << param;        \
+      *lstream << "TID: " << std::this_thread::get_id() << " " << tStr        \
+               << msg_prefix << __FUNCTION__ << ": " << param;                \
       /* This will trigger the write to stream */                             \
       lstream = nullptr;                                                      \
       if (logStream != nullptr) {                                             \
@@ -92,29 +93,31 @@ using ignite::odbc::common::concurrent::CriticalSection;
 // TODO replace and remove LOG_MSG
 // https://bitquill.atlassian.net/browse/AD-703
 // @Deprecated
-#define LOG_MSG(param)                                                                                   \
-  LOG_INFO_MSG(param)
+#define LOG_MSG(param) LOG_INFO_MSG(param)
 
 // Debug messages are messages that are useful for debugging
 #define LOG_DEBUG_MSG(param) \
   WRITE_LOG_MSG(param, ignite::odbc::LogLevel::Type::DEBUG_LEVEL)
 
-#define LOG_DEBUG_MSG_TO_STREAM(param, logStream) \
-  WRITE_MSG_TO_STREAM(param, ignite::odbc::LogLevel::Type::DEBUG_LEVEL, logStream)
+#define LOG_DEBUG_MSG_TO_STREAM(param, logStream)                       \
+  WRITE_MSG_TO_STREAM(param, ignite::odbc::LogLevel::Type::DEBUG_LEVEL, \
+                      logStream)
 
 // Info messages are messages that document the application flow
 #define LOG_INFO_MSG(param) \
   WRITE_LOG_MSG(param, ignite::odbc::LogLevel::Type::INFO_LEVEL)
 
-#define LOG_INFO_MSG_TO_STREAM(param, logStream) \
-  WRITE_MSG_TO_STREAM(param, ignite::odbc::LogLevel::Type::INFO_LEVEL, logStream)
+#define LOG_INFO_MSG_TO_STREAM(param, logStream)                       \
+  WRITE_MSG_TO_STREAM(param, ignite::odbc::LogLevel::Type::INFO_LEVEL, \
+                      logStream)
 
 // Error messages display errors.
 #define LOG_ERROR_MSG(param) \
   WRITE_LOG_MSG(param, ignite::odbc::LogLevel::Type::ERROR_LEVEL)
 
-#define LOG_ERROR_MSG_TO_STREAM(param, logStream) \
-  WRITE_MSG_TO_STREAM(param, ignite::odbc::LogLevel::Type::ERROR_LEVEL, logStream)
+#define LOG_ERROR_MSG_TO_STREAM(param, logStream)                       \
+  WRITE_MSG_TO_STREAM(param, ignite::odbc::LogLevel::Type::ERROR_LEVEL, \
+                      logStream)
 
 namespace ignite {
 namespace odbc {
@@ -175,7 +178,7 @@ class Logger {
    */
   void SetLogPath(const std::string& path);
 
-  /** 
+  /**
    * Sets the stream to use for logging.
    */
   void SetLogStream(std::ostream* stream);
@@ -265,7 +268,7 @@ class Logger {
   std::ostream* stream = nullptr;
 
   /** Log path */
-  std::string logPath;
+  std::string logPath = DEFAULT_LOG_PATH;
 
   /** Log Level */
   LogLevel::Type logLevel = LogLevel::Type::OFF;
