@@ -34,8 +34,8 @@ DsnConfigurationWindow::DsnConfigurationWindow(Window* parent,
                                                config::Configuration& config)
     : CustomWindow(parent, "IgniteConfigureDsn",
                    "Configure Amazon DocumentDB DSN"),
-      width(730),
-      height(585),
+      width(780),
+      height(625),
       connectionSettingsGroupBox(),
       tlsSettingsGroupBox(),
       tlsCheckBox(),
@@ -329,34 +329,39 @@ int DsnConfigurationWindow::CreateLogSettingsGroup(int posX, int posY,
   enum { LABEL_WIDTH = 120 };
 
   int labelPosX = posX + INTERVAL;
-
-  int editSizeX = sizeX - LABEL_WIDTH - 3 * INTERVAL;
-  int editPosX = labelPosX + LABEL_WIDTH + INTERVAL;
+  int pathSizeX = sizeX - 2 * INTERVAL;
+  int comboSizeX = sizeX - LABEL_WIDTH - 3 * INTERVAL;
+  int editPosX = labelPosX;
 
   int rowPos = posY + 2 * INTERVAL;
 
   LogLevel::Type logLevel = config.GetLogLevel();
 
   logLevelLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                                "Log Level:", ChildId::LOG_LEVEL_LABEL);
-  logLevelComboBox = CreateComboBox(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                                      "", ChildId::LOG_LEVEL_COMBO_BOX);
+                              "Log Level:", ChildId::LOG_LEVEL_LABEL);
+  logLevelComboBox = CreateComboBox(editPosX, rowPos, comboSizeX, ROW_HEIGHT,
+                                    "",
+                                    ChildId::LOG_LEVEL_COMBO_BOX);
 
   logLevelComboBox->AddString("Debug");
   logLevelComboBox->AddString("Info");
   logLevelComboBox->AddString("Error");
   logLevelComboBox->AddString("Off");
 
-  logLevelComboBox->SetSelection(
-      static_cast< int >(logLevel));  // set default
+  logLevelComboBox->SetSelection(static_cast< int >(logLevel));  // set default
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
   const char* val = config.GetLogPath().c_str();
-  logPathLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                               "Log File:", ChildId::LOG_PATH_LABEL);
-  logPathEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
-                             ChildId::LOG_PATH_EDIT);
+  logPathLabel = CreateLabel(
+      labelPosX, rowPos, pathSizeX, ROW_HEIGHT * 2,
+      "Log Path:\n(the log file name format is docdb_odbc_YYYYMMDD_HHMMSS.log)",
+      ChildId::LOG_PATH_LABEL);
+
+  rowPos += INTERVAL * 2 + ROW_HEIGHT;
+
+  logPathEdit = CreateEdit(editPosX, rowPos, pathSizeX, ROW_HEIGHT, val,
+                           ChildId::LOG_PATH_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -802,9 +807,10 @@ void DsnConfigurationWindow::RetrieveSshParameters(
   cfg.SetSshKnownHostsFile(sshKnownHostsFileStr);
 }
 
-// RetrieveLogParameters is a special case. We want to get the log level and path 
-// as soon as possible. If user set log level to OFF, then nothing should be logged.
-// Therefore, the LOG_MSG calls are after log level and log path are set.
+// RetrieveLogParameters is a special case. We want to get the log level and
+// path as soon as possible. If user set log level to OFF, then nothing should
+// be logged. Therefore, the LOG_MSG calls are after log level and log path are
+// set.
 void DsnConfigurationWindow::RetrieveLogParameters(
     config::Configuration& cfg) const {
   std::string logLevelStr;
