@@ -60,7 +60,7 @@ void Logger::CreateFileName(std::string& fileName) {
 void Logger::setLogPath(const std::string& path) {
   if (logPath == path) {
     LOG_DEBUG_MSG(
-        "WARNING: setLogPath is called again with the same path string. "
+        "WARNING: setLogPath is called with the existing path string. "
         "setLogPath should only be called once in normal circumstances aside from testing");
     return;
   }
