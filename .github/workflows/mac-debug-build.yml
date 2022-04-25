@@ -9,7 +9,7 @@ env:
   ODBC_BIN_PATH: "./build/odbc/bin"
   ODBC_BUILD_PATH: "./build/odbc/build"
   DOCUMENTDB_HOME: "./build/odbc/bin"
-  DOC_DB_LOG_PATH: "./build/odbc/logs/odbc_log.txt"
+  DOC_DB_LOG_PATH: "./build/odbc/logs"
   DOC_DB_LOG_LEVEL: "debug"
 
 jobs:
