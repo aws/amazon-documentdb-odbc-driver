@@ -18,6 +18,7 @@
 #include <boost/optional.hpp>
 #include <ignite/odbc/log_level.h>
 #include <ignite/odbc/log.h>
+
 #include <string>
 
 #include "odbc_test_suite.h"
@@ -89,6 +90,8 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   testData = "defTest" + std::to_string(std::rand());
 
   // Write to log file.
+  LOG_DEBUG_MSG("TestLogStreamCreatedOnDefaultInstance begins. Log path/level changes are expected.");
+
   LOG_DEBUG_MSG(testData);
 
   // Check that log file is working
@@ -109,6 +112,8 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   // Check that log stream is working
   // this boost check means that testData is in stringStream
   BOOST_CHECK_NE(std::string::npos, stringStream.str().find(testData));
+
+  LOG_DEBUG_MSG("TestLogStreamCreatedOnDefaultInstance ends. Log path/level changes are expected.");
 
   // set the original log level / log path back
   if (logVarSaved)
@@ -140,49 +145,52 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   BOOST_CHECK(logLevel == loggerLogLevel);
 
   std::stringstream stringStream;
-  std::string testData1;
-  testData1 = "infoLvlTest2" + std::to_string(std::rand());
+  std::string testData;
+  testData = "infoLvlTest1" + std::to_string(std::rand());
 
   // Write to log file.
-  LOG_INFO_MSG(testData1);
-  std::cout << "infoLvlTestData1 (test2): " << testData1 << std::endl;
+  LOG_INFO_MSG("TestLogStreamWithInfoLevel begins. Log path/level changes are expected.");
+
+  LOG_INFO_MSG(testData);
+  std::cout << "infoLvlTestData (test1): " << testData << std::endl;
 
   // Check that log file is working
   BOOST_CHECK(logger->IsFileStremOpen());
   BOOST_CHECK(logger->IsEnabled());
 
-  //check that stringStream does not have testData1
+  //check that stringStream does not have testData
   BOOST_CHECK_EQUAL(std::string::npos,
-                    stringStream.str().find(testData1));
+                    stringStream.str().find(testData));
 
   // Attempt to write debug log to log file, which should fail
-  testData1 = "infoLvlTest3" + std::to_string(std::rand());
-  std::cout << "infoLvlTestData1 (test3): " << testData1 << std::endl;
-  LOG_DEBUG_MSG(testData1);
+  testData = "infoLvlTest2" + std::to_string(std::rand());
+  std::cout << "infoLvlTestData (test2): " << testData << std::endl;
+  LOG_DEBUG_MSG(testData);
 
   // Check that the debug log is not logged
   BOOST_CHECK_EQUAL(std::string::npos,
-                    stringStream.str().find(testData1));
+                    stringStream.str().find(testData));
 
-  testData1 = "infoLvlTest4" + std::to_string(std::rand());
+  testData = "infoLvlTest3" + std::to_string(std::rand());
   // Write to stream.
-  LOG_INFO_MSG_TO_STREAM(testData1, &stringStream);
-  std::cout << "infoLvlTestData1 (test4): " << testData1 << std::endl;
+  LOG_INFO_MSG_TO_STREAM(testData, &stringStream);
+  std::cout << "infoLvlTestData (test3): " << testData << std::endl;
 
   // Chekc that logger is still enabled after writing to stream
   BOOST_CHECK(logger->IsEnabled());
 
   // Check that log stream is working
-  BOOST_CHECK_NE(std::string::npos, stringStream.str().find(testData1));
+  BOOST_CHECK_NE(std::string::npos, stringStream.str().find(testData));
 
   // Attempt to write debug log to log stream, which should fail
-  testData1 = "infoLvlTest5" + std::to_string(std::rand());
-  LOG_DEBUG_MSG_TO_STREAM(testData1, &stringStream);
-  std::cout << "infoLvlTestData1 (test5): " << testData1 << std::endl;
+  testData = "infoLvlTest4" + std::to_string(std::rand());
+  LOG_DEBUG_MSG_TO_STREAM(testData, &stringStream);
+  std::cout << "infoLvlTestData (test4): " << testData << std::endl; // -AL- todo delete those msg later
 
   // Check that the debug log is not logged
-  // Apr-25-2022: I see that this line is not in the log file but this check fails still
-  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData1));
+  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
+
+  LOG_INFO_MSG("TestLogStreamWithInfoLevel ends. Log path/level changes are expected.");
 
   // set the original log level / log path back
   if (logVarSaved)
@@ -191,7 +199,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
 
 
 BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
-  LogLevel::Type logLevel = LogLevel::Type::INFO_LEVEL;
+  LogLevel::Type logLevel = LogLevel::Type::ERROR_LEVEL;
 
   std::shared_ptr< Logger > logger = Logger::getLoggerInstance();
 
@@ -208,48 +216,66 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   BOOST_CHECK(logLevel == loggerLogLevel);
 
   std::stringstream stringStream;
-  std::string testData1;
-  testData1 = "infoLvlTest2" + std::to_string(std::rand());
+  std::string testData;
+  testData = "errLvlTest1" + std::to_string(std::rand());
 
   // Write to log file.
-  LOG_INFO_MSG(testData1);
-  std::cout << "infoLvlTestData1 (test2): " << testData1 << std::endl;
+  LOG_ERROR_MSG("(Not an actual error, logged for clarity) TestLogStreamWithErrorLevel begins. Log path/level changes are expected.");
+
+  LOG_ERROR_MSG(testData);
+  std::cout << "errLvlTestData (test1): " << testData << std::endl;
 
   // Check that log file is working
   BOOST_CHECK(logger->IsFileStremOpen());
   BOOST_CHECK(logger->IsEnabled());
 
-  // check that stringStream does not have testData1
-  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData1));
+  // check that stringStream does not have testData
+  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
 
   // Attempt to write debug log to log file, which should fail
-  testData1 = "infoLvlTest3" + std::to_string(std::rand());
-  std::cout << "infoLvlTestData1 (test3): " << testData1 << std::endl;
-  LOG_DEBUG_MSG(testData1);
+  testData = "errLvlTest2" + std::to_string(std::rand());
+  std::cout << "errLvlTestData (test2): " << testData << std::endl;
+  LOG_DEBUG_MSG(testData);
 
   // Check that the debug log is not logged
-  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData1));
+  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
 
-  testData1 = "infoLvlTest4" + std::to_string(std::rand());
+  // Attempt to write info log to log file, which should fail
+  testData = "errLvlTest3" + std::to_string(std::rand());
+  std::cout << "errLvlTestData (test3): " << testData << std::endl;
+  LOG_INFO_MSG(testData);
+
+  // Check that the debug log is not logged
+  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
+
+  testData = "errLvlTest4" + std::to_string(std::rand());
   // Write to stream.
-  LOG_INFO_MSG_TO_STREAM(testData1, &stringStream);
-  std::cout << "infoLvlTestData1 (test4): " << testData1 << std::endl;
+  LOG_ERROR_MSG_TO_STREAM(testData, &stringStream);
+  std::cout << "errLvlTestData (test4): " << testData << std::endl;
 
   // Chekc that logger is still enabled after writing to stream
   BOOST_CHECK(logger->IsEnabled());
 
   // Check that log stream is working
-  BOOST_CHECK_NE(std::string::npos, stringStream.str().find(testData1));
+  BOOST_CHECK_NE(std::string::npos, stringStream.str().find(testData));
 
   // Attempt to write debug log to log stream, which should fail
-  testData1 = "infoLvlTest5" + std::to_string(std::rand());
-  LOG_DEBUG_MSG_TO_STREAM(testData1, &stringStream);
-  std::cout << "infoLvlTestData1 (test5): " << testData1 << std::endl;
+  testData = "errLvlTest5" + std::to_string(std::rand());
+  LOG_DEBUG_MSG_TO_STREAM(testData, &stringStream);
+  std::cout << "errLvlTestData (test5): " << testData << std::endl;
 
   // Check that the debug log is not logged
-  // Apr-25-2022: I see that this line is not in the log file but this check
-  // fails still
-  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData1));
+  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
+
+  // Attempt to write info log to log stream, which should fail
+  testData = "errLvlTest6" + std::to_string(std::rand());
+  LOG_INFO_MSG_TO_STREAM(testData, &stringStream);
+  std::cout << "errLvlTestData (test6): " << testData << std::endl;
+
+  // Check that the info log is not logged
+  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
+
+  LOG_ERROR_MSG("(Not an actual error, logged for clarity) TestLogStreamWithErrorLevel ends. Log path/level changes are expected.");
 
   // set the original log level / log path back
   if (logVarSaved)
