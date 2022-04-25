@@ -87,7 +87,7 @@ using ignite::odbc::common::concurrent::CriticalSection;
         p.get()->SetLogStream(prevStream);                                    \
       }                                                                       \
     }                                                                         \
-  }; static_assert(true, "")
+  }
 
 // TODO replace and remove LOG_MSG
 // https://bitquill.atlassian.net/browse/AD-703
