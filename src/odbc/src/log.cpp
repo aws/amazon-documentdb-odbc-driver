@@ -43,7 +43,7 @@ LogStream::LogStream(Logger* parent)
 }
 
 bool LogStream::operator()() const{
-  return logger != 0;
+  return logger != nullptr;
 }
 
 LogStream::~LogStream() {
@@ -54,11 +54,11 @@ LogStream::~LogStream() {
 
 std::string Logger::CreateFileName() const{
   char tStr[1000];
-  time_t curTime = time(NULL);
+  time_t curTime = time(nullptr);
   struct tm* locTime = localtime(&curTime);
   strftime(tStr, 1000, "_%Y%m%d_%H%M%S", locTime);
   std::string dateTime(tStr, std::find(tStr, tStr + 1000, '\0'));
-  std::string fileName = "docdb_odbc" + dateTime + ".log";
+  std::string fileName("docdb_odbc" + dateTime + ".log");
   return fileName;
 }
 
