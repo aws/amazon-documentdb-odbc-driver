@@ -96,8 +96,8 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   BOOST_CHECK(logger->IsEnabled());
 
   // this boost check means that testData is not in stringStream
-  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find_last_of(testData));
-  // find_last_of means finding the last instance of the string (param)
+  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
+  // find means finding the last instance of the string (param)
 
   // Write to stream.
   LOG_DEBUG_MSG_TO_STREAM(testData, &stringStream);
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
 
   // Check that log stream is working
   // this boost check means that testData is in stringStream
-  BOOST_CHECK_NE(std::string::npos, stringStream.str().find_last_of(testData));
+  BOOST_CHECK_NE(std::string::npos, stringStream.str().find(testData));
 
   // set the original log level / log path back
   if (logVarSaved)
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
 
   //check that stringStream does not have testData1
   BOOST_CHECK_EQUAL(std::string::npos,
-                    stringStream.str().find_last_of(testData1));
+                    stringStream.str().find(testData1));
 
   // Attempt to write debug log to log file, which should fail
   testData1 = "infoLvlTest3" + std::to_string(std::rand());
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
 
   // Check that the debug log is not logged
   BOOST_CHECK_EQUAL(std::string::npos,
-                    stringStream.str().find_last_of(testData1));
+                    stringStream.str().find(testData1));
 
   testData1 = "infoLvlTest4" + std::to_string(std::rand());
   // Write to stream.
@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   BOOST_CHECK(logger->IsEnabled());
 
   // Check that log stream is working
-  BOOST_CHECK_NE(std::string::npos, stringStream.str().find_last_of(testData1));
+  BOOST_CHECK_NE(std::string::npos, stringStream.str().find(testData1));
 
   // Attempt to write debug log to log stream, which should fail
   testData1 = "infoLvlTest5" + std::to_string(std::rand());
@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
 
   // Check that the debug log is not logged
   // Apr-25-2022: I see that this line is not in the log file but this check fails still
-  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find_last_of(testData1));
+  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData1));
 
   // set the original log level / log path back
   if (logVarSaved)
