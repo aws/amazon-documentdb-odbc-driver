@@ -20,6 +20,7 @@
 #include <ignite/odbc/log.h>
 
 #include <string>
+#include <random>
 
 #include "odbc_test_suite.h"
 
@@ -61,6 +62,9 @@ void setLoggerVars(std::shared_ptr< Logger > logger,
 // supported in test suites
 // https://bitquill.atlassian.net/browse/AD-712
 BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
+  std::minstd_rand randNum;
+  randNum.seed(29);
+
   std::string logPath = DEFAULT_LOG_PATH;
   LogLevel::Type logLevel = LogLevel::Type::DEBUG_LEVEL;
 
@@ -87,7 +91,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
 
   std::stringstream stringStream;
   std::string testData;
-  testData = "defTest" + std::to_string(std::rand());
+  testData = "defTest" + std::to_string(randNum());
 
   // Write to log file.
   LOG_DEBUG_MSG("TestLogStreamCreatedOnDefaultInstance begins. Log path/level changes are expected.");
@@ -128,6 +132,10 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
 
 
 BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
+  std::minstd_rand randNum;
+  randNum.seed(31);
+
+  std::string logPath = DEFAULT_LOG_PATH;
   LogLevel::Type logLevel = LogLevel::Type::INFO_LEVEL;
 
   std::shared_ptr< Logger > logger = Logger::getLoggerInstance();
@@ -139,6 +147,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
 
   // set log level and stream
   logger->setLogLevel(logLevel);
+  logger->setLogPath(logPath);
 
   // check log level
   LogLevel::Type loggerLogLevel = logger->getLogLevel();
@@ -146,7 +155,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
 
   std::stringstream stringStream;
   std::string testData;
-  testData = "infoLvlTest1" + std::to_string(std::rand());
+  testData = "infoLvlTest1" + std::to_string(randNum());
 
   // Write to log file.
   LOG_INFO_MSG("TestLogStreamWithInfoLevel begins. Log path/level changes are expected.");
@@ -163,7 +172,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
                     stringStream.str().find(testData));
 
   // Attempt to write debug log to log file, which should fail
-  testData = "infoLvlTest2" + std::to_string(std::rand());
+  testData = "infoLvlTest2" + std::to_string(randNum());
   std::cout << "infoLvlTestData (test2): " << testData << std::endl;
   LOG_DEBUG_MSG(testData);
 
@@ -171,7 +180,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   BOOST_CHECK_EQUAL(std::string::npos,
                     stringStream.str().find(testData));
 
-  testData = "infoLvlTest3" + std::to_string(std::rand());
+  testData = "infoLvlTest3" + std::to_string(randNum());
   // Write to stream.
   LOG_INFO_MSG_TO_STREAM(testData, &stringStream);
   std::cout << "infoLvlTestData (test3): " << testData << std::endl;
@@ -183,7 +192,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   BOOST_CHECK_NE(std::string::npos, stringStream.str().find(testData));
 
   // Attempt to write debug log to log stream, which should fail
-  testData = "infoLvlTest4" + std::to_string(std::rand());
+  testData = "infoLvlTest4" + std::to_string(randNum());
   LOG_DEBUG_MSG_TO_STREAM(testData, &stringStream);
   std::cout << "infoLvlTestData (test4): " << testData << std::endl; // -AL- todo delete those msg later
 
@@ -199,6 +208,10 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
 
 
 BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
+  std::minstd_rand randNum;
+  randNum.seed(42);
+
+  std::string logPath = DEFAULT_LOG_PATH;
   LogLevel::Type logLevel = LogLevel::Type::ERROR_LEVEL;
 
   std::shared_ptr< Logger > logger = Logger::getLoggerInstance();
@@ -210,6 +223,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
 
   // set log level and stream
   logger->setLogLevel(logLevel);
+  logger->setLogPath(logPath);
 
   // check log level
   LogLevel::Type loggerLogLevel = logger->getLogLevel();
@@ -217,7 +231,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
 
   std::stringstream stringStream;
   std::string testData;
-  testData = "errLvlTest1" + std::to_string(std::rand());
+  testData = "errLvlTest1" + std::to_string(randNum());
 
   // Write to log file.
   LOG_ERROR_MSG("(Not an actual error, logged for clarity) TestLogStreamWithErrorLevel begins. Log path/level changes are expected.");
@@ -233,7 +247,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
 
   // Attempt to write debug log to log file, which should fail
-  testData = "errLvlTest2" + std::to_string(std::rand());
+  testData = "errLvlTest2" + std::to_string(randNum());
   std::cout << "errLvlTestData (test2): " << testData << std::endl;
   LOG_DEBUG_MSG(testData);
 
@@ -241,14 +255,14 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
 
   // Attempt to write info log to log file, which should fail
-  testData = "errLvlTest3" + std::to_string(std::rand());
+  testData = "errLvlTest3" + std::to_string(randNum());
   std::cout << "errLvlTestData (test3): " << testData << std::endl;
   LOG_INFO_MSG(testData);
 
   // Check that the debug log is not logged
   BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
 
-  testData = "errLvlTest4" + std::to_string(std::rand());
+  testData = "errLvlTest4" + std::to_string(randNum());
   // Write to stream.
   LOG_ERROR_MSG_TO_STREAM(testData, &stringStream);
   std::cout << "errLvlTestData (test4): " << testData << std::endl;
@@ -260,7 +274,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   BOOST_CHECK_NE(std::string::npos, stringStream.str().find(testData));
 
   // Attempt to write debug log to log stream, which should fail
-  testData = "errLvlTest5" + std::to_string(std::rand());
+  testData = "errLvlTest5" + std::to_string(randNum());
   LOG_DEBUG_MSG_TO_STREAM(testData, &stringStream);
   std::cout << "errLvlTestData (test5): " << testData << std::endl;
 
@@ -268,7 +282,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
 
   // Attempt to write info log to log stream, which should fail
-  testData = "errLvlTest6" + std::to_string(std::rand());
+  testData = "errLvlTest6" + std::to_string(randNum());
   LOG_INFO_MSG_TO_STREAM(testData, &stringStream);
   std::cout << "errLvlTestData (test6): " << testData << std::endl;
 
