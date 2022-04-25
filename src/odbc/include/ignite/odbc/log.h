@@ -269,6 +269,9 @@ class Logger {
 
   /** Log Level */
   LogLevel::Type logLevel = LogLevel::Type::OFF;
+
+  /** Log file name */
+  std::string logFileName = "";
 };
 }  // namespace odbc
 }  // namespace ignite
