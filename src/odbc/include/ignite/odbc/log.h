@@ -51,8 +51,8 @@ using ignite::odbc::common::concurrent::CriticalSection;
 #define WRITE_MSG_TO_STREAM(param, logLevel, logStream)                       \
   {                                                                           \
     std::shared_ptr< ignite::odbc::Logger > p =                               \
-        ignite::odbc::Logger::getLoggerInstance();                            \
-    if (p->getLogLevel() <= logLevel && (p->IsEnabled() || p->EnableLog())) { \
+        ignite::odbc::Logger::GetLoggerInstance();                            \
+    if (p->GetLogLevel() <= logLevel && (p->IsEnabled() || p->EnableLog())) { \
       std::ostream* prevStream = p.get()->GetLogStream();                     \
       if (logStream != nullptr) {                                             \
         /* Override the stream temporarily */                                 \
@@ -95,7 +95,7 @@ using ignite::odbc::common::concurrent::CriticalSection;
 #define LOG_MSG(param)                                                                                   \
   {                                                                                                      \
     std::shared_ptr< ignite::odbc::Logger > p =                                                          \
-        ignite::odbc::Logger::getLoggerInstance();                                                       \
+        ignite::odbc::Logger::GetLoggerInstance();                                                       \
     if (p->IsEnabled() || p->EnableLog()) {                                                              \
       ignite::odbc::LogStream lstream(p.get());                                                          \
       char tStr[1000];                                                                                   \
@@ -178,13 +178,13 @@ class Logger {
   /**
    * Set the logger's set log level.
    */
-  void setLogLevel(LogLevel::Type level);
+  void SetLogLevel(LogLevel::Type level);
 
   /**
    * Set the logger's set log path.
    * Once a log path is set, it cannot be changed
    */
-  void setLogPath(const std::string& path);
+  void SetLogPath(const std::string& path);
 
   /** 
    * Sets the stream to use for logging.
@@ -203,7 +203,7 @@ class Logger {
    * If there is no instance, create new instance.
    * @return Logger instance.
    */
-  static std::shared_ptr< Logger > getLoggerInstance() {
+  static std::shared_ptr< Logger > GetLoggerInstance() {
     // TODO add locks to prevent 2 or more instances being
     // created at once
     // [AD-716](https://bitquill.atlassian.net/browse/AD-716)
@@ -218,13 +218,13 @@ class Logger {
    * Get the logger's set log level.
    * @return logLevel.
    */
-  LogLevel::Type getLogLevel() const;
+  LogLevel::Type GetLogLevel() const;
 
   /**
    * Get the logger's set log path.
    * @return logPath.
    */
-  std::string& getLogPath();
+  std::string& GetLogPath();
 
   /**
    * Checks if file stream is opened.

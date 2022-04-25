@@ -345,7 +345,7 @@ LogLevel::Type Configuration::GetLogLevel() const {
 
 void Configuration::SetLogLevel(const LogLevel::Type level) {
   this->logLevel.SetValue(level);
-  Logger::getLoggerInstance()->setLogLevel(level);
+  Logger::GetLoggerInstance()->SetLogLevel(level);
 }
 
 bool Configuration::IsLogLevelSet() const {
@@ -358,7 +358,7 @@ const std::string& Configuration::GetLogPath() const {
 
 void Configuration::SetLogPath(const std::string& path) {
   this->logPath.SetValue(path);
-  Logger::getLoggerInstance()->setLogPath(path);
+  Logger::GetLoggerInstance()->SetLogPath(path);
 }
 
 bool Configuration::IsLogPathSet() const {

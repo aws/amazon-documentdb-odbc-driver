@@ -36,8 +36,8 @@ bool saveLoggerVars(
     std::shared_ptr< Logger > logger, boost::optional< std::string >& origLogPath,
                     boost::optional< LogLevel::Type >& origLogLevel) {
   if (logger->IsEnabled()) {
-    origLogPath = logger->getLogPath();
-    origLogLevel = logger->getLogLevel();
+    origLogPath = logger->GetLogPath();
+    origLogLevel = logger->GetLogLevel();
 
     return true;
   }
@@ -52,8 +52,8 @@ void setLoggerVars(std::shared_ptr< Logger > logger,
                     boost::optional< LogLevel::Type >& origLogLevel) {
   // pre-requiste: origLogPath and origLogLevel hold valid values
 
-  logger->setLogLevel(origLogLevel.get());
-  logger->setLogPath(origLogPath.get());
+  logger->SetLogLevel(origLogLevel.get());
+  logger->SetLogPath(origLogPath.get());
 }
 
 // -AL- idea: duplicate the same tests for different log levels.
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   std::string logPath = DEFAULT_LOG_PATH;
   LogLevel::Type logLevel = LogLevel::Type::DEBUG_LEVEL;
 
-  std::shared_ptr< Logger > logger = Logger::getLoggerInstance();
+  std::shared_ptr< Logger > logger = Logger::GetLoggerInstance();
 
   // -TODO -AL- if the logger is enabled, save the original log path/level and 
   // change it back at the end of this test
@@ -78,15 +78,15 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   bool logVarSaved = saveLoggerVars(logger, origLogPath, origLogLevel);
 
   // set log level and stream
-  logger->setLogLevel(logLevel);
-  logger->setLogPath(logPath);
+  logger->SetLogLevel(logLevel);
+  logger->SetLogPath(logPath);
 
   // check log level
-  LogLevel::Type loggerLogLevel = logger->getLogLevel();
+  LogLevel::Type loggerLogLevel = logger->GetLogLevel();
   BOOST_CHECK(logLevel == loggerLogLevel);
 
   // check log path
-  std::string loggerLogPath = logger->getLogPath();
+  std::string loggerLogPath = logger->GetLogPath();
   BOOST_CHECK_EQUAL(logPath, loggerLogPath);
 
   std::stringstream stringStream;
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   std::string logPath = DEFAULT_LOG_PATH;
   LogLevel::Type logLevel = LogLevel::Type::INFO_LEVEL;
 
-  std::shared_ptr< Logger > logger = Logger::getLoggerInstance();
+  std::shared_ptr< Logger > logger = Logger::GetLoggerInstance();
 
   // save the original log path / log level
   boost::optional< std::string > origLogPath;
@@ -146,11 +146,11 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   bool logVarSaved = saveLoggerVars(logger, origLogPath, origLogLevel);
 
   // set log level and stream
-  logger->setLogLevel(logLevel);
-  logger->setLogPath(logPath);
+  logger->SetLogLevel(logLevel);
+  logger->SetLogPath(logPath);
 
   // check log level
-  LogLevel::Type loggerLogLevel = logger->getLogLevel();
+  LogLevel::Type loggerLogLevel = logger->GetLogLevel();
   BOOST_CHECK(logLevel == loggerLogLevel);
 
   std::stringstream stringStream;
@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   std::string logPath = DEFAULT_LOG_PATH;
   LogLevel::Type logLevel = LogLevel::Type::ERROR_LEVEL;
 
-  std::shared_ptr< Logger > logger = Logger::getLoggerInstance();
+  std::shared_ptr< Logger > logger = Logger::GetLoggerInstance();
 
   // save the original log path / log level
   boost::optional< std::string > origLogPath;
@@ -222,11 +222,11 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   bool logVarSaved = saveLoggerVars(logger, origLogPath, origLogLevel);
 
   // set log level and stream
-  logger->setLogLevel(logLevel);
-  logger->setLogPath(logPath);
+  logger->SetLogLevel(logLevel);
+  logger->SetLogPath(logPath);
 
   // check log level
-  LogLevel::Type loggerLogLevel = logger->getLogLevel();
+  LogLevel::Type loggerLogLevel = logger->GetLogLevel();
   BOOST_CHECK(logLevel == loggerLogLevel);
 
   std::stringstream stringStream;

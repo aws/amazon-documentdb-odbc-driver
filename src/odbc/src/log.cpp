@@ -26,7 +26,7 @@ using ignite::odbc::Logger;
 using ignite::odbc::config::Configuration;
 using ignite::odbc::common::concurrent::CsLockGuard;
 
-// _logger pointer will  initialized in first call to getLoggerInstance
+// _logger pointer will  initialized in first call to GetLoggerInstance
 std::shared_ptr< Logger > Logger::_logger;
 
 namespace ignite {
@@ -57,11 +57,11 @@ void Logger::CreateFileName(std::string& fileName) {
   fileName = "docdb_odbc" + dateTime + ".log";
 }
 
-void Logger::setLogPath(const std::string& path) {
+void Logger::SetLogPath(const std::string& path) {
   if (logPath == path) {
     LOG_DEBUG_MSG(
-        "WARNING: setLogPath is called with the existing path string. "
-        "setLogPath should only be called once in normal circumstances aside from testing");
+        "WARNING: SetLogPath is called with the existing path string. "
+        "SetLogPath should only be called once in normal circumstances aside from testing");
     return;
   }
   std::string oldLogPath = logPath;
@@ -79,7 +79,7 @@ void Logger::SetLogStream(std::ostream* logStream) {
   stream = logStream;
 }
 
-void Logger::setLogLevel(LogLevel::Type level) {
+void Logger::SetLogLevel(LogLevel::Type level) {
   logLevel = level;
 }
 
@@ -107,11 +107,11 @@ void Logger::WriteMessage(std::string const& message) {
   }
 }
 
-LogLevel::Type Logger::getLogLevel() const {
+LogLevel::Type Logger::GetLogLevel() const {
   return logLevel;
 }
 
-std::string& Logger::getLogPath() {
+std::string& Logger::GetLogPath() {
   return logPath;
 }
 
