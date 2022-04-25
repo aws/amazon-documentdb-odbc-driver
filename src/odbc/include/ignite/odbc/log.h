@@ -93,18 +93,7 @@ using ignite::odbc::common::concurrent::CriticalSection;
 // https://bitquill.atlassian.net/browse/AD-703
 // @Deprecated
 #define LOG_MSG(param)                                                                                   \
-  {                                                                                                      \
-    std::shared_ptr< ignite::odbc::Logger > p =                                                          \
-        ignite::odbc::Logger::GetLoggerInstance();                                                       \
-    if (p->IsEnabled() || p->EnableLog()) {                                                              \
-      ignite::odbc::LogStream lstream(p.get());                                                          \
-      char tStr[1000];                                                                                   \
-      time_t curTime = time(NULL);                                                                       \
-      struct tm* locTime = localtime(&curTime);                                                          \
-      strftime(tStr, 1000, "%T %x ", locTime);                                                           \
-      lstream << "TID: " << std::this_thread::get_id() << " " << tStr << __FUNCTION__ << ": " << param;  \
-    }                                                                                                    \
-  }; static_assert(true, "")
+  LOG_INFO_MSG(param)
 
 // Debug messages are messages that are useful for debugging
 #define LOG_DEBUG_MSG(param) \
