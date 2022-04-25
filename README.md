@@ -26,7 +26,7 @@ SSH host credentials
 Log configurations
 1. `DOC_DB_LOG_PATH`=`<path_to_log_file>`(e.g.:`"C:\\Users\\BQUser\\Desktop\\DocumentDB ODBC Driver\\odbc_log.txt"`)
 Please make sure that the folder in the path exists or else driver will not be able to create the log file. 
-ODBC Driver will append to the existing log file, so it is the user's responsibility to ensure that the log file either does not exist or is clean. 
+ODBC Driver will append to the existing log file, so it is the user's responsibility to ensure that the log file either does not exist or is clean.  // -todo- -AL- update this after implementing file name
 2. `DOC_DB_LOG_LEVEL`=`<log_level>`. The default is 'error'. (Choose from `debug`, `info`, `error`, `off`)
 
 #### Running an SSH tunnel for Testing

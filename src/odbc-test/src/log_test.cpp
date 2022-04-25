@@ -56,11 +56,6 @@ void setLoggerVars(std::shared_ptr< Logger > logger,
   logger->SetLogPath(origLogPath.get());
 }
 
-// -AL- idea: duplicate the same tests for different log levels.
-
-// TODO enable the log file unit test after logging is properly
-// supported in test suites
-// https://bitquill.atlassian.net/browse/AD-712
 BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   std::minstd_rand randNum;
   randNum.seed(29);
@@ -70,9 +65,6 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
 
   std::shared_ptr< Logger > logger = Logger::GetLoggerInstance();
 
-  // -TODO -AL- if the logger is enabled, save the original log path/level and 
-  // change it back at the end of this test
-  // save the original log path / log level
   boost::optional< std::string > origLogPath;
   boost::optional< LogLevel::Type > origLogLevel;
   bool logVarSaved = saveLoggerVars(logger, origLogPath, origLogLevel);
@@ -122,13 +114,6 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   if (logVarSaved)
     setLoggerVars(logger, origLogPath, origLogLevel);
 }
-// move out of connection test and into log_test.cpp
-// can test for setting log path and log level
-// can test unknown log level gives error level
-
-// try to swap out the file stream with in-memory stream (only for testing),
-// but it is okay to write the file then look at it
-
 
 BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   std::minstd_rand randNum;
