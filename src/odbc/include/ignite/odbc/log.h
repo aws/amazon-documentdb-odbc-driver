@@ -250,7 +250,7 @@ class Logger {
   /**
    * Creates the log file name based on date and time
    */
-  void CreateFileName(std::string& fileName);
+  std::string CreateFileName() const;
 
   IGNITE_NO_COPY_ASSIGNMENT(Logger);
 

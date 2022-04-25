@@ -46,7 +46,7 @@ LogStream::~LogStream() {
   }
 }
 
-void Logger::CreateFileName(std::string& fileName) {
+std::string Logger::CreateFileName() const{
   char tStr[1000];
   time_t curTime = time(NULL);
   struct tm* locTime = localtime(&curTime);
@@ -54,7 +54,8 @@ void Logger::CreateFileName(std::string& fileName) {
                                            // -AL- look at https://linux.die.net/man/3/strftime  for guidance
   // could test on web C++
   std::string dateTime(tStr, std::find(tStr, tStr + 1000, '\0'));
-  fileName = "docdb_odbc" + dateTime + ".log";
+  std::string fileName = "docdb_odbc" + dateTime + ".log";
+  return fileName;
 }
 
 void Logger::SetLogPath(const std::string& path) {
