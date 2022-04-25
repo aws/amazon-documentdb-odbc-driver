@@ -26,6 +26,12 @@ using ignite::odbc::Logger;
 using ignite::odbc::config::Configuration;
 using ignite::odbc::common::concurrent::CsLockGuard;
 
+#if defined(_WIN32)
+#define SLASH "\\"  // Windows
+#else
+#define SLASH "/"  // unix
+#endif
+
 // _logger pointer will  initialized in first call to GetLoggerInstance
 std::shared_ptr< Logger > Logger::_logger;
 
@@ -50,9 +56,7 @@ std::string Logger::CreateFileName() const{
   char tStr[1000];
   time_t curTime = time(NULL);
   struct tm* locTime = localtime(&curTime);
-  strftime(tStr, 1000, "%T_%x ", locTime); // TODO -AL- change to format YYYYMMDD_HHMMSS. 
-                                           // -AL- look at https://linux.die.net/man/3/strftime  for guidance
-  // could test on web C++
+  strftime(tStr, 1000, "_%Y%m%d_%H%M%S", locTime);
   std::string dateTime(tStr, std::find(tStr, tStr + 1000, '\0'));
   std::string fileName = "docdb_odbc" + dateTime + ".log";
   return fileName;

@@ -36,11 +36,11 @@ using ignite::odbc::common::concurrent::CriticalSection;
 
 #if defined(_WIN32)
 #define DEFAULT_LOG_PATH \
-  std::string(getenv("TEMP")) + "\\documentdb_odbc.log"  // Windows
+  std::string(getenv("TEMP")) // Windows
 // In Windows, DEFAULT_LOG_PATH is used to pre-populate the log path field in 
 // the DSN Configuration Window. 
 #else
-#define DEFAULT_LOG_PATH "./documentdb_odbc.log"  // unix
+#define DEFAULT_LOG_PATH "."  // unix
 // In the ODBC driver, DEFAULT_LOG_PATH is only used for testing in unix platforms.
 // It is expected for the user to enter a valid log path during DSN connection in unix platforms. 
 #endif
@@ -249,6 +249,7 @@ class Logger {
 
   /**
    * Creates the log file name based on date and time
+   * Log file format: docdb_odbc_YYYYMMDD_HHMMSS.log
    */
   std::string CreateFileName() const;
 
