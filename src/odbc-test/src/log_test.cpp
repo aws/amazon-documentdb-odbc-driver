@@ -45,6 +45,15 @@ bool saveLoggerVars(
   return false;
 }
 
+void setLoggerVars(std::shared_ptr< Logger > logger,
+                    boost::optional< std::string >& origLogPath,
+                    boost::optional< LogLevel::Type >& origLogLevel) {
+  // pre-requiste: origLogPath and origLogLevel hold valid values
+
+  logger->setLogLevel(origLogLevel.get());
+  logger->setLogPath(origLogPath.get());
+}
+
 // -AL- idea: duplicate the same tests for different log levels.
 
 // TODO enable the log file unit test after logging is properly
@@ -59,12 +68,9 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   // -TODO -AL- if the logger is enabled, save the original log path/level and 
   // change it back at the end of this test
   // save the original log path / log level
-  boost::optional< std::string > origLogPath = boost::none;
-  boost::optional< LogLevel::Type > origLogLevel = boost::none;
-  if (logger->IsEnabled()) {
-    origLogPath = logger->getLogPath();
-    origLogLevel = logger->getLogLevel();
-  }
+  boost::optional< std::string > origLogPath;
+  boost::optional< LogLevel::Type > origLogLevel;
+  bool logVarSaved = saveLoggerVars(logger, origLogPath, origLogLevel);
 
   // set log level and stream
   logger->setLogLevel(logLevel);
@@ -80,7 +86,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
 
   std::stringstream stringStream;
   std::string testData;
-  testData = "test" + std::to_string(std::rand());
+  testData = "defTest" + std::to_string(std::rand());
 
   // Write to log file.
   LOG_DEBUG_MSG(testData);
@@ -95,7 +101,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
 
   // Write to stream.
   LOG_DEBUG_MSG_TO_STREAM(testData, &stringStream);
-  std::cout << "testData: " << testData << std::endl;
+  std::cout << "defTestData: " << testData << std::endl;
 
   // Chekc that logger is still enabled after writing to stream
   BOOST_CHECK(logger->IsEnabled());
@@ -105,10 +111,8 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   BOOST_CHECK_NE(std::string::npos, stringStream.str().find_last_of(testData));
 
   // set the original log level / log path back
-  if (origLogPath && origLogLevel) {
-    logger->setLogLevel(origLogLevel.get());
-    logger->setLogPath(origLogPath.get());
-  }
+  if (logVarSaved)
+    setLoggerVars(logger, origLogPath, origLogLevel);
 }
 // move out of connection test and into log_test.cpp
 // can test for setting log path and log level
@@ -118,11 +122,16 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
 // but it is okay to write the file then look at it
 
 
-// too much random string can create duplicates. 
 BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   LogLevel::Type logLevel = LogLevel::Type::INFO_LEVEL;
 
   std::shared_ptr< Logger > logger = Logger::getLoggerInstance();
+
+  // save the original log path / log level
+  boost::optional< std::string > origLogPath;
+  boost::optional< LogLevel::Type > origLogLevel;
+  bool logVarSaved = saveLoggerVars(logger, origLogPath, origLogLevel);
+
   // set log level and stream
   logger->setLogLevel(logLevel);
 
@@ -132,11 +141,11 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
 
   std::stringstream stringStream;
   std::string testData1;
-  testData1 = "test2" + std::to_string(std::rand());
+  testData1 = "infoLvlTest2" + std::to_string(std::rand());
 
   // Write to log file.
   LOG_INFO_MSG(testData1);
-  std::cout << "testData1 (test2): " << testData1 << std::endl;
+  std::cout << "infoLvlTestData1 (test2): " << testData1 << std::endl;
 
   // Check that log file is working
   BOOST_CHECK(logger->IsFileStremOpen());
@@ -147,18 +156,18 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
                     stringStream.str().find_last_of(testData1));
 
   // Attempt to write debug log to log file, which should fail
-  testData1 = "test3" + std::to_string(std::rand());
-  std::cout << "testData1 (test3): " << testData1 << std::endl;
+  testData1 = "infoLvlTest3" + std::to_string(std::rand());
+  std::cout << "infoLvlTestData1 (test3): " << testData1 << std::endl;
   LOG_DEBUG_MSG(testData1);
 
   // Check that the debug log is not logged
   BOOST_CHECK_EQUAL(std::string::npos,
                     stringStream.str().find_last_of(testData1));
 
-  testData1 = "test4" + std::to_string(std::rand());
+  testData1 = "infoLvlTest4" + std::to_string(std::rand());
   // Write to stream.
   LOG_INFO_MSG_TO_STREAM(testData1, &stringStream);
-  std::cout << "testData1 (test4): " << testData1 << std::endl;
+  std::cout << "infoLvlTestData1 (test4): " << testData1 << std::endl;
 
   // Chekc that logger is still enabled after writing to stream
   BOOST_CHECK(logger->IsEnabled());
@@ -167,12 +176,82 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   BOOST_CHECK_NE(std::string::npos, stringStream.str().find_last_of(testData1));
 
   // Attempt to write debug log to log stream, which should fail
-  testData1 = "test5" + std::to_string(std::rand());
+  testData1 = "infoLvlTest5" + std::to_string(std::rand());
   LOG_DEBUG_MSG_TO_STREAM(testData1, &stringStream);
-  std::cout << "testData1 (test5): " << testData1 << std::endl;
+  std::cout << "infoLvlTestData1 (test5): " << testData1 << std::endl;
 
   // Check that the debug log is not logged
   // Apr-25-2022: I see that this line is not in the log file but this check fails still
   BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find_last_of(testData1));
+
+  // set the original log level / log path back
+  if (logVarSaved)
+    setLoggerVars(logger, origLogPath, origLogLevel);
 }
 
+
+BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
+  LogLevel::Type logLevel = LogLevel::Type::INFO_LEVEL;
+
+  std::shared_ptr< Logger > logger = Logger::getLoggerInstance();
+
+  // save the original log path / log level
+  boost::optional< std::string > origLogPath;
+  boost::optional< LogLevel::Type > origLogLevel;
+  bool logVarSaved = saveLoggerVars(logger, origLogPath, origLogLevel);
+
+  // set log level and stream
+  logger->setLogLevel(logLevel);
+
+  // check log level
+  LogLevel::Type loggerLogLevel = logger->getLogLevel();
+  BOOST_CHECK(logLevel == loggerLogLevel);
+
+  std::stringstream stringStream;
+  std::string testData1;
+  testData1 = "infoLvlTest2" + std::to_string(std::rand());
+
+  // Write to log file.
+  LOG_INFO_MSG(testData1);
+  std::cout << "infoLvlTestData1 (test2): " << testData1 << std::endl;
+
+  // Check that log file is working
+  BOOST_CHECK(logger->IsFileStremOpen());
+  BOOST_CHECK(logger->IsEnabled());
+
+  // check that stringStream does not have testData1
+  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData1));
+
+  // Attempt to write debug log to log file, which should fail
+  testData1 = "infoLvlTest3" + std::to_string(std::rand());
+  std::cout << "infoLvlTestData1 (test3): " << testData1 << std::endl;
+  LOG_DEBUG_MSG(testData1);
+
+  // Check that the debug log is not logged
+  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData1));
+
+  testData1 = "infoLvlTest4" + std::to_string(std::rand());
+  // Write to stream.
+  LOG_INFO_MSG_TO_STREAM(testData1, &stringStream);
+  std::cout << "infoLvlTestData1 (test4): " << testData1 << std::endl;
+
+  // Chekc that logger is still enabled after writing to stream
+  BOOST_CHECK(logger->IsEnabled());
+
+  // Check that log stream is working
+  BOOST_CHECK_NE(std::string::npos, stringStream.str().find(testData1));
+
+  // Attempt to write debug log to log stream, which should fail
+  testData1 = "infoLvlTest5" + std::to_string(std::rand());
+  LOG_DEBUG_MSG_TO_STREAM(testData1, &stringStream);
+  std::cout << "infoLvlTestData1 (test5): " << testData1 << std::endl;
+
+  // Check that the debug log is not logged
+  // Apr-25-2022: I see that this line is not in the log file but this check
+  // fails still
+  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData1));
+
+  // set the original log level / log path back
+  if (logVarSaved)
+    setLoggerVars(logger, origLogPath, origLogLevel);
+}
