@@ -7,8 +7,7 @@
 When troubleshooting, it can be helpful to view the logs so that you might be able 
 to resolve the issue on your own or at least have more context to provide when seeking support. 
 On Windows, the driver's logs will be written to `%TEMP%/` by default.
-On Mac/Linux/Unix, the default log path is `./`. 
-In the ODBC driver, DEFAULT_LOG_PATH is only used for testing in unix platforms. 
+On Mac/Linux/Unix, the default log path is `./`.
 It is expected for the user to enter a valid log path during DSN connection in unix platforms. 
 On Windows, you may change the default path in the DSN configuration window.
 In any platform, you may pass your log path / log level in the connection string.

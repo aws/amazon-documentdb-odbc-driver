@@ -24,8 +24,9 @@ SSH host credentials
 2. `DOC_DB_PRIV_KEY_FILE`=`<path_to_ssh_host_private_key_file>`(e.g.:`~/.ssh/ssh_host.pem`)
 
 Log configurations
-1. `DOC_DB_LOG_PATH`=`<path_to_log_file>`(e.g.:`"C:\\Users\\BQUser\\Desktop\\DocumentDB ODBC Driver\\odbc_log.txt"`)
+1. `DOC_DB_LOG_PATH`=`<path_to_log_file>`(e.g.:`"C:\\Users\\BQUser\\Desktop\\DocumentDB ODBC Driver"`)
 Please make sure that the folder in the path exists or else driver will not be able to create the log file. 
+Do **not** include a slash at the end of the log path.
 The log path indicates the path to store the log file. The log file name has `docdb_odbc_YYYYMMDD_HHMMSS.log` format, 
 where `YYYYMMDD_HHMMSS` (e.g., 20220225_180923 <= Feb 25th, 2022 at 06:92:23 pm) is the timestamp at the first log message.
 2. `DOC_DB_LOG_LEVEL`=`<log_level>`. The default is 'error'. (Choose from `debug`, `info`, `error`, `off`)
