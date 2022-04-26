@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <boost/test/unit_test.hpp>
-#include <boost/optional.hpp>
-#include <ignite/odbc/log_level.h>
 #include <ignite/odbc/log.h>
+#include <ignite/odbc/log_level.h>
 
-#include <string>
+#include <boost/optional.hpp>
+#include <boost/test/unit_test.hpp>
 #include <random>
+#include <string>
 
 #include "odbc_test_suite.h"
 
@@ -28,12 +28,12 @@ using namespace ignite::odbc::common;
 using namespace boost::unit_test;
 
 using boost::unit_test::precondition;
-using ignite::odbc::OdbcTestSuite;
-using ignite::odbc::LogLevel;
 using ignite::odbc::Logger;
+using ignite::odbc::LogLevel;
+using ignite::odbc::OdbcTestSuite;
 
-bool SaveLoggerVars(
-    std::shared_ptr< Logger > logger, boost::optional< std::string >& origLogPath,
+bool SaveLoggerVars(std::shared_ptr< Logger > logger,
+                    boost::optional< std::string >& origLogPath,
                     boost::optional< LogLevel::Type >& origLogLevel) {
   if (logger->IsEnabled()) {
     origLogPath = logger->GetLogPath();
@@ -48,8 +48,8 @@ bool SaveLoggerVars(
 }
 
 void setLoggerVars(std::shared_ptr< Logger > logger,
-                    boost::optional< std::string >& origLogPath,
-                    boost::optional< LogLevel::Type >& origLogLevel) {
+                   boost::optional< std::string >& origLogPath,
+                   boost::optional< LogLevel::Type >& origLogLevel) {
   // pre-requiste: origLogPath and origLogLevel hold valid values
 
   logger->SetLogLevel(origLogLevel.get());
@@ -86,7 +86,9 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   testData = "defTest" + std::to_string(randNum());
 
   // Write to log file.
-  LOG_DEBUG_MSG("TestLogStreamCreatedOnDefaultInstance begins. Log path/level changes are expected.");
+  LOG_DEBUG_MSG(
+      "TestLogStreamCreatedOnDefaultInstance begins. Log path/level changes "
+      "are expected.");
 
   LOG_DEBUG_MSG(testData);
 
@@ -108,7 +110,9 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   // this boost check means that testData is in stringStream
   BOOST_CHECK_NE(std::string::npos, stringStream.str().find(testData));
 
-  LOG_DEBUG_MSG("TestLogStreamCreatedOnDefaultInstance ends. Log path/level changes are expected.");
+  LOG_DEBUG_MSG(
+      "TestLogStreamCreatedOnDefaultInstance ends. Log path/level changes are "
+      "expected.");
 
   // set the original log level / log path back
   if (logVarSaved)
@@ -142,7 +146,9 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   testData = "infoLvlTest1" + std::to_string(randNum());
 
   // Write to log file.
-  LOG_INFO_MSG("TestLogStreamWithInfoLevel begins. Log path/level changes are expected.");
+  LOG_INFO_MSG(
+      "TestLogStreamWithInfoLevel begins. Log path/level changes are "
+      "expected.");
 
   LOG_INFO_MSG(testData);
 
@@ -150,17 +156,15 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   BOOST_CHECK(logger->IsFileStreamOpen());
   BOOST_CHECK(logger->IsEnabled());
 
-  //check that stringStream does not have testData
-  BOOST_CHECK_EQUAL(std::string::npos,
-                    stringStream.str().find(testData));
+  // check that stringStream does not have testData
+  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
 
   // Attempt to write debug log to log file, which should fail
   testData = "infoLvlTest2" + std::to_string(randNum());
   LOG_DEBUG_MSG(testData);
 
   // Check that the debug log is not logged
-  BOOST_CHECK_EQUAL(std::string::npos,
-                    stringStream.str().find(testData));
+  BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
 
   testData = "infoLvlTest3" + std::to_string(randNum());
   // Write to stream.
@@ -179,13 +183,13 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   // Check that the debug log is not logged
   BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
 
-  LOG_INFO_MSG("TestLogStreamWithInfoLevel ends. Log path/level changes are expected.");
+  LOG_INFO_MSG(
+      "TestLogStreamWithInfoLevel ends. Log path/level changes are expected.");
 
   // set the original log level / log path back
   if (logVarSaved)
     setLoggerVars(logger, origLogPath, origLogLevel);
 }
-
 
 BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   std::minstd_rand randNum;
@@ -214,7 +218,9 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   testData = "errLvlTest1" + std::to_string(randNum());
 
   // Write to log file.
-  LOG_ERROR_MSG("(Not an actual error, logged for clarity) TestLogStreamWithErrorLevel begins. Log path/level changes are expected.");
+  LOG_ERROR_MSG(
+      "(Not an actual error, logged for clarity) TestLogStreamWithErrorLevel "
+      "begins. Log path/level changes are expected.");
 
   LOG_ERROR_MSG(testData);
 
@@ -263,9 +269,36 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   // Check that the info log is not logged
   BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
 
-  LOG_ERROR_MSG("(Not an actual error, logged for clarity) TestLogStreamWithErrorLevel ends. Log path/level changes are expected.");
+  LOG_ERROR_MSG(
+      "(Not an actual error, logged for clarity) TestLogStreamWithErrorLevel "
+      "ends. Log path/level changes are expected.");
 
   // set the original log level / log path back
+  if (logVarSaved)
+    setLoggerVars(logger, origLogPath, origLogLevel);
+}
+
+BOOST_AUTO_TEST_CASE(TestLogSetInvalidLogPath) {
+  std::string logPath = "invalid\\log\\path";
+
+  std::shared_ptr< Logger > logger = Logger::GetLoggerInstance();
+
+  // save the original log path / log level
+  boost::optional< std::string > origLogPath;
+  boost::optional< LogLevel::Type > origLogLevel;
+  bool logVarSaved = SaveLoggerVars(logger, origLogPath, origLogLevel);
+
+  // attempt to set wrong log path
+  logger->SetLogPath(logPath);
+
+  // check that invalid log path is not set and the original log path remains (if not null)
+  BOOST_CHECK_NE(logPath, logger->GetLogPath());
+  if (origLogPath)
+    BOOST_CHECK_EQUAL(origLogPath.get(), logger->GetLogPath());
+
+  // set the original log level / log path back
+  // in case the invalid log path is set, still ensure to change it back at end
+  // of the test
   if (logVarSaved)
     setLoggerVars(logger, origLogPath, origLogLevel);
 }
