@@ -16,19 +16,19 @@
  */
 
 #ifdef __linux__
-#include <unistd.h>
 #include <pwd.h>
+#include <unistd.h>
 #endif
 
-#include "ignite/odbc/log.h"
-
 #include <cstdlib>
+
 #include "ignite/odbc/config/configuration.h"
+#include "ignite/odbc/log.h"
 #include "ignite/odbc/log_level.h"
 
 using ignite::odbc::Logger;
-using ignite::odbc::config::Configuration;
 using ignite::odbc::common::concurrent::CsLockGuard;
+using ignite::odbc::config::Configuration;
 
 #if defined(_WIN32)
 #define SLASH "\\"  // Windows
@@ -36,8 +36,8 @@ using ignite::odbc::common::concurrent::CsLockGuard;
 #define SLASH "/"  // unix
 #endif
 
-// _logger pointer will  initialized in first call to GetLoggerInstance
-std::shared_ptr< Logger > Logger::_logger;
+// logger_ pointer will  initialized in first call to GetLoggerInstance
+std::shared_ptr< Logger > Logger::logger_;
 
 namespace ignite {
 namespace odbc {
@@ -46,7 +46,7 @@ LogStream::LogStream(Logger* parent)
   init(&strbuf);
 }
 
-bool LogStream::operator()() const{
+bool LogStream::operator()() const {
   return logger != nullptr;
 }
 
@@ -77,14 +77,16 @@ std::string Logger::GetDefaultLogPath() {
 
   if (defPath.empty()) {
     // couldn't find home directory, fall back to current working directory
-    std::cout << "warning: couldn't find home directory, the default log path is set as the current working directory" << '\n';
+    std::cout << "warning: couldn't find home directory, the default log path "
+                 "is set as the current working directory"
+              << '\n';
     defPath = ".";
   }
 
   return defPath;
 }
 
-std::string Logger::CreateFileName() const{
+std::string Logger::CreateFileName() const {
   char tStr[1000];
   time_t curTime = time(nullptr);
   struct tm* locTime = localtime(&curTime);
@@ -98,18 +100,19 @@ void Logger::SetLogPath(const std::string& path) {
   if (logPath == path) {
     LOG_DEBUG_MSG(
         "WARNING: SetLogPath is called with the existing path string. "
-        "SetLogPath should only be called once in normal circumstances aside from testing");
+        "SetLogPath should only be called once in normal circumstances aside "
+        "from testing");
     return;
   }
   std::string oldLogPath = logPath;
   std::string oldLogFileName = logFileName;
   logPath = path;
   if (IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()) {
-      LOG_INFO_MSG("Reset log path: Log path is changed to " + logPath + SLASH
+    LOG_INFO_MSG("Reset log path: Log path is changed to " + logPath + SLASH
                  + logFileName);
-      fileStream.close();
-      LOG_INFO_MSG("Previously logged information is stored in log file "
-                   + oldLogPath + SLASH + oldLogFileName);
+    fileStream.close();
+    LOG_INFO_MSG("Previously logged information is stored in log file "
+                 + oldLogPath + SLASH + oldLogFileName);
   }
   SetLogStream(&fileStream);
 }
@@ -130,11 +133,11 @@ bool Logger::IsEnabled() const {
   return stream != nullptr && (stream != &fileStream || IsFileStreamOpen());
 }
 
-bool Logger::EnableLog() { // stream is nullptr, which makes enable log called. 
+bool Logger::EnableLog() {  // stream is nullptr, which makes enable log called.
   if (!IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()
       && stream == &fileStream) {
     if (logFileName.empty())
-        logFileName = CreateFileName();
+      logFileName = CreateFileName();
     fileStream.open(logPath + SLASH + logFileName, std::ios_base::app);
   }
   return IsEnabled();

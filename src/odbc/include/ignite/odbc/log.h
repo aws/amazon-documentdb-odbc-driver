@@ -194,10 +194,10 @@ class Logger {
     // created at once
     // [AD-716](https://bitquill.atlassian.net/browse/AD-716)
 
-    if (!_logger)
-      _logger = std::shared_ptr< Logger >(new Logger());
+    if (!logger_)
+      logger_ = std::shared_ptr< Logger >(new Logger());
 
-    return _logger;
+    return logger_;
   }
 
   /**
@@ -237,7 +237,7 @@ class Logger {
   void WriteMessage(std::string const& message);
 
  private:
-  static std::shared_ptr< Logger > _logger;  // a singleton instance
+  static std::shared_ptr< Logger > logger_;  // a singleton instance
 
   /**
    * Constructor.
