@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#ifdef __linux__
+#ifdef unix
 #include <pwd.h>
 #include <unistd.h>
 #endif
@@ -53,12 +53,12 @@ LogStream::~LogStream() {
 std::string Logger::GetDefaultLogPath() {
   std::string defPath;
 #ifdef unix
-  struct passwd* pwd = getpwuid(getuid());
-  if (pwd) {
-    defPath = pwd->pw_dir;
-  } else {
-    // try the $HOME environment variable (note: $HOME is not defined in OS X)
-    defPath = common::GetEnv("HOME");
+  // try the $HOME environment variable (note: $HOME is not defined in OS X)
+  defPath = common::GetEnv("HOME");
+  if (defPath.empty()) {
+    struct passwd* pwd = getpwuid(getuid());
+    if (pwd)
+      defPath = pwd->pw_dir;
   }
 #elif defined(_WIN32)
   defPath = common::GetEnv("USERPROFILE");
