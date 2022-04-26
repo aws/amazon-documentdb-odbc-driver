@@ -261,7 +261,7 @@ class Logger {
   /** Reference to logging stream */
   std::ostream* stream = nullptr;
 
-  /** Log path */
+  /** Log folder path */
   std::string logPath = DEFAULT_LOG_PATH;
 
   /** Log Level */
@@ -269,6 +269,9 @@ class Logger {
 
   /** Log file name */
   std::string logFileName;
+
+  /** Log file path */
+  std::string logFilePath;
 };
 }  // namespace odbc
 }  // namespace ignite

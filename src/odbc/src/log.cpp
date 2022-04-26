@@ -30,12 +30,6 @@ using ignite::odbc::Logger;
 using ignite::odbc::common::concurrent::CsLockGuard;
 using ignite::odbc::config::Configuration;
 
-#if defined(_WIN32)
-#define SLASH "\\"  // Windows
-#else
-#define SLASH "/"  // unix
-#endif
-
 // logger_ pointer will  initialized in first call to GetLoggerInstance
 std::shared_ptr< Logger > Logger::logger_;
 
@@ -104,15 +98,13 @@ void Logger::SetLogPath(const std::string& path) {
         "from testing");
     return;
   }
-  std::string oldLogPath = logPath;
-  std::string oldLogFileName = logFileName;
+  std::string oldLogFilePath = logFilePath;
   logPath = path;
   if (IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()) {
-    LOG_INFO_MSG("Reset log path: Log path is changed to " + logPath + SLASH
-                 + logFileName);
+    LOG_INFO_MSG("Reset log path: Log path is changed to " + logFilePath);
     fileStream.close();
     LOG_INFO_MSG("Previously logged information is stored in log file "
-                 + oldLogPath + SLASH + oldLogFileName);
+                 + oldLogFilePath);
   }
   SetLogStream(&fileStream);
 }
@@ -136,9 +128,13 @@ bool Logger::IsEnabled() const {
 bool Logger::EnableLog() {  // stream is nullptr, which makes enable log called.
   if (!IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()
       && stream == &fileStream) {
-    if (logFileName.empty())
+    if (logFileName.empty()) {
       logFileName = CreateFileName();
-    fileStream.open(logPath + SLASH + logFileName, std::ios_base::app);
+      std::stringstream tmpStream;
+      tmpStream << logPath << ignite::odbc::common::Fs << logFileName;
+      logFilePath = tmpStream.str();
+    }
+    fileStream.open(logFilePath, std::ios_base::app);
   }
   return IsEnabled();
 }
