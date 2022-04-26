@@ -98,9 +98,18 @@ void Logger::SetLogPath(const std::string& path) {
         "from testing");
     return;
   }
+  if (!common::IsValidDirectory(path)) {
+    // if path is not a valid directory, ignore passed path.
+    std::cerr << "Error during setting log path: \"" << path
+              << "\" is not a valid directory. Log path is not updated"
+              << '\n';
+    std::cout << "Current Log Path: \"" << logPath << "\" \n";
+    return;
+  }
   std::string oldLogFilePath = logFilePath;
   logPath = path;
   if (IsEnabled() && logLevel != LogLevel::Type::OFF) {
+  // TODO Bruce suggestion: use IsValidDirectory() and/or FileExists() here
     LOG_INFO_MSG("Reset log path: Log path is changed to " + logFilePath);
     fileStream.close();
     LOG_INFO_MSG("Previously logged information is stored in log file "
@@ -132,6 +141,9 @@ bool Logger::EnableLog() {  // stream is nullptr, which makes enable log called.
       std::stringstream tmpStream;
       tmpStream << logPath << ignite::odbc::common::Fs << logFileName;
       logFilePath = tmpStream.str();
+      if (common::FileExists(logFilePath))
+        std::cout << "log file at " << logFilePath
+                  << "already exists. Appending logs to the log file." << '\n';
       std::cout << "logFilePath: " << logFilePath << '\n';
     }
     fileStream.open(logFilePath, std::ios_base::app);
