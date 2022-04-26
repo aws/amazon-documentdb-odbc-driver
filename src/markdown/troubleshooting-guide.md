@@ -11,8 +11,8 @@ On Mac/Linux/Unix, the default log path is `./`.
 It is expected for the user to enter a valid log path during DSN connection in unix platforms. 
 On Windows, you may change the default path in the DSN configuration window.
 In any platform, you may pass your log path / log level in the connection string.
-The log path indicates the path to store the log file. The log file name has `docdb_odbc_YYYYMMDD_HHMMSS.log` format, 
-where `YYYYMMDD_HHMMSS` (e.g., 20220225_180923 <= Feb 25th, 2022 at 06:92:23 pm)
+The log path indicates the path to store the log file. The log file name has `docdb_odbc_YYYYMMDD.log` format, 
+where `YYYYMMDD` (e.g., 20220225 <= Feb 25th, 2022)
 is the timestamp at the first log message.
 The keyword for log path is `log_path` and the keyword for log level is `log_level`. 
 
