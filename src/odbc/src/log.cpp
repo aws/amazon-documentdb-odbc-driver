@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+#ifdef __linux__
+#include <unistd.h>
+#include <pwd.h>
+#endif
+
 #include "ignite/odbc/log.h"
 
 #include <cstdlib>
@@ -49,6 +54,32 @@ LogStream::~LogStream() {
   if (logger) {
     logger->WriteMessage(strbuf.str());
   }
+}
+std::string Logger::GetDefaultLogPath() {
+  std::string defPath;
+#ifdef unix
+  struct passwd* pwd = getpwuid(getuid());
+  if (pwd) {
+    defPath = pwd->pw_dir;
+  } else {
+    // try the $HOME environment variable (note: $HOME is not defined in OS X)
+    defPath = common::GetEnv("HOME");
+  }
+#elif defined(_WIN32)
+  defPath = common::GetEnv("USERPROFILE");
+  if (defPath.empty()) {
+    const std::string homeDirectory = common::GetEnv("HOMEDRIVE");
+    const std::string homepath = common::GetEnv("HOMEPATH");
+    defPath = homeDirectory + homepath;
+  }
+#endif
+
+  if (defPath.empty()) {
+    // couldn't find home directory, fall back to current working directory
+    defPath = ".";
+  }
+
+  return defPath;
 }
 
 std::string Logger::CreateFileName() const{

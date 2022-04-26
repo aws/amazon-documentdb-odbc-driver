@@ -31,19 +31,7 @@
 
 using ignite::odbc::common::concurrent::CriticalSection;
 
-// Todo: implement log file using user-provided log path
-// https://bitquill.atlassian.net/browse/AD-697
-
-#if defined(_WIN32)
-#define DEFAULT_LOG_PATH std::string(getenv("TEMP"))  // Windows
-// In Windows, DEFAULT_LOG_PATH is used to pre-populate the log path field in
-// the DSN Configuration Window.
-#else
-#define DEFAULT_LOG_PATH "."  // unix
-// In the ODBC driver, DEFAULT_LOG_PATH should only be used for testing in unix
-// platforms. It is expected for the user to enter a valid log path during DSN
-// connection in unix platforms.
-#endif
+#define DEFAULT_LOG_PATH ignite::odbc::Logger::GetDefaultLogPath()
 
 #define WRITE_LOG_MSG(param, logLevel) \
   WRITE_MSG_TO_STREAM(param, logLevel, (std::ostream*)nullptr)
@@ -189,6 +177,12 @@ class Logger {
   std::ostream* GetLogStream() {
     return stream;
   }
+
+  /**
+   * Get default log path.
+   * @return Logger default path.
+   */
+  static std::string GetDefaultLogPath();
 
   /**
    * Get singleton instance of Logger.
