@@ -1548,7 +1548,7 @@ JniErrorCode JniContext::ResultSetGetInt(
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
 
-    LOG_ERROR_MSG("function exiting with error msg: " << errInfo.errMsg);
+    LOG_ERROR_MSG("ResultSetGetInt exiting with error msg: " << errInfo.errMsg);
 
     return errInfo.code;
   }
@@ -2053,7 +2053,7 @@ JniErrorCode JniContext::CallIntMethod(
 
   value = result;
 
-  LOG_DEBUG_MSG("function exiting");
+  LOG_DEBUG_MSG("CallIntMethod exiting");
 
   return errInfo.code;
 }
