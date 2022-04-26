@@ -82,7 +82,7 @@ jobs:
         ./src/odbc-test/scripts/import_test_data.sh
     - name: run-tests
       run: |
-        mkdir -p "${{github.workspace}}/build/odbc/logs"
+        mkdir -p "${{env.DOC_DB_LOG_PATH}}"
         ./build/odbc/bin/tests
     - name: upload-test-report
       if: always()

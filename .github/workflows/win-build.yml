@@ -134,7 +134,7 @@ jobs:
 
     - name: run-tests
       run: |
-        mkdir -p "${{github.workspace}}/build/odbc/logs"
+        mkdir -p "${{env.DOC_DB_LOG_PATH}}"
         Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
         ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
 
