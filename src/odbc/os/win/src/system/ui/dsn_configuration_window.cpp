@@ -355,7 +355,7 @@ int DsnConfigurationWindow::CreateLogSettingsGroup(int posX, int posY,
   const char* val = config.GetLogPath().c_str();
   logPathLabel = CreateLabel(
       labelPosX, rowPos, pathSizeX, ROW_HEIGHT * 2,
-      "Log Path:\n(the log file name format is docdb_odbc_YYYYMMDD_HHMMSS.log)",
+      "Log Path:\n(the log file name format is docdb_odbc_YYYYMMDD.log)",
       ChildId::LOG_PATH_LABEL);
 
   rowPos += INTERVAL * 2 + ROW_HEIGHT;

@@ -32,7 +32,7 @@ using ignite::odbc::OdbcTestSuite;
 using ignite::odbc::LogLevel;
 using ignite::odbc::Logger;
 
-bool saveLoggerVars(
+bool SaveLoggerVars(
     std::shared_ptr< Logger > logger, boost::optional< std::string >& origLogPath,
                     boost::optional< LogLevel::Type >& origLogLevel) {
   if (logger->IsEnabled()) {
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
 
   boost::optional< std::string > origLogPath;
   boost::optional< LogLevel::Type > origLogLevel;
-  bool logVarSaved = saveLoggerVars(logger, origLogPath, origLogLevel);
+  bool logVarSaved = SaveLoggerVars(logger, origLogPath, origLogLevel);
 
   // set log level and stream
   logger->SetLogLevel(logLevel);
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
 
   // check log level
   LogLevel::Type loggerLogLevel = logger->GetLogLevel();
-  BOOST_CHECK(logLevel == loggerLogLevel);
+  BOOST_CHECK_EQUAL(logLevel, loggerLogLevel);
 
   // check log path
   std::string loggerLogPath = logger->GetLogPath();
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   // save the original log path / log level
   boost::optional< std::string > origLogPath;
   boost::optional< LogLevel::Type > origLogLevel;
-  bool logVarSaved = saveLoggerVars(logger, origLogPath, origLogLevel);
+  bool logVarSaved = SaveLoggerVars(logger, origLogPath, origLogLevel);
 
   // set log level and stream
   logger->SetLogLevel(logLevel);
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
 
   // check log level
   LogLevel::Type loggerLogLevel = logger->GetLogLevel();
-  BOOST_CHECK(logLevel == loggerLogLevel);
+  BOOST_CHECK_EQUAL(logLevel,  loggerLogLevel);
 
   std::stringstream stringStream;
   std::string testData;
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   // save the original log path / log level
   boost::optional< std::string > origLogPath;
   boost::optional< LogLevel::Type > origLogLevel;
-  bool logVarSaved = saveLoggerVars(logger, origLogPath, origLogLevel);
+  bool logVarSaved = SaveLoggerVars(logger, origLogPath, origLogLevel);
 
   // set log level and stream
   logger->SetLogLevel(logLevel);
@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
 
   // check log level
   LogLevel::Type loggerLogLevel = logger->GetLogLevel();
-  BOOST_CHECK(logLevel == loggerLogLevel);
+  BOOST_CHECK_EQUAL(logLevel,  loggerLogLevel);
 
   std::stringstream stringStream;
   std::string testData;
