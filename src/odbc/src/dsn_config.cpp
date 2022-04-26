@@ -232,7 +232,7 @@ void ReadDsnConfiguration(const char* dsn, Configuration& config,
 
   if (logLevel.IsSet() && !config.IsLogLevelSet()) {
     LogLevel::Type level =
-        LogLevel::FromString(logLevel.GetValue(), LogLevel::Type::INFO_LEVEL);
+        LogLevel::FromString(logLevel.GetValue(), LogLevel::Type::ERROR_LEVEL);
     config.SetLogLevel(level);
   }
 
