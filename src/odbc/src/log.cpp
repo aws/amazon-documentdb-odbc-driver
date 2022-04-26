@@ -100,7 +100,7 @@ void Logger::SetLogPath(const std::string& path) {
   }
   std::string oldLogFilePath = logFilePath;
   logPath = path;
-  if (IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()) {
+  if (IsEnabled() && logLevel != LogLevel::Type::OFF) {
     LOG_INFO_MSG("Reset log path: Log path is changed to " + logFilePath);
     fileStream.close();
     LOG_INFO_MSG("Previously logged information is stored in log file "
@@ -126,13 +126,13 @@ bool Logger::IsEnabled() const {
 }
 
 bool Logger::EnableLog() {  // stream is nullptr, which makes enable log called.
-  if (!IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()
-      && stream == &fileStream) {
+  if (!IsEnabled() && logLevel != LogLevel::Type::OFF && stream == &fileStream) {
     if (logFileName.empty()) {
       logFileName = CreateFileName();
       std::stringstream tmpStream;
       tmpStream << logPath << ignite::odbc::common::Fs << logFileName;
       logFilePath = tmpStream.str();
+      std::cout << "logFilePath: " << logFilePath << '\n';
     }
     fileStream.open(logFilePath, std::ios_base::app);
   }
