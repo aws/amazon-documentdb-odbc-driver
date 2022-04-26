@@ -14,8 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#if defined(__unix__) || defined(__unix) || \
+    (defined(__APPLE__) && defined(__MACH__))
+# define PREDEF_PLATFORM_UNIX_OR_APPLE 1
+#endif
 
-#ifdef unix
+#ifdef PREDEF_PLATFORM_UNIX_OR_APPLE
 #include <pwd.h>
 #include <unistd.h>
 #endif
@@ -52,7 +56,7 @@ LogStream::~LogStream() {
 
 std::string Logger::GetDefaultLogPath() {
   std::string defPath;
-#ifdef unix
+#if defined(PREDEF_PLATFORM_UNIX_OR_APPLE)
   // try the $HOME environment variable (note: $HOME is not defined in OS X)
   defPath = common::GetEnv("HOME");
   if (defPath.empty()) {
