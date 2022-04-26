@@ -40,7 +40,7 @@ For example: (Note: The capitalization does not matter.)
 to your connection string.
     * You can also set the log path and log level from the configuration window in the Microsoft ODBC Administrator. 
     * Click on the drop menu for setting the log level
-    * Enter the desired log file path in the field next to the label `Log File`. The user needs to ensure that the directory mentioned in the log file path does exist, or ODBC will be unable to create the log file.
+    * Enter the desired log file path in the field next to the label `Log File`. The user needs to ensure that the directory mentioned in the log file path does exist, or driver will ignore user's passed value and create the log file in the default log path.
 
 - In MacOS/Linux/Unix, append `LOG_PATH="~/path/to/log/file";LOG_LEVEL=ERROR;` to your connection string, or append
 `LOG_PATH` and `LOG_LEVEL` as keywords in the ODBC manager. 
