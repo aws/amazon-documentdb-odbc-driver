@@ -5,11 +5,11 @@ on:
 
 env:
   CI_OUTPUT_PATH: "ci-output"
-  ODBC_LIB_PATH: "./build/odbc/lib"
-  ODBC_BIN_PATH: "./build/odbc/bin"
-  ODBC_BUILD_PATH: "./build/odbc/build"
-  DOCUMENTDB_HOME: "./build/odbc/bin"
-  DOC_DB_LOG_PATH: "./build/odbc/logs"
+  ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"
+  ODBC_BIN_PATH: "${{github.workspace}}/build/odbc/bin"
+  ODBC_BUILD_PATH: "${{github.workspace}}/build/odbc/build"
+  DOCUMENTDB_HOME: "${{github.workspace}}/build/odbc/bin"
+  DOC_DB_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
   DOC_DB_LOG_LEVEL: "debug"
 
 jobs:
