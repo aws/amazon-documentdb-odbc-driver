@@ -56,7 +56,7 @@ std::string Logger::CreateFileName() const{
 // get process id
   std::ostringstream tmpStream;
   // tmpStream << GetCurrentProcessId();
-  tmpStream << _getpid();
+  tmpStream << getpid();
   std::string pid = tmpStream.str();
 
   char tStr[1000];
