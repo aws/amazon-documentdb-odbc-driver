@@ -6,9 +6,8 @@
 
 When troubleshooting, it can be helpful to view the logs so that you might be able 
 to resolve the issue on your own or at least have more context to provide when seeking support. 
-On Windows, the driver's logs will be written to `%TEMP%/` by default.
-On Mac/Linux/Unix, the default log path is `./`.
-It is expected for the user to enter a valid log path during DSN connection in unix platforms. 
+On Windows, the driver's logs will be written to `%USERPROFILE%` or `%HOMEDRIVE%%HOMEPATH%` by default.
+On Mac/Linux/Unix, the default log path is `getpwuid()` or `$HOME`, whichever one is available.
 On Windows, you may change the default path in the DSN configuration window.
 In any platform, you may pass your log path / log level in the connection string.
 The log path indicates the path to store the log file. The log file name has `docdb_odbc_YYYYMMDD.log` format, 
@@ -29,9 +28,9 @@ There are the following levels of logging:
 | Property Name | Description | Platform | Default |
 |--------|-------------|--------|---------------|
 | `log_level` | The log level for all sources/appenders. | All Platforms | `ERROR` |
-| `log_path` | The location for file logging. | Windows | `%TEMP%/` |
-| `log_path` | The location for file logging. | MacOS | `./` |
-| `log_path` | The location for file logging. | Linux/Unix | `./` |
+| `log_path` | The location for file logging. | Windows | `%USERPROFILE%`, or if not available, `%HOMEDRIVE%%HOMEPATH%` |
+| `log_path` | The location for file logging. | MacOS | `getpwuid()`, or if not available, `$HOME` |
+| `log_path` | The location for file logging. | Linux/Unix | `getpwuid()`, or if not available, `$HOME` |
 
 To set these properties, use the connection string with the following format 
 `<property-name>=<property-value>`. The user should **not** have a slash at the end of the log path. 
