@@ -19,9 +19,9 @@
 #include <ignite/odbc/config/config_tools.h>
 #include <ignite/odbc/config/configuration.h>
 #include <ignite/odbc/config/connection_string_parser.h>
-#include <ignite/odbc/odbc_error.h>
 #include <ignite/odbc/log.h>
 #include <ignite/odbc/log_level.h>
+#include <ignite/odbc/odbc_error.h>
 
 #include <boost/test/unit_test.hpp>
 #include <iostream>
@@ -360,8 +360,11 @@ BOOST_AUTO_TEST_CASE(CheckTestValuesNotEqualDefault) {
                  Configuration::DefaultValue::sshStrictHostKeyChecking);
   BOOST_CHECK_NE(testSshKnownHostsFile,
                  Configuration::DefaultValue::sshKnownHostsFile);
-  BOOST_CHECK_NE(testLogPath,
-                 Configuration::DefaultValue::logPath);
+  if (Configuration::DefaultValue::logPath == testLogPath)
+    std::cout << "ODBC Driver's default path happens to be test log path. It "
+                 "is expected for the boost check of testLogPath to fail."
+              << '\n';
+  BOOST_CHECK_NE(testLogPath, Configuration::DefaultValue::logPath);
   BOOST_CHECK_NE(testScanLimit, Configuration::DefaultValue::scanLimit);
   BOOST_CHECK_NE(testSchemaName, Configuration::DefaultValue::schemaName);
   BOOST_CHECK_NE(testRefreshSchemaFlag,
