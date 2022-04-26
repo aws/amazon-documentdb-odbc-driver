@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
 
   // check log level
   LogLevel::Type loggerLogLevel = logger->GetLogLevel();
-  BOOST_CHECK_EQUAL(logLevel, loggerLogLevel);
+  BOOST_CHECK(logLevel == loggerLogLevel);
 
   // check log path
   std::string loggerLogPath = logger->GetLogPath();
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
 
   // check log level
   LogLevel::Type loggerLogLevel = logger->GetLogLevel();
-  BOOST_CHECK_EQUAL(logLevel,  loggerLogLevel);
+  BOOST_CHECK(logLevel == loggerLogLevel);
 
   std::stringstream stringStream;
   std::string testData;
@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
 
   // check log level
   LogLevel::Type loggerLogLevel = logger->GetLogLevel();
-  BOOST_CHECK_EQUAL(logLevel,  loggerLogLevel);
+  BOOST_CHECK(logLevel == loggerLogLevel);
 
   std::stringstream stringStream;
   std::string testData;
