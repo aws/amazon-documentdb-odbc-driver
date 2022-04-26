@@ -55,6 +55,7 @@ LogStream::~LogStream() {
     logger->WriteMessage(strbuf.str());
   }
 }
+
 std::string Logger::GetDefaultLogPath() {
   std::string defPath;
 #ifdef unix
@@ -76,6 +77,7 @@ std::string Logger::GetDefaultLogPath() {
 
   if (defPath.empty()) {
     // couldn't find home directory, fall back to current working directory
+    std::cout << "warning: couldn't find home directory, the default log path is set as the current working directory" << '\n';
     defPath = ".";
   }
 
