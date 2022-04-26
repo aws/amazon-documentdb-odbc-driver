@@ -18,7 +18,6 @@
 #include "ignite/odbc/log.h"
 
 #include <cstdlib>
-//#include <Windows.h> // -AL- use macros and only include this if it is win32 defined.
 #include "ignite/odbc/config/configuration.h"
 #include "ignite/odbc/log_level.h"
 
@@ -53,20 +52,12 @@ LogStream::~LogStream() {
 }
 
 std::string Logger::CreateFileName() const{
-// get process id
-  std::ostringstream tmpStream;
-  // tmpStream << GetCurrentProcessId();
-  tmpStream << getpid();
-  std::string pid = tmpStream.str();
-
   char tStr[1000];
   time_t curTime = time(nullptr);
   struct tm* locTime = localtime(&curTime);
-  //strftime(tStr, 1000, "_%Y%m%d_%H%M%S", locTime);
-  strftime(tStr, 1000, "_%Y%m%d_", locTime);
+  strftime(tStr, 1000, "%Y%m%d", locTime);
   std::string dateTime(tStr, std::find(tStr, tStr + 1000, '\0'));
-  std::string fileName("docdb_odbc" + dateTime + pid
-                        + ".log");
+  std::string fileName("docdb_odbc_" + dateTime + ".log");
   return fileName;
 }
 
@@ -109,11 +100,9 @@ bool Logger::IsEnabled() const {
 bool Logger::EnableLog() { // stream is nullptr, which makes enable log called. 
   if (!IsEnabled() && logLevel != LogLevel::Type::OFF && !logPath.empty()
       && stream == &fileStream) {
-    std::cout << IsFileStremOpen() << '\n';
     if (logFileName.empty())
         logFileName = CreateFileName();
     fileStream.open(logPath + SLASH + logFileName, std::ios_base::app);
-    std::cout << logFileName << '\n';
   }
   return IsEnabled();
 }
