@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   LOG_DEBUG_MSG(testData);
 
   // Check that log file is working
-  BOOST_CHECK(logger->IsFileStremOpen());
+  BOOST_CHECK(logger->IsFileStreamOpen());
   BOOST_CHECK(logger->IsEnabled());
 
   // this boost check means that testData is not in stringStream
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   LOG_INFO_MSG(testData);
 
   // Check that log file is working
-  BOOST_CHECK(logger->IsFileStremOpen());
+  BOOST_CHECK(logger->IsFileStreamOpen());
   BOOST_CHECK(logger->IsEnabled());
 
   //check that stringStream does not have testData
@@ -219,7 +219,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   LOG_ERROR_MSG(testData);
 
   // Check that log file is working
-  BOOST_CHECK(logger->IsFileStremOpen());
+  BOOST_CHECK(logger->IsFileStreamOpen());
   BOOST_CHECK(logger->IsEnabled());
 
   // check that stringStream does not have testData

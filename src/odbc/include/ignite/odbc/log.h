@@ -222,7 +222,7 @@ class Logger {
    * Checks if file stream is opened.
    * @return True, if file stream is opened.
    */
-  bool IsFileStremOpen() const;
+  bool IsFileStreamOpen() const;
 
   /**
    * Checks if logging is enabled.
@@ -275,7 +275,7 @@ class Logger {
   LogLevel::Type logLevel = LogLevel::Type::OFF;
 
   /** Log file name */
-  std::string logFileName = "";
+  std::string logFileName;
 };
 }  // namespace odbc
 }  // namespace ignite
