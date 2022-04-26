@@ -252,7 +252,8 @@ class Logger {
 
   /**
    * Creates the log file name based on date and time
-   * Log file format: docdb_odbc_YYYYMMDD_HHMMSS.log
+   * Log file format: docdb_odbc_YYYYMMDD_ProcessID.log
+   * // Log file format: docdb_odbc_YYYYMMDD_HHMMSS.log
    */
   std::string CreateFileName() const;
 
