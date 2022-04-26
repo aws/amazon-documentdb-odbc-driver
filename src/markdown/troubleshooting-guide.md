@@ -6,8 +6,8 @@
 
 When troubleshooting, it can be helpful to view the logs so that you might be able 
 to resolve the issue on your own or at least have more context to provide when seeking support. 
-On Windows, the driver's logs will be written to `%USERPROFILE%` or `%HOMEDRIVE%%HOMEPATH%` by default.
-On Mac/Linux/Unix, the default log path is `getpwuid()` or `$HOME`, whichever one is available.
+On Windows, the driver's logs will be written to the user's home directory (`%USERPROFILE%` or `%HOMEDRIVE%%HOMEPATH%`) by default.
+On Mac/Linux/Unix, the default log path is also the user's home directory(`getpwuid()` or `$HOME`), whichever one is available.
 On Windows, you may change the default path in the DSN configuration window.
 In any platform, you may pass your log path / log level in the connection string.
 The log path indicates the path to store the log file. The log file name has `docdb_odbc_YYYYMMDD.log` format, 

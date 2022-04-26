@@ -23,13 +23,19 @@ SSH host credentials
 1. `DOC_DB_USER`=`<ssh_user>`(e.g.:`ec2-user@ec2-instance.us-east-2.compute.amazonaws.com`)
 2. `DOC_DB_PRIV_KEY_FILE`=`<path_to_ssh_host_private_key_file>`(e.g.:`~/.ssh/ssh_host.pem`)
 
-Log configurations
-1. `DOC_DB_LOG_PATH`=`<path_to_log_file>`(e.g.:`"C:\\Users\\BQUser\\Desktop\\DocumentDB ODBC Driver"`)
-The user needs to ensure that the directory mentioned in the log file path does exist, or driver will ignore user's passed value and create the log file in the default log path.
-Do **not** include a slash at the end of the log path.
-The log path indicates the path to store the log file. The log file name has `docdb_odbc_YYYYMMDD.log` format, 
-where `YYYYMMDD` (e.g., 20220225 <= Feb 25th, 2022) is the date at the first log message.
-2. `DOC_DB_LOG_LEVEL`=`<log_level>`. The default is 'error'. (Choose from `debug`, `info`, `error`, `off`)
+[`Optional`] Log configurations
+
+Set these 2 variables only if you would like to set a custom log path or log level for connection tests; it is completely optional.
+1. `DOC_DB_LOG_PATH`=`<path_to_log_file>`(e.g.:`"C:\\Users\\BitQuillUser\\Desktop\\DocumentDB ODBC Driver"`)
+
+   The user needs to ensure that the directory mentioned in the log file path does exist, or driver will ignore user's passed value and create the log file in the default log path. Do **not** include a slash at the end of the log path.
+
+   The log path indicates the path to store the log file. The log file name has `docdb_odbc_YYYYMMDD.log` format, 
+   where `YYYYMMDD` (e.g., 20220225 <= Feb 25th, 2022) is the date at the first log message.
+
+2. `DOC_DB_LOG_LEVEL`=`<log_level>`. The default is `error` level. (Choose from `debug`, `info`, `error`, `off`)
+
+   More details about logging in [`src\markdown\troubleshooting-guide.md`](src/markdown/troubleshooting-guide.md).
 
 #### Running an SSH tunnel for Testing
 By default, remote integration tests are not run. To enable remote integration tests, 
