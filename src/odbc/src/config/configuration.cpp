@@ -357,8 +357,10 @@ const std::string& Configuration::GetLogPath() const {
 }
 
 void Configuration::SetLogPath(const std::string& path) {
-  this->logPath.SetValue(path);
-  Logger::GetLoggerInstance()->SetLogPath(path);
+  if (common::IsValidDirectory(path)) {
+    this->logPath.SetValue(path);
+    Logger::GetLoggerInstance()->SetLogPath(path);
+  }
 }
 
 bool Configuration::IsLogPathSet() const {
