@@ -344,8 +344,10 @@ LogLevel::Type Configuration::GetLogLevel() const {
 }
 
 void Configuration::SetLogLevel(const LogLevel::Type level) {
-  this->logLevel.SetValue(level);
-  Logger::GetLoggerInstance()->SetLogLevel(level);
+  if (level != LogLevel::Type::UNKNOWN) {
+    this->logLevel.SetValue(level);
+    Logger::GetLoggerInstance()->SetLogLevel(level);
+  }
 }
 
 bool Configuration::IsLogLevelSet() const {
