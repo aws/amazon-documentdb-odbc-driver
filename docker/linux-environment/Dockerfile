@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:20.04
 
 #set DEBIAN_FRONTEND=noninteractive to ignore user prompt
 ENV DEBIAN_FRONTEND=noninteractive
