@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   // Write to stream.
   LOG_DEBUG_MSG_TO_STREAM(testData, &stringStream);
 
-  // Chekc that logger is still enabled after writing to stream
+  // Check that logger is still enabled after writing to stream
   BOOST_CHECK(logger->IsEnabled());
 
   // Check that log stream is working
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   // Write to stream.
   LOG_INFO_MSG_TO_STREAM(testData, &stringStream);
 
-  // Chekc that logger is still enabled after writing to stream
+  // Check that logger is still enabled after writing to stream
   BOOST_CHECK(logger->IsEnabled());
 
   // Check that log stream is working
@@ -249,7 +249,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   // Write to stream.
   LOG_ERROR_MSG_TO_STREAM(testData, &stringStream);
 
-  // Chekc that logger is still enabled after writing to stream
+  // Check that logger is still enabled after writing to stream
   BOOST_CHECK(logger->IsEnabled());
 
   // Check that log stream is working
