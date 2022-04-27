@@ -55,8 +55,8 @@ const std::string testSshHost = "testsshhost.com";
 const std::string testSshPrivateKeyFile = "/path/to/keyfile";
 const std::string testSshPrivateKeyPassphrase = "testPassphrase";
 const bool testSshStrictHostKeyCheckingFlag = false;
-const std::string testLogPath = ".";
-const LogLevel::Type testLogLevel = LogLevel::Type::INFO_LEVEL;
+const std::string testLogPath = Logger::GetLoggerInstance()->GetLogPath();
+const LogLevel::Type testLogLevel = Logger::GetLoggerInstance()->GetLogLevel();
 const std::string testSshKnownHostsFile = "/path/to/knownhostsfile";
 const ScanMethod::Type testScanMethod = ScanMethod::Type::ID_FORWARD;
 const int32_t testScanLimit = 3000;
@@ -290,6 +290,10 @@ void CheckConnectionConfig(const Configuration& cfg) {
 }
 
 void CheckDsnConfig(const Configuration& cfg) {
+  // since setting logger path/level will change the logger settings,
+  // we will not change the logger path/level in configuration_test,
+  // which means it is possible for the logger path/level to be equivalent to 
+  // the default values. Therefore, there will be no boost check for logger path/level.
   BOOST_CHECK_EQUAL(cfg.GetDriver(), testDriverName);
   BOOST_CHECK_EQUAL(cfg.GetDsn(), testDsn);
   BOOST_CHECK_EQUAL(cfg.GetDatabase(), Configuration::DefaultValue::database);
@@ -360,18 +364,12 @@ BOOST_AUTO_TEST_CASE(CheckTestValuesNotEqualDefault) {
                  Configuration::DefaultValue::sshStrictHostKeyChecking);
   BOOST_CHECK_NE(testSshKnownHostsFile,
                  Configuration::DefaultValue::sshKnownHostsFile);
-  if (Configuration::DefaultValue::logPath == testLogPath)
-    std::cout << "ODBC Driver's default path happens to be test log path. It "
-                 "is expected for the boost check of testLogPath to fail."
-              << '\n';
-  BOOST_CHECK_NE(testLogPath, Configuration::DefaultValue::logPath);
   BOOST_CHECK_NE(testScanLimit, Configuration::DefaultValue::scanLimit);
   BOOST_CHECK_NE(testSchemaName, Configuration::DefaultValue::schemaName);
   BOOST_CHECK_NE(testRefreshSchemaFlag,
                  Configuration::DefaultValue::refreshSchema);
   BOOST_CHECK_NE(testDefaultFetchSize,
                  Configuration::DefaultValue::defaultFetchSize);
-  BOOST_CHECK(testLogLevel != Configuration::DefaultValue::logLevel);
   BOOST_CHECK(testReadPreference
               != Configuration::DefaultValue::readPreference);
   BOOST_CHECK(testScanMethod != Configuration::DefaultValue::scanMethod);
