@@ -56,21 +56,7 @@ jobs:
       with:
         name: cppcheck-results
         path: cppcheck-results.log
-    
-    - name: generate-compile-commands-file
-      run: |
-        cmake "${{github.workspace}}/src" -DCMAKE_EXPORT_COMPILE_COMMANDS=on -DCMAKE_BUILD_TYPE="Debug" -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_CORE="OFF" -DWITH_ODBC="ON"
-    
-    - name: clang-tidy-check
-      uses: ZedThree/clang-tidy-review@v0.8.3
-      id: review
-      #with:         
-      # CMake command to run in order to generate compile_commands.json
-      #  cmake_command: cmake "./src" -DCMAKE_EXPORT_COMPILE_COMMANDS=on -DCMAKE_BUILD_TYPE="Debug" -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_CORE="OFF" -DWITH_ODBC="ON"
-      # If there are any comments, fail the check
-    - if: steps.review.outputs.total_comments > 0
-      run: exit 1
-  
+
     - name: Extract key-pair into file
       run: |
         mkdir ~/certs
@@ -82,6 +68,20 @@ jobs:
       run: |
         sudo apt update
         sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib linux-headers-$(uname -r) build-essential valgrind libboost-all-dev libbson-dev libsasl2-dev lcov
+
+    - name: generate-compile-commands-file
+      run: |
+        cmake "${{github.workspace}}/src" -DCMAKE_EXPORT_COMPILE_COMMANDS=on -DCMAKE_BUILD_TYPE="Debug" -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_CORE="OFF" -DWITH_ODBC="ON"
+ 
+    - name: clang-tidy-check
+      uses: ZedThree/clang-tidy-review@v0.8.3
+      id: review
+      #with:         
+      # CMake command to run in order to generate compile_commands.json
+      #  cmake_command: cmake "./src" -DCMAKE_EXPORT_COMPILE_COMMANDS=on -DCMAKE_BUILD_TYPE="Debug" -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_CORE="OFF" -DWITH_ODBC="ON"
+      # If there are any comments, fail the check
+    - if: steps.review.outputs.total_comments > 0
+      run: exit 1
 
     - name: Cache DocumentDB JDBC JAR
       id: cache-documentdb-jdbc-jar
