@@ -38,7 +38,7 @@ namespace app {
  * Conversion result
  */
 struct ConversionResult {
-  enum Type {
+  enum class Type {
     /** Conversion successful. No data lost. */
     AI_SUCCESS,
 

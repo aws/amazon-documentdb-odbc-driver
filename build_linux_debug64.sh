@@ -2,6 +2,9 @@ BUILD_DIR=cmake-build64
 BUILD_TYPE=Debug
 PROJECT_DIR=$(pwd)
 DRIVER_BIN_DIR="$PROJECT_DIR/build/odbc/bin"
+DRIVER_LOG_DIR="$PROJECT_DIR/build/odbc/logs"
+
+mkdir $DRIVER_LOG_DIR
 
 mkdir cmake-build64
 cd cmake-build64

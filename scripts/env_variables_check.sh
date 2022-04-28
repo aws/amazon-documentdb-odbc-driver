@@ -48,7 +48,7 @@ else
   echo $ODBC_LIB_PATH
 fi
 
-if [[ "${CHECK}" == 0]]; then
+if [[ "${CHECK}" -eq "0" ]]; then
   echo "Missing envrionment variables, please set them accordingly."
 else
   echo "Environment variables are all set"

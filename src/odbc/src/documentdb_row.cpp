@@ -47,10 +47,10 @@ void DocumentDbRow::Update(bsoncxx::document::view const& document) {
 app::ConversionResult::Type DocumentDbRow::ReadColumnToBuffer(
     uint32_t columnIdx, app::ApplicationDataBuffer& dataBuf) {
   if (columnIdx > GetSize() || columnIdx < 1)
-    return app::ConversionResult::AI_FAILURE;
+    return app::ConversionResult::Type::AI_FAILURE;
 
   if (!EnsureColumnDiscovered(columnIdx))
-    return app::ConversionResult::AI_FAILURE;
+    return app::ConversionResult::Type::AI_FAILURE;
 
   DocumentDbColumn const& column = GetColumn(columnIdx);
 

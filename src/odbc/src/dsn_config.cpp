@@ -227,6 +227,21 @@ void ReadDsnConfiguration(const char* dsn, Configuration& config,
   if (sshKnownHostsFile.IsSet() && !config.IsSshKnownHostsFileSet())
     config.SetSshKnownHostsFile(sshKnownHostsFile.GetValue());
 
+  SettableValue< std::string > logLevel =
+      ReadDsnString(dsn, ConnectionStringParser::Key::logLevel);
+
+  if (logLevel.IsSet() && !config.IsLogLevelSet()) {
+    LogLevel::Type level =
+        LogLevel::FromString(logLevel.GetValue(), LogLevel::Type::ERROR_LEVEL);
+    config.SetLogLevel(level);
+  }
+
+  SettableValue< std::string > logPath =
+      ReadDsnString(dsn, ConnectionStringParser::Key::logPath);
+
+  if (logPath.IsSet() && !config.IsLogPathSet())
+    config.SetLogPath(logPath.GetValue());
+
   SettableValue< std::string > scanMethod =
       ReadDsnString(dsn, ConnectionStringParser::Key::scanMethod);
 
