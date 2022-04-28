@@ -15,6 +15,7 @@
 *.ipch
 *.cache
 *.log
+*.xml
 bin32/*
 bin64/*
 lib32/*

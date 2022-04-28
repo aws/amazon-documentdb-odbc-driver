@@ -36,6 +36,7 @@ class DsnConfigurationWindow : public CustomWindow {
     enum Type {
       CONNECTION_SETTINGS_GROUP_BOX = 100,
       SSH_SETTINGS_GROUP_BOX,
+      LOG_SETTINGS_GROUP_BOX,
       TLS_SETTINGS_GROUP_BOX,
       SCHEMA_SETTINGS_GROUP_BOX,
       ADDITIONAL_SETTINGS_GROUP_BOX,
@@ -53,6 +54,10 @@ class DsnConfigurationWindow : public CustomWindow {
       SSH_STRICT_HOST_KEY_CHECKING_CHECK_BOX,
       SSH_KNOWN_HOSTS_FILE_EDIT,
       SSH_KNOWN_HOSTS_FILE_LABEL,
+      LOG_LEVEL_LABEL,
+      LOG_LEVEL_COMBO_BOX,
+      LOG_PATH_LABEL,
+      LOG_PATH_EDIT,
       APP_NAME_EDIT,
       APP_NAME_LABEL,
       LOGIN_TIMEOUT_SEC_EDIT,
@@ -164,6 +169,14 @@ class DsnConfigurationWindow : public CustomWindow {
   void RetrieveSshParameters(config::Configuration& cfg) const;
 
   /**
+   * Retrieves current values from the log configuration UI group and
+   * stores them to the specified configuration.
+   *
+   * @param cfg Configuration.
+   */
+  void RetrieveLogParameters(config::Configuration& cfg) const;
+
+  /**
    * Retrieves current values from the TLS/SSL UI group and
    * stores them to the specified configuration.
    *
@@ -208,6 +221,16 @@ class DsnConfigurationWindow : public CustomWindow {
   int CreateSshSettingsGroup(int posX, int posY, int sizeX);
 
   /**
+   * Create logging configuration settings group box.
+   *
+   * @param posX X position.
+   * @param posY Y position.
+   * @param sizeX Width.
+   * @return Size by Y.
+   */
+  int CreateLogSettingsGroup(int posX, int posY, int sizeX);
+
+  /**
    * Create TLS/SSL settings group box.
    *
    * @param posX X position.
@@ -248,6 +271,9 @@ class DsnConfigurationWindow : public CustomWindow {
 
   /** SSH settings group box. */
   std::unique_ptr< Window > sshSettingsGroupBox;
+
+  /** Log settings group box. */
+  std::unique_ptr< Window > logSettingsGroupBox;
 
   /** TLS settings group box. */
   std::unique_ptr< Window > tlsSettingsGroupBox;
@@ -320,6 +346,18 @@ class DsnConfigurationWindow : public CustomWindow {
 
   /** SSH know host file label. */
   std::unique_ptr< Window > sshKnownHostsFileLabel;
+
+  /** Log Level ComboBox **/
+  std::unique_ptr< Window > logLevelComboBox;
+
+  /** Log Level label. */
+  std::unique_ptr< Window > logLevelLabel;
+
+  /** Log Path edit. */
+  std::unique_ptr< Window > logPathEdit;
+
+  /** Log Path label. */
+  std::unique_ptr< Window > logPathLabel;
 
   /** Application name edit. */
   std::unique_ptr< Window > appNameEdit;

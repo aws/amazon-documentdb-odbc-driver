@@ -5,10 +5,12 @@ on:
 
 env:
   CI_OUTPUT_PATH: "ci-output"
-  ODBC_LIB_PATH: "./build/odbc/lib"
-  ODBC_BIN_PATH: "./build/odbc/bin"
-  ODBC_BUILD_PATH: "./build/odbc/build"
-  DOCUMENTDB_HOME: "./build/odbc/bin"
+  ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"
+  ODBC_BIN_PATH: "${{github.workspace}}/build/odbc/bin"
+  ODBC_BUILD_PATH: "${{github.workspace}}/build/odbc/build"
+  DOCUMENTDB_HOME: "${{github.workspace}}/build/odbc/bin"
+  DOC_DB_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
+  DOC_DB_LOG_LEVEL: "debug"
 
 jobs:
   build-mac:
@@ -78,9 +80,10 @@ jobs:
       run: |
         chmod +x ./src/odbc-test/scripts/import_test_data.sh
         ./src/odbc-test/scripts/import_test_data.sh
-    # - name: run-tests
-    #   run: |
-    #     ./build/odbc/bin/tests --gtest_output="xml:report.xml"
+    - name: run-tests
+      run: |
+        mkdir -p "${{env.DOC_DB_LOG_PATH}}"
+        ./build/odbc/bin/tests
     - name: upload-test-report
       if: always()
       uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
