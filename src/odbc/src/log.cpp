@@ -34,7 +34,7 @@ using ignite::odbc::Logger;
 using ignite::odbc::common::concurrent::CsLockGuard;
 using ignite::odbc::config::Configuration;
 
-// logger_ pointer will  initialized in first call to GetLoggerInstance
+// logger_ pointer will be initialized in first call to GetLoggerInstance
 std::shared_ptr< Logger > Logger::logger_;
 
 namespace ignite {
