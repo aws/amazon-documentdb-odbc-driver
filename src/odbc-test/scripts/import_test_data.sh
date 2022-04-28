@@ -20,7 +20,7 @@ mongosh --quiet -u="${DOC_DB_USER_NAME}" -p="${DOC_DB_PASSWORD}" --authenticatio
     --eval "db.dropDatabase()" "${DATABASE_NAME}"
 
 # Load each test input file
-for FILENAME in ${TEST_INPUT_FOLDER}/*.json
+for FILENAME in "${TEST_INPUT_FOLDER}"/*.json
 do
     # Collection will be named the same as the input file base name
     COLLECTION_NAME="$(basename -- ${FILENAME%.json})"

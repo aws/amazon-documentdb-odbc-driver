@@ -43,10 +43,10 @@ int64_t ToValidLong(int64_t value, ConversionResult::Type& convRes, int64_t max,
   int64_t intValue = value;
   if (intValue > max) {
     intValue = max;
-    convRes = ConversionResult::AI_FAILURE;
+    convRes = ConversionResult::Type::AI_FAILURE;
   } else if (intValue < min) {
     intValue = min;
-    convRes = ConversionResult::AI_FAILURE;
+    convRes = ConversionResult::Type::AI_FAILURE;
   }
   return intValue;
 }
@@ -58,9 +58,9 @@ int64_t ToValidLong(std::string const& value, ConversionResult::Type& convRes,
     intValue =
         ToValidLong(std::stoll(value.c_str(), nullptr, 0), convRes, max, min);
   } catch (std::invalid_argument const&) {
-    convRes = ConversionResult::AI_FAILURE;
+    convRes = ConversionResult::Type::AI_FAILURE;
   } catch (std::out_of_range const&) {
-    convRes = ConversionResult::AI_FAILURE;
+    convRes = ConversionResult::Type::AI_FAILURE;
   }
   return intValue;
 }
@@ -83,7 +83,7 @@ ConversionResult::Type DocumentDbColumn::PutInt8(
     case bsoncxx::type::k_double:
       if (element.get_double().value > INT8_MAX
           || element.get_double().value < INT8_MIN) {
-        convRes = ConversionResult::AI_FAILURE;
+        convRes = ConversionResult::Type::AI_FAILURE;
       } else {
         value = element.get_double().value != 0 ? 1 : 0;
       }
@@ -102,7 +102,7 @@ ConversionResult::Type DocumentDbColumn::PutInt8(
     case bsoncxx::type::k_null:
       break;
     default:
-      convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
+      convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
   }
   if (convRes == ConversionResult::Type::AI_SUCCESS) {
@@ -129,7 +129,7 @@ ConversionResult::Type DocumentDbColumn::PutInt16(
     case bsoncxx::type::k_double:
       if (element.get_double().value > INT16_MAX
           || element.get_double().value < INT16_MIN) {
-        convRes = ConversionResult::AI_FAILURE;
+        convRes = ConversionResult::Type::AI_FAILURE;
       } else {
         value = element.get_double().value;
       }
@@ -154,7 +154,7 @@ ConversionResult::Type DocumentDbColumn::PutInt16(
     case bsoncxx::type::k_null:
       break;
     default:
-      convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
+      convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
   }
   if (convRes == ConversionResult::Type::AI_SUCCESS) {
@@ -180,7 +180,7 @@ ConversionResult::Type DocumentDbColumn::PutInt32(
     case bsoncxx::type::k_double:
       if (element.get_double().value > INT32_MAX
           || element.get_double().value < INT32_MIN) {
-        convRes = ConversionResult::AI_FAILURE;
+        convRes = ConversionResult::Type::AI_FAILURE;
       } else {
         value = element.get_double().value;
       }
@@ -205,7 +205,7 @@ ConversionResult::Type DocumentDbColumn::PutInt32(
     case bsoncxx::type::k_null:
       break;
     default:
-      convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
+      convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
   }
   if (convRes == ConversionResult::Type::AI_SUCCESS) {
@@ -230,7 +230,7 @@ ConversionResult::Type DocumentDbColumn::PutInt64(
     case bsoncxx::type::k_double:
       if (element.get_double().value > INT64_MAX
           || element.get_double().value < INT64_MIN) {
-        convRes = ConversionResult::AI_FAILURE;
+        convRes = ConversionResult::Type::AI_FAILURE;
       } else {
         value = element.get_double().value;
       }
@@ -255,7 +255,7 @@ ConversionResult::Type DocumentDbColumn::PutInt64(
     case bsoncxx::type::k_null:
       break;
     default:
-      convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
+      convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
   }
   if (convRes == ConversionResult::Type::AI_SUCCESS) {
@@ -298,7 +298,7 @@ ConversionResult::Type DocumentDbColumn::PutFloat(
     case bsoncxx::type::k_null:
       break;
     default:
-      convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
+      convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
   }
   if (convRes == ConversionResult::Type::AI_SUCCESS) {
@@ -341,7 +341,7 @@ ConversionResult::Type DocumentDbColumn::PutDouble(
     case bsoncxx::type::k_null:
       break;
     default:
-      convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
+      convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
   }
   if (convRes == ConversionResult::Type::AI_SUCCESS) {
@@ -354,7 +354,7 @@ ConversionResult::Type
     DocumentDbColumn::PutString(
     ApplicationDataBuffer& dataBuf,
     bsoncxx::document::element const& element) const {
-  ConversionResult::Type convRes = ConversionResult::AI_SUCCESS;  
+  ConversionResult::Type convRes = ConversionResult::Type::AI_SUCCESS;  
   bsoncxx::type docType = element.type();
   boost::optional< std::string > value{};
   switch (docType) {
@@ -414,7 +414,7 @@ ConversionResult::Type
       value = bsoncxx::to_json(element.get_array().value);
       break;
     default:
-      convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
+      convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
   }
   if (convRes == ConversionResult::Type::AI_SUCCESS) {
@@ -449,10 +449,10 @@ ConversionResult::Type DocumentDbColumn::PutDecimal(
       value = common::Decimal(element.get_bool().value ? 1 : 0);
       break;
     default:
-      convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
+      convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
   }
-  if (convRes == ConversionResult::AI_SUCCESS) {
+  if (convRes == ConversionResult::Type::AI_SUCCESS) {
     dataBuf.PutDecimal(value);
   }
   return convRes;
@@ -479,13 +479,13 @@ ConversionResult::Type DocumentDbColumn::PutTime(
     case bsoncxx::type::k_utf8:
       // TODO: Determine if we could support reading data as string
       // https://bitquill.atlassian.net/browse/AD-680
-      convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
+      convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
     default:
-      convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
+      convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
   }
-  if (convRes == ConversionResult::AI_SUCCESS) {
+  if (convRes == ConversionResult::Type::AI_SUCCESS) {
     dataBuf.PutTime(value);
   }
   return convRes;
@@ -512,13 +512,13 @@ ConversionResult::Type DocumentDbColumn::PutDate(
     case bsoncxx::type::k_utf8:
       // TODO: Determine if we could support reading data as string
       // https://bitquill.atlassian.net/browse/AD-680
-      convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
+      convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
     default:
-      convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
+      convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
   }
-  if (convRes == ConversionResult::AI_SUCCESS) {
+  if (convRes == ConversionResult::Type::AI_SUCCESS) {
     dataBuf.PutDate(value);
 
   }
@@ -546,13 +546,13 @@ ConversionResult::Type DocumentDbColumn::PutTimestamp(
     case bsoncxx::type::k_utf8:
       // TODO: Determine if we could support reading data as string
       // https://bitquill.atlassian.net/browse/AD-680
-      convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
+      convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
     default:
-      convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
+      convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
   }
-  if (convRes == ConversionResult::AI_SUCCESS) {
+  if (convRes == ConversionResult::Type::AI_SUCCESS) {
     dataBuf.PutTimestamp(value);
   }
   return convRes;
@@ -561,7 +561,7 @@ ConversionResult::Type DocumentDbColumn::PutTimestamp(
 ConversionResult::Type DocumentDbColumn::PutBinaryData(
     ApplicationDataBuffer& dataBuf,
     bsoncxx::document::element const& element) const {
-  ConversionResult::Type convRes = ConversionResult::AI_SUCCESS;
+  ConversionResult::Type convRes = ConversionResult::Type::AI_SUCCESS;
   bsoncxx::type docType = element.type();
   const void* value = nullptr;
   size_t length = 0;
@@ -581,7 +581,7 @@ ConversionResult::Type DocumentDbColumn::PutBinaryData(
     case bsoncxx::type::k_null:
       break;
     default:
-      convRes = ConversionResult::AI_UNSUPPORTED_CONVERSION;
+      convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
   }
   if (convRes == ConversionResult::Type::AI_SUCCESS) {
@@ -602,10 +602,10 @@ ConversionResult::Type DocumentDbColumn::ReadToBuffer(
   // Invalid (or missing) element is null
   if (!element) {
     dataBuf.PutNull();
-    return ConversionResult::AI_SUCCESS;
+    return ConversionResult::Type::AI_SUCCESS;
   }
   
-  ConversionResult::Type convRes = ConversionResult::AI_SUCCESS;
+  ConversionResult::Type convRes = ConversionResult::Type::AI_SUCCESS;
 
   switch (type_) {
 
@@ -669,7 +669,7 @@ ConversionResult::Type DocumentDbColumn::ReadToBuffer(
       break;
     
     default:
-      return ConversionResult::AI_UNSUPPORTED_CONVERSION;
+      return ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
   }
 
   return convRes;

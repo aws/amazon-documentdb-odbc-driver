@@ -23,6 +23,7 @@
 #include "ignite/common/utils.h"
 #include "ignite/odbc/config/config_tools.h"
 #include "ignite/odbc/config/connection_string_parser.h"
+#include "ignite/odbc/log.h"
 #include "ignite/odbc/utility.h"
 
 using ignite::common::EncodeURIComponent;
@@ -59,6 +60,11 @@ const std::string Configuration::DefaultValue::sshPrivateKeyFile = "";
 const std::string Configuration::DefaultValue::sshPrivateKeyPassphrase = "";
 const bool Configuration::DefaultValue::sshStrictHostKeyChecking = true;
 const std::string Configuration::DefaultValue::sshKnownHostsFile = "";
+
+// Logging Configuration options
+const LogLevel::Type Configuration::DefaultValue::logLevel =
+    LogLevel::Type::ERROR_LEVEL;
+const std::string Configuration::DefaultValue::logPath = DEFAULT_LOG_PATH;
 
 // Additional options
 const std::string Configuration::DefaultValue::appName =
@@ -333,6 +339,36 @@ bool Configuration::IsSshKnownHostsFileSet() const {
   return sshKnownHostsFile.IsSet();
 }
 
+LogLevel::Type Configuration::GetLogLevel() const {
+  return logLevel.GetValue();
+}
+
+void Configuration::SetLogLevel(const LogLevel::Type level) {
+  if (level != LogLevel::Type::UNKNOWN) {
+    this->logLevel.SetValue(level);
+    Logger::GetLoggerInstance()->SetLogLevel(level);
+  }
+}
+
+bool Configuration::IsLogLevelSet() const {
+  return logLevel.IsSet();
+}
+
+const std::string& Configuration::GetLogPath() const {
+  return logPath.GetValue();
+}
+
+void Configuration::SetLogPath(const std::string& path) {
+  if (common::IsValidDirectory(path)) {
+    this->logPath.SetValue(path);
+    Logger::GetLoggerInstance()->SetLogPath(path);
+  }
+}
+
+bool Configuration::IsLogPathSet() const {
+  return logPath.IsSet();
+}
+
 ScanMethod::Type Configuration::GetScanMethod() const {
   return scanMethod.GetValue();
 }
@@ -446,6 +482,8 @@ void Configuration::ToMap(ArgumentMap& res) const {
            sshStrictHostKeyChecking);
   AddToMap(res, ConnectionStringParser::Key::sshKnownHostsFile,
            sshKnownHostsFile);
+  AddToMap(res, ConnectionStringParser::Key::logLevel, logLevel);
+  AddToMap(res, ConnectionStringParser::Key::logPath, logPath);
   AddToMap(res, ConnectionStringParser::Key::scanMethod, scanMethod, false);
   AddToMap(res, ConnectionStringParser::Key::scanLimit, scanLimit);
   AddToMap(res, ConnectionStringParser::Key::schemaName, schemaName);
@@ -496,7 +534,7 @@ std::string Configuration::ToJdbcConnectionString() const {
        it != arguments.end(); ++it) {
     const std::string& key = it->first;
     const std::string& value = it->second;
-    if (!value.empty())
+    if (key != "logLevel" && key != "logPath" && !value.empty())
       options << '&' << key << '=' << EncodeURIComponent(value);
   }
   jdbcConnectionString.append(options.str());
@@ -518,6 +556,8 @@ void Configuration::ToJdbcOptionsMap(ArgumentMap& res) const {
   AddToMap(res, "sshPrivateKeyPassphrase", sshPrivateKeyPassphrase);
   AddToMap(res, "sshStrictHostKeyChecking", sshStrictHostKeyChecking);
   AddToMap(res, "sshKnownHostsFile", sshKnownHostsFile);
+  AddToMap(res, "logLevel", logLevel);
+  AddToMap(res, "logPath", logPath);
   AddToMap(res, "scanMethod", scanMethod, true);
   AddToMap(res, "scanLimit", scanLimit);
   AddToMap(res, "schemaName", schemaName);
@@ -560,6 +600,13 @@ void Configuration::AddToMap(ArgumentMap& map, const std::string& key,
   if (value.IsSet())
     map[key] = isJdbcFormat ? ReadPreference::ToJdbcString(value.GetValue())
                             : ReadPreference::ToString(value.GetValue());
+}
+
+template <>
+void Configuration::AddToMap(ArgumentMap& map, const std::string& key,
+                             const SettableValue< LogLevel::Type >& value) {
+  if (value.IsSet())
+    map[key] = LogLevel::ToString(value.GetValue());
 }
 
 template <>

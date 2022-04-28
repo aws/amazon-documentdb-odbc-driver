@@ -26,6 +26,7 @@
 #include "ignite/odbc/config/settable_value.h"
 #include "ignite/odbc/diagnostic/diagnosable.h"
 #include "ignite/odbc/odbc_error.h"
+#include "ignite/odbc/log_level.h"
 #include "ignite/odbc/read_preference.h"
 #include "ignite/odbc/scan_method.h"
 
@@ -108,6 +109,12 @@ class Configuration {
     /** Default value for sshKnownHostsFile attribute. */
     static const std::string sshKnownHostsFile;
 
+    /** Default value for logLevel attribute. */
+    static const LogLevel::Type logLevel;
+
+    /** Default value for logPath attribute. */
+    static const std::string logPath;
+    
     /** Default value for scanMethod attribute. */
     static const ScanMethod::Type scanMethod;
 
@@ -598,6 +605,48 @@ class Configuration {
   bool IsSshKnownHostsFileSet() const;
 
   /**
+   * Get log level.
+   *
+   * @return Log level.
+   */
+  LogLevel::Type GetLogLevel() const;
+
+  /**
+   * Set log level.
+   *
+   * @param level Log level.
+   */
+  void SetLogLevel(const LogLevel::Type level);
+
+  /**
+   * Check if log level set.
+   *
+   * @return @true if Log level set.
+   */
+  bool IsLogLevelSet() const;
+
+  /**
+   * Get log path to save.
+   *
+   * @return Log path.
+   */
+  const std::string& GetLogPath() const;
+
+  /**
+   * Set log path to save.
+   *
+   * @param path Log path.
+   */
+  void SetLogPath(const std::string& path);
+
+  /**
+   * Check if log path set.
+   *
+   * @return @true if Log path set.
+   */
+  bool IsLogPathSet() const;
+
+  /**
    * Get scan method.
    *
    * @return Scan method.
@@ -654,9 +703,9 @@ class Configuration {
   void SetSchemaName(const std::string& name);
 
   /**
-   * Check if the value set.
+   * Check if schema name set.
    *
-   * @return @true if the value set.
+   * @return @true if schema name set.
    */
   bool IsSchemaNameSet() const;
 
@@ -825,6 +874,13 @@ class Configuration {
   SettableValue< std::string > sshKnownHostsFile =
       DefaultValue::sshKnownHostsFile;
 
+  /** The log level for the log file. */
+  SettableValue< LogLevel::Type > logLevel = DefaultValue::logLevel;
+
+  /** The logging file path. */
+  SettableValue< std::string > logPath =
+      DefaultValue::logPath;
+
   /** Scan method. */
   SettableValue< ScanMethod::Type > scanMethod = DefaultValue::scanMethod;
 
@@ -864,6 +920,11 @@ template <>
 void Configuration::AddToMap< ReadPreference::Type >(
     ArgumentMap& map, const std::string& key,
     const SettableValue< ReadPreference::Type >& value, bool isJdbcFormat);
+
+template <>
+void Configuration::AddToMap< LogLevel::Type >(
+    ArgumentMap& map, const std::string& key,
+    const SettableValue< LogLevel::Type >& value);
 
 template <>
 void Configuration::AddToMap< ScanMethod::Type >(

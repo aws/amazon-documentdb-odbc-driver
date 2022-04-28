@@ -21,6 +21,7 @@
 #include <ignite/odbc/ignite_error.h>
 #include <ignite/odbc/jni/java.h>
 #include <ignite/odbc/jni/utils.h>
+#include <ignite/odbc/log.h>
 
 #include <algorithm>
 #include <cstring>  // needed only on linux
@@ -93,17 +94,23 @@ namespace java {
 namespace iocc = ignite::odbc::common::concurrent;
 
 bool IGNITE_IMPORT_EXPORT IsJava9OrLater() {
+  LOG_DEBUG_MSG("IsJava9OrLater called");
+
   JavaVMInitArgs args;
 
   memset(&args, 0, sizeof(args));
 
   args.version = JNI_VERSION_9;
 
+  LOG_DEBUG_MSG("IsJava9OrLater exiting");
+
   return JNI_GetDefaultJavaVMInitArgs(&args) == JNI_OK;
 }
 
 void BuildJvmOptions(const std::string& cp, std::vector< char* >& opts, int xms,
                      int xmx) {
+  LOG_DEBUG_MSG("BuildJvmOptions is called");
+
   using namespace common;
 
   const size_t REQ_OPTS_CNT = 4;
@@ -153,6 +160,7 @@ void BuildJvmOptions(const std::string& cp, std::vector< char* >& opts, int xms,
         CopyChars("--add-opens=jdk.management/"
                   "com.sun.management.internal=ALL-UNNAMED"));
   }
+  LOG_DEBUG_MSG("BuildJvmOptions exiting");
 }
 
 /* --- Startup exception. --- */
@@ -185,6 +193,8 @@ JniErrorInfo::JniErrorInfo(JniErrorCode code, const char* errCls,
 JniErrorInfo::JniErrorInfo(const JniErrorInfo& other) = default;
 
 JniErrorInfo& JniErrorInfo::operator=(const JniErrorInfo& other) {
+  LOG_DEBUG_MSG("JniErrorInfo constructor is called");
+
   if (this != &other) {
     // 1. Create new instance, exception could occur at this point.
     JniErrorInfo tmp(other);
@@ -194,6 +204,8 @@ JniErrorInfo& JniErrorInfo::operator=(const JniErrorInfo& other) {
     std::swap(errCls, tmp.errCls);
     std::swap(errMsg, tmp.errMsg);
   }
+
+  LOG_DEBUG_MSG("JniErrorInfo constructor exiting");
 
   return *this;
 }
@@ -352,7 +364,8 @@ JniMethod const M_DOCUMENTDB_QUERY_MAPPING_SERVICE_INIT =
     JniMethod("<init>",
               "("
               "Lsoftware/amazon/documentdb/jdbc/DocumentDbConnectionProperties;"
-              "Lsoftware/amazon/documentdb/jdbc/metadata/DocumentDbDatabaseSchemaMetadata;"
+              "Lsoftware/amazon/documentdb/jdbc/metadata/"
+              "DocumentDbDatabaseSchemaMetadata;"
               ")V",
               false);
 JniMethod const M_DOCUMENTDB_QUERY_MAPPING_SERVICE_GET = JniMethod(
@@ -389,6 +402,7 @@ int ThrowOnMissingHandler(JNIEnv* env) {
   // jclass cls = env->FindClass(C_PLATFORM_NO_CALLBACK_EXCEPTION);
 
   // env->ThrowNew(cls, "Callback handler is not set in native platform.");
+  LOG_DEBUG_MSG("ThrowOnMissingHandler is called, and exiting");
 
   return 0;
 }
@@ -409,10 +423,14 @@ void ThrowToJava(JNIEnv* env, const char* msg) {
 }
 
 char* StringToChars(JNIEnv* env, jstring str, int* len) {
+  LOG_DEBUG_MSG("StringToChars is called");
+
   if (!str) {
     if (len) {
       *len = 0;
     }
+    LOG_DEBUG_MSG("StringToChars exiting with nullptr");
+
     return nullptr;
   }
 
@@ -427,11 +445,14 @@ char* StringToChars(JNIEnv* env, jstring str, int* len) {
   if (len) {
     *len = strCharsLen;
   }
+  LOG_DEBUG_MSG("StringToChars exiting");
 
   return strChars0;
 }
 
 std::string JavaStringToCString(JNIEnv* env, jstring str, int& len) {
+  LOG_DEBUG_MSG("JavaStringToCString is called");
+
   char* resChars = StringToChars(env, str, &len);
 
   if (resChars) {
@@ -439,12 +460,19 @@ std::string JavaStringToCString(JNIEnv* env, jstring str, int& len) {
 
     delete[] resChars;
 
+    LOG_DEBUG_MSG("JavaStringToCString exiting");
+
     return res;
-  } else
+  } else {
+    LOG_DEBUG_MSG("JavaStringToCString exiting with empty string");
+
     return std::string();
+  }
 }
 
 jclass FindClass(JNIEnv* env, const char* name) {
+  LOG_DEBUG_MSG("FindClass is called");
+
   jclass res = env->FindClass(name);
 
   if (!res)
@@ -454,22 +482,34 @@ jclass FindClass(JNIEnv* env, const char* name) {
 
   env->DeleteLocalRef(res);
 
+  LOG_DEBUG_MSG("FindClass exiting");
+
   return res0;
 }
 
 void DeleteClass(JNIEnv* env, jclass cls) {
+  LOG_DEBUG_MSG("DeleteClass is called");
+
   if (cls)
     env->DeleteGlobalRef(cls);
+
+  LOG_DEBUG_MSG("DeleteClass exiting");
 }
 
 void CheckClass(JNIEnv* env, const char* name) {
+  LOG_DEBUG_MSG("CheckClass is called");
+
   jclass res = env->FindClass(name);
 
   if (!res)
     throw JvmException();
+
+  LOG_DEBUG_MSG("CheckClass exiting");
 }
 
 jmethodID FindMethod(JNIEnv* env, jclass cls, JniMethod mthd) {
+  LOG_DEBUG_MSG("FindMethod is called");
+
   jmethodID mthd0 = mthd.isStatic
                         ? env->GetStaticMethodID(cls, mthd.name, mthd.sign)
                         : env->GetMethodID(cls, mthd.name, mthd.sign);
@@ -477,10 +517,14 @@ jmethodID FindMethod(JNIEnv* env, jclass cls, JniMethod mthd) {
   if (!mthd0)
     throw JvmException();
 
+  LOG_DEBUG_MSG("FindMethod exiting");
+
   return mthd0;
 }
 
 void JniJavaMembers::Initialize(JNIEnv* env) {
+  LOG_DEBUG_MSG("Initialize is called");
+
   c_Class = FindClass(env, C_CLASS);
   m_Class_getName = FindMethod(env, c_Class, M_CLASS_GET_NAME);
 
@@ -495,18 +539,26 @@ void JniJavaMembers::Initialize(JNIEnv* env) {
   // TODO: Provide "getFullStackTrace" in DocumentDB
   // m_PlatformUtils_getFullStackTrace = FindMethod(env, c_PlatformUtils,
   // M_PLATFORM_UTILS_GET_FULL_STACK_TRACE);
+
+  LOG_DEBUG_MSG("Initialize exiting");
 }
 
 void JniJavaMembers::Destroy(JNIEnv* env) {
+  LOG_DEBUG_MSG("Destroy is called");
+
   DeleteClass(env, c_Class);
   DeleteClass(env, c_Throwable);
   DeleteClass(env, c_PlatformUtils);
+
+  LOG_DEBUG_MSG("Destroy exiting");
 }
 
 bool JniJavaMembers::WriteErrorInfo(JNIEnv* env, char** errClsName,
                                     int* errClsNameLen, char** errMsg,
                                     int* errMsgLen, char** stackTrace,
                                     int* stackTraceLen) {
+  LOG_DEBUG_MSG("WriteErrorInfo is called");
+
   if (env && env->ExceptionCheck()) {
     if (m_Class_getName && m_Throwable_getMessage) {
       jthrowable err = env->ExceptionOccurred();
@@ -543,16 +595,21 @@ bool JniJavaMembers::WriteErrorInfo(JNIEnv* env, char** errClsName,
       if (trace)
         env->DeleteLocalRef(trace);
 
+      LOG_DEBUG_MSG("WriteErrorInfo exiting with bool true");
+
       return true;
     } else {
       env->ExceptionClear();
     }
   }
+  LOG_DEBUG_MSG("WriteErrorInfo exiting with bool false");
 
   return false;
 }
 
 void JniMembers::Initialize(JNIEnv* env) {
+  LOG_DEBUG_MSG("Initialize is called");
+
   c_DocumentDbConnectionProperties =
       FindClass(env, C_DOCUMENTDB_CONNECTION_PROPERTIES);
   m_DocumentDbConnectionPropertiesGetPropertiesFromConnectionString = FindMethod(
@@ -681,46 +738,73 @@ void JniMembers::Initialize(JNIEnv* env) {
   m_DocumentDbQueryMappingServiceGet =
       FindMethod(env, c_DocumentDbQueryMappingService,
                  M_DOCUMENTDB_QUERY_MAPPING_SERVICE_GET);
+
+  LOG_DEBUG_MSG("Initialize exiting");
 }
 
 void JniMembers::Destroy(JNIEnv* env) {
+  LOG_DEBUG_MSG("Destroy is called");
+
   DeleteClass(env, c_IgniteException);
   DeleteClass(env, c_PlatformIgnition);
   DeleteClass(env, c_PlatformTarget);
   DeleteClass(env, c_PlatformUtils);
+
+  LOG_DEBUG_MSG("Destroy exiting");
 }
 
 JniJvm::JniJvm()
     : jvm(nullptr), javaMembers(JniJavaMembers()), members(JniMembers()) {
   // No-op.
+
+  LOG_DEBUG_MSG("JniJvm() is called, and exiting");
 }
 
-JniJvm::JniJvm(JavaVM* jvm, JniJavaMembers const& javaMembers, JniMembers const& members)
+JniJvm::JniJvm(JavaVM* jvm, JniJavaMembers const& javaMembers,
+               JniMembers const& members)
     : jvm(jvm), javaMembers(javaMembers), members(members) {
   // No-op.
+
+  LOG_DEBUG_MSG(
+      "JniJvm(JavaVM* jvm, JniJavaMembers const& javaMembers,  JniMembers "
+      "const& members) is called, and exiting ");
 }
 
 JavaVM* JniJvm::GetJvm() {
+  LOG_DEBUG_MSG("GetJvm is called, and exiting");
+
   return jvm;
 }
 
 JniJavaMembers& JniJvm::GetJavaMembers() {
+  LOG_DEBUG_MSG("GetJavaMembers is called, and exiting");
+
   return javaMembers;
 }
 
 JniMembers& JniJvm::GetMembers() {
+  LOG_DEBUG_MSG("GetMembers is called, and exiting");
+
   return members;
 }
 
 GlobalJObject::GlobalJObject(JNIEnv* e, jobject obj) : env(e), ref(obj) {
   // No-op.
+
+  LOG_DEBUG_MSG("GlobalJObject is called, and exiting");
 }
 
 GlobalJObject::~GlobalJObject() {
+  LOG_DEBUG_MSG("~GlobalJObject is called");
+
   env->DeleteGlobalRef(ref);
+
+  LOG_DEBUG_MSG("~GlobalJObject exiting");
 }
 
 jobject GlobalJObject::GetRef() const {
+  LOG_DEBUG_MSG("GetRef is called, and exiting");
+
   return ref;
 }
 
@@ -729,6 +813,8 @@ jobject GlobalJObject::GetRef() const {
  */
 jint GetOrCreateJvm(char** opts, int optsLen, JavaVM** jvm, JNIEnv** env) {
   // Check to see if a VM is already created
+  LOG_DEBUG_MSG("GetOrCreateJvm is called");
+
   const jsize nJvms = 1;
   jsize nJvmsAvailable = 0;
   JavaVM* availableJvms[nJvms]{};
@@ -737,6 +823,9 @@ jint GetOrCreateJvm(char** opts, int optsLen, JavaVM** jvm, JNIEnv** env) {
     *jvm = availableJvms[0];
     res = (*jvm)->GetEnv(reinterpret_cast< void** >(env), JNI_VERSION_1_8);
     if (res == JNI_OK) {
+      LOG_INFO_MSG("Jvm already created. Existing Jvm is used.");
+      LOG_DEBUG_MSG("GetOrCreateJvm exiting with JNI_OK");
+
       return res;
     }
   }
@@ -757,6 +846,9 @@ jint GetOrCreateJvm(char** opts, int optsLen, JavaVM** jvm, JNIEnv** env) {
 
   delete[] opts0;
 
+  LOG_INFO_MSG("There is no previous Jvm created. Created new Jvm.");
+  LOG_DEBUG_MSG("GetOrCreateJvm exiting");
+
   return res;
 }
 
@@ -765,8 +857,10 @@ void RegisterNatives(JNIEnv* env) {
   // TODO: Investigate registering callbacks to get console and logging streams.
 }
 
-JniContext::JniContext(JniJvm* jvm, JniHandlers const& hnds) : jvm(jvm), hnds(hnds) {
+JniContext::JniContext(JniJvm* jvm, JniHandlers const& hnds)
+    : jvm(jvm), hnds(hnds) {
   // No-op.
+  LOG_DEBUG_MSG("JniContext constructor called, and exiting");
 }
 
 void GetJniErrorMessage(std::string& errMsg, jint res) {
@@ -802,8 +896,10 @@ void GetJniErrorMessage(std::string& errMsg, jint res) {
   }
 }
 
-JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers const& hnds,
-                               JniErrorInfo& errInfo) {
+JniContext* JniContext::Create(char** opts, int optsLen,
+                               JniHandlers const& hnds, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("Create is is called");
+
   // Acquire global lock to instantiate the JVM.
   JVM_LOCK.Enter();
 
@@ -897,19 +993,22 @@ JniContext* JniContext::Create(char** opts, int optsLen, JniHandlers const& hnds
 
   // Notify err callback if needed.
   if (!ctx) {
-      errInfo = JniErrorInfo(JniErrorCode::IGNITE_JNI_ERR_JVM_INIT,
-                            errClsName.c_str(), errMsg.c_str());
+    errInfo = JniErrorInfo(JniErrorCode::IGNITE_JNI_ERR_JVM_INIT,
+                           errClsName.c_str(), errMsg.c_str());
 
     if (hnds.error)
       hnds.error(hnds.target, JniErrorCode::IGNITE_JNI_ERR_JVM_INIT,
                  errClsName.c_str(), errClsNameLen, errMsg.c_str(), errMsgLen,
                  stackTrace.c_str(), stackTraceLen, nullptr, 0);
   }
+  LOG_DEBUG_MSG("Create is exiting");
 
   return ctx;
 }
 
 int JniContext::Reallocate(int64_t memPtr, int cap) {
+  LOG_DEBUG_MSG("Reallocate is called");
+
   JavaVM* jvm = JVM.GetJvm();
 
   JNIEnv* env;
@@ -919,8 +1018,11 @@ int JniContext::Reallocate(int64_t memPtr, int cap) {
 
   if (attachRes == JNI_OK)
     AttachHelper::OnThreadAttach();
-  else
+  else {
+    LOG_ERROR_MSG("Reallocate exiting with -1");
+    LOG_INFO_MSG("attachRes: " << attachRes);
     return -1;
+  }
 
   env->CallStaticVoidMethod(JVM.GetMembers().c_PlatformUtils,
                             JVM.GetMembers().m_PlatformUtils_reallocate, memPtr,
@@ -928,9 +1030,11 @@ int JniContext::Reallocate(int64_t memPtr, int cap) {
 
   if (env->ExceptionCheck()) {
     env->ExceptionClear();
-
+    LOG_ERROR_MSG("Reallocate exiting with -1 because JVM exception occured");
     return -1;
   }
+
+  LOG_DEBUG_MSG("Reallocate exiting");
 
   return 0;
 }
@@ -950,8 +1054,10 @@ void JniContext::Detach() {
 
 std::string JniContext::JavaStringToCppString(
     const SharedPointer< GlobalJObject >& value) {
+  LOG_DEBUG_MSG("JavaStringToCppString is called");
   int len;
   JNIEnv* env = Attach();
+  LOG_DEBUG_MSG("JavaStringToCppString exiting");
   return JavaStringToCString(env, static_cast< jstring >(value.Get()->GetRef()),
                              len);
 }
@@ -959,7 +1065,14 @@ std::string JniContext::JavaStringToCppString(
 JniErrorCode JniContext::DriverManagerGetConnection(
     const char* connectionString, SharedPointer< GlobalJObject >& connection,
     JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("DriverManagerGetConnection is called");
+
   JNIEnv* env = Attach();
+
+  // TODO enable string logging and hide the user password.
+  // https://bitquill.atlassian.net/browse/AD-702
+  //LOG_INFO_MSG("Connection String: [" << connectionString << "]");
+
   jstring jConnectionString = env->NewStringUTF(connectionString);
   jobject result = env->CallStaticObjectMethod(
       jvm->GetMembers().c_DriverManager,
@@ -970,30 +1083,49 @@ JniErrorCode JniContext::DriverManagerGetConnection(
   } else {
     connection = new GlobalJObject(env, env->NewGlobalRef(result));
   }
+
   env->DeleteLocalRef(jConnectionString);
+  
+  LOG_DEBUG_MSG("DriverManagerGetConnection exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::ConnectionClose(
     const SharedPointer< GlobalJObject >& connection, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("ConnectionClose is called");
+
   if (connection.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "Connection object must be set.";
+
+    LOG_ERROR_MSG("ConnectionClose exiting with error msg: " << errInfo.errMsg);
+
     return errInfo.code;
   }
   JNIEnv* env = Attach();
   env->CallVoidMethod(connection.Get()->GetRef(),
                       jvm->GetMembers().m_ConnectionClose);
   ExceptionCheck(env, &errInfo);
+
+  LOG_DEBUG_MSG("ConnectionClose exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::DocumentDbConnectionIsSshTunnelActive(
     const SharedPointer< GlobalJObject >& connection, bool& isActive,
     JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("DocumentDbConnectionIsSshTunnelActive is called");
+
   if (!connection.Get()) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "Connection object must be set.";
+
+    LOG_ERROR_MSG(
+        "DocumentDbConnectionIsSshTunnelActive exiting with error msg: "
+        << errInfo.errMsg);
+
     return errInfo.code;
   }
   JNIEnv* env = Attach();
@@ -1004,15 +1136,24 @@ JniErrorCode JniContext::DocumentDbConnectionIsSshTunnelActive(
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     isActive = res != JNI_FALSE;
   }
+
+  LOG_DEBUG_MSG("DocumentDbConnectionIsSshTunnelActive exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::DocumentDbConnectionGetSshLocalPort(
     const SharedPointer< GlobalJObject >& connection, int32_t& result,
     JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("DocumentDbConnectionGetSshLocalPort is called");
+
   if (!connection.Get()) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "Connection object must be set.";
+
+    LOG_ERROR_MSG("DocumentDbConnectionGetSshLocalPort exiting with error msg: "
+                  << errInfo.errMsg);
+
     return errInfo.code;
   }
   JNIEnv* env = Attach();
@@ -1020,15 +1161,24 @@ JniErrorCode JniContext::DocumentDbConnectionGetSshLocalPort(
       connection.Get()->GetRef(),
       jvm->GetMembers().m_DocumentDbConnectionGetSshLocalPort);
   ExceptionCheck(env, &errInfo);
+
+  LOG_DEBUG_MSG("DocumentDbConnectionGetSshLocalPort exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::DocumentDbConnectionGetDatabaseMetadata(
     const SharedPointer< GlobalJObject >& connection,
     SharedPointer< GlobalJObject >& metadata, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("DocumentDbConnectionGetDatabaseMetadata is called");
   if (!connection.Get()) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "Connection object must be set.";
+
+    LOG_ERROR_MSG(
+        "DocumentDbConnectionGetDatabaseMetadata exiting with error msg: "
+        << errInfo.errMsg);
+
     return errInfo.code;
   }
   JNIEnv* env = Attach();
@@ -1039,10 +1189,17 @@ JniErrorCode JniContext::DocumentDbConnectionGetDatabaseMetadata(
 
   if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     metadata = nullptr;
+
+    LOG_ERROR_MSG(
+        "DocumentDbConnectionGetDatabaseMetadata exiting with error. metadata "
+        "will be null");
+
     return errInfo.code;
   }
 
   metadata = new GlobalJObject(env, env->NewGlobalRef(result));
+
+  LOG_DEBUG_MSG("DocumentDbConnectionGetDatabaseMetadata exiting");
   return errInfo.code;
 }
 
@@ -1050,9 +1207,16 @@ JniErrorCode JniContext::DocumentDbConnectionGetConnectionProperties(
     const SharedPointer< GlobalJObject >& connection,
     SharedPointer< GlobalJObject >& connectionProperties,
     JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("DocumentDbConnectionGetConnectionProperties is called");
+
   if (!connection.Get()) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "Connection object must be set.";
+
+    LOG_ERROR_MSG(
+        "DocumentDbConnectionGetConnectionProperties exiting with error msg: "
+        << errInfo.errMsg);
+
     return errInfo.code;
   }
   JNIEnv* env = Attach();
@@ -1063,19 +1227,29 @@ JniErrorCode JniContext::DocumentDbConnectionGetConnectionProperties(
 
   if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     connectionProperties = nullptr;
+    LOG_ERROR_MSG(
+        "DocumentDbConnectionGetConnectionProperties exiting with error. "
+        "connectionProperties will be null");
     return errInfo.code;
   }
 
   connectionProperties = new GlobalJObject(env, env->NewGlobalRef(result));
+
+  LOG_DEBUG_MSG("DocumentDbConnectionGetConnectionProperties exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::DocumentDbDatabaseSchemaMetadataGetSchemaName(
     const SharedPointer< GlobalJObject >& databaseMetadata, std::string& value,
     bool& wasNull, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("DocumentDbDatabaseSchemaMetadataGetSchemaName is called");
   if (!databaseMetadata.Get()) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "DatabaseMetadata object must be set.";
+    LOG_ERROR_MSG(
+        "DocumentDbDatabaseSchemaMetadataGetSchemaName exiting with error msg: "
+        << errInfo.errMsg);
     return errInfo.code;
   }
 
@@ -1094,6 +1268,7 @@ JniErrorCode JniContext::DocumentDbDatabaseSchemaMetadataGetSchemaName(
       env->ReleaseStringUTFChars((jstring)result, utfChars);
     }
   }
+  LOG_DEBUG_MSG("DocumentDbDatabaseSchemaMetadataGetSchemaName exiting");
 
   return errInfo.code;
 }
@@ -1101,9 +1276,15 @@ JniErrorCode JniContext::DocumentDbDatabaseSchemaMetadataGetSchemaName(
 JniErrorCode JniContext::ConnectionGetMetaData(
     const SharedPointer< GlobalJObject >& connection,
     SharedPointer< GlobalJObject >& databaseMetaData, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("ConnectionGetMetaData is called");
+
   if (connection.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "Connection object must be set.";
+
+    LOG_ERROR_MSG(
+        "ConnectionGetMetaData exiting with error msg: " << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1114,10 +1295,18 @@ JniErrorCode JniContext::ConnectionGetMetaData(
 
   if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     databaseMetaData = nullptr;
+
+    LOG_ERROR_MSG(
+        "ConnectionGetMetaData exiting with error. databaseMetaData will be "
+        "null");
+
     return errInfo.code;
   }
 
   databaseMetaData = new GlobalJObject(env, env->NewGlobalRef(result));
+
+  LOG_DEBUG_MSG("ConnectionGetMetaData exiting");
+
   return errInfo.code;
 }
 
@@ -1127,9 +1316,15 @@ JniErrorCode JniContext::DatabaseMetaDataGetTables(
     const std::string& tableNamePattern,
     const std::vector< std::string >& types,
     SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("DatabaseMetaDataGetTables is called");
+
   if (databaseMetaData.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "DatabaseMetaData object must be set.";
+
+    LOG_ERROR_MSG(
+        "DatabaseMetaDataGetTables exiting with error msg: " << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1156,10 +1351,17 @@ JniErrorCode JniContext::DatabaseMetaDataGetTables(
 
   if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     resultSet = nullptr;
+
+    LOG_ERROR_MSG(
+        "DatabaseMetaDataGetTables exiting with error. resultSet will be null");
+
     return errInfo.code;
   }
 
   resultSet = new GlobalJObject(env, env->NewGlobalRef(result));
+
+  LOG_DEBUG_MSG("DatabaseMetaDataGetTables exiting");
+
   return errInfo.code;
 }
 
@@ -1168,9 +1370,15 @@ JniErrorCode JniContext::DatabaseMetaDataGetColumns(
     const std::string& catalog, const std::string& schemaPattern,
     const std::string& tableNamePattern, const std::string& columnNamePattern,
     SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("DatabaseMetaDataGetColumns is called");
+
   if (databaseMetaData.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "DatabaseMetaData object must be set.";
+
+    LOG_ERROR_MSG("DatabaseMetaDataGetColumns exiting with error msg: "
+                  << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1193,18 +1401,29 @@ JniErrorCode JniContext::DatabaseMetaDataGetColumns(
 
   if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     resultSet = nullptr;
+    LOG_ERROR_MSG(
+        "DatabaseMetaDataGetColumns exiting with error. resultSet will be "
+        "null");
     return errInfo.code;
   }
 
   resultSet = new GlobalJObject(env, env->NewGlobalRef(result));
+
+  LOG_DEBUG_MSG("DatabaseMetaDataGetColumns exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::ResultSetClose(
     const SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("ResultSetClose is called");
+
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
+
+    LOG_ERROR_MSG("ResultSetClose exiting with error msg: " << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1212,15 +1431,23 @@ JniErrorCode JniContext::ResultSetClose(
   env->CallVoidMethod(resultSet.Get()->GetRef(),
                       jvm->GetMembers().m_ResultSetClose);
   ExceptionCheck(env, &errInfo);
+
+  LOG_DEBUG_MSG("ResultSetClose exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::ResultSetNext(
     const SharedPointer< GlobalJObject >& resultSet, bool& hasNext,
     JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("ResultSetNext is called");
+
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
+
+    LOG_ERROR_MSG("ResultSetNext exiting with error msg: " << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1231,16 +1458,24 @@ JniErrorCode JniContext::ResultSetNext(
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     hasNext = res != JNI_FALSE;
   }
+
+  LOG_DEBUG_MSG("ResultSetNext exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::ResultSetGetString(
     const SharedPointer< GlobalJObject >& resultSet, int columnIndex,
-    boost::optional< std::string >& value,
-    JniErrorInfo& errInfo) {
+    boost::optional< std::string >& value, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("ResultSetGetString is called");
+
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
+
+    LOG_ERROR_MSG(
+        "ResultSetGetString exiting with error msg: " << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1259,6 +1494,9 @@ JniErrorCode JniContext::ResultSetGetString(
       env->ReleaseStringUTFChars((jstring)result, utfChars);
     }
   }
+
+  LOG_DEBUG_MSG("ResultSetGetString exiting");
+
   return errInfo.code;
 }
 
@@ -1266,9 +1504,15 @@ JniErrorCode JniContext::ResultSetGetString(
     const SharedPointer< GlobalJObject >& resultSet,
     const std::string& columnName, boost::optional< std::string >& value,
     JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("ResultSetGetString is called");
+
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
+
+    LOG_ERROR_MSG(
+        "ResultSetGetString exiting with error msg: " << errInfo.errMsg);
+
     return errInfo.code;
   }
   value = boost::none;
@@ -1290,15 +1534,22 @@ JniErrorCode JniContext::ResultSetGetString(
     }
   }
 
+  LOG_DEBUG_MSG("ResultSetGetString exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::ResultSetGetInt(
     const SharedPointer< GlobalJObject >& resultSet, int columnIndex,
     boost::optional< int >& value, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("ResultSetGetInt is called");
+
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
+
+    LOG_ERROR_MSG("ResultSetGetInt exiting with error msg: " << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1316,6 +1567,8 @@ JniErrorCode JniContext::ResultSetGetInt(
       value = result;
   }
 
+  LOG_DEBUG_MSG("ResultSetGetInt exiting");
+
   return errInfo.code;
 }
 
@@ -1323,9 +1576,14 @@ JniErrorCode JniContext::ResultSetGetInt(
     const SharedPointer< GlobalJObject >& resultSet,
     const std::string& columnName, boost::optional< int >& value,
     JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("ResultSetGetInt is called");
+
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
+
+    LOG_ERROR_MSG("ResultSetGetInt exiting with error msg: " << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1345,16 +1603,23 @@ JniErrorCode JniContext::ResultSetGetInt(
     if (!wasNull)
       value = result;
   }
+
+  LOG_DEBUG_MSG("ResultSetGetInt exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::ResultSetGetRow(
     const SharedPointer< GlobalJObject >& resultSet,
-    boost::optional< int >& value,
-    JniErrorInfo& errInfo) {
+    boost::optional< int >& value, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("ResultSetGetRow is called");
+
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
+
+    LOG_ERROR_MSG("ResultSetGetRow exiting with error msg: " << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1370,15 +1635,24 @@ JniErrorCode JniContext::ResultSetGetRow(
     if (!wasNull)
       value = result;
   }
+
+  LOG_DEBUG_MSG("ResultSetGetRow exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::ResultSetWasNull(
     const SharedPointer< GlobalJObject >& resultSet, bool& value,
     JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("ResultSetWasNull is called");
+
   if (resultSet.Get() == nullptr) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
+
+    LOG_ERROR_MSG(
+        "ResultSetWasNull exiting with error msg: " << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1389,14 +1663,22 @@ JniErrorCode JniContext::ResultSetWasNull(
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     value = res != JNI_FALSE;
   }
+
+  LOG_DEBUG_MSG("ResultSetWasNull exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::ListSize(const SharedPointer< GlobalJObject >& list,
                                   int32_t& size, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("ListSize is called");
+
   if (!list.IsValid()) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "List object must be set.";
+
+    LOG_ERROR_MSG("ListSize exiting with error msg: " << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1407,6 +1689,9 @@ JniErrorCode JniContext::ListSize(const SharedPointer< GlobalJObject >& list,
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     size = res;
   }
+
+  LOG_DEBUG_MSG("ListSize exiting");
+
   return errInfo.code;
 }
 
@@ -1414,9 +1699,14 @@ JniErrorCode JniContext::ListGet(const SharedPointer< GlobalJObject >& list,
                                  int32_t index,
                                  SharedPointer< GlobalJObject >& value,
                                  JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("ListGet is called");
+
   if (!list.IsValid()) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "List object must be set.";
+
+    LOG_ERROR_MSG("ListGet exiting with error msg: " << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1426,9 +1716,15 @@ JniErrorCode JniContext::ListGet(const SharedPointer< GlobalJObject >& list,
   ExceptionCheck(env, &errInfo);
   if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     value = nullptr;
+
+    LOG_ERROR_MSG("ListGet exiting with error. value variable will be null");
+
     return errInfo.code;
   }
   value = new GlobalJObject(env, env->NewGlobalRef(result));
+
+  LOG_DEBUG_MSG("ListGet exiting");
+
   return errInfo.code;
 }
 
@@ -1436,30 +1732,18 @@ JniErrorCode
 JniContext::DocumentdbMqlQueryContextGetAggregateOperationsAsStrings(
     const SharedPointer< GlobalJObject >& mqlQueryContext,
     SharedPointer< GlobalJObject >& list, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG(
+      "DocumentdbMqlQueryContextGetAggregateOperationsAsStrings is called");
+
   if (!mqlQueryContext.IsValid()) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "MQL Query Context object must be set.";
-    return errInfo.code;
-  }
 
-  JNIEnv* env = Attach();
-  jobject result = env->CallObjectMethod(mqlQueryContext.Get()->GetRef(),
-                                         jvm->GetMembers().m_DocumentDbMqlQueryContextGetAggregateOperationsAsStrings);
-  ExceptionCheck(env, &errInfo);
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    list = nullptr;
-    return errInfo.code;
-  }
-  list = new GlobalJObject(env, env->NewGlobalRef(result));
-  return errInfo.code;
-}
+    LOG_ERROR_MSG(
+        "DocumentdbMqlQueryContextGetAggregateOperationsAsStrings exiting with "
+        "error msg: "
+        << errInfo.errMsg);
 
-JniErrorCode JniContext::DocumentdbMqlQueryContextGetColumnMetadata(
-    const SharedPointer< GlobalJObject >& mqlQueryContext,
-    SharedPointer< GlobalJObject >& columnMetadata, JniErrorInfo& errInfo) {
-  if (!mqlQueryContext.IsValid()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
-    errInfo.errMsg = "MQL Query Context object must be set.";
     return errInfo.code;
   }
 
@@ -1467,22 +1751,75 @@ JniErrorCode JniContext::DocumentdbMqlQueryContextGetColumnMetadata(
   jobject result = env->CallObjectMethod(
       mqlQueryContext.Get()->GetRef(),
       jvm->GetMembers()
-          .m_DocumentDbMqlQueryContextGetColumnMetadata);
+          .m_DocumentDbMqlQueryContextGetAggregateOperationsAsStrings);
+  ExceptionCheck(env, &errInfo);
+  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    list = nullptr;
+
+    LOG_ERROR_MSG(
+        "DocumentdbMqlQueryContextGetAggregateOperationsAsStrings exiting with "
+        "error. list variable will be null");
+
+    return errInfo.code;
+  }
+  list = new GlobalJObject(env, env->NewGlobalRef(result));
+
+  LOG_DEBUG_MSG(
+      "DocumentdbMqlQueryContextGetAggregateOperationsAsStrings exiting");
+
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::DocumentdbMqlQueryContextGetColumnMetadata(
+    const SharedPointer< GlobalJObject >& mqlQueryContext,
+    SharedPointer< GlobalJObject >& columnMetadata, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("DocumentdbMqlQueryContextGetColumnMetadata is called");
+
+  if (!mqlQueryContext.IsValid()) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "MQL Query Context object must be set.";
+
+    LOG_ERROR_MSG(
+        "DocumentdbMqlQueryContextGetColumnMetadata exiting with error msg: "
+        << errInfo.errMsg);
+
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  jobject result = env->CallObjectMethod(
+      mqlQueryContext.Get()->GetRef(),
+      jvm->GetMembers().m_DocumentDbMqlQueryContextGetColumnMetadata);
   ExceptionCheck(env, &errInfo);
   if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     columnMetadata = nullptr;
+
+    LOG_ERROR_MSG(
+        "DocumentdbMqlQueryContextGetColumnMetadata exiting with error. "
+        "columnMetadata variable will be null");
+
     return errInfo.code;
   }
   columnMetadata = new GlobalJObject(env, env->NewGlobalRef(result));
+
+  LOG_DEBUG_MSG("DocumentdbMqlQueryContextGetColumnMetadata exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::DocumentdbMqlQueryContextGetCollectionName(
     const SharedPointer< GlobalJObject >& mqlQueryContext,
     std::string& collectionName, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("DocumentdbMqlQueryContextGetCollectionName is called");
+
   if (!mqlQueryContext.IsValid()) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "MQL Query Context object must be set.";
+
+    LOG_ERROR_MSG(
+        "DocumentdbMqlQueryContextGetCollectionName exiting with error msg: "
+        << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1493,19 +1830,33 @@ JniErrorCode JniContext::DocumentdbMqlQueryContextGetCollectionName(
   ExceptionCheck(env, &errInfo);
   if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     collectionName = "";
+
+    LOG_ERROR_MSG(
+        "DocumentdbMqlQueryContextGetCollectionName exiting with error. "
+        "collectionName variable will be null");
+
     return errInfo.code;
   }
   int len;
   collectionName = JavaStringToCString(env, result, len);
+
+  LOG_DEBUG_MSG("DocumentdbMqlQueryContextGetCollectionName exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::DocumentdbMqlQueryContextGetPaths(
     const SharedPointer< GlobalJObject >& mqlQueryContext,
     SharedPointer< GlobalJObject >& list, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("DocumentdbMqlQueryContextGetPaths is called");
+
   if (!mqlQueryContext.IsValid()) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "MQL Query Context object must be set.";
+
+    LOG_ERROR_MSG("DocumentdbMqlQueryContextGetPaths exiting with error msg: "
+                  << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1516,9 +1867,17 @@ JniErrorCode JniContext::DocumentdbMqlQueryContextGetPaths(
   ExceptionCheck(env, &errInfo);
   if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     list = nullptr;
+
+    LOG_ERROR_MSG(
+        "DocumentdbMqlQueryContextGetPaths exiting with error. list variable "
+        "will be null");
+
     return errInfo.code;
   }
   list = new GlobalJObject(env, env->NewGlobalRef(result));
+
+  LOG_DEBUG_MSG("DocumentdbMqlQueryContextGetPaths exiting");
+
   return errInfo.code;
 }
 
@@ -1527,9 +1886,16 @@ JniErrorCode JniContext::DocumentDbQueryMappingServiceCtor(
     const SharedPointer< GlobalJObject >& databaseMetadata,
     SharedPointer< GlobalJObject >& queryMappingService,
     JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("DocumentDbQueryMappingServiceCtor is called");
+
   if (!connectionProperties.IsValid() || !databaseMetadata.IsValid()) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
-    errInfo.errMsg = "Connection Properties and Database Metadata objects must be set.";
+    errInfo.errMsg =
+        "Connection Properties and Database Metadata objects must be set.";
+
+    LOG_ERROR_MSG("DocumentDbQueryMappingServiceCtor exiting with error msg: "
+                  << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1541,9 +1907,17 @@ JniErrorCode JniContext::DocumentDbQueryMappingServiceCtor(
   ExceptionCheck(env, &errInfo);
   if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     queryMappingService = nullptr;
+
+    LOG_ERROR_MSG(
+        "DocumentDbQueryMappingServiceCtor exiting with error. "
+        "queryMappingService variable will be null");
+
     return errInfo.code;
   }
   queryMappingService = new GlobalJObject(env, env->NewGlobalRef(result));
+
+  LOG_DEBUG_MSG("DocumentDbQueryMappingServiceCtor exiting");
+
   return errInfo.code;
 }
 
@@ -1551,9 +1925,15 @@ JniErrorCode JniContext::DocumentDbQueryMappingServiceGet(
     const SharedPointer< GlobalJObject >& queryMappingService,
     const std::string sql, int64_t maxRowCount,
     SharedPointer< GlobalJObject >& mqlQueryContext, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("DocumentDbQueryMappingServiceGet is called");
+
   if (!queryMappingService.IsValid()) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "Query Mapping Service object must be set.";
+
+    LOG_ERROR_MSG("DocumentDbQueryMappingServiceGet exiting with error msg: "
+                  << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1562,67 +1942,102 @@ JniErrorCode JniContext::DocumentDbQueryMappingServiceGet(
   jlong maxRowCountLong = maxRowCount;
   jobject result = env->CallObjectMethod(
       queryMappingService.Get()->GetRef(),
-      jvm->GetMembers().m_DocumentDbQueryMappingServiceGet, sqlString, maxRowCountLong);
+      jvm->GetMembers().m_DocumentDbQueryMappingServiceGet, sqlString,
+      maxRowCountLong);
   env->DeleteLocalRef(sqlString);
   ExceptionCheck(env, &errInfo);
   if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     mqlQueryContext = nullptr;
+
+    LOG_ERROR_MSG(
+        "DocumentDbQueryMappingServiceGet exiting with error. mqlQueryContext "
+        "variable will be null");
+
     return errInfo.code;
   }
   mqlQueryContext = new GlobalJObject(env, env->NewGlobalRef(result));
+
+  LOG_DEBUG_MSG("DocumentDbQueryMappingServiceGet exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::JdbcColumnMetadataGetOrdinal(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata, int32_t& ordinal,
     JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataGetOrdinal is called");
+
   if (!jdbcColumnMetadata.IsValid()) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
     errInfo.errMsg = "JDBC Column Metaata object must be set.";
+
+    LOG_ERROR_MSG("JdbcColumnMetadataGetOrdinal exiting with error msg: "
+                  << errInfo.errMsg);
+
     return errInfo.code;
   }
 
   JNIEnv* env = Attach();
-  jint result = env->CallIntMethod(jdbcColumnMetadata.Get()->GetRef(),
-      jvm->GetMembers().m_JdbcColumnMetadataGetOrdinal);
+  jint result =
+      env->CallIntMethod(jdbcColumnMetadata.Get()->GetRef(),
+                         jvm->GetMembers().m_JdbcColumnMetadataGetOrdinal);
   ExceptionCheck(env, &errInfo);
   if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    LOG_ERROR_MSG(
+        "JdbcColumnMetadataGetOrdinal exiting with error. ordinal variable "
+        "will not be set");
     return errInfo.code;
   }
 
   ordinal = result;
+
+  LOG_DEBUG_MSG("JdbcColumnMetadataGetOrdinal exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::CallBooleanMethod(
-    const SharedPointer< GlobalJObject >& object,
-    const jmethodID& method,
+    const SharedPointer< GlobalJObject >& object, const jmethodID& method,
     bool& value, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("CallBooleanMethod is called");
+
   if (!object.IsValid()) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
-    errInfo.errMsg = "JDBC Column Metaata object must be set.";
+    errInfo.errMsg = "JDBC Column Metadata object must be set.";
+
+    LOG_ERROR_MSG(
+        "CallBooleanMethod exiting with error msg: " << errInfo.errMsg);
+
     return errInfo.code;
   }
 
   JNIEnv* env = Attach();
-  jboolean result = env->CallBooleanMethod(
-      object.Get()->GetRef(),
-      method);
+  jboolean result = env->CallBooleanMethod(object.Get()->GetRef(), method);
   ExceptionCheck(env, &errInfo);
   if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    LOG_ERROR_MSG(
+        "CallBooleanMethod exiting with error. value variable will not be set");
     return errInfo.code;
   }
 
   value = result;
+
+  LOG_DEBUG_MSG("CallBooleanMethod exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::CallIntMethod(
     const SharedPointer< GlobalJObject >& object, const jmethodID& method,
     int32_t& value, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("CallIntMethod is called");
+
   if (!object.IsValid()) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
-    errInfo.errMsg = "JDBC Column Metaata object must be set.";
+    errInfo.errMsg = "JDBC Column Metadata object must be set.";
+
+    LOG_ERROR_MSG("CallIntMethod exiting with error msg: " << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1630,19 +2045,31 @@ JniErrorCode JniContext::CallIntMethod(
   jint result = env->CallIntMethod(object.Get()->GetRef(), method);
   ExceptionCheck(env, &errInfo);
   if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    LOG_ERROR_MSG(
+        "CallIntMethod exiting with error. value variable will not be set");
+
     return errInfo.code;
   }
 
   value = result;
+
+  LOG_DEBUG_MSG("CallIntMethod exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::CallStringMethod(
     const SharedPointer< GlobalJObject >& object, const jmethodID& method,
     boost::optional< std::string >& value, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("CallStringMethod is called");
+
   if (!object.IsValid()) {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
-    errInfo.errMsg = "JDBC Column Metaata object must be set.";
+    errInfo.errMsg = "JDBC Column Metadata object must be set.";
+
+    LOG_ERROR_MSG(
+        "CallStringMethod exiting with error msg: " << errInfo.errMsg);
+
     return errInfo.code;
   }
 
@@ -1651,21 +2078,29 @@ JniErrorCode JniContext::CallStringMethod(
       env->CallObjectMethod(object.Get()->GetRef(), method));
   ExceptionCheck(env, &errInfo);
   if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    LOG_ERROR_MSG(
+        "CallStringMethod exiting with error. value variable will not be set");
+
     return errInfo.code;
   }
 
   if (result == nullptr) {
     value = boost::none;
   } else {
-      int len;
-      value = JavaStringToCString(env, result, len);
+    int len;
+    value = JavaStringToCString(env, result, len);
   }
+
+  LOG_DEBUG_MSG("CallStringMethod exiting");
+
   return errInfo.code;
 }
 
 JniErrorCode JniContext::JdbcColumnMetadataIsAutoIncrement(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-    bool& autoIncrement, JniErrorInfo& errInfo){
+    bool& autoIncrement, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataIsAutoIncrement is called, and exiting");
+
   return CallBooleanMethod(
       jdbcColumnMetadata, jvm->GetMembers().m_JdbcColumnMetadataIsAutoIncrement,
       autoIncrement, errInfo);
@@ -1673,7 +2108,9 @@ JniErrorCode JniContext::JdbcColumnMetadataIsAutoIncrement(
 
 JniErrorCode JniContext::JdbcColumnMetadataIsCaseSensitive(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-    bool& caseSensitive, JniErrorInfo& errInfo){
+    bool& caseSensitive, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataIsCaseSensitive is called, and exiting");
+
   return CallBooleanMethod(
       jdbcColumnMetadata, jvm->GetMembers().m_JdbcColumnMetadataIsCaseSensitive,
       caseSensitive, errInfo);
@@ -1681,7 +2118,9 @@ JniErrorCode JniContext::JdbcColumnMetadataIsCaseSensitive(
 
 JniErrorCode JniContext::JdbcColumnMetadataIsSearchable(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata, bool& searchable,
-    JniErrorInfo& errInfo){
+    JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataIsSearchable is called, and exiting");
+
   return CallBooleanMethod(jdbcColumnMetadata,
                            jvm->GetMembers().m_JdbcColumnMetadataIsSearchable,
                            searchable, errInfo);
@@ -1689,7 +2128,9 @@ JniErrorCode JniContext::JdbcColumnMetadataIsSearchable(
 
 JniErrorCode JniContext::JdbcColumnMetadataIsCurrency(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata, bool& currency,
-    JniErrorInfo& errInfo){
+    JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataIsCurrency is called, and exiting");
+
   return CallBooleanMethod(jdbcColumnMetadata,
                            jvm->GetMembers().m_JdbcColumnMetadataIsCurrency,
                            currency, errInfo);
@@ -1697,7 +2138,9 @@ JniErrorCode JniContext::JdbcColumnMetadataIsCurrency(
 
 JniErrorCode JniContext::JdbcColumnMetadataGetNullable(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata, int32_t& nullable,
-    JniErrorInfo& errInfo){
+    JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataGetNullable is called, and exiting");
+
   return CallIntMethod(jdbcColumnMetadata,
                        jvm->GetMembers().m_JdbcColumnMetadataGetNullable,
                        nullable, errInfo);
@@ -1705,7 +2148,9 @@ JniErrorCode JniContext::JdbcColumnMetadataGetNullable(
 
 JniErrorCode JniContext::JdbcColumnMetadataIsSigned(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata, bool& isSigned,
-    JniErrorInfo& errInfo){
+    JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataIsSigned is called, and exiting");
+
   return CallBooleanMethod(jdbcColumnMetadata,
                            jvm->GetMembers().m_JdbcColumnMetadataIsSigned,
                            isSigned, errInfo);
@@ -1713,7 +2158,10 @@ JniErrorCode JniContext::JdbcColumnMetadataIsSigned(
 
 JniErrorCode JniContext::JdbcColumnMetadataGetColumnDisplaySize(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-    int32_t& columnDisplaySize, JniErrorInfo& errInfo){
+    int32_t& columnDisplaySize, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG(
+      "JdbcColumnMetadataGetColumnDisplaySize is called, and exiting");
+
   return CallIntMethod(
       jdbcColumnMetadata,
       jvm->GetMembers().m_JdbcColumnMetadataGetColumnDisplaySize,
@@ -1722,7 +2170,9 @@ JniErrorCode JniContext::JdbcColumnMetadataGetColumnDisplaySize(
 
 JniErrorCode JniContext::JdbcColumnMetadataGetColumnLabel(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-    boost::optional< std::string >& columnLabel, JniErrorInfo& errInfo){
+    boost::optional< std::string >& columnLabel, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataGetColumnLabel is called, and exiting");
+
   return CallStringMethod(jdbcColumnMetadata,
                           jvm->GetMembers().m_JdbcColumnMetadataGetColumnLabel,
                           columnLabel, errInfo);
@@ -1730,7 +2180,9 @@ JniErrorCode JniContext::JdbcColumnMetadataGetColumnLabel(
 
 JniErrorCode JniContext::JdbcColumnMetadataGetColumnName(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-    boost::optional< std::string >& columnName, JniErrorInfo& errInfo){
+    boost::optional< std::string >& columnName, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataGetColumnName is called, and exiting");
+
   return CallStringMethod(jdbcColumnMetadata,
                           jvm->GetMembers().m_JdbcColumnMetadataGetColumnName,
                           columnName, errInfo);
@@ -1738,7 +2190,9 @@ JniErrorCode JniContext::JdbcColumnMetadataGetColumnName(
 
 JniErrorCode JniContext::JdbcColumnMetadataGetSchemaName(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-    boost::optional< std::string >& schemaName, JniErrorInfo& errInfo){
+    boost::optional< std::string >& schemaName, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataGetSchemaName is called, and exiting");
+
   return CallStringMethod(jdbcColumnMetadata,
                           jvm->GetMembers().m_JdbcColumnMetadataGetSchemaName,
                           schemaName, errInfo);
@@ -1746,7 +2200,9 @@ JniErrorCode JniContext::JdbcColumnMetadataGetSchemaName(
 
 JniErrorCode JniContext::JdbcColumnMetadataGetPrecision(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-    int32_t& precision, JniErrorInfo& errInfo){
+    int32_t& precision, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataGetPrecision is called, and exiting");
+
   return CallIntMethod(jdbcColumnMetadata,
                        jvm->GetMembers().m_JdbcColumnMetadataGetPrecision,
                        precision, errInfo);
@@ -1754,7 +2210,9 @@ JniErrorCode JniContext::JdbcColumnMetadataGetPrecision(
 
 JniErrorCode JniContext::JdbcColumnMetadataGetScale(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata, int32_t& scale,
-    JniErrorInfo& errInfo){
+    JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataGetScale is called, and exiting");
+
   return CallIntMethod(jdbcColumnMetadata,
                        jvm->GetMembers().m_JdbcColumnMetadataGetScale, scale,
                        errInfo);
@@ -1762,7 +2220,9 @@ JniErrorCode JniContext::JdbcColumnMetadataGetScale(
 
 JniErrorCode JniContext::JdbcColumnMetadataGetTableName(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-    boost::optional< std::string >& tableName, JniErrorInfo& errInfo){
+    boost::optional< std::string >& tableName, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataGetTableName is called, and exiting");
+
   return CallStringMethod(jdbcColumnMetadata,
                           jvm->GetMembers().m_JdbcColumnMetadataGetTableName,
                           tableName, errInfo);
@@ -1770,7 +2230,9 @@ JniErrorCode JniContext::JdbcColumnMetadataGetTableName(
 
 JniErrorCode JniContext::JdbcColumnMetadataGetCatalogName(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-    boost::optional< std::string >& catalogName, JniErrorInfo& errInfo){
+    boost::optional< std::string >& catalogName, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataGetCatalogName is called, and exiting");
+
   return CallStringMethod(jdbcColumnMetadata,
                           jvm->GetMembers().m_JdbcColumnMetadataGetCatalogName,
                           catalogName, errInfo);
@@ -1778,7 +2240,9 @@ JniErrorCode JniContext::JdbcColumnMetadataGetCatalogName(
 
 JniErrorCode JniContext::JdbcColumnMetadataGetColumnType(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-    int32_t& columnType, JniErrorInfo& errInfo){
+    int32_t& columnType, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataGetColumnType is called, and exiting");
+
   return CallIntMethod(jdbcColumnMetadata,
                        jvm->GetMembers().m_JdbcColumnMetadataGetColumnType,
                        columnType, errInfo);
@@ -1786,15 +2250,20 @@ JniErrorCode JniContext::JdbcColumnMetadataGetColumnType(
 
 JniErrorCode JniContext::JdbcColumnMetadataGetColumnTypeName(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-    boost::optional< std::string >& columnTypeName, JniErrorInfo& errInfo){
-  return CallStringMethod(jdbcColumnMetadata,
-                          jvm->GetMembers().m_JdbcColumnMetadataGetColumnTypeName,
-                          columnTypeName, errInfo);
+    boost::optional< std::string >& columnTypeName, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataGetColumnTypeName is called, and exiting");
+
+  return CallStringMethod(
+      jdbcColumnMetadata,
+      jvm->GetMembers().m_JdbcColumnMetadataGetColumnTypeName, columnTypeName,
+      errInfo);
 }
 
 JniErrorCode JniContext::JdbcColumnMetadataIsReadOnly(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata, bool& readOnly,
-    JniErrorInfo& errInfo){
+    JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataIsReadOnly is called, and exiting");
+
   return CallBooleanMethod(jdbcColumnMetadata,
                            jvm->GetMembers().m_JdbcColumnMetadataIsReadOnly,
                            readOnly, errInfo);
@@ -1802,7 +2271,9 @@ JniErrorCode JniContext::JdbcColumnMetadataIsReadOnly(
 
 JniErrorCode JniContext::JdbcColumnMetadataIsWritable(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata, bool& writable,
-    JniErrorInfo& errInfo){
+    JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataIsWritable is called, and exiting");
+
   return CallBooleanMethod(jdbcColumnMetadata,
                            jvm->GetMembers().m_JdbcColumnMetadataIsWritable,
                            writable, errInfo);
@@ -1810,7 +2281,10 @@ JniErrorCode JniContext::JdbcColumnMetadataIsWritable(
 
 JniErrorCode JniContext::JdbcColumnMetadataIsDefinitelyWritable(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-    bool& definitelyWritable, JniErrorInfo& errInfo){
+    bool& definitelyWritable, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG(
+      "JdbcColumnMetadataIsDefinitelyWritable is called, and exiting");
+
   return CallBooleanMethod(
       jdbcColumnMetadata,
       jvm->GetMembers().m_JdbcColumnMetadataIsDefinitelyWritable,
@@ -1819,7 +2293,9 @@ JniErrorCode JniContext::JdbcColumnMetadataIsDefinitelyWritable(
 
 JniErrorCode JniContext::JdbcColumnMetadataGetColumnClassName(
     const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-    boost::optional< std::string >& columnClassName, JniErrorInfo& errInfo){
+    boost::optional< std::string >& columnClassName, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("JdbcColumnMetadataGetColumnClassName is called, and exiting");
+
   return CallStringMethod(
       jdbcColumnMetadata,
       jvm->GetMembers().m_JdbcColumnMetadataGetColumnClassName, columnClassName,
@@ -1828,6 +2304,8 @@ JniErrorCode JniContext::JdbcColumnMetadataGetColumnClassName(
 
 int64_t JniContext::TargetInLongOutLong(jobject obj, int opType, int64_t val,
                                         JniErrorInfo* err) {
+  LOG_DEBUG_MSG("TargetInLongOutLong is called");
+
   JNIEnv* env = Attach();
 
   int64_t res = env->CallLongMethod(
@@ -1835,11 +2313,15 @@ int64_t JniContext::TargetInLongOutLong(jobject obj, int opType, int64_t val,
 
   ExceptionCheck(env, err);
 
+  LOG_DEBUG_MSG("TargetInLongOutLong exiting");
+
   return res;
 }
 
 int64_t JniContext::TargetInStreamOutLong(jobject obj, int opType,
                                           int64_t memPtr, JniErrorInfo* err) {
+  LOG_DEBUG_MSG("TargetInStreamOutLong is called");
+
   JNIEnv* env = Attach();
 
   int64_t res = env->CallLongMethod(
@@ -1847,22 +2329,30 @@ int64_t JniContext::TargetInStreamOutLong(jobject obj, int opType,
 
   ExceptionCheck(env, err);
 
+  LOG_DEBUG_MSG("TargetInStreamOutLong exiting");
+
   return res;
 }
 
 void JniContext::TargetInStreamOutStream(jobject obj, int opType,
                                          int64_t inMemPtr, int64_t outMemPtr,
                                          JniErrorInfo* err) {
+  LOG_DEBUG_MSG("TargetInStreamOutStream is called");
+
   JNIEnv* env = Attach();
 
   env->CallVoidMethod(obj, jvm->GetMembers().m_PlatformTarget_inStreamOutStream,
                       opType, inMemPtr, outMemPtr);
 
   ExceptionCheck(env, err);
+
+  LOG_DEBUG_MSG("TargetInStreamOutStream exiting");
 }
 
 jobject JniContext::TargetInStreamOutObject(jobject obj, int opType,
                                             int64_t memPtr, JniErrorInfo* err) {
+  LOG_DEBUG_MSG("TargetInStreamOutObject is called");
+
   JNIEnv* env = Attach();
 
   jobject res = env->CallObjectMethod(
@@ -1870,6 +2360,8 @@ jobject JniContext::TargetInStreamOutObject(jobject obj, int opType,
       memPtr);
 
   ExceptionCheck(env, err);
+
+  LOG_DEBUG_MSG("TargetInStreamOutObject exiting");
 
   return LocalToGlobal(env, res);
 }
@@ -1879,6 +2371,8 @@ jobject JniContext::TargetInObjectStreamOutObjectStream(jobject obj, int opType,
                                                         int64_t inMemPtr,
                                                         int64_t outMemPtr,
                                                         JniErrorInfo* err) {
+  LOG_DEBUG_MSG("TargetInObjectStreamOutObjectStream is called");
+
   JNIEnv* env = Attach();
 
   jobject res = env->CallObjectMethod(
@@ -1886,6 +2380,8 @@ jobject JniContext::TargetInObjectStreamOutObjectStream(jobject obj, int opType,
       opType, arg, inMemPtr, outMemPtr);
 
   ExceptionCheck(env, err);
+
+  LOG_DEBUG_MSG("TargetInObjectStreamOutObjectStream exiting");
 
   return LocalToGlobal(env, res);
 }
@@ -1902,6 +2398,8 @@ void JniContext::TargetOutStream(jobject obj, int opType, int64_t memPtr,
 
 jobject JniContext::TargetOutObject(jobject obj, int opType,
                                     JniErrorInfo* err) {
+  LOG_DEBUG_MSG("TargetOutObject is called");
+
   JNIEnv* env = Attach();
 
   jobject res = env->CallObjectMethod(
@@ -1909,22 +2407,30 @@ jobject JniContext::TargetOutObject(jobject obj, int opType,
 
   ExceptionCheck(env, err);
 
+  LOG_DEBUG_MSG("TargetOutObject exiting");
+
   return LocalToGlobal(env, res);
 }
 
 void JniContext::TargetInStreamAsync(jobject obj, int opType, int64_t memPtr,
                                      JniErrorInfo* err) {
+  LOG_DEBUG_MSG("TargetInStreamAsync is called");
+
   JNIEnv* env = Attach();
 
   env->CallVoidMethod(obj, jvm->GetMembers().m_PlatformTarget_inStreamAsync,
                       opType, memPtr);
 
   ExceptionCheck(env, err);
+
+  LOG_DEBUG_MSG("TargetInStreamAsync exiting");
 }
 
 jobject JniContext::TargetInStreamOutObjectAsync(jobject obj, int opType,
                                                  int64_t memPtr,
                                                  JniErrorInfo* err) {
+  LOG_DEBUG_MSG("TargetInStreamOutObjectAsync is called");
+
   JNIEnv* env = Attach();
 
   jobject res = env->CallObjectMethod(
@@ -1933,17 +2439,23 @@ jobject JniContext::TargetInStreamOutObjectAsync(jobject obj, int opType,
 
   ExceptionCheck(env, err);
 
+  LOG_DEBUG_MSG("TargetInStreamOutObjectAsync exiting");
+
   return LocalToGlobal(env, res);
 }
 
 jobject JniContext::CacheOutOpQueryCursor(jobject obj, int type, int64_t memPtr,
                                           JniErrorInfo* err) {
+  LOG_DEBUG_MSG("CacheOutOpQueryCursor is called");
+
   JNIEnv* env = Attach();
 
   jobject res = env->CallObjectMethod(
       obj, jvm->GetMembers().m_PlatformTarget_inStreamOutObject, type, memPtr);
 
   ExceptionCheck(env, err);
+
+  LOG_DEBUG_MSG("CacheOutOpQueryCursor exiting");
 
   return LocalToGlobal(env, res);
 }
@@ -1951,6 +2463,8 @@ jobject JniContext::CacheOutOpQueryCursor(jobject obj, int type, int64_t memPtr,
 jobject JniContext::CacheOutOpContinuousQuery(jobject obj, int type,
                                               int64_t memPtr,
                                               JniErrorInfo* err) {
+  LOG_DEBUG_MSG("CacheOutOpContinuousQuery is called");
+
   JNIEnv* env = Attach();
 
   jobject res = env->CallObjectMethod(
@@ -1958,10 +2472,14 @@ jobject JniContext::CacheOutOpContinuousQuery(jobject obj, int type,
 
   ExceptionCheck(env, err);
 
+  LOG_DEBUG_MSG("CacheOutOpContinuousQuery exiting");
+
   return LocalToGlobal(env, res);
 }
 
 jobject JniContext::Acquire(jobject obj) {
+  LOG_DEBUG_MSG("Acquire is called");
+
   if (obj) {
     JNIEnv* env = Attach();
 
@@ -1969,13 +2487,19 @@ jobject JniContext::Acquire(jobject obj) {
 
     ExceptionCheck(env);
 
+    LOG_DEBUG_MSG("Acquire exiting with obj0 variable.");
+
     return obj0;
   }
+
+  LOG_ERROR_MSG("Acquire exiting with nullptr.");
 
   return nullptr;
 }
 
 void JniContext::Release(jobject obj) {
+  LOG_DEBUG_MSG("Release is called");
+
   if (obj) {
     JavaVM* jvm = JVM.GetJvm();
 
@@ -1992,9 +2516,12 @@ void JniContext::Release(jobject obj) {
       }
     }
   }
+  LOG_DEBUG_MSG("Release exiting");
 }
 
 void JniContext::SetConsoleHandler(ConsoleWriteHandler consoleHandler) {
+  LOG_DEBUG_MSG("SetConsoleHandler is called");
+
   if (!consoleHandler)
     throw std::invalid_argument("consoleHandler can not be null");
 
@@ -2003,9 +2530,13 @@ void JniContext::SetConsoleHandler(ConsoleWriteHandler consoleHandler) {
   consoleWriteHandlers.push_back(consoleHandler);
 
   CONSOLE_LOCK.Leave();
+
+  LOG_DEBUG_MSG("SetConsoleHandler exiting");
 }
 
 int JniContext::RemoveConsoleHandler(ConsoleWriteHandler consoleHandler) {
+  LOG_DEBUG_MSG("RemoveConsoleHandler is called");
+
   if (!consoleHandler)
     throw std::invalid_argument("consoleHandler can not be null");
 
@@ -2021,23 +2552,35 @@ int JniContext::RemoveConsoleHandler(ConsoleWriteHandler consoleHandler) {
 
   CONSOLE_LOCK.Leave();
 
+  LOG_DEBUG_MSG("RemoveConsoleHandler exiting");
+
   return removedCnt;
 }
 
 void JniContext::ThrowToJava(char* msg) {
+  LOG_DEBUG_MSG("ThrowToJava is called");
+
   JNIEnv* env = Attach();
 
   env->ThrowNew(jvm->GetMembers().c_IgniteException, msg);
+
+  LOG_DEBUG_MSG("ThrowToJava exiting");
 }
 
 void JniContext::DestroyJvm() {
+  LOG_DEBUG_MSG("DestroyJvm is called");
+
   jvm->GetJvm()->DestroyJavaVM();
+
+  LOG_DEBUG_MSG("DestroyJvm exiting");
 }
 
 /**
  * Attach thread to JVM.
  */
 JNIEnv* JniContext::Attach() {
+  LOG_DEBUG_MSG("Attach is called");
+
   JNIEnv* env;
 
   jint attachRes = jvm->GetJvm()->AttachCurrentThread(
@@ -2047,18 +2590,25 @@ JNIEnv* JniContext::Attach() {
     AttachHelper::OnThreadAttach();
   else {
     if (hnds.error)
-      hnds.error(hnds.target, JniErrorCode::IGNITE_JNI_ERR_JVM_ATTACH, nullptr, 0,
-                 nullptr, 0, nullptr, 0, nullptr, 0);
+      hnds.error(hnds.target, JniErrorCode::IGNITE_JNI_ERR_JVM_ATTACH, nullptr,
+                 0, nullptr, 0, nullptr, 0, nullptr, 0);
   }
+  LOG_DEBUG_MSG("Attach exiting");
 
   return env;
 }
 
 void JniContext::ExceptionCheck(JNIEnv* env) {
+  LOG_DEBUG_MSG("ExceptionCheck(JNIEnv* env) is called");
+
   ExceptionCheck(env, nullptr);
+
+  LOG_DEBUG_MSG("ExceptionCheck(JNIEnv* env) exiting");
 }
 
 void JniContext::ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) {
+  LOG_DEBUG_MSG("ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) is called");
+
   if (env->ExceptionCheck()) {
     jthrowable err = env->ExceptionOccurred();
 
@@ -2133,12 +2683,15 @@ void JniContext::ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) {
     JniErrorInfo errInfo0(JniErrorCode::IGNITE_JNI_ERR_SUCCESS, "", "");
     *errInfo = errInfo0;
   }
+  LOG_DEBUG_MSG("ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) exiting");
 }
 
 /**
  * Convert local reference to global.
  */
 jobject JniContext::LocalToGlobal(JNIEnv* env, jobject localRef) {
+  LOG_DEBUG_MSG("LocalToGlobal is called");
+
   if (localRef) {
     jobject globalRef = env->NewGlobalRef(localRef);
 
@@ -2147,13 +2700,21 @@ jobject JniContext::LocalToGlobal(JNIEnv* env, jobject localRef) {
     if (!globalRef)
       ExceptionCheck(env);
 
+    LOG_DEBUG_MSG("LocalToGlobal exiting with globalRef variable");
+
     return globalRef;
-  } else
+  } else {
+    LOG_DEBUG_MSG(
+        "LocalToGlobal exiting with nullptr because localRef variable is null");
+
     return nullptr;
+  }
 }
 
 JNIEXPORT void JNICALL JniConsoleWrite(JNIEnv* env, jclass, jstring str,
                                        jboolean isErr) {
+  LOG_DEBUG_MSG("JniConsoleWrite is called");
+
   CONSOLE_LOCK.Enter();
 
   if (consoleWriteHandlers.size() > 0) {
@@ -2168,12 +2729,16 @@ JNIEXPORT void JNICALL JniConsoleWrite(JNIEnv* env, jclass, jstring str,
   }
 
   CONSOLE_LOCK.Leave();
+
+  LOG_DEBUG_MSG("JniConsoleWrite exiting");
 }
 
 JNIEXPORT void JNICALL JniLoggerLog(JNIEnv* env, jclass, jlong envPtr,
                                     jint level, jstring message,
                                     jstring category, jstring errorInfo,
                                     jlong memPtr) {
+  LOG_DEBUG_MSG("JniLoggerLog is called");
+
   int messageLen;
   char* messageChars = StringToChars(env, message, &messageLen);
 
@@ -2195,17 +2760,27 @@ JNIEXPORT void JNICALL JniLoggerLog(JNIEnv* env, jclass, jlong envPtr,
 
   if (errorInfoChars)
     delete[] errorInfoChars;
+
+  LOG_DEBUG_MSG("JniLoggerLog exiting");
 }
 
 JNIEXPORT jboolean JNICALL JniLoggerIsLevelEnabled(JNIEnv* env, jclass,
                                                    jlong envPtr, jint level) {
+  LOG_DEBUG_MSG("JniLoggerIsLevelEnabled is called");
+
   IGNITE_SAFE_FUNC(env, envPtr, LoggerIsLevelEnabledHandler,
                    loggerIsLevelEnabled, level);
+
+  LOG_DEBUG_MSG("JniLoggerIsLevelEnabled exiting");
 }
 
 JNIEXPORT jlong JNICALL JniInLongOutLong(JNIEnv* env, jclass, jlong envPtr,
                                          jint type, jlong val) {
+  LOG_DEBUG_MSG("JniInLongOutLong is called");
+
   IGNITE_SAFE_FUNC(env, envPtr, InLongOutLongHandler, inLongOutLong, type, val);
+
+  LOG_DEBUG_MSG("JniInLongOutLong exiting");
 }
 
 JNIEXPORT jlong JNICALL JniInLongLongLongObjectOutLong(JNIEnv* env, jclass,
@@ -2213,8 +2788,12 @@ JNIEXPORT jlong JNICALL JniInLongLongLongObjectOutLong(JNIEnv* env, jclass,
                                                        jlong val1, jlong val2,
                                                        jlong val3,
                                                        jobject arg) {
+  LOG_DEBUG_MSG("JniInLongLongLongObjectOutLong is called");
+
   IGNITE_SAFE_FUNC(env, envPtr, InLongLongLongObjectOutLongHandler,
                    inLongLongLongObjectOutLong, type, val1, val2, val3, arg);
+
+  LOG_DEBUG_MSG("JniInLongLongLongObjectOutLong exiting");
 }
 }  //  namespace java
 }  //  namespace jni
