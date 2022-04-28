@@ -57,6 +57,10 @@ jobs:
         name: cppcheck-results
         path: cppcheck-results.log
     
+    - name: generate-compile-commands-file
+      run: |
+        cmake "${{github.workspace}}/src" -DCMAKE_EXPORT_COMPILE_COMMANDS=on -DCMAKE_BUILD_TYPE="Debug" -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_CORE="OFF" -DWITH_ODBC="ON"
+    
     - name: clang-tidy-check
       uses: ZedThree/clang-tidy-review@v0.8.3
       id: review
