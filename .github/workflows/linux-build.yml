@@ -145,6 +145,13 @@ jobs:
         check_name: "Ubuntu 20.04 Build Unit Test Results Check"
         comment_title: "Ubuntu 20.04 Build Unit Test Results"
         files: ./odbc_test_result.xml
+
+    - name: clang-tidy-check
+      uses: ZedThree/clang-tidy-review@v0.8.3
+      id: review
+      # If there are any comments, fail the check
+    - if: steps.review.outputs.total_comments > 0
+      run: exit 1
   
   build-linux-docker-image:
     runs-on: ubuntu-20.04
