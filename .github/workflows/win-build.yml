@@ -12,12 +12,12 @@ on:
 
 env:
   CI_OUTPUT_PATH: "ci-output"
-  ODBC_LIB_PATH: "./build/odbc/lib"
-  ODBC_BIN_PATH: "./build/odbc/bin/Release"
-  ODBC_DEBUG_PATH: "./build/odbc/bin/Debug"
-  ODBC_BUILD_PATH: "./build/odbc/cmake"
+  ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"
+  ODBC_BIN_PATH: "${{github.workspace}}/build/odbc/bin/Release"
+  ODBC_DEBUG_PATH: "${{github.workspace}}/build/odbc/bin/Debug"
+  ODBC_BUILD_PATH: "${{github.workspace}}/build/odbc/cmake"
   VCPKG_ROOT: "c:/vcpkg"
-  DOCUMENTDB_HOME: "./build/odbc/bin/Release"
+  DOCUMENTDB_HOME: "${{github.workspace}}/build/odbc/bin/Release"
   DOC_DB_KEYPAIR: ${{secrets.DOC_DB_KEYPAIR}}
   DOC_DB_USER_NAME: ${{secrets.DOC_DB_USER_NAME}}
   DOC_DB_PASSWORD: ${{secrets.DOC_DB_PASSWORD}}
@@ -27,6 +27,8 @@ env:
   DOC_DB_LOCAL_PORT: 27019
   DOC_DB_REMOTE_PORT: 27017
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
+  DOC_DB_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
+  DOC_DB_LOG_LEVEL: "debug"
   JDBC_DRIVER_VERSION: "1.2.1"
   MONGO_IMPORT_COMMAND: "C:/ProgramData/chocolatey/lib/mongodb-database-tools/tools/mongodb-database-tools-windows-x86_64-100.5.2binmongoimport.exe"
 
@@ -132,6 +134,7 @@ jobs:
 
     - name: run-tests
       run: |
+        mkdir -p "${{env.DOC_DB_LOG_PATH}}"
         Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
         ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
 
@@ -388,7 +391,7 @@ jobs:
 
     - name: run-tests
       env:
-        DOCUMENTDB_HOME: "./build/odbc/bin/Debug"
+        DOCUMENTDB_HOME: "${{github.workspace}}/build/odbc/bin/Debug"
       run: |
         Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
         opencppcoverage --sources src --export_type html:coverage --excluded_modules boost_unit_test_framework --excluded_modules ignite-odbc-tests --excluded_modules mongoc --excluded_modules mongocxx --excluded_modules bson --excluded_modules bsoncxx --excluded_modules zlib -- ${{env.ODBC_DEBUG_PATH}}/ignite-odbc-tests.exe

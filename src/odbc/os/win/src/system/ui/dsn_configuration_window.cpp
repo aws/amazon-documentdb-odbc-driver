@@ -22,6 +22,7 @@
 
 #include "ignite/odbc/config/config_tools.h"
 #include "ignite/odbc/log.h"
+#include "ignite/odbc/log_level.h"
 #include "ignite/odbc/read_preference.h"
 #include "ignite/odbc/scan_method.h"
 
@@ -33,8 +34,8 @@ DsnConfigurationWindow::DsnConfigurationWindow(Window* parent,
                                                config::Configuration& config)
     : CustomWindow(parent, "IgniteConfigureDsn",
                    "Configure Amazon DocumentDB DSN"),
-      width(730),
-      height(515),
+      width(780),
+      height(625),
       connectionSettingsGroupBox(),
       tlsSettingsGroupBox(),
       tlsCheckBox(),
@@ -60,6 +61,10 @@ DsnConfigurationWindow::DsnConfigurationWindow(Window* parent,
       sshStrictHostKeyCheckingCheckBox(),
       sshKnownHostsFileLabel(),
       sshKnownHostsFileEdit(),
+      logLevelLabel(),
+      logLevelComboBox(),
+      logPathLabel(),
+      logPathEdit(),
       appNameLabel(),
       appNameEdit(),
       readPreferenceLabel(),
@@ -133,9 +138,13 @@ void DsnConfigurationWindow::OnCreate() {
       INTERVAL + CreateTlsSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
   groupPosYLeft +=
       INTERVAL + CreateSchemaSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
+  groupPosYLeft +=
+      INTERVAL + CreateSshSettingsGroup(MARGIN, groupPosYLeft, groupSizeY);
   // create right column group settings
   groupPosYRight +=
       INTERVAL + CreateSshSettingsGroup(posXRight, groupPosYRight, groupSizeY);
+  groupPosYRight +=
+      INTERVAL + CreateLogSettingsGroup(posXRight, groupPosYRight, groupSizeY);
   groupPosYRight +=
       INTERVAL
       + CreateAdditionalSettingsGroup(posXRight, groupPosYRight, groupSizeY);
@@ -311,6 +320,63 @@ int DsnConfigurationWindow::CreateSshSettingsGroup(int posX, int posY,
   sshKnownHostsFileEdit->SetEnabled(
       sshEnableCheckBox->IsChecked()
       && sshStrictHostKeyCheckingCheckBox->IsChecked());
+
+  return rowPos - posY;
+}
+
+int DsnConfigurationWindow::CreateLogSettingsGroup(int posX, int posY,
+                                                   int sizeX) {
+  enum { LABEL_WIDTH = 120 };
+
+  int labelPosX = posX + INTERVAL;
+  int pathSizeX = sizeX - 2 * INTERVAL;
+  int comboSizeX = sizeX - LABEL_WIDTH - 3 * INTERVAL;
+  int editPosX = labelPosX;
+
+  int rowPos = posY + 2 * INTERVAL;
+
+  LogLevel::Type logLevel = config.GetLogLevel();
+
+  logLevelLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                              "Log Level:", ChildId::LOG_LEVEL_LABEL);
+  logLevelComboBox = CreateComboBox(editPosX, rowPos, comboSizeX, ROW_HEIGHT,
+                                    "",
+                                    ChildId::LOG_LEVEL_COMBO_BOX);
+
+  logLevelComboBox->AddString("Debug");
+  logLevelComboBox->AddString("Info");
+  logLevelComboBox->AddString("Error");
+  logLevelComboBox->AddString("Off");
+
+  logLevelComboBox->SetSelection(static_cast< int >(logLevel));  // set default
+
+  rowPos += INTERVAL + ROW_HEIGHT;
+
+  const char* val = config.GetLogPath().c_str();
+  logPathLabel = CreateLabel(
+      labelPosX, rowPos, pathSizeX, ROW_HEIGHT * 2,
+      "Log Path:\n(the log file name format is docdb_odbc_YYYYMMDD.log)",
+      ChildId::LOG_PATH_LABEL);
+
+  rowPos += INTERVAL * 2 + ROW_HEIGHT;
+
+  logPathEdit = CreateEdit(editPosX, rowPos, pathSizeX, ROW_HEIGHT, val,
+                           ChildId::LOG_PATH_EDIT);
+
+  rowPos += INTERVAL + ROW_HEIGHT;
+
+  logSettingsGroupBox =
+      CreateGroupBox(posX, posY, sizeX, rowPos - posY, "Log Settings",
+                     ChildId::LOG_SETTINGS_GROUP_BOX);
+
+  std::string logLevelStr;
+  logLevelComboBox->GetText(logLevelStr);
+  if (LogLevel::FromString(logLevelStr, LogLevel::Type::UNKNOWN)
+      == LogLevel::Type::OFF) {
+    logPathEdit->SetEnabled(false);
+  } else {
+    logPathEdit->SetEnabled(true);
+  }
 
   return rowPos - posY;
 }
@@ -599,6 +665,18 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
           break;
         }
 
+        case ChildId::LOG_LEVEL_COMBO_BOX: {
+          std::string logLevelStr;
+          logLevelComboBox->GetText(logLevelStr);
+          if (LogLevel::FromString(logLevelStr, LogLevel::Type::UNKNOWN)
+              == LogLevel::Type::OFF) {
+            logPathEdit->SetEnabled(false);
+          } else {
+            logPathEdit->SetEnabled(true);
+          }
+          break;
+        }
+
         case ChildId::SCAN_METHOD_COMBO_BOX: {
           std::string scanMethodStr;
           scanMethodComboBox->GetText(scanMethodStr);
@@ -645,6 +723,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
 
 void DsnConfigurationWindow::RetrieveParameters(
     config::Configuration& cfg) const {
+  RetrieveLogParameters(cfg);
   RetrieveConnectionParameters(cfg);
   RetrieveSshParameters(cfg);
   RetrieveTlsParameters(cfg);
@@ -726,6 +805,28 @@ void DsnConfigurationWindow::RetrieveSshParameters(
   cfg.SetSshPrivateKeyPassphrase(sshPrivateKeyPassphraseStr);
   cfg.SetSshStrictHostKeyChecking(sshStrictHostKeyChecking);
   cfg.SetSshKnownHostsFile(sshKnownHostsFileStr);
+}
+
+// RetrieveLogParameters is a special case. We want to get the log level and
+// path as soon as possible. If user set log level to OFF, then nothing should
+// be logged. Therefore, the LOG_MSG calls are after log level and log path are
+// set.
+void DsnConfigurationWindow::RetrieveLogParameters(
+    config::Configuration& cfg) const {
+  std::string logLevelStr;
+  std::string logPathStr;
+
+  logLevelComboBox->GetText(logLevelStr);
+  logPathEdit->GetText(logPathStr);
+
+  LogLevel::Type logLevel =
+      LogLevel::FromString(logLevelStr, LogLevel::Type::UNKNOWN);
+
+  cfg.SetLogLevel(logLevel);
+  cfg.SetLogPath(logPathStr);
+
+  LOG_MSG("Log level:    " << logLevelStr);
+  LOG_MSG("Log path:     " << logPathStr);
 }
 
 void DsnConfigurationWindow::RetrieveTlsParameters(

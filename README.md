@@ -23,6 +23,20 @@ SSH host credentials
 1. `DOC_DB_USER`=`<ssh_user>`(e.g.:`ec2-user@ec2-instance.us-east-2.compute.amazonaws.com`)
 2. `DOC_DB_PRIV_KEY_FILE`=`<path_to_ssh_host_private_key_file>`(e.g.:`~/.ssh/ssh_host.pem`)
 
+[`Optional`] Log configurations
+
+Set these 2 variables only if you would like to set a custom log path or log level for connection tests; it is completely optional.
+1. `DOC_DB_LOG_PATH`=`<path_to_log_file>`(e.g.:`"C:\\Users\\BitQuillUser\\Desktop\\DocumentDB ODBC Driver"`)
+
+   The user needs to ensure that the directory mentioned in the log file path does exist, or driver will ignore user's passed value and create the log file in the default log path. Do **not** include a slash at the end of the log path.
+
+   The log path indicates the path to store the log file. The log file name has `docdb_odbc_YYYYMMDD.log` format, 
+   where `YYYYMMDD` (e.g., 20220225 <= Feb 25th, 2022) is the date at the first log message.
+
+2. `DOC_DB_LOG_LEVEL`=`<log_level>`. The default is `error` level. (Choose from `debug`, `info`, `error`, `off`)
+
+   More details about logging in [`src\markdown\troubleshooting-guide.md`](src/markdown/troubleshooting-guide.md).
+
 #### Running an SSH tunnel for Testing
 By default, remote integration tests are not run. To enable remote integration tests, 
 set the environment variable `DOC_DB_ODBC_INTEGRATION_TEST=1`
@@ -44,7 +58,7 @@ Example:
    E.g. `docker run --name mongo -e MONGO_INITDB_ROOT_USERNAME=$DOC_DB_USER_NAME -e MONGO_INITDB_ROOT_PASSWORD=$DOC_DB_PASSWORD -d -p 27017:27017 mongo:latest`
 2. Install the test data
    1. `cd src/odbc-test/scripts`
-   2. `.\import_test_data.ps1` (Windows) or `./import_test_data.sh` (MacOS or Linux)
+   2. `.\import_test_data.ps1` (Windows) or `./import_test_data.sh` (MacOS or Linux).
    If receiving permission errors on MacOS while importing the test data, 
    use `chmod +x ./reinstall_mongodb_mac.sh` and try again.
 
@@ -55,8 +69,11 @@ Example:
    2. Visual Studio core editor
    3. C++ ATL for latest v142 build tools (x86 & x64)
    4. C++ MFC for latest v142 build tools (x86 & x64)
-   5. WiX Toolset v3 Schemas for Visual Studio
-   6. WiX Toolset Visual Studio 2019 Extension
+   5. [WiX Toolset v3 Schemas for Visual Studio](https://wixtoolset.org/releases/)
+      If encountering "wix toolset requires .net 3.5.1 to be enabled", follow the steps below.
+      1. Open Settings -> Apps -> Optional Features -> Under "Related Settings", click on "More Windows features", and select ".Net Framework 3.5".
+      ![Alt text](src/markdown/dotNet_screenshot.PNG "Example")
+   6. [WiX Toolset Visual Studio 2019 Extension](https://marketplace.visualstudio.com/items?itemName=WixToolset.WiXToolset)
 2. OpenSSL (full)
    1. Installed via [VCPKG](https://vcpkg.io/en/getting-started.html) (`.\vcpkg install openssl`).
    2. Or installed via [Chocolatey](https://community.chocolatey.org/packages/openssl). 
@@ -69,16 +86,17 @@ Example:
    Example: C:\Program Files\Java\jdk1.8.0_321\jre\bin\server
 5. Boost Test Framework and Mondodb Driver
    1. Install via [VCPKG](https://vcpkg.io/en/getting-started.html) using `.\vcpkg install openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows mongo-cxx-driver:x64-windows`
-6. Run one of the build scripts to create an initial compilation.
+6. On the Developer PowerShell, run one of the build scripts to create an initial compilation.
    1. E.g.: `.\build_win_debug64.ps1`
    2. Navigate to the `build\odbc\cmake` folder to use the generated solution file, `Ignite.C++.sln` to work on
    source code development and testing.
 7. Set the environment variable `DOCUMENTDB_HOME`. On a developer's machine, set it to `<repo-folder>\build\odbc\bin\Debug`. The 
    build script run above, downloads it to the `<repo-folder>\build\odbc\bin\Debug\libs` folder.
-8. Open a **64-bit** command shell or **64-bit** PowerShell window, **as Administrator**, run the 
+8. Open a **64-bit** command shell or **64-bit** PowerShell window, **as Administrator**, run the command below
    ```
-   <repo-folder>\src\odbc\src\install\install_amd64.cmd <repo-folder>\buildbuild\odbc\cmake\Debug\ignite.odbc.dll
+   .\<repo-folder>\src\odbc\install\install_amd64.cmd <repo-folder>\build\odbc\cmake\Debug\ignite.odbc.dll
    ``` 
+   Ensure that backslashes are used in your command. 
 9. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
 ### MacOS
@@ -89,7 +107,7 @@ Example:
    3. `brew install unixodbc`  
       - You may need to unlink `libiodbc` if you already have this installed. Use `brew unlink libiodbc`.
    4. `brew install boost`
-   5. `brew install mongodb-community`
+   5. Install MongoDB using [`MongoDB's Installation Guide for MongoDB Community Edition on macOS`](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-os-x/).
    6. `brew install mongo-cxx-driver`
    7. Install Java **JDK** (version 8+ - 17 recommended)  
       - This can be done through Homebrew using `brew install --cask temurin<version>`. 
@@ -108,7 +126,8 @@ Example:
 3. Set the environment variable `DOCUMENTDB_HOME`. On a developer's machine, set it to `<repo-folder>/build/odbc/bin`
 4. Run the following command to register the ODBC driver. 
    `./scripts/register_driver_unix.sh`
-5. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
+5. Now you're ready to run the tests (e.g., `./build/odbc/bin/ignite-odbc-tests  --catch_system_errors=false`).
+6. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
 ### Linux
 
@@ -140,7 +159,7 @@ Example:
    4. set LOCAL_DATABASE_HOST with the ip of your local mongo
       E.g. If is in another docker container `export LOCAL_DATABASE_HOST=<ip from the mongo docker container>` or if is your host machine `export LOCAL_DATABASE_HOST=host.docker.internal`
    5. You are ready to run the tests.
-   E.g. `cd /documentdb-odbc/build/odbc/bin/ && ./ignite-odbc-tests`
+   E.g. `cd /documentdb-odbc/build/odbc/bin/ && ./ignite-odbc-tests  --catch_system_errors=false`
 3. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
 ##### Known issues
@@ -212,7 +231,7 @@ There are two ways to fix the issue.
    8. set LOCAL_DATABASE_HOST with the ip of your local mongo
       E.g. If is in another docker container `export LOCAL_DATABASE_HOST=<ip from the mongo docker container>` or if is your host machine `export LOCAL_DATABASE_HOST=host.docker.internal`.
    9. You are ready to run the tests.
-      E.g. `/documentdb-odbc/build/odbc/bin/ignite-odbc-tests`.
+      E.g. `/documentdb-odbc/build/odbc/bin/ignite-odbc-tests --catch_system_errors=false`.
 
 
 ### Troubleshooting 
