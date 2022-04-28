@@ -60,7 +60,7 @@ jobs:
       id: review
       with:         
       # CMake command to run in order to generate compile_commands.json
-        cmake_command: cmake "${{github.workspace}}/src" -DCMAKE_EXPORT_COMPILE_COMMANDS=on -DCMAKE_BUILD_TYPE="Debug" -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_CORE="OFF" -DWITH_ODBC="ON"
+        cmake_command: cmake "./src" -DCMAKE_EXPORT_COMPILE_COMMANDS=on -DCMAKE_BUILD_TYPE="Debug" -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_CORE="OFF" -DWITH_ODBC="ON"
       # If there are any comments, fail the check
     - if: steps.review.outputs.total_comments > 0
       run: exit 1
