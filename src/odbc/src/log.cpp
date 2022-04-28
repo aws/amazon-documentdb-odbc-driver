@@ -74,7 +74,7 @@ std::string Logger::GetDefaultLogPath() {
 #endif
 
   if (defPath.empty()) {
-    // couldn't find home directory, fall back to current working directory
+    // couldn't find home directory, fall back to current working directory instead
     std::cout << "warning: couldn't find home directory, the default log path "
                  "is set as the current working directory"
               << '\n';
