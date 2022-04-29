@@ -99,6 +99,12 @@ class ConnectionStringParser {
     /** Connection attribute keyword for sshKnownHostsFile attribute. */
     static const std::string sshKnownHostsFile;
 
+    /** Connection attribute keyword for log level. */
+    static const std::string logLevel;
+
+    /** Connection attribute keyword for log path. */
+    static const std::string logPath;
+
     /** Connection attribute keyword for scanMethod attribute. */
     static const std::string scanMethod;
 

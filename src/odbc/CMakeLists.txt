@@ -113,6 +113,7 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/type_traits.cpp
         src/utility.cpp
         src/log.cpp
+        src/log_level.cpp
         src/read_preference.cpp
         src/scan_method.cpp
         src/date.cpp

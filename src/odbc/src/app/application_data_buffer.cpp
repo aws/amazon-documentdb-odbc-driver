@@ -36,14 +36,14 @@ ignite::odbc::app::ConversionResult::Type StringToWstring(const char* str,
   using namespace ignite::odbc;
 
   if (wstrLen <= 0)
-    return app::ConversionResult::AI_VARLEN_DATA_TRUNCATED;
+    return app::ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
 
   int64_t toCopy = std::min(strLen, wstrLen - 1);
 
   if (toCopy <= 0) {
     wstr[0] = 0;
 
-    return app::ConversionResult::AI_VARLEN_DATA_TRUNCATED;
+    return app::ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
   }
 
   for (int64_t i = 0; i < toCopy; ++i)
@@ -52,9 +52,9 @@ ignite::odbc::app::ConversionResult::Type StringToWstring(const char* str,
   wstr[toCopy] = 0;
 
   if (toCopy < strLen)
-    return app::ConversionResult::AI_VARLEN_DATA_TRUNCATED;
+    return app::ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
 
-  return app::ConversionResult::AI_SUCCESS;
+  return app::ConversionResult::Type::AI_SUCCESS;
 }
 }  // namespace
 
@@ -190,7 +190,7 @@ ConversionResult::Type ApplicationDataBuffer::PutNum(T value) {
       if (resLenPtr)
         *resLenPtr = static_cast< SqlLen >(sizeof(SQL_NUMERIC_STRUCT));
 
-      return ConversionResult::AI_SUCCESS;
+      return ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_BINARY:
@@ -203,8 +203,8 @@ ConversionResult::Type ApplicationDataBuffer::PutNum(T value) {
         *resLenPtr = sizeof(value);
 
       return static_cast< size_t >(buflen) < sizeof(value)
-                 ? ConversionResult::AI_VARLEN_DATA_TRUNCATED
-                 : ConversionResult::AI_SUCCESS;
+                 ? ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED
+                 : ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_TDATE: {
@@ -223,7 +223,7 @@ ConversionResult::Type ApplicationDataBuffer::PutNum(T value) {
       break;
   }
 
-  return ConversionResult::AI_UNSUPPORTED_CONVERSION;
+  return ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
 }
 
 template < typename Tbuf, typename Tin >
@@ -239,7 +239,7 @@ ConversionResult::Type ApplicationDataBuffer::PutNumToNumBuffer(Tin value) {
   if (resLenPtr)
     *resLenPtr = static_cast< SqlLen >(sizeof(Tbuf));
 
-  return ConversionResult::AI_SUCCESS;
+  return ConversionResult::Type::AI_SUCCESS;
 }
 
 template < typename CharT, typename Tin >
@@ -284,10 +284,10 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
     *resLenPtr = static_cast< SqlLen >(value.size());
 
   if (!dataPtr)
-    return ConversionResult::AI_SUCCESS;
+    return ConversionResult::Type::AI_SUCCESS;
 
   if (buflen < charSize)
-    return ConversionResult::AI_VARLEN_DATA_TRUNCATED;
+    return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
 
   OutCharT* out = reinterpret_cast< OutCharT* >(dataPtr);
 
@@ -303,9 +303,9 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
   written = static_cast< int32_t >(toCopy);
 
   if (toCopy < static_cast< SqlLen >(value.size()))
-    return ConversionResult::AI_VARLEN_DATA_TRUNCATED;
+    return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
 
-  return ConversionResult::AI_SUCCESS;
+  return ConversionResult::Type::AI_SUCCESS;
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutRawDataToBuffer(
@@ -325,8 +325,8 @@ ConversionResult::Type ApplicationDataBuffer::PutRawDataToBuffer(
 
   written = static_cast< int32_t >(toCopy);
 
-  return toCopy < iLen ? ConversionResult::AI_VARLEN_DATA_TRUNCATED
-                       : ConversionResult::AI_SUCCESS;
+  return toCopy < iLen ? ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED
+                       : ConversionResult::Type::AI_SUCCESS;
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutInt8(boost::optional< int8_t > value) {
@@ -474,7 +474,7 @@ ConversionResult::Type ApplicationDataBuffer::PutString(
       break;
   }
 
-  return ConversionResult::AI_UNSUPPORTED_CONVERSION;
+  return ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutGuid(const Guid& value) {
@@ -511,14 +511,14 @@ ConversionResult::Type ApplicationDataBuffer::PutGuid(const Guid& value) {
       if (resLenPtr)
         *resLenPtr = static_cast< SqlLen >(sizeof(SQLGUID));
 
-      return ConversionResult::AI_SUCCESS;
+      return ConversionResult::Type::AI_SUCCESS;
     }
 
     default:
       break;
   }
 
-  return ConversionResult::AI_UNSUPPORTED_CONVERSION;
+  return ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutBinaryData(const void* data,
@@ -562,18 +562,18 @@ ConversionResult::Type ApplicationDataBuffer::PutBinaryData(const void* data,
       break;
   }
 
-  return ConversionResult::AI_UNSUPPORTED_CONVERSION;
+  return ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutNull() {
   SqlLen* resLenPtr = GetResLen();
 
   if (!resLenPtr)
-    return ConversionResult::AI_INDICATOR_NEEDED;
+    return ConversionResult::Type::AI_INDICATOR_NEEDED;
 
   *resLenPtr = SQL_NULL_DATA;
 
-  return ConversionResult::AI_SUCCESS;
+  return ConversionResult::Type::AI_SUCCESS;
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutDecimal(
@@ -602,14 +602,14 @@ ConversionResult::Type ApplicationDataBuffer::PutDecimal(
     case OdbcNativeType::AI_UNSIGNED_BIGINT: {
       PutNum< int64_t >(value.ToInt64());
 
-      return ConversionResult::AI_FRACTIONAL_TRUNCATED;
+      return ConversionResult::Type::AI_FRACTIONAL_TRUNCATED;
     }
 
     case OdbcNativeType::AI_FLOAT:
     case OdbcNativeType::AI_DOUBLE: {
       PutNum< double >(value.ToDouble());
 
-      return ConversionResult::AI_FRACTIONAL_TRUNCATED;
+      return ConversionResult::Type::AI_FRACTIONAL_TRUNCATED;
     }
 
     case OdbcNativeType::AI_CHAR:
@@ -652,9 +652,9 @@ ConversionResult::Type ApplicationDataBuffer::PutDecimal(
         *resLenPtr = static_cast< SqlLen >(sizeof(SQL_NUMERIC_STRUCT));
 
       if (bytesBuffer.GetSize() > SQL_MAX_NUMERIC_LEN)
-        return ConversionResult::AI_FRACTIONAL_TRUNCATED;
+        return ConversionResult::Type::AI_FRACTIONAL_TRUNCATED;
 
-      return ConversionResult::AI_SUCCESS;
+      return ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_DEFAULT:
@@ -663,7 +663,7 @@ ConversionResult::Type ApplicationDataBuffer::PutDecimal(
       break;
   }
 
-  return ConversionResult::AI_UNSUPPORTED_CONVERSION;
+  return ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutDate(
@@ -696,9 +696,9 @@ ConversionResult::Type ApplicationDataBuffer::PutDate(const Date& value) {
         strftime(buffer, GetSize(), "%Y-%m-%d", &tmTime);
 
       if (static_cast< SqlLen >(valLen) + 1 > GetSize())
-        return ConversionResult::AI_VARLEN_DATA_TRUNCATED;
+        return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
 
-      return ConversionResult::AI_SUCCESS;
+      return ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_WCHAR: {
@@ -717,9 +717,9 @@ ConversionResult::Type ApplicationDataBuffer::PutDate(const Date& value) {
       }
 
       if (static_cast< SqlLen >(valLen) + 1 > GetSize())
-        return ConversionResult::AI_VARLEN_DATA_TRUNCATED;
+        return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
 
-      return ConversionResult::AI_SUCCESS;
+      return ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_TDATE: {
@@ -732,7 +732,7 @@ ConversionResult::Type ApplicationDataBuffer::PutDate(const Date& value) {
       if (resLenPtr)
         *resLenPtr = static_cast< SqlLen >(sizeof(SQL_DATE_STRUCT));
 
-      return ConversionResult::AI_SUCCESS;
+      return ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_TTIME: {
@@ -745,7 +745,7 @@ ConversionResult::Type ApplicationDataBuffer::PutDate(const Date& value) {
       if (resLenPtr)
         *resLenPtr = static_cast< SqlLen >(sizeof(SQL_TIME_STRUCT));
 
-      return ConversionResult::AI_SUCCESS;
+      return ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_TTIMESTAMP: {
@@ -763,7 +763,7 @@ ConversionResult::Type ApplicationDataBuffer::PutDate(const Date& value) {
       if (resLenPtr)
         *resLenPtr = static_cast< SqlLen >(sizeof(SQL_TIMESTAMP_STRUCT));
 
-      return ConversionResult::AI_SUCCESS;
+      return ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_BINARY:
@@ -784,7 +784,7 @@ ConversionResult::Type ApplicationDataBuffer::PutDate(const Date& value) {
       break;
   }
 
-  return ConversionResult::AI_UNSUPPORTED_CONVERSION;
+  return ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
@@ -819,9 +819,9 @@ ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
         strftime(buffer, GetSize(), "%Y-%m-%d %H:%M:%S", &tmTime);
 
       if (static_cast< SqlLen >(valLen) + 1 > GetSize())
-        return ConversionResult::AI_VARLEN_DATA_TRUNCATED;
+        return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
 
-      return ConversionResult::AI_SUCCESS;
+      return ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_WCHAR: {
@@ -841,9 +841,9 @@ ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
       }
 
       if (static_cast< SqlLen >(valLen) + 1 > GetSize())
-        return ConversionResult::AI_VARLEN_DATA_TRUNCATED;
+        return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
 
-      return ConversionResult::AI_SUCCESS;
+      return ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_TDATE: {
@@ -856,7 +856,7 @@ ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
       if (resLenPtr)
         *resLenPtr = static_cast< SqlLen >(sizeof(SQL_DATE_STRUCT));
 
-      return ConversionResult::AI_FRACTIONAL_TRUNCATED;
+      return ConversionResult::Type::AI_FRACTIONAL_TRUNCATED;
     }
 
     case OdbcNativeType::AI_TTIME: {
@@ -869,7 +869,7 @@ ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
       if (resLenPtr)
         *resLenPtr = static_cast< SqlLen >(sizeof(SQL_TIME_STRUCT));
 
-      return ConversionResult::AI_FRACTIONAL_TRUNCATED;
+      return ConversionResult::Type::AI_FRACTIONAL_TRUNCATED;
     }
 
     case OdbcNativeType::AI_TTIMESTAMP: {
@@ -887,7 +887,7 @@ ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
       if (resLenPtr)
         *resLenPtr = static_cast< SqlLen >(sizeof(SQL_TIMESTAMP_STRUCT));
 
-      return ConversionResult::AI_SUCCESS;
+      return ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_BINARY:
@@ -908,7 +908,7 @@ ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
       break;
   }
 
-  return ConversionResult::AI_UNSUPPORTED_CONVERSION;
+  return ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutTime(const boost::optional< Time >& value) {
@@ -941,9 +941,9 @@ ConversionResult::Type ApplicationDataBuffer::PutTime(const Time& value) {
         strftime(buffer, GetSize(), "%H:%M:%S", &tmTime);
 
       if (static_cast< SqlLen >(valLen) + 1 > GetSize())
-        return ConversionResult::AI_VARLEN_DATA_TRUNCATED;
+        return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
 
-      return ConversionResult::AI_SUCCESS;
+      return ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_WCHAR: {
@@ -963,9 +963,9 @@ ConversionResult::Type ApplicationDataBuffer::PutTime(const Time& value) {
       }
 
       if (static_cast< SqlLen >(valLen) + 1 > GetSize())
-        return ConversionResult::AI_VARLEN_DATA_TRUNCATED;
+        return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
 
-      return ConversionResult::AI_SUCCESS;
+      return ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_TTIME: {
@@ -978,7 +978,7 @@ ConversionResult::Type ApplicationDataBuffer::PutTime(const Time& value) {
       if (resLenPtr)
         *resLenPtr = static_cast< SqlLen >(sizeof(SQL_TIME_STRUCT));
 
-      return ConversionResult::AI_SUCCESS;
+      return ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_TTIMESTAMP: {
@@ -996,7 +996,7 @@ ConversionResult::Type ApplicationDataBuffer::PutTime(const Time& value) {
       if (resLenPtr)
         *resLenPtr = static_cast< SqlLen >(sizeof(SQL_TIMESTAMP_STRUCT));
 
-      return ConversionResult::AI_SUCCESS;
+      return ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_BINARY:
@@ -1018,7 +1018,7 @@ ConversionResult::Type ApplicationDataBuffer::PutTime(const Time& value) {
       break;
   }
 
-  return ConversionResult::AI_UNSUPPORTED_CONVERSION;
+  return ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
 }
 
 std::string ApplicationDataBuffer::GetString(size_t maxLen) const {

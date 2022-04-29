@@ -19,6 +19,8 @@
 #include <ignite/odbc/config/config_tools.h>
 #include <ignite/odbc/config/configuration.h>
 #include <ignite/odbc/config/connection_string_parser.h>
+#include <ignite/odbc/log.h>
+#include <ignite/odbc/log_level.h>
 #include <ignite/odbc/odbc_error.h>
 
 #include <boost/test/unit_test.hpp>
@@ -53,6 +55,8 @@ const std::string testSshHost = "testsshhost.com";
 const std::string testSshPrivateKeyFile = "/path/to/keyfile";
 const std::string testSshPrivateKeyPassphrase = "testPassphrase";
 const bool testSshStrictHostKeyCheckingFlag = false;
+const std::string testLogPath = Logger::GetLoggerInstance()->GetLogPath();
+const LogLevel::Type testLogLevel = Logger::GetLoggerInstance()->GetLogLevel();
 const std::string testSshKnownHostsFile = "/path/to/knownhostsfile";
 const ScanMethod::Type testScanMethod = ScanMethod::Type::ID_FORWARD;
 const int32_t testScanLimit = 3000;
@@ -111,6 +115,22 @@ void CheckValidAddress(const char* connectStr, const EndPoint& endPoint) {
 
   BOOST_CHECK_EQUAL(cfg.GetHostname(), endPoint.host);
   BOOST_CHECK_EQUAL(cfg.GetPort(), endPoint.port);
+}
+
+void CheckValidLogLevel(const char* connectStr, LogLevel::Type loglevel) {
+  Configuration cfg;
+
+  ParseValidConnectString(connectStr, cfg);
+
+  BOOST_CHECK(cfg.GetLogLevel() == loglevel);
+}
+
+void CheckInvalidLogLevel(const char* connectStr) {
+  Configuration cfg;
+
+  ParseConnectStringWithError(connectStr, cfg);
+
+  BOOST_CHECK(cfg.GetLogLevel() == Configuration::DefaultValue::logLevel);
 }
 
 void CheckValidScanMethod(const char* connectStr, ScanMethod::Type scanMethod) {
@@ -196,6 +216,8 @@ void CheckConnectionConfig(const Configuration& cfg) {
   BOOST_CHECK_EQUAL(cfg.IsSshStrictHostKeyChecking(),
                     testSshStrictHostKeyCheckingFlag);
   BOOST_CHECK_EQUAL(cfg.GetSshKnownHostsFile(), testSshKnownHostsFile);
+  BOOST_CHECK(cfg.GetLogLevel() == testLogLevel);
+  BOOST_CHECK(cfg.GetLogPath() == testLogPath);
   BOOST_CHECK_EQUAL(cfg.GetScanLimit(), testScanLimit);
   BOOST_CHECK_EQUAL(cfg.GetSchemaName(), testSchemaName);
   BOOST_CHECK_EQUAL(cfg.IsRefreshSchema(), testRefreshSchemaFlag);
@@ -210,6 +232,8 @@ void CheckConnectionConfig(const Configuration& cfg) {
               << "default_fetch_size=" << testDefaultFetchSize << ';'
               << "driver={" << testDriverName << "};"
               << "hostname=" << testHostname << ';'
+              << "log_level=" << LogLevel::ToString(testLogLevel) << ';'
+              << "log_path=" << testLogPath << ';'
               << "login_timeout_sec=" << testLoginTimeoutSec << ';'
               << "password=" << testPassword << ';' << "port=" << testServerPort
               << ';' << "read_preference="
@@ -253,7 +277,8 @@ void CheckConnectionConfig(const Configuration& cfg) {
       << "&sshPrivateKeyPassphrase=" << testSshPrivateKeyPassphrase
       << "&sshStrictHostKeyChecking="
       << BoolToStr(testSshStrictHostKeyCheckingFlag)
-      << "&sshUser=" << testSshUser << "&tls=" << BoolToStr(testTlsFlag)
+      << "&sshUser=" << testSshUser
+      << "&tls=" << BoolToStr(testTlsFlag)
       << "&tlsAllowInvalidHostnames="
       << BoolToStr(testTlsAllowInvalidHostnamesFlag)
       << "&tlsCaFile=" << EncodeURIComponent(testTlsCaFile);
@@ -265,6 +290,10 @@ void CheckConnectionConfig(const Configuration& cfg) {
 }
 
 void CheckDsnConfig(const Configuration& cfg) {
+  // since setting logger path/level will change the logger settings,
+  // we will not change the logger path/level in configuration_test,
+  // which means it is possible for the logger path/level to be equivalent to 
+  // the default values. Therefore, there will be no boost check for logger path/level.
   BOOST_CHECK_EQUAL(cfg.GetDriver(), testDriverName);
   BOOST_CHECK_EQUAL(cfg.GetDsn(), testDsn);
   BOOST_CHECK_EQUAL(cfg.GetDatabase(), Configuration::DefaultValue::database);
@@ -355,6 +384,8 @@ BOOST_AUTO_TEST_CASE(TestConnectStringUppercase) {
               << ';' << "DATABASE=" << testDatabaseName << ';'
               << "USER=" << testUsername << ';' << "PASSWORD=" << testPassword
               << ';' << "APP_NAME=" << testAppName << ';'
+              << "LOG_LEVEL=" << LogLevel::ToString(testLogLevel) << ';'
+              << "LOG_PATH=" << testLogPath << ';'
               << "LOGIN_TIMEOUT_SEC=" << testLoginTimeoutSec << ';'
               << "READ_PREFERENCE="
               << ReadPreference::ToString(testReadPreference) << ';'
@@ -393,6 +424,8 @@ BOOST_AUTO_TEST_CASE(TestConnectStringLowercase) {
               << ';' << "database=" << testDatabaseName << ';'
               << "user=" << testUsername << ';' << "password=" << testPassword
               << ';' << "app_name=" << testAppName << ';'
+              << "log_level=" << LogLevel::ToString(testLogLevel) << ';'
+              << "log_path=" << testLogPath << ';'
               << "login_timeout_sec=" << testLoginTimeoutSec << ';'
               << "read_preference="
               << ReadPreference::ToString(testReadPreference) << ';'
@@ -431,6 +464,8 @@ BOOST_AUTO_TEST_CASE(TestConnectStringZeroTerminated) {
               << ';' << "database=" << testDatabaseName << ';'
               << "user=" << testUsername << ';' << "password=" << testPassword
               << ';' << "app_name=" << testAppName << ';'
+              << "log_level=" << LogLevel::ToString(testLogLevel) << ';'
+              << "log_path=" << testLogPath << ';'
               << "login_timeout_sec=" << testLoginTimeoutSec << ';'
               << "read_preference="
               << ReadPreference::ToString(testReadPreference) << ';'
@@ -471,6 +506,8 @@ BOOST_AUTO_TEST_CASE(TestConnectStringMixed) {
               << ';' << "Database=" << testDatabaseName << ';'
               << "User=" << testUsername << ';' << "Password=" << testPassword
               << ';' << "App_Name=" << testAppName << ';'
+              << "Log_Level=" << LogLevel::ToString(testLogLevel) << ';'
+              << "Log_Path=" << testLogPath << ';'
               << "Login_Timeout_Sec=" << testLoginTimeoutSec << ';'
               << "Read_Preference="
               << ReadPreference::ToString(testReadPreference) << ';'
@@ -510,6 +547,8 @@ BOOST_AUTO_TEST_CASE(TestConnectStringWhitepaces) {
               << "  DATABASE=" << testDatabaseName << ';'
               << "USER =" << testUsername << ';' << "PASSWORD=" << testPassword
               << ';' << "APP_NAME=" << testAppName << ';'
+              << "  LOG_LEVEL =" << LogLevel::ToString(testLogLevel) << ';'
+              << "LOG_PATH=  " << testLogPath << ';'
               << "LOGIN_TIMEOUT_SEC=" << testLoginTimeoutSec << ';'
               << "READ_PREFERENCE="
               << ReadPreference::ToString(testReadPreference) << ';'
@@ -564,6 +603,18 @@ BOOST_AUTO_TEST_CASE(TestConnectStringValidAddress) {
                     EndPoint("example.com", Configuration::DefaultValue::port));
   CheckValidAddress("hostname=example.com:1000..1010;",
                     EndPoint("example.com", 1000, 10));
+}
+
+BOOST_AUTO_TEST_CASE(TestConnectStringInvalidLogLevel) {
+  CheckInvalidLogLevel("log_level=debug_level;");
+  CheckInvalidLogLevel("log_level=off_level;");
+}
+
+BOOST_AUTO_TEST_CASE(TestConnectStringValidLogLevel) {
+  CheckValidLogLevel("log_level=debug;", LogLevel::Type::DEBUG_LEVEL);
+  CheckValidLogLevel("log_level=info;", LogLevel::Type::INFO_LEVEL);
+  CheckValidLogLevel("log_level=error;", LogLevel::Type::ERROR_LEVEL);
+  CheckValidLogLevel("log_level=off;", LogLevel::Type::OFF);
 }
 
 BOOST_AUTO_TEST_CASE(TestConnectStringInvalidScanMethod) {

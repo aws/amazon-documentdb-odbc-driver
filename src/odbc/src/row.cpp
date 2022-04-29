@@ -75,7 +75,7 @@ bool Row::EnsureColumnDiscovered(uint16_t columnIdx) {
 app::ConversionResult::Type Row::ReadColumnToBuffer(
     uint16_t columnIdx, app::ApplicationDataBuffer& dataBuf) {
   if (!EnsureColumnDiscovered(columnIdx))
-    return app::ConversionResult::AI_FAILURE;
+    return app::ConversionResult::Type::AI_FAILURE;
 
   Column& column = GetColumn(columnIdx);
 
