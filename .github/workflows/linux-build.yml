@@ -115,7 +115,23 @@ jobs:
         cmake .. -DCMAKE_BUILD_TYPE=Release -DBSONCXX_POLY_USE_MNMLSTC=1 -DCMAKE_INSTALL_PREFIX=/usr/local
         sudo make
         sudo make install
-        
+
+    # TODO enable clang-tidy-check
+    # https://bitquill.atlassian.net/browse/AD-726
+    
+    # generate compile_commands.json file for clang-tidy-check, requires mongocxx and boost dependencies
+    # - name: generate-compile-commands-file
+    #   run: |
+    #    cmake "${{github.workspace}}/src" -DCMAKE_EXPORT_COMPILE_COMMANDS=on -DCMAKE_BUILD_TYPE=Release -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_CORE="OFF" -DWITH_ODBC="ON"
+ 
+    # - name: clang-tidy-check
+    #  uses: ZedThree/clang-tidy-review@v0.8.3
+    #  id: review
+      # with:         
+        # If there are any comments, fail the check
+    # - if: steps.review.outputs.total_comments > 0
+    #   run: exit 1        
+
     - name: configure-and-build-driver
       run: |
         ./build_linux_release64_deb.sh
