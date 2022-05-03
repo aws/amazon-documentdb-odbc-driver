@@ -1,4 +1,5 @@
 *.aps
+*.DS_Store
 *.obj
 *.iobj
 *.ipdb
@@ -14,6 +15,7 @@
 *.ipch
 *.cache
 *.log
+*.xml
 bin32/*
 bin64/*
 lib32/*
@@ -21,6 +23,7 @@ lib64/*
 *.tlog
 include/*
 packages/*
+odbc_test_result.xml
 # Visual Studio 
 .vs/*
 src/.vs/*

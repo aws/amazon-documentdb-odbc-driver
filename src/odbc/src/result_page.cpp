@@ -15,44 +15,40 @@
  * limitations under the License.
  */
 
-#include <ignite/impl/interop/interop_input_stream.h>
-
 #include "ignite/odbc/result_page.h"
+
+#include <ignite/odbc/impl/interop/interop_input_stream.h>
+
 #include "ignite/odbc/utility.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        ResultPage::ResultPage() :
-            last(false), size(0), data(DEFAULT_ALLOCATED_MEMORY)
-        {
-            //No-op.
-        }
+using namespace ignite::odbc::impl::binary;
 
-        ResultPage::~ResultPage()
-        {
-            //No-op.
-        }
-
-        void ResultPage::Read(ignite::impl::binary::BinaryReaderImpl& reader)
-        {
-            last = reader.ReadBool();
-            size = reader.ReadInt32();
-
-            impl::interop::InteropInputStream& stream = *reader.GetStream();
-
-            int32_t dataToRead = stream.Remaining();
-
-            data.Length(dataToRead);
-
-            if (dataToRead)
-            {
-                data.Reallocate(dataToRead);
-
-                reader.GetStream()->ReadInt8Array(data.Data(), dataToRead);
-            }
-        }
-    }
+namespace ignite {
+namespace odbc {
+ResultPage::ResultPage()
+    : last(false), size(0), data(DEFAULT_ALLOCATED_MEMORY) {
+  // No-op.
 }
 
+ResultPage::~ResultPage() {
+  // No-op.
+}
+
+void ResultPage::Read(BinaryReaderImpl& reader) {
+  last = reader.ReadBool();
+  size = reader.ReadInt32();
+
+  impl::interop::InteropInputStream& stream = *reader.GetStream();
+
+  int32_t dataToRead = stream.Remaining();
+
+  data.Length(dataToRead);
+
+  if (dataToRead) {
+    data.Reallocate(dataToRead);
+
+    reader.GetStream()->ReadInt8Array(data.Data(), dataToRead);
+  }
+}
+}  // namespace odbc
+}  // namespace ignite

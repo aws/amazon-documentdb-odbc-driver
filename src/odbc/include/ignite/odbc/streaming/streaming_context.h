@@ -18,119 +18,113 @@
 #ifndef _IGNITE_ODBC_STREAMING_STREAMING_CONTEXT
 #define _IGNITE_ODBC_STREAMING_STREAMING_CONTEXT
 
-#include "ignite/odbc/query/query.h"
 #include "ignite/odbc/app/parameter_set.h"
-
+#include "ignite/odbc/query/query.h"
 #include "ignite/odbc/streaming/streaming_batch.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        /** Set streaming forward-declaration. */
-        class SqlSetStreamingCommand;
+namespace ignite {
+namespace odbc {
+/** Set streaming forward-declaration. */
+class SqlSetStreamingCommand;
 
-        /** Connection forward-declaration. */
-        class Connection;
+/** Connection forward-declaration. */
+class Connection;
 
-        namespace streaming
-        {
-            /**
-             * Streaming Query.
-             */
-            class StreamingContext
-            {
-            public:
-                /**
-                 * Default constructor.
-                 */
-                StreamingContext();
+namespace streaming {
+/**
+ * Streaming Query.
+ */
+class StreamingContext {
+ public:
+  /**
+   * Default constructor.
+   */
+  StreamingContext();
 
-                /**
-                 * Set connection for streaming.
-                 *
-                 * @param connection Connection for streaming.
-                 */
-                void SetConnection(Connection& connection)
-                {
-                    this->connection = &connection;
-                }
+  /**
+   * Set connection for streaming.
+   *
+   * @param connection Connection for streaming.
+   */
+  void SetConnection(Connection& connection) {
+    this->connection = &connection;
+  }
 
-                /**
-                 * Destructor.
-                 */
-                ~StreamingContext();
+  /**
+   * Destructor.
+   */
+  ~StreamingContext();
 
-                /**
-                 * Enable streaming.
-                 *
-                 * @param cmd Set streaming command.
-                 * @return Result.
-                 */
-                SqlResult::Type Enable(const SqlSetStreamingCommand& cmd);
+  /**
+   * Enable streaming.
+   *
+   * @param cmd Set streaming command.
+   * @return Result.
+   */
+  SqlResult::Type Enable(const SqlSetStreamingCommand& cmd);
 
-                /**
-                 * Disable streaming.
-                 *
-                 * @return Result.
-                 */
-                SqlResult::Type Disable();
+  /**
+   * Disable streaming.
+   *
+   * @return Result.
+   */
+  SqlResult::Type Disable();
 
-                /**
-                 * Check if the streaming is enabled.
-                 *
-                 * @return @c true if enabled.
-                 */
-                bool IsEnabled() const
-                {
-                    return enabled;
-                }
+  /**
+   * Check if the streaming is enabled.
+   *
+   * @return @c true if enabled.
+   */
+  bool IsEnabled() const {
+    return enabled;
+  }
 
-                /**
-                 * Execute query.
-                 *
-                 * @param sql SQL.
-                 * @param params SQL params.
-                 * @return True on success.
-                 */
-                SqlResult::Type Execute(const std::string& sql, const app::ParameterSet& params);
+  /**
+   * Execute query.
+   *
+   * @param sql SQL.
+   * @param params SQL params.
+   * @return True on success.
+   */
+  SqlResult::Type Execute(const std::string& sql,
+                          const app::ParameterSet& params);
 
-            private:
-                IGNITE_NO_COPY_ASSIGNMENT(StreamingContext);
+ private:
+  IGNITE_NO_COPY_ASSIGNMENT(StreamingContext);
 
-                /**
-                 * Flush collected streaming data to remote server.
-                 *
-                 * @param last Last page indicator.
-                 * @return Operation result.
-                 */
-                SqlResult::Type Flush(bool last);
+  /**
+   * Flush collected streaming data to remote server.
+   *
+   * @param last Last page indicator.
+   * @return Operation result.
+   */
+  SqlResult::Type Flush(bool last);
 
-                /**
-                 * Send batch request.
-                 *
-                 * @param last Last page flag.
-                 * @return Result.
-                 */
-                SqlResult::Type MakeRequestStreamingBatch(bool last);
+  /**
+   * Send batch request.
+   *
+   * @param last Last page flag.
+   * @return Result.
+   */
+  SqlResult::Type MakeRequestStreamingBatch(bool last);
 
-                /** Connection associated with the statement. */
-                Connection* connection;
+  /** Connection associated with the statement. */
+  Connection* connection;
 
-                /** Batch size. */
-                int32_t batchSize;
+  /** Batch size. */
+  int32_t batchSize;
 
-                /** Order. */
-                int64_t order;
+  /** Order. */
+  int64_t order;
 
-                /** Streaming enabled. */
-                bool enabled;
+  /** Streaming enabled. */
+  bool enabled;
 
-                /** Current batch. */
-                StreamingBatch currentBatch;
-            };
-        }
-    }
-}
+  /** Current batch. */
+  StreamingBatch currentBatch;
+};
+}  // namespace streaming
+}  // namespace odbc
+}  // namespace ignite
 
-#endif //_IGNITE_ODBC_STREAMING_STREAMING_CONTEXT
+#endif  //_IGNITE_ODBC_STREAMING_STREAMING_CONTEXT

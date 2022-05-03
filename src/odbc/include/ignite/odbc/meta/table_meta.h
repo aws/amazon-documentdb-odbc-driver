@@ -19,166 +19,158 @@
 #define _IGNITE_ODBC_META_TABLE_META
 
 #include <stdint.h>
+
 #include <string>
 
-#include "ignite/impl/binary/binary_reader_impl.h"
+#include <boost/optional.hpp>
+#include <boost/optional/optional_io.hpp>
 
-#include "ignite/odbc/utility.h"
+#include "ignite/odbc/impl/binary/binary_reader_impl.h"
 #include "ignite/odbc/jni/result_set.h"
+#include "ignite/odbc/utility.h"
 
 using ignite::odbc::jni::ResultSet;
 using ignite::odbc::jni::java::JniErrorInfo;
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace meta
-        {
-            /**
-             * Table metadata.
-             */
-            class TableMeta
-            {
-            public:
-                /**
-                 * Default constructor.
-                 */
-                TableMeta()
-                {
-                    // No-op.
-                }
-            
-                /**
-                 * Constructor.
-                 *
-                 * @param catalogName Catalog name.
-                 * @param schemaName Schema name.
-                 * @param tableName Table name.
-                 * @param tableType Table type.
-                 */
-                TableMeta(const std::string& catalogName, const std::string& schemaName,
-                          const std::string& tableName, const std::string& tableType) :
-                    catalogName(catalogName), schemaName(schemaName), tableName(tableName),
-                    tableType(tableType)
-                {
-                    // No-op.
-                }
+namespace ignite {
+namespace odbc {
+namespace meta {
+/**
+ * Table metadata.
+ */
+class TableMeta {
+ public:
+  /**
+   * Default constructor.
+   */
+  TableMeta() {
+    // No-op.
+  }
 
-                /**
-                 * Destructor.
-                 */
-                ~TableMeta()
-                {
-                    // No-op.
-                }
+  /**
+   * Constructor.
+   *
+   * @param catalogName Catalog name.
+   * @param schemaName Schema name.
+   * @param tableName Table name.
+   * @param tableType Table type.
+   */
+  TableMeta(const std::string& catalogName, const std::string& schemaName,
+            const std::string& tableName, const std::string& tableType)
+      : catalogName(catalogName),
+        schemaName(schemaName),
+        tableName(tableName),
+        tableType(tableType) {
+    // No-op.
+  }
 
-                /**
-                 * Copy constructor.
-                 */
-                TableMeta(const TableMeta& other)
-                    : catalogName(other.catalogName),
-                      schemaName(other.schemaName),
-                      tableName(other.tableName),
-                      tableType(other.tableType),
-                      remarks(other.remarks) {
-                    // No-op.
-                }
+  /**
+   * Destructor.
+   */
+  ~TableMeta() {
+    // No-op.
+  }
 
-                /**
-                 * Copy operator.
-                 */
-                TableMeta& operator=(const TableMeta& other)
-                {
-                    catalogName = other.catalogName;
-                    schemaName = other.schemaName;
-                    tableName = other.tableName;
-                    tableType = other.tableType;
-                    remarks = other.remarks;
+  /**
+   * Copy constructor.
+   */
+  TableMeta(const TableMeta& other)
+      : catalogName(other.catalogName),
+        schemaName(other.schemaName),
+        tableName(other.tableName),
+        tableType(other.tableType),
+        remarks(other.remarks) {
+    // No-op.
+  }
 
-                    return *this;
-                }
+  /**
+   * Copy operator.
+   */
+  TableMeta& operator=(const TableMeta& other) {
+    catalogName = other.catalogName;
+    schemaName = other.schemaName;
+    tableName = other.tableName;
+    tableType = other.tableType;
+    remarks = other.remarks;
 
-                /**
-                 * Read using reader.
-                 * @param resultSet SharedPointer< ResultSet >.
-                 */
-                void Read(SharedPointer< ResultSet >& resultSet, JniErrorInfo& errInfo);
+    return *this;
+  }
 
-                /**
-                 * Get catalog name.
-                 * @return Catalog name.
-                 */
-                const std::string& GetCatalogName() const
-                {
-                    return catalogName;
-                }
+  /**
+   * Read using reader.
+   * @param resultSet SharedPointer< ResultSet >.
+   */
+  void Read(SharedPointer< ResultSet >& resultSet, JniErrorInfo& errInfo);
 
-                /**
-                 * Get schema name.
-                 * @return Schema name.
-                 */
-                const std::string& GetSchemaName() const
-                {
-                    return schemaName;
-                }
+  /**
+   * Get catalog name.
+   * @return Catalog name.
+   */
+  const boost::optional<std::string>& GetCatalogName() const {
+    return catalogName;
+  }
 
-                /**
-                 * Get table name.
-                 * @return Table name.
-                 */
-                const std::string& GetTableName() const
-                {
-                    return tableName;
-                }
+  /**
+   * Get schema name.
+   * @return Schema name.
+   */
+  const boost::optional<std::string>& GetSchemaName() const {
+    return schemaName;
+  }
 
-                /**
-                 * Get table type.
-                 * @return Table type.
-                 */
-                const std::string& GetTableType() const
-                {
-                    return tableType;
-                }
+  /**
+   * Get table name.
+   * @return Table name.
+   */
+  const boost::optional<std::string>& GetTableName() const {
+    return tableName;
+  }
 
-                /** 
-                 * Get the remarks.
-                 * @return Remarks.
-                 */
-                const std::string& GetRemarks() const {
-                    return remarks;
-                }
+  /**
+   * Get table type.
+   * @return Table type.
+   */
+  const boost::optional<std::string>& GetTableType() const {
+    return tableType;
+  }
 
-            private:
-                /** Catalog name. */
-                std::string catalogName;
+  /**
+   * Get the remarks.
+   * @return Remarks.
+   */
+  const boost::optional<std::string>& GetRemarks() const {
+    return remarks;
+  }
 
-                /** Schema name. */
-                std::string schemaName;
+ private:
+  /** Catalog name. */
+  boost::optional<std::string> catalogName;
 
-                /** Table name. */
-                std::string tableName;
+  /** Schema name. */
+  boost::optional<std::string> schemaName;
 
-                /** Table type. */
-                std::string tableType;
+  /** Table name. */
+  boost::optional<std::string> tableName;
 
-                /** Remarks */
-                std::string remarks;
-            };
+  /** Table type. */
+  boost::optional<std::string> tableType;
 
-            /** Table metadata vector alias. */
-            typedef std::vector<TableMeta> TableMetaVector;
+  /** Remarks */
+  boost::optional<std::string> remarks;
+};
 
-            /**
-             * Read tables metadata collection.
-             * @param resultSet SharedPointer< ResultSet >.
-             * @param meta Collection.
-             */
-            void ReadTableMetaVector(
-                SharedPointer< ResultSet >& resultSet,
-                TableMetaVector& meta);
-            }
-    }
-}
+/** Table metadata vector alias. */
+typedef std::vector< TableMeta > TableMetaVector;
 
-#endif //_IGNITE_ODBC_META_TABLE_META
+/**
+ * Read tables metadata collection.
+ * @param resultSet SharedPointer< ResultSet >.
+ * @param meta Collection.
+ */
+void ReadTableMetaVector(SharedPointer< ResultSet >& resultSet,
+                         TableMetaVector& meta);
+}  // namespace meta
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_META_TABLE_META

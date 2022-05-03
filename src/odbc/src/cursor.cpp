@@ -17,74 +17,59 @@
 
 #include "ignite/odbc/cursor.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        Cursor::Cursor(int64_t queryId) :
-            queryId(queryId),
-            currentPage(),
-            currentPagePos(0),
-            currentRow()
-        {
-            // No-op.
-        }
-
-        Cursor::~Cursor()
-        {
-            // No-op.
-        }
-
-        bool Cursor::Increment()
-        {
-            if (currentPage.get() && currentPagePos < currentPage->GetSize())
-            {
-                ++currentPagePos;
-
-                if (currentPagePos == currentPage->GetSize())
-                    currentRow.reset();
-                else
-                {
-                    Row *row = currentRow.get();
-
-                    if (row)
-                        row->MoveToNext();
-                }
-                return true;
-            }
-            return false;
-        }
-
-        bool Cursor::NeedDataUpdate() const
-        {
-            return !currentPage.get() || (!currentPage->IsLast() &&
-                currentPagePos == currentPage->GetSize());
-        }
-
-        bool Cursor::HasData() const
-        {
-            return !currentPage.get() || !currentPage->IsLast() ||
-                currentPagePos < currentPage->GetSize();
-        }
-
-        bool Cursor::IsClosedRemotely() const
-        {
-            return currentPage.get() && currentPage->IsLast();
-        }
-
-        void Cursor::UpdateData(std::auto_ptr<ResultPage>& newPage)
-        {
-            currentPage = newPage;
-
-            currentPagePos = 0;
-
-            currentRow.reset(new Row(currentPage->GetData()));
-        }
-
-        Row* Cursor::GetRow()
-        {
-            return currentRow.get();
-        }
-    }
+namespace ignite {
+namespace odbc {
+Cursor::Cursor(int64_t queryId)
+    : queryId(queryId), currentPage(), currentPagePos(0), currentRow() {
+  // No-op.
 }
 
+Cursor::~Cursor() {
+  // No-op.
+}
+
+bool Cursor::Increment() {
+  if (currentPage.get() && currentPagePos < currentPage->GetSize()) {
+    ++currentPagePos;
+
+    if (currentPagePos == currentPage->GetSize())
+      currentRow.reset();
+    else {
+      Row* row = currentRow.get();
+
+      if (row)
+        row->MoveToNext();
+    }
+    return true;
+  }
+  return false;
+}
+
+bool Cursor::NeedDataUpdate() const {
+  return !currentPage.get()
+         || (!currentPage->IsLast()
+             && currentPagePos == currentPage->GetSize());
+}
+
+bool Cursor::HasData() const {
+  return !currentPage.get() || !currentPage->IsLast()
+         || currentPagePos < currentPage->GetSize();
+}
+
+bool Cursor::IsClosedRemotely() const {
+  return currentPage.get() && currentPage->IsLast();
+}
+
+void Cursor::UpdateData(std::shared_ptr< ResultPage >& newPage) {
+  currentPage = newPage;
+
+  currentPagePos = 0;
+
+  currentRow.reset(new Row(currentPage->GetData()));
+}
+
+Row* Cursor::GetRow() {
+  return currentRow.get();
+}
+}  // namespace odbc
+}  // namespace ignite

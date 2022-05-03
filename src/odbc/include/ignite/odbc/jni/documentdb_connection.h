@@ -17,94 +17,106 @@
 
 #include <ignite/odbc/common/concurrent.h>
 #include <ignite/odbc/config/configuration.h>
-#include <ignite/odbc/jni/java.h>
 #include <ignite/odbc/jni/database_metadata.h>
+#include <ignite/odbc/jni/documentdb_connection_properties.h>
+#include <ignite/odbc/jni/documentdb_database_metadata.h>
+#include <ignite/odbc/jni/java.h>
 
 #ifndef _IGNITE_ODBC_JNI_DOCUMENTDB_CONNECTION
 #define _IGNITE_ODBC_JNI_DOCUMENTDB_CONNECTION
 
 using ignite::odbc::common::concurrent::SharedPointer;
 using ignite::odbc::config::Configuration;
-using ignite::odbc::jni::java::JniContext;
 using ignite::odbc::jni::java::GlobalJObject;
+using ignite::odbc::jni::java::JniContext;
 using ignite::odbc::jni::java::JniErrorInfo;
 
 namespace ignite {
-    namespace odbc {
-        namespace jni {
-            /** 
-             * A wrapper class for the DocumentDbConnection Java class
-             */
-            class DocumentDbConnection {
-               public:
-                /** 
-                 * Creates a new instance of the DocumentDbConnection class.
-                 */
-                DocumentDbConnection(SharedPointer< JniContext > jniContext)
-                    : _jniContext(jniContext) {
-                }
+namespace odbc {
+namespace jni {
+/**
+ * A wrapper class for the DocumentDbConnection Java class
+ */
+class DocumentDbConnection {
+ public:
+  /**
+   * Creates a new instance of the DocumentDbConnection class.
+   */
+  DocumentDbConnection(SharedPointer< JniContext > jniContext)
+      : _jniContext(jniContext) {
+  }
 
-                /** 
-                 * Destructs the current instance.
-                 */
-                ~DocumentDbConnection();
+  /**
+   * Destructs the current instance.
+   */
+  ~DocumentDbConnection();
 
-                /** 
-                 * Opens a DocumentDbConnection object given the configuration.
-                 * 
-                 * @return a JniErrorCode indicating success or failure.
-                 */
-                JniErrorCode Open(const Configuration& config,
-                                  JniErrorInfo& errInfo);
+  /**
+   * Opens a DocumentDbConnection object given the configuration.
+   *
+   * @return a JniErrorCode indicating success or failure.
+   */
+  JniErrorCode Open(const Configuration& config, JniErrorInfo& errInfo);
 
-                /**
-                 * Closes the current DocumentDbConnection object.
-                 *
-                 * @return a JniErrorCode indicating success or failure.
-                 */
-                JniErrorCode Close(JniErrorInfo& errInfo);
+  /**
+   * Closes the current DocumentDbConnection object.
+   *
+   * @return a JniErrorCode indicating success or failure.
+   */
+  JniErrorCode Close(JniErrorInfo& errInfo);
 
-                bool IsOpen() {
-                    return _connection.IsValid();
-                }
+  bool IsOpen() {
+    return _connection.IsValid();
+  }
 
-                /**
-                 * Gets the DatbaseMetaData for this connection.
-                 *
-                 * @return a JniErrorCode indicating success or failure.
-                 */
-                SharedPointer< DatabaseMetaData > GetMetaData(
-                    JniErrorInfo& errInfo);
+  /**
+   * Gets the DatbaseMetaData for this connection.
+   *
+   * @return a JniErrorCode indicating success or failure.
+   */
+  SharedPointer< DatabaseMetaData > GetMetaData(JniErrorInfo& errInfo);
 
-                /** 
-                 * Gets indicator of whether an SSH tunnel is active.
-                 * 
-                 * @return true if active, false, otherwise.
-                 */
-                JniErrorCode IsSshTunnelActive(bool& isActive,
-                                               JniErrorInfo& errInfo);
+  /**
+   * Gets indicator of whether an SSH tunnel is active.
+   *
+   * @return true if active, false, otherwise.
+   */
+  JniErrorCode IsSshTunnelActive(bool& isActive, JniErrorInfo& errInfo);
 
-                /**
-                 * Gets indicator of whether an SSH tunnel is active.
-                 *
-                 * @return If IGNITE_JNI_ERR_SUCCESS is returned, then localPort is updated with the 
-                 * value of the local port of SSH tunnel.
-                 */
-                JniErrorCode GetSshLocalPort(int32_t& localPort,
-                                             JniErrorInfo& errInfo);
+  /**
+   * Gets indicator of whether an SSH tunnel is active.
+   *
+   * @return If IGNITE_JNI_ERR_SUCCESS is returned, then localPort is updated
+   * with the value of the local port of SSH tunnel.
+   */
+  JniErrorCode GetSshLocalPort(int32_t& localPort, JniErrorInfo& errInfo);
 
-               private:
+  /** 
+   * Gets the connection properties.
+   * 
+   * @return the connection properties
+   */
+  SharedPointer< DocumentDbConnectionProperties > GetConnectionProperties(JniErrorInfo& errInfo);
 
-                /** The JNI context */
-                SharedPointer< JniContext > _jniContext;
+  /** 
+   * Gets the DocumentDb Database Metadata (different from JDBC Database MetaData)
+   * 
+   * @return the DocumentDb database metadata.
+   */
+  SharedPointer< DocumentDbDatabaseMetadata > GetDatabaseMetadata(
+      JniErrorInfo& errInfo);
 
-                /** The DocumentDbConnection Java object */
-                SharedPointer< GlobalJObject > _connection;
+ private:
+  /** The JNI context */
+  SharedPointer< JniContext > _jniContext;
 
-                IGNITE_NO_COPY_ASSIGNMENT(DocumentDbConnection);
-            };
-        }  // namespace jni
-    }  // namespace odbc
+  /** The DocumentDbConnection Java object */
+  SharedPointer< GlobalJObject > _connection;
+
+  IGNITE_NO_COPY_ASSIGNMENT(DocumentDbConnection);
+};
+}  // namespace jni
+}  // namespace odbc
 }  // namespace ignite
 
-#endif // _IGNITE_ODBC_JNI_DOCUMENTDB_CONNECTION
+#endif  // _IGNITE_ODBC_JNI_DOCUMENTDB_CONNECTION

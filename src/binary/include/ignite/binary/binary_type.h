@@ -30,6 +30,9 @@
 
 #include <ignite/impl/binary/binary_type_impl.h>
 
+
+#ifndef _IGNITE_BINARY_TYPE_MACRO
+#define _IGNITE_BINARY_TYPE_MACRO
 /**
  * @def IGNITE_BINARY_TYPE_START(T)
  * Start binary type definition.
@@ -126,7 +129,7 @@ static void GetNull(T& dst) \
     dst = 0; \
 }
 
-
+#endif // _IGNITE_BINARY_TYPE_MACRO
 namespace ignite
 {
     namespace binary

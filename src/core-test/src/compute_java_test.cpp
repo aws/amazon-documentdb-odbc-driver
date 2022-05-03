@@ -134,13 +134,13 @@ struct ComputeJavaTestSuiteFixture
 /**
  * Binarizable object for task tests.
  */
-class PlatformComputeBinarizable
+class JavaPlatformComputeBinarizable
 {
 public:
     /**
      * Constructor.
      */
-    PlatformComputeBinarizable()
+    JavaPlatformComputeBinarizable()
     {
         // No-op.
     }
@@ -150,7 +150,7 @@ public:
      *
      * @param field Field.
      */
-    PlatformComputeBinarizable(int32_t field) :
+    JavaPlatformComputeBinarizable(int32_t field) :
         field(field)
     {
         // No-op.
@@ -166,19 +166,19 @@ namespace ignite
     namespace binary
     {
         template<>
-        struct BinaryType<PlatformComputeBinarizable> : BinaryTypeDefaultAll<PlatformComputeBinarizable>
+        struct BinaryType<JavaPlatformComputeBinarizable> : BinaryTypeDefaultAll<JavaPlatformComputeBinarizable>
         {
             static void GetTypeName(std::string& dst)
             {
-                dst = "PlatformComputeBinarizable";
+                dst = "JavaPlatformComputeBinarizable";
             }
 
-            static void Write(BinaryWriter& writer, const PlatformComputeBinarizable& obj)
+            static void Write(BinaryWriter& writer, const JavaPlatformComputeBinarizable& obj)
             {
                 writer.WriteInt32("field", obj.field);
             }
 
-            static void Read(BinaryReader& reader, PlatformComputeBinarizable& dst)
+            static void Read(BinaryReader& reader, JavaPlatformComputeBinarizable& dst)
             {
                 dst.field = reader.ReadInt32("field");
             }
@@ -244,8 +244,8 @@ BOOST_AUTO_TEST_CASE(EchoTaskObject)
         int32_t value = i * 42;
         cache.Put(ECHO_TYPE_OBJECT, value);
 
-        PlatformComputeBinarizable res =
-            compute.ExecuteJavaTask<PlatformComputeBinarizable>(ECHO_TASK, ECHO_TYPE_OBJECT);
+        JavaPlatformComputeBinarizable res =
+            compute.ExecuteJavaTask<JavaPlatformComputeBinarizable>(ECHO_TASK, ECHO_TYPE_OBJECT);
 
         BOOST_CHECK_EQUAL(value, res.field);
     }
@@ -261,8 +261,8 @@ BOOST_AUTO_TEST_CASE(EchoTaskObjectAsync)
         int32_t value = i * 42;
         cache.Put(ECHO_TYPE_OBJECT, value);
 
-        PlatformComputeBinarizable res =
-                compute.ExecuteJavaTaskAsync<PlatformComputeBinarizable>(ECHO_TASK, ECHO_TYPE_OBJECT).GetValue();
+        JavaPlatformComputeBinarizable res =
+                compute.ExecuteJavaTaskAsync<JavaPlatformComputeBinarizable>(ECHO_TASK, ECHO_TYPE_OBJECT).GetValue();
 
         BOOST_CHECK_EQUAL(value, res.field);
     }

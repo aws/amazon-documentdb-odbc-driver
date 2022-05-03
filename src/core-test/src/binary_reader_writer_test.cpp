@@ -2013,9 +2013,9 @@ BOOST_AUTO_TEST_CASE(TestPrimitivePointers)
 
     in.Position(IGNITE_DFLT_HDR_LEN);
 
-    std::auto_ptr<int32_t> field2Res(reader.ReadObject<int32_t*>("field2"));
-    std::auto_ptr<int8_t> fieldNullRes(reader.ReadObject<int8_t*>("null"));
-    std::auto_ptr<std::string> field1Res(reader.ReadObject<std::string*>("field1"));
+    std::unique_ptr<int32_t> field2Res(reader.ReadObject<int32_t*>("field2"));
+    std::unique_ptr<int8_t> fieldNullRes(reader.ReadObject<int8_t*>("null"));
+    std::unique_ptr<std::string> field1Res(reader.ReadObject<std::string*>("field1"));
 
     BOOST_CHECK_EQUAL(*field1Res, field1);
     BOOST_CHECK(fieldNullRes.get() == 0);

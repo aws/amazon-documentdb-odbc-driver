@@ -15,62 +15,51 @@
  * limitations under the License.
  */
 
-#include "ignite/impl/interop/interop_output_stream.h"
-#include "ignite/impl/binary/binary_writer_impl.h"
-
-#include "ignite/odbc/app/parameter_set.h"
 #include "ignite/odbc/streaming/streaming_batch.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace streaming
-        {
-            StreamingBatch::StreamingBatch() :
-                currentSql(),
-                size(0),
-                data(1024 * 16)
-            {
-                // No-op.
-            }
+#include "ignite/odbc/impl/binary/binary_writer_impl.h"
+#include "ignite/odbc/impl/interop/interop_output_stream.h"
+#include "ignite/odbc/app/parameter_set.h"
 
-            StreamingBatch::~StreamingBatch()
-            {
-                // No-op.
-            }
-
-            void StreamingBatch::AddRow(const std::string& sql, const app::ParameterSet& params)
-            {
-                impl::interop::InteropOutputStream out(&data);
-
-                out.Position(data.Length());
-
-                impl::binary::BinaryWriterImpl writer(&out, 0);
-
-                if (currentSql != sql)
-                {
-                    currentSql = sql;
-
-                    writer.WriteString(sql);
-                }
-                else
-                    writer.WriteNull();
-
-                params.Write(writer);
-                ++size;
-
-                out.Synchronize();
-            }
-
-            void StreamingBatch::Clear()
-            {
-                currentSql.clear();
-
-                size = 0;
-
-                data.Length(0);
-            }
-        }
-    }
+namespace ignite {
+namespace odbc {
+namespace streaming {
+StreamingBatch::StreamingBatch() : currentSql(), size(0), data(1024 * 16) {
+  // No-op.
 }
+
+StreamingBatch::~StreamingBatch() {
+  // No-op.
+}
+
+void StreamingBatch::AddRow(const std::string& sql,
+                            const app::ParameterSet& params) {
+  impl::interop::InteropOutputStream out(&data);
+
+  out.Position(data.Length());
+
+  impl::binary::BinaryWriterImpl writer(&out, 0);
+
+  if (currentSql != sql) {
+    currentSql = sql;
+
+    writer.WriteString(sql);
+  } else
+    writer.WriteNull();
+
+  params.Write(writer);
+  ++size;
+
+  out.Synchronize();
+}
+
+void StreamingBatch::Clear() {
+  currentSql.clear();
+
+  size = 0;
+
+  data.Length(0);
+}
+}  // namespace streaming
+}  // namespace odbc
+}  // namespace ignite

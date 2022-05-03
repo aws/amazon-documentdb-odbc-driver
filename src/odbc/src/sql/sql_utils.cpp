@@ -16,40 +16,33 @@
  */
 
 #include <ignite/odbc/odbc_error.h>
-
 #include <ignite/odbc/sql/sql_lexer.h>
 #include <ignite/odbc/sql/sql_utils.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace sql_utils
-        {
-            bool IsInternalCommand(const std::string& sql)
-            {
-                SqlLexer lexer(sql);
+namespace ignite {
+namespace odbc {
+namespace sql_utils {
+bool IsInternalCommand(const std::string& sql) {
+  SqlLexer lexer(sql);
 
-                while (true)
-                {
-                    OdbcExpected<bool> hasNext = lexer.Shift();
+  while (true) {
+    OdbcExpected< bool > hasNext = lexer.Shift();
 
-                    if (!hasNext.IsOk() || !*hasNext)
-                        return false;
+    if (!hasNext.IsOk() || !*hasNext)
+      return false;
 
-                    const SqlToken& token = lexer.GetCurrentToken();
+    const SqlToken& token = lexer.GetCurrentToken();
 
-                    if (token.GetType() != TokenType::SEMICOLON)
-                    {
-                        if (token.GetType() == TokenType::WORD && token.ToLower() == "set")
-                            break;
+    if (token.GetType() != TokenType::SEMICOLON) {
+      if (token.GetType() == TokenType::WORD && token.ToLower() == "set")
+        break;
 
-                        return false;
-                    }
-                }
-
-                return lexer.ExpectNextToken(TokenType::WORD, "streaming");
-            }
-        }
+      return false;
     }
+  }
+
+  return lexer.ExpectNextToken(TokenType::WORD, "streaming");
 }
+}  // namespace sql_utils
+}  // namespace odbc
+}  // namespace ignite

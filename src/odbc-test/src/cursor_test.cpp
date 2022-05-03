@@ -15,187 +15,175 @@
  * limitations under the License.
  */
 
-#include <boost/test/unit_test.hpp>
-
 #include <ignite/impl/binary/binary_writer_impl.h>
-
-#include <ignite/odbc/system/odbc_constants.h>
 #include <ignite/odbc/cursor.h>
+#include <ignite/odbc/system/odbc_constants.h>
+
+#include <boost/test/unit_test.hpp>
 
 using namespace ignite::odbc;
 
 const int64_t testQueryId = 42;
 
-std::auto_ptr<ResultPage> CreateTestPage(bool last, int32_t size)
-{
-    using namespace ignite::impl::binary;
-    using namespace ignite::impl::interop;
+std::shared_ptr< ResultPage > CreateTestPage(bool last, int32_t size) {
+  using namespace ignite::impl::binary;
+  using namespace ignite::impl::interop;
 
-    InteropUnpooledMemory mem(1024);
-    InteropOutputStream outStream(&mem);
-    BinaryWriterImpl writer(&outStream, 0);
+  InteropUnpooledMemory mem(1024);
+  InteropOutputStream outStream(&mem);
+  BinaryWriterImpl writer(&outStream, 0);
 
-    // Last page flag.
-    writer.WriteBool(last);
+  // Last page flag.
+  writer.WriteBool(last);
 
-    //Page size.
-    writer.WriteInt32(size);
+  // Page size.
+  writer.WriteInt32(size);
 
-    for (int32_t i = 0; i < size; ++i)
-    {
-        // Writing row size = 1 column.
-        writer.WriteInt32(1);
+  for (int32_t i = 0; i < size; ++i) {
+    // Writing row size = 1 column.
+    writer.WriteInt32(1);
 
-        // Writing column type.
-        writer.WriteInt8(IGNITE_TYPE_INT);
+    // Writing column type.
+    writer.WriteInt8(IGNITE_TYPE_INT);
 
-        // Column value.
-        writer.WriteInt32(i);
-    }
+    // Column value.
+    writer.WriteInt32(i);
+  }
 
-    outStream.Synchronize();
+  outStream.Synchronize();
 
-    std::auto_ptr<ResultPage> res(new ResultPage());
+  std::shared_ptr< ResultPage > res(new ResultPage());
 
-    InteropInputStream inStream(&mem);
-    BinaryReaderImpl reader(&inStream);
+  InteropInputStream inStream(&mem);
+  BinaryReaderImpl reader(&inStream);
 
-    res->Read(reader);
+  res->Read(reader);
 
-    BOOST_REQUIRE(res->GetSize() == size);
-    BOOST_REQUIRE(res->IsLast() == last);
+  BOOST_REQUIRE(res->GetSize() == size);
+  BOOST_REQUIRE(res->IsLast() == last);
 
-    return res;
+  return res;
 }
 
-void CheckCursorNeedUpdate(Cursor& cursor)
-{
-    BOOST_REQUIRE(cursor.NeedDataUpdate());
+void CheckCursorNeedUpdate(Cursor& cursor) {
+  BOOST_REQUIRE(cursor.NeedDataUpdate());
 
-    BOOST_REQUIRE(cursor.HasData());
+  BOOST_REQUIRE(cursor.HasData());
 
-    BOOST_REQUIRE(!cursor.Increment());
+  BOOST_REQUIRE(!cursor.Increment());
 
-    BOOST_REQUIRE(!cursor.GetRow());
+  BOOST_REQUIRE(!cursor.GetRow());
 }
 
-void CheckCursorReady(Cursor& cursor)
-{
-    BOOST_REQUIRE(!cursor.NeedDataUpdate());
+void CheckCursorReady(Cursor& cursor) {
+  BOOST_REQUIRE(!cursor.NeedDataUpdate());
 
-    BOOST_REQUIRE(cursor.HasData());
+  BOOST_REQUIRE(cursor.HasData());
 
-    BOOST_REQUIRE(cursor.GetRow());
+  BOOST_REQUIRE(cursor.GetRow());
 }
 
-void CheckCursorEnd(Cursor& cursor)
-{
-    BOOST_REQUIRE(!cursor.NeedDataUpdate());
+void CheckCursorEnd(Cursor& cursor) {
+  BOOST_REQUIRE(!cursor.NeedDataUpdate());
 
-    BOOST_REQUIRE(!cursor.HasData());
+  BOOST_REQUIRE(!cursor.HasData());
 
-    BOOST_REQUIRE(!cursor.Increment());
+  BOOST_REQUIRE(!cursor.Increment());
 
-    BOOST_REQUIRE(!cursor.GetRow());
+  BOOST_REQUIRE(!cursor.GetRow());
 }
 
 BOOST_AUTO_TEST_SUITE(CursorTestSuite)
 
-BOOST_AUTO_TEST_CASE(TestCursorEmpty)
-{
-    Cursor cursor(testQueryId);
+BOOST_AUTO_TEST_CASE(TestCursorEmpty) {
+  Cursor cursor(testQueryId);
 
-    BOOST_REQUIRE(cursor.GetQueryId() == testQueryId);
+  BOOST_REQUIRE(cursor.GetQueryId() == testQueryId);
 
-    CheckCursorNeedUpdate(cursor);
+  CheckCursorNeedUpdate(cursor);
 }
 
-BOOST_AUTO_TEST_CASE(TestCursorLast)
-{
-    const int32_t pageSize = 16;
+BOOST_AUTO_TEST_CASE(TestCursorLast) {
+  const int32_t pageSize = 16;
 
-    Cursor cursor(testQueryId);
+  Cursor cursor(testQueryId);
 
-    std::auto_ptr<ResultPage> resultPage = CreateTestPage(true, pageSize);
+  std::shared_ptr< ResultPage > resultPage = CreateTestPage(true, pageSize);
 
-    cursor.UpdateData(resultPage);
+  cursor.UpdateData(resultPage);
 
-    BOOST_REQUIRE(cursor.GetQueryId() == testQueryId);
+  BOOST_REQUIRE(cursor.GetQueryId() == testQueryId);
 
-    CheckCursorReady(cursor);
+  CheckCursorReady(cursor);
 
-    for (int32_t i = 0; i < pageSize; ++i)
-        BOOST_REQUIRE(cursor.Increment());
+  for (int32_t i = 0; i < pageSize; ++i)
+    BOOST_REQUIRE(cursor.Increment());
 
-    CheckCursorEnd(cursor);
+  CheckCursorEnd(cursor);
 }
 
-BOOST_AUTO_TEST_CASE(TestCursorUpdate)
-{
-    const int32_t pageSize = 16;
+BOOST_AUTO_TEST_CASE(TestCursorUpdate) {
+  const int32_t pageSize = 16;
 
-    Cursor cursor(testQueryId);
+  Cursor cursor(testQueryId);
 
-    std::auto_ptr<ResultPage> resultPage = CreateTestPage(false, pageSize);
+  std::shared_ptr< ResultPage > resultPage = CreateTestPage(false, pageSize);
 
-    cursor.UpdateData(resultPage);
+  cursor.UpdateData(resultPage);
 
-    BOOST_REQUIRE(cursor.GetQueryId() == testQueryId);
+  BOOST_REQUIRE(cursor.GetQueryId() == testQueryId);
 
-    for (int32_t i = 0; i < pageSize; ++i)
-    {
-        CheckCursorReady(cursor);
-
-        BOOST_REQUIRE(cursor.Increment());
-    }
-
-    CheckCursorNeedUpdate(cursor);
-
-    resultPage = CreateTestPage(true, pageSize);
-
-    cursor.UpdateData(resultPage);
-
-    CheckCursorReady(cursor);
-
-    for (int32_t i = 0; i < pageSize; ++i)
-    {
-        CheckCursorReady(cursor);
-
-        BOOST_REQUIRE(cursor.Increment());
-    }
-
-    CheckCursorEnd(cursor);
-}
-
-BOOST_AUTO_TEST_CASE(TestCursorUpdateOneRow)
-{
-    Cursor cursor(testQueryId);
-
-    std::auto_ptr<ResultPage> resultPage = CreateTestPage(false, 1);
-
-    cursor.UpdateData(resultPage);
-
-    BOOST_REQUIRE(cursor.GetQueryId() == testQueryId);
-
+  for (int32_t i = 0; i < pageSize; ++i) {
     CheckCursorReady(cursor);
 
     BOOST_REQUIRE(cursor.Increment());
+  }
 
-    CheckCursorNeedUpdate(cursor);
+  CheckCursorNeedUpdate(cursor);
 
-    BOOST_REQUIRE(!cursor.Increment());
+  resultPage = CreateTestPage(true, pageSize);
 
-    resultPage = CreateTestPage(true, 1);
+  cursor.UpdateData(resultPage);
 
-    cursor.UpdateData(resultPage);
+  CheckCursorReady(cursor);
 
+  for (int32_t i = 0; i < pageSize; ++i) {
     CheckCursorReady(cursor);
 
     BOOST_REQUIRE(cursor.Increment());
+  }
 
-    CheckCursorEnd(cursor);
+  CheckCursorEnd(cursor);
+}
 
-    BOOST_REQUIRE(!cursor.Increment());
+BOOST_AUTO_TEST_CASE(TestCursorUpdateOneRow) {
+  Cursor cursor(testQueryId);
+
+  std::shared_ptr< ResultPage > resultPage = CreateTestPage(false, 1);
+
+  cursor.UpdateData(resultPage);
+
+  BOOST_REQUIRE(cursor.GetQueryId() == testQueryId);
+
+  CheckCursorReady(cursor);
+
+  BOOST_REQUIRE(cursor.Increment());
+
+  CheckCursorNeedUpdate(cursor);
+
+  BOOST_REQUIRE(!cursor.Increment());
+
+  resultPage = CreateTestPage(true, 1);
+
+  cursor.UpdateData(resultPage);
+
+  CheckCursorReady(cursor);
+
+  BOOST_REQUIRE(cursor.Increment());
+
+  CheckCursorEnd(cursor);
+
+  BOOST_REQUIRE(!cursor.Increment());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

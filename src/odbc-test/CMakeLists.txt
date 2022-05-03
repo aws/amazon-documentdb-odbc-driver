@@ -39,15 +39,23 @@ else ()
 endif()
 
 set(SOURCES 
+         src/api_robustness_test.cpp
          src/configuration_test.cpp
          src/connection_test.cpp
          src/java_test.cpp
          src/jni_test.cpp
+         src/log_test.cpp
          src/meta_queries_test.cpp
          src/odbc_test_suite.cpp
+         src/queries_test.cpp
          src/test_utils.cpp
-         src/dummy_test.cpp
          ../odbc/src/app/application_data_buffer.cpp
+         ../odbc/src/binary/binary_containers.cpp
+         ../odbc/src/binary/binary_raw_writer.cpp
+         ../odbc/src/binary/binary_writer.cpp
+         ../odbc/src/binary/binary_reader.cpp
+         ../odbc/src/binary/binary_type.cpp
+         ../odbc/src/binary/binary_raw_reader.cpp
          ../odbc/src/common_types.cpp
          ../odbc/src/common/big_integer.cpp
          ../odbc/src/common/bits.cpp
@@ -65,17 +73,36 @@ set(SOURCES
          ../odbc/src/config/config_tools.cpp
          ../odbc/src/config/connection_info.cpp
          ../odbc/src/config/connection_string_parser.cpp
+         ../odbc/src/impl/binary/binary_type_manager.cpp
+         ../odbc/src/impl/binary/binary_type_impl.cpp
+         ../odbc/src/impl/binary/binary_utils.cpp
+         ../odbc/src/impl/binary/binary_reader_impl.cpp
+         ../odbc/src/impl/binary/binary_type_handler.cpp
+         ../odbc/src/impl/binary/binary_writer_impl.cpp
+         ../odbc/src/impl/binary/binary_schema.cpp
+         ../odbc/src/impl/binary/binary_type_snapshot.cpp
+         ../odbc/src/impl/binary/binary_object_header.cpp
+         ../odbc/src/impl/binary/binary_object_impl.cpp
+         ../odbc/src/impl/binary/binary_field_meta.cpp
+         ../odbc/src/impl/interop/interop_memory.cpp
+         ../odbc/src/impl/interop/interop_output_stream.cpp
+         ../odbc/src/impl/interop/interop_input_stream.cpp
          ../odbc/src/connection.cpp
-         ../odbc/src/driverInstance.cpp
+         ../odbc/src/driver_instance.cpp
          ../odbc/src/cursor.cpp
          ../odbc/src/diagnostic/diagnosable_adapter.cpp
          ../odbc/src/diagnostic/diagnostic_record_storage.cpp
          ../odbc/src/diagnostic/diagnostic_record.cpp
+         ../odbc/src/documentdb_column.cpp
+         ../odbc/src/documentdb_cursor.cpp
+         ../odbc/src/documentdb_row.cpp
          ../odbc/src/dsn_config.cpp
          ../odbc/src/environment.cpp
          ../odbc/src/ignite_error.cpp
          ../odbc/src/jni/database_metadata.cpp
          ../odbc/src/jni/documentdb_connection.cpp
+         ../odbc/src/jni/documentdb_mql_query_context.cpp
+         ../odbc/src/jni/documentdb_query_mapping_service.cpp
          ../odbc/src/jni/java.cpp
          ../odbc/src/jni/result_set.cpp
          ../odbc/src/log.cpp
@@ -90,13 +117,13 @@ set(SOURCES
          ../odbc/src/query/foreign_keys_query.cpp
          ../odbc/src/query/primary_keys_query.cpp
          ../odbc/src/query/special_columns_query.cpp
-         ../odbc/src/query/streaming_query.cpp
          ../odbc/src/query/type_info_query.cpp
          ../odbc/src/query/table_metadata_query.cpp
          ../odbc/src/sql/sql_lexer.cpp
          ../odbc/src/sql/sql_parser.cpp
          ../odbc/src/sql/sql_set_streaming_command.cpp
          ../odbc/src/sql/sql_utils.cpp
+         ../odbc/src/log_level.cpp
          ../odbc/src/read_preference.cpp
          ../odbc/src/result_page.cpp
          ../odbc/src/row.cpp
@@ -106,6 +133,11 @@ set(SOURCES
          ../odbc/src/streaming/streaming_context.cpp
          ../odbc/src/type_traits.cpp
          ../odbc/src/utility.cpp
+         ../odbc/src/scan_method.cpp
+         ../odbc/src/date.cpp
+         ../odbc/src/guid.cpp
+         ../odbc/src/time.cpp
+         ../odbc/src/timestamp.cpp
         )
 
 if (WIN32)

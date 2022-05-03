@@ -20,16 +20,13 @@
 
 #include <ignite/odbc/system/odbc_constants.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace config
-        {
-            class Configuration;
-        }
-    }
+namespace ignite {
+namespace odbc {
+namespace config {
+class Configuration;
 }
+}  // namespace odbc
+}  // namespace ignite
 
 #ifdef _WIN32
 /**
@@ -39,7 +36,8 @@ namespace ignite
  * @param config Output configuration.
  * @return True on success and false on fail.
  */
-bool DisplayConnectionWindow(void* windowParent, ignite::odbc::config::Configuration& config);
+bool DisplayConnectionWindow(void* windowParent,
+                             ignite::odbc::config::Configuration& config);
 #endif
 
-#endif //_IGNITE_ODBC_SYSTEM_SYSTEM_DSN
+#endif  //_IGNITE_ODBC_SYSTEM_SYSTEM_DSN

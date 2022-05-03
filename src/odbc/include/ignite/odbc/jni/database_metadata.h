@@ -15,62 +15,73 @@
  * limitations under the License.
  */
 
-#include <string>
 #include <ignite/odbc/common/concurrent.h>
 #include <ignite/odbc/jni/java.h>
 #include <ignite/odbc/jni/result_set.h>
+
+#include <string>
 
 #ifndef _IGNITE_ODBC_JNI_DATABASE_METADATA
 #define _IGNITE_ODBC_JNI_DATABASE_METADATA
 
 using ignite::odbc::common::concurrent::SharedPointer;
+using ignite::odbc::jni::ResultSet;
 using ignite::odbc::jni::java::GlobalJObject;
 using ignite::odbc::jni::java::JniContext;
 using ignite::odbc::jni::java::JniErrorInfo;
-using ignite::odbc::jni::ResultSet;
 
 namespace ignite {
-    namespace odbc {
-        namespace jni {
-            /**
-             * Wrapper for the the JDBC DatabaseMetaData.
-             */
-            class DatabaseMetaData {
-                friend class DocumentDbConnection;
-               public:
-                ~DatabaseMetaData() = default;
+namespace odbc {
+namespace jni {
+/**
+ * Wrapper for the the JDBC DatabaseMetaData.
+ */
+class DatabaseMetaData {
+  friend class DocumentDbConnection;
+  friend class DocumentDbQueryMappingService;
 
-                /**
-                 * Query the tables in the database according to the given search 
-                 * critera in catalog (not supported), schemaPattern, tablePattern
-                 * and types of tables.
-                 */
-                SharedPointer< ResultSet > GetTables(
-                    const std::string& catalog,
-                    const std::string& schemaPattern,
-                    const std::string& tableNamePattern,
-                    const std::vector< std::string >& types,
-                    JniErrorInfo& errInfo);
+ public:
+  ~DatabaseMetaData() = default;
 
-               private:
-                /**
-                 * Constructs an instance of the DatabaseMetaData class.
-                 */
-                DatabaseMetaData(
-                    SharedPointer< JniContext >& jniContext,
-                    SharedPointer< GlobalJObject >& databaseMetaData)
-                    : _jniContext(jniContext),
-                      _databaseMetaData(databaseMetaData) {
-                }
+  /**
+   * Query the tables in the database according to the given search
+   * critera in catalog (not supported), schemaPattern, tablePattern
+   * and types of tables.
+   */
+  SharedPointer< ResultSet > GetTables(const std::string& catalog,
+                                       const std::string& schemaPattern,
+                                       const std::string& tableNamePattern,
+                                       const std::vector< std::string >& types,
+                                       JniErrorInfo& errInfo);
 
-                /** The JNI context */
-                SharedPointer< JniContext > _jniContext;
+  /**
+   * Query the columns in the database according to the given
+   * search critera in catalog (not supported), schemaPattern,
+   * tablePattern and columnPattern.
+   */
+  SharedPointer< ResultSet > GetColumns(const std::string& catalog,
+                                        const std::string& schemaPattern,
+                                        const std::string& tableNamePattern,
+                                        const std::string& columnNamePattern,
+                                        JniErrorInfo& errInfo);
 
-                /** The DatabaseMetaData Java object  */
-                SharedPointer< GlobalJObject > _databaseMetaData;
-            };
-        }  // namespace
-    }  // namespace odbc
+ private:
+  /**
+   * Constructs an instance of the DatabaseMetaData class.
+   */
+  DatabaseMetaData(SharedPointer< JniContext >& jniContext,
+                   SharedPointer< GlobalJObject >& databaseMetaData)
+      : _jniContext(jniContext), _databaseMetaData(databaseMetaData) {
+  }
+
+  /** The JNI context */
+  SharedPointer< JniContext > _jniContext;
+
+  /** The DatabaseMetaData Java object  */
+  SharedPointer< GlobalJObject > _databaseMetaData;
+};
+}  // namespace jni
+}  // namespace odbc
 }  // namespace ignite
 
-#endif // _IGNITE_ODBC_JNI_DATABASE_METADATA
+#endif  // _IGNITE_ODBC_JNI_DATABASE_METADATA

@@ -18,471 +18,475 @@
 #ifndef _IGNITE_ODBC_CONNECTION
 #define _IGNITE_ODBC_CONNECTION
 
+#include <ignite/odbc/common/concurrent.h>
 #include <stdint.h>
 
 #include <vector>
 
-#include "ignite/odbc/parser.h"
-#include "ignite/odbc/config/connection_info.h"
 #include "ignite/odbc/config/configuration.h"
+#include "ignite/odbc/config/connection_info.h"
 #include "ignite/odbc/diagnostic/diagnosable_adapter.h"
-#include "ignite/odbc/streaming/streaming_context.h"
-#include "ignite/odbc/odbc_error.h"
+#include "ignite/odbc/end_point.h"
 #include "ignite/odbc/jni/database_metadata.h"
 #include "ignite/odbc/jni/documentdb_connection.h"
+#include "ignite/odbc/jni/documentdb_connection_properties.h"
+#include "ignite/odbc/jni/documentdb_database_metadata.h"
 #include "ignite/odbc/jni/java.h"
-#include <ignite/odbc/common/concurrent.h>
-#include "ignite/odbc/end_point.h"
+#include "ignite/odbc/odbc_error.h"
+#include "ignite/odbc/parser.h"
+#include "ignite/odbc/streaming/streaming_context.h"
+#include "mongocxx/client.hpp"
 
 using ignite::odbc::common::concurrent::SharedPointer;
+using ignite::odbc::jni::DatabaseMetaData;
+using ignite::odbc::jni::DocumentDbConnection;
+using ignite::odbc::jni::DocumentDbConnectionProperties;
+using ignite::odbc::jni::DocumentDbDatabaseMetadata;
 using ignite::odbc::jni::java::GlobalJObject;
 using ignite::odbc::jni::java::JniContext;
-using ignite::odbc::jni::DocumentDbConnection;
-using ignite::odbc::jni::DatabaseMetaData;
 
-namespace ignite
-{
-    namespace odbc
-    {
-        class Environment;
-        class Statement;
+namespace ignite {
+namespace odbc {
+class Environment;
+class Statement;
 
-        /**
-         * ODBC node connection.
-         */
-        class Connection : public diagnostic::DiagnosableAdapter
-        {
-            friend class Environment;
-        public:
-            /**
-             * Operation with timeout result.
-             */
-            struct OperationResult
-            {
-                enum T
-                {
-                    SUCCESS,
-                    FAIL,
-                    TIMEOUT
-                };
-            };
+/**
+ * ODBC node connection.
+ */
+class Connection : public diagnostic::DiagnosableAdapter {
+  friend class Environment;
 
-            /** Default connection timeout in seconds. */
-            enum
-            {
-                DEFAULT_CONNECT_TIMEOUT = 5
-            };
+ public:
+  /**
+   * Operation with timeout result.
+   */
+  struct OperationResult {
+    enum T { SUCCESS, FAIL, TIMEOUT };
+  };
 
-            /**
-             * Destructor.
-             */
-            ~Connection();
+  /** Default connection timeout in seconds. */
+  enum { DEFAULT_CONNECT_TIMEOUT = 5 };
 
-            /**
-             * Get connection info.
-             *
-             * @return Connection info.
-             */
-            const config::ConnectionInfo& GetInfo() const;
+  /**
+   * Destructor.
+   */
+  ~Connection();
 
-            /**
-             * Get info of any type.
-             *
-             * @param type Info type.
-             * @param buf Result buffer pointer.
-             * @param buflen Result buffer length.
-             * @param reslen Result value length pointer.
-             */
-            void GetInfo(config::ConnectionInfo::InfoType type, void* buf, short buflen, short* reslen);
+  /**
+   * Get connection info.
+   *
+   * @return Connection info.
+   */
+  const config::ConnectionInfo& GetInfo() const;
 
-            /**
-             * Establish connection to ODBC server.
-             *
-             * @param connectStr Connection string.
-             * @param parentWindow Parent window pointer.
-             */
-            void Establish(const std::string& connectStr, void* parentWindow);
+  /**
+   * Get info of any type.
+   *
+   * @param type Info type.
+   * @param buf Result buffer pointer.
+   * @param buflen Result buffer length.
+   * @param reslen Result value length pointer.
+   */
+  void GetInfo(config::ConnectionInfo::InfoType type, void* buf, short buflen,
+               short* reslen);
 
-            /**
-             * Establish connection to ODBC server.
-             *
-             * @param cfg Configuration.
-             */
-            void Establish(const config::Configuration cfg);
+  /**
+   * Establish connection to ODBC server.
+   *
+   * @param connectStr Connection string.
+   * @param parentWindow Parent window pointer.
+   */
+  void Establish(const std::string& connectStr, void* parentWindow);
 
-            /**
-             * Release established connection.
-             *
-             * @return Operation result.
-             */
-            void Release();
+  /**
+   * Establish connection to ODBC server.
+   *
+   * @param cfg Configuration.
+   */
+  void Establish(const config::Configuration cfg);
 
-            /**
-             * Deregister self from the parent.
-             */
-            void Deregister();
+  /**
+   * Release established connection.
+   *
+   * @return Operation result.
+   */
+  void Release();
 
-            /**
-             * Create statement associated with the connection.
-             *
-             * @return Pointer to valid instance on success and NULL on failure.
-             */
-            Statement* CreateStatement();
+  /**
+   * Deregister self from the parent.
+   */
+  void Deregister();
 
-            /** 
-             * Gets the database metadata for the connection.
-             * 
-             * @return SharedPointer to DatabaseMetaData.
-             */
-            SharedPointer< DatabaseMetaData > GetMetaData(IgniteError& err);
+  /**
+   * Create statement associated with the connection.
+   *
+   * @return Pointer to valid instance on success and NULL on failure.
+   */
+  Statement* CreateStatement();
 
-            /**
-             * Get name of the assotiated schema.
-             *
-             * @return Schema name.
-             */
-            const std::string& GetSchema() const;
+  /**
+   * Gets the database metadata for the connection.
+   *
+   * @return SharedPointer to DatabaseMetaData.
+   */
+  SharedPointer< DatabaseMetaData > GetMetaData(IgniteError& err);
 
-            /**
-             * Get configuration.
-             *
-             * @return Connection configuration.
-             */
-            const config::Configuration& GetConfiguration() const;
+  /**
+   * Gets the DocumentDB database metadata for the connection.
+   *
+   * @return SharedPointer to DocumentDbDatabaseMetadata.
+   */
+  SharedPointer< DocumentDbDatabaseMetadata > GetDatabaseMetadata(IgniteError& err);
 
-            /**
-             * Is auto commit.
-             *
-             * @return @c true if the auto commit is enabled.
-             */
-            bool IsAutoCommit() const;
+  /**
+   * Gets the DocumentDB connection properties.
+   *
+   * @return SharedPointer to DocumentDbConnectionProperties.
+   */
+  SharedPointer< DocumentDbConnectionProperties > GetConnectionProperties(
+      IgniteError& err);
 
-            /**
-             * Get streaming context.
-             *
-             * @return Streaming context.
-             */
-            streaming::StreamingContext& GetStreamingContext()
-            {
-                return streamingContext;
-            }
+  /**
+   * Get name of the assotiated schema.
+   *
+   * @return Schema name.
+   */
+  const std::string& GetSchema() const;
 
-            /**
-             * Create diagnostic record associated with the Connection instance.
-             *
-             * @param sqlState SQL state.
-             * @param message Message.
-             * @param rowNum Associated row number.
-             * @param columnNum Associated column number.
-             * @return DiagnosticRecord associated with the instance.
-             */
-            static diagnostic::DiagnosticRecord CreateStatusRecord(SqlState::Type sqlState,
-                const std::string& message, int32_t rowNum = 0, int32_t columnNum = 0);
+  /**
+   * Get configuration.
+   *
+   * @return Connection configuration.
+   */
+  const config::Configuration& GetConfiguration() const;
 
-            /**
-             * Synchronously send request message and receive response.
-             * Uses provided timeout.
-             *
-             * @param req Request message.
-             * @param rsp Response message.
-             * @param timeout Timeout.
-             * @return @c true on success, @c false on timeout.
-             * @throw OdbcError on error.
-             */
-            template<typename ReqT, typename RspT>
-            bool SyncMessage(const ReqT& req, RspT& rsp, int32_t timeout)
-            {
-                // TODO: Remove when unnecessary.
-                return true;
-            }
+  /**
+   * Is auto commit.
+   *
+   * @return @c true if the auto commit is enabled.
+   */
+  bool IsAutoCommit() const;
 
-            /**
-             * Synchronously send request message and receive response.
-             * Uses connection timeout.
-             *
-             * @param req Request message.
-             * @param rsp Response message.
-             * @throw OdbcError on error.
-             */
-            template<typename ReqT, typename RspT>
-            void SyncMessage(const ReqT& req, RspT& rsp)
-            {
-                // TODO: Remove when unnecessary.
-            }
+  /**
+   * Create diagnostic record associated with the Connection instance.
+   *
+   * @param sqlState SQL state.
+   * @param message Message.
+   * @param rowNum Associated row number.
+   * @param columnNum Associated column number.
+   * @return DiagnosticRecord associated with the instance.
+   */
+  static diagnostic::DiagnosticRecord CreateStatusRecord(
+      SqlState::Type sqlState, const std::string& message, int32_t rowNum = 0,
+      int32_t columnNum = 0);
 
-            /**
-             * Send request message.
-             * Uses connection timeout.
-             *
-             * @param req Request message.
-             * @throw OdbcError on error.
-             */
-            template<typename ReqT>
-            void SendRequest(const ReqT& req)
-            {
-                // TODO: Remove when unnecessary.
-            }
+  /**
+   * Synchronously send request message and receive response.
+   * Uses provided timeout.
+   *
+   * @param req Request message.
+   * @param rsp Response message.
+   * @param timeout Timeout.
+   * @return @c true on success, @c false on timeout.
+   * @throw OdbcError on error.
+   */
+  template < typename ReqT, typename RspT >
+  bool SyncMessage(const ReqT& req, RspT& rsp, int32_t timeout) {
+    // TODO: Remove when unnecessary.
+    return true;
+  }
 
-            /**
-             * Perform transaction commit.
-             */
-            void TransactionCommit();
+  /**
+   * Synchronously send request message and receive response.
+   * Uses connection timeout.
+   *
+   * @param req Request message.
+   * @param rsp Response message.
+   * @throw OdbcError on error.
+   */
+  template < typename ReqT, typename RspT >
+  void SyncMessage(const ReqT& req, RspT& rsp) {
+    // TODO: Remove when unnecessary.
+  }
 
-            /**
-             * Perform transaction rollback.
-             */
-            void TransactionRollback();
+  /**
+   * Send request message.
+   * Uses connection timeout.
+   *
+   * @param req Request message.
+   * @throw OdbcError on error.
+   */
+  template < typename ReqT >
+  void SendRequest(const ReqT& req) {
+    // TODO: Remove when unnecessary.
+  }
 
-            /**
-             * Get connection attribute.
-             *
-             * @param attr Attribute type.
-             * @param buf Buffer for value.
-             * @param bufLen Buffer length.
-             * @param valueLen Resulting value length.
-             */
-            void GetAttribute(int attr, void* buf, SQLINTEGER bufLen, SQLINTEGER *valueLen);
+  /**
+   * Perform transaction commit.
+   */
+  void TransactionCommit();
 
-            /**
-             * Set connection attribute.
-             *
-             * @param attr Attribute type.
-             * @param value Value pointer.
-             * @param valueLen Value length.
-             */
-            void SetAttribute(int attr, void* value, SQLINTEGER valueLen);
+  /**
+   * Perform transaction rollback.
+   */
+  void TransactionRollback();
 
-           private:
-            IGNITE_NO_COPY_ASSIGNMENT(Connection);
+  /**
+   * Get connection attribute.
+   *
+   * @param attr Attribute type.
+   * @param buf Buffer for value.
+   * @param bufLen Buffer length.
+   * @param valueLen Resulting value length.
+   */
+  void GetAttribute(int attr, void* buf, SQLINTEGER bufLen,
+                    SQLINTEGER* valueLen);
 
-            /**
-             * Init connection socket, using configuration.
-             *
-             * @return Operation result.
-             */
-            SqlResult::Type InitSocket();
+  /**
+   * Set connection attribute.
+   *
+   * @param attr Attribute type.
+   * @param value Value pointer.
+   * @param valueLen Value length.
+   */
+  void SetAttribute(int attr, void* value, SQLINTEGER valueLen);
 
-            /**
-             * Synchronously send request message and receive response.
-             * Uses provided timeout. Does not try to restore connection on
-             * fail.
-             *
-             * @param req Request message.
-             * @param rsp Response message.
-             * @param timeout Timeout.
-             * @return @c true on success, @c false on timeout.
-             * @throw OdbcError on error.
-             */
-            template<typename ReqT, typename RspT>
-            bool InternalSyncMessage(const ReqT& req, RspT& rsp, int32_t timeout)
-            {
-                // TODO: Remove when unnecessary.
-                return true;
-            }
+  inline std::shared_ptr<mongocxx::client>& GetMongoClient() {
+    return mongoClient_;
+  }
 
-            /**
-             * Establish connection to ODBC server.
-             * Internal call.
-             *
-             * @param connectStr Connection string.
-             * @param parentWindow Parent window.
-             * @return Operation result.
-             */
-            SqlResult::Type InternalEstablish(const std::string& connectStr, void* parentWindow);
+ private:
+  IGNITE_NO_COPY_ASSIGNMENT(Connection);
 
-            /**
-             * Establish connection to ODBC server.
-             * Internal call.
-             *
-             * @param cfg Configuration.
-             * @return Operation result.
-             */
-            SqlResult::Type InternalEstablish(const config::Configuration& cfg);
+  /**
+   * Init connection socket, using configuration.
+   *
+   * @return Operation result.
+   */
+  SqlResult::Type InitSocket();
 
-            /**
-             * Release established connection.
-             * Internal call.
-             *
-             * @return Operation result.
-             */
-            SqlResult::Type InternalRelease();
+  /**
+   * Synchronously send request message and receive response.
+   * Uses provided timeout. Does not try to restore connection on
+   * fail.
+   *
+   * @param req Request message.
+   * @param rsp Response message.
+   * @param timeout Timeout.
+   * @return @c true on success, @c false on timeout.
+   * @throw OdbcError on error.
+   */
+  template < typename ReqT, typename RspT >
+  bool InternalSyncMessage(const ReqT& req, RspT& rsp, int32_t timeout) {
+    // TODO: Remove when unnecessary.
+    return true;
+  }
 
-            /**
-             * Close connection.
-             */
-            void Close();
+  /**
+   * Establish connection to ODBC server.
+   * Internal call.
+   *
+   * @param connectStr Connection string.
+   * @param parentWindow Parent window.
+   * @return Operation result.
+   */
+  SqlResult::Type InternalEstablish(const std::string& connectStr,
+                                    void* parentWindow);
 
-            /**
-             * Get info of any type.
-             * Internal call.
-             *
-             * @param type Info type.
-             * @param buf Result buffer pointer.
-             * @param buflen Result buffer length.
-             * @param reslen Result value length pointer.
-             * @return Operation result.
-             */
-            SqlResult::Type InternalGetInfo(config::ConnectionInfo::InfoType type, void* buf, short buflen, short* reslen);
+  /**
+   * Establish connection to ODBC server.
+   * Internal call.
+   *
+   * @param cfg Configuration.
+   * @return Operation result.
+   */
+  SqlResult::Type InternalEstablish(const config::Configuration& cfg);
 
-            /**
-             * Create statement associated with the connection.
-             * Internal call.
-             *
-             * @param statement Pointer to valid instance on success and NULL on failure.
-             * @return Operation result.
-             */
-            SqlResult::Type InternalCreateStatement(Statement*& statement);
+  /**
+   * Release established connection.
+   * Internal call.
+   *
+   * @return Operation result.
+   */
+  SqlResult::Type InternalRelease();
 
-            /**
-             * Perform transaction commit on all the associated connections.
-             * Internal call.
-             *
-             * @return Operation result.
-             */
-            SqlResult::Type InternalTransactionCommit();
+  /**
+   * Close connection.
+   */
+  void Close();
 
-            /**
-             * Perform transaction rollback on all the associated connections.
-             * Internal call.
-             *
-             * @return Operation result.
-             */
-            SqlResult::Type InternalTransactionRollback();
+  /**
+   * Get info of any type.
+   * Internal call.
+   *
+   * @param type Info type.
+   * @param buf Result buffer pointer.
+   * @param buflen Result buffer length.
+   * @param reslen Result value length pointer.
+   * @return Operation result.
+   */
+  SqlResult::Type InternalGetInfo(config::ConnectionInfo::InfoType type,
+                                  void* buf, short buflen, short* reslen);
 
-            /**
-             * Get connection attribute.
-             * Internal call.
-             *
-             * @param attr Attribute type.
-             * @param buf Buffer for value.
-             * @param bufLen Buffer length.
-             * @param valueLen Resulting value length.
-             * @return Operation result.
-             */
-            SqlResult::Type InternalGetAttribute(int attr, void* buf, SQLINTEGER bufLen, SQLINTEGER* valueLen);
+  /**
+   * Create statement associated with the connection.
+   * Internal call.
+   *
+   * @param statement Pointer to valid instance on success and NULL on failure.
+   * @return Operation result.
+   */
+  SqlResult::Type InternalCreateStatement(Statement*& statement);
 
-            /**
-             * Set connection attribute.
-             * Internal call.
-             *
-             * @param attr Attribute type.
-             * @param value Value pointer.
-             * @param valueLen Value length.
-             * @return Operation result.
-             */
-            SqlResult::Type InternalSetAttribute(int attr, void* value, SQLINTEGER valueLen);
+  /**
+   * Perform transaction commit on all the associated connections.
+   * Internal call.
+   *
+   * @return Operation result.
+   */
+  SqlResult::Type InternalTransactionCommit();
 
-            /**
-             * Perform handshake request.
-             *
-             * @return Operation result.
-             */
-            SqlResult::Type MakeRequestHandshake();
+  /**
+   * Perform transaction rollback on all the associated connections.
+   * Internal call.
+   *
+   * @return Operation result.
+   */
+  SqlResult::Type InternalTransactionRollback();
 
-            /**
-             * Ensure there is a connection to the cluster.
-             *
-             * @throw OdbcError on failure.
-             */
-            void EnsureConnected();
+  /**
+   * Get connection attribute.
+   * Internal call.
+   *
+   * @param attr Attribute type.
+   * @param buf Buffer for value.
+   * @param bufLen Buffer length.
+   * @param valueLen Resulting value length.
+   * @return Operation result.
+   */
+  SqlResult::Type InternalGetAttribute(int attr, void* buf, SQLINTEGER bufLen,
+                                       SQLINTEGER* valueLen);
 
-            /**
-             * Try to restore connection to the cluster.
-             *
-             * @throw IgniteError on failure.
-             * @return @c true on success and @c false otherwise.
-             */
-            bool TryRestoreConnection(IgniteError& err);
+  /**
+   * Set connection attribute.
+   * Internal call.
+   *
+   * @param attr Attribute type.
+   * @param value Value pointer.
+   * @param valueLen Value length.
+   * @return Operation result.
+   */
+  SqlResult::Type InternalSetAttribute(int attr, void* value,
+                                       SQLINTEGER valueLen);
 
-            /**
-             * Connect to DocumentDB using Mongo cxx driver
-             * 
-             * @param localSSHTunnelPort internal SSH tunnel port
-             * @param err 
-             * @return @c true on success and @c false otherwise.
-             */
-            bool ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
-                                      IgniteError& err);
+  /**
+   * Perform handshake request.
+   *
+   * @return Operation result.
+   */
+  SqlResult::Type MakeRequestHandshake();
 
-            /**
-             * Formats the Mongo connection string from configuration values.
-             *
-             *  @return the JDBC connection string.
-             */
-            std::string FormatMongoCppConnectionString(
-                int32_t localSSHTunnelPort) const;
+  /**
+   * Ensure there is a connection to the cluster.
+   *
+   * @throw OdbcError on failure.
+   */
+  void EnsureConnected();
 
-            /**
-             * Helper function to get internall SSH tunnel Port
-             * 
-             * @param localSSHTunnelPort internal SSH tunnel port
-             * @param ctx java context
-             * @param err 
-             * @return bool 
-             */
-            bool GetInternalSSHTunnelPort (int32_t& localSSHTunnelPort, SharedPointer< jni::java::JniContext > ctx, IgniteError& err);
+  /**
+   * Try to restore connection to the cluster.
+   *
+   * @throw IgniteError on failure.
+   * @return @c true on success and @c false otherwise.
+   */
+  bool TryRestoreConnection(IgniteError& err);
 
-            /** 
-             * Creates JVM options
-             */
-            void SetJvmOptions(const std::string& cp);
+  /**
+   * Connect to DocumentDB using Mongo cxx driver
+   *
+   * @param localSSHTunnelPort internal SSH tunnel port
+   * @param err
+   * @return @c true on success and @c false otherwise.
+   */
+  bool ConnectCPPDocumentDB(int32_t localSSHTunnelPort, IgniteError& err);
 
-            /**
-             * Get the singleton instance of the JNI context for the connection.
-             *
-             * @return JNI context.
-             */
-            SharedPointer< JniContext > GetJniContext();
+  /**
+   * Formats the Mongo connection string from configuration values.
+   *
+   *  @return the JDBC connection string.
+   */
+  std::string FormatMongoCppConnectionString(int32_t localSSHTunnelPort) const;
 
-            /**
-             * De-initializes the JVM options
-             */
-            void Deinit();
+  /**
+   * Helper function to get internall SSH tunnel Port
+   *
+   * @param localSSHTunnelPort internal SSH tunnel port
+   * @param ctx java context
+   * @param err
+   * @return bool
+   */
+  bool GetInternalSSHTunnelPort(int32_t& localSSHTunnelPort,
+                                SharedPointer< jni::java::JniContext > ctx,
+                                IgniteError& err);
 
-            /**
-             * Retrieve timeout from parameter.
-             *
-             * @param value Parameter.
-             * @return Timeout.
-             */
-            int32_t RetrieveTimeout(void* value);
+  /**
+   * Creates JVM options
+   */
+  void SetJvmOptions(const std::string& cp);
 
-            /**
-             * Constructor.
-             */
-            Connection(Environment* env);
+  /**
+   * Get the singleton instance of the JNI context for the connection.
+   *
+   * @return JNI context.
+   */
+  SharedPointer< JniContext > GetJniContext(JniErrorInfo& errInfo);
 
-            /** Parent. */
-            Environment* env;
+  /**
+   * De-initializes the JVM options
+   */
+  void Deinit();
 
-            /** Connection timeout in seconds. */
-            int32_t timeout = 0;
+  /**
+   * Retrieve timeout from parameter.
+   *
+   * @param value Parameter.
+   * @return Timeout.
+   */
+  int32_t RetrieveTimeout(void* value);
 
-            /** Login timeout in seconds. */
-            int32_t loginTimeout = DEFAULT_CONNECT_TIMEOUT;
+  /**
+   * Constructor.
+   */
+  Connection(Environment* env);
 
-            /** Autocommit flag. */
-            bool autoCommit = true;
+  /** Parent. */
+  Environment* env_;
 
-            /** Configuration. */
-            config::Configuration config;
+  /** Connection timeout in seconds. */
+  int32_t timeout_ = 0;
 
-            /** Connection info. */
-            config::ConnectionInfo info;
+  /** Login timeout in seconds. */
+  int32_t loginTimeout_ = DEFAULT_CONNECT_TIMEOUT;
 
-            /** Java connection object */
-            SharedPointer< DocumentDbConnection > _connection;
+  /** Autocommit flag. */
+  bool autoCommit_ = true;
 
-            SharedPointer< JniContext > _jniContext;
+  /** Configuration. */
+  config::Configuration config_;
 
-            /** JVM options */
-            std::vector< char* > opts;
+  /** Connection info. */
+  config::ConnectionInfo info_;
 
-            /** Streaming context. */
-            streaming::StreamingContext streamingContext;
+  /** Java connection object */
+  SharedPointer< DocumentDbConnection > connection_;
 
-        };
-    }
-}
+  SharedPointer< JniContext > jniContext_;
 
-#endif //_IGNITE_ODBC_CONNECTION
+  std::shared_ptr< mongocxx::client > mongoClient_;
+
+  /** JVM options */
+  std::vector< char* > opts_;
+};
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_CONNECTION

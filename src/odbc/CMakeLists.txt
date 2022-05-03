@@ -33,6 +33,12 @@ include_directories(include)
 set(SOURCES src/app/application_data_buffer.cpp
         src/app/parameter.cpp
         src/app/parameter_set.cpp
+        src/binary/binary_containers.cpp
+        src/binary/binary_raw_writer.cpp
+        src/binary/binary_writer.cpp
+        src/binary/binary_reader.cpp
+        src/binary/binary_type.cpp
+        src/binary/binary_raw_reader.cpp
         src/common_types.cpp
         src/common/big_integer.cpp
         src/common/bits.cpp
@@ -44,14 +50,36 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/config/configuration.cpp
         src/config/connection_info.cpp
         src/config/connection_string_parser.cpp
+        src/impl/binary/binary_type_manager.cpp
+        src/impl/binary/binary_type_impl.cpp
+        src/impl/binary/binary_utils.cpp
+        src/impl/binary/binary_reader_impl.cpp
+        src/impl/binary/binary_type_handler.cpp
+        src/impl/binary/binary_writer_impl.cpp
+        src/impl/binary/binary_schema.cpp
+        src/impl/binary/binary_type_snapshot.cpp
+        src/impl/binary/binary_object_header.cpp
+        src/impl/binary/binary_object_impl.cpp
+        src/impl/binary/binary_field_meta.cpp
+        src/impl/interop/interop_memory.cpp
+        src/impl/interop/interop_output_stream.cpp
+        src/impl/interop/interop_input_stream.cpp
         src/connection.cpp
-        src/driverInstance.cpp
+        src/driver_instance.cpp
         src/cursor.cpp
         src/diagnostic/diagnosable_adapter.cpp
         src/diagnostic/diagnostic_record.cpp
         src/diagnostic/diagnostic_record_storage.cpp
+        src/documentdb_column.cpp
+        src/documentdb_cursor.cpp
+        src/documentdb_row.cpp
         src/jni/database_metadata.cpp
         src/jni/documentdb_connection.cpp
+        src/jni/documentdb_connection_properties.cpp
+        src/jni/documentdb_database_metadata.cpp
+        src/jni/documentdb_mql_query_context.cpp
+        src/jni/documentdb_query_mapping_service.cpp
+        src/jni/jdbc_column_metadata.cpp
         src/jni/java.cpp
         src/jni/result_set.cpp
         src/environment.cpp
@@ -68,7 +96,6 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/query/table_metadata_query.cpp
         src/query/type_info_query.cpp
         src/query/special_columns_query.cpp
-        src/query/streaming_query.cpp
         src/sql/sql_parser.cpp
         src/sql/sql_lexer.cpp
         src/sql/sql_set_streaming_command.cpp
@@ -86,8 +113,13 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/type_traits.cpp
         src/utility.cpp
         src/log.cpp
+        src/log_level.cpp
         src/read_preference.cpp
-        src/scan_method.cpp)
+        src/scan_method.cpp
+        src/date.cpp
+        src/guid.cpp
+        src/time.cpp
+        src/timestamp.cpp)
 
 if (WIN32)
     set(OS_INCLUDE os/win/include)
@@ -130,7 +162,7 @@ if (WIN32)
         add_definitions(-DNOMINMAX)
     endif()
 
-    target_link_libraries(${TARGET} ignite-common-objlib ignite-binary-objlib ignite-network-objlib odbccp32 shlwapi)
+    target_link_libraries(${TARGET} ignite-common-objlib odbccp32 shlwapi)
 
     remove_definitions(-DUNICODE=1)
 
@@ -142,7 +174,7 @@ if (WIN32)
                 
     set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME "ignite.odbc")
 else()
-    target_link_libraries(${TARGET} ignite-common ignite-binary ignite-network)
+    target_link_libraries(${TARGET} ignite-common)
 endif()
 
 if (WIN32 AND ${WITH_ODBC_MSI})
@@ -158,8 +190,8 @@ if (WIN32 AND ${WITH_ODBC_MSI})
 
     set(WIX_ODBC_LIBRARY_PATH ".\\ignite.odbc.dll")
 
-    set(WIX_PROJECT_NAME "Apache Ignite")
-    set(WIX_MANUFACTURER "The Apache Software Foundation")
+    set(WIX_PROJECT_NAME "Amazon DocumentDB")
+    set(WIX_MANUFACTURER "Amazon Web Services")
     set(WIX_COPYRIGHT_COMMENT "Apache, Apache Ignite, the Apache feather and the Apache Ignite logo are trademarks of The Apache Software Foundation.")
 
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -170,7 +202,7 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         set(WIX_PROGRAM_FILES_FOLDER_ID "ProgramFiles64Folder")
         set(WIX_COMPONENT_IS_WIN64 "yes")
         set(WIX_PACKAGE_PLATFORM "x64")
-        set(WIX_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/ignite-odbc-amd64)
+        set(WIX_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-amd64)
     elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
         set(WIX_BIT_SUFFIX "32-bit")
         set(WIX_PRODUCT_ID "D39CBABA-1E21-4701-AA5C-91EDA07B383B")
@@ -179,7 +211,7 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         set(WIX_PROGRAM_FILES_FOLDER_ID "ProgramFilesFolder")
         set(WIX_COMPONENT_IS_WIN64 "no")
         set(WIX_PACKAGE_PLATFORM "x86")
-        set(WIX_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/ignite-odbc-x86)
+        set(WIX_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-x86)
     endif()
 
     set(WIX_PRODUCT_NAME "${WIX_PROJECT_NAME} ODBC ${WIX_BIT_SUFFIX} Driver")

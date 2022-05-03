@@ -15,37 +15,49 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/ignite_error.h>
 #include <ignite/odbc/common/concurrent.h>
+#include <ignite/odbc/ignite_error.h>
 #include <ignite/odbc/jni/database_metadata.h>
 #include <ignite/odbc/jni/java.h>
 
 using ignite::odbc::common::concurrent::SharedPointer;
+using ignite::odbc::jni::ResultSet;
 using ignite::odbc::jni::java::GlobalJObject;
 using ignite::odbc::jni::java::JniContext;
-using ignite::odbc::jni::java::JniErrorInfo;
-using ignite::odbc::jni::ResultSet;
 using ignite::odbc::jni::java::JniErrorCode;
-
+using ignite::odbc::jni::java::JniErrorInfo;
 
 namespace ignite {
-    namespace odbc {
-        namespace jni {
-            SharedPointer< ResultSet > DatabaseMetaData::GetTables(
-                    const std::string& catalog,
-                    const std::string& schemaPattern,
-                    const std::string& tableNamePattern,
-                    const std::vector< std::string >& types,
-                    JniErrorInfo& errInfo) {
-                SharedPointer< GlobalJObject > resultSet;
-                JniErrorCode success = _jniContext.Get()->DatabaseMetaDataGetTables(
-                    _databaseMetaData, catalog, schemaPattern, tableNamePattern,
-                    types, resultSet, errInfo);
-                if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-                    return nullptr;
-                }
-                return new ResultSet(_jniContext, resultSet);
-            }
-        }  // namespace
-    }  // namespace odbc
+namespace odbc {
+namespace jni {
+SharedPointer< ResultSet > DatabaseMetaData::GetTables(
+    const std::string& catalog, const std::string& schemaPattern,
+    const std::string& tableNamePattern,
+    const std::vector< std::string >& types, JniErrorInfo& errInfo) {
+  SharedPointer< GlobalJObject > resultSet;
+  JniErrorCode success = _jniContext.Get()->DatabaseMetaDataGetTables(
+      _databaseMetaData, catalog, schemaPattern, tableNamePattern, types,
+      resultSet, errInfo);
+  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return nullptr;
+  }
+  return new ResultSet(_jniContext, resultSet);
+}
+
+SharedPointer< ResultSet > DatabaseMetaData::GetColumns(
+    const std::string& catalog, const std::string& schemaPattern,
+    const std::string& tableNamePattern, const std::string& columnNamePattern,
+    JniErrorInfo& errInfo) {
+  SharedPointer< GlobalJObject > resultSet;
+  const std::vector< std::string > types;
+  JniErrorCode success = _jniContext.Get()->DatabaseMetaDataGetColumns(
+      _databaseMetaData, catalog, schemaPattern, tableNamePattern,
+      columnNamePattern, resultSet, errInfo);
+  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return nullptr;
+  }
+  return new ResultSet(_jniContext, resultSet);
+}
+}  // namespace jni
+}  // namespace odbc
 }  // namespace ignite
