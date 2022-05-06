@@ -409,6 +409,13 @@ jobs:
       with:
         name: docdb-odbc-driver
         path: build/odbc/cmake/Debug/ignite.odbc.dll
+
+    - name: Upload performance test at push to develop
+    #  if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance
+        path: build/odbc/bin/Debug/performance.exe
     # 
     # The step below should be uncommented after the codecov is setup
     # - name: Upload Report to Codecov
