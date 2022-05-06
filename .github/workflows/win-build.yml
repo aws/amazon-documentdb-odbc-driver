@@ -404,7 +404,7 @@ jobs:
         path: coverage
 
     - name: Upload ODBC driver build at push to develop
-      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+    #  if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
       uses: actions/upload-artifact@v3
       with:
         name: docdb-odbc-driver
