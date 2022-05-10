@@ -9,6 +9,18 @@ SQL-relational interface for developers and BI tool users.
 
 This project is licensed under the Apache-2.0 License.
 
+## Architecture
+
+```mermaid
+graph LR
+    A(BI Tool) --> B(ODBC Driver Adapter)
+    subgraph Driver [ODBC Driver]
+    B --> C(JAVA Adapter)
+    B --> D(Native Adapter)
+    end
+    C --> E[(DocumentDB Server)]
+    D --> E 
+```
 ## Documentation
 
 - Setup
