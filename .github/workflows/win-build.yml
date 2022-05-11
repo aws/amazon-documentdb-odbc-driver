@@ -258,14 +258,14 @@ jobs:
         OPENSSL_ROOT_DIR: '${{env.VCPKG_ROOT}}/packages/openssl_x64-windows'
 
     - name: Upload ODBC driver build at push to develop
-    #  if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
       uses: actions/upload-artifact@v3
       with:
         name: docdb-odbc-driver
         path: build/odbc/cmake/Release
 
     - name: Upload performance test at push to develop
-    #  if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
       uses: actions/upload-artifact@v3
       with:
         name: performance
