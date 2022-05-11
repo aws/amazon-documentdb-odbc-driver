@@ -257,6 +257,20 @@ jobs:
       env:
         OPENSSL_ROOT_DIR: '${{env.VCPKG_ROOT}}/packages/openssl_x64-windows'
 
+    - name: Upload ODBC driver build at push to develop
+    #  if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: docdb-odbc-driver
+        path: build/odbc/cmake/Release
+
+    - name: Upload performance test at push to develop
+    #  if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance
+        path: build/odbc/bin/Release/performance.exe
+
     - name: register-driver
       run: |
         .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
@@ -403,19 +417,6 @@ jobs:
         name: code-coverage
         path: coverage
 
-    - name: Upload ODBC driver build at push to develop
-    #  if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
-      uses: actions/upload-artifact@v3
-      with:
-        name: docdb-odbc-driver
-        path: build/odbc/cmake/Release
-
-    - name: Upload performance test at push to develop
-    #  if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
-      uses: actions/upload-artifact@v3
-      with:
-        name: performance
-        path: build/odbc/bin/Debug/performance.exe
     # 
     # The step below should be uncommented after the codecov is setup
     # - name: Upload Report to Codecov
