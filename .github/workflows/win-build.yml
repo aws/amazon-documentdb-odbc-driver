@@ -408,7 +408,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: docdb-odbc-driver
-        path: build/odbc/cmake/Debug/ignite.odbc.dll
+        path: build/odbc/cmake/Release
 
     - name: Upload performance test at push to develop
     #  if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
