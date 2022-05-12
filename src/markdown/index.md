@@ -49,7 +49,7 @@ your cluster in the VPC. If you're a Tableau or other BI user, follow the direct
 
 ## Setup and Usage
 
-To set up and use the DocumentDB JDBC driver, see [Amazon DocumentDB ODBC Driver Setup](setup/setup.md).
+To set up and use the DocumentDB ODBC driver, see [Amazon DocumentDB ODBC Driver Setup](setup/setup.md).
 
 ## Connection String Syntax
 

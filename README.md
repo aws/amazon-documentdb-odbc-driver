@@ -27,5 +27,5 @@ To setup and use the DocumentDB ODBC driver, follow [these directions](src/markd
 DRIVER={Amazon DocumentDB};HOSTNAME=<host>:<port>;DATABASE=<database>;USER=<user>;PASSWORD=<password>;<option>=<value>;
 ```
 
-For more information about connecting to an Amazon DocumentDB database using this JDBC driver, see
+For more information about connecting to an Amazon DocumentDB database using this ODBC driver, see
 the [connection string documentation](src/markdown/setup/connection-string.md) for more details.

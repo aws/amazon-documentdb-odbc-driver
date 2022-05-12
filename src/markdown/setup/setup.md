@@ -4,7 +4,7 @@
 - [Prerequisites](#prerequisites)  
     - [DocumentDB Cluster](#documentdb-cluster)
     - [JRE or JDK](#jre-or-jdk) 
-    - [DocumentDB JDBC Driver](#documentdb-jdbc-driver)
+    - [DocumentDB ODBC Driver](#documentdb-odbc-driver)
 - [Specifying the Amazon RDS Certificate Authority Certificate File](#specifying-the-amazon-rds-certificate-authority-certificate-file) 
 - [Using an SSH Tunnel to Connect to Amazon DocumentDB](#using-an-ssh-tunnel-to-connect-to-amazon-documentdb)
 - [Driver Setup in BI Applications](#driver-setup-in-bi-applications)
@@ -34,11 +34,11 @@ Download the DocumentDB ODBC driver [here](https://github.com/aws/amazon-documen
 ## Specifying the Amazon RDS Certificate Authority Certificate File
 If you are connecting to a TLS-enabled cluster, you may want to specify the Amazon RDS Certificate Authority certificate 
 on your connection string. By default, an Amazon RDS Certificate Authority root certificate has been embedded in the 
-JDBC driver JAR file which should work when connecting to Amazon DocumentDB clusters using SSL/TLS encryption. However, 
+ODBC driver which should work when connecting to Amazon DocumentDB clusters using SSL/TLS encryption. However, 
 if you want to provide a new Amazon RDS Certificate Authority root certificate, follow the directions below:
 1. [Download the root CA certificate](https://s3.amazonaws.com/rds-downloads/rds-ca-2019-root.pem)
 2. It is recommended to relocate the file to your user's home directory: `$HOME` for Windows or `~` for MacOS/Linux.
-3. Add the `tlsCAFile` option to your [ODBC connection string](connection-string.md). For example: 
+3. Add the `TLS_CA_FILE` option to your [ODBC connection string](connection-string.md). For example: 
    
     ~~~
     DRIVER={Amazon DocumentDB};HOSTNAME=localhost:27017;DATABASE=customer;TLSALLOWINVALIDHOSTNAMES=true;TLSCAFILE=rds-ca-2019-root.pem
@@ -104,7 +104,7 @@ Example: Given the following
     ssh -i ~/.ssh/ec2Access.pem -N -L 27117:sample-cluster.node.us-east-1.docdb.amazonaws.com:27017 ubuntu@ec2-34-229-221-164.compute-1.amazonaws.com
     ~~~
 
-    The [JDBC connection string](connection-string.md) for connecting to the TLS-enabled Amazon DocumentDB cluster with 
+    The [ODBC connection string](connection-string.md) for connecting to the TLS-enabled Amazon DocumentDB cluster with 
     `<database-name>` = `customer` would look like:
 
     ~~~
