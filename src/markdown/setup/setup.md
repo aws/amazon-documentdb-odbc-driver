@@ -115,7 +115,7 @@ For further information on SSH tunneling , please refer to the documentation on
 [Connecting from Outside an Amazon VPC.](https://docs.aws.amazon.com/documentdb/latest/developerguide/connect-from-outside-a-vpc.html)
 
 ## Driver Setup in BI Applications
-The JDBC driver is compatible with a number of BI tools. Instructions are outlined here for:
+The ODBC driver is compatible with a number of BI tools. Instructions are outlined here for:
 1. [Microsoft Power BI](microsoft-power-bi.md)
 
 For other BI tools, please refer to that tool's product documentation.
