@@ -38,7 +38,7 @@ JDBC driver JAR file which should work when connecting to Amazon DocumentDB clus
 if you want to provide a new Amazon RDS Certificate Authority root certificate, follow the directions below:
 1. [Download the root CA certificate](https://s3.amazonaws.com/rds-downloads/rds-ca-2019-root.pem)
 2. It is recommended to relocate the file to your user's home directory: `$HOME` for Windows or `~` for MacOS/Linux.
-3. Add the `tlsCAFile` option to your [JDBC connection string](connection-string.md). For example: 
+3. Add the `tlsCAFile` option to your [ODBC connection string](connection-string.md). For example: 
    
     ~~~
     DRIVER={Amazon DocumentDB};HOSTNAME=localhost:27017;DATABASE=customer;TLSALLOWINVALIDHOSTNAMES=true;TLSCAFILE=rds-ca-2019-root.pem
