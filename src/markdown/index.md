@@ -41,7 +41,7 @@ graph LR
   
 ## Getting Started
 
-Follow the [requirements and setup directions](setup/setup.md) to get you environment ready to use the
+Follow the [requirements and setup directions](setup/setup.md) to get your environment ready to use the
 Amazon DocumentDB ODBC driver. Assuming your Amazon DocumentDB cluster is hosted in a private VPC, 
 you'll want to [create an SSH tunnel](setup/setup.md#using-an-ssh-tunnel-to-connect-to-amazon-documentdb) to bridge to 
 your cluster in the VPC. If you're a Tableau or other BI user, follow the directions on how to 
