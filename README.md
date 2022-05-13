@@ -91,7 +91,7 @@ Example:
    2. Navigate to the `build\odbc\cmake` folder to use the generated solution file, `Ignite.C++.sln` to work on
    source code development and testing.
 7. Set the environment variable `DOCUMENTDB_HOME`. On a developer's machine, set it to `<repo-folder>\build\odbc\bin\Debug`. The 
-   build script run above, downloads it to the `<repo-folder>\build\odbc\bin\Debug\libs` folder.
+   build script run above, downloads the JDBC jar to the `<repo-folder>\build\odbc\bin\Debug\libs` folder.
 8. Open a **64-bit** command shell or **64-bit** PowerShell window, **as Administrator**, run the command below
    ```
    .\<repo-folder>\src\odbc\install\install_amd64.cmd <repo-folder>\build\odbc\cmake\Debug\ignite.odbc.dll
