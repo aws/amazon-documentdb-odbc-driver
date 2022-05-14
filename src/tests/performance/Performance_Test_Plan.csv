@@ -36,7 +36,7 @@ SELECT LAST_DAY(createDate) FROM performance.employer_employees,10000,,LAST_DAY,
 "SELECT DATEDIFF(createDate, createDate) FROM performance.employer_employees",10000,,DATEDIFF,FALSE,10
 "SELECT PERIOD_DIFF(createDate, createDate) FROM performance.employer_employees",10000,,PERIOD_DIFF,FALSE,10
 SELECT YEAR(createDate) FROM performance.employer   ,10000,,SELECT YEAR FROM,FALSE,10
-"SELECT YEAR(createDate),name,sector,createDate,emplyer__id FROM performance.employer   ",10000,,"SELECT YEAR(createDate),name,sector,createDate,emplyer__id FROM performance.employer   ",FALSE,10
+"SELECT YEAR(createDate),name,sector,createDate,employer__id FROM performance.employer   ",10000,,"SELECT YEAR(createDate),name,sector,createDate,emplyer__id FROM performance.employer   ",FALSE,10
 SELECT YEAR(createDate) FROM performance.employer GROUP BY YEAR(createDate)    ,10000,,SELECT YEAR FROM GROUP BY YEAR,FALSE,10
 SELECT MONTH(createDate) FROM performance.employer   ,10000,,SELECT MONTH FROM,FALSE,10
 SELECT MONTH(createDate) FROM performance.employer GROUP BY MONTH(createDate)    ,10000,,SELECT MONTH FROM GROUP BY MONTH,FALSE,10
