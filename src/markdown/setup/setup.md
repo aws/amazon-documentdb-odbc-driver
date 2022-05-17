@@ -41,7 +41,7 @@ if you want to provide a new Amazon RDS Certificate Authority root certificate, 
 3. Add the `TLS_CA_FILE` option to your [ODBC connection string](connection-string.md). For example: 
    
     ~~~
-    DRIVER={Amazon DocumentDB};HOSTNAME=localhost:27017;DATABASE=customer;TLSALLOWINVALIDHOSTNAMES=true;TLSCAFILE=rds-ca-2019-root.pem
+    DRIVER={Amazon DocumentDB};HOSTNAME=localhost:27017;DATABASE=customer;TLS_ALLOW_INVALID_HOSTNAMES=true;TLS_CA_FILE=rds-ca-2019-root.pem
     ~~~
 
 To determine whether your cluster is TLS-enabled, you can 
@@ -74,7 +74,7 @@ option.
 3. For external SSH, if your local port (`-L <local-port>:<cluster-host>:<remote-port>`) configured for the SSH tunnel is not the default
 port (27017) for Amazon DocumentDB, ensure the connection string host setting for your SSH tunnel is properly set in the
 [ODBC connection string](connection-string.md).
-4. The `replicaSet` option is not supported when using an SSH tunnel.
+4. The `REPLICA_SET` option is not supported when using an SSH tunnel.
 
 ### Using an External SSH Tunnel to Connect to Amazon DocumentDB
 Start an SSH port-forwarding tunnel to the cluster with the following command:
@@ -108,7 +108,7 @@ Example: Given the following
     `<database-name>` = `customer` would look like:
 
     ~~~
-    jdbc:documentdb://localhost:27117/customer?tlsAllowedInvalidHostnames=true
+   DRIVER={Amazon DocumentDB};HOSTNAME=localhost:27117;DATABASE=customer;TLS_ALLOW_INVALID_HOSTNAMES=true
     ~~~
 
 For further information on SSH tunneling , please refer to the documentation on
