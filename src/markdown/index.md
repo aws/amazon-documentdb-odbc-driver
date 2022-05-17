@@ -30,6 +30,8 @@ graph LR
 - Setup
     - [Amazon DocumentDB ODBC Driver Setup](setup/setup.md)
     - [DSN](setup/dsn-configuration.md)
+- Development Envrionment
+    - [Amazon DocumentDB ODBC Development Environment Setup](setup/developer-guide.md)
 - Managing Schema
     - [Schema Discovery and Generation](https://github.com/aws/amazon-documentdb-jdbc-driver/blob/develop/src/markdown/schema/schema-discovery.md)
     - [Managing Schema Using the Command Line Interface](https://github.com/aws/amazon-documentdb-jdbc-driver/blob/develop/src/markdown/schema/manage-schema-cli.md)
