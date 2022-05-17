@@ -1,7 +1,4 @@
 # Development Environment
-
-For development environment check our [Development Guide](src/markdown/setup/developer-guide.md)
-
 ## Pre-requisites
 
 ### C/C++ Formatting
