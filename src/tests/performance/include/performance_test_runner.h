@@ -31,7 +31,7 @@ typedef SQLLEN SQLROWOFFSET;
  * GLOBAL CONSTANTS
  *******************************************************/
 
-#define BIND_SIZE 255 // used for SQLBindCol function
+#define BIND_SIZE 512 // used for SQLBindCol function
 
 // CSV header definitions (input csv file must match)
 #define QUERY_HEADER "query"
