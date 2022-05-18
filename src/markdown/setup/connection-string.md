@@ -10,8 +10,8 @@
 | `DATABASE` (required) | The name of the database the ODBC driver will connect to. | `NONE`
 | `HOSTNAME` (required) | The hostname or IP address of the DocumentDB server or cluster. | `NONE`
 | `PORT` (optional) | The port number the DocumentDB server or cluster is listening on. | `27017`
-| `USER` (optional) | The username of the authorized user. While the username is optional on the connection string, it is still required either via the connection string, or the properties. _Note: the username must be properly (%) encoded to avoid any confusion with URI special characters._ | `NONE`
-| `PASSWORD` (optional) | The password of the authorized user. While the password is optional on the connection string, it is still required either via the connection string, or the properties. _Note: the password must be properly (%) encoded to avoid any confusion with URI special characters._ | `NONE`
+| `USER` (optional) | The username of the authorized user. While the username is optional on the connection string, it is still required either via the connection string, or the properties. | `NONE`
+| `PASSWORD` (optional) | The password of the authorized user. While the password is optional on the connection string, it is still required either via the connection string, or the properties. | `NONE`
 | `OPTION` (optional) | One of the connection string options listed below. | `NONE`
 | `VALUE` (optional) | The associated value for the option. | `NONE`
 
