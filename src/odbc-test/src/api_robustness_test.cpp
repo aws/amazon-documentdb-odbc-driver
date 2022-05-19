@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeysEmpty) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
   ret = SQLFetch(stmt);
-  BOOST_CHECK_EQUAL(SQL_NO_DATA, ret);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttrGetStmtAttr) {
