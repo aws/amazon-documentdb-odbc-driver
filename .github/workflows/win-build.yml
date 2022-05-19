@@ -29,7 +29,7 @@ env:
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
   DOC_DB_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
   DOC_DB_LOG_LEVEL: "debug"
-  JDBC_DRIVER_VERSION: "1.2.1"
+  JDBC_DRIVER_VERSION: "1.2.3"
   MONGO_IMPORT_COMMAND: "C:/ProgramData/chocolatey/lib/mongodb-database-tools/tools/mongodb-database-tools-windows-x86_64-100.5.2binmongoimport.exe"
 
 jobs:
@@ -49,7 +49,7 @@ jobs:
         .\run_cppcheck.ps1
     - name: upload-cppcheck-results
       if: failure()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: cppcheck-results
         path: cppcheck-results.log 
@@ -155,19 +155,19 @@ jobs:
     #     .\scripts\prepare_ci_output.ps1 $Env:ODBC_BIN_PATH $Env:ODBC_LIB_PATH $Env:ODBC_BUILD_PATH
     # - name: upload-build
     #   if: always()
-    #   uses: actions/upload-artifact@v2
+    #   uses: actions/upload-artifact@v3
     #   with:
     #     name: windows32-build
     #     path: ci-output/build
     # - name: upload-installer
     #   if: success()
-    #   uses: actions/upload-artifact@v2
+    #   uses: actions/upload-artifact@v3
     #   with:
     #     name: windows32-installer
     #     path: ci-output/installer
     # - name: upload-test-results
     #   if: always()
-    #   uses: actions/upload-artifact@v2
+    #   uses: actions/upload-artifact@v3
     #   with:
     #     name: windows-test-results
     #     path: $CI_OUTPUT_PATH/test
@@ -186,7 +186,7 @@ jobs:
         .\run_cppcheck.ps1
     - name: upload-cppcheck-results
       if: failure()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: cppcheck-results
         path: cppcheck-results.log 
@@ -257,6 +257,20 @@ jobs:
       env:
         OPENSSL_ROOT_DIR: '${{env.VCPKG_ROOT}}/packages/openssl_x64-windows'
 
+    - name: Upload ODBC driver build at push to develop
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: docdb-odbc-driver
+        path: build/odbc/cmake/Release
+
+    - name: Upload performance test at push to develop
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance
+        path: build/odbc/bin/Release/performance.exe
+
     - name: register-driver
       run: |
         .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
@@ -290,13 +304,13 @@ jobs:
   #       .\scripts\prepare_ci_output.ps1 $Env:ODBC_BIN_PATH $Env:ODBC_LIB_PATH $Env:ODBC_BUILD_PATH
   #   - name: upload-build
   #     if: always()
-  #     uses: actions/upload-artifact@v2
+  #     uses: actions/upload-artifact@v3
   #     with:
   #       name: windows64-build
   #       path: ci-output/build
   #   - name: upload-installer
   #     if: success()
-  #     uses: actions/upload-artifact@v2
+  #     uses: actions/upload-artifact@v3
   #     with:
   #       name: windows64-installer
   #       path: ci-output/installer
@@ -398,10 +412,11 @@ jobs:
 
     - name: upload-coverage
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: code-coverage
         path: coverage
+
     # 
     # The step below should be uncommented after the codecov is setup
     # - name: Upload Report to Codecov

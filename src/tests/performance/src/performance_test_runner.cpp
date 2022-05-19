@@ -406,13 +406,9 @@ void performance::PerformanceTestRunner::RecordExecBindFetch(
     SQLRETURN ret;
     SQLSMALLINT total_columns = 0;
     SQLROWSETSIZE row_count;
-    SQLROWSETSIZE rows_fetched;
-    SQLUSMALLINT* row_status;
     long long time_exec_ms;
     long long time_bind_fetch_ms;
-
-    // Dynamic memory allocated
-    row_status = new SQLUSMALLINT[test_case.limit];
+    std::vector< Col > cols;
 
     // Query
     std::string temp_str =
@@ -429,7 +425,6 @@ void performance::PerformanceTestRunner::RecordExecBindFetch(
         auto time_exec_end = std::chrono::steady_clock::now();
 
         if (ret != SQL_SUCCESS) {
-            delete[] row_status;
             LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
             test_case.status = error;
             test_case.err_msg = "SQLExecDirect failed";
@@ -446,27 +441,24 @@ void performance::PerformanceTestRunner::RecordExecBindFetch(
         ret = SQLNumResultCols(*hstmt, &total_columns);
 
         if (ret != SQL_SUCCESS) {
-            delete[] row_status;
             LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
             test_case.status = error;
             test_case.err_msg = "SQLNumResultCols failed";
             return; // continue to next test case
         }
 
-        std::vector< std::vector< Col > > cols(total_columns);
-        for (size_t i = 0; i < cols.size(); i++) {
-            cols[i].resize(test_case.limit);
+        if (static_cast< size_t >(total_columns) > cols.size()) {
+            cols.resize(static_cast< size_t >(total_columns));
         }
 
         // Bind and fetch and record time
         auto time_bind_fetch_start = std::chrono::steady_clock::now();
-        for (size_t i = 0; i < cols.size(); i++) {
+        for (size_t i = 0; i < static_cast< size_t >(total_columns); i++) {
             ret = SQLBindCol(*hstmt, static_cast< SQLUSMALLINT >(i + 1),
                              SQL_C_CHAR,
-                             static_cast< SQLPOINTER >(&cols[i][0].data_dat[i]),
-                             BIND_SIZE, &cols[i][0].data_len);
+                             static_cast< SQLPOINTER >(&cols[i].data_dat[0]),
+                             BIND_SIZE, &cols[i].data_len);
             if (ret != SQL_SUCCESS) {
-                delete[] row_status;
                 LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
                 test_case.status = error;
                 test_case.err_msg = "SQLBindCol failed";
@@ -474,11 +466,10 @@ void performance::PerformanceTestRunner::RecordExecBindFetch(
             }
         }
 
-        while (SQLExtendedFetch(*hstmt, SQL_FETCH_NEXT, 0, &rows_fetched,
-                                row_status)
-               == SQL_SUCCESS) {
+        while (SQLFetch(*hstmt) == SQL_SUCCESS) {
             row_count++;
         }
+
         auto time_bind_fetch_end = std::chrono::steady_clock::now();
 
         // Store bind and fetch time
@@ -490,7 +481,6 @@ void performance::PerformanceTestRunner::RecordExecBindFetch(
 
         test_case.time_ms.push_back(time_exec_ms + time_bind_fetch_ms);
     }
-    delete[] row_status;
     test_case.status = success;
 }
 
