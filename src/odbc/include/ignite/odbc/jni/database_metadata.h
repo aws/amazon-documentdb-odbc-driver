@@ -65,16 +65,6 @@ class DatabaseMetaData {
                                         const std::string& columnNamePattern,
                                         JniErrorInfo& errInfo);
 
-  /**
-   * Query the primary keys in the database according to the given
-   * search critera in catalog (not supported), schema, and
-   * table.
-   */
-  SharedPointer< ResultSet > GetPrimaryKeys(const std::string& catalog,
-                                            const std::string& schema,
-                                            const std::string& table,
-                                            JniErrorInfo& errInfo);
-
  private:
   /**
    * Constructs an instance of the DatabaseMetaData class.

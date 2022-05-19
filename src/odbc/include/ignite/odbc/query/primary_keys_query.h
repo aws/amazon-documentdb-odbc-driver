@@ -110,15 +110,6 @@ class PrimaryKeysQuery : public Query {
  private:
   IGNITE_NO_COPY_ASSIGNMENT(PrimaryKeysQuery);
 
-    /**
-   * Make get primary keys metadata requets and use response to set internal
-   * state.
-   *
-   * @return Operation result.
-   */
-  virtual SqlResult::Type MakeRequestGetPrimaryKeysMeta();
-
-
   /** Connection associated with the statement. */
   Connection& connection;
 
@@ -133,9 +124,6 @@ class PrimaryKeysQuery : public Query {
 
   /** Query executed. */
   bool executed;
-
-  /** Fetched flag. */
-  bool fetched;
 
   /** Columns metadata. */
   meta::ColumnMetaVector columnsMeta;

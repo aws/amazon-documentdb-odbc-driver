@@ -72,18 +72,18 @@ PrimaryKeysQuery::PrimaryKeysQuery(diagnostic::DiagnosableAdapter& diag,
   const std::string sch("");
   const std::string tbl("");
 
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", JDBC_TYPE_VARCHAR,
-                                   Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_SCHEM", JDBC_TYPE_VARCHAR,
-                                   Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", JDBC_TYPE_VARCHAR,
-                                   Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_NAME", JDBC_TYPE_VARCHAR,
-                                   Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "KEY_SEQ", JDBC_TYPE_SMALLINT,
-                                   Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "PK_NAME", JDBC_TYPE_VARCHAR,
-                                   Nullability::NULLABLE));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_SCHEM", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_NAME", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "KEY_SEQ", IGNITE_TYPE_SHORT,
+                                   Nullability::NULLABILITY_UNKNOWN));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "PK_NAME", IGNITE_TYPE_STRING,
+                                   Nullability::NULLABILITY_UNKNOWN));
 }
 
 PrimaryKeysQuery::~PrimaryKeysQuery() {
@@ -94,16 +94,14 @@ SqlResult::Type PrimaryKeysQuery::Execute() {
   if (executed)
     Close();
 
-  SqlResult::Type result = MakeRequestGetPrimaryKeysMeta();
+  meta.push_back(
+      meta::PrimaryKeyMeta(catalog, schema, table, "_KEY", 1, "_KEY"));
 
-  if (result == SqlResult::AI_SUCCESS) {
-    executed = true;
-    fetched = false;
+  executed = true;
 
-    cursor = meta.begin();
-  }
+  cursor = meta.begin();
 
-  return result;
+  return SqlResult::AI_SUCCESS;
 }
 
 const meta::ColumnMetaVector* PrimaryKeysQuery::GetMeta() {
@@ -112,27 +110,28 @@ const meta::ColumnMetaVector* PrimaryKeysQuery::GetMeta() {
 
 SqlResult::Type PrimaryKeysQuery::FetchNextRow(
     app::ColumnBindingMap& columnBindings) {
-  if (!executed) {
-    diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
-                         "Query was not executed.");
+  // TODO: [AD-551] Adaptation SQLPrimaryKeys return tables PK
+  // https://bitquill.atlassian.net/browse/AD-551
+  return SqlResult::AI_NO_DATA;
 
-    return SqlResult::AI_ERROR;
-  }
+  //if (!executed) {
+  //  diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
+  //                       "Query was not executed.");
 
-  if (!fetched)
-    fetched = true;
-  else
-    ++cursor;
+  //  return SqlResult::AI_ERROR;
+  //}
 
-  if (cursor == meta.end())
-    return SqlResult::AI_NO_DATA;
+  //if (cursor == meta.end())
+  //  return SqlResult::AI_NO_DATA;
 
-  app::ColumnBindingMap::iterator it;
+  //app::ColumnBindingMap::iterator it;
 
-  for (it = columnBindings.begin(); it != columnBindings.end(); ++it)
-    GetColumn(it->first, it->second);
+  //for (it = columnBindings.begin(); it != columnBindings.end(); ++it)
+  //  GetColumn(it->first, it->second);
 
-  return SqlResult::AI_SUCCESS;
+  //++cursor;
+
+  //return SqlResult::AI_SUCCESS;
 }
 
 SqlResult::Type PrimaryKeysQuery::GetColumn(
@@ -191,7 +190,6 @@ SqlResult::Type PrimaryKeysQuery::Close() {
   meta.clear();
 
   executed = false;
-  fetched = false;
 
   return SqlResult::AI_SUCCESS;
 }
@@ -206,39 +204,6 @@ int64_t PrimaryKeysQuery::AffectedRows() const {
 
 SqlResult::Type PrimaryKeysQuery::NextResultSet() {
   return SqlResult::AI_NO_DATA;
-}
-
-SqlResult::Type PrimaryKeysQuery::MakeRequestGetPrimaryKeysMeta() {
-  IgniteError error;
-  SharedPointer< DatabaseMetaData > databaseMetaData =
-      connection.GetMetaData(error);
-  if (!databaseMetaData.IsValid()
-      || error.GetCode() != IgniteError::IGNITE_SUCCESS) {
-    diag.AddStatusRecord(error.GetText());
-    return SqlResult::AI_ERROR;
-  }
-
-  JniErrorInfo errInfo;
-  SharedPointer< ResultSet > resultSet =
-      databaseMetaData.Get()->GetPrimaryKeys(catalog, schema, table, errInfo);
-  if (!resultSet.IsValid()
-      || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    diag.AddStatusRecord(errInfo.errMsg);
-    return SqlResult::AI_ERROR;
-  }
-
-  meta::ReadPrimaryKeysColumnMetaVector(resultSet, meta);
-
-  for (size_t i = 0; i < meta.size(); ++i) {
-    LOG_MSG("\n[" << i << "] SchemaName:     "
-                  << meta[i].GetSchemaName().get_value_or("") << "\n[" << i
-                  << "] TableName:      "
-                  << meta[i].GetTableName().get_value_or("") << "\n[" << i
-                  << "] ColumnName:     "
-                  << meta[i].GetColumnName().get_value_or("") << "\n[" << i
-                  << "] ColumnType: not available");
-  }
-  return SqlResult::AI_SUCCESS;
 }
 }  // namespace query
 }  // namespace odbc

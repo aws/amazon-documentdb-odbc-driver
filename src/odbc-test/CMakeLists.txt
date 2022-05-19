@@ -108,7 +108,6 @@ set(SOURCES
          ../odbc/src/log.cpp
          ../odbc/src/message.cpp
          ../odbc/src/meta/column_meta.cpp
-         ../odbc/src/meta/primary_key_meta.cpp
          ../odbc/src/meta/table_meta.cpp
          ../odbc/src/nested_tx_mode.cpp
          ../odbc/src/protocol_version.cpp

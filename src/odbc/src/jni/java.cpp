@@ -257,11 +257,7 @@ JniMethod const M_DATABASE_META_DATA_GET_COLUMNS =
               "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/"
               "String;Ljava/lang/String;)Ljava/sql/ResultSet;",
               false);
-JniMethod const M_DATABASE_META_DATA_GET_PRIMARY_KEYS =
-    JniMethod("getPrimaryKeys",
-              "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/"
-              "String;)Ljava/sql/ResultSet;",
-              false);
+
 const char* const C_DOCUMENTDB_CONNECTION =
     "software/amazon/documentdb/jdbc/DocumentDbConnection";
 JniMethod const M_DOCUMENTDB_CONNECTION_GET_SSH_LOCAL_PORT =
@@ -664,8 +660,6 @@ void JniMembers::Initialize(JNIEnv* env) {
       FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_TABLES);
   m_DatabaseMetaDataGetColumns =
       FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_COLUMNS);
-  m_DatabaseMetaDataGetPrimaryKeys =
-      FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_PRIMARY_KEYS);
 
   c_Connection = FindClass(env, C_JAVA_SQL_CONNECTION);
   m_ConnectionClose =
@@ -1416,53 +1410,6 @@ JniErrorCode JniContext::DatabaseMetaDataGetColumns(
   resultSet = new GlobalJObject(env, env->NewGlobalRef(result));
 
   LOG_DEBUG_MSG("DatabaseMetaDataGetColumns exiting");
-
-  return errInfo.code;
-}
-
-JniErrorCode JniContext::DatabaseMetaDataGetPrimaryKeys(
-    const SharedPointer< GlobalJObject >& databaseMetaData,
-    const std::string& catalog, const std::string& schema,
-    const std::string& table, SharedPointer< GlobalJObject >& resultSet,
-    JniErrorInfo& errInfo) {
-  LOG_DEBUG_MSG("DatabaseMetaDataGetPrimaryKeys is called");
-
-  if (databaseMetaData.Get() == nullptr) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
-    errInfo.errMsg = "DatabaseMetaData object must be set.";
-
-    LOG_ERROR_MSG("DatabaseMetaDataGetPrimaryKeys exiting with error msg: "
-                  << errInfo.errMsg);
-
-    return errInfo.code;
-  }
-
-  JNIEnv* env = Attach();
-  jstring jCatalog = env->NewStringUTF(catalog.c_str());
-  jstring jSchema = env->NewStringUTF(schema.c_str());
-  jstring jTableName = env->NewStringUTF(table.c_str());
-
-  jobject result = env->CallObjectMethod(
-      databaseMetaData.Get()->GetRef(),
-      jvm->GetMembers().m_DatabaseMetaDataGetPrimaryKeys, jCatalog, jSchema,
-      jTableName);
-  ExceptionCheck(env, &errInfo);
-
-  env->DeleteLocalRef(jCatalog);
-  env->DeleteLocalRef(jSchema);
-  env->DeleteLocalRef(jTableName);
-
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    resultSet = nullptr;
-    LOG_ERROR_MSG(
-        "DatabaseMetaDataGetPrimaryKeys exiting with error. resultSet will be "
-        "null");
-    return errInfo.code;
-  }
-
-  resultSet = new GlobalJObject(env, env->NewGlobalRef(result));
-
-  LOG_DEBUG_MSG("DatabaseMetaDataGetPrimaryKeys exiting");
 
   return errInfo.code;
 }

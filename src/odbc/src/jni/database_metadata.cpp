@@ -58,19 +58,6 @@ SharedPointer< ResultSet > DatabaseMetaData::GetColumns(
   }
   return new ResultSet(_jniContext, resultSet);
 }
-
-SharedPointer< ResultSet > DatabaseMetaData::GetPrimaryKeys(
-    const std::string& catalog, const std::string& schema,
-    const std::string& table, JniErrorInfo& errInfo) {
-  SharedPointer< GlobalJObject > resultSet;
-  const std::vector< std::string > types;
-  JniErrorCode success = _jniContext.Get()->DatabaseMetaDataGetPrimaryKeys(
-      _databaseMetaData, catalog, schema, table, resultSet, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    return nullptr;
-  }
-  return new ResultSet(_jniContext, resultSet);
-}
 }  // namespace jni
 }  // namespace odbc
 }  // namespace ignite

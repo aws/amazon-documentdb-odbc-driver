@@ -114,30 +114,6 @@ class ResultSet {
   JniErrorCode GetInt(const std::string& columnName,
                       boost::optional< int >& value, JniErrorInfo& errInfo);
 
-  /**
-   * Gets a value on the current row of the result set for the
-   * given columnIndex (1-indexed). If a value exists, the value
-   * is set. If the value is null, the wasNull will be set to
-   * true, false, otherwise.
-   *
-   * @return a JniErrorCode indicating success or failure.
-   */
-  JniErrorCode GetSmallInt(const int columnIndex,
-                           boost::optional< int16_t >& value,
-                           JniErrorInfo& errInfo);
-
-  /**
-   * Gets a value on the current row of the result set for the
-   * given columnName. If a value exists, the value
-   * is set. If the value is null, the wasNull will be set to
-   * true, false, otherwise.
-   *
-   * @return a JniErrorCode indicating success or failure.
-   */
-  JniErrorCode GetSmallInt(const std::string& columnName,
-                           boost::optional< int16_t >& value,
-                           JniErrorInfo& errInfo);
-
  private:
   /**
    * Constructs a new instancee of ResultSet.
