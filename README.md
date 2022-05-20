@@ -15,7 +15,7 @@ This project is licensed under the Apache-2.0 License.
 
 ## Documentation
 
-See the [product documentation](src/markdown/index.md) for more detailed information about this driver.
+See the [product documentation](src/markdown/index.md) for more detailed information about this driver, such as setup and configuration.
 
 ## Setup and Usage
 
