@@ -65,6 +65,16 @@ class DatabaseMetaData {
                                         const std::string& columnNamePattern,
                                         JniErrorInfo& errInfo);
 
+  /**
+   * Query the foreign keys in the database according to the given
+   * search critera in catalog (not supported), schema, and
+   * table.
+   */
+  SharedPointer< ResultSet > GetImportedKeys(const boost::optional< std::string >& catalog,
+                                             const boost::optional< std::string >& schema,
+                                             const std::string& table,
+                                             JniErrorInfo& errInfo);
+
  private:
   /**
    * Constructs an instance of the DatabaseMetaData class.

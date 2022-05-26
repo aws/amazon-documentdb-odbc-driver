@@ -125,8 +125,8 @@ ColumnMetadataQuery::ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
 
   columnsMeta.reserve(18);
 
-  const std::string sch;
-  const std::string tbl;
+  const std::string sch("");
+  const std::string tbl("");
 
   columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", JDBC_TYPE_VARCHAR,
                                    Nullability::NULLABLE));

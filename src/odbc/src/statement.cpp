@@ -697,24 +697,24 @@ SqlResult::Type Statement::InternalExecuteGetTablesMetaQuery(
 void Statement::ExecuteGetForeignKeysQuery(const std::string& primaryCatalog,
                                            const std::string& primarySchema,
                                            const std::string& primaryTable,
-                                           const std::string& foreignCatalog,
-                                           const std::string& foreignSchema,
+                                           const boost::optional< std::string >& foreignCatalog,
+                                           const boost::optional< std::string >& foreignSchema,
                                            const std::string& foreignTable) {
   IGNITE_ODBC_API_CALL(InternalExecuteGetForeignKeysQuery(
       primaryCatalog, primarySchema, primaryTable, foreignCatalog,
       foreignSchema, foreignTable));
 }
 
-SqlResult::Type Statement::InternalExecuteGetForeignKeysQuery(
-    const std::string& primaryCatalog, const std::string& primarySchema,
-    const std::string& primaryTable, const std::string& foreignCatalog,
-    const std::string& foreignSchema, const std::string& foreignTable) {
+SqlResult::Type Statement::InternalExecuteGetForeignKeysQuery(const std::string& primaryCatalog, const std::string& primarySchema,
+    const std::string& primaryTable,
+    const boost::optional< std::string >& foreignCatalog,
+    const boost::optional< std::string >& foreignSchema,
+    const std::string& foreignTable) {
   if (currentQuery.get())
     currentQuery->Close();
 
   currentQuery.reset(new query::ForeignKeysQuery(
-      *this, connection, primaryCatalog, primarySchema, primaryTable,
-      foreignCatalog, foreignSchema, foreignTable));
+      *this, connection, foreignCatalog, foreignSchema, foreignTable));
 
   return currentQuery->Execute();
 }

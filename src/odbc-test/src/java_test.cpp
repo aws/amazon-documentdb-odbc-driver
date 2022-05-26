@@ -653,4 +653,366 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
   }
 }
 
+BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
+  PrepareContext();
+  BOOST_REQUIRE(_ctx.Get() != nullptr);
+
+  JniErrorInfo errInfo;
+  SharedPointer< GlobalJObject > connection;
+  // get connection
+  JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
+      _jdbcConnectionString.c_str(), connection, errInfo);
+  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    BOOST_FAIL(errInfo.errMsg);
+  }
+  BOOST_REQUIRE(connection.Get());
+  AutoCloseConnection autoCloseConnection(_ctx, connection);
+
+  // get databaseMetaData object
+  SharedPointer< GlobalJObject > databaseMetaData;
+  if (_ctx.Get()->ConnectionGetMetaData(connection, databaseMetaData, errInfo)
+      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    std::string errMsg = errInfo.errMsg;
+    BOOST_FAIL(errMsg);
+  }
+  BOOST_REQUIRE(databaseMetaData.Get());
+
+  const boost::optional< std::string > catalog = boost::none;
+  const boost::optional< std::string > schema = boost::none;
+  std::string fkTableName = "jni_test_001_sub_doc";
+  SharedPointer< GlobalJObject > resultSet;
+  if (_ctx.Get()->DatabaseMetaDataGetImportedKeys(
+          databaseMetaData, catalog, schema, fkTableName, resultSet, errInfo)
+      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    std::string errMsg = errInfo.errMsg;
+    BOOST_FAIL(errMsg);
+  }
+  BOOST_REQUIRE(resultSet.Get());
+  AutoCloseResultSet autoCloseResultSet(_ctx, resultSet);
+
+  // Get first
+  bool hasNext;
+  if (_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)
+      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    std::string errMsg = errInfo.errMsg;
+    BOOST_FAIL(errMsg);
+  }
+  BOOST_REQUIRE(hasNext);
+
+  std::string table = "jni_test_001_sub";
+  std::string fkColumn = "jni_test_001_sub__id";
+
+  int i = 1;
+  while (hasNext) {
+    boost::optional< std::string > value;
+    // TABLE_CAT (i.e., catalog - always NULL in our case)
+    if (_ctx.Get()->ResultSetGetString(resultSet, 1, value, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      // grab string from first column
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(!value);
+
+    // PKTABLE_CAT (i.e., catalog - always NULL in our case)
+    if (_ctx.Get()->ResultSetGetString(resultSet, "PKTABLE_CAT", value,
+                                       errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {  // grab string from first
+                                                    // column by name
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(!value);
+
+    // PKTABLE_SCHEM (i.e., database)
+    if (_ctx.Get()->ResultSetGetString(resultSet, 2, value, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(value);
+    BOOST_CHECK_EQUAL(DATABASE_NAME, *value);
+
+    // PKTABLE_SCHEM (i.e., database)
+    if (_ctx.Get()->ResultSetGetString(resultSet, "PKTABLE_SCHEM", value, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(value);
+    BOOST_CHECK_EQUAL(DATABASE_NAME, *value);
+
+    // PKTABLE_NAME
+    if (_ctx.Get()->ResultSetGetString(resultSet, 3, value, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_REQUIRE(value);
+    BOOST_CHECK_EQUAL(table, *value);
+
+    // PKTABLE_NAME
+    if (_ctx.Get()->ResultSetGetString(resultSet, "PKTABLE_NAME", value, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_REQUIRE(value);
+    BOOST_REQUIRE(value->size() > 0);
+    BOOST_CHECK_EQUAL(table, *value);
+
+    // PKCOLUMN_NAME
+    if (_ctx.Get()->ResultSetGetString(resultSet, 4, value, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_REQUIRE(value);
+    BOOST_REQUIRE(value->size() > 0);
+    BOOST_CHECK_EQUAL(fkColumn, *value);
+
+    // PKCOLUMN_NAME
+    if (_ctx.Get()->ResultSetGetString(resultSet, "PKCOLUMN_NAME", value, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_REQUIRE(value);
+    BOOST_REQUIRE(value->size() > 0);
+    BOOST_CHECK_EQUAL(fkColumn, *value);
+
+    // FKTABLE_CAT (always null)
+    if (_ctx.Get()->ResultSetGetString(resultSet, 5, value, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(!value);
+
+    // FKTABLE_CAT
+    if (_ctx.Get()->ResultSetGetString(resultSet, "FKTABLE_CAT", value,
+                                       errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(!value);
+
+    // FKTABLE_SCHEM (i.e., database)
+    if (_ctx.Get()->ResultSetGetString(resultSet, 6, value, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(value);
+    BOOST_CHECK_EQUAL(DATABASE_NAME, *value);
+
+    // FKTABLE_SCHEM (i.e., database)
+    if (_ctx.Get()->ResultSetGetString(resultSet, "FKTABLE_SCHEM", value,
+                                       errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(value);
+    BOOST_CHECK_EQUAL(DATABASE_NAME, *value);
+
+    // FKTABLE_NAME
+    if (_ctx.Get()->ResultSetGetString(resultSet, 7, value, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_REQUIRE(value);
+    BOOST_CHECK_EQUAL(fkTableName, *value);
+
+    // FKTABLE_NAME
+    if (_ctx.Get()->ResultSetGetString(resultSet, "FKTABLE_NAME", value,
+                                       errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_REQUIRE(value);
+    BOOST_REQUIRE(value->size() > 0);
+    BOOST_CHECK_EQUAL(fkTableName, *value);
+
+    // FKCOLUMN_NAME
+    if (_ctx.Get()->ResultSetGetString(resultSet, 8, value, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_REQUIRE(value);
+    BOOST_REQUIRE(value->size() > 0);
+    BOOST_CHECK_EQUAL(fkColumn, *value);
+
+    // FKCOLUMN_NAME
+    if (_ctx.Get()->ResultSetGetString(resultSet, "FKCOLUMN_NAME", value,
+                                       errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_REQUIRE(value);
+    BOOST_REQUIRE(value->size() > 0);
+    BOOST_CHECK_EQUAL(fkColumn, *value);
+
+    // KEY_SEQ
+    boost::optional< int > val;
+    if (_ctx.Get()->ResultSetGetInt(resultSet, 9, val, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_REQUIRE(val);
+    BOOST_CHECK_EQUAL(1, *val);
+
+    // KEY_SEQ
+    if (_ctx.Get()->ResultSetGetInt(resultSet, "KEY_SEQ", val, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_REQUIRE(val);
+    BOOST_CHECK_EQUAL(1, *val);
+
+    // UPDATE_RULE
+    if (_ctx.Get()->ResultSetGetInt(resultSet, 10, val, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(val);
+
+    // UPDATE_RULE
+    if (_ctx.Get()->ResultSetGetInt(resultSet, "UPDATE_RULE", val, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(val);
+
+    // DELETE_RULE
+    if (_ctx.Get()->ResultSetGetInt(resultSet, 11, val, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(val);
+
+    // DELETE_RULE
+    if (_ctx.Get()->ResultSetGetInt(resultSet, "DELETE_RULE", val, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(val);
+
+    // FK_NAME
+    if (_ctx.Get()->ResultSetGetString(resultSet, 12, value, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(!value);
+
+    // FK_NAME
+    if (_ctx.Get()->ResultSetGetString(resultSet, "FK_NAME", value, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(!value);
+
+    // PK_NAME
+    if (_ctx.Get()->ResultSetGetString(resultSet, 13, value, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(!value);
+
+    // PK_NAME
+    if (_ctx.Get()->ResultSetGetString(resultSet, "PK_NAME", value, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(!value);
+
+    // DEFERRABILITY
+    if (_ctx.Get()->ResultSetGetInt(resultSet, 14, val, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(val);
+
+    // DEFERRABILITY
+    if (_ctx.Get()->ResultSetGetInt(resultSet, "DEFERRABILITY", val, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+    BOOST_CHECK(val);
+
+    // Get next
+    if (_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)
+        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      std::string errMsg = errInfo.errMsg;
+      BOOST_FAIL(errMsg);
+    }
+
+    i++;
+  }
+  BOOST_CHECK_EQUAL(2, i);
+}
+
+BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeysReturnsNone) {
+  PrepareContext();
+  BOOST_REQUIRE(_ctx.Get() != nullptr);
+
+  JniErrorInfo errInfo;
+  SharedPointer< GlobalJObject > connection;
+  // get connection
+  JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
+      _jdbcConnectionString.c_str(), connection, errInfo);
+  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    BOOST_FAIL(errInfo.errMsg);
+  }
+  BOOST_REQUIRE(connection.Get());
+  AutoCloseConnection autoCloseConnection(_ctx, connection);
+
+  // get databaseMetaData object
+  SharedPointer< GlobalJObject > databaseMetaData;
+  if (_ctx.Get()->ConnectionGetMetaData(connection, databaseMetaData, errInfo)
+      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    std::string errMsg = errInfo.errMsg;
+    BOOST_FAIL(errMsg);
+  }
+  BOOST_REQUIRE(databaseMetaData.Get());
+
+  const boost::optional< std::string > catalog(std::string(""));
+  const boost::optional< std::string > schema(std::string(""));
+  std::string fkTableName("");
+  SharedPointer< GlobalJObject > resultSet;
+  if (_ctx.Get()->DatabaseMetaDataGetImportedKeys(
+          databaseMetaData, catalog, schema, fkTableName, resultSet, errInfo)
+      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    std::string errMsg = errInfo.errMsg;
+    BOOST_FAIL(errMsg);
+  }
+  BOOST_REQUIRE(resultSet.Get());
+  AutoCloseResultSet autoCloseResultSet(_ctx, resultSet);
+
+  bool hasNext;
+  if (_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)
+      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    std::string errMsg = errInfo.errMsg;
+    BOOST_FAIL(errMsg);
+  }
+  BOOST_CHECK(!hasNext);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
