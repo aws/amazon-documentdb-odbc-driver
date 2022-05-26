@@ -257,6 +257,10 @@ JniMethod const M_DATABASE_META_DATA_GET_COLUMNS =
               "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/"
               "String;Ljava/lang/String;)Ljava/sql/ResultSet;",
               false);
+JniMethod const M_DATABASE_META_DATA_GET_IMPORTED_KEYS =
+    JniMethod("getImportedKeys", 
+              "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/"
+              "String;)Ljava/sql/ResultSet;", false);
 
 const char* const C_DOCUMENTDB_CONNECTION =
     "software/amazon/documentdb/jdbc/DocumentDbConnection";
@@ -660,6 +664,8 @@ void JniMembers::Initialize(JNIEnv* env) {
       FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_TABLES);
   m_DatabaseMetaDataGetColumns =
       FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_COLUMNS);
+  m_DatabaseMetaDataGetImportedKeys =
+      FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_IMPORTED_KEYS);
 
   c_Connection = FindClass(env, C_JAVA_SQL_CONNECTION);
   m_ConnectionClose =
@@ -1410,6 +1416,54 @@ JniErrorCode JniContext::DatabaseMetaDataGetColumns(
   resultSet = new GlobalJObject(env, env->NewGlobalRef(result));
 
   LOG_DEBUG_MSG("DatabaseMetaDataGetColumns exiting");
+
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::DatabaseMetaDataGetImportedKeys(
+    const SharedPointer< GlobalJObject >& databaseMetaData,
+    const boost::optional< std::string >& catalog,
+    const boost::optional< std::string >& schema,
+    const std::string& table, SharedPointer< GlobalJObject >& resultSet,
+    JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("DatabaseMetaDataGetImportedKeys is called");
+
+  if (databaseMetaData.Get() == nullptr) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "DatabaseMetaData object must be set.";
+
+    LOG_ERROR_MSG("DatabaseMetaDataGetImportedKeys exiting with error msg: "
+                  << errInfo.errMsg);
+
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  jstring jCatalog = catalog ? env->NewStringUTF(catalog->c_str()) : nullptr;
+  jstring jSchema = schema ? env->NewStringUTF(schema->c_str()) : nullptr;
+  jstring jTable = env->NewStringUTF(table.c_str());
+
+  jobject result = env->CallObjectMethod(
+      databaseMetaData.Get()->GetRef(),
+      jvm->GetMembers().m_DatabaseMetaDataGetImportedKeys, jCatalog, jSchema,
+      jTable);
+  ExceptionCheck(env, &errInfo);
+
+  env->DeleteLocalRef(jCatalog);
+  env->DeleteLocalRef(jSchema);
+  env->DeleteLocalRef(jTable);
+
+  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    resultSet = nullptr;
+    LOG_ERROR_MSG(
+        "DatabaseMetaDataGetImportedKeys exiting with error. resultSet will be "
+        "null");
+    return errInfo.code;
+  }
+
+  resultSet = new GlobalJObject(env, env->NewGlobalRef(result));
+
+  LOG_DEBUG_MSG("DatabaseMetaDataGetImportedKeys exiting");
 
   return errInfo.code;
 }

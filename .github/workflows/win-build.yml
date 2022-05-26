@@ -37,22 +37,24 @@ jobs:
     runs-on: windows-2022
     steps:
     - uses: actions/checkout@v2
-    - name: setup-cppcheck
-      id: setup_cppcheck
-      run: |
-        choco install cppcheck -y
-        echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
+    # TODO Reactivate cppcheck
+    # https://bitquill.atlassian.net/browse/AD-752
+    # - name: setup-cppcheck
+    #   id: setup_cppcheck
+    #   run: |
+    #     choco install cppcheck -y -d
+    #     echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
         
-    - name: run-cppcheck
-      id: run-cppcheck
-      run: |
-        .\run_cppcheck.ps1
-    - name: upload-cppcheck-results
-      if: failure()
-      uses: actions/upload-artifact@v3
-      with:
-        name: cppcheck-results
-        path: cppcheck-results.log 
+    # - name: run-cppcheck
+    #   id: run-cppcheck
+    #   run: |
+    #     .\run_cppcheck.ps1
+    # - name: upload-cppcheck-results
+    #   if: failure()
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: cppcheck-results
+    #     path: cppcheck-results.log 
     - name: Get Java distribution
       uses: actions/setup-java@v2
       with:
@@ -175,21 +177,23 @@ jobs:
     runs-on: windows-2022
     steps:
     - uses: actions/checkout@v2
-    - name: run-cppcheck
-      id: setup_cppcheck
-      run: |
-        choco install cppcheck -y
-        echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
-    - name: run-cppcheck
-      id: run-cppcheck
-      run: |
-        .\run_cppcheck.ps1
-    - name: upload-cppcheck-results
-      if: failure()
-      uses: actions/upload-artifact@v3
-      with:
-        name: cppcheck-results
-        path: cppcheck-results.log 
+    # TODO Reactivate cppcheck
+    # https://bitquill.atlassian.net/browse/AD-752
+    # - name: run-cppcheck
+    #   id: setup_cppcheck
+    #   run: |
+    #     choco install cppcheck -y -d
+    #     echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
+    # - name: run-cppcheck
+    #   id: run-cppcheck
+    #   run: |
+    #     .\run_cppcheck.ps1
+    # - name: upload-cppcheck-results
+    #   if: failure()
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: cppcheck-results
+    #     path: cppcheck-results.log 
     - name: Get Java distribution
       uses: actions/setup-java@v2
       with:
