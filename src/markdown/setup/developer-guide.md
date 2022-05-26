@@ -1,33 +1,52 @@
-# Amazon DocumentDB ODBC Driver
+# Development Environment
+## Pre-requisites
 
-## Overview
+### C/C++ Formatting
 
-The ODBC driver for the Amazon DocumentDB managed document database provides an 
-SQL-relational interface for developers and BI tool users.
+- This project uses [Google's C++ Style Guide](https://google.github.io/styleguide/cppguide.htm) as a basis for 
+C/C++ usage and formatting.
+- Some formatting is set using the .clang-format file at the base of repository. Other options for Visual Studio can be imported from the 
+`VS-C++-Settings-Export.vssettings` file also found at root of repository.
 
-## Security
+### Environment Variables for Testing Accounts/Secrets 
+To enable the test environment to run the tests against a live DocumentDB system, set the following environment variables on your development machine.
 
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+DocumentDB cluster credentials
+1. `DOC_DB_HOST`=`<remote_documentdb_host>`(e.g.:`docdb-host.us-east-2.docdb.amazonaws.com`)
+2. `DOC_DB_PASSWORD`=`<documentdb_user_password>`
+3. `DOC_DB_USER_NAME`=`<documentdb_user_name>`
 
-## License
+SSH host credentials 
+1. `DOC_DB_USER`=`<ssh_user>`(e.g.:`ec2-user@ec2-instance.us-east-2.compute.amazonaws.com`)
+2. `DOC_DB_PRIV_KEY_FILE`=`<path_to_ssh_host_private_key_file>`(e.g.:`~/.ssh/ssh_host.pem`)
 
-This project is licensed under the Apache-2.0 License.
+[`Optional`] Log configurations
 
-## Documentation
+Set these 2 variables only if you would like to set a custom log path or log level for connection tests; it is completely optional.
+1. `DOC_DB_LOG_PATH`=`<path_to_log_file>`(e.g.:`"C:\\Users\\BitQuillUser\\Desktop\\DocumentDB ODBC Driver"`)
 
-See the [product documentation](src/markdown/index.md) for more detailed information about this driver, such as setup and configuration.
+   The user needs to ensure that the directory mentioned in the log file path does exist, or driver will ignore user's passed value and create the log file in the default log path. Do **not** include a slash at the end of the log path.
 
-## Setup and Usage
+   The log path indicates the path to store the log file. The log file name has `docdb_odbc_YYYYMMDD.log` format, 
+   where `YYYYMMDD` (e.g., 20220225 <= Feb 25th, 2022) is the date at the first log message.
 
-To setup and use the DocumentDB ODBC driver, follow [these directions](src/markdown/setup/setup.md).
+2. `DOC_DB_LOG_LEVEL`=`<log_level>`. The default is `error` level. (Choose from `debug`, `info`, `error`, `off`)
 
-## Connection String Syntax
+   More details about logging in [`src\markdown\troubleshooting-guide.md`](src/markdown/troubleshooting-guide.md).
 
+### Running an SSH tunnel for Testing
+By default, remote integration tests are not run. To enable remote integration tests, 
+set the environment variable `DOC_DB_ODBC_INTEGRATION_TEST=1`
+To run tests that require an external SSH tunnel, you will need to start an SSH tunnel using the same values as the environment variables set in the previous section. 
+If the local port is a value other than 27019, set `DOC_DB_LOCAL_PORT` to that value. 
+If the remote port is a value other than 27017, set `DOC_DB_REMOTE_PORT` to that value. 
+
+Example:
 ```
-DRIVER={Amazon DocumentDB};HOSTNAME=<host>:<port>;DATABASE=<database>;USER=<user>;PASSWORD=<password>;<option>=<value>;
+ ssh -i $DOC_DB_PRIV_KEY_FILE -N -L $DOC_DB_LOCAL_PORT:$DOC_DB_HOST:$DOC_DB_REMOTE_PORT $DOC_DB_USER
 ```
 
-#### Running and Installing Local MongoDB Server 
+### Running and Installing Local MongoDB Server 
 
 1. Run the following script to setup MongoDB server on your machine.
    1. `cd src/odbc-test/scripts`
@@ -40,7 +59,7 @@ DRIVER={Amazon DocumentDB};HOSTNAME=<host>:<port>;DATABASE=<database>;USER=<user
    If receiving permission errors on MacOS while importing the test data, 
    use `chmod +x ./reinstall_mongodb_mac.sh` and try again.
 
-### Windows
+## Windows
 
 1. Microsoft Visual Studio (Community 2019 Verified)
    1. Desktop Development for C++
@@ -50,7 +69,7 @@ DRIVER={Amazon DocumentDB};HOSTNAME=<host>:<port>;DATABASE=<database>;USER=<user
    5. [WiX Toolset v3 Schemas for Visual Studio](https://wixtoolset.org/releases/)
       If encountering "wix toolset requires .net 3.5.1 to be enabled", follow the steps below.
       1. Open Settings -> Apps -> Optional Features -> Under "Related Settings", click on "More Windows features", and select ".Net Framework 3.5".
-      ![Alt text](src/markdown/dotNet_screenshot.PNG "Example")
+      ![Alt text](src/markdown/images/dotNet_screenshot.PNG "Example")
    6. [WiX Toolset Visual Studio 2019 Extension](https://marketplace.visualstudio.com/items?itemName=WixToolset.WiXToolset)
 2. OpenSSL (full)
    1. Installed via [VCPKG](https://vcpkg.io/en/getting-started.html) (`.\vcpkg install openssl`).
@@ -77,7 +96,7 @@ DRIVER={Amazon DocumentDB};HOSTNAME=<host>:<port>;DATABASE=<database>;USER=<user
    Ensure that backslashes are used in your command. 
 9. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
-### MacOS
+## MacOS
 
 1. Install dependencies
    1. `brew install cmake`
@@ -107,11 +126,11 @@ DRIVER={Amazon DocumentDB};HOSTNAME=<host>:<port>;DATABASE=<database>;USER=<user
 5. Now you're ready to run the tests (e.g., `./build/odbc/bin/ignite-odbc-tests  --catch_system_errors=false`).
 6. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
-### Linux
+## Linux
 
-#### Using docker
+### Using docker
 
-##### Pre-requisites 
+#### Pre-requisites 
 
 1. Mongo instance running in your local (host) machine or in a docker container. Check [Running and Installing Local MongoDB Server ](#running-and-installing-local-mongodb-server)
    1. If running in a docker container collect the MongoDB container IP.
@@ -125,7 +144,7 @@ DRIVER={Amazon DocumentDB};HOSTNAME=<host>:<port>;DATABASE=<database>;USER=<user
       Alternatively you can add -v in docker run command to mount your folder with the pem files
       E.g. `-v <local path of pem folder file>:/<docker container path>` `
 
-##### Using the dev image
+#### Using the dev image
 
 1. Run docker container with interactive mode. If you are running MongoDB in the host, run `docker run --add-host host.docker.internal:host-gateway -v <local path of documentdb odbc repo>:/documentdb-odbc -it documentdb-dev-linux`. If you MongoDB is running in another conatainer run `docker run -v <local path of documentdb odbc repo>:/documentdb-odbc -it documentdb-dev-linux`
 2. Next steps all are from inside the container
@@ -140,14 +159,14 @@ DRIVER={Amazon DocumentDB};HOSTNAME=<host>:<port>;DATABASE=<database>;USER=<user
    E.g. `cd /documentdb-odbc/build/odbc/bin/ && ./ignite-odbc-tests  --catch_system_errors=false`
 3. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
-##### Known issues
+#### Known issues
 
 If a windows host machine is used, it is possible to have an issue with end of line character in the *.sh files. 
 There are two ways to fix the issue.
    1. Ensure that your github is checking out the files as Unix-style https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings
    2. Alternatively you can convert the end-of-line using the following command `tr -d '\015' < build_linux_debug64.sh > build_linux_debug64_lf.sh and run the build_linux_debug64_lf.sh`
       1. Note that the command will need to be executed for all scripts that you will run in the container (register_driver_unix.sh,env_variables_check.sh and any other that you might need).
-#### Using Ubuntu 64bit
+### Using Ubuntu 64bit
 
 1. Install all dependencies
    1. Ubuntu dev dependencies
@@ -212,14 +231,14 @@ There are two ways to fix the issue.
       E.g. `/documentdb-odbc/build/odbc/bin/ignite-odbc-tests --catch_system_errors=false`.
 
 
-### Troubleshooting 
+## Troubleshooting 
 
-#### Issue: MacOS build fails with error about iODBC header
-##### Example error message  
+### Issue: MacOS build fails with error about iODBC header
+#### Example error message  
 ```
 /Library/Frameworks/iODBC.framework/Headers/sqlext.h:82:10: fatal error: 'iODBC/sql.h' file not found
 #include <iODBC/sql.h>
      ^~~~~~~~~~~~~ 
 ``` 
-##### Fix 
+#### Fix 
 If you have installed the iODBC Driver Manager, the headers installed with it might be used instead of those from `unixodbc`. You may need to uninstall this driver manager and remove the `/Library/Frameworks/iODBC.framework/` directory. 
