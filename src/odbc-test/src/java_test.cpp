@@ -1015,7 +1015,6 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
-
     BOOST_REQUIRE(value);
     BOOST_REQUIRE(value->size() > 0);
     BOOST_CHECK_EQUAL(fkColumn, *value);
