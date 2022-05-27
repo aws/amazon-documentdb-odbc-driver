@@ -396,6 +396,25 @@ BOOST_AUTO_TEST_CASE(TestSQLNumResultCols) {
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 }
 
+BOOST_AUTO_TEST_CASE(TestSQLForeignKeys) {
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR fkTableName[] = "jni_test_001_sub_doc";
+
+  SQLRETURN ret =
+      SQLForeignKeys(stmt, NULL, 0,                     /* Primary catalog */
+                     NULL, 0,                           /* Primary schema */
+                     NULL, 0,                           /* Primary table */
+                     NULL, 0,                           /* Foreign catalog */
+                     NULL, 0,                           /* Foreign schema */
+                     fkTableName, sizeof(fkTableName)); /* Foreign table */
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+}
+
 BOOST_AUTO_TEST_CASE(TestSQLTables, *disabled()) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
@@ -693,7 +712,7 @@ BOOST_AUTO_TEST_CASE(TestSQLRowCount, *disabled()) {
   SQLRowCount(stmt, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLForeignKeys, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLForeignKeysSegFault, *disabled()) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 

@@ -85,6 +85,28 @@ JniErrorCode ResultSet::GetInt(const std::string& columnName,
   return _jniContext.Get()->ResultSetGetInt(_resultSet, columnName, value,
                                             errInfo);
 }
+
+JniErrorCode ResultSet::GetSmallInt(const int columnIndex,
+                                    boost::optional< int16_t >& value,
+                                    JniErrorInfo& errInfo) {
+  boost::optional< int > val;
+  JniErrorCode err =
+      _jniContext.Get()->ResultSetGetInt(_resultSet, columnIndex, val, errInfo);
+  if (val)
+    value = static_cast< int16_t >(*val);
+  return err;
+}
+
+JniErrorCode ResultSet::GetSmallInt(const std::string& columnName,
+                                    boost::optional< int16_t >& value,
+                                    JniErrorInfo& errInfo) {
+  boost::optional< int > val;
+  JniErrorCode err =
+      _jniContext.Get()->ResultSetGetInt(_resultSet, columnName, val, errInfo);
+  if (val)
+    value = static_cast< int16_t >(*val);
+  return err;
+}
 }  // namespace jni
 }  // namespace odbc
 }  // namespace ignite

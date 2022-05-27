@@ -1058,6 +1058,86 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsMany) {
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 }
 
+BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsOneFromLocalServer) {
+  SQLCHAR table[] = "meta_queries_test_002_with_array_array";
+
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLRETURN ret =
+      SQLForeignKeys(stmt, NULL, 0,              /* Primary catalog */
+                     NULL, 0,                    /* Primary schema */
+                     NULL, 0,                    /* Primary table */
+                     NULL, 0,                    /* Foreign catalog */
+                     NULL, 0,                    /* Foreign schema */
+                     table, sizeof(table));      /* Foreign table */
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // check result for PKTableName
+  CheckSingleRowResultSetWithGetData(stmt, 4, "meta_queries_test_002_with_array__id");
+
+  SQLCHAR empty[] = "";
+
+  ret = SQLForeignKeys(stmt, NULL, 0,         /* Primary catalog */
+                                 NULL, 0,               /* Primary schema */
+                                 NULL, 0,               /* Primary table */
+                                 empty, SQL_NTS,        /* Foreign catalog */
+                                 NULL, 0,               /* Foreign schema */
+                                 table, sizeof(table)); /* Foreign table */
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // check result for PKTableName
+  CheckSingleRowResultSetWithGetData(stmt, 4,
+                                     "meta_queries_test_002_with_array__id");
+}
+
+BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsNone) {
+  SQLCHAR empty[] = "";
+  SQLCHAR table[] = "meta_queries_test_002_with_array_array";
+
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLRETURN ret = SQLForeignKeys(stmt, empty, SQL_NTS,  /* Primary catalog */
+                                 empty, SQL_NTS,        /* Primary schema */
+                                 empty, SQL_NTS,        /* Primary table */
+                                 empty, SQL_NTS,        /* Foreign catalog */
+                                 empty, SQL_NTS,        /* Foreign schema */
+                                 empty, SQL_NTS);       /* Foreign table */
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  ret = SQLFetch(stmt);
+
+  BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+
+  // when empty strings are passed as catalog/schema, SQL_NO_DATA should be returned
+  ret = SQLForeignKeys(stmt, empty, SQL_NTS,  /* Primary catalog */
+                       empty, SQL_NTS,        /* Primary schema */
+                       empty, SQL_NTS,        /* Primary table */
+                       empty, SQL_NTS,        /* Foreign catalog */
+                       empty, SQL_NTS,        /* Foreign schema */
+                       table, sizeof(table)); /* Foreign table */
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  ret = SQLFetch(stmt);
+
+  BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+}
+
 BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
