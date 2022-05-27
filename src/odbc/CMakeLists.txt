@@ -85,6 +85,7 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/environment.cpp
         src/meta/column_meta.cpp
         src/meta/foreign_key_meta.cpp
+        src/meta/primary_key_meta.cpp
         src/meta/table_meta.cpp
         src/odbc.cpp
         src/entry_points.cpp

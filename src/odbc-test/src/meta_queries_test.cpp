@@ -77,8 +77,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
 
     columnIndex = columnIndex >= 1 ? columnIndex : 1;
     for (int i = 1; i <= columnIndex; i++) {
-      ret =
-          SQLGetData(stmt, columnIndex, SQL_C_CHAR, buf, sizeof(buf), &bufLen);
+      ret = SQLGetData(stmt, i, SQL_C_CHAR, buf, sizeof(buf), &bufLen);
 
       if (!SQL_SUCCEEDED(ret))
         BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1054,6 +1053,84 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsMany) {
     count++;
   } while (SQL_SUCCEEDED(ret));
   BOOST_CHECK(count > 1);
+
+  BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+}
+
+BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsOneFromLocalServer) {
+  SQLCHAR table[] = "meta_queries_test_001";
+
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLRETURN ret = SQLPrimaryKeys(stmt, nullptr, 0,  
+                                 nullptr, 0,        
+                                 table, sizeof(table)); 
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // check result for COLUMN_NAME
+  CheckSingleRowResultSetWithGetData(stmt, 4,
+                                     "meta_queries_test_001__id");
+}
+
+BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsManyFromLocalServer) {
+  SQLCHAR empty[] = "";
+  SQLCHAR table[] = "";
+
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLRETURN ret = SQLPrimaryKeys(stmt, nullptr, 0, 
+                                 nullptr, 0,      
+                                 empty, 0);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  int count = 0;
+  do {
+    ret = SQLFetch(stmt);
+    count++;
+  } while (SQL_SUCCEEDED(ret));
+  BOOST_CHECK(count > 1);
+
+  BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+}
+
+BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsNone) {
+  SQLCHAR empty[] = "";
+  SQLCHAR table[] = "meta_queries_test_001";
+
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLRETURN ret =
+      SQLPrimaryKeys(stmt, empty, SQL_NTS, empty, SQL_NTS, empty, SQL_NTS);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  ret = SQLFetch(stmt);
+
+  BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+
+  ret = SQLPrimaryKeys(stmt, empty, SQL_NTS, empty, SQL_NTS, table, SQL_NTS);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  ret = SQLFetch(stmt);
 
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 }
