@@ -66,6 +66,16 @@ class DatabaseMetaData {
                                         JniErrorInfo& errInfo);
 
   /**
+   * Query the primary keys in the database according to the given
+   * search critera in catalog (not supported), schema, and
+   * table.
+   */
+  SharedPointer< ResultSet > GetPrimaryKeys(const boost::optional< std::string >& catalog,
+                                            const boost::optional< std::string >& schema,
+                                            const boost::optional< std::string >& table,
+                                            JniErrorInfo& errInfo);
+
+  /**
    * Query the foreign keys in the database according to the given
    * search critera in catalog (not supported), schema, and
    * table.

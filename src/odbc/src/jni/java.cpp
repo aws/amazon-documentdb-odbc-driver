@@ -257,6 +257,11 @@ JniMethod const M_DATABASE_META_DATA_GET_COLUMNS =
               "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/"
               "String;Ljava/lang/String;)Ljava/sql/ResultSet;",
               false);
+JniMethod const M_DATABASE_META_DATA_GET_PRIMARY_KEYS =
+    JniMethod("getPrimaryKeys",
+              "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/"
+              "String;)Ljava/sql/ResultSet;",
+              false);
 JniMethod const M_DATABASE_META_DATA_GET_IMPORTED_KEYS =
     JniMethod("getImportedKeys", 
               "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/"
@@ -664,6 +669,8 @@ void JniMembers::Initialize(JNIEnv* env) {
       FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_TABLES);
   m_DatabaseMetaDataGetColumns =
       FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_COLUMNS);
+  m_DatabaseMetaDataGetPrimaryKeys =
+      FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_PRIMARY_KEYS);
   m_DatabaseMetaDataGetImportedKeys =
       FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_IMPORTED_KEYS);
 
@@ -1416,6 +1423,55 @@ JniErrorCode JniContext::DatabaseMetaDataGetColumns(
   resultSet = new GlobalJObject(env, env->NewGlobalRef(result));
 
   LOG_DEBUG_MSG("DatabaseMetaDataGetColumns exiting");
+
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::DatabaseMetaDataGetPrimaryKeys(
+    const SharedPointer< GlobalJObject >& databaseMetaData,
+    const boost::optional< std::string >& catalog,
+    const boost::optional< std::string >& schema,
+    const boost::optional< std::string >& table,
+    SharedPointer< GlobalJObject >& resultSet,
+    JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("DatabaseMetaDataGetPrimaryKeys is called");
+
+  if (databaseMetaData.Get() == nullptr) {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.errMsg = "DatabaseMetaData object must be set.";
+
+    LOG_ERROR_MSG("DatabaseMetaDataGetPrimaryKeys exiting with error msg: "
+                  << errInfo.errMsg);
+
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach();
+  jstring jCatalog = catalog ? env->NewStringUTF(catalog->c_str()) : nullptr;
+  jstring jSchema = schema ? env->NewStringUTF(schema->c_str()) : nullptr;
+  jstring jTableName = table ? env->NewStringUTF(table->c_str()) : nullptr;
+
+  jobject result =
+      env->CallObjectMethod(databaseMetaData.Get()->GetRef(),
+                            jvm->GetMembers().m_DatabaseMetaDataGetPrimaryKeys,
+                            jCatalog, jSchema, jTableName);
+  ExceptionCheck(env, &errInfo);
+
+  env->DeleteLocalRef(jCatalog);
+  env->DeleteLocalRef(jSchema);
+  env->DeleteLocalRef(jTableName);
+
+  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    resultSet = nullptr;
+    LOG_ERROR_MSG(
+        "DatabaseMetaDataGetPrimaryKeys exiting with error. resultSet will be "
+        "null");
+    return errInfo.code;
+  }
+
+  resultSet = new GlobalJObject(env, env->NewGlobalRef(result));
+
+  LOG_DEBUG_MSG("DatabaseMetaDataGetPrimaryKeys exiting");
 
   return errInfo.code;
 }
