@@ -916,6 +916,107 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
   BOOST_CHECK(!dbConnection.IsOpen());
 }
 
+BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetPrimaryKeys) {
+  PrepareContext();
+  BOOST_REQUIRE(_ctx.Get() != nullptr);
+
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+
+  Configuration config;
+  ConnectionStringParser parser(config);
+  parser.ParseConnectionString(dsnConnectionString, nullptr);
+  JniErrorInfo errInfo;
+  DocumentDbConnection dbConnection(_ctx);
+
+  BOOST_CHECK(!dbConnection.IsOpen());
+  if (dbConnection.Open(config, errInfo)
+      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    BOOST_FAIL(errInfo.errMsg);
+  }
+  BOOST_CHECK(dbConnection.IsOpen());
+
+  SharedPointer< DatabaseMetaData > databaseMetaData =
+      dbConnection.GetMetaData(errInfo);
+  BOOST_REQUIRE(databaseMetaData.IsValid());
+
+  boost::optional< std::string > catalog = boost::none;
+  boost::optional< std::string > schema = boost::none;
+  boost::optional< std::string > table = TABLE_NAME;
+  SharedPointer< ResultSet > resultSet =
+      databaseMetaData.Get()->GetPrimaryKeys(catalog, schema, table, errInfo);
+  BOOST_CHECK(resultSet.IsValid());
+  BOOST_CHECK(resultSet.Get()->IsOpen());
+
+  int columnIndex = 0;
+  // Loop the result set records
+  bool hasNext = false;
+  boost::optional< std::string > value;
+  std::string columnName;
+  boost::optional< int16_t > smallIntValue;
+  do {
+    resultSet.Get()->Next(hasNext, errInfo);
+    if (!hasNext) {
+      break;
+    }
+    columnIndex++;
+
+    resultSet.Get()->GetString(1, value, errInfo);
+    BOOST_CHECK(!value);
+
+    resultSet.Get()->GetString("TABLE_CAT", value, errInfo);
+    BOOST_CHECK(!value);
+
+    resultSet.Get()->GetString(2, value, errInfo);
+
+    BOOST_CHECK(value);
+    resultSet.Get()->GetString("TABLE_SCHEM", value, errInfo);
+
+    BOOST_CHECK(value);
+
+    resultSet.Get()->GetString(3, value, errInfo);
+    BOOST_CHECK(value);
+    BOOST_CHECK_EQUAL(TABLE_NAME, *value);
+
+    resultSet.Get()->GetString("TABLE_NAME", value, errInfo);
+    BOOST_CHECK(value);
+    BOOST_CHECK_EQUAL(TABLE_NAME, *value);
+
+    resultSet.Get()->GetString(4, value, errInfo);
+
+    BOOST_CHECK(value);
+    BOOST_CHECK(!value->empty());
+    resultSet.Get()->GetString("COLUMN_NAME", value, errInfo);
+
+    BOOST_CHECK(value);
+    BOOST_CHECK_EQUAL(TABLE_ID_COLUMN_NAME, *value);
+
+    resultSet.Get()->GetSmallInt(5, smallIntValue, errInfo);
+    BOOST_CHECK(smallIntValue);
+
+    resultSet.Get()->GetSmallInt("KEY_SEQ", smallIntValue, errInfo);
+    BOOST_CHECK(smallIntValue);
+
+    resultSet.Get()->GetString(6, value, errInfo);
+    BOOST_CHECK(!value);
+
+    resultSet.Get()->GetString("PK_NAME", value, errInfo);
+    BOOST_CHECK(!value);
+
+  } while (hasNext);
+  BOOST_CHECK_EQUAL(1, columnIndex);
+
+  if (resultSet.Get()->Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    BOOST_FAIL(errInfo.errMsg);
+  }
+  BOOST_CHECK(!resultSet.Get()->IsOpen());
+
+  if (dbConnection.Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    BOOST_FAIL(errInfo.errMsg);
+  }
+  BOOST_CHECK(!dbConnection.IsOpen());
+}
+
 BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetImportedKeys) {
   PrepareContext();
   BOOST_REQUIRE(_ctx.Get() != nullptr);
@@ -1073,6 +1174,54 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetImportedKeys) {
   }
   BOOST_CHECK(!dbConnection.IsOpen());
 }
+
+BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetPrimaryKeysReturnsNone) {
+  PrepareContext();
+  BOOST_REQUIRE(_ctx.Get() != nullptr);
+
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+
+  Configuration config;
+  ConnectionStringParser parser(config);
+  parser.ParseConnectionString(dsnConnectionString, nullptr);
+  JniErrorInfo errInfo;
+  DocumentDbConnection dbConnection(_ctx);
+
+  BOOST_CHECK(!dbConnection.IsOpen());
+  if (dbConnection.Open(config, errInfo)
+      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    BOOST_FAIL(errInfo.errMsg);
+  }
+  BOOST_CHECK(dbConnection.IsOpen());
+
+  SharedPointer< DatabaseMetaData > databaseMetaData =
+      dbConnection.GetMetaData(errInfo);
+  BOOST_REQUIRE(databaseMetaData.IsValid());
+
+  boost::optional< std::string > catalog("");
+  boost::optional< std::string > schema("");
+  boost::optional< std::string > table("");
+  SharedPointer< ResultSet > resultSet =
+      databaseMetaData.Get()->GetPrimaryKeys(catalog, schema, table, errInfo);
+  BOOST_CHECK(resultSet.IsValid());
+  BOOST_CHECK(resultSet.Get()->IsOpen());
+
+  bool hasNext = false;
+  resultSet.Get()->Next(hasNext, errInfo);
+  BOOST_CHECK(!hasNext);
+
+  if (resultSet.Get()->Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    BOOST_FAIL(errInfo.errMsg);
+  }
+  BOOST_CHECK(!resultSet.Get()->IsOpen());
+
+  if (dbConnection.Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    BOOST_FAIL(errInfo.errMsg);
+  }
+  BOOST_CHECK(!dbConnection.IsOpen());
+}
+
 
 BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetImportedKeysReturnsNone) {
   PrepareContext();

@@ -211,9 +211,9 @@ class Statement : public diagnostic::DiagnosableAdapter {
    * @param schema Schema name.
    * @param table Table name.
    */
-  void ExecuteGetPrimaryKeysQuery(const std::string& catalog,
-                                  const std::string& schema,
-                                  const std::string& table);
+  void ExecuteGetPrimaryKeysQuery(const boost::optional< std::string >& catalog,
+                                  const boost::optional< std::string >& schema,
+                                  const boost::optional< std::string >& table);
 
   /**
    * Get special columns.
@@ -583,9 +583,9 @@ class Statement : public diagnostic::DiagnosableAdapter {
    * @param table Table name.
    * @return Operation result.
    */
-  SqlResult::Type InternalExecuteGetPrimaryKeysQuery(const std::string& catalog,
-                                                     const std::string& schema,
-                                                     const std::string& table);
+  SqlResult::Type InternalExecuteGetPrimaryKeysQuery(const boost::optional< std::string >& catalog,
+                                                     const boost::optional< std::string >& schema,
+                                                     const boost::optional< std::string >& table);
 
   /**
    * Get special columns.

@@ -23,7 +23,11 @@
 #include <string>
 
 #include "ignite/odbc/impl/binary/binary_reader_impl.h"
+#include "ignite/odbc/jni/result_set.h"
+#include "ignite/odbc/log.h"
 #include "ignite/odbc/utility.h"
+
+using ignite::odbc::jni::ResultSet;
 
 namespace ignite {
 namespace odbc {
@@ -97,10 +101,17 @@ class PrimaryKeyMeta {
   }
 
   /**
+   * Read resultset item.
+   * @param resultSet SharedPointer< ResultSet >.
+   * @paran errInfo JniErrorInfo.
+   */
+  void Read(SharedPointer< ResultSet >& resultSet, JniErrorInfo& errInfo);
+
+  /**
    * Get catalog name.
    * @return Catalog name.
    */
-  const std::string& GetCatalogName() const {
+  const boost::optional< std::string >& GetCatalogName() const {
     return catalog;
   }
 
@@ -108,7 +119,7 @@ class PrimaryKeyMeta {
    * Get schema name.
    * @return Schema name.
    */
-  const std::string& GetSchemaName() const {
+  const boost::optional< std::string >& GetSchemaName() const {
     return schema;
   }
 
@@ -116,7 +127,7 @@ class PrimaryKeyMeta {
    * Get table name.
    * @return Table name.
    */
-  const std::string& GetTableName() const {
+  const boost::optional< std::string >& GetTableName() const {
     return table;
   }
 
@@ -124,15 +135,15 @@ class PrimaryKeyMeta {
    * Get column name.
    * @return Column name.
    */
-  const std::string& GetColumnName() const {
-    return table;
+  const boost::optional< std::string >& GetColumnName() const {
+    return column;
   }
 
   /**
    * Get column sequence number in key.
    * @return Sequence number in key.
    */
-  int16_t GetKeySeq() const {
+  boost::optional< int16_t > GetKeySeq() const {
     return keySeq;
   }
 
@@ -140,32 +151,40 @@ class PrimaryKeyMeta {
    * Get key name.
    * @return Key name.
    */
-  const std::string& GetKeyName() const {
+  const boost::optional< std::string >& GetKeyName() const {
     return keyName;
   }
 
  private:
   /** Catalog name. */
-  std::string catalog;
+  boost::optional< std::string > catalog;
 
   /** Schema name. */
-  std::string schema;
+  boost::optional< std::string > schema;
 
   /** Table name. */
-  std::string table;
+  boost::optional< std::string > table;
 
   /** Column name. */
-  std::string column;
+  boost::optional< std::string > column;
 
   /** Column sequence number in key. */
-  int16_t keySeq;
+  boost::optional< int16_t > keySeq;
 
   /** Key name. */
-  std::string keyName;
+  boost::optional< std::string > keyName;
 };
 
 /** Table metadata vector alias. */
 typedef std::vector< PrimaryKeyMeta > PrimaryKeyMetaVector;
+
+/**
+ * Read primary keys metadata collection.
+ * @param resultSet SharedPointer< ResultSet >.
+ * @param meta Collection.
+ */
+void ReadPrimaryKeysColumnMetaVector(SharedPointer< ResultSet >& resultSet,
+                                     PrimaryKeyMetaVector& meta);
 }  // namespace meta
 }  // namespace odbc
 }  // namespace ignite
