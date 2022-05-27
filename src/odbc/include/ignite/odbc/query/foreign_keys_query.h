@@ -20,6 +20,7 @@
 
 #include "ignite/odbc/connection.h"
 #include "ignite/odbc/query/query.h"
+#include "ignite/odbc/meta/foreign_key_meta.h"
 
 namespace ignite {
 namespace odbc {
@@ -29,25 +30,20 @@ namespace query {
  */
 class ForeignKeysQuery : public Query {
  public:
+
   /**
    * Constructor.
    *
    * @param diag Diagnostics collector.
    * @param connection Statement-associated connection.
-   * @param primaryCatalog Primary key catalog name.
-   * @param primarySchema Primary key schema name.
-   * @param primaryTable Primary key table name.
-   * @param foreignCatalog Foreign key catalog name.
-   * @param foreignSchema Foreign key schema name.
-   * @param foreignTable Foreign key table name.
+   * @param catalog Foreign key catalog name.
+   * @param schema Foreign key schema name.
+   * @param table Foreign key table name.
    */
   ForeignKeysQuery(diagnostic::DiagnosableAdapter& diag, Connection& connection,
-                   const std::string& primaryCatalog,
-                   const std::string& primarySchema,
-                   const std::string& primaryTable,
-                   const std::string& foreignCatalog,
-                   const std::string& foreignSchema,
-                   const std::string& foreignTable);
+                   const boost::optional< std::string >& catalog,
+                   const boost::optional< std::string >& schema,
+                   const std::string& table);
 
   /**
    * Destructor.
@@ -116,32 +112,40 @@ class ForeignKeysQuery : public Query {
  private:
   IGNITE_NO_COPY_ASSIGNMENT(ForeignKeysQuery);
 
+  /**
+   * Make get foreign keys metadata requets and use response to set internal
+   * state.
+   *
+   * @return Operation result.
+   */
+  virtual SqlResult::Type MakeRequestGetForeignKeysMeta();
+
   /** Connection associated with the statement. */
   Connection& connection;
 
-  /** Primary key catalog name. */
-  std::string primaryCatalog;
-
-  /** Primary key schema name. */
-  std::string primarySchema;
-
-  /** Primary key table name. */
-  std::string primaryTable;
-
   /** Foreign key catalog name. */
-  std::string foreignCatalog;
+  const boost::optional< std::string > catalog;
 
   /** Foreign key schema name. */
-  std::string foreignSchema;
+  const boost::optional< std::string > schema;
 
   /** Foreign key table name. */
-  std::string foreignTable;
+  std::string table;
 
   /** Query executed. */
   bool executed;
 
+  /** Fetched flag. */
+  bool fetched;
+
   /** Columns metadata. */
   meta::ColumnMetaVector columnsMeta;
+
+  /** Metadata cursor. */
+  meta::ForeignKeyMetaVector::iterator cursor;
+
+  /** Fetched Foreign Keys metadata. */
+  meta::ForeignKeyMetaVector meta;
 };
 }  // namespace query
 }  // namespace odbc

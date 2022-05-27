@@ -288,6 +288,7 @@ struct JniMembers {
   jclass c_DatabaseMetaData;
   jmethodID m_DatabaseMetaDataGetTables;
   jmethodID m_DatabaseMetaDataGetColumns;
+  jmethodID m_DatabaseMetaDataGetImportedKeys;
 
   jclass c_List;
   jmethodID m_ListSize;
@@ -528,6 +529,13 @@ class IGNITE_IMPORT_EXPORT JniContext {
       const std::string& catalog, const std::string& schemaPattern,
       const std::string& tableNamePattern, const std::string& columnNamePattern,
       SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo);
+
+  JniErrorCode DatabaseMetaDataGetImportedKeys(
+      const SharedPointer< GlobalJObject >& databaseMetaData,
+      const boost::optional< std::string >& catalog,
+      const boost::optional< std::string >& schema,
+      const std::string& table, SharedPointer< GlobalJObject >& resultSet,
+      JniErrorInfo& errInfo);
 
   JniErrorCode ResultSetClose(const SharedPointer< GlobalJObject >& resultSet,
                               JniErrorInfo& errInfo);

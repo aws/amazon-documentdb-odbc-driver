@@ -126,6 +126,12 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
 
 SQLRETURN SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCnt);
 
+/** Currently, we only support the following case :
+ * If *FKTableName contains a table name, SQLForeignKeys returns a result set
+ * that contains  all the foreign keys in the specified table that point to
+ * primary keys in other tables, and the primary keys in the other tables to
+ * which they refer. The list of foreign keys in the specified table does not
+ * contain foreign keys that refer to unique constraints in other tables. */
 SQLRETURN SQLForeignKeys(
     SQLHSTMT stmt, SQLCHAR* primaryCatalogName,
     SQLSMALLINT primaryCatalogNameLen, SQLCHAR* primarySchemaName,
