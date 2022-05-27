@@ -719,16 +719,17 @@ SqlResult::Type Statement::InternalExecuteGetForeignKeysQuery(const std::string&
   return currentQuery->Execute();
 }
 
-void Statement::ExecuteGetPrimaryKeysQuery(const std::string& catalog,
-                                           const std::string& schema,
-                                           const std::string& table) {
+void Statement::ExecuteGetPrimaryKeysQuery(const boost::optional< std::string >& catalog,
+                                           const boost::optional< std::string >& schema,
+                                           const boost::optional< std::string >& table) {
   IGNITE_ODBC_API_CALL(
       InternalExecuteGetPrimaryKeysQuery(catalog, schema, table));
 }
 
 SqlResult::Type Statement::InternalExecuteGetPrimaryKeysQuery(
-    const std::string& catalog, const std::string& schema,
-    const std::string& table) {
+    const boost::optional< std::string >& catalog,
+    const boost::optional< std::string >& schema,
+    const boost::optional< std::string >& table) {
   if (currentQuery.get())
     currentQuery->Close();
 

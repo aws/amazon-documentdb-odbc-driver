@@ -40,8 +40,9 @@ class PrimaryKeysQuery : public Query {
    * @param table Table name.
    */
   PrimaryKeysQuery(diagnostic::DiagnosableAdapter& diag, Connection& connection,
-                   const std::string& catalog, const std::string& schema,
-                   const std::string& table);
+                   const boost::optional< std::string >& catalog,
+                   const boost::optional< std::string >& schema,
+                   const boost::optional< std::string >& table);
 
   /**
    * Destructor.
@@ -110,20 +111,32 @@ class PrimaryKeysQuery : public Query {
  private:
   IGNITE_NO_COPY_ASSIGNMENT(PrimaryKeysQuery);
 
+    /**
+   * Make get primary keys metadata requets and use response to set internal
+   * state.
+   *
+   * @return Operation result.
+   */
+  virtual SqlResult::Type MakeRequestGetPrimaryKeysMeta();
+
+
   /** Connection associated with the statement. */
   Connection& connection;
 
   /** Catalog name. */
-  std::string catalog;
+  boost::optional< std::string > catalog;
 
   /** Schema name. */
-  std::string schema;
+  boost::optional< std::string > schema;
 
   /** Table name. */
-  std::string table;
+  boost::optional< std::string > table;
 
   /** Query executed. */
   bool executed;
+
+  /** Fetched flag. */
+  bool fetched;
 
   /** Columns metadata. */
   meta::ColumnMetaVector columnsMeta;

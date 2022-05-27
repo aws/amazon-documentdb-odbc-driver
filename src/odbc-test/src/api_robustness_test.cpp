@@ -146,26 +146,6 @@ SQLSMALLINT unsupportedSql[] = {SQL_WVARCHAR,
 
 BOOST_FIXTURE_TEST_SUITE(ApiRobustnessTestSuite, ApiRobustnessTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeysEmpty) {
-  std::string dsnConnectionString;
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
-
-  Connect(dsnConnectionString);
-
-  SQLCHAR empty[] = "";
-  SQLCHAR schema[] = "odbc-test";
-  SQLCHAR tableName[] = "api_robustness_test_001";
-
-  SQLRETURN ret;
-  ret = SQLPrimaryKeys(stmt, empty, sizeof(empty), schema, sizeof(schema),
-                       tableName, sizeof(tableName));
-  if (!SQL_SUCCEEDED(ret)) {
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-  }
-  ret = SQLFetch(stmt);
-  BOOST_CHECK_EQUAL(SQL_NO_DATA, ret);
-}
-
 BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttrGetStmtAttr) {
   // check that statement array size is set correctly
 
@@ -471,6 +451,41 @@ BOOST_AUTO_TEST_CASE(TestSQLColumns, *disabled()) {
 
   // All nulls.
   SQLColumns(dbc, 0, 0, 0, 0, 0, 0, 0, 0);
+}
+
+BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeys) {
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR catalogName[] = "";
+  SQLCHAR schemaName[] = "odbc-test";
+  SQLCHAR tableName[] = "jni_test_001";
+
+  // Everything is ok.
+  SQLRETURN ret =
+      SQLPrimaryKeys(stmt, catalogName, sizeof(catalogName), schemaName,
+                     sizeof(schemaName), tableName, sizeof(tableName));
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+
+  SQLPrimaryKeys(stmt, 0, sizeof(catalogName), schemaName, sizeof(schemaName),
+                 tableName, sizeof(tableName));
+  SQLPrimaryKeys(stmt, catalogName, 0, schemaName, sizeof(schemaName),
+                 tableName, sizeof(tableName));
+  SQLPrimaryKeys(stmt, catalogName, sizeof(catalogName), 0, sizeof(schemaName),
+                 tableName, sizeof(tableName));
+  SQLPrimaryKeys(stmt, catalogName, sizeof(catalogName), schemaName, 0,
+                 tableName, sizeof(tableName));
+  SQLPrimaryKeys(stmt, catalogName, sizeof(catalogName), schemaName,
+                 sizeof(schemaName), 0, sizeof(tableName));
+  SQLPrimaryKeys(stmt, catalogName, sizeof(catalogName), schemaName,
+                 sizeof(schemaName), tableName, 0);
+  SQLPrimaryKeys(stmt, 0, 0, 0, 0, 0, 0);
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLBindCol, *disabled()) {
@@ -857,38 +872,6 @@ BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttr, *disabled()) {
   SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE,
                  reinterpret_cast< SQLPOINTER >(val), 0);
   SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE, 0, 0);
-}
-
-BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeys, *disabled()) {
-  // There are no checks because we do not really care what is the result of
-  // these calls as long as they do not cause segmentation fault.
-
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
-
-  SQLCHAR catalogName[] = "";
-  SQLCHAR schemaName[] = "cache";
-  SQLCHAR tableName[] = "TestType";
-
-  // Everything is ok.
-  SQLRETURN ret =
-      SQLPrimaryKeys(stmt, catalogName, sizeof(catalogName), schemaName,
-                     sizeof(schemaName), tableName, sizeof(tableName));
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
-
-  SQLPrimaryKeys(stmt, 0, sizeof(catalogName), schemaName, sizeof(schemaName),
-                 tableName, sizeof(tableName));
-  SQLPrimaryKeys(stmt, catalogName, 0, schemaName, sizeof(schemaName),
-                 tableName, sizeof(tableName));
-  SQLPrimaryKeys(stmt, catalogName, sizeof(catalogName), 0, sizeof(schemaName),
-                 tableName, sizeof(tableName));
-  SQLPrimaryKeys(stmt, catalogName, sizeof(catalogName), schemaName, 0,
-                 tableName, sizeof(tableName));
-  SQLPrimaryKeys(stmt, catalogName, sizeof(catalogName), schemaName,
-                 sizeof(schemaName), 0, sizeof(tableName));
-  SQLPrimaryKeys(stmt, catalogName, sizeof(catalogName), schemaName,
-                 sizeof(schemaName), tableName, 0);
-  SQLPrimaryKeys(stmt, 0, 0, 0, 0, 0, 0);
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLNumParams, *disabled()) {
