@@ -26,6 +26,8 @@
 #include <ignite/odbc/common/utils.h>
 #include <stdint.h>
 
+#include <boost/optional.hpp>
+#include <boost/optional/optional_io.hpp>
 #include <string>
 
 #include "ignite/odbc/impl/binary/binary_reader_impl.h"
@@ -105,6 +107,17 @@ void WriteDecimal(BinaryWriterImpl& writer,
  * @return Standard string containing the same data.
  */
 std::string SqlStringToString(const unsigned char* sqlStr, int32_t sqlStrLen);
+
+/**
+ * Convert SQL string buffer to boost::optional< std::string >.
+ *
+ * @param sqlStr SQL string buffer.
+ * @param sqlStrLen SQL string length.
+ * @return Standard optional string containing the same data.
+ * If sqlStrLen indicates null string, boost::none is returned.
+ */
+boost::optional< std::string > SqlStringToOptString(const unsigned char* sqlStr,
+                                                    int32_t sqlStrLen);
 
 /**
  * Convert binary data to hex dump form

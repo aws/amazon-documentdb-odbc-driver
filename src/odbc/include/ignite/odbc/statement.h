@@ -200,8 +200,8 @@ class Statement : public diagnostic::DiagnosableAdapter {
   void ExecuteGetForeignKeysQuery(const std::string& primaryCatalog,
                                   const std::string& primarySchema,
                                   const std::string& primaryTable,
-                                  const std::string& foreignCatalog,
-                                  const std::string& foreignSchema,
+                                  const boost::optional< std::string >& foreignCatalog,
+                                  const boost::optional< std::string >& foreignSchema,
                                   const std::string& foreignTable);
 
   /**
@@ -558,6 +558,7 @@ class Statement : public diagnostic::DiagnosableAdapter {
 
   /**
    * Get foreign keys.
+   * Params for primary key catalog, schema, and table names are ignored. 
    *
    * @param primaryCatalog Primary key catalog name.
    * @param primarySchema Primary key schema name.
@@ -569,8 +570,10 @@ class Statement : public diagnostic::DiagnosableAdapter {
    */
   SqlResult::Type InternalExecuteGetForeignKeysQuery(
       const std::string& primaryCatalog, const std::string& primarySchema,
-      const std::string& primaryTable, const std::string& foreignCatalog,
-      const std::string& foreignSchema, const std::string& foreignTable);
+      const std::string& primaryTable,
+      const boost::optional< std::string >& foreignCatalog,
+      const boost::optional< std::string >& foreignSchema,
+      const std::string& foreignTable);
 
   /**
    * Get primary keys.

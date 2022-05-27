@@ -154,7 +154,7 @@ class PrimaryKeyMeta {
   /** Table name. */
   std::string table;
 
-  /** Collumn name. */
+  /** Column name. */
   std::string column;
 
   /** Column sequence number in key. */

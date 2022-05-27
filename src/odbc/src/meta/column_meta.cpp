@@ -108,14 +108,11 @@ const std::string ORDINAL_POSITION = "ORDINAL_POSITION";
 
 void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
                       int32_t& prevPosition, JniErrorInfo& errInfo) {
-  boost::optional< int > intDataType;
   resultSet.Get()->GetString(TABLE_CAT, catalogName, errInfo);
   resultSet.Get()->GetString(TABLE_SCHEM, schemaName, errInfo);
   resultSet.Get()->GetString(TABLE_NAME, tableName, errInfo);
   resultSet.Get()->GetString(COLUMN_NAME, columnName, errInfo);
-  resultSet.Get()->GetInt(DATA_TYPE, intDataType, errInfo);
-  if (intDataType)
-    dataType = static_cast< int16_t >(*intDataType);
+  resultSet.Get()->GetSmallInt(DATA_TYPE, dataType, errInfo);
   resultSet.Get()->GetString(REMARKS, remarks, errInfo);
   resultSet.Get()->GetString(COLUMN_DEF, columnDef, errInfo);
   resultSet.Get()->GetInt(NULLABLE, nullability, errInfo);
