@@ -326,11 +326,11 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
 
   LOG_DEBUG_MSG("SQLDriverConnect called");
 
-  // TODO enable logging connection string 
+  // TODO enable logging connection string
   // https://bitquill.atlassian.net/browse/AD-702
-  
-  //if (inConnectionString)
-  //  LOG_INFO_MSG("Connection String: [" << inConnectionString << "]");
+
+  // if (inConnectionString)
+  //   LOG_INFO_MSG("Connection String: [" << inConnectionString << "]");
 
   Connection* connection = reinterpret_cast< Connection* >(conn);
 
@@ -360,8 +360,8 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
   if (outConnectionStringLen)
     *outConnectionStringLen = static_cast< SQLSMALLINT >(reslen);
 
-  //if (outConnectionString)
-  //  LOG_INFO_MSG(outConnectionString);
+  // if (outConnectionString)
+  //   LOG_INFO_MSG(outConnectionString);
 
   LOG_DEBUG_MSG("SQLDriverConnect exiting");
 
@@ -852,9 +852,10 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
   LOG_INFO_MSG("columnSizeRes: " << columnSizeRes);
   LOG_INFO_MSG("decimalDigitsRes: " << decimalDigitsRes);
   LOG_INFO_MSG("nullableRes: " << nullableRes);
-  LOG_INFO_MSG("columnNameBuf: "
-          << (columnNameBuf ? reinterpret_cast< const char* >(columnNameBuf)
-                            : "<null>"));
+  LOG_INFO_MSG(
+      "columnNameBuf: " << (columnNameBuf
+                                ? reinterpret_cast< const char* >(columnNameBuf)
+                                : "<null>"));
   LOG_INFO_MSG("columnNameLen: " << (columnNameLen ? *columnNameLen : -1));
 
   if (dataType)
@@ -910,6 +911,7 @@ SQLRETURN SQLForeignKeys(
     SQLSMALLINT foreignTableNameLen) {
   using odbc::Statement;
   using odbc::utility::SqlStringToString;
+  using odbc::utility::SqlStringToOptString;
 
   LOG_DEBUG_MSG("SQLForeignKeys called");
 
@@ -928,18 +930,18 @@ SQLRETURN SQLForeignKeys(
       SqlStringToString(primarySchemaName, primarySchemaNameLen);
   std::string primaryTable =
       SqlStringToString(primaryTableName, primaryTableNameLen);
-  std::string foreignCatalog =
-      SqlStringToString(foreignCatalogName, foreignCatalogNameLen);
-  std::string foreignSchema =
-      SqlStringToString(foreignSchemaName, foreignSchemaNameLen);
+  const boost::optional< std::string > foreignCatalog =
+      SqlStringToOptString(foreignCatalogName, foreignCatalogNameLen);
+  const boost::optional< std::string > foreignSchema =
+      SqlStringToOptString(foreignSchemaName, foreignSchemaNameLen);
   std::string foreignTable =
       SqlStringToString(foreignTableName, foreignTableNameLen);
 
   LOG_INFO_MSG("primaryCatalog: " << primaryCatalog);
   LOG_INFO_MSG("primarySchema: " << primarySchema);
   LOG_INFO_MSG("primaryTable: " << primaryTable);
-  LOG_INFO_MSG("foreignCatalog: " << foreignCatalog);
-  LOG_INFO_MSG("foreignSchema: " << foreignSchema);
+  LOG_INFO_MSG("foreignCatalog: " << foreignCatalog.get_value_or(""));
+  LOG_INFO_MSG("foreignSchema: " << foreignSchema.get_value_or(""));
   LOG_INFO_MSG("foreignTable: " << foreignTable);
 
   statement->ExecuteGetForeignKeysQuery(primaryCatalog, primarySchema,
@@ -1167,7 +1169,8 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
     } else {
       LOG_ERROR_MSG(
           "SQLGetDiagRec exiting with SQL_NO_DATA because records variable is "
-          "null. recNum: " << recNum << ", records: " << records);
+          "null. recNum: "
+          << recNum << ", records: " << records);
     }
     return SQL_NO_DATA;
   }
