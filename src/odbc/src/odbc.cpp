@@ -1016,7 +1016,7 @@ SQLRETURN SQLPrimaryKeys(SQLHSTMT stmt, SQLCHAR* catalogName,
                          SQLSMALLINT schemaNameLen, SQLCHAR* tableName,
                          SQLSMALLINT tableNameLen) {
   using odbc::Statement;
-  using odbc::utility::SqlStringToString;
+  using odbc::utility::SqlStringToOptString;
 
   LOG_DEBUG_MSG("SQLPrimaryKeys called");
 
@@ -1029,13 +1029,16 @@ SQLRETURN SQLPrimaryKeys(SQLHSTMT stmt, SQLCHAR* catalogName,
     return SQL_INVALID_HANDLE;
   }
 
-  std::string catalog = SqlStringToString(catalogName, catalogNameLen);
-  std::string schema = SqlStringToString(schemaName, schemaNameLen);
-  std::string table = SqlStringToString(tableName, tableNameLen);
+  boost::optional< std::string > catalog =
+      SqlStringToOptString(catalogName, catalogNameLen);
+  boost::optional< std::string > schema =
+      SqlStringToOptString(schemaName, schemaNameLen);
+  boost::optional< std::string > table =
+      SqlStringToOptString(tableName, tableNameLen);
 
-  LOG_INFO_MSG("catalog: " << catalog);
-  LOG_INFO_MSG("schema: " << schema);
-  LOG_INFO_MSG("table: " << table);
+  LOG_INFO_MSG("catalog: " << catalog.get_value_or(""));
+  LOG_INFO_MSG("schema: " << schema.get_value_or(""));
+  LOG_INFO_MSG("table: " << table.get_value_or(""));
 
   statement->ExecuteGetPrimaryKeysQuery(catalog, schema, table);
 

@@ -22,6 +22,9 @@
 #undef min
 #endif  // min
 
+#include <boost/optional.hpp>
+#include <boost/optional/optional_io.hpp>
+
 #include <ignite/odbc/common/decimal.h>
 #include <ignite/odbc/common/utils.h>
 #include <stdint.h>
