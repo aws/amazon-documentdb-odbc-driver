@@ -165,27 +165,28 @@ class Statement : public diagnostic::DiagnosableAdapter {
   /**
    * Get columns metadata.
    *
-   * @param schema Schema search pattern.
+   * @param catalog Catalog search pattern, nullable.
+   * @param schema Schema search pattern, nullable.
    * @param table Table search pattern.
    * @param column Column search pattern.
    */
-  void ExecuteGetColumnsMetaQuery(const std::string& catalog,
-                                  const std::string& schema,
+  void ExecuteGetColumnsMetaQuery(const boost::optional< std::string >& catalog,
+                                  const boost::optional< std::string >& schema,
                                   const std::string& table,
                                   const std::string& column);
 
   /**
    * Get tables metadata.
    *
-   * @param catalog Catalog search pattern.
-   * @param schema Schema search pattern.
+   * @param catalog Catalog search pattern, nullable.
+   * @param schema Schema search pattern, nullable.
    * @param table Table search pattern.
-   * @param tableType Table type search pattern.
+   * @param tableType Table type search pattern, nullable.
    */
-  void ExecuteGetTablesMetaQuery(const std::string& catalog,
-                                 const std::string& schema,
+  void ExecuteGetTablesMetaQuery(const boost::optional< std::string >& catalog,
+                                 const boost::optional< std::string >& schema,
                                  const std::string& table,
-                                 const std::string& tableType);
+                                 const boost::optional< std::string >& tableType);
 
   /**
    * Get foreign keys.
@@ -538,27 +539,28 @@ class Statement : public diagnostic::DiagnosableAdapter {
    * @param column Column search pattern.
    * @return Operation result.
    */
-  SqlResult::Type InternalExecuteGetColumnsMetaQuery(const std::string& catalog,
-                                                     const std::string& schema,
+  SqlResult::Type InternalExecuteGetColumnsMetaQuery(const boost::optional< std::string >& catalog,
+                                                     const boost::optional< std::string >& schema,
                                                      const std::string& table,
                                                      const std::string& column);
 
   /**
    * Get tables metadata.
    *
-   * @param catalog Catalog search pattern.
-   * @param schema Schema search pattern.
+   * @param catalog Catalog search pattern, nullable.
+   * @param schema Schema search pattern, nullable.
    * @param table Table search pattern.
-   * @param tableType Table type search pattern.
+   * @param tableType Table type search pattern, nullable.
    * @return Operation result.
    */
   SqlResult::Type InternalExecuteGetTablesMetaQuery(
-      const std::string& catalog, const std::string& schema,
-      const std::string& table, const std::string& tableType);
+    const boost::optional< std::string >& catalog,
+    const boost::optional< std::string >& schema, const std::string& table,
+    const boost::optional< std::string >& tableType);
 
   /**
    * Get foreign keys.
-   * Params for primary key catalog, schema, and table names are ignored. 
+   * Params primaryCatalog, primarySchema, and primaryTable are ignored. 
    *
    * @param primaryCatalog Primary key catalog name.
    * @param primarySchema Primary key schema name.

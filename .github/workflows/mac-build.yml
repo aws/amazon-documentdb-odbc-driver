@@ -27,7 +27,7 @@ env:
   DOC_DB_ODBC_INTEGRATION_TEST: 1
   DOC_DB_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
   DOC_DB_LOG_LEVEL: "debug"
-  JDBC_DRIVER_VERSION: "1.2.3"
+  JDBC_DRIVER_VERSION: "1.2.4"
 
 jobs:
   build-mac:
