@@ -103,8 +103,8 @@ namespace odbc {
 namespace query {
 ColumnMetadataQuery::ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
                                          Connection& connection,
-                                         const std::string& catalog,
-                                         const std::string& schema,
+                                         const boost::optional< std::string >& catalog,
+                                         const boost::optional< std::string >& schema,
                                          const std::string& table,
                                          const std::string& column)
     : Query(diag, QueryType::COLUMN_METADATA),

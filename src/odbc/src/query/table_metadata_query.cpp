@@ -62,10 +62,10 @@ namespace odbc {
 namespace query {
 TableMetadataQuery::TableMetadataQuery(diagnostic::DiagnosableAdapter& diag,
                                        Connection& connection,
-                                       const std::string& catalog,
-                                       const std::string& schema,
+                                       const boost::optional< std::string >& catalog,
+                                       const boost::optional< std::string >& schema,
                                        const std::string& table,
-                                       const std::string& tableType)
+                                       const boost::optional< std::string >& tableType)
     : Query(diag, QueryType::TABLE_METADATA),
       connection(connection),
       catalog(catalog),
@@ -229,15 +229,19 @@ SqlResult::Type TableMetadataQuery::MakeRequestGetTablesMeta() {
     return SqlResult::AI_ERROR;
   }
 
-  std::vector< std::string > types;
-  if (tableType.empty()) {
-    types.emplace_back("TABLE");
-  } else {
-    std::stringstream ss(tableType);
-    std::string singleTableType;
-    while (std::getline(ss, singleTableType, ',')) {
-      types.push_back(dequote(trim(singleTableType)));
+  boost::optional< std::vector< std::string > > types = boost::none;
+  if (tableType) {
+    std::vector< std::string > typesArr;
+    if (tableType->empty()) {
+      typesArr.emplace_back("TABLE");
+    } else {
+      std::stringstream ss(*tableType);
+      std::string singleTableType;
+      while (std::getline(ss, singleTableType, ',')) {
+        typesArr.push_back(dequote(trim(singleTableType)));
+      }
     }
+    types = typesArr;
   }
 
   JniErrorInfo errInfo;

@@ -1325,9 +1325,10 @@ JniErrorCode JniContext::ConnectionGetMetaData(
 
 JniErrorCode JniContext::DatabaseMetaDataGetTables(
     const SharedPointer< GlobalJObject >& databaseMetaData,
-    const std::string& catalog, const std::string& schemaPattern,
+    const boost::optional< std::string >& catalog,
+    const boost::optional< std::string >& schemaPattern,
     const std::string& tableNamePattern,
-    const std::vector< std::string >& types,
+    const boost::optional < std::vector< std::string > >& types,
     SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo) {
   LOG_DEBUG_MSG("DatabaseMetaDataGetTables is called");
 
@@ -1342,14 +1343,22 @@ JniErrorCode JniContext::DatabaseMetaDataGetTables(
   }
 
   JNIEnv* env = Attach();
-  jstring jCatalog = env->NewStringUTF(catalog.c_str());
-  jstring jSchemaPattern = env->NewStringUTF(schemaPattern.c_str());
+  jstring jCatalog = catalog ? env->NewStringUTF(catalog->c_str()) : nullptr;
+  jstring jSchemaPattern =
+      schemaPattern ? env->NewStringUTF(schemaPattern->c_str()) : nullptr;
   jstring jTableNamePattern = env->NewStringUTF(tableNamePattern.c_str());
-  jobjectArray jTypes =
-      env->NewObjectArray(static_cast< jsize >(types.size()),
-                          jvm->GetJavaMembers().c_String, nullptr);
-  for (int i = 0; i < types.size(); i++) {
-    env->SetObjectArrayElement(jTypes, i, env->NewStringUTF(types[i].c_str()));
+  jobjectArray jTypes;
+
+  if (types) {
+    jTypes = env->NewObjectArray(static_cast< jsize >(types->size()),
+                                 jvm->GetJavaMembers().c_String, nullptr);
+    for (int i = 0; i < types->size(); i++) {
+      env->SetObjectArrayElement(jTypes, i,
+                                 env->NewStringUTF((*types)[i].c_str()));
+    }
+  } 
+  else {
+    jTypes = nullptr;
   }
 
   jobject result = env->CallObjectMethod(
@@ -1380,7 +1389,8 @@ JniErrorCode JniContext::DatabaseMetaDataGetTables(
 
 JniErrorCode JniContext::DatabaseMetaDataGetColumns(
     const SharedPointer< GlobalJObject >& databaseMetaData,
-    const std::string& catalog, const std::string& schemaPattern,
+    const boost::optional< std::string >& catalog,
+    const boost::optional< std::string >& schemaPattern,
     const std::string& tableNamePattern, const std::string& columnNamePattern,
     SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo) {
   LOG_DEBUG_MSG("DatabaseMetaDataGetColumns is called");
@@ -1396,8 +1406,9 @@ JniErrorCode JniContext::DatabaseMetaDataGetColumns(
   }
 
   JNIEnv* env = Attach();
-  jstring jCatalog = env->NewStringUTF(catalog.c_str());
-  jstring jSchemaPattern = env->NewStringUTF(schemaPattern.c_str());
+  jstring jCatalog = catalog ? env->NewStringUTF(catalog->c_str()) : nullptr;
+  jstring jSchemaPattern =
+      schemaPattern ? env->NewStringUTF(schemaPattern->c_str()) : nullptr;
   jstring jTableNamePattern = env->NewStringUTF(tableNamePattern.c_str());
   jstring jColumnNamePattern = env->NewStringUTF(columnNamePattern.c_str());
 

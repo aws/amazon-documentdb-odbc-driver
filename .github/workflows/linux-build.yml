@@ -26,7 +26,7 @@ env:
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
   DOC_DB_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
   DOC_DB_LOG_LEVEL: "debug"
-  JDBC_DRIVER_VERSION: "1.2.3"
+  JDBC_DRIVER_VERSION: "1.2.4"
   JAVA_HOME: "/usr/lib/jvm/java-17-amazon-corretto/"
 
 jobs:
