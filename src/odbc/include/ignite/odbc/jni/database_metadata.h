@@ -48,19 +48,19 @@ class DatabaseMetaData {
    * critera in catalog (not supported), schemaPattern, tablePattern
    * and types of tables.
    */
-  SharedPointer< ResultSet > GetTables(const std::string& catalog,
-                                       const std::string& schemaPattern,
+  SharedPointer< ResultSet > GetTables(const boost::optional< std::string >& catalog,
+                                       const boost::optional< std::string >& schemaPattern,
                                        const std::string& tableNamePattern,
-                                       const std::vector< std::string >& types,
+                                       const boost::optional< std::vector< std::string > >& types,
                                        JniErrorInfo& errInfo);
 
   /**
    * Query the columns in the database according to the given
-   * search critera in catalog (not supported), schemaPattern,
+   * search critera in catalog (not supported), schemaPattern (nullable),
    * tablePattern and columnPattern.
    */
-  SharedPointer< ResultSet > GetColumns(const std::string& catalog,
-                                        const std::string& schemaPattern,
+  SharedPointer< ResultSet > GetColumns(const boost::optional< std::string >& catalog,
+                                        const boost::optional< std::string >& schemaPattern,
                                         const std::string& tableNamePattern,
                                         const std::string& columnNamePattern,
                                         JniErrorInfo& errInfo);

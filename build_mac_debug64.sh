@@ -13,7 +13,7 @@ cd ..
 
 # Download the DocumentDB JDBC Driver
 if [ -z "$JDBC_DRIVER_VERSION" ]; then 
-    JDBC_DRIVER_VERSION="1.2.3"
+    JDBC_DRIVER_VERSION="1.2.4"
 fi
 JDBC_DRIVER_FILENAME="documentdb-jdbc-$JDBC_DRIVER_VERSION-all.jar"
 JDBC_DRIVER_FULLPATH="$DRIVER_BIN_DIR/libs/$JDBC_DRIVER_FILENAME"

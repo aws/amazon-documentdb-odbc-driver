@@ -29,7 +29,7 @@ env:
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
   DOC_DB_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
   DOC_DB_LOG_LEVEL: "debug"
-  JDBC_DRIVER_VERSION: "1.2.3"
+  JDBC_DRIVER_VERSION: "1.2.4"
   MONGO_IMPORT_COMMAND: "C:/ProgramData/chocolatey/lib/mongodb-database-tools/tools/mongodb-database-tools-windows-x86_64-100.5.2binmongoimport.exe"
 
 jobs:
@@ -44,7 +44,6 @@ jobs:
     #   run: |
     #     choco install cppcheck -y -d
     #     echo "C:\Program Files\Cppcheck" >> $env:GITHUB_PATH
-        
     # - name: run-cppcheck
     #   id: run-cppcheck
     #   run: |
@@ -193,7 +192,7 @@ jobs:
     #   uses: actions/upload-artifact@v3
     #   with:
     #     name: cppcheck-results
-    #     path: cppcheck-results.log 
+    #     path: cppcheck-results.log
     - name: Get Java distribution
       uses: actions/setup-java@v2
       with:

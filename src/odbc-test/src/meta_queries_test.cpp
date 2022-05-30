@@ -716,7 +716,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOne) {
   SQLCHAR empty[] = "";
   SQLCHAR table[] = "meta_queries_test_001";
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
+  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
                             SQL_NTS, empty, SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
@@ -734,7 +734,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneFromLocalServer) {
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
+  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
                             SQL_NTS, empty, SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
@@ -753,7 +753,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneWithTableTypes) {
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
+  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
                             SQL_NTS, tableTypes, SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
@@ -770,12 +770,13 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
   Connect(dsnConnectionString);
 
   SQLCHAR table[] = "meta_queries_test_001";
+  SQLCHAR column[] = "%";
   SQLCHAR empty[] = "";
   SQLCHAR *schemaName = (SQLCHAR *)databaseName.c_str();
    
 
-  SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, schemaName, SQL_NTS, table,
-                             SQL_NTS, empty, SQL_NTS);
+  SQLRETURN ret = SQLColumns(stmt, nullptr, 0, schemaName, SQL_NTS, table,
+                             SQL_NTS, column, SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -920,7 +921,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneForQuotedTypes) {
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
+  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
                             SQL_NTS, tableTypes, SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
@@ -939,7 +940,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsNoneForUnsupportedTableType) {
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
+  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
                             SQL_NTS, tableTypes, SQL_NTS);
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -957,8 +958,21 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsNone) {
   SQLCHAR empty[] = "";
   SQLCHAR table[] = "nonexistent";
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
+  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
                             SQL_NTS, empty, SQL_NTS);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  ret = SQLFetch(stmt);
+
+  BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+
+  // test that no data is returned with empty string schema
+  SQLCHAR correctTable[] = "meta_queries_test_001";
+
+  ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, correctTable, SQL_NTS,
+                  empty, SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -975,8 +989,9 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsMany) {
   Connect(dsnConnectionString);
 
   SQLCHAR empty[] = "";
+  SQLCHAR table[] = "%";
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, empty,
+  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
                             SQL_NTS, empty, SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
@@ -1003,8 +1018,18 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsOneFromLocalServer) {
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
+  SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, nullptr, 0, table,
                             SQL_NTS, column, SQL_NTS);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  CheckSingleRowResultSetWithGetData(stmt, 4, "fieldString");
+
+  // check that passing catalog NULL value gives data
+  ret =
+      SQLColumns(stmt, nullptr, 0, nullptr, 0, table, SQL_NTS,
+                             column, SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1022,8 +1047,33 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsNone) {
   SQLCHAR table[] = "nonexistent";
   SQLCHAR column[] = "nonexistent_column";
 
-  SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, table,
+  SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, nullptr, 0, table,
                              SQL_NTS, column, SQL_NTS);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  ret = SQLFetch(stmt);
+
+  BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+
+  SQLCHAR catalog[] = "nonexistent_catalog";
+  SQLCHAR correctTable[] = "meta_queries_test_002";
+  SQLCHAR correctColumn[] = "fieldString";
+
+  ret = SQLColumns(stmt, catalog, SQL_NTS, nullptr, 0, correctTable, SQL_NTS,
+                   correctColumn, SQL_NTS);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  ret = SQLFetch(stmt);
+
+  BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+
+  // test passing empty string schemaName to SQLColumns returns no data
+  ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, correctTable, SQL_NTS,
+                   correctColumn, SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1040,9 +1090,12 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsMany) {
   Connect(dsnConnectionString);
 
   SQLCHAR empty[] = "";
+  SQLCHAR table[] = "meta_queries_test_002";
+  SQLCHAR column[] = "%";
 
-  SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, empty,
-                             SQL_NTS, empty, SQL_NTS);
+  SQLRETURN ret =
+      SQLColumns(stmt, nullptr, 0, nullptr, 0, table,
+                             SQL_NTS, column, SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1274,7 +1327,8 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
       char_octet_length_len, ordinal_position, ordinal_position_len,
       is_nullable, is_nullable_len);
 
-  ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, table, SQL_NTS, column,
+  ret =
+      SQLColumns(stmt, nullptr, 0, nullptr, 0, table, SQL_NTS, column,
                    SQL_NTS);
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1408,7 +1462,7 @@ BOOST_AUTO_TEST_CASE(TestDdlTablesMeta, *disabled()) {
   SQLCHAR empty[] = "";
   SQLCHAR table[] = "TestTable";
 
-  ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, table, SQL_NTS, empty,
+  ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table, SQL_NTS, empty,
                   SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
@@ -1443,7 +1497,7 @@ BOOST_AUTO_TEST_CASE(TestDdlTablesMetaTableTypeList, *disabled()) {
   SQLCHAR table[] = "TestTable";
   SQLCHAR typeList[] = "TABLE,VIEW";
 
-  ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, table, SQL_NTS,
+  ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table, SQL_NTS,
                   typeList, SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))

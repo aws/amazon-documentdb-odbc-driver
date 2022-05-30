@@ -649,8 +649,8 @@ SqlResult::Type Statement::InternalExecuteSqlQuery() {
   return currentQuery->Execute();
 }
 
-void Statement::ExecuteGetColumnsMetaQuery(const std::string& catalog,
-                                           const std::string& schema,
+void Statement::ExecuteGetColumnsMetaQuery(const boost::optional< std::string >& catalog,
+                                           const boost::optional< std::string >& schema,
                                            const std::string& table,
                                            const std::string& column) {
   IGNITE_ODBC_API_CALL(
@@ -658,12 +658,13 @@ void Statement::ExecuteGetColumnsMetaQuery(const std::string& catalog,
 }
 
 SqlResult::Type Statement::InternalExecuteGetColumnsMetaQuery(
-    const std::string& catalog, const std::string& schema,
+    const boost::optional< std::string >& catalog,
+    const boost::optional< std::string >& schema,
     const std::string& table, const std::string& column) {
   if (currentQuery.get())
     currentQuery->Close();
 
-  std::string schema0(schema);
+  std::string schema0(schema.get_value_or(""));
 
   if (schema0.empty())
     schema0 = connection.GetSchema();
@@ -674,17 +675,18 @@ SqlResult::Type Statement::InternalExecuteGetColumnsMetaQuery(
   return currentQuery->Execute();
 }
 
-void Statement::ExecuteGetTablesMetaQuery(const std::string& catalog,
-                                          const std::string& schema,
+void Statement::ExecuteGetTablesMetaQuery(const boost::optional< std::string >& catalog,
+                                          const boost::optional< std::string >& schema,
                                           const std::string& table,
-                                          const std::string& tableType) {
+                                          const boost::optional< std::string >& tableType) {
   IGNITE_ODBC_API_CALL(
       InternalExecuteGetTablesMetaQuery(catalog, schema, table, tableType));
 }
 
 SqlResult::Type Statement::InternalExecuteGetTablesMetaQuery(
-    const std::string& catalog, const std::string& schema,
-    const std::string& table, const std::string& tableType) {
+    const boost::optional< std::string >& catalog,
+    const boost::optional< std::string >& schema, const std::string& table,
+    const boost::optional< std::string >& tableType) {
   if (currentQuery.get())
     currentQuery->Close();
 

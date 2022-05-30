@@ -43,9 +43,11 @@ class TableMetadataQuery : public Query {
    * @param tableType Table type search pattern.
    */
   TableMetadataQuery(diagnostic::DiagnosableAdapter& diag,
-                     Connection& connection, const std::string& catalog,
-                     const std::string& schema, const std::string& table,
-                     const std::string& tableType);
+                     Connection& connection,
+                     const boost::optional< std::string >& catalog,
+                     const boost::optional< std::string >& schema,
+                     const std::string& table,
+                     const boost::optional< std::string >& tableType);
 
   /**
    * Destructor.
@@ -154,16 +156,16 @@ class TableMetadataQuery : public Query {
   Connection& connection;
 
   /** Catalog search pattern. */
-  std::string catalog;
+  boost::optional< std::string > catalog;
 
   /** Schema search pattern. */
-  std::string schema;
+  boost::optional< std::string > schema;
 
   /** Table search pattern. */
   std::string table;
 
   /** Table type search pattern. */
-  std::string tableType;
+  boost::optional< std::string > tableType;
 
   /** Query executed. */
   bool executed;
