@@ -520,14 +520,16 @@ class IGNITE_IMPORT_EXPORT JniContext {
 
   JniErrorCode DatabaseMetaDataGetTables(
       const SharedPointer< GlobalJObject >& databaseMetaData,
-      const std::string& catalog, const std::string& schemaPattern,
+      const boost::optional< std::string >& catalog,
+      const boost::optional< std::string >& schemaPattern,
       const std::string& tableNamePattern,
-      const std::vector< std::string >& types,
+      const boost::optional< std::vector< std::string > >& types,
       SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo);
 
   JniErrorCode DatabaseMetaDataGetColumns(
       const SharedPointer< GlobalJObject >& databaseMetaData,
-      const std::string& catalog, const std::string& schemaPattern,
+      const boost::optional< std::string >& catalog,
+      const boost::optional< std::string >& schemaPattern,
       const std::string& tableNamePattern, const std::string& columnNamePattern,
       SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo);
 
