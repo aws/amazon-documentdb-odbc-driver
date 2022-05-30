@@ -632,6 +632,7 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLCHAR* catalogName,
                     SQLSMALLINT tableTypeLen) {
   using odbc::Statement;
   using odbc::utility::SqlStringToString;
+  using odbc::utility::SqlStringToOptString;
 
   LOG_DEBUG_MSG("SQLTables called");
 
@@ -644,10 +645,10 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLCHAR* catalogName,
     return SQL_INVALID_HANDLE;
   }
 
-  std::string catalog = SqlStringToString(catalogName, catalogNameLen);
-  std::string schema = SqlStringToString(schemaName, schemaNameLen);
+  boost::optional< std::string > catalog = SqlStringToOptString(catalogName, catalogNameLen);
+  boost::optional< std::string > schema = SqlStringToOptString(schemaName, schemaNameLen);
   std::string table = SqlStringToString(tableName, tableNameLen);
-  std::string tableTypeStr = SqlStringToString(tableType, tableTypeLen);
+  boost::optional< std::string > tableTypeStr = SqlStringToOptString(tableType, tableTypeLen);
 
   LOG_INFO_MSG("catalog: " << catalog);
   LOG_INFO_MSG("schema: " << schema);
@@ -668,6 +669,7 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLCHAR* catalogName,
                      SQLSMALLINT columnNameLen) {
   using odbc::Statement;
   using odbc::utility::SqlStringToString;
+  using odbc::utility::SqlStringToOptString;
 
   LOG_DEBUG_MSG("SQLColumns called");
 
@@ -680,13 +682,15 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLCHAR* catalogName,
     return SQL_INVALID_HANDLE;
   }
 
-  std::string catalog = SqlStringToString(catalogName, catalogNameLen);
-  std::string schema = SqlStringToString(schemaName, schemaNameLen);
+  const boost::optional< std::string > catalog =
+      SqlStringToOptString(catalogName, catalogNameLen);
+  const boost::optional< std::string > schema =
+      SqlStringToOptString(schemaName, schemaNameLen);
   std::string table = SqlStringToString(tableName, tableNameLen);
   std::string column = SqlStringToString(columnName, columnNameLen);
 
-  LOG_INFO_MSG("catalog: " << catalog);
-  LOG_INFO_MSG("schema: " << schema);
+  LOG_INFO_MSG("catalog: " << catalog.get_value_or(""));
+  LOG_INFO_MSG("schema: " << schema.get_value_or(""));
   LOG_INFO_MSG("table: " << table);
   LOG_INFO_MSG("column: " << column);
 

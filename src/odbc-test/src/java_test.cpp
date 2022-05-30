@@ -363,10 +363,10 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
   }
   BOOST_REQUIRE(databaseMetaData.Get());
 
-  std::string catalog;
-  std::string schemaPattern;
-  std::string tableNamePattern;
-  std::vector< std::string > types(
+  boost::optional< std::string > catalog = boost::none;
+  boost::optional< std::string > schemaPattern = boost::none;
+  std::string tableNamePattern = "%";
+  boost::optional < std::vector< std::string > > types(
       {"TABLE"});  // Need to specify this to get result.
   SharedPointer< GlobalJObject > resultSet;
   if (_ctx.Get()->DatabaseMetaDataGetTables(databaseMetaData, catalog,
@@ -510,10 +510,10 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
   }
   BOOST_REQUIRE(databaseMetaData.Get());
 
-  std::string catalog;
-  std::string schemaPattern;
-  std::string tableNamePattern;
-  std::string columnNamePattern;
+  boost::optional< std::string > catalog;
+  boost::optional< std::string > schemaPattern;
+  std::string tableNamePattern = "%";
+  std::string columnNamePattern = "%";
   SharedPointer< GlobalJObject > resultSet;
   if (_ctx.Get()->DatabaseMetaDataGetColumns(
           databaseMetaData, catalog, schemaPattern, tableNamePattern,

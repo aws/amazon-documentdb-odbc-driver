@@ -31,9 +31,11 @@ namespace ignite {
 namespace odbc {
 namespace jni {
 SharedPointer< ResultSet > DatabaseMetaData::GetTables(
-    const std::string& catalog, const std::string& schemaPattern,
+    const boost::optional< std::string >& catalog,
+    const boost::optional< std::string >& schemaPattern,
     const std::string& tableNamePattern,
-    const std::vector< std::string >& types, JniErrorInfo& errInfo) {
+    const boost::optional < std::vector< std::string > >& types,
+    JniErrorInfo& errInfo) {
   SharedPointer< GlobalJObject > resultSet;
   JniErrorCode success = _jniContext.Get()->DatabaseMetaDataGetTables(
       _databaseMetaData, catalog, schemaPattern, tableNamePattern, types,
@@ -45,7 +47,8 @@ SharedPointer< ResultSet > DatabaseMetaData::GetTables(
 }
 
 SharedPointer< ResultSet > DatabaseMetaData::GetColumns(
-    const std::string& catalog, const std::string& schemaPattern,
+    const boost::optional< std::string >& catalog,
+    const boost::optional< std::string >& schemaPattern,
     const std::string& tableNamePattern, const std::string& columnNamePattern,
     JniErrorInfo& errInfo) {
   SharedPointer< GlobalJObject > resultSet;

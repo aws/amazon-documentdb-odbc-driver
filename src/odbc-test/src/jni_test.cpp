@@ -554,10 +554,11 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetTables) {
       dbConnection.GetMetaData(errInfo);
   BOOST_REQUIRE(databaseMetaData.IsValid());
 
-  std::string catalog;
-  std::string schemaPattern;
+  boost::optional< std::string > catalog;
+  boost::optional< std::string > schemaPattern;
   std::string tablePattern;
-  std::vector< std::string > types = {"TABLE"};
+  boost::optional< std::vector< std::string > > types(
+      std::vector< std::string >({"TABLE"}));
   SharedPointer< ResultSet > resultSet = databaseMetaData.Get()->GetTables(
       catalog, schemaPattern, tablePattern, types, errInfo);
   BOOST_CHECK(resultSet.IsValid());
@@ -635,10 +636,10 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
       dbConnection.GetMetaData(errInfo);
   BOOST_REQUIRE(databaseMetaData.IsValid());
 
-  std::string catalog;
-  std::string schemaPattern = DATABASE_NAME;
+  boost::optional< std::string > catalog;
+  boost::optional< std::string > schemaPattern = DATABASE_NAME;
   std::string tablePattern = "jni_test_001";
-  std::string columnNamePattern;
+  std::string columnNamePattern = "%";
   SharedPointer< ResultSet > resultSet = databaseMetaData.Get()->GetColumns(
       catalog, schemaPattern, tablePattern, columnNamePattern, errInfo);
   BOOST_CHECK(resultSet.IsValid());
