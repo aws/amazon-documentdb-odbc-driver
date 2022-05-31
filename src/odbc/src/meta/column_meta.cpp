@@ -17,9 +17,9 @@
 
 #include "ignite/odbc/meta/column_meta.h"
 
-#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/common/utils.h"
 #include "ignite/odbc/common_types.h"
+#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/jni/java.h"
 #include "ignite/odbc/log.h"
 #include "ignite/odbc/system/odbc_constants.h"
@@ -129,7 +129,7 @@ void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
 }
 
 void ColumnMeta::ReadJdbcMetadata(JdbcColumnMetadata& jdbcMetadata,
-                              int32_t& prevPosition) {
+                                  int32_t& prevPosition) {
   catalogName = jdbcMetadata.GetCatalogName();
   schemaName = jdbcMetadata.GetSchemaName();
   tableName = jdbcMetadata.GetTableName();
@@ -196,19 +196,18 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
                  || (*dataType == JDBC_TYPE_VARBINARY)
                  || (*dataType == JDBC_TYPE_LONGVARBINARY))
           value = "0x";
-      }
-      else
+      } else
         value.clear();
 
       return true;
     }
 
     case SQL_DESC_LITERAL_SUFFIX: {
-      if (dataType && (*dataType == JDBC_TYPE_VARCHAR) || (*dataType == JDBC_TYPE_CHAR)
-            || (*dataType == JDBC_TYPE_NCHAR)
-            || (*dataType == JDBC_TYPE_NVARCHAR)
-            || (*dataType == JDBC_TYPE_LONGVARCHAR)
-            || (*dataType == JDBC_TYPE_LONGNVARCHAR))
+      if (dataType && (*dataType == JDBC_TYPE_VARCHAR)
+          || (*dataType == JDBC_TYPE_CHAR) || (*dataType == JDBC_TYPE_NCHAR)
+          || (*dataType == JDBC_TYPE_NVARCHAR)
+          || (*dataType == JDBC_TYPE_LONGVARCHAR)
+          || (*dataType == JDBC_TYPE_LONGNVARCHAR))
         value = "'";
       else
         value.clear();
@@ -221,9 +220,9 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
       if (boost::optional< std::string > val =
               type_traits::BinaryTypeToSqlTypeName(dataType))
         value = *val;
-       else 
+      else
         value.clear();
-       
+
       return true;
     }
 
@@ -294,13 +293,13 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
       if (boost::optional< int16_t > val =
               type_traits::BinaryToSqlType(dataType))
         value = *val;
-      
+
       break;
     }
 
     case SQL_DESC_COUNT:
-    // TODO AD-760 implement SQL_DESC_COUNT (ODBC 1.0)
-    // https://bitquill.atlassian.net/browse/AD-760
+      // TODO AD-760 implement SQL_DESC_COUNT (ODBC 1.0)
+      // https://bitquill.atlassian.net/browse/AD-760
       return false;
 
     case SQL_DESC_DISPLAY_SIZE: {
@@ -318,8 +317,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
         if (boost::optional< int > val =
                 type_traits::BinaryTypeTransferLength(dataType))
           value = *val;
-      }
-      else if (precision)
+      } else if (precision)
         value = *precision;
 
       break;
@@ -341,12 +339,19 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
 
     case SQL_DESC_PRECISION:
     case SQL_COLUMN_PRECISION: {
-      if (dataType && (!precision || *precision == -1)) {
-        if (boost::optional< int > val =
-                type_traits::BinaryTypeColumnSize(dataType))
-          value = *val;
-      }
-      else if (precision)
+      if (dataType) {
+        if (decimalDigits
+            && ((*dataType == JDBC_TYPE_TIME) || (*dataType == JDBC_TYPE_DATE)
+                || (*dataType == JDBC_TYPE_TIMESTAMP))) {
+          // return decimal digits for all datetime types and all interval
+          // types with a seconds component
+          value = *decimalDigits;
+        } else if (!precision || *precision == -1) {
+          if (boost::optional< int > val =
+                  type_traits::BinaryTypeColumnSize(dataType))
+            value = *val;
+        }
+      } else if (precision)
         value = *precision;
 
       break;
