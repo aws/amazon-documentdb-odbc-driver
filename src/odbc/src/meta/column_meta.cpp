@@ -221,7 +221,8 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
         value = *val;
        else 
         value.clear();
-        return true;
+       
+      return true;
     }
 
     case SQL_DESC_PRECISION:
@@ -370,7 +371,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     }
 
     case SQL_DESC_UNNAMED: {
-      value = columnName ? SQL_UNNAMED : SQL_NAMED;
+      value = columnName ? SQL_NAMED : SQL_UNNAMED;
 
       break;
     }
