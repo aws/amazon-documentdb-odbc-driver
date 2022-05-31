@@ -148,6 +148,9 @@ void ColumnMeta::ReadJdbcMetadata(JdbcColumnMetadata& jdbcMetadata,
 bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
   using namespace ignite::odbc::impl::binary;
 
+  // an empty string is returned if the column does not have the requested field
+  value = "";
+
   switch (fieldId) {
     case SQL_DESC_LABEL:
     case SQL_DESC_BASE_COLUMN_NAME:
@@ -239,7 +242,10 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     }
 
     case SQL_DESC_AUTO_UNIQUE_VALUE: {
-      value = SQL_FALSE;
+      if (isAutoIncrement && (*isAutoIncrement == "YES"))
+        value = SQL_TRUE;
+      else
+        value = SQL_FALSE;
 
       break;
     }

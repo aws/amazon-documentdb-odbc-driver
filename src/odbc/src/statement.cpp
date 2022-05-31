@@ -968,9 +968,11 @@ SqlResult::Type Statement::InternalGetColumnAttribute(
 
   bool found = false;
 
+  // NumericAttributePtr field is used.
   if (numbuf)
     found = columnMeta.GetAttribute(attrId, *numbuf);
 
+  // NumericAttributePtr field is unused.
   if (!found) {
     std::string out;
 
