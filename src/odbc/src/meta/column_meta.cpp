@@ -251,7 +251,12 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     }
 
     case SQL_DESC_CASE_SENSITIVE: {
-      if (dataType && (*dataType == JDBC_TYPE_VARCHAR))
+      if (dataType
+          && ((*dataType == JDBC_TYPE_VARCHAR) || (*dataType == JDBC_TYPE_CHAR)
+              || (*dataType == JDBC_TYPE_NCHAR)
+              || (*dataType == JDBC_TYPE_NVARCHAR)
+              || (*dataType == JDBC_TYPE_LONGVARCHAR)
+              || (*dataType == JDBC_TYPE_LONGNVARCHAR)))
         value = SQL_TRUE;
       else
         value = SQL_FALSE;
