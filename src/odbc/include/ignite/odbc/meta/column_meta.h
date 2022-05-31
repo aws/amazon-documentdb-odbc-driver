@@ -99,6 +99,7 @@ class ColumnMeta {
         columnName(columnName),
         dataType(dataType),
         precision(-1),
+        decimalDigits(-1),
         scale(-1),
         nullability(nullability),
         ordinalPosition(-1) {
@@ -125,6 +126,7 @@ class ColumnMeta {
         isAutoIncrement(other.isAutoIncrement),
         dataType(other.dataType),
         precision(other.precision),
+        decimalDigits(other.decimalDigits),
         scale(other.scale),
         nullability(other.nullability),
         ordinalPosition(other.ordinalPosition) {
@@ -144,6 +146,7 @@ class ColumnMeta {
     isAutoIncrement = other.isAutoIncrement;
     dataType = other.dataType;
     precision = other.precision;
+    decimalDigits = other.decimalDigits;
     scale = other.scale;
     nullability = other.nullability;
     ordinalPosition = other.ordinalPosition;
@@ -241,6 +244,14 @@ class ColumnMeta {
   }
 
   /**
+   * Get column decimal digits.
+   * @return Column decimal digits.
+   */
+  boost::optional< int32_t > GetDecimalDigits() const {
+    return decimalDigits;
+  }
+
+  /**
    * Get column scale.
    * @return Column scale.
    */
@@ -309,6 +320,9 @@ class ColumnMeta {
 
   /** Column precision. */
   boost::optional< int32_t > precision;
+
+  /** Column decimal digits. */
+  boost::optional< int32_t > decimalDigits;
 
   /** Column scale. */
   boost::optional< int32_t > scale;

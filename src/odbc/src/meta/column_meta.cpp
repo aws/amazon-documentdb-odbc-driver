@@ -101,6 +101,7 @@ const std::string TABLE_SCHEM = "TABLE_SCHEM";
 const std::string TABLE_NAME = "TABLE_NAME";
 const std::string COLUMN_NAME = "COLUMN_NAME";
 const std::string DATA_TYPE = "DATA_TYPE";
+const std::string DECIMAL_DIGITS = "DECIMAL_DIGITS";
 const std::string REMARKS = "REMARKS";
 const std::string COLUMN_DEF = "COLUMN_DEF";
 const std::string NULLABLE = "NULLABLE";
@@ -114,6 +115,7 @@ void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
   resultSet.Get()->GetString(TABLE_NAME, tableName, errInfo);
   resultSet.Get()->GetString(COLUMN_NAME, columnName, errInfo);
   resultSet.Get()->GetSmallInt(DATA_TYPE, dataType, errInfo);
+  resultSet.Get()->GetInt(DECIMAL_DIGITS, decimalDigits, errInfo);
   resultSet.Get()->GetString(REMARKS, remarks, errInfo);
   resultSet.Get()->GetString(COLUMN_DEF, columnDef, errInfo);
   resultSet.Get()->GetInt(NULLABLE, nullability, errInfo);
