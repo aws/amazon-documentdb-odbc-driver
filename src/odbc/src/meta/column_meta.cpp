@@ -105,6 +105,7 @@ const std::string REMARKS = "REMARKS";
 const std::string COLUMN_DEF = "COLUMN_DEF";
 const std::string NULLABLE = "NULLABLE";
 const std::string ORDINAL_POSITION = "ORDINAL_POSITION";
+const std::string IS_AUTOINCREMENT = "IS_AUTOINCREMENT";
 
 void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
                       int32_t& prevPosition, JniErrorInfo& errInfo) {
@@ -122,6 +123,7 @@ void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
   } else {
     prevPosition = *ordinalPosition;
   }
+  resultSet.Get()->GetString(IS_AUTOINCREMENT, isAutoIncrement, errInfo);
 }
 
 void ColumnMeta::ReadJdbcMetadata(JdbcColumnMetadata& jdbcMetadata,
@@ -140,6 +142,7 @@ void ColumnMeta::ReadJdbcMetadata(JdbcColumnMetadata& jdbcMetadata,
   } else {
     prevPosition = *ordinalPosition;
   }
+  isAutoIncrement = jdbcMetadata.IsAutoIncrement() ? "YES" : "NO";
 }
 
 bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {

@@ -122,6 +122,7 @@ class ColumnMeta {
         columnName(other.columnName),
         remarks(other.remarks),
         columnDef(other.columnDef),
+        isAutoIncrement(other.isAutoIncrement),
         dataType(other.dataType),
         precision(other.precision),
         scale(other.scale),
@@ -140,6 +141,7 @@ class ColumnMeta {
     columnName = other.columnName;
     remarks = other.remarks;
     columnDef = other.columnDef;
+    isAutoIncrement = other.isAutoIncrement;
     dataType = other.dataType;
     precision = other.precision;
     scale = other.scale;
@@ -212,6 +214,14 @@ class ColumnMeta {
    */
   const boost::optional< std::string >& GetColumnDef() const {
     return columnDef;
+  }
+
+  /**
+   * Get the column is auto increment.
+   * @return Column is auto increment.
+   */
+  const boost::optional< std::string >& GetIsAutoIncrement() const {
+    return isAutoIncrement;
   }
 
   /**
@@ -290,6 +300,9 @@ class ColumnMeta {
 
   /** Column default value */
   boost::optional< std::string > columnDef;
+
+  /** Column is auto incremented */
+  boost::optional< std::string > isAutoIncrement;
 
   /** Data type. */
   boost::optional< int16_t > dataType;
