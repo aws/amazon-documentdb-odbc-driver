@@ -182,9 +182,31 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
       return true;
     }
 
-    case SQL_DESC_LITERAL_PREFIX:
+    case SQL_DESC_LITERAL_PREFIX: {
+      if (dataType) {
+        if ((*dataType == JDBC_TYPE_VARCHAR) || (*dataType == JDBC_TYPE_CHAR)
+            || (*dataType == JDBC_TYPE_NCHAR)
+            || (*dataType == JDBC_TYPE_NVARCHAR)
+            || (*dataType == JDBC_TYPE_LONGVARCHAR)
+            || (*dataType == JDBC_TYPE_LONGNVARCHAR))
+          value = "'";
+        else if ((*dataType == JDBC_TYPE_BINARY)
+                 || (*dataType == JDBC_TYPE_VARBINARY)
+                 || (*dataType == JDBC_TYPE_LONGVARBINARY))
+          value = "0x";
+      }
+      else
+        value.clear();
+
+      return true;
+    }
+
     case SQL_DESC_LITERAL_SUFFIX: {
-      if (dataType && (*dataType == JDBC_TYPE_VARCHAR))
+      if (dataType && (*dataType == JDBC_TYPE_VARCHAR) || (*dataType == JDBC_TYPE_CHAR)
+            || (*dataType == JDBC_TYPE_NCHAR)
+            || (*dataType == JDBC_TYPE_NVARCHAR)
+            || (*dataType == JDBC_TYPE_LONGVARCHAR)
+            || (*dataType == JDBC_TYPE_LONGNVARCHAR))
         value = "'";
       else
         value.clear();
