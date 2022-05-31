@@ -1366,7 +1366,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   BOOST_CHECK_EQUAL(SQL_NO_TOTAL, buffer_length);  // BUFFER_LENGTH
   BOOST_CHECK_EQUAL(true, WasNull(decimal_digits_len));
   BOOST_CHECK_EQUAL(0, decimal_digits);  // DECIMAL_DIGITS
-  BOOST_CHECK_EQUAL(true, WasNull(num_prec_radix_len));
+  BOOST_CHECK_EQUAL(false, WasNull(num_prec_radix_len));
   BOOST_CHECK_EQUAL(0, num_prec_radix);  // NUM_PREC_RADIX
   BOOST_CHECK_EQUAL(false, WasNull(nullable_len));
   BOOST_CHECK_EQUAL(SQL_NO_NULLS, nullable);  // NULLABLE

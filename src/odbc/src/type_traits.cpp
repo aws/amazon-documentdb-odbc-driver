@@ -701,7 +701,7 @@ boost::optional< int32_t > SqlTypeNumPrecRadix(
       return 10;
 
     default:
-      return -1;
+      return 0;
   }
 }
 
