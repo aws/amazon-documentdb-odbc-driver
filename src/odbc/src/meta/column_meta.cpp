@@ -268,6 +268,11 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
       break;
     }
 
+    case SQL_DESC_COUNT:
+    // TODO AD-760 implement SQL_DESC_COUNT (ODBC 1.0)
+    // https://bitquill.atlassian.net/browse/AD-760
+      return false;
+
     case SQL_DESC_DISPLAY_SIZE: {
       if (boost::optional< int > val =
               type_traits::BinaryTypeDisplaySize(dataType))
