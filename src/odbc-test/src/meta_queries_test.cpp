@@ -761,6 +761,79 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralSuffix) {
   BOOST_CHECK("'" == buf);
 }
 
+BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR req[] = "select fieldNull from meta_queries_test_001";
+  SQLExecDirect(stmt, req, SQL_NTS);
+
+  SQLLEN intVal;
+  SQLCHAR strBuf[1024];
+  SQLSMALLINT strLen;
+
+  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_PRECISION, strBuf,
+                                  sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_NULL should have precision 1
+  BOOST_CHECK_EQUAL(intVal, 1);
+
+  SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
+  SQLExecDirect(stmt, req2, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_PRECISION, strBuf, sizeof(strBuf),
+                        &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_INTEGER should have precision 10
+  BOOST_CHECK_EQUAL(intVal, 10);
+
+  SQLCHAR req3[] = "select fieldLong from meta_queries_test_001";
+  SQLExecDirect(stmt, req3, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_PRECISION, strBuf, sizeof(strBuf),
+                        &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_LONG should have precision 19
+  BOOST_CHECK_EQUAL(intVal, 19);
+
+  SQLCHAR req4[] = "select fieldDouble from meta_queries_test_001";
+  SQLExecDirect(stmt, req4, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_PRECISION, strBuf, sizeof(strBuf),
+                        &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_DOUBLE should have precision 15
+  BOOST_CHECK_EQUAL(intVal, 15);
+
+  SQLCHAR req5[] = "select fieldDate from meta_queries_test_001";
+  SQLExecDirect(stmt, req5, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_PRECISION, strBuf, sizeof(strBuf),
+                        &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_TIMESTAMP should have precision 19
+  BOOST_CHECK_EQUAL(intVal, 19);
+
+}
+
 BOOST_AUTO_TEST_CASE(TestColAttributeDescUnnamed) {
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
