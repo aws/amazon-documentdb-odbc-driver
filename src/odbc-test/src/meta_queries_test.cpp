@@ -742,7 +742,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescConciseType) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR req[] = "select fieldNull from meta_queries_test_001";
+  SQLCHAR req[] = "select fieldString from meta_queries_test_001";
   SQLExecDirect(stmt, req, SQL_NTS);
 
   SQLLEN intVal;
@@ -755,7 +755,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescConciseType) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  BOOST_CHECK_EQUAL(intVal, SQL_TYPE_NULL);
+  BOOST_CHECK_EQUAL(intVal, SQL_VARCHAR);
 
   SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
   SQLExecDirect(stmt, req2, SQL_NTS);
@@ -777,7 +777,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescConciseType) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  BOOST_CHECK_EQUAL(intVal, SQL_BINARY);
+  BOOST_CHECK_EQUAL(intVal, SQL_VARBINARY);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescCount) {
