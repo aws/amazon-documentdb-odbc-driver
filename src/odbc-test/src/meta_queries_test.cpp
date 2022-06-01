@@ -712,7 +712,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCatalogName) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR req[] = "select _id from meta_queries_test_001";
+  SQLCHAR req[] = "select fieldDecimal128 from meta_queries_test_001";
   SQLExecDirect(stmt, req, SQL_NTS);
 
   SQLLEN intVal;
