@@ -587,6 +587,30 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnPresicion, *disabled()) {
   BOOST_CHECK_EQUAL(intVal, 60);
 }
 
+BOOST_AUTO_TEST_CASE(TestColAttributeDescAutoUniqueValue) {
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR req[] = "select fieldDouble from meta_queries_test_001";
+  SQLExecDirect(stmt, req, SQL_NTS);
+
+  SQLLEN intVal;
+  SQLCHAR strBuf[1024];
+  SQLSMALLINT strLen;
+
+  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_AUTO_UNIQUE_VALUE, strBuf,
+                                  sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // only "NO" is returned for IS_AUTOINCREMENT field
+  BOOST_CHECK_EQUAL(intVal, SQL_FALSE);
+}
+
 BOOST_AUTO_TEST_CASE(TestColAttributeDescCaseSensitive) {
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
