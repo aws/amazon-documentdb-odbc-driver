@@ -255,6 +255,8 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
 bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
   using namespace ignite::odbc::impl::binary;
 
+  // value equals -1 by default.
+  value = -1;
   switch (fieldId) {
     case SQL_DESC_FIXED_PREC_SCALE: {
       if (!scale || scale == -1)
