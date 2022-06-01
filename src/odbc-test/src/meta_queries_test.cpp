@@ -735,6 +735,51 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCatalogName) {
   BOOST_CHECK("" == buf);
 }
 
+BOOST_AUTO_TEST_CASE(TestColAttributeDescConciseType) {
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR req[] = "select fieldNull from meta_queries_test_001";
+  SQLExecDirect(stmt, req, SQL_NTS);
+
+  SQLLEN intVal;
+  SQLCHAR strBuf[1024];
+  SQLSMALLINT strLen;
+
+  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_CONCISE_TYPE, strBuf,
+                                  sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  BOOST_CHECK_EQUAL(intVal, SQL_TYPE_NULL);
+
+  SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
+  SQLExecDirect(stmt, req2, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_CONCISE_TYPE, strBuf,
+                                  sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  BOOST_CHECK_EQUAL(intVal, SQL_INTEGER);
+
+  SQLCHAR req3[] = "select fieldBinary from meta_queries_test_001";
+  SQLExecDirect(stmt, req3, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_CONCISE_TYPE, strBuf, sizeof(strBuf),
+                        &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  BOOST_CHECK_EQUAL(intVal, SQL_BINARY);
+}
+
 BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralPrefix) {
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
