@@ -938,7 +938,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  // SQL_NULL should have precision 1
+  // SQL_TYPE_NULL should have precision 1
   BOOST_CHECK_EQUAL(intVal, 1);
 
   SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
@@ -962,7 +962,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  // SQL_LONG should have precision 19
+  // SQL_BIGINT should have precision 19
   BOOST_CHECK_EQUAL(intVal, 19);
 
   SQLCHAR req4[] = "select fieldDouble from meta_queries_test_001";
