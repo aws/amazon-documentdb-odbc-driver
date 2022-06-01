@@ -611,6 +611,64 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescAutoUniqueValue) {
   BOOST_CHECK_EQUAL(intVal, SQL_FALSE);
 }
 
+BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseColumnName) {
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR req[] = "select array from meta_queries_test_002_with_array";
+  SQLExecDirect(stmt, req, SQL_NTS);
+
+  SQLLEN intVal;
+  SQLCHAR strBuf[1024];
+  SQLSMALLINT strLen;
+
+  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_BASE_COLUMN_NAME, strBuf,
+                                  sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // convert SQLCHAR[] strBuf to to std::string buf
+  std::stringstream bufStream;
+  bufStream << strBuf;
+  std::string buf;
+  bufStream >> buf;
+
+  BOOST_CHECK("array" == buf);
+}
+
+BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseTableName) {
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR req[] = "select array from meta_queries_test_002_with_array";
+  SQLExecDirect(stmt, req, SQL_NTS);
+
+  SQLLEN intVal;
+  SQLCHAR strBuf[1024];
+  SQLSMALLINT strLen;
+
+  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_BASE_TABLE_NAME, strBuf,
+                                  sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // convert SQLCHAR[] strBuf to to std::string buf
+  std::stringstream bufStream;
+  bufStream << strBuf;
+  std::string buf;
+  bufStream >> buf;
+
+  BOOST_CHECK("meta_queries_test_002_with_array" == buf);
+}
+
 BOOST_AUTO_TEST_CASE(TestColAttributeDescCaseSensitive) {
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
@@ -645,6 +703,36 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCaseSensitive) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   BOOST_CHECK_EQUAL(intVal, SQL_FALSE);
+}
+
+BOOST_AUTO_TEST_CASE(TestColAttributeDescCatalogName) {
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR req[] = "select _id from meta_queries_test_001";
+  SQLExecDirect(stmt, req, SQL_NTS);
+
+  SQLLEN intVal;
+  SQLCHAR strBuf[1024];
+  SQLSMALLINT strLen;
+
+  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_CATALOG_NAME, strBuf,
+                                  sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // convert SQLCHAR[] strBuf to to std::string buf
+  std::stringstream bufStream;
+  bufStream << strBuf;
+  std::string buf;
+  bufStream >> buf;
+
+  // check that catalog should be empty
+  BOOST_CHECK("" == buf);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralPrefix) {
