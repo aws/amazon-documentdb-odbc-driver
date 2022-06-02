@@ -1247,6 +1247,43 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescName) {
 
   BOOST_CHECK("field" == buf);
 }
+
+BOOST_AUTO_TEST_CASE(TestColAttributeDescNullable) {
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  // test fieldObjectId (a primary key) should not be nullable 
+  SQLCHAR req1[] = "select fieldObjectId from meta_queries_test_001";
+  SQLExecDirect(stmt, req1, SQL_NTS);
+
+  SQLLEN intVal;
+  SQLCHAR strBuf[1024];
+  SQLSMALLINT strLen;
+
+  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_NULLABLE, strBuf,
+                                  sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  BOOST_CHECK_EQUAL(intVal, SQL_NO_NULLS);
+
+  // test non-primary key field should be nullable.
+  SQLCHAR req2[] = "select fieldNull from meta_queries_test_001";
+  SQLExecDirect(stmt, req2, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_NULLABLE, strBuf,
+                        sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  BOOST_CHECK_EQUAL(intVal, SQL_NULLABLE);
+}
+
 // -AL- somehow precision is initialized as -1, although the dataType should be there 
 // -AL- todo re-enable test when I am able to test on local machine
 BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
