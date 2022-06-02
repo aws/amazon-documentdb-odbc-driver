@@ -1179,8 +1179,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
   bufStream << strBuf;
   bufStream >> buf;
 
-  // SQL_BINARY should have type name SqlTypeName::BINARY
-  BOOST_CHECK(SqlTypeName::BINARY == buf);
+  // SQL_BINARY should have type name SqlTypeName::VARBINARY
+  BOOST_CHECK(SqlTypeName::VARBINARY == buf);
 
   SQLCHAR req4[] = "select fieldDate from meta_queries_test_002";
   SQLExecDirect(stmt, req4, SQL_NTS);
