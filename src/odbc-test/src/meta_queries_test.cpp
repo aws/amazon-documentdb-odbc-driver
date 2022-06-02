@@ -898,6 +898,35 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescFixedPrecScale) {
   BOOST_CHECK_EQUAL(intVal, SQL_FALSE);
 }
 
+BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseLabel) {
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR req[] = "select fieldBoolean from meta_queries_test_002";
+  SQLExecDirect(stmt, req, SQL_NTS);
+
+  SQLLEN intVal;
+  SQLCHAR strBuf[1024];
+  SQLSMALLINT strLen;
+
+  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_LABEL, strBuf,
+                                  sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // convert SQLCHAR[] strBuf to to std::string buf
+  std::stringstream bufStream;
+  bufStream << strBuf;
+  std::string buf;
+  bufStream >> buf;
+
+  BOOST_CHECK("fieldBoolean" == buf);
+}
+
   BOOST_CHECK_EQUAL(intVal, 10);
 
   SQLCHAR req3[] = "select fieldLong from meta_queries_test_001";
