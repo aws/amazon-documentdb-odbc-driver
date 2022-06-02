@@ -1219,6 +1219,34 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
   BOOST_CHECK(SqlTypeName::INTEGER == buf);
 }
 
+BOOST_AUTO_TEST_CASE(TestColAttributeDescName) {
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
+  SQLExecDirect(stmt, req, SQL_NTS);
+
+  SQLLEN intVal;
+  SQLCHAR strBuf[1024];
+  SQLSMALLINT strLen;
+
+  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_NAME, strBuf,
+                                  sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // convert SQLCHAR[] strBuf to to std::string buf
+  std::stringstream bufStream;
+  bufStream << strBuf;
+  std::string buf;
+  bufStream >> buf;
+
+  BOOST_CHECK("field" == buf);
+}
 // -AL- somehow precision is initialized as -1, although the dataType should be there 
 // -AL- todo re-enable test when I am able to test on local machine
 BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
