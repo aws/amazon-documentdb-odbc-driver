@@ -19,8 +19,11 @@
 #define _IGNITE_ODBC_TEST_TEST_TYPE
 
 #include <string>
+#include <ignite/odbc/guid.h>
+#include <ignite/odbc/binary/binary.h>
+#include <ignite/odbc/date.h>
 
-#include "ignite/ignite.h"
+using namespace ignite::odbc;
 
 namespace ignite {
 struct TestType {
@@ -41,8 +44,9 @@ struct TestType {
 
   TestType(int8_t i8Field, int16_t i16Field, int32_t i32Field, int64_t i64Field,
            const std::string& strField, float floatField, double doubleField,
-           bool boolField, const Guid& guidField, const Date& dateField,
-           const Time& timeField, const Timestamp& timestampField)
+           bool boolField, const odbc::Guid& guidField,
+           const odbc::Date& dateField, const odbc::Time& timeField,
+           const odbc::Timestamp& timestampField)
       : allNulls(false),
         i8Field(i8Field),
         i16Field(i16Field),
@@ -80,13 +84,14 @@ struct TestType {
   float floatField;
   double doubleField;
   bool boolField;
-  Guid guidField;
-  Date dateField;
-  Time timeField;
-  Timestamp timestampField;
+  odbc::Guid guidField;
+  odbc::Date dateField;
+  odbc::Time timeField;
+  odbc::Timestamp timestampField;
   std::vector< int8_t > i8ArrayField;
 };
 
+namespace odbc {
 namespace binary {
 IGNITE_BINARY_TYPE_START(ignite::TestType)
 
@@ -158,6 +163,7 @@ static void Read(BinaryReader& reader, TestType& dst) {
 
 IGNITE_BINARY_TYPE_END
 }  // namespace binary
+}  // namespace odbc
 }  // namespace ignite
 
 #endif  // _IGNITE_ODBC_TEST_TEST_TYPE

@@ -17,7 +17,7 @@
 
 #include "ignite/odbc/nested_tx_mode.h"
 
-#include "ignite/common/utils.h"
+#include "ignite/odbc/common/utils.h"
 
 namespace {
 using ignite::odbc::NestedTxMode;

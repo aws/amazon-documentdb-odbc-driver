@@ -336,7 +336,7 @@ struct OdbcTestSuite {
    * @param qry Query.
    * @return Corresponding vector.
    */
-  static std::vector< SQLCHAR > MakeQuery(const std::string& qry);
+  static std::vector< SQLWCHAR > MakeQuery(const std::wstring& qry);
 
   /**
    * Performs SQL query.
@@ -344,7 +344,7 @@ struct OdbcTestSuite {
    * @param qry Query.
    * @return Result.
    */
-  SQLRETURN ExecQuery(const std::string& qry);
+  SQLRETURN ExecQuery(const std::wstring& qry);
 
   /**
    * Prepares SQL query.
@@ -352,7 +352,7 @@ struct OdbcTestSuite {
    * @param qry Query.
    * @return Result.
    */
-  SQLRETURN PrepareQuery(const std::string& qry);
+  SQLRETURN PrepareQuery(const std::wstring& qry);
 
   /**
    * Creates the standard DSN connection string.

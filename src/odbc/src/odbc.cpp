@@ -34,6 +34,14 @@
 #include "ignite/odbc/type_traits.h"
 #include "ignite/odbc/utility.h"
 
+/** 
+ * Sets the global locale to use C, UTF-8.
+ */
+void SetUtf8Local() {
+  char* newLocale = std::setlocale(LC_ALL, "C.UTF-8");
+  assert(newLocale);
+}
+
 /**
  * Handle window handle.
  * @param windowHandle Window handle.
@@ -311,9 +319,9 @@ SQLRETURN SQLCloseCursor(SQLHSTMT stmt) {
 }
 
 SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
-                           SQLCHAR* inConnectionString,
+                           SQLWCHAR* inConnectionString,
                            SQLSMALLINT inConnectionStringLen,
-                           SQLCHAR* outConnectionString,
+                           SQLWCHAR* outConnectionString,
                            SQLSMALLINT outConnectionStringBufferLen,
                            SQLSMALLINT* outConnectionStringLen,
                            SQLUSMALLINT driverCompletion) {
@@ -342,7 +350,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
   }
 
   std::string connectStr =
-      SqlStringToString(inConnectionString, inConnectionStringLen);
+      SqlStringToString(reinterpret_cast<const unsigned char*>(inConnectionString), inConnectionStringLen, sizeof(SQLWCHAR));
   connection->Establish(connectStr, windowHandle);
 
   DiagnosticRecordStorage& diag = connection->GetDiagnosticRecords();
@@ -353,9 +361,9 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
     return diag.GetReturnCode();
   }
 
-  size_t reslen = CopyStringToBuffer(
-      connectStr, reinterpret_cast< char* >(outConnectionString),
-      static_cast< size_t >(outConnectionStringBufferLen));
+  size_t reslen =
+      CopyStringToBuffer(connectStr, outConnectionString,
+                         static_cast< size_t >(outConnectionStringBufferLen));
 
   if (outConnectionStringLen)
     *outConnectionStringLen = static_cast< SQLSMALLINT >(reslen);
@@ -368,9 +376,9 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
   return diag.GetReturnCode();
 }
 
-SQLRETURN SQLConnect(SQLHDBC conn, SQLCHAR* serverName,
-                     SQLSMALLINT serverNameLen, SQLCHAR* userName,
-                     SQLSMALLINT userNameLen, SQLCHAR* auth,
+SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* serverName,
+                     SQLSMALLINT serverNameLen, SQLWCHAR* userName,
+                     SQLSMALLINT userNameLen, SQLWCHAR* auth,
                      SQLSMALLINT authLen) {
   IGNITE_UNUSED(userName);
   IGNITE_UNUSED(userNameLen);
@@ -394,7 +402,9 @@ SQLRETURN SQLConnect(SQLHDBC conn, SQLCHAR* serverName,
 
   odbc::config::Configuration config;
 
-  std::string dsn = SqlStringToString(serverName, serverNameLen);
+  std::string dsn =
+      SqlStringToString(reinterpret_cast< const unsigned char* >(serverName),
+                        serverNameLen, sizeof(SQLWCHAR));
 
   LOG_INFO_MSG("DSN: " << dsn);
 
@@ -429,7 +439,7 @@ SQLRETURN SQLDisconnect(SQLHDBC conn) {
   return connection->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLCHAR* query, SQLINTEGER queryLen) {
+SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLWCHAR* query, SQLINTEGER queryLen) {
   using odbc::Statement;
   using odbc::utility::SqlStringToString;
 
@@ -444,7 +454,9 @@ SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLCHAR* query, SQLINTEGER queryLen) {
     return SQL_INVALID_HANDLE;
   }
 
-  std::string sql = SqlStringToString(query, queryLen);
+  std::string sql =
+      SqlStringToString(reinterpret_cast< const unsigned char* >(query),
+                        queryLen, sizeof(SQLWCHAR));
 
   LOG_INFO_MSG("SQL: " << sql);
 
@@ -476,7 +488,7 @@ SQLRETURN SQLExecute(SQLHSTMT stmt) {
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLCHAR* query, SQLINTEGER queryLen) {
+SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* query, SQLINTEGER queryLen) {
   using odbc::Statement;
   using odbc::utility::SqlStringToString;
 
@@ -491,7 +503,9 @@ SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLCHAR* query, SQLINTEGER queryLen) {
     return SQL_INVALID_HANDLE;
   }
 
-  std::string sql = SqlStringToString(query, queryLen);
+  std::string sql =
+      SqlStringToString(reinterpret_cast< const unsigned char* >(query),
+                        queryLen, sizeof(SQLWCHAR));
 
   LOG_INFO_MSG("SQL: " << sql);
 
@@ -625,10 +639,10 @@ SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnNum) {
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLTables(SQLHSTMT stmt, SQLCHAR* catalogName,
-                    SQLSMALLINT catalogNameLen, SQLCHAR* schemaName,
-                    SQLSMALLINT schemaNameLen, SQLCHAR* tableName,
-                    SQLSMALLINT tableNameLen, SQLCHAR* tableType,
+SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
+                    SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
+                    SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
+                    SQLSMALLINT tableNameLen, SQLWCHAR* tableType,
                     SQLSMALLINT tableTypeLen) {
   using odbc::Statement;
   using odbc::utility::SqlStringToString;
@@ -645,10 +659,18 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLCHAR* catalogName,
     return SQL_INVALID_HANDLE;
   }
 
-  boost::optional< std::string > catalog = SqlStringToOptString(catalogName, catalogNameLen);
-  boost::optional< std::string > schema = SqlStringToOptString(schemaName, schemaNameLen);
-  std::string table = SqlStringToString(tableName, tableNameLen);
-  boost::optional< std::string > tableTypeStr = SqlStringToOptString(tableType, tableTypeLen);
+  boost::optional< std::string > catalog = SqlStringToOptString(
+      reinterpret_cast< const unsigned char* >(catalogName), catalogNameLen,
+      sizeof(SQLWCHAR));
+  boost::optional< std::string > schema =
+      SqlStringToOptString(reinterpret_cast< const unsigned char* >(schemaName),
+                           schemaNameLen, sizeof(SQLWCHAR));
+  std::string table =
+      SqlStringToString(reinterpret_cast< const unsigned char* >(tableName),
+                        tableNameLen, sizeof(SQLWCHAR));
+  boost::optional< std::string > tableTypeStr =
+      SqlStringToOptString(reinterpret_cast< const unsigned char* >(tableType),
+                           tableTypeLen, sizeof(SQLWCHAR));
 
   LOG_INFO_MSG("catalog: " << catalog);
   LOG_INFO_MSG("schema: " << schema);
@@ -662,14 +684,14 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLCHAR* catalogName,
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLColumns(SQLHSTMT stmt, SQLCHAR* catalogName,
-                     SQLSMALLINT catalogNameLen, SQLCHAR* schemaName,
-                     SQLSMALLINT schemaNameLen, SQLCHAR* tableName,
-                     SQLSMALLINT tableNameLen, SQLCHAR* columnName,
+SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
+                     SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
+                     SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
+                     SQLSMALLINT tableNameLen, SQLWCHAR* columnName,
                      SQLSMALLINT columnNameLen) {
   using odbc::Statement;
-  using odbc::utility::SqlStringToString;
   using odbc::utility::SqlStringToOptString;
+  using odbc::utility::SqlStringToString;
 
   LOG_DEBUG_MSG("SQLColumns called");
 
@@ -682,12 +704,18 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLCHAR* catalogName,
     return SQL_INVALID_HANDLE;
   }
 
-  const boost::optional< std::string > catalog =
-      SqlStringToOptString(catalogName, catalogNameLen);
+  const boost::optional< std::string > catalog = SqlStringToOptString(
+      reinterpret_cast< const unsigned char* >(catalogName), catalogNameLen,
+      sizeof(SQLWCHAR));
   const boost::optional< std::string > schema =
-      SqlStringToOptString(schemaName, schemaNameLen);
-  std::string table = SqlStringToString(tableName, tableNameLen);
-  std::string column = SqlStringToString(columnName, columnNameLen);
+      SqlStringToOptString(reinterpret_cast< const unsigned char* >(schemaName),
+                           schemaNameLen, sizeof(SQLWCHAR));
+  std::string table =
+      SqlStringToString(reinterpret_cast< const unsigned char* >(tableName),
+                        tableNameLen, sizeof(SQLWCHAR));
+  std::string column =
+      SqlStringToString(reinterpret_cast< const unsigned char* >(columnName),
+                        columnNameLen, sizeof(SQLWCHAR));
 
   LOG_INFO_MSG("catalog: " << catalog.get_value_or(""));
   LOG_INFO_MSG("schema: " << schema.get_value_or(""));
@@ -749,8 +777,8 @@ SQLRETURN SQLBindParameter(SQLHSTMT stmt, SQLUSMALLINT paramIdx,
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLNativeSql(SQLHDBC conn, SQLCHAR* inQuery, SQLINTEGER inQueryLen,
-                       SQLCHAR* outQueryBuffer, SQLINTEGER outQueryBufferLen,
+SQLRETURN SQLNativeSql(SQLHDBC conn, SQLWCHAR* inQuery, SQLINTEGER inQueryLen,
+                       SQLWCHAR* outQueryBuffer, SQLINTEGER outQueryBufferLen,
                        SQLINTEGER* outQueryLen) {
   IGNITE_UNUSED(conn);
 
@@ -758,9 +786,11 @@ SQLRETURN SQLNativeSql(SQLHDBC conn, SQLCHAR* inQuery, SQLINTEGER inQueryLen,
 
   LOG_DEBUG_MSG("SQLNativeSql called");
 
-  std::string in = SqlStringToString(inQuery, inQueryLen);
+  std::string in =
+      SqlStringToString(reinterpret_cast< const unsigned char* >(inQuery),
+                        inQueryLen, sizeof(SQLWCHAR));
 
-  CopyStringToBuffer(in, reinterpret_cast< char* >(outQueryBuffer),
+  CopyStringToBuffer(in, outQueryBuffer,
                      static_cast< size_t >(outQueryBufferLen));
 
   if (outQueryLen)
@@ -806,7 +836,7 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT columnNum,
   }
 
   statement->GetColumnAttribute(columnNum, fieldId,
-                                reinterpret_cast< char* >(strAttr), bufferLen,
+                                reinterpret_cast< SQLWCHAR* >(strAttr), bufferLen,
                                 strAttrLen, numericAttr);
 
   LOG_DEBUG_MSG("SQLColAttribute exiting");
@@ -815,7 +845,7 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT columnNum,
 }
 
 SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
-                         SQLCHAR* columnNameBuf, SQLSMALLINT columnNameBufLen,
+                         SQLWCHAR* columnNameBuf, SQLSMALLINT columnNameBufLen,
                          SQLSMALLINT* columnNameLen, SQLSMALLINT* dataType,
                          SQLULEN* columnSize, SQLSMALLINT* decimalDigits,
                          SQLSMALLINT* nullable) {
@@ -833,8 +863,7 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
     return SQL_INVALID_HANDLE;
   }
 
-  statement->GetColumnAttribute(columnNum, SQL_DESC_NAME,
-                                reinterpret_cast< char* >(columnNameBuf),
+  statement->GetColumnAttribute(columnNum, SQL_DESC_NAME, columnNameBuf,
                                 columnNameBufLen, columnNameLen, 0);
 
   SqlLen dataTypeRes;
@@ -906,12 +935,12 @@ SQLRETURN SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCnt) {
 }
 
 SQLRETURN SQLForeignKeys(
-    SQLHSTMT stmt, SQLCHAR* primaryCatalogName,
-    SQLSMALLINT primaryCatalogNameLen, SQLCHAR* primarySchemaName,
-    SQLSMALLINT primarySchemaNameLen, SQLCHAR* primaryTableName,
-    SQLSMALLINT primaryTableNameLen, SQLCHAR* foreignCatalogName,
-    SQLSMALLINT foreignCatalogNameLen, SQLCHAR* foreignSchemaName,
-    SQLSMALLINT foreignSchemaNameLen, SQLCHAR* foreignTableName,
+    SQLHSTMT stmt, SQLWCHAR* primaryCatalogName,
+    SQLSMALLINT primaryCatalogNameLen, SQLWCHAR* primarySchemaName,
+    SQLSMALLINT primarySchemaNameLen, SQLWCHAR* primaryTableName,
+    SQLSMALLINT primaryTableNameLen, SQLWCHAR* foreignCatalogName,
+    SQLSMALLINT foreignCatalogNameLen, SQLWCHAR* foreignSchemaName,
+    SQLSMALLINT foreignSchemaNameLen, SQLWCHAR* foreignTableName,
     SQLSMALLINT foreignTableNameLen) {
   using odbc::Statement;
   using odbc::utility::SqlStringToString;
@@ -928,18 +957,24 @@ SQLRETURN SQLForeignKeys(
     return SQL_INVALID_HANDLE;
   }
 
-  std::string primaryCatalog =
-      SqlStringToString(primaryCatalogName, primaryCatalogNameLen);
-  std::string primarySchema =
-      SqlStringToString(primarySchemaName, primarySchemaNameLen);
-  std::string primaryTable =
-      SqlStringToString(primaryTableName, primaryTableNameLen);
-  const boost::optional< std::string > foreignCatalog =
-      SqlStringToOptString(foreignCatalogName, foreignCatalogNameLen);
-  const boost::optional< std::string > foreignSchema =
-      SqlStringToOptString(foreignSchemaName, foreignSchemaNameLen);
-  std::string foreignTable =
-      SqlStringToString(foreignTableName, foreignTableNameLen);
+  std::string primaryCatalog = SqlStringToString(
+      reinterpret_cast< const unsigned char* >(primaryCatalogName),
+      primaryCatalogNameLen, sizeof(SQLWCHAR));
+  std::string primarySchema = SqlStringToString(
+      reinterpret_cast< const unsigned char* >(primarySchemaName),
+      primarySchemaNameLen, sizeof(SQLWCHAR));
+  std::string primaryTable = SqlStringToString(
+      reinterpret_cast< const unsigned char* >(primaryTableName),
+      primaryTableNameLen, sizeof(SQLWCHAR));
+  const boost::optional< std::string > foreignCatalog = SqlStringToOptString(
+      reinterpret_cast< const unsigned char* >(foreignCatalogName),
+      foreignCatalogNameLen, sizeof(SQLWCHAR));
+  const boost::optional< std::string > foreignSchema = SqlStringToOptString(
+      reinterpret_cast< const unsigned char* >(foreignSchemaName),
+      foreignSchemaNameLen, sizeof(SQLWCHAR));
+  std::string foreignTable = SqlStringToString(
+      reinterpret_cast< const unsigned char* >(foreignTableName),
+      foreignTableNameLen, sizeof(SQLWCHAR));
 
   LOG_INFO_MSG("primaryCatalog: " << primaryCatalog);
   LOG_INFO_MSG("primarySchema: " << primarySchema);
@@ -1015,9 +1050,9 @@ SQLRETURN SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attr, SQLPOINTER value,
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLPrimaryKeys(SQLHSTMT stmt, SQLCHAR* catalogName,
-                         SQLSMALLINT catalogNameLen, SQLCHAR* schemaName,
-                         SQLSMALLINT schemaNameLen, SQLCHAR* tableName,
+SQLRETURN SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
+                         SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
+                         SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
                          SQLSMALLINT tableNameLen) {
   using odbc::Statement;
   using odbc::utility::SqlStringToOptString;
@@ -1033,12 +1068,15 @@ SQLRETURN SQLPrimaryKeys(SQLHSTMT stmt, SQLCHAR* catalogName,
     return SQL_INVALID_HANDLE;
   }
 
-  boost::optional< std::string > catalog =
-      SqlStringToOptString(catalogName, catalogNameLen);
+  boost::optional< std::string > catalog = SqlStringToOptString(
+      reinterpret_cast< const unsigned char* >(catalogName), catalogNameLen,
+      sizeof(SQLWCHAR));
   boost::optional< std::string > schema =
-      SqlStringToOptString(schemaName, schemaNameLen);
+      SqlStringToOptString(reinterpret_cast< const unsigned char* >(schemaName),
+                           schemaNameLen, sizeof(SQLWCHAR));
   boost::optional< std::string > table =
-      SqlStringToOptString(tableName, tableNameLen);
+      SqlStringToOptString(reinterpret_cast< const unsigned char* >(tableName),
+                           tableNameLen, sizeof(SQLWCHAR));
 
   LOG_INFO_MSG("catalog: " << catalog.get_value_or(""));
   LOG_INFO_MSG("schema: " << schema.get_value_or(""));
@@ -1123,8 +1161,8 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle,
 }
 
 SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
-                        SQLSMALLINT recNum, SQLCHAR* sqlState,
-                        SQLINTEGER* nativeError, SQLCHAR* msgBuffer,
+                        SQLSMALLINT recNum, SQLWCHAR* sqlState,
+                        SQLINTEGER* nativeError, SQLWCHAR* msgBuffer,
                         SQLSMALLINT msgBufferLen, SQLSMALLINT* msgLen) {
   using namespace odbc::utility;
   using namespace odbc;
@@ -1185,8 +1223,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
   const DiagnosticRecord& record = records->GetStatusRecord(recNum);
 
   if (sqlState)
-    CopyStringToBuffer(record.GetSqlState(),
-                       reinterpret_cast< char* >(sqlState), 6);
+    CopyStringToBuffer(record.GetSqlState(), sqlState, 6 * sizeof(SQLWCHAR));
 
   if (nativeError)
     *nativeError = 0;
@@ -1196,25 +1233,23 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
   if (!msgBuffer
       || msgBufferLen < static_cast< SQLSMALLINT >(errMsg.size() + 1)) {
     if (!msgLen) {
-      LOG_ERROR_MSG("SQLGetDiagRec exiting with SQL_ERROR. msgLen: " << msgLen);
+      LOG_ERROR_MSG("SQLGetDiagRec exiting with SQL_ERROR. msgLen must not be NULL.");
       return SQL_ERROR;
     }
 
-    CopyStringToBuffer(errMsg, reinterpret_cast< char* >(msgBuffer),
+    *msgLen = CopyStringToBuffer(errMsg, msgBuffer,
                        static_cast< size_t >(msgBufferLen));
-
-    *msgLen = static_cast< SQLSMALLINT >(errMsg.size());
 
     LOG_DEBUG_MSG("SQLGetDiagRec exiting with SQL_SUCCESS_WITH_INFO");
 
     return SQL_SUCCESS_WITH_INFO;
   }
 
-  CopyStringToBuffer(errMsg, reinterpret_cast< char* >(msgBuffer),
-                     static_cast< size_t >(msgBufferLen));
+  size_t msgLen0 = CopyStringToBuffer(errMsg, msgBuffer,
+                                      static_cast< size_t >(msgBufferLen));
 
   if (msgLen)
-    *msgLen = static_cast< SQLSMALLINT >(errMsg.size());
+    *msgLen = msgLen0;
 
   LOG_DEBUG_MSG("SQLGetDiagRec exiting with SQL_SUCCESS");
 
@@ -1389,9 +1424,9 @@ SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valueBuf,
 }
 
 SQLRETURN SQLSpecialColumns(SQLHSTMT stmt, SQLSMALLINT idType,
-                            SQLCHAR* catalogName, SQLSMALLINT catalogNameLen,
-                            SQLCHAR* schemaName, SQLSMALLINT schemaNameLen,
-                            SQLCHAR* tableName, SQLSMALLINT tableNameLen,
+                            SQLWCHAR* catalogName, SQLSMALLINT catalogNameLen,
+                            SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen,
+                            SQLWCHAR* tableName, SQLSMALLINT tableNameLen,
                             SQLSMALLINT scope, SQLSMALLINT nullable) {
   using namespace odbc;
 
@@ -1408,9 +1443,15 @@ SQLRETURN SQLSpecialColumns(SQLHSTMT stmt, SQLSMALLINT idType,
     return SQL_INVALID_HANDLE;
   }
 
-  std::string catalog = SqlStringToString(catalogName, catalogNameLen);
-  std::string schema = SqlStringToString(schemaName, schemaNameLen);
-  std::string table = SqlStringToString(tableName, tableNameLen);
+  std::string catalog =
+      SqlStringToString(reinterpret_cast< const unsigned char* >(catalogName),
+                        catalogNameLen, sizeof(SQLWCHAR));
+  std::string schema =
+      SqlStringToString(reinterpret_cast< const unsigned char* >(schemaName),
+                        schemaNameLen, sizeof(SQLWCHAR));
+  std::string table =
+      SqlStringToString(reinterpret_cast< const unsigned char* >(tableName),
+                        tableNameLen, sizeof(SQLWCHAR));
 
   LOG_INFO_MSG("catalog: " << catalog);
   LOG_INFO_MSG("schema: " << schema);
@@ -1491,8 +1532,8 @@ SQLRETURN SQLDescribeParam(SQLHSTMT stmt, SQLUSMALLINT paramNum,
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLCHAR* state,
-                   SQLINTEGER* error, SQLCHAR* msgBuf, SQLSMALLINT msgBufLen,
+SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* state,
+                   SQLINTEGER* error, SQLWCHAR* msgBuf, SQLSMALLINT msgBufLen,
                    SQLSMALLINT* msgResLen) {
   using namespace ignite::odbc::utility;
   using namespace ignite::odbc;
@@ -1532,8 +1573,7 @@ SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLCHAR* state,
   record.MarkRetrieved();
 
   if (state)
-    CopyStringToBuffer(record.GetSqlState(), reinterpret_cast< char* >(state),
-                       6);
+    CopyStringToBuffer(record.GetSqlState(), state, 6 * sizeof(SQLWCHAR));
 
   if (error)
     *error = 0;

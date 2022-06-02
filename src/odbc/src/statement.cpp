@@ -941,14 +941,14 @@ SqlResult::Type Statement::InternalMoreResults() {
 }
 
 void Statement::GetColumnAttribute(uint16_t colIdx, uint16_t attrId,
-                                   char* strbuf, int16_t buflen,
+                                   SQLWCHAR* strbuf, int16_t buflen,
                                    int16_t* reslen, SqlLen* numbuf) {
   IGNITE_ODBC_API_CALL(InternalGetColumnAttribute(colIdx, attrId, strbuf,
                                                   buflen, reslen, numbuf));
 }
 
 SqlResult::Type Statement::InternalGetColumnAttribute(
-    uint16_t colIdx, uint16_t attrId, char* strbuf, int16_t buflen,
+    uint16_t colIdx, uint16_t attrId, SQLWCHAR* strbuf, int16_t buflen,
     int16_t* reslen, SqlLen* numbuf) {
   const meta::ColumnMetaVector* meta = GetMeta();
 
@@ -979,7 +979,8 @@ SqlResult::Type Statement::InternalGetColumnAttribute(
     size_t outSize = out.size();
 
     if (found && strbuf)
-      outSize = utility::CopyStringToBuffer(out, strbuf, buflen);
+      outSize =
+          utility::CopyStringToBuffer(out, strbuf, buflen);
 
     if (found && reslen)
       *reslen = static_cast< int16_t >(outSize);

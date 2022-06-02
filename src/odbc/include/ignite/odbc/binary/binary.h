@@ -15,9 +15,21 @@
  * limitations under the License.
  */
 
-namespace ignite {
-namespace odbc {
-namespace jni {
-}  // namespace jni
-}  // namespace odbc
-}  // namespace ignite
+/**
+ * @file
+ * Includes all binary API headers.
+ */
+
+#ifndef _IGNITE_ODBC_BINARY_BINARY
+#define _IGNITE_ODBC_BINARY_BINARY
+
+#include <ignite/odbc/binary/binary_consts.h>
+#include <ignite/odbc/binary/binary_containers.h>
+#include <ignite/odbc/binary/binary_type.h>
+#include <ignite/odbc/binary/binary_object.h>
+#include <ignite/odbc/binary/binary_raw_reader.h>
+#include <ignite/odbc/binary/binary_raw_writer.h>
+#include <ignite/odbc/binary/binary_reader.h>
+#include <ignite/odbc/binary/binary_writer.h>
+
+#endif //_IGNITE_ODBC_BINARY_BINARY

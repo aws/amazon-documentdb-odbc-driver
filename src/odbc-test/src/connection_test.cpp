@@ -44,7 +44,7 @@ struct ConnectionTestSuiteFixture : OdbcTestSuite {
    * Execute the query and return an error code.
    */
   std::string ExecQueryAndReturnError() {
-    SQLCHAR selectReq[] = "select count(*) from TestType";
+    SQLWCHAR selectReq[] = L"select count(*) from TestType";
 
     SQLRETURN ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
 

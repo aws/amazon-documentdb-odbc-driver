@@ -166,8 +166,7 @@ if (WIN32)
 
     target_link_libraries(${TARGET} ignite-common-objlib odbccp32 shlwapi)
 
-    remove_definitions(-DUNICODE=1)
-
+    add_definitions(-DUNICODE=1)
     add_definitions(-DTARGET_MODULE_FULL_NAME="$<TARGET_FILE_NAME:${TARGET}>")
 
     if (MSVC_VERSION GREATER_EQUAL 1900)
@@ -176,6 +175,7 @@ if (WIN32)
                 
     set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME "ignite.odbc")
 else()
+    add_definitions(-DUNICODE=1)
     target_link_libraries(${TARGET} ignite-common)
 endif()
 

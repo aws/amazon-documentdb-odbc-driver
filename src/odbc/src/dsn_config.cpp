@@ -17,7 +17,7 @@
 
 #include "ignite/odbc/dsn_config.h"
 
-#include <ignite/common/fixed_size_array.h>
+#include <ignite/odbc/common/fixed_size_array.h>
 
 #include "ignite/odbc/config/config_tools.h"
 #include "ignite/odbc/config/connection_string_parser.h"
@@ -27,51 +27,60 @@
 using namespace ignite::odbc::config;
 
 #define BUFFER_SIZE (1024 * 1024)
-#define CONFIG_FILE "ODBC.INI"
+#define CONFIG_FILE u8"ODBC.INI"
 
 namespace ignite {
 namespace odbc {
 void ThrowLastSetupError() {
   DWORD code;
-  common::FixedSizeArray< char > msg(BUFFER_SIZE);
+  common::FixedSizeArray< wchar_t > msg(BUFFER_SIZE);
 
   SQLInstallerError(1, &code, msg.GetData(), msg.GetSize(), NULL);
 
   std::stringstream buf;
 
-  buf << "Message: \"" << msg.GetData() << "\", Code: " << code;
+  buf << "Message: \"" << utility::ToUtf8(msg.GetData()) << "\", Code: " << code;
 
   throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, buf.str().c_str());
 }
 
 void WriteDsnString(const char* dsn, const char* key, const char* value) {
-  if (!SQLWritePrivateProfileString(dsn, key, value, CONFIG_FILE))
+  std::wstring dsn0 = utility::FromUtf8(dsn);
+  std::wstring key0 = utility::FromUtf8(key);
+  std::wstring value0 = utility::FromUtf8(value);
+  std::wstring configFile = utility::FromUtf8(CONFIG_FILE);
+  if (!SQLWritePrivateProfileString(dsn0.c_str(), key0.c_str(), value0.c_str(),
+                                    configFile.c_str()))
     ThrowLastSetupError();
 }
 
 SettableValue< std::string > ReadDsnString(const char* dsn,
                                            const std::string& key,
                                            const std::string& dflt = "") {
-  static const char* unique = "35a920dd-8837-43d2-a846-e01a2e7b5f84";
+  static const wchar_t* unique = L"35a920dd-8837-43d2-a846-e01a2e7b5f84";
 
   SettableValue< std::string > val(dflt);
 
-  common::FixedSizeArray< char > buf(BUFFER_SIZE);
-
-  int ret = SQLGetPrivateProfileString(dsn, key.c_str(), unique, buf.GetData(),
-                                       buf.GetSize(), CONFIG_FILE);
+  common::FixedSizeArray< wchar_t > buf(BUFFER_SIZE);
+  std::wstring dsn0 = utility::FromUtf8(dsn);
+  std::wstring key0 = utility::FromUtf8(key);
+  std::wstring configFile = utility::FromUtf8(CONFIG_FILE);
+  int ret = SQLGetPrivateProfileString(dsn0.c_str(), key0.c_str(), unique,
+                                       buf.GetData(), buf.GetSize(),
+                                       configFile.c_str());
 
   if (ret > BUFFER_SIZE) {
     buf.Reset(ret + 1);
 
-    ret = SQLGetPrivateProfileString(dsn, key.c_str(), unique, buf.GetData(),
-                                     buf.GetSize(), CONFIG_FILE);
+    ret = SQLGetPrivateProfileString(dsn0.c_str(), key0.c_str(), unique,
+                                     buf.GetData(), buf.GetSize(),
+                                     configFile.c_str());
   }
 
-  std::string res(buf.GetData());
+  std::wstring res(buf.GetData());
 
   if (res != unique)
-    val.SetValue(res);
+    val.SetValue(utility::ToUtf8(res));
 
   return val;
 }

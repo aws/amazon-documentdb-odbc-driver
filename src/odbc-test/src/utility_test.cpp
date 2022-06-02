@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#include <ignite/common/utils.h>
-#include <ignite/impl/binary/binary_writer_impl.h>
+#include <ignite/odbc/common/utils.h>
+#include <ignite/odbc/impl/binary/binary_writer_impl.h>
 #include <ignite/odbc/utility.h>
 
 #include <boost/test/unit_test.hpp>

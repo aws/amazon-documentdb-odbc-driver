@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "ignite/odbc/common/bits.h"
 #include "ignite/odbc/log.h"
@@ -280,8 +281,10 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
   SqlLen* resLenPtr = GetResLen();
   void* dataPtr = GetData();
 
-  if (resLenPtr)
-    *resLenPtr = static_cast< SqlLen >(value.size());
+  if (resLenPtr) {
+    // In bytes
+    *resLenPtr = static_cast< SqlLen >(value.size() * charSize);
+  }
 
   if (!dataPtr)
     return ConversionResult::Type::AI_SUCCESS;
@@ -293,14 +296,25 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
 
   SqlLen outLen = (buflen / charSize) - 1;
 
-  SqlLen toCopy = std::min< SqlLen >(outLen, value.size());
+  // Data stored in utf-8, convert to wide string before copying.
+  std::wstring value0 =
+      utility::FromUtf8(reinterpret_cast< const char* >(value.c_str()));
+  SqlLen toCopy = std::min< SqlLen >(outLen, value0.size());
 
-  for (SqlLen i = 0; i < toCopy; ++i)
-    out[i] = value[i];
+  if (sizeof(OutCharT) == 1) {
+    // wstring to string
+    std::locale currentLocale("");
+    std::use_facet< std::ctype< wchar_t > >(currentLocale)
+        .narrow(value0.data(), value0.data() + toCopy, '?', reinterpret_cast< char* >(out));
+  } else {
+    for (SqlLen i = 0; i < toCopy; ++i)
+      out[i] = value0[i];
+  }
 
   out[toCopy] = 0;
 
-  written = static_cast< int32_t >(toCopy);
+  // In bytes
+  written = static_cast< int32_t >(toCopy * charSize);
 
   if (toCopy < static_cast< SqlLen >(value.size()))
     return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
@@ -1034,7 +1048,7 @@ std::string ApplicationDataBuffer::GetString(size_t maxLen) const {
 
       res = utility::SqlStringToString(
           reinterpret_cast< const unsigned char* >(GetData()),
-          static_cast< int32_t >(paramLen));
+          static_cast< int32_t >(paramLen), sizeof(SQLWCHAR));
 
       if (res.size() > maxLen)
         res.resize(maxLen);
@@ -1135,7 +1149,7 @@ Guid ApplicationDataBuffer::GetGuid() const {
 
       std::string str = utility::SqlStringToString(
           reinterpret_cast< const unsigned char* >(GetData()),
-          static_cast< int32_t >(paramLen));
+          static_cast< int32_t >(paramLen), sizeof(SQLWCHAR));
 
       std::stringstream converter;
 
@@ -1350,7 +1364,7 @@ Date ApplicationDataBuffer::GetDate() const {
 
       std::string str = utility::SqlStringToString(
           reinterpret_cast< const unsigned char* >(GetData()),
-          static_cast< int32_t >(paramLen));
+          static_cast< int32_t >(paramLen), sizeof(SQLWCHAR));
 
       sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &tmTime.tm_year, &tmTime.tm_mon,
              &tmTime.tm_mday, &tmTime.tm_hour, &tmTime.tm_min, &tmTime.tm_sec);
@@ -1426,7 +1440,7 @@ Timestamp ApplicationDataBuffer::GetTimestamp() const {
 
       std::string str = utility::SqlStringToString(
           reinterpret_cast< const unsigned char* >(GetData()),
-          static_cast< int32_t >(paramLen));
+          static_cast< int32_t >(paramLen), sizeof(SQLWCHAR));
 
       sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &tmTime.tm_year, &tmTime.tm_mon,
              &tmTime.tm_mday, &tmTime.tm_hour, &tmTime.tm_min, &tmTime.tm_sec);
@@ -1486,7 +1500,7 @@ Time ApplicationDataBuffer::GetTime() const {
 
       std::string str = utility::SqlStringToString(
           reinterpret_cast< const unsigned char* >(GetData()),
-          static_cast< int32_t >(paramLen));
+          static_cast< int32_t >(paramLen), sizeof(SQLWCHAR));
 
       sscanf(str.c_str(), "%d:%d:%d", &tmTime.tm_hour, &tmTime.tm_min,
              &tmTime.tm_sec);

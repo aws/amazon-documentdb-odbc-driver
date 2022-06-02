@@ -118,9 +118,12 @@ void BuildJvmOptions(const std::string& cp, std::vector< char* >& opts, int xms,
 
   opts.reserve(REQ_OPTS_CNT + JAVA9_OPTS_CNT);
 
-  // 1. Set classpath.
-  std::string cpFull = "-Djava.class.path=" + cp;
 
+  // 1. Set calcite default charset to utf8.
+  opts.push_back(CopyChars("-Dcalcite.default.charset=utf8"));
+
+  // 2. Set classpath.
+  std::string cpFull = "-Djava.class.path=" + cp;
   opts.push_back(CopyChars(cpFull.c_str()));
 
   // 3. Set Xms, Xmx.

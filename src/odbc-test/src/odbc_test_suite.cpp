@@ -75,9 +75,9 @@ void OdbcTestSuite::Connect(SQLHDBC& conn, SQLHSTMT& statement,
   BOOST_REQUIRE(conn != NULL);
 
   // Connect string
-  std::vector< SQLCHAR > connectStr0(connectStr.begin(), connectStr.end());
+  std::vector< SQLWCHAR > connectStr0(connectStr.begin(), connectStr.end());
 
-  SQLCHAR outstr[ODBC_BUFFER_SIZE];
+  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
   SQLSMALLINT outstrlen;
 
   // Connecting to ODBC server.
@@ -100,9 +100,9 @@ void OdbcTestSuite::Connect(const std::string& connectStr) {
   Prepare();
 
   // Connect string
-  std::vector< SQLCHAR > connectStr0(connectStr.begin(), connectStr.end());
+  std::vector< SQLWCHAR > connectStr0(connectStr.begin(), connectStr.end());
 
-  SQLCHAR outstr[ODBC_BUFFER_SIZE];
+  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
   SQLSMALLINT outstrlen;
 
   // Connecting to ODBC server.
@@ -125,9 +125,9 @@ std::string OdbcTestSuite::ExpectConnectionReject(
   Prepare();
 
   // Connect string
-  std::vector< SQLCHAR > connectStr0(connectStr.begin(), connectStr.end());
+  std::vector< SQLWCHAR > connectStr0(connectStr.begin(), connectStr.end());
 
-  SQLCHAR outstr[ODBC_BUFFER_SIZE];
+  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
   SQLSMALLINT outstrlen;
 
   // Connecting to ODBC server.
@@ -336,9 +336,9 @@ void OdbcTestSuite::CheckTestI8ArrayValue(int idx, const int8_t* val,
 void OdbcTestSuite::CheckSQLDiagnosticError(int16_t handleType,
                                             SQLHANDLE handle,
                                             const std::string& expectSqlState) {
-  SQLCHAR state[ODBC_BUFFER_SIZE];
+  SQLWCHAR state[ODBC_BUFFER_SIZE];
   SQLINTEGER nativeError = 0;
-  SQLCHAR message[ODBC_BUFFER_SIZE];
+  SQLWCHAR message[ODBC_BUFFER_SIZE];
   SQLSMALLINT messageLen = 0;
 
   SQLRETURN ret = SQLGetDiagRec(handleType, handle, 1, state, &nativeError,
@@ -360,25 +360,25 @@ void OdbcTestSuite::CheckSQLConnectionDiagnosticError(
   CheckSQLDiagnosticError(SQL_HANDLE_DBC, dbc, expectSqlState);
 }
 
-std::vector< SQLCHAR > OdbcTestSuite::MakeQuery(const std::string& qry) {
-  return std::vector< SQLCHAR >(qry.begin(), qry.end());
+std::vector< SQLWCHAR > OdbcTestSuite::MakeQuery(const std::wstring& qry) {
+  return std::vector< SQLWCHAR >(qry.begin(), qry.end());
 }
 
-SQLRETURN OdbcTestSuite::ExecQuery(const std::string& qry) {
-  std::vector< SQLCHAR > sql = MakeQuery(qry);
+SQLRETURN OdbcTestSuite::ExecQuery(const std::wstring& qry) {
+  std::vector< SQLWCHAR > sql = MakeQuery(qry);
 
   return SQLExecDirect(stmt, sql.data(), static_cast< SQLINTEGER >(sql.size()));
 }
 
-SQLRETURN OdbcTestSuite::PrepareQuery(const std::string& qry) {
-  std::vector< SQLCHAR > sql = MakeQuery(qry);
+SQLRETURN OdbcTestSuite::PrepareQuery(const std::wstring& qry) {
+  std::vector< SQLWCHAR > sql = MakeQuery(qry);
 
   return SQLPrepare(stmt, sql.data(), static_cast< SQLINTEGER >(sql.size()));
 }
 
 void OdbcTestSuite::InsertTestStrings(int recordsNum, bool merge) {
-  SQLCHAR insertReq[] = "INSERT INTO TestType(_key, strField) VALUES(?, ?)";
-  SQLCHAR mergeReq[] = "MERGE INTO TestType(_key, strField) VALUES(?, ?)";
+  SQLWCHAR insertReq[] = L"INSERT INTO TestType(_key, strField) VALUES(?, ?)";
+  SQLWCHAR mergeReq[] = L"MERGE INTO TestType(_key, strField) VALUES(?, ?)";
 
   SQLRETURN ret = SQLPrepare(stmt, merge ? mergeReq : insertReq, SQL_NTS);
 
@@ -441,19 +441,19 @@ int OdbcTestSuite::InsertTestBatch(int from, int to, int expectedToAffect,
                                    bool merge) {
   using common::FixedSizeArray;
 
-  SQLCHAR insertReq[] =
-      "INSERT "
-      "INTO TestType(_key, i8Field, i16Field, i32Field, strField, floatField, "
-      "doubleField, boolField, dateField, "
-      "timeField, timestampField, i8ArrayField) VALUES(?, ?, ?, ?, ?, ?, ?, ?, "
-      "?, ?, ?, ?)";
+  SQLWCHAR insertReq[] =
+      L"INSERT "
+      L"INTO TestType(_key, i8Field, i16Field, i32Field, strField, floatField, "
+      L"doubleField, boolField, dateField, "
+      L"timeField, timestampField, i8ArrayField) VALUES(?, ?, ?, ?, ?, ?, ?, "
+      L"?, ?, ?, ?, ?)";
 
-  SQLCHAR mergeReq[] =
-      "MERGE "
-      "INTO TestType(_key, i8Field, i16Field, i32Field, strField, floatField, "
-      "doubleField, boolField, dateField, "
-      "timeField, timestampField, i8ArrayField) VALUES(?, ?, ?, ?, ?, ?, ?, ?, "
-      "?, ?, ?, ?)";
+  SQLWCHAR mergeReq[] =
+      L"MERGE "
+      L"INTO TestType(_key, i8Field, i16Field, i32Field, strField, floatField, "
+      L"doubleField, boolField, dateField, "
+      L"timeField, timestampField, i8ArrayField) VALUES(?, ?, ?, ?, ?, ?, ?, "
+      L"?, ?, ?, ?, ?)";
 
   SQLRETURN ret;
 
@@ -679,7 +679,7 @@ void OdbcTestSuite::InsertBatchSelect(int recordsNum) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // Just selecting everything to make sure everything is OK
-  SQLCHAR selectReq[] = "SELECT _key, strField FROM TestType ORDER BY _key";
+  SQLWCHAR selectReq[] = L"SELECT _key, strField FROM TestType ORDER BY _key";
 
   ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
 
@@ -761,7 +761,7 @@ void OdbcTestSuite::InsertNonFullBatchSelect(int recordsNum, int splitAt) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // Just selecting everything to make sure everything is OK
-  SQLCHAR selectReq[] = "SELECT _key, strField FROM TestType ORDER BY _key";
+  SQLWCHAR selectReq[] = L"SELECT _key, strField FROM TestType ORDER BY _key";
 
   ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
 
@@ -804,8 +804,9 @@ void OdbcTestSuite::CreateDsnConnectionStringForRemoteServer(
       sshTunnel ? common::GetEnv("DOC_DB_HOST", "") : "localhost";
   std::string sshUserAtHost = common::GetEnv("DOC_DB_USER", "");
   std::string sshPrivKeyFile = common::GetEnv("DOC_DB_PRIV_KEY_FILE", "");
-  std::string port = sshTunnel ? common::GetEnv("DOC_DB_REMOTE_PORT", "27017")
-                               : common::GetEnv("DOC_DB_LOCAL_PORT", "27019");
+  std::string port = sshTunnel
+                          ? common::GetEnv("DOC_DB_REMOTE_PORT", "27017")
+                          : common::GetEnv("DOC_DB_LOCAL_PORT", "27019");
 
   if (!username.empty()) {
     user = username;
@@ -850,12 +851,11 @@ void OdbcTestSuite::CreateDsnConnectionStringForLocalServer(
     const std::string& userName, const std::string& miscOptions) const {
   std::string user = userName.size() > 0
                          ? userName
-                         : common::GetEnv("DOC_DB_USER_NAME", "documentdb");
+                          : common::GetEnv("DOC_DB_USER_NAME", "documentdb");
   std::string password = common::GetEnv("DOC_DB_PASSWORD", "");
   std::string host = common::GetEnv("LOCAL_DATABASE_HOST", "localhost");
   std::string port = "27017";
-  std::string database =
-      databaseName.size() > 0 ? databaseName : "odbc-test";
+  std::string database = databaseName.size() > 0 ? databaseName : "odbc-test";
   std::string logPath = common::GetEnv("DOC_DB_LOG_PATH", "");
   std::string logLevel = common::GetEnv("DOC_DB_LOG_LEVEL", "");
 

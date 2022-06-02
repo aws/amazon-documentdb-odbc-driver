@@ -24,7 +24,6 @@
 #include <string>
 #include <thread>
 
-#include "ignite/common/utils.h"
 #include "ignite/odbc/common/common.h"
 #include "ignite/odbc/common/concurrent.h"
 #include "ignite/odbc/log_level.h"

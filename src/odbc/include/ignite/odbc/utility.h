@@ -62,6 +62,24 @@ T* GetPointerWithOffset(T* ptr, size_t offset) {
 size_t CopyStringToBuffer(const std::string& str, char* buf, size_t buflen);
 
 /**
+ * Copy string to buffer of the specific length.
+ * @param str String to copy data from.
+ * @param buf Buffer to copy data to.
+ * @param buflen Length of the buffer.
+ * @return Length of the resulting string in buffer.
+ */
+size_t CopyStringToBuffer(const std::string& str, wchar_t* buf, size_t buflen);
+
+/**
+ * Copy string to buffer of the specific length.
+ * @param str String to copy data from.
+ * @param buf Buffer to copy data to.
+ * @param buflen Length of the buffer.
+ * @return Length of the resulting string in buffer.
+ */
+size_t CopyStringToBuffer(const std::string& str, unsigned short* buf, size_t buflen);
+
+/**
  * Read array from reader.
  * @param reader Reader.
  * @param res Resulting vector.
@@ -109,7 +127,9 @@ void WriteDecimal(BinaryWriterImpl& writer,
  * @param sqlStrLen SQL string length.
  * @return Standard string containing the same data.
  */
-std::string SqlStringToString(const unsigned char* sqlStr, int32_t sqlStrLen);
+std::string SqlStringToString(const unsigned char* sqlStr, int32_t sqlStrLen,
+                              size_t char_size);
+
 
 /**
  * Convert SQL string buffer to boost::optional< std::string >.
@@ -120,7 +140,40 @@ std::string SqlStringToString(const unsigned char* sqlStr, int32_t sqlStrLen);
  * If sqlStrLen indicates null string, boost::none is returned.
  */
 boost::optional< std::string > SqlStringToOptString(const unsigned char* sqlStr,
-                                                    int32_t sqlStrLen);
+                                                    int32_t sqlStrLen,
+                                                    size_t char_size);
+
+/**
+ * Convert a wide string to UTF-8 encoded string.
+ *
+ * @param value wide string value to convert.
+ * @return String value converted to UTF-8 encoding.
+ */
+std::string ToUtf8(const std::wstring& value);
+
+/**
+ * Convert a wide string to UTF-8 encoded string.
+ *
+ * @param value wide string value to convert.
+ * @return String value converted to UTF-8 encoding.
+ */
+std::string ToUtf8(const wchar_t* value);
+
+/**
+ * Convert a UTF-8 encoded string to wide string.
+ *
+ * @param value wide string value to convert.
+ * @return String value converted to UTF-8 encoding.
+ */
+std::wstring FromUtf8(const std::string& value);
+
+/**
+ * Convert a UTF-8 encoded string to wide string.
+ *
+ * @param value wide string value to convert.
+ * @return String value converted to UTF-8 encoding.
+ */
+std::wstring FromUtf8(const char* value);
 
 /**
  * Convert binary data to hex dump form
@@ -132,4 +185,15 @@ std::string HexDump(const void* data, size_t count);
 }  // namespace utility
 }  // namespace odbc
 }  // namespace ignite
+
+namespace std {
+/** 
+ * Convert wstring to utf-8 encoding.
+ */
+inline std::ostream& operator<<(std::ostream& out, const std::wstring& value) {
+  out << ignite::odbc::utility::ToUtf8(value);
+  return out;
+}
+}  // namespace std
+
 #endif  //_IGNITE_ODBC_UTILITY

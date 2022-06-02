@@ -27,22 +27,18 @@
 #include <string>
 #include <vector>
 
-#include "ignite/ignite.h"
-#include "ignite/ignition.h"
-#include "ignite/impl/binary/binary_utils.h"
+#include "ignite/odbc/impl/binary/binary_utils.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"
 #include "test_utils.h"
 
 using namespace ignite;
-using namespace ignite::cache;
-using namespace ignite::cache::query;
-using namespace ignite::common;
+using namespace ignite::odbc::common;
 using namespace ignite_test;
 
 using namespace boost::unit_test;
 
-using ignite::impl::binary::BinaryUtils;
+using ignite::odbc::impl::binary::BinaryUtils;
 
 /**
  * Test setup fixture.
@@ -51,7 +47,7 @@ struct ApiRobustnessTestSuiteFixture : public odbc::OdbcTestSuite {
   /**
    * Constructor.
    */
-  ApiRobustnessTestSuiteFixture() : testCache(0) {
+  ApiRobustnessTestSuiteFixture() {
     // No-op
   }
 
@@ -69,8 +65,6 @@ struct ApiRobustnessTestSuiteFixture : public odbc::OdbcTestSuite {
       TestType val;
 
       val.i32Field = i * 10;
-
-      testCache.Put(i, val);
     }
 
     int32_t i32Field = -1;
@@ -81,7 +75,7 @@ struct ApiRobustnessTestSuiteFixture : public odbc::OdbcTestSuite {
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-    SQLCHAR request[] = "SELECT i32Field FROM TestType ORDER BY _key";
+    SQLWCHAR request[] = L"SELECT i32Field FROM TestType ORDER BY _key";
 
     ret = SQLExecDirect(stmt, request, SQL_NTS);
     if (!SQL_SUCCEEDED(ret))
@@ -107,9 +101,6 @@ struct ApiRobustnessTestSuiteFixture : public odbc::OdbcTestSuite {
   virtual ~ApiRobustnessTestSuiteFixture() {
     // No-op.
   }
-
-  /** Test cache instance. */
-  Cache< int64_t, TestType > testCache;
 };
 
 SQLSMALLINT unsupportedC[] = {SQL_C_INTERVAL_YEAR,
@@ -181,10 +172,10 @@ BOOST_AUTO_TEST_CASE(TestSQLDriverConnect, *disabled()) {
 
   Prepare();
 
-  SQLCHAR connectStr[] =
-      "DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache";
+  SQLWCHAR connectStr[] =
+      L"DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache";
 
-  SQLCHAR outStr[ODBC_BUFFER_SIZE];
+  SQLWCHAR outStr[ODBC_BUFFER_SIZE];
   SQLSMALLINT outStrLen;
 
   // Normal connect.
@@ -227,7 +218,7 @@ BOOST_AUTO_TEST_CASE(TestSQLConnect, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR buffer[ODBC_BUFFER_SIZE];
+  SQLWCHAR buffer[ODBC_BUFFER_SIZE];
   SQLSMALLINT resLen = 0;
 
   // Everything is ok.
@@ -258,7 +249,7 @@ BOOST_AUTO_TEST_CASE(TestSQLPrepare, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR sql[] = "SELECT strField FROM TestType";
+  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
 
   // Everything is ok.
   SQLRETURN ret = SQLPrepare(stmt, sql, sizeof(sql));
@@ -289,7 +280,7 @@ BOOST_AUTO_TEST_CASE(TestSQLExecDirect, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR sql[] = "SELECT strField FROM TestType";
+  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
 
   // Everything is ok.
   SQLRETURN ret = SQLExecDirect(stmt, sql, sizeof(sql));
@@ -322,13 +313,11 @@ BOOST_AUTO_TEST_CASE(TestSQLExtendedFetch, *disabled()) {
     TestType obj;
 
     obj.strField = LexicalCast< std::string >(i);
-
-    testCache.Put(i, obj);
   }
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR sql[] = "SELECT strField FROM TestType";
+  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
 
   SQLRETURN ret = SQLExecDirect(stmt, sql, sizeof(sql));
 
@@ -358,7 +347,7 @@ BOOST_AUTO_TEST_CASE(TestSQLNumResultCols) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR sql[] = "SELECT * FROM \"api_robustness_test_001\"";
+  SQLWCHAR sql[] = L"SELECT * FROM \"api_robustness_test_001\"";
 
   SQLRETURN ret = SQLExecDirect(stmt, sql, sizeof(sql));
 
@@ -382,7 +371,7 @@ BOOST_AUTO_TEST_CASE(TestSQLForeignKeys) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR fkTableName[] = "jni_test_001_sub_doc";
+  SQLWCHAR fkTableName[] = L"jni_test_001_sub_doc";
 
   SQLRETURN ret =
       SQLForeignKeys(stmt, NULL, 0,                     /* Primary catalog */
@@ -401,10 +390,10 @@ BOOST_AUTO_TEST_CASE(TestSQLTables, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR catalogName[] = "";
-  SQLCHAR schemaName[] = "";
-  SQLCHAR tableName[] = "";
-  SQLCHAR tableType[] = "";
+  SQLWCHAR catalogName[] = L"";
+  SQLWCHAR schemaName[] = L"";
+  SQLWCHAR tableName[] = L"";
+  SQLWCHAR tableType[] = L"";
 
   // Everything is ok.
   SQLRETURN ret = SQLTables(stmt, catalogName, sizeof(catalogName), schemaName,
@@ -430,10 +419,10 @@ BOOST_AUTO_TEST_CASE(TestSQLColumns, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR catalogName[] = "";
-  SQLCHAR schemaName[] = "";
-  SQLCHAR tableName[] = "";
-  SQLCHAR columnName[] = "";
+  SQLWCHAR catalogName[] = L"";
+  SQLWCHAR schemaName[] = L"";
+  SQLWCHAR tableName[] = L"";
+  SQLWCHAR columnName[] = L"";
 
   // Everything is ok.
   SQLRETURN ret = SQLColumns(stmt, catalogName, sizeof(catalogName), schemaName,
@@ -459,9 +448,9 @@ BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeys) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR catalogName[] = "";
-  SQLCHAR schemaName[] = "odbc-test";
-  SQLCHAR tableName[] = "jni_test_001";
+  SQLWCHAR catalogName[] = L"";
+  SQLWCHAR schemaName[] = L"odbc-test";
+  SQLWCHAR tableName[] = L"jni_test_001";
 
   // Everything is ok.
   SQLRETURN ret =
@@ -587,8 +576,8 @@ BOOST_AUTO_TEST_CASE(TestSQLNativeSql, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR sql[] = "SELECT strField FROM TestType";
-  SQLCHAR buffer[ODBC_BUFFER_SIZE];
+  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
+  SQLWCHAR buffer[ODBC_BUFFER_SIZE];
   SQLINTEGER resLen = 0;
 
   // Everything is ok.
@@ -622,13 +611,13 @@ BOOST_AUTO_TEST_CASE(TestSQLColAttribute, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR sql[] = "SELECT strField FROM TestType";
+  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
 
   SQLRETURN ret = SQLExecDirect(stmt, sql, sizeof(sql));
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-  SQLCHAR buffer[ODBC_BUFFER_SIZE];
+  SQLWCHAR buffer[ODBC_BUFFER_SIZE];
   SQLSMALLINT resLen = 0;
   SQLLEN numericAttr = 0;
 
@@ -669,13 +658,13 @@ BOOST_AUTO_TEST_CASE(TestSQLDescribeCol, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR sql[] = "SELECT strField FROM TestType";
+  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
 
   SQLRETURN ret = SQLExecDirect(stmt, sql, sizeof(sql));
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-  SQLCHAR columnName[ODBC_BUFFER_SIZE];
+  SQLWCHAR columnName[ODBC_BUFFER_SIZE];
   SQLSMALLINT columnNameLen = 0;
   SQLSMALLINT dataType = 0;
   SQLULEN columnSize = 0;
@@ -711,7 +700,7 @@ BOOST_AUTO_TEST_CASE(TestSQLRowCount, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR sql[] = "SELECT strField FROM TestType";
+  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
 
   SQLRETURN ret = SQLExecDirect(stmt, sql, sizeof(sql));
 
@@ -733,9 +722,9 @@ BOOST_AUTO_TEST_CASE(TestSQLForeignKeysSegFault, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR catalogName[] = "";
-  SQLCHAR schemaName[] = "cache";
-  SQLCHAR tableName[] = "TestType";
+  SQLWCHAR catalogName[] = L"";
+  SQLWCHAR schemaName[] = L"cache";
+  SQLWCHAR tableName[] = L"TestType";
 
   // Everything is ok.
   SQLRETURN ret = SQLForeignKeys(
@@ -838,7 +827,7 @@ BOOST_AUTO_TEST_CASE(TestSQLGetStmtAttr, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR buffer[ODBC_BUFFER_SIZE];
+  SQLWCHAR buffer[ODBC_BUFFER_SIZE];
   SQLINTEGER resLen = 0;
 
   // Everything is ok.
@@ -880,7 +869,7 @@ BOOST_AUTO_TEST_CASE(TestSQLNumParams, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR sql[] = "SELECT strField FROM TestType";
+  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
 
   // Everything is ok.
   SQLRETURN ret = SQLPrepare(stmt, sql, sizeof(sql));
@@ -903,7 +892,7 @@ BOOST_AUTO_TEST_CASE(TestSQLNumParamsEscaped, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR sql[] = "SELECT {fn NOW()}";
+  SQLWCHAR sql[] = L"SELECT {fn NOW()}";
 
   // Everything is ok.
   SQLRETURN ret = SQLPrepare(stmt, sql, sizeof(sql));
@@ -931,7 +920,7 @@ BOOST_AUTO_TEST_CASE(TestSQLGetDiagField, *disabled()) {
 
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
 
-  SQLCHAR buffer[ODBC_BUFFER_SIZE];
+  SQLWCHAR buffer[ODBC_BUFFER_SIZE];
   SQLSMALLINT resLen = 0;
 
   // Everything is ok
@@ -952,9 +941,9 @@ BOOST_AUTO_TEST_CASE(TestSQLGetDiagField, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestSQLGetDiagRec, *disabled()) {
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR state[ODBC_BUFFER_SIZE];
+  SQLWCHAR state[ODBC_BUFFER_SIZE];
   SQLINTEGER nativeError = 0;
-  SQLCHAR message[ODBC_BUFFER_SIZE];
+  SQLWCHAR message[ODBC_BUFFER_SIZE];
   SQLSMALLINT messageLen = 0;
 
   // Generating error.
@@ -999,13 +988,11 @@ BOOST_AUTO_TEST_CASE(TestSQLGetData, *disabled()) {
     TestType obj;
 
     obj.strField = LexicalCast< std::string >(i);
-
-    testCache.Put(i, obj);
   }
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR sql[] = "SELECT strField FROM TestType";
+  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
 
   SQLRETURN ret = SQLExecDirect(stmt, sql, sizeof(sql));
 
@@ -1015,7 +1002,7 @@ BOOST_AUTO_TEST_CASE(TestSQLGetData, *disabled()) {
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-  SQLCHAR buffer[ODBC_BUFFER_SIZE];
+  SQLWCHAR buffer[ODBC_BUFFER_SIZE];
   SQLLEN resLen = 0;
 
   // Everything is ok.
@@ -1048,7 +1035,7 @@ BOOST_AUTO_TEST_CASE(TestSQLGetEnvAttr, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR buffer[ODBC_BUFFER_SIZE];
+  SQLWCHAR buffer[ODBC_BUFFER_SIZE];
   SQLINTEGER resLen = 0;
 
   // Everything is ok.
@@ -1069,9 +1056,9 @@ BOOST_AUTO_TEST_CASE(TestSQLSpecialColumns, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR catalogName[] = "";
-  SQLCHAR schemaName[] = "cache";
-  SQLCHAR tableName[] = "TestType";
+  SQLWCHAR catalogName[] = L"";
+  SQLWCHAR schemaName[] = L"cache";
+  SQLWCHAR tableName[] = L"TestType";
 
   // Everything is ok.
   SQLRETURN ret =
@@ -1143,9 +1130,9 @@ BOOST_AUTO_TEST_CASE(TestSQLError, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLCHAR state[6] = {0};
+  SQLWCHAR state[6] = {0};
   SQLINTEGER nativeCode = 0;
-  SQLCHAR message[ODBC_BUFFER_SIZE] = {0};
+  SQLWCHAR message[ODBC_BUFFER_SIZE] = {0};
   SQLSMALLINT messageLen = 0;
 
   // Everything is ok.

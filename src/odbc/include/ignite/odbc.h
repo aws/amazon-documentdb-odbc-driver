@@ -55,25 +55,25 @@ SQLRETURN SQLFreeStmt(SQLHSTMT stmt, SQLUSMALLINT option);
 SQLRETURN SQLCloseCursor(SQLHSTMT stmt);
 
 SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
-                           SQLCHAR* inConnectionString,
+                           SQLWCHAR* inConnectionString,
                            SQLSMALLINT inConnectionStringLen,
-                           SQLCHAR* outConnectionString,
+                           SQLWCHAR* outConnectionString,
                            SQLSMALLINT outConnectionStringBufferLen,
                            SQLSMALLINT* outConnectionStringLen,
                            SQLUSMALLINT driverCompletion);
 
-SQLRETURN SQLConnect(SQLHDBC conn, SQLCHAR* serverName,
-                     SQLSMALLINT serverNameLen, SQLCHAR* userName,
-                     SQLSMALLINT userNameLen, SQLCHAR* auth,
+SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* serverName,
+                     SQLSMALLINT serverNameLen, SQLWCHAR* userName,
+                     SQLSMALLINT userNameLen, SQLWCHAR* auth,
                      SQLSMALLINT authLen);
 
 SQLRETURN SQLDisconnect(SQLHDBC conn);
 
-SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLCHAR* query, SQLINTEGER queryLen);
+SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLWCHAR* query, SQLINTEGER queryLen);
 
 SQLRETURN SQLExecute(SQLHSTMT stmt);
 
-SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLCHAR* query, SQLINTEGER queryLen);
+SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* query, SQLINTEGER queryLen);
 
 SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT colNum, SQLSMALLINT targetType,
                      SQLPOINTER targetValue, SQLLEN bufferLength,
@@ -89,16 +89,16 @@ SQLRETURN SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT orientation,
 
 SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnNum);
 
-SQLRETURN SQLTables(SQLHSTMT stmt, SQLCHAR* catalogName,
-                    SQLSMALLINT catalogNameLen, SQLCHAR* schemaName,
-                    SQLSMALLINT schemaNameLen, SQLCHAR* tableName,
-                    SQLSMALLINT tableNameLen, SQLCHAR* tableType,
+SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
+                    SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
+                    SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
+                    SQLSMALLINT tableNameLen, SQLWCHAR* tableType,
                     SQLSMALLINT tableTypeLen);
 
-SQLRETURN SQLColumns(SQLHSTMT stmt, SQLCHAR* catalogName,
-                     SQLSMALLINT catalogNameLen, SQLCHAR* schemaName,
-                     SQLSMALLINT schemaNameLen, SQLCHAR* tableName,
-                     SQLSMALLINT tableNameLen, SQLCHAR* columnName,
+SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
+                     SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
+                     SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
+                     SQLSMALLINT tableNameLen, SQLWCHAR* columnName,
                      SQLSMALLINT columnNameLen);
 
 SQLRETURN SQLMoreResults(SQLHSTMT stmt);
@@ -109,8 +109,8 @@ SQLRETURN SQLBindParameter(SQLHSTMT stmt, SQLUSMALLINT paramIdx,
                            SQLSMALLINT decDigits, SQLPOINTER buffer,
                            SQLLEN bufferLen, SQLLEN* resLen);
 
-SQLRETURN SQLNativeSql(SQLHDBC conn, SQLCHAR* inQuery, SQLINTEGER inQueryLen,
-                       SQLCHAR* outQueryBuffer, SQLINTEGER outQueryBufferLen,
+SQLRETURN SQLNativeSql(SQLHDBC conn, SQLWCHAR* inQuery, SQLINTEGER inQueryLen,
+                       SQLWCHAR* outQueryBuffer, SQLINTEGER outQueryBufferLen,
                        SQLINTEGER* outQueryLen);
 
 SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT columnNum,
@@ -119,7 +119,7 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT columnNum,
                           SQLLEN* numericAttr);
 
 SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
-                         SQLCHAR* columnNameBuf, SQLSMALLINT columnNameBufLen,
+                         SQLWCHAR* columnNameBuf, SQLSMALLINT columnNameBufLen,
                          SQLSMALLINT* columnNameLen, SQLSMALLINT* dataType,
                          SQLULEN* columnSize, SQLSMALLINT* decimalDigits,
                          SQLSMALLINT* nullable);
@@ -133,12 +133,12 @@ SQLRETURN SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCnt);
  * which they refer. The list of foreign keys in the specified table does not
  * contain foreign keys that refer to unique constraints in other tables. */
 SQLRETURN SQLForeignKeys(
-    SQLHSTMT stmt, SQLCHAR* primaryCatalogName,
-    SQLSMALLINT primaryCatalogNameLen, SQLCHAR* primarySchemaName,
-    SQLSMALLINT primarySchemaNameLen, SQLCHAR* primaryTableName,
-    SQLSMALLINT primaryTableNameLen, SQLCHAR* foreignCatalogName,
-    SQLSMALLINT foreignCatalogNameLen, SQLCHAR* foreignSchemaName,
-    SQLSMALLINT foreignSchemaNameLen, SQLCHAR* foreignTableName,
+    SQLHSTMT stmt, SQLWCHAR* primaryCatalogName,
+    SQLSMALLINT primaryCatalogNameLen, SQLWCHAR* primarySchemaName,
+    SQLSMALLINT primarySchemaNameLen, SQLWCHAR* primaryTableName,
+    SQLSMALLINT primaryTableNameLen, SQLWCHAR* foreignCatalogName,
+    SQLSMALLINT foreignCatalogNameLen, SQLWCHAR* foreignSchemaName,
+    SQLSMALLINT foreignSchemaNameLen, SQLWCHAR* foreignTableName,
     SQLSMALLINT foreignTableNameLen);
 
 SQLRETURN SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attr, SQLPOINTER valueBuf,
@@ -147,9 +147,9 @@ SQLRETURN SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attr, SQLPOINTER valueBuf,
 SQLRETURN SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attr, SQLPOINTER value,
                          SQLINTEGER valueLen);
 
-SQLRETURN SQLPrimaryKeys(SQLHSTMT stmt, SQLCHAR* catalogName,
-                         SQLSMALLINT catalogNameLen, SQLCHAR* schemaName,
-                         SQLSMALLINT schemaNameLen, SQLCHAR* tableName,
+SQLRETURN SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
+                         SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
+                         SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
                          SQLSMALLINT tableNameLen);
 
 SQLRETURN SQLNumParams(SQLHSTMT stmt, SQLSMALLINT* paramCnt);
@@ -160,8 +160,8 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle,
                           SQLSMALLINT* resLen);
 
 SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
-                        SQLSMALLINT recNum, SQLCHAR* sqlState,
-                        SQLINTEGER* nativeError, SQLCHAR* msgBuffer,
+                        SQLSMALLINT recNum, SQLWCHAR* sqlState,
+                        SQLINTEGER* nativeError, SQLWCHAR* msgBuffer,
                         SQLSMALLINT msgBufferLen, SQLSMALLINT* msgLen);
 
 SQLRETURN SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT type);
@@ -180,9 +180,9 @@ SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valueBuf,
                         SQLINTEGER valueBufLen, SQLINTEGER* valueResLen);
 
 SQLRETURN SQLSpecialColumns(SQLHSTMT stmt, SQLSMALLINT idType,
-                            SQLCHAR* catalogName, SQLSMALLINT catalogNameLen,
-                            SQLCHAR* schemaName, SQLSMALLINT schemaNameLen,
-                            SQLCHAR* tableName, SQLSMALLINT tableNameLen,
+                            SQLWCHAR* catalogName, SQLSMALLINT catalogNameLen,
+                            SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen,
+                            SQLWCHAR* tableName, SQLSMALLINT tableNameLen,
                             SQLSMALLINT scope, SQLSMALLINT nullable);
 
 SQLRETURN SQLParamData(SQLHSTMT stmt, SQLPOINTER* value);
@@ -194,8 +194,8 @@ SQLRETURN SQLDescribeParam(SQLHSTMT stmt, SQLUSMALLINT paramNum,
                            SQLSMALLINT* dataType, SQLULEN* paramSize,
                            SQLSMALLINT* decimalDigits, SQLSMALLINT* nullable);
 
-SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLCHAR* state,
-                   SQLINTEGER* error, SQLCHAR* msgBuf, SQLSMALLINT msgBufLen,
+SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* state,
+                   SQLINTEGER* error, SQLWCHAR* msgBuf, SQLSMALLINT msgBufLen,
                    SQLSMALLINT* msgResLen);
 
 SQLRETURN SQL_API SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attr,
