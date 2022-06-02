@@ -487,8 +487,6 @@ class IGNITE_IMPORT_EXPORT JniContext {
   static int Reallocate(int64_t memPtr, int cap);
   static void Detach();
   static void Release(jobject obj);
-  static void SetConsoleHandler(ConsoleWriteHandler consoleHandler);
-  static int RemoveConsoleHandler(ConsoleWriteHandler consoleHandler);
 
   std::string JavaStringToCppString(const SharedPointer< GlobalJObject >& jstring);
 
@@ -680,36 +678,7 @@ class IGNITE_IMPORT_EXPORT JniContext {
       boost::optional< std::string >& columnClassName,
       JniErrorInfo& errInfo);
 
-  int64_t TargetInLongOutLong(jobject obj, int type, int64_t memPtr,
-                              JniErrorInfo* errInfo = NULL);
-  int64_t TargetInStreamOutLong(jobject obj, int type, int64_t memPtr,
-                                JniErrorInfo* errInfo = NULL);
-  void TargetInStreamOutStream(jobject obj, int opType, int64_t inMemPtr,
-                               int64_t outMemPtr, JniErrorInfo* errInfo = NULL);
-  jobject TargetInStreamOutObject(jobject obj, int type, int64_t memPtr,
-                                  JniErrorInfo* errInfo = NULL);
-  jobject TargetInObjectStreamOutObjectStream(jobject obj, int opType,
-                                              void* arg, int64_t inMemPtr,
-                                              int64_t outMemPtr,
-                                              JniErrorInfo* errInfo = NULL);
-  void TargetOutStream(jobject obj, int opType, int64_t memPtr,
-                       JniErrorInfo* errInfo = NULL);
-  jobject TargetOutObject(jobject obj, int opType,
-                          JniErrorInfo* errInfo = NULL);
-  void TargetInStreamAsync(jobject obj, int type, int64_t memPtr,
-                           JniErrorInfo* errInfo = NULL);
-  jobject TargetInStreamOutObjectAsync(jobject obj, int type, int64_t memPtr,
-                                       JniErrorInfo* errInfo = NULL);
-
-  jobject CacheOutOpQueryCursor(jobject obj, int type, int64_t memPtr,
-                                JniErrorInfo* errInfo = NULL);
-  jobject CacheOutOpContinuousQuery(jobject obj, int type, int64_t memPtr,
-                                    JniErrorInfo* errInfo = NULL);
-
   jobject Acquire(jobject obj);
-
-  void DestroyJvm();
-  void ThrowToJava(char* errMsg);
 
  private:
   JniJvm* jvm;
@@ -720,7 +689,6 @@ class IGNITE_IMPORT_EXPORT JniContext {
   JNIEnv* Attach();
   void ExceptionCheck(JNIEnv* env);
   void ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo);
-  jobject LocalToGlobal(JNIEnv* env, jobject obj);
 
   JniErrorCode CallBooleanMethod(const SharedPointer< GlobalJObject >& object,
                                  const jmethodID& method, bool& value,
@@ -904,22 +872,6 @@ JNIEXPORT void JNICALL JniAffinityFunctionRemoveNode(JNIEnv* env, jclass cls,
 JNIEXPORT void JNICALL JniAffinityFunctionDestroy(JNIEnv* env, jclass cls,
                                                   jlong envPtr, jlong ptr);
 
-JNIEXPORT void JNICALL JniConsoleWrite(JNIEnv* env, jclass cls, jstring str,
-                                       jboolean isErr);
-
-JNIEXPORT void JNICALL JniLoggerLog(JNIEnv* env, jclass cls, jlong envPtr,
-                                    jint level, jstring message,
-                                    jstring category, jstring errorInfo,
-                                    jlong memPtr);
-JNIEXPORT jboolean JNICALL JniLoggerIsLevelEnabled(JNIEnv* env, jclass cls,
-                                                   jlong envPtr, jint level);
-
-JNIEXPORT jlong JNICALL JniInLongOutLong(JNIEnv* env, jclass cls, jlong envPtr,
-                                         jint type, jlong val);
-JNIEXPORT jlong JNICALL JniInLongLongLongObjectOutLong(JNIEnv* env, jclass cls,
-                                                       jlong envPtr, jint type,
-                                                       jlong val1, jlong val2,
-                                                       jlong val3, jobject arg);
 }  // namespace java
 }  // namespace jni
 }  // namespace odbc
