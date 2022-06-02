@@ -1393,9 +1393,9 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
 BOOST_AUTO_TEST_CASE(TestGetDataWithSelectQuery, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLWCHAR insertReq[] =
-      L"insert into TestType(_key, strField) VALUES(1, 'Lorem ipsum')";
-  SQLRETURN ret = SQLExecDirect(stmt, insertReq, SQL_NTS);
+  std::vector< SQLWCHAR > insertReq = NewSqlWchar(
+      L"insert into TestType(_key, strField) VALUES(1, 'Lorem ipsum')");
+  SQLRETURN ret = SQLExecDirect(stmt, insertReq.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1413,11 +1413,11 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithSelectQuery, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestInsertTooLongValueFail, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLWCHAR insertReq[] =
+  std::vector< SQLWCHAR > insertReq = NewSqlWchar(
       L"insert into TestType(_key, strField) VALUES(42, "
-      L"'0123456789012345678901234567890123456789012345678901234567891')";
+      L"'0123456789012345678901234567890123456789012345678901234567891')");
 
-  SQLRETURN ret = SQLExecDirect(stmt, insertReq, SQL_NTS);
+  SQLRETURN ret = SQLExecDirect(stmt, insertReq.data(), SQL_NTS);
 
   if (SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1438,9 +1438,9 @@ BOOST_AUTO_TEST_CASE(TestGetInfoScrollOptions, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestDdlTablesMeta, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
 
-  SQLWCHAR createTable[] =
-      L"create table TestTable(id int primary key, testColumn varchar)";
-  SQLRETURN ret = SQLExecDirect(stmt, createTable, SQL_NTS);
+  std::vector< SQLWCHAR > createTable = NewSqlWchar(
+      L"create table TestTable(id int primary key, testColumn varchar)");
+  SQLRETURN ret = SQLExecDirect(stmt, createTable.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1472,9 +1472,9 @@ BOOST_AUTO_TEST_CASE(TestDdlTablesMeta, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestDdlTablesMetaTableTypeList, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
 
-  SQLWCHAR createTable[] =
-      L"create table TestTable(id int primary key, testColumn varchar)";
-  SQLRETURN ret = SQLExecDirect(stmt, createTable, SQL_NTS);
+  std::vector< SQLWCHAR > createTable = NewSqlWchar(
+      L"create table TestTable(id int primary key, testColumn varchar)");
+  SQLRETURN ret = SQLExecDirect(stmt, createTable.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1507,9 +1507,9 @@ BOOST_AUTO_TEST_CASE(TestDdlTablesMetaTableTypeList, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestDdlColumnsMeta, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
 
-  SQLWCHAR createTable[] =
-      L"create table TestTable(id int primary key, testColumn varchar)";
-  SQLRETURN ret = SQLExecDirect(stmt, createTable, SQL_NTS);
+  std::vector< SQLWCHAR > createTable = NewSqlWchar(
+      L"create table TestTable(id int primary key, testColumn varchar)");
+  SQLRETURN ret = SQLExecDirect(stmt, createTable.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1551,9 +1551,9 @@ BOOST_AUTO_TEST_CASE(TestDdlColumnsMeta, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestDdlColumnsMetaEscaped, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
 
-  SQLWCHAR createTable[] =
-      L"create table ESG_FOCUS(id int primary key, TEST_COLUMN varchar)";
-  SQLRETURN ret = SQLExecDirect(stmt, createTable, SQL_NTS);
+  std::vector< SQLWCHAR > createTable = NewSqlWchar(
+      L"create table ESG_FOCUS(id int primary key, TEST_COLUMN varchar)");
+  SQLRETURN ret = SQLExecDirect(stmt, createTable.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));

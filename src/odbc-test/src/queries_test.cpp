@@ -685,12 +685,12 @@ BOOST_AUTO_TEST_CASE(TestTwoRowsString, *disabled()) {
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
 
-  SQLWCHAR request[] =
+  std::vector< SQLWCHAR > request = NewSqlWchar(
       L"SELECT i8Field, i16Field, i32Field, i64Field, strField, floatField, "
       L"doubleField, boolField, guidField, dateField, timeField, "
-      L"timestampField FROM TestType";
+      L"timestampField FROM TestType");
 
-  ret = SQLExecDirect(stmt, request, SQL_NTS);
+  ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
@@ -810,12 +810,12 @@ BOOST_AUTO_TEST_CASE(TestOneRowString, *disabled()) {
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
 
-  SQLWCHAR request[] =
+  std::vector< SQLWCHAR > request = NewSqlWchar(
       L"SELECT i8Field, i16Field, i32Field, i64Field, strField, floatField, "
       L"doubleField, boolField, guidField, dateField, CAST('12:48:12' AS "
-      L"TIME), timestampField FROM TestType";
+      L"TIME), timestampField FROM TestType");
 
-  ret = SQLExecDirect(stmt, request, SQL_NTS);
+  ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
@@ -887,12 +887,12 @@ BOOST_AUTO_TEST_CASE(TestOneRowStringLen, *disabled()) {
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
 
-  SQLWCHAR request[] =
+  std::vector< SQLWCHAR > request = NewSqlWchar(
       L"SELECT i8Field, i16Field, i32Field, i64Field, strField, floatField, "
       L"doubleField, boolField, guidField, dateField, timeField, "
-      L"timestampField FROM TestType";
+      L"timestampField FROM TestType");
 
-  ret = SQLExecDirect(stmt, request, SQL_NTS);
+  ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
@@ -998,13 +998,13 @@ BOOST_AUTO_TEST_CASE(TestDataAtExecution, *disabled()) {
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
 
-  SQLWCHAR request[] =
+  std::vector< SQLWCHAR > request = NewSqlWchar(
       L"SELECT i8Field, i16Field, i32Field, i64Field, strField, floatField, "
       L"doubleField, boolField, guidField, dateField, timeField, "
       L"timestampField FROM TestType "
-      L"WHERE i32Field = ? AND strField = ?";
+      L"WHERE i32Field = ? AND strField = ?");
 
-  ret = SQLPrepare(stmt, request, SQL_NTS);
+  ret = SQLPrepare(stmt, request.data(), SQL_NTS);
 
   SQLLEN ind1 = 1;
   SQLLEN ind2 = 2;
@@ -1189,13 +1189,13 @@ BOOST_AUTO_TEST_CASE(TestNullFields, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  SQLWCHAR request[] =
+  std::vector< SQLWCHAR > request = NewSqlWchar(
       L"SELECT i8Field, i16Field, i32Field, i64Field, strField, floatField, "
       L"doubleField, boolField, dateField, timeField, timestampField FROM "
       L"TestType "
-      L"ORDER BY _key";
+      L"ORDER BY _key");
 
-  ret = SQLExecDirect(stmt, request, SQL_NTS);
+  ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
@@ -1257,12 +1257,12 @@ BOOST_AUTO_TEST_CASE(TestDistributedJoins, *disabled()) {
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
 
-  SQLWCHAR request[] =
+  std::vector< SQLWCHAR > request = NewSqlWchar(
       L"SELECT T0.i32Field, T1.i64Field FROM TestType AS T0 "
       L"INNER JOIN TestType AS T1 "
-      L"ON (T0.i32Field = T1.i64Field)";
+      L"ON (T0.i32Field = T1.i64Field)");
 
-  ret = SQLExecDirect(stmt, request, SQL_NTS);
+  ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1286,7 +1286,7 @@ BOOST_AUTO_TEST_CASE(TestDistributedJoins, *disabled()) {
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
 
-  ret = SQLExecDirect(stmt, request, SQL_NTS);
+  ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1381,10 +1381,10 @@ BOOST_AUTO_TEST_CASE(TestKeyVal, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  SQLWCHAR request[] =
-      L"SELECT _key, _val, k, v, i32Field, objField, strField FROM ComplexType";
+  std::vector< SQLWCHAR > request = NewSqlWchar(
+      L"SELECT _key, _val, k, v, i32Field, objField, strField FROM ComplexType");
 
-  ret = SQLExecDirect(stmt, request, SQL_NTS);
+  ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
@@ -1642,15 +1642,14 @@ BOOST_AUTO_TEST_CASE(TestLoginTimeout, *disabled()) {
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
 
-  SQLWCHAR connectStr[] =
-      L"DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache";
+  std::vector< SQLWCHAR > connectStr = NewSqlWchar(
+      L"DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   SQLWCHAR outstr[ODBC_BUFFER_SIZE];
   SQLSMALLINT outstrlen;
 
   // Connecting to ODBC server.
-  ret = SQLDriverConnect(dbc, NULL, &connectStr[0],
-                         static_cast< SQLSMALLINT >(sizeof(connectStr)), outstr,
+  ret = SQLDriverConnect(dbc, NULL, connectStr.data(), SQL_NTS, outstr,
                          sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
 
   if (!SQL_SUCCEEDED(ret))
@@ -1665,15 +1664,14 @@ BOOST_AUTO_TEST_CASE(TestLoginTimeoutFail, *disabled()) {
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
 
-  SQLWCHAR connectStr[] =
-      L"DRIVER={Apache Ignite};ADDRESS=192.168.0.1:11120;SCHEMA=cache";
+  std::vector< SQLWCHAR > connectStr = NewSqlWchar(
+      L"DRIVER={Apache Ignite};ADDRESS=192.168.0.1:11120;SCHEMA=cache");
 
   SQLWCHAR outstr[ODBC_BUFFER_SIZE];
   SQLSMALLINT outstrlen;
 
   // Connecting to ODBC server.
-  ret = SQLDriverConnect(dbc, NULL, &connectStr[0],
-                         static_cast< SQLSMALLINT >(sizeof(connectStr)), outstr,
+  ret = SQLDriverConnect(dbc, NULL, connectStr.data(), SQL_NTS, outstr,
                          sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
 
   if (SQL_SUCCEEDED(ret))
@@ -2017,11 +2015,11 @@ BOOST_AUTO_TEST_CASE(TestSingleResultSelectWideCharUsingGetDataWideChar) {
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
   Connect(dsnConnectionString);
   SQLRETURN ret;
-  SQLWCHAR request[] =
+  std::vector< SQLWCHAR > request = NewSqlWchar(
       L"SELECT fieldString FROM \"queries_test_004\" WHERE fieldString = "
-      L"'你好'";
+      L"'你好'");
 
-  ret = SQLExecDirect(stmt, request, SQL_NTS);
+  ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret)) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
@@ -2051,11 +2049,11 @@ BOOST_AUTO_TEST_CASE(TestSingleResultSelectWideCharUsingGetDataNarrowChar) {
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
   Connect(dsnConnectionString);
   SQLRETURN ret;
-  SQLWCHAR request[] =
+  std::vector< SQLWCHAR > request = NewSqlWchar(
       L"SELECT fieldString FROM \"queries_test_004\" WHERE fieldString = "
-      L"'你好'";
+      L"'你好'");
 
-  ret = SQLExecDirect(stmt, request, SQL_NTS);
+  ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret)) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }

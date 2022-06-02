@@ -173,15 +173,15 @@ BOOST_AUTO_TEST_CASE(TestSQLDriverConnect, *disabled()) {
 
   Prepare();
 
-  SQLWCHAR connectStr[] =
-      L"DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache";
+  std::vector< SQLWCHAR > connectStr = NewSqlWchar(
+      L"DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
   SQLWCHAR outStr[ODBC_BUFFER_SIZE];
   SQLSMALLINT outStrLen;
 
   // Normal connect.
   SQLRETURN ret =
-      SQLDriverConnect(dbc, NULL, connectStr, sizeof(connectStr), outStr,
+      SQLDriverConnect(dbc, NULL, connectStr.data(), SQL_NTS, outStr,
                        sizeof(outStr), &outStrLen, SQL_DRIVER_COMPLETE);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
@@ -189,25 +189,25 @@ BOOST_AUTO_TEST_CASE(TestSQLDriverConnect, *disabled()) {
   SQLDisconnect(dbc);
 
   // Null out string resulting length.
-  SQLDriverConnect(dbc, NULL, connectStr, sizeof(connectStr), outStr,
+  SQLDriverConnect(dbc, NULL, connectStr.data(), SQL_NTS, outStr,
                    sizeof(outStr), 0, SQL_DRIVER_COMPLETE);
 
   SQLDisconnect(dbc);
 
   // Null out string buffer length.
-  SQLDriverConnect(dbc, NULL, connectStr, sizeof(connectStr), outStr, 0,
+  SQLDriverConnect(dbc, NULL, connectStr.data(), SQL_NTS, outStr, 0,
                    &outStrLen, SQL_DRIVER_COMPLETE);
 
   SQLDisconnect(dbc);
 
   // Null out string.
-  SQLDriverConnect(dbc, NULL, connectStr, sizeof(connectStr), 0, sizeof(outStr),
+  SQLDriverConnect(dbc, NULL, connectStr.data(), SQL_NTS, 0, sizeof(outStr),
                    &outStrLen, SQL_DRIVER_COMPLETE);
 
   SQLDisconnect(dbc);
 
   // Null all.
-  SQLDriverConnect(dbc, NULL, connectStr, sizeof(connectStr), 0, 0, 0,
+  SQLDriverConnect(dbc, NULL, connectStr.data(), SQL_NTS, 0, 0, 0,
                    SQL_DRIVER_COMPLETE);
 
   SQLDisconnect(dbc);

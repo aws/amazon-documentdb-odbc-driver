@@ -444,25 +444,25 @@ int OdbcTestSuite::InsertTestBatch(int from, int to, int expectedToAffect,
                                    bool merge) {
   using common::FixedSizeArray;
 
-  SQLWCHAR insertReq[] =
+  std::vector< SQLWCHAR > insertReq = NewSqlWchar(
       L"INSERT "
       L"INTO TestType(_key, i8Field, i16Field, i32Field, strField, floatField, "
       L"doubleField, boolField, dateField, "
       L"timeField, timestampField, i8ArrayField) VALUES(?, ?, ?, ?, ?, ?, ?, "
-      L"?, ?, ?, ?, ?)";
+      L"?, ?, ?, ?, ?)");
 
-  SQLWCHAR mergeReq[] =
+  std::vector< SQLWCHAR > mergeReq = NewSqlWchar(
       L"MERGE "
       L"INTO TestType(_key, i8Field, i16Field, i32Field, strField, floatField, "
       L"doubleField, boolField, dateField, "
       L"timeField, timestampField, i8ArrayField) VALUES(?, ?, ?, ?, ?, ?, ?, "
-      L"?, ?, ?, ?, ?)";
+      L"?, ?, ?, ?, ?)");
 
   SQLRETURN ret;
 
   int32_t recordsNum = to - from;
 
-  ret = SQLPrepare(stmt, merge ? mergeReq : insertReq, SQL_NTS);
+  ret = SQLPrepare(stmt, merge ? mergeReq.data() : insertReq.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
