@@ -1115,6 +1115,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralSuffix) {
   BOOST_CHECK("'" == buf);
 }
 
+// -AL- somehow precision is initialized as -1, although the dataType should be there 
 // -AL- todo re-enable test when I am able to test on local machine
 BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
   std::string dsnConnectionString;
@@ -1186,34 +1187,10 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
 
   // SQL_TIMESTAMP should have precision 19
   BOOST_CHECK_EQUAL(intVal, 19);
-
-  // -AL- NOTE: tiny int and small int have not been tested before
-  // assumption is that the following test would fail
-  //SQLCHAR req6[] = "select fieldTinyInt from meta_queries_test_002";
-  //SQLExecDirect(stmt, req6, SQL_NTS);
-
-  //ret = SQLColAttribute(stmt, 1, SQL_DESC_PRECISION, strBuf, sizeof(strBuf),
-  //                      &strLen, &intVal);
-
-  //if (!SQL_SUCCEEDED(ret))
-  //  BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  //// SQL_TINYINT should have precision 3
-  //BOOST_CHECK_EQUAL(intVal, 3);
-
-  //SQLCHAR req7[] = "select fieldSmallInt from meta_queries_test_002";
-  //SQLExecDirect(stmt, req7, SQL_NTS);
-
-  //ret = SQLColAttribute(stmt, 1, SQL_DESC_PRECISION, strBuf, sizeof(strBuf),
-  //                      &strLen, &intVal);
-
-  //if (!SQL_SUCCEEDED(ret))
-  //  BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  //// SQL_SMALLINT should have precision 5
-  //BOOST_CHECK_EQUAL(intVal, 5);
 }
 
+// -AL- somehow precision is initialized as -1, although the dataType should be
+// there. Need to debug this once my tests can run
 BOOST_AUTO_TEST_CASE(TestColAttributeDescScale) {
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
