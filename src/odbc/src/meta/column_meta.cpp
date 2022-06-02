@@ -309,12 +309,28 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     }
 
     case SQL_DESC_LENGTH:
-    case SQL_DESC_OCTET_LENGTH:
+      // SQL_DESC_LENGTH is either the maximum or actual character length of a
+      // character string or binary data type
     case SQL_COLUMN_LENGTH: {
       if (dataType) {
         if (boost::optional< int > val =
                 type_traits::BinaryTypeTransferLength(dataType))
           value = *val;
+      }
+
+      break;
+    }
+
+    case SQL_DESC_OCTET_LENGTH: {
+      // SQL_DESC_OCTET_LENGTH is SQL_DESC_LENGTH in bytes
+      if (dataType) {
+        if (boost::optional< int > val =
+                type_traits::BinaryTypeTransferLength(dataType)) {
+          // multiply SQL_DESC_LENGTH by bytes per char if needed
+          if (*val != SQL_NO_TOTAL)
+            *val *= sizeof(char);
+          value = *val;
+        }
       }
 
       break;
