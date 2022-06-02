@@ -928,7 +928,6 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseLabel) {
   BOOST_CHECK("fieldBoolean" == buf);
 }
 
-// TODO update expected values 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescLength) {
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
@@ -1331,6 +1330,78 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescNumPrecRadix) {
 
   // SQL_BIT (non-numeric type) should have precision radix 0
   BOOST_CHECK_EQUAL(intVal, 0);
+}
+
+BOOST_AUTO_TEST_CASE(TestColAttributeDescOctetLength) {
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
+  SQLExecDirect(stmt, req1, SQL_NTS);
+
+  SQLLEN intVal;
+  SQLCHAR strBuf[1024];
+  SQLSMALLINT strLen;
+
+  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_OCTET_LENGTH, strBuf,
+                                  sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_VARCHAR should have octet length SQL_NO_TOTAL
+  BOOST_CHECK_EQUAL(intVal, SQL_NO_TOTAL);
+
+  SQLCHAR req2[] = "select fieldInt from meta_queries_test_002";
+  SQLExecDirect(stmt, req2, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_OCTET_LENGTH, strBuf, sizeof(strBuf),
+                        &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_INTEGER should have octet length 4 * sizeof(char)
+  BOOST_CHECK_EQUAL(intVal, 4 * sizeof(char));
+
+  SQLCHAR req3[] = "select fieldLong from meta_queries_test_002";
+  SQLExecDirect(stmt, req3, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_OCTET_LENGTH, strBuf, sizeof(strBuf),
+                        &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_BIGINT should have octet length 8 * sizeof(char)
+  BOOST_CHECK_EQUAL(intVal, 8 * sizeof(char));
+
+  SQLCHAR req4[] = "select fieldDouble from meta_queries_test_002";
+  SQLExecDirect(stmt, req4, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_OCTET_LENGTH, strBuf, sizeof(strBuf),
+                        &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_DOUBLE should have octet length 8 * sizeof(char)
+  BOOST_CHECK_EQUAL(intVal, 8 * sizeof(char));
+
+  SQLCHAR req5[] = "select fieldDate from meta_queries_test_002";
+  SQLExecDirect(stmt, req5, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_OCTET_LENGTH, strBuf, sizeof(strBuf),
+                        &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_TYPE_TIMESTAMP should have octet length 16 * sizeof(char)
+  BOOST_CHECK_EQUAL(intVal, 16 * sizeof(char));
 }
 
 // -AL- somehow precision is initialized as -1, although the dataType should be there 
