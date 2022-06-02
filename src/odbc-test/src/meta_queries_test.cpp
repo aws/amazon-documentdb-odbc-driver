@@ -1290,7 +1290,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescNumPrecRadix) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR req1[] = "select fieldDecimal128 from meta_queries_test_002";
+  SQLCHAR req1[] = "select fieldFloat from meta_queries_test_002";
   SQLExecDirect(stmt, req1, SQL_NTS);
 
   SQLLEN intVal;
@@ -1319,7 +1319,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescNumPrecRadix) {
   // SQL_INT should have precision radix 10
   BOOST_CHECK_EQUAL(intVal, 10);
 
-  SQLCHAR req3[] = "select fieldBoolean from meta_queries_test_002";
+  SQLCHAR req3[] = "select fieldString from meta_queries_test_002";
   SQLExecDirect(stmt, req3, SQL_NTS);
 
   ret = SQLColAttribute(stmt, 1, SQL_DESC_NUM_PREC_RADIX, strBuf,
@@ -1328,7 +1328,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescNumPrecRadix) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  // SQL_BIT (non-numeric type) should have precision radix 0
+  // SQL_VARCHAR (non-numeric type) should have precision radix 0
   BOOST_CHECK_EQUAL(intVal, 0);
 }
 
