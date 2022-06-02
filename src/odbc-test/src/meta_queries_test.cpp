@@ -990,14 +990,14 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralSuffix) {
 }
 
 // -AL- todo re-enable test when I am able to test on local machine
-BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
   CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
 
   Connect(dsnConnectionString);
 
-  SQLCHAR req[] = "select fieldNull from meta_queries_test_001";
+  SQLCHAR req[] = "select fieldString from meta_queries_test_001";
   SQLExecDirect(stmt, req, SQL_NTS);
 
   SQLLEN intVal;
@@ -1010,8 +1010,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  // SQL_TYPE_NULL should have precision 1
-  BOOST_CHECK_EQUAL(intVal, 1);
+  // SQL_VARCHAR should have precision SQL_NO_TOTAL
+  BOOST_CHECK_EQUAL(intVal, SQL_NO_TOTAL);
 
   SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
   SQLExecDirect(stmt, req2, SQL_NTS);
