@@ -1254,8 +1254,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescNullable) {
 
   Connect(dsnConnectionString);
 
-  // test fieldObjectId (a primary key) should not be nullable 
-  SQLCHAR req1[] = "select fieldObjectId from meta_queries_test_001";
+  // test meta_queries_test_001__id (a primary key) should not be nullable 
+  SQLCHAR req1[] = "select meta_queries_test_001__id from meta_queries_test_001";
   SQLExecDirect(stmt, req1, SQL_NTS);
 
   SQLLEN intVal;
