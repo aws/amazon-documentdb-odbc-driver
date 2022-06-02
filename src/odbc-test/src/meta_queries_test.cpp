@@ -803,6 +803,78 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCount) {
   BOOST_CHECK_EQUAL(intVal, 1);
 }
 
+BOOST_AUTO_TEST_CASE(TestColAttributeDescDisplaySize) {
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR req[] = "select fieldBinary from meta_queries_test_001";
+  SQLExecDirect(stmt, req, SQL_NTS);
+
+  SQLLEN intVal;
+  SQLCHAR strBuf[1024];
+  SQLSMALLINT strLen;
+
+  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_DISPLAY_SIZE, strBuf,
+                                  sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_VARBINARY should have display size SQL_NO_TOTAL
+  BOOST_CHECK_EQUAL(intVal, SQL_NO_TOTAL);
+
+  SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
+  SQLExecDirect(stmt, req2, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_DISPLAY_SIZE, strBuf, sizeof(strBuf),
+                        &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_INTEGER should have display size 11
+  BOOST_CHECK_EQUAL(intVal, 11);
+
+  SQLCHAR req3[] = "select fieldLong from meta_queries_test_001";
+  SQLExecDirect(stmt, req3, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_DISPLAY_SIZE, strBuf, sizeof(strBuf),
+                        &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_BIGINT should have display size 20
+  BOOST_CHECK_EQUAL(intVal, 20);
+
+  SQLCHAR req4[] = "select fieldDouble from meta_queries_test_001";
+  SQLExecDirect(stmt, req4, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_DISPLAY_SIZE, strBuf, sizeof(strBuf),
+                        &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_DOUBLE should have display size 24
+  BOOST_CHECK_EQUAL(intVal, 24);
+
+  SQLCHAR req5[] = "select fieldDate from meta_queries_test_001";
+  SQLExecDirect(stmt, req5, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_DISPLAY_SIZE, strBuf, sizeof(strBuf),
+                        &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_TIMESTAMP should have display size 19
+  BOOST_CHECK_EQUAL(intVal, 10);
+}
+
 BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralPrefix) {
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
