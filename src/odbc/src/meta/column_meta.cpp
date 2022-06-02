@@ -259,7 +259,8 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
   value = -1;
   switch (fieldId) {
     case SQL_DESC_FIXED_PREC_SCALE: {
-      if (!scale || *scale == -1)
+      if ((!precision || *precision == -1)
+          || (!scale || *scale == -1 || *scale == 0))
         value = SQL_FALSE;
       else
         value = SQL_TRUE;
@@ -355,7 +356,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
 
     case SQL_DESC_SCALE:
     case SQL_COLUMN_SCALE: {
-      // scale value of -1 means value not availabe. 
+      // scale value of -1 means value not availabe.
       if (dataType) {
         if (decimalDigits
             && ((*dataType == JDBC_TYPE_DECIMAL)
@@ -363,9 +364,9 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
           // return decimal digits for all decimal and numeric types
           value = *decimalDigits;
         } else if (!scale || *scale == -1) {
-            if (boost::optional< int16_t > val =
-                    type_traits::BinaryTypeDecimalDigits(dataType))
-              value = *val;
+          if (boost::optional< int16_t > val =
+                  type_traits::BinaryTypeDecimalDigits(dataType))
+            value = *val;
         }
       } else if (scale)
         value = *scale;
