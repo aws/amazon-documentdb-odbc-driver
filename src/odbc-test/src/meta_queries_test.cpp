@@ -1075,7 +1075,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralSuffix) {
   Connect(dsnConnectionString);
 
   // test that empty string is returned for non-char and non-binary type
-  SQLCHAR req[] = "select fieldObjectId from meta_queries_test_001";
+  SQLCHAR req[] = "select fieldBoolean from meta_queries_test_001";
   SQLExecDirect(stmt, req, SQL_NTS);
 
   SQLLEN intVal;
@@ -1094,7 +1094,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralSuffix) {
   std::string buf;
   bufStream >> buf;
 
-  BOOST_CHECK("'" == buf);
+  BOOST_CHECK("" == buf);
 
   // test that "'" is returned for *CHAR type
   SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
