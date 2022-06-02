@@ -1115,6 +1115,110 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralSuffix) {
   BOOST_CHECK("'" == buf);
 }
 
+BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
+  using ignite::odbc::type_traits::SqlTypeName;
+
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR req1[] = "select fieldDouble from meta_queries_test_001";
+  SQLExecDirect(stmt, req1, SQL_NTS);
+
+  SQLLEN intVal;
+  SQLCHAR strBuf[1024];
+  SQLSMALLINT strLen;
+
+  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_LOCAL_TYPE_NAME, strBuf,
+                                  sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // convert SQLCHAR[] strBuf to to std::string buf
+  std::stringstream bufStream;
+  bufStream << strBuf;
+  std::string buf;
+  bufStream >> buf;
+
+  // SQL_DOUBLE should have type name SqlTypeName::DOUBLE
+  BOOST_CHECK(SqlTypeName::DOUBLE == buf);
+
+  SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
+  SQLExecDirect(stmt, req2, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_LOCAL_TYPE_NAME, strBuf,
+                        sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // convert SQLCHAR[] strBuf to to std::string buf
+  bufStream.clear();
+  buf.clear();
+  bufStream << strBuf;
+  bufStream >> buf;
+
+  // SQL_VARCHAR should have type name SqlTypeName::VARCHAR
+  BOOST_CHECK(SqlTypeName::VARCHAR == buf);
+
+  SQLCHAR req3[] = "select fieldBinary from meta_queries_test_002";
+  SQLExecDirect(stmt, req3, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_LOCAL_TYPE_NAME, strBuf,
+                        sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // convert SQLCHAR[] strBuf to to std::string buf
+  bufStream.clear();
+  buf.clear();
+  bufStream << strBuf;
+  bufStream >> buf;
+
+  // SQL_BINARY should have type name SqlTypeName::BINARY
+  BOOST_CHECK(SqlTypeName::BINARY == buf);
+
+  SQLCHAR req4[] = "select fieldDate from meta_queries_test_002";
+  SQLExecDirect(stmt, req4, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_LOCAL_TYPE_NAME, strBuf,
+                        sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // convert SQLCHAR[] strBuf to to std::string buf
+  bufStream.clear();
+  buf.clear();
+  bufStream << strBuf;
+  bufStream >> buf;
+
+  // SQL_TYPE_TIMESTAMP should have type name SqlTypeName::TIMESTAMP
+  BOOST_CHECK(SqlTypeName::TIMESTAMP == buf);
+
+  SQLCHAR req5[] = "select fieldInt from meta_queries_test_002";
+  SQLExecDirect(stmt, req5, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_LOCAL_TYPE_NAME, strBuf,
+                        sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // convert SQLCHAR[] strBuf to to std::string buf
+  bufStream.clear();
+  buf.clear();
+  bufStream << strBuf;
+  bufStream >> buf;
+
+  // SQL_INTEGER should have type name SqlTypeName::INTEGER
+  BOOST_CHECK(SqlTypeName::INTEGER == buf);
+}
+
 // -AL- somehow precision is initialized as -1, although the dataType should be there 
 // -AL- todo re-enable test when I am able to test on local machine
 BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
@@ -1124,8 +1228,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR req[] = "select fieldString from meta_queries_test_001";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
+  SQLExecDirect(stmt, req1, SQL_NTS);
 
   SQLLEN intVal;
   SQLCHAR strBuf[1024];
