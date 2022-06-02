@@ -259,7 +259,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
   value = -1;
   switch (fieldId) {
     case SQL_DESC_FIXED_PREC_SCALE: {
-      if (!scale || scale == -1)
+      if (!scale || *scale == -1)
         value = SQL_FALSE;
       else
         value = SQL_TRUE;
