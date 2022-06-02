@@ -1284,6 +1284,55 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescNullable) {
   BOOST_CHECK_EQUAL(intVal, SQL_NULLABLE);
 }
 
+BOOST_AUTO_TEST_CASE(TestColAttributeDescNumPrecRadix) {
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR req1[] = "select fieldDecimal128 from meta_queries_test_002";
+  SQLExecDirect(stmt, req1, SQL_NTS);
+
+  SQLLEN intVal;
+  SQLCHAR strBuf[1024];
+  SQLSMALLINT strLen;
+
+  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_NUM_PREC_RADIX, strBuf,
+                                  sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_FLOAT should have precision radix 2
+  BOOST_CHECK_EQUAL(intVal, 2);
+
+  SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
+  SQLExecDirect(stmt, req2, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_NUM_PREC_RADIX, strBuf,
+                        sizeof(strBuf),
+                        &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_INT should have precision radix 10
+  BOOST_CHECK_EQUAL(intVal, 10);
+
+  SQLCHAR req3[] = "select fieldBoolean from meta_queries_test_002";
+  SQLExecDirect(stmt, req3, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_NUM_PREC_RADIX, strBuf,
+                        sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_BIT (non-numeric type) should have precision radix 0
+  BOOST_CHECK_EQUAL(intVal, 0);
+}
+
 // -AL- somehow precision is initialized as -1, although the dataType should be there 
 // -AL- todo re-enable test when I am able to test on local machine
 BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
