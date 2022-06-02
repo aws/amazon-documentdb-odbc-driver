@@ -75,9 +75,10 @@ struct ApiRobustnessTestSuiteFixture : public odbc::OdbcTestSuite {
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-    SQLWCHAR request[] = L"SELECT i32Field FROM TestType ORDER BY _key";
+    std::vector< SQLWCHAR > request =
+        NewSqlWchar(L"SELECT i32Field FROM TestType ORDER BY _key");
 
-    ret = SQLExecDirect(stmt, request, SQL_NTS);
+    ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
@@ -249,22 +250,22 @@ BOOST_AUTO_TEST_CASE(TestSQLPrepare, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
+  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
 
   // Everything is ok.
-  SQLRETURN ret = SQLPrepare(stmt, sql, sizeof(sql));
+  SQLRETURN ret = SQLPrepare(stmt, sql.data(), SQL_NTS);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   SQLCloseCursor(stmt);
 
   // Value length is null.
-  SQLPrepare(stmt, sql, 0);
+  SQLPrepare(stmt, sql.data(), 0);
 
   SQLCloseCursor(stmt);
 
   // Value is null.
-  SQLPrepare(stmt, 0, sizeof(sql));
+  SQLPrepare(stmt, 0, SQL_NTS);
 
   SQLCloseCursor(stmt);
 
@@ -280,22 +281,22 @@ BOOST_AUTO_TEST_CASE(TestSQLExecDirect, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
+  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
 
   // Everything is ok.
-  SQLRETURN ret = SQLExecDirect(stmt, sql, sizeof(sql));
+  SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   SQLCloseCursor(stmt);
 
   // Value length is null.
-  SQLExecDirect(stmt, sql, 0);
+  SQLExecDirect(stmt, sql.data(), 0);
 
   SQLCloseCursor(stmt);
 
   // Value is null.
-  SQLExecDirect(stmt, 0, sizeof(sql));
+  SQLExecDirect(stmt, 0, SQL_NTS);
 
   SQLCloseCursor(stmt);
 
@@ -317,9 +318,9 @@ BOOST_AUTO_TEST_CASE(TestSQLExtendedFetch, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
+  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
 
-  SQLRETURN ret = SQLExecDirect(stmt, sql, sizeof(sql));
+  SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
@@ -347,9 +348,10 @@ BOOST_AUTO_TEST_CASE(TestSQLNumResultCols) {
 
   Connect(dsnConnectionString);
 
-  SQLWCHAR sql[] = L"SELECT * FROM \"api_robustness_test_001\"";
+  std::vector< SQLWCHAR > sql =
+      NewSqlWchar(L"SELECT * FROM \"api_robustness_test_001\"");
 
-  SQLRETURN ret = SQLExecDirect(stmt, sql, sizeof(sql));
+  SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
@@ -371,15 +373,15 @@ BOOST_AUTO_TEST_CASE(TestSQLForeignKeys) {
 
   Connect(dsnConnectionString);
 
-  SQLWCHAR fkTableName[] = L"jni_test_001_sub_doc";
+  std::vector< SQLWCHAR > fkTableName = NewSqlWchar(L"jni_test_001_sub_doc");
 
   SQLRETURN ret =
-      SQLForeignKeys(stmt, NULL, 0,                     /* Primary catalog */
-                     NULL, 0,                           /* Primary schema */
-                     NULL, 0,                           /* Primary table */
-                     NULL, 0,                           /* Foreign catalog */
-                     NULL, 0,                           /* Foreign schema */
-                     fkTableName, sizeof(fkTableName)); /* Foreign table */
+      SQLForeignKeys(stmt, NULL, 0,                /* Primary catalog */
+                     NULL, 0,                      /* Primary schema */
+                     NULL, 0,                      /* Primary table */
+                     NULL, 0,                      /* Foreign catalog */
+                     NULL, 0,                      /* Foreign schema */
+                     fkTableName.data(), SQL_NTS); /* Foreign table */
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 }
@@ -390,24 +392,24 @@ BOOST_AUTO_TEST_CASE(TestSQLTables, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLWCHAR catalogName[] = L"";
-  SQLWCHAR schemaName[] = L"";
-  SQLWCHAR tableName[] = L"";
-  SQLWCHAR tableType[] = L"";
+  std::vector< SQLWCHAR > catalogName{0};
+  std::vector< SQLWCHAR > schemaName{0};
+  std::vector< SQLWCHAR > tableName{0};
+  std::vector< SQLWCHAR > tableType{0};
 
   // Everything is ok.
-  SQLRETURN ret = SQLTables(stmt, catalogName, sizeof(catalogName), schemaName,
-                            sizeof(schemaName), tableName, sizeof(tableName),
-                            tableType, sizeof(tableType));
+  SQLRETURN ret =
+      SQLTables(stmt, catalogName.data(), SQL_NTS, schemaName.data(), SQL_NTS,
+                tableName.data(), SQL_NTS, tableType.data(), SQL_NTS);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   // Sizes are nulls.
-  SQLTables(dbc, catalogName, 0, schemaName, 0, tableName, 0, tableType, 0);
+  SQLTables(dbc, catalogName.data(), 0, schemaName.data(), 0, tableName.data(),
+            0, tableType.data(), 0);
 
   // Values are nulls.
-  SQLTables(dbc, 0, sizeof(catalogName), 0, sizeof(schemaName), 0,
-            sizeof(tableName), 0, sizeof(tableType));
+  SQLTables(dbc, 0, SQL_NTS, 0, SQL_NTS, 0, SQL_NTS, 0, SQL_NTS);
 
   // All nulls.
   SQLTables(dbc, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -419,24 +421,24 @@ BOOST_AUTO_TEST_CASE(TestSQLColumns, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLWCHAR catalogName[] = L"";
-  SQLWCHAR schemaName[] = L"";
-  SQLWCHAR tableName[] = L"";
-  SQLWCHAR columnName[] = L"";
+  std::vector< SQLWCHAR > catalogName{0};
+  std::vector< SQLWCHAR > schemaName{0};
+  std::vector< SQLWCHAR > tableName{0};
+  std::vector< SQLWCHAR > columnName{0};
 
   // Everything is ok.
-  SQLRETURN ret = SQLColumns(stmt, catalogName, sizeof(catalogName), schemaName,
-                             sizeof(schemaName), tableName, sizeof(tableName),
-                             columnName, sizeof(columnName));
+  SQLRETURN ret =
+      SQLColumns(stmt, catalogName.data(), SQL_NTS, schemaName.data(), SQL_NTS,
+                 tableName.data(), SQL_NTS, columnName.data(), SQL_NTS);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   // Sizes are nulls.
-  SQLColumns(dbc, catalogName, 0, schemaName, 0, tableName, 0, columnName, 0);
+  SQLColumns(dbc, catalogName.data(), 0, schemaName.data(), 0, tableName.data(),
+             0, columnName.data(), 0);
 
   // Values are nulls.
-  SQLColumns(dbc, 0, sizeof(catalogName), 0, sizeof(schemaName), 0,
-             sizeof(tableName), 0, sizeof(columnName));
+  SQLColumns(dbc, 0, SQL_NTS, 0, SQL_NTS, 0, SQL_NTS, 0, SQL_NTS);
 
   // All nulls.
   SQLColumns(dbc, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -448,32 +450,32 @@ BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeys) {
 
   Connect(dsnConnectionString);
 
-  SQLWCHAR catalogName[] = L"";
-  SQLWCHAR schemaName[] = L"odbc-test";
-  SQLWCHAR tableName[] = L"jni_test_001";
+  std::vector< SQLWCHAR > catalogName{0};
+  std::vector< SQLWCHAR > schemaName = NewSqlWchar(L"odbc-test");
+  std::vector< SQLWCHAR > tableName = NewSqlWchar(L"jni_test_001");
 
   // Everything is ok.
-  SQLRETURN ret =
-      SQLPrimaryKeys(stmt, catalogName, sizeof(catalogName), schemaName,
-                     sizeof(schemaName), tableName, sizeof(tableName));
+  SQLRETURN ret = SQLPrimaryKeys(stmt, catalogName.data(), sizeof(catalogName),
+                                 schemaName.data(), sizeof(schemaName),
+                                 tableName.data(), sizeof(tableName));
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   ret = SQLFetch(stmt);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
-  SQLPrimaryKeys(stmt, 0, sizeof(catalogName), schemaName, sizeof(schemaName),
-                 tableName, sizeof(tableName));
-  SQLPrimaryKeys(stmt, catalogName, 0, schemaName, sizeof(schemaName),
-                 tableName, sizeof(tableName));
-  SQLPrimaryKeys(stmt, catalogName, sizeof(catalogName), 0, sizeof(schemaName),
-                 tableName, sizeof(tableName));
-  SQLPrimaryKeys(stmt, catalogName, sizeof(catalogName), schemaName, 0,
-                 tableName, sizeof(tableName));
-  SQLPrimaryKeys(stmt, catalogName, sizeof(catalogName), schemaName,
-                 sizeof(schemaName), 0, sizeof(tableName));
-  SQLPrimaryKeys(stmt, catalogName, sizeof(catalogName), schemaName,
-                 sizeof(schemaName), tableName, 0);
+  SQLPrimaryKeys(stmt, 0, SQL_NTS, schemaName.data(), SQL_NTS, tableName.data(),
+                 SQL_NTS);
+  SQLPrimaryKeys(stmt, catalogName.data(), 0, schemaName.data(), SQL_NTS,
+                 tableName.data(), SQL_NTS);
+  SQLPrimaryKeys(stmt, catalogName.data(), SQL_NTS, 0, SQL_NTS,
+                 tableName.data(), SQL_NTS);
+  SQLPrimaryKeys(stmt, catalogName.data(), SQL_NTS, schemaName.data(), 0,
+                 tableName.data(), SQL_NTS);
+  SQLPrimaryKeys(stmt, catalogName.data(), SQL_NTS, schemaName.data(), SQL_NTS,
+                 0, SQL_NTS);
+  SQLPrimaryKeys(stmt, catalogName.data(), SQL_NTS, schemaName.data(), SQL_NTS,
+                 tableName.data(), 0);
   SQLPrimaryKeys(stmt, 0, 0, 0, 0, 0, 0);
 }
 
@@ -576,33 +578,33 @@ BOOST_AUTO_TEST_CASE(TestSQLNativeSql, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
+  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
   SQLWCHAR buffer[ODBC_BUFFER_SIZE];
   SQLINTEGER resLen = 0;
 
   // Everything is ok.
-  SQLRETURN ret =
-      SQLNativeSql(dbc, sql, sizeof(sql), buffer, sizeof(buffer), &resLen);
+  SQLRETURN ret = SQLNativeSql(dbc, sql.data(), SQL_NTS, buffer,
+                               sizeof(buffer), &resLen);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   // Value size is null.
-  SQLNativeSql(dbc, sql, 0, buffer, sizeof(buffer), &resLen);
+  SQLNativeSql(dbc, sql.data(), 0, buffer, sizeof(buffer), &resLen);
 
   // Buffer size is null.
-  SQLNativeSql(dbc, sql, sizeof(sql), buffer, 0, &resLen);
+  SQLNativeSql(dbc, sql.data(), SQL_NTS, buffer, 0, &resLen);
 
   // Res size is null.
-  SQLNativeSql(dbc, sql, sizeof(sql), buffer, sizeof(buffer), 0);
+  SQLNativeSql(dbc, sql.data(), SQL_NTS, buffer, sizeof(buffer), 0);
 
   // Value is null.
-  SQLNativeSql(dbc, sql, 0, buffer, sizeof(buffer), &resLen);
+  SQLNativeSql(dbc, sql.data(), 0, buffer, sizeof(buffer), &resLen);
 
   // Buffer is null.
-  SQLNativeSql(dbc, sql, sizeof(sql), 0, sizeof(buffer), &resLen);
+  SQLNativeSql(dbc, sql.data(), SQL_NTS, 0, sizeof(buffer), &resLen);
 
   // All nulls.
-  SQLNativeSql(dbc, sql, 0, 0, 0, 0);
+  SQLNativeSql(dbc, sql.data(), 0, 0, 0, 0);
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLColAttribute, *disabled()) {
@@ -611,9 +613,9 @@ BOOST_AUTO_TEST_CASE(TestSQLColAttribute, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
+  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
 
-  SQLRETURN ret = SQLExecDirect(stmt, sql, sizeof(sql));
+  SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
@@ -658,9 +660,9 @@ BOOST_AUTO_TEST_CASE(TestSQLDescribeCol, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
+  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
 
-  SQLRETURN ret = SQLExecDirect(stmt, sql, sizeof(sql));
+  SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
@@ -700,9 +702,9 @@ BOOST_AUTO_TEST_CASE(TestSQLRowCount, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
+  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
 
-  SQLRETURN ret = SQLExecDirect(stmt, sql, sizeof(sql));
+  SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
@@ -722,97 +724,90 @@ BOOST_AUTO_TEST_CASE(TestSQLForeignKeysSegFault, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLWCHAR catalogName[] = L"";
-  SQLWCHAR schemaName[] = L"cache";
-  SQLWCHAR tableName[] = L"TestType";
+  std::vector< SQLWCHAR > catalogName{0};
+  std::vector< SQLWCHAR > schemaName = NewSqlWchar(L"cache");
+  std::vector< SQLWCHAR > tableName = NewSqlWchar(L"TestType");
 
   // Everything is ok.
   SQLRETURN ret = SQLForeignKeys(
-      stmt, catalogName, sizeof(catalogName), schemaName, sizeof(schemaName),
-      tableName, sizeof(tableName), catalogName, sizeof(catalogName),
-      schemaName, sizeof(schemaName), tableName, sizeof(tableName));
+      stmt, catalogName.data(), SQL_NTS, schemaName.data(), SQL_NTS,
+      tableName.data(), SQL_NTS, catalogName.data(), SQL_NTS, schemaName.data(),
+      SQL_NTS, tableName.data(), SQL_NTS);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   SQLCloseCursor(stmt);
 
-  SQLForeignKeys(stmt, 0, sizeof(catalogName), schemaName, sizeof(schemaName),
-                 tableName, sizeof(tableName), catalogName, sizeof(catalogName),
-                 schemaName, sizeof(schemaName), tableName, sizeof(tableName));
+  SQLForeignKeys(stmt, 0, SQL_NTS, schemaName.data(), SQL_NTS, tableName.data(),
+                 SQL_NTS, catalogName.data(), SQL_NTS, schemaName.data(),
+                 SQL_NTS, tableName.data(), SQL_NTS);
 
   SQLCloseCursor(stmt);
 
-  SQLForeignKeys(stmt, catalogName, 0, schemaName, sizeof(schemaName),
-                 tableName, sizeof(tableName), catalogName, sizeof(catalogName),
-                 schemaName, sizeof(schemaName), tableName, sizeof(tableName));
+  SQLForeignKeys(stmt, catalogName.data(), 0, schemaName.data(),
+                 sizeof(schemaName), tableName.data(), SQL_NTS,
+                 catalogName.data(), SQL_NTS, schemaName.data(), SQL_NTS,
+                 tableName.data(), SQL_NTS);
 
   SQLCloseCursor(stmt);
 
-  SQLForeignKeys(stmt, catalogName, sizeof(catalogName), 0, sizeof(schemaName),
-                 tableName, sizeof(tableName), catalogName, sizeof(catalogName),
-                 schemaName, sizeof(schemaName), tableName, sizeof(tableName));
+  SQLForeignKeys(stmt, catalogName.data(), SQL_NTS, 0, SQL_NTS,
+                 tableName.data(), SQL_NTS, catalogName.data(), SQL_NTS,
+                 schemaName.data(), SQL_NTS, tableName.data(), SQL_NTS);
 
   SQLCloseCursor(stmt);
 
-  SQLForeignKeys(stmt, catalogName, sizeof(catalogName), schemaName, 0,
-                 tableName, sizeof(tableName), catalogName, sizeof(catalogName),
-                 schemaName, sizeof(schemaName), tableName, sizeof(tableName));
+  SQLForeignKeys(stmt, catalogName.data(), SQL_NTS, schemaName.data(), 0,
+                 tableName.data(), SQL_NTS, catalogName.data(), SQL_NTS,
+                 schemaName.data(), SQL_NTS, tableName.data(), SQL_NTS);
 
   SQLCloseCursor(stmt);
 
-  SQLForeignKeys(stmt, catalogName, sizeof(catalogName), schemaName,
-                 sizeof(schemaName), 0, sizeof(tableName), catalogName,
-                 sizeof(catalogName), schemaName, sizeof(schemaName), tableName,
-                 sizeof(tableName));
+  SQLForeignKeys(stmt, catalogName.data(), SQL_NTS, schemaName.data(), SQL_NTS,
+                 0, SQL_NTS, catalogName.data(), SQL_NTS, schemaName.data(),
+                 SQL_NTS, tableName.data(), SQL_NTS);
 
   SQLCloseCursor(stmt);
 
-  SQLForeignKeys(stmt, catalogName, sizeof(catalogName), schemaName,
-                 sizeof(schemaName), tableName, 0, catalogName,
-                 sizeof(catalogName), schemaName, sizeof(schemaName), tableName,
-                 sizeof(tableName));
+  SQLForeignKeys(stmt, catalogName.data(), SQL_NTS, schemaName.data(), SQL_NTS,
+                 tableName.data(), 0, catalogName.data(), SQL_NTS,
+                 schemaName.data(), SQL_NTS, tableName.data(), SQL_NTS);
 
   SQLCloseCursor(stmt);
 
-  SQLForeignKeys(stmt, catalogName, sizeof(catalogName), schemaName,
-                 sizeof(schemaName), tableName, sizeof(tableName), 0,
-                 sizeof(catalogName), schemaName, sizeof(schemaName), tableName,
-                 sizeof(tableName));
+  SQLForeignKeys(stmt, catalogName.data(), SQL_NTS, schemaName.data(), SQL_NTS,
+                 tableName.data(), SQL_NTS, 0, SQL_NTS, schemaName.data(),
+                 SQL_NTS, tableName.data(), SQL_NTS);
 
   SQLCloseCursor(stmt);
 
-  SQLForeignKeys(stmt, catalogName, sizeof(catalogName), schemaName,
-                 sizeof(schemaName), tableName, sizeof(tableName), catalogName,
-                 0, schemaName, sizeof(schemaName), tableName,
-                 sizeof(tableName));
+  SQLForeignKeys(stmt, catalogName.data(), SQL_NTS, schemaName.data(), SQL_NTS,
+                 tableName.data(), SQL_NTS, catalogName.data(), 0,
+                 schemaName.data(), SQL_NTS, tableName.data(), SQL_NTS);
 
   SQLCloseCursor(stmt);
 
-  SQLForeignKeys(stmt, catalogName, sizeof(catalogName), schemaName,
-                 sizeof(schemaName), tableName, sizeof(tableName), catalogName,
-                 sizeof(catalogName), 0, sizeof(schemaName), tableName,
-                 sizeof(tableName));
+  SQLForeignKeys(stmt, catalogName.data(), SQL_NTS, schemaName.data(), SQL_NTS,
+                 tableName.data(), SQL_NTS, catalogName.data(), SQL_NTS, 0,
+                 SQL_NTS, tableName.data(), SQL_NTS);
 
   SQLCloseCursor(stmt);
 
-  SQLForeignKeys(stmt, catalogName, sizeof(catalogName), schemaName,
-                 sizeof(schemaName), tableName, sizeof(tableName), catalogName,
-                 sizeof(catalogName), schemaName, 0, tableName,
-                 sizeof(tableName));
+  SQLForeignKeys(stmt, catalogName.data(), SQL_NTS, schemaName.data(), SQL_NTS,
+                 tableName.data(), SQL_NTS, catalogName.data(), SQL_NTS,
+                 schemaName.data(), 0, tableName.data(), SQL_NTS);
 
   SQLCloseCursor(stmt);
 
-  SQLForeignKeys(stmt, catalogName, sizeof(catalogName), schemaName,
-                 sizeof(schemaName), tableName, sizeof(tableName), catalogName,
-                 sizeof(catalogName), schemaName, sizeof(schemaName), 0,
-                 sizeof(tableName));
+  SQLForeignKeys(stmt, catalogName.data(), SQL_NTS, schemaName.data(), SQL_NTS,
+                 tableName.data(), SQL_NTS, catalogName.data(), SQL_NTS,
+                 schemaName.data(), SQL_NTS, 0, SQL_NTS);
 
   SQLCloseCursor(stmt);
 
-  SQLForeignKeys(stmt, catalogName, sizeof(catalogName), schemaName,
-                 sizeof(schemaName), tableName, sizeof(tableName), catalogName,
-                 sizeof(catalogName), schemaName, sizeof(schemaName), tableName,
-                 0);
+  SQLForeignKeys(stmt, catalogName.data(), SQL_NTS, schemaName.data(), SQL_NTS,
+                 tableName.data(), SQL_NTS, catalogName.data(), SQL_NTS,
+                 schemaName.data(), SQL_NTS, tableName.data(), 0);
 
   SQLCloseCursor(stmt);
 
@@ -869,10 +864,10 @@ BOOST_AUTO_TEST_CASE(TestSQLNumParams, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
+  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
 
   // Everything is ok.
-  SQLRETURN ret = SQLPrepare(stmt, sql, sizeof(sql));
+  SQLRETURN ret = SQLPrepare(stmt, sql.data(), SQL_NTS);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
@@ -892,10 +887,10 @@ BOOST_AUTO_TEST_CASE(TestSQLNumParamsEscaped, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLWCHAR sql[] = L"SELECT {fn NOW()}";
+  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT {fn NOW()}");
 
   // Everything is ok.
-  SQLRETURN ret = SQLPrepare(stmt, sql, sizeof(sql));
+  SQLRETURN ret = SQLPrepare(stmt, sql.data(), SQL_NTS);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
@@ -992,9 +987,9 @@ BOOST_AUTO_TEST_CASE(TestSQLGetData, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLWCHAR sql[] = L"SELECT strField FROM TestType";
+  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
 
-  SQLRETURN ret = SQLExecDirect(stmt, sql, sizeof(sql));
+  SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
@@ -1056,52 +1051,58 @@ BOOST_AUTO_TEST_CASE(TestSQLSpecialColumns, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  SQLWCHAR catalogName[] = L"";
-  SQLWCHAR schemaName[] = L"cache";
-  SQLWCHAR tableName[] = L"TestType";
+  std::vector< SQLWCHAR > catalogName{0};
+  std::vector< SQLWCHAR > schemaName = NewSqlWchar(L"cache");
+  std::vector< SQLWCHAR > tableName = NewSqlWchar(L"TestType");
 
   // Everything is ok.
-  SQLRETURN ret =
-      SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName, sizeof(catalogName),
-                        schemaName, sizeof(schemaName), tableName,
-                        sizeof(tableName), SQL_SCOPE_CURROW, SQL_NO_NULLS);
+  SQLRETURN ret = SQLSpecialColumns(
+      stmt, SQL_BEST_ROWID, catalogName.data(), SQL_NTS,
+      schemaName.data(), SQL_NTS, tableName.data(),
+                        SQL_NTS, SQL_SCOPE_CURROW, SQL_NO_NULLS);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   SQLCloseCursor(stmt);
 
-  SQLSpecialColumns(stmt, SQL_BEST_ROWID, 0, sizeof(catalogName), schemaName,
-                    sizeof(schemaName), tableName, sizeof(tableName),
+  SQLSpecialColumns(stmt, SQL_BEST_ROWID, 0, SQL_NTS,
+                    schemaName.data(), SQL_NTS, tableName.data(),
+                    SQL_NTS,
                     SQL_SCOPE_CURROW, SQL_NO_NULLS);
 
   SQLCloseCursor(stmt);
 
-  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName, 0, schemaName,
-                    sizeof(schemaName), tableName, sizeof(tableName),
+  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName.data(), 0,
+                    schemaName.data(), SQL_NTS, tableName.data(),
+                    SQL_NTS,
                     SQL_SCOPE_CURROW, SQL_NO_NULLS);
 
   SQLCloseCursor(stmt);
 
-  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName, sizeof(catalogName), 0,
-                    sizeof(schemaName), tableName, sizeof(tableName),
+  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName.data(),
+                    SQL_NTS, 0, SQL_NTS,
+                    tableName.data(), SQL_NTS,
                     SQL_SCOPE_CURROW, SQL_NO_NULLS);
 
   SQLCloseCursor(stmt);
 
-  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName, sizeof(catalogName),
-                    schemaName, 0, tableName, sizeof(tableName),
+  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName.data(),
+                    SQL_NTS, schemaName.data(), 0, tableName.data(),
+                    SQL_NTS,
                     SQL_SCOPE_CURROW, SQL_NO_NULLS);
 
   SQLCloseCursor(stmt);
 
-  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName, sizeof(catalogName),
-                    schemaName, sizeof(schemaName), 0, sizeof(tableName),
+  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName.data(),
+                    SQL_NTS, schemaName.data(), SQL_NTS,
+                    0, SQL_NTS,
                     SQL_SCOPE_CURROW, SQL_NO_NULLS);
 
   SQLCloseCursor(stmt);
 
-  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName, sizeof(catalogName),
-                    schemaName, sizeof(schemaName), tableName, 0,
+  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName.data(),
+                    SQL_NTS, schemaName.data(), SQL_NTS,
+                    tableName.data(), 0,
                     SQL_SCOPE_CURROW, SQL_NO_NULLS);
 
   SQLCloseCursor(stmt);

@@ -469,8 +469,8 @@ BOOST_AUTO_TEST_CASE(TestGetTypeInfoAllTypes, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeCurdate, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLWCHAR req[] = L"select CURDATE()";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = NewSqlWchar(L"select CURDATE()");
+  SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal = 0;
 
@@ -485,8 +485,8 @@ BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeCurdate, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeLiteral, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLWCHAR req[] = L"select DATE '2020-10-25'";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = NewSqlWchar(L"select DATE '2020-10-25'");
+  SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal = 0;
 
@@ -501,8 +501,9 @@ BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeLiteral, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeField, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLWCHAR req[] = L"select CAST (dateField as DATE) from TestType";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req =
+      NewSqlWchar(L"select CAST (dateField as DATE) from TestType");
+  SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal = 0;
 
@@ -517,8 +518,8 @@ BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeField, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestTimeTypeColumnAttributeLiteral, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLWCHAR req[] = L"select TIME '12:42:13'";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = NewSqlWchar(L"select TIME '12:42:13'");
+  SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal = 0;
 
@@ -533,8 +534,8 @@ BOOST_AUTO_TEST_CASE(TestTimeTypeColumnAttributeLiteral, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestTimeTypeColumnAttributeField, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLWCHAR req[] = L"select timeField from TestType";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = NewSqlWchar(L"select timeField from TestType");
+  SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal = 0;
 
@@ -549,8 +550,8 @@ BOOST_AUTO_TEST_CASE(TestTimeTypeColumnAttributeField, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestColAttributesColumnLength, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLWCHAR req[] = L"select strField from TestType";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = NewSqlWchar(L"select strField from TestType");
+  SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal;
   SQLWCHAR strBuf[1024];
@@ -568,8 +569,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnLength, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestColAttributesColumnPresicion, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLWCHAR req[] = L"select strField from TestType";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = NewSqlWchar(L"select strField from TestType");
+  SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal;
   SQLWCHAR strBuf[1024];
@@ -587,8 +588,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnPresicion, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestColAttributesColumnScale, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLWCHAR req[] = L"select strField from TestType";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = NewSqlWchar(L"select strField from TestType");
+  SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal;
   SQLWCHAR strBuf[1024];
@@ -606,8 +607,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnLengthPrepare, *disabled()) {
 
   InsertTestStrings(1);
 
-  SQLWCHAR req[] = L"select strField from TestType";
-  SQLPrepare(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = NewSqlWchar(L"select strField from TestType");
+  SQLPrepare(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal;
   SQLWCHAR strBuf[1024];
@@ -638,8 +639,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnPresicionPrepare, *disabled()) {
 
   InsertTestStrings(1);
 
-  SQLWCHAR req[] = L"select strField from TestType";
-  SQLPrepare(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = NewSqlWchar(L"select strField from TestType");
+  SQLPrepare(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal;
   SQLWCHAR strBuf[1024];
@@ -670,8 +671,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnScalePrepare, *disabled()) {
 
   InsertTestStrings(1);
 
-  SQLWCHAR req[] = L"select strField from TestType";
-  SQLPrepare(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = NewSqlWchar(L"select strField from TestType");
+  SQLPrepare(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal;
   SQLWCHAR strBuf[1024];
@@ -710,29 +711,29 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOne) {
 
   Connect(dsnConnectionString);
 
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"meta_queries_test_001";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"meta_queries_test_001");
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
-                            SQL_NTS, empty, SQL_NTS);
+  SQLRETURN ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                            table.data(), SQL_NTS, empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  CheckSingleRowResultSetWithGetData(stmt, 3, table);
+  CheckSingleRowResultSetWithGetData(stmt, 3, table.data());
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneFromLocalServer) {
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"meta_queries_test_001";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"meta_queries_test_001");
 
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
-                            SQL_NTS, empty, SQL_NTS);
+  SQLRETURN ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                            table.data(), SQL_NTS, empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -741,18 +742,18 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneFromLocalServer) {
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneWithTableTypes) {
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"meta_queries_test_001";
-  SQLWCHAR tableTypes[] =
-      L"TABLE,VIEW";  // Test that VIEW type is ignored by JDBC
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"meta_queries_test_001");
+  std::vector< SQLWCHAR > tableTypes =
+      NewSqlWchar(L"TABLE,VIEW");  // Test that VIEW type is ignored by JDBC
 
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
-                            SQL_NTS, tableTypes, SQL_NTS);
+  SQLRETURN ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                            table.data(), SQL_NTS, tableTypes.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -767,14 +768,14 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
 
   Connect(dsnConnectionString);
 
-  SQLWCHAR table[] = L"meta_queries_test_001";
-  SQLWCHAR column[] = L"%";
-  SQLWCHAR empty[] = L"";
-  std::wstring database0 = utility::FromUtf8(databaseName);
-  SQLWCHAR *schemaName = (SQLWCHAR *)(database0.c_str());
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"meta_queries_test_001");
+  std::vector< SQLWCHAR > column = NewSqlWchar(L"%");
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > schemaName =
+      NewSqlWchar(utility::FromUtf8(databaseName));
    
-  SQLRETURN ret = SQLColumns(stmt, nullptr, 0, schemaName, SQL_NTS, table,
-                             SQL_NTS, column, SQL_NTS);
+  SQLRETURN ret = SQLColumns(stmt, nullptr, 0, schemaName.data(), SQL_NTS,
+                             table.data(), SQL_NTS, column.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -911,18 +912,18 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneForQuotedTypes) {
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"meta_queries_test_001";
-  SQLWCHAR tableTypes[] =
-      L"'TABLE' , 'VIEW'";  // Test that quoted values are handled
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"meta_queries_test_001");
+  std::vector< SQLWCHAR > tableTypes =
+      NewSqlWchar(L"'TABLE' , 'VIEW'");  // Test that quoted values are handled
 
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
-                            SQL_NTS, tableTypes, SQL_NTS);
+  SQLRETURN ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                            table.data(), SQL_NTS, tableTypes.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -931,17 +932,17 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneForQuotedTypes) {
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsNoneForUnsupportedTableType) {
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"meta_queries_test_001";
-  SQLWCHAR tableTypes[] = L"VIEW";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"meta_queries_test_001");
+  std::vector< SQLWCHAR > tableTypes = NewSqlWchar(L"VIEW");
 
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
-                            SQL_NTS, tableTypes, SQL_NTS);
+  SQLRETURN ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                            table.data(), SQL_NTS, tableTypes.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
@@ -955,11 +956,11 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsNone) {
 
   Connect(dsnConnectionString);
 
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"nonexistent";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"nonexistent");
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
-                            SQL_NTS, empty, SQL_NTS);
+  SQLRETURN ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                            table.data(), SQL_NTS, empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -969,10 +970,10 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsNone) {
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 
   // test that no data is returned with empty string schema
-  SQLWCHAR correctTable[] = L"meta_queries_test_001";
+  std::vector< SQLWCHAR > correctTable = NewSqlWchar(L"meta_queries_test_001");
 
-  ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, correctTable, SQL_NTS,
-                  empty, SQL_NTS);
+  ret = SQLTables(stmt, empty.data(), SQL_NTS, empty.data(), SQL_NTS,
+                  correctTable.data(), SQL_NTS, empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -988,11 +989,11 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsMany) {
 
   Connect(dsnConnectionString);
 
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"%";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"%");
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
-                            SQL_NTS, empty, SQL_NTS);
+  SQLRETURN ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                            table.data(), SQL_NTS, empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1008,9 +1009,9 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsMany) {
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsOneFromLocalServer) {
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"meta_queries_test_002";
-  SQLWCHAR column[] = L"fieldString";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"meta_queries_test_002");
+  std::vector< SQLWCHAR > column = NewSqlWchar(L"fieldString");
 
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
@@ -1018,8 +1019,8 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsOneFromLocalServer) {
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, nullptr, 0, table,
-                            SQL_NTS, column, SQL_NTS);
+  SQLRETURN ret = SQLColumns(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                             table.data(), SQL_NTS, column.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1027,9 +1028,8 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsOneFromLocalServer) {
   CheckSingleRowResultSetWithGetData(stmt, 4, L"fieldString");
 
   // check that passing catalog NULL value gives data
-  ret =
-      SQLColumns(stmt, nullptr, 0, nullptr, 0, table, SQL_NTS,
-                             column, SQL_NTS);
+  ret = SQLColumns(stmt, nullptr, 0, nullptr, 0, table.data(), SQL_NTS,
+                   column.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1043,12 +1043,12 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsNone) {
 
   Connect(dsnConnectionString);
 
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"nonexistent";
-  SQLWCHAR column[] = L"nonexistent_column";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"nonexistent");
+  std::vector< SQLWCHAR > column = NewSqlWchar(L"nonexistent_column");
 
-  SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, nullptr, 0, table,
-                             SQL_NTS, column, SQL_NTS);
+  SQLRETURN ret = SQLColumns(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                             table.data(), SQL_NTS, column.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1057,12 +1057,12 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsNone) {
 
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 
-  SQLWCHAR catalog[] = L"nonexistent_catalog";
-  SQLWCHAR correctTable[] = L"meta_queries_test_002";
-  SQLWCHAR correctColumn[] = L"fieldString";
+  std::vector< SQLWCHAR > catalog = NewSqlWchar(L"nonexistent_catalog");
+  std::vector< SQLWCHAR > correctTable = NewSqlWchar(L"meta_queries_test_002");
+  std::vector< SQLWCHAR > correctColumn = NewSqlWchar(L"fieldString");
 
-  ret = SQLColumns(stmt, catalog, SQL_NTS, nullptr, 0, correctTable, SQL_NTS,
-                   correctColumn, SQL_NTS);
+  ret = SQLColumns(stmt, catalog.data(), SQL_NTS, nullptr, 0,
+                   correctTable.data(), SQL_NTS, correctColumn.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1072,8 +1072,8 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsNone) {
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 
   // test passing empty string schemaName to SQLColumns returns no data
-  ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, correctTable, SQL_NTS,
-                   correctColumn, SQL_NTS);
+  ret = SQLColumns(stmt, empty.data(), SQL_NTS, empty.data(), SQL_NTS,
+                   correctTable.data(), SQL_NTS, correctColumn.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1089,13 +1089,12 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsMany) {
 
   Connect(dsnConnectionString);
 
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"meta_queries_test_002";
-  SQLWCHAR column[] = L"%";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"meta_queries_test_002");
+  std::vector< SQLWCHAR > column = NewSqlWchar(L"%");
 
-  SQLRETURN ret =
-      SQLColumns(stmt, nullptr, 0, nullptr, 0, table,
-                             SQL_NTS, column, SQL_NTS);
+  SQLRETURN ret = SQLColumns(stmt, nullptr, 0, nullptr, 0, table.data(),
+                             SQL_NTS, column.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1111,7 +1110,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsMany) {
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsOneFromLocalServer) {
-  SQLWCHAR table[] = L"meta_queries_test_001";
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"meta_queries_test_001");
 
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
@@ -1121,7 +1120,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsOneFromLocalServer) {
 
   SQLRETURN ret = SQLPrimaryKeys(stmt, nullptr, 0,  
                                  nullptr, 0,        
-                                 table, sizeof(table)); 
+                                 table.data(), SQL_NTS); 
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1131,8 +1130,8 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsOneFromLocalServer) {
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsNone) {
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"meta_queries_test_001";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"meta_queries_test_001");
 
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
@@ -1140,8 +1139,8 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsNone) {
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret =
-      SQLPrimaryKeys(stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, empty, SQL_NTS);
+  SQLRETURN ret = SQLPrimaryKeys(stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
+                                 empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1150,8 +1149,8 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsNone) {
 
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 
-  ret =
-      SQLPrimaryKeys(stmt, empty, SQL_NTS, empty, SQL_NTS, empty, SQL_NTS);
+  ret = SQLPrimaryKeys(stmt, empty.data(), SQL_NTS, empty.data(), SQL_NTS,
+                       empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1160,7 +1159,8 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsNone) {
 
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 
-  ret = SQLPrimaryKeys(stmt, empty, SQL_NTS, empty, SQL_NTS, table, SQL_NTS);
+  ret = SQLPrimaryKeys(stmt, empty.data(), SQL_NTS, empty.data(), SQL_NTS,
+                       table.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1171,7 +1171,8 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsNone) {
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsOneFromLocalServer) {
-  SQLWCHAR table[] = L"meta_queries_test_002_with_array_array";
+  std::vector< SQLWCHAR > table =
+      NewSqlWchar(L"meta_queries_test_002_with_array_array");
 
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
@@ -1185,7 +1186,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsOneFromLocalServer) {
                      NULL, 0,                    /* Primary table */
                      NULL, 0,                    /* Foreign catalog */
                      NULL, 0,                    /* Foreign schema */
-                     table, sizeof(table));      /* Foreign table */
+                     table.data(), SQL_NTS); /* Foreign table */
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1194,14 +1195,14 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsOneFromLocalServer) {
   CheckSingleRowResultSetWithGetData(stmt, 4,
                                      L"meta_queries_test_002_with_array__id");
 
-  SQLWCHAR empty[] = L"";
+  std::vector< SQLWCHAR > empty = {0};
 
-  ret = SQLForeignKeys(stmt, NULL, 0,         /* Primary catalog */
-                                 NULL, 0,               /* Primary schema */
-                                 NULL, 0,               /* Primary table */
-                                 empty, SQL_NTS,        /* Foreign catalog */
-                                 NULL, 0,               /* Foreign schema */
-                                 table, sizeof(table)); /* Foreign table */
+  ret = SQLForeignKeys(stmt, NULL, 0,          /* Primary catalog */
+                       NULL, 0,                /* Primary schema */
+                       NULL, 0,                /* Primary table */
+                       empty.data(), SQL_NTS,  /* Foreign catalog */
+                       NULL, 0,                /* Foreign schema */
+                       table.data(), SQL_NTS); /* Foreign table */
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1212,8 +1213,9 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsOneFromLocalServer) {
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsNone) {
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"meta_queries_test_002_with_array_array";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table =
+      NewSqlWchar(L"meta_queries_test_002_with_array_array");
 
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
@@ -1221,12 +1223,13 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsNone) {
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret = SQLForeignKeys(stmt, empty, SQL_NTS,  /* Primary catalog */
-                                 empty, SQL_NTS,        /* Primary schema */
-                                 empty, SQL_NTS,        /* Primary table */
-                                 empty, SQL_NTS,        /* Foreign catalog */
-                                 empty, SQL_NTS,        /* Foreign schema */
-                                 empty, SQL_NTS);       /* Foreign table */
+  SQLRETURN ret =
+      SQLForeignKeys(stmt, empty.data(), SQL_NTS, /* Primary catalog */
+                     empty.data(), SQL_NTS,       /* Primary schema */
+                     empty.data(), SQL_NTS,       /* Primary table */
+                     empty.data(), SQL_NTS,       /* Foreign catalog */
+                     empty.data(), SQL_NTS,       /* Foreign schema */
+                     empty.data(), SQL_NTS);      /* Foreign table */
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1236,12 +1239,12 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsNone) {
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 
   // when empty strings are passed as catalog/schema, SQL_NO_DATA should be returned
-  ret = SQLForeignKeys(stmt, empty, SQL_NTS,  /* Primary catalog */
-                       empty, SQL_NTS,        /* Primary schema */
-                       empty, SQL_NTS,        /* Primary table */
-                       empty, SQL_NTS,        /* Foreign catalog */
-                       empty, SQL_NTS,        /* Foreign schema */
-                       table, sizeof(table)); /* Foreign table */
+  ret = SQLForeignKeys(stmt, empty.data(), SQL_NTS, /* Primary catalog */
+                       empty.data(), SQL_NTS,       /* Primary schema */
+                       empty.data(), SQL_NTS,       /* Primary table */
+                       empty.data(), SQL_NTS,       /* Foreign catalog */
+                       empty.data(), SQL_NTS,       /* Foreign schema */
+                       table.data(), SQL_NTS);      /* Foreign table */
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1256,9 +1259,9 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
   Connect(dsnConnectionString);
 
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"meta_queries_test_001";
-  SQLWCHAR column[] = L"meta_queries_test_001__id";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"meta_queries_test_001");
+  std::vector< SQLWCHAR > column = NewSqlWchar(L"meta_queries_test_001__id");
 
   SQLRETURN ret = SQL_SUCCESS;
 
@@ -1310,9 +1313,8 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
       char_octet_length_len, ordinal_position, ordinal_position_len,
       is_nullable, is_nullable_len);
 
-  ret =
-      SQLColumns(stmt, nullptr, 0, nullptr, 0, table, SQL_NTS, column,
-                   SQL_NTS);
+  ret = SQLColumns(stmt, nullptr, 0, nullptr, 0, table.data(), SQL_NTS,
+                   column.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
@@ -1398,8 +1400,9 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithSelectQuery, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  SQLWCHAR selectReq[] = L"select strField from TestType";
-  ret = SQLExecDirect(stmt, selectReq, SQL_NTS);
+  std::vector< SQLWCHAR > selectReq =
+      NewSqlWchar(L"select strField from TestType");
+  ret = SQLExecDirect(stmt, selectReq.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1442,11 +1445,11 @@ BOOST_AUTO_TEST_CASE(TestDdlTablesMeta, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"TestTable";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"TestTable");
 
-  ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table, SQL_NTS, empty,
-                  SQL_NTS);
+  ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0, table.data(),
+                  SQL_NTS, empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1476,12 +1479,12 @@ BOOST_AUTO_TEST_CASE(TestDdlTablesMetaTableTypeList, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"TestTable";
-  SQLWCHAR typeList[] = L"TABLE,VIEW";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"TestTable");
+  std::vector< SQLWCHAR > typeList = NewSqlWchar(L"TABLE,VIEW");
 
-  ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table, SQL_NTS,
-                  typeList, SQL_NTS);
+  ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0, table.data(),
+                  SQL_NTS, typeList.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1511,11 +1514,11 @@ BOOST_AUTO_TEST_CASE(TestDdlColumnsMeta, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"TestTable";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"TestTable");
 
-  ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, table, SQL_NTS, empty,
-                   SQL_NTS);
+  ret = SQLColumns(stmt, empty.data(), SQL_NTS, empty.data(), SQL_NTS,
+                   table.data(), SQL_NTS, empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1555,11 +1558,11 @@ BOOST_AUTO_TEST_CASE(TestDdlColumnsMetaEscaped, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"ESG\\_FOCUS";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = NewSqlWchar(L"ESG\\_FOCUS");
 
-  ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, table, SQL_NTS, empty,
-                   SQL_NTS);
+  ret = SQLColumns(stmt, empty.data(), SQL_NTS, empty.data(), SQL_NTS,
+                   table.data(), SQL_NTS, empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));

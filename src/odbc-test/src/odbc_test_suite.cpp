@@ -377,10 +377,13 @@ SQLRETURN OdbcTestSuite::PrepareQuery(const std::wstring& qry) {
 }
 
 void OdbcTestSuite::InsertTestStrings(int recordsNum, bool merge) {
-  SQLWCHAR insertReq[] = L"INSERT INTO TestType(_key, strField) VALUES(?, ?)";
-  SQLWCHAR mergeReq[] = L"MERGE INTO TestType(_key, strField) VALUES(?, ?)";
+  std::vector< SQLWCHAR > insertReq =
+      NewSqlWchar(L"INSERT INTO TestType(_key, strField) VALUES(?, ?)");
+  std::vector< SQLWCHAR > mergeReq =
+      NewSqlWchar(L"MERGE INTO TestType(_key, strField) VALUES(?, ?)");
 
-  SQLRETURN ret = SQLPrepare(stmt, merge ? mergeReq : insertReq, SQL_NTS);
+  SQLRETURN ret =
+      SQLPrepare(stmt, merge ? mergeReq.data() : insertReq.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -679,9 +682,10 @@ void OdbcTestSuite::InsertBatchSelect(int recordsNum) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // Just selecting everything to make sure everything is OK
-  SQLWCHAR selectReq[] = L"SELECT _key, strField FROM TestType ORDER BY _key";
+  std::vector< SQLWCHAR > selectReq =
+      NewSqlWchar(L"SELECT _key, strField FROM TestType ORDER BY _key");
 
-  ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
+  ret = SQLExecDirect(stmt, selectReq.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -761,9 +765,10 @@ void OdbcTestSuite::InsertNonFullBatchSelect(int recordsNum, int splitAt) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // Just selecting everything to make sure everything is OK
-  SQLWCHAR selectReq[] = L"SELECT _key, strField FROM TestType ORDER BY _key";
+  std::vector< SQLWCHAR > selectReq =
+      NewSqlWchar(L"SELECT _key, strField FROM TestType ORDER BY _key");
 
-  ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
+  ret = SQLExecDirect(stmt, selectReq.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));

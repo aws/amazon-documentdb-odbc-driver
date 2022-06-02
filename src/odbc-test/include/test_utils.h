@@ -24,8 +24,8 @@
 
 #include <sql.h>
 #include <sqlext.h>
-
 #include <string>
+#include <vector>
 
 #include "ignite/odbc/common/utils.h"
 
@@ -156,6 +156,12 @@ std::string GetTestConfigDir();
  * Remove all the LFS artifacts.
  */
 void ClearLfs();
+
+/**
+ * Create a vector of SQLWCHAR from string value.
+ */
+std::vector< SQLWCHAR > NewSqlWchar(const std::wstring& value);
+
 }  // namespace ignite_test
 
 #endif  // _IGNITE_ODBC_TEST_TEST_UTILS

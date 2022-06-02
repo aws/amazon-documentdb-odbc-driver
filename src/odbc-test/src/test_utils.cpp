@@ -114,4 +114,13 @@ void ClearLfs() {
 
   ignite::odbc::common::DeletePath(workDir);
 }
+
+std::vector< SQLWCHAR > NewSqlWchar(const std::wstring& value) {
+  std::vector< SQLWCHAR > result(value.size() + 1);
+  for (int i = 0; i < value.size(); i++) {
+    result[i] = value[i];
+  }
+  result[value.size()] = 0;
+  return result;
+}
 }  // namespace ignite_test

@@ -212,9 +212,10 @@ BOOST_AUTO_TEST_CASE(TestMoviesCast, *disabled()) {
                                            "movies");
   Connect(dsnConnectionString);
   SQLRETURN ret;
-  SQLWCHAR request[] = L"SELECT * FROM \"movies_cast\"";
+  std::vector< SQLWCHAR > request =
+      NewSqlWchar(L"SELECT * FROM \"movies_cast\"");
 
-  ret = SQLExecDirect(stmt, request, SQL_NTS);
+  ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret)) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
@@ -257,9 +258,10 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingGetData) {
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
   Connect(dsnConnectionString);
   SQLRETURN ret;
-  SQLWCHAR request[] = L"SELECT * FROM \"queries_test_001\"";
+  std::vector< SQLWCHAR > request =
+      NewSqlWchar(L"SELECT * FROM \"queries_test_001\"");
 
-  ret = SQLExecDirect(stmt, request, SQL_NTS);
+  ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret)) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
@@ -952,9 +954,9 @@ BOOST_AUTO_TEST_CASE(TestOneRowObject, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  SQLWCHAR request[] = L"SELECT i32Field, objField, strField FROM ComplexType";
+  std::vector< SQLWCHAR > request = NewSqlWchar(L"SELECT i32Field, objField, strField FROM ComplexType");
 
-  ret = SQLExecDirect(stmt, request, SQL_NTS);
+  ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
@@ -1411,9 +1413,9 @@ BOOST_AUTO_TEST_CASE(TestKeyVal, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  SQLWCHAR requestStar[] = L"SELECT _key, _val, * FROM ComplexType";
+  std::vector< SQLWCHAR > requestStar = NewSqlWchar(L"SELECT _key, _val, * FROM ComplexType");
 
-  ret = SQLExecDirect(stmt, requestStar, SQL_NTS);
+  ret = SQLExecDirect(stmt, requestStar.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
@@ -1474,9 +1476,10 @@ BOOST_AUTO_TEST_CASE(TestExecuteAfterCursorClose, *disabled()) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // Just selecting everything to make sure everything is OK
-  SQLWCHAR selectReq[] = L"SELECT _key, strField FROM TestType";
+  std::vector< SQLWCHAR > selectReq =
+      NewSqlWchar(L"SELECT _key, strField FROM TestType");
 
-  ret = SQLPrepare(stmt, selectReq, sizeof(selectReq));
+  ret = SQLPrepare(stmt, selectReq.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1537,9 +1540,10 @@ BOOST_AUTO_TEST_CASE(TestCloseNonFullFetch, *disabled()) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // Just selecting everything to make sure everything is OK
-  SQLWCHAR selectReq[] = L"SELECT _key, strField FROM TestType ORDER BY _key";
+  std::vector< SQLWCHAR > selectReq =
+      NewSqlWchar(L"SELECT _key, strField FROM TestType ORDER BY _key");
 
-  ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
+  ret = SQLExecDirect(stmt, selectReq.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1571,9 +1575,10 @@ BOOST_AUTO_TEST_CASE(TestBindNullParameter, *disabled()) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // Just selecting everything to make sure everything is OK
-  SQLWCHAR insertReq[] = L"INSERT INTO TestType(_key, strField) VALUES(1, ?)";
+  std::vector< SQLWCHAR > insertReq =
+      NewSqlWchar(L"INSERT INTO TestType(_key, strField) VALUES(1, ?)");
 
-  ret = SQLExecDirect(stmt, insertReq, SQL_NTS);
+  ret = SQLExecDirect(stmt, insertReq.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1585,7 +1590,8 @@ BOOST_AUTO_TEST_CASE(TestBindNullParameter, *disabled()) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // Selecting inserted column to make sure that everything is OK
-  SQLWCHAR selectReq[] = L"SELECT strField FROM TestType";
+  std::vector< SQLWCHAR > selectReq =
+      NewSqlWchar(L"SELECT strField FROM TestType");
 
   wchar_t strField[1024];
   SQLLEN strFieldLen = 0;
@@ -1597,7 +1603,7 @@ BOOST_AUTO_TEST_CASE(TestBindNullParameter, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
+  ret = SQLExecDirect(stmt, selectReq.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1614,9 +1620,9 @@ BOOST_AUTO_TEST_CASE(TestErrorMessage, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   // Just selecting everything to make sure everything is OK
-  SQLWCHAR selectReq[] = L"SELECT a FROM B";
+  std::vector< SQLWCHAR > selectReq = NewSqlWchar(L"SELECT a FROM B");
 
-  SQLRETURN ret = SQLExecDirect(stmt, selectReq, sizeof(selectReq));
+  SQLRETURN ret = SQLExecDirect(stmt, selectReq.data(), SQL_NTS);
 
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
 
@@ -1794,9 +1800,10 @@ BOOST_AUTO_TEST_CASE(TestQueryAndConnectionTimeoutBoth, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestSeveralInsertsWithoutClosing, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLWCHAR request[] = L"INSERT INTO TestType(_key, i32Field) VALUES(?, ?)";
+  std::vector< SQLWCHAR > request =
+      NewSqlWchar(L"INSERT INTO TestType(_key, i32Field) VALUES(?, ?)");
 
-  SQLRETURN ret = SQLPrepare(stmt, request, SQL_NTS);
+  SQLRETURN ret = SQLPrepare(stmt, request.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1830,9 +1837,9 @@ BOOST_AUTO_TEST_CASE(TestManyCursors, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   for (int32_t i = 0; i < 1000; ++i) {
-    SQLWCHAR req[] = L"SELECT 1";
+    std::vector< SQLWCHAR > req = NewSqlWchar(L"SELECT 1");
 
-    SQLRETURN ret = SQLExecDirect(stmt, req, SQL_NTS);
+    SQLRETURN ret = SQLExecDirect(stmt, req.data(), SQL_NTS);
 
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1858,9 +1865,9 @@ BOOST_AUTO_TEST_CASE(TestManyCursors2, *disabled()) {
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-    SQLWCHAR req[] = L"SELECT 1";
+    std::vector< SQLWCHAR > req = NewSqlWchar(L"SELECT 1");
 
-    ret = SQLExecDirect(stmt, req, SQL_NTS);
+    ret = SQLExecDirect(stmt, req.data(), SQL_NTS);
 
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1892,9 +1899,9 @@ BOOST_AUTO_TEST_CASE(TestManyCursorsTwoSelects1, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   for (int32_t i = 0; i < 1000; ++i) {
-    SQLWCHAR req[] = L"SELECT 1; SELECT 2";
+    std::vector< SQLWCHAR > req = NewSqlWchar(L"SELECT 1; SELECT 2");
 
-    SQLRETURN ret = SQLExecDirect(stmt, req, SQL_NTS);
+    SQLRETURN ret = SQLExecDirect(stmt, req.data(), SQL_NTS);
 
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1910,9 +1917,9 @@ BOOST_AUTO_TEST_CASE(TestManyCursorsTwoSelects2, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   for (int32_t i = 0; i < 1000; ++i) {
-    SQLWCHAR req[] = L"SELECT 1; SELECT 2;";
+    std::vector< SQLWCHAR > req = NewSqlWchar(L"SELECT 1; SELECT 2;");
 
-    SQLRETURN ret = SQLExecDirect(stmt, req, SQL_NTS);
+    SQLRETURN ret = SQLExecDirect(stmt, req.data(), SQL_NTS);
 
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1933,9 +1940,10 @@ BOOST_AUTO_TEST_CASE(TestManyCursorsSelectMerge1, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   for (int32_t i = 0; i < 1000; ++i) {
-    SQLWCHAR req[] = L"SELECT 1; MERGE into TestType(_key) values(2)";
+    std::vector< SQLWCHAR > req =
+        NewSqlWchar(L"SELECT 1; MERGE into TestType(_key) values(2)");
 
-    SQLRETURN ret = SQLExecDirect(stmt, req, SQL_NTS);
+    SQLRETURN ret = SQLExecDirect(stmt, req.data(), SQL_NTS);
 
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1951,9 +1959,10 @@ BOOST_AUTO_TEST_CASE(TestManyCursorsSelectMerge2, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
   for (int32_t i = 0; i < 1000; ++i) {
-    SQLWCHAR req[] = L"SELECT 1; MERGE into TestType(_key) values(2)";
+    std::vector< SQLWCHAR > req =
+        NewSqlWchar(L"SELECT 1; MERGE into TestType(_key) values(2)");
 
-    SQLRETURN ret = SQLExecDirect(stmt, req, SQL_NTS);
+    SQLRETURN ret = SQLExecDirect(stmt, req.data(), SQL_NTS);
 
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1975,9 +1984,10 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingGetDataWideChar) {
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
   Connect(dsnConnectionString);
   SQLRETURN ret;
-  SQLWCHAR request[] = L"SELECT fieldString FROM \"queries_test_004\"";
+  std::vector< SQLWCHAR > request =
+      NewSqlWchar(L"SELECT fieldString FROM \"queries_test_004\"");
 
-  ret = SQLExecDirect(stmt, request, SQL_NTS);
+  ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret)) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
@@ -2007,7 +2017,9 @@ BOOST_AUTO_TEST_CASE(TestSingleResultSelectWideCharUsingGetDataWideChar) {
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
   Connect(dsnConnectionString);
   SQLRETURN ret;
-  SQLWCHAR request[] = L"SELECT fieldString FROM \"queries_test_004\" WHERE fieldString = '你好'";
+  SQLWCHAR request[] =
+      L"SELECT fieldString FROM \"queries_test_004\" WHERE fieldString = "
+      L"'你好'";
 
   ret = SQLExecDirect(stmt, request, SQL_NTS);
   if (!SQL_SUCCEEDED(ret)) {
