@@ -967,7 +967,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLength) {
   SQLCHAR req3[] = "select fieldLong from meta_queries_test_002";
   SQLExecDirect(stmt, req3, SQL_NTS);
 
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_DISPLAY_SIZE, strBuf, sizeof(strBuf),
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_LENGTH, strBuf, sizeof(strBuf),
                         &strLen, &intVal);
 
   if (!SQL_SUCCEEDED(ret))
@@ -979,7 +979,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLength) {
   SQLCHAR req4[] = "select fieldDouble from meta_queries_test_002";
   SQLExecDirect(stmt, req4, SQL_NTS);
 
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_DISPLAY_SIZE, strBuf, sizeof(strBuf),
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_LENGTH, strBuf, sizeof(strBuf),
                         &strLen, &intVal);
 
   if (!SQL_SUCCEEDED(ret))
@@ -991,7 +991,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLength) {
   SQLCHAR req5[] = "select fieldDate from meta_queries_test_002";
   SQLExecDirect(stmt, req5, SQL_NTS);
 
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_DISPLAY_SIZE, strBuf, sizeof(strBuf),
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_LENGTH, strBuf, sizeof(strBuf),
                         &strLen, &intVal);
 
   if (!SQL_SUCCEEDED(ret))
