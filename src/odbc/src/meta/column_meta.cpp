@@ -310,12 +310,11 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     case SQL_DESC_LENGTH:
     case SQL_DESC_OCTET_LENGTH:
     case SQL_COLUMN_LENGTH: {
-      if (dataType && (!precision || *precision == -1)) {
+      if (dataType) {
         if (boost::optional< int > val =
                 type_traits::BinaryTypeTransferLength(dataType))
           value = *val;
-      } else if (precision)
-        value = *precision;
+      }
 
       break;
     }
