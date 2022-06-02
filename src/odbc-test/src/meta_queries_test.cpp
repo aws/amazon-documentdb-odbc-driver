@@ -871,9 +871,47 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescDisplaySize) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  // SQL_TIMESTAMP should have display size 19
+  // SQL_TYPE_TIMESTAMP should have display size 19
+  BOOST_CHECK_EQUAL(intVal, 19);
   BOOST_CHECK_EQUAL(intVal, 10);
+
+  SQLCHAR req3[] = "select fieldLong from meta_queries_test_001";
+  SQLExecDirect(stmt, req3, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_LENGTH, strBuf, sizeof(strBuf),
+                        &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_BIGINT should have precision 19
+  BOOST_CHECK_EQUAL(intVal, 19);
+
+  SQLCHAR req4[] = "select fieldDouble from meta_queries_test_001";
+  SQLExecDirect(stmt, req4, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_LENGTH, strBuf, sizeof(strBuf),
+                        &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_DOUBLE should have precision 15
+  BOOST_CHECK_EQUAL(intVal, 15);
+
+  SQLCHAR req5[] = "select fieldDate from meta_queries_test_001";
+  SQLExecDirect(stmt, req5, SQL_NTS);
+
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_LENGTH, strBuf, sizeof(strBuf),
+                        &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // SQL_TIMESTAMP should have precision 19
+  BOOST_CHECK_EQUAL(intVal, 19);
 }
+
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralPrefix) {
   std::string dsnConnectionString;
