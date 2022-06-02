@@ -873,6 +873,31 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescDisplaySize) {
 
   // SQL_TYPE_TIMESTAMP should have display size 19
   BOOST_CHECK_EQUAL(intVal, 19);
+
+BOOST_AUTO_TEST_CASE(TestColAttributeDescFixedPrecScale) {
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR req[] = "select fieldLong from meta_queries_test_001";
+  SQLExecDirect(stmt, req, SQL_NTS);
+
+  SQLLEN intVal;
+  SQLCHAR strBuf[1024];
+  SQLSMALLINT strLen;
+
+  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_FIXED_PREC_SCALE, strBuf,
+                                  sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // only SQL_FALSE is returned
+  BOOST_CHECK_EQUAL(intVal, SQL_FALSE);
+}
+
   BOOST_CHECK_EQUAL(intVal, 10);
 
   SQLCHAR req3[] = "select fieldLong from meta_queries_test_001";
