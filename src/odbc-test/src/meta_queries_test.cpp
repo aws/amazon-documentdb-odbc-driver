@@ -677,8 +677,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCaseSensitive) {
   Connect(dsnConnectionString);
 
   // test that case sensitive returns true for string field.
-  SQLCHAR req[] = "select fieldString from meta_queries_test_001";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
+  SQLExecDirect(stmt, req1, SQL_NTS);
 
   SQLLEN intVal;
   SQLCHAR strBuf[1024];
@@ -742,8 +742,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescConciseType) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR req[] = "select fieldString from meta_queries_test_001";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
+  SQLExecDirect(stmt, req1, SQL_NTS);
 
   SQLLEN intVal;
   SQLCHAR strBuf[1024];
@@ -810,8 +810,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescDisplaySize) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR req[] = "select fieldBinary from meta_queries_test_001";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  SQLCHAR req1[] = "select fieldBinary from meta_queries_test_001";
+  SQLExecDirect(stmt, req1, SQL_NTS);
 
   SQLLEN intVal;
   SQLCHAR strBuf[1024];
@@ -936,8 +936,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLength) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR req[] = "select fieldString from meta_queries_test_002";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
+  SQLExecDirect(stmt, req1, SQL_NTS);
 
   SQLLEN intVal;
   SQLCHAR strBuf[1024];
@@ -1009,8 +1009,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralPrefix) {
   Connect(dsnConnectionString);
 
   // test that empty string is returned for non-char and non-binary type
-  SQLCHAR req[] = "select fieldDouble from meta_queries_test_001";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  SQLCHAR req1[] = "select fieldDouble from meta_queries_test_001";
+  SQLExecDirect(stmt, req1, SQL_NTS);
 
   SQLLEN intVal;
   SQLCHAR strBuf[1024];
@@ -1075,8 +1075,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralSuffix) {
   Connect(dsnConnectionString);
 
   // test that empty string is returned for non-char and non-binary type
-  SQLCHAR req[] = "select fieldBoolean from meta_queries_test_001";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  SQLCHAR req1[] = "select fieldBoolean from meta_queries_test_001";
+  SQLExecDirect(stmt, req1, SQL_NTS);
 
   SQLLEN intVal;
   SQLCHAR strBuf[1024];
