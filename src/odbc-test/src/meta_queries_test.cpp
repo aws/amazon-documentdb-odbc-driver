@@ -778,6 +778,19 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescConciseType) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   BOOST_CHECK_EQUAL(intVal, SQL_VARBINARY);
+
+  // TODO re-enable this test when bug from JDBC (AD-765) is fixed.
+  // SQLCHAR req4[] = "select fieldNull from meta_queries_test_001";
+  // SQLExecDirect(stmt, req4, SQL_NTS);
+
+  // ret = SQLColAttribute(stmt, 1, SQL_DESC_CONCISE_TYPE, strBuf,
+  // sizeof(strBuf),
+  //                       &strLen, &intVal);
+
+  // if (!SQL_SUCCEEDED(ret))
+  //   BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // BOOST_CHECK_EQUAL(intVal, SQL_TYPE_NULL);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescCount) {
@@ -1609,7 +1622,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescType) {
   SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
   SQLExecDirect(stmt, req2, SQL_NTS);
 
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_CONCISE_TYPE, strBuf, sizeof(strBuf),
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_TYPE, strBuf, sizeof(strBuf),
                         &strLen, &intVal);
 
   if (!SQL_SUCCEEDED(ret))
@@ -1620,13 +1633,25 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescType) {
   SQLCHAR req3[] = "select fieldBinary from meta_queries_test_001";
   SQLExecDirect(stmt, req3, SQL_NTS);
 
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_CONCISE_TYPE, strBuf, sizeof(strBuf),
+  ret = SQLColAttribute(stmt, 1, SQL_DESC_TYPE, strBuf, sizeof(strBuf),
                         &strLen, &intVal);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   BOOST_CHECK_EQUAL(intVal, SQL_VARBINARY);
+
+  // TODO re-enable this test when bug from JDBC (AD-765) is fixed. 
+  //SQLCHAR req4[] = "select fieldNull from meta_queries_test_001";
+  //SQLExecDirect(stmt, req4, SQL_NTS);
+
+  //ret = SQLColAttribute(stmt, 1, SQL_DESC_TYPE, strBuf, sizeof(strBuf),
+  //                      &strLen, &intVal);
+
+  //if (!SQL_SUCCEEDED(ret))
+  //  BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  //BOOST_CHECK_EQUAL(intVal, SQL_TYPE_NULL);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescUnnamed) {
