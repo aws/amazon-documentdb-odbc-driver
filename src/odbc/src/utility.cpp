@@ -289,12 +289,12 @@ void ReadByteArray(BinaryReaderImpl& reader,
     res.clear();
 }
 
-std::vector< WCHAR > ToWCHARVector(const std::wstring& value) {
+std::vector< SQLWCHAR > ToWCHARVector(const std::wstring& value) {
   return ToWCHARVector(value.c_str());
 }
 
-std::vector< WCHAR > ToWCHARVector(const wchar_t* value) {
-  std::vector< WCHAR > result;
+std::vector< SQLWCHAR > ToWCHARVector(const wchar_t* value) {
+  std::vector< SQLWCHAR > result;
   for (int i = 0; value[i] != 0; i++) {
     result.push_back(value[i]);
   }

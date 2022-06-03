@@ -22,14 +22,6 @@
 #undef min
 #endif  // min
 
-// This defines a common type so we have portable code on MAC and Linux
-#ifdef __APPLE__
-#ifndef _WCHAR_T_DEFINED
-typedef unsigned short WCHAR;
-#define _WCHAR_T_DEFINED
-#endif
-#endif // _WIN32
-
 #include <boost/optional.hpp>
 #include <boost/optional/optional_io.hpp>
 
@@ -43,6 +35,7 @@ typedef unsigned short WCHAR;
 
 #include "ignite/odbc/impl/binary/binary_reader_impl.h"
 #include "ignite/odbc/impl/binary/binary_writer_impl.h"
+#include <sqltypes.h>
 
 
 namespace ignite {
@@ -206,7 +199,7 @@ std::wstring FromUtf8(const char* value);
  * @param value wide string value to convert.
  * @return String value converted to vector of unsigned short encoding.
  */
-std::vector< WCHAR > ToWCHARVector(const std::wstring& value);
+std::vector< SQLWCHAR > ToWCHARVector(const std::wstring& value);
 
 /**
  * Convert a wide string to vector of unsigned short.
@@ -214,7 +207,7 @@ std::vector< WCHAR > ToWCHARVector(const std::wstring& value);
  * @param value pointer to null-terminated wide string value to convert.
  * @return String value converted to vector of unsigned short encoding.
  */
-std::vector< WCHAR > ToWCHARVector(const wchar_t* value);
+std::vector< SQLWCHAR > ToWCHARVector(const wchar_t* value);
 
 /**
  * Convert binary data to hex dump form
