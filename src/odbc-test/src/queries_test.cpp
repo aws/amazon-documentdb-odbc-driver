@@ -1336,7 +1336,7 @@ BOOST_AUTO_TEST_CASE(TestKeyVal, *disabled()) {
   // objField
   int8_t column6[ODBC_BUFFER_SIZE];
   // strField
-  SQLWCHAR column7[ODBC_BUFFER_SIZE];
+  char column7[ODBC_BUFFER_SIZE];
 
   SQLLEN column1Len = sizeof(column1);
   SQLLEN column2Len = sizeof(column2);
@@ -1377,7 +1377,7 @@ BOOST_AUTO_TEST_CASE(TestKeyVal, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  ret = SQLBindCol(stmt, 7, SQL_C_WCHAR, &column7, column7Len, &column7Len);
+  ret = SQLBindCol(stmt, 7, SQL_C_CHAR, &column7, column7Len, &column7Len);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1405,7 +1405,7 @@ BOOST_AUTO_TEST_CASE(TestKeyVal, *disabled()) {
 
   CheckObjectData(column6, static_cast< int32_t >(column6Len), obj.objField);
 
-  BOOST_CHECK_EQUAL(column7, utility::FromUtf8(obj.strField).c_str());
+  BOOST_CHECK_EQUAL(column7, obj.strField.c_str());
 
   ret = SQLFetch(stmt);
   BOOST_CHECK(ret == SQL_NO_DATA);
@@ -1436,7 +1436,7 @@ BOOST_AUTO_TEST_CASE(TestKeyVal, *disabled()) {
 
   CheckObjectData(column6, static_cast< int32_t >(column6Len), obj.objField);
 
-  BOOST_CHECK_EQUAL(column7, utility::FromUtf8(obj.strField).c_str());
+  BOOST_CHECK_EQUAL(column7, obj.strField.c_str());
 
   ret = SQLFetch(stmt);
   BOOST_CHECK(ret == SQL_NO_DATA);

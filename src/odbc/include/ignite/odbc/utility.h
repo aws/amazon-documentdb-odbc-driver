@@ -22,6 +22,7 @@
 #undef min
 #endif  // min
 
+// This defines a common type so we have portable code on MAC and Linux
 #ifndef _WIN32
 #ifndef _WCHAR_T_DEFINED
 typedef unsigned short WCHAR;
