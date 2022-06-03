@@ -1478,8 +1478,6 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
   BOOST_CHECK_EQUAL(intVal, 19);
 }
 
-// -AL- somehow precision is initialized as -1, although the dataType should be
-// there. Need to debug this once my tests can run
 BOOST_AUTO_TEST_CASE(TestColAttributeDescScale) {
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");

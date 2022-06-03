@@ -373,17 +373,16 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     case SQL_DESC_SCALE:
     case SQL_COLUMN_SCALE: {
       // scale value of -1 means value not availabe.
-      if (dataType) {
-        if (decimalDigits
-            && ((*dataType == JDBC_TYPE_DECIMAL)
-                || (*dataType == JDBC_TYPE_NUMERIC))) {
-          // return decimal digits for all decimal and numeric types
-          value = *decimalDigits;
-        } else if (!scale || *scale == -1) {
-          if (boost::optional< int16_t > val =
-                  type_traits::BinaryTypeDecimalDigits(dataType))
-            value = *val;
-        }
+      if (dataType
+          && (decimalDigits
+              && ((*dataType == JDBC_TYPE_DECIMAL)
+                  || (*dataType == JDBC_TYPE_NUMERIC)))) {
+        // return decimal digits for all decimal and numeric types
+        value = *decimalDigits;
+      } else if (dataType && (!scale || *scale == -1)) {
+        if (boost::optional< int16_t > val =
+                type_traits::BinaryTypeDecimalDigits(dataType))
+          value = *val;
       } else if (scale)
         value = *scale;
 
