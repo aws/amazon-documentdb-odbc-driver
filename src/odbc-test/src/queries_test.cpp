@@ -932,7 +932,7 @@ BOOST_AUTO_TEST_CASE(TestOneRowObject, *disabled()) {
 
   int64_t column1 = 0;
   int8_t column2[ODBC_BUFFER_SIZE];
-  SQLWCHAR column3[ODBC_BUFFER_SIZE];
+  char column3[ODBC_BUFFER_SIZE];
 
   SQLLEN column1Len = sizeof(column1);
   SQLLEN column2Len = sizeof(column2);
@@ -949,12 +949,13 @@ BOOST_AUTO_TEST_CASE(TestOneRowObject, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  ret = SQLBindCol(stmt, 3, SQL_C_WCHAR, &column3, column3Len, &column3Len);
+  ret = SQLBindCol(stmt, 3, SQL_C_CHAR, &column3, column3Len, &column3Len);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  std::vector< SQLWCHAR > request = NewSqlWchar(L"SELECT i32Field, objField, strField FROM ComplexType");
+  std::vector< SQLWCHAR > request =
+      NewSqlWchar(L"SELECT i32Field, objField, strField FROM ComplexType");
 
   ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret))
@@ -965,7 +966,7 @@ BOOST_AUTO_TEST_CASE(TestOneRowObject, *disabled()) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   BOOST_CHECK_EQUAL(column1, obj.i32Field);
-  BOOST_CHECK_EQUAL(column3, utility::FromUtf8(obj.strField).c_str());
+  BOOST_CHECK_EQUAL(column3, obj.strField.c_str());
 
   ret = SQLFetch(stmt);
   BOOST_CHECK(ret == SQL_NO_DATA);

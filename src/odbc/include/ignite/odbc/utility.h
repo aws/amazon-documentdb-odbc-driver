@@ -162,7 +162,7 @@ std::string ToUtf8(const wchar_t* value);
 /**
  * Convert a UTF-8 encoded string to wide string.
  *
- * @param value wide string value to convert.
+ * @param value UTF-8 encoded string.
  * @return String value converted to UTF-8 encoding.
  */
 std::wstring FromUtf8(const std::string& value);
@@ -170,10 +170,26 @@ std::wstring FromUtf8(const std::string& value);
 /**
  * Convert a UTF-8 encoded string to wide string.
  *
- * @param value wide string value to convert.
+ * @param value Pointer to UTF-8 encoded string.
  * @return String value converted to UTF-8 encoding.
  */
 std::wstring FromUtf8(const char* value);
+
+/**
+ * Convert a wide string to vector of unsigned short.
+ *
+ * @param value wide string value to convert.
+ * @return String value converted to vector of unsigned short encoding.
+ */
+std::vector< WCHAR > ToWCHARVector(const std::wstring& value);
+
+/**
+ * Convert a wide string to vector of unsigned short.
+ *
+ * @param value pointer to null-terminated wide string value to convert.
+ * @return String value converted to vector of unsigned short encoding.
+ */
+std::vector< WCHAR > ToWCHARVector(const wchar_t* value);
 
 /**
  * Convert binary data to hex dump form

@@ -275,6 +275,19 @@ void ReadByteArray(BinaryReaderImpl& reader,
     res.clear();
 }
 
+std::vector< WCHAR > ToWCHARVector(const std::wstring& value) {
+  return ToWCHARVector(value.c_str());
+}
+
+std::vector< WCHAR > ToWCHARVector(const wchar_t* value) {
+  std::vector< WCHAR > result;
+  for (int i = 0; value[i] != 0; i++) {
+    result.push_back(value[i]);
+  }
+  result.push_back(0);
+  return result;
+}
+
 std::string HexDump(const void* data, size_t count) {
   std::stringstream dump;
   size_t cnt = 0;

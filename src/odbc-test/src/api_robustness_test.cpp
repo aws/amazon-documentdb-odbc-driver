@@ -455,9 +455,9 @@ BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeys) {
   std::vector< SQLWCHAR > tableName = NewSqlWchar(L"jni_test_001");
 
   // Everything is ok.
-  SQLRETURN ret = SQLPrimaryKeys(stmt, catalogName.data(), sizeof(catalogName),
-                                 schemaName.data(), sizeof(schemaName),
-                                 tableName.data(), sizeof(tableName));
+  SQLRETURN ret =
+      SQLPrimaryKeys(stmt, catalogName.data(), SQL_NTS, schemaName.data(),
+                     SQL_NTS, tableName.data(), SQL_NTS);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 

@@ -35,7 +35,8 @@ void ThrowLastSetupError() {
   DWORD code;
   common::FixedSizeArray< wchar_t > msg(BUFFER_SIZE);
 
-  SQLInstallerError(1, &code, msg.GetData(), msg.GetSize(), NULL);
+  SQLInstallerError(1, &code, utility::ToWCHARVector(msg.GetData()).data(),
+                    msg.GetSize(), NULL);
 
   std::stringstream buf;
 
@@ -49,8 +50,10 @@ void WriteDsnString(const char* dsn, const char* key, const char* value) {
   std::wstring key0 = utility::FromUtf8(key);
   std::wstring value0 = utility::FromUtf8(value);
   std::wstring configFile = utility::FromUtf8(CONFIG_FILE);
-  if (!SQLWritePrivateProfileString(dsn0.c_str(), key0.c_str(), value0.c_str(),
-                                    configFile.c_str()))
+  if (!SQLWritePrivateProfileString(utility::ToWCHARVector(dsn0).data(),
+                                    utility::ToWCHARVector(key0).data(),
+                                    utility::ToWCHARVector(value0).data(),
+                                    utility::ToWCHARVector(configFile).data()))
     ThrowLastSetupError();
 }
 
@@ -65,16 +68,21 @@ SettableValue< std::string > ReadDsnString(const char* dsn,
   std::wstring dsn0 = utility::FromUtf8(dsn);
   std::wstring key0 = utility::FromUtf8(key);
   std::wstring configFile = utility::FromUtf8(CONFIG_FILE);
-  int ret = SQLGetPrivateProfileString(dsn0.c_str(), key0.c_str(), unique,
-                                       buf.GetData(), buf.GetSize(),
-                                       configFile.c_str());
+  int ret = SQLGetPrivateProfileString(
+      utility::ToWCHARVector(dsn0).data(), utility::ToWCHARVector(key0).data(),
+      utility::ToWCHARVector(unique).data(),
+      utility::ToWCHARVector(buf.GetData()).data(), buf.GetSize(),
+      utility::ToWCHARVector(configFile).data());
 
   if (ret > BUFFER_SIZE) {
     buf.Reset(ret + 1);
 
-    ret = SQLGetPrivateProfileString(dsn0.c_str(), key0.c_str(), unique,
-                                     buf.GetData(), buf.GetSize(),
-                                     configFile.c_str());
+    ret = SQLGetPrivateProfileString(
+        utility::ToWCHARVector(dsn0).data(),
+        utility::ToWCHARVector(key0).data(),
+        utility::ToWCHARVector(unique).data(),
+        utility::ToWCHARVector(buf.GetData()).data(), buf.GetSize(),
+        utility::ToWCHARVector(configFile).data());
   }
 
   std::wstring res(buf.GetData());
