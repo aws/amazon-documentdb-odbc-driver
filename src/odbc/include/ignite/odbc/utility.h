@@ -22,6 +22,13 @@
 #undef min
 #endif  // min
 
+#ifndef _WIN32
+#ifndef _WCHAR_T_DEFINED
+typedef unsigned short WCHAR;
+#define _WCHAR_T_DEFINED
+#endif
+#endif // _WIN32
+
 #include <boost/optional.hpp>
 #include <boost/optional/optional_io.hpp>
 
