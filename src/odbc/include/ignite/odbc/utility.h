@@ -60,25 +60,7 @@ T* GetPointerWithOffset(T* ptr, size_t offset) {
  * @param buflen Length of the buffer.
  * @return Length of the resulting string in buffer.
  */
-size_t CopyStringToBuffer(const std::string& str, char* buf, size_t buflen);
-
-/**
- * Copy string to buffer of the specific length.
- * @param str String to copy data from.
- * @param buf Buffer to copy data to.
- * @param buflen Length of the buffer.
- * @return Length of the resulting string in buffer.
- */
-size_t CopyStringToBuffer(const std::string& str, wchar_t* buf, size_t buflen);
-
-/**
- * Copy string to buffer of the specific length.
- * @param str String to copy data from.
- * @param buf Buffer to copy data to.
- * @param buflen Length of the buffer.
- * @return Length of the resulting string in buffer.
- */
-size_t CopyStringToBuffer(const std::string& str, unsigned short* buf, size_t buflen);
+size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen);
 
 /**
  * Read array from reader.
@@ -128,16 +110,7 @@ void WriteDecimal(BinaryWriterImpl& writer,
  * @param sqlStrLen SQL string length.
  * @return Standard string containing the same data.
  */
-std::string SqlStringToString(const wchar_t* sqlStr, int32_t sqlStrLen);
-
-/**
- * Convert SQL string buffer to std::string.
- *
- * @param sqlStr SQL string buffer.
- * @param sqlStrLen SQL string length.
- * @return Standard string containing the same data.
- */
-std::string SqlStringToString(const unsigned short* sqlStr, int32_t sqlStrLen);
+std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen);
 
 /**
  * Convert SQL string buffer to boost::optional< std::string >.
@@ -147,19 +120,8 @@ std::string SqlStringToString(const unsigned short* sqlStr, int32_t sqlStrLen);
  * @return Standard optional string containing the same data.
  * If sqlStrLen indicates null string, boost::none is returned.
  */
-boost::optional< std::string > SqlStringToOptString(const wchar_t* sqlStr,
+boost::optional< std::string > SqlStringToOptString(const SQLWCHAR* sqlStr,
                                                     int32_t sqlStrLen);
-
-/**
- * Convert SQL string buffer to boost::optional< std::string >.
- *
- * @param sqlStr SQL string buffer.
- * @param sqlStrLen SQL string length.
- * @return Standard optional string containing the same data.
- * If sqlStrLen indicates null string, boost::none is returned.
- */
-boost::optional< std::string > SqlStringToOptString(
-    const unsigned short* sqlStr, int32_t sqlStrLen);
 
 /**
  * Convert a wide string to UTF-8 encoded string.

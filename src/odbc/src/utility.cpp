@@ -30,85 +30,37 @@ namespace utility {
 using namespace odbc::impl::binary;
 using namespace odbc::common;
 
-size_t CopyStringToBuffer(const std::string& str, wchar_t* buf, size_t buflen) {
-  static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
-      converter;
-  size_t char_size = sizeof(wchar_t);
-
-  if (buflen < 0 || buflen % char_size != 0)
-    return 0;
-
-  std::wstring str0;
-  str0 = converter.from_bytes(str);
-
-  size_t charsToCopy =
-      std::min(str0.size(), ((buflen - char_size) / char_size));
-  if (buf && charsToCopy > 0) {
-    std::wcsncpy(buf, str0.data(), charsToCopy);
-  }
-  if (buf && buflen >= char_size) {
-    buf[charsToCopy] = 0;
-  }
-
-  size_t bytesRequired = str0.size() * char_size;
-  size_t bytesToCopy = std::min(bytesRequired, (buflen - char_size));
-  return (buflen > 0) ? bytesToCopy : bytesRequired;
-}
-
-size_t CopyStringToBuffer(const std::string& str, unsigned short* buf,
+size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf,
                           size_t buflen) {
   static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
       converter;
-  size_t char_size = sizeof(unsigned short);
+  size_t char_size = sizeof(SQLWCHAR);
 
   if (buflen < 0 || buflen % char_size != 0)
     return 0;
 
   std::wstring str0;
   str0 = converter.from_bytes(str);
-
   size_t charsToCopy =
       std::min(str0.size(), ((buflen - char_size) / char_size));
+
   if (buf && charsToCopy > 0) {
-    const wchar_t* data = str0.data();
-    for (int i = 0; i < charsToCopy; i++) {
-      buf[i] = data[i];
+    if (char_size == sizeof(wchar_t)) {
+      std::wcsncpy(buf, str0.data(), charsToCopy);
+    } else {
+      const wchar_t* data = str0.data();
+      for (int i = 0; i < charsToCopy; i++) {
+        buf[i] = data[i];
+      }
     }
   }
   if (buf && buflen >= char_size) {
     buf[charsToCopy] = 0;
   }
 
-  size_t bytesRequired = str0.size() * char_size;
-  size_t bytesToCopy = std::min(bytesRequired, (buflen - char_size));
-  return (buflen > 0) ? bytesToCopy : bytesRequired;
-}
-
-size_t CopyStringToBuffer(const std::string& str, char* buf, size_t buflen) {
-  static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
-      converter;
-  size_t char_size = sizeof(char);
-
-  if (buflen < 0 || buflen % char_size != 0)
-    return 0;
-
-  std::wstring str0;
-  str0 = converter.from_bytes(str);
-
-  size_t charsToCopy =
-      std::min(str0.size(), ((buflen - char_size) / char_size));
-  if (buf && charsToCopy > 0) {
-    std::locale currentLocale("");
-    std::use_facet< std::ctype< wchar_t > >(currentLocale)
-        .narrow(str0.data(), str0.data() + charsToCopy, '?', buf);
-  }
-  if (buf && buflen >= char_size) {
-    buf[charsToCopy] = 0;
-  }
-
-  size_t bytesRequired = str0.size() * char_size;
-  size_t bytesToCopy = std::min(bytesRequired, (buflen - char_size));
-  return (buflen > 0) ? bytesToCopy : bytesRequired;
+  size_t bytesRequired = bytesRequired = str0.size() * char_size;
+  size_t bytesCopied = std::min(bytesRequired, (buflen - char_size));
+  return (buflen > 0) ? bytesCopied : bytesRequired;
 }
 
 void ReadString(BinaryReaderImpl& reader, std::string& str) {
@@ -193,29 +145,11 @@ void WriteDecimal(BinaryWriterImpl& writer,
       writer.GetStream(), magnitude.GetData(), magnitude.GetSize());
 }
 
-std::string SqlStringToString(const wchar_t* sqlStr, int32_t sqlStrLen) {
+std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen) {
   std::string result;
+  size_t char_size = sizeof(SQLWCHAR);
 
-  static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
-      converter;
-  if (sqlStrLen == SQL_NTS) {
-    result = converter.to_bytes(reinterpret_cast< const wchar_t* >(sqlStr));
-  } else if (sqlStrLen > 0) {
-    result = converter.to_bytes(
-        reinterpret_cast< const wchar_t* >(sqlStr),
-        reinterpret_cast< const wchar_t* >(sqlStr + sqlStrLen));
-  }
-
-  return result;
-}
-
-std::string SqlStringToString(const unsigned short* sqlStr, int32_t sqlStrLen) {
-  size_t wchar_t_size = sizeof(wchar_t);
-  size_t char_size = sizeof(unsigned short);
-
-  std::string result;
-
-  if (char_size == wchar_t_size) {
+  if (char_size == sizeof(wchar_t)) {
     static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
         converter;
     if (sqlStrLen == SQL_NTS) {
@@ -241,15 +175,7 @@ std::string SqlStringToString(const unsigned short* sqlStr, int32_t sqlStrLen) {
   return result;
 }
 
-boost::optional< std::string > SqlStringToOptString(const wchar_t* sqlStr,
-                                                    int32_t sqlStrLen) {
-  if (!sqlStr)
-    return boost::none;
-
-  return SqlStringToString(sqlStr, sqlStrLen);
-}
-
-boost::optional< std::string > SqlStringToOptString(const unsigned short* sqlStr,
+boost::optional< std::string > SqlStringToOptString(const SQLWCHAR* sqlStr,
                                                     int32_t sqlStrLen) {
   if (!sqlStr)
     return boost::none;
