@@ -342,7 +342,8 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
   }
 
   std::string connectStr =
-      SqlStringToString(reinterpret_cast<const unsigned char*>(inConnectionString), inConnectionStringLen, sizeof(SQLWCHAR));
+      SqlStringToString(reinterpret_cast< const SQLWCHAR* >(inConnectionString),
+                        inConnectionStringLen);
   connection->Establish(connectStr, windowHandle);
 
   DiagnosticRecordStorage& diag = connection->GetDiagnosticRecords();
@@ -394,9 +395,8 @@ SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* serverName,
 
   odbc::config::Configuration config;
 
-  std::string dsn =
-      SqlStringToString(reinterpret_cast< const unsigned char* >(serverName),
-                        serverNameLen, sizeof(SQLWCHAR));
+  std::string dsn = SqlStringToString(
+      reinterpret_cast< const SQLWCHAR* >(serverName), serverNameLen);
 
   LOG_INFO_MSG("DSN: " << dsn);
 
@@ -447,8 +447,7 @@ SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLWCHAR* query, SQLINTEGER queryLen) {
   }
 
   std::string sql =
-      SqlStringToString(reinterpret_cast< const unsigned char* >(query),
-                        queryLen, sizeof(SQLWCHAR));
+      SqlStringToString(reinterpret_cast< const SQLWCHAR* >(query), queryLen);
 
   LOG_INFO_MSG("SQL: " << sql);
 
@@ -496,8 +495,7 @@ SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* query, SQLINTEGER queryLen) {
   }
 
   std::string sql =
-      SqlStringToString(reinterpret_cast< const unsigned char* >(query),
-                        queryLen, sizeof(SQLWCHAR));
+      SqlStringToString(reinterpret_cast< const SQLWCHAR* >(query), queryLen);
 
   LOG_INFO_MSG("SQL: " << sql);
 
@@ -652,17 +650,13 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
   }
 
   boost::optional< std::string > catalog = SqlStringToOptString(
-      reinterpret_cast< const unsigned char* >(catalogName), catalogNameLen,
-      sizeof(SQLWCHAR));
-  boost::optional< std::string > schema =
-      SqlStringToOptString(reinterpret_cast< const unsigned char* >(schemaName),
-                           schemaNameLen, sizeof(SQLWCHAR));
-  std::string table =
-      SqlStringToString(reinterpret_cast< const unsigned char* >(tableName),
-                        tableNameLen, sizeof(SQLWCHAR));
-  boost::optional< std::string > tableTypeStr =
-      SqlStringToOptString(reinterpret_cast< const unsigned char* >(tableType),
-                           tableTypeLen, sizeof(SQLWCHAR));
+      reinterpret_cast< const SQLWCHAR* >(catalogName), catalogNameLen);
+  boost::optional< std::string > schema = SqlStringToOptString(
+      reinterpret_cast< const SQLWCHAR* >(schemaName), schemaNameLen);
+  std::string table = SqlStringToString(
+      reinterpret_cast< const SQLWCHAR* >(tableName), tableNameLen);
+  boost::optional< std::string > tableTypeStr = SqlStringToOptString(
+      reinterpret_cast< const SQLWCHAR* >(tableType), tableTypeLen);
 
   LOG_INFO_MSG("catalog: " << catalog);
   LOG_INFO_MSG("schema: " << schema);
@@ -697,17 +691,13 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
   }
 
   const boost::optional< std::string > catalog = SqlStringToOptString(
-      reinterpret_cast< const unsigned char* >(catalogName), catalogNameLen,
-      sizeof(SQLWCHAR));
-  const boost::optional< std::string > schema =
-      SqlStringToOptString(reinterpret_cast< const unsigned char* >(schemaName),
-                           schemaNameLen, sizeof(SQLWCHAR));
-  std::string table =
-      SqlStringToString(reinterpret_cast< const unsigned char* >(tableName),
-                        tableNameLen, sizeof(SQLWCHAR));
-  std::string column =
-      SqlStringToString(reinterpret_cast< const unsigned char* >(columnName),
-                        columnNameLen, sizeof(SQLWCHAR));
+      reinterpret_cast< const SQLWCHAR* >(catalogName), catalogNameLen);
+  const boost::optional< std::string > schema = SqlStringToOptString(
+      reinterpret_cast< const SQLWCHAR* >(schemaName), schemaNameLen);
+  std::string table = SqlStringToString(
+      reinterpret_cast< const SQLWCHAR* >(tableName), tableNameLen);
+  std::string column = SqlStringToString(
+      reinterpret_cast< const SQLWCHAR* >(columnName), columnNameLen);
 
   LOG_INFO_MSG("catalog: " << catalog.get_value_or(""));
   LOG_INFO_MSG("schema: " << schema.get_value_or(""));
@@ -778,9 +768,8 @@ SQLRETURN SQLNativeSql(SQLHDBC conn, SQLWCHAR* inQuery, SQLINTEGER inQueryLen,
 
   LOG_DEBUG_MSG("SQLNativeSql called");
 
-  std::string in =
-      SqlStringToString(reinterpret_cast< const unsigned char* >(inQuery),
-                        inQueryLen, sizeof(SQLWCHAR));
+  std::string in = SqlStringToString(
+      reinterpret_cast< const SQLWCHAR* >(inQuery), inQueryLen);
 
   CopyStringToBuffer(in, outQueryBuffer,
                      static_cast< size_t >(outQueryBufferLen));
@@ -949,24 +938,24 @@ SQLRETURN SQLForeignKeys(
     return SQL_INVALID_HANDLE;
   }
 
-  std::string primaryCatalog = SqlStringToString(
-      reinterpret_cast< const unsigned char* >(primaryCatalogName),
-      primaryCatalogNameLen, sizeof(SQLWCHAR));
-  std::string primarySchema = SqlStringToString(
-      reinterpret_cast< const unsigned char* >(primarySchemaName),
-      primarySchemaNameLen, sizeof(SQLWCHAR));
-  std::string primaryTable = SqlStringToString(
-      reinterpret_cast< const unsigned char* >(primaryTableName),
-      primaryTableNameLen, sizeof(SQLWCHAR));
+  std::string primaryCatalog =
+      SqlStringToString(reinterpret_cast< const SQLWCHAR* >(primaryCatalogName),
+                        primaryCatalogNameLen);
+  std::string primarySchema =
+      SqlStringToString(reinterpret_cast< const SQLWCHAR* >(primarySchemaName),
+                        primarySchemaNameLen);
+  std::string primaryTable =
+      SqlStringToString(reinterpret_cast< const SQLWCHAR* >(primaryTableName),
+                        primaryTableNameLen);
   const boost::optional< std::string > foreignCatalog = SqlStringToOptString(
-      reinterpret_cast< const unsigned char* >(foreignCatalogName),
-      foreignCatalogNameLen, sizeof(SQLWCHAR));
+      reinterpret_cast< const SQLWCHAR* >(foreignCatalogName),
+      foreignCatalogNameLen);
   const boost::optional< std::string > foreignSchema = SqlStringToOptString(
-      reinterpret_cast< const unsigned char* >(foreignSchemaName),
-      foreignSchemaNameLen, sizeof(SQLWCHAR));
-  std::string foreignTable = SqlStringToString(
-      reinterpret_cast< const unsigned char* >(foreignTableName),
-      foreignTableNameLen, sizeof(SQLWCHAR));
+      reinterpret_cast< const SQLWCHAR* >(foreignSchemaName),
+      foreignSchemaNameLen);
+  std::string foreignTable =
+      SqlStringToString(reinterpret_cast< const SQLWCHAR* >(foreignTableName),
+                        foreignTableNameLen);
 
   LOG_INFO_MSG("primaryCatalog: " << primaryCatalog);
   LOG_INFO_MSG("primarySchema: " << primarySchema);
@@ -1061,14 +1050,11 @@ SQLRETURN SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
   }
 
   boost::optional< std::string > catalog = SqlStringToOptString(
-      reinterpret_cast< const unsigned char* >(catalogName), catalogNameLen,
-      sizeof(SQLWCHAR));
-  boost::optional< std::string > schema =
-      SqlStringToOptString(reinterpret_cast< const unsigned char* >(schemaName),
-                           schemaNameLen, sizeof(SQLWCHAR));
-  boost::optional< std::string > table =
-      SqlStringToOptString(reinterpret_cast< const unsigned char* >(tableName),
-                           tableNameLen, sizeof(SQLWCHAR));
+      reinterpret_cast< const SQLWCHAR* >(catalogName), catalogNameLen);
+  boost::optional< std::string > schema = SqlStringToOptString(
+      reinterpret_cast< const SQLWCHAR* >(schemaName), schemaNameLen);
+  boost::optional< std::string > table = SqlStringToOptString(
+      reinterpret_cast< const SQLWCHAR* >(tableName), tableNameLen);
 
   LOG_INFO_MSG("catalog: " << catalog.get_value_or(""));
   LOG_INFO_MSG("schema: " << schema.get_value_or(""));
@@ -1435,15 +1421,12 @@ SQLRETURN SQLSpecialColumns(SQLHSTMT stmt, SQLSMALLINT idType,
     return SQL_INVALID_HANDLE;
   }
 
-  std::string catalog =
-      SqlStringToString(reinterpret_cast< const unsigned char* >(catalogName),
-                        catalogNameLen, sizeof(SQLWCHAR));
-  std::string schema =
-      SqlStringToString(reinterpret_cast< const unsigned char* >(schemaName),
-                        schemaNameLen, sizeof(SQLWCHAR));
-  std::string table =
-      SqlStringToString(reinterpret_cast< const unsigned char* >(tableName),
-                        tableNameLen, sizeof(SQLWCHAR));
+  std::string catalog = SqlStringToString(
+      reinterpret_cast< const SQLWCHAR* >(catalogName), catalogNameLen);
+  std::string schema = SqlStringToString(
+      reinterpret_cast< const SQLWCHAR* >(schemaName), schemaNameLen);
+  std::string table = SqlStringToString(
+      reinterpret_cast< const SQLWCHAR* >(tableName), tableNameLen);
 
   LOG_INFO_MSG("catalog: " << catalog);
   LOG_INFO_MSG("schema: " << schema);

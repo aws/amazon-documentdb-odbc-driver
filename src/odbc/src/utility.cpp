@@ -193,54 +193,68 @@ void WriteDecimal(BinaryWriterImpl& writer,
       writer.GetStream(), magnitude.GetData(), magnitude.GetSize());
 }
 
-std::string SqlStringToString(const unsigned char* sqlStr, int32_t sqlStrLen,
-                              size_t char_size) {
+std::string SqlStringToString(const wchar_t* sqlStr, int32_t sqlStrLen) {
+  std::string result;
+
+  static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
+      converter;
+  if (sqlStrLen == SQL_NTS) {
+    result = converter.to_bytes(reinterpret_cast< const wchar_t* >(sqlStr));
+  } else if (sqlStrLen > 0) {
+    result = converter.to_bytes(
+        reinterpret_cast< const wchar_t* >(sqlStr),
+        reinterpret_cast< const wchar_t* >(sqlStr + sqlStrLen));
+  }
+
+  return result;
+}
+
+std::string SqlStringToString(const unsigned short* sqlStr, int32_t sqlStrLen) {
   size_t wchar_t_size = sizeof(wchar_t);
- 
-  std::string res;
+  size_t char_size = sizeof(unsigned short);
+
+  std::string result;
 
   if (char_size == wchar_t_size) {
     static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
         converter;
     if (sqlStrLen == SQL_NTS) {
-      res =converter.to_bytes(reinterpret_cast< const wchar_t* >(sqlStr));
-    } else if (sqlStr > 0) {
-      res = converter.to_bytes(reinterpret_cast< const wchar_t* >(sqlStr),
-                         reinterpret_cast< const wchar_t* >(sqlStr + sqlStrLen));
+      result = converter.to_bytes(reinterpret_cast< const wchar_t* >(sqlStr));
+    } else if (sqlStrLen > 0) {
+      result = converter.to_bytes(
+          reinterpret_cast< const wchar_t* >(sqlStr),
+          reinterpret_cast< const wchar_t* >(sqlStr + sqlStrLen));
     }
-  } else if (char_size == 2) {
+  } else {
     static std::wstring_convert< std::codecvt_utf8< char16_t >, char16_t >
         converter_utf16;
     if (sqlStrLen == SQL_NTS) {
-      res = converter_utf16.to_bytes(reinterpret_cast< const char16_t* >(sqlStr));
-    } else if (sqlStr > 0) {
-      res = converter_utf16.to_bytes(
+      result =
+          converter_utf16.to_bytes(reinterpret_cast< const char16_t* >(sqlStr));
+    } else if (sqlStrLen > 0) {
+      result = converter_utf16.to_bytes(
           reinterpret_cast< const char16_t* >(sqlStr),
           reinterpret_cast< const char16_t* >(sqlStr + sqlStrLen));
     }
-  } else if (char_size == 4) {
-    static std::wstring_convert< std::codecvt_utf8< char32_t >, char32_t >
-        converter_utf32;
-    if (sqlStrLen == SQL_NTS) {
-      res =
-          converter_utf32.to_bytes(reinterpret_cast< const char32_t* >(sqlStr));
-    } else if (sqlStr > 0) {
-      res = converter_utf32.to_bytes(
-          reinterpret_cast< const char32_t* >(sqlStr),
-          reinterpret_cast< const char32_t* >(sqlStr + sqlStrLen));
-    }
   }
 
-  return res;
+  return result;
 }
 
-boost::optional< std::string > SqlStringToOptString(const unsigned char* sqlStr,
-                                                    int32_t sqlStrLen,
-                                                    size_t char_size) {
+boost::optional< std::string > SqlStringToOptString(const wchar_t* sqlStr,
+                                                    int32_t sqlStrLen) {
   if (!sqlStr)
     return boost::none;
 
-  return SqlStringToString(sqlStr, sqlStrLen, char_size);
+  return SqlStringToString(sqlStr, sqlStrLen);
+}
+
+boost::optional< std::string > SqlStringToOptString(const unsigned short* sqlStr,
+                                                    int32_t sqlStrLen) {
+  if (!sqlStr)
+    return boost::none;
+
+  return SqlStringToString(sqlStr, sqlStrLen);
 }
 
 std::string ToUtf8(const std::wstring& value) {
