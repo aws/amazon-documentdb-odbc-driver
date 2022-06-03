@@ -150,7 +150,6 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
 
   // an empty string is returned if the column does not have the requested field
   value = "";
-
   switch (fieldId) {
     case SQL_DESC_LABEL:
     case SQL_DESC_BASE_COLUMN_NAME:
