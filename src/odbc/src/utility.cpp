@@ -141,42 +141,49 @@ void WriteDecimal(BinaryWriterImpl& writer,
       writer.GetStream(), magnitude.GetData(), magnitude.GetSize());
 }
 
-std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen) {
+std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
+                              bool inChars) {
   std::string result;
   size_t char_size = sizeof(SQLWCHAR);
 
+  assert(char_size == sizeof(wchar_t) || char_size == 2);
+
+  static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
+      converter;
+  size_t charsToCopy = inChars ? sqlStrLen : (sqlStrLen / char_size);
   if (char_size == sizeof(wchar_t)) {
-    static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
-        converter;
     if (sqlStrLen == SQL_NTS) {
       result = converter.to_bytes(reinterpret_cast< const wchar_t* >(sqlStr));
     } else if (sqlStrLen > 0) {
       result = converter.to_bytes(
           reinterpret_cast< const wchar_t* >(sqlStr),
-          reinterpret_cast< const wchar_t* >(sqlStr + sqlStrLen));
+          reinterpret_cast< const wchar_t* >(sqlStr + charsToCopy));
     }
-  } else {
-    static std::wstring_convert< std::codecvt_utf8< char16_t >, char16_t >
-        converter_utf16;
+  } else if (char_size == 2) {
+    std::wstring sqlStr0;
     if (sqlStrLen == SQL_NTS) {
-      result =
-          converter_utf16.to_bytes(reinterpret_cast< const char16_t* >(sqlStr));
+      for (int i = 0; sqlStr[i] != 0; i++) {
+        sqlStr0.push_back(sqlStr[i]);
+      }
     } else if (sqlStrLen > 0) {
-      result = converter_utf16.to_bytes(
-          reinterpret_cast< const char16_t* >(sqlStr),
-          reinterpret_cast< const char16_t* >(sqlStr + sqlStrLen));
+      sqlStr0.reserve(charsToCopy + 1);
+      for (int i = 0; i < charsToCopy; i++) {
+        sqlStr0.push_back(sqlStr[i]);
+      }
     }
+    result = converter.to_bytes(sqlStr0);
   }
 
   return result;
 }
 
 boost::optional< std::string > SqlStringToOptString(const SQLWCHAR* sqlStr,
-                                                    int32_t sqlStrLen) {
+                                                    int32_t sqlStrLen,
+                                                    bool inChars) {
   if (!sqlStr)
     return boost::none;
 
-  return SqlStringToString(sqlStr, sqlStrLen);
+  return SqlStringToString(sqlStr, sqlStrLen, inChars);
 }
 
 std::string ToUtf8(const std::wstring& value) {

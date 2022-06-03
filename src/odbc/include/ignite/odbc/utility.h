@@ -110,7 +110,8 @@ void WriteDecimal(BinaryWriterImpl& writer,
  * @param sqlStrLen SQL string length.
  * @return Standard string containing the same data.
  */
-std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen);
+std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
+                              bool inChars = false);
 
 /**
  * Convert SQL string buffer to boost::optional< std::string >.
@@ -121,7 +122,8 @@ std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen);
  * If sqlStrLen indicates null string, boost::none is returned.
  */
 boost::optional< std::string > SqlStringToOptString(const SQLWCHAR* sqlStr,
-                                                    int32_t sqlStrLen);
+                                                    int32_t sqlStrLen,
+                                                    bool inChars = false);
 
 /**
  * Convert a wide string to UTF-8 encoded string.
