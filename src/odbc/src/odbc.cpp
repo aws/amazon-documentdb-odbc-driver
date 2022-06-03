@@ -354,9 +354,9 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
     return diag.GetReturnCode();
   }
 
-  size_t reslen =
-      CopyStringToBuffer(connectStr, outConnectionString,
-                         static_cast< size_t >(outConnectionStringBufferLen));
+  size_t reslen = CopyStringToBuffer(
+      connectStr, outConnectionString,
+      static_cast< size_t >(outConnectionStringBufferLen), true);
 
   if (outConnectionStringLen)
     *outConnectionStringLen = static_cast< SQLSMALLINT >(reslen);
@@ -772,7 +772,7 @@ SQLRETURN SQLNativeSql(SQLHDBC conn, SQLWCHAR* inQuery, SQLINTEGER inQueryLen,
       reinterpret_cast< const SQLWCHAR* >(inQuery), inQueryLen, true);
 
   CopyStringToBuffer(in, outQueryBuffer,
-                     static_cast< size_t >(outQueryBufferLen));
+                     static_cast< size_t >(outQueryBufferLen), true);
 
   if (outQueryLen)
     *outQueryLen =
@@ -1201,7 +1201,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
   const DiagnosticRecord& record = records->GetStatusRecord(recNum);
 
   if (sqlState)
-    CopyStringToBuffer(record.GetSqlState(), sqlState, 6 * sizeof(SQLWCHAR));
+    CopyStringToBuffer(record.GetSqlState(), sqlState, 6, true);
 
   if (nativeError)
     *nativeError = 0;
@@ -1215,16 +1215,19 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
       return SQL_ERROR;
     }
 
+    // In bytes
     *msgLen = CopyStringToBuffer(errMsg, msgBuffer,
-                       static_cast< size_t >(msgBufferLen));
+                                 static_cast< size_t >(msgBufferLen));
 
     LOG_DEBUG_MSG("SQLGetDiagRec exiting with SQL_SUCCESS_WITH_INFO");
 
     return SQL_SUCCESS_WITH_INFO;
   }
 
-  size_t msgLen0 = CopyStringToBuffer(errMsg, msgBuffer,
-                                      static_cast< size_t >(msgBufferLen));
+  // In bytes
+  size_t msgLen0 = CopyStringToBuffer(
+      errMsg, msgBuffer,
+      static_cast< size_t >(msgBufferLen));
 
   if (msgLen)
     *msgLen = msgLen0;
@@ -1548,7 +1551,7 @@ SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* state,
   record.MarkRetrieved();
 
   if (state)
-    CopyStringToBuffer(record.GetSqlState(), state, 6 * sizeof(SQLWCHAR));
+    CopyStringToBuffer(record.GetSqlState(), state, 6, true);
 
   if (error)
     *error = 0;

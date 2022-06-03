@@ -978,9 +978,10 @@ SqlResult::Type Statement::InternalGetColumnAttribute(
 
     size_t outSize = out.size();
 
-    if (found && strbuf)
-      outSize =
-          utility::CopyStringToBuffer(out, strbuf, buflen);
+    if (found && strbuf) {
+      // In bytes
+      outSize = utility::CopyStringToBuffer(out, strbuf, buflen);
+    }
 
     if (found && reslen)
       *reslen = static_cast< int16_t >(outSize);

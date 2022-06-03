@@ -38,9 +38,8 @@ OdbcClientError GetOdbcError(SQLSMALLINT handleType, SQLHANDLE handle) {
   SQLGetDiagRec(handleType, handle, 1, sqlstate, &nativeCode, message,
                 sizeof(message), &reallen);
 
-  return OdbcClientError(
-      utility::ToUtf8(reinterpret_cast< wchar_t* >(sqlstate)),
-      utility::ToUtf8(reinterpret_cast< wchar_t* >(message)));
+  return OdbcClientError(utility::SqlStringToString(sqlstate, SQL_NTS, true),
+                         utility::SqlStringToString(message, reallen, true));
 }
 
 std::string GetOdbcErrorState(SQLSMALLINT handleType, SQLHANDLE handle,
@@ -54,7 +53,7 @@ std::string GetOdbcErrorState(SQLSMALLINT handleType, SQLHANDLE handle,
   SQLGetDiagRec(handleType, handle, idx, sqlstate, &nativeCode, message,
                 sizeof(message), &reallen);
 
-  return utility::ToUtf8(reinterpret_cast< wchar_t* >(sqlstate));
+  return utility::SqlStringToString(sqlstate, SQL_NTS);
 }
 
 std::string GetOdbcErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle,

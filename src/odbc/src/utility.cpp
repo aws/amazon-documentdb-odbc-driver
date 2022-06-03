@@ -31,7 +31,7 @@ using namespace odbc::impl::binary;
 using namespace odbc::common;
 
 size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf,
-                          size_t buflen) {
+                          size_t buflen, bool inChars) {
   static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
       converter;
   size_t char_size = sizeof(SQLWCHAR);
@@ -42,7 +42,8 @@ size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf,
   std::wstring str0;
   str0 = converter.from_bytes(str);
   size_t charsToCopy =
-      std::min(str0.size(), ((buflen - char_size) / char_size));
+      inChars ? std::min(str0.size(), (buflen - 1))
+              : std::min(str0.size(), ((buflen - char_size) / char_size));
 
   if (buf && charsToCopy > 0) {
     const wchar_t* data = str0.data();
@@ -54,9 +55,16 @@ size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf,
     buf[charsToCopy] = 0;
   }
 
-  size_t bytesRequired = bytesRequired = str0.size() * char_size;
-  size_t bytesCopied = std::min(bytesRequired, (buflen - char_size));
-  return (buflen > 0) ? bytesCopied : bytesRequired;
+  size_t required;
+  size_t copied;
+  if (inChars) {
+    required = str0.size();
+    copied = charsToCopy;
+  } else {
+    required = str0.size() * char_size;
+    copied = charsToCopy * char_size;
+  }
+  return (buflen > 0) ? copied : required;
 }
 
 void ReadString(BinaryReaderImpl& reader, std::string& str) {

@@ -60,7 +60,8 @@ T* GetPointerWithOffset(T* ptr, size_t offset) {
  * @param buflen Length of the buffer.
  * @return Length of the resulting string in buffer.
  */
-size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen);
+size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen,
+                          bool inChars = false);
 
 /**
  * Read array from reader.
