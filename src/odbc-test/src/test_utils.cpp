@@ -123,4 +123,24 @@ std::vector< SQLWCHAR > NewSqlWchar(const std::wstring& value) {
   result[value.size()] = 0;
   return result;
 }
+
+std::wstring FromSQLWCHAR(const SQLWCHAR* value, const size_t len) {
+  std::wstring result;
+  if (!value || (len != SQL_NTS) && len <= 0) {
+    return result;
+  }
+
+  if (len == SQL_NTS) {
+    for (int i = 0; value[i] != 0; i++) {
+      result.push_back(value[i]);
+    }
+  } else {
+    size_t charsToCopy = len / sizeof(SQLWCHAR);
+    for (int i = 0; i < charsToCopy; i++) {
+      result.push_back(value[i]);
+    }
+  }
+
+  return result;
+}
 }  // namespace ignite_test

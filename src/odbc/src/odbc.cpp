@@ -34,14 +34,6 @@
 #include "ignite/odbc/type_traits.h"
 #include "ignite/odbc/utility.h"
 
-/** 
- * Sets the global locale to use C, UTF-8.
- */
-void SetUtf8Local() {
-  char* newLocale = std::setlocale(LC_ALL, "C.UTF-8");
-  assert(newLocale);
-}
-
 /**
  * Handle window handle.
  * @param windowHandle Window handle.

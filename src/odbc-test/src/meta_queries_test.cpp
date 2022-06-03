@@ -81,7 +81,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
         BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
       if (i == columnIndex && !expectedValue.empty()) {
-        std::wstring actualValueStr(buf, bufLen / sizeof(SQLWCHAR));
+        std::wstring actualValueStr = FromSQLWCHAR(buf, bufLen);
         std::wstring expectedValueStr = expectedValue;
         BOOST_CHECK(expectedValueStr == actualValueStr);
       }
@@ -720,7 +720,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOne) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  CheckSingleRowResultSetWithGetData(stmt, 3, table.data());
+  CheckSingleRowResultSetWithGetData(stmt, 3, FromSQLWCHAR(table.data(), SQL_NTS));
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneFromLocalServer) {
@@ -1383,7 +1383,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   if (!SQL_SUCCEEDED(ret)) {
     BOOST_ERROR(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
-  BOOST_CHECK_EQUAL(L"TABLE_SCHEM", attrColumnName);
+  BOOST_CHECK_EQUAL(std::wstring(L"TABLE_SCHEM"), FromSQLWCHAR(attrColumnName, attrColumnNameLen));
 
   // Test that the next fetch will have no data.
   ret = SQLFetch(stmt);
