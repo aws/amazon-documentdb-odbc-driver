@@ -135,8 +135,6 @@ void ColumnMeta::ReadJdbcMetadata(JdbcColumnMetadata& jdbcMetadata,
   tableName = jdbcMetadata.GetTableName();
   columnName = jdbcMetadata.GetColumnName();
   dataType = jdbcMetadata.GetColumnType();
-  precision = jdbcMetadata.GetPrecision();
-  scale = jdbcMetadata.GetScale();
   nullability = jdbcMetadata.GetNullable();
   ordinalPosition = jdbcMetadata.GetOrdinal();
   if (!ordinalPosition) {
@@ -352,18 +350,17 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
 
     case SQL_DESC_PRECISION:
     case SQL_COLUMN_PRECISION: {
-      if (dataType) {
-        if (decimalDigits
-            && ((*dataType == JDBC_TYPE_TIME) || (*dataType == JDBC_TYPE_DATE)
-                || (*dataType == JDBC_TYPE_TIMESTAMP))) {
-          // return decimal digits for all datetime types and all interval
-          // types with a seconds component
-          value = *decimalDigits;
-        } else if (!precision || *precision == -1) {
-          if (boost::optional< int > val =
-                  type_traits::BinaryTypeColumnSize(dataType))
-            value = *val;
-        }
+      if (dataType
+          && (decimalDigits
+              && ((*dataType == JDBC_TYPE_TIME) || (*dataType == JDBC_TYPE_DATE)
+                  || (*dataType == JDBC_TYPE_TIMESTAMP)))) {
+        // return decimal digits for all datetime types and all interval
+        // types with a seconds component
+        value = *decimalDigits;
+      } else if (dataType && (!precision || *precision == -1)) {
+        if (boost::optional< int > val =
+                type_traits::BinaryTypeColumnSize(dataType))
+          value = *val;
       } else if (precision)
         value = *precision;
 
