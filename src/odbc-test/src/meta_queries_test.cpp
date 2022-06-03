@@ -1502,6 +1502,35 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescScale) {
   BOOST_CHECK_EQUAL(intVal, 0);
 }
 
+BOOST_AUTO_TEST_CASE(TestColAttributeDescSchemaName) {
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
+  SQLExecDirect(stmt, req, SQL_NTS);
+
+  SQLLEN intVal;
+  SQLCHAR strBuf[1024];
+  SQLSMALLINT strLen;
+
+  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_SCHEMA_NAME, strBuf,
+                                  sizeof(strBuf), &strLen, &intVal);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  // convert SQLCHAR[] strBuf to to std::string buf
+  std::stringstream bufStream;
+  bufStream << strBuf;
+  std::string buf;
+  bufStream >> buf;
+
+  BOOST_CHECK(buf == "odbc-test");
+}
+
 BOOST_AUTO_TEST_CASE(TestColAttributeDescUnnamed) {
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
