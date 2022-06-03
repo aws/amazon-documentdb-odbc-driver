@@ -780,6 +780,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescConciseType) {
   BOOST_CHECK_EQUAL(intVal, SQL_VARBINARY);
 
   // TODO re-enable this test when bug from JDBC (AD-765) is fixed.
+  // https://bitquill.atlassian.net/browse/AD-766
   // SQLCHAR req4[] = "select fieldNull from meta_queries_test_001";
   // SQLExecDirect(stmt, req4, SQL_NTS);
 
@@ -1642,6 +1643,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescType) {
   BOOST_CHECK_EQUAL(intVal, SQL_VARBINARY);
 
   // TODO re-enable this test when bug from JDBC (AD-765) is fixed. 
+  // https://bitquill.atlassian.net/browse/AD-766
   //SQLCHAR req4[] = "select fieldNull from meta_queries_test_001";
   //SQLExecDirect(stmt, req4, SQL_NTS);
 
