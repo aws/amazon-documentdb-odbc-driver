@@ -45,13 +45,9 @@ size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf,
       std::min(str0.size(), ((buflen - char_size) / char_size));
 
   if (buf && charsToCopy > 0) {
-    if (char_size == sizeof(wchar_t)) {
-      std::wcsncpy(buf, str0.data(), charsToCopy);
-    } else {
-      const wchar_t* data = str0.data();
-      for (int i = 0; i < charsToCopy; i++) {
-        buf[i] = data[i];
-      }
+    const wchar_t* data = str0.data();
+    for (int i = 0; i < charsToCopy; i++) {
+      buf[i] = data[i];
     }
   }
   if (buf && buflen >= char_size) {
