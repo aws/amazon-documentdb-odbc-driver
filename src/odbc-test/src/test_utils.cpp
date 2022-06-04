@@ -67,14 +67,15 @@ std::string GetOdbcErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle,
   SQLGetDiagRec(handleType, handle, idx, sqlstate, &nativeCode, message,
                 sizeof(message), &reallen);
 
-  std::wstring res(reinterpret_cast< wchar_t* >(sqlstate));
+  std::string res = utility::SqlStringToString(sqlstate, SQL_NTS);
 
   if (!res.empty())
-    res.append(L": ").append(reinterpret_cast< wchar_t* >(message), reallen);
+    // In bytes
+    res.append(": ").append(utility::SqlStringToString(message, reallen));
   else
-    res = L"No results";
+    res = "No results";
 
-  return utility::ToUtf8(res);
+  return res;
 }
 
 std::string GetTestConfigDir() {

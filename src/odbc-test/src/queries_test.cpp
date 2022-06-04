@@ -702,31 +702,23 @@ BOOST_AUTO_TEST_CASE(TestTwoRowsString, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[0])),
-                    L"1");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[1])),
-                    L"2");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[2])),
-                    L"3");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[3])),
-                    L"4");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[4])),
-                    L"5");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[5])),
-                    L"6");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[6])),
-                    L"7");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[7])),
-                    L"1");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[8])),
-                    L"00000000-0000-0008-0000-000000000009");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[0], SQL_NTS), "1");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[1], SQL_NTS), "2");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[2], SQL_NTS), "3");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[3], SQL_NTS), "4");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[4], SQL_NTS), "5");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[5], SQL_NTS), "6");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[6], SQL_NTS), "7");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[7], SQL_NTS), "1");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[8], SQL_NTS),
+                    "00000000-0000-0008-0000-000000000009");
   // Such format is used because Date returned as Timestamp.
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[9])),
-                    L"1987-06-05 00:00:00");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[10])),
-                    L"12:48:12");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[11])),
-                    L"1998-12-27 01:02:03");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[9], SQL_NTS),
+                    "1987-06-05 00:00:00");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10], SQL_NTS),
+                    "12:48:12");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[11], SQL_NTS),
+                    "1998-12-27 01:02:03");
 
   SQLLEN columnLens[columnsCnt];
 
@@ -743,31 +735,23 @@ BOOST_AUTO_TEST_CASE(TestTwoRowsString, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[0])),
-                    L"8");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[1])),
-                    L"7");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[2])),
-                    L"6");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[3])),
-                    L"5");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[4])),
-                    L"4");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[5])),
-                    L"3");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[6])),
-                    L"2");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[7])),
-                    L"0");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[8])),
-                    L"00000000-0000-0001-0000-000000000000");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[0], SQL_NTS), "8");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[1], SQL_NTS), "7");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[2], SQL_NTS), "6");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[3], SQL_NTS), "5");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[4], SQL_NTS), "4");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[5], SQL_NTS), "3");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[6], SQL_NTS), "2");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[7], SQL_NTS), "0");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[8], SQL_NTS),
+                    "00000000-0000-0001-0000-000000000000");
   // Such format is used because Date returned as Timestamp.
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[9])),
-                    L"1976-01-12 00:00:00");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[10])),
-                    L"00:08:59");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[11])),
-                    L"1978-08-21 23:13:45");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[9], SQL_NTS),
+                    "1976-01-12 00:00:00");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10], SQL_NTS),
+                    "00:08:59");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[11], SQL_NTS),
+                    "1978-08-21 23:13:45");
 
   BOOST_CHECK_EQUAL(columnLens[0], 1);
   BOOST_CHECK_EQUAL(columnLens[1], 1);
@@ -823,31 +807,31 @@ BOOST_AUTO_TEST_CASE(TestOneRowString, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[0])),
-                    L"1");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[1])),
-                    L"2");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[2])),
-                    L"3");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[3])),
-                    L"4");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[4])),
-                    L"5");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[5])),
-                    L"6");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[6])),
-                    L"7");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[7])),
-                    L"1");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[8])),
-                    L"00000000-0000-0008-0000-000000000009");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[0], SQL_NTS),
+                    "1");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[1], SQL_NTS),
+                    "2");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[2], SQL_NTS),
+                    "3");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[3], SQL_NTS),
+                    "4");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[4], SQL_NTS),
+                    "5");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[5], SQL_NTS),
+                    "6");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[6], SQL_NTS),
+                    "7");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[7], SQL_NTS),
+                    "1");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[8], SQL_NTS),
+                    "00000000-0000-0008-0000-000000000009");
   // Such format is used because Date returned as Timestamp.
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[9])),
-                    L"1987-06-05 00:00:00");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[10])),
-                    L"12:48:12");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[11])),
-                    L"1998-12-27 01:02:03");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[9], SQL_NTS),
+                    "1987-06-05 00:00:00");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10], SQL_NTS),
+                    "12:48:12");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[11], SQL_NTS),
+                    "1998-12-27 01:02:03");
 
   BOOST_CHECK_EQUAL(columnLens[0], 1);
   BOOST_CHECK_EQUAL(columnLens[1], 1);
@@ -1071,31 +1055,31 @@ BOOST_AUTO_TEST_CASE(TestDataAtExecution, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[0])),
-                    L"1");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[1])),
-                    L"2");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[2])),
-                    L"3");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[3])),
-                    L"4");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[4])),
-                    L"5");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[5])),
-                    L"6");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[6])),
-                    L"7");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[7])),
-                    L"1");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[8])),
-                    L"00000000-0000-0008-0000-000000000009");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[0], SQL_NTS),
+                    "1");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[1], SQL_NTS),
+                    "2");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[2], SQL_NTS),
+                    "3");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[3], SQL_NTS),
+                    "4");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[4], SQL_NTS),
+                    "5");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[5], SQL_NTS),
+                    "6");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[6], SQL_NTS),
+                    "7");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[7], SQL_NTS),
+                    "1");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[8], SQL_NTS),
+                    "00000000-0000-0008-0000-000000000009");
   // Such format is used because Date returned as Timestamp.
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[9])),
-                    L"1987-06-05 00:00:00");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[10])),
-                    L"12:48:12");
-  BOOST_CHECK_EQUAL(std::wstring(reinterpret_cast< wchar_t* >(columns[11])),
-                    L"1998-12-27 01:02:03");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[9], SQL_NTS),
+                    "1987-06-05 00:00:00");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10], SQL_NTS),
+                    "12:48:12");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[11], SQL_NTS),
+                    "1998-12-27 01:02:03");
 
   BOOST_CHECK_EQUAL(columnLens[0], 1);
   BOOST_CHECK_EQUAL(columnLens[1], 1);
