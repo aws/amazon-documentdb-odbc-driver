@@ -36,8 +36,8 @@ size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen,
       converter;
   size_t char_size = sizeof(SQLWCHAR);
 
-  if (buflen < 0 || (lenInBytes && (buflen % char_size != 0)))
-    return 0;
+  //if (buflen < 0 || (lenInBytes && (buflen % char_size != 0)))
+  //  return 0;
 
   std::wstring str0;
   str0 = converter.from_bytes(str);
