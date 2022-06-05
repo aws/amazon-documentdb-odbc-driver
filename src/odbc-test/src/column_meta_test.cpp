@@ -107,13 +107,50 @@ BOOST_AUTO_TEST_CASE(TestGetAttribute) {
   BOOST_CHECK(found);
   BOOST_CHECK_EQUAL(resVal, SqlTypeName::VARCHAR);
 
+  // fields SQL_COLUMN_PRECISION and SQL_DESC_SCALE are not tested 
+  // for retrieving string values
+
   // test retrieving SQLLEN value
-  
+ 
+  // test SQL_DESC_FIXED_PREC_SCALE
+  found = columnMeta.GetAttribute(SQL_DESC_FIXED_PREC_SCALE, intVal);
+  BOOST_CHECK(found);
+  BOOST_CHECK_EQUAL(intVal, SQL_FALSE);
+
+  // test SQL_DESC_AUTO_UNIQUE_VALUE
+  found = columnMeta.GetAttribute(SQL_DESC_AUTO_UNIQUE_VALUE, intVal);
+  BOOST_CHECK(found);
+  BOOST_CHECK_EQUAL(intVal, SQL_FALSE);
+
+  // test SQL_DESC_CASE_SENSITIVE
+  found = columnMeta.GetAttribute(SQL_DESC_CASE_SENSITIVE, intVal);
+  BOOST_CHECK(found);
+  BOOST_CHECK_EQUAL(intVal, SQL_TRUE);
+
+  // test SQL_DESC_CONCISE_TYPE
+  found = columnMeta.GetAttribute(SQL_DESC_CONCISE_TYPE, intVal);
+  BOOST_CHECK(found);
+  BOOST_CHECK_EQUAL(intVal, SQL_VARCHAR);
+
   // test SQL_DESC_TYPE
   found = columnMeta.GetAttribute(SQL_DESC_TYPE, intVal);
   BOOST_CHECK(found);
   BOOST_CHECK_EQUAL(intVal, SQL_VARCHAR);
 
+  // test SQL_DESC_DISPLAY_SIZE
+  found = columnMeta.GetAttribute(SQL_DESC_DISPLAY_SIZE, intVal);
+  BOOST_CHECK(found);
+  BOOST_CHECK_EQUAL(intVal, SQL_NO_TOTAL);
+
+  // test SQL_DESC_LENGTH
+  found = columnMeta.GetAttribute(SQL_DESC_LENGTH, intVal);
+  BOOST_CHECK(found);
+  BOOST_CHECK_EQUAL(intVal, SQL_NO_TOTAL);
+
+  // test SQL_DESC_OCTET_LENGTH
+  found = columnMeta.GetAttribute(SQL_DESC_OCTET_LENGTH, intVal);
+  BOOST_CHECK(found);
+  BOOST_CHECK_EQUAL(intVal, SQL_NO_TOTAL);
 }
 
 
