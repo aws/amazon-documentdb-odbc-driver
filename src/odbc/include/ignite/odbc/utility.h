@@ -61,7 +61,7 @@ T* GetPointerWithOffset(T* ptr, size_t offset) {
  * @return Length of the resulting string in buffer.
  */
 size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen,
-                          bool inChars = false);
+                          bool lenInBytes = false);
 
 /**
  * Read array from reader.
@@ -112,7 +112,7 @@ void WriteDecimal(BinaryWriterImpl& writer,
  * @return Standard string containing the same data.
  */
 std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
-                              bool inChars = false);
+                              bool lenInBytes = false);
 
 /**
  * Convert SQL string buffer to boost::optional< std::string >.
@@ -124,7 +124,7 @@ std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
  */
 boost::optional< std::string > SqlStringToOptString(const SQLWCHAR* sqlStr,
                                                     int32_t sqlStrLen,
-                                                    bool inChars = false);
+                                                    bool lenInBytes = false);
 
 /**
  * Convert a wide string to UTF-8 encoded string.

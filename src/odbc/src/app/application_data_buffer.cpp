@@ -1048,7 +1048,7 @@ std::string ApplicationDataBuffer::GetString(size_t maxLen) const {
 
       res = utility::SqlStringToString(
           reinterpret_cast< const SQLWCHAR* >(GetData()),
-          static_cast< int32_t >(paramLen));
+          static_cast< int32_t >(paramLen), true);
 
       if (res.size() > maxLen)
         res.resize(maxLen);
@@ -1149,7 +1149,7 @@ Guid ApplicationDataBuffer::GetGuid() const {
 
       std::string str = utility::SqlStringToString(
           reinterpret_cast< const SQLWCHAR* >(GetData()),
-          static_cast< int32_t >(paramLen));
+          static_cast< int32_t >(paramLen), true);
 
       std::stringstream converter;
 
@@ -1364,7 +1364,7 @@ Date ApplicationDataBuffer::GetDate() const {
 
       std::string str = utility::SqlStringToString(
           reinterpret_cast< const SQLWCHAR* >(GetData()),
-          static_cast< int32_t >(paramLen));
+          static_cast< int32_t >(paramLen), true);
 
       sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &tmTime.tm_year, &tmTime.tm_mon,
              &tmTime.tm_mday, &tmTime.tm_hour, &tmTime.tm_min, &tmTime.tm_sec);
@@ -1440,7 +1440,7 @@ Timestamp ApplicationDataBuffer::GetTimestamp() const {
 
       std::string str = utility::SqlStringToString(
           reinterpret_cast< const SQLWCHAR* >(GetData()),
-          static_cast< int32_t >(paramLen));
+          static_cast< int32_t >(paramLen), true);
 
       sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &tmTime.tm_year, &tmTime.tm_mon,
              &tmTime.tm_mday, &tmTime.tm_hour, &tmTime.tm_min, &tmTime.tm_sec);
@@ -1500,7 +1500,7 @@ Time ApplicationDataBuffer::GetTime() const {
 
       std::string str = utility::SqlStringToString(
           reinterpret_cast< const SQLWCHAR* >(GetData()),
-          static_cast< int32_t >(paramLen));
+          static_cast< int32_t >(paramLen), true);
 
       sscanf(str.c_str(), "%d:%d:%d", &tmTime.tm_hour, &tmTime.tm_min,
              &tmTime.tm_sec);

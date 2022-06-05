@@ -38,7 +38,7 @@ OdbcClientError GetOdbcError(SQLSMALLINT handleType, SQLHANDLE handle) {
   SQLGetDiagRec(handleType, handle, 1, sqlstate, &nativeCode, message,
                 sizeof(message), &reallen);
 
-  return OdbcClientError(utility::SqlStringToString(sqlstate, SQL_NTS, true),
+  return OdbcClientError(utility::SqlStringToString(sqlstate, SQL_NTS),
                          utility::SqlStringToString(message, reallen, true));
 }
 
@@ -71,7 +71,7 @@ std::string GetOdbcErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle,
 
   if (!res.empty())
     // In bytes
-    res.append(": ").append(utility::SqlStringToString(message, reallen));
+    res.append(": ").append(utility::SqlStringToString(message, reallen, true));
   else
     res = "No results";
 

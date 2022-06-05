@@ -343,7 +343,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
 
   std::string connectStr =
       SqlStringToString(reinterpret_cast< const SQLWCHAR* >(inConnectionString),
-                        inConnectionStringLen, true);
+                        inConnectionStringLen);
   connection->Establish(connectStr, windowHandle);
 
   DiagnosticRecordStorage& diag = connection->GetDiagnosticRecords();
@@ -354,9 +354,9 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
     return diag.GetReturnCode();
   }
 
-  size_t reslen = CopyStringToBuffer(
-      connectStr, outConnectionString,
-      static_cast< size_t >(outConnectionStringBufferLen), true);
+  size_t reslen =
+      CopyStringToBuffer(connectStr, outConnectionString,
+                         static_cast< size_t >(outConnectionStringBufferLen));
 
   if (outConnectionStringLen)
     *outConnectionStringLen = static_cast< SQLSMALLINT >(reslen);
@@ -396,7 +396,7 @@ SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* serverName,
   odbc::config::Configuration config;
 
   std::string dsn = SqlStringToString(
-      reinterpret_cast< const SQLWCHAR* >(serverName), serverNameLen, true);
+      reinterpret_cast< const SQLWCHAR* >(serverName), serverNameLen);
 
   LOG_INFO_MSG("DSN: " << dsn);
 
@@ -447,7 +447,7 @@ SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLWCHAR* query, SQLINTEGER queryLen) {
   }
 
   std::string sql = SqlStringToString(
-      reinterpret_cast< const SQLWCHAR* >(query), queryLen, true);
+      reinterpret_cast< const SQLWCHAR* >(query), queryLen);
 
   LOG_INFO_MSG("SQL: " << sql);
 
@@ -495,7 +495,7 @@ SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* query, SQLINTEGER queryLen) {
   }
 
   std::string sql = SqlStringToString(
-      reinterpret_cast< const SQLWCHAR* >(query), queryLen, true);
+      reinterpret_cast< const SQLWCHAR* >(query), queryLen);
 
   LOG_INFO_MSG("SQL: " << sql);
 
@@ -650,13 +650,13 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
   }
 
   boost::optional< std::string > catalog = SqlStringToOptString(
-      reinterpret_cast< const SQLWCHAR* >(catalogName), catalogNameLen, true);
+      reinterpret_cast< const SQLWCHAR* >(catalogName), catalogNameLen);
   boost::optional< std::string > schema = SqlStringToOptString(
-      reinterpret_cast< const SQLWCHAR* >(schemaName), schemaNameLen, true);
+      reinterpret_cast< const SQLWCHAR* >(schemaName), schemaNameLen);
   std::string table = SqlStringToString(
-      reinterpret_cast< const SQLWCHAR* >(tableName), tableNameLen, true);
+      reinterpret_cast< const SQLWCHAR* >(tableName), tableNameLen);
   boost::optional< std::string > tableTypeStr = SqlStringToOptString(
-      reinterpret_cast< const SQLWCHAR* >(tableType), tableTypeLen, true);
+      reinterpret_cast< const SQLWCHAR* >(tableType), tableTypeLen);
 
   LOG_INFO_MSG("catalog: " << catalog);
   LOG_INFO_MSG("schema: " << schema);
@@ -691,13 +691,13 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
   }
 
   const boost::optional< std::string > catalog = SqlStringToOptString(
-      reinterpret_cast< const SQLWCHAR* >(catalogName), catalogNameLen, true);
+      reinterpret_cast< const SQLWCHAR* >(catalogName), catalogNameLen);
   const boost::optional< std::string > schema = SqlStringToOptString(
-      reinterpret_cast< const SQLWCHAR* >(schemaName), schemaNameLen, true);
+      reinterpret_cast< const SQLWCHAR* >(schemaName), schemaNameLen);
   std::string table = SqlStringToString(
-      reinterpret_cast< const SQLWCHAR* >(tableName), tableNameLen, true);
+      reinterpret_cast< const SQLWCHAR* >(tableName), tableNameLen);
   std::string column = SqlStringToString(
-      reinterpret_cast< const SQLWCHAR* >(columnName), columnNameLen, true);
+      reinterpret_cast< const SQLWCHAR* >(columnName), columnNameLen);
 
   LOG_INFO_MSG("catalog: " << catalog.get_value_or(""));
   LOG_INFO_MSG("schema: " << schema.get_value_or(""));
@@ -769,10 +769,10 @@ SQLRETURN SQLNativeSql(SQLHDBC conn, SQLWCHAR* inQuery, SQLINTEGER inQueryLen,
   LOG_DEBUG_MSG("SQLNativeSql called");
 
   std::string in = SqlStringToString(
-      reinterpret_cast< const SQLWCHAR* >(inQuery), inQueryLen, true);
+      reinterpret_cast< const SQLWCHAR* >(inQuery), inQueryLen);
 
   CopyStringToBuffer(in, outQueryBuffer,
-                     static_cast< size_t >(outQueryBufferLen), true);
+                     static_cast< size_t >(outQueryBufferLen));
 
   if (outQueryLen)
     *outQueryLen =
@@ -940,22 +940,22 @@ SQLRETURN SQLForeignKeys(
 
   std::string primaryCatalog =
       SqlStringToString(reinterpret_cast< const SQLWCHAR* >(primaryCatalogName),
-                        primaryCatalogNameLen, true);
+                        primaryCatalogNameLen);
   std::string primarySchema =
       SqlStringToString(reinterpret_cast< const SQLWCHAR* >(primarySchemaName),
-                        primarySchemaNameLen, true);
+                        primarySchemaNameLen);
   std::string primaryTable =
       SqlStringToString(reinterpret_cast< const SQLWCHAR* >(primaryTableName),
-                        primaryTableNameLen, true);
+                        primaryTableNameLen);
   const boost::optional< std::string > foreignCatalog = SqlStringToOptString(
       reinterpret_cast< const SQLWCHAR* >(foreignCatalogName),
-      foreignCatalogNameLen, true);
+      foreignCatalogNameLen);
   const boost::optional< std::string > foreignSchema = SqlStringToOptString(
       reinterpret_cast< const SQLWCHAR* >(foreignSchemaName),
-      foreignSchemaNameLen, true);
+      foreignSchemaNameLen);
   std::string foreignTable =
       SqlStringToString(reinterpret_cast< const SQLWCHAR* >(foreignTableName),
-                        foreignTableNameLen, true);
+                        foreignTableNameLen);
 
   LOG_INFO_MSG("primaryCatalog: " << primaryCatalog);
   LOG_INFO_MSG("primarySchema: " << primarySchema);
@@ -1201,7 +1201,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
   const DiagnosticRecord& record = records->GetStatusRecord(recNum);
 
   if (sqlState)
-    CopyStringToBuffer(record.GetSqlState(), sqlState, 6, true);
+    CopyStringToBuffer(record.GetSqlState(), sqlState, 6);
 
   if (nativeError)
     *nativeError = 0;
@@ -1217,7 +1217,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
 
     // In bytes
     *msgLen = CopyStringToBuffer(errMsg, msgBuffer,
-                                 static_cast< size_t >(msgBufferLen));
+                                 static_cast< size_t >(msgBufferLen), true);
 
     LOG_DEBUG_MSG("SQLGetDiagRec exiting with SQL_SUCCESS_WITH_INFO");
 
@@ -1226,8 +1226,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
 
   // In bytes
   size_t msgLen0 = CopyStringToBuffer(
-      errMsg, msgBuffer,
-      static_cast< size_t >(msgBufferLen));
+      errMsg, msgBuffer, static_cast< size_t >(msgBufferLen), true);
 
   if (msgLen)
     *msgLen = msgLen0;
@@ -1425,11 +1424,11 @@ SQLRETURN SQLSpecialColumns(SQLHSTMT stmt, SQLSMALLINT idType,
   }
 
   std::string catalog = SqlStringToString(
-      reinterpret_cast< const SQLWCHAR* >(catalogName), catalogNameLen, true);
+      reinterpret_cast< const SQLWCHAR* >(catalogName), catalogNameLen);
   std::string schema = SqlStringToString(
-      reinterpret_cast< const SQLWCHAR* >(schemaName), schemaNameLen, true);
+      reinterpret_cast< const SQLWCHAR* >(schemaName), schemaNameLen);
   std::string table = SqlStringToString(
-      reinterpret_cast< const SQLWCHAR* >(tableName), tableNameLen, true);
+      reinterpret_cast< const SQLWCHAR* >(tableName), tableNameLen);
 
   LOG_INFO_MSG("catalog: " << catalog);
   LOG_INFO_MSG("schema: " << schema);
@@ -1551,7 +1550,7 @@ SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* state,
   record.MarkRetrieved();
 
   if (state)
-    CopyStringToBuffer(record.GetSqlState(), state, 6, true);
+    CopyStringToBuffer(record.GetSqlState(), state, 6);
 
   if (error)
     *error = 0;

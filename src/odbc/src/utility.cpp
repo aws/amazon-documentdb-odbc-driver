@@ -30,20 +30,20 @@ namespace utility {
 using namespace odbc::impl::binary;
 using namespace odbc::common;
 
-size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf,
-                          size_t buflen, bool inChars) {
+size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen,
+                          bool lenInBytes) {
   static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
       converter;
   size_t char_size = sizeof(SQLWCHAR);
 
-  if (buflen < 0 || buflen % char_size != 0)
+  if (buflen < 0 || (lenInBytes && (buflen % char_size != 0)))
     return 0;
 
   std::wstring str0;
   str0 = converter.from_bytes(str);
-  size_t charsToCopy =
-      inChars ? std::min(str0.size(), (buflen - 1))
-              : std::min(str0.size(), ((buflen - char_size) / char_size));
+  size_t charsToCopy = lenInBytes
+                           ? std::min(str0.size(), ((buflen / char_size) - 1))
+                           : std::min(str0.size(), (buflen - 1));
 
   if (buf && charsToCopy > 0) {
     const wchar_t* data = str0.data();
@@ -57,13 +57,14 @@ size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf,
 
   size_t required;
   size_t copied;
-  if (inChars) {
-    required = str0.size();
-    copied = charsToCopy;
-  } else {
+  if (lenInBytes) {
     required = str0.size() * char_size;
     copied = charsToCopy * char_size;
+  } else {
+    required = str0.size();
+    copied = charsToCopy;
   }
+ 
   return (buflen > 0) ? copied : required;
 }
 
@@ -150,7 +151,7 @@ void WriteDecimal(BinaryWriterImpl& writer,
 }
 
 std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
-                              bool inChars) {
+                              bool lenInBytes) {
   std::string result;
   size_t char_size = sizeof(SQLWCHAR);
 
@@ -158,11 +159,11 @@ std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
 
   static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
       converter;
-  size_t charsToCopy = inChars ? sqlStrLen : (sqlStrLen / char_size);
   if (char_size == sizeof(wchar_t)) {
     if (sqlStrLen == SQL_NTS) {
       result = converter.to_bytes(reinterpret_cast< const wchar_t* >(sqlStr));
     } else if (sqlStrLen > 0) {
+      size_t charsToCopy = lenInBytes ? (sqlStrLen / char_size) : sqlStrLen;
       result = converter.to_bytes(
           reinterpret_cast< const wchar_t* >(sqlStr),
           reinterpret_cast< const wchar_t* >(sqlStr + charsToCopy));
@@ -174,6 +175,7 @@ std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
         sqlStr0.push_back(sqlStr[i]);
       }
     } else if (sqlStrLen > 0) {
+      size_t charsToCopy = lenInBytes ? (sqlStrLen / char_size) : sqlStrLen;
       sqlStr0.reserve(charsToCopy + 1);
       for (int i = 0; i < charsToCopy; i++) {
         sqlStr0.push_back(sqlStr[i]);
@@ -187,11 +189,11 @@ std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
 
 boost::optional< std::string > SqlStringToOptString(const SQLWCHAR* sqlStr,
                                                     int32_t sqlStrLen,
-                                                    bool inChars) {
+                                                    bool lenInBytes) {
   if (!sqlStr)
     return boost::none;
 
-  return SqlStringToString(sqlStr, sqlStrLen, inChars);
+  return SqlStringToString(sqlStr, sqlStrLen, lenInBytes);
 }
 
 std::string ToUtf8(const std::wstring& value) {

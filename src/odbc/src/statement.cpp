@@ -980,7 +980,7 @@ SqlResult::Type Statement::InternalGetColumnAttribute(
 
     if (found && strbuf) {
       // In bytes
-      outSize = utility::CopyStringToBuffer(out, strbuf, buflen);
+      outSize = utility::CopyStringToBuffer(out, strbuf, buflen, true);
     }
 
     if (found && reslen)
