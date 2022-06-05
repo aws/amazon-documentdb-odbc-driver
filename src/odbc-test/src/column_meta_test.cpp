@@ -18,12 +18,12 @@
 #include <windows.h>
 #endif
 
-#include <sql.h>
 #include <sqlext.h>
 
 #include <boost/test/unit_test.hpp>
 
 #include "ignite/odbc/meta/column_meta.h"
+#include "ignite/odbc/type_traits.h"
 #include "ignite/odbc/impl/binary/binary_common.h"
 
 #include "odbc_test_suite.h"
@@ -33,7 +33,12 @@ using ignite::odbc::meta::ColumnMeta;
 using ignite::odbc::meta::Nullability;
 
 BOOST_AUTO_TEST_CASE(TestGetAttribute) {
+  // Only SQL_DESC_* fields are tested in this test.
+  // This is because those are the fields that would be passed to 
+  // SQLColAttribute function. 
+
   using namespace ignite::odbc::impl::binary;
+  using namespace ignite::odbc::type_traits;
 
   std::string schema("database");
   std::string table("table");
@@ -45,19 +50,69 @@ BOOST_AUTO_TEST_CASE(TestGetAttribute) {
   std::string resVal;
   bool found;
 
+  // test retrieving std::string value
+
   // test SQL_DESC_LABEL
   found = columnMeta.GetAttribute(SQL_DESC_LABEL, resVal);
   BOOST_CHECK(found);
-
   BOOST_CHECK_EQUAL(resVal, column);
 
+  // test SQL_DESC_BASE_COLUMN_NAME
+  found = columnMeta.GetAttribute(SQL_DESC_BASE_COLUMN_NAME, resVal);
+  BOOST_CHECK(found);
+  BOOST_CHECK_EQUAL(resVal, column);
+
+  // test SQL_DESC_NAME
+  found = columnMeta.GetAttribute(SQL_DESC_NAME, resVal);
+  BOOST_CHECK(found);
+  BOOST_CHECK_EQUAL(resVal, column);
+
+  // test SQL_DESC_TABLE_NAME
+  found = columnMeta.GetAttribute(SQL_DESC_TABLE_NAME, resVal);
+  BOOST_CHECK(found);
+  BOOST_CHECK_EQUAL(resVal, table);
+
+  // test SQL_DESC_BASE_TABLE_NAME
+  found = columnMeta.GetAttribute(SQL_DESC_BASE_TABLE_NAME, resVal);
+  BOOST_CHECK(found);
+  BOOST_CHECK_EQUAL(resVal, table);
+
+  // test SQL_DESC_SCHEMA_NAME
+  found = columnMeta.GetAttribute(SQL_DESC_SCHEMA_NAME, resVal);
+  BOOST_CHECK(found);
+  BOOST_CHECK_EQUAL(resVal, schema);
+
+  // test SQL_DESC_CATALOG_NAME
+  found = columnMeta.GetAttribute(SQL_DESC_CATALOG_NAME, resVal);
+  BOOST_CHECK(found);
+  BOOST_CHECK_EQUAL(resVal, "");
+
+  // test SQL_DESC_LITERAL_PREFIX
+  found = columnMeta.GetAttribute(SQL_DESC_LITERAL_PREFIX, resVal);
+  BOOST_CHECK(found);
+  BOOST_CHECK_EQUAL(resVal, "'");
+
+  // test SQL_DESC_LITERAL_SUFFIX
+  found = columnMeta.GetAttribute(SQL_DESC_LITERAL_SUFFIX, resVal);
+  BOOST_CHECK(found);
+  BOOST_CHECK_EQUAL(resVal, "'");
+
+  // test SQL_DESC_TYPE_NAME
+  found = columnMeta.GetAttribute(SQL_DESC_TYPE_NAME, resVal);
+  BOOST_CHECK(found);
+  BOOST_CHECK_EQUAL(resVal, SqlTypeName::VARCHAR);
+
+  // test SQL_DESC_LOCAL_TYPE_NAME
+  found = columnMeta.GetAttribute(SQL_DESC_LOCAL_TYPE_NAME, resVal);
+  BOOST_CHECK(found);
+  BOOST_CHECK_EQUAL(resVal, SqlTypeName::VARCHAR);
+
+  // test retrieving SQLLEN value
+  
   // test SQL_DESC_TYPE
   found = columnMeta.GetAttribute(SQL_DESC_TYPE, intVal);
   BOOST_CHECK(found);
-
   BOOST_CHECK_EQUAL(intVal, SQL_VARCHAR);
-
-
 
 }
 
