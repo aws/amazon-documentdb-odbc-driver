@@ -181,7 +181,7 @@ std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
     } else if (sqlStrLen > 0) {
       size_t charsToCopy = lenInBytes ? (sqlStrLen / char_size) : sqlStrLen;
       sqlStr0.reserve(charsToCopy + 1);
-      for (int i = 0; i < charsToCopy; i++) {
+      for (int i = 0; i < charsToCopy && sqlStr[i] != 0; i++) {
         sqlStr0.push_back(sqlStr[i]);
       }
     }
