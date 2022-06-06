@@ -20,6 +20,7 @@
 
 #include <string>
 
+#include "ignite/odbc/ignite.h"
 #include "ignite/odbc/binary/binary.h"
 
 namespace ignite {

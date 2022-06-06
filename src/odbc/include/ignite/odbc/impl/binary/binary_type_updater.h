@@ -60,4 +60,4 @@ class IGNITE_IMPORT_EXPORT BinaryTypeUpdater {
 }  // namespace odbc
 }  // namespace ignite
 
-#endif  //_IGNITE_IMPL_BINARY_BINARY_TYPE_UPDATER
+#endif  //_IGNITE_ODBC_IMPL_BINARY_BINARY_TYPE_UPDATER

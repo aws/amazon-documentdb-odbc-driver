@@ -42,6 +42,7 @@ using namespace ignite_test;
 using namespace ignite::odbc::binary;
 using namespace ignite::odbc::impl::binary;
 using namespace ignite::odbc::impl::interop;
+using ignite::odbc::TestType;
 
 using namespace boost::unit_test;
 

@@ -26,6 +26,7 @@
 using namespace ignite::odbc;
 
 namespace ignite {
+namespace odbc {
 struct TestType {
   TestType()
       : allNulls(false),
@@ -91,11 +92,10 @@ struct TestType {
   std::vector< int8_t > i8ArrayField;
 };
 
-namespace odbc {
 namespace binary {
-IGNITE_BINARY_TYPE_START(ignite::TestType)
+IGNITE_BINARY_TYPE_START(ignite::odbc::TestType)
 
-typedef ignite::TestType TestType;
+typedef ignite::odbc::TestType TestType;
 
 IGNITE_BINARY_GET_TYPE_ID_AS_HASH(TestType)
 IGNITE_BINARY_GET_TYPE_NAME_AS_IS(TestType)

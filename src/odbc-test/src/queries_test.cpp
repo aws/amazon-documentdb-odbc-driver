@@ -30,7 +30,6 @@
 #include "complex_type.h"
 #include "ignite/odbc/binary/binary_object.h"
 #include "ignite/odbc/common/fixed_size_array.h"
-#include "ignite/odbc/guid.h"
 #include "ignite/odbc/impl/binary/binary_utils.h"
 #include "ignite/odbc/utility.h"
 #include "odbc_test_suite.h"

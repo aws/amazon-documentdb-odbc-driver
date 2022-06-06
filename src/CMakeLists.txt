@@ -58,14 +58,13 @@ if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 endif()
 
-option (WITH_CORE ON)
 option (WITH_ODBC OFF)
 option (WITH_ODBC_MSI OFF)
 option (WITH_THIN_CLIENT OFF)
 option (WITH_TESTS OFF)
 option (WARNINGS_AS_ERRORS OFF)
 
-if (${WITH_CORE} OR ${WITH_TESTS})
+if (${WITH_TESTS})
     find_package(Java 1.8 REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)
@@ -79,19 +78,8 @@ if (${WARNINGS_AS_ERRORS})
     endif()
 endif()
 
-add_subdirectory(common)
-add_subdirectory(binary)
-
-if (${WITH_CORE} OR ${WITH_TESTS})
-    add_subdirectory(core)
-endif()
-
 if (${WITH_TESTS})
     enable_testing()
-
-    if (EXISTS ${CMAKE_SOURCE_DIR}/core-test)
-        add_subdirectory(core-test)
-    endif()
 
     if (EXISTS ${CMAKE_SOURCE_DIR}/tests)
         add_subdirectory(tests)

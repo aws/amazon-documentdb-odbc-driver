@@ -490,6 +490,19 @@ class IGNITE_IMPORT_EXPORT JniContext {
 
   std::string JavaStringToCppString(const SharedPointer< GlobalJObject >& jstring);
 
+  int64_t TargetInLongOutLong(jobject obj, int type, int64_t memPtr,
+                              JniErrorInfo* errInfo = NULL);
+  int64_t TargetInStreamOutLong(jobject obj, int type, int64_t memPtr,
+                                JniErrorInfo* errInfo = NULL);
+  jobject TargetOutObject(jobject obj, int opType,
+                          JniErrorInfo* errInfo = NULL);
+  void TargetInStreamOutStream(jobject obj, int opType, int64_t inMemPtr,
+                               int64_t outMemPtr, JniErrorInfo* errInfo = NULL);
+  jobject TargetInStreamOutObject(jobject obj, int type, int64_t memPtr,
+                                  JniErrorInfo* errInfo = NULL);
+  void TargetOutStream(jobject obj, int opType, int64_t memPtr,
+                       JniErrorInfo* errInfo = NULL);
+
   JniErrorCode DriverManagerGetConnection(
       const char* connectionString, SharedPointer< GlobalJObject >& connection,
       JniErrorInfo& errInfo);
@@ -678,6 +691,11 @@ class IGNITE_IMPORT_EXPORT JniContext {
       boost::optional< std::string >& columnClassName,
       JniErrorInfo& errInfo);
 
+  jobject CacheOutOpQueryCursor(jobject obj, int type, int64_t memPtr,
+                                JniErrorInfo* errInfo = NULL);
+  jobject CacheOutOpContinuousQuery(jobject obj, int type, int64_t memPtr,
+                                    JniErrorInfo* errInfo = NULL);
+
   jobject Acquire(jobject obj);
 
  private:
@@ -700,6 +718,7 @@ class IGNITE_IMPORT_EXPORT JniContext {
                                 const jmethodID& method,
                                 boost::optional< std::string >& value,
                                 JniErrorInfo& errInfo);
+  jobject LocalToGlobal(JNIEnv* env, jobject obj);
 };
 
 JNIEXPORT jlong JNICALL JniCacheStoreCreate(JNIEnv* env, jclass cls,

@@ -61,7 +61,7 @@ inline std::string ToLower(const std::string& str) {
   return res;
 }
 
-        /**
+/**
  * Replaces illegal URI characters in string with %-encoded characters.
  *
  * @param str String to be transformed.
