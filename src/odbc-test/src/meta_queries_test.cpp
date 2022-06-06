@@ -770,13 +770,12 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
   Connect(dsnConnectionString);
 
   SQLCHAR table[] = "meta_queries_test_001";
-  SQLCHAR column[] = "%";
   SQLCHAR empty[] = "";
   SQLCHAR *schemaName = (SQLCHAR *)databaseName.c_str();
    
 
   SQLRETURN ret = SQLColumns(stmt, nullptr, 0, schemaName, SQL_NTS, table,
-                             SQL_NTS, column, SQL_NTS);
+                             SQL_NTS, nullptr, 0);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -991,6 +990,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsMany) {
   SQLCHAR empty[] = "";
   SQLCHAR table[] = "%";
 
+  // test with table passed as "%"
   SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
                             SQL_NTS, empty, SQL_NTS);
 
@@ -998,6 +998,23 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsMany) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   int count = 0;
+  do {
+    ret = SQLFetch(stmt);
+    count++;
+  } while (SQL_SUCCEEDED(ret));
+  BOOST_CHECK(count > 1);
+
+  BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+
+  // test with table passed as nullptr
+  ret =
+      SQLTables(stmt, empty, SQL_NTS, nullptr, 0, nullptr, 0,
+                            empty, SQL_NTS);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  count = 0;
   do {
     ret = SQLFetch(stmt);
     count++;
@@ -1093,6 +1110,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsMany) {
   SQLCHAR table[] = "meta_queries_test_002";
   SQLCHAR column[] = "%";
 
+  // test with column name "%"
   SQLRETURN ret =
       SQLColumns(stmt, nullptr, 0, nullptr, 0, table,
                              SQL_NTS, column, SQL_NTS);
@@ -1101,6 +1119,21 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsMany) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   int count = 0;
+  do {
+    ret = SQLFetch(stmt);
+    count++;
+  } while (SQL_SUCCEEDED(ret));
+  BOOST_CHECK(count > 1);
+
+  BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+
+  // test with column name passed as nullptr
+  ret = SQLColumns(stmt, nullptr, 0, nullptr, 0, table, SQL_NTS, nullptr, 0);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  count = 0;
   do {
     ret = SQLFetch(stmt);
     count++;
