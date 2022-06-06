@@ -168,6 +168,10 @@ std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
           reinterpret_cast< const wchar_t* >(sqlStr),
           reinterpret_cast< const wchar_t* >(sqlStr + charsToCopy));
     }
+    size_t first_null = result.find_first_of('\0');
+    if (first_null != std::string::npos) {
+      result.resize(first_null);
+    }
   } else if (char_size == 2) {
     std::wstring sqlStr0;
     if (sqlStrLen == SQL_NTS) {
