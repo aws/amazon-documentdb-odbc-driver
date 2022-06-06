@@ -247,29 +247,37 @@ ConversionResult::Type ApplicationDataBuffer::PutNumToNumBuffer(Tin value) {
 template < typename CharT, typename Tin >
 ConversionResult::Type ApplicationDataBuffer::PutValToStrBuffer(
     const Tin& value) {
-  typedef std::basic_stringstream< CharT > ConverterType;
-
-  ConverterType converter;
-
-  converter << value;
-
-  int32_t written = 0;
-
-  return PutStrToStrBuffer< CharT >(converter.str(), written);
+  if (sizeof(CharT) == sizeof(wchar_t) || sizeof(CharT) == sizeof(char)) {
+    typedef std::basic_stringstream< CharT > ConverterType;
+    ConverterType converter;
+    converter << value;
+    int32_t written = 0;
+    return PutStrToStrBuffer< CharT >(converter.str(), written);
+  } else {
+    typedef std::wstringstream ConverterType;
+    ConverterType converter;
+    converter << value;
+    int32_t written = 0;
+    return PutStrToStrBuffer< CharT >(converter.str(), written);
+  }
 }
 
 template < typename CharT >
 ConversionResult::Type ApplicationDataBuffer::PutValToStrBuffer(
     const int8_t& value) {
-  typedef std::basic_stringstream< CharT > ConverterType;
-
-  ConverterType converter;
-
-  converter << static_cast< int >(value);
-
-  int32_t written = 0;
-
-  return PutStrToStrBuffer< CharT >(converter.str(), written);
+  if (sizeof(CharT) == sizeof(wchar_t) || sizeof(CharT) == sizeof(char)) {
+    typedef std::basic_stringstream< CharT > ConverterType;
+    ConverterType converter;
+    converter << value;
+    int32_t written = 0;
+    return PutStrToStrBuffer< CharT >(converter.str(), written);
+  } else {
+    typedef std::wstringstream ConverterType;
+    ConverterType converter;
+    converter << value;
+    int32_t written = 0;
+    return PutStrToStrBuffer< CharT >(converter.str(), written);
+  }
 }
 
 template < typename OutCharT, typename InCharT >
