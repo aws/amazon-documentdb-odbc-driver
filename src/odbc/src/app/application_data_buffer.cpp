@@ -247,15 +247,13 @@ ConversionResult::Type ApplicationDataBuffer::PutNumToNumBuffer(Tin value) {
 template < typename CharT, typename Tin >
 ConversionResult::Type ApplicationDataBuffer::PutValToStrBuffer(
     const Tin& value) {
-  if (sizeof(CharT) == sizeof(wchar_t) || sizeof(CharT) == sizeof(char)) {
-    typedef std::basic_stringstream< CharT > ConverterType;
-    ConverterType converter;
+  if (sizeof(CharT) == sizeof(char)) {
+    std::stringstream converter;
     converter << value;
     int32_t written = 0;
     return PutStrToStrBuffer< CharT >(converter.str(), written);
   } else {
-    typedef std::wstringstream ConverterType;
-    ConverterType converter;
+    std::wstringstream converter;
     converter << value;
     int32_t written = 0;
     return PutStrToStrBuffer< CharT >(converter.str(), written);
@@ -265,15 +263,13 @@ ConversionResult::Type ApplicationDataBuffer::PutValToStrBuffer(
 template < typename CharT >
 ConversionResult::Type ApplicationDataBuffer::PutValToStrBuffer(
     const int8_t& value) {
-  if (sizeof(CharT) == sizeof(wchar_t) || sizeof(CharT) == sizeof(char)) {
-    typedef std::basic_stringstream< CharT > ConverterType;
-    ConverterType converter;
+  if (sizeof(CharT) == sizeof(char)) {
+    std::stringstream converter;
     converter << value;
     int32_t written = 0;
     return PutStrToStrBuffer< CharT >(converter.str(), written);
   } else {
-    typedef std::wstringstream ConverterType;
-    ConverterType converter;
+    std::wstringstream converter;
     converter << value;
     int32_t written = 0;
     return PutStrToStrBuffer< CharT >(converter.str(), written);
