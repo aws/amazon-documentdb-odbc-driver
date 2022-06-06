@@ -328,16 +328,6 @@ std::string FindJvmLibrary(const std::string& path) {
 #endif
 }
 
-bool LoadJvmLibrary(const std::string& path) {
-#ifdef __APPLE__
-  return RTLD_DEFAULT;
-#else
-  void* hnd = dlopen(path.c_str(), RTLD_LAZY);
-
-  return hnd != NULL;
-#endif
-}
-
 /**
  * Create Ignite classpath based on user input and home directory.
  *

@@ -16,7 +16,7 @@
 
 #include "ignite/odbc/read_preference.h"
 
-#include <ignite/common/utils.h>
+#include <ignite/odbc/common/utils.h>
 
 namespace ignite {
 namespace odbc {
