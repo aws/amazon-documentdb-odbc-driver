@@ -62,6 +62,36 @@ inline std::string ToLower(const std::string& str) {
 }
 
 /**
+ * Replaces whitespaces in string with underscores.
+ *
+ * @param str String to be transformed.
+ */
+inline void SpaceToUnderscore(std::string& str) {
+  std::replace(str.begin(), str.end(), ' ', '_');
+}
+
+/**
+ * Replaces illegal URI characters in string with %-encoded characters.
+ *
+ * @param str String to be transformed.
+ * @return str New string with replaced characters.
+ */
+inline std::string EncodeURIComponent(std::string unencoded) {
+  std::ostringstream oss;
+
+  for (char& c : unencoded) {
+    if (std::isalnum(c) || c == '-' || c == '_' || c == '~' || c == '.'
+        || c == '*' || c == '!' || c == '(' || c == ')') {
+      oss << c;
+    } else {
+      oss << "%" << std::uppercase << std::hex << (0xff & c);
+    }
+  }
+  return oss.str();
+}
+
+
+/**
  * Strips leading and trailing whitespaces from string.
  *
  * @param str String to be transformed.
