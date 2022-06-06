@@ -1196,6 +1196,10 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsOneFromLocalServer) {
   CheckSingleRowResultSetWithGetData(stmt, 4,
                                      L"meta_queries_test_002_with_array__id");
 
+  ret = SQLCloseCursor(stmt);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
   std::vector< SQLWCHAR > empty = {0};
 
   ret = SQLForeignKeys(stmt, NULL, 0,          /* Primary catalog */

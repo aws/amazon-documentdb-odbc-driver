@@ -1556,7 +1556,7 @@ SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* state,
     *error = 0;
 
   SqlLen outResLen;
-  ApplicationDataBuffer outBuffer(OdbcNativeType::AI_CHAR, msgBuf, msgBufLen,
+  ApplicationDataBuffer outBuffer(OdbcNativeType::AI_WCHAR, msgBuf, msgBufLen,
                                   &outResLen);
 
   outBuffer.PutString(record.GetMessageText());
