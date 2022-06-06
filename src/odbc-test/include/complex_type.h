@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include "ignite/ignite.h"
+#include "ignite/odbc/ignite.h"
 
 namespace ignite {
 struct TestObject {
@@ -65,6 +65,7 @@ struct ComplexType {
 }  // namespace ignite
 
 namespace ignite {
+namespace odbc {
 namespace binary {
 
 IGNITE_BINARY_TYPE_START(ignite::TestObject)
@@ -113,6 +114,7 @@ static void Read(BinaryReader& reader, ComplexType& dst) {
 
 IGNITE_BINARY_TYPE_END
 }  // namespace binary
+}  // namespace odbc
 }  // namespace ignite
 
 #endif  // _IGNITE_ODBC_TEST_COMPLEX_TYPE
