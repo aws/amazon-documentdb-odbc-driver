@@ -477,6 +477,7 @@ SQLRETURN SQLExecute(SQLHSTMT stmt) {
 }
 
 SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLCHAR* query, SQLINTEGER queryLen) {
+  auto start = std::chrono::high_resolution_clock::now();
   using odbc::Statement;
   using odbc::utility::SqlStringToString;
 
@@ -498,6 +499,12 @@ SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLCHAR* query, SQLINTEGER queryLen) {
   statement->ExecuteSqlQuery(sql);
 
   LOG_DEBUG_MSG("SQLExecDirect exiting");
+  
+  auto end = std::chrono::high_resolution_clock::now();
+  auto int_s = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+  std::stringstream message;
+  message  << "SQLExecDirect exiting elapsed time "<< int_s.count() << " seconds" << std::endl;
+  LOG_DEBUG_MSG(message.str());
 
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
@@ -505,6 +512,7 @@ SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLCHAR* query, SQLINTEGER queryLen) {
 SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT colNum, SQLSMALLINT targetType,
                      SQLPOINTER targetValue, SQLLEN bufferLength,
                      SQLLEN* strLengthOrIndicator) {
+  auto start = std::chrono::high_resolution_clock::now();
   using namespace odbc::type_traits;
 
   using odbc::Statement;
@@ -529,11 +537,18 @@ SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT colNum, SQLSMALLINT targetType,
                         strLengthOrIndicator);
 
   LOG_DEBUG_MSG("SQLBindCol exiting");
+  
+  auto end = std::chrono::high_resolution_clock::now();
+  auto int_s = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+  std::stringstream message;
+  message << "SQLBindCol exiting elapsed time "<< int_s.count() << " seconds" << std::endl;
+  LOG_DEBUG_MSG(message.str());
 
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
 SQLRETURN SQLFetch(SQLHSTMT stmt) {
+  auto start = std::chrono::high_resolution_clock::now();
   using odbc::Statement;
 
   LOG_DEBUG_MSG("SQLFetch called");
@@ -550,6 +565,11 @@ SQLRETURN SQLFetch(SQLHSTMT stmt) {
   statement->FetchRow();
 
   LOG_DEBUG_MSG("SQLFetch exiting");
+  auto end = std::chrono::high_resolution_clock::now();
+  auto int_s = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+  std::stringstream message;
+  message << "SQLFetch exiting elapsed time "<< int_s.count() << " seconds" << std::endl;
+  LOG_DEBUG_MSG(message.str());
 
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
