@@ -1552,14 +1552,12 @@ SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* state,
   if (state)
     CopyStringToBuffer(record.GetSqlState(), state, 6);
 
+  std::string errMsg = record.GetMessageText();
   if (error)
     *error = 0;
 
-  SqlLen outResLen;
-  ApplicationDataBuffer outBuffer(OdbcNativeType::AI_WCHAR, msgBuf, msgBufLen,
-                                  &outResLen);
-
-  outBuffer.PutString(record.GetMessageText());
+  size_t outResLen = CopyStringToBuffer(errMsg, msgBuf,
+                                        static_cast< size_t >(msgBufLen), true);
 
   if (msgResLen)
     *msgResLen = static_cast< SQLSMALLINT >(outResLen);
