@@ -28,27 +28,28 @@
 #include <vector>
 
 #include "complex_type.h"
-#include "ignite/binary/binary_object.h"
-#include "ignite/common/fixed_size_array.h"
-#include "ignite/ignite.h"
-#include "ignite/ignition.h"
-#include "ignite/impl/binary/binary_utils.h"
+#include "ignite/odbc/binary/binary_object.h"
+#include "ignite/odbc/common/fixed_size_array.h"
+#include "ignite/odbc/ignite.h"
+#include "ignite/odbc/impl/binary/binary_utils.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"
 #include "test_utils.h"
 
 using namespace ignite;
-using namespace ignite::cache;
-using namespace ignite::cache::query;
-using namespace ignite::common;
+using namespace ignite::odbc::cache;
+using namespace ignite::odbc::cache::query;
+using namespace ignite::odbc::common;
 using namespace ignite_test;
-using namespace ignite::binary;
-using namespace ignite::impl::binary;
-using namespace ignite::impl::interop;
+using namespace ignite::odbc::binary;
+using namespace ignite::odbc::impl::binary;
+using namespace ignite::odbc::impl::interop;
 
 using namespace boost::unit_test;
 
-using ignite::impl::binary::BinaryUtils;
+using ignite::odbc::impl::binary::BinaryUtils;
+using ignite::odbc::TestType;
+using ignite::odbc::Guid;
 
 /**
  * Test setup fixture.

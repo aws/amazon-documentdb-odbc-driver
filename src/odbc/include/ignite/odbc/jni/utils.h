@@ -137,14 +137,6 @@ class IGNITE_IMPORT_EXPORT JavaGlobalRef {
 IGNITE_IMPORT_EXPORT std::string FindJvmLibrary(const std::string& path);
 
 /**
- * Load JVM library into the process.
- *
- * @param path Optional path to the library.
- * @return Whether load was successful.
- */
-IGNITE_IMPORT_EXPORT bool LoadJvmLibrary(const std::string& path);
-
-/**
  * Helper function to create classpath based on Ignite home directory.
  *
  * @param home Home directory; expected to be valid.
