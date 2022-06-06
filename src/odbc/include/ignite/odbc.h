@@ -89,12 +89,15 @@ SQLRETURN SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT orientation,
 
 SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnNum);
 
+/** If NULL tableName is passed, it will automatically be converted to "%". */
 SQLRETURN SQLTables(SQLHSTMT stmt, SQLCHAR* catalogName,
                     SQLSMALLINT catalogNameLen, SQLCHAR* schemaName,
                     SQLSMALLINT schemaNameLen, SQLCHAR* tableName,
                     SQLSMALLINT tableNameLen, SQLCHAR* tableType,
                     SQLSMALLINT tableTypeLen);
 
+/** If NULL tableName is passed, it will automatically be converted to "%".
+* If NULL columnName is passed, it will automatically be converted to "%". */
 SQLRETURN SQLColumns(SQLHSTMT stmt, SQLCHAR* catalogName,
                      SQLSMALLINT catalogNameLen, SQLCHAR* schemaName,
                      SQLSMALLINT schemaNameLen, SQLCHAR* tableName,

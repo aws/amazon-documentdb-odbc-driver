@@ -631,7 +631,6 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLCHAR* catalogName,
                     SQLSMALLINT tableNameLen, SQLCHAR* tableType,
                     SQLSMALLINT tableTypeLen) {
   using odbc::Statement;
-  using odbc::utility::SqlStringToString;
   using odbc::utility::SqlStringToOptString;
 
   LOG_DEBUG_MSG("SQLTables called");
@@ -647,7 +646,8 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLCHAR* catalogName,
 
   boost::optional< std::string > catalog = SqlStringToOptString(catalogName, catalogNameLen);
   boost::optional< std::string > schema = SqlStringToOptString(schemaName, schemaNameLen);
-  std::string table = SqlStringToString(tableName, tableNameLen);
+  boost::optional< std::string > tableTmp = SqlStringToOptString(tableName, tableNameLen);
+  std::string table = tableTmp ? *tableTmp : std::string("%");
   boost::optional< std::string > tableTypeStr = SqlStringToOptString(tableType, tableTypeLen);
 
   LOG_INFO_MSG("catalog: " << catalog);
@@ -668,7 +668,6 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLCHAR* catalogName,
                      SQLSMALLINT tableNameLen, SQLCHAR* columnName,
                      SQLSMALLINT columnNameLen) {
   using odbc::Statement;
-  using odbc::utility::SqlStringToString;
   using odbc::utility::SqlStringToOptString;
 
   LOG_DEBUG_MSG("SQLColumns called");
@@ -682,12 +681,16 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLCHAR* catalogName,
     return SQL_INVALID_HANDLE;
   }
 
-  const boost::optional< std::string > catalog =
+  boost::optional< std::string > catalog =
       SqlStringToOptString(catalogName, catalogNameLen);
-  const boost::optional< std::string > schema =
+  boost::optional< std::string > schema =
       SqlStringToOptString(schemaName, schemaNameLen);
-  std::string table = SqlStringToString(tableName, tableNameLen);
-  std::string column = SqlStringToString(columnName, columnNameLen);
+  boost::optional< std::string > tableTmp =
+      SqlStringToOptString(tableName, tableNameLen);
+  std::string table = tableTmp ? *tableTmp : std::string("%");
+  boost::optional< std::string > columnTmp =
+      SqlStringToOptString(columnName, columnNameLen);
+  std::string column = columnTmp ? *columnTmp : std::string("%");
 
   LOG_INFO_MSG("catalog: " << catalog.get_value_or(""));
   LOG_INFO_MSG("schema: " << schema.get_value_or(""));
