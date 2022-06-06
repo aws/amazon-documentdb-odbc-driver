@@ -1557,7 +1557,7 @@ SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* state,
     *error = 0;
 
   size_t outResLen = CopyStringToBuffer(errMsg, msgBuf,
-                                        static_cast< size_t >(msgBufLen), true);
+                                        static_cast< size_t >(msgBufLen));
 
   if (msgResLen)
     *msgResLen = static_cast< SQLSMALLINT >(outResLen);
