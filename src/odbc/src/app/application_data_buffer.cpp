@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 
+#include <sqltypes.h>
 #include "ignite/odbc/common/bits.h"
 #include "ignite/odbc/log.h"
 #include "ignite/odbc/system/odbc_constants.h"
@@ -168,7 +169,7 @@ ConversionResult::Type ApplicationDataBuffer::PutNum(T value) {
     }
 
     case OdbcNativeType::AI_WCHAR: {
-      return PutValToStrBuffer< wchar_t >(value);
+      return PutValToStrBuffer< SQLWCHAR >(value);
     }
 
     case OdbcNativeType::AI_NUMERIC: {
@@ -481,7 +482,7 @@ ConversionResult::Type ApplicationDataBuffer::PutString(
     }
 
     case OdbcNativeType::AI_WCHAR: {
-      return PutStrToStrBuffer< wchar_t >(value, written);
+      return PutStrToStrBuffer< SQLWCHAR >(value, written);
     }
 
     default:
@@ -506,7 +507,7 @@ ConversionResult::Type ApplicationDataBuffer::PutGuid(const Guid& value) {
     }
 
     case OdbcNativeType::AI_WCHAR: {
-      return PutValToStrBuffer< wchar_t >(value);
+      return PutValToStrBuffer< SQLWCHAR >(value);
     }
 
     case OdbcNativeType::AI_GUID: {
@@ -569,7 +570,7 @@ ConversionResult::Type ApplicationDataBuffer::PutBinaryData(const void* data,
                   << static_cast< unsigned >(dataBytes[i]);
       }
 
-      return PutStrToStrBuffer< wchar_t >(converter.str(), written);
+      return PutStrToStrBuffer< SQLWCHAR >(converter.str(), written);
     }
 
     default:
