@@ -20,9 +20,10 @@
 
 #include <string>
 
-#include "ignite/ignite.h"
+#include "ignite/odbc/ignite.h"
 
 namespace ignite {
+namespace odbc {
 struct TestType {
   TestType()
       : allNulls(false),
@@ -88,9 +89,9 @@ struct TestType {
 };
 
 namespace binary {
-IGNITE_BINARY_TYPE_START(ignite::TestType)
+IGNITE_BINARY_TYPE_START(ignite::odbc::TestType)
 
-typedef ignite::TestType TestType;
+typedef ignite::odbc::TestType TestType;
 
 IGNITE_BINARY_GET_TYPE_ID_AS_HASH(TestType)
 IGNITE_BINARY_GET_TYPE_NAME_AS_IS(TestType)
@@ -158,6 +159,7 @@ static void Read(BinaryReader& reader, TestType& dst) {
 
 IGNITE_BINARY_TYPE_END
 }  // namespace binary
+}  // namespace odbc
 }  // namespace ignite
 
 #endif  // _IGNITE_ODBC_TEST_TEST_TYPE

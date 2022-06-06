@@ -20,13 +20,13 @@
 #include <sstream>
 #include <string>
 
-#include "ignite/common/utils.h"
+#include "ignite/odbc/common/utils.h"
 #include "ignite/odbc/config/config_tools.h"
 #include "ignite/odbc/config/connection_string_parser.h"
 #include "ignite/odbc/log.h"
 #include "ignite/odbc/utility.h"
 
-using ignite::common::EncodeURIComponent;
+using ignite::odbc::common::EncodeURIComponent;
 
 namespace ignite {
 namespace odbc {

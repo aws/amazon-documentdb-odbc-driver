@@ -18,7 +18,7 @@
 #ifndef _IGNITE_ODBC_SQL_SQL_TOKEN
 #define _IGNITE_ODBC_SQL_SQL_TOKEN
 
-#include <ignite/common/utils.h>
+#include <ignite/odbc/common/utils.h>
 #include <stdint.h>
 
 namespace ignite {
