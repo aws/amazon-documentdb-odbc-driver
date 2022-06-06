@@ -127,7 +127,7 @@ jobs:
         name: odbc-test-results
         path: |
           ./odbc_test_result.xml
-          ~/docdb_odbc_*.log
+          ./build/odbc/logs/docdb_odbc_*.log
 
     # - name: print-memory-leak-logs
     #   if: always()
