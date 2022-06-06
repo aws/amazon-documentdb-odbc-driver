@@ -193,7 +193,7 @@ std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
                     + std::to_string(sqlStr0.size()));
     }
     result = converter.to_bytes(sqlStr0);
-    LOG_ERROR_MSG("SQL string : '" + std::to_string(sqlStr0.size()) + "'");
+    LOG_ERROR_MSG("SQL string : '" + result + "'");
     //}
 
   return result;
