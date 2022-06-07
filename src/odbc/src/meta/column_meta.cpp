@@ -346,7 +346,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     case SQL_DESC_PRECISION:
     case SQL_COLUMN_PRECISION: {
       if (dataType
-          && (decimalDigits
+          && ((decimalDigits && *decimalDigits != -1)
               && ((*dataType == JDBC_TYPE_TIME) || (*dataType == JDBC_TYPE_DATE)
                   || (*dataType == JDBC_TYPE_TIMESTAMP)))) {
         // return decimal digits for all datetime types and all interval
@@ -366,7 +366,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     case SQL_COLUMN_SCALE: {
       // scale value of -1 means value not available.
       if (dataType
-          && (decimalDigits
+          && ((decimalDigits && *decimalDigits != -1)
               && ((*dataType == JDBC_TYPE_DECIMAL)
                   || (*dataType == JDBC_TYPE_NUMERIC)))) {
         // return decimal digits for all decimal and numeric types
@@ -388,7 +388,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     }
 
     case SQL_DESC_UNNAMED: {
-      value = columnName ? SQL_NAMED : SQL_UNNAMED;
+      value = (columnName && *columnName != "") ? SQL_NAMED : SQL_UNNAMED;
 
       break;
     }
