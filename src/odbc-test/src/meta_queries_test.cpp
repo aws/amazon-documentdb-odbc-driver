@@ -29,7 +29,6 @@
 
 #include "complex_type.h"
 #include "ignite/odbc/common/fixed_size_array.h"
-#include "ignite/ignition.h"
 #include "ignite/odbc/impl/binary/binary_utils.h"
 #include "ignite/odbc/type_traits.h"
 #include "odbc_test_suite.h"
@@ -37,13 +36,14 @@
 #include "test_utils.h"
 
 using namespace ignite;
-using namespace ignite::cache;
-using namespace ignite::cache::query;
+using namespace ignite::odbc::cache;
+using namespace ignite::odbc::cache::query;
 using namespace ignite::odbc::common;
 using namespace ignite_test;
 using namespace ignite::odbc::binary;
 using namespace ignite::odbc::impl::binary;
 using namespace ignite::odbc::impl::interop;
+using ignite::odbc::TestType;
 
 using namespace boost::unit_test;
 
@@ -511,9 +511,6 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
   ~MetaQueriesTestSuiteFixture() {
     // No-op.
   }
-
-  /** Node started during the test. */
-  Ignite grid = nullptr;
 
   /** Frist cache instance. */
   Cache< int64_t, TestType > cache1 = nullptr;

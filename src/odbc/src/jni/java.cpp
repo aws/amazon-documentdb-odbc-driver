@@ -2423,6 +2423,118 @@ JniErrorCode JniContext::JdbcColumnMetadataGetColumnClassName(
       errInfo);
 }
 
+/**
+ * Convert local reference to global.
+ */
+jobject JniContext::LocalToGlobal(JNIEnv* env, jobject localRef) {
+  if (localRef) {
+    jobject globalRef = env->NewGlobalRef(localRef);
+
+    env->DeleteLocalRef(localRef);  // Clear local ref irrespective of result.
+
+    if (!globalRef)
+      ExceptionCheck(env);
+
+    return globalRef;
+  } else
+    return NULL;
+}
+
+int64_t JniContext::TargetInLongOutLong(jobject obj, int opType, int64_t val,
+                                        JniErrorInfo* err) {
+  JNIEnv* env = Attach();
+
+  int64_t res = env->CallLongMethod(
+      obj, jvm->GetMembers().m_PlatformTarget_inLongOutLong, opType, val);
+
+  ExceptionCheck(env, err);
+
+  return res;
+}
+
+int64_t JniContext::TargetInStreamOutLong(jobject obj, int opType,
+                                          int64_t memPtr, JniErrorInfo* err) {
+  JNIEnv* env = Attach();
+
+  int64_t res = env->CallLongMethod(
+      obj, jvm->GetMembers().m_PlatformTarget_inStreamOutLong, opType, memPtr);
+
+  ExceptionCheck(env, err);
+
+  return res;
+}
+
+jobject JniContext::TargetOutObject(jobject obj, int opType,
+                                    JniErrorInfo* err) {
+  JNIEnv* env = Attach();
+
+  jobject res = env->CallObjectMethod(
+      obj, jvm->GetMembers().m_PlatformTarget_outObject, opType);
+
+  ExceptionCheck(env, err);
+
+  return LocalToGlobal(env, res);
+}
+
+void JniContext::TargetInStreamOutStream(jobject obj, int opType,
+                                         int64_t inMemPtr, int64_t outMemPtr,
+                                         JniErrorInfo* err) {
+  JNIEnv* env = Attach();
+
+  env->CallVoidMethod(obj, jvm->GetMembers().m_PlatformTarget_inStreamOutStream,
+                      opType, inMemPtr, outMemPtr);
+
+  ExceptionCheck(env, err);
+}
+
+jobject JniContext::TargetInStreamOutObject(jobject obj, int opType,
+                                            int64_t memPtr, JniErrorInfo* err) {
+  JNIEnv* env = Attach();
+
+  jobject res = env->CallObjectMethod(
+      obj, jvm->GetMembers().m_PlatformTarget_inStreamOutObject, opType,
+      memPtr);
+
+  ExceptionCheck(env, err);
+
+  return LocalToGlobal(env, res);
+}
+
+void JniContext::TargetOutStream(jobject obj, int opType, int64_t memPtr,
+                                 JniErrorInfo* err) {
+  JNIEnv* env = Attach();
+
+  env->CallVoidMethod(obj, jvm->GetMembers().m_PlatformTarget_outStream, opType,
+                      memPtr);
+
+  ExceptionCheck(env, err);
+}
+
+jobject JniContext::CacheOutOpQueryCursor(jobject obj, int type, int64_t memPtr,
+                                          JniErrorInfo* err) {
+  JNIEnv* env = Attach();
+
+  jobject res = env->CallObjectMethod(
+      obj, jvm->GetMembers().m_PlatformTarget_inStreamOutObject, type, memPtr);
+
+  ExceptionCheck(env, err);
+
+  return LocalToGlobal(env, res);
+}
+
+jobject JniContext::CacheOutOpContinuousQuery(jobject obj, int type,
+                                              int64_t memPtr,
+                                              JniErrorInfo* err) {
+  JNIEnv* env = Attach();
+
+  jobject res = env->CallObjectMethod(
+      obj, jvm->GetMembers().m_PlatformTarget_inStreamOutObject, type, memPtr);
+
+  ExceptionCheck(env, err);
+
+  return LocalToGlobal(env, res);
+}
+
 jobject JniContext::Acquire(jobject obj) {
   LOG_DEBUG_MSG("Acquire is called");
 

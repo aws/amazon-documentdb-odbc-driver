@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include <ignite/common/utils.h>
+#include <ignite/odbc/common/utils.h>
 #include <ignite/odbc/config/config_tools.h>
 #include <ignite/odbc/config/configuration.h>
 #include <ignite/odbc/config/connection_string_parser.h>
@@ -31,7 +31,7 @@
 
 using namespace ignite::odbc;
 using namespace ignite::odbc::config;
-using ignite::common::EncodeURIComponent;
+using ignite::odbc::common::EncodeURIComponent;
 
 namespace {
 const std::string testDriverName = "Test Driver";
@@ -284,8 +284,8 @@ void CheckConnectionConfig(const Configuration& cfg) {
       << "&tlsCaFile=" << EncodeURIComponent(testTlsCaFile);
   const std::string& expectedJdbcStr = jdbcConstructor.str();
 
-  BOOST_CHECK_EQUAL(ignite::common::ToLower(cfg.ToConnectString()),
-                    ignite::common::ToLower(expectedStr));
+  BOOST_CHECK_EQUAL(ignite::odbc::common::ToLower(cfg.ToConnectString()),
+                    ignite::odbc::common::ToLower(expectedStr));
   BOOST_CHECK_EQUAL(cfg.ToJdbcConnectionString(), expectedJdbcStr);
 }
 
