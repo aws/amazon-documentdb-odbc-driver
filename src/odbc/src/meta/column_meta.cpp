@@ -145,6 +145,14 @@ void ColumnMeta::ReadJdbcMetadata(JdbcColumnMetadata& jdbcMetadata,
   isAutoIncrement = jdbcMetadata.IsAutoIncrement() ? "YES" : "NO";
 }
 
+bool isCharType(int16_t dataType) {
+  using namespace ignite::odbc::impl::binary;
+  return ((dataType == JDBC_TYPE_VARCHAR) || (dataType == JDBC_TYPE_CHAR)
+          || (dataType == JDBC_TYPE_NCHAR) || (dataType == JDBC_TYPE_NVARCHAR)
+          || (dataType == JDBC_TYPE_LONGVARCHAR)
+          || (dataType == JDBC_TYPE_LONGNVARCHAR));
+}
+
 bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
   using namespace ignite::odbc::impl::binary;
 
@@ -183,11 +191,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
 
     case SQL_DESC_LITERAL_PREFIX: {
       if (dataType) {
-        if ((*dataType == JDBC_TYPE_VARCHAR) || (*dataType == JDBC_TYPE_CHAR)
-            || (*dataType == JDBC_TYPE_NCHAR)
-            || (*dataType == JDBC_TYPE_NVARCHAR)
-            || (*dataType == JDBC_TYPE_LONGVARCHAR)
-            || (*dataType == JDBC_TYPE_LONGNVARCHAR))
+        if (isCharType(*dataType))
           value = "'";
         else if ((*dataType == JDBC_TYPE_BINARY)
                  || (*dataType == JDBC_TYPE_VARBINARY)
@@ -200,11 +204,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
     }
 
     case SQL_DESC_LITERAL_SUFFIX: {
-      if (dataType && (*dataType == JDBC_TYPE_VARCHAR)
-          || (*dataType == JDBC_TYPE_CHAR) || (*dataType == JDBC_TYPE_NCHAR)
-          || (*dataType == JDBC_TYPE_NVARCHAR)
-          || (*dataType == JDBC_TYPE_LONGVARCHAR)
-          || (*dataType == JDBC_TYPE_LONGNVARCHAR))
+      if (dataType && isCharType(*dataType))
         value = "'";
       else
         value.clear();
@@ -276,11 +276,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
 
     case SQL_DESC_CASE_SENSITIVE: {
       if (dataType
-          && ((*dataType == JDBC_TYPE_VARCHAR) || (*dataType == JDBC_TYPE_CHAR)
-              || (*dataType == JDBC_TYPE_NCHAR)
-              || (*dataType == JDBC_TYPE_NVARCHAR)
-              || (*dataType == JDBC_TYPE_LONGVARCHAR)
-              || (*dataType == JDBC_TYPE_LONGNVARCHAR)))
+          && isCharType(*dataType))
         value = SQL_TRUE;
       else
         value = SQL_FALSE;
@@ -368,7 +364,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
 
     case SQL_DESC_SCALE:
     case SQL_COLUMN_SCALE: {
-      // scale value of -1 means value not availabe.
+      // scale value of -1 means value not available.
       if (dataType
           && (decimalDigits
               && ((*dataType == JDBC_TYPE_DECIMAL)
