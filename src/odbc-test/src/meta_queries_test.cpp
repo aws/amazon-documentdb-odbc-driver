@@ -648,6 +648,63 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnPresicion, *disabled()) {
   BOOST_CHECK_EQUAL(intVal, 60);
 }
 
+BOOST_AUTO_TEST_CASE(TestColAttributeDataTypesAndColumnNames) {
+  std::string dsnConnectionString;
+  std::string databaseName("odbc-test");
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+  Connect(dsnConnectionString);
+
+  std::pair< int16_t, std::string > tests[] = {
+      std::make_pair(SQL_VARCHAR, std::string("meta_queries_test_002__id")),
+      std::make_pair(SQL_DECIMAL, std::string("fieldDecimal128")),
+      std::make_pair(SQL_DOUBLE, std::string("fieldFloat")),
+      // our ODBC driver identifies float fields as double by default
+      std::make_pair(SQL_DOUBLE, std::string("fieldDouble")),
+      std::make_pair(SQL_VARCHAR, std::string("fieldString")),
+      std::make_pair(SQL_VARCHAR, std::string("fieldObjectId")),
+      std::make_pair(SQL_BIT, std::string("fieldBoolean")),
+      std::make_pair(SQL_TYPE_TIMESTAMP, std::string("fieldDate")),
+      std::make_pair(SQL_INTEGER, std::string("fieldInt")),
+      std::make_pair(SQL_DOUBLE, std::string("fieldLong")),
+      std::make_pair(SQL_VARCHAR, std::string("fieldMaxKey")),
+      std::make_pair(SQL_VARCHAR, std::string("fieldMinKey")),
+      std::make_pair(SQL_TYPE_NULL, std::string("fieldNull")),
+      std::make_pair(SQL_VARBINARY, std::string("fieldBinary"))};
+
+  int numTests = sizeof(tests) / sizeof(std::pair< int16_t, std::string >);
+
+  SQLCHAR req[] = "select * from meta_queries_test_002";
+  SQLLEN intVal;
+  SQLSMALLINT strLen;
+  SQLCHAR strBuf[1024];
+
+  SQLExecDirect(stmt, req, SQL_NTS);
+
+  for (int i = 1; i <= numTests; i++) {
+
+    // TODO remove below if statement when bug from JDBC (AD-765) is fixed.
+    // https://bitquill.atlassian.net/browse/AD-766
+    // the fieldNull pair is the 13th pair
+    if (i == 13)
+      continue;
+
+    SQLRETURN ret = SQLColAttribute(stmt, SQLSMALLINT(i), SQL_DESC_TYPE, nullptr,
+                                    0, nullptr, &intVal);
+    if (!SQL_SUCCEEDED(ret))
+      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+    BOOST_CHECK_EQUAL(intVal, tests[i - 1].first);
+
+    ret = SQLColAttribute(stmt, SQLSMALLINT(i), SQL_DESC_NAME, strBuf,
+                          sizeof(strBuf), &strLen, &intVal);
+    if (!SQL_SUCCEEDED(ret))
+      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+    BOOST_CHECK(SqlCharToString(strBuf) == tests[i - 1].second);
+  }
+}
+
 BOOST_AUTO_TEST_CASE(TestColAttributeDescAutoUniqueValue) {
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
