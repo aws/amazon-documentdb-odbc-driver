@@ -29,6 +29,7 @@
 #include "odbc_test_suite.h"
 
 using namespace ignite::odbc::impl::binary;
+using namespace ignite::odbc::type_traits;
 using ignite::odbc::OdbcTestSuite;
 using ignite::odbc::meta::ColumnMeta;
 using ignite::odbc::meta::Nullability;
@@ -37,8 +38,6 @@ BOOST_AUTO_TEST_CASE(TestGetAttribute) {
   // Only SQL_DESC_* fields are tested in this test.
   // This is because those are the fields that would be passed to
   // SQLColAttribute function.
-
-  using namespace ignite::odbc::type_traits;
 
   std::string schema("database");
   std::string table("table");
@@ -202,6 +201,7 @@ BOOST_AUTO_TEST_CASE(TestGetAttributeLiteralPrefix) {
   SQLLEN intVal;
   std::string resVal;
   bool found;
+
   std::pair< int16_t, std::string > tests[] = {
       std::make_pair(JDBC_TYPE_VARCHAR, std::string("'")),
       std::make_pair(JDBC_TYPE_CHAR, std::string("'")),
@@ -227,6 +227,45 @@ BOOST_AUTO_TEST_CASE(TestGetAttributeLiteralPrefix) {
 
     // test SQL_DESC_LITERAL_PREFIX
     found = columnMeta.GetAttribute(SQL_DESC_LITERAL_PREFIX, resVal);
+    BOOST_CHECK(found);
+    BOOST_CHECK_EQUAL(resVal, tests[i].second);
+
+  }
+}
+
+BOOST_AUTO_TEST_CASE(TestGetAttributeLiteralSuffix) {
+  std::string schema("database");
+  std::string table("table");
+  std::string column("column");
+
+  SQLLEN intVal;
+  std::string resVal;
+  bool found;
+
+  std::pair< int16_t, std::string > tests[] = {
+      std::make_pair(JDBC_TYPE_VARCHAR, std::string("'")),
+      std::make_pair(JDBC_TYPE_CHAR, std::string("'")),
+      std::make_pair(JDBC_TYPE_NCHAR, std::string("'")),
+      std::make_pair(JDBC_TYPE_NVARCHAR, std::string("'")),
+      std::make_pair(JDBC_TYPE_LONGVARCHAR, std::string("'")),
+      std::make_pair(JDBC_TYPE_LONGNVARCHAR, std::string("'")),
+      std::make_pair(JDBC_TYPE_BINARY, std::string("")),
+      std::make_pair(JDBC_TYPE_VARBINARY, std::string("")),
+      std::make_pair(JDBC_TYPE_LONGVARBINARY, std::string("")),
+      std::make_pair(JDBC_TYPE_BIGINT, std::string("")),
+      std::make_pair(JDBC_TYPE_BOOLEAN, std::string("")),
+      std::make_pair(JDBC_TYPE_FLOAT, std::string(""))};
+
+  int numTests = sizeof(tests) / sizeof(std::pair< int16_t, std::string >);
+
+
+  for (int i = 0; i < numTests; i++) {
+    ColumnMeta columnMeta(schema, table, column, tests[i].first,
+                          Nullability::NULLABLE);
+    // test retrieving std::string value
+
+    // test SQL_DESC_LITERAL_PREFIX
+    found = columnMeta.GetAttribute(SQL_DESC_LITERAL_SUFFIX, resVal);
     BOOST_CHECK(found);
     BOOST_CHECK_EQUAL(resVal, tests[i].second);
 
