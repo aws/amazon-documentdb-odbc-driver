@@ -331,12 +331,12 @@ struct OdbcTestSuite {
   void CheckSQLConnectionDiagnosticError(const std::string& expectSqlState);
 
   /**
-   * Convert string to vector of SQLCHARs.
+   * Convert string to vector of SQLWCHARs.
    *
    * @param qry Query.
    * @return Corresponding vector.
    */
-  static std::vector< SQLWCHAR > MakeQuery(const std::wstring& qry);
+  static std::vector< SQLWCHAR > MakeSqlBuffer(const std::string& qry);
 
   /**
    * Performs SQL query.
@@ -344,7 +344,7 @@ struct OdbcTestSuite {
    * @param qry Query.
    * @return Result.
    */
-  SQLRETURN ExecQuery(const std::wstring& qry);
+  SQLRETURN ExecQuery(const std::string& qry);
 
   /**
    * Prepares SQL query.
@@ -352,7 +352,7 @@ struct OdbcTestSuite {
    * @param qry Query.
    * @return Result.
    */
-  SQLRETURN PrepareQuery(const std::wstring& qry);
+  SQLRETURN PrepareQuery(const std::string& qry);
 
   /**
    * Creates the standard DSN connection string.

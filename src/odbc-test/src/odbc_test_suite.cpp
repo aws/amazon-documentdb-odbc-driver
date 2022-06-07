@@ -26,6 +26,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <ignite/odbc/utility.h>
 #include "odbc_test_suite.h"
 #include "test_utils.h"
 
@@ -360,27 +361,29 @@ void OdbcTestSuite::CheckSQLConnectionDiagnosticError(
   CheckSQLDiagnosticError(SQL_HANDLE_DBC, dbc, expectSqlState);
 }
 
-std::vector< SQLWCHAR > OdbcTestSuite::MakeQuery(const std::wstring& qry) {
-  return std::vector< SQLWCHAR >(qry.begin(), qry.end());
+std::vector< SQLWCHAR > OdbcTestSuite::MakeSqlBuffer(const std::string& qry) {
+  std::vector< SQLWCHAR > buffer(qry.size() + 1);
+  utility::CopyStringToBuffer(qry, buffer.data(), buffer.size());
+  return buffer;
 }
 
-SQLRETURN OdbcTestSuite::ExecQuery(const std::wstring& qry) {
-  std::vector< SQLWCHAR > sql = MakeQuery(qry);
+SQLRETURN OdbcTestSuite::ExecQuery(const std::string& qry) {
+  std::vector< SQLWCHAR > sql = MakeSqlBuffer(qry);
 
   return SQLExecDirect(stmt, sql.data(), static_cast< SQLINTEGER >(sql.size()));
 }
 
-SQLRETURN OdbcTestSuite::PrepareQuery(const std::wstring& qry) {
-  std::vector< SQLWCHAR > sql = MakeQuery(qry);
+SQLRETURN OdbcTestSuite::PrepareQuery(const std::string& qry) {
+  std::vector< SQLWCHAR > sql = MakeSqlBuffer(qry);
 
   return SQLPrepare(stmt, sql.data(), static_cast< SQLINTEGER >(sql.size()));
 }
 
 void OdbcTestSuite::InsertTestStrings(int recordsNum, bool merge) {
   std::vector< SQLWCHAR > insertReq =
-      NewSqlWchar(L"INSERT INTO TestType(_key, strField) VALUES(?, ?)");
+      MakeSqlBuffer("INSERT INTO TestType(_key, strField) VALUES(?, ?)");
   std::vector< SQLWCHAR > mergeReq =
-      NewSqlWchar(L"MERGE INTO TestType(_key, strField) VALUES(?, ?)");
+      MakeSqlBuffer("MERGE INTO TestType(_key, strField) VALUES(?, ?)");
 
   SQLRETURN ret =
       SQLPrepare(stmt, merge ? mergeReq.data() : insertReq.data(), SQL_NTS);
@@ -444,19 +447,19 @@ int OdbcTestSuite::InsertTestBatch(int from, int to, int expectedToAffect,
                                    bool merge) {
   using common::FixedSizeArray;
 
-  std::vector< SQLWCHAR > insertReq = NewSqlWchar(
-      L"INSERT "
-      L"INTO TestType(_key, i8Field, i16Field, i32Field, strField, floatField, "
-      L"doubleField, boolField, dateField, "
-      L"timeField, timestampField, i8ArrayField) VALUES(?, ?, ?, ?, ?, ?, ?, "
-      L"?, ?, ?, ?, ?)");
+  std::vector< SQLWCHAR > insertReq = MakeSqlBuffer(
+      "INSERT "
+      "INTO TestType(_key, i8Field, i16Field, i32Field, strField, floatField, "
+      "doubleField, boolField, dateField, "
+      "timeField, timestampField, i8ArrayField) VALUES(?, ?, ?, ?, ?, ?, ?, "
+      "?, ?, ?, ?, ?)");
 
-  std::vector< SQLWCHAR > mergeReq = NewSqlWchar(
-      L"MERGE "
-      L"INTO TestType(_key, i8Field, i16Field, i32Field, strField, floatField, "
-      L"doubleField, boolField, dateField, "
-      L"timeField, timestampField, i8ArrayField) VALUES(?, ?, ?, ?, ?, ?, ?, "
-      L"?, ?, ?, ?, ?)");
+  std::vector< SQLWCHAR > mergeReq = MakeSqlBuffer(
+      "MERGE "
+      "INTO TestType(_key, i8Field, i16Field, i32Field, strField, floatField, "
+      "doubleField, boolField, dateField, "
+      "timeField, timestampField, i8ArrayField) VALUES(?, ?, ?, ?, ?, ?, ?, "
+      "?, ?, ?, ?, ?)");
 
   SQLRETURN ret;
 
@@ -683,7 +686,7 @@ void OdbcTestSuite::InsertBatchSelect(int recordsNum) {
 
   // Just selecting everything to make sure everything is OK
   std::vector< SQLWCHAR > selectReq =
-      NewSqlWchar(L"SELECT _key, strField FROM TestType ORDER BY _key");
+      MakeSqlBuffer("SELECT _key, strField FROM TestType ORDER BY _key");
 
   ret = SQLExecDirect(stmt, selectReq.data(), SQL_NTS);
 
@@ -766,7 +769,7 @@ void OdbcTestSuite::InsertNonFullBatchSelect(int recordsNum, int splitAt) {
 
   // Just selecting everything to make sure everything is OK
   std::vector< SQLWCHAR > selectReq =
-      NewSqlWchar(L"SELECT _key, strField FROM TestType ORDER BY _key");
+      MakeSqlBuffer("SELECT _key, strField FROM TestType ORDER BY _key");
 
   ret = SQLExecDirect(stmt, selectReq.data(), SQL_NTS);
 

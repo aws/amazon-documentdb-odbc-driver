@@ -45,7 +45,7 @@ struct ConnectionTestSuiteFixture : OdbcTestSuite {
    */
   std::string ExecQueryAndReturnError() {
     std::vector< SQLWCHAR > selectReq =
-        ignite_test::NewSqlWchar(L"select count(*) from TestType");
+        MakeSqlBuffer("select count(*) from TestType");
 
     SQLRETURN ret = SQLExecDirect(stmt, selectReq.data(), SQL_NTS);
 

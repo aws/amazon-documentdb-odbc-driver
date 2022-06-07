@@ -76,7 +76,7 @@ struct ApiRobustnessTestSuiteFixture : public odbc::OdbcTestSuite {
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
     std::vector< SQLWCHAR > request =
-        NewSqlWchar(L"SELECT i32Field FROM TestType ORDER BY _key");
+        MakeSqlBuffer("SELECT i32Field FROM TestType ORDER BY _key");
 
     ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
     if (!SQL_SUCCEEDED(ret))
@@ -173,8 +173,8 @@ BOOST_AUTO_TEST_CASE(TestSQLDriverConnect, *disabled()) {
 
   Prepare();
 
-  std::vector< SQLWCHAR > connectStr = NewSqlWchar(
-      L"DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  std::vector< SQLWCHAR > connectStr = MakeSqlBuffer(
+      "DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
   SQLWCHAR outStr[ODBC_BUFFER_SIZE];
   SQLSMALLINT outStrLen;
@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE(TestSQLPrepare, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
+  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
 
   // Everything is ok.
   SQLRETURN ret = SQLPrepare(stmt, sql.data(), SQL_NTS);
@@ -281,7 +281,7 @@ BOOST_AUTO_TEST_CASE(TestSQLExecDirect, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
+  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
 
   // Everything is ok.
   SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
@@ -318,7 +318,7 @@ BOOST_AUTO_TEST_CASE(TestSQLExtendedFetch, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
+  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
 
   SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
@@ -349,7 +349,7 @@ BOOST_AUTO_TEST_CASE(TestSQLNumResultCols) {
   Connect(dsnConnectionString);
 
   std::vector< SQLWCHAR > sql =
-      NewSqlWchar(L"SELECT * FROM \"api_robustness_test_001\"");
+      MakeSqlBuffer("SELECT * FROM \"api_robustness_test_001\"");
 
   SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
@@ -373,7 +373,7 @@ BOOST_AUTO_TEST_CASE(TestSQLForeignKeys) {
 
   Connect(dsnConnectionString);
 
-  std::vector< SQLWCHAR > fkTableName = NewSqlWchar(L"jni_test_001_sub_doc");
+  std::vector< SQLWCHAR > fkTableName = MakeSqlBuffer("jni_test_001_sub_doc");
 
   SQLRETURN ret =
       SQLForeignKeys(stmt, NULL, 0,                /* Primary catalog */
@@ -451,8 +451,8 @@ BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeys) {
   Connect(dsnConnectionString);
 
   std::vector< SQLWCHAR > catalogName{0};
-  std::vector< SQLWCHAR > schemaName = NewSqlWchar(L"odbc-test");
-  std::vector< SQLWCHAR > tableName = NewSqlWchar(L"jni_test_001");
+  std::vector< SQLWCHAR > schemaName = MakeSqlBuffer("odbc-test");
+  std::vector< SQLWCHAR > tableName = MakeSqlBuffer("jni_test_001");
 
   // Everything is ok.
   SQLRETURN ret =
@@ -578,7 +578,7 @@ BOOST_AUTO_TEST_CASE(TestSQLNativeSql, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
+  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
   SQLWCHAR buffer[ODBC_BUFFER_SIZE];
   SQLINTEGER resLen = 0;
 
@@ -613,7 +613,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColAttribute, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
+  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
 
   SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
@@ -660,7 +660,7 @@ BOOST_AUTO_TEST_CASE(TestSQLDescribeCol, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
+  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
 
   SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
@@ -702,7 +702,7 @@ BOOST_AUTO_TEST_CASE(TestSQLRowCount, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
+  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
 
   SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
@@ -725,8 +725,8 @@ BOOST_AUTO_TEST_CASE(TestSQLForeignKeysSegFault, *disabled()) {
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
   std::vector< SQLWCHAR > catalogName{0};
-  std::vector< SQLWCHAR > schemaName = NewSqlWchar(L"cache");
-  std::vector< SQLWCHAR > tableName = NewSqlWchar(L"TestType");
+  std::vector< SQLWCHAR > schemaName = MakeSqlBuffer("cache");
+  std::vector< SQLWCHAR > tableName = MakeSqlBuffer("TestType");
 
   // Everything is ok.
   SQLRETURN ret = SQLForeignKeys(
@@ -864,7 +864,7 @@ BOOST_AUTO_TEST_CASE(TestSQLNumParams, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
+  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
 
   // Everything is ok.
   SQLRETURN ret = SQLPrepare(stmt, sql.data(), SQL_NTS);
@@ -887,7 +887,7 @@ BOOST_AUTO_TEST_CASE(TestSQLNumParamsEscaped, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT {fn NOW()}");
+  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT {fn NOW()}");
 
   // Everything is ok.
   SQLRETURN ret = SQLPrepare(stmt, sql.data(), SQL_NTS);
@@ -987,7 +987,7 @@ BOOST_AUTO_TEST_CASE(TestSQLGetData, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  std::vector< SQLWCHAR > sql = NewSqlWchar(L"SELECT strField FROM TestType");
+  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
 
   SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
@@ -1052,8 +1052,8 @@ BOOST_AUTO_TEST_CASE(TestSQLSpecialColumns, *disabled()) {
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
   std::vector< SQLWCHAR > catalogName{0};
-  std::vector< SQLWCHAR > schemaName = NewSqlWchar(L"cache");
-  std::vector< SQLWCHAR > tableName = NewSqlWchar(L"TestType");
+  std::vector< SQLWCHAR > schemaName = MakeSqlBuffer("cache");
+  std::vector< SQLWCHAR > tableName = MakeSqlBuffer("TestType");
 
   // Everything is ok.
   SQLRETURN ret = SQLSpecialColumns(
