@@ -176,54 +176,53 @@ int DsnConfigurationWindow::CreateConnectionSettingsGroup(int posX, int posY,
 
   int rowPos = posY + 2 * INTERVAL;
 
-  std::wstring val = utility::FromUtf8(config.GetDsn());
+  std::wstring wVal = utility::FromUtf8(config.GetDsn());
   nameLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                           L"Data Source Name*:", ChildId::NAME_LABEL);
-  nameEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+  nameEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                         ChildId::NAME_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  val = utility::FromUtf8(config.GetHostname());
+  wVal = utility::FromUtf8(config.GetHostname());
   hostnameLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                               L"Hostname*:", ChildId::HOST_NAME_LABEL);
   hostnameEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                            val,
+                            wVal,
                             ChildId::HOST_NAME_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  std::wstring tmp = std::to_wstring(config.GetPort());
-  val = tmp;
+  wVal = std::to_wstring(config.GetPort());
   portLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"Port*:",
                           ChildId::PORT_LABEL);
-  portEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+  portEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                         ChildId::PORT_EDIT, ES_NUMBER);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  val = utility::FromUtf8(config.GetDatabase());
+  wVal = utility::FromUtf8(config.GetDatabase());
   databaseLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                               L"Database*:", ChildId::DATABASE_LABEL);
   databaseEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                            val,
+                            wVal,
                             ChildId::DATABASE_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  val = utility::FromUtf8(config.GetUser());
+  wVal = utility::FromUtf8(config.GetUser());
   userLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                           L"User* :", ChildId::USER_LABEL);
-  userEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+  userEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                         ChildId::USER_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  val = utility::FromUtf8(config.GetPassword());
+  wVal = utility::FromUtf8(config.GetPassword());
   passwordLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                               L"Password*:", ChildId::PASSWORD_LABEL);
   passwordEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                            val,
+                            wVal,
                             ChildId::USER_EDIT, ES_PASSWORD);
 
   rowPos += INTERVAL + ROW_HEIGHT;
@@ -254,32 +253,32 @@ int DsnConfigurationWindow::CreateSshSettingsGroup(int posX, int posY,
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  std::wstring val = utility::FromUtf8(config.GetSshUser());
+  std::wstring wVal = utility::FromUtf8(config.GetSshUser());
   sshUserLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                              L"SSH User:", ChildId::SSH_USER_LABEL);
-  sshUserEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+  sshUserEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                            ChildId::SSH_USER_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  val = utility::FromUtf8(config.GetSshHost());
+  wVal = utility::FromUtf8(config.GetSshHost());
   sshHostLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                              L"SSH Hostname:", ChildId::SSH_HOST_LABEL);
-  sshHostEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+  sshHostEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                            ChildId::SSH_HOST_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  val = utility::FromUtf8(config.GetSshPrivateKeyFile());
+  wVal = utility::FromUtf8(config.GetSshPrivateKeyFile());
   sshPrivateKeyFileLabel =
       CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"SSH Private Key File:",
                                        ChildId::SSH_PRIVATE_KEY_FILE_LABEL);
   sshPrivateKeyFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                                     val, ChildId::SSH_PRIVATE_KEY_FILE_EDIT);
+                                     wVal, ChildId::SSH_PRIVATE_KEY_FILE_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  val = utility::FromUtf8(config.GetSshPrivateKeyPassphrase());
+  wVal = utility::FromUtf8(config.GetSshPrivateKeyPassphrase());
   // ssh private key passphrase label requires double the row height due to the
   // long label.
   sshPrivateKeyPassphraseLabel =
@@ -287,7 +286,7 @@ int DsnConfigurationWindow::CreateSshSettingsGroup(int posX, int posY,
                   L"SSH Private Key File Passphrase:",
                   ChildId::SSH_PRIVATE_KEY_PASSPHRASE_LABEL);
   sshPrivateKeyPassphraseEdit =
-      CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+      CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                  ChildId::SSH_PRIVATE_KEY_PASSPHRASE_EDIT, ES_PASSWORD);
 
   rowPos += INTERVAL + ROW_HEIGHT;
@@ -302,12 +301,12 @@ int DsnConfigurationWindow::CreateSshSettingsGroup(int posX, int posY,
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  val = utility::FromUtf8(config.GetSshKnownHostsFile());
+  wVal = utility::FromUtf8(config.GetSshKnownHostsFile());
   sshKnownHostsFileLabel =
       CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"SSH Known Hosts File:",
                                        ChildId::SSH_KNOWN_HOSTS_FILE_LABEL);
   sshKnownHostsFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                                     val, ChildId::SSH_KNOWN_HOSTS_FILE_EDIT);
+                                     wVal, ChildId::SSH_KNOWN_HOSTS_FILE_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -355,7 +354,7 @@ int DsnConfigurationWindow::CreateLogSettingsGroup(int posX, int posY,
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  std::wstring val = utility::FromUtf8(config.GetLogPath());
+  std::wstring wVal = utility::FromUtf8(config.GetLogPath());
   logPathLabel = CreateLabel(
       labelPosX, rowPos, pathSizeX, ROW_HEIGHT * 2,
       L"Log Path:\n(the log file name format is docdb_odbc_YYYYMMDD.log)",
@@ -363,7 +362,7 @@ int DsnConfigurationWindow::CreateLogSettingsGroup(int posX, int posY,
 
   rowPos += INTERVAL * 2 + ROW_HEIGHT;
 
-  logPathEdit = CreateEdit(editPosX, rowPos, pathSizeX, ROW_HEIGHT, val,
+  logPathEdit = CreateEdit(editPosX, rowPos, pathSizeX, ROW_HEIGHT, wVal,
                            ChildId::LOG_PATH_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
@@ -372,9 +371,9 @@ int DsnConfigurationWindow::CreateLogSettingsGroup(int posX, int posY,
       CreateGroupBox(posX, posY, sizeX, rowPos - posY, L"Log Settings",
                      ChildId::LOG_SETTINGS_GROUP_BOX);
 
-  std::wstring logLevelStr;
-  logLevelComboBox->GetText(logLevelStr);
-  if (LogLevel::FromString(utility::ToUtf8(logLevelStr), LogLevel::Type::UNKNOWN)
+  std::wstring logLevelWStr;
+  logLevelComboBox->GetText(logLevelWStr);
+  if (LogLevel::FromString(utility::ToUtf8(logLevelWStr), LogLevel::Type::UNKNOWN)
       == LogLevel::Type::OFF) {
     logPathEdit->SetEnabled(false);
   } else {
@@ -411,10 +410,10 @@ int DsnConfigurationWindow::CreateTlsSettingsGroup(int posX, int posY,
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  std::wstring val = utility::FromUtf8(config.GetTlsCaFile());
+  std::wstring wVal = utility::FromUtf8(config.GetTlsCaFile());
   tlsCaFileLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                                L"TLS CA File:", ChildId::TLS_CA_FILE_LABEL);
-  tlsCaFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+  tlsCaFileEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                              ChildId::TLS_CA_FILE_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
@@ -459,19 +458,18 @@ int DsnConfigurationWindow::CreateSchemaSettingsGroup(int posX, int posY,
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  std::wstring tmp = std::to_wstring(config.GetScanLimit());
-  std::wstring val = tmp.c_str();
+  std::wstring wVal = std::to_wstring(config.GetScanLimit());
   scanLimitLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                                L"Scan Limit:", ChildId::SCAN_LIMIT_LABEL);
-  scanLimitEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+  scanLimitEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                              ChildId::SCAN_LIMIT_EDIT, ES_NUMBER);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  val = utility::FromUtf8(config.GetSchemaName());
+  wVal = utility::FromUtf8(config.GetSchemaName());
   schemaLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                             L"Schema Name:", ChildId::SCHEMA_LABEL);
-  schemaEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+  schemaEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                           ChildId::SCHEMA_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
@@ -487,9 +485,9 @@ int DsnConfigurationWindow::CreateSchemaSettingsGroup(int posX, int posY,
                                           L"Schema Generation Settings",
                                           ChildId::SCHEMA_SETTINGS_GROUP_BOX);
 
-  std::wstring scanMethodStr;
-  scanMethodComboBox->GetText(scanMethodStr);
-  if (ScanMethod::FromString(utility::ToUtf8(scanMethodStr), ScanMethod::Type::UNKNOWN)
+  std::wstring scanMethodWStr;
+  scanMethodComboBox->GetText(scanMethodWStr);
+  if (ScanMethod::FromString(utility::ToUtf8(scanMethodWStr), ScanMethod::Type::UNKNOWN)
       == ScanMethod::Type::ALL) {
     scanLimitEdit->SetEnabled(false);
   } else {
@@ -538,42 +536,39 @@ int DsnConfigurationWindow::CreateAdditionalSettingsGroup(int posX, int posY,
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  std::wstring val = utility::FromUtf8(config.GetApplicationName());
+  std::wstring wVal = utility::FromUtf8(config.GetApplicationName());
   appNameLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                              L"Application Name:", ChildId::APP_NAME_LABEL);
-  appNameEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+  appNameEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                            ChildId::APP_NAME_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  std::wstring tmp =
-      std::to_wstring(config.GetLoginTimeoutSeconds());
-  val = tmp;
+  wVal = std::to_wstring(config.GetLoginTimeoutSeconds());
   loginTimeoutSecLabel =
       CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                   L"Login Timeout (s):", ChildId::LOGIN_TIMEOUT_SEC_LABEL);
 
-  loginTimeoutSecEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+  loginTimeoutSecEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                                    ChildId::LOGIN_TIMEOUT_SEC_EDIT, ES_NUMBER);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  val = utility::FromUtf8(config.GetReplicaSet());
+  wVal = utility::FromUtf8(config.GetReplicaSet());
   replicaSetLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                                 L"Replica Set:", ChildId::REPLICA_SET_LABEL);
-  replicaSetEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+  replicaSetEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                               ChildId::REPLICA_SET_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  tmp = std::to_wstring(config.GetDefaultFetchSize());
-  val = tmp;
+  wVal = std::to_wstring(config.GetDefaultFetchSize());
   defaultFetchSizeLabel =
       CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                   L"Fetch Size:", ChildId::DEFAULT_FETCH_SIZE_LABEL);
 
   defaultFetchSizeEdit =
-      CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, val,
+      CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                  ChildId::DEFAULT_FETCH_SIZE_EDIT, ES_NUMBER);
 
   rowPos += INTERVAL + ROW_HEIGHT;
@@ -597,8 +592,8 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
 
             PostMessage(GetHandle(), WM_CLOSE, 0, 0);
           } catch (IgniteError& err) {
-            std::wstring errText = utility::FromUtf8(err.GetText());
-            MessageBox(NULL, errText.c_str(), L"Error!",
+            std::wstring errWText = utility::FromUtf8(err.GetText());
+            MessageBox(NULL, errWText.c_str(), L"Error!",
                        MB_ICONEXCLAMATION | MB_OK);
           }
 
@@ -670,9 +665,9 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
         }
 
         case ChildId::LOG_LEVEL_COMBO_BOX: {
-          std::wstring logLevelStr;
-          logLevelComboBox->GetText(logLevelStr);
-          if (LogLevel::FromString(utility::ToUtf8(logLevelStr), LogLevel::Type::UNKNOWN)
+          std::wstring logLevelWStr;
+          logLevelComboBox->GetText(logLevelWStr);
+          if (LogLevel::FromString(utility::ToUtf8(logLevelWStr), LogLevel::Type::UNKNOWN)
               == LogLevel::Type::OFF) {
             logPathEdit->SetEnabled(false);
           } else {
@@ -682,9 +677,9 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
         }
 
         case ChildId::SCAN_METHOD_COMBO_BOX: {
-          std::wstring scanMethodStr;
-          scanMethodComboBox->GetText(scanMethodStr);
-          if (ScanMethod::FromString(utility::ToUtf8(scanMethodStr), ScanMethod::Type::UNKNOWN)
+          std::wstring scanMethodWStr;
+          scanMethodComboBox->GetText(scanMethodWStr);
+          if (ScanMethod::FromString(utility::ToUtf8(scanMethodWStr), ScanMethod::Type::UNKNOWN)
               == ScanMethod::Type::ALL) {
             scanLimitEdit->SetEnabled(false);
           } else {
@@ -737,49 +732,49 @@ void DsnConfigurationWindow::RetrieveParameters(
 
 void DsnConfigurationWindow::RetrieveConnectionParameters(
     config::Configuration& cfg) const {
-  std::wstring dsnStr;
-  std::wstring hostnameStr;
-  std::wstring portStr;
-  std::wstring databaseStr;
-  std::wstring userStr;
-  std::wstring passwordStr;
+  std::wstring dsnWStr;
+  std::wstring hostnameWStr;
+  std::wstring portWStr;
+  std::wstring databaseWStr;
+  std::wstring userWStr;
+  std::wstring passwordWStr;
 
-  nameEdit->GetText(dsnStr);
-  std::string dsnStr0 = utility::ToUtf8(dsnStr);
-  common::StripSurroundingWhitespaces(dsnStr0);
+  nameEdit->GetText(dsnWStr);
+  std::string dsnStr = utility::ToUtf8(dsnWStr);
+  common::StripSurroundingWhitespaces(dsnStr);
   // Stripping of whitespaces off the schema skipped intentionally
 
-  hostnameEdit->GetText(hostnameStr);
-  portEdit->GetText(portStr);
-  databaseEdit->GetText(databaseStr);
-  userEdit->GetText(userStr);
-  passwordEdit->GetText(passwordStr);
+  hostnameEdit->GetText(hostnameWStr);
+  portEdit->GetText(portWStr);
+  databaseEdit->GetText(databaseWStr);
+  userEdit->GetText(userWStr);
+  passwordEdit->GetText(passwordWStr);
 
-  std::string hostnameStr0 = utility::ToUtf8(hostnameStr);
-  std::string portStr0 = utility::ToUtf8(portStr);
-  std::string databaseStr0 = utility::ToUtf8(databaseStr);
-  std::string userStr0 = utility::ToUtf8(userStr);
-  std::string passwordStr0 = utility::ToUtf8(passwordStr);
+  std::string hostnameStr = utility::ToUtf8(hostnameWStr);
+  std::string portStr = utility::ToUtf8(portWStr);
+  std::string databaseStr = utility::ToUtf8(databaseWStr);
+  std::string userStr = utility::ToUtf8(userWStr);
+  std::string passwordStr = utility::ToUtf8(passwordWStr);
 
-  int16_t port = common::LexicalCast< int16_t >(portStr0);
+  int16_t port = common::LexicalCast< int16_t >(portStr);
 
   if (port <= 0)
     port = config.GetPort();
 
   LOG_MSG("Retrieving arguments:");
-  LOG_MSG("DSN:      " << dsnStr0);
-  LOG_MSG("Hostname: " << hostnameStr0);
-  LOG_MSG("Port:     " << portStr0);
-  LOG_MSG("Database: " << databaseStr0);
+  LOG_MSG("DSN:      " << dsnStr);
+  LOG_MSG("Hostname: " << hostnameStr);
+  LOG_MSG("Port:     " << portStr);
+  LOG_MSG("Database: " << databaseStr);
 
   // username and password intentionally not logged for security reasons
 
-  cfg.SetDsn(dsnStr0);
+  cfg.SetDsn(dsnStr);
   cfg.SetPort(port);
-  cfg.SetHostname(hostnameStr0);
-  cfg.SetDatabase(databaseStr0);
-  cfg.SetUser(userStr0);
-  cfg.SetPassword(passwordStr0);
+  cfg.SetHostname(hostnameStr);
+  cfg.SetDatabase(databaseStr);
+  cfg.SetUser(userStr);
+  cfg.SetPassword(passwordStr);
 }
 
 void DsnConfigurationWindow::RetrieveSshParameters(
@@ -787,40 +782,40 @@ void DsnConfigurationWindow::RetrieveSshParameters(
   bool sshEnable = sshEnableCheckBox->IsChecked();
   bool sshStrictHostKeyChecking = sshStrictHostKeyCheckingCheckBox->IsChecked();
 
-  std::wstring sshUserStr;
-  std::wstring sshHostStr;
-  std::wstring sshPrivateKeyFileStr;
-  std::wstring sshPrivateKeyPassphraseStr;
-  std::wstring sshKnownHostsFileStr;
+  std::wstring sshUserWStr;
+  std::wstring sshHostWStr;
+  std::wstring sshPrivateKeyFileWStr;
+  std::wstring sshPrivateKeyPassphraseWStr;
+  std::wstring sshKnownHostsFileWStr;
 
-  sshUserEdit->GetText(sshUserStr);
-  sshHostEdit->GetText(sshHostStr);
-  sshPrivateKeyFileEdit->GetText(sshPrivateKeyFileStr);
-  sshPrivateKeyPassphraseEdit->GetText(sshPrivateKeyPassphraseStr);
-  sshKnownHostsFileEdit->GetText(sshKnownHostsFileStr);
+  sshUserEdit->GetText(sshUserWStr);
+  sshHostEdit->GetText(sshHostWStr);
+  sshPrivateKeyFileEdit->GetText(sshPrivateKeyFileWStr);
+  sshPrivateKeyPassphraseEdit->GetText(sshPrivateKeyPassphraseWStr);
+  sshKnownHostsFileEdit->GetText(sshKnownHostsFileWStr);
 
-  std::string sshUserStr0 = utility::ToUtf8(sshUserStr);
-  std::string sshHostStr0 = utility::ToUtf8(sshHostStr);
-  std::string sshPrivateKeyFileStr0 = utility::ToUtf8(sshPrivateKeyFileStr);
-  std::string sshPrivateKeyPassphraseStr0 = utility::ToUtf8(sshPrivateKeyPassphraseStr);
-  std::string sshKnownHostsFileStr0 = utility::ToUtf8(sshKnownHostsFileStr);
+  std::string sshUserStr = utility::ToUtf8(sshUserWStr);
+  std::string sshHostStr = utility::ToUtf8(sshHostWStr);
+  std::string sshPrivateKeyFileStr = utility::ToUtf8(sshPrivateKeyFileWStr);
+  std::string sshPrivateKeyPassphraseStr = utility::ToUtf8(sshPrivateKeyPassphraseWStr);
+  std::string sshKnownHostsFileStr = utility::ToUtf8(sshKnownHostsFileWStr);
 
   LOG_MSG("Retrieving arguments:");
   LOG_MSG("SSH enable:                    " << (sshEnable ? "true" : "false"));
-  LOG_MSG("SSH user:                      " << sshUserStr0);
-  LOG_MSG("SSH host:                      " << sshHostStr0);
-  LOG_MSG("SSH private key file:          " << sshPrivateKeyFileStr0);
+  LOG_MSG("SSH user:                      " << sshUserStr);
+  LOG_MSG("SSH host:                      " << sshHostStr);
+  LOG_MSG("SSH private key file:          " << sshPrivateKeyFileStr);
   LOG_MSG("SSH strict host key checking:  "
           << (sshStrictHostKeyChecking ? "true" : "false"));
-  LOG_MSG("SSH known hosts file:          " << sshKnownHostsFileStr0);
+  LOG_MSG("SSH known hosts file:          " << sshKnownHostsFileStr);
 
   cfg.SetSshEnable(sshEnable);
-  cfg.SetSshUser(sshUserStr0);
-  cfg.SetSshHost(sshHostStr0);
-  cfg.SetSshPrivateKeyFile(sshPrivateKeyFileStr0);
-  cfg.SetSshPrivateKeyPassphrase(sshPrivateKeyPassphraseStr0);
+  cfg.SetSshUser(sshUserStr);
+  cfg.SetSshHost(sshHostStr);
+  cfg.SetSshPrivateKeyFile(sshPrivateKeyFileStr);
+  cfg.SetSshPrivateKeyPassphrase(sshPrivateKeyPassphraseStr);
   cfg.SetSshStrictHostKeyChecking(sshStrictHostKeyChecking);
-  cfg.SetSshKnownHostsFile(sshKnownHostsFileStr0);
+  cfg.SetSshKnownHostsFile(sshKnownHostsFileStr);
 }
 
 // RetrieveLogParameters is a special case. We want to get the log level and
@@ -829,125 +824,125 @@ void DsnConfigurationWindow::RetrieveSshParameters(
 // set.
 void DsnConfigurationWindow::RetrieveLogParameters(
     config::Configuration& cfg) const {
-  std::wstring logLevelStr;
-  std::wstring logPathStr;
+  std::wstring logLevelWStr;
+  std::wstring logPathWStr;
 
-  logLevelComboBox->GetText(logLevelStr);
-  logPathEdit->GetText(logPathStr);
+  logLevelComboBox->GetText(logLevelWStr);
+  logPathEdit->GetText(logPathWStr);
 
-  std::string logLevelStr0 = utility::ToUtf8(logLevelStr);
-  std::string logPathStr0 = utility::ToUtf8(logPathStr);
+  std::string logLevelStr = utility::ToUtf8(logLevelWStr);
+  std::string logPathStr = utility::ToUtf8(logPathWStr);
 
   LogLevel::Type logLevel =
-      LogLevel::FromString(logLevelStr0, LogLevel::Type::UNKNOWN);
+      LogLevel::FromString(logLevelStr, LogLevel::Type::UNKNOWN);
 
   cfg.SetLogLevel(logLevel);
-  cfg.SetLogPath(logPathStr0);
+  cfg.SetLogPath(logPathStr);
 
-  LOG_MSG("Log level:    " << logLevelStr0);
-  LOG_MSG("Log path:     " << logPathStr0);
+  LOG_MSG("Log level:    " << logLevelStr);
+  LOG_MSG("Log path:     " << logPathStr);
 }
 
 void DsnConfigurationWindow::RetrieveTlsParameters(
     config::Configuration& cfg) const {
   bool tls = tlsCheckBox->IsChecked();
   bool tlsAllowInvalidHostnames = tlsAllowInvalidHostnamesCheckBox->IsChecked();
-  std::wstring tlsCaStr;
+  std::wstring tlsCaWStr;
 
-  tlsCaFileEdit->GetText(tlsCaStr);
+  tlsCaFileEdit->GetText(tlsCaWStr);
 
-  std::string tlsCaStr0 = utility::ToUtf8(tlsCaStr);
+  std::string tlsCaStr = utility::ToUtf8(tlsCaWStr);
 
   LOG_MSG(
       "TLS/SSL Encryption:                       " << (tls ? "true" : "false"));
   LOG_MSG("TLS Allow Invalid Hostnames:              "
           << (tlsAllowInvalidHostnames ? "true" : "false"));
-  LOG_MSG("TLS CA (Certificate Authority) File: " << tlsCaStr0);
+  LOG_MSG("TLS CA (Certificate Authority) File: " << tlsCaStr);
 
   cfg.SetTls(tls);
   cfg.SetTlsAllowInvalidHostnames(tlsAllowInvalidHostnames);
-  cfg.SetTlsCaFile(tlsCaStr0);
+  cfg.SetTlsCaFile(tlsCaStr);
 }
 
 void DsnConfigurationWindow::RetrieveSchemaParameters(
     config::Configuration& cfg) const {
-  std::wstring scanMethodStr;
-  std::wstring scanLimitStr;
-  std::wstring schemaStr;
+  std::wstring scanMethodWStr;
+  std::wstring scanLimitWStr;
+  std::wstring schemaWStr;
   bool refreshSchema = refreshSchemaCheckBox->IsChecked();
 
-  scanMethodComboBox->GetText(scanMethodStr);
-  scanLimitEdit->GetText(scanLimitStr);
-  schemaEdit->GetText(schemaStr);
+  scanMethodComboBox->GetText(scanMethodWStr);
+  scanLimitEdit->GetText(scanLimitWStr);
+  schemaEdit->GetText(schemaWStr);
 
-  std::string scanMethodStr0 = utility::ToUtf8(scanMethodStr);
-  std::string scanLimitStr0 = utility::ToUtf8(scanLimitStr);
-  std::string schemaStr0 = utility::ToUtf8(schemaStr);
+  std::string scanMethodStr = utility::ToUtf8(scanMethodWStr);
+  std::string scanLimitStr = utility::ToUtf8(scanLimitWStr);
+  std::string schemaStr = utility::ToUtf8(schemaWStr);
 
-  int32_t scanLimit = common::LexicalCast< int32_t >(scanLimitStr0);
+  int32_t scanLimit = common::LexicalCast< int32_t >(scanLimitStr);
 
   if (scanLimit <= 0)
     scanLimit = config.GetScanLimit();
 
-  LOG_MSG("Scan method:    " << scanMethodStr0);
+  LOG_MSG("Scan method:    " << scanMethodStr);
   LOG_MSG("Scan limit      " << scanLimit);
-  LOG_MSG("Schema:         " << schemaStr0);
+  LOG_MSG("Schema:         " << schemaStr);
   LOG_MSG("Refresh schema: " << (refreshSchema ? "true" : "false"));
 
   ScanMethod::Type scanMethod =
-      ScanMethod::FromString(scanMethodStr0, ScanMethod::Type::UNKNOWN);
+      ScanMethod::FromString(scanMethodStr, ScanMethod::Type::UNKNOWN);
 
   cfg.SetScanMethod(scanMethod);
-  cfg.SetSchemaName(schemaStr0);
+  cfg.SetSchemaName(schemaStr);
   cfg.SetScanLimit(scanLimit);
   cfg.SetRefreshSchema(refreshSchema);
 }
 
 void DsnConfigurationWindow::RetrieveAdditionalParameters(
     config::Configuration& cfg) const {
-  std::wstring readPreferenceStr;
-  std::wstring appNameStr;
-  std::wstring replicaSetStr;
-  std::wstring loginTimeoutSecStr;
-  std::wstring fetchSizeStr;
+  std::wstring readPreferenceWStr;
+  std::wstring appNameWStr;
+  std::wstring replicaSetWStr;
+  std::wstring loginTimeoutSecWStr;
+  std::wstring fetchSizeWStr;
 
-  readPreferenceComboBox->GetText(readPreferenceStr);
-  appNameEdit->GetText(appNameStr);
-  replicaSetEdit->GetText(replicaSetStr);
+  readPreferenceComboBox->GetText(readPreferenceWStr);
+  appNameEdit->GetText(appNameWStr);
+  replicaSetEdit->GetText(replicaSetWStr);
   bool retryReads = retryReadsCheckBox->IsChecked();
-  loginTimeoutSecEdit->GetText(loginTimeoutSecStr);
-  defaultFetchSizeEdit->GetText(fetchSizeStr);
+  loginTimeoutSecEdit->GetText(loginTimeoutSecWStr);
+  defaultFetchSizeEdit->GetText(fetchSizeWStr);
 
-  std::string readPreferenceStr0 = utility::ToUtf8(readPreferenceStr);
-  std::string appNameStr0 = utility::ToUtf8(appNameStr);
-  std::string replicaSetStr0 = utility::ToUtf8(replicaSetStr);
-  std::string loginTimeoutSecStr0 = utility::ToUtf8(loginTimeoutSecStr);
-  std::string fetchSizeStr0 = utility::ToUtf8(fetchSizeStr);
+  std::string readPreferenceStr = utility::ToUtf8(readPreferenceWStr);
+  std::string appNameStr = utility::ToUtf8(appNameWStr);
+  std::string replicaSetStr = utility::ToUtf8(replicaSetWStr);
+  std::string loginTimeoutSecStr = utility::ToUtf8(loginTimeoutSecWStr);
+  std::string fetchSizeStr = utility::ToUtf8(fetchSizeWStr);
 
-  int32_t loginTimeoutSec = common::LexicalCast< int32_t >(loginTimeoutSecStr0);
+  int32_t loginTimeoutSec = common::LexicalCast< int32_t >(loginTimeoutSecStr);
   if (loginTimeoutSec <= 0)
     loginTimeoutSec = config.GetLoginTimeoutSeconds();
 
-  int32_t fetchSize = common::LexicalCast< int32_t >(fetchSizeStr0);
+  int32_t fetchSize = common::LexicalCast< int32_t >(fetchSizeStr);
   if (fetchSize <= 0)
     fetchSize = config.GetDefaultFetchSize();
 
   LOG_MSG("Retrieving arguments:");
   LOG_MSG("Retry reads:              " << (retryReads ? "true" : "false"));
-  LOG_MSG("Read preference:          " << readPreferenceStr0);
-  LOG_MSG("App name:                 " << appNameStr0);
-  LOG_MSG("Login timeout (seconds):  " << loginTimeoutSecStr0);
-  LOG_MSG("Replica Set:              " << replicaSetStr0);
+  LOG_MSG("Read preference:          " << readPreferenceStr);
+  LOG_MSG("App name:                 " << appNameStr);
+  LOG_MSG("Login timeout (seconds):  " << loginTimeoutSecStr);
+  LOG_MSG("Replica Set:              " << replicaSetStr);
   LOG_MSG("Fetch size:               " << fetchSize);
 
   ReadPreference::Type readPreference = ReadPreference::FromString(
-      readPreferenceStr0, ReadPreference::Type::UNKNOWN);
+      readPreferenceStr, ReadPreference::Type::UNKNOWN);
 
   cfg.SetReadPreference(readPreference);
   cfg.SetRetryReads(retryReads);
-  cfg.SetApplicationName(appNameStr0);
+  cfg.SetApplicationName(appNameStr);
   cfg.SetLoginTimeoutSeconds(loginTimeoutSec);
-  cfg.SetReplicaSet(replicaSetStr0);
+  cfg.SetReplicaSet(replicaSetStr);
   cfg.SetDefaultFetchSize(fetchSize);
 }
 }  // namespace ui
