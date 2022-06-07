@@ -194,4 +194,42 @@ BOOST_AUTO_TEST_CASE(TestGetAttribute) {
   BOOST_CHECK_EQUAL(intVal, SQL_ATTR_READWRITE_UNKNOWN);
 }
 
+BOOST_AUTO_TEST_CASE(TestGetAttributeLiteralPrefix) {
+  std::string schema("database");
+  std::string table("table");
+  std::string column("column");
+
+  SQLLEN intVal;
+  std::string resVal;
+  bool found;
+  std::pair< int16_t, std::string > tests[] = {
+      std::make_pair(JDBC_TYPE_VARCHAR, std::string("'")),
+      std::make_pair(JDBC_TYPE_CHAR, std::string("'")),
+      std::make_pair(JDBC_TYPE_NCHAR, std::string("'")),
+      std::make_pair(JDBC_TYPE_NVARCHAR, std::string("'")),
+      std::make_pair(JDBC_TYPE_LONGVARCHAR, std::string("'")),
+      std::make_pair(JDBC_TYPE_LONGNVARCHAR, std::string("'")),
+      std::make_pair(JDBC_TYPE_BINARY, std::string("0x")),
+      std::make_pair(JDBC_TYPE_VARBINARY, std::string("0x")),
+      std::make_pair(JDBC_TYPE_LONGVARBINARY, std::string("0x")),
+      std::make_pair(JDBC_TYPE_BIGINT, std::string("")),
+      std::make_pair(JDBC_TYPE_BOOLEAN, std::string("")),
+      std::make_pair(JDBC_TYPE_FLOAT, std::string(""))};
+
+  int numTests =
+      sizeof(tests) / sizeof(std::pair< int16_t, std::string >);
+
+
+  for (int i = 0; i < numTests; i++) {
+    ColumnMeta columnMeta(schema, table, column, tests[i].first,
+                          Nullability::NULLABLE);
+    // test retrieving std::string value
+
+    // test SQL_DESC_LITERAL_PREFIX
+    found = columnMeta.GetAttribute(SQL_DESC_LITERAL_PREFIX, resVal);
+    BOOST_CHECK(found);
+    BOOST_CHECK_EQUAL(resVal, tests[i].second);
+
+  }
+}
 
