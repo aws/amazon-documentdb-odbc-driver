@@ -219,11 +219,22 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     BOOST_CHECK(SQL_SUCCEEDED(ret));
   }
 
+  /**
+   * Check attribute using SQLColAttribute.
+   * The value returned from SQLColAttribute should match the expected value.
+   *
+   * @param stmt Statement.
+   * @param query SQL Query.
+   * @param fieldId Field Identifier.
+   * @param expectedVal Expected string data.
+   */
   void callSQLColAttribute(SQLHSTMT stmt, SQLCHAR *query,
                            SQLSMALLINT fieldId,
                            const std::string &expectedVal) {
     SQLCHAR strBuf[1024];
+
     SQLExecDirect(stmt, query, SQL_NTS);
+
     SQLRETURN ret = SQLColAttribute(stmt, 1, fieldId, strBuf,
                                     sizeof(strBuf), nullptr, nullptr);
     if (!SQL_SUCCEEDED(ret))
@@ -232,6 +243,29 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     std::string buf = SqlCharToString(strBuf);
 
     BOOST_CHECK(expectedVal == buf);
+  }
+
+  /**
+   * Check attribute using SQLColAttribute.
+   * The value returned from SQLColAttribute should match the expected value.
+   *
+   * @param stmt Statement.
+   * @param query SQL Query.
+   * @param fieldId Field Identifier.
+   * @param expectedVal Expected int data.
+   */
+  void callSQLColAttribute(SQLHSTMT stmt, SQLCHAR *query, SQLSMALLINT fieldId,
+                           const int &expectedVal) {
+    SQLLEN intVal;
+
+    SQLExecDirect(stmt, query, SQL_NTS);
+
+    SQLRETURN ret = SQLColAttribute(stmt, 1, fieldId, nullptr, 0,
+                                    nullptr, &intVal);
+    if (!SQL_SUCCEEDED(ret))
+      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+    BOOST_CHECK_EQUAL(intVal, expectedVal);
   }
 
   /**
@@ -625,20 +659,9 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescAutoUniqueValue) {
   Connect(dsnConnectionString);
 
   SQLCHAR req[] = "select fieldDouble from meta_queries_test_001";
-  SQLExecDirect(stmt, req, SQL_NTS);
-
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_AUTO_UNIQUE_VALUE, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // only "NO" is returned for IS_AUTOINCREMENT field
-  BOOST_CHECK_EQUAL(intVal, SQL_FALSE);
+  callSQLColAttribute(stmt, req, SQL_DESC_AUTO_UNIQUE_VALUE, SQL_FALSE);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseColumnName) {
@@ -676,31 +699,13 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCaseSensitive) {
 
   // test that case sensitive returns true for string field.
   SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
-  SQLExecDirect(stmt, req1, SQL_NTS);
 
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_CASE_SENSITIVE, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_CHECK_EQUAL(intVal, SQL_TRUE);
+  callSQLColAttribute(stmt, req1, SQL_DESC_CASE_SENSITIVE, SQL_TRUE);
 
   // test that case sensitive returns false for int field.
   SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
-  SQLExecDirect(stmt, req2, SQL_NTS);
 
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_CASE_SENSITIVE, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_CHECK_EQUAL(intVal, SQL_FALSE);
+  callSQLColAttribute(stmt, req2, SQL_DESC_CASE_SENSITIVE, SQL_FALSE);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescCatalogName) {
@@ -725,55 +730,22 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescConciseType) {
   Connect(dsnConnectionString);
 
   SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
-  SQLExecDirect(stmt, req1, SQL_NTS);
 
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_CONCISE_TYPE, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_CHECK_EQUAL(intVal, SQL_VARCHAR);
+  callSQLColAttribute(stmt, req1, SQL_DESC_CONCISE_TYPE, SQL_VARCHAR);
 
   SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
-  SQLExecDirect(stmt, req2, SQL_NTS);
 
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_CONCISE_TYPE, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_CHECK_EQUAL(intVal, SQL_INTEGER);
+  callSQLColAttribute(stmt, req2, SQL_DESC_CONCISE_TYPE, SQL_INTEGER);
 
   SQLCHAR req3[] = "select fieldBinary from meta_queries_test_001";
-  SQLExecDirect(stmt, req3, SQL_NTS);
 
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_CONCISE_TYPE, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_CHECK_EQUAL(intVal, SQL_VARBINARY);
+  callSQLColAttribute(stmt, req3, SQL_DESC_CONCISE_TYPE, SQL_VARBINARY);
 
   // TODO re-enable this test when bug from JDBC (AD-765) is fixed.
   // https://bitquill.atlassian.net/browse/AD-766
   // SQLCHAR req4[] = "select fieldNull from meta_queries_test_001";
-  // SQLExecDirect(stmt, req4, SQL_NTS);
-
-  // ret = SQLColAttribute(stmt, 1, SQL_DESC_CONCISE_TYPE, strBuf,
-  // sizeof(strBuf),
-  //                       &strLen, &intVal);
-
-  // if (!SQL_SUCCEEDED(ret))
-  //   BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // BOOST_CHECK_EQUAL(intVal, SQL_TYPE_NULL);
+  // 
+  // callSQLColAttribute(stmt, req3, SQL_DESC_CONCISE_TYPE, SQL_TYPE_NULL);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescCount) {
@@ -784,19 +756,9 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCount) {
   Connect(dsnConnectionString);
 
   SQLCHAR req[] = "select fieldString from meta_queries_test_001";
-  SQLExecDirect(stmt, req, SQL_NTS);
-
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_COUNT, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_CHECK_EQUAL(intVal, 1);
+  
+  // count should be 1
+  callSQLColAttribute(stmt, req, SQL_DESC_COUNT, 1);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescDisplaySize) {
@@ -807,68 +769,30 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescDisplaySize) {
   Connect(dsnConnectionString);
 
   SQLCHAR req1[] = "select fieldBinary from meta_queries_test_001";
-  SQLExecDirect(stmt, req1, SQL_NTS);
-
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_DISPLAY_SIZE, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_VARBINARY should have display size SQL_NO_TOTAL
-  BOOST_CHECK_EQUAL(intVal, SQL_NO_TOTAL);
+  callSQLColAttribute(stmt, req1, SQL_DESC_DISPLAY_SIZE, SQL_NO_TOTAL);
 
   SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
-  SQLExecDirect(stmt, req2, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_DISPLAY_SIZE, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_INTEGER should have display size 11
-  BOOST_CHECK_EQUAL(intVal, 11);
+  callSQLColAttribute(stmt, req2, SQL_DESC_DISPLAY_SIZE, 11);
 
   SQLCHAR req3[] = "select fieldLong from meta_queries_test_001";
-  SQLExecDirect(stmt, req3, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_DISPLAY_SIZE, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_BIGINT should have display size 20
-  BOOST_CHECK_EQUAL(intVal, 20);
+  callSQLColAttribute(stmt, req3, SQL_DESC_DISPLAY_SIZE, 20);
+
 
   SQLCHAR req4[] = "select fieldDouble from meta_queries_test_001";
-  SQLExecDirect(stmt, req4, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_DISPLAY_SIZE, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_DOUBLE should have display size 24
-  BOOST_CHECK_EQUAL(intVal, 24);
+  callSQLColAttribute(stmt, req4, SQL_DESC_DISPLAY_SIZE, 24);
 
   SQLCHAR req5[] = "select fieldDate from meta_queries_test_001";
-  SQLExecDirect(stmt, req5, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_DISPLAY_SIZE, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_TYPE_TIMESTAMP should have display size 19
-  BOOST_CHECK_EQUAL(intVal, 19);
+  callSQLColAttribute(stmt, req5, SQL_DESC_DISPLAY_SIZE, 19);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescFixedPrecScale) {
@@ -879,20 +803,9 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescFixedPrecScale) {
   Connect(dsnConnectionString);
 
   SQLCHAR req[] = "select fieldLong from meta_queries_test_001";
-  SQLExecDirect(stmt, req, SQL_NTS);
-
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_FIXED_PREC_SCALE, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // only SQL_FALSE is returned
-  BOOST_CHECK_EQUAL(intVal, SQL_FALSE);
+  callSQLColAttribute(stmt, req, SQL_DESC_FIXED_PREC_SCALE, SQL_FALSE);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescLabel) {
@@ -916,68 +829,29 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLength) {
   Connect(dsnConnectionString);
 
   SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
-  SQLExecDirect(stmt, req1, SQL_NTS);
-
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_LENGTH, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_VARCHAR should have length SQL_NO_TOTAL
-  BOOST_CHECK_EQUAL(intVal, SQL_NO_TOTAL);
+  callSQLColAttribute(stmt, req1, SQL_DESC_LENGTH, SQL_NO_TOTAL);
 
   SQLCHAR req2[] = "select fieldInt from meta_queries_test_002";
-  SQLExecDirect(stmt, req2, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_LENGTH, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_INTEGER should have length 4
-  BOOST_CHECK_EQUAL(intVal, 4);
+  callSQLColAttribute(stmt, req2, SQL_DESC_LENGTH, 4);
 
   SQLCHAR req3[] = "select fieldLong from meta_queries_test_002";
-  SQLExecDirect(stmt, req3, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_LENGTH, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_BIGINT should have length 8
-  BOOST_CHECK_EQUAL(intVal, 8);
+  callSQLColAttribute(stmt, req3, SQL_DESC_LENGTH, 8);
 
   SQLCHAR req4[] = "select fieldDouble from meta_queries_test_002";
-  SQLExecDirect(stmt, req4, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_LENGTH, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_DOUBLE should have length 8
-  BOOST_CHECK_EQUAL(intVal, 8);
+  callSQLColAttribute(stmt, req4, SQL_DESC_LENGTH, 8);
 
   SQLCHAR req5[] = "select fieldDate from meta_queries_test_002";
-  SQLExecDirect(stmt, req5, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_LENGTH, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_TYPE_TIMESTAMP should have length 16
-  BOOST_CHECK_EQUAL(intVal, 16);
+  callSQLColAttribute(stmt, req5, SQL_DESC_LENGTH, 16);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralPrefix) {
@@ -1084,31 +958,13 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescNullable) {
 
   // test meta_queries_test_001__id (a primary key) should not be nullable 
   SQLCHAR req1[] = "select meta_queries_test_001__id from meta_queries_test_001";
-  SQLExecDirect(stmt, req1, SQL_NTS);
 
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_NULLABLE, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_CHECK_EQUAL(intVal, SQL_NO_NULLS);
+  callSQLColAttribute(stmt, req1, SQL_DESC_NULLABLE, SQL_NO_NULLS);
 
   // test non-primary key field should be nullable.
   SQLCHAR req2[] = "select fieldNull from meta_queries_test_001";
-  SQLExecDirect(stmt, req2, SQL_NTS);
 
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_NULLABLE, strBuf,
-                        sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_CHECK_EQUAL(intVal, SQL_NULLABLE);
+  callSQLColAttribute(stmt, req2, SQL_DESC_NULLABLE, SQL_NULLABLE);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescNumPrecRadix) {
@@ -1119,45 +975,19 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescNumPrecRadix) {
   Connect(dsnConnectionString);
 
   SQLCHAR req1[] = "select fieldFloat from meta_queries_test_002";
-  SQLExecDirect(stmt, req1, SQL_NTS);
-
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_NUM_PREC_RADIX, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_FLOAT should have precision radix 2
-  BOOST_CHECK_EQUAL(intVal, 2);
+  callSQLColAttribute(stmt, req1, SQL_DESC_NUM_PREC_RADIX, 2);
 
   SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
-  SQLExecDirect(stmt, req2, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_NUM_PREC_RADIX, strBuf,
-                        sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_INT should have precision radix 10
-  BOOST_CHECK_EQUAL(intVal, 10);
+  callSQLColAttribute(stmt, req2, SQL_DESC_NUM_PREC_RADIX, 10);
 
   SQLCHAR req3[] = "select fieldString from meta_queries_test_002";
-  SQLExecDirect(stmt, req3, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_NUM_PREC_RADIX, strBuf,
-                        sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_VARCHAR (non-numeric type) should have precision radix 0
-  BOOST_CHECK_EQUAL(intVal, 0);
+  callSQLColAttribute(stmt, req3, SQL_DESC_NUM_PREC_RADIX, 0);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescOctetLength) {
@@ -1168,68 +998,30 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescOctetLength) {
   Connect(dsnConnectionString);
 
   SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
-  SQLExecDirect(stmt, req1, SQL_NTS);
-
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_OCTET_LENGTH, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_VARCHAR should have octet length SQL_NO_TOTAL
-  BOOST_CHECK_EQUAL(intVal, SQL_NO_TOTAL);
+  callSQLColAttribute(stmt, req1, SQL_DESC_OCTET_LENGTH, SQL_NO_TOTAL);
 
   SQLCHAR req2[] = "select fieldInt from meta_queries_test_002";
-  SQLExecDirect(stmt, req2, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_OCTET_LENGTH, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_INTEGER should have octet length 4 * sizeof(char)
-  BOOST_CHECK_EQUAL(intVal, 4 * sizeof(char));
+  callSQLColAttribute(stmt, req2, SQL_DESC_OCTET_LENGTH, 4 * sizeof(char));
+  
 
   SQLCHAR req3[] = "select fieldLong from meta_queries_test_002";
-  SQLExecDirect(stmt, req3, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_OCTET_LENGTH, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_BIGINT should have octet length 8 * sizeof(char)
-  BOOST_CHECK_EQUAL(intVal, 8 * sizeof(char));
+  callSQLColAttribute(stmt, req3, SQL_DESC_OCTET_LENGTH, 8 * sizeof(char));
 
   SQLCHAR req4[] = "select fieldDouble from meta_queries_test_002";
-  SQLExecDirect(stmt, req4, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_OCTET_LENGTH, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_DOUBLE should have octet length 8 * sizeof(char)
-  BOOST_CHECK_EQUAL(intVal, 8 * sizeof(char));
+  callSQLColAttribute(stmt, req4, SQL_DESC_OCTET_LENGTH, 8 * sizeof(char));
 
   SQLCHAR req5[] = "select fieldDate from meta_queries_test_002";
-  SQLExecDirect(stmt, req5, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_OCTET_LENGTH, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_TYPE_TIMESTAMP should have octet length 16 * sizeof(char)
-  BOOST_CHECK_EQUAL(intVal, 16 * sizeof(char));
+  callSQLColAttribute(stmt, req5, SQL_DESC_OCTET_LENGTH, 16 * sizeof(char));
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
@@ -1240,68 +1032,29 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
   Connect(dsnConnectionString);
 
   SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
-  SQLExecDirect(stmt, req1, SQL_NTS);
-
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_PRECISION, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_VARCHAR should have precision SQL_NO_TOTAL
-  BOOST_CHECK_EQUAL(intVal, SQL_NO_TOTAL);
+  callSQLColAttribute(stmt, req1, SQL_DESC_PRECISION, SQL_NO_TOTAL);
 
   SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
-  SQLExecDirect(stmt, req2, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_PRECISION, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_INTEGER should have precision 10
-  BOOST_CHECK_EQUAL(intVal, 10);
+  callSQLColAttribute(stmt, req2, SQL_DESC_PRECISION, 10);
 
   SQLCHAR req3[] = "select fieldLong from meta_queries_test_001";
-  SQLExecDirect(stmt, req3, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_PRECISION, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_BIGINT should have precision 19
-  BOOST_CHECK_EQUAL(intVal, 19);
+  callSQLColAttribute(stmt, req3, SQL_DESC_PRECISION, 19);
 
   SQLCHAR req4[] = "select fieldDouble from meta_queries_test_001";
-  SQLExecDirect(stmt, req4, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_PRECISION, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_DOUBLE should have precision 15
-  BOOST_CHECK_EQUAL(intVal, 15);
+  callSQLColAttribute(stmt, req4, SQL_DESC_PRECISION, 15);
 
   SQLCHAR req5[] = "select fieldDate from meta_queries_test_001";
-  SQLExecDirect(stmt, req5, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_PRECISION, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // SQL_TIMESTAMP should have precision 19
-  BOOST_CHECK_EQUAL(intVal, 19);
+  callSQLColAttribute(stmt, req5, SQL_DESC_PRECISION, 19);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescScale) {
@@ -1312,20 +1065,9 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescScale) {
   Connect(dsnConnectionString);
 
   SQLCHAR req[] = "select fieldLong from meta_queries_test_001";
-  SQLExecDirect(stmt, req, SQL_NTS);
-
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_SCALE, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // default scale value is 0
-  BOOST_CHECK_EQUAL(intVal, 0);
+  callSQLColAttribute(stmt, req, SQL_DESC_SCALE, 0);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescSchemaName) {
@@ -1349,20 +1091,9 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescSearchable) {
   Connect(dsnConnectionString);
 
   SQLCHAR req[] = "select fieldString from meta_queries_test_002";
-  SQLExecDirect(stmt, req, SQL_NTS);
-
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_SEARCHABLE, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // only SQL_PRED_BASIC is returned
-  BOOST_CHECK_EQUAL(intVal, SQL_PRED_BASIC);
+  callSQLColAttribute(stmt, req, SQL_DESC_SEARCHABLE, SQL_PRED_BASIC);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescTableName) {
@@ -1386,54 +1117,23 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescType) {
   Connect(dsnConnectionString);
 
   SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
-  SQLExecDirect(stmt, req1, SQL_NTS);
 
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
+  callSQLColAttribute(stmt, req1, SQL_DESC_TYPE, SQL_VARCHAR);
 
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_TYPE, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_CHECK_EQUAL(intVal, SQL_VARCHAR);
 
   SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
-  SQLExecDirect(stmt, req2, SQL_NTS);
 
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_TYPE, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_CHECK_EQUAL(intVal, SQL_INTEGER);
+  callSQLColAttribute(stmt, req2, SQL_DESC_TYPE, SQL_INTEGER);
 
   SQLCHAR req3[] = "select fieldBinary from meta_queries_test_001";
-  SQLExecDirect(stmt, req3, SQL_NTS);
 
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_TYPE, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_CHECK_EQUAL(intVal, SQL_VARBINARY);
+  callSQLColAttribute(stmt, req3, SQL_DESC_TYPE, SQL_VARBINARY);
 
   // TODO re-enable this test when bug from JDBC (AD-765) is fixed. 
   // https://bitquill.atlassian.net/browse/AD-766
   //SQLCHAR req4[] = "select fieldNull from meta_queries_test_001";
-  //SQLExecDirect(stmt, req4, SQL_NTS);
-
-  //ret = SQLColAttribute(stmt, 1, SQL_DESC_TYPE, strBuf, sizeof(strBuf),
-  //                      &strLen, &intVal);
-
-  //if (!SQL_SUCCEEDED(ret))
-  //  BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  //BOOST_CHECK_EQUAL(intVal, SQL_TYPE_NULL);
+  // 
+  //callSQLColAttribute(stmt, req4, SQL_DESC_TYPE, SQL_TYPE_NULL);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescUnnamed) {
@@ -1444,20 +1144,9 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescUnnamed) {
   Connect(dsnConnectionString);
 
   SQLCHAR req[] = "select fieldNull from meta_queries_test_001";
-  SQLExecDirect(stmt, req, SQL_NTS);
-
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_UNNAMED, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // all columns should be named bacause they cannot be null
-  BOOST_CHECK_EQUAL(intVal, SQL_NAMED);
+  callSQLColAttribute(stmt, req, SQL_DESC_UNNAMED, SQL_NAMED);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescUnsigned) {
@@ -1468,30 +1157,15 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescUnsigned) {
   Connect(dsnConnectionString);
 
   SQLCHAR req1[] = "select fieldInt from meta_queries_test_001";
-  SQLExecDirect(stmt, req1, SQL_NTS);
 
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
+  // numeric type should be signed
+  callSQLColAttribute(stmt, req1, SQL_DESC_UNSIGNED, SQL_FALSE);
 
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_UNSIGNED, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_CHECK_EQUAL(intVal, SQL_FALSE);
 
   SQLCHAR req2[] = "select fieldString from meta_queries_test_001";
-  SQLExecDirect(stmt, req2, SQL_NTS);
 
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_UNSIGNED, strBuf, sizeof(strBuf),
-                        &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_CHECK_EQUAL(intVal, SQL_TRUE);
+  // non-numeric types should be unsigned
+  callSQLColAttribute(stmt, req2, SQL_DESC_UNSIGNED, SQL_TRUE);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescUpdatable) {
@@ -1502,20 +1176,10 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescUpdatable) {
   Connect(dsnConnectionString);
 
   SQLCHAR req[] = "select fieldMaxKey from meta_queries_test_002";
-  SQLExecDirect(stmt, req, SQL_NTS);
-
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_UPDATABLE, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // only SQL_ATTR_READWRITE_UNKNOWN is returned
-  BOOST_CHECK_EQUAL(intVal, SQL_ATTR_READWRITE_UNKNOWN);
+  callSQLColAttribute(stmt, req, SQL_DESC_UPDATABLE,
+                      SQL_ATTR_READWRITE_UNKNOWN);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributesColumnScale, *disabled()) {
