@@ -52,6 +52,21 @@ using namespace boost::unit_test;
  */
 struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
   const static SQLLEN C_STR_LEN_DEFAULT = 1024;
+  /**
+   * Converts SQLCHAR[] to std::string
+   *
+   * @param strBuf SQLCHAR pointer
+   * @return buf std::string
+   */
+  std::string SqlCharToString(SQLCHAR* strBuf) {
+    std::stringstream bufStream;
+    bufStream << strBuf;
+    std::string buf;
+    bufStream >> buf;
+
+    return buf;
+  }
+
 
   /**
    * Checks single row result set for correct work with SQLGetData.
@@ -632,10 +647,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseColumnName) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // convert SQLCHAR[] strBuf to to std::string buf
-  std::stringstream bufStream;
-  bufStream << strBuf;
-  std::string buf;
-  bufStream >> buf;
+  std::string buf = SqlCharToString(strBuf);
 
   BOOST_CHECK("field" == buf);
 }
@@ -661,10 +673,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseTableName) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // convert SQLCHAR[] strBuf to to std::string buf
-  std::stringstream bufStream;
-  bufStream << strBuf;
-  std::string buf;
-  bufStream >> buf;
+  std::string buf = SqlCharToString(strBuf);
 
   BOOST_CHECK("meta_queries_test_002_with_array" == buf);
 }
@@ -726,10 +735,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCatalogName) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // convert SQLCHAR[] strBuf to to std::string buf
-  std::stringstream bufStream;
-  bufStream << strBuf;
-  std::string buf;
-  bufStream >> buf;
+  std::string buf = SqlCharToString(strBuf);
 
   // check that catalog should be empty
   BOOST_CHECK("" == buf);
@@ -934,10 +940,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseLabel) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // convert SQLCHAR[] strBuf to to std::string buf
-  std::stringstream bufStream;
-  bufStream << strBuf;
-  std::string buf;
-  bufStream >> buf;
+  std::string buf = SqlCharToString(strBuf);
 
   BOOST_CHECK("fieldBoolean" == buf);
 }
@@ -1036,10 +1039,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralPrefix) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // convert SQLCHAR[] strBuf to to std::string buf
-  std::stringstream bufStream;
-  bufStream << strBuf;
-  std::string buf;
-  bufStream >> buf;
+  std::string buf = SqlCharToString(strBuf);
 
   BOOST_CHECK("" == buf);
 
@@ -1054,10 +1054,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralPrefix) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // convert SQLCHAR[] strBuf to to std::string buf
-  bufStream.clear();
-  buf.clear();
-  bufStream << strBuf;
-  bufStream >> buf;
+  buf = SqlCharToString(strBuf);
 
   BOOST_CHECK("'" == buf);
 
@@ -1072,10 +1069,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralPrefix) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // convert SQLCHAR[] strBuf to to std::string buf
-  bufStream.clear();
-  buf.clear();
-  bufStream << strBuf;
-  bufStream >> buf;
+  buf = SqlCharToString(strBuf);
 
   BOOST_CHECK("0x" == buf);
 }
@@ -1102,10 +1096,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralSuffix) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // convert SQLCHAR[] strBuf to to std::string buf
-  std::stringstream bufStream;
-  bufStream << strBuf;
-  std::string buf;
-  bufStream >> buf;
+  std::string buf = SqlCharToString(strBuf);
 
   BOOST_CHECK("" == buf);
 
@@ -1120,10 +1111,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralSuffix) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // convert SQLCHAR[] strBuf to to std::string buf
-  bufStream.clear();
-  buf.clear();
-  bufStream << strBuf;
-  bufStream >> buf;
+  buf = SqlCharToString(strBuf);
 
   BOOST_CHECK("'" == buf);
 }
@@ -1151,10 +1139,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // convert SQLCHAR[] strBuf to to std::string buf
-  std::stringstream bufStream;
-  bufStream << strBuf;
-  std::string buf;
-  bufStream >> buf;
+  std::string buf = SqlCharToString(strBuf);
 
   // SQL_DOUBLE should have type name SqlTypeName::DOUBLE
   BOOST_CHECK(SqlTypeName::DOUBLE == buf);
@@ -1169,10 +1154,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // convert SQLCHAR[] strBuf to to std::string buf
-  bufStream.clear();
-  buf.clear();
-  bufStream << strBuf;
-  bufStream >> buf;
+  buf = SqlCharToString(strBuf);
 
   // SQL_VARCHAR should have type name SqlTypeName::VARCHAR
   BOOST_CHECK(SqlTypeName::VARCHAR == buf);
@@ -1187,10 +1169,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // convert SQLCHAR[] strBuf to to std::string buf
-  bufStream.clear();
-  buf.clear();
-  bufStream << strBuf;
-  bufStream >> buf;
+  buf = SqlCharToString(strBuf);
 
   // SQL_BINARY should have type name SqlTypeName::VARBINARY
   BOOST_CHECK(SqlTypeName::VARBINARY == buf);
@@ -1205,10 +1184,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // convert SQLCHAR[] strBuf to to std::string buf
-  bufStream.clear();
-  buf.clear();
-  bufStream << strBuf;
-  bufStream >> buf;
+  buf = SqlCharToString(strBuf);
 
   // SQL_TYPE_TIMESTAMP should have type name SqlTypeName::TIMESTAMP
   BOOST_CHECK(SqlTypeName::TIMESTAMP == buf);
@@ -1223,10 +1199,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // convert SQLCHAR[] strBuf to to std::string buf
-  bufStream.clear();
-  buf.clear();
-  bufStream << strBuf;
-  bufStream >> buf;
+  buf = SqlCharToString(strBuf);
 
   // SQL_INTEGER should have type name SqlTypeName::INTEGER
   BOOST_CHECK(SqlTypeName::INTEGER == buf);
@@ -1253,10 +1226,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescName) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // convert SQLCHAR[] strBuf to to std::string buf
-  std::stringstream bufStream;
-  bufStream << strBuf;
-  std::string buf;
-  bufStream >> buf;
+  std::string buf = SqlCharToString(strBuf);
 
   BOOST_CHECK("field" == buf);
 }
@@ -1537,10 +1507,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescSchemaName) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // convert SQLCHAR[] strBuf to to std::string buf
-  std::stringstream bufStream;
-  bufStream << strBuf;
-  std::string buf;
-  bufStream >> buf;
+  std::string buf = SqlCharToString(strBuf);
 
   BOOST_CHECK(buf == "odbc-test");
 }
@@ -1590,10 +1557,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescTableName) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // convert SQLCHAR[] strBuf to to std::string buf
-  std::stringstream bufStream;
-  bufStream << strBuf;
-  std::string buf;
-  bufStream >> buf;
+  std::string buf = SqlCharToString(strBuf);
 
   BOOST_CHECK("meta_queries_test_002_with_array" == buf);
 }
