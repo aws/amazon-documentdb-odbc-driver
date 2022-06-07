@@ -53,10 +53,10 @@ std::string GetEnv(const std::string& name) {
 
 std::string GetEnv(const std::string& name, const std::string& dflt) {
   wchar_t res[_MAX_ENV];
-  std::wstring name0 = utility::FromUtf8(name);
+  std::wstring wname = utility::FromUtf8(name);
   // Choosing
   DWORD envRes =
-      GetEnvironmentVariableW(name0.c_str(), res, sizeof(res) / sizeof(res[0]));
+      GetEnvironmentVariableW(wname.c_str(), res, sizeof(res) / sizeof(res[0]));
 
   if (envRes == 0 || envRes > sizeof(res))
     return dflt;

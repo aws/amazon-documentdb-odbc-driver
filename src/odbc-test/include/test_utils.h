@@ -162,8 +162,6 @@ void ClearLfs();
  */
 std::vector< SQLWCHAR > NewSqlWchar(const std::wstring& value);
 
-std::wstring FromSQLWCHAR(const SQLWCHAR* value, const size_t len);
-
 }  // namespace ignite_test
 
 #endif  // _IGNITE_ODBC_TEST_TEST_UTILS

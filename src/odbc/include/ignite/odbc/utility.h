@@ -110,6 +110,7 @@ void WriteDecimal(BinaryWriterImpl& writer,
  *
  * @param sqlStr SQL string buffer.
  * @param sqlStrLen SQL string length.
+ * @param lenInBytes Indicator of whether the length indicates bytes or characters.
  * @return Standard string containing the same data.
  */
 std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen = SQL_NTS,

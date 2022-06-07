@@ -59,7 +59,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
    */
   void CheckSingleRowResultSetWithGetData(
       SQLHSTMT stmt, SQLUSMALLINT columnIndex = 1,
-      const std::wstring expectedValue = nullptr) const {
+      const std::string expectedValue = "") const {
     SQLRETURN ret = SQLFetch(stmt);
 
     if (!SQL_SUCCEEDED(ret)) {
@@ -82,9 +82,8 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
         BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
       if (i == columnIndex && !expectedValue.empty()) {
-        std::wstring actualValueStr = FromSQLWCHAR(buf, bufLen);
-        std::wstring expectedValueStr = expectedValue;
-        BOOST_CHECK(expectedValueStr == actualValueStr);
+        std::string actualValueStr = utility::SqlStringToString(buf, bufLen);
+        BOOST_CHECK_EQUAL(expectedValue, actualValueStr);
       }
     }
 
@@ -721,7 +720,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOne) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  CheckSingleRowResultSetWithGetData(stmt, 3, FromSQLWCHAR(table.data(), SQL_NTS));
+  CheckSingleRowResultSetWithGetData(stmt, 3, utility::SqlStringToString(table.data()));
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneFromLocalServer) {
@@ -739,7 +738,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneFromLocalServer) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  CheckSingleRowResultSetWithGetData(stmt, 3, L"meta_queries_test_001");
+  CheckSingleRowResultSetWithGetData(stmt, 3, "meta_queries_test_001");
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneWithTableTypes) {
@@ -759,7 +758,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneWithTableTypes) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  CheckSingleRowResultSetWithGetData(stmt, 3, L"meta_queries_test_001");
+  CheckSingleRowResultSetWithGetData(stmt, 3, "meta_queries_test_001");
 }
 
 BOOST_AUTO_TEST_CASE(TestDataTypes) {
@@ -929,7 +928,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneForQuotedTypes) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  CheckSingleRowResultSetWithGetData(stmt, 3, L"meta_queries_test_001");
+  CheckSingleRowResultSetWithGetData(stmt, 3, "meta_queries_test_001");
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsNoneForUnsupportedTableType) {
@@ -1026,7 +1025,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsOneFromLocalServer) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  CheckSingleRowResultSetWithGetData(stmt, 4, L"fieldString");
+  CheckSingleRowResultSetWithGetData(stmt, 4, "fieldString");
 
   // check that passing catalog NULL value gives data
   ret = SQLColumns(stmt, nullptr, 0, nullptr, 0, table.data(), SQL_NTS,
@@ -1035,7 +1034,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsOneFromLocalServer) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  CheckSingleRowResultSetWithGetData(stmt, 4, L"fieldString");
+  CheckSingleRowResultSetWithGetData(stmt, 4, "fieldString");
 
   // check that passing catalog NULL value gives data
   ret = SQLColumns(stmt, nullptr, 0, nullptr, 0, table.data(), SQL_NTS,
@@ -1044,7 +1043,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsOneFromLocalServer) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  CheckSingleRowResultSetWithGetData(stmt, 4, L"fieldString");
+  CheckSingleRowResultSetWithGetData(stmt, 4, "fieldString");
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsNone) {
@@ -1136,7 +1135,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsOneFromLocalServer) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // check result for COLUMN_NAME
-  CheckSingleRowResultSetWithGetData(stmt, 4, L"meta_queries_test_001__id");
+  CheckSingleRowResultSetWithGetData(stmt, 4, "meta_queries_test_001__id");
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsNone) {
@@ -1203,7 +1202,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsOneFromLocalServer) {
 
   // check result for PKTableName
   CheckSingleRowResultSetWithGetData(stmt, 4,
-                                     L"meta_queries_test_002_with_array__id");
+                                     "meta_queries_test_002_with_array__id");
 
   ret = SQLCloseCursor(stmt);
   if (!SQL_SUCCEEDED(ret))
@@ -1223,7 +1222,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsOneFromLocalServer) {
 
   // check result for PKTableName
   CheckSingleRowResultSetWithGetData(stmt, 4,
-                                     L"meta_queries_test_002_with_array__id");
+                                     "meta_queries_test_002_with_array__id");
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsNone) {
@@ -1397,7 +1396,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   if (!SQL_SUCCEEDED(ret)) {
     BOOST_ERROR(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
-  BOOST_CHECK_EQUAL(std::wstring(L"TABLE_SCHEM"), FromSQLWCHAR(attrColumnName, attrColumnNameLen));
+  BOOST_CHECK_EQUAL("TABLE_SCHEM", utility::SqlStringToString(attrColumnName, attrColumnNameLen));
 
   // Test that the next fetch will have no data.
   ret = SQLFetch(stmt);

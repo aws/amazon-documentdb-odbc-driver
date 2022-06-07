@@ -45,9 +45,9 @@ struct TestType {
 
   TestType(int8_t i8Field, int16_t i16Field, int32_t i32Field, int64_t i64Field,
            const std::string& strField, float floatField, double doubleField,
-           bool boolField, const odbc::Guid& guidField,
-           const odbc::Date& dateField, const odbc::Time& timeField,
-           const odbc::Timestamp& timestampField)
+           bool boolField, const Guid& guidField,
+           const Date& dateField, const Time& timeField,
+           const Timestamp& timestampField)
       : allNulls(false),
         i8Field(i8Field),
         i16Field(i16Field),
@@ -85,10 +85,10 @@ struct TestType {
   float floatField;
   double doubleField;
   bool boolField;
-  odbc::Guid guidField;
-  odbc::Date dateField;
-  odbc::Time timeField;
-  odbc::Timestamp timestampField;
+  Guid guidField;
+  Date dateField;
+  Time timeField;
+  Timestamp timestampField;
   std::vector< int8_t > i8ArrayField;
 };
 

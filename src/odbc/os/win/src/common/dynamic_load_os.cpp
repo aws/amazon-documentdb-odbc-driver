@@ -96,10 +96,6 @@ namespace ignite
     
                 Module LoadModule(const wchar_t* path)
                 {
-                  // TODO: check
-                  // std::wstring convertedPath = StringToWstring(path);
-
-                  // HMODULE handle = LoadLibrary(convertedPath.c_str());
                   HMODULE handle = LoadLibrary(path);
 
                   return Module(handle);
