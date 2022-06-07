@@ -33,9 +33,9 @@ namespace ignite {
 namespace odbc {
 void ThrowLastSetupError() {
   DWORD code;
-  common::FixedSizeArray< wchar_t > msg(BUFFER_SIZE);
+  common::FixedSizeArray< SQLWCHAR > msg(BUFFER_SIZE);
 
-  SQLInstallerError(1, &code, utility::ToWCHARVector(msg.GetData()).data(),
+  SQLInstallerError(1, &code, msg.GetData(),
                     msg.GetSize(), NULL);
 
   std::stringstream buf;
@@ -46,14 +46,10 @@ void ThrowLastSetupError() {
 }
 
 void WriteDsnString(const char* dsn, const char* key, const char* value) {
-  std::wstring dsn0 = utility::FromUtf8(dsn);
-  std::wstring key0 = utility::FromUtf8(key);
-  std::wstring value0 = utility::FromUtf8(value);
-  std::wstring configFile = utility::FromUtf8(CONFIG_FILE);
-  if (!SQLWritePrivateProfileString(utility::ToWCHARVector(dsn0).data(),
-                                    utility::ToWCHARVector(key0).data(),
-                                    utility::ToWCHARVector(value0).data(),
-                                    utility::ToWCHARVector(configFile).data()))
+  if (!SQLWritePrivateProfileString(utility::ToWCHARVector(dsn).data(),
+                                    utility::ToWCHARVector(key).data(),
+                                    utility::ToWCHARVector(value).data(),
+                                    utility::ToWCHARVector(CONFIG_FILE).data()))
     ThrowLastSetupError();
 }
 
@@ -64,25 +60,23 @@ SettableValue< std::string > ReadDsnString(const char* dsn,
 
   SettableValue< std::string > val(dflt);
 
-  common::FixedSizeArray< wchar_t > buf(BUFFER_SIZE);
-  std::wstring dsn0 = utility::FromUtf8(dsn);
-  std::wstring key0 = utility::FromUtf8(key);
-  std::wstring configFile = utility::FromUtf8(CONFIG_FILE);
+  common::FixedSizeArray< SQLWCHAR > buf(BUFFER_SIZE);
+  
   int ret = SQLGetPrivateProfileString(
-      utility::ToWCHARVector(dsn0).data(), utility::ToWCHARVector(key0).data(),
+      utility::ToWCHARVector(dsn).data(), utility::ToWCHARVector(key).data(),
       utility::ToWCHARVector(unique).data(),
-      utility::ToWCHARVector(buf.GetData()).data(), buf.GetSize(),
-      utility::ToWCHARVector(configFile).data());
+      buf.GetData(), buf.GetSize(),
+      utility::ToWCHARVector(CONFIG_FILE).data());
 
   if (ret > BUFFER_SIZE) {
     buf.Reset(ret + 1);
 
     ret = SQLGetPrivateProfileString(
-        utility::ToWCHARVector(dsn0).data(),
-        utility::ToWCHARVector(key0).data(),
+        utility::ToWCHARVector(dsn).data(),
+        utility::ToWCHARVector(key).data(),
         utility::ToWCHARVector(unique).data(),
-        utility::ToWCHARVector(buf.GetData()).data(), buf.GetSize(),
-        utility::ToWCHARVector(configFile).data());
+        buf.GetData(), buf.GetSize(),
+        utility::ToWCHARVector(CONFIG_FILE).data());
   }
 
   std::wstring res(buf.GetData());

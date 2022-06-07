@@ -1556,14 +1556,11 @@ SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* state,
     *error = 0;
 
   std::string errMsg = record.GetMessageText();
-  LOG_ERROR_MSG("Message: '" + errMsg + "'; msgBufLen: " + std::to_string(msgBufLen));
   size_t outResLen = CopyStringToBuffer(errMsg, msgBuf,
                                         static_cast< size_t >(msgBufLen), true);
-  LOG_ERROR_MSG("Message: '" + errMsg
-                + "'; msgReslen: " + std::to_string(outResLen));
 
   if (msgResLen)
-    *msgResLen = static_cast< SQLSMALLINT >(outResLen * sizeof(SQLWCHAR));
+    *msgResLen = static_cast< SQLSMALLINT >(outResLen);
 
   LOG_DEBUG_MSG("SQLError exiting");
 

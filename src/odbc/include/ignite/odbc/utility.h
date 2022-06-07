@@ -175,6 +175,22 @@ std::vector< SQLWCHAR > ToWCHARVector(const std::wstring& value);
 std::vector< SQLWCHAR > ToWCHARVector(const wchar_t* value);
 
 /**
+ * Convert a UTF-8 string to vector of unsigned short.
+ *
+ * @param value wide string value to convert.
+ * @return String value converted to vector of unsigned short encoding.
+ */
+std::vector< SQLWCHAR > ToWCHARVector(const std::string& value);
+
+/**
+ * Convert a UTF-8 string to vector of unsigned short.
+ *
+ * @param value pointer to null-terminated wide string value to convert.
+ * @return String value converted to vector of unsigned short encoding.
+ */
+std::vector< SQLWCHAR > ToWCHARVector(const char* value);
+
+/**
  * Convert binary data to hex dump form
  * @param data  pointer to data
  * @param count data length

@@ -37,8 +37,7 @@ size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen,
       converter;
   size_t char_size = sizeof(SQLWCHAR);
 
-  //if (buflen < 0 || (lenInBytes && (buflen % char_size != 0)))
-  //  return 0;
+  assert(buflen >= 0 && (!lenInBytes || (buflen % char_size == 0)));
 
   std::wstring str0;
   str0 = converter.from_bytes(str);
@@ -65,7 +64,7 @@ size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen,
     required = str0.size();
     copied = charsToCopy;
   }
- 
+
   return (buflen > 0) ? copied : required;
 }
 
@@ -244,6 +243,14 @@ std::vector< SQLWCHAR > ToWCHARVector(const wchar_t* value) {
   }
   result.push_back(0);
   return result;
+}
+
+std::vector< SQLWCHAR > ToWCHARVector(const std::string& value) {
+  return ToWCHARVector(FromUtf8(value));
+}
+
+std::vector< SQLWCHAR > ToWCHARVector(const char* value) {
+  return ToWCHARVector(FromUtf8(value));
 }
 
 std::string HexDump(const void* data, size_t count) {
