@@ -1036,6 +1036,15 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsOneFromLocalServer) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   CheckSingleRowResultSetWithGetData(stmt, 4, L"fieldString");
+
+  // check that passing catalog NULL value gives data
+  ret = SQLColumns(stmt, nullptr, 0, nullptr, 0, table.data(), SQL_NTS,
+                   column.data(), SQL_NTS);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  CheckSingleRowResultSetWithGetData(stmt, 4, L"fieldString");
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsNone) {

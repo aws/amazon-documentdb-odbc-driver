@@ -678,6 +678,7 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
   using odbc::Statement;
   using odbc::utility::SqlStringToOptString;
   using odbc::utility::SqlStringToString;
+  using odbc::utility::SqlStringToOptString;
 
   LOG_DEBUG_MSG("SQLColumns called");
 
