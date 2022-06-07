@@ -40,7 +40,7 @@ void ThrowLastSetupError() {
 
   std::stringstream buf;
 
-  buf << "Message: \"" << utility::ToUtf8(msg.GetData()) << "\", Code: " << code;
+  buf << "Message: \"" << utility::SqlStringToString(msg.GetData(), msg.GetSize()) << "\", Code: " << code;
 
   throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, buf.str().c_str());
 }
@@ -56,7 +56,7 @@ void WriteDsnString(const char* dsn, const char* key, const char* value) {
 SettableValue< std::string > ReadDsnString(const char* dsn,
                                            const std::string& key,
                                            const std::string& dflt = "") {
-  static const wchar_t* unique = L"35a920dd-8837-43d2-a846-e01a2e7b5f84";
+  static const char* unique = "35a920dd-8837-43d2-a846-e01a2e7b5f84";
 
   SettableValue< std::string > val(dflt);
 
@@ -79,10 +79,10 @@ SettableValue< std::string > ReadDsnString(const char* dsn,
         utility::ToWCHARVector(CONFIG_FILE).data());
   }
 
-  std::wstring res(buf.GetData());
+  std::string res = utility::SqlStringToString(buf.GetData(), SQL_NTS);
 
   if (res != unique)
-    val.SetValue(utility::ToUtf8(res));
+    val.SetValue(res);
 
   return val;
 }
