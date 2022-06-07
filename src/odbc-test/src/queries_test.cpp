@@ -702,22 +702,21 @@ BOOST_AUTO_TEST_CASE(TestTwoRowsString, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[0], SQL_NTS), "1");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[1], SQL_NTS), "2");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[2], SQL_NTS), "3");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[3], SQL_NTS), "4");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[4], SQL_NTS), "5");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[5], SQL_NTS), "6");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[6], SQL_NTS), "7");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[7], SQL_NTS), "1");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[8], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[0]), "1");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[1]), "2");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[2]), "3");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[3]), "4");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[4]), "5");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[5]), "6");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[6]), "7");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[7]), "1");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[8]),
                     "00000000-0000-0008-0000-000000000009");
   // Such format is used because Date returned as Timestamp.
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[9], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[9]),
                     "1987-06-05 00:00:00");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10], SQL_NTS),
-                    "12:48:12");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[11], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10]), "12:48:12");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[11]),
                     "1998-12-27 01:02:03");
 
   SQLLEN columnLens[columnsCnt];
@@ -735,22 +734,22 @@ BOOST_AUTO_TEST_CASE(TestTwoRowsString, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[0], SQL_NTS), "8");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[1], SQL_NTS), "7");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[2], SQL_NTS), "6");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[3], SQL_NTS), "5");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[4], SQL_NTS), "4");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[5], SQL_NTS), "3");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[6], SQL_NTS), "2");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[7], SQL_NTS), "0");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[8], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[0]), "8");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[1]), "7");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[2]), "6");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[3]), "5");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[4]), "4");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[5]), "3");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[6]), "2");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[7]), "0");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[8]),
                     "00000000-0000-0001-0000-000000000000");
   // Such format is used because Date returned as Timestamp.
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[9], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[9]),
                     "1976-01-12 00:00:00");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10]),
                     "00:08:59");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[11], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[11]),
                     "1978-08-21 23:13:45");
 
   BOOST_CHECK_EQUAL(columnLens[0], 1);
@@ -807,30 +806,30 @@ BOOST_AUTO_TEST_CASE(TestOneRowString, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[0], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[0]),
                     "1");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[1], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[1]),
                     "2");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[2], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[2]),
                     "3");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[3], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[3]),
                     "4");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[4], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[4]),
                     "5");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[5], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[5]),
                     "6");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[6], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[6]),
                     "7");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[7], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[7]),
                     "1");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[8], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[8]),
                     "00000000-0000-0008-0000-000000000009");
   // Such format is used because Date returned as Timestamp.
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[9], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[9]),
                     "1987-06-05 00:00:00");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10]),
                     "12:48:12");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[11], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[11]),
                     "1998-12-27 01:02:03");
 
   BOOST_CHECK_EQUAL(columnLens[0], 1);
@@ -1055,30 +1054,30 @@ BOOST_AUTO_TEST_CASE(TestDataAtExecution, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[0], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[0]),
                     "1");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[1], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[1]),
                     "2");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[2], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[2]),
                     "3");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[3], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[3]),
                     "4");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[4], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[4]),
                     "5");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[5], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[5]),
                     "6");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[6], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[6]),
                     "7");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[7], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[7]),
                     "1");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[8], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[8]),
                     "00000000-0000-0008-0000-000000000009");
   // Such format is used because Date returned as Timestamp.
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[9], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[9]),
                     "1987-06-05 00:00:00");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10]),
                     "12:48:12");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[11], SQL_NTS),
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[11]),
                     "1998-12-27 01:02:03");
 
   BOOST_CHECK_EQUAL(columnLens[0], 1);

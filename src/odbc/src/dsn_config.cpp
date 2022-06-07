@@ -79,7 +79,7 @@ SettableValue< std::string > ReadDsnString(const char* dsn,
         utility::ToWCHARVector(CONFIG_FILE).data());
   }
 
-  std::string res = utility::SqlStringToString(buf.GetData(), SQL_NTS);
+  std::string res = utility::SqlStringToString(buf.GetData());
 
   if (res != unique)
     val.SetValue(res);

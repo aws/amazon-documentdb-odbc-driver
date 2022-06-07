@@ -36,6 +36,7 @@
 #include "ignite/odbc/impl/binary/binary_reader_impl.h"
 #include "ignite/odbc/impl/binary/binary_writer_impl.h"
 #include <sqltypes.h>
+#include <sql.h>
 
 
 namespace ignite {
@@ -111,7 +112,7 @@ void WriteDecimal(BinaryWriterImpl& writer,
  * @param sqlStrLen SQL string length.
  * @return Standard string containing the same data.
  */
-std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
+std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen = SQL_NTS,
                               bool lenInBytes = false);
 
 /**
@@ -123,7 +124,7 @@ std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
  * If sqlStrLen indicates null string, boost::none is returned.
  */
 boost::optional< std::string > SqlStringToOptString(const SQLWCHAR* sqlStr,
-                                                    int32_t sqlStrLen,
+                                                    int32_t sqlStrLen = SQL_NTS,
                                                     bool lenInBytes = false);
 
 /**

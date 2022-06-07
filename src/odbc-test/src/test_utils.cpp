@@ -36,12 +36,12 @@ OdbcClientError GetOdbcError(SQLSMALLINT handleType, SQLHANDLE handle) {
   SQLSMALLINT reallen = 0;
 
   // On Windows, reallen is in bytes, on Linux reallen is in chars.
-  // Can't rely on returned length. So just use the buffer length in bytes.
+  // Can't rely on returned length.
   SQLGetDiagRec(handleType, handle, 1, sqlstate, &nativeCode, message,
                 sizeof(message), &reallen);
 
-  return OdbcClientError(utility::SqlStringToString(sqlstate, SQL_NTS),
-                         utility::SqlStringToString(message, sizeof(message), true));
+  return OdbcClientError(utility::SqlStringToString(sqlstate),
+                         utility::SqlStringToString(message));
 }
 
 std::string GetOdbcErrorState(SQLSMALLINT handleType, SQLHANDLE handle,
@@ -53,11 +53,11 @@ std::string GetOdbcErrorState(SQLSMALLINT handleType, SQLHANDLE handle,
   SQLSMALLINT reallen = 0;
 
   // On Windows, reallen is in bytes, on Linux reallen is in chars.
-  // Can't rely on returned length. So just use the buffer length in bytes.
+  // Can't rely on returned length.
   SQLGetDiagRec(handleType, handle, idx, sqlstate, &nativeCode, message,
                 sizeof(message), &reallen);
 
-  return utility::SqlStringToString(sqlstate, SQL_NTS);
+  return utility::SqlStringToString(sqlstate);
 }
 
 std::string GetOdbcErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle,
@@ -69,15 +69,14 @@ std::string GetOdbcErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle,
   SQLSMALLINT reallen = 0;
 
   // On Windows, reallen is in bytes, on Linux reallen is in chars.
-  // Can't rely on returned length. So just use the buffer length in bytes.
+  // Can't rely on returned length.
   SQLGetDiagRec(handleType, handle, idx, sqlstate, &nativeCode, message,
                 sizeof(message), &reallen);
 
-  std::string res = utility::SqlStringToString(sqlstate, SQL_NTS);
+  std::string res = utility::SqlStringToString(sqlstate);
 
   if (!res.empty()) {
-    res.append(": ").append(
-        utility::SqlStringToString(message, sizeof(message), true));
+    res.append(": ").append(utility::SqlStringToString(message));
   } else {
     res = "No results";
   }
