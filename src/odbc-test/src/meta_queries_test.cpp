@@ -219,6 +219,21 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     BOOST_CHECK(SQL_SUCCEEDED(ret));
   }
 
+  void callSQLColAttribute(SQLHSTMT stmt, SQLCHAR *query,
+                           SQLSMALLINT fieldId,
+                           const std::string &expectedVal) {
+    SQLCHAR strBuf[1024];
+    SQLExecDirect(stmt, query, SQL_NTS);
+    SQLRETURN ret = SQLColAttribute(stmt, 1, fieldId, strBuf,
+                                    sizeof(strBuf), nullptr, nullptr);
+    if (!SQL_SUCCEEDED(ret))
+      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+    std::string buf = SqlCharToString(strBuf);
+
+    BOOST_CHECK(expectedVal == buf);
+  }
+
   /**
    * Check result set column metadata using SQLDescribeCol.
    *
@@ -634,22 +649,9 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseColumnName) {
   Connect(dsnConnectionString);
 
   SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
-  SQLExecDirect(stmt, req, SQL_NTS);
 
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_BASE_COLUMN_NAME, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // convert SQLCHAR[] strBuf to to std::string buf
-  std::string buf = SqlCharToString(strBuf);
-
-  BOOST_CHECK("field" == buf);
+  callSQLColAttribute(stmt, req, SQL_DESC_BASE_COLUMN_NAME,
+                      std::string("field"));
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseTableName) {
@@ -660,22 +662,9 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseTableName) {
   Connect(dsnConnectionString);
 
   SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
-  SQLExecDirect(stmt, req, SQL_NTS);
 
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_BASE_TABLE_NAME, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // convert SQLCHAR[] strBuf to to std::string buf
-  std::string buf = SqlCharToString(strBuf);
-
-  BOOST_CHECK("meta_queries_test_002_with_array" == buf);
+  callSQLColAttribute(stmt, req, SQL_DESC_BASE_TABLE_NAME,
+                      std::string("meta_queries_test_002_with_array"));
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescCaseSensitive) {
@@ -722,23 +711,10 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCatalogName) {
   Connect(dsnConnectionString);
 
   SQLCHAR req[] = "select fieldDecimal128 from meta_queries_test_001";
-  SQLExecDirect(stmt, req, SQL_NTS);
-
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_CATALOG_NAME, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // convert SQLCHAR[] strBuf to to std::string buf
-  std::string buf = SqlCharToString(strBuf);
 
   // check that catalog should be empty
-  BOOST_CHECK("" == buf);
+  callSQLColAttribute(stmt, req, SQL_DESC_CATALOG_NAME,
+                      std::string(""));
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescConciseType) {
@@ -919,7 +895,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescFixedPrecScale) {
   BOOST_CHECK_EQUAL(intVal, SQL_FALSE);
 }
 
-BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseLabel) {
+BOOST_AUTO_TEST_CASE(TestColAttributeDescLabel) {
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
   CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
@@ -927,22 +903,9 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseLabel) {
   Connect(dsnConnectionString);
 
   SQLCHAR req[] = "select fieldBoolean from meta_queries_test_002";
-  SQLExecDirect(stmt, req, SQL_NTS);
 
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_LABEL, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // convert SQLCHAR[] strBuf to to std::string buf
-  std::string buf = SqlCharToString(strBuf);
-
-  BOOST_CHECK("fieldBoolean" == buf);
+  callSQLColAttribute(stmt, req, SQL_DESC_LABEL,
+                      std::string("fieldBoolean"));
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescLength) {
@@ -1026,52 +989,19 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralPrefix) {
 
   // test that empty string is returned for non-char and non-binary type
   SQLCHAR req1[] = "select fieldDouble from meta_queries_test_001";
-  SQLExecDirect(stmt, req1, SQL_NTS);
 
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_LITERAL_PREFIX, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // convert SQLCHAR[] strBuf to to std::string buf
-  std::string buf = SqlCharToString(strBuf);
-
-  BOOST_CHECK("" == buf);
+  callSQLColAttribute(stmt, req1, SQL_DESC_LITERAL_PREFIX,
+                      std::string(""));
 
   // test that "'" is returned for *CHAR type
   SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
-  SQLExecDirect(stmt, req2, SQL_NTS);
 
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_LITERAL_PREFIX, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // convert SQLCHAR[] strBuf to to std::string buf
-  buf = SqlCharToString(strBuf);
-
-  BOOST_CHECK("'" == buf);
+  callSQLColAttribute(stmt, req2, SQL_DESC_LITERAL_PREFIX, std::string("'"));
 
   // test that "0x" is returned for *CHAR type
   SQLCHAR req3[] = "select fieldBinary from meta_queries_test_002";
-  SQLExecDirect(stmt, req3, SQL_NTS);
 
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_LITERAL_PREFIX, strBuf,
-                        sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // convert SQLCHAR[] strBuf to to std::string buf
-  buf = SqlCharToString(strBuf);
-
-  BOOST_CHECK("0x" == buf);
+  callSQLColAttribute(stmt, req3, SQL_DESC_LITERAL_PREFIX, std::string("0x"));
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralSuffix) {
@@ -1083,37 +1013,13 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralSuffix) {
 
   // test that empty string is returned for non-char and non-binary type
   SQLCHAR req1[] = "select fieldBoolean from meta_queries_test_001";
-  SQLExecDirect(stmt, req1, SQL_NTS);
 
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_LITERAL_SUFFIX, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // convert SQLCHAR[] strBuf to to std::string buf
-  std::string buf = SqlCharToString(strBuf);
-
-  BOOST_CHECK("" == buf);
+  callSQLColAttribute(stmt, req1, SQL_DESC_LITERAL_SUFFIX, std::string(""));
 
   // test that "'" is returned for *CHAR type
   SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
-  SQLExecDirect(stmt, req2, SQL_NTS);
 
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_LITERAL_SUFFIX, strBuf,
-                        sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // convert SQLCHAR[] strBuf to to std::string buf
-  buf = SqlCharToString(strBuf);
-
-  BOOST_CHECK("'" == buf);
+  callSQLColAttribute(stmt, req2, SQL_DESC_LITERAL_SUFFIX, std::string("'"));
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
@@ -1126,83 +1032,34 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
   Connect(dsnConnectionString);
 
   SQLCHAR req1[] = "select fieldDouble from meta_queries_test_001";
-  SQLExecDirect(stmt, req1, SQL_NTS);
 
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_LOCAL_TYPE_NAME, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // convert SQLCHAR[] strBuf to to std::string buf
-  std::string buf = SqlCharToString(strBuf);
-
-  // SQL_DOUBLE should have type name SqlTypeName::DOUBLE
-  BOOST_CHECK(SqlTypeName::DOUBLE == buf);
+ // SQL_DOUBLE should have type name SqlTypeName::DOUBLE
+  callSQLColAttribute(stmt, req1, SQL_DESC_LOCAL_TYPE_NAME,
+                      SqlTypeName::DOUBLE);
 
   SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
-  SQLExecDirect(stmt, req2, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_LOCAL_TYPE_NAME, strBuf,
-                        sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // convert SQLCHAR[] strBuf to to std::string buf
-  buf = SqlCharToString(strBuf);
 
   // SQL_VARCHAR should have type name SqlTypeName::VARCHAR
-  BOOST_CHECK(SqlTypeName::VARCHAR == buf);
+  callSQLColAttribute(stmt, req2, SQL_DESC_LOCAL_TYPE_NAME,
+                      SqlTypeName::VARCHAR);
 
   SQLCHAR req3[] = "select fieldBinary from meta_queries_test_002";
-  SQLExecDirect(stmt, req3, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_LOCAL_TYPE_NAME, strBuf,
-                        sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // convert SQLCHAR[] strBuf to to std::string buf
-  buf = SqlCharToString(strBuf);
 
   // SQL_BINARY should have type name SqlTypeName::VARBINARY
-  BOOST_CHECK(SqlTypeName::VARBINARY == buf);
+  callSQLColAttribute(stmt, req3, SQL_DESC_LOCAL_TYPE_NAME,
+                      SqlTypeName::VARBINARY);
 
   SQLCHAR req4[] = "select fieldDate from meta_queries_test_002";
-  SQLExecDirect(stmt, req4, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_LOCAL_TYPE_NAME, strBuf,
-                        sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // convert SQLCHAR[] strBuf to to std::string buf
-  buf = SqlCharToString(strBuf);
 
   // SQL_TYPE_TIMESTAMP should have type name SqlTypeName::TIMESTAMP
-  BOOST_CHECK(SqlTypeName::TIMESTAMP == buf);
+  callSQLColAttribute(stmt, req4, SQL_DESC_LOCAL_TYPE_NAME,
+                      SqlTypeName::TIMESTAMP);
 
   SQLCHAR req5[] = "select fieldInt from meta_queries_test_002";
-  SQLExecDirect(stmt, req5, SQL_NTS);
-
-  ret = SQLColAttribute(stmt, 1, SQL_DESC_LOCAL_TYPE_NAME, strBuf,
-                        sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // convert SQLCHAR[] strBuf to to std::string buf
-  buf = SqlCharToString(strBuf);
 
   // SQL_INTEGER should have type name SqlTypeName::INTEGER
-  BOOST_CHECK(SqlTypeName::INTEGER == buf);
+  callSQLColAttribute(stmt, req5, SQL_DESC_LOCAL_TYPE_NAME,
+                      SqlTypeName::INTEGER);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescName) {
@@ -1213,22 +1070,9 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescName) {
   Connect(dsnConnectionString);
 
   SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
-  SQLExecDirect(stmt, req, SQL_NTS);
 
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_NAME, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // convert SQLCHAR[] strBuf to to std::string buf
-  std::string buf = SqlCharToString(strBuf);
-
-  BOOST_CHECK("field" == buf);
+  callSQLColAttribute(stmt, req, SQL_DESC_NAME,
+                      std::string("field"));
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescNullable) {
@@ -1388,8 +1232,6 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescOctetLength) {
   BOOST_CHECK_EQUAL(intVal, 16 * sizeof(char));
 }
 
-// -AL- somehow precision is initialized as -1, although the dataType should be there 
-// -AL- todo re-enable test when I am able to test on local machine
 BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
@@ -1494,22 +1336,9 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescSchemaName) {
   Connect(dsnConnectionString);
 
   SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
-  SQLExecDirect(stmt, req, SQL_NTS);
 
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_SCHEMA_NAME, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // convert SQLCHAR[] strBuf to to std::string buf
-  std::string buf = SqlCharToString(strBuf);
-
-  BOOST_CHECK(buf == "odbc-test");
+  callSQLColAttribute(stmt, req, SQL_DESC_SCHEMA_NAME,
+                      std::string("odbc-test"));
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescSearchable) {
@@ -1544,22 +1373,9 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescTableName) {
   Connect(dsnConnectionString);
 
   SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
-  SQLExecDirect(stmt, req, SQL_NTS);
 
-  SQLLEN intVal;
-  SQLCHAR strBuf[1024];
-  SQLSMALLINT strLen;
-
-  SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_DESC_TABLE_NAME, strBuf,
-                                  sizeof(strBuf), &strLen, &intVal);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // convert SQLCHAR[] strBuf to to std::string buf
-  std::string buf = SqlCharToString(strBuf);
-
-  BOOST_CHECK("meta_queries_test_002_with_array" == buf);
+  callSQLColAttribute(stmt, req, SQL_DESC_TABLE_NAME,
+                      std::string("meta_queries_test_002_with_array"));
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescType) {
