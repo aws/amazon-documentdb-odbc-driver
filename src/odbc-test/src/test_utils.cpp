@@ -62,16 +62,19 @@ std::string GetOdbcErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle,
   SQLINTEGER nativeCode;
 
   SQLWCHAR message[ODBC_BUFFER_SIZE];
+  SQLSMALLINT bufSize = static_cast< SQLSMALLINT >(sizeof(message));
   SQLSMALLINT reallen = 0;
 
   SQLGetDiagRec(handleType, handle, idx, sqlstate, &nativeCode, message,
-                sizeof(message), &reallen);
+                bufSize, &reallen);
 
   std::string res = utility::SqlStringToString(sqlstate, SQL_NTS);
 
   if (!res.empty())
-    // In bytes
-    res.append(": ").append(utility::SqlStringToString(message, reallen, true));
+
+    res.append(": ").append(utility::SqlStringToString(
+        message,
+        std::max(bufSize, std::min(bufSize, reallen))));
   else
     res = "No results";
 
