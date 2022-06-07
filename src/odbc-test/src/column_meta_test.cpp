@@ -272,3 +272,43 @@ BOOST_AUTO_TEST_CASE(TestGetAttributeLiteralSuffix) {
   }
 }
 
+BOOST_AUTO_TEST_CASE(TestGetAttributeLocalTypeName) {
+  std::string schema("database");
+  std::string table("table");
+  std::string column("column");
+
+  SQLLEN intVal;
+  std::string resVal;
+  bool found;
+
+  std::pair< int16_t, std::string > tests[] = {
+      std::make_pair(JDBC_TYPE_BOOLEAN, SqlTypeName::BIT),
+      std::make_pair(JDBC_TYPE_SMALLINT, SqlTypeName::SMALLINT),
+      std::make_pair(JDBC_TYPE_TINYINT, SqlTypeName::TINYINT),
+      std::make_pair(JDBC_TYPE_INTEGER, SqlTypeName::INTEGER),
+      std::make_pair(JDBC_TYPE_BIGINT, SqlTypeName::BIGINT),
+      std::make_pair(JDBC_TYPE_FLOAT, SqlTypeName::FLOAT),
+      std::make_pair(JDBC_TYPE_REAL, SqlTypeName::REAL),
+      std::make_pair(JDBC_TYPE_DOUBLE, SqlTypeName::DOUBLE),
+      std::make_pair(JDBC_TYPE_VARCHAR, SqlTypeName::VARCHAR),
+      std::make_pair(JDBC_TYPE_BINARY, SqlTypeName::BINARY),
+      std::make_pair(JDBC_TYPE_VARBINARY, SqlTypeName::VARBINARY),
+      std::make_pair(JDBC_TYPE_DATE, SqlTypeName::DATE),
+      std::make_pair(JDBC_TYPE_TIME, SqlTypeName::TIME),
+      std::make_pair(JDBC_TYPE_TIMESTAMP, SqlTypeName::TIMESTAMP)};
+
+  int numTests = sizeof(tests) / sizeof(std::pair< int16_t, std::string >);
+
+
+  for (int i = 0; i < numTests; i++) {
+    ColumnMeta columnMeta(schema, table, column, tests[i].first,
+                          Nullability::NULLABLE);
+    // test retrieving std::string value
+
+    // test SQL_DESC_LITERAL_PREFIX
+    found = columnMeta.GetAttribute(SQL_DESC_LOCAL_TYPE_NAME, resVal);
+    BOOST_CHECK(found);
+    BOOST_CHECK_EQUAL(resVal, tests[i].second);
+
+  }
+}
