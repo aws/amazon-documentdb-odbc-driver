@@ -35,11 +35,13 @@ OdbcClientError GetOdbcError(SQLSMALLINT handleType, SQLHANDLE handle) {
   SQLWCHAR message[ODBC_BUFFER_SIZE];
   SQLSMALLINT reallen = 0;
 
+  // On Windows, reallen is in bytes, on Linux reallen is in chars.
+  // Can't rely on returned length. So just use the buffer length in bytes.
   SQLGetDiagRec(handleType, handle, 1, sqlstate, &nativeCode, message,
                 sizeof(message), &reallen);
 
   return OdbcClientError(utility::SqlStringToString(sqlstate, SQL_NTS),
-                         utility::SqlStringToString(message, reallen, true));
+                         utility::SqlStringToString(message, sizeof(message), true));
 }
 
 std::string GetOdbcErrorState(SQLSMALLINT handleType, SQLHANDLE handle,
@@ -50,6 +52,8 @@ std::string GetOdbcErrorState(SQLSMALLINT handleType, SQLHANDLE handle,
   SQLWCHAR message[ODBC_BUFFER_SIZE];
   SQLSMALLINT reallen = 0;
 
+  // On Windows, reallen is in bytes, on Linux reallen is in chars.
+  // Can't rely on returned length. So just use the buffer length in bytes.
   SQLGetDiagRec(handleType, handle, idx, sqlstate, &nativeCode, message,
                 sizeof(message), &reallen);
 
@@ -62,21 +66,21 @@ std::string GetOdbcErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle,
   SQLINTEGER nativeCode;
 
   SQLWCHAR message[ODBC_BUFFER_SIZE];
-  SQLSMALLINT bufSize = static_cast< SQLSMALLINT >(sizeof(message));
   SQLSMALLINT reallen = 0;
 
+  // On Windows, reallen is in bytes, on Linux reallen is in chars.
+  // Can't rely on returned length. So just use the buffer length in bytes.
   SQLGetDiagRec(handleType, handle, idx, sqlstate, &nativeCode, message,
-                bufSize, &reallen);
+                sizeof(message), &reallen);
 
   std::string res = utility::SqlStringToString(sqlstate, SQL_NTS);
 
-  if (!res.empty())
-
-    res.append(": ").append(utility::SqlStringToString(
-        message,
-        std::max(bufSize, std::min(bufSize, reallen))));
-  else
+  if (!res.empty()) {
+    res.append(": ").append(
+        utility::SqlStringToString(message, sizeof(message), true));
+  } else {
     res = "No results";
+  }
 
   return res;
 }

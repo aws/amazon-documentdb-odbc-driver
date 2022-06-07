@@ -4,7 +4,7 @@ The DocumentDB ODBC Driver supports the Unicode ODBC interface. It does not supp
 
 ## 1.1. Unicode encoding at ODBC Layer
 
-The definition of the Unicode at the ODBC layer is define as SQLWCHAR. There is platform specific implementations.
+The definition of the Unicode at the ODBC layer is defined as SQLWCHAR. There is platform specific implementations.
 
 - *Windows*: The SQLWCHAR is defined as wchar_t (2-byte)
 - *MacOS (iODBC)*: The SQLWCHAR is defined as wchar_t (4-byte)
@@ -14,7 +14,7 @@ In terms of our driver, the entry point is the entry_point.cpp/h. For each API e
 
 Here we pass the SQLWCHAR pointer to/from entry_point and odbc. 
 
-However, from the `odbc` namespace to the rest of the driver, we encode data in UTF-8 encoding. The reason being is that all the backend API (JNI and MongoCXX) use UTF-8 encoding. So to minimize the number of conversions, we chosse to use UTF-8 encoding at this layer.
+However, from the `odbc` namespace to the rest of the driver, we encode data in UTF-8 encoding. The reason being is that all the backend API (JNI and MongoCXX) use UTF-8 encoding. So to minimize the number of conversions, we choose to use UTF-8 encoding at this layer.
 
 ```mermaid
 graph TD
@@ -37,4 +37,4 @@ Log files are encoded in UTF-8 format with BOM (byte-order-mark).
 
 When creating and comparing literals with the C/C++ data type of `[const] char*`, ensure to use the literal prefix: `u8`. For example : `u8"你好"`.
 
-When create and comparing literals in SQLWCHAR, use the literal prefix `L`. For example: `L"你好"`.
+When creating use the `NewSqlWchar(L"你好")` function. When comparing literals in SQLWCHAR , first convert to string (`utility::SqlStringToString()`) and then compare as UTF-8 literal `u8"你好"`.
