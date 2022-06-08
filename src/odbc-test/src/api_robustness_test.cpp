@@ -715,7 +715,7 @@ BOOST_AUTO_TEST_CASE(TestSQLRowCount, *disabled()) {
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-  SQLRowCount(stmt, 0);
+  SQLRowCount(stmt, nullptr);
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLForeignKeysSegFault, *disabled()) {
@@ -1039,10 +1039,10 @@ BOOST_AUTO_TEST_CASE(TestSQLGetEnvAttr, *disabled()) {
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_ENV, env);
 
-  SQLGetEnvAttr(env, SQL_ATTR_ODBC_VERSION, 0, sizeof(buffer), &resLen);
+  SQLGetEnvAttr(env, SQL_ATTR_ODBC_VERSION, nullptr, sizeof(buffer), &resLen);
   SQLGetEnvAttr(env, SQL_ATTR_ODBC_VERSION, buffer, 0, &resLen);
   SQLGetEnvAttr(env, SQL_ATTR_ODBC_VERSION, buffer, sizeof(buffer), 0);
-  SQLGetEnvAttr(env, SQL_ATTR_ODBC_VERSION, 0, 0, 0);
+  SQLGetEnvAttr(env, SQL_ATTR_ODBC_VERSION, nullptr, 0, nullptr);
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLSpecialColumns, *disabled()) {

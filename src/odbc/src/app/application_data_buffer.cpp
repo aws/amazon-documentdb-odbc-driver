@@ -286,11 +286,6 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
   SqlLen* resLenPtr = GetResLen();
   void* dataPtr = GetData();
 
-  if (resLenPtr) {
-    // In bytes
-    *resLenPtr = static_cast< SqlLen >(value.size() * charSize);
-  }
-
   if (!dataPtr)
     return ConversionResult::Type::AI_SUCCESS;
 
@@ -302,26 +297,31 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
   SqlLen outLen = (buflen / charSize) - 1;
 
   // Data stored in utf-8, convert to wide string before copying.
-  std::wstring value0 =
+  std::wstring wValue =
       utility::FromUtf8(reinterpret_cast< const char* >(value.c_str()));
-  SqlLen toCopy = std::min< SqlLen >(outLen, value0.size());
+  SqlLen toCopy = std::min< SqlLen >(outLen, wValue.size());
 
   if (sizeof(OutCharT) == 1) {
     // wstring to string
     std::locale currentLocale("");
     std::use_facet< std::ctype< wchar_t > >(currentLocale)
-        .narrow(value0.data(), value0.data() + toCopy, '?', reinterpret_cast< char* >(out));
+        .narrow(wValue.data(), wValue.data() + toCopy, '?', reinterpret_cast< char* >(out));
   } else {
     for (SqlLen i = 0; i < toCopy; ++i)
-      out[i] = value0[i];
+      out[i] = wValue[i];
   }
 
   out[toCopy] = 0;
 
   // In bytes
   written = static_cast< int32_t >(toCopy * charSize);
+  if (resLenPtr) {
+    // In bytes
+    *resLenPtr = static_cast< SqlLen >(written);
+  }
 
-  if (toCopy < static_cast< SqlLen >(value.size()))
+  // Need to compare in "code-points"
+  if (toCopy < static_cast< SqlLen >(wValue.size()))
     return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
 
   return ConversionResult::Type::AI_SUCCESS;
