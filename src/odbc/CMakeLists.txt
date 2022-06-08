@@ -39,6 +39,9 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/binary/binary_reader.cpp
         src/binary/binary_type.cpp
         src/binary/binary_raw_reader.cpp
+	src/cluster/cluster_group.cpp
+	src/cluster/cluster_node.cpp
+	src/cluster/ignite_cluster.cpp
         src/common_types.cpp
         src/common/big_integer.cpp
         src/common/bits.cpp
@@ -61,9 +64,26 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/impl/binary/binary_object_header.cpp
         src/impl/binary/binary_object_impl.cpp
         src/impl/binary/binary_field_meta.cpp
+	src/impl/binary/binary_type_updater_impl.cpp
+        src/impl/cache/cache_affinity_impl.cpp
+        src/impl/cache/cache_impl.cpp
+        src/impl/cache/query/query_batch.cpp
+        src/impl/cache/query/query_impl.cpp
+        src/impl/cache/query/continuous/continuous_query_handle_impl.cpp
+        src/impl/cluster/cluster_group_impl.cpp
+        src/impl/cluster/cluster_node_impl.cpp
+        src/impl/cluster/ignite_cluster_impl.cpp
+        src/impl/compute/cancelable_impl.cpp
+        src/impl/compute/compute_impl.cpp
+        src/impl/interop/interop_input_stream.cpp
         src/impl/interop/interop_memory.cpp
         src/impl/interop/interop_output_stream.cpp
-        src/impl/interop/interop_input_stream.cpp
+        src/impl/interop/interop_target.cpp
+	src/impl/interop/interop_external_memory.cpp
+        src/impl/handle_registry.cpp
+        src/impl/ignite_binding_impl.cpp
+        src/impl/ignite_environment.cpp
+        src/impl/ignite_impl.cpp
         src/connection.cpp
         src/driver_instance.cpp
         src/cursor.cpp
@@ -104,6 +124,7 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/sql/sql_utils.cpp
         src/streaming/streaming_batch.cpp
         src/streaming/streaming_context.cpp
+        src/ignite.cpp
         src/ssl_mode.cpp
         src/protocol_version.cpp
         src/result_page.cpp
@@ -133,6 +154,7 @@ if (WIN32)
             os/win/src/system/ui/window.cpp
             os/win/src/common/concurrent_os.cpp
             os/win/src/common/platform_utils.cpp
+	    os/win/src/common/dynamic_load_os.cpp
             src/jni/os/win/utils.cpp
             module.def
     )
@@ -142,6 +164,7 @@ else()
     list(APPEND SOURCES 
             os/linux/src/common/concurrent_os.cpp
             os/linux/src/common/platform_utils.cpp
+	    os/linux/src/common/dynamic_load_os.cpp
             src/jni/os/linux/utils.cpp
     )
 endif ()
@@ -164,7 +187,7 @@ if (WIN32)
         add_definitions(-DNOMINMAX)
     endif()
 
-    target_link_libraries(${TARGET} ignite-common-objlib odbccp32 shlwapi)
+    target_link_libraries(${TARGET} odbccp32 shlwapi)
 
     remove_definitions(-DUNICODE=1)
 
@@ -176,7 +199,7 @@ if (WIN32)
                 
     set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME "ignite.odbc")
 else()
-    target_link_libraries(${TARGET} ignite-common)
+    target_link_libraries(${TARGET})
 endif()
 
 if (WIN32 AND ${WITH_ODBC_MSI})

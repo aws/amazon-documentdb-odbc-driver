@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include <ignite/common/utils.h>
+#include <ignite/odbc/common/utils.h>
 #include <ignite/odbc/odbc_error.h>
 #include <ignite/odbc/sql/sql_lexer.h>
 #include <ignite/odbc/sql/sql_set_streaming_command.h>
