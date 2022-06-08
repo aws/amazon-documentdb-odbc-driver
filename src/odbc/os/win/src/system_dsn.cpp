@@ -49,13 +49,11 @@ bool DisplayConnectionWindow(void* windowParent, Configuration& config) {
 
     return ProcessMessages(window) == Result::OK;
   } catch (const ignite::odbc::IgniteError& err) {
-    std::stringstream buf;
+    std::wstringstream buf;
 
-    buf << "Message: " << err.GetText() << ", Code: " << err.GetCode();
+    buf << L"Message: " << err.GetText() << L", Code: " << err.GetCode();
 
-    std::wstring message = FromUtf8(buf.str());
-
-    MessageBox(NULL, message.c_str(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
+    MessageBox(NULL, buf.str().c_str(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
 
     SQLPostInstallerError(err.GetCode(), FromUtf8(err.GetText()).c_str());
   }
