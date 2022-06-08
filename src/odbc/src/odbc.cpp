@@ -625,6 +625,7 @@ SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnNum) {
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
+/** If NULL tableName is passed, it will automatically be converted to "%". */
 SQLRETURN SQLTables(SQLHSTMT stmt, SQLCHAR* catalogName,
                     SQLSMALLINT catalogNameLen, SQLCHAR* schemaName,
                     SQLSMALLINT schemaNameLen, SQLCHAR* tableName,
@@ -646,8 +647,7 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLCHAR* catalogName,
 
   boost::optional< std::string > catalog = SqlStringToOptString(catalogName, catalogNameLen);
   boost::optional< std::string > schema = SqlStringToOptString(schemaName, schemaNameLen);
-  boost::optional< std::string > tableTmp = SqlStringToOptString(tableName, tableNameLen);
-  std::string table = tableTmp ? *tableTmp : std::string("%");
+  std::string table = SqlStringToOptString(tableName, tableNameLen).get_value_or("%");
   boost::optional< std::string > tableTypeStr = SqlStringToOptString(tableType, tableTypeLen);
 
   LOG_INFO_MSG("catalog: " << catalog);
@@ -662,6 +662,8 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLCHAR* catalogName,
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
+/** If NULL tableName is passed, it will automatically be converted to "%".
+ * If NULL columnName is passed, it will automatically be converted to "%". */
 SQLRETURN SQLColumns(SQLHSTMT stmt, SQLCHAR* catalogName,
                      SQLSMALLINT catalogNameLen, SQLCHAR* schemaName,
                      SQLSMALLINT schemaNameLen, SQLCHAR* tableName,
@@ -685,12 +687,10 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLCHAR* catalogName,
       SqlStringToOptString(catalogName, catalogNameLen);
   boost::optional< std::string > schema =
       SqlStringToOptString(schemaName, schemaNameLen);
-  boost::optional< std::string > tableTmp =
-      SqlStringToOptString(tableName, tableNameLen);
-  std::string table = tableTmp ? *tableTmp : std::string("%");
-  boost::optional< std::string > columnTmp =
-      SqlStringToOptString(columnName, columnNameLen);
-  std::string column = columnTmp ? *columnTmp : std::string("%");
+  std::string table =
+      SqlStringToOptString(tableName, tableNameLen).get_value_or("%");
+  std::string column =
+      SqlStringToOptString(columnName, columnNameLen).get_value_or("%");
 
   LOG_INFO_MSG("catalog: " << catalog.get_value_or(""));
   LOG_INFO_MSG("schema: " << schema.get_value_or(""));
