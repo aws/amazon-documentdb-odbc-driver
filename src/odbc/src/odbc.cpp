@@ -625,13 +625,13 @@ SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnNum) {
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
+/** If NULL tableName is passed, it will automatically be converted to "%". */
 SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
                     SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
                     SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
                     SQLSMALLINT tableNameLen, SQLWCHAR* tableType,
                     SQLSMALLINT tableTypeLen) {
   using odbc::Statement;
-  using odbc::utility::SqlStringToString;
   using odbc::utility::SqlStringToOptString;
 
   LOG_DEBUG_MSG("SQLTables called");
@@ -649,7 +649,8 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
       SqlStringToOptString(catalogName, catalogNameLen);
   boost::optional< std::string > schema =
       SqlStringToOptString(schemaName, schemaNameLen);
-  std::string table = SqlStringToString(tableName, tableNameLen);
+  std::string table =
+      SqlStringToOptString(tableName, tableNameLen).get_value_or("%");
   boost::optional< std::string > tableTypeStr =
       SqlStringToOptString(tableType, tableTypeLen);
 
@@ -665,13 +666,14 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
+/** If NULL tableName is passed, it will automatically be converted to "%".
+ * If NULL columnName is passed, it will automatically be converted to "%". */
 SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
                      SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
                      SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
                      SQLSMALLINT tableNameLen, SQLWCHAR* columnName,
                      SQLSMALLINT columnNameLen) {
   using odbc::Statement;
-  using odbc::utility::SqlStringToString;
   using odbc::utility::SqlStringToOptString;
 
   LOG_DEBUG_MSG("SQLColumns called");
@@ -685,12 +687,14 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
     return SQL_INVALID_HANDLE;
   }
 
-  const boost::optional< std::string > catalog =
+  boost::optional< std::string > catalog =
       SqlStringToOptString(catalogName, catalogNameLen);
-  const boost::optional< std::string > schema =
+  boost::optional< std::string > schema =
       SqlStringToOptString(schemaName, schemaNameLen);
-  std::string table = SqlStringToString(tableName, tableNameLen);
-  std::string column = SqlStringToString(columnName, columnNameLen);
+  std::string table =
+      SqlStringToOptString(tableName, tableNameLen).get_value_or("%");
+  std::string column =
+      SqlStringToOptString(columnName, columnNameLen).get_value_or("%");
 
   LOG_INFO_MSG("catalog: " << catalog.get_value_or(""));
   LOG_INFO_MSG("schema: " << schema.get_value_or(""));
