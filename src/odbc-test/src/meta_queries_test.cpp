@@ -52,6 +52,19 @@ using namespace boost::unit_test;
  */
 struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
   const static SQLLEN C_STR_LEN_DEFAULT = 1024;
+
+  /**
+   * Connect to the local server with the database name
+   *
+   * @param databaseName Database Name
+   */
+  void connectToLocalServer(std::string databaseName) {
+    std::string dsnConnectionString;
+    CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+    Connect(dsnConnectionString);
+  }
+
   /**
    * Converts SQLCHAR[] to std::string
    *
@@ -66,7 +79,6 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
 
     return buf;
   }
-
 
   /**
    * Checks single row result set for correct work with SQLGetData.
@@ -649,11 +661,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnPresicion, *disabled()) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDataTypesAndColumnNames) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   std::pair< int16_t, std::string > tests[] = {
       std::make_pair(SQL_VARCHAR, std::string("meta_queries_test_002__id")),
@@ -706,11 +715,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDataTypesAndColumnNames) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescAutoUniqueValue) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req[] = "select fieldDouble from meta_queries_test_001";
 
@@ -719,11 +725,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescAutoUniqueValue) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseColumnName) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
 
@@ -732,11 +735,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseColumnName) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseTableName) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
 
@@ -745,11 +745,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseTableName) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescCaseSensitive) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   // test that case sensitive returns true for string field.
   SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
@@ -763,11 +760,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCaseSensitive) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescCatalogName) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req[] = "select fieldDecimal128 from meta_queries_test_001";
 
@@ -777,11 +771,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCatalogName) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescConciseType) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
 
@@ -803,11 +794,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescConciseType) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescCount) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req[] = "select fieldString from meta_queries_test_001";
   
@@ -816,11 +804,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCount) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescDisplaySize) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req1[] = "select fieldBinary from meta_queries_test_001";
 
@@ -850,11 +835,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescDisplaySize) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescFixedPrecScale) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req[] = "select fieldLong from meta_queries_test_001";
 
@@ -863,11 +845,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescFixedPrecScale) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescLabel) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req[] = "select fieldBoolean from meta_queries_test_002";
 
@@ -876,11 +855,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLabel) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescLength) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
 
@@ -909,11 +885,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLength) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralPrefix) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   // test that empty string is returned for non-char and non-binary type
   SQLCHAR req1[] = "select fieldDouble from meta_queries_test_001";
@@ -933,11 +906,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralPrefix) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralSuffix) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   // test that empty string is returned for non-char and non-binary type
   SQLCHAR req1[] = "select fieldBoolean from meta_queries_test_001";
@@ -953,11 +923,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralSuffix) {
 BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
   using ignite::odbc::type_traits::SqlTypeName;
 
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req1[] = "select fieldDouble from meta_queries_test_001";
 
@@ -991,11 +958,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescName) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
 
@@ -1004,11 +968,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescName) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescNullable) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   // test meta_queries_test_001__id (a primary key) should not be nullable 
   SQLCHAR req1[] = "select meta_queries_test_001__id from meta_queries_test_001";
@@ -1022,11 +983,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescNullable) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescNumPrecRadix) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req1[] = "select fieldFloat from meta_queries_test_002";
 
@@ -1045,11 +1003,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescNumPrecRadix) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescOctetLength) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
 
@@ -1079,11 +1034,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescOctetLength) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
 
@@ -1112,11 +1064,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescScale) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req[] = "select fieldLong from meta_queries_test_001";
 
@@ -1125,11 +1074,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescScale) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescSchemaName) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
 
@@ -1138,11 +1084,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescSchemaName) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescSearchable) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req[] = "select fieldString from meta_queries_test_002";
 
@@ -1151,11 +1094,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescSearchable) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescTableName) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
 
@@ -1191,11 +1131,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescType) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescUnnamed) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req[] = "select fieldNull from meta_queries_test_001";
 
@@ -1204,11 +1141,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescUnnamed) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescUnsigned) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req1[] = "select fieldInt from meta_queries_test_001";
 
@@ -1223,11 +1157,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescUnsigned) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescUpdatable) {
-  std::string dsnConnectionString;
   std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer(databaseName);
 
   SQLCHAR req[] = "select fieldMaxKey from meta_queries_test_002";
 
