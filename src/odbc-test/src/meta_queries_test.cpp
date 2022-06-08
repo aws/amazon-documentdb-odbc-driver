@@ -1006,6 +1006,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescOctetLength) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
+  size_t size_of_char = sizeof(char);
+
   SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
 
   // SQL_VARCHAR should have octet length SQL_NO_TOTAL
@@ -1014,23 +1016,23 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescOctetLength) {
   SQLCHAR req2[] = "select fieldInt from meta_queries_test_002";
 
   // SQL_INTEGER should have octet length 4 * sizeof(char)
-  callSQLColAttribute(stmt, req2, SQL_DESC_OCTET_LENGTH, 4 * sizeof(char));
+  callSQLColAttribute(stmt, req2, SQL_DESC_OCTET_LENGTH, 4 * size_of_char);
   
 
   SQLCHAR req3[] = "select fieldLong from meta_queries_test_002";
 
   // SQL_BIGINT should have octet length 8 * sizeof(char)
-  callSQLColAttribute(stmt, req3, SQL_DESC_OCTET_LENGTH, 8 * sizeof(char));
+  callSQLColAttribute(stmt, req3, SQL_DESC_OCTET_LENGTH, 8 * size_of_char);
 
   SQLCHAR req4[] = "select fieldDouble from meta_queries_test_002";
 
   // SQL_DOUBLE should have octet length 8 * sizeof(char)
-  callSQLColAttribute(stmt, req4, SQL_DESC_OCTET_LENGTH, 8 * sizeof(char));
+  callSQLColAttribute(stmt, req4, SQL_DESC_OCTET_LENGTH, 8 * size_of_char);
 
   SQLCHAR req5[] = "select fieldDate from meta_queries_test_002";
 
   // SQL_TYPE_TIMESTAMP should have octet length 16 * sizeof(char)
-  callSQLColAttribute(stmt, req5, SQL_DESC_OCTET_LENGTH, 16 * sizeof(char));
+  callSQLColAttribute(stmt, req5, SQL_DESC_OCTET_LENGTH, 16 * size_of_char);
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
@@ -1148,7 +1150,6 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescUnsigned) {
 
   // numeric type should be signed
   callSQLColAttribute(stmt, req1, SQL_DESC_UNSIGNED, SQL_FALSE);
-
 
   SQLCHAR req2[] = "select fieldString from meta_queries_test_001";
 
