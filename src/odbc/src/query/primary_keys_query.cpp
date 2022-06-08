@@ -119,6 +119,10 @@ SqlResult::Type PrimaryKeysQuery::FetchNextRow(
     return SqlResult::AI_ERROR;
   }
 
+  // An extra if check is needed here to prevent iterating past vector end
+  if (cursor == meta.end())
+    return SqlResult::AI_NO_DATA;
+
   if (!fetched)
     fetched = true;
   else
