@@ -392,10 +392,10 @@ BOOST_AUTO_TEST_CASE(TestSQLTables, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  std::vector< SQLWCHAR > catalogName{0};
-  std::vector< SQLWCHAR > schemaName{0};
-  std::vector< SQLWCHAR > tableName{0};
-  std::vector< SQLWCHAR > tableType{0};
+  std::vector< SQLWCHAR > catalogName = MakeSqlBuffer("");
+  std::vector< SQLWCHAR > schemaName = MakeSqlBuffer("");
+  std::vector< SQLWCHAR > tableName = MakeSqlBuffer("");
+  std::vector< SQLWCHAR > tableType = MakeSqlBuffer("");
 
   // Everything is ok.
   SQLRETURN ret =
@@ -421,10 +421,10 @@ BOOST_AUTO_TEST_CASE(TestSQLColumns, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  std::vector< SQLWCHAR > catalogName{0};
-  std::vector< SQLWCHAR > schemaName{0};
-  std::vector< SQLWCHAR > tableName{0};
-  std::vector< SQLWCHAR > columnName{0};
+  std::vector< SQLWCHAR > catalogName = MakeSqlBuffer("");
+  std::vector< SQLWCHAR > schemaName = MakeSqlBuffer("");
+  std::vector< SQLWCHAR > tableName = MakeSqlBuffer("");
+  std::vector< SQLWCHAR > columnName = MakeSqlBuffer("");
 
   // Everything is ok.
   SQLRETURN ret =
@@ -450,7 +450,7 @@ BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeys) {
 
   Connect(dsnConnectionString);
 
-  std::vector< SQLWCHAR > catalogName{0};
+  std::vector< SQLWCHAR > catalogName = MakeSqlBuffer("");
   std::vector< SQLWCHAR > schemaName = MakeSqlBuffer("odbc-test");
   std::vector< SQLWCHAR > tableName = MakeSqlBuffer("jni_test_001");
 
@@ -724,7 +724,7 @@ BOOST_AUTO_TEST_CASE(TestSQLForeignKeysSegFault, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  std::vector< SQLWCHAR > catalogName{0};
+  std::vector< SQLWCHAR > catalogName = MakeSqlBuffer("");
   std::vector< SQLWCHAR > schemaName = MakeSqlBuffer("cache");
   std::vector< SQLWCHAR > tableName = MakeSqlBuffer("TestType");
 
@@ -1051,7 +1051,7 @@ BOOST_AUTO_TEST_CASE(TestSQLSpecialColumns, *disabled()) {
 
   Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
 
-  std::vector< SQLWCHAR > catalogName{0};
+  std::vector< SQLWCHAR > catalogName = MakeSqlBuffer("");
   std::vector< SQLWCHAR > schemaName = MakeSqlBuffer("cache");
   std::vector< SQLWCHAR > tableName = MakeSqlBuffer("TestType");
 
