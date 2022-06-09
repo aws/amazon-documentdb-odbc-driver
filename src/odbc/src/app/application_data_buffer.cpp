@@ -18,6 +18,7 @@
 #include "ignite/odbc/app/application_data_buffer.h"
 
 #include <algorithm>
+#include <codecvt>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -297,8 +298,10 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
   SqlLen outLen = (buflen / charSize) - 1;
 
   // Data stored in utf-8, convert to wide string before copying.
+  static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
+      converter;
   std::wstring wValue =
-      utility::FromUtf8(reinterpret_cast< const char* >(value.c_str()));
+      converter.from_bytes(reinterpret_cast< const char* >(value.c_str()));
   SqlLen toCopy = std::min< SqlLen >(outLen, wValue.size());
 
   if (sizeof(OutCharT) == 1) {
