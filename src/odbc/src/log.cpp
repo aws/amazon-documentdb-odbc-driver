@@ -142,7 +142,6 @@ bool Logger::EnableLog() {
   if (stream == nullptr)
     SetLogStream(&fileStream);
 
-  bool fileExists = false;
   if (!IsEnabled() && logLevel != LogLevel::Type::OFF && stream == &fileStream) {
     if (logFileName.empty()) {
       logFileName = CreateFileName();
@@ -152,15 +151,10 @@ bool Logger::EnableLog() {
       if (common::FileExists(logFilePath)) {
         std::cout << "log file at \"" << logFilePath
                   << "\" already exists. Appending logs to the log file." << '\n';
-        fileExists = true;
       }
       std::cout << "logFilePath: " << logFilePath << '\n';
     }
     fileStream.open(logFilePath, std::ios_base::app);
-    if (!fileExists) {
-      const unsigned char bom[] = {0xEF, 0xBB, 0xBF};
-      fileStream << bom;
-    }
   }
   return IsEnabled();
 }

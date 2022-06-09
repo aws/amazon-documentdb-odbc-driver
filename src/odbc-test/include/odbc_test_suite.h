@@ -333,7 +333,7 @@ struct OdbcTestSuite {
   /**
    * Convert string to vector of SQLWCHARs.
    *
-   * @param qry Query.
+   * @param value Query.
    * @return Corresponding vector.
    */
   static std::vector< SQLWCHAR > MakeSqlBuffer(const std::string& value);

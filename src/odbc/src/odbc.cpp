@@ -1040,11 +1040,11 @@ SQLRETURN SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
   }
 
   boost::optional< std::string > catalog =
-      SqlStringToOptString(catalogName, catalogNameLen, true);
+      SqlStringToOptString(catalogName, catalogNameLen);
   boost::optional< std::string > schema =
-      SqlStringToOptString(schemaName, schemaNameLen, true);
+      SqlStringToOptString(schemaName, schemaNameLen);
   boost::optional< std::string > table =
-      SqlStringToOptString(tableName, tableNameLen, true);
+      SqlStringToOptString(tableName, tableNameLen);
 
   LOG_INFO_MSG("catalog: " << catalog.get_value_or(""));
   LOG_INFO_MSG("schema: " << schema.get_value_or(""));

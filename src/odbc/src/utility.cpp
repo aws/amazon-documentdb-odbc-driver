@@ -159,36 +159,19 @@ std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
 
   static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
       converter;
-  if (char_size == sizeof(wchar_t)) {
-    if (sqlStrLen == SQL_NTS) {
-      result = converter.to_bytes(reinterpret_cast< const wchar_t* >(sqlStr));
-    } else if (sqlStrLen > 0) {
-      size_t charsToCopy = lenInBytes ? (sqlStrLen / char_size) : sqlStrLen;
-      result = converter.to_bytes(
-          reinterpret_cast< const wchar_t* >(sqlStr),
-          reinterpret_cast< const wchar_t* >(sqlStr + charsToCopy));
-      size_t first_null = result.find_first_of('\0');
-      if (first_null != std::string::npos) {
-        result.resize(first_null);
-      }
+  std::wstring sqlStr0;
+  if (sqlStrLen == SQL_NTS) {
+    for (int i = 0; sqlStr[i] != 0; i++) {
+      sqlStr0.push_back(sqlStr[i]);
     }
-  } else if (char_size == 2) {
-    std::wstring sqlStr0;
-    if (sqlStrLen == SQL_NTS) {
-      for (int i = 0; sqlStr[i] != 0; i++) {
-        sqlStr0.push_back(sqlStr[i]);
-      }
-    } else if (sqlStrLen > 0) {
-      size_t charsToCopy = lenInBytes ? (sqlStrLen / char_size) : sqlStrLen;
-      sqlStr0.reserve(charsToCopy + 1);
-      for (int i = 0; i < charsToCopy && sqlStr[i] != 0; i++) {
-        sqlStr0.push_back(sqlStr[i]);
-      }
+  } else if (sqlStrLen > 0) {
+    size_t charsToCopy = lenInBytes ? (sqlStrLen / char_size) : sqlStrLen;
+    sqlStr0.reserve(charsToCopy + 1);
+    for (int i = 0; i < charsToCopy && sqlStr[i] != 0; i++) {
+      sqlStr0.push_back(sqlStr[i]);
     }
-    result = converter.to_bytes(sqlStr0);
   }
-
-  return result;
+  return converter.to_bytes(sqlStr0);
 }
 
 boost::optional< std::string > SqlStringToOptString(const SQLWCHAR* sqlStr,
