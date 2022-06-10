@@ -99,6 +99,7 @@ class ColumnMeta {
         columnName(columnName),
         dataType(dataType),
         precision(-1),
+        decimalDigits(-1),
         scale(-1),
         nullability(nullability),
         ordinalPosition(-1) {
@@ -122,8 +123,10 @@ class ColumnMeta {
         columnName(other.columnName),
         remarks(other.remarks),
         columnDef(other.columnDef),
+        isAutoIncrement(other.isAutoIncrement),
         dataType(other.dataType),
         precision(other.precision),
+        decimalDigits(other.decimalDigits),
         scale(other.scale),
         nullability(other.nullability),
         ordinalPosition(other.ordinalPosition) {
@@ -140,8 +143,10 @@ class ColumnMeta {
     columnName = other.columnName;
     remarks = other.remarks;
     columnDef = other.columnDef;
+    isAutoIncrement = other.isAutoIncrement;
     dataType = other.dataType;
     precision = other.precision;
+    decimalDigits = other.decimalDigits;
     scale = other.scale;
     nullability = other.nullability;
     ordinalPosition = other.ordinalPosition;
@@ -215,6 +220,14 @@ class ColumnMeta {
   }
 
   /**
+   * Get the column is auto increment.
+   * @return Column is auto increment.
+   */
+  const boost::optional< std::string >& GetIsAutoIncrement() const {
+    return isAutoIncrement;
+  }
+
+  /**
    * Get data type.
    * @return Data type.
    */
@@ -228,6 +241,14 @@ class ColumnMeta {
    */
   boost::optional< int32_t > GetPrecision() const {
     return precision;
+  }
+
+  /**
+   * Get column decimal digits.
+   * @return Column decimal digits.
+   */
+  boost::optional< int32_t > GetDecimalDigits() const {
+    return decimalDigits;
   }
 
   /**
@@ -291,11 +312,17 @@ class ColumnMeta {
   /** Column default value */
   boost::optional< std::string > columnDef;
 
+  /** Column is auto incremented */
+  boost::optional< std::string > isAutoIncrement;
+
   /** Data type. */
   boost::optional< int16_t > dataType;
 
   /** Column precision. */
   boost::optional< int32_t > precision;
+
+  /** Column decimal digits. */
+  boost::optional< int32_t > decimalDigits;
 
   /** Column scale. */
   boost::optional< int32_t > scale;
