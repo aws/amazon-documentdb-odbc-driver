@@ -488,24 +488,25 @@ BOOST_AUTO_TEST_CASE(TestGetAttributeOctetLength) {
   SQLLEN intVal;
   std::string resVal;
   bool found;
+  size_t size_of_char = sizeof(char);
 
   std::pair< int16_t, SQLLEN > tests[] = {
       std::make_pair(JDBC_TYPE_VARCHAR, SQL_NO_TOTAL),
       std::make_pair(JDBC_TYPE_CHAR, SQL_NO_TOTAL),
       std::make_pair(JDBC_TYPE_LONGVARCHAR, SQL_NO_TOTAL),
-      std::make_pair(JDBC_TYPE_BOOLEAN, 1 * sizeof(char)),
-      std::make_pair(JDBC_TYPE_SMALLINT, 2 * sizeof(char)),
-      std::make_pair(JDBC_TYPE_TINYINT, 1 * sizeof(char)),
-      std::make_pair(JDBC_TYPE_INTEGER, 4 * sizeof(char)),
-      std::make_pair(JDBC_TYPE_BIGINT, 8 * sizeof(char)),
-      std::make_pair(JDBC_TYPE_FLOAT, 4 * sizeof(char)),
-      std::make_pair(JDBC_TYPE_REAL, 4 * sizeof(char)),
-      std::make_pair(JDBC_TYPE_DOUBLE, 8 * sizeof(char)),
+      std::make_pair(JDBC_TYPE_BOOLEAN, 1 * size_of_char),
+      std::make_pair(JDBC_TYPE_SMALLINT, 2 * size_of_char),
+      std::make_pair(JDBC_TYPE_TINYINT, 1 * size_of_char),
+      std::make_pair(JDBC_TYPE_INTEGER, 4 * size_of_char),
+      std::make_pair(JDBC_TYPE_BIGINT, 8 * size_of_char),
+      std::make_pair(JDBC_TYPE_FLOAT, 4 * size_of_char),
+      std::make_pair(JDBC_TYPE_REAL, 4 * size_of_char),
+      std::make_pair(JDBC_TYPE_DOUBLE, 8 * size_of_char),
       std::make_pair(JDBC_TYPE_BINARY, SQL_NO_TOTAL),
       std::make_pair(JDBC_TYPE_VARBINARY, SQL_NO_TOTAL),
-      std::make_pair(JDBC_TYPE_DATE, 6),
-      std::make_pair(JDBC_TYPE_TIME, 6),
-      std::make_pair(JDBC_TYPE_TIMESTAMP, 16)};
+      std::make_pair(JDBC_TYPE_DATE, 6 * size_of_char),
+      std::make_pair(JDBC_TYPE_TIME, 6 * size_of_char),
+      std::make_pair(JDBC_TYPE_TIMESTAMP, 16 * size_of_char)};
 
   int numTests = sizeof(tests) / sizeof(std::pair< int16_t, SQLLEN >);
 
