@@ -6,6 +6,7 @@
     "fieldDecimal128": {
       "$numberDecimal": "Infinity"
     },
+    "fieldFloat": 1.23,
     "fieldDouble": 3.1415926E23,
     "fieldString": "こんにちは",
     "fieldObjectId": {
