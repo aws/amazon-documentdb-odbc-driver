@@ -488,6 +488,169 @@ BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeys) {
   SQLPrimaryKeys(stmt, 0, 0, 0, 0, 0, 0);
 }
 
+BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeysHighRowArraySize) { 
+  // -AL- todo copy this test to last bug PR and ensure that it crashes
+  // todo do the same tests for other modified queries (column, table, foreignkey, type info)
+
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR catalogName[] = "";
+  SQLCHAR schemaName[] = "odbc-test";
+  SQLCHAR tableName[] = "jni_test_001";
+  SQLULEN val = 50;
+
+  // set the value of row array size to be greater than the available rows in the database
+  SQLRETURN ret =
+      SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE,
+                     reinterpret_cast< SQLPOINTER >(val), sizeof(val));
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  // Everything is ok.
+  ret = SQLPrimaryKeys(stmt, catalogName, SQL_NTS, schemaName, SQL_NTS,
+                       tableName, SQL_NTS);
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  // Ensure that it does not crash 
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+}
+
+BOOST_AUTO_TEST_CASE(TestSQLForiegnKeysHighRowArraySize) {
+  // -AL- todo copy this test to last bug PR and ensure that it crashes
+  // todo do the same tests for other modified queries (column, table,
+  // foreignkey, type info)
+
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR tableName[] = "meta_queries_test_002_with_array_array";
+  SQLULEN val = 50;
+
+  // set the value of row array size to be greater than the available rows in
+  // the database
+  SQLRETURN ret =
+      SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE,
+                     reinterpret_cast< SQLPOINTER >(val), sizeof(val));
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  // Everything is ok.
+  ret = SQLForeignKeys(stmt, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+                       nullptr, 0, tableName, sizeof(tableName));
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  // Ensure that it does not crash
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+}
+
+BOOST_AUTO_TEST_CASE(TestSQLTablesHighRowArraySize) {
+  // -AL- todo copy this test to last bug PR and ensure that it crashes
+  // todo do the same tests for other modified queries (column, table,
+  // foreignkey, type info)
+
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR empty[] = "";
+  SQLCHAR tableName[] = "jni_test_001";
+  SQLULEN val = 50;
+
+  // set the value of row array size to be greater than the available rows in
+  // the database
+  SQLRETURN ret =
+      SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE,
+                     reinterpret_cast< SQLPOINTER >(val), sizeof(val));
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  // Everything is ok.
+  ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, tableName, SQL_NTS, empty,
+                  SQL_NTS);
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  // Ensure that it does not crash
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+}
+
+BOOST_AUTO_TEST_CASE(TestSQLColumnsHighRowArraySize) {
+  // -AL- todo copy this test to last bug PR and ensure that it crashes
+  // todo do the same tests for other modified queries (column, table,
+  // foreignkey, type info)
+
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+
+  Connect(dsnConnectionString);
+
+  SQLCHAR catalogName[] = "";
+  SQLCHAR schemaName[] = "odbc-test";
+  SQLCHAR tableName[] = "jni_test_001";
+  SQLCHAR columnName[] = "fieldString";
+  SQLULEN val = 50;
+
+  // set the value of row array size to be greater than the available rows in
+  // the database
+  SQLRETURN ret =
+      SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE,
+                     reinterpret_cast< SQLPOINTER >(val), sizeof(val));
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  // Everything is ok.
+  ret =
+      SQLColumns(stmt, catalogName, SQL_NTS, schemaName, SQL_NTS, tableName,
+                   SQL_NTS, columnName, SQL_NTS);
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  // Ensure that it does not crash
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+}
+
+BOOST_AUTO_TEST_CASE(TestSQLTypeInfoHighRowArraySize) {
+  // -AL- todo copy this test to last bug PR and ensure that it crashes
+  // todo do the same tests for other modified queries (column, table,
+  // foreignkey, type info)
+
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+
+  Connect(dsnConnectionString);
+
+  SQLULEN val = 50;
+
+  // set the value of row array size to be greater than the available rows in
+  // the database
+  SQLRETURN ret =
+      SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE,
+                     reinterpret_cast< SQLPOINTER >(val), sizeof(val));
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  // Everything is ok.
+  ret = ret = SQLGetTypeInfo(stmt, SQL_ALL_TYPES);
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  // Ensure that it does not crash
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+}
+
 BOOST_AUTO_TEST_CASE(TestSQLBindCol, *disabled()) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
