@@ -488,10 +488,7 @@ BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeys) {
   SQLPrimaryKeys(stmt, 0, 0, 0, 0, 0, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeysHighRowArraySize) { 
-  // -AL- todo copy this test to last bug PR and ensure that it crashes
-  // todo do the same tests for other modified queries (column, table, foreignkey, type info)
-
+BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeysHighRowArraySize) {
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
@@ -521,10 +518,6 @@ BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeysHighRowArraySize) {
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLForiegnKeysHighRowArraySize) {
-  // -AL- todo copy this test to last bug PR and ensure that it crashes
-  // todo do the same tests for other modified queries (column, table,
-  // foreignkey, type info)
-
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
@@ -553,10 +546,6 @@ BOOST_AUTO_TEST_CASE(TestSQLForiegnKeysHighRowArraySize) {
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLTablesHighRowArraySize) {
-  // -AL- todo copy this test to last bug PR and ensure that it crashes
-  // todo do the same tests for other modified queries (column, table,
-  // foreignkey, type info)
-
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
@@ -586,10 +575,6 @@ BOOST_AUTO_TEST_CASE(TestSQLTablesHighRowArraySize) {
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLColumnsHighRowArraySize) {
-  // -AL- todo copy this test to last bug PR and ensure that it crashes
-  // todo do the same tests for other modified queries (column, table,
-  // foreignkey, type info)
-
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
@@ -622,10 +607,6 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnsHighRowArraySize) {
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLTypeInfoHighRowArraySize) {
-  // -AL- todo copy this test to last bug PR and ensure that it crashes
-  // todo do the same tests for other modified queries (column, table,
-  // foreignkey, type info)
-
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
