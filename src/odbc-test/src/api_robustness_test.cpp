@@ -623,7 +623,7 @@ BOOST_AUTO_TEST_CASE(TestSQLTypeInfoHighRowArraySize) {
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   // Everything is ok.
-  ret = ret = SQLGetTypeInfo(stmt, SQL_ALL_TYPES);
+  ret = SQLGetTypeInfo(stmt, SQL_ALL_TYPES);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
