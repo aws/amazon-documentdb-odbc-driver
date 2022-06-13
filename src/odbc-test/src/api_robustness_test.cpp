@@ -612,7 +612,7 @@ BOOST_AUTO_TEST_CASE(TestSQLTypeInfoHighRowArraySize) {
 
   Connect(dsnConnectionString);
 
-  SQLULEN val = 50;
+  SQLULEN val = 12;
 
   // set the value of row array size to be greater than the available rows in
   // the database
