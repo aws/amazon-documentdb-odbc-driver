@@ -31,41 +31,135 @@ namespace utility {
 using namespace odbc::impl::binary;
 using namespace odbc::common;
 
-size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen,
-                          bool lenInBytes) {
+size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
+                                     size_t outBufferLenBytes,
+                                     bool& isTruncated) {
+  if (!inBuffer)
+    return 0;
+
   static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
       converter;
-  size_t char_size = sizeof(SQLWCHAR);
+  std::wstring inString = converter.from_bytes(inBuffer);
+  size_t inBufferLenChars = inString.size();
+  size_t outBufferLenActual = std::min(
+      inBufferLenChars, outBufferLenBytes ? (outBufferLenBytes - 1) : 0);
 
-  assert(buflen >= 0 && (!lenInBytes || (buflen % char_size == 0)));
+  if (!outBuffer)
+    return inBufferLenChars;
 
-  std::wstring str0;
-  str0 = converter.from_bytes(str);
-  size_t charsToCopy = lenInBytes
-                           ? std::min(str0.size(), ((buflen / char_size) - 1))
-                           : std::min(str0.size(), (buflen - 1));
+  std::locale currentLocale("");
+  const std::codecvt_utf8< char > convFacet;
 
-  if (buf && charsToCopy > 0) {
-    const wchar_t* data = str0.data();
-    for (int i = 0; i < charsToCopy; i++) {
-      buf[i] = data[i];
-    }
-  }
-  if (buf && buflen >= char_size) {
-    buf[charsToCopy] = 0;
+  std::use_facet< std::ctype< wchar_t > >(currentLocale)
+      .narrow(inString.data(), inString.data() + outBufferLenActual, '?',
+              reinterpret_cast< char* >(outBuffer));
+  if (outBufferLenBytes > 0) {
+    outBuffer[outBufferLenActual] = 0;
   }
 
-  size_t required;
-  size_t copied;
-  if (lenInBytes) {
-    required = str0.size() * char_size;
-    copied = charsToCopy * char_size;
+  return outBufferLenActual;
+}
+
+template< typename OutCharT >
+size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
+                                      size_t outBufferLenBytes,
+                                      bool& isTruncated) {
+  size_t charSize = sizeof(SQLWCHAR);
+  assert(sizeof(OutCharT) == charSize);
+
+  size_t outBufferLenChars =
+      outBufferLenBytes ? (outBufferLenBytes / charSize) - 1 : 0;
+  // Does NOT include the null-terminating character.
+  size_t inBufferLen = std::strlen(inBuffer);
+  OutCharT* pOutBuffer;
+  std::vector< OutCharT > targetProxy;
+
+  if (outBuffer) {
+    pOutBuffer = reinterpret_cast< OutCharT* >(outBuffer);
   } else {
-    required = str0.size();
-    copied = charsToCopy;
+    // Creates a proxy buffer so we can determine the required length.
+    targetProxy.resize(inBufferLen + (1 * charSize));
+    pOutBuffer = targetProxy.data();
+    outBufferLenChars = inBufferLen;
   }
 
-  return (buflen > 0) ? copied : required;
+  // Setup conversion facet.
+  typedef std::codecvt< OutCharT, char, std::mbstate_t > facet_type;
+  const std::codecvt_utf8< OutCharT > convFacet;
+  std::mbstate_t convState = std::mbstate_t();
+  const char* pInBufferNext;
+  OutCharT* pOutBufferNext;
+
+  // translate characters:
+  facet_type::result myresult =
+      convFacet.in(convState, inBuffer, inBuffer + inBufferLen, pInBufferNext,
+                   pOutBuffer, pOutBuffer + outBufferLenChars, pOutBufferNext);
+
+  size_t lenConverted = 0;
+  switch (myresult) {
+    case facet_type::ok:
+    case facet_type::partial:
+      lenConverted = pOutBufferNext - pOutBuffer;
+      // null-terminate target string, if room
+      if (outBufferLenBytes >= charSize) {
+        pOutBuffer[lenConverted] = 0;
+      }
+      isTruncated = (myresult == facet_type::partial);
+      break;
+    case facet_type::error:
+      LOG_ERROR_MSG("Unable to convert character '" << *pInBufferNext << "'");
+      lenConverted = pOutBufferNext - pOutBuffer;
+      // null-terminate target string, if room
+      if (outBufferLenBytes >= charSize) {
+        pOutBuffer[lenConverted] = 0;
+      }
+      isTruncated = true;
+      break;
+    default:
+      LOG_ERROR_MSG("Unexpected error converting string '" << inBuffer << "'");
+      assert(false);
+      break;
+  }
+
+  return lenConverted * charSize;
+}
+
+size_t CopyUtf8StringToSqlWcharString(const char* inBuffer, SQLWCHAR* outBuffer,
+                                      size_t outBufferLenBytes,
+                                      bool& isTruncated) {
+  if (!inBuffer)
+    return 0;
+
+  size_t charSize = sizeof(SQLWCHAR);
+  switch (charSize) {
+    case 2:
+      return CopyUtf8StringToWcharString(
+          inBuffer, reinterpret_cast< char16_t* >(outBuffer), outBufferLenBytes,
+          isTruncated);
+      break;
+    case 4:
+      return CopyUtf8StringToWcharString(
+          inBuffer, reinterpret_cast< char32_t* >(outBuffer), outBufferLenBytes,
+          isTruncated);
+      break;
+    default:
+      LOG_ERROR_MSG("Unexpected error converting string '" << inBuffer << "'");
+      assert(false);
+      return 0;
+  }
+}
+
+size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen,
+                          bool lenInBytes) {
+  size_t charSize = sizeof(SQLWCHAR);
+
+  assert(buflen >= 0 && (!lenInBytes || (buflen % charSize == 0)));
+
+  size_t bufLenInBytes = lenInBytes ? buflen : buflen * charSize;
+  bool isTruncated = false;
+  size_t bytesWritten = CopyUtf8StringToSqlWcharString(
+      str.c_str(), buf, bufLenInBytes, isTruncated);
+  return lenInBytes ? bytesWritten : bytesWritten / charSize;
 }
 
 void ReadString(BinaryReaderImpl& reader, std::string& str) {

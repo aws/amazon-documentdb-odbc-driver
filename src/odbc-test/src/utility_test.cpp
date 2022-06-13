@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -20,8 +20,12 @@
 #include <ignite/odbc/utility.h>
 
 #include <boost/test/unit_test.hpp>
+#include <chrono>
+#include <stdio.h>
 
-using namespace ignite::utility;
+using namespace ignite::odbc;
+using namespace ignite::odbc::utility;
+using namespace boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE(UtilityTestSuite)
 
@@ -30,28 +34,106 @@ BOOST_AUTO_TEST_CASE(TestUtilityRemoveSurroundingSpaces) {
   std::string expectedOutStr("some meaningfull data");
 
   std::string realOutStr(
-      ignite::common::StripSurroundingWhitespaces(inStr.begin(), inStr.end()));
+      common::StripSurroundingWhitespaces(inStr.begin(), inStr.end()));
 
   BOOST_REQUIRE(expectedOutStr == realOutStr);
 }
 
 BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBuffer) {
-  char buffer[1024];
+  SQLWCHAR buffer[1024];
+  std::wstring wstr(L"你好 - Some data. And some more data here.");
+  std::string str = ToUtf8(wstr);
+  size_t bytesWrittenOrRequired = 0;
 
-  std::string str("Some data. And some more data here.");
+  // With length in character mode
+  bytesWrittenOrRequired =
+      CopyStringToBuffer(str, buffer, sizeof(buffer) / sizeof(SQLWCHAR));
+  BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), str);
+  BOOST_CHECK_EQUAL(wstr.size(), bytesWrittenOrRequired);
+  buffer[0] = 0;
 
-  CopyStringToBuffer(str, buffer, sizeof(buffer));
+  // With length in byte mode
+  bytesWrittenOrRequired =
+      CopyStringToBuffer(str, buffer, sizeof(buffer), true);
+  BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), str);
+  BOOST_CHECK_EQUAL(wstr.size() * sizeof(SQLWCHAR), bytesWrittenOrRequired);
+  buffer[0] = 0;
 
-  BOOST_REQUIRE(!strcmp(buffer, str.c_str()));
+  // 10 characters plus 1 for null char.
+  bytesWrittenOrRequired = CopyStringToBuffer(str, buffer, 11, false);
+  BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), ToUtf8(wstr.substr(0, 10)));
+  BOOST_CHECK_EQUAL(10, bytesWrittenOrRequired);
+  buffer[0] = 0;
 
-  CopyStringToBuffer(str, buffer, 11);
+  // In bytes
+  bytesWrittenOrRequired =
+      CopyStringToBuffer(str, buffer, ((10 + 1) * sizeof(SQLWCHAR)), true);
+  BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), ToUtf8(wstr.substr(0, 10)));
+  BOOST_CHECK_EQUAL(20, bytesWrittenOrRequired);
+  buffer[0] = 0;
 
-  BOOST_REQUIRE(!strcmp(buffer, str.substr(0, 10).c_str()));
+  // Zero length buffer.
+  bytesWrittenOrRequired = CopyStringToBuffer(str, buffer, 0);
+  BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), std::string());
+  BOOST_CHECK_EQUAL(0, bytesWrittenOrRequired);
+  buffer[0] = 0;
+
+  // Zero length buffer.
+  bytesWrittenOrRequired = CopyStringToBuffer(str, buffer, 0, true);
+  BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), std::string());
+  BOOST_CHECK_EQUAL(0, bytesWrittenOrRequired);
+  buffer[0] = 0;
+
+  // nullptr buffer, zero length.
+  bytesWrittenOrRequired = CopyStringToBuffer(str, nullptr, 0);
+  BOOST_CHECK_EQUAL(wstr.size(), bytesWrittenOrRequired);
+  buffer[0] = 0;
+
+  // nullptr buffer, zero length.
+  bytesWrittenOrRequired = CopyStringToBuffer(str, nullptr, 0, true);
+  BOOST_CHECK_EQUAL(wstr.size() * sizeof(SQLWCHAR), bytesWrittenOrRequired);
+  buffer[0] = 0;
+
+  // nullptr buffer, non-zero length.
+  bytesWrittenOrRequired =
+      CopyStringToBuffer(str, nullptr, sizeof(buffer) / sizeof(SQLWCHAR));
+  BOOST_CHECK_EQUAL(wstr.size(), bytesWrittenOrRequired);
+  buffer[0] = 0;
+
+  // nullptr buffer, non-zero length.
+  bytesWrittenOrRequired =
+      CopyStringToBuffer(str, nullptr, sizeof(buffer), true);
+  BOOST_CHECK_EQUAL(wstr.size() * sizeof(SQLWCHAR), bytesWrittenOrRequired);
+  buffer[0] = 0;
+}
+
+// Enable test to determine efficiency of conversion function.
+BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBufferRepetative, *disabled()) {
+  char cch;
+  int strLen = 1024 * 1024;
+  std::string str;
+  std::vector< SQLWCHAR > buffer(strLen + 1);
+
+  for (int i = 0; i < strLen; i++) {
+    cch = 'a' + rand() % 26;
+    str.push_back(cch);
+  }
+
+  auto t1 = std::chrono::high_resolution_clock::now(); 
+  size_t bytesWrittenOrRequired = 0;
+  for (int i = 0; i < 500; i++) {
+    bytesWrittenOrRequired = CopyStringToBuffer(
+        str, buffer.data(), ((strLen + 1) * sizeof(SQLWCHAR)));
+    BOOST_CHECK_EQUAL(str.size(), bytesWrittenOrRequired);
+  }
+  auto t2 = std::chrono::high_resolution_clock::now(); 
+  std::cout << t2.time_since_epoch().count() - t1.time_since_epoch().count()
+            << " nanoseconds\n";
 }
 
 BOOST_AUTO_TEST_CASE(TestUtilityWriteReadString) {
-  using namespace ignite::impl::binary;
-  using namespace ignite::impl::interop;
+  using namespace impl::binary;
+  using namespace impl::interop;
 
   std::string inStr1("Hello World!");
   std::string inStr2;
@@ -62,7 +144,7 @@ BOOST_AUTO_TEST_CASE(TestUtilityWriteReadString) {
   std::string outStr3;
   std::string outStr4;
 
-  ignite::impl::interop::InteropUnpooledMemory mem(1024);
+  impl::interop::InteropUnpooledMemory mem(1024);
   InteropOutputStream outStream(&mem);
   BinaryWriterImpl writer(&outStream, 0);
 
@@ -88,10 +170,10 @@ BOOST_AUTO_TEST_CASE(TestUtilityWriteReadString) {
 }
 
 void CheckDecimalWriteRead(const std::string& val) {
-  using namespace ignite::impl::binary;
-  using namespace ignite::impl::interop;
-  using namespace ignite::common;
-  using namespace ignite::utility;
+  using namespace impl::binary;
+  using namespace impl::interop;
+  using namespace common;
+  using namespace utility;
 
   InteropUnpooledMemory mem(1024);
   InteropOutputStream outStream(&mem);

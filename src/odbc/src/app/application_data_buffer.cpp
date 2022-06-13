@@ -280,9 +280,10 @@ ConversionResult::Type ApplicationDataBuffer::PutValToStrBuffer(
 template < typename OutCharT, typename InCharT >
 ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
     const std::basic_string< InCharT >& value, int32_t& written) {
+
   written = 0;
 
-  SqlLen charSize = static_cast< SqlLen >(sizeof(OutCharT));
+  SqlLen outCharSize = static_cast< SqlLen >(sizeof(OutCharT));
 
   SqlLen* resLenPtr = GetResLen();
   void* dataPtr = GetData();
@@ -290,41 +291,32 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
   if (!dataPtr)
     return ConversionResult::Type::AI_SUCCESS;
 
-  if (buflen < charSize)
+  if (buflen < outCharSize)
     return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
 
-  OutCharT* out = reinterpret_cast< OutCharT* >(dataPtr);
-
-  SqlLen outLen = (buflen / charSize) - 1;
-
-  // Data stored in utf-8, convert to wide string before copying.
-  static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
-      converter;
-  std::wstring wValue =
-      converter.from_bytes(reinterpret_cast< const char* >(value.c_str()));
-  SqlLen toCopy = std::min< SqlLen >(outLen, wValue.size());
-
-  if (sizeof(OutCharT) == 1) {
-    // wstring to string
-    std::locale currentLocale("");
-    std::use_facet< std::ctype< wchar_t > >(currentLocale)
-        .narrow(wValue.data(), wValue.data() + toCopy, '?', reinterpret_cast< char* >(out));
+  size_t lenWrittenOrRequired = 0;
+  bool isTruncated = false;
+  if (sizeof(InCharT) == 1) {
+    if (outCharSize == 2 || outCharSize == 4) {
+      lenWrittenOrRequired = utility::CopyUtf8StringToSqlWcharString(
+          reinterpret_cast< const char* >(value.c_str()),
+          reinterpret_cast< SQLWCHAR* >(dataPtr), buflen, isTruncated);
+    } else if (sizeof(OutCharT) == 1) {
+      lenWrittenOrRequired = utility::CopyUtf8StringToSqlCharString(
+          reinterpret_cast< const char* >(value.c_str()),
+          reinterpret_cast< SQLCHAR* >(dataPtr), buflen, isTruncated);
+    }
   } else {
-    for (SqlLen i = 0; i < toCopy; ++i)
-      out[i] = wValue[i];
+    LOG_ERROR_MSG("Unexpected conversion from UCS2 string.")
+    assert(false);
   }
 
-  out[toCopy] = 0;
-
-  // In bytes
-  written = static_cast< int32_t >(toCopy * charSize);
+  written = static_cast< int32_t >(lenWrittenOrRequired);
   if (resLenPtr) {
-    // In bytes
     *resLenPtr = static_cast< SqlLen >(written);
   }
 
-  // Need to compare in "code-points"
-  if (toCopy < static_cast< SqlLen >(wValue.size()))
+  if (isTruncated)
     return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
 
   return ConversionResult::Type::AI_SUCCESS;
