@@ -166,22 +166,14 @@ SqlResult::Type ForeignKeysQuery::FetchNextRow(
     return SqlResult::AI_ERROR;
   }
 
-  // An extra if check is needed here to prevent iterating past vector end
-  if (cursor == meta.end())
-    return SqlResult::AI_NO_DATA;
-
-  if (!fetched)
-    fetched = true;
-  else
-    ++cursor;
-
   if (cursor == meta.end())
     return SqlResult::AI_NO_DATA;
 
   app::ColumnBindingMap::iterator it;
-
   for (it = columnBindings.begin(); it != columnBindings.end(); ++it)
     GetColumn(it->first, it->second);
+
+  ++cursor;
 
   return SqlResult::AI_SUCCESS;
 }
