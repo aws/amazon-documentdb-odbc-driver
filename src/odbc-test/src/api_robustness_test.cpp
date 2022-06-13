@@ -497,7 +497,7 @@ BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeysHighRowArraySize) {
   SQLCHAR catalogName[] = "";
   SQLCHAR schemaName[] = "odbc-test";
   SQLCHAR tableName[] = "jni_test_001";
-  SQLULEN val = 50;
+  SQLULEN val = 3;
 
   // set the value of row array size to be greater than the available rows in the database
   SQLRETURN ret =
@@ -524,7 +524,7 @@ BOOST_AUTO_TEST_CASE(TestSQLForiegnKeysHighRowArraySize) {
   Connect(dsnConnectionString);
 
   SQLCHAR tableName[] = "meta_queries_test_002_with_array_array";
-  SQLULEN val = 50;
+  SQLULEN val = 3;
 
   // set the value of row array size to be greater than the available rows in
   // the database
@@ -553,7 +553,7 @@ BOOST_AUTO_TEST_CASE(TestSQLTablesHighRowArraySize) {
 
   SQLCHAR empty[] = "";
   SQLCHAR tableName[] = "jni_test_001";
-  SQLULEN val = 50;
+  SQLULEN val = 3;
 
   // set the value of row array size to be greater than the available rows in
   // the database
@@ -584,7 +584,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnsHighRowArraySize) {
   SQLCHAR schemaName[] = "odbc-test";
   SQLCHAR tableName[] = "jni_test_001";
   SQLCHAR columnName[] = "fieldString";
-  SQLULEN val = 50;
+  SQLULEN val = 3;
 
   // set the value of row array size to be greater than the available rows in
   // the database
