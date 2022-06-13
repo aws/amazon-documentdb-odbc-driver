@@ -307,7 +307,7 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
           reinterpret_cast< SQLCHAR* >(dataPtr), buflen, isTruncated);
     }
   } else {
-    LOG_ERROR_MSG("Unexpected conversion from UCS2 string.")
+    LOG_ERROR_MSG("Unexpected conversion from UCS2 string.");
     assert(false);
   }
 
