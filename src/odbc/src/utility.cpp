@@ -84,29 +84,28 @@ size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
   }
 
   // Setup conversion facet.
-  typedef std::codecvt< OutCharT, char, std::mbstate_t > facet_type;
   const std::codecvt_utf8< OutCharT > convFacet;
   std::mbstate_t convState = std::mbstate_t();
   const char* pInBufferNext;
   OutCharT* pOutBufferNext;
 
   // translate characters:
-  facet_type::result myresult =
+  std::codecvt_base::result result =
       convFacet.in(convState, inBuffer, inBuffer + inBufferLen, pInBufferNext,
                    pOutBuffer, pOutBuffer + outBufferLenChars, pOutBufferNext);
 
   size_t lenConverted = 0;
-  switch (myresult) {
-    case facet_type::ok:
-    case facet_type::partial:
+  switch (result) {
+    case std::codecvt_base::ok:
+    case std::codecvt_base::partial:
       lenConverted = pOutBufferNext - pOutBuffer;
       // null-terminate target string, if room
       if (outBufferLenBytes >= charSize) {
         pOutBuffer[lenConverted] = 0;
       }
-      isTruncated = (myresult == facet_type::partial);
+      isTruncated = (result == std::codecvt_base::partial);
       break;
-    case facet_type::error:
+    case std::codecvt_base::error:
       LOG_ERROR_MSG("Unable to convert character '" << *pInBufferNext << "'");
       lenConverted = pOutBufferNext - pOutBuffer;
       // null-terminate target string, if room
