@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttrRowArraySize) {
 
   // check that statement array size cannot be set to values not equal to 1
   // repeat test for different values
-  SQLULEN valList[] = {-1, 0, 3, 81, 304};
+  SQLULEN valList[5] = {-1, 0, 3, 81, 304};
   for (SQLULEN val : valList) {
     SQLRETURN ret =
         SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE,
