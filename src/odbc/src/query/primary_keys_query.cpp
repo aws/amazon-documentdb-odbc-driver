@@ -60,6 +60,7 @@ PrimaryKeysQuery::PrimaryKeysQuery(diagnostic::DiagnosableAdapter& diag,
       schema(schema),
       table(table),
       executed(false),
+      fetched(false),
       columnsMeta() {
   using namespace ignite::odbc::impl::binary;
   using namespace ignite::odbc::type_traits;
