@@ -548,7 +548,7 @@ SQLRETURN SQLFetch(SQLHSTMT stmt) {
   }
 
   statement->FetchRow();
-  
+
   LOG_DEBUG_MSG("SQLFetch exiting");
 
   return statement->GetDiagnosticRecords().GetReturnCode();
