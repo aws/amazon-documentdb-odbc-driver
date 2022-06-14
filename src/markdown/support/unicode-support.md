@@ -4,7 +4,7 @@ The DocumentDB ODBC Driver supports the Unicode ODBC interface. It does not supp
 
 ## 1.1. Unicode encoding at ODBC Layer
 
-The definition of the Unicode at the ODBC layer is defined as SQLWCHAR. There is platform specific implementations.
+The definition of the Unicode at the ODBC layer is defined as SQLWCHAR. There are platform specific implementations.
 
 - *Windows*: The SQLWCHAR is defined as wchar_t (2-byte)
 - *MacOS (iODBC)*: The SQLWCHAR is defined as wchar_t (4-byte)
