@@ -146,6 +146,51 @@ SQLSMALLINT unsupportedSql[] = {SQL_WVARCHAR,
 
 BOOST_FIXTURE_TEST_SUITE(ApiRobustnessTestSuite, ApiRobustnessTestSuiteFixture)
 
+BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttrRowArraySize) {
+  // check that statement array size cannot be set to values other than 1
+
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+
+  Connect(dsnConnectionString);
+
+  SQLINTEGER actual_row_array_size;
+  SQLINTEGER resLen = 0;
+
+  // check that statement array size cannot be set to values not equal to 1
+  // repeat test for different values
+  SQLULEN valList[] = {-1, 0, 3, 81, 304};
+  for (SQLULEN val : valList) {
+    SQLRETURN ret =
+        SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE,
+                       reinterpret_cast< SQLPOINTER >(val), sizeof(val));
+
+    BOOST_CHECK_EQUAL(ret, SQL_ERROR);
+
+    ret = SQLGetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE, &actual_row_array_size,
+                         sizeof(actual_row_array_size), &resLen);
+
+    ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+    BOOST_CHECK_EQUAL(actual_row_array_size, 1);
+  }
+
+  // check that setting row array size to 1 is successful
+  SQLULEN val = 1;
+  SQLRETURN ret =
+      SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE,
+                     reinterpret_cast< SQLPOINTER >(val), sizeof(val));
+
+  BOOST_CHECK_EQUAL(ret, SQL_SUCCESS);
+
+  ret = SQLGetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE, &actual_row_array_size,
+                       sizeof(actual_row_array_size), &resLen);
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  BOOST_CHECK_EQUAL(actual_row_array_size, val);
+}
+
 BOOST_AUTO_TEST_CASE(TestSQLDriverConnect, *disabled()) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
