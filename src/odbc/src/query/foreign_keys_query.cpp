@@ -145,6 +145,7 @@ SqlResult::Type ForeignKeysQuery::Execute() {
 
   if (result == SqlResult::AI_SUCCESS) {
     executed = true;
+    fetched = false;
 
     cursor = meta.begin();
   }
@@ -281,6 +282,7 @@ SqlResult::Type ForeignKeysQuery::Close() {
   meta.clear();
 
   executed = false;
+  fetched = false;
 
   return SqlResult::AI_SUCCESS;
 }

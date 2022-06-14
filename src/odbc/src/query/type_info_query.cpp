@@ -117,6 +117,7 @@ TypeInfoQuery::TypeInfoQuery(diagnostic::DiagnosableAdapter& diag,
     : Query(diag, QueryType::TYPE_INFO),
       columnsMeta(),
       executed(false),
+      fetched(false),
       types(),
       cursor(types.end()) {
   using namespace ignite::odbc::impl::binary;
@@ -207,6 +208,7 @@ SqlResult::Type TypeInfoQuery::Execute() {
   cursor = types.begin();
 
   executed = true;
+  fetched = false;
 
   return SqlResult::AI_SUCCESS;
 }

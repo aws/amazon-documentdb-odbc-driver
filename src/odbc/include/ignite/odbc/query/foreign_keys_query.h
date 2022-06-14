@@ -135,6 +135,9 @@ class ForeignKeysQuery : public Query {
   /** Query executed. */
   bool executed;
 
+  /** Fetched flag. */
+  bool fetched;
+
   /** Columns metadata. */
   meta::ColumnMetaVector columnsMeta;
 
