@@ -37,6 +37,10 @@ size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
   if (!inBuffer)
     return 0;
 
+  // Need to convert input string to wide-char to get the 
+  // length in characters - as well as get .narrow() to work, as expected
+  // Otherwise, it would be impossible to safely determine the
+  // output buffer length needed.
   static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
       converter;
   std::wstring inString = converter.from_bytes(inBuffer);
@@ -44,6 +48,7 @@ size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
   size_t outBufferLenActual = std::min(
       inBufferLenChars, outBufferLenBytes ? (outBufferLenBytes - 1) : 0);
 
+  // If no output buffer, return REQUIRED length.
   if (!outBuffer)
     return inBufferLenChars;
 
@@ -51,9 +56,11 @@ size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
   std::use_facet< std::ctype< wchar_t > >(currentLocale)
       .narrow(inString.data(), inString.data() + outBufferLenActual, '?',
               reinterpret_cast< char* >(outBuffer));
+  // Null terminate string, if room.
   if (outBufferLenBytes > 0) {
     outBuffer[outBufferLenActual] = 0;
   }
+  isTruncated = (outBufferLenActual < inBufferLenChars);
 
   return outBufferLenActual;
 }
@@ -62,12 +69,16 @@ template< typename OutCharT >
 size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
                                       size_t outBufferLenBytes,
                                       bool& isTruncated) {
-  size_t charSize = sizeof(SQLWCHAR);
-  assert(sizeof(OutCharT) == charSize);
+  size_t wCharSize = sizeof(SQLWCHAR);
+  // This is intended to convert to the SQLWCHAR. Ensure we have the same size.
+  assert(sizeof(OutCharT) == wCharSize);
 
+  // Get the number of characters that can be safely transfered, excluding the null 
+  // terminating character. Handle the case of zero given for length.
   size_t outBufferLenChars =
-      outBufferLenBytes ? (outBufferLenBytes / charSize) - 1 : 0;
-  // Does NOT include the null-terminating character.
+      outBufferLenBytes ? (outBufferLenBytes / wCharSize) - 1 : 0;
+  // Find the lenght (in bytes) of the input string.
+  // This does NOT include the null-terminating character.
   size_t inBufferLen = std::strlen(inBuffer);
   OutCharT* pOutBuffer;
   std::vector< OutCharT > targetProxy;
@@ -76,7 +87,8 @@ size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
     pOutBuffer = reinterpret_cast< OutCharT* >(outBuffer);
   } else {
     // Creates a proxy buffer so we can determine the required length.
-    targetProxy.resize(inBufferLen + (1 * charSize));
+    // This buffer will be ignored and automatically deleted after use.
+    targetProxy.resize(inBufferLen + 1);
     pOutBuffer = targetProxy.data();
     outBufferLenChars = inBufferLen;
   }
@@ -84,7 +96,9 @@ size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
   // Setup conversion facet.
   const std::codecvt_utf8< OutCharT > convFacet;
   std::mbstate_t convState = std::mbstate_t();
+  // Pointer to next for input.
   const char* pInBufferNext;
+  // Pointer to next for output.
   OutCharT* pOutBufferNext;
 
   // translate characters:
@@ -96,29 +110,35 @@ size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
   switch (result) {
     case std::codecvt_base::ok:
     case std::codecvt_base::partial:
+      // The number of characters converted (in OutCharT)
       lenConverted = pOutBufferNext - pOutBuffer;
       // null-terminate target string, if room
-      if (outBufferLenBytes >= charSize) {
+      if (outBufferLenBytes >= wCharSize) {
         pOutBuffer[lenConverted] = 0;
       }
       isTruncated = (result == std::codecvt_base::partial);
       break;
     case std::codecvt_base::error:
+      // Error returned if unable to convert character.
       LOG_ERROR_MSG("Unable to convert character '" << *pInBufferNext << "'");
+      // The number of characters converted (in OutCharT)
       lenConverted = pOutBufferNext - pOutBuffer;
       // null-terminate target string, if room
-      if (outBufferLenBytes >= charSize) {
+      if (outBufferLenBytes >= wCharSize) {
         pOutBuffer[lenConverted] = 0;
       }
       isTruncated = true;
       break;
     default:
+      // This situation occurs if the source and target are the same encoding.
+      // Impossible?
       LOG_ERROR_MSG("Unexpected error converting string '" << inBuffer << "'");
       assert(false);
       break;
   }
 
-  return lenConverted * charSize;
+  // Return the number of bytes transfered or required.
+  return lenConverted * wCharSize;
 }
 
 size_t CopyUtf8StringToSqlWcharString(const char* inBuffer, SQLWCHAR* outBuffer,
@@ -127,8 +147,9 @@ size_t CopyUtf8StringToSqlWcharString(const char* inBuffer, SQLWCHAR* outBuffer,
   if (!inBuffer)
     return 0;
 
-  size_t charSize = sizeof(SQLWCHAR);
-  switch (charSize) {
+  // Handles SQLWCHAR if either UTF-16 and UTF-32
+  size_t wCharSize = sizeof(SQLWCHAR);
+  switch (wCharSize) {
     case 2:
       return CopyUtf8StringToWcharString(
           inBuffer, reinterpret_cast< char16_t* >(outBuffer), outBufferLenBytes,
@@ -146,17 +167,20 @@ size_t CopyUtf8StringToSqlWcharString(const char* inBuffer, SQLWCHAR* outBuffer,
   }
 }
 
+// High-level entry point to handle buffer size in either bytes or characters
 size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen,
-                          bool lenInBytes) {
-  size_t charSize = sizeof(SQLWCHAR);
+                          bool isLenInBytes) {
+  size_t wCharSize = sizeof(SQLWCHAR);
 
-  assert(buflen >= 0 && (!lenInBytes || (buflen % charSize == 0)));
+  // Ensure non-zero length in bytes is a multiple of wide char size.
+  assert(!isLenInBytes || (buflen % wCharSize == 0));
 
-  size_t bufLenInBytes = lenInBytes ? buflen : buflen * charSize;
+  // Convert buffer length to bytes.
+  size_t bufLenInBytes = isLenInBytes ? buflen : buflen * wCharSize;
   bool isTruncated = false;
   size_t bytesWritten = CopyUtf8StringToSqlWcharString(
       str.c_str(), buf, bufLenInBytes, isTruncated);
-  return lenInBytes ? bytesWritten : bytesWritten / charSize;
+  return isLenInBytes ? bytesWritten : bytesWritten / wCharSize;
 }
 
 void ReadString(BinaryReaderImpl& reader, std::string& str) {
@@ -242,7 +266,7 @@ void WriteDecimal(BinaryWriterImpl& writer,
 }
 
 std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
-                              bool lenInBytes) {
+                              bool isLenInBytes) {
   std::string result;
   size_t char_size = sizeof(SQLWCHAR);
 
@@ -256,7 +280,7 @@ std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
       sqlStr0.push_back(sqlStr[i]);
     }
   } else if (sqlStrLen > 0) {
-    size_t charsToCopy = lenInBytes ? (sqlStrLen / char_size) : sqlStrLen;
+    size_t charsToCopy = isLenInBytes ? (sqlStrLen / char_size) : sqlStrLen;
     sqlStr0.reserve(charsToCopy + 1);
     for (int i = 0; i < charsToCopy && sqlStr[i] != 0; i++) {
       sqlStr0.push_back(sqlStr[i]);
@@ -267,11 +291,11 @@ std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
 
 boost::optional< std::string > SqlStringToOptString(const SQLWCHAR* sqlStr,
                                                     int32_t sqlStrLen,
-                                                    bool lenInBytes) {
+                                                    bool isLenInBytes) {
   if (!sqlStr)
     return boost::none;
 
-  return SqlStringToString(sqlStr, sqlStrLen, lenInBytes);
+  return SqlStringToString(sqlStr, sqlStrLen, isLenInBytes);
 }
 
 std::string ToUtf8(const std::wstring& value) {

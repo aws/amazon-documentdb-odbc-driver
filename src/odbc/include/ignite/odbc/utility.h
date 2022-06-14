@@ -88,7 +88,7 @@ size_t CopyUtf8StringToSqlWcharString(const char* inBuffer, SQLWCHAR* outBuffer,
  * @return Length of the resulting string in buffer.
  */
 size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen,
-                          bool lenInBytes = false);
+                          bool isLenInBytes = false);
 
 /**
  * Read array from reader.
@@ -136,23 +136,24 @@ void WriteDecimal(BinaryWriterImpl& writer,
  *
  * @param sqlStr SQL string buffer.
  * @param sqlStrLen SQL string length.
- * @param lenInBytes Indicator of whether the length indicates bytes or characters.
+ * @param isLenInBytes Indicator of whether the length indicates bytes or characters.
  * @return Standard string containing the same data.
  */
 std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen = SQL_NTS,
-                              bool lenInBytes = false);
+                              bool isLenInBytes = false);
 
 /**
  * Convert SQL string buffer to boost::optional< std::string >.
  *
  * @param sqlStr SQL string buffer.
  * @param sqlStrLen SQL string length.
+ * @param isLenInBytes Indicator of whether given length is in bytes or characters.
  * @return Standard optional string containing the same data.
  * If sqlStrLen indicates null string, boost::none is returned.
  */
 boost::optional< std::string > SqlStringToOptString(const SQLWCHAR* sqlStr,
                                                     int32_t sqlStrLen = SQL_NTS,
-                                                    bool lenInBytes = false);
+                                                    bool isLenInBytes = false);
 
 /**
  * Convert a wide string to UTF-8 encoded string.
