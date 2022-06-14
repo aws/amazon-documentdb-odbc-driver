@@ -968,9 +968,15 @@ SqlResult::Type Statement::InternalGetColumnAttribute(
 
   bool found = false;
 
-  if (numbuf)
-    found = columnMeta.GetAttribute(attrId, *numbuf);
+  LOG_DEBUG_MSG("calling GetAttribute, numbuf: " << numbuf);
 
+  // NumericAttributePtr field is used.
+  if (numbuf) {
+    found = columnMeta.GetAttribute(attrId, *numbuf);
+    LOG_DEBUG_MSG("numbuf found: " << numbuf);
+  }
+
+  // NumericAttributePtr field is unused.
   if (!found) {
     std::string out;
 
@@ -978,11 +984,13 @@ SqlResult::Type Statement::InternalGetColumnAttribute(
 
     size_t outSize = out.size();
 
-    if (found && strbuf)
-      outSize = utility::CopyStringToBuffer(out, strbuf, buflen);
-
-    if (found && reslen)
-      *reslen = static_cast< int16_t >(outSize);
+    if (found) {
+      LOG_DEBUG_MSG("out found: " << out);
+      if (strbuf)
+        outSize = utility::CopyStringToBuffer(out, strbuf, buflen);
+      if (reslen)
+        *reslen = static_cast< int16_t >(outSize);
+    }
   }
 
   if (!found) {
