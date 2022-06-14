@@ -1974,8 +1974,7 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingGetDataWideChar) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
 
-  const int32_t buf_size = 1024;
-  SQLWCHAR fieldString[buf_size]{};
+  SQLWCHAR fieldString[1024]{};
   SQLLEN fieldString_len = 0;
 
   // Fetch 1st row
@@ -2059,7 +2058,7 @@ BOOST_AUTO_TEST_CASE(TestSingleResultSelectWideCharUsingGetDataNarrowChar) {
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldString_len);
   BOOST_CHECK_EQUAL(std::string("??"), std::string((char*)fieldString));
 
-  // Fetch 2nd row - not exist
+  // Fetch 2nd row - does not exist
   ret = SQLFetch(stmt);
   BOOST_CHECK_EQUAL(SQL_NO_DATA, ret);
 }

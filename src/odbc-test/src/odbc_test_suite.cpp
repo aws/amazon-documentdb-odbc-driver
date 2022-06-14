@@ -862,7 +862,7 @@ void OdbcTestSuite::CreateDsnConnectionStringForLocalServer(
     const std::string& userName, const std::string& miscOptions) const {
   std::string user = userName.size() > 0
                          ? userName
-                          : common::GetEnv("DOC_DB_USER_NAME", "documentdb");
+                         : common::GetEnv("DOC_DB_USER_NAME", "documentdb");
   std::string password = common::GetEnv("DOC_DB_PASSWORD", "");
   std::string host = common::GetEnv("LOCAL_DATABASE_HOST", "localhost");
   std::string port = "27017";

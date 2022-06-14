@@ -293,7 +293,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
    * @param expNullability expected nullability.
    */
   void CheckColumnMetaWithSQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT idx,
-                                         const std::string& expName,
+                                         const std::string &expName,
                                          SQLSMALLINT expDataType,
                                          SQLULEN expSize, SQLSMALLINT expScale,
                                          SQLSMALLINT expNullability) const {
@@ -304,10 +304,9 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     SQLSMALLINT scale;
     SQLSMALLINT nullability;
 
-    SQLRETURN ret =
-        SQLDescribeCol(stmt, idx, &name[0], (SQLSMALLINT)name.size() * sizeof(SQLWCHAR),
-                       &nameLen,
-                       &dataType, &size, &scale, &nullability);
+    SQLRETURN ret = SQLDescribeCol(
+        stmt, idx, &name[0], (SQLSMALLINT)name.size() * sizeof(SQLWCHAR),
+        &nameLen, &dataType, &size, &scale, &nullability);
     ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
     BOOST_CHECK_GE(nameLen, 0);
@@ -387,11 +386,9 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
                                       SQL_NULLABLE);
     CheckColumnMetaWithSQLDescribeCol(stmt, 6, "CHAR2", SQL_VARCHAR, 42, 0,
                                       SQL_NULLABLE);
-    CheckColumnMetaWithSQLDescribeCol(stmt, 7, "CHAR3", SQL_VARCHAR,
-                                      2147483647,
+    CheckColumnMetaWithSQLDescribeCol(stmt, 7, "CHAR3", SQL_VARCHAR, 2147483647,
                                       0, SQL_NO_NULLS);
-    CheckColumnMetaWithSQLDescribeCol(stmt, 8, "VCHAR", SQL_VARCHAR,
-                                      2147483647,
+    CheckColumnMetaWithSQLDescribeCol(stmt, 8, "VCHAR", SQL_VARCHAR, 2147483647,
                                       0, SQL_NULLABLE);
   }
 
@@ -437,7 +434,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     BOOST_CHECK_GE(nameLen, 0);
     BOOST_CHECK_LE(nameLen, static_cast< SQLSMALLINT >(ODBC_BUFFER_SIZE));
 
-    BOOST_CHECK_EQUAL(expName, utility::SqlStringToString(name.data()));
+    BOOST_CHECK_EQUAL(utility::SqlStringToString(name.data()), expName);
     BOOST_CHECK_EQUAL(dataType, expDataType);
     BOOST_CHECK_EQUAL(size, expSize);
     BOOST_CHECK_EQUAL(scale, expScale);
@@ -734,7 +731,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseTableName) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
+  const SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
 
   callSQLColAttribute(stmt, req, SQL_DESC_BASE_TABLE_NAME,
                       std::string("meta_queries_test_002_with_array"));
@@ -745,12 +742,12 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCaseSensitive) {
   connectToLocalServer(databaseName);
 
   // test that case sensitive returns true for string field.
-  SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req1, SQL_DESC_CASE_SENSITIVE, SQL_TRUE);
 
   // test that case sensitive returns false for int field.
-  SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
+  const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req2, SQL_DESC_CASE_SENSITIVE, SQL_FALSE);
 }
@@ -759,7 +756,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCatalogName) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select fieldDecimal128 from meta_queries_test_001";
+  const SQLCHAR req[] = "select fieldDecimal128 from meta_queries_test_001";
 
   // check that catalog should be empty
   callSQLColAttribute(stmt, req, SQL_DESC_CATALOG_NAME,
@@ -770,21 +767,21 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescConciseType) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req1, SQL_DESC_CONCISE_TYPE, SQL_VARCHAR);
 
-  SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
+  const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req2, SQL_DESC_CONCISE_TYPE, SQL_INTEGER);
 
-  SQLCHAR req3[] = "select fieldBinary from meta_queries_test_001";
+  const SQLCHAR req3[] = "select fieldBinary from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req3, SQL_DESC_CONCISE_TYPE, SQL_VARBINARY);
 
   // TODO re-enable this test when bug from JDBC (AD-765) is fixed.
   // https://bitquill.atlassian.net/browse/AD-766
-  // SQLCHAR req4[] = "select fieldNull from meta_queries_test_001";
+  // const SQLCHAR req4[] = "select fieldNull from meta_queries_test_001";
   // 
   // callSQLColAttribute(stmt, req3, SQL_DESC_CONCISE_TYPE, SQL_TYPE_NULL);
 }
@@ -793,7 +790,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCount) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select fieldString from meta_queries_test_001";
+  const SQLCHAR req[] = "select fieldString from meta_queries_test_001";
   
   // count should be 1
   callSQLColAttribute(stmt, req, SQL_DESC_COUNT, 1);
@@ -803,28 +800,28 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescDisplaySize) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req1[] = "select fieldBinary from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldBinary from meta_queries_test_001";
 
   // SQL_VARBINARY should have display size SQL_NO_TOTAL
   callSQLColAttribute(stmt, req1, SQL_DESC_DISPLAY_SIZE, SQL_NO_TOTAL);
 
-  SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
+  const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
 
   // SQL_INTEGER should have display size 11
   callSQLColAttribute(stmt, req2, SQL_DESC_DISPLAY_SIZE, 11);
 
-  SQLCHAR req3[] = "select fieldLong from meta_queries_test_001";
+  const SQLCHAR req3[] = "select fieldLong from meta_queries_test_001";
 
   // SQL_BIGINT should have display size 20
   callSQLColAttribute(stmt, req3, SQL_DESC_DISPLAY_SIZE, 20);
 
 
-  SQLCHAR req4[] = "select fieldDouble from meta_queries_test_001";
+  const SQLCHAR req4[] = "select fieldDouble from meta_queries_test_001";
 
   // SQL_DOUBLE should have display size 24
   callSQLColAttribute(stmt, req4, SQL_DESC_DISPLAY_SIZE, 24);
 
-  SQLCHAR req5[] = "select fieldDate from meta_queries_test_001";
+  const SQLCHAR req5[] = "select fieldDate from meta_queries_test_001";
 
   // SQL_TYPE_TIMESTAMP should have display size 19
   callSQLColAttribute(stmt, req5, SQL_DESC_DISPLAY_SIZE, 19);
@@ -834,7 +831,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescFixedPrecScale) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select fieldLong from meta_queries_test_001";
+  const SQLCHAR req[] = "select fieldLong from meta_queries_test_001";
 
   // only SQL_FALSE is returned
   callSQLColAttribute(stmt, req, SQL_DESC_FIXED_PREC_SCALE, SQL_FALSE);
@@ -844,7 +841,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLabel) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select fieldBoolean from meta_queries_test_002";
+  const SQLCHAR req[] = "select fieldBoolean from meta_queries_test_002";
 
   callSQLColAttribute(stmt, req, SQL_DESC_LABEL,
                       std::string("fieldBoolean"));
@@ -854,27 +851,27 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLength) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
+  const SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
 
   // SQL_VARCHAR should have length SQL_NO_TOTAL
   callSQLColAttribute(stmt, req1, SQL_DESC_LENGTH, SQL_NO_TOTAL);
 
-  SQLCHAR req2[] = "select fieldInt from meta_queries_test_002";
+  const SQLCHAR req2[] = "select fieldInt from meta_queries_test_002";
 
   // SQL_INTEGER should have length 4
   callSQLColAttribute(stmt, req2, SQL_DESC_LENGTH, 4);
 
-  SQLCHAR req3[] = "select fieldLong from meta_queries_test_002";
+  const SQLCHAR req3[] = "select fieldLong from meta_queries_test_002";
 
   // SQL_BIGINT should have length 8
   callSQLColAttribute(stmt, req3, SQL_DESC_LENGTH, 8);
 
-  SQLCHAR req4[] = "select fieldDouble from meta_queries_test_002";
+  const SQLCHAR req4[] = "select fieldDouble from meta_queries_test_002";
 
   // SQL_DOUBLE should have length 8
   callSQLColAttribute(stmt, req4, SQL_DESC_LENGTH, 8);
 
-  SQLCHAR req5[] = "select fieldDate from meta_queries_test_002";
+  const SQLCHAR req5[] = "select fieldDate from meta_queries_test_002";
 
   // SQL_TYPE_TIMESTAMP should have length 16
   callSQLColAttribute(stmt, req5, SQL_DESC_LENGTH, 16);
@@ -885,18 +882,18 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralPrefix) {
   connectToLocalServer(databaseName);
 
   // test that empty string is returned for non-char and non-binary type
-  SQLCHAR req1[] = "select fieldDouble from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldDouble from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req1, SQL_DESC_LITERAL_PREFIX,
                       std::string(""));
 
   // test that "'" is returned for *CHAR type
-  SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
+  const SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
 
   callSQLColAttribute(stmt, req2, SQL_DESC_LITERAL_PREFIX, std::string("'"));
 
   // test that "0x" is returned for *CHAR type
-  SQLCHAR req3[] = "select fieldBinary from meta_queries_test_002";
+  const SQLCHAR req3[] = "select fieldBinary from meta_queries_test_002";
 
   callSQLColAttribute(stmt, req3, SQL_DESC_LITERAL_PREFIX, std::string("0x"));
 }
@@ -906,12 +903,12 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralSuffix) {
   connectToLocalServer(databaseName);
 
   // test that empty string is returned for non-char and non-binary type
-  SQLCHAR req1[] = "select fieldBoolean from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldBoolean from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req1, SQL_DESC_LITERAL_SUFFIX, std::string(""));
 
   // test that "'" is returned for *CHAR type
-  SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
+  const SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
 
   callSQLColAttribute(stmt, req2, SQL_DESC_LITERAL_SUFFIX, std::string("'"));
 }
@@ -922,31 +919,31 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req1[] = "select fieldDouble from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldDouble from meta_queries_test_001";
 
  // SQL_DOUBLE should have type name SqlTypeName::DOUBLE
   callSQLColAttribute(stmt, req1, SQL_DESC_LOCAL_TYPE_NAME,
                       SqlTypeName::DOUBLE);
 
-  SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
+  const SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
 
   // SQL_VARCHAR should have type name SqlTypeName::VARCHAR
   callSQLColAttribute(stmt, req2, SQL_DESC_LOCAL_TYPE_NAME,
                       SqlTypeName::VARCHAR);
 
-  SQLCHAR req3[] = "select fieldBinary from meta_queries_test_002";
+  const SQLCHAR req3[] = "select fieldBinary from meta_queries_test_002";
 
   // SQL_BINARY should have type name SqlTypeName::VARBINARY
   callSQLColAttribute(stmt, req3, SQL_DESC_LOCAL_TYPE_NAME,
                       SqlTypeName::VARBINARY);
 
-  SQLCHAR req4[] = "select fieldDate from meta_queries_test_002";
+  const SQLCHAR req4[] = "select fieldDate from meta_queries_test_002";
 
   // SQL_TYPE_TIMESTAMP should have type name SqlTypeName::TIMESTAMP
   callSQLColAttribute(stmt, req4, SQL_DESC_LOCAL_TYPE_NAME,
                       SqlTypeName::TIMESTAMP);
 
-  SQLCHAR req5[] = "select fieldInt from meta_queries_test_002";
+  const SQLCHAR req5[] = "select fieldInt from meta_queries_test_002";
 
   // SQL_INTEGER should have type name SqlTypeName::INTEGER
   callSQLColAttribute(stmt, req5, SQL_DESC_LOCAL_TYPE_NAME,
@@ -957,7 +954,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescName) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
+  const SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
 
   callSQLColAttribute(stmt, req, SQL_DESC_NAME,
                       std::string("field"));
@@ -968,12 +965,13 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescNullable) {
   connectToLocalServer(databaseName);
 
   // test meta_queries_test_001__id (a primary key) should not be nullable 
-  SQLCHAR req1[] = "select meta_queries_test_001__id from meta_queries_test_001";
+  const SQLCHAR req1[] =
+      "select meta_queries_test_001__id from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req1, SQL_DESC_NULLABLE, SQL_NO_NULLS);
 
   // test non-primary key field should be nullable.
-  SQLCHAR req2[] = "select fieldNull from meta_queries_test_001";
+  const SQLCHAR req2[] = "select fieldNull from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req2, SQL_DESC_NULLABLE, SQL_NULLABLE);
 }
@@ -982,17 +980,17 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescNumPrecRadix) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req1[] = "select fieldFloat from meta_queries_test_002";
+  const SQLCHAR req1[] = "select fieldFloat from meta_queries_test_002";
 
   // SQL_FLOAT should have precision radix 2
   callSQLColAttribute(stmt, req1, SQL_DESC_NUM_PREC_RADIX, 2);
 
-  SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
+  const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
 
   // SQL_INT should have precision radix 10
   callSQLColAttribute(stmt, req2, SQL_DESC_NUM_PREC_RADIX, 10);
 
-  SQLCHAR req3[] = "select fieldString from meta_queries_test_002";
+  const SQLCHAR req3[] = "select fieldString from meta_queries_test_002";
 
   // SQL_VARCHAR (non-numeric type) should have precision radix 0
   callSQLColAttribute(stmt, req3, SQL_DESC_NUM_PREC_RADIX, 0);
@@ -1004,28 +1002,28 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescOctetLength) {
 
   size_t size_of_char = sizeof(char);
 
-  SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
+  const SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
 
   // SQL_VARCHAR should have octet length SQL_NO_TOTAL
   callSQLColAttribute(stmt, req1, SQL_DESC_OCTET_LENGTH, SQL_NO_TOTAL);
 
-  SQLCHAR req2[] = "select fieldInt from meta_queries_test_002";
+  const SQLCHAR req2[] = "select fieldInt from meta_queries_test_002";
 
   // SQL_INTEGER should have octet length 4 * sizeof(char)
   callSQLColAttribute(stmt, req2, SQL_DESC_OCTET_LENGTH, 4 * size_of_char);
   
 
-  SQLCHAR req3[] = "select fieldLong from meta_queries_test_002";
+  const SQLCHAR req3[] = "select fieldLong from meta_queries_test_002";
 
   // SQL_BIGINT should have octet length 8 * sizeof(char)
   callSQLColAttribute(stmt, req3, SQL_DESC_OCTET_LENGTH, 8 * size_of_char);
 
-  SQLCHAR req4[] = "select fieldDouble from meta_queries_test_002";
+  const SQLCHAR req4[] = "select fieldDouble from meta_queries_test_002";
 
   // SQL_DOUBLE should have octet length 8 * sizeof(char)
   callSQLColAttribute(stmt, req4, SQL_DESC_OCTET_LENGTH, 8 * size_of_char);
 
-  SQLCHAR req5[] = "select fieldDate from meta_queries_test_002";
+  const SQLCHAR req5[] = "select fieldDate from meta_queries_test_002";
 
   // SQL_TYPE_TIMESTAMP should have octet length 16 * sizeof(char)
   callSQLColAttribute(stmt, req5, SQL_DESC_OCTET_LENGTH, 16 * size_of_char);
@@ -1035,27 +1033,27 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
 
   // SQL_VARCHAR should have precision SQL_NO_TOTAL
   callSQLColAttribute(stmt, req1, SQL_DESC_PRECISION, SQL_NO_TOTAL);
 
-  SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
+  const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
 
   // SQL_INTEGER should have precision 10
   callSQLColAttribute(stmt, req2, SQL_DESC_PRECISION, 10);
 
-  SQLCHAR req3[] = "select fieldLong from meta_queries_test_001";
+  const SQLCHAR req3[] = "select fieldLong from meta_queries_test_001";
 
   // SQL_BIGINT should have precision 19
   callSQLColAttribute(stmt, req3, SQL_DESC_PRECISION, 19);
 
-  SQLCHAR req4[] = "select fieldDouble from meta_queries_test_001";
+  const SQLCHAR req4[] = "select fieldDouble from meta_queries_test_001";
 
   // SQL_DOUBLE should have precision 15
   callSQLColAttribute(stmt, req4, SQL_DESC_PRECISION, 15);
 
-  SQLCHAR req5[] = "select fieldDate from meta_queries_test_001";
+  const SQLCHAR req5[] = "select fieldDate from meta_queries_test_001";
 
   // SQL_TIMESTAMP should have precision 19
   callSQLColAttribute(stmt, req5, SQL_DESC_PRECISION, 19);
@@ -1065,7 +1063,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescScale) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select fieldLong from meta_queries_test_001";
+  const SQLCHAR req[] = "select fieldLong from meta_queries_test_001";
 
   // default scale value is 0
   callSQLColAttribute(stmt, req, SQL_DESC_SCALE, 0);
@@ -1075,7 +1073,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescSchemaName) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
+  const SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
 
   callSQLColAttribute(stmt, req, SQL_DESC_SCHEMA_NAME,
                       std::string("odbc-test"));
@@ -1085,7 +1083,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescSearchable) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select fieldString from meta_queries_test_002";
+  const SQLCHAR req[] = "select fieldString from meta_queries_test_002";
 
   // only SQL_PRED_BASIC is returned
   callSQLColAttribute(stmt, req, SQL_DESC_SEARCHABLE, SQL_PRED_BASIC);
@@ -1095,7 +1093,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescTableName) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
+  const SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
 
   callSQLColAttribute(stmt, req, SQL_DESC_TABLE_NAME,
                       std::string("meta_queries_test_002_with_array"));
@@ -1108,22 +1106,22 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescType) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req1, SQL_DESC_TYPE, SQL_VARCHAR);
 
 
-  SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
+  const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req2, SQL_DESC_TYPE, SQL_INTEGER);
 
-  SQLCHAR req3[] = "select fieldBinary from meta_queries_test_001";
+  const SQLCHAR req3[] = "select fieldBinary from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req3, SQL_DESC_TYPE, SQL_VARBINARY);
 
   // TODO re-enable this test when bug from JDBC (AD-765) is fixed. 
   // https://bitquill.atlassian.net/browse/AD-766
-  //SQLCHAR req4[] = "select fieldNull from meta_queries_test_001";
+  //const SQLCHAR req4[] = "select fieldNull from meta_queries_test_001";
   // 
   //callSQLColAttribute(stmt, req4, SQL_DESC_TYPE, SQL_TYPE_NULL);
 }
@@ -1132,7 +1130,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescUnnamed) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select fieldNull from meta_queries_test_001";
+  const SQLCHAR req[] = "select fieldNull from meta_queries_test_001";
 
   // all columns should be named bacause they cannot be null
   callSQLColAttribute(stmt, req, SQL_DESC_UNNAMED, SQL_NAMED);
@@ -1142,12 +1140,12 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescUnsigned) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req1[] = "select fieldInt from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldInt from meta_queries_test_001";
 
   // numeric type should be signed
   callSQLColAttribute(stmt, req1, SQL_DESC_UNSIGNED, SQL_FALSE);
 
-  SQLCHAR req2[] = "select fieldString from meta_queries_test_001";
+  const SQLCHAR req2[] = "select fieldString from meta_queries_test_001";
 
   // non-numeric types should be unsigned
   callSQLColAttribute(stmt, req2, SQL_DESC_UNSIGNED, SQL_TRUE);
@@ -1157,7 +1155,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescUpdatable) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select fieldMaxKey from meta_queries_test_002";
+  const SQLCHAR req[] = "select fieldMaxKey from meta_queries_test_002";
 
   // only SQL_ATTR_READWRITE_UNKNOWN is returned
   callSQLColAttribute(stmt, req, SQL_DESC_UPDATABLE,
@@ -1615,15 +1613,6 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsOneFromLocalServer) {
 
   SQLRETURN ret = SQLColumns(stmt, empty.data(), SQL_NTS, nullptr, 0,
                              table.data(), SQL_NTS, column.data(), SQL_NTS);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  CheckSingleRowResultSetWithGetData(stmt, 4, "fieldString");
-
-  // check that passing catalog NULL value gives data
-  ret = SQLColumns(stmt, nullptr, 0, nullptr, 0, table.data(), SQL_NTS,
-                   column.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));

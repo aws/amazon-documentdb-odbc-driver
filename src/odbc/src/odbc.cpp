@@ -1205,7 +1205,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
       return SQL_ERROR;
     }
 
-    // In bytes
+    // Length is given in bytes
     *msgLen = CopyStringToBuffer(errMsg, msgBuffer,
                                  static_cast< size_t >(msgBufferLen), true);
 
@@ -1214,7 +1214,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
     return SQL_SUCCESS_WITH_INFO;
   }
 
-  // In bytes
+  // Length is given in bytes
   size_t msgLen0 = CopyStringToBuffer(
       errMsg, msgBuffer, static_cast< size_t >(msgBufferLen), true);
 
