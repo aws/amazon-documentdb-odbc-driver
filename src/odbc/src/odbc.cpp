@@ -497,6 +497,8 @@ SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLCHAR* query, SQLINTEGER queryLen) {
 
   statement->ExecuteSqlQuery(sql);
 
+  LOG_DEBUG_MSG("SQLExecDirect exiting");
+
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
@@ -546,6 +548,8 @@ SQLRETURN SQLFetch(SQLHSTMT stmt) {
   }
 
   statement->FetchRow();
+  
+  LOG_DEBUG_MSG("SQLFetch exiting");
 
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
