@@ -109,9 +109,6 @@ class TypeInfoQuery : public Query {
   /** Executed flag. */
   bool executed;
 
-  /** Fetched flag. */
-  bool fetched;
-
   /** Requested types. */
   std::vector< int8_t > types;
 

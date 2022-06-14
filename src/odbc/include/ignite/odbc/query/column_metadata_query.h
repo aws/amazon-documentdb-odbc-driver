@@ -141,9 +141,6 @@ class ColumnMetadataQuery : public Query {
   /** Query executed. */
   bool executed;
 
-  /** Fetched flag. */
-  bool fetched;
-
   /** Fetched metadata. */
   meta::ColumnMetaVector meta;
 

@@ -73,7 +73,6 @@ TableMetadataQuery::TableMetadataQuery(diagnostic::DiagnosableAdapter& diag,
       table(table),
       tableType(tableType),
       executed(false),
-      fetched(false),
       meta(),
       columnsMeta() {
   using namespace ignite::odbc::impl::binary;
@@ -111,7 +110,6 @@ SqlResult::Type TableMetadataQuery::Execute() {
 
   if (result == SqlResult::AI_SUCCESS) {
     executed = true;
-    fetched = false;
 
     cursor = meta.begin();
   }
