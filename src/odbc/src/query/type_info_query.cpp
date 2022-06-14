@@ -226,13 +226,9 @@ SqlResult::Type TypeInfoQuery::FetchNextRow(
     return SqlResult::AI_ERROR;
   }
 
-  // An extra if check is needed here to prevent iterating past vector end
-  if (cursor == types.end())
-    return SqlResult::AI_NO_DATA;
-
   if (!fetched)
     fetched = true;
-  else
+  else if (cursor != types.end())
     ++cursor;
 
   if (cursor == types.end())
