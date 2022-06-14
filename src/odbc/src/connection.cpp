@@ -660,7 +660,7 @@ std::string Connection::FormatMongoCppConnectionString(
   if (config_.IsTls()) {
     mongoConnectionString.append("?tlsAllowInvalidHostnames=true");
   }
-  mongoConnectionString.append("&authMechanism=SCRAM-SHA-1");
+  //mongoConnectionString.append("&authMechanism=SCRAM-SHA-1");
   // tls configuration is handled using tls_options in connectionCPP
   // TODO handle the other DSN configuration
   // https://bitquill.atlassian.net/browse/AD-599
