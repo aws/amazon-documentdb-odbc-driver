@@ -701,7 +701,7 @@ boost::optional< int32_t > SqlTypeNumPrecRadix(
       return 10;
 
     default:
-      return -1;
+      return 0;
   }
 }
 
@@ -712,9 +712,21 @@ boost::optional< int32_t > BinaryTypeNumPrecRadix(
   return SqlTypeNumPrecRadix(sqlType);
 }
 
-boost::optional< int16_t > SqlTypeDecimalDigits(boost::optional< int16_t >) {
+boost::optional< int16_t > SqlTypeDecimalDigits(boost::optional< int16_t > type) {
   // Not implemented for the NUMERIC and DECIMAL data types.
-  return -1;
+  // All exact numeric types other than SQL_DECIMAL and SQL_NUMERIC should return 0
+  if (!type)
+    return boost::none;
+  switch (*type) {
+    case SQL_TINYINT:
+    case SQL_SMALLINT:
+    case SQL_INTEGER:
+    case SQL_BIGINT:
+      return 0;
+
+    default:
+      return -1;
+  }
 }
 
 boost::optional< int16_t > BinaryTypeDecimalDigits(

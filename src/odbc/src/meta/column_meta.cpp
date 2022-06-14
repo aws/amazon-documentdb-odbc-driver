@@ -17,9 +17,9 @@
 
 #include "ignite/odbc/meta/column_meta.h"
 
-#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/common/utils.h"
 #include "ignite/odbc/common_types.h"
+#include "ignite/odbc/impl/binary/binary_common.h"
 #include "ignite/odbc/jni/java.h"
 #include "ignite/odbc/log.h"
 #include "ignite/odbc/system/odbc_constants.h"
@@ -101,10 +101,12 @@ const std::string TABLE_SCHEM = "TABLE_SCHEM";
 const std::string TABLE_NAME = "TABLE_NAME";
 const std::string COLUMN_NAME = "COLUMN_NAME";
 const std::string DATA_TYPE = "DATA_TYPE";
+const std::string DECIMAL_DIGITS = "DECIMAL_DIGITS";
 const std::string REMARKS = "REMARKS";
 const std::string COLUMN_DEF = "COLUMN_DEF";
 const std::string NULLABLE = "NULLABLE";
 const std::string ORDINAL_POSITION = "ORDINAL_POSITION";
+const std::string IS_AUTOINCREMENT = "IS_AUTOINCREMENT";
 
 void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
                       int32_t& prevPosition, JniErrorInfo& errInfo) {
@@ -113,6 +115,7 @@ void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
   resultSet.Get()->GetString(TABLE_NAME, tableName, errInfo);
   resultSet.Get()->GetString(COLUMN_NAME, columnName, errInfo);
   resultSet.Get()->GetSmallInt(DATA_TYPE, dataType, errInfo);
+  resultSet.Get()->GetInt(DECIMAL_DIGITS, decimalDigits, errInfo);
   resultSet.Get()->GetString(REMARKS, remarks, errInfo);
   resultSet.Get()->GetString(COLUMN_DEF, columnDef, errInfo);
   resultSet.Get()->GetInt(NULLABLE, nullability, errInfo);
@@ -122,17 +125,16 @@ void ColumnMeta::Read(SharedPointer< ResultSet >& resultSet,
   } else {
     prevPosition = *ordinalPosition;
   }
+  resultSet.Get()->GetString(IS_AUTOINCREMENT, isAutoIncrement, errInfo);
 }
 
 void ColumnMeta::ReadJdbcMetadata(JdbcColumnMetadata& jdbcMetadata,
-                              int32_t& prevPosition) {
+                                  int32_t& prevPosition) {
   catalogName = jdbcMetadata.GetCatalogName();
   schemaName = jdbcMetadata.GetSchemaName();
   tableName = jdbcMetadata.GetTableName();
   columnName = jdbcMetadata.GetColumnName();
   dataType = jdbcMetadata.GetColumnType();
-  precision = jdbcMetadata.GetPrecision();
-  scale = jdbcMetadata.GetScale();
   nullability = jdbcMetadata.GetNullable();
   ordinalPosition = jdbcMetadata.GetOrdinal();
   if (!ordinalPosition) {
@@ -140,11 +142,22 @@ void ColumnMeta::ReadJdbcMetadata(JdbcColumnMetadata& jdbcMetadata,
   } else {
     prevPosition = *ordinalPosition;
   }
+  isAutoIncrement = jdbcMetadata.IsAutoIncrement() ? "YES" : "NO";
+}
+
+bool isCharType(int16_t dataType) {
+  using namespace ignite::odbc::impl::binary;
+  return ((dataType == JDBC_TYPE_VARCHAR) || (dataType == JDBC_TYPE_CHAR)
+          || (dataType == JDBC_TYPE_NCHAR) || (dataType == JDBC_TYPE_NVARCHAR)
+          || (dataType == JDBC_TYPE_LONGVARCHAR)
+          || (dataType == JDBC_TYPE_LONGNVARCHAR));
 }
 
 bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
   using namespace ignite::odbc::impl::binary;
 
+  // an empty string is returned if the column does not have the requested field
+  value = "";
   switch (fieldId) {
     case SQL_DESC_LABEL:
     case SQL_DESC_BASE_COLUMN_NAME:
@@ -176,9 +189,22 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
       return true;
     }
 
-    case SQL_DESC_LITERAL_PREFIX:
+    case SQL_DESC_LITERAL_PREFIX: {
+      if (dataType) {
+        if (isCharType(*dataType))
+          value = "'";
+        else if ((*dataType == JDBC_TYPE_BINARY)
+                 || (*dataType == JDBC_TYPE_VARBINARY)
+                 || (*dataType == JDBC_TYPE_LONGVARBINARY))
+          value = "0x";
+      } else
+        value.clear();
+
+      return true;
+    }
+
     case SQL_DESC_LITERAL_SUFFIX: {
-      if (dataType && (*dataType == JDBC_TYPE_VARCHAR))
+      if (dataType && isCharType(*dataType))
         value = "'";
       else
         value.clear();
@@ -191,9 +217,10 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
       if (boost::optional< std::string > val =
               type_traits::BinaryTypeToSqlTypeName(dataType))
         value = *val;
-       else 
+      else
         value.clear();
-        return true;
+
+      return true;
     }
 
     case SQL_DESC_PRECISION:
@@ -225,9 +252,12 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
 bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
   using namespace ignite::odbc::impl::binary;
 
+  // value equals -1 by default.
+  value = -1;
   switch (fieldId) {
     case SQL_DESC_FIXED_PREC_SCALE: {
-      if (!scale || scale == -1)
+      if ((!precision || *precision == -1)
+          || (!scale || *scale == -1 || *scale == 0))
         value = SQL_FALSE;
       else
         value = SQL_TRUE;
@@ -236,13 +266,17 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     }
 
     case SQL_DESC_AUTO_UNIQUE_VALUE: {
-      value = SQL_FALSE;
+      if (isAutoIncrement && (*isAutoIncrement == "YES"))
+        value = SQL_TRUE;
+      else
+        value = SQL_FALSE;
 
       break;
     }
 
     case SQL_DESC_CASE_SENSITIVE: {
-      if (dataType && (*dataType == JDBC_TYPE_VARCHAR))
+      if (dataType
+          && isCharType(*dataType))
         value = SQL_TRUE;
       else
         value = SQL_FALSE;
@@ -255,7 +289,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
       if (boost::optional< int16_t > val =
               type_traits::BinaryToSqlType(dataType))
         value = *val;
-      
+
       break;
     }
 
@@ -268,15 +302,29 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     }
 
     case SQL_DESC_LENGTH:
-    case SQL_DESC_OCTET_LENGTH:
+      // SQL_DESC_LENGTH is either the maximum or actual character length of a
+      // character string or binary data type
     case SQL_COLUMN_LENGTH: {
-      if (dataType && (!precision || *precision == -1)) {
+      if (dataType) {
         if (boost::optional< int > val =
                 type_traits::BinaryTypeTransferLength(dataType))
           value = *val;
       }
-      else if (precision)
-        value = *precision;
+
+      break;
+    }
+
+    case SQL_DESC_OCTET_LENGTH: {
+      // SQL_DESC_OCTET_LENGTH is SQL_DESC_LENGTH in bytes
+      if (dataType) {
+        if (boost::optional< int > val =
+                type_traits::BinaryTypeTransferLength(dataType)) {
+          // multiply SQL_DESC_LENGTH by bytes per char if needed
+          if (*val != SQL_NO_TOTAL)
+            *val *= sizeof(char);
+          value = *val;
+        }
+      }
 
       break;
     }
@@ -297,12 +345,18 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
 
     case SQL_DESC_PRECISION:
     case SQL_COLUMN_PRECISION: {
-      if (dataType && (!precision || *precision == -1)) {
+      if (dataType
+          && ((decimalDigits && *decimalDigits != -1)
+              && ((*dataType == JDBC_TYPE_TIME) || (*dataType == JDBC_TYPE_DATE)
+                  || (*dataType == JDBC_TYPE_TIMESTAMP)))) {
+        // return decimal digits for all datetime types and all interval
+        // types with a seconds component
+        value = *decimalDigits;
+      } else if (dataType && (!precision || *precision == -1)) {
         if (boost::optional< int > val =
                 type_traits::BinaryTypeColumnSize(dataType))
           value = *val;
-      }
-      else if (precision)
+      } else if (precision)
         value = *precision;
 
       break;
@@ -310,12 +364,17 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
 
     case SQL_DESC_SCALE:
     case SQL_COLUMN_SCALE: {
-      if (dataType && (!scale || *scale == -1)) {
+      // scale value of -1 means value not available.
+      if (dataType
+          && ((decimalDigits && *decimalDigits != -1)
+              && ((*dataType == JDBC_TYPE_DECIMAL)
+                  || (*dataType == JDBC_TYPE_NUMERIC)))) {
+        // return decimal digits for all decimal and numeric types
+        value = *decimalDigits;
+      } else if (dataType && (!scale || *scale == -1)) {
         if (boost::optional< int16_t > val =
                 type_traits::BinaryTypeDecimalDigits(dataType))
           value = *val;
-        if (value < 0)
-          value = 0;
       } else if (scale)
         value = *scale;
 
@@ -329,7 +388,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     }
 
     case SQL_DESC_UNNAMED: {
-      value = columnName ? SQL_UNNAMED : SQL_NAMED;
+      value = (columnName && *columnName != "") ? SQL_NAMED : SQL_UNNAMED;
 
       break;
     }

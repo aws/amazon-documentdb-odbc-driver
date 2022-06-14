@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include <ignite/common/utils.h>
+#include <ignite/odbc/common/utils.h>
 #include <ignite/odbc/config/config_tools.h>
 #include <ignite/odbc/config/configuration.h>
 #include <ignite/odbc/utility.h>

@@ -29,6 +29,12 @@ find_package(bsoncxx REQUIRED)
 
 find_package(ODBC REQUIRED)
 
+find_package(Java REQUIRED)
+find_package(JNI REQUIRED)
+include(UseJava)
+
+find_package(Threads REQUIRED)
+
 include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS} ${BSONCXX_INCLUDE_DIRS})
 include_directories(include ../odbc/include)
 if (WIN32)
@@ -40,6 +46,7 @@ endif()
 
 set(SOURCES 
          src/api_robustness_test.cpp
+         src/column_meta_test.cpp
          src/configuration_test.cpp
          src/connection_test.cpp
          src/java_test.cpp
@@ -56,6 +63,9 @@ set(SOURCES
          ../odbc/src/binary/binary_reader.cpp
          ../odbc/src/binary/binary_type.cpp
          ../odbc/src/binary/binary_raw_reader.cpp
+         ../odbc/src/cluster/cluster_group.cpp
+         ../odbc/src/cluster/cluster_node.cpp
+         ../odbc/src/cluster/ignite_cluster.cpp
          ../odbc/src/common_types.cpp
          ../odbc/src/common/big_integer.cpp
          ../odbc/src/common/bits.cpp
@@ -84,9 +94,26 @@ set(SOURCES
          ../odbc/src/impl/binary/binary_object_header.cpp
          ../odbc/src/impl/binary/binary_object_impl.cpp
          ../odbc/src/impl/binary/binary_field_meta.cpp
+	 ../odbc/src/impl/binary/binary_type_updater_impl.cpp
+         ../odbc/src/impl/cache/cache_affinity_impl.cpp
+         ../odbc/src/impl/cache/cache_impl.cpp
+         ../odbc/src/impl/cache/query/query_batch.cpp
+         ../odbc/src/impl/cache/query/query_impl.cpp
+         ../odbc/src/impl/cache/query/continuous/continuous_query_handle_impl.cpp
+         ../odbc/src/impl/cluster/cluster_group_impl.cpp
+         ../odbc/src/impl/cluster/cluster_node_impl.cpp
+         ../odbc/src/impl/cluster/ignite_cluster_impl.cpp
+         ../odbc/src/impl/compute/cancelable_impl.cpp
+         ../odbc/src/impl/compute/compute_impl.cpp
+         ../odbc/src/impl/interop/interop_input_stream.cpp
          ../odbc/src/impl/interop/interop_memory.cpp
          ../odbc/src/impl/interop/interop_output_stream.cpp
-         ../odbc/src/impl/interop/interop_input_stream.cpp
+         ../odbc/src/impl/interop/interop_target.cpp
+	 ../odbc/src/impl/interop/interop_external_memory.cpp
+         ../odbc/src/impl/handle_registry.cpp
+         ../odbc/src/impl/ignite_binding_impl.cpp
+         ../odbc/src/impl/ignite_environment.cpp
+         ../odbc/src/impl/ignite_impl.cpp
          ../odbc/src/connection.cpp
          ../odbc/src/driver_instance.cpp
          ../odbc/src/cursor.cpp
@@ -140,6 +167,7 @@ set(SOURCES
          ../odbc/src/guid.cpp
          ../odbc/src/time.cpp
          ../odbc/src/timestamp.cpp
+         ../odbc/src/ignite.cpp
         )
 
 if (WIN32)
@@ -151,12 +179,14 @@ if (WIN32)
         ../odbc/os/win/src/system/ui/custom_window.cpp
         ../odbc/os/win/src/system/ui/dsn_configuration_window.cpp
         ../odbc/os/win/src/system/ui/window.cpp
+        ../odbc/os/win/src/common/dynamic_load_os.cpp
     )
 else()
     # TODO: Ensure MacOS is portable. https://bitquill.atlassian.net/browse/AD-525
     list(APPEND SOURCES
         ../odbc/os/linux/src/common/concurrent_os.cpp
         ../odbc/os/linux/src/common/platform_utils.cpp
+	../odbc/os/linux/src/common/dynamic_load_os.cpp
         ../odbc/src/jni/os/linux/utils.cpp
     )
 endif()
@@ -164,7 +194,7 @@ endif()
 add_executable(${TARGET} ${SOURCES})
 
 target_link_libraries(${TARGET} ${ODBC_LIBRARIES})
-target_link_libraries(${TARGET} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} ignite mongo::mongocxx_shared)
+target_link_libraries(${TARGET} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} mongo::mongocxx_shared ${JNI_LIBRARIES})
 target_code_coverage(${TARGET}  PUBLIC AUTO ALL)
 
 if (WIN32)
@@ -180,10 +210,10 @@ if (WIN32)
     endif()
 elseif(APPLE)
     add_definitions(-DBOOST_TEST_DYN_LINK)
-    target_link_libraries(${TARGET} iodbcinst)
+    target_link_libraries(${TARGET} iodbcinst ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 else()
     add_definitions(-DBOOST_TEST_DYN_LINK)
-    target_link_libraries(${TARGET} odbcinst)
+    target_link_libraries(${TARGET} odbcinst ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
 set(TEST_TARGET IgniteOdbcTest)
