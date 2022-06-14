@@ -265,6 +265,9 @@ void WriteDecimal(BinaryWriterImpl& writer,
 
 std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
                               bool isLenInBytes) {
+  if (!sqlStr)
+    return std::string();
+
   size_t char_size = sizeof(SQLWCHAR);
 
   assert(char_size == sizeof(wchar_t) || char_size == 2);

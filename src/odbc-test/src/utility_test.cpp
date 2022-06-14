@@ -131,6 +131,43 @@ BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBufferRepetative, *disabled()) {
             << " nanoseconds\n";
 }
 
+BOOST_AUTO_TEST_CASE(TestUtilitySqlStringToString) {
+  std::string utf8String = u8"你好 - Some data. And some more data here.";
+  std::vector< SQLWCHAR > buffer = ToWCHARVector(utf8String);
+  std::string utf8StringShortened = u8"你好 - Some da";
+
+  std::string result = SqlStringToString(buffer.data());
+  BOOST_CHECK_EQUAL(utf8String, result);
+
+  result = SqlStringToString(buffer.data(), buffer.size());
+  BOOST_CHECK_EQUAL(utf8String, result);
+
+  result = SqlStringToString(buffer.data(), buffer.size(), false);
+  BOOST_CHECK_EQUAL(utf8String, result);
+
+  result =
+      SqlStringToString(buffer.data(), buffer.size() * sizeof(SQLWCHAR), true);
+  BOOST_CHECK_EQUAL(utf8String, result);
+
+  result = SqlStringToString(nullptr, buffer.size());
+  BOOST_CHECK_EQUAL(std::string(), result);
+
+  result = SqlStringToString(nullptr, buffer.size() * sizeof(SQLWCHAR), true);
+  BOOST_CHECK_EQUAL(std::string(), result);
+
+  result = SqlStringToString(buffer.data(), 0);
+  BOOST_CHECK_EQUAL(std::string(), result);
+
+  result = SqlStringToString(buffer.data(), 0, true);
+  BOOST_CHECK_EQUAL(std::string(), result);
+
+  result = SqlStringToString(buffer.data(), 12);
+  BOOST_CHECK_EQUAL(utf8StringShortened, result);
+
+  result = SqlStringToString(buffer.data(), 12 * sizeof(SQLWCHAR), true);
+  BOOST_CHECK_EQUAL(utf8StringShortened, result);
+}
+
 BOOST_AUTO_TEST_CASE(TestUtilityWriteReadString) {
   using namespace impl::binary;
   using namespace impl::interop;

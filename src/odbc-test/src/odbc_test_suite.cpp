@@ -362,12 +362,7 @@ void OdbcTestSuite::CheckSQLConnectionDiagnosticError(
 }
 
 std::vector< SQLWCHAR > OdbcTestSuite::MakeSqlBuffer(const std::string& value) {
-  // This may be 6-times too large.
-  std::vector< SQLWCHAR > buffer(value.size() + 1);
-  size_t length = utility::CopyStringToBuffer(value, buffer.data(), buffer.size());
-  // Resize to the actual number of characters.
-  buffer.resize(length + 1);
-  return buffer;
+  return utility::ToWCHARVector(value);
 }
 
 SQLRETURN OdbcTestSuite::ExecQuery(const std::string& qry) {
