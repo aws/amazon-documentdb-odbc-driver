@@ -488,20 +488,21 @@ class IGNITE_IMPORT_EXPORT JniContext {
   static void Detach();
   static void Release(jobject obj);
 
-  std::string JavaStringToCppString(const SharedPointer< GlobalJObject >& jstring);
+  std::string JavaStringToCppString(
+      const SharedPointer< GlobalJObject >& jstring, JniErrorInfo& errInfo);
 
   int64_t TargetInLongOutLong(jobject obj, int type, int64_t memPtr,
-                              JniErrorInfo* errInfo = NULL);
+                              JniErrorInfo* errInfo);
   int64_t TargetInStreamOutLong(jobject obj, int type, int64_t memPtr,
-                                JniErrorInfo* errInfo = NULL);
+                                JniErrorInfo* errInfo);
   jobject TargetOutObject(jobject obj, int opType,
-                          JniErrorInfo* errInfo = NULL);
+                          JniErrorInfo* errInfo);
   void TargetInStreamOutStream(jobject obj, int opType, int64_t inMemPtr,
-                               int64_t outMemPtr, JniErrorInfo* errInfo = NULL);
+                               int64_t outMemPtr, JniErrorInfo* errInfo);
   jobject TargetInStreamOutObject(jobject obj, int type, int64_t memPtr,
-                                  JniErrorInfo* errInfo = NULL);
+                                  JniErrorInfo* errInfo);
   void TargetOutStream(jobject obj, int opType, int64_t memPtr,
-                       JniErrorInfo* errInfo = NULL);
+                       JniErrorInfo* errInfo);
 
   JniErrorCode DriverManagerGetConnection(
       const char* connectionString, SharedPointer< GlobalJObject >& connection,
@@ -692,9 +693,9 @@ class IGNITE_IMPORT_EXPORT JniContext {
       JniErrorInfo& errInfo);
 
   jobject CacheOutOpQueryCursor(jobject obj, int type, int64_t memPtr,
-                                JniErrorInfo* errInfo = NULL);
+                                JniErrorInfo* errInfo);
   jobject CacheOutOpContinuousQuery(jobject obj, int type, int64_t memPtr,
-                                    JniErrorInfo* errInfo = NULL);
+                                    JniErrorInfo* errInfo);
 
   jobject Acquire(jobject obj);
 
@@ -704,7 +705,7 @@ class IGNITE_IMPORT_EXPORT JniContext {
 
   JniContext(JniJvm* jvm, JniHandlers const& hnds);
 
-  JNIEnv* Attach();
+  JNIEnv* Attach(JniErrorInfo& errInfo);
   void ExceptionCheck(JNIEnv* env);
   void ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo);
 
