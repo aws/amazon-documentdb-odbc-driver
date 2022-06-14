@@ -73,7 +73,7 @@ size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
  * @param inBuffer UTF-8, null-terminated string to copy data from.
  * @param outBuffer SQLWCHAR buffer to copy data to.
  * @param outBufferLenBytes Length of the output buffer, in bytes.
- * @return isTruncted Reference to indicator of whether the input string was
+ * @return isTruncated Reference to indicator of whether the input string was
  * truncted in the output buffer.
  */
 size_t CopyUtf8StringToSqlWcharString(const char* inBuffer, SQLWCHAR* outBuffer,
