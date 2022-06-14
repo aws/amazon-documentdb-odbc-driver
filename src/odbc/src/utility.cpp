@@ -48,8 +48,6 @@ size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
     return inBufferLenChars;
 
   std::locale currentLocale("");
-  const std::codecvt_utf8< char > convFacet;
-
   std::use_facet< std::ctype< wchar_t > >(currentLocale)
       .narrow(inString.data(), inString.data() + outBufferLenActual, '?',
               reinterpret_cast< char* >(outBuffer));
