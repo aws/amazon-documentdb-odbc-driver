@@ -1069,11 +1069,15 @@ void JniContext::Detach() {
 }
 
 std::string JniContext::JavaStringToCppString(
-    const SharedPointer< GlobalJObject >& value) {
+    const SharedPointer< GlobalJObject >& value, JniErrorInfo& errInfo) {
   LOG_DEBUG_MSG("JavaStringToCppString is called");
-  int len;
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return std::string();
+  }
+
   LOG_DEBUG_MSG("JavaStringToCppString exiting");
+  int len;
   return JavaStringToCString(env, static_cast< jstring >(value.Get()->GetRef()),
                              len);
 }
@@ -1083,7 +1087,10 @@ JniErrorCode JniContext::DriverManagerGetConnection(
     JniErrorInfo& errInfo) {
   LOG_DEBUG_MSG("DriverManagerGetConnection is called");
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
 
   // TODO enable string logging and hide the user password.
   // https://bitquill.atlassian.net/browse/AD-702
@@ -1119,7 +1126,11 @@ JniErrorCode JniContext::ConnectionClose(
 
     return errInfo.code;
   }
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   env->CallVoidMethod(connection.Get()->GetRef(),
                       jvm->GetMembers().m_ConnectionClose);
   ExceptionCheck(env, &errInfo);
@@ -1144,7 +1155,11 @@ JniErrorCode JniContext::DocumentDbConnectionIsSshTunnelActive(
 
     return errInfo.code;
   }
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jboolean res = env->CallBooleanMethod(
       connection.Get()->GetRef(),
       jvm->GetMembers().m_DocumentDbConnectionIsSshTunnelActive);
@@ -1172,7 +1187,11 @@ JniErrorCode JniContext::DocumentDbConnectionGetSshLocalPort(
 
     return errInfo.code;
   }
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   result = env->CallIntMethod(
       connection.Get()->GetRef(),
       jvm->GetMembers().m_DocumentDbConnectionGetSshLocalPort);
@@ -1197,7 +1216,11 @@ JniErrorCode JniContext::DocumentDbConnectionGetDatabaseMetadata(
 
     return errInfo.code;
   }
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jobject result = env->CallObjectMethod(
       connection.Get()->GetRef(),
       jvm->GetMembers().m_DocumentDbConnectionGetDatabaseMetadata);
@@ -1235,7 +1258,11 @@ JniErrorCode JniContext::DocumentDbConnectionGetConnectionProperties(
 
     return errInfo.code;
   }
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jobject result = env->CallObjectMethod(
       connection.Get()->GetRef(),
       jvm->GetMembers().m_DocumentDbConnectionGetConnectionProperties);
@@ -1269,7 +1296,11 @@ JniErrorCode JniContext::DocumentDbDatabaseSchemaMetadataGetSchemaName(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jobject result = env->CallObjectMethod(
       databaseMetadata.Get()->GetRef(),
       jvm->GetMembers().m_DocumentDbDatabaseSchemaMetadataGetSchemaName);
@@ -1304,7 +1335,11 @@ JniErrorCode JniContext::ConnectionGetMetaData(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jobject result = env->CallObjectMethod(
       connection.Get()->GetRef(), jvm->GetMembers().m_ConnectionGetMetaData);
   ExceptionCheck(env, &errInfo);
@@ -1345,7 +1380,11 @@ JniErrorCode JniContext::DatabaseMetaDataGetTables(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jstring jCatalog = catalog ? env->NewStringUTF(catalog->c_str()) : nullptr;
   jstring jSchemaPattern =
       schemaPattern ? env->NewStringUTF(schemaPattern->c_str()) : nullptr;
@@ -1408,7 +1447,11 @@ JniErrorCode JniContext::DatabaseMetaDataGetColumns(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jstring jCatalog = catalog ? env->NewStringUTF(catalog->c_str()) : nullptr;
   jstring jSchemaPattern =
       schemaPattern ? env->NewStringUTF(schemaPattern->c_str()) : nullptr;
@@ -1460,7 +1503,11 @@ JniErrorCode JniContext::DatabaseMetaDataGetPrimaryKeys(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jstring jCatalog = catalog ? env->NewStringUTF(catalog->c_str()) : nullptr;
   jstring jSchema = schema ? env->NewStringUTF(schema->c_str()) : nullptr;
   jstring jTableName = table ? env->NewStringUTF(table->c_str()) : nullptr;
@@ -1508,7 +1555,11 @@ JniErrorCode JniContext::DatabaseMetaDataGetImportedKeys(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jstring jCatalog = catalog ? env->NewStringUTF(catalog->c_str()) : nullptr;
   jstring jSchema = schema ? env->NewStringUTF(schema->c_str()) : nullptr;
   jstring jTable = env->NewStringUTF(table.c_str());
@@ -1551,7 +1602,11 @@ JniErrorCode JniContext::ResultSetClose(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   env->CallVoidMethod(resultSet.Get()->GetRef(),
                       jvm->GetMembers().m_ResultSetClose);
   ExceptionCheck(env, &errInfo);
@@ -1575,7 +1630,11 @@ JniErrorCode JniContext::ResultSetNext(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jboolean res = env->CallBooleanMethod(resultSet.Get()->GetRef(),
                                         jvm->GetMembers().m_ResultSetNext);
   ExceptionCheck(env, &errInfo);
@@ -1604,7 +1663,11 @@ JniErrorCode JniContext::ResultSetGetString(
   }
 
   value = boost::none;
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jobject result = env->CallObjectMethod(
       resultSet.Get()->GetRef(), jvm->GetMembers().m_ResultSetGetStringByIndex,
       columnIndex);
@@ -1640,7 +1703,11 @@ JniErrorCode JniContext::ResultSetGetString(
     return errInfo.code;
   }
   value = boost::none;
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jstring jColumnName = env->NewStringUTF(columnName.c_str());
   jobject result = env->CallObjectMethod(
       resultSet.Get()->GetRef(), jvm->GetMembers().m_ResultSetGetStringByName,
@@ -1678,7 +1745,11 @@ JniErrorCode JniContext::ResultSetGetInt(
   }
 
   value = boost::none;
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jint result = env->CallIntMethod(resultSet.Get()->GetRef(),
                                    jvm->GetMembers().m_ResultSetGetIntByIndex,
                                    columnIndex);
@@ -1712,7 +1783,11 @@ JniErrorCode JniContext::ResultSetGetInt(
   }
 
   value = boost::none;
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jstring jColumnName = env->NewStringUTF(columnName.c_str());
   jint result = env->CallIntMethod(resultSet.Get()->GetRef(),
                                    jvm->GetMembers().m_ResultSetGetIntByName,
@@ -1748,7 +1823,11 @@ JniErrorCode JniContext::ResultSetGetRow(
   }
 
   value = boost::none;
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jint result = env->CallIntMethod(resultSet.Get()->GetRef(),
                                    jvm->GetMembers().m_ResultSetGetRow);
   ExceptionCheck(env, &errInfo);
@@ -1780,7 +1859,11 @@ JniErrorCode JniContext::ResultSetWasNull(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jboolean res = env->CallBooleanMethod(resultSet.Get()->GetRef(),
                                         jvm->GetMembers().m_ResultSetWasNull);
   ExceptionCheck(env, &errInfo);
@@ -1806,7 +1889,11 @@ JniErrorCode JniContext::ListSize(const SharedPointer< GlobalJObject >& list,
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jint res =
       env->CallIntMethod(list.Get()->GetRef(), jvm->GetMembers().m_ListSize);
   ExceptionCheck(env, &errInfo);
@@ -1834,7 +1921,11 @@ JniErrorCode JniContext::ListGet(const SharedPointer< GlobalJObject >& list,
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jobject result = env->CallObjectMethod(list.Get()->GetRef(),
                                          jvm->GetMembers().m_ListGet, index);
   ExceptionCheck(env, &errInfo);
@@ -1871,7 +1962,11 @@ JniContext::DocumentdbMqlQueryContextGetAggregateOperationsAsStrings(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jobject result = env->CallObjectMethod(
       mqlQueryContext.Get()->GetRef(),
       jvm->GetMembers()
@@ -1910,7 +2005,11 @@ JniErrorCode JniContext::DocumentdbMqlQueryContextGetColumnMetadata(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jobject result = env->CallObjectMethod(
       mqlQueryContext.Get()->GetRef(),
       jvm->GetMembers().m_DocumentDbMqlQueryContextGetColumnMetadata);
@@ -1947,7 +2046,11 @@ JniErrorCode JniContext::DocumentdbMqlQueryContextGetCollectionName(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jstring result = static_cast< jstring >(env->CallObjectMethod(
       mqlQueryContext.Get()->GetRef(),
       jvm->GetMembers().m_DocumentDbMqlQueryContextGetCollectionName));
@@ -1984,7 +2087,11 @@ JniErrorCode JniContext::DocumentdbMqlQueryContextGetPaths(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jobject result = env->CallObjectMethod(
       mqlQueryContext.Get()->GetRef(),
       jvm->GetMembers().m_DocumentDbMqlQueryContextGetPaths);
@@ -2023,7 +2130,11 @@ JniErrorCode JniContext::DocumentDbQueryMappingServiceCtor(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jobject result = env->NewObject(
       jvm->GetMembers().c_DocumentDbQueryMappingService,
       jvm->GetMembers().m_DocumentDbQueryMappingServiceCtor,
@@ -2061,7 +2172,11 @@ JniErrorCode JniContext::DocumentDbQueryMappingServiceGet(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jstring sqlString = env->NewStringUTF(sql.c_str());
   jlong maxRowCountLong = maxRowCount;
   jobject result = env->CallObjectMethod(
@@ -2101,7 +2216,11 @@ JniErrorCode JniContext::JdbcColumnMetadataGetOrdinal(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jint result =
       env->CallIntMethod(jdbcColumnMetadata.Get()->GetRef(),
                          jvm->GetMembers().m_JdbcColumnMetadataGetOrdinal);
@@ -2135,7 +2254,11 @@ JniErrorCode JniContext::CallBooleanMethod(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jboolean result = env->CallBooleanMethod(object.Get()->GetRef(), method);
   ExceptionCheck(env, &errInfo);
   if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
@@ -2165,7 +2288,11 @@ JniErrorCode JniContext::CallIntMethod(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   jint result = env->CallIntMethod(object.Get()->GetRef(), method);
   ExceptionCheck(env, &errInfo);
   if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
@@ -2197,7 +2324,11 @@ JniErrorCode JniContext::CallStringMethod(
     return errInfo.code;
   }
 
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
   auto result = static_cast< jstring >(
       env->CallObjectMethod(object.Get()->GetRef(), method));
   ExceptionCheck(env, &errInfo);
@@ -2445,7 +2576,10 @@ jobject JniContext::LocalToGlobal(JNIEnv* env, jobject localRef) {
 
 int64_t JniContext::TargetInLongOutLong(jobject obj, int opType, int64_t val,
                                         JniErrorInfo* err) {
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(*err);
+  if (err->code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return 0;
+  }
 
   int64_t res = env->CallLongMethod(
       obj, jvm->GetMembers().m_PlatformTarget_inLongOutLong, opType, val);
@@ -2457,7 +2591,10 @@ int64_t JniContext::TargetInLongOutLong(jobject obj, int opType, int64_t val,
 
 int64_t JniContext::TargetInStreamOutLong(jobject obj, int opType,
                                           int64_t memPtr, JniErrorInfo* err) {
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(*err);
+  if (err->code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return 0;
+  }
 
   int64_t res = env->CallLongMethod(
       obj, jvm->GetMembers().m_PlatformTarget_inStreamOutLong, opType, memPtr);
@@ -2469,7 +2606,10 @@ int64_t JniContext::TargetInStreamOutLong(jobject obj, int opType,
 
 jobject JniContext::TargetOutObject(jobject obj, int opType,
                                     JniErrorInfo* err) {
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(*err);
+  if (err->code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return nullptr;
+  }
 
   jobject res = env->CallObjectMethod(
       obj, jvm->GetMembers().m_PlatformTarget_outObject, opType);
@@ -2482,7 +2622,10 @@ jobject JniContext::TargetOutObject(jobject obj, int opType,
 void JniContext::TargetInStreamOutStream(jobject obj, int opType,
                                          int64_t inMemPtr, int64_t outMemPtr,
                                          JniErrorInfo* err) {
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(*err);
+  if (err->code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return;
+  }
 
   env->CallVoidMethod(obj, jvm->GetMembers().m_PlatformTarget_inStreamOutStream,
                       opType, inMemPtr, outMemPtr);
@@ -2492,7 +2635,10 @@ void JniContext::TargetInStreamOutStream(jobject obj, int opType,
 
 jobject JniContext::TargetInStreamOutObject(jobject obj, int opType,
                                             int64_t memPtr, JniErrorInfo* err) {
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(*err);
+  if (err->code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return nullptr;
+  }
 
   jobject res = env->CallObjectMethod(
       obj, jvm->GetMembers().m_PlatformTarget_inStreamOutObject, opType,
@@ -2505,7 +2651,10 @@ jobject JniContext::TargetInStreamOutObject(jobject obj, int opType,
 
 void JniContext::TargetOutStream(jobject obj, int opType, int64_t memPtr,
                                  JniErrorInfo* err) {
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(*err);
+  if (err->code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return;
+  }
 
   env->CallVoidMethod(obj, jvm->GetMembers().m_PlatformTarget_outStream, opType,
                       memPtr);
@@ -2515,7 +2664,10 @@ void JniContext::TargetOutStream(jobject obj, int opType, int64_t memPtr,
 
 jobject JniContext::CacheOutOpQueryCursor(jobject obj, int type, int64_t memPtr,
                                           JniErrorInfo* err) {
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(*err);
+  if (err->code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return nullptr;
+  }
 
   jobject res = env->CallObjectMethod(
       obj, jvm->GetMembers().m_PlatformTarget_inStreamOutObject, type, memPtr);
@@ -2528,7 +2680,10 @@ jobject JniContext::CacheOutOpQueryCursor(jobject obj, int type, int64_t memPtr,
 jobject JniContext::CacheOutOpContinuousQuery(jobject obj, int type,
                                               int64_t memPtr,
                                               JniErrorInfo* err) {
-  JNIEnv* env = Attach();
+  JNIEnv* env = Attach(*err);
+  if (err->code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    return nullptr;
+  }
 
   jobject res = env->CallObjectMethod(
       obj, jvm->GetMembers().m_PlatformTarget_inStreamOutObject, type, memPtr);
@@ -2542,15 +2697,22 @@ jobject JniContext::Acquire(jobject obj) {
   LOG_DEBUG_MSG("Acquire is called");
 
   if (obj) {
-    JNIEnv* env = Attach();
+    JniErrorInfo errInfo;
+    JNIEnv* env = Attach(errInfo);
+    if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      return nullptr;
+    }
 
-    jobject obj0 = env->NewGlobalRef(obj);
 
-    ExceptionCheck(env);
+    if (env) {
+      jobject obj0 = env->NewGlobalRef(obj);
 
-    LOG_DEBUG_MSG("Acquire exiting with obj0 variable.");
+      ExceptionCheck(env);
 
-    return obj0;
+      LOG_DEBUG_MSG("Acquire exiting with obj0 variable.");
+
+      return obj0;
+    }
   }
 
   LOG_ERROR_MSG("Acquire exiting with nullptr.");
@@ -2583,7 +2745,7 @@ void JniContext::Release(jobject obj) {
 /**
  * Attach thread to JVM.
  */
-JNIEnv* JniContext::Attach() {
+JNIEnv* JniContext::Attach(JniErrorInfo& errInfo) {
   LOG_DEBUG_MSG("Attach is called");
 
   JNIEnv* env;
@@ -2591,11 +2753,17 @@ JNIEnv* JniContext::Attach() {
   jint attachRes = jvm->GetJvm()->AttachCurrentThread(
       reinterpret_cast< void** >(&env), nullptr);
 
-  if (attachRes == JNI_OK)
+  if (attachRes == JNI_OK) {
     AttachHelper::OnThreadAttach();
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
+  }
   else {
+    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_JVM_ATTACH;
+    errInfo.errMsg = "Failed to connect to JVM";
+    LOG_ERROR_MSG(errInfo.errMsg);
+
     if (hnds.error)
-      hnds.error(hnds.target, JniErrorCode::IGNITE_JNI_ERR_JVM_ATTACH, nullptr,
+      hnds.error(hnds.target, errInfo.code, nullptr,
                  0, nullptr, 0, nullptr, 0, nullptr, 0);
   }
   LOG_DEBUG_MSG("Attach exiting");

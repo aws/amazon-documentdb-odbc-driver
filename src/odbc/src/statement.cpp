@@ -230,14 +230,15 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
 
       LOG_MSG("SQL_ATTR_ROW_ARRAY_SIZE: " << val);
 
-      if (val < 1) {
-        AddStatusRecord(SqlState::SHY092_OPTION_TYPE_OUT_OF_RANGE,
-                        "Array size value can not be less than 1");
+      if (val != 1) {
+        AddStatusRecord(
+            SqlState::SIM001_FUNCTION_NOT_SUPPORTED,
+            "Array size value cannot be set to a value other than 1");
 
         return SqlResult::AI_ERROR;
-      }
-
-      rowArraySize = val;
+      } else if (rowArraySize != 1)
+        // val is 1
+        rowArraySize = 1;
 
       break;
     }
