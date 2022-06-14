@@ -154,12 +154,10 @@ size_t CopyUtf8StringToSqlWcharString(const char* inBuffer, SQLWCHAR* outBuffer,
       return CopyUtf8StringToWcharString(
           inBuffer, reinterpret_cast< char16_t* >(outBuffer), outBufferLenBytes,
           isTruncated);
-      break;
     case 4:
       return CopyUtf8StringToWcharString(
           inBuffer, reinterpret_cast< char32_t* >(outBuffer), outBufferLenBytes,
           isTruncated);
-      break;
     default:
       LOG_ERROR_MSG("Unexpected error converting string '" << inBuffer << "'");
       assert(false);
@@ -267,7 +265,6 @@ void WriteDecimal(BinaryWriterImpl& writer,
 
 std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
                               bool isLenInBytes) {
-  std::string result;
   size_t char_size = sizeof(SQLWCHAR);
 
   assert(char_size == sizeof(wchar_t) || char_size == 2);
@@ -330,25 +327,20 @@ void ReadByteArray(BinaryReaderImpl& reader,
     res.clear();
 }
 
-std::vector< SQLWCHAR > ToWCHARVector(const std::wstring& value) {
+std::vector< SQLWCHAR > ToWCHARVector(const std::string& value) {
   return ToWCHARVector(value.c_str());
 }
 
-std::vector< SQLWCHAR > ToWCHARVector(const wchar_t* value) {
-  std::vector< SQLWCHAR > result;
-  for (int i = 0; value[i] != 0; i++) {
-    result.push_back(value[i]);
-  }
-  result.push_back(0);
-  return result;
-}
-
-std::vector< SQLWCHAR > ToWCHARVector(const std::string& value) {
-  return ToWCHARVector(FromUtf8(value));
-}
-
 std::vector< SQLWCHAR > ToWCHARVector(const char* value) {
-  return ToWCHARVector(FromUtf8(value));
+  size_t wCharSize = sizeof(SQLWCHAR);
+  size_t inBufferLenBytes = std::strlen(value);
+  // Handle worst-case scenario where there is a one-to-one mapping.
+  std::vector< SQLWCHAR > outBuffer(inBufferLenBytes + 1);
+  bool isTruncated = false;
+  size_t length = CopyUtf8StringToSqlWcharString(
+      value, outBuffer.data(), outBuffer.size() * wCharSize, isTruncated);
+  outBuffer.resize((length / wCharSize) + 1);
+  return outBuffer;
 }
 
 std::string HexDump(const void* data, size_t count) {
