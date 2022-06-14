@@ -492,17 +492,17 @@ class IGNITE_IMPORT_EXPORT JniContext {
       const SharedPointer< GlobalJObject >& jstring, JniErrorInfo& errInfo);
 
   int64_t TargetInLongOutLong(jobject obj, int type, int64_t memPtr,
-                              JniErrorInfo* errInfo = NULL);
+                              JniErrorInfo* errInfo);
   int64_t TargetInStreamOutLong(jobject obj, int type, int64_t memPtr,
-                                JniErrorInfo* errInfo = NULL);
-  jobject TargetOutObject(jobject obj, int opType,
-                          JniErrorInfo* errInfo = NULL);
+                                JniErrorInfo* errInfo);
+  jobject TargetOutObject(jobject obj, int opType, 
+                          JniErrorInfo* errInfo);
   void TargetInStreamOutStream(jobject obj, int opType, int64_t inMemPtr,
-                               int64_t outMemPtr, JniErrorInfo* errInfo = NULL);
+                               int64_t outMemPtr, JniErrorInfo* errInfo);
   jobject TargetInStreamOutObject(jobject obj, int type, int64_t memPtr,
-                                  JniErrorInfo* errInfo = NULL);
+                                  JniErrorInfo* errInfo);
   void TargetOutStream(jobject obj, int opType, int64_t memPtr,
-                       JniErrorInfo* errInfo = NULL);
+                       JniErrorInfo* errInfo);
 
   JniErrorCode DriverManagerGetConnection(
       const char* connectionString, SharedPointer< GlobalJObject >& connection,
