@@ -297,7 +297,9 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
     for (auto const& stage : aggregateOperations) {
       pipeline.append_stage(bsoncxx::from_json(stage));
     }
-    mongocxx::cursor cursor = collection.aggregate(pipeline);
+    auto options = mongocxx::options::aggregate{};
+    options.batch_size(2000);
+    mongocxx::cursor cursor = collection.aggregate(pipeline, options);
 
     this->cursor_.reset(new DocumentDbCursor(cursor, columnMetadata, paths));
 
