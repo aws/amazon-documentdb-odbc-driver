@@ -56,7 +56,8 @@ namespace ignite
     
                         ContinuousQueryHandleImpl::~ContinuousQueryHandleImpl()
                         {
-                            env.Get()->Context()->TargetInLongOutLong(javaRef, Command::CLOSE, 0);
+                            JniErrorInfo err;
+                            env.Get()->Context()->TargetInLongOutLong(javaRef, Command::CLOSE, 0, &err);
     
                             JniContext::Release(javaRef);
     
