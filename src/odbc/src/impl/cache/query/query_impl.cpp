@@ -65,7 +65,8 @@ namespace ignite
                         delete batch;
     
                         // 2. Close the cursor.
-                        env.Get()->Context()->TargetInLongOutLong(javaRef, OP_ITERATOR_CLOSE, 0);
+                        JniErrorInfo err;
+                        env.Get()->Context()->TargetInLongOutLong(javaRef, OP_ITERATOR_CLOSE, 0, &err);
     
                         // 3. Release Java reference.
                         JniContext::Release(javaRef);

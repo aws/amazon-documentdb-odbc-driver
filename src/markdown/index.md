@@ -89,7 +89,7 @@ fields in an existing collection. To regenerate or clear the existing schema, pl
 ## SQL and ODBC Limitations
 
 The Amazon DocumentDB ODBC driver has a number of important limitations. See the
-[SQL limitations documentation](https://github.com/aws/amazon-documentdb-jdbc-driver/blob/develop/src/markdown/sql/sql-limitations.md).
+[SQL limitations documentation](https://github.com/aws/amazon-documentdb-jdbc-driver/blob/develop/src/markdown/sql/sql-limitations.md), and [ODBC limitations documentation](support/odbc-limitations.md)
 
 ## Troubleshooting Guide
 
