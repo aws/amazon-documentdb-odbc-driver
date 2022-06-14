@@ -230,7 +230,6 @@ SqlResult::Type TypeInfoQuery::FetchNextRow(
     fetched = true;
   else if (cursor != types.end())
     ++cursor;
-
   if (cursor == types.end())
     return SqlResult::AI_NO_DATA;
 

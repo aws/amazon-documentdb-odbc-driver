@@ -4,7 +4,7 @@
 
 //https://bitquill.atlassian.net/browse/AD-682
 
-Table of statement attribute supported by DocumentDB ODBC.\
+Table of statement attributes supported by the Amazon DocumentDB ODBC driver.\
 Related function: `SQLSetStmtAttr`
 | Statement attribute | Default | Support Value Change|
 |--------|------|-------|

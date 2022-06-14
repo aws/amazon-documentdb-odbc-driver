@@ -171,7 +171,6 @@ SqlResult::Type ForeignKeysQuery::FetchNextRow(
     fetched = true;
   else if (cursor != meta.end())
     ++cursor;
-  
   if (cursor == meta.end())
     return SqlResult::AI_NO_DATA;
 
