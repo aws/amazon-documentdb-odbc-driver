@@ -91,6 +91,7 @@ ForeignKeysQuery::ForeignKeysQuery(diagnostic::DiagnosableAdapter& diag,
       schema(schema),
       table(table),
       executed(false),
+      fetched(false),
       columnsMeta() {
   using namespace ignite::odbc::impl::binary;
   using namespace ignite::odbc::type_traits;
@@ -168,9 +169,8 @@ SqlResult::Type ForeignKeysQuery::FetchNextRow(
 
   if (!fetched)
     fetched = true;
-  else
+  else if (cursor != meta.end())
     ++cursor;
-
   if (cursor == meta.end())
     return SqlResult::AI_NO_DATA;
 

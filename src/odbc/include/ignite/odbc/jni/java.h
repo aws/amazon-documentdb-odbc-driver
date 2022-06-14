@@ -488,7 +488,8 @@ class IGNITE_IMPORT_EXPORT JniContext {
   static void Detach();
   static void Release(jobject obj);
 
-  std::string JavaStringToCppString(const SharedPointer< GlobalJObject >& jstring);
+  std::string JavaStringToCppString(
+      const SharedPointer< GlobalJObject >& jstring, JniErrorInfo& errInfo);
 
   int64_t TargetInLongOutLong(jobject obj, int type, int64_t memPtr,
                               JniErrorInfo* errInfo = NULL);
@@ -692,9 +693,9 @@ class IGNITE_IMPORT_EXPORT JniContext {
       JniErrorInfo& errInfo);
 
   jobject CacheOutOpQueryCursor(jobject obj, int type, int64_t memPtr,
-                                JniErrorInfo* errInfo = NULL);
+                                JniErrorInfo* errInfo);
   jobject CacheOutOpContinuousQuery(jobject obj, int type, int64_t memPtr,
-                                    JniErrorInfo* errInfo = NULL);
+                                    JniErrorInfo* errInfo);
 
   jobject Acquire(jobject obj);
 
@@ -704,7 +705,7 @@ class IGNITE_IMPORT_EXPORT JniContext {
 
   JniContext(JniJvm* jvm, JniHandlers const& hnds);
 
-  JNIEnv* Attach();
+  JNIEnv* Attach(JniErrorInfo& errInfo);
   void ExceptionCheck(JNIEnv* env);
   void ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo);
 
