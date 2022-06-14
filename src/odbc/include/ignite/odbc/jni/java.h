@@ -495,7 +495,7 @@ class IGNITE_IMPORT_EXPORT JniContext {
                               JniErrorInfo* errInfo);
   int64_t TargetInStreamOutLong(jobject obj, int type, int64_t memPtr,
                                 JniErrorInfo* errInfo);
-  jobject TargetOutObject(jobject obj, int opType, 
+  jobject TargetOutObject(jobject obj, int opType,
                           JniErrorInfo* errInfo);
   void TargetInStreamOutStream(jobject obj, int opType, int64_t inMemPtr,
                                int64_t outMemPtr, JniErrorInfo* errInfo);
