@@ -56,7 +56,7 @@ T* GetPointerWithOffset(T* ptr, size_t offset) {
 
 /**
  * Copy utf-8 string to SQLCHAR buffer of the specific length. It will ensure
- * null terminated result, possibly truncted.
+ * null terminated result, possibly truncated.
  * @param inBuffer UTF-8, null-terminated string to copy data from.
  * @param outBuffer SQLCHAR buffer to copy data to.
  * @param outBufferLenBytes Length of the output buffer, in bytes.
