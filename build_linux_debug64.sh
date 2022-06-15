@@ -7,9 +7,9 @@ export BOOST_TEST_CATCH_SYSTEM_ERRORS=no
 
 mkdir $DRIVER_LOG_DIR
 
-mkdir cmake-build64
-cd cmake-build64
-cmake ../src -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_CORE="OFF" -DWITH_ODBC="ON"
+mkdir $BUILD_DIR
+cd $BUILD_DIR
+cmake ../src -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_ODBC="ON"
 cd ..
 
 # Download the DocumentDB JDBC Driver
@@ -28,6 +28,7 @@ fi
 
 cd cmake-build64
 if [ -n "$RUN_CODE_COVERAGE" ]; then
+    make -j 4
     make ccov-all -j 4
 else
     make -j 4
