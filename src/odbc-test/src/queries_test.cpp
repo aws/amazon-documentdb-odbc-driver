@@ -1553,7 +1553,7 @@ BOOST_AUTO_TEST_CASE(TestBindNullParameter, *disabled()) {
 
   // Binding NULL parameter.
   SQLRETURN ret = SQLBindParameter(stmt, 1, SQL_PARAM_INPUT, SQL_C_WCHAR,
-                                   SQL_CHAR, 100, 100, 0, 0, &paramInd);
+                                   SQL_WCHAR, 100, 100, 0, 0, &paramInd);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));

@@ -382,13 +382,13 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
                                       SQL_NULLABLE);
     CheckColumnMetaWithSQLDescribeCol(stmt, 4, "DEC3", SQL_DECIMAL, 65535,
                                       32767, SQL_NULLABLE);
-    CheckColumnMetaWithSQLDescribeCol(stmt, 5, "CHAR1", SQL_VARCHAR, 3, 0,
+    CheckColumnMetaWithSQLDescribeCol(stmt, 5, "CHAR1", SQL_WVARCHAR, 3, 0,
                                       SQL_NULLABLE);
-    CheckColumnMetaWithSQLDescribeCol(stmt, 6, "CHAR2", SQL_VARCHAR, 42, 0,
+    CheckColumnMetaWithSQLDescribeCol(stmt, 6, "CHAR2", SQL_WVARCHAR, 42, 0,
                                       SQL_NULLABLE);
-    CheckColumnMetaWithSQLDescribeCol(stmt, 7, "CHAR3", SQL_VARCHAR, 2147483647,
+    CheckColumnMetaWithSQLDescribeCol(stmt, 7, "CHAR3", SQL_WVARCHAR, 2147483647,
                                       0, SQL_NO_NULLS);
-    CheckColumnMetaWithSQLDescribeCol(stmt, 8, "VCHAR", SQL_VARCHAR, 2147483647,
+    CheckColumnMetaWithSQLDescribeCol(stmt, 8, "VCHAR", SQL_WVARCHAR, 2147483647,
                                       0, SQL_NULLABLE);
   }
 
@@ -504,13 +504,13 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
                                        SQL_NULLABLE);
     CheckColumnMetaWithSQLColAttribute(stmt, 4, "DEC3", SQL_DECIMAL, 65535,
                                        32767, SQL_NULLABLE);
-    CheckColumnMetaWithSQLColAttribute(stmt, 5, "CHAR1", SQL_VARCHAR, 3, 0,
+    CheckColumnMetaWithSQLColAttribute(stmt, 5, "CHAR1", SQL_WVARCHAR, 3, 0,
                                        SQL_NULLABLE);
-    CheckColumnMetaWithSQLColAttribute(stmt, 6, "CHAR2", SQL_VARCHAR, 42, 0,
+    CheckColumnMetaWithSQLColAttribute(stmt, 6, "CHAR2", SQL_WVARCHAR, 42, 0,
                                        SQL_NULLABLE);
-    CheckColumnMetaWithSQLColAttribute(stmt, 7, "CHAR3", SQL_VARCHAR,
+    CheckColumnMetaWithSQLColAttribute(stmt, 7, "CHAR3", SQL_WVARCHAR,
                                        2147483647, 0, SQL_NO_NULLS);
-    CheckColumnMetaWithSQLColAttribute(stmt, 8, "VCHAR", SQL_VARCHAR,
+    CheckColumnMetaWithSQLColAttribute(stmt, 8, "VCHAR", SQL_WVARCHAR,
                                        2147483647, 0, SQL_NULLABLE);
   }
 
@@ -657,19 +657,19 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDataTypesAndColumnNames) {
   connectToLocalServer(databaseName);
 
   std::pair< int16_t, std::string > tests[] = {
-      std::make_pair(SQL_VARCHAR, std::string("meta_queries_test_002__id")),
+      std::make_pair(SQL_WVARCHAR, std::string("meta_queries_test_002__id")),
       std::make_pair(SQL_DECIMAL, std::string("fieldDecimal128")),
       std::make_pair(SQL_DOUBLE, std::string("fieldFloat")),
       // our ODBC driver identifies float fields as double by default
       std::make_pair(SQL_DOUBLE, std::string("fieldDouble")),
-      std::make_pair(SQL_VARCHAR, std::string("fieldString")),
-      std::make_pair(SQL_VARCHAR, std::string("fieldObjectId")),
+      std::make_pair(SQL_WVARCHAR, std::string("fieldString")),
+      std::make_pair(SQL_WVARCHAR, std::string("fieldObjectId")),
       std::make_pair(SQL_BIT, std::string("fieldBoolean")),
       std::make_pair(SQL_TYPE_TIMESTAMP, std::string("fieldDate")),
       std::make_pair(SQL_INTEGER, std::string("fieldInt")),
       std::make_pair(SQL_DOUBLE, std::string("fieldLong")),
-      std::make_pair(SQL_VARCHAR, std::string("fieldMaxKey")),
-      std::make_pair(SQL_VARCHAR, std::string("fieldMinKey")),
+      std::make_pair(SQL_WVARCHAR, std::string("fieldMaxKey")),
+      std::make_pair(SQL_WVARCHAR, std::string("fieldMinKey")),
       std::make_pair(SQL_TYPE_NULL, std::string("fieldNull")),
       std::make_pair(SQL_VARBINARY, std::string("fieldBinary"))};
 
@@ -769,7 +769,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescConciseType) {
 
   const SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
 
-  callSQLColAttribute(stmt, req1, SQL_DESC_CONCISE_TYPE, SQL_VARCHAR);
+  callSQLColAttribute(stmt, req1, SQL_DESC_CONCISE_TYPE, SQL_WVARCHAR);
 
   const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
 
@@ -853,7 +853,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLength) {
 
   const SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
 
-  // SQL_VARCHAR should have length SQL_NO_TOTAL
+  // SQL_WVARCHAR should have length SQL_NO_TOTAL
   callSQLColAttribute(stmt, req1, SQL_DESC_LENGTH, SQL_NO_TOTAL);
 
   const SQLCHAR req2[] = "select fieldInt from meta_queries_test_002";
@@ -927,7 +927,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
 
   const SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
 
-  // SQL_VARCHAR should have type name SqlTypeName::VARCHAR
+  // SQL_WVARCHAR should have type name SqlTypeName::VARCHAR
   callSQLColAttribute(stmt, req2, SQL_DESC_LOCAL_TYPE_NAME,
                       SqlTypeName::VARCHAR);
 
@@ -992,7 +992,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescNumPrecRadix) {
 
   const SQLCHAR req3[] = "select fieldString from meta_queries_test_002";
 
-  // SQL_VARCHAR (non-numeric type) should have precision radix 0
+  // SQL_WVARCHAR (non-numeric type) should have precision radix 0
   callSQLColAttribute(stmt, req3, SQL_DESC_NUM_PREC_RADIX, 0);
 }
 
@@ -1004,7 +1004,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescOctetLength) {
 
   const SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
 
-  // SQL_VARCHAR should have octet length SQL_NO_TOTAL
+  // SQL_WVARCHAR should have octet length SQL_NO_TOTAL
   callSQLColAttribute(stmt, req1, SQL_DESC_OCTET_LENGTH, SQL_NO_TOTAL);
 
   const SQLCHAR req2[] = "select fieldInt from meta_queries_test_002";
@@ -1035,7 +1035,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
 
   const SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
 
-  // SQL_VARCHAR should have precision SQL_NO_TOTAL
+  // SQL_WVARCHAR should have precision SQL_NO_TOTAL
   callSQLColAttribute(stmt, req1, SQL_DESC_PRECISION, SQL_NO_TOTAL);
 
   const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
@@ -1108,7 +1108,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescType) {
 
   const SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
 
-  callSQLColAttribute(stmt, req1, SQL_DESC_TYPE, SQL_VARCHAR);
+  callSQLColAttribute(stmt, req1, SQL_DESC_TYPE, SQL_WVARCHAR);
 
 
   const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
@@ -1274,7 +1274,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnScalePrepare, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestGetDataWithGetTypeInfo, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLRETURN ret = SQLGetTypeInfo(stmt, SQL_VARCHAR);
+  SQLRETURN ret = SQLGetTypeInfo(stmt, SQL_WVARCHAR);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1382,7 +1382,7 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
 
   using namespace ignite::odbc::type_traits;
   BOOST_CHECK_EQUAL("meta_queries_test_001__id", column_name);  // COLUMN_NAME
-  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);                    // DATA_TYPE
+  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);                    // DATA_TYPE
   BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);           // TYPE_NAME
 
   ret = SQLFetch(stmt);
@@ -1406,7 +1406,7 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   BOOST_CHECK_EQUAL("fieldString", column_name);  // COLUMN_NAME
-  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);       // DATA_TYPE
+  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);       // DATA_TYPE
   BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
 
   ret = SQLFetch(stmt);
@@ -1414,7 +1414,7 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   BOOST_CHECK_EQUAL("fieldObjectId", column_name);  // COLUMN_NAME
-  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);      // DATA_TYPE
+  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);      // DATA_TYPE
   BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
 
   ret = SQLFetch(stmt);
@@ -1454,7 +1454,7 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   BOOST_CHECK_EQUAL("fieldMaxKey", column_name);  // COLUMN_NAME
-  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);     // DATA_TYPE
+  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);     // DATA_TYPE
   BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
 
   ret = SQLFetch(stmt);
@@ -1462,7 +1462,7 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   BOOST_CHECK_EQUAL("fieldMinKey", column_name);  // COLUMN_NAME
-  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);      // DATA_TYPE
+  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);      // DATA_TYPE
   BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
 
   ret = SQLFetch(stmt);
@@ -1952,7 +1952,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   BOOST_CHECK_EQUAL(false, WasNull(column_name_len));
   BOOST_CHECK_EQUAL("meta_queries_test_001__id", column_name);  // COLUMN_NAME
   BOOST_CHECK_EQUAL(false, WasNull(data_type_len));
-  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);  // DATA_TYPE
+  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);  // DATA_TYPE
   BOOST_CHECK_EQUAL(false, WasNull(type_name_len));
   BOOST_CHECK_EQUAL("VARCHAR", type_name);  // TYPE_NAME
   BOOST_CHECK_EQUAL(false, WasNull(column_size_len));
@@ -1977,7 +1977,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
       WasNull(column_def_len));
   BOOST_CHECK_EQUAL("", column_def);  // COLUMN_DEF
   BOOST_CHECK_EQUAL(false, WasNull(sql_data_type_len));
-  BOOST_CHECK_EQUAL(SQL_VARCHAR, sql_data_type);  // SQL_DATA_TYPE
+  BOOST_CHECK_EQUAL(SQL_WVARCHAR, sql_data_type);  // SQL_DATA_TYPE
   BOOST_CHECK_EQUAL(true, WasNull(sql_datetime_sub_len));
   BOOST_CHECK_EQUAL(0, sql_datetime_sub);  // SQL_DATETIME_SUB
   BOOST_CHECK_EQUAL(false, WasNull(char_octet_length_len));

@@ -130,12 +130,12 @@ BOOST_AUTO_TEST_CASE(TestGetAttribute) {
   // test SQL_DESC_CONCISE_TYPE
   found = columnMeta.GetAttribute(SQL_DESC_CONCISE_TYPE, intVal);
   BOOST_CHECK(found);
-  BOOST_CHECK_EQUAL(intVal, SQL_VARCHAR);
+  BOOST_CHECK_EQUAL(intVal, SQL_WVARCHAR);
 
   // test SQL_DESC_TYPE
   found = columnMeta.GetAttribute(SQL_DESC_TYPE, intVal);
   BOOST_CHECK(found);
-  BOOST_CHECK_EQUAL(intVal, SQL_VARCHAR);
+  BOOST_CHECK_EQUAL(intVal, SQL_WVARCHAR);
 
   // test SQL_DESC_DISPLAY_SIZE
   found = columnMeta.GetAttribute(SQL_DESC_DISPLAY_SIZE, intVal);
@@ -362,9 +362,9 @@ BOOST_AUTO_TEST_CASE(TestGetAttributeConciseTypeAndType) {
   bool found;
 
   std::pair< int16_t, SQLLEN > tests[] = {
-      std::make_pair(JDBC_TYPE_VARCHAR, SQL_VARCHAR),
-      std::make_pair(JDBC_TYPE_CHAR, SQL_CHAR),
-      std::make_pair(JDBC_TYPE_LONGVARCHAR, SQL_LONGVARCHAR),
+      std::make_pair(JDBC_TYPE_VARCHAR, SQL_WVARCHAR),
+      std::make_pair(JDBC_TYPE_CHAR, SQL_WCHAR),
+      std::make_pair(JDBC_TYPE_LONGVARCHAR, SQL_WLONGVARCHAR),
       std::make_pair(JDBC_TYPE_BOOLEAN, SQL_BIT),
       std::make_pair(JDBC_TYPE_SMALLINT, SQL_SMALLINT),
       std::make_pair(JDBC_TYPE_TINYINT, SQL_TINYINT),

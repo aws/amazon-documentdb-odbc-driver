@@ -400,7 +400,7 @@ void OdbcTestSuite::InsertTestStrings(int recordsNum, bool merge) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  ret = SQLBindParameter(stmt, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR,
+  ret = SQLBindParameter(stmt, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_WVARCHAR,
                          sizeof(strField), sizeof(strField), &strField,
                          sizeof(strField), &strFieldLen);
 
@@ -549,7 +549,7 @@ int OdbcTestSuite::InsertTestBatch(int from, int to, int expectedToAffect,
 
   BOOST_TEST_CHECKPOINT("Binding strFields");
   ret =
-      SQLBindParameter(stmt, 5, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, 1024,
+      SQLBindParameter(stmt, 5, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_WVARCHAR, 1024,
                        0, strFields.GetData(), 1024, strFieldsLen.GetData());
 
   if (!SQL_SUCCEEDED(ret))
