@@ -37,7 +37,7 @@ size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
   if (!inBuffer)
     return 0;
 
-  // Need to convert input string to wide-char to get the 
+  // Need to convert input string to wide-char to get the
   // length in characters - as well as get .narrow() to work, as expected
   // Otherwise, it would be impossible to safely determine the
   // output buffer length needed.
@@ -56,7 +56,8 @@ size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
   std::use_facet< std::ctype< wchar_t > >(currentLocale)
       .narrow(inString.data(), inString.data() + outBufferLenActual, '?',
               reinterpret_cast< char* >(outBuffer));
-  // Null terminate string, if room.
+  // Handles case where output buffer is non-null but length is zero.
+  // null-terminate target string, if room.
   if (outBufferLenBytes > 0) {
     outBuffer[outBufferLenActual] = 0;
   }
@@ -67,14 +68,14 @@ size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
 
 template< typename OutCharT >
 size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
-                                      size_t outBufferLenBytes,
-                                      bool& isTruncated) {
+                                   size_t outBufferLenBytes,
+                                   bool& isTruncated) {
   size_t wCharSize = sizeof(SQLWCHAR);
   // This is intended to convert to the SQLWCHAR. Ensure we have the same size.
   assert(sizeof(OutCharT) == wCharSize);
 
-  // Get the number of characters that can be safely transfered, excluding the null 
-  // terminating character. Handle the case of zero given for length.
+  // Get the number of characters that can be safely transfered, excluding the
+  // null terminating character. Handle the case of zero given for length.
   size_t outBufferLenChars =
       outBufferLenBytes ? (outBufferLenBytes / wCharSize) - 1 : 0;
   // Find the lenght (in bytes) of the input string.
@@ -112,6 +113,7 @@ size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
     case std::codecvt_base::partial:
       // The number of characters converted (in OutCharT)
       lenConverted = pOutBufferNext - pOutBuffer;
+      // Handles case where output buffer is non-null but length is zero.
       // null-terminate target string, if room
       if (outBufferLenBytes >= wCharSize) {
         pOutBuffer[lenConverted] = 0;
@@ -123,7 +125,8 @@ size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
       LOG_ERROR_MSG("Unable to convert character '" << *pInBufferNext << "'");
       // The number of characters converted (in OutCharT)
       lenConverted = pOutBufferNext - pOutBuffer;
-      // null-terminate target string, if room
+      // Handles case where output buffer is non-null but length is zero.
+      // null-terminate target string, if room.
       if (outBufferLenBytes >= wCharSize) {
         pOutBuffer[lenConverted] = 0;
       }
