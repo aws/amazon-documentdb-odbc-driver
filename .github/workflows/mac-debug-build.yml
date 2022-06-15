@@ -123,6 +123,12 @@ jobs:
         check_name: "MacOS Big Sur 11 Debug Build Unit Test Results Check"
         comment_title: "MacOS Big Sur 11 Debug Build Unit Test Results"
         files: ./odbc_test_result.xml
+    - name: upload-coverage
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: code-coverage-MacOS
+        path: cmake-build64/ccov/all-merged
     # - name: print-memory-leak-logs
     #   if: always()
     #   run: |
