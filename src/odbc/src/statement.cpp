@@ -228,7 +228,7 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
     case SQL_ATTR_ROW_ARRAY_SIZE: {
       SqlUlen val = reinterpret_cast< SqlUlen >(value);
 
-      LOG_MSG("SQL_ATTR_ROW_ARRAY_SIZE: " << val);
+      LOG_DEBUG_MSG("SQL_ATTR_ROW_ARRAY_SIZE: " << val);
 
       if (val != 1) {
         AddStatusRecord(
@@ -236,9 +236,16 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
             "Array size value cannot be set to a value other than 1");
 
         return SqlResult::AI_ERROR;
-      } else if (rowArraySize != 1)
+      } else if (rowArraySize != 1) {
         // val is 1
         rowArraySize = 1;
+        LOG_DEBUG_MSG(
+            "else if (rowArraySize != 1) branch is executed."
+            "This branch should not be executed as we currently do not support "
+            "rowArraySize to have values other than 1.");
+      }
+
+      LOG_DEBUG_MSG("rowArraySize: " << rowArraySize);
 
       break;
     }
