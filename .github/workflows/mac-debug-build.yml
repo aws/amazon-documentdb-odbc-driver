@@ -66,10 +66,15 @@ jobs:
         brew install openssl
         brew install boost
         brew install mongo-cxx-driver
+        xcode-select --install
+    
+    - name: verify-CommandLineTools installation
+      run: |
+        xcode-select -p
 
     - name: set-PATH
       run: |
-        export GITHUB_PATH=/Library/Developer/CommandLineTools/usr/bin:$GITHUB_PATH
+        echo "/Library/Developer/CommandLineTools/usr/bin" >> $GITHUB_PATH
 
     - name: Cache DocumentDB JDBC JAR
       id: cache-documentdb-jdbc-jar
