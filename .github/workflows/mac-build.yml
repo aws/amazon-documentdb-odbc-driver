@@ -59,7 +59,7 @@ jobs:
     - name: get-dependencies
       run: |
         brew tap homebrew/services
-        brew install unixodbc
+        brew install libiodbc
         brew install cmake
         brew install openssl
         brew install boost
