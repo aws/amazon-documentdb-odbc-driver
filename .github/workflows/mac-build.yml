@@ -59,6 +59,7 @@ jobs:
     - name: get-dependencies
       run: |
         brew tap homebrew/services
+        brew unlink unixodbc
         brew install libiodbc
         brew install cmake
         brew install openssl
