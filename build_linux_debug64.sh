@@ -3,12 +3,13 @@ BUILD_TYPE=Debug
 PROJECT_DIR=$(pwd)
 DRIVER_BIN_DIR="$PROJECT_DIR/build/odbc/bin"
 DRIVER_LOG_DIR="$PROJECT_DIR/build/odbc/logs"
+export BOOST_TEST_CATCH_SYSTEM_ERRORS=no
 
 mkdir $DRIVER_LOG_DIR
 
 mkdir cmake-build64
 cd cmake-build64
-cmake ../src -DCMAKE_BUILD_TYPE="Debug" -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_CORE="OFF" -DWITH_ODBC="ON"
+cmake ../src -DCMAKE_BUILD_TYPE="Debug" -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_CORE="OFF" -DWITH_ODBC="ON"
 cd ..
 
 # Download the DocumentDB JDBC Driver
@@ -26,5 +27,9 @@ if [ ! -f "$JDBC_DRIVER_FULLPATH" ]; then
 fi
 
 cd cmake-build64
-make -j 4
+if [ -n "$RUN_CODE_COVERAGE" ]; then
+    make ccov-all -j 4
+else
+    make -j 4
+fi
 cd ..
