@@ -180,6 +180,7 @@ target_link_libraries(${TARGET} ${ODBC_LIBRARIES})
 target_link_libraries(${TARGET} ${JNI_LIBRARIES})
 target_link_libraries(${TARGET} mongo::mongocxx_shared) 
 
+add_definitions(-DUNICODE=1)
 if (WIN32)
     if (MSVC)
         # On Windows, min() and max() are defined macro. This causes a colision with MONGOCXX library.
@@ -188,8 +189,6 @@ if (WIN32)
     endif()
 
     target_link_libraries(${TARGET} odbccp32 shlwapi)
-
-    remove_definitions(-DUNICODE=1)
 
     add_definitions(-DTARGET_MODULE_FULL_NAME="$<TARGET_FILE_NAME:${TARGET}>")
 

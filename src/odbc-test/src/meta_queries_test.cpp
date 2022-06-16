@@ -31,13 +31,12 @@
 #include "ignite/odbc/common/fixed_size_array.h"
 #include "ignite/odbc/impl/binary/binary_utils.h"
 #include "ignite/odbc/type_traits.h"
+#include "ignite/odbc/utility.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"
 #include "test_utils.h"
 
 using namespace ignite;
-using namespace ignite::odbc::cache;
-using namespace ignite::odbc::cache::query;
 using namespace ignite::odbc::common;
 using namespace ignite_test;
 using namespace ignite::odbc::binary;
@@ -87,7 +86,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
    */
   void CheckSingleRowResultSetWithGetData(
       SQLHSTMT stmt, SQLUSMALLINT columnIndex = 1,
-      const char *expectedValue = nullptr) const {
+      const std::string expectedValue = "") const {
     SQLRETURN ret = SQLFetch(stmt);
 
     if (!SQL_SUCCEEDED(ret)) {
@@ -99,20 +98,19 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
       BOOST_FAIL(sqlMessage);
     }
 
-    char buf[1024];
+    SQLWCHAR buf[1024];
     SQLLEN bufLen = sizeof(buf);
 
     columnIndex = columnIndex >= 1 ? columnIndex : 1;
     for (int i = 1; i <= columnIndex; i++) {
-      ret = SQLGetData(stmt, i, SQL_C_CHAR, buf, sizeof(buf), &bufLen);
+      ret = SQLGetData(stmt, i, SQL_C_WCHAR, buf, sizeof(buf), &bufLen);
 
       if (!SQL_SUCCEEDED(ret))
         BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-      if (i == columnIndex && expectedValue != nullptr) {
-        std::string actualValueStr = buf;
-        std::string expectedValueStr = expectedValue;
-        BOOST_CHECK(expectedValueStr == actualValueStr);
+      if (i == columnIndex && !expectedValue.empty()) {
+        std::string actualValueStr = utility::SqlStringToString(buf, bufLen);
+        BOOST_CHECK_EQUAL(expectedValue, actualValueStr);
       }
     }
 
@@ -240,19 +238,20 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
    * @param fieldId Field Identifier.
    * @param expectedVal Expected string data.
    */
-  void callSQLColAttribute(SQLHSTMT stmt, SQLCHAR *query,
+  void callSQLColAttribute(SQLHSTMT stmt, const SQLCHAR *query,
                            SQLSMALLINT fieldId,
                            const std::string &expectedVal) {
-    SQLCHAR strBuf[1024];
+    SQLWCHAR strBuf[1024];
+    std::vector< SQLWCHAR > wQuery = MakeSqlBuffer(reinterpret_cast< const char* >(query));
 
-    SQLExecDirect(stmt, query, SQL_NTS);
+    SQLExecDirect(stmt, wQuery.data(), SQL_NTS);
 
     SQLRETURN ret = SQLColAttribute(stmt, 1, fieldId, strBuf,
                                     sizeof(strBuf), nullptr, nullptr);
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-    std::string buf = SqlCharToString(strBuf);
+    std::string buf = utility::SqlStringToString(strBuf);
 
     BOOST_CHECK(expectedVal == buf);
   }
@@ -266,14 +265,16 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
    * @param fieldId Field Identifier.
    * @param expectedVal Expected int data.
    */
-  void callSQLColAttribute(SQLHSTMT stmt, SQLCHAR *query, SQLSMALLINT fieldId,
-                           const int &expectedVal) {
+  void callSQLColAttribute(SQLHSTMT stmt, const SQLCHAR *query,
+                           SQLSMALLINT fieldId, const int &expectedVal) {
     SQLLEN intVal;
+    std::vector< SQLWCHAR > wQuery =
+        MakeSqlBuffer(reinterpret_cast< const char * >(query));
 
-    SQLExecDirect(stmt, query, SQL_NTS);
+    SQLExecDirect(stmt, wQuery.data(), SQL_NTS);
 
-    SQLRETURN ret = SQLColAttribute(stmt, 1, fieldId, nullptr, 0,
-                                    nullptr, &intVal);
+    SQLRETURN ret =
+        SQLColAttribute(stmt, 1, fieldId, nullptr, 0, nullptr, &intVal);
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
@@ -296,24 +297,22 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
                                          SQLSMALLINT expDataType,
                                          SQLULEN expSize, SQLSMALLINT expScale,
                                          SQLSMALLINT expNullability) const {
-    std::vector< SQLCHAR > name(ODBC_BUFFER_SIZE);
+    std::vector< SQLWCHAR > name(ODBC_BUFFER_SIZE);
     SQLSMALLINT nameLen = 0;
     SQLSMALLINT dataType = 0;
     SQLULEN size;
     SQLSMALLINT scale;
     SQLSMALLINT nullability;
 
-    SQLRETURN ret =
-        SQLDescribeCol(stmt, idx, &name[0], (SQLSMALLINT)name.size(), &nameLen,
-                       &dataType, &size, &scale, &nullability);
+    SQLRETURN ret = SQLDescribeCol(
+        stmt, idx, &name[0], (SQLSMALLINT)name.size() * sizeof(SQLWCHAR),
+        &nameLen, &dataType, &size, &scale, &nullability);
     ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
     BOOST_CHECK_GE(nameLen, 0);
     BOOST_CHECK_LE(nameLen, static_cast< SQLSMALLINT >(ODBC_BUFFER_SIZE));
 
-    std::string nameStr(name.begin(), name.begin() + nameLen);
-
-    BOOST_CHECK_EQUAL(nameStr, expName);
+    BOOST_CHECK_EQUAL(utility::SqlStringToString(name.data()), expName);
     BOOST_CHECK_EQUAL(dataType, expDataType);
     BOOST_CHECK_EQUAL(size, expSize);
     BOOST_CHECK_EQUAL(scale, expScale);
@@ -383,13 +382,13 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
                                       SQL_NULLABLE);
     CheckColumnMetaWithSQLDescribeCol(stmt, 4, "DEC3", SQL_DECIMAL, 65535,
                                       32767, SQL_NULLABLE);
-    CheckColumnMetaWithSQLDescribeCol(stmt, 5, "CHAR1", SQL_VARCHAR, 3, 0,
+    CheckColumnMetaWithSQLDescribeCol(stmt, 5, "CHAR1", SQL_WVARCHAR, 3, 0,
                                       SQL_NULLABLE);
-    CheckColumnMetaWithSQLDescribeCol(stmt, 6, "CHAR2", SQL_VARCHAR, 42, 0,
+    CheckColumnMetaWithSQLDescribeCol(stmt, 6, "CHAR2", SQL_WVARCHAR, 42, 0,
                                       SQL_NULLABLE);
-    CheckColumnMetaWithSQLDescribeCol(stmt, 7, "CHAR3", SQL_VARCHAR, 2147483647,
+    CheckColumnMetaWithSQLDescribeCol(stmt, 7, "CHAR3", SQL_WVARCHAR, 2147483647,
                                       0, SQL_NO_NULLS);
-    CheckColumnMetaWithSQLDescribeCol(stmt, 8, "VCHAR", SQL_VARCHAR, 2147483647,
+    CheckColumnMetaWithSQLDescribeCol(stmt, 8, "VCHAR", SQL_WVARCHAR, 2147483647,
                                       0, SQL_NULLABLE);
   }
 
@@ -405,11 +404,11 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
    * @param expNullability expected nullability.
    */
   void CheckColumnMetaWithSQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT idx,
-                                          const std::string &expName,
+                                          const std::string& expName,
                                           SQLLEN expDataType, SQLULEN expSize,
                                           SQLLEN expScale,
                                           SQLLEN expNullability) {
-    std::vector< SQLCHAR > name(ODBC_BUFFER_SIZE);
+    std::vector< SQLWCHAR > name(ODBC_BUFFER_SIZE);
     SQLSMALLINT nameLen = 0;
     SQLLEN dataType = 0;
     SQLLEN size;
@@ -417,7 +416,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     SQLLEN nullability;
 
     SQLRETURN ret = SQLColAttribute(stmt, idx, SQL_DESC_NAME, &name[0],
-                                    (SQLSMALLINT)name.size(), &nameLen, nullptr);
+                        (SQLSMALLINT)name.size() * sizeof(SQLWCHAR), &nameLen, nullptr);
     ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
     ret = SQLColAttribute(stmt, idx, SQL_DESC_TYPE, 0, 0, 0, &dataType);
@@ -435,9 +434,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     BOOST_CHECK_GE(nameLen, 0);
     BOOST_CHECK_LE(nameLen, static_cast< SQLSMALLINT >(ODBC_BUFFER_SIZE));
 
-    std::string nameStr(name.begin(), name.begin() + nameLen);
-
-    BOOST_CHECK_EQUAL(nameStr, expName);
+    BOOST_CHECK_EQUAL(utility::SqlStringToString(name.data()), expName);
     BOOST_CHECK_EQUAL(dataType, expDataType);
     BOOST_CHECK_EQUAL(size, expSize);
     BOOST_CHECK_EQUAL(scale, expScale);
@@ -507,13 +504,13 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
                                        SQL_NULLABLE);
     CheckColumnMetaWithSQLColAttribute(stmt, 4, "DEC3", SQL_DECIMAL, 65535,
                                        32767, SQL_NULLABLE);
-    CheckColumnMetaWithSQLColAttribute(stmt, 5, "CHAR1", SQL_VARCHAR, 3, 0,
+    CheckColumnMetaWithSQLColAttribute(stmt, 5, "CHAR1", SQL_WVARCHAR, 3, 0,
                                        SQL_NULLABLE);
-    CheckColumnMetaWithSQLColAttribute(stmt, 6, "CHAR2", SQL_VARCHAR, 42, 0,
+    CheckColumnMetaWithSQLColAttribute(stmt, 6, "CHAR2", SQL_WVARCHAR, 42, 0,
                                        SQL_NULLABLE);
-    CheckColumnMetaWithSQLColAttribute(stmt, 7, "CHAR3", SQL_VARCHAR,
+    CheckColumnMetaWithSQLColAttribute(stmt, 7, "CHAR3", SQL_WVARCHAR,
                                        2147483647, 0, SQL_NO_NULLS);
-    CheckColumnMetaWithSQLColAttribute(stmt, 8, "VCHAR", SQL_VARCHAR,
+    CheckColumnMetaWithSQLColAttribute(stmt, 8, "VCHAR", SQL_WVARCHAR,
                                        2147483647, 0, SQL_NULLABLE);
   }
 
@@ -523,12 +520,6 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
   ~MetaQueriesTestSuiteFixture() {
     // No-op.
   }
-
-  /** Frist cache instance. */
-  Cache< int64_t, TestType > cache1 = nullptr;
-
-  /** Second cache instance. */
-  Cache< int64_t, ComplexType > cache2 = nullptr;
 };
 
 BOOST_FIXTURE_TEST_SUITE(MetaQueriesTestSuite, MetaQueriesTestSuiteFixture)
@@ -545,8 +536,8 @@ BOOST_AUTO_TEST_CASE(TestGetTypeInfoAllTypes, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeCurdate, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLCHAR req[] = "select CURDATE()";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = MakeSqlBuffer("select CURDATE()");
+  SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal = 0;
 
@@ -561,8 +552,8 @@ BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeCurdate, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeLiteral, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLCHAR req[] = "select DATE '2020-10-25'";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = MakeSqlBuffer("select DATE '2020-10-25'");
+  SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal = 0;
 
@@ -577,8 +568,9 @@ BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeLiteral, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeField, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLCHAR req[] = "select CAST (dateField as DATE) from TestType";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req =
+      MakeSqlBuffer("select CAST (dateField as DATE) from TestType");
+  SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal = 0;
 
@@ -593,8 +585,8 @@ BOOST_AUTO_TEST_CASE(TestDateTypeColumnAttributeField, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestTimeTypeColumnAttributeLiteral, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLCHAR req[] = "select TIME '12:42:13'";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = MakeSqlBuffer("select TIME '12:42:13'");
+  SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal = 0;
 
@@ -609,8 +601,8 @@ BOOST_AUTO_TEST_CASE(TestTimeTypeColumnAttributeLiteral, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestTimeTypeColumnAttributeField, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLCHAR req[] = "select timeField from TestType";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = MakeSqlBuffer("select timeField from TestType");
+  SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal = 0;
 
@@ -625,11 +617,11 @@ BOOST_AUTO_TEST_CASE(TestTimeTypeColumnAttributeField, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestColAttributesColumnLength, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLCHAR req[] = "select strField from TestType";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = MakeSqlBuffer("select strField from TestType");
+  SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal;
-  SQLCHAR strBuf[1024];
+  SQLWCHAR strBuf[1024];
   SQLSMALLINT strLen;
 
   SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_COLUMN_LENGTH, strBuf,
@@ -644,11 +636,11 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnLength, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestColAttributesColumnPresicion, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLCHAR req[] = "select strField from TestType";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = MakeSqlBuffer("select strField from TestType");
+  SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal;
-  SQLCHAR strBuf[1024];
+  SQLWCHAR strBuf[1024];
   SQLSMALLINT strLen;
 
   SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_COLUMN_PRECISION, strBuf,
@@ -665,30 +657,31 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDataTypesAndColumnNames) {
   connectToLocalServer(databaseName);
 
   std::pair< int16_t, std::string > tests[] = {
-      std::make_pair(SQL_VARCHAR, std::string("meta_queries_test_002__id")),
+      std::make_pair(SQL_WVARCHAR, std::string("meta_queries_test_002__id")),
       std::make_pair(SQL_DECIMAL, std::string("fieldDecimal128")),
       std::make_pair(SQL_DOUBLE, std::string("fieldFloat")),
       // our ODBC driver identifies float fields as double by default
       std::make_pair(SQL_DOUBLE, std::string("fieldDouble")),
-      std::make_pair(SQL_VARCHAR, std::string("fieldString")),
-      std::make_pair(SQL_VARCHAR, std::string("fieldObjectId")),
+      std::make_pair(SQL_WVARCHAR, std::string("fieldString")),
+      std::make_pair(SQL_WVARCHAR, std::string("fieldObjectId")),
       std::make_pair(SQL_BIT, std::string("fieldBoolean")),
       std::make_pair(SQL_TYPE_TIMESTAMP, std::string("fieldDate")),
       std::make_pair(SQL_INTEGER, std::string("fieldInt")),
       std::make_pair(SQL_DOUBLE, std::string("fieldLong")),
-      std::make_pair(SQL_VARCHAR, std::string("fieldMaxKey")),
-      std::make_pair(SQL_VARCHAR, std::string("fieldMinKey")),
+      std::make_pair(SQL_WVARCHAR, std::string("fieldMaxKey")),
+      std::make_pair(SQL_WVARCHAR, std::string("fieldMinKey")),
       std::make_pair(SQL_TYPE_NULL, std::string("fieldNull")),
       std::make_pair(SQL_VARBINARY, std::string("fieldBinary"))};
 
   int numTests = sizeof(tests) / sizeof(std::pair< int16_t, std::string >);
 
-  SQLCHAR req[] = "select * from meta_queries_test_002";
+  std::vector< SQLWCHAR > req =
+      MakeSqlBuffer("select * from meta_queries_test_002");
   SQLLEN intVal;
   SQLSMALLINT strLen;
-  SQLCHAR strBuf[1024];
+  SQLWCHAR strBuf[1024];
 
-  SQLExecDirect(stmt, req, SQL_NTS);
+  SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   for (int i = 1; i <= numTests; i++) {
 
@@ -710,7 +703,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDataTypesAndColumnNames) {
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-    BOOST_CHECK(SqlCharToString(strBuf) == tests[i - 1].second);
+    BOOST_CHECK_EQUAL(utility::SqlStringToString(strBuf), tests[i - 1].second);
   }
 }
 
@@ -718,7 +711,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescAutoUniqueValue) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select fieldDouble from meta_queries_test_001";
+  const SQLCHAR req[] = "select fieldDouble from meta_queries_test_001";
 
   // only "NO" is returned for IS_AUTOINCREMENT field
   callSQLColAttribute(stmt, req, SQL_DESC_AUTO_UNIQUE_VALUE, SQL_FALSE);
@@ -728,7 +721,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseColumnName) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
+  const SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
 
   callSQLColAttribute(stmt, req, SQL_DESC_BASE_COLUMN_NAME,
                       std::string("field"));
@@ -738,7 +731,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescBaseTableName) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
+  const SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
 
   callSQLColAttribute(stmt, req, SQL_DESC_BASE_TABLE_NAME,
                       std::string("meta_queries_test_002_with_array"));
@@ -749,12 +742,12 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCaseSensitive) {
   connectToLocalServer(databaseName);
 
   // test that case sensitive returns true for string field.
-  SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req1, SQL_DESC_CASE_SENSITIVE, SQL_TRUE);
 
   // test that case sensitive returns false for int field.
-  SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
+  const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req2, SQL_DESC_CASE_SENSITIVE, SQL_FALSE);
 }
@@ -763,7 +756,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCatalogName) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select fieldDecimal128 from meta_queries_test_001";
+  const SQLCHAR req[] = "select fieldDecimal128 from meta_queries_test_001";
 
   // check that catalog should be empty
   callSQLColAttribute(stmt, req, SQL_DESC_CATALOG_NAME,
@@ -774,21 +767,21 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescConciseType) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
 
-  callSQLColAttribute(stmt, req1, SQL_DESC_CONCISE_TYPE, SQL_VARCHAR);
+  callSQLColAttribute(stmt, req1, SQL_DESC_CONCISE_TYPE, SQL_WVARCHAR);
 
-  SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
+  const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req2, SQL_DESC_CONCISE_TYPE, SQL_INTEGER);
 
-  SQLCHAR req3[] = "select fieldBinary from meta_queries_test_001";
+  const SQLCHAR req3[] = "select fieldBinary from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req3, SQL_DESC_CONCISE_TYPE, SQL_VARBINARY);
 
   // TODO re-enable this test when bug from JDBC (AD-765) is fixed.
   // https://bitquill.atlassian.net/browse/AD-766
-  // SQLCHAR req4[] = "select fieldNull from meta_queries_test_001";
+  // const SQLCHAR req4[] = "select fieldNull from meta_queries_test_001";
   // 
   // callSQLColAttribute(stmt, req3, SQL_DESC_CONCISE_TYPE, SQL_TYPE_NULL);
 }
@@ -797,7 +790,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescCount) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select fieldString from meta_queries_test_001";
+  const SQLCHAR req[] = "select fieldString from meta_queries_test_001";
   
   // count should be 1
   callSQLColAttribute(stmt, req, SQL_DESC_COUNT, 1);
@@ -807,28 +800,28 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescDisplaySize) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req1[] = "select fieldBinary from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldBinary from meta_queries_test_001";
 
   // SQL_VARBINARY should have display size SQL_NO_TOTAL
   callSQLColAttribute(stmt, req1, SQL_DESC_DISPLAY_SIZE, SQL_NO_TOTAL);
 
-  SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
+  const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
 
   // SQL_INTEGER should have display size 11
   callSQLColAttribute(stmt, req2, SQL_DESC_DISPLAY_SIZE, 11);
 
-  SQLCHAR req3[] = "select fieldLong from meta_queries_test_001";
+  const SQLCHAR req3[] = "select fieldLong from meta_queries_test_001";
 
   // SQL_BIGINT should have display size 20
   callSQLColAttribute(stmt, req3, SQL_DESC_DISPLAY_SIZE, 20);
 
 
-  SQLCHAR req4[] = "select fieldDouble from meta_queries_test_001";
+  const SQLCHAR req4[] = "select fieldDouble from meta_queries_test_001";
 
   // SQL_DOUBLE should have display size 24
   callSQLColAttribute(stmt, req4, SQL_DESC_DISPLAY_SIZE, 24);
 
-  SQLCHAR req5[] = "select fieldDate from meta_queries_test_001";
+  const SQLCHAR req5[] = "select fieldDate from meta_queries_test_001";
 
   // SQL_TYPE_TIMESTAMP should have display size 19
   callSQLColAttribute(stmt, req5, SQL_DESC_DISPLAY_SIZE, 19);
@@ -838,7 +831,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescFixedPrecScale) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select fieldLong from meta_queries_test_001";
+  const SQLCHAR req[] = "select fieldLong from meta_queries_test_001";
 
   // only SQL_FALSE is returned
   callSQLColAttribute(stmt, req, SQL_DESC_FIXED_PREC_SCALE, SQL_FALSE);
@@ -848,7 +841,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLabel) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select fieldBoolean from meta_queries_test_002";
+  const SQLCHAR req[] = "select fieldBoolean from meta_queries_test_002";
 
   callSQLColAttribute(stmt, req, SQL_DESC_LABEL,
                       std::string("fieldBoolean"));
@@ -858,27 +851,27 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLength) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
+  const SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
 
-  // SQL_VARCHAR should have length SQL_NO_TOTAL
+  // SQL_WVARCHAR should have length SQL_NO_TOTAL
   callSQLColAttribute(stmt, req1, SQL_DESC_LENGTH, SQL_NO_TOTAL);
 
-  SQLCHAR req2[] = "select fieldInt from meta_queries_test_002";
+  const SQLCHAR req2[] = "select fieldInt from meta_queries_test_002";
 
   // SQL_INTEGER should have length 4
   callSQLColAttribute(stmt, req2, SQL_DESC_LENGTH, 4);
 
-  SQLCHAR req3[] = "select fieldLong from meta_queries_test_002";
+  const SQLCHAR req3[] = "select fieldLong from meta_queries_test_002";
 
   // SQL_BIGINT should have length 8
   callSQLColAttribute(stmt, req3, SQL_DESC_LENGTH, 8);
 
-  SQLCHAR req4[] = "select fieldDouble from meta_queries_test_002";
+  const SQLCHAR req4[] = "select fieldDouble from meta_queries_test_002";
 
   // SQL_DOUBLE should have length 8
   callSQLColAttribute(stmt, req4, SQL_DESC_LENGTH, 8);
 
-  SQLCHAR req5[] = "select fieldDate from meta_queries_test_002";
+  const SQLCHAR req5[] = "select fieldDate from meta_queries_test_002";
 
   // SQL_TYPE_TIMESTAMP should have length 16
   callSQLColAttribute(stmt, req5, SQL_DESC_LENGTH, 16);
@@ -889,18 +882,18 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralPrefix) {
   connectToLocalServer(databaseName);
 
   // test that empty string is returned for non-char and non-binary type
-  SQLCHAR req1[] = "select fieldDouble from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldDouble from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req1, SQL_DESC_LITERAL_PREFIX,
                       std::string(""));
 
   // test that "'" is returned for *CHAR type
-  SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
+  const SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
 
   callSQLColAttribute(stmt, req2, SQL_DESC_LITERAL_PREFIX, std::string("'"));
 
   // test that "0x" is returned for *CHAR type
-  SQLCHAR req3[] = "select fieldBinary from meta_queries_test_002";
+  const SQLCHAR req3[] = "select fieldBinary from meta_queries_test_002";
 
   callSQLColAttribute(stmt, req3, SQL_DESC_LITERAL_PREFIX, std::string("0x"));
 }
@@ -910,12 +903,12 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralSuffix) {
   connectToLocalServer(databaseName);
 
   // test that empty string is returned for non-char and non-binary type
-  SQLCHAR req1[] = "select fieldBoolean from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldBoolean from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req1, SQL_DESC_LITERAL_SUFFIX, std::string(""));
 
   // test that "'" is returned for *CHAR type
-  SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
+  const SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
 
   callSQLColAttribute(stmt, req2, SQL_DESC_LITERAL_SUFFIX, std::string("'"));
 }
@@ -926,31 +919,31 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req1[] = "select fieldDouble from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldDouble from meta_queries_test_001";
 
  // SQL_DOUBLE should have type name SqlTypeName::DOUBLE
   callSQLColAttribute(stmt, req1, SQL_DESC_LOCAL_TYPE_NAME,
                       SqlTypeName::DOUBLE);
 
-  SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
+  const SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
 
-  // SQL_VARCHAR should have type name SqlTypeName::VARCHAR
+  // SQL_WVARCHAR should have type name SqlTypeName::VARCHAR
   callSQLColAttribute(stmt, req2, SQL_DESC_LOCAL_TYPE_NAME,
                       SqlTypeName::VARCHAR);
 
-  SQLCHAR req3[] = "select fieldBinary from meta_queries_test_002";
+  const SQLCHAR req3[] = "select fieldBinary from meta_queries_test_002";
 
   // SQL_BINARY should have type name SqlTypeName::VARBINARY
   callSQLColAttribute(stmt, req3, SQL_DESC_LOCAL_TYPE_NAME,
                       SqlTypeName::VARBINARY);
 
-  SQLCHAR req4[] = "select fieldDate from meta_queries_test_002";
+  const SQLCHAR req4[] = "select fieldDate from meta_queries_test_002";
 
   // SQL_TYPE_TIMESTAMP should have type name SqlTypeName::TIMESTAMP
   callSQLColAttribute(stmt, req4, SQL_DESC_LOCAL_TYPE_NAME,
                       SqlTypeName::TIMESTAMP);
 
-  SQLCHAR req5[] = "select fieldInt from meta_queries_test_002";
+  const SQLCHAR req5[] = "select fieldInt from meta_queries_test_002";
 
   // SQL_INTEGER should have type name SqlTypeName::INTEGER
   callSQLColAttribute(stmt, req5, SQL_DESC_LOCAL_TYPE_NAME,
@@ -961,7 +954,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescName) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
+  const SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
 
   callSQLColAttribute(stmt, req, SQL_DESC_NAME,
                       std::string("field"));
@@ -972,12 +965,13 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescNullable) {
   connectToLocalServer(databaseName);
 
   // test meta_queries_test_001__id (a primary key) should not be nullable 
-  SQLCHAR req1[] = "select meta_queries_test_001__id from meta_queries_test_001";
+  const SQLCHAR req1[] =
+      "select meta_queries_test_001__id from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req1, SQL_DESC_NULLABLE, SQL_NO_NULLS);
 
   // test non-primary key field should be nullable.
-  SQLCHAR req2[] = "select fieldNull from meta_queries_test_001";
+  const SQLCHAR req2[] = "select fieldNull from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req2, SQL_DESC_NULLABLE, SQL_NULLABLE);
 }
@@ -986,19 +980,19 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescNumPrecRadix) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req1[] = "select fieldFloat from meta_queries_test_002";
+  const SQLCHAR req1[] = "select fieldFloat from meta_queries_test_002";
 
   // SQL_FLOAT should have precision radix 2
   callSQLColAttribute(stmt, req1, SQL_DESC_NUM_PREC_RADIX, 2);
 
-  SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
+  const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
 
   // SQL_INT should have precision radix 10
   callSQLColAttribute(stmt, req2, SQL_DESC_NUM_PREC_RADIX, 10);
 
-  SQLCHAR req3[] = "select fieldString from meta_queries_test_002";
+  const SQLCHAR req3[] = "select fieldString from meta_queries_test_002";
 
-  // SQL_VARCHAR (non-numeric type) should have precision radix 0
+  // SQL_WVARCHAR (non-numeric type) should have precision radix 0
   callSQLColAttribute(stmt, req3, SQL_DESC_NUM_PREC_RADIX, 0);
 }
 
@@ -1008,28 +1002,28 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescOctetLength) {
 
   size_t size_of_char = sizeof(char);
 
-  SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
+  const SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
 
-  // SQL_VARCHAR should have octet length SQL_NO_TOTAL
+  // SQL_WVARCHAR should have octet length SQL_NO_TOTAL
   callSQLColAttribute(stmt, req1, SQL_DESC_OCTET_LENGTH, SQL_NO_TOTAL);
 
-  SQLCHAR req2[] = "select fieldInt from meta_queries_test_002";
+  const SQLCHAR req2[] = "select fieldInt from meta_queries_test_002";
 
   // SQL_INTEGER should have octet length 4 * sizeof(char)
   callSQLColAttribute(stmt, req2, SQL_DESC_OCTET_LENGTH, 4 * size_of_char);
   
 
-  SQLCHAR req3[] = "select fieldLong from meta_queries_test_002";
+  const SQLCHAR req3[] = "select fieldLong from meta_queries_test_002";
 
   // SQL_BIGINT should have octet length 8 * sizeof(char)
   callSQLColAttribute(stmt, req3, SQL_DESC_OCTET_LENGTH, 8 * size_of_char);
 
-  SQLCHAR req4[] = "select fieldDouble from meta_queries_test_002";
+  const SQLCHAR req4[] = "select fieldDouble from meta_queries_test_002";
 
   // SQL_DOUBLE should have octet length 8 * sizeof(char)
   callSQLColAttribute(stmt, req4, SQL_DESC_OCTET_LENGTH, 8 * size_of_char);
 
-  SQLCHAR req5[] = "select fieldDate from meta_queries_test_002";
+  const SQLCHAR req5[] = "select fieldDate from meta_queries_test_002";
 
   // SQL_TYPE_TIMESTAMP should have octet length 16 * sizeof(char)
   callSQLColAttribute(stmt, req5, SQL_DESC_OCTET_LENGTH, 16 * size_of_char);
@@ -1039,27 +1033,27 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
 
-  // SQL_VARCHAR should have precision SQL_NO_TOTAL
+  // SQL_WVARCHAR should have precision SQL_NO_TOTAL
   callSQLColAttribute(stmt, req1, SQL_DESC_PRECISION, SQL_NO_TOTAL);
 
-  SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
+  const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
 
   // SQL_INTEGER should have precision 10
   callSQLColAttribute(stmt, req2, SQL_DESC_PRECISION, 10);
 
-  SQLCHAR req3[] = "select fieldLong from meta_queries_test_001";
+  const SQLCHAR req3[] = "select fieldLong from meta_queries_test_001";
 
   // SQL_BIGINT should have precision 19
   callSQLColAttribute(stmt, req3, SQL_DESC_PRECISION, 19);
 
-  SQLCHAR req4[] = "select fieldDouble from meta_queries_test_001";
+  const SQLCHAR req4[] = "select fieldDouble from meta_queries_test_001";
 
   // SQL_DOUBLE should have precision 15
   callSQLColAttribute(stmt, req4, SQL_DESC_PRECISION, 15);
 
-  SQLCHAR req5[] = "select fieldDate from meta_queries_test_001";
+  const SQLCHAR req5[] = "select fieldDate from meta_queries_test_001";
 
   // SQL_TIMESTAMP should have precision 19
   callSQLColAttribute(stmt, req5, SQL_DESC_PRECISION, 19);
@@ -1069,7 +1063,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescScale) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select fieldLong from meta_queries_test_001";
+  const SQLCHAR req[] = "select fieldLong from meta_queries_test_001";
 
   // default scale value is 0
   callSQLColAttribute(stmt, req, SQL_DESC_SCALE, 0);
@@ -1079,7 +1073,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescSchemaName) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
+  const SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
 
   callSQLColAttribute(stmt, req, SQL_DESC_SCHEMA_NAME,
                       std::string("odbc-test"));
@@ -1089,7 +1083,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescSearchable) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select fieldString from meta_queries_test_002";
+  const SQLCHAR req[] = "select fieldString from meta_queries_test_002";
 
   // only SQL_PRED_BASIC is returned
   callSQLColAttribute(stmt, req, SQL_DESC_SEARCHABLE, SQL_PRED_BASIC);
@@ -1099,7 +1093,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescTableName) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
+  const SQLCHAR req[] = "select field from meta_queries_test_002_with_array";
 
   callSQLColAttribute(stmt, req, SQL_DESC_TABLE_NAME,
                       std::string("meta_queries_test_002_with_array"));
@@ -1112,22 +1106,22 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescType) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
 
-  callSQLColAttribute(stmt, req1, SQL_DESC_TYPE, SQL_VARCHAR);
+  callSQLColAttribute(stmt, req1, SQL_DESC_TYPE, SQL_WVARCHAR);
 
 
-  SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
+  const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req2, SQL_DESC_TYPE, SQL_INTEGER);
 
-  SQLCHAR req3[] = "select fieldBinary from meta_queries_test_001";
+  const SQLCHAR req3[] = "select fieldBinary from meta_queries_test_001";
 
   callSQLColAttribute(stmt, req3, SQL_DESC_TYPE, SQL_VARBINARY);
 
   // TODO re-enable this test when bug from JDBC (AD-765) is fixed. 
   // https://bitquill.atlassian.net/browse/AD-766
-  //SQLCHAR req4[] = "select fieldNull from meta_queries_test_001";
+  //const SQLCHAR req4[] = "select fieldNull from meta_queries_test_001";
   // 
   //callSQLColAttribute(stmt, req4, SQL_DESC_TYPE, SQL_TYPE_NULL);
 }
@@ -1136,7 +1130,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescUnnamed) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select fieldNull from meta_queries_test_001";
+  const SQLCHAR req[] = "select fieldNull from meta_queries_test_001";
 
   // all columns should be named bacause they cannot be null
   callSQLColAttribute(stmt, req, SQL_DESC_UNNAMED, SQL_NAMED);
@@ -1146,12 +1140,12 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescUnsigned) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req1[] = "select fieldInt from meta_queries_test_001";
+  const SQLCHAR req1[] = "select fieldInt from meta_queries_test_001";
 
   // numeric type should be signed
   callSQLColAttribute(stmt, req1, SQL_DESC_UNSIGNED, SQL_FALSE);
 
-  SQLCHAR req2[] = "select fieldString from meta_queries_test_001";
+  const SQLCHAR req2[] = "select fieldString from meta_queries_test_001";
 
   // non-numeric types should be unsigned
   callSQLColAttribute(stmt, req2, SQL_DESC_UNSIGNED, SQL_TRUE);
@@ -1161,7 +1155,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescUpdatable) {
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
 
-  SQLCHAR req[] = "select fieldMaxKey from meta_queries_test_002";
+  const SQLCHAR req[] = "select fieldMaxKey from meta_queries_test_002";
 
   // only SQL_ATTR_READWRITE_UNKNOWN is returned
   callSQLColAttribute(stmt, req, SQL_DESC_UPDATABLE,
@@ -1171,11 +1165,11 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescUpdatable) {
 BOOST_AUTO_TEST_CASE(TestColAttributesColumnScale, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLCHAR req[] = "select strField from TestType";
-  SQLExecDirect(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = MakeSqlBuffer("select strField from TestType");
+  SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal;
-  SQLCHAR strBuf[1024];
+  SQLWCHAR strBuf[1024];
   SQLSMALLINT strLen;
 
   SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_COLUMN_SCALE, strBuf,
@@ -1190,11 +1184,11 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnLengthPrepare, *disabled()) {
 
   InsertTestStrings(1);
 
-  SQLCHAR req[] = "select strField from TestType";
-  SQLPrepare(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = MakeSqlBuffer("select strField from TestType");
+  SQLPrepare(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal;
-  SQLCHAR strBuf[1024];
+  SQLWCHAR strBuf[1024];
   SQLSMALLINT strLen;
 
   SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_COLUMN_LENGTH, strBuf,
@@ -1222,11 +1216,11 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnPresicionPrepare, *disabled()) {
 
   InsertTestStrings(1);
 
-  SQLCHAR req[] = "select strField from TestType";
-  SQLPrepare(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = MakeSqlBuffer("select strField from TestType");
+  SQLPrepare(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal;
-  SQLCHAR strBuf[1024];
+  SQLWCHAR strBuf[1024];
   SQLSMALLINT strLen;
 
   SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_COLUMN_PRECISION, strBuf,
@@ -1254,11 +1248,11 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnScalePrepare, *disabled()) {
 
   InsertTestStrings(1);
 
-  SQLCHAR req[] = "select strField from TestType";
-  SQLPrepare(stmt, req, SQL_NTS);
+  std::vector< SQLWCHAR > req = MakeSqlBuffer("select strField from TestType");
+  SQLPrepare(stmt, req.data(), SQL_NTS);
 
   SQLLEN intVal;
-  SQLCHAR strBuf[1024];
+  SQLWCHAR strBuf[1024];
   SQLSMALLINT strLen;
 
   SQLRETURN ret = SQLColAttribute(stmt, 1, SQL_COLUMN_SCALE, strBuf,
@@ -1280,7 +1274,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnScalePrepare, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestGetDataWithGetTypeInfo, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLRETURN ret = SQLGetTypeInfo(stmt, SQL_VARCHAR);
+  SQLRETURN ret = SQLGetTypeInfo(stmt, SQL_WVARCHAR);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1294,29 +1288,29 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOne) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "meta_queries_test_001";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("meta_queries_test_001");
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
-                            SQL_NTS, empty, SQL_NTS);
+  SQLRETURN ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                            table.data(), SQL_NTS, empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  CheckSingleRowResultSetWithGetData(stmt, 3, (const char*)table);
+  CheckSingleRowResultSetWithGetData(stmt, 3, utility::SqlStringToString(table.data()));
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneFromLocalServer) {
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "meta_queries_test_001";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("meta_queries_test_001");
 
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
-                            SQL_NTS, empty, SQL_NTS);
+  SQLRETURN ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                            table.data(), SQL_NTS, empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1325,17 +1319,18 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneFromLocalServer) {
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneWithTableTypes) {
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "meta_queries_test_001";
-  SQLCHAR tableTypes[] = "TABLE,VIEW"; // Test that VIEW type is ignored by JDBC
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("meta_queries_test_001");
+  std::vector< SQLWCHAR > tableTypes =
+      MakeSqlBuffer("TABLE,VIEW");  // Test that VIEW type is ignored by JDBC
 
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
-                            SQL_NTS, tableTypes, SQL_NTS);
+  SQLRETURN ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                            table.data(), SQL_NTS, tableTypes.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1350,13 +1345,12 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR table[] = "meta_queries_test_001";
-  SQLCHAR empty[] = "";
-  SQLCHAR *schemaName = (SQLCHAR *)databaseName.c_str();
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("meta_queries_test_001");
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > schemaName = MakeSqlBuffer(databaseName);
    
-
-  SQLRETURN ret = SQLColumns(stmt, nullptr, 0, schemaName, SQL_NTS, table,
-                             SQL_NTS, nullptr, 0);
+  SQLRETURN ret = SQLColumns(stmt, nullptr, 0, schemaName.data(), SQL_NTS,
+                             table.data(), SQL_NTS, nullptr, 0);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1368,13 +1362,14 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
   char type_name[C_STR_LEN_DEFAULT]{};
   SQLLEN type_name_len = sizeof(type_name);
 
-  ret = SQLBindCol(stmt, 4, SQL_C_CHAR, column_name, C_STR_LEN_DEFAULT,
+  ret =
+      SQLBindCol(stmt, 4, SQL_C_CHAR, column_name, sizeof(column_name),
                    &column_name_len);
   BOOST_CHECK(SQL_SUCCEEDED(ret));
   ret = SQLBindCol(stmt, 5, SQL_SMALLINT, &data_type, sizeof(data_type),
                    &data_type_len);
   BOOST_CHECK(SQL_SUCCEEDED(ret));
-  ret = SQLBindCol(stmt, 6, SQL_C_CHAR, type_name, C_STR_LEN_DEFAULT,
+  ret = SQLBindCol(stmt, 6, SQL_C_CHAR, type_name, sizeof(type_name),
                    &type_name_len);
   BOOST_CHECK(SQL_SUCCEEDED(ret));
 
@@ -1387,7 +1382,7 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
 
   using namespace ignite::odbc::type_traits;
   BOOST_CHECK_EQUAL("meta_queries_test_001__id", column_name);  // COLUMN_NAME
-  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);                    // DATA_TYPE
+  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);                    // DATA_TYPE
   BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);           // TYPE_NAME
 
   ret = SQLFetch(stmt);
@@ -1411,7 +1406,7 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   BOOST_CHECK_EQUAL("fieldString", column_name);  // COLUMN_NAME
-  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);       // DATA_TYPE
+  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);       // DATA_TYPE
   BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
 
   ret = SQLFetch(stmt);
@@ -1419,7 +1414,7 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   BOOST_CHECK_EQUAL("fieldObjectId", column_name);  // COLUMN_NAME
-  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);      // DATA_TYPE
+  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);      // DATA_TYPE
   BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
 
   ret = SQLFetch(stmt);
@@ -1459,7 +1454,7 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   BOOST_CHECK_EQUAL("fieldMaxKey", column_name);  // COLUMN_NAME
-  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);     // DATA_TYPE
+  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);     // DATA_TYPE
   BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
 
   ret = SQLFetch(stmt);
@@ -1467,7 +1462,7 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   BOOST_CHECK_EQUAL("fieldMinKey", column_name);  // COLUMN_NAME
-  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);      // DATA_TYPE
+  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);      // DATA_TYPE
   BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
 
   ret = SQLFetch(stmt);
@@ -1492,17 +1487,18 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneForQuotedTypes) {
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "meta_queries_test_001";
-  SQLCHAR tableTypes[] = "'TABLE' , 'VIEW'";  // Test that quoted values are handled
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("meta_queries_test_001");
+  std::vector< SQLWCHAR > tableTypes =
+      MakeSqlBuffer("'TABLE' , 'VIEW'");  // Test that quoted values are handled
 
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
-                            SQL_NTS, tableTypes, SQL_NTS);
+  SQLRETURN ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                            table.data(), SQL_NTS, tableTypes.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1511,17 +1507,17 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneForQuotedTypes) {
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsNoneForUnsupportedTableType) {
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "meta_queries_test_001";
-  SQLCHAR tableTypes[] = "VIEW";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("meta_queries_test_001");
+  std::vector< SQLWCHAR > tableTypes = MakeSqlBuffer("VIEW");
 
   std::string dsnConnectionString;
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
-                            SQL_NTS, tableTypes, SQL_NTS);
+  SQLRETURN ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                            table.data(), SQL_NTS, tableTypes.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
@@ -1535,11 +1531,11 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsNone) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "nonexistent";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("nonexistent");
 
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
-                            SQL_NTS, empty, SQL_NTS);
+  SQLRETURN ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                            table.data(), SQL_NTS, empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1549,10 +1545,10 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsNone) {
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 
   // test that no data is returned with empty string schema
-  SQLCHAR correctTable[] = "meta_queries_test_001";
+  std::vector< SQLWCHAR > correctTable = MakeSqlBuffer("meta_queries_test_001");
 
-  ret = SQLTables(stmt, empty, SQL_NTS, empty, SQL_NTS, correctTable, SQL_NTS,
-                  empty, SQL_NTS);
+  ret = SQLTables(stmt, empty.data(), SQL_NTS, empty.data(), SQL_NTS,
+                  correctTable.data(), SQL_NTS, empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1568,12 +1564,12 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsMany) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "%";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("%");
 
   // test with table passed as "%"
-  SQLRETURN ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table,
-                            SQL_NTS, empty, SQL_NTS);
+  SQLRETURN ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                            table.data(), SQL_NTS, empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1588,9 +1584,8 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsMany) {
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 
   // test with table passed as nullptr
-  ret =
-      SQLTables(stmt, empty, SQL_NTS, nullptr, 0, nullptr, 0,
-                            empty, SQL_NTS);
+  ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0, nullptr, 0,
+                  empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1606,9 +1601,9 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsMany) {
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsOneFromLocalServer) {
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "meta_queries_test_002";
-  SQLCHAR column[] = "fieldString";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("meta_queries_test_002");
+  std::vector< SQLWCHAR > column = MakeSqlBuffer("fieldString");
 
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
@@ -1616,8 +1611,8 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsOneFromLocalServer) {
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, nullptr, 0, table,
-                            SQL_NTS, column, SQL_NTS);
+  SQLRETURN ret = SQLColumns(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                             table.data(), SQL_NTS, column.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1625,9 +1620,8 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsOneFromLocalServer) {
   CheckSingleRowResultSetWithGetData(stmt, 4, "fieldString");
 
   // check that passing catalog NULL value gives data
-  ret =
-      SQLColumns(stmt, nullptr, 0, nullptr, 0, table, SQL_NTS,
-                             column, SQL_NTS);
+  ret = SQLColumns(stmt, nullptr, 0, nullptr, 0, table.data(), SQL_NTS,
+                   column.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1641,12 +1635,12 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsNone) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "nonexistent";
-  SQLCHAR column[] = "nonexistent_column";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("nonexistent");
+  std::vector< SQLWCHAR > column = MakeSqlBuffer("nonexistent_column");
 
-  SQLRETURN ret = SQLColumns(stmt, empty, SQL_NTS, nullptr, 0, table,
-                             SQL_NTS, column, SQL_NTS);
+  SQLRETURN ret = SQLColumns(stmt, empty.data(), SQL_NTS, nullptr, 0,
+                             table.data(), SQL_NTS, column.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1655,12 +1649,12 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsNone) {
 
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 
-  SQLCHAR catalog[] = "nonexistent_catalog";
-  SQLCHAR correctTable[] = "meta_queries_test_002";
-  SQLCHAR correctColumn[] = "fieldString";
+  std::vector< SQLWCHAR > catalog = MakeSqlBuffer("nonexistent_catalog");
+  std::vector< SQLWCHAR > correctTable = MakeSqlBuffer("meta_queries_test_002");
+  std::vector< SQLWCHAR > correctColumn = MakeSqlBuffer("fieldString");
 
-  ret = SQLColumns(stmt, catalog, SQL_NTS, nullptr, 0, correctTable, SQL_NTS,
-                   correctColumn, SQL_NTS);
+  ret = SQLColumns(stmt, catalog.data(), SQL_NTS, nullptr, 0,
+                   correctTable.data(), SQL_NTS, correctColumn.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1670,8 +1664,8 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsNone) {
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 
   // test passing empty string schemaName to SQLColumns returns no data
-  ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, correctTable, SQL_NTS,
-                   correctColumn, SQL_NTS);
+  ret = SQLColumns(stmt, empty.data(), SQL_NTS, empty.data(), SQL_NTS,
+                   correctTable.data(), SQL_NTS, correctColumn.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1687,14 +1681,13 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsMany) {
 
   Connect(dsnConnectionString);
 
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "meta_queries_test_002";
-  SQLCHAR column[] = "%";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("meta_queries_test_002");
+  std::vector< SQLWCHAR > column = MakeSqlBuffer("%");
 
   // test with column name "%"
-  SQLRETURN ret =
-      SQLColumns(stmt, nullptr, 0, nullptr, 0, table,
-                             SQL_NTS, column, SQL_NTS);
+  SQLRETURN ret = SQLColumns(stmt, nullptr, 0, nullptr, 0, table.data(),
+                             SQL_NTS, column.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1709,7 +1702,8 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsMany) {
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 
   // test with column name passed as nullptr
-  ret = SQLColumns(stmt, nullptr, 0, nullptr, 0, table, SQL_NTS, nullptr, 0);
+  ret = SQLColumns(stmt, nullptr, 0, nullptr, 0, table.data(), SQL_NTS, nullptr,
+                   0);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1725,7 +1719,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithColumnsReturnsMany) {
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsOneFromLocalServer) {
-  SQLCHAR table[] = "meta_queries_test_001";
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("meta_queries_test_001");
 
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
@@ -1735,46 +1729,18 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsOneFromLocalServer) {
 
   SQLRETURN ret = SQLPrimaryKeys(stmt, nullptr, 0,  
                                  nullptr, 0,        
-                                 table, sizeof(table)); 
+                                 table.data(), SQL_NTS); 
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // check result for COLUMN_NAME
-  CheckSingleRowResultSetWithGetData(stmt, 4,
-                                     "meta_queries_test_001__id");
-}
-
-BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsManyFromLocalServer) {
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "";
-
-  std::string dsnConnectionString;
-  std::string databaseName("odbc-test");
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
-
-  Connect(dsnConnectionString);
-
-  SQLRETURN ret = SQLPrimaryKeys(stmt, nullptr, 0, 
-                                 nullptr, 0,      
-                                 empty, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  int count = 0;
-  do {
-    ret = SQLFetch(stmt);
-    count++;
-  } while (SQL_SUCCEEDED(ret));
-  BOOST_CHECK(count > 1);
-
-  BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+  CheckSingleRowResultSetWithGetData(stmt, 4, "meta_queries_test_001__id");
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsNone) {
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "meta_queries_test_001";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("meta_queries_test_001");
 
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
@@ -1782,8 +1748,8 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsNone) {
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret =
-      SQLPrimaryKeys(stmt, empty, SQL_NTS, empty, SQL_NTS, empty, SQL_NTS);
+  SQLRETURN ret = SQLPrimaryKeys(stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
+                                 empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1792,7 +1758,18 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsNone) {
 
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 
-  ret = SQLPrimaryKeys(stmt, empty, SQL_NTS, empty, SQL_NTS, table, SQL_NTS);
+  ret = SQLPrimaryKeys(stmt, empty.data(), SQL_NTS, empty.data(), SQL_NTS,
+                       empty.data(), SQL_NTS);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  ret = SQLFetch(stmt);
+
+  BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
+
+  ret = SQLPrimaryKeys(stmt, empty.data(), SQL_NTS, empty.data(), SQL_NTS,
+                       table.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1803,7 +1780,8 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithPrimaryKeysReturnsNone) {
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsOneFromLocalServer) {
-  SQLCHAR table[] = "meta_queries_test_002_with_array_array";
+  std::vector< SQLWCHAR > table =
+      MakeSqlBuffer("meta_queries_test_002_with_array_array");
 
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
@@ -1817,22 +1795,27 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsOneFromLocalServer) {
                      NULL, 0,                    /* Primary table */
                      NULL, 0,                    /* Foreign catalog */
                      NULL, 0,                    /* Foreign schema */
-                     table, sizeof(table));      /* Foreign table */
+                     table.data(), SQL_NTS); /* Foreign table */
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   // check result for PKTableName
-  CheckSingleRowResultSetWithGetData(stmt, 4, "meta_queries_test_002_with_array__id");
+  CheckSingleRowResultSetWithGetData(stmt, 4,
+                                     "meta_queries_test_002_with_array__id");
 
-  SQLCHAR empty[] = "";
+  ret = SQLCloseCursor(stmt);
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  ret = SQLForeignKeys(stmt, NULL, 0,         /* Primary catalog */
-                                 NULL, 0,               /* Primary schema */
-                                 NULL, 0,               /* Primary table */
-                                 empty, SQL_NTS,        /* Foreign catalog */
-                                 NULL, 0,               /* Foreign schema */
-                                 table, sizeof(table)); /* Foreign table */
+  std::vector< SQLWCHAR > empty = {0};
+
+  ret = SQLForeignKeys(stmt, NULL, 0,          /* Primary catalog */
+                       NULL, 0,                /* Primary schema */
+                       NULL, 0,                /* Primary table */
+                       empty.data(), SQL_NTS,  /* Foreign catalog */
+                       NULL, 0,                /* Foreign schema */
+                       table.data(), SQL_NTS); /* Foreign table */
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1843,8 +1826,9 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsOneFromLocalServer) {
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsNone) {
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "meta_queries_test_002_with_array_array";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table =
+      MakeSqlBuffer("meta_queries_test_002_with_array_array");
 
   std::string dsnConnectionString;
   std::string databaseName("odbc-test");
@@ -1852,12 +1836,13 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsNone) {
 
   Connect(dsnConnectionString);
 
-  SQLRETURN ret = SQLForeignKeys(stmt, empty, SQL_NTS,  /* Primary catalog */
-                                 empty, SQL_NTS,        /* Primary schema */
-                                 empty, SQL_NTS,        /* Primary table */
-                                 empty, SQL_NTS,        /* Foreign catalog */
-                                 empty, SQL_NTS,        /* Foreign schema */
-                                 empty, SQL_NTS);       /* Foreign table */
+  SQLRETURN ret =
+      SQLForeignKeys(stmt, empty.data(), SQL_NTS, /* Primary catalog */
+                     empty.data(), SQL_NTS,       /* Primary schema */
+                     empty.data(), SQL_NTS,       /* Primary table */
+                     empty.data(), SQL_NTS,       /* Foreign catalog */
+                     empty.data(), SQL_NTS,       /* Foreign schema */
+                     empty.data(), SQL_NTS);      /* Foreign table */
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1867,12 +1852,12 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithForeignKeysReturnsNone) {
   BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 
   // when empty strings are passed as catalog/schema, SQL_NO_DATA should be returned
-  ret = SQLForeignKeys(stmt, empty, SQL_NTS,  /* Primary catalog */
-                       empty, SQL_NTS,        /* Primary schema */
-                       empty, SQL_NTS,        /* Primary table */
-                       empty, SQL_NTS,        /* Foreign catalog */
-                       empty, SQL_NTS,        /* Foreign schema */
-                       table, sizeof(table)); /* Foreign table */
+  ret = SQLForeignKeys(stmt, empty.data(), SQL_NTS, /* Primary catalog */
+                       empty.data(), SQL_NTS,       /* Primary schema */
+                       empty.data(), SQL_NTS,       /* Primary table */
+                       empty.data(), SQL_NTS,       /* Foreign catalog */
+                       empty.data(), SQL_NTS,       /* Foreign schema */
+                       table.data(), SQL_NTS);      /* Foreign table */
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1887,9 +1872,9 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
   Connect(dsnConnectionString);
 
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "meta_queries_test_001";
-  SQLCHAR column[] = "meta_queries_test_001__id";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("meta_queries_test_001");
+  std::vector< SQLWCHAR > column = MakeSqlBuffer("meta_queries_test_001__id");
 
   SQLRETURN ret = SQL_SUCCESS;
 
@@ -1941,9 +1926,8 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
       char_octet_length_len, ordinal_position, ordinal_position_len,
       is_nullable, is_nullable_len);
 
-  ret =
-      SQLColumns(stmt, nullptr, 0, nullptr, 0, table, SQL_NTS, column,
-                   SQL_NTS);
+  ret = SQLColumns(stmt, nullptr, 0, nullptr, 0, table.data(), SQL_NTS,
+                   column.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
@@ -1968,7 +1952,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   BOOST_CHECK_EQUAL(false, WasNull(column_name_len));
   BOOST_CHECK_EQUAL("meta_queries_test_001__id", column_name);  // COLUMN_NAME
   BOOST_CHECK_EQUAL(false, WasNull(data_type_len));
-  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);  // DATA_TYPE
+  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);  // DATA_TYPE
   BOOST_CHECK_EQUAL(false, WasNull(type_name_len));
   BOOST_CHECK_EQUAL("VARCHAR", type_name);  // TYPE_NAME
   BOOST_CHECK_EQUAL(false, WasNull(column_size_len));
@@ -1993,7 +1977,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
       WasNull(column_def_len));
   BOOST_CHECK_EQUAL("", column_def);  // COLUMN_DEF
   BOOST_CHECK_EQUAL(false, WasNull(sql_data_type_len));
-  BOOST_CHECK_EQUAL(SQL_VARCHAR, sql_data_type);  // SQL_DATA_TYPE
+  BOOST_CHECK_EQUAL(SQL_WVARCHAR, sql_data_type);  // SQL_DATA_TYPE
   BOOST_CHECK_EQUAL(true, WasNull(sql_datetime_sub_len));
   BOOST_CHECK_EQUAL(0, sql_datetime_sub);  // SQL_DATETIME_SUB
   BOOST_CHECK_EQUAL(false, WasNull(char_octet_length_len));
@@ -2004,7 +1988,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   BOOST_CHECK_EQUAL("NO", is_nullable);  // IS_NULLABLE
 
   // Check that we can get an attribute on the columns metadata.
-  char attrColumnName[C_STR_LEN_DEFAULT];
+  SQLWCHAR attrColumnName[C_STR_LEN_DEFAULT];
   SQLSMALLINT attrColumnNameLen = 0;
   ret = SQLColAttribute(stmt, 2, SQL_DESC_NAME, attrColumnName,
                         sizeof(attrColumnName), &attrColumnNameLen,
@@ -2012,7 +1996,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   if (!SQL_SUCCEEDED(ret)) {
     BOOST_ERROR(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
-  BOOST_CHECK_EQUAL("TABLE_SCHEM", attrColumnName);
+  BOOST_CHECK_EQUAL("TABLE_SCHEM", utility::SqlStringToString(attrColumnName, attrColumnNameLen));
 
   // Test that the next fetch will have no data.
   ret = SQLFetch(stmt);
@@ -2022,15 +2006,16 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
 BOOST_AUTO_TEST_CASE(TestGetDataWithSelectQuery, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLCHAR insertReq[] =
-      "insert into TestType(_key, strField) VALUES(1, 'Lorem ipsum')";
-  SQLRETURN ret = SQLExecDirect(stmt, insertReq, SQL_NTS);
+  std::vector< SQLWCHAR > insertReq = MakeSqlBuffer(
+      "insert into TestType(_key, strField) VALUES(1, 'Lorem ipsum')");
+  SQLRETURN ret = SQLExecDirect(stmt, insertReq.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  SQLCHAR selectReq[] = "select strField from TestType";
-  ret = SQLExecDirect(stmt, selectReq, SQL_NTS);
+  std::vector< SQLWCHAR > selectReq =
+      MakeSqlBuffer("select strField from TestType");
+  ret = SQLExecDirect(stmt, selectReq.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -2041,11 +2026,11 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithSelectQuery, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestInsertTooLongValueFail, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
 
-  SQLCHAR insertReq[] =
+  std::vector< SQLWCHAR > insertReq = MakeSqlBuffer(
       "insert into TestType(_key, strField) VALUES(42, "
-      "'0123456789012345678901234567890123456789012345678901234567891')";
+      "'0123456789012345678901234567890123456789012345678901234567891')");
 
-  SQLRETURN ret = SQLExecDirect(stmt, insertReq, SQL_NTS);
+  SQLRETURN ret = SQLExecDirect(stmt, insertReq.data(), SQL_NTS);
 
   if (SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -2066,18 +2051,18 @@ BOOST_AUTO_TEST_CASE(TestGetInfoScrollOptions, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestDdlTablesMeta, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
 
-  SQLCHAR createTable[] =
-      "create table TestTable(id int primary key, testColumn varchar)";
-  SQLRETURN ret = SQLExecDirect(stmt, createTable, SQL_NTS);
+  std::vector< SQLWCHAR > createTable = MakeSqlBuffer(
+      "create table TestTable(id int primary key, testColumn varchar)");
+  SQLRETURN ret = SQLExecDirect(stmt, createTable.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "TestTable";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("TestTable");
 
-  ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table, SQL_NTS, empty,
-                  SQL_NTS);
+  ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0, table.data(),
+                  SQL_NTS, empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -2100,19 +2085,19 @@ BOOST_AUTO_TEST_CASE(TestDdlTablesMeta, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestDdlTablesMetaTableTypeList, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
 
-  SQLCHAR createTable[] =
-      "create table TestTable(id int primary key, testColumn varchar)";
-  SQLRETURN ret = SQLExecDirect(stmt, createTable, SQL_NTS);
+  std::vector< SQLWCHAR > createTable = MakeSqlBuffer(
+      "create table TestTable(id int primary key, testColumn varchar)");
+  SQLRETURN ret = SQLExecDirect(stmt, createTable.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "TestTable";
-  SQLCHAR typeList[] = "TABLE,VIEW";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("TestTable");
+  std::vector< SQLWCHAR > typeList = MakeSqlBuffer("TABLE,VIEW");
 
-  ret = SQLTables(stmt, empty, SQL_NTS, nullptr, 0, table, SQL_NTS,
-                  typeList, SQL_NTS);
+  ret = SQLTables(stmt, empty.data(), SQL_NTS, nullptr, 0, table.data(),
+                  SQL_NTS, typeList.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -2135,18 +2120,18 @@ BOOST_AUTO_TEST_CASE(TestDdlTablesMetaTableTypeList, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestDdlColumnsMeta, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
 
-  SQLCHAR createTable[] =
-      "create table TestTable(id int primary key, testColumn varchar)";
-  SQLRETURN ret = SQLExecDirect(stmt, createTable, SQL_NTS);
+  std::vector< SQLWCHAR > createTable = MakeSqlBuffer(
+      "create table TestTable(id int primary key, testColumn varchar)");
+  SQLRETURN ret = SQLExecDirect(stmt, createTable.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "TestTable";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("TestTable");
 
-  ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, table, SQL_NTS, empty,
-                   SQL_NTS);
+  ret = SQLColumns(stmt, empty.data(), SQL_NTS, empty.data(), SQL_NTS,
+                   table.data(), SQL_NTS, empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -2179,18 +2164,18 @@ BOOST_AUTO_TEST_CASE(TestDdlColumnsMeta, *disabled()) {
 BOOST_AUTO_TEST_CASE(TestDdlColumnsMetaEscaped, *disabled()) {
   Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=PUBLIC");
 
-  SQLCHAR createTable[] =
-      "create table ESG_FOCUS(id int primary key, TEST_COLUMN varchar)";
-  SQLRETURN ret = SQLExecDirect(stmt, createTable, SQL_NTS);
+  std::vector< SQLWCHAR > createTable = MakeSqlBuffer(
+      "create table ESG_FOCUS(id int primary key, TEST_COLUMN varchar)");
+  SQLRETURN ret = SQLExecDirect(stmt, createTable.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  SQLCHAR empty[] = "";
-  SQLCHAR table[] = "ESG\\_FOCUS";
+  std::vector< SQLWCHAR > empty = {0};
+  std::vector< SQLWCHAR > table = MakeSqlBuffer("ESG\\_FOCUS");
 
-  ret = SQLColumns(stmt, empty, SQL_NTS, empty, SQL_NTS, table, SQL_NTS, empty,
-                   SQL_NTS);
+  ret = SQLColumns(stmt, empty.data(), SQL_NTS, empty.data(), SQL_NTS,
+                   table.data(), SQL_NTS, empty.data(), SQL_NTS);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));

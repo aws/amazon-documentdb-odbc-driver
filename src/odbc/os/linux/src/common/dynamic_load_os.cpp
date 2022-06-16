@@ -19,6 +19,7 @@
 
 #include <sstream>
 #include "ignite/odbc/common/dynamic_load_os.h"
+#include "ignite/odbc/utility.h"
 
 namespace ignite
 {
@@ -71,14 +72,15 @@ namespace ignite
                         dlclose(handle);
                 }
     
-                Module LoadModule(const char* path)
+                Module LoadModule(const wchar_t* path)
                 {
-                    void* handle = dlopen(path, RTLD_NOW);
+                    std::string path0 = utility::ToUtf8(path);
+                    void* handle = dlopen(path0.c_str(), RTLD_NOW);
     
                     return Module(handle);
                 }
     
-                Module LoadModule(const std::string& path)
+                Module LoadModule(const std::wstring& path)
                 {
                     return LoadModule(path.c_str());
                 }

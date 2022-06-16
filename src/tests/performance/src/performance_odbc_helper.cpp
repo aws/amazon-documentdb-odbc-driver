@@ -65,6 +65,8 @@ void LogAnyDiagnostics(SQLSMALLINT handle_type, SQLHANDLE handle, SQLRETURN ret,
   SQLSMALLINT rec_number = 0;
   do {
     rec_number++;
+    // On Windows, reallen is in bytes, on Linux reallen is in chars.
+    // Can't rely on returned length. So just use the buffer length in bytes.
     diag_ret = SQLGetDiagRec(
         handle_type, handle, rec_number, sqlstate, &native_error_code,
         msg_return == NULL ? diag_message : msg_return,
