@@ -28,8 +28,6 @@ env:
   DOC_DB_LOG_LEVEL: "debug"
   JDBC_DRIVER_VERSION: "1.2.4"
   JAVA_HOME: "/usr/lib/jvm/java-17-amazon-corretto/"
-  RUN_CODE_COVERAGE: ${{ true }}
-  BOOST_TEST_CATCH_SYSTEM_ERRORS: no
 
 jobs:
   build-linux64:
@@ -290,6 +288,22 @@ jobs:
         docker run --name mongo -e MONGO_INITDB_ROOT_USERNAME=${{env.DOC_DB_USER_NAME}} -e MONGO_INITDB_ROOT_PASSWORD=${{env.DOC_DB_PASSWORD}} -d -p 27017:27017 mongo:latest
         chmod +x ./src/odbc-test/scripts/import_test_data.sh
         ./src/odbc-test/scripts/import_test_data.sh
+
+    - name: generate-code-coverage-report
+      run: |
+        chmod +x generate_code_cov.sh
+        ./generate_code_cov.sh
+      env:
+        RUN_CODE_COVERAGE: ${{ true }}
+        BOOST_TEST_CATCH_SYSTEM_ERRORS: no
+# temporary
+    - name: upload-test-file-codecov-run
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: odbc-test-results-linux-debug-codecov-run
+        path: |
+          ./cmake-build64/odbc-test/odbc_test_result.xml
 
     - name: run-tests
       run: |

@@ -108,16 +108,6 @@ jobs:
         ./build_mac_debug64.sh
       env:
         OPENSSL_ROOT_DIR: /usr/local/opt/openssl
-        RUN_CODE_COVERAGE: ${{ true }}
-        BOOST_TEST_CATCH_SYSTEM_ERRORS: no
-
-    - name: upload-test-file-codecov-run
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: odbc-test-results-mac-debug-codecov-run
-        path: |
-          ./cmake-build64/odbc-test/odbc_test_result.xml
 
     # - name: prepare-dsn
     #   run: |
@@ -125,10 +115,12 @@ jobs:
     #     sudo cp ./src/Tests/Tests/odbc-mac.ini /Library/ODBC/odbc.ini
     #     sudo cp ./src/Tests/Tests/odbcinst-mac.ini /Library/ODBC/odbcinst.ini
     #     mkdir ${{ github.workspace }}/odbc-logs
+    
     - name: register-odbc-driver
       run: |
         chmod +x scripts/register_driver_unix.sh
         ./scripts/register_driver_unix.sh
+
     - name: Setup MongoDB
       run: |
         chmod +x ./src/odbc-test/scripts/reinstall_mongodb_mac.sh
@@ -137,6 +129,23 @@ jobs:
       run: |
         chmod +x ./src/odbc-test/scripts/import_test_data.sh
         ./src/odbc-test/scripts/import_test_data.sh
+
+    - name: generate-code-coverage-report
+      run: |
+        chmod +x generate_code_cov.sh
+        ./generate_code_cov.sh
+      env:
+        RUN_CODE_COVERAGE: ${{ true }}
+        BOOST_TEST_CATCH_SYSTEM_ERRORS: no
+# temporary
+    - name: upload-test-file-codecov-run
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: odbc-test-results-mac-debug-codecov-run
+        path: |
+          ./cmake-build64/odbc-test/odbc_test_result.xml
+
     - name: run-tests
       run: |
         mkdir -p "${{env.DOC_DB_LOG_PATH}}"

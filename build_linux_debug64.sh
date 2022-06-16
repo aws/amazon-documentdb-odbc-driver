@@ -3,7 +3,6 @@ BUILD_TYPE=Debug
 PROJECT_DIR=$(pwd)
 DRIVER_BIN_DIR="$PROJECT_DIR/build/odbc/bin"
 DRIVER_LOG_DIR="$PROJECT_DIR/build/odbc/logs"
-export BOOST_TEST_CATCH_SYSTEM_ERRORS=no
 
 mkdir $DRIVER_LOG_DIR
 
@@ -28,7 +27,4 @@ fi
 
 cd cmake-build64
 make -j 4
-if [ -n "$RUN_CODE_COVERAGE" ]; then
-    make ccov-all -j 4
-fi
 cd ..
