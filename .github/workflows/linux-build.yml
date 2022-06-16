@@ -309,7 +309,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v2
       with:
-        name: odbc-test-results
+        name: odbc-test-results-linux-debug
         path: |
           ./odbc_test_result.xml
           ./build/odbc/logs/docdb_odbc_*.log   
