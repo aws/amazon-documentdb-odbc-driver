@@ -16,7 +16,13 @@
  */
 
 #ifdef _WIN32
-#include <windows.h>
+#include <Windows.h>
+#endif
+
+#ifdef __APPLE__
+constexpr auto FUNCTION_SEQUENCE_ERROR_STATE = "S1010";
+#else
+constexpr auto FUNCTION_SEQUENCE_ERROR_STATE = "24000";
 #endif
 
 #include <sql.h>
@@ -121,13 +127,8 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     ret = SQLGetData(stmt, 1, SQL_C_CHAR, buf, sizeof(buf), &bufLen);
 
     BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
-
-#ifdef __APPLE__
-    const char *expectedState = "S1010";
-#else
-    const char *expectedState = "24000";
-#endif
-    BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_STMT, stmt), expectedState);
+    BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_STMT, stmt),
+                      FUNCTION_SEQUENCE_ERROR_STATE);
   }
 
   /**
