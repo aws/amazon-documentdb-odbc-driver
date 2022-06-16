@@ -28,9 +28,6 @@ env:
   DOC_DB_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
   DOC_DB_LOG_LEVEL: "debug"
   JDBC_DRIVER_VERSION: "1.2.4"
-  RUN_CODE_COVERAGE: ${{ true }}
-  BOOST_TEST_CATCH_SYSTEM_ERRORS: no
-
 
 jobs:
   build-mac-debug:
@@ -68,6 +65,10 @@ jobs:
         brew install boost
         brew install mongo-cxx-driver
     
+    - name: get update command 
+      run: |
+        softwareupdate --list
+
     - name: verify-CommandLineTools installation
       run: |
         xcode-select -p
@@ -105,6 +106,17 @@ jobs:
         ./build_mac_debug64.sh
       env:
         OPENSSL_ROOT_DIR: /usr/local/opt/openssl
+        RUN_CODE_COVERAGE: ${{ true }}
+        BOOST_TEST_CATCH_SYSTEM_ERRORS: no
+
+    - name: upload-test-file-codecov-run
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: odbc-test-results-mac-debug-codecov-run
+        path: |
+          ./odbc_test_result.xml
+
     # - name: prepare-dsn
     #   run: |
     #     sudo mkdir /Library/ODBC
