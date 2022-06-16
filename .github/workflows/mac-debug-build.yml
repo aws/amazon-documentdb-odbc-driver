@@ -30,7 +30,7 @@ env:
   JDBC_DRIVER_VERSION: "1.2.4"
 
 jobs:
-  build-mac-debug:
+  build-mac-debug_same_as_mac_build:
     runs-on: macos-11
     steps:
     - uses: actions/checkout@v2
@@ -64,24 +64,6 @@ jobs:
         brew install openssl
         brew install boost
         brew install mongo-cxx-driver
-    
-    - name: get update command 
-      run: |
-        softwareupdate --list
-
-    - name: verify-CommandLineTools installation
-      run: |
-        xcode-select -p
-# echo "/Library/Developer/CommandLineTools/usr/bin" >> $GITHUB_PATH
-# echo "/Applications/Xcode_13.2.1.app/Contents/Developer" >> $GITHUB_PATH
-# export PATH=$PATH:/Library/Developer/CommandLineTools/usr/bin
-# echo "$PATH"
-
-# if action `EnricoMi/publish-unit-test-result-action/composite@v1.30`
-# recognizes Python in Library/Developer/CommandLineTools instead of in /usr/local/bin/, then errors would occur
-    - name: set-PATH
-      run: |
-        echo "/usr/local/bin/:/Library/Developer/CommandLineTools/usr/bin:" >> $GITHUB_PATH
 
     - name: Cache DocumentDB JDBC JAR
       id: cache-documentdb-jdbc-jar
@@ -105,22 +87,19 @@ jobs:
 
     - name: configure-and-build-driver
       run: |
-        ./build_mac_debug64.sh
+        ./build_mac_release64.sh
       env:
         OPENSSL_ROOT_DIR: /usr/local/opt/openssl
-
     # - name: prepare-dsn
     #   run: |
     #     sudo mkdir /Library/ODBC
     #     sudo cp ./src/Tests/Tests/odbc-mac.ini /Library/ODBC/odbc.ini
     #     sudo cp ./src/Tests/Tests/odbcinst-mac.ini /Library/ODBC/odbcinst.ini
     #     mkdir ${{ github.workspace }}/odbc-logs
-    
     - name: register-odbc-driver
       run: |
         chmod +x scripts/register_driver_unix.sh
         ./scripts/register_driver_unix.sh
-
     - name: Setup MongoDB
       run: |
         chmod +x ./src/odbc-test/scripts/reinstall_mongodb_mac.sh
@@ -129,23 +108,6 @@ jobs:
       run: |
         chmod +x ./src/odbc-test/scripts/import_test_data.sh
         ./src/odbc-test/scripts/import_test_data.sh
-
-    - name: generate-code-coverage-report
-      run: |
-        chmod +x generate_code_cov.sh
-        ./generate_code_cov.sh
-      env:
-        RUN_CODE_COVERAGE: ${{ true }}
-        BOOST_TEST_CATCH_SYSTEM_ERRORS: no
-# temporary
-    - name: upload-test-file-codecov-run
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: odbc-test-results-mac-debug-codecov-run
-        path: |
-          ./cmake-build64/odbc-test/odbc_test_result.xml
-
     - name: run-tests
       run: |
         mkdir -p "${{env.DOC_DB_LOG_PATH}}"
@@ -158,68 +120,235 @@ jobs:
         check_name: "MacOS Big Sur 11 Debug Build Unit Test Results Check"
         comment_title: "MacOS Big Sur 11 Debug Build Unit Test Results"
         files: ./odbc_test_result.xml
-    # temporarily upload the test files
     - name: upload-test-file
       if: always()
       uses: actions/upload-artifact@v2
       with:
-        name: odbc-test-results-mac-debug
+        name: odbc-test-results
         path: |
           ./odbc_test_result.xml
-          ./build/odbc/logs/docdb_odbc_*.log        
-    - name: upload-coverage
-      if: always()
-      uses: actions/upload-artifact@v3
-      with:
-        name: code-coverage-MacOS
-        path: cmake-build64/ccov/all-merged
-    # - name: print-memory-leak-logs
-    #   if: always()
-    #   run: |
-    #     cat ./leaks_*
-    # - name: upload-test-logs
-    #   if: failure()
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: test-logs-mac64
-    #     path: |
-    #       ${{ github.workspace }}/odbc-logs/
-    #       ${{ github.workspace }}/leaks_
-    # - name: test
-    #   run: |
-    #     bash ./run_test_runner.sh
-    # - name: build-installer
-    #   if: success()
-    #   run: |
-    #     cd cmake-build64
-    #     cmake ../src
-    #     make
-    #     cpack .
-    #     cd ..
-    # - name: create-output
-    #   if: success()
-    #   run: |
-    #     mkdir build-output
-    #     mkdir test-output
-    #     mkdir installer
-    #     cp ./build/odbc/lib/*.dylib build-output/
-    #     cp ./build/odbc/lib/*.a build-output/
-    #     cp ./cmake-build64/*.pkg installer/
-    # - name: upload-build
-    #   if: success()
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: mac64-build
-    #     path: build-output
-    # - name: upload-installer
-    #   if: success()
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: mac64-installer
-    #     path: installer
-    # - name: upload-test-results
-    #   if: success()
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: mac-test-results
-    #     path: test-output
+          ./build/odbc/logs/docdb_odbc_*.log
+
+# on:
+#   push:
+#     branches:
+#       - main
+#       - develop
+#   pull_request:
+#     branches:
+#       - main
+#       - develop
+
+# env:
+#   CI_OUTPUT_PATH: "ci-output"
+#   ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"
+#   ODBC_BIN_PATH: "${{github.workspace}}/build/odbc/bin"
+#   ODBC_BUILD_PATH: "${{github.workspace}}/build/odbc/build"
+#   DOCUMENTDB_HOME: "${{github.workspace}}/build/odbc/bin"
+#   DOC_DB_KEYPAIR: ${{secrets.DOC_DB_KEYPAIR}}
+#   DOC_DB_USER_NAME: ${{secrets.DOC_DB_USER_NAME}}
+#   DOC_DB_PASSWORD: ${{secrets.DOC_DB_PASSWORD}}
+#   DOC_DB_USER: ${{secrets.DOC_DB_USER}}
+#   DOC_DB_HOST: ${{secrets.DOC_DB_HOST}}
+#   DOC_DB_LOCAL_PORT: 27019
+#   DOC_DB_REMOTE_PORT: 27017
+#   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
+#   DOC_DB_ODBC_INTEGRATION_TEST: 1
+#   DOC_DB_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
+#   DOC_DB_LOG_LEVEL: "debug"
+#   JDBC_DRIVER_VERSION: "1.2.4"
+
+# jobs:
+#   build-mac-debug:
+#     runs-on: macos-11
+#     steps:
+#     - uses: actions/checkout@v2
+#     - name: Get Java distribution
+#       uses: actions/setup-java@v2
+#       with:
+#         distribution: 'temurin'
+#         java-version: '17'
+#         architecture: x64
+#     - name: run-cppcheck
+#       run: |
+#         brew install cppcheck
+#         sh run_cppcheck.sh
+#     - name: upload-cppcheck-results
+#       if: failure()
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: cppcheck-results
+#         path: cppcheck-results.log
+#     - name: Extract key-pair into file
+#       run: |
+#         mkdir ~/certs
+#         echo "${{env.DOC_DB_KEYPAIR}}" > ${{env.DOC_DB_PRIV_KEY_FILE}}
+#         chmod 400 ${{env.DOC_DB_PRIV_KEY_FILE}}
+
+#     - name: get-dependencies
+#       run: |
+#         brew tap homebrew/services
+#         brew install unixodbc
+#         brew install cmake
+#         brew install openssl
+#         brew install boost
+#         brew install mongo-cxx-driver
+    
+#     - name: get update command 
+#       run: |
+#         softwareupdate --list
+
+#     - name: verify-CommandLineTools installation
+#       run: |
+#         xcode-select -p
+# # echo "/Library/Developer/CommandLineTools/usr/bin" >> $GITHUB_PATH
+# # echo "/Applications/Xcode_13.2.1.app/Contents/Developer" >> $GITHUB_PATH
+# # export PATH=$PATH:/Library/Developer/CommandLineTools/usr/bin
+# # echo "$PATH"
+
+# # if action `EnricoMi/publish-unit-test-result-action/composite@v1.30`
+# # recognizes Python in Library/Developer/CommandLineTools instead of in /usr/local/bin/, then errors would occur
+#     - name: set-PATH
+#       run: |
+#         echo "/usr/local/bin/:/Library/Developer/CommandLineTools/usr/bin:" >> $GITHUB_PATH
+
+#     - name: Cache DocumentDB JDBC JAR
+#       id: cache-documentdb-jdbc-jar
+#       uses: actions/cache@v3
+#       with:
+#         path: | 
+#           cache/jar
+#         key: cache-documentdb-jdbc-jar-${{env.JDBC_DRIVER_VERSION}}
+
+#     - name: Download DocumentDB JDBC JAR
+#       if: steps.cache-documentdb-jdbc-jar.outputs.cache-hit != 'true'
+#       run: |
+#         mkdir -p cache/jar
+#         cd cache/jar
+#         wget https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
+
+#     - name: Install DocumentDB JDBC JAR
+#       run: |
+#         mkdir -p ${{env.ODBC_BIN_PATH}}/libs
+#         cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
+
+#     - name: configure-and-build-driver
+#       run: |
+#         ./build_mac_debug64.sh
+#       env:
+#         OPENSSL_ROOT_DIR: /usr/local/opt/openssl
+
+#     # - name: prepare-dsn
+#     #   run: |
+#     #     sudo mkdir /Library/ODBC
+#     #     sudo cp ./src/Tests/Tests/odbc-mac.ini /Library/ODBC/odbc.ini
+#     #     sudo cp ./src/Tests/Tests/odbcinst-mac.ini /Library/ODBC/odbcinst.ini
+#     #     mkdir ${{ github.workspace }}/odbc-logs
+
+#     - name: register-odbc-driver
+#       run: |
+#         chmod +x scripts/register_driver_unix.sh
+#         ./scripts/register_driver_unix.sh
+
+#     - name: Setup MongoDB
+#       run: |
+#         chmod +x ./src/odbc-test/scripts/reinstall_mongodb_mac.sh
+#         ./src/odbc-test/scripts/reinstall_mongodb_mac.sh
+#     - name: Import test data
+#       run: |
+#         chmod +x ./src/odbc-test/scripts/import_test_data.sh
+#         ./src/odbc-test/scripts/import_test_data.sh
+
+#     - name: generate-code-coverage-report
+#       run: |
+#         chmod +x generate_code_cov.sh
+#         ./generate_code_cov.sh
+#       env:
+#         RUN_CODE_COVERAGE: ${{ true }}
+#         BOOST_TEST_CATCH_SYSTEM_ERRORS: no
+# # temporary
+#     - name: upload-test-file-codecov-run
+#       if: always()
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: odbc-test-results-mac-debug-codecov-run
+#         path: |
+#           ./cmake-build64/odbc-test/odbc_test_result.xml
+
+#     - name: run-tests
+#       run: |
+#         mkdir -p "${{env.DOC_DB_LOG_PATH}}"
+#         ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
+#         ./build/odbc/bin/ignite-odbc-tests --catch_system_errors=false
+#     - name: upload-test-report
+#       if: always()
+#       uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
+#       with:
+#         check_name: "MacOS Big Sur 11 Debug Build Unit Test Results Check"
+#         comment_title: "MacOS Big Sur 11 Debug Build Unit Test Results"
+#         files: ./odbc_test_result.xml
+#     # temporarily upload the test files
+#     - name: upload-test-file
+#       if: always()
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: odbc-test-results-mac-debug
+#         path: |
+#           ./odbc_test_result.xml
+#           ./build/odbc/logs/docdb_odbc_*.log        
+#     - name: upload-coverage
+#       if: always()
+#       uses: actions/upload-artifact@v3
+#       with:
+#         name: code-coverage-MacOS
+#         path: cmake-build64/ccov/all-merged
+#     # - name: print-memory-leak-logs
+#     #   if: always()
+#     #   run: |
+#     #     cat ./leaks_*
+#     # - name: upload-test-logs
+#     #   if: failure()
+#     #   uses: actions/upload-artifact@v2
+#     #   with:
+#     #     name: test-logs-mac64
+#     #     path: |
+#     #       ${{ github.workspace }}/odbc-logs/
+#     #       ${{ github.workspace }}/leaks_
+#     # - name: test
+#     #   run: |
+#     #     bash ./run_test_runner.sh
+#     # - name: build-installer
+#     #   if: success()
+#     #   run: |
+#     #     cd cmake-build64
+#     #     cmake ../src
+#     #     make
+#     #     cpack .
+#     #     cd ..
+#     # - name: create-output
+#     #   if: success()
+#     #   run: |
+#     #     mkdir build-output
+#     #     mkdir test-output
+#     #     mkdir installer
+#     #     cp ./build/odbc/lib/*.dylib build-output/
+#     #     cp ./build/odbc/lib/*.a build-output/
+#     #     cp ./cmake-build64/*.pkg installer/
+#     # - name: upload-build
+#     #   if: success()
+#     #   uses: actions/upload-artifact@v2
+#     #   with:
+#     #     name: mac64-build
+#     #     path: build-output
+#     # - name: upload-installer
+#     #   if: success()
+#     #   uses: actions/upload-artifact@v2
+#     #   with:
+#     #     name: mac64-installer
+#     #     path: installer
+#     # - name: upload-test-results
+#     #   if: success()
+#     #   uses: actions/upload-artifact@v2
+#     #   with:
+#     #     name: mac-test-results
+#     #     path: test-output
