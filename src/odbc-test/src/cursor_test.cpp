@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include <ignite/impl/binary/binary_writer_impl.h>
+#include <ignite/odbc/impl/binary/binary_writer_impl.h>
 #include <ignite/odbc/cursor.h>
 #include <ignite/odbc/system/odbc_constants.h>
 

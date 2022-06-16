@@ -37,6 +37,7 @@ target_compile_definitions(performance PUBLIC _UNICODE UNICODE)
 target_link_libraries(performance ${ODBC_LIBRARY})
 set_target_properties(performance PROPERTIES CXX_STANDARD 17)
 
+add_definitions(-DUNICODE=1)
 add_custom_command(
 	TARGET performance POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy
