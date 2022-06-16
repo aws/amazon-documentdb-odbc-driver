@@ -31,7 +31,7 @@ env:
 
 jobs:
   build-mac-debug:
-    runs-on: macos-11
+    runs-on: macos-12
     steps:
     - uses: actions/checkout@v2
     - name: Get Java distribution
@@ -123,8 +123,8 @@ jobs:
       if: always()
       uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
       with:
-        check_name: "MacOS Big Sur 11 Debug Build Unit Test Results Check"
-        comment_title: "MacOS Big Sur 11 Debug Build Unit Test Results"
+        check_name: "MacOS Big Sur 12 Debug Build Unit Test Results Check"
+        comment_title: "MacOS Big Sur 12 Debug Build Unit Test Results"
         files: ./odbc_test_result.xml
     - name: upload-test-file
       if: always()
