@@ -94,22 +94,16 @@ namespace ignite
                     }
                 }
     
-                Module LoadModule(const char* path)
+                Module LoadModule(const wchar_t* path)
                 {
-                    std::string strPath(path);
-    
-                    return LoadModule(strPath);
+                  HMODULE handle = LoadLibrary(path);
+
+                  return Module(handle);
                 }
     
-                Module LoadModule(const std::string& path)
+                Module LoadModule(const std::wstring& path)
                 {
-                    //TODO: check
-                    //std::wstring convertedPath = StringToWstring(path);
-    
-                    //HMODULE handle = LoadLibrary(convertedPath.c_str());
-                    HMODULE handle = LoadLibrary(path.c_str());
-
-                    return Module(handle);
+                  return LoadModule(path.c_str());
                 }
     
                 Module GetCurrent()

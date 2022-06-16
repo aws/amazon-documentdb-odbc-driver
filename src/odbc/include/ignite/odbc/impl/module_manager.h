@@ -24,6 +24,7 @@
 #include <ignite/odbc/common/common.h>
 #include <ignite/odbc/common/dynamic_load_os.h>
 #include <ignite/odbc/ignite_binding_context.h>
+#include <ignite/odbc/utility.h>
 
 /**
  * @def IGNITE_CACHE_ENTRY_PROCESSOR_INVOKER_NAME
@@ -82,14 +83,14 @@ namespace ignite
                  * @param path Module path.
                  * @param err Error.
                  */
-                void LoadModule(const std::string& path, IgniteError& err)
+                void LoadModule(const std::wstring& path, IgniteError& err)
                 {
                     common::dynamic::Module module = common::dynamic::LoadModule(path);
     
                     if (!module.IsLoaded())
                     {
                         err = IgniteError(IgniteError::IGNITE_ERR_GENERIC,
-                            ("Can not load module [path=" + path + ']').c_str());
+                            ("Can not load module [path=" + utility::ToUtf8(path) + ']').c_str());
     
                         return;
                     }

@@ -19,7 +19,7 @@
 #include <windows.h>
 #endif
 
-#include <ignite/common/decimal.h>
+#include <ignite/odbc/common/decimal.h>
 
 #include <boost/test/unit_test.hpp>
 #include <string>

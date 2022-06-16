@@ -148,9 +148,10 @@ bool Logger::EnableLog() {
       std::stringstream tmpStream;
       tmpStream << logPath << ignite::odbc::common::Fs << logFileName;
       logFilePath = tmpStream.str();
-      if (common::FileExists(logFilePath))
+      if (common::FileExists(logFilePath)) {
         std::cout << "log file at \"" << logFilePath
                   << "\" already exists. Appending logs to the log file." << '\n';
+      }
       std::cout << "logFilePath: " << logFilePath << '\n';
     }
     fileStream.open(logFilePath, std::ios_base::app);

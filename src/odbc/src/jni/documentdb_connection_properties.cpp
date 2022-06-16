@@ -15,16 +15,6 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/platform_utils.h>
-#include <ignite/odbc/ignite_error.h>
-#include <ignite/odbc/jni/documentdb_connection_properties.h>
-#include <ignite/odbc/jni/utils.h>
-#include <ignite/odbc/log.h>
-
-using ignite::odbc::common::GetEnv;
-using ignite::odbc::jni::java::JniErrorCode;
-using ignite::odbc::jni::java::JniErrorInfo;
-
 namespace ignite {
 namespace odbc {
 namespace jni {
