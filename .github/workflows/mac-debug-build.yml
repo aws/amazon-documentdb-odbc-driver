@@ -115,7 +115,7 @@ jobs:
       with:
         name: odbc-test-results-mac-debug-codecov-run
         path: |
-          ./odbc_test_result.xml
+          ./cmake-build64/odbc-test/odbc_test_result.xml
 
     # - name: prepare-dsn
     #   run: |
