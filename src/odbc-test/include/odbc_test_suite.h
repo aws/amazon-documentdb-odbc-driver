@@ -331,12 +331,12 @@ struct OdbcTestSuite {
   void CheckSQLConnectionDiagnosticError(const std::string& expectSqlState);
 
   /**
-   * Convert string to vector of SQLCHARs.
+   * Convert string to vector of SQLWCHARs.
    *
-   * @param qry Query.
+   * @param value Query.
    * @return Corresponding vector.
    */
-  static std::vector< SQLCHAR > MakeQuery(const std::string& qry);
+  static std::vector< SQLWCHAR > MakeSqlBuffer(const std::string& value);
 
   /**
    * Performs SQL query.

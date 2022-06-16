@@ -29,7 +29,7 @@
 
 #include "ignite/ignite.h"
 #include "ignite/ignition.h"
-#include "ignite/impl/binary/binary_utils.h"
+#include "ignite/odbc/impl/binary/binary_utils.h"
 #include "ignite/odbc/connection.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"

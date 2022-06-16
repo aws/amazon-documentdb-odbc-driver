@@ -29,11 +29,11 @@
 #include <vector>
 
 #include "complex_type.h"
-#include "ignite/binary/binary_object.h"
-#include "ignite/common/fixed_size_array.h"
+#include "ignite/odbc/binary/binary_object.h"
+#include "ignite/odbc/common/fixed_size_array.h"
 #include "ignite/ignite.h"
 #include "ignite/ignition.h"
-#include "ignite/impl/binary/binary_utils.h"
+#include "ignite/odbc/impl/binary/binary_utils.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"
 #include "test_utils.h"

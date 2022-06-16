@@ -52,7 +52,7 @@ class CustomWindow : public Window {
    * @param className Window class name.
    * @param title Window title.
    */
-  CustomWindow(Window* parent, const char* className, const char* title);
+  CustomWindow(Window* parent, const wchar_t* className, const wchar_t* title);
 
   /**
    * Destructor.
@@ -88,7 +88,7 @@ class CustomWindow : public Window {
    * @return Auto pointer containing new window.
    */
   std::unique_ptr< Window > CreateGroupBox(int posX, int posY, int sizeX,
-                                         int sizeY, const char* title, int id);
+                                         int sizeY, const std::wstring& title, int id);
 
   /**
    * Create child label window.
@@ -102,7 +102,7 @@ class CustomWindow : public Window {
    * @return Auto pointer containing new window.
    */
   std::unique_ptr< Window > CreateLabel(int posX, int posY, int sizeX, int sizeY,
-                                      const char* title, int id);
+                                      const std::wstring& title, int id);
 
   /**
    * Create child Edit window.
@@ -116,7 +116,7 @@ class CustomWindow : public Window {
    * @return Auto pointer containing new window.
    */
   std::unique_ptr< Window > CreateEdit(int posX, int posY, int sizeX, int sizeY,
-                                     const char* title, int id, int style = 0);
+                                     const std::wstring& title, int id, int style = 0);
 
   /**
    * Create child button window.
@@ -129,8 +129,8 @@ class CustomWindow : public Window {
    * @param id ID to be assigned to the created window.
    * @return Auto pointer containing new window.
    */
-  std::unique_ptr< Window > CreateButton(int posX, int posY, int sizeX, int sizeY,
-                                       const char* title, int id);
+  std::unique_ptr< Window > CreateButton(int posX, int posY, int sizeX, int sizeY, const std::wstring& title,
+                                         int id);
 
   /**
    * Create child CheckBox window.
@@ -144,8 +144,8 @@ class CustomWindow : public Window {
    * @return Auto pointer containing new window.
    */
   std::unique_ptr< Window > CreateCheckBox(int posX, int posY, int sizeX,
-                                         int sizeY, const char* title, int id,
-                                         bool state);
+                                           int sizeY, const std::wstring& title,
+                                           int id, bool state);
 
   /**
    * Create child ComboBox window.
@@ -159,7 +159,8 @@ class CustomWindow : public Window {
    * @return Auto pointer containing new window.
    */
   std::unique_ptr< Window > CreateComboBox(int posX, int posY, int sizeX,
-                                         int sizeY, const char* title, int id);
+                                           int sizeY, const std::wstring& title,
+                                           int id);
 
  private:
   IGNITE_NO_COPY_ASSIGNMENT(CustomWindow)

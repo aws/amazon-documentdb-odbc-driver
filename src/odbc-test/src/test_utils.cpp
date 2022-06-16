@@ -18,59 +18,68 @@
 #include "test_utils.h"
 
 #include <ignite/odbc/common/platform_utils.h>
+#include <ignite/odbc/utility.h>
 
 #include <boost/test/unit_test.hpp>
 #include <cassert>
 
 #include "ignite/odbc/jni/utils.h"
 
+using namespace ignite::odbc;
+
 namespace ignite_test {
 OdbcClientError GetOdbcError(SQLSMALLINT handleType, SQLHANDLE handle) {
-  SQLCHAR sqlstate[7] = {};
+  SQLWCHAR sqlstate[7] = {};
   SQLINTEGER nativeCode;
 
-  SQLCHAR message[ODBC_BUFFER_SIZE];
+  SQLWCHAR message[ODBC_BUFFER_SIZE];
   SQLSMALLINT reallen = 0;
 
+  // On Windows, reallen is in bytes, on Linux reallen is in chars.
+  // Can't rely on returned length.
   SQLGetDiagRec(handleType, handle, 1, sqlstate, &nativeCode, message,
-                ODBC_BUFFER_SIZE, &reallen);
+                sizeof(message), &reallen);
 
-  return OdbcClientError(
-      std::string(reinterpret_cast< char* >(sqlstate)),
-      std::string(reinterpret_cast< char* >(message), reallen));
+  return OdbcClientError(utility::SqlStringToString(sqlstate),
+                         utility::SqlStringToString(message));
 }
 
 std::string GetOdbcErrorState(SQLSMALLINT handleType, SQLHANDLE handle,
                               int idx) {
-  SQLCHAR sqlstate[7] = {};
+  SQLWCHAR sqlstate[7] = {};
   SQLINTEGER nativeCode;
 
-  SQLCHAR message[ODBC_BUFFER_SIZE];
+  SQLWCHAR message[ODBC_BUFFER_SIZE];
   SQLSMALLINT reallen = 0;
 
+  // On Windows, reallen is in bytes, on Linux reallen is in chars.
+  // Can't rely on returned length.
   SQLGetDiagRec(handleType, handle, idx, sqlstate, &nativeCode, message,
-                ODBC_BUFFER_SIZE, &reallen);
+                sizeof(message), &reallen);
 
-  return std::string(reinterpret_cast< char* >(sqlstate));
+  return utility::SqlStringToString(sqlstate);
 }
 
 std::string GetOdbcErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle,
                                 int idx) {
-  SQLCHAR sqlstate[7] = {};
+  SQLWCHAR sqlstate[7] = {};
   SQLINTEGER nativeCode;
 
-  SQLCHAR message[ODBC_BUFFER_SIZE];
+  SQLWCHAR message[ODBC_BUFFER_SIZE];
   SQLSMALLINT reallen = 0;
 
+  // On Windows, reallen is in bytes, on Linux reallen is in chars.
+  // Can't rely on returned length.
   SQLGetDiagRec(handleType, handle, idx, sqlstate, &nativeCode, message,
-                ODBC_BUFFER_SIZE, &reallen);
+                sizeof(message), &reallen);
 
-  std::string res(reinterpret_cast< char* >(sqlstate));
+  std::string res = utility::SqlStringToString(sqlstate);
 
-  if (!res.empty())
-    res.append(": ").append(reinterpret_cast< char* >(message), reallen);
-  else
+  if (!res.empty()) {
+    res.append(": ").append(utility::SqlStringToString(message));
+  } else {
     res = "No results";
+  }
 
   return res;
 }

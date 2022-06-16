@@ -36,8 +36,8 @@
 #pragma warning(pop)
 #endif  //_MSC_VER
 
-#include <ignite/binary/binary.h>
-#include <ignite/impl/binary/binary_utils.h>
+#include <ignite/odbc/binary/binary.h>
+#include <ignite/odbc/impl/binary/binary_utils.h>
 
 #include "test_server.h"
 

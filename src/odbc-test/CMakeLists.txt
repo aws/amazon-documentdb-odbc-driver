@@ -56,6 +56,7 @@ set(SOURCES
          src/odbc_test_suite.cpp
          src/queries_test.cpp
          src/test_utils.cpp
+         src/utility_test.cpp
          ../odbc/src/app/application_data_buffer.cpp
          ../odbc/src/binary/binary_containers.cpp
          ../odbc/src/binary/binary_raw_writer.cpp
@@ -197,13 +198,13 @@ target_link_libraries(${TARGET} ${ODBC_LIBRARIES})
 target_link_libraries(${TARGET} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} mongo::mongocxx_shared ${JNI_LIBRARIES})
 target_code_coverage(${TARGET}  PUBLIC AUTO ALL)
 
+add_definitions(-DUNICODE=1)
 if (WIN32)
     if (MSVC)
         # On Windows, min() and max() are defined macro. This causes a colision with MONGOCXX library.
         # See: http://www.suodenjoki.dk/us/archive/2010/min-max.htm
         add_definitions(-DNOMINMAX)
     endif()
-    remove_definitions(-DUNICODE=1)
     add_definitions(-DTARGET_MODULE_FULL_NAME="$<TARGET_FILE_NAME:${TARGET}>")
     if (MSVC_VERSION GREATER_EQUAL 1900)
         target_link_libraries(${TARGET} legacy_stdio_definitions odbccp32 shlwapi)

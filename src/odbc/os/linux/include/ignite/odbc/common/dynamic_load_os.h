@@ -110,7 +110,7 @@ namespace ignite
                  * @param path Path to the Module to load.
                  * @return Module instance.
                  */
-                IGNITE_IMPORT_EXPORT Module LoadModule(const char* path);
+                IGNITE_IMPORT_EXPORT Module LoadModule(const wchar_t* path);
     
                 /**
                  * Load Module by the specified path.
@@ -118,7 +118,7 @@ namespace ignite
                  * @param path Path to the Module to load.
                  * @return Module instance.
                  */
-                IGNITE_IMPORT_EXPORT Module LoadModule(const std::string& path);
+                IGNITE_IMPORT_EXPORT Module LoadModule(const std::wstring& path);
     
                 /**
                  * Returns Module associated with the calling process itself.

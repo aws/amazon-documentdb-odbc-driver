@@ -93,7 +93,10 @@ void Parameter::Write(impl::binary::BinaryWriterImpl& writer, int offset,
   switch (sqlType) {
     case SQL_CHAR:
     case SQL_VARCHAR:
-    case SQL_LONGVARCHAR: {
+    case SQL_LONGVARCHAR:
+    case SQL_WCHAR:
+    case SQL_WVARCHAR:
+    case SQL_WLONGVARCHAR: {
       utility::WriteString(writer, buf.GetString(columnSize));
       break;
     }
