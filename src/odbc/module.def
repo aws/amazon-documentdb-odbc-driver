@@ -4,65 +4,64 @@ EXPORTS
 	ConfigDSN
 	SQLAllocConnect
 	SQLAllocEnv
-	SQLAllocStmt
 	SQLAllocHandle
-	SQLFreeConnect
-	SQLFreeEnv
-	SQLFreeStmt
+	SQLAllocStmt
 	SQLBindCol
+	SQLBindParameter
+	SQLBrowseConnectW
+	SQLBulkOperations
 	SQLCancel
-	SQLConnect
-	SQLDescribeCol
+	SQLCloseCursor
+	SQLColAttributeW
+	SQLColumnPrivilegesW
+	SQLColumnsW
+	SQLConnectW
+	SQLCopyDesc
+	SQLDescribeColW
 	SQLDisconnect
-	SQLError
-	SQLExecDirect
+	SQLDriverConnectW
+	SQLEndTran
+	SQLErrorW
+	SQLExecDirectW
 	SQLExecute
 	SQLExtendedFetch
 	SQLFetch
-	SQLGetCursorName
-	SQLNumResultCols
-	SQLPrepare
-	SQLRowCount
-	SQLSetCursorName
-	SQLColumns
-	SQLDriverConnect
-	SQLGetData
-	SQLGetInfo
-	SQLGetTypeInfo
-	SQLParamData
-	SQLPutData
-	SQLStatistics
-	SQLTables
-	SQLBrowseConnect
-	SQLColumnPrivileges
-	SQLForeignKeys
-	SQLMoreResults
-	SQLNativeSql
-	SQLNumParams
-	SQLPrimaryKeys
-	SQLProcedureColumns
-	SQLProcedures
-	SQLSetPos
-	SQLTablePrivileges
-	SQLBindParameter
-	SQLCloseCursor
-	SQLColAttribute
-	SQLCopyDesc
-	SQLEndTran
 	SQLFetchScroll
+	SQLForeignKeysW
+	SQLFreeConnect
+	SQLFreeEnv
 	SQLFreeHandle
-	SQLGetConnectAttr
-	SQLGetDescField
-	SQLGetDescRec
-	SQLGetDiagField
-	SQLGetDiagRec
+	SQLFreeStmt
+	SQLGetConnectAttrW
+	SQLGetCursorNameW
+	SQLGetData
+	SQLGetDescFieldW
+	SQLGetDescRecW
+	SQLGetDiagFieldW
+	SQLGetDiagRecW
 	SQLGetEnvAttr
-	SQLGetStmtAttr
-	SQLSetConnectAttr
-	SQLSetDescField
+	SQLGetInfoW
+	SQLGetStmtAttrW
+	SQLGetTypeInfoW
+	SQLMoreResults
+	SQLNativeSqlW
+	SQLNumParams
+	SQLNumResultCols
+	SQLParamData
+	SQLPrepareW
+	SQLPrimaryKeysW
+	SQLProcedureColumnsW
+	SQLProceduresW
+	SQLPutData
+	SQLRowCount
+	SQLSetConnectAttrW
+	SQLSetCursorNameW
+	SQLSetDescFieldW
 	SQLSetDescRec
 	SQLSetEnvAttr
-	SQLSetStmtAttr
-	SQLBulkOperations
-	SQLSpecialColumns
-	
+	SQLSetPos
+	SQLSetStmtAttrW
+	SQLSpecialColumnsW
+	SQLStatisticsW
+	SQLTablePrivilegesW
+	SQLTablesW

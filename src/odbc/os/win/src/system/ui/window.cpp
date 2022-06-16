@@ -24,7 +24,7 @@ namespace odbc {
 namespace system {
 namespace ui {
 HINSTANCE GetHInstance() {
-  HINSTANCE hInstance = GetModuleHandle(TARGET_MODULE_FULL_NAME);
+  HINSTANCE hInstance = GetModuleHandle(utility::FromUtf8(TARGET_MODULE_FULL_NAME).c_str());
 
   if (hInstance == NULL) {
     std::stringstream buf;
@@ -38,7 +38,8 @@ HINSTANCE GetHInstance() {
   return hInstance;
 }
 
-Window::Window(Window* parent, const char* className, const char* title)
+Window::Window(Window* parent, const std::wstring& className,
+               const std::wstring& title)
     : className(className),
       title(title),
       handle(NULL),
@@ -102,7 +103,7 @@ void Window::Destroy() {
   handle = nullptr;
 }
 
-void Window::GetText(std::string& text) const {
+void Window::GetText(std::wstring& text) const {
   if (!IsEnabled()) {
     text.clear();
 
@@ -125,7 +126,7 @@ void Window::GetText(std::string& text) const {
   text.resize(len);
 }
 
-void Window::SetText(const std::string& text) const {
+void Window::SetText(const std::wstring& text) const {
   SNDMSG(handle, WM_SETTEXT, 0, reinterpret_cast< LPARAM >(text.c_str()));
 }
 
@@ -141,7 +142,7 @@ void Window::SetChecked(bool state) {
   Button_SetCheck(handle, state ? BST_CHECKED : BST_UNCHECKED);
 }
 
-void Window::AddString(const std::string& str) {
+void Window::AddString(const std::wstring& str) {
   SNDMSG(handle, CB_ADDSTRING, 0, reinterpret_cast< LPARAM >(str.c_str()));
 }
 

@@ -26,6 +26,7 @@
 #include "ignite/odbc/utility.h"
 
 using ignite::odbc::config::Configuration;
+using ignite::odbc::utility::FromUtf8;
 
 #ifdef _WIN32
 bool DisplayConnectionWindow(void* windowParent, Configuration& config) {
@@ -48,15 +49,13 @@ bool DisplayConnectionWindow(void* windowParent, Configuration& config) {
 
     return ProcessMessages(window) == Result::OK;
   } catch (const ignite::odbc::IgniteError& err) {
-    std::stringstream buf;
+    std::wstringstream buf;
 
-    buf << "Message: " << err.GetText() << ", Code: " << err.GetCode();
+    buf << L"Message: " << err.GetText() << L", Code: " << err.GetCode();
 
-    std::string message = buf.str();
+    MessageBox(NULL, buf.str().c_str(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
 
-    MessageBox(NULL, message.c_str(), "Error!", MB_ICONEXCLAMATION | MB_OK);
-
-    SQLPostInstallerError(err.GetCode(), err.GetText());
+    SQLPostInstallerError(err.GetCode(), FromUtf8(err.GetText()).c_str());
   }
 
   return false;
@@ -79,7 +78,9 @@ bool RegisterDsn(const Configuration& config, LPCSTR driver) {
   const char* dsn = config.GetDsn().c_str();
 
   try {
-    if (!SQLWriteDSNToIni(dsn, driver))
+    std::wstring dsn0 = FromUtf8(dsn);
+    std::wstring driver0 = FromUtf8(driver);
+    if (!SQLWriteDSNToIni(dsn0.c_str(), driver0.c_str()))
       ignite::odbc::ThrowLastSetupError();
 
     ArgMap map;
@@ -98,9 +99,10 @@ bool RegisterDsn(const Configuration& config, LPCSTR driver) {
 
     return true;
   } catch (ignite::odbc::IgniteError& err) {
-    MessageBox(NULL, err.GetText(), "Error!", MB_ICONEXCLAMATION | MB_OK);
+    std::wstring errText = FromUtf8(err.GetText());
+    MessageBox(NULL, errText.c_str(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
 
-    SQLPostInstallerError(err.GetCode(), err.GetText());
+    SQLPostInstallerError(err.GetCode(), errText.c_str());
   }
 
   return false;
@@ -112,16 +114,18 @@ bool RegisterDsn(const Configuration& config, LPCSTR driver) {
  * @param dsn DSN name.
  * @return True on success and false on fail.
  */
-bool UnregisterDsn(const char* dsn) {
+bool UnregisterDsn(const std::string& dsn) {
   try {
-    if (!SQLRemoveDSNFromIni(dsn))
+    if (!SQLRemoveDSNFromIni(FromUtf8(dsn).c_str()))
       ignite::odbc::ThrowLastSetupError();
 
     return true;
   } catch (ignite::odbc::IgniteError& err) {
-    MessageBox(NULL, err.GetText(), "Error!", MB_ICONEXCLAMATION | MB_OK);
+    std::wstring errText = FromUtf8(err.GetText());
+    MessageBox(NULL, errText.c_str(), L"Error!",
+               MB_ICONEXCLAMATION | MB_OK);
 
-    SQLPostInstallerError(err.GetCode(), err.GetText());
+    SQLPostInstallerError(err.GetCode(), errText.c_str());
   }
 
   return false;
@@ -143,7 +147,7 @@ BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver,
 
   parser.ParseConfigAttributes(attributes, &diag);
 
-  if (!SQLValidDSN(config.GetDsn().c_str()))
+  if (!SQLValidDSN(utility::FromUtf8(config.GetDsn()).c_str()))
     return FALSE;
 
   LOG_MSG("Driver: " << driver);

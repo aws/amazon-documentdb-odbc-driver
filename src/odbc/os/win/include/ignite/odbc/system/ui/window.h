@@ -45,7 +45,7 @@ class Window {
    * @param title Window title.
    * @param callback Event processing function.
    */
-  Window(Window* parent, const char* className, const char* title);
+  Window(Window* parent, const std::wstring& className, const std::wstring& title);
 
   /**
    * Constructor for the existing window.
@@ -100,14 +100,14 @@ class Window {
    *
    * @param text Text.
    */
-  void GetText(std::string& text) const;
+  void GetText(std::wstring& text) const;
 
   /**
    * Set window text.
    *
    * @param text Text.
    */
-  void SetText(const std::string& text) const;
+  void SetText(const std::wstring& text) const;
 
   /**
    * Check if the window has text.
@@ -135,7 +135,7 @@ class Window {
    *
    * @param str String.
    */
-  void AddString(const std::string& str);
+  void AddString(const std::wstring& str);
 
   /**
    * Set current ComboBox selection.
@@ -176,10 +176,10 @@ class Window {
   }
 
   /** Window class name. */
-  std::string className;
+  std::wstring className;
 
   /** Window title. */
-  std::string title;
+  std::wstring title;
 
   /** Window handle. */
   HWND handle;
