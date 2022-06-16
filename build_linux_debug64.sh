@@ -27,10 +27,8 @@ if [ ! -f "$JDBC_DRIVER_FULLPATH" ]; then
 fi
 
 cd cmake-build64
+make -j 4
 if [ -n "$RUN_CODE_COVERAGE" ]; then
-    make -j 4
     make ccov-all -j 4
-else
-    make -j 4
 fi
 cd ..
