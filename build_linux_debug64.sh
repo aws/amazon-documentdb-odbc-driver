@@ -8,7 +8,7 @@ mkdir $DRIVER_LOG_DIR
 
 mkdir cmake-build64
 cd cmake-build64
-cmake ../src -DCMAKE_BUILD_TYPE="Debug" -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_CORE="OFF" -DWITH_ODBC="ON"
+cmake ../src -DCMAKE_BUILD_TYPE="Debug" -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_ODBC="ON"
 cd ..
 
 # Download the DocumentDB JDBC Driver

@@ -28,7 +28,7 @@
 #include <boost/test/unit_test.hpp>
 #include <string>
 
-#include "ignite/common/decimal.h"
+#include "ignite/odbc/common/decimal.h"
 #include "ignite/ignite.h"
 #include "ignite/ignition.h"
 #include "test_type.h"

@@ -17,8 +17,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "ignite/common/decimal.h"
-#include "ignite/common/utils.h"
+#include "ignite/odbc/common/decimal.h"
+#include "ignite/odbc/common/utils.h"
 #include "sql_test_suite_fixture.h"
 #include "test_utils.h"
 

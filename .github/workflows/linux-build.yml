@@ -122,7 +122,7 @@ jobs:
     # generate compile_commands.json file for clang-tidy-check, requires mongocxx and boost dependencies
     # - name: generate-compile-commands-file
     #   run: |
-    #    cmake "${{github.workspace}}/src" -DCMAKE_EXPORT_COMPILE_COMMANDS=on -DCMAKE_BUILD_TYPE=Release -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_CORE="OFF" -DWITH_ODBC="ON"
+    #    cmake "${{github.workspace}}/src" -DCMAKE_EXPORT_COMPILE_COMMANDS=on -DCMAKE_BUILD_TYPE=Release -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_ODBC="ON"
  
     # - name: clang-tidy-check
     #  uses: ZedThree/clang-tidy-review@v0.8.3
@@ -161,6 +161,14 @@ jobs:
         check_name: "Ubuntu 20.04 Build Unit Test Results Check"
         comment_title: "Ubuntu 20.04 Build Unit Test Results"
         files: ./odbc_test_result.xml
+    - name: upload-test-file
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: odbc-test-results
+        path: |
+          ./odbc_test_result.xml
+          ./build/odbc/logs/docdb_odbc_*.log
   
   build-linux-docker-image:
     runs-on: ubuntu-20.04

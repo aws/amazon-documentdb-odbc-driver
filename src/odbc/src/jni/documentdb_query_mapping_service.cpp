@@ -24,7 +24,6 @@
 
 #include <vector>
 
-using ignite::odbc::common::GetEnv;
 using ignite::odbc::jni::java::JniErrorCode;
 using ignite::odbc::jni::java::JniErrorInfo;
 

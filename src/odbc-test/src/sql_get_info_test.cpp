@@ -24,7 +24,7 @@
 #include <vector>
 
 #include "ignite/ignition.h"
-#include "ignite/impl/binary/binary_utils.h"
+#include "ignite/odbc/impl/binary/binary_utils.h"
 #include "ignite/odbc/config/connection_info.h"
 #include "ignite/odbc/system/odbc_constants.h"
 #include "odbc_test_suite.h"

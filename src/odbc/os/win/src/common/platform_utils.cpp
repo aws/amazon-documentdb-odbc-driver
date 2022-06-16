@@ -17,6 +17,7 @@
 
 #include <Windows.h>
 #include <ignite/odbc/common/platform_utils.h>
+#include <ignite/odbc/utility.h>
 #include <time.h>
 
 #include <vector>
@@ -51,15 +52,16 @@ std::string GetEnv(const std::string& name) {
 }
 
 std::string GetEnv(const std::string& name, const std::string& dflt) {
-  char res[32767];
-
+  wchar_t res[_MAX_ENV];
+  std::wstring wname = utility::FromUtf8(name);
+  // Choosing
   DWORD envRes =
-      GetEnvironmentVariableA(name.c_str(), res, sizeof(res) / sizeof(res[0]));
+      GetEnvironmentVariableW(wname.c_str(), res, sizeof(res) / sizeof(res[0]));
 
   if (envRes == 0 || envRes > sizeof(res))
     return dflt;
 
-  return std::string(res, static_cast< size_t >(envRes));
+  return utility::ToUtf8(std::wstring(res, static_cast< size_t >(envRes)));
 }
 
 bool FileExists(const std::string& path) {
@@ -79,21 +81,22 @@ bool IsValidDirectory(const std::string& path) {
   if (path.empty())
     return false;
 
-  DWORD attrs = GetFileAttributesA(path.c_str());
+  std::wstring path0 = utility::FromUtf8(path);
+  DWORD attrs = GetFileAttributesW(path0.c_str());
 
   return attrs != INVALID_FILE_ATTRIBUTES
          && (attrs & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
 bool DeletePath(const std::string& path) {
-  std::vector< TCHAR > path0(path.begin(), path.end());
+  std::wstring path0 = utility::FromUtf8(path);
   path0.push_back('\0');
   path0.push_back('\0');
 
-  SHFILEOPSTRUCT fileop;
+  SHFILEOPSTRUCTW fileop;
   fileop.hwnd = nullptr;
   fileop.wFunc = FO_DELETE;
-  fileop.pFrom = &path0[0];
+  fileop.pFrom = path0.data();
   fileop.pTo = nullptr;
   fileop.fFlags = FOF_NOCONFIRMATION | FOF_SILENT;
 
@@ -101,7 +104,7 @@ bool DeletePath(const std::string& path) {
   fileop.lpszProgressTitle = nullptr;
   fileop.hNameMappings = nullptr;
 
-  int ret = SHFileOperation(&fileop);
+  int ret = SHFileOperationW(&fileop);
 
   return ret == 0;
 }
