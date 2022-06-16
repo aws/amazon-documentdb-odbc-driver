@@ -2024,7 +2024,7 @@ BOOST_AUTO_TEST_CASE(TestSingleResultSelectWideCharUsingGetDataWideChar) {
   BOOST_CHECK_EQUAL(
       u8"你好", utility::SqlStringToString(fieldString, fieldString_len, true));
 
-  // Fetch 2nd row - not exist
+  // Fetch 2nd row - does not exist
   ret = SQLFetch(stmt);
   BOOST_CHECK_EQUAL(SQL_NO_DATA, ret);
 }

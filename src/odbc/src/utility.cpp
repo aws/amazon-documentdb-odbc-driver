@@ -321,6 +321,27 @@ std::wstring FromUtf8(const char* value) {
   return converter.from_bytes(value);
 }
 
+boost::optional< std::string > SqlStringToOptString(const unsigned char* sqlStr,
+                                                    int32_t sqlStrLen) {
+  boost::optional< std::string > res = boost::none;
+  std::string tmp;
+
+  const char* sqlStrC = reinterpret_cast< const char* >(sqlStr);
+
+  if (!sqlStr)
+    return res;
+
+  if (sqlStrLen == SQL_NTS) {
+    tmp.assign(sqlStrC);
+    res = tmp;
+  } else if (sqlStrLen > 0) {
+    tmp.assign(sqlStrC, sqlStrLen);
+    res = tmp;
+  }
+
+  return res;
+}
+
 void ReadByteArray(BinaryReaderImpl& reader,
                    std::vector< int8_t >& res) {
   int32_t len = reader.ReadInt8Array(0, 0);

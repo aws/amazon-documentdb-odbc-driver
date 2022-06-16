@@ -204,6 +204,17 @@ std::vector< SQLWCHAR > ToWCHARVector(const std::string& value);
 std::vector< SQLWCHAR > ToWCHARVector(const char* value);
 
 /**
+ * Convert SQL string buffer to boost::optional< std::string >.
+ *
+ * @param sqlStr SQL string buffer.
+ * @param sqlStrLen SQL string length.
+ * @return Standard optional string containing the same data.
+ * If sqlStrLen indicates null string, boost::none is returned.
+ */
+boost::optional< std::string > SqlStringToOptString(const unsigned char* sqlStr,
+                                                    int32_t sqlStrLen);
+
+/**
  * Convert binary data to hex dump form
  * @param data  pointer to data
  * @param count data length

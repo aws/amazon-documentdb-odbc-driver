@@ -65,42 +65,42 @@ BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBuffer) {
   BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), ToUtf8(wstr.substr(0, 10)));
   BOOST_CHECK_EQUAL(10, bytesWrittenOrRequired);
 
-  // In bytes
+  // 10 characters plus 1 for null char, in bytes
   buffer[0] = 0;
   bytesWrittenOrRequired =
       CopyStringToBuffer(str, buffer, ((10 + 1) * sizeof(SQLWCHAR)), true);
   BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), ToUtf8(wstr.substr(0, 10)));
   BOOST_CHECK_EQUAL(20, bytesWrittenOrRequired);
 
-  // Zero length buffer.
+  // Zero length buffer in character mode.
   buffer[0] = 0;
   bytesWrittenOrRequired = CopyStringToBuffer(str, buffer, 0);
   BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), std::string());
   BOOST_CHECK_EQUAL(0, bytesWrittenOrRequired);
 
-  // Zero length buffer.
+  // Zero length buffer in byte mode.
   buffer[0] = 0;
   bytesWrittenOrRequired = CopyStringToBuffer(str, buffer, 0, true);
   BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), std::string());
   BOOST_CHECK_EQUAL(0, bytesWrittenOrRequired);
 
-  // nullptr buffer, zero length.
+  // nullptr buffer, zero length, in character mode.
   buffer[0] = 0;
   bytesWrittenOrRequired = CopyStringToBuffer(str, nullptr, 0);
   BOOST_CHECK_EQUAL(wstr.size(), bytesWrittenOrRequired);
 
-  // nullptr buffer, zero length.
+  // nullptr buffer, zero length, in byte mode.
   buffer[0] = 0;
   bytesWrittenOrRequired = CopyStringToBuffer(str, nullptr, 0, true);
   BOOST_CHECK_EQUAL(wstr.size() * sizeof(SQLWCHAR), bytesWrittenOrRequired);
 
-  // nullptr buffer, non-zero length.
+  // nullptr buffer, non-zero length, in character mode.
   buffer[0] = 0;
   bytesWrittenOrRequired =
       CopyStringToBuffer(str, nullptr, sizeof(buffer) / sizeof(SQLWCHAR));
   BOOST_CHECK_EQUAL(wstr.size(), bytesWrittenOrRequired);
 
-  // nullptr buffer, non-zero length.
+  // nullptr buffer, non-zero length, in byte mode.
   buffer[0] = 0;
   bytesWrittenOrRequired =
       CopyStringToBuffer(str, nullptr, sizeof(buffer), true);
