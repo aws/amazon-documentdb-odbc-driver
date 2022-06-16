@@ -220,6 +220,9 @@ bool IsSqlTypeSupported(boost::optional< int16_t > type) {
     case SQL_CHAR:
     case SQL_VARCHAR:
     case SQL_LONGVARCHAR:
+    case SQL_WCHAR:
+    case SQL_WVARCHAR:
+    case SQL_WLONGVARCHAR:
     case SQL_TYPE_DATE:
     case SQL_TYPE_TIMESTAMP:
     case SQL_TYPE_TIME:
@@ -229,9 +232,6 @@ bool IsSqlTypeSupported(boost::optional< int16_t > type) {
     case SQL_TYPE_NULL:
       return true;
 
-    case SQL_WCHAR:
-    case SQL_WVARCHAR:
-    case SQL_WLONGVARCHAR:
     case SQL_GUID:
     case SQL_INTERVAL_MONTH:
     case SQL_INTERVAL_YEAR:
@@ -291,12 +291,15 @@ boost::optional<int16_t> SqlTypeToBinary(boost::optional< int16_t > sqlType) {
       return JDBC_TYPE_DECIMAL;
 
     case SQL_CHAR:
+    case SQL_WCHAR:
       return JDBC_TYPE_CHAR;
 
     case SQL_VARCHAR:
+    case SQL_WVARCHAR:
       return JDBC_TYPE_VARCHAR;
 
     case SQL_LONGVARCHAR:
+    case SQL_WLONGVARCHAR:
       return JDBC_TYPE_LONGVARCHAR;
 
     case SQL_TYPE_DATE:
@@ -440,15 +443,15 @@ boost::optional<int16_t> BinaryToSqlType(boost::optional<int16_t> binaryType) {
 
     case JDBC_TYPE_CHAR:
     case JDBC_TYPE_NCHAR:
-      return SQL_CHAR;
+      return SQL_WCHAR;
 
     case JDBC_TYPE_VARCHAR:
     case JDBC_TYPE_NVARCHAR:
-      return SQL_VARCHAR;
+      return SQL_WVARCHAR;
 
     case JDBC_TYPE_LONGVARCHAR:
     case JDBC_TYPE_LONGNVARCHAR:
-      return SQL_LONGVARCHAR;
+      return SQL_WLONGVARCHAR;
 
     case JDBC_TYPE_DATE:
       return SQL_TYPE_DATE;
@@ -508,9 +511,11 @@ boost::optional<int32_t> SqlTypeDisplaySize(boost::optional<int16_t> type) {
     return boost::none;
   switch (*type) {
     case SQL_VARCHAR:
+    case SQL_WVARCHAR:
     case SQL_CHAR:
     case SQL_WCHAR:
     case SQL_LONGVARCHAR:
+    case SQL_WLONGVARCHAR:
     case SQL_LONGVARBINARY:
     case SQL_BINARY:
     case SQL_VARBINARY:
@@ -569,9 +574,11 @@ boost::optional< int32_t > SqlTypeColumnSize(boost::optional< int16_t > type) {
     return boost::none;
   switch (*type) {
     case SQL_VARCHAR:
+    case SQL_WVARCHAR:
     case SQL_CHAR:
     case SQL_WCHAR:
     case SQL_LONGVARCHAR:
+    case SQL_WLONGVARCHAR:
     case SQL_LONGVARBINARY:
     case SQL_BINARY:
     case SQL_VARBINARY:
@@ -630,9 +637,11 @@ boost::optional< int32_t > SqlTypeTransferLength(boost::optional< int16_t > type
     return boost::none;
   switch (*type) {
     case SQL_VARCHAR:
+    case SQL_WVARCHAR:
     case SQL_CHAR:
     case SQL_WCHAR:
     case SQL_LONGVARCHAR:
+    case SQL_WLONGVARCHAR:
     case SQL_LONGVARBINARY:
     case SQL_BINARY:
     case SQL_VARBINARY:
@@ -744,6 +753,9 @@ boost::optional< int32_t > SqlTypeCharOctetLength(
     case SQL_CHAR:
     case SQL_VARCHAR:
     case SQL_LONGVARCHAR:
+    case SQL_WCHAR:
+    case SQL_WVARCHAR:
+    case SQL_WLONGVARCHAR:
     case SQL_BINARY:
     case SQL_LONGVARBINARY:
       return SQL_NO_TOTAL;

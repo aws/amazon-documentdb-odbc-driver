@@ -24,7 +24,6 @@
 
 #include <vector>
 
-using ignite::odbc::common::GetEnv;
 using ignite::odbc::jni::java::JniErrorCode;
 using ignite::odbc::jni::java::JniErrorInfo;
 
@@ -73,7 +72,10 @@ bool ReadListOfString(SharedPointer< JniContext >& _jniContext,
     if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
       return false;
     }
-    std::string value = _jniContext.Get()->JavaStringToCppString(operation);
+    std::string value = _jniContext.Get()->JavaStringToCppString(operation, errInfo);
+    if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      return false;
+    }
     targetList.push_back(value);
   }
 

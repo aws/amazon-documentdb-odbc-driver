@@ -293,7 +293,7 @@ class Statement : public diagnostic::DiagnosableAdapter {
    * @param reslen Buffer to put resulting string length to.
    * @param numbuf Numeric value buffer.
    */
-  void GetColumnAttribute(uint16_t colIdx, uint16_t attrId, char* strbuf,
+  void GetColumnAttribute(uint16_t colIdx, uint16_t attrId, SQLWCHAR* strbuf,
                           int16_t buflen, int16_t* reslen, SqlLen* numbuf);
 
   /**
@@ -634,7 +634,7 @@ class Statement : public diagnostic::DiagnosableAdapter {
    * @return Operation result.
    */
   SqlResult::Type InternalGetColumnAttribute(uint16_t colIdx, uint16_t attrId,
-                                             char* strbuf, int16_t buflen,
+                                             SQLWCHAR* strbuf, int16_t buflen,
                                              int16_t* reslen, SqlLen* numbuf);
 
   /**

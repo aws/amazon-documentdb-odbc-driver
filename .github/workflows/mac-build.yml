@@ -120,6 +120,15 @@ jobs:
         check_name: "MacOS Big Sur 11 Build Unit Test Results Check"
         comment_title: "MacOS Big Sur 11 Build Unit Test Results"
         files: ./odbc_test_result.xml
+    - name: upload-test-file
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: odbc-test-results
+        path: |
+          ./odbc_test_result.xml
+          ./build/odbc/logs/docdb_odbc_*.log
+
     # - name: print-memory-leak-logs
     #   if: always()
     #   run: |

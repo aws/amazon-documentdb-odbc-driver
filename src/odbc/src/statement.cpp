@@ -228,16 +228,24 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
     case SQL_ATTR_ROW_ARRAY_SIZE: {
       SqlUlen val = reinterpret_cast< SqlUlen >(value);
 
-      LOG_MSG("SQL_ATTR_ROW_ARRAY_SIZE: " << val);
+      LOG_DEBUG_MSG("SQL_ATTR_ROW_ARRAY_SIZE: " << val);
 
-      if (val < 1) {
-        AddStatusRecord(SqlState::SHY092_OPTION_TYPE_OUT_OF_RANGE,
-                        "Array size value can not be less than 1");
+      if (val != 1) {
+        AddStatusRecord(
+            SqlState::SIM001_FUNCTION_NOT_SUPPORTED,
+            "Array size value cannot be set to a value other than 1");
 
         return SqlResult::AI_ERROR;
+      } else if (rowArraySize != 1) {
+        // val is 1
+        rowArraySize = 1;
+        LOG_DEBUG_MSG(
+            "else if (rowArraySize != 1) branch is executed."
+            "This branch should not be executed as we currently do not support "
+            "rowArraySize to have values other than 1.");
       }
 
-      rowArraySize = val;
+      LOG_DEBUG_MSG("rowArraySize: " << rowArraySize);
 
       break;
     }
@@ -941,14 +949,14 @@ SqlResult::Type Statement::InternalMoreResults() {
 }
 
 void Statement::GetColumnAttribute(uint16_t colIdx, uint16_t attrId,
-                                   char* strbuf, int16_t buflen,
+                                   SQLWCHAR* strbuf, int16_t buflen,
                                    int16_t* reslen, SqlLen* numbuf) {
   IGNITE_ODBC_API_CALL(InternalGetColumnAttribute(colIdx, attrId, strbuf,
                                                   buflen, reslen, numbuf));
 }
 
 SqlResult::Type Statement::InternalGetColumnAttribute(
-    uint16_t colIdx, uint16_t attrId, char* strbuf, int16_t buflen,
+    uint16_t colIdx, uint16_t attrId, SQLWCHAR* strbuf, int16_t buflen,
     int16_t* reslen, SqlLen* numbuf) {
   const meta::ColumnMetaVector* meta = GetMeta();
 
@@ -987,7 +995,8 @@ SqlResult::Type Statement::InternalGetColumnAttribute(
     if (found) {
       LOG_DEBUG_MSG("out found: " << out);
       if (strbuf)
-        outSize = utility::CopyStringToBuffer(out, strbuf, buflen);
+        // Length is given in bytes
+        outSize = utility::CopyStringToBuffer(out, strbuf, buflen, true);
       if (reslen)
         *reslen = static_cast< int16_t >(outSize);
     }

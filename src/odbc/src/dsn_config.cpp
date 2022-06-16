@@ -27,25 +27,29 @@
 using namespace ignite::odbc::config;
 
 #define BUFFER_SIZE (1024 * 1024)
-#define CONFIG_FILE "ODBC.INI"
+#define CONFIG_FILE u8"ODBC.INI"
 
 namespace ignite {
 namespace odbc {
 void ThrowLastSetupError() {
   DWORD code;
-  common::FixedSizeArray< char > msg(BUFFER_SIZE);
+  common::FixedSizeArray< SQLWCHAR > msg(BUFFER_SIZE);
 
-  SQLInstallerError(1, &code, msg.GetData(), msg.GetSize(), NULL);
+  SQLInstallerError(1, &code, msg.GetData(),
+                    msg.GetSize(), NULL);
 
   std::stringstream buf;
 
-  buf << "Message: \"" << msg.GetData() << "\", Code: " << code;
+  buf << "Message: \"" << utility::SqlStringToString(msg.GetData(), msg.GetSize()) << "\", Code: " << code;
 
   throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, buf.str().c_str());
 }
 
 void WriteDsnString(const char* dsn, const char* key, const char* value) {
-  if (!SQLWritePrivateProfileString(dsn, key, value, CONFIG_FILE))
+  if (!SQLWritePrivateProfileString(utility::ToWCHARVector(dsn).data(),
+                                    utility::ToWCHARVector(key).data(),
+                                    utility::ToWCHARVector(value).data(),
+                                    utility::ToWCHARVector(CONFIG_FILE).data()))
     ThrowLastSetupError();
 }
 
@@ -56,19 +60,26 @@ SettableValue< std::string > ReadDsnString(const char* dsn,
 
   SettableValue< std::string > val(dflt);
 
-  common::FixedSizeArray< char > buf(BUFFER_SIZE);
-
-  int ret = SQLGetPrivateProfileString(dsn, key.c_str(), unique, buf.GetData(),
-                                       buf.GetSize(), CONFIG_FILE);
+  common::FixedSizeArray< SQLWCHAR > buf(BUFFER_SIZE);
+  
+  int ret = SQLGetPrivateProfileString(
+      utility::ToWCHARVector(dsn).data(), utility::ToWCHARVector(key).data(),
+      utility::ToWCHARVector(unique).data(),
+      buf.GetData(), buf.GetSize(),
+      utility::ToWCHARVector(CONFIG_FILE).data());
 
   if (ret > BUFFER_SIZE) {
     buf.Reset(ret + 1);
 
-    ret = SQLGetPrivateProfileString(dsn, key.c_str(), unique, buf.GetData(),
-                                     buf.GetSize(), CONFIG_FILE);
+    ret = SQLGetPrivateProfileString(
+        utility::ToWCHARVector(dsn).data(),
+        utility::ToWCHARVector(key).data(),
+        utility::ToWCHARVector(unique).data(),
+        buf.GetData(), buf.GetSize(),
+        utility::ToWCHARVector(CONFIG_FILE).data());
   }
 
-  std::string res(buf.GetData());
+  std::string res = utility::SqlStringToString(buf.GetData());
 
   if (res != unique)
     val.SetValue(res);

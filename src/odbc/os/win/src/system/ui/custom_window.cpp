@@ -76,8 +76,8 @@ LRESULT CALLBACK CustomWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam,
   return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-CustomWindow::CustomWindow(Window* parent, const char* className,
-                           const char* title)
+CustomWindow::CustomWindow(Window* parent, const wchar_t* className,
+                           const wchar_t* title)
     : Window(parent, className, title) {
   WNDCLASS wcx;
 
@@ -105,11 +105,10 @@ CustomWindow::~CustomWindow() {
   UnregisterClass(className.c_str(), GetHInstance());
 }
 
-std::unique_ptr< Window > CustomWindow::CreateGroupBox(int posX, int posY,
-                                                     int sizeX, int sizeY,
-                                                     const char* title,
-                                                     int id) {
-  std::unique_ptr< Window > child(new Window(this, "Button", title));
+std::unique_ptr< Window > CustomWindow::CreateGroupBox(
+    int posX, int posY, int sizeX, int sizeY, const std::wstring& title,
+    int id) {
+  std::unique_ptr< Window > child(new Window(this, L"Button", title));
 
   child->Create(WS_CHILD | WS_VISIBLE | BS_GROUPBOX, posX, posY, sizeX, sizeY,
                 id);
@@ -118,9 +117,9 @@ std::unique_ptr< Window > CustomWindow::CreateGroupBox(int posX, int posY,
 }
 
 std::unique_ptr< Window > CustomWindow::CreateLabel(int posX, int posY, int sizeX,
-                                                  int sizeY, const char* title,
+                                                  int sizeY, const std::wstring& title,
                                                   int id) {
-  std::unique_ptr< Window > child(new Window(this, "Static", title));
+  std::unique_ptr< Window > child(new Window(this, L"Static", title));
 
   child->Create(WS_CHILD | WS_VISIBLE, posX, posY, sizeX, sizeY, id);
 
@@ -128,9 +127,9 @@ std::unique_ptr< Window > CustomWindow::CreateLabel(int posX, int posY, int size
 }
 
 std::unique_ptr< Window > CustomWindow::CreateEdit(int posX, int posY, int sizeX,
-                                                 int sizeY, const char* title,
+                                                 int sizeY, const std::wstring& title,
                                                  int id, int style) {
-  std::unique_ptr< Window > child(new Window(this, "Edit", title));
+  std::unique_ptr< Window > child(new Window(this, L"Edit", title));
 
   child->Create(
       WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | WS_TABSTOP | style,
@@ -140,9 +139,10 @@ std::unique_ptr< Window > CustomWindow::CreateEdit(int posX, int posY, int sizeX
 }
 
 std::unique_ptr< Window > CustomWindow::CreateButton(int posX, int posY,
-                                                   int sizeX, int sizeY,
-                                                   const char* title, int id) {
-  std::unique_ptr< Window > child(new Window(this, "Button", title));
+                                                     int sizeX, int sizeY,
+                                                     const std::wstring& title,
+                                                     int id) {
+  std::unique_ptr< Window > child(new Window(this, L"Button", title));
 
   child->Create(WS_CHILD | WS_VISIBLE | WS_TABSTOP, posX, posY, sizeX, sizeY,
                 id);
@@ -150,11 +150,10 @@ std::unique_ptr< Window > CustomWindow::CreateButton(int posX, int posY,
   return child;
 }
 
-std::unique_ptr< Window > CustomWindow::CreateCheckBox(int posX, int posY,
-                                                     int sizeX, int sizeY,
-                                                     const char* title, int id,
-                                                     bool state) {
-  std::unique_ptr< Window > child(new Window(this, "Button", title));
+std::unique_ptr< Window > CustomWindow::CreateCheckBox(
+    int posX, int posY, int sizeX, int sizeY, const std::wstring& title, int id,
+    bool state) {
+  std::unique_ptr< Window > child(new Window(this, L"Button", title));
 
   child->Create(WS_CHILD | WS_VISIBLE | BS_CHECKBOX | WS_TABSTOP, posX, posY,
                 sizeX, sizeY, id);
@@ -164,11 +163,10 @@ std::unique_ptr< Window > CustomWindow::CreateCheckBox(int posX, int posY,
   return child;
 }
 
-std::unique_ptr< Window > CustomWindow::CreateComboBox(int posX, int posY,
-                                                     int sizeX, int sizeY,
-                                                     const char* title,
-                                                     int id) {
-  std::unique_ptr< Window > child(new Window(this, "Combobox", title));
+std::unique_ptr< Window > CustomWindow::CreateComboBox(
+    int posX, int posY, int sizeX, int sizeY, const std::wstring& title,
+    int id) {
+  std::unique_ptr< Window > child(new Window(this, L"Combobox", title));
 
   child->Create(WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_TABSTOP, posX,
                 posY, sizeX, sizeY, id);

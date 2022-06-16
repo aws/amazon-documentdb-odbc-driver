@@ -134,9 +134,8 @@ SqlResult::Type TableMetadataQuery::FetchNextRow(
 
   if (!fetched)
     fetched = true;
-  else
+  else if (cursor != meta.end())
     ++cursor;
-
   if (cursor == meta.end())
     return SqlResult::AI_NO_DATA;
 
