@@ -33,5 +33,6 @@ echo "FileUsage=0"               >> "$ODBC_LIB_PATH/ignite-odbc-install.ini"
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   odbcinst -i -d -f "$ODBC_LIB_PATH/ignite-odbc-install.ini"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
+  mkdir -p /Library/ODBC
   cp "$ODBC_LIB_PATH/ignite-odbc-install.ini" /Library/ODBC/odbcinst.ini
 fi
