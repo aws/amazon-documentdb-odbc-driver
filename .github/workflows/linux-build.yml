@@ -29,6 +29,7 @@ env:
   JDBC_DRIVER_VERSION: "1.2.4"
   JAVA_HOME: "/usr/lib/jvm/java-17-amazon-corretto/"
   RUN_CODE_COVERAGE: ${{ true }}
+  BOOST_TEST_CATCH_SYSTEM_ERRORS: no
 
 jobs:
   build-linux64:
