@@ -133,7 +133,7 @@ jobs:
       with:
         name: odbc-test-results-code-cov
         path: |
-          ./odbc_test_result.xml
+          ./cmake-build64/odbc-test/odbc_test_result.xml
           ./build/odbc/logs/docdb_odbc_*.log
 
     - name: run-tests
