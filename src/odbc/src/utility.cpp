@@ -176,6 +176,7 @@ size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen,
   LOG_DEBUG_MSG("isLenInBytes: " << isLenInBytes);
   LOG_DEBUG_MSG("buflen: " << buflen);
   LOG_DEBUG_MSG("wCharSize: " << wCharSize);
+  LOG_DEBUG_MSG("buflen % wCharSize: << " buflen % wCharSize);
 
   // Ensure non-zero length in bytes is a multiple of wide char size.
   assert(!isLenInBytes || (buflen % wCharSize == 0));
