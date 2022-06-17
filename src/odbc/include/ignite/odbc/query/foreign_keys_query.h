@@ -30,7 +30,6 @@ namespace query {
  */
 class ForeignKeysQuery : public Query {
  public:
-
   /**
    * Constructor.
    *
