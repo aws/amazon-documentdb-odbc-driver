@@ -55,4 +55,3 @@ void BinaryType< IgniteError >::Read(BinaryReader& reader, IgniteError& dst) {
 }  // namespace binary
 }  // namespace odbc
 }  // namespace ignite
-

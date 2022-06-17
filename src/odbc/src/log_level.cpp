@@ -20,8 +20,7 @@
 
 namespace ignite {
 namespace odbc {
-LogLevel::Type LogLevel::FromString(const std::string& val,
-                                                Type dflt) {
+LogLevel::Type LogLevel::FromString(const std::string& val, Type dflt) {
   std::string lowerVal = common::ToLower(val);
 
   common::StripSurroundingWhitespaces(lowerVal);

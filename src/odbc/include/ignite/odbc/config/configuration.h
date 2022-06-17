@@ -114,7 +114,7 @@ class Configuration {
 
     /** Default value for logPath attribute. */
     static const std::string logPath;
-    
+
     /** Default value for scanMethod attribute. */
     static const ScanMethod::Type scanMethod;
 
@@ -878,8 +878,7 @@ class Configuration {
   SettableValue< LogLevel::Type > logLevel = DefaultValue::logLevel;
 
   /** The logging file path. */
-  SettableValue< std::string > logPath =
-      DefaultValue::logPath;
+  SettableValue< std::string > logPath = DefaultValue::logPath;
 
   /** Scan method. */
   SettableValue< ScanMethod::Type > scanMethod = DefaultValue::scanMethod;

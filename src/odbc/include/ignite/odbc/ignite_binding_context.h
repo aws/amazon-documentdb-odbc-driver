@@ -26,66 +26,60 @@
 #include <ignite/odbc/ignite_binding.h>
 #include <ignite/odbc/ignite_configuration.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace impl
-        {
-            class IgniteEnvironment;
-        }
-    
-        /**
-         * %Ignite binding context.
-         *
-         * Provides methods that can be used to get Ignite components which may be
-         * needed for initial module initialization.
-         */
-        class IgniteBindingContext
-        {
-            friend class impl::IgniteEnvironment;
-        public:
-            /**
-             * Get binding.
-             *
-             * @return IgniteBinding instance.
-             */
-            IgniteBinding GetBinding() const
-            {
-                return binding;
-            }
-    
-            /**
-             * Get configuration for current node.
-             *
-             * @return Configuration.
-             */
-            const IgniteConfiguration& GetConfiguration() const
-            {
-                return cfg;
-            }
-    
-        private:
-            /**
-             * Constructor.
-             *
-             * @param cfg Configuration.
-             * @param binding Binding.
-             */
-            IgniteBindingContext(const IgniteConfiguration& cfg, const IgniteBinding& binding) :
-                cfg(cfg),
-                binding(binding)
-            {
-                // No-op.
-            }
-    
-            /** Configuration */
-            const IgniteConfiguration& cfg;
-    
-            /** Binding. */
-            IgniteBinding binding;
-        };
-    }
+namespace ignite {
+namespace odbc {
+namespace impl {
+class IgniteEnvironment;
 }
 
-#endif //_IGNITE_ODBC_IGNITE_BINDING_CONTEXT
+/**
+ * %Ignite binding context.
+ *
+ * Provides methods that can be used to get Ignite components which may be
+ * needed for initial module initialization.
+ */
+class IgniteBindingContext {
+  friend class impl::IgniteEnvironment;
+
+ public:
+  /**
+   * Get binding.
+   *
+   * @return IgniteBinding instance.
+   */
+  IgniteBinding GetBinding() const {
+    return binding;
+  }
+
+  /**
+   * Get configuration for current node.
+   *
+   * @return Configuration.
+   */
+  const IgniteConfiguration& GetConfiguration() const {
+    return cfg;
+  }
+
+ private:
+  /**
+   * Constructor.
+   *
+   * @param cfg Configuration.
+   * @param binding Binding.
+   */
+  IgniteBindingContext(const IgniteConfiguration& cfg,
+                       const IgniteBinding& binding)
+      : cfg(cfg), binding(binding) {
+    // No-op.
+  }
+
+  /** Configuration */
+  const IgniteConfiguration& cfg;
+
+  /** Binding. */
+  IgniteBinding binding;
+};
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_IGNITE_BINDING_CONTEXT

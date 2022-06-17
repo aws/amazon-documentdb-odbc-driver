@@ -45,8 +45,8 @@ class DocumentDbRow {
    * @param pageData Page data.
    */
   DocumentDbRow(bsoncxx::document::view const& document,
-           std::vector< JdbcColumnMetadata >& columnMetadata,
-           std::vector< std::string >& paths);
+                std::vector< JdbcColumnMetadata >& columnMetadata,
+                std::vector< std::string >& paths);
 
   /**
    * Destructor.
@@ -72,7 +72,7 @@ class DocumentDbRow {
   app::ConversionResult::Type ReadColumnToBuffer(
       uint32_t columnIdx, app::ApplicationDataBuffer& dataBuf);
 
-  /** 
+  /**
    * Updates the row and columns with a new document.
    */
   void Update(bsoncxx::document::view const& document);

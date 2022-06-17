@@ -23,38 +23,33 @@
 #include <ignite/odbc/cache/cache_entry.h>
 #include <ignite/odbc/impl/binary/binary_writer_impl.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace impl
-        {
-            /**
-             * Class-helper to properly write values of different type.
-             */
-            template<typename K, typename V>
-            struct ContainerEntryWriteHelper
-            {
-                template<typename E>
-                static void Write(binary::BinaryWriterImpl& writer, const E& val)
-                {
-                    writer.WriteTopObject(val);
-                }
-    
-                static void Write(binary::BinaryWriterImpl& writer, const typename std::map<K, V>::value_type& val)
-                {
-                    writer.WriteTopObject(val.first);
-                    writer.WriteTopObject(val.second);
-                }
-    
-                static void Write(binary::BinaryWriterImpl& writer, const ignite::odbc::cache::CacheEntry<K, V>& val)
-                {
-                    writer.WriteTopObject(val.GetKey());
-                    writer.WriteTopObject(val.GetValue());
-                }
-            };
-        }
-    }
-}
+namespace ignite {
+namespace odbc {
+namespace impl {
+/**
+ * Class-helper to properly write values of different type.
+ */
+template < typename K, typename V >
+struct ContainerEntryWriteHelper {
+  template < typename E >
+  static void Write(binary::BinaryWriterImpl& writer, const E& val) {
+    writer.WriteTopObject(val);
+  }
 
-#endif //_IGNITE_ODBC_IMPL_HELPERS
+  static void Write(binary::BinaryWriterImpl& writer,
+                    const typename std::map< K, V >::value_type& val) {
+    writer.WriteTopObject(val.first);
+    writer.WriteTopObject(val.second);
+  }
+
+  static void Write(binary::BinaryWriterImpl& writer,
+                    const ignite::odbc::cache::CacheEntry< K, V >& val) {
+    writer.WriteTopObject(val.GetKey());
+    writer.WriteTopObject(val.GetValue());
+  }
+};
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_IMPL_HELPERS

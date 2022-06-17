@@ -5,6 +5,7 @@ AllowShortIfStatementsOnASingleLine: 'false'
 AllowShortLoopsOnASingleLine: 'false'
 BreakBeforeBinaryOperators: NonAssignment
 IndentWidth: '2'
+SortIncludes: false
 SpaceBeforeParens: ControlStatements
 SpaceInEmptyParentheses: 'false'
 SpacesInAngles: 'true'

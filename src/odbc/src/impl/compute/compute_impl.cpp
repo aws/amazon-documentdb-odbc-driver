@@ -19,31 +19,25 @@
 
 using namespace ignite::odbc::common::concurrent;
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace impl
-        {
-            namespace compute
-            {
-                ComputeImpl::ComputeImpl(SharedPointer<IgniteEnvironment> env, cluster::SP_ClusterGroupImpl clusterGroup) :
-                    InteropTarget(env, clusterGroup.Get()->GetComputeProcessor()),
-                    clusterGroup(clusterGroup)
-                {
-                    // No-op.
-                }
-    
-                bool ComputeImpl::ProjectionContainsPredicate() const
-                {
-                    return clusterGroup.IsValid() && clusterGroup.Get()->GetPredicate() != 0;
-                }
-    
-                std::vector<ignite::odbc::cluster::ClusterNode> ComputeImpl::GetNodes()
-                {
-                    return clusterGroup.Get()->GetNodes();
-                }
-            }
-        }
-    }
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace compute {
+ComputeImpl::ComputeImpl(SharedPointer< IgniteEnvironment > env,
+                         cluster::SP_ClusterGroupImpl clusterGroup)
+    : InteropTarget(env, clusterGroup.Get()->GetComputeProcessor()),
+      clusterGroup(clusterGroup) {
+  // No-op.
 }
+
+bool ComputeImpl::ProjectionContainsPredicate() const {
+  return clusterGroup.IsValid() && clusterGroup.Get()->GetPredicate() != 0;
+}
+
+std::vector< ignite::odbc::cluster::ClusterNode > ComputeImpl::GetNodes() {
+  return clusterGroup.Get()->GetNodes();
+}
+}  // namespace compute
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite

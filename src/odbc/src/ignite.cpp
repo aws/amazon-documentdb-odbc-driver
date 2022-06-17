@@ -23,59 +23,46 @@
 using namespace ignite::odbc::common::concurrent;
 using namespace ignite::odbc::impl;
 
-namespace ignite
-{
-    namespace odbc
-    {
-        Ignite::Ignite() : impl(SharedPointer<IgniteImpl>())
-        {
-            // No-op.
-        }
-    
-        Ignite::Ignite(IgniteImpl* impl) : impl(SharedPointer<IgniteImpl>(impl))
-        {
-            // No-op.
-        }
-    
-        const char* Ignite::GetName() const
-        {
-            return impl.Get()->GetName();
-        }
-    
-        const IgniteConfiguration& Ignite::GetConfiguration() const
-        {
-            return impl.Get()->GetConfiguration();
-        }
-    
-        bool Ignite::IsActive()
-        {
-            return impl.Get()->IsActive();
-        }
-    
-        void Ignite::SetActive(bool active)
-        {
-            impl.Get()->SetActive(active);
-        }
-    
-        cluster::IgniteCluster Ignite::GetCluster()
-        {
-            return cluster::IgniteCluster(impl.Get()->GetCluster());
-        }
-    
-        compute::Compute Ignite::GetCompute()
-        {
-            return compute::Compute(impl.Get()->GetCompute());
-        }
-    
-        compute::Compute Ignite::GetCompute(cluster::ClusterGroup grp)
-        {
-            return compute::Compute(impl.Get()->GetCompute(grp));
-        }
-    
-        IgniteBinding Ignite::GetBinding()
-        {
-            return impl.Get()->GetBinding();
-        }
-    }
+namespace ignite {
+namespace odbc {
+Ignite::Ignite() : impl(SharedPointer< IgniteImpl >()) {
+  // No-op.
 }
 
+Ignite::Ignite(IgniteImpl* impl) : impl(SharedPointer< IgniteImpl >(impl)) {
+  // No-op.
+}
+
+const char* Ignite::GetName() const {
+  return impl.Get()->GetName();
+}
+
+const IgniteConfiguration& Ignite::GetConfiguration() const {
+  return impl.Get()->GetConfiguration();
+}
+
+bool Ignite::IsActive() {
+  return impl.Get()->IsActive();
+}
+
+void Ignite::SetActive(bool active) {
+  impl.Get()->SetActive(active);
+}
+
+cluster::IgniteCluster Ignite::GetCluster() {
+  return cluster::IgniteCluster(impl.Get()->GetCluster());
+}
+
+compute::Compute Ignite::GetCompute() {
+  return compute::Compute(impl.Get()->GetCompute());
+}
+
+compute::Compute Ignite::GetCompute(cluster::ClusterGroup grp) {
+  return compute::Compute(impl.Get()->GetCompute(grp));
+}
+
+IgniteBinding Ignite::GetBinding() {
+  return impl.Get()->GetBinding();
+}
+}  // namespace odbc
+}  // namespace ignite

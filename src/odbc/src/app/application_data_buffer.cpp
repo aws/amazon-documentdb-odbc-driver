@@ -343,7 +343,8 @@ ConversionResult::Type ApplicationDataBuffer::PutRawDataToBuffer(
                        : ConversionResult::Type::AI_SUCCESS;
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutInt8(boost::optional< int8_t > value) {
+ConversionResult::Type ApplicationDataBuffer::PutInt8(
+    boost::optional< int8_t > value) {
   if (value)
     return PutInt8(*value);
   else
@@ -925,7 +926,8 @@ ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
   return ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutTime(const boost::optional< Time >& value) {
+ConversionResult::Type ApplicationDataBuffer::PutTime(
+    const boost::optional< Time >& value) {
   if (value)
     return PutTime(*value);
   else

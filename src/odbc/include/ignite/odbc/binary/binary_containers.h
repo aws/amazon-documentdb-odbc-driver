@@ -617,4 +617,4 @@ class BinaryMapReader {
 }  // namespace binary
 }  // namespace odbc
 }  // namespace ignite
-#endif //_IGNITE_ODBC_BINARY_BINARY_CONTAINERS
+#endif  //_IGNITE_ODBC_BINARY_BINARY_CONTAINERS
