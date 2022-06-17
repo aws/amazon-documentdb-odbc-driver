@@ -41,6 +41,7 @@ QueryFieldsRowImpl* QueryBatch::GetNextRow() {
 
   return new QueryFieldsRowImpl(mem, dataPos, columnNum);
 }
+
 }  // namespace query
 }  // namespace cache
 }  // namespace impl
