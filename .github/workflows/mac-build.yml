@@ -32,6 +32,7 @@ env:
 jobs:
   build-mac:
     runs-on: macos-11
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
     steps:
     - uses: actions/checkout@v2
     - name: Get Java distribution
