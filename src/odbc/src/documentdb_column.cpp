@@ -31,7 +31,8 @@ void DocumentDbColumn::Update(bsoncxx::document::view const& document) {
 }
 
 DocumentDbColumn::DocumentDbColumn(bsoncxx::document::view& document,
-                         JdbcColumnMetadata& columnMetadata, std::string& path)
+                                   JdbcColumnMetadata& columnMetadata,
+                                   std::string& path)
     : type_(columnMetadata.GetColumnType()),
       document_(document),
       columnMetadata_(columnMetadata),
@@ -52,7 +53,7 @@ int64_t ToValidLong(int64_t value, ConversionResult::Type& convRes, int64_t max,
 }
 
 int64_t ToValidLong(std::string const& value, ConversionResult::Type& convRes,
-               int64_t max, int64_t min) {
+                    int64_t max, int64_t min) {
   int64_t intValue = 0;
   try {
     intValue =
@@ -90,11 +91,11 @@ ConversionResult::Type DocumentDbColumn::PutInt8(
       break;
     case bsoncxx::type::k_decimal128:
       value = ToValidLong(element.get_decimal128().value.to_string(), convRes,
-                     INT8_MAX, INT8_MIN);
+                          INT8_MAX, INT8_MIN);
       break;
     case bsoncxx::type::k_utf8:
       value = ToValidLong(element.get_utf8().value.to_string(), convRes,
-                     INT8_MAX, INT8_MIN);
+                          INT8_MAX, INT8_MIN);
       break;
     case bsoncxx::type::k_bool:
       value = element.get_bool().value ? 1 : 0;
@@ -135,12 +136,12 @@ ConversionResult::Type DocumentDbColumn::PutInt16(
       }
       break;
     case bsoncxx::type::k_decimal128:
-      value = ToValidLong(element.get_decimal128().value.to_string(), convRes, INT16_MAX,
-                     INT16_MIN);
+      value = ToValidLong(element.get_decimal128().value.to_string(), convRes,
+                          INT16_MAX, INT16_MIN);
       break;
     case bsoncxx::type::k_utf8:
       value = ToValidLong(element.get_utf8().value.to_string(), convRes,
-                     INT16_MAX, INT16_MIN);
+                          INT16_MAX, INT16_MIN);
       break;
     case bsoncxx::type::k_bool:
       value = element.get_bool().value ? 1 : 0;
@@ -187,11 +188,11 @@ ConversionResult::Type DocumentDbColumn::PutInt32(
       break;
     case bsoncxx::type::k_decimal128:
       value = ToValidLong(element.get_decimal128().value.to_string(), convRes,
-                     INT32_MAX, INT32_MIN);
+                          INT32_MAX, INT32_MIN);
       break;
     case bsoncxx::type::k_utf8:
       value = ToValidLong(element.get_utf8().value.to_string(), convRes,
-                     INT32_MAX, INT32_MIN);
+                          INT32_MAX, INT32_MIN);
       break;
     case bsoncxx::type::k_bool:
       value = element.get_bool().value ? 1 : 0;
@@ -237,11 +238,11 @@ ConversionResult::Type DocumentDbColumn::PutInt64(
       break;
     case bsoncxx::type::k_decimal128:
       value = ToValidLong(element.get_decimal128().value.to_string(), convRes,
-                     INT64_MAX, INT64_MIN);
+                          INT64_MAX, INT64_MIN);
       break;
     case bsoncxx::type::k_utf8:
       value = ToValidLong(element.get_utf8().value.to_string(), convRes,
-                     INT64_MAX, INT64_MIN);
+                          INT64_MAX, INT64_MIN);
       break;
     case bsoncxx::type::k_bool:
       value = element.get_bool().value ? 1 : 0;
@@ -350,11 +351,10 @@ ConversionResult::Type DocumentDbColumn::PutDouble(
   return convRes;
 }
 
-ConversionResult::Type
-    DocumentDbColumn::PutString(
+ConversionResult::Type DocumentDbColumn::PutString(
     ApplicationDataBuffer& dataBuf,
     bsoncxx::document::element const& element) const {
-  ConversionResult::Type convRes = ConversionResult::Type::AI_SUCCESS;  
+  ConversionResult::Type convRes = ConversionResult::Type::AI_SUCCESS;
   bsoncxx::type docType = element.type();
   boost::optional< std::string > value{};
   switch (docType) {
@@ -520,7 +520,6 @@ ConversionResult::Type DocumentDbColumn::PutDate(
   }
   if (convRes == ConversionResult::Type::AI_SUCCESS) {
     dataBuf.PutDate(value);
-
   }
   return convRes;
 }
@@ -597,18 +596,16 @@ ConversionResult::Type DocumentDbColumn::PutBinaryData(
 
 ConversionResult::Type DocumentDbColumn::ReadToBuffer(
     ApplicationDataBuffer& dataBuf) const {
-
   auto element = document_[path_];
   // Invalid (or missing) element is null
   if (!element) {
     dataBuf.PutNull();
     return ConversionResult::Type::AI_SUCCESS;
   }
-  
+
   ConversionResult::Type convRes = ConversionResult::Type::AI_SUCCESS;
 
   switch (type_) {
-
     case JDBC_TYPE_BOOLEAN:
     case JDBC_TYPE_SMALLINT:
       convRes = PutInt8(dataBuf, element);
@@ -667,7 +664,7 @@ ConversionResult::Type DocumentDbColumn::ReadToBuffer(
     case JDBC_TYPE_TIME:
       convRes = PutTime(dataBuf, element);
       break;
-    
+
     default:
       return ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
   }

@@ -20,169 +20,147 @@
 
 #include <ignite/odbc/reference.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace impl
-        {
-            namespace cache
-            {
-                namespace event
-                {
-                    /* Forward declaration. */
-                    class CacheEntryEventFilterBase;
-    
-                    class CacheEntryEventFilterHolderBase
-                    {
-                    public:
-                        /**
-                         * Destructor.
-                         */
-                        virtual ~CacheEntryEventFilterHolderBase()
-                        {
-                            // No-op.
-                        }
-    
-                        /**
-                         * Write.
-                         *
-                         * @param writer Writer.
-                         */
-                        virtual void Write(binary::BinaryWriterImpl& writer) = 0;
-    
-                        /**
-                         * Get filter pointer.
-                         *
-                         * @return Filter.
-                         */
-                        virtual CacheEntryEventFilterBase* GetFilter() = 0;
-                    };
-    
-                    /**
-                     * Holder for the Cache Entry Event Filter.
-                     */
-                    template<typename F>
-                    class CacheEntryEventFilterHolder : public CacheEntryEventFilterHolderBase
-                    {
-                    public:
-                        typedef F FilterType;
-    
-                        /**
-                         * Default constructor.
-                         */
-                        CacheEntryEventFilterHolder() :
-                            filter()
-                        {
-                            // No-op.
-                        }
-    
-                        /**
-                         * Constructor.
-                         *
-                         * @param filter Filter.
-                         */
-                        CacheEntryEventFilterHolder(const Reference<FilterType>& filter) :
-                            filter(filter)
-                        {
-                            // No-op.
-                        }
-    
-                        /**
-                         * Destructor.
-                         */
-                        virtual ~CacheEntryEventFilterHolder()
-                        {
-                            // No-op.
-                        }
-    
-                        /**
-                         * Process input.
-                         *
-                         * @param writer Writer.
-                         */
-                        virtual void Write(binary::BinaryWriterImpl& writer)
-                        {
-                            if (!filter.IsNull())
-                            {
-                                writer.WriteBool(true);
-                                writer.WriteObject<FilterType>(*filter.Get());
-                            }
-                            else
-                            {
-                                writer.WriteBool(false);
-                                writer.WriteNull();
-                            }
-                        }
-    
-                        /**
-                         * Get filter pointer.
-                         *
-                         * @return Filter.
-                         */
-                        virtual CacheEntryEventFilterBase* GetFilter()
-                        {
-                            return filter.Get();
-                        }
-    
-                    private:
-                        /** Stored filter. */
-                        Reference<FilterType> filter;
-                    };
-    
-                    template<>
-                    class CacheEntryEventFilterHolder<void> : public CacheEntryEventFilterHolderBase
-                    {
-                    public:
-                        /**
-                         * Default constructor.
-                         */
-                        CacheEntryEventFilterHolder()
-                        {
-                            // No-op.
-                        }
-    
-                        /**
-                         * Constructor.
-                         */
-                        CacheEntryEventFilterHolder(const Reference<void>&)
-                        {
-                            // No-op.
-                        }
-    
-                        /**
-                         * Destructor.
-                         */
-                        virtual ~CacheEntryEventFilterHolder()
-                        {
-                            // No-op.
-                        }
-    
-                        /**
-                         * Process input.
-                         *
-                         * @param writer Writer.
-                         */
-                        virtual void Write(binary::BinaryWriterImpl& writer)
-                        {
-                            writer.WriteBool(false);
-                            writer.WriteNull();
-                        }
-    
-                        /**
-                         * Get filter pointer.
-                         *
-                         * @return Filter.
-                         */
-                        virtual CacheEntryEventFilterBase* GetFilter()
-                        {
-                            return 0;
-                        }
-                    };
-                }
-            }
-        }
-    }
-}
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace cache {
+namespace event {
+/* Forward declaration. */
+class CacheEntryEventFilterBase;
 
-#endif //_IGNITE_ODBC_IMPL_CACHE_EVENT_CACHE_ENTRY_EVENT_FILTER_HOLDER
+class CacheEntryEventFilterHolderBase {
+ public:
+  /**
+   * Destructor.
+   */
+  virtual ~CacheEntryEventFilterHolderBase() {
+    // No-op.
+  }
+
+  /**
+   * Write.
+   *
+   * @param writer Writer.
+   */
+  virtual void Write(binary::BinaryWriterImpl& writer) = 0;
+
+  /**
+   * Get filter pointer.
+   *
+   * @return Filter.
+   */
+  virtual CacheEntryEventFilterBase* GetFilter() = 0;
+};
+
+/**
+ * Holder for the Cache Entry Event Filter.
+ */
+template < typename F >
+class CacheEntryEventFilterHolder : public CacheEntryEventFilterHolderBase {
+ public:
+  typedef F FilterType;
+
+  /**
+   * Default constructor.
+   */
+  CacheEntryEventFilterHolder() : filter() {
+    // No-op.
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param filter Filter.
+   */
+  CacheEntryEventFilterHolder(const Reference< FilterType >& filter)
+      : filter(filter) {
+    // No-op.
+  }
+
+  /**
+   * Destructor.
+   */
+  virtual ~CacheEntryEventFilterHolder() {
+    // No-op.
+  }
+
+  /**
+   * Process input.
+   *
+   * @param writer Writer.
+   */
+  virtual void Write(binary::BinaryWriterImpl& writer) {
+    if (!filter.IsNull()) {
+      writer.WriteBool(true);
+      writer.WriteObject< FilterType >(*filter.Get());
+    } else {
+      writer.WriteBool(false);
+      writer.WriteNull();
+    }
+  }
+
+  /**
+   * Get filter pointer.
+   *
+   * @return Filter.
+   */
+  virtual CacheEntryEventFilterBase* GetFilter() {
+    return filter.Get();
+  }
+
+ private:
+  /** Stored filter. */
+  Reference< FilterType > filter;
+};
+
+template <>
+class CacheEntryEventFilterHolder< void >
+    : public CacheEntryEventFilterHolderBase {
+ public:
+  /**
+   * Default constructor.
+   */
+  CacheEntryEventFilterHolder() {
+    // No-op.
+  }
+
+  /**
+   * Constructor.
+   */
+  CacheEntryEventFilterHolder(const Reference< void >&) {
+    // No-op.
+  }
+
+  /**
+   * Destructor.
+   */
+  virtual ~CacheEntryEventFilterHolder() {
+    // No-op.
+  }
+
+  /**
+   * Process input.
+   *
+   * @param writer Writer.
+   */
+  virtual void Write(binary::BinaryWriterImpl& writer) {
+    writer.WriteBool(false);
+    writer.WriteNull();
+  }
+
+  /**
+   * Get filter pointer.
+   *
+   * @return Filter.
+   */
+  virtual CacheEntryEventFilterBase* GetFilter() {
+    return 0;
+  }
+};
+}  // namespace event
+}  // namespace cache
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_IMPL_CACHE_EVENT_CACHE_ENTRY_EVENT_FILTER_HOLDER

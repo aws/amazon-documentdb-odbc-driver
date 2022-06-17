@@ -20,63 +20,51 @@
 
 #include "ignite/binary/binary.h"
 
-namespace ignite
-{
-    namespace examples
-    {
-        struct Address
-        {
-            Address() : street(), zip(0)
-            {
-                // No-op.
-            }
+namespace ignite {
+namespace examples {
+struct Address {
+  Address() : street(), zip(0) {
+    // No-op.
+  }
 
-            Address(const std::string& street, int zip) :
-                street(street), zip(zip)
-            {
-                // No-op.
-            }
+  Address(const std::string& street, int zip) : street(street), zip(zip) {
+    // No-op.
+  }
 
-            std::string ToString() 
-            {
-                std::ostringstream oss;
+  std::string ToString() {
+    std::ostringstream oss;
 
-                oss << "Address [street=" << street << ", zip=" << zip << "]";
+    oss << "Address [street=" << street << ", zip=" << zip << "]";
 
-                return oss.str();
-            }
+    return oss.str();
+  }
 
-            std::string street;
-            int zip;
-        };
-    }
-}
+  std::string street;
+  int zip;
+};
+}  // namespace examples
+}  // namespace ignite
 
-namespace ignite
-{
-    namespace binary
-    {
-        template<>
-        struct BinaryType<examples::Address> : BinaryTypeDefaultAll<examples::Address>
-        {
-            static void GetTypeName(std::string& dst)
-            {
-                dst = "Address";
-            }
+namespace ignite {
+namespace binary {
+template <>
+struct BinaryType< examples::Address >
+    : BinaryTypeDefaultAll< examples::Address > {
+  static void GetTypeName(std::string& dst) {
+    dst = "Address";
+  }
 
-            static void Write(BinaryWriter& writer, const examples::Address& obj)
-            {
-                writer.WriteString("street", obj.street);
-                writer.WriteInt32("zip", obj.zip);
-            }
+  static void Write(BinaryWriter& writer, const examples::Address& obj) {
+    writer.WriteString("street", obj.street);
+    writer.WriteInt32("zip", obj.zip);
+  }
 
-            static void Read(BinaryReader& reader, examples::Address& dst)
-            {
-                dst.street = reader.ReadString("street");
-                dst.zip = reader.ReadInt32("zip");
-            }
-        };
-    }
-}
+  static void Read(BinaryReader& reader, examples::Address& dst) {
+    dst.street = reader.ReadString("street");
+    dst.zip = reader.ReadInt32("zip");
+  }
+};
+}  // namespace binary
+}  // namespace ignite
 
 #endif

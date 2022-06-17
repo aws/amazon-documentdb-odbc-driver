@@ -746,20 +746,20 @@ void BinaryWriterImpl::WriteFieldId(const char* fieldName,
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, int8_t >(
-    const int8_t& obj) {
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+                                        int8_t >(const int8_t& obj) {
   WriteTopObject0< int8_t >(obj, BinaryUtils::WriteInt8, IGNITE_TYPE_BYTE);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, bool >(
-    const bool& obj) {
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+                                        bool >(const bool& obj) {
   WriteTopObject0< bool >(obj, BinaryUtils::WriteBool, IGNITE_TYPE_BOOL);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, int16_t >(
-    const int16_t& obj) {
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+                                        int16_t >(const int16_t& obj) {
   WriteTopObject0< int16_t >(obj, BinaryUtils::WriteInt16, IGNITE_TYPE_SHORT);
 }
 
@@ -770,38 +770,38 @@ void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, int32_t >(
-    const int32_t& obj) {
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+                                        int32_t >(const int32_t& obj) {
   WriteTopObject0< int32_t >(obj, BinaryUtils::WriteInt32, IGNITE_TYPE_INT);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, int64_t >(
-    const int64_t& obj) {
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+                                        int64_t >(const int64_t& obj) {
   WriteTopObject0< int64_t >(obj, BinaryUtils::WriteInt64, IGNITE_TYPE_LONG);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, float >(
-    const float& obj) {
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+                                        float >(const float& obj) {
   WriteTopObject0< float >(obj, BinaryUtils::WriteFloat, IGNITE_TYPE_FLOAT);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, double >(
-    const double& obj) {
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+                                        double >(const double& obj) {
   WriteTopObject0< double >(obj, BinaryUtils::WriteDouble, IGNITE_TYPE_DOUBLE);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, Guid >(
-    const Guid& obj) {
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+                                        Guid >(const Guid& obj) {
   WriteTopObject0< Guid >(obj, BinaryUtils::WriteGuid, IGNITE_TYPE_UUID);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, Date >(
-    const Date& obj) {
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+                                        Date >(const Date& obj) {
   WriteTopObject0< Date >(obj, BinaryUtils::WriteDate, IGNITE_TYPE_DATE);
 }
 
@@ -813,8 +813,8 @@ void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter, Time >(
-    const Time& obj) {
+void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+                                        Time >(const Time& obj) {
   WriteTopObject0< Time >(obj, BinaryUtils::WriteTime, IGNITE_TYPE_TIME);
 }
 

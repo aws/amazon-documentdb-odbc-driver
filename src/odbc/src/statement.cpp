@@ -390,7 +390,7 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
     case SQL_ATTR_ROW_ARRAY_SIZE: {
       SQLINTEGER* val = reinterpret_cast< SQLINTEGER* >(buf);
 
-      *val = static_cast< SQLINTEGER >(rowArraySize); 
+      *val = static_cast< SQLINTEGER >(rowArraySize);
 
       if (valueLen)
         *valueLen = SQL_IS_INTEGER;
@@ -657,18 +657,18 @@ SqlResult::Type Statement::InternalExecuteSqlQuery() {
   return currentQuery->Execute();
 }
 
-void Statement::ExecuteGetColumnsMetaQuery(const boost::optional< std::string >& catalog,
-                                           const boost::optional< std::string >& schema,
-                                           const std::string& table,
-                                           const std::string& column) {
+void Statement::ExecuteGetColumnsMetaQuery(
+    const boost::optional< std::string >& catalog,
+    const boost::optional< std::string >& schema, const std::string& table,
+    const std::string& column) {
   IGNITE_ODBC_API_CALL(
       InternalExecuteGetColumnsMetaQuery(catalog, schema, table, column));
 }
 
 SqlResult::Type Statement::InternalExecuteGetColumnsMetaQuery(
     const boost::optional< std::string >& catalog,
-    const boost::optional< std::string >& schema,
-    const std::string& table, const std::string& column) {
+    const boost::optional< std::string >& schema, const std::string& table,
+    const std::string& column) {
   if (currentQuery.get())
     currentQuery->Close();
 
@@ -683,10 +683,10 @@ SqlResult::Type Statement::InternalExecuteGetColumnsMetaQuery(
   return currentQuery->Execute();
 }
 
-void Statement::ExecuteGetTablesMetaQuery(const boost::optional< std::string >& catalog,
-                                          const boost::optional< std::string >& schema,
-                                          const std::string& table,
-                                          const boost::optional< std::string >& tableType) {
+void Statement::ExecuteGetTablesMetaQuery(
+    const boost::optional< std::string >& catalog,
+    const boost::optional< std::string >& schema, const std::string& table,
+    const boost::optional< std::string >& tableType) {
   IGNITE_ODBC_API_CALL(
       InternalExecuteGetTablesMetaQuery(catalog, schema, table, tableType));
 }
@@ -704,18 +704,19 @@ SqlResult::Type Statement::InternalExecuteGetTablesMetaQuery(
   return currentQuery->Execute();
 }
 
-void Statement::ExecuteGetForeignKeysQuery(const std::string& primaryCatalog,
-                                           const std::string& primarySchema,
-                                           const std::string& primaryTable,
-                                           const boost::optional< std::string >& foreignCatalog,
-                                           const boost::optional< std::string >& foreignSchema,
-                                           const std::string& foreignTable) {
+void Statement::ExecuteGetForeignKeysQuery(
+    const std::string& primaryCatalog, const std::string& primarySchema,
+    const std::string& primaryTable,
+    const boost::optional< std::string >& foreignCatalog,
+    const boost::optional< std::string >& foreignSchema,
+    const std::string& foreignTable) {
   IGNITE_ODBC_API_CALL(InternalExecuteGetForeignKeysQuery(
       primaryCatalog, primarySchema, primaryTable, foreignCatalog,
       foreignSchema, foreignTable));
 }
 
-SqlResult::Type Statement::InternalExecuteGetForeignKeysQuery(const std::string& primaryCatalog, const std::string& primarySchema,
+SqlResult::Type Statement::InternalExecuteGetForeignKeysQuery(
+    const std::string& primaryCatalog, const std::string& primarySchema,
     const std::string& primaryTable,
     const boost::optional< std::string >& foreignCatalog,
     const boost::optional< std::string >& foreignSchema,
@@ -729,9 +730,10 @@ SqlResult::Type Statement::InternalExecuteGetForeignKeysQuery(const std::string&
   return currentQuery->Execute();
 }
 
-void Statement::ExecuteGetPrimaryKeysQuery(const boost::optional< std::string >& catalog,
-                                           const boost::optional< std::string >& schema,
-                                           const boost::optional< std::string >& table) {
+void Statement::ExecuteGetPrimaryKeysQuery(
+    const boost::optional< std::string >& catalog,
+    const boost::optional< std::string >& schema,
+    const boost::optional< std::string >& table) {
   IGNITE_ODBC_API_CALL(
       InternalExecuteGetPrimaryKeysQuery(catalog, schema, table));
 }
@@ -1169,17 +1171,16 @@ SqlResult::Type Statement::InternalDescribeParam(int16_t paramNum,
 
   boost::optional< int16_t > sqlType = type_traits::BinaryToSqlType(type);
   if (dataType && sqlType)
-      *dataType = *sqlType;
+    *dataType = *sqlType;
 
-  boost::optional< int32_t > colSize =
-            type_traits::BinaryTypeColumnSize(type);
+  boost::optional< int32_t > colSize = type_traits::BinaryTypeColumnSize(type);
   if (paramSize && colSize)
-      *paramSize = *colSize;
+    *paramSize = *colSize;
 
   boost::optional< int16_t > decDigits =
-            type_traits::BinaryTypeDecimalDigits(type);
+      type_traits::BinaryTypeDecimalDigits(type);
   if (decimalDigits && decDigits)
-      *decimalDigits = *decDigits;
+    *decimalDigits = *decDigits;
 
   if (nullable)
     *nullable = type_traits::BinaryTypeNullability(type);

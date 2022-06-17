@@ -48,42 +48,43 @@ class DatabaseMetaData {
    * critera in catalog (not supported), schemaPattern, tablePattern
    * and types of tables.
    */
-  SharedPointer< ResultSet > GetTables(const boost::optional< std::string >& catalog,
-                                       const boost::optional< std::string >& schemaPattern,
-                                       const std::string& tableNamePattern,
-                                       const boost::optional< std::vector< std::string > >& types,
-                                       JniErrorInfo& errInfo);
+  SharedPointer< ResultSet > GetTables(
+      const boost::optional< std::string >& catalog,
+      const boost::optional< std::string >& schemaPattern,
+      const std::string& tableNamePattern,
+      const boost::optional< std::vector< std::string > >& types,
+      JniErrorInfo& errInfo);
 
   /**
    * Query the columns in the database according to the given
    * search critera in catalog (not supported), schemaPattern (nullable),
    * tablePattern and columnPattern.
    */
-  SharedPointer< ResultSet > GetColumns(const boost::optional< std::string >& catalog,
-                                        const boost::optional< std::string >& schemaPattern,
-                                        const std::string& tableNamePattern,
-                                        const std::string& columnNamePattern,
-                                        JniErrorInfo& errInfo);
+  SharedPointer< ResultSet > GetColumns(
+      const boost::optional< std::string >& catalog,
+      const boost::optional< std::string >& schemaPattern,
+      const std::string& tableNamePattern, const std::string& columnNamePattern,
+      JniErrorInfo& errInfo);
 
   /**
    * Query the primary keys in the database according to the given
    * search critera in catalog (not supported), schema, and
    * table.
    */
-  SharedPointer< ResultSet > GetPrimaryKeys(const boost::optional< std::string >& catalog,
-                                            const boost::optional< std::string >& schema,
-                                            const boost::optional< std::string >& table,
-                                            JniErrorInfo& errInfo);
+  SharedPointer< ResultSet > GetPrimaryKeys(
+      const boost::optional< std::string >& catalog,
+      const boost::optional< std::string >& schema,
+      const boost::optional< std::string >& table, JniErrorInfo& errInfo);
 
   /**
    * Query the foreign keys in the database according to the given
    * search critera in catalog (not supported), schema, and
    * table.
    */
-  SharedPointer< ResultSet > GetImportedKeys(const boost::optional< std::string >& catalog,
-                                             const boost::optional< std::string >& schema,
-                                             const std::string& table,
-                                             JniErrorInfo& errInfo);
+  SharedPointer< ResultSet > GetImportedKeys(
+      const boost::optional< std::string >& catalog,
+      const boost::optional< std::string >& schema, const std::string& table,
+      JniErrorInfo& errInfo);
 
  private:
   /**

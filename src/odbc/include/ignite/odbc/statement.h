@@ -183,10 +183,10 @@ class Statement : public diagnostic::DiagnosableAdapter {
    * @param table Table search pattern.
    * @param tableType Table type search pattern, nullable.
    */
-  void ExecuteGetTablesMetaQuery(const boost::optional< std::string >& catalog,
-                                 const boost::optional< std::string >& schema,
-                                 const std::string& table,
-                                 const boost::optional< std::string >& tableType);
+  void ExecuteGetTablesMetaQuery(
+      const boost::optional< std::string >& catalog,
+      const boost::optional< std::string >& schema, const std::string& table,
+      const boost::optional< std::string >& tableType);
 
   /**
    * Get foreign keys.
@@ -198,12 +198,12 @@ class Statement : public diagnostic::DiagnosableAdapter {
    * @param foreignSchema Foreign key schema name.
    * @param foreignTable Foreign key table name.
    */
-  void ExecuteGetForeignKeysQuery(const std::string& primaryCatalog,
-                                  const std::string& primarySchema,
-                                  const std::string& primaryTable,
-                                  const boost::optional< std::string >& foreignCatalog,
-                                  const boost::optional< std::string >& foreignSchema,
-                                  const std::string& foreignTable);
+  void ExecuteGetForeignKeysQuery(
+      const std::string& primaryCatalog, const std::string& primarySchema,
+      const std::string& primaryTable,
+      const boost::optional< std::string >& foreignCatalog,
+      const boost::optional< std::string >& foreignSchema,
+      const std::string& foreignTable);
 
   /**
    * Get primary keys.
@@ -539,10 +539,10 @@ class Statement : public diagnostic::DiagnosableAdapter {
    * @param column Column search pattern.
    * @return Operation result.
    */
-  SqlResult::Type InternalExecuteGetColumnsMetaQuery(const boost::optional< std::string >& catalog,
-                                                     const boost::optional< std::string >& schema,
-                                                     const std::string& table,
-                                                     const std::string& column);
+  SqlResult::Type InternalExecuteGetColumnsMetaQuery(
+      const boost::optional< std::string >& catalog,
+      const boost::optional< std::string >& schema, const std::string& table,
+      const std::string& column);
 
   /**
    * Get tables metadata.
@@ -554,13 +554,13 @@ class Statement : public diagnostic::DiagnosableAdapter {
    * @return Operation result.
    */
   SqlResult::Type InternalExecuteGetTablesMetaQuery(
-    const boost::optional< std::string >& catalog,
-    const boost::optional< std::string >& schema, const std::string& table,
-    const boost::optional< std::string >& tableType);
+      const boost::optional< std::string >& catalog,
+      const boost::optional< std::string >& schema, const std::string& table,
+      const boost::optional< std::string >& tableType);
 
   /**
    * Get foreign keys.
-   * Params primaryCatalog, primarySchema, and primaryTable are ignored. 
+   * Params primaryCatalog, primarySchema, and primaryTable are ignored.
    *
    * @param primaryCatalog Primary key catalog name.
    * @param primarySchema Primary key schema name.
@@ -585,9 +585,10 @@ class Statement : public diagnostic::DiagnosableAdapter {
    * @param table Table name.
    * @return Operation result.
    */
-  SqlResult::Type InternalExecuteGetPrimaryKeysQuery(const boost::optional< std::string >& catalog,
-                                                     const boost::optional< std::string >& schema,
-                                                     const boost::optional< std::string >& table);
+  SqlResult::Type InternalExecuteGetPrimaryKeysQuery(
+      const boost::optional< std::string >& catalog,
+      const boost::optional< std::string >& schema,
+      const boost::optional< std::string >& table);
 
   /**
    * Get special columns.

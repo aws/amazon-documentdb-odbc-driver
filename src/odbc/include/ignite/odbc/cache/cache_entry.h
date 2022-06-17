@@ -26,143 +26,118 @@
 #include <utility>
 #include <ignite/odbc/common/common.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace cache
-        {
-            /**
-             * %Cache entry class template.
-             *
-             * Both key and value types should be default-constructable,
-             * copy-constructable and assignable.
-             */
-            template<typename K, typename V>
-            class CacheEntry
-            {
-            public:
-                /**
-                 * Default constructor.
-                 *
-                 * Creates instance with both key and value default-constructed.
-                 */
-                CacheEntry() :
-                    key(),
-                    val(),
-                    hasValue(false)
-                {
-                    // No-op.
-                }
-    
-                /**
-                 * Constructor.
-                 *
-                 * @param key Key.
-                 * @param val Value.
-                 */
-                CacheEntry(const K& key, const V& val) :
-                    key(key),
-                    val(val),
-                    hasValue(true)
-                {
-                    // No-op.
-                }
-    
-                /**
-                 * Copy constructor.
-                 *
-                 * @param other Other instance.
-                 */
-                CacheEntry(const CacheEntry& other) :
-                    key(other.key),
-                    val(other.val),
-                    hasValue(other.hasValue)
-                {
-                    // No-op.
-                }
-    
-                /**
-                 * Constructor.
-                 *
-                 * @param p Pair.
-                 */
-                CacheEntry(const std::pair<K, V>& p) :
-                    key(p.first),
-                    val(p.second),
-                    hasValue(true)
-                {
-                    // No-op.
-                }
-    
-    
-                /**
-                 * Destructor.
-                 */
-                virtual ~CacheEntry()
-                {
-                    // No-op.
-                }
-    
-                /**
-                 * Assignment operator.
-                 *
-                 * @param other Other instance.
-                 */
-                CacheEntry& operator=(const CacheEntry& other) 
-                {
-                    if (this != &other)
-                    {
-                        key = other.key;
-                        val = other.val;
-                        hasValue = other.hasValue;
-                    }
-    
-                    return *this;
-                }
-    
-                /**
-                 * Get key.
-                 *
-                 * @return Key.
-                 */
-                const K& GetKey() const
-                {
-                    return key;
-                }
-    
-                /**
-                 * Get value.
-                 *
-                 * @return Value.
-                 */
-                const V& GetValue() const
-                {
-                    return val;
-                }
-    
-                /**
-                 * Check if the value exists.
-                 *
-                 * @return True, if the value exists.
-                 */
-                bool HasValue() const
-                {
-                    return hasValue;
-                }
-    
-            protected:
-                /** Key. */
-                K key;
-    
-                /** Value. */
-                V val;
-    
-                /** Indicates whether value exists */
-                bool hasValue;
-            };
-        }
-    }
-}
+namespace ignite {
+namespace odbc {
+namespace cache {
+/**
+ * %Cache entry class template.
+ *
+ * Both key and value types should be default-constructable,
+ * copy-constructable and assignable.
+ */
+template < typename K, typename V >
+class CacheEntry {
+ public:
+  /**
+   * Default constructor.
+   *
+   * Creates instance with both key and value default-constructed.
+   */
+  CacheEntry() : key(), val(), hasValue(false) {
+    // No-op.
+  }
 
-#endif //_IGNITE_ODBC_CACHE_CACHE_ENTRY
+  /**
+   * Constructor.
+   *
+   * @param key Key.
+   * @param val Value.
+   */
+  CacheEntry(const K& key, const V& val) : key(key), val(val), hasValue(true) {
+    // No-op.
+  }
+
+  /**
+   * Copy constructor.
+   *
+   * @param other Other instance.
+   */
+  CacheEntry(const CacheEntry& other)
+      : key(other.key), val(other.val), hasValue(other.hasValue) {
+    // No-op.
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param p Pair.
+   */
+  CacheEntry(const std::pair< K, V >& p)
+      : key(p.first), val(p.second), hasValue(true) {
+    // No-op.
+  }
+
+  /**
+   * Destructor.
+   */
+  virtual ~CacheEntry() {
+    // No-op.
+  }
+
+  /**
+   * Assignment operator.
+   *
+   * @param other Other instance.
+   */
+  CacheEntry& operator=(const CacheEntry& other) {
+    if (this != &other) {
+      key = other.key;
+      val = other.val;
+      hasValue = other.hasValue;
+    }
+
+    return *this;
+  }
+
+  /**
+   * Get key.
+   *
+   * @return Key.
+   */
+  const K& GetKey() const {
+    return key;
+  }
+
+  /**
+   * Get value.
+   *
+   * @return Value.
+   */
+  const V& GetValue() const {
+    return val;
+  }
+
+  /**
+   * Check if the value exists.
+   *
+   * @return True, if the value exists.
+   */
+  bool HasValue() const {
+    return hasValue;
+  }
+
+ protected:
+  /** Key. */
+  K key;
+
+  /** Value. */
+  V val;
+
+  /** Indicates whether value exists */
+  bool hasValue;
+};
+}  // namespace cache
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_CACHE_CACHE_ENTRY

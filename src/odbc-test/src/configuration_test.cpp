@@ -277,8 +277,7 @@ void CheckConnectionConfig(const Configuration& cfg) {
       << "&sshPrivateKeyPassphrase=" << testSshPrivateKeyPassphrase
       << "&sshStrictHostKeyChecking="
       << BoolToStr(testSshStrictHostKeyCheckingFlag)
-      << "&sshUser=" << testSshUser
-      << "&tls=" << BoolToStr(testTlsFlag)
+      << "&sshUser=" << testSshUser << "&tls=" << BoolToStr(testTlsFlag)
       << "&tlsAllowInvalidHostnames="
       << BoolToStr(testTlsAllowInvalidHostnamesFlag)
       << "&tlsCaFile=" << EncodeURIComponent(testTlsCaFile);
@@ -292,8 +291,9 @@ void CheckConnectionConfig(const Configuration& cfg) {
 void CheckDsnConfig(const Configuration& cfg) {
   // since setting logger path/level will change the logger settings,
   // we will not change the logger path/level in configuration_test,
-  // which means it is possible for the logger path/level to be equivalent to 
-  // the default values. Therefore, there will be no boost check for logger path/level.
+  // which means it is possible for the logger path/level to be equivalent to
+  // the default values. Therefore, there will be no boost check for logger
+  // path/level.
   BOOST_CHECK_EQUAL(cfg.GetDriver(), testDriverName);
   BOOST_CHECK_EQUAL(cfg.GetDsn(), testDsn);
   BOOST_CHECK_EQUAL(cfg.GetDatabase(), Configuration::DefaultValue::database);

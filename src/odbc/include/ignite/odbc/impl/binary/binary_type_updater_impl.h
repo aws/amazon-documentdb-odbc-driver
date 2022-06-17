@@ -21,48 +21,45 @@
 #include "ignite/odbc/impl/ignite_environment.h"
 #include "ignite/odbc/impl/binary/binary_type_updater.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace impl
-        {
-            namespace binary
-            {
-                /**
-                 * Type updater implementation.
-                 */
-                class IGNITE_IMPORT_EXPORT BinaryTypeUpdaterImpl : public BinaryTypeUpdater
-                {
-                public:
-                    /**
-                     * Constructor.
-                     *
-                     * @param env Environment.
-                     * @param javaRef Reference to Java object which is able to process type request.
-                     */
-                    BinaryTypeUpdaterImpl(IgniteEnvironment& env, jobject javaRef);
-    
-                    /**
-                     * Destructor.
-                     */
-                    ~BinaryTypeUpdaterImpl();
-    
-                    virtual bool Update(const Snap& snap, IgniteError& err);
-    
-                    virtual SPSnap GetMeta(int32_t typeId, IgniteError& err);
-                private:
-                    /** Environment. */
-                    IgniteEnvironment& env;
-    
-                    /** Handle to Java object. */
-                    jobject javaRef;
-    
-                    IGNITE_NO_COPY_ASSIGNMENT(BinaryTypeUpdaterImpl);
-                };
-            }
-    }
-    }
-}
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace binary {
+/**
+ * Type updater implementation.
+ */
+class IGNITE_IMPORT_EXPORT BinaryTypeUpdaterImpl : public BinaryTypeUpdater {
+ public:
+  /**
+   * Constructor.
+   *
+   * @param env Environment.
+   * @param javaRef Reference to Java object which is able to process type
+   * request.
+   */
+  BinaryTypeUpdaterImpl(IgniteEnvironment& env, jobject javaRef);
 
-#endif //_IGNITE_ODBC_IMPL_BINARY_BINARY_TYPE_UPDATER_IMPL
+  /**
+   * Destructor.
+   */
+  ~BinaryTypeUpdaterImpl();
+
+  virtual bool Update(const Snap& snap, IgniteError& err);
+
+  virtual SPSnap GetMeta(int32_t typeId, IgniteError& err);
+
+ private:
+  /** Environment. */
+  IgniteEnvironment& env;
+
+  /** Handle to Java object. */
+  jobject javaRef;
+
+  IGNITE_NO_COPY_ASSIGNMENT(BinaryTypeUpdaterImpl);
+};
+}  // namespace binary
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_IMPL_BINARY_BINARY_TYPE_UPDATER_IMPL

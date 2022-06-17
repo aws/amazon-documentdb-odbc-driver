@@ -27,48 +27,41 @@
 
 #include <ignite/odbc/cache/event/cache_entry_event.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace cache
-        {
-            namespace event
-            {
-                /**
-                 * Cache entry event listener.
-                 */
-                template<typename K, typename V>
-                class CacheEntryEventListener
-                {
-                public:
-                    /**
-                     * Default constructor.
-                     */
-                    CacheEntryEventListener()
-                    {
-                        // No-op.
-                    }
-    
-                    /**
-                     * Destructor.
-                     */
-                    virtual ~CacheEntryEventListener()
-                    {
-                        // No-op.
-                    }
-    
-                    /**
-                     * Event callback.
-                     *
-                     * @param evts Events.
-                     * @param num Events number.
-                     */
-                    virtual void OnEvent(const CacheEntryEvent<K, V>* evts, uint32_t num) = 0;
-                };
-            }
-        }
-    }
-}
+namespace ignite {
+namespace odbc {
+namespace cache {
+namespace event {
+/**
+ * Cache entry event listener.
+ */
+template < typename K, typename V >
+class CacheEntryEventListener {
+ public:
+  /**
+   * Default constructor.
+   */
+  CacheEntryEventListener() {
+    // No-op.
+  }
 
-#endif //_IGNITE_ODBC_CACHE_EVENT_CACHE_ENTRY_EVENT_LISTENER
+  /**
+   * Destructor.
+   */
+  virtual ~CacheEntryEventListener() {
+    // No-op.
+  }
+
+  /**
+   * Event callback.
+   *
+   * @param evts Events.
+   * @param num Events number.
+   */
+  virtual void OnEvent(const CacheEntryEvent< K, V >* evts, uint32_t num) = 0;
+};
+}  // namespace event
+}  // namespace cache
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_CACHE_EVENT_CACHE_ENTRY_EVENT_LISTENER

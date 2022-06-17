@@ -136,7 +136,8 @@ class Connection : public diagnostic::DiagnosableAdapter {
    *
    * @return SharedPointer to DocumentDbDatabaseMetadata.
    */
-  SharedPointer< DocumentDbDatabaseMetadata > GetDatabaseMetadata(IgniteError& err);
+  SharedPointer< DocumentDbDatabaseMetadata > GetDatabaseMetadata(
+      IgniteError& err);
 
   /**
    * Gets the DocumentDB connection properties.
@@ -251,7 +252,7 @@ class Connection : public diagnostic::DiagnosableAdapter {
    */
   void SetAttribute(int attr, void* value, SQLINTEGER valueLen);
 
-  inline std::shared_ptr<mongocxx::client>& GetMongoClient() {
+  inline std::shared_ptr< mongocxx::client >& GetMongoClient() {
     return mongoClient_;
   }
 

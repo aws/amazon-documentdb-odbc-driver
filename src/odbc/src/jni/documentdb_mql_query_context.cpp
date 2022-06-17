@@ -15,10 +15,8 @@
  * limitations under the License.
  */
 
- namespace ignite {
- namespace odbc {
- namespace jni {
-
- }  // namespace jni
- }  // namespace odbc
- }  // namespace ignite
+namespace ignite {
+namespace odbc {
+namespace jni {}  // namespace jni
+}  // namespace odbc
+}  // namespace ignite

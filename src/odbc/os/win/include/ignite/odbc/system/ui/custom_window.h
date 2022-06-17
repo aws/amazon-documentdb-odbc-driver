@@ -88,7 +88,8 @@ class CustomWindow : public Window {
    * @return Auto pointer containing new window.
    */
   std::unique_ptr< Window > CreateGroupBox(int posX, int posY, int sizeX,
-                                         int sizeY, const std::wstring& title, int id);
+                                           int sizeY, const std::wstring& title,
+                                           int id);
 
   /**
    * Create child label window.
@@ -101,8 +102,9 @@ class CustomWindow : public Window {
    * @param id ID to be assigned to the created window.
    * @return Auto pointer containing new window.
    */
-  std::unique_ptr< Window > CreateLabel(int posX, int posY, int sizeX, int sizeY,
-                                      const std::wstring& title, int id);
+  std::unique_ptr< Window > CreateLabel(int posX, int posY, int sizeX,
+                                        int sizeY, const std::wstring& title,
+                                        int id);
 
   /**
    * Create child Edit window.
@@ -116,7 +118,8 @@ class CustomWindow : public Window {
    * @return Auto pointer containing new window.
    */
   std::unique_ptr< Window > CreateEdit(int posX, int posY, int sizeX, int sizeY,
-                                     const std::wstring& title, int id, int style = 0);
+                                       const std::wstring& title, int id,
+                                       int style = 0);
 
   /**
    * Create child button window.
@@ -129,7 +132,8 @@ class CustomWindow : public Window {
    * @param id ID to be assigned to the created window.
    * @return Auto pointer containing new window.
    */
-  std::unique_ptr< Window > CreateButton(int posX, int posY, int sizeX, int sizeY, const std::wstring& title,
+  std::unique_ptr< Window > CreateButton(int posX, int posY, int sizeX,
+                                         int sizeY, const std::wstring& title,
                                          int id);
 
   /**
