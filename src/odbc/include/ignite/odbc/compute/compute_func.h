@@ -23,83 +23,76 @@
 #ifndef _IGNITE_ODBC_COMPUTE_COMPUTE_FUNC
 #define _IGNITE_ODBC_COMPUTE_COMPUTE_FUNC
 
-namespace ignite
-{
-    class Ignite;
-    class IgniteBinding;
+namespace ignite {
+class Ignite;
+class IgniteBinding;
 
-    namespace compute
-    {
-        /**
-         * Interface for a simple compute function that can be serialized and
-         * called on the remote nodes. ignite::odbc::binary::BinaryType class template
-         * should be specialized for any class, inheriting from this class.
-         *
-         * @tparam R Call return type. BinaryType should be specialized for the
-         *  type if it is not primitive.
-         */
-        template<typename R>
-        class ComputeFunc
-        {
-            template<typename TF, typename TR>
-            friend class ignite::odbc::impl::compute::ComputeJobHolderImpl;
-            friend class ignite::odbc::IgniteBinding;
+namespace compute {
+/**
+ * Interface for a simple compute function that can be serialized and
+ * called on the remote nodes. ignite::odbc::binary::BinaryType class template
+ * should be specialized for any class, inheriting from this class.
+ *
+ * @tparam R Call return type. BinaryType should be specialized for the
+ *  type if it is not primitive.
+ */
+template < typename R >
+class ComputeFunc {
+  template < typename TF, typename TR >
+  friend class ignite::odbc::impl::compute::ComputeJobHolderImpl;
+  friend class ignite::odbc::IgniteBinding;
 
-            typedef R ReturnType;
-        public:
-            /**
-             * Constructor.
-             */
-            ComputeFunc() :
-                ignite(0)
-            {
-                // No-op.
-            }
+  typedef R ReturnType;
 
-            /**
-             * Destructor.
-             */
-            virtual ~ComputeFunc()
-            {
-                // No-op.
-            }
+ public:
+  /**
+   * Constructor.
+   */
+  ComputeFunc() : ignite(0) {
+    // No-op.
+  }
 
-            /**
-             * Called upon execution by compute.
-             *
-             * @return Computation result.
-             */
-            virtual R Call() = 0;
+  /**
+   * Destructor.
+   */
+  virtual ~ComputeFunc() {
+    // No-op.
+  }
 
-        protected:
-            /*
-             * Get ignite node pointer.
-             * Return pointer to the node on which this function was called.
-             *
-             * @return Ignite node pointer.
-             */
-            Ignite& GetIgnite()
-            {
-                assert(ignite != 0);
+  /**
+   * Called upon execution by compute.
+   *
+   * @return Computation result.
+   */
+  virtual R Call() = 0;
 
-                return *ignite;
-            }
+ protected:
+  /*
+   * Get ignite node pointer.
+   * Return pointer to the node on which this function was called.
+   *
+   * @return Ignite node pointer.
+   */
+  Ignite& GetIgnite() {
+    assert(ignite != 0);
 
-        private:
-            /*
-             * Set ignite node pointer.
-             *
-             * @param ignite Ignite node pointer.
-             */
-            void SetIgnite(Ignite* ignite)
-            {
-                this->ignite = ignite;
-            }
+    return *ignite;
+  }
 
-            /** Ignite node pointer. */
-            Ignite* ignite;
-        };
-    }
-}
+ private:
+  /*
+   * Set ignite node pointer.
+   *
+   * @param ignite Ignite node pointer.
+   */
+  void SetIgnite(Ignite* ignite) {
+    this->ignite = ignite;
+  }
 
-#endif //_IGNITE_ODBC_COMPUTE_COMPUTE_FUNC
+  /** Ignite node pointer. */
+  Ignite* ignite;
+};
+}  // namespace compute
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_COMPUTE_COMPUTE_FUNC

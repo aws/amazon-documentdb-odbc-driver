@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#if defined(__unix__) || defined(__unix) || \
-    (defined(__APPLE__) && defined(__MACH__))
-# define PREDEF_PLATFORM_UNIX_OR_APPLE 1
+#if defined(__unix__) || defined(__unix) \
+    || (defined(__APPLE__) && defined(__MACH__))
+#define PREDEF_PLATFORM_UNIX_OR_APPLE 1
 #endif
 
 #ifdef PREDEF_PLATFORM_UNIX_OR_APPLE
@@ -105,8 +105,7 @@ void Logger::SetLogPath(const std::string& path) {
   if (!common::IsValidDirectory(path)) {
     // if path is not a valid directory, ignore passed path.
     std::cerr << "Error during setting log path: \"" << path
-              << "\" is not a valid directory. Log path is not updated"
-              << '\n';
+              << "\" is not a valid directory. Log path is not updated" << '\n';
     std::cout << "Current Log Path: \"" << logPath << "\" \n";
     return;
   }
@@ -142,7 +141,8 @@ bool Logger::EnableLog() {
   if (stream == nullptr)
     SetLogStream(&fileStream);
 
-  if (!IsEnabled() && logLevel != LogLevel::Type::OFF && stream == &fileStream) {
+  if (!IsEnabled() && logLevel != LogLevel::Type::OFF
+      && stream == &fileStream) {
     if (logFileName.empty()) {
       logFileName = CreateFileName();
       std::stringstream tmpStream;
@@ -150,7 +150,8 @@ bool Logger::EnableLog() {
       logFilePath = tmpStream.str();
       if (common::FileExists(logFilePath)) {
         std::cout << "log file at \"" << logFilePath
-                  << "\" already exists. Appending logs to the log file." << '\n';
+                  << "\" already exists. Appending logs to the log file."
+                  << '\n';
       }
       std::cout << "logFilePath: " << logFilePath << '\n';
     }

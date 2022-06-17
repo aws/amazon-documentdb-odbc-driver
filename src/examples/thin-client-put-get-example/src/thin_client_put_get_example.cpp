@@ -34,20 +34,21 @@ using namespace examples;
  *
  * @param cache Cache instance.
  */
-void PutGet(CacheClient<int32_t, Organization>& cache) 
-{
-    // Create new Organization to store in cache.
-    Organization org("Microsoft", Address("1096 Eddy Street, San Francisco, CA", 94109));
+void PutGet(CacheClient< int32_t, Organization >& cache) {
+  // Create new Organization to store in cache.
+  Organization org("Microsoft",
+                   Address("1096 Eddy Street, San Francisco, CA", 94109));
 
-    // Put organization to cache.
-    cache.Put(1, org);
+  // Put organization to cache.
+  cache.Put(1, org);
 
-    // Get recently created employee as a strongly-typed fully de-serialized instance.
-    Organization orgFromCache = cache.Get(1);
+  // Get recently created employee as a strongly-typed fully de-serialized
+  // instance.
+  Organization orgFromCache = cache.Get(1);
 
-    std::cout <<  ">>> Retrieved organization instance from cache: " << std::endl;
-    std::cout << orgFromCache.ToString() << std::endl;
-    std::cout << std::endl;
+  std::cout << ">>> Retrieved organization instance from cache: " << std::endl;
+  std::cout << orgFromCache.ToString() << std::endl;
+  std::cout << std::endl;
 }
 
 /*
@@ -55,73 +56,73 @@ void PutGet(CacheClient<int32_t, Organization>& cache)
  *
  * @param cache Cache instance.
  */
-void PutGetAll(CacheClient<int32_t, Organization>& cache)
-{
-    // Create new Organizations to store in cache.
-    Organization org1("Microsoft", Address("1096 Eddy Street, San Francisco, CA", 94109));
-    Organization org2("Red Cross", Address("184 Fidler Drive, San Antonio, TX", 78205));
+void PutGetAll(CacheClient< int32_t, Organization >& cache) {
+  // Create new Organizations to store in cache.
+  Organization org1("Microsoft",
+                    Address("1096 Eddy Street, San Francisco, CA", 94109));
+  Organization org2("Red Cross",
+                    Address("184 Fidler Drive, San Antonio, TX", 78205));
 
-    // Put created data entries to cache.
-    std::map<int, Organization> vals;
+  // Put created data entries to cache.
+  std::map< int, Organization > vals;
 
-    vals[1] = org1;
-    vals[2] = org2;
+  vals[1] = org1;
+  vals[2] = org2;
 
-    cache.PutAll(vals);
+  cache.PutAll(vals);
 
-    // Get recently created organizations as a strongly-typed fully de-serialized instances.
-    std::set<int> keys;
+  // Get recently created organizations as a strongly-typed fully de-serialized
+  // instances.
+  std::set< int > keys;
 
-    keys.insert(1);
-    keys.insert(2);
+  keys.insert(1);
+  keys.insert(2);
 
-    std::map<int, Organization> valsFromCache;
-    cache.GetAll(keys, valsFromCache);
+  std::map< int, Organization > valsFromCache;
+  cache.GetAll(keys, valsFromCache);
 
-    std::cout <<  ">>> Retrieved organization instances from cache: " << std::endl;
+  std::cout << ">>> Retrieved organization instances from cache: " << std::endl;
 
-    for (std::map<int, Organization>::iterator it = valsFromCache.begin(); it != valsFromCache.end(); ++it)
-        std::cout <<  it->second.ToString() << std::endl;
+  for (std::map< int, Organization >::iterator it = valsFromCache.begin();
+       it != valsFromCache.end(); ++it)
+    std::cout << it->second.ToString() << std::endl;
 
-    std::cout << std::endl;
+  std::cout << std::endl;
 }
 
-int main()
-{
-    IgniteClientConfiguration cfg;
+int main() {
+  IgniteClientConfiguration cfg;
 
-    cfg.SetEndPoints("127.0.0.1");
+  cfg.SetEndPoints("127.0.0.1");
 
-    try
-    {
-        // Start a client.
-        IgniteClient client = IgniteClient::Start(cfg);
-
-        std::cout << std::endl;
-        std::cout << ">>> Cache put-get example started." << std::endl;
-        std::cout << std::endl;
-
-        // Get cache instance.
-        CacheClient<int32_t, Organization> cache = client.GetOrCreateCache<int32_t, Organization>("PutGetExample");
-
-        // Clear cache.
-        cache.Clear();
-
-        PutGet(cache);
-        PutGetAll(cache);
-    }
-    catch (IgniteError& err)
-    {
-        std::cout << "An error occurred: " << err.GetText() << std::endl;
-
-        return err.GetCode();
-    }
+  try {
+    // Start a client.
+    IgniteClient client = IgniteClient::Start(cfg);
 
     std::cout << std::endl;
-    std::cout << ">>> Example finished, press 'Enter' to exit ..." << std::endl;
+    std::cout << ">>> Cache put-get example started." << std::endl;
     std::cout << std::endl;
 
-    std::cin.get();
+    // Get cache instance.
+    CacheClient< int32_t, Organization > cache =
+        client.GetOrCreateCache< int32_t, Organization >("PutGetExample");
 
-    return 0;
+    // Clear cache.
+    cache.Clear();
+
+    PutGet(cache);
+    PutGetAll(cache);
+  } catch (IgniteError& err) {
+    std::cout << "An error occurred: " << err.GetText() << std::endl;
+
+    return err.GetCode();
+  }
+
+  std::cout << std::endl;
+  std::cout << ">>> Example finished, press 'Enter' to exit ..." << std::endl;
+  std::cout << std::endl;
+
+  std::cin.get();
+
+  return 0;
 }

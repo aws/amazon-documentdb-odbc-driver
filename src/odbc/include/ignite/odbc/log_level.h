@@ -23,13 +23,7 @@ namespace ignite {
 namespace odbc {
 /** Log Level enum. */
 struct LogLevel {
-  enum class Type {
-    DEBUG_LEVEL,
-    INFO_LEVEL,
-    ERROR_LEVEL,
-    OFF,
-    UNKNOWN
-  };
+  enum class Type { DEBUG_LEVEL, INFO_LEVEL, ERROR_LEVEL, OFF, UNKNOWN };
 
   /**
    * Convert log level from string.

@@ -30,128 +30,122 @@ using namespace cluster;
 /*
  * Function class.
  */
-class PrintMsg : public ComputeFunc<void>
-{
-    friend struct ignite::binary::BinaryType<PrintMsg>;
-public:
-    /*
-     * Default constructor.
-     */
-    PrintMsg() :
-        msg("default")
-    {
-        // No-op.
-    }
+class PrintMsg : public ComputeFunc< void > {
+  friend struct ignite::binary::BinaryType< PrintMsg >;
 
-    /*
-     * Constructor.
-     *
-     * @param text Text.
-     */
-    PrintMsg(std::string msg) :
-        msg(msg)
-    {
-        // No-op.
-    }
+ public:
+  /*
+   * Default constructor.
+   */
+  PrintMsg() : msg("default") {
+    // No-op.
+  }
 
-    /**
-     * Callback.
-     * Just print the message.
-     *
-     */
-    virtual void Call()
-    {
-        std::cout << "# MESSAGE => " <<  msg << std::endl;
-    }
+  /*
+   * Constructor.
+   *
+   * @param text Text.
+   */
+  PrintMsg(std::string msg) : msg(msg) {
+    // No-op.
+  }
 
-private:
-    /** Message text. */
-    std::string msg;
+  /**
+   * Callback.
+   * Just print the message.
+   *
+   */
+  virtual void Call() {
+    std::cout << "# MESSAGE => " << msg << std::endl;
+  }
+
+ private:
+  /** Message text. */
+  std::string msg;
 };
 
-namespace ignite
-{
-    namespace binary
-    {
-        template<>
-        struct BinaryType<PrintMsg>: BinaryTypeDefaultAll<PrintMsg>
-        {
-            static void GetTypeName(std::string& dst)
-            {
-                dst = "Func";
-            }
+namespace ignite {
+namespace binary {
+template <>
+struct BinaryType< PrintMsg > : BinaryTypeDefaultAll< PrintMsg > {
+  static void GetTypeName(std::string& dst) {
+    dst = "Func";
+  }
 
-            static void Write(BinaryWriter& writer, const PrintMsg& obj)
-            {
-                writer.RawWriter().WriteString(obj.msg);
-            }
+  static void Write(BinaryWriter& writer, const PrintMsg& obj) {
+    writer.RawWriter().WriteString(obj.msg);
+  }
 
-            static void Read(BinaryReader& reader, PrintMsg& dst)
-            {
-                dst.msg = reader.RawReader().ReadString();
-            }
-        };
-    }
-}
+  static void Read(BinaryReader& reader, PrintMsg& dst) {
+    dst.msg = reader.RawReader().ReadString();
+  }
+};
+}  // namespace binary
+}  // namespace ignite
 
-int main()
-{
-    IgniteConfiguration cfgs[4];
+int main() {
+  IgniteConfiguration cfgs[4];
 
-    cfgs[0].springCfgPath = "platforms/cpp/examples/cluster-compute-example/config/cluster-compute-example1.xml";
-    cfgs[1].springCfgPath = "platforms/cpp/examples/cluster-compute-example/config/cluster-compute-example2.xml";
-    cfgs[2].springCfgPath = "platforms/cpp/examples/cluster-compute-example/config/cluster-compute-example2.xml";
-    cfgs[3].springCfgPath = "platforms/cpp/examples/cluster-compute-example/config/cluster-compute-example-client.xml";
+  cfgs[0].springCfgPath =
+      "platforms/cpp/examples/cluster-compute-example/config/"
+      "cluster-compute-example1.xml";
+  cfgs[1].springCfgPath =
+      "platforms/cpp/examples/cluster-compute-example/config/"
+      "cluster-compute-example2.xml";
+  cfgs[2].springCfgPath =
+      "platforms/cpp/examples/cluster-compute-example/config/"
+      "cluster-compute-example2.xml";
+  cfgs[3].springCfgPath =
+      "platforms/cpp/examples/cluster-compute-example/config/"
+      "cluster-compute-example-client.xml";
 
-    try
-    {
-        // Start server nodes.
-        Ignite node1 = Ignition::Start(cfgs[0], "DemoAttributeValue0");
-        Ignite node2 = Ignition::Start(cfgs[1], "DemoAttributeValue1I0");
-        Ignite node3 = Ignition::Start(cfgs[2], "DemoAttributeValue1I1");
+  try {
+    // Start server nodes.
+    Ignite node1 = Ignition::Start(cfgs[0], "DemoAttributeValue0");
+    Ignite node2 = Ignition::Start(cfgs[1], "DemoAttributeValue1I0");
+    Ignite node3 = Ignition::Start(cfgs[2], "DemoAttributeValue1I1");
 
-        // Start client node.
-        Ignite client = Ignition::Start(cfgs[3], "Client");
+    // Start client node.
+    Ignite client = Ignition::Start(cfgs[3], "Client");
 
-        std::cout << std::endl;
-        std::cout << ">>> Cluster compute example started." << std::endl;
-        std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << ">>> Cluster compute example started." << std::endl;
+    std::cout << std::endl;
 
-        // Get binding instances and register our classes as a compute functions.
-        node1.GetBinding().RegisterComputeFunc<PrintMsg>();
-        node2.GetBinding().RegisterComputeFunc<PrintMsg>();
-        node3.GetBinding().RegisterComputeFunc<PrintMsg>();
-        client.GetBinding().RegisterComputeFunc<PrintMsg>();
+    // Get binding instances and register our classes as a compute functions.
+    node1.GetBinding().RegisterComputeFunc< PrintMsg >();
+    node2.GetBinding().RegisterComputeFunc< PrintMsg >();
+    node3.GetBinding().RegisterComputeFunc< PrintMsg >();
+    client.GetBinding().RegisterComputeFunc< PrintMsg >();
 
-        // Create cluster groups split up by demo attribute value.
-        ClusterGroup localGroup = client.GetCluster().AsClusterGroup();
-        ClusterGroup group1 = localGroup.ForAttribute("DemoAttribute", "Value0");
-        ClusterGroup group2 = localGroup.ForAttribute("DemoAttribute", "Value1");
+    // Create cluster groups split up by demo attribute value.
+    ClusterGroup localGroup = client.GetCluster().AsClusterGroup();
+    ClusterGroup group1 = localGroup.ForAttribute("DemoAttribute", "Value0");
+    ClusterGroup group2 = localGroup.ForAttribute("DemoAttribute", "Value1");
 
-        // Broadcast compute jobs.
-        client.GetCompute(group1).Broadcast(PrintMsg("DemoAttribute=Value0"));
-        client.GetCompute(group2).Broadcast(PrintMsg("DemoAttribute=Value1"));
+    // Broadcast compute jobs.
+    client.GetCompute(group1).Broadcast(PrintMsg("DemoAttribute=Value0"));
+    client.GetCompute(group2).Broadcast(PrintMsg("DemoAttribute=Value1"));
 
-        // Waiting the compute jobs to complete.
-        std::cout << std::endl;
-        std::cout << ">>> Example finished. Press 'Enter to stop cluster nodes ..." << std::endl;
-        std::cout << std::endl;
-        std::cin.get();
-
-        // Stop client node first.
-        Ignition::Stop(client.GetName(), true);
-
-        // Stop server nodes.
-        Ignition::StopAll(false);
-    }
-    catch (IgniteError& err)
-    {
-        std::cout << "An error occurred: " << err.GetText() << std::endl;
-
-        return err.GetCode();
-    }
-
+    // Waiting the compute jobs to complete.
+    std::cout << std::endl;
+    std::cout << ">>> Example finished. Press 'Enter to stop cluster nodes ..."
+              << std::endl;
+    std::cout << std::endl;
     std::cin.get();
 
-    return 0;
+    // Stop client node first.
+    Ignition::Stop(client.GetName(), true);
+
+    // Stop server nodes.
+    Ignition::StopAll(false);
+  } catch (IgniteError& err) {
+    std::cout << "An error occurred: " << err.GetText() << std::endl;
+
+    return err.GetCode();
+  }
+
+  std::cin.get();
+
+  return 0;
 }

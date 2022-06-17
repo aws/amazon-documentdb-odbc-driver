@@ -802,17 +802,15 @@ void OdbcTestSuite::InsertNonFullBatchSelect(int recordsNum, int splitAt) {
 
 void OdbcTestSuite::CreateDsnConnectionStringForRemoteServer(
     std::string& connectionString, bool sshTunnel, const std::string& username,
-    const std::string& miscOptions,
-    const std::string databasename) const {
+    const std::string& miscOptions, const std::string databasename) const {
   std::string user = common::GetEnv("DOC_DB_USER_NAME", "documentdb");
   std::string password = common::GetEnv("DOC_DB_PASSWORD", "");
   std::string host =
       sshTunnel ? common::GetEnv("DOC_DB_HOST", "") : "localhost";
   std::string sshUserAtHost = common::GetEnv("DOC_DB_USER", "");
   std::string sshPrivKeyFile = common::GetEnv("DOC_DB_PRIV_KEY_FILE", "");
-  std::string port = sshTunnel
-                          ? common::GetEnv("DOC_DB_REMOTE_PORT", "27017")
-                          : common::GetEnv("DOC_DB_LOCAL_PORT", "27019");
+  std::string port = sshTunnel ? common::GetEnv("DOC_DB_REMOTE_PORT", "27017")
+                               : common::GetEnv("DOC_DB_LOCAL_PORT", "27019");
 
   if (!username.empty()) {
     user = username;

@@ -91,8 +91,7 @@ class HandshakeRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(BinaryWriterImpl& writer,
-             const ProtocolVersion&) const;
+  void Write(BinaryWriterImpl& writer, const ProtocolVersion&) const;
 
  private:
   /** Configuration. */
@@ -127,8 +126,7 @@ class QueryExecuteRequest {
    * @param writer Writer.
    * @param ver Version.
    */
-  void Write(BinaryWriterImpl& writer,
-             const ProtocolVersion& ver) const;
+  void Write(BinaryWriterImpl& writer, const ProtocolVersion& ver) const;
 
  private:
   /** Schema name. */
@@ -178,8 +176,7 @@ class QueryExecuteBatchRequest {
    * @param writer Writer.
    * @param ver Version.
    */
-  void Write(BinaryWriterImpl& writer,
-             const ProtocolVersion& ver) const;
+  void Write(BinaryWriterImpl& writer, const ProtocolVersion& ver) const;
 
  private:
   /** Schema name. */
@@ -228,8 +225,7 @@ class QueryCloseRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(BinaryWriterImpl& writer,
-             const ProtocolVersion&) const;
+  void Write(BinaryWriterImpl& writer, const ProtocolVersion&) const;
 
  private:
   /** Query ID. */
@@ -258,8 +254,7 @@ class QueryFetchRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(BinaryWriterImpl& writer,
-             const ProtocolVersion&) const;
+  void Write(BinaryWriterImpl& writer, const ProtocolVersion&) const;
 
  private:
   /** Query ID. */
@@ -294,8 +289,7 @@ class QueryGetColumnsMetaRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(BinaryWriterImpl& writer,
-             const ProtocolVersion&) const;
+  void Write(BinaryWriterImpl& writer, const ProtocolVersion&) const;
 
  private:
   /** Schema search pattern. */
@@ -331,8 +325,7 @@ class QueryGetResultsetMetaRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(BinaryWriterImpl& writer,
-             const ProtocolVersion&) const;
+  void Write(BinaryWriterImpl& writer, const ProtocolVersion&) const;
 
  private:
   /** Schema. */
@@ -368,8 +361,7 @@ class QueryGetTablesMetaRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(BinaryWriterImpl& writer,
-             const ProtocolVersion&) const;
+  void Write(BinaryWriterImpl& writer, const ProtocolVersion&) const;
 
  private:
   /** Column search pattern. */
@@ -413,8 +405,7 @@ class QueryGetParamsMetaRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(BinaryWriterImpl& writer,
-             const ProtocolVersion&) const;
+  void Write(BinaryWriterImpl& writer, const ProtocolVersion&) const;
 
  private:
   /** Schema. */
@@ -451,8 +442,7 @@ class QueryMoreResultsRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(BinaryWriterImpl& writer,
-             const ProtocolVersion&) const;
+  void Write(BinaryWriterImpl& writer, const ProtocolVersion&) const;
 
  private:
   /** Query ID. */
@@ -488,8 +478,7 @@ class StreamingBatchRequest {
    * Write request using provided writer.
    * @param writer Writer.
    */
-  void Write(BinaryWriterImpl& writer,
-             const ProtocolVersion&) const;
+  void Write(BinaryWriterImpl& writer, const ProtocolVersion&) const;
 
  private:
   /** Schema name. */
@@ -547,8 +536,7 @@ class Response {
   /**
    * Read data if response status is ResponseStatus::SUCCESS.
    */
-  virtual void ReadOnSuccess(BinaryReaderImpl&,
-                             const ProtocolVersion&);
+  virtual void ReadOnSuccess(BinaryReaderImpl&, const ProtocolVersion&);
 
  private:
   /** Request processing status. */
@@ -642,8 +630,7 @@ class QueryCloseResponse : public Response {
    * Read response using provided reader.
    * @param reader Reader.
    */
-  virtual void ReadOnSuccess(BinaryReaderImpl& reader,
-                             const ProtocolVersion&);
+  virtual void ReadOnSuccess(BinaryReaderImpl& reader, const ProtocolVersion&);
 
   /** Query ID. */
   int64_t queryId;
@@ -844,8 +831,7 @@ class QueryFetchResponse : public Response {
    * Read response using provided reader.
    * @param reader Reader.
    */
-  virtual void ReadOnSuccess(BinaryReaderImpl& reader,
-                             const ProtocolVersion&);
+  virtual void ReadOnSuccess(BinaryReaderImpl& reader, const ProtocolVersion&);
 
   /** Query ID. */
   int64_t queryId;
@@ -910,8 +896,7 @@ class QueryGetParamsMetaResponse : public Response {
    * Read response using provided reader.
    * @param reader Reader.
    */
-  virtual void ReadOnSuccess(BinaryReaderImpl& reader,
-                             const ProtocolVersion&);
+  virtual void ReadOnSuccess(BinaryReaderImpl& reader, const ProtocolVersion&);
 
   /** Columns metadata. */
   std::vector< int8_t > typeIds;
@@ -946,8 +931,7 @@ class QueryMoreResultsResponse : public Response {
    * Read response using provided reader.
    * @param reader Reader.
    */
-  virtual void ReadOnSuccess(BinaryReaderImpl& reader,
-                             const ProtocolVersion&);
+  virtual void ReadOnSuccess(BinaryReaderImpl& reader, const ProtocolVersion&);
 
   /** Query ID. */
   int64_t queryId;

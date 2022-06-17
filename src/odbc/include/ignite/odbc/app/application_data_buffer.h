@@ -144,7 +144,7 @@ class ApplicationDataBuffer {
    * @param value Value.
    * @return Conversion result.
    */
-  ConversionResult::Type PutInt16(boost::optional<int16_t> value);
+  ConversionResult::Type PutInt16(boost::optional< int16_t > value);
 
   /**
    * Put in buffer value of type int16_t.
@@ -224,8 +224,7 @@ class ApplicationDataBuffer {
    * @param optional value Value.
    * @return Conversion result.
    */
-  ConversionResult::Type PutString(
-      const boost::optional< std::string >& value);
+  ConversionResult::Type PutString(const boost::optional< std::string >& value);
 
   /**
    * Put in buffer value of type string.
@@ -275,7 +274,8 @@ class ApplicationDataBuffer {
    * @param value Value to put.
    * @return Conversion result.
    */
-  ConversionResult::Type PutDecimal(const boost::optional< common::Decimal >& value);
+  ConversionResult::Type PutDecimal(
+      const boost::optional< common::Decimal >& value);
 
   /**
    * Put decimal value to buffer.
@@ -307,7 +307,8 @@ class ApplicationDataBuffer {
    * @param value Value to put.
    * @return Conversion result.
    */
-  ConversionResult::Type PutTimestamp(const boost::optional< Timestamp >& value);
+  ConversionResult::Type PutTimestamp(
+      const boost::optional< Timestamp >& value);
 
   /**
    * Put timestamp to buffer.

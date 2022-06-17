@@ -22,76 +22,65 @@ using namespace ignite::odbc::jni::java;
 using namespace ignite::odbc::impl::interop;
 using namespace ignite::odbc::impl::binary;
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace impl
-        {
-            namespace cache
-            {
-                namespace query
-                {
-                    namespace continuous
-                    {
-                        struct Command
-                        {
-                            enum Type
-                            {
-                                GET_INITIAL_QUERY = 0,
-    
-                                CLOSE = 1
-                            };
-                        };
-    
-                        ContinuousQueryHandleImpl::ContinuousQueryHandleImpl(SP_IgniteEnvironment env, int64_t handle, jobject javaRef) :
-                            env(env),
-                            handle(handle),
-                            javaRef(javaRef),
-                            mutex(),
-                            extracted(false)
-                        {
-                            // No-op.
-                        }
-    
-                        ContinuousQueryHandleImpl::~ContinuousQueryHandleImpl()
-                        {
-                            JniErrorInfo err;
-                            env.Get()->Context()->TargetInLongOutLong(javaRef, Command::CLOSE, 0, &err);
-    
-                            JniContext::Release(javaRef);
-    
-                            env.Get()->GetHandleRegistry().Release(handle);
-                        }
-    
-                        QueryCursorImpl* ContinuousQueryHandleImpl::GetInitialQueryCursor(IgniteError& err)
-                        {
-                            CsLockGuard guard(mutex);
-    
-                            if (extracted)
-                            {
-                                err = IgniteError(IgniteError::IGNITE_ERR_GENERIC,
-                                    "GetInitialQueryCursor() can be called only once.");
-    
-                                return 0;
-                            }
-    
-                            JniErrorInfo jniErr;
-    
-                            jobject res = env.Get()->Context()->TargetOutObject(javaRef, Command::GET_INITIAL_QUERY, &jniErr);
-    
-                            IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(), jniErr.errMsg.c_str(), err);
-    
-                            if (jniErr.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
-                                return 0;
-    
-                            extracted = true;
-    
-                            return new QueryCursorImpl(env, res);
-                        }
-                    }
-                }
-            }
-        }
-    }
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace cache {
+namespace query {
+namespace continuous {
+struct Command {
+  enum Type {
+    GET_INITIAL_QUERY = 0,
+
+    CLOSE = 1
+  };
+};
+
+ContinuousQueryHandleImpl::ContinuousQueryHandleImpl(SP_IgniteEnvironment env,
+                                                     int64_t handle,
+                                                     jobject javaRef)
+    : env(env), handle(handle), javaRef(javaRef), mutex(), extracted(false) {
+  // No-op.
 }
+
+ContinuousQueryHandleImpl::~ContinuousQueryHandleImpl() {
+  JniErrorInfo err;
+  env.Get()->Context()->TargetInLongOutLong(javaRef, Command::CLOSE, 0, &err);
+
+  JniContext::Release(javaRef);
+
+  env.Get()->GetHandleRegistry().Release(handle);
+}
+
+QueryCursorImpl* ContinuousQueryHandleImpl::GetInitialQueryCursor(
+    IgniteError& err) {
+  CsLockGuard guard(mutex);
+
+  if (extracted) {
+    err = IgniteError(IgniteError::IGNITE_ERR_GENERIC,
+                      "GetInitialQueryCursor() can be called only once.");
+
+    return 0;
+  }
+
+  JniErrorInfo jniErr;
+
+  jobject res = env.Get()->Context()->TargetOutObject(
+      javaRef, Command::GET_INITIAL_QUERY, &jniErr);
+
+  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+                        jniErr.errMsg.c_str(), err);
+
+  if (jniErr.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
+    return 0;
+
+  extracted = true;
+
+  return new QueryCursorImpl(env, res);
+}
+}  // namespace continuous
+}  // namespace query
+}  // namespace cache
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite

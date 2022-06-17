@@ -20,72 +20,56 @@
 using namespace ignite::odbc::common::concurrent;
 using namespace ignite::odbc::impl::cluster;
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace cluster
-        {
-            ClusterNode::ClusterNode(SharedPointer<ClusterNodeImpl> impl) :
-                impl(impl)
-            {
-                // No-op.
-            }
-    
-            const std::vector<std::string>& ClusterNode::GetAddresses() const
-            {
-                return impl.Get()->GetAddresses();
-            }
-    
-            std::string ClusterNode::GetConsistentId() const
-            {
-                return impl.Get()->GetConsistentId();
-            }
-    
-            const std::vector<std::string>& ClusterNode::GetHostNames() const
-            {
-                return impl.Get()->GetHostNames();
-            }
-    
-            bool ClusterNode::IsAttributeSet(std::string name) const
-            {
-                return impl.Get()->IsAttributeSet(name);
-            }
-    
-            std::vector<std::string> ClusterNode::GetAttributes() const
-            {
-                return impl.Get()->GetAttributes();
-            }
-    
-            Guid ClusterNode::GetId() const
-            {
-                return impl.Get()->GetId();
-            }
-    
-            bool ClusterNode::IsClient() const
-            {
-                return impl.Get()->IsClient();
-            }
-    
-            bool ClusterNode::IsDaemon() const
-            {
-                return impl.Get()->IsDaemon();
-            }
-    
-            bool ClusterNode::IsLocal() const
-            {
-                return impl.Get()->IsLocal();
-            }
-    
-            int64_t ClusterNode::GetOrder() const
-            {
-                return impl.Get()->GetOrder();
-            }
-    
-            const IgniteProductVersion& ClusterNode::GetVersion() const
-            {
-                return impl.Get()->GetVersion();
-            }
-        }
-    }
+namespace ignite {
+namespace odbc {
+namespace cluster {
+ClusterNode::ClusterNode(SharedPointer< ClusterNodeImpl > impl) : impl(impl) {
+  // No-op.
 }
+
+const std::vector< std::string >& ClusterNode::GetAddresses() const {
+  return impl.Get()->GetAddresses();
+}
+
+std::string ClusterNode::GetConsistentId() const {
+  return impl.Get()->GetConsistentId();
+}
+
+const std::vector< std::string >& ClusterNode::GetHostNames() const {
+  return impl.Get()->GetHostNames();
+}
+
+bool ClusterNode::IsAttributeSet(std::string name) const {
+  return impl.Get()->IsAttributeSet(name);
+}
+
+std::vector< std::string > ClusterNode::GetAttributes() const {
+  return impl.Get()->GetAttributes();
+}
+
+Guid ClusterNode::GetId() const {
+  return impl.Get()->GetId();
+}
+
+bool ClusterNode::IsClient() const {
+  return impl.Get()->IsClient();
+}
+
+bool ClusterNode::IsDaemon() const {
+  return impl.Get()->IsDaemon();
+}
+
+bool ClusterNode::IsLocal() const {
+  return impl.Get()->IsLocal();
+}
+
+int64_t ClusterNode::GetOrder() const {
+  return impl.Get()->GetOrder();
+}
+
+const IgniteProductVersion& ClusterNode::GetVersion() const {
+  return impl.Get()->GetVersion();
+}
+}  // namespace cluster
+}  // namespace odbc
+}  // namespace ignite

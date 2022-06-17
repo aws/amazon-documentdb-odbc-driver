@@ -22,70 +22,56 @@
 
 #include "ignite/examples/address.h"
 
-namespace ignite
-{
-    namespace examples
-    {
-        struct Organization
-        {
-            Organization() :
-                name(), addr()
-            {
-                // No-op.
-            }
+namespace ignite {
+namespace examples {
+struct Organization {
+  Organization() : name(), addr() {
+    // No-op.
+  }
 
-            Organization(const std::string& name) :
-                name(name), addr()
-            {
-                // No-op.
-            }
+  Organization(const std::string& name) : name(name), addr() {
+    // No-op.
+  }
 
-            Organization(const std::string& name, Address addr) :
-                name(name), addr(addr)
-            {
-                // No-op.
-            }
+  Organization(const std::string& name, Address addr) : name(name), addr(addr) {
+    // No-op.
+  }
 
-            std::string ToString() 
-            {
-                std::ostringstream oss;
+  std::string ToString() {
+    std::ostringstream oss;
 
-                oss << "Organization [name=" << name << ", Address=" << addr.ToString() << "]";
+    oss << "Organization [name=" << name << ", Address=" << addr.ToString()
+        << "]";
 
-                return oss.str();
-            }
+    return oss.str();
+  }
 
-            std::string name;
-            Address addr;
-        };
-    }
-}
+  std::string name;
+  Address addr;
+};
+}  // namespace examples
+}  // namespace ignite
 
-namespace ignite
-{
-    namespace binary
-    {
-        template<>
-        struct BinaryType<examples::Organization> : BinaryTypeDefaultAll<examples::Organization>
-        {
-            static void GetTypeName(std::string& dst)
-            {
-                dst = "Organization";
-            }
+namespace ignite {
+namespace binary {
+template <>
+struct BinaryType< examples::Organization >
+    : BinaryTypeDefaultAll< examples::Organization > {
+  static void GetTypeName(std::string& dst) {
+    dst = "Organization";
+  }
 
-            static void Write(BinaryWriter& writer, const examples::Organization& obj)
-            {
-                writer.WriteString("name", obj.name);
-                writer.WriteObject<examples::Address>("addr", obj.addr);
-            }
+  static void Write(BinaryWriter& writer, const examples::Organization& obj) {
+    writer.WriteString("name", obj.name);
+    writer.WriteObject< examples::Address >("addr", obj.addr);
+  }
 
-            static void Read(BinaryReader& reader, examples::Organization& dst)
-            {
-                dst.name = reader.ReadString("name");
-                dst.addr = reader.ReadObject<examples::Address>("addr");
-            }
-        };
-    }
-}
+  static void Read(BinaryReader& reader, examples::Organization& dst) {
+    dst.name = reader.ReadString("name");
+    dst.addr = reader.ReadObject< examples::Address >("addr");
+  }
+};
+}  // namespace binary
+}  // namespace ignite
 
 #endif

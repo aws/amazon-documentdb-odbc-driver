@@ -280,7 +280,6 @@ ConversionResult::Type ApplicationDataBuffer::PutValToStrBuffer(
 template < typename OutCharT, typename InCharT >
 ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
     const std::basic_string< InCharT >& value, int32_t& written) {
-
   written = 0;
 
   SqlLen outCharSize = static_cast< SqlLen >(sizeof(OutCharT));
@@ -343,7 +342,8 @@ ConversionResult::Type ApplicationDataBuffer::PutRawDataToBuffer(
                        : ConversionResult::Type::AI_SUCCESS;
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutInt8(boost::optional< int8_t > value) {
+ConversionResult::Type ApplicationDataBuffer::PutInt8(
+    boost::optional< int8_t > value) {
   if (value)
     return PutInt8(*value);
   else
@@ -925,7 +925,8 @@ ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
   return ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutTime(const boost::optional< Time >& value) {
+ConversionResult::Type ApplicationDataBuffer::PutTime(
+    const boost::optional< Time >& value) {
   if (value)
     return PutTime(*value);
   else

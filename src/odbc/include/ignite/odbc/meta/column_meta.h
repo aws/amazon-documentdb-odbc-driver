@@ -31,9 +31,9 @@
 #include "ignite/odbc/protocol_version.h"
 #include "ignite/odbc/utility.h"
 
+using ignite::odbc::jni::JdbcColumnMetadata;
 using ignite::odbc::jni::ResultSet;
 using ignite::odbc::jni::java::JniErrorInfo;
-using ignite::odbc::jni::JdbcColumnMetadata;
 
 namespace ignite {
 namespace odbc {
@@ -169,7 +169,8 @@ class ColumnMeta {
    * @param prevPosition the ordinal position of the previous column.
    * @paran err IgniteError.
    */
-  void ReadJdbcMetadata(JdbcColumnMetadata& jdbcMetadata, int32_t& prevPosition);
+  void ReadJdbcMetadata(JdbcColumnMetadata& jdbcMetadata,
+                        int32_t& prevPosition);
 
   /**
    * Get catalog name.

@@ -38,7 +38,6 @@
 #include <sqltypes.h>
 #include <sql.h>
 
-
 namespace ignite {
 namespace odbc {
 namespace utility {
@@ -95,8 +94,7 @@ size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen,
  * @param reader Reader.
  * @param res Resulting vector.
  */
-void ReadByteArray(BinaryReaderImpl& reader,
-                   std::vector< int8_t >& res);
+void ReadByteArray(BinaryReaderImpl& reader, std::vector< int8_t >& res);
 
 /**
  * Read string from reader.
@@ -110,8 +108,7 @@ void ReadString(BinaryReaderImpl& reader, std::string& str);
  * @param writer Writer.
  * @param str String.
  */
-void WriteString(BinaryWriterImpl& writer,
-                 const std::string& str);
+void WriteString(BinaryWriterImpl& writer, const std::string& str);
 
 /**
  * Read decimal value using reader.
@@ -119,8 +116,7 @@ void WriteString(BinaryWriterImpl& writer,
  * @param reader Reader.
  * @param decimal Decimal value.
  */
-void ReadDecimal(BinaryReaderImpl& reader,
-                 Decimal& decimal);
+void ReadDecimal(BinaryReaderImpl& reader, Decimal& decimal);
 
 /**
  * Write decimal value using writer.
@@ -128,18 +124,19 @@ void ReadDecimal(BinaryReaderImpl& reader,
  * @param writer Writer.
  * @param decimal Decimal value.
  */
-void WriteDecimal(BinaryWriterImpl& writer,
-                  const Decimal& decimal);
+void WriteDecimal(BinaryWriterImpl& writer, const Decimal& decimal);
 
 /**
  * Convert SQL string buffer to std::string.
  *
  * @param sqlStr SQL string buffer.
  * @param sqlStrLen SQL string length.
- * @param isLenInBytes Indicator of whether the length indicates bytes or characters.
+ * @param isLenInBytes Indicator of whether the length indicates bytes or
+ * characters.
  * @return Standard string containing the same data.
  */
-std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen = SQL_NTS,
+std::string SqlStringToString(const SQLWCHAR* sqlStr,
+                              int32_t sqlStrLen = SQL_NTS,
                               bool isLenInBytes = false);
 
 /**
@@ -147,7 +144,8 @@ std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen = SQL_NT
  *
  * @param sqlStr SQL string buffer.
  * @param sqlStrLen SQL string length.
- * @param isLenInBytes Indicator of whether given length is in bytes or characters.
+ * @param isLenInBytes Indicator of whether given length is in bytes or
+ * characters.
  * @return Standard optional string containing the same data.
  * If sqlStrLen indicates null string, boost::none is returned.
  */
@@ -215,7 +213,7 @@ std::string HexDump(const void* data, size_t count);
 }  // namespace ignite
 
 namespace std {
-/** 
+/**
  * Convert wstring to utf-8 encoding.
  */
 inline std::ostream& operator<<(std::ostream& out, const std::wstring& value) {

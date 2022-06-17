@@ -118,7 +118,6 @@ void BuildJvmOptions(const std::string& cp, std::vector< char* >& opts, int xms,
 
   opts.reserve(REQ_OPTS_CNT + JAVA9_OPTS_CNT);
 
-
   // 1. Set calcite default charset to utf8.
   opts.push_back(CopyChars("-Dcalcite.default.charset=utf8"));
 
@@ -266,9 +265,10 @@ JniMethod const M_DATABASE_META_DATA_GET_PRIMARY_KEYS =
               "String;)Ljava/sql/ResultSet;",
               false);
 JniMethod const M_DATABASE_META_DATA_GET_IMPORTED_KEYS =
-    JniMethod("getImportedKeys", 
+    JniMethod("getImportedKeys",
               "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/"
-              "String;)Ljava/sql/ResultSet;", false);
+              "String;)Ljava/sql/ResultSet;",
+              false);
 
 const char* const C_DOCUMENTDB_CONNECTION =
     "software/amazon/documentdb/jdbc/DocumentDbConnection";
@@ -672,10 +672,10 @@ void JniMembers::Initialize(JNIEnv* env) {
       FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_TABLES);
   m_DatabaseMetaDataGetColumns =
       FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_COLUMNS);
-  m_DatabaseMetaDataGetPrimaryKeys =
-      FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_PRIMARY_KEYS);
-  m_DatabaseMetaDataGetImportedKeys =
-      FindMethod(env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_IMPORTED_KEYS);
+  m_DatabaseMetaDataGetPrimaryKeys = FindMethod(
+      env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_PRIMARY_KEYS);
+  m_DatabaseMetaDataGetImportedKeys = FindMethod(
+      env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_IMPORTED_KEYS);
 
   c_Connection = FindClass(env, C_JAVA_SQL_CONNECTION);
   m_ConnectionClose =
@@ -1094,7 +1094,7 @@ JniErrorCode JniContext::DriverManagerGetConnection(
 
   // TODO enable string logging and hide the user password.
   // https://bitquill.atlassian.net/browse/AD-702
-  //LOG_INFO_MSG("Connection String: [" << connectionString << "]");
+  // LOG_INFO_MSG("Connection String: [" << connectionString << "]");
 
   jstring jConnectionString = env->NewStringUTF(connectionString);
   jobject result = env->CallStaticObjectMethod(
@@ -1108,7 +1108,7 @@ JniErrorCode JniContext::DriverManagerGetConnection(
   }
 
   env->DeleteLocalRef(jConnectionString);
-  
+
   LOG_DEBUG_MSG("DriverManagerGetConnection exiting");
 
   return errInfo.code;
@@ -1366,7 +1366,7 @@ JniErrorCode JniContext::DatabaseMetaDataGetTables(
     const boost::optional< std::string >& catalog,
     const boost::optional< std::string >& schemaPattern,
     const std::string& tableNamePattern,
-    const boost::optional < std::vector< std::string > >& types,
+    const boost::optional< std::vector< std::string > >& types,
     SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo) {
   LOG_DEBUG_MSG("DatabaseMetaDataGetTables is called");
 
@@ -1398,8 +1398,7 @@ JniErrorCode JniContext::DatabaseMetaDataGetTables(
       env->SetObjectArrayElement(jTypes, i,
                                  env->NewStringUTF((*types)[i].c_str()));
     }
-  } 
-  else {
+  } else {
     jTypes = nullptr;
   }
 
@@ -1489,8 +1488,7 @@ JniErrorCode JniContext::DatabaseMetaDataGetPrimaryKeys(
     const boost::optional< std::string >& catalog,
     const boost::optional< std::string >& schema,
     const boost::optional< std::string >& table,
-    SharedPointer< GlobalJObject >& resultSet,
-    JniErrorInfo& errInfo) {
+    SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo) {
   LOG_DEBUG_MSG("DatabaseMetaDataGetPrimaryKeys is called");
 
   if (databaseMetaData.Get() == nullptr) {
@@ -1540,9 +1538,8 @@ JniErrorCode JniContext::DatabaseMetaDataGetPrimaryKeys(
 JniErrorCode JniContext::DatabaseMetaDataGetImportedKeys(
     const SharedPointer< GlobalJObject >& databaseMetaData,
     const boost::optional< std::string >& catalog,
-    const boost::optional< std::string >& schema,
-    const std::string& table, SharedPointer< GlobalJObject >& resultSet,
-    JniErrorInfo& errInfo) {
+    const boost::optional< std::string >& schema, const std::string& table,
+    SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo) {
   LOG_DEBUG_MSG("DatabaseMetaDataGetImportedKeys is called");
 
   if (databaseMetaData.Get() == nullptr) {
@@ -1564,10 +1561,10 @@ JniErrorCode JniContext::DatabaseMetaDataGetImportedKeys(
   jstring jSchema = schema ? env->NewStringUTF(schema->c_str()) : nullptr;
   jstring jTable = env->NewStringUTF(table.c_str());
 
-  jobject result = env->CallObjectMethod(
-      databaseMetaData.Get()->GetRef(),
-      jvm->GetMembers().m_DatabaseMetaDataGetImportedKeys, jCatalog, jSchema,
-      jTable);
+  jobject result =
+      env->CallObjectMethod(databaseMetaData.Get()->GetRef(),
+                            jvm->GetMembers().m_DatabaseMetaDataGetImportedKeys,
+                            jCatalog, jSchema, jTable);
   ExceptionCheck(env, &errInfo);
 
   env->DeleteLocalRef(jCatalog);
@@ -1713,7 +1710,7 @@ JniErrorCode JniContext::ResultSetGetString(
       resultSet.Get()->GetRef(), jvm->GetMembers().m_ResultSetGetStringByName,
       jColumnName);
   ExceptionCheck(env, &errInfo);
-  
+
   env->DeleteLocalRef(jColumnName);
 
   if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
@@ -2703,7 +2700,6 @@ jobject JniContext::Acquire(jobject obj) {
       return nullptr;
     }
 
-
     if (env) {
       jobject obj0 = env->NewGlobalRef(obj);
 
@@ -2756,15 +2752,14 @@ JNIEnv* JniContext::Attach(JniErrorInfo& errInfo) {
   if (attachRes == JNI_OK) {
     AttachHelper::OnThreadAttach();
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
-  }
-  else {
+  } else {
     errInfo.code = JniErrorCode::IGNITE_JNI_ERR_JVM_ATTACH;
     errInfo.errMsg = "Failed to connect to JVM";
     LOG_ERROR_MSG(errInfo.errMsg);
 
     if (hnds.error)
-      hnds.error(hnds.target, errInfo.code, nullptr,
-                 0, nullptr, 0, nullptr, 0, nullptr, 0);
+      hnds.error(hnds.target, errInfo.code, nullptr, 0, nullptr, 0, nullptr, 0,
+                 nullptr, 0);
   }
   LOG_DEBUG_MSG("Attach exiting");
 
