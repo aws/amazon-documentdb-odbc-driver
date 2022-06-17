@@ -764,8 +764,8 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
    * @param size Map size.
    * @return Read session ID.
    */
-  int32_t ReadMap(const char* fieldName, ignite::odbc::binary::MapType::Type* typ,
-                  int32_t* size);
+  int32_t ReadMap(const char* fieldName,
+                  ignite::odbc::binary::MapType::Type* typ, int32_t* size);
 
   /**
    * Read type of the collection.
@@ -1566,9 +1566,8 @@ BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, int16_t >(
     int16_t& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT
-BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, uint16_t >(
-    uint16_t& res);
+void IGNITE_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
+    ignite::odbc::binary::BinaryReader, uint16_t >(uint16_t& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT
@@ -1601,9 +1600,8 @@ BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, Date >(
     Date& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT
-BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, Timestamp >(
-    Timestamp& res);
+void IGNITE_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
+    ignite::odbc::binary::BinaryReader, Timestamp >(Timestamp& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT
@@ -1611,9 +1609,8 @@ BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, Time >(
     Time& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT
-BinaryReaderImpl::ReadTopObject0< ignite::odbc::binary::BinaryReader, std::string >(
-    std::string& res);
+void IGNITE_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
+    ignite::odbc::binary::BinaryReader, std::string >(std::string& res);
 
 template <>
 void IGNITE_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<

@@ -20,99 +20,83 @@
 
 #include "ignite/odbc/common/dynamic_load_os.h"
 
-namespace
-{
-    std::wstring StringToWstring(const std::string& str)
-    {
-        int wslen = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()), NULL, 0);
+namespace {
+std::wstring StringToWstring(const std::string& str) {
+  int wslen = MultiByteToWideChar(CP_UTF8, 0, str.c_str(),
+                                  static_cast< int >(str.size()), NULL, 0);
 
-        if (!wslen)
-            return std::wstring();
+  if (!wslen)
+    return std::wstring();
 
-        std::vector<WCHAR> converted(wslen);
+  std::vector< WCHAR > converted(wslen);
 
-        MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()), &converted[0], wslen);
+  MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast< int >(str.size()),
+                      &converted[0], wslen);
 
-        std::wstring res(converted.begin(), converted.end());
+  std::wstring res(converted.begin(), converted.end());
 
-        return res;
-    }
+  return res;
+}
+}  // namespace
+
+namespace ignite {
+namespace odbc {
+namespace common {
+namespace dynamic {
+Module::Module() : handle(NULL) {
+  // No-op.
 }
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace common
-        {
-            namespace dynamic
-            {
-                Module::Module() : handle(NULL)
-                {
-                    // No-op.
-                }
-    
-                Module::Module(HMODULE handle) : handle(handle)
-                {
-                    // No-op.
-                }
-    
-                Module::~Module()
-                {
-                    // No-op.
-                }
-    
-                Module::Module(const Module& other) : handle(other.handle)
-                {
-                    // No-op.
-                }
-    
-                Module& Module::operator=(const Module& other)
-                {
-                    handle = other.handle;
-    
-                    return *this;
-                }
-    
-                void* Module::FindSymbol(const char* name)
-                {
-                    return GetProcAddress(handle, name);
-                }
-    
-                bool Module::IsLoaded() const
-                {
-                    return handle != NULL;
-                }
-    
-                void Module::Unload()
-                {
-                    if (IsLoaded())
-                    {
-                        FreeLibrary(handle);
-    
-                        handle = NULL;
-                    }
-                }
-    
-                Module LoadModule(const wchar_t* path)
-                {
-                  HMODULE handle = LoadLibrary(path);
-
-                  return Module(handle);
-                }
-    
-                Module LoadModule(const std::wstring& path)
-                {
-                  return LoadModule(path.c_str());
-                }
-    
-                Module GetCurrent()
-                {
-                    HMODULE handle = GetModuleHandle(NULL);
-    
-                    return Module(handle);
-                }
-            }
-        }
-    }
+Module::Module(HMODULE handle) : handle(handle) {
+  // No-op.
 }
+
+Module::~Module() {
+  // No-op.
+}
+
+Module::Module(const Module& other) : handle(other.handle) {
+  // No-op.
+}
+
+Module& Module::operator=(const Module& other) {
+  handle = other.handle;
+
+  return *this;
+}
+
+void* Module::FindSymbol(const char* name) {
+  return GetProcAddress(handle, name);
+}
+
+bool Module::IsLoaded() const {
+  return handle != NULL;
+}
+
+void Module::Unload() {
+  if (IsLoaded()) {
+    FreeLibrary(handle);
+
+    handle = NULL;
+  }
+}
+
+Module LoadModule(const wchar_t* path) {
+  HMODULE handle = LoadLibrary(path);
+
+  return Module(handle);
+}
+
+Module LoadModule(const std::wstring& path) {
+  return LoadModule(path.c_str());
+}
+
+Module GetCurrent() {
+  HMODULE handle = GetModuleHandle(NULL);
+
+  return Module(handle);
+}
+}  // namespace dynamic
+}  // namespace common
+}  // namespace odbc
+}  // namespace ignite

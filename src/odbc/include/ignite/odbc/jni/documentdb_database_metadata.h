@@ -50,9 +50,8 @@ class DocumentDbDatabaseMetadata {
   /**
    * Constructs an instance of the DocumentDbDatabaseMetadata class.
    */
-  DocumentDbDatabaseMetadata(
-      SharedPointer< JniContext >& jniContext,
-      SharedPointer< GlobalJObject >& databaseMetadata)
+  DocumentDbDatabaseMetadata(SharedPointer< JniContext >& jniContext,
+                             SharedPointer< GlobalJObject >& databaseMetadata)
       : jniContext_(jniContext), databaseMetadata_(databaseMetadata) {
   }
 

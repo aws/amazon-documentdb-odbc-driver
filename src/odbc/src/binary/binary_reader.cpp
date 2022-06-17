@@ -168,4 +168,3 @@ BinaryRawReader BinaryReader::RawReader() {
 }  // namespace binary
 }  // namespace odbc
 }  // namespace ignite
-

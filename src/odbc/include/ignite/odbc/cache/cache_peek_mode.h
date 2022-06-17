@@ -23,60 +23,57 @@
 #ifndef _IGNITE_ODBC_CACHE_CACHE_PEEK_MODE
 #define _IGNITE_ODBC_CACHE_CACHE_PEEK_MODE
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace cache
-        {
-            /**
-             * Enumeration of all supported cache peek modes.
-             */
-            struct CachePeekMode
-            {
-                enum Type
-                {
-                    /**
-                     * Peeks into all available cache storages.
-                     */
-                    ALL = 0x01,
-    
-                    /**
-                     * Peek into near cache only (don't peek into partitioned cache).
-                     * In case of LOCAL cache, behaves as CachePeekMode::ALL mode.
-                     */
-                    NEAR_CACHE = 0x02,
-    
-                    /**
-                     * Peek value from primary copy of partitioned cache only (skip near cache).
-                     * In case of LOCAL cache, behaves as CachePeekMode::ALL mode.
-                     */
-                    PRIMARY = 0x04,
-    
-                    /**
-                     * Peek value from backup copies of partitioned cache only (skip near cache).
-                     * In case of LOCAL cache, behaves as CachePeekMode::ALL mode.
-                     */
-                    BACKUP = 0x08,
-    
-                    /**
-                     * Peeks value from the on-heap storage only.
-                     */
-                    ONHEAP = 0x10,
-    
-                    /**
-                     * Peeks value from the off-heap storage only, without loading off-heap value into cache.
-                     */
-                    OFFHEAP = 0x20,
-    
-                    /**
-                     * Peeks value from the swap storage only, without loading swapped value into cache.
-                     */
-                    SWAP = 0x40
-                };
-            };
-        }
-    }
-}
+namespace ignite {
+namespace odbc {
+namespace cache {
+/**
+ * Enumeration of all supported cache peek modes.
+ */
+struct CachePeekMode {
+  enum Type {
+    /**
+     * Peeks into all available cache storages.
+     */
+    ALL = 0x01,
 
-#endif //_IGNITE_ODBC_CACHE_CACHE_PEEK_MODE
+    /**
+     * Peek into near cache only (don't peek into partitioned cache).
+     * In case of LOCAL cache, behaves as CachePeekMode::ALL mode.
+     */
+    NEAR_CACHE = 0x02,
+
+    /**
+     * Peek value from primary copy of partitioned cache only (skip near cache).
+     * In case of LOCAL cache, behaves as CachePeekMode::ALL mode.
+     */
+    PRIMARY = 0x04,
+
+    /**
+     * Peek value from backup copies of partitioned cache only (skip near
+     * cache). In case of LOCAL cache, behaves as CachePeekMode::ALL mode.
+     */
+    BACKUP = 0x08,
+
+    /**
+     * Peeks value from the on-heap storage only.
+     */
+    ONHEAP = 0x10,
+
+    /**
+     * Peeks value from the off-heap storage only, without loading off-heap
+     * value into cache.
+     */
+    OFFHEAP = 0x20,
+
+    /**
+     * Peeks value from the swap storage only, without loading swapped value
+     * into cache.
+     */
+    SWAP = 0x40
+  };
+};
+}  // namespace cache
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_CACHE_CACHE_PEEK_MODE

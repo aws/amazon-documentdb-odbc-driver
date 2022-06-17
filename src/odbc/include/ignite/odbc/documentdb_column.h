@@ -25,9 +25,9 @@
 #include <bsoncxx/document/view.hpp>
 
 using namespace ignite::odbc::impl::binary;
-using ignite::odbc::jni::JdbcColumnMetadata;
 using ignite::odbc::app::ApplicationDataBuffer;
 using ignite::odbc::app::ConversionResult;
+using ignite::odbc::jni::JdbcColumnMetadata;
 
 namespace ignite {
 namespace odbc {
@@ -56,7 +56,7 @@ class DocumentDbColumn {
    */
   DocumentDbColumn& operator=(const DocumentDbColumn& other) = delete;
 
-  /** 
+  /**
    * Updates the reference to the current document.
    */
   void Update(bsoncxx::document::view const& document);
@@ -72,7 +72,7 @@ class DocumentDbColumn {
    * @param reader Reader to be used to retrieve column data.
    */
   DocumentDbColumn(bsoncxx::document::view& document,
-              JdbcColumnMetadata& columnMetadata, std::string& path);
+                   JdbcColumnMetadata& columnMetadata, std::string& path);
 
   /**
    * Get column size in bytes.
@@ -90,11 +90,9 @@ class DocumentDbColumn {
    * @param dataBuf Application data buffer.
    * @return Operation result.
    */
-  ConversionResult::Type ReadToBuffer(
-      ApplicationDataBuffer& dataBuf) const;
+  ConversionResult::Type ReadToBuffer(ApplicationDataBuffer& dataBuf) const;
 
  private:
-
   /** Setter for int8 data type */
   ConversionResult::Type PutInt8(
       ApplicationDataBuffer& dataBuf,

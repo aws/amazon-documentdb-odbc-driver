@@ -29,238 +29,210 @@
 #include <ignite/odbc/impl/compute/compute_job_result.h>
 #include <ignite/odbc/impl/compute/compute_task_holder.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace impl
-        {
-            namespace compute
-            {
-                /**
-                 * Compute task holder type-specific implementation.
-                 */
-                template<typename R>
-                class JavaComputeTaskHolder : public ComputeTaskHolder
-                {
-                public:
-                    typedef R ResultType;
-    
-                    /**
-                     * Constructor.
-                     */
-                    JavaComputeTaskHolder() :
-                        ComputeTaskHolder(-1)
-                    {
-                        // No-op.
-                    }
-    
-                    /**
-                     * Destructor.
-                     */
-                    virtual ~JavaComputeTaskHolder()
-                    {
-                        // No-op.
-                    }
-    
-                    /**
-                     * Process local job result.
-                     *
-                     * @param job Job.
-                     * @return Policy.
-                     */
-                    virtual int32_t JobResultLocal(ComputeJobHolder&)
-                    {
-                        return ComputeJobResultPolicy::WAIT;
-                    }
-    
-                    /**
-                     * Process remote job result.
-                     *
-                     * @param reader Reader for stream with result.
-                     * @return Policy.
-                     */
-                    virtual int32_t JobResultRemote(binary::BinaryReaderImpl&)
-                    {
-                        return ComputeJobResultPolicy::WAIT;
-                    }
-    
-                    /**
-                     * Process remote job result.
-                     *
-                     * @param reader Reader for stream with result.
-                     */
-                    virtual void JobResultError(const IgniteError& err)
-                    {
-                        res.SetError(err);
-                    }
-    
-                    /**
-                     * Process successful result.
-                     *
-                     * @param value Value.
-                     */
-                    virtual void JobResultSuccess(int64_t value)
-                    {
-                        res.SetResult(PrimitiveFutureResult<ResultType>(value));
-                    }
-    
-                    /**
-                     * Process successful result.
-                     *
-                     * @param reader Reader for stream with result.
-                     */
-                    virtual void JobResultSuccess(binary::BinaryReaderImpl& reader)
-                    {
-                        res.SetResult(reader.ReadObject<ResultType>());
-                    }
-    
-                    /**
-                     * Process successful null result.
-                     */
-                    virtual void JobNullResultSuccess()
-                    {
-                        res.SetResult(impl::binary::BinaryUtils::GetDefaultValue<ResultType>());
-                    }
-    
-                    /**
-                     * Reduce results of related jobs.
-                     */
-                    virtual void Reduce()
-                    {
-                        res.SetPromise(promise);
-                    }
-    
-                    /**
-                     * Get result promise.
-                     *
-                     * @return Reference to result promise.
-                     */
-                    common::Promise<ResultType>& GetPromise()
-                    {
-                        return promise;
-                    }
-    
-                private:
-                    /** Result. */
-                    ComputeJobResult<ResultType> res;
-    
-                    /** Task result promise. */
-                    common::Promise<ResultType> promise;
-                };
-    
-                /**
-                 * Compute task holder type-specific implementation.
-                 */
-                template<>
-                class JavaComputeTaskHolder<void> : public ComputeTaskHolder
-                {
-                public:
-                    /**
-                     * Constructor.
-                     */
-                    JavaComputeTaskHolder() :
-                        ComputeTaskHolder(-1)
-                    {
-                        // No-op.
-                    }
-    
-                    /**
-                     * Destructor.
-                     */
-                    virtual ~JavaComputeTaskHolder()
-                    {
-                        // No-op.
-                    }
-    
-                    /**
-                     * Process local job result.
-                     *
-                     * @param job Job.
-                     * @return Policy.
-                     */
-                    virtual int32_t JobResultLocal(ComputeJobHolder&)
-                    {
-                        return ComputeJobResultPolicy::WAIT;
-                    }
-    
-                    /**
-                     * Process remote job result.
-                     *
-                     * @param reader Reader for stream with result.
-                     * @return Policy.
-                     */
-                    virtual int32_t JobResultRemote(binary::BinaryReaderImpl&)
-                    {
-                        return ComputeJobResultPolicy::WAIT;
-                    }
-    
-                    /**
-                     * Process remote job result.
-                     *
-                     * @param reader Reader for stream with result.
-                     */
-                    virtual void JobResultError(const IgniteError& err)
-                    {
-                        res.SetError(err);
-                    }
-    
-                    /**
-                     * Process successful result.
-                     *
-                     * @param value Value.
-                     */
-                    virtual void JobResultSuccess(int64_t)
-                    {
-                        res.SetResult();
-                    }
-    
-                    /**
-                     * Process successful result.
-                     *
-                     * @param reader Reader for stream with result.
-                     */
-                    virtual void JobResultSuccess(binary::BinaryReaderImpl&)
-                    {
-                        res.SetResult();
-                    }
-    
-                    /**
-                     * Process successful null result.
-                     */
-                    virtual void JobNullResultSuccess()
-                    {
-                        res.SetResult();
-                    }
-    
-                    /**
-                     * Reduce results of related jobs.
-                     */
-                    virtual void Reduce()
-                    {
-                        res.SetPromise(promise);
-                    }
-    
-                    /**
-                     * Get result promise.
-                     *
-                     * @return Reference to result promise.
-                     */
-                    common::Promise<void>& GetPromise()
-                    {
-                        return promise;
-                    }
-    
-                private:
-                    /** Result. */
-                    ComputeJobResult<void> res;
-    
-                    /** Task result promise. */
-                    common::Promise<void> promise;
-                };
-            }
-        }
-    }
-}
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace compute {
+/**
+ * Compute task holder type-specific implementation.
+ */
+template < typename R >
+class JavaComputeTaskHolder : public ComputeTaskHolder {
+ public:
+  typedef R ResultType;
 
-#endif //_IGNITE_ODBC_IMPL_COMPUTE_JAVA_COMPUTE_TASK_HOLDER
+  /**
+   * Constructor.
+   */
+  JavaComputeTaskHolder() : ComputeTaskHolder(-1) {
+    // No-op.
+  }
+
+  /**
+   * Destructor.
+   */
+  virtual ~JavaComputeTaskHolder() {
+    // No-op.
+  }
+
+  /**
+   * Process local job result.
+   *
+   * @param job Job.
+   * @return Policy.
+   */
+  virtual int32_t JobResultLocal(ComputeJobHolder&) {
+    return ComputeJobResultPolicy::WAIT;
+  }
+
+  /**
+   * Process remote job result.
+   *
+   * @param reader Reader for stream with result.
+   * @return Policy.
+   */
+  virtual int32_t JobResultRemote(binary::BinaryReaderImpl&) {
+    return ComputeJobResultPolicy::WAIT;
+  }
+
+  /**
+   * Process remote job result.
+   *
+   * @param reader Reader for stream with result.
+   */
+  virtual void JobResultError(const IgniteError& err) {
+    res.SetError(err);
+  }
+
+  /**
+   * Process successful result.
+   *
+   * @param value Value.
+   */
+  virtual void JobResultSuccess(int64_t value) {
+    res.SetResult(PrimitiveFutureResult< ResultType >(value));
+  }
+
+  /**
+   * Process successful result.
+   *
+   * @param reader Reader for stream with result.
+   */
+  virtual void JobResultSuccess(binary::BinaryReaderImpl& reader) {
+    res.SetResult(reader.ReadObject< ResultType >());
+  }
+
+  /**
+   * Process successful null result.
+   */
+  virtual void JobNullResultSuccess() {
+    res.SetResult(impl::binary::BinaryUtils::GetDefaultValue< ResultType >());
+  }
+
+  /**
+   * Reduce results of related jobs.
+   */
+  virtual void Reduce() {
+    res.SetPromise(promise);
+  }
+
+  /**
+   * Get result promise.
+   *
+   * @return Reference to result promise.
+   */
+  common::Promise< ResultType >& GetPromise() {
+    return promise;
+  }
+
+ private:
+  /** Result. */
+  ComputeJobResult< ResultType > res;
+
+  /** Task result promise. */
+  common::Promise< ResultType > promise;
+};
+
+/**
+ * Compute task holder type-specific implementation.
+ */
+template <>
+class JavaComputeTaskHolder< void > : public ComputeTaskHolder {
+ public:
+  /**
+   * Constructor.
+   */
+  JavaComputeTaskHolder() : ComputeTaskHolder(-1) {
+    // No-op.
+  }
+
+  /**
+   * Destructor.
+   */
+  virtual ~JavaComputeTaskHolder() {
+    // No-op.
+  }
+
+  /**
+   * Process local job result.
+   *
+   * @param job Job.
+   * @return Policy.
+   */
+  virtual int32_t JobResultLocal(ComputeJobHolder&) {
+    return ComputeJobResultPolicy::WAIT;
+  }
+
+  /**
+   * Process remote job result.
+   *
+   * @param reader Reader for stream with result.
+   * @return Policy.
+   */
+  virtual int32_t JobResultRemote(binary::BinaryReaderImpl&) {
+    return ComputeJobResultPolicy::WAIT;
+  }
+
+  /**
+   * Process remote job result.
+   *
+   * @param reader Reader for stream with result.
+   */
+  virtual void JobResultError(const IgniteError& err) {
+    res.SetError(err);
+  }
+
+  /**
+   * Process successful result.
+   *
+   * @param value Value.
+   */
+  virtual void JobResultSuccess(int64_t) {
+    res.SetResult();
+  }
+
+  /**
+   * Process successful result.
+   *
+   * @param reader Reader for stream with result.
+   */
+  virtual void JobResultSuccess(binary::BinaryReaderImpl&) {
+    res.SetResult();
+  }
+
+  /**
+   * Process successful null result.
+   */
+  virtual void JobNullResultSuccess() {
+    res.SetResult();
+  }
+
+  /**
+   * Reduce results of related jobs.
+   */
+  virtual void Reduce() {
+    res.SetPromise(promise);
+  }
+
+  /**
+   * Get result promise.
+   *
+   * @return Reference to result promise.
+   */
+  common::Promise< void >& GetPromise() {
+    return promise;
+  }
+
+ private:
+  /** Result. */
+  ComputeJobResult< void > res;
+
+  /** Task result promise. */
+  common::Promise< void > promise;
+};
+}  // namespace compute
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_IMPL_COMPUTE_JAVA_COMPUTE_TASK_HOLDER

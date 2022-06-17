@@ -26,97 +26,96 @@
 #include <ignite/odbc/impl/cache/cache_entry_processor_holder.h>
 #include <ignite/odbc/impl/compute/compute_task_holder.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace impl
-        {
-            namespace binding
-            {
-                /**
-                 * Binding for filter creation.
-                 * 
-                 * @tparam F The filter which inherits from CacheEntryEventFilter.
-                 *
-                 * @param reader Reader.
-                 * @param env Environment.
-                 * @return Handle for the filter.
-                 */
-                template<typename F>
-                int64_t FilterCreate(binary::BinaryReaderImpl& reader, binary::BinaryWriterImpl&, IgniteEnvironment& env)
-                {
-                    using namespace common::concurrent;
-                    using namespace cache::query::continuous;
-    
-                    F filter = reader.ReadObject<F>();
-    
-                    SharedPointer<ContinuousQueryImplBase> qry(new RemoteFilterHolder(MakeReferenceFromCopy(filter)));
-    
-                    return env.GetHandleRegistry().Allocate(qry);
-                }
-    
-                /**
-                 * Process input streaming data to produce output streaming data.
-                 *
-                 * Deserializes cache entry and processor using provided reader, invokes
-                 * cache entry processor, gets result and serializes it using provided
-                 * writer.
-                 *
-                 * @param reader Reader.
-                 * @param writer Writer.
-                 */
-                template<typename P, typename K, typename V, typename R, typename A>
-                int64_t ListenerApply(binary::BinaryReaderImpl& reader, binary::BinaryWriterImpl& writer, IgniteEnvironment&)
-                {
-                    typedef cache::CacheEntryProcessorHolder<P, A> ProcessorHolder;
-    
-                    ProcessorHolder procHolder = reader.ReadObject<ProcessorHolder>();
-    
-                    K key = reader.ReadObject<K>();
-    
-                    V value;
-                    bool exists = reader.TryReadObject<V>(value);
-    
-                    cache::MutableCacheEntryState::Type entryState;
-    
-                    R res = procHolder.template Process<R, K, V>(key, value, exists, entryState);
-    
-                    writer.WriteInt8(static_cast<int8_t>(entryState));
-    
-                    if (entryState == cache::MutableCacheEntryState::VALUE_SET)
-                        writer.WriteTopObject(value);
-    
-                    writer.WriteTopObject(res);
-    
-                    return 0;
-                }
-    
-                /**
-                 * Binding for compute job creation.
-                 *
-                 * @tparam F The job type.
-                 * @tparam R The job return type.
-                 *
-                 * @param reader Reader.
-                 * @param env Environment.
-                 * @return Handle for the job.
-                 */
-                template<typename F, typename R>
-                int64_t ComputeJobCreate(binary::BinaryReaderImpl& reader, binary::BinaryWriterImpl&, IgniteEnvironment& env)
-                {
-                    using namespace common::concurrent;
-                    using namespace compute;
-    
-                    F job = reader.ReadObject<F>();
-    
-                    SharedPointer<ComputeJobHolder> jobPtr(new ComputeJobHolderImpl<F, R>(job));
-    
-                    return env.GetHandleRegistry().Allocate(jobPtr);
-                }
-            }
-        }
-    }
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace binding {
+/**
+ * Binding for filter creation.
+ *
+ * @tparam F The filter which inherits from CacheEntryEventFilter.
+ *
+ * @param reader Reader.
+ * @param env Environment.
+ * @return Handle for the filter.
+ */
+template < typename F >
+int64_t FilterCreate(binary::BinaryReaderImpl& reader,
+                     binary::BinaryWriterImpl&, IgniteEnvironment& env) {
+  using namespace common::concurrent;
+  using namespace cache::query::continuous;
+
+  F filter = reader.ReadObject< F >();
+
+  SharedPointer< ContinuousQueryImplBase > qry(
+      new RemoteFilterHolder(MakeReferenceFromCopy(filter)));
+
+  return env.GetHandleRegistry().Allocate(qry);
 }
 
-#endif //_IGNITE_ODBC_IMPL_BINDINGS
+/**
+ * Process input streaming data to produce output streaming data.
+ *
+ * Deserializes cache entry and processor using provided reader, invokes
+ * cache entry processor, gets result and serializes it using provided
+ * writer.
+ *
+ * @param reader Reader.
+ * @param writer Writer.
+ */
+template < typename P, typename K, typename V, typename R, typename A >
+int64_t ListenerApply(binary::BinaryReaderImpl& reader,
+                      binary::BinaryWriterImpl& writer, IgniteEnvironment&) {
+  typedef cache::CacheEntryProcessorHolder< P, A > ProcessorHolder;
+
+  ProcessorHolder procHolder = reader.ReadObject< ProcessorHolder >();
+
+  K key = reader.ReadObject< K >();
+
+  V value;
+  bool exists = reader.TryReadObject< V >(value);
+
+  cache::MutableCacheEntryState::Type entryState;
+
+  R res =
+      procHolder.template Process< R, K, V >(key, value, exists, entryState);
+
+  writer.WriteInt8(static_cast< int8_t >(entryState));
+
+  if (entryState == cache::MutableCacheEntryState::VALUE_SET)
+    writer.WriteTopObject(value);
+
+  writer.WriteTopObject(res);
+
+  return 0;
+}
+
+/**
+ * Binding for compute job creation.
+ *
+ * @tparam F The job type.
+ * @tparam R The job return type.
+ *
+ * @param reader Reader.
+ * @param env Environment.
+ * @return Handle for the job.
+ */
+template < typename F, typename R >
+int64_t ComputeJobCreate(binary::BinaryReaderImpl& reader,
+                         binary::BinaryWriterImpl&, IgniteEnvironment& env) {
+  using namespace common::concurrent;
+  using namespace compute;
+
+  F job = reader.ReadObject< F >();
+
+  SharedPointer< ComputeJobHolder > jobPtr(
+      new ComputeJobHolderImpl< F, R >(job));
+
+  return env.GetHandleRegistry().Allocate(jobPtr);
+}
+}  // namespace binding
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_IMPL_BINDINGS

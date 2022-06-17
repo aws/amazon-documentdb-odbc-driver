@@ -17,7 +17,9 @@
 
 /**
  * @file
- * Declares ignite::odbc::impl::cache::query::continuous::ContinuousQueryHandleImpl class.
+ * Declares
+ * ignite::odbc::impl::cache::query::continuous::ContinuousQueryHandleImpl
+ * class.
  */
 
 #ifndef _IGNITE_ODBC_IMPL_CACHE_QUERY_CONTINUOUS_CONTINUOUS_QUERY_HANDLE_IMPL
@@ -26,69 +28,66 @@
 #include "ignite/odbc/cache/query/query_cursor.h"
 #include "ignite/odbc/impl/cache/query/continuous/continuous_query_impl.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace impl
-        {
-            namespace cache
-            {
-                namespace query
-                {
-                    namespace continuous
-                    {
-                        /**
-                         * Continuous query handle implementation.
-                         */
-                        class IGNITE_IMPORT_EXPORT ContinuousQueryHandleImpl
-                        {
-                            typedef common::concurrent::SharedPointer<IgniteEnvironment> SP_IgniteEnvironment;
-                            typedef common::concurrent::SharedPointer<ContinuousQueryImplBase> SP_ContinuousQueryImplBase;
-                        public:
-                            /**
-                             * Default constructor.
-                             * 
-                             * @param env Environment.
-                             * @param javaRef Java reference.
-                             */
-                            ContinuousQueryHandleImpl(SP_IgniteEnvironment env, int64_t handle, jobject javaRef);
-    
-                            /**
-                             * Destructor.
-                             */
-                            ~ContinuousQueryHandleImpl();
-    
-                            /**
-                             * Gets the cursor for initial query.
-                             * Can be called only once, throws exception on consequent calls.
-                             *
-                             * @param err Error.
-                             * @return Initial query cursor.
-                             */
-                            QueryCursorImpl* GetInitialQueryCursor(IgniteError& err);
-    
-                        private:
-                            /** Environment. */
-                            SP_IgniteEnvironment env;
-    
-                            /** Local handle for handle registry. */
-                            int64_t handle;
-    
-                            /** Handle to Java object. */
-                            jobject javaRef;
-    
-                            /** Mutex. */
-                            common::concurrent::CriticalSection mutex;
-    
-                            /** Cursor extracted. */
-                            bool extracted;
-                        };
-                    }
-                }
-            }
-        }
-    }
-}
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace cache {
+namespace query {
+namespace continuous {
+/**
+ * Continuous query handle implementation.
+ */
+class IGNITE_IMPORT_EXPORT ContinuousQueryHandleImpl {
+  typedef common::concurrent::SharedPointer< IgniteEnvironment >
+      SP_IgniteEnvironment;
+  typedef common::concurrent::SharedPointer< ContinuousQueryImplBase >
+      SP_ContinuousQueryImplBase;
 
-#endif //_IGNITE_ODBC_IMPL_CACHE_QUERY_CONTINUOUS_CONTINUOUS_QUERY_HANDLE_IMPL
+ public:
+  /**
+   * Default constructor.
+   *
+   * @param env Environment.
+   * @param javaRef Java reference.
+   */
+  ContinuousQueryHandleImpl(SP_IgniteEnvironment env, int64_t handle,
+                            jobject javaRef);
+
+  /**
+   * Destructor.
+   */
+  ~ContinuousQueryHandleImpl();
+
+  /**
+   * Gets the cursor for initial query.
+   * Can be called only once, throws exception on consequent calls.
+   *
+   * @param err Error.
+   * @return Initial query cursor.
+   */
+  QueryCursorImpl* GetInitialQueryCursor(IgniteError& err);
+
+ private:
+  /** Environment. */
+  SP_IgniteEnvironment env;
+
+  /** Local handle for handle registry. */
+  int64_t handle;
+
+  /** Handle to Java object. */
+  jobject javaRef;
+
+  /** Mutex. */
+  common::concurrent::CriticalSection mutex;
+
+  /** Cursor extracted. */
+  bool extracted;
+};
+}  // namespace continuous
+}  // namespace query
+}  // namespace cache
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_IMPL_CACHE_QUERY_CONTINUOUS_CONTINUOUS_QUERY_HANDLE_IMPL

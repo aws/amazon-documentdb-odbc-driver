@@ -275,8 +275,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     }
 
     case SQL_DESC_CASE_SENSITIVE: {
-      if (dataType
-          && isCharType(*dataType))
+      if (dataType && isCharType(*dataType))
         value = SQL_TRUE;
       else
         value = SQL_FALSE;

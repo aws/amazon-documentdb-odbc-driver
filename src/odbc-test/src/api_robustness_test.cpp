@@ -211,8 +211,8 @@ BOOST_AUTO_TEST_CASE(TestSQLDriverConnect, *disabled()) {
   SQLDisconnect(dbc);
 
   // Null out string buffer length.
-  SQLDriverConnect(dbc, NULL, connectStr.data(), SQL_NTS, outStr, 0,
-                   &outStrLen, SQL_DRIVER_COMPLETE);
+  SQLDriverConnect(dbc, NULL, connectStr.data(), SQL_NTS, outStr, 0, &outStrLen,
+                   SQL_DRIVER_COMPLETE);
 
   SQLDisconnect(dbc);
 
@@ -599,8 +599,8 @@ BOOST_AUTO_TEST_CASE(TestSQLNativeSql, *disabled()) {
   SQLINTEGER resLen = 0;
 
   // Everything is ok.
-  SQLRETURN ret = SQLNativeSql(dbc, sql.data(), SQL_NTS, buffer,
-                               sizeof(buffer), &resLen);
+  SQLRETURN ret =
+      SQLNativeSql(dbc, sql.data(), SQL_NTS, buffer, sizeof(buffer), &resLen);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
@@ -1073,52 +1073,45 @@ BOOST_AUTO_TEST_CASE(TestSQLSpecialColumns, *disabled()) {
 
   // Everything is ok.
   SQLRETURN ret = SQLSpecialColumns(
-      stmt, SQL_BEST_ROWID, catalogName.data(), SQL_NTS,
-      schemaName.data(), SQL_NTS, tableName.data(),
-                        SQL_NTS, SQL_SCOPE_CURROW, SQL_NO_NULLS);
+      stmt, SQL_BEST_ROWID, catalogName.data(), SQL_NTS, schemaName.data(),
+      SQL_NTS, tableName.data(), SQL_NTS, SQL_SCOPE_CURROW, SQL_NO_NULLS);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   SQLCloseCursor(stmt);
 
-  SQLSpecialColumns(stmt, SQL_BEST_ROWID, 0, SQL_NTS,
-                    schemaName.data(), SQL_NTS, tableName.data(),
-                    SQL_NTS,
-                    SQL_SCOPE_CURROW, SQL_NO_NULLS);
+  SQLSpecialColumns(stmt, SQL_BEST_ROWID, 0, SQL_NTS, schemaName.data(),
+                    SQL_NTS, tableName.data(), SQL_NTS, SQL_SCOPE_CURROW,
+                    SQL_NO_NULLS);
 
   SQLCloseCursor(stmt);
 
   SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName.data(), 0,
-                    schemaName.data(), SQL_NTS, tableName.data(),
-                    SQL_NTS,
+                    schemaName.data(), SQL_NTS, tableName.data(), SQL_NTS,
                     SQL_SCOPE_CURROW, SQL_NO_NULLS);
 
   SQLCloseCursor(stmt);
 
-  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName.data(),
-                    SQL_NTS, 0, SQL_NTS,
-                    tableName.data(), SQL_NTS,
+  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName.data(), SQL_NTS, 0,
+                    SQL_NTS, tableName.data(), SQL_NTS, SQL_SCOPE_CURROW,
+                    SQL_NO_NULLS);
+
+  SQLCloseCursor(stmt);
+
+  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName.data(), SQL_NTS,
+                    schemaName.data(), 0, tableName.data(), SQL_NTS,
                     SQL_SCOPE_CURROW, SQL_NO_NULLS);
 
   SQLCloseCursor(stmt);
 
-  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName.data(),
-                    SQL_NTS, schemaName.data(), 0, tableName.data(),
-                    SQL_NTS,
-                    SQL_SCOPE_CURROW, SQL_NO_NULLS);
+  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName.data(), SQL_NTS,
+                    schemaName.data(), SQL_NTS, 0, SQL_NTS, SQL_SCOPE_CURROW,
+                    SQL_NO_NULLS);
 
   SQLCloseCursor(stmt);
 
-  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName.data(),
-                    SQL_NTS, schemaName.data(), SQL_NTS,
-                    0, SQL_NTS,
-                    SQL_SCOPE_CURROW, SQL_NO_NULLS);
-
-  SQLCloseCursor(stmt);
-
-  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName.data(),
-                    SQL_NTS, schemaName.data(), SQL_NTS,
-                    tableName.data(), 0,
+  SQLSpecialColumns(stmt, SQL_BEST_ROWID, catalogName.data(), SQL_NTS,
+                    schemaName.data(), SQL_NTS, tableName.data(), 0,
                     SQL_SCOPE_CURROW, SQL_NO_NULLS);
 
   SQLCloseCursor(stmt);

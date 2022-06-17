@@ -23,90 +23,70 @@ using namespace ignite::odbc::jni::java;
 using namespace ignite::odbc::cluster;
 using namespace ignite::odbc::impl::cluster;
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace impl
-        {
-            namespace cluster
-            {
-                IgniteClusterImpl::IgniteClusterImpl(SP_ClusterGroupImpl impl) :
-                    impl(impl)
-                {
-                    // No-op.
-                }
-    
-                IgniteClusterImpl::~IgniteClusterImpl()
-                {
-                    // No-op.
-                }
-    
-                bool IgniteClusterImpl::IsActive()
-                {
-                    return impl.Get()->IsActive();
-                }
-    
-                void IgniteClusterImpl::SetActive(bool active)
-                {
-                    impl.Get()->SetActive(active);
-                }
-    
-                void IgniteClusterImpl::DisableWal(std::string cacheName)
-                {
-                    impl.Get()->DisableWal(cacheName);
-                }
-    
-                void IgniteClusterImpl::EnableWal(std::string cacheName)
-                {
-                    impl.Get()->EnableWal(cacheName);
-                }
-    
-                bool IgniteClusterImpl::IsWalEnabled(std::string cacheName)
-                {
-                    return impl.Get()->IsWalEnabled(cacheName);
-                }
-    
-                ClusterGroup IgniteClusterImpl::ForLocal()
-                {
-                    return impl.Get()->ForLocal();
-                }
-    
-                ClusterNode IgniteClusterImpl::GetLocalNode()
-                {
-                    return impl.Get()->GetLocalNode();
-                }
-    
-                void IgniteClusterImpl::SetBaselineTopologyVersion(int64_t topVer)
-                {
-                    impl.Get()->SetBaselineTopologyVersion(topVer);
-                }
-    
-                void IgniteClusterImpl::SetTxTimeoutOnPartitionMapExchange(int64_t timeout)
-                {
-                    impl.Get()->SetTxTimeoutOnPartitionMapExchange(timeout);
-                }
-    
-                bool IgniteClusterImpl::PingNode(Guid nid)
-                {
-                    return impl.Get()->PingNode(nid);
-                }
-    
-                std::vector<ClusterNode> IgniteClusterImpl::GetTopology(int64_t version)
-                {
-                    return impl.Get()->GetTopology(version);
-                }
-    
-                int64_t IgniteClusterImpl::GetTopologyVersion()
-                {
-                    return impl.Get()->GetTopologyVersion();
-                }
-    
-                SP_ClusterGroupImpl IgniteClusterImpl::AsClusterGroup()
-                {
-                    return impl;
-                }
-            }
-        }
-    }
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace cluster {
+IgniteClusterImpl::IgniteClusterImpl(SP_ClusterGroupImpl impl) : impl(impl) {
+  // No-op.
 }
+
+IgniteClusterImpl::~IgniteClusterImpl() {
+  // No-op.
+}
+
+bool IgniteClusterImpl::IsActive() {
+  return impl.Get()->IsActive();
+}
+
+void IgniteClusterImpl::SetActive(bool active) {
+  impl.Get()->SetActive(active);
+}
+
+void IgniteClusterImpl::DisableWal(std::string cacheName) {
+  impl.Get()->DisableWal(cacheName);
+}
+
+void IgniteClusterImpl::EnableWal(std::string cacheName) {
+  impl.Get()->EnableWal(cacheName);
+}
+
+bool IgniteClusterImpl::IsWalEnabled(std::string cacheName) {
+  return impl.Get()->IsWalEnabled(cacheName);
+}
+
+ClusterGroup IgniteClusterImpl::ForLocal() {
+  return impl.Get()->ForLocal();
+}
+
+ClusterNode IgniteClusterImpl::GetLocalNode() {
+  return impl.Get()->GetLocalNode();
+}
+
+void IgniteClusterImpl::SetBaselineTopologyVersion(int64_t topVer) {
+  impl.Get()->SetBaselineTopologyVersion(topVer);
+}
+
+void IgniteClusterImpl::SetTxTimeoutOnPartitionMapExchange(int64_t timeout) {
+  impl.Get()->SetTxTimeoutOnPartitionMapExchange(timeout);
+}
+
+bool IgniteClusterImpl::PingNode(Guid nid) {
+  return impl.Get()->PingNode(nid);
+}
+
+std::vector< ClusterNode > IgniteClusterImpl::GetTopology(int64_t version) {
+  return impl.Get()->GetTopology(version);
+}
+
+int64_t IgniteClusterImpl::GetTopologyVersion() {
+  return impl.Get()->GetTopologyVersion();
+}
+
+SP_ClusterGroupImpl IgniteClusterImpl::AsClusterGroup() {
+  return impl;
+}
+}  // namespace cluster
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite

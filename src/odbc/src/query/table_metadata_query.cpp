@@ -60,12 +60,11 @@ struct ResultColumn {
 namespace ignite {
 namespace odbc {
 namespace query {
-TableMetadataQuery::TableMetadataQuery(diagnostic::DiagnosableAdapter& diag,
-                                       Connection& connection,
-                                       const boost::optional< std::string >& catalog,
-                                       const boost::optional< std::string >& schema,
-                                       const std::string& table,
-                                       const boost::optional< std::string >& tableType)
+TableMetadataQuery::TableMetadataQuery(
+    diagnostic::DiagnosableAdapter& diag, Connection& connection,
+    const boost::optional< std::string >& catalog,
+    const boost::optional< std::string >& schema, const std::string& table,
+    const boost::optional< std::string >& tableType)
     : Query(diag, QueryType::TABLE_METADATA),
       connection(connection),
       catalog(catalog),

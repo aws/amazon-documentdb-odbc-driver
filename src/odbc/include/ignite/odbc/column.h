@@ -79,9 +79,8 @@ class Column {
    * @param dataBuf Application data buffer.
    * @return Operation result.
    */
-  app::ConversionResult::Type ReadToBuffer(
-      BinaryReaderImpl& reader,
-      app::ApplicationDataBuffer& dataBuf);
+  app::ConversionResult::Type ReadToBuffer(BinaryReaderImpl& reader,
+                                           app::ApplicationDataBuffer& dataBuf);
 
   /**
    * Check if the column is in valid state.

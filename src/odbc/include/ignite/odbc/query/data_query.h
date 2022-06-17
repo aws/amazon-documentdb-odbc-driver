@@ -156,7 +156,6 @@ class DataQuery : public Query {
    */
   SqlResult::Type MakeRequestFetch();
 
-
   /**
    * Gets the MQL query context.
    *
@@ -193,12 +192,11 @@ class DataQuery : public Query {
   ;
 
   /**
-   * Set result set meta. 
+   * Set result set meta.
    *
    * @param value Metadata value.
    */
   void SetResultsetMeta(const meta::ColumnMetaVector& value);
-
 
   /**
    * Set result set meta by reading Jdbc column metadata vector.

@@ -45,9 +45,8 @@ struct TestType {
 
   TestType(int8_t i8Field, int16_t i16Field, int32_t i32Field, int64_t i64Field,
            const std::string& strField, float floatField, double doubleField,
-           bool boolField, const Guid& guidField,
-           const Date& dateField, const Time& timeField,
-           const Timestamp& timestampField)
+           bool boolField, const Guid& guidField, const Date& dateField,
+           const Time& timeField, const Timestamp& timestampField)
       : allNulls(false),
         i8Field(i8Field),
         i16Field(i16Field),
