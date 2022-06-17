@@ -280,7 +280,6 @@ ConversionResult::Type ApplicationDataBuffer::PutValToStrBuffer(
 template < typename OutCharT, typename InCharT >
 ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
     const std::basic_string< InCharT >& value, int32_t& written) {
-
   written = 0;
 
   SqlLen outCharSize = static_cast< SqlLen >(sizeof(OutCharT));

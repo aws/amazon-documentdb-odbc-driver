@@ -412,7 +412,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
    * @param expNullability expected nullability.
    */
   void CheckColumnMetaWithSQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT idx,
-                                          const std::string& expName,
+                                          const std::string &expName,
                                           SQLLEN expDataType, SQLULEN expSize,
                                           SQLLEN expScale,
                                           SQLLEN expNullability) {
@@ -1350,6 +1350,7 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
   std::vector< SQLWCHAR > table = MakeSqlBuffer("meta_queries_test_001");
   std::vector< SQLWCHAR > empty = {0};
   std::vector< SQLWCHAR > schemaName = MakeSqlBuffer(databaseName);
+
   SQLRETURN ret = SQLColumns(stmt, nullptr, 0, schemaName.data(), SQL_NTS,
                              table.data(), SQL_NTS, nullptr, 0);
 

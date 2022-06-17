@@ -809,9 +809,8 @@ void OdbcTestSuite::CreateDsnConnectionStringForRemoteServer(
       sshTunnel ? common::GetEnv("DOC_DB_HOST", "") : "localhost";
   std::string sshUserAtHost = common::GetEnv("DOC_DB_USER", "");
   std::string sshPrivKeyFile = common::GetEnv("DOC_DB_PRIV_KEY_FILE", "");
-  std::string port = sshTunnel
-                          ? common::GetEnv("DOC_DB_REMOTE_PORT", "27017")
-                          : common::GetEnv("DOC_DB_LOCAL_PORT", "27019");
+  std::string port = sshTunnel ? common::GetEnv("DOC_DB_REMOTE_PORT", "27017")
+                               : common::GetEnv("DOC_DB_LOCAL_PORT", "27019");
 
   if (!username.empty()) {
     user = username;
