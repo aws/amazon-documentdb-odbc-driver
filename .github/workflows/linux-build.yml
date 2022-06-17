@@ -24,6 +24,7 @@ env:
   DOC_DB_LOCAL_PORT: 27019
   DOC_DB_REMOTE_PORT: 27017
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
+  DOC_DB_ODBC_INTEGRATION_TEST: 1
   DOC_DB_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
   DOC_DB_LOG_LEVEL: "debug"
   JDBC_DRIVER_VERSION: "1.2.4"
@@ -32,7 +33,8 @@ env:
 jobs:
   build-linux64:
     runs-on: ubuntu-20.04
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+    # TODO remove comment out
+    # if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
     steps:
     - uses: actions/checkout@v2
     - name: Get Java distribution
