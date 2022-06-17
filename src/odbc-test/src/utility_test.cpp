@@ -54,6 +54,7 @@ BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBuffer) {
 
   // With length in byte mode
   buffer[0] = 0;
+  LOG_DEBUG_MSG("TestUtilityCopyStringToBuffer calling CopyStringToBuffer(str, buffer, sizeof(buffer), true)");
   bytesWrittenOrRequired =
       CopyStringToBuffer(str, buffer, sizeof(buffer), true);
   BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), str);
@@ -61,12 +62,14 @@ BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBuffer) {
 
   // 10 characters plus 1 for null char.
   buffer[0] = 0;
+  LOG_DEBUG_MSG("TestUtilityCopyStringToBuffer calling CopyStringToBuffer(str, buffer, 11, false)");
   bytesWrittenOrRequired = CopyStringToBuffer(str, buffer, 11, false);
   BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), ToUtf8(wstr.substr(0, 10)));
   BOOST_CHECK_EQUAL(10, bytesWrittenOrRequired);
 
   // 10 characters plus 1 for null char, in bytes
   buffer[0] = 0;
+  LOG_DEBUG_MSG("TestUtilityCopyStringToBuffer calling CopyStringToBuffer(str, buffer, ((10 + 1) * sizeof(SQLWCHAR)), true)");
   bytesWrittenOrRequired =
       CopyStringToBuffer(str, buffer, ((10 + 1) * sizeof(SQLWCHAR)), true);
   BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), ToUtf8(wstr.substr(0, 10)));
@@ -80,6 +83,7 @@ BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBuffer) {
 
   // Zero length buffer in byte mode.
   buffer[0] = 0;
+  LOG_DEBUG_MSG("TestUtilityCopyStringToBuffer calling CopyStringToBuffer(str, buffer, 0, true)");
   bytesWrittenOrRequired = CopyStringToBuffer(str, buffer, 0, true);
   BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), std::string());
   BOOST_CHECK_EQUAL(0, bytesWrittenOrRequired);
@@ -91,6 +95,7 @@ BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBuffer) {
 
   // nullptr buffer, zero length, in byte mode.
   buffer[0] = 0;
+  LOG_DEBUG_MSG("TestUtilityCopyStringToBuffer calling CopyStringToBuffer(str, nullptr, 0, true)");
   bytesWrittenOrRequired = CopyStringToBuffer(str, nullptr, 0, true);
   BOOST_CHECK_EQUAL(wstr.size() * sizeof(SQLWCHAR), bytesWrittenOrRequired);
 
@@ -102,6 +107,7 @@ BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBuffer) {
 
   // nullptr buffer, non-zero length, in byte mode.
   buffer[0] = 0;
+  LOG_DEBUG_MSG("TestUtilityCopyStringToBuffer calling CopyStringToBuffer(str, nullptr, sizeof(buffer), true)");
   bytesWrittenOrRequired =
       CopyStringToBuffer(str, nullptr, sizeof(buffer), true);
   BOOST_CHECK_EQUAL(wstr.size() * sizeof(SQLWCHAR), bytesWrittenOrRequired);
