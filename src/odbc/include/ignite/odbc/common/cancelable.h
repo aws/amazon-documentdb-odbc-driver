@@ -25,44 +25,38 @@
 
 #include <ignite/odbc/common/common.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace common
-        {
-            /**
-             * Cancelable.
-             */
-            class IGNITE_IMPORT_EXPORT Cancelable
-            {
-            public:
-                /**
-                 * Default constructor.
-                 */
-                Cancelable()
-                {
-                    // No-op.
-                }
-    
-                /**
-                 * Destructor.
-                 */
-                virtual ~Cancelable()
-                {
-                    // No-op.
-                }
-    
-                /**
-                 * Cancels the operation.
-                 */
-                virtual void Cancel() = 0;
-    
-            private:
-                IGNITE_NO_COPY_ASSIGNMENT(Cancelable);
-            };
-        }
-    }
-}
+namespace ignite {
+namespace odbc {
+namespace common {
+/**
+ * Cancelable.
+ */
+class IGNITE_IMPORT_EXPORT Cancelable {
+ public:
+  /**
+   * Default constructor.
+   */
+  Cancelable() {
+    // No-op.
+  }
 
-#endif //_IGNITE_ODBC_COMMON_CANCELABLE
+  /**
+   * Destructor.
+   */
+  virtual ~Cancelable() {
+    // No-op.
+  }
+
+  /**
+   * Cancels the operation.
+   */
+  virtual void Cancel() = 0;
+
+ private:
+  IGNITE_NO_COPY_ASSIGNMENT(Cancelable);
+};
+}  // namespace common
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_COMMON_CANCELABLE

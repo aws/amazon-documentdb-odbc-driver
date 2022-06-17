@@ -80,11 +80,10 @@ struct ResultColumn {
 namespace ignite {
 namespace odbc {
 namespace query {
-ForeignKeysQuery::ForeignKeysQuery(diagnostic::DiagnosableAdapter& diag,
-                                   Connection& connection,
-                                   const boost::optional< std::string >& catalog,
-                                   const boost::optional< std::string >& schema,
-                                   const std::string& table)
+ForeignKeysQuery::ForeignKeysQuery(
+    diagnostic::DiagnosableAdapter& diag, Connection& connection,
+    const boost::optional< std::string >& catalog,
+    const boost::optional< std::string >& schema, const std::string& table)
     : Query(diag, QueryType::FOREIGN_KEYS),
       connection(connection),
       catalog(catalog),
@@ -322,8 +321,7 @@ SqlResult::Type ForeignKeysQuery::MakeRequestGetForeignKeysMeta() {
                         << meta[i].GetPKTableName().get_value_or("") << "\n["
                         << i << "] PKColumnName:     "
                         << meta[i].GetPKColumnName().get_value_or("") << "\n["
-                        << i << "] KeySeq:           " 
-                        << meta[i].GetKeySeq());
+                        << i << "] KeySeq:           " << meta[i].GetKeySeq());
   }
 
   return SqlResult::AI_SUCCESS;

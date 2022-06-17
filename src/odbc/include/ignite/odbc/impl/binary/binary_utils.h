@@ -107,8 +107,8 @@ class IGNITE_IMPORT_EXPORT BinaryUtils {
    * @param val Value.
    * @param len Array length.
    */
-  static void WriteInt8Array(InteropOutputStream* stream,
-                             const int8_t* val, int32_t len);
+  static void WriteInt8Array(InteropOutputStream* stream, const int8_t* val,
+                             int32_t len);
 
   /**
    * Utility method to read boolean from stream.
@@ -133,8 +133,7 @@ class IGNITE_IMPORT_EXPORT BinaryUtils {
    * @param res Target array.
    * @param len Array length.
    */
-  static void ReadBoolArray(InteropInputStream* stream, bool* res,
-                            int32_t len);
+  static void ReadBoolArray(InteropInputStream* stream, bool* res, int32_t len);
 
   /**
    * Utility method to write bool array to stream.
@@ -143,8 +142,8 @@ class IGNITE_IMPORT_EXPORT BinaryUtils {
    * @param val Value.
    * @param len Array length.
    */
-  static void WriteBoolArray(InteropOutputStream* stream,
-                             const bool* val, int32_t len);
+  static void WriteBoolArray(InteropOutputStream* stream, const bool* val,
+                             int32_t len);
 
   /**
    * Utility method to read signed 16-bit integer from stream.
@@ -199,8 +198,8 @@ class IGNITE_IMPORT_EXPORT BinaryUtils {
    * @param val Value.
    * @param len Array length.
    */
-  static void WriteInt16Array(InteropOutputStream* stream,
-                              const int16_t* val, int32_t len);
+  static void WriteInt16Array(InteropOutputStream* stream, const int16_t* val,
+                              int32_t len);
 
   /**
    * Utility method to read unsigned 16-bit integer from stream.
@@ -225,8 +224,8 @@ class IGNITE_IMPORT_EXPORT BinaryUtils {
    * @param res Target array.
    * @param len Array length.
    */
-  static void ReadUInt16Array(InteropInputStream* stream,
-                              uint16_t* res, int32_t len);
+  static void ReadUInt16Array(InteropInputStream* stream, uint16_t* res,
+                              int32_t len);
 
   /**
    * Utility method to write unsigned 16-bit integer array to stream.
@@ -235,8 +234,8 @@ class IGNITE_IMPORT_EXPORT BinaryUtils {
    * @param val Value.
    * @param len Array length.
    */
-  static void WriteUInt16Array(InteropOutputStream* stream,
-                               const uint16_t* val, int32_t len);
+  static void WriteUInt16Array(InteropOutputStream* stream, const uint16_t* val,
+                               int32_t len);
 
   /**
    * Utility method to read signed 32-bit integer from stream.
@@ -291,8 +290,8 @@ class IGNITE_IMPORT_EXPORT BinaryUtils {
    * @param val Value.
    * @param len Array length.
    */
-  static void WriteInt32Array(InteropOutputStream* stream,
-                              const int32_t* val, int32_t len);
+  static void WriteInt32Array(InteropOutputStream* stream, const int32_t* val,
+                              int32_t len);
 
   /**
    * Utility method to read signed 64-bit integer from stream.
@@ -327,8 +326,8 @@ class IGNITE_IMPORT_EXPORT BinaryUtils {
    * @param val Value.
    * @param len Array length.
    */
-  static void WriteInt64Array(InteropOutputStream* stream,
-                              const int64_t* val, int32_t len);
+  static void WriteInt64Array(InteropOutputStream* stream, const int64_t* val,
+                              int32_t len);
 
   /**
    * Utility method to read float from stream.
@@ -363,8 +362,8 @@ class IGNITE_IMPORT_EXPORT BinaryUtils {
    * @param val Value.
    * @param len Array length.
    */
-  static void WriteFloatArray(InteropOutputStream* stream,
-                              const float* val, int32_t len);
+  static void WriteFloatArray(InteropOutputStream* stream, const float* val,
+                              int32_t len);
 
   /**
    * Utility method to read double from stream.
@@ -399,8 +398,8 @@ class IGNITE_IMPORT_EXPORT BinaryUtils {
    * @param val Value.
    * @param len Array length.
    */
-  static void WriteDoubleArray(InteropOutputStream* stream,
-                               const double* val, int32_t len);
+  static void WriteDoubleArray(InteropOutputStream* stream, const double* val,
+                               int32_t len);
 
   /**
    * Utility method to read Guid from stream.
@@ -446,8 +445,7 @@ class IGNITE_IMPORT_EXPORT BinaryUtils {
    * @param stream Stream.
    * @param val Value.
    */
-  static void WriteTimestamp(InteropOutputStream* stream,
-                             Timestamp val);
+  static void WriteTimestamp(InteropOutputStream* stream, Timestamp val);
 
   /**
    * Utility method to read Time from stream.
@@ -471,8 +469,7 @@ class IGNITE_IMPORT_EXPORT BinaryUtils {
    * @param stream Stream.
    * @return Value.
    */
-  static BinaryEnumEntry ReadBinaryEnumEntry(
-      InteropInputStream* stream);
+  static BinaryEnumEntry ReadBinaryEnumEntry(InteropInputStream* stream);
 
   /**
    * Utility method to write BinaryEnumEntry to stream.
@@ -492,8 +489,8 @@ class IGNITE_IMPORT_EXPORT BinaryUtils {
    * @param typeId Type ID.
    * @param ordinal Ordinal.
    */
-  static void WriteBinaryEnumEntry(InteropOutputStream* stream,
-                                   int32_t typeId, int32_t ordinal);
+  static void WriteBinaryEnumEntry(InteropOutputStream* stream, int32_t typeId,
+                                   int32_t ordinal);
 
   /**
    * Utility method to write string to stream.
@@ -581,8 +578,7 @@ inline Time BinaryUtils::GetDefaultValue< Time >() {
 }
 
 template <>
-inline BinaryEnumEntry
-BinaryUtils::GetDefaultValue< BinaryEnumEntry >() {
+inline BinaryEnumEntry BinaryUtils::GetDefaultValue< BinaryEnumEntry >() {
   return BinaryEnumEntry();
 }
 

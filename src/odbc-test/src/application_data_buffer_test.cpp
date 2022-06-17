@@ -750,7 +750,8 @@ BOOST_AUTO_TEST_CASE(TestGetIntWithOffset) {
     SqlLen reslen;
   };
 
-  GetIntWithOffsetTestStruct buf[2] = {{12, sizeof(uint64_t)}, {42, sizeof(uint64_t)}};
+  GetIntWithOffsetTestStruct buf[2] = {{12, sizeof(uint64_t)},
+                                       {42, sizeof(uint64_t)}};
 
   ApplicationDataBuffer appBuf(OdbcNativeType::AI_UNSIGNED_BIGINT, &buf[0].val,
                                sizeof(buf[0].val), &buf[0].reslen);

@@ -27,8 +27,8 @@ namespace ignite {
 namespace odbc {
 // ASSUMPTION: iterator is not at the end.
 DocumentDbRow::DocumentDbRow(bsoncxx::document::view const& document,
-                   std::vector< JdbcColumnMetadata >& columnMetadata,
-                   std::vector< std::string >& paths)
+                             std::vector< JdbcColumnMetadata >& columnMetadata,
+                             std::vector< std::string >& paths)
     : pos(0),
       size(columnMetadata.size()),
       columns_(),
@@ -63,7 +63,8 @@ bool DocumentDbRow::EnsureColumnDiscovered(uint32_t columnIdx) {
 
   int64_t index = columns_.size();
   while (columns_.size() < columnIdx) {
-    DocumentDbColumn newColumn(document_, columnMetadata_[index], paths_[index]);
+    DocumentDbColumn newColumn(document_, columnMetadata_[index],
+                               paths_[index]);
 
     columns_.push_back(newColumn);
     index++;

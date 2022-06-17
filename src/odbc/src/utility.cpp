@@ -66,7 +66,7 @@ size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
   return outBufferLenActual;
 }
 
-template< typename OutCharT >
+template < typename OutCharT >
 size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
                                    size_t outBufferLenBytes,
                                    bool& isTruncated) {
@@ -202,13 +202,11 @@ void ReadString(BinaryReaderImpl& reader, std::string& str) {
   }
 }
 
-void WriteString(BinaryWriterImpl& writer,
-                 const std::string& str) {
+void WriteString(BinaryWriterImpl& writer, const std::string& str) {
   writer.WriteString(str.data(), static_cast< int32_t >(str.size()));
 }
 
-void ReadDecimal(BinaryReaderImpl& reader,
-                 Decimal& decimal) {
+void ReadDecimal(BinaryReaderImpl& reader, Decimal& decimal) {
   int8_t hdr = reader.ReadInt8();
 
   assert(hdr == IGNITE_TYPE_DECIMAL);
@@ -223,8 +221,8 @@ void ReadDecimal(BinaryReaderImpl& reader,
 
   mag.resize(len);
 
-  BinaryUtils::ReadInt8Array(
-      reader.GetStream(), mag.data(), static_cast< int32_t >(mag.size()));
+  BinaryUtils::ReadInt8Array(reader.GetStream(), mag.data(),
+                             static_cast< int32_t >(mag.size()));
 
   int32_t sign = 1;
 
@@ -234,14 +232,12 @@ void ReadDecimal(BinaryReaderImpl& reader,
     sign = -1;
   }
 
-  Decimal res(mag.data(), static_cast< int32_t >(mag.size()),
-                            scale, sign);
+  Decimal res(mag.data(), static_cast< int32_t >(mag.size()), scale, sign);
 
   decimal.Swap(res);
 }
 
-void WriteDecimal(BinaryWriterImpl& writer,
-                  const Decimal& decimal) {
+void WriteDecimal(BinaryWriterImpl& writer, const Decimal& decimal) {
   writer.WriteInt8(IGNITE_TYPE_DECIMAL);
 
   const BigInteger& unscaled = decimal.GetUnscaledValue();
@@ -262,8 +258,8 @@ void WriteDecimal(BinaryWriterImpl& writer,
     magnitude[0] |= addBit;
   }
 
-  BinaryUtils::WriteInt8Array(
-      writer.GetStream(), magnitude.GetData(), magnitude.GetSize());
+  BinaryUtils::WriteInt8Array(writer.GetStream(), magnitude.GetData(),
+                              magnitude.GetSize());
 }
 
 std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
@@ -321,29 +317,7 @@ std::wstring FromUtf8(const char* value) {
   return converter.from_bytes(value);
 }
 
-boost::optional< std::string > SqlStringToOptString(const unsigned char* sqlStr,
-                                                    int32_t sqlStrLen) {
-  boost::optional< std::string > res = boost::none;
-  std::string tmp;
-
-  const char* sqlStrC = reinterpret_cast< const char* >(sqlStr);
-
-  if (!sqlStr)
-    return res;
-
-  if (sqlStrLen == SQL_NTS) {
-    tmp.assign(sqlStrC);
-    res = tmp;
-  } else if (sqlStrLen > 0) {
-    tmp.assign(sqlStrC, sqlStrLen);
-    res = tmp;
-  }
-
-  return res;
-}
-
-void ReadByteArray(BinaryReaderImpl& reader,
-                   std::vector< int8_t >& res) {
+void ReadByteArray(BinaryReaderImpl& reader, std::vector< int8_t >& res) {
   int32_t len = reader.ReadInt8Array(0, 0);
 
   if (len > 0) {

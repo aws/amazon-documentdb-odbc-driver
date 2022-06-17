@@ -49,11 +49,11 @@ struct ResultColumn {
 namespace ignite {
 namespace odbc {
 namespace query {
-PrimaryKeysQuery::PrimaryKeysQuery(diagnostic::DiagnosableAdapter& diag,
-                                   Connection& connection,
-                                   const boost::optional< std::string >& catalog,
-                                   const boost::optional< std::string >& schema,
-                                   const boost::optional< std::string >& table)
+PrimaryKeysQuery::PrimaryKeysQuery(
+    diagnostic::DiagnosableAdapter& diag, Connection& connection,
+    const boost::optional< std::string >& catalog,
+    const boost::optional< std::string >& schema,
+    const boost::optional< std::string >& table)
     : Query(diag, QueryType::PRIMARY_KEYS),
       connection(connection),
       catalog(catalog),
@@ -231,12 +231,12 @@ SqlResult::Type PrimaryKeysQuery::MakeRequestGetPrimaryKeysMeta() {
 
   for (size_t i = 0; i < meta.size(); ++i) {
     LOG_DEBUG_MSG("\n[" << i << "] SchemaName:     "
-                       << meta[i].GetSchemaName().get_value_or("") << "\n[" << i
-                       << "] TableName:      "
-                       << meta[i].GetTableName().get_value_or("") << "\n[" << i
-                       << "] ColumnName:     "
-                       << meta[i].GetColumnName().get_value_or("") << "\n[" << i
-                       << "] ColumnType: not available");
+                        << meta[i].GetSchemaName().get_value_or("") << "\n["
+                        << i << "] TableName:      "
+                        << meta[i].GetTableName().get_value_or("") << "\n[" << i
+                        << "] ColumnName:     "
+                        << meta[i].GetColumnName().get_value_or("") << "\n["
+                        << i << "] ColumnType: not available");
   }
   return SqlResult::AI_SUCCESS;
 }

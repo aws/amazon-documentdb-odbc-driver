@@ -27,46 +27,48 @@
 #include <string>
 #include <list>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        /**
-         * %Ignite configuration.
-         */
-        struct IgniteConfiguration
-        {
-            /** Path to Ignite home. */
-            std::string igniteHome;
-    
-            /** Path to Spring configuration file. */
-            std::string springCfgPath;
-    
-            /** Path ot JVM libbrary. */
-            std::string jvmLibPath;
-    
-            /** JVM classpath. */
-            std::string jvmClassPath;
-    
-            /** Initial amount of JVM memory. */
-            int32_t jvmInitMem;
-    
-            /** Maximum amount of JVM memory. */
-            int32_t jvmMaxMem;
-    
-            /** Additional JVM options. */
-            std::list<std::string> jvmOpts;
-    
-            /**
-             * Default constructor.
-             */
-            IgniteConfiguration() : igniteHome(), springCfgPath(), jvmLibPath(), jvmClassPath(),
-                jvmInitMem(512), jvmMaxMem(1024), jvmOpts()
-            {
-                // No-op.
-            }
-        };    
-    }
-}
+namespace ignite {
+namespace odbc {
+/**
+ * %Ignite configuration.
+ */
+struct IgniteConfiguration {
+  /** Path to Ignite home. */
+  std::string igniteHome;
 
-#endif //_IGNITE_ODBC_IGNITE_CONFIGURATION
+  /** Path to Spring configuration file. */
+  std::string springCfgPath;
+
+  /** Path ot JVM libbrary. */
+  std::string jvmLibPath;
+
+  /** JVM classpath. */
+  std::string jvmClassPath;
+
+  /** Initial amount of JVM memory. */
+  int32_t jvmInitMem;
+
+  /** Maximum amount of JVM memory. */
+  int32_t jvmMaxMem;
+
+  /** Additional JVM options. */
+  std::list< std::string > jvmOpts;
+
+  /**
+   * Default constructor.
+   */
+  IgniteConfiguration()
+      : igniteHome(),
+        springCfgPath(),
+        jvmLibPath(),
+        jvmClassPath(),
+        jvmInitMem(512),
+        jvmMaxMem(1024),
+        jvmOpts() {
+    // No-op.
+  }
+};
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_IGNITE_CONFIGURATION

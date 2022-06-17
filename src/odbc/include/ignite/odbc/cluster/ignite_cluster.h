@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
- /**
-  * @file
-  * Declares ignite::odbc::cluster::IgniteCluster class.
-  */
+/**
+ * @file
+ * Declares ignite::odbc::cluster::IgniteCluster class.
+ */
 
 #ifndef _IGNITE_ODBC_CLUSTER_IGNITE_ODBC_CLUSTER
 #define _IGNITE_ODBC_CLUSTER_IGNITE_ODBC_CLUSTER
@@ -27,129 +27,130 @@
 
 #include <ignite/odbc/impl/cluster/ignite_cluster_impl.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace cluster
-        {
-            /**
-             * Represents whole cluster (all available nodes). Node-local map is useful for saving shared state
-             * between job executions on the grid. Additionally you can also ping, start, and restart remote nodes, map keys to
-             * caching nodes, and get other useful information about topology.
-             */
-            class IGNITE_IMPORT_EXPORT IgniteCluster
-            {
-            public:
-                /**
-                 * Constructor.
-                 *
-                 * @param impl Pointer to ignite cluster implementation.
-                 */
-                IgniteCluster(common::concurrent::SharedPointer<ignite::odbc::impl::cluster::IgniteClusterImpl> impl);
-    
-                /**
-                 * Check if the Ignite grid is active.
-                 *
-                 * @return True if grid is active and false otherwise.
-                 */
-                bool IsActive();
-    
-                /**
-                 * Change Ignite grid state to active or inactive.
-                 *
-                 * @param active If true start activation process. If false start
-                 *    deactivation process.
-                 */
-                void SetActive(bool active);
-    
-                /**
-                 * Disable write-ahead logging for specified cache.
-                 *
-                 * @param cacheName Cache name.
-                 */
-                void DisableWal(std::string cacheName);
-    
-                /**
-                 * Enable write-ahead logging for specified cache.
-                 *
-                 * @param cacheName Cache name.
-                 */
-                void EnableWal(std::string cacheName);
-    
-                /**
-                 * Check if write - ahead logging is enabled for specified cache.
-                 *
-                 * @param cacheName Cache name.
-                 *
-                 * @return True if enabled.
-                 */
-                bool IsWalEnabled(std::string cacheName);
-    
-                /**
-                 * Get a cluster group consisting from the local node.
-                 *
-                 * @return Cluster group consisting from the local node.
-                 */
-                cluster::ClusterGroup ForLocal();
-    
-                /**
-                 * Get local grid node.
-                 *
-                 * @return Local node.
-                 */
-                cluster::ClusterNode GetLocalNode();
-    
-                /**
-                 * Set baseline topology constructed from the cluster topology of the given version.
-                 * The method succeeds only if the cluster topology has not changed.
-                 *
-                 * @param topVer Topology version.
-                 */
-                void SetBaselineTopologyVersion(int64_t topVer);
-    
-                /**
-                 * Set transaction timeout on partition map exchange.
-                 *
-                 * @param timeout Timeout in milliseconds.
-                 */
-                void SetTxTimeoutOnPartitionMapExchange(int64_t timeout);
-    
-                /**
-                 * Ping node.
-                 *
-                 * @param nid Cluster node ID.
-                 * @return True in case of success.
-                 */
-                bool PingNode(Guid nid);
-    
-                /**
-                 * Get a topology by version.
-                 *
-                 * @param version Topology version.
-                 * @return Nodes collection for the requested topology version.
-                 */
-                std::vector<ClusterNode> GetTopology(int64_t version);
-    
-                /**
-                 * Get current topology version.
-                 *
-                 * @return Current topology version.
-                 */
-                int64_t GetTopologyVersion();
-    
-                /**
-                 * Get cluster group consisting of all cluster nodes.
-                 *
-                 * @return ClusterGroup instance.
-                 */
-                ClusterGroup AsClusterGroup();
-    
-            private:
-                common::concurrent::SharedPointer<ignite::odbc::impl::cluster::IgniteClusterImpl> impl;
-            };
-        }
-    }
-}
+namespace ignite {
+namespace odbc {
+namespace cluster {
+/**
+ * Represents whole cluster (all available nodes). Node-local map is useful for
+ * saving shared state between job executions on the grid. Additionally you can
+ * also ping, start, and restart remote nodes, map keys to caching nodes, and
+ * get other useful information about topology.
+ */
+class IGNITE_IMPORT_EXPORT IgniteCluster {
+ public:
+  /**
+   * Constructor.
+   *
+   * @param impl Pointer to ignite cluster implementation.
+   */
+  IgniteCluster(common::concurrent::SharedPointer<
+                ignite::odbc::impl::cluster::IgniteClusterImpl >
+                    impl);
 
-#endif //_IGNITE_ODBC_CLUSTER_IGNITE_ODBC_CLUSTER
+  /**
+   * Check if the Ignite grid is active.
+   *
+   * @return True if grid is active and false otherwise.
+   */
+  bool IsActive();
+
+  /**
+   * Change Ignite grid state to active or inactive.
+   *
+   * @param active If true start activation process. If false start
+   *    deactivation process.
+   */
+  void SetActive(bool active);
+
+  /**
+   * Disable write-ahead logging for specified cache.
+   *
+   * @param cacheName Cache name.
+   */
+  void DisableWal(std::string cacheName);
+
+  /**
+   * Enable write-ahead logging for specified cache.
+   *
+   * @param cacheName Cache name.
+   */
+  void EnableWal(std::string cacheName);
+
+  /**
+   * Check if write - ahead logging is enabled for specified cache.
+   *
+   * @param cacheName Cache name.
+   *
+   * @return True if enabled.
+   */
+  bool IsWalEnabled(std::string cacheName);
+
+  /**
+   * Get a cluster group consisting from the local node.
+   *
+   * @return Cluster group consisting from the local node.
+   */
+  cluster::ClusterGroup ForLocal();
+
+  /**
+   * Get local grid node.
+   *
+   * @return Local node.
+   */
+  cluster::ClusterNode GetLocalNode();
+
+  /**
+   * Set baseline topology constructed from the cluster topology of the given
+   * version. The method succeeds only if the cluster topology has not changed.
+   *
+   * @param topVer Topology version.
+   */
+  void SetBaselineTopologyVersion(int64_t topVer);
+
+  /**
+   * Set transaction timeout on partition map exchange.
+   *
+   * @param timeout Timeout in milliseconds.
+   */
+  void SetTxTimeoutOnPartitionMapExchange(int64_t timeout);
+
+  /**
+   * Ping node.
+   *
+   * @param nid Cluster node ID.
+   * @return True in case of success.
+   */
+  bool PingNode(Guid nid);
+
+  /**
+   * Get a topology by version.
+   *
+   * @param version Topology version.
+   * @return Nodes collection for the requested topology version.
+   */
+  std::vector< ClusterNode > GetTopology(int64_t version);
+
+  /**
+   * Get current topology version.
+   *
+   * @return Current topology version.
+   */
+  int64_t GetTopologyVersion();
+
+  /**
+   * Get cluster group consisting of all cluster nodes.
+   *
+   * @return ClusterGroup instance.
+   */
+  ClusterGroup AsClusterGroup();
+
+ private:
+  common::concurrent::SharedPointer<
+      ignite::odbc::impl::cluster::IgniteClusterImpl >
+      impl;
+};
+}  // namespace cluster
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_CLUSTER_IGNITE_ODBC_CLUSTER

@@ -16,24 +16,25 @@
 
 #include "performance_odbc_helper.h"
 
-#define EXECUTION_HANDLER(throw_on_error, log_diag, handle_type, handle,    \
-                          ret_code, statement, error_msg)                   \
-  do {                                                                      \
-    (ret_code) = (statement);                                               \
-    if ((log_diag)) LogAnyDiagnostics((handle_type), (handle), (ret_code)); \
-    if ((throw_on_error) && !SQL_SUCCEEDED((ret_code)))                     \
-      throw std::runtime_error((error_msg));                                \
+#define EXECUTION_HANDLER(throw_on_error, log_diag, handle_type, handle, \
+                          ret_code, statement, error_msg)                \
+  do {                                                                   \
+    (ret_code) = (statement);                                            \
+    if ((log_diag))                                                      \
+      LogAnyDiagnostics((handle_type), (handle), (ret_code));            \
+    if ((throw_on_error) && !SQL_SUCCEEDED((ret_code)))                  \
+      throw std::runtime_error((error_msg));                             \
   } while (0);
 
 #ifdef __linux__
 test_string to_test_string(const std::string& src) {
-  return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}
+  return std::wstring_convert< std::codecvt_utf8_utf16< char16_t >, char16_t >{}
       .from_bytes(src);
 }
 #else
 test_string to_test_string(const std::string& src) {
-  return std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>{}.from_bytes(
-      src);
+  return std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >{}
+      .from_bytes(src);
 }
 #endif
 
@@ -92,22 +93,22 @@ void CloseCursor(SQLHSTMT* h_statement, bool throw_on_error, bool log_diag) {
 }
 
 std::string wstring_to_string(const std::wstring& src) {
-  return std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>{}.to_bytes(
-      src);
+  return std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >{}
+      .to_bytes(src);
 }
 
 std::string u16string_to_string(const std::u16string& src) {
-  return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}
+  return std::wstring_convert< std::codecvt_utf8_utf16< char16_t >, char16_t >{}
       .to_bytes(src);
 }
 
 std::string u32string_to_string(const std::u32string& src) {
-  return std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>{}.to_bytes(
-      src);
+  return std::wstring_convert< std::codecvt_utf8< char32_t >, char32_t >{}
+      .to_bytes(src);
 }
 
 std::u16string string_to_u16string(const std::string& src) {
-  return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}
+  return std::wstring_convert< std::codecvt_utf8_utf16< char16_t >, char16_t >{}
       .from_bytes(src);
 }
 

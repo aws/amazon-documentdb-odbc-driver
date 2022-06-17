@@ -971,62 +971,52 @@ void BinaryReaderImpl::SetRawMode() {
 }
 
 template <>
-void BinaryReaderImpl::ReadTopObject0< BinaryReader, int8_t >(
-    int8_t& res) {
+void BinaryReaderImpl::ReadTopObject0< BinaryReader, int8_t >(int8_t& res) {
   res = ReadTopObject0< int8_t >(IGNITE_TYPE_BYTE, BinaryUtils::ReadInt8);
 }
 
 template <>
-void BinaryReaderImpl::ReadTopObject0< BinaryReader, bool >(
-    bool& res) {
+void BinaryReaderImpl::ReadTopObject0< BinaryReader, bool >(bool& res) {
   res = ReadTopObject0< bool >(IGNITE_TYPE_BOOL, BinaryUtils::ReadBool);
 }
 
 template <>
-void BinaryReaderImpl::ReadTopObject0< BinaryReader, int16_t >(
-    int16_t& res) {
+void BinaryReaderImpl::ReadTopObject0< BinaryReader, int16_t >(int16_t& res) {
   res = ReadTopObject0< int16_t >(IGNITE_TYPE_SHORT, BinaryUtils::ReadInt16);
 }
 
 template <>
-void BinaryReaderImpl::ReadTopObject0< BinaryReader, uint16_t >(
-    uint16_t& res) {
+void BinaryReaderImpl::ReadTopObject0< BinaryReader, uint16_t >(uint16_t& res) {
   res = ReadTopObject0< uint16_t >(IGNITE_TYPE_CHAR, BinaryUtils::ReadUInt16);
 }
 
 template <>
-void BinaryReaderImpl::ReadTopObject0< BinaryReader, int32_t >(
-    int32_t& res) {
+void BinaryReaderImpl::ReadTopObject0< BinaryReader, int32_t >(int32_t& res) {
   res = ReadTopObject0< int32_t >(IGNITE_TYPE_INT, BinaryUtils::ReadInt32);
 }
 
 template <>
-void BinaryReaderImpl::ReadTopObject0< BinaryReader, int64_t >(
-    int64_t& res) {
+void BinaryReaderImpl::ReadTopObject0< BinaryReader, int64_t >(int64_t& res) {
   res = ReadTopObject0< int64_t >(IGNITE_TYPE_LONG, BinaryUtils::ReadInt64);
 }
 
 template <>
-void BinaryReaderImpl::ReadTopObject0< BinaryReader, float >(
-    float& res) {
+void BinaryReaderImpl::ReadTopObject0< BinaryReader, float >(float& res) {
   res = ReadTopObject0< float >(IGNITE_TYPE_FLOAT, BinaryUtils::ReadFloat);
 }
 
 template <>
-void BinaryReaderImpl::ReadTopObject0< BinaryReader, double >(
-    double& res) {
+void BinaryReaderImpl::ReadTopObject0< BinaryReader, double >(double& res) {
   res = ReadTopObject0< double >(IGNITE_TYPE_DOUBLE, BinaryUtils::ReadDouble);
 }
 
 template <>
-void BinaryReaderImpl::ReadTopObject0< BinaryReader, Guid >(
-    Guid& res) {
+void BinaryReaderImpl::ReadTopObject0< BinaryReader, Guid >(Guid& res) {
   res = ReadTopObject0< Guid >(IGNITE_TYPE_UUID, BinaryUtils::ReadGuid);
 }
 
 template <>
-void BinaryReaderImpl::ReadTopObject0< BinaryReader, Date >(
-    Date& res) {
+void BinaryReaderImpl::ReadTopObject0< BinaryReader, Date >(Date& res) {
   int8_t typeId = stream->ReadInt8();
 
   if (typeId == IGNITE_TYPE_DATE)
@@ -1045,21 +1035,20 @@ void BinaryReaderImpl::ReadTopObject0< BinaryReader, Date >(
 }
 
 template <>
-void BinaryReaderImpl::ReadTopObject0< BinaryReader,
-                                       Timestamp >(Timestamp& res) {
+void BinaryReaderImpl::ReadTopObject0< BinaryReader, Timestamp >(
+    Timestamp& res) {
   res = ReadTopObject0< Timestamp >(IGNITE_TYPE_TIMESTAMP,
                                     BinaryUtils::ReadTimestamp);
 }
 
 template <>
-void BinaryReaderImpl::ReadTopObject0< BinaryReader, Time >(
-    Time& res) {
+void BinaryReaderImpl::ReadTopObject0< BinaryReader, Time >(Time& res) {
   res = ReadTopObject0< Time >(IGNITE_TYPE_TIME, BinaryUtils::ReadTime);
 }
 
 template <>
-void BinaryReaderImpl::ReadTopObject0< BinaryReader,
-                                       std::string >(std::string& res) {
+void BinaryReaderImpl::ReadTopObject0< BinaryReader, std::string >(
+    std::string& res) {
   int8_t typeId = stream->ReadInt8();
 
   if (typeId == IGNITE_TYPE_STRING) {
@@ -1083,32 +1072,28 @@ void BinaryReaderImpl::ReadTopObject0< BinaryReader,
 }
 
 template <>
-void BinaryReaderImpl::ReadTopObject0< BinaryReader,
-                                       std::vector< int8_t > >(
+void BinaryReaderImpl::ReadTopObject0< BinaryReader, std::vector< int8_t > >(
     std::vector< int8_t >& res) {
   ReadArrayToVectorInternal< int8_t >(res, stream, BinaryUtils::ReadInt8Array,
                                       IGNITE_TYPE_ARRAY_BYTE);
 }
 
 template <>
-void BinaryReaderImpl::ReadTopObject0< BinaryReader,
-                                       std::vector< int16_t > >(
+void BinaryReaderImpl::ReadTopObject0< BinaryReader, std::vector< int16_t > >(
     std::vector< int16_t >& res) {
   ReadArrayToVectorInternal< int16_t >(res, stream, BinaryUtils::ReadInt16Array,
                                        IGNITE_TYPE_ARRAY_SHORT);
 }
 
 template <>
-void BinaryReaderImpl::ReadTopObject0< BinaryReader,
-                                       std::vector< int32_t > >(
+void BinaryReaderImpl::ReadTopObject0< BinaryReader, std::vector< int32_t > >(
     std::vector< int32_t >& res) {
   ReadArrayToVectorInternal< int32_t >(res, stream, BinaryUtils::ReadInt32Array,
                                        IGNITE_TYPE_ARRAY_INT);
 }
 
 template <>
-void BinaryReaderImpl::ReadTopObject0< BinaryReader,
-                                       std::vector< int64_t > >(
+void BinaryReaderImpl::ReadTopObject0< BinaryReader, std::vector< int64_t > >(
     std::vector< int64_t >& res) {
   ReadArrayToVectorInternal< int64_t >(res, stream, BinaryUtils::ReadInt64Array,
                                        IGNITE_TYPE_ARRAY_LONG);

@@ -45,7 +45,8 @@ class Window {
    * @param title Window title.
    * @param callback Event processing function.
    */
-  Window(Window* parent, const std::wstring& className, const std::wstring& title);
+  Window(Window* parent, const std::wstring& className,
+         const std::wstring& title);
 
   /**
    * Constructor for the existing window.

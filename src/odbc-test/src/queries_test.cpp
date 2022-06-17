@@ -55,7 +55,7 @@ struct QueriesTestSuiteFixture : odbc::OdbcTestSuite {
    * Constructor.
    */
   QueriesTestSuiteFixture() {
-      // No-op
+    // No-op
   }
 
   /**
@@ -85,7 +85,8 @@ struct QueriesTestSuiteFixture : odbc::OdbcTestSuite {
 
     // Binding columns.
     for (SQLSMALLINT i = 0; i < columnsCnt; ++i) {
-      ret = SQLBindCol(stmt, i + 1, type, &columns[i], sizeof(columns[i]), nullptr);
+      ret = SQLBindCol(stmt, i + 1, type, &columns[i], sizeof(columns[i]),
+                       nullptr);
 
       if (!SQL_SUCCEEDED(ret))
         BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -231,14 +232,11 @@ BOOST_AUTO_TEST_CASE(TestMoviesCast, *disabled()) {
   ret = SQLFetch(stmt);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
   while (SQL_SUCCEEDED(ret)) {
-
     ret = SQLGetData(stmt, 1, SQL_C_WCHAR, id, sizeof(id), &id_len);
     BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-    ret = SQLGetData(stmt, 2, SQL_C_SBIGINT, &index, sizeof(index),
-                     &index_len);
+    ret = SQLGetData(stmt, 2, SQL_C_SBIGINT, &index, sizeof(index), &index_len);
     BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-    ret = SQLGetData(stmt, 3, SQL_C_WCHAR, value, sizeof(value),
-                     &value_len);
+    ret = SQLGetData(stmt, 3, SQL_C_WCHAR, value, sizeof(value), &value_len);
     BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
     BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
@@ -299,14 +297,14 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingGetData) {
 
   ret = SQLGetData(stmt, 1, SQL_C_WCHAR, id, sizeof(id), &id_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  ret = SQLGetData(stmt, 2, SQL_C_WCHAR, fieldDecimal128, sizeof(fieldDecimal128),
-                   &fieldDecimal128_len);
+  ret = SQLGetData(stmt, 2, SQL_C_WCHAR, fieldDecimal128,
+                   sizeof(fieldDecimal128), &fieldDecimal128_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
   ret = SQLGetData(stmt, 3, SQL_C_DOUBLE, &fieldDouble, sizeof(fieldDouble),
                    &fieldDouble_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  ret =
-      SQLGetData(stmt, 4, SQL_C_WCHAR, fieldString, sizeof(fieldString), &fieldString_len);
+  ret = SQLGetData(stmt, 4, SQL_C_WCHAR, fieldString, sizeof(fieldString),
+                   &fieldString_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
   ret = SQLGetData(stmt, 5, SQL_C_WCHAR, fieldObjectId, sizeof(fieldObjectId),
                    &fieldObjectId_len);
@@ -329,22 +327,29 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingGetData) {
   ret = SQLGetData(stmt, 11, SQL_C_WCHAR, fieldMinKey, sizeof(fieldMinKey),
                    &fieldMinKey_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  ret = SQLGetData(stmt, 12, SQL_C_WCHAR, fieldNull, sizeof(fieldNull), &fieldNull_len);
+  ret = SQLGetData(stmt, 12, SQL_C_WCHAR, fieldNull, sizeof(fieldNull),
+                   &fieldNull_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
   ret = SQLGetData(stmt, 13, SQL_C_BINARY, fieldBinary, sizeof(fieldBinary),
                    &fieldBinary_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
-  BOOST_CHECK_EQUAL("62196dcc4d91892191475139", utility::SqlStringToString(id, id_len, true));
+  BOOST_CHECK_EQUAL("62196dcc4d91892191475139",
+                    utility::SqlStringToString(id, id_len, true));
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldDecimal128_len);
-  BOOST_CHECK_EQUAL("340282350000000000000", utility::SqlStringToString(fieldDecimal128, fieldDecimal128_len, true));
+  BOOST_CHECK_EQUAL(
+      "340282350000000000000",
+      utility::SqlStringToString(fieldDecimal128, fieldDecimal128_len, true));
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldDouble_len);
   BOOST_CHECK_EQUAL(1.7976931348623157e308, fieldDouble);
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldString_len);
-  BOOST_CHECK_EQUAL("some Text", utility::SqlStringToString(fieldString, fieldString_len, true));
+  BOOST_CHECK_EQUAL("some Text", utility::SqlStringToString(
+                                     fieldString, fieldString_len, true));
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldObjectId_len);
-  BOOST_CHECK_EQUAL("62196dcc4d9189219147513a", utility::SqlStringToString(fieldObjectId, fieldObjectId_len, true));
+  BOOST_CHECK_EQUAL(
+      "62196dcc4d9189219147513a",
+      utility::SqlStringToString(fieldObjectId, fieldObjectId_len, true));
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldBoolean_len);
   BOOST_CHECK_EQUAL(true, fieldBoolean);
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldDate_len);
@@ -356,9 +361,11 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingGetData) {
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldLong_len);
   BOOST_CHECK_EQUAL(9223372036854775807, fieldLong);
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldMaxKey_len);
-  BOOST_CHECK_EQUAL("MAXKEY", utility::SqlStringToString(fieldMaxKey, fieldMaxKey_len, true));
+  BOOST_CHECK_EQUAL(
+      "MAXKEY", utility::SqlStringToString(fieldMaxKey, fieldMaxKey_len, true));
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldMinKey_len);
-  BOOST_CHECK_EQUAL("MINKEY", utility::SqlStringToString(fieldMinKey, fieldMinKey_len, true));
+  BOOST_CHECK_EQUAL(
+      "MINKEY", utility::SqlStringToString(fieldMinKey, fieldMinKey_len, true));
   BOOST_CHECK_EQUAL(SQL_NULL_DATA, fieldNull_len);
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldBinary_len);
   BOOST_CHECK_EQUAL(3, fieldBinary_len);
@@ -413,7 +420,8 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingBindCol) {
 
   ret = SQLBindCol(stmt, 1, SQL_C_WCHAR, id, sizeof(id), &id_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  ret = SQLBindCol(stmt, 2, SQL_C_WCHAR, fieldDecimal128, sizeof(fieldDecimal128), &fieldDecimal128_len);
+  ret = SQLBindCol(stmt, 2, SQL_C_WCHAR, fieldDecimal128,
+                   sizeof(fieldDecimal128), &fieldDecimal128_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
   ret = SQLBindCol(stmt, 3, SQL_C_DOUBLE, &fieldDouble, sizeof(fieldDouble),
                    &fieldDouble_len);
@@ -430,20 +438,23 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingBindCol) {
   ret = SQLBindCol(stmt, 7, SQL_C_TYPE_DATE, &fieldDate, sizeof(fieldDate),
                    &fieldDate_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  ret = SQLBindCol(stmt, 8, SQL_C_SLONG, &fieldInt, sizeof(fieldInt), &fieldInt_len);
+  ret = SQLBindCol(stmt, 8, SQL_C_SLONG, &fieldInt, sizeof(fieldInt),
+                   &fieldInt_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
   ret = SQLBindCol(stmt, 9, SQL_C_SBIGINT, &fieldLong, sizeof(fieldLong),
                    &fieldLong_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  ret =
-      SQLBindCol(stmt, 10, SQL_C_WCHAR, fieldMaxKey, sizeof(fieldMaxKey), &fieldMaxKey_len);
+  ret = SQLBindCol(stmt, 10, SQL_C_WCHAR, fieldMaxKey, sizeof(fieldMaxKey),
+                   &fieldMaxKey_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  ret =
-      SQLBindCol(stmt, 11, SQL_C_WCHAR, fieldMinKey, sizeof(fieldMinKey), &fieldMinKey_len);
-    BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  ret = SQLBindCol(stmt, 12, SQL_C_WCHAR, fieldNull, sizeof(fieldNull), &fieldNull_len);
+  ret = SQLBindCol(stmt, 11, SQL_C_WCHAR, fieldMinKey, sizeof(fieldMinKey),
+                   &fieldMinKey_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  ret = SQLBindCol(stmt, 13, SQL_C_BINARY, fieldBinary, sizeof(fieldBinary), &fieldBinary_len);
+  ret = SQLBindCol(stmt, 12, SQL_C_WCHAR, fieldNull, sizeof(fieldNull),
+                   &fieldNull_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 13, SQL_C_BINARY, fieldBinary, sizeof(fieldBinary),
+                   &fieldBinary_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   // Fetch 1st row
@@ -451,15 +462,21 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingBindCol) {
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
-  BOOST_CHECK_EQUAL("62196dcc4d91892191475139", utility::SqlStringToString(id, id_len, true));
+  BOOST_CHECK_EQUAL("62196dcc4d91892191475139",
+                    utility::SqlStringToString(id, id_len, true));
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldDecimal128_len);
-  BOOST_CHECK_EQUAL("340282350000000000000", utility::SqlStringToString(fieldDecimal128, fieldDecimal128_len, true));
+  BOOST_CHECK_EQUAL(
+      "340282350000000000000",
+      utility::SqlStringToString(fieldDecimal128, fieldDecimal128_len, true));
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldDouble_len);
   BOOST_CHECK_EQUAL(1.7976931348623157e308, fieldDouble);
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldString_len);
-  BOOST_CHECK_EQUAL("some Text", utility::SqlStringToString(fieldString, fieldString_len, true));
+  BOOST_CHECK_EQUAL("some Text", utility::SqlStringToString(
+                                     fieldString, fieldString_len, true));
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldObjectId_len);
-  BOOST_CHECK_EQUAL("62196dcc4d9189219147513a", utility::SqlStringToString(fieldObjectId, fieldObjectId_len, true));
+  BOOST_CHECK_EQUAL(
+      "62196dcc4d9189219147513a",
+      utility::SqlStringToString(fieldObjectId, fieldObjectId_len, true));
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldBoolean_len);
   BOOST_CHECK_EQUAL(true, fieldBoolean);
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldDate_len);
@@ -471,9 +488,11 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingBindCol) {
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldLong_len);
   BOOST_CHECK_EQUAL(9223372036854775807, fieldLong);
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldMaxKey_len);
-  BOOST_CHECK_EQUAL("MAXKEY", utility::SqlStringToString(fieldMaxKey, fieldMaxKey_len, true));
+  BOOST_CHECK_EQUAL(
+      "MAXKEY", utility::SqlStringToString(fieldMaxKey, fieldMaxKey_len, true));
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldMinKey_len);
-  BOOST_CHECK_EQUAL("MINKEY", utility::SqlStringToString(fieldMinKey, fieldMinKey_len, true));
+  BOOST_CHECK_EQUAL(
+      "MINKEY", utility::SqlStringToString(fieldMinKey, fieldMinKey_len, true));
   BOOST_CHECK_EQUAL(SQL_NULL_DATA, fieldNull_len);
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldBinary_len);
   BOOST_CHECK_EQUAL(3, fieldBinary_len);
@@ -491,7 +510,8 @@ BOOST_AUTO_TEST_CASE(TestMultiLineResultUsingGetData) {
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
   Connect(dsnConnectionString);
   SQLRETURN ret;
-  std::vector< SQLWCHAR > request = MakeSqlBuffer("SELECT * FROM \"queries_test_002\" ORDER BY \"queries_test_002__id\"");
+  std::vector< SQLWCHAR > request = MakeSqlBuffer(
+      "SELECT * FROM \"queries_test_002\" ORDER BY \"queries_test_002__id\"");
 
   ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret)) {
@@ -511,14 +531,17 @@ BOOST_AUTO_TEST_CASE(TestMultiLineResultUsingGetData) {
 
   ret = SQLGetData(stmt, 1, SQL_C_WCHAR, id, sizeof(id), &id_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  ret = SQLGetData(stmt, 2, SQL_C_WCHAR, fieldDecimal128, sizeof(fieldDecimal128),
-                   &fieldDecimal128_len);
+  ret = SQLGetData(stmt, 2, SQL_C_WCHAR, fieldDecimal128,
+                   sizeof(fieldDecimal128), &fieldDecimal128_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
-  BOOST_CHECK_EQUAL("62196dcc4d91892191475139", utility::SqlStringToString(id, id_len, true));
+  BOOST_CHECK_EQUAL("62196dcc4d91892191475139",
+                    utility::SqlStringToString(id, id_len, true));
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldDecimal128_len);
-  BOOST_CHECK_EQUAL("340282350000000000000", utility::SqlStringToString(fieldDecimal128, fieldDecimal128_len, true));
+  BOOST_CHECK_EQUAL(
+      "340282350000000000000",
+      utility::SqlStringToString(fieldDecimal128, fieldDecimal128_len, true));
 
   // Fetch 2nd row
   ret = SQLFetch(stmt);
@@ -526,11 +549,12 @@ BOOST_AUTO_TEST_CASE(TestMultiLineResultUsingGetData) {
 
   ret = SQLGetData(stmt, 1, SQL_C_WCHAR, id, sizeof(id), &id_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  ret = SQLGetData(stmt, 2, SQL_C_WCHAR, fieldDecimal128, sizeof(fieldDecimal128),
-                   &fieldDecimal128_len);
+  ret = SQLGetData(stmt, 2, SQL_C_WCHAR, fieldDecimal128,
+                   sizeof(fieldDecimal128), &fieldDecimal128_len);
 
   BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
-  BOOST_CHECK_EQUAL("62196dcc4d9189219147513a", utility::SqlStringToString(id, id_len, true));
+  BOOST_CHECK_EQUAL("62196dcc4d9189219147513a",
+                    utility::SqlStringToString(id, id_len, true));
   BOOST_CHECK_EQUAL(SQL_NULL_DATA, fieldDecimal128_len);
 
   // Fetch 3rd row
@@ -539,13 +563,16 @@ BOOST_AUTO_TEST_CASE(TestMultiLineResultUsingGetData) {
 
   ret = SQLGetData(stmt, 1, SQL_C_WCHAR, id, sizeof(id), &id_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  ret = SQLGetData(stmt, 2, SQL_C_WCHAR, fieldDecimal128, sizeof(fieldDecimal128),
-                   &fieldDecimal128_len);
+  ret = SQLGetData(stmt, 2, SQL_C_WCHAR, fieldDecimal128,
+                   sizeof(fieldDecimal128), &fieldDecimal128_len);
 
   BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
-  BOOST_CHECK_EQUAL("62196dcc4d9189219147513b", utility::SqlStringToString(id, id_len, true));
+  BOOST_CHECK_EQUAL("62196dcc4d9189219147513b",
+                    utility::SqlStringToString(id, id_len, true));
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldDecimal128_len);
-  BOOST_CHECK_EQUAL("340282350000000000000", utility::SqlStringToString(fieldDecimal128, fieldDecimal128_len, true));
+  BOOST_CHECK_EQUAL(
+      "340282350000000000000",
+      utility::SqlStringToString(fieldDecimal128, fieldDecimal128_len, true));
 
   // Fetch 4th row - not exist
   ret = SQLFetch(stmt);
@@ -596,26 +623,34 @@ BOOST_AUTO_TEST_CASE(TestArrayStructJoinUsingGetData) {
 
   ret = SQLGetData(stmt, 1, SQL_C_WCHAR, id, sizeof(id), &id_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  ret = SQLGetData(stmt, 2, SQL_C_SLONG, &a1_value, sizeof(a1_value), &a1_value_len);
+  ret = SQLGetData(stmt, 2, SQL_C_SLONG, &a1_value, sizeof(a1_value),
+                   &a1_value_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  ret = SQLGetData(stmt, 3, SQL_C_WCHAR, a2_value, sizeof(a2_value), &a2_value_len);
+  ret = SQLGetData(stmt, 3, SQL_C_WCHAR, a2_value, sizeof(a2_value),
+                   &a2_value_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  ret = SQLGetData(stmt, 4, SQL_C_WCHAR, d1_value, sizeof(d1_value), &d1_value_len);
+  ret = SQLGetData(stmt, 4, SQL_C_WCHAR, d1_value, sizeof(d1_value),
+                   &d1_value_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  ret = SQLGetData(stmt, 5, SQL_C_WCHAR, d2_value, sizeof(d2_value), &d2_value_len);
+  ret = SQLGetData(stmt, 5, SQL_C_WCHAR, d2_value, sizeof(d2_value),
+                   &d2_value_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   // Check the first row
   BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
-  BOOST_CHECK_EQUAL("62196dcc4d91892191475139", utility::SqlStringToString(id, id_len, true));
+  BOOST_CHECK_EQUAL("62196dcc4d91892191475139",
+                    utility::SqlStringToString(id, id_len, true));
   BOOST_CHECK_NE(SQL_NULL_DATA, a1_value_len);
   BOOST_CHECK_EQUAL(1, a1_value);
   BOOST_CHECK_NE(SQL_NULL_DATA, a2_value_len);
-  BOOST_CHECK_EQUAL("value1", utility::SqlStringToString(a2_value, a2_value_len, true));
+  BOOST_CHECK_EQUAL("value1",
+                    utility::SqlStringToString(a2_value, a2_value_len, true));
   BOOST_CHECK_NE(SQL_NULL_DATA, d1_value_len);
-  BOOST_CHECK_EQUAL("field1 Value", utility::SqlStringToString(d1_value, d1_value_len, true));
+  BOOST_CHECK_EQUAL("field1 Value",
+                    utility::SqlStringToString(d1_value, d1_value_len, true));
   BOOST_CHECK_NE(SQL_NULL_DATA, d2_value_len);
-  BOOST_CHECK_EQUAL("field2 Value", utility::SqlStringToString(d2_value, d2_value_len, true));
+  BOOST_CHECK_EQUAL("field2 Value",
+                    utility::SqlStringToString(d2_value, d2_value_len, true));
 
   // Count the rows
   int32_t actual_rows = 0;
@@ -747,8 +782,7 @@ BOOST_AUTO_TEST_CASE(TestTwoRowsString, *disabled()) {
   // Such format is used because Date returned as Timestamp.
   BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[9]),
                     "1976-01-12 00:00:00");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10]),
-                    "00:08:59");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10]), "00:08:59");
   BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[11]),
                     "1978-08-21 23:13:45");
 
@@ -806,29 +840,20 @@ BOOST_AUTO_TEST_CASE(TestOneRowString, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[0]),
-                    "1");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[1]),
-                    "2");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[2]),
-                    "3");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[3]),
-                    "4");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[4]),
-                    "5");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[5]),
-                    "6");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[6]),
-                    "7");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[7]),
-                    "1");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[0]), "1");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[1]), "2");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[2]), "3");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[3]), "4");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[4]), "5");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[5]), "6");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[6]), "7");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[7]), "1");
   BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[8]),
                     "00000000-0000-0008-0000-000000000009");
   // Such format is used because Date returned as Timestamp.
   BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[9]),
                     "1987-06-05 00:00:00");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10]),
-                    "12:48:12");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10]), "12:48:12");
   BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[11]),
                     "1998-12-27 01:02:03");
 
@@ -1003,8 +1028,8 @@ BOOST_AUTO_TEST_CASE(TestDataAtExecution, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  ret = SQLBindParameter(stmt, 2, SQL_PARAM_INPUT, SQL_C_WCHAR, SQL_VARCHAR, 100,
-                         100, &ind2, sizeof(ind2), &len2);
+  ret = SQLBindParameter(stmt, 2, SQL_PARAM_INPUT, SQL_C_WCHAR, SQL_VARCHAR,
+                         100, 100, &ind2, sizeof(ind2), &len2);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1054,29 +1079,20 @@ BOOST_AUTO_TEST_CASE(TestDataAtExecution, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[0]),
-                    "1");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[1]),
-                    "2");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[2]),
-                    "3");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[3]),
-                    "4");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[4]),
-                    "5");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[5]),
-                    "6");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[6]),
-                    "7");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[7]),
-                    "1");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[0]), "1");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[1]), "2");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[2]), "3");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[3]), "4");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[4]), "5");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[5]), "6");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[6]), "7");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[7]), "1");
   BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[8]),
                     "00000000-0000-0008-0000-000000000009");
   // Such format is used because Date returned as Timestamp.
   BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[9]),
                     "1987-06-05 00:00:00");
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10]),
-                    "12:48:12");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[10]), "12:48:12");
   BOOST_CHECK_EQUAL(utility::SqlStringToString(columns[11]),
                     "1998-12-27 01:02:03");
 
@@ -1397,7 +1413,8 @@ BOOST_AUTO_TEST_CASE(TestKeyVal, *disabled()) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  std::vector< SQLWCHAR > requestStar = MakeSqlBuffer("SELECT _key, _val, * FROM ComplexType");
+  std::vector< SQLWCHAR > requestStar =
+      MakeSqlBuffer("SELECT _key, _val, * FROM ComplexType");
 
   ret = SQLExecDirect(stmt, requestStar.data(), SQL_NTS);
   if (!SQL_SUCCEEDED(ret))
@@ -1490,7 +1507,8 @@ BOOST_AUTO_TEST_CASE(TestExecuteAfterCursorClose, *disabled()) {
 
   BOOST_CHECK_EQUAL(key, 1);
 
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(strField, strFieldLen, true), "5");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(strField, strFieldLen, true),
+                    "5");
 
   ret = SQLFetch(stmt);
 
@@ -1538,7 +1556,8 @@ BOOST_AUTO_TEST_CASE(TestCloseNonFullFetch, *disabled()) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   BOOST_CHECK_EQUAL(key, 1);
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(strField, strFieldLen, true), "str1");
+  BOOST_CHECK_EQUAL(utility::SqlStringToString(strField, strFieldLen, true),
+                    "str1");
 
   ret = SQLFreeStmt(stmt, SQL_CLOSE);
 

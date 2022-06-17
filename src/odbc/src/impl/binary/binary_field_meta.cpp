@@ -29,8 +29,7 @@ IGNITE_IMPORT_EXPORT void BinaryFieldMeta::Write(
   writer.WriteInt32(fieldId);
 }
 
-IGNITE_IMPORT_EXPORT void BinaryFieldMeta::Read(
-    BinaryRawReader& reader) {
+IGNITE_IMPORT_EXPORT void BinaryFieldMeta::Read(BinaryRawReader& reader) {
   typeId = reader.ReadInt32();
   fieldId = reader.ReadInt32();
 }

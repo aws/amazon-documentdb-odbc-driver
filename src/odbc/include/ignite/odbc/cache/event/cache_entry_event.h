@@ -26,120 +26,105 @@
 #include <ignite/odbc/binary/binary_raw_reader.h>
 #include <ignite/odbc/cache/cache_entry.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace cache
-        {
-            /**
-             * Cache entry event class template.
-             *
-             * Both key and value types should be default-constructable,
-             * copy-constructable and assignable.
-             */
-            template<typename K, typename V>
-            class CacheEntryEvent : public CacheEntry<K, V>
-            {
-            public:
-                /**
-                 * Default constructor.
-                 *
-                 * Creates instance with all fields default-constructed.
-                 */
-                CacheEntryEvent() :
-                    CacheEntry<K, V>(),
-                    oldVal(),
-                    hasOldValue(false)
-                {
-                    // No-op.
-                }
-    
-                /**
-                 * Copy constructor.
-                 *
-                 * @param other Other instance.
-                 */
-                CacheEntryEvent(const CacheEntryEvent<K, V>& other) :
-                    CacheEntry<K, V>(other),
-                    oldVal(other.oldVal),
-                    hasOldValue(other.hasOldValue)
-                {
-                    // No-op.
-                }
-    
-                /**
-                 * Destructor.
-                 */
-                virtual ~CacheEntryEvent()
-                {
-                    // No-op.
-                }
-    
-                /**
-                 * Assignment operator.
-                 *
-                 * @param other Other instance.
-                 * @return *this.
-                 */
-                CacheEntryEvent& operator=(const CacheEntryEvent<K, V>& other)
-                {
-                    if (this != &other)
-                    {
-                        CacheEntry<K, V>::operator=(other);
-    
-                        oldVal = other.oldVal;
-                        hasOldValue = other.hasOldValue;
-                    }
-    
-                    return *this;
-                }
-    
-                /**
-                 * Get old value.
-                 *
-                 * @return Old value.
-                 */
-                const V& GetOldValue() const
-                {
-                    return oldVal;
-                }
-    
-                /**
-                 * Check if the old value exists.
-                 *
-                 * @return True, if the old value exists.
-                 */
-                bool HasOldValue() const
-                {
-                    return hasOldValue;
-                }
-    
-                /**
-                 * Reads cache event using provided raw reader.
-                 *
-                 * @param reader Reader to use.
-                 */
-                void Read(binary::BinaryRawReader& reader)
-                {
-                    this->key = reader.ReadObject<K>();
-    
-                    this->hasOldValue = reader.TryReadObject(this->oldVal);
-                    this->hasValue = reader.TryReadObject(this->val);
-                    
-                    // Java send an event type, we need to fetch it from the buffer.
-                    reader.ReadInt8();
-                }
-    
-            private:
-                /** Old value. */
-                V oldVal;
-    
-                /** Indicates whether old value exists */
-                bool hasOldValue;
-            };
-        }
-    }
-}
+namespace ignite {
+namespace odbc {
+namespace cache {
+/**
+ * Cache entry event class template.
+ *
+ * Both key and value types should be default-constructable,
+ * copy-constructable and assignable.
+ */
+template < typename K, typename V >
+class CacheEntryEvent : public CacheEntry< K, V > {
+ public:
+  /**
+   * Default constructor.
+   *
+   * Creates instance with all fields default-constructed.
+   */
+  CacheEntryEvent() : CacheEntry< K, V >(), oldVal(), hasOldValue(false) {
+    // No-op.
+  }
 
-#endif //_IGNITE_ODBC_CACHE_EVENT_CACHE_ENTRY_EVENT
+  /**
+   * Copy constructor.
+   *
+   * @param other Other instance.
+   */
+  CacheEntryEvent(const CacheEntryEvent< K, V >& other)
+      : CacheEntry< K, V >(other),
+        oldVal(other.oldVal),
+        hasOldValue(other.hasOldValue) {
+    // No-op.
+  }
+
+  /**
+   * Destructor.
+   */
+  virtual ~CacheEntryEvent() {
+    // No-op.
+  }
+
+  /**
+   * Assignment operator.
+   *
+   * @param other Other instance.
+   * @return *this.
+   */
+  CacheEntryEvent& operator=(const CacheEntryEvent< K, V >& other) {
+    if (this != &other) {
+      CacheEntry< K, V >::operator=(other);
+
+      oldVal = other.oldVal;
+      hasOldValue = other.hasOldValue;
+    }
+
+    return *this;
+  }
+
+  /**
+   * Get old value.
+   *
+   * @return Old value.
+   */
+  const V& GetOldValue() const {
+    return oldVal;
+  }
+
+  /**
+   * Check if the old value exists.
+   *
+   * @return True, if the old value exists.
+   */
+  bool HasOldValue() const {
+    return hasOldValue;
+  }
+
+  /**
+   * Reads cache event using provided raw reader.
+   *
+   * @param reader Reader to use.
+   */
+  void Read(binary::BinaryRawReader& reader) {
+    this->key = reader.ReadObject< K >();
+
+    this->hasOldValue = reader.TryReadObject(this->oldVal);
+    this->hasValue = reader.TryReadObject(this->val);
+
+    // Java send an event type, we need to fetch it from the buffer.
+    reader.ReadInt8();
+  }
+
+ private:
+  /** Old value. */
+  V oldVal;
+
+  /** Indicates whether old value exists */
+  bool hasOldValue;
+};
+}  // namespace cache
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_CACHE_EVENT_CACHE_ENTRY_EVENT

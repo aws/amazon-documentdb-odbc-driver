@@ -113,7 +113,8 @@ DocumentDbConnection::GetConnectionProperties(JniErrorInfo& errInfo) {
     return nullptr;
   }
   SharedPointer< GlobalJObject > connectionProperties;
-  JniErrorCode success = _jniContext.Get()->DocumentDbConnectionGetConnectionProperties(
+  JniErrorCode success =
+      _jniContext.Get()->DocumentDbConnectionGetConnectionProperties(
           _connection, connectionProperties, errInfo);
   if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
     return nullptr;
@@ -122,8 +123,7 @@ DocumentDbConnection::GetConnectionProperties(JniErrorInfo& errInfo) {
 }
 
 SharedPointer< DocumentDbDatabaseMetadata >
-DocumentDbConnection::GetDatabaseMetadata(
-    JniErrorInfo& errInfo) {
+DocumentDbConnection::GetDatabaseMetadata(JniErrorInfo& errInfo) {
   if (!_connection.IsValid()) {
     errInfo = JniErrorInfo(JniErrorCode::IGNITE_JNI_ERR_GENERIC, "",
                            "Connection must be set.");

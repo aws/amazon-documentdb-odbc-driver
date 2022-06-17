@@ -26,192 +26,161 @@
 #include <ignite/odbc/impl/binary/binary_writer_impl.h>
 #include <ignite/odbc/impl/compute/compute_job_result.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace impl
-        {
-            namespace compute
-            {
-                /**
-                 * Compute job holder. Internal helper class.
-                 * Used to handle jobs in general way, without specific types.
-                 */
-                class ComputeJobHolder
-                {
-                public:
-                    /**
-                     * Destructor.
-                     */
-                    virtual ~ComputeJobHolder()
-                    {
-                        // No-op.
-                    }
-    
-                    /**
-                     * Execute job locally.
-                     */
-                    virtual void ExecuteLocal(IgniteEnvironment* env) = 0;
-    
-                    /**
-                     * Execute job remote.
-                     *
-                     * @param writer Writer.
-                     */
-                    virtual void ExecuteRemote(IgniteEnvironment* env, binary::BinaryWriterImpl& writer) = 0;
-                };
-    
-                /**
-                 * Compute job holder. Internal class.
-                 *
-                 * @tparam F Actual job type.
-                 * @tparam R Job return type.
-                 */
-                template<typename F, typename R>
-                class ComputeJobHolderImpl : public ComputeJobHolder
-                {
-                public:
-                    typedef R ResultType;
-                    typedef F JobType;
-    
-                    /**
-                     * Constructor.
-                     *
-                     * @param job Job.
-                     */
-                    ComputeJobHolderImpl(JobType job) :
-                        job(job)
-                    {
-                        // No-op.
-                    }
-    
-                    /**
-                     * Destructor.
-                     */
-                    virtual ~ComputeJobHolderImpl()
-                    {
-                        // No-op.
-                    }
-    
-                    const ComputeJobResult<ResultType>& GetResult()
-                    {
-                        return res;
-                    }
-    
-                    virtual void ExecuteLocal(IgniteEnvironment* env)
-                    {
-                        try
-                        {
-                            job.SetIgnite(env->GetIgnite());
-                            res.SetResult(job.Call());
-                        }
-                        catch (const IgniteError& err)
-                        {
-                            res.SetError(err);
-                        }
-                        catch (const std::exception& err)
-                        {
-                            res.SetError(IgniteError(IgniteError::IGNITE_ERR_STD, err.what()));
-                        }
-                        catch (...)
-                        {
-                            res.SetError(IgniteError(IgniteError::IGNITE_ERR_UNKNOWN,
-                                "Unknown error occurred during call."));
-                        }
-                    }
-    
-                    virtual void ExecuteRemote(IgniteEnvironment* env, binary::BinaryWriterImpl& writer)
-                    {
-                        ExecuteLocal(env);
-    
-                        res.Write(writer);
-                    }
-    
-                private:
-                    /** Result. */
-                    ComputeJobResult<ResultType> res;
-    
-                    /** Job. */
-                    JobType job;
-                };
-    
-                /**
-                 * Compute job holder. Internal class.
-                 * Specialisation for void return type
-                 *
-                 * @tparam F Actual job type.
-                 */
-                template<typename F>
-                class ComputeJobHolderImpl<F, void> : public ComputeJobHolder
-                {
-                public:
-                    typedef F JobType;
-    
-                    /**
-                     * Constructor.
-                     *
-                     * @param job Job.
-                     */
-                    ComputeJobHolderImpl(JobType job) :
-                        job(job)
-                    {
-                        // No-op.
-                    }
-    
-                    /**
-                     * Destructor.
-                     */
-                    virtual ~ComputeJobHolderImpl()
-                    {
-                        // No-op.
-                    }
-    
-                    const ComputeJobResult<void>& GetResult()
-                    {
-                        return res;
-                    }
-    
-                    virtual void ExecuteLocal(IgniteEnvironment* env)
-                    {
-                        try
-                        {
-                            job.SetIgnite(env->GetIgnite());
-                            job.Call();
-                            res.SetResult();
-                        }
-                        catch (const IgniteError& err)
-                        {
-                            res.SetError(err);
-                        }
-                        catch (const std::exception& err)
-                        {
-                            res.SetError(IgniteError(IgniteError::IGNITE_ERR_STD, err.what()));
-                        }
-                        catch (...)
-                        {
-                            res.SetError(IgniteError(IgniteError::IGNITE_ERR_UNKNOWN,
-                                "Unknown error occurred during call."));
-                        }
-                    }
-    
-                    virtual void ExecuteRemote(IgniteEnvironment* env, binary::BinaryWriterImpl& writer)
-                    {
-                        ExecuteLocal(env);
-    
-                        res.Write(writer);
-                    }
-    
-                private:
-                    /** Result. */
-                    ComputeJobResult<void> res;
-    
-                    /** Job. */
-                    JobType job;
-                };
-            }
-        }
-    }
-}
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace compute {
+/**
+ * Compute job holder. Internal helper class.
+ * Used to handle jobs in general way, without specific types.
+ */
+class ComputeJobHolder {
+ public:
+  /**
+   * Destructor.
+   */
+  virtual ~ComputeJobHolder() {
+    // No-op.
+  }
 
-#endif //_IGNITE_ODBC_IMPL_COMPUTE_COMPUTE_JOB_HOLDER
+  /**
+   * Execute job locally.
+   */
+  virtual void ExecuteLocal(IgniteEnvironment* env) = 0;
+
+  /**
+   * Execute job remote.
+   *
+   * @param writer Writer.
+   */
+  virtual void ExecuteRemote(IgniteEnvironment* env,
+                             binary::BinaryWriterImpl& writer) = 0;
+};
+
+/**
+ * Compute job holder. Internal class.
+ *
+ * @tparam F Actual job type.
+ * @tparam R Job return type.
+ */
+template < typename F, typename R >
+class ComputeJobHolderImpl : public ComputeJobHolder {
+ public:
+  typedef R ResultType;
+  typedef F JobType;
+
+  /**
+   * Constructor.
+   *
+   * @param job Job.
+   */
+  ComputeJobHolderImpl(JobType job) : job(job) {
+    // No-op.
+  }
+
+  /**
+   * Destructor.
+   */
+  virtual ~ComputeJobHolderImpl() {
+    // No-op.
+  }
+
+  const ComputeJobResult< ResultType >& GetResult() {
+    return res;
+  }
+
+  virtual void ExecuteLocal(IgniteEnvironment* env) {
+    try {
+      job.SetIgnite(env->GetIgnite());
+      res.SetResult(job.Call());
+    } catch (const IgniteError& err) {
+      res.SetError(err);
+    } catch (const std::exception& err) {
+      res.SetError(IgniteError(IgniteError::IGNITE_ERR_STD, err.what()));
+    } catch (...) {
+      res.SetError(IgniteError(IgniteError::IGNITE_ERR_UNKNOWN,
+                               "Unknown error occurred during call."));
+    }
+  }
+
+  virtual void ExecuteRemote(IgniteEnvironment* env,
+                             binary::BinaryWriterImpl& writer) {
+    ExecuteLocal(env);
+
+    res.Write(writer);
+  }
+
+ private:
+  /** Result. */
+  ComputeJobResult< ResultType > res;
+
+  /** Job. */
+  JobType job;
+};
+
+/**
+ * Compute job holder. Internal class.
+ * Specialisation for void return type
+ *
+ * @tparam F Actual job type.
+ */
+template < typename F >
+class ComputeJobHolderImpl< F, void > : public ComputeJobHolder {
+ public:
+  typedef F JobType;
+
+  /**
+   * Constructor.
+   *
+   * @param job Job.
+   */
+  ComputeJobHolderImpl(JobType job) : job(job) {
+    // No-op.
+  }
+
+  /**
+   * Destructor.
+   */
+  virtual ~ComputeJobHolderImpl() {
+    // No-op.
+  }
+
+  const ComputeJobResult< void >& GetResult() {
+    return res;
+  }
+
+  virtual void ExecuteLocal(IgniteEnvironment* env) {
+    try {
+      job.SetIgnite(env->GetIgnite());
+      job.Call();
+      res.SetResult();
+    } catch (const IgniteError& err) {
+      res.SetError(err);
+    } catch (const std::exception& err) {
+      res.SetError(IgniteError(IgniteError::IGNITE_ERR_STD, err.what()));
+    } catch (...) {
+      res.SetError(IgniteError(IgniteError::IGNITE_ERR_UNKNOWN,
+                               "Unknown error occurred during call."));
+    }
+  }
+
+  virtual void ExecuteRemote(IgniteEnvironment* env,
+                             binary::BinaryWriterImpl& writer) {
+    ExecuteLocal(env);
+
+    res.Write(writer);
+  }
+
+ private:
+  /** Result. */
+  ComputeJobResult< void > res;
+
+  /** Job. */
+  JobType job;
+};
+}  // namespace compute
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_IMPL_COMPUTE_COMPUTE_JOB_HOLDER

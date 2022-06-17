@@ -47,18 +47,21 @@ class DocumentDbQueryMappingService {
    */
   ~DocumentDbQueryMappingService() = default;
 
-  /** 
-   * Creates an instance of DocumentDbQueryMappingService from connection properties and database metadata.
-   * 
+  /**
+   * Creates an instance of DocumentDbQueryMappingService from connection
+   * properties and database metadata.
+   *
    * @return an new instance of DocumentDbQueryMappingService.
    */
   static SharedPointer< DocumentDbQueryMappingService > Create(
-      const SharedPointer< DocumentDbConnectionProperties >& connectionProperties,
-      const SharedPointer< DocumentDbDatabaseMetadata >& databaseMetadata, JniErrorInfo& errInfo);
+      const SharedPointer< DocumentDbConnectionProperties >&
+          connectionProperties,
+      const SharedPointer< DocumentDbDatabaseMetadata >& databaseMetadata,
+      JniErrorInfo& errInfo);
 
-  /** 
+  /**
    * Getst the MQL query context for a SQL query.
-   * 
+   *
    * @return a pointer to DocumentDbMqlQueryContext.
    */
   SharedPointer< DocumentDbMqlQueryContext > GetMqlQueryContext(
@@ -68,18 +71,19 @@ class DocumentDbQueryMappingService {
   /**
    * Constructs an instance of the DocumentDbQueryMappingService class.
    */
-  DocumentDbQueryMappingService(SharedPointer< JniContext >& jniContext,
-                            SharedPointer< GlobalJObject >& queryMappingService)
+  DocumentDbQueryMappingService(
+      SharedPointer< JniContext >& jniContext,
+      SharedPointer< GlobalJObject >& queryMappingService)
       : jniContext_(jniContext), queryMappingService_(queryMappingService) {
   }
 
   /**
    * Reads the JDBC column metadata into a vector of JdbcColumnMetadata.
-   * 
+   *
    * @return true if able to read the metadata, false, otherwise.
    */
   bool ReadJdbcColumnMetadata(
-      SharedPointer< GlobalJObject > const& columnMetadata, 
+      SharedPointer< GlobalJObject > const& columnMetadata,
       std::vector< JdbcColumnMetadata >& columnMetadataList,
       JniErrorInfo& errInfo);
 
