@@ -40,7 +40,9 @@ class DocumentDbCursor {
    * Constructor.
    * @param queryId ID of the executed query.
    */
-  DocumentDbCursor(mongocxx::cursor& cursor, std::vector< JdbcColumnMetadata >& columnMetadata, std::vector< std::string >& paths);
+  DocumentDbCursor(mongocxx::cursor& cursor,
+                   std::vector< JdbcColumnMetadata >& columnMetadata,
+                   std::vector< std::string >& paths);
 
   /**
    * Destructor.

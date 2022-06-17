@@ -26,87 +26,77 @@
 #include <ignite/odbc/cache/event/cache_entry_event.h>
 #include <ignite/odbc/impl/cache/event/cache_entry_event_filter_base.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        class IgniteBinding;
-    
-        namespace impl
-        {
-            namespace cache
-            {
-                namespace event
-                {
-                    template<typename T>
-                    class CacheEntryEventFilterHolder;
-                }
-            }
-        }
-    
-        namespace cache
-        {
-            namespace event
-            {
-                /**
-                 * Cache entry event filter.
-                 *
-                 * All templated types should be default-constructable,
-                 * copy-constructable and assignable.
-                 *
-                 * @tparam K Key type.
-                 * @tparam V Value type.
-                 */
-                template<typename K, typename V>
-                class CacheEntryEventFilter : private impl::cache::event::CacheEntryEventFilterBase
-                {
-                    template<typename T>
-                    friend class impl::cache::event::CacheEntryEventFilterHolder;
-    
-                public:
-                    /**
-                     * Default constructor.
-                     */
-                    CacheEntryEventFilter()
-                    {
-                        // No-op.
-                    }
-    
-                    /**
-                     * Destructor.
-                     */
-                    virtual ~CacheEntryEventFilter()
-                    {
-                        // No-op.
-                    }
-    
-                    /**
-                     * Event callback.
-                     *
-                     * @param event Event.
-                     * @return True if the event passes filter.
-                     */
-                    virtual bool Process(const CacheEntryEvent<K, V>& event) = 0;
-    
-                private:
-                    /**
-                     * Process serialized events.
-                     *
-                     * @param reader Reader for a serialized event.
-                     * @return Filter evaluation result.
-                     */
-                    virtual bool ReadAndProcessEvent(binary::BinaryRawReader& reader)
-                    {
-                        CacheEntryEvent<K, V> event;
-    
-                        event.Read(reader);
-    
-                        return Process(event);
-                    }
-                };
-            }
-        }
-    }
-}
+namespace ignite {
+namespace odbc {
+class IgniteBinding;
 
-#endif //_IGNITE_ODBC_CACHE_EVENT_CACHE_ENTRY_EVENT_FILTER
+namespace impl {
+namespace cache {
+namespace event {
+template < typename T >
+class CacheEntryEventFilterHolder;
+}
+}  // namespace cache
+}  // namespace impl
+
+namespace cache {
+namespace event {
+/**
+ * Cache entry event filter.
+ *
+ * All templated types should be default-constructable,
+ * copy-constructable and assignable.
+ *
+ * @tparam K Key type.
+ * @tparam V Value type.
+ */
+template < typename K, typename V >
+class CacheEntryEventFilter
+    : private impl::cache::event::CacheEntryEventFilterBase {
+  template < typename T >
+  friend class impl::cache::event::CacheEntryEventFilterHolder;
+
+ public:
+  /**
+   * Default constructor.
+   */
+  CacheEntryEventFilter() {
+    // No-op.
+  }
+
+  /**
+   * Destructor.
+   */
+  virtual ~CacheEntryEventFilter() {
+    // No-op.
+  }
+
+  /**
+   * Event callback.
+   *
+   * @param event Event.
+   * @return True if the event passes filter.
+   */
+  virtual bool Process(const CacheEntryEvent< K, V >& event) = 0;
+
+ private:
+  /**
+   * Process serialized events.
+   *
+   * @param reader Reader for a serialized event.
+   * @return Filter evaluation result.
+   */
+  virtual bool ReadAndProcessEvent(binary::BinaryRawReader& reader) {
+    CacheEntryEvent< K, V > event;
+
+    event.Read(reader);
+
+    return Process(event);
+  }
+};
+}  // namespace event
+}  // namespace cache
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_CACHE_EVENT_CACHE_ENTRY_EVENT_FILTER

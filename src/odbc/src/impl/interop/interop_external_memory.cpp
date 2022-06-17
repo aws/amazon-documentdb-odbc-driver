@@ -22,27 +22,22 @@
 
 using namespace ignite::odbc::jni::java;
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace impl
-        {
-            namespace interop
-            {
-                InteropExternalMemory::InteropExternalMemory(int8_t* memPtr)
-                {
-                    this->memPtr = memPtr;
-                }
-    
-                void InteropExternalMemory::Reallocate(int32_t cap)
-                {
-                    if (JniContext::Reallocate(reinterpret_cast<int64_t>(memPtr), cap) == -1) {
-                        IGNITE_ERROR_FORMATTED_2(IgniteError::IGNITE_ERR_MEMORY, "Failed to reallocate external memory",
-                            "memPtr", PointerLong(), "requestedCapacity", cap)
-                    }
-                }
-            }
-        }
-    }
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace interop {
+InteropExternalMemory::InteropExternalMemory(int8_t* memPtr) {
+  this->memPtr = memPtr;
 }
+
+void InteropExternalMemory::Reallocate(int32_t cap) {
+  if (JniContext::Reallocate(reinterpret_cast< int64_t >(memPtr), cap) == -1) {
+    IGNITE_ERROR_FORMATTED_2(IgniteError::IGNITE_ERR_MEMORY,
+                             "Failed to reallocate external memory", "memPtr",
+                             PointerLong(), "requestedCapacity", cap)
+  }
+}
+}  // namespace interop
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite

@@ -147,8 +147,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
     BOOST_CHECK_EQUAL(DATABASE_NAME, *columnMetadataItem.GetSchemaName());
     BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetPrecision());
     BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
-    BOOST_CHECK_EQUAL(TABLE_NAME,
-                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK_EQUAL(TABLE_NAME, *columnMetadataItem.GetTableName());
     BOOST_CHECK(!columnMetadataItem.GetCatalogName());
     BOOST_CHECK_EQUAL(JDBC_TYPE_VARCHAR, columnMetadataItem.GetColumnType());
     BOOST_CHECK_EQUAL("VARCHAR", *columnMetadataItem.GetColumnTypeName());
@@ -173,8 +172,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
     BOOST_CHECK_EQUAL(DATABASE_NAME, *columnMetadataItem.GetSchemaName());
     BOOST_CHECK_EQUAL(19, columnMetadataItem.GetPrecision());
     BOOST_CHECK_EQUAL(19, columnMetadataItem.GetScale());
-    BOOST_CHECK_EQUAL(TABLE_NAME,
-                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK_EQUAL(TABLE_NAME, *columnMetadataItem.GetTableName());
     BOOST_CHECK(!columnMetadataItem.GetCatalogName());
     BOOST_CHECK_EQUAL(JDBC_TYPE_DECIMAL, columnMetadataItem.GetColumnType());
     BOOST_CHECK_EQUAL("DECIMAL", *columnMetadataItem.GetColumnTypeName());
@@ -199,8 +197,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
     BOOST_CHECK_EQUAL(DATABASE_NAME, *columnMetadataItem.GetSchemaName());
     BOOST_CHECK_EQUAL(15, columnMetadataItem.GetPrecision());
     BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
-    BOOST_CHECK_EQUAL(TABLE_NAME,
-                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK_EQUAL(TABLE_NAME, *columnMetadataItem.GetTableName());
     BOOST_CHECK(!columnMetadataItem.GetCatalogName());
     BOOST_CHECK_EQUAL(JDBC_TYPE_DOUBLE, columnMetadataItem.GetColumnType());
     BOOST_CHECK_EQUAL("DOUBLE", *columnMetadataItem.GetColumnTypeName());
@@ -225,8 +222,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
     BOOST_CHECK_EQUAL(DATABASE_NAME, *columnMetadataItem.GetSchemaName());
     BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetPrecision());
     BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
-    BOOST_CHECK_EQUAL(TABLE_NAME,
-                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK_EQUAL(TABLE_NAME, *columnMetadataItem.GetTableName());
     BOOST_CHECK(!columnMetadataItem.GetCatalogName());
     BOOST_CHECK_EQUAL(JDBC_TYPE_VARCHAR, columnMetadataItem.GetColumnType());
     BOOST_CHECK_EQUAL("VARCHAR", *columnMetadataItem.GetColumnTypeName());
@@ -251,8 +247,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
     BOOST_CHECK_EQUAL(DATABASE_NAME, *columnMetadataItem.GetSchemaName());
     BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetPrecision());
     BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
-    BOOST_CHECK_EQUAL(TABLE_NAME,
-                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK_EQUAL(TABLE_NAME, *columnMetadataItem.GetTableName());
     BOOST_CHECK(!columnMetadataItem.GetCatalogName());
     BOOST_CHECK_EQUAL(JDBC_TYPE_VARCHAR, columnMetadataItem.GetColumnType());
     BOOST_CHECK_EQUAL("VARCHAR", *columnMetadataItem.GetColumnTypeName());
@@ -277,8 +272,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
     BOOST_CHECK_EQUAL(DATABASE_NAME, *columnMetadataItem.GetSchemaName());
     BOOST_CHECK_EQUAL(1, columnMetadataItem.GetPrecision());
     BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
-    BOOST_CHECK_EQUAL(TABLE_NAME,
-                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK_EQUAL(TABLE_NAME, *columnMetadataItem.GetTableName());
     BOOST_CHECK(!columnMetadataItem.GetCatalogName());
     BOOST_CHECK_EQUAL(JDBC_TYPE_BOOLEAN, columnMetadataItem.GetColumnType());
     BOOST_CHECK_EQUAL("BOOLEAN", *columnMetadataItem.GetColumnTypeName());
@@ -303,8 +297,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
     BOOST_CHECK_EQUAL(DATABASE_NAME, *columnMetadataItem.GetSchemaName());
     BOOST_CHECK_EQUAL(0, columnMetadataItem.GetPrecision());
     BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
-    BOOST_CHECK_EQUAL(TABLE_NAME,
-                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK_EQUAL(TABLE_NAME, *columnMetadataItem.GetTableName());
     BOOST_CHECK(!columnMetadataItem.GetCatalogName());
     BOOST_CHECK_EQUAL(JDBC_TYPE_TIMESTAMP, columnMetadataItem.GetColumnType());
     BOOST_CHECK_EQUAL("TIMESTAMP", *columnMetadataItem.GetColumnTypeName());
@@ -329,8 +322,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
     BOOST_CHECK_EQUAL(DATABASE_NAME, *columnMetadataItem.GetSchemaName());
     BOOST_CHECK_EQUAL(10, columnMetadataItem.GetPrecision());
     BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
-    BOOST_CHECK_EQUAL(TABLE_NAME,
-                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK_EQUAL(TABLE_NAME, *columnMetadataItem.GetTableName());
     BOOST_CHECK(!columnMetadataItem.GetCatalogName());
     BOOST_CHECK_EQUAL(JDBC_TYPE_INTEGER, columnMetadataItem.GetColumnType());
     BOOST_CHECK_EQUAL("INTEGER", *columnMetadataItem.GetColumnTypeName());
@@ -355,8 +347,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
     BOOST_CHECK_EQUAL(DATABASE_NAME, *columnMetadataItem.GetSchemaName());
     BOOST_CHECK_EQUAL(19, columnMetadataItem.GetPrecision());
     BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
-    BOOST_CHECK_EQUAL(TABLE_NAME,
-                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK_EQUAL(TABLE_NAME, *columnMetadataItem.GetTableName());
     BOOST_CHECK(!columnMetadataItem.GetCatalogName());
     BOOST_CHECK_EQUAL(JDBC_TYPE_BIGINT, columnMetadataItem.GetColumnType());
     BOOST_CHECK_EQUAL("BIGINT", *columnMetadataItem.GetColumnTypeName());
@@ -381,8 +372,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
     BOOST_CHECK_EQUAL(DATABASE_NAME, *columnMetadataItem.GetSchemaName());
     BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetPrecision());
     BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
-    BOOST_CHECK_EQUAL(TABLE_NAME,
-                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK_EQUAL(TABLE_NAME, *columnMetadataItem.GetTableName());
     BOOST_CHECK(!columnMetadataItem.GetCatalogName());
     BOOST_CHECK_EQUAL(JDBC_TYPE_VARCHAR, columnMetadataItem.GetColumnType());
     BOOST_CHECK_EQUAL("VARCHAR", *columnMetadataItem.GetColumnTypeName());
@@ -407,8 +397,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
     BOOST_CHECK_EQUAL(DATABASE_NAME, *columnMetadataItem.GetSchemaName());
     BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetPrecision());
     BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
-    BOOST_CHECK_EQUAL(TABLE_NAME,
-                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK_EQUAL(TABLE_NAME, *columnMetadataItem.GetTableName());
     BOOST_CHECK(!columnMetadataItem.GetCatalogName());
     BOOST_CHECK_EQUAL(JDBC_TYPE_VARCHAR, columnMetadataItem.GetColumnType());
     BOOST_CHECK_EQUAL("VARCHAR", *columnMetadataItem.GetColumnTypeName());
@@ -434,8 +423,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
     BOOST_CHECK_EQUAL(DATABASE_NAME, *columnMetadataItem.GetSchemaName());
     BOOST_CHECK_EQUAL(0, columnMetadataItem.GetPrecision());
     BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
-    BOOST_CHECK_EQUAL(TABLE_NAME,
-                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK_EQUAL(TABLE_NAME, *columnMetadataItem.GetTableName());
     BOOST_CHECK(!columnMetadataItem.GetCatalogName());
     BOOST_CHECK_EQUAL(JDBC_TYPE_VARCHAR, columnMetadataItem.GetColumnType());
     BOOST_CHECK_EQUAL("VARCHAR", *columnMetadataItem.GetColumnTypeName());
@@ -461,8 +449,7 @@ struct JniTestSuiteFixture : OdbcTestSuite {
     BOOST_CHECK_EQUAL(DATABASE_NAME, *columnMetadataItem.GetSchemaName());
     BOOST_CHECK_EQUAL(65536, columnMetadataItem.GetPrecision());
     BOOST_CHECK_EQUAL(0, columnMetadataItem.GetScale());
-    BOOST_CHECK_EQUAL(TABLE_NAME,
-                      *columnMetadataItem.GetTableName());
+    BOOST_CHECK_EQUAL(TABLE_NAME, *columnMetadataItem.GetTableName());
     BOOST_CHECK(!columnMetadataItem.GetCatalogName());
     BOOST_CHECK_EQUAL(JDBC_TYPE_VARBINARY, columnMetadataItem.GetColumnType());
     BOOST_CHECK_EQUAL("VARBINARY", *columnMetadataItem.GetColumnTypeName());
@@ -1041,7 +1028,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetImportedKeys) {
   SharedPointer< DatabaseMetaData > databaseMetaData =
       dbConnection.GetMetaData(errInfo);
   BOOST_REQUIRE(databaseMetaData.IsValid());
-  
+
   const boost::optional< std::string > fkCatalog = boost::none;
   const boost::optional< std::string > fkSchema = boost::none;
   std::string fkTable = "jni_test_001_sub_doc";
@@ -1086,7 +1073,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetImportedKeys) {
     resultSet.Get()->GetString("PKTABLE_NAME", value, errInfo);
     BOOST_CHECK(value);
     BOOST_CHECK_EQUAL(table, *value);
-    
+
     resultSet.Get()->GetString(4, value, errInfo);
     BOOST_CHECK(value);
     BOOST_CHECK(!value->empty());
@@ -1136,7 +1123,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetImportedKeys) {
     resultSet.Get()->GetSmallInt("KEY_SEQ", smallIntValue, errInfo);
     BOOST_CHECK(smallIntValue);
     BOOST_CHECK_EQUAL(1, *smallIntValue);
-   
+
     resultSet.Get()->GetSmallInt(10, smallIntValue, errInfo);
     BOOST_CHECK(smallIntValue);
 
@@ -1222,7 +1209,6 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetPrimaryKeysReturnsNone) {
   }
   BOOST_CHECK(!dbConnection.IsOpen());
 }
-
 
 BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetImportedKeysReturnsNone) {
   PrepareContext();
@@ -1311,8 +1297,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbGetMqlQueryContext) {
   std::vector< JdbcColumnMetadata > columnMetadata =
       queryContext.Get()->GetColumnMetadata();
   ValidateJdbcColumnMetadata(columnMetadata);
-  BOOST_CHECK_EQUAL(TABLE_NAME,
-                    queryContext.Get()->GetCollectionName());
+  BOOST_CHECK_EQUAL(TABLE_NAME, queryContext.Get()->GetCollectionName());
   BOOST_CHECK_EQUAL(13, queryContext.Get()->GetPaths().size());
   BOOST_CHECK_EQUAL(1, queryContext.Get()->GetAggregateOperations().size());
   BOOST_CHECK_EQUAL(

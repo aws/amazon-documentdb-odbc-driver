@@ -36,13 +36,6 @@
 #define SQL_ASYNC_NOTIFICATION_CAPABLE 0x00000001L
 #endif
 
-// Missing definition in iODBC sqlext.h
-#if (ODBCVER >= 0x0300)
-#ifndef SQL_CVT_GUID
-#define SQL_CVT_GUID 0x01000000L
-#endif
-#endif
-
 namespace ignite {
 namespace odbc {
 namespace config {
@@ -2881,7 +2874,7 @@ SqlResult::Type ConnectionInfo::GetInfo(InfoType type, void* buf, short buflen,
     if (!buflen)
       return SqlResult::AI_ERROR;
 
-    // Length is given in bytes, 
+    // Length is given in bytes,
     unsigned short strlen = static_cast< short >(utility::CopyStringToBuffer(
         itStr->second, reinterpret_cast< SQLWCHAR* >(buf), buflen, true));
 

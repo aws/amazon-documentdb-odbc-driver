@@ -401,7 +401,8 @@ class IGNITE_IMPORT_EXPORT JniJvm {
    * @param javaMembers Java members.
    * @param members Members.
    */
-  JniJvm(JavaVM* jvm, JniJavaMembers const& javaMembers, JniMembers const& members);
+  JniJvm(JavaVM* jvm, JniJavaMembers const& javaMembers,
+         JniMembers const& members);
 
   /**
    * Get JVM.
@@ -483,7 +484,8 @@ struct IGNITE_IMPORT_EXPORT JniErrorInfo {
  */
 class IGNITE_IMPORT_EXPORT JniContext {
  public:
-  static JniContext* Create(char** opts, int optsLen, JniHandlers const& hnds, JniErrorInfo& errInfo);
+  static JniContext* Create(char** opts, int optsLen, JniHandlers const& hnds,
+                            JniErrorInfo& errInfo);
   static int Reallocate(int64_t memPtr, int cap);
   static void Detach();
   static void Release(jobject obj);
@@ -495,8 +497,7 @@ class IGNITE_IMPORT_EXPORT JniContext {
                               JniErrorInfo* errInfo);
   int64_t TargetInStreamOutLong(jobject obj, int type, int64_t memPtr,
                                 JniErrorInfo* errInfo);
-  jobject TargetOutObject(jobject obj, int opType,
-                          JniErrorInfo* errInfo);
+  jobject TargetOutObject(jobject obj, int opType, JniErrorInfo* errInfo);
   void TargetInStreamOutStream(jobject obj, int opType, int64_t inMemPtr,
                                int64_t outMemPtr, JniErrorInfo* errInfo);
   jobject TargetInStreamOutObject(jobject obj, int type, int64_t memPtr,
@@ -524,7 +525,8 @@ class IGNITE_IMPORT_EXPORT JniContext {
       SharedPointer< GlobalJObject >& metadata, JniErrorInfo& errInfo);
   JniErrorCode DocumentDbConnectionGetConnectionProperties(
       const SharedPointer< GlobalJObject >& connection,
-      SharedPointer< GlobalJObject >& connectionProperties, JniErrorInfo& errInfo);
+      SharedPointer< GlobalJObject >& connectionProperties,
+      JniErrorInfo& errInfo);
 
   JniErrorCode DocumentDbDatabaseSchemaMetadataGetSchemaName(
       const SharedPointer< GlobalJObject >& databaseMetadata,
@@ -550,15 +552,13 @@ class IGNITE_IMPORT_EXPORT JniContext {
       const boost::optional< std::string >& catalog,
       const boost::optional< std::string >& schema,
       const boost::optional< std::string >& table,
-      SharedPointer< GlobalJObject >& resultSet,
-      JniErrorInfo& errInfo);
+      SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo);
 
   JniErrorCode DatabaseMetaDataGetImportedKeys(
       const SharedPointer< GlobalJObject >& databaseMetaData,
       const boost::optional< std::string >& catalog,
-      const boost::optional< std::string >& schema,
-      const std::string& table, SharedPointer< GlobalJObject >& resultSet,
-      JniErrorInfo& errInfo);
+      const boost::optional< std::string >& schema, const std::string& table,
+      SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo);
 
   JniErrorCode ResultSetClose(const SharedPointer< GlobalJObject >& resultSet,
                               JniErrorInfo& errInfo);
@@ -585,8 +585,8 @@ class IGNITE_IMPORT_EXPORT JniContext {
   JniErrorCode ResultSetWasNull(const SharedPointer< GlobalJObject >& resultSet,
                                 bool& value, JniErrorInfo& errInfo);
 
-  JniErrorCode ListSize(const SharedPointer< GlobalJObject >& list, int32_t& size,
-                        JniErrorInfo& errInfo);
+  JniErrorCode ListSize(const SharedPointer< GlobalJObject >& list,
+                        int32_t& size, JniErrorInfo& errInfo);
   JniErrorCode ListGet(const SharedPointer< GlobalJObject >& list,
                        int32_t index, SharedPointer< GlobalJObject >& array,
                        JniErrorInfo& errInfo);
@@ -611,8 +611,7 @@ class IGNITE_IMPORT_EXPORT JniContext {
       JniErrorInfo& errInfo);
   JniErrorCode DocumentDbQueryMappingServiceGet(
       const SharedPointer< GlobalJObject >& queryMappingService,
-      const std::string sql,
-      int64_t maxRowCount,
+      const std::string sql, int64_t maxRowCount,
       SharedPointer< GlobalJObject >& mqlQueryContext, JniErrorInfo& errInfo);
 
   JniErrorCode JdbcColumnMetadataGetOrdinal(
@@ -631,8 +630,8 @@ class IGNITE_IMPORT_EXPORT JniContext {
       const SharedPointer< GlobalJObject >& jdbcColumnMetadata, bool& currency,
       JniErrorInfo& errInfo);
   JniErrorCode JdbcColumnMetadataGetNullable(
-      const SharedPointer< GlobalJObject >& jdbcColumnMetadata, int32_t& nullable,
-      JniErrorInfo& errInfo);
+      const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
+      int32_t& nullable, JniErrorInfo& errInfo);
   JniErrorCode JdbcColumnMetadataIsSigned(
       const SharedPointer< GlobalJObject >& jdbcColumnMetadata, bool& isSigned,
       JniErrorInfo& errInfo);
@@ -641,56 +640,43 @@ class IGNITE_IMPORT_EXPORT JniContext {
       int32_t& columnDisplaySize, JniErrorInfo& errInfo);
   JniErrorCode JdbcColumnMetadataGetColumnLabel(
       const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-      boost::optional< std::string >& columnLabel,
-      JniErrorInfo& errInfo);
+      boost::optional< std::string >& columnLabel, JniErrorInfo& errInfo);
   JniErrorCode JdbcColumnMetadataGetColumnName(
       const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-      boost::optional< std::string >& columnName,
-      JniErrorInfo& errInfo);
+      boost::optional< std::string >& columnName, JniErrorInfo& errInfo);
   JniErrorCode JdbcColumnMetadataGetSchemaName(
       const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-      boost::optional< std::string >& schemaName,
-      JniErrorInfo& errInfo);
+      boost::optional< std::string >& schemaName, JniErrorInfo& errInfo);
   JniErrorCode JdbcColumnMetadataGetPrecision(
       const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-      int32_t& precision,
-      JniErrorInfo& errInfo);
+      int32_t& precision, JniErrorInfo& errInfo);
   JniErrorCode JdbcColumnMetadataGetScale(
-      const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-      int32_t& scale,
+      const SharedPointer< GlobalJObject >& jdbcColumnMetadata, int32_t& scale,
       JniErrorInfo& errInfo);
   JniErrorCode JdbcColumnMetadataGetTableName(
       const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-      boost::optional< std::string >& tableName,
-      JniErrorInfo& errInfo);
+      boost::optional< std::string >& tableName, JniErrorInfo& errInfo);
   JniErrorCode JdbcColumnMetadataGetCatalogName(
       const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-      boost::optional< std::string >& catalogName,
-      JniErrorInfo& errInfo);
+      boost::optional< std::string >& catalogName, JniErrorInfo& errInfo);
   JniErrorCode JdbcColumnMetadataGetColumnType(
       const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-      int32_t& columnType,
-      JniErrorInfo& errInfo);
+      int32_t& columnType, JniErrorInfo& errInfo);
   JniErrorCode JdbcColumnMetadataGetColumnTypeName(
       const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-      boost::optional< std::string >& columnTypeName,
-      JniErrorInfo& errInfo);
+      boost::optional< std::string >& columnTypeName, JniErrorInfo& errInfo);
   JniErrorCode JdbcColumnMetadataIsReadOnly(
-      const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-      bool& readOnly,
+      const SharedPointer< GlobalJObject >& jdbcColumnMetadata, bool& readOnly,
       JniErrorInfo& errInfo);
   JniErrorCode JdbcColumnMetadataIsWritable(
-      const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-      bool& writable,
+      const SharedPointer< GlobalJObject >& jdbcColumnMetadata, bool& writable,
       JniErrorInfo& errInfo);
   JniErrorCode JdbcColumnMetadataIsDefinitelyWritable(
       const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-      bool& definitelyWritable,
-      JniErrorInfo& errInfo);
+      bool& definitelyWritable, JniErrorInfo& errInfo);
   JniErrorCode JdbcColumnMetadataGetColumnClassName(
       const SharedPointer< GlobalJObject >& jdbcColumnMetadata,
-      boost::optional< std::string >& columnClassName,
-      JniErrorInfo& errInfo);
+      boost::optional< std::string >& columnClassName, JniErrorInfo& errInfo);
 
   jobject CacheOutOpQueryCursor(jobject obj, int type, int64_t memPtr,
                                 JniErrorInfo* errInfo);

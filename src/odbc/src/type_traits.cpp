@@ -196,7 +196,7 @@ const boost::optional< std::string > BinaryTypeToSqlTypeName(
   }
 }
 
-bool IsApplicationTypeSupported(boost::optional<int16_t> type) {
+bool IsApplicationTypeSupported(boost::optional< int16_t > type) {
   if (type)
     return ToDriverType(*type) != OdbcNativeType::AI_UNSUPPORTED;
   else
@@ -256,7 +256,7 @@ bool IsSqlTypeSupported(boost::optional< int16_t > type) {
  * JDBC side, the change should be reflected under this function as
  * well.
  */
-boost::optional<int16_t> SqlTypeToBinary(boost::optional< int16_t > sqlType) {
+boost::optional< int16_t > SqlTypeToBinary(boost::optional< int16_t > sqlType) {
   if (!sqlType)
     return boost::none;
   switch (*sqlType) {
@@ -406,7 +406,8 @@ OdbcNativeType::Type ToDriverType(int16_t type) {
  * JDBC side, the change should be reflected under this function as
  * well.
  */
-boost::optional<int16_t> BinaryToSqlType(boost::optional<int16_t> binaryType) {
+boost::optional< int16_t > BinaryToSqlType(
+    boost::optional< int16_t > binaryType) {
   if (!binaryType)
     return boost::none;
   switch (*binaryType) {
@@ -506,7 +507,7 @@ boost::optional< std::string > NullabilityToIsNullable(
   }
 }
 
-boost::optional<int32_t> SqlTypeDisplaySize(boost::optional<int16_t> type) {
+boost::optional< int32_t > SqlTypeDisplaySize(boost::optional< int16_t > type) {
   if (!type)
     return boost::none;
   switch (*type) {
@@ -563,7 +564,8 @@ boost::optional<int32_t> SqlTypeDisplaySize(boost::optional<int16_t> type) {
   }
 }
 
-boost::optional<int32_t> BinaryTypeDisplaySize(boost::optional<int16_t> type) {
+boost::optional< int32_t > BinaryTypeDisplaySize(
+    boost::optional< int16_t > type) {
   boost::optional< int16_t > sqlType = BinaryToSqlType(type);
 
   return SqlTypeDisplaySize(sqlType);
@@ -626,13 +628,15 @@ boost::optional< int32_t > SqlTypeColumnSize(boost::optional< int16_t > type) {
   }
 }
 
-boost::optional<int32_t> BinaryTypeColumnSize(boost::optional<int16_t> type) {
+boost::optional< int32_t > BinaryTypeColumnSize(
+    boost::optional< int16_t > type) {
   boost::optional< int16_t > sqlType = BinaryToSqlType(type);
 
   return SqlTypeColumnSize(sqlType);
 }
 
-boost::optional< int32_t > SqlTypeTransferLength(boost::optional< int16_t > type) {
+boost::optional< int32_t > SqlTypeTransferLength(
+    boost::optional< int16_t > type) {
   if (!type)
     return boost::none;
   switch (*type) {
@@ -721,9 +725,11 @@ boost::optional< int32_t > BinaryTypeNumPrecRadix(
   return SqlTypeNumPrecRadix(sqlType);
 }
 
-boost::optional< int16_t > SqlTypeDecimalDigits(boost::optional< int16_t > type) {
+boost::optional< int16_t > SqlTypeDecimalDigits(
+    boost::optional< int16_t > type) {
   // Not implemented for the NUMERIC and DECIMAL data types.
-  // All exact numeric types other than SQL_DECIMAL and SQL_NUMERIC should return 0
+  // All exact numeric types other than SQL_DECIMAL and SQL_NUMERIC should
+  // return 0
   if (!type)
     return boost::none;
   switch (*type) {
@@ -772,7 +778,7 @@ boost::optional< int32_t > BinaryTypeCharOctetLength(
   return SqlTypeCharOctetLength(sqlType);
 }
 
-bool SqlTypeUnsigned(boost::optional<int16_t> type) {
+bool SqlTypeUnsigned(boost::optional< int16_t > type) {
   if (!type)
     return false;
   switch (*type) {
@@ -791,7 +797,7 @@ bool SqlTypeUnsigned(boost::optional<int16_t> type) {
   }
 }
 
-bool BinaryTypeUnsigned(boost::optional<int16_t> type) {
+bool BinaryTypeUnsigned(boost::optional< int16_t > type) {
   boost::optional< int16_t > sqlType = BinaryToSqlType(type);
 
   return SqlTypeUnsigned(sqlType);

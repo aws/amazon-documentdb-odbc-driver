@@ -107,7 +107,8 @@ class IGNITE_IMPORT_EXPORT BinaryObjectImpl {
   template < typename T >
   T Deserialize() const {
     int32_t actualTypeId = GetTypeId();
-    int32_t requestedTypeId = ignite::odbc::binary::BinaryType< T >::GetTypeId();
+    int32_t requestedTypeId =
+        ignite::odbc::binary::BinaryType< T >::GetTypeId();
 
     if (requestedTypeId != actualTypeId) {
       IGNITE_ERROR_FORMATTED_3(

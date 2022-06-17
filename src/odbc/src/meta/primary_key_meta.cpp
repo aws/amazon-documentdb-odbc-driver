@@ -35,7 +35,6 @@ const std::string COLUMN_NAME = "COLUMN_NAME";
 const std::string KEY_SEQ = "KEY_SEQ";
 const std::string PK_NAME = "PK_NAME";
 
-
 void PrimaryKeyMeta::Read(SharedPointer< ResultSet >& resultSet,
                           JniErrorInfo& errInfo) {
   resultSet.Get()->GetString(TABLE_CAT, catalog, errInfo);

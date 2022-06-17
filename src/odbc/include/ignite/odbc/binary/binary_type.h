@@ -120,7 +120,7 @@
     dst = 0;                              \
   }
 
-#endif // _IGNITE_ODBC_BINARY_TYPE_MACRO
+#endif  // _IGNITE_ODBC_BINARY_TYPE_MACRO
 
 namespace ignite {
 namespace odbc {

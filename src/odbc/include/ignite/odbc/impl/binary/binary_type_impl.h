@@ -30,23 +30,24 @@
  *
  * This macro declares checker for the method.
  */
-#define IGNITE_DECLARE_BINARY_TYPE_METHOD_CHECKER(method, sign)                \
-  template < typename T >                                                      \
-  class IsDeclaredBinaryType##method {                                         \
-    typedef char one;                                                          \
-    typedef char two[2];                                                       \
-                                                                               \
-    template < class U, U >                                                    \
-    struct test;                                                               \
-                                                                               \
-    template < typename C >                                                    \
-    static one& helper(test< sign, &C::method >*);                             \
-    template < typename C >                                                    \
-    static two& helper(...);                                                   \
-                                                                               \
-   public:                                                                     \
-    const static bool value =                                                  \
-        (sizeof(helper< ignite::odbc::binary::BinaryType< T > >(0)) == sizeof(one)); \
+#define IGNITE_DECLARE_BINARY_TYPE_METHOD_CHECKER(method, sign)     \
+  template < typename T >                                           \
+  class IsDeclaredBinaryType##method {                              \
+    typedef char one;                                               \
+    typedef char two[2];                                            \
+                                                                    \
+    template < class U, U >                                         \
+    struct test;                                                    \
+                                                                    \
+    template < typename C >                                         \
+    static one& helper(test< sign, &C::method >*);                  \
+    template < typename C >                                         \
+    static two& helper(...);                                        \
+                                                                    \
+   public:                                                          \
+    const static bool value =                                       \
+        (sizeof(helper< ignite::odbc::binary::BinaryType< T > >(0)) \
+         == sizeof(one));                                           \
   }
 
 namespace ignite {
@@ -104,7 +105,8 @@ struct WriteHelper< T* > {
     if (!val)
       writer.WriteNull0();
     else
-      writer.template WriteTopObject0< ignite::odbc::binary::BinaryWriter >(*val);
+      writer.template WriteTopObject0< ignite::odbc::binary::BinaryWriter >(
+          *val);
   }
 };
 
@@ -124,7 +126,8 @@ struct ReadHelper {
 
   template < typename R >
   static void Read(R& reader, T& val) {
-    reader.template ReadTopObject0< ignite::odbc::binary::BinaryReader, T >(val);
+    reader.template ReadTopObject0< ignite::odbc::binary::BinaryReader, T >(
+        val);
   }
 };
 
@@ -140,7 +143,8 @@ struct ReadHelper< T* > {
 
     std::unique_ptr< T > res(new T());
 
-    reader.template ReadTopObject0< ignite::odbc::binary::BinaryReader, T >(*res);
+    reader.template ReadTopObject0< ignite::odbc::binary::BinaryReader, T >(
+        *res);
 
     return res.release();
   }

@@ -119,14 +119,14 @@ BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBufferRepetative, *disabled()) {
     str.push_back(cch);
   }
 
-  auto t1 = std::chrono::high_resolution_clock::now(); 
+  auto t1 = std::chrono::high_resolution_clock::now();
   size_t bytesWrittenOrRequired = 0;
   for (int i = 0; i < 500; i++) {
     bytesWrittenOrRequired = CopyStringToBuffer(
         str, buffer.data(), ((strLen + 1) * sizeof(SQLWCHAR)));
     BOOST_CHECK_EQUAL(str.size(), bytesWrittenOrRequired);
   }
-  auto t2 = std::chrono::high_resolution_clock::now(); 
+  auto t2 = std::chrono::high_resolution_clock::now();
   std::cout << t2.time_since_epoch().count() - t1.time_since_epoch().count()
             << " nanoseconds\n";
 }

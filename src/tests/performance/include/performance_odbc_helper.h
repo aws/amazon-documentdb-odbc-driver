@@ -26,7 +26,6 @@
 #pragma comment(lib, "odbc32.lib")
 #endif
 
-
 #ifndef ODBCVER
 #define ODBCVER 0x0351
 #endif
@@ -34,7 +33,6 @@
 #include <odbcinst.h>
 #include <sql.h>
 #include <sqlext.h>
-
 
 #include <codecvt>
 #include <iostream>
@@ -54,7 +52,7 @@ typedef std::wstring test_string;
 #endif
 
 #define AS_SQLTCHAR(str) \
-  const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(str))
+  const_cast< SQLTCHAR* >(reinterpret_cast< const SQLTCHAR* >(str))
 
 #define convert_to_test_string(t) to_test_string(std::to_string(t))
 test_string to_test_string(const std::string& src);
@@ -91,4 +89,4 @@ std::u16string string_to_u16string(const std::string& src);
 std::string tchar_to_string(const SQLTCHAR* tchar);
 std::string wchar_to_string(const SQLWCHAR* tchar);
 
-#endif // PERFORMANCE_ODBC_HELPER_H
+#endif  // PERFORMANCE_ODBC_HELPER_H

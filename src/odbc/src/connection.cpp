@@ -257,15 +257,16 @@ SharedPointer< DocumentDbDatabaseMetadata > Connection::GetDatabaseMetadata(
       connection_.Get()->GetDatabaseMetadata(errInfo);
   if (!documentDbDatabaseMetaData.IsValid()) {
     std::string message = errInfo.errMsg;
-    err = IgniteError(IgniteError::IGNITE_ERR_JNI_GET_DOCUMENTDB_DATABASE_METADATA,
-                      message.c_str());
+    err = IgniteError(
+        IgniteError::IGNITE_ERR_JNI_GET_DOCUMENTDB_DATABASE_METADATA,
+        message.c_str());
     return nullptr;
   }
   return documentDbDatabaseMetaData;
 }
 
-SharedPointer< DocumentDbConnectionProperties > Connection::GetConnectionProperties(
-    IgniteError& err) {
+SharedPointer< DocumentDbConnectionProperties >
+Connection::GetConnectionProperties(IgniteError& err) {
   if (!connection_.IsValid()) {
     err = IgniteError(IgniteError::IGNITE_ERR_ILLEGAL_STATE,
                       "Must be connected.");
@@ -276,8 +277,9 @@ SharedPointer< DocumentDbConnectionProperties > Connection::GetConnectionPropert
       connection_.Get()->GetConnectionProperties(errInfo);
   if (!connectionProperties.IsValid()) {
     std::string message = errInfo.errMsg;
-    err = IgniteError(IgniteError::IGNITE_ERR_JNI_GET_DOCUMENTDB_CONNECTION_PROPERTIES,
-                      message.c_str());
+    err = IgniteError(
+        IgniteError::IGNITE_ERR_JNI_GET_DOCUMENTDB_CONNECTION_PROPERTIES,
+        message.c_str());
     return nullptr;
   }
   return connectionProperties;
@@ -580,11 +582,12 @@ bool Connection::TryRestoreConnection(IgniteError& err) {
   JniErrorInfo errInfo;
   auto ctx = GetJniContext(errInfo);
   if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    err = IgniteError(
-        static_cast< int32_t >(errInfo.code),
-        std::string(errInfo.errCls).append(": ").append(errInfo.errMsg).c_str());
+    err = IgniteError(static_cast< int32_t >(errInfo.code),
+                      std::string(errInfo.errCls)
+                          .append(": ")
+                          .append(errInfo.errMsg)
+                          .c_str());
     return false;
-
   }
   SharedPointer< DocumentDbConnection > conn = new DocumentDbConnection(ctx);
   if (!conn.IsValid()
@@ -667,7 +670,7 @@ std::string Connection::FormatMongoCppConnectionString(
   return mongoConnectionString;
 }
 
-SharedPointer< JniContext > Connection::GetJniContext(JniErrorInfo &errInfo) {
+SharedPointer< JniContext > Connection::GetJniContext(JniErrorInfo& errInfo) {
   if (!jniContext_.IsValid()) {
     // Resolve DOCUMENTDB_HOME.
     std::string home = jni::ResolveDocumentDbHome();
@@ -745,7 +748,7 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
       tls_options.allow_invalid_certificates(true);
       client_options.tls_opts(tls_options);
     }
-    
+
     mongoClient_ = std::make_shared< mongocxx::client >(
         mongocxx::uri(mongoCPPConnectionString), client_options);
     std::string database = config_.GetDatabase();
@@ -764,9 +767,9 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
   } catch (const mongocxx::exception& xcp) {
     std::stringstream message;
     message << "Unable to establish connection with DocumentDB."
-              << " code: " << xcp.code().value()
-              << " messagge: " << xcp.code().message()
-              << " cause: " << xcp.what();
+            << " code: " << xcp.code().value()
+            << " messagge: " << xcp.code().message()
+            << " cause: " << xcp.what();
     err = odbc::IgniteError(
         odbc::IgniteError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
         message.str().c_str());
