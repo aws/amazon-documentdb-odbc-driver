@@ -122,8 +122,7 @@ bool UnregisterDsn(const std::string& dsn) {
     return true;
   } catch (ignite::odbc::IgniteError& err) {
     std::wstring errText = FromUtf8(err.GetText());
-    MessageBox(NULL, errText.c_str(), L"Error!",
-               MB_ICONEXCLAMATION | MB_OK);
+    MessageBox(NULL, errText.c_str(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
 
     SQLPostInstallerError(err.GetCode(), errText.c_str());
   }

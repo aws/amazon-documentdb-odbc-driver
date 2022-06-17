@@ -503,4 +503,4 @@ class IGNITE_IMPORT_EXPORT BinaryReader {
 }  // namespace odbc
 }  // namespace ignite
 
-#endif //_IGNITE_ODBC_BINARY_BINARY_READER
+#endif  //_IGNITE_ODBC_BINARY_BINARY_READER

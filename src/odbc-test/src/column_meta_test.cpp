@@ -531,7 +531,7 @@ BOOST_AUTO_TEST_CASE(TestGetAttributeNullable) {
   std::string resVal;
   bool found;
   ColumnMeta columnMetaNullable(schema, table, column, JDBC_TYPE_NULL,
-                               Nullability::NULLABLE);
+                                Nullability::NULLABLE);
 
   // test SQL_DESC_NULLABLE
   found = columnMetaNullable.GetAttribute(SQL_DESC_NULLABLE, intVal);
@@ -539,7 +539,7 @@ BOOST_AUTO_TEST_CASE(TestGetAttributeNullable) {
   BOOST_CHECK_EQUAL(intVal, SQL_NULLABLE);
 
   ColumnMeta columnMetaNoNulls(schema, table, column, JDBC_TYPE_VARCHAR,
-                             Nullability::NO_NULL);
+                               Nullability::NO_NULL);
 
   // test SQL_DESC_NULLABLE
   found = columnMetaNoNulls.GetAttribute(SQL_DESC_NULLABLE, intVal);

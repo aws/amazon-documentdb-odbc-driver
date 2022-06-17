@@ -24,34 +24,30 @@
 
 #include <ignite/odbc/impl/interop/interop_memory.h>
 
-namespace ignite 
-{
-    namespace odbc
-    {
-        namespace impl 
-        {
-            namespace interop
-            {
-                /**
-                 * Interop external memory.
-                 */
-                class IGNITE_IMPORT_EXPORT InteropExternalMemory : public InteropMemory
-                {
-                public:
-                    /**
-                     * Constructor.
-                     *
-                     * @param memPtr External memory pointer.
-                     */
-                    explicit InteropExternalMemory(int8_t* memPtr);
-    
-                    virtual void Reallocate(int32_t cap);
-                private:
-                    IGNITE_NO_COPY_ASSIGNMENT(InteropExternalMemory);
-                };
-            }
-        }
-    }
-}
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace interop {
+/**
+ * Interop external memory.
+ */
+class IGNITE_IMPORT_EXPORT InteropExternalMemory : public InteropMemory {
+ public:
+  /**
+   * Constructor.
+   *
+   * @param memPtr External memory pointer.
+   */
+  explicit InteropExternalMemory(int8_t* memPtr);
 
-#endif //_IGNITE_ODBC_IMPL_INTEROP_INTEROP_EXTERNAL_MEMORY
+  virtual void Reallocate(int32_t cap);
+
+ private:
+  IGNITE_NO_COPY_ASSIGNMENT(InteropExternalMemory);
+};
+}  // namespace interop
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_IMPL_INTEROP_INTEROP_EXTERNAL_MEMORY

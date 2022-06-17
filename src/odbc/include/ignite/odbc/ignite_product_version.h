@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
- /**
-  * @file
-  * Declares ignite::odbc::IgniteProductVersion class.
-  */
+/**
+ * @file
+ * Declares ignite::odbc::IgniteProductVersion class.
+ */
 
 #ifndef _IGNITE_ODBC_IGNITE_PRODUCT_VERSION
 #define _IGNITE_ODBC_IGNITE_PRODUCT_VERSION
@@ -28,46 +28,49 @@
 
 #include <ignite/odbc/ignite_error.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        /**
-         * %Ignite product version.
-         */
-        struct IgniteProductVersion
-        {
-            /** Major version number. */
-            int8_t majorNumber;
-    
-            /** Minor version number. */
-            int8_t minorNumber;
-    
-            /** Maintenance version number. */
-            int8_t maintenance;
-    
-            /** Stage of development. */
-            std::string stage;
-    
-            /** Release date. */
-            int64_t releaseDate;
-    
-            /** Revision hash. */
-            std::vector<int8_t> revHash;
-    
-            /** SHA1 Length. */
-            static const int SHA1_LENGTH = 20;
-    
-            /**
-             * Default constructor.
-             */
-            IgniteProductVersion(int8_t majorNumber, int8_t minorNumber, int8_t maintenance, std::string stage, int64_t releaseDate, std::vector<int8_t> revHash) :
-                majorNumber(majorNumber), minorNumber(minorNumber), maintenance(maintenance), stage(stage), releaseDate(releaseDate), revHash(revHash)
-            {
-                assert(revHash.size() == SHA1_LENGTH);
-            }
-        };
-    }
-}
+namespace ignite {
+namespace odbc {
+/**
+ * %Ignite product version.
+ */
+struct IgniteProductVersion {
+  /** Major version number. */
+  int8_t majorNumber;
 
-#endif //_IGNITE_ODBC_IGNITE_PRODUCT_VERSION
+  /** Minor version number. */
+  int8_t minorNumber;
+
+  /** Maintenance version number. */
+  int8_t maintenance;
+
+  /** Stage of development. */
+  std::string stage;
+
+  /** Release date. */
+  int64_t releaseDate;
+
+  /** Revision hash. */
+  std::vector< int8_t > revHash;
+
+  /** SHA1 Length. */
+  static const int SHA1_LENGTH = 20;
+
+  /**
+   * Default constructor.
+   */
+  IgniteProductVersion(int8_t majorNumber, int8_t minorNumber,
+                       int8_t maintenance, std::string stage,
+                       int64_t releaseDate, std::vector< int8_t > revHash)
+      : majorNumber(majorNumber),
+        minorNumber(minorNumber),
+        maintenance(maintenance),
+        stage(stage),
+        releaseDate(releaseDate),
+        revHash(revHash) {
+    assert(revHash.size() == SHA1_LENGTH);
+  }
+};
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_IGNITE_PRODUCT_VERSION

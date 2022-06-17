@@ -813,8 +813,8 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT columnNum,
   }
 
   statement->GetColumnAttribute(columnNum, fieldId,
-                                reinterpret_cast< SQLWCHAR* >(strAttr), bufferLen,
-                                strAttrLen, numericAttr);
+                                reinterpret_cast< SQLWCHAR* >(strAttr),
+                                bufferLen, strAttrLen, numericAttr);
 
   LOG_DEBUG_MSG("SQLColAttribute exiting");
 
@@ -920,8 +920,8 @@ SQLRETURN SQLForeignKeys(
     SQLSMALLINT foreignSchemaNameLen, SQLWCHAR* foreignTableName,
     SQLSMALLINT foreignTableNameLen) {
   using odbc::Statement;
-  using odbc::utility::SqlStringToString;
   using odbc::utility::SqlStringToOptString;
+  using odbc::utility::SqlStringToString;
 
   LOG_DEBUG_MSG("SQLForeignKeys called");
 
@@ -1201,7 +1201,8 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
   if (!msgBuffer
       || msgBufferLen < static_cast< SQLSMALLINT >(errMsg.size() + 1)) {
     if (!msgLen) {
-      LOG_ERROR_MSG("SQLGetDiagRec exiting with SQL_ERROR. msgLen must not be NULL.");
+      LOG_ERROR_MSG(
+          "SQLGetDiagRec exiting with SQL_ERROR. msgLen must not be NULL.");
       return SQL_ERROR;
     }
 

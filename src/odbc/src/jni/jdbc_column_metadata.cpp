@@ -17,7 +17,6 @@
 
 namespace ignite {
 namespace odbc {
-namespace jni {
-}  // namespace jni
+namespace jni {}  // namespace jni
 }  // namespace odbc
 }  // namespace ignite

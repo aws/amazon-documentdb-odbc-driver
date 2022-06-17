@@ -27,128 +27,115 @@ using namespace ignite;
 /*
  * Function class.
  */
-class CountWords : public compute::ComputeFunc<int32_t>
-{
-    friend struct ignite::binary::BinaryType<CountWords>;
-public:
-    /*
-     * Default constructor.
-     */
-    CountWords() :
-        text()
-    {
-        // No-op.
-    }
+class CountWords : public compute::ComputeFunc< int32_t > {
+  friend struct ignite::binary::BinaryType< CountWords >;
 
-    /*
-     * Constructor.
-     *
-     * @param text Text.
-     */
-    CountWords(const std::string& text) :
-        text(text)
-    {
-        // No-op.
-    }
+ public:
+  /*
+   * Default constructor.
+   */
+  CountWords() : text() {
+    // No-op.
+  }
 
-    /**
-     * Callback.
-     * Counts number of words in provided text.
-     *
-     * @return Number of words in provided text.
-     */
-    virtual int32_t Call()
-    {
-        std::stringstream buf(text);
-        std::string word;
+  /*
+   * Constructor.
+   *
+   * @param text Text.
+   */
+  CountWords(const std::string& text) : text(text) {
+    // No-op.
+  }
 
-        int32_t wordsCount = 0;
-        while (buf >> word)
-            ++wordsCount;
+  /**
+   * Callback.
+   * Counts number of words in provided text.
+   *
+   * @return Number of words in provided text.
+   */
+  virtual int32_t Call() {
+    std::stringstream buf(text);
+    std::string word;
 
-        return wordsCount;
-    }
+    int32_t wordsCount = 0;
+    while (buf >> word)
+      ++wordsCount;
 
-private:
-    /** Text in which to count words. */
-    std::string text;
+    return wordsCount;
+  }
+
+ private:
+  /** Text in which to count words. */
+  std::string text;
 };
 
-namespace ignite
-{
-    namespace binary
-    {
-        template<>
-        struct BinaryType<CountWords>: BinaryTypeDefaultAll<CountWords>
-        {
-            static void GetTypeName(std::string& dst)
-            {
-                dst = "CountWords";
-            }
+namespace ignite {
+namespace binary {
+template <>
+struct BinaryType< CountWords > : BinaryTypeDefaultAll< CountWords > {
+  static void GetTypeName(std::string& dst) {
+    dst = "CountWords";
+  }
 
-            static void Write(BinaryWriter& writer, const CountWords& obj)
-            {
-                writer.RawWriter().WriteString(obj.text);
-            }
+  static void Write(BinaryWriter& writer, const CountWords& obj) {
+    writer.RawWriter().WriteString(obj.text);
+  }
 
-            static void Read(BinaryReader& reader, CountWords& dst)
-            {
-                dst.text = reader.RawReader().ReadString();
-            }
-        };
-    }
-}
+  static void Read(BinaryReader& reader, CountWords& dst) {
+    dst.text = reader.RawReader().ReadString();
+  }
+};
+}  // namespace binary
+}  // namespace ignite
 
-int main()
-{
-    IgniteConfiguration cfg;
+int main() {
+  IgniteConfiguration cfg;
 
-    cfg.springCfgPath = "platforms/cpp/examples/compute-example/config/compute-example.xml";
+  cfg.springCfgPath =
+      "platforms/cpp/examples/compute-example/config/compute-example.xml";
 
-    try
-    {
-        // Start a node.
-        Ignite ignite = Ignition::Start(cfg);
-
-        std::cout << std::endl;
-        std::cout << ">>> Compute example started." << std::endl;
-        std::cout << std::endl;
-
-        // Get binding instance.
-        IgniteBinding binding = ignite.GetBinding();
-
-        // Registering our class as a compute function.
-        binding.RegisterComputeFunc<CountWords>();
-
-        // Get compute instance.
-        compute::Compute compute = ignite.GetCompute();
-
-        std::string testText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
-
-        // Declaring counter.
-        CountWords counter(testText);
-
-        // Making call.
-        int32_t wordsCount = compute.Call<int32_t>(counter);
-
-        // Printing result.
-        std::cout << ">>> Text contains " << wordsCount << " words" << std::endl;
-
-        // Stop node.
-        Ignition::StopAll(false);
-    }
-    catch (IgniteError& err)
-    {
-        std::cout << "An error occurred: " << err.GetText() << std::endl;
-
-        return err.GetCode();
-    }
+  try {
+    // Start a node.
+    Ignite ignite = Ignition::Start(cfg);
 
     std::cout << std::endl;
-    std::cout << ">>> Example finished, press 'Enter' to exit ..." << std::endl;
+    std::cout << ">>> Compute example started." << std::endl;
     std::cout << std::endl;
 
-    std::cin.get();
+    // Get binding instance.
+    IgniteBinding binding = ignite.GetBinding();
 
-    return 0;
+    // Registering our class as a compute function.
+    binding.RegisterComputeFunc< CountWords >();
+
+    // Get compute instance.
+    compute::Compute compute = ignite.GetCompute();
+
+    std::string testText =
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+
+    // Declaring counter.
+    CountWords counter(testText);
+
+    // Making call.
+    int32_t wordsCount = compute.Call< int32_t >(counter);
+
+    // Printing result.
+    std::cout << ">>> Text contains " << wordsCount << " words" << std::endl;
+
+    // Stop node.
+    Ignition::StopAll(false);
+  } catch (IgniteError& err) {
+    std::cout << "An error occurred: " << err.GetText() << std::endl;
+
+    return err.GetCode();
+  }
+
+  std::cout << std::endl;
+  std::cout << ">>> Example finished, press 'Enter' to exit ..." << std::endl;
+  std::cout << std::endl;
+
+  std::cin.get();
+
+  return 0;
 }

@@ -37,8 +37,8 @@
 #define BOOST_TEST_INFO(...)
 #endif
 
-using ignite::odbc::common::GetEnv;
 using boost::unit_test::test_unit_id;
+using ignite::odbc::common::GetEnv;
 
 namespace ignite {
 namespace odbc {
@@ -367,8 +367,7 @@ struct OdbcTestSuite {
    * Creates the standard DSN connection string for use with local instance.
    */
   void CreateDsnConnectionStringForLocalServer(
-      std::string& connectionString, 
-      const std::string& databaseName = "",
+      std::string& connectionString, const std::string& databaseName = "",
       const std::string& userName = "",
       const std::string& miscOptions = "") const;
 

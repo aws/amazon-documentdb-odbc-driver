@@ -20,72 +20,67 @@
 
 using namespace ignite::odbc::common::concurrent;
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace impl
-        {
-            IgniteBindingImpl::IgniteBindingImpl(IgniteEnvironment &env) :
-                env(env),
-                callbacks()
-            {
-                // No-op.
-            }
-    
-            int64_t IgniteBindingImpl::InvokeCallback(bool& found, int32_t type, int32_t id,
-                binary::BinaryReaderImpl& reader, binary::BinaryWriterImpl& writer)
-            {
-                int64_t key = makeKey(type, id);
-    
-                CsLockGuard guard(lock);
-    
-                std::map<int64_t, Callback*>::iterator it = callbacks.find(key);
-    
-                found = it != callbacks.end();
-    
-                if (found)
-                {
-                    Callback* callback = it->second;
-    
-                    // We have found callback and does not need lock here anymore.
-                    guard.Reset();
-    
-                    return callback(reader, writer, env);
-                }
-    
-                return 0;
-            }
-    
-            void IgniteBindingImpl::RegisterCallback(int32_t type, int32_t id, Callback* proc, IgniteError& err)
-            {
-                int64_t key = makeKey(type, id);
-    
-                CsLockGuard guard(lock);
-    
-                bool inserted = callbacks.insert(std::make_pair(key, proc)).second;
-    
-                guard.Reset();
-    
-                if (!inserted)
-                {
-                    std::stringstream builder;
-    
-                    builder << "Trying to register multiple PRC callbacks with the same ID. [type="
-                            << type << ", id=" << id << ']';
-    
-                    err = IgniteError(IgniteError::IGNITE_ERR_ENTRY_PROCESSOR, builder.str().c_str());
-                }
-            }
-    
-            void IgniteBindingImpl::RegisterCallback(int32_t type, int32_t id, Callback* callback)
-            {
-                IgniteError err;
-    
-                RegisterCallback(type, id, callback, err);
-    
-                IgniteError::ThrowIfNeeded(err);
-            }
-        }
-    }
+namespace ignite {
+namespace odbc {
+namespace impl {
+IgniteBindingImpl::IgniteBindingImpl(IgniteEnvironment& env)
+    : env(env), callbacks() {
+  // No-op.
 }
+
+int64_t IgniteBindingImpl::InvokeCallback(bool& found, int32_t type, int32_t id,
+                                          binary::BinaryReaderImpl& reader,
+                                          binary::BinaryWriterImpl& writer) {
+  int64_t key = makeKey(type, id);
+
+  CsLockGuard guard(lock);
+
+  std::map< int64_t, Callback* >::iterator it = callbacks.find(key);
+
+  found = it != callbacks.end();
+
+  if (found) {
+    Callback* callback = it->second;
+
+    // We have found callback and does not need lock here anymore.
+    guard.Reset();
+
+    return callback(reader, writer, env);
+  }
+
+  return 0;
+}
+
+void IgniteBindingImpl::RegisterCallback(int32_t type, int32_t id,
+                                         Callback* proc, IgniteError& err) {
+  int64_t key = makeKey(type, id);
+
+  CsLockGuard guard(lock);
+
+  bool inserted = callbacks.insert(std::make_pair(key, proc)).second;
+
+  guard.Reset();
+
+  if (!inserted) {
+    std::stringstream builder;
+
+    builder
+        << "Trying to register multiple PRC callbacks with the same ID. [type="
+        << type << ", id=" << id << ']';
+
+    err = IgniteError(IgniteError::IGNITE_ERR_ENTRY_PROCESSOR,
+                      builder.str().c_str());
+  }
+}
+
+void IgniteBindingImpl::RegisterCallback(int32_t type, int32_t id,
+                                         Callback* callback) {
+  IgniteError err;
+
+  RegisterCallback(type, id, callback, err);
+
+  IgniteError::ThrowIfNeeded(err);
+}
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite

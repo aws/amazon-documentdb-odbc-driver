@@ -34,7 +34,7 @@ SharedPointer< ResultSet > DatabaseMetaData::GetTables(
     const boost::optional< std::string >& catalog,
     const boost::optional< std::string >& schemaPattern,
     const std::string& tableNamePattern,
-    const boost::optional < std::vector< std::string > >& types,
+    const boost::optional< std::vector< std::string > >& types,
     JniErrorInfo& errInfo) {
   SharedPointer< GlobalJObject > resultSet;
   JniErrorCode success = _jniContext.Get()->DatabaseMetaDataGetTables(
@@ -78,8 +78,8 @@ SharedPointer< ResultSet > DatabaseMetaData::GetPrimaryKeys(
 
 SharedPointer< ResultSet > DatabaseMetaData::GetImportedKeys(
     const boost::optional< std::string >& catalog,
-    const boost::optional< std::string >& schema,
-    const std::string& table, JniErrorInfo& errInfo) {
+    const boost::optional< std::string >& schema, const std::string& table,
+    JniErrorInfo& errInfo) {
   SharedPointer< GlobalJObject > resultSet;
   const std::vector< std::string > types;
   JniErrorCode success = _jniContext.Get()->DatabaseMetaDataGetImportedKeys(

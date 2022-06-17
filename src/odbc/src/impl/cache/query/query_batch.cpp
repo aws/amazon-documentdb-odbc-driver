@@ -18,38 +18,32 @@
 #include "ignite/odbc/impl/cache/query/query_batch.h"
 #include "ignite/odbc/impl/cache/query/query_fields_row_impl.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace impl
-        {
-            namespace cache
-            {
-                namespace query
-                {
-                    QueryFieldsRowImpl* QueryBatch::GetNextRow()
-                    {
-                        assert(Left() > 0);
-    
-                        int32_t rowBegin = stream.Position();
-    
-                        int32_t rowLen = reader.ReadInt32();
-                        int32_t columnNum = reader.ReadInt32();
-    
-                        int32_t dataPos = stream.Position();
-    
-                        assert(rowLen >= 4);
-    
-                        ++pos;
-    
-                        stream.Position(rowBegin + rowLen);
-    
-                        return new QueryFieldsRowImpl(mem, dataPos, columnNum);
-                    }
-    
-                }
-            }
-        }
-    }
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace cache {
+namespace query {
+QueryFieldsRowImpl* QueryBatch::GetNextRow() {
+  assert(Left() > 0);
+
+  int32_t rowBegin = stream.Position();
+
+  int32_t rowLen = reader.ReadInt32();
+  int32_t columnNum = reader.ReadInt32();
+
+  int32_t dataPos = stream.Position();
+
+  assert(rowLen >= 4);
+
+  ++pos;
+
+  stream.Position(rowBegin + rowLen);
+
+  return new QueryFieldsRowImpl(mem, dataPos, columnNum);
 }
+
+}  // namespace query
+}  // namespace cache
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite

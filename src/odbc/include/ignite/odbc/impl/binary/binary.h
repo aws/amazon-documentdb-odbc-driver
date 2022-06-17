@@ -32,4 +32,4 @@
 #include <ignite/odbc/binary/binary_reader.h>
 #include <ignite/odbc/binary/binary_writer.h>
 
-#endif //_IGNITE_BINARY_BINARY
+#endif  //_IGNITE_BINARY_BINARY

@@ -43,7 +43,8 @@ const std::string FK_NAME = "FK_NAME";
 const std::string PK_NAME = "PK_NAME";
 const std::string DEFERRABILITY = "DEFERRABILITY";
 
-void ForeignKeyMeta::Read(SharedPointer< ResultSet >& resultSet, JniErrorInfo& errInfo) {
+void ForeignKeyMeta::Read(SharedPointer< ResultSet >& resultSet,
+                          JniErrorInfo& errInfo) {
   boost::optional< int > intDataType;
   resultSet.Get()->GetString(PKTABLE_CAT, PKCatalogName, errInfo);
   resultSet.Get()->GetString(PKTABLE_SCHEM, PKSchemaName, errInfo);
@@ -62,7 +63,7 @@ void ForeignKeyMeta::Read(SharedPointer< ResultSet >& resultSet, JniErrorInfo& e
 }
 
 void ReadForeignKeysColumnMetaVector(SharedPointer< ResultSet >& resultSet,
-                          ForeignKeyMetaVector& meta) {
+                                     ForeignKeyMetaVector& meta) {
   meta.clear();
 
   if (!resultSet.IsValid()) {

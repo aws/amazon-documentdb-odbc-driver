@@ -20,50 +20,43 @@
 
 #include <ignite/odbc/binary/binary_raw_reader.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace impl
-        {
-            namespace cache
-            {
-                namespace event
-                {
-                    /**
-                     * Base for the Cache Entry Event Filter.
-                     */
-                    class CacheEntryEventFilterBase
-                    {
-                    public:
-                        /**
-                         * Default constructor.
-                         */
-                        CacheEntryEventFilterBase()
-                        {
-                            // No-op.
-                        }
-    
-                        /**
-                         * Destructor.
-                         */
-                        virtual ~CacheEntryEventFilterBase()
-                        {
-                            // No-op.
-                        }
-    
-                        /**
-                         * Process serialized events.
-                         *
-                         * @param reader Reader for a serialized event.
-                         * @return Filter evaluation result.
-                         */
-                        virtual bool ReadAndProcessEvent(ignite::odbc::binary::BinaryRawReader& reader) = 0;
-                    };
-                }
-            }
-        }
-    }
-}
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace cache {
+namespace event {
+/**
+ * Base for the Cache Entry Event Filter.
+ */
+class CacheEntryEventFilterBase {
+ public:
+  /**
+   * Default constructor.
+   */
+  CacheEntryEventFilterBase() {
+    // No-op.
+  }
 
-#endif //_IGNITE_ODBC_IMPL_CACHE_EVENT_CACHE_ENTRY_EVENT_FILTER_BASE
+  /**
+   * Destructor.
+   */
+  virtual ~CacheEntryEventFilterBase() {
+    // No-op.
+  }
+
+  /**
+   * Process serialized events.
+   *
+   * @param reader Reader for a serialized event.
+   * @return Filter evaluation result.
+   */
+  virtual bool ReadAndProcessEvent(
+      ignite::odbc::binary::BinaryRawReader& reader) = 0;
+};
+}  // namespace event
+}  // namespace cache
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_IMPL_CACHE_EVENT_CACHE_ENTRY_EVENT_FILTER_BASE

@@ -19,44 +19,33 @@
 
 using namespace ignite::odbc::common::concurrent;
 
-namespace
-{
-    /**
-     * Operation type.
-     */
-    struct Operation
-    {
-        enum Type
-        {
-            Cancel = 1
-        };
-    };
+namespace {
+/**
+ * Operation type.
+ */
+struct Operation {
+  enum Type { Cancel = 1 };
+};
+}  // namespace
+
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace compute {
+CancelableImpl::CancelableImpl(SharedPointer< IgniteEnvironment > env,
+                               jobject javaRef)
+    : InteropTarget(env, javaRef), Cancelable() {
+  // No-op.
 }
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace impl
-        {
-            namespace compute
-            {
-                CancelableImpl::CancelableImpl(SharedPointer<IgniteEnvironment> env, jobject javaRef) :
-                    InteropTarget(env, javaRef),
-                    Cancelable()
-                {
-                    // No-op.
-                }
-    
-                void CancelableImpl::Cancel()
-                {
-                    IgniteError err;
-    
-                    OutInOpLong(Operation::Cancel, 0, err);
-    
-                    IgniteError::ThrowIfNeeded(err);
-                }
-            }
-        }
-    }
+void CancelableImpl::Cancel() {
+  IgniteError err;
+
+  OutInOpLong(Operation::Cancel, 0, err);
+
+  IgniteError::ThrowIfNeeded(err);
 }
+}  // namespace compute
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite

@@ -101,12 +101,11 @@ struct ResultColumn {
 namespace ignite {
 namespace odbc {
 namespace query {
-ColumnMetadataQuery::ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
-                                         Connection& connection,
-                                         const boost::optional< std::string >& catalog,
-                                         const boost::optional< std::string >& schema,
-                                         const std::string& table,
-                                         const std::string& column)
+ColumnMetadataQuery::ColumnMetadataQuery(
+    diagnostic::DiagnosableAdapter& diag, Connection& connection,
+    const boost::optional< std::string >& catalog,
+    const boost::optional< std::string >& schema, const std::string& table,
+    const std::string& column)
     : Query(diag, QueryType::COLUMN_METADATA),
       connection(connection),
       catalog(catalog),
@@ -401,8 +400,7 @@ SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
                     << meta[i].GetColumnName().get_value_or("") << "\n[" << i
                     << "] ColumnType:     "
                     << static_cast< int32_t >(*meta[i].GetDataType()));
-    }
-    else {
+    } else {
       LOG_MSG("\n[" << i << "] SchemaName:     "
                     << meta[i].GetSchemaName().get_value_or("") << "\n[" << i
                     << "] TableName:      "
