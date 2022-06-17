@@ -353,8 +353,6 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
     return diag.GetReturnCode();
   }
 
-  LOG_DEBUG_MSG("SQLDriverConnect calling CopyStringToBuffer with 3 args");
-
   size_t reslen =
       CopyStringToBuffer(connectStr, outConnectionString,
                          static_cast< size_t >(outConnectionStringBufferLen));
@@ -768,7 +766,7 @@ SQLRETURN SQLNativeSql(SQLHDBC conn, SQLWCHAR* inQuery, SQLINTEGER inQueryLen,
   LOG_DEBUG_MSG("SQLNativeSql called");
 
   std::string in = SqlStringToString(inQuery, inQueryLen);
-  LOG_DEBUG_MSG("SQLNativeSql calling CopyStringToBuffer with 3 args");
+
   CopyStringToBuffer(in, outQueryBuffer,
                      static_cast< size_t >(outQueryBufferLen));
 
@@ -1192,10 +1190,8 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
 
   const DiagnosticRecord& record = records->GetStatusRecord(recNum);
 
-  if (sqlState){
-    LOG_DEBUG_MSG("SQLGetDiagRec calling CopyStringToBuffer with 3 args because of sqlState is true");
+  if (sqlState)
     CopyStringToBuffer(record.GetSqlState(), sqlState, 6);
-  }
 
   if (nativeError)
     *nativeError = 0;
@@ -1210,7 +1206,6 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
     }
 
     // Length is given in bytes
-    LOG_DEBUG_MSG("SQLGetDiagRec calling CopyStringToBuffer(errMsg, msgBuffer,static_cast< size_t >(msgBufferLen), true) - SQL_SUCCESS_WITH_INFO");
     *msgLen = CopyStringToBuffer(errMsg, msgBuffer,
                                  static_cast< size_t >(msgBufferLen), true);
 
@@ -1220,7 +1215,6 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
   }
 
   // Length is given in bytes
-  LOG_DEBUG_MSG("SQLGetDiagRec calling CopyStringToBuffer(errMsg, msgBuffer, static_cast< size_t >(msgBufferLen), true) - SQL_SUCCESS");
   size_t msgLen0 = CopyStringToBuffer(
       errMsg, msgBuffer, static_cast< size_t >(msgBufferLen), true);
 
@@ -1542,16 +1536,13 @@ SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* state,
 
   record.MarkRetrieved();
 
-  if (state){
-    LOG_DEBUG_MSG("SQLError calling CopyStringToBuffer(record.GetSqlState(), state, 6)");
+  if (state)
     CopyStringToBuffer(record.GetSqlState(), state, 6);
-  }
 
   if (error)
     *error = 0;
 
   std::string errMsg = record.GetMessageText();
-  LOG_DEBUG_MSG("SQLError calling CopyStringToBuffer(errMsg, msgBuf,static_cast< size_t >(msgBufLen), true);");
   // This buffer length is given in characters, not bytes.
   size_t outResLen =
       CopyStringToBuffer(errMsg, msgBuf, static_cast< size_t >(msgBufLen));
