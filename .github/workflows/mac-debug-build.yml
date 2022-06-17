@@ -140,7 +140,9 @@ jobs:
         check_name: "MacOS Big Sur 11 Debug Build Unit Test Results Check"
         comment_title: "MacOS Big Sur 11 Debug Build Unit Test Results"
         files: ./odbc_test_result.xml
-
+        
+    # TODO Do not create debug log artifacts if build successful.
+    # https://bitquill.atlassian.net/browse/AD-803
     # - name: upload-test-file
     #   if: always()
     #   uses: actions/upload-artifact@v3

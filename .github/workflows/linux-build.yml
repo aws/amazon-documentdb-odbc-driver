@@ -296,14 +296,6 @@ jobs:
       env:
         RUN_CODE_COVERAGE: ${{ true }}
         BOOST_TEST_CATCH_SYSTEM_ERRORS: no
-# temporary
-    - name: upload-test-file-codecov-run
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: odbc-test-results-linux-debug-codecov-run
-        path: |
-          ./cmake-build64/odbc-test/odbc_test_result.xml
 
     - name: run-tests
       run: |
@@ -318,15 +310,18 @@ jobs:
         check_name: "Ubuntu 20.04 Debug Build Unit Test Results Check"
         comment_title: "Ubuntu 20.04 Debug Build Unit Test Results"
         files: ./odbc_test_result.xml
-    # temporarily upload the test files
-    - name: upload-test-file
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: odbc-test-results-linux-debug
-        path: |
-          ./odbc_test_result.xml
-          ./build/odbc/logs/docdb_odbc_*.log   
+
+    # TODO Do not create debug log artifacts if build successful.
+    # https://bitquill.atlassian.net/browse/AD-803
+    # - name: upload-test-file
+    #   if: always()
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: odbc-test-results-linux-debug
+    #     path: |
+    #       ./odbc_test_result.xml
+    #       ./build/odbc/logs/docdb_odbc_*.log   
+
     - name: upload-coverage
       if: always()
       uses: actions/upload-artifact@v3
