@@ -46,8 +46,7 @@ class ColumnMetadataQuery : public Query {
                       Connection& connection,
                       const boost::optional< std::string >& catalog,
                       const boost::optional< std::string >& schema,
-                      const std::string& table,
-                      const std::string& column);
+                      const std::string& table, const std::string& column);
 
   /**
    * Destructor.

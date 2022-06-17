@@ -15,34 +15,65 @@
  * limitations under the License.
  */
 
+<<<<<<<< HEAD:src/odbc/src/impl/compute/cancelable_impl.cpp
+#include <ignite/odbc/impl/compute/cancelable_impl.h>
+
+using namespace ignite::odbc::common::concurrent;
+========
 #include <ignite/odbc/ignite_error.h>
 #include <ignite/odbc/jni/java.h>
 
 #include "ignite/odbc/impl/interop/interop_external_memory.h"
+>>>>>>>> 7f25089f0c1c376439b2ccaaccc36f5e74b8f9e4:src/odbc/src/impl/interop/interop_external_memory.cpp
 
 using namespace ignite::odbc::jni::java;
 
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace interop {
+InteropExternalMemory::InteropExternalMemory(int8_t* memPtr) {
+  this->memPtr = memPtr;
+}
+
+<<<<<<<< HEAD:src/odbc/src/impl/compute/cancelable_impl.cpp
 namespace ignite
 {
     namespace odbc
     {
         namespace impl
         {
-            namespace interop
+            namespace compute
             {
-                InteropExternalMemory::InteropExternalMemory(int8_t* memPtr)
+                CancelableImpl::CancelableImpl(SharedPointer<IgniteEnvironment> env, jobject javaRef) :
+                    InteropTarget(env, javaRef),
+                    Cancelable()
                 {
-                    this->memPtr = memPtr;
+                    // No-op.
                 }
     
-                void InteropExternalMemory::Reallocate(int32_t cap)
+                void CancelableImpl::Cancel()
                 {
-                    if (JniContext::Reallocate(reinterpret_cast<int64_t>(memPtr), cap) == -1) {
-                        IGNITE_ERROR_FORMATTED_2(IgniteError::IGNITE_ERR_MEMORY, "Failed to reallocate external memory",
-                            "memPtr", PointerLong(), "requestedCapacity", cap)
-                    }
+                    IgniteError err;
+    
+                    OutInOpLong(Operation::Cancel, 0, err);
+    
+                    IgniteError::ThrowIfNeeded(err);
                 }
             }
         }
     }
 }
+========
+void InteropExternalMemory::Reallocate(int32_t cap) {
+  if (JniContext::Reallocate(reinterpret_cast< int64_t >(memPtr), cap) == -1) {
+    IGNITE_ERROR_FORMATTED_2(IgniteError::IGNITE_ERR_MEMORY,
+                             "Failed to reallocate external memory", "memPtr",
+                             PointerLong(), "requestedCapacity", cap)
+  }
+}
+}  // namespace interop
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite
+>>>>>>>> 7f25089f0c1c376439b2ccaaccc36f5e74b8f9e4:src/odbc/src/impl/interop/interop_external_memory.cpp

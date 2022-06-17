@@ -27,47 +27,43 @@
 #include <ignite/odbc/common/cancelable.h>
 #include <ignite/odbc/impl/interop/interop_target.h>
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace impl
-        {
-            namespace compute
-            {
-                /**
-                 * Compute implementation.
-                 */
-                class IGNITE_IMPORT_EXPORT CancelableImpl : public interop::InteropTarget, public common::Cancelable
-                {
-                public:
-                    /**
-                     * Constructor.
-                     *
-                     * @param env Environment.
-                     * @param javaRef Java object reference.
-                     */
-                    CancelableImpl(common::concurrent::SharedPointer<IgniteEnvironment> env, jobject javaRef);
-    
-                    /**
-                     * Destructor.
-                     */
-                    virtual ~CancelableImpl()
-                    {
-                        // No-op.
-                    }
-    
-                    /**
-                     * Cancels the operation.
-                     */
-                    virtual void Cancel();
-    
-                private:
-                    IGNITE_NO_COPY_ASSIGNMENT(CancelableImpl);
-                };
-            }
-        }
-    }
-}
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace compute {
+/**
+ * Compute implementation.
+ */
+class IGNITE_IMPORT_EXPORT CancelableImpl : public interop::InteropTarget,
+                                            public common::Cancelable {
+ public:
+  /**
+   * Constructor.
+   *
+   * @param env Environment.
+   * @param javaRef Java object reference.
+   */
+  CancelableImpl(common::concurrent::SharedPointer< IgniteEnvironment > env,
+                 jobject javaRef);
 
-#endif //_IGNITE_ODBC_IMPL_COMPUTE_CANCELABLE_IMPL
+  /**
+   * Destructor.
+   */
+  virtual ~CancelableImpl() {
+    // No-op.
+  }
+
+  /**
+   * Cancels the operation.
+   */
+  virtual void Cancel();
+
+ private:
+  IGNITE_NO_COPY_ASSIGNMENT(CancelableImpl);
+};
+}  // namespace compute
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite
+
+#endif  //_IGNITE_ODBC_IMPL_COMPUTE_CANCELABLE_IMPL

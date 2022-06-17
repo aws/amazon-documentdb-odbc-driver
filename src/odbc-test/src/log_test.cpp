@@ -291,7 +291,8 @@ BOOST_AUTO_TEST_CASE(TestLogSetInvalidLogPath) {
   // attempt to set wrong log path
   logger->SetLogPath(logPath);
 
-  // check that invalid log path is not set and the original log path remains (if not null)
+  // check that invalid log path is not set and the original log path remains
+  // (if not null)
   BOOST_CHECK_NE(logPath, logger->GetLogPath());
   if (origLogPath)
     BOOST_CHECK_EQUAL(origLogPath.get(), logger->GetLogPath());

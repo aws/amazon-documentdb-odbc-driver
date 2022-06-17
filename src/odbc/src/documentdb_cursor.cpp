@@ -20,8 +20,8 @@
 
 namespace ignite {
 namespace odbc {
-DocumentDbCursor::DocumentDbCursor(mongocxx::cursor& cursor,
-    std::vector< JdbcColumnMetadata >& columnMetadata,
+DocumentDbCursor::DocumentDbCursor(
+    mongocxx::cursor& cursor, std::vector< JdbcColumnMetadata >& columnMetadata,
     std::vector< std::string >& paths)
     : cursor_(std::move(cursor)),
       iterator_(cursor_.begin()),

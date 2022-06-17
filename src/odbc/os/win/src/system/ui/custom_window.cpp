@@ -116,9 +116,10 @@ std::unique_ptr< Window > CustomWindow::CreateGroupBox(
   return child;
 }
 
-std::unique_ptr< Window > CustomWindow::CreateLabel(int posX, int posY, int sizeX,
-                                                  int sizeY, const std::wstring& title,
-                                                  int id) {
+std::unique_ptr< Window > CustomWindow::CreateLabel(int posX, int posY,
+                                                    int sizeX, int sizeY,
+                                                    const std::wstring& title,
+                                                    int id) {
   std::unique_ptr< Window > child(new Window(this, L"Static", title));
 
   child->Create(WS_CHILD | WS_VISIBLE, posX, posY, sizeX, sizeY, id);
@@ -126,9 +127,10 @@ std::unique_ptr< Window > CustomWindow::CreateLabel(int posX, int posY, int size
   return child;
 }
 
-std::unique_ptr< Window > CustomWindow::CreateEdit(int posX, int posY, int sizeX,
-                                                 int sizeY, const std::wstring& title,
-                                                 int id, int style) {
+std::unique_ptr< Window > CustomWindow::CreateEdit(int posX, int posY,
+                                                   int sizeX, int sizeY,
+                                                   const std::wstring& title,
+                                                   int id, int style) {
   std::unique_ptr< Window > child(new Window(this, L"Edit", title));
 
   child->Create(

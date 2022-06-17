@@ -24,7 +24,8 @@ namespace odbc {
 namespace system {
 namespace ui {
 HINSTANCE GetHInstance() {
-  HINSTANCE hInstance = GetModuleHandle(utility::FromUtf8(TARGET_MODULE_FULL_NAME).c_str());
+  HINSTANCE hInstance =
+      GetModuleHandle(utility::FromUtf8(TARGET_MODULE_FULL_NAME).c_str());
 
   if (hInstance == NULL) {
     std::stringstream buf;

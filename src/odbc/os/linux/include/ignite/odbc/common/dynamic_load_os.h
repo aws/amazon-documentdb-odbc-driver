@@ -22,113 +22,107 @@
 
 #include "ignite/odbc/common/common.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace common
-        {
-            namespace dynamic
-            {
-                /**
-                 * Represents dynamically loadable program module such as dymanic
-                 * or shared library.
-                 */
-                class IGNITE_IMPORT_EXPORT Module
-                {
-                public:
-                    /**
-                     * Default constructor.
-                     */
-                    Module();
-    
-                    /**
-                     * Handle constructor.
-                     *
-                     * @param handle Os-specific Module handle.
-                     */
-                    Module(void* handle);
-    
-                    /**
-                     * Destructor.
-                     */
-                    ~Module();
-    
-                    /**
-                     * Copy constructor.
-                     *
-                     * @param other Other instance.
-                     */
-                    Module(const Module& other);
-    
-                    /**
-                     * Copy constructor.
-                     *
-                     * @param other Other instance.
-                     * @return This.
-                     */
-                    Module& operator=(const Module& other);
-    
-                    /**
-                     * Load symbol from Module.
-                     *
-                     * @param name Name of the symbol to load.
-                     * @return Pointer to symbol if found and NULL otherwise.
-                     */
-                    void* FindSymbol(const char* name);
-    
-                    /**
-                     * Load symbol from Module.
-                     *
-                     * @param name Name of the symbol to load.
-                     * @return Pointer to symbol if found and NULL otherwise.
-                     */
-                    void* FindSymbol(const std::string& name)
-                    {
-                        return FindSymbol(name.c_str());
-                    }
-    
-                    /**
-                     * Check if the instance is loaded.
-                     *
-                     * @return True if the instance is loaded.
-                     */
-                    bool IsLoaded() const;
-    
-                    /**
-                     * Unload module.
-                     */
-                    void Unload();
-    
-                private:
-                    void* handle;
-                };
-    
-                /**
-                 * Load Module by the specified path.
-                 *
-                 * @param path Path to the Module to load.
-                 * @return Module instance.
-                 */
-                IGNITE_IMPORT_EXPORT Module LoadModule(const wchar_t* path);
-    
-                /**
-                 * Load Module by the specified path.
-                 *
-                 * @param path Path to the Module to load.
-                 * @return Module instance.
-                 */
-                IGNITE_IMPORT_EXPORT Module LoadModule(const std::wstring& path);
-    
-                /**
-                 * Returns Module associated with the calling process itself.
-                 *
-                 * @return Module for the calling process.
-                 */
-                IGNITE_IMPORT_EXPORT Module GetCurrent();
-            }
-        }
-    }
-}
+namespace ignite {
+namespace odbc {
+namespace common {
+namespace dynamic {
+/**
+ * Represents dynamically loadable program module such as dymanic
+ * or shared library.
+ */
+class IGNITE_IMPORT_EXPORT Module {
+ public:
+  /**
+   * Default constructor.
+   */
+  Module();
+
+  /**
+   * Handle constructor.
+   *
+   * @param handle Os-specific Module handle.
+   */
+  Module(void* handle);
+
+  /**
+   * Destructor.
+   */
+  ~Module();
+
+  /**
+   * Copy constructor.
+   *
+   * @param other Other instance.
+   */
+  Module(const Module& other);
+
+  /**
+   * Copy constructor.
+   *
+   * @param other Other instance.
+   * @return This.
+   */
+  Module& operator=(const Module& other);
+
+  /**
+   * Load symbol from Module.
+   *
+   * @param name Name of the symbol to load.
+   * @return Pointer to symbol if found and NULL otherwise.
+   */
+  void* FindSymbol(const char* name);
+
+  /**
+   * Load symbol from Module.
+   *
+   * @param name Name of the symbol to load.
+   * @return Pointer to symbol if found and NULL otherwise.
+   */
+  void* FindSymbol(const std::string& name) {
+    return FindSymbol(name.c_str());
+  }
+
+  /**
+   * Check if the instance is loaded.
+   *
+   * @return True if the instance is loaded.
+   */
+  bool IsLoaded() const;
+
+  /**
+   * Unload module.
+   */
+  void Unload();
+
+ private:
+  void* handle;
+};
+
+/**
+ * Load Module by the specified path.
+ *
+ * @param path Path to the Module to load.
+ * @return Module instance.
+ */
+IGNITE_IMPORT_EXPORT Module LoadModule(const wchar_t* path);
+
+/**
+ * Load Module by the specified path.
+ *
+ * @param path Path to the Module to load.
+ * @return Module instance.
+ */
+IGNITE_IMPORT_EXPORT Module LoadModule(const std::wstring& path);
+
+/**
+ * Returns Module associated with the calling process itself.
+ *
+ * @return Module for the calling process.
+ */
+IGNITE_IMPORT_EXPORT Module GetCurrent();
+}  // namespace dynamic
+}  // namespace common
+}  // namespace odbc
+}  // namespace ignite
 
 #endif

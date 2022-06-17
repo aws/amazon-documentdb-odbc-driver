@@ -21,75 +21,60 @@
 #include "ignite/odbc/common/dynamic_load_os.h"
 #include "ignite/odbc/utility.h"
 
-namespace ignite
-{
-    namespace odbc
-    {
-        namespace common
-        {
-            namespace dynamic
-            {
-                Module::Module() : handle(NULL)
-                {
-                    // No-op.
-                }
-    
-                Module::Module(void* handle) : handle(handle)
-                {
-                    // No-op.
-                }
-    
-                Module::~Module()
-                {
-                    // No-op.
-                }
-    
-                Module::Module(const Module& other) : handle(other.handle)
-                {
-                    // No-op.
-                }
-    
-                Module& Module::operator=(const Module& other)
-                {
-                    handle = other.handle;
-    
-                    return *this;
-                }
-    
-                void* Module::FindSymbol(const char* name)
-                {
-                    return dlsym(handle, name);
-                }
-    
-                bool Module::IsLoaded() const
-                {
-                    return handle != NULL;
-                }
-    
-                void Module::Unload()
-                {
-                    if (IsLoaded())
-                        dlclose(handle);
-                }
-    
-                Module LoadModule(const wchar_t* path)
-                {
-                    std::string path0 = utility::ToUtf8(path);
-                    void* handle = dlopen(path0.c_str(), RTLD_NOW);
-    
-                    return Module(handle);
-                }
-    
-                Module LoadModule(const std::wstring& path)
-                {
-                    return LoadModule(path.c_str());
-                }
-    
-                Module GetCurrent()
-                {
-                    return LoadModule(NULL);
-                }
-            }
-        }
-    }
+namespace ignite {
+namespace odbc {
+namespace common {
+namespace dynamic {
+Module::Module() : handle(NULL) {
+  // No-op.
 }
+
+Module::Module(void* handle) : handle(handle) {
+  // No-op.
+}
+
+Module::~Module() {
+  // No-op.
+}
+
+Module::Module(const Module& other) : handle(other.handle) {
+  // No-op.
+}
+
+Module& Module::operator=(const Module& other) {
+  handle = other.handle;
+
+  return *this;
+}
+
+void* Module::FindSymbol(const char* name) {
+  return dlsym(handle, name);
+}
+
+bool Module::IsLoaded() const {
+  return handle != NULL;
+}
+
+void Module::Unload() {
+  if (IsLoaded())
+    dlclose(handle);
+}
+
+Module LoadModule(const wchar_t* path) {
+  std::string path0 = utility::ToUtf8(path);
+  void* handle = dlopen(path0.c_str(), RTLD_NOW);
+
+  return Module(handle);
+}
+
+Module LoadModule(const std::wstring& path) {
+  return LoadModule(path.c_str());
+}
+
+Module GetCurrent() {
+  return LoadModule(NULL);
+}
+}  // namespace dynamic
+}  // namespace common
+}  // namespace odbc
+}  // namespace ignite

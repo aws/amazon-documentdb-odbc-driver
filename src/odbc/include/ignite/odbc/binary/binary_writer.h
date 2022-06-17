@@ -480,4 +480,4 @@ class IGNITE_IMPORT_EXPORT BinaryWriter {
 }  // namespace binary
 }  // namespace odbc
 }  // namespace ignite
-#endif //_IGNITE_ODBC_BINARY_BINARY_WRITER
+#endif  //_IGNITE_ODBC_BINARY_BINARY_WRITER

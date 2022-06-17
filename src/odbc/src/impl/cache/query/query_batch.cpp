@@ -15,8 +15,10 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/cache/query/query_batch.h"
-#include "ignite/odbc/impl/cache/query/query_fields_row_impl.h"
+<<<<<<<< HEAD:src/odbc/src/impl/compute/compute_impl.cpp
+#include <ignite/odbc/impl/compute/compute_impl.h>
+
+using namespace ignite::odbc::common::concurrent;
 
 namespace ignite
 {
@@ -24,32 +26,58 @@ namespace ignite
     {
         namespace impl
         {
-            namespace cache
+            namespace compute
             {
-                namespace query
+                ComputeImpl::ComputeImpl(SharedPointer<IgniteEnvironment> env, cluster::SP_ClusterGroupImpl clusterGroup) :
+                    InteropTarget(env, clusterGroup.Get()->GetComputeProcessor()),
+                    clusterGroup(clusterGroup)
                 {
-                    QueryFieldsRowImpl* QueryBatch::GetNextRow()
-                    {
-                        assert(Left() > 0);
+                    // No-op.
+                }
     
-                        int32_t rowBegin = stream.Position();
+                bool ComputeImpl::ProjectionContainsPredicate() const
+                {
+                    return clusterGroup.IsValid() && clusterGroup.Get()->GetPredicate() != 0;
+                }
     
-                        int32_t rowLen = reader.ReadInt32();
-                        int32_t columnNum = reader.ReadInt32();
-    
-                        int32_t dataPos = stream.Position();
-    
-                        assert(rowLen >= 4);
-    
-                        ++pos;
-    
-                        stream.Position(rowBegin + rowLen);
-    
-                        return new QueryFieldsRowImpl(mem, dataPos, columnNum);
-                    }
-    
+                std::vector<ignite::odbc::cluster::ClusterNode> ComputeImpl::GetNodes()
+                {
+                    return clusterGroup.Get()->GetNodes();
                 }
             }
         }
     }
+========
+#include "ignite/odbc/impl/cache/query/query_batch.h"
+#include "ignite/odbc/impl/cache/query/query_fields_row_impl.h"
+
+namespace ignite {
+namespace odbc {
+namespace impl {
+namespace cache {
+namespace query {
+QueryFieldsRowImpl* QueryBatch::GetNextRow() {
+  assert(Left() > 0);
+
+  int32_t rowBegin = stream.Position();
+
+  int32_t rowLen = reader.ReadInt32();
+  int32_t columnNum = reader.ReadInt32();
+
+  int32_t dataPos = stream.Position();
+
+  assert(rowLen >= 4);
+
+  ++pos;
+
+  stream.Position(rowBegin + rowLen);
+
+  return new QueryFieldsRowImpl(mem, dataPos, columnNum);
+>>>>>>>> 7f25089f0c1c376439b2ccaaccc36f5e74b8f9e4:src/odbc/src/impl/cache/query/query_batch.cpp
 }
+
+}  // namespace query
+}  // namespace cache
+}  // namespace impl
+}  // namespace odbc
+}  // namespace ignite

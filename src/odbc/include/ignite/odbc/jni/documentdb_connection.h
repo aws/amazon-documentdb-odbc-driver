@@ -91,16 +91,18 @@ class DocumentDbConnection {
    */
   JniErrorCode GetSshLocalPort(int32_t& localPort, JniErrorInfo& errInfo);
 
-  /** 
+  /**
    * Gets the connection properties.
-   * 
+   *
    * @return the connection properties
    */
-  SharedPointer< DocumentDbConnectionProperties > GetConnectionProperties(JniErrorInfo& errInfo);
+  SharedPointer< DocumentDbConnectionProperties > GetConnectionProperties(
+      JniErrorInfo& errInfo);
 
-  /** 
-   * Gets the DocumentDb Database Metadata (different from JDBC Database MetaData)
-   * 
+  /**
+   * Gets the DocumentDb Database Metadata (different from JDBC Database
+   * MetaData)
+   *
    * @return the DocumentDb database metadata.
    */
   SharedPointer< DocumentDbDatabaseMetadata > GetDatabaseMetadata(

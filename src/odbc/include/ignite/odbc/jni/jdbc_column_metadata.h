@@ -88,7 +88,8 @@ class JdbcColumnMetadata {
   }
 
   /**
-   * Gets the indicator of whether the column is nullable, non-nullable or unknown-nullable.
+   * Gets the indicator of whether the column is nullable, non-nullable or
+   * unknown-nullable.
    */
   int32_t GetNullable() const {
     return nullable_;
@@ -177,7 +178,7 @@ class JdbcColumnMetadata {
   bool IsReadOnly() const {
     return readOnly_;
   }
-  
+
   /**
    * Gets the indicator of whether the column is writable.
    */
@@ -198,7 +199,6 @@ class JdbcColumnMetadata {
   boost::optional< std::string > GetColumnClassName() const {
     return columnClassName_;
   }
-
 
  private:
   /**
@@ -238,7 +238,7 @@ class JdbcColumnMetadata {
         writable_(writable),
         definitelyWritable_(definitelyWritable),
         columnClassName_(columnClassName) {
-      // No-op
+    // No-op
   }
 
   int32_t ordinal_;

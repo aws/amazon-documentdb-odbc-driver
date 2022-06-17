@@ -234,8 +234,9 @@ SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attr,
 
 SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
                                  SQLSMALLINT catalogNameLen,
-                                 SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen,
-                                 SQLWCHAR* tableName, SQLSMALLINT tableNameLen) {
+                                 SQLWCHAR* schemaName,
+                                 SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
+                                 SQLSMALLINT tableNameLen) {
   return ignite::SQLPrimaryKeys(stmt, catalogName, catalogNameLen, schemaName,
                                 schemaNameLen, tableName, tableNameLen);
 }
@@ -425,10 +426,10 @@ SQLRETURN SQL_API SQLSetStmtOption(SQLHSTMT stmt, SQLUSMALLINT option,
 }
 
 SQLRETURN SQL_API SQLStatistics(SQLHSTMT stmt, SQLWCHAR* catalogName,
-                                SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
-                                SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
-                                SQLSMALLINT tableNameLen, SQLUSMALLINT unique,
-                                SQLUSMALLINT reserved) {
+                                SQLSMALLINT catalogNameLen,
+                                SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen,
+                                SQLWCHAR* tableName, SQLSMALLINT tableNameLen,
+                                SQLUSMALLINT unique, SQLUSMALLINT reserved) {
   IGNITE_UNUSED(stmt);
   IGNITE_UNUSED(catalogName);
   IGNITE_UNUSED(catalogNameLen);
@@ -632,9 +633,9 @@ SQLRETURN SQL_API SQLParamOptions(SQLHSTMT stmt, SQLULEN paramSetSize,
 }
 
 SQLRETURN SQL_API SQLProcedures(SQLHSTMT stmt, SQLWCHAR* catalogName,
-                                SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
-                                SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
-                                SQLSMALLINT tableNameLen) {
+                                SQLSMALLINT catalogNameLen,
+                                SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen,
+                                SQLWCHAR* tableName, SQLSMALLINT tableNameLen) {
   IGNITE_UNUSED(stmt);
   IGNITE_UNUSED(catalogName);
   IGNITE_UNUSED(catalogNameLen);

@@ -171,4 +171,3 @@ BinaryRawWriter BinaryWriter::RawWriter() {
 }  // namespace binary
 }  // namespace odbc
 }  // namespace ignite
-
