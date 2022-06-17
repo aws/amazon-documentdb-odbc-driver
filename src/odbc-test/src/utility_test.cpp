@@ -17,6 +17,7 @@
 
 #include <ignite/odbc/common/utils.h>
 #include <ignite/odbc/impl/binary/binary_writer_impl.h>
+#include <ignite/odbc/log.h>
 #include <ignite/odbc/utility.h>
 
 #include <boost/test/unit_test.hpp>

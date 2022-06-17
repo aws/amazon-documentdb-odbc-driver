@@ -16,6 +16,7 @@
  */
 
 #include "ignite/odbc/config/connection_info.h"
+#include "ignite/odbc/log.h"
 
 #include <algorithm>
 #include <cstring>
