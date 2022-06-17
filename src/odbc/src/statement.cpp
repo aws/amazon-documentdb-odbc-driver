@@ -996,9 +996,6 @@ SqlResult::Type Statement::InternalGetColumnAttribute(
       LOG_DEBUG_MSG("out found: " << out);
       if (strbuf)
         // Length is given in bytes
-
-        LOG_DEBUG_MSG("Statement::InternalGetColumnAttribute calling CopyStringToBuffer");
-
         outSize = utility::CopyStringToBuffer(out, strbuf, buflen, true);
       if (reslen)
         *reslen = static_cast< int16_t >(outSize);

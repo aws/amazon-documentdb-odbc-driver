@@ -2875,7 +2875,6 @@ SqlResult::Type ConnectionInfo::GetInfo(InfoType type, void* buf, short buflen,
     if (!buflen)
       return SqlResult::AI_ERROR;
 
-    LOG_DEBUG_MSG("ConnectionInfo::GetInfo calling CopyStringToBuffer");
     // Length is given in bytes, 
     unsigned short strlen = static_cast< short >(utility::CopyStringToBuffer(
         itStr->second, reinterpret_cast< SQLWCHAR* >(buf), buflen, true));
