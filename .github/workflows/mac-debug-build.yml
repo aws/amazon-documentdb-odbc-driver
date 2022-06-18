@@ -128,15 +128,6 @@ jobs:
         RUN_CODE_COVERAGE: ${{ true }}
         BOOST_TEST_CATCH_SYSTEM_ERRORS: no
 
-    - name: upload-test-file-code-cov
-      if: always()
-      uses: actions/upload-artifact@v3
-      with:
-        name: odbc-test-results-code-cov
-        path: |
-          ./cmake-build64/odbc-test/odbc_test_result.xml
-          ./build/odbc/logs/docdb_odbc_*.log
-
     - name: run-tests
       run: |
         mkdir -p "${{env.DOC_DB_LOG_PATH}}"
