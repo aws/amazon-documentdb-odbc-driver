@@ -34,4 +34,5 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   odbcinst -i -d -f "$ODBC_LIB_PATH/ignite-odbc-install.ini"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   export ODBCINSTINI="$ODBC_LIB_PATH/ignite-odbc-install.ini"
+  echo "Exported ODBCINSTINI=$ODBCINSTINI"
 fi

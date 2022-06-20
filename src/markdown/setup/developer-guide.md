@@ -101,8 +101,8 @@ Example:
 1. Install dependencies
    1. `brew install cmake`
    2. `brew install openssl`
-   3. `brew install unixodbc`  
-      - You may need to unlink `libiodbc` if you already have this installed. Use `brew unlink libiodbc`.
+   3. `brew install libiodbc`  
+      - You may need to unlink `unixodbc` if you already have this installed. Use `brew unlink unixodbc`.
    4. `brew install boost`
    5. Install MongoDB using [`MongoDB's Installation Guide for MongoDB Community Edition on macOS`](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-os-x/).
    6. `brew install mongo-cxx-driver`
@@ -121,10 +121,11 @@ Example:
    1. E.g.: `./build_mac_release64.sh`
    2. Navigate to the `build/odbc/lib` folder to use the generated files.
 3. Set the environment variable `DOCUMENTDB_HOME`. On a developer's machine, set it to `<repo-folder>/build/odbc/bin`
-4. Run the following command to register the ODBC driver. 
-   `./scripts/register_driver_unix.sh`
-5. Now you're ready to run the tests (e.g., `./build/odbc/bin/ignite-odbc-tests  --catch_system_errors=false`).
-6. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
+4. Set the environment variable `ODBCINSTINI`. On a developer's machine, set it to `<repo-folder>/build/odbc/lib/ignite-odbc-install.ini`
+5. Run the following command to register the ODBC driver. 
+   `./scripts/register_driver_unix.sh`.
+6. Now you're ready to run the tests (e.g., `./build/odbc/bin/ignite-odbc-tests  --catch_system_errors=false`).
+7. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
 ## Linux
 
@@ -229,16 +230,3 @@ There are two ways to fix the issue.
       E.g. If is in another docker container `export LOCAL_DATABASE_HOST=<ip from the mongo docker container>` or if is your host machine `export LOCAL_DATABASE_HOST=host.docker.internal`.
    9. You are ready to run the tests.
       E.g. `/documentdb-odbc/build/odbc/bin/ignite-odbc-tests --catch_system_errors=false`.
-
-
-## Troubleshooting 
-
-### Issue: MacOS build fails with error about iODBC header
-#### Example error message  
-```
-/Library/Frameworks/iODBC.framework/Headers/sqlext.h:82:10: fatal error: 'iODBC/sql.h' file not found
-#include <iODBC/sql.h>
-     ^~~~~~~~~~~~~ 
-``` 
-#### Fix 
-If you have installed the iODBC Driver Manager, the headers installed with it might be used instead of those from `unixodbc`. You may need to uninstall this driver manager and remove the `/Library/Frameworks/iODBC.framework/` directory. 
