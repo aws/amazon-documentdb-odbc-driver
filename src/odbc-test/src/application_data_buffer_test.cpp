@@ -31,8 +31,6 @@ using namespace ignite::odbc;
 using namespace ignite::odbc::app;
 using namespace ignite::odbc::type_traits;
 
-using ignite::odbc::impl::binary::BinaryUtils;
-
 BOOST_AUTO_TEST_SUITE(ApplicationDataBufferTestSuite)
 
 BOOST_AUTO_TEST_CASE(TestPutIntToString) {
