@@ -196,10 +196,10 @@ add_executable(${TARGET} ${SOURCES})
 
 target_link_libraries(${TARGET} ${ODBC_LIBRARIES})
 target_link_libraries(${TARGET} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} mongo::mongocxx_shared ${JNI_LIBRARIES})
+target_code_coverage(${TARGET} AUTO ALL)
 
 add_definitions(-DUNICODE=1)
 if (WIN32)
-    target_code_coverage(${TARGET} AUTO ALL)
     if (MSVC)
         # On Windows, min() and max() are defined macro. This causes a colision with MONGOCXX library.
         # See: http://www.suodenjoki.dk/us/archive/2010/min-max.htm
@@ -210,11 +210,9 @@ if (WIN32)
         target_link_libraries(${TARGET} legacy_stdio_definitions odbccp32 shlwapi)
     endif()
 elseif(APPLE)
-    target_code_coverage(${TARGET} AUTO ALL)
     add_definitions(-DBOOST_TEST_DYN_LINK)
     target_link_libraries(${TARGET} iodbcinst ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 else()
-    target_code_coverage(${TARGET} EXCLUDE usr/*)
     add_definitions(-DBOOST_TEST_DYN_LINK)
     target_link_libraries(${TARGET} odbcinst ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 endif()
