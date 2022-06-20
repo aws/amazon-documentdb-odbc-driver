@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(TestUtilitySqlStringToString) {
       SqlStringToString(buffer.data(), buffer.size() * sizeof(SQLWCHAR), true);
   BOOST_CHECK_EQUAL(utf8String, result);
 
-  result = SqlStringToString(nullptr, buffer.size());
+  result = SqlStringToString((const SQLWCHAR*)nullptr, buffer.size());
   BOOST_CHECK_EQUAL(std::string(), result);
 
   result = SqlStringToString(nullptr, buffer.size() * sizeof(SQLWCHAR), true);

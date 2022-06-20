@@ -140,6 +140,17 @@ std::string SqlStringToString(const SQLWCHAR* sqlStr,
                               bool isLenInBytes = false);
 
 /**
+ * Convert SQL string buffer to std::string.
+ *
+ * @param sqlStr SQL string buffer.
+ * @param sqlStrLen SQL string length.
+ * @param isLenInBytes Indicator of whether the length indicates bytes or
+ * characters.
+ * @return Standard string containing the same data.
+ */
+std::string SqlStringToString(const SQLCHAR* sqlStr, int32_t sqlStrLen);
+
+/**
  * Convert SQL string buffer to boost::optional< std::string >.
  *
  * @param sqlStr SQL string buffer.

@@ -288,6 +288,22 @@ std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
   return converter.to_bytes(sqlStr0);
 }
 
+std::string SqlStringToString(const SQLCHAR* sqlStr, int32_t sqlStrLen) {
+  std::string res;
+
+  const char* sqlStrC = reinterpret_cast< const char* >(sqlStr);
+
+  if (!sqlStr || !sqlStrLen)
+    return res;
+
+  if (sqlStrLen == SQL_NTS)
+    res.assign(sqlStrC);
+  else if (sqlStrLen > 0)
+    res.assign(sqlStrC, sqlStrLen);
+
+  return res;
+}
+
 boost::optional< std::string > SqlStringToOptString(const SQLWCHAR* sqlStr,
                                                     int32_t sqlStrLen,
                                                     bool isLenInBytes) {
