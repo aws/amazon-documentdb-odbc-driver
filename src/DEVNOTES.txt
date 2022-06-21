@@ -32,7 +32,8 @@ Thin-client module is disabled by default, you can enable it by setting CMake op
 
 ODBC module requirements:
  * OpenSSL, 1.0 or later
- * UnixODBC on Linux or Mac OS X
+ * UnixODBC on Linux
+ * iODBC on Mac OS X
 
 ODBC module is disabled by default, you can enable it by setting CMake option -DWITH_ODBC=ON.
 OPENSSL_ROOT_DIR environment variable must be set to openssl installation directory on Windows, on other platforms
