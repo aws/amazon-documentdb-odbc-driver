@@ -1544,8 +1544,9 @@ SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* state,
     *error = 0;
 
   std::string errMsg = record.GetMessageText();
-  size_t outResLen = CopyStringToBuffer(errMsg, msgBuf,
-                                        static_cast< size_t >(msgBufLen), true);
+  // NOTE: msgBufLen is in characters.
+  size_t outResLen =
+      CopyStringToBuffer(errMsg, msgBuf, static_cast< size_t >(msgBufLen));
 
   if (msgResLen)
     *msgResLen = static_cast< SQLSMALLINT >(outResLen);
