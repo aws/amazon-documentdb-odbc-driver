@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBuffer) {
   bytesWrittenOrRequired =
       CopyStringToBuffer(str, buffer, ((10 + 1) * sizeof(SQLWCHAR)), true);
   BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), ToUtf8(wstr.substr(0, 10)));
-  BOOST_CHECK_EQUAL(20, bytesWrittenOrRequired);
+  BOOST_CHECK_EQUAL(10 * sizeof(SQLWCHAR), bytesWrittenOrRequired);
 
   // Zero length buffer in character mode.
   buffer[0] = 0;
