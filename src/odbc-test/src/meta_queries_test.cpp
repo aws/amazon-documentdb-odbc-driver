@@ -109,7 +109,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
         BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
       if (i == columnIndex && !expectedValue.empty()) {
-        std::string actualValueStr = utility::SqlStringToString(buf, bufLen);
+        std::string actualValueStr = utility::SqlWcharToString(buf, bufLen);
         BOOST_CHECK_EQUAL(expectedValue, actualValueStr);
       }
     }
@@ -252,7 +252,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-    std::string buf = utility::SqlStringToString(strBuf);
+    std::string buf = utility::SqlWcharToString(strBuf);
 
     BOOST_CHECK(expectedVal == buf);
   }
@@ -313,7 +313,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     BOOST_CHECK_GE(nameLen, 0);
     BOOST_CHECK_LE(nameLen, static_cast< SQLSMALLINT >(ODBC_BUFFER_SIZE));
 
-    BOOST_CHECK_EQUAL(utility::SqlStringToString(name.data()), expName);
+    BOOST_CHECK_EQUAL(utility::SqlWcharToString(name.data()), expName);
     BOOST_CHECK_EQUAL(dataType, expDataType);
     BOOST_CHECK_EQUAL(size, expSize);
     BOOST_CHECK_EQUAL(scale, expScale);
@@ -436,7 +436,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     BOOST_CHECK_GE(nameLen, 0);
     BOOST_CHECK_LE(nameLen, static_cast< SQLSMALLINT >(ODBC_BUFFER_SIZE));
 
-    BOOST_CHECK_EQUAL(utility::SqlStringToString(name.data()), expName);
+    BOOST_CHECK_EQUAL(utility::SqlWcharToString(name.data()), expName);
     BOOST_CHECK_EQUAL(dataType, expDataType);
     BOOST_CHECK_EQUAL(size, expSize);
     BOOST_CHECK_EQUAL(scale, expScale);
@@ -704,7 +704,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDataTypesAndColumnNames) {
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-    BOOST_CHECK_EQUAL(utility::SqlStringToString(strBuf), tests[i - 1].second);
+    BOOST_CHECK_EQUAL(utility::SqlWcharToString(strBuf), tests[i - 1].second);
   }
 }
 
@@ -1292,7 +1292,7 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOne) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   CheckSingleRowResultSetWithGetData(stmt, 3,
-                                     utility::SqlStringToString(table.data()));
+                                     utility::SqlWcharToString(table.data()));
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOneFromLocalServer) {
@@ -1981,7 +1981,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   if (!SQL_SUCCEEDED(ret)) {
     BOOST_ERROR(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
   }
-  BOOST_CHECK_EQUAL("TABLE_SCHEM", utility::SqlStringToString(
+  BOOST_CHECK_EQUAL("TABLE_SCHEM", utility::SqlWcharToString(
                                        attrColumnName, attrColumnNameLen));
 
   // Test that the next fetch will have no data.

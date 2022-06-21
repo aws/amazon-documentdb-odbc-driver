@@ -225,8 +225,11 @@ ConversionResult::Type ApplicationDataBuffer::PutValToStrBuffer(
 template < typename CharT >
 ConversionResult::Type ApplicationDataBuffer::PutValToStrBuffer(
     const int8_t& value) {
+  std::stringstream converter;
+  // NOTE: Need to cast to larger integer - or will mistake it for a character.
+  converter << static_cast< int32_t >(value);
   int32_t written = 0;
-  return PutStrToStrBuffer< CharT >(std::to_string(value), written);
+  return PutStrToStrBuffer< CharT >(converter.str(), written);
 }
 
 template < typename OutCharT, typename InCharT >
@@ -999,7 +1002,7 @@ std::string ApplicationDataBuffer::GetString(size_t maxLen) const {
       if (!paramLen)
         break;
 
-      res = utility::SqlStringToString(
+      res = utility::SqlCharToString(
           reinterpret_cast< const SQLCHAR* >(GetData()),
           static_cast< int32_t >(paramLen));
 
@@ -1015,7 +1018,7 @@ std::string ApplicationDataBuffer::GetString(size_t maxLen) const {
       if (!paramLen)
         break;
 
-      res = utility::SqlStringToString(
+      res = utility::SqlWcharToString(
           reinterpret_cast< const SQLWCHAR* >(GetData()),
           static_cast< int32_t >(paramLen), true);
 
@@ -1116,7 +1119,7 @@ Guid ApplicationDataBuffer::GetGuid() const {
       if (!paramLen)
         break;
 
-      std::string str = utility::SqlStringToString(
+      std::string str = utility::SqlCharToString(
           reinterpret_cast< const SQLCHAR* >(GetData()),
           static_cast< int32_t >(paramLen));
 
@@ -1135,7 +1138,7 @@ Guid ApplicationDataBuffer::GetGuid() const {
       if (!paramLen)
         break;
 
-      std::string str = utility::SqlStringToString(
+      std::string str = utility::SqlWcharToString(
           reinterpret_cast< const SQLWCHAR* >(GetData()),
           static_cast< int32_t >(paramLen), true);
 
@@ -1351,7 +1354,7 @@ Date ApplicationDataBuffer::GetDate() const {
       if (!paramLen)
         break;
 
-      std::string str = utility::SqlStringToString(
+      std::string str = utility::SqlCharToString(
           reinterpret_cast< const SQLCHAR* >(GetData()),
           static_cast< int32_t >(paramLen));
 
@@ -1370,7 +1373,7 @@ Date ApplicationDataBuffer::GetDate() const {
       if (!paramLen)
         break;
 
-      std::string str = utility::SqlStringToString(
+      std::string str = utility::SqlWcharToString(
           reinterpret_cast< const SQLWCHAR* >(GetData()),
           static_cast< int32_t >(paramLen), true);
 
@@ -1446,7 +1449,7 @@ Timestamp ApplicationDataBuffer::GetTimestamp() const {
       if (!paramLen)
         break;
 
-      std::string str = utility::SqlStringToString(
+      std::string str = utility::SqlCharToString(
           reinterpret_cast< const SQLCHAR* >(GetData()),
           static_cast< int32_t >(paramLen));
 
@@ -1465,7 +1468,7 @@ Timestamp ApplicationDataBuffer::GetTimestamp() const {
       if (!paramLen)
         break;
 
-      std::string str = utility::SqlStringToString(
+      std::string str = utility::SqlWcharToString(
           reinterpret_cast< const SQLWCHAR* >(GetData()),
           static_cast< int32_t >(paramLen), true);
 
@@ -1525,7 +1528,7 @@ Time ApplicationDataBuffer::GetTime() const {
       if (!paramLen)
         break;
 
-      std::string str = utility::SqlStringToString(
+      std::string str = utility::SqlCharToString(
           reinterpret_cast< const SQLCHAR* >(GetData()),
           static_cast< int32_t >(paramLen));
 
@@ -1541,7 +1544,7 @@ Time ApplicationDataBuffer::GetTime() const {
       if (!paramLen)
         break;
 
-      std::string str = utility::SqlStringToString(
+      std::string str = utility::SqlWcharToString(
           reinterpret_cast< const SQLWCHAR* >(GetData()),
           static_cast< int32_t >(paramLen), true);
 

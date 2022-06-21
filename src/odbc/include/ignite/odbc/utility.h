@@ -135,20 +135,9 @@ void WriteDecimal(BinaryWriterImpl& writer, const Decimal& decimal);
  * characters.
  * @return Standard string containing the same data.
  */
-std::string SqlStringToString(const SQLWCHAR* sqlStr,
+std::string SqlWcharToString(const SQLWCHAR* sqlStr,
                               int32_t sqlStrLen = SQL_NTS,
                               bool isLenInBytes = false);
-
-/**
- * Convert SQL string buffer to std::string.
- *
- * @param sqlStr SQL string buffer.
- * @param sqlStrLen SQL string length.
- * @param isLenInBytes Indicator of whether the length indicates bytes or
- * characters.
- * @return Standard string containing the same data.
- */
-std::string SqlStringToString(const SQLCHAR* sqlStr, int32_t sqlStrLen);
 
 /**
  * Convert SQL string buffer to boost::optional< std::string >.
@@ -160,9 +149,20 @@ std::string SqlStringToString(const SQLCHAR* sqlStr, int32_t sqlStrLen);
  * @return Standard optional string containing the same data.
  * If sqlStrLen indicates null string, boost::none is returned.
  */
-boost::optional< std::string > SqlStringToOptString(const SQLWCHAR* sqlStr,
+boost::optional< std::string > SqlWcharToOptString(const SQLWCHAR* sqlStr,
                                                     int32_t sqlStrLen = SQL_NTS,
                                                     bool isLenInBytes = false);
+
+/**
+ * Convert SQL string buffer to std::string.
+ *
+ * @param sqlStr SQL string buffer.
+ * @param sqlStrLen SQL string length.
+ * @param isLenInBytes Indicator of whether the length indicates bytes or
+ * characters.
+ * @return Standard string containing the same data.
+ */
+std::string SqlCharToString(const SQLCHAR* sqlStr, int32_t sqlStrLen);
 
 /**
  * Convert a wide string to UTF-8 encoded string.

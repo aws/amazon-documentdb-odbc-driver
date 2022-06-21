@@ -73,27 +73,27 @@ BOOST_AUTO_TEST_CASE(TestPutIntToWString) {
                                &reslen);
 
   appBuf.PutInt8(12);
-  BOOST_CHECK(utility::SqlStringToString(buffer) == "12");
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "12");
   BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("12"));
 
   appBuf.PutInt8(-12);
-  BOOST_CHECK(utility::SqlStringToString(buffer) == "-12");
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "-12");
   BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("-12"));
 
   appBuf.PutInt16(9876);
-  BOOST_CHECK(utility::SqlStringToString(buffer) == "9876");
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "9876");
   BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("9876"));
 
   appBuf.PutInt16(-9876);
-  BOOST_CHECK(utility::SqlStringToString(buffer) == "-9876");
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "-9876");
   BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("-9876"));
 
   appBuf.PutInt32(1234567);
-  BOOST_CHECK(utility::SqlStringToString(buffer) == "1234567");
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "1234567");
   BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("1234567"));
 
   appBuf.PutInt32(-1234567);
-  BOOST_CHECK(utility::SqlStringToString(buffer) == "-1234567");
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "-1234567");
   BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("-1234567"));
 }
 
@@ -129,19 +129,19 @@ BOOST_AUTO_TEST_CASE(TestPutFloatToWString) {
                                &reslen);
 
   appBuf.PutFloat(12.42f);
-  BOOST_CHECK(utility::SqlStringToString(buffer) == "12.42");
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "12.42");
   BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("12.42"));
 
   appBuf.PutFloat(-12.42f);
-  BOOST_CHECK(utility::SqlStringToString(buffer) == "-12.42");
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "-12.42");
   BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("-12.42"));
 
   appBuf.PutDouble(1000.21);
-  BOOST_CHECK(utility::SqlStringToString(buffer) == "1000.21");
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "1000.21");
   BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("1000.21"));
 
   appBuf.PutDouble(-1000.21);
-  BOOST_CHECK(utility::SqlStringToString(buffer) == "-1000.21");
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "-1000.21");
   BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("-1000.21"));
 }
 
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(TestPutGuidToWString) {
 
   appBuf.PutGuid(guid);
 
-  BOOST_CHECK(utility::SqlStringToString(buffer) == "1da1ef8f-39ff-4d62-8b72-e8e9f3371801");
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "1da1ef8f-39ff-4d62-8b72-e8e9f3371801");
   BOOST_CHECK((reslen / sizeof(SQLWCHAR))
               == strlen("1da1ef8f-39ff-4d62-8b72-e8e9f3371801"));
 }
@@ -206,8 +206,8 @@ BOOST_AUTO_TEST_CASE(TestPutBinaryToWString) {
 
   appBuf.PutBinaryData(binary, sizeof(binary), written);
 
-  std::string bufferAsString = utility::SqlStringToString(buffer);
-  BOOST_CHECK(utility::SqlStringToString(buffer) == "2184f4dc0100fff0");
+  std::string bufferAsString = utility::SqlWcharToString(buffer);
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "2184f4dc0100fff0");
   BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("2184f4dc0100fff0"));
 }
 
@@ -236,7 +236,7 @@ BOOST_AUTO_TEST_CASE(TestPutStringToWstring) {
   std::string testString("Test string");
 
   appBuf.PutString(testString);
-  BOOST_CHECK(utility::SqlStringToString(buffer) == "Test string");
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "Test string");
 }
 
 BOOST_AUTO_TEST_CASE(TestPutStringToLong) {
@@ -421,21 +421,21 @@ BOOST_AUTO_TEST_CASE(TestPutDecimalToWString) {
   common::Decimal decimal;
 
   appBuf.PutDecimal(decimal);
-  BOOST_CHECK(utility::SqlStringToString(strBuf) == "0");
+  BOOST_CHECK(utility::SqlWcharToString(strBuf) == "0");
 
   int8_t mag1[] = {1, 0};
 
   decimal = common::Decimal(mag1, sizeof(mag1), 0, 1);
 
   appBuf.PutDecimal(decimal);
-  BOOST_CHECK(utility::SqlStringToString(strBuf) == "256");
+  BOOST_CHECK(utility::SqlWcharToString(strBuf) == "256");
 
   int8_t mag2[] = {2, 23};
 
   decimal = common::Decimal(mag2, sizeof(mag2), 1, -1);
 
   appBuf.PutDecimal(decimal);
-  BOOST_CHECK(utility::SqlStringToString(strBuf) == "-53.5");
+  BOOST_CHECK(utility::SqlWcharToString(strBuf) == "-53.5");
 }
 
 BOOST_AUTO_TEST_CASE(TestPutDecimalToNumeric) {
@@ -522,7 +522,7 @@ BOOST_AUTO_TEST_CASE(TestPutDateToWString) {
 
   appBuf.PutDate(date);
 
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(strBuf), std::string("1999-02-22"));
+  BOOST_CHECK_EQUAL(utility::SqlWcharToString(strBuf), std::string("1999-02-22"));
 }
 
 BOOST_AUTO_TEST_CASE(TestPutDateToDate) {
@@ -587,7 +587,7 @@ BOOST_AUTO_TEST_CASE(TestPutTimeToWString) {
 
   appBuf.PutTime(time);
 
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(strBuf), std::string("07:15:00"));
+  BOOST_CHECK_EQUAL(utility::SqlWcharToString(strBuf), std::string("07:15:00"));
 }
 
 BOOST_AUTO_TEST_CASE(TestPutTimeToTime) {
@@ -632,7 +632,7 @@ BOOST_AUTO_TEST_CASE(TestPutTimestampToWString) {
 
   appBuf.PutTimestamp(date);
 
-  BOOST_CHECK_EQUAL(utility::SqlStringToString(strBuf),
+  BOOST_CHECK_EQUAL(utility::SqlWcharToString(strBuf),
                     std::string("2018-11-01 17:45:59"));
 }
 
@@ -769,7 +769,7 @@ BOOST_AUTO_TEST_CASE(TestGetStringFromWString) {
 
   std::string res = appBuf.GetString(reslen);
 
-  BOOST_CHECK(utility::SqlStringToString(buf.data()) == res);
+  BOOST_CHECK(utility::SqlWcharToString(buf.data()) == res);
 }
 
 BOOST_AUTO_TEST_CASE(TestGetFloatFromUshort) {

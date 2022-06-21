@@ -40,7 +40,7 @@ void ThrowLastSetupError() {
   std::stringstream buf;
 
   buf << "Message: \""
-      << utility::SqlStringToString(msg.GetData(), msg.GetSize())
+      << utility::SqlWcharToString(msg.GetData(), msg.GetSize())
       << "\", Code: " << code;
 
   throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, buf.str().c_str());
@@ -77,7 +77,7 @@ SettableValue< std::string > ReadDsnString(const char* dsn,
         utility::ToWCHARVector(CONFIG_FILE).data());
   }
 
-  std::string res = utility::SqlStringToString(buf.GetData());
+  std::string res = utility::SqlWcharToString(buf.GetData());
 
   if (res != unique)
     val.SetValue(res);
