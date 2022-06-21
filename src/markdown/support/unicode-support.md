@@ -8,7 +8,7 @@ The definition of the Unicode at the ODBC layer is defined as SQLWCHAR. There ar
 
 - *Windows*: The SQLWCHAR is defined as wchar_t (2-byte)
 - *MacOS (iODBC)*: The SQLWCHAR is defined as wchar_t (4-byte)
-- *Linux (unixODBC)*: The SQLWCHAR is defined as unsigned short (2-byte) or wchar_t (4-byte)
+- *Linux (unixODBC)*: The SQLWCHAR is defined as unsigned short (2-byte)
 
 In terms of our driver, the entry point is the entry_point.cpp/h. For each API entry point, it calls the equivalent in the `odbc` namespace.
 
