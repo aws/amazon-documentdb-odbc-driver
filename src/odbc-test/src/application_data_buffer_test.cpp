@@ -63,6 +63,10 @@ BOOST_AUTO_TEST_CASE(TestPutIntToString) {
   appBuf.PutInt32(-1234567);
   BOOST_CHECK(!strcmp(buffer, "-1234567"));
   BOOST_CHECK(reslen == strlen("-1234567"));
+
+  appBuf.PutInt64(INT64_MIN);
+  BOOST_CHECK(!strcmp(buffer, std::to_string(INT64_MIN).c_str()));
+  BOOST_CHECK(reslen == std::to_string(INT64_MIN).size());
 }
 
 BOOST_AUTO_TEST_CASE(TestPutIntToWString) {
@@ -95,6 +99,10 @@ BOOST_AUTO_TEST_CASE(TestPutIntToWString) {
   appBuf.PutInt32(-1234567);
   BOOST_CHECK(utility::SqlWcharToString(buffer) == "-1234567");
   BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("-1234567"));
+
+  appBuf.PutInt64(INT64_MIN);
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == std::to_string(INT64_MIN));
+  BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == std::to_string(INT64_MIN).size());
 }
 
 BOOST_AUTO_TEST_CASE(TestPutFloatToString) {
