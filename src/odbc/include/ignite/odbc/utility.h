@@ -127,7 +127,7 @@ void ReadDecimal(BinaryReaderImpl& reader, Decimal& decimal);
 void WriteDecimal(BinaryWriterImpl& writer, const Decimal& decimal);
 
 /**
- * Convert SQL string buffer to std::string.
+ * Convert SQLWCHAR string buffer to std::string.
  *
  * @param sqlStr SQL string buffer.
  * @param sqlStrLen SQL string length.
@@ -140,7 +140,7 @@ std::string SqlWcharToString(const SQLWCHAR* sqlStr,
                               bool isLenInBytes = false);
 
 /**
- * Convert SQL string buffer to boost::optional< std::string >.
+ * Convert SQLWCHAR string buffer to boost::optional< std::string >.
  *
  * @param sqlStr SQL string buffer.
  * @param sqlStrLen SQL string length.
@@ -158,8 +158,6 @@ boost::optional< std::string > SqlWcharToOptString(const SQLWCHAR* sqlStr,
  *
  * @param sqlStr SQL string buffer.
  * @param sqlStrLen SQL string length.
- * @param isLenInBytes Indicator of whether the length indicates bytes or
- * characters.
  * @return Standard string containing the same data.
  */
 std::string SqlCharToString(const SQLCHAR* sqlStr, int32_t sqlStrLen);
