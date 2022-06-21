@@ -149,4 +149,5 @@ class ForeignKeysQuery : public Query {
 }  // namespace query
 }  // namespace odbc
 }  // namespace ignite
+
 #endif  //_IGNITE_ODBC_QUERY_FOREIGN_KEYS_QUERY
