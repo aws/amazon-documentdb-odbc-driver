@@ -262,7 +262,7 @@ void WriteDecimal(BinaryWriterImpl& writer, const Decimal& decimal) {
                               magnitude.GetSize());
 }
 
-std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
+std::string SqlWcharToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
                               bool isLenInBytes) {
   if (!sqlStr)
     return std::string();
@@ -288,13 +288,29 @@ std::string SqlStringToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
   return converter.to_bytes(sqlStr0);
 }
 
-boost::optional< std::string > SqlStringToOptString(const SQLWCHAR* sqlStr,
+boost::optional< std::string > SqlWcharToOptString(const SQLWCHAR* sqlStr,
                                                     int32_t sqlStrLen,
                                                     bool isLenInBytes) {
   if (!sqlStr)
     return boost::none;
 
-  return SqlStringToString(sqlStr, sqlStrLen, isLenInBytes);
+  return SqlWcharToString(sqlStr, sqlStrLen, isLenInBytes);
+}
+
+std::string SqlCharToString(const SQLCHAR* sqlStr, int32_t sqlStrLen) {
+  std::string res;
+
+  const char* sqlStrC = reinterpret_cast< const char* >(sqlStr);
+
+  if (!sqlStr || !sqlStrLen)
+    return res;
+
+  if (sqlStrLen == SQL_NTS)
+    res.assign(sqlStrC);
+  else if (sqlStrLen > 0)
+    res.assign(sqlStrC, sqlStrLen);
+
+  return res;
 }
 
 std::string ToUtf8(const std::wstring& value) {
