@@ -106,9 +106,15 @@ BOOST_AUTO_TEST_CASE(TestPutIntToWString) {
   BOOST_CHECK(utility::SqlWcharToString(buffer) == "-1234567");
   BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("-1234567"));
 
+  std::string intMaxStr = std::to_string(INT64_MAX);
+  appBuf.PutInt64(INT64_MAX);
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == intMaxStr);
+  BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == intMaxStr.size());
+
+  std::string intMinStr = std::to_string(INT64_MIN);
   appBuf.PutInt64(INT64_MIN);
-  BOOST_CHECK(utility::SqlWcharToString(buffer) == std::to_string(INT64_MIN));
-  BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == std::to_string(INT64_MIN).size());
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == intMinStr);
+  BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == intMinStr.size());
 }
 
 BOOST_AUTO_TEST_CASE(TestPutFloatToString) {
