@@ -49,39 +49,39 @@ BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBuffer) {
   buffer[0] = 0;
   bytesWrittenOrRequired =
       CopyStringToBuffer(str, buffer, sizeof(buffer) / sizeof(SQLWCHAR));
-  BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), str);
+  BOOST_REQUIRE_EQUAL(SqlWcharToString(buffer), str);
   BOOST_CHECK_EQUAL(wstr.size(), bytesWrittenOrRequired);
 
   // With length in byte mode
   buffer[0] = 0;
   bytesWrittenOrRequired =
       CopyStringToBuffer(str, buffer, sizeof(buffer), true);
-  BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), str);
+  BOOST_REQUIRE_EQUAL(SqlWcharToString(buffer), str);
   BOOST_CHECK_EQUAL(wstr.size() * sizeof(SQLWCHAR), bytesWrittenOrRequired);
 
   // 10 characters plus 1 for null char.
   buffer[0] = 0;
   bytesWrittenOrRequired = CopyStringToBuffer(str, buffer, 11, false);
-  BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), ToUtf8(wstr.substr(0, 10)));
+  BOOST_REQUIRE_EQUAL(SqlWcharToString(buffer), ToUtf8(wstr.substr(0, 10)));
   BOOST_CHECK_EQUAL(10, bytesWrittenOrRequired);
 
   // 10 characters plus 1 for null char, in bytes
   buffer[0] = 0;
   bytesWrittenOrRequired =
       CopyStringToBuffer(str, buffer, ((10 + 1) * sizeof(SQLWCHAR)), true);
-  BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), ToUtf8(wstr.substr(0, 10)));
+  BOOST_REQUIRE_EQUAL(SqlWcharToString(buffer), ToUtf8(wstr.substr(0, 10)));
   BOOST_CHECK_EQUAL(10 * sizeof(SQLWCHAR), bytesWrittenOrRequired);
 
   // Zero length buffer in character mode.
   buffer[0] = 0;
   bytesWrittenOrRequired = CopyStringToBuffer(str, buffer, 0);
-  BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), std::string());
+  BOOST_REQUIRE_EQUAL(SqlWcharToString(buffer), std::string());
   BOOST_CHECK_EQUAL(0, bytesWrittenOrRequired);
 
   // Zero length buffer in byte mode.
   buffer[0] = 0;
   bytesWrittenOrRequired = CopyStringToBuffer(str, buffer, 0, true);
-  BOOST_REQUIRE_EQUAL(SqlStringToString(buffer), std::string());
+  BOOST_REQUIRE_EQUAL(SqlWcharToString(buffer), std::string());
   BOOST_CHECK_EQUAL(0, bytesWrittenOrRequired);
 
   // nullptr buffer, zero length, in character mode.
@@ -136,35 +136,35 @@ BOOST_AUTO_TEST_CASE(TestUtilitySqlStringToString) {
   std::vector< SQLWCHAR > buffer = ToWCHARVector(utf8String);
   std::string utf8StringShortened = u8"你好 - Some da";
 
-  std::string result = SqlStringToString(buffer.data());
+  std::string result = SqlWcharToString(buffer.data());
   BOOST_CHECK_EQUAL(utf8String, result);
 
-  result = SqlStringToString(buffer.data(), buffer.size());
+  result = SqlWcharToString(buffer.data(), buffer.size());
   BOOST_CHECK_EQUAL(utf8String, result);
 
-  result = SqlStringToString(buffer.data(), buffer.size(), false);
+  result = SqlWcharToString(buffer.data(), buffer.size(), false);
   BOOST_CHECK_EQUAL(utf8String, result);
 
   result =
-      SqlStringToString(buffer.data(), buffer.size() * sizeof(SQLWCHAR), true);
+      SqlWcharToString(buffer.data(), buffer.size() * sizeof(SQLWCHAR), true);
   BOOST_CHECK_EQUAL(utf8String, result);
 
-  result = SqlStringToString(nullptr, buffer.size());
+  result = SqlWcharToString(nullptr, buffer.size());
   BOOST_CHECK_EQUAL(std::string(), result);
 
-  result = SqlStringToString(nullptr, buffer.size() * sizeof(SQLWCHAR), true);
+  result = SqlWcharToString(nullptr, buffer.size() * sizeof(SQLWCHAR), true);
   BOOST_CHECK_EQUAL(std::string(), result);
 
-  result = SqlStringToString(buffer.data(), 0);
+  result = SqlWcharToString(buffer.data(), 0);
   BOOST_CHECK_EQUAL(std::string(), result);
 
-  result = SqlStringToString(buffer.data(), 0, true);
+  result = SqlWcharToString(buffer.data(), 0, true);
   BOOST_CHECK_EQUAL(std::string(), result);
 
-  result = SqlStringToString(buffer.data(), 12);
+  result = SqlWcharToString(buffer.data(), 12);
   BOOST_CHECK_EQUAL(utf8StringShortened, result);
 
-  result = SqlStringToString(buffer.data(), 12 * sizeof(SQLWCHAR), true);
+  result = SqlWcharToString(buffer.data(), 12 * sizeof(SQLWCHAR), true);
   BOOST_CHECK_EQUAL(utf8StringShortened, result);
 }
 
