@@ -25,12 +25,11 @@
 
 #define FLOAT_PRECISION 0.0000001f
 
+using namespace boost::unit_test;
 using namespace ignite;
 using namespace ignite::odbc;
 using namespace ignite::odbc::app;
 using namespace ignite::odbc::type_traits;
-
-using ignite::impl::binary::BinaryUtils;
 
 BOOST_AUTO_TEST_SUITE(ApplicationDataBufferTestSuite)
 
@@ -64,6 +63,58 @@ BOOST_AUTO_TEST_CASE(TestPutIntToString) {
   appBuf.PutInt32(-1234567);
   BOOST_CHECK(!strcmp(buffer, "-1234567"));
   BOOST_CHECK(reslen == strlen("-1234567"));
+
+  std::string intMaxStr = std::to_string(INT64_MAX);
+  appBuf.PutInt64(INT64_MAX);
+  BOOST_CHECK(!strcmp(buffer, intMaxStr.c_str()));
+  BOOST_CHECK(reslen == intMaxStr.size());
+
+  std::string intMinStr = std::to_string(INT64_MIN);
+  appBuf.PutInt64(INT64_MIN);
+  BOOST_CHECK(!strcmp(buffer, intMinStr.c_str()));
+  BOOST_CHECK(reslen == intMinStr.size());
+}
+
+BOOST_AUTO_TEST_CASE(TestPutIntToWString) {
+  SQLWCHAR buffer[1024];
+  SqlLen reslen = 0;
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, buffer, sizeof(buffer),
+                               &reslen);
+
+  appBuf.PutInt8(12);
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "12");
+  BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("12"));
+
+  appBuf.PutInt8(-12);
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "-12");
+  BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("-12"));
+
+  appBuf.PutInt16(9876);
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "9876");
+  BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("9876"));
+
+  appBuf.PutInt16(-9876);
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "-9876");
+  BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("-9876"));
+
+  appBuf.PutInt32(1234567);
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "1234567");
+  BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("1234567"));
+
+  appBuf.PutInt32(-1234567);
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "-1234567");
+  BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("-1234567"));
+
+  std::string intMaxStr = std::to_string(INT64_MAX);
+  appBuf.PutInt64(INT64_MAX);
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == intMaxStr);
+  BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == intMaxStr.size());
+
+  std::string intMinStr = std::to_string(INT64_MIN);
+  appBuf.PutInt64(INT64_MIN);
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == intMinStr);
+  BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == intMinStr.size());
 }
 
 BOOST_AUTO_TEST_CASE(TestPutFloatToString) {
@@ -90,6 +141,30 @@ BOOST_AUTO_TEST_CASE(TestPutFloatToString) {
   BOOST_CHECK(reslen == strlen("-1000.21"));
 }
 
+BOOST_AUTO_TEST_CASE(TestPutFloatToWString) {
+  SQLWCHAR buffer[1024];
+  SqlLen reslen = 0;
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, buffer, sizeof(buffer),
+                               &reslen);
+
+  appBuf.PutFloat(12.42f);
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "12.42");
+  BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("12.42"));
+
+  appBuf.PutFloat(-12.42f);
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "-12.42");
+  BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("-12.42"));
+
+  appBuf.PutDouble(1000.21);
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "1000.21");
+  BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("1000.21"));
+
+  appBuf.PutDouble(-1000.21);
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "-1000.21");
+  BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("-1000.21"));
+}
+
 BOOST_AUTO_TEST_CASE(TestPutGuidToString) {
   char buffer[1024];
   SqlLen reslen = 0;
@@ -97,12 +172,28 @@ BOOST_AUTO_TEST_CASE(TestPutGuidToString) {
   ApplicationDataBuffer appBuf(OdbcNativeType::AI_CHAR, buffer, sizeof(buffer),
                                &reslen);
 
-  ignite::Guid guid(0x1da1ef8f39ff4d62UL, 0x8b72e8e9f3371801UL);
+  Guid guid(0x1da1ef8f39ff4d62UL, 0x8b72e8e9f3371801UL);
 
   appBuf.PutGuid(guid);
 
   BOOST_CHECK(!strcmp(buffer, "1da1ef8f-39ff-4d62-8b72-e8e9f3371801"));
   BOOST_CHECK(reslen == strlen("1da1ef8f-39ff-4d62-8b72-e8e9f3371801"));
+}
+
+BOOST_AUTO_TEST_CASE(TestPutGuidToWString) {
+  SQLWCHAR buffer[1024];
+  SqlLen reslen = 0;
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, buffer, sizeof(buffer),
+                               &reslen);
+
+  Guid guid(0x1da1ef8f39ff4d62UL, 0x8b72e8e9f3371801UL);
+
+  appBuf.PutGuid(guid);
+
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "1da1ef8f-39ff-4d62-8b72-e8e9f3371801");
+  BOOST_CHECK((reslen / sizeof(SQLWCHAR))
+              == strlen("1da1ef8f-39ff-4d62-8b72-e8e9f3371801"));
 }
 
 BOOST_AUTO_TEST_CASE(TestPutBinaryToString) {
@@ -122,6 +213,24 @@ BOOST_AUTO_TEST_CASE(TestPutBinaryToString) {
   BOOST_CHECK(reslen == strlen("2184f4dc0100fff0"));
 }
 
+BOOST_AUTO_TEST_CASE(TestPutBinaryToWString) {
+  SQLWCHAR buffer[1024];
+  SqlLen reslen = 0;
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, buffer, sizeof(buffer),
+                               &reslen);
+
+  uint8_t binary[] = {0x21, 0x84, 0xF4, 0xDC, 0x01, 0x00, 0xFF, 0xF0};
+
+  int32_t written = 0;
+
+  appBuf.PutBinaryData(binary, sizeof(binary), written);
+
+  std::string bufferAsString = utility::SqlWcharToString(buffer);
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "2184f4dc0100fff0");
+  BOOST_CHECK((reslen / sizeof(SQLWCHAR)) == strlen("2184f4dc0100fff0"));
+}
+
 BOOST_AUTO_TEST_CASE(TestPutStringToString) {
   char buffer[1024];
   SqlLen reslen = 0;
@@ -138,7 +247,7 @@ BOOST_AUTO_TEST_CASE(TestPutStringToString) {
 }
 
 BOOST_AUTO_TEST_CASE(TestPutStringToWstring) {
-  wchar_t buffer[1024];
+  SQLWCHAR buffer[1024];
   SqlLen reslen = 0;
 
   ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, buffer, sizeof(buffer),
@@ -147,7 +256,7 @@ BOOST_AUTO_TEST_CASE(TestPutStringToWstring) {
   std::string testString("Test string");
 
   appBuf.PutString(testString);
-  BOOST_CHECK(!wcscmp(buffer, L"Test string"));
+  BOOST_CHECK(utility::SqlWcharToString(buffer) == "Test string");
 }
 
 BOOST_AUTO_TEST_CASE(TestPutStringToLong) {
@@ -322,6 +431,33 @@ BOOST_AUTO_TEST_CASE(TestPutDecimalToString) {
   BOOST_CHECK(std::string(strBuf, reslen) == "-53.5");
 }
 
+BOOST_AUTO_TEST_CASE(TestPutDecimalToWString) {
+  SQLWCHAR strBuf[64];
+  SqlLen reslen = 0;
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, &strBuf,
+                               sizeof(strBuf), &reslen);
+
+  common::Decimal decimal;
+
+  appBuf.PutDecimal(decimal);
+  BOOST_CHECK(utility::SqlWcharToString(strBuf) == "0");
+
+  int8_t mag1[] = {1, 0};
+
+  decimal = common::Decimal(mag1, sizeof(mag1), 0, 1);
+
+  appBuf.PutDecimal(decimal);
+  BOOST_CHECK(utility::SqlWcharToString(strBuf) == "256");
+
+  int8_t mag2[] = {2, 23};
+
+  decimal = common::Decimal(mag2, sizeof(mag2), 1, -1);
+
+  appBuf.PutDecimal(decimal);
+  BOOST_CHECK(utility::SqlWcharToString(strBuf) == "-53.5");
+}
+
 BOOST_AUTO_TEST_CASE(TestPutDecimalToNumeric) {
   SQL_NUMERIC_STRUCT buf;
   SqlLen reslen = 0;
@@ -395,6 +531,20 @@ BOOST_AUTO_TEST_CASE(TestPutDateToString) {
   BOOST_CHECK_EQUAL(std::string(strBuf, reslen), std::string("1999-02-22"));
 }
 
+BOOST_AUTO_TEST_CASE(TestPutDateToWString) {
+  SQLWCHAR strBuf[64];
+  SqlLen reslen = 0;
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, &strBuf, sizeof(strBuf),
+                               &reslen);
+
+  Date date = common::MakeDateGmt(1999, 2, 22);
+
+  appBuf.PutDate(date);
+
+  BOOST_CHECK_EQUAL(utility::SqlWcharToString(strBuf), std::string("1999-02-22"));
+}
+
 BOOST_AUTO_TEST_CASE(TestPutDateToDate) {
   SQL_DATE_STRUCT buf;
   SqlLen reslen = sizeof(buf);
@@ -446,6 +596,20 @@ BOOST_AUTO_TEST_CASE(TestPutTimeToString) {
   BOOST_CHECK_EQUAL(std::string(strBuf, reslen), std::string("07:15:00"));
 }
 
+BOOST_AUTO_TEST_CASE(TestPutTimeToWString) {
+  SQLWCHAR strBuf[64];
+  SqlLen reslen = 0;
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, &strBuf, sizeof(strBuf),
+                               &reslen);
+
+  Time time = common::MakeTimeGmt(7, 15, 0);
+
+  appBuf.PutTime(time);
+
+  BOOST_CHECK_EQUAL(utility::SqlWcharToString(strBuf), std::string("07:15:00"));
+}
+
 BOOST_AUTO_TEST_CASE(TestPutTimeToTime) {
   SQL_TIME_STRUCT buf;
   SqlLen reslen = sizeof(buf);
@@ -474,6 +638,21 @@ BOOST_AUTO_TEST_CASE(TestPutTimestampToString) {
   appBuf.PutTimestamp(date);
 
   BOOST_CHECK_EQUAL(std::string(strBuf, reslen),
+                    std::string("2018-11-01 17:45:59"));
+}
+
+BOOST_AUTO_TEST_CASE(TestPutTimestampToWString) {
+  SQLWCHAR strBuf[64];
+  SqlLen reslen = 0;
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, &strBuf, sizeof(strBuf),
+                               &reslen);
+
+  Timestamp date = common::MakeTimestampGmt(2018, 11, 1, 17, 45, 59);
+
+  appBuf.PutTimestamp(date);
+
+  BOOST_CHECK_EQUAL(utility::SqlWcharToString(strBuf),
                     std::string("2018-11-01 17:45:59"));
 }
 
@@ -536,7 +715,20 @@ BOOST_AUTO_TEST_CASE(TestGetGuidFromString) {
   ApplicationDataBuffer appBuf(OdbcNativeType::AI_CHAR, buffer,
                                sizeof(buffer) - 1, &reslen);
 
-  ignite::Guid guid = appBuf.GetGuid();
+  Guid guid = appBuf.GetGuid();
+
+  BOOST_CHECK_EQUAL(guid, Guid(0x1da1ef8f39ff4d62UL, 0x8b72e8e9f3371801UL));
+}
+
+BOOST_AUTO_TEST_CASE(TestGetGuidFromWString) {
+  std::vector< SQLWCHAR > buffer =
+      utility::ToWCHARVector("1da1ef8f-39ff-4d62-8b72-e8e9f3371801");
+  SqlLen reslen = buffer.size() * sizeof(SQLWCHAR);
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, buffer.data(),
+                               buffer.size() * sizeof(SQLWCHAR), &reslen);
+
+  Guid guid = appBuf.GetGuid();
 
   BOOST_CHECK_EQUAL(guid, Guid(0x1da1ef8f39ff4d62UL, 0x8b72e8e9f3371801UL));
 }
@@ -588,6 +780,18 @@ BOOST_AUTO_TEST_CASE(TestGetStringFromString) {
   BOOST_CHECK(res.compare(buf));
 }
 
+BOOST_AUTO_TEST_CASE(TestGetStringFromWString) {
+  std::vector< SQLWCHAR > buf = utility::ToWCHARVector("Some data 32d2d5hs");
+  SqlLen reslen = buf.size() * sizeof(SQLWCHAR);
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, buf.data(), reslen,
+                               &reslen);
+
+  std::string res = appBuf.GetString(reslen);
+
+  BOOST_CHECK(utility::SqlWcharToString(buf.data()) == res);
+}
+
 BOOST_AUTO_TEST_CASE(TestGetFloatFromUshort) {
   unsigned short numBuf = 7162;
   SqlLen reslen = sizeof(numBuf);
@@ -609,6 +813,22 @@ BOOST_AUTO_TEST_CASE(TestGetFloatFromString) {
   SqlLen reslen = sizeof(buf);
 
   ApplicationDataBuffer appBuf(OdbcNativeType::AI_CHAR, &buf, reslen, &reslen);
+
+  float resFloat = appBuf.GetFloat();
+
+  BOOST_CHECK_CLOSE_FRACTION(resFloat, 28.562f, FLOAT_PRECISION);
+
+  double resDouble = appBuf.GetDouble();
+
+  BOOST_CHECK_CLOSE_FRACTION(resDouble, 28.562, FLOAT_PRECISION);
+}
+
+BOOST_AUTO_TEST_CASE(TestGetFloatFromWString) {
+  std::vector< SQLWCHAR > buf = utility::ToWCHARVector("28.562");
+  SqlLen reslen = buf.size() * sizeof(SQLWCHAR);
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, buf.data(), reslen,
+                               &reslen);
 
   float resFloat = appBuf.GetFloat();
 
@@ -655,6 +875,30 @@ BOOST_AUTO_TEST_CASE(TestGetIntFromString) {
   SqlLen reslen = sizeof(buf);
 
   ApplicationDataBuffer appBuf(OdbcNativeType::AI_CHAR, &buf, reslen, &reslen);
+
+  int64_t resInt64 = appBuf.GetInt64();
+
+  BOOST_CHECK(resInt64 == 39);
+
+  int32_t resInt32 = appBuf.GetInt32();
+
+  BOOST_CHECK(resInt32 == 39);
+
+  int16_t resInt16 = appBuf.GetInt16();
+
+  BOOST_CHECK(resInt16 == 39);
+
+  int8_t resInt8 = appBuf.GetInt8();
+
+  BOOST_CHECK(resInt8 == 39);
+}
+
+BOOST_AUTO_TEST_CASE(TestGetIntFromWString) {
+  std::vector< SQLWCHAR > buf = utility::ToWCHARVector("39");
+  SqlLen reslen = buf.size() * sizeof(SQLWCHAR);
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, buf.data(), reslen,
+                               &reslen);
 
   int64_t resInt64 = appBuf.GetInt64();
 
@@ -832,6 +1076,29 @@ BOOST_AUTO_TEST_CASE(TestGetDateFromString) {
   BOOST_CHECK_EQUAL(0, tmDate.tm_sec);
 }
 
+BOOST_AUTO_TEST_CASE(TestGetDateFromWString) {
+  std::vector< SQLWCHAR > buf = utility::ToWCHARVector("1999-02-22");
+  SqlLen reslen = buf.size() * sizeof(SQLWCHAR);
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, buf.data(), reslen,
+                               &reslen);
+
+  Date date = appBuf.GetDate();
+
+  tm tmDate;
+
+  bool success = common::DateToCTm(date, tmDate);
+
+  BOOST_REQUIRE(success);
+
+  BOOST_CHECK_EQUAL(1999, tmDate.tm_year + 1900);
+  BOOST_CHECK_EQUAL(2, tmDate.tm_mon + 1);
+  BOOST_CHECK_EQUAL(22, tmDate.tm_mday);
+  BOOST_CHECK_EQUAL(0, tmDate.tm_hour);
+  BOOST_CHECK_EQUAL(0, tmDate.tm_min);
+  BOOST_CHECK_EQUAL(0, tmDate.tm_sec);
+}
+
 BOOST_AUTO_TEST_CASE(TestGetTimeFromString) {
   char buf[] = "17:5:59";
   SqlLen reslen = sizeof(buf);
@@ -855,11 +1122,57 @@ BOOST_AUTO_TEST_CASE(TestGetTimeFromString) {
   BOOST_CHECK_EQUAL(59, tmTime.tm_sec);
 }
 
+BOOST_AUTO_TEST_CASE(TestGetTimeFromWString) {
+  std::vector< SQLWCHAR > buf = utility::ToWCHARVector("17:5:59");
+  SqlLen reslen = buf.size() * sizeof(SQLWCHAR);
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, buf.data(), reslen,
+                               &reslen);
+
+  Time time = appBuf.GetTime();
+
+  tm tmTime;
+
+  bool success = common::TimeToCTm(time, tmTime);
+
+  BOOST_REQUIRE(success);
+
+  BOOST_CHECK_EQUAL(1970, tmTime.tm_year + 1900);
+  BOOST_CHECK_EQUAL(1, tmTime.tm_mon + 1);
+  BOOST_CHECK_EQUAL(1, tmTime.tm_mday);
+  BOOST_CHECK_EQUAL(17, tmTime.tm_hour);
+  BOOST_CHECK_EQUAL(5, tmTime.tm_min);
+  BOOST_CHECK_EQUAL(59, tmTime.tm_sec);
+}
+
 BOOST_AUTO_TEST_CASE(TestGetTimestampFromString) {
   char buf[] = "2018-11-01 17:45:59";
   SqlLen reslen = sizeof(buf);
 
   ApplicationDataBuffer appBuf(OdbcNativeType::AI_CHAR, &buf[0], sizeof(buf),
+                               &reslen);
+
+  Timestamp date = appBuf.GetTimestamp();
+
+  tm tmDate;
+
+  bool success = common::TimestampToCTm(date, tmDate);
+
+  BOOST_REQUIRE(success);
+
+  BOOST_CHECK_EQUAL(2018, tmDate.tm_year + 1900);
+  BOOST_CHECK_EQUAL(11, tmDate.tm_mon + 1);
+  BOOST_CHECK_EQUAL(1, tmDate.tm_mday);
+  BOOST_CHECK_EQUAL(17, tmDate.tm_hour);
+  BOOST_CHECK_EQUAL(45, tmDate.tm_min);
+  BOOST_CHECK_EQUAL(59, tmDate.tm_sec);
+}
+
+BOOST_AUTO_TEST_CASE(TestGetTimestampFromWString) {
+  std::vector< SQLWCHAR > buf = utility::ToWCHARVector("2018-11-01 17:45:59");
+  SqlLen reslen = buf.size() * sizeof(SQLWCHAR);
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, buf.data(), reslen,
                                &reslen);
 
   Timestamp date = appBuf.GetTimestamp();
