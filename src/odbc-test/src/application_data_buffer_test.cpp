@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(TestPutIntToString) {
   std::string intMaxStr = std::to_string(INT64_MAX);
   appBuf.PutInt64(INT64_MAX);
   BOOST_CHECK(!strcmp(buffer, intMaxStr.c_str()));
-  BOOST_CHECK(reslen == std::to_string(INT64_MAX).size());
+  BOOST_CHECK(reslen == intMaxStr.size());
 
   std::string intMinStr = std::to_string(INT64_MIN);
   appBuf.PutInt64(INT64_MIN);
