@@ -40,8 +40,8 @@ OdbcClientError GetOdbcError(SQLSMALLINT handleType, SQLHANDLE handle) {
   SQLGetDiagRec(handleType, handle, 1, sqlstate, &nativeCode, message,
                 sizeof(message), &reallen);
 
-  return OdbcClientError(utility::SqlStringToString(sqlstate),
-                         utility::SqlStringToString(message));
+  return OdbcClientError(utility::SqlWcharToString(sqlstate),
+                         utility::SqlWcharToString(message));
 }
 
 std::string GetOdbcErrorState(SQLSMALLINT handleType, SQLHANDLE handle,
@@ -57,7 +57,7 @@ std::string GetOdbcErrorState(SQLSMALLINT handleType, SQLHANDLE handle,
   SQLGetDiagRec(handleType, handle, idx, sqlstate, &nativeCode, message,
                 sizeof(message), &reallen);
 
-  return utility::SqlStringToString(sqlstate);
+  return utility::SqlWcharToString(sqlstate);
 }
 
 std::string GetOdbcErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle,
@@ -73,10 +73,10 @@ std::string GetOdbcErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle,
   SQLGetDiagRec(handleType, handle, idx, sqlstate, &nativeCode, message,
                 sizeof(message), &reallen);
 
-  std::string res = utility::SqlStringToString(sqlstate);
+  std::string res = utility::SqlWcharToString(sqlstate);
 
   if (!res.empty()) {
-    res.append(": ").append(utility::SqlStringToString(message));
+    res.append(": ").append(utility::SqlWcharToString(message));
   } else {
     res = "No results";
   }
