@@ -64,9 +64,15 @@ BOOST_AUTO_TEST_CASE(TestPutIntToString) {
   BOOST_CHECK(!strcmp(buffer, "-1234567"));
   BOOST_CHECK(reslen == strlen("-1234567"));
 
+  std::string intMaxStr = std::to_string(INT64_MAX);
+  appBuf.PutInt64(INT64_MAX);
+  BOOST_CHECK(!strcmp(buffer, intMaxStr.c_str()));
+  BOOST_CHECK(reslen == std::to_string(INT64_MAX).size());
+
+  std::string intMinStr = std::to_string(INT64_MIN);
   appBuf.PutInt64(INT64_MIN);
-  BOOST_CHECK(!strcmp(buffer, std::to_string(INT64_MIN).c_str()));
-  BOOST_CHECK(reslen == std::to_string(INT64_MIN).size());
+  BOOST_CHECK(!strcmp(buffer, intMinStr.c_str()));
+  BOOST_CHECK(reslen == intMinStr.size());
 }
 
 BOOST_AUTO_TEST_CASE(TestPutIntToWString) {
