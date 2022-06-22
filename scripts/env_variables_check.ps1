@@ -54,6 +54,8 @@ if ( [string]::IsNullOrEmpty(${Env:DOCUMENTDB_HOME}) ) {
   Write-Output "DOCUMENTDB_HOME=$Env:DOCUMENTDB_HOME"
 }
 
+#ODBCINSTINI
+
 #if ( [string]::IsNullOrEmpty(${Env:ODBC_LIB_PATH}) ) {
 #  Write-Output "ODBC_LIB_PATH environment variable is not set. Using default."
 #  $Env:ODBC_LIB_PATH="${scriptPath}\..\build\odbc\lib"
