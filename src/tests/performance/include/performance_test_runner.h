@@ -91,6 +91,8 @@ struct TestCase {
   std::vector< long long > time_ms;  // time for exec->bind->fetch combined
   std::vector< long long > time_exec_ms;
   std::vector< long long > time_bind_fetch_ms;
+  std::vector< long long > time_bind_ms;
+  std::vector< long long > time_fetch_ms;
   StatisticalInfo stat_info;
   StatisticalInfo stat_info_exec;
   StatisticalInfo stat_info_bind_fetch;
