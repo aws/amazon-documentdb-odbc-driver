@@ -60,13 +60,13 @@ else
   echo "DOCUMENTDB_HOME=$DOCUMENTDB_HOME"
 fi
 
-if [[ -z "${ODBC_LIB_PATH}" ]]; then
-  echo "ODBC_LIB_PATH environment variable is not set. Using default."
-  export ODBC_LIB_PATH=${SCRIPT_DIR}/../build/odbc/lib
-  echo "ODBC_LIB_PATH=$ODBC_LIB_PATH"
-else
-  echo "ODBC_LIB_PATH=$ODBC_LIB_PATH"
-fi
+#if [[ -z "${ODBC_LIB_PATH}" ]]; then
+#  echo "ODBC_LIB_PATH environment variable is not set. Using default."
+#  export ODBC_LIB_PATH=${SCRIPT_DIR}/../build/odbc/lib
+#  echo "ODBC_LIB_PATH=$ODBC_LIB_PATH"
+#else
+#  echo "ODBC_LIB_PATH=$ODBC_LIB_PATH"
+#fi
 
 if [[ "${CHECK}" -eq "0" ]]; then
   echo "Missing envrionment variables, please set them accordingly."
