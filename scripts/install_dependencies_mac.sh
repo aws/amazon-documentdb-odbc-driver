@@ -11,12 +11,30 @@ brew unlink unixodbc
 echo "TRACE calling check_dependencies_mac.sh"
 
 source $SCRIPT_DIR/check_dependencies_mac.sh
+# num_apps, apps_installed and req_apps are variables from check_dependencies_mac.sh
 
-echo ${apps_installed[*]}                   
+# -AL- TRACE messages 
+echo "TRACE - apps_installed: ${apps_installed[*]}"
+echo "TRACE - req_apps: ${req_apps[*]}"
 
-# install iODBC driver manager
-brew install libiodbc
-brew install cmake
-brew install openssl
-brew install boost
-brew install mongo-cxx-driver
+if [[ "${missing_formula}" -eq "0" ]]; then
+    echo "All required dependencies are installed"
+else
+    echo "Installing the missing required dependencies"
+    for (( i=0 ; i<$num_apps ; i++ )); 
+    do
+    if [[ "${apps_installed[i]}" -eq "0" ]]; then
+        echo  "${req_apps[i]} is not installed, attempt to install it with brew."
+        brew install ${req_apps[i]}
+    #   else
+    #     echo  "${req_apps[i]} is installed."
+    fi
+    done
+fi
+
+# # install iODBC driver manager
+# brew install libiodbc
+# brew install cmake
+# brew install openssl
+# brew install boost
+# brew install mongo-cxx-driver

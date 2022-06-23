@@ -1,5 +1,7 @@
 # script to check if formulas in req_apps are installed. 
 
+# add the required dependencies to the req_apps array. 
+# There is no need to change other variables
 req_apps=("libiodbc" "cmake" "openssl" "boost" "mongo-cxx-driver") 
 num_apps=${#req_apps[@]}
 apps_installed=()
@@ -15,6 +17,7 @@ do
   else
     # ${req_apps[i]} not installed via brew
     echo "${req_apps[i]} is not installed."
+    missing_formula=1
   fi
   echo ${req_apps[i]} # -AL- TRACE remove later
 done
