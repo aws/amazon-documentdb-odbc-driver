@@ -31,10 +31,3 @@ else
     fi
     done
 fi
-
-# # install iODBC driver manager
-# brew install libiodbc
-# brew install cmake
-# brew install openssl
-# brew install boost
-# brew install mongo-cxx-driver
