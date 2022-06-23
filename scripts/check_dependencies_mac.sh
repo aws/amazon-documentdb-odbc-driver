@@ -19,10 +19,9 @@ do
     echo "${req_apps[i]} is not installed."
     missing_formula=1
   fi
-  echo ${req_apps[i]} # -AL- TRACE remove later
 done
 
-# -AL- TRACE, remove later
+# -AL- TRACE message, to be removed later
 echo ${apps_installed[*]}
 
 for (( i=0 ; i<$num_apps ; i++ )); 
