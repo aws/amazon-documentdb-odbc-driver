@@ -108,6 +108,7 @@ Example:
    6. `brew install mongo-cxx-driver`
    7. Install Java **JDK** (version 8+ - 17 recommended)  
       - This can be done through Homebrew using `brew install --cask temurin<version>`. 
+      - If the above command fails with `No Cask with this name exists`, run `brew tap homebrew/cask-versions` first and try it again.
       - Ensure to set `JAVA_HOME`. Make sure it is set to temurin. Other JDK package may cause test errors 
       such as `Unable to get initialized JVM` at run time.  
       Example: /Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home
