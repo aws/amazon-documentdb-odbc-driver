@@ -1,56 +1,32 @@
+# script to check if formulas in req_apps are installed. 
 
-if brew ls --versions libiodbc > /dev/null; then
-  # libiodbc is installed
-  echo "libiodbc is installed"
-else
-  # libiodbcis not installed
-  echo "libiodbc is not installed."
-  $libiodbc_installed=0
-fi
-
-s=("football" "cricket" "hockey" "libiodbc") 
-num_apps=${#s[@]}
+req_apps=("libiodbc" "cmake" "openssl" "boost" "mongo-cxx-driver") 
+num_apps=${#req_apps[@]}
 apps_installed=()
 
 for (( i=0 ; i<$num_apps ; i++ )); 
 do
-  echo $i
+  echo $i # -AL- TRACE remove later
   apps_installed+=(0)
-  if brew ls --versions ${s[i]} > /dev/null; then
-    # $${s[i]} is installed via brew
-    echo "${s[i]} is installed."
+  if brew ls --versions ${req_apps[i]} > /dev/null; then
+    # ${req_apps[i]} is installed via brew
+    echo "${req_apps[i]} is installed."
     apps_installed[i]=1
   else
-    # $${s[i]} not installed via brew
-    echo "${s[i]} is not installed."
-    # $n_installed=0
+    # ${req_apps[i]} not installed via brew
+    echo "${req_apps[i]} is not installed."
   fi
-  echo $n
+  echo ${req_apps[i]} # -AL- TRACE remove later
 done
 
-# -AL- TRACE
+# -AL- TRACE, remove later
 echo ${apps_installed[*]}
-
-# for n in ${s[@]}; 
-# do
-#   if brew ls --versions $n > /dev/null; then
-#     # $n is installed via brew
-#     echo "$n is installed."
-#     apps_installed[i]=1
-#   else
-#     # $n not installed via brew
-#     echo "$n is not installed."
-#     # $n_installed=0
-#   fi
-#   echo $n
-# done
 
 for (( i=0 ; i<$num_apps ; i++ )); 
 do
   if [[ "${apps_installed[i]}" -eq "0" ]]; then
-    echo  "${s[i]} is not installed."
+    echo  "${req_apps[i]} is not installed."
   else
-    echo  "${s[i]} is installed."
+    echo  "${req_apps[i]} is installed."
   fi
-
 done
