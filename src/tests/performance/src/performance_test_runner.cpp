@@ -406,6 +406,8 @@ void performance::PerformanceTestRunner::RecordExecBindFetch(
   SQLROWSETSIZE row_count;
   long long time_exec_ms;
   long long time_bind_fetch_ms;
+  long long time_bind_ms;
+  long long time_fetch_ms;
   std::vector< Col > cols;
 
   // Query
@@ -450,7 +452,7 @@ void performance::PerformanceTestRunner::RecordExecBindFetch(
     }
 
     // Bind and fetch and record time
-    auto time_bind_fetch_start = std::chrono::steady_clock::now();
+    auto time_bind_start = std::chrono::steady_clock::now();
     for (size_t i = 0; i < static_cast< size_t >(total_columns); i++) {
       ret = SQLBindCol(*hstmt, static_cast< SQLUSMALLINT >(i + 1), SQL_C_CHAR,
                        static_cast< SQLPOINTER >(&cols[i].data_dat[0]),
@@ -462,18 +464,28 @@ void performance::PerformanceTestRunner::RecordExecBindFetch(
         return;  // continue to next test case
       }
     }
+    auto time_bind_end = std::chrono::steady_clock::now();
 
+    auto time_fetch_start = std::chrono::steady_clock::now();
     while (SQLFetch(*hstmt) == SQL_SUCCESS) {
       row_count++;
     }
-
-    auto time_bind_fetch_end = std::chrono::steady_clock::now();
+    auto time_fetch_end = std::chrono::steady_clock::now();
 
     // Store bind and fetch time
-    time_bind_fetch_ms =
-        std::chrono::duration_cast< std::chrono::milliseconds >(
-            time_bind_fetch_end - time_bind_fetch_start)
-            .count();
+    time_bind_ms = std::chrono::duration_cast< std::chrono::milliseconds >(
+                       time_bind_end - time_bind_start)
+                       .count();
+    test_case.time_bind_ms.push_back(time_bind_ms);
+
+    // Store bind and fetch time
+    time_fetch_ms = std::chrono::duration_cast< std::chrono::milliseconds >(
+                        time_fetch_end - time_fetch_start)
+                        .count();
+    test_case.time_fetch_ms.push_back(time_fetch_ms);
+
+    // Store bind and fetch time
+    time_bind_fetch_ms = time_bind_ms + time_fetch_ms;
     test_case.time_bind_fetch_ms.push_back(time_bind_fetch_ms);
 
     test_case.time_ms.push_back(time_exec_ms + time_bind_fetch_ms);
@@ -644,6 +656,22 @@ void performance::PerformanceTestRunner::ReportTime(const TestCase& test_case) {
       if (i != (test_case.time_exec_ms.size() - 1))
         std::cout << ", ";
     }
+    std::cout << "\n\n";
+
+    std::cout << "SQLBindCol time dump: ";
+    for (size_t i = 0; i < test_case.time_bind_ms.size(); i++) {
+      std::cout << test_case.time_bind_ms[i] << " ms";
+      if (i != (test_case.time_bind_ms.size() - 1))
+        std::cout << ", ";
+    }
+    std::cout << "\n\n";
+    std::cout << "SQLFetch time dump: ";
+    for (size_t i = 0; i < test_case.time_fetch_ms.size(); i++) {
+      std::cout << test_case.time_fetch_ms[i] << " ms";
+      if (i != (test_case.time_fetch_ms.size() - 1))
+        std::cout << ", ";
+    }
+
     std::cout << "\n\n";
 
   } else if (_output_mode == 2) {
@@ -980,6 +1008,11 @@ void performance::PerformanceTestRunner::RunPerformanceTestPlan() {
       test_case.query.clear();
       test_case.test_name.clear();
       test_case.time_ms.clear();
+
+      test_case.time_exec_ms.clear();
+      test_case.time_bind_fetch_ms.clear();
+      test_case.time_bind_ms.clear();
+      test_case.time_fetch_ms.clear();
 
       // Deallocate Statement Handle
       if (SQL_NULL_HSTMT != _hstmt) {
