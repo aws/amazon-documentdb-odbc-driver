@@ -2,8 +2,8 @@
 CURRENT_DIR=$(pwd)
 
 #find correct path to java_home_path
-java_home_path="/Library/Java/JavaVirtualMachines/temurin-18.jdk/Contents/Home" 
-#java_home_path="/path/to/java/home"
+#java_home_path="/Library/Java/JavaVirtualMachines/temurin-18.jdk/Contents/Home" 
+java_home_path="/path/to/java/home"
 java_server_path="$java_home_path/lib/server/"
 java_bin_path="$java_home_path/bin"
 set_java_home="export JAVA_HOME=\"$java_home_path\""
@@ -34,37 +34,48 @@ while IFS= read -r line || [ -n "$line" ]; do
     #Reading each line  
     echo "Line No. $i : $line"
 
-    # first alternative
-    # if (java home has not been not set and line is setting java home)
-    #     set java home by modifying line
+    # check if line is a comment. 
+    if [[ ! "$line" =~ ^[[:space:]]*\#.* ]]; then
+        echo "TRACE - this line is not a comment, proceeding"
 
-    # append line to new_zshrc
 
-    # second alternative
+        # check that the line exports JAVA_HOME and is not a comment
 
-    # check that the line exports JAVA_HOME and is not a comment
+        #todo Fix required here, see below
+        # note: this check would think "export JAVA_HOME="xxxx" # export JAVA_HOME" sets JAVA_HOME but is a comment
+        if [[ "$line" =~ "#.*export JAVA_HOME=" ]] || [[ "$line" =~ "#export JAVA_HOME=" ]]; then
+        # if [[ "$line" =~ \#.*export\ JAVA_HOME\= ]] || [[ "$line" =~ \#export\ JAVA_HOME\= ]]; then
+        #if [[ "$line" =~ "^[[:space:]]*#.*export JAVA_HOME=" ]] || [[ "$line" =~ "^[[:space:]]*#export JAVA_HOME=" ]]; then
+            echo "DUMB if statement: this line sets JAVA_HOME but is a comment"
+        fi
 
-    #todo Fix required here, see below
-    # note: this check would think "export JAVA_HOME="xxxx" # export JAVA_HOME" sets JAVA_HOME but is a comment
-    if [[ "$line" =~ "#.*export JAVA_HOME=" ]] || [[ "$line" =~ "#export JAVA_HOME=" ]]; then
-    #if [[ "$line" =~ "^[[:space:]]*#.*export JAVA_HOME=" ]] || [[ "$line" =~ "^[[:space:]]*#export JAVA_HOME=" ]]; then
-        echo "this line sets JAVA_HOME but is a comment"
+        # if [[ "$line" =~ "export JAVA_HOME=" ]] && ! [[ "$line" =~ "^[[:space:]]*#.*export JAVA_HOME=" ]] && ! [[ "$line" =~ "^[[:space:]]*#export JAVA_HOME=" ]]; then
+        if [[ "${java_home_set}" == "0"  ]] && [[ "$line" =~ "export JAVA_HOME=" ]] && [[ ! "$line" =~ "^[[:space:]]*#.*export JAVA_HOME=" ]] && [[ ! "$line" =~ "^[[:space:]]*#export JAVA_HOME=" ]]; then
+        #if [[ "${java_home_set}" == "0"  ]] && [[ "$line" =~ "export JAVA_HOME=" ]] && [[ ! "$line" =~ "#.*export JAVA_HOME=" ]] && [[ ! "$line" =~ "#export JAVA_HOME=" ]]; then
+            # modify this line before writing to new_zshrc
+
+            # removes instances of export JAVA_HOME="anything", only if there is no # symbol before that expression in the entore string
+            line=$(echo $line | sed -e '/\#/!s/export JAVA_HOME=\".*\"//g')
+
+            # removes all reference of export and comments would be deleted too
+            # line=$(echo $line | sed -e 's/export JAVA_HOME=\".*\"//g')
+            line=$(echo $line | sed -e 's/export JAVA_HOME=\".*?\"//g')
+            #line=$(echo $line | sed -e 's/export JAVA_HOME=\"\[^\"]*\"//g')
+
+            # try negative look-ahead
+            # line=$(echo $line | sed -e 's/(?!(^#export JAVA_HOME=))(export JAVA_HOME=\".*\")//g')
+
+            # uses look behind does not work
+            #line=$(echo $line | sed -e 's/(?<!(^[[:space:]]*\#.*))(export JAVA_HOME=\".*?\")//g')
+        #  line=$(echo $line | sed -e 's/(?!\#[[:space:]]*)export JAVA_HOME=\".*\"//g')
+
+
+            echo "this line is setting JAVA_HOME"
+            echo "modified line: $line"
+            change_zshrc=1
+        fi
+
     fi
-
-    # if [[ "$line" =~ "export JAVA_HOME=" ]] && ! [[ "$line" =~ "^[[:space:]]*#.*export JAVA_HOME=" ]] && ! [[ "$line" =~ "^[[:space:]]*#export JAVA_HOME=" ]]; then
-    if [[ "${java_home_set}" == "0"  ]] && [[ "$line" =~ "export JAVA_HOME=" ]] && ! [[ "$line" =~ "#.*export JAVA_HOME=" ]] && ! [[ "$line" =~ "#export JAVA_HOME=" ]]; then
-        # modify this line before writing to new_zshrc
-
-        # removes instances of export JAVA_HOME="anything", only if there is no # symbol before that expression in the entore string
-        line=$(echo $line | sed -e '/\#/!s/export JAVA_HOME=\".*\"//g')
-      #  line=$(echo $line | sed -e 's/(?!\#[[:space:]]*)export JAVA_HOME=\".*\"//g')
-
-
-        echo "this line is setting JAVA_HOME"
-        echo "modified line: $line"
-        change_zshrc=1
-    fi
-
 
     # remove duplicate of $set_path
     # but this is not needed. We just need to make sure we export the path when we don't have it -AL-
