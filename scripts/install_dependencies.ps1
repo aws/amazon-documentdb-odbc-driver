@@ -1,4 +1,4 @@
-
+birschick-bq/ad-781/dev-setup
 $scriptPath = Split-Path -parent $PSCommandPath
 $projectPath = Split-Path -parent $scriptPath
 
@@ -10,20 +10,20 @@ Write-Output "Checking for dependency JDK"
 $jdkFound = $false
 if ( -not ([string]::IsNullOrEmpty($Env:JAVA_HOME)) `
 	-and (Test-Path -Path $Env:JAVA_HOME) `
-	-and (Test-Path -Path ${Env:JAVA_HOME}/include) ) {
+	-and (Test-Path -Path "${Env:JAVA_HOME}\include") ) {
 
 	# Test Java in path and has minimum version
 	$regex = "\d+[.]\d+[.]\d+"
 	$javaVersionString = $(java --version)
 	$javaVersion = $($javaVersionString | Select-String -Pattern $regex | % { $_.Matches } | % { $_.Value } | Get-Unique -AsString)
-	$regexDigit = "^\d+"
+	$regexDigit = "\d+"
 	$javaVersionArray = $($javaVersion | Select-String -Pattern $regexDigit -AllMatches | % { $_.Matches } | % { $_.Value } )
 	if ( ($javaVersionArray.Count -ge 1) -and -not ([string]::IsNullOrEmpty($javaVersionArray[0])) ) {
 		if ( "1" -eq $javaVersionArray[0] -and -not ([string]::IsNullOrEmpty($javaVersionArray[1])) ) {
 			if ( $javaVersionArray[1] -eq "8" -or $javaVersionArray[1] -eq "9" ) {
 				$jdkFound = $true
 			}
-		} else if ( $javaVersionArray[0] -ge "10") {
+		} elseif ( $javaVersionArray[0] -ge "10") {
 			$jdkFound = $true
 		}
 	}
@@ -62,27 +62,27 @@ Write-Output "Checking for dependency JDK complete"
 
 
 # VCPKG (Windows)
-if ( -not ([string]::IsNullOrEmpty($Env:VCPKG_ROOT)) ) {
+if ( [string]::IsNullOrEmpty($Env:VCPKG_ROOT) ) {
 	$Env:VCPKG_ROOT = "c:/vcpkg"
 }
 if ( -not ((Test-Path -Path $Env:VCPKG_ROOT)) ) {
-	New-Item $Env:VCPKG_ROOT -ItemType Directory
+	New-Item $Env:VCPKG_ROOT -ItemType Directory -Force
 	cd $Env:VCPKG_ROOT
 	git clone https://github.com/Bit-Quill/amazon-documentdb-odbc-driver-mirror.git
 	./vcpkg integrate install
 } else {
 	cd $Env:VCPKG_ROOT
 	git pull
-	./vcpkg integrate install
+	.\vcpkg.exe integrate install
 }
 
 # OpenSSL
 cd $Env:VCPKG_ROOT
-./vcpkg install openssl:x64-windows
+.\vcpkg.exe install openssl:x64-windows
 
 # Boost SDK
 cd $Env:VCPKG_ROOT
-./vcpkg install `
+.\vcpkg.exe install `
 	boost-test:x64-windows `
 	boost-asio:x64-windows `
 	boost-chrono:x64-windows `
@@ -93,9 +93,10 @@ cd $Env:VCPKG_ROOT
 
 # Mongo SDK
 cd $Env:VCPKG_ROOT
-./vcpkg install mongo-cxx-driver:x64-windows
+.\vcpkg.exe install mongo-cxx-driver:x64-windows
 
 # Mongo Server
+cd $projectPath
 ./src/odbc-test/scripts/reinstall_mongodb.ps1
 
 # WIX (Windows)
