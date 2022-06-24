@@ -41,5 +41,5 @@ cd $CURRENT_DIR
 if [[ ${updated} -eq "0" ]]; then
     echo "JAVA_HOME, JAVA bin path, and JAVA server path are set properly. No changes made to ~/$env_var_file"
 else
-    echo "~/$env_var_file has been updated to set environment variables properly"
+    echo "~/$env_var_file has been updated to set environment variables properly. Please restart your terminal to load the variables"
 fi
