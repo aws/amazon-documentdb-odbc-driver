@@ -26,6 +26,10 @@ find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
 include(UseJava)
 
+if (${CODE_COVERAGE}) 
+    add_code_coverage()    
+endif()
+
 include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS} ${BSONCXX_INCLUDE_DIRS})
 include_directories(include)
 
