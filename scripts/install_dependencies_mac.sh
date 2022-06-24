@@ -49,9 +49,7 @@ if [[ "${java_not_installed}" -eq "1" ]]; then
     brew tap homebrew/cask-versions
     brew install --cask $java_ver
 
-    # set temporary variables
-    # -AL- but we want them to be permanent 
-    # value=$(<~/.zshrc) # gets current value from zshrc
-    export JAVA_HOME="/Library/Java/JavaVirtualMachines/temurin-18.jdk/Contents/Home"
-    export PATH="$JAVA_HOME/lib/server/:$JAVA_HOME/bin:$PATH"
+    # set JAVA_HOME and save JAVA /bin and JAVA /server paths to $PATH
+    chmod +x $SCRIPT_DIR/set_java_def_mac.sh
+    source $SCRIPT_DIR/set_java_def_mac.sh
 fi
