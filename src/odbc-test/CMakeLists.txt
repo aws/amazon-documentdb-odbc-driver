@@ -197,7 +197,9 @@ add_executable(${TARGET} ${SOURCES})
 
 target_link_libraries(${TARGET} ${ODBC_LIBRARIES})
 target_link_libraries(${TARGET} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} mongo::mongocxx_shared ${JNI_LIBRARIES})
-target_code_coverage(${TARGET}  PUBLIC AUTO ALL)
+if (${CODE_COVERAGE}) 
+    target_code_coverage(${TARGET} AUTO)
+endif()
 
 add_definitions(-DUNICODE=1)
 if (WIN32)
