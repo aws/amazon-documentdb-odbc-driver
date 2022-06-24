@@ -66,8 +66,13 @@ fi
 
 echo "writing new lines to ${env_var_file}"
 
-echo 'export JAVA_HOME="$JAVA_HOME"' >> $env_var_file
-echo 'export PATH="$JAVA_HOME/lib/server/:$JAVA_HOME/bin:$PATH"' >> $env_var_file
+set_java_home="export JAVA_HOME=\"$JAVA_HOME\""
+set_path="export PATH=\"$JAVA_HOME/lib/server/:$JAVA_HOME/bin:\$PATH"
+echo "$set_java_home" >> $env_var_file
+echo "$set_path" >> $env_var_file
+
+# echo 'export JAVA_HOME="${JAVA_HOME}"' >> $env_var_file
+# echo 'export PATH="${JAVA_HOME}/lib/server/:${JAVA_HOME}/bin:$PATH"' >> $env_var_file
 
 # to append lines in zshrc (instead of re-writing the file):
 # echo -n '\nactual new line in zshrc with no extra space' >> ~/.zshrc
