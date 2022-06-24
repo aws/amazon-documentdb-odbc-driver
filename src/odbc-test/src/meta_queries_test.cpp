@@ -19,12 +19,6 @@
 #include <Windows.h>
 #endif
 
-#ifdef __APPLE__
-constexpr auto FUNCTION_SEQUENCE_ERROR_STATE = "S1010";
-#else
-constexpr auto FUNCTION_SEQUENCE_ERROR_STATE = "24000";
-#endif
-
 #include <sql.h>
 #include <sqlext.h>
 
