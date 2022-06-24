@@ -25,7 +25,9 @@ while IFS= read -r line || [ -n "$line" ]; do
     # append line to new_zshrc
 
     # second alternative
-    if [[ "$line" =~ "export JAVA_HOME=" ]]; then
+
+    # check that the line exports JAVA_HOME and is not a comment
+    if [[ "$line" =~ "export JAVA_HOME=" ]] && [[ ! "$line" =~ "#.*export JAVA_HOME=" ]]; then
         # do not write this line to new_zshrc
 
         # note: can split line by spaces and just skip the java home line
@@ -36,7 +38,9 @@ while IFS= read -r line || [ -n "$line" ]; do
         change_zshrc=1
     fi
 
-    if (line not whitespce) then
+    # if line is not white space
+    if [[ $line =~ [^[:space:]] ]]; then
+        echo "line is not whitespace"
         # write this line to new_zshrc
         new_zshrc="$new_zshrc\n$line"
     fi
@@ -62,7 +66,7 @@ fi
 
 echo "writing new lines to ${env_var_file}"
 
-echo '\nexport JAVA_HOME="$JAVA_HOME"' >> $env_var_file
+echo 'export JAVA_HOME="$JAVA_HOME"' >> $env_var_file
 echo 'export PATH="$JAVA_HOME/lib/server/:$JAVA_HOME/bin:$PATH"' >> $env_var_file
 
 # to append lines in zshrc (instead of re-writing the file):
