@@ -207,7 +207,8 @@ class Connection : public diagnostic::DiagnosableAdapter {
    */
   template < typename ReqT, typename RspT >
   void SyncMessage(const ReqT& req, RspT& rsp) {
-    // TODO: Remove when unnecessary.
+    // TODO: Should be needed for TimeStream though not
+    // for DocumentDB
   }
 
   /**

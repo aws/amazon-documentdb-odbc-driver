@@ -237,6 +237,7 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
     const std::basic_string< InCharT >& value, int32_t& written) {
   written = 0;
 
+  SqlLen inCharSize = static_cast< SqlLen >(sizeof(InCharT));
   SqlLen outCharSize = static_cast< SqlLen >(sizeof(OutCharT));
 
   SqlLen* resLenPtr = GetResLen();
@@ -250,7 +251,7 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
 
   size_t lenWrittenOrRequired = 0;
   bool isTruncated = false;
-  if (sizeof(InCharT) == 1) {
+  if (inCharSize == 1) {
     if (outCharSize == 2 || outCharSize == 4) {
       lenWrittenOrRequired = utility::CopyUtf8StringToSqlWcharString(
           reinterpret_cast< const char* >(value.c_str()),
@@ -259,9 +260,14 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
       lenWrittenOrRequired = utility::CopyUtf8StringToSqlCharString(
           reinterpret_cast< const char* >(value.c_str()),
           reinterpret_cast< SQLCHAR* >(dataPtr), buflen, isTruncated);
+    } else {
+      LOG_ERROR_MSG("Unexpected conversion from UTF8 string.");
+      assert(false);
     }
   } else {
-    LOG_ERROR_MSG("Unexpected conversion from UCS2 string.");
+    LOG_ERROR_MSG(
+        "Unexpected conversion from unknown type string, char size is "
+        << inCharSize);
     assert(false);
   }
 
