@@ -19,12 +19,3 @@ do
     missing_formula=1
   fi
 done
-
-for (( i=0 ; i<$num_apps ; i++ )); 
-do
-  if [[ "${apps_installed[i]}" -eq "0" ]]; then
-    echo  "${req_apps[i]} is not installed."
-  else
-    echo  "${req_apps[i]} is installed."
-  fi
-done
