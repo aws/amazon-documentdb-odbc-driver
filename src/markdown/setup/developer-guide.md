@@ -98,7 +98,7 @@ Example:
 
 ## MacOS
 
-1. Install dependencies
+1. Install dependencies by running `./script/install_dependencies_mac.sh`. Or you can do it manually with commands below.
    1. `brew install cmake`
    2. `brew install openssl`
    3. `brew install libiodbc`  
