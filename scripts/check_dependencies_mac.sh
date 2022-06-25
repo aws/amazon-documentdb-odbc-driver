@@ -8,7 +8,6 @@ apps_installed=()
 
 for (( i=0 ; i<$num_apps ; i++ )); 
 do
-  echo $i # -AL- TRACE remove later
   apps_installed+=(0)
   if brew ls --versions ${req_apps[i]} > /dev/null; then
     # ${req_apps[i]} is installed via brew
@@ -20,9 +19,6 @@ do
     missing_formula=1
   fi
 done
-
-# -AL- TRACE message, to be removed later
-echo ${apps_installed[*]}
 
 for (( i=0 ; i<$num_apps ; i++ )); 
 do

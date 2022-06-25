@@ -1,7 +1,5 @@
 # this script installs all required dependencies on Mac and sets the appropriate vars
 
-# TODO -AL-: may need to write to zshrc file for permanent vars storing
-
 # get the current script directory
 PROJECT_DIR=$(pwd)
 SCRIPT_DIR="$PROJECT_DIR/scripts"
@@ -11,8 +9,6 @@ brew tap homebrew/services
 
 # unlink unix ODBC driver manager
 brew unlink unixodbc
-
-echo "TRACE calling check_dependencies_mac.sh"
 
 # check if dependnecies are installed
 
@@ -26,10 +22,6 @@ chmod +x $SCRIPT_DIR/check_dependencies_mac.sh
 source $SCRIPT_DIR/check_dependencies_mac.sh
 # num_apps, apps_installed and req_apps are variables from check_dependencies_mac.sh
 
-# -AL- TRACE messages, to be removed later
-echo "TRACE - apps_installed: ${apps_installed[*]}"
-echo "TRACE - req_apps: ${req_apps[*]}"
-
 if [[ "${missing_formula}" -eq "0" ]]; then
     echo "All required dependencies are installed"
 else
@@ -42,8 +34,6 @@ else
     fi
     done
 fi
-
-echo "TRACE calling check_java_dependency_mac.sh"
 
 # check if java dependency is installed
 chmod +x $SCRIPT_DIR/check_java_dependency_mac.sh
