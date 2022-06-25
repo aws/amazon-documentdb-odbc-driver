@@ -53,3 +53,7 @@ if [[ "${java_not_installed}" -eq "1" ]]; then
     chmod +x $SCRIPT_DIR/set_java_def_mac.sh
     source $SCRIPT_DIR/set_java_def_mac.sh
 fi
+
+# add llvm to path
+chmod +x $SCRIPT_DIR/set_llvm_mac.sh
+source $SCRIPT_DIR/set_llvm_mac.sh
