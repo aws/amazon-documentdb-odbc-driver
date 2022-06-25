@@ -15,6 +15,13 @@ brew unlink unixodbc
 echo "TRACE calling check_dependencies_mac.sh"
 
 # check if dependnecies are installed
+
+# check if user is under the DocDB ODBC repository
+if [[ ! -f "$SCRIPT_DIR/check_dependencies_mac.sh" ]]; then
+    echo "Cannot find file $SCRIPT_DIR/check_dependencies_mac.sh, please check that you're under the DocumentDB ODBC repository before executing this script"
+    exit 1
+fi
+
 chmod +x $SCRIPT_DIR/check_dependencies_mac.sh
 source $SCRIPT_DIR/check_dependencies_mac.sh
 # num_apps, apps_installed and req_apps are variables from check_dependencies_mac.sh
