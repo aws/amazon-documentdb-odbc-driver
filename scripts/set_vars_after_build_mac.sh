@@ -13,13 +13,13 @@ updated=0
 
 if [[ ! -d "${docdb_home}" ]]
 then
-    echo "cannot find directory \"${docdb_home}\", please check that you're under the DocumentDB ODBC repository before executing this script and that a build script has run successfully."
+    echo "Cannot find directory \"${docdb_home}\", please check that you're under the DocumentDB ODBC repository before executing this script and that a build script has run successfully."
     exit 1
 fi
 
 if [[ ! -f "${odbc_instini}" ]]
 then
-    echo "cannot find file \"${odbc_instini}\", please check that you're under the DocumentDB ODBC repository before executing this script and that a build script has been run successfully."
+    echo "Cannot find file \"${odbc_instini}\", please check that you're under the DocumentDB ODBC repository before executing this script and that a build script has been run successfully."
     exit 1
 fi
 
@@ -42,7 +42,7 @@ fi
 cd $PROJECT_DIR
 
 if [[ ${updated} -eq "0" ]]; then
-    echo "DOCUMENTDB_HOME and ODBCINSTINI are set properly. No changes made to ~/$env_var_file"
+    echo "DOCUMENTDB_HOME and ODBCINSTINI are set properly. No new changes made to ~/$env_var_file"
 else
     echo "~/$env_var_file has been updated to set environment variables properly. Please restart your terminal to load the variables"
 fi

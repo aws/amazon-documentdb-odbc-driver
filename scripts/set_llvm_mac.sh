@@ -2,10 +2,8 @@
 PROJECT_DIR=$(pwd)
 
 #find correct path to java_home_path
-#llvm_path="/fake/PATH/TO/LLVM"
 llvm_path="/Library/Developer/CommandLineTools/usr/bin/"
 set_llvm_path="export PATH=\"$llvm_path:\$PATH\""
-#llvm_app_path="/fake/PATH/TO/LLVM/APP/Dir"
 llvm_app_path"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/"
 set_llvm_app_path="export PATH=\"$llvm_app_path:\$PATH\""
 
@@ -38,9 +36,9 @@ fi
 cd $PROJECT_DIR
 
 if [[ ${no_llvm_found} -eq "1" ]]; then
-    echo "No llvm found on your machine. No updates has been made to ~/$env_var_file"
+    echo "No llvm found on your machine. No new updates has been made to ~/$env_var_file"
 elif [[ ${updated} -eq "0" ]]; then
-    echo "PATH includes at least 1 path to llvm. No changes made to ~/$env_var_file"
+    echo "PATH includes at least 1 path to llvm. No new changes made to ~/$env_var_file"
 else
     echo "~/$env_var_file has been updated to include llvm in your \$PATH. Please restart your terminal to load the system path"
 fi

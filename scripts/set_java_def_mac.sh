@@ -56,7 +56,7 @@ cd $CURRENT_DIR
 if [[ ${dir_not_found} -eq "1" ]]; then
     echo "One or more JAVA directories not found. Please make sure JAVA_HOME, JAVA bin path, and JAVA server path are set properly manually."
 elif [[ ${updated} -eq "0" ]]; then
-    echo "JAVA_HOME, JAVA bin path, and JAVA server path are set properly. No changes made to ~/$env_var_file"
+    echo "JAVA_HOME, JAVA bin path, and JAVA server path are set properly. No new changes made to ~/$env_var_file"
 else
     echo "~/$env_var_file has been updated to set environment variables properly. Please restart your terminal to load the variables"
 fi
