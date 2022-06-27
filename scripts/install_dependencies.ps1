@@ -74,13 +74,6 @@ function Confirm-CmakeExists {
 
 # ODBC SDK
 
-function Get-IsJdkInstalled {
-	[OutputType([Boolean])]
-	Param()
-
-	
-}
-
 function Confirm-JavaJdk {
 	[OutputType([Boolean])]
 	param ()
@@ -88,6 +81,7 @@ function Confirm-JavaJdk {
 	# Java SDK
 	Write-Host "Checking for dependency JDK"
 	$jdkFound = $false
+	# Checks that JAVA_HOME is define, path exists and is a JDK (i.e., include subdirectory)
 	if ( -not ([string]::IsNullOrEmpty($Env:JAVA_HOME)) `
 		-and (Test-Path -Path $Env:JAVA_HOME) `
 		-and (Test-Path -Path "${Env:JAVA_HOME}\include") ) {
@@ -106,12 +100,16 @@ function Confirm-JavaJdk {
 				$jdkFound = $true
 			}
 		}
+		if ( $jdkFound ) {
+			Set-JdkPath
+		}
 	}
 
 	return $jdkFound
 }
 
 function Install-JavaJdk {
+	[OutputType([Boolean])]
 	param ()
 	
 	Write-Host "Installing Java JDK"
@@ -142,22 +140,7 @@ function Install-JavaJdk {
 		}
 
 		# Update PATH for bin (java.exe) and server (jvm.dll)
-		$javaFile = Get-ChildItem -Path $Env:JAVA_HOME -Recurse -Filter "java.exe"
-		$binPath = $javaFile.Directory
-		$jvmFile = Get-ChildItem -Path $Env:JAVA_HOME -Recurse -Filter "jvm.dll"
-		$jvmPath = $jvmFile.Directory
-		$paths = $Env:Path.Split(";")
-		if ( -not $paths.Contains($jvmPath) ) {
-			$Env:Path = "${jvmPath};${Env:Path}"
-		}
-		$paths = $Env:Path.Split(";")
-		if ( -not $paths.Contains($binPath) ) {
-			$Env:Path = "${binPath};${Env:Path}"
-		}
-
-		# permanently set an environment variable for user...
-		[System.Environment]::SetEnvironmentVariable('JAVA_HOME', $Env:JAVA_HOME, [System.EnvironmentVariableTarget]::User)
-		[System.Environment]::SetEnvironmentVariable('PATH', $Env:Path, [System.EnvironmentVariableTarget]::User)
+		Set-JdkPath
 	}
 	catch {
 		Write-Host "Error installing Java JDK."
@@ -171,6 +154,36 @@ function Install-JavaJdk {
 	}
 	Write-Host "Finished installing Java JDK"
 	return $true
+}
+
+function Set-JdkPath {
+	[OutputType([Boolean])]
+	param ()
+
+	$updatePath = $false
+
+	# Update PATH for bin (java.exe) and server (jvm.dll)
+	$javaFile = Get-ChildItem -Path $Env:JAVA_HOME -Recurse -Filter "java.exe"
+	$binPath = $javaFile.Directory
+	$jvmFile = Get-ChildItem -Path $Env:JAVA_HOME -Recurse -Filter "jvm.dll"
+	$jvmPath = $jvmFile.Directory
+
+	$paths = $Env:Path.Split(";")
+	if ( -not $paths.Contains($jvmPath) ) {
+		$Env:Path = "${jvmPath};${Env:Path}"
+		$updatePath = $true
+	}
+	$paths = $Env:Path.Split(";")
+	if ( -not $paths.Contains($binPath) ) {
+		$Env:Path = "${binPath};${Env:Path}"
+		$updatePath = $true
+	}
+
+	# permanently set an environment variable for user...
+	[System.Environment]::SetEnvironmentVariable('JAVA_HOME', $Env:JAVA_HOME, [System.EnvironmentVariableTarget]::User)
+	if ( $updatePath ) {
+		[System.Environment]::SetEnvironmentVariable('PATH', $Env:Path, [System.EnvironmentVariableTarget]::User)
+	}
 }
 
 function Install-Vcpkg {
@@ -231,7 +244,13 @@ function Install-MongoDb {
 	return $true
 }
 
-# WIX (Windows)
+function Install-WixToolset {
+	[OutputType([Boolean])]
+	Param()
+
+	choco upgrade wixtoolset -y
+	return $true
+}
 
 if ( -not $(Confirm-PowerShellVersion) ) {
 	exit 1
@@ -260,6 +279,10 @@ if ( -not $(Install-Vcpkg) ) {
 }
 
 if ( -not $(Install-VcpkgPackages) ) {
+	exit 1
+}
+
+if ( -not $(Install-WixToolset) ) {
 	exit 1
 }
 
