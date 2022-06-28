@@ -200,7 +200,7 @@ if (WIN32)
         target_link_libraries(${TARGET} legacy_stdio_definitions)
     endif()
                 
-    set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME "ignite.odbc")
+    set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME "documentdb.odbc")
 else()
     target_link_libraries(${TARGET})
 endif()
