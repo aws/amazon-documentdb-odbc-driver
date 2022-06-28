@@ -1,4 +1,19 @@
-
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 
 $powerShellVersion = $PSVersionTable.PSVersion.Major
 $scriptPath = Split-Path -parent $PSCommandPath
@@ -17,27 +32,86 @@ function Confirm-PowerShellVersion {
 		Write-Host "PowerShell version must be version 7 or greater. Found version: $powerShellVersion"
 		return $false
 	}
-	Write-Host "PowerShell version: $powerShellVersion"
 	return $true
 }
 
 function Confirm-RunAsAdministrator {
 	[OutputType([Boolean])]
-	Param($myCommandPath)
+	Param()
 
 	$currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 	if ( -not ($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator) ) ) {
-		Write-Host "Must be running PowerShell as administrator. Attempting to restart script in elevated PowerShell."
-		# Self-elevate the script if required
-		if ([int](Get-CimInstance -Class Win32_OperatingSystem | Select-Object -ExpandProperty BuildNumber) -ge 6000) {
-			$CommandLine = "-File `"" + $myCommandPath + "`" " + $MyInvocation.UnboundArguments
-			Start-Process -Wait -FilePath pwsh.exe -Verb Runas -ArgumentList "-noe $CommandLine"
-			exit 0
-		}
 		return $false
 	}
 	Write-Host "Running as administrator."
 	return $true
+}
+
+function Invoke-RunAsAdministrator {
+	[OutputType([Boolean])]
+	Param(
+		[Parameter(Mandatory=$true, ValueFromPipeline=$false)]
+		[string]$CommandPath,
+		[Parameter(Mandatory=$false, ValueFromPipeline=$false)]
+		[string]$Arguments,
+		[switch]$Wait
+	)
+
+	if ( -not $(Confirm-PowerShellVersion) ){
+		return $false
+	}
+
+	if ( -not $(Confirm-RunAsAdministrator) ) {
+		# Elevate the command
+		if ([int](Get-CimInstance -Class Win32_OperatingSystem | Select-Object -ExpandProperty BuildNumber) -ge 6000) {
+			Write-Host "Starting command `"$CommandPath`" in new elevated process."
+			if ($Wait) {
+				Start-Process -Wait -FilePath $CommandPath -Verb Runas -ArgumentList "$Arguments"
+			} 
+			else {
+				Start-Process -FilePath $CommandPath -Verb Runas -ArgumentList "$Arguments"
+			}
+			return $true
+		}
+	}
+	else {
+		
+	}
+
+	return $false
+}
+
+function Invoke-ScriptRunAsAdministrator {
+	[OutputType([Boolean])]
+	Param(
+		[Parameter(Mandatory=$true, ValueFromPipeline=$false)]
+		[string]$CommandPath,
+		[Parameter(Mandatory=$false, ValueFromPipeline=$false)]
+		[string]$Arguments,
+		[switch]$Wait,
+		[switch]$NoExit
+	)
+
+	if ( -not $(Confirm-PowerShellVersion) ){
+		return $false
+	}
+
+	# Self-elevate the script if required
+	if ([int](Get-CimInstance -Class Win32_OperatingSystem | Select-Object -ExpandProperty BuildNumber) -ge 6000) {
+		$CommandArguments = "-File `"" + $CommandPath + "`" " + $Arguments
+		if ($NoExit) {
+			$CommandArguments = "-noe $CommandArguments"
+		}
+		if ($Wait) {
+			Invoke-RunAsAdministrator -Wait "pwsh.exe" $CommandArguments
+		} 
+		else {
+			Invoke-RunAsAdministrator -Wait $CommandArguments
+		}
+		return $true
+	}
+
+	return $false
 }
 
 function Enable-VsDevShell {
@@ -88,20 +162,25 @@ function Confirm-JavaJdk {
 
 		# Test Java in path and has minimum version
 		$regex = "\d+[.]\d+[.]\d+"
-		$javaVersionString = $(java --version)
-		$javaVersion = $($javaVersionString | Select-String -Pattern $regex | ForEach-Object { $_.Matches } | ForEach-Object { $_.Value } | Get-Unique -AsString)
-		$javaVersionArray = $javaVersion.Split(".")
-		if ( ($javaVersionArray.Count -ge 1) -and -not ([string]::IsNullOrEmpty($javaVersionArray[0])) ) {
-			if ( "1" -eq $javaVersionArray[0] -and -not ([string]::IsNullOrEmpty($javaVersionArray[1])) ) {
-				if ( $javaVersionArray[1] -eq "8" -or $javaVersionArray[1] -eq "9" ) {
+		try {
+			$javaVersionString = $(java --version)
+			$javaVersion = $($javaVersionString | Select-String -Pattern $regex | ForEach-Object { $_.Matches } | ForEach-Object { $_.Value } | Get-Unique -AsString)
+			$javaVersionArray = $javaVersion.Split(".")
+			if ( ($javaVersionArray.Count -ge 1) -and -not ([string]::IsNullOrEmpty($javaVersionArray[0])) ) {
+				if ( "1" -eq $javaVersionArray[0] -and -not ([string]::IsNullOrEmpty($javaVersionArray[1])) ) {
+					if ( $javaVersionArray[1] -eq "8" -or $javaVersionArray[1] -eq "9" ) {
+						$jdkFound = $true
+					}
+				} elseif ( $javaVersionArray[0] -ge "10") {
 					$jdkFound = $true
 				}
-			} elseif ( $javaVersionArray[0] -ge "10") {
-				$jdkFound = $true
+			}
+			if ( $jdkFound ) {
+				Set-JdkPath
 			}
 		}
-		if ( $jdkFound ) {
-			Set-JdkPath
+		catch {
+			Write-Host $_
 		}
 	}
 
@@ -200,13 +279,14 @@ function Install-Vcpkg {
 		Write-Host "Cloning VCPKG GitHub repository into $Env:VCPKG_ROOT"
 		New-Item $Env:VCPKG_ROOT -ItemType Directory -Force
 		Set-Location $Env:VCPKG_ROOT
-		git clone https://github.com/Bit-Quill/amazon-documentdb-odbc-driver-mirror.git
-		.\vcpkg.exe integrate install
+		git clone https://github.com/microsoft/vcpkg.git $Env:VCPKG_ROOT
+		.\bootstrap-vcpkg | Write-Host
+		.\vcpkg.exe integrate install | Write-Host
 	} else {
 		Write-Host "Updating VCPKG GitHub local repository in $Env:VCPKG_ROOT"
 		Set-Location $Env:VCPKG_ROOT
 		git pull
-		.\vcpkg.exe integrate install
+		.\vcpkg.exe integrate install | Write-Host
 	}
 	return $true
 }
@@ -217,7 +297,12 @@ function Install-VcpkgPackages {
 
 	# OpenSSL
 	Set-Location $Env:VCPKG_ROOT
-	.\vcpkg.exe install openssl:x64-windows
+	.\vcpkg.exe install openssl:x64-windows | Write-Host
+	if ($LASTEXITCODE -ne 0) {
+		Write-Host "Unable to install openssl library"
+		return $false
+	}
+
 	# Boost SDK
 	.\vcpkg.exe install `
 		boost-test:x64-windows `
@@ -226,9 +311,18 @@ function Install-VcpkgPackages {
 		boost-interprocess:x64-windows `
 		boost-regex:x64-windows `
 		boost-system:x64-windows `
-		boost-thread:x64-windows
+		boost-thread:x64-windows | Write-Host
+	if ($LASTEXITCODE -ne 0) {
+		Write-Host "Unable to install openssl library"
+		return $false
+	}
+
 	# Mongo SDK
-	.\vcpkg.exe install mongo-cxx-driver:x64-windows
+	.\vcpkg.exe install mongo-cxx-driver:x64-windows | Write-Host
+	if ($LASTEXITCODE -ne 0) {
+		Write-Host "Unable to install openssl library"
+		return $false
+	}
 
 	return $true
 }
@@ -237,9 +331,13 @@ function Install-MongoDb {
 	[OutputType([Boolean])]
 	Param()
 
-	# Mongo Server
-	Set-Location $projectPath
-	./src/odbc-test/scripts/reinstall_mongodb.ps1
+	# Install/upgrade Mongo Server
+	if ( -not $(Confirm-RunAsAdministrator) ) {
+		Invoke-ScriptRunAsAdministrator "$projectPath\src\odbc-test\scripts\reinstall_mongodb.ps1" -Wait
+	}
+	else {
+		"$projectPath\src\odbc-test\scripts\reinstall_mongodb.ps1"
+	}
 
 	return $true
 }
@@ -248,47 +346,11 @@ function Install-WixToolset {
 	[OutputType([Boolean])]
 	Param()
 
-	choco upgrade wixtoolset -y
+	if ( -not $(Confirm-RunAsAdministrator) ) {
+		Invoke-RunAsAdministrator -Wait "choco" "upgrade wixtoolset -y"
+	}
+	else {
+		choco upgrade wixtoolset -y
+	}
 	return $true
 }
-
-if ( -not $(Confirm-PowerShellVersion) ) {
-	exit 1
-}
-
-if ( -not $(Confirm-RunAsAdministrator($MyInvocation.MyCommand.Path)) ) {
-	exit 1
-}
-
-if ( -not $(Enable-VsDevShell) ) {
-	exit 1
-}
-
-if ( -not $(Confirm-CmakeExists) ) {
-	exit 1
-}
-
-if ( -not $(Confirm-JavaJdk) ) {
-	if ( -not $(Install-JavaJdk) ) {
-		exit 1
-	}
-}
-
-if ( -not $(Install-Vcpkg) ) {
-	exit 1
-}
-
-if ( -not $(Install-VcpkgPackages) ) {
-	exit 1
-}
-
-if ( -not $(Install-WixToolset) ) {
-	exit 1
-}
-
-if ( -not $(Install-MongoDb) ) {
-	exit 1
-}
-
-exit 0
-
