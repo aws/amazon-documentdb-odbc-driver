@@ -31,9 +31,9 @@ Linux info
 Files list:
 
  * ignite - executable to start standalone Ignite C++ node.
- * libignite.so - Ignite C++ API library.
- * libignite-odbc.so - Ignite ODBC driver.
- * libignite-thin-client.so - Ignite C++ thin client library.
+ * libdocumentdb.so - Ignite C++ API library.
+ * libdocumentdb-odbc.so - Ignite ODBC driver.
+ * libdocumentdb-thin-client.so - Ignite C++ thin client library.
  
 Development:
 
@@ -56,7 +56,7 @@ Files list:
 
  * ignite.exe - executable to start standalone Ignite C++ node.
  * ignite.core.dll - Ignite C++ API library.
- * ignite.odbc.dll - Ignite ODBC driver.
+ * documentdb-odbc-tests - Ignite ODBC driver.
  * ignite.thin-client.dll - Ignite thin C++ client.
  
 Development:

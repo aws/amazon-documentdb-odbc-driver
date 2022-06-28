@@ -28,7 +28,7 @@ env:
   DOC_DB_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
   DOC_DB_LOG_LEVEL: "debug"
   JDBC_DRIVER_VERSION: "1.2.4"
-  ODBCINSTINI: "${{github.workspace}}/build/odbc/lib/ignite-odbc-install.ini"
+  ODBCINSTINI: "${{github.workspace}}/build/odbc/lib/documentdb-odbc-install.ini"
 
 jobs:
   build-mac-debug:
@@ -131,8 +131,8 @@ jobs:
       run: |
         mkdir -p "${{env.DOC_DB_LOG_PATH}}"
         ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
-        ./build/odbc/bin/ignite-odbc-tests --catch_system_errors=false
-        gcovr --exclude-directories cmake-build64/odbc-test/CMakeFiles/ignite-odbc-tests.dir$ --cobertura --output coverage.cobertura.xml
+        ./build/odbc/bin/documentdb-odbc-tests --catch_system_errors=false
+        gcovr --exclude-directories cmake-build64/odbc-test/CMakeFiles/documentdb-odbc-tests.dir$ --cobertura --output coverage.cobertura.xml
 
     - name: upload-coverage
       if: always()
