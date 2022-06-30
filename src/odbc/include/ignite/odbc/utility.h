@@ -61,6 +61,12 @@ T* GetPointerWithOffset(T* ptr, size_t offset) {
  * @param outBufferLenBytes Length of the output buffer, in bytes.
  * @return isTruncated Reference to indicator of whether the input string was
  * truncated in the output buffer.
+ * return value(bytes):
+ *   - 0, if the inBuffer is nullptr or outBufferLenBytes is 0 but outBuffer is not
+ *   nullptr
+ *   - the required output buffer length, if outBuffer is nullptr
+ *   - copied bytes number, if outBuffer is not nullptr and outBufferLenBytes
+ *   is not 0
  */
 size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
                                      size_t outBufferLenBytes,
@@ -74,6 +80,12 @@ size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
  * @param outBufferLenBytes Length of the output buffer, in bytes.
  * @return isTruncated Reference to indicator of whether the input string was
  * truncated in the output buffer.
+ * return value(bytes):
+ *   - 0, if the inBuffer is nullptr or outBufferLenBytes is 0 but outBuffer is
+ * not nullptr
+ *   - the required output buffer length, if outBuffer is nullptr
+ *   - copied bytes number, if outBuffer is not nullptr and outBufferLenBytes
+ *   is not 0
  */
 size_t CopyUtf8StringToSqlWcharString(const char* inBuffer, SQLWCHAR* outBuffer,
                                       size_t outBufferLenBytes,
@@ -85,6 +97,12 @@ size_t CopyUtf8StringToSqlWcharString(const char* inBuffer, SQLWCHAR* outBuffer,
  * @param buf Buffer to copy data to.
  * @param buflen Length of the buffer.
  * @return Length of the resulting string in buffer.
+ * return value(bytes):
+ *   - 0, if the inBuffer is nullptr or outBufferLenBytes is 0 but outBuffer is
+ * not nullptr
+ *   - the required output buffer length, if outBuffer is nullptr
+ *   - copied bytes number, if outBuffer is not nullptr and outBufferLenBytes
+ *   is not 0
  */
 size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen,
                           bool isLenInBytes = false);

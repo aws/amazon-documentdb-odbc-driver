@@ -24,13 +24,14 @@ find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
 find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
+find_package(Boost REQUIRED)
 include(UseJava)
 
 if (${CODE_COVERAGE}) 
     add_code_coverage()    
 endif()
 
-include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS} ${BSONCXX_INCLUDE_DIRS})
+include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS} ${BSONCXX_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 include_directories(include)
 
 

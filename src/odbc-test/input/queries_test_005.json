@@ -1,0 +1,48 @@
+[
+  {
+    "_id": {
+      "$oid": "62196dcc4d91892191475139"
+    },
+    "fieldInt": 1,
+    "fieldLong": 2,
+    "fieldDecimal128": {
+      "$numberDecimal": "3.0"
+    },
+    "fieldDouble": 4.0,
+    "fieldString": "5",
+    "fieldBoolean": 1,
+    "fieldDate": {
+      "$date": "2020-01-01T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "62196dcc4d9189219147513b"
+    },
+    "fieldInt": 6,
+    "fieldLong": 5,
+    "fieldDecimal128": {
+      "$numberDecimal": "4.0"
+    },
+    "fieldDouble": 3.0,
+    "fieldString": "2",
+    "fieldBoolean": 1,
+    "fieldDate": {
+      "$date": "2020-01-01T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  }
+]
