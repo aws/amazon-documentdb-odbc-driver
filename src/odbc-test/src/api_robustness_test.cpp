@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -20,6 +20,8 @@
 #endif
 
 #include <sql.h>
+#include <sqltypes.h>
+#include "ignite/odbc/utility.h"
 #include <sqlext.h>
 
 #include <boost/test/unit_test.hpp>
@@ -57,26 +59,18 @@ struct ApiRobustnessTestSuiteFixture : public odbc::OdbcTestSuite {
    * @param orientation Fetch orientation.
    */
   void CheckFetchScrollUnsupportedOrientation(SQLUSMALLINT orientation) {
-    Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
+    connectToLocalServer("odbc-test");
 
-    const int64_t recordsNum = 100;
-
-    for (int i = 0; i < recordsNum; ++i) {
-      TestType val;
-
-      val.i32Field = i * 10;
-    }
-
-    int32_t i32Field = -1;
+    int32_t intField = -1;
 
     // Binding column.
-    SQLRETURN ret = SQLBindCol(stmt, 1, SQL_C_SLONG, &i32Field, 0, 0);
+    SQLRETURN ret = SQLBindCol(stmt, 1, SQL_C_SLONG, &intField, 0, 0);
 
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
     std::vector< SQLWCHAR > request =
-        MakeSqlBuffer("SELECT i32Field FROM TestType ORDER BY _key");
+        MakeSqlBuffer("SELECT fieldInt FROM \"api_robustness_test_001\"");
 
     ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
     if (!SQL_SUCCEEDED(ret))
@@ -86,7 +80,7 @@ struct ApiRobustnessTestSuiteFixture : public odbc::OdbcTestSuite {
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-    BOOST_CHECK_EQUAL(i32Field, 0);
+    BOOST_CHECK_EQUAL(intField, 2147483647);
 
     ret = SQLFetchScroll(stmt, orientation, 0);
 
@@ -94,6 +88,13 @@ struct ApiRobustnessTestSuiteFixture : public odbc::OdbcTestSuite {
     BOOST_CHECK(ret == SQL_ERROR);
 
     CheckSQLStatementDiagnosticError("HYC00");
+  }
+
+  void connectToLocalServer(const std::string& databaseName) {
+    std::string dsnConnectionString;
+    CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+    Connect(dsnConnectionString);
   }
 
   /**
@@ -118,11 +119,7 @@ SQLSMALLINT unsupportedC[] = {SQL_C_INTERVAL_YEAR,
                               SQL_C_INTERVAL_HOUR_TO_SECOND,
                               SQL_C_INTERVAL_MINUTE_TO_SECOND};
 
-SQLSMALLINT unsupportedSql[] = {SQL_WVARCHAR,
-                                SQL_WLONGVARCHAR,
-                                SQL_REAL,
-                                SQL_NUMERIC,
-                                SQL_INTERVAL_MONTH,
+SQLSMALLINT unsupportedSql[] = {SQL_INTERVAL_MONTH,
                                 SQL_INTERVAL_YEAR,
                                 SQL_INTERVAL_YEAR_TO_MONTH,
                                 SQL_INTERVAL_DAY,
@@ -183,57 +180,69 @@ BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttrRowArraySize) {
   BOOST_CHECK_EQUAL(actual_row_array_size, val);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLDriverConnect, *disabled()) {
+#ifndef __APPLE__
+// only enable for Windows and Linux as it crashes on Mac
+// with iODBC, traced by AD-820
+// https://bitquill.atlassian.net/browse/AD-820
+BOOST_AUTO_TEST_CASE(TestSQLDriverConnect) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
   Prepare();
 
-  std::vector< SQLWCHAR > connectStr = MakeSqlBuffer(
-      "DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+  std::vector< SQLWCHAR > connectStr(dsnConnectionString.begin(),
+                                     dsnConnectionString.end());
 
   SQLWCHAR outStr[ODBC_BUFFER_SIZE];
   SQLSMALLINT outStrLen;
 
   // Normal connect.
-  SQLRETURN ret =
-      SQLDriverConnect(dbc, NULL, connectStr.data(), SQL_NTS, outStr,
-                       sizeof(outStr), &outStrLen, SQL_DRIVER_COMPLETE);
+  SQLRETURN ret = SQLDriverConnect(
+      dbc, NULL, &connectStr[0], static_cast< SQLSMALLINT >(connectStr.size()),
+      outStr, sizeof(outStr), &outStrLen, SQL_DRIVER_COMPLETE);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   SQLDisconnect(dbc);
 
   // Null out string resulting length.
-  SQLDriverConnect(dbc, NULL, connectStr.data(), SQL_NTS, outStr,
+  SQLDriverConnect(dbc, NULL, &connectStr[0],
+                   static_cast< SQLSMALLINT >(connectStr.size()), outStr,
                    sizeof(outStr), 0, SQL_DRIVER_COMPLETE);
 
   SQLDisconnect(dbc);
 
   // Null out string buffer length.
-  SQLDriverConnect(dbc, NULL, connectStr.data(), SQL_NTS, outStr, 0, &outStrLen,
-                   SQL_DRIVER_COMPLETE);
+  SQLDriverConnect(dbc, NULL, &connectStr[0],
+                   static_cast< SQLSMALLINT >(connectStr.size()), outStr, 0,
+                   &outStrLen, SQL_DRIVER_COMPLETE);
+
 
   SQLDisconnect(dbc);
 
   // Null out string.
-  SQLDriverConnect(dbc, NULL, connectStr.data(), SQL_NTS, 0, sizeof(outStr),
-                   &outStrLen, SQL_DRIVER_COMPLETE);
+  SQLDriverConnect(dbc, NULL, &connectStr[0],
+                   static_cast< SQLSMALLINT >(connectStr.size()), 0,
+                   sizeof(outStr), &outStrLen, SQL_DRIVER_COMPLETE);
 
   SQLDisconnect(dbc);
 
   // Null all.
-  SQLDriverConnect(dbc, NULL, connectStr.data(), SQL_NTS, 0, 0, 0,
+  SQLDriverConnect(dbc, NULL, &connectStr[0],
+                   static_cast< SQLSMALLINT >(connectStr.size()), 0, 0, 0,
                    SQL_DRIVER_COMPLETE);
 
   SQLDisconnect(dbc);
 }
+#endif
 
-BOOST_AUTO_TEST_CASE(TestSQLConnect, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLConnect) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
   SQLWCHAR buffer[ODBC_BUFFER_SIZE];
   SQLSMALLINT resLen = 0;
@@ -260,13 +269,14 @@ BOOST_AUTO_TEST_CASE(TestSQLConnect, *disabled()) {
   SQLGetInfo(dbc, SQL_DRIVER_NAME, 0, 0, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLPrepare, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLPrepare) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
-  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
+  std::vector< SQLWCHAR > sql =
+      MakeSqlBuffer("SELECT * FROM \"api_robustness_test_001\"");
 
   // Everything is ok.
   SQLRETURN ret = SQLPrepare(stmt, sql.data(), SQL_NTS);
@@ -291,13 +301,14 @@ BOOST_AUTO_TEST_CASE(TestSQLPrepare, *disabled()) {
   SQLCloseCursor(stmt);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLExecDirect, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLExecDirect) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
-  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
+  std::vector< SQLWCHAR > sql =
+      MakeSqlBuffer("SELECT * FROM \"api_robustness_test_001\"");
 
   // Everything is ok.
   SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
@@ -322,19 +333,13 @@ BOOST_AUTO_TEST_CASE(TestSQLExecDirect, *disabled()) {
   SQLCloseCursor(stmt);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLExtendedFetch, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLExtendedFetch) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
+  connectToLocalServer("odbc-test");
 
-  for (int i = 0; i < 100; ++i) {
-    TestType obj;
-
-    obj.strField = LexicalCast< std::string >(i);
-  }
-
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
-
-  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
+  std::vector< SQLWCHAR > sql =
+      MakeSqlBuffer("SELECT * FROM \"api_robustness_test_001\"");
 
   SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
@@ -359,10 +364,7 @@ BOOST_AUTO_TEST_CASE(TestSQLExtendedFetch, *disabled()) {
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLNumResultCols) {
-  std::string dsnConnectionString;
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer("odbc-test");
 
   std::vector< SQLWCHAR > sql =
       MakeSqlBuffer("SELECT * FROM \"api_robustness_test_001\"");
@@ -384,10 +386,7 @@ BOOST_AUTO_TEST_CASE(TestSQLNumResultCols) {
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLForeignKeys) {
-  std::string dsnConnectionString;
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer("odbc-test");
 
   std::vector< SQLWCHAR > fkTableName = MakeSqlBuffer("jni_test_001_sub_doc");
 
@@ -402,11 +401,11 @@ BOOST_AUTO_TEST_CASE(TestSQLForeignKeys) {
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLTables, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLTables) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
   std::vector< SQLWCHAR > catalogName = {0};
   std::vector< SQLWCHAR > schemaName = {0};
@@ -431,11 +430,11 @@ BOOST_AUTO_TEST_CASE(TestSQLTables, *disabled()) {
   SQLTables(dbc, 0, 0, 0, 0, 0, 0, 0, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLColumns, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLColumns) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
   std::vector< SQLWCHAR > catalogName = {0};
   std::vector< SQLWCHAR > schemaName = {0};
@@ -461,10 +460,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumns, *disabled()) {
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeys) {
-  std::string dsnConnectionString;
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
-
-  Connect(dsnConnectionString);
+  connectToLocalServer("odbc-test");
 
   std::vector< SQLWCHAR > catalogName = {0};
   std::vector< SQLWCHAR > schemaName = MakeSqlBuffer("odbc-test");
@@ -495,11 +491,11 @@ BOOST_AUTO_TEST_CASE(TestSQLPrimaryKeys) {
   SQLPrimaryKeys(stmt, 0, 0, 0, 0, 0, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLBindCol, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLBindCol) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
   SQLINTEGER ind1;
   SQLLEN len1 = 0;
@@ -519,7 +515,11 @@ BOOST_AUTO_TEST_CASE(TestSQLBindCol, *disabled()) {
   // Size is negative.
   ret = SQLBindCol(stmt, 1, SQL_C_SLONG, &ind1, -1, &len1);
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
+#ifdef __APPLE__
+  CheckSQLStatementDiagnosticError("S1090");
+#else
   CheckSQLStatementDiagnosticError("HY090");
+#endif
 
   // Size is null.
   SQLBindCol(stmt, 1, SQL_C_SLONG, &ind1, 0, &len1);
@@ -534,11 +534,11 @@ BOOST_AUTO_TEST_CASE(TestSQLBindCol, *disabled()) {
   SQLBindCol(stmt, 4, SQL_C_SLONG, 0, 0, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLBindParameter, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLBindParameter) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
   SQLINTEGER ind1;
   SQLLEN len1 = 0;
@@ -548,7 +548,11 @@ BOOST_AUTO_TEST_CASE(TestSQLBindParameter, *disabled()) {
       SQLBindParameter(stmt, 1, SQL_PARAM_INPUT, SQL_C_SLONG, SQL_INTEGER, 100,
                        100, &ind1, sizeof(ind1), &len1);
 
+#ifdef __APPLE__
+  BOOST_REQUIRE_EQUAL(ret, SQL_INVALID_HANDLE);
+#else
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+#endif
 
   // Unsupported parameter type : output
   SQLBindParameter(stmt, 2, SQL_PARAM_OUTPUT, SQL_C_SLONG, SQL_INTEGER, 100,
@@ -567,7 +571,11 @@ BOOST_AUTO_TEST_CASE(TestSQLBindParameter, *disabled()) {
                            unsupportedSql[i], 100, 100, &ind1, sizeof(ind1),
                            &len1);
 
+#ifdef __APPLE__
+    BOOST_REQUIRE_EQUAL(ret, SQL_INVALID_HANDLE);
+#else
     BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
+#endif
     CheckSQLStatementDiagnosticError("HYC00");
   }
 
@@ -588,13 +596,14 @@ BOOST_AUTO_TEST_CASE(TestSQLBindParameter, *disabled()) {
                    0, 0, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLNativeSql, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLNativeSql) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
-  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
+  std::vector< SQLWCHAR > sql =
+      MakeSqlBuffer("SELECT * FROM \"api_robustness_test_001\"");
   SQLWCHAR buffer[ODBC_BUFFER_SIZE];
   SQLINTEGER resLen = 0;
 
@@ -623,13 +632,14 @@ BOOST_AUTO_TEST_CASE(TestSQLNativeSql, *disabled()) {
   SQLNativeSql(dbc, sql.data(), 0, 0, 0, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLColAttribute, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLColAttribute) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
-  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
+  std::vector< SQLWCHAR > sql =
+      MakeSqlBuffer("SELECT * FROM \"api_robustness_test_001\"");
 
   SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
@@ -670,13 +680,14 @@ BOOST_AUTO_TEST_CASE(TestSQLColAttribute, *disabled()) {
   SQLColAttribute(stmt, 1, SQL_DESC_COUNT, 0, 0, 0, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLDescribeCol, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLDescribeCol) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
-  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
+  std::vector< SQLWCHAR > sql =
+      MakeSqlBuffer("SELECT * FROM \"api_robustness_test_001\"");
 
   SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
@@ -712,13 +723,14 @@ BOOST_AUTO_TEST_CASE(TestSQLDescribeCol, *disabled()) {
   SQLDescribeCol(stmt, 1, 0, 0, 0, 0, 0, 0, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLRowCount, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLRowCount) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
-  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
+  std::vector< SQLWCHAR > sql =
+      MakeSqlBuffer("SELECT * FROM \"api_robustness_test_001\"");
 
   SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
@@ -734,11 +746,11 @@ BOOST_AUTO_TEST_CASE(TestSQLRowCount, *disabled()) {
   SQLRowCount(stmt, nullptr);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLForeignKeysSegFault, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLForeignKeysSegFault) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
   std::vector< SQLWCHAR > catalogName = {0};
   std::vector< SQLWCHAR > schemaName = MakeSqlBuffer("cache");
@@ -832,11 +844,11 @@ BOOST_AUTO_TEST_CASE(TestSQLForeignKeysSegFault, *disabled()) {
   SQLCloseCursor(stmt);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLGetStmtAttr, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLGetStmtAttr) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
   SQLWCHAR buffer[ODBC_BUFFER_SIZE];
   SQLINTEGER resLen = 0;
@@ -853,11 +865,11 @@ BOOST_AUTO_TEST_CASE(TestSQLGetStmtAttr, *disabled()) {
   SQLGetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE, 0, 0, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttr, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttr) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
   SQLULEN val = 1;
 
@@ -874,57 +886,10 @@ BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttr, *disabled()) {
   SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE, 0, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLNumParams, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLGetDiagField) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
-
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
-
-  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
-
-  // Everything is ok.
-  SQLRETURN ret = SQLPrepare(stmt, sql.data(), SQL_NTS);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
-
-  SQLSMALLINT params;
-
-  // Everything is ok.
-  ret = SQLNumParams(stmt, &params);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
-
-  SQLNumParams(stmt, 0);
-}
-
-BOOST_AUTO_TEST_CASE(TestSQLNumParamsEscaped, *disabled()) {
-  // There are no checks because we do not really care what is the result of
-  // these calls as long as they do not cause segmentation fault.
-
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
-
-  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT {fn NOW()}");
-
-  // Everything is ok.
-  SQLRETURN ret = SQLPrepare(stmt, sql.data(), SQL_NTS);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
-
-  SQLSMALLINT params;
-
-  // Everything is ok.
-  ret = SQLNumParams(stmt, &params);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
-
-  SQLNumParams(stmt, 0);
-}
-
-BOOST_AUTO_TEST_CASE(TestSQLGetDiagField, *disabled()) {
-  // There are no checks because we do not really care what is the result of
-  // these calls as long as they do not cause segmentation fault.
-
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
   // Should fail.
   SQLRETURN ret = SQLGetTypeInfo(stmt, SQL_INTERVAL_MONTH);
@@ -949,8 +914,8 @@ BOOST_AUTO_TEST_CASE(TestSQLGetDiagField, *disabled()) {
   SQLGetDiagField(SQL_HANDLE_STMT, stmt, 1, SQL_DIAG_MESSAGE_TEXT, 0, 0, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLGetDiagRec, *disabled()) {
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+BOOST_AUTO_TEST_CASE(TestSQLGetDiagRec) {
+  connectToLocalServer("odbc-test");
 
   SQLWCHAR state[ODBC_BUFFER_SIZE];
   SQLINTEGER nativeError = 0;
@@ -972,8 +937,8 @@ BOOST_AUTO_TEST_CASE(TestSQLGetDiagRec, *disabled()) {
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
 
   // Should return message length.
-  ret = SQLGetDiagRec(SQL_HANDLE_STMT, stmt, 1, state, &nativeError, message, 1,
-                      &messageLen);
+  ret = SQLGetDiagRec(SQL_HANDLE_STMT, stmt, 1, state, &nativeError, message,
+                      sizeof(SQLWCHAR), &messageLen);
   BOOST_REQUIRE_EQUAL(ret, SQL_SUCCESS_WITH_INFO);
 
   // There are no checks because we do not really care what is the result of
@@ -991,19 +956,14 @@ BOOST_AUTO_TEST_CASE(TestSQLGetDiagRec, *disabled()) {
   SQLGetDiagRec(SQL_HANDLE_STMT, stmt, 1, 0, 0, 0, 0, 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLGetData, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLGetData) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  for (int i = 0; i < 100; ++i) {
-    TestType obj;
+  connectToLocalServer("odbc-test");
 
-    obj.strField = LexicalCast< std::string >(i);
-  }
-
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
-
-  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT strField FROM TestType");
+  std::vector< SQLWCHAR > sql =
+      MakeSqlBuffer("SELECT * FROM \"api_robustness_test_001\"");
 
   SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
 
@@ -1040,11 +1000,11 @@ BOOST_AUTO_TEST_CASE(TestSQLGetData, *disabled()) {
   SQLFetch(stmt);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLGetEnvAttr, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLGetEnvAttr) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
   SQLWCHAR buffer[ODBC_BUFFER_SIZE];
   SQLINTEGER resLen = 0;
@@ -1061,11 +1021,11 @@ BOOST_AUTO_TEST_CASE(TestSQLGetEnvAttr, *disabled()) {
   SQLGetEnvAttr(env, SQL_ATTR_ODBC_VERSION, nullptr, 0, nullptr);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLSpecialColumns, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestSQLSpecialColumns) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
   std::vector< SQLWCHAR > catalogName = {0};
   std::vector< SQLWCHAR > schemaName = MakeSqlBuffer("cache");
@@ -1122,6 +1082,7 @@ BOOST_AUTO_TEST_CASE(TestSQLSpecialColumns, *disabled()) {
   SQLCloseCursor(stmt);
 }
 
+// TODO: Memory leak, traced by https://bitquill.atlassian.net/browse/AD-813
 BOOST_AUTO_TEST_CASE(TestFetchScrollLast, *disabled()) {
   CheckFetchScrollUnsupportedOrientation(SQL_FETCH_LAST);
 }
@@ -1134,11 +1095,15 @@ BOOST_AUTO_TEST_CASE(TestFetchScrollFirst, *disabled()) {
   CheckFetchScrollUnsupportedOrientation(SQL_FETCH_FIRST);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLError, *disabled()) {
+#ifndef __APPLE__
+// only enable for Windows and Linux as it crashes on Mac
+// with iODBC, traced by AD-820
+// https://bitquill.atlassian.net/browse/AD-820
+BOOST_AUTO_TEST_CASE(TestSQLError) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
   SQLWCHAR state[6] = {0};
   SQLINTEGER nativeCode = 0;
@@ -1180,9 +1145,10 @@ BOOST_AUTO_TEST_CASE(TestSQLError, *disabled()) {
 
   SQLError(0, 0, 0, 0, 0, 0, 0, 0);
 }
+#endif
 
-BOOST_AUTO_TEST_CASE(TestSQLDiagnosticRecords, *disabled()) {
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+BOOST_AUTO_TEST_CASE(TestSQLDiagnosticRecords) {
+  connectToLocalServer("odbc-test");
 
   SQLHANDLE hnd;
 
@@ -1192,10 +1158,14 @@ BOOST_AUTO_TEST_CASE(TestSQLDiagnosticRecords, *disabled()) {
 
   ret = SQLFreeStmt(stmt, 4);
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
+#ifdef __APPLE__
+  CheckSQLStatementDiagnosticError("S1092");
+#else
   CheckSQLStatementDiagnosticError("HY092");
+#endif
 }
 
-BOOST_AUTO_TEST_CASE(TestManyFds, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestManyFds) {
   enum { FDS_NUM = 2000 };
 
   std::FILE* fds[FDS_NUM];
@@ -1203,7 +1173,7 @@ BOOST_AUTO_TEST_CASE(TestManyFds, *disabled()) {
   for (int i = 0; i < FDS_NUM; ++i)
     fds[i] = tmpfile();
 
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
   for (int i = 0; i < FDS_NUM; ++i) {
     if (fds[i])

@@ -34,7 +34,7 @@ using namespace odbc::common;
 size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
                                      size_t outBufferLenBytes,
                                      bool& isTruncated) {
-  if (!inBuffer)
+  if (!inBuffer || (outBuffer && outBufferLenBytes == 0))
     return 0;
 
   // Need to convert input string to wide-char to get the
@@ -45,22 +45,19 @@ size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
       converter;
   std::wstring inString = converter.from_bytes(inBuffer);
   size_t inBufferLenChars = inString.size();
-  size_t outBufferLenActual = std::min(
-      inBufferLenChars, outBufferLenBytes ? (outBufferLenBytes - 1) : 0);
 
   // If no output buffer, return REQUIRED length.
   if (!outBuffer)
     return inBufferLenChars;
 
+  size_t outBufferLenActual = std::min(inBufferLenChars, outBufferLenBytes - 1);
+
   std::locale currentLocale("");
   std::use_facet< std::ctype< wchar_t > >(currentLocale)
       .narrow(inString.data(), inString.data() + outBufferLenActual, '?',
               reinterpret_cast< char* >(outBuffer));
-  // Handles case where output buffer is non-null but length is zero.
-  // null-terminate target string, if room.
-  if (outBufferLenBytes > 0) {
-    outBuffer[outBufferLenActual] = 0;
-  }
+
+  outBuffer[outBufferLenActual] = 0;
   isTruncated = (outBufferLenActual < inBufferLenChars);
 
   return outBufferLenActual;
@@ -70,14 +67,17 @@ template < typename OutCharT >
 size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
                                    size_t outBufferLenBytes,
                                    bool& isTruncated) {
+  if (!inBuffer || (outBuffer && outBufferLenBytes == 0))
+    return 0;
+
   size_t wCharSize = sizeof(SQLWCHAR);
   // This is intended to convert to the SQLWCHAR. Ensure we have the same size.
   assert(sizeof(OutCharT) == wCharSize);
+  assert((outBufferLenBytes % wCharSize) == 0);
 
-  // Get the number of characters that can be safely transfered, excluding the
-  // null terminating character. Handle the case of zero given for length.
-  size_t outBufferLenChars =
-      outBufferLenBytes ? (outBufferLenBytes / wCharSize) - 1 : 0;
+  // The number of characters that can be safely transfered, excluding the
+  // null terminating character.
+  size_t outBufferLenChars;
   // Find the lenght (in bytes) of the input string.
   // This does NOT include the null-terminating character.
   size_t inBufferLen = std::strlen(inBuffer);
@@ -86,6 +86,7 @@ size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
 
   if (outBuffer) {
     pOutBuffer = reinterpret_cast< OutCharT* >(outBuffer);
+    outBufferLenChars = (outBufferLenBytes / wCharSize) - 1;
   } else {
     // Creates a proxy buffer so we can determine the required length.
     // This buffer will be ignored and automatically deleted after use.
@@ -113,23 +114,20 @@ size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
     case std::codecvt_base::partial:
       // The number of characters converted (in OutCharT)
       lenConverted = pOutBufferNext - pOutBuffer;
-      // Handles case where output buffer is non-null but length is zero.
       // null-terminate target string, if room
-      if (outBufferLenBytes >= wCharSize) {
-        pOutBuffer[lenConverted] = 0;
-      }
+      pOutBuffer[lenConverted] = 0;
+
       isTruncated = (result == std::codecvt_base::partial);
       break;
     case std::codecvt_base::error:
       // Error returned if unable to convert character.
       LOG_ERROR_MSG("Unable to convert character '" << *pInBufferNext << "'");
+
       // The number of characters converted (in OutCharT)
       lenConverted = pOutBufferNext - pOutBuffer;
-      // Handles case where output buffer is non-null but length is zero.
       // null-terminate target string, if room.
-      if (outBufferLenBytes >= wCharSize) {
-        pOutBuffer[lenConverted] = 0;
-      }
+      pOutBuffer[lenConverted] = 0;
+
       isTruncated = true;
       break;
     default:
