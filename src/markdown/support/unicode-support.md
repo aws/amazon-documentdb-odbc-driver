@@ -37,4 +37,4 @@ Log files are encoded in UTF-8 format with BOM (byte-order-mark).
 
 When creating and comparing literals with the C/C++ data type of `[const] char*`, ensure to use the literal prefix: `u8`. For example : `u8"你好"`.
 
-When creating use the `NewSqlWchar(L"你好")` function. When comparing literals in SQLWCHAR , first convert to string (`utility::SqlStringToString()`) and then compare as UTF-8 literal `u8"你好"`.
+When creating use the `NewSqlWchar(L"你好")` function. When comparing literals in SQLWCHAR , first convert to string (`utility::SqlWcharToString()`) and then compare as UTF-8 literal `u8"你好"`.

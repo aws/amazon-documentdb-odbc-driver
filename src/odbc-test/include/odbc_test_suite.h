@@ -368,8 +368,8 @@ struct OdbcTestSuite {
    */
   void CreateDsnConnectionStringForLocalServer(
       std::string& connectionString, const std::string& databaseName = "",
-      const std::string& userName = "",
-      const std::string& miscOptions = "") const;
+      const std::string& userName = "", const std::string& miscOptions = "",
+      const std::string& portNum = "27017") const;
 
   /** ODBC Environment. */
   SQLHENV env;
