@@ -33,6 +33,7 @@ env:
 jobs:
   build-mac:
     runs-on: macos-11
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
     steps:
     - uses: actions/checkout@v2
     - name: Get Java distribution
@@ -47,7 +48,7 @@ jobs:
         sh run_cppcheck.sh
     - name: upload-cppcheck-results
       if: failure()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: cppcheck-results
         path: cppcheck-results.log
@@ -120,7 +121,7 @@ jobs:
         files: ./odbc_test_result.xml
     - name: upload-test-file
       if: always() && (steps.runtests.outcome == 'failure')
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: odbc-test-results
         path: |
@@ -133,7 +134,7 @@ jobs:
     #     cat ./leaks_*
     # - name: upload-test-logs
     #   if: failure()
-    #   uses: actions/upload-artifact@v2
+    #   uses: actions/upload-artifact@v3
     #   with:
     #     name: test-logs-mac64
     #     path: |
@@ -161,19 +162,19 @@ jobs:
     #     cp ./cmake-build64/*.pkg installer/
     # - name: upload-build
     #   if: success()
-    #   uses: actions/upload-artifact@v2
+    #   uses: actions/upload-artifact@v3
     #   with:
     #     name: mac64-build
     #     path: build-output
     # - name: upload-installer
     #   if: success()
-    #   uses: actions/upload-artifact@v2
+    #   uses: actions/upload-artifact@v3
     #   with:
     #     name: mac64-installer
     #     path: installer
     # - name: upload-test-results
     #   if: success()
-    #   uses: actions/upload-artifact@v2
+    #   uses: actions/upload-artifact@v3
     #   with:
     #     name: mac-test-results
     #     path: test-output

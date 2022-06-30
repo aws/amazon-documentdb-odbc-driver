@@ -57,7 +57,7 @@ fi
 if [[ -z "${DOC_DB_PRIV_KEY_FILE}" ]]; then
   echo "DOC_DB_PRIV_KEY_FILE environment variable is not set. Please set this variable explicitly."
   CHECK=0
-else 
+else
   echo "DOC_DB_PRIV_KEY_FILE$DOC_DB_PRIV_KEY_FILE"
 fi
 
