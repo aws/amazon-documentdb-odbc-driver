@@ -110,8 +110,8 @@ jobs:
 
     - name: Import test data
       run: |
-        chmod +x ./scripts/import_test_data.sh
-        ./scripts/import_test_data.sh
+        chmod +x ./src/odbc-test/scripts/import_test_data.sh
+        ./src/odbc-test/scripts/import_test_data.sh
 
       env:
         RUN_CODE_COVERAGE: ${{ true }}
