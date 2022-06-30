@@ -76,14 +76,6 @@ else
   echo "DOCUMENTDB_HOME=$DOCUMENTDB_HOME"
 fi
 
-if [[ -z "${DOCUMENTDB_HOME}" ]]; then
-  echo "DOCUMENTDB_HOME environment variable is not set. Using default."
-  export DOCUMENTDB_HOME=${SCRIPT_DIR}/../build/odbc/bin
-  echo "DOCUMENTDB_HOME=$DOCUMENTDB_HOME"
-else
-  echo "DOCUMENTDB_HOME=$DOCUMENTDB_HOME"
-fi
-
 if [[ -z "${ODBCINSTINI}" ]]; then
   echo "ODBCINSTINI environment variable is not set. Using default."
   export ODBCINSTINI="${SCRIPT_DIR}/../build/odbc/lib/ignite-odbc-install.ini"
