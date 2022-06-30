@@ -333,10 +333,10 @@ function Install-MongoDb {
 
 	# Install/upgrade Mongo Server
 	if ( -not $(Confirm-RunAsAdministrator) ) {
-		Invoke-ScriptRunAsAdministrator "$projectPath\src\odbc-test\scripts\reinstall_mongodb.ps1" -Wait
+		Invoke-ScriptRunAsAdministrator "$projectPath\scripts\reinstall_mongodb.ps1" -Wait
 	}
 	else {
-		"$projectPath\src\odbc-test\scripts\reinstall_mongodb.ps1"
+		"$projectPath\scripts\reinstall_mongodb.ps1"
 	}
 
 	return $true

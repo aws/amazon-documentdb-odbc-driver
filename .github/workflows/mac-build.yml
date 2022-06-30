@@ -98,14 +98,10 @@ jobs:
       run: |
         chmod +x scripts/register_driver_unix.sh
         ./scripts/register_driver_unix.sh
-    - name: Setup MongoDB
-      run: |
-        chmod +x ./src/odbc-test/scripts/reinstall_mongodb_mac.sh
-        ./src/odbc-test/scripts/reinstall_mongodb_mac.sh
     - name: Import test data
       run: |
-        chmod +x ./src/odbc-test/scripts/import_test_data.sh
-        ./src/odbc-test/scripts/import_test_data.sh
+        chmod +x ./scripts/import_test_data.sh
+        ./scripts/import_test_data.sh
     - name: run-tests
       id: runtests
       run: |

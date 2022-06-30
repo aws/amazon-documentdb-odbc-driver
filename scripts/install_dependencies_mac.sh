@@ -54,6 +54,10 @@ else
     done
 fi
 
+# [Re-]Install mongodb server
+chmod +x $MAC_SCRIPT_DIR/reinstall_mongodb_mac.sh
+$MAC_SCRIPT_DIR/reinstall_mongodb_mac.sh
+
 # check if java dependency is installed
 chmod +x $MAC_SCRIPT_DIR/check_java_dependency_mac.sh
 source $MAC_SCRIPT_DIR/check_java_dependency_mac.sh

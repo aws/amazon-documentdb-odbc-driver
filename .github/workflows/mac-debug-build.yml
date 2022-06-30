@@ -59,13 +59,8 @@ jobs:
 
     - name: get-dependencies
       run: |
-        brew tap homebrew/services
-        brew unlink unixodbc
-        brew install libiodbc
-        brew install cmake
-        brew install openssl
-        brew install boost
-        brew install mongo-cxx-driver
+        chmod +x scripts/install_dependencies_mac.sh
+        ./scripts/install_dependencies_mac.sh
         pip3 install gcovr
 
 # if action `EnricoMi/publish-unit-test-result-action/composite@v1.30`
@@ -113,14 +108,10 @@ jobs:
         chmod +x scripts/register_driver_unix.sh
         ./scripts/register_driver_unix.sh
 
-    - name: Setup MongoDB
-      run: |
-        chmod +x ./src/odbc-test/scripts/reinstall_mongodb_mac.sh
-        ./src/odbc-test/scripts/reinstall_mongodb_mac.sh
     - name: Import test data
       run: |
-        chmod +x ./src/odbc-test/scripts/import_test_data.sh
-        ./src/odbc-test/scripts/import_test_data.sh
+        chmod +x ./scripts/import_test_data.sh
+        ./scripts/import_test_data.sh
 
       env:
         RUN_CODE_COVERAGE: ${{ true }}
