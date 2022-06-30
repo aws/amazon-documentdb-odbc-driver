@@ -352,5 +352,15 @@ function Install-WixToolset {
 	else {
 		choco upgrade wixtoolset -y
 	}
+
+	$wixToolsetBinFolder = "${Env:ProgramFiles(x86)}\WiX Toolset v3.11\bin"
+	if ( Test-Path $wixToolsetBinFolder ) {
+		$paths = $Env:Path.Split(";")
+		if ( -not $paths.Contains($wixToolsetBinFolder) ) {
+			$Env:Path = "${wixToolsetBinFolder};${Env:Path}"
+			[System.Environment]::SetEnvironmentVariable('PATH', $Env:Path, [System.EnvironmentVariableTarget]::User)
+		}
+	}
+
 	return $true
 }
