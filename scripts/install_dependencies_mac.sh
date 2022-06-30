@@ -19,7 +19,7 @@
 
 # get the current script directory
 PROJECT_DIR=$(pwd)
-MAC_SCRIPT_DIR="$PROJECT_DIR/scripts/mac_scripts"
+MAC_SCRIPT_DIR="$PROJECT_DIR/scripts/mac"
 
 # install formula dependencies via brew
 brew tap homebrew/services
