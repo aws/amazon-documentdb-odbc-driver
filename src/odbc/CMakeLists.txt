@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-project(ignite-odbc)
+project(documentdb-odbc)
 
 set(TARGET ${PROJECT_NAME})
 
@@ -201,7 +201,7 @@ if (WIN32)
         target_link_libraries(${TARGET} legacy_stdio_definitions)
     endif()
                 
-    set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME "ignite.odbc")
+    set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME "documentdb.odbc")
 else()
     target_link_libraries(${TARGET})
 endif()
@@ -217,7 +217,7 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         message(FATAL_ERROR "WIX light.exe not found! Have you installed WIX Toolset or forgotten to add it to Path?")
     endif()
 
-    set(WIX_ODBC_LIBRARY_PATH ".\\ignite.odbc.dll")
+    set(WIX_ODBC_LIBRARY_PATH ".\\documentdb.odbc.dll")
 
     set(WIX_PROJECT_NAME "Amazon DocumentDB")
     set(WIX_MANUFACTURER "Amazon Web Services")
