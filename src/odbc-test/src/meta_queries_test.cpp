@@ -129,7 +129,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
 
     BOOST_REQUIRE_EQUAL(ret, SQL_NO_DATA);
 
-    ret = SQLGetData(stmt, 1, SQL_C_CHAR, buf, sizeof(buf), &bufLen);
+    ret = SQLGetData(stmt, 1, SQL_C_WCHAR, buf, sizeof(buf), &bufLen);
 
     BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
     BOOST_CHECK_EQUAL(GetOdbcErrorState(SQL_HANDLE_STMT, stmt),
@@ -318,7 +318,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     SQLSMALLINT nullability;
 
     SQLRETURN ret = SQLDescribeCol(
-        stmt, idx, &name[0], (SQLSMALLINT)name.size() * sizeof(SQLWCHAR),
+        stmt, idx, &name[0], (SQLSMALLINT)name.size(),
         &nameLen, &dataType, &size, &scale, &nullability);
     ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 

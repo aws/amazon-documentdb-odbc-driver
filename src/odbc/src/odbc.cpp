@@ -836,8 +836,15 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
     return SQL_INVALID_HANDLE;
   }
 
+  // Convert from length in characters to bytes.
+  SQLSMALLINT columnNameLenInBytes = 0;
   statement->GetColumnAttribute(columnNum, SQL_DESC_NAME, columnNameBuf,
-                                columnNameBufLen, columnNameLen, 0);
+                                columnNameBufLen * sizeof(SQLWCHAR),
+                                &columnNameLenInBytes, 0);
+  if (columnNameLen) {
+    // Convert from length in bytes to characters.
+    *columnNameLen = columnNameLenInBytes / sizeof(SQLWCHAR);
+  }
 
   SqlLen dataTypeRes;
   SqlLen columnSizeRes;
@@ -1199,18 +1206,18 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
       return SQL_ERROR;
     }
 
-    // Length is given in bytes
+    // Length is given in characters
     *msgLen = CopyStringToBuffer(errMsg, msgBuffer,
-                                 static_cast< size_t >(msgBufferLen), true);
+                                 static_cast< size_t >(msgBufferLen));
 
     LOG_DEBUG_MSG("SQLGetDiagRec exiting with SQL_SUCCESS_WITH_INFO");
 
     return SQL_SUCCESS_WITH_INFO;
   }
 
-  // Length is given in bytes
-  size_t msgLen0 = CopyStringToBuffer(
-      errMsg, msgBuffer, static_cast< size_t >(msgBufferLen), true);
+  // Length is given in characters
+  size_t msgLen0 = CopyStringToBuffer(errMsg, msgBuffer,
+                                      static_cast< size_t >(msgBufferLen));
 
   if (msgLen)
     *msgLen = msgLen0;

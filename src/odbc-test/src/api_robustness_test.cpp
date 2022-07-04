@@ -194,46 +194,57 @@ BOOST_AUTO_TEST_CASE(TestSQLDriverConnect) {
   CreateDsnConnectionStringForLocalServer(dsnConnectionString);
   std::vector< SQLWCHAR > connectStr(dsnConnectionString.begin(),
                                      dsnConnectionString.end());
+  SQLSMALLINT connectStrLen = static_cast< SQLSMALLINT >(connectStr.size());
 
   SQLWCHAR outStr[ODBC_BUFFER_SIZE];
   SQLSMALLINT outStrLen;
 
   // Normal connect.
   SQLRETURN ret = SQLDriverConnect(
-      dbc, NULL, &connectStr[0], static_cast< SQLSMALLINT >(connectStr.size()),
-      outStr, sizeof(outStr), &outStrLen, SQL_DRIVER_COMPLETE);
-
+      dbc, NULL, &connectStr[0], connectStrLen,
+      outStr, ODBC_BUFFER_SIZE, &outStrLen, SQL_DRIVER_COMPLETE);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
-
   SQLDisconnect(dbc);
 
   // Null out string resulting length.
   SQLDriverConnect(dbc, NULL, &connectStr[0],
-                   static_cast< SQLSMALLINT >(connectStr.size()), outStr,
-                   sizeof(outStr), 0, SQL_DRIVER_COMPLETE);
-
+                   connectStrLen, outStr,
+                   ODBC_BUFFER_SIZE, 0, SQL_DRIVER_COMPLETE);
   SQLDisconnect(dbc);
 
   // Null out string buffer length.
   SQLDriverConnect(dbc, NULL, &connectStr[0],
-                   static_cast< SQLSMALLINT >(connectStr.size()), outStr, 0,
+                   connectStrLen, outStr, 0,
                    &outStrLen, SQL_DRIVER_COMPLETE);
-
-
   SQLDisconnect(dbc);
 
   // Null out string.
   SQLDriverConnect(dbc, NULL, &connectStr[0],
-                   static_cast< SQLSMALLINT >(connectStr.size()), 0,
-                   sizeof(outStr), &outStrLen, SQL_DRIVER_COMPLETE);
-
+                   connectStrLen, 0,
+                   ODBC_BUFFER_SIZE, &outStrLen, SQL_DRIVER_COMPLETE);
   SQLDisconnect(dbc);
 
   // Null all.
   SQLDriverConnect(dbc, NULL, &connectStr[0],
-                   static_cast< SQLSMALLINT >(connectStr.size()), 0, 0, 0,
+                   connectStrLen, 0, 0, 0,
                    SQL_DRIVER_COMPLETE);
+  SQLDisconnect(dbc);
 
+  // Reduced output buffer length. Test boundary condition of output buffer
+  SQLSMALLINT reducedOutStrLen = 9;
+  ret = SQLDriverConnect(dbc, NULL, &connectStr[0], connectStrLen, outStr, reducedOutStrLen + 1,
+                         &outStrLen, SQL_DRIVER_COMPLETE);
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+  BOOST_REQUIRE_EQUAL(outStrLen, reducedOutStrLen);
+  std::vector< SQLWCHAR > expectedOutStr(connectStr.begin(),
+                                         connectStr.begin() + reducedOutStrLen);
+  expectedOutStr.push_back(0);
+  std::vector< SQLWCHAR > actualOutStr(outStrLen + 1);
+  for (int i = 0; i <= outStrLen; i++) {
+    actualOutStr[i] = outStr[i];
+  }
+  BOOST_CHECK_EQUAL_COLLECTIONS(actualOutStr.begin(), actualOutStr.end(),
+                                expectedOutStr.begin(), expectedOutStr.end());
   SQLDisconnect(dbc);
 }
 #endif
@@ -248,22 +259,21 @@ BOOST_AUTO_TEST_CASE(TestSQLConnect) {
   SQLSMALLINT resLen = 0;
 
   // Everything is ok.
-  SQLRETURN ret =
-      SQLGetInfo(dbc, SQL_DRIVER_NAME, buffer, ODBC_BUFFER_SIZE, &resLen);
+  SQLRETURN ret = SQLGetInfo(dbc, SQL_DRIVER_NAME, buffer, sizeof(buffer), &resLen);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
 
   // Resulting length is null.
-  SQLGetInfo(dbc, SQL_DRIVER_NAME, buffer, ODBC_BUFFER_SIZE, 0);
+  SQLGetInfo(dbc, SQL_DRIVER_NAME, buffer, sizeof(buffer), 0);
 
   // Buffer length is null.
   SQLGetInfo(dbc, SQL_DRIVER_NAME, buffer, 0, &resLen);
 
   // Buffer is null.
-  SQLGetInfo(dbc, SQL_DRIVER_NAME, 0, ODBC_BUFFER_SIZE, &resLen);
+  SQLGetInfo(dbc, SQL_DRIVER_NAME, 0, sizeof(buffer), &resLen);
 
   // Unknown info.
-  SQLGetInfo(dbc, -1, buffer, ODBC_BUFFER_SIZE, &resLen);
+  SQLGetInfo(dbc, -1, buffer, sizeof(buffer), &resLen);
 
   // All nulls.
   SQLGetInfo(dbc, SQL_DRIVER_NAME, 0, 0, 0);
@@ -609,24 +619,24 @@ BOOST_AUTO_TEST_CASE(TestSQLNativeSql) {
 
   // Everything is ok.
   SQLRETURN ret =
-      SQLNativeSql(dbc, sql.data(), SQL_NTS, buffer, sizeof(buffer), &resLen);
+      SQLNativeSql(dbc, sql.data(), SQL_NTS, buffer, ODBC_BUFFER_SIZE, &resLen);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   // Value size is null.
-  SQLNativeSql(dbc, sql.data(), 0, buffer, sizeof(buffer), &resLen);
+  SQLNativeSql(dbc, sql.data(), 0, buffer, ODBC_BUFFER_SIZE, &resLen);
 
   // Buffer size is null.
   SQLNativeSql(dbc, sql.data(), SQL_NTS, buffer, 0, &resLen);
 
   // Res size is null.
-  SQLNativeSql(dbc, sql.data(), SQL_NTS, buffer, sizeof(buffer), 0);
+  SQLNativeSql(dbc, sql.data(), SQL_NTS, buffer, ODBC_BUFFER_SIZE, 0);
 
   // Value is null.
-  SQLNativeSql(dbc, sql.data(), 0, buffer, sizeof(buffer), &resLen);
+  SQLNativeSql(dbc, sql.data(), 0, buffer, ODBC_BUFFER_SIZE, &resLen);
 
   // Buffer is null.
-  SQLNativeSql(dbc, sql.data(), SQL_NTS, 0, sizeof(buffer), &resLen);
+  SQLNativeSql(dbc, sql.data(), SQL_NTS, 0, ODBC_BUFFER_SIZE, &resLen);
 
   // All nulls.
   SQLNativeSql(dbc, sql.data(), 0, 0, 0, 0);
@@ -701,24 +711,24 @@ BOOST_AUTO_TEST_CASE(TestSQLDescribeCol) {
   SQLSMALLINT nullable = 0;
 
   // Everything is ok.
-  ret = SQLDescribeCol(stmt, 1, columnName, sizeof(columnName), &columnNameLen,
+  ret = SQLDescribeCol(stmt, 1, columnName, ODBC_BUFFER_SIZE, &columnNameLen,
                        &dataType, &columnSize, &decimalDigits, &nullable);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-  SQLDescribeCol(stmt, 1, 0, sizeof(columnName), &columnNameLen, &dataType,
+  SQLDescribeCol(stmt, 1, 0, ODBC_BUFFER_SIZE, &columnNameLen, &dataType,
                  &columnSize, &decimalDigits, &nullable);
   SQLDescribeCol(stmt, 1, columnName, 0, &columnNameLen, &dataType, &columnSize,
                  &decimalDigits, &nullable);
-  SQLDescribeCol(stmt, 1, columnName, sizeof(columnName), 0, &dataType,
+  SQLDescribeCol(stmt, 1, columnName, ODBC_BUFFER_SIZE, 0, &dataType,
                  &columnSize, &decimalDigits, &nullable);
-  SQLDescribeCol(stmt, 1, columnName, sizeof(columnName), &columnNameLen, 0,
+  SQLDescribeCol(stmt, 1, columnName, ODBC_BUFFER_SIZE, &columnNameLen, 0,
                  &columnSize, &decimalDigits, &nullable);
-  SQLDescribeCol(stmt, 1, columnName, sizeof(columnName), &columnNameLen,
+  SQLDescribeCol(stmt, 1, columnName, ODBC_BUFFER_SIZE, &columnNameLen,
                  &dataType, 0, &decimalDigits, &nullable);
-  SQLDescribeCol(stmt, 1, columnName, sizeof(columnName), &columnNameLen,
+  SQLDescribeCol(stmt, 1, columnName, ODBC_BUFFER_SIZE, &columnNameLen,
                  &dataType, &columnSize, 0, &nullable);
-  SQLDescribeCol(stmt, 1, columnName, sizeof(columnName), &columnNameLen,
+  SQLDescribeCol(stmt, 1, columnName, ODBC_BUFFER_SIZE, &columnNameLen,
                  &dataType, &columnSize, &decimalDigits, 0);
   SQLDescribeCol(stmt, 1, 0, 0, 0, 0, 0, 0, 0);
 }
@@ -928,7 +938,7 @@ BOOST_AUTO_TEST_CASE(TestSQLGetDiagRec) {
 
   // Everything is ok.
   ret = SQLGetDiagRec(SQL_HANDLE_STMT, stmt, 1, state, &nativeError, message,
-                      sizeof(message), &messageLen);
+                      ODBC_BUFFER_SIZE, &messageLen);
   BOOST_REQUIRE_EQUAL(ret, SQL_SUCCESS);
 
   // Should return error.
@@ -938,21 +948,21 @@ BOOST_AUTO_TEST_CASE(TestSQLGetDiagRec) {
 
   // Should return message length.
   ret = SQLGetDiagRec(SQL_HANDLE_STMT, stmt, 1, state, &nativeError, message,
-                      sizeof(SQLWCHAR), &messageLen);
+                      0, &messageLen);
   BOOST_REQUIRE_EQUAL(ret, SQL_SUCCESS_WITH_INFO);
 
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
   SQLGetDiagRec(SQL_HANDLE_STMT, stmt, 1, 0, &nativeError, message,
-                sizeof(message), &messageLen);
-  SQLGetDiagRec(SQL_HANDLE_STMT, stmt, 1, state, 0, message, sizeof(message),
+                ODBC_BUFFER_SIZE, &messageLen);
+  SQLGetDiagRec(SQL_HANDLE_STMT, stmt, 1, state, 0, message, ODBC_BUFFER_SIZE,
                 &messageLen);
   SQLGetDiagRec(SQL_HANDLE_STMT, stmt, 1, state, &nativeError, 0,
-                sizeof(message), &messageLen);
+                ODBC_BUFFER_SIZE, &messageLen);
   SQLGetDiagRec(SQL_HANDLE_STMT, stmt, 1, state, &nativeError, message, 0,
                 &messageLen);
   SQLGetDiagRec(SQL_HANDLE_STMT, stmt, 1, state, &nativeError, message,
-                sizeof(message), 0);
+                ODBC_BUFFER_SIZE, 0);
   SQLGetDiagRec(SQL_HANDLE_STMT, stmt, 1, 0, 0, 0, 0, 0);
 }
 
@@ -977,25 +987,25 @@ BOOST_AUTO_TEST_CASE(TestSQLGetData) {
   SQLLEN resLen = 0;
 
   // Everything is ok.
-  ret = SQLGetData(stmt, 1, SQL_C_CHAR, buffer, sizeof(buffer), &resLen);
+  ret = SQLGetData(stmt, 1, SQL_C_WCHAR, buffer, sizeof(buffer), &resLen);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   SQLFetch(stmt);
 
-  SQLGetData(stmt, 1, SQL_C_CHAR, 0, sizeof(buffer), &resLen);
+  SQLGetData(stmt, 1, SQL_C_WCHAR, 0, sizeof(buffer), &resLen);
 
   SQLFetch(stmt);
 
-  SQLGetData(stmt, 1, SQL_C_CHAR, buffer, 0, &resLen);
+  SQLGetData(stmt, 1, SQL_C_WCHAR, buffer, 0, &resLen);
 
   SQLFetch(stmt);
 
-  SQLGetData(stmt, 1, SQL_C_CHAR, buffer, sizeof(buffer), 0);
+  SQLGetData(stmt, 1, SQL_C_WCHAR, buffer, sizeof(buffer), 0);
 
   SQLFetch(stmt);
 
-  SQLGetData(stmt, 1, SQL_C_CHAR, 0, 0, 0);
+  SQLGetData(stmt, 1, SQL_C_WCHAR, 0, 0, 0);
 
   SQLFetch(stmt);
 }
@@ -1112,34 +1122,34 @@ BOOST_AUTO_TEST_CASE(TestSQLError) {
 
   // Everything is ok.
   SQLRETURN ret = SQLError(env, 0, 0, state, &nativeCode, message,
-                           sizeof(message), &messageLen);
+                           ODBC_BUFFER_SIZE, &messageLen);
 
   if (ret != SQL_SUCCESS && ret != SQL_NO_DATA)
     BOOST_FAIL("Unexpected error");
 
-  ret = SQLError(0, dbc, 0, state, &nativeCode, message, sizeof(message),
+  ret = SQLError(0, dbc, 0, state, &nativeCode, message, ODBC_BUFFER_SIZE,
                  &messageLen);
 
   if (ret != SQL_SUCCESS && ret != SQL_NO_DATA)
     BOOST_FAIL("Unexpected error");
 
-  ret = SQLError(0, 0, stmt, state, &nativeCode, message, sizeof(message),
+  ret = SQLError(0, 0, stmt, state, &nativeCode, message, ODBC_BUFFER_SIZE,
                  &messageLen);
 
   if (ret != SQL_SUCCESS && ret != SQL_NO_DATA)
     BOOST_FAIL("Unexpected error");
 
-  SQLError(0, 0, 0, state, &nativeCode, message, sizeof(message), &messageLen);
+  SQLError(0, 0, 0, state, &nativeCode, message, ODBC_BUFFER_SIZE, &messageLen);
 
-  SQLError(0, 0, stmt, 0, &nativeCode, message, sizeof(message), &messageLen);
+  SQLError(0, 0, stmt, 0, &nativeCode, message, ODBC_BUFFER_SIZE, &messageLen);
 
-  SQLError(0, 0, stmt, state, 0, message, sizeof(message), &messageLen);
+  SQLError(0, 0, stmt, state, 0, message, ODBC_BUFFER_SIZE, &messageLen);
 
-  SQLError(0, 0, stmt, state, &nativeCode, 0, sizeof(message), &messageLen);
+  SQLError(0, 0, stmt, state, &nativeCode, 0, ODBC_BUFFER_SIZE, &messageLen);
 
   SQLError(0, 0, stmt, state, &nativeCode, message, 0, &messageLen);
 
-  SQLError(0, 0, stmt, state, &nativeCode, message, sizeof(message), 0);
+  SQLError(0, 0, stmt, state, &nativeCode, message, ODBC_BUFFER_SIZE, 0);
 
   SQLError(0, 0, stmt, 0, 0, 0, 0, 0);
 
