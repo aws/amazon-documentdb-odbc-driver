@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-project(ignite-odbc-tests)
+project(documentdb-odbc-tests)
 
 set(TARGET ${PROJECT_NAME})
 
