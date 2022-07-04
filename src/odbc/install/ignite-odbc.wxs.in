@@ -34,7 +34,7 @@
             <Directory Id='@WIX_PROGRAM_FILES_FOLDER_ID@' Name='ProgramFiles'>
                 <Directory Id='AmazonDocumentDB' Name='Amazon DocumentDB'>
                     <Directory Id='INSTALLDIR' Name='ODBC Driver'>
-                        <Component Id='Driver' Guid='@WIX_COMPONENT_ID@' Win64='@WIX_COMPONENT_IS_WIN64@'>
+                        <Component Id='Driver' Guid='@WIX_COMPONENT_ID_ODBC_LIBRARY@' Win64='@WIX_COMPONENT_IS_WIN64@'>
                             <File Id='IgniteOdbcDll' Name='ignite.odbc.dll' DiskId='1' Source='@WIX_ODBC_LIBRARY_PATH@' KeyPath='yes'/>
 
                             <RegistryValue Root='HKLM' Key='Software\ODBC\ODBCINST.INI\ODBC Drivers' Name='Amazon DocumentDB' Type='string' Value='Installed'/>
@@ -46,6 +46,29 @@
                                 <RegistryValue Type='integer' Name='UsageCount' Value='1'/>
                             </RegistryKey>
                         </Component>
+                        <Component Id='bson1' Guid='@WIX_COMPONENT_ID_BSON1@' Win64='@WIX_COMPONENT_IS_WIN64@'>
+                            <File Id='bson1' Name='bson-1.0.dll' DiskId='1' Source='@WIX_ODBC_BSON1_PATH@' KeyPath='yes'/>
+                        </Component>
+                        <Component Id='bsoncxx' Guid='@WIX_COMPONENT_ID_BSONCXX@' Win64='@WIX_COMPONENT_IS_WIN64@'>
+                            <File Id='bsoncxx' Name='bsoncxx.dll' DiskId='1' Source='@WIX_ODBC_BSONCXX_PATH@' KeyPath='yes'/>
+                        </Component>
+                        <Component Id='mongoc' Guid='@WIX_COMPONENT_ID_MONGOC@' Win64='@WIX_COMPONENT_IS_WIN64@'>
+                            <File Id='mongoc' Name='mongoc-1.0.dll' DiskId='1' Source='@WIX_ODBC_MONGOC_PATH@' KeyPath='yes'/>
+                        </Component>
+                        <Component Id='mongocxx' Guid='@WIX_COMPONENT_ID_MONGOCXX@' Win64='@WIX_COMPONENT_IS_WIN64@'>
+                            <File Id='mongocxx' Name='mongocxx.dll' DiskId='1' Source='@WIX_ODBC_MONGOCXX_PATH@' KeyPath='yes'/>
+                        </Component>
+                        <Component Id='zlib' Guid='@WIX_COMPONENT_ID_ZLIB1@' Win64='@WIX_COMPONENT_IS_WIN64@'>
+                            <File Id='zlib' Name='zlib1.dll' DiskId='1' Source='@WIX_ODBC_ZLIB1_PATH@' KeyPath='yes'/>
+                        </Component>
+                        <Directory Id='JDBCDIR' Name='libs'>
+                            <Component Id='JDBC' Guid='@WIX_COMPONENT_ID_JDBC@' Win64='@WIX_COMPONENT_IS_WIN64@'>
+                                <File Id='JDBC' Name='documentdb-jdbc-1.2.4-all.jar' DiskId='1' Source='@WIX_ODBC_JDBC_PATH@' KeyPath='yes'/>
+                            </Component>
+                        </Directory>
+                        <Component Id='DOCUMENTDBHOMEVAR' Guid='@WIX_COMPONENT_ID_DOCUMNETDB_HOME_ENV_VAR@' Win64='@WIX_COMPONENT_IS_WIN64@' KeyPath='yes' >
+                            <Environment Id='DOCUMENTDBHOME' Name='DOCUMENTDB_HOME' Action='set' System='yes' Part='all' Value='[INSTALLDIR]' />
+                        </Component>
                     </Directory>
                 </Directory>
             </Directory>
@@ -54,6 +77,13 @@
         <Feature Id='Complete' Title='ODBC Driver' Description='@WIX_PRODUCT_NAME@.' Level='1'
             ConfigurableDirectory='INSTALLDIR' Absent='disallow' AllowAdvertise='no' InstallDefault='local'>
             <ComponentRef Id='Driver' />
+            <ComponentRef Id='bson1' />
+            <ComponentRef Id='bsoncxx' />
+            <ComponentRef Id='mongoc' />
+            <ComponentRef Id='mongocxx' />
+            <ComponentRef Id='zlib' />
+            <ComponentRef Id='JDBC' />
+            <ComponentRef Id='DOCUMENTDBHOMEVAR' />
         </Feature>
 
         <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
