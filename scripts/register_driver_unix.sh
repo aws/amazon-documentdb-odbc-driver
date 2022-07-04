@@ -11,9 +11,9 @@ SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 PROJECT_DIR="$SCRIPT_DIR/.."
 ODBC_LIB_PATH="$PROJECT_DIR/build/odbc/lib"
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  ODBC_LIB_FILENAME="$ODBC_LIB_PATH/libignite-odbc.so"
+  ODBC_LIB_FILENAME="$ODBC_LIB_PATH/libdocumentdb-odbc.so"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-  ODBC_LIB_FILENAME="$ODBC_LIB_PATH/libignite-odbc.dylib"
+  ODBC_LIB_FILENAME="$ODBC_LIB_PATH/libdocumentdb-odbc.dylib"
 fi
 
 
@@ -23,16 +23,16 @@ then
   exit 1
 fi
 
-echo "[Amazon DocumentDB]"            > "$ODBC_LIB_PATH/ignite-odbc-install.ini"
-echo "Description=Amazon DocumentDB" >> "$ODBC_LIB_PATH/ignite-odbc-install.ini"
-echo "Driver=$ODBC_LIB_FILENAME" >> "$ODBC_LIB_PATH/ignite-odbc-install.ini"
-echo "Setup=$ODBC_LIB_FILENAME"  >> "$ODBC_LIB_PATH/ignite-odbc-install.ini"
-echo "DriverODBCVer=03.00"       >> "$ODBC_LIB_PATH/ignite-odbc-install.ini"
-echo "FileUsage=0"               >> "$ODBC_LIB_PATH/ignite-odbc-install.ini"
+echo "[Amazon DocumentDB]"            > "$ODBC_LIB_PATH/documentdb-odbc-install.ini"
+echo "Description=Amazon DocumentDB" >> "$ODBC_LIB_PATH/documentdb-odbc-install.ini"
+echo "Driver=$ODBC_LIB_FILENAME" >> "$ODBC_LIB_PATH/documentdb-odbc-install.ini"
+echo "Setup=$ODBC_LIB_FILENAME"  >> "$ODBC_LIB_PATH/documentdb-odbc-install.ini"
+echo "DriverODBCVer=03.00"       >> "$ODBC_LIB_PATH/documentdb-odbc-install.ini"
+echo "FileUsage=0"               >> "$ODBC_LIB_PATH/documentdb-odbc-install.ini"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  odbcinst -i -d -f "$ODBC_LIB_PATH/ignite-odbc-install.ini"
+  odbcinst -i -d -f "$ODBC_LIB_PATH/documentdb-odbc-install.ini"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-  export ODBCINSTINI="$ODBC_LIB_PATH/ignite-odbc-install.ini"
+  export ODBCINSTINI="$ODBC_LIB_PATH/documentdb-odbc-install.ini"
   echo "Exported ODBCINSTINI=$ODBCINSTINI"
 fi
