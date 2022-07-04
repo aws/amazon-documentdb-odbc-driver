@@ -20,6 +20,7 @@ $CHECK=1
 if ( [string]::IsNullOrEmpty(${Env:DOC_DB_USER_NAME}) ) {
   Write-Output "DOC_DB_USER_NAME environment variable is not set. Using default."
   $Env:DOC_DB_USER_NAME = "documentdb"
+  [System.Environment]::SetEnvironmentVariable('DOC_DB_USER_NAME', $Env:DOC_DB_USER_NAME, [System.EnvironmentVariableTarget]::User)
   Write-Output "DOC_DB_USER_NAME=$Env:DOC_DB_USER_NAME"
 } else {
   Write-Output "DOC_DB_USER_NAME=$Env:DOC_DB_USER_NAME"
@@ -63,6 +64,7 @@ if ( [string]::IsNullOrEmpty(${Env:JAVA_HOME}) ) {
 if ( [string]::IsNullOrEmpty(${Env:DOCUMENTDB_HOME}) ) {
   Write-Output "DOCUMENTDB_HOME environment variable is not set. Using default."
   $Env:DOCUMENTDB_HOME="${scriptPath}\..\build\odbc\bin\Debug"
+  [System.Environment]::SetEnvironmentVariable('DOCUMENTDB_HOME', $Env:DOCUMENTDB_HOME, [System.EnvironmentVariableTarget]::User)
   Write-Output "DOCUMENTDB_HOME=$Env:DOCUMENTDB_HOME"
 } else {
   Write-Output "DOCUMENTDB_HOME=$Env:DOCUMENTDB_HOME"

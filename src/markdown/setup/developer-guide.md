@@ -71,30 +71,31 @@ Example:
       1. Open Settings -> Apps -> Optional Features -> Under "Related Settings", click on "More Windows features", and select ".Net Framework 3.5".
       ![Alt text](src/markdown/images/dotNet_screenshot.PNG "Example")
    6. [WiX Toolset Visual Studio 2019 Extension](https://marketplace.visualstudio.com/items?itemName=WixToolset.WiXToolset)
-2. OpenSSL (full)
-   1. Installed via [VCPKG](https://vcpkg.io/en/getting-started.html) (`.\vcpkg install openssl`).
-   2. Or installed via [Chocolatey](https://community.chocolatey.org/packages/openssl). 
-   3. Ensure to set the OPENSSL_ROOT_DIR.
-3. [WiX Installer (3.11)](https://wixtoolset.org/releases/)
-   1. Ensure to add path to WiX executables (e.g. `C:\Program Files (x86)\WiX Toolset v3.11\bin`)
-4. [Java](https://www.oracle.com/java/technologies/downloads/) **JDK** (version 8+ - 17 recommended)
-   1. Ensure to set `JAVA_HOME`. (e.g. C:\Program Files\Java\jdk-17.0.2)
-   2. Ensure to save Java `\bin` and `\server` directories to the User `PATH` variable. 
-   Example: C:\Program Files\Java\jdk1.8.0_321\jre\bin\server
-5. Boost Test Framework and Mondodb Driver
-   1. Install via [VCPKG](https://vcpkg.io/en/getting-started.html) using `.\vcpkg install openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows mongo-cxx-driver:x64-windows`
+2. Ensure PowerShell (64-bit, version 7 or greater) is installed.
+   1. [Dowload and install PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2).
+   2. Create a short-cut for a Developer Shell. Change the path to the `Microsoft.VisualStudio.DevShell.dll` as appropriate for
+   your version of Visual Studio. 
+      - Example short-cut path: `"C:\Program Files\PowerShell\7\pwsh.exe" -noe -c "&{Import-Module """C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\Microsoft.VisualStudio.DevShell.dll"""; Enter-VsDevShell db62f8c1}"`
+2. Install Dependencies
+   1. Start a version 7 or greater PowerShell (pwsh.exe) - preferrably 
+    in ***Run as Administrator*** mode.
+   2. Change directory to the project directory.
+   3. Run the installation script `scripts\install_dependencies_win.ps1`
+2. Setup Environment Variables
+   1. Start a version 7 or greater PowerShell (pwsh.exe) 
+   2. Change directory to the project directory.
+   3. Run the following script: `scripts\env_variables_check.ps1`
+   4. For any missing environment variables, add the missing environment variable to your
+   user setup.
 6. On the Developer PowerShell, run one of the build scripts to create an initial compilation.
    1. E.g.: `.\build_win_debug64.ps1`
    2. Navigate to the `build\odbc\cmake` folder to use the generated solution file, `Ignite.C++.sln` to work on
    source code development and testing.
-7. Set the environment variable `DOCUMENTDB_HOME`. On a developer's machine, set it to `<repo-folder>\build\odbc\bin\Debug`. The 
-   build script run above, downloads the JDBC jar to the `<repo-folder>\build\odbc\bin\Debug\libs` folder.
-8. Open a **64-bit** command shell or **64-bit** PowerShell window, **as Administrator**, run the command below
+8. Open a **64-bit** command shell or **64-bit** PowerShell window, ***as Administrator***, run the command below
    ```
    .\<repo-folder>\src\odbc\install\install_amd64.cmd <repo-folder>\build\odbc\cmake\Debug\ignite.odbc.dll
    ``` 
    Ensure that backslashes are used in your command. 
-9. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
 ## MacOS
 
