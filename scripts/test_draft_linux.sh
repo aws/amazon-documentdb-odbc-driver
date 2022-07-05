@@ -19,7 +19,7 @@ env_var_file=".bashrc"
 
 
 java_home_set=1
-# check env vars
+# check enviornment variables
 if [[ "${JAVA_HOME}" != "${java_home_path}" ]]; then
     echo "JAVA_HOME is not set properly. Removing previous definitions to JAVA_HOME and give new definition"
     java_home_set=0
