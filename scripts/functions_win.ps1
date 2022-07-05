@@ -19,6 +19,8 @@ $powerShellVersion = $PSVersionTable.PSVersion.Major
 $scriptPath = Split-Path -parent $PSCommandPath
 $projectPath = Split-Path -parent $scriptPath
 
+# Confirms that the minimum PowerShell version is being used.
+# Returns true if version is supported, otherwise, returns false.
 function Confirm-PowerShellVersion {
 	[OutputType([Boolean])]
 	Param()
@@ -35,6 +37,8 @@ function Confirm-PowerShellVersion {
 	return $true
 }
 
+# Confirms if the PowerShell is running as an administrator.
+# Returns true is running as an administrator, otherwise, returns false.
 function Confirm-RunAsAdministrator {
 	[OutputType([Boolean])]
 	Param()
@@ -47,6 +51,7 @@ function Confirm-RunAsAdministrator {
 	return $true
 }
 
+# Invokes the given command in a new process elevated to run as administrator.
 function Invoke-RunAsAdministrator {
 	[OutputType([Boolean])]
 	Param(
@@ -74,13 +79,11 @@ function Invoke-RunAsAdministrator {
 			return $true
 		}
 	}
-	else {
-		
-	}
 
 	return $false
 }
 
+# Invokes the given script in a new process elevated to run as administrator.
 function Invoke-ScriptRunAsAdministrator {
 	[OutputType([Boolean])]
 	Param(
@@ -114,6 +117,7 @@ function Invoke-ScriptRunAsAdministrator {
 	return $false
 }
 
+# Enables the Visual Studio DevShell. This provides paths and evironment to support compiling, etc.
 function Enable-VsDevShell {
 	[OutputType([Boolean])]
 	Param()
@@ -131,6 +135,7 @@ function Enable-VsDevShell {
 	return $true
 }
 
+# Confirms that the 'cmake' command is available.
 function Confirm-CmakeExists {
 	[OutputType([Boolean])]
 	Param()
@@ -146,8 +151,7 @@ function Confirm-CmakeExists {
 	return $true
 }
 
-# ODBC SDK
-
+# Confirms that a valid version of Java JDK is installed and available.
 function Confirm-JavaJdk {
 	[OutputType([Boolean])]
 	param ()
@@ -155,7 +159,8 @@ function Confirm-JavaJdk {
 	# Java SDK
 	Write-Host "Checking for dependency JDK"
 	$jdkFound = $false
-	# Checks that JAVA_HOME is define, path exists and is a JDK (i.e., include subdirectory)
+	# Checks that JAVA_HOME is defined, the path to JAVA_HOME exists 
+	# and is a JDK (i.e., include subdirectory)
 	if ( -not ([string]::IsNullOrEmpty($Env:JAVA_HOME)) `
 		-and (Test-Path -Path $Env:JAVA_HOME) `
 		-and (Test-Path -Path "${Env:JAVA_HOME}\include") ) {
@@ -187,6 +192,7 @@ function Confirm-JavaJdk {
 	return $jdkFound
 }
 
+# Installs an Amazon Corretto JDK into the user's folder and updates the JAVA_HOME and PATH environment variables.
 function Install-JavaJdk {
 	[OutputType([Boolean])]
 	param ()
@@ -235,6 +241,7 @@ function Install-JavaJdk {
 	return $true
 }
 
+# Sets the PATH for ensuring access to 'java.exe' and 'jvm.dll'
 function Set-JdkPath {
 	[OutputType([Boolean])]
 	param ()
@@ -265,6 +272,7 @@ function Set-JdkPath {
 	}
 }
 
+# Installs or updates the VCPKG repository from GitHub.
 function Install-Vcpkg {
 	[OutputType([Boolean])]
 	Param()
@@ -278,55 +286,48 @@ function Install-Vcpkg {
 	if ( -not ((Test-Path -Path $Env:VCPKG_ROOT)) ) {
 		Write-Host "Cloning VCPKG GitHub repository into $Env:VCPKG_ROOT"
 		New-Item $Env:VCPKG_ROOT -ItemType Directory -Force
+		$prevLocation = Get-Location
 		Set-Location $Env:VCPKG_ROOT
 		git clone https://github.com/microsoft/vcpkg.git $Env:VCPKG_ROOT
 		.\bootstrap-vcpkg | Write-Host
 		.\vcpkg.exe integrate install | Write-Host
+		Set-Location $prevLocation
 	} else {
 		Write-Host "Updating VCPKG GitHub local repository in $Env:VCPKG_ROOT"
+		$prevLocation = Get-Location
 		Set-Location $Env:VCPKG_ROOT
 		git pull
 		.\vcpkg.exe integrate install | Write-Host
+		Set-Location $prevLocation
 	}
 	return $true
 }
 
+# Installs or updates the required VCPKG packages using the 'vcpkg.json' manifest file.
 function Install-VcpkgPackages {
 	[OutputType([Boolean])]
-	Param()
+	Param(
+		$Triplet = "x64-windows"
+	)
 
-	# OpenSSL
-	Set-Location $Env:VCPKG_ROOT
-	.\vcpkg.exe install openssl:x64-windows | Write-Host
-	if ($LASTEXITCODE -ne 0) {
-		Write-Host "Unable to install openssl library"
-		return $false
+	$prevLocation = Get-Location
+	try {
+		# Assumes the script's folder contains the 'vcpkg.json' configuration file.
+		Set-Location $scriptPath
+		& "${Env:VCPKG_ROOT}\vcpkg.exe" install --triplet $Triplet --x-install-root="${Env:VCPKG_ROOT}/installed" | Write-Host
+		if ($LASTEXITCODE -ne 0) {
+			Write-Host "Unable to install VCPKG libraries"
+			return $false
+		}
+
+		return $true
 	}
-
-	# Boost SDK
-	.\vcpkg.exe install `
-		boost-test:x64-windows `
-		boost-asio:x64-windows `
-		boost-chrono:x64-windows `
-		boost-interprocess:x64-windows `
-		boost-regex:x64-windows `
-		boost-system:x64-windows `
-		boost-thread:x64-windows | Write-Host
-	if ($LASTEXITCODE -ne 0) {
-		Write-Host "Unable to install openssl library"
-		return $false
+	finally {
+		Set-Location $prevLocation
 	}
-
-	# Mongo SDK
-	.\vcpkg.exe install mongo-cxx-driver:x64-windows | Write-Host
-	if ($LASTEXITCODE -ne 0) {
-		Write-Host "Unable to install openssl library"
-		return $false
-	}
-
-	return $true
 }
 
+# Installs or updates the MongoDb server and shell commands.
 function Install-MongoDb {
 	[OutputType([Boolean])]
 	Param()
@@ -342,6 +343,7 @@ function Install-MongoDb {
 	return $true
 }
 
+# Installs or updates the WIX Toolset and updates the PATH environment variable.
 function Install-WixToolset {
 	[OutputType([Boolean])]
 	Param()

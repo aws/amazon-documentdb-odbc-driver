@@ -53,6 +53,7 @@ try {
 		return 1
 	}
 
+	Write-Host "Installation completed."
 	return
 }
 finally {
