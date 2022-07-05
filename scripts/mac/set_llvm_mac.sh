@@ -1,7 +1,7 @@
 # store project directory
 PROJECT_DIR=$(pwd)
 
-#find correct path to java_home_path
+#llvm_path points to path to LLVM
 llvm_path="/Library/Developer/CommandLineTools/usr/bin/"
 set_llvm_path="export PATH=\"$llvm_path:\$PATH\""
 llvm_app_path"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/"

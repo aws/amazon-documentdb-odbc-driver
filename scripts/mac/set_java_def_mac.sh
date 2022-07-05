@@ -1,7 +1,7 @@
 # store current directory
 CURRENT_DIR=$(pwd)
 
-#find correct path to java_home_path
+#java_home_path points to JAVA_HOME
 java_home_path="/Library/Java/JavaVirtualMachines/temurin-18.jdk/Contents/Home" 
 java_server_path="$java_home_path/lib/server/"
 java_bin_path="$java_home_path/bin"
@@ -13,7 +13,7 @@ cd ~
 env_var_file=".zshrc"
 updated=0
 
-# check env vars
+# check enviornment variables
 if [[ "${JAVA_HOME}" != "${java_home_path}" ]]; then
     if [[ -d "${java_home_path}" ]]; then
         echo "JAVA_HOME is not set properly. Appending definition of JAVA_HOME to end of ${env_var_file}"

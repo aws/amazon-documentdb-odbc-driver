@@ -23,7 +23,7 @@ then
     exit 1
 fi
 
-# check env vars and write them as needed
+# check enviornment variables and write them as needed
 if [[ "${DOCUMENTDB_HOME}" != "${docdb_home}" ]]; then
     echo "DOCUMENTDB_HOME is not set properly. Appending definition of DOCUMENTDB_HOME to end of ${env_var_file}"
     echo "$set_docdb_home" >> $env_var_file
