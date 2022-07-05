@@ -940,6 +940,9 @@ BOOST_AUTO_TEST_CASE(TestSQLGetDiagRec) {
   ret = SQLGetDiagRec(SQL_HANDLE_STMT, stmt, 1, state, &nativeError, message,
                       ODBC_BUFFER_SIZE, &messageLen);
   BOOST_REQUIRE_EQUAL(ret, SQL_SUCCESS);
+  std::vector< SQLWCHAR > actualMessage;
+  actualMessage.insert(actualMessage.end(), &message[0],
+                       &message[messageLen + 1]);
 
   // Should return error.
   ret = SQLGetDiagRec(SQL_HANDLE_STMT, stmt, 1, state, &nativeError, message,
@@ -950,6 +953,22 @@ BOOST_AUTO_TEST_CASE(TestSQLGetDiagRec) {
   ret = SQLGetDiagRec(SQL_HANDLE_STMT, stmt, 1, state, &nativeError, message,
                       0, &messageLen);
   BOOST_REQUIRE_EQUAL(ret, SQL_SUCCESS_WITH_INFO);
+
+  // Check boundary condition on reduced output buffer.
+  SQLSMALLINT reducedMessageLen = 8;
+  ret = SQLGetDiagRec(SQL_HANDLE_STMT, stmt, 1, state, &nativeError, message,
+                      reducedMessageLen + 1, &messageLen);
+  BOOST_REQUIRE_EQUAL(ret, SQL_SUCCESS_WITH_INFO);
+  BOOST_REQUIRE_EQUAL(messageLen, reducedMessageLen);
+  std::vector< SQLWCHAR > reducedExpectedMessage(
+      actualMessage.begin(), actualMessage.begin() + reducedMessageLen);
+  reducedExpectedMessage.push_back(0);
+  std::vector< SQLWCHAR > reducedMessage;
+  reducedMessage.insert(reducedMessage.end(), &message[0],
+                        &message[messageLen + 1]);
+  BOOST_CHECK_EQUAL_COLLECTIONS(reducedMessage.begin(), reducedMessage.end(),
+                                reducedExpectedMessage.begin(),
+                                reducedExpectedMessage.end());
 
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
@@ -1120,22 +1139,46 @@ BOOST_AUTO_TEST_CASE(TestSQLError) {
   SQLWCHAR message[ODBC_BUFFER_SIZE] = {0};
   SQLSMALLINT messageLen = 0;
 
-  // Everything is ok.
-  SQLRETURN ret = SQLError(env, 0, 0, state, &nativeCode, message,
-                           ODBC_BUFFER_SIZE, &messageLen);
+  // Generating error.
+  SQLRETURN ret = SQLGetTypeInfo(stmt, SQL_INTERVAL_MONTH);
+  BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
 
-  if (ret != SQL_SUCCESS && ret != SQL_NO_DATA)
-    BOOST_FAIL("Unexpected error");
+  // Everything is ok.
+  ret = SQLError(env, dbc, stmt, state, &nativeCode, message, ODBC_BUFFER_SIZE,
+                 &messageLen);
+  BOOST_REQUIRE_EQUAL(SQL_SUCCESS, ret);
+  BOOST_CHECK_EQUAL(message[messageLen], 0);
+  std::vector< SQLWCHAR > actualMessage;
+  actualMessage.insert(actualMessage.end(), &message[0],
+                       &message[messageLen + 1]);
+
+  // Check boundary condition with reduced buffer size.
+  ret = SQLGetTypeInfo(stmt, SQL_INTERVAL_MONTH);
+  BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
+  SQLSMALLINT reducedMessageLen = 8;
+  ret = SQLError(env, dbc, stmt, state, &nativeCode, message,
+                 reducedMessageLen + 1, &messageLen);
+  BOOST_REQUIRE_EQUAL(SQL_SUCCESS_WITH_INFO, ret);
+  BOOST_REQUIRE_EQUAL(messageLen, reducedMessageLen);
+  BOOST_CHECK_EQUAL(message[messageLen], 0);
+  std::vector< SQLWCHAR > reducedActualMessage;
+  reducedActualMessage.insert(reducedActualMessage.end(), &message[0],
+                       &message[messageLen + 1]);
+  std::vector< SQLWCHAR > reducedExpectedMessage(
+      actualMessage.begin(), actualMessage.begin() + reducedMessageLen);
+  reducedExpectedMessage.push_back(0);
+  BOOST_CHECK_EQUAL_COLLECTIONS(
+      reducedActualMessage.begin(), reducedActualMessage.end(),
+      reducedExpectedMessage.begin(), reducedExpectedMessage.end());
+
 
   ret = SQLError(0, dbc, 0, state, &nativeCode, message, ODBC_BUFFER_SIZE,
                  &messageLen);
-
   if (ret != SQL_SUCCESS && ret != SQL_NO_DATA)
     BOOST_FAIL("Unexpected error");
 
   ret = SQLError(0, 0, stmt, state, &nativeCode, message, ODBC_BUFFER_SIZE,
                  &messageLen);
-
   if (ret != SQL_SUCCESS && ret != SQL_NO_DATA)
     BOOST_FAIL("Unexpected error");
 
