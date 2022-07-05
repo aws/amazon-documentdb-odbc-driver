@@ -334,9 +334,9 @@ void OdbcTestSuite::CheckTestI8ArrayValue(int idx, const int8_t* val,
   }
 }
 
-void OdbcTestSuite::CheckSQLDiagnosticError(int16_t handleType,
-                                            SQLHANDLE handle,
-                                            const std::string& expectSqlState) {
+void OdbcTestSuite::CheckSQLDiagnosticError(
+    int16_t handleType, SQLHANDLE handle,
+    const std::string& expectedSqlStateStr) {
   SQLWCHAR state[ODBC_BUFFER_SIZE];
   SQLINTEGER nativeError = 0;
   SQLWCHAR message[ODBC_BUFFER_SIZE];
@@ -345,9 +345,13 @@ void OdbcTestSuite::CheckSQLDiagnosticError(int16_t handleType,
   SQLRETURN ret = SQLGetDiagRec(handleType, handle, 1, state, &nativeError,
                                 message, sizeof(message), &messageLen);
 
+  std::vector< SQLWCHAR > expectSqlStateWchar =
+      MakeSqlBuffer(expectedSqlStateStr);
+  const std::string expectedSqlState =
+      reinterpret_cast< char* >(&expectSqlStateWchar[0]);
   const std::string sqlState = reinterpret_cast< char* >(state);
   BOOST_REQUIRE_EQUAL(ret, SQL_SUCCESS);
-  BOOST_REQUIRE_EQUAL(sqlState, expectSqlState);
+  BOOST_REQUIRE_EQUAL(sqlState, expectedSqlState);
   BOOST_REQUIRE(messageLen > 0);
 }
 
@@ -852,13 +856,14 @@ void OdbcTestSuite::CreateDsnConnectionStringForRemoteServer(
 
 void OdbcTestSuite::CreateDsnConnectionStringForLocalServer(
     std::string& connectionString, const std::string& databaseName,
-    const std::string& userName, const std::string& miscOptions) const {
+    const std::string& userName, const std::string& miscOptions,
+    const std::string& portNum) const {
   std::string user = userName.size() > 0
                          ? userName
                          : common::GetEnv("DOC_DB_USER_NAME", "documentdb");
   std::string password = common::GetEnv("DOC_DB_PASSWORD", "");
   std::string host = common::GetEnv("LOCAL_DATABASE_HOST", "localhost");
-  std::string port = "27017";
+  std::string port = portNum;
   std::string database = databaseName.size() > 0 ? databaseName : "odbc-test";
   std::string logPath = common::GetEnv("DOC_DB_LOG_PATH", "");
   std::string logLevel = common::GetEnv("DOC_DB_LOG_LEVEL", "");

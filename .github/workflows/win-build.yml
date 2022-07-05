@@ -30,7 +30,6 @@ env:
   DOC_DB_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
   DOC_DB_LOG_LEVEL: "debug"
   JDBC_DRIVER_VERSION: "1.2.4"
-  MONGO_IMPORT_COMMAND: "C:/ProgramData/chocolatey/lib/mongodb-database-tools/tools/mongodb-database-tools-windows-x86_64-100.5.2binmongoimport.exe"
 
 jobs:
   build-windows32:
@@ -124,7 +123,7 @@ jobs:
 
     - name: register-driver
       run: |
-        .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
+        .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\documentdb.odbc.dll ${{env.ODBC_BIN_PATH}}\documentdb.odbc.dll
 
     - name: Setup MongoDB
       run: |
@@ -138,7 +137,7 @@ jobs:
       run: |
         mkdir -p "${{env.DOC_DB_LOG_PATH}}"
         Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
-        ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
+        ${{env.ODBC_BIN_PATH}}/documentdb-odbc-tests.exe
 
     - name: upload-test-report
       if: always()
@@ -150,7 +149,7 @@ jobs:
 
     - name: upload-test-file
       if: always() && (steps.runtests.outcome == 'failure')
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: odbc-test-results
         path: |
@@ -286,7 +285,7 @@ jobs:
 
     - name: register-driver
       run: |
-        .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\ignite.odbc.dll
+        .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\documentdb.odbc.dll
 
     - name: Setup MongoDB
       run: |
@@ -298,7 +297,7 @@ jobs:
     - name: run-tests
       run: |
         Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
-        ${{env.ODBC_BIN_PATH}}/ignite-odbc-tests.exe
+        ${{env.ODBC_BIN_PATH}}/documentdb-odbc-tests.exe
 
     - name: upload-test-report
       if: always()
@@ -310,7 +309,7 @@ jobs:
 
     - name: upload-test-file
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: odbc-test-results
         path: |
@@ -416,7 +415,7 @@ jobs:
 
     - name: register-driver
       run: |
-        .\src\odbc\install\install_amd64.cmd ${{env.ODBC_DEBUG_PATH}}\ignite.odbc.dll
+        .\src\odbc\install\install_amd64.cmd ${{env.ODBC_DEBUG_PATH}}\documentdb.odbc.dll
 
     - name: Setup MongoDB
       run: |
@@ -430,14 +429,55 @@ jobs:
         DOCUMENTDB_HOME: "${{github.workspace}}/build/odbc/bin/Debug"
       run: |
         Start-Process -NoNewWindow ssh "-f -N -o UserKnownHostsFile=/temp -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}"
-        opencppcoverage --sources src --export_type html:coverage --excluded_modules boost_unit_test_framework --excluded_modules ignite-odbc-tests --excluded_modules mongoc --excluded_modules mongocxx --excluded_modules bson --excluded_modules bsoncxx --excluded_modules zlib -- ${{env.ODBC_DEBUG_PATH}}/ignite-odbc-tests.exe
+        opencppcoverage --sources src --export_type cobertura:coverage.cobertura.xml --excluded_modules boost_unit_test_framework --excluded_modules documentdb-odbc-tests --excluded_modules mongoc --excluded_modules mongocxx --excluded_modules bson --excluded_modules bsoncxx --excluded_modules zlib -- ${{env.ODBC_DEBUG_PATH}}/documentdb-odbc-tests.exe
 
     - name: upload-coverage
       if: always()
       uses: actions/upload-artifact@v3
       with:
         name: code-coverage
-        path: coverage
+        path: coverage.cobertura.xml
+
+
+  comment_PR_coverage:
+    runs-on: ubuntu-latest
+    needs: build-windows64_coverage
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Retrieve coverage
+      uses: actions/download-artifact@v2
+      with:
+        name: code-coverage
+
+    - name: Code Coverage Summary Report
+      uses: irongut/CodeCoverageSummary@v1.2.0
+      with:
+        filename: coverage.cobertura.xml
+        badge: true
+        format: markdown
+        indicators: true
+        output: both
+
+    - name: Add Header for Code Coverage Summary Report
+      run: |
+        echo "## Windows 2022 (x32) Debug Build  Unit Test Results Check" > coverage-cobertura.md
+        cat code-coverage-results.md >> coverage-cobertura.md
+    
+    - name: Add Coverage PR Comment
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request'
+      with:
+        header: windows
+        recreate: true
+        path: coverage-cobertura.md
+
+    # - name: upload-coverage
+    #   if: always()
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: code-coverage
+    #     path: coverage
 
     # 
     # The step below should be uncommented after the codecov is setup

@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-project(ignite-odbc)
+project(documentdb-odbc)
 
 set(TARGET ${PROJECT_NAME})
 
@@ -24,9 +24,14 @@ find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
 find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
+find_package(Boost REQUIRED)
 include(UseJava)
 
-include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS} ${BSONCXX_INCLUDE_DIRS})
+if (${CODE_COVERAGE}) 
+    add_code_coverage()    
+endif()
+
+include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${JNI_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS} ${BSONCXX_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 include_directories(include)
 
 
@@ -195,7 +200,7 @@ if (WIN32)
         target_link_libraries(${TARGET} legacy_stdio_definitions)
     endif()
                 
-    set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME "ignite.odbc")
+    set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME "documentdb.odbc")
 else()
     target_link_libraries(${TARGET})
 endif()
@@ -211,7 +216,7 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         message(FATAL_ERROR "WIX light.exe not found! Have you installed WIX Toolset or forgotten to add it to Path?")
     endif()
 
-    set(WIX_ODBC_LIBRARY_PATH ".\\ignite.odbc.dll")
+    set(WIX_ODBC_LIBRARY_PATH ".\\documentdb.odbc.dll")
     set(WIX_ODBC_BSON1_PATH ".\\bson-1.0.dll")
     set(WIX_ODBC_BSONCXX_PATH ".\\bsoncxx.dll")
     set(WIX_ODBC_MONGOC_PATH ".\\mongoc-1.0.dll")
