@@ -221,7 +221,15 @@ if (WIN32 AND ${WITH_ODBC_MSI})
     set(WIX_ODBC_BSONCXX_PATH ".\\bsoncxx.dll")
     set(WIX_ODBC_MONGOC_PATH ".\\mongoc-1.0.dll")
     set(WIX_ODBC_MONGOCXX_PATH ".\\mongocxx.dll")
-    set(WIX_ODBC_ZLIB1_PATH ".\\zlib1.dll")
+    
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        set(WIX_ODBC_ZLIB1_PATH ".\\zlib1.dll")
+        set(WIX_ODBC_ZLIB1_FILE "zlib1.dll")
+    elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(WIX_ODBC_ZLIB1_PATH ".\\zlibd1.dll")
+        set(WIX_ODBC_ZLIB1_FILE "zlibd1.dll")
+    endif()
+
     set(WIX_ODBC_JDBC_PATH ".\\libs\\documentdb-jdbc-1.2.4-all.jar")
 
     set(WIX_PROJECT_NAME "Amazon DocumentDB")

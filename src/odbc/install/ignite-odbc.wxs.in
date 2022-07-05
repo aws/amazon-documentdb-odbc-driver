@@ -59,7 +59,7 @@
                             <File Id='mongocxx' Name='mongocxx.dll' DiskId='1' Source='@WIX_ODBC_MONGOCXX_PATH@' KeyPath='yes'/>
                         </Component>
                         <Component Id='zlib' Guid='@WIX_COMPONENT_ID_ZLIB1@' Win64='@WIX_COMPONENT_IS_WIN64@'>
-                            <File Id='zlib' Name='zlib1.dll' DiskId='1' Source='@WIX_ODBC_ZLIB1_PATH@' KeyPath='yes'/>
+                            <File Id='zlib' Name='@WIX_ODBC_ZLIB1_FILE@' DiskId='1' Source='@WIX_ODBC_ZLIB1_PATH@' KeyPath='yes'/>
                         </Component>
                         <Directory Id='JDBCDIR' Name='libs'>
                             <Component Id='JDBC' Guid='@WIX_COMPONENT_ID_JDBC@' Win64='@WIX_COMPONENT_IS_WIN64@'>
