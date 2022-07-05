@@ -171,7 +171,7 @@ endif ()
 
 include_directories(${OS_INCLUDE})
 
-add_library(${TARGET} SHARED ${SOURCES})
+add_library(${TARGET} SHARED ${SOURCES} version.rc)
 
 set_target_properties(${TARGET} PROPERTIES VERSION ${CMAKE_PROJECT_VERSION})
 
@@ -293,3 +293,7 @@ elseif(APPLE)
 else()
     target_link_libraries(${TARGET} odbcinst)
 endif()
+
+set(VERSIONINFO ${CMAKE_PROJECT_VERSION_MAJOR},${CMAKE_PROJECT_VERSION_MINOR},${CMAKE_PROJECT_VERSION_PATCH})
+set(VERSIONINFO_STR ${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}.${CMAKE_PROJECT_VERSION_PATCH})
+configure_file("version.rc.in" "version.rc" @ONLY)
