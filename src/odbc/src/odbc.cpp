@@ -755,24 +755,22 @@ SQLRETURN SQLBindParameter(SQLHSTMT stmt, SQLUSMALLINT paramIdx,
 SQLRETURN SQLNativeSql(SQLHDBC conn, SQLWCHAR* inQuery, SQLINTEGER inQueryLen,
                        SQLWCHAR* outQueryBuffer, SQLINTEGER outQueryBufferLen,
                        SQLINTEGER* outQueryLen) {
-  IGNITE_UNUSED(conn);
-
-  using namespace odbc::utility;
+  using namespace odbc;
 
   LOG_DEBUG_MSG("SQLNativeSql called");
 
-  std::string in = SqlWcharToString(inQuery, inQueryLen);
+  Connection* connection = reinterpret_cast< Connection* >(conn);
+  if (!connection) {
+    LOG_ERROR_MSG("SQLAllocHandle exiting with SQL_INVALID_HANDLE");
+    return SQL_INVALID_HANDLE;
+  }
 
-  CopyStringToBuffer(in, outQueryBuffer,
-                     static_cast< size_t >(outQueryBufferLen));
-
-  if (outQueryLen)
-    *outQueryLen =
-        std::min(outQueryBufferLen, static_cast< SQLINTEGER >(in.size()));
+  connection->NativeSql(inQuery, inQueryLen, outQueryBuffer, outQueryBufferLen,
+                        outQueryLen);
 
   LOG_DEBUG_MSG("SQLNativeSql exiting");
 
-  return SQL_SUCCESS;
+  return connection->GetDiagnosticRecords().GetReturnCode();
 }
 
 SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT columnNum,

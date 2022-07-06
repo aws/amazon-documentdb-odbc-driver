@@ -620,26 +620,39 @@ BOOST_AUTO_TEST_CASE(TestSQLNativeSql) {
   // Everything is ok.
   SQLRETURN ret =
       SQLNativeSql(dbc, sql.data(), SQL_NTS, buffer, ODBC_BUFFER_SIZE, &resLen);
-
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
+  // Confirm boundary condition.
+  SQLINTEGER reducedLength = 8;
+  ret = SQLNativeSql(dbc, sql.data(), SQL_NTS, buffer, reducedLength + 1, &resLen);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS_WITH_INFO, ret);
+  BOOST_CHECK_EQUAL(reducedLength, resLen);
+
   // Value size is null.
-  SQLNativeSql(dbc, sql.data(), 0, buffer, ODBC_BUFFER_SIZE, &resLen);
+  ret = SQLNativeSql(dbc, sql.data(), 0, buffer, ODBC_BUFFER_SIZE, &resLen);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  BOOST_CHECK_EQUAL(0, resLen);
 
   // Buffer size is null.
-  SQLNativeSql(dbc, sql.data(), SQL_NTS, buffer, 0, &resLen);
+  ret = SQLNativeSql(dbc, sql.data(), SQL_NTS, buffer, 0, &resLen);
+  BOOST_CHECK_EQUAL(SQL_ERROR, ret);
 
   // Res size is null.
-  SQLNativeSql(dbc, sql.data(), SQL_NTS, buffer, ODBC_BUFFER_SIZE, 0);
+  ret = SQLNativeSql(dbc, sql.data(), SQL_NTS, buffer, ODBC_BUFFER_SIZE, nullptr);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   // Value is null.
-  SQLNativeSql(dbc, sql.data(), 0, buffer, ODBC_BUFFER_SIZE, &resLen);
+  ret = SQLNativeSql(dbc, nullptr, SQL_NTS, buffer, ODBC_BUFFER_SIZE, &resLen);
+  BOOST_CHECK_EQUAL(SQL_ERROR, ret);
 
   // Buffer is null.
-  SQLNativeSql(dbc, sql.data(), SQL_NTS, 0, ODBC_BUFFER_SIZE, &resLen);
+  ret = SQLNativeSql(dbc, sql.data(), SQL_NTS, nullptr, ODBC_BUFFER_SIZE, &resLen);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  BOOST_CHECK_EQUAL(sql.size() - 1, resLen);
 
   // All nulls.
-  SQLNativeSql(dbc, sql.data(), 0, 0, 0, 0);
+  ret = SQLNativeSql(dbc, nullptr, 0, nullptr, 0, nullptr);
+  BOOST_CHECK_EQUAL(SQL_ERROR, ret);
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLColAttribute) {

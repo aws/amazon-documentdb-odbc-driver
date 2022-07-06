@@ -32,6 +32,7 @@
 #include "ignite/odbc/jni/documentdb_connection_properties.h"
 #include "ignite/odbc/jni/documentdb_database_metadata.h"
 #include "ignite/odbc/jni/java.h"
+#include "ignite/odbc/log.h"
 #include "ignite/odbc/odbc_error.h"
 #include "ignite/odbc/parser.h"
 #include "ignite/odbc/streaming/streaming_context.h"
@@ -89,6 +90,24 @@ class Connection : public diagnostic::DiagnosableAdapter {
    */
   void GetInfo(config::ConnectionInfo::InfoType type, void* buf, short buflen,
                short* reslen);
+
+  /**
+   * Gets the native SQL statement.
+   *
+   * @param inQuery SQL query to translate to native SQL.
+   * @param inQueryLen Length of the SQL query.
+   * @param outQueryBuffer Buffer to place the native SQL.
+   * @param outQueryBufferLen Length of the output buffer for the native SQL 
+   * including the null terminating character.
+   * @param outQueryLen Actual or required length of the output buffer for the native SQL
+   * NOT including the null terminating character.
+   */
+  template < typename CharT >
+  void NativeSql(const CharT* inQuery, long inQueryLen, CharT* outQueryBuffer,
+                 long outQueryBufferLen, long* outQueryLen) {
+    IGNITE_ODBC_API_CALL(InternalNativeSql(inQuery, inQueryLen, outQueryBuffer,
+                                           outQueryBufferLen, outQueryLen));
+  }
 
   /**
    * Establish connection to ODBC server.
@@ -329,6 +348,86 @@ class Connection : public diagnostic::DiagnosableAdapter {
    */
   SqlResult::Type InternalGetInfo(config::ConnectionInfo::InfoType type,
                                   void* buf, short buflen, short* reslen);
+
+  /**
+   * Gets the native SQL statement.
+   *
+   * @param inQuery SQL query to translate to native SQL.
+   * @param inQueryLen Length of the SQL query.
+   * @param outQueryBuffer Buffer to place the native SQL.
+   * @param outQueryBufferLen Length of the output buffer for the native SQL
+   * including the null terminating character.
+   * @param outQueryLen Actual or required length of the output buffer for the
+   * native SQL NOT including the null terminating character.
+   * @return Operation result.
+   */
+  template < typename CharT >
+  SqlResult::Type InternalNativeSql(const CharT* inQuery, long inQueryLen,
+                                    CharT* outQueryBuffer,
+                                    long outQueryBufferLen, long* outQueryLen) {
+    bool isTruncated = false;
+    if (!inQuery) {
+      AddStatusRecord(SqlState::SHY009_INVALID_USE_OF_NULL_POINTER,
+                      "The InStatementText argument must not NULL");
+      return SqlResult::AI_ERROR;
+    }
+
+    SQLINTEGER actualBufferLen = 0;
+    if (outQueryBuffer) {
+      if (outQueryBufferLen <= 0) {
+        AddStatusRecord(SqlState::SHY090_INVALID_STRING_OR_BUFFER_LENGTH,
+                        "The BufferLength argument must be greater than zero");
+        return SqlResult::AI_ERROR;
+      }
+
+      if (inQueryLen == SQL_NTS) {
+        for (; inQuery[actualBufferLen] != 0; actualBufferLen++) {
+          if ((actualBufferLen + 1) >= outQueryBufferLen) {
+            isTruncated = true;
+            break;
+          }
+          outQueryBuffer[actualBufferLen] = inQuery[actualBufferLen];
+        }
+      } else if (inQueryLen >= 0) {
+        for (; actualBufferLen < inQueryLen; actualBufferLen++) {
+          if ((actualBufferLen + 1) >= outQueryBufferLen) {
+            isTruncated = true;
+            break;
+          }
+          outQueryBuffer[actualBufferLen] = inQuery[actualBufferLen];
+        }
+      } else {
+        AddStatusRecord(
+            SqlState::SHY090_INVALID_STRING_OR_BUFFER_LENGTH,
+            "The argument TextLength1 was less than 0, but not equal to "
+            "SQL_NTS");
+        return SqlResult::AI_ERROR;
+      }
+      outQueryBuffer[actualBufferLen] = 0;
+    } else {
+      // Get the required length
+      if (inQueryLen == SQL_NTS) {
+        for (; inQuery[actualBufferLen] != 0; actualBufferLen++) {
+        }
+      } else if (inQueryLen > 0) {
+        actualBufferLen = inQueryLen;
+      }
+    }
+
+    if (outQueryLen)
+      *outQueryLen = actualBufferLen;
+
+    LOG_DEBUG_MSG("SQLNativeSql exiting");
+
+    if (isTruncated) {
+      AddStatusRecord(
+          SqlState::S01004_DATA_TRUNCATED,
+          "Buffer is too small for the data. Truncated from the right.");
+      return SqlResult::AI_SUCCESS_WITH_INFO;
+    }
+
+    return SqlResult::AI_SUCCESS;
+  }
 
   /**
    * Create statement associated with the connection.
