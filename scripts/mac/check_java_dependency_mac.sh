@@ -1,4 +1,4 @@
-java_ver=temurin
+java_ver=corretto
 if brew ls --versions $java_ver --cask > /dev/null; then
     # Java installed via brew
     echo "$java_ver is installed."

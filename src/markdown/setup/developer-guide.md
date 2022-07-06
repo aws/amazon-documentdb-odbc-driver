@@ -109,11 +109,11 @@ Example:
    5. Install MongoDB using [`MongoDB's Installation Guide for MongoDB Community Edition on macOS`](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-os-x/).
    6. `brew install mongo-cxx-driver`
    7. Install Java **JDK** (version 8+ - 17 recommended)  
-      - This can be done through Homebrew using `brew install --cask temurin<version>`. 
+      - This can be done through Homebrew using `brew install --cask corretto<version>`. 
       - If the above command fails with `No Cask with this name exists`, run `brew tap homebrew/cask-versions` first and try it again.
-      - Ensure to set `JAVA_HOME`. Make sure it is set to temurin. Other JDK package may cause test errors 
+      - Ensure to set `JAVA_HOME`. Make sure it is set to corretto. Other JDK package may cause test errors 
       such as `Unable to get initialized JVM` at run time.  
-      Example: /Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home
+      Example: /Library/Java/JavaVirtualMachines/amazon-corretto-18.jdk/Contents/Home
       - Ensure to save Java `/bin` and `/server` directories to the User `PATH` variable.  
       Example: /Library/Java/JavaVirtualMachines/jdk-17.0.2.jdk/Contents/Home/lib/server/
       /Library/Java/JavaVirtualMachines/jdk-17.0.2.jdk/Contents/Home/bin/

@@ -79,3 +79,5 @@ source $MAC_SCRIPT_DIR/set_java_def_mac.sh
 # add llvm to path
 chmod +x $MAC_SCRIPT_DIR/set_llvm_mac.sh
 source $MAC_SCRIPT_DIR/set_llvm_mac.sh
+
+echo "The mac dependency installation script has finshed running."
