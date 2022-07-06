@@ -221,7 +221,7 @@ if (WIN32 AND ${WITH_ODBC_MSI})
     set(WIX_ODBC_BSONCXX_PATH ".\\bsoncxx.dll")
     set(WIX_ODBC_MONGOC_PATH ".\\mongoc-1.0.dll")
     set(WIX_ODBC_MONGOCXX_PATH ".\\mongocxx.dll")
-    
+
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
         set(WIX_ODBC_ZLIB1_PATH ".\\zlib1.dll")
         set(WIX_ODBC_ZLIB1_FILE "zlib1.dll")
@@ -234,7 +234,6 @@ if (WIN32 AND ${WITH_ODBC_MSI})
 
     set(WIX_PROJECT_NAME "Amazon DocumentDB")
     set(WIX_MANUFACTURER "Amazon Web Services")
-    set(WIX_COPYRIGHT_COMMENT "Apache, Apache Ignite, the Apache feather and the Apache Ignite logo are trademarks of The Apache Software Foundation.")
 
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
         set(WIX_BIT_SUFFIX "64-bit")
