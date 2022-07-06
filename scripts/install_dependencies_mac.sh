@@ -63,9 +63,10 @@ $MAC_SCRIPT_DIR/reinstall_mongodb_mac.sh
 # check if java dependency is installed
 chmod +x $MAC_SCRIPT_DIR/check_java_dependency_mac.sh
 source $MAC_SCRIPT_DIR/check_java_dependency_mac.sh
-# java_ver and java_not_installed are variables from check_dependencies_mac.sh
+# jdkFound is a variable from check_java_dependency_mac.sh
 
-if [[ "${java_not_installed}" -eq "1" ]]; then
+java_ver=corretto
+if [[ "${jdkFound}" -ne "1" ]]; then
     echo "$java_ver is not installed, attempt to install it with brew."
     # install JAVA dependency via brew
     brew tap homebrew/cask-versions

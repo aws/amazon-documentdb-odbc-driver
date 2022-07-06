@@ -2,7 +2,12 @@
 CURRENT_DIR=$(pwd)
 
 #java_home_path points to JAVA_HOME
-java_home_path="/Library/Java/JavaVirtualMachines/temurin-18.jdk/Contents/Home" 
+#jdkFound is a variable from check_java_dependency_mac.sh.
+if [[ "${jdkFound}" -eq "1" ]]; then
+    java_home_path=$JAVA_HOME
+else
+    java_home_path="/Library/Java/JavaVirtualMachines/amazon-corretto-18.jdk/Contents/Home" 
+fi
 java_server_path="$java_home_path/lib/server/"
 java_bin_path="$java_home_path/bin"
 set_java_home="export JAVA_HOME=\"$java_home_path\""
@@ -14,6 +19,8 @@ env_var_file=".zshrc"
 updated=0
 
 # check enviornment variables
+# Checks that JAVA_HOME is defined, the path to JAVA_HOME exists 
+# and is a JDK (i.e., include subdirectory)
 if [[ "${JAVA_HOME}" != "${java_home_path}" ]]; then
     if [[ -d "${java_home_path}" ]]; then
         echo "JAVA_HOME is not set properly. Appending definition of JAVA_HOME to end of ${env_var_file}"

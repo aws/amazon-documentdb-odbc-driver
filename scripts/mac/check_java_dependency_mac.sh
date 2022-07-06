@@ -9,7 +9,9 @@ if [[ ! -z "${JAVA_HOME}" ]] && [[ -d "${JAVA_HOME}" ]] && [[ -d "${JAVA_HOME}/i
 #   -AL- e.g., openjdk 18 2022-03-22
     javaVersionString=`echo "$(java --version)" | head -1` # works in terminal but not in .sh 
     # -AL- tests
-    javaVersionString="java 1.2.3 2012-11-11"
+    #javaVersionString="java 1.2 2012-11-11" # pass, 1,2
+    #javaVersionString="java 1.7 2012-11-11" # pass, 1,2
+    #javaVersionString="java 1.8 2012-11-11" # pass, 1,2,3
     echo "-AL- TRACE javaVersionString: $javaVersionString"
     # IFS=';' read -ra javaVersionStringArr <<< $javaVersionString # invalid -a option "read: bad option: -a"
 # In order to read in an array in zsh, read requires the option -A (instead of -a
@@ -21,9 +23,7 @@ if [[ ! -z "${JAVA_HOME}" ]] && [[ -d "${JAVA_HOME}" ]] && [[ -d "${JAVA_HOME}/i
     read -a javaVersionStringArrary <<< "$javaVersionString" # Reading a space-delimited string into an array
     echo "-al- trace javaVersionStringArrary[1]: ${javaVersionStringArrary[1]}"
     javaVersion=${javaVersionStringArrary[1]}
-    javaVersionArray=(${javaVersion//./ })
-    #IFS="."; read -ra javaVersionArray <<< $javaVersion; unset IFS; # -AL- works, if javaVersion=18.1.2, then echo $javaVersionArr gives 18 1 2
-    # ^ does not work on bash, only zsh
+    javaVersionArray=(${javaVersion//./ }) # separate javaVersion string by delimiter '.'
     echo "-al- trace javaVersionArray: $javaVersionArray"
     echo "-al- trace javaVersionArray array length: ${#javaVersionArray[@]}"
     echo "-al- trace javaVersionArray[0]: ${javaVersionArray[0]}"
@@ -31,7 +31,7 @@ if [[ ! -z "${JAVA_HOME}" ]] && [[ -d "${JAVA_HOME}" ]] && [[ -d "${JAVA_HOME}/i
         echo "pass 1"
         if [[ "1" -eq ${javaVersionArray[0]} ]] && [[ ! -z ${javaVersionArray[1]} ]]; then
             echo "pass 2"
-            if  [[ ${javaVersionArray[1]} -eq "8" || ${javaVersionArray[0]} -eq "9" ]]; then
+            if  [[ ${javaVersionArray[1]} -eq "8" || ${javaVersionArray[1]} -eq "9" ]]; then
                 echo "pass 3"
                 jdkFound=1
             fi
@@ -42,11 +42,8 @@ if [[ ! -z "${JAVA_HOME}" ]] && [[ -d "${JAVA_HOME}" ]] && [[ -d "${JAVA_HOME}/i
     fi
 fi
 
-if brew ls --versions $java_ver --cask > /dev/null; then
-    # Java installed via brew
-    echo "$java_ver is installed."
-else
-    # Java not installed via brew
-    echo "$java_ver is not installed."
-    java_not_installed=1
+if [[ "${jdkFound}" -eq "1" ]]; then
+    echo "Found suitable JDK on user's machine."
+else 
+    echo "Did not find JDK on user's machine. If you have JDK installed, please ensure to set JAVA_HOME to the home directory of JDK to help me find it next time."
 fi
