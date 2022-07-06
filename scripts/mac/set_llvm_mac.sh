@@ -36,7 +36,7 @@ fi
 cd $PROJECT_DIR
 
 if [[ ${no_llvm_found} -eq "1" ]]; then
-    echo "No llvm found on your machine. No new updates has been made to ~/$env_var_file"
+    echo "No llvm found on your machine. No new updates has been made to ~/$env_var_file. XCode installation is required for DocumentDB ODBC driver to build. After XCode is installed, run ./scripts/mac/set_llvm_mac.sh to add the path to llvm to your \$PATH."
 elif [[ ${updated} -eq "0" ]]; then
     echo "PATH includes at least 1 path to llvm. No new changes made to ~/$env_var_file"
 else
