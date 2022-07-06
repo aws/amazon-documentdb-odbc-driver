@@ -80,7 +80,8 @@ Example:
    1. Start a version 7 or greater PowerShell (pwsh.exe) - preferrably 
     in ***Run as Administrator*** mode.
    2. Change directory to the project directory.
-   3. Run the installation script `scripts\install_dependencies_win.ps1`
+   3. Run the installation script `scripts\install_dependencies_win.ps1`. Note: ***This will
+   forcibly install any dependency that has not already been set (i.e, Java JDK, libraries and local MongoDB server).***
 2. Setup Environment Variables
    1. Start a version 7 or greater PowerShell (pwsh.exe) 
    2. Change directory to the project directory.
