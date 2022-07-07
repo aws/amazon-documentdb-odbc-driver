@@ -69,6 +69,9 @@
                         <Component Id='DOCUMENTDBHOMEVAR' Guid='@WIX_COMPONENT_ID_DOCUMNETDB_HOME_ENV_VAR@' Win64='@WIX_COMPONENT_IS_WIN64@' KeyPath='yes' >
                             <Environment Id='DOCUMENTDBHOME' Name='DOCUMENTDB_HOME' Action='set' System='yes' Part='all' Value='[INSTALLDIR]' />
                         </Component>
+                        <Component Id='PATH_JVM_DLL' Guid='@WIX_COMPONENT_ID_PATH_JVM_DLL@' Win64='@WIX_COMPONENT_IS_WIN64@' KeyPath='yes' >
+                            <Environment Id='PATH_JVM_DLL' Permanent='no' Name='PATH' Action='set' System='no' Part='last' Value='%JAVA_HOME%\bin\server\' />
+                        </Component>
                     </Directory>
                 </Directory>
             </Directory>
@@ -84,6 +87,7 @@
             <ComponentRef Id='zlib' />
             <ComponentRef Id='JDBC' />
             <ComponentRef Id='DOCUMENTDBHOMEVAR' />
+            <ComponentRef Id='PATH_JVM_DLL' />
         </Feature>
 
         <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
