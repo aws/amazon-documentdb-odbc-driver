@@ -354,9 +354,10 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
     return diag.GetReturnCode();
   }
 
+  bool isTruncated = false;
   size_t reslen =
       CopyStringToBuffer(connectStr, outConnectionString,
-                         static_cast< size_t >(outConnectionStringBufferLen));
+                         static_cast< size_t >(outConnectionStringBufferLen), isTruncated);
 
   if (outConnectionStringLen)
     *outConnectionStringLen = static_cast< SQLSMALLINT >(reslen);
@@ -834,11 +835,15 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
     return SQL_INVALID_HANDLE;
   }
 
+  std::vector< SQLRETURN > returnCodes;
+
   // Convert from length in characters to bytes.
   SQLSMALLINT columnNameLenInBytes = 0;
   statement->GetColumnAttribute(columnNum, SQL_DESC_NAME, columnNameBuf,
                                 columnNameBufLen * sizeof(SQLWCHAR),
                                 &columnNameLenInBytes, 0);
+  // Save status of getting column name.
+  returnCodes.push_back(statement->GetDiagnosticRecords().GetReturnCode());
   if (columnNameLen) {
     // Convert from length in bytes to characters.
     *columnNameLen = columnNameLenInBytes / sizeof(SQLWCHAR);
@@ -851,12 +856,20 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
 
   statement->GetColumnAttribute(columnNum, SQL_DESC_TYPE, 0, 0, 0,
                                 &dataTypeRes);
+  // Save status of getting column type.
+  returnCodes.push_back(statement->GetDiagnosticRecords().GetReturnCode());
   statement->GetColumnAttribute(columnNum, SQL_DESC_PRECISION, 0, 0, 0,
                                 &columnSizeRes);
+  // Save status of getting column precision.
+  returnCodes.push_back(statement->GetDiagnosticRecords().GetReturnCode());
   statement->GetColumnAttribute(columnNum, SQL_DESC_SCALE, 0, 0, 0,
                                 &decimalDigitsRes);
+  // Save status of getting column scale.
+  returnCodes.push_back(statement->GetDiagnosticRecords().GetReturnCode());
   statement->GetColumnAttribute(columnNum, SQL_DESC_NULLABLE, 0, 0, 0,
                                 &nullableRes);
+  // Save status of getting column nullable.
+  returnCodes.push_back(statement->GetDiagnosticRecords().GetReturnCode());
 
   LOG_INFO_MSG("columnNum: " << columnNum);
   LOG_INFO_MSG("dataTypeRes: " << dataTypeRes);
@@ -883,7 +896,20 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
 
   LOG_DEBUG_MSG("SQLDescribeCol exiting");
 
-  return statement->GetDiagnosticRecords().GetReturnCode();
+  // Return error code, any any.
+  for (auto returnCode : returnCodes) {
+    if (!SQL_SUCCEEDED(returnCode)) {
+      return returnCode;
+    }
+  }
+  // Return success with info, any any.
+  for (auto returnCode : returnCodes) {
+    if (returnCode != SQL_SUCCESS) {
+      return returnCode;
+    }
+  }
+  
+  return SQL_SUCCESS;
 }
 
 SQLRETURN SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCnt) {
@@ -1140,6 +1166,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
   LOG_DEBUG_MSG("SQLGetDiagRec called");
 
   const DiagnosticRecordStorage* records = 0;
+  bool isTruncated = false;
 
   switch (handleType) {
     case SQL_HANDLE_ENV:
@@ -1189,7 +1216,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
   const DiagnosticRecord& record = records->GetStatusRecord(recNum);
 
   if (sqlState)
-    CopyStringToBuffer(record.GetSqlState(), sqlState, 6);
+    CopyStringToBuffer(record.GetSqlState(), sqlState, 6, isTruncated);
 
   if (nativeError)
     *nativeError = 0;
@@ -1206,7 +1233,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
 
     // Length is given in characters
     *msgLen = CopyStringToBuffer(errMsg, msgBuffer,
-                                 static_cast< size_t >(msgBufferLen));
+                                 static_cast< size_t >(msgBufferLen), isTruncated);
 
     LOG_DEBUG_MSG("SQLGetDiagRec exiting with SQL_SUCCESS_WITH_INFO");
 
@@ -1215,7 +1242,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
 
   // Length is given in characters
   size_t msgLen0 = CopyStringToBuffer(errMsg, msgBuffer,
-                                      static_cast< size_t >(msgBufferLen));
+                                      static_cast< size_t >(msgBufferLen), isTruncated);
 
   if (msgLen)
     *msgLen = msgLen0;
@@ -1533,16 +1560,17 @@ SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* state,
 
   record.MarkRetrieved();
 
+  bool isTruncated = false;
   if (state)
-    CopyStringToBuffer(record.GetSqlState(), state, 6);
+    CopyStringToBuffer(record.GetSqlState(), state, 6, isTruncated);
 
   if (error)
     *error = 0;
 
   std::string errMsg = record.GetMessageText();
   // NOTE: msgBufLen is in characters.
-  size_t outResLen =
-      CopyStringToBuffer(errMsg, msgBuf, static_cast< size_t >(msgBufLen));
+  size_t outResLen = CopyStringToBuffer(
+      errMsg, msgBuf, static_cast< size_t >(msgBufLen), isTruncated);
 
   if (msgResLen)
     *msgResLen = static_cast< SQLSMALLINT >(outResLen);

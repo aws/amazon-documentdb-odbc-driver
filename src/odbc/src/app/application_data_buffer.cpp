@@ -688,7 +688,8 @@ ConversionResult::Type ApplicationDataBuffer::PutDate(const Date& value) {
 
         strftime(&tmp[0], tmp.size(), "%Y-%m-%d", &tmTime);
 
-        utility::CopyStringToBuffer(&tmp[0], buffer, GetSize());
+        bool isTruncated = false;
+        utility::CopyStringToBuffer(&tmp[0], buffer, GetSize(), isTruncated);
       }
 
       if (static_cast< SqlLen >(valLen) + 1 > GetSize())
@@ -812,7 +813,8 @@ ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
 
         strftime(&tmp[0], GetSize(), "%Y-%m-%d %H:%M:%S", &tmTime);
 
-        utility::CopyStringToBuffer(&tmp[0], buffer, GetSize());
+        bool isTruncated = false;
+        utility::CopyStringToBuffer(&tmp[0], buffer, GetSize(), isTruncated);
       }
 
       if (static_cast< SqlLen >(valLen) + 1 > GetSize())
@@ -935,7 +937,8 @@ ConversionResult::Type ApplicationDataBuffer::PutTime(const Time& value) {
 
         strftime(&tmp[0], GetSize(), "%H:%M:%S", &tmTime);
 
-        utility::CopyStringToBuffer(&tmp[0], buffer, GetSize());
+        bool isTruncated = false;
+        utility::CopyStringToBuffer(&tmp[0], buffer, GetSize(), isTruncated);
       }
 
       if (static_cast< SqlLen >(valLen) + 1 > GetSize())

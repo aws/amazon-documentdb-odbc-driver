@@ -2881,9 +2881,11 @@ SqlResult::Type ConnectionInfo::GetInfo(InfoType type, void* buf, short buflen,
     if (!buflen)
       return SqlResult::AI_ERROR;
 
+    bool isTruncated = false;
     // Length is given in bytes,
     unsigned short strlen = static_cast< short >(utility::CopyStringToBuffer(
-        itStr->second, reinterpret_cast< SQLWCHAR* >(buf), buflen, true));
+        itStr->second, reinterpret_cast< SQLWCHAR* >(buf), buflen, isTruncated,
+        true));
 
     if (reslen)
       *reslen = strlen;

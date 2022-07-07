@@ -726,24 +726,52 @@ BOOST_AUTO_TEST_CASE(TestSQLDescribeCol) {
   // Everything is ok.
   ret = SQLDescribeCol(stmt, 1, columnName, ODBC_BUFFER_SIZE, &columnNameLen,
                        &dataType, &columnSize, &decimalDigits, &nullable);
-
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-  SQLDescribeCol(stmt, 1, 0, ODBC_BUFFER_SIZE, &columnNameLen, &dataType,
-                 &columnSize, &decimalDigits, &nullable);
-  SQLDescribeCol(stmt, 1, columnName, 0, &columnNameLen, &dataType, &columnSize,
-                 &decimalDigits, &nullable);
-  SQLDescribeCol(stmt, 1, columnName, ODBC_BUFFER_SIZE, 0, &dataType,
-                 &columnSize, &decimalDigits, &nullable);
-  SQLDescribeCol(stmt, 1, columnName, ODBC_BUFFER_SIZE, &columnNameLen, 0,
-                 &columnSize, &decimalDigits, &nullable);
-  SQLDescribeCol(stmt, 1, columnName, ODBC_BUFFER_SIZE, &columnNameLen,
-                 &dataType, 0, &decimalDigits, &nullable);
-  SQLDescribeCol(stmt, 1, columnName, ODBC_BUFFER_SIZE, &columnNameLen,
-                 &dataType, &columnSize, 0, &nullable);
-  SQLDescribeCol(stmt, 1, columnName, ODBC_BUFFER_SIZE, &columnNameLen,
-                 &dataType, &columnSize, &decimalDigits, 0);
-  SQLDescribeCol(stmt, 1, 0, 0, 0, 0, 0, 0, 0);
+  // Confirm boundary condition.
+  SQLSMALLINT reducedNameLen = 4;
+  ret = SQLDescribeCol(stmt, 1, columnName, reducedNameLen + 1, &columnNameLen,
+                       &dataType, &columnSize, &decimalDigits, &nullable);
+  BOOST_CHECK_EQUAL(ret, SQL_SUCCESS_WITH_INFO);
+  BOOST_CHECK_EQUAL(columnNameLen, reducedNameLen);
+
+  ret = SQLDescribeCol(stmt, 1, 0, ODBC_BUFFER_SIZE, &columnNameLen, &dataType,
+                       &columnSize, &decimalDigits, &nullable);
+  BOOST_CHECK_EQUAL(ret, SQL_SUCCESS);
+
+  ret = SQLDescribeCol(stmt, 1, columnName, 0, &columnNameLen, &dataType,
+                       &columnSize, &decimalDigits, &nullable);
+  BOOST_CHECK_EQUAL(ret, SQL_SUCCESS);
+  BOOST_CHECK_EQUAL(columnNameLen, 0);
+
+  ret = SQLDescribeCol(stmt, 1, columnName, ODBC_BUFFER_SIZE, 0, &dataType,
+                       &columnSize, &decimalDigits, &nullable);
+  BOOST_CHECK_EQUAL(ret, SQL_SUCCESS);
+
+  ret = SQLDescribeCol(stmt, 1, columnName, ODBC_BUFFER_SIZE, &columnNameLen, 0,
+                       &columnSize, &decimalDigits, &nullable);
+  BOOST_CHECK_EQUAL(ret, SQL_SUCCESS);
+
+  ret = SQLDescribeCol(stmt, 1, columnName, ODBC_BUFFER_SIZE, &columnNameLen,
+                       &dataType, 0, &decimalDigits, &nullable);
+  BOOST_CHECK_EQUAL(ret, SQL_SUCCESS);
+
+  ret = SQLDescribeCol(stmt, 1, columnName, ODBC_BUFFER_SIZE, &columnNameLen,
+                       &dataType, &columnSize, 0, &nullable);
+  BOOST_CHECK_EQUAL(ret, SQL_SUCCESS);
+
+  ret = SQLDescribeCol(stmt, 1, columnName, ODBC_BUFFER_SIZE, &columnNameLen,
+                       &dataType, &columnSize, &decimalDigits, 0);
+  BOOST_CHECK_EQUAL(ret, SQL_SUCCESS);
+
+  ret = SQLDescribeCol(stmt, 1, 0, 0, 0, 0, 0, 0, 0);
+  BOOST_CHECK_EQUAL(ret, SQL_SUCCESS);
+
+  ret = SQLDescribeCol(stmt, -1, 0, 0, 0, 0, 0, 0, 0);
+  BOOST_CHECK_EQUAL(ret, SQL_ERROR);
+
+  ret = SQLDescribeCol(nullptr, 1, 0, 0, 0, 0, 0, 0, 0);
+  BOOST_CHECK_EQUAL(ret, SQL_INVALID_HANDLE);
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLRowCount) {
