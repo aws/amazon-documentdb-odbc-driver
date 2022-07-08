@@ -285,7 +285,7 @@ function Install-Vcpkg {
 		[System.Environment]::SetEnvironmentVariable('VCPKG_ROOT', $Env:VCPKG_ROOT, [System.EnvironmentVariableTarget]::User)
 		Write-Host "Setting environment variable VCPKG_ROOT=$Env:VCPKG_ROOT"
 	}
-	if ( -not ((Test-Path -Path $Env:VCPKG_ROOT)) ) {
+	if ( -not (Test-Path -Path $Env:VCPKG_ROOT) ) {
 		Write-Host "Cloning VCPKG GitHub repository into $Env:VCPKG_ROOT"
 		New-Item $Env:VCPKG_ROOT -ItemType Directory -Force
 		$prevLocation = Get-Location

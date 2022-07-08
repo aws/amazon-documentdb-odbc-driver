@@ -1,3 +1,4 @@
+# TODO: [AD-838](https://bitquill.atlassian.net/browse/AD-838)
 # store current directory
 CURRENT_DIR=$(pwd)
 
