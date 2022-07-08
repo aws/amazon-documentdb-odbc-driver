@@ -26,7 +26,7 @@ if [[ ! :$PATH: == *:"$llvm_path":* ]] && [[ ! :$PATH: == *:"$llvm_app_path":* ]
             echo "XCode application llvm path has been set"
             updated=1
         else
-            echo "cannot find directory \"${set_llvm_app_path}\". Will not update \$PATH"
+            echo "cannot find directory \"${set_llvm_app_path}\". Will not update \$PATH. XCode installation is required."
             no_llvm_found=1
         fi
     fi
