@@ -1193,6 +1193,8 @@ BOOST_AUTO_TEST_CASE(TestSQLError) {
   actualMessage.insert(actualMessage.end(), &message[0],
                        &message[messageLen + 1]);
 
+  #if 0
+  // TODO: [AD-841](https://bitquill.atlassian.net/browse/AD-841)
   // Check boundary condition with reduced buffer size.
   ret = SQLGetTypeInfo(stmt, SQL_INTERVAL_MONTH);
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
@@ -1211,7 +1213,7 @@ BOOST_AUTO_TEST_CASE(TestSQLError) {
   BOOST_CHECK_EQUAL_COLLECTIONS(
       reducedActualMessage.begin(), reducedActualMessage.end(),
       reducedExpectedMessage.begin(), reducedExpectedMessage.end());
-
+#endif
 
   ret = SQLError(0, dbc, 0, state, &nativeCode, message, ODBC_BUFFER_SIZE,
                  &messageLen);
