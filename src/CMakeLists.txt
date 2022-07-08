@@ -16,7 +16,7 @@
 #
 
 cmake_minimum_required(VERSION 3.20)
-project(DocumentDB-ODBC.C++ VERSION 1.0.0)
+project(DocumentDB-ODBC.C++ VERSION 0.1.0)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/modules/code-coverage.cmake")
 if (NOT "$ENV{BOOST_ROOT}" STREQUAL "")
