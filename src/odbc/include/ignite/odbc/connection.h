@@ -103,8 +103,9 @@ class Connection : public diagnostic::DiagnosableAdapter {
    * NOT including the null terminating character.
    */
   template < typename CharT >
-  void NativeSql(const CharT* inQuery, long inQueryLen, CharT* outQueryBuffer,
-                 long outQueryBufferLen, long* outQueryLen) {
+  inline void NativeSql(const CharT* inQuery, int64_t inQueryLen,
+                        CharT* outQueryBuffer, int64_t outQueryBufferLen,
+                        int64_t* outQueryLen) {
     IGNITE_ODBC_API_CALL(InternalNativeSql(inQuery, inQueryLen, outQueryBuffer,
                                            outQueryBufferLen, outQueryLen));
   }
@@ -362,9 +363,11 @@ class Connection : public diagnostic::DiagnosableAdapter {
    * @return Operation result.
    */
   template < typename CharT >
-  SqlResult::Type InternalNativeSql(const CharT* inQuery, long inQueryLen,
-                                    CharT* outQueryBuffer,
-                                    long outQueryBufferLen, long* outQueryLen) {
+  inline SqlResult::Type InternalNativeSql(const CharT* inQuery,
+                                           int64_t inQueryLen,
+                                           CharT* outQueryBuffer,
+                                           int64_t outQueryBufferLen,
+                                           int64_t* outQueryLen) {
     bool isTruncated = false;
     if (!inQuery) {
       AddStatusRecord(SqlState::SHY009_INVALID_USE_OF_NULL_POINTER,

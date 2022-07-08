@@ -766,8 +766,12 @@ SQLRETURN SQLNativeSql(SQLHDBC conn, SQLWCHAR* inQuery, SQLINTEGER inQueryLen,
     return SQL_INVALID_HANDLE;
   }
 
-  connection->NativeSql(inQuery, inQueryLen, outQueryBuffer, outQueryBufferLen,
-                        outQueryLen);
+  int64_t outQueryLenLocal = 0;
+  connection->NativeSql(inQuery, static_cast< int64_t >(inQueryLen),
+                        outQueryBuffer,
+                        static_cast< int64_t >(outQueryBufferLen), &outQueryLenLocal);
+  if (outQueryLen)
+    *outQueryLen = static_cast< SQLINTEGER >(outQueryLenLocal);
 
   LOG_DEBUG_MSG("SQLNativeSql exiting");
 
