@@ -1200,7 +1200,7 @@ BOOST_AUTO_TEST_CASE(TestSQLError) {
   ret = SQLError(env, dbc, stmt, state, &nativeCode, message,
                  reducedMessageLen + 1, &messageLen);
   BOOST_REQUIRE_EQUAL(SQL_SUCCESS_WITH_INFO, ret);
-  BOOST_REQUIRE_EQUAL(messageLen, reducedMessageLen);
+  BOOST_CHECK_EQUAL(messageLen, reducedMessageLen);
   BOOST_CHECK_EQUAL(message[messageLen], 0);
   std::vector< SQLWCHAR > reducedActualMessage;
   reducedActualMessage.insert(reducedActualMessage.end(), &message[0],
