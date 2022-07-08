@@ -19,6 +19,22 @@ $powerShellVersion = $PSVersionTable.PSVersion.Major
 $scriptPath = Split-Path -parent $PSCommandPath
 $projectPath = Split-Path -parent $scriptPath
 
+function Update-UserPath {
+	[OutputType([Boolean])]
+	Param(
+		$Path
+	)
+
+	$userPath = [System.Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::User)
+	[string[]]$paths = $($userPath.Split(";") | Get-Unique)
+	if ( -not $paths.Contains($Path) ) {
+		[string[]]$addPath = $Path
+		$newPaths = $addPath + $paths
+		$newPath = [String]::Join(";", $newPaths)
+		[System.Environment]::SetEnvironmentVariable('Path', $newPath, [System.EnvironmentVariableTarget]::User)
+	}
+}
+
 # Confirms that the minimum PowerShell version is being used.
 # Returns true if version is supported, otherwise, returns false.
 function Confirm-PowerShellVersion {
@@ -250,26 +266,12 @@ function Set-JdkPath {
 
 	# Update PATH for bin (java.exe) and server (jvm.dll)
 	$javaFile = Get-ChildItem -Path $Env:JAVA_HOME -Recurse -Filter "java.exe"
-	$binPath = $javaFile.Directory
+	$binPath = $javaFile.Directory.FullName
 	$jvmFile = Get-ChildItem -Path $Env:JAVA_HOME -Recurse -Filter "jvm.dll"
-	$jvmPath = $jvmFile.Directory
+	$jvmPath = $jvmFile.Directory.FullName
 
-	$paths = $Env:Path.Split(";")
-	if ( -not $paths.Contains($jvmPath) ) {
-		$Env:Path = "${jvmPath};${Env:Path}"
-		$updatePath = $true
-	}
-	$paths = $Env:Path.Split(";")
-	if ( -not $paths.Contains($binPath) ) {
-		$Env:Path = "${binPath};${Env:Path}"
-		$updatePath = $true
-	}
-
-	# permanently set an environment variable for user...
-	[System.Environment]::SetEnvironmentVariable('JAVA_HOME', $Env:JAVA_HOME, [System.EnvironmentVariableTarget]::User)
-	if ( $updatePath ) {
-		[System.Environment]::SetEnvironmentVariable('PATH', $Env:Path, [System.EnvironmentVariableTarget]::User)
-	}
+	Update-UserPath $jvmPath
+	Update-UserPath $binPath
 }
 
 # Installs or updates the VCPKG repository from GitHub.
@@ -356,13 +358,7 @@ function Install-WixToolset {
 	}
 
 	$wixToolsetBinFolder = "${Env:ProgramFiles(x86)}\WiX Toolset v3.11\bin"
-	if ( Test-Path $wixToolsetBinFolder ) {
-		$paths = $Env:Path.Split(";")
-		if ( -not $paths.Contains($wixToolsetBinFolder) ) {
-			$Env:Path = "${wixToolsetBinFolder};${Env:Path}"
-			[System.Environment]::SetEnvironmentVariable('PATH', $Env:Path, [System.EnvironmentVariableTarget]::User)
-		}
-	}
+	Update-UserPath $wixToolsetBinFolder
 
 	return $true
 }
