@@ -12,4 +12,4 @@
 
 ## Next Steps
 
-- [DSN](setup/dsn-configuration.md)
+- [DSN](dsn-configuration.md)
