@@ -30,6 +30,7 @@ env:
   DOC_DB_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
   DOC_DB_LOG_LEVEL: "debug"
   JDBC_DRIVER_VERSION: "1.2.4"
+  MONGO_IMPORT_COMMAND: "mongoimport.exe"
 
 jobs:
   build-windows32:
@@ -127,7 +128,7 @@ jobs:
 
     - name: Setup MongoDB
       run: |
-        ./src/odbc-test/scripts/reinstall_mongodb.ps1
+        ./scripts/reinstall_mongodb.ps1
     - name: Import test data
       run: |
         ./src/odbc-test/scripts/import_test_data.ps1
@@ -289,7 +290,7 @@ jobs:
 
     - name: Setup MongoDB
       run: |
-        ./src/odbc-test/scripts/reinstall_mongodb.ps1
+        ./scripts/reinstall_mongodb.ps1
     - name: Import test data
       run: |
         ./src/odbc-test/scripts/import_test_data.ps1
@@ -419,7 +420,7 @@ jobs:
 
     - name: Setup MongoDB
       run: |
-        ./src/odbc-test/scripts/reinstall_mongodb.ps1
+        ./scripts/reinstall_mongodb.ps1
     - name: Import test data
       run: |
         ./src/odbc-test/scripts/import_test_data.ps1
