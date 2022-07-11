@@ -1192,6 +1192,7 @@ BOOST_AUTO_TEST_CASE(TestSQLError) {
   std::vector< SQLWCHAR > actualMessage;
   actualMessage.insert(actualMessage.end(), &message[0],
                        &message[messageLen + 1]);
+  // variable actualMessage is to be used in AD-841
 
   #if 0
   // TODO: [AD-841](https://bitquill.atlassian.net/browse/AD-841)
