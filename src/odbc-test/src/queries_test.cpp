@@ -777,8 +777,8 @@ BOOST_AUTO_TEST_CASE(TestDataAtExecution, *disabled()) {
 
   // Binding columns.
   for (SQLSMALLINT i = 0; i < columnsCnt; ++i) {
-    ret = SQLBindCol(stmt, i + 1, SQL_C_WCHAR, &columns[i], ODBC_BUFFER_SIZE,
-                     &columnLens[i]);
+    ret = SQLBindCol(stmt, i + 1, SQL_C_WCHAR, &columns[i],
+                     ODBC_BUFFER_SIZE * sizeof(SQLWCHAR), &columnLens[i]);
 
     if (!SQL_SUCCEEDED(ret))
       BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1086,7 +1086,7 @@ BOOST_AUTO_TEST_CASE(TestLoginTimeout) {
   // Connecting to ODBC server.
   ret = SQLDriverConnect(dbc, NULL, &connectStr[0],
                          static_cast< SQLSMALLINT >(connectStr.size()), outstr,
-                         sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
+                         ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_COMPLETE);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc));
@@ -1116,7 +1116,7 @@ BOOST_AUTO_TEST_CASE(TestConnectionTimeoutFail, *disabled()) {
   // Connecting to ODBC server.
   ret = SQLDriverConnect(dbc, NULL, &connectStr[0],
                          static_cast< SQLSMALLINT >(connectStr.size()), outstr,
-                         sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
+                         ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_COMPLETE);
 
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
 
@@ -1186,7 +1186,7 @@ BOOST_AUTO_TEST_CASE(TestQueryAndConnectionTimeoutQuery) {
 BOOST_AUTO_TEST_CASE(TestManyCursors) {
   connectToLocalServer("odbc-test");
 
-  for (int32_t i = 0; i < 1000; ++i) {
+  for (int32_t i = 0; i < 100; ++i) {
     std::vector< SQLWCHAR > req =
         MakeSqlBuffer("SELECT * FROM queries_test_005");
 

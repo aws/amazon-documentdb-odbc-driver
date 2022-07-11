@@ -105,7 +105,7 @@ size_t CopyUtf8StringToSqlWcharString(const char* inBuffer, SQLWCHAR* outBuffer,
  *   is not 0
  */
 size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen,
-                          bool isLenInBytes = false);
+                          bool& isTruncated, bool isLenInBytes = false);
 
 /**
  * Read array from reader.

@@ -85,7 +85,7 @@ void OdbcTestSuite::Connect(SQLHDBC& conn, SQLHSTMT& statement,
   SQLRETURN ret =
       SQLDriverConnect(conn, NULL, &connectStr0[0],
                        static_cast< SQLSMALLINT >(connectStr0.size()), outstr,
-                       sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
+                       ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_COMPLETE);
 
   if (!SQL_SUCCEEDED(ret)) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_DBC, conn));
@@ -110,7 +110,7 @@ void OdbcTestSuite::Connect(const std::string& connectStr) {
   SQLRETURN ret =
       SQLDriverConnect(dbc, NULL, &connectStr0[0],
                        static_cast< SQLSMALLINT >(connectStr0.size()), outstr,
-                       sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
+                       ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_COMPLETE);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc));
@@ -135,7 +135,7 @@ std::string OdbcTestSuite::ExpectConnectionReject(
   SQLRETURN ret =
       SQLDriverConnect(dbc, NULL, &connectStr0[0],
                        static_cast< SQLSMALLINT >(connectStr0.size()), outstr,
-                       sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
+                       ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_COMPLETE);
 
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
   BOOST_REQUIRE_EQUAL(
@@ -343,7 +343,7 @@ void OdbcTestSuite::CheckSQLDiagnosticError(
   SQLSMALLINT messageLen = 0;
 
   SQLRETURN ret = SQLGetDiagRec(handleType, handle, 1, state, &nativeError,
-                                message, sizeof(message), &messageLen);
+                                message, ODBC_BUFFER_SIZE, &messageLen);
 
   std::vector< SQLWCHAR > expectSqlStateWchar =
       MakeSqlBuffer(expectedSqlStateStr);

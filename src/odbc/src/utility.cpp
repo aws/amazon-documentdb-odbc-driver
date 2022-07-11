@@ -104,8 +104,9 @@ size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
   OutCharT* pOutBufferNext;
 
   // translate characters:
+  const char* inBufferEnd = (inBuffer + inBufferLen);
   std::codecvt_base::result result =
-      convFacet.in(convState, inBuffer, inBuffer + inBufferLen, pInBufferNext,
+      convFacet.in(convState, inBuffer, inBufferEnd, pInBufferNext,
                    pOutBuffer, pOutBuffer + outBufferLenChars, pOutBufferNext);
 
   size_t lenConverted = 0;
@@ -117,7 +118,11 @@ size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
       // null-terminate target string, if room
       pOutBuffer[lenConverted] = 0;
 
-      isTruncated = (result == std::codecvt_base::partial);
+      // TODO AD-843 Complete the following comment
+      // https://bitquill.atlassian.net/browse/AD-843
+      // Note:
+      isTruncated = (result == std::codecvt_base::partial
+                     || (inBufferEnd != pInBufferNext));
       break;
     case std::codecvt_base::error:
       // Error returned if unable to convert character.
@@ -168,7 +173,7 @@ size_t CopyUtf8StringToSqlWcharString(const char* inBuffer, SQLWCHAR* outBuffer,
 
 // High-level entry point to handle buffer size in either bytes or characters
 size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen,
-                          bool isLenInBytes) {
+                          bool& isTruncated, bool isLenInBytes) {
   size_t wCharSize = sizeof(SQLWCHAR);
 
   // Ensure non-zero length in bytes is a multiple of wide char size.
@@ -176,7 +181,7 @@ size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen,
 
   // Convert buffer length to bytes.
   size_t bufLenInBytes = isLenInBytes ? buflen : buflen * wCharSize;
-  bool isTruncated = false;
+  isTruncated = false;
   size_t bytesWritten = CopyUtf8StringToSqlWcharString(
       str.c_str(), buf, bufLenInBytes, isTruncated);
   return isLenInBytes ? bytesWritten : bytesWritten / wCharSize;

@@ -996,11 +996,15 @@ SqlResult::Type Statement::InternalGetColumnAttribute(
 
     if (found) {
       LOG_DEBUG_MSG("out found: " << out);
+      bool isTruncated = false;
       if (strbuf)
         // Length is given in bytes
-        outSize = utility::CopyStringToBuffer(out, strbuf, buflen, true);
+        outSize =
+            utility::CopyStringToBuffer(out, strbuf, buflen, isTruncated, true);
       if (reslen)
         *reslen = static_cast< int16_t >(outSize);
+      if (isTruncated)
+        return SqlResult::AI_SUCCESS_WITH_INFO;
     }
   }
 
