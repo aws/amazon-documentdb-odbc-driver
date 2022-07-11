@@ -900,13 +900,13 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
 
   LOG_DEBUG_MSG("SQLDescribeCol exiting");
 
-  // Return error code, any any.
+  // Return error code, if any.
   for (auto returnCode : returnCodes) {
     if (!SQL_SUCCEEDED(returnCode)) {
       return returnCode;
     }
   }
-  // Return success with info, any any.
+  // Return success with info, if any.
   for (auto returnCode : returnCodes) {
     if (returnCode != SQL_SUCCESS) {
       return returnCode;
