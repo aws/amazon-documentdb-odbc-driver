@@ -118,6 +118,8 @@ size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
       // null-terminate target string, if room
       pOutBuffer[lenConverted] = 0;
 
+      // TODO AD-843 Complete the following comment
+      // https://bitquill.atlassian.net/browse/AD-843
       // Note:
       isTruncated = (result == std::codecvt_base::partial
                      || (inBufferEnd != pInBufferNext));
