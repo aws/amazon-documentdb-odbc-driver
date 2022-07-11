@@ -1180,7 +1180,7 @@ BOOST_AUTO_TEST_CASE(TestSQLError) {
   SQLWCHAR message[ODBC_BUFFER_SIZE] = {0};
   SQLSMALLINT messageLen = 0;
 
-  // Generating error.
+  // Generating error by passing unsupported SQL Type (SQL_INTERVAL_MONTH).
   SQLRETURN ret = SQLGetTypeInfo(stmt, SQL_INTERVAL_MONTH);
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
 
