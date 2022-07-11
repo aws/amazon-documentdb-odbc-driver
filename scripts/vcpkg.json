@@ -1,0 +1,15 @@
+{
+	"name": "documentdb-odbc",
+	"version-string": "1.0.0",
+	"dependencies": [
+		"openssl",
+		"boost-test",
+		"boost-asio",
+		"boost-chrono",
+		"boost-interprocess",
+		"boost-regex",
+		"boost-system",
+		"boost-thread",
+		"mongo-cxx-driver"
+	]
+}
