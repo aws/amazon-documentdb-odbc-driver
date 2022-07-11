@@ -38,7 +38,7 @@ OdbcClientError GetOdbcError(SQLSMALLINT handleType, SQLHANDLE handle) {
   // On Windows, reallen is in bytes, on Linux reallen is in chars.
   // Can't rely on returned length.
   SQLGetDiagRec(handleType, handle, 1, sqlstate, &nativeCode, message,
-                sizeof(message), &reallen);
+                ODBC_BUFFER_SIZE, &reallen);
 
   return OdbcClientError(utility::SqlWcharToString(sqlstate),
                          utility::SqlWcharToString(message));
@@ -55,7 +55,7 @@ std::string GetOdbcErrorState(SQLSMALLINT handleType, SQLHANDLE handle,
   // On Windows, reallen is in bytes, on Linux reallen is in chars.
   // Can't rely on returned length.
   SQLGetDiagRec(handleType, handle, idx, sqlstate, &nativeCode, message,
-                sizeof(message), &reallen);
+                ODBC_BUFFER_SIZE, &reallen);
 
   return utility::SqlWcharToString(sqlstate);
 }
@@ -71,7 +71,7 @@ std::string GetOdbcErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle,
   // On Windows, reallen is in bytes, on Linux reallen is in chars.
   // Can't rely on returned length.
   SQLGetDiagRec(handleType, handle, idx, sqlstate, &nativeCode, message,
-                sizeof(message), &reallen);
+                ODBC_BUFFER_SIZE, &reallen);
 
   std::string res = utility::SqlWcharToString(sqlstate);
 
