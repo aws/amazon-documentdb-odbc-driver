@@ -54,7 +54,7 @@ Example:
    Alternatively, you can run MongoDB in a docker container
    E.g. `docker run --name mongo -e MONGO_INITDB_ROOT_USERNAME=$DOC_DB_USER_NAME -e MONGO_INITDB_ROOT_PASSWORD=$DOC_DB_PASSWORD -d -p 27017:27017 mongo:latest`
 2. Install the test data
-   1. `cd src/odbc-test/scripts`
+   1. `cd scripts`
    2. `.\import_test_data.ps1` (Windows) or `./import_test_data.sh` (MacOS or Linux).
    If receiving permission errors on MacOS while importing the test data, 
    use `chmod +x ./reinstall_mongodb_mac.sh` and try again.
@@ -71,34 +71,36 @@ Example:
       1. Open Settings -> Apps -> Optional Features -> Under "Related Settings", click on "More Windows features", and select ".Net Framework 3.5".
       ![Alt text](src/markdown/images/dotNet_screenshot.PNG "Example")
    6. [WiX Toolset Visual Studio 2019 Extension](https://marketplace.visualstudio.com/items?itemName=WixToolset.WiXToolset)
-2. OpenSSL (full)
-   1. Installed via [VCPKG](https://vcpkg.io/en/getting-started.html) (`.\vcpkg install openssl`).
-   2. Or installed via [Chocolatey](https://community.chocolatey.org/packages/openssl). 
-   3. Ensure to set the OPENSSL_ROOT_DIR.
-3. [WiX Installer (3.11)](https://wixtoolset.org/releases/)
-   1. Ensure to add path to WiX executables (e.g. `C:\Program Files (x86)\WiX Toolset v3.11\bin`)
-4. [Java](https://www.oracle.com/java/technologies/downloads/) **JDK** (version 8+ - 17 recommended)
-   1. Ensure to set `JAVA_HOME`. (e.g. C:\Program Files\Java\jdk-17.0.2)
-   2. Ensure to save Java `\bin` and `\server` directories to the User `PATH` variable. 
-   Example: C:\Program Files\Java\jdk1.8.0_321\jre\bin\server
-5. Boost Test Framework and Mondodb Driver
-   1. Install via [VCPKG](https://vcpkg.io/en/getting-started.html) using `.\vcpkg install openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows mongo-cxx-driver:x64-windows`
+2. Ensure PowerShell (64-bit, version 7 or greater) is installed.
+   1. [Dowload and install PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2).
+   2. Create a short-cut for a Developer Shell. Change the path to the `Microsoft.VisualStudio.DevShell.dll` as appropriate for
+   your version of Visual Studio. 
+      - Example short-cut path: `"C:\Program Files\PowerShell\7\pwsh.exe" -noe -c "&{Import-Module """C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\Microsoft.VisualStudio.DevShell.dll"""; Enter-VsDevShell db62f8c1}"`
+2. Install Dependencies
+   1. Start a version 7 or greater PowerShell (pwsh.exe) - preferrably 
+    in ***Run as Administrator*** mode.
+   2. Change directory to the project directory.
+   3. Run the installation script `scripts\install_dependencies_win.ps1`. Note: ***This will
+   forcibly install any dependency that has not already been set (i.e, Java JDK, libraries and local MongoDB server).***
+2. Setup Environment Variables
+   1. Start a version 7 or greater PowerShell (pwsh.exe) 
+   2. Change directory to the project directory.
+   3. Run the following script: `scripts\env_variables_check.ps1`
+   4. For any missing environment variables, add the missing environment variable to your
+   user setup.
 6. On the Developer PowerShell, run one of the build scripts to create an initial compilation.
    1. E.g.: `.\build_win_debug64.ps1`
    2. Navigate to the `build\odbc\cmake` folder to use the generated solution file, `Ignite.C++.sln` to work on
    source code development and testing.
-7. Set the environment variable `DOCUMENTDB_HOME`. On a developer's machine, set it to `<repo-folder>\build\odbc\bin\Debug`. The 
-   build script run above, downloads the JDBC jar to the `<repo-folder>\build\odbc\bin\Debug\libs` folder.
-8. Open a **64-bit** command shell or **64-bit** PowerShell window, **as Administrator**, run the command below
+8. Open a **64-bit** command shell or **64-bit** PowerShell window, ***as Administrator***, run the command below
    ```
    .\<repo-folder>\src\odbc\install\install_amd64.cmd <repo-folder>\build\odbc\cmake\Debug\documentdb.odbc.dll
    ``` 
    Ensure that backslashes are used in your command. 
-9. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
 ## MacOS
 
-1. Install dependencies
+1. Install dependencies by running `./script/install_dependencies_mac.sh`. Or you can do it manually with commands below.
    1. `brew install cmake`
    2. `brew install openssl`
    3. `brew install libiodbc`  
@@ -107,10 +109,11 @@ Example:
    5. Install MongoDB using [`MongoDB's Installation Guide for MongoDB Community Edition on macOS`](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-os-x/).
    6. `brew install mongo-cxx-driver`
    7. Install Java **JDK** (version 8+ - 17 recommended)  
-      - This can be done through Homebrew using `brew install --cask temurin<version>`. 
-      - Ensure to set `JAVA_HOME`. Make sure it is set to temurin. Other JDK package may cause test errors 
+      - This can be done through Homebrew using `brew install --cask corretto<version>`. 
+      - If the above command fails with `No Cask with this name exists`, run `brew tap homebrew/cask-versions` first and try it again.
+      - Ensure to set `JAVA_HOME`. Make sure it is set to corretto. Other JDK package may cause test errors 
       such as `Unable to get initialized JVM` at run time.  
-      Example: /Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home
+      Example: /Library/Java/JavaVirtualMachines/amazon-corretto-18.jdk/Contents/Home
       - Ensure to save Java `/bin` and `/server` directories to the User `PATH` variable.  
       Example: /Library/Java/JavaVirtualMachines/jdk-17.0.2.jdk/Contents/Home/lib/server/
       /Library/Java/JavaVirtualMachines/jdk-17.0.2.jdk/Contents/Home/bin/
@@ -120,12 +123,13 @@ Example:
 2. Run one of the build scripts to create an initial compilation.
    1. E.g.: `./build_mac_release64.sh`
    2. Navigate to the `build/odbc/lib` folder to use the generated files.
-3. Set the environment variable `DOCUMENTDB_HOME`. On a developer's machine, set it to `<repo-folder>/build/odbc/bin`
-4. Set the environment variable `ODBCINSTINI`. On a developer's machine, set it to `<repo-folder>/build/odbc/lib/documentdb-odbc-install.ini`.
-5. Run the following command to register the ODBC driver. 
+3. Call `./script/set_vars_after_build_mac.sh` to set `DOCUMENTDB_HOME` and `ODBCINSTINI` automatically. Or you can do it mannually with instructions below. 
+   - Set the environment variable `DOCUMENTDB_HOME`. On a developer's machine, set it to `<repo-folder>/build/odbc/bin`
+   - Set the environment variable `ODBCINSTINI`. On a developer's machine, set it to `<repo-folder>/build/odbc/lib/documentdb-odbc-install.ini`.
+4. Run the following command to register the ODBC driver. 
    `./scripts/register_driver_unix.sh`.
-6. Now you're ready to run the tests (e.g., `./build/odbc/bin/documentdb-odbc-tests  --catch_system_errors=false`).
-7. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
+5. Now you're ready to run the tests (e.g., `./build/odbc/bin/documentdb-odbc-tests  --catch_system_errors=false`).
+6. More details in [`src\DEVNOTES.txt`](src/DEVNOTES.txt).
 
 ## Linux
 
