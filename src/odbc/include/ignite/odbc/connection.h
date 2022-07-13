@@ -161,12 +161,6 @@ class Connection : public diagnostic::DiagnosableAdapter {
    */
   const config::Configuration& GetConfiguration() const;
 
-  /**
-   * Is auto commit.
-   *
-   * @return @c true if the auto commit is enabled.
-   */
-  bool IsAutoCommit() const;
 
   /**
    * Create diagnostic record associated with the Connection instance.
@@ -222,16 +216,6 @@ class Connection : public diagnostic::DiagnosableAdapter {
   void SendRequest(const ReqT& req) {
     // TODO: Remove when unnecessary.
   }
-
-  /**
-   * Perform transaction commit.
-   */
-  void TransactionCommit();
-
-  /**
-   * Perform transaction rollback.
-   */
-  void TransactionRollback();
 
   /**
    * Get connection attribute.
@@ -340,22 +324,6 @@ class Connection : public diagnostic::DiagnosableAdapter {
   SqlResult::Type InternalCreateStatement(Statement*& statement);
 
   /**
-   * Perform transaction commit on all the associated connections.
-   * Internal call.
-   *
-   * @return Operation result.
-   */
-  SqlResult::Type InternalTransactionCommit();
-
-  /**
-   * Perform transaction rollback on all the associated connections.
-   * Internal call.
-   *
-   * @return Operation result.
-   */
-  SqlResult::Type InternalTransactionRollback();
-
-  /**
    * Get connection attribute.
    * Internal call.
    *
@@ -379,13 +347,6 @@ class Connection : public diagnostic::DiagnosableAdapter {
    */
   SqlResult::Type InternalSetAttribute(int attr, void* value,
                                        SQLINTEGER valueLen);
-
-  /**
-   * Perform handshake request.
-   *
-   * @return Operation result.
-   */
-  SqlResult::Type MakeRequestHandshake();
 
   /**
    * Ensure there is a connection to the cluster.
@@ -465,12 +426,6 @@ class Connection : public diagnostic::DiagnosableAdapter {
 
   /** Connection timeout in seconds. */
   int32_t timeout_ = 0;
-
-  /** Login timeout in seconds. */
-  int32_t loginTimeout_ = DEFAULT_CONNECT_TIMEOUT;
-
-  /** Autocommit flag. */
-  bool autoCommit_ = true;
 
   /** Configuration. */
   config::Configuration config_;

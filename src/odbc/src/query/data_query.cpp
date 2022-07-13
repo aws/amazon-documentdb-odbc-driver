@@ -299,6 +299,7 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
     }
     auto options = mongocxx::options::aggregate{};
     options.batch_size(config.GetDefaultFetchSize());
+    options.max_time(std::chrono::milliseconds(std::chrono::seconds(timeout_)));
     mongocxx::cursor cursor = collection.aggregate(pipeline, options);
 
     this->cursor_.reset(new DocumentDbCursor(cursor, columnMetadata, paths));

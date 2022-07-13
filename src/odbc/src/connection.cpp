@@ -305,83 +305,11 @@ const config::Configuration& Connection::GetConfiguration() const {
   return config_;
 }
 
-bool Connection::IsAutoCommit() const {
-  return autoCommit_;
-}
-
 diagnostic::DiagnosticRecord Connection::CreateStatusRecord(
     SqlState::Type sqlState, const std::string& message, int32_t rowNum,
     int32_t columnNum) {
   return diagnostic::DiagnosticRecord(sqlState, message, "", "", rowNum,
                                       columnNum);
-}
-
-void Connection::TransactionCommit() {
-  IGNITE_ODBC_API_CALL(InternalTransactionCommit());
-}
-
-SqlResult::Type Connection::InternalTransactionCommit() {
-  std::string schema = config_.GetDatabase();
-
-  app::ParameterSet empty;
-
-  QueryExecuteRequest req(schema, "COMMIT", empty, timeout_, autoCommit_);
-  QueryExecuteResponse rsp;
-
-  try {
-    bool sent = SyncMessage(req, rsp, timeout_);
-
-    if (!sent) {
-      AddStatusRecord(SqlState::S08S01_LINK_FAILURE,
-                      "Failed to send commit request.");
-
-      return SqlResult::AI_ERROR;
-    }
-  } catch (const OdbcError& err) {
-    AddStatusRecord(err);
-
-    return SqlResult::AI_ERROR;
-  } catch (const IgniteError& err) {
-    AddStatusRecord(err.GetText());
-
-    return SqlResult::AI_ERROR;
-  }
-
-  return SqlResult::AI_SUCCESS;
-}
-
-void Connection::TransactionRollback() {
-  IGNITE_ODBC_API_CALL(InternalTransactionRollback());
-}
-
-SqlResult::Type Connection::InternalTransactionRollback() {
-  std::string schema = config_.GetDatabase();
-
-  app::ParameterSet empty;
-
-  QueryExecuteRequest req(schema, "ROLLBACK", empty, timeout_, autoCommit_);
-  QueryExecuteResponse rsp;
-
-  try {
-    bool sent = SyncMessage(req, rsp, timeout_);
-
-    if (!sent) {
-      AddStatusRecord(SqlState::S08S01_LINK_FAILURE,
-                      "Failed to send rollback request.");
-
-      return SqlResult::AI_ERROR;
-    }
-  } catch (const OdbcError& err) {
-    AddStatusRecord(err);
-
-    return SqlResult::AI_ERROR;
-  } catch (const IgniteError& err) {
-    AddStatusRecord(err.GetText());
-
-    return SqlResult::AI_ERROR;
-  }
-
-  return SqlResult::AI_SUCCESS;
 }
 
 void Connection::GetAttribute(int attr, void* buf, SQLINTEGER bufLen,
@@ -425,7 +353,7 @@ SqlResult::Type Connection::InternalGetAttribute(int attr, void* buf,
     case SQL_ATTR_LOGIN_TIMEOUT: {
       SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
 
-      *val = static_cast< SQLUINTEGER >(loginTimeout_);
+      *val = static_cast< SQLUINTEGER >(config_.GetLoginTimeoutSeconds());
 
       if (valueLen)
         *valueLen = SQL_IS_INTEGER;
@@ -433,10 +361,10 @@ SqlResult::Type Connection::InternalGetAttribute(int attr, void* buf,
       break;
     }
 
-    case SQL_ATTR_AUTOCOMMIT: {
+    case SQL_ATTR_PACKET_SIZE: {
       SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
 
-      *val = autoCommit_ ? SQL_AUTOCOMMIT_ON : SQL_AUTOCOMMIT_OFF;
+      *val = static_cast< SQLUINTEGER >(config_.GetDefaultFetchSize());
 
       if (valueLen)
         *valueLen = SQL_IS_INTEGER;
@@ -479,7 +407,7 @@ SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
     }
 
     case SQL_ATTR_LOGIN_TIMEOUT: {
-      loginTimeout_ = RetrieveTimeout(value);
+      config_.SetLoginTimeoutSeconds(RetrieveTimeout(value));
 
       if (GetDiagnosticRecords().GetStatusRecordsNumber() != 0)
         return SqlResult::AI_SUCCESS_WITH_INFO;
@@ -487,20 +415,9 @@ SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
       break;
     }
 
-    case SQL_ATTR_AUTOCOMMIT: {
-      SQLUINTEGER mode =
-          static_cast< SQLUINTEGER >(reinterpret_cast< ptrdiff_t >(value));
-
-      if (mode != SQL_AUTOCOMMIT_ON && mode != SQL_AUTOCOMMIT_OFF) {
-        AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
-                        "Specified attribute is not supported.");
-
-        return SqlResult::AI_ERROR;
-      }
-
-      autoCommit_ = mode == SQL_AUTOCOMMIT_ON;
-
-      break;
+    case SQL_ATTR_PACKET_SIZE: {
+      SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(value);
+      config_.SetDefaultFetchSize(static_cast< int32_t >(*val));
     }
 
     default: {
@@ -509,50 +426,6 @@ SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
 
       return SqlResult::AI_ERROR;
     }
-  }
-
-  return SqlResult::AI_SUCCESS;
-}
-
-SqlResult::Type Connection::MakeRequestHandshake() {
-  HandshakeRequest req(config_);
-  HandshakeResponse rsp;
-
-  try {
-    // Workaround for some Linux systems that report connection on non-blocking
-    // sockets as successful but fail to establish real connection.
-    bool sent = InternalSyncMessage(req, rsp, loginTimeout_);
-
-    if (!sent) {
-      AddStatusRecord(
-          SqlState::S08001_CANNOT_CONNECT,
-          "Failed to get handshake response (Did you forget to enable SSL?).");
-
-      return SqlResult::AI_ERROR;
-    }
-  } catch (const OdbcError& err) {
-    AddStatusRecord(err);
-
-    return SqlResult::AI_ERROR;
-  } catch (const IgniteError& err) {
-    AddStatusRecord(SqlState::S08004_CONNECTION_REJECTED, err.GetText());
-
-    return SqlResult::AI_ERROR;
-  }
-
-  if (!rsp.IsAccepted()) {
-    LOG_MSG("Handshake message has been rejected.");
-
-    std::stringstream constructor;
-
-    constructor << "Node rejected handshake message. ";
-
-    if (!rsp.GetError().empty())
-      constructor << "Additional info: " << rsp.GetError() << " ";
-
-    AddStatusRecord(SqlState::S08004_CONNECTION_REJECTED, constructor.str());
-
-    return SqlResult::AI_ERROR;
   }
 
   return SqlResult::AI_SUCCESS;
@@ -663,6 +536,10 @@ std::string Connection::FormatMongoCppConnectionString(
   mongoConnectionString.append("?authMechanism=SCRAM-SHA-1");
   if (config_.IsTls()) {
     mongoConnectionString.append("&tlsAllowInvalidHostnames=true");
+  }
+  if (config_.GetLoginTimeoutSeconds()) {
+    std::chrono::milliseconds connectionTimeoutMS = std::chrono::seconds(config_.GetLoginTimeoutSeconds());
+    mongoConnectionString.append("&socketTimeoutMS=" + connectionTimeoutMS.count());
   }
 
   // tls configuration is handled using tls_options in connectionCPP

@@ -265,11 +265,6 @@ SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT type) {
   return ignite::SQLGetTypeInfo(stmt, type);
 }
 
-SQLRETURN SQL_API SQLEndTran(SQLSMALLINT handleType, SQLHANDLE handle,
-                             SQLSMALLINT completionType) {
-  return ignite::SQLEndTran(handleType, handle, completionType);
-}
-
 SQLRETURN SQL_API SQLGetData(SQLHSTMT stmt, SQLUSMALLINT colNum,
                              SQLSMALLINT targetType, SQLPOINTER targetValue,
                              SQLLEN bufferLength,
@@ -335,6 +330,20 @@ SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr,
   return ignite::SQLSetConnectAttr(conn, attr, value, valueLen);
 }
 
+//
+// ==== Not Supported ====
+//
+
+SQLRETURN SQL_API SQLEndTran(SQLSMALLINT handleType, SQLHANDLE handle,
+                             SQLSMALLINT completionType) {
+                               
+  IGNITE_UNUSED(handleType);
+  IGNITE_UNUSED(handle);
+  IGNITE_UNUSED(completionType);
+
+  LOG_MSG("SQLEndTran called");
+  return SQL_SUCCESS;
+}
 //
 // ==== Not implemented ====
 //
