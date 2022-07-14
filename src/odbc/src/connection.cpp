@@ -120,20 +120,20 @@ void Connection::Establish(const std::string& connectStr, void* parentWindow) {
 
 SqlResult::Type Connection::InternalEstablish(const std::string& connectStr,
                                               void* parentWindow) {
-  //config::Configuration config;
-  config::ConnectionStringParser parser(config_);
+  config::Configuration config;
+  config::ConnectionStringParser parser(config);
   parser.ParseConnectionString(connectStr, &GetDiagnosticRecords());
 
-  if (config_.IsDsnSet()) {
+  if (config.IsDsnSet()) {
     std::string dsn = config_.GetDsn();
 
-    ReadDsnConfiguration(dsn.c_str(), config_, &GetDiagnosticRecords());
+    ReadDsnConfiguration(dsn.c_str(), config, &GetDiagnosticRecords());
   }
 
 #ifdef _WIN32
   if (parentWindow) {
     LOG_MSG("Parent window is passed. Creating configuration window.");
-    if (!DisplayConnectionWindow(parentWindow, config_)) {
+    if (!DisplayConnectionWindow(parentWindow, config)) {
       AddStatusRecord(odbc::SqlState::SHY008_OPERATION_CANCELED,
                       "Connection canceled by user");
 
@@ -142,7 +142,7 @@ SqlResult::Type Connection::InternalEstablish(const std::string& connectStr,
   }
 #endif  // _WIN32
 
-  return InternalEstablish(config_);
+  return InternalEstablish(config);
 }
 
 void Connection::Establish(const config::Configuration cfg) {
@@ -361,17 +361,6 @@ SqlResult::Type Connection::InternalGetAttribute(int attr, void* buf,
       break;
     }
 
-    case SQL_ATTR_PACKET_SIZE: {
-      SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
-
-      *val = static_cast< SQLUINTEGER >(config_.GetDefaultFetchSize());
-
-      if (valueLen)
-        *valueLen = SQL_IS_INTEGER;
-
-      break;
-    }
-
     default: {
       AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
                       "Specified attribute is not supported.");
@@ -412,13 +401,6 @@ SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
       if (GetDiagnosticRecords().GetStatusRecordsNumber() != 0)
         return SqlResult::AI_SUCCESS_WITH_INFO;
 
-      break;
-    }
-
-    case SQL_ATTR_PACKET_SIZE: {
-      SQLUINTEGER val =
-          static_cast< SQLUINTEGER >(reinterpret_cast< ptrdiff_t >(value));
-      config_.SetDefaultFetchSize(static_cast< int32_t >(val));
       break;
     }
 

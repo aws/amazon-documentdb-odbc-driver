@@ -176,58 +176,6 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributeLoginTimeout) {
   BOOST_REQUIRE_EQUAL(timeout, 42);
 }
 
-//SQL_ATTR_PACKET_SIZE
-
-BOOST_AUTO_TEST_CASE(ConnectionAttributePacketSizeDefaultValue) {
-  connectToLocalServer("odbc-test");
-  SQLUINTEGER packetSize = -1;
-  SQLRETURN ret =
-      SQLGetConnectAttr(dbc, SQL_ATTR_PACKET_SIZE, &packetSize, 0, 0);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
-  BOOST_REQUIRE_EQUAL(packetSize, (SQLUINTEGER)Configuration::DefaultValue::defaultFetchSize);
-}
-
-BOOST_AUTO_TEST_CASE(ConnectionAttributePacketSize) {
-  Prepare();
-  
-  SQLRETURN ret = SQLSetConnectAttr(dbc, SQL_ATTR_PACKET_SIZE,
-                          reinterpret_cast< SQLPOINTER >(1000), 0);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
-
-  SQLUINTEGER packetSize = -1;
-
-  std::string dsnConnectionString;
-  CreateDsnConnectionStringForLocalServer(dsnConnectionString, "odbc-test");
-
-  // Connect string
-  std::vector< SQLWCHAR > connectStr0(dsnConnectionString.begin(),
-                                      dsnConnectionString.end());
-
-  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
-  SQLSMALLINT outstrlen;
-
-  // Connecting to ODBC server.
-  ret =
-      SQLDriverConnect(dbc, NULL, &connectStr0[0],
-                       static_cast< SQLSMALLINT >(connectStr0.size()), outstr,
-                       sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc));
-
-  // Allocate a statement handle
-  SQLAllocHandle(SQL_HANDLE_STMT, dbc, &stmt);
-
-  BOOST_REQUIRE(stmt != NULL);
-
-  ret = SQLGetConnectAttr(dbc, SQL_ATTR_PACKET_SIZE, &packetSize, 0, 0);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
-  BOOST_REQUIRE_EQUAL(packetSize, 1000);
-}
-
 /**
  * Check that environment returns expected version of ODBC standard.
  *
