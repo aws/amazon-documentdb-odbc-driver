@@ -186,18 +186,6 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributePacketSizeDefaultValue) {
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
   BOOST_REQUIRE_EQUAL(packetSize, (SQLUINTEGER)Configuration::DefaultValue::defaultFetchSize);
-
-  ret = SQLSetConnectAttr(dbc, SQL_ATTR_PACKET_SIZE,
-                          reinterpret_cast< SQLPOINTER >(1000), 0);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
-
-  packetSize = -1;
-
-  ret = SQLGetConnectAttr(dbc, SQL_ATTR_PACKET_SIZE, &packetSize, 0, 0);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
-  BOOST_REQUIRE_EQUAL(packetSize, 1000);
 }
 
 BOOST_AUTO_TEST_CASE(ConnectionAttributePacketSize) {
