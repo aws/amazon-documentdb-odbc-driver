@@ -120,20 +120,20 @@ void Connection::Establish(const std::string& connectStr, void* parentWindow) {
 
 SqlResult::Type Connection::InternalEstablish(const std::string& connectStr,
                                               void* parentWindow) {
-  config::Configuration config;
-  config::ConnectionStringParser parser(config);
+  //config::Configuration config;
+  config::ConnectionStringParser parser(config_);
   parser.ParseConnectionString(connectStr, &GetDiagnosticRecords());
 
-  if (config.IsDsnSet()) {
-    std::string dsn = config.GetDsn();
+  if (config_.IsDsnSet()) {
+    std::string dsn = config_.GetDsn();
 
-    ReadDsnConfiguration(dsn.c_str(), config, &GetDiagnosticRecords());
+    ReadDsnConfiguration(dsn.c_str(), config_, &GetDiagnosticRecords());
   }
 
 #ifdef _WIN32
   if (parentWindow) {
     LOG_MSG("Parent window is passed. Creating configuration window.");
-    if (!DisplayConnectionWindow(parentWindow, config)) {
+    if (!DisplayConnectionWindow(parentWindow, config_)) {
       AddStatusRecord(odbc::SqlState::SHY008_OPERATION_CANCELED,
                       "Connection canceled by user");
 
@@ -142,7 +142,7 @@ SqlResult::Type Connection::InternalEstablish(const std::string& connectStr,
   }
 #endif  // _WIN32
 
-  return InternalEstablish(config);
+  return InternalEstablish(config_);
 }
 
 void Connection::Establish(const config::Configuration cfg) {
