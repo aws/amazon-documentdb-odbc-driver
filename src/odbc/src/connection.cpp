@@ -416,8 +416,10 @@ SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
     }
 
     case SQL_ATTR_PACKET_SIZE: {
-      SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(value);
-      config_.SetDefaultFetchSize(static_cast< int32_t >(*val));
+      SQLUINTEGER val =
+          static_cast< SQLUINTEGER >(reinterpret_cast< ptrdiff_t >(value));
+      config_.SetDefaultFetchSize(static_cast< int32_t >(val));
+      break;
     }
 
     default: {
@@ -539,7 +541,8 @@ std::string Connection::FormatMongoCppConnectionString(
   }
   if (config_.GetLoginTimeoutSeconds()) {
     std::chrono::milliseconds connectionTimeoutMS = std::chrono::seconds(config_.GetLoginTimeoutSeconds());
-    mongoConnectionString.append("&socketTimeoutMS=" + connectionTimeoutMS.count());
+    mongoConnectionString.append("&socketTimeoutMS="
+                                 + std::to_string(connectionTimeoutMS.count()));
   }
 
   // tls configuration is handled using tls_options in connectionCPP

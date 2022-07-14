@@ -176,6 +176,31 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributeLoginTimeout) {
   BOOST_REQUIRE_EQUAL(timeout, 42);
 }
 
+//SQL_ATTR_PACKET_SIZE
+
+BOOST_AUTO_TEST_CASE(ConnectionAttributePacketSize) {
+  connectToLocalServer("odbc-test");
+
+  SQLUINTEGER packetSize = -1;
+  SQLRETURN ret =
+      SQLGetConnectAttr(dbc, SQL_ATTR_PACKET_SIZE, &packetSize, 0, 0);
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
+  BOOST_REQUIRE_EQUAL(packetSize, (SQLUINTEGER)Configuration::DefaultValue::defaultFetchSize);
+
+  ret = SQLSetConnectAttr(dbc, SQL_ATTR_PACKET_SIZE,
+                          reinterpret_cast< SQLPOINTER >(1000), 0);
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
+
+  packetSize = -1;
+
+  ret = SQLGetConnectAttr(dbc, SQL_ATTR_PACKET_SIZE, &packetSize, 0, 0);
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
+  BOOST_REQUIRE_EQUAL(packetSize, 1000);
+}
+
 /**
  * Check that environment returns expected version of ODBC standard.
  *
