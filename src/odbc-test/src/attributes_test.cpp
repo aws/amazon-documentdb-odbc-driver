@@ -233,7 +233,7 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributeDefaultPacketSize) {
 BOOST_AUTO_TEST_CASE(ConnectionAttributePacketSize) {
   Prepare();
 
-  SQLRETURN ret = SQLSetConnectAttrW(dbc, SQL_ATTR_PACKET_SIZE,
+  SQLRETURN ret = SQLSetConnectAttr(dbc, SQL_ATTR_PACKET_SIZE,
                           reinterpret_cast< SQLPOINTER >(1000), 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
@@ -248,7 +248,7 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributePacketSize) {
   SQLSMALLINT outstrlen;
 
     // Connecting to ODBC server.
-  ret = SQLDriverConnectW(dbc, NULL, &connectStr[0],
+  ret = SQLDriverConnect(dbc, NULL, &connectStr[0],
                          static_cast< SQLSMALLINT >(connectStr.size()), outstr,
                          sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
 
