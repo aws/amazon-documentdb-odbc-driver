@@ -130,50 +130,124 @@ BOOST_AUTO_TEST_CASE(StatementAttributeQueryTimeout) {
   BOOST_REQUIRE_EQUAL(timeout, 7);
 }
 
-BOOST_AUTO_TEST_CASE(ConnectionAttributeConnectionTimeout) {
-  connectToLocalServer("odbc-test");
+BOOST_AUTO_TEST_CASE(ConnectionAttributeDefaultLoginTimeout) {
+  Prepare();
+
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, "odbc-test");
+
+  std::vector< SQLWCHAR > connectStr(dsnConnectionString.begin(),
+                                     dsnConnectionString.end());
+
+  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
+  SQLSMALLINT outstrlen;
+
+  // Connecting to ODBC server.
+  SQLRETURN ret = SQLDriverConnect(
+      dbc, NULL, &connectStr[0],
+                         static_cast< SQLSMALLINT >(connectStr.size()), outstr,
+                         sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
 
   SQLUINTEGER timeout = -1;
-  SQLRETURN ret =
-      SQLGetConnectAttr(dbc, SQL_ATTR_CONNECTION_TIMEOUT, &timeout, 0, 0);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
-  BOOST_REQUIRE_EQUAL(timeout, 0);
-
-  ret = SQLSetConnectAttr(dbc, SQL_ATTR_CONNECTION_TIMEOUT,
-                          reinterpret_cast< SQLPOINTER >(42), 0);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
-
-  timeout = -1;
-
-  ret = SQLGetConnectAttr(dbc, SQL_ATTR_CONNECTION_TIMEOUT, &timeout, 0, 0);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
-  BOOST_REQUIRE_EQUAL(timeout, 42);
-}
-
-BOOST_AUTO_TEST_CASE(ConnectionAttributeLoginTimeout) {
-  connectToLocalServer("odbc-test");
-
-  SQLUINTEGER timeout = -1;
-  SQLRETURN ret =
+  ret =
       SQLGetConnectAttr(dbc, SQL_ATTR_LOGIN_TIMEOUT, &timeout, 0, 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
-  BOOST_REQUIRE_EQUAL(timeout, (SQLUINTEGER)Configuration::DefaultValue::loginTimeoutSec);
+  BOOST_REQUIRE_EQUAL(
+      timeout, (SQLUINTEGER)Configuration::DefaultValue::loginTimeoutSec);
 
   ret = SQLSetConnectAttr(dbc, SQL_ATTR_LOGIN_TIMEOUT,
+                          reinterpret_cast< SQLPOINTER >(42), 0);
+}
+
+BOOST_AUTO_TEST_CASE(ConnectionAttributeLoginTimeout) {
+  Prepare();
+
+  SQLRETURN ret = SQLSetConnectAttr(dbc, SQL_ATTR_LOGIN_TIMEOUT,
                           reinterpret_cast< SQLPOINTER >(42), 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
 
-  timeout = -1;
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, "odbc-test");
+
+  std::vector< SQLWCHAR > connectStr(dsnConnectionString.begin(),
+                                     dsnConnectionString.end());
+
+  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
+  SQLSMALLINT outstrlen;
+
+    // Connecting to ODBC server.
+  ret = SQLDriverConnect(dbc, NULL, &connectStr[0],
+                         static_cast< SQLSMALLINT >(connectStr.size()), outstr,
+                         sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
+
+  SQLUINTEGER timeout = -1;
 
   ret = SQLGetConnectAttr(dbc, SQL_ATTR_LOGIN_TIMEOUT, &timeout, 0, 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
   BOOST_REQUIRE_EQUAL(timeout, 42);
+}
+
+BOOST_AUTO_TEST_CASE(ConnectionAttributeDefaultPacketSize) {
+  Prepare();
+
+
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, "odbc-test");
+
+  std::vector< SQLWCHAR > connectStr(dsnConnectionString.begin(),
+                                     dsnConnectionString.end());
+
+  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
+  SQLSMALLINT outstrlen;
+
+  // Connecting to ODBC server.
+  SQLRETURN ret = SQLDriverConnect(
+      dbc, NULL, &connectStr[0],
+                         static_cast< SQLSMALLINT >(connectStr.size()), outstr,
+                         sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
+
+  SQLUINTEGER packetSize = -1;
+  ret =
+      SQLGetConnectAttr(dbc, SQL_ATTR_PACKET_SIZE, &packetSize, 0, 0);
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
+  BOOST_REQUIRE_EQUAL(
+      packetSize, (SQLUINTEGER)Configuration::DefaultValue::defaultFetchSize);
+}
+
+BOOST_AUTO_TEST_CASE(ConnectionAttributePacketSize) {
+  Prepare();
+
+  SQLRETURN ret = SQLSetConnectAttr(dbc, SQL_ATTR_PACKET_SIZE,
+                          reinterpret_cast< SQLPOINTER >(1000), 0);
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
+
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, "odbc-test");
+
+  std::vector< SQLWCHAR > connectStr(dsnConnectionString.begin(),
+                                     dsnConnectionString.end());
+
+  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
+  SQLSMALLINT outstrlen;
+
+    // Connecting to ODBC server.
+  ret = SQLDriverConnect(dbc, NULL, &connectStr[0],
+                         static_cast< SQLSMALLINT >(connectStr.size()), outstr,
+                         sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
+
+  SQLUINTEGER packetSize = -1;
+
+  ret = SQLGetConnectAttr(dbc, SQL_ATTR_PACKET_SIZE, &packetSize, 0, 0);
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
+  BOOST_REQUIRE_EQUAL(packetSize, 1000);
 }
 
 /**

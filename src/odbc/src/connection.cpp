@@ -120,20 +120,20 @@ void Connection::Establish(const std::string& connectStr, void* parentWindow) {
 
 SqlResult::Type Connection::InternalEstablish(const std::string& connectStr,
                                               void* parentWindow) {
-  config::Configuration config;
-  config::ConnectionStringParser parser(config);
+  //config::Configuration config;
+  config::ConnectionStringParser parser(config_);
   parser.ParseConnectionString(connectStr, &GetDiagnosticRecords());
 
-  if (config.IsDsnSet()) {
+  if (config_.IsDsnSet()) {
     std::string dsn = config_.GetDsn();
 
-    ReadDsnConfiguration(dsn.c_str(), config, &GetDiagnosticRecords());
+    ReadDsnConfiguration(dsn.c_str(), config_, &GetDiagnosticRecords());
   }
 
 #ifdef _WIN32
   if (parentWindow) {
     LOG_MSG("Parent window is passed. Creating configuration window.");
-    if (!DisplayConnectionWindow(parentWindow, config)) {
+    if (!DisplayConnectionWindow(parentWindow, config_)) {
       AddStatusRecord(odbc::SqlState::SHY008_OPERATION_CANCELED,
                       "Connection canceled by user");
 
@@ -142,7 +142,7 @@ SqlResult::Type Connection::InternalEstablish(const std::string& connectStr,
   }
 #endif  // _WIN32
 
-  return InternalEstablish(config);
+  return InternalEstablish(config_);
 }
 
 void Connection::Establish(const config::Configuration cfg) {
@@ -328,10 +328,10 @@ SqlResult::Type Connection::InternalGetAttribute(int attr, void* buf,
   }
 
   switch (attr) {
-    case SQL_ATTR_CONNECTION_DEAD: {
+    case SQL_ATTR_PACKET_SIZE: {
       SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
 
-      *val = connection_.Get() ? SQL_CD_FALSE : SQL_CD_TRUE;
+      *val = static_cast< SQLUINTEGER >(config_.GetDefaultFetchSize());
 
       if (valueLen)
         *valueLen = SQL_IS_INTEGER;
@@ -339,10 +339,10 @@ SqlResult::Type Connection::InternalGetAttribute(int attr, void* buf,
       break;
     }
 
-    case SQL_ATTR_CONNECTION_TIMEOUT: {
+    case SQL_ATTR_CONNECTION_DEAD: {
       SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
 
-      *val = static_cast< SQLUINTEGER >(timeout_);
+      *val = connection_.Get() ? SQL_CD_FALSE : SQL_CD_TRUE;
 
       if (valueLen)
         *valueLen = SQL_IS_INTEGER;
@@ -386,12 +386,10 @@ SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
       return SqlResult::AI_ERROR;
     }
 
-    case SQL_ATTR_CONNECTION_TIMEOUT: {
-      timeout_ = RetrieveTimeout(value);
-
-      if (GetDiagnosticRecords().GetStatusRecordsNumber() != 0)
-        return SqlResult::AI_SUCCESS_WITH_INFO;
-
+    case SQL_ATTR_PACKET_SIZE: {
+      SQLUINTEGER val =
+          static_cast< SQLUINTEGER >(reinterpret_cast< ptrdiff_t >(value));
+      config_.SetDefaultFetchSize(static_cast< int32_t >(val));
       break;
     }
 
