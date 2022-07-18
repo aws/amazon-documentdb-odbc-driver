@@ -120,7 +120,6 @@ void Connection::Establish(const std::string& connectStr, void* parentWindow) {
 
 SqlResult::Type Connection::InternalEstablish(const std::string& connectStr,
                                               void* parentWindow) {
-  //config::Configuration config;
   config::ConnectionStringParser parser(config_);
   parser.ParseConnectionString(connectStr, &GetDiagnosticRecords());
 
