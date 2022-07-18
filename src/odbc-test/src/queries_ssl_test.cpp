@@ -137,6 +137,8 @@ BOOST_AUTO_TEST_CASE(TestConnectionSslReject) {
   BOOST_CHECK_EQUAL(codes.count(GetOdbcErrorState(SQL_HANDLE_DBC, dbc)), 1);
 }
 
+// TODO fix bug on logintimeoutsec on JDBC and ODBC
+// https://bitquill.atlassian.net/browse/AD-847
 BOOST_AUTO_TEST_CASE(TestLoginTimeout, *disabled()) {
   Prepare();
 
