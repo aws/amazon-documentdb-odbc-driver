@@ -327,17 +327,6 @@ SqlResult::Type Connection::InternalGetAttribute(int attr, void* buf,
   }
 
   switch (attr) {
-    case SQL_ATTR_PACKET_SIZE: {
-      SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
-
-      *val = static_cast< SQLUINTEGER >(config_.GetDefaultFetchSize());
-
-      if (valueLen)
-        *valueLen = SQL_IS_INTEGER;
-
-      break;
-    }
-
     case SQL_ATTR_CONNECTION_DEAD: {
       SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
 
@@ -383,13 +372,6 @@ SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
                       "Attribute is read only.");
 
       return SqlResult::AI_ERROR;
-    }
-
-    case SQL_ATTR_PACKET_SIZE: {
-      SQLUINTEGER val =
-          static_cast< SQLUINTEGER >(reinterpret_cast< ptrdiff_t >(value));
-      config_.SetDefaultFetchSize(static_cast< int32_t >(val));
-      break;
     }
 
     case SQL_ATTR_LOGIN_TIMEOUT: {
