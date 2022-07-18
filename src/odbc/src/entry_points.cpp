@@ -341,7 +341,7 @@ SQLRETURN SQL_API SQLEndTran(SQLSMALLINT handleType, SQLHANDLE handle,
   IGNITE_UNUSED(handle);
   IGNITE_UNUSED(completionType);
 
-  LOG_MSG("SQLEndTran called");
+  LOG_DEBUG_MSG("SQLEndTran called");
   return SQL_SUCCESS;
 }
 //
@@ -351,7 +351,7 @@ SQLRETURN SQL_API SQLEndTran(SQLSMALLINT handleType, SQLHANDLE handle,
 SQLRETURN SQL_API SQLCancel(SQLHSTMT stmt) {
   IGNITE_UNUSED(stmt);
 
-  LOG_MSG("SQLCancel called");
+  LOG_DEBUG_MSG("SQLCancel called");
   return SQL_SUCCESS;
 }
 
@@ -368,7 +368,7 @@ SQLRETURN SQL_API SQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT colNum,
   IGNITE_UNUSED(strAttrResLen);
   IGNITE_UNUSED(numAttrBuf);
 
-  LOG_MSG("SQLColAttributes called");
+  LOG_DEBUG_MSG("SQLColAttributes called");
   return SQL_SUCCESS;
 }
 
@@ -380,7 +380,7 @@ SQLRETURN SQL_API SQLGetCursorName(SQLHSTMT stmt, SQLWCHAR* nameBuf,
   IGNITE_UNUSED(nameBufLen);
   IGNITE_UNUSED(nameResLen);
 
-  LOG_MSG("SQLGetCursorName called");
+  LOG_DEBUG_MSG("SQLGetCursorName called");
   return SQL_SUCCESS;
 }
 
@@ -390,7 +390,7 @@ SQLRETURN SQL_API SQLSetCursorName(SQLHSTMT stmt, SQLWCHAR* name,
   IGNITE_UNUSED(name);
   IGNITE_UNUSED(nameLen);
 
-  LOG_MSG("SQLSetCursorName called");
+  LOG_DEBUG_MSG("SQLSetCursorName called");
   return SQL_SUCCESS;
 }
 
@@ -400,7 +400,7 @@ SQLRETURN SQL_API SQLGetConnectOption(SQLHDBC conn, SQLUSMALLINT option,
   IGNITE_UNUSED(option);
   IGNITE_UNUSED(value);
 
-  LOG_MSG("SQLGetConnectOption called");
+  LOG_DEBUG_MSG("SQLGetConnectOption called");
   return SQL_SUCCESS;
 }
 
@@ -410,7 +410,7 @@ SQLRETURN SQL_API SQLGetStmtOption(SQLHSTMT stmt, SQLUSMALLINT option,
   IGNITE_UNUSED(option);
   IGNITE_UNUSED(value);
 
-  LOG_MSG("SQLGetStmtOption called");
+  LOG_DEBUG_MSG("SQLGetStmtOption called");
   return SQL_SUCCESS;
 }
 
@@ -420,7 +420,7 @@ SQLRETURN SQL_API SQLSetConnectOption(SQLHDBC conn, SQLUSMALLINT option,
   IGNITE_UNUSED(option);
   IGNITE_UNUSED(value);
 
-  LOG_MSG("SQLSetConnectOption called");
+  LOG_DEBUG_MSG("SQLSetConnectOption called");
   return SQL_SUCCESS;
 }
 
@@ -430,7 +430,7 @@ SQLRETURN SQL_API SQLSetStmtOption(SQLHSTMT stmt, SQLUSMALLINT option,
   IGNITE_UNUSED(option);
   IGNITE_UNUSED(value);
 
-  LOG_MSG("SQLSetStmtOption called");
+  LOG_DEBUG_MSG("SQLSetStmtOption called");
   return SQL_SUCCESS;
 }
 
@@ -449,7 +449,7 @@ SQLRETURN SQL_API SQLStatistics(SQLHSTMT stmt, SQLWCHAR* catalogName,
   IGNITE_UNUSED(unique);
   IGNITE_UNUSED(reserved);
 
-  LOG_MSG("SQLStatistics called");
+  LOG_DEBUG_MSG("SQLStatistics called");
   return SQL_SUCCESS;
 }
 
@@ -465,7 +465,7 @@ SQLRETURN SQL_API SQLBrowseConnect(SQLHDBC conn, SQLWCHAR* inConnectionStr,
   IGNITE_UNUSED(outConnectionStrBufLen);
   IGNITE_UNUSED(outConnectionStrResLen);
 
-  LOG_MSG("SQLBrowseConnect called");
+  LOG_DEBUG_MSG("SQLBrowseConnect called");
   return SQL_SUCCESS;
 }
 
@@ -483,7 +483,7 @@ SQLRETURN SQL_API SQLProcedureColumns(
   IGNITE_UNUSED(columnName);
   IGNITE_UNUSED(columnNameLen);
 
-  LOG_MSG("SQLProcedureColumns called");
+  LOG_DEBUG_MSG("SQLProcedureColumns called");
   return SQL_SUCCESS;
 }
 
@@ -494,7 +494,7 @@ SQLRETURN SQL_API SQLSetPos(SQLHSTMT stmt, SQLSETPOSIROW rowNum,
   IGNITE_UNUSED(operation);
   IGNITE_UNUSED(lockType);
 
-  LOG_MSG("SQLSetPos called");
+  LOG_DEBUG_MSG("SQLSetPos called");
   return SQL_SUCCESS;
 }
 
@@ -506,7 +506,7 @@ SQLRETURN SQL_API SQLSetScrollOptions(SQLHSTMT stmt, SQLUSMALLINT concurrency,
   IGNITE_UNUSED(crowKeyset);
   IGNITE_UNUSED(crowRowset);
 
-  LOG_MSG("SQLSetScrollOptions called");
+  LOG_DEBUG_MSG("SQLSetScrollOptions called");
   return SQL_SUCCESS;
 }
 
@@ -514,7 +514,7 @@ SQLRETURN SQL_API SQLBulkOperations(SQLHSTMT stmt, SQLUSMALLINT operation) {
   IGNITE_UNUSED(stmt);
   IGNITE_UNUSED(operation);
 
-  LOG_MSG("SQLBulkOperations called");
+  LOG_DEBUG_MSG("SQLBulkOperations called");
   return SQL_SUCCESS;
 }
 
@@ -532,7 +532,7 @@ SQLRETURN SQL_API SQLTablePrivileges(SQLHSTMT stmt, SQLWCHAR* catalogName,
   IGNITE_UNUSED(tableName);
   IGNITE_UNUSED(tableNameLen);
 
-  LOG_MSG("SQLTablePrivileges called");
+  LOG_DEBUG_MSG("SQLTablePrivileges called");
   return SQL_SUCCESS;
 }
 
@@ -540,7 +540,7 @@ SQLRETURN SQL_API SQLCopyDesc(SQLHDESC src, SQLHDESC dst) {
   IGNITE_UNUSED(src);
   IGNITE_UNUSED(dst);
 
-  LOG_MSG("SQLCopyDesc called");
+  LOG_DEBUG_MSG("SQLCopyDesc called");
   return SQL_SUCCESS;
 }
 
@@ -554,7 +554,7 @@ SQLRETURN SQL_API SQLGetDescField(SQLHDESC descr, SQLSMALLINT recNum,
   IGNITE_UNUSED(bufferLen);
   IGNITE_UNUSED(resLen);
 
-  LOG_MSG("SQLGetDescField called");
+  LOG_DEBUG_MSG("SQLGetDescField called");
   return SQL_SUCCESS;
 }
 
@@ -576,7 +576,7 @@ SQLRETURN SQL_API SQLGetDescRec(SQLHDESC DescriptorHandle,
   IGNITE_UNUSED(scale);
   IGNITE_UNUSED(nullable);
 
-  LOG_MSG("SQLGetDescRec called");
+  LOG_DEBUG_MSG("SQLGetDescRec called");
   return SQL_SUCCESS;
 }
 
@@ -589,7 +589,7 @@ SQLRETURN SQL_API SQLSetDescField(SQLHDESC descr, SQLSMALLINT recNum,
   IGNITE_UNUSED(buffer);
   IGNITE_UNUSED(bufferLen);
 
-  LOG_MSG("SQLSetDescField called");
+  LOG_DEBUG_MSG("SQLSetDescField called");
   return SQL_SUCCESS;
 }
 
@@ -609,7 +609,7 @@ SQLRETURN SQL_API SQLSetDescRec(SQLHDESC descr, SQLSMALLINT recNum,
   IGNITE_UNUSED(resLen);
   IGNITE_UNUSED(id);
 
-  LOG_MSG("SQLSetDescRec called");
+  LOG_DEBUG_MSG("SQLSetDescRec called");
   return SQL_SUCCESS;
 }
 
@@ -627,7 +627,7 @@ SQLRETURN SQL_API SQLColumnPrivileges(
   IGNITE_UNUSED(columnName);
   IGNITE_UNUSED(columnNameLen);
 
-  LOG_MSG("SQLColumnPrivileges called");
+  LOG_DEBUG_MSG("SQLColumnPrivileges called");
   return SQL_SUCCESS;
 }
 
@@ -637,7 +637,7 @@ SQLRETURN SQL_API SQLParamOptions(SQLHSTMT stmt, SQLULEN paramSetSize,
   IGNITE_UNUSED(paramSetSize);
   IGNITE_UNUSED(paramsProcessed);
 
-  LOG_MSG("SQLParamOptions called");
+  LOG_DEBUG_MSG("SQLParamOptions called");
   return SQL_SUCCESS;
 }
 
@@ -653,6 +653,6 @@ SQLRETURN SQL_API SQLProcedures(SQLHSTMT stmt, SQLWCHAR* catalogName,
   IGNITE_UNUSED(tableName);
   IGNITE_UNUSED(tableNameLen);
 
-  LOG_MSG("SQLProcedures called");
+  LOG_DEBUG_MSG("SQLProcedures called");
   return SQL_SUCCESS;
 }

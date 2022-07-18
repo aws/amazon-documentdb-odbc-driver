@@ -520,7 +520,7 @@ std::string Connection::FormatMongoCppConnectionString(
   }
   if (config_.GetLoginTimeoutSeconds()) {
     std::chrono::milliseconds connectionTimeoutMS = std::chrono::seconds(config_.GetLoginTimeoutSeconds());
-    mongoConnectionString.append("&socketTimeoutMS="
+    mongoConnectionString.append("&connectTimeoutMS="
                                  + std::to_string(connectionTimeoutMS.count()));
   }
 

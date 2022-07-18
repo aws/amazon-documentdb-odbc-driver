@@ -145,8 +145,8 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributeDefaultLoginTimeout) {
   // Connecting to ODBC server.
   SQLRETURN ret = SQLDriverConnect(
       dbc, NULL, &connectStr[0],
-                         static_cast< SQLSMALLINT >(connectStr.size()), outstr,
-                         sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
+      static_cast< SQLSMALLINT >(connectStr.size()), outstr,
+      sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
 
@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributeLoginTimeout) {
   SQLWCHAR outstr[ODBC_BUFFER_SIZE];
   SQLSMALLINT outstrlen;
 
-    // Connecting to ODBC server.
+  // Connecting to ODBC server.
   ret = SQLDriverConnect(dbc, NULL, &connectStr[0],
                          static_cast< SQLSMALLINT >(connectStr.size()), outstr,
                          sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
@@ -212,8 +212,8 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributeDefaultPacketSize) {
   // Connecting to ODBC server.
   SQLRETURN ret = SQLDriverConnect(
       dbc, NULL, &connectStr[0],
-                         static_cast< SQLSMALLINT >(connectStr.size()), outstr,
-                         sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
+      static_cast< SQLSMALLINT >(connectStr.size()), outstr,
+      sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
 
   SQLUINTEGER packetSize = -1;
   ret =
@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributePacketSize) {
   SQLWCHAR outstr[ODBC_BUFFER_SIZE];
   SQLSMALLINT outstrlen;
 
-    // Connecting to ODBC server.
+  // Connecting to ODBC server.
   ret = SQLDriverConnect(dbc, NULL, &connectStr[0],
                          static_cast< SQLSMALLINT >(connectStr.size()), outstr,
                          sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
