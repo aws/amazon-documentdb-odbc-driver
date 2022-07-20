@@ -45,6 +45,7 @@ else ()
 endif()
 
 set(SOURCES 
+         src/attributes_test.cpp
          src/api_robustness_test.cpp
          src/application_data_buffer_test.cpp
          src/column_meta_test.cpp
