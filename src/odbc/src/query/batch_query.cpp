@@ -136,8 +136,7 @@ SqlResult::Type BatchQuery::MakeRequestExecuteBatch(SqlUlen begin, SqlUlen end,
                                                     bool last) {
   const std::string& schema = connection.GetSchema();
 
-  QueryExecuteBatchRequest req(schema, sql, params, begin, end, last, timeout,
-                               connection.IsAutoCommit());
+  QueryExecuteBatchRequest req(schema, sql, params, begin, end, last, timeout);
   QueryExecuteBatchResponse rsp;
 
   try {

@@ -1277,69 +1277,6 @@ SQLRETURN SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT type) {
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLEndTran(SQLSMALLINT handleType, SQLHANDLE handle,
-                     SQLSMALLINT completionType) {
-  using namespace odbc;
-
-  LOG_DEBUG_MSG("SQLEndTran called");
-
-  SQLRETURN result;
-
-  switch (handleType) {
-    case SQL_HANDLE_ENV: {
-      Environment* env = reinterpret_cast< Environment* >(handle);
-
-      if (!env) {
-        LOG_ERROR_MSG(
-            "SQLEndTran exiting with SQL_INVALID_HANDLE because env "
-            "object is null.");
-        LOG_DEBUG_MSG("handletype is SQL_HANDLE_ENV");
-        return SQL_INVALID_HANDLE;
-      }
-
-      if (completionType == SQL_COMMIT)
-        env->TransactionCommit();
-      else
-        env->TransactionRollback();
-
-      result = env->GetDiagnosticRecords().GetReturnCode();
-
-      break;
-    }
-
-    case SQL_HANDLE_DBC: {
-      Connection* conn = reinterpret_cast< Connection* >(handle);
-
-      if (!conn) {
-        LOG_ERROR_MSG(
-            "SQLEndTran exiting with SQL_INVALID_HANDLE because conn "
-            "object is null");
-        LOG_DEBUG_MSG("handletype is SQL_HANDLE_DBC");
-        return SQL_INVALID_HANDLE;
-      }
-
-      if (completionType == SQL_COMMIT)
-        conn->TransactionCommit();
-      else
-        conn->TransactionRollback();
-
-      result = conn->GetDiagnosticRecords().GetReturnCode();
-
-      break;
-    }
-
-    default: {
-      result = SQL_INVALID_HANDLE;
-
-      break;
-    }
-  }
-
-  LOG_DEBUG_MSG("SQLEndTran exiting");
-
-  return result;
-}
-
 SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT colNum, SQLSMALLINT targetType,
                      SQLPOINTER targetValue, SQLLEN bufferLength,
                      SQLLEN* strLengthOrIndicator) {

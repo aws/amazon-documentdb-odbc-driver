@@ -161,12 +161,6 @@ const char* ConnectionInfo::InfoTypeToString(InfoType type) {
 #ifdef SQL_MAX_CONCURRENT_ACTIVITIES
     DBG_STR_CASE(SQL_MAX_CONCURRENT_ACTIVITIES);
 #endif  // SQL_MAX_CONCURRENT_ACTIVITIES
-#ifdef SQL_CURSOR_COMMIT_BEHAVIOR
-    DBG_STR_CASE(SQL_CURSOR_COMMIT_BEHAVIOR);
-#endif  // SQL_CURSOR_COMMIT_BEHAVIOR
-#ifdef SQL_CURSOR_ROLLBACK_BEHAVIOR
-    DBG_STR_CASE(SQL_CURSOR_ROLLBACK_BEHAVIOR);
-#endif  // SQL_CURSOR_ROLLBACK_BEHAVIOR
 #ifdef SQL_TXN_CAPABLE
     DBG_STR_CASE(SQL_TXN_CAPABLE);
 #endif  // SQL_TXN_CAPABLE
@@ -2568,43 +2562,6 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // connection. Zero mean no limit.
   shortParams[SQL_MAX_CONCURRENT_ACTIVITIES] = 0;
 #endif  // SQL_MAX_CONCURRENT_ACTIVITIES
-
-#ifdef SQL_CURSOR_COMMIT_BEHAVIOR
-  // Value that indicates how a COMMIT operation affects cursors and prepared
-  // statements in the data source (the behavior of the data source when you
-  // commit a transaction).
-  //
-  // The value of this attribute will reflect the current state of the next
-  // setting : SQL_COPT_SS_PRESERVE_CURSORS. SQL_CB_DELETE = Close cursors and
-  // delete prepared statements.To use the cursor again, the application
-  //     must reprepare and reexecute the statement.
-  // SQL_CB_CLOSE = Close cursors. For prepared statements, the application can
-  // call SQLExecute on the
-  //     statement without calling SQLPrepare again. The default for the SQL
-  //     ODBC driver is SQL_CB_CLOSE. This means that the SQL ODBC driver will
-  //     close your cursor(s) when you commit a transaction.
-  // SQL_CB_PRESERVE = Preserve cursors in the same position as before the
-  // COMMIT operation. The
-  //     application can continue to fetch data, or it can close the cursor and
-  //     re-execute the statement without re-preparing it.
-  // SQL_CURSOR_ROLLBACK_BEHAVIOR (ODBC 1.0)
-  shortParams[SQL_CURSOR_COMMIT_BEHAVIOR] = SQL_CB_PRESERVE;
-#endif  // SQL_CURSOR_COMMIT_BEHAVIOR
-
-#ifdef SQL_CURSOR_ROLLBACK_BEHAVIOR
-  // Indicates how a ROLLBACK  operation affects cursors and prepared statements
-  // in the data source: SQL_CB_DELETE = Close cursors and delete prepared
-  // statements. To use the cursor again, the
-  //     application must reprepare and reexecute the statement.
-  // SQL_CB_CLOSE = Close cursors. For prepared statements, the application can
-  // call SQLExecute on the
-  //     statement without calling SQLPrepare again.
-  // SQL_CB_PRESERVE = Preserve cursors in the same position as before the
-  // ROLLBACK operation. The
-  //     application can continue to fetch data, or it can close the cursor and
-  //     re-execute the statement without repreparing it.
-  shortParams[SQL_CURSOR_ROLLBACK_BEHAVIOR] = SQL_CB_PRESERVE;
-#endif  // SQL_CURSOR_ROLLBACK_BEHAVIOR
 
 #ifdef SQL_TXN_CAPABLE
   // Describs the transaction support in the driver or data source.

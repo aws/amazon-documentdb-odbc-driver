@@ -25,6 +25,9 @@ if [ ! -f "$JDBC_DRIVER_FULLPATH" ]; then
     echo "Download complete." 
 fi
 
+#clean up the binary files used to generate code coverage report
+find . -name "*.gcda" -type f -delete
+
 cd cmake-build64
 make -j 4
 cd ..

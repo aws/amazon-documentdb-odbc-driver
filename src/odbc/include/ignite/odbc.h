@@ -166,8 +166,6 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
 
 SQLRETURN SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT type);
 
-SQLRETURN SQLEndTran(SQLSMALLINT handleType, SQLHANDLE handle,
-                     SQLSMALLINT completionType);
 
 SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT colNum, SQLSMALLINT targetType,
                      SQLPOINTER targetValue, SQLLEN bufferLength,

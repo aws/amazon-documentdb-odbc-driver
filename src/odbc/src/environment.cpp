@@ -59,56 +59,6 @@ SqlResult::Type Environment::InternalCreateConnection(Connection*& connection) {
   return SqlResult::AI_SUCCESS;
 }
 
-void Environment::TransactionCommit() {
-  IGNITE_ODBC_API_CALL(InternalTransactionCommit());
-}
-
-SqlResult::Type Environment::InternalTransactionCommit() {
-  SqlResult::Type res = SqlResult::AI_SUCCESS;
-
-  for (ConnectionSet::iterator it = connections.begin();
-       it != connections.end(); ++it) {
-    Connection* conn = *it;
-
-    conn->TransactionCommit();
-
-    diagnostic::DiagnosticRecordStorage& diag = conn->GetDiagnosticRecords();
-
-    if (diag.GetStatusRecordsNumber() > 0) {
-      AddStatusRecord(diag.GetStatusRecord(1));
-
-      res = SqlResult::AI_SUCCESS_WITH_INFO;
-    }
-  }
-
-  return res;
-}
-
-void Environment::TransactionRollback() {
-  IGNITE_ODBC_API_CALL(InternalTransactionRollback());
-}
-
-SqlResult::Type Environment::InternalTransactionRollback() {
-  SqlResult::Type res = SqlResult::AI_SUCCESS;
-
-  for (ConnectionSet::iterator it = connections.begin();
-       it != connections.end(); ++it) {
-    Connection* conn = *it;
-
-    conn->TransactionRollback();
-
-    diagnostic::DiagnosticRecordStorage& diag = conn->GetDiagnosticRecords();
-
-    if (diag.GetStatusRecordsNumber() > 0) {
-      AddStatusRecord(diag.GetStatusRecord(1));
-
-      res = SqlResult::AI_SUCCESS_WITH_INFO;
-    }
-  }
-
-  return res;
-}
-
 void Environment::SetAttribute(int32_t attr, void* value, int32_t len) {
   IGNITE_ODBC_API_CALL(InternalSetAttribute(attr, value, len));
 }
