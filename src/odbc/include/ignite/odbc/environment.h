@@ -59,16 +59,6 @@ class Environment : public diagnostic::DiagnosableAdapter {
   void DeregisterConnection(Connection* conn);
 
   /**
-   * Perform transaction commit on all the associated connections.
-   */
-  void TransactionCommit();
-
-  /**
-   * Perform transaction rollback on all the associated connections.
-   */
-  void TransactionRollback();
-
-  /**
    * Set attribute.
    *
    * @param attr Attribute to set.
@@ -96,22 +86,6 @@ class Environment : public diagnostic::DiagnosableAdapter {
    * @return Operation result.
    */
   SqlResult::Type InternalCreateConnection(Connection*& connection);
-
-  /**
-   * Perform transaction commit on all the associated connections.
-   * Internal call.
-   *
-   * @return Operation result.
-   */
-  SqlResult::Type InternalTransactionCommit();
-
-  /**
-   * Perform transaction rollback on all the associated connections.
-   * Internal call.
-   *
-   * @return Operation result.
-   */
-  SqlResult::Type InternalTransactionRollback();
 
   /**
    * Set attribute.

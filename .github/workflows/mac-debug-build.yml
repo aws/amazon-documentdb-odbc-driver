@@ -140,6 +140,15 @@ jobs:
         comment_title: "MacOS Big Sur 11 Debug Build Unit Test Results"
         files: ./odbc_test_result.xml
 
+    - name: upload-test-file
+      if: always() && (steps.runtests.outcome == 'failure')
+      uses: actions/upload-artifact@v3
+      with:
+        name: odbc-test-results-mac-debug
+        path: |
+          ./odbc_test_result.xml
+          ./build/odbc/logs/docdb_odbc_*.log   
+
   comment_PR_mac_coverage:
     runs-on: ubuntu-latest
     needs: build-mac-debug

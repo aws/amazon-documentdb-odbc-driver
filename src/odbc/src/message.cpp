@@ -67,12 +67,11 @@ void HandshakeRequest::Write(impl::binary::BinaryWriterImpl& writer,
 QueryExecuteRequest::QueryExecuteRequest(const std::string& schema,
                                          const std::string& sql,
                                          const app::ParameterSet& params,
-                                         int32_t timeout, bool autoCommit)
+                                         int32_t timeout)
     : schema(schema),
       sql(sql),
       params(params),
-      timeout(timeout),
-      autoCommit(autoCommit) {
+      timeout(timeout) {
   // No-op.
 }
 
@@ -96,22 +95,19 @@ void QueryExecuteRequest::Write(impl::binary::BinaryWriterImpl& writer,
   if (ver >= ProtocolVersion::VERSION_2_3_2)
     writer.WriteInt32(timeout);
 
-  if (ver >= ProtocolVersion::VERSION_2_5_0)
-    writer.WriteBool(autoCommit);
 }
 
 QueryExecuteBatchRequest::QueryExecuteBatchRequest(
     const std::string& schema, const std::string& sql,
     const app::ParameterSet& params, SqlUlen begin, SqlUlen end, bool last,
-    int32_t timeout, bool autoCommit)
+    int32_t timeout)
     : schema(schema),
       sql(sql),
       params(params),
       begin(begin),
       end(end),
       last(last),
-      timeout(timeout),
-      autoCommit(autoCommit) {
+      timeout(timeout) {
   // No-op.
 }
 
@@ -135,8 +131,6 @@ void QueryExecuteBatchRequest::Write(impl::binary::BinaryWriterImpl& writer,
   if (ver >= ProtocolVersion::VERSION_2_3_2)
     writer.WriteInt32(timeout);
 
-  if (ver >= ProtocolVersion::VERSION_2_5_0)
-    writer.WriteBool(autoCommit);
 }
 
 QueryCloseRequest::QueryCloseRequest(int64_t queryId) : queryId(queryId) {
