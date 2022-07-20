@@ -19,31 +19,34 @@
 #include <windows.h>
 #endif
 
-#include <ignite/network/socket_client.h>
 #include <sql.h>
 #include <sqlext.h>
 
+#include <algorithm>
 #include <boost/test/unit_test.hpp>
 #include <string>
 #include <vector>
 
-#include "ignite/ignite.h"
-#include "ignite/ignition.h"
-#include "ignite/odbc/impl/binary/binary_utils.h"
+#include "complex_type.h"
 #include "ignite/odbc/connection.h"
+#include "ignite/odbc/binary/binary_object.h"
+#include "ignite/odbc/common/fixed_size_array.h"
+#include "ignite/odbc/impl/binary/binary_utils.h"
+#include "ignite/odbc/utility.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"
 #include "test_utils.h"
 
 using namespace ignite;
-using namespace ignite::cache;
-using namespace ignite::cache::query;
-using namespace ignite::common;
+using namespace ignite::odbc::common;
 using namespace ignite_test;
+using namespace ignite::odbc::binary;
+using namespace ignite::odbc::impl::binary;
+using namespace ignite::odbc::impl::interop;
 
 using namespace boost::unit_test;
 
-using ignite::impl::binary::BinaryUtils;
+using ignite::odbc::impl::binary::BinaryUtils;
 
 /**
  * Test setup fixture.
@@ -53,125 +56,32 @@ struct AttributesTestSuiteFixture : odbc::OdbcTestSuite {
    * Constructor.
    */
   AttributesTestSuiteFixture() {
-    grid = StartPlatformNode("queries-test.xml", "NodeMain");
+    // No-op
   }
 
   /**
    * Destructor.
    */
-  ~AttributesTestSuiteFixture() {
-    Ignition::StopAll(true);
+  ~AttributesTestSuiteFixture() override = default;
+
+  /**
+   * Connect to the local server with the database name
+   *
+   * @param databaseName Database Name
+   */
+  void connectToLocalServer(std::string databaseName) {
+    std::string dsnConnectionString;
+    CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+    Connect(dsnConnectionString);
   }
 
-  /** Node started during the test. */
-  Ignite grid;
 };
 
 BOOST_FIXTURE_TEST_SUITE(AttributesTestSuite, AttributesTestSuiteFixture)
 
-BOOST_AUTO_TEST_CASE(TestLegacyConnection) {
-  Connect("DRIVER={Apache Ignite};SERVER=127.0.0.1;PORT=11110;SCHEMA=cache");
-
-  InsertTestStrings(10, false);
-  InsertTestBatch(11, 20, 9);
-}
-
-BOOST_AUTO_TEST_CASE(TestConnectionProtocolVersion_2_1_0) {
-  Connect(
-      "DRIVER={Apache "
-      "Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache;PROTOCOL_VERSION=2.1.0");
-
-  InsertTestStrings(10, false);
-  InsertTestBatch(11, 20, 9);
-}
-
-BOOST_AUTO_TEST_CASE(TestConnectionProtocolVersion_2_1_5) {
-  Connect(
-      "DRIVER={Apache "
-      "Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache;PROTOCOL_VERSION=2.1.5");
-
-  InsertTestStrings(10, false);
-  InsertTestBatch(11, 20, 9);
-}
-
-BOOST_AUTO_TEST_CASE(TestConnectionProtocolVersion_2_3_0) {
-  Connect(
-      "DRIVER={Apache "
-      "Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache;PROTOCOL_VERSION=2.3.0");
-
-  InsertTestStrings(10, false);
-  InsertTestBatch(11, 20, 9);
-}
-
-BOOST_AUTO_TEST_CASE(TestConnectionProtocolVersion_2_3_2) {
-  Connect(
-      "DRIVER={Apache "
-      "Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache;PROTOCOL_VERSION=2.3.2");
-
-  InsertTestStrings(10, false);
-  InsertTestBatch(11, 20, 9);
-}
-
-BOOST_AUTO_TEST_CASE(TestConnectionProtocolVersion_2_5_0) {
-  Connect(
-      "DRIVER={Apache "
-      "Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache;PROTOCOL_VERSION=2.5.0");
-
-  InsertTestStrings(10, false);
-  InsertTestBatch(11, 20, 9);
-}
-
-BOOST_AUTO_TEST_CASE(TestConnectionProtocolVersion_2_7_0) {
-  Connect(
-      "DRIVER={Apache "
-      "Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache;PROTOCOL_VERSION=2.7.0");
-
-  InsertTestStrings(10, false);
-  InsertTestBatch(11, 20, 9);
-}
-
-BOOST_AUTO_TEST_CASE(TestConnectionProtocolVersion_2_8_0) {
-  Connect(
-      "DRIVER={Apache "
-      "Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache;PROTOCOL_VERSION=2.8.0");
-
-  InsertTestStrings(10, false);
-  InsertTestBatch(11, 20, 9);
-}
-
-BOOST_AUTO_TEST_CASE(TestConnectionRangeBegin) {
-  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11110..11115;SCHEMA=cache");
-
-  InsertTestStrings(10, false);
-  InsertTestBatch(11, 20, 9);
-}
-
-BOOST_AUTO_TEST_CASE(TestConnectionRangeEnd) {
-  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11108..11110;SCHEMA=cache");
-
-  InsertTestStrings(10, false);
-  InsertTestBatch(11, 20, 9);
-}
-
-BOOST_AUTO_TEST_CASE(TestConnectionRangeMiddle) {
-  Connect("DRIVER={Apache Ignite};ADDRESS=127.0.0.1:11108..11115;SCHEMA=cache");
-
-  InsertTestStrings(10, false);
-  InsertTestBatch(11, 20, 9);
-}
-
-BOOST_AUTO_TEST_CASE(TestConnectionMultipleAddresses) {
-  Connect(
-      "DRIVER={Apache "
-      "Ignite};ADDRESS=127.0.0.1:4242,127.0.0.1:11109..11115,127.0.0.1;SCHEMA="
-      "cache");
-
-  InsertTestStrings(10, false);
-  InsertTestBatch(11, 20, 9);
-}
-
 BOOST_AUTO_TEST_CASE(ConnectionAttributeConnectionDeadGet) {
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
   SQLUINTEGER dead = SQL_CD_TRUE;
   SQLRETURN ret;
@@ -184,7 +94,7 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributeConnectionDeadGet) {
 }
 
 BOOST_AUTO_TEST_CASE(ConnectionAttributeConnectionDeadSet) {
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
   SQLUINTEGER dead = SQL_CD_TRUE;
   SQLRETURN ret;
@@ -199,7 +109,7 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributeConnectionDeadSet) {
 }
 
 BOOST_AUTO_TEST_CASE(StatementAttributeQueryTimeout) {
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
   SQLULEN timeout = -1;
   SQLRETURN ret = SQLGetStmtAttr(stmt, SQL_ATTR_QUERY_TIMEOUT, &timeout, 0, 0);
@@ -220,52 +130,71 @@ BOOST_AUTO_TEST_CASE(StatementAttributeQueryTimeout) {
   BOOST_REQUIRE_EQUAL(timeout, 7);
 }
 
-BOOST_AUTO_TEST_CASE(ConnectionAttributeConnectionTimeout) {
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+BOOST_AUTO_TEST_CASE(ConnectionAttributeDefaultLoginTimeout) {
+  Prepare();
+
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, "odbc-test");
+
+  std::vector< SQLWCHAR > connectStr(dsnConnectionString.begin(),
+                                     dsnConnectionString.end());
+
+  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
+  SQLSMALLINT outstrlen;
+
+  // Connecting to ODBC server.
+  SQLRETURN ret = SQLDriverConnect(
+      dbc, NULL, &connectStr[0],
+      static_cast< SQLSMALLINT >(connectStr.size()), outstr,
+      sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
 
   SQLUINTEGER timeout = -1;
-  SQLRETURN ret =
-      SQLGetConnectAttr(dbc, SQL_ATTR_CONNECTION_TIMEOUT, &timeout, 0, 0);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
-  BOOST_REQUIRE_EQUAL(timeout, 0);
-
-  ret = SQLSetConnectAttr(dbc, SQL_ATTR_CONNECTION_TIMEOUT,
-                          reinterpret_cast< SQLPOINTER >(42), 0);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
-
-  timeout = -1;
-
-  ret = SQLGetConnectAttr(dbc, SQL_ATTR_CONNECTION_TIMEOUT, &timeout, 0, 0);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
-  BOOST_REQUIRE_EQUAL(timeout, 42);
-}
-
-BOOST_AUTO_TEST_CASE(ConnectionAttributeLoginTimeout) {
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
-
-  SQLUINTEGER timeout = -1;
-  SQLRETURN ret =
+  ret =
       SQLGetConnectAttr(dbc, SQL_ATTR_LOGIN_TIMEOUT, &timeout, 0, 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
-  BOOST_REQUIRE_EQUAL(timeout,
-                      (SQLUINTEGER)odbc::Connection::DEFAULT_CONNECT_TIMEOUT);
+  BOOST_REQUIRE_EQUAL(
+      timeout, (SQLUINTEGER)Configuration::DefaultValue::loginTimeoutSec);
+}
 
-  ret = SQLSetConnectAttr(dbc, SQL_ATTR_LOGIN_TIMEOUT,
+// iODBC not working as expected 
+// TODO investigate why the setConnectAttr are not being called before
+// establishing connection
+// enable test after fix
+// https://bitquill.atlassian.net/browse/AD-848
+#ifndef __APPLE__
+BOOST_AUTO_TEST_CASE(ConnectionAttributeLoginTimeout) {
+  Prepare();
+
+  SQLRETURN ret = SQLSetConnectAttr(dbc, SQL_ATTR_LOGIN_TIMEOUT,
                           reinterpret_cast< SQLPOINTER >(42), 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
 
-  timeout = -1;
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString, "odbc-test");
+
+  std::vector< SQLWCHAR > connectStr(dsnConnectionString.begin(),
+                                     dsnConnectionString.end());
+
+  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
+  SQLSMALLINT outstrlen;
+
+  // Connecting to ODBC server.
+  ret = SQLDriverConnect(dbc, NULL, &connectStr[0],
+                         static_cast< SQLSMALLINT >(connectStr.size()), outstr,
+                         sizeof(outstr), &outstrlen, SQL_DRIVER_COMPLETE);
+
+  SQLUINTEGER timeout = -1;
 
   ret = SQLGetConnectAttr(dbc, SQL_ATTR_LOGIN_TIMEOUT, &timeout, 0, 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
   BOOST_REQUIRE_EQUAL(timeout, 42);
 }
+#endif
 
 /**
  * Check that environment returns expected version of ODBC standard.
@@ -276,7 +205,7 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributeLoginTimeout) {
  * 4. Check that version is of the expected value.
  */
 BOOST_AUTO_TEST_CASE(TestSQLGetEnvAttrDriverVersion) {
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
   SQLINTEGER version;
   SQLRETURN ret = SQLGetEnvAttr(env, SQL_ATTR_ODBC_VERSION, &version, 0, 0);
