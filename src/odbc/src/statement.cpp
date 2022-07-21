@@ -651,7 +651,12 @@ SqlResult::Type Statement::InternalExecuteSqlQuery() {
       return SqlResult::AI_ERROR;
     }
 
-    return SqlResult::AI_NEED_DATA;
+    // In a normal case we should return SQL_NEED_DATA, but since we dont support
+    // parameters in sql statemets we will return not support and SQL_ERROR
+    AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
+                    "Parameters are not supported.");
+
+    return SqlResult::AI_ERROR;
   }
 
   return currentQuery->Execute();
