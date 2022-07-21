@@ -21,3 +21,9 @@ Related function: `SQLSetStmtAttr`
 |SQL_ATTR_ROW_STATUS_PTR| | |
 |SQL_ATTR_ROWS_FETCHED_PTR| | |
 
+## SQLPrepare,SQLExecute and SQLExecDirect
+
+To support BI tools that may use the SQLPrepare interface in auto-generated queries, the driver
+supports the use of SQLPrepare. However, the use of parameters in queries (values left as ?) is not supported SQLExecute and SQLExecDirect. 
+
+
