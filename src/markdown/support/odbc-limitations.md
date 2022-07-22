@@ -24,6 +24,6 @@ Related function: `SQLSetStmtAttr`
 ## SQLPrepare,SQLExecute and SQLExecDirect
 
 To support BI tools that may use the SQLPrepare interface in auto-generated queries, the driver
-supports the use of SQLPrepare. However, the use of parameters in queries (values left as ?) is not supported SQLPrepare, SQLExecute and SQLExecDirect. 
+supports the use of SQLPrepare. However, the use of parameters in queries (values left as ?) is not supported in SQLPrepare, SQLExecute and SQLExecDirect. 
 
 
