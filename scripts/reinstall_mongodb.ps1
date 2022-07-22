@@ -7,7 +7,8 @@
 
 # Uninstall the mongodb server so we can reset the authorization.
 choco uninstall mongodb mongodb.install -y
-choco upgrade mongodb mongodb-shell mongodb-database-tools -y
+choco upgrade mongodb-shell mongodb-database-tools -y
+choco upgrade mongodb --version=5.2.1 -y
 Restart-Service MongoDB -Force
 
 # By reinstalling, we've disabled authorization - so we can reset the authorization from scratch.
