@@ -653,8 +653,12 @@ SqlResult::Type Statement::InternalExecuteSqlQuery() {
 
     // In a normal case we should return SQL_NEED_DATA, but since we dont support
     // parameters in sql statemets we will return not support and SQL_ERROR
-    AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
-                    "Parameters are not supported.");
+    AddStatusRecord(
+        SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
+        "Usage the value \"?\" as query parameters are not supported."
+        "See ODBC limitations at "
+        "https://github.com/aws/amazon-documentdb-odbc-driver/blob/develop/src/"
+        "markdown/support/odbc-limitations.md");
 
     return SqlResult::AI_ERROR;
   }
