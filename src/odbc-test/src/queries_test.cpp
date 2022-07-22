@@ -764,8 +764,7 @@ BOOST_AUTO_TEST_CASE(TestOneRowObject, *disabled()) {
   BOOST_CHECK_EQUAL(column3, "5");
 }
 
-// Enable this testcase when AD-549 is finished
-BOOST_AUTO_TEST_CASE(TestDataAtExecution, *disabled()) {
+BOOST_AUTO_TEST_CASE(TestUnsuporttedQueryParameterAtExecute ) {
   connectToLocalServer("odbc-test");
 
   SQLRETURN ret;
@@ -791,6 +790,42 @@ BOOST_AUTO_TEST_CASE(TestDataAtExecution, *disabled()) {
 
   ret = SQLPrepare(stmt, request.data(), SQL_NTS);
 
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  ret = SQLExecute(stmt);
+
+  CheckSQLStatementDiagnosticError("HYC00");
+
+}
+
+BOOST_AUTO_TEST_CASE(TestUnsuporttedQueryParameterAtExecDirect ) {
+  connectToLocalServer("odbc-test");
+
+  SQLRETURN ret;
+
+  const SQLSMALLINT columnsCnt = 6;
+
+  SQLLEN columnLens[columnsCnt];
+  SQLWCHAR columns[columnsCnt][ODBC_BUFFER_SIZE];
+
+  // Binding columns.
+  for (SQLSMALLINT i = 0; i < columnsCnt; ++i) {
+    ret = SQLBindCol(stmt, i + 1, SQL_C_WCHAR, &columns[i],
+                     ODBC_BUFFER_SIZE * sizeof(SQLWCHAR), &columnLens[i]);
+
+    if (!SQL_SUCCEEDED(ret))
+      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  }
+
+  std::vector< SQLWCHAR > request = MakeSqlBuffer(
+      "SELECT fieldInt, fieldLong, fieldDecimal128, fieldDouble,"
+      "fieldString, fieldBoolean FROM queries_test_005 "
+      "where fieldInt = ?");
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
   SQLLEN ind1 = 1;
 
   SQLLEN len1 = SQL_DATA_AT_EXEC;
@@ -798,53 +833,9 @@ BOOST_AUTO_TEST_CASE(TestDataAtExecution, *disabled()) {
   ret = SQLBindParameter(stmt, 1, SQL_PARAM_INPUT, SQL_C_SLONG, SQL_INTEGER,
                          100, 100, &ind1, sizeof(ind1), &len1);
 
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
 
-  ret = SQLExecute(stmt);
-
-  BOOST_REQUIRE_EQUAL(ret, SQL_NEED_DATA);
-
-  void* oind;
-
-  ret = SQLParamData(stmt, &oind);
-
-  BOOST_REQUIRE_EQUAL(ret, SQL_NEED_DATA);
-
-  int value = 1;
-  if (oind == &ind1)
-    ret = SQLPutData(stmt, &value, 0);
-  else
-    BOOST_FAIL("Unknown indicator value");
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  ret = SQLParamData(stmt, &oind);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  ret = SQLFetch(stmt);
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_CHECK_EQUAL(utility::SqlWcharToString(columns[0], SQL_NTS, true), "1");
-  BOOST_CHECK_EQUAL(utility::SqlWcharToString(columns[1], SQL_NTS, true), "2");
-  BOOST_CHECK_EQUAL(utility::SqlWcharToString(columns[2], SQL_NTS, true), "3");
-  BOOST_CHECK_EQUAL(utility::SqlWcharToString(columns[3], SQL_NTS, true), "4");
-  BOOST_CHECK_EQUAL(utility::SqlWcharToString(columns[4], SQL_NTS, true), "5");
-  BOOST_CHECK_EQUAL(utility::SqlWcharToString(columns[5], SQL_NTS, true), "6");
-
-  BOOST_CHECK_EQUAL(columnLens[0], 1);
-  BOOST_CHECK_EQUAL(columnLens[1], 1);
-  BOOST_CHECK_EQUAL(columnLens[2], 1);
-  BOOST_CHECK_EQUAL(columnLens[3], 1);
-  BOOST_CHECK_EQUAL(columnLens[4], 1);
-  BOOST_CHECK_EQUAL(columnLens[5], 1);
-
-  ret = SQLFetch(stmt);
-  BOOST_CHECK(ret == SQL_NO_DATA);
+  CheckSQLStatementDiagnosticError("HYC00");
 }
 
 BOOST_AUTO_TEST_CASE(TestNullFields) {
