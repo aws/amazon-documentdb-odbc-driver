@@ -790,13 +790,6 @@ BOOST_AUTO_TEST_CASE(TestUnsuporttedQueryParameterAtExecute ) {
 
   ret = SQLPrepare(stmt, request.data(), SQL_NTS);
 
-  SQLLEN ind1 = 1;
-
-  SQLLEN len1 = SQL_DATA_AT_EXEC;
-
-  ret = SQLBindParameter(stmt, 1, SQL_PARAM_INPUT, SQL_C_SLONG, SQL_INTEGER,
-                         100, 100, &ind1, sizeof(ind1), &len1);
-
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
