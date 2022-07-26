@@ -19,7 +19,7 @@
 
 #include "test_utils.h"
 
-using namespace ignite_test;
+using namespace documentdb_test;
 
 namespace documentdb {
 SqlTestSuiteFixture::SqlTestSuiteFixture()

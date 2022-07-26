@@ -31,17 +31,17 @@
 
 #define ODBC_THROW_ON_ERROR(ret, type, handle)     \
   if (!SQL_SUCCEEDED(ret)) {                       \
-    throw ignite_test::GetOdbcError(type, handle); \
+    throw documentdb_test::GetOdbcError(type, handle); \
   }
 
 #define ODBC_FAIL_ON_ERROR(ret, type, handle)                   \
   if (!SQL_SUCCEEDED(ret)) {                                    \
-    BOOST_FAIL(ignite_test::GetOdbcErrorMessage(type, handle)); \
+    BOOST_FAIL(documentdb_test::GetOdbcErrorMessage(type, handle)); \
   }
 
 #define ODBC_FAIL_ON_ERROR1(ret, type, handle, msg)           \
   if (!SQL_SUCCEEDED(ret)) {                                  \
-    BOOST_FAIL(ignite_test::GetOdbcErrorMessage(type, handle) \
+    BOOST_FAIL(documentdb_test::GetOdbcErrorMessage(type, handle) \
                + ", msg = " + msg);                           \
   }
 
@@ -112,7 +112,7 @@ class OdbcClientError : public std::exception {
   std::string message;
 };
 
-namespace ignite_test {
+namespace documentdb_test {
 /** Read buffer size. */
 enum { ODBC_BUFFER_SIZE = 1024 };
 
@@ -157,6 +157,6 @@ std::string GetTestConfigDir();
  */
 void ClearLfs();
 
-}  // namespace ignite_test
+}  // namespace documentdb_test
 
 #endif  // _DOCUMENTDB_ODBC_TEST_TEST_UTILS

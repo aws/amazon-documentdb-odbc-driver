@@ -38,7 +38,7 @@ using namespace documentdb;
 using namespace documentdb::cache;
 using namespace documentdb::cache::query;
 using namespace documentdb::common;
-using namespace ignite_test;
+using namespace documentdb_test;
 
 using namespace boost::unit_test;
 

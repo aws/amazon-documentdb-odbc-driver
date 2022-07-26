@@ -27,7 +27,7 @@
 
 using namespace documentdb::odbc;
 
-namespace ignite_test {
+namespace documentdb_test {
 OdbcClientError GetOdbcError(SQLSMALLINT handleType, SQLHANDLE handle) {
   SQLWCHAR sqlstate[7] = {};
   SQLINTEGER nativeCode;
@@ -120,4 +120,4 @@ void ClearLfs() {
 
   documentdb::odbc::common::DeletePath(workDir);
 }
-}  // namespace ignite_test
+}  // namespace documentdb_test

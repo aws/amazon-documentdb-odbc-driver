@@ -33,7 +33,7 @@
 #include "test_utils.h"
 
 using namespace documentdb;
-using namespace ignite_test;
+using namespace documentdb_test;
 
 using namespace boost::unit_test;
 

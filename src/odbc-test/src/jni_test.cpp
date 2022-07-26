@@ -52,7 +52,7 @@ using namespace boost::unit_test;
 using namespace documentdb::odbc::impl::binary;
 
 using documentdb::odbc::OdbcTestSuite;
-using ignite_test::GetOdbcErrorMessage;
+using documentdb_test::GetOdbcErrorMessage;
 
 using documentdb::odbc::Connection;
 using documentdb::odbc::common::ReleaseChars;

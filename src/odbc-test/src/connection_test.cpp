@@ -32,7 +32,7 @@
 using boost::unit_test::precondition;
 using documentdb::odbc::if_integration;
 using documentdb::odbc::OdbcTestSuite;
-using ignite_test::GetOdbcErrorMessage;
+using documentdb_test::GetOdbcErrorMessage;
 
 /**
  * Test setup fixture.
