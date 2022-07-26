@@ -33,7 +33,7 @@ function update_mongod_config_authorization() {
 }
 
 brew tap mongodb/brew
-brew update mongodb-community
+brew upgrade mongodb-community
 
 update_mongod_config_authorization "disabled"
 brew services restart ${MONGODB_SERVICE_NAME}
