@@ -29,25 +29,25 @@
 #include <string>
 #include <vector>
 
-#include "ignite/ignite.h"
-#include "ignite/ignition.h"
-#include "ignite/odbc/impl/binary/binary_utils.h"
+#include "documentdb/ignite.h"
+#include "documentdb/ignition.h"
+#include "documentdb/odbc/impl/binary/binary_utils.h"
 #include "sql_test_suite_fixture.h"
 #include "test_type.h"
 #include "test_utils.h"
 
-using namespace ignite;
-using namespace ignite::cache;
-using namespace ignite::cache::query;
-using namespace ignite::common;
+using namespace documentdb;
+using namespace documentdb::cache;
+using namespace documentdb::cache::query;
+using namespace documentdb::common;
 using namespace ignite_test;
 
 using namespace boost::unit_test;
 
-using ignite::impl::binary::BinaryUtils;
+using documentdb::impl::binary::BinaryUtils;
 
 BOOST_FIXTURE_TEST_SUITE(SqlAggregateFunctionTestSuite,
-                         ignite::SqlTestSuiteFixture)
+                         documentdb::SqlTestSuiteFixture)
 
 BOOST_AUTO_TEST_CASE(TestAggregateFunctionAvgInt) {
   std::vector< TestType > in(3);

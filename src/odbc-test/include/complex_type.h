@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-#ifndef _IGNITE_ODBC_TEST_COMPLEX_TYPE
-#define _IGNITE_ODBC_TEST_COMPLEX_TYPE
+#ifndef _DOCUMENTDB_ODBC_TEST_COMPLEX_TYPE
+#define _DOCUMENTDB_ODBC_TEST_COMPLEX_TYPE
 
 #include <string>
 
-#include "ignite/odbc/ignite.h"
+#include "documentdb/odbc/ignite.h"
 
-namespace ignite {
+namespace documentdb {
 struct TestObject {
   TestObject() : f1(412), f2("Lorem ipsum") {
     // No-op.
@@ -62,15 +62,15 @@ struct ComplexType {
   TestObject objField;
   std::string strField;
 };
-}  // namespace ignite
+}  // namespace documentdb
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace binary {
 
-IGNITE_BINARY_TYPE_START(ignite::TestObject)
+IGNITE_BINARY_TYPE_START(documentdb::TestObject)
 
-typedef ignite::TestObject TestObject;
+typedef documentdb::TestObject TestObject;
 
 IGNITE_BINARY_GET_TYPE_ID_AS_HASH(TestObject)
 IGNITE_BINARY_GET_TYPE_NAME_AS_IS(TestObject)
@@ -90,9 +90,9 @@ static void Read(BinaryReader& reader, TestObject& dst) {
 
 IGNITE_BINARY_TYPE_END
 
-IGNITE_BINARY_TYPE_START(ignite::ComplexType)
+IGNITE_BINARY_TYPE_START(documentdb::ComplexType)
 
-typedef ignite::ComplexType ComplexType;
+typedef documentdb::ComplexType ComplexType;
 
 IGNITE_BINARY_GET_TYPE_ID_AS_HASH(ComplexType)
 IGNITE_BINARY_GET_TYPE_NAME_AS_IS(ComplexType)
@@ -115,6 +115,6 @@ static void Read(BinaryReader& reader, ComplexType& dst) {
 IGNITE_BINARY_TYPE_END
 }  // namespace binary
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb
 
-#endif  // _IGNITE_ODBC_TEST_COMPLEX_TYPE
+#endif  // _DOCUMENTDB_ODBC_TEST_COMPLEX_TYPE

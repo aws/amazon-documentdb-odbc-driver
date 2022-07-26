@@ -20,15 +20,15 @@
 #include <string>
 #include <vector>
 
-#include "ignite/ignite.h"
-#include "ignite/ignition.h"
-#include "ignite/odbc/system/odbc_constants.h"
+#include "documentdb/ignite.h"
+#include "documentdb/ignition.h"
+#include "documentdb/odbc/system/odbc_constants.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"
 #include "test_utils.h"
 
-using namespace ignite;
-using namespace ignite::common;
+using namespace documentdb;
+using namespace documentdb::common;
 using namespace ignite_test;
 
 using namespace boost::unit_test;

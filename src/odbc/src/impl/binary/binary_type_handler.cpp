@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/binary/binary_type_handler.h"
+#include "documentdb/odbc/impl/binary/binary_type_handler.h"
 
-using namespace ignite::odbc::common::concurrent;
+using namespace documentdb::odbc::common::concurrent;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace binary {
@@ -39,4 +39,4 @@ void BinaryTypeHandler::OnFieldWritten(int32_t fieldId, std::string fieldName,
 }  // namespace binary
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

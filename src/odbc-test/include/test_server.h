@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef _IGNITE_ODBC_TEST_TEST_SERVER
-#define _IGNITE_ODBC_TEST_TEST_SERVER
+#ifndef _DOCUMENTDB_ODBC_TEST_TEST_SERVER
+#define _DOCUMENTDB_ODBC_TEST_TEST_SERVER
 
 #include <stdint.h>
 
@@ -29,7 +29,7 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 
-namespace ignite {
+namespace documentdb {
 
 /**
  * Test Server Session.
@@ -193,6 +193,6 @@ class TestServer {
   boost::shared_ptr< boost::thread > serverThread;
 };
 
-}  // namespace ignite
+}  // namespace documentdb
 
-#endif  //_IGNITE_ODBC_TEST_TEST_SERVER
+#endif  //_DOCUMENTDB_ODBC_TEST_TEST_SERVER

@@ -19,14 +19,14 @@
 #include <Windows.h>
 #endif
 
-#include <ignite/odbc/common/common.h>
-#include <ignite/odbc/common/concurrent.h>
-#include <ignite/odbc/config/connection_string_parser.h>
-#include <ignite/odbc/connection.h>
-#include <ignite/odbc/dsn_config.h>
-#include <ignite/odbc/ignite_error.h>
-#include <ignite/odbc/jni/java.h>
-#include <ignite/odbc/jni/utils.h>
+#include <documentdb/odbc/common/common.h>
+#include <documentdb/odbc/common/concurrent.h>
+#include <documentdb/odbc/config/connection_string_parser.h>
+#include <documentdb/odbc/connection.h>
+#include <documentdb/odbc/dsn_config.h>
+#include <documentdb/odbc/documentdb_error.h>
+#include <documentdb/odbc/jni/java.h>
+#include <documentdb/odbc/jni/utils.h>
 #include <sql.h>
 #include <sqlext.h>
 
@@ -37,16 +37,16 @@
 #include "odbc_test_suite.h"
 #include "test_utils.h"
 
-using ignite::odbc::OdbcTestSuite;
+using documentdb::odbc::OdbcTestSuite;
 using namespace boost::unit_test;
-using ignite::odbc::if_integration;
+using documentdb::odbc::if_integration;
 
-using ignite::odbc::common::ReleaseChars;
-using ignite::odbc::config::ConnectionStringParser;
-using ignite::odbc::jni::ResolveDocumentDbHome;
-using ignite::odbc::jni::java::BuildJvmOptions;
-using ignite::odbc::jni::java::JniErrorCode;
-using ignite::odbc::jni::java::JniHandlers;
+using documentdb::odbc::common::ReleaseChars;
+using documentdb::odbc::config::ConnectionStringParser;
+using documentdb::odbc::jni::ResolveDocumentDbHome;
+using documentdb::odbc::jni::java::BuildJvmOptions;
+using documentdb::odbc::jni::java::JniErrorCode;
+using documentdb::odbc::jni::java::JniHandlers;
 
 /**
  * Test setup fixture.

@@ -15,24 +15,24 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc.h"
+#include "documentdb/odbc.h"
 
 #include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
-#include "ignite/odbc/config/configuration.h"
-#include "ignite/odbc/config/connection_string_parser.h"
-#include "ignite/odbc/connection.h"
-#include "ignite/odbc/dsn_config.h"
-#include "ignite/odbc/environment.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/statement.h"
-#include "ignite/odbc/system/odbc_constants.h"
-#include "ignite/odbc/system/system_dsn.h"
-#include "ignite/odbc/type_traits.h"
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/config/configuration.h"
+#include "documentdb/odbc/config/connection_string_parser.h"
+#include "documentdb/odbc/connection.h"
+#include "documentdb/odbc/dsn_config.h"
+#include "documentdb/odbc/environment.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/statement.h"
+#include "documentdb/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/system/system_dsn.h"
+#include "documentdb/odbc/type_traits.h"
+#include "documentdb/odbc/utility.h"
 
 /**
  * Handle window handle.
@@ -41,7 +41,7 @@
  * @return @c true on success and @c false otherwise.
  */
 bool HandleParentWindow(SQLHWND windowHandle,
-                        ignite::odbc::config::Configuration& config) {
+                        documentdb::odbc::config::Configuration& config) {
 #ifdef _WIN32
   if (windowHandle) {
     LOG_INFO_MSG("Parent window is passed. Creating configuration window.");
@@ -54,9 +54,9 @@ bool HandleParentWindow(SQLHWND windowHandle,
   return true;
 }
 
-using namespace ignite::odbc::utility;
+using namespace documentdb::odbc::utility;
 
-namespace ignite {
+namespace documentdb {
 SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValue,
                      SQLSMALLINT infoValueMax, SQLSMALLINT* length) {
   using odbc::Connection;
@@ -1395,7 +1395,7 @@ SQLRETURN SQLSpecialColumns(SQLHSTMT stmt, SQLSMALLINT idType,
 }
 
 SQLRETURN SQLParamData(SQLHSTMT stmt, SQLPOINTER* value) {
-  using namespace ignite::odbc;
+  using namespace documentdb::odbc;
 
   LOG_DEBUG_MSG("SQLParamData called");
 
@@ -1417,7 +1417,7 @@ SQLRETURN SQLParamData(SQLHSTMT stmt, SQLPOINTER* value) {
 
 SQLRETURN SQLPutData(SQLHSTMT stmt, SQLPOINTER data,
                      SQLLEN strLengthOrIndicator) {
-  using namespace ignite::odbc;
+  using namespace documentdb::odbc;
 
   LOG_DEBUG_MSG("SQLPutData called");
 
@@ -1440,7 +1440,7 @@ SQLRETURN SQLPutData(SQLHSTMT stmt, SQLPOINTER data,
 SQLRETURN SQLDescribeParam(SQLHSTMT stmt, SQLUSMALLINT paramNum,
                            SQLSMALLINT* dataType, SQLULEN* paramSize,
                            SQLSMALLINT* decimalDigits, SQLSMALLINT* nullable) {
-  using namespace ignite::odbc;
+  using namespace documentdb::odbc;
 
   LOG_DEBUG_MSG("SQLDescribeParam called");
 
@@ -1464,12 +1464,12 @@ SQLRETURN SQLDescribeParam(SQLHSTMT stmt, SQLUSMALLINT paramNum,
 SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* state,
                    SQLINTEGER* error, SQLWCHAR* msgBuf, SQLSMALLINT msgBufLen,
                    SQLSMALLINT* msgResLen) {
-  using namespace ignite::odbc::utility;
-  using namespace ignite::odbc;
-  using namespace ignite::odbc::diagnostic;
-  using namespace ignite::odbc::type_traits;
+  using namespace documentdb::odbc::utility;
+  using namespace documentdb::odbc;
+  using namespace documentdb::odbc::diagnostic;
+  using namespace documentdb::odbc::type_traits;
 
-  using ignite::odbc::app::ApplicationDataBuffer;
+  using documentdb::odbc::app::ApplicationDataBuffer;
 
   LOG_DEBUG_MSG("SQLError called");
 
@@ -1569,4 +1569,4 @@ SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr,
   return connection->GetDiagnosticRecords().GetReturnCode();
 }
 
-}  // namespace ignite
+}  // namespace documentdb

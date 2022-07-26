@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/interop/interop_target.h"
-#include "ignite/odbc/impl/binary/binary_type_updater_impl.h"
+#include "documentdb/odbc/impl/interop/interop_target.h"
+#include "documentdb/odbc/impl/binary/binary_type_updater_impl.h"
 
-using namespace ignite::odbc::common::concurrent;
-using namespace ignite::odbc::jni::java;
-using namespace ignite::odbc::impl::interop;
-using namespace ignite::odbc::impl::binary;
-using namespace ignite::odbc::binary;
+using namespace documentdb::odbc::common::concurrent;
+using namespace documentdb::odbc::jni::java;
+using namespace documentdb::odbc::impl::interop;
+using namespace documentdb::odbc::impl::binary;
+using namespace documentdb::odbc::binary;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace interop {
@@ -47,7 +47,7 @@ InteropTarget::~InteropTarget() {
 }
 
 int64_t InteropTarget::WriteTo(InteropMemory* mem, InputOperation& inOp,
-                               IgniteError& err) {
+                               DocumentDbError& err) {
   BinaryTypeManager* metaMgr = env.Get()->GetTypeManager();
 
   int32_t metaVer = metaMgr->GetVersion();
@@ -74,7 +74,7 @@ void InteropTarget::ReadFrom(InteropMemory* mem, OutputOperation& outOp) {
   outOp.ProcessOutput(reader);
 }
 
-void InteropTarget::ReadError(InteropMemory* mem, IgniteError& err) {
+void InteropTarget::ReadError(InteropMemory* mem, DocumentDbError& err) {
   InteropInputStream in(mem);
   BinaryReaderImpl reader(&in);
 
@@ -83,11 +83,11 @@ void InteropTarget::ReadError(InteropMemory* mem, IgniteError& err) {
 
   std::string msg = reader.ReadObject< std::string >();
 
-  err = IgniteError(IgniteError::IGNITE_ERR_GENERIC, msg.c_str());
+  err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC, msg.c_str());
 }
 
 bool InteropTarget::OutOp(int32_t opType, InteropMemory& inMem,
-                          IgniteError& err) {
+                          DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   SharedPointer< InteropMemory > mem = env.Get()->AllocateMemory();
@@ -98,7 +98,7 @@ bool InteropTarget::OutOp(int32_t opType, InteropMemory& inMem,
     int64_t res = env.Get()->Context()->TargetInStreamOutLong(javaRef, opType,
                                                               outPtr, &jniErr);
 
-    IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+    DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                           jniErr.errMsg.c_str(), err);
 
     if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
@@ -109,7 +109,7 @@ bool InteropTarget::OutOp(int32_t opType, InteropMemory& inMem,
 }
 
 bool InteropTarget::OutOp(int32_t opType, InputOperation& inOp,
-                          IgniteError& err) {
+                          DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   SharedPointer< InteropMemory > mem = env.Get()->AllocateMemory();
@@ -120,7 +120,7 @@ bool InteropTarget::OutOp(int32_t opType, InputOperation& inOp,
     int64_t res = env.Get()->Context()->TargetInStreamOutLong(javaRef, opType,
                                                               outPtr, &jniErr);
 
-    IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+    DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                           jniErr.errMsg.c_str(), err);
 
     if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
@@ -130,13 +130,13 @@ bool InteropTarget::OutOp(int32_t opType, InputOperation& inOp,
   return false;
 }
 
-bool InteropTarget::OutOp(int32_t opType, IgniteError& err) {
+bool InteropTarget::OutOp(int32_t opType, DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   int64_t res =
       env.Get()->Context()->TargetInLongOutLong(javaRef, opType, 0, &jniErr);
 
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
   if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
@@ -146,7 +146,7 @@ bool InteropTarget::OutOp(int32_t opType, IgniteError& err) {
 }
 
 bool InteropTarget::InOp(int32_t opType, OutputOperation& outOp,
-                         IgniteError& err) {
+                         DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   SharedPointer< InteropMemory > mem = env.Get()->AllocateMemory();
@@ -154,7 +154,7 @@ bool InteropTarget::InOp(int32_t opType, OutputOperation& outOp,
   env.Get()->Context()->TargetOutStream(javaRef, opType,
                                         mem.Get()->PointerLong(), &jniErr);
 
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
   if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
@@ -166,19 +166,19 @@ bool InteropTarget::InOp(int32_t opType, OutputOperation& outOp,
   return false;
 }
 
-jobject InteropTarget::InOpObject(int32_t opType, IgniteError& err) {
+jobject InteropTarget::InOpObject(int32_t opType, DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   jobject res = env.Get()->Context()->TargetOutObject(javaRef, opType, &jniErr);
 
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
   return res;
 }
 
 void InteropTarget::OutInOp(int32_t opType, InputOperation& inOp,
-                            OutputOperation& outOp, IgniteError& err) {
+                            OutputOperation& outOp, DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   SharedPointer< InteropMemory > outMem = env.Get()->AllocateMemory();
@@ -190,7 +190,7 @@ void InteropTarget::OutInOp(int32_t opType, InputOperation& inOp,
     env.Get()->Context()->TargetInStreamOutStream(
         javaRef, opType, outPtr, inMem.Get()->PointerLong(), &jniErr);
 
-    IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+    DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                           jniErr.errMsg.c_str(), err);
 
     if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
@@ -199,7 +199,7 @@ void InteropTarget::OutInOp(int32_t opType, InputOperation& inOp,
 }
 
 void InteropTarget::OutInOpX(int32_t opType, InputOperation& inOp,
-                             OutputOperation& outOp, IgniteError& err) {
+                             OutputOperation& outOp, DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   SharedPointer< InteropMemory > outInMem = env.Get()->AllocateMemory();
@@ -210,7 +210,7 @@ void InteropTarget::OutInOpX(int32_t opType, InputOperation& inOp,
     int64_t res = env.Get()->Context()->TargetInStreamOutLong(
         javaRef, opType, outInPtr, &jniErr);
 
-    IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+    DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                           jniErr.errMsg.c_str(), err);
 
     if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS
@@ -226,7 +226,7 @@ void InteropTarget::OutInOpX(int32_t opType, InputOperation& inOp,
 }
 
 InteropTarget::OperationResult::Type InteropTarget::InStreamOutLong(
-    int32_t opType, InteropMemory& outInMem, IgniteError& err) {
+    int32_t opType, InteropMemory& outInMem, DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   int64_t outInPtr = outInMem.PointerLong();
@@ -235,7 +235,7 @@ InteropTarget::OperationResult::Type InteropTarget::InStreamOutLong(
     int64_t res = env.Get()->Context()->TargetInStreamOutLong(
         javaRef, opType, outInPtr, &jniErr);
 
-    IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+    DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                           jniErr.errMsg.c_str(), err);
 
     return static_cast< OperationResult::Type >(res);
@@ -245,7 +245,7 @@ InteropTarget::OperationResult::Type InteropTarget::InStreamOutLong(
 }
 
 int64_t InteropTarget::InStreamOutLong(int32_t opType, InputOperation& inOp,
-                                       IgniteError& err) {
+                                       DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   SharedPointer< InteropMemory > outMem = env.Get()->AllocateMemory();
@@ -255,7 +255,7 @@ int64_t InteropTarget::InStreamOutLong(int32_t opType, InputOperation& inOp,
     int64_t res = env.Get()->Context()->TargetInStreamOutLong(javaRef, opType,
                                                               outPtr, &jniErr);
 
-    IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+    DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                           jniErr.errMsg.c_str(), err);
 
     if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
@@ -267,7 +267,7 @@ int64_t InteropTarget::InStreamOutLong(int32_t opType, InputOperation& inOp,
 
 jobject InteropTarget::InStreamOutObject(int32_t opType,
                                          InteropMemory& outInMem,
-                                         IgniteError& err) {
+                                         DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   int64_t outInPtr = outInMem.PointerLong();
@@ -276,7 +276,7 @@ jobject InteropTarget::InStreamOutObject(int32_t opType,
     jobject res = env.Get()->Context()->TargetInStreamOutObject(
         javaRef, opType, outInPtr, &jniErr);
 
-    IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+    DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                           jniErr.errMsg.c_str(), err);
 
     return res;
@@ -286,7 +286,7 @@ jobject InteropTarget::InStreamOutObject(int32_t opType,
 }
 
 void InteropTarget::InStreamOutStream(int32_t opType, InteropMemory& inMem,
-                                      InteropMemory& outMem, IgniteError& err) {
+                                      InteropMemory& outMem, DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   int64_t inPtr = inMem.PointerLong();
@@ -296,19 +296,19 @@ void InteropTarget::InStreamOutStream(int32_t opType, InteropMemory& inMem,
     env.Get()->Context()->TargetInStreamOutStream(javaRef, opType, inPtr,
                                                   outPtr, &jniErr);
 
-    IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+    DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                           jniErr.errMsg.c_str(), err);
   }
 }
 
 int64_t InteropTarget::OutInOpLong(int32_t opType, int64_t val,
-                                   IgniteError& err) {
+                                   DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   int64_t res =
       env.Get()->Context()->TargetInLongOutLong(javaRef, opType, val, &jniErr);
 
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
   return res;
@@ -316,4 +316,4 @@ int64_t InteropTarget::OutInOpLong(int32_t opType, int64_t val,
 }  // namespace interop
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

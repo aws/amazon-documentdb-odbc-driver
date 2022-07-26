@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/interop//interop_output_stream.h"
+#include "documentdb/odbc/impl/interop//interop_output_stream.h"
 
-#include <ignite/odbc/ignite_error.h>
+#include <documentdb/odbc/documentdb_error.h>
 
 #include <cstring>
 
@@ -37,7 +37,7 @@
 #define IGNITE_INTEROP_OUT_WRITE_ARRAY(val, len) \
   { CopyAndShift(reinterpret_cast< const int8_t* >(val), 0, len); }
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace interop {
@@ -209,4 +209,4 @@ void InteropOutputStream::CopyAndShift(const int8_t* src, int32_t off,
 }  // namespace interop
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/column.h"
+#include "documentdb/odbc/column.h"
 
-#include <ignite/odbc/impl/interop/interop_stream_position_guard.h>
+#include <documentdb/odbc/impl/interop/interop_stream_position_guard.h>
 
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/utility.h"
 
 namespace {
-using namespace ignite::odbc::impl::interop;
-using namespace ignite::odbc::impl::binary;
+using namespace documentdb::odbc::impl::interop;
+using namespace documentdb::odbc::impl::binary;
 
 bool GetObjectLength(InteropInputStream& stream, int32_t& len) {
   InteropStreamPositionGuard< InteropInputStream > guard(stream);
@@ -63,7 +63,7 @@ bool GetObjectLength(InteropInputStream& stream, int32_t& len) {
  * @return Column type header.
  */
 int8_t ReadColumnHeader(InteropInputStream& stream) {
-  using namespace ignite::odbc::impl::binary;
+  using namespace documentdb::odbc::impl::binary;
 
   int32_t headerPos = stream.Position();
 
@@ -98,7 +98,7 @@ int8_t ReadColumnHeader(InteropInputStream& stream) {
 }
 }  // namespace
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 Column::Column() : type(0), startPos(-1), endPos(-1), offset(0), size(0) {
   // No-op.
@@ -489,4 +489,4 @@ void Column::IncreaseOffset(int32_t value) {
     offset = size;
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

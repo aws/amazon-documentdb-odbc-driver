@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/binary/binary_containers.h"
+#include "documentdb/odbc/binary/binary_containers.h"
 
-using namespace ignite::odbc::impl::binary;
+using namespace documentdb::odbc::impl::binary;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace binary {
 BinaryStringArrayWriter::BinaryStringArrayWriter(BinaryWriterImpl* impl,
@@ -66,4 +66,4 @@ bool BinaryStringArrayReader::IsNull() const {
 }
 }  // namespace binary
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

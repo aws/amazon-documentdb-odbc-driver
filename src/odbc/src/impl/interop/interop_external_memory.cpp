@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/ignite_error.h>
-#include <ignite/odbc/jni/java.h>
+#include <documentdb/odbc/documentdb_error.h>
+#include <documentdb/odbc/jni/java.h>
 
-#include "ignite/odbc/impl/interop/interop_external_memory.h"
+#include "documentdb/odbc/impl/interop/interop_external_memory.h"
 
-using namespace ignite::odbc::jni::java;
+using namespace documentdb::odbc::jni::java;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace interop {
@@ -32,7 +32,7 @@ InteropExternalMemory::InteropExternalMemory(int8_t* memPtr) {
 
 void InteropExternalMemory::Reallocate(int32_t cap) {
   if (JniContext::Reallocate(reinterpret_cast< int64_t >(memPtr), cap) == -1) {
-    IGNITE_ERROR_FORMATTED_2(IgniteError::IGNITE_ERR_MEMORY,
+    IGNITE_ERROR_FORMATTED_2(DocumentDbError::IGNITE_ERR_MEMORY,
                              "Failed to reallocate external memory", "memPtr",
                              PointerLong(), "requestedCapacity", cap)
   }
@@ -40,4 +40,4 @@ void InteropExternalMemory::Reallocate(int32_t cap) {
 }  // namespace interop
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

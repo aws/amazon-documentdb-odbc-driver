@@ -17,20 +17,20 @@
 
 #include <time.h>
 
-#include "ignite/odbc/ignite_error.h"
+#include "documentdb/odbc/documentdb_error.h"
 
-#include "ignite/odbc/impl/interop/interop.h"
-#include "ignite/odbc/impl/binary/binary_utils.h"
+#include "documentdb/odbc/impl/interop/interop.h"
+#include "documentdb/odbc/impl/binary/binary_utils.h"
 
-using namespace ignite::odbc;
-using namespace ignite::odbc::binary;
-using namespace ignite::odbc::impl::interop;
-using namespace ignite::odbc::impl::binary;
+using namespace documentdb::odbc;
+using namespace documentdb::odbc::binary;
+using namespace documentdb::odbc::impl::interop;
+using namespace documentdb::odbc::impl::binary;
 
 namespace {
 /**
  * Check if there is enough data in memory.
- * @throw IgniteError if there is not enough memory.
+ * @throw DocumentDbError if there is not enough memory.
  *
  * @param mem Memory.
  * @param pos Position.
@@ -38,7 +38,7 @@ namespace {
  */
 inline void CheckEnoughData(InteropMemory& mem, int32_t pos, int32_t len) {
   if (mem.Length() < (pos + len)) {
-    IGNITE_ERROR_FORMATTED_4(IgniteError::IGNITE_ERR_MEMORY,
+    IGNITE_ERROR_FORMATTED_4(DocumentDbError::IGNITE_ERR_MEMORY,
                              "Not enough data in "
                              "the binary object",
                              "memPtr", mem.PointerLong(), "len", mem.Length(),
@@ -48,7 +48,7 @@ inline void CheckEnoughData(InteropMemory& mem, int32_t pos, int32_t len) {
 
 /**
  * Read primitive int type from the specific place in memory.
- * @throw IgniteError if there is not enough memory.
+ * @throw DocumentDbError if there is not enough memory.
  *
  * @param mem Memory.
  * @param pos Position.
@@ -75,7 +75,7 @@ inline T UnsafeReadPrimitive(InteropMemory& mem, int32_t pos) {
 }
 }  // namespace
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace binary {
@@ -329,4 +329,4 @@ void BinaryUtils::WriteString(InteropOutputStream* stream, const char* val,
 }  // namespace binary
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

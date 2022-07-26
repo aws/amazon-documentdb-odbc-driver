@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/query/batch_query.h"
+#include "documentdb/odbc/query/batch_query.h"
 
-#include "ignite/odbc/connection.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/message.h"
-#include "ignite/odbc/odbc_error.h"
+#include "documentdb/odbc/connection.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/message.h"
+#include "documentdb/odbc/odbc_error.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace query {
 BatchQuery::BatchQuery(diagnostic::DiagnosableAdapter& diag,
@@ -155,7 +155,7 @@ SqlResult::Type BatchQuery::MakeRequestExecuteBatch(SqlUlen begin, SqlUlen end,
     diag.AddStatusRecord(err);
 
     return SqlResult::AI_ERROR;
-  } catch (const IgniteError& err) {
+  } catch (const DocumentDbError& err) {
     diag.AddStatusRecord(err.GetText());
 
     return SqlResult::AI_ERROR;
@@ -198,4 +198,4 @@ SqlResult::Type BatchQuery::MakeRequestExecuteBatch(SqlUlen begin, SqlUlen end,
 }
 }  // namespace query
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

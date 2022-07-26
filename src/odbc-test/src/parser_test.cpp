@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/parser.h>
+#include <documentdb/odbc/parser.h>
 
 #include <boost/test/unit_test.hpp>
 
-using namespace ignite::odbc;
+using namespace documentdb::odbc;
 
 struct TestMessage {
   TestMessage() : a(0), b() {
@@ -34,13 +34,13 @@ struct TestMessage {
     // No-op.
   }
 
-  void Write(ignite::impl::binary::BinaryWriterImpl& writer,
+  void Write(documentdb::impl::binary::BinaryWriterImpl& writer,
              const ProtocolVersion&) const {
     writer.WriteInt32(a);
     writer.WriteString(b.data(), static_cast< int32_t >(b.size()));
   }
 
-  void Read(ignite::impl::binary::BinaryReaderImpl& reader,
+  void Read(documentdb::impl::binary::BinaryReaderImpl& reader,
             const ProtocolVersion&) {
     a = reader.ReadInt32();
 

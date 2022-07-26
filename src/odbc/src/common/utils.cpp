@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/utils.h>
+#include <documentdb/odbc/common/utils.h>
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace common {
 /**
@@ -204,4 +204,4 @@ IGNITE_IMPORT_EXPORT bool AllDigits(const std::string& val) {
 
 }  // namespace common
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

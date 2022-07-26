@@ -15,21 +15,21 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/cluster/cluster_group.h"
-#include "ignite/odbc/impl/ignite_impl.h"
+#include "documentdb/odbc/cluster/cluster_group.h"
+#include "documentdb/odbc/impl/ignite_impl.h"
 
-using namespace ignite::odbc::common::concurrent;
-using namespace ignite::odbc::cache;
-using namespace ignite::odbc::cluster;
-using namespace ignite::odbc::jni::java;
-using namespace ignite::odbc::impl::interop;
-using namespace ignite::odbc::impl::binary;
-using namespace ignite::odbc::impl::cache;
-using namespace ignite::odbc::impl::cluster;
+using namespace documentdb::odbc::common::concurrent;
+using namespace documentdb::odbc::cache;
+using namespace documentdb::odbc::cluster;
+using namespace documentdb::odbc::jni::java;
+using namespace documentdb::odbc::impl::interop;
+using namespace documentdb::odbc::impl::binary;
+using namespace documentdb::odbc::impl::cache;
+using namespace documentdb::odbc::impl::cluster;
 
-using namespace ignite::odbc::binary;
+using namespace documentdb::odbc::binary;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 /*
@@ -60,7 +60,7 @@ IgniteImpl::IgniteImpl(SharedPointer< IgniteEnvironment > env)
 }
 
 IgniteImpl::SP_CacheAffinityImpl IgniteImpl::GetAffinity(
-    const std::string& cacheName, IgniteError& err) {
+    const std::string& cacheName, DocumentDbError& err) {
   SharedPointer< InteropMemory > mem = env.Get()->AllocateMemory();
   InteropMemory* mem0 = mem.Get();
   InteropOutputStream out(mem0);
@@ -93,15 +93,15 @@ JniContext* IgniteImpl::GetContext() {
   return env.Get()->Context();
 }
 
-CacheImpl* IgniteImpl::GetCache(const char* name, IgniteError& err) {
+CacheImpl* IgniteImpl::GetCache(const char* name, DocumentDbError& err) {
   return GetOrCreateCache(name, err, ProcessorOp::GET_CACHE);
 }
 
-CacheImpl* IgniteImpl::GetOrCreateCache(const char* name, IgniteError& err) {
+CacheImpl* IgniteImpl::GetOrCreateCache(const char* name, DocumentDbError& err) {
   return GetOrCreateCache(name, err, ProcessorOp::GET_OR_CREATE_CACHE);
 }
 
-CacheImpl* IgniteImpl::CreateCache(const char* name, IgniteError& err) {
+CacheImpl* IgniteImpl::CreateCache(const char* name, DocumentDbError& err) {
   return GetOrCreateCache(name, err, ProcessorOp::CREATE_CACHE);
 }
 
@@ -128,72 +128,72 @@ IgniteImpl::SP_ComputeImpl IgniteImpl::GetCompute(ClusterGroup grp) {
 }
 
 void IgniteImpl::DisableWal(std::string cacheName) {
-  IgniteError err;
+  DocumentDbError err;
   In1Operation< std::string > inOp(cacheName);
 
   InteropTarget::OutOp(ProcessorOp::WAL_DISABLE, inOp, err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 }
 
 void IgniteImpl::EnableWal(std::string cacheName) {
-  IgniteError err;
+  DocumentDbError err;
   In1Operation< std::string > inOp(cacheName);
 
   InteropTarget::OutOp(ProcessorOp::WAL_ENABLE, inOp, err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 }
 
 bool IgniteImpl::IsWalEnabled(std::string cacheName) {
-  IgniteError err;
+  DocumentDbError err;
   In1Operation< std::string > inOp(cacheName);
 
   bool ret = InteropTarget::OutOp(ProcessorOp::WAL_IS_ENABLED, inOp, err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   return ret;
 }
 
 void IgniteImpl::SetBaselineTopologyVersion(int64_t topVer) {
-  IgniteError err;
+  DocumentDbError err;
 
   OutInOpLong(ProcessorOp::SET_BASELINE_TOPOLOGY_VERSION, topVer, err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 }
 
 void IgniteImpl::SetTxTimeoutOnPartitionMapExchange(int64_t timeout) {
-  IgniteError err;
+  DocumentDbError err;
 
   if (timeout < 0) {
     const char* msg = "Impossible to set negative timeout";
-    throw IgniteError(IgniteError::IGNITE_ERR_ILLEGAL_ARGUMENT, msg);
+    throw DocumentDbError(DocumentDbError::IGNITE_ERR_ILLEGAL_ARGUMENT, msg);
   }
 
   In1Operation< int64_t > inOp(timeout);
 
   OutOp(ProcessorOp::SET_TX_TIMEOUT_ON_PARTITION_MAP_EXCHANGE, inOp, err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 }
 
 ClusterGroupImpl* IgniteImpl::InternalGetProjection() {
-  IgniteError err;
+  DocumentDbError err;
 
   jobject clusterGroupJavaRef = InOpObject(ProcessorOp::GET_CLUSTER_GROUP, err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   if (!clusterGroupJavaRef)
-    throw IgniteError(IgniteError::IGNITE_ERR_GENERIC,
+    throw DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
                       "Can not get ClusterGroup instance.");
 
   return new ClusterGroupImpl(env, clusterGroupJavaRef);
 }
 
-CacheImpl* IgniteImpl::GetOrCreateCache(const char* name, IgniteError& err,
+CacheImpl* IgniteImpl::GetOrCreateCache(const char* name, DocumentDbError& err,
                                         int32_t op) {
   SharedPointer< InteropMemory > mem = env.Get()->AllocateMemory();
   InteropMemory* mem0 = mem.Get();
@@ -217,4 +217,4 @@ CacheImpl* IgniteImpl::GetOrCreateCache(const char* name, IgniteError& err,
 }
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

@@ -15,26 +15,26 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/utils.h>
+#include <documentdb/odbc/common/utils.h>
 
-#include <ignite/odbc/impl/cache/cache_impl.h>
-#include <ignite/odbc/impl/binary/binary_type_updater_impl.h>
-#include <ignite/odbc/impl/cache/query/continuous/continuous_query_handle_impl.h>
+#include <documentdb/odbc/impl/cache/cache_impl.h>
+#include <documentdb/odbc/impl/binary/binary_type_updater_impl.h>
+#include <documentdb/odbc/impl/cache/query/continuous/continuous_query_handle_impl.h>
 
-#include <ignite/odbc/cache/query/continuous/continuous_query_handle.h>
+#include <documentdb/odbc/cache/query/continuous/continuous_query_handle.h>
 
-using namespace ignite::odbc::common::concurrent;
-using namespace ignite::odbc::jni::java;
-using namespace ignite::odbc::common;
-using namespace ignite::odbc::cache;
-using namespace ignite::odbc::cache::query;
-using namespace ignite::odbc::cache::query::continuous;
-using namespace ignite::odbc::impl;
-using namespace ignite::odbc::impl::binary;
-using namespace ignite::odbc::impl::cache::query;
-using namespace ignite::odbc::impl::cache::query::continuous;
-using namespace ignite::odbc::impl::interop;
-using namespace ignite::odbc::binary;
+using namespace documentdb::odbc::common::concurrent;
+using namespace documentdb::odbc::jni::java;
+using namespace documentdb::odbc::common;
+using namespace documentdb::odbc::cache;
+using namespace documentdb::odbc::cache::query;
+using namespace documentdb::odbc::cache::query::continuous;
+using namespace documentdb::odbc::impl;
+using namespace documentdb::odbc::impl::binary;
+using namespace documentdb::odbc::impl::cache::query;
+using namespace documentdb::odbc::impl::cache::query::continuous;
+using namespace documentdb::odbc::impl::interop;
+using namespace documentdb::odbc::binary;
 
 struct Operation {
   enum Type {
@@ -145,7 +145,7 @@ struct Operation {
   };
 };
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace cache {
@@ -166,175 +166,175 @@ const char* CacheImpl::GetName() const {
   return name;
 }
 
-bool CacheImpl::ContainsKey(InputOperation& inOp, IgniteError& err) {
+bool CacheImpl::ContainsKey(InputOperation& inOp, DocumentDbError& err) {
   return OutOp(Operation::CONTAINS_KEY, inOp, err);
 }
 
-bool CacheImpl::ContainsKeys(InputOperation& inOp, IgniteError& err) {
+bool CacheImpl::ContainsKeys(InputOperation& inOp, DocumentDbError& err) {
   return OutOp(Operation::CONTAINS_KEYS, inOp, err);
 }
 
 void CacheImpl::LocalPeek(InputOperation& inOp, OutputOperation& outOp,
-                          IgniteError& err) {
+                          DocumentDbError& err) {
   OutInOpX(Operation::LOCAL_PEEK, inOp, outOp, err);
 }
 
 void CacheImpl::Get(InputOperation& inOp, OutputOperation& outOp,
-                    IgniteError& err) {
+                    DocumentDbError& err) {
   OutInOpX(Operation::GET, inOp, outOp, err);
 }
 
 void CacheImpl::GetAll(InputOperation& inOp, OutputOperation& outOp,
-                       IgniteError& err) {
+                       DocumentDbError& err) {
   OutInOpX(Operation::GET_ALL, inOp, outOp, err);
 }
 
-void CacheImpl::Put(InputOperation& inOp, IgniteError& err) {
+void CacheImpl::Put(InputOperation& inOp, DocumentDbError& err) {
   OutOp(Operation::PUT, inOp, err);
 }
 
-void CacheImpl::PutAll(ignite::odbc::impl::InputOperation& inOp,
-                       IgniteError& err) {
+void CacheImpl::PutAll(documentdb::odbc::impl::InputOperation& inOp,
+                       DocumentDbError& err) {
   OutOp(Operation::PUT_ALL, inOp, err);
 }
 
 void CacheImpl::GetAndPut(InputOperation& inOp, OutputOperation& outOp,
-                          IgniteError& err) {
+                          DocumentDbError& err) {
   OutInOpX(Operation::GET_AND_PUT, inOp, outOp, err);
 }
 
 void CacheImpl::GetAndReplace(InputOperation& inOp, OutputOperation& outOp,
-                              IgniteError& err) {
+                              DocumentDbError& err) {
   OutInOpX(Operation::GET_AND_REPLACE, inOp, outOp, err);
 }
 
 void CacheImpl::GetAndRemove(InputOperation& inOp, OutputOperation& outOp,
-                             IgniteError& err) {
+                             DocumentDbError& err) {
   OutInOpX(Operation::GET_AND_REMOVE, inOp, outOp, err);
 }
 
-bool CacheImpl::PutIfAbsent(InputOperation& inOp, IgniteError& err) {
+bool CacheImpl::PutIfAbsent(InputOperation& inOp, DocumentDbError& err) {
   return OutOp(Operation::PUT_IF_ABSENT, inOp, err);
 }
 
 void CacheImpl::GetAndPutIfAbsent(InputOperation& inOp, OutputOperation& outOp,
-                                  IgniteError& err) {
+                                  DocumentDbError& err) {
   OutInOpX(Operation::GET_AND_PUT_IF_ABSENT, inOp, outOp, err);
 }
 
-bool CacheImpl::Replace(InputOperation& inOp, IgniteError& err) {
+bool CacheImpl::Replace(InputOperation& inOp, DocumentDbError& err) {
   return OutOp(Operation::REPLACE_2, inOp, err);
 }
 
-bool CacheImpl::ReplaceIfEqual(InputOperation& inOp, IgniteError& err) {
+bool CacheImpl::ReplaceIfEqual(InputOperation& inOp, DocumentDbError& err) {
   return OutOp(Operation::REPLACE_3, inOp, err);
 }
 
-void CacheImpl::LocalEvict(InputOperation& inOp, IgniteError& err) {
+void CacheImpl::LocalEvict(InputOperation& inOp, DocumentDbError& err) {
   OutOp(Operation::LOCAL_EVICT, inOp, err);
 }
 
-void CacheImpl::Clear(IgniteError& err) {
+void CacheImpl::Clear(DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   OutOp(Operation::CLEAR_CACHE, err);
 
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 }
 
-void CacheImpl::Clear(InputOperation& inOp, IgniteError& err) {
+void CacheImpl::Clear(InputOperation& inOp, DocumentDbError& err) {
   OutOp(Operation::CLEAR, inOp, err);
 }
 
-void CacheImpl::ClearAll(InputOperation& inOp, IgniteError& err) {
+void CacheImpl::ClearAll(InputOperation& inOp, DocumentDbError& err) {
   OutOp(Operation::CLEAR_ALL, inOp, err);
 }
 
-void CacheImpl::LocalClear(InputOperation& inOp, IgniteError& err) {
+void CacheImpl::LocalClear(InputOperation& inOp, DocumentDbError& err) {
   OutOp(Operation::LOCAL_CLEAR, inOp, err);
 }
 
-void CacheImpl::LocalClearAll(InputOperation& inOp, IgniteError& err) {
+void CacheImpl::LocalClearAll(InputOperation& inOp, DocumentDbError& err) {
   OutOp(Operation::LOCAL_CLEAR_ALL, inOp, err);
 }
 
-bool CacheImpl::Remove(InputOperation& inOp, IgniteError& err) {
+bool CacheImpl::Remove(InputOperation& inOp, DocumentDbError& err) {
   return OutOp(Operation::REMOVE_1, inOp, err);
 }
 
-bool CacheImpl::RemoveIfEqual(InputOperation& inOp, IgniteError& err) {
+bool CacheImpl::RemoveIfEqual(InputOperation& inOp, DocumentDbError& err) {
   return OutOp(Operation::REMOVE_2, inOp, err);
 }
 
-void CacheImpl::RemoveAll(InputOperation& inOp, IgniteError& err) {
+void CacheImpl::RemoveAll(InputOperation& inOp, DocumentDbError& err) {
   OutOp(Operation::REMOVE_ALL, inOp, err);
 }
 
-void CacheImpl::RemoveAll(IgniteError& err) {
+void CacheImpl::RemoveAll(DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   OutOp(Operation::REMOVE_ALL2, err);
 
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 }
 
-int32_t CacheImpl::Size(int32_t peekModes, bool local, IgniteError& err) {
+int32_t CacheImpl::Size(int32_t peekModes, bool local, DocumentDbError& err) {
   int32_t op = local ? Operation::SIZE_LOC : Operation::SIZE;
 
   return static_cast< int32_t >(OutInOpLong(op, peekModes, err));
 }
 
-QueryCursorImpl* CacheImpl::QuerySql(const SqlQuery& qry, IgniteError& err) {
+QueryCursorImpl* CacheImpl::QuerySql(const SqlQuery& qry, DocumentDbError& err) {
   return QueryInternal(qry, Operation::QRY_SQL, err);
 }
 
-QueryCursorImpl* CacheImpl::QueryText(const TextQuery& qry, IgniteError& err) {
+QueryCursorImpl* CacheImpl::QueryText(const TextQuery& qry, DocumentDbError& err) {
   return QueryInternal(qry, Operation::QRY_TEXT, err);
 }
 
-QueryCursorImpl* CacheImpl::QueryScan(const ScanQuery& qry, IgniteError& err) {
+QueryCursorImpl* CacheImpl::QueryScan(const ScanQuery& qry, DocumentDbError& err) {
   return QueryInternal(qry, Operation::QRY_SCAN, err);
 }
 
 void CacheImpl::Invoke(InputOperation& inOp, OutputOperation& outOp,
-                       IgniteError& err) {
+                       DocumentDbError& err) {
   OutInOpX(Operation::INVOKE, inOp, outOp, err);
 }
 
 void CacheImpl::InvokeJava(InputOperation& inOp, OutputOperation& outOp,
-                           IgniteError& err) {
+                           DocumentDbError& err) {
   OutInOpX(Operation::INVOKE_JAVA, inOp, outOp, err);
 }
 
 QueryCursorImpl* CacheImpl::QuerySqlFields(const SqlFieldsQuery& qry,
-                                           IgniteError& err) {
+                                           DocumentDbError& err) {
   return QueryInternal(qry, Operation::QRY_SQL_FIELDS, err);
 }
 
 ContinuousQueryHandleImpl* CacheImpl::QueryContinuous(
     const SharedPointer< ContinuousQueryImplBase > qry,
-    const SqlQuery& initialQry, IgniteError& err) {
+    const SqlQuery& initialQry, DocumentDbError& err) {
   return QueryContinuous(qry, initialQry, Operation::QRY_SQL,
                          Operation::QRY_CONTINUOUS, err);
 }
 
 ContinuousQueryHandleImpl* CacheImpl::QueryContinuous(
     const SharedPointer< ContinuousQueryImplBase > qry,
-    const TextQuery& initialQry, IgniteError& err) {
+    const TextQuery& initialQry, DocumentDbError& err) {
   return QueryContinuous(qry, initialQry, Operation::QRY_TEXT,
                          Operation::QRY_CONTINUOUS, err);
 }
 
 ContinuousQueryHandleImpl* CacheImpl::QueryContinuous(
     const SharedPointer< ContinuousQueryImplBase > qry,
-    const ScanQuery& initialQry, IgniteError& err) {
+    const ScanQuery& initialQry, DocumentDbError& err) {
   return QueryContinuous(qry, initialQry, Operation::QRY_SCAN,
                          Operation::QRY_CONTINUOUS, err);
 }
 
-void CacheImpl::LoadCache(IgniteError& err) {
+void CacheImpl::LoadCache(DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   SharedPointer< InteropMemory > mem = GetEnvironment().AllocateMemory();
@@ -351,11 +351,11 @@ void CacheImpl::LoadCache(IgniteError& err) {
 
   InStreamOutLong(Operation::LOAD_CACHE, *mem.Get(), err);
 
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 }
 
-void CacheImpl::LocalLoadCache(IgniteError& err) {
+void CacheImpl::LocalLoadCache(DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   SharedPointer< InteropMemory > mem = GetEnvironment().AllocateMemory();
@@ -372,7 +372,7 @@ void CacheImpl::LocalLoadCache(IgniteError& err) {
 
   InStreamOutLong(Operation::LOC_LOAD_CACHE, *mem.Get(), err);
 
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 }
 
@@ -383,14 +383,14 @@ struct Dummy {
 };
 
 ContinuousQueryHandleImpl* CacheImpl::QueryContinuous(
-    const SharedPointer< ContinuousQueryImplBase > qry, IgniteError& err) {
+    const SharedPointer< ContinuousQueryImplBase > qry, DocumentDbError& err) {
   Dummy dummy;
   return QueryContinuous(qry, dummy, -1, Operation::QRY_CONTINUOUS, err);
 }
 
 template < typename T >
 QueryCursorImpl* CacheImpl::QueryInternal(const T& qry, int32_t typ,
-                                          IgniteError& err) {
+                                          DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   SharedPointer< InteropMemory > mem = GetEnvironment().AllocateMemory();
@@ -406,7 +406,7 @@ QueryCursorImpl* CacheImpl::QueryInternal(const T& qry, int32_t typ,
   jobject qryJavaRef = GetEnvironment().Context()->CacheOutOpQueryCursor(
       GetTarget(), typ, mem.Get()->PointerLong(), &jniErr);
 
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
   if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
@@ -418,7 +418,7 @@ QueryCursorImpl* CacheImpl::QueryInternal(const T& qry, int32_t typ,
 template < typename T >
 ContinuousQueryHandleImpl* CacheImpl::QueryContinuous(
     const SharedPointer< ContinuousQueryImplBase > qry, const T& initialQry,
-    int32_t typ, int32_t cmd, IgniteError& err) {
+    int32_t typ, int32_t cmd, DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   SharedPointer< InteropMemory > mem = GetEnvironment().AllocateMemory();
@@ -455,7 +455,7 @@ ContinuousQueryHandleImpl* CacheImpl::QueryContinuous(
   jobject qryJavaRef = GetEnvironment().Context()->CacheOutOpContinuousQuery(
       GetTarget(), cmd, mem.Get()->PointerLong(), &jniErr);
 
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
   if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
@@ -467,4 +467,4 @@ ContinuousQueryHandleImpl* CacheImpl::QueryContinuous(
 }  // namespace cache
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

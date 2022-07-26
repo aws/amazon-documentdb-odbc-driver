@@ -15,21 +15,21 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/dsn_config.h"
+#include "documentdb/odbc/dsn_config.h"
 
-#include <ignite/odbc/common/fixed_size_array.h>
+#include <documentdb/odbc/common/fixed_size_array.h>
 
-#include "ignite/odbc/config/config_tools.h"
-#include "ignite/odbc/config/connection_string_parser.h"
-#include "ignite/odbc/system/odbc_constants.h"
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/config/config_tools.h"
+#include "documentdb/odbc/config/connection_string_parser.h"
+#include "documentdb/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/utility.h"
 
-using namespace ignite::odbc::config;
+using namespace documentdb::odbc::config;
 
 #define BUFFER_SIZE (1024 * 1024)
 #define CONFIG_FILE u8"ODBC.INI"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 void ThrowLastSetupError() {
   DWORD code;
@@ -43,7 +43,7 @@ void ThrowLastSetupError() {
       << utility::SqlWcharToString(msg.GetData(), msg.GetSize())
       << "\", Code: " << code;
 
-  throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, buf.str().c_str());
+  throw DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC, buf.str().c_str());
 }
 
 void WriteDsnString(const char* dsn, const char* key, const char* value) {
@@ -286,4 +286,4 @@ void ReadDsnConfiguration(const char* dsn, Configuration& config,
     config.SetDefaultFetchSize(defaultFetchSize.GetValue());
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/utils.h>
-#include <ignite/odbc/odbc_error.h>
-#include <ignite/odbc/sql/sql_parser.h>
-#include <ignite/odbc/sql/sql_set_streaming_command.h>
+#include <documentdb/odbc/common/utils.h>
+#include <documentdb/odbc/odbc_error.h>
+#include <documentdb/odbc/sql/sql_parser.h>
+#include <documentdb/odbc/sql/sql_set_streaming_command.h>
 
 const static std::string WORD_SET("set");
 
 const static std::string WORD_STREAMING("streaming");
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 SqlParser::SqlParser(const std::string& sql) : lexer(sql) {
   // No-op.
@@ -80,4 +80,4 @@ std::shared_ptr< SqlCommand > SqlParser::ProcessCommand() {
                   "Unexpected token: '" + token.ToString() + "'");
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

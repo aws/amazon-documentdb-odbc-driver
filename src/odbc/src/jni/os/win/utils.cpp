@@ -15,23 +15,23 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/common/utils.h"
+#include "documentdb/odbc/common/utils.h"
 
 #include <windows.h>
 
 #include <algorithm>
 
-#include "ignite/odbc/common/concurrent.h"
-#include "ignite/odbc/common/fixed_size_array.h"
-#include "ignite/odbc/jni/java.h"
-#include "ignite/odbc/jni/utils.h"
+#include "documentdb/odbc/common/concurrent.h"
+#include "documentdb/odbc/common/fixed_size_array.h"
+#include "documentdb/odbc/jni/java.h"
+#include "documentdb/odbc/jni/utils.h"
 
-using namespace ignite::odbc::common;
-using namespace ignite::odbc::common::concurrent;
+using namespace documentdb::odbc::common;
+using namespace documentdb::odbc::common::concurrent;
 
-using namespace ignite::odbc::jni::java;
+using namespace documentdb::odbc::jni::java;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace jni {
 const char* JAVA_HOME = "JAVA_HOME";
@@ -361,7 +361,7 @@ std::string ResolveDocumentDbHome(const std::string& path) {
 }
 }  // namespace jni
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb
 
 BOOL WINAPI DllMain(_In_ HINSTANCE hinstDLL, _In_ DWORD fdwReason,
                     _In_ LPVOID lpvReserved) {

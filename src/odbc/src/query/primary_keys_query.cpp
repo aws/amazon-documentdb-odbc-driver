@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/query/primary_keys_query.h"
+#include "documentdb/odbc/query/primary_keys_query.h"
 
-#include "ignite/odbc/connection.h"
-#include "ignite/odbc/impl/binary/binary_common.h"
-#include "ignite/odbc/message.h"
-#include "ignite/odbc/type_traits.h"
+#include "documentdb/odbc/connection.h"
+#include "documentdb/odbc/impl/binary/binary_common.h"
+#include "documentdb/odbc/message.h"
+#include "documentdb/odbc/type_traits.h"
 
 namespace {
 struct ResultColumn {
@@ -46,7 +46,7 @@ struct ResultColumn {
 };
 }  // namespace
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace query {
 PrimaryKeysQuery::PrimaryKeysQuery(
@@ -62,8 +62,8 @@ PrimaryKeysQuery::PrimaryKeysQuery(
       executed(false),
       fetched(false),
       columnsMeta() {
-  using namespace ignite::odbc::impl::binary;
-  using namespace ignite::odbc::type_traits;
+  using namespace documentdb::odbc::impl::binary;
+  using namespace documentdb::odbc::type_traits;
 
   using meta::ColumnMeta;
   using meta::Nullability;
@@ -209,11 +209,11 @@ SqlResult::Type PrimaryKeysQuery::NextResultSet() {
 }
 
 SqlResult::Type PrimaryKeysQuery::MakeRequestGetPrimaryKeysMeta() {
-  IgniteError error;
+  DocumentDbError error;
   SharedPointer< DatabaseMetaData > databaseMetaData =
       connection.GetMetaData(error);
   if (!databaseMetaData.IsValid()
-      || error.GetCode() != IgniteError::IGNITE_SUCCESS) {
+      || error.GetCode() != DocumentDbError::IGNITE_SUCCESS) {
     diag.AddStatusRecord(error.GetText());
     return SqlResult::AI_ERROR;
   }
@@ -242,4 +242,4 @@ SqlResult::Type PrimaryKeysQuery::MakeRequestGetPrimaryKeysMeta() {
 }
 }  // namespace query
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

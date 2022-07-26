@@ -23,20 +23,20 @@
 #include <string>
 #include <vector>
 
-#include "ignite/ignition.h"
-#include "ignite/odbc/impl/binary/binary_utils.h"
-#include "ignite/odbc/config/connection_info.h"
-#include "ignite/odbc/system/odbc_constants.h"
+#include "documentdb/ignition.h"
+#include "documentdb/odbc/impl/binary/binary_utils.h"
+#include "documentdb/odbc/config/connection_info.h"
+#include "documentdb/odbc/system/odbc_constants.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"
 #include "test_utils.h"
 
-using namespace ignite;
+using namespace documentdb;
 using namespace ignite_test;
 
 using namespace boost::unit_test;
 
-using ignite::impl::binary::BinaryUtils;
+using documentdb::impl::binary::BinaryUtils;
 
 /**
  * Test setup fixture.

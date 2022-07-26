@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/protocol_version.h"
+#include "documentdb/odbc/protocol_version.h"
 
-#include <ignite/odbc/ignite_error.h>
+#include <documentdb/odbc/documentdb_error.h>
 
 #include <sstream>
 
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/utility.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 const ProtocolVersion ProtocolVersion::VERSION_2_1_0(2, 1, 0);
 const ProtocolVersion ProtocolVersion::VERSION_2_1_5(2, 1, 5);
@@ -62,7 +62,7 @@ const ProtocolVersion& ProtocolVersion::GetCurrent() {
 }
 
 void ThrowParseError() {
-  throw IgniteError(IgniteError::IGNITE_ERR_GENERIC,
+  throw DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
                     "Invalid version format. Valid format is X.Y.Z, where X, Y "
                     "and Z are major, "
                     "minor and maintenance version parts of Ignite since which "
@@ -157,4 +157,4 @@ bool operator>=(const ProtocolVersion& val1, const ProtocolVersion& val2) {
   return val1.Compare(val2) >= 0;
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/diagnostic/diagnosable_adapter.h"
+#include "documentdb/odbc/diagnostic/diagnosable_adapter.h"
 
-#include "ignite/odbc/connection.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/odbc_error.h"
+#include "documentdb/odbc/connection.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/odbc_error.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace diagnostic {
 void DiagnosableAdapter::AddStatusRecord(SqlState::Type sqlState,
@@ -57,4 +57,4 @@ void DiagnosableAdapter::AddStatusRecord(const DiagnosticRecord& rec) {
 }
 }  // namespace diagnostic
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

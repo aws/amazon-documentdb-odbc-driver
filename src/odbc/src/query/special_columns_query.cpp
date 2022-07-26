@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/query/special_columns_query.h"
+#include "documentdb/odbc/query/special_columns_query.h"
 
-#include "ignite/odbc/impl/binary/binary_common.h"
+#include "documentdb/odbc/impl/binary/binary_common.h"
 
-#include "ignite/odbc/type_traits.h"
+#include "documentdb/odbc/type_traits.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace query {
 SpecialColumnsQuery::SpecialColumnsQuery(diagnostic::DiagnosableAdapter& diag,
@@ -39,8 +39,8 @@ SpecialColumnsQuery::SpecialColumnsQuery(diagnostic::DiagnosableAdapter& diag,
       nullable(nullable),
       executed(false),
       columnsMeta() {
-  using namespace ignite::odbc::impl::binary;
-  using namespace ignite::odbc::type_traits;
+  using namespace documentdb::odbc::impl::binary;
+  using namespace documentdb::odbc::type_traits;
 
   using meta::ColumnMeta;
   using meta::Nullability;
@@ -125,4 +125,4 @@ SqlResult::Type SpecialColumnsQuery::NextResultSet() {
 }
 }  // namespace query
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

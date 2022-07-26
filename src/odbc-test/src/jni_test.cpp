@@ -19,22 +19,22 @@
 #include <Windows.h>
 #endif
 
-#include <ignite/odbc/common/common.h>
-#include <ignite/odbc/common/concurrent.h>
-#include <ignite/odbc/config/connection_string_parser.h>
-#include <ignite/odbc/connection.h>
-#include <ignite/odbc/dsn_config.h>
-#include <ignite/odbc/ignite_error.h>
-#include <ignite/odbc/jni/database_metadata.h>
-#include <ignite/odbc/jni/documentdb_connection.h>
-#include <ignite/odbc/jni/documentdb_connection_properties.h>
-#include <ignite/odbc/jni/documentdb_database_metadata.h>
-#include <ignite/odbc/jni/documentdb_mql_query_context.h>
-#include <ignite/odbc/jni/documentdb_query_mapping_service.h>
-#include <ignite/odbc/jni/java.h>
-#include <ignite/odbc/jni/jdbc_column_metadata.h>
-#include <ignite/odbc/jni/result_set.h>
-#include <ignite/odbc/jni/utils.h>
+#include <documentdb/odbc/common/common.h>
+#include <documentdb/odbc/common/concurrent.h>
+#include <documentdb/odbc/config/connection_string_parser.h>
+#include <documentdb/odbc/connection.h>
+#include <documentdb/odbc/dsn_config.h>
+#include <documentdb/odbc/documentdb_error.h>
+#include <documentdb/odbc/jni/database_metadata.h>
+#include <documentdb/odbc/jni/documentdb_connection.h>
+#include <documentdb/odbc/jni/documentdb_connection_properties.h>
+#include <documentdb/odbc/jni/documentdb_database_metadata.h>
+#include <documentdb/odbc/jni/documentdb_mql_query_context.h>
+#include <documentdb/odbc/jni/documentdb_query_mapping_service.h>
+#include <documentdb/odbc/jni/java.h>
+#include <documentdb/odbc/jni/jdbc_column_metadata.h>
+#include <documentdb/odbc/jni/result_set.h>
+#include <documentdb/odbc/jni/utils.h>
 #include <sql.h>
 #include <sqlext.h>
 
@@ -49,29 +49,29 @@
 #include "test_utils.h"
 
 using namespace boost::unit_test;
-using namespace ignite::odbc::impl::binary;
+using namespace documentdb::odbc::impl::binary;
 
-using ignite::odbc::OdbcTestSuite;
+using documentdb::odbc::OdbcTestSuite;
 using ignite_test::GetOdbcErrorMessage;
 
-using ignite::odbc::Connection;
-using ignite::odbc::common::ReleaseChars;
-using ignite::odbc::common::concurrent::SharedPointer;
-using ignite::odbc::config::Configuration;
-using ignite::odbc::config::ConnectionStringParser;
-using ignite::odbc::jni::DatabaseMetaData;
-using ignite::odbc::jni::DocumentDbConnection;
-using ignite::odbc::jni::DocumentDbConnectionProperties;
-using ignite::odbc::jni::DocumentDbDatabaseMetadata;
-using ignite::odbc::jni::DocumentDbMqlQueryContext;
-using ignite::odbc::jni::DocumentDbQueryMappingService;
-using ignite::odbc::jni::JdbcColumnMetadata;
-using ignite::odbc::jni::ResolveDocumentDbHome;
-using ignite::odbc::jni::ResultSet;
-using ignite::odbc::jni::java::BuildJvmOptions;
-using ignite::odbc::jni::java::JniErrorCode;
-using ignite::odbc::jni::java::JniErrorInfo;
-using ignite::odbc::jni::java::JniHandlers;
+using documentdb::odbc::Connection;
+using documentdb::odbc::common::ReleaseChars;
+using documentdb::odbc::common::concurrent::SharedPointer;
+using documentdb::odbc::config::Configuration;
+using documentdb::odbc::config::ConnectionStringParser;
+using documentdb::odbc::jni::DatabaseMetaData;
+using documentdb::odbc::jni::DocumentDbConnection;
+using documentdb::odbc::jni::DocumentDbConnectionProperties;
+using documentdb::odbc::jni::DocumentDbDatabaseMetadata;
+using documentdb::odbc::jni::DocumentDbMqlQueryContext;
+using documentdb::odbc::jni::DocumentDbQueryMappingService;
+using documentdb::odbc::jni::JdbcColumnMetadata;
+using documentdb::odbc::jni::ResolveDocumentDbHome;
+using documentdb::odbc::jni::ResultSet;
+using documentdb::odbc::jni::java::BuildJvmOptions;
+using documentdb::odbc::jni::java::JniErrorCode;
+using documentdb::odbc::jni::java::JniErrorInfo;
+using documentdb::odbc::jni::java::JniHandlers;
 
 /**
  * Test setup fixture.

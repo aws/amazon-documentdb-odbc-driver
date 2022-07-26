@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/concurrent.h>
-#include <ignite/odbc/jni/java.h>
-#include <ignite/odbc/jni/result_set.h>
-#include <ignite/odbc/log.h>
+#include <documentdb/odbc/common/concurrent.h>
+#include <documentdb/odbc/jni/java.h>
+#include <documentdb/odbc/jni/result_set.h>
+#include <documentdb/odbc/log.h>
 
-using ignite::odbc::common::concurrent::SharedPointer;
-using ignite::odbc::jni::java::GlobalJObject;
-using ignite::odbc::jni::java::JniContext;
-using ignite::odbc::jni::java::JniErrorInfo;
+using documentdb::odbc::common::concurrent::SharedPointer;
+using documentdb::odbc::jni::java::GlobalJObject;
+using documentdb::odbc::jni::java::JniContext;
+using documentdb::odbc::jni::java::JniErrorInfo;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace jni {
 ResultSet::ResultSet(SharedPointer< JniContext >& jniContext,
@@ -109,4 +109,4 @@ JniErrorCode ResultSet::GetSmallInt(const std::string& columnName,
 }
 }  // namespace jni
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

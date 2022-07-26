@@ -21,7 +21,7 @@
 
 #include <sql.h>
 #include <sqltypes.h>
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/utility.h"
 #include <sqlext.h>
 
 #include <boost/test/unit_test.hpp>
@@ -29,18 +29,18 @@
 #include <string>
 #include <vector>
 
-#include "ignite/odbc/impl/binary/binary_utils.h"
+#include "documentdb/odbc/impl/binary/binary_utils.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"
 #include "test_utils.h"
 
-using namespace ignite;
-using namespace ignite::odbc::common;
+using namespace documentdb;
+using namespace documentdb::odbc::common;
 using namespace ignite_test;
 
 using namespace boost::unit_test;
 
-using ignite::odbc::impl::binary::BinaryUtils;
+using documentdb::odbc::impl::binary::BinaryUtils;
 
 /**
  * Test setup fixture.

@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/impl/binary/binary_object_header.h>
-#include <ignite/odbc/impl/binary/binary_object_impl.h>
-#include <ignite/odbc/impl/binary/binary_utils.h>
-#include <ignite/odbc/impl/interop/interop_input_stream.h>
-#include <ignite/odbc/impl/interop/interop_stream_position_guard.h>
+#include <documentdb/odbc/impl/binary/binary_object_header.h>
+#include <documentdb/odbc/impl/binary/binary_object_impl.h>
+#include <documentdb/odbc/impl/binary/binary_utils.h>
+#include <documentdb/odbc/impl/interop/interop_input_stream.h>
+#include <documentdb/odbc/impl/interop/interop_stream_position_guard.h>
 
 #include <cassert>
 
-using namespace ignite::odbc::impl::binary;
+using namespace documentdb::odbc::impl::binary;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace binary {
@@ -47,7 +47,7 @@ BinaryObjectImpl::BinaryObjectImpl(interop::InteropMemory& mem, int32_t start,
     this->start += portOff + 5;
   } else if (hdr != IGNITE_TYPE_OBJECT) {
     IGNITE_ERROR_FORMATTED_3(
-        IgniteError::IGNITE_ERR_BINARY,
+        DocumentDbError::IGNITE_ERR_BINARY,
         "Memory layuout does not look like a binary object", "memPtr",
         mem.Data(), "pos", start, "header", hdr);
   }
@@ -114,7 +114,7 @@ bool BinaryObjectImpl::HasField(const char* name) const {
 }
 
 int32_t BinaryObjectImpl::GetEnumValue() const {
-  throw IgniteError(IgniteError::IGNITE_ERR_BINARY,
+  throw DocumentDbError(DocumentDbError::IGNITE_ERR_BINARY,
                     "GetEnumValue is only supported for enums.");
 }
 
@@ -161,7 +161,7 @@ int32_t BinaryObjectImpl::FindField(const int32_t fieldId) const {
   int32_t footerEnd = footerBegin + header.GetFooterLength();
 
   if ((mem->Length() - start) < footerEnd) {
-    IGNITE_ERROR_FORMATTED_3(IgniteError::IGNITE_ERR_BINARY,
+    IGNITE_ERROR_FORMATTED_3(DocumentDbError::IGNITE_ERR_BINARY,
                              "Not enough data in the binary object", "memPtr",
                              mem->PointerLong(), "len", (mem->Length() - start),
                              "footerEnd", footerEnd);
@@ -215,4 +215,4 @@ void BinaryObjectImpl::CheckIdResolver() const {
 }  // namespace binary
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/meta/foreign_key_meta.h"
+#include "documentdb/odbc/meta/foreign_key_meta.h"
 
-#include "ignite/odbc/impl/binary/binary_common.h"
-#include "ignite/odbc/common/utils.h"
-#include "ignite/odbc/common_types.h"
-#include "ignite/odbc/jni/java.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/system/odbc_constants.h"
-#include "ignite/odbc/type_traits.h"
+#include "documentdb/odbc/impl/binary/binary_common.h"
+#include "documentdb/odbc/common/utils.h"
+#include "documentdb/odbc/common_types.h"
+#include "documentdb/odbc/jni/java.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/type_traits.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace meta {
 const std::string PKTABLE_CAT = "PKTABLE_CAT";
@@ -87,4 +87,4 @@ void ReadForeignKeysColumnMetaVector(SharedPointer< ResultSet >& resultSet,
 
 }  // namespace meta
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

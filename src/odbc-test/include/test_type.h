@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-#ifndef _IGNITE_ODBC_TEST_TEST_TYPE
-#define _IGNITE_ODBC_TEST_TEST_TYPE
+#ifndef _DOCUMENTDB_ODBC_TEST_TEST_TYPE
+#define _DOCUMENTDB_ODBC_TEST_TEST_TYPE
 
 #include <string>
-#include <ignite/odbc/guid.h>
-#include <ignite/odbc/binary/binary.h>
-#include <ignite/odbc/date.h>
+#include <documentdb/odbc/guid.h>
+#include <documentdb/odbc/binary/binary.h>
+#include <documentdb/odbc/date.h>
 
-using namespace ignite::odbc;
+using namespace documentdb::odbc;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 struct TestType {
   TestType()
@@ -92,9 +92,9 @@ struct TestType {
 };
 
 namespace binary {
-IGNITE_BINARY_TYPE_START(ignite::odbc::TestType)
+IGNITE_BINARY_TYPE_START(documentdb::odbc::TestType)
 
-typedef ignite::odbc::TestType TestType;
+typedef documentdb::odbc::TestType TestType;
 
 IGNITE_BINARY_GET_TYPE_ID_AS_HASH(TestType)
 IGNITE_BINARY_GET_TYPE_NAME_AS_IS(TestType)
@@ -163,6 +163,6 @@ static void Read(BinaryReader& reader, TestType& dst) {
 IGNITE_BINARY_TYPE_END
 }  // namespace binary
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb
 
-#endif  // _IGNITE_ODBC_TEST_TEST_TYPE
+#endif  // _DOCUMENTDB_ODBC_TEST_TEST_TYPE

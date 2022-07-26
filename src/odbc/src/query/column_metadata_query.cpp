@@ -15,26 +15,26 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/query/column_metadata_query.h"
+#include "documentdb/odbc/query/column_metadata_query.h"
 
 #include <vector>
 
-#include "ignite/odbc/common/concurrent.h"
-#include "ignite/odbc/connection.h"
-#include "ignite/odbc/ignite_error.h"
-#include "ignite/odbc/impl/binary/binary_common.h"
-#include "ignite/odbc/jni/database_metadata.h"
-#include "ignite/odbc/jni/java.h"
-#include "ignite/odbc/jni/result_set.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/message.h"
-#include "ignite/odbc/odbc_error.h"
-#include "ignite/odbc/type_traits.h"
+#include "documentdb/odbc/common/concurrent.h"
+#include "documentdb/odbc/connection.h"
+#include "documentdb/odbc/documentdb_error.h"
+#include "documentdb/odbc/impl/binary/binary_common.h"
+#include "documentdb/odbc/jni/database_metadata.h"
+#include "documentdb/odbc/jni/java.h"
+#include "documentdb/odbc/jni/result_set.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/message.h"
+#include "documentdb/odbc/odbc_error.h"
+#include "documentdb/odbc/type_traits.h"
 
-using ignite::odbc::IgniteError;
-using ignite::odbc::common::concurrent::SharedPointer;
-using ignite::odbc::jni::DatabaseMetaData;
-using ignite::odbc::jni::java::JniErrorInfo;
+using documentdb::odbc::DocumentDbError;
+using documentdb::odbc::common::concurrent::SharedPointer;
+using documentdb::odbc::jni::DatabaseMetaData;
+using documentdb::odbc::jni::java::JniErrorInfo;
 
 namespace {
 struct ResultColumn {
@@ -98,7 +98,7 @@ struct ResultColumn {
 };
 }  // namespace
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace query {
 ColumnMetadataQuery::ColumnMetadataQuery(
@@ -116,8 +116,8 @@ ColumnMetadataQuery::ColumnMetadataQuery(
       fetched(false),
       meta(),
       columnsMeta() {
-  using namespace ignite::odbc::impl::binary;
-  using namespace ignite::odbc::type_traits;
+  using namespace documentdb::odbc::impl::binary;
+  using namespace documentdb::odbc::type_traits;
 
   using meta::ColumnMeta;
   using meta::Nullability;
@@ -370,11 +370,11 @@ SqlResult::Type ColumnMetadataQuery::NextResultSet() {
 }
 
 SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
-  IgniteError error;
+  DocumentDbError error;
   SharedPointer< DatabaseMetaData > databaseMetaData =
       connection.GetMetaData(error);
   if (!databaseMetaData.IsValid()
-      || error.GetCode() != IgniteError::IGNITE_SUCCESS) {
+      || error.GetCode() != DocumentDbError::IGNITE_SUCCESS) {
     diag.AddStatusRecord(error.GetText());
     return SqlResult::AI_ERROR;
   }
@@ -415,4 +415,4 @@ SqlResult::Type ColumnMetadataQuery::MakeRequestGetColumnsMeta() {
 }
 }  // namespace query
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

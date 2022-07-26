@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/ssl_mode.h"
+#include "documentdb/odbc/ssl_mode.h"
 
-#include <ignite/odbc/common/utils.h>
+#include <documentdb/odbc/common/utils.h>
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace ssl {
 SslMode::Type SslMode::FromString(const std::string& val, Type dflt) {
@@ -51,4 +51,4 @@ std::string SslMode::ToString(Type val) {
 }
 }  // namespace ssl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

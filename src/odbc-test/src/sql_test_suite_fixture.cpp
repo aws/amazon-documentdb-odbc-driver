@@ -21,7 +21,7 @@
 
 using namespace ignite_test;
 
-namespace ignite {
+namespace documentdb {
 SqlTestSuiteFixture::SqlTestSuiteFixture()
     : testCache(0), env(NULL), dbc(NULL), stmt(NULL) {
   grid = StartPlatformNode("queries-test.xml", "NodeMain");
@@ -77,7 +77,7 @@ SqlTestSuiteFixture::~SqlTestSuiteFixture() {
   SQLFreeHandle(SQL_HANDLE_DBC, dbc);
   SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  ignite::Ignition::StopAll(true);
+  documentdb::Ignition::StopAll(true);
 }
 
 void SqlTestSuiteFixture::CheckSingleResult0(const char* request,
@@ -183,8 +183,8 @@ void SqlTestSuiteFixture::CheckSingleResult< bool >(const char* request,
 }
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< ignite::Guid >(
-    const char* request, const ignite::Guid& expected) {
+void SqlTestSuiteFixture::CheckSingleResult< documentdb::Guid >(
+    const char* request, const documentdb::Guid& expected) {
   SQLGUID res;
 
   memset(&res, 0, sizeof(res));
@@ -287,13 +287,13 @@ void SqlTestSuiteFixture::CheckSingleResult< std::vector< int8_t > >(
 }
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< ignite::common::Decimal >(
-    const char* request, const ignite::common::Decimal& expected) {
+void SqlTestSuiteFixture::CheckSingleResult< documentdb::common::Decimal >(
+    const char* request, const documentdb::common::Decimal& expected) {
   SQLCHAR res[ODBC_BUFFER_SIZE] = {0};
   SQLLEN resLen = 0;
 
   CheckSingleResult0(request, SQL_C_CHAR, res, ODBC_BUFFER_SIZE, &resLen);
-  ignite::common::Decimal actual(std::string(res, res + resLen));
+  documentdb::common::Decimal actual(std::string(res, res + resLen));
   BOOST_REQUIRE_EQUAL(actual, expected);
 }
 
@@ -304,7 +304,7 @@ void SqlTestSuiteFixture::CheckSingleResult< Date >(const char* request,
 
   CheckSingleResult0(request, SQL_C_TYPE_DATE, &res, 0, 0);
 
-  using ignite::impl::binary::BinaryUtils;
+  using documentdb::impl::binary::BinaryUtils;
   Date actual = common::MakeDateGmt(res.year, res.month, res.day);
   BOOST_REQUIRE_EQUAL(actual.GetSeconds(), expected.GetSeconds());
 }
@@ -316,7 +316,7 @@ void SqlTestSuiteFixture::CheckSingleResult< Timestamp >(
 
   CheckSingleResult0(request, SQL_C_TYPE_TIMESTAMP, &res, 0, 0);
 
-  using ignite::impl::binary::BinaryUtils;
+  using documentdb::impl::binary::BinaryUtils;
   Timestamp actual =
       common::MakeTimestampGmt(res.year, res.month, res.day, res.hour,
                                res.minute, res.second, res.fraction);
@@ -332,9 +332,9 @@ void SqlTestSuiteFixture::CheckSingleResult< Time >(const char* request,
 
   CheckSingleResult0(request, SQL_C_TYPE_TIME, &res, 0, 0);
 
-  using ignite::impl::binary::BinaryUtils;
+  using documentdb::impl::binary::BinaryUtils;
   Time actual = common::MakeTimeGmt(res.hour, res.minute, res.second);
 
   BOOST_REQUIRE_EQUAL(actual.GetSeconds(), expected.GetSeconds());
 }
-}  // namespace ignite
+}  // namespace documentdb

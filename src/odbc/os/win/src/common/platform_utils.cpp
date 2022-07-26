@@ -16,13 +16,13 @@
  */
 
 #include <Windows.h>
-#include <ignite/odbc/common/platform_utils.h>
-#include <ignite/odbc/utility.h>
+#include <documentdb/odbc/common/platform_utils.h>
+#include <documentdb/odbc/utility.h>
 #include <time.h>
 
 #include <vector>
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace common {
 time_t IgniteTimeGm(const tm& time) {
@@ -127,4 +127,4 @@ IGNITE_IMPORT_EXPORT unsigned GetRandSeed() {
 }
 }  // namespace common
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

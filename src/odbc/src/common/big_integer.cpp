@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/common/big_integer.h"
+#include "documentdb/odbc/common/big_integer.h"
 
-#include "ignite/odbc/common/bits.h"
-#include "ignite/odbc/ignite_error.h"
+#include "documentdb/odbc/common/bits.h"
+#include "documentdb/odbc/documentdb_error.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace common {
 BigInteger::BigInteger() : sign(1), mag() {
@@ -572,7 +572,7 @@ void BigInteger::Divide(const BigInteger& divisor, BigInteger& res,
                         BigInteger* rem) const {
   // Can't divide by zero.
   if (divisor.mag.IsEmpty())
-    throw IgniteError(IgniteError::IGNITE_ERR_ILLEGAL_ARGUMENT,
+    throw DocumentDbError(DocumentDbError::IGNITE_ERR_ILLEGAL_ARGUMENT,
                       "Division by zero.");
 
   int32_t compRes = Compare(divisor, true);
@@ -770,4 +770,4 @@ bool operator>=(const BigInteger& val1, const BigInteger& val2) {
 }
 }  // namespace common
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

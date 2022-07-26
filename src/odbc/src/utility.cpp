@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/utility.h"
 
-#include <ignite/odbc/impl/binary/binary_utils.h>
+#include <documentdb/odbc/impl/binary/binary_utils.h>
 
 #include <cassert>
 #include <codecvt>
 
-#include "ignite/odbc/system/odbc_constants.h"
-#include "ignite/odbc/log.h"
+#include "documentdb/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/log.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace utility {
 using namespace odbc::impl::binary;
@@ -378,4 +378,4 @@ std::string HexDump(const void* data, size_t count) {
 }
 }  // namespace utility
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

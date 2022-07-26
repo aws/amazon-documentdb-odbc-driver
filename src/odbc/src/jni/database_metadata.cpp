@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/concurrent.h>
-#include <ignite/odbc/ignite_error.h>
-#include <ignite/odbc/jni/database_metadata.h>
-#include <ignite/odbc/jni/java.h>
+#include <documentdb/odbc/common/concurrent.h>
+#include <documentdb/odbc/documentdb_error.h>
+#include <documentdb/odbc/jni/database_metadata.h>
+#include <documentdb/odbc/jni/java.h>
 
-using ignite::odbc::common::concurrent::SharedPointer;
-using ignite::odbc::jni::ResultSet;
-using ignite::odbc::jni::java::GlobalJObject;
-using ignite::odbc::jni::java::JniContext;
-using ignite::odbc::jni::java::JniErrorCode;
-using ignite::odbc::jni::java::JniErrorInfo;
+using documentdb::odbc::common::concurrent::SharedPointer;
+using documentdb::odbc::jni::ResultSet;
+using documentdb::odbc::jni::java::GlobalJObject;
+using documentdb::odbc::jni::java::JniContext;
+using documentdb::odbc::jni::java::JniErrorCode;
+using documentdb::odbc::jni::java::JniErrorInfo;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace jni {
 SharedPointer< ResultSet > DatabaseMetaData::GetTables(
@@ -91,4 +91,4 @@ SharedPointer< ResultSet > DatabaseMetaData::GetImportedKeys(
 }
 }  // namespace jni
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

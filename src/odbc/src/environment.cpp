@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/environment.h"
+#include "documentdb/odbc/environment.h"
 
 #include <cstdlib>
 
-#include "ignite/odbc/connection.h"
-#include "ignite/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/connection.h"
+#include "documentdb/odbc/system/odbc_constants.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 Environment::Environment()
     : connections(), odbcVersion(SQL_OV_ODBC3), odbcNts(SQL_TRUE) {
@@ -141,4 +141,4 @@ SqlResult::Type Environment::InternalGetAttribute(
   return SqlResult::AI_ERROR;
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

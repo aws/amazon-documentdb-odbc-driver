@@ -15,43 +15,43 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/binary/binary_reader.h>
-#include <ignite/odbc/binary/binary_writer.h>
-#include <ignite/odbc/impl/binary/binary_type_impl.h>
+#include <documentdb/odbc/binary/binary_reader.h>
+#include <documentdb/odbc/binary/binary_writer.h>
+#include <documentdb/odbc/impl/binary/binary_type_impl.h>
 
 #include <cstring>
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace binary {
-int32_t BinaryType< IgniteError >::GetTypeId() {
-  return GetBinaryStringHashCode("IgniteError");
+int32_t BinaryType< DocumentDbError >::GetTypeId() {
+  return GetBinaryStringHashCode("DocumentDbError");
 }
 
-int32_t BinaryType< IgniteError >::GetFieldId(const char* name) {
+int32_t BinaryType< DocumentDbError >::GetFieldId(const char* name) {
   return GetBinaryStringHashCode(name);
 }
 
-void BinaryType< IgniteError >::GetNull(IgniteError& dst) {
-  dst = IgniteError(0, 0);
+void BinaryType< DocumentDbError >::GetNull(DocumentDbError& dst) {
+  dst = DocumentDbError(0, 0);
 }
 
-void BinaryType< IgniteError >::Write(BinaryWriter& writer,
-                                      const IgniteError& obj) {
+void BinaryType< DocumentDbError >::Write(BinaryWriter& writer,
+                                      const DocumentDbError& obj) {
   BinaryRawWriter raw = writer.RawWriter();
 
   raw.WriteInt32(obj.GetCode());
   raw.WriteString(obj.GetText(), static_cast< int32_t >(strlen(obj.GetText())));
 }
 
-void BinaryType< IgniteError >::Read(BinaryReader& reader, IgniteError& dst) {
+void BinaryType< DocumentDbError >::Read(BinaryReader& reader, DocumentDbError& dst) {
   BinaryRawReader raw = reader.RawReader();
 
   int32_t code = raw.ReadInt32();
   std::string msg = raw.ReadObject< std::string >();
 
-  dst = IgniteError(code, msg.c_str());
+  dst = DocumentDbError(code, msg.c_str());
 }
 }  // namespace binary
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

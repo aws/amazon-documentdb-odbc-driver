@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/driver_instance.h"
+#include "documentdb/odbc/driver_instance.h"
 
 #include <mongocxx/instance.hpp>
 

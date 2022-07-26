@@ -15,31 +15,31 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/statement.h"
+#include "documentdb/odbc/statement.h"
 
 #include <boost/optional.hpp>
 #include <limits>
 
-#include "ignite/odbc/connection.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/message.h"
-#include "ignite/odbc/odbc_error.h"
-#include "ignite/odbc/query/batch_query.h"
-#include "ignite/odbc/query/column_metadata_query.h"
-#include "ignite/odbc/query/data_query.h"
-#include "ignite/odbc/query/foreign_keys_query.h"
-#include "ignite/odbc/query/internal_query.h"
-#include "ignite/odbc/query/primary_keys_query.h"
-#include "ignite/odbc/query/special_columns_query.h"
-#include "ignite/odbc/query/table_metadata_query.h"
-#include "ignite/odbc/query/type_info_query.h"
-#include "ignite/odbc/sql/sql_parser.h"
-#include "ignite/odbc/sql/sql_set_streaming_command.h"
-#include "ignite/odbc/sql/sql_utils.h"
-#include "ignite/odbc/system/odbc_constants.h"
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/connection.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/message.h"
+#include "documentdb/odbc/odbc_error.h"
+#include "documentdb/odbc/query/batch_query.h"
+#include "documentdb/odbc/query/column_metadata_query.h"
+#include "documentdb/odbc/query/data_query.h"
+#include "documentdb/odbc/query/foreign_keys_query.h"
+#include "documentdb/odbc/query/internal_query.h"
+#include "documentdb/odbc/query/primary_keys_query.h"
+#include "documentdb/odbc/query/special_columns_query.h"
+#include "documentdb/odbc/query/table_metadata_query.h"
+#include "documentdb/odbc/query/type_info_query.h"
+#include "documentdb/odbc/sql/sql_parser.h"
+#include "documentdb/odbc/sql/sql_set_streaming_command.h"
+#include "documentdb/odbc/sql/sql_utils.h"
+#include "documentdb/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/utility.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 Statement::Statement(Connection& parent)
     : connection(parent),
@@ -1221,7 +1221,7 @@ SqlResult::Type Statement::UpdateParamsMeta() {
     AddStatusRecord(err);
 
     return SqlResult::AI_ERROR;
-  } catch (const IgniteError& err) {
+  } catch (const DocumentDbError& err) {
     AddStatusRecord(err.GetText());
 
     return SqlResult::AI_ERROR;
@@ -1260,4 +1260,4 @@ uint16_t Statement::SqlResultToRowResult(SqlResult::Type value) {
   }
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

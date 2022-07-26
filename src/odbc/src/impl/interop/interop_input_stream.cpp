@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/interop//interop_input_stream.h"
+#include "documentdb/odbc/impl/interop//interop_input_stream.h"
 
-#include <ignite/odbc/ignite_error.h>
+#include <documentdb/odbc/documentdb_error.h>
 
 #include <cstring>
 
@@ -38,7 +38,7 @@
 #define IGNITE_INTEROP_IN_READ_ARRAY(len, shift) \
   { CopyAndShift(reinterpret_cast< int8_t* >(res), 0, ((len) << (shift))); }
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace interop {
@@ -163,7 +163,7 @@ void InteropInputStream::Position(int32_t pos) {
   if (pos <= len)
     this->pos = pos;
   else {
-    IGNITE_ERROR_FORMATTED_3(IgniteError::IGNITE_ERR_MEMORY,
+    IGNITE_ERROR_FORMATTED_3(DocumentDbError::IGNITE_ERR_MEMORY,
                              "Requested input stream position is out of bounds",
                              "memPtr", mem->PointerLong(), "len", len, "pos",
                              pos);
@@ -184,7 +184,7 @@ void InteropInputStream::EnsureEnoughData(int32_t cnt) const {
     return;
   else {
     IGNITE_ERROR_FORMATTED_4(
-        IgniteError::IGNITE_ERR_MEMORY, "Not enough data in the stream",
+        DocumentDbError::IGNITE_ERR_MEMORY, "Not enough data in the stream",
         "memPtr", mem->PointerLong(), "len", len, "pos", pos, "requested", cnt);
   }
 }
@@ -203,4 +203,4 @@ inline void InteropInputStream::Shift(int32_t cnt) {
 }  // namespace interop
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

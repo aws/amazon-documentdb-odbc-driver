@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/platform_utils.h>
-#include <ignite/odbc/ignite_error.h>
-#include <ignite/odbc/jni/documentdb_mql_query_context.h>
-#include <ignite/odbc/jni/documentdb_query_mapping_service.h>
-#include <ignite/odbc/jni/utils.h>
-#include <ignite/odbc/log.h>
+#include <documentdb/odbc/common/platform_utils.h>
+#include <documentdb/odbc/documentdb_error.h>
+#include <documentdb/odbc/jni/documentdb_mql_query_context.h>
+#include <documentdb/odbc/jni/documentdb_query_mapping_service.h>
+#include <documentdb/odbc/jni/utils.h>
+#include <documentdb/odbc/log.h>
 
 #include <vector>
 
-using ignite::odbc::jni::java::JniErrorCode;
-using ignite::odbc::jni::java::JniErrorInfo;
+using documentdb::odbc::jni::java::JniErrorCode;
+using documentdb::odbc::jni::java::JniErrorInfo;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace jni {
 SharedPointer< DocumentDbQueryMappingService >
@@ -299,4 +299,4 @@ DocumentDbQueryMappingService::GetMqlQueryContext(const std::string& sql,
 }
 }  // namespace jni
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

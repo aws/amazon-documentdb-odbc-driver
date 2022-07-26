@@ -15,23 +15,23 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/binary/binary_reader_impl.h"
+#include "documentdb/odbc/impl/binary/binary_reader_impl.h"
 
-#include <ignite/odbc/ignite_error.h>
+#include <documentdb/odbc/documentdb_error.h>
 
-#include "ignite/odbc/binary/binary_type.h"
-#include "ignite/odbc/impl/binary/binary_common.h"
-#include "ignite/odbc/impl/binary/binary_id_resolver.h"
-#include "ignite/odbc/impl/binary/binary_utils.h"
-#include "ignite/odbc/impl/interop/interop_input_stream.h"
-#include "ignite/odbc/impl/interop/interop_memory.h"
-#include "ignite/odbc/impl/interop/interop_stream_position_guard.h"
+#include "documentdb/odbc/binary/binary_type.h"
+#include "documentdb/odbc/impl/binary/binary_common.h"
+#include "documentdb/odbc/impl/binary/binary_id_resolver.h"
+#include "documentdb/odbc/impl/binary/binary_utils.h"
+#include "documentdb/odbc/impl/interop/interop_input_stream.h"
+#include "documentdb/odbc/impl/interop/interop_memory.h"
+#include "documentdb/odbc/impl/interop/interop_stream_position_guard.h"
 
-using namespace ignite::odbc::impl::interop;
-using namespace ignite::odbc::impl::binary;
-using namespace ignite::odbc::binary;
+using namespace documentdb::odbc::impl::interop;
+using namespace documentdb::odbc::impl::binary;
+using namespace documentdb::odbc::binary;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace binary {
@@ -955,7 +955,7 @@ void BinaryReaderImpl::Skip() {
 
     default: {
       int32_t pos = stream->Position() - 1;
-      IGNITE_ERROR_FORMATTED_2(IgniteError::IGNITE_ERR_BINARY, "Invalid header",
+      IGNITE_ERROR_FORMATTED_2(DocumentDbError::IGNITE_ERR_BINARY, "Invalid header",
                                "position", pos, "unsupported type",
                                static_cast< int >(hdr));
     }
@@ -1028,7 +1028,7 @@ void BinaryReaderImpl::ReadTopObject0< BinaryReader, Date >(Date& res) {
   else {
     int32_t pos = stream->Position() - 1;
 
-    IGNITE_ERROR_FORMATTED_3(IgniteError::IGNITE_ERR_BINARY, "Invalid header",
+    IGNITE_ERROR_FORMATTED_3(DocumentDbError::IGNITE_ERR_BINARY, "Invalid header",
                              "position", pos, "expected", (int)IGNITE_TYPE_DATE,
                              "actual", (int)typeId)
   }
@@ -1064,7 +1064,7 @@ void BinaryReaderImpl::ReadTopObject0< BinaryReader, std::string >(
   else {
     int32_t pos = stream->Position() - 1;
 
-    IGNITE_ERROR_FORMATTED_3(IgniteError::IGNITE_ERR_BINARY, "Invalid header",
+    IGNITE_ERROR_FORMATTED_3(DocumentDbError::IGNITE_ERR_BINARY, "Invalid header",
                              "position", pos, "expected",
                              static_cast< int >(IGNITE_TYPE_STRING), "actual",
                              static_cast< int >(typeId))
@@ -1112,7 +1112,7 @@ T BinaryReaderImpl::ReadTopObject0(const int8_t expHdr,
 
   int32_t pos = stream->Position() - 1;
 
-  IGNITE_ERROR_FORMATTED_3(IgniteError::IGNITE_ERR_BINARY, "Invalid header",
+  IGNITE_ERROR_FORMATTED_3(DocumentDbError::IGNITE_ERR_BINARY, "Invalid header",
                            "position", pos, "expected", (int)expHdr, "actual",
                            (int)typeId)
 }
@@ -1167,10 +1167,10 @@ int32_t BinaryReaderImpl::FindField(const int32_t fieldId) {
 
 void BinaryReaderImpl::CheckRawMode(bool expected) const {
   if (expected && !rawMode) {
-    IGNITE_ERROR_1(IgniteError::IGNITE_ERR_BINARY,
+    IGNITE_ERROR_1(DocumentDbError::IGNITE_ERR_BINARY,
                    "Operation can be performed only in raw mode.")
   } else if (!expected && rawMode) {
-    IGNITE_ERROR_1(IgniteError::IGNITE_ERR_BINARY,
+    IGNITE_ERROR_1(DocumentDbError::IGNITE_ERR_BINARY,
                    "Operation cannot be performed in raw mode.")
   }
 }
@@ -1178,11 +1178,11 @@ void BinaryReaderImpl::CheckRawMode(bool expected) const {
 void BinaryReaderImpl::CheckSingleMode(bool expected) const {
   if (expected && elemId != 0) {
     IGNITE_ERROR_1(
-        IgniteError::IGNITE_ERR_BINARY,
+        DocumentDbError::IGNITE_ERR_BINARY,
         "Operation cannot be performed when container is being read.");
   } else if (!expected && elemId == 0) {
     IGNITE_ERROR_1(
-        IgniteError::IGNITE_ERR_BINARY,
+        DocumentDbError::IGNITE_ERR_BINARY,
         "Operation can be performed only when container is being read.");
   }
 }
@@ -1223,7 +1223,7 @@ int32_t BinaryReaderImpl::StartContainerSession(bool expRawMode, int8_t expHdr,
 void BinaryReaderImpl::CheckSession(int32_t expSes) const {
   if (elemId != expSes) {
     IGNITE_ERROR_1(
-        IgniteError::IGNITE_ERR_BINARY,
+        DocumentDbError::IGNITE_ERR_BINARY,
         "Containter read session has been finished or is not started yet.");
   }
 }
@@ -1231,7 +1231,7 @@ void BinaryReaderImpl::CheckSession(int32_t expSes) const {
 void BinaryReaderImpl::ThrowOnInvalidHeader(int32_t pos, int8_t expHdr,
                                             int8_t hdr) {
   IGNITE_ERROR_FORMATTED_3(
-      IgniteError::IGNITE_ERR_BINARY, "Invalid header", "position", pos,
+      DocumentDbError::IGNITE_ERR_BINARY, "Invalid header", "position", pos,
       "expected", static_cast< int >(expHdr), "actual", static_cast< int >(hdr))
 }
 
@@ -1243,4 +1243,4 @@ void BinaryReaderImpl::ThrowOnInvalidHeader(int8_t expHdr, int8_t hdr) const {
 }  // namespace binary
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

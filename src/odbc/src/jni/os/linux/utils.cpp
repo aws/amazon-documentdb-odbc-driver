@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "ignite/odbc/common/utils.h"
+#include "documentdb/odbc/common/utils.h"
 
 #include <dirent.h>
 #include <dlfcn.h>
@@ -25,14 +25,14 @@
 #include <algorithm>
 #include <cstring>
 
-#include "ignite/odbc/common/fixed_size_array.h"
-#include "ignite/odbc/jni/java.h"
-#include "ignite/odbc/jni/utils.h"
+#include "documentdb/odbc/common/fixed_size_array.h"
+#include "documentdb/odbc/jni/java.h"
+#include "documentdb/odbc/jni/utils.h"
 
-using namespace ignite::odbc::common;
-using namespace ignite::odbc::jni::java;
+using namespace documentdb::odbc::common;
+using namespace documentdb::odbc::jni::java;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace jni {
 const char* JAVA_HOME = "JAVA_HOME";
@@ -416,4 +416,4 @@ std::string ResolveDocumentDbHome(const std::string& path) {
 }
 }  // namespace jni
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

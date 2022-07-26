@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/binary/binary_type_manager.h"
+#include "documentdb/odbc/impl/binary/binary_type_manager.h"
 
-#include <ignite/odbc/common/concurrent.h>
+#include <documentdb/odbc/common/concurrent.h>
 
 #include <algorithm>
 #include <map>
 #include <vector>
 
-using namespace ignite::odbc::common::concurrent;
+using namespace documentdb::odbc::common::concurrent;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace binary {
@@ -92,11 +92,11 @@ bool BinaryTypeManager::IsUpdatedSince(int32_t oldVer) const {
   return pendingVer > oldVer;
 }
 
-bool BinaryTypeManager::ProcessPendingUpdates(IgniteError& err) {
+bool BinaryTypeManager::ProcessPendingUpdates(DocumentDbError& err) {
   CsLockGuard guard(cs);
 
   if (!updater) {
-    err = IgniteError(IgniteError::IGNITE_ERR_GENERIC, "Updater is not set");
+    err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC, "Updater is not set");
 
     return false;
   }
@@ -109,7 +109,7 @@ bool BinaryTypeManager::ProcessPendingUpdates(IgniteError& err) {
       continue;  // Snapshot has been processed already.
 
     if (!updater->Update(*pendingSnap, err)) {
-      err = IgniteError(IgniteError::IGNITE_ERR_GENERIC, "Can not send update");
+      err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC, "Can not send update");
 
       return false;  // Stop as we cannot move further.
     }
@@ -163,14 +163,14 @@ SPSnap BinaryTypeManager::GetMeta(int32_t typeId) {
   }
 
   if (!updater)
-    throw IgniteError(IgniteError::IGNITE_ERR_BINARY,
+    throw DocumentDbError(DocumentDbError::IGNITE_ERR_BINARY,
                       "Metadata updater is not available.");
 
-  IgniteError err;
+  DocumentDbError err;
 
   SPSnap snap = updater->GetMeta(typeId, err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   // Caching meta snapshot for faster access in future.
   snapshots->insert(std::make_pair(typeId, snap));
@@ -180,4 +180,4 @@ SPSnap BinaryTypeManager::GetMeta(int32_t typeId) {
 }  // namespace binary
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

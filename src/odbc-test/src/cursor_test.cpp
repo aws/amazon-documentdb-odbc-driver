@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/impl/binary/binary_writer_impl.h>
-#include <ignite/odbc/cursor.h>
-#include <ignite/odbc/system/odbc_constants.h>
+#include <documentdb/odbc/impl/binary/binary_writer_impl.h>
+#include <documentdb/odbc/cursor.h>
+#include <documentdb/odbc/system/odbc_constants.h>
 
 #include <boost/test/unit_test.hpp>
 
-using namespace ignite::odbc;
+using namespace documentdb::odbc;
 
 const int64_t testQueryId = 42;
 
 std::shared_ptr< ResultPage > CreateTestPage(bool last, int32_t size) {
-  using namespace ignite::impl::binary;
-  using namespace ignite::impl::interop;
+  using namespace documentdb::impl::binary;
+  using namespace documentdb::impl::interop;
 
   InteropUnpooledMemory mem(1024);
   InteropOutputStream outStream(&mem);

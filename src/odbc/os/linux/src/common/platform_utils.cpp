@@ -19,7 +19,7 @@
 #include <dlfcn.h>
 #include <ftw.h>
 #include <glob.h>
-#include <ignite/odbc/common/utils.h>
+#include <documentdb/odbc/common/utils.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <unistd.h>
@@ -27,7 +27,7 @@
 #include <cstdio>
 #include <ctime>
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace common {
 time_t IgniteTimeGm(const tm& time) {
@@ -123,4 +123,4 @@ IGNITE_IMPORT_EXPORT unsigned GetRandSeed() {
 }
 }  // namespace common
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

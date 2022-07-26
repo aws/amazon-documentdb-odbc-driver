@@ -16,12 +16,12 @@
  */
 
 // ReSharper disable once CppUnusedIncludeDirective
-#include <ignite/odbc/common/common.h>
-#include <ignite/odbc/common/utils.h>
-#include <ignite/odbc/ignite_error.h>
-#include <ignite/odbc/jni/java.h>
-#include <ignite/odbc/jni/utils.h>
-#include <ignite/odbc/log.h>
+#include <documentdb/odbc/common/common.h>
+#include <documentdb/odbc/common/utils.h>
+#include <documentdb/odbc/documentdb_error.h>
+#include <documentdb/odbc/jni/java.h>
+#include <documentdb/odbc/jni/utils.h>
+#include <documentdb/odbc/log.h>
 
 #include <algorithm>
 #include <cstring>  // needed only on linux
@@ -33,8 +33,8 @@
 // Todo: Refactor boost::optional to std::optional after code base is migrated
 // to C++17 https://bitquill.atlassian.net/browse/AD-631
 
-using namespace ignite::odbc::common::concurrent;
-using namespace ignite::odbc::jni::java;
+using namespace documentdb::odbc::common::concurrent;
+using namespace documentdb::odbc::jni::java;
 
 #ifndef JNI_VERSION_9
 #define JNI_VERSION_9 0x00090000
@@ -85,13 +85,13 @@ using namespace ignite::odbc::jni::java;
     }                                                             \
   }
 
-using namespace ignite::odbc::jni::java;
+using namespace documentdb::odbc::jni::java;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace jni {
 namespace java {
-namespace iocc = ignite::odbc::common::concurrent;
+namespace iocc = documentdb::odbc::common::concurrent;
 
 bool IGNITE_IMPORT_EXPORT IsJava9OrLater() {
   LOG_DEBUG_MSG("IsJava9OrLater called");
@@ -2856,4 +2856,4 @@ void JniContext::ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) {
 }  //  namespace java
 }  //  namespace jni
 }  //  namespace odbc
-}  //  namespace ignite
+}  //  namespace documentdb

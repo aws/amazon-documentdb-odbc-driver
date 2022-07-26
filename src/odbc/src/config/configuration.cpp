@@ -14,21 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "ignite/odbc/config/configuration.h"
+#include "documentdb/odbc/config/configuration.h"
 
 #include <iterator>
 #include <sstream>
 #include <string>
 
-#include "ignite/odbc/common/utils.h"
-#include "ignite/odbc/config/config_tools.h"
-#include "ignite/odbc/config/connection_string_parser.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/common/utils.h"
+#include "documentdb/odbc/config/config_tools.h"
+#include "documentdb/odbc/config/connection_string_parser.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/utility.h"
 
-using ignite::odbc::common::EncodeURIComponent;
+using documentdb::odbc::common::EncodeURIComponent;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace config {
 // Connection Settings
@@ -620,4 +620,4 @@ void Configuration::AddToMap(ArgumentMap& map, const std::string& key,
 
 }  // namespace config
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

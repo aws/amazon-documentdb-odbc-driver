@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef _IGNITE_ODBC_TEST_TEST_UTILS
-#define _IGNITE_ODBC_TEST_TEST_UTILS
+#ifndef _DOCUMENTDB_ODBC_TEST_TEST_UTILS
+#define _DOCUMENTDB_ODBC_TEST_TEST_UTILS
 
 #ifdef _WIN32
 #include <windows.h>
@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-#include "ignite/odbc/common/utils.h"
+#include "documentdb/odbc/common/utils.h"
 
 #define ODBC_THROW_ON_ERROR(ret, type, handle)     \
   if (!SQL_SUCCEEDED(ret)) {                       \
@@ -159,4 +159,4 @@ void ClearLfs();
 
 }  // namespace ignite_test
 
-#endif  // _IGNITE_ODBC_TEST_TEST_UTILS
+#endif  // _DOCUMENTDB_ODBC_TEST_TEST_UTILS

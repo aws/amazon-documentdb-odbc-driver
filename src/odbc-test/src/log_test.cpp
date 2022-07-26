@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <ignite/odbc/log.h>
-#include <ignite/odbc/log_level.h>
+#include <documentdb/odbc/log.h>
+#include <documentdb/odbc/log_level.h>
 
 #include <boost/optional.hpp>
 #include <boost/test/unit_test.hpp>
@@ -24,13 +24,13 @@
 
 #include "odbc_test_suite.h"
 
-using namespace ignite::odbc::common;
+using namespace documentdb::odbc::common;
 using namespace boost::unit_test;
 
 using boost::unit_test::precondition;
-using ignite::odbc::Logger;
-using ignite::odbc::LogLevel;
-using ignite::odbc::OdbcTestSuite;
+using documentdb::odbc::Logger;
+using documentdb::odbc::LogLevel;
+using documentdb::odbc::OdbcTestSuite;
 
 bool SaveLoggerVars(std::shared_ptr< Logger > logger,
                     boost::optional< std::string >& origLogPath,

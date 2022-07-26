@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/cache/query/query_impl.h"
-#include "ignite/odbc/impl/cache/query/query_fields_row_impl.h"
+#include "documentdb/odbc/impl/cache/query/query_impl.h"
+#include "documentdb/odbc/impl/cache/query/query_fields_row_impl.h"
 
-using namespace ignite::odbc::common::concurrent;
-using namespace ignite::odbc::jni::java;
-using namespace ignite::odbc::impl::interop;
-using namespace ignite::odbc::impl::binary;
+using namespace documentdb::odbc::common::concurrent;
+using namespace documentdb::odbc::jni::java;
+using namespace documentdb::odbc::impl::interop;
+using namespace documentdb::odbc::impl::binary;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace cache {
@@ -67,11 +67,11 @@ QueryCursorImpl::~QueryCursorImpl() {
   JniContext::Release(javaRef);
 }
 
-bool QueryCursorImpl::HasNext(IgniteError& err) {
+bool QueryCursorImpl::HasNext(DocumentDbError& err) {
   // Check whether GetAll() was called earlier.
   if (getAllCalled) {
     err =
-        IgniteError(IgniteError::IGNITE_ERR_GENERIC,
+        DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
                     "Cannot use HasNext() method because GetAll() was called.");
 
     return false;
@@ -89,11 +89,11 @@ bool QueryCursorImpl::HasNext(IgniteError& err) {
   return !endReached;
 }
 
-void QueryCursorImpl::GetNext(OutputOperation& op, IgniteError& err) {
+void QueryCursorImpl::GetNext(OutputOperation& op, DocumentDbError& err) {
   // Check whether GetAll() was called earlier.
   if (getAllCalled) {
     err =
-        IgniteError(IgniteError::IGNITE_ERR_GENERIC,
+        DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
                     "Cannot use GetNext() method because GetAll() was called.");
 
     return;
@@ -110,8 +110,8 @@ void QueryCursorImpl::GetNext(OutputOperation& op, IgniteError& err) {
 
   if (endReached) {
     // Ensure we do not overwrite possible previous error.
-    if (err.GetCode() == IgniteError::IGNITE_SUCCESS)
-      err = IgniteError(IgniteError::IGNITE_ERR_GENERIC,
+    if (err.GetCode() == DocumentDbError::IGNITE_SUCCESS)
+      err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
                         "No more elements available.");
 
     return;
@@ -120,7 +120,7 @@ void QueryCursorImpl::GetNext(OutputOperation& op, IgniteError& err) {
   batch->GetNext(op);
 }
 
-QueryFieldsRowImpl* QueryCursorImpl::GetNextRow(IgniteError& err) {
+QueryFieldsRowImpl* QueryCursorImpl::GetNextRow(DocumentDbError& err) {
   // Create iterator in Java if needed.
   if (!CreateIteratorIfNeeded(err))
     return 0;
@@ -132,8 +132,8 @@ QueryFieldsRowImpl* QueryCursorImpl::GetNextRow(IgniteError& err) {
 
   if (endReached) {
     // Ensure we do not overwrite possible previous error.
-    if (err.GetCode() == IgniteError::IGNITE_SUCCESS)
-      err = IgniteError(IgniteError::IGNITE_ERR_GENERIC,
+    if (err.GetCode() == DocumentDbError::IGNITE_SUCCESS)
+      err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
                         "No more elements available.");
 
     return 0;
@@ -142,11 +142,11 @@ QueryFieldsRowImpl* QueryCursorImpl::GetNextRow(IgniteError& err) {
   return batch->GetNextRow();
 }
 
-void QueryCursorImpl::GetAll(OutputOperation& op, IgniteError& err) {
+void QueryCursorImpl::GetAll(OutputOperation& op, DocumentDbError& err) {
   // Check whether any of iterator methods were called.
   if (iterCalled) {
-    err = IgniteError(
-        IgniteError::IGNITE_ERR_GENERIC,
+    err = DocumentDbError(
+        DocumentDbError::IGNITE_ERR_GENERIC,
         "Cannot use GetAll() method because an iteration method was called.");
 
     return;
@@ -155,7 +155,7 @@ void QueryCursorImpl::GetAll(OutputOperation& op, IgniteError& err) {
   // Check whether GetAll was called before.
   if (getAllCalled) {
     err =
-        IgniteError(IgniteError::IGNITE_ERR_GENERIC,
+        DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
                     "Cannot use GetNext() method because GetAll() was called.");
 
     return;
@@ -169,7 +169,7 @@ void QueryCursorImpl::GetAll(OutputOperation& op, IgniteError& err) {
   env.Get()->Context()->TargetOutStream(javaRef, OP_GET_ALL,
                                         inMem.Get()->PointerLong(), &jniErr);
 
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
   if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
@@ -186,15 +186,15 @@ void QueryCursorImpl::GetAll(OutputOperation& op, IgniteError& err) {
 void QueryCursorImpl::GetAll(OutputOperation& op) {
   // Check whether any of iterator methods were called.
   if (iterCalled) {
-    throw IgniteError(
-        IgniteError::IGNITE_ERR_GENERIC,
+    throw DocumentDbError(
+        DocumentDbError::IGNITE_ERR_GENERIC,
         "Cannot use GetAll() method because an iteration method was called.");
   }
 
   // Check whether GetAll was called before.
   if (getAllCalled) {
-    throw IgniteError(
-        IgniteError::IGNITE_ERR_GENERIC,
+    throw DocumentDbError(
+        DocumentDbError::IGNITE_ERR_GENERIC,
         "Cannot use GetNext() method because GetAll() was called.");
   }
 
@@ -206,11 +206,11 @@ void QueryCursorImpl::GetAll(OutputOperation& op) {
   env.Get()->Context()->TargetOutStream(javaRef, OP_GET_ALL,
                                         inMem.Get()->PointerLong(), &jniErr);
 
-  IgniteError err;
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError err;
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   getAllCalled = true;
 
@@ -221,7 +221,7 @@ void QueryCursorImpl::GetAll(OutputOperation& op) {
   op.ProcessOutput(reader);
 }
 
-bool QueryCursorImpl::CreateIteratorIfNeeded(IgniteError& err) {
+bool QueryCursorImpl::CreateIteratorIfNeeded(DocumentDbError& err) {
   if (iterCalled)
     return true;
 
@@ -229,7 +229,7 @@ bool QueryCursorImpl::CreateIteratorIfNeeded(IgniteError& err) {
 
   env.Get()->Context()->TargetInLongOutLong(javaRef, OP_ITERATOR, 0, &jniErr);
 
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
   if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
@@ -238,7 +238,7 @@ bool QueryCursorImpl::CreateIteratorIfNeeded(IgniteError& err) {
   return iterCalled;
 }
 
-bool QueryCursorImpl::GetNextBatchIfNeeded(IgniteError& err) {
+bool QueryCursorImpl::GetNextBatchIfNeeded(DocumentDbError& err) {
   assert(iterCalled);
 
   if (endReached || (batch && batch->Left() > 0))
@@ -256,7 +256,7 @@ bool QueryCursorImpl::GetNextBatchIfNeeded(IgniteError& err) {
   env.Get()->Context()->TargetOutStream(javaRef, OP_GET_BATCH,
                                         inMem.Get()->PointerLong(), &jniErr);
 
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
   if (jniErr.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
@@ -274,14 +274,14 @@ bool QueryCursorImpl::GetNextBatchIfNeeded(IgniteError& err) {
   return true;
 }
 
-bool QueryCursorImpl::IteratorHasNext(IgniteError& err) {
+bool QueryCursorImpl::IteratorHasNext(DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   bool res = env.Get()->Context()->TargetInLongOutLong(
                  javaRef, OP_ITERATOR_HAS_NEXT, 0, &jniErr)
              == 1;
 
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
   if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
@@ -293,4 +293,4 @@ bool QueryCursorImpl::IteratorHasNext(IgniteError& err) {
 }  // namespace cache
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

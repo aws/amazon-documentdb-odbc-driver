@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/binary/binary_reader.h"
-#include "ignite/odbc/impl/binary/binary_reader_impl.h"
+#include "documentdb/odbc/binary/binary_reader.h"
+#include "documentdb/odbc/impl/binary/binary_reader_impl.h"
 
-using namespace ignite::odbc::impl::binary;
+using namespace documentdb::odbc::impl::binary;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace binary {
 BinaryReader::BinaryReader(BinaryReaderImpl* impl) : impl(impl) {
@@ -167,4 +167,4 @@ BinaryRawReader BinaryReader::RawReader() {
 }
 }  // namespace binary
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

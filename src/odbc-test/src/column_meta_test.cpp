@@ -23,21 +23,21 @@
 #include <boost/test/unit_test.hpp>
 #include <utility>
 
-#include "ignite/odbc/impl/binary/binary_common.h"
-#include "ignite/odbc/meta/column_meta.h"
-#include "ignite/odbc/type_traits.h"
+#include "documentdb/odbc/impl/binary/binary_common.h"
+#include "documentdb/odbc/meta/column_meta.h"
+#include "documentdb/odbc/type_traits.h"
 #include "odbc_test_suite.h"
 
-using namespace ignite::odbc::impl::binary;
-using ignite::odbc::OdbcTestSuite;
-using ignite::odbc::meta::ColumnMeta;
-using ignite::odbc::meta::Nullability;
+using namespace documentdb::odbc::impl::binary;
+using documentdb::odbc::OdbcTestSuite;
+using documentdb::odbc::meta::ColumnMeta;
+using documentdb::odbc::meta::Nullability;
 
 BOOST_AUTO_TEST_CASE(TestGetAttribute) {
   // Only SQL_DESC_* fields are tested in this test.
   // This is because those are the fields that would be passed to
   // SQLColAttribute function.
-  using namespace ignite::odbc::type_traits;
+  using namespace documentdb::odbc::type_traits;
 
   std::string schema("database");
   std::string table("table");
@@ -268,7 +268,7 @@ BOOST_AUTO_TEST_CASE(TestGetAttributeLiteralSuffix) {
 }
 
 BOOST_AUTO_TEST_CASE(TestGetAttributeLocalTypeName) {
-  using namespace ignite::odbc::type_traits;
+  using namespace documentdb::odbc::type_traits;
 
   std::string schema("database");
   std::string table("table");

@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/common/concurrent_os.h"
+#include "documentdb/odbc/common/concurrent_os.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace common {
 namespace concurrent {
@@ -185,4 +185,4 @@ void ThreadLocal::Set0(void* ptr) {
 }  // namespace concurrent
 }  // namespace common
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/system/ui/custom_window.h"
+#include "documentdb/odbc/system/ui/custom_window.h"
 
 #include <Windowsx.h>
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace system {
 namespace ui {
@@ -97,7 +97,7 @@ CustomWindow::CustomWindow(Window* parent, const wchar_t* className,
 
     buf << "Can not register window class, error code: " << GetLastError();
 
-    throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, buf.str().c_str());
+    throw DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC, buf.str().c_str());
   }
 }
 
@@ -178,4 +178,4 @@ std::unique_ptr< Window > CustomWindow::CreateComboBox(
 }  // namespace ui
 }  // namespace system
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

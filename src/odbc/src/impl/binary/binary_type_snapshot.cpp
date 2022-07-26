@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/binary/binary_type_snapshot.h"
+#include "documentdb/odbc/impl/binary/binary_type_snapshot.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace binary {
@@ -56,4 +56,4 @@ void BinaryTypeSnapshot::CopyFieldsFrom(const BinaryTypeSnapshot* another) {
 }  // namespace binary
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

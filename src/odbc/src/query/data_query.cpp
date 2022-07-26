@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/query/data_query.h"
+#include "documentdb/odbc/query/data_query.h"
 
 #include <bsoncxx/json.hpp>
 #include <mongocxx/collection.hpp>
@@ -24,22 +24,22 @@
 #include <mongocxx/options/aggregate.hpp>
 #include <mongocxx/pipeline.hpp>
 
-#include "ignite/odbc/connection.h"
-#include "ignite/odbc/documentdb_cursor.h"
-#include "ignite/odbc/jni/documentdb_mql_query_context.h"
-#include "ignite/odbc/jni/documentdb_query_mapping_service.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/message.h"
-#include "ignite/odbc/odbc_error.h"
-#include "ignite/odbc/query/batch_query.h"
+#include "documentdb/odbc/connection.h"
+#include "documentdb/odbc/documentdb_cursor.h"
+#include "documentdb/odbc/jni/documentdb_mql_query_context.h"
+#include "documentdb/odbc/jni/documentdb_query_mapping_service.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/message.h"
+#include "documentdb/odbc/odbc_error.h"
+#include "documentdb/odbc/query/batch_query.h"
 
-using ignite::odbc::jni::DocumentDbConnectionProperties;
-using ignite::odbc::jni::DocumentDbDatabaseMetadata;
-using ignite::odbc::jni::DocumentDbMqlQueryContext;
-using ignite::odbc::jni::DocumentDbQueryMappingService;
-using ignite::odbc::jni::JdbcColumnMetadata;
+using documentdb::odbc::jni::DocumentDbConnectionProperties;
+using documentdb::odbc::jni::DocumentDbDatabaseMetadata;
+using documentdb::odbc::jni::DocumentDbMqlQueryContext;
+using documentdb::odbc::jni::DocumentDbQueryMappingService;
+using documentdb::odbc::jni::JdbcColumnMetadata;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace query {
 DataQuery::DataQuery(diagnostic::DiagnosableAdapter& diag,
@@ -263,7 +263,7 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
 
   try {
     SharedPointer< DocumentDbMqlQueryContext > mqlQueryContext;
-    IgniteError error;
+    DocumentDbError error;
 
     SqlResult::Type result = GetMqlQueryContext(mqlQueryContext, error);
     if (result != SqlResult::AI_SUCCESS) {
@@ -315,8 +315,8 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
             << " code: " << xcp.code().value()
             << " messagge: " << xcp.code().message()
             << " cause: " << xcp.what();
-    odbc::IgniteError error(
-        odbc::IgniteError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
+    odbc::DocumentDbError error(
+        odbc::DocumentDbError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
         message.str().c_str());
     diag.AddStatusRecord(error.GetText());
 
@@ -331,12 +331,12 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
 
 SqlResult::Type DataQuery::GetMqlQueryContext(
     SharedPointer< DocumentDbMqlQueryContext >& mqlQueryContext,
-    IgniteError& error) {
+    DocumentDbError& error) {
   LOG_DEBUG_MSG("GetMqlQueryContext is called");
 
   SharedPointer< DocumentDbConnectionProperties > connectionProperties =
       connection_.GetConnectionProperties(error);
-  if (error.GetCode() != IgniteError::IGNITE_SUCCESS) {
+  if (error.GetCode() != DocumentDbError::IGNITE_SUCCESS) {
     LOG_ERROR_MSG(
         "GetMqlQueryContext exiting with error msg: " << error.GetText());
 
@@ -344,7 +344,7 @@ SqlResult::Type DataQuery::GetMqlQueryContext(
   }
   SharedPointer< DocumentDbDatabaseMetadata > databaseMetadata =
       connection_.GetDatabaseMetadata(error);
-  if (error.GetCode() != IgniteError::IGNITE_SUCCESS) {
+  if (error.GetCode() != DocumentDbError::IGNITE_SUCCESS) {
     LOG_ERROR_MSG(
         "GetMqlQueryContext exiting with error msg: " << error.GetText());
 
@@ -355,7 +355,7 @@ SqlResult::Type DataQuery::GetMqlQueryContext(
       DocumentDbQueryMappingService::Create(connectionProperties,
                                             databaseMetadata, errInfo);
   if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    IgniteError::SetError(errInfo.code, errInfo.errCls.c_str(),
+    DocumentDbError::SetError(errInfo.code, errInfo.errCls.c_str(),
                           errInfo.errMsg.c_str(), error);
     LOG_ERROR_MSG(
         "GetMqlQueryContext exiting with error msg: " << error.GetText());
@@ -365,7 +365,7 @@ SqlResult::Type DataQuery::GetMqlQueryContext(
   mqlQueryContext =
       queryMappingService.Get()->GetMqlQueryContext(sql_, 0, errInfo);
   if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    IgniteError::SetError(errInfo.code, errInfo.errCls.c_str(),
+    DocumentDbError::SetError(errInfo.code, errInfo.errCls.c_str(),
                           errInfo.errMsg.c_str(), error);
 
     LOG_ERROR_MSG(
@@ -387,7 +387,7 @@ SqlResult::Type DataQuery::MakeRequestMoreResults() {
 SqlResult::Type DataQuery::MakeRequestResultsetMeta() {
   LOG_DEBUG_MSG("MakeRequestResultsetMeta is called");
 
-  IgniteError error;
+  DocumentDbError error;
   SharedPointer< DocumentDbMqlQueryContext > mqlQueryContext;
   SqlResult::Type sqlRes = GetMqlQueryContext(mqlQueryContext, error);
   if (!mqlQueryContext.IsValid() || sqlRes != SqlResult::AI_SUCCESS) {
@@ -408,7 +408,7 @@ void DataQuery::ReadJdbcColumnMetadataVector(
     std::vector< JdbcColumnMetadata > jdbcVector) {
   LOG_DEBUG_MSG("ReadJdbcColumnMetadataVector is called");
 
-  using ignite::odbc::meta::ColumnMeta;
+  using documentdb::odbc::meta::ColumnMeta;
   resultMeta_.clear();
 
   if (jdbcVector.empty()) {
@@ -419,7 +419,7 @@ void DataQuery::ReadJdbcColumnMetadataVector(
     return;
   }
 
-  IgniteError error;
+  DocumentDbError error;
   int32_t prevPosition = 0;
   for (JdbcColumnMetadata jdbcMetadata : jdbcVector) {
     resultMeta_.emplace_back(ColumnMeta());
@@ -551,4 +551,4 @@ void DataQuery::SetResultsetMeta(const meta::ColumnMetaVector& value) {
 }
 }  // namespace query
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

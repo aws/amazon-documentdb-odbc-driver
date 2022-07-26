@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/cache/query/query_batch.h"
-#include "ignite/odbc/impl/cache/query/query_fields_row_impl.h"
+#include "documentdb/odbc/impl/cache/query/query_batch.h"
+#include "documentdb/odbc/impl/cache/query/query_fields_row_impl.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace cache {
@@ -46,4 +46,4 @@ QueryFieldsRowImpl* QueryBatch::GetNextRow() {
 }  // namespace cache
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

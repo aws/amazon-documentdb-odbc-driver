@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/query/type_info_query.h"
+#include "documentdb/odbc/query/type_info_query.h"
 
 #include <cassert>
 
-#include "ignite/odbc/impl/binary/binary_common.h"
-#include "ignite/odbc/system/odbc_constants.h"
-#include "ignite/odbc/type_traits.h"
+#include "documentdb/odbc/impl/binary/binary_common.h"
+#include "documentdb/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/type_traits.h"
 
 namespace {
 struct ResultColumn {
@@ -109,7 +109,7 @@ struct ResultColumn {
 };
 }  // namespace
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace query {
 TypeInfoQuery::TypeInfoQuery(diagnostic::DiagnosableAdapter& diag,
@@ -120,8 +120,8 @@ TypeInfoQuery::TypeInfoQuery(diagnostic::DiagnosableAdapter& diag,
       fetched(false),
       types(),
       cursor(types.end()) {
-  using namespace ignite::odbc::impl::binary;
-  using namespace ignite::odbc::type_traits;
+  using namespace documentdb::odbc::impl::binary;
+  using namespace documentdb::odbc::type_traits;
 
   using meta::ColumnMeta;
   using meta::Nullability;
@@ -243,7 +243,7 @@ SqlResult::Type TypeInfoQuery::FetchNextRow(
 
 SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
                                          app::ApplicationDataBuffer& buffer) {
-  using namespace ignite::odbc::impl::binary;
+  using namespace documentdb::odbc::impl::binary;
 
   if (!executed) {
     diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
@@ -400,4 +400,4 @@ SqlResult::Type TypeInfoQuery::NextResultSet() {
 }
 }  // namespace query
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

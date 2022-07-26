@@ -30,8 +30,8 @@
 #include "test_utils.h"
 
 using boost::unit_test::precondition;
-using ignite::odbc::if_integration;
-using ignite::odbc::OdbcTestSuite;
+using documentdb::odbc::if_integration;
+using documentdb::odbc::OdbcTestSuite;
 using ignite_test::GetOdbcErrorMessage;
 
 /**

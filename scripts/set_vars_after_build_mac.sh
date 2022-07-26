@@ -4,7 +4,7 @@ PROJECT_DIR=$(pwd)
 #find correct path to java_home_path
 docdb_home="$PROJECT_DIR/build/odbc/bin"
 set_docdb_home="export DOCUMENTDB_HOME=\"$docdb_home\""
-odbc_instini="$PROJECT_DIR/build/odbc/lib/ignite-odbc-install.ini"
+odbc_instini="$PROJECT_DIR/build/odbc/lib/documentdb-odbc-install.ini"
 set_odbc_instini="export ODBCINSTINI=\"$odbc_instini\""
 
 cd ~

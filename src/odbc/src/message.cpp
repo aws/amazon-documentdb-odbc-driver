@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/message.h"
+#include "documentdb/odbc/message.h"
 
-#include "ignite/odbc/streaming/streaming_batch.h"
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/streaming/streaming_batch.h"
+#include "documentdb/odbc/utility.h"
 
 namespace {
-using namespace ignite;
+using namespace documentdb;
 using namespace odbc;
 
-void ReadAffectedRows(ignite::odbc::impl::binary::BinaryReaderImpl& reader,
+void ReadAffectedRows(documentdb::odbc::impl::binary::BinaryReaderImpl& reader,
                       const ProtocolVersion& protocolVersion,
                       std::vector< int64_t >& affectedRows) {
   affectedRows.clear();
@@ -41,7 +41,7 @@ void ReadAffectedRows(ignite::odbc::impl::binary::BinaryReaderImpl& reader,
 }
 }  // namespace
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 HandshakeRequest::HandshakeRequest(const config::Configuration& config)
     : config(config) {
@@ -433,4 +433,4 @@ void QueryMoreResultsResponse::ReadOnSuccess(
   resultPage.Read(reader);
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb
