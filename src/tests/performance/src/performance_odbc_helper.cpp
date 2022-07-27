@@ -28,13 +28,15 @@
 
 #ifdef __linux__
 test_string to_test_string(const std::string& src) {
-  return std::wstring_convert< std::codecvt_utf8_utf16< char16_t >, char16_t >{}
-      .from_bytes(src);
+  static std::wstring_convert< std::codecvt_utf8_utf16< char16_t >, char16_t >
+      converter;
+  return converter.from_bytes(src);
 }
 #else
 test_string to_test_string(const std::string& src) {
-  return std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >{}
-      .from_bytes(src);
+  static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
+      converter;
+  return converter.from_bytes(src);
 }
 #endif
 
@@ -93,8 +95,9 @@ void CloseCursor(SQLHSTMT* h_statement, bool throw_on_error, bool log_diag) {
 }
 
 std::string wstring_to_string(const std::wstring& src) {
-  return std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >{}
-      .to_bytes(src);
+  static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
+      converter;
+  return converter.to_bytes(src);
 }
 
 std::string u16string_to_string(const std::u16string& src) {
@@ -103,8 +106,9 @@ std::string u16string_to_string(const std::u16string& src) {
 }
 
 std::string u32string_to_string(const std::u32string& src) {
-  return std::wstring_convert< std::codecvt_utf8< char32_t >, char32_t >{}
-      .to_bytes(src);
+  static std::wstring_convert< std::codecvt_utf8< char32_t >, char32_t >
+      converter;
+  return converter.to_bytes(src);
 }
 
 std::u16string string_to_u16string(const std::string& src) {
