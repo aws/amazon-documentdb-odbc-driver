@@ -136,7 +136,7 @@ void ClusterNodeImpl::ReadHosts(BinaryReaderImpl& reader) {
 void ClusterNodeImpl::ReadConsistentId(BinaryReaderImpl& reader) {
   int8_t typeId = reader.ReadInt8();
   reader.GetStream()->Position(reader.GetStream()->Position() - 1);
-  if (typeId == IGNITE_TYPE_STRING) {
+  if (typeId == DOCUMENTDB_TYPE_STRING) {
     reader.ReadString(*consistentId.Get());
     return;
   }

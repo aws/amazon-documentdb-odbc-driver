@@ -35,7 +35,7 @@ namespace odbc {
  * %Ignite Binding.
  * Used to register callable classes.
  */
-class IGNITE_IMPORT_EXPORT IgniteBinding {
+class DOCUMENTDB_IMPORT_EXPORT IgniteBinding {
  public:
   /**
    * Default constructor.
@@ -91,7 +91,7 @@ class IGNITE_IMPORT_EXPORT IgniteBinding {
               typename P::ReturnType, typename P::ArgumentType >,
           err);
     } else {
-      err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+      err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "Instance is not usable (did you check for error?).");
     }
   }
@@ -113,7 +113,7 @@ class IGNITE_IMPORT_EXPORT IgniteBinding {
           impl::IgniteBindingImpl::CallbackType::CACHE_ENTRY_FILTER_CREATE,
           typeId, impl::binding::FilterCreate< F >);
     } else {
-      throw DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+      throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "Instance is not usable (did you check for error?).");
     }
   }
@@ -135,7 +135,7 @@ class IGNITE_IMPORT_EXPORT IgniteBinding {
           impl::IgniteBindingImpl::CallbackType::COMPUTE_JOB_CREATE, typeId,
           impl::binding::ComputeJobCreate< F, typename F::ReturnType >);
     } else {
-      throw DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+      throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "Instance is not usable (did you check for error?).");
     }
   }

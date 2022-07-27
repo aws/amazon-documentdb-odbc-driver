@@ -41,7 +41,7 @@ namespace odbc {
  * underlying object. Underlying object will be released automatically once all
  * the instances are destructed.
  */
-class IGNITE_IMPORT_EXPORT Ignite {
+class DOCUMENTDB_IMPORT_EXPORT Ignite {
   friend class impl::IgniteImpl;
 
  public:

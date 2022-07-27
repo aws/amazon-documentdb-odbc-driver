@@ -26,25 +26,25 @@ namespace odbc {
 namespace impl {
 namespace interop {
 /** Memory header length. */
-const int IGNITE_MEM_HDR_LEN = 20;
+const int DOCUMENTDB_MEM_HDR_LEN = 20;
 
 /** Memory header offset: capacity. */
-const int IGNITE_MEM_HDR_OFF_CAP = 8;
+const int DOCUMENTDB_MEM_HDR_OFF_CAP = 8;
 
 /** Memory header offset: length. */
-const int IGNITE_MEM_HDR_OFF_LEN = 12;
+const int DOCUMENTDB_MEM_HDR_OFF_LEN = 12;
 
 /** Memory header offset: flags. */
-const int IGNITE_MEM_HDR_OFF_FLAGS = 16;
+const int DOCUMENTDB_MEM_HDR_OFF_FLAGS = 16;
 
 /** Flag: external. */
-const int IGNITE_MEM_FLAG_EXT = 0x1;
+const int DOCUMENTDB_MEM_FLAG_EXT = 0x1;
 
 /** Flag: pooled. */
-const int IGNITE_MEM_FLAG_POOLED = 0x2;
+const int DOCUMENTDB_MEM_FLAG_POOLED = 0x2;
 
 /** Flag: acquired. */
-const int IGNITE_MEM_FLAG_ACQUIRED = 0x4;
+const int DOCUMENTDB_MEM_FLAG_ACQUIRED = 0x4;
 
 /**
  * A helper union to bitwise conversion from int32_t to float and back.
@@ -65,7 +65,7 @@ union BinaryDoubleInt64 {
 /**
  * Interop memory.
  */
-class IGNITE_IMPORT_EXPORT InteropMemory {
+class DOCUMENTDB_IMPORT_EXPORT InteropMemory {
  public:
   /**
    * Get raw data pointer.
@@ -260,7 +260,7 @@ class IGNITE_IMPORT_EXPORT InteropMemory {
 /**
  * Interop unpooled memory.
  */
-class IGNITE_IMPORT_EXPORT InteropUnpooledMemory : public InteropMemory {
+class DOCUMENTDB_IMPORT_EXPORT InteropUnpooledMemory : public InteropMemory {
  public:
   /**
    * Constructor create new unpooled memory object from scratch.
@@ -300,7 +300,7 @@ class IGNITE_IMPORT_EXPORT InteropUnpooledMemory : public InteropMemory {
   /** Whether this instance is owner of memory chunk. */
   bool owning;
 
-  IGNITE_NO_COPY_ASSIGNMENT(InteropUnpooledMemory);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(InteropUnpooledMemory);
 };
 }  // namespace interop
 }  // namespace impl

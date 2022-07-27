@@ -34,7 +34,7 @@ class QueryFieldsRowImpl;
 /**
  * Query cursor implementation.
  */
-class IGNITE_IMPORT_EXPORT QueryCursorImpl {
+class DOCUMENTDB_IMPORT_EXPORT QueryCursorImpl {
  public:
   /**
    * Constructor.
@@ -110,7 +110,7 @@ class IGNITE_IMPORT_EXPORT QueryCursorImpl {
   /** Whether GetAll() method was called. */
   bool getAllCalled;
 
-  IGNITE_NO_COPY_ASSIGNMENT(QueryCursorImpl);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(QueryCursorImpl);
 
   /**
    * Create Java-side iterator if needed.

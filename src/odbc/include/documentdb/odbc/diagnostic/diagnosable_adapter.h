@@ -20,12 +20,12 @@
 
 #include "documentdb/odbc/diagnostic/diagnosable.h"
 
-#define IGNITE_ODBC_API_CALL(...)         \
+#define DOCUMENTDB_ODBC_API_CALL(...)         \
   diagnosticRecords.Reset();              \
   SqlResult::Type result = (__VA_ARGS__); \
   diagnosticRecords.SetHeaderRecord(result)
 
-#define IGNITE_ODBC_API_CALL_ALWAYS_SUCCESS \
+#define DOCUMENTDB_ODBC_API_CALL_ALWAYS_SUCCESS \
   diagnosticRecords.Reset();                \
   diagnosticRecords.SetHeaderRecord(SqlResult::AI_SUCCESS)
 

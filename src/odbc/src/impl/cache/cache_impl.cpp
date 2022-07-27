@@ -409,7 +409,7 @@ QueryCursorImpl* CacheImpl::QueryInternal(const T& qry, int32_t typ,
   DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
-  if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
+  if (jniErr.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS)
     return new QueryCursorImpl(GetEnvironmentPointer(), qryJavaRef);
 
   return 0;
@@ -458,7 +458,7 @@ ContinuousQueryHandleImpl* CacheImpl::QueryContinuous(
   DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
-  if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
+  if (jniErr.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS)
     return new ContinuousQueryHandleImpl(GetEnvironmentPointer(), handle,
                                          qryJavaRef);
 

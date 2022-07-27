@@ -32,7 +32,7 @@ namespace dynamic {
  * Represents dynamically loadable program module such as dymanic
  * or shared library.
  */
-class IGNITE_IMPORT_EXPORT Module {
+class DOCUMENTDB_IMPORT_EXPORT Module {
  public:
   /**
    * Default constructor.
@@ -106,7 +106,7 @@ class IGNITE_IMPORT_EXPORT Module {
  * @param path Path to the Module to load.
  * @return Module instance.
  */
-IGNITE_IMPORT_EXPORT Module LoadModule(const wchar_t* path);
+DOCUMENTDB_IMPORT_EXPORT Module LoadModule(const wchar_t* path);
 
 /**
  * Load Module by the specified path.
@@ -114,14 +114,14 @@ IGNITE_IMPORT_EXPORT Module LoadModule(const wchar_t* path);
  * @param path Path to the Module to load.
  * @return Module instance.
  */
-IGNITE_IMPORT_EXPORT Module LoadModule(const std::wstring& path);
+DOCUMENTDB_IMPORT_EXPORT Module LoadModule(const std::wstring& path);
 
 /**
  * Returns Module associated with the calling process itself.
  *
  * @return Module for the calling process.
  */
-IGNITE_IMPORT_EXPORT Module GetCurrent();
+DOCUMENTDB_IMPORT_EXPORT Module GetCurrent();
 }  // namespace dynamic
 }  // namespace common
 }  // namespace odbc

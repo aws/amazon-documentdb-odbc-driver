@@ -38,7 +38,7 @@ namespace {
  */
 inline void CheckEnoughData(InteropMemory& mem, int32_t pos, int32_t len) {
   if (mem.Length() < (pos + len)) {
-    IGNITE_ERROR_FORMATTED_4(DocumentDbError::IGNITE_ERR_MEMORY,
+    DOCUMENTDB_ERROR_FORMATTED_4(DocumentDbError::DOCUMENTDB_ERR_MEMORY,
                              "Not enough data in "
                              "the binary object",
                              "memPtr", mem.PointerLong(), "len", mem.Length(),

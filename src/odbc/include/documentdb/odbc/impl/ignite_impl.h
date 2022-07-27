@@ -38,7 +38,7 @@ namespace impl {
 /**
  * Ignite implementation.
  */
-class IGNITE_FRIEND_EXPORT IgniteImpl : private interop::InteropTarget {
+class DOCUMENTDB_FRIEND_EXPORT IgniteImpl : private interop::InteropTarget {
   typedef common::concurrent::SharedPointer< cluster::IgniteClusterImpl >
       SP_IgniteClusterImpl;
   typedef common::concurrent::SharedPointer< compute::ComputeImpl >
@@ -245,7 +245,7 @@ class IGNITE_FRIEND_EXPORT IgniteImpl : private interop::InteropTarget {
   /** Projection implementation. */
   common::Lazy< cluster::ClusterGroupImpl > prjImpl;
 
-  IGNITE_NO_COPY_ASSIGNMENT(IgniteImpl);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(IgniteImpl);
 
   /**
    * Get or create cache.

@@ -62,7 +62,7 @@ const ProtocolVersion& ProtocolVersion::GetCurrent() {
 }
 
 void ThrowParseError() {
-  throw DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+  throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                     "Invalid version format. Valid format is X.Y.Z, where X, Y "
                     "and Z are major, "
                     "minor and maintenance version parts of Ignite since which "

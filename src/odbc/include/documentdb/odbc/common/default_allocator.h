@@ -30,7 +30,7 @@ namespace common {
  * as a memory allocation.
  */
 template < typename T >
-class IGNITE_IMPORT_EXPORT DefaultAllocator {
+class DOCUMENTDB_IMPORT_EXPORT DefaultAllocator {
  public:
   typedef T ValueType;
   typedef T* PointerType;

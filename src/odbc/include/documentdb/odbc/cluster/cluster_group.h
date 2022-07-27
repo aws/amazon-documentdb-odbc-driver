@@ -42,7 +42,7 @@ namespace cluster {
  * cluster group containing all cluster nodes. Use
  * IgniteCluster::AsClusterGroup() to get the cluster group in this case.
  */
-class IGNITE_IMPORT_EXPORT ClusterGroup {
+class DOCUMENTDB_IMPORT_EXPORT ClusterGroup {
   friend class impl::cluster::ClusterGroupImpl;
   friend class impl::IgniteImpl;
 

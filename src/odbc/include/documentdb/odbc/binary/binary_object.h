@@ -42,7 +42,7 @@ namespace binary {
  * This is a thin wrapper over the memory area that contains serialized
  * binary object. Provides method that allows deserialize object.
  */
-class IGNITE_IMPORT_EXPORT BinaryObject {
+class DOCUMENTDB_IMPORT_EXPORT BinaryObject {
   friend class documentdb::odbc::impl::binary::BinaryWriterImpl;
 
  public:

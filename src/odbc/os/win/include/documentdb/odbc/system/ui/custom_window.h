@@ -167,7 +167,7 @@ class CustomWindow : public Window {
                                            int id);
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(CustomWindow)
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(CustomWindow)
 
   /**
    * Static callback.

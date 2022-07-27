@@ -97,7 +97,7 @@ void Connection::GetInfo(config::ConnectionInfo::InfoType type, void* buf,
           << buflen << ", " << std::hex << reinterpret_cast< size_t >(reslen)
           << std::dec);
 
-  IGNITE_ODBC_API_CALL(InternalGetInfo(type, buf, buflen, reslen));
+  DOCUMENTDB_ODBC_API_CALL(InternalGetInfo(type, buf, buflen, reslen));
 }
 
 SqlResult::Type Connection::InternalGetInfo(
@@ -115,7 +115,7 @@ SqlResult::Type Connection::InternalGetInfo(
 }
 
 void Connection::Establish(const std::string& connectStr, void* parentWindow) {
-  IGNITE_ODBC_API_CALL(InternalEstablish(connectStr, parentWindow));
+  DOCUMENTDB_ODBC_API_CALL(InternalEstablish(connectStr, parentWindow));
 }
 
 SqlResult::Type Connection::InternalEstablish(const std::string& connectStr,
@@ -145,7 +145,7 @@ SqlResult::Type Connection::InternalEstablish(const std::string& connectStr,
 }
 
 void Connection::Establish(const config::Configuration cfg) {
-  IGNITE_ODBC_API_CALL(InternalEstablish(cfg));
+  DOCUMENTDB_ODBC_API_CALL(InternalEstablish(cfg));
 }
 
 SqlResult::Type Connection::InternalEstablish(
@@ -184,7 +184,7 @@ SqlResult::Type Connection::InternalEstablish(
 }
 
 void Connection::Release() {
-  IGNITE_ODBC_API_CALL(InternalRelease());
+  DOCUMENTDB_ODBC_API_CALL(InternalRelease());
 }
 
 void Connection::Deregister() {
@@ -211,7 +211,7 @@ void Connection::Close() {
     if (connection_.IsValid()) {
       JniErrorInfo errInfo;
       connection_.Get()->Close(errInfo);
-      if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
         // TODO: Determine if we need to error check the close.
       }
       connection_ = nullptr;
@@ -222,14 +222,14 @@ void Connection::Close() {
 Statement* Connection::CreateStatement() {
   Statement* statement;
 
-  IGNITE_ODBC_API_CALL(InternalCreateStatement(statement));
+  DOCUMENTDB_ODBC_API_CALL(InternalCreateStatement(statement));
 
   return statement;
 }
 
 SharedPointer< DatabaseMetaData > Connection::GetMetaData(DocumentDbError& err) {
   if (!connection_.IsValid()) {
-    err = DocumentDbError(DocumentDbError::IGNITE_ERR_ILLEGAL_STATE,
+    err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_ILLEGAL_STATE,
                       "Must be connected.");
     return nullptr;
   }
@@ -237,7 +237,7 @@ SharedPointer< DatabaseMetaData > Connection::GetMetaData(DocumentDbError& err) 
   auto databaseMetaData = connection_.Get()->GetMetaData(errInfo);
   if (!databaseMetaData.IsValid()) {
     std::string message = errInfo.errMsg;
-    err = DocumentDbError(DocumentDbError::IGNITE_ERR_JNI_GET_DATABASE_METADATA,
+    err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_JNI_GET_DATABASE_METADATA,
                       message.c_str());
     return nullptr;
   }
@@ -247,7 +247,7 @@ SharedPointer< DatabaseMetaData > Connection::GetMetaData(DocumentDbError& err) 
 SharedPointer< DocumentDbDatabaseMetadata > Connection::GetDatabaseMetadata(
     DocumentDbError& err) {
   if (!connection_.IsValid()) {
-    err = DocumentDbError(DocumentDbError::IGNITE_ERR_ILLEGAL_STATE,
+    err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_ILLEGAL_STATE,
                       "Must be connected.");
     return nullptr;
   }
@@ -257,7 +257,7 @@ SharedPointer< DocumentDbDatabaseMetadata > Connection::GetDatabaseMetadata(
   if (!documentDbDatabaseMetaData.IsValid()) {
     std::string message = errInfo.errMsg;
     err = DocumentDbError(
-        DocumentDbError::IGNITE_ERR_JNI_GET_DOCUMENTDB_DATABASE_METADATA,
+        DocumentDbError::DOCUMENTDB_ERR_JNI_GET_DOCUMENTDB_DATABASE_METADATA,
         message.c_str());
     return nullptr;
   }
@@ -267,7 +267,7 @@ SharedPointer< DocumentDbDatabaseMetadata > Connection::GetDatabaseMetadata(
 SharedPointer< DocumentDbConnectionProperties >
 Connection::GetConnectionProperties(DocumentDbError& err) {
   if (!connection_.IsValid()) {
-    err = DocumentDbError(DocumentDbError::IGNITE_ERR_ILLEGAL_STATE,
+    err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_ILLEGAL_STATE,
                       "Must be connected.");
     return nullptr;
   }
@@ -277,7 +277,7 @@ Connection::GetConnectionProperties(DocumentDbError& err) {
   if (!connectionProperties.IsValid()) {
     std::string message = errInfo.errMsg;
     err = DocumentDbError(
-        DocumentDbError::IGNITE_ERR_JNI_GET_DOCUMENTDB_CONNECTION_PROPERTIES,
+        DocumentDbError::DOCUMENTDB_ERR_JNI_GET_DOCUMENTDB_CONNECTION_PROPERTIES,
         message.c_str());
     return nullptr;
   }
@@ -313,7 +313,7 @@ diagnostic::DiagnosticRecord Connection::CreateStatusRecord(
 
 void Connection::GetAttribute(int attr, void* buf, SQLINTEGER bufLen,
                               SQLINTEGER* valueLen) {
-  IGNITE_ODBC_API_CALL(InternalGetAttribute(attr, buf, bufLen, valueLen));
+  DOCUMENTDB_ODBC_API_CALL(InternalGetAttribute(attr, buf, bufLen, valueLen));
 }
 
 SqlResult::Type Connection::InternalGetAttribute(int attr, void* buf,
@@ -361,7 +361,7 @@ SqlResult::Type Connection::InternalGetAttribute(int attr, void* buf,
 }
 
 void Connection::SetAttribute(int attr, void* value, SQLINTEGER valueLen) {
-  IGNITE_ODBC_API_CALL(InternalSetAttribute(attr, value, valueLen));
+  DOCUMENTDB_ODBC_API_CALL(InternalSetAttribute(attr, value, valueLen));
 }
 
 SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
@@ -417,7 +417,7 @@ bool Connection::TryRestoreConnection(DocumentDbError& err) {
 
   JniErrorInfo errInfo;
   auto ctx = GetJniContext(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     err = DocumentDbError(static_cast< int32_t >(errInfo.code),
                       std::string(errInfo.errCls)
                           .append(": ")
@@ -428,14 +428,14 @@ bool Connection::TryRestoreConnection(DocumentDbError& err) {
   SharedPointer< DocumentDbConnection > conn = new DocumentDbConnection(ctx);
   if (!conn.IsValid()
       || conn.Get()->Open(config_, errInfo)
-             != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+             != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string message = errInfo.errMsg;
-    err = DocumentDbError(DocumentDbError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
+    err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_SECURE_CONNECTION_FAILURE,
                       message.c_str());
   }
   connection_ = conn;
   bool connected = connection_.IsValid() && connection_.Get()->IsOpen()
-                   && errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
+                   && errInfo.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS;
 
   if (!connected) {
     return connected;
@@ -459,8 +459,8 @@ bool Connection::GetInternalSSHTunnelPort(int32_t& localSSHTunnelPort,
   JniErrorCode success =
       connection_.Get()->IsSshTunnelActive(isSSHTunnelActive, errInfo);
 
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    err = DocumentDbError(odbc::DocumentDbError::IGNITE_ERR_JVM_INIT,
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
+    err = DocumentDbError(odbc::DocumentDbError::DOCUMENTDB_ERR_JVM_INIT,
                       errInfo.errMsg.c_str());
     return false;
   }
@@ -468,8 +468,8 @@ bool Connection::GetInternalSSHTunnelPort(int32_t& localSSHTunnelPort,
   if (isSSHTunnelActive) {
     JniErrorCode success =
         connection_.Get()->GetSshLocalPort(localSSHTunnelPort, errInfo);
-    if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-      err = DocumentDbError(odbc::DocumentDbError::IGNITE_ERR_JVM_INIT,
+    if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
+      err = DocumentDbError(odbc::DocumentDbError::DOCUMENTDB_ERR_JVM_INIT,
                         errInfo.errMsg.c_str());
       return false;
     }
@@ -601,7 +601,7 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
     auto result = db.run_command(ping.view());
 
     if (result.view()["ok"].get_double() != 1) {
-      err = odbc::DocumentDbError(odbc::DocumentDbError::IGNITE_ERR_NETWORK_FAILURE,
+      err = odbc::DocumentDbError(odbc::DocumentDbError::DOCUMENTDB_ERR_NETWORK_FAILURE,
                               "Unable to ping DocumentDB.");
       return false;
     }
@@ -614,7 +614,7 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
             << " messagge: " << xcp.code().message()
             << " cause: " << xcp.what();
     err = odbc::DocumentDbError(
-        odbc::DocumentDbError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
+        odbc::DocumentDbError::DOCUMENTDB_ERR_SECURE_CONNECTION_FAILURE,
         message.str().c_str());
     return false;
   }

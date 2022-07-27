@@ -32,7 +32,7 @@ namespace odbc {
 /**
  * %Timestamp type.
  */
-class IGNITE_IMPORT_EXPORT Timestamp {
+class DOCUMENTDB_IMPORT_EXPORT Timestamp {
  public:
   /**
    * Default constructor.
@@ -105,7 +105,7 @@ class IGNITE_IMPORT_EXPORT Timestamp {
    * @param val2 Second value.
    * @return True if equal.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator==(const Timestamp& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator==(const Timestamp& val1,
                                               const Timestamp& val2);
 
   /**
@@ -115,7 +115,7 @@ class IGNITE_IMPORT_EXPORT Timestamp {
    * @param val2 Second value.
    * @return True if not equal.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator!=(const Timestamp& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator!=(const Timestamp& val1,
                                               const Timestamp& val2);
 
   /**
@@ -125,7 +125,7 @@ class IGNITE_IMPORT_EXPORT Timestamp {
    * @param val2 Second value.
    * @return True if less.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator<(const Timestamp& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator<(const Timestamp& val1,
                                              const Timestamp& val2);
 
   /**
@@ -135,7 +135,7 @@ class IGNITE_IMPORT_EXPORT Timestamp {
    * @param val2 Second value.
    * @return True if less or equal.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator<=(const Timestamp& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator<=(const Timestamp& val1,
                                               const Timestamp& val2);
 
   /**
@@ -145,7 +145,7 @@ class IGNITE_IMPORT_EXPORT Timestamp {
    * @param val2 Second value.
    * @return True if gretter.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator>(const Timestamp& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator>(const Timestamp& val1,
                                              const Timestamp& val2);
 
   /**
@@ -155,7 +155,7 @@ class IGNITE_IMPORT_EXPORT Timestamp {
    * @param val2 Second value.
    * @return True if gretter or equal.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator>=(const Timestamp& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator>=(const Timestamp& val1,
                                               const Timestamp& val2);
 
  private:

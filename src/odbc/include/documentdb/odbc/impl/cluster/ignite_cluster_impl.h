@@ -33,7 +33,7 @@ namespace cluster {
 /**
  * Ignite cluster implementation.
  */
-class IGNITE_FRIEND_EXPORT IgniteClusterImpl {
+class DOCUMENTDB_FRIEND_EXPORT IgniteClusterImpl {
  public:
   /**
    * Constructor used to create new instance.
@@ -146,7 +146,7 @@ class IGNITE_FRIEND_EXPORT IgniteClusterImpl {
   SP_ClusterGroupImpl AsClusterGroup();
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(IgniteClusterImpl);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(IgniteClusterImpl);
 
   /** Implementation. */
   SP_ClusterGroupImpl impl;

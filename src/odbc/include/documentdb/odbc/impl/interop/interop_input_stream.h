@@ -27,7 +27,7 @@ namespace interop {
 /**
  * Interop input stream implementation.
  */
-class IGNITE_IMPORT_EXPORT InteropInputStream {
+class DOCUMENTDB_IMPORT_EXPORT InteropInputStream {
  public:
   /**
    * Constructor.

@@ -51,7 +51,7 @@ struct BinaryOffsetType {
 /**
  * Binary schema.
  */
-class IGNITE_IMPORT_EXPORT BinarySchema {
+class DOCUMENTDB_IMPORT_EXPORT BinarySchema {
  public:
   /**
    * Default constructor.
@@ -124,7 +124,7 @@ class IGNITE_IMPORT_EXPORT BinarySchema {
   /** Information about written fields. */
   FieldContainer* fieldsInfo;
 
-  IGNITE_NO_COPY_ASSIGNMENT(BinarySchema);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(BinarySchema);
 };
 }  // namespace binary
 }  // namespace impl

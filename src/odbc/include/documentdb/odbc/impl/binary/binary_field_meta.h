@@ -77,7 +77,7 @@ class BinaryFieldMeta {
    *
    * @param writer Writer.
    */
-  IGNITE_IMPORT_EXPORT void Write(
+  DOCUMENTDB_IMPORT_EXPORT void Write(
       documentdb::odbc::binary::BinaryRawWriter& writer) const;
 
   /**
@@ -85,7 +85,7 @@ class BinaryFieldMeta {
    *
    * @param reader reader.
    */
-  IGNITE_IMPORT_EXPORT void Read(documentdb::odbc::binary::BinaryRawReader& reader);
+  DOCUMENTDB_IMPORT_EXPORT void Read(documentdb::odbc::binary::BinaryRawReader& reader);
 
  private:
   /** Type ID. */

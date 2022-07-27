@@ -76,13 +76,13 @@ class HandleRegistrySegment {
   /** Mutex. */
   common::concurrent::CriticalSection mux;
 
-  IGNITE_NO_COPY_ASSIGNMENT(HandleRegistrySegment);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(HandleRegistrySegment);
 };
 
 /**
  * Handle registry.
  */
-class IGNITE_IMPORT_EXPORT HandleRegistry {
+class DOCUMENTDB_IMPORT_EXPORT HandleRegistry {
  public:
   /**
    * Constructor.
@@ -173,7 +173,7 @@ class IGNITE_IMPORT_EXPORT HandleRegistry {
   /** Close flag. */
   int32_t closed;
 
-  IGNITE_NO_COPY_ASSIGNMENT(HandleRegistry);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(HandleRegistry);
 
   /**
    * Internal allocation routine.

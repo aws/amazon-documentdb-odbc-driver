@@ -572,7 +572,7 @@ void BigInteger::Divide(const BigInteger& divisor, BigInteger& res,
                         BigInteger* rem) const {
   // Can't divide by zero.
   if (divisor.mag.IsEmpty())
-    throw DocumentDbError(DocumentDbError::IGNITE_ERR_ILLEGAL_ARGUMENT,
+    throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_ILLEGAL_ARGUMENT,
                       "Division by zero.");
 
   int32_t compRes = Compare(divisor, true);

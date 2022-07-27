@@ -92,15 +92,15 @@ struct TestType {
 };
 
 namespace binary {
-IGNITE_BINARY_TYPE_START(documentdb::odbc::TestType)
+DOCUMENTDB_BINARY_TYPE_START(documentdb::odbc::TestType)
 
 typedef documentdb::odbc::TestType TestType;
 
-IGNITE_BINARY_GET_TYPE_ID_AS_HASH(TestType)
-IGNITE_BINARY_GET_TYPE_NAME_AS_IS(TestType)
-IGNITE_BINARY_GET_FIELD_ID_AS_HASH
-IGNITE_BINARY_IS_NULL_FALSE(TestType)
-IGNITE_BINARY_GET_NULL_DEFAULT_CTOR(TestType)
+DOCUMENTDB_BINARY_GET_TYPE_ID_AS_HASH(TestType)
+DOCUMENTDB_BINARY_GET_TYPE_NAME_AS_IS(TestType)
+DOCUMENTDB_BINARY_GET_FIELD_ID_AS_HASH
+DOCUMENTDB_BINARY_IS_NULL_FALSE(TestType)
+DOCUMENTDB_BINARY_GET_NULL_DEFAULT_CTOR(TestType)
 
 static void Write(BinaryWriter& writer, const TestType& obj) {
   if (!obj.allNulls) {
@@ -160,7 +160,7 @@ static void Read(BinaryReader& reader, TestType& dst) {
   }
 }
 
-IGNITE_BINARY_TYPE_END
+DOCUMENTDB_BINARY_TYPE_END
 }  // namespace binary
 }  // namespace odbc
 }  // namespace documentdb

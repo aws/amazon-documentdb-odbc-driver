@@ -169,7 +169,7 @@ void IgniteImpl::SetTxTimeoutOnPartitionMapExchange(int64_t timeout) {
 
   if (timeout < 0) {
     const char* msg = "Impossible to set negative timeout";
-    throw DocumentDbError(DocumentDbError::IGNITE_ERR_ILLEGAL_ARGUMENT, msg);
+    throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_ILLEGAL_ARGUMENT, msg);
   }
 
   In1Operation< int64_t > inOp(timeout);
@@ -187,7 +187,7 @@ ClusterGroupImpl* IgniteImpl::InternalGetProjection() {
   DocumentDbError::ThrowIfNeeded(err);
 
   if (!clusterGroupJavaRef)
-    throw DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+    throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                       "Can not get ClusterGroup instance.");
 
   return new ClusterGroupImpl(env, clusterGroupJavaRef);

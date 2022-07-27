@@ -114,7 +114,7 @@ class TableMetadataQuery : public Query {
   virtual SqlResult::Type NextResultSet();
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(TableMetadataQuery);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(TableMetadataQuery);
 
   /**
    * Make get columns metadata requets and use response to set internal state.

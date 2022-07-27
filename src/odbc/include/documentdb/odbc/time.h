@@ -31,7 +31,7 @@ namespace odbc {
 /**
  * %Time type.
  */
-class IGNITE_IMPORT_EXPORT Time {
+class DOCUMENTDB_IMPORT_EXPORT Time {
  public:
   /**
    * Default constructor.
@@ -81,7 +81,7 @@ class IGNITE_IMPORT_EXPORT Time {
    * @param val2 Second value.
    * @return True if equal.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator==(const Time& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator==(const Time& val1,
                                               const Time& val2);
 
   /**
@@ -91,7 +91,7 @@ class IGNITE_IMPORT_EXPORT Time {
    * @param val2 Second value.
    * @return True if not equal.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator!=(const Time& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator!=(const Time& val1,
                                               const Time& val2);
 
   /**
@@ -101,7 +101,7 @@ class IGNITE_IMPORT_EXPORT Time {
    * @param val2 Second value.
    * @return True if less.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator<(const Time& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator<(const Time& val1,
                                              const Time& val2);
 
   /**
@@ -111,7 +111,7 @@ class IGNITE_IMPORT_EXPORT Time {
    * @param val2 Second value.
    * @return True if less or equal.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator<=(const Time& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator<=(const Time& val1,
                                               const Time& val2);
 
   /**
@@ -121,7 +121,7 @@ class IGNITE_IMPORT_EXPORT Time {
    * @param val2 Second value.
    * @return True if gretter.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator>(const Time& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator>(const Time& val1,
                                              const Time& val2);
 
   /**
@@ -131,7 +131,7 @@ class IGNITE_IMPORT_EXPORT Time {
    * @param val2 Second value.
    * @return True if gretter or equal.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator>=(const Time& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator>=(const Time& val1,
                                               const Time& val2);
 
  private:

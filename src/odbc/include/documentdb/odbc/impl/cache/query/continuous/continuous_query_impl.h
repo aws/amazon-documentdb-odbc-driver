@@ -371,7 +371,7 @@ class RemoteFilterHolder : public ContinuousQueryImplBase {
 
   virtual void ReadAndProcessEvents(documentdb::odbc::binary::BinaryRawReader&) {
     throw DocumentDbError(
-        DocumentDbError::IGNITE_ERR_GENERIC,
+        DocumentDbError::DOCUMENTDB_ERR_GENERIC,
         "No listener is registered for the ContinuousQuery instance");
   }
 };

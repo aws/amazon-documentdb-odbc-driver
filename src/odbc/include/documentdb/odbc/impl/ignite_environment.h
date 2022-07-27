@@ -49,7 +49,7 @@ typedef common::concurrent::SharedPointer< IgniteEnvironment >
 /**
  * Defines environment in which Ignite operates.
  */
-class IGNITE_IMPORT_EXPORT IgniteEnvironment {
+class DOCUMENTDB_IMPORT_EXPORT IgniteEnvironment {
   typedef common::concurrent::SharedPointer< cluster::ClusterNodeImpl >
       SP_ClusterNodeImpl;
 
@@ -374,7 +374,7 @@ class IGNITE_IMPORT_EXPORT IgniteEnvironment {
    * @param type Operation type.
    * @param val Value.
    */
-  friend int64_t IGNITE_CALL InLongOutLong(void* target, int type, int64_t val);
+  friend int64_t DOCUMENTDB_CALL InLongOutLong(void* target, int type, int64_t val);
 
  private:
   /** Node configuration. */
@@ -413,7 +413,7 @@ class IGNITE_IMPORT_EXPORT IgniteEnvironment {
   /** Ignite node. */
   documentdb::odbc::Ignite* ignite;
 
-  IGNITE_NO_COPY_ASSIGNMENT(IgniteEnvironment);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(IgniteEnvironment);
 };
 }  // namespace impl
 }  // namespace odbc

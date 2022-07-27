@@ -44,7 +44,7 @@ namespace binary {
  * been called, instance is not usable and will throw an DocumentDbError
  * on any subsequent attempt to use it.
  */
-class IGNITE_IMPORT_EXPORT BinaryStringArrayWriter {
+class DOCUMENTDB_IMPORT_EXPORT BinaryStringArrayWriter {
  public:
   /**
    * Constructor.
@@ -115,7 +115,7 @@ class IGNITE_IMPORT_EXPORT BinaryStringArrayWriter {
  * on any subsequent attempt to use it.
  */
 template < typename T >
-class IGNITE_IMPORT_EXPORT BinaryArrayWriter {
+class DOCUMENTDB_IMPORT_EXPORT BinaryArrayWriter {
  public:
   /**
    * Constructor.
@@ -172,7 +172,7 @@ class IGNITE_IMPORT_EXPORT BinaryArrayWriter {
  * on any subsequent attempt to use it.
  */
 template < typename T >
-class IGNITE_IMPORT_EXPORT BinaryCollectionWriter {
+class DOCUMENTDB_IMPORT_EXPORT BinaryCollectionWriter {
  public:
   /**
    * Constructor.
@@ -228,7 +228,7 @@ class IGNITE_IMPORT_EXPORT BinaryCollectionWriter {
  * on any subsequent attempt to use it.
  */
 template < typename K, typename V >
-class IGNITE_IMPORT_EXPORT BinaryMapWriter {
+class DOCUMENTDB_IMPORT_EXPORT BinaryMapWriter {
  public:
   /**
    * Constructor.
@@ -281,7 +281,7 @@ class IGNITE_IMPORT_EXPORT BinaryMapWriter {
  * Use GetNext() method to read array value by value while HasNext()
  * method returns true.
  */
-class IGNITE_IMPORT_EXPORT BinaryStringArrayReader {
+class DOCUMENTDB_IMPORT_EXPORT BinaryStringArrayReader {
  public:
   /**
    * Constructor.

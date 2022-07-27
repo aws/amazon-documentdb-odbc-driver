@@ -47,7 +47,7 @@ class AttachHelper {
 /**
  * Represents global reference to Java object.
  */
-class IGNITE_IMPORT_EXPORT JavaGlobalRef {
+class DOCUMENTDB_IMPORT_EXPORT JavaGlobalRef {
  public:
   /**
    * Default constructor
@@ -134,26 +134,26 @@ class IGNITE_IMPORT_EXPORT JavaGlobalRef {
  * @param path Explicitly defined path (optional).
  * @return Path to the file. Empty string if the library was not found.
  */
-IGNITE_IMPORT_EXPORT std::string FindJvmLibrary(const std::string& path);
+DOCUMENTDB_IMPORT_EXPORT std::string FindJvmLibrary(const std::string& path);
 
 /**
- * Helper function to create classpath based on Ignite home directory.
+ * Helper function to create classpath based on DocumentDB home directory.
  *
  * @param home Home directory; expected to be valid.
  * @param forceTest Force test classpath.
  * @return Classpath.
  */
-IGNITE_IMPORT_EXPORT std::string CreateDocumentDbHomeClasspath(
+DOCUMENTDB_IMPORT_EXPORT std::string CreateDocumentDbHomeClasspath(
     const std::string& home, bool forceTest);
 
 /**
- * Create Ignite classpath based on user input and home directory.
+ * Create DocumentDB classpath based on user input and home directory.
  *
  * @param usrCp User's classpath.
- * @param home Ignite home directory.
+ * @param home DocumentDB home directory.
  * @return Classpath.
  */
-IGNITE_IMPORT_EXPORT std::string CreateDocumentDbClasspath(
+DOCUMENTDB_IMPORT_EXPORT std::string CreateDocumentDbClasspath(
     const std::string& usrCp, const std::string& home);
 
 /**
@@ -163,13 +163,13 @@ IGNITE_IMPORT_EXPORT std::string CreateDocumentDbClasspath(
  * 2) Check for environment variable.
  * 3) Check for current working directory.
  * Result of these checks are evaluated based on existence of certain
- * predefined folders inside possible Ignite home. If they are found,
- * IGNITE_HOME is considered resolved.
+ * predefined folders inside possible DocumentDB home. If they are found,
+ * DOCUMENTDB_HOME is considered resolved.
  *
  * @param path Optional path to evaluate.
- * @return Resolved Ignite home.
+ * @return Resolved DocumentDB home.
  */
-IGNITE_IMPORT_EXPORT std::string ResolveDocumentDbHome(
+DOCUMENTDB_IMPORT_EXPORT std::string ResolveDocumentDbHome(
     const std::string& path = "");
 }  // namespace jni
 }  // namespace odbc

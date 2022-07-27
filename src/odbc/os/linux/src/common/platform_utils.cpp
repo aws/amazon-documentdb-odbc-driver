@@ -110,7 +110,7 @@ StdCharOutStream& Dle(StdCharOutStream& ostr) {
   return ostr;
 }
 
-IGNITE_IMPORT_EXPORT unsigned GetRandSeed() {
+DOCUMENTDB_IMPORT_EXPORT unsigned GetRandSeed() {
   timespec ts;
 
   clock_gettime(CLOCK_MONOTONIC, &ts);

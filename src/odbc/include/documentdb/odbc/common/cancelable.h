@@ -31,7 +31,7 @@ namespace common {
 /**
  * Cancelable.
  */
-class IGNITE_IMPORT_EXPORT Cancelable {
+class DOCUMENTDB_IMPORT_EXPORT Cancelable {
  public:
   /**
    * Default constructor.
@@ -53,7 +53,7 @@ class IGNITE_IMPORT_EXPORT Cancelable {
   virtual void Cancel() = 0;
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(Cancelable);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(Cancelable);
 };
 }  // namespace common
 }  // namespace odbc

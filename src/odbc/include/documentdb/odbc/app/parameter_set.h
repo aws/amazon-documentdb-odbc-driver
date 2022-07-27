@@ -252,7 +252,7 @@ class ParameterSet {
    */
   void WriteRow(impl::binary::BinaryWriterImpl& writer, SqlUlen idx) const;
 
-  IGNITE_NO_COPY_ASSIGNMENT(ParameterSet);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(ParameterSet);
 
   /** Parameters. */
   ParameterBindingMap parameters;

@@ -28,7 +28,7 @@ namespace interop {
 /**
  * Interop target.
  */
-class IGNITE_IMPORT_EXPORT InteropTarget {
+class DOCUMENTDB_IMPORT_EXPORT InteropTarget {
  public:
   /**
    * Operation result.
@@ -236,7 +236,7 @@ class IGNITE_IMPORT_EXPORT InteropTarget {
   /** javaRef release flag. */
   bool skipJavaRefRelease;
 
-  IGNITE_NO_COPY_ASSIGNMENT(InteropTarget);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(InteropTarget);
 
   /**
    * Write data to memory.

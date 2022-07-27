@@ -33,7 +33,7 @@ namespace odbc {
 namespace cache {
 // Forward-declaration.
 template < typename K, typename V >
-class IGNITE_IMPORT_EXPORT Cache;
+class DOCUMENTDB_IMPORT_EXPORT Cache;
 
 namespace query {
 namespace continuous {

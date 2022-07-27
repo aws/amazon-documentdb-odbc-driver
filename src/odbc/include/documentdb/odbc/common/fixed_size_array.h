@@ -34,7 +34,7 @@ namespace common {
  * its size can not be changed without resetting arrays content.
  */
 template < typename T >
-class IGNITE_IMPORT_EXPORT FixedSizeArray {
+class DOCUMENTDB_IMPORT_EXPORT FixedSizeArray {
  public:
   typedef int32_t SizeType;
 

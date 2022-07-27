@@ -30,7 +30,7 @@ namespace common {
 /**
  * Big integer number implementation.
  */
-class IGNITE_IMPORT_EXPORT BigInteger {
+class DOCUMENTDB_IMPORT_EXPORT BigInteger {
   friend class Decimal;
 
  public:
@@ -456,7 +456,7 @@ class IGNITE_IMPORT_EXPORT BigInteger {
  * @param val2 Second value.
  * @return True if equal.
  */
-IGNITE_IMPORT_EXPORT bool operator==(const BigInteger& val1,
+DOCUMENTDB_IMPORT_EXPORT bool operator==(const BigInteger& val1,
                                      const BigInteger& val2);
 
 /**
@@ -466,7 +466,7 @@ IGNITE_IMPORT_EXPORT bool operator==(const BigInteger& val1,
  * @param val2 Second value.
  * @return True if not equal.
  */
-IGNITE_IMPORT_EXPORT bool operator!=(const BigInteger& val1,
+DOCUMENTDB_IMPORT_EXPORT bool operator!=(const BigInteger& val1,
                                      const BigInteger& val2);
 
 /**
@@ -476,7 +476,7 @@ IGNITE_IMPORT_EXPORT bool operator!=(const BigInteger& val1,
  * @param val2 Second value.
  * @return True if less.
  */
-IGNITE_IMPORT_EXPORT bool operator<(const BigInteger& val1,
+DOCUMENTDB_IMPORT_EXPORT bool operator<(const BigInteger& val1,
                                     const BigInteger& val2);
 
 /**
@@ -486,7 +486,7 @@ IGNITE_IMPORT_EXPORT bool operator<(const BigInteger& val1,
  * @param val2 Second value.
  * @return True if less or equal.
  */
-IGNITE_IMPORT_EXPORT bool operator<=(const BigInteger& val1,
+DOCUMENTDB_IMPORT_EXPORT bool operator<=(const BigInteger& val1,
                                      const BigInteger& val2);
 
 /**
@@ -496,7 +496,7 @@ IGNITE_IMPORT_EXPORT bool operator<=(const BigInteger& val1,
  * @param val2 Second value.
  * @return True if gretter.
  */
-IGNITE_IMPORT_EXPORT bool operator>(const BigInteger& val1,
+DOCUMENTDB_IMPORT_EXPORT bool operator>(const BigInteger& val1,
                                     const BigInteger& val2);
 
 /**
@@ -506,7 +506,7 @@ IGNITE_IMPORT_EXPORT bool operator>(const BigInteger& val1,
  * @param val2 Second value.
  * @return True if gretter or equal.
  */
-IGNITE_IMPORT_EXPORT bool operator>=(const BigInteger& val1,
+DOCUMENTDB_IMPORT_EXPORT bool operator>=(const BigInteger& val1,
                                      const BigInteger& val2);
 }  // namespace common
 }  // namespace odbc

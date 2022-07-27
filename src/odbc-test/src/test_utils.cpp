@@ -87,7 +87,7 @@ std::string GetOdbcErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle,
 std::string GetTestConfigDir() {
   using namespace documentdb::odbc;
 
-  std::string cfgPath = common::GetEnv("IGNITE_NATIVE_TEST_ODBC_CONFIG_PATH");
+  std::string cfgPath = common::GetEnv("DOCUMENTDB_NATIVE_TEST_ODBC_CONFIG_PATH");
 
   if (!cfgPath.empty())
     return cfgPath;

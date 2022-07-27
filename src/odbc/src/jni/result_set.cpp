@@ -45,13 +45,13 @@ JniErrorCode ResultSet::Close(JniErrorInfo& errInfo) {
   if (_jniContext.IsValid() && _resultSet.IsValid()) {
     JniErrorCode success =
         _jniContext.Get()->ResultSetClose(_resultSet, errInfo);
-    if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       LOG_MSG(errInfo.errMsg);
     }
     _resultSet = nullptr;
     return success;
   }
-  return JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
+  return JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS;
 }
 
 JniErrorCode ResultSet::Next(bool& hasNext, JniErrorInfo& errInfo) {

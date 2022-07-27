@@ -68,7 +68,7 @@ class ConnectionInfo {
                           short* reslen) const;
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(ConnectionInfo);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(ConnectionInfo);
 
   /** Associative array of string parameters. */
   typedef std::map< InfoType, std::string > StringInfoMap;

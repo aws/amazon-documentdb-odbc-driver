@@ -123,7 +123,7 @@ class ComputeTaskHolder {
  */
 template < typename T >
 T PrimitiveFutureResult(int64_t value) {
-  IGNITE_ERROR_FORMATTED_1(DocumentDbError::IGNITE_ERR_GENERIC,
+  DOCUMENTDB_ERROR_FORMATTED_1(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                            "Primitive value passed to non-primitive future",
                            "value", value);
 }

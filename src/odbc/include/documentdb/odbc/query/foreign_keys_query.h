@@ -109,7 +109,7 @@ class ForeignKeysQuery : public Query {
   virtual SqlResult::Type NextResultSet();
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(ForeignKeysQuery);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(ForeignKeysQuery);
 
   /**
    * Make get foreign keys metadata requets and use response to set internal

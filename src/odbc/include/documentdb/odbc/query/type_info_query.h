@@ -101,7 +101,7 @@ class TypeInfoQuery : public Query {
   virtual SqlResult::Type NextResultSet();
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(TypeInfoQuery);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(TypeInfoQuery);
 
   /** Columns metadata. */
   meta::ColumnMetaVector columnsMeta;

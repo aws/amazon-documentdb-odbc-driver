@@ -31,7 +31,7 @@ namespace interop {
 /**
  * Interop external memory.
  */
-class IGNITE_IMPORT_EXPORT InteropExternalMemory : public InteropMemory {
+class DOCUMENTDB_IMPORT_EXPORT InteropExternalMemory : public InteropMemory {
  public:
   /**
    * Constructor.
@@ -43,7 +43,7 @@ class IGNITE_IMPORT_EXPORT InteropExternalMemory : public InteropMemory {
   virtual void Reallocate(int32_t cap);
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(InteropExternalMemory);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(InteropExternalMemory);
 };
 }  // namespace interop
 }  // namespace impl

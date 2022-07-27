@@ -37,7 +37,7 @@
  */
 #define IGNITE_MODULE_ADDITIONAL_INIT_CALLBACKS_MAX_NUM 100
 
-#define IGNITE_EXPORTED_CALL extern "C" IGNITE_IMPORT_EXPORT
+#define DOCUMENTDB_EXPORTED_CALL extern "C" DOCUMENTDB_IMPORT_EXPORT
 
 namespace documentdb {
 namespace odbc {
@@ -81,7 +81,7 @@ class ModuleManager {
 
     if (!module.IsLoaded()) {
       err = DocumentDbError(
-          DocumentDbError::IGNITE_ERR_GENERIC,
+          DocumentDbError::DOCUMENTDB_ERR_GENERIC,
           ("Can not load module [path=" + utility::ToUtf8(path) + ']').c_str());
 
       return;
@@ -115,7 +115,7 @@ class ModuleManager {
   }
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(ModuleManager);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(ModuleManager);
 
   /**
    * Get callback that inits Ignite module.

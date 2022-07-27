@@ -78,7 +78,7 @@ class DocumentDbRow {
   void Update(bsoncxx::document::view const& document);
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(DocumentDbRow);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(DocumentDbRow);
 
   /**
    * Get columns by its index.

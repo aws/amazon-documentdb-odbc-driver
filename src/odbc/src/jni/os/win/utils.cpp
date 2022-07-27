@@ -40,7 +40,7 @@ const char* JAVA_DLL2 = "\\bin\\server\\jvm.dll";
 
 const char* DOCUMENTDB_HOME = "DOCUMENTDB_HOME";
 
-const char* IGNITE_NATIVE_TEST_CLASSPATH = "IGNITE_NATIVE_TEST_CLASSPATH";
+const char* DOCUMENTDB_NATIVE_TEST_CLASSPATH = "DOCUMENTDB_NATIVE_TEST_CLASSPATH";
 
 /** Excluded modules from test classpath. */
 const char* TEST_EXCLUDED_MODULES[] = {"rest-http"};
@@ -318,7 +318,7 @@ std::string CreateDocumentDbClasspath(const std::string& usrCp,
 
   // 2. Append home classpath
   if (!home.empty()) {
-    std::string env = GetEnv(IGNITE_NATIVE_TEST_CLASSPATH, "false");
+    std::string env = GetEnv(DOCUMENTDB_NATIVE_TEST_CLASSPATH, "false");
 
     bool forceTest = ToLower(env) == "true";
 

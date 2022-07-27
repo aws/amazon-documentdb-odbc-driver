@@ -195,7 +195,7 @@ typedef int64_t(JNICALL* InLongLongLongObjectOutLongHandler)(
  *
  * @return true if the Java 9 or later is in use.
  */
-bool IGNITE_IMPORT_EXPORT IsJava9OrLater();
+bool DOCUMENTDB_IMPORT_EXPORT IsJava9OrLater();
 
 /**
  * Builds the JVM options
@@ -381,13 +381,13 @@ class GlobalJObject {
   /** Target reference. */
   jobject ref;
 
-  IGNITE_NO_COPY_ASSIGNMENT(GlobalJObject);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(GlobalJObject);
 };
 
 /**
  * JNI JVM wrapper.
  */
-class IGNITE_IMPORT_EXPORT JniJvm {
+class DOCUMENTDB_IMPORT_EXPORT JniJvm {
  public:
   /**
    * Default constructor for uninitialized JVM.
@@ -439,7 +439,7 @@ class IGNITE_IMPORT_EXPORT JniJvm {
 /**
  * JNI error information.
  */
-struct IGNITE_IMPORT_EXPORT JniErrorInfo {
+struct DOCUMENTDB_IMPORT_EXPORT JniErrorInfo {
   JniErrorCode code;
   std::string errCls;
   std::string errMsg;
@@ -482,7 +482,7 @@ struct IGNITE_IMPORT_EXPORT JniErrorInfo {
 /**
  * Unmanaged context.
  */
-class IGNITE_IMPORT_EXPORT JniContext {
+class DOCUMENTDB_IMPORT_EXPORT JniContext {
  public:
   static JniContext* Create(char** opts, int optsLen, JniHandlers const& hnds,
                             JniErrorInfo& errInfo);

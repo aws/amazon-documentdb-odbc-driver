@@ -87,7 +87,7 @@ class TemplatedBinaryIdResolver : public BinaryIdResolver {
     if (name)
       return documentdb::odbc::binary::BinaryType< T >::GetFieldId(name);
 
-    IGNITE_ERROR_FORMATTED_1(DocumentDbError::IGNITE_ERR_BINARY,
+    DOCUMENTDB_ERROR_FORMATTED_1(DocumentDbError::DOCUMENTDB_ERR_BINARY,
                              "Field name cannot be NULL.", "typeId", typeId);
   }
 
@@ -123,7 +123,7 @@ class MetadataBinaryIdResolver : public BinaryIdResolver {
 
   virtual int32_t GetFieldId(const int32_t typeId, const char* name) {
     if (!name) {
-      IGNITE_ERROR_FORMATTED_1(DocumentDbError::IGNITE_ERR_BINARY,
+      DOCUMENTDB_ERROR_FORMATTED_1(DocumentDbError::DOCUMENTDB_ERR_BINARY,
                                "Field name cannot be NULL.", "typeId", typeId);
     }
 
@@ -133,8 +133,8 @@ class MetadataBinaryIdResolver : public BinaryIdResolver {
       res = documentdb::odbc::binary::GetBinaryStringHashCode(name);
 
     if (res == 0) {
-      IGNITE_ERROR_FORMATTED_2(
-          DocumentDbError::IGNITE_ERR_BINARY,
+      DOCUMENTDB_ERROR_FORMATTED_2(
+          DocumentDbError::DOCUMENTDB_ERR_BINARY,
           "Field ID for the field name is zero. Please, redefine GetFieldId()"
           " method for the type or change field name",
           "typeId", typeId, "fieldName", name);

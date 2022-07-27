@@ -103,7 +103,7 @@ class QueryFieldsCursor {
     if (impl0)
       return impl0->HasNext(err);
     else {
-      err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+      err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "Instance is not usable (did you check for error?).");
 
       return false;
@@ -145,7 +145,7 @@ class QueryFieldsCursor {
     if (impl0)
       return impl0->GetNextRow(err);
     else {
-      err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+      err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "Instance is not usable (did you check for error?).");
 
       return QueryFieldsRow();

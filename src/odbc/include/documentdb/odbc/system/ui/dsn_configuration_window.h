@@ -142,7 +142,7 @@ class DsnConfigurationWindow : public CustomWindow {
   virtual bool OnMessage(UINT msg, WPARAM wParam, LPARAM lParam);
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(DsnConfigurationWindow)
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(DsnConfigurationWindow)
 
   /**
    * Retrieves current values from the children and stores

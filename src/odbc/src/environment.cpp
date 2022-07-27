@@ -36,7 +36,7 @@ Environment::~Environment() {
 Connection* Environment::CreateConnection() {
   Connection* connection;
 
-  IGNITE_ODBC_API_CALL(InternalCreateConnection(connection));
+  DOCUMENTDB_ODBC_API_CALL(InternalCreateConnection(connection));
 
   return connection;
 }
@@ -60,12 +60,12 @@ SqlResult::Type Environment::InternalCreateConnection(Connection*& connection) {
 }
 
 void Environment::SetAttribute(int32_t attr, void* value, int32_t len) {
-  IGNITE_ODBC_API_CALL(InternalSetAttribute(attr, value, len));
+  DOCUMENTDB_ODBC_API_CALL(InternalSetAttribute(attr, value, len));
 }
 
 SqlResult::Type Environment::InternalSetAttribute(int32_t attr, void* value,
                                                   int32_t len) {
-  IGNITE_UNUSED(len);
+  DOCUMENTDB_UNUSED(len);
 
   EnvironmentAttribute::Type attribute = EnvironmentAttributeToInternal(attr);
 
@@ -110,7 +110,7 @@ SqlResult::Type Environment::InternalSetAttribute(int32_t attr, void* value,
 
 void Environment::GetAttribute(int32_t attr,
                                app::ApplicationDataBuffer& buffer) {
-  IGNITE_ODBC_API_CALL(InternalGetAttribute(attr, buffer));
+  DOCUMENTDB_ODBC_API_CALL(InternalGetAttribute(attr, buffer));
 }
 
 SqlResult::Type Environment::InternalGetAttribute(

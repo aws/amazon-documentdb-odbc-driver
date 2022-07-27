@@ -141,7 +141,7 @@ class ClusterNodesHolder {
  * @param type Operation type.
  * @param val Value.
  */
-int64_t IGNITE_CALL InLongOutLong(void* target, int type, int64_t val) {
+int64_t DOCUMENTDB_CALL InLongOutLong(void* target, int type, int64_t val) {
   int64_t res = 0;
   SharedPointer< IgniteEnvironment >* env =
       static_cast< SharedPointer< IgniteEnvironment >* >(target);
@@ -277,10 +277,10 @@ int64_t IGNITE_CALL InLongOutLong(void* target, int type, int64_t val) {
  * @param val3 Value3.
  * @param arg Object arg.
  */
-int64_t IGNITE_CALL InLongLongLongObjectOutLong(void* target, int type,
+int64_t DOCUMENTDB_CALL InLongLongLongObjectOutLong(void* target, int type,
                                                 int64_t val1, int64_t val2,
                                                 int64_t val3, void* arg) {
-  IGNITE_UNUSED(val3);
+  DOCUMENTDB_UNUSED(val3);
 
   int64_t res = 0;
   SharedPointer< IgniteEnvironment >* env =
@@ -515,8 +515,8 @@ void IgniteEnvironment::ComputeJobExecuteLocal(int64_t jobHandle) {
   if (job)
     job->ExecuteLocal(this);
   else {
-    IGNITE_ERROR_FORMATTED_1(
-        DocumentDbError::IGNITE_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
+    DOCUMENTDB_ERROR_FORMATTED_1(
+        DocumentDbError::DOCUMENTDB_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
         "Job is not registred for handle", "jobHandle", jobHandle);
   }
 }
@@ -537,13 +537,13 @@ int32_t IgniteEnvironment::ComputeTaskLocalJobResult(int64_t taskHandle,
     return task->JobResultLocal(*job);
 
   if (!task) {
-    IGNITE_ERROR_FORMATTED_1(
-        DocumentDbError::IGNITE_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
+    DOCUMENTDB_ERROR_FORMATTED_1(
+        DocumentDbError::DOCUMENTDB_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
         "Task is not registred for handle", "taskHandle", taskHandle);
   }
 
-  IGNITE_ERROR_FORMATTED_1(
-      DocumentDbError::IGNITE_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
+  DOCUMENTDB_ERROR_FORMATTED_1(
+      DocumentDbError::DOCUMENTDB_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
       "Job is not registred for handle", "jobHandle", jobHandle);
 }
 
@@ -560,8 +560,8 @@ void IgniteEnvironment::ComputeTaskReduce(int64_t taskHandle) {
   if (task)
     task->Reduce();
   else {
-    IGNITE_ERROR_FORMATTED_1(
-        DocumentDbError::IGNITE_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
+    DOCUMENTDB_ERROR_FORMATTED_1(
+        DocumentDbError::DOCUMENTDB_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
         "Task is not registred for handle", "taskHandle", taskHandle);
   }
 }
@@ -581,7 +581,7 @@ void IgniteEnvironment::ComputeTaskComplete(int64_t taskHandle) {
 int64_t IgniteEnvironment::ComputeJobCreate(
     SharedPointer< InteropMemory >& mem) {
   if (!binding.Get())
-    throw DocumentDbError(DocumentDbError::IGNITE_ERR_UNKNOWN,
+    throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_UNKNOWN,
                       "IgniteBinding is not initialized.");
 
   InteropInputStream inStream(mem.Get());
@@ -602,8 +602,8 @@ int64_t IgniteEnvironment::ComputeJobCreate(
       reader, writer);
 
   if (!invoked) {
-    IGNITE_ERROR_FORMATTED_1(
-        DocumentDbError::IGNITE_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
+    DOCUMENTDB_ERROR_FORMATTED_1(
+        DocumentDbError::DOCUMENTDB_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
         "C++ compute job is not registered on the node (did you compile your "
         "program without -rdynamic?).",
         "jobTypeId", jobTypeId);
@@ -628,8 +628,8 @@ void IgniteEnvironment::ComputeJobExecute(SharedPointer< InteropMemory >& mem) {
   if (job)
     job->ExecuteRemote(this, writer);
   else {
-    IGNITE_ERROR_FORMATTED_1(
-        DocumentDbError::IGNITE_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
+    DOCUMENTDB_ERROR_FORMATTED_1(
+        DocumentDbError::DOCUMENTDB_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
         "Job is not registred for handle", "jobHandle", jobHandle);
   }
 
@@ -662,8 +662,8 @@ int32_t IgniteEnvironment::ComputeTaskJobResult(
   compute::ComputeTaskHolder* task = task0.Get();
 
   if (!task) {
-    IGNITE_ERROR_FORMATTED_1(
-        DocumentDbError::IGNITE_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
+    DOCUMENTDB_ERROR_FORMATTED_1(
+        DocumentDbError::DOCUMENTDB_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
         "Task is not registred for handle", "taskHandle", taskHandle);
   }
 
@@ -720,7 +720,7 @@ void IgniteEnvironment::OnContinuousQueryListenerApply(
 int64_t IgniteEnvironment::OnContinuousQueryFilterCreate(
     SharedPointer< InteropMemory >& mem) {
   if (!binding.Get())
-    throw DocumentDbError(DocumentDbError::IGNITE_ERR_UNKNOWN,
+    throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_UNKNOWN,
                       "IgniteBinding is not initialized.");
 
   InteropInputStream inStream(mem.Get());
@@ -741,8 +741,8 @@ int64_t IgniteEnvironment::OnContinuousQueryFilterCreate(
       filterId, reader, writer);
 
   if (!invoked) {
-    IGNITE_ERROR_FORMATTED_1(
-        DocumentDbError::IGNITE_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
+    DOCUMENTDB_ERROR_FORMATTED_1(
+        DocumentDbError::DOCUMENTDB_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
         "C++ remote filter is not registered on the node (did you compile your "
         "program without -rdynamic?).",
         "filterId", filterId);
@@ -765,14 +765,14 @@ int64_t IgniteEnvironment::OnContinuousQueryFilterApply(
       StaticPointerCast< ContinuousQueryImplBase >(registry.Get(handle));
 
   if (!qry.Get())
-    IGNITE_ERROR_FORMATTED_1(DocumentDbError::IGNITE_ERR_GENERIC,
+    DOCUMENTDB_ERROR_FORMATTED_1(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                              "Null query for handle.", "handle", handle);
 
   cache::event::CacheEntryEventFilterBase* filter =
       qry.Get()->GetFilterHolder().GetFilter();
 
   if (!filter)
-    IGNITE_ERROR_FORMATTED_1(DocumentDbError::IGNITE_ERR_GENERIC,
+    DOCUMENTDB_ERROR_FORMATTED_1(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                              "Null filter for handle.", "handle", handle);
 
   bool res = filter->ReadAndProcessEvent(rawReader);
@@ -838,7 +838,7 @@ int64_t IgniteEnvironment::OnFutureError(int64_t handle,
 
   std::string errStr = rawReader.ReadString();
 
-  DocumentDbError err(DocumentDbError::IGNITE_ERR_GENERIC, errStr.c_str());
+  DocumentDbError err(DocumentDbError::DOCUMENTDB_ERR_GENERIC, errStr.c_str());
 
   SharedPointer< compute::ComputeTaskHolder > task0 =
       StaticPointerCast< compute::ComputeTaskHolder >(registry.Get(handle));
@@ -878,8 +878,8 @@ int64_t IgniteEnvironment::OnComputeFuncExecute(
         reader, writer);
 
     if (!invoked) {
-      IGNITE_ERROR_FORMATTED_1(
-          DocumentDbError::IGNITE_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
+      DOCUMENTDB_ERROR_FORMATTED_1(
+          DocumentDbError::DOCUMENTDB_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
           "Compute function is not registred", "jobTypeId", jobTypeId);
     }
   }
@@ -892,8 +892,8 @@ int64_t IgniteEnvironment::OnComputeFuncExecute(
   compute::ComputeJobHolder* job = job0.Get();
 
   if (!job) {
-    IGNITE_ERROR_FORMATTED_1(
-        DocumentDbError::IGNITE_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
+    DOCUMENTDB_ERROR_FORMATTED_1(
+        DocumentDbError::DOCUMENTDB_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
         "Job is not registred for handle", "handle", handle);
   }
 
@@ -907,7 +907,7 @@ int64_t IgniteEnvironment::OnComputeFuncExecute(
 void IgniteEnvironment::CacheInvokeCallback(
     SharedPointer< InteropMemory >& mem) {
   if (!binding.Get())
-    throw DocumentDbError(DocumentDbError::IGNITE_ERR_UNKNOWN,
+    throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_UNKNOWN,
                       "IgniteBinding is not initialized.");
 
   InteropInputStream inStream(mem.Get());
@@ -919,7 +919,7 @@ void IgniteEnvironment::CacheInvokeCallback(
   bool local = reader.ReadBool();
 
   if (local)
-    throw DocumentDbError(DocumentDbError::IGNITE_ERR_UNSUPPORTED_OPERATION,
+    throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_UNSUPPORTED_OPERATION,
                       "Local invokation is not supported.");
 
   BinaryObjectImpl binProcHolder =
@@ -935,8 +935,8 @@ void IgniteEnvironment::CacheInvokeCallback(
       procId, reader, writer);
 
   if (!invoked) {
-    IGNITE_ERROR_FORMATTED_1(
-        DocumentDbError::IGNITE_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
+    DOCUMENTDB_ERROR_FORMATTED_1(
+        DocumentDbError::DOCUMENTDB_ERR_COMPUTE_USER_UNDECLARED_EXCEPTION,
         "C++ entry processor is not registered on the node (did you compile "
         "your program without -rdynamic?).",
         "procId", procId);

@@ -20,8 +20,8 @@
  * Declares documentdb::odbc::commom::SharedState class template.
  */
 
-#ifndef _IGNITE_SHARED_STATE
-#define _IGNITE_SHARED_STATE
+#ifndef _DOCUMENTDB_SHARED_STATE
+#define _DOCUMENTDB_SHARED_STATE
 
 #include <memory>
 
@@ -59,13 +59,13 @@ class SharedState {
    * @return True if the value or error set for the state.
    */
   bool IsSet() const {
-    return value.get() || error.GetCode() != DocumentDbError::IGNITE_SUCCESS;
+    return value.get() || error.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS;
   }
 
   /**
    * Set value.
    *
-   * @throw DocumentDbError with DocumentDbError::IGNITE_ERR_FUTURE_STATE if error or
+   * @throw DocumentDbError with DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE if error or
    * value has been set already.
    * @param val Value to set.
    */
@@ -74,11 +74,11 @@ class SharedState {
 
     if (IsSet()) {
       if (value.get())
-        throw DocumentDbError(DocumentDbError::IGNITE_ERR_FUTURE_STATE,
+        throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE,
                           "Future value already set");
 
-      if (error.GetCode() != DocumentDbError::IGNITE_SUCCESS)
-        throw DocumentDbError(DocumentDbError::IGNITE_ERR_FUTURE_STATE,
+      if (error.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS)
+        throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE,
                           "Future error already set");
     }
 
@@ -90,7 +90,7 @@ class SharedState {
   /**
    * Set error.
    *
-   * @throw DocumentDbError with DocumentDbError::IGNITE_ERR_FUTURE_STATE if error or
+   * @throw DocumentDbError with DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE if error or
    * value has been set already.
    * @param err Error to set.
    */
@@ -99,11 +99,11 @@ class SharedState {
 
     if (IsSet()) {
       if (value.get())
-        throw DocumentDbError(DocumentDbError::IGNITE_ERR_FUTURE_STATE,
+        throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE,
                           "Future value already set");
 
-      if (error.GetCode() != DocumentDbError::IGNITE_SUCCESS)
-        throw DocumentDbError(DocumentDbError::IGNITE_ERR_FUTURE_STATE,
+      if (error.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS)
+        throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE,
                           "Future error already set");
     }
 
@@ -153,7 +153,7 @@ class SharedState {
     if (value.get())
       return *value;
 
-    assert(error.GetCode() != DocumentDbError::IGNITE_SUCCESS);
+    assert(error.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS);
 
     throw error;
   }
@@ -178,7 +178,7 @@ class SharedState {
   }
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(SharedState);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(SharedState);
 
   /** Cancel target. */
   std::shared_ptr< Cancelable > cancelTarget;
@@ -225,13 +225,13 @@ class SharedState< void > {
    * @return True if the value or error set for the state.
    */
   bool IsSet() const {
-    return done || error.GetCode() != DocumentDbError::IGNITE_SUCCESS;
+    return done || error.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS;
   }
 
   /**
    * Set value.
    *
-   * @throw DocumentDbError with DocumentDbError::IGNITE_ERR_FUTURE_STATE if error or
+   * @throw DocumentDbError with DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE if error or
    * value has been set already.
    */
   void SetValue() {
@@ -239,11 +239,11 @@ class SharedState< void > {
 
     if (IsSet()) {
       if (done)
-        throw DocumentDbError(DocumentDbError::IGNITE_ERR_FUTURE_STATE,
+        throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE,
                           "Future value already set");
 
-      if (error.GetCode() != DocumentDbError::IGNITE_SUCCESS)
-        throw DocumentDbError(DocumentDbError::IGNITE_ERR_FUTURE_STATE,
+      if (error.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS)
+        throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE,
                           "Future error already set");
     }
 
@@ -255,7 +255,7 @@ class SharedState< void > {
   /**
    * Set error.
    *
-   * @throw DocumentDbError with DocumentDbError::IGNITE_ERR_FUTURE_STATE if error or
+   * @throw DocumentDbError with DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE if error or
    * value has been set already.
    * @param err Error to set.
    */
@@ -264,11 +264,11 @@ class SharedState< void > {
 
     if (IsSet()) {
       if (done)
-        throw DocumentDbError(DocumentDbError::IGNITE_ERR_FUTURE_STATE,
+        throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE,
                           "Future value already set");
 
-      if (error.GetCode() != DocumentDbError::IGNITE_SUCCESS)
-        throw DocumentDbError(DocumentDbError::IGNITE_ERR_FUTURE_STATE,
+      if (error.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS)
+        throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE,
                           "Future error already set");
     }
 
@@ -317,7 +317,7 @@ class SharedState< void > {
     if (done)
       return;
 
-    assert(error.GetCode() != DocumentDbError::IGNITE_SUCCESS);
+    assert(error.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS);
 
     throw error;
   }
@@ -342,7 +342,7 @@ class SharedState< void > {
   }
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(SharedState);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(SharedState);
 
   /** Cancel target. */
   std::shared_ptr< Cancelable > cancelTarget;
@@ -363,4 +363,4 @@ class SharedState< void > {
 }  // namespace odbc
 }  // namespace documentdb
 
-#endif  //_IGNITE_SHARED_STATE
+#endif  //_DOCUMENTDB_SHARED_STATE

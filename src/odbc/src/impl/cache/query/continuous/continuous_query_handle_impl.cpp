@@ -57,7 +57,7 @@ QueryCursorImpl* ContinuousQueryHandleImpl::GetInitialQueryCursor(
   CsLockGuard guard(mutex);
 
   if (extracted) {
-    err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+    err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                       "GetInitialQueryCursor() can be called only once.");
 
     return 0;
@@ -71,7 +71,7 @@ QueryCursorImpl* ContinuousQueryHandleImpl::GetInitialQueryCursor(
   DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
-  if (jniErr.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
+  if (jniErr.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS)
     return 0;
 
   extracted = true;

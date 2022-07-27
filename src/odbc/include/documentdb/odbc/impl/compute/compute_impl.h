@@ -42,7 +42,7 @@ namespace compute {
 /**
  * Compute implementation.
  */
-class IGNITE_IMPORT_EXPORT ComputeImpl : public interop::InteropTarget {
+class DOCUMENTDB_IMPORT_EXPORT ComputeImpl : public interop::InteropTarget {
  public:
   /**
    * Operation type.
@@ -270,7 +270,7 @@ class IGNITE_IMPORT_EXPORT ComputeImpl : public interop::InteropTarget {
   }
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(ComputeImpl);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(ComputeImpl);
 
   struct FutureType {
     enum Type {
@@ -558,42 +558,42 @@ class IGNITE_IMPORT_EXPORT ComputeImpl : public interop::InteropTarget {
 };
 
 template <>
-struct IGNITE_IMPORT_EXPORT ComputeImpl::FutureTypeForType< int8_t > {
+struct DOCUMENTDB_IMPORT_EXPORT ComputeImpl::FutureTypeForType< int8_t > {
   static const int32_t value = FutureType::F_BYTE;
 };
 
 template <>
-struct IGNITE_IMPORT_EXPORT ComputeImpl::FutureTypeForType< bool > {
+struct DOCUMENTDB_IMPORT_EXPORT ComputeImpl::FutureTypeForType< bool > {
   static const int32_t value = FutureType::F_BOOL;
 };
 
 template <>
-struct IGNITE_IMPORT_EXPORT ComputeImpl::FutureTypeForType< int16_t > {
+struct DOCUMENTDB_IMPORT_EXPORT ComputeImpl::FutureTypeForType< int16_t > {
   static const int32_t value = FutureType::F_SHORT;
 };
 
 template <>
-struct IGNITE_IMPORT_EXPORT ComputeImpl::FutureTypeForType< uint16_t > {
+struct DOCUMENTDB_IMPORT_EXPORT ComputeImpl::FutureTypeForType< uint16_t > {
   static const int32_t value = FutureType::F_CHAR;
 };
 
 template <>
-struct IGNITE_IMPORT_EXPORT ComputeImpl::FutureTypeForType< int32_t > {
+struct DOCUMENTDB_IMPORT_EXPORT ComputeImpl::FutureTypeForType< int32_t > {
   static const int32_t value = FutureType::F_INT;
 };
 
 template <>
-struct IGNITE_IMPORT_EXPORT ComputeImpl::FutureTypeForType< int64_t > {
+struct DOCUMENTDB_IMPORT_EXPORT ComputeImpl::FutureTypeForType< int64_t > {
   static const int32_t value = FutureType::F_LONG;
 };
 
 template <>
-struct IGNITE_IMPORT_EXPORT ComputeImpl::FutureTypeForType< float > {
+struct DOCUMENTDB_IMPORT_EXPORT ComputeImpl::FutureTypeForType< float > {
   static const int32_t value = FutureType::F_FLOAT;
 };
 
 template <>
-struct IGNITE_IMPORT_EXPORT ComputeImpl::FutureTypeForType< double > {
+struct DOCUMENTDB_IMPORT_EXPORT ComputeImpl::FutureTypeForType< double > {
   static const int32_t value = FutureType::F_DOUBLE;
 };
 }  // namespace compute

@@ -122,7 +122,7 @@ StdCharOutStream& Dle(StdCharOutStream& ostr) {
   return ostr;
 }
 
-IGNITE_IMPORT_EXPORT unsigned GetRandSeed() {
+DOCUMENTDB_IMPORT_EXPORT unsigned GetRandSeed() {
   return static_cast< unsigned >(GetTickCount64() ^ GetCurrentProcessId());
 }
 }  // namespace common

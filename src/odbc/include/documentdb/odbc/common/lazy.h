@@ -29,7 +29,7 @@ namespace common {
  * Lazy initialization template.
  */
 template < typename T >
-class IGNITE_IMPORT_EXPORT Lazy {
+class DOCUMENTDB_IMPORT_EXPORT Lazy {
   /**
    * Init function type.
    */

@@ -120,7 +120,7 @@ void DsnConfigurationWindow::Create() {
 
     buf << "Can not create window, error code: " << GetLastError();
 
-    throw DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC, buf.str().c_str());
+    throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC, buf.str().c_str());
   }
 }
 

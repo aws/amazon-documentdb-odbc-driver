@@ -38,7 +38,7 @@ const int32_t UINT64_MAX_PRECISION = 20;
  * @return The number of trailing zero bits in the two's complement
  *     binary representation of the specified 32-bit int value.
  */
-IGNITE_IMPORT_EXPORT int32_t NumberOfTrailingZerosI32(int32_t i);
+DOCUMENTDB_IMPORT_EXPORT int32_t NumberOfTrailingZerosI32(int32_t i);
 
 /**
  * Get number of leading zero bits in the two's complement binary
@@ -48,7 +48,7 @@ IGNITE_IMPORT_EXPORT int32_t NumberOfTrailingZerosI32(int32_t i);
  * @return The number of leading zero bits in the two's complement
  *     binary representation of the specified 32-bit int value.
  */
-IGNITE_IMPORT_EXPORT int32_t NumberOfLeadingZerosI32(int32_t i);
+DOCUMENTDB_IMPORT_EXPORT int32_t NumberOfLeadingZerosI32(int32_t i);
 
 /**
  * Get number of leading zero bits in the two's complement binary
@@ -58,7 +58,7 @@ IGNITE_IMPORT_EXPORT int32_t NumberOfLeadingZerosI32(int32_t i);
  * @return The number of leading zero bits in the two's complement
  *     binary representation of the specified 32-bit int value.
  */
-IGNITE_IMPORT_EXPORT int32_t NumberOfLeadingZerosU32(uint32_t i);
+DOCUMENTDB_IMPORT_EXPORT int32_t NumberOfLeadingZerosU32(uint32_t i);
 
 /**
  * Get number of leading zero bits in the two's complement binary
@@ -68,7 +68,7 @@ IGNITE_IMPORT_EXPORT int32_t NumberOfLeadingZerosU32(uint32_t i);
  * @return The number of leading zero bits in the two's complement
  *     binary representation of the specified 64-bit int value.
  */
-IGNITE_IMPORT_EXPORT int32_t NumberOfLeadingZerosI64(int64_t i);
+DOCUMENTDB_IMPORT_EXPORT int32_t NumberOfLeadingZerosI64(int64_t i);
 
 /**
  * Get number of leading zero bits in the two's complement binary
@@ -78,7 +78,7 @@ IGNITE_IMPORT_EXPORT int32_t NumberOfLeadingZerosI64(int64_t i);
  * @return The number of leading zero bits in the two's complement
  *     binary representation of the specified 64-bit int value.
  */
-IGNITE_IMPORT_EXPORT int32_t NumberOfLeadingZerosU64(uint64_t i);
+DOCUMENTDB_IMPORT_EXPORT int32_t NumberOfLeadingZerosU64(uint64_t i);
 
 /**
  * Get the number of one-bits in the two's complement binary
@@ -88,7 +88,7 @@ IGNITE_IMPORT_EXPORT int32_t NumberOfLeadingZerosU64(uint64_t i);
  * @return The number of one-bits in the two's complement binary
  *     representation of the specified 32-bit int value.
  */
-IGNITE_IMPORT_EXPORT int32_t BitCountI32(int32_t i);
+DOCUMENTDB_IMPORT_EXPORT int32_t BitCountI32(int32_t i);
 
 /**
  * Get bit length for the specified signed 32-bit int value.
@@ -97,7 +97,7 @@ IGNITE_IMPORT_EXPORT int32_t BitCountI32(int32_t i);
  * @return The number of significant bits in the two's complement binary
  *     representation of the specified 32-bit int value.
  */
-IGNITE_IMPORT_EXPORT int32_t BitLengthI32(int32_t i);
+DOCUMENTDB_IMPORT_EXPORT int32_t BitLengthI32(int32_t i);
 
 /**
  * Get bit length for the specified unsigned 32-bit int value.
@@ -106,7 +106,7 @@ IGNITE_IMPORT_EXPORT int32_t BitLengthI32(int32_t i);
  * @return The number of significant bits in the two's complement binary
  *     representation of the specified 32-bit int value.
  */
-IGNITE_IMPORT_EXPORT int32_t BitLengthU32(uint32_t i);
+DOCUMENTDB_IMPORT_EXPORT int32_t BitLengthU32(uint32_t i);
 
 /**
  * Calcutale capasity for required size.
@@ -115,7 +115,7 @@ IGNITE_IMPORT_EXPORT int32_t BitLengthU32(uint32_t i);
  * @param size Needed capasity.
  * @return Recomended capasity to allocate.
  */
-IGNITE_IMPORT_EXPORT int32_t GetCapasityForSize(int32_t size);
+DOCUMENTDB_IMPORT_EXPORT int32_t GetCapasityForSize(int32_t size);
 
 /**
  * Get the number of decimal digits of the integer value.
@@ -123,7 +123,7 @@ IGNITE_IMPORT_EXPORT int32_t GetCapasityForSize(int32_t size);
  * @param x The value.
  * @return The number of decimal digits of the integer value.
  */
-IGNITE_IMPORT_EXPORT int32_t DigitLength(uint64_t x);
+DOCUMENTDB_IMPORT_EXPORT int32_t DigitLength(uint64_t x);
 
 /**
  * Get n-th power of ten.
@@ -132,7 +132,7 @@ IGNITE_IMPORT_EXPORT int32_t DigitLength(uint64_t x);
  * @return 10 pow n, if n is in range [0, UINT64_MAX_PRECISION].
  *     Otherwise, behaviour is undefined.
  */
-IGNITE_IMPORT_EXPORT uint64_t TenPowerU64(int32_t n);
+DOCUMENTDB_IMPORT_EXPORT uint64_t TenPowerU64(int32_t n);
 
 /**
  * Get the signum function of the specified 64-bit integer value.

@@ -41,7 +41,7 @@ class ContinuousQueryHandleImpl;
 /**
  * Cache implementation.
  */
-class IGNITE_IMPORT_EXPORT CacheImpl : private interop::InteropTarget {
+class DOCUMENTDB_IMPORT_EXPORT CacheImpl : private interop::InteropTarget {
  public:
   /**
    * Constructor used to create new instance.
@@ -421,7 +421,7 @@ class IGNITE_IMPORT_EXPORT CacheImpl : private interop::InteropTarget {
   void LocalLoadCache(DocumentDbError& err);
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(CacheImpl);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(CacheImpl);
 
   /** Name. */
   char* name;

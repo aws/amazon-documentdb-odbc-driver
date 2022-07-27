@@ -114,7 +114,7 @@ class Parser {
   }
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(Parser);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(Parser);
 
   /**
    * Reset internal state of the parser.

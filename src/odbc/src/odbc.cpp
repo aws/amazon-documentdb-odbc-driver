@@ -48,8 +48,8 @@ bool HandleParentWindow(SQLHWND windowHandle,
     return DisplayConnectionWindow(windowHandle, config);
   }
 #else
-  IGNITE_UNUSED(windowHandle);
-  IGNITE_UNUSED(config);
+  DOCUMENTDB_UNUSED(windowHandle);
+  DOCUMENTDB_UNUSED(config);
 #endif
   return true;
 }
@@ -319,7 +319,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
                            SQLSMALLINT outConnectionStringBufferLen,
                            SQLSMALLINT* outConnectionStringLen,
                            SQLUSMALLINT driverCompletion) {
-  IGNITE_UNUSED(driverCompletion);
+  DOCUMENTDB_UNUSED(driverCompletion);
 
   using odbc::Connection;
   using odbc::diagnostic::DiagnosticRecordStorage;
@@ -374,10 +374,10 @@ SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* serverName,
                      SQLSMALLINT serverNameLen, SQLWCHAR* userName,
                      SQLSMALLINT userNameLen, SQLWCHAR* auth,
                      SQLSMALLINT authLen) {
-  IGNITE_UNUSED(userName);
-  IGNITE_UNUSED(userNameLen);
-  IGNITE_UNUSED(auth);
-  IGNITE_UNUSED(authLen);
+  DOCUMENTDB_UNUSED(userName);
+  DOCUMENTDB_UNUSED(userNameLen);
+  DOCUMENTDB_UNUSED(auth);
+  DOCUMENTDB_UNUSED(authLen);
 
   using odbc::Connection;
   using odbc::config::Configuration;

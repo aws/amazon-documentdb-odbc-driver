@@ -71,7 +71,7 @@ bool QueryCursorImpl::HasNext(DocumentDbError& err) {
   // Check whether GetAll() was called earlier.
   if (getAllCalled) {
     err =
-        DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+        DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                     "Cannot use HasNext() method because GetAll() was called.");
 
     return false;
@@ -93,7 +93,7 @@ void QueryCursorImpl::GetNext(OutputOperation& op, DocumentDbError& err) {
   // Check whether GetAll() was called earlier.
   if (getAllCalled) {
     err =
-        DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+        DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                     "Cannot use GetNext() method because GetAll() was called.");
 
     return;
@@ -110,8 +110,8 @@ void QueryCursorImpl::GetNext(OutputOperation& op, DocumentDbError& err) {
 
   if (endReached) {
     // Ensure we do not overwrite possible previous error.
-    if (err.GetCode() == DocumentDbError::IGNITE_SUCCESS)
-      err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+    if (err.GetCode() == DocumentDbError::DOCUMENTDB_SUCCESS)
+      err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "No more elements available.");
 
     return;
@@ -132,8 +132,8 @@ QueryFieldsRowImpl* QueryCursorImpl::GetNextRow(DocumentDbError& err) {
 
   if (endReached) {
     // Ensure we do not overwrite possible previous error.
-    if (err.GetCode() == DocumentDbError::IGNITE_SUCCESS)
-      err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+    if (err.GetCode() == DocumentDbError::DOCUMENTDB_SUCCESS)
+      err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "No more elements available.");
 
     return 0;
@@ -146,7 +146,7 @@ void QueryCursorImpl::GetAll(OutputOperation& op, DocumentDbError& err) {
   // Check whether any of iterator methods were called.
   if (iterCalled) {
     err = DocumentDbError(
-        DocumentDbError::IGNITE_ERR_GENERIC,
+        DocumentDbError::DOCUMENTDB_ERR_GENERIC,
         "Cannot use GetAll() method because an iteration method was called.");
 
     return;
@@ -155,7 +155,7 @@ void QueryCursorImpl::GetAll(OutputOperation& op, DocumentDbError& err) {
   // Check whether GetAll was called before.
   if (getAllCalled) {
     err =
-        DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+        DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                     "Cannot use GetNext() method because GetAll() was called.");
 
     return;
@@ -172,7 +172,7 @@ void QueryCursorImpl::GetAll(OutputOperation& op, DocumentDbError& err) {
   DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
-  if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (jniErr.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     getAllCalled = true;
 
     InteropInputStream in(inMem.Get());
@@ -187,14 +187,14 @@ void QueryCursorImpl::GetAll(OutputOperation& op) {
   // Check whether any of iterator methods were called.
   if (iterCalled) {
     throw DocumentDbError(
-        DocumentDbError::IGNITE_ERR_GENERIC,
+        DocumentDbError::DOCUMENTDB_ERR_GENERIC,
         "Cannot use GetAll() method because an iteration method was called.");
   }
 
   // Check whether GetAll was called before.
   if (getAllCalled) {
     throw DocumentDbError(
-        DocumentDbError::IGNITE_ERR_GENERIC,
+        DocumentDbError::DOCUMENTDB_ERR_GENERIC,
         "Cannot use GetNext() method because GetAll() was called.");
   }
 
@@ -232,7 +232,7 @@ bool QueryCursorImpl::CreateIteratorIfNeeded(DocumentDbError& err) {
   DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
-  if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
+  if (jniErr.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS)
     iterCalled = true;
 
   return iterCalled;
@@ -259,7 +259,7 @@ bool QueryCursorImpl::GetNextBatchIfNeeded(DocumentDbError& err) {
   DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
-  if (jniErr.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
+  if (jniErr.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS)
     return false;
 
   delete batch;
@@ -284,7 +284,7 @@ bool QueryCursorImpl::IteratorHasNext(DocumentDbError& err) {
   DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
-  if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
+  if (jniErr.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS)
     return res;
 
   return false;

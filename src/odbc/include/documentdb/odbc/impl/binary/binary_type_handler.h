@@ -73,7 +73,7 @@ class BinaryTypeHandler {
   /** Snapshot. */
   SPSnap updated;
 
-  IGNITE_NO_COPY_ASSIGNMENT(BinaryTypeHandler);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(BinaryTypeHandler);
 };
 }  // namespace binary
 }  // namespace impl

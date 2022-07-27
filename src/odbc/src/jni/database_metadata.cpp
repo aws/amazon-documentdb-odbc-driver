@@ -40,7 +40,7 @@ SharedPointer< ResultSet > DatabaseMetaData::GetTables(
   JniErrorCode success = _jniContext.Get()->DatabaseMetaDataGetTables(
       _databaseMetaData, catalog, schemaPattern, tableNamePattern, types,
       resultSet, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return nullptr;
   }
   return new ResultSet(_jniContext, resultSet);
@@ -56,7 +56,7 @@ SharedPointer< ResultSet > DatabaseMetaData::GetColumns(
   JniErrorCode success = _jniContext.Get()->DatabaseMetaDataGetColumns(
       _databaseMetaData, catalog, schemaPattern, tableNamePattern,
       columnNamePattern, resultSet, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return nullptr;
   }
   return new ResultSet(_jniContext, resultSet);
@@ -70,7 +70,7 @@ SharedPointer< ResultSet > DatabaseMetaData::GetPrimaryKeys(
   const std::vector< std::string > types;
   JniErrorCode success = _jniContext.Get()->DatabaseMetaDataGetPrimaryKeys(
       _databaseMetaData, catalog, schema, table, resultSet, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return nullptr;
   }
   return new ResultSet(_jniContext, resultSet);
@@ -84,7 +84,7 @@ SharedPointer< ResultSet > DatabaseMetaData::GetImportedKeys(
   const std::vector< std::string > types;
   JniErrorCode success = _jniContext.Get()->DatabaseMetaDataGetImportedKeys(
       _databaseMetaData, catalog, schema, table, resultSet, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return nullptr;
   }
   return new ResultSet(_jniContext, resultSet);

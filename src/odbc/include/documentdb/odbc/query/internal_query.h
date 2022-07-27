@@ -74,7 +74,7 @@ class InternalQuery : public Query {
    * @return Operation result.
    */
   virtual SqlResult::Type FetchNextRow(app::ColumnBindingMap& columnBindings) {
-    IGNITE_UNUSED(columnBindings);
+    DOCUMENTDB_UNUSED(columnBindings);
 
     return SqlResult::AI_NO_DATA;
   }
@@ -88,8 +88,8 @@ class InternalQuery : public Query {
    */
   virtual SqlResult::Type GetColumn(uint16_t columnIdx,
                                     app::ApplicationDataBuffer& buffer) {
-    IGNITE_UNUSED(columnIdx);
-    IGNITE_UNUSED(buffer);
+    DOCUMENTDB_UNUSED(columnIdx);
+    DOCUMENTDB_UNUSED(buffer);
 
     return SqlResult::AI_NO_DATA;
   }

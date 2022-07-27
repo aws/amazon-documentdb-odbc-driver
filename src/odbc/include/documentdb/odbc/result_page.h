@@ -74,7 +74,7 @@ class ResultPage {
   }
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(ResultPage);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(ResultPage);
 
   /** Last page flag. */
   bool last;

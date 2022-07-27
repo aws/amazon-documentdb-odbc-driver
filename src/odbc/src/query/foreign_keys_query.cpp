@@ -298,7 +298,7 @@ SqlResult::Type ForeignKeysQuery::MakeRequestGetForeignKeysMeta() {
   SharedPointer< DatabaseMetaData > databaseMetaData =
       connection.GetMetaData(error);
   if (!databaseMetaData.IsValid()
-      || error.GetCode() != DocumentDbError::IGNITE_SUCCESS) {
+      || error.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS) {
     diag.AddStatusRecord(error.GetText());
     return SqlResult::AI_ERROR;
   }
@@ -307,7 +307,7 @@ SqlResult::Type ForeignKeysQuery::MakeRequestGetForeignKeysMeta() {
   SharedPointer< ResultSet > resultSet =
       databaseMetaData.Get()->GetImportedKeys(catalog, schema, table, errInfo);
   if (!resultSet.IsValid()
-      || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     diag.AddStatusRecord(errInfo.errMsg);
     return SqlResult::AI_ERROR;
   }

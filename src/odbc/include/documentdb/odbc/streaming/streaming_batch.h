@@ -88,7 +88,7 @@ class StreamingBatch {
   }
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(StreamingBatch);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(StreamingBatch);
 
   /** Current SQL. */
   std::string currentSql;

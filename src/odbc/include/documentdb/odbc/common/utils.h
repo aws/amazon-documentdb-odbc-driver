@@ -31,10 +31,10 @@
 
 #include "documentdb/odbc/time.h"
 
-#ifdef IGNITE_FRIEND
-#define IGNITE_FRIEND_EXPORT IGNITE_EXPORT
+#ifdef DOCUMENTDB_FRIEND
+#define DOCUMENTDB_FRIEND_EXPORT DOCUMENTDB_EXPORT
 #else
-#define IGNITE_FRIEND_EXPORT
+#define DOCUMENTDB_FRIEND_EXPORT
 #endif
 
 namespace documentdb {
@@ -95,7 +95,7 @@ inline void SpaceToUnderscore(std::string& str) {
  *
  * @param str String to be transformed.
  */
-IGNITE_IMPORT_EXPORT void StripSurroundingWhitespaces(std::string& str);
+DOCUMENTDB_IMPORT_EXPORT void StripSurroundingWhitespaces(std::string& str);
 
 /**
  * Skip leading spaces.
@@ -183,14 +183,14 @@ inline int ParseInt(const std::string& str) {
  * @param val Value.
  * @return Result.
  */
-IGNITE_IMPORT_EXPORT char* CopyChars(const char* val);
+DOCUMENTDB_IMPORT_EXPORT char* CopyChars(const char* val);
 
 /**
  * Release characters.
  *
  * @param val Value.
  */
-IGNITE_IMPORT_EXPORT void ReleaseChars(char* val);
+DOCUMENTDB_IMPORT_EXPORT void ReleaseChars(char* val);
 
 /**
  * Casts value of one type to another type, using stringstream.
@@ -226,7 +226,7 @@ T1 LexicalCast(const T2& val) {
  *
  * @param val Value to check.
  */
-IGNITE_IMPORT_EXPORT bool AllDigits(const std::string& val);
+DOCUMENTDB_IMPORT_EXPORT bool AllDigits(const std::string& val);
 
 /**
  * Converts 32-bit integer to big endian format
@@ -234,7 +234,7 @@ IGNITE_IMPORT_EXPORT bool AllDigits(const std::string& val);
  * @param value Input value
  * @return Resulting value
  */
-IGNITE_IMPORT_EXPORT uint32_t ToBigEndian(uint32_t value);
+DOCUMENTDB_IMPORT_EXPORT uint32_t ToBigEndian(uint32_t value);
 
 /**
  * Convert Date type to standard C type time_t.
@@ -386,7 +386,7 @@ inline Timestamp CTmToTimestamp(const tm& ctime, int32_t ns) {
  * @param sec Sec.
  * @return Date.
  */
-IGNITE_FRIEND_EXPORT Date MakeDateGmt(int year = 1900, int month = 1,
+DOCUMENTDB_FRIEND_EXPORT Date MakeDateGmt(int year = 1900, int month = 1,
                                       int day = 1, int hour = 0, int min = 0,
                                       int sec = 0);
 
@@ -403,7 +403,7 @@ IGNITE_FRIEND_EXPORT Date MakeDateGmt(int year = 1900, int month = 1,
  * @param sec Sec.
  * @return Date.
  */
-IGNITE_FRIEND_EXPORT Date MakeDateLocal(int year = 1900, int month = 1,
+DOCUMENTDB_FRIEND_EXPORT Date MakeDateLocal(int year = 1900, int month = 1,
                                         int day = 1, int hour = 0, int min = 0,
                                         int sec = 0);
 
@@ -417,7 +417,7 @@ IGNITE_FRIEND_EXPORT Date MakeDateLocal(int year = 1900, int month = 1,
  * @param sec Second.
  * @return Time.
  */
-IGNITE_FRIEND_EXPORT Time MakeTimeGmt(int hour = 0, int min = 0, int sec = 0);
+DOCUMENTDB_FRIEND_EXPORT Time MakeTimeGmt(int hour = 0, int min = 0, int sec = 0);
 
 /**
  * Make Time in human understandable way.
@@ -429,7 +429,7 @@ IGNITE_FRIEND_EXPORT Time MakeTimeGmt(int hour = 0, int min = 0, int sec = 0);
  * @param sec Second.
  * @return Time.
  */
-IGNITE_FRIEND_EXPORT Time MakeTimeLocal(int hour = 0, int min = 0, int sec = 0);
+DOCUMENTDB_FRIEND_EXPORT Time MakeTimeLocal(int hour = 0, int min = 0, int sec = 0);
 
 /**
  * Make Timestamp in human understandable way.
@@ -445,7 +445,7 @@ IGNITE_FRIEND_EXPORT Time MakeTimeLocal(int hour = 0, int min = 0, int sec = 0);
  * @param ns Nanosecond.
  * @return Timestamp.
  */
-IGNITE_FRIEND_EXPORT Timestamp MakeTimestampGmt(int year = 1900, int month = 1,
+DOCUMENTDB_FRIEND_EXPORT Timestamp MakeTimestampGmt(int year = 1900, int month = 1,
                                                 int day = 1, int hour = 0,
                                                 int min = 0, int sec = 0,
                                                 long ns = 0);
@@ -464,7 +464,7 @@ IGNITE_FRIEND_EXPORT Timestamp MakeTimestampGmt(int year = 1900, int month = 1,
  * @param ns Nanosecond.
  * @return Timestamp.
  */
-IGNITE_FRIEND_EXPORT Timestamp MakeTimestampLocal(int year = 1900,
+DOCUMENTDB_FRIEND_EXPORT Timestamp MakeTimestampLocal(int year = 1900,
                                                   int month = 1, int day = 1,
                                                   int hour = 0, int min = 0,
                                                   int sec = 0, long ns = 0);
@@ -647,7 +647,7 @@ class DeinitGuard {
  * @param name Name without extension.
  * @return Full name.
  */
-IGNITE_IMPORT_EXPORT std::string GetDynamicLibraryName(const char* name);
+DOCUMENTDB_IMPORT_EXPORT std::string GetDynamicLibraryName(const char* name);
 }  // namespace common
 }  // namespace odbc
 }  // namespace documentdb

@@ -104,7 +104,7 @@ bool BinaryTypeUpdaterImpl::Update(const Snap& snap, DocumentDbError& err) {
   DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
-  return jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS && res == 1;
+  return jniErr.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS && res == 1;
 }
 
 SPSnap BinaryTypeUpdaterImpl::GetMeta(int32_t typeId, DocumentDbError& err) {
@@ -127,7 +127,7 @@ SPSnap BinaryTypeUpdaterImpl::GetMeta(int32_t typeId, DocumentDbError& err) {
   DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
-  if (err.GetCode() != DocumentDbError::IGNITE_SUCCESS)
+  if (err.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS)
     return SPSnap();
 
   InteropInputStream in(inMem.Get());

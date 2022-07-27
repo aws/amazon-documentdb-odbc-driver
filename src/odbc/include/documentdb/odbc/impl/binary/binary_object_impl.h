@@ -41,7 +41,7 @@ namespace binary {
  * data without deserialization. Also provides method that allows
  * deserialize object.
  */
-class IGNITE_IMPORT_EXPORT BinaryObjectImpl {
+class DOCUMENTDB_IMPORT_EXPORT BinaryObjectImpl {
  public:
   /**
    * Constructor.
@@ -111,8 +111,8 @@ class IGNITE_IMPORT_EXPORT BinaryObjectImpl {
         documentdb::odbc::binary::BinaryType< T >::GetTypeId();
 
     if (requestedTypeId != actualTypeId) {
-      IGNITE_ERROR_FORMATTED_3(
-          documentdb::odbc::DocumentDbError::IGNITE_ERR_BINARY,
+      DOCUMENTDB_ERROR_FORMATTED_3(
+          documentdb::odbc::DocumentDbError::DOCUMENTDB_ERR_BINARY,
           "Trying to deserialize binary object to a different type", "memPtr",
           mem->PointerLong(), "actualTypeId", actualTypeId, "requestedTypeId",
           requestedTypeId);
@@ -244,7 +244,7 @@ class IGNITE_IMPORT_EXPORT BinaryObjectImpl {
 
 /* Specialization */
 template <>
-IGNITE_IMPORT_EXPORT BinaryObjectImpl
+DOCUMENTDB_IMPORT_EXPORT BinaryObjectImpl
 BinaryObjectImpl::GetField(const char* name) const;
 }  // namespace binary
 }  // namespace impl

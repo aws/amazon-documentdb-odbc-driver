@@ -20,8 +20,8 @@
  * Declares documentdb::odbc::commom::Promise class template.
  */
 
-#ifndef _IGNITE_PROMISE
-#define _IGNITE_PROMISE
+#ifndef _DOCUMENTDB_PROMISE
+#define _DOCUMENTDB_PROMISE
 
 #include <documentdb/odbc/common/common.h>
 #include <documentdb/odbc/common/shared_state.h>
@@ -61,7 +61,7 @@ class Promise {
 
     if (!state0->IsSet())
       state0->SetError(DocumentDbError(
-          DocumentDbError::IGNITE_ERR_FUTURE_STATE,
+          DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE,
           "Broken promise. Value will never be set due to internal error."));
   }
 
@@ -77,7 +77,7 @@ class Promise {
   /**
    * Set value.
    *
-   * @throw DocumentDbError with DocumentDbError::IGNITE_ERR_FUTURE_STATE if error or
+   * @throw DocumentDbError with DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE if error or
    * value has been set already.
    * @param val Value to set.
    */
@@ -92,7 +92,7 @@ class Promise {
   /**
    * Set error.
    *
-   * @throw DocumentDbError with DocumentDbError::IGNITE_ERR_FUTURE_STATE if error or
+   * @throw DocumentDbError with DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE if error or
    * value has been set already.
    * @param err Error to set.
    */
@@ -112,7 +112,7 @@ class Promise {
   }
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(Promise);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(Promise);
 
   /** Shared state. */
   concurrent::SharedPointer< SharedState< ValueType > > state;
@@ -144,7 +144,7 @@ class Promise< void > {
 
     if (!state0->IsSet())
       state0->SetError(DocumentDbError(
-          DocumentDbError::IGNITE_ERR_FUTURE_STATE,
+          DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE,
           "Broken promise. Value will never be set due to internal error."));
   }
 
@@ -160,7 +160,7 @@ class Promise< void > {
   /**
    * Mark as complete.
    *
-   * @throw DocumentDbError with DocumentDbError::IGNITE_ERR_FUTURE_STATE if error or
+   * @throw DocumentDbError with DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE if error or
    * value has been set already.
    */
   void SetValue() {
@@ -174,7 +174,7 @@ class Promise< void > {
   /**
    * Set error.
    *
-   * @throw DocumentDbError with DocumentDbError::IGNITE_ERR_FUTURE_STATE if error or
+   * @throw DocumentDbError with DocumentDbError::DOCUMENTDB_ERR_FUTURE_STATE if error or
    * value has been set already.
    * @param err Error to set.
    */
@@ -194,7 +194,7 @@ class Promise< void > {
   }
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(Promise);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(Promise);
 
   /** Shared state. */
   concurrent::SharedPointer< SharedState< ValueType > > state;
@@ -203,4 +203,4 @@ class Promise< void > {
 }  // namespace odbc
 }  // namespace documentdb
 
-#endif  //_IGNITE_PROMISE
+#endif  //_DOCUMENTDB_PROMISE

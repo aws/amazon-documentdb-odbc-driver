@@ -179,7 +179,7 @@ struct BinaryType< impl::cache::CacheEntryProcessorHolder< P, A > >
           impl::cache::CacheEntryProcessorHolder< P, A > > {
   typedef impl::cache::CacheEntryProcessorHolder< P, A > UnderlyingType;
 
-  IGNITE_BINARY_GET_FIELD_ID_AS_HASH
+  DOCUMENTDB_BINARY_GET_FIELD_ID_AS_HASH
 
   static int32_t GetTypeId() {
     static bool typeIdInited = false;

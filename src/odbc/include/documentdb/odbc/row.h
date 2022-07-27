@@ -74,7 +74,7 @@ class Row {
   bool MoveToNext();
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(Row);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(Row);
 
   /**
    * Reinitialize row state using stream data.

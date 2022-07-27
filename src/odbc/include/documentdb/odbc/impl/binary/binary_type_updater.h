@@ -28,7 +28,7 @@ namespace binary {
 /**
  * Type updater interface.
  */
-class IGNITE_IMPORT_EXPORT BinaryTypeUpdater {
+class DOCUMENTDB_IMPORT_EXPORT BinaryTypeUpdater {
  public:
   /**
    * Destructor.

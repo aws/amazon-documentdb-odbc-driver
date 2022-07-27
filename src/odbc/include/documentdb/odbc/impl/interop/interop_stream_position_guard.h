@@ -28,7 +28,7 @@ namespace interop {
  * Interop stream position guard.
  */
 template < typename T >
-class IGNITE_IMPORT_EXPORT InteropStreamPositionGuard {
+class DOCUMENTDB_IMPORT_EXPORT InteropStreamPositionGuard {
  public:
   /**
    * Create new position guard and saves current stream position.
@@ -66,7 +66,7 @@ class IGNITE_IMPORT_EXPORT InteropStreamPositionGuard {
   /** Saved position. */
   int32_t pos;
 
-  IGNITE_NO_COPY_ASSIGNMENT(InteropStreamPositionGuard);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(InteropStreamPositionGuard);
 };
 }  // namespace interop
 }  // namespace impl

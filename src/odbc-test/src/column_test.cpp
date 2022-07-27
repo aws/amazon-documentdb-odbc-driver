@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(TestColumnShort) {
 
   int16_t data = 42;
 
-  writer.WriteInt8(IGNITE_TYPE_SHORT);
+  writer.WriteInt8(DOCUMENTDB_TYPE_SHORT);
   writer.WriteInt16(data);
 
   outStream.Synchronize();

@@ -135,7 +135,7 @@ class LogStream : public std::basic_ostream< char > {
   virtual ~LogStream();
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(LogStream);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(LogStream);
 
   /** String buffer. */
   std::basic_stringbuf< char > strbuf;
@@ -249,7 +249,7 @@ class Logger {
    */
   std::string CreateFileName() const;
 
-  IGNITE_NO_COPY_ASSIGNMENT(Logger);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(Logger);
 
   /** Mutex for writes synchronization. */
   CriticalSection mutex;

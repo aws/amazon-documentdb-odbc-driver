@@ -83,7 +83,7 @@ void InteropTarget::ReadError(InteropMemory* mem, DocumentDbError& err) {
 
   std::string msg = reader.ReadObject< std::string >();
 
-  err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC, msg.c_str());
+  err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC, msg.c_str());
 }
 
 bool InteropTarget::OutOp(int32_t opType, InteropMemory& inMem,
@@ -101,7 +101,7 @@ bool InteropTarget::OutOp(int32_t opType, InteropMemory& inMem,
     DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                           jniErr.errMsg.c_str(), err);
 
-    if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
+    if (jniErr.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS)
       return res == 1;
   }
 
@@ -123,7 +123,7 @@ bool InteropTarget::OutOp(int32_t opType, InputOperation& inOp,
     DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                           jniErr.errMsg.c_str(), err);
 
-    if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
+    if (jniErr.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS)
       return res == 1;
   }
 
@@ -139,7 +139,7 @@ bool InteropTarget::OutOp(int32_t opType, DocumentDbError& err) {
   DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
-  if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
+  if (jniErr.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS)
     return res == 1;
 
   return false;
@@ -157,7 +157,7 @@ bool InteropTarget::InOp(int32_t opType, OutputOperation& outOp,
   DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
-  if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (jniErr.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     ReadFrom(mem.Get(), outOp);
 
     return true;
@@ -193,7 +193,7 @@ void InteropTarget::OutInOp(int32_t opType, InputOperation& inOp,
     DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                           jniErr.errMsg.c_str(), err);
 
-    if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
+    if (jniErr.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS)
       ReadFrom(inMem.Get(), outOp);
   }
 }
@@ -213,7 +213,7 @@ void InteropTarget::OutInOpX(int32_t opType, InputOperation& inOp,
     DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                           jniErr.errMsg.c_str(), err);
 
-    if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS
+    if (jniErr.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS
         && res == OperationResult::AI_SUCCESS)
       ReadFrom(outInMem.Get(), outOp);
     else if (res == OperationResult::AI_NULL)
@@ -258,7 +258,7 @@ int64_t InteropTarget::InStreamOutLong(int32_t opType, InputOperation& inOp,
     DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                           jniErr.errMsg.c_str(), err);
 
-    if (jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
+    if (jniErr.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS)
       return res;
   }
 

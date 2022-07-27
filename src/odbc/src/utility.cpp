@@ -212,9 +212,9 @@ void WriteString(BinaryWriterImpl& writer, const std::string& str) {
 void ReadDecimal(BinaryReaderImpl& reader, Decimal& decimal) {
   int8_t hdr = reader.ReadInt8();
 
-  assert(hdr == IGNITE_TYPE_DECIMAL);
+  assert(hdr == DOCUMENTDB_TYPE_DECIMAL);
 
-  IGNITE_UNUSED(hdr);
+  DOCUMENTDB_UNUSED(hdr);
 
   int32_t scale = reader.ReadInt32();
 
@@ -241,7 +241,7 @@ void ReadDecimal(BinaryReaderImpl& reader, Decimal& decimal) {
 }
 
 void WriteDecimal(BinaryWriterImpl& writer, const Decimal& decimal) {
-  writer.WriteInt8(IGNITE_TYPE_DECIMAL);
+  writer.WriteInt8(DOCUMENTDB_TYPE_DECIMAL);
 
   const BigInteger& unscaled = decimal.GetUnscaledValue();
 

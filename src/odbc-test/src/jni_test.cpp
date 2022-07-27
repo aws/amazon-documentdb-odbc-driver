@@ -485,7 +485,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionOpen) {
   DocumentDbConnection dbConnection(_ctx);
   BOOST_CHECK(!dbConnection.IsOpen());
   if (dbConnection.Open(config, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(dbConnection.IsOpen());
@@ -506,12 +506,12 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionClose) {
 
   BOOST_CHECK(!dbConnection.IsOpen());
   if (dbConnection.Open(config, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(dbConnection.IsOpen());
 
-  if (dbConnection.Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (dbConnection.Close(errInfo) != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(!dbConnection.IsOpen());
@@ -532,7 +532,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetTables) {
 
   BOOST_CHECK(!dbConnection.IsOpen());
   if (dbConnection.Open(config, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(dbConnection.IsOpen());
@@ -588,12 +588,12 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetTables) {
 
   } while (hasNext);
 
-  if (resultSet.Get()->Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (resultSet.Get()->Close(errInfo) != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(!resultSet.Get()->IsOpen());
 
-  if (dbConnection.Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (dbConnection.Close(errInfo) != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(!dbConnection.IsOpen());
@@ -614,7 +614,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
 
   BOOST_CHECK(!dbConnection.IsOpen());
   if (dbConnection.Open(config, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(dbConnection.IsOpen());
@@ -893,12 +893,12 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetColumns) {
   } while (hasNext);
   BOOST_CHECK_EQUAL(13, columnIndex);
 
-  if (resultSet.Get()->Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (resultSet.Get()->Close(errInfo) != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(!resultSet.Get()->IsOpen());
 
-  if (dbConnection.Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (dbConnection.Close(errInfo) != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(!dbConnection.IsOpen());
@@ -919,7 +919,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetPrimaryKeys) {
 
   BOOST_CHECK(!dbConnection.IsOpen());
   if (dbConnection.Open(config, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(dbConnection.IsOpen());
@@ -994,12 +994,12 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetPrimaryKeys) {
   } while (hasNext);
   BOOST_CHECK_EQUAL(1, columnIndex);
 
-  if (resultSet.Get()->Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (resultSet.Get()->Close(errInfo) != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(!resultSet.Get()->IsOpen());
 
-  if (dbConnection.Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (dbConnection.Close(errInfo) != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(!dbConnection.IsOpen());
@@ -1020,7 +1020,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetImportedKeys) {
 
   BOOST_CHECK(!dbConnection.IsOpen());
   if (dbConnection.Open(config, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(dbConnection.IsOpen());
@@ -1152,12 +1152,12 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetImportedKeys) {
   } while (hasNext);
   BOOST_CHECK_EQUAL(1, columnIndex);
 
-  if (resultSet.Get()->Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (resultSet.Get()->Close(errInfo) != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(!resultSet.Get()->IsOpen());
 
-  if (dbConnection.Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (dbConnection.Close(errInfo) != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(!dbConnection.IsOpen());
@@ -1178,7 +1178,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetPrimaryKeysReturnsNone) {
 
   BOOST_CHECK(!dbConnection.IsOpen());
   if (dbConnection.Open(config, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(dbConnection.IsOpen());
@@ -1199,12 +1199,12 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetPrimaryKeysReturnsNone) {
   resultSet.Get()->Next(hasNext, errInfo);
   BOOST_CHECK(!hasNext);
 
-  if (resultSet.Get()->Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (resultSet.Get()->Close(errInfo) != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(!resultSet.Get()->IsOpen());
 
-  if (dbConnection.Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (dbConnection.Close(errInfo) != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(!dbConnection.IsOpen());
@@ -1225,7 +1225,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetImportedKeysReturnsNone) {
 
   BOOST_CHECK(!dbConnection.IsOpen());
   if (dbConnection.Open(config, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(dbConnection.IsOpen());
@@ -1247,12 +1247,12 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetImportedKeysReturnsNone) {
   resultSet.Get()->Next(hasNext, errInfo);
   BOOST_CHECK(!hasNext);
 
-  if (resultSet.Get()->Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (resultSet.Get()->Close(errInfo) != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(!resultSet.Get()->IsOpen());
 
-  if (dbConnection.Close(errInfo) != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (dbConnection.Close(errInfo) != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(!dbConnection.IsOpen());
@@ -1271,28 +1271,28 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbGetMqlQueryContext) {
   JniErrorInfo errInfo;
   DocumentDbConnection dbConnection(_ctx);
   dbConnection.Open(config, errInfo);
-  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS == errInfo.code);
+  BOOST_CHECK(JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS == errInfo.code);
 
   SharedPointer< DocumentDbConnectionProperties > connectionProperties =
       dbConnection.GetConnectionProperties(errInfo);
-  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS == errInfo.code);
+  BOOST_CHECK(JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS == errInfo.code);
   BOOST_CHECK(connectionProperties.IsValid());
 
   SharedPointer< DocumentDbDatabaseMetadata > databaseMetadata =
       dbConnection.GetDatabaseMetadata(errInfo);
-  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS == errInfo.code);
+  BOOST_CHECK(JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS == errInfo.code);
   BOOST_CHECK(databaseMetadata.IsValid());
 
   SharedPointer< DocumentDbQueryMappingService > queryMappingService =
       DocumentDbQueryMappingService::Create(connectionProperties,
                                             databaseMetadata, errInfo);
-  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS == errInfo.code);
+  BOOST_CHECK(JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS == errInfo.code);
   BOOST_CHECK(queryMappingService.IsValid());
 
   SharedPointer< DocumentDbMqlQueryContext > queryContext =
       queryMappingService.Get()->GetMqlQueryContext(
           "SELECT * FROM \"" + TABLE_NAME + "\"", 0, errInfo);
-  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS == errInfo.code);
+  BOOST_CHECK(JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS == errInfo.code);
   BOOST_REQUIRE(queryContext.IsValid());
   std::vector< JdbcColumnMetadata > columnMetadata =
       queryContext.Get()->GetColumnMetadata();
@@ -1322,7 +1322,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbGetMqlQueryContext) {
   SharedPointer< DocumentDbMqlQueryContext > queryContext2 =
       queryMappingService.Get()->GetMqlQueryContext(
           "SELECT * FROM \"jni_test_001_xxx\"", 0, errInfo);
-  BOOST_CHECK(JniErrorCode::IGNITE_JNI_ERR_SUCCESS != errInfo.code);
+  BOOST_CHECK(JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS != errInfo.code);
   std::string modErrMsg = errInfo.errMsg;
   boost::erase_all(modErrMsg, "\r");
   boost::erase_all(modErrMsg, "\n");

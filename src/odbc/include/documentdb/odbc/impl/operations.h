@@ -79,7 +79,7 @@ class In1Operation : public InputOperation {
   /** Value. */
   const T& val;
 
-  IGNITE_NO_COPY_ASSIGNMENT(In1Operation);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(In1Operation);
 };
 
 /**
@@ -111,7 +111,7 @@ class In2Operation : public InputOperation {
   /** Second value. */
   const T2& val2;
 
-  IGNITE_NO_COPY_ASSIGNMENT(In2Operation);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(In2Operation);
 };
 
 /**
@@ -149,7 +149,7 @@ class In3Operation : public InputOperation {
   /** Third value. */
   const T3& val3;
 
-  IGNITE_NO_COPY_ASSIGNMENT(In3Operation);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(In3Operation);
 };
 
 /**
@@ -180,7 +180,7 @@ class InSetOperation : public InputOperation {
   /** Value. */
   const std::set< T >& val;
 
-  IGNITE_NO_COPY_ASSIGNMENT(InSetOperation);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(InSetOperation);
 };
 
 /**
@@ -213,7 +213,7 @@ class InMapOperation : public InputOperation {
   /** Value. */
   const std::map< K, V >& val;
 
-  IGNITE_NO_COPY_ASSIGNMENT(InMapOperation);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(InMapOperation);
 };
 
 /**
@@ -246,7 +246,7 @@ class InCacheLocalPeekOperation : public InputOperation {
   /** Peek modes. */
   int32_t peekModes;
 
-  IGNITE_NO_COPY_ASSIGNMENT(InCacheLocalPeekOperation);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(InCacheLocalPeekOperation);
 };
 
 /**
@@ -280,7 +280,7 @@ class InCacheInvokeOperation : public InputOperation {
   /** Second value. */
   const T2& val2;
 
-  IGNITE_NO_COPY_ASSIGNMENT(InCacheInvokeOperation);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(InCacheInvokeOperation);
 };
 
 /**
@@ -320,7 +320,7 @@ class InIterOperation : public InputOperation {
   /** Sequence end. */
   Iter end;
 
-  IGNITE_NO_COPY_ASSIGNMENT(InIterOperation);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(InIterOperation);
 };
 
 /**
@@ -375,7 +375,7 @@ class Out1Operation : public OutputOperation {
   /** Value. */
   T& val;
 
-  IGNITE_NO_COPY_ASSIGNMENT(Out1Operation);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(Out1Operation);
 };
 
 /**
@@ -411,7 +411,7 @@ class Out2Operation : public OutputOperation {
   /** Value 2. */
   T2& val2;
 
-  IGNITE_NO_COPY_ASSIGNMENT(Out2Operation);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(Out2Operation);
 };
 
 /**
@@ -460,7 +460,7 @@ class Out4Operation : public OutputOperation {
   /** Value 4. */
   T4& val4;
 
-  IGNITE_NO_COPY_ASSIGNMENT(Out4Operation);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(Out4Operation);
 };
 
 /**
@@ -505,7 +505,7 @@ class OutMapOperation : public OutputOperation {
   /** Value. */
   std::map< T1, T2 >& val;
 
-  IGNITE_NO_COPY_ASSIGNMENT(OutMapOperation);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(OutMapOperation);
 };
 
 /**
@@ -544,7 +544,7 @@ class OutQueryGetAllOperation : public OutputOperation {
   /** Entries. */
   std::vector< documentdb::odbc::cache::CacheEntry< K, V > >& res;
 
-  IGNITE_NO_COPY_ASSIGNMENT(OutQueryGetAllOperation);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(OutQueryGetAllOperation);
 };
 
 /**
@@ -581,7 +581,7 @@ class OutQueryGetAllOperationIter : public OutputOperation {
   /** Out iter. */
   Iter iter;
 
-  IGNITE_NO_COPY_ASSIGNMENT(OutQueryGetAllOperationIter);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(OutQueryGetAllOperationIter);
 };
 
 /**
@@ -621,7 +621,7 @@ class OutMapIterOperation : public OutputOperation {
   /** Out iter. */
   Iter iter;
 
-  IGNITE_NO_COPY_ASSIGNMENT(OutMapIterOperation);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(OutMapIterOperation);
 };
 }  // namespace impl
 }  // namespace odbc

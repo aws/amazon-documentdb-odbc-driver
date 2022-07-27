@@ -68,7 +68,7 @@ void IgniteBindingImpl::RegisterCallback(int32_t type, int32_t id,
         << "Trying to register multiple PRC callbacks with the same ID. [type="
         << type << ", id=" << id << ']';
 
-    err = DocumentDbError(DocumentDbError::IGNITE_ERR_ENTRY_PROCESSOR,
+    err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_ENTRY_PROCESSOR,
                       builder.str().c_str());
   }
 }

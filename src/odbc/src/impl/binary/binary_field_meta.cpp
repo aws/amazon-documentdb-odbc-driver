@@ -23,13 +23,13 @@ namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace binary {
-IGNITE_IMPORT_EXPORT void BinaryFieldMeta::Write(
+DOCUMENTDB_IMPORT_EXPORT void BinaryFieldMeta::Write(
     BinaryRawWriter& writer) const {
   writer.WriteInt32(typeId);
   writer.WriteInt32(fieldId);
 }
 
-IGNITE_IMPORT_EXPORT void BinaryFieldMeta::Read(BinaryRawReader& reader) {
+DOCUMENTDB_IMPORT_EXPORT void BinaryFieldMeta::Read(BinaryRawReader& reader) {
   typeId = reader.ReadInt32();
   fieldId = reader.ReadInt32();
 }

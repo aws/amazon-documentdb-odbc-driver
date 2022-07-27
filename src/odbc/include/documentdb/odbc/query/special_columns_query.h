@@ -110,7 +110,7 @@ class SpecialColumnsQuery : public Query {
   virtual SqlResult::Type NextResultSet();
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(SpecialColumnsQuery);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(SpecialColumnsQuery);
 
   /** Query type. */
   int16_t type;

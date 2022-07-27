@@ -39,7 +39,7 @@ typedef common::concurrent::SharedPointer< ClusterNodeImpl > SP_ClusterNodeImpl;
 /**
  * Cluster node implementation.
  */
-class IGNITE_FRIEND_EXPORT ClusterNodeImpl {
+class DOCUMENTDB_FRIEND_EXPORT ClusterNodeImpl {
  public:
   /**
    * Constructor used to create new instance.
@@ -83,7 +83,7 @@ class IGNITE_FRIEND_EXPORT ClusterNodeImpl {
     if (attrs.Get()->find(name) == attrs.Get()->end()) {
       const char* msg =
           "There is no Cluster Node attribute with name requested";
-      throw DocumentDbError(DocumentDbError::IGNITE_ERR_ILLEGAL_ARGUMENT, msg);
+      throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_ILLEGAL_ARGUMENT, msg);
     }
 
     interop::InteropInputStream stream(
@@ -159,7 +159,7 @@ class IGNITE_FRIEND_EXPORT ClusterNodeImpl {
   const IgniteProductVersion& GetVersion() const;
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(ClusterNodeImpl);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(ClusterNodeImpl);
 
   /**
    * Read Cluster Node addresses.

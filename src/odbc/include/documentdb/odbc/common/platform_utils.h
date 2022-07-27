@@ -32,7 +32,7 @@ typedef std::basic_ostream< char, std::char_traits< char > > StdCharOutStream;
  * @param time Standard C type struct tm value.
  * @return Standard C type time_t value.
  */
-IGNITE_IMPORT_EXPORT time_t IgniteTimeGm(const tm& time);
+DOCUMENTDB_IMPORT_EXPORT time_t IgniteTimeGm(const tm& time);
 
 /**
  * Convert struct tm to time_t (Local time).
@@ -40,7 +40,7 @@ IGNITE_IMPORT_EXPORT time_t IgniteTimeGm(const tm& time);
  * @param time Standard C type struct tm value.
  * @return Standard C type time_t value.
  */
-IGNITE_IMPORT_EXPORT time_t IgniteTimeLocal(const tm& time);
+DOCUMENTDB_IMPORT_EXPORT time_t IgniteTimeLocal(const tm& time);
 
 /**
  * Convert time_t to struct tm (UTC).
@@ -49,7 +49,7 @@ IGNITE_IMPORT_EXPORT time_t IgniteTimeLocal(const tm& time);
  * @param out Standard C type struct tm value.
  * @return True on success.
  */
-IGNITE_IMPORT_EXPORT bool IgniteGmTime(time_t in, tm& out);
+DOCUMENTDB_IMPORT_EXPORT bool IgniteGmTime(time_t in, tm& out);
 
 /**
  * Convert time_t to struct tm (Local time).
@@ -58,7 +58,7 @@ IGNITE_IMPORT_EXPORT bool IgniteGmTime(time_t in, tm& out);
  * @param out Standard C type struct tm value.
  * @return True on success.
  */
-IGNITE_IMPORT_EXPORT bool IgniteLocalTime(time_t in, tm& out);
+DOCUMENTDB_IMPORT_EXPORT bool IgniteLocalTime(time_t in, tm& out);
 
 /**
  * Read system environment variable taking thread-safety in count.
@@ -66,7 +66,7 @@ IGNITE_IMPORT_EXPORT bool IgniteLocalTime(time_t in, tm& out);
  * @param name Environment variable name.
  * @return Environment variable value if found and empty string otherwise.
  */
-IGNITE_IMPORT_EXPORT std::string GetEnv(const std::string& name);
+DOCUMENTDB_IMPORT_EXPORT std::string GetEnv(const std::string& name);
 
 /**
  * Read system environment variable taking thread-safety in count.
@@ -75,7 +75,7 @@ IGNITE_IMPORT_EXPORT std::string GetEnv(const std::string& name);
  * @param dflt Default value to return on fail.
  * @return Environment variable value if found and @c dflt otherwise.
  */
-IGNITE_IMPORT_EXPORT std::string GetEnv(const std::string& name,
+DOCUMENTDB_IMPORT_EXPORT std::string GetEnv(const std::string& name,
                                         const std::string& dflt);
 
 /**
@@ -84,40 +84,40 @@ IGNITE_IMPORT_EXPORT std::string GetEnv(const std::string& name,
  * @param path Path.
  * @return True if file exists, false otherwise.
  */
-IGNITE_IMPORT_EXPORT bool FileExists(const std::string& path);
+DOCUMENTDB_IMPORT_EXPORT bool FileExists(const std::string& path);
 
 /**
  * Check if the provided path is the valid directory.
  * @return @c true if the provided path is the valid directory.
  */
-IGNITE_IMPORT_EXPORT bool IsValidDirectory(const std::string& path);
+DOCUMENTDB_IMPORT_EXPORT bool IsValidDirectory(const std::string& path);
 
 /**
  * Deletes provided filesystem element if exists.
  * @return @c true if the provided path exists.
  */
-IGNITE_IMPORT_EXPORT bool DeletePath(const std::string& path);
+DOCUMENTDB_IMPORT_EXPORT bool DeletePath(const std::string& path);
 
 /**
  * Write file separator to a stream.
  * @param ostr Stream.
  * @return The same stream for chaining.
  */
-IGNITE_IMPORT_EXPORT StdCharOutStream& Fs(StdCharOutStream& ostr);
+DOCUMENTDB_IMPORT_EXPORT StdCharOutStream& Fs(StdCharOutStream& ostr);
 
 /**
  * Write dynamic library expansion to a stream.
  * @param ostr Stream.
  * @return The same stream for chaining.
  */
-IGNITE_IMPORT_EXPORT StdCharOutStream& Dle(StdCharOutStream& ostr);
+DOCUMENTDB_IMPORT_EXPORT StdCharOutStream& Dle(StdCharOutStream& ostr);
 
 /**
  * Get random seed.
  *
  * @return Random seed.
  */
-IGNITE_IMPORT_EXPORT unsigned GetRandSeed();
+DOCUMENTDB_IMPORT_EXPORT unsigned GetRandSeed();
 }  // namespace common
 }  // namespace odbc
 }  // namespace documentdb

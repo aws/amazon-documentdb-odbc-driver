@@ -96,7 +96,7 @@ bool BinaryTypeManager::ProcessPendingUpdates(DocumentDbError& err) {
   CsLockGuard guard(cs);
 
   if (!updater) {
-    err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC, "Updater is not set");
+    err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC, "Updater is not set");
 
     return false;
   }
@@ -109,7 +109,7 @@ bool BinaryTypeManager::ProcessPendingUpdates(DocumentDbError& err) {
       continue;  // Snapshot has been processed already.
 
     if (!updater->Update(*pendingSnap, err)) {
-      err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC, "Can not send update");
+      err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC, "Can not send update");
 
       return false;  // Stop as we cannot move further.
     }
@@ -163,7 +163,7 @@ SPSnap BinaryTypeManager::GetMeta(int32_t typeId) {
   }
 
   if (!updater)
-    throw DocumentDbError(DocumentDbError::IGNITE_ERR_BINARY,
+    throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_BINARY,
                       "Metadata updater is not available.");
 
   DocumentDbError err;

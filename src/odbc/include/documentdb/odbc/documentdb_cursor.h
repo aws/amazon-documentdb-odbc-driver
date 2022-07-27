@@ -72,7 +72,7 @@ class DocumentDbCursor {
   DocumentDbRow* GetRow();
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(DocumentDbCursor);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(DocumentDbCursor);
 
   /** The resulting cursor to query/aggregate call */
   mongocxx::cursor cursor_;

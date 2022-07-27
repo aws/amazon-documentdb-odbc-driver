@@ -31,91 +31,91 @@
 #ifndef _DOCUMENTDB_ODBC_BINARY_TYPE_MACRO
 #define _DOCUMENTDB_ODBC_BINARY_TYPE_MACRO
 /**
- * @def IGNITE_BINARY_TYPE_START(T)
+ * @def DOCUMENTDB_BINARY_TYPE_START(T)
  * Start binary type definition.
  */
-#define IGNITE_BINARY_TYPE_START(T) \
+#define DOCUMENTDB_BINARY_TYPE_START(T) \
   template <>                       \
   struct BinaryType< T > {
 /**
- * @def IGNITE_BINARY_TYPE_END
+ * @def DOCUMENTDB_BINARY_TYPE_END
  * End binary type definition.
  */
-#define IGNITE_BINARY_TYPE_END \
+#define DOCUMENTDB_BINARY_TYPE_END \
   }                            \
   ;
 
 /**
- * @def IGNITE_BINARY_GET_TYPE_ID_AS_CONST(id)
+ * @def DOCUMENTDB_BINARY_GET_TYPE_ID_AS_CONST(id)
  * Implementation of GetTypeId() which returns predefined constant.
  */
-#define IGNITE_BINARY_GET_TYPE_ID_AS_CONST(id) \
+#define DOCUMENTDB_BINARY_GET_TYPE_ID_AS_CONST(id) \
   static int32_t GetTypeId() {                 \
     return id;                                 \
   }
 
 /**
- * @def IGNITE_BINARY_GET_TYPE_ID_AS_HASH(typeName)
+ * @def DOCUMENTDB_BINARY_GET_TYPE_ID_AS_HASH(typeName)
  * Implementation of GetTypeId() which returns hash of passed type name.
  */
-#define IGNITE_BINARY_GET_TYPE_ID_AS_HASH(typeName) \
+#define DOCUMENTDB_BINARY_GET_TYPE_ID_AS_HASH(typeName) \
   static int32_t GetTypeId() {                      \
     return GetBinaryStringHashCode(#typeName);      \
   }
 
 /**
- * @def IGNITE_BINARY_GET_TYPE_NAME_AS_IS(typeName)
+ * @def DOCUMENTDB_BINARY_GET_TYPE_NAME_AS_IS(typeName)
  * Implementation of GetTypeName() which returns type name as is.
  */
-#define IGNITE_BINARY_GET_TYPE_NAME_AS_IS(typeName) \
+#define DOCUMENTDB_BINARY_GET_TYPE_NAME_AS_IS(typeName) \
   static void GetTypeName(std::string& dst) {       \
     dst = #typeName;                                \
   }
 
 /**
- * @def IGNITE_BINARY_GET_FIELD_ID_AS_HASH
+ * @def DOCUMENTDB_BINARY_GET_FIELD_ID_AS_HASH
  * Default implementation of GetFieldId() function which returns Java-way hash
  * code of the string.
  */
-#define IGNITE_BINARY_GET_FIELD_ID_AS_HASH      \
+#define DOCUMENTDB_BINARY_GET_FIELD_ID_AS_HASH      \
   static int32_t GetFieldId(const char* name) { \
     return GetBinaryStringHashCode(name);       \
   }
 
 /**
- * @def IGNITE_BINARY_IS_NULL_FALSE(T)
+ * @def DOCUMENTDB_BINARY_IS_NULL_FALSE(T)
  * Implementation of IsNull() function which always returns false.
  */
-#define IGNITE_BINARY_IS_NULL_FALSE(T) \
+#define DOCUMENTDB_BINARY_IS_NULL_FALSE(T) \
   static bool IsNull(const T&) {       \
     return false;                      \
   }
 
 /**
- * @def IGNITE_BINARY_IS_NULL_IF_NULLPTR(T)
+ * @def DOCUMENTDB_BINARY_IS_NULL_IF_NULLPTR(T)
  * Implementation of IsNull() function which return true if passed object is
  * null pointer.
  */
-#define IGNITE_BINARY_IS_NULL_IF_NULLPTR(T) \
+#define DOCUMENTDB_BINARY_IS_NULL_IF_NULLPTR(T) \
   static bool IsNull(const T& obj) {        \
     return obj;                             \
   }
 
 /**
- * @def IGNITE_BINARY_GET_NULL_DEFAULT_CTOR(T)
+ * @def DOCUMENTDB_BINARY_GET_NULL_DEFAULT_CTOR(T)
  * Implementation of GetNull() function which returns an instance created with
  * default constructor.
  */
-#define IGNITE_BINARY_GET_NULL_DEFAULT_CTOR(T) \
+#define DOCUMENTDB_BINARY_GET_NULL_DEFAULT_CTOR(T) \
   static void GetNull(T& dst) {                \
     dst = T();                                 \
   }
 
 /**
- * @def IGNITE_BINARY_GET_NULL_NULLPTR(T)
+ * @def DOCUMENTDB_BINARY_GET_NULL_NULLPTR(T)
  * Implementation of GetNull() function which returns NULL pointer.
  */
-#define IGNITE_BINARY_GET_NULL_NULLPTR(T) \
+#define DOCUMENTDB_BINARY_GET_NULL_NULLPTR(T) \
   static void GetNull(T& dst) {           \
     dst = 0;                              \
   }
@@ -134,20 +134,20 @@ class BinaryReader;
  * @param val Value.
  * @return Hash code.
  */
-IGNITE_IMPORT_EXPORT int32_t GetBinaryStringHashCode(const char* val);
+DOCUMENTDB_IMPORT_EXPORT int32_t GetBinaryStringHashCode(const char* val);
 
 /**
  * Binary type structure. Defines a set of functions required for type to be
  * serialized and deserialized.
  */
 template < typename T >
-struct IGNITE_IMPORT_EXPORT BinaryType {};
+struct DOCUMENTDB_IMPORT_EXPORT BinaryType {};
 
 /**
  * Default implementations of BinaryType hashing functions.
  */
 template < typename T >
-struct IGNITE_IMPORT_EXPORT BinaryTypeDefaultHashing {
+struct DOCUMENTDB_IMPORT_EXPORT BinaryTypeDefaultHashing {
   /**
    * Get binary object type ID.
    *
@@ -175,7 +175,7 @@ struct IGNITE_IMPORT_EXPORT BinaryTypeDefaultHashing {
  * Default implementations of BinaryType methods for non-null type.
  */
 template < typename T >
-struct IGNITE_IMPORT_EXPORT BinaryTypeNonNullableType {
+struct DOCUMENTDB_IMPORT_EXPORT BinaryTypeNonNullableType {
   /**
    * Check whether passed binary object should be interpreted as NULL.
    *
@@ -200,7 +200,7 @@ struct IGNITE_IMPORT_EXPORT BinaryTypeNonNullableType {
  * behaviour.
  */
 template < typename T >
-struct IGNITE_IMPORT_EXPORT BinaryTypeDefaultAll
+struct DOCUMENTDB_IMPORT_EXPORT BinaryTypeDefaultAll
     : BinaryTypeDefaultHashing< T >,
       BinaryTypeNonNullableType< T > {};
 
@@ -208,7 +208,7 @@ struct IGNITE_IMPORT_EXPORT BinaryTypeDefaultAll
  * BinaryType template specialization for pointers.
  */
 template < typename T >
-struct IGNITE_IMPORT_EXPORT BinaryType< T* > {
+struct DOCUMENTDB_IMPORT_EXPORT BinaryType< T* > {
   /** Actual type. */
   typedef BinaryType< T > BinaryTypeDereferenced;
 

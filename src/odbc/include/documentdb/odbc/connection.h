@@ -106,7 +106,7 @@ class Connection : public diagnostic::DiagnosableAdapter {
   inline void NativeSql(const CharT* inQuery, int64_t inQueryLen,
                         CharT* outQueryBuffer, int64_t outQueryBufferLen,
                         int64_t* outQueryLen) {
-    IGNITE_ODBC_API_CALL(InternalNativeSql(inQuery, inQueryLen, outQueryBuffer,
+    DOCUMENTDB_ODBC_API_CALL(InternalNativeSql(inQuery, inQueryLen, outQueryBuffer,
                                            outQueryBufferLen, outQueryLen));
   }
 
@@ -262,7 +262,7 @@ class Connection : public diagnostic::DiagnosableAdapter {
   }
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(Connection);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(Connection);
 
   /**
    * Init connection socket, using configuration.

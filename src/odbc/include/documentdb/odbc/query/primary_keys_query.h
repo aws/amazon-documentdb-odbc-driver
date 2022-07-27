@@ -109,7 +109,7 @@ class PrimaryKeysQuery : public Query {
   virtual SqlResult::Type NextResultSet();
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(PrimaryKeysQuery);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(PrimaryKeysQuery);
 
   /**
    * Make get primary keys metadata requets and use response to set internal

@@ -25,33 +25,33 @@
 #if (defined(__GNUC__)                                               \
      && ((__GNUC__ > 4) || (__GNUC__ == 4) && (__GNUC_MINOR__ > 2))) \
     || __has_attribute(visibility)
-#define IGNITE_EXPORT __attribute__((visibility("default")))
-#define IGNITE_IMPORT __attribute__((visibility("default")))
+#define DOCUMENTDB_EXPORT __attribute__((visibility("default")))
+#define DOCUMENTDB_IMPORT __attribute__((visibility("default")))
 #else
-#define IGNITE_EXPORT
-#define IGNITE_IMPORT
+#define DOCUMENTDB_EXPORT
+#define DOCUMENTDB_IMPORT
 #endif
 
-#define IGNITE_CALL
+#define DOCUMENTDB_CALL
 
-#ifdef IGNITE_IMPL
-#define IGNITE_IMPORT_EXPORT IGNITE_EXPORT
+#ifdef DOCUMENTDB_IMPL
+#define DOCUMENTDB_IMPORT_EXPORT DOCUMENTDB_EXPORT
 #else
-#define IGNITE_IMPORT_EXPORT IGNITE_IMPORT
+#define DOCUMENTDB_IMPORT_EXPORT DOCUMENTDB_IMPORT
 #endif
 
 #if (__cplusplus >= 201103L)
-#define IGNITE_NO_THROW noexcept
+#define DOCUMENTDB_NO_THROW noexcept
 #else
-#define IGNITE_NO_THROW throw()
+#define DOCUMENTDB_NO_THROW throw()
 #endif
 
-#define IGNITE_UNUSED(x) ((void)x)
+#define DOCUMENTDB_UNUSED(x) ((void)x)
 
 /**
  * Common construction to disable copy constructor and assignment for class.
  */
-#define IGNITE_NO_COPY_ASSIGNMENT(cls) \
+#define DOCUMENTDB_NO_COPY_ASSIGNMENT(cls) \
   cls(const cls& src);                 \
   cls& operator=(const cls& other)
 

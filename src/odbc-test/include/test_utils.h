@@ -91,7 +91,7 @@ class OdbcClientError : public std::exception {
   /**
    * Destructor.
    */
-  virtual ~OdbcClientError() IGNITE_NO_THROW {
+  virtual ~OdbcClientError() DOCUMENTDB_NO_THROW {
     // No-op.
   }
 
@@ -101,7 +101,7 @@ class OdbcClientError : public std::exception {
    *
    * @return Error message string.
    */
-  virtual const char* what() const IGNITE_NO_THROW {
+  virtual const char* what() const DOCUMENTDB_NO_THROW {
     return message.c_str();
   }
 

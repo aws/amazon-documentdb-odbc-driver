@@ -137,7 +137,7 @@ class ClusterNodePredicateHolder : public IgnitePredicate< ClusterNode > {
   }
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(ClusterNodePredicateHolder);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(ClusterNodePredicateHolder);
 
   /* Predicates container. */
   std::vector< SP_Pred > preds;
@@ -413,7 +413,7 @@ ClusterNode ClusterGroupImpl::GetNode() {
     return nodes.at(0);
 
   const char* msg = "There are no available cluster nodes";
-  throw DocumentDbError(DocumentDbError::IGNITE_ERR_ILLEGAL_ARGUMENT, msg);
+  throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_ILLEGAL_ARGUMENT, msg);
 }
 
 struct FindGuid {
@@ -436,7 +436,7 @@ ClusterNode ClusterGroupImpl::GetNode(Guid nid) {
     return *it;
 
   const char* msg = "There is no cluster node with requested ID";
-  throw DocumentDbError(DocumentDbError::IGNITE_ERR_ILLEGAL_ARGUMENT, msg);
+  throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_ILLEGAL_ARGUMENT, msg);
 }
 
 std::vector< ClusterNode > ClusterGroupImpl::GetNodes() {

@@ -17,31 +17,31 @@
 #ifndef _DOCUMENTDB_ODBC_COMMON_COMMON
 #define _DOCUMENTDB_ODBC_COMMON_COMMON
 
-#define IGNITE_EXPORT __declspec(dllexport)
-#define IGNITE_IMPORT __declspec(dllimport)
-#define IGNITE_CALL __stdcall
+#define DOCUMENTDB_EXPORT __declspec(dllexport)
+#define DOCUMENTDB_IMPORT __declspec(dllimport)
+#define DOCUMENTDB_CALL __stdcall
 
-#define IGNITE_IMPORT_EXPORT IGNITE_EXPORT
+#define DOCUMENTDB_IMPORT_EXPORT DOCUMENTDB_EXPORT
 
 #include <iostream>
 
-#define IGNITE_TRACE_ALLOC(addr)                                  \
+#define DOCUMENTDB_TRACE_ALLOC(addr)                                  \
   std::cout << "ALLOC " << __FILE__ << "(" << __LINE__ << "): 0x" \
             << (void*)addr << std::endl;
 
 /**
  * Common construction to disable copy constructor and assignment for class.
  */
-#define IGNITE_NO_COPY_ASSIGNMENT(cls) \
+#define DOCUMENTDB_NO_COPY_ASSIGNMENT(cls) \
   cls(const cls& src);                 \
   cls& operator=(const cls& other);
 
 #if (__cplusplus >= 201103L)
-#define IGNITE_NO_THROW noexcept
+#define DOCUMENTDB_NO_THROW noexcept
 #else
-#define IGNITE_NO_THROW throw()
+#define DOCUMENTDB_NO_THROW throw()
 #endif
 
-#define IGNITE_UNUSED(x) ((void)x)
+#define DOCUMENTDB_UNUSED(x) ((void)x)
 
 #endif  //_DOCUMENTDB_ODBC_COMMON_COMMON

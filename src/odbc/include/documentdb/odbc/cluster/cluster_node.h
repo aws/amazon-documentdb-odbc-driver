@@ -33,7 +33,7 @@ namespace cluster {
  * Use GetAttribute(String) or GetMetrics() to get static and dynamic
  * information about cluster nodes.
  */
-class IGNITE_IMPORT_EXPORT ClusterNode {
+class DOCUMENTDB_IMPORT_EXPORT ClusterNode {
  public:
   /**
    * Constructor.
@@ -144,7 +144,7 @@ class IGNITE_IMPORT_EXPORT ClusterNode {
    * @param rnode Right cluster node.
    * @return True if less.
    */
-  friend IGNITE_IMPORT_EXPORT bool operator<(const ClusterNode& lnode,
+  friend DOCUMENTDB_IMPORT_EXPORT bool operator<(const ClusterNode& lnode,
                                              const ClusterNode& rnode) {
     return lnode.GetId() < rnode.GetId();
   }

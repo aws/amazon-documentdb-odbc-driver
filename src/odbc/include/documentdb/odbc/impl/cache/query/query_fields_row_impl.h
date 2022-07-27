@@ -73,7 +73,7 @@ class QueryFieldsRowImpl {
     if (IsValid())
       return processed < columnNum;
     else {
-      err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+      err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "Instance is not usable (did you check for error?).");
 
       return false;
@@ -108,7 +108,7 @@ class QueryFieldsRowImpl {
       ++processed;
       return reader.ReadTopObject< T >();
     } else {
-      err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+      err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "Instance is not usable (did you check for error?).");
 
       return T();
@@ -135,7 +135,7 @@ class QueryFieldsRowImpl {
 
       return actualLen;
     } else {
-      throw DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+      throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "Instance is not usable (did you check for error?).");
     }
   }
@@ -171,7 +171,7 @@ class QueryFieldsRowImpl {
   /** Number of elements that have been read by now. */
   int32_t processed;
 
-  IGNITE_NO_COPY_ASSIGNMENT(QueryFieldsRowImpl);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(QueryFieldsRowImpl);
 };
 }  // namespace query
 }  // namespace cache

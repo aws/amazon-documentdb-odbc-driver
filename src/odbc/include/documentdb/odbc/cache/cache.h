@@ -64,7 +64,7 @@ namespace cache {
  * @tparam V Cache value type.
  */
 template < typename K, typename V >
-class IGNITE_IMPORT_EXPORT Cache {
+class DOCUMENTDB_IMPORT_EXPORT Cache {
  public:
   /**
    * Constructor.
@@ -1524,7 +1524,7 @@ class IGNITE_IMPORT_EXPORT Cache {
    *
    * See the example below for details:
    * @code{.cpp}
-   * IGNITE_EXPORTED_CALL void
+   * DOCUMENTDB_EXPORTED_CALL void
    * IgniteModuleInit(documentdb::odbc::IgniteBindingContext& context)
    * {
    *     IgniteBinding binding = context.GetBinding();
@@ -1577,7 +1577,7 @@ class IGNITE_IMPORT_EXPORT Cache {
    *
    * See the example below for details:
    * @code{.cpp}
-   * IGNITE_EXPORTED_CALL void
+   * DOCUMENTDB_EXPORTED_CALL void
    * IgniteModuleInit(documentdb::odbc::IgniteBindingContext& context)
    * {
    *     IgniteBinding binding = context.GetBinding();
@@ -1726,7 +1726,7 @@ class IGNITE_IMPORT_EXPORT Cache {
 
     if (!qryImpl.IsValid() || !qryImpl.Get()->HasListener()) {
       err =
-          DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+          DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                       "Event listener is not set for ContinuousQuery instance");
 
       return query::continuous::ContinuousQueryHandle< K, V >();
@@ -1778,7 +1778,7 @@ class IGNITE_IMPORT_EXPORT Cache {
 
     if (!qryImpl.IsValid() || !qryImpl.Get()->HasListener()) {
       err =
-          DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+          DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                       "Event listener is not set for ContinuousQuery instance");
 
       return query::continuous::ContinuousQueryHandle< K, V >();

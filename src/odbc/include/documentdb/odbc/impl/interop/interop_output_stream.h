@@ -27,7 +27,7 @@ namespace interop {
 /**
  * Interop output stream.
  */
-class IGNITE_IMPORT_EXPORT InteropOutputStream {
+class DOCUMENTDB_IMPORT_EXPORT InteropOutputStream {
  public:
   /**
    * Create new output stream with the given capacity.
@@ -232,7 +232,7 @@ class IGNITE_IMPORT_EXPORT InteropOutputStream {
   /** Current position. */
   int pos;
 
-  IGNITE_NO_COPY_ASSIGNMENT(InteropOutputStream);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(InteropOutputStream);
 
   /**
    * Ensure that stream enough capacity optionally extending it.

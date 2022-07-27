@@ -32,7 +32,7 @@ InteropExternalMemory::InteropExternalMemory(int8_t* memPtr) {
 
 void InteropExternalMemory::Reallocate(int32_t cap) {
   if (JniContext::Reallocate(reinterpret_cast< int64_t >(memPtr), cap) == -1) {
-    IGNITE_ERROR_FORMATTED_2(DocumentDbError::IGNITE_ERR_MEMORY,
+    DOCUMENTDB_ERROR_FORMATTED_2(DocumentDbError::DOCUMENTDB_ERR_MEMORY,
                              "Failed to reallocate external memory", "memPtr",
                              PointerLong(), "requestedCapacity", cap)
   }

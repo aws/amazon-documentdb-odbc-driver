@@ -76,7 +76,7 @@ void ReadForeignKeysColumnMetaVector(SharedPointer< ResultSet >& resultSet,
   JniErrorCode errCode;
   do {
     errCode = resultSet.Get()->Next(hasNext, errInfo);
-    if (!hasNext || errCode != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    if (!hasNext || errCode != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       break;
     }
 

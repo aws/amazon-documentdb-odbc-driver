@@ -38,7 +38,7 @@ namespace cache {
  * @tparam K Cache affinity key type.
  */
 template < typename K >
-class IGNITE_IMPORT_EXPORT CacheAffinity {
+class DOCUMENTDB_IMPORT_EXPORT CacheAffinity {
  public:
   /**
    * Constructor.

@@ -34,7 +34,7 @@ class QueryFieldsRowImpl;
 /**
  * Query batch.
  */
-class IGNITE_IMPORT_EXPORT QueryBatch {
+class DOCUMENTDB_IMPORT_EXPORT QueryBatch {
   typedef common::concurrent::SharedPointer< interop::InteropMemory >
       MemorySharedPtr;
 
@@ -129,7 +129,7 @@ class IGNITE_IMPORT_EXPORT QueryBatch {
   /** Position in memory. */
   int32_t pos;
 
-  IGNITE_NO_COPY_ASSIGNMENT(QueryBatch);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(QueryBatch);
 };
 }  // namespace query
 }  // namespace cache

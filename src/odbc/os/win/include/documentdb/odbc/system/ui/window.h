@@ -193,7 +193,7 @@ class Window {
   Window* parent;
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(Window)
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(Window)
 };
 }  // namespace ui
 }  // namespace system

@@ -32,7 +32,7 @@ namespace binary {
 /**
  * Type manager.
  */
-class IGNITE_IMPORT_EXPORT BinaryTypeManager {
+class DOCUMENTDB_IMPORT_EXPORT BinaryTypeManager {
  public:
   /**
    * Constructor.
@@ -119,7 +119,7 @@ class IGNITE_IMPORT_EXPORT BinaryTypeManager {
   /** Latest version. */
   int32_t ver;
 
-  IGNITE_NO_COPY_ASSIGNMENT(BinaryTypeManager);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(BinaryTypeManager);
 };
 }  // namespace binary
 }  // namespace impl

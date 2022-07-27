@@ -37,7 +37,7 @@ namespace continuous {
 /**
  * Continuous query handle implementation.
  */
-class IGNITE_IMPORT_EXPORT ContinuousQueryHandleImpl {
+class DOCUMENTDB_IMPORT_EXPORT ContinuousQueryHandleImpl {
   typedef common::concurrent::SharedPointer< IgniteEnvironment >
       SP_IgniteEnvironment;
   typedef common::concurrent::SharedPointer< ContinuousQueryImplBase >

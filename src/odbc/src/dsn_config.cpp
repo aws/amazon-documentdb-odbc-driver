@@ -43,7 +43,7 @@ void ThrowLastSetupError() {
       << utility::SqlWcharToString(msg.GetData(), msg.GetSize())
       << "\", Code: " << code;
 
-  throw DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC, buf.str().c_str());
+  throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC, buf.str().c_str());
 }
 
 void WriteDsnString(const char* dsn, const char* key, const char* value) {

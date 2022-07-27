@@ -177,7 +177,7 @@ class DiagnosticRecordStorage {
                            app::ApplicationDataBuffer& buffer) const;
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(DiagnosticRecordStorage);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(DiagnosticRecordStorage);
 
   /**
    * Header record field. This field contains the count of rows

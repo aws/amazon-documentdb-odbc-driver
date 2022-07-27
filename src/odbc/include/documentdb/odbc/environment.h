@@ -76,7 +76,7 @@ class Environment : public diagnostic::DiagnosableAdapter {
   void GetAttribute(int32_t attr, app::ApplicationDataBuffer& buffer);
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(Environment);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(Environment);
 
   /**
    * Create connection associated with the environment.

@@ -31,7 +31,7 @@ namespace common {
 /**
  * Big decimal number implementation.
  */
-class IGNITE_IMPORT_EXPORT Decimal {
+class DOCUMENTDB_IMPORT_EXPORT Decimal {
  public:
   /**
    * Default constructor.
@@ -452,7 +452,7 @@ class IGNITE_IMPORT_EXPORT Decimal {
  * @param val2 Second value.
  * @return True if equal.
  */
-IGNITE_IMPORT_EXPORT bool operator==(const Decimal& val1, const Decimal& val2);
+DOCUMENTDB_IMPORT_EXPORT bool operator==(const Decimal& val1, const Decimal& val2);
 
 /**
  * Comparison operator.
@@ -461,7 +461,7 @@ IGNITE_IMPORT_EXPORT bool operator==(const Decimal& val1, const Decimal& val2);
  * @param val2 Second value.
  * @return True if not equal.
  */
-IGNITE_IMPORT_EXPORT bool operator!=(const Decimal& val1, const Decimal& val2);
+DOCUMENTDB_IMPORT_EXPORT bool operator!=(const Decimal& val1, const Decimal& val2);
 
 /**
  * Comparison operator.
@@ -470,7 +470,7 @@ IGNITE_IMPORT_EXPORT bool operator!=(const Decimal& val1, const Decimal& val2);
  * @param val2 Second value.
  * @return True if less.
  */
-IGNITE_IMPORT_EXPORT bool operator<(const Decimal& val1, const Decimal& val2);
+DOCUMENTDB_IMPORT_EXPORT bool operator<(const Decimal& val1, const Decimal& val2);
 
 /**
  * Comparison operator.
@@ -479,7 +479,7 @@ IGNITE_IMPORT_EXPORT bool operator<(const Decimal& val1, const Decimal& val2);
  * @param val2 Second value.
  * @return True if less or equal.
  */
-IGNITE_IMPORT_EXPORT bool operator<=(const Decimal& val1, const Decimal& val2);
+DOCUMENTDB_IMPORT_EXPORT bool operator<=(const Decimal& val1, const Decimal& val2);
 
 /**
  * Comparison operator.
@@ -488,7 +488,7 @@ IGNITE_IMPORT_EXPORT bool operator<=(const Decimal& val1, const Decimal& val2);
  * @param val2 Second value.
  * @return True if gretter.
  */
-IGNITE_IMPORT_EXPORT bool operator>(const Decimal& val1, const Decimal& val2);
+DOCUMENTDB_IMPORT_EXPORT bool operator>(const Decimal& val1, const Decimal& val2);
 
 /**
  * Comparison operator.
@@ -497,7 +497,7 @@ IGNITE_IMPORT_EXPORT bool operator>(const Decimal& val1, const Decimal& val2);
  * @param val2 Second value.
  * @return True if gretter or equal.
  */
-IGNITE_IMPORT_EXPORT bool operator>=(const Decimal& val1, const Decimal& val2);
+DOCUMENTDB_IMPORT_EXPORT bool operator>=(const Decimal& val1, const Decimal& val2);
 }  // namespace common
 }  // namespace odbc
 }  // namespace documentdb

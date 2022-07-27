@@ -124,7 +124,7 @@ class DataQuery : public Query {
   }
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(DataQuery);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(DataQuery);
 
   /**
    * Make query prepare request and use response to set internal

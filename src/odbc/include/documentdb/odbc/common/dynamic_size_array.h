@@ -35,7 +35,7 @@ namespace common {
  * in exported classes as we can't export standard library classes.
  */
 template < typename T, typename A = DefaultAllocator< T > >
-class IGNITE_IMPORT_EXPORT DynamicSizeArray {
+class DOCUMENTDB_IMPORT_EXPORT DynamicSizeArray {
  public:
   typedef T ValueType;
   typedef A AllocatorType;

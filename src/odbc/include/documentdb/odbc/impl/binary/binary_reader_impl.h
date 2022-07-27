@@ -51,7 +51,7 @@ namespace binary {
 /**
  * Internal implementation of binary reader.
  */
-class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
+class DOCUMENTDB_IMPORT_EXPORT BinaryReaderImpl {
  public:
   /**
    * Constructor.
@@ -697,7 +697,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
   template < typename T, typename OutputIterator >
   int32_t ReadCollection(OutputIterator out) {
     int32_t size;
-    int32_t id = StartContainerSession(true, IGNITE_TYPE_COLLECTION, &size);
+    int32_t id = StartContainerSession(true, DOCUMENTDB_TYPE_COLLECTION, &size);
 
     // Reading collection type. We don't need it here but it should be read.
     if (size != -1)
@@ -733,7 +733,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
     stream->Position(fieldPos);
 
     int32_t size;
-    int32_t id = StartContainerSession(false, IGNITE_TYPE_COLLECTION, &size);
+    int32_t id = StartContainerSession(false, DOCUMENTDB_TYPE_COLLECTION, &size);
 
     // Reading collection type. We don't need it here but it should be read.
     if (size != -1)
@@ -974,18 +974,18 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
     int8_t hdr = stream->ReadInt8();
 
     switch (hdr) {
-      case IGNITE_HDR_NULL: {
+      case DOCUMENTDB_HDR_NULL: {
         res = GetNull< T >();
 
         return;
       }
 
-      case IGNITE_HDR_HND: {
-        IGNITE_ERROR_1(documentdb::odbc::DocumentDbError::IGNITE_ERR_BINARY,
+      case DOCUMENTDB_HDR_HND: {
+        DOCUMENTDB_ERROR_1(documentdb::odbc::DocumentDbError::DOCUMENTDB_ERR_BINARY,
                        "Circular references are not supported.");
       }
 
-      case IGNITE_TYPE_BINARY: {
+      case DOCUMENTDB_TYPE_BINARY: {
         int32_t portLen =
             stream->ReadInt32();  // Total length of binary object.
         int32_t curPos = stream->Position();
@@ -1002,23 +1002,23 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
         return;
       }
 
-      case IGNITE_HDR_FULL: {
+      case DOCUMENTDB_HDR_FULL: {
         typedef documentdb::odbc::binary::BinaryType< T > BType;
 
         int8_t protoVer = stream->ReadInt8();
 
-        if (protoVer != IGNITE_PROTO_VER) {
-          IGNITE_ERROR_2(documentdb::odbc::DocumentDbError::IGNITE_ERR_BINARY,
+        if (protoVer != DOCUMENTDB_PROTO_VER) {
+          DOCUMENTDB_ERROR_2(documentdb::odbc::DocumentDbError::DOCUMENTDB_ERR_BINARY,
                          "Unsupported binary protocol version: ", protoVer);
         }
 
         int16_t flags = stream->ReadInt16();
 
-        if (flags & IGNITE_BINARY_FLAG_COMPACT_FOOTER) {
-          IGNITE_ERROR_2(documentdb::odbc::DocumentDbError::IGNITE_ERR_BINARY,
+        if (flags & DOCUMENTDB_BINARY_FLAG_COMPACT_FOOTER) {
+          DOCUMENTDB_ERROR_2(documentdb::odbc::DocumentDbError::DOCUMENTDB_ERR_BINARY,
                          "Unsupported binary protocol flag: "
-                         "IGNITE_BINARY_FLAG_COMPACT_FOOTER: ",
-                         IGNITE_BINARY_FLAG_COMPACT_FOOTER);
+                         "DOCUMENTDB_BINARY_FLAG_COMPACT_FOOTER: ",
+                         DOCUMENTDB_BINARY_FLAG_COMPACT_FOOTER);
         }
 
         int32_t typeId = stream->ReadInt32();
@@ -1033,24 +1033,24 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
         int32_t rawOff;
         int32_t footerBegin;
 
-        if (flags & IGNITE_BINARY_FLAG_HAS_SCHEMA)
+        if (flags & DOCUMENTDB_BINARY_FLAG_HAS_SCHEMA)
           footerBegin = pos + schemaOrRawOff;
         else
           footerBegin = pos + len;
 
         BinaryOffsetType::Type schemaType;
 
-        if (flags & IGNITE_BINARY_FLAG_OFFSET_ONE_BYTE)
+        if (flags & DOCUMENTDB_BINARY_FLAG_OFFSET_ONE_BYTE)
           schemaType = BinaryOffsetType::ONE_BYTE;
-        else if (flags & IGNITE_BINARY_FLAG_OFFSET_TWO_BYTES)
+        else if (flags & DOCUMENTDB_BINARY_FLAG_OFFSET_TWO_BYTES)
           schemaType = BinaryOffsetType::TWO_BYTES;
         else
           schemaType = BinaryOffsetType::FOUR_BYTES;
 
         int32_t footerEnd;
 
-        if (flags & IGNITE_BINARY_FLAG_HAS_RAW
-            && flags & IGNITE_BINARY_FLAG_HAS_SCHEMA) {
+        if (flags & DOCUMENTDB_BINARY_FLAG_HAS_RAW
+            && flags & DOCUMENTDB_BINARY_FLAG_HAS_SCHEMA) {
           // 4 is the size of RawOffset field at the end of the packet.
           footerEnd = pos + len - 4;
 
@@ -1061,7 +1061,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
           rawOff = schemaOrRawOff;
         }
 
-        bool usrType = (flags & IGNITE_BINARY_FLAG_USER_TYPE) != 0;
+        bool usrType = (flags & DOCUMENTDB_BINARY_FLAG_USER_TYPE) != 0;
 
         TemplatedBinaryIdResolver< T > idRslvr;
         BinaryReaderImpl readerImpl(stream, &idRslvr, pos, usrType, typeId,
@@ -1077,7 +1077,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
       }
 
       default: {
-        IGNITE_ERROR_2(documentdb::odbc::DocumentDbError::IGNITE_ERR_BINARY,
+        DOCUMENTDB_ERROR_2(documentdb::odbc::DocumentDbError::DOCUMENTDB_ERR_BINARY,
                        "Unexpected header during deserialization: ",
                        static_cast< int >(hdr & 0xFF));
       }
@@ -1094,7 +1094,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
     int8_t hdr = stream->ReadInt8();
 
     switch (hdr) {
-      case IGNITE_TYPE_ARRAY: {
+      case DOCUMENTDB_TYPE_ARRAY: {
         int32_t elementNum = stream->ReadInt32();
 
         res.clear();
@@ -1107,7 +1107,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
       }
 
       default: {
-        IGNITE_ERROR_2(documentdb::odbc::DocumentDbError::IGNITE_ERR_BINARY,
+        DOCUMENTDB_ERROR_2(documentdb::odbc::DocumentDbError::DOCUMENTDB_ERR_BINARY,
                        "Unexpected header during deserialization: ",
                        static_cast< int >(hdr & 0xFF));
       }
@@ -1182,7 +1182,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
   /** Object schema type. */
   BinaryOffsetType::Type schemaType;
 
-  IGNITE_NO_COPY_ASSIGNMENT(BinaryReaderImpl);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(BinaryReaderImpl);
 
   /**
    * Deserialize EnumEntry into user type.
@@ -1203,8 +1203,8 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
     }
 
     if (entry.GetTypeId() != TypeMeta::GetTypeId()) {
-      IGNITE_ERROR_FORMATTED_2(
-          documentdb::odbc::DocumentDbError::IGNITE_ERR_BINARY,
+      DOCUMENTDB_ERROR_FORMATTED_2(
+          documentdb::odbc::DocumentDbError::DOCUMENTDB_ERR_BINARY,
           "Unexpected type ID during deserialization of the enum: ", "expected",
           TypeMeta::GetTypeId(), "actual", entry.GetTypeId());
     }
@@ -1293,13 +1293,13 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
 
     int8_t typeId = stream->ReadInt8();
 
-    if (typeId == IGNITE_HDR_NULL)
+    if (typeId == DOCUMENTDB_HDR_NULL)
       return dflt;
 
     if (typeId != expHdr) {
       int32_t pos = stream->Position();
 
-      IGNITE_ERROR_FORMATTED_3(DocumentDbError::IGNITE_ERR_BINARY,
+      DOCUMENTDB_ERROR_FORMATTED_3(DocumentDbError::DOCUMENTDB_ERR_BINARY,
                                "Invalid type ID", "position", pos, "expected",
                                static_cast< int >(expHdr), "actual",
                                static_cast< int >(typeId))
@@ -1390,7 +1390,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
         stream->Position(stream->Position() - 5);
 
       return realLen;
-    } else if (hdr != IGNITE_HDR_NULL)
+    } else if (hdr != DOCUMENTDB_HDR_NULL)
       ThrowOnInvalidHeader(stream->Position() - 1, expHdr, hdr);
 
     return -1;
@@ -1420,7 +1420,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
 
         func(stream, &res[0], realLen);
       }
-    } else if (hdr == IGNITE_HDR_NULL)
+    } else if (hdr == DOCUMENTDB_HDR_NULL)
       res.clear();
     else
       ThrowOnInvalidHeader(stream->Position() - 1, expHdr, hdr);
@@ -1442,7 +1442,7 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
 
       if (hdr == expHdr)
         return func(stream);
-      else if (hdr == IGNITE_HDR_NULL)
+      else if (hdr == DOCUMENTDB_HDR_NULL)
         return T();
       else {
         ThrowOnInvalidHeader(stream->Position() - 1, expHdr, hdr);
@@ -1551,84 +1551,84 @@ class IGNITE_IMPORT_EXPORT BinaryReaderImpl {
 };
 
 template <>
-void IGNITE_IMPORT_EXPORT
+void DOCUMENTDB_IMPORT_EXPORT
 BinaryReaderImpl::ReadTopObject0< documentdb::odbc::binary::BinaryReader, int8_t >(
     int8_t& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT
+void DOCUMENTDB_IMPORT_EXPORT
 BinaryReaderImpl::ReadTopObject0< documentdb::odbc::binary::BinaryReader, bool >(
     bool& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT
+void DOCUMENTDB_IMPORT_EXPORT
 BinaryReaderImpl::ReadTopObject0< documentdb::odbc::binary::BinaryReader, int16_t >(
     int16_t& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
+void DOCUMENTDB_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
     documentdb::odbc::binary::BinaryReader, uint16_t >(uint16_t& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT
+void DOCUMENTDB_IMPORT_EXPORT
 BinaryReaderImpl::ReadTopObject0< documentdb::odbc::binary::BinaryReader, int32_t >(
     int32_t& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT
+void DOCUMENTDB_IMPORT_EXPORT
 BinaryReaderImpl::ReadTopObject0< documentdb::odbc::binary::BinaryReader, int64_t >(
     int64_t& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT
+void DOCUMENTDB_IMPORT_EXPORT
 BinaryReaderImpl::ReadTopObject0< documentdb::odbc::binary::BinaryReader, float >(
     float& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT
+void DOCUMENTDB_IMPORT_EXPORT
 BinaryReaderImpl::ReadTopObject0< documentdb::odbc::binary::BinaryReader, double >(
     double& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT
+void DOCUMENTDB_IMPORT_EXPORT
 BinaryReaderImpl::ReadTopObject0< documentdb::odbc::binary::BinaryReader, Guid >(
     Guid& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT
+void DOCUMENTDB_IMPORT_EXPORT
 BinaryReaderImpl::ReadTopObject0< documentdb::odbc::binary::BinaryReader, Date >(
     Date& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
+void DOCUMENTDB_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
     documentdb::odbc::binary::BinaryReader, Timestamp >(Timestamp& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT
+void DOCUMENTDB_IMPORT_EXPORT
 BinaryReaderImpl::ReadTopObject0< documentdb::odbc::binary::BinaryReader, Time >(
     Time& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
+void DOCUMENTDB_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
     documentdb::odbc::binary::BinaryReader, std::string >(std::string& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
+void DOCUMENTDB_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
     documentdb::odbc::binary::BinaryReader, std::vector< int8_t > >(
     std::vector< int8_t >& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
+void DOCUMENTDB_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
     documentdb::odbc::binary::BinaryReader, std::vector< int16_t > >(
     std::vector< int16_t >& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
+void DOCUMENTDB_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
     documentdb::odbc::binary::BinaryReader, std::vector< int32_t > >(
     std::vector< int32_t >& res);
 
 template <>
-void IGNITE_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
+void DOCUMENTDB_IMPORT_EXPORT BinaryReaderImpl::ReadTopObject0<
     documentdb::odbc::binary::BinaryReader, std::vector< int64_t > >(
     std::vector< int64_t >& res);
 

@@ -43,7 +43,7 @@ using namespace documentdb::odbc::binary;
 /**
  * Binary uilts.
  */
-class IGNITE_IMPORT_EXPORT BinaryUtils {
+class DOCUMENTDB_IMPORT_EXPORT BinaryUtils {
  public:
   /**
    * Get data hash code.

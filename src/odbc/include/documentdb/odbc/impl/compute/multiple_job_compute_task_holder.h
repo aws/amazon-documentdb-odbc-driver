@@ -154,7 +154,7 @@ class MultipleJobComputeTaskHolder : public ComputeTaskHolder {
    * Reduce results of related jobs.
    */
   virtual void Reduce() {
-    if (error.GetCode() == DocumentDbError::IGNITE_SUCCESS)
+    if (error.GetCode() == DocumentDbError::DOCUMENTDB_SUCCESS)
       promise.SetValue(result);
     else
       promise.SetError(error);
@@ -178,7 +178,7 @@ class MultipleJobComputeTaskHolder : public ComputeTaskHolder {
   void ProcessResult(const ComputeJobResult< ResultType >& res) {
     const DocumentDbError& err = res.GetError();
 
-    if (err.GetCode() == DocumentDbError::IGNITE_SUCCESS)
+    if (err.GetCode() == DocumentDbError::DOCUMENTDB_SUCCESS)
       result->push_back(res.GetResult());
     else
       error = err;
@@ -304,7 +304,7 @@ class MultipleJobComputeTaskHolder< F, void > : public ComputeTaskHolder {
    * Reduce results of related jobs.
    */
   virtual void Reduce() {
-    if (error.GetCode() == DocumentDbError::IGNITE_SUCCESS)
+    if (error.GetCode() == DocumentDbError::DOCUMENTDB_SUCCESS)
       promise.SetValue();
     else
       promise.SetError(error);
@@ -328,7 +328,7 @@ class MultipleJobComputeTaskHolder< F, void > : public ComputeTaskHolder {
   void ProcessResult(const ComputeJobResult< void >& res) {
     const DocumentDbError& err = res.GetError();
 
-    if (err.GetCode() != DocumentDbError::IGNITE_SUCCESS)
+    if (err.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS)
       error = err;
   }
 

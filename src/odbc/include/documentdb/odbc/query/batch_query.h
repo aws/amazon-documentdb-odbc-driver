@@ -121,7 +121,7 @@ class BatchQuery : public Query {
   }
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(BatchQuery);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(BatchQuery);
 
   /**
    * Make query execute request and use response to set internal

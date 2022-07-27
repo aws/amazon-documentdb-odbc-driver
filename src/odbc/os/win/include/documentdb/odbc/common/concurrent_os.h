@@ -32,7 +32,7 @@ namespace concurrent {
 /**
  * Static class to manage memory visibility semantics.
  */
-class IGNITE_IMPORT_EXPORT Memory {
+class DOCUMENTDB_IMPORT_EXPORT Memory {
  public:
   /**
    * Full fence.
@@ -43,7 +43,7 @@ class IGNITE_IMPORT_EXPORT Memory {
 /**
  * Critical section.
  */
-class IGNITE_IMPORT_EXPORT CriticalSection {
+class DOCUMENTDB_IMPORT_EXPORT CriticalSection {
   friend class ConditionVariable;
 
  public:
@@ -71,10 +71,10 @@ class IGNITE_IMPORT_EXPORT CriticalSection {
   /** Handle. */
   CRITICAL_SECTION hnd;
 
-  IGNITE_NO_COPY_ASSIGNMENT(CriticalSection)
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(CriticalSection)
 };
 
-class IGNITE_IMPORT_EXPORT ReadWriteLock {
+class DOCUMENTDB_IMPORT_EXPORT ReadWriteLock {
  public:
   /**
    * Constructor.
@@ -110,13 +110,13 @@ class IGNITE_IMPORT_EXPORT ReadWriteLock {
   /** Lock. */
   SRWLOCK lock;
 
-  IGNITE_NO_COPY_ASSIGNMENT(ReadWriteLock)
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(ReadWriteLock)
 };
 
 /**
  * Special latch with count = 1.
  */
-class IGNITE_IMPORT_EXPORT SingleLatch {
+class DOCUMENTDB_IMPORT_EXPORT SingleLatch {
  public:
   /**
    * Constructor.
@@ -142,13 +142,13 @@ class IGNITE_IMPORT_EXPORT SingleLatch {
   /** Handle. */
   HANDLE hnd = CreateEvent(nullptr, TRUE, FALSE, nullptr);
 
-  IGNITE_NO_COPY_ASSIGNMENT(SingleLatch)
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(SingleLatch)
 };
 
 /**
  * Primitives for atomic access.
  */
-class IGNITE_IMPORT_EXPORT Atomics {
+class DOCUMENTDB_IMPORT_EXPORT Atomics {
  public:
   /**
    * Update the 32-bit integer value if it is equal to expected value.
@@ -228,7 +228,7 @@ class IGNITE_IMPORT_EXPORT Atomics {
 /**
  * Thread-local entry.
  */
-class IGNITE_IMPORT_EXPORT ThreadLocalEntry {
+class DOCUMENTDB_IMPORT_EXPORT ThreadLocalEntry {
  public:
   /**
    * Virtual destructor to allow for correct typed entries cleanup.
@@ -242,7 +242,7 @@ class IGNITE_IMPORT_EXPORT ThreadLocalEntry {
  * Typed thread-local entry.
  */
 template < typename T >
-class IGNITE_IMPORT_EXPORT ThreadLocalTypedEntry : public ThreadLocalEntry {
+class DOCUMENTDB_IMPORT_EXPORT ThreadLocalTypedEntry : public ThreadLocalEntry {
  public:
   /**
    * Constructor.
@@ -274,7 +274,7 @@ class IGNITE_IMPORT_EXPORT ThreadLocalTypedEntry : public ThreadLocalEntry {
 /**
  * Thread-local abstraction.
  */
-class IGNITE_IMPORT_EXPORT ThreadLocal {
+class DOCUMENTDB_IMPORT_EXPORT ThreadLocal {
  public:
   /**
    * Allocate thread-local index. Invoked once on DLL process attach.
@@ -388,7 +388,7 @@ class IGNITE_IMPORT_EXPORT ThreadLocal {
  * Thread-local instance. Simplifies API avoiding direct index allocations.
  */
 template < typename T >
-class IGNITE_IMPORT_EXPORT ThreadLocalInstance {
+class DOCUMENTDB_IMPORT_EXPORT ThreadLocalInstance {
  public:
   /**
    * Constructor.
@@ -491,7 +491,7 @@ class ConditionVariable {
   }
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(ConditionVariable);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(ConditionVariable);
 
   /** OS-specific type. */
   CONDITION_VARIABLE cond;
@@ -562,7 +562,7 @@ class ManualEvent {
   }
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(ManualEvent);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(ManualEvent);
 
   /** Event handle. */
   HANDLE handle;

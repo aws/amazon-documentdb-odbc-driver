@@ -46,7 +46,7 @@ class BinaryTypeSnapshot {
    * @param affFieldName Affinity fiend name.
    * @param typeId Type ID.
    */
-  IGNITE_IMPORT_EXPORT BinaryTypeSnapshot(const std::string& typeName,
+  DOCUMENTDB_IMPORT_EXPORT BinaryTypeSnapshot(const std::string& typeName,
                                           const std::string& affFieldName,
                                           int32_t typeId);
 
@@ -119,7 +119,7 @@ class BinaryTypeSnapshot {
    * @param fieldName Field name.
    * @param fieldTypeId Field type ID.
    */
-  IGNITE_IMPORT_EXPORT void AddField(int32_t fieldId,
+  DOCUMENTDB_IMPORT_EXPORT void AddField(int32_t fieldId,
                                      const std::string& fieldName,
                                      int32_t fieldTypeId);
 

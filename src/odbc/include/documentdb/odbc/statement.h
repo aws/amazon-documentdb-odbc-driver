@@ -359,7 +359,7 @@ class Statement : public diagnostic::DiagnosableAdapter {
                      int16_t* decimalDigits, int16_t* nullable);
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(Statement);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(Statement);
 
   /**
    * Bind result column to specified data buffer.

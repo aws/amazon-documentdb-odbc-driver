@@ -36,7 +36,7 @@ namespace cluster {
  * also ping, start, and restart remote nodes, map keys to caching nodes, and
  * get other useful information about topology.
  */
-class IGNITE_IMPORT_EXPORT IgniteCluster {
+class DOCUMENTDB_IMPORT_EXPORT IgniteCluster {
  public:
   /**
    * Constructor.

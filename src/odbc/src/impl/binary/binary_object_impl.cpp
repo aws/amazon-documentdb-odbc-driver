@@ -38,16 +38,16 @@ BinaryObjectImpl::BinaryObjectImpl(interop::InteropMemory& mem, int32_t start,
 
   int8_t hdr = BinaryUtils::ReadInt8(mem, this->start);
 
-  if (hdr == IGNITE_TYPE_BINARY) {
+  if (hdr == DOCUMENTDB_TYPE_BINARY) {
     binary = true;
 
     int32_t portLen = BinaryUtils::ReadInt32(mem, this->start + 1);
     int32_t portOff = BinaryUtils::ReadInt32(mem, this->start + 5 + portLen);
 
     this->start += portOff + 5;
-  } else if (hdr != IGNITE_TYPE_OBJECT) {
-    IGNITE_ERROR_FORMATTED_3(
-        DocumentDbError::IGNITE_ERR_BINARY,
+  } else if (hdr != DOCUMENTDB_TYPE_OBJECT) {
+    DOCUMENTDB_ERROR_FORMATTED_3(
+        DocumentDbError::DOCUMENTDB_ERR_BINARY,
         "Memory layuout does not look like a binary object", "memPtr",
         mem.Data(), "pos", start, "header", hdr);
   }
@@ -93,7 +93,7 @@ BinaryObjectImpl BinaryObjectImpl::FromMemory(interop::InteropMemory& mem,
 }
 
 template <>
-IGNITE_IMPORT_EXPORT BinaryObjectImpl
+DOCUMENTDB_IMPORT_EXPORT BinaryObjectImpl
 BinaryObjectImpl::GetField(const char* name) const {
   CheckIdResolver();
 
@@ -114,7 +114,7 @@ bool BinaryObjectImpl::HasField(const char* name) const {
 }
 
 int32_t BinaryObjectImpl::GetEnumValue() const {
-  throw DocumentDbError(DocumentDbError::IGNITE_ERR_BINARY,
+  throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_BINARY,
                     "GetEnumValue is only supported for enums.");
 }
 
@@ -161,13 +161,13 @@ int32_t BinaryObjectImpl::FindField(const int32_t fieldId) const {
   int32_t footerEnd = footerBegin + header.GetFooterLength();
 
   if ((mem->Length() - start) < footerEnd) {
-    IGNITE_ERROR_FORMATTED_3(DocumentDbError::IGNITE_ERR_BINARY,
+    DOCUMENTDB_ERROR_FORMATTED_3(DocumentDbError::DOCUMENTDB_ERR_BINARY,
                              "Not enough data in the binary object", "memPtr",
                              mem->PointerLong(), "len", (mem->Length() - start),
                              "footerEnd", footerEnd);
   }
 
-  if (flags & IGNITE_BINARY_FLAG_OFFSET_ONE_BYTE) {
+  if (flags & DOCUMENTDB_BINARY_FLAG_OFFSET_ONE_BYTE) {
     for (int32_t schemaPos = footerBegin; schemaPos < footerEnd;
          schemaPos += 5) {
       int32_t currentFieldId = BinaryUtils::UnsafeReadInt32(*mem, schemaPos);
@@ -176,7 +176,7 @@ int32_t BinaryObjectImpl::FindField(const int32_t fieldId) const {
         return (BinaryUtils::UnsafeReadInt8(*mem, schemaPos + 4) & 0xFF)
                + start;
     }
-  } else if (flags & IGNITE_BINARY_FLAG_OFFSET_TWO_BYTES) {
+  } else if (flags & DOCUMENTDB_BINARY_FLAG_OFFSET_TWO_BYTES) {
     for (int32_t schemaPos = footerBegin; schemaPos < footerEnd;
          schemaPos += 6) {
       int32_t currentFieldId = BinaryUtils::UnsafeReadInt32(*mem, schemaPos);

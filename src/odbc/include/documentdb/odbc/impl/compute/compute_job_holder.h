@@ -96,9 +96,9 @@ class ComputeJobHolderImpl : public ComputeJobHolder {
     } catch (const DocumentDbError& err) {
       res.SetError(err);
     } catch (const std::exception& err) {
-      res.SetError(DocumentDbError(DocumentDbError::IGNITE_ERR_STD, err.what()));
+      res.SetError(DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_STD, err.what()));
     } catch (...) {
-      res.SetError(DocumentDbError(DocumentDbError::IGNITE_ERR_UNKNOWN,
+      res.SetError(DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_UNKNOWN,
                                "Unknown error occurred during call."));
     }
   }
@@ -157,9 +157,9 @@ class ComputeJobHolderImpl< F, void > : public ComputeJobHolder {
     } catch (const DocumentDbError& err) {
       res.SetError(err);
     } catch (const std::exception& err) {
-      res.SetError(DocumentDbError(DocumentDbError::IGNITE_ERR_STD, err.what()));
+      res.SetError(DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_STD, err.what()));
     } catch (...) {
-      res.SetError(DocumentDbError(DocumentDbError::IGNITE_ERR_UNKNOWN,
+      res.SetError(DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_UNKNOWN,
                                "Unknown error occurred during call."));
     }
   }

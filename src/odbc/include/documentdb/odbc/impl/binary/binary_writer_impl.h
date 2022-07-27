@@ -53,7 +53,7 @@ class BinaryTypeManager;
 /**
  * Internal implementation of binary reader.
  */
-class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
+class DOCUMENTDB_IMPORT_EXPORT BinaryWriterImpl {
  public:
   /**
    * Constructor.
@@ -628,7 +628,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
                        documentdb::odbc::binary::CollectionType::Type typ) {
     StartContainerSession(false);
 
-    WriteFieldId(fieldName, IGNITE_TYPE_COLLECTION);
+    WriteFieldId(fieldName, DOCUMENTDB_TYPE_COLLECTION);
 
     WriteCollectionWithinSession(first, last, typ);
   }
@@ -712,7 +712,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
   void WriteObject(const char* fieldName, const T& val) {
     CheckRawMode(false);
 
-    WriteFieldId(fieldName, IGNITE_TYPE_OBJECT);
+    WriteFieldId(fieldName, DOCUMENTDB_TYPE_OBJECT);
 
     WriteTopObject(val);
   }
@@ -797,7 +797,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
     typedef documentdb::odbc::binary::BinaryType< T > BType;
 
     if (BType::IsNull(obj))
-      stream->WriteInt8(IGNITE_HDR_NULL);
+      stream->WriteInt8(DOCUMENTDB_HDR_NULL);
     else {
       TemplatedBinaryIdResolver< T > idRslvr;
       common::concurrent::SharedPointer< BinaryTypeHandler > metaHnd;
@@ -817,9 +817,9 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
                                   pos);
       W writer(&writerImpl);
 
-      stream->WriteInt8(IGNITE_HDR_FULL);
-      stream->WriteInt8(IGNITE_PROTO_VER);
-      stream->WriteInt16(IGNITE_BINARY_FLAG_USER_TYPE);
+      stream->WriteInt8(DOCUMENTDB_HDR_FULL);
+      stream->WriteInt8(DOCUMENTDB_PROTO_VER);
+      stream->WriteInt16(DOCUMENTDB_BINARY_FLAG_USER_TYPE);
       stream->WriteInt32(idRslvr.GetTypeId());
 
       int32_t hashPos = stream->Reserve(4);
@@ -914,7 +914,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
   /** Writing start position. */
   int32_t start;
 
-  IGNITE_NO_COPY_ASSIGNMENT(BinaryWriterImpl);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(BinaryWriterImpl);
 
   /**
    * Write a primitive value to stream in raw mode.
@@ -982,7 +982,7 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
   void WriteCollectionWithinSession(
       InputIterator first, InputIterator last,
       documentdb::odbc::binary::CollectionType::Type typ) {
-    stream->WriteInt8(IGNITE_TYPE_COLLECTION);
+    stream->WriteInt8(DOCUMENTDB_TYPE_COLLECTION);
     stream->Position(stream->Position() + 4);
     stream->WriteInt8(typ);
 
@@ -1045,62 +1045,62 @@ class IGNITE_IMPORT_EXPORT BinaryWriterImpl {
 };
 
 template <>
-void IGNITE_IMPORT_EXPORT
+void DOCUMENTDB_IMPORT_EXPORT
 BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter, int8_t >(
     const int8_t& obj);
 
 template <>
-void IGNITE_IMPORT_EXPORT
+void DOCUMENTDB_IMPORT_EXPORT
 BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter, bool >(
     const bool& obj);
 
 template <>
-void IGNITE_IMPORT_EXPORT BinaryWriterImpl::WriteTopObject0<
+void DOCUMENTDB_IMPORT_EXPORT BinaryWriterImpl::WriteTopObject0<
     documentdb::odbc::binary::BinaryWriter, int16_t >(const int16_t& obj);
 
 template <>
-void IGNITE_IMPORT_EXPORT BinaryWriterImpl::WriteTopObject0<
+void DOCUMENTDB_IMPORT_EXPORT BinaryWriterImpl::WriteTopObject0<
     documentdb::odbc::binary::BinaryWriter, uint16_t >(const uint16_t& obj);
 
 template <>
-void IGNITE_IMPORT_EXPORT BinaryWriterImpl::WriteTopObject0<
+void DOCUMENTDB_IMPORT_EXPORT BinaryWriterImpl::WriteTopObject0<
     documentdb::odbc::binary::BinaryWriter, int32_t >(const int32_t& obj);
 
 template <>
-void IGNITE_IMPORT_EXPORT BinaryWriterImpl::WriteTopObject0<
+void DOCUMENTDB_IMPORT_EXPORT BinaryWriterImpl::WriteTopObject0<
     documentdb::odbc::binary::BinaryWriter, int64_t >(const int64_t& obj);
 
 template <>
-void IGNITE_IMPORT_EXPORT
+void DOCUMENTDB_IMPORT_EXPORT
 BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter, float >(
     const float& obj);
 
 template <>
-void IGNITE_IMPORT_EXPORT
+void DOCUMENTDB_IMPORT_EXPORT
 BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter, double >(
     const double& obj);
 
 template <>
-void IGNITE_IMPORT_EXPORT
+void DOCUMENTDB_IMPORT_EXPORT
 BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter, Guid >(
     const Guid& obj);
 
 template <>
-void IGNITE_IMPORT_EXPORT
+void DOCUMENTDB_IMPORT_EXPORT
 BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter, Date >(
     const Date& obj);
 
 template <>
-void IGNITE_IMPORT_EXPORT BinaryWriterImpl::WriteTopObject0<
+void DOCUMENTDB_IMPORT_EXPORT BinaryWriterImpl::WriteTopObject0<
     documentdb::odbc::binary::BinaryWriter, Timestamp >(const Timestamp& obj);
 
 template <>
-void IGNITE_IMPORT_EXPORT
+void DOCUMENTDB_IMPORT_EXPORT
 BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter, Time >(
     const Time& obj);
 
 template <>
-void IGNITE_IMPORT_EXPORT BinaryWriterImpl::WriteTopObject0<
+void DOCUMENTDB_IMPORT_EXPORT BinaryWriterImpl::WriteTopObject0<
     documentdb::odbc::binary::BinaryWriter, std::string >(const std::string& obj);
 }  // namespace binary
 }  // namespace impl

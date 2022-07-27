@@ -34,7 +34,7 @@ namespace compute {
 /**
  * Compute implementation.
  */
-class IGNITE_IMPORT_EXPORT CancelableImpl : public interop::InteropTarget,
+class DOCUMENTDB_IMPORT_EXPORT CancelableImpl : public interop::InteropTarget,
                                             public common::Cancelable {
  public:
   /**
@@ -59,7 +59,7 @@ class IGNITE_IMPORT_EXPORT CancelableImpl : public interop::InteropTarget,
   virtual void Cancel();
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(CancelableImpl);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(CancelableImpl);
 };
 }  // namespace compute
 }  // namespace impl

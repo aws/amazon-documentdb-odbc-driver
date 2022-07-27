@@ -20,8 +20,8 @@
  * Includes all binary API headers.
  */
 
-#ifndef _IGNITE_BINARY_BINARY
-#define _IGNITE_BINARY_BINARY
+#ifndef _DOCUMENTDB_BINARY_BINARY
+#define _DOCUMENTDB_BINARY_BINARY
 
 #include <documentdb/odbc/binary/binary_consts.h>
 #include <documentdb/odbc/binary/binary_containers.h>
@@ -32,4 +32,4 @@
 #include <documentdb/odbc/binary/binary_reader.h>
 #include <documentdb/odbc/binary/binary_writer.h>
 
-#endif  //_IGNITE_BINARY_BINARY
+#endif  //_DOCUMENTDB_BINARY_BINARY

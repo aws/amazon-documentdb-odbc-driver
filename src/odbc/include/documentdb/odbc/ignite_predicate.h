@@ -31,7 +31,7 @@ namespace odbc {
  * User should inherit from it to implement own predicate types.
  */
 template < typename T >
-class IGNITE_IMPORT_EXPORT IgnitePredicate {
+class DOCUMENTDB_IMPORT_EXPORT IgnitePredicate {
  public:
   virtual bool operator()(T&) = 0;
 

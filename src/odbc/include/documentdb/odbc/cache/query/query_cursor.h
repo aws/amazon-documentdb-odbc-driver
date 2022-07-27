@@ -107,7 +107,7 @@ class QueryCursor {
     if (impl0)
       return impl0->HasNext(err);
     else {
-      err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+      err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "Instance is not usable (did you check for error?).");
 
       return false;
@@ -157,7 +157,7 @@ class QueryCursor {
 
       return CacheEntry< K, V >(key, val);
     } else {
-      err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+      err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "Instance is not usable (did you check for error?).");
 
       return CacheEntry< K, V >();
@@ -198,7 +198,7 @@ class QueryCursor {
 
       impl0->GetAll(outOp, err);
     } else
-      err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+      err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "Instance is not usable (did you check for error?).");
   }
 
@@ -218,7 +218,7 @@ class QueryCursor {
 
       impl0->GetAll(outOp);
     } else {
-      throw DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+      throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "Instance is not usable (did you check for error?).");
     }
   }

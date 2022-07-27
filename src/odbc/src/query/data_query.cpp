@@ -316,7 +316,7 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
             << " messagge: " << xcp.code().message()
             << " cause: " << xcp.what();
     odbc::DocumentDbError error(
-        odbc::DocumentDbError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
+        odbc::DocumentDbError::DOCUMENTDB_ERR_SECURE_CONNECTION_FAILURE,
         message.str().c_str());
     diag.AddStatusRecord(error.GetText());
 
@@ -336,7 +336,7 @@ SqlResult::Type DataQuery::GetMqlQueryContext(
 
   SharedPointer< DocumentDbConnectionProperties > connectionProperties =
       connection_.GetConnectionProperties(error);
-  if (error.GetCode() != DocumentDbError::IGNITE_SUCCESS) {
+  if (error.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS) {
     LOG_ERROR_MSG(
         "GetMqlQueryContext exiting with error msg: " << error.GetText());
 
@@ -344,7 +344,7 @@ SqlResult::Type DataQuery::GetMqlQueryContext(
   }
   SharedPointer< DocumentDbDatabaseMetadata > databaseMetadata =
       connection_.GetDatabaseMetadata(error);
-  if (error.GetCode() != DocumentDbError::IGNITE_SUCCESS) {
+  if (error.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS) {
     LOG_ERROR_MSG(
         "GetMqlQueryContext exiting with error msg: " << error.GetText());
 
@@ -354,7 +354,7 @@ SqlResult::Type DataQuery::GetMqlQueryContext(
   SharedPointer< DocumentDbQueryMappingService > queryMappingService =
       DocumentDbQueryMappingService::Create(connectionProperties,
                                             databaseMetadata, errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     DocumentDbError::SetError(errInfo.code, errInfo.errCls.c_str(),
                           errInfo.errMsg.c_str(), error);
     LOG_ERROR_MSG(
@@ -364,7 +364,7 @@ SqlResult::Type DataQuery::GetMqlQueryContext(
   }
   mqlQueryContext =
       queryMappingService.Get()->GetMqlQueryContext(sql_, 0, errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     DocumentDbError::SetError(errInfo.code, errInfo.errCls.c_str(),
                           errInfo.errMsg.c_str(), error);
 

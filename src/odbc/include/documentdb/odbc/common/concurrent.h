@@ -38,7 +38,7 @@ struct StaticTag {};
  * @param obj Object to be deleted.
  */
 template < typename T >
-IGNITE_IMPORT_EXPORT void SharedPointerDefaultDeleter(T* obj) {
+DOCUMENTDB_IMPORT_EXPORT void SharedPointerDefaultDeleter(T* obj) {
   delete obj;
 }
 
@@ -48,14 +48,14 @@ IGNITE_IMPORT_EXPORT void SharedPointerDefaultDeleter(T* obj) {
  * @param obj Object to be deleted.
  */
 template < typename T >
-IGNITE_IMPORT_EXPORT void SharedPointerEmptyDeleter(T*) {
+DOCUMENTDB_IMPORT_EXPORT void SharedPointerEmptyDeleter(T*) {
   // No-op.
 }
 
 /**
  * Holder of shared pointer data.
  */
-class IGNITE_IMPORT_EXPORT SharedPointerImpl {
+class DOCUMENTDB_IMPORT_EXPORT SharedPointerImpl {
  public:
   typedef void (*DeleterType)(void*);
   /**
@@ -108,12 +108,12 @@ class IGNITE_IMPORT_EXPORT SharedPointerImpl {
   /** Reference count. */
   int32_t refCnt;
 
-  IGNITE_NO_COPY_ASSIGNMENT(SharedPointerImpl);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(SharedPointerImpl);
 };
 
 /* Forward declaration. */
 template < typename T >
-class IGNITE_IMPORT_EXPORT EnableSharedFromThis;
+class DOCUMENTDB_IMPORT_EXPORT EnableSharedFromThis;
 
 /* Forward declaration. */
 template < typename T >
@@ -129,7 +129,7 @@ inline void ImplEnableShared(const volatile void*, const volatile void*) {
  * Shared pointer.
  */
 template < typename T >
-class IGNITE_IMPORT_EXPORT SharedPointer {
+class DOCUMENTDB_IMPORT_EXPORT SharedPointer {
  public:
   friend class EnableSharedFromThis< T >;
 
@@ -330,7 +330,7 @@ SharedPointer< T1 > StaticPointerCast(const SharedPointer< T2 >& val) {
  * and sharing ownership with existing shared_ptr objects.
  */
 template < typename T >
-class IGNITE_IMPORT_EXPORT EnableSharedFromThis {
+class DOCUMENTDB_IMPORT_EXPORT EnableSharedFromThis {
  public:
   /**
    * Default constructor.

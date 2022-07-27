@@ -44,7 +44,7 @@ std::shared_ptr< ResultPage > CreateTestPage(bool last, int32_t size) {
     writer.WriteInt32(1);
 
     // Writing column type.
-    writer.WriteInt8(IGNITE_TYPE_INT);
+    writer.WriteInt8(DOCUMENTDB_TYPE_INT);
 
     // Column value.
     writer.WriteInt32(i);

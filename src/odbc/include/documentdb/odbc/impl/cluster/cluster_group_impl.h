@@ -47,7 +47,7 @@ typedef common::concurrent::SharedPointer< ClusterGroupImpl >
 /**
  * Cluster group implementation.
  */
-class IGNITE_FRIEND_EXPORT ClusterGroupImpl : private interop::InteropTarget {
+class DOCUMENTDB_FRIEND_EXPORT ClusterGroupImpl : private interop::InteropTarget {
   typedef common::concurrent::SharedPointer< IgniteEnvironment >
       SP_IgniteEnvironment;
   typedef common::concurrent::SharedPointer<
@@ -382,7 +382,7 @@ class IGNITE_FRIEND_EXPORT ClusterGroupImpl : private interop::InteropTarget {
   jobject GetComputeProcessor();
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(ClusterGroupImpl);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(ClusterGroupImpl);
 
   /**
    * Get cluster group without cluster nodes.

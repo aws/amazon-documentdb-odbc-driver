@@ -33,7 +33,7 @@ namespace odbc {
 /**
  * Global universally unique identifier (GUID).
  */
-class IGNITE_IMPORT_EXPORT Guid {
+class DOCUMENTDB_IMPORT_EXPORT Guid {
  public:
   /**
    * Default constructor.
@@ -104,7 +104,7 @@ class IGNITE_IMPORT_EXPORT Guid {
    * @param val2 Second value.
    * @return True if equal.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator==(const Guid& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator==(const Guid& val1,
                                               const Guid& val2);
 
   /**
@@ -122,7 +122,7 @@ class IGNITE_IMPORT_EXPORT Guid {
    * @param val2 Second value.
    * @return True if equal.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator==(const Guid& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator==(const Guid& val1,
                                               const Guid& val2);
 
   /**
@@ -132,7 +132,7 @@ class IGNITE_IMPORT_EXPORT Guid {
    * @param val2 Second value.
    * @return True if not equal.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator!=(const Guid& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator!=(const Guid& val1,
                                               const Guid& val2);
 
   /**
@@ -142,7 +142,7 @@ class IGNITE_IMPORT_EXPORT Guid {
    * @param val2 Second value.
    * @return True if less.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator<(const Guid& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator<(const Guid& val1,
                                              const Guid& val2);
 
   /**
@@ -152,7 +152,7 @@ class IGNITE_IMPORT_EXPORT Guid {
    * @param val2 Second value.
    * @return True if less or equal.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator<=(const Guid& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator<=(const Guid& val1,
                                               const Guid& val2);
 
   /**
@@ -162,7 +162,7 @@ class IGNITE_IMPORT_EXPORT Guid {
    * @param val2 Second value.
    * @return True if greater.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator>(const Guid& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator>(const Guid& val1,
                                              const Guid& val2);
 
   /**
@@ -172,7 +172,7 @@ class IGNITE_IMPORT_EXPORT Guid {
    * @param val2 Second value.
    * @return True if greater or equal.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator>=(const Guid& val1,
+  friend bool DOCUMENTDB_IMPORT_EXPORT operator>=(const Guid& val1,
                                               const Guid& val2);
 
  private:

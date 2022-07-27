@@ -57,7 +57,7 @@ struct BinaryObjectHeaderLayout {
  *
  * @note Most methods are defined in header to encourage inlining.
  */
-class IGNITE_IMPORT_EXPORT BinaryObjectHeader {
+class DOCUMENTDB_IMPORT_EXPORT BinaryObjectHeader {
  public:
   // Header size in bytes.
   enum { SIZE = sizeof(BinaryObjectHeaderLayout) };
@@ -183,7 +183,7 @@ class IGNITE_IMPORT_EXPORT BinaryObjectHeader {
    * @return True if the binary object has schema.
    */
   bool HasSchema() const {
-    return (header->flags & IGNITE_BINARY_FLAG_HAS_SCHEMA) != 0;
+    return (header->flags & DOCUMENTDB_BINARY_FLAG_HAS_SCHEMA) != 0;
   }
 
   /**
@@ -192,7 +192,7 @@ class IGNITE_IMPORT_EXPORT BinaryObjectHeader {
    * @return True if the binary object is of user-defined type.
    */
   bool IsUserType() const {
-    return (header->flags & IGNITE_BINARY_FLAG_USER_TYPE) != 0;
+    return (header->flags & DOCUMENTDB_BINARY_FLAG_USER_TYPE) != 0;
   }
 
   /**

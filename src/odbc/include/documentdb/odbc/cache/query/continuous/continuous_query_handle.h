@@ -88,7 +88,7 @@ class ContinuousQueryHandle {
     if (impl0)
       return QueryCursor< K, V >(impl0->GetInitialQueryCursor(err));
     else {
-      err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+      err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "Instance is not usable (did you check for error?).");
 
       return QueryCursor< K, V >();

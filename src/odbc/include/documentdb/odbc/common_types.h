@@ -386,7 +386,7 @@ struct ResponseStatus {
 };
 
 /**
- * Convert internal Ignite type into ODBC SQL return code.
+ * Convert internal DocumentDB type into ODBC SQL return code.
  *
  * @param result Internal result type.
  * @return ODBC result type.

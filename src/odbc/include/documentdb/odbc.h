@@ -204,4 +204,4 @@ SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr,
                                     SQLPOINTER value, SQLINTEGER valueLen);
 }  // namespace documentdb
 
-#endif  //_IGNITE_ODBC
+#endif  // _DOCUMENTDB_ODBC_ODBC

@@ -28,7 +28,7 @@ namespace binary {
 /**
  * Type updater implementation.
  */
-class IGNITE_IMPORT_EXPORT BinaryTypeUpdaterImpl : public BinaryTypeUpdater {
+class DOCUMENTDB_IMPORT_EXPORT BinaryTypeUpdaterImpl : public BinaryTypeUpdater {
  public:
   /**
    * Constructor.
@@ -55,7 +55,7 @@ class IGNITE_IMPORT_EXPORT BinaryTypeUpdaterImpl : public BinaryTypeUpdater {
   /** Handle to Java object. */
   jobject javaRef;
 
-  IGNITE_NO_COPY_ASSIGNMENT(BinaryTypeUpdaterImpl);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(BinaryTypeUpdaterImpl);
 };
 }  // namespace binary
 }  // namespace impl

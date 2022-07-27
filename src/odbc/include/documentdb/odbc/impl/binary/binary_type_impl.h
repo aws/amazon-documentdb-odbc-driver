@@ -30,7 +30,7 @@
  *
  * This macro declares checker for the method.
  */
-#define IGNITE_DECLARE_BINARY_TYPE_METHOD_CHECKER(method, sign)     \
+#define DOCUMENTDB_DECLARE_BINARY_TYPE_METHOD_CHECKER(method, sign)     \
   template < typename T >                                           \
   class IsDeclaredBinaryType##method {                              \
     typedef char one;                                               \
@@ -60,7 +60,7 @@ template < typename T >
 struct BinaryType;
 
 template <>
-struct IGNITE_IMPORT_EXPORT BinaryType< DocumentDbError > {
+struct DOCUMENTDB_IMPORT_EXPORT BinaryType< DocumentDbError > {
   static int32_t GetTypeId();
 
   static void GetTypeName(std::string& dst) {
@@ -155,7 +155,7 @@ struct ReadHelper< T* > {
   }
 };
 
-IGNITE_DECLARE_BINARY_TYPE_METHOD_CHECKER(GetAffinityFieldName,
+DOCUMENTDB_DECLARE_BINARY_TYPE_METHOD_CHECKER(GetAffinityFieldName,
                                           void (*)(std::string&));
 
 /**

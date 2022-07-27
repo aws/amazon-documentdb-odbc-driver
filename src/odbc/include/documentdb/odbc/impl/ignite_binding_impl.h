@@ -74,7 +74,7 @@ class IgniteBindingImpl {
    * @param found Output param. True if callback was found and false otherwise.
    * @return Callback return value.
    */
-  IGNITE_IMPORT_EXPORT int64_t InvokeCallback(bool& found, int32_t type,
+  DOCUMENTDB_IMPORT_EXPORT int64_t InvokeCallback(bool& found, int32_t type,
                                               int32_t id,
                                               binary::BinaryReaderImpl& reader,
                                               binary::BinaryWriterImpl& writer);
@@ -90,7 +90,7 @@ class IgniteBindingImpl {
    * @param callback Callback.
    * @param err Error.
    */
-  IGNITE_IMPORT_EXPORT void RegisterCallback(int32_t type, int32_t id,
+  DOCUMENTDB_IMPORT_EXPORT void RegisterCallback(int32_t type, int32_t id,
                                              Callback* callback,
                                              DocumentDbError& err);
 
@@ -104,11 +104,11 @@ class IgniteBindingImpl {
    * @param id Callback identifier.
    * @param callback Callback.
    */
-  IGNITE_IMPORT_EXPORT void RegisterCallback(int32_t type, int32_t id,
+  DOCUMENTDB_IMPORT_EXPORT void RegisterCallback(int32_t type, int32_t id,
                                              Callback* callback);
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(IgniteBindingImpl);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(IgniteBindingImpl);
 
   /**
    * Make key out of callback's type and ID.

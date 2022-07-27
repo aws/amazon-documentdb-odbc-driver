@@ -51,7 +51,7 @@ namespace binary {
  *     store and use copy of this class out of the scope of this
  *     function.
  */
-class IGNITE_IMPORT_EXPORT BinaryRawWriter {
+class DOCUMENTDB_IMPORT_EXPORT BinaryRawWriter {
  public:
   /**
    * Constructor.

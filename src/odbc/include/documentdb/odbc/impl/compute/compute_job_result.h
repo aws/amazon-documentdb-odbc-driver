@@ -110,7 +110,7 @@ class ComputeJobResult {
    * @param promise Promise, which state to set.
    */
   void SetPromise(common::Promise< ResultType >& promise) {
-    if (err.GetCode() != DocumentDbError::IGNITE_SUCCESS)
+    if (err.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS)
       promise.SetError(err);
     else
       promise.SetValue(std::shared_ptr< ResultType >(new ResultType(res)));
@@ -122,7 +122,7 @@ class ComputeJobResult {
    * @param writer Writer.
    */
   void Write(binary::BinaryWriterImpl& writer) {
-    if (err.GetCode() != DocumentDbError::IGNITE_SUCCESS) {
+    if (err.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS) {
       // Fail
       writer.WriteBool(false);
 
@@ -164,7 +164,7 @@ class ComputeJobResult {
 
         std::string msg = buf.str();
 
-        err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC, msg.c_str());
+        err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC, msg.c_str());
       }
     }
   }
@@ -221,7 +221,7 @@ class ComputeJobResult< void > {
    * @param promise Promise, which state to set.
    */
   void SetPromise(common::Promise< void >& promise) {
-    if (err.GetCode() != DocumentDbError::IGNITE_SUCCESS)
+    if (err.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS)
       promise.SetError(err);
     else
       promise.SetValue();
@@ -233,7 +233,7 @@ class ComputeJobResult< void > {
    * @param writer Writer.
    */
   void Write(binary::BinaryWriterImpl& writer) {
-    if (err.GetCode() != DocumentDbError::IGNITE_SUCCESS) {
+    if (err.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS) {
       // Fail
       writer.WriteBool(false);
 
@@ -273,7 +273,7 @@ class ComputeJobResult< void > {
 
         std::string msg = buf.str();
 
-        err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC, msg.c_str());
+        err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC, msg.c_str());
       }
     }
   }

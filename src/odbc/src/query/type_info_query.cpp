@@ -284,7 +284,7 @@ SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
     case ResultColumn::LITERAL_PREFIX: {
       if (currentType == JDBC_TYPE_VARCHAR)
         buffer.PutString("'");
-      else if (currentType == IGNITE_TYPE_BINARY)
+      else if (currentType == DOCUMENTDB_TYPE_BINARY)
         buffer.PutString("0x");
       else
         buffer.PutNull();

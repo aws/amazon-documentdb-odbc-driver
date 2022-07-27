@@ -20,8 +20,8 @@
  * Declares documentdb::odbc::Future class template.
  */
 
-#ifndef _IGNITE_FUTURE
-#define _IGNITE_FUTURE
+#ifndef _DOCUMENTDB_ODBC_FUTURE
+#define _DOCUMENTDB_ODBC_FUTURE
 
 #include <documentdb/odbc/common/shared_state.h>
 #include <documentdb/odbc/documentdb_error.h>
@@ -264,4 +264,4 @@ class Future< void > {
 }  // namespace odbc
 }  // namespace documentdb
 
-#endif  //_IGNITE_FUTURE
+#endif  //_DOCUMENTDB_ODBC_FUTURE

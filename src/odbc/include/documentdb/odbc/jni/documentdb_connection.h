@@ -86,7 +86,7 @@ class DocumentDbConnection {
   /**
    * Gets indicator of whether an SSH tunnel is active.
    *
-   * @return If IGNITE_JNI_ERR_SUCCESS is returned, then localPort is updated
+   * @return If DOCUMENTDB_JNI_ERR_SUCCESS is returned, then localPort is updated
    * with the value of the local port of SSH tunnel.
    */
   JniErrorCode GetSshLocalPort(int32_t& localPort, JniErrorInfo& errInfo);
@@ -115,7 +115,7 @@ class DocumentDbConnection {
   /** The DocumentDbConnection Java object */
   SharedPointer< GlobalJObject > _connection;
 
-  IGNITE_NO_COPY_ASSIGNMENT(DocumentDbConnection);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(DocumentDbConnection);
 };
 }  // namespace jni
 }  // namespace odbc

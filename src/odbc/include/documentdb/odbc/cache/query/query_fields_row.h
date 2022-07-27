@@ -101,7 +101,7 @@ class QueryFieldsRow {
     if (impl0)
       return impl0->HasNext();
     else {
-      err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+      err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "Instance is not usable (did you check for error?).");
 
       return false;
@@ -153,7 +153,7 @@ class QueryFieldsRow {
     if (impl0)
       return impl0->GetNext< T >(err);
     else {
-      err = DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+      err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "Instance is not usable (did you check for error?).");
 
       return T();
@@ -181,7 +181,7 @@ class QueryFieldsRow {
     if (impl0)
       return impl0->GetNextInt8Array(dst, len);
     else {
-      throw DocumentDbError(DocumentDbError::IGNITE_ERR_GENERIC,
+      throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                         "Instance is not usable (did you check for error?).");
     }
   }

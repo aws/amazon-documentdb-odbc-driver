@@ -25,11 +25,11 @@ using namespace documentdb::odbc::jni::java;
 namespace documentdb {
 namespace odbc {
 void DocumentDbError::ThrowIfNeeded(const DocumentDbError& err) {
-  if (err.code != IGNITE_SUCCESS)
+  if (err.code != DOCUMENTDB_SUCCESS)
     throw err;
 }
 
-DocumentDbError::DocumentDbError() : code(IGNITE_SUCCESS), msg(NULL) {
+DocumentDbError::DocumentDbError() : code(DOCUMENTDB_SUCCESS), msg(NULL) {
   // No-op.
 }
 
@@ -57,7 +57,7 @@ DocumentDbError& DocumentDbError::operator=(const DocumentDbError& other) {
   return *this;
 }
 
-DocumentDbError::~DocumentDbError() IGNITE_NO_THROW {
+DocumentDbError::~DocumentDbError() DOCUMENTDB_NO_THROW {
   ReleaseChars(msg);
 }
 
@@ -65,8 +65,8 @@ int32_t DocumentDbError::GetCode() const {
   return code;
 }
 
-const char* DocumentDbError::GetText() const IGNITE_NO_THROW {
-  if (code == IGNITE_SUCCESS)
+const char* DocumentDbError::GetText() const DOCUMENTDB_NO_THROW {
+  if (code == DOCUMENTDB_SUCCESS)
     return "Operation completed successfully.";
   else if (msg)
     return msg;
@@ -74,15 +74,15 @@ const char* DocumentDbError::GetText() const IGNITE_NO_THROW {
     return "No additional information available.";
 }
 
-const char* DocumentDbError::what() const IGNITE_NO_THROW {
+const char* DocumentDbError::what() const DOCUMENTDB_NO_THROW {
   return GetText();
 }
 
 void DocumentDbError::SetError(const JniErrorCode jniCode, const char* jniCls,
                            const char* jniMsg, DocumentDbError& err) {
-  if (jniCode == JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
+  if (jniCode == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS)
     err = DocumentDbError();
-  else if (jniCode == JniErrorCode::IGNITE_JNI_ERR_GENERIC) {
+  else if (jniCode == JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC) {
     // The most common case when we have Java exception "in hands" and must map
     // it to respective code.
     if (jniCls) {
@@ -97,7 +97,7 @@ void DocumentDbError::SetError(const JniErrorCode jniCode, const char* jniCls,
         if (jniMsg)
           stream << ": " << jniMsg;
 
-        err = DocumentDbError(IGNITE_ERR_JVM_NO_CLASS_DEF_FOUND,
+        err = DocumentDbError(DOCUMENTDB_ERR_JVM_NO_CLASS_DEF_FOUND,
                           stream.str().c_str());
       } else if (jniCls0.compare("java.lang.NoSuchMethodError") == 0) {
         std::stringstream stream;
@@ -108,26 +108,26 @@ void DocumentDbError::SetError(const JniErrorCode jniCode, const char* jniCls,
         if (jniMsg)
           stream << ": " << jniMsg;
 
-        err = DocumentDbError(IGNITE_ERR_JVM_NO_SUCH_METHOD, stream.str().c_str());
+        err = DocumentDbError(DOCUMENTDB_ERR_JVM_NO_SUCH_METHOD, stream.str().c_str());
       } else if (jniCls0.compare("java.lang.IllegalArgumentException") == 0)
-        err = DocumentDbError(IGNITE_ERR_ILLEGAL_ARGUMENT, jniMsg);
+        err = DocumentDbError(DOCUMENTDB_ERR_ILLEGAL_ARGUMENT, jniMsg);
       else if (jniCls0.compare("java.lang.IllegalStateException") == 0)
-        err = DocumentDbError(IGNITE_ERR_ILLEGAL_STATE, jniMsg);
+        err = DocumentDbError(DOCUMENTDB_ERR_ILLEGAL_STATE, jniMsg);
       else if (jniCls0.compare("java.lang.UnsupportedOperationException") == 0)
-        err = DocumentDbError(IGNITE_ERR_UNSUPPORTED_OPERATION, jniMsg);
+        err = DocumentDbError(DOCUMENTDB_ERR_UNSUPPORTED_OPERATION, jniMsg);
       else if (jniCls0.compare("java.lang.InterruptedException") == 0)
-        err = DocumentDbError(IGNITE_ERR_INTERRUPTED, jniMsg);
+        err = DocumentDbError(DOCUMENTDB_ERR_INTERRUPTED, jniMsg);
       else if (jniCls0.compare("javax.cache.CacheException") == 0)
-        err = DocumentDbError(IGNITE_ERR_CACHE, jniMsg);
+        err = DocumentDbError(DOCUMENTDB_ERR_CACHE, jniMsg);
       else if (jniCls0.compare("javax.cache.integration.CacheLoaderException")
                == 0)
-        err = DocumentDbError(IGNITE_ERR_CACHE_LOADER, jniMsg);
+        err = DocumentDbError(DOCUMENTDB_ERR_CACHE_LOADER, jniMsg);
       else if (jniCls0.compare("javax.cache.integration.CacheWriterException")
                == 0)
-        err = DocumentDbError(IGNITE_ERR_CACHE_WRITER, jniMsg);
+        err = DocumentDbError(DOCUMENTDB_ERR_CACHE_WRITER, jniMsg);
       else if (jniCls0.compare("javax.cache.processor.EntryProcessorException")
                == 0)
-        err = DocumentDbError(IGNITE_ERR_ENTRY_PROCESSOR, jniMsg);
+        err = DocumentDbError(DOCUMENTDB_ERR_ENTRY_PROCESSOR, jniMsg);
       else {
         std::stringstream stream;
 
@@ -138,13 +138,13 @@ void DocumentDbError::SetError(const JniErrorCode jniCode, const char* jniCls,
 
         stream << "]";
 
-        err = DocumentDbError(IGNITE_ERR_UNKNOWN, stream.str().c_str());
+        err = DocumentDbError(DOCUMENTDB_ERR_UNKNOWN, stream.str().c_str());
       }
     } else {
       // JNI class name is not available. Something really weird.
-      err = DocumentDbError(IGNITE_ERR_UNKNOWN);
+      err = DocumentDbError(DOCUMENTDB_ERR_UNKNOWN);
     }
-  } else if (jniCode == JniErrorCode::IGNITE_JNI_ERR_JVM_INIT) {
+  } else if (jniCode == JniErrorCode::DOCUMENTDB_JNI_ERR_JVM_INIT) {
     std::stringstream stream;
 
     stream << "Failed to initialize JVM [errCls=";
@@ -163,9 +163,9 @@ void DocumentDbError::SetError(const JniErrorCode jniCode, const char* jniCls,
 
     stream << "]";
 
-    err = DocumentDbError(IGNITE_ERR_JVM_INIT, stream.str().c_str());
-  } else if (jniCode == JniErrorCode::IGNITE_JNI_ERR_JVM_ATTACH) {
-    err = DocumentDbError(IGNITE_ERR_JVM_ATTACH, "Failed to attach to JVM.");
+    err = DocumentDbError(DOCUMENTDB_ERR_JVM_INIT, stream.str().c_str());
+  } else if (jniCode == JniErrorCode::DOCUMENTDB_JNI_ERR_JVM_ATTACH) {
+    err = DocumentDbError(DOCUMENTDB_ERR_JVM_ATTACH, "Failed to attach to JVM.");
   }
 }
 }  // namespace odbc

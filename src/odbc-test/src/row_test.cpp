@@ -48,7 +48,7 @@ void FillMemWithData(documentdb::impl::interop::InteropUnpooledMemory& mem,
     writer.WriteInt32(4);
 
     // First column is int.
-    writer.WriteInt8(IGNITE_TYPE_LONG);
+    writer.WriteInt8(DOCUMENTDB_TYPE_LONG);
     writer.WriteInt64(static_cast< int64_t >(i * 10));
 
     // Second column is string.
@@ -62,7 +62,7 @@ void FillMemWithData(documentdb::impl::interop::InteropUnpooledMemory& mem,
     writer.WriteGuid(guid);
 
     // The last column is bool.
-    writer.WriteInt8(IGNITE_TYPE_BOOL);
+    writer.WriteInt8(DOCUMENTDB_TYPE_BOOL);
     writer.WriteBool(i % 2 == 1);
   }
 

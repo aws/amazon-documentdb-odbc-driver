@@ -72,7 +72,7 @@ typedef common::concurrent::SharedPointer< CacheAffinityImpl >
 /**
  * Cache affinity implementation.
  */
-class IGNITE_FRIEND_EXPORT CacheAffinityImpl : private interop::InteropTarget {
+class DOCUMENTDB_FRIEND_EXPORT CacheAffinityImpl : private interop::InteropTarget {
   typedef common::concurrent::SharedPointer< IgniteEnvironment >
       SP_IgniteEnvironment;
 

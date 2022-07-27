@@ -569,8 +569,8 @@ class HandshakeResponse {
   }
 
   /**
-   * Current host Apache Ignite version.
-   * @return Current host Apache Ignite version.
+   * Current host DocumentDB version.
+   * @return Current host DocumentDB version.
    */
   const ProtocolVersion& GetCurrentVer() const {
     return currentVer;

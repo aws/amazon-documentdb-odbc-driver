@@ -34,7 +34,7 @@ namespace binary {
  *
  * Represents a single entry of enum in a binary form.
  */
-class IGNITE_IMPORT_EXPORT BinaryEnumEntry {
+class DOCUMENTDB_IMPORT_EXPORT BinaryEnumEntry {
  public:
   /**
    * Default constructor.

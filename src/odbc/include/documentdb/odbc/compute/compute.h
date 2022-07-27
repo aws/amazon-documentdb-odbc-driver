@@ -70,7 +70,7 @@ namespace compute {
  * compute instance will be used (i.e. failover, load balancing,
  * collision resolution, checkpoints, etc.).
  */
-class IGNITE_IMPORT_EXPORT Compute {
+class DOCUMENTDB_IMPORT_EXPORT Compute {
  public:
   /**
    * Constructor.

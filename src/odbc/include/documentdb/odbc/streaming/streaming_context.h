@@ -90,7 +90,7 @@ class StreamingContext {
                           const app::ParameterSet& params);
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(StreamingContext);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(StreamingContext);
 
   /**
    * Flush collected streaming data to remote server.
