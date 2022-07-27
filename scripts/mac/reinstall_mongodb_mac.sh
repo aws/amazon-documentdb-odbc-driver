@@ -32,6 +32,9 @@ function update_mongod_config_authorization() {
     fi
 }
 
+brew tap mongodb/brew
+brew install ${MONGODB_SERVICE_NAME}
+
 update_mongod_config_authorization "disabled"
 brew services restart ${MONGODB_SERVICE_NAME}
 
