@@ -80,25 +80,11 @@ void AttachHelper::OnThreadAttach() {
  * @return @c true if the path looks like binary release home directory.
  */
 bool LooksLikeBinaryReleaseHome(const std::string& path) {
-  static const char* PROBE_CORE_LIB = "/libs/ignite-core*.jar";
+  static const char* PROBE_CORE_LIB = "/libs/documentdb-jdbc*.jar";
 
   std::string coreLibProbe = path + PROBE_CORE_LIB;
 
   return FileExists(coreLibProbe);
-}
-
-/**
- * Checks if the path looks like source release home directory.
- * Internally checks for presence of core source directory.
- * @return @c true if the path looks like binary release home directory.
- */
-bool LooksLikeSourceReleaseHome(const std::string& path) {
-  static const char* PROBE_CORE_SOURCE =
-      "/modules/core/src/main/java/org/apache/ignite";
-
-  std::string coreSourcePath = path + PROBE_CORE_SOURCE;
-
-  return IsValidDirectory(coreSourcePath);
 }
 
 /**
@@ -109,7 +95,7 @@ bool LooksLikeSourceReleaseHome(const std::string& path) {
  * @param path Path to evaluate.
  * @return res Resolved directory. Empty string if not found.
  */
-std::string ResolveIgniteHome0(const std::string& path) {
+std::string ResolveDocumentDbHome0(const std::string& path) {
   if (!IsValidDirectory(path))
     return std::string();
 
@@ -121,7 +107,7 @@ std::string ResolveIgniteHome0(const std::string& path) {
 
   std::string path0(path, 0, last + 1);
 
-  if (LooksLikeBinaryReleaseHome(path0) || LooksLikeSourceReleaseHome(path0))
+  if (LooksLikeBinaryReleaseHome(path0))
     return path0;
 
   // Evaluate parent directory.
@@ -132,7 +118,7 @@ std::string ResolveIgniteHome0(const std::string& path) {
 
   std::string parent(path0, 0, slashPos);
 
-  return ResolveIgniteHome0(parent);
+  return ResolveDocumentDbHome0(parent);
 }
 
 /**
@@ -412,7 +398,7 @@ std::string ResolveDocumentDbHome(const std::string& path) {
 
   std::string curDirStr(curDir.GetData());
 
-  return ResolveIgniteHome0(curDirStr);
+  return ResolveDocumentDbHome0(curDirStr);
 }
 }  // namespace jni
 }  // namespace odbc
