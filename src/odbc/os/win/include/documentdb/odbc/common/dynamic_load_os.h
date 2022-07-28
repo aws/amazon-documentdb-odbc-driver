@@ -127,4 +127,4 @@ DOCUMENTDB_IMPORT_EXPORT Module GetCurrent();
 }  // namespace odbc
 }  // namespace documentdb
 
-#endif
+#endif // _DOCUMENTDB_ODBC_COMMON_DYNAMIC_LOAD
