@@ -30,23 +30,23 @@
 namespace documentdb {
 namespace odbc {
 namespace common {
-time_t IgniteTimeGm(const tm& time) {
+time_t ToTimeGm(const tm& time) {
   tm tmc = time;
 
   return timegm(&tmc);
 }
 
-time_t IgniteTimeLocal(const tm& time) {
+time_t ToTimeLocal(const tm& time) {
   tm tmc = time;
 
   return mktime(&tmc);
 }
 
-bool IgniteGmTime(time_t in, tm& out) {
+bool ToGmTime(time_t in, tm& out) {
   return gmtime_r(&in, &out) != NULL;
 }
 
-bool IgniteLocalTime(time_t in, tm& out) {
+bool ToLocalTime(time_t in, tm& out) {
   return localtime_r(&in, &out) == 0;
 }
 

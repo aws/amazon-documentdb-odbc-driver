@@ -276,7 +276,7 @@ inline time_t TimeToCTime(const Time& time) {
 inline bool DateToCTm(const Date& date, tm& ctime) {
   time_t tmt = DateToCTime(date);
 
-  return common::IgniteGmTime(tmt, ctime);
+  return common::ToGmTime(tmt, ctime);
 }
 
 /**
@@ -289,7 +289,7 @@ inline bool DateToCTm(const Date& date, tm& ctime) {
 inline bool TimestampToCTm(const Timestamp& ts, tm& ctime) {
   time_t tmt = TimestampToCTime(ts);
 
-  return common::IgniteGmTime(tmt, ctime);
+  return common::ToGmTime(tmt, ctime);
 }
 
 /**
@@ -302,7 +302,7 @@ inline bool TimestampToCTm(const Timestamp& ts, tm& ctime) {
 inline bool TimeToCTm(const Time& time, tm& ctime) {
   time_t tmt = TimeToCTime(time);
 
-  return common::IgniteGmTime(tmt, ctime);
+  return common::ToGmTime(tmt, ctime);
 }
 
 /**
@@ -343,7 +343,7 @@ inline Timestamp CTimeToTimestamp(time_t ctime, int32_t ns) {
  * @return Corresponding value of Date.
  */
 inline Date CTmToDate(const tm& ctime) {
-  time_t time = common::IgniteTimeGm(ctime);
+  time_t time = common::ToTimeGm(ctime);
 
   return CTimeToDate(time);
 }
@@ -355,7 +355,7 @@ inline Date CTmToDate(const tm& ctime) {
  * @return Corresponding value of Time.
  */
 inline Time CTmToTime(const tm& ctime) {
-  time_t time = common::IgniteTimeGm(ctime);
+  time_t time = common::ToTimeGm(ctime);
 
   return CTimeToTime(time);
 }
@@ -368,7 +368,7 @@ inline Time CTmToTime(const tm& ctime) {
  * @return Corresponding value of Timestamp.
  */
 inline Timestamp CTmToTimestamp(const tm& ctime, int32_t ns) {
-  time_t time = common::IgniteTimeGm(ctime);
+  time_t time = common::ToTimeGm(ctime);
 
   return CTimeToTimestamp(time, ns);
 }

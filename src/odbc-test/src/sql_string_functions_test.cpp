@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE(TestStringFunctionInsert) {
 
   CheckSingleResult< std::string >(
       "SELECT {fn INSERT(strField, 7, 5, \'Ignite\')} FROM TestType",
-      "Hello Ignite!");
+      "Hello world!");
 }
 
 BOOST_AUTO_TEST_CASE(TestStringFunctionLcase) {
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(TestStringFunctionRepeat) {
 
 BOOST_AUTO_TEST_CASE(TestStringFunctionReplace) {
   TestType in;
-  in.strField = "Hello Ignite!";
+  in.strField = "Hello world!";
 
   testCache.Put(1, in);
 
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE(TestStringFunctionRtrim) {
 
 BOOST_AUTO_TEST_CASE(TestStringFunctionSoundex) {
   TestType in;
-  in.strField = "Hello Ignite!";
+  in.strField = "Hello world!";
 
   testCache.Put(1, in);
 
@@ -271,7 +271,7 @@ BOOST_AUTO_TEST_CASE(TestStringFunctionSpace) {
 
 BOOST_AUTO_TEST_CASE(TestStringFunctionSubstring) {
   TestType in;
-  in.strField = "Hello Ignite!";
+  in.strField = "Hello world!";
 
   testCache.Put(1, in);
 
@@ -311,7 +311,7 @@ BOOST_AUTO_TEST_CASE(Test92StringFunctionUpper) {
 
 BOOST_AUTO_TEST_CASE(Test92StringFunctionSubstring) {
   TestType in;
-  in.strField = "Hello Ignite!";
+  in.strField = "Hello world!";
 
   testCache.Put(1, in);
 

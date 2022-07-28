@@ -112,7 +112,7 @@ DOCUMENTDB_FRIEND_EXPORT Date MakeDateLocal(int year, int month, int day, int ho
   date.tm_min = min;
   date.tm_sec = sec;
 
-  time_t localTime = common::IgniteTimeLocal(date);
+  time_t localTime = common::ToTimeLocal(date);
 
   return CTimeToDate(localTime);
 }
@@ -144,7 +144,7 @@ DOCUMENTDB_FRIEND_EXPORT Time MakeTimeLocal(int hour, int min, int sec) {
   date.tm_min = min;
   date.tm_sec = sec;
 
-  time_t localTime = common::IgniteTimeLocal(date);
+  time_t localTime = common::ToTimeLocal(date);
 
   return CTimeToTime(localTime);
 }
@@ -180,7 +180,7 @@ DOCUMENTDB_FRIEND_EXPORT Timestamp MakeTimestampLocal(int year, int month, int d
   date.tm_min = min;
   date.tm_sec = sec;
 
-  time_t localTime = common::IgniteTimeLocal(date);
+  time_t localTime = common::ToTimeLocal(date);
 
   return CTimeToTimestamp(localTime, ns);
 }

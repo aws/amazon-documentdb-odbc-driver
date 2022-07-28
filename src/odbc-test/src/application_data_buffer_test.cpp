@@ -1028,13 +1028,13 @@ BOOST_AUTO_TEST_CASE(TestSetStringWithOffset) {
   ApplicationDataBuffer appBuf(OdbcNativeType::AI_CHAR, &buf[0].val,
                                sizeof(buf[0].val), &buf[0].reslen);
 
-  appBuf.PutString("Hello Ignite!");
+  appBuf.PutString("Hello world!");
 
   std::string res(buf[0].val, buf[0].reslen);
 
-  BOOST_CHECK(buf[0].reslen == strlen("Hello Ignite!"));
-  BOOST_CHECK(res == "Hello Ignite!");
-  BOOST_CHECK(res.size() == strlen("Hello Ignite!"));
+  BOOST_CHECK(buf[0].reslen == strlen("Hello world!"));
+  BOOST_CHECK(res == "Hello world!");
+  BOOST_CHECK(res.size() == strlen("Hello world!"));
 
   appBuf.SetByteOffset(sizeof(SetStringWithOffsetTestStruct));
 
@@ -1042,9 +1042,9 @@ BOOST_AUTO_TEST_CASE(TestSetStringWithOffset) {
 
   res.assign(buf[0].val, buf[0].reslen);
 
-  BOOST_CHECK(res == "Hello Ignite!");
-  BOOST_CHECK(res.size() == strlen("Hello Ignite!"));
-  BOOST_CHECK(buf[0].reslen == strlen("Hello Ignite!"));
+  BOOST_CHECK(res == "Hello world!");
+  BOOST_CHECK(res.size() == strlen("Hello world!"));
+  BOOST_CHECK(buf[0].reslen == strlen("Hello world!"));
 
   res.assign(buf[1].val, buf[1].reslen);
 

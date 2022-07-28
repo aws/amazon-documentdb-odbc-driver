@@ -32,7 +32,7 @@ namespace system {
 namespace ui {
 DsnConfigurationWindow::DsnConfigurationWindow(Window* parent,
                                                config::Configuration& config)
-    : CustomWindow(parent, L"IgniteConfigureDsn",
+    : CustomWindow(parent, L"DocumentDbConfigureDsn",
                    L"Configure Amazon DocumentDB DSN"),
       width(780),
       height(625),

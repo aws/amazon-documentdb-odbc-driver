@@ -32,7 +32,7 @@ typedef std::basic_ostream< char, std::char_traits< char > > StdCharOutStream;
  * @param time Standard C type struct tm value.
  * @return Standard C type time_t value.
  */
-DOCUMENTDB_IMPORT_EXPORT time_t IgniteTimeGm(const tm& time);
+DOCUMENTDB_IMPORT_EXPORT time_t ToTimeGm(const tm& time);
 
 /**
  * Convert struct tm to time_t (Local time).
@@ -40,7 +40,7 @@ DOCUMENTDB_IMPORT_EXPORT time_t IgniteTimeGm(const tm& time);
  * @param time Standard C type struct tm value.
  * @return Standard C type time_t value.
  */
-DOCUMENTDB_IMPORT_EXPORT time_t IgniteTimeLocal(const tm& time);
+DOCUMENTDB_IMPORT_EXPORT time_t ToTimeLocal(const tm& time);
 
 /**
  * Convert time_t to struct tm (UTC).
@@ -49,7 +49,7 @@ DOCUMENTDB_IMPORT_EXPORT time_t IgniteTimeLocal(const tm& time);
  * @param out Standard C type struct tm value.
  * @return True on success.
  */
-DOCUMENTDB_IMPORT_EXPORT bool IgniteGmTime(time_t in, tm& out);
+DOCUMENTDB_IMPORT_EXPORT bool ToGmTime(time_t in, tm& out);
 
 /**
  * Convert time_t to struct tm (Local time).
@@ -58,7 +58,7 @@ DOCUMENTDB_IMPORT_EXPORT bool IgniteGmTime(time_t in, tm& out);
  * @param out Standard C type struct tm value.
  * @return True on success.
  */
-DOCUMENTDB_IMPORT_EXPORT bool IgniteLocalTime(time_t in, tm& out);
+DOCUMENTDB_IMPORT_EXPORT bool ToLocalTime(time_t in, tm& out);
 
 /**
  * Read system environment variable taking thread-safety in count.

@@ -31,23 +31,23 @@
  * This macro declares checker for the method.
  */
 #define DOCUMENTDB_DECLARE_BINARY_TYPE_METHOD_CHECKER(method, sign)     \
-  template < typename T >                                           \
-  class IsDeclaredBinaryType##method {                              \
-    typedef char one;                                               \
-    typedef char two[2];                                            \
-                                                                    \
-    template < class U, U >                                         \
-    struct test;                                                    \
-                                                                    \
-    template < typename C >                                         \
-    static one& helper(test< sign, &C::method >*);                  \
-    template < typename C >                                         \
-    static two& helper(...);                                        \
-                                                                    \
-   public:                                                          \
-    const static bool value =                                       \
+  template < typename T >                                               \
+  class IsDeclaredBinaryType##method {                                  \
+    typedef char one;                                                   \
+    typedef char two[2];                                                \
+                                                                        \
+    template < class U, U >                                             \
+    struct test;                                                        \
+                                                                        \
+    template < typename C >                                             \
+    static one& helper(test< sign, &C::method >*);                      \
+    template < typename C >                                             \
+    static two& helper(...);                                            \
+                                                                        \
+   public:                                                              \
+    const static bool value =                                           \
         (sizeof(helper< documentdb::odbc::binary::BinaryType< T > >(0)) \
-         == sizeof(one));                                           \
+         == sizeof(one));                                               \
   }
 
 namespace documentdb {
