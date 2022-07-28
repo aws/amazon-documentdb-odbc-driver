@@ -159,7 +159,7 @@ class DOCUMENTDB_IMPORT_EXPORT DocumentDbError : public std::exception {
   /** Standard library exception. */
   static const int DOCUMENTDB_ERR_STD = 1003;
 
-  /** Generic %Ignite error. */
+  /** Generic %DocumentDB error. */
   static const int DOCUMENTDB_ERR_GENERIC = 2000;
 
   /** Illegal argument passed. */
