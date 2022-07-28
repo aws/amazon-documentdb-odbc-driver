@@ -569,8 +569,8 @@ class HandshakeResponse {
   }
 
   /**
-   * Current host DocumentDB version.
-   * @return Current host DocumentDB version.
+   * Current host Amazon DocumentDB version.
+   * @return Current host Amazon DocumentDB version.
    */
   const ProtocolVersion& GetCurrentVer() const {
     return currentVer;
