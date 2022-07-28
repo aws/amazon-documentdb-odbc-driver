@@ -110,7 +110,7 @@ enum class JniErrorCode {
 }  // namespace jni
 
 /**
- * %Ignite error information.
+ * %DocumentDB error information.
  */
 class DOCUMENTDB_IMPORT_EXPORT DocumentDbError : public std::exception {
  public:
