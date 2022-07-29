@@ -52,7 +52,7 @@ size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
 
   size_t outBufferLenActual = std::min(inBufferLenChars, outBufferLenBytes - 1);
 
-  std::locale currentLocale("");
+  static const std::locale currentLocale("");
   std::use_facet< std::ctype< wchar_t > >(currentLocale)
       .narrow(inString.data(), inString.data() + outBufferLenActual, '?',
               reinterpret_cast< char* >(outBuffer));
@@ -96,7 +96,7 @@ size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
   }
 
   // Setup conversion facet.
-  const std::codecvt_utf8< OutCharT > convFacet;
+  static const std::codecvt_utf8< OutCharT > convFacet;
   std::mbstate_t convState = std::mbstate_t();
   // Pointer to next for input.
   const char* pInBufferNext;
