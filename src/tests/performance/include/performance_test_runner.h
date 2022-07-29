@@ -60,7 +60,7 @@ enum testCaseStatus { success, error, skip };
 
 typedef struct Col {
   SQLLEN data_len;
-  SQLCHAR data_dat[BIND_SIZE];
+  SQLWCHAR data_dat[BIND_SIZE];
 } Col;
 
 struct CsvHeaders {

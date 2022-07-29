@@ -454,9 +454,9 @@ void performance::PerformanceTestRunner::RecordExecBindFetch(
     // Bind and fetch and record time
     auto time_bind_start = std::chrono::steady_clock::now();
     for (size_t i = 0; i < static_cast< size_t >(total_columns); i++) {
-      ret = SQLBindCol(*hstmt, static_cast< SQLUSMALLINT >(i + 1), SQL_C_CHAR,
+      ret = SQLBindCol(*hstmt, static_cast< SQLUSMALLINT >(i + 1), SQL_C_WCHAR,
                        static_cast< SQLPOINTER >(&cols[i].data_dat[0]),
-                       BIND_SIZE, &cols[i].data_len);
+                       BIND_SIZE * sizeof(SQLWCHAR), &cols[i].data_len);
       if (ret != SQL_SUCCESS) {
         LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
         test_case.status = error;
