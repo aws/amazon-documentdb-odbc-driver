@@ -23,10 +23,10 @@
 #include <string>
 #include <vector>
 
-#include "ignite/ignition.h"
 #include "ignite/odbc/impl/binary/binary_utils.h"
 #include "ignite/odbc/config/connection_info.h"
 #include "ignite/odbc/system/odbc_constants.h"
+#include "ignite/odbc/utility.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"
 #include "test_utils.h"
@@ -36,22 +36,21 @@ using namespace ignite_test;
 
 using namespace boost::unit_test;
 
-using ignite::impl::binary::BinaryUtils;
+using ignite::odbc::impl::binary::BinaryUtils;
 
 /**
  * Test setup fixture.
  */
 struct SqlGetInfoTestSuiteFixture : odbc::OdbcTestSuite {
   void CheckStrInfo(SQLSMALLINT type, const std::string& expectedValue) {
-    SQLCHAR val[ODBC_BUFFER_SIZE];
+    SQLWCHAR val[ODBC_BUFFER_SIZE];
     SQLSMALLINT valLen = 0;
 
-    SQLRETURN ret = SQLGetInfo(dbc, type, &val, sizeof(val), &valLen);
+    SQLRETURN ret = SQLGetInfo(dbc, type, &val, ODBC_BUFFER_SIZE, &valLen);
 
     std::string typeStr = odbc::config::ConnectionInfo::InfoTypeToString(type);
     ODBC_FAIL_ON_ERROR1(ret, SQL_HANDLE_DBC, dbc, typeStr);
-    BOOST_CHECK_EQUAL(std::string(reinterpret_cast< const char* >(val), valLen),
-                      expectedValue);
+    BOOST_CHECK_EQUAL(utility::ToUtf8(val), expectedValue);
   }
 
   void CheckIntInfo(SQLSMALLINT type, SQLUINTEGER expectedValue) {
@@ -76,32 +75,39 @@ struct SqlGetInfoTestSuiteFixture : odbc::OdbcTestSuite {
    * Constructor.
    */
   SqlGetInfoTestSuiteFixture() {
-    grid = StartPlatformNode("queries-test.xml", "NodeMain");
   }
 
   /**
    * Destructor.
    */
   ~SqlGetInfoTestSuiteFixture() {
-    Ignition::StopAll(true);
   }
 
-  /** Node started during the test. */
-  Ignite grid;
+  /**
+   * Connect to the local server with the database name
+   *
+   * @param databaseName Database Name
+   */
+  void connectToLocalServer(std::string databaseName) {
+    std::string dsnConnectionString;
+    CreateDsnConnectionStringForLocalServer(dsnConnectionString, databaseName);
+
+    Connect(dsnConnectionString);
+  }
 };
 
 BOOST_FIXTURE_TEST_SUITE(SqlGetInfoTestSuite, SqlGetInfoTestSuiteFixture)
 
 BOOST_AUTO_TEST_CASE(TestValues) {
-  Connect("DRIVER={Apache Ignite};address=127.0.0.1:11110;schema=cache");
+  connectToLocalServer("odbc-test");
 
-  CheckStrInfo(SQL_DRIVER_NAME, "Apache Ignite");
-  CheckStrInfo(SQL_DBMS_NAME, "Apache Ignite");
+  CheckStrInfo(SQL_DRIVER_NAME, "Amazon DocumentDB");
+  CheckStrInfo(SQL_DBMS_NAME, "Amazon DocumentDB");
   CheckStrInfo(SQL_DRIVER_ODBC_VER, "03.00");
   CheckStrInfo(SQL_DRIVER_VER, "02.04.0000");
   CheckStrInfo(SQL_DBMS_VER, "02.04.0000");
   CheckStrInfo(SQL_COLUMN_ALIAS, "Y");
-  CheckStrInfo(SQL_IDENTIFIER_QUOTE_CHAR, "");
+  CheckStrInfo(SQL_IDENTIFIER_QUOTE_CHAR, "\"");
   CheckStrInfo(SQL_CATALOG_NAME_SEPARATOR, ".");
   CheckStrInfo(SQL_SPECIAL_CHARACTERS, "");
   CheckStrInfo(SQL_CATALOG_TERM, "");
@@ -130,7 +136,7 @@ BOOST_AUTO_TEST_CASE(TestValues) {
   CheckStrInfo(SQL_PROCEDURES, "N");
   CheckStrInfo(SQL_ROW_UPDATES, "N");
   CheckStrInfo(SQL_SEARCH_PATTERN_ESCAPE, "\\");
-  CheckStrInfo(SQL_SERVER_NAME, "Apache Ignite");
+  CheckStrInfo(SQL_SERVER_NAME, "Amazon DocumentDB");
   CheckStrInfo(SQL_USER_NAME, "apache_ignite_user");
 
   CheckIntInfo(SQL_ASYNC_MODE, SQL_AM_NONE);
