@@ -67,6 +67,8 @@ class ConnectionInfo {
   SqlResult::Type GetInfo(InfoType type, void* buf, short buflen,
                           short* reslen) const;
 
+  SqlResult::Type SetInfo(InfoType type, std::string value);
+
  private:
   IGNITE_NO_COPY_ASSIGNMENT(ConnectionInfo);
 

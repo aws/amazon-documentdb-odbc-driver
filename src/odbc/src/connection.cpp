@@ -410,6 +410,23 @@ void Connection::EnsureConnected() {
   }
 }
 
+/** 
+ * Updates connection runtime information used by SQLGetInfo.
+ * 
+ */
+void UpdateConnectionRuntimeInfo(const Configuration& config,
+                                 config::ConnectionInfo& info) {
+#ifdef SQL_USER_NAME
+  info.SetInfo(SQL_USER_NAME, config.GetUser());
+#endif
+#ifdef SQL_DATABASE_NAME
+  info.SetInfo(SQL_DATABASE_NAME, config.GetDatabase());
+#endif
+#ifdef SQL_DATA_SOURCE_NAME
+  info.SetInfo(SQL_DATA_SOURCE_NAME, config.GetDsn());
+#endif
+}
+
 bool Connection::TryRestoreConnection(IgniteError& err) {
   if (connection_.IsValid()) {
     return true;
@@ -447,6 +464,8 @@ bool Connection::TryRestoreConnection(IgniteError& err) {
   }
 
   connected = ConnectCPPDocumentDB(localSSHTunnelPort, err);
+
+  UpdateConnectionRuntimeInfo(config_, info_);
 
   return connected;
 }
@@ -573,6 +592,58 @@ int32_t Connection::RetrieveTimeout(void* value) {
   return static_cast< int32_t >(uTimeout);
 }
 
+/**
+ * Updates the SQL_DBMS_VER information. Updates the info used by SQLGetInfo.
+ *
+ * @param db the database to get the information from.
+ */
+void UpdateSqlDbmsVerInfo(mongocxx::database& db, config::ConnectionInfo& info) {
+#ifdef SQL_DBMS_VER
+  bsoncxx::builder::stream::document buildInfo;
+  buildInfo << "buildInfo" << 1;
+  auto result2 = db.run_command(buildInfo.view());
+  if (result2.view()["ok"].get_double() == 1) {
+    auto buildInfoView = result2.view();
+    if (buildInfoView.find("versionArray") != buildInfoView.end()) {
+      auto versionArray = buildInfoView["versionArray"];
+      auto array = versionArray.get_array().value;
+      std::stringstream versionString;
+      int64_t versionElement = 0;
+      int index = 0;
+      for (auto &element : array) {
+        switch (element.type()) {
+          case bsoncxx::type::k_int32:
+            versionElement = element.get_int32().value;
+            break;
+          case bsoncxx::type::k_int64:
+            versionElement = element.get_int64().value;
+            break;
+          case bsoncxx::type::k_utf8:
+            versionElement =
+                std::atol(element.get_utf8().value.to_string().c_str());
+        }
+        switch (index) {
+          case 0:
+            versionString << std::setw(2) << std::setfill('0')
+                          << versionElement;
+            break;
+          case 1:
+            versionString << "." << std::setw(2) << std::setfill('0')
+                          << versionElement;
+            break;
+          case 2:
+            versionString << "." << std::setw(4) << std::setfill('0')
+                          << versionElement;
+            break;
+        }
+        index++;
+      }
+      info.SetInfo(SQL_DBMS_VER, versionString.str());
+    }
+  }
+#endif  // SQL_DBMS_VER
+}
+
 bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
                                       odbc::IgniteError& err) {
   using bsoncxx::builder::basic::kvp;
@@ -605,6 +676,8 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
                               "Unable to ping DocumentDB.");
       return false;
     }
+
+    UpdateSqlDbmsVerInfo(db, info_);
 
     return true;
   } catch (const mongocxx::exception& xcp) {

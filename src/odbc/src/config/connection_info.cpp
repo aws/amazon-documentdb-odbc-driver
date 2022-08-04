@@ -600,10 +600,11 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // Driver version. At a minimum, the version is of the form ##.##.####, where
   // the first two digits are the major version, the next two digits are the
   // minor version, and the last four digits are the release version.
-  strParams[SQL_DRIVER_VER] = "02.04.0000";
+  strParams[SQL_DRIVER_VER] = "00.01.0000";
 #endif  // SQL_DRIVER_VER
 #ifdef SQL_DBMS_VER
-  strParams[SQL_DBMS_VER] = "02.04.0000";
+  // Note: this is updated after a successful connection.
+  strParams[SQL_DBMS_VER] = "";
 #endif  // SQL_DBMS_VER
 
 #ifdef SQL_COLUMN_ALIAS
@@ -704,7 +705,8 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // this is the value of the DSN keyword in the connection string passed to the
   // driver. If the connection string did not contain the DSN keyword (such as
   // when it contains the DRIVER keyword), this is an empty string.
-  strParams[SQL_DATA_SOURCE_NAME] = config.GetDsn("");
+  // Note: this is updated after a successful connection.
+  strParams[SQL_DATA_SOURCE_NAME] = "";
 #endif  // SQL_DATA_SOURCE_NAME
 
 #ifdef SQL_DATA_SOURCE_READ_ONLY
@@ -716,12 +718,13 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // driver that is read/write can be used with a data source that is read-only.
   // If a driver is read-only, all of its data sources must be read-only and
   // must return SQL_DATA_SOURCE_READ_ONLY.
-  strParams[SQL_DATA_SOURCE_READ_ONLY] = "N";
+  strParams[SQL_DATA_SOURCE_READ_ONLY] = "Y";
 #endif  // SQL_DATA_SOURCE_READ_ONLY
 
 #ifdef SQL_DATABASE_NAME
   // A character string with the name of the current database in use, if the
   // data source defines a named object called "database".
+  // Note: this is updated after a successful connection.
   strParams[SQL_DATABASE_NAME] = "";
 #endif  // SQL_DATABASE_NAME
 
@@ -754,7 +757,31 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // use these words in object names. The #define value SQL_ODBC_KEYWORDS
   // contains a comma - separated list of ODBC keywords.
   strParams[SQL_KEYWORDS] =
-      "LIMIT,MINUS,OFFSET,ROWNUM,SYSDATE,SYSTIME,SYSTIMESTAMP,TODAY";
+      "ABS,ALLOW,ARRAY,ARRAY_MAX_CARDINALITY,ASYMMETRIC,ATOMIC,BEGIN_FRAME,"
+      "BEGIN_PARTITION,BIGINT,BINARY,BLOB,BOOLEAN,CALL,CALLED,CARDINALITY,CEIL,"
+      "CEILING,CHAR_LENGTH,CLASSIFIER,CLOB,COLLECT,CONDITION,CORR,COVAR_POP,"
+      "COVAR_SAMP,CUBE,CUME_DIST,CURRENT_CATALOG,CURRENT_DEFAULT_TRANSFORM_"
+      "GROUP,CURRENT_PATH,CURRENT_ROLE,CURRENT_ROW,CURRENT_SCHEMA,CURRENT_"
+      "TRANSFORM_GROUP_FOR_TYPE,CYCLE,DENSE_RANK,DEREF,DETERMINISTIC,DISALLOW,"
+      "DYNAMIC,EACH,ELEMENT,EMPTY,END_FRAME,END_PARTITION,EQUALS,EVERY,EXP,"
+      "EXPLAIN,EXTEND,FILTER,FIRST_VALUE,FLOOR,FRAME_ROW,FREE,FUNCTION,FUSION,"
+      "GROUPING,GROUPS,HOLD,IMPORT,INITIAL,INOUT,INTERSECTION,JSON_ARRAY,JSON_"
+      "ARRAYAGG,JSON_EXISTS,JSON_OBJECT,JSON_OBJECTAGG,JSON_QUERY,JSON_VALUE,"
+      "LAG,LARGE,LAST_VALUE,LATERAL,LEAD,LIKE_REGEX,LIMIT,LN,LOCALTIME,"
+      "LOCALTIMESTAMP,MATCHES,MATCH_NUMBER,MATCH_RECOGNIZE,MEASURES,MEMBER,"
+      "MERGE,METHOD,MINUS,MOD,MODIFIES,MULTISET,NCLOB,NEW,NORMALIZE,NTH_VALUE,"
+      "NTILE,OCCURRENCES_REGEX,OFFSET,OLD,OMIT,ONE,OUT,OVER,OVERLAY,PARAMETER,"
+      "PARTITION,PATTERN,PER,PERCENT,PERCENTILE_CONT,PERCENTILE_DISC,PERCENT_"
+      "RANK,PERIOD,PERMUTE,PORTION,POSITION_REGEX,POWER,PRECEDES,PREV,RANGE,"
+      "RANK,READS,RECURSIVE,REF,REFERENCING,REGR_AVGX,REGR_AVGY,REGR_COUNT,"
+      "REGR_INTERCEPT,REGR_R2,REGR_SLOPE,REGR_SXX,REGR_SXY,REGR_SYY,RELEASE,"
+      "RESET,RESULT,RETURN,RETURNS,ROLLUP,ROW,ROW_NUMBER,RUNNING,SAVEPOINT,"
+      "SCOPE,SEARCH,SEEK,SENSITIVE,SHOW,SIMILAR,SKIP,SPECIFIC,SPECIFICTYPE,"
+      "SQLEXCEPTION,SQRT,START,STATIC,STDDEV_POP,STDDEV_SAMP,STREAM,"
+      "SUBMULTISET,SUBSET,SUBSTRING_REGEX,SUCCEEDS,SYMMETRIC,SYSTEM,SYSTEM_"
+      "TIME,TABLESAMPLE,TINYINT,TRANSLATE_REGEX,TREAT,TRIGGER,TRIM_ARRAY,"
+      "TRUNCATE,UESCAPE,UNNEST,UPSERT,VALUE_OF,VARBINARY,VAR_POP,VAR_SAMP,"
+      "VERSIONING,WIDTH_BUCKET,WINDOW,WITHIN,WITHOUT";
 #endif  // SQL_KEYWORDS
 
 #ifdef SQL_LIKE_ESCAPE_CLAUSE
@@ -839,7 +866,8 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
 #ifdef SQL_USER_NAME
   // A character string with the name used in a particular database, which can
   // be different from the login name.
-  strParams[SQL_USER_NAME] = "apache_ignite_user";
+  // Note: This is updated after a successful connection.
+  strParams[SQL_USER_NAME] = "";
 #endif  // SQL_USER_NAME
 
   //
@@ -918,7 +946,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_BS_ROW_COUNT_PROC = The driver supports explicit procedures that can
   // have row - count generating
   //     statements.
-  intParams[SQL_BATCH_SUPPORT] = SQL_BS_ROW_COUNT_EXPLICIT;
+  intParams[SQL_BATCH_SUPPORT] = 0;
 #endif  // SQL_BATCH_SUPPORT
 
 #ifdef SQL_BOOKMARK_PERSISTENCE
@@ -1034,59 +1062,59 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // Bitmask enumerating support for aggregation functions.
   intParams[SQL_AGGREGATE_FUNCTIONS] = SQL_AF_AVG | SQL_AF_COUNT | SQL_AF_MAX
                                        | SQL_AF_MIN | SQL_AF_SUM
-                                       | SQL_AF_DISTINCT;
+                                       | SQL_AF_DISTINCT | SQL_AF_ALL;
 #endif  // SQL_AGGREGATE_FUNCTIONS
 
 #ifdef SQL_NUMERIC_FUNCTIONS
   // Bitmask enumerating the scalar numeric functions supported by the driver
   // and associated data source.
-  intParams[SQL_NUMERIC_FUNCTIONS] =
-      SQL_FN_NUM_ABS | SQL_FN_NUM_ACOS | SQL_FN_NUM_ASIN | SQL_FN_NUM_EXP
-      | SQL_FN_NUM_ATAN | SQL_FN_NUM_ATAN2 | SQL_FN_NUM_CEILING | SQL_FN_NUM_COS
-      | SQL_FN_NUM_TRUNCATE | SQL_FN_NUM_FLOOR | SQL_FN_NUM_DEGREES
-      | SQL_FN_NUM_POWER | SQL_FN_NUM_RADIANS | SQL_FN_NUM_SIGN | SQL_FN_NUM_SIN
-      | SQL_FN_NUM_LOG | SQL_FN_NUM_TAN | SQL_FN_NUM_PI | SQL_FN_NUM_MOD
-      | SQL_FN_NUM_COT | SQL_FN_NUM_LOG10 | SQL_FN_NUM_ROUND | SQL_FN_NUM_SQRT
-      | SQL_FN_NUM_RAND;
+  intParams[SQL_NUMERIC_FUNCTIONS] = SQL_FN_NUM_MOD;
 #endif  // SQL_NUMERIC_FUNCTIONS
 
 #ifdef SQL_STRING_FUNCTIONS
   // Bitmask enumerating the scalar string functions supported by the driver and
   // associated data source.
   intParams[SQL_STRING_FUNCTIONS] =
-      SQL_FN_STR_ASCII | SQL_FN_STR_BIT_LENGTH | SQL_FN_STR_CHAR_LENGTH
-      | SQL_FN_STR_CHAR | SQL_FN_STR_CONCAT | SQL_FN_STR_DIFFERENCE
-      | SQL_FN_STR_INSERT | SQL_FN_STR_LEFT | SQL_FN_STR_LENGTH
-      | SQL_FN_STR_CHARACTER_LENGTH | SQL_FN_STR_LTRIM | SQL_FN_STR_OCTET_LENGTH
-      | SQL_FN_STR_POSITION | SQL_FN_STR_REPEAT | SQL_FN_STR_REPLACE
-      | SQL_FN_STR_RIGHT | SQL_FN_STR_RTRIM | SQL_FN_STR_SOUNDEX
-      | SQL_FN_STR_SPACE | SQL_FN_STR_SUBSTRING | SQL_FN_STR_LCASE
-      | SQL_FN_STR_UCASE | SQL_FN_STR_LOCATE_2 | SQL_FN_STR_LOCATE;
+      SQL_FN_STR_CHAR_LENGTH
+      | SQL_FN_STR_CONCAT
+      | SQL_FN_STR_LEFT
+      | SQL_FN_STR_LOCATE
+      | SQL_FN_STR_CHARACTER_LENGTH
+      | SQL_FN_STR_POSITION
+      | SQL_FN_STR_RIGHT
+      | SQL_FN_STR_SUBSTRING
+      | SQL_FN_STR_LCASE
+      | SQL_FN_STR_UCASE;
 #endif  // SQL_STRING_FUNCTIONS
 
 #ifdef SQL_TIMEDATE_FUNCTIONS
   // Bitmask enumerating the scalar date and time functions supported by the
   // driver and associated data source.
   intParams[SQL_TIMEDATE_FUNCTIONS] =
-      SQL_FN_TD_CURRENT_DATE | SQL_FN_TD_CURRENT_TIME | SQL_FN_TD_WEEK
-      | SQL_FN_TD_QUARTER | SQL_FN_TD_SECOND | SQL_FN_TD_CURDATE
-      | SQL_FN_TD_CURTIME | SQL_FN_TD_DAYNAME | SQL_FN_TD_MINUTE
-      | SQL_FN_TD_DAYOFWEEK | SQL_FN_TD_DAYOFYEAR | SQL_FN_TD_EXTRACT
-      | SQL_FN_TD_HOUR | SQL_FN_TD_DAYOFMONTH | SQL_FN_TD_MONTH
-      | SQL_FN_TD_MONTHNAME | SQL_FN_TD_NOW | SQL_FN_TD_YEAR
-      | SQL_FN_TD_CURRENT_TIMESTAMP;
+      SQL_FN_TD_CURRENT_TIME | SQL_FN_TD_CURRENT_DATE
+      | SQL_FN_TD_CURRENT_TIMESTAMP | SQL_FN_TD_EXTRACT | SQL_FN_TD_YEAR
+      | SQL_FN_TD_QUARTER | SQL_FN_TD_MONTH | SQL_FN_TD_WEEK
+      | SQL_FN_TD_DAYOFYEAR | SQL_FN_TD_DAYOFMONTH | SQL_FN_TD_DAYOFWEEK
+      | SQL_FN_TD_HOUR | SQL_FN_TD_MINUTE | SQL_FN_TD_SECOND | SQL_FN_TD_DAYNAME
+      | SQL_FN_TD_MONTHNAME;
 #endif  // SQL_TIMEDATE_FUNCTIONS
 
 #ifdef SQL_TIMEDATE_ADD_INTERVALS
   // Bitmask enumerating timestamp intervals supported by the driver and
   // associated data source for the TIMESTAMPADD scalar function.
-  intParams[SQL_TIMEDATE_ADD_INTERVALS] = 0;
+  intParams[SQL_TIMEDATE_ADD_INTERVALS] =
+      SQL_FN_TSI_FRAC_SECOND | SQL_FN_TSI_SECOND | SQL_FN_TSI_MINUTE
+      | SQL_FN_TSI_HOUR | SQL_FN_TSI_DAY | SQL_FN_TSI_WEEK | SQL_FN_TSI_MONTH
+      | SQL_FN_TSI_QUARTER | SQL_FN_TSI_YEAR;
 #endif  // SQL_TIMEDATE_ADD_INTERVALS
 
 #ifdef SQL_TIMEDATE_DIFF_INTERVALS
   // Bitmask enumerating timestamp intervals supported by the driver and
   // associated data source for the TIMESTAMPDIFF scalar function.
-  intParams[SQL_TIMEDATE_DIFF_INTERVALS] = 0;
+  intParams[SQL_TIMEDATE_DIFF_INTERVALS] =
+      SQL_FN_TSI_FRAC_SECOND | SQL_FN_TSI_SECOND | SQL_FN_TSI_MINUTE
+      | SQL_FN_TSI_HOUR | SQL_FN_TSI_DAY | SQL_FN_TSI_WEEK | SQL_FN_TSI_MONTH
+      | SQL_FN_TSI_QUARTER | SQL_FN_TSI_YEAR;
 #endif  // SQL_TIMEDATE_DIFF_INTERVALS
 
 #ifdef SQL_DATETIME_LITERALS
@@ -1138,15 +1166,13 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_SNVF_OCTET_LENGTH
   // SQL_SNVF_POSITION
   intParams[SQL_SQL92_NUMERIC_VALUE_FUNCTIONS] =
-      SQL_SNVF_BIT_LENGTH | SQL_SNVF_CHARACTER_LENGTH | SQL_SNVF_EXTRACT
-      | SQL_SNVF_OCTET_LENGTH | SQL_SNVF_POSITION;
+      SQL_SNVF_CHARACTER_LENGTH | SQL_SNVF_EXTRACT | SQL_SNVF_POSITION;
 #endif  // SQL_SQL92_NUMERIC_VALUE_FUNCTIONS
 
 #ifdef SQL_SQL92_STRING_FUNCTIONS
   // Bitmask enumerating the string scalar functions.
   intParams[SQL_SQL92_STRING_FUNCTIONS] =
-      SQL_SSF_LOWER | SQL_SSF_UPPER | SQL_SSF_TRIM_TRAILING | SQL_SSF_SUBSTRING
-      | SQL_SSF_TRIM_BOTH | SQL_SSF_TRIM_LEADING;
+      SQL_SSF_LOWER | SQL_SSF_UPPER | SQL_SSF_SUBSTRING;
 #endif  // SQL_SQL92_STRING_FUNCTIONS
 
 #ifdef SQL_SQL92_DATETIME_FUNCTIONS
@@ -1588,7 +1614,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // (Full level) (ODBC 3.0) SQL_AT_CONSTRAINT_INITIALLY_IMMEDIATE (Full level)
   // (ODBC 3.0) SQL_AT_CONSTRAINT_DEFERRABLE (Full level) (ODBC 3.0)
   // SQL_AT_CONSTRAINT_NON_DEFERRABLE (Full level) (ODBC 3.0)
-  intParams[SQL_ALTER_TABLE] = SQL_AT_ADD_COLUMN_SINGLE;
+  intParams[SQL_ALTER_TABLE] = 0;
 #endif  // SQL_ALTER_TABLE
 
 #ifdef SQL_CREATE_ASSERTION
@@ -2829,17 +2855,14 @@ ConnectionInfo::~ConnectionInfo() {
 
 SqlResult::Type ConnectionInfo::GetInfo(InfoType type, void* buf, short buflen,
                                         short* reslen) const {
-  if (!buf)
-    return SqlResult::AI_ERROR;
-
   StringInfoMap::const_iterator itStr = strParams.find(type);
 
   if (itStr != strParams.end()) {
-    if (!buflen)
+    if (buf && !buflen)
       return SqlResult::AI_ERROR;
 
     bool isTruncated = false;
-    // Length is given in bytes,
+    // Length is given in bytes, implicitly handles if buf is NULL.
     unsigned short strlen = static_cast< short >(utility::CopyStringToBuffer(
         itStr->second, reinterpret_cast< SQLWCHAR* >(buf), buflen, isTruncated,
         true));
@@ -2849,6 +2872,10 @@ SqlResult::Type ConnectionInfo::GetInfo(InfoType type, void* buf, short buflen,
 
     return SqlResult::AI_SUCCESS;
   }
+
+  // Numeric results must have a buffer to write to!
+  if (!buf)
+    return SqlResult::AI_ERROR;
 
   UintInfoMap::const_iterator itInt = intParams.find(type);
 
@@ -2872,6 +2899,17 @@ SqlResult::Type ConnectionInfo::GetInfo(InfoType type, void* buf, short buflen,
 
   return SqlResult::AI_ERROR;
 }
+
+SqlResult::Type ConnectionInfo::SetInfo(InfoType type, std::string value) {
+  StringInfoMap::const_iterator itStr = strParams.find(type);
+
+  if (itStr != strParams.end()) {
+    strParams[type] = value;
+    return SqlResult::AI_SUCCESS;
+  }
+  return SqlResult::AI_ERROR;
+}
+
 }  // namespace config
 }  // namespace odbc
 }  // namespace ignite
