@@ -67,7 +67,7 @@ bool LooksLikeBinaryReleaseHome(const std::string& path) {
 }
 
 /**
- * Helper function for Ignite home resolution.
+ * Helper function for DocumentDB home resolution.
  * Goes upwards in directory hierarchy and checks whether certain
  * folders exist in the path.
  *

@@ -173,7 +173,7 @@ const int16_t JDBC_TYPE_REF_CURSOR = 2012;
 /** Type: null. */
 const int16_t JDBC_TYPE_NULL = 0;
 
-// Ignite enum types
+// DocumentDB enum types
 
 /** Type: unsigned byte. */
 const int8_t DOCUMENTDB_TYPE_BYTE = 1;

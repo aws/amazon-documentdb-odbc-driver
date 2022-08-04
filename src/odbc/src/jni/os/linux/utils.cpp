@@ -88,7 +88,7 @@ bool LooksLikeBinaryReleaseHome(const std::string& path) {
 }
 
 /**
- * Helper function for Ignite home resolution.
+ * Helper function for DocumentDB home resolution.
  * Goes upwards in directory hierarchy and checks whether certain
  * folders exist in the path.
  *
@@ -315,14 +315,14 @@ std::string FindJvmLibrary(const std::string& path) {
 }
 
 /**
- * Create Ignite classpath based on user input and home directory.
+ * Create DocumentDB classpath based on user input and home directory.
  *
  * @param usrCp User's classpath.
- * @param home Ignite home directory.
+ * @param home DocumentDB home directory.
  * @param forceTest Whether test classpath must be used.
  * @return Classpath.
  */
-std::string CreateIgniteClasspath(const std::string& usrCp,
+std::string CreateDocumentDbClasspath(const std::string& usrCp,
                                   const std::string* home, bool forceTest) {
   // 1. Append user classpath if it exists.
   std::string cp;
