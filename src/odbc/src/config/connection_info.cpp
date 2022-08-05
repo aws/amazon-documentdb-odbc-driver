@@ -317,6 +317,9 @@ const char* ConnectionInfo::InfoTypeToString(InfoType type) {
 #ifdef SQL_CREATE_DOMAIN
     DBG_STR_CASE(SQL_CREATE_DOMAIN);
 #endif  // SQL_CREATE_DOMAIN
+#ifdef SQL_CREATE_SCHEMA
+    DBG_STR_CASE(SQL_CREATE_SCHEMA);
+#endif  // SQL_CREATE_SCHEMA
 #ifdef SQL_CREATE_TABLE
     DBG_STR_CASE(SQL_CREATE_TABLE);
 #endif  // SQL_CREATE_TABLE
@@ -1794,7 +1797,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // Value that indicates support for creation and dropping of indexes:
   // SQL_DI_CREATE_INDEX
   // SQL_DI_DROP_INDEX
-  intParams[SQL_DDL_INDEX] = SQL_DI_CREATE_INDEX | SQL_DI_DROP_INDEX;
+  intParams[SQL_DDL_INDEX] = 0;
 #endif  // SQL_DDL_INDEX
 
 #ifdef SQL_DEFAULT_TXN_ISOLATION
@@ -1880,7 +1883,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_DT_RESTRICT
   // An FIPS Transitional level-conformant driver will always return all of
   // these options as supported.
-  intParams[SQL_DROP_TABLE] = SQL_DT_DROP_TABLE;
+  intParams[SQL_DROP_TABLE] = 0;
 #endif  // SQL_DROP_TABLE
 
 #ifdef SQL_DROP_TRANSLATION
@@ -2074,7 +2077,10 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // attributes; for the second subset, see SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES2.
   //
   // The following bitmasks are used to determine which attributes are
-  // supported: SQL_CA1_NEXT SQL_CA1_LOCK_EXCLUSIVE SQL_CA1_LOCK_NO_CHANGE
+  // supported: 
+  // SQL_CA1_NEXT 
+  // SQL_CA1_LOCK_EXCLUSIVE 
+  // SQL_CA1_LOCK_NO_CHANGE
   // SQL_CA1_LOCK_UNLOCK
   // SQL_CA1_POS_POSITION
   // SQL_CA1_POS_UPDATE
@@ -2099,7 +2105,9 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // attributes; for the first subset, see SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES1.
   //
   // The following bitmasks are used to determine which attributes are
-  // supported: SQL_CA2_READ_ONLY_CONCURRENCY SQL_CA2_LOCK_CONCURRENCY
+  // supported: 
+  // SQL_CA2_READ_ONLY_CONCURRENCY 
+  // SQL_CA2_LOCK_CONCURRENCY
   // SQL_CA2_OPT_ROWVER_CONCURRENCY
   // SQL_CA2_OPT_VALUES_CONCURRENCY
   // SQL_CA2_SENSITIVITY_ADDITIONS
@@ -2134,7 +2142,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   //
   // To see whether the CREATE INDEX statement is supported, an application
   // calls SQLGetInfo with the SQL_DLL_INDEX information type.
-  intParams[SQL_INDEX_KEYWORDS] = SQL_IK_ALL;
+  intParams[SQL_INDEX_KEYWORDS] = SQL_IK_NONE;
 #endif  // SQL_INDEX_KEYWORDS
 
 #ifdef SQL_INFO_SCHEMA_VIEWS
@@ -2222,8 +2230,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_IS_SELECT_INTO
   // An SQL-92 Entry level-conformant driver will always return all of these
   // options as supported.
-  intParams[SQL_INSERT_STATEMENT] =
-      SQL_IS_INSERT_LITERALS | SQL_IS_INSERT_SEARCHED;
+  intParams[SQL_INSERT_STATEMENT] = 0;
 #endif  // SQL_INSERT_STATEMENT
 
 #ifdef SQL_KEYSET_CURSOR_ATTRIBUTES1
@@ -2481,7 +2488,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   //     both SQL_U_UNION and SQL_U_UNION_ALL in this case.)
   // An SQL-92 Entry level-conformant driver will always return both of these
   // options as supported.
-  intParams[SQL_UNION] = SQL_U_UNION | SQL_U_UNION_ALL;
+  intParams[SQL_UNION] = 0;
 #endif  // SQL_UNION
 
 #ifdef SQL_FETCH_DIRECTION
@@ -2495,7 +2502,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_FD_FETCH_ABSOLUTE (ODBC 1.0)
   // SQL_FD_FETCH_RELATIVE (ODBC 1.0)
   // SQL_FD_FETCH_BOOKMARK (ODBC 2.0)
-  intParams[SQL_FETCH_DIRECTION] = SQL_FD_FETCH_NEXT | SQL_FD_FETCH_PRIOR;
+  intParams[SQL_FETCH_DIRECTION] = SQL_FD_FETCH_NEXT;
 #endif  // SQL_FETCH_DIRECTION
 
 #ifdef SQL_LOCK_TYPES
