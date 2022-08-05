@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/utils.h>
-#include <ignite/odbc/impl/binary/binary_writer_impl.h>
-#include <ignite/odbc/utility.h>
+#include <documentdb/odbc/common/utils.h>
+#include <documentdb/odbc/impl/binary/binary_writer_impl.h>
+#include <documentdb/odbc/utility.h>
 
 #include <boost/test/unit_test.hpp>
 #include <chrono>
 #include <stdio.h>
 
-using namespace ignite::odbc;
-using namespace ignite::odbc::utility;
+using namespace documentdb::odbc;
+using namespace documentdb::odbc::utility;
 using namespace boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE(UtilityTestSuite)

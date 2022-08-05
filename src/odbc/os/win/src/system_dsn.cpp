@@ -15,22 +15,22 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/config/connection_string_parser.h"
-#include "ignite/odbc/diagnostic/diagnosable_adapter.h"
-#include "ignite/odbc/dsn_config.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/odbc_error.h"
-#include "ignite/odbc/system/odbc_constants.h"
-#include "ignite/odbc/system/ui/dsn_configuration_window.h"
-#include "ignite/odbc/system/ui/window.h"
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/config/connection_string_parser.h"
+#include "documentdb/odbc/diagnostic/diagnosable_adapter.h"
+#include "documentdb/odbc/dsn_config.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/odbc_error.h"
+#include "documentdb/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/system/ui/dsn_configuration_window.h"
+#include "documentdb/odbc/system/ui/window.h"
+#include "documentdb/odbc/utility.h"
 
-using ignite::odbc::config::Configuration;
-using ignite::odbc::utility::FromUtf8;
+using documentdb::odbc::config::Configuration;
+using documentdb::odbc::utility::FromUtf8;
 
 #ifdef _WIN32
 bool DisplayConnectionWindow(void* windowParent, Configuration& config) {
-  using namespace ignite::odbc::system::ui;
+  using namespace documentdb::odbc::system::ui;
 
   HWND hwndParent = (HWND)windowParent;
 
@@ -48,7 +48,7 @@ bool DisplayConnectionWindow(void* windowParent, Configuration& config) {
     window.Update();
 
     return ProcessMessages(window) == Result::OK;
-  } catch (const ignite::odbc::IgniteError& err) {
+  } catch (const documentdb::odbc::DocumentDbError& err) {
     std::wstringstream buf;
 
     buf << L"Message: " << err.GetText() << L", Code: " << err.GetCode();
@@ -70,8 +70,8 @@ bool DisplayConnectionWindow(void* windowParent, Configuration& config) {
  * @return True on success and false on fail.
  */
 bool RegisterDsn(const Configuration& config, LPCSTR driver) {
-  using namespace ignite::odbc::config;
-  using ignite::odbc::common::LexicalCast;
+  using namespace documentdb::odbc::config;
+  using documentdb::odbc::common::LexicalCast;
 
   typedef Configuration::ArgumentMap ArgMap;
 
@@ -81,7 +81,7 @@ bool RegisterDsn(const Configuration& config, LPCSTR driver) {
     std::wstring dsn0 = FromUtf8(dsn);
     std::wstring driver0 = FromUtf8(driver);
     if (!SQLWriteDSNToIni(dsn0.c_str(), driver0.c_str()))
-      ignite::odbc::ThrowLastSetupError();
+      documentdb::odbc::ThrowLastSetupError();
 
     ArgMap map;
 
@@ -94,11 +94,11 @@ bool RegisterDsn(const Configuration& config, LPCSTR driver) {
       const std::string& key = it->first;
       const std::string& value = it->second;
 
-      ignite::odbc::WriteDsnString(dsn, key.c_str(), value.c_str());
+      documentdb::odbc::WriteDsnString(dsn, key.c_str(), value.c_str());
     }
 
     return true;
-  } catch (ignite::odbc::IgniteError& err) {
+  } catch (documentdb::odbc::DocumentDbError& err) {
     std::wstring errText = FromUtf8(err.GetText());
     MessageBox(NULL, errText.c_str(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
 
@@ -117,10 +117,10 @@ bool RegisterDsn(const Configuration& config, LPCSTR driver) {
 bool UnregisterDsn(const std::string& dsn) {
   try {
     if (!SQLRemoveDSNFromIni(FromUtf8(dsn).c_str()))
-      ignite::odbc::ThrowLastSetupError();
+      documentdb::odbc::ThrowLastSetupError();
 
     return true;
-  } catch (ignite::odbc::IgniteError& err) {
+  } catch (documentdb::odbc::DocumentDbError& err) {
     std::wstring errText = FromUtf8(err.GetText());
     MessageBox(NULL, errText.c_str(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
 
@@ -132,7 +132,7 @@ bool UnregisterDsn(const std::string& dsn) {
 
 BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver,
                        LPCSTR attributes) {
-  using namespace ignite::odbc;
+  using namespace documentdb::odbc;
 
   LOG_MSG("ConfigDSN called");
 

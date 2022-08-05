@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/cursor.h"
+#include "documentdb/odbc/cursor.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 Cursor::Cursor(int64_t queryId)
     : queryId(queryId), currentPage(), currentPagePos(0), currentRow() {
@@ -72,4 +72,4 @@ Row* Cursor::GetRow() {
   return currentRow.get();
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

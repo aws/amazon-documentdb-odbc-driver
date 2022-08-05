@@ -15,25 +15,25 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/binary/binary_raw_reader.h>
-#include <ignite/odbc/binary/binary_raw_writer.h>
-#include <ignite/odbc/impl/binary/binary_field_meta.h>
+#include <documentdb/odbc/binary/binary_raw_reader.h>
+#include <documentdb/odbc/binary/binary_raw_writer.h>
+#include <documentdb/odbc/impl/binary/binary_field_meta.h>
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace binary {
-IGNITE_IMPORT_EXPORT void BinaryFieldMeta::Write(
+DOCUMENTDB_IMPORT_EXPORT void BinaryFieldMeta::Write(
     BinaryRawWriter& writer) const {
   writer.WriteInt32(typeId);
   writer.WriteInt32(fieldId);
 }
 
-IGNITE_IMPORT_EXPORT void BinaryFieldMeta::Read(BinaryRawReader& reader) {
+DOCUMENTDB_IMPORT_EXPORT void BinaryFieldMeta::Read(BinaryRawReader& reader) {
   typeId = reader.ReadInt32();
   fieldId = reader.ReadInt32();
 }
 }  // namespace binary
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

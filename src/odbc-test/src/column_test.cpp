@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/column.h"
+#include "documentdb/odbc/column.h"
 
-#include "ignite/odbc/impl/binary/binary_common.h"
-#include "ignite/odbc/impl/binary/binary_writer_impl.h"
+#include "documentdb/odbc/impl/binary/binary_common.h"
+#include "documentdb/odbc/impl/binary/binary_writer_impl.h"
 
 #include <boost/test/unit_test.hpp>
 
-#include "ignite/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/system/odbc_constants.h"
 
-using namespace ignite::odbc::impl::binary;
-using namespace ignite::odbc::impl::interop;
-using namespace ignite::odbc::app;
-using namespace ignite::odbc;
+using namespace documentdb::odbc::impl::binary;
+using namespace documentdb::odbc::impl::interop;
+using namespace documentdb::odbc::app;
+using namespace documentdb::odbc;
 
 BOOST_AUTO_TEST_SUITE(ColumnTestSuite)
 
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(TestColumnShort) {
 
   int16_t data = 42;
 
-  writer.WriteInt8(IGNITE_TYPE_SHORT);
+  writer.WriteInt8(DOCUMENTDB_TYPE_SHORT);
   writer.WriteInt16(data);
 
   outStream.Synchronize();

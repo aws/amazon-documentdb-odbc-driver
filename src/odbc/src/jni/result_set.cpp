@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/concurrent.h>
-#include <ignite/odbc/jni/java.h>
-#include <ignite/odbc/jni/result_set.h>
-#include <ignite/odbc/log.h>
+#include <documentdb/odbc/common/concurrent.h>
+#include <documentdb/odbc/jni/java.h>
+#include <documentdb/odbc/jni/result_set.h>
+#include <documentdb/odbc/log.h>
 
-using ignite::odbc::common::concurrent::SharedPointer;
-using ignite::odbc::jni::java::GlobalJObject;
-using ignite::odbc::jni::java::JniContext;
-using ignite::odbc::jni::java::JniErrorInfo;
+using documentdb::odbc::common::concurrent::SharedPointer;
+using documentdb::odbc::jni::java::GlobalJObject;
+using documentdb::odbc::jni::java::JniContext;
+using documentdb::odbc::jni::java::JniErrorInfo;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace jni {
 ResultSet::ResultSet(SharedPointer< JniContext >& jniContext,
@@ -45,13 +45,13 @@ JniErrorCode ResultSet::Close(JniErrorInfo& errInfo) {
   if (_jniContext.IsValid() && _resultSet.IsValid()) {
     JniErrorCode success =
         _jniContext.Get()->ResultSetClose(_resultSet, errInfo);
-    if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       LOG_MSG(errInfo.errMsg);
     }
     _resultSet = nullptr;
     return success;
   }
-  return JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
+  return JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS;
 }
 
 JniErrorCode ResultSet::Next(bool& hasNext, JniErrorInfo& errInfo) {
@@ -109,4 +109,4 @@ JniErrorCode ResultSet::GetSmallInt(const std::string& columnName,
 }
 }  // namespace jni
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

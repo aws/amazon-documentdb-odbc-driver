@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/common/decimal.h"
+#include "documentdb/odbc/common/decimal.h"
 
 #include <cstring>
 #include <utility>
 
-#include "ignite/odbc/common/utils.h"
+#include "documentdb/odbc/common/utils.h"
 
-using ignite::odbc::common::BigInteger;
+using documentdb::odbc::common::BigInteger;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace common {
 Decimal::Decimal() : scale(0), magnitude(0) {
@@ -224,4 +224,4 @@ bool operator>=(const Decimal& val1, const Decimal& val2) {
 }
 }  // namespace common
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

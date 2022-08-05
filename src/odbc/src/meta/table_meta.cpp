@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/meta/table_meta.h"
+#include "documentdb/odbc/meta/table_meta.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace meta {
 const std::string TABLE_CAT = "TABLE_CAT";
@@ -47,7 +47,7 @@ void ReadTableMetaVector(SharedPointer< ResultSet >& resultSet,
   JniErrorCode errCode;
   do {
     errCode = resultSet.Get()->Next(hasNext, errInfo);
-    if (!hasNext || errCode != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    if (!hasNext || errCode != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       break;
     }
 
@@ -57,4 +57,4 @@ void ReadTableMetaVector(SharedPointer< ResultSet >& resultSet,
 }
 }  // namespace meta
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

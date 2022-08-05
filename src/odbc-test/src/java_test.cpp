@@ -19,14 +19,14 @@
 #include <Windows.h>
 #endif
 
-#include <ignite/odbc/common/common.h>
-#include <ignite/odbc/common/concurrent.h>
-#include <ignite/odbc/config/connection_string_parser.h>
-#include <ignite/odbc/connection.h>
-#include <ignite/odbc/dsn_config.h>
-#include <ignite/odbc/ignite_error.h>
-#include <ignite/odbc/jni/java.h>
-#include <ignite/odbc/jni/utils.h>
+#include <documentdb/odbc/common/common.h>
+#include <documentdb/odbc/common/concurrent.h>
+#include <documentdb/odbc/config/connection_string_parser.h>
+#include <documentdb/odbc/connection.h>
+#include <documentdb/odbc/dsn_config.h>
+#include <documentdb/odbc/documentdb_error.h>
+#include <documentdb/odbc/jni/java.h>
+#include <documentdb/odbc/jni/utils.h>
 #include <sql.h>
 #include <sqlext.h>
 
@@ -37,16 +37,16 @@
 #include "odbc_test_suite.h"
 #include "test_utils.h"
 
-using ignite::odbc::OdbcTestSuite;
+using documentdb::odbc::OdbcTestSuite;
 using namespace boost::unit_test;
-using ignite::odbc::if_integration;
+using documentdb::odbc::if_integration;
 
-using ignite::odbc::common::ReleaseChars;
-using ignite::odbc::config::ConnectionStringParser;
-using ignite::odbc::jni::ResolveDocumentDbHome;
-using ignite::odbc::jni::java::BuildJvmOptions;
-using ignite::odbc::jni::java::JniErrorCode;
-using ignite::odbc::jni::java::JniHandlers;
+using documentdb::odbc::common::ReleaseChars;
+using documentdb::odbc::config::ConnectionStringParser;
+using documentdb::odbc::jni::ResolveDocumentDbHome;
+using documentdb::odbc::jni::java::BuildJvmOptions;
+using documentdb::odbc::jni::java::JniErrorCode;
+using documentdb::odbc::jni::java::JniHandlers;
 
 /**
  * Test setup fixture.
@@ -137,7 +137,7 @@ struct AutoCloseConnection {
  private:
   SharedPointer< JniContext > _ctx;
   SharedPointer< GlobalJObject > _connection;
-  IGNITE_NO_COPY_ASSIGNMENT(AutoCloseConnection);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(AutoCloseConnection);
 };
 
 struct AutoCloseResultSet {
@@ -159,7 +159,7 @@ struct AutoCloseResultSet {
  private:
   SharedPointer< JniContext > _ctx;
   SharedPointer< GlobalJObject > _resultSet;
-  IGNITE_NO_COPY_ASSIGNMENT(AutoCloseResultSet);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(AutoCloseResultSet);
 };
 
 BOOST_FIXTURE_TEST_SUITE(JavaTestSuite, JavaTestSuiteFixture)
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE(TestDriverManagerGetConnection) {
   SharedPointer< GlobalJObject > connection;
   JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
       _jdbcConnectionString.c_str(), connection, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_REQUIRE(connection.Get() != nullptr);
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPort,
   SharedPointer< GlobalJObject > connection;
   JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
       _jdbcConnectionString.c_str(), connection, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_REQUIRE(connection.Get());
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPort,
   success = _ctx.Get()->DocumentDbConnectionIsSshTunnelActive(
       connection, isActive, errInfo);
   // if tunnel is not shown as active, or operation not successful, BOOST FAIL
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_CHECK(isActive);
@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPort,
   int32_t port;
   success = _ctx.Get()->DocumentDbConnectionGetSshLocalPort(connection, port,
                                                             errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }
@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPortSshTunnelNotActive,
   SharedPointer< GlobalJObject > connection;
   JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
       _jdbcConnectionString.c_str(), connection, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_REQUIRE(connection.Get());
@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPortSshTunnelNotActive,
   success = _ctx.Get()->DocumentDbConnectionIsSshTunnelActive(
       connection, isActive, errInfo);
   // if SSH tunnel is active, or operation not successful, BOOST FAIL
-  if (isActive || success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (isActive || success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
 
@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetSshTunnelPortSshTunnelNotActive,
   int32_t port;
   success = _ctx.Get()->DocumentDbConnectionGetSshLocalPort(connection, port,
                                                             errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }
@@ -269,7 +269,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetDatabaseMetadata) {
   SharedPointer< GlobalJObject > connection;
   JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
       _jdbcConnectionString.c_str(), connection, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_REQUIRE(connection.Get());
@@ -279,7 +279,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbConnectionGetDatabaseMetadata) {
   SharedPointer< GlobalJObject > databaseMetadata;
   if (_ctx.Get()->DocumentDbConnectionGetDatabaseMetadata(
           connection, databaseMetadata, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_REQUIRE(databaseMetadata.Get());
@@ -294,7 +294,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseSchemaMetadataGetSchemaName) {
   SharedPointer< GlobalJObject > connection;
   JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
       _jdbcConnectionString.c_str(), connection, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_REQUIRE(connection.Get());
@@ -304,7 +304,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseSchemaMetadataGetSchemaName) {
   SharedPointer< GlobalJObject > databaseMetadata;
   if (_ctx.Get()->DocumentDbConnectionGetDatabaseMetadata(
           connection, databaseMetadata, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_REQUIRE(databaseMetadata.Get());
@@ -313,7 +313,7 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseSchemaMetadataGetSchemaName) {
   bool wasNull;
   success = _ctx.Get()->DocumentDbDatabaseSchemaMetadataGetSchemaName(
       databaseMetadata, schemaName, wasNull, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
 
@@ -329,7 +329,7 @@ BOOST_AUTO_TEST_CASE(TestConnectionGetMetaData) {
   SharedPointer< GlobalJObject > connection;
   JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
       _jdbcConnectionString.c_str(), connection, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_REQUIRE(connection.Get() != nullptr);
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_CASE(TestConnectionGetMetaData) {
 
   SharedPointer< GlobalJObject > databaseMetaData;
   if (_ctx.Get()->ConnectionGetMetaData(connection, databaseMetaData, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }
@@ -352,7 +352,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
   SharedPointer< GlobalJObject > connection;
   JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
       _jdbcConnectionString.c_str(), connection, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_REQUIRE(connection.Get());
@@ -360,7 +360,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
 
   SharedPointer< GlobalJObject > databaseMetaData;
   if (_ctx.Get()->ConnectionGetMetaData(connection, databaseMetaData, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }
@@ -375,7 +375,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
   if (_ctx.Get()->DatabaseMetaDataGetTables(databaseMetaData, catalog,
                                             schemaPattern, tableNamePattern,
                                             types, resultSet, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }
@@ -385,7 +385,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
   // Get first
   bool hasNext;
   if (_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }
@@ -396,7 +396,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
     boost::optional< std::string > value;
     // TABLE_CAT (i.e., catalog - always NULL in our case)
     if (_ctx.Get()->ResultSetGetString(resultSet, 1, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -404,7 +404,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
 
     // TABLE_CAT (i.e., catalog - always NULL in our case)
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_CAT", value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -412,7 +412,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
 
     // TABLE_SCHEM (i.e., database)
     if (_ctx.Get()->ResultSetGetString(resultSet, 2, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -421,7 +421,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
 
     // TABLE_SCHEM (i.e., database)
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_SCHEM", value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -430,7 +430,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
 
     // TABLE_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 3, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -439,7 +439,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
 
     // TABLE_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_NAME", value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -448,7 +448,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
 
     // TABLE_TYPE
     if (_ctx.Get()->ResultSetGetString(resultSet, 4, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -457,7 +457,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
 
     // TABLE_TYPE
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_TYPE", value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -467,7 +467,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
     // check getRow
     boost::optional< int > val;
     if (_ctx.Get()->ResultSetGetRow(resultSet, val, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -476,7 +476,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetTables) {
 
     // Get next
     if (_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -494,7 +494,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
   // get connection
   JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
       _jdbcConnectionString.c_str(), connection, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_REQUIRE(connection.Get());
@@ -503,7 +503,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
   // get databaseMetaData object
   SharedPointer< GlobalJObject > databaseMetaData;
   if (_ctx.Get()->ConnectionGetMetaData(connection, databaseMetaData, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }
@@ -517,7 +517,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
   if (_ctx.Get()->DatabaseMetaDataGetColumns(
           databaseMetaData, catalog, schemaPattern, tableNamePattern,
           columnNamePattern, resultSet, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }
@@ -527,7 +527,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
   // Get first
   bool hasNext;
   if (_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }
@@ -538,7 +538,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
     boost::optional< std::string > value;
     // TABLE_CAT (i.e., catalog - always NULL in our case)
     if (_ctx.Get()->ResultSetGetString(resultSet, 1, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       // grab string from first column
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
@@ -548,7 +548,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
     // TABLE_CAT (i.e., catalog - always NULL in our case)
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_CAT", value,
                                        errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {  // grab string from first
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {  // grab string from first
                                                     // column by name
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
@@ -557,7 +557,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
 
     // TABLE_SCHEM (i.e., database)
     if (_ctx.Get()->ResultSetGetString(resultSet, 2, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -566,7 +566,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
 
     // TABLE_SCHEM (i.e., database)
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_SCHEM", value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -575,7 +575,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
 
     // TABLE_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 3, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -584,7 +584,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
 
     // TABLE_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_NAME", value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -593,7 +593,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
 
     // COLUMN_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 4, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -602,7 +602,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
 
     // COLUMN_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, "COLUMN_NAME", value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -612,7 +612,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
     // ORDINAL_POSITION
     boost::optional< int > val;
     if (_ctx.Get()->ResultSetGetInt(resultSet, 17, val, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -621,7 +621,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
 
     // ORDINAL_POSITION
     if (_ctx.Get()->ResultSetGetInt(resultSet, "ORDINAL_POSITION", val, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -630,7 +630,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
 
     // check getRow
     if (_ctx.Get()->ResultSetGetRow(resultSet, val, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -639,7 +639,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetColumns) {
 
     // Get next
     if (_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -657,7 +657,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetPrimaryKeys) {
   // get connection
   JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
       _jdbcConnectionString.c_str(), connection, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_REQUIRE(connection.Get());
@@ -666,7 +666,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetPrimaryKeys) {
   // get databaseMetaData object
   SharedPointer< GlobalJObject > databaseMetaData;
   if (_ctx.Get()->ConnectionGetMetaData(connection, databaseMetaData, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }
@@ -679,7 +679,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetPrimaryKeys) {
   SharedPointer< GlobalJObject > resultSet;
   if (_ctx.Get()->DatabaseMetaDataGetPrimaryKeys(
           databaseMetaData, catalog, schema, table, resultSet, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }
@@ -689,7 +689,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetPrimaryKeys) {
   // Get first
   bool hasNext;
   if (_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }
@@ -700,7 +700,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetPrimaryKeys) {
     boost::optional< std::string > value;
     // TABLE_CAT (i.e., catalog - always NULL in our case)
     if (_ctx.Get()->ResultSetGetString(resultSet, 1, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       // grab string from first column
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
@@ -710,7 +710,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetPrimaryKeys) {
     // TABLE_CAT (i.e., catalog - always NULL in our case)
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_CAT", value,
                                        errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {  // grab string from first
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {  // grab string from first
                                                     // column by name
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
@@ -719,7 +719,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetPrimaryKeys) {
 
     // TABLE_SCHEM (i.e., database)
     if (_ctx.Get()->ResultSetGetString(resultSet, 2, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -728,7 +728,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetPrimaryKeys) {
 
     // TABLE_SCHEM (i.e., database)
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_SCHEM", value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -737,7 +737,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetPrimaryKeys) {
 
     // TABLE_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 3, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -746,7 +746,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetPrimaryKeys) {
 
     // TABLE_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, "TABLE_NAME", value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -755,7 +755,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetPrimaryKeys) {
 
     // COLUMN_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 4, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -764,7 +764,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetPrimaryKeys) {
 
     // COLUMN_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, "COLUMN_NAME", value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -774,7 +774,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetPrimaryKeys) {
     // KEY_SEQ
     boost::optional< int > intVal;
     if (_ctx.Get()->ResultSetGetInt(resultSet, 5, intVal, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -783,7 +783,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetPrimaryKeys) {
 
     // KEY_SEQ
     if (_ctx.Get()->ResultSetGetInt(resultSet, "KEY_SEQ", intVal, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -792,7 +792,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetPrimaryKeys) {
 
     // PK_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 6, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -800,7 +800,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetPrimaryKeys) {
 
     // PK_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, "PK_NAME", value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -808,7 +808,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetPrimaryKeys) {
 
     // Get next
     if (_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -827,7 +827,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
   // get connection
   JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
       _jdbcConnectionString.c_str(), connection, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_REQUIRE(connection.Get());
@@ -836,7 +836,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
   // get databaseMetaData object
   SharedPointer< GlobalJObject > databaseMetaData;
   if (_ctx.Get()->ConnectionGetMetaData(connection, databaseMetaData, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }
@@ -848,7 +848,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
   SharedPointer< GlobalJObject > resultSet;
   if (_ctx.Get()->DatabaseMetaDataGetImportedKeys(
           databaseMetaData, catalog, schema, fkTableName, resultSet, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }
@@ -858,7 +858,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
   // Get first
   bool hasNext;
   if (_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }
@@ -872,7 +872,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
     boost::optional< std::string > value;
     // TABLE_CAT (i.e., catalog - always NULL in our case)
     if (_ctx.Get()->ResultSetGetString(resultSet, 1, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       // grab string from first column
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
@@ -882,7 +882,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
     // PKTABLE_CAT (i.e., catalog - always NULL in our case)
     if (_ctx.Get()->ResultSetGetString(resultSet, "PKTABLE_CAT", value,
                                        errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {  // grab string from first
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {  // grab string from first
                                                     // column by name
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
@@ -891,7 +891,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // PKTABLE_SCHEM (i.e., database)
     if (_ctx.Get()->ResultSetGetString(resultSet, 2, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -901,7 +901,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
     // PKTABLE_SCHEM (i.e., database)
     if (_ctx.Get()->ResultSetGetString(resultSet, "PKTABLE_SCHEM", value,
                                        errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -910,7 +910,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // PKTABLE_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 3, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -920,7 +920,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
     // PKTABLE_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, "PKTABLE_NAME", value,
                                        errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -930,7 +930,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // PKCOLUMN_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 4, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -941,7 +941,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
     // PKCOLUMN_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, "PKCOLUMN_NAME", value,
                                        errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -951,7 +951,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // FKTABLE_CAT (always null)
     if (_ctx.Get()->ResultSetGetString(resultSet, 5, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -959,7 +959,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // FKTABLE_CAT
     if (_ctx.Get()->ResultSetGetString(resultSet, "FKTABLE_CAT", value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -967,7 +967,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // FKTABLE_SCHEM (i.e., database)
     if (_ctx.Get()->ResultSetGetString(resultSet, 6, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -977,7 +977,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
     // FKTABLE_SCHEM (i.e., database)
     if (_ctx.Get()->ResultSetGetString(resultSet, "FKTABLE_SCHEM", value,
                                        errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -986,7 +986,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // FKTABLE_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 7, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -996,7 +996,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
     // FKTABLE_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, "FKTABLE_NAME", value,
                                        errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -1006,7 +1006,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // FKCOLUMN_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 8, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -1018,7 +1018,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
     // FKCOLUMN_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, "FKCOLUMN_NAME", value,
                                        errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -1029,7 +1029,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
     // KEY_SEQ
     boost::optional< int > val;
     if (_ctx.Get()->ResultSetGetInt(resultSet, 9, val, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -1038,7 +1038,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // KEY_SEQ
     if (_ctx.Get()->ResultSetGetInt(resultSet, "KEY_SEQ", val, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -1047,7 +1047,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // UPDATE_RULE
     if (_ctx.Get()->ResultSetGetInt(resultSet, 10, val, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -1055,7 +1055,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // UPDATE_RULE
     if (_ctx.Get()->ResultSetGetInt(resultSet, "UPDATE_RULE", val, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -1063,7 +1063,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // DELETE_RULE
     if (_ctx.Get()->ResultSetGetInt(resultSet, 11, val, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -1071,7 +1071,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // DELETE_RULE
     if (_ctx.Get()->ResultSetGetInt(resultSet, "DELETE_RULE", val, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -1079,7 +1079,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // FK_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 12, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -1087,7 +1087,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // FK_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, "FK_NAME", value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -1095,7 +1095,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // PK_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, 13, value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -1103,7 +1103,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // PK_NAME
     if (_ctx.Get()->ResultSetGetString(resultSet, "PK_NAME", value, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -1111,7 +1111,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // DEFERRABILITY
     if (_ctx.Get()->ResultSetGetInt(resultSet, 14, val, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -1119,7 +1119,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // DEFERRABILITY
     if (_ctx.Get()->ResultSetGetInt(resultSet, "DEFERRABILITY", val, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -1127,7 +1127,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeys) {
 
     // Get next
     if (_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)
-        != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+        != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       std::string errMsg = errInfo.errMsg;
       BOOST_FAIL(errMsg);
     }
@@ -1146,7 +1146,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeysReturnsNone) {
   // get connection
   JniErrorCode success = _ctx.Get()->DriverManagerGetConnection(
       _jdbcConnectionString.c_str(), connection, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     BOOST_FAIL(errInfo.errMsg);
   }
   BOOST_REQUIRE(connection.Get());
@@ -1155,7 +1155,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeysReturnsNone) {
   // get databaseMetaData object
   SharedPointer< GlobalJObject > databaseMetaData;
   if (_ctx.Get()->ConnectionGetMetaData(connection, databaseMetaData, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }
@@ -1167,7 +1167,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeysReturnsNone) {
   SharedPointer< GlobalJObject > resultSet;
   if (_ctx.Get()->DatabaseMetaDataGetImportedKeys(
           databaseMetaData, catalog, schema, fkTableName, resultSet, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }
@@ -1176,7 +1176,7 @@ BOOST_AUTO_TEST_CASE(TestDatabaseMetaDataGetImportedKeysReturnsNone) {
 
   bool hasNext;
   if (_ctx.Get()->ResultSetNext(resultSet, hasNext, errInfo)
-      != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string errMsg = errInfo.errMsg;
     BOOST_FAIL(errMsg);
   }

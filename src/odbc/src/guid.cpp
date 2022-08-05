@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/guid.h"
+#include "documentdb/odbc/guid.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 Guid::Guid() : most(0), least(0) {
   // No-op.
@@ -83,4 +83,4 @@ bool operator>=(const Guid& val1, const Guid& val2) {
   return val1.Compare(val2) >= 0;
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

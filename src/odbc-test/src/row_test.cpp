@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/row.h"
+#include "documentdb/odbc/row.h"
 
-#include <ignite/odbc/impl/binary/binary_writer_impl.h>
+#include <documentdb/odbc/impl/binary/binary_writer_impl.h>
 
 #include <boost/test/unit_test.hpp>
 
-#include "ignite/odbc/diagnostic/diagnosable_adapter.h"
-#include "ignite/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/diagnostic/diagnosable_adapter.h"
+#include "documentdb/odbc/system/odbc_constants.h"
 
-using namespace ignite::odbc::app;
-using namespace ignite::odbc;
+using namespace documentdb::odbc::app;
+using namespace documentdb::odbc;
 
 std::string GetStrColumnValue(size_t rowIdx) {
   std::stringstream generator;
@@ -35,10 +35,10 @@ std::string GetStrColumnValue(size_t rowIdx) {
   return generator.str();
 }
 
-void FillMemWithData(ignite::impl::interop::InteropUnpooledMemory& mem,
+void FillMemWithData(documentdb::impl::interop::InteropUnpooledMemory& mem,
                      size_t rowNum) {
-  using namespace ignite::impl::binary;
-  using namespace ignite::impl::interop;
+  using namespace documentdb::impl::binary;
+  using namespace documentdb::impl::interop;
 
   InteropOutputStream stream(&mem);
   BinaryWriterImpl writer(&stream, 0);
@@ -48,7 +48,7 @@ void FillMemWithData(ignite::impl::interop::InteropUnpooledMemory& mem,
     writer.WriteInt32(4);
 
     // First column is int.
-    writer.WriteInt8(IGNITE_TYPE_LONG);
+    writer.WriteInt8(DOCUMENTDB_TYPE_LONG);
     writer.WriteInt64(static_cast< int64_t >(i * 10));
 
     // Second column is string.
@@ -57,12 +57,12 @@ void FillMemWithData(ignite::impl::interop::InteropUnpooledMemory& mem,
     writer.WriteString(str.data(), static_cast< int32_t >(str.size()));
 
     // Third column is GUID.
-    ignite::Guid guid(0x2b218f63642a4a64UL, 0x9674098f388ac298UL + i);
+    documentdb::Guid guid(0x2b218f63642a4a64UL, 0x9674098f388ac298UL + i);
 
     writer.WriteGuid(guid);
 
     // The last column is bool.
-    writer.WriteInt8(IGNITE_TYPE_BOOL);
+    writer.WriteInt8(DOCUMENTDB_TYPE_BOOL);
     writer.WriteBool(i % 2 == 1);
   }
 
@@ -129,7 +129,7 @@ void CheckRowData(Row& row, size_t rowIdx) {
 BOOST_AUTO_TEST_SUITE(RowTestSuite)
 
 BOOST_AUTO_TEST_CASE(TestRowMoveToNext) {
-  ignite::impl::interop::InteropUnpooledMemory mem(4096);
+  documentdb::impl::interop::InteropUnpooledMemory mem(4096);
 
   const size_t rowNum = 32;
 
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(TestRowMoveToNext) {
 }
 
 BOOST_AUTO_TEST_CASE(TestRowRead) {
-  ignite::impl::interop::InteropUnpooledMemory mem(4096);
+  documentdb::impl::interop::InteropUnpooledMemory mem(4096);
 
   const size_t rowNum = 8;
 
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(TestRowRead) {
 }
 
 BOOST_AUTO_TEST_CASE(TestSingleRow) {
-  ignite::impl::interop::InteropUnpooledMemory mem(4096);
+  documentdb::impl::interop::InteropUnpooledMemory mem(4096);
 
   FillMemWithData(mem, 1);
 
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(TestSingleRow) {
 }
 
 BOOST_AUTO_TEST_CASE(TestTwoRows) {
-  ignite::impl::interop::InteropUnpooledMemory mem(4096);
+  documentdb::impl::interop::InteropUnpooledMemory mem(4096);
 
   FillMemWithData(mem, 2);
 

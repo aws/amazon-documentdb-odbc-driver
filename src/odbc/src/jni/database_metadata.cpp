@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/concurrent.h>
-#include <ignite/odbc/ignite_error.h>
-#include <ignite/odbc/jni/database_metadata.h>
-#include <ignite/odbc/jni/java.h>
+#include <documentdb/odbc/common/concurrent.h>
+#include <documentdb/odbc/documentdb_error.h>
+#include <documentdb/odbc/jni/database_metadata.h>
+#include <documentdb/odbc/jni/java.h>
 
-using ignite::odbc::common::concurrent::SharedPointer;
-using ignite::odbc::jni::ResultSet;
-using ignite::odbc::jni::java::GlobalJObject;
-using ignite::odbc::jni::java::JniContext;
-using ignite::odbc::jni::java::JniErrorCode;
-using ignite::odbc::jni::java::JniErrorInfo;
+using documentdb::odbc::common::concurrent::SharedPointer;
+using documentdb::odbc::jni::ResultSet;
+using documentdb::odbc::jni::java::GlobalJObject;
+using documentdb::odbc::jni::java::JniContext;
+using documentdb::odbc::jni::java::JniErrorCode;
+using documentdb::odbc::jni::java::JniErrorInfo;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace jni {
 SharedPointer< ResultSet > DatabaseMetaData::GetTables(
@@ -40,7 +40,7 @@ SharedPointer< ResultSet > DatabaseMetaData::GetTables(
   JniErrorCode success = _jniContext.Get()->DatabaseMetaDataGetTables(
       _databaseMetaData, catalog, schemaPattern, tableNamePattern, types,
       resultSet, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return nullptr;
   }
   return new ResultSet(_jniContext, resultSet);
@@ -56,7 +56,7 @@ SharedPointer< ResultSet > DatabaseMetaData::GetColumns(
   JniErrorCode success = _jniContext.Get()->DatabaseMetaDataGetColumns(
       _databaseMetaData, catalog, schemaPattern, tableNamePattern,
       columnNamePattern, resultSet, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return nullptr;
   }
   return new ResultSet(_jniContext, resultSet);
@@ -70,7 +70,7 @@ SharedPointer< ResultSet > DatabaseMetaData::GetPrimaryKeys(
   const std::vector< std::string > types;
   JniErrorCode success = _jniContext.Get()->DatabaseMetaDataGetPrimaryKeys(
       _databaseMetaData, catalog, schema, table, resultSet, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return nullptr;
   }
   return new ResultSet(_jniContext, resultSet);
@@ -84,11 +84,11 @@ SharedPointer< ResultSet > DatabaseMetaData::GetImportedKeys(
   const std::vector< std::string > types;
   JniErrorCode success = _jniContext.Get()->DatabaseMetaDataGetImportedKeys(
       _databaseMetaData, catalog, schema, table, resultSet, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return nullptr;
   }
   return new ResultSet(_jniContext, resultSet);
 }
 }  // namespace jni
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/system/ui/window.h"
+#include "documentdb/odbc/system/ui/window.h"
 
 #include <windowsx.h>
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace system {
 namespace ui {
@@ -33,7 +33,7 @@ HINSTANCE GetHInstance() {
     buf << "Can not get hInstance for the module, error code: "
         << GetLastError();
 
-    throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, buf.str().c_str());
+    throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC, buf.str().c_str());
   }
 
   return hInstance;
@@ -66,7 +66,7 @@ void Window::Create(DWORD style, int posX, int posY, int width, int height,
 
     buf << "Window already created, error code: " << GetLastError();
 
-    throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, buf.str().c_str());
+    throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC, buf.str().c_str());
   }
 
   handle = CreateWindow(className.c_str(), title.c_str(), style, posX, posY,
@@ -79,7 +79,7 @@ void Window::Create(DWORD style, int posX, int posY, int width, int height,
 
     buf << "Can not create window, error code: " << GetLastError();
 
-    throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, buf.str().c_str());
+    throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC, buf.str().c_str());
   }
 
   created = true;
@@ -165,4 +165,4 @@ bool Window::IsEnabled() const {
 }  // namespace ui
 }  // namespace system
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

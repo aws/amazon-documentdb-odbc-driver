@@ -36,12 +36,12 @@
 #pragma warning(pop)
 #endif  //_MSC_VER
 
-#include <ignite/odbc/binary/binary.h>
-#include <ignite/odbc/impl/binary/binary_utils.h>
+#include <documentdb/odbc/binary/binary.h>
+#include <documentdb/odbc/impl/binary/binary_utils.h>
 
 #include "test_server.h"
 
-namespace ignite {
+namespace documentdb {
 
 TestServerSession::TestServerSession(
     boost::asio::io_service& service,
@@ -166,4 +166,4 @@ void TestServer::HandleAccept(boost::shared_ptr< TestServerSession > session,
   StartAccept();
 }
 
-}  // namespace ignite
+}  // namespace documentdb

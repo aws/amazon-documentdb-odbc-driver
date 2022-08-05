@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/common/bits.h"
+#include "documentdb/odbc/common/bits.h"
 
 #include <algorithm>
 #include <cassert>
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace common {
 namespace bits {
@@ -219,4 +219,4 @@ uint64_t TenPowerU64(int32_t n) {
 }  // namespace bits
 }  // namespace common
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

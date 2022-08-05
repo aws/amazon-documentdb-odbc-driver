@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/documentdb_cursor.h"
+#include "documentdb/odbc/documentdb_cursor.h"
 #include "mongocxx/cursor.hpp"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 DocumentDbCursor::DocumentDbCursor(
     mongocxx::cursor& cursor, std::vector< JdbcColumnMetadata >& columnMetadata,
@@ -65,4 +65,4 @@ DocumentDbRow* DocumentDbCursor::GetRow() {
   return currentRow_.get();
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

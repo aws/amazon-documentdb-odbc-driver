@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-#ifndef _IGNITE_ODBC_TEST_TEST_TYPE
-#define _IGNITE_ODBC_TEST_TEST_TYPE
+#ifndef _DOCUMENTDB_ODBC_TEST_TEST_TYPE
+#define _DOCUMENTDB_ODBC_TEST_TEST_TYPE
 
 #include <string>
-#include <ignite/odbc/guid.h>
-#include <ignite/odbc/binary/binary.h>
-#include <ignite/odbc/date.h>
+#include <documentdb/odbc/guid.h>
+#include <documentdb/odbc/binary/binary.h>
+#include <documentdb/odbc/date.h>
 
-using namespace ignite::odbc;
+using namespace documentdb::odbc;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 struct TestType {
   TestType()
@@ -92,15 +92,15 @@ struct TestType {
 };
 
 namespace binary {
-IGNITE_BINARY_TYPE_START(ignite::odbc::TestType)
+DOCUMENTDB_BINARY_TYPE_START(documentdb::odbc::TestType)
 
-typedef ignite::odbc::TestType TestType;
+typedef documentdb::odbc::TestType TestType;
 
-IGNITE_BINARY_GET_TYPE_ID_AS_HASH(TestType)
-IGNITE_BINARY_GET_TYPE_NAME_AS_IS(TestType)
-IGNITE_BINARY_GET_FIELD_ID_AS_HASH
-IGNITE_BINARY_IS_NULL_FALSE(TestType)
-IGNITE_BINARY_GET_NULL_DEFAULT_CTOR(TestType)
+DOCUMENTDB_BINARY_GET_TYPE_ID_AS_HASH(TestType)
+DOCUMENTDB_BINARY_GET_TYPE_NAME_AS_IS(TestType)
+DOCUMENTDB_BINARY_GET_FIELD_ID_AS_HASH
+DOCUMENTDB_BINARY_IS_NULL_FALSE(TestType)
+DOCUMENTDB_BINARY_GET_NULL_DEFAULT_CTOR(TestType)
 
 static void Write(BinaryWriter& writer, const TestType& obj) {
   if (!obj.allNulls) {
@@ -160,9 +160,9 @@ static void Read(BinaryReader& reader, TestType& dst) {
   }
 }
 
-IGNITE_BINARY_TYPE_END
+DOCUMENTDB_BINARY_TYPE_END
 }  // namespace binary
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb
 
-#endif  // _IGNITE_ODBC_TEST_TEST_TYPE
+#endif  // _DOCUMENTDB_ODBC_TEST_TEST_TYPE

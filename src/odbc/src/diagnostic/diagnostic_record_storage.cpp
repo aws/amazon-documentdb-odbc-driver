@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/diagnostic/diagnostic_record_storage.h"
+#include "documentdb/odbc/diagnostic/diagnostic_record_storage.h"
 
 #include <set>
 #include <string>
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace diagnostic {
 DiagnosticRecordStorage::DiagnosticRecordStorage()
@@ -227,4 +227,4 @@ SqlResult::Type DiagnosticRecordStorage::GetField(
 
 }  // namespace diagnostic
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

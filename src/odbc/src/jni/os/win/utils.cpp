@@ -15,23 +15,23 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/common/utils.h"
+#include "documentdb/odbc/common/utils.h"
 
 #include <windows.h>
 
 #include <algorithm>
 
-#include "ignite/odbc/common/concurrent.h"
-#include "ignite/odbc/common/fixed_size_array.h"
-#include "ignite/odbc/jni/java.h"
-#include "ignite/odbc/jni/utils.h"
+#include "documentdb/odbc/common/concurrent.h"
+#include "documentdb/odbc/common/fixed_size_array.h"
+#include "documentdb/odbc/jni/java.h"
+#include "documentdb/odbc/jni/utils.h"
 
-using namespace ignite::odbc::common;
-using namespace ignite::odbc::common::concurrent;
+using namespace documentdb::odbc::common;
+using namespace documentdb::odbc::common::concurrent;
 
-using namespace ignite::odbc::jni::java;
+using namespace documentdb::odbc::jni::java;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace jni {
 const char* JAVA_HOME = "JAVA_HOME";
@@ -40,7 +40,7 @@ const char* JAVA_DLL2 = "\\bin\\server\\jvm.dll";
 
 const char* DOCUMENTDB_HOME = "DOCUMENTDB_HOME";
 
-const char* IGNITE_NATIVE_TEST_CLASSPATH = "IGNITE_NATIVE_TEST_CLASSPATH";
+const char* DOCUMENTDB_NATIVE_TEST_CLASSPATH = "DOCUMENTDB_NATIVE_TEST_CLASSPATH";
 
 /** Excluded modules from test classpath. */
 const char* TEST_EXCLUDED_MODULES[] = {"rest-http"};
@@ -67,28 +67,14 @@ bool LooksLikeBinaryReleaseHome(const std::string& path) {
 }
 
 /**
- * Checks if the path looks like source release home directory.
- * Internally checks for presence of core source directory.
- * @return @c true if the path looks like binary release home directory.
- */
-bool LooksLikeSourceReleaseHome(const std::string& path) {
-  static const char* PROBE_CORE_SOURCE =
-      "\\modules\\core\\src\\main\\java\\org\\apache\\ignite";
-
-  std::string coreSourcePath = path + PROBE_CORE_SOURCE;
-
-  return IsValidDirectory(coreSourcePath);
-}
-
-/**
- * Helper function for Ignite home resolution.
+ * Helper function for DocumentDB home resolution.
  * Goes upwards in directory hierarchy and checks whether certain
  * folders exist in the path.
  *
  * @param path Path to evaluate.
  * @return res Resolved directory. Empty string if not found.
  */
-std::string ResolveIgniteHome0(const std::string& path) {
+std::string ResolveDocumentDbHome0(const std::string& path) {
   if (!IsValidDirectory(path))
     return std::string();
 
@@ -100,7 +86,7 @@ std::string ResolveIgniteHome0(const std::string& path) {
 
   std::string path0(path, 0, last + 1);
 
-  if (LooksLikeBinaryReleaseHome(path0) || LooksLikeSourceReleaseHome(path0))
+  if (LooksLikeBinaryReleaseHome(path0))
     return path0;
 
   // Evaluate parent directory.
@@ -111,7 +97,7 @@ std::string ResolveIgniteHome0(const std::string& path) {
 
   std::string parent(path0, 0, slashPos);
 
-  return ResolveIgniteHome0(parent);
+  return ResolveDocumentDbHome0(parent);
 }
 
 /**
@@ -318,7 +304,7 @@ std::string CreateDocumentDbClasspath(const std::string& usrCp,
 
   // 2. Append home classpath
   if (!home.empty()) {
-    std::string env = GetEnv(IGNITE_NATIVE_TEST_CLASSPATH, "false");
+    std::string env = GetEnv(DOCUMENTDB_NATIVE_TEST_CLASSPATH, "false");
 
     bool forceTest = ToLower(env) == "true";
 
@@ -357,11 +343,11 @@ std::string ResolveDocumentDbHome(const std::string& path) {
 
   std::string curDirStr(curDir.GetData());
 
-  return ResolveIgniteHome0(curDirStr);
+  return ResolveDocumentDbHome0(curDirStr);
 }
 }  // namespace jni
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb
 
 BOOL WINAPI DllMain(_In_ HINSTANCE hinstDLL, _In_ DWORD fdwReason,
                     _In_ LPVOID lpvReserved) {

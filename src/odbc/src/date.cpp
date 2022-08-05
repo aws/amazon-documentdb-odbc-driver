@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/date.h"
+#include "documentdb/odbc/date.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 Date::Date() : milliseconds(0) {
   // No-op.
@@ -69,4 +69,4 @@ bool operator>=(const Date& val1, const Date& val2) {
   return val1.milliseconds >= val2.milliseconds;
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

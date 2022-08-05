@@ -15,21 +15,21 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/decimal.h>
-#include <ignite/odbc/guid.h>
-#include <ignite/odbc/app/application_data_buffer.h>
-#include <ignite/odbc/system/odbc_constants.h>
-#include <ignite/odbc/utility.h>
+#include <documentdb/odbc/common/decimal.h>
+#include <documentdb/odbc/guid.h>
+#include <documentdb/odbc/app/application_data_buffer.h>
+#include <documentdb/odbc/system/odbc_constants.h>
+#include <documentdb/odbc/utility.h>
 
 #include <boost/test/unit_test.hpp>
 
 #define FLOAT_PRECISION 0.0000001f
 
 using namespace boost::unit_test;
-using namespace ignite;
-using namespace ignite::odbc;
-using namespace ignite::odbc::app;
-using namespace ignite::odbc::type_traits;
+using namespace documentdb;
+using namespace documentdb::odbc;
+using namespace documentdb::odbc::app;
+using namespace documentdb::odbc::type_traits;
 
 BOOST_AUTO_TEST_SUITE(ApplicationDataBufferTestSuite)
 
@@ -1028,13 +1028,13 @@ BOOST_AUTO_TEST_CASE(TestSetStringWithOffset) {
   ApplicationDataBuffer appBuf(OdbcNativeType::AI_CHAR, &buf[0].val,
                                sizeof(buf[0].val), &buf[0].reslen);
 
-  appBuf.PutString("Hello Ignite!");
+  appBuf.PutString("Hello world!");
 
   std::string res(buf[0].val, buf[0].reslen);
 
-  BOOST_CHECK(buf[0].reslen == strlen("Hello Ignite!"));
-  BOOST_CHECK(res == "Hello Ignite!");
-  BOOST_CHECK(res.size() == strlen("Hello Ignite!"));
+  BOOST_CHECK(buf[0].reslen == strlen("Hello world!"));
+  BOOST_CHECK(res == "Hello world!");
+  BOOST_CHECK(res.size() == strlen("Hello world!"));
 
   appBuf.SetByteOffset(sizeof(SetStringWithOffsetTestStruct));
 
@@ -1042,9 +1042,9 @@ BOOST_AUTO_TEST_CASE(TestSetStringWithOffset) {
 
   res.assign(buf[0].val, buf[0].reslen);
 
-  BOOST_CHECK(res == "Hello Ignite!");
-  BOOST_CHECK(res.size() == strlen("Hello Ignite!"));
-  BOOST_CHECK(buf[0].reslen == strlen("Hello Ignite!"));
+  BOOST_CHECK(res == "Hello world!");
+  BOOST_CHECK(res.size() == strlen("Hello world!"));
+  BOOST_CHECK(buf[0].reslen == strlen("Hello world!"));
 
   res.assign(buf[1].val, buf[1].reslen);
 
