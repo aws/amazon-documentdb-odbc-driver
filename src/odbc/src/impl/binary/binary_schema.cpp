@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/binary/binary_schema.h"
+#include "documentdb/odbc/impl/binary/binary_schema.h"
 
 #include <cassert>
 
-#include "ignite/odbc/impl/binary/binary_writer_impl.h"
+#include "documentdb/odbc/impl/binary/binary_writer_impl.h"
 
 /** FNV1 hash offset basis. */
 enum { FNV1_OFFSET_BASIS = 0x811C9DC5L };
@@ -27,7 +27,7 @@ enum { FNV1_OFFSET_BASIS = 0x811C9DC5L };
 /** FNV1 hash prime. */
 enum { FNV1_PRIME = 0x01000193 };
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace binary {
@@ -120,4 +120,4 @@ BinaryOffsetType::Type BinarySchema::GetType() const {
 }  // namespace binary
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

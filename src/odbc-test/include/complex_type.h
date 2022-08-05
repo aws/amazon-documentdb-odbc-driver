@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-#ifndef _IGNITE_ODBC_TEST_COMPLEX_TYPE
-#define _IGNITE_ODBC_TEST_COMPLEX_TYPE
+#ifndef _DOCUMENTDB_ODBC_TEST_COMPLEX_TYPE
+#define _DOCUMENTDB_ODBC_TEST_COMPLEX_TYPE
 
 #include <string>
 
-#include "ignite/odbc/ignite.h"
+#include "documentdb/odbc/ignite.h"
 
-namespace ignite {
+namespace documentdb {
 struct TestObject {
   TestObject() : f1(412), f2("Lorem ipsum") {
     // No-op.
@@ -62,21 +62,21 @@ struct ComplexType {
   TestObject objField;
   std::string strField;
 };
-}  // namespace ignite
+}  // namespace documentdb
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace binary {
 
-IGNITE_BINARY_TYPE_START(ignite::TestObject)
+DOCUMENTDB_BINARY_TYPE_START(documentdb::TestObject)
 
-typedef ignite::TestObject TestObject;
+typedef documentdb::TestObject TestObject;
 
-IGNITE_BINARY_GET_TYPE_ID_AS_HASH(TestObject)
-IGNITE_BINARY_GET_TYPE_NAME_AS_IS(TestObject)
-IGNITE_BINARY_GET_FIELD_ID_AS_HASH
-IGNITE_BINARY_IS_NULL_FALSE(TestObject)
-IGNITE_BINARY_GET_NULL_DEFAULT_CTOR(TestObject)
+DOCUMENTDB_BINARY_GET_TYPE_ID_AS_HASH(TestObject)
+DOCUMENTDB_BINARY_GET_TYPE_NAME_AS_IS(TestObject)
+DOCUMENTDB_BINARY_GET_FIELD_ID_AS_HASH
+DOCUMENTDB_BINARY_IS_NULL_FALSE(TestObject)
+DOCUMENTDB_BINARY_GET_NULL_DEFAULT_CTOR(TestObject)
 
 static void Write(BinaryWriter& writer, const TestObject& obj) {
   writer.WriteInt32("f1", obj.f1);
@@ -88,17 +88,17 @@ static void Read(BinaryReader& reader, TestObject& dst) {
   dst.f2 = reader.ReadString("f2");
 }
 
-IGNITE_BINARY_TYPE_END
+DOCUMENTDB_BINARY_TYPE_END
 
-IGNITE_BINARY_TYPE_START(ignite::ComplexType)
+DOCUMENTDB_BINARY_TYPE_START(documentdb::ComplexType)
 
-typedef ignite::ComplexType ComplexType;
+typedef documentdb::ComplexType ComplexType;
 
-IGNITE_BINARY_GET_TYPE_ID_AS_HASH(ComplexType)
-IGNITE_BINARY_GET_TYPE_NAME_AS_IS(ComplexType)
-IGNITE_BINARY_GET_FIELD_ID_AS_HASH
-IGNITE_BINARY_IS_NULL_FALSE(ComplexType)
-IGNITE_BINARY_GET_NULL_DEFAULT_CTOR(ComplexType)
+DOCUMENTDB_BINARY_GET_TYPE_ID_AS_HASH(ComplexType)
+DOCUMENTDB_BINARY_GET_TYPE_NAME_AS_IS(ComplexType)
+DOCUMENTDB_BINARY_GET_FIELD_ID_AS_HASH
+DOCUMENTDB_BINARY_IS_NULL_FALSE(ComplexType)
+DOCUMENTDB_BINARY_GET_NULL_DEFAULT_CTOR(ComplexType)
 
 static void Write(BinaryWriter& writer, const ComplexType& obj) {
   writer.WriteInt32("i32Field", obj.i32Field);
@@ -112,9 +112,9 @@ static void Read(BinaryReader& reader, ComplexType& dst) {
   dst.strField = reader.ReadString("strField");
 }
 
-IGNITE_BINARY_TYPE_END
+DOCUMENTDB_BINARY_TYPE_END
 }  // namespace binary
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb
 
-#endif  // _IGNITE_ODBC_TEST_COMPLEX_TYPE
+#endif  // _DOCUMENTDB_ODBC_TEST_COMPLEX_TYPE

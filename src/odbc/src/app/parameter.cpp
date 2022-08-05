@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/app/parameter.h"
+#include "documentdb/odbc/app/parameter.h"
 
 #include <algorithm>
 
-#include "ignite/odbc/system/odbc_constants.h"
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/utility.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace app {
 Parameter::Parameter()
@@ -254,4 +254,4 @@ void Parameter::PutData(void* data, SqlLen len) {
 }
 }  // namespace app
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

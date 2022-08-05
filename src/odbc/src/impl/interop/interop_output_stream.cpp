@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/interop//interop_output_stream.h"
+#include "documentdb/odbc/impl/interop//interop_output_stream.h"
 
-#include <ignite/odbc/ignite_error.h>
+#include <documentdb/odbc/documentdb_error.h>
 
 #include <cstring>
 
 /**
  * Common macro to write a single value.
  */
-#define IGNITE_INTEROP_OUT_WRITE(val, type, len)  \
+#define DOCUMENTDB_INTEROP_OUT_WRITE(val, type, len)  \
   {                                               \
     EnsureCapacity(pos + len);                    \
     *reinterpret_cast< type* >(data + pos) = val; \
@@ -34,10 +34,10 @@
 /**
  * Common macro to write an array.
  */
-#define IGNITE_INTEROP_OUT_WRITE_ARRAY(val, len) \
+#define DOCUMENTDB_INTEROP_OUT_WRITE_ARRAY(val, len) \
   { CopyAndShift(reinterpret_cast< const int8_t* >(val), 0, len); }
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace interop {
@@ -50,7 +50,7 @@ InteropOutputStream::InteropOutputStream(InteropMemory* mem) {
 }
 
 void InteropOutputStream::WriteInt8(const int8_t val) {
-  IGNITE_INTEROP_OUT_WRITE(val, int8_t, 1);
+  DOCUMENTDB_INTEROP_OUT_WRITE(val, int8_t, 1);
 }
 
 void InteropOutputStream::WriteInt8(const int8_t val, const int32_t pos) {
@@ -60,7 +60,7 @@ void InteropOutputStream::WriteInt8(const int8_t val, const int32_t pos) {
 }
 
 void InteropOutputStream::WriteInt8Array(const int8_t* val, const int32_t len) {
-  IGNITE_INTEROP_OUT_WRITE_ARRAY(val, len);
+  DOCUMENTDB_INTEROP_OUT_WRITE_ARRAY(val, len);
 }
 
 void InteropOutputStream::WriteBool(const bool val) {
@@ -73,7 +73,7 @@ void InteropOutputStream::WriteBoolArray(const bool* val, const int32_t len) {
 }
 
 void InteropOutputStream::WriteInt16(const int16_t val) {
-  IGNITE_INTEROP_OUT_WRITE(val, int16_t, 2);
+  DOCUMENTDB_INTEROP_OUT_WRITE(val, int16_t, 2);
 }
 
 void InteropOutputStream::WriteInt16(const int32_t pos, const int16_t val) {
@@ -84,20 +84,20 @@ void InteropOutputStream::WriteInt16(const int32_t pos, const int16_t val) {
 
 void InteropOutputStream::WriteInt16Array(const int16_t* val,
                                           const int32_t len) {
-  IGNITE_INTEROP_OUT_WRITE_ARRAY(val, len << 1);
+  DOCUMENTDB_INTEROP_OUT_WRITE_ARRAY(val, len << 1);
 }
 
 void InteropOutputStream::WriteUInt16(const uint16_t val) {
-  IGNITE_INTEROP_OUT_WRITE(val, uint16_t, 2);
+  DOCUMENTDB_INTEROP_OUT_WRITE(val, uint16_t, 2);
 }
 
 void InteropOutputStream::WriteUInt16Array(const uint16_t* val,
                                            const int32_t len) {
-  IGNITE_INTEROP_OUT_WRITE_ARRAY(val, len << 1);
+  DOCUMENTDB_INTEROP_OUT_WRITE_ARRAY(val, len << 1);
 }
 
 void InteropOutputStream::WriteInt32(const int32_t val) {
-  IGNITE_INTEROP_OUT_WRITE(val, int32_t, 4);
+  DOCUMENTDB_INTEROP_OUT_WRITE(val, int32_t, 4);
 }
 
 void InteropOutputStream::WriteInt32(const int32_t pos, const int32_t val) {
@@ -108,11 +108,11 @@ void InteropOutputStream::WriteInt32(const int32_t pos, const int32_t val) {
 
 void InteropOutputStream::WriteInt32Array(const int32_t* val,
                                           const int32_t len) {
-  IGNITE_INTEROP_OUT_WRITE_ARRAY(val, len << 2);
+  DOCUMENTDB_INTEROP_OUT_WRITE_ARRAY(val, len << 2);
 }
 
 void InteropOutputStream::WriteInt64(const int64_t val) {
-  IGNITE_INTEROP_OUT_WRITE(val, int64_t, 8);
+  DOCUMENTDB_INTEROP_OUT_WRITE(val, int64_t, 8);
 }
 
 void InteropOutputStream::WriteInt64(const int32_t pos, const int64_t val) {
@@ -123,7 +123,7 @@ void InteropOutputStream::WriteInt64(const int32_t pos, const int64_t val) {
 
 void InteropOutputStream::WriteInt64Array(const int64_t* val,
                                           const int32_t len) {
-  IGNITE_INTEROP_OUT_WRITE_ARRAY(val, len << 3);
+  DOCUMENTDB_INTEROP_OUT_WRITE_ARRAY(val, len << 3);
 }
 
 void InteropOutputStream::WriteFloat(const float val) {
@@ -209,4 +209,4 @@ void InteropOutputStream::CopyAndShift(const int8_t* src, int32_t off,
 }  // namespace interop
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

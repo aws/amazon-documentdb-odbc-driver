@@ -27,13 +27,13 @@
 #include <string>
 #include <vector>
 
-#include "ignite/ignite.h"
+#include "documentdb/ignite.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"
 #include "test_utils.h"
 
-using namespace ignite;
-using namespace ignite_test;
+using namespace documentdb;
+using namespace documentdb_test;
 
 using namespace boost::unit_test;
 

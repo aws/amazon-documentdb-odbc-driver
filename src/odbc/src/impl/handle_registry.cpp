@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/handle_registry.h"
+#include "documentdb/odbc/impl/handle_registry.h"
 
-using namespace ignite::odbc::common::concurrent;
+using namespace documentdb::odbc::common::concurrent;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 HandleRegistrySegment::HandleRegistrySegment() : map(), mux() {
@@ -194,4 +194,4 @@ int64_t HandleRegistry::Allocate0(const SharedPointer< void >& target,
 }
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

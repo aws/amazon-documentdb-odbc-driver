@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/app/application_data_buffer.h"
+#include "documentdb/odbc/app/application_data_buffer.h"
 
 #include <algorithm>
 #include <codecvt>
@@ -24,12 +24,12 @@
 #include <vector>
 
 #include <sqltypes.h>
-#include "ignite/odbc/common/bits.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/system/odbc_constants.h"
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/common/bits.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/utility.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace app {
 using impl::binary::BinaryUtils;
@@ -1806,4 +1806,4 @@ SqlLen ApplicationDataBuffer::GetInputSize() const {
 }
 }  // namespace app
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

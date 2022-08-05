@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/streaming/streaming_context.h"
+#include "documentdb/odbc/streaming/streaming_context.h"
 
-#include "ignite/odbc/connection.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/message.h"
-#include "ignite/odbc/sql/sql_set_streaming_command.h"
+#include "documentdb/odbc/connection.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/message.h"
+#include "documentdb/odbc/sql/sql_set_streaming_command.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace streaming {
 StreamingContext::StreamingContext()
@@ -104,7 +104,7 @@ SqlResult::Type StreamingContext::MakeRequestStreamingBatch(bool last) {
     connection->AddStatusRecord(err);
 
     return SqlResult::AI_ERROR;
-  } catch (const IgniteError& err) {
+  } catch (const DocumentDbError& err) {
     connection->AddStatusRecord(err.GetText());
 
     return SqlResult::AI_ERROR;
@@ -138,4 +138,4 @@ SqlResult::Type StreamingContext::MakeRequestStreamingBatch(bool last) {
 }
 }  // namespace streaming
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

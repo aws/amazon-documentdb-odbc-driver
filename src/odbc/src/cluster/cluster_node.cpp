@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/cluster/cluster_node.h"
+#include "documentdb/odbc/cluster/cluster_node.h"
 
-using namespace ignite::odbc::common::concurrent;
-using namespace ignite::odbc::impl::cluster;
+using namespace documentdb::odbc::common::concurrent;
+using namespace documentdb::odbc::impl::cluster;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace cluster {
 ClusterNode::ClusterNode(SharedPointer< ClusterNodeImpl > impl) : impl(impl) {
@@ -72,4 +72,4 @@ const IgniteProductVersion& ClusterNode::GetVersion() const {
 }
 }  // namespace cluster
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

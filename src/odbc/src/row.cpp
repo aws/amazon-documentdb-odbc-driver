@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/row.h"
+#include "documentdb/odbc/row.h"
 
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/utility.h"
 
-using namespace ignite::odbc::impl::interop;
+using namespace documentdb::odbc::impl::interop;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 Row::Row(InteropUnpooledMemory& pageData)
     : rowBeginPos(0),
@@ -109,4 +109,4 @@ void Row::Reinit() {
   pos = 0;
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

@@ -15,53 +15,53 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/common.h>
+#include <documentdb/odbc/common/common.h>
 
-#include "ignite/odbc.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/utility.h"
 
 SQLRETURN SQL_API SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType,
                              SQLPOINTER infoValue, SQLSMALLINT infoValueMax,
                              SQLSMALLINT* length) {
-  return ignite::SQLGetInfo(conn, infoType, infoValue, infoValueMax, length);
+  return documentdb::SQLGetInfo(conn, infoType, infoValue, infoValueMax, length);
 }
 
 SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent,
                                  SQLHANDLE* result) {
-  return ignite::SQLAllocHandle(type, parent, result);
+  return documentdb::SQLAllocHandle(type, parent, result);
 }
 
 SQLRETURN SQL_API SQLAllocEnv(SQLHENV* env) {
-  return ignite::SQLAllocEnv(env);
+  return documentdb::SQLAllocEnv(env);
 }
 
 SQLRETURN SQL_API SQLAllocConnect(SQLHENV env, SQLHDBC* conn) {
-  return ignite::SQLAllocConnect(env, conn);
+  return documentdb::SQLAllocConnect(env, conn);
 }
 
 SQLRETURN SQL_API SQLAllocStmt(SQLHDBC conn, SQLHSTMT* stmt) {
-  return ignite::SQLAllocStmt(conn, stmt);
+  return documentdb::SQLAllocStmt(conn, stmt);
 }
 
 SQLRETURN SQL_API SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle) {
-  return ignite::SQLFreeHandle(type, handle);
+  return documentdb::SQLFreeHandle(type, handle);
 }
 
 SQLRETURN SQL_API SQLFreeEnv(SQLHENV env) {
-  return ignite::SQLFreeEnv(env);
+  return documentdb::SQLFreeEnv(env);
 }
 
 SQLRETURN SQL_API SQLFreeConnect(SQLHDBC conn) {
-  return ignite::SQLFreeConnect(conn);
+  return documentdb::SQLFreeConnect(conn);
 }
 
 SQLRETURN SQL_API SQLFreeStmt(SQLHSTMT stmt, SQLUSMALLINT option) {
-  return ignite::SQLFreeStmt(stmt, option);
+  return documentdb::SQLFreeStmt(stmt, option);
 }
 
 SQLRETURN SQL_API SQLCloseCursor(SQLHSTMT stmt) {
-  return ignite::SQLCloseCursor(stmt);
+  return documentdb::SQLCloseCursor(stmt);
 }
 
 SQLRETURN SQL_API SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
@@ -71,7 +71,7 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
                                    SQLSMALLINT outConnectionStringBufferLen,
                                    SQLSMALLINT* outConnectionStringLen,
                                    SQLUSMALLINT driverCompletion) {
-  return ignite::SQLDriverConnect(conn, windowHandle, inConnectionString,
+  return documentdb::SQLDriverConnect(conn, windowHandle, inConnectionString,
                                   inConnectionStringLen, outConnectionString,
                                   outConnectionStringBufferLen,
                                   outConnectionStringLen, driverCompletion);
@@ -81,54 +81,54 @@ SQLRETURN SQL_API SQLConnect(SQLHDBC conn, SQLWCHAR* serverName,
                              SQLSMALLINT serverNameLen, SQLWCHAR* userName,
                              SQLSMALLINT userNameLen, SQLWCHAR* auth,
                              SQLSMALLINT authLen) {
-  return ignite::SQLConnect(conn, serverName, serverNameLen, userName,
+  return documentdb::SQLConnect(conn, serverName, serverNameLen, userName,
                             userNameLen, auth, authLen);
 }
 
 SQLRETURN SQL_API SQLDisconnect(SQLHDBC conn) {
-  return ignite::SQLDisconnect(conn);
+  return documentdb::SQLDisconnect(conn);
 }
 
 SQLRETURN SQL_API SQLPrepare(SQLHSTMT stmt, SQLWCHAR* query,
                              SQLINTEGER queryLen) {
-  return ignite::SQLPrepare(stmt, query, queryLen);
+  return documentdb::SQLPrepare(stmt, query, queryLen);
 }
 
 SQLRETURN SQL_API SQLExecute(SQLHSTMT stmt) {
-  return ignite::SQLExecute(stmt);
+  return documentdb::SQLExecute(stmt);
 }
 
 SQLRETURN SQL_API SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* query,
                                 SQLINTEGER queryLen) {
-  return ignite::SQLExecDirect(stmt, query, queryLen);
+  return documentdb::SQLExecDirect(stmt, query, queryLen);
 }
 
 SQLRETURN SQL_API SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT colNum,
                              SQLSMALLINT targetType, SQLPOINTER targetValue,
                              SQLLEN bufferLength,
                              SQLLEN* strLengthOrIndicator) {
-  return ignite::SQLBindCol(stmt, colNum, targetType, targetValue, bufferLength,
+  return documentdb::SQLBindCol(stmt, colNum, targetType, targetValue, bufferLength,
                             strLengthOrIndicator);
 }
 
 SQLRETURN SQL_API SQLFetch(SQLHSTMT stmt) {
-  return ignite::SQLFetch(stmt);
+  return documentdb::SQLFetch(stmt);
 }
 
 SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT stmt, SQLSMALLINT orientation,
                                  SQLLEN offset) {
-  return ignite::SQLFetchScroll(stmt, orientation, offset);
+  return documentdb::SQLFetchScroll(stmt, orientation, offset);
 }
 
 SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT orientation,
                                    SQLLEN offset, SQLULEN* rowCount,
                                    SQLUSMALLINT* rowStatusArray) {
-  return ignite::SQLExtendedFetch(stmt, orientation, offset, rowCount,
+  return documentdb::SQLExtendedFetch(stmt, orientation, offset, rowCount,
                                   rowStatusArray);
 }
 
 SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnNum) {
-  return ignite::SQLNumResultCols(stmt, columnNum);
+  return documentdb::SQLNumResultCols(stmt, columnNum);
 }
 
 SQLRETURN SQL_API SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
@@ -136,7 +136,7 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
                             SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
                             SQLSMALLINT tableNameLen, SQLWCHAR* tableType,
                             SQLSMALLINT tableTypeLen) {
-  return ignite::SQLTables(stmt, catalogName, catalogNameLen, schemaName,
+  return documentdb::SQLTables(stmt, catalogName, catalogNameLen, schemaName,
                            schemaNameLen, tableName, tableNameLen, tableType,
                            tableTypeLen);
 }
@@ -146,13 +146,13 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
                              SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
                              SQLSMALLINT tableNameLen, SQLWCHAR* columnName,
                              SQLSMALLINT columnNameLen) {
-  return ignite::SQLColumns(stmt, catalogName, catalogNameLen, schemaName,
+  return documentdb::SQLColumns(stmt, catalogName, catalogNameLen, schemaName,
                             schemaNameLen, tableName, tableNameLen, columnName,
                             columnNameLen);
 }
 
 SQLRETURN SQL_API SQLMoreResults(SQLHSTMT stmt) {
-  return ignite::SQLMoreResults(stmt);
+  return documentdb::SQLMoreResults(stmt);
 }
 
 SQLRETURN SQL_API SQLBindParameter(SQLHSTMT stmt, SQLUSMALLINT paramIdx,
@@ -160,7 +160,7 @@ SQLRETURN SQL_API SQLBindParameter(SQLHSTMT stmt, SQLUSMALLINT paramIdx,
                                    SQLSMALLINT paramSqlType, SQLULEN columnSize,
                                    SQLSMALLINT decDigits, SQLPOINTER buffer,
                                    SQLLEN bufferLen, SQLLEN* resLen) {
-  return ignite::SQLBindParameter(stmt, paramIdx, ioType, bufferType,
+  return documentdb::SQLBindParameter(stmt, paramIdx, ioType, bufferType,
                                   paramSqlType, columnSize, decDigits, buffer,
                                   bufferLen, resLen);
 }
@@ -169,7 +169,7 @@ SQLRETURN SQL_API SQLNativeSql(SQLHDBC conn, SQLWCHAR* inQuery,
                                SQLINTEGER inQueryLen, SQLWCHAR* outQueryBuffer,
                                SQLINTEGER outQueryBufferLen,
                                SQLINTEGER* outQueryLen) {
-  return ignite::SQLNativeSql(conn, inQuery, inQueryLen, outQueryBuffer,
+  return documentdb::SQLNativeSql(conn, inQuery, inQueryLen, outQueryBuffer,
                               outQueryBufferLen, outQueryLen);
 }
 
@@ -186,7 +186,7 @@ SQLRETURN SQL_API SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT columnNum,
                                   SQLPOINTER numericAttr)
 #endif
 {
-  return ignite::SQLColAttribute(stmt, columnNum, fieldId, strAttr, bufferLen,
+  return documentdb::SQLColAttribute(stmt, columnNum, fieldId, strAttr, bufferLen,
                                  strAttrLen, (SQLLEN*)numericAttr);
 }
 
@@ -197,13 +197,13 @@ SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
                                  SQLSMALLINT* dataType, SQLULEN* columnSize,
                                  SQLSMALLINT* decimalDigits,
                                  SQLSMALLINT* nullable) {
-  return ignite::SQLDescribeCol(stmt, columnNum, columnNameBuf,
+  return documentdb::SQLDescribeCol(stmt, columnNum, columnNameBuf,
                                 columnNameBufLen, columnNameLen, dataType,
                                 columnSize, decimalDigits, nullable);
 }
 
 SQLRETURN SQL_API SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCnt) {
-  return ignite::SQLRowCount(stmt, rowCnt);
+  return documentdb::SQLRowCount(stmt, rowCnt);
 }
 
 SQLRETURN SQL_API
@@ -214,7 +214,7 @@ SQLForeignKeys(SQLHSTMT stmt, SQLWCHAR* primaryCatalogName,
                SQLSMALLINT foreignCatalogNameLen, SQLWCHAR* foreignSchemaName,
                SQLSMALLINT foreignSchemaNameLen, SQLWCHAR* foreignTableName,
                SQLSMALLINT foreignTableNameLen) {
-  return ignite::SQLForeignKeys(
+  return documentdb::SQLForeignKeys(
       stmt, primaryCatalogName, primaryCatalogNameLen, primarySchemaName,
       primarySchemaNameLen, primaryTableName, primaryTableNameLen,
       foreignCatalogName, foreignCatalogNameLen, foreignSchemaName,
@@ -224,12 +224,12 @@ SQLForeignKeys(SQLHSTMT stmt, SQLWCHAR* primaryCatalogName,
 SQLRETURN SQL_API SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attr,
                                  SQLPOINTER valueBuf, SQLINTEGER valueBufLen,
                                  SQLINTEGER* valueResLen) {
-  return ignite::SQLGetStmtAttr(stmt, attr, valueBuf, valueBufLen, valueResLen);
+  return documentdb::SQLGetStmtAttr(stmt, attr, valueBuf, valueBufLen, valueResLen);
 }
 
 SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attr,
                                  SQLPOINTER value, SQLINTEGER valueLen) {
-  return ignite::SQLSetStmtAttr(stmt, attr, value, valueLen);
+  return documentdb::SQLSetStmtAttr(stmt, attr, value, valueLen);
 }
 
 SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
@@ -237,19 +237,19 @@ SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
                                  SQLWCHAR* schemaName,
                                  SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
                                  SQLSMALLINT tableNameLen) {
-  return ignite::SQLPrimaryKeys(stmt, catalogName, catalogNameLen, schemaName,
+  return documentdb::SQLPrimaryKeys(stmt, catalogName, catalogNameLen, schemaName,
                                 schemaNameLen, tableName, tableNameLen);
 }
 
 SQLRETURN SQL_API SQLNumParams(SQLHSTMT stmt, SQLSMALLINT* paramCnt) {
-  return ignite::SQLNumParams(stmt, paramCnt);
+  return documentdb::SQLNumParams(stmt, paramCnt);
 }
 
 SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle,
                                   SQLSMALLINT recNum, SQLSMALLINT diagId,
                                   SQLPOINTER buffer, SQLSMALLINT bufferLen,
                                   SQLSMALLINT* resLen) {
-  return ignite::SQLGetDiagField(handleType, handle, recNum, diagId, buffer,
+  return documentdb::SQLGetDiagField(handleType, handle, recNum, diagId, buffer,
                                  bufferLen, resLen);
 }
 
@@ -257,31 +257,31 @@ SQLRETURN SQL_API SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
                                 SQLSMALLINT recNum, SQLWCHAR* sqlState,
                                 SQLINTEGER* nativeError, SQLWCHAR* msgBuffer,
                                 SQLSMALLINT msgBufferLen, SQLSMALLINT* msgLen) {
-  return ignite::SQLGetDiagRec(handleType, handle, recNum, sqlState,
+  return documentdb::SQLGetDiagRec(handleType, handle, recNum, sqlState,
                                nativeError, msgBuffer, msgBufferLen, msgLen);
 }
 
 SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT type) {
-  return ignite::SQLGetTypeInfo(stmt, type);
+  return documentdb::SQLGetTypeInfo(stmt, type);
 }
 
 SQLRETURN SQL_API SQLGetData(SQLHSTMT stmt, SQLUSMALLINT colNum,
                              SQLSMALLINT targetType, SQLPOINTER targetValue,
                              SQLLEN bufferLength,
                              SQLLEN* strLengthOrIndicator) {
-  return ignite::SQLGetData(stmt, colNum, targetType, targetValue, bufferLength,
+  return documentdb::SQLGetData(stmt, colNum, targetType, targetValue, bufferLength,
                             strLengthOrIndicator);
 }
 
 SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER value,
                                 SQLINTEGER valueLen) {
-  return ignite::SQLSetEnvAttr(env, attr, value, valueLen);
+  return documentdb::SQLSetEnvAttr(env, attr, value, valueLen);
 }
 
 SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr,
                                 SQLPOINTER valueBuf, SQLINTEGER valueBufLen,
                                 SQLINTEGER* valueResLen) {
-  return ignite::SQLGetEnvAttr(env, attr, valueBuf, valueBufLen, valueResLen);
+  return documentdb::SQLGetEnvAttr(env, attr, valueBuf, valueBufLen, valueResLen);
 }
 
 SQLRETURN SQL_API SQLSpecialColumns(
@@ -289,45 +289,45 @@ SQLRETURN SQL_API SQLSpecialColumns(
     SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen,
     SQLWCHAR* tableName, SQLSMALLINT tableNameLen, SQLUSMALLINT scope,
     SQLUSMALLINT nullable) {
-  return ignite::SQLSpecialColumns(stmt, idType, catalogName, catalogNameLen,
+  return documentdb::SQLSpecialColumns(stmt, idType, catalogName, catalogNameLen,
                                    schemaName, schemaNameLen, tableName,
                                    tableNameLen, scope, nullable);
 }
 
 SQLRETURN SQL_API SQLParamData(SQLHSTMT stmt, SQLPOINTER* value) {
-  return ignite::SQLParamData(stmt, value);
+  return documentdb::SQLParamData(stmt, value);
 }
 
 SQLRETURN SQL_API SQLPutData(SQLHSTMT stmt, SQLPOINTER data,
                              SQLLEN strLengthOrIndicator) {
-  return ignite::SQLPutData(stmt, data, strLengthOrIndicator);
+  return documentdb::SQLPutData(stmt, data, strLengthOrIndicator);
 }
 
 SQLRETURN SQL_API SQLDescribeParam(SQLHSTMT stmt, SQLUSMALLINT paramNum,
                                    SQLSMALLINT* dataType, SQLULEN* paramSize,
                                    SQLSMALLINT* decimalDigits,
                                    SQLSMALLINT* nullable) {
-  return ignite::SQLDescribeParam(stmt, paramNum, dataType, paramSize,
+  return documentdb::SQLDescribeParam(stmt, paramNum, dataType, paramSize,
                                   decimalDigits, nullable);
 }
 
 SQLRETURN SQL_API SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt,
                            SQLWCHAR* state, SQLINTEGER* error, SQLWCHAR* msgBuf,
                            SQLSMALLINT msgBufLen, SQLSMALLINT* msgResLen) {
-  return ignite::SQLError(env, conn, stmt, state, error, msgBuf, msgBufLen,
+  return documentdb::SQLError(env, conn, stmt, state, error, msgBuf, msgBufLen,
                           msgResLen);
 }
 
 SQLRETURN SQL_API SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attr,
                                     SQLPOINTER valueBuf, SQLINTEGER valueBufLen,
                                     SQLINTEGER* valueResLen) {
-  return ignite::SQLGetConnectAttr(conn, attr, valueBuf, valueBufLen,
+  return documentdb::SQLGetConnectAttr(conn, attr, valueBuf, valueBufLen,
                                    valueResLen);
 }
 
 SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr,
                                     SQLPOINTER value, SQLINTEGER valueLen) {
-  return ignite::SQLSetConnectAttr(conn, attr, value, valueLen);
+  return documentdb::SQLSetConnectAttr(conn, attr, value, valueLen);
 }
 
 //
@@ -337,9 +337,9 @@ SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr,
 SQLRETURN SQL_API SQLEndTran(SQLSMALLINT handleType, SQLHANDLE handle,
                              SQLSMALLINT completionType) {
                                
-  IGNITE_UNUSED(handleType);
-  IGNITE_UNUSED(handle);
-  IGNITE_UNUSED(completionType);
+  DOCUMENTDB_UNUSED(handleType);
+  DOCUMENTDB_UNUSED(handle);
+  DOCUMENTDB_UNUSED(completionType);
 
   LOG_DEBUG_MSG("SQLEndTran called");
   return SQL_SUCCESS;
@@ -349,7 +349,7 @@ SQLRETURN SQL_API SQLEndTran(SQLSMALLINT handleType, SQLHANDLE handle,
 //
 
 SQLRETURN SQL_API SQLCancel(SQLHSTMT stmt) {
-  IGNITE_UNUSED(stmt);
+  DOCUMENTDB_UNUSED(stmt);
 
   LOG_DEBUG_MSG("SQLCancel called");
   return SQL_SUCCESS;
@@ -360,13 +360,13 @@ SQLRETURN SQL_API SQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT colNum,
                                    SQLSMALLINT strAttrBufLen,
                                    SQLSMALLINT* strAttrResLen,
                                    SQLLEN* numAttrBuf) {
-  IGNITE_UNUSED(stmt);
-  IGNITE_UNUSED(colNum);
-  IGNITE_UNUSED(fieldId);
-  IGNITE_UNUSED(strAttrBuf);
-  IGNITE_UNUSED(strAttrBufLen);
-  IGNITE_UNUSED(strAttrResLen);
-  IGNITE_UNUSED(numAttrBuf);
+  DOCUMENTDB_UNUSED(stmt);
+  DOCUMENTDB_UNUSED(colNum);
+  DOCUMENTDB_UNUSED(fieldId);
+  DOCUMENTDB_UNUSED(strAttrBuf);
+  DOCUMENTDB_UNUSED(strAttrBufLen);
+  DOCUMENTDB_UNUSED(strAttrResLen);
+  DOCUMENTDB_UNUSED(numAttrBuf);
 
   LOG_DEBUG_MSG("SQLColAttributes called");
   return SQL_SUCCESS;
@@ -375,10 +375,10 @@ SQLRETURN SQL_API SQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT colNum,
 SQLRETURN SQL_API SQLGetCursorName(SQLHSTMT stmt, SQLWCHAR* nameBuf,
                                    SQLSMALLINT nameBufLen,
                                    SQLSMALLINT* nameResLen) {
-  IGNITE_UNUSED(stmt);
-  IGNITE_UNUSED(nameBuf);
-  IGNITE_UNUSED(nameBufLen);
-  IGNITE_UNUSED(nameResLen);
+  DOCUMENTDB_UNUSED(stmt);
+  DOCUMENTDB_UNUSED(nameBuf);
+  DOCUMENTDB_UNUSED(nameBufLen);
+  DOCUMENTDB_UNUSED(nameResLen);
 
   LOG_DEBUG_MSG("SQLGetCursorName called");
   return SQL_SUCCESS;
@@ -386,9 +386,9 @@ SQLRETURN SQL_API SQLGetCursorName(SQLHSTMT stmt, SQLWCHAR* nameBuf,
 
 SQLRETURN SQL_API SQLSetCursorName(SQLHSTMT stmt, SQLWCHAR* name,
                                    SQLSMALLINT nameLen) {
-  IGNITE_UNUSED(stmt);
-  IGNITE_UNUSED(name);
-  IGNITE_UNUSED(nameLen);
+  DOCUMENTDB_UNUSED(stmt);
+  DOCUMENTDB_UNUSED(name);
+  DOCUMENTDB_UNUSED(nameLen);
 
   LOG_DEBUG_MSG("SQLSetCursorName called");
   return SQL_SUCCESS;
@@ -396,9 +396,9 @@ SQLRETURN SQL_API SQLSetCursorName(SQLHSTMT stmt, SQLWCHAR* name,
 
 SQLRETURN SQL_API SQLGetConnectOption(SQLHDBC conn, SQLUSMALLINT option,
                                       SQLPOINTER value) {
-  IGNITE_UNUSED(conn);
-  IGNITE_UNUSED(option);
-  IGNITE_UNUSED(value);
+  DOCUMENTDB_UNUSED(conn);
+  DOCUMENTDB_UNUSED(option);
+  DOCUMENTDB_UNUSED(value);
 
   LOG_DEBUG_MSG("SQLGetConnectOption called");
   return SQL_SUCCESS;
@@ -406,9 +406,9 @@ SQLRETURN SQL_API SQLGetConnectOption(SQLHDBC conn, SQLUSMALLINT option,
 
 SQLRETURN SQL_API SQLGetStmtOption(SQLHSTMT stmt, SQLUSMALLINT option,
                                    SQLPOINTER value) {
-  IGNITE_UNUSED(stmt);
-  IGNITE_UNUSED(option);
-  IGNITE_UNUSED(value);
+  DOCUMENTDB_UNUSED(stmt);
+  DOCUMENTDB_UNUSED(option);
+  DOCUMENTDB_UNUSED(value);
 
   LOG_DEBUG_MSG("SQLGetStmtOption called");
   return SQL_SUCCESS;
@@ -416,9 +416,9 @@ SQLRETURN SQL_API SQLGetStmtOption(SQLHSTMT stmt, SQLUSMALLINT option,
 
 SQLRETURN SQL_API SQLSetConnectOption(SQLHDBC conn, SQLUSMALLINT option,
                                       SQLULEN value) {
-  IGNITE_UNUSED(conn);
-  IGNITE_UNUSED(option);
-  IGNITE_UNUSED(value);
+  DOCUMENTDB_UNUSED(conn);
+  DOCUMENTDB_UNUSED(option);
+  DOCUMENTDB_UNUSED(value);
 
   LOG_DEBUG_MSG("SQLSetConnectOption called");
   return SQL_SUCCESS;
@@ -426,9 +426,9 @@ SQLRETURN SQL_API SQLSetConnectOption(SQLHDBC conn, SQLUSMALLINT option,
 
 SQLRETURN SQL_API SQLSetStmtOption(SQLHSTMT stmt, SQLUSMALLINT option,
                                    SQLULEN value) {
-  IGNITE_UNUSED(stmt);
-  IGNITE_UNUSED(option);
-  IGNITE_UNUSED(value);
+  DOCUMENTDB_UNUSED(stmt);
+  DOCUMENTDB_UNUSED(option);
+  DOCUMENTDB_UNUSED(value);
 
   LOG_DEBUG_MSG("SQLSetStmtOption called");
   return SQL_SUCCESS;
@@ -439,15 +439,15 @@ SQLRETURN SQL_API SQLStatistics(SQLHSTMT stmt, SQLWCHAR* catalogName,
                                 SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen,
                                 SQLWCHAR* tableName, SQLSMALLINT tableNameLen,
                                 SQLUSMALLINT unique, SQLUSMALLINT reserved) {
-  IGNITE_UNUSED(stmt);
-  IGNITE_UNUSED(catalogName);
-  IGNITE_UNUSED(catalogNameLen);
-  IGNITE_UNUSED(schemaName);
-  IGNITE_UNUSED(schemaNameLen);
-  IGNITE_UNUSED(tableName);
-  IGNITE_UNUSED(tableNameLen);
-  IGNITE_UNUSED(unique);
-  IGNITE_UNUSED(reserved);
+  DOCUMENTDB_UNUSED(stmt);
+  DOCUMENTDB_UNUSED(catalogName);
+  DOCUMENTDB_UNUSED(catalogNameLen);
+  DOCUMENTDB_UNUSED(schemaName);
+  DOCUMENTDB_UNUSED(schemaNameLen);
+  DOCUMENTDB_UNUSED(tableName);
+  DOCUMENTDB_UNUSED(tableNameLen);
+  DOCUMENTDB_UNUSED(unique);
+  DOCUMENTDB_UNUSED(reserved);
 
   LOG_DEBUG_MSG("SQLStatistics called");
   return SQL_SUCCESS;
@@ -458,12 +458,12 @@ SQLRETURN SQL_API SQLBrowseConnect(SQLHDBC conn, SQLWCHAR* inConnectionStr,
                                    SQLWCHAR* outConnectionStrBuf,
                                    SQLSMALLINT outConnectionStrBufLen,
                                    SQLSMALLINT* outConnectionStrResLen) {
-  IGNITE_UNUSED(conn);
-  IGNITE_UNUSED(inConnectionStr);
-  IGNITE_UNUSED(inConnectionStrLen);
-  IGNITE_UNUSED(outConnectionStrBuf);
-  IGNITE_UNUSED(outConnectionStrBufLen);
-  IGNITE_UNUSED(outConnectionStrResLen);
+  DOCUMENTDB_UNUSED(conn);
+  DOCUMENTDB_UNUSED(inConnectionStr);
+  DOCUMENTDB_UNUSED(inConnectionStrLen);
+  DOCUMENTDB_UNUSED(outConnectionStrBuf);
+  DOCUMENTDB_UNUSED(outConnectionStrBufLen);
+  DOCUMENTDB_UNUSED(outConnectionStrResLen);
 
   LOG_DEBUG_MSG("SQLBrowseConnect called");
   return SQL_SUCCESS;
@@ -473,15 +473,15 @@ SQLRETURN SQL_API SQLProcedureColumns(
     SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNameLen,
     SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen, SQLWCHAR* procName,
     SQLSMALLINT procNameLen, SQLWCHAR* columnName, SQLSMALLINT columnNameLen) {
-  IGNITE_UNUSED(stmt);
-  IGNITE_UNUSED(catalogName);
-  IGNITE_UNUSED(catalogNameLen);
-  IGNITE_UNUSED(schemaName);
-  IGNITE_UNUSED(schemaNameLen);
-  IGNITE_UNUSED(procName);
-  IGNITE_UNUSED(procNameLen);
-  IGNITE_UNUSED(columnName);
-  IGNITE_UNUSED(columnNameLen);
+  DOCUMENTDB_UNUSED(stmt);
+  DOCUMENTDB_UNUSED(catalogName);
+  DOCUMENTDB_UNUSED(catalogNameLen);
+  DOCUMENTDB_UNUSED(schemaName);
+  DOCUMENTDB_UNUSED(schemaNameLen);
+  DOCUMENTDB_UNUSED(procName);
+  DOCUMENTDB_UNUSED(procNameLen);
+  DOCUMENTDB_UNUSED(columnName);
+  DOCUMENTDB_UNUSED(columnNameLen);
 
   LOG_DEBUG_MSG("SQLProcedureColumns called");
   return SQL_SUCCESS;
@@ -489,10 +489,10 @@ SQLRETURN SQL_API SQLProcedureColumns(
 
 SQLRETURN SQL_API SQLSetPos(SQLHSTMT stmt, SQLSETPOSIROW rowNum,
                             SQLUSMALLINT operation, SQLUSMALLINT lockType) {
-  IGNITE_UNUSED(stmt);
-  IGNITE_UNUSED(rowNum);
-  IGNITE_UNUSED(operation);
-  IGNITE_UNUSED(lockType);
+  DOCUMENTDB_UNUSED(stmt);
+  DOCUMENTDB_UNUSED(rowNum);
+  DOCUMENTDB_UNUSED(operation);
+  DOCUMENTDB_UNUSED(lockType);
 
   LOG_DEBUG_MSG("SQLSetPos called");
   return SQL_SUCCESS;
@@ -501,18 +501,18 @@ SQLRETURN SQL_API SQLSetPos(SQLHSTMT stmt, SQLSETPOSIROW rowNum,
 SQLRETURN SQL_API SQLSetScrollOptions(SQLHSTMT stmt, SQLUSMALLINT concurrency,
                                       SQLLEN crowKeyset,
                                       SQLUSMALLINT crowRowset) {
-  IGNITE_UNUSED(stmt);
-  IGNITE_UNUSED(concurrency);
-  IGNITE_UNUSED(crowKeyset);
-  IGNITE_UNUSED(crowRowset);
+  DOCUMENTDB_UNUSED(stmt);
+  DOCUMENTDB_UNUSED(concurrency);
+  DOCUMENTDB_UNUSED(crowKeyset);
+  DOCUMENTDB_UNUSED(crowRowset);
 
   LOG_DEBUG_MSG("SQLSetScrollOptions called");
   return SQL_SUCCESS;
 }
 
 SQLRETURN SQL_API SQLBulkOperations(SQLHSTMT stmt, SQLUSMALLINT operation) {
-  IGNITE_UNUSED(stmt);
-  IGNITE_UNUSED(operation);
+  DOCUMENTDB_UNUSED(stmt);
+  DOCUMENTDB_UNUSED(operation);
 
   LOG_DEBUG_MSG("SQLBulkOperations called");
   return SQL_SUCCESS;
@@ -524,21 +524,21 @@ SQLRETURN SQL_API SQLTablePrivileges(SQLHSTMT stmt, SQLWCHAR* catalogName,
                                      SQLSMALLINT schemaNameLen,
                                      SQLWCHAR* tableName,
                                      SQLSMALLINT tableNameLen) {
-  IGNITE_UNUSED(stmt);
-  IGNITE_UNUSED(catalogName);
-  IGNITE_UNUSED(catalogNameLen);
-  IGNITE_UNUSED(schemaName);
-  IGNITE_UNUSED(schemaNameLen);
-  IGNITE_UNUSED(tableName);
-  IGNITE_UNUSED(tableNameLen);
+  DOCUMENTDB_UNUSED(stmt);
+  DOCUMENTDB_UNUSED(catalogName);
+  DOCUMENTDB_UNUSED(catalogNameLen);
+  DOCUMENTDB_UNUSED(schemaName);
+  DOCUMENTDB_UNUSED(schemaNameLen);
+  DOCUMENTDB_UNUSED(tableName);
+  DOCUMENTDB_UNUSED(tableNameLen);
 
   LOG_DEBUG_MSG("SQLTablePrivileges called");
   return SQL_SUCCESS;
 }
 
 SQLRETURN SQL_API SQLCopyDesc(SQLHDESC src, SQLHDESC dst) {
-  IGNITE_UNUSED(src);
-  IGNITE_UNUSED(dst);
+  DOCUMENTDB_UNUSED(src);
+  DOCUMENTDB_UNUSED(dst);
 
   LOG_DEBUG_MSG("SQLCopyDesc called");
   return SQL_SUCCESS;
@@ -547,12 +547,12 @@ SQLRETURN SQL_API SQLCopyDesc(SQLHDESC src, SQLHDESC dst) {
 SQLRETURN SQL_API SQLGetDescField(SQLHDESC descr, SQLSMALLINT recNum,
                                   SQLSMALLINT fieldId, SQLPOINTER buffer,
                                   SQLINTEGER bufferLen, SQLINTEGER* resLen) {
-  IGNITE_UNUSED(descr);
-  IGNITE_UNUSED(recNum);
-  IGNITE_UNUSED(fieldId);
-  IGNITE_UNUSED(buffer);
-  IGNITE_UNUSED(bufferLen);
-  IGNITE_UNUSED(resLen);
+  DOCUMENTDB_UNUSED(descr);
+  DOCUMENTDB_UNUSED(recNum);
+  DOCUMENTDB_UNUSED(fieldId);
+  DOCUMENTDB_UNUSED(buffer);
+  DOCUMENTDB_UNUSED(bufferLen);
+  DOCUMENTDB_UNUSED(resLen);
 
   LOG_DEBUG_MSG("SQLGetDescField called");
   return SQL_SUCCESS;
@@ -564,17 +564,17 @@ SQLRETURN SQL_API SQLGetDescRec(SQLHDESC DescriptorHandle,
                                 SQLSMALLINT* type, SQLSMALLINT* subType,
                                 SQLLEN* len, SQLSMALLINT* precision,
                                 SQLSMALLINT* scale, SQLSMALLINT* nullable) {
-  IGNITE_UNUSED(DescriptorHandle);
-  IGNITE_UNUSED(RecNumber);
-  IGNITE_UNUSED(nameBuffer);
-  IGNITE_UNUSED(nameBufferLen);
-  IGNITE_UNUSED(strLen);
-  IGNITE_UNUSED(type);
-  IGNITE_UNUSED(subType);
-  IGNITE_UNUSED(len);
-  IGNITE_UNUSED(precision);
-  IGNITE_UNUSED(scale);
-  IGNITE_UNUSED(nullable);
+  DOCUMENTDB_UNUSED(DescriptorHandle);
+  DOCUMENTDB_UNUSED(RecNumber);
+  DOCUMENTDB_UNUSED(nameBuffer);
+  DOCUMENTDB_UNUSED(nameBufferLen);
+  DOCUMENTDB_UNUSED(strLen);
+  DOCUMENTDB_UNUSED(type);
+  DOCUMENTDB_UNUSED(subType);
+  DOCUMENTDB_UNUSED(len);
+  DOCUMENTDB_UNUSED(precision);
+  DOCUMENTDB_UNUSED(scale);
+  DOCUMENTDB_UNUSED(nullable);
 
   LOG_DEBUG_MSG("SQLGetDescRec called");
   return SQL_SUCCESS;
@@ -583,11 +583,11 @@ SQLRETURN SQL_API SQLGetDescRec(SQLHDESC DescriptorHandle,
 SQLRETURN SQL_API SQLSetDescField(SQLHDESC descr, SQLSMALLINT recNum,
                                   SQLSMALLINT fieldId, SQLPOINTER buffer,
                                   SQLINTEGER bufferLen) {
-  IGNITE_UNUSED(descr);
-  IGNITE_UNUSED(recNum);
-  IGNITE_UNUSED(fieldId);
-  IGNITE_UNUSED(buffer);
-  IGNITE_UNUSED(bufferLen);
+  DOCUMENTDB_UNUSED(descr);
+  DOCUMENTDB_UNUSED(recNum);
+  DOCUMENTDB_UNUSED(fieldId);
+  DOCUMENTDB_UNUSED(buffer);
+  DOCUMENTDB_UNUSED(bufferLen);
 
   LOG_DEBUG_MSG("SQLSetDescField called");
   return SQL_SUCCESS;
@@ -598,16 +598,16 @@ SQLRETURN SQL_API SQLSetDescRec(SQLHDESC descr, SQLSMALLINT recNum,
                                 SQLLEN len, SQLSMALLINT precision,
                                 SQLSMALLINT scale, SQLPOINTER buffer,
                                 SQLLEN* resLen, SQLLEN* id) {
-  IGNITE_UNUSED(descr);
-  IGNITE_UNUSED(recNum);
-  IGNITE_UNUSED(type);
-  IGNITE_UNUSED(subType);
-  IGNITE_UNUSED(len);
-  IGNITE_UNUSED(precision);
-  IGNITE_UNUSED(scale);
-  IGNITE_UNUSED(buffer);
-  IGNITE_UNUSED(resLen);
-  IGNITE_UNUSED(id);
+  DOCUMENTDB_UNUSED(descr);
+  DOCUMENTDB_UNUSED(recNum);
+  DOCUMENTDB_UNUSED(type);
+  DOCUMENTDB_UNUSED(subType);
+  DOCUMENTDB_UNUSED(len);
+  DOCUMENTDB_UNUSED(precision);
+  DOCUMENTDB_UNUSED(scale);
+  DOCUMENTDB_UNUSED(buffer);
+  DOCUMENTDB_UNUSED(resLen);
+  DOCUMENTDB_UNUSED(id);
 
   LOG_DEBUG_MSG("SQLSetDescRec called");
   return SQL_SUCCESS;
@@ -617,15 +617,15 @@ SQLRETURN SQL_API SQLColumnPrivileges(
     SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNameLen,
     SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
     SQLSMALLINT tableNameLen, SQLWCHAR* columnName, SQLSMALLINT columnNameLen) {
-  IGNITE_UNUSED(stmt);
-  IGNITE_UNUSED(catalogName);
-  IGNITE_UNUSED(catalogNameLen);
-  IGNITE_UNUSED(schemaName);
-  IGNITE_UNUSED(schemaNameLen);
-  IGNITE_UNUSED(tableName);
-  IGNITE_UNUSED(tableNameLen);
-  IGNITE_UNUSED(columnName);
-  IGNITE_UNUSED(columnNameLen);
+  DOCUMENTDB_UNUSED(stmt);
+  DOCUMENTDB_UNUSED(catalogName);
+  DOCUMENTDB_UNUSED(catalogNameLen);
+  DOCUMENTDB_UNUSED(schemaName);
+  DOCUMENTDB_UNUSED(schemaNameLen);
+  DOCUMENTDB_UNUSED(tableName);
+  DOCUMENTDB_UNUSED(tableNameLen);
+  DOCUMENTDB_UNUSED(columnName);
+  DOCUMENTDB_UNUSED(columnNameLen);
 
   LOG_DEBUG_MSG("SQLColumnPrivileges called");
   return SQL_SUCCESS;
@@ -633,9 +633,9 @@ SQLRETURN SQL_API SQLColumnPrivileges(
 
 SQLRETURN SQL_API SQLParamOptions(SQLHSTMT stmt, SQLULEN paramSetSize,
                                   SQLULEN* paramsProcessed) {
-  IGNITE_UNUSED(stmt);
-  IGNITE_UNUSED(paramSetSize);
-  IGNITE_UNUSED(paramsProcessed);
+  DOCUMENTDB_UNUSED(stmt);
+  DOCUMENTDB_UNUSED(paramSetSize);
+  DOCUMENTDB_UNUSED(paramsProcessed);
 
   LOG_DEBUG_MSG("SQLParamOptions called");
   return SQL_SUCCESS;
@@ -645,13 +645,13 @@ SQLRETURN SQL_API SQLProcedures(SQLHSTMT stmt, SQLWCHAR* catalogName,
                                 SQLSMALLINT catalogNameLen,
                                 SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen,
                                 SQLWCHAR* tableName, SQLSMALLINT tableNameLen) {
-  IGNITE_UNUSED(stmt);
-  IGNITE_UNUSED(catalogName);
-  IGNITE_UNUSED(catalogNameLen);
-  IGNITE_UNUSED(schemaName);
-  IGNITE_UNUSED(schemaNameLen);
-  IGNITE_UNUSED(tableName);
-  IGNITE_UNUSED(tableNameLen);
+  DOCUMENTDB_UNUSED(stmt);
+  DOCUMENTDB_UNUSED(catalogName);
+  DOCUMENTDB_UNUSED(catalogNameLen);
+  DOCUMENTDB_UNUSED(schemaName);
+  DOCUMENTDB_UNUSED(schemaNameLen);
+  DOCUMENTDB_UNUSED(tableName);
+  DOCUMENTDB_UNUSED(tableNameLen);
 
   LOG_DEBUG_MSG("SQLProcedures called");
   return SQL_SUCCESS;

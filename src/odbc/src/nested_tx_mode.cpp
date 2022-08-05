@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/nested_tx_mode.h"
+#include "documentdb/odbc/nested_tx_mode.h"
 
-#include "ignite/odbc/common/utils.h"
+#include "documentdb/odbc/common/utils.h"
 
 namespace {
-using ignite::odbc::NestedTxMode;
+using documentdb::odbc::NestedTxMode;
 NestedTxMode::Type validValues0[] = {
     NestedTxMode::AI_COMMIT, NestedTxMode::AI_IGNORE, NestedTxMode::AI_ERROR};
 
@@ -29,7 +29,7 @@ NestedTxMode::ModeSet validValues(
     validValues0 + (sizeof(validValues0) / sizeof(validValues0[0])));
 }  // namespace
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 NestedTxMode::Type NestedTxMode::FromString(const std::string& str, Type dflt) {
   std::string lower = common::ToLower(str);
@@ -68,4 +68,4 @@ const NestedTxMode::ModeSet& NestedTxMode::GetValidValues() {
   return validValues;
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/interop//interop_input_stream.h"
+#include "documentdb/odbc/impl/interop//interop_input_stream.h"
 
-#include <ignite/odbc/ignite_error.h>
+#include <documentdb/odbc/documentdb_error.h>
 
 #include <cstring>
 
 /**
  * Common macro to read a single value.
  */
-#define IGNITE_INTEROP_IN_READ(type, len)              \
+#define DOCUMENTDB_INTEROP_IN_READ(type, len)              \
   {                                                    \
     EnsureEnoughData(len);                             \
     type res = *reinterpret_cast< type* >(data + pos); \
@@ -35,10 +35,10 @@
 /**
  * Common macro to read an array.
  */
-#define IGNITE_INTEROP_IN_READ_ARRAY(len, shift) \
+#define DOCUMENTDB_INTEROP_IN_READ_ARRAY(len, shift) \
   { CopyAndShift(reinterpret_cast< int8_t* >(res), 0, ((len) << (shift))); }
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace interop {
@@ -51,7 +51,7 @@ InteropInputStream::InteropInputStream(InteropMemory* mem) {
 }
 
 int8_t InteropInputStream::ReadInt8() {
-  IGNITE_INTEROP_IN_READ(int8_t, 1);
+  DOCUMENTDB_INTEROP_IN_READ(int8_t, 1);
 }
 
 int32_t InteropInputStream::ReadInt8(int32_t pos) {
@@ -64,7 +64,7 @@ int32_t InteropInputStream::ReadInt8(int32_t pos) {
 }
 
 void InteropInputStream::ReadInt8Array(int8_t* const res, const int32_t len) {
-  IGNITE_INTEROP_IN_READ_ARRAY(len, 0);
+  DOCUMENTDB_INTEROP_IN_READ_ARRAY(len, 0);
 }
 
 bool InteropInputStream::ReadBool() {
@@ -77,7 +77,7 @@ void InteropInputStream::ReadBoolArray(bool* const res, const int32_t len) {
 }
 
 int16_t InteropInputStream::ReadInt16() {
-  IGNITE_INTEROP_IN_READ(int16_t, 2);
+  DOCUMENTDB_INTEROP_IN_READ(int16_t, 2);
 }
 
 int32_t InteropInputStream::ReadInt16(int32_t pos) {
@@ -90,20 +90,20 @@ int32_t InteropInputStream::ReadInt16(int32_t pos) {
 }
 
 void InteropInputStream::ReadInt16Array(int16_t* const res, const int32_t len) {
-  IGNITE_INTEROP_IN_READ_ARRAY(len, 1);
+  DOCUMENTDB_INTEROP_IN_READ_ARRAY(len, 1);
 }
 
 uint16_t InteropInputStream::ReadUInt16() {
-  IGNITE_INTEROP_IN_READ(uint16_t, 2);
+  DOCUMENTDB_INTEROP_IN_READ(uint16_t, 2);
 }
 
 void InteropInputStream::ReadUInt16Array(uint16_t* const res,
                                          const int32_t len) {
-  IGNITE_INTEROP_IN_READ_ARRAY(len, 1);
+  DOCUMENTDB_INTEROP_IN_READ_ARRAY(len, 1);
 }
 
 int32_t InteropInputStream::ReadInt32() {
-  IGNITE_INTEROP_IN_READ(int32_t, 4);
+  DOCUMENTDB_INTEROP_IN_READ(int32_t, 4);
 }
 
 int32_t InteropInputStream::ReadInt32(int32_t pos) {
@@ -116,15 +116,15 @@ int32_t InteropInputStream::ReadInt32(int32_t pos) {
 }
 
 void InteropInputStream::ReadInt32Array(int32_t* const res, const int32_t len) {
-  IGNITE_INTEROP_IN_READ_ARRAY(len, 2);
+  DOCUMENTDB_INTEROP_IN_READ_ARRAY(len, 2);
 }
 
 int64_t InteropInputStream::ReadInt64() {
-  IGNITE_INTEROP_IN_READ(int64_t, 8);
+  DOCUMENTDB_INTEROP_IN_READ(int64_t, 8);
 }
 
 void InteropInputStream::ReadInt64Array(int64_t* const res, const int32_t len) {
-  IGNITE_INTEROP_IN_READ_ARRAY(len, 3);
+  DOCUMENTDB_INTEROP_IN_READ_ARRAY(len, 3);
 }
 
 float InteropInputStream::ReadFloat() {
@@ -136,7 +136,7 @@ float InteropInputStream::ReadFloat() {
 }
 
 void InteropInputStream::ReadFloatArray(float* const res, const int32_t len) {
-  IGNITE_INTEROP_IN_READ_ARRAY(len, 2);
+  DOCUMENTDB_INTEROP_IN_READ_ARRAY(len, 2);
 }
 
 double InteropInputStream::ReadDouble() {
@@ -148,7 +148,7 @@ double InteropInputStream::ReadDouble() {
 }
 
 void InteropInputStream::ReadDoubleArray(double* const res, const int32_t len) {
-  IGNITE_INTEROP_IN_READ_ARRAY(len, 3);
+  DOCUMENTDB_INTEROP_IN_READ_ARRAY(len, 3);
 }
 
 int32_t InteropInputStream::Remaining() const {
@@ -163,7 +163,7 @@ void InteropInputStream::Position(int32_t pos) {
   if (pos <= len)
     this->pos = pos;
   else {
-    IGNITE_ERROR_FORMATTED_3(IgniteError::IGNITE_ERR_MEMORY,
+    DOCUMENTDB_ERROR_FORMATTED_3(DocumentDbError::DOCUMENTDB_ERR_MEMORY,
                              "Requested input stream position is out of bounds",
                              "memPtr", mem->PointerLong(), "len", len, "pos",
                              pos);
@@ -183,8 +183,8 @@ void InteropInputStream::EnsureEnoughData(int32_t cnt) const {
   if (len - pos >= cnt)
     return;
   else {
-    IGNITE_ERROR_FORMATTED_4(
-        IgniteError::IGNITE_ERR_MEMORY, "Not enough data in the stream",
+    DOCUMENTDB_ERROR_FORMATTED_4(
+        DocumentDbError::DOCUMENTDB_ERR_MEMORY, "Not enough data in the stream",
         "memPtr", mem->PointerLong(), "len", len, "pos", pos, "requested", cnt);
   }
 }
@@ -203,4 +203,4 @@ inline void InteropInputStream::Shift(int32_t cnt) {
 }  // namespace interop
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

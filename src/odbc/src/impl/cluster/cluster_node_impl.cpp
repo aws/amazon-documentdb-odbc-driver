@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/jni/java.h>
+#include <documentdb/odbc/jni/java.h>
 
-#include <ignite/odbc/impl/cluster/cluster_node_impl.h>
+#include <documentdb/odbc/impl/cluster/cluster_node_impl.h>
 
-using namespace ignite::odbc::jni::java;
-using namespace ignite::odbc::common::concurrent;
-using namespace ignite::odbc::impl::cluster;
-using namespace ignite::odbc::impl::interop;
-using namespace ignite::odbc::impl::binary;
+using namespace documentdb::odbc::jni::java;
+using namespace documentdb::odbc::common::concurrent;
+using namespace documentdb::odbc::impl::cluster;
+using namespace documentdb::odbc::impl::interop;
+using namespace documentdb::odbc::impl::binary;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace cluster {
@@ -136,7 +136,7 @@ void ClusterNodeImpl::ReadHosts(BinaryReaderImpl& reader) {
 void ClusterNodeImpl::ReadConsistentId(BinaryReaderImpl& reader) {
   int8_t typeId = reader.ReadInt8();
   reader.GetStream()->Position(reader.GetStream()->Position() - 1);
-  if (typeId == IGNITE_TYPE_STRING) {
+  if (typeId == DOCUMENTDB_TYPE_STRING) {
     reader.ReadString(*consistentId.Get());
     return;
   }
@@ -165,4 +165,4 @@ void ClusterNodeImpl::ReadProductVersion(BinaryReaderImpl& reader) {
 }  // namespace cluster
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/binary/binary_writer_impl.h"
+#include "documentdb/odbc/impl/binary/binary_writer_impl.h"
 
-#include <ignite/odbc/ignite_error.h>
+#include <documentdb/odbc/documentdb_error.h>
 
-#include "ignite/odbc/impl/interop/interop_stream_position_guard.h"
+#include "documentdb/odbc/impl/interop/interop_stream_position_guard.h"
 
-using namespace ignite::odbc::impl::interop;
-using namespace ignite::odbc::impl::binary;
-using namespace ignite::odbc::binary;
+using namespace documentdb::odbc::impl::interop;
+using namespace documentdb::odbc::impl::binary;
+using namespace documentdb::odbc::binary;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace binary {
@@ -69,19 +69,19 @@ void BinaryWriterImpl::WriteInt8(const int8_t val) {
 
 void BinaryWriterImpl::WriteInt8Array(const int8_t* val, const int32_t len) {
   WritePrimitiveArrayRaw< int8_t >(val, len, BinaryUtils::WriteInt8Array,
-                                   IGNITE_TYPE_ARRAY_BYTE);
+                                   DOCUMENTDB_TYPE_ARRAY_BYTE);
 }
 
 void BinaryWriterImpl::WriteInt8(const char* fieldName, const int8_t val) {
   WritePrimitive< int8_t >(fieldName, val, BinaryUtils::WriteInt8,
-                           IGNITE_TYPE_BYTE, 1);
+                           DOCUMENTDB_TYPE_BYTE, 1);
 }
 
 void BinaryWriterImpl::WriteInt8Array(const char* fieldName, const int8_t* val,
                                       const int32_t len) {
   WritePrimitiveArray< int8_t >(fieldName, val, len,
                                 BinaryUtils::WriteInt8Array,
-                                IGNITE_TYPE_ARRAY_BYTE, 0);
+                                DOCUMENTDB_TYPE_ARRAY_BYTE, 0);
 }
 
 void BinaryWriterImpl::WriteBool(const bool val) {
@@ -90,18 +90,18 @@ void BinaryWriterImpl::WriteBool(const bool val) {
 
 void BinaryWriterImpl::WriteBoolArray(const bool* val, const int32_t len) {
   WritePrimitiveArrayRaw< bool >(val, len, BinaryUtils::WriteBoolArray,
-                                 IGNITE_TYPE_ARRAY_BOOL);
+                                 DOCUMENTDB_TYPE_ARRAY_BOOL);
 }
 
 void BinaryWriterImpl::WriteBool(const char* fieldName, const bool val) {
   WritePrimitive< bool >(fieldName, val, BinaryUtils::WriteBool,
-                         IGNITE_TYPE_BOOL, 1);
+                         DOCUMENTDB_TYPE_BOOL, 1);
 }
 
 void BinaryWriterImpl::WriteBoolArray(const char* fieldName, const bool* val,
                                       const int32_t len) {
   WritePrimitiveArray< bool >(fieldName, val, len, BinaryUtils::WriteBoolArray,
-                              IGNITE_TYPE_ARRAY_BOOL, 0);
+                              DOCUMENTDB_TYPE_ARRAY_BOOL, 0);
 }
 
 void BinaryWriterImpl::WriteInt16(const int16_t val) {
@@ -110,19 +110,19 @@ void BinaryWriterImpl::WriteInt16(const int16_t val) {
 
 void BinaryWriterImpl::WriteInt16Array(const int16_t* val, const int32_t len) {
   WritePrimitiveArrayRaw< int16_t >(val, len, BinaryUtils::WriteInt16Array,
-                                    IGNITE_TYPE_ARRAY_SHORT);
+                                    DOCUMENTDB_TYPE_ARRAY_SHORT);
 }
 
 void BinaryWriterImpl::WriteInt16(const char* fieldName, const int16_t val) {
   WritePrimitive< int16_t >(fieldName, val, BinaryUtils::WriteInt16,
-                            IGNITE_TYPE_SHORT, 2);
+                            DOCUMENTDB_TYPE_SHORT, 2);
 }
 
 void BinaryWriterImpl::WriteInt16Array(const char* fieldName,
                                        const int16_t* val, const int32_t len) {
   WritePrimitiveArray< int16_t >(fieldName, val, len,
                                  BinaryUtils::WriteInt16Array,
-                                 IGNITE_TYPE_ARRAY_SHORT, 1);
+                                 DOCUMENTDB_TYPE_ARRAY_SHORT, 1);
 }
 
 void BinaryWriterImpl::WriteUInt16(const uint16_t val) {
@@ -132,12 +132,12 @@ void BinaryWriterImpl::WriteUInt16(const uint16_t val) {
 void BinaryWriterImpl::WriteUInt16Array(const uint16_t* val,
                                         const int32_t len) {
   WritePrimitiveArrayRaw< uint16_t >(val, len, BinaryUtils::WriteUInt16Array,
-                                     IGNITE_TYPE_ARRAY_CHAR);
+                                     DOCUMENTDB_TYPE_ARRAY_CHAR);
 }
 
 void BinaryWriterImpl::WriteUInt16(const char* fieldName, const uint16_t val) {
   WritePrimitive< uint16_t >(fieldName, val, BinaryUtils::WriteUInt16,
-                             IGNITE_TYPE_CHAR, 2);
+                             DOCUMENTDB_TYPE_CHAR, 2);
 }
 
 void BinaryWriterImpl::WriteUInt16Array(const char* fieldName,
@@ -145,7 +145,7 @@ void BinaryWriterImpl::WriteUInt16Array(const char* fieldName,
                                         const int32_t len) {
   WritePrimitiveArray< uint16_t >(fieldName, val, len,
                                   BinaryUtils::WriteUInt16Array,
-                                  IGNITE_TYPE_ARRAY_CHAR, 1);
+                                  DOCUMENTDB_TYPE_ARRAY_CHAR, 1);
 }
 
 void BinaryWriterImpl::WriteInt32(const int32_t val) {
@@ -154,19 +154,19 @@ void BinaryWriterImpl::WriteInt32(const int32_t val) {
 
 void BinaryWriterImpl::WriteInt32Array(const int32_t* val, const int32_t len) {
   WritePrimitiveArrayRaw< int32_t >(val, len, BinaryUtils::WriteInt32Array,
-                                    IGNITE_TYPE_ARRAY_INT);
+                                    DOCUMENTDB_TYPE_ARRAY_INT);
 }
 
 void BinaryWriterImpl::WriteInt32(const char* fieldName, const int32_t val) {
   WritePrimitive< int32_t >(fieldName, val, BinaryUtils::WriteInt32,
-                            IGNITE_TYPE_INT, 4);
+                            DOCUMENTDB_TYPE_INT, 4);
 }
 
 void BinaryWriterImpl::WriteInt32Array(const char* fieldName,
                                        const int32_t* val, const int32_t len) {
   WritePrimitiveArray< int32_t >(fieldName, val, len,
                                  BinaryUtils::WriteInt32Array,
-                                 IGNITE_TYPE_ARRAY_INT, 2);
+                                 DOCUMENTDB_TYPE_ARRAY_INT, 2);
 }
 
 void BinaryWriterImpl::WriteInt64(const int64_t val) {
@@ -175,19 +175,19 @@ void BinaryWriterImpl::WriteInt64(const int64_t val) {
 
 void BinaryWriterImpl::WriteInt64Array(const int64_t* val, const int32_t len) {
   WritePrimitiveArrayRaw< int64_t >(val, len, BinaryUtils::WriteInt64Array,
-                                    IGNITE_TYPE_ARRAY_LONG);
+                                    DOCUMENTDB_TYPE_ARRAY_LONG);
 }
 
 void BinaryWriterImpl::WriteInt64(const char* fieldName, const int64_t val) {
   WritePrimitive< int64_t >(fieldName, val, BinaryUtils::WriteInt64,
-                            IGNITE_TYPE_LONG, 8);
+                            DOCUMENTDB_TYPE_LONG, 8);
 }
 
 void BinaryWriterImpl::WriteInt64Array(const char* fieldName,
                                        const int64_t* val, const int32_t len) {
   WritePrimitiveArray< int64_t >(fieldName, val, len,
                                  BinaryUtils::WriteInt64Array,
-                                 IGNITE_TYPE_ARRAY_LONG, 3);
+                                 DOCUMENTDB_TYPE_ARRAY_LONG, 3);
 }
 
 void BinaryWriterImpl::WriteFloat(const float val) {
@@ -196,19 +196,19 @@ void BinaryWriterImpl::WriteFloat(const float val) {
 
 void BinaryWriterImpl::WriteFloatArray(const float* val, const int32_t len) {
   WritePrimitiveArrayRaw< float >(val, len, BinaryUtils::WriteFloatArray,
-                                  IGNITE_TYPE_ARRAY_FLOAT);
+                                  DOCUMENTDB_TYPE_ARRAY_FLOAT);
 }
 
 void BinaryWriterImpl::WriteFloat(const char* fieldName, const float val) {
   WritePrimitive< float >(fieldName, val, BinaryUtils::WriteFloat,
-                          IGNITE_TYPE_FLOAT, 4);
+                          DOCUMENTDB_TYPE_FLOAT, 4);
 }
 
 void BinaryWriterImpl::WriteFloatArray(const char* fieldName, const float* val,
                                        const int32_t len) {
   WritePrimitiveArray< float >(fieldName, val, len,
                                BinaryUtils::WriteFloatArray,
-                               IGNITE_TYPE_ARRAY_FLOAT, 2);
+                               DOCUMENTDB_TYPE_ARRAY_FLOAT, 2);
 }
 
 void BinaryWriterImpl::WriteDouble(const double val) {
@@ -217,26 +217,26 @@ void BinaryWriterImpl::WriteDouble(const double val) {
 
 void BinaryWriterImpl::WriteDoubleArray(const double* val, const int32_t len) {
   WritePrimitiveArrayRaw< double >(val, len, BinaryUtils::WriteDoubleArray,
-                                   IGNITE_TYPE_ARRAY_DOUBLE);
+                                   DOCUMENTDB_TYPE_ARRAY_DOUBLE);
 }
 
 void BinaryWriterImpl::WriteDouble(const char* fieldName, const double val) {
   WritePrimitive< double >(fieldName, val, BinaryUtils::WriteDouble,
-                           IGNITE_TYPE_DOUBLE, 8);
+                           DOCUMENTDB_TYPE_DOUBLE, 8);
 }
 
 void BinaryWriterImpl::WriteDoubleArray(const char* fieldName,
                                         const double* val, const int32_t len) {
   WritePrimitiveArray< double >(fieldName, val, len,
                                 BinaryUtils::WriteDoubleArray,
-                                IGNITE_TYPE_ARRAY_DOUBLE, 3);
+                                DOCUMENTDB_TYPE_ARRAY_DOUBLE, 3);
 }
 
 void BinaryWriterImpl::WriteGuid(const Guid val) {
   CheckRawMode(true);
   CheckSingleMode(true);
 
-  stream->WriteInt8(IGNITE_TYPE_UUID);
+  stream->WriteInt8(DOCUMENTDB_TYPE_UUID);
 
   BinaryUtils::WriteGuid(stream, val);
 }
@@ -246,24 +246,24 @@ void BinaryWriterImpl::WriteGuidArray(const Guid* val, const int32_t len) {
   CheckSingleMode(true);
 
   if (val) {
-    stream->WriteInt8(IGNITE_TYPE_ARRAY_UUID);
+    stream->WriteInt8(DOCUMENTDB_TYPE_ARRAY_UUID);
     stream->WriteInt32(len);
 
     for (int i = 0; i < len; i++) {
-      stream->WriteInt8(IGNITE_TYPE_UUID);
+      stream->WriteInt8(DOCUMENTDB_TYPE_UUID);
       BinaryUtils::WriteGuid(stream, val[i]);
     }
   } else
-    stream->WriteInt8(IGNITE_HDR_NULL);
+    stream->WriteInt8(DOCUMENTDB_HDR_NULL);
 }
 
 void BinaryWriterImpl::WriteGuid(const char* fieldName, const Guid val) {
   CheckRawMode(false);
   CheckSingleMode(true);
 
-  WriteFieldId(fieldName, IGNITE_TYPE_UUID);
+  WriteFieldId(fieldName, DOCUMENTDB_TYPE_UUID);
 
-  stream->WriteInt8(IGNITE_TYPE_UUID);
+  stream->WriteInt8(DOCUMENTDB_TYPE_UUID);
 
   BinaryUtils::WriteGuid(stream, val);
 }
@@ -273,16 +273,16 @@ void BinaryWriterImpl::WriteGuidArray(const char* fieldName, const Guid* val,
   CheckRawMode(false);
   CheckSingleMode(true);
 
-  WriteFieldId(fieldName, IGNITE_TYPE_ARRAY_UUID);
+  WriteFieldId(fieldName, DOCUMENTDB_TYPE_ARRAY_UUID);
 
   if (val) {
-    stream->WriteInt8(IGNITE_TYPE_ARRAY_UUID);
+    stream->WriteInt8(DOCUMENTDB_TYPE_ARRAY_UUID);
     stream->WriteInt32(len);
 
     for (int i = 0; i < len; i++)
-      WriteTopObject0< ignite::odbc::binary::BinaryWriter >(val[i]);
+      WriteTopObject0< documentdb::odbc::binary::BinaryWriter >(val[i]);
   } else {
-    stream->WriteInt8(IGNITE_HDR_NULL);
+    stream->WriteInt8(DOCUMENTDB_HDR_NULL);
   }
 }
 
@@ -290,7 +290,7 @@ void BinaryWriterImpl::WriteDate(const Date& val) {
   CheckRawMode(true);
   CheckSingleMode(true);
 
-  stream->WriteInt8(IGNITE_TYPE_DATE);
+  stream->WriteInt8(DOCUMENTDB_TYPE_DATE);
 
   BinaryUtils::WriteDate(stream, val);
 }
@@ -300,24 +300,24 @@ void BinaryWriterImpl::WriteDateArray(const Date* val, const int32_t len) {
   CheckSingleMode(true);
 
   if (val) {
-    stream->WriteInt8(IGNITE_TYPE_ARRAY_DATE);
+    stream->WriteInt8(DOCUMENTDB_TYPE_ARRAY_DATE);
     stream->WriteInt32(len);
 
     for (int i = 0; i < len; i++) {
-      stream->WriteInt8(IGNITE_TYPE_DATE);
+      stream->WriteInt8(DOCUMENTDB_TYPE_DATE);
       BinaryUtils::WriteDate(stream, val[i]);
     }
   } else
-    stream->WriteInt8(IGNITE_HDR_NULL);
+    stream->WriteInt8(DOCUMENTDB_HDR_NULL);
 }
 
 void BinaryWriterImpl::WriteDate(const char* fieldName, const Date& val) {
   CheckRawMode(false);
   CheckSingleMode(true);
 
-  WriteFieldId(fieldName, IGNITE_TYPE_DATE);
+  WriteFieldId(fieldName, DOCUMENTDB_TYPE_DATE);
 
-  stream->WriteInt8(IGNITE_TYPE_DATE);
+  stream->WriteInt8(DOCUMENTDB_TYPE_DATE);
 
   BinaryUtils::WriteDate(stream, val);
 }
@@ -327,23 +327,23 @@ void BinaryWriterImpl::WriteDateArray(const char* fieldName, const Date* val,
   CheckRawMode(false);
   CheckSingleMode(true);
 
-  WriteFieldId(fieldName, IGNITE_TYPE_ARRAY_DATE);
+  WriteFieldId(fieldName, DOCUMENTDB_TYPE_ARRAY_DATE);
 
   if (val) {
-    stream->WriteInt8(IGNITE_TYPE_ARRAY_DATE);
+    stream->WriteInt8(DOCUMENTDB_TYPE_ARRAY_DATE);
     stream->WriteInt32(len);
 
     for (int i = 0; i < len; i++)
-      WriteTopObject0< ignite::odbc::binary::BinaryWriter >(val[i]);
+      WriteTopObject0< documentdb::odbc::binary::BinaryWriter >(val[i]);
   } else
-    stream->WriteInt8(IGNITE_HDR_NULL);
+    stream->WriteInt8(DOCUMENTDB_HDR_NULL);
 }
 
 void BinaryWriterImpl::WriteTimestamp(const Timestamp& val) {
   CheckRawMode(true);
   CheckSingleMode(true);
 
-  stream->WriteInt8(IGNITE_TYPE_TIMESTAMP);
+  stream->WriteInt8(DOCUMENTDB_TYPE_TIMESTAMP);
 
   BinaryUtils::WriteTimestamp(stream, val);
 }
@@ -354,15 +354,15 @@ void BinaryWriterImpl::WriteTimestampArray(const Timestamp* val,
   CheckSingleMode(true);
 
   if (val) {
-    stream->WriteInt8(IGNITE_TYPE_ARRAY_TIMESTAMP);
+    stream->WriteInt8(DOCUMENTDB_TYPE_ARRAY_TIMESTAMP);
     stream->WriteInt32(len);
 
     for (int i = 0; i < len; i++) {
-      stream->WriteInt8(IGNITE_TYPE_TIMESTAMP);
+      stream->WriteInt8(DOCUMENTDB_TYPE_TIMESTAMP);
       BinaryUtils::WriteTimestamp(stream, val[i]);
     }
   } else
-    stream->WriteInt8(IGNITE_HDR_NULL);
+    stream->WriteInt8(DOCUMENTDB_HDR_NULL);
 }
 
 void BinaryWriterImpl::WriteTimestamp(const char* fieldName,
@@ -370,9 +370,9 @@ void BinaryWriterImpl::WriteTimestamp(const char* fieldName,
   CheckRawMode(false);
   CheckSingleMode(true);
 
-  WriteFieldId(fieldName, IGNITE_TYPE_TIMESTAMP);
+  WriteFieldId(fieldName, DOCUMENTDB_TYPE_TIMESTAMP);
 
-  stream->WriteInt8(IGNITE_TYPE_TIMESTAMP);
+  stream->WriteInt8(DOCUMENTDB_TYPE_TIMESTAMP);
 
   BinaryUtils::WriteTimestamp(stream, val);
 }
@@ -383,23 +383,23 @@ void BinaryWriterImpl::WriteTimestampArray(const char* fieldName,
   CheckRawMode(false);
   CheckSingleMode(true);
 
-  WriteFieldId(fieldName, IGNITE_TYPE_ARRAY_TIMESTAMP);
+  WriteFieldId(fieldName, DOCUMENTDB_TYPE_ARRAY_TIMESTAMP);
 
   if (val) {
-    stream->WriteInt8(IGNITE_TYPE_ARRAY_TIMESTAMP);
+    stream->WriteInt8(DOCUMENTDB_TYPE_ARRAY_TIMESTAMP);
     stream->WriteInt32(len);
 
     for (int i = 0; i < len; i++)
-      WriteTopObject0< ignite::odbc::binary::BinaryWriter >(val[i]);
+      WriteTopObject0< documentdb::odbc::binary::BinaryWriter >(val[i]);
   } else
-    stream->WriteInt8(IGNITE_HDR_NULL);
+    stream->WriteInt8(DOCUMENTDB_HDR_NULL);
 }
 
 void BinaryWriterImpl::WriteTime(const Time& val) {
   CheckRawMode(true);
   CheckSingleMode(true);
 
-  stream->WriteInt8(IGNITE_TYPE_TIME);
+  stream->WriteInt8(DOCUMENTDB_TYPE_TIME);
 
   BinaryUtils::WriteTime(stream, val);
 }
@@ -409,24 +409,24 @@ void BinaryWriterImpl::WriteTimeArray(const Time* val, const int32_t len) {
   CheckSingleMode(true);
 
   if (val) {
-    stream->WriteInt8(IGNITE_TYPE_ARRAY_TIME);
+    stream->WriteInt8(DOCUMENTDB_TYPE_ARRAY_TIME);
     stream->WriteInt32(len);
 
     for (int i = 0; i < len; i++) {
-      stream->WriteInt8(IGNITE_TYPE_TIME);
+      stream->WriteInt8(DOCUMENTDB_TYPE_TIME);
       BinaryUtils::WriteTime(stream, val[i]);
     }
   } else
-    stream->WriteInt8(IGNITE_HDR_NULL);
+    stream->WriteInt8(DOCUMENTDB_HDR_NULL);
 }
 
 void BinaryWriterImpl::WriteTime(const char* fieldName, const Time& val) {
   CheckRawMode(false);
   CheckSingleMode(true);
 
-  WriteFieldId(fieldName, IGNITE_TYPE_TIME);
+  WriteFieldId(fieldName, DOCUMENTDB_TYPE_TIME);
 
-  stream->WriteInt8(IGNITE_TYPE_TIME);
+  stream->WriteInt8(DOCUMENTDB_TYPE_TIME);
 
   BinaryUtils::WriteTime(stream, val);
 }
@@ -436,16 +436,16 @@ void BinaryWriterImpl::WriteTimeArray(const char* fieldName, const Time* val,
   CheckRawMode(false);
   CheckSingleMode(true);
 
-  WriteFieldId(fieldName, IGNITE_TYPE_ARRAY_TIME);
+  WriteFieldId(fieldName, DOCUMENTDB_TYPE_ARRAY_TIME);
 
   if (val) {
-    stream->WriteInt8(IGNITE_TYPE_ARRAY_TIME);
+    stream->WriteInt8(DOCUMENTDB_TYPE_ARRAY_TIME);
     stream->WriteInt32(len);
 
     for (int i = 0; i < len; i++)
-      WriteTopObject0< ignite::odbc::binary::BinaryWriter >(val[i]);
+      WriteTopObject0< documentdb::odbc::binary::BinaryWriter >(val[i]);
   } else
-    stream->WriteInt8(IGNITE_HDR_NULL);
+    stream->WriteInt8(DOCUMENTDB_HDR_NULL);
 }
 
 void BinaryWriterImpl::WriteString(const char* val, const int32_t len) {
@@ -453,11 +453,11 @@ void BinaryWriterImpl::WriteString(const char* val, const int32_t len) {
   CheckSingleMode(true);
 
   if (val) {
-    stream->WriteInt8(IGNITE_TYPE_STRING);
+    stream->WriteInt8(DOCUMENTDB_TYPE_STRING);
 
     BinaryUtils::WriteString(stream, val, len);
   } else
-    stream->WriteInt8(IGNITE_HDR_NULL);
+    stream->WriteInt8(DOCUMENTDB_HDR_NULL);
 }
 
 void BinaryWriterImpl::WriteString(const char* fieldName, const char* val,
@@ -465,20 +465,20 @@ void BinaryWriterImpl::WriteString(const char* fieldName, const char* val,
   CheckRawMode(false);
   CheckSingleMode(true);
 
-  WriteFieldId(fieldName, IGNITE_TYPE_STRING);
+  WriteFieldId(fieldName, DOCUMENTDB_TYPE_STRING);
 
   if (val) {
-    stream->WriteInt8(IGNITE_TYPE_STRING);
+    stream->WriteInt8(DOCUMENTDB_TYPE_STRING);
 
     BinaryUtils::WriteString(stream, val, len);
   } else
-    stream->WriteInt8(IGNITE_HDR_NULL);
+    stream->WriteInt8(DOCUMENTDB_HDR_NULL);
 }
 
 int32_t BinaryWriterImpl::WriteStringArray() {
   StartContainerSession(true);
 
-  stream->WriteInt8(IGNITE_TYPE_ARRAY_STRING);
+  stream->WriteInt8(DOCUMENTDB_TYPE_ARRAY_STRING);
   stream->Position(stream->Position() + 4);
 
   return elemId;
@@ -487,9 +487,9 @@ int32_t BinaryWriterImpl::WriteStringArray() {
 int32_t BinaryWriterImpl::WriteStringArray(const char* fieldName) {
   StartContainerSession(false);
 
-  WriteFieldId(fieldName, IGNITE_TYPE_ARRAY_STRING);
+  WriteFieldId(fieldName, DOCUMENTDB_TYPE_ARRAY_STRING);
 
-  stream->WriteInt8(IGNITE_TYPE_ARRAY_STRING);
+  stream->WriteInt8(DOCUMENTDB_TYPE_ARRAY_STRING);
   stream->Position(stream->Position() + 4);
 
   return elemId;
@@ -500,11 +500,11 @@ void BinaryWriterImpl::WriteStringElement(int32_t id, const char* val,
   CheckSession(id);
 
   if (val) {
-    stream->WriteInt8(IGNITE_TYPE_STRING);
+    stream->WriteInt8(DOCUMENTDB_TYPE_STRING);
 
     BinaryUtils::WriteString(stream, val, len);
   } else
-    stream->WriteInt8(IGNITE_HDR_NULL);
+    stream->WriteInt8(DOCUMENTDB_HDR_NULL);
 
   elemCnt++;
 }
@@ -513,7 +513,7 @@ void BinaryWriterImpl::WriteBinaryEnum(BinaryEnumEntry entry) {
   CheckRawMode(true);
   CheckSingleMode(true);
 
-  stream->WriteInt8(IGNITE_TYPE_ENUM);
+  stream->WriteInt8(DOCUMENTDB_TYPE_ENUM);
 
   BinaryUtils::WriteBinaryEnumEntry(stream, entry);
 }
@@ -523,8 +523,8 @@ void BinaryWriterImpl::WriteBinaryEnum(const char* fieldName,
   CheckRawMode(false);
   CheckSingleMode(true);
 
-  WriteFieldId(fieldName, IGNITE_TYPE_ENUM);
-  stream->WriteInt8(IGNITE_TYPE_ENUM);
+  WriteFieldId(fieldName, DOCUMENTDB_TYPE_ENUM);
+  stream->WriteInt8(DOCUMENTDB_TYPE_ENUM);
 
   BinaryUtils::WriteBinaryEnumEntry(stream, entry);
 }
@@ -540,18 +540,18 @@ void BinaryWriterImpl::WriteNull(const char* fieldName) {
   CheckRawMode(false);
   CheckSingleMode(true);
 
-  WriteFieldId(fieldName, IGNITE_TYPE_OBJECT);
+  WriteFieldId(fieldName, DOCUMENTDB_TYPE_OBJECT);
   WriteNull0();
 }
 
 void BinaryWriterImpl::WriteNull0() {
-  stream->WriteInt8(IGNITE_HDR_NULL);
+  stream->WriteInt8(DOCUMENTDB_HDR_NULL);
 }
 
 int32_t BinaryWriterImpl::WriteArray() {
   StartContainerSession(true);
 
-  stream->WriteInt8(IGNITE_TYPE_ARRAY);
+  stream->WriteInt8(DOCUMENTDB_TYPE_ARRAY);
   stream->Position(stream->Position() + 4);
 
   return elemId;
@@ -560,9 +560,9 @@ int32_t BinaryWriterImpl::WriteArray() {
 int32_t BinaryWriterImpl::WriteArray(const char* fieldName) {
   StartContainerSession(false);
 
-  WriteFieldId(fieldName, IGNITE_TYPE_ARRAY);
+  WriteFieldId(fieldName, DOCUMENTDB_TYPE_ARRAY);
 
-  stream->WriteInt8(IGNITE_TYPE_ARRAY);
+  stream->WriteInt8(DOCUMENTDB_TYPE_ARRAY);
   stream->Position(stream->Position() + 4);
 
   return elemId;
@@ -571,7 +571,7 @@ int32_t BinaryWriterImpl::WriteArray(const char* fieldName) {
 int32_t BinaryWriterImpl::WriteCollection(CollectionType::Type typ) {
   StartContainerSession(true);
 
-  stream->WriteInt8(IGNITE_TYPE_COLLECTION);
+  stream->WriteInt8(DOCUMENTDB_TYPE_COLLECTION);
   stream->Position(stream->Position() + 4);
   stream->WriteInt8(typ);
 
@@ -582,19 +582,19 @@ int32_t BinaryWriterImpl::WriteCollection(const char* fieldName,
                                           CollectionType::Type typ) {
   StartContainerSession(false);
 
-  WriteFieldId(fieldName, IGNITE_TYPE_COLLECTION);
+  WriteFieldId(fieldName, DOCUMENTDB_TYPE_COLLECTION);
 
-  stream->WriteInt8(IGNITE_TYPE_COLLECTION);
+  stream->WriteInt8(DOCUMENTDB_TYPE_COLLECTION);
   stream->Position(stream->Position() + 4);
   stream->WriteInt8(typ);
 
   return elemId;
 }
 
-int32_t BinaryWriterImpl::WriteMap(ignite::odbc::binary::MapType::Type typ) {
+int32_t BinaryWriterImpl::WriteMap(documentdb::odbc::binary::MapType::Type typ) {
   StartContainerSession(true);
 
-  stream->WriteInt8(IGNITE_TYPE_MAP);
+  stream->WriteInt8(DOCUMENTDB_TYPE_MAP);
   stream->Position(stream->Position() + 4);
   stream->WriteInt8(typ);
 
@@ -602,12 +602,12 @@ int32_t BinaryWriterImpl::WriteMap(ignite::odbc::binary::MapType::Type typ) {
 }
 
 int32_t BinaryWriterImpl::WriteMap(const char* fieldName,
-                                   ignite::odbc::binary::MapType::Type typ) {
+                                   documentdb::odbc::binary::MapType::Type typ) {
   StartContainerSession(false);
 
-  WriteFieldId(fieldName, IGNITE_TYPE_MAP);
+  WriteFieldId(fieldName, DOCUMENTDB_TYPE_MAP);
 
-  stream->WriteInt8(IGNITE_TYPE_MAP);
+  stream->WriteInt8(DOCUMENTDB_TYPE_MAP);
   stream->Position(stream->Position() + 4);
   stream->WriteInt8(typ);
 
@@ -657,7 +657,7 @@ void BinaryWriterImpl::WritePrimitiveArrayRaw(
     stream->WriteInt32(len);
     func(stream, val, len);
   } else
-    stream->WriteInt8(IGNITE_HDR_NULL);
+    stream->WriteInt8(DOCUMENTDB_HDR_NULL);
 }
 
 template < typename T >
@@ -690,7 +690,7 @@ void BinaryWriterImpl::WritePrimitiveArray(
     stream->WriteInt32(len);
     func(stream, val, len);
   } else {
-    stream->WriteInt8(IGNITE_HDR_NULL);
+    stream->WriteInt8(DOCUMENTDB_HDR_NULL);
   }
 }
 
@@ -698,22 +698,22 @@ void BinaryWriterImpl::CheckRawMode(bool expected) const {
   bool rawMode = rawPos != -1;
 
   if (expected && !rawMode) {
-    IGNITE_ERROR_1(IgniteError::IGNITE_ERR_BINARY,
+    DOCUMENTDB_ERROR_1(DocumentDbError::DOCUMENTDB_ERR_BINARY,
                    "Operation can be performed only in raw mode.");
   } else if (!expected && rawMode) {
-    IGNITE_ERROR_1(IgniteError::IGNITE_ERR_BINARY,
+    DOCUMENTDB_ERROR_1(DocumentDbError::DOCUMENTDB_ERR_BINARY,
                    "Operation cannot be performed in raw mode.");
   }
 }
 
 void BinaryWriterImpl::CheckSingleMode(bool expected) const {
   if (expected && elemId != 0) {
-    IGNITE_ERROR_1(
-        IgniteError::IGNITE_ERR_BINARY,
+    DOCUMENTDB_ERROR_1(
+        DocumentDbError::DOCUMENTDB_ERR_BINARY,
         "Operation cannot be performed when container is being written.");
   } else if (!expected && elemId == 0) {
-    IGNITE_ERROR_1(
-        IgniteError::IGNITE_ERR_BINARY,
+    DOCUMENTDB_ERROR_1(
+        DocumentDbError::DOCUMENTDB_ERR_BINARY,
         "Operation can be performed only when container is being written.");
   }
 }
@@ -728,8 +728,8 @@ void BinaryWriterImpl::StartContainerSession(bool expRawMode) {
 
 void BinaryWriterImpl::CheckSession(int32_t expSes) const {
   if (elemId != expSes) {
-    IGNITE_ERROR_1(
-        IgniteError::IGNITE_ERR_BINARY,
+    DOCUMENTDB_ERROR_1(
+        DocumentDbError::DOCUMENTDB_ERR_BINARY,
         "Containter write session has been finished or is not started yet.");
   }
 }
@@ -746,86 +746,86 @@ void BinaryWriterImpl::WriteFieldId(const char* fieldName,
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+void BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter,
                                         int8_t >(const int8_t& obj) {
-  WriteTopObject0< int8_t >(obj, BinaryUtils::WriteInt8, IGNITE_TYPE_BYTE);
+  WriteTopObject0< int8_t >(obj, BinaryUtils::WriteInt8, DOCUMENTDB_TYPE_BYTE);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+void BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter,
                                         bool >(const bool& obj) {
-  WriteTopObject0< bool >(obj, BinaryUtils::WriteBool, IGNITE_TYPE_BOOL);
+  WriteTopObject0< bool >(obj, BinaryUtils::WriteBool, DOCUMENTDB_TYPE_BOOL);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+void BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter,
                                         int16_t >(const int16_t& obj) {
-  WriteTopObject0< int16_t >(obj, BinaryUtils::WriteInt16, IGNITE_TYPE_SHORT);
+  WriteTopObject0< int16_t >(obj, BinaryUtils::WriteInt16, DOCUMENTDB_TYPE_SHORT);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+void BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter,
                                         uint16_t >(const uint16_t& obj) {
-  WriteTopObject0< uint16_t >(obj, BinaryUtils::WriteUInt16, IGNITE_TYPE_CHAR);
+  WriteTopObject0< uint16_t >(obj, BinaryUtils::WriteUInt16, DOCUMENTDB_TYPE_CHAR);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+void BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter,
                                         int32_t >(const int32_t& obj) {
-  WriteTopObject0< int32_t >(obj, BinaryUtils::WriteInt32, IGNITE_TYPE_INT);
+  WriteTopObject0< int32_t >(obj, BinaryUtils::WriteInt32, DOCUMENTDB_TYPE_INT);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+void BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter,
                                         int64_t >(const int64_t& obj) {
-  WriteTopObject0< int64_t >(obj, BinaryUtils::WriteInt64, IGNITE_TYPE_LONG);
+  WriteTopObject0< int64_t >(obj, BinaryUtils::WriteInt64, DOCUMENTDB_TYPE_LONG);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+void BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter,
                                         float >(const float& obj) {
-  WriteTopObject0< float >(obj, BinaryUtils::WriteFloat, IGNITE_TYPE_FLOAT);
+  WriteTopObject0< float >(obj, BinaryUtils::WriteFloat, DOCUMENTDB_TYPE_FLOAT);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+void BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter,
                                         double >(const double& obj) {
-  WriteTopObject0< double >(obj, BinaryUtils::WriteDouble, IGNITE_TYPE_DOUBLE);
+  WriteTopObject0< double >(obj, BinaryUtils::WriteDouble, DOCUMENTDB_TYPE_DOUBLE);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+void BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter,
                                         Guid >(const Guid& obj) {
-  WriteTopObject0< Guid >(obj, BinaryUtils::WriteGuid, IGNITE_TYPE_UUID);
+  WriteTopObject0< Guid >(obj, BinaryUtils::WriteGuid, DOCUMENTDB_TYPE_UUID);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+void BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter,
                                         Date >(const Date& obj) {
-  WriteTopObject0< Date >(obj, BinaryUtils::WriteDate, IGNITE_TYPE_DATE);
+  WriteTopObject0< Date >(obj, BinaryUtils::WriteDate, DOCUMENTDB_TYPE_DATE);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+void BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter,
                                         Timestamp >(const Timestamp& obj) {
   WriteTopObject0< Timestamp >(obj, BinaryUtils::WriteTimestamp,
-                               IGNITE_TYPE_TIMESTAMP);
+                               DOCUMENTDB_TYPE_TIMESTAMP);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+void BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter,
                                         Time >(const Time& obj) {
-  WriteTopObject0< Time >(obj, BinaryUtils::WriteTime, IGNITE_TYPE_TIME);
+  WriteTopObject0< Time >(obj, BinaryUtils::WriteTime, DOCUMENTDB_TYPE_TIME);
 }
 
 template <>
-void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
+void BinaryWriterImpl::WriteTopObject0< documentdb::odbc::binary::BinaryWriter,
                                         std::string >(const std::string& obj) {
   const char* obj0 = obj.c_str();
 
   int32_t len = static_cast< int32_t >(obj.size());
 
-  stream->WriteInt8(IGNITE_TYPE_STRING);
+  stream->WriteInt8(DOCUMENTDB_TYPE_STRING);
 
   BinaryUtils::WriteString(stream, obj0, len);
 }
@@ -833,16 +833,16 @@ void BinaryWriterImpl::WriteTopObject0< ignite::odbc::binary::BinaryWriter,
 void BinaryWriterImpl::PostWrite() {
   int32_t lenWithoutSchema = stream->Position() - start;
 
-  uint16_t flags = IGNITE_BINARY_FLAG_USER_TYPE;
+  uint16_t flags = DOCUMENTDB_BINARY_FLAG_USER_TYPE;
 
   if (rawPos > 0)
-    flags |= IGNITE_BINARY_FLAG_HAS_RAW;
+    flags |= DOCUMENTDB_BINARY_FLAG_HAS_RAW;
 
   if (!HasSchema()) {
-    stream->WriteInt16(start + IGNITE_OFFSET_FLAGS, flags);
-    stream->WriteInt32(start + IGNITE_OFFSET_LEN, lenWithoutSchema);
-    stream->WriteInt32(start + IGNITE_OFFSET_SCHEMA_ID, 0);
-    stream->WriteInt32(start + IGNITE_OFFSET_SCHEMA_OR_RAW_OFF,
+    stream->WriteInt16(start + DOCUMENTDB_OFFSET_FLAGS, flags);
+    stream->WriteInt32(start + DOCUMENTDB_OFFSET_LEN, lenWithoutSchema);
+    stream->WriteInt32(start + DOCUMENTDB_OFFSET_SCHEMA_ID, 0);
+    stream->WriteInt32(start + DOCUMENTDB_OFFSET_SCHEMA_OR_RAW_OFF,
                        GetRawPosition() - start);
   } else {
     int32_t schemaId = schema.GetId();
@@ -855,17 +855,17 @@ void BinaryWriterImpl::PostWrite() {
 
     int32_t length = stream->Position() - start;
 
-    flags |= IGNITE_BINARY_FLAG_HAS_SCHEMA;
+    flags |= DOCUMENTDB_BINARY_FLAG_HAS_SCHEMA;
 
     if (schemaType == BinaryOffsetType::ONE_BYTE)
-      flags |= IGNITE_BINARY_FLAG_OFFSET_ONE_BYTE;
+      flags |= DOCUMENTDB_BINARY_FLAG_OFFSET_ONE_BYTE;
     else if (schemaType == BinaryOffsetType::TWO_BYTES)
-      flags |= IGNITE_BINARY_FLAG_OFFSET_TWO_BYTES;
+      flags |= DOCUMENTDB_BINARY_FLAG_OFFSET_TWO_BYTES;
 
-    stream->WriteInt16(start + IGNITE_OFFSET_FLAGS, flags);
-    stream->WriteInt32(start + IGNITE_OFFSET_LEN, length);
-    stream->WriteInt32(start + IGNITE_OFFSET_SCHEMA_ID, schemaId);
-    stream->WriteInt32(start + IGNITE_OFFSET_SCHEMA_OR_RAW_OFF,
+    stream->WriteInt16(start + DOCUMENTDB_OFFSET_FLAGS, flags);
+    stream->WriteInt32(start + DOCUMENTDB_OFFSET_LEN, length);
+    stream->WriteInt32(start + DOCUMENTDB_OFFSET_SCHEMA_ID, schemaId);
+    stream->WriteInt32(start + DOCUMENTDB_OFFSET_SCHEMA_OR_RAW_OFF,
                        lenWithoutSchema);
   }
 }
@@ -886,4 +886,4 @@ InteropOutputStream* BinaryWriterImpl::GetStream() {
 }  // namespace binary
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

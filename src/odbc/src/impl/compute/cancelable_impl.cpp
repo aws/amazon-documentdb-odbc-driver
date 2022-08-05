@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/impl/compute/cancelable_impl.h>
+#include <documentdb/odbc/impl/compute/cancelable_impl.h>
 
-using namespace ignite::odbc::common::concurrent;
+using namespace documentdb::odbc::common::concurrent;
 
 namespace {
 /**
@@ -28,7 +28,7 @@ struct Operation {
 };
 }  // namespace
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace compute {
@@ -39,13 +39,13 @@ CancelableImpl::CancelableImpl(SharedPointer< IgniteEnvironment > env,
 }
 
 void CancelableImpl::Cancel() {
-  IgniteError err;
+  DocumentDbError err;
 
   OutInOpLong(Operation::Cancel, 0, err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 }
 }  // namespace compute
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

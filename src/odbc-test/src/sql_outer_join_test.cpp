@@ -20,12 +20,12 @@
 #include "sql_test_suite_fixture.h"
 #include "test_utils.h"
 
-using namespace ignite;
-using namespace ignite_test;
+using namespace documentdb;
+using namespace documentdb_test;
 
 using namespace boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE(SqlOuterJoinTestSuite, ignite::SqlTestSuiteFixture)
+BOOST_FIXTURE_TEST_SUITE(SqlOuterJoinTestSuite, documentdb::SqlTestSuiteFixture)
 
 // Checking that left outer joins are supported.
 // Corresponds to SQL_OJ_LEFT flag.

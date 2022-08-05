@@ -18,7 +18,7 @@
 #include <sstream>
 #include <vector>
 
-#include "ignite/odbc/common/dynamic_load_os.h"
+#include "documentdb/odbc/common/dynamic_load_os.h"
 
 namespace {
 std::wstring StringToWstring(const std::string& str) {
@@ -39,7 +39,7 @@ std::wstring StringToWstring(const std::string& str) {
 }
 }  // namespace
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace common {
 namespace dynamic {
@@ -99,4 +99,4 @@ Module GetCurrent() {
 }  // namespace dynamic
 }  // namespace common
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

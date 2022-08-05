@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "ignite/odbc/impl/interop/interop_memory.h"
+#include "documentdb/odbc/impl/interop/interop_memory.h"
 
-#include <ignite/odbc/ignite_error.h>
+#include <documentdb/odbc/documentdb_error.h>
 
 #include <cstdlib>
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace interop {
@@ -34,27 +34,27 @@ void InteropMemory::Data(int8_t* memPtr, void* ptr) {
 }
 
 int32_t InteropMemory::Capacity(const int8_t* memPtr) {
-  return *reinterpret_cast< const int32_t* >(memPtr + IGNITE_MEM_HDR_OFF_CAP);
+  return *reinterpret_cast< const int32_t* >(memPtr + DOCUMENTDB_MEM_HDR_OFF_CAP);
 }
 
 void InteropMemory::Capacity(int8_t* memPtr, int32_t val) {
-  *reinterpret_cast< int32_t* >(memPtr + IGNITE_MEM_HDR_OFF_CAP) = val;
+  *reinterpret_cast< int32_t* >(memPtr + DOCUMENTDB_MEM_HDR_OFF_CAP) = val;
 }
 
 int32_t InteropMemory::Length(const int8_t* memPtr) {
-  return *reinterpret_cast< const int32_t* >(memPtr + IGNITE_MEM_HDR_OFF_LEN);
+  return *reinterpret_cast< const int32_t* >(memPtr + DOCUMENTDB_MEM_HDR_OFF_LEN);
 }
 
 void InteropMemory::Length(int8_t* memPtr, int32_t val) {
-  *reinterpret_cast< int32_t* >(memPtr + IGNITE_MEM_HDR_OFF_LEN) = val;
+  *reinterpret_cast< int32_t* >(memPtr + DOCUMENTDB_MEM_HDR_OFF_LEN) = val;
 }
 
 int32_t InteropMemory::Flags(const int8_t* memPtr) {
-  return *reinterpret_cast< const int32_t* >(memPtr + IGNITE_MEM_HDR_OFF_FLAGS);
+  return *reinterpret_cast< const int32_t* >(memPtr + DOCUMENTDB_MEM_HDR_OFF_FLAGS);
 }
 
 void InteropMemory::Flags(int8_t* memPtr, int32_t val) {
-  *reinterpret_cast< int32_t* >(memPtr + IGNITE_MEM_HDR_OFF_FLAGS) = val;
+  *reinterpret_cast< int32_t* >(memPtr + DOCUMENTDB_MEM_HDR_OFF_FLAGS) = val;
 }
 
 bool InteropMemory::IsExternal(const int8_t* memPtr) {
@@ -62,7 +62,7 @@ bool InteropMemory::IsExternal(const int8_t* memPtr) {
 }
 
 bool InteropMemory::IsExternal(int32_t flags) {
-  return (flags & IGNITE_MEM_FLAG_EXT) != IGNITE_MEM_FLAG_EXT;
+  return (flags & DOCUMENTDB_MEM_FLAG_EXT) != DOCUMENTDB_MEM_FLAG_EXT;
 }
 
 bool InteropMemory::IsPooled(const int8_t* memPtr) {
@@ -70,7 +70,7 @@ bool InteropMemory::IsPooled(const int8_t* memPtr) {
 }
 
 bool InteropMemory::IsPooled(int32_t flags) {
-  return (flags & IGNITE_MEM_FLAG_POOLED) != 0;
+  return (flags & DOCUMENTDB_MEM_FLAG_POOLED) != 0;
 }
 
 bool InteropMemory::IsAcquired(const int8_t* memPtr) {
@@ -78,7 +78,7 @@ bool InteropMemory::IsAcquired(const int8_t* memPtr) {
 }
 
 bool InteropMemory::IsAcquired(int32_t flags) {
-  return (flags & IGNITE_MEM_FLAG_ACQUIRED) != 0;
+  return (flags & DOCUMENTDB_MEM_FLAG_ACQUIRED) != 0;
 }
 
 int8_t* InteropMemory::Pointer() {
@@ -114,12 +114,12 @@ void InteropMemory::Length(int32_t val) {
 }
 
 InteropUnpooledMemory::InteropUnpooledMemory(int32_t cap) {
-  memPtr = static_cast< int8_t* >(malloc(IGNITE_MEM_HDR_LEN));
+  memPtr = static_cast< int8_t* >(malloc(DOCUMENTDB_MEM_HDR_LEN));
 
   Data(memPtr, malloc(cap));
   Capacity(memPtr, cap);
   Length(memPtr, 0);
-  Flags(memPtr, IGNITE_MEM_FLAG_EXT);
+  Flags(memPtr, DOCUMENTDB_MEM_FLAG_EXT);
 
   owning = true;
 }
@@ -165,4 +165,4 @@ void InteropUnpooledMemory::CleanUp() {
 }  // namespace interop
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

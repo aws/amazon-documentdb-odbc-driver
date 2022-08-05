@@ -14,11 +14,11 @@
  *
  */
 
-#include "ignite/odbc/scan_method.h"
+#include "documentdb/odbc/scan_method.h"
 
-#include <ignite/odbc/common/utils.h>
+#include <documentdb/odbc/common/utils.h>
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 ScanMethod::Type ScanMethod::FromString(const std::string& val, Type dflt) {
   std::string lowerVal = common::ToLower(val);
@@ -77,4 +77,4 @@ std::string ScanMethod::ToJdbcString(Type val) {
   }
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

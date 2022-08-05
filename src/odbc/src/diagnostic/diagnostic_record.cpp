@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/diagnostic/diagnostic_record.h"
+#include "documentdb/odbc/diagnostic/diagnostic_record.h"
 
 #include <set>
 #include <string>
@@ -154,7 +154,7 @@ const std::string STATE_HYT01 = "HYT01";
 const std::string STATE_IM001 = "IM001";
 }  // namespace
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace diagnostic {
 DiagnosticRecord::DiagnosticRecord()
@@ -412,4 +412,4 @@ void DiagnosticRecord::MarkRetrieved() {
 }
 }  // namespace diagnostic
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb
