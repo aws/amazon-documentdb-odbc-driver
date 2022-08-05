@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/common_types.h"
+#include "documentdb/odbc/common_types.h"
 
-#include "ignite/odbc/impl/binary/binary_common.h"
+#include "documentdb/odbc/impl/binary/binary_common.h"
 
-#include "ignite/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/system/odbc_constants.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 int SqlResultToReturnCode(SqlResult::Type result) {
   switch (result) {
@@ -167,4 +167,4 @@ SqlState::Type ResponseStatusToSqlState(int32_t status) {
   }
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

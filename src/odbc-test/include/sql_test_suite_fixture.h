@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef _IGNITE_ODBC_TEST_SQL_TEST_SUIT_FIXTURE
-#define _IGNITE_ODBC_TEST_SQL_TEST_SUIT_FIXTURE
+#ifndef _DOCUMENTDB_ODBC_TEST_SQL_TEST_SUIT_FIXTURE
+#define _DOCUMENTDB_ODBC_TEST_SQL_TEST_SUIT_FIXTURE
 
 #ifdef _WIN32
 #include <windows.h>
@@ -28,12 +28,11 @@
 #include <boost/test/unit_test.hpp>
 #include <string>
 
-#include "ignite/odbc/common/decimal.h"
-#include "ignite/ignite.h"
-#include "ignite/ignition.h"
+#include "documentdb/odbc/common/decimal.h"
+#include "documentdb/odbc/ignite.h"
 #include "test_type.h"
 
-namespace ignite {
+namespace documentdb {
 /**
  * Test setup fixture.
  */
@@ -160,8 +159,8 @@ void SqlTestSuiteFixture::CheckSingleResult< bool >(const char* request,
                                                     const bool& expected);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< ignite::Guid >(
-    const char* request, const ignite::Guid& expected);
+void SqlTestSuiteFixture::CheckSingleResult< documentdb::Guid >(
+    const char* request, const documentdb::Guid& expected);
 
 template <>
 void SqlTestSuiteFixture::CheckSingleResult< std::string >(const char* request);
@@ -198,8 +197,8 @@ void SqlTestSuiteFixture::CheckSingleResult< std::vector< int8_t > >(
     const char* request, const std::vector< int8_t >& expected);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< ignite::common::Decimal >(
-    const char* request, const ignite::common::Decimal& expected);
+void SqlTestSuiteFixture::CheckSingleResult< documentdb::common::Decimal >(
+    const char* request, const documentdb::common::Decimal& expected);
 
 template <>
 void SqlTestSuiteFixture::CheckSingleResult< Date >(const char* request,
@@ -212,6 +211,6 @@ void SqlTestSuiteFixture::CheckSingleResult< Timestamp >(
 template <>
 void SqlTestSuiteFixture::CheckSingleResult< Time >(const char* request,
                                                     const Time& expected);
-}  // namespace ignite
+}  // namespace documentdb
 
-#endif  //_IGNITE_ODBC_TEST_SQL_TEST_SUIT_FIXTURE
+#endif  //_DOCUMENTDB_ODBC_TEST_SQL_TEST_SUIT_FIXTURE

@@ -14,11 +14,11 @@
  *
  */
 
-#include "ignite/odbc/read_preference.h"
+#include "documentdb/odbc/read_preference.h"
 
-#include <ignite/odbc/common/utils.h>
+#include <documentdb/odbc/common/utils.h>
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 ReadPreference::Type ReadPreference::FromString(const std::string& val,
                                                 Type dflt) {
@@ -87,4 +87,4 @@ std::string ReadPreference::ToJdbcString(Type val) {
   }
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

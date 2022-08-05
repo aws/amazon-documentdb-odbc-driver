@@ -18,10 +18,10 @@
 #include <dlfcn.h>
 
 #include <sstream>
-#include "ignite/odbc/common/dynamic_load_os.h"
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/common/dynamic_load_os.h"
+#include "documentdb/odbc/utility.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace common {
 namespace dynamic {
@@ -77,4 +77,4 @@ Module GetCurrent() {
 }  // namespace dynamic
 }  // namespace common
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

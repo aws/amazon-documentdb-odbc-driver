@@ -19,18 +19,18 @@
 #include <windows.h>
 #endif
 
-#include <ignite/odbc/common/fixed_size_array.h>
+#include <documentdb/odbc/common/fixed_size_array.h>
 #include <sql.h>
 #include <sqlext.h>
 #include <fstream>
 
 #include <boost/test/unit_test.hpp>
 
-#include <ignite/odbc/utility.h>
+#include <documentdb/odbc/utility.h>
 #include "odbc_test_suite.h"
 #include "test_utils.h"
 
-using namespace ignite_test;
+using namespace documentdb_test;
 using namespace boost::unit_test;
 
 /**
@@ -50,7 +50,7 @@ struct OdbcConfig {
 
 BOOST_GLOBAL_FIXTURE(OdbcConfig);
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 void OdbcTestSuite::Prepare() {
   // Allocate an environment handle
@@ -883,4 +883,4 @@ void OdbcTestSuite::CreateDsnConnectionStringForLocalServer(
   }
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

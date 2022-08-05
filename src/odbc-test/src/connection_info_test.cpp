@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/config/connection_info.h"
+#include "documentdb/odbc/config/connection_info.h"
 
 #include <boost/test/unit_test.hpp>
 #include <iostream>
 
-#include "ignite/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/system/odbc_constants.h"
 
-using namespace ignite::odbc;
-using namespace ignite::odbc::config;
+using namespace documentdb::odbc;
+using namespace documentdb::odbc::config;
 
 BOOST_AUTO_TEST_SUITE(ConnectionInfoTestSuite)
 

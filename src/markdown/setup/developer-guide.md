@@ -90,7 +90,7 @@ Example:
    user setup.
 6. On the Developer PowerShell, run one of the build scripts to create an initial compilation.
    1. E.g.: `.\build_win_debug64.ps1`
-   2. Navigate to the `build\odbc\cmake` folder to use the generated solution file, `Ignite.C++.sln` to work on
+   2. Navigate to the `build\odbc\cmake` folder to use the generated solution file, `DocumentDB-ODBC.C++.sln` to work on
    source code development and testing.
 8. Open a **64-bit** command shell or **64-bit** PowerShell window, ***as Administrator***, run the command below
    ```

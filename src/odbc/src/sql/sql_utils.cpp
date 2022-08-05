@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/odbc_error.h>
-#include <ignite/odbc/sql/sql_lexer.h>
-#include <ignite/odbc/sql/sql_utils.h>
+#include <documentdb/odbc/odbc_error.h>
+#include <documentdb/odbc/sql/sql_lexer.h>
+#include <documentdb/odbc/sql/sql_utils.h>
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace sql_utils {
 bool IsInternalCommand(const std::string& sql) {
@@ -45,4 +45,4 @@ bool IsInternalCommand(const std::string& sql) {
 }
 }  // namespace sql_utils
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

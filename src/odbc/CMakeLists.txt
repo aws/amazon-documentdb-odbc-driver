@@ -52,7 +52,7 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/common/bits.cpp
         src/common/concurrent.cpp
         src/common/decimal.cpp
-        src/ignite_error.cpp
+        src/documentdb_error.cpp
         src/common/utils.cpp
         src/config/config_tools.cpp
         src/config/configuration.cpp
@@ -274,7 +274,7 @@ if (WIN32 AND ${WITH_ODBC_MSI})
     set(WIX_PRODUCT_NAME "${WIX_PROJECT_NAME} ODBC ${WIX_BIT_SUFFIX} Driver")
 
     configure_file(
-        "${CMAKE_CURRENT_LIST_DIR}/install/ignite-odbc.wxs.in"
+        "${CMAKE_CURRENT_LIST_DIR}/install/documentdb-odbc.wxs.in"
         "${WIX_INSTALLER_PREFIX}.wxs"
         @ONLY
     )

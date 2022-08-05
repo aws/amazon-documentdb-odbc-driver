@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/column.h"
+#include "documentdb/odbc/column.h"
 
-#include <ignite/odbc/impl/interop/interop_stream_position_guard.h>
+#include <documentdb/odbc/impl/interop/interop_stream_position_guard.h>
 
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/utility.h"
 
 namespace {
-using namespace ignite::odbc::impl::interop;
-using namespace ignite::odbc::impl::binary;
+using namespace documentdb::odbc::impl::interop;
+using namespace documentdb::odbc::impl::binary;
 
 bool GetObjectLength(InteropInputStream& stream, int32_t& len) {
   InteropStreamPositionGuard< InteropInputStream > guard(stream);
@@ -31,17 +31,17 @@ bool GetObjectLength(InteropInputStream& stream, int32_t& len) {
   int8_t hdr = stream.ReadInt8();
 
   switch (hdr) {
-    case IGNITE_TYPE_BINARY: {
+    case DOCUMENTDB_TYPE_BINARY: {
       // Header field + Length field + Object itself + Offset field
       len = 1 + 4 + stream.ReadInt32() + 4;
 
       break;
     }
 
-    case IGNITE_TYPE_OBJECT: {
+    case DOCUMENTDB_TYPE_OBJECT: {
       int8_t protoVer = stream.ReadInt8();
 
-      if (protoVer != IGNITE_PROTO_VER)
+      if (protoVer != DOCUMENTDB_PROTO_VER)
         return false;
 
       // Skipping flags, typeId and hash code
@@ -63,7 +63,7 @@ bool GetObjectLength(InteropInputStream& stream, int32_t& len) {
  * @return Column type header.
  */
 int8_t ReadColumnHeader(InteropInputStream& stream) {
-  using namespace ignite::odbc::impl::binary;
+  using namespace documentdb::odbc::impl::binary;
 
   int32_t headerPos = stream.Position();
 
@@ -73,16 +73,16 @@ int8_t ReadColumnHeader(InteropInputStream& stream) {
   // stream should have unread header, but for primitive types it
   // should not.
   switch (hdr) {
-    case IGNITE_TYPE_BYTE:
-    case IGNITE_TYPE_SHORT:
-    case IGNITE_TYPE_CHAR:
-    case IGNITE_TYPE_INT:
-    case IGNITE_TYPE_LONG:
-    case IGNITE_TYPE_FLOAT:
-    case IGNITE_TYPE_DOUBLE:
-    case IGNITE_TYPE_BOOL:
-    case IGNITE_HDR_NULL:
-    case IGNITE_TYPE_ARRAY_BYTE: {
+    case DOCUMENTDB_TYPE_BYTE:
+    case DOCUMENTDB_TYPE_SHORT:
+    case DOCUMENTDB_TYPE_CHAR:
+    case DOCUMENTDB_TYPE_INT:
+    case DOCUMENTDB_TYPE_LONG:
+    case DOCUMENTDB_TYPE_FLOAT:
+    case DOCUMENTDB_TYPE_DOUBLE:
+    case DOCUMENTDB_TYPE_BOOL:
+    case DOCUMENTDB_HDR_NULL:
+    case DOCUMENTDB_TYPE_ARRAY_BYTE: {
       // No-op.
       break;
     }
@@ -98,7 +98,7 @@ int8_t ReadColumnHeader(InteropInputStream& stream) {
 }
 }  // namespace
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 Column::Column() : type(0), startPos(-1), endPos(-1), offset(0), size(0) {
   // No-op.
@@ -143,13 +143,13 @@ Column::Column(BinaryReaderImpl& reader)
   int32_t startPosTmp = stream->Position();
 
   switch (hdr) {
-    case IGNITE_HDR_NULL: {
+    case DOCUMENTDB_HDR_NULL: {
       sizeTmp = 1;
 
       break;
     }
 
-    case IGNITE_TYPE_BYTE: {
+    case DOCUMENTDB_TYPE_BYTE: {
       reader.ReadInt8();
 
       sizeTmp = 1;
@@ -157,7 +157,7 @@ Column::Column(BinaryReaderImpl& reader)
       break;
     }
 
-    case IGNITE_TYPE_BOOL: {
+    case DOCUMENTDB_TYPE_BOOL: {
       reader.ReadBool();
 
       sizeTmp = 1;
@@ -165,8 +165,8 @@ Column::Column(BinaryReaderImpl& reader)
       break;
     }
 
-    case IGNITE_TYPE_SHORT:
-    case IGNITE_TYPE_CHAR: {
+    case DOCUMENTDB_TYPE_SHORT:
+    case DOCUMENTDB_TYPE_CHAR: {
       reader.ReadInt16();
 
       sizeTmp = 2;
@@ -174,7 +174,7 @@ Column::Column(BinaryReaderImpl& reader)
       break;
     }
 
-    case IGNITE_TYPE_FLOAT: {
+    case DOCUMENTDB_TYPE_FLOAT: {
       reader.ReadFloat();
 
       sizeTmp = 4;
@@ -182,7 +182,7 @@ Column::Column(BinaryReaderImpl& reader)
       break;
     }
 
-    case IGNITE_TYPE_INT: {
+    case DOCUMENTDB_TYPE_INT: {
       reader.ReadInt32();
 
       sizeTmp = 4;
@@ -190,7 +190,7 @@ Column::Column(BinaryReaderImpl& reader)
       break;
     }
 
-    case IGNITE_TYPE_DOUBLE: {
+    case DOCUMENTDB_TYPE_DOUBLE: {
       reader.ReadDouble();
 
       sizeTmp = 8;
@@ -198,7 +198,7 @@ Column::Column(BinaryReaderImpl& reader)
       break;
     }
 
-    case IGNITE_TYPE_LONG: {
+    case DOCUMENTDB_TYPE_LONG: {
       reader.ReadInt64();
 
       sizeTmp = 8;
@@ -206,7 +206,7 @@ Column::Column(BinaryReaderImpl& reader)
       break;
     }
 
-    case IGNITE_TYPE_STRING: {
+    case DOCUMENTDB_TYPE_STRING: {
       std::string str;
       utility::ReadString(reader, str);
 
@@ -215,7 +215,7 @@ Column::Column(BinaryReaderImpl& reader)
       break;
     }
 
-    case IGNITE_TYPE_UUID: {
+    case DOCUMENTDB_TYPE_UUID: {
       reader.ReadGuid();
 
       sizeTmp = 16;
@@ -223,8 +223,8 @@ Column::Column(BinaryReaderImpl& reader)
       break;
     }
 
-    case IGNITE_TYPE_BINARY:
-    case IGNITE_TYPE_OBJECT: {
+    case DOCUMENTDB_TYPE_BINARY:
+    case DOCUMENTDB_TYPE_OBJECT: {
       int32_t len;
 
       if (!GetObjectLength(*stream, len))
@@ -237,7 +237,7 @@ Column::Column(BinaryReaderImpl& reader)
       break;
     }
 
-    case IGNITE_TYPE_DECIMAL: {
+    case DOCUMENTDB_TYPE_DECIMAL: {
       common::Decimal res;
 
       utility::ReadDecimal(reader, res);
@@ -247,7 +247,7 @@ Column::Column(BinaryReaderImpl& reader)
       break;
     }
 
-    case IGNITE_TYPE_DATE: {
+    case DOCUMENTDB_TYPE_DATE: {
       reader.ReadDate();
 
       sizeTmp = 8;
@@ -255,7 +255,7 @@ Column::Column(BinaryReaderImpl& reader)
       break;
     }
 
-    case IGNITE_TYPE_TIME: {
+    case DOCUMENTDB_TYPE_TIME: {
       reader.ReadTime();
 
       sizeTmp = 8;
@@ -263,7 +263,7 @@ Column::Column(BinaryReaderImpl& reader)
       break;
     }
 
-    case IGNITE_TYPE_TIMESTAMP: {
+    case DOCUMENTDB_TYPE_TIMESTAMP: {
       reader.ReadTimestamp();
 
       sizeTmp = 12;
@@ -271,7 +271,7 @@ Column::Column(BinaryReaderImpl& reader)
       break;
     }
 
-    case IGNITE_TYPE_ARRAY_BYTE: {
+    case DOCUMENTDB_TYPE_ARRAY_BYTE: {
       sizeTmp = reader.ReadInt32();
       assert(sizeTmp >= 0);
 
@@ -317,7 +317,7 @@ app::ConversionResult::Type Column::ReadToBuffer(
   app::ConversionResult::Type convRes = app::ConversionResult::Type::AI_SUCCESS;
 
   switch (type) {
-    case IGNITE_TYPE_BYTE: {
+    case DOCUMENTDB_TYPE_BYTE: {
       convRes = dataBuf.PutInt8(reader.ReadInt8());
 
       IncreaseOffset(size);
@@ -325,8 +325,8 @@ app::ConversionResult::Type Column::ReadToBuffer(
       break;
     }
 
-    case IGNITE_TYPE_SHORT:
-    case IGNITE_TYPE_CHAR: {
+    case DOCUMENTDB_TYPE_SHORT:
+    case DOCUMENTDB_TYPE_CHAR: {
       convRes = dataBuf.PutInt16(reader.ReadInt16());
 
       IncreaseOffset(size);
@@ -334,7 +334,7 @@ app::ConversionResult::Type Column::ReadToBuffer(
       break;
     }
 
-    case IGNITE_TYPE_INT: {
+    case DOCUMENTDB_TYPE_INT: {
       convRes = dataBuf.PutInt32(reader.ReadInt32());
 
       IncreaseOffset(size);
@@ -342,7 +342,7 @@ app::ConversionResult::Type Column::ReadToBuffer(
       break;
     }
 
-    case IGNITE_TYPE_LONG: {
+    case DOCUMENTDB_TYPE_LONG: {
       convRes = dataBuf.PutInt64(reader.ReadInt64());
 
       IncreaseOffset(size);
@@ -350,7 +350,7 @@ app::ConversionResult::Type Column::ReadToBuffer(
       break;
     }
 
-    case IGNITE_TYPE_FLOAT: {
+    case DOCUMENTDB_TYPE_FLOAT: {
       convRes = dataBuf.PutFloat(reader.ReadFloat());
 
       IncreaseOffset(size);
@@ -358,7 +358,7 @@ app::ConversionResult::Type Column::ReadToBuffer(
       break;
     }
 
-    case IGNITE_TYPE_DOUBLE: {
+    case DOCUMENTDB_TYPE_DOUBLE: {
       convRes = dataBuf.PutDouble(reader.ReadDouble());
 
       IncreaseOffset(size);
@@ -366,7 +366,7 @@ app::ConversionResult::Type Column::ReadToBuffer(
       break;
     }
 
-    case IGNITE_TYPE_BOOL: {
+    case DOCUMENTDB_TYPE_BOOL: {
       convRes = dataBuf.PutInt8(reader.ReadBool() ? 1 : 0);
 
       IncreaseOffset(size);
@@ -374,7 +374,7 @@ app::ConversionResult::Type Column::ReadToBuffer(
       break;
     }
 
-    case IGNITE_TYPE_STRING: {
+    case DOCUMENTDB_TYPE_STRING: {
       std::string str;
       utility::ReadString(reader, str);
 
@@ -386,7 +386,7 @@ app::ConversionResult::Type Column::ReadToBuffer(
       break;
     }
 
-    case IGNITE_TYPE_UUID: {
+    case DOCUMENTDB_TYPE_UUID: {
       Guid guid = reader.ReadGuid();
 
       convRes = dataBuf.PutGuid(guid);
@@ -396,7 +396,7 @@ app::ConversionResult::Type Column::ReadToBuffer(
       break;
     }
 
-    case IGNITE_HDR_NULL: {
+    case DOCUMENTDB_HDR_NULL: {
       convRes = dataBuf.PutNull();
 
       IncreaseOffset(size);
@@ -404,8 +404,8 @@ app::ConversionResult::Type Column::ReadToBuffer(
       break;
     }
 
-    case IGNITE_TYPE_BINARY:
-    case IGNITE_TYPE_OBJECT: {
+    case DOCUMENTDB_TYPE_BINARY:
+    case DOCUMENTDB_TYPE_OBJECT: {
       int32_t len;
 
       if (!GetObjectLength(*stream, len))
@@ -424,7 +424,7 @@ app::ConversionResult::Type Column::ReadToBuffer(
       break;
     }
 
-    case IGNITE_TYPE_DECIMAL: {
+    case DOCUMENTDB_TYPE_DECIMAL: {
       common::Decimal res;
 
       utility::ReadDecimal(reader, res);
@@ -436,7 +436,7 @@ app::ConversionResult::Type Column::ReadToBuffer(
       break;
     }
 
-    case IGNITE_TYPE_DATE: {
+    case DOCUMENTDB_TYPE_DATE: {
       Date date = reader.ReadDate();
 
       convRes = dataBuf.PutDate(date);
@@ -444,7 +444,7 @@ app::ConversionResult::Type Column::ReadToBuffer(
       break;
     }
 
-    case IGNITE_TYPE_TIMESTAMP: {
+    case DOCUMENTDB_TYPE_TIMESTAMP: {
       Timestamp ts = reader.ReadTimestamp();
 
       convRes = dataBuf.PutTimestamp(ts);
@@ -452,7 +452,7 @@ app::ConversionResult::Type Column::ReadToBuffer(
       break;
     }
 
-    case IGNITE_TYPE_TIME: {
+    case DOCUMENTDB_TYPE_TIME: {
       Time time = reader.ReadTime();
 
       convRes = dataBuf.PutTime(time);
@@ -460,7 +460,7 @@ app::ConversionResult::Type Column::ReadToBuffer(
       break;
     }
 
-    case IGNITE_TYPE_ARRAY_BYTE: {
+    case DOCUMENTDB_TYPE_ARRAY_BYTE: {
       stream->Position(startPos + offset);
       int32_t maxRead = std::min(GetUnreadDataLength(),
                                  static_cast< int32_t >(dataBuf.GetSize()));
@@ -489,4 +489,4 @@ void Column::IncreaseOffset(int32_t value) {
     offset = size;
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

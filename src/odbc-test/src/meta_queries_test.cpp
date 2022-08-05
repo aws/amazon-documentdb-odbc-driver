@@ -28,21 +28,21 @@
 #include <vector>
 
 #include "complex_type.h"
-#include "ignite/odbc/common/fixed_size_array.h"
-#include "ignite/odbc/impl/binary/binary_utils.h"
-#include "ignite/odbc/type_traits.h"
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/common/fixed_size_array.h"
+#include "documentdb/odbc/impl/binary/binary_utils.h"
+#include "documentdb/odbc/type_traits.h"
+#include "documentdb/odbc/utility.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"
 #include "test_utils.h"
 
-using namespace ignite;
-using namespace ignite::odbc::common;
-using namespace ignite_test;
-using namespace ignite::odbc::binary;
-using namespace ignite::odbc::impl::binary;
-using namespace ignite::odbc::impl::interop;
-using ignite::odbc::TestType;
+using namespace documentdb;
+using namespace documentdb::odbc::common;
+using namespace documentdb_test;
+using namespace documentdb::odbc::binary;
+using namespace documentdb::odbc::impl::binary;
+using namespace documentdb::odbc::impl::interop;
+using documentdb::odbc::TestType;
 
 using namespace boost::unit_test;
 
@@ -866,7 +866,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLiteralSuffix) {
 }
 
 BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
-  using ignite::odbc::type_traits::SqlTypeName;
+  using documentdb::odbc::type_traits::SqlTypeName;
 
   std::string databaseName("odbc-test");
   connectToLocalServer(databaseName);
@@ -1327,7 +1327,7 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
-  using namespace ignite::odbc::type_traits;
+  using namespace documentdb::odbc::type_traits;
   BOOST_CHECK_EQUAL("meta_queries_test_001__id", column_name);  // COLUMN_NAME
   BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);                   // DATA_TYPE
   BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);           // TYPE_NAME

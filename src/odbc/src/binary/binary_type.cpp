@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/binary/binary_type.h"
+#include "documentdb/odbc/binary/binary_type.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace binary {
 int32_t GetBinaryStringHashCode(const char* val) {
@@ -45,4 +45,4 @@ int32_t GetBinaryStringHashCode(const char* val) {
 }
 }  // namespace binary
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

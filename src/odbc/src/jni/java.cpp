@@ -16,12 +16,12 @@
  */
 
 // ReSharper disable once CppUnusedIncludeDirective
-#include <ignite/odbc/common/common.h>
-#include <ignite/odbc/common/utils.h>
-#include <ignite/odbc/ignite_error.h>
-#include <ignite/odbc/jni/java.h>
-#include <ignite/odbc/jni/utils.h>
-#include <ignite/odbc/log.h>
+#include <documentdb/odbc/common/common.h>
+#include <documentdb/odbc/common/utils.h>
+#include <documentdb/odbc/documentdb_error.h>
+#include <documentdb/odbc/jni/java.h>
+#include <documentdb/odbc/jni/utils.h>
+#include <documentdb/odbc/log.h>
 
 #include <algorithm>
 #include <cstring>  // needed only on linux
@@ -33,8 +33,8 @@
 // Todo: Refactor boost::optional to std::optional after code base is migrated
 // to C++17 https://bitquill.atlassian.net/browse/AD-631
 
-using namespace ignite::odbc::common::concurrent;
-using namespace ignite::odbc::jni::java;
+using namespace documentdb::odbc::common::concurrent;
+using namespace documentdb::odbc::jni::java;
 
 #ifndef JNI_VERSION_9
 #define JNI_VERSION_9 0x00090000
@@ -85,15 +85,15 @@ using namespace ignite::odbc::jni::java;
     }                                                             \
   }
 
-using namespace ignite::odbc::jni::java;
+using namespace documentdb::odbc::jni::java;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace jni {
 namespace java {
-namespace iocc = ignite::odbc::common::concurrent;
+namespace iocc = documentdb::odbc::common::concurrent;
 
-bool IGNITE_IMPORT_EXPORT IsJava9OrLater() {
+bool DOCUMENTDB_IMPORT_EXPORT IsJava9OrLater() {
   LOG_DEBUG_MSG("IsJava9OrLater called");
 
   JavaVMInitArgs args;
@@ -183,7 +183,7 @@ struct JniMethod {
   }
 };
 
-JniErrorInfo::JniErrorInfo() : code(JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+JniErrorInfo::JniErrorInfo() : code(JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
   // No-op.
 }
 
@@ -429,7 +429,7 @@ int ThrowOnMissingHandler(JNIEnv* env) {
  * @param msg Message.
  */
 void ThrowToJava(JNIEnv* env, const char* msg) {
-  // jclass cls = env->FindClass(C_IGNITE_EXCEPTION);
+  // jclass cls = env->FindClass(C_DOCUMENTDB_EXCEPTION);
 
   // env->ThrowNew(cls, msg);
 }
@@ -869,7 +869,7 @@ jint GetOrCreateJvm(char** opts, int optsLen, JavaVM** jvm, JNIEnv** env) {
 }
 
 void RegisterNatives(JNIEnv* env) {
-  IGNITE_UNUSED(env);
+  DOCUMENTDB_UNUSED(env);
   // TODO: Investigate registering callbacks to get console and logging streams.
 }
 
@@ -954,7 +954,7 @@ JniContext* JniContext::Create(char** opts, int optsLen,
         // Create JNI JVM.
         JVM = JniJvm(jvm, javaMembers, members);
 
-        char* printStack = getenv("IGNITE_CPP_PRINT_STACK");
+        char* printStack = getenv("DOCUMENTDB_CPP_PRINT_STACK");
         PRINT_EXCEPTION = printStack && strcmp("true", printStack) == 0;
       } else {
         GetJniErrorMessage(errMsg, res);
@@ -1009,11 +1009,11 @@ JniContext* JniContext::Create(char** opts, int optsLen,
 
   // Notify err callback if needed.
   if (!ctx) {
-    errInfo = JniErrorInfo(JniErrorCode::IGNITE_JNI_ERR_JVM_INIT,
+    errInfo = JniErrorInfo(JniErrorCode::DOCUMENTDB_JNI_ERR_JVM_INIT,
                            errClsName.c_str(), errMsg.c_str());
 
     if (hnds.error)
-      hnds.error(hnds.target, JniErrorCode::IGNITE_JNI_ERR_JVM_INIT,
+      hnds.error(hnds.target, JniErrorCode::DOCUMENTDB_JNI_ERR_JVM_INIT,
                  errClsName.c_str(), errClsNameLen, errMsg.c_str(), errMsgLen,
                  stackTrace.c_str(), stackTraceLen, nullptr, 0);
   }
@@ -1072,7 +1072,7 @@ std::string JniContext::JavaStringToCppString(
     const SharedPointer< GlobalJObject >& value, JniErrorInfo& errInfo) {
   LOG_DEBUG_MSG("JavaStringToCppString is called");
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return std::string();
   }
 
@@ -1088,7 +1088,7 @@ JniErrorCode JniContext::DriverManagerGetConnection(
   LOG_DEBUG_MSG("DriverManagerGetConnection is called");
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1101,7 +1101,7 @@ JniErrorCode JniContext::DriverManagerGetConnection(
       jvm->GetMembers().c_DriverManager,
       jvm->GetMembers().m_DriverManagerGetConnection, jConnectionString);
   ExceptionCheck(env, &errInfo);
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (!result || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     connection = nullptr;
   } else {
     connection = new GlobalJObject(env, env->NewGlobalRef(result));
@@ -1119,7 +1119,7 @@ JniErrorCode JniContext::ConnectionClose(
   LOG_DEBUG_MSG("ConnectionClose is called");
 
   if (connection.Get() == nullptr) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "Connection object must be set.";
 
     LOG_ERROR_MSG("ConnectionClose exiting with error msg: " << errInfo.errMsg);
@@ -1127,7 +1127,7 @@ JniErrorCode JniContext::ConnectionClose(
     return errInfo.code;
   }
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1146,7 +1146,7 @@ JniErrorCode JniContext::DocumentDbConnectionIsSshTunnelActive(
   LOG_DEBUG_MSG("DocumentDbConnectionIsSshTunnelActive is called");
 
   if (!connection.Get()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "Connection object must be set.";
 
     LOG_ERROR_MSG(
@@ -1156,7 +1156,7 @@ JniErrorCode JniContext::DocumentDbConnectionIsSshTunnelActive(
     return errInfo.code;
   }
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1164,7 +1164,7 @@ JniErrorCode JniContext::DocumentDbConnectionIsSshTunnelActive(
       connection.Get()->GetRef(),
       jvm->GetMembers().m_DocumentDbConnectionIsSshTunnelActive);
   ExceptionCheck(env, &errInfo);
-  if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     isActive = res != JNI_FALSE;
   }
 
@@ -1179,7 +1179,7 @@ JniErrorCode JniContext::DocumentDbConnectionGetSshLocalPort(
   LOG_DEBUG_MSG("DocumentDbConnectionGetSshLocalPort is called");
 
   if (!connection.Get()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "Connection object must be set.";
 
     LOG_ERROR_MSG("DocumentDbConnectionGetSshLocalPort exiting with error msg: "
@@ -1188,7 +1188,7 @@ JniErrorCode JniContext::DocumentDbConnectionGetSshLocalPort(
     return errInfo.code;
   }
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1207,7 +1207,7 @@ JniErrorCode JniContext::DocumentDbConnectionGetDatabaseMetadata(
     SharedPointer< GlobalJObject >& metadata, JniErrorInfo& errInfo) {
   LOG_DEBUG_MSG("DocumentDbConnectionGetDatabaseMetadata is called");
   if (!connection.Get()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "Connection object must be set.";
 
     LOG_ERROR_MSG(
@@ -1217,7 +1217,7 @@ JniErrorCode JniContext::DocumentDbConnectionGetDatabaseMetadata(
     return errInfo.code;
   }
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1226,7 +1226,7 @@ JniErrorCode JniContext::DocumentDbConnectionGetDatabaseMetadata(
       jvm->GetMembers().m_DocumentDbConnectionGetDatabaseMetadata);
   ExceptionCheck(env, &errInfo);
 
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (!result || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     metadata = nullptr;
 
     LOG_ERROR_MSG(
@@ -1249,7 +1249,7 @@ JniErrorCode JniContext::DocumentDbConnectionGetConnectionProperties(
   LOG_DEBUG_MSG("DocumentDbConnectionGetConnectionProperties is called");
 
   if (!connection.Get()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "Connection object must be set.";
 
     LOG_ERROR_MSG(
@@ -1259,7 +1259,7 @@ JniErrorCode JniContext::DocumentDbConnectionGetConnectionProperties(
     return errInfo.code;
   }
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1268,7 +1268,7 @@ JniErrorCode JniContext::DocumentDbConnectionGetConnectionProperties(
       jvm->GetMembers().m_DocumentDbConnectionGetConnectionProperties);
   ExceptionCheck(env, &errInfo);
 
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (!result || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     connectionProperties = nullptr;
     LOG_ERROR_MSG(
         "DocumentDbConnectionGetConnectionProperties exiting with error. "
@@ -1288,7 +1288,7 @@ JniErrorCode JniContext::DocumentDbDatabaseSchemaMetadataGetSchemaName(
     bool& wasNull, JniErrorInfo& errInfo) {
   LOG_DEBUG_MSG("DocumentDbDatabaseSchemaMetadataGetSchemaName is called");
   if (!databaseMetadata.Get()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "DatabaseMetadata object must be set.";
     LOG_ERROR_MSG(
         "DocumentDbDatabaseSchemaMetadataGetSchemaName exiting with error msg: "
@@ -1297,7 +1297,7 @@ JniErrorCode JniContext::DocumentDbDatabaseSchemaMetadataGetSchemaName(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1306,7 +1306,7 @@ JniErrorCode JniContext::DocumentDbDatabaseSchemaMetadataGetSchemaName(
       jvm->GetMembers().m_DocumentDbDatabaseSchemaMetadataGetSchemaName);
   ExceptionCheck(env, &errInfo);
 
-  if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     wasNull = !result;
     if (result != nullptr) {
       jboolean isCopy;
@@ -1326,7 +1326,7 @@ JniErrorCode JniContext::ConnectionGetMetaData(
   LOG_DEBUG_MSG("ConnectionGetMetaData is called");
 
   if (connection.Get() == nullptr) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "Connection object must be set.";
 
     LOG_ERROR_MSG(
@@ -1336,7 +1336,7 @@ JniErrorCode JniContext::ConnectionGetMetaData(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1344,7 +1344,7 @@ JniErrorCode JniContext::ConnectionGetMetaData(
       connection.Get()->GetRef(), jvm->GetMembers().m_ConnectionGetMetaData);
   ExceptionCheck(env, &errInfo);
 
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (!result || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     databaseMetaData = nullptr;
 
     LOG_ERROR_MSG(
@@ -1371,7 +1371,7 @@ JniErrorCode JniContext::DatabaseMetaDataGetTables(
   LOG_DEBUG_MSG("DatabaseMetaDataGetTables is called");
 
   if (databaseMetaData.Get() == nullptr) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "DatabaseMetaData object must be set.";
 
     LOG_ERROR_MSG(
@@ -1381,7 +1381,7 @@ JniErrorCode JniContext::DatabaseMetaDataGetTables(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1412,7 +1412,7 @@ JniErrorCode JniContext::DatabaseMetaDataGetTables(
   env->DeleteLocalRef(jTableNamePattern);
   env->DeleteLocalRef(jTypes);
 
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (!result || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     resultSet = nullptr;
 
     LOG_ERROR_MSG(
@@ -1437,7 +1437,7 @@ JniErrorCode JniContext::DatabaseMetaDataGetColumns(
   LOG_DEBUG_MSG("DatabaseMetaDataGetColumns is called");
 
   if (databaseMetaData.Get() == nullptr) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "DatabaseMetaData object must be set.";
 
     LOG_ERROR_MSG("DatabaseMetaDataGetColumns exiting with error msg: "
@@ -1447,7 +1447,7 @@ JniErrorCode JniContext::DatabaseMetaDataGetColumns(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1468,7 +1468,7 @@ JniErrorCode JniContext::DatabaseMetaDataGetColumns(
   env->DeleteLocalRef(jTableNamePattern);
   env->DeleteLocalRef(jColumnNamePattern);
 
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (!result || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     resultSet = nullptr;
     LOG_ERROR_MSG(
         "DatabaseMetaDataGetColumns exiting with error. resultSet will be "
@@ -1492,7 +1492,7 @@ JniErrorCode JniContext::DatabaseMetaDataGetPrimaryKeys(
   LOG_DEBUG_MSG("DatabaseMetaDataGetPrimaryKeys is called");
 
   if (databaseMetaData.Get() == nullptr) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "DatabaseMetaData object must be set.";
 
     LOG_ERROR_MSG("DatabaseMetaDataGetPrimaryKeys exiting with error msg: "
@@ -1502,7 +1502,7 @@ JniErrorCode JniContext::DatabaseMetaDataGetPrimaryKeys(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1520,7 +1520,7 @@ JniErrorCode JniContext::DatabaseMetaDataGetPrimaryKeys(
   env->DeleteLocalRef(jSchema);
   env->DeleteLocalRef(jTableName);
 
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (!result || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     resultSet = nullptr;
     LOG_ERROR_MSG(
         "DatabaseMetaDataGetPrimaryKeys exiting with error. resultSet will be "
@@ -1543,7 +1543,7 @@ JniErrorCode JniContext::DatabaseMetaDataGetImportedKeys(
   LOG_DEBUG_MSG("DatabaseMetaDataGetImportedKeys is called");
 
   if (databaseMetaData.Get() == nullptr) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "DatabaseMetaData object must be set.";
 
     LOG_ERROR_MSG("DatabaseMetaDataGetImportedKeys exiting with error msg: "
@@ -1553,7 +1553,7 @@ JniErrorCode JniContext::DatabaseMetaDataGetImportedKeys(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1571,7 +1571,7 @@ JniErrorCode JniContext::DatabaseMetaDataGetImportedKeys(
   env->DeleteLocalRef(jSchema);
   env->DeleteLocalRef(jTable);
 
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (!result || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     resultSet = nullptr;
     LOG_ERROR_MSG(
         "DatabaseMetaDataGetImportedKeys exiting with error. resultSet will be "
@@ -1591,7 +1591,7 @@ JniErrorCode JniContext::ResultSetClose(
   LOG_DEBUG_MSG("ResultSetClose is called");
 
   if (resultSet.Get() == nullptr) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
 
     LOG_ERROR_MSG("ResultSetClose exiting with error msg: " << errInfo.errMsg);
@@ -1600,7 +1600,7 @@ JniErrorCode JniContext::ResultSetClose(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1619,7 +1619,7 @@ JniErrorCode JniContext::ResultSetNext(
   LOG_DEBUG_MSG("ResultSetNext is called");
 
   if (resultSet.Get() == nullptr) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
 
     LOG_ERROR_MSG("ResultSetNext exiting with error msg: " << errInfo.errMsg);
@@ -1628,14 +1628,14 @@ JniErrorCode JniContext::ResultSetNext(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
   jboolean res = env->CallBooleanMethod(resultSet.Get()->GetRef(),
                                         jvm->GetMembers().m_ResultSetNext);
   ExceptionCheck(env, &errInfo);
-  if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     hasNext = res != JNI_FALSE;
   }
 
@@ -1650,7 +1650,7 @@ JniErrorCode JniContext::ResultSetGetString(
   LOG_DEBUG_MSG("ResultSetGetString is called");
 
   if (resultSet.Get() == nullptr) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
 
     LOG_ERROR_MSG(
@@ -1661,7 +1661,7 @@ JniErrorCode JniContext::ResultSetGetString(
 
   value = boost::none;
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1670,7 +1670,7 @@ JniErrorCode JniContext::ResultSetGetString(
       columnIndex);
   ExceptionCheck(env, &errInfo);
 
-  if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     if (result != nullptr) {
       jboolean isCopy;
       const char* utfChars = env->GetStringUTFChars((jstring)result, &isCopy);
@@ -1691,7 +1691,7 @@ JniErrorCode JniContext::ResultSetGetString(
   LOG_DEBUG_MSG("ResultSetGetString is called");
 
   if (resultSet.Get() == nullptr) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
 
     LOG_ERROR_MSG(
@@ -1701,7 +1701,7 @@ JniErrorCode JniContext::ResultSetGetString(
   }
   value = boost::none;
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1713,7 +1713,7 @@ JniErrorCode JniContext::ResultSetGetString(
 
   env->DeleteLocalRef(jColumnName);
 
-  if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     if (result != nullptr) {
       jboolean isCopy;
       const char* utfChars = env->GetStringUTFChars((jstring)result, &isCopy);
@@ -1733,7 +1733,7 @@ JniErrorCode JniContext::ResultSetGetInt(
   LOG_DEBUG_MSG("ResultSetGetInt is called");
 
   if (resultSet.Get() == nullptr) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
 
     LOG_ERROR_MSG("ResultSetGetInt exiting with error msg: " << errInfo.errMsg);
@@ -1743,7 +1743,7 @@ JniErrorCode JniContext::ResultSetGetInt(
 
   value = boost::none;
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1752,7 +1752,7 @@ JniErrorCode JniContext::ResultSetGetInt(
                                    columnIndex);
   ExceptionCheck(env, &errInfo);
 
-  if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     bool wasNull;
     errInfo.code = ResultSetWasNull(resultSet, wasNull, errInfo);
     if (!wasNull)
@@ -1771,7 +1771,7 @@ JniErrorCode JniContext::ResultSetGetInt(
   LOG_DEBUG_MSG("ResultSetGetInt is called");
 
   if (resultSet.Get() == nullptr) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
 
     LOG_ERROR_MSG("ResultSetGetInt exiting with error msg: " << errInfo.errMsg);
@@ -1781,7 +1781,7 @@ JniErrorCode JniContext::ResultSetGetInt(
 
   value = boost::none;
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1793,7 +1793,7 @@ JniErrorCode JniContext::ResultSetGetInt(
 
   env->DeleteLocalRef(jColumnName);
 
-  if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     bool wasNull;
     errInfo.code = ResultSetWasNull(resultSet, wasNull, errInfo);
     if (!wasNull)
@@ -1811,7 +1811,7 @@ JniErrorCode JniContext::ResultSetGetRow(
   LOG_DEBUG_MSG("ResultSetGetRow is called");
 
   if (resultSet.Get() == nullptr) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
 
     LOG_ERROR_MSG("ResultSetGetRow exiting with error msg: " << errInfo.errMsg);
@@ -1821,14 +1821,14 @@ JniErrorCode JniContext::ResultSetGetRow(
 
   value = boost::none;
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
   jint result = env->CallIntMethod(resultSet.Get()->GetRef(),
                                    jvm->GetMembers().m_ResultSetGetRow);
   ExceptionCheck(env, &errInfo);
-  if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     value = result;
     bool wasNull;
     errInfo.code = ResultSetWasNull(resultSet, wasNull, errInfo);
@@ -1847,7 +1847,7 @@ JniErrorCode JniContext::ResultSetWasNull(
   LOG_DEBUG_MSG("ResultSetWasNull is called");
 
   if (resultSet.Get() == nullptr) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "ResultSet object must be set.";
 
     LOG_ERROR_MSG(
@@ -1857,14 +1857,14 @@ JniErrorCode JniContext::ResultSetWasNull(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
   jboolean res = env->CallBooleanMethod(resultSet.Get()->GetRef(),
                                         jvm->GetMembers().m_ResultSetWasNull);
   ExceptionCheck(env, &errInfo);
-  if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     value = res != JNI_FALSE;
   }
 
@@ -1878,7 +1878,7 @@ JniErrorCode JniContext::ListSize(const SharedPointer< GlobalJObject >& list,
   LOG_DEBUG_MSG("ListSize is called");
 
   if (!list.IsValid()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "List object must be set.";
 
     LOG_ERROR_MSG("ListSize exiting with error msg: " << errInfo.errMsg);
@@ -1887,14 +1887,14 @@ JniErrorCode JniContext::ListSize(const SharedPointer< GlobalJObject >& list,
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
   jint res =
       env->CallIntMethod(list.Get()->GetRef(), jvm->GetMembers().m_ListSize);
   ExceptionCheck(env, &errInfo);
-  if (errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     size = res;
   }
 
@@ -1910,7 +1910,7 @@ JniErrorCode JniContext::ListGet(const SharedPointer< GlobalJObject >& list,
   LOG_DEBUG_MSG("ListGet is called");
 
   if (!list.IsValid()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "List object must be set.";
 
     LOG_ERROR_MSG("ListGet exiting with error msg: " << errInfo.errMsg);
@@ -1919,14 +1919,14 @@ JniErrorCode JniContext::ListGet(const SharedPointer< GlobalJObject >& list,
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
   jobject result = env->CallObjectMethod(list.Get()->GetRef(),
                                          jvm->GetMembers().m_ListGet, index);
   ExceptionCheck(env, &errInfo);
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (!result || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     value = nullptr;
 
     LOG_ERROR_MSG("ListGet exiting with error. value variable will be null");
@@ -1948,7 +1948,7 @@ JniContext::DocumentdbMqlQueryContextGetAggregateOperationsAsStrings(
       "DocumentdbMqlQueryContextGetAggregateOperationsAsStrings is called");
 
   if (!mqlQueryContext.IsValid()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "MQL Query Context object must be set.";
 
     LOG_ERROR_MSG(
@@ -1960,7 +1960,7 @@ JniContext::DocumentdbMqlQueryContextGetAggregateOperationsAsStrings(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -1969,7 +1969,7 @@ JniContext::DocumentdbMqlQueryContextGetAggregateOperationsAsStrings(
       jvm->GetMembers()
           .m_DocumentDbMqlQueryContextGetAggregateOperationsAsStrings);
   ExceptionCheck(env, &errInfo);
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (!result || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     list = nullptr;
 
     LOG_ERROR_MSG(
@@ -1992,7 +1992,7 @@ JniErrorCode JniContext::DocumentdbMqlQueryContextGetColumnMetadata(
   LOG_DEBUG_MSG("DocumentdbMqlQueryContextGetColumnMetadata is called");
 
   if (!mqlQueryContext.IsValid()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "MQL Query Context object must be set.";
 
     LOG_ERROR_MSG(
@@ -2003,7 +2003,7 @@ JniErrorCode JniContext::DocumentdbMqlQueryContextGetColumnMetadata(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -2011,7 +2011,7 @@ JniErrorCode JniContext::DocumentdbMqlQueryContextGetColumnMetadata(
       mqlQueryContext.Get()->GetRef(),
       jvm->GetMembers().m_DocumentDbMqlQueryContextGetColumnMetadata);
   ExceptionCheck(env, &errInfo);
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (!result || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     columnMetadata = nullptr;
 
     LOG_ERROR_MSG(
@@ -2033,7 +2033,7 @@ JniErrorCode JniContext::DocumentdbMqlQueryContextGetCollectionName(
   LOG_DEBUG_MSG("DocumentdbMqlQueryContextGetCollectionName is called");
 
   if (!mqlQueryContext.IsValid()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "MQL Query Context object must be set.";
 
     LOG_ERROR_MSG(
@@ -2044,7 +2044,7 @@ JniErrorCode JniContext::DocumentdbMqlQueryContextGetCollectionName(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -2052,7 +2052,7 @@ JniErrorCode JniContext::DocumentdbMqlQueryContextGetCollectionName(
       mqlQueryContext.Get()->GetRef(),
       jvm->GetMembers().m_DocumentDbMqlQueryContextGetCollectionName));
   ExceptionCheck(env, &errInfo);
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (!result || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     collectionName = "";
 
     LOG_ERROR_MSG(
@@ -2075,7 +2075,7 @@ JniErrorCode JniContext::DocumentdbMqlQueryContextGetPaths(
   LOG_DEBUG_MSG("DocumentdbMqlQueryContextGetPaths is called");
 
   if (!mqlQueryContext.IsValid()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "MQL Query Context object must be set.";
 
     LOG_ERROR_MSG("DocumentdbMqlQueryContextGetPaths exiting with error msg: "
@@ -2085,7 +2085,7 @@ JniErrorCode JniContext::DocumentdbMqlQueryContextGetPaths(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -2093,7 +2093,7 @@ JniErrorCode JniContext::DocumentdbMqlQueryContextGetPaths(
       mqlQueryContext.Get()->GetRef(),
       jvm->GetMembers().m_DocumentDbMqlQueryContextGetPaths);
   ExceptionCheck(env, &errInfo);
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (!result || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     list = nullptr;
 
     LOG_ERROR_MSG(
@@ -2117,7 +2117,7 @@ JniErrorCode JniContext::DocumentDbQueryMappingServiceCtor(
   LOG_DEBUG_MSG("DocumentDbQueryMappingServiceCtor is called");
 
   if (!connectionProperties.IsValid() || !databaseMetadata.IsValid()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg =
         "Connection Properties and Database Metadata objects must be set.";
 
@@ -2128,7 +2128,7 @@ JniErrorCode JniContext::DocumentDbQueryMappingServiceCtor(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -2137,7 +2137,7 @@ JniErrorCode JniContext::DocumentDbQueryMappingServiceCtor(
       jvm->GetMembers().m_DocumentDbQueryMappingServiceCtor,
       connectionProperties.Get()->GetRef(), databaseMetadata.Get()->GetRef());
   ExceptionCheck(env, &errInfo);
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (!result || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     queryMappingService = nullptr;
 
     LOG_ERROR_MSG(
@@ -2160,7 +2160,7 @@ JniErrorCode JniContext::DocumentDbQueryMappingServiceGet(
   LOG_DEBUG_MSG("DocumentDbQueryMappingServiceGet is called");
 
   if (!queryMappingService.IsValid()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "Query Mapping Service object must be set.";
 
     LOG_ERROR_MSG("DocumentDbQueryMappingServiceGet exiting with error msg: "
@@ -2170,7 +2170,7 @@ JniErrorCode JniContext::DocumentDbQueryMappingServiceGet(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -2182,7 +2182,7 @@ JniErrorCode JniContext::DocumentDbQueryMappingServiceGet(
       maxRowCountLong);
   env->DeleteLocalRef(sqlString);
   ExceptionCheck(env, &errInfo);
-  if (!result || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (!result || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     mqlQueryContext = nullptr;
 
     LOG_ERROR_MSG(
@@ -2204,7 +2204,7 @@ JniErrorCode JniContext::JdbcColumnMetadataGetOrdinal(
   LOG_DEBUG_MSG("JdbcColumnMetadataGetOrdinal is called");
 
   if (!jdbcColumnMetadata.IsValid()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "JDBC Column Metaata object must be set.";
 
     LOG_ERROR_MSG("JdbcColumnMetadataGetOrdinal exiting with error msg: "
@@ -2214,7 +2214,7 @@ JniErrorCode JniContext::JdbcColumnMetadataGetOrdinal(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
@@ -2222,7 +2222,7 @@ JniErrorCode JniContext::JdbcColumnMetadataGetOrdinal(
       env->CallIntMethod(jdbcColumnMetadata.Get()->GetRef(),
                          jvm->GetMembers().m_JdbcColumnMetadataGetOrdinal);
   ExceptionCheck(env, &errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     LOG_ERROR_MSG(
         "JdbcColumnMetadataGetOrdinal exiting with error. ordinal variable "
         "will not be set");
@@ -2242,7 +2242,7 @@ JniErrorCode JniContext::CallBooleanMethod(
   LOG_DEBUG_MSG("CallBooleanMethod is called");
 
   if (!object.IsValid()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "JDBC Column Metadata object must be set.";
 
     LOG_ERROR_MSG(
@@ -2252,13 +2252,13 @@ JniErrorCode JniContext::CallBooleanMethod(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
   jboolean result = env->CallBooleanMethod(object.Get()->GetRef(), method);
   ExceptionCheck(env, &errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     LOG_ERROR_MSG(
         "CallBooleanMethod exiting with error. value variable will not be set");
     return errInfo.code;
@@ -2277,7 +2277,7 @@ JniErrorCode JniContext::CallIntMethod(
   LOG_DEBUG_MSG("CallIntMethod is called");
 
   if (!object.IsValid()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "JDBC Column Metadata object must be set.";
 
     LOG_ERROR_MSG("CallIntMethod exiting with error msg: " << errInfo.errMsg);
@@ -2286,13 +2286,13 @@ JniErrorCode JniContext::CallIntMethod(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
   jint result = env->CallIntMethod(object.Get()->GetRef(), method);
   ExceptionCheck(env, &errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     LOG_ERROR_MSG(
         "CallIntMethod exiting with error. value variable will not be set");
 
@@ -2312,7 +2312,7 @@ JniErrorCode JniContext::CallStringMethod(
   LOG_DEBUG_MSG("CallStringMethod is called");
 
   if (!object.IsValid()) {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_GENERIC;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
     errInfo.errMsg = "JDBC Column Metadata object must be set.";
 
     LOG_ERROR_MSG(
@@ -2322,14 +2322,14 @@ JniErrorCode JniContext::CallStringMethod(
   }
 
   JNIEnv* env = Attach(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return errInfo.code;
   }
 
   auto result = static_cast< jstring >(
       env->CallObjectMethod(object.Get()->GetRef(), method));
   ExceptionCheck(env, &errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     LOG_ERROR_MSG(
         "CallStringMethod exiting with error. value variable will not be set");
 
@@ -2574,7 +2574,7 @@ jobject JniContext::LocalToGlobal(JNIEnv* env, jobject localRef) {
 int64_t JniContext::TargetInLongOutLong(jobject obj, int opType, int64_t val,
                                         JniErrorInfo* err) {
   JNIEnv* env = Attach(*err);
-  if (err->code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (err->code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return 0;
   }
 
@@ -2589,7 +2589,7 @@ int64_t JniContext::TargetInLongOutLong(jobject obj, int opType, int64_t val,
 int64_t JniContext::TargetInStreamOutLong(jobject obj, int opType,
                                           int64_t memPtr, JniErrorInfo* err) {
   JNIEnv* env = Attach(*err);
-  if (err->code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (err->code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return 0;
   }
 
@@ -2604,7 +2604,7 @@ int64_t JniContext::TargetInStreamOutLong(jobject obj, int opType,
 jobject JniContext::TargetOutObject(jobject obj, int opType,
                                     JniErrorInfo* err) {
   JNIEnv* env = Attach(*err);
-  if (err->code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (err->code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return nullptr;
   }
 
@@ -2620,7 +2620,7 @@ void JniContext::TargetInStreamOutStream(jobject obj, int opType,
                                          int64_t inMemPtr, int64_t outMemPtr,
                                          JniErrorInfo* err) {
   JNIEnv* env = Attach(*err);
-  if (err->code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (err->code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return;
   }
 
@@ -2633,7 +2633,7 @@ void JniContext::TargetInStreamOutStream(jobject obj, int opType,
 jobject JniContext::TargetInStreamOutObject(jobject obj, int opType,
                                             int64_t memPtr, JniErrorInfo* err) {
   JNIEnv* env = Attach(*err);
-  if (err->code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (err->code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return nullptr;
   }
 
@@ -2649,7 +2649,7 @@ jobject JniContext::TargetInStreamOutObject(jobject obj, int opType,
 void JniContext::TargetOutStream(jobject obj, int opType, int64_t memPtr,
                                  JniErrorInfo* err) {
   JNIEnv* env = Attach(*err);
-  if (err->code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (err->code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return;
   }
 
@@ -2662,7 +2662,7 @@ void JniContext::TargetOutStream(jobject obj, int opType, int64_t memPtr,
 jobject JniContext::CacheOutOpQueryCursor(jobject obj, int type, int64_t memPtr,
                                           JniErrorInfo* err) {
   JNIEnv* env = Attach(*err);
-  if (err->code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (err->code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return nullptr;
   }
 
@@ -2678,7 +2678,7 @@ jobject JniContext::CacheOutOpContinuousQuery(jobject obj, int type,
                                               int64_t memPtr,
                                               JniErrorInfo* err) {
   JNIEnv* env = Attach(*err);
-  if (err->code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (err->code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return nullptr;
   }
 
@@ -2696,7 +2696,7 @@ jobject JniContext::Acquire(jobject obj) {
   if (obj) {
     JniErrorInfo errInfo;
     JNIEnv* env = Attach(errInfo);
-    if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       return nullptr;
     }
 
@@ -2751,9 +2751,9 @@ JNIEnv* JniContext::Attach(JniErrorInfo& errInfo) {
 
   if (attachRes == JNI_OK) {
     AttachHelper::OnThreadAttach();
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS;
   } else {
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_JVM_ATTACH;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_JVM_ATTACH;
     errInfo.errMsg = "Failed to connect to JVM";
     LOG_ERROR_MSG(errInfo.errMsg);
 
@@ -2813,7 +2813,7 @@ void JniContext::ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) {
     std::string msg0 = JavaStringToCString(env, msg, msgLen);
 
     if (errInfo) {
-      JniErrorInfo errInfo0(JniErrorCode::IGNITE_JNI_ERR_GENERIC,
+      JniErrorInfo errInfo0(JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC,
                             clsName0.c_str(), msg0.c_str());
 
       *errInfo = errInfo0;
@@ -2834,21 +2834,21 @@ void JniContext::ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) {
       int errBytesLen = env->GetArrayLength(errData);
 
       if (hnds.error)
-        hnds.error(hnds.target, JniErrorCode::IGNITE_JNI_ERR_GENERIC,
+        hnds.error(hnds.target, JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC,
                    clsName0.c_str(), clsNameLen, msg0.c_str(), msgLen,
                    trace0.c_str(), traceLen, errBytesNative, errBytesLen);
 
       env->ReleaseByteArrayElements(errData, errBytesNative, JNI_ABORT);
     } else {
       if (hnds.error)
-        hnds.error(hnds.target, JniErrorCode::IGNITE_JNI_ERR_GENERIC,
+        hnds.error(hnds.target, JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC,
                    clsName0.c_str(), clsNameLen, msg0.c_str(), msgLen,
                    trace0.c_str(), traceLen, nullptr, 0);
     }
 
     env->DeleteLocalRef(err);
   } else if (errInfo) {
-    JniErrorInfo errInfo0(JniErrorCode::IGNITE_JNI_ERR_SUCCESS, "", "");
+    JniErrorInfo errInfo0(JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS, "", "");
     *errInfo = errInfo0;
   }
   LOG_DEBUG_MSG("ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) exiting");
@@ -2856,4 +2856,4 @@ void JniContext::ExceptionCheck(JNIEnv* env, JniErrorInfo* errInfo) {
 }  //  namespace java
 }  //  namespace jni
 }  //  namespace odbc
-}  //  namespace ignite
+}  //  namespace documentdb

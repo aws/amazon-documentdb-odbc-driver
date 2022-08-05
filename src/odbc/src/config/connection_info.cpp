@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/config/connection_info.h"
+#include "documentdb/odbc/config/connection_info.h"
 
 #include <algorithm>
 #include <cstring>
 
-#include "ignite/odbc/system/odbc_constants.h"
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/utility.h"
 
 // Temporary workaround.
 #ifndef SQL_ASYNC_NOTIFICATION
@@ -43,7 +43,7 @@
 #endif
 #endif
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace config {
 
@@ -2919,4 +2919,4 @@ SqlResult::Type ConnectionInfo::SetInfo(InfoType type, std::string value) {
 
 }  // namespace config
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

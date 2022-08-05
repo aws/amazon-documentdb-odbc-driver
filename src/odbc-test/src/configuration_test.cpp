@@ -15,23 +15,23 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/utils.h>
-#include <ignite/odbc/config/config_tools.h>
-#include <ignite/odbc/config/configuration.h>
-#include <ignite/odbc/config/connection_string_parser.h>
-#include <ignite/odbc/log.h>
-#include <ignite/odbc/log_level.h>
-#include <ignite/odbc/odbc_error.h>
+#include <documentdb/odbc/common/utils.h>
+#include <documentdb/odbc/config/config_tools.h>
+#include <documentdb/odbc/config/configuration.h>
+#include <documentdb/odbc/config/connection_string_parser.h>
+#include <documentdb/odbc/log.h>
+#include <documentdb/odbc/log_level.h>
+#include <documentdb/odbc/odbc_error.h>
 
 #include <boost/test/unit_test.hpp>
 #include <iostream>
 #include <set>
 
-#include "ignite/odbc/diagnostic/diagnostic_record_storage.h"
+#include "documentdb/odbc/diagnostic/diagnostic_record_storage.h"
 
-using namespace ignite::odbc;
-using namespace ignite::odbc::config;
-using ignite::odbc::common::EncodeURIComponent;
+using namespace documentdb::odbc;
+using namespace documentdb::odbc::config;
+using documentdb::odbc::common::EncodeURIComponent;
 
 namespace {
 const std::string testDriverName = "Test Driver";
@@ -283,8 +283,8 @@ void CheckConnectionConfig(const Configuration& cfg) {
       << "&tlsCaFile=" << EncodeURIComponent(testTlsCaFile);
   const std::string& expectedJdbcStr = jdbcConstructor.str();
 
-  BOOST_CHECK_EQUAL(ignite::odbc::common::ToLower(cfg.ToConnectString()),
-                    ignite::odbc::common::ToLower(expectedStr));
+  BOOST_CHECK_EQUAL(documentdb::odbc::common::ToLower(cfg.ToConnectString()),
+                    documentdb::odbc::common::ToLower(expectedStr));
   BOOST_CHECK_EQUAL(cfg.ToJdbcConnectionString(), expectedJdbcStr);
 }
 

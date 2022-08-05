@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/impl/compute/compute_impl.h>
+#include <documentdb/odbc/impl/compute/compute_impl.h>
 
-using namespace ignite::odbc::common::concurrent;
+using namespace documentdb::odbc::common::concurrent;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace compute {
@@ -34,10 +34,10 @@ bool ComputeImpl::ProjectionContainsPredicate() const {
   return clusterGroup.IsValid() && clusterGroup.Get()->GetPredicate() != 0;
 }
 
-std::vector< ignite::odbc::cluster::ClusterNode > ComputeImpl::GetNodes() {
+std::vector< documentdb::odbc::cluster::ClusterNode > ComputeImpl::GetNodes() {
   return clusterGroup.Get()->GetNodes();
 }
 }  // namespace compute
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/app/parameter_set.h"
+#include "documentdb/odbc/app/parameter_set.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace app {
 ParameterSet::ParameterSet()
@@ -226,4 +226,4 @@ int32_t ParameterSet::GetParamSetSize() const {
 }
 }  // namespace app
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

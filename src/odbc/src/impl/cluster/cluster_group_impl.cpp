@@ -15,21 +15,21 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/cluster/cluster_group.h>
-#include <ignite/odbc/cluster/cluster_node.h>
+#include <documentdb/odbc/cluster/cluster_group.h>
+#include <documentdb/odbc/cluster/cluster_node.h>
 
-#include <ignite/odbc/impl/ignite_impl.h>
-#include <ignite/odbc/impl/cluster/cluster_node_impl.h>
-#include "ignite/odbc/impl/cluster/cluster_group_impl.h"
+#include <documentdb/odbc/impl/ignite_impl.h>
+#include <documentdb/odbc/impl/cluster/cluster_node_impl.h>
+#include "documentdb/odbc/impl/cluster/cluster_group_impl.h"
 
-using namespace ignite::odbc;
-using namespace ignite::odbc::common;
-using namespace ignite::odbc::common::concurrent;
-using namespace ignite::odbc::cluster;
-using namespace ignite::odbc::jni::java;
-using namespace ignite::odbc::impl::cluster;
+using namespace documentdb::odbc;
+using namespace documentdb::odbc::common;
+using namespace documentdb::odbc::common::concurrent;
+using namespace documentdb::odbc::cluster;
+using namespace documentdb::odbc::jni::java;
+using namespace documentdb::odbc::impl::cluster;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace cluster {
@@ -137,7 +137,7 @@ class ClusterNodePredicateHolder : public IgnitePredicate< ClusterNode > {
   }
 
  private:
-  IGNITE_NO_COPY_ASSIGNMENT(ClusterNodePredicateHolder);
+  DOCUMENTDB_NO_COPY_ASSIGNMENT(ClusterNodePredicateHolder);
 
   /* Predicates container. */
   std::vector< SP_Pred > preds;
@@ -168,9 +168,9 @@ SP_ClusterGroupImpl ClusterGroupImpl::ForAttribute(std::string name,
 
   out.Synchronize();
 
-  IgniteError err;
+  DocumentDbError err;
   jobject target = InStreamOutObject(Command::FOR_ATTRIBUTE, *mem.Get(), err);
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   return SP_ClusterGroupImpl(
       new ClusterGroupImpl(GetEnvironmentPointer(), target));
@@ -196,11 +196,11 @@ SP_ClusterGroupImpl ClusterGroupImpl::ForClients() {
 }
 
 SP_ClusterGroupImpl ClusterGroupImpl::ForDaemons() {
-  IgniteError err;
+  DocumentDbError err;
 
   jobject res = InOpObject(Command::FOR_DAEMONS, err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   return FromTarget(res);
 }
@@ -219,9 +219,9 @@ SP_ClusterGroupImpl ClusterGroupImpl::ForHost(ClusterNode node) {
 
   out.Synchronize();
 
-  IgniteError err;
+  DocumentDbError err;
   jobject target = InStreamOutObject(Command::FOR_HOST, *mem.Get(), err);
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   return SP_ClusterGroupImpl(
       new ClusterGroupImpl(GetEnvironmentPointer(), target));
@@ -295,9 +295,9 @@ SP_ClusterGroupImpl ClusterGroupImpl::ForNodeIds(std::vector< Guid > ids) {
 
   out.Synchronize();
 
-  IgniteError err;
+  DocumentDbError err;
   jobject target = InStreamOutObject(Command::FOR_NODE_IDS, *mem.Get(), err);
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   return SP_ClusterGroupImpl(
       new ClusterGroupImpl(GetEnvironmentPointer(), target));
@@ -320,11 +320,11 @@ SP_ClusterGroupImpl ClusterGroupImpl::ForNodes(
 }
 
 SP_ClusterGroupImpl ClusterGroupImpl::ForOldest() {
-  IgniteError err;
+  DocumentDbError err;
 
   jobject res = InOpObject(Command::FOR_OLDEST, err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   return FromTarget(res);
 }
@@ -354,41 +354,41 @@ SP_ClusterGroupImpl ClusterGroupImpl::ForPredicate(
 }
 
 SP_ClusterGroupImpl ClusterGroupImpl::ForRandom() {
-  IgniteError err;
+  DocumentDbError err;
 
   jobject res = InOpObject(Command::FOR_RANDOM, err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   return FromTarget(res);
 }
 
 SP_ClusterGroupImpl ClusterGroupImpl::ForRemotes() {
-  IgniteError err;
+  DocumentDbError err;
 
   jobject res = InOpObject(Command::FOR_REMOTES, err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   return FromTarget(res);
 }
 
 SP_ClusterGroupImpl ClusterGroupImpl::ForYoungest() {
-  IgniteError err;
+  DocumentDbError err;
 
   jobject res = InOpObject(Command::FOR_YOUNGEST, err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   return FromTarget(res);
 }
 
 SP_ClusterGroupImpl ClusterGroupImpl::ForServers() {
-  IgniteError err;
+  DocumentDbError err;
 
   jobject res = InOpObject(Command::FOR_SERVERS, err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   return FromTarget(res);
 }
@@ -413,7 +413,7 @@ ClusterNode ClusterGroupImpl::GetNode() {
     return nodes.at(0);
 
   const char* msg = "There are no available cluster nodes";
-  throw IgniteError(IgniteError::IGNITE_ERR_ILLEGAL_ARGUMENT, msg);
+  throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_ILLEGAL_ARGUMENT, msg);
 }
 
 struct FindGuid {
@@ -436,7 +436,7 @@ ClusterNode ClusterGroupImpl::GetNode(Guid nid) {
     return *it;
 
   const char* msg = "There is no cluster node with requested ID";
-  throw IgniteError(IgniteError::IGNITE_ERR_ILLEGAL_ARGUMENT, msg);
+  throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_ILLEGAL_ARGUMENT, msg);
 }
 
 std::vector< ClusterNode > ClusterGroupImpl::GetNodes() {
@@ -444,21 +444,21 @@ std::vector< ClusterNode > ClusterGroupImpl::GetNodes() {
 }
 
 bool ClusterGroupImpl::IsActive() {
-  IgniteError err;
+  DocumentDbError err;
 
   int64_t res = OutInOpLong(Command::IS_ACTIVE, 0, err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   return res == 1;
 }
 
 void ClusterGroupImpl::SetActive(bool active) {
-  IgniteError err;
+  DocumentDbError err;
 
   OutInOpLong(Command::SET_ACTIVE, active ? 1 : 0, err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 }
 
 void ClusterGroupImpl::DisableWal(std::string cacheName) {
@@ -492,7 +492,7 @@ void ClusterGroupImpl::SetTxTimeoutOnPartitionMapExchange(int64_t timeout) {
 }
 
 bool ClusterGroupImpl::PingNode(Guid nid) {
-  IgniteError err;
+  DocumentDbError err;
   In1Operation< Guid > inOp(nid);
 
   return OutOp(Command::PING_NODE, inOp, err);
@@ -518,9 +518,9 @@ std::vector< ClusterNode > ClusterGroupImpl::GetTopology(int64_t version) {
 
   out.Synchronize();
 
-  IgniteError err;
+  DocumentDbError err;
   InStreamOutStream(Command::TOPOLOGY, *memIn.Get(), *memOut.Get(), err);
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   interop::InteropInputStream inStream(memOut.Get());
   binary::BinaryReaderImpl reader(&inStream);
@@ -554,9 +554,9 @@ SP_ClusterGroupImpl ClusterGroupImpl::ForCacheNodes(std::string name,
 
   out.Synchronize();
 
-  IgniteError err;
+  DocumentDbError err;
   jobject target = InStreamOutObject(op, *mem.Get(), err);
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   return SP_ClusterGroupImpl(
       new ClusterGroupImpl(GetEnvironmentPointer(), target));
@@ -604,9 +604,9 @@ std::vector< ClusterNode > ClusterGroupImpl::RefreshNodes() {
 
   out.Synchronize();
 
-  IgniteError err;
+  DocumentDbError err;
   InStreamOutStream(Command::NODES, *memIn.Get(), *memOut.Get(), err);
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   interop::InteropInputStream inStream(memOut.Get());
   binary::BinaryReaderImpl reader(&inStream);
@@ -626,4 +626,4 @@ void ClusterGroupImpl::SetPredicate(SP_PredicateHolder predHolder) {
 }  // namespace cluster
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

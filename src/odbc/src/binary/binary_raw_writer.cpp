@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/binary/binary_raw_writer.h"
+#include "documentdb/odbc/binary/binary_raw_writer.h"
 
-#include "ignite/odbc/impl/binary/binary_writer_impl.h"
+#include "documentdb/odbc/impl/binary/binary_writer_impl.h"
 
-using namespace ignite::odbc::impl::binary;
+using namespace documentdb::odbc::impl::binary;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace binary {
 BinaryRawWriter::BinaryRawWriter(BinaryWriterImpl* impl) : impl(impl) {
@@ -150,4 +150,4 @@ void BinaryRawWriter::WriteNull() {
 }
 }  // namespace binary
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace jni {}  // namespace jni
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

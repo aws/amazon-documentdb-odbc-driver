@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/utils.h>
-#include <ignite/odbc/config/config_tools.h>
-#include <ignite/odbc/config/configuration.h>
-#include <ignite/odbc/utility.h>
+#include <documentdb/odbc/common/utils.h>
+#include <documentdb/odbc/config/config_tools.h>
+#include <documentdb/odbc/config/configuration.h>
+#include <documentdb/odbc/utility.h>
 
 #include <algorithm>
 #include <cctype>
 #include <sstream>
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace config {
 std::string AddressesToString(const std::vector< EndPoint >& addresses) {
@@ -238,4 +238,4 @@ uint16_t ParsePort(const std::string& value,
 }
 }  // namespace config
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

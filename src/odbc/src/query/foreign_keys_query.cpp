@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/query/foreign_keys_query.h"
+#include "documentdb/odbc/query/foreign_keys_query.h"
 
-#include "ignite/odbc/connection.h"
-#include "ignite/odbc/impl/binary/binary_common.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/message.h"
-#include "ignite/odbc/type_traits.h"
+#include "documentdb/odbc/connection.h"
+#include "documentdb/odbc/impl/binary/binary_common.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/message.h"
+#include "documentdb/odbc/type_traits.h"
 
 namespace {
 struct ResultColumn {
@@ -77,7 +77,7 @@ struct ResultColumn {
 };
 }  // namespace
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace query {
 ForeignKeysQuery::ForeignKeysQuery(
@@ -92,8 +92,8 @@ ForeignKeysQuery::ForeignKeysQuery(
       executed(false),
       fetched(false),
       columnsMeta() {
-  using namespace ignite::odbc::impl::binary;
-  using namespace ignite::odbc::type_traits;
+  using namespace documentdb::odbc::impl::binary;
+  using namespace documentdb::odbc::type_traits;
 
   using meta::ColumnMeta;
   using meta::Nullability;
@@ -294,11 +294,11 @@ SqlResult::Type ForeignKeysQuery::NextResultSet() {
 }
 
 SqlResult::Type ForeignKeysQuery::MakeRequestGetForeignKeysMeta() {
-  IgniteError error;
+  DocumentDbError error;
   SharedPointer< DatabaseMetaData > databaseMetaData =
       connection.GetMetaData(error);
   if (!databaseMetaData.IsValid()
-      || error.GetCode() != IgniteError::IGNITE_SUCCESS) {
+      || error.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS) {
     diag.AddStatusRecord(error.GetText());
     return SqlResult::AI_ERROR;
   }
@@ -307,7 +307,7 @@ SqlResult::Type ForeignKeysQuery::MakeRequestGetForeignKeysMeta() {
   SharedPointer< ResultSet > resultSet =
       databaseMetaData.Get()->GetImportedKeys(catalog, schema, table, errInfo);
   if (!resultSet.IsValid()
-      || errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     diag.AddStatusRecord(errInfo.errMsg);
     return SqlResult::AI_ERROR;
   }
@@ -328,4 +328,4 @@ SqlResult::Type ForeignKeysQuery::MakeRequestGetForeignKeysMeta() {
 }
 }  // namespace query
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

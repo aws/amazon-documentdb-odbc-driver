@@ -26,18 +26,18 @@
 
 #include <cstdlib>
 
-#include "ignite/odbc/config/configuration.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/log_level.h"
+#include "documentdb/odbc/config/configuration.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/log_level.h"
 
-using ignite::odbc::Logger;
-using ignite::odbc::common::concurrent::CsLockGuard;
-using ignite::odbc::config::Configuration;
+using documentdb::odbc::Logger;
+using documentdb::odbc::common::concurrent::CsLockGuard;
+using documentdb::odbc::config::Configuration;
 
 // logger_ pointer will  initialized in first call to GetLoggerInstance
 std::shared_ptr< Logger > Logger::logger_;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 LogStream::LogStream(Logger* parent)
     : std::basic_ostream< char >(0), strbuf(), logger(parent) {
@@ -146,7 +146,7 @@ bool Logger::EnableLog() {
     if (logFileName.empty()) {
       logFileName = CreateFileName();
       std::stringstream tmpStream;
-      tmpStream << logPath << ignite::odbc::common::Fs << logFileName;
+      tmpStream << logPath << documentdb::odbc::common::Fs << logFileName;
       logFilePath = tmpStream.str();
       if (common::FileExists(logFilePath)) {
         std::cout << "log file at \"" << logFilePath
@@ -176,4 +176,4 @@ std::string& Logger::GetLogPath() {
 }
 
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

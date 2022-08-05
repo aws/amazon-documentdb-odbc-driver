@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/cluster/cluster_group.h"
+#include "documentdb/odbc/cluster/cluster_group.h"
 
-#include "ignite/odbc/impl/cluster/ignite_cluster_impl.h"
+#include "documentdb/odbc/impl/cluster/ignite_cluster_impl.h"
 
-using namespace ignite::odbc::jni::java;
-using namespace ignite::odbc::cluster;
-using namespace ignite::odbc::impl::cluster;
+using namespace documentdb::odbc::jni::java;
+using namespace documentdb::odbc::cluster;
+using namespace documentdb::odbc::impl::cluster;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace cluster {
@@ -89,4 +89,4 @@ SP_ClusterGroupImpl IgniteClusterImpl::AsClusterGroup() {
 }  // namespace cluster
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

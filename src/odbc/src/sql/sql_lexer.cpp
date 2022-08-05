@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/sql/sql_lexer.h"
+#include "documentdb/odbc/sql/sql_lexer.h"
 
 #include <cctype>
 
-#include "ignite/odbc/odbc_error.h"
+#include "documentdb/odbc/odbc_error.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 SqlLexer::SqlLexer(const std::string& sql)
     : sql(sql), pos(0), currentToken(0, 0, TokenType::EOD) {
@@ -201,4 +201,4 @@ bool SqlLexer::IsDelimiter(int c) {
   return !isalnum(c) && c != '_';
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb
