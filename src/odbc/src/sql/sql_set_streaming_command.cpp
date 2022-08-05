@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/utils.h>
-#include <ignite/odbc/odbc_error.h>
-#include <ignite/odbc/sql/sql_lexer.h>
-#include <ignite/odbc/sql/sql_set_streaming_command.h>
-#include <ignite/odbc/sql/sql_token.h>
-#include <ignite/odbc/sql/sql_utils.h>
+#include <documentdb/odbc/common/utils.h>
+#include <documentdb/odbc/odbc_error.h>
+#include <documentdb/odbc/sql/sql_lexer.h>
+#include <documentdb/odbc/sql/sql_set_streaming_command.h>
+#include <documentdb/odbc/sql/sql_token.h>
+#include <documentdb/odbc/sql/sql_utils.h>
 
 const static std::string WORD_BATCH_SIZE("batch_size");
 
@@ -35,7 +35,7 @@ const static std::string WORD_FLUSH_FREQUENCY("flush_frequency");
 
 const static std::string WORD_ORDERED("ordered");
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 SqlSetStreamingCommand::SqlSetStreamingCommand()
     : SqlCommand(SqlCommandType::SET_STREAMING),
@@ -183,4 +183,4 @@ bool SqlSetStreamingCommand::ExpectBool(SqlLexer& lexer) {
   return *sql_utils::TokenToBoolean(token);
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

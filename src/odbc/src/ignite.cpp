@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/jni/java.h>
+#include <documentdb/odbc/jni/java.h>
 
-#include "ignite/odbc/impl/ignite_impl.h"
-#include "ignite/odbc/ignite.h"
+#include "documentdb/odbc/impl/ignite_impl.h"
+#include "documentdb/odbc/ignite.h"
 
-using namespace ignite::odbc::common::concurrent;
-using namespace ignite::odbc::impl;
+using namespace documentdb::odbc::common::concurrent;
+using namespace documentdb::odbc::impl;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 Ignite::Ignite() : impl(SharedPointer< IgniteImpl >()) {
   // No-op.
@@ -65,4 +65,4 @@ IgniteBinding Ignite::GetBinding() {
   return impl.Get()->GetBinding();
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

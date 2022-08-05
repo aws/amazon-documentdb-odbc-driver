@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef _IGNITE_ODBC_TEST_TEST_UTILS
-#define _IGNITE_ODBC_TEST_TEST_UTILS
+#ifndef _DOCUMENTDB_ODBC_TEST_TEST_UTILS
+#define _DOCUMENTDB_ODBC_TEST_TEST_UTILS
 
 #ifdef _WIN32
 #include <windows.h>
@@ -27,21 +27,21 @@
 #include <string>
 #include <vector>
 
-#include "ignite/odbc/common/utils.h"
+#include "documentdb/odbc/common/utils.h"
 
 #define ODBC_THROW_ON_ERROR(ret, type, handle)     \
   if (!SQL_SUCCEEDED(ret)) {                       \
-    throw ignite_test::GetOdbcError(type, handle); \
+    throw documentdb_test::GetOdbcError(type, handle); \
   }
 
 #define ODBC_FAIL_ON_ERROR(ret, type, handle)                   \
   if (!SQL_SUCCEEDED(ret)) {                                    \
-    BOOST_FAIL(ignite_test::GetOdbcErrorMessage(type, handle)); \
+    BOOST_FAIL(documentdb_test::GetOdbcErrorMessage(type, handle)); \
   }
 
 #define ODBC_FAIL_ON_ERROR1(ret, type, handle, msg)           \
   if (!SQL_SUCCEEDED(ret)) {                                  \
-    BOOST_FAIL(ignite_test::GetOdbcErrorMessage(type, handle) \
+    BOOST_FAIL(documentdb_test::GetOdbcErrorMessage(type, handle) \
                + ", msg = " + msg);                           \
   }
 
@@ -91,7 +91,7 @@ class OdbcClientError : public std::exception {
   /**
    * Destructor.
    */
-  virtual ~OdbcClientError() IGNITE_NO_THROW {
+  virtual ~OdbcClientError() DOCUMENTDB_NO_THROW {
     // No-op.
   }
 
@@ -101,7 +101,7 @@ class OdbcClientError : public std::exception {
    *
    * @return Error message string.
    */
-  virtual const char* what() const IGNITE_NO_THROW {
+  virtual const char* what() const DOCUMENTDB_NO_THROW {
     return message.c_str();
   }
 
@@ -112,7 +112,7 @@ class OdbcClientError : public std::exception {
   std::string message;
 };
 
-namespace ignite_test {
+namespace documentdb_test {
 /** Read buffer size. */
 enum { ODBC_BUFFER_SIZE = 1024 };
 
@@ -157,6 +157,6 @@ std::string GetTestConfigDir();
  */
 void ClearLfs();
 
-}  // namespace ignite_test
+}  // namespace documentdb_test
 
-#endif  // _IGNITE_ODBC_TEST_TEST_UTILS
+#endif  // _DOCUMENTDB_ODBC_TEST_TEST_UTILS

@@ -19,12 +19,12 @@
 
 #include "sql_test_suite_fixture.h"
 
-using namespace ignite;
+using namespace documentdb;
 
 using namespace boost::unit_test;
 
 BOOST_FIXTURE_TEST_SUITE(SqlDateTimeFunctionTestSuite,
-                         ignite::SqlTestSuiteFixture)
+                         documentdb::SqlTestSuiteFixture)
 
 BOOST_AUTO_TEST_CASE(TestCurrentDate) {
   CheckSingleResult< Date >("SELECT {fn CURRENT_DATE()}");

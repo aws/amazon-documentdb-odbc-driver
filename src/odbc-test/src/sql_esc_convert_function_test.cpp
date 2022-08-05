@@ -17,17 +17,17 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "ignite/odbc/common/decimal.h"
-#include "ignite/odbc/common/utils.h"
+#include "documentdb/odbc/common/decimal.h"
+#include "documentdb/odbc/common/utils.h"
 #include "sql_test_suite_fixture.h"
 #include "test_utils.h"
 
-using namespace ignite;
-using namespace ignite::common;
+using namespace documentdb;
+using namespace documentdb::common;
 using namespace boost::unit_test;
 
 BOOST_FIXTURE_TEST_SUITE(SqlEscConvertFunctionTestSuite,
-                         ignite::SqlTestSuiteFixture)
+                         documentdb::SqlTestSuiteFixture)
 
 int CheckConnectionInfo(HDBC dbc, int infoType) {
   SQLUINTEGER mask = 0;
@@ -130,20 +130,20 @@ BOOST_AUTO_TEST_CASE(TestEscConvertFunctionGuid) {
 }
 
 BOOST_AUTO_TEST_CASE(TestEscConvertFunctionDate) {
-  using ignite::impl::binary::BinaryUtils;
+  using documentdb::impl::binary::BinaryUtils;
   Date date = common::MakeDateGmt(1983, 3, 14);
   CheckSingleResult< Date >("SELECT {fn CONVERT('1983-03-14', SQL_DATE)}",
                             date);
 }
 
 BOOST_AUTO_TEST_CASE(TestEscConvertFunctionTime) {
-  using ignite::impl::binary::BinaryUtils;
+  using documentdb::impl::binary::BinaryUtils;
   Time time = common::MakeTimeGmt(13, 20, 15);
   CheckSingleResult< Time >("SELECT {fn CONVERT('13:20:15', SQL_TIME)}", time);
 }
 
 BOOST_AUTO_TEST_CASE(TestEscConvertFunctionTimestamp) {
-  using ignite::impl::binary::BinaryUtils;
+  using documentdb::impl::binary::BinaryUtils;
   Timestamp ts = common::MakeTimestampGmt(1983, 3, 14, 13, 20, 15, 999999000);
   CheckSingleResult< Timestamp >(
       "SELECT {fn CONVERT('1983-03-14 13:20:15.999999', SQL_TIMESTAMP)}", ts);

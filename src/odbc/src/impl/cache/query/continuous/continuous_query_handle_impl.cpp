@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/cache/query/continuous/continuous_query_handle_impl.h"
+#include "documentdb/odbc/impl/cache/query/continuous/continuous_query_handle_impl.h"
 
-using namespace ignite::odbc::common::concurrent;
-using namespace ignite::odbc::jni::java;
-using namespace ignite::odbc::impl::interop;
-using namespace ignite::odbc::impl::binary;
+using namespace documentdb::odbc::common::concurrent;
+using namespace documentdb::odbc::jni::java;
+using namespace documentdb::odbc::impl::interop;
+using namespace documentdb::odbc::impl::binary;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace cache {
@@ -53,11 +53,11 @@ ContinuousQueryHandleImpl::~ContinuousQueryHandleImpl() {
 }
 
 QueryCursorImpl* ContinuousQueryHandleImpl::GetInitialQueryCursor(
-    IgniteError& err) {
+    DocumentDbError& err) {
   CsLockGuard guard(mutex);
 
   if (extracted) {
-    err = IgniteError(IgniteError::IGNITE_ERR_GENERIC,
+    err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
                       "GetInitialQueryCursor() can be called only once.");
 
     return 0;
@@ -68,10 +68,10 @@ QueryCursorImpl* ContinuousQueryHandleImpl::GetInitialQueryCursor(
   jobject res = env.Get()->Context()->TargetOutObject(
       javaRef, Command::GET_INITIAL_QUERY, &jniErr);
 
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
-  if (jniErr.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS)
+  if (jniErr.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS)
     return 0;
 
   extracted = true;
@@ -83,4 +83,4 @@ QueryCursorImpl* ContinuousQueryHandleImpl::GetInitialQueryCursor(
 }  // namespace cache
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

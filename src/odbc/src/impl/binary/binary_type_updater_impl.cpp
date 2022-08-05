@@ -17,19 +17,19 @@
 
 #include <iterator>
 
-#include "ignite/odbc/impl/binary/binary_type_updater_impl.h"
-#include "ignite/odbc/impl/interop/interop_output_stream.h"
-#include "ignite/odbc/impl/binary/binary_writer_impl.h"
-#include "ignite/odbc/binary/binary_writer.h"
-#include "ignite/odbc/binary/binary_reader.h"
+#include "documentdb/odbc/impl/binary/binary_type_updater_impl.h"
+#include "documentdb/odbc/impl/interop/interop_output_stream.h"
+#include "documentdb/odbc/impl/binary/binary_writer_impl.h"
+#include "documentdb/odbc/binary/binary_writer.h"
+#include "documentdb/odbc/binary/binary_reader.h"
 
-using namespace ignite::odbc::common::concurrent;
-using namespace ignite::odbc::jni::java;
-using namespace ignite::odbc::impl;
-using namespace ignite::odbc::impl::interop;
-using namespace ignite::odbc::binary;
+using namespace documentdb::odbc::common::concurrent;
+using namespace documentdb::odbc::jni::java;
+using namespace documentdb::odbc::impl;
+using namespace documentdb::odbc::impl::interop;
+using namespace documentdb::odbc::binary;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace binary {
@@ -53,7 +53,7 @@ BinaryTypeUpdaterImpl::~BinaryTypeUpdaterImpl() {
   JniContext::Release(javaRef);
 }
 
-bool BinaryTypeUpdaterImpl::Update(const Snap& snap, IgniteError& err) {
+bool BinaryTypeUpdaterImpl::Update(const Snap& snap, DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   SharedPointer< InteropMemory > mem = env.AllocateMemory();
@@ -101,13 +101,13 @@ bool BinaryTypeUpdaterImpl::Update(const Snap& snap, IgniteError& err) {
   int64_t res = env.Context()->TargetInStreamOutLong(
       javaRef, Operation::PUT_META, mem.Get()->PointerLong(), &jniErr);
 
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
-  return jniErr.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS && res == 1;
+  return jniErr.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS && res == 1;
 }
 
-SPSnap BinaryTypeUpdaterImpl::GetMeta(int32_t typeId, IgniteError& err) {
+SPSnap BinaryTypeUpdaterImpl::GetMeta(int32_t typeId, DocumentDbError& err) {
   JniErrorInfo jniErr;
 
   SharedPointer< InteropMemory > outMem = env.AllocateMemory();
@@ -124,10 +124,10 @@ SPSnap BinaryTypeUpdaterImpl::GetMeta(int32_t typeId, IgniteError& err) {
                                          outMem.Get()->PointerLong(),
                                          inMem.Get()->PointerLong(), &jniErr);
 
-  IgniteError::SetError(jniErr.code, jniErr.errCls.c_str(),
+  DocumentDbError::SetError(jniErr.code, jniErr.errCls.c_str(),
                         jniErr.errMsg.c_str(), err);
 
-  if (err.GetCode() != IgniteError::IGNITE_SUCCESS)
+  if (err.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS)
     return SPSnap();
 
   InteropInputStream in(inMem.Get());
@@ -167,4 +167,4 @@ SPSnap BinaryTypeUpdaterImpl::GetMeta(int32_t typeId, IgniteError& err) {
 }  // namespace binary
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

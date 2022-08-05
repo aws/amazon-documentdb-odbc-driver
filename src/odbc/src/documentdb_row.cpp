@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/jni/jdbc_column_metadata.h"
-#include "ignite/odbc/documentdb_row.h"
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/jni/jdbc_column_metadata.h"
+#include "documentdb/odbc/documentdb_row.h"
+#include "documentdb/odbc/utility.h"
 #include "mongocxx/cursor.hpp"
 
-using namespace ignite::odbc::impl::interop;
-using ignite::odbc::jni::JdbcColumnMetadata;
+using namespace documentdb::odbc::impl::interop;
+using documentdb::odbc::jni::JdbcColumnMetadata;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 // ASSUMPTION: iterator is not at the end.
 DocumentDbRow::DocumentDbRow(bsoncxx::document::view const& document,
@@ -73,4 +73,4 @@ bool DocumentDbRow::EnsureColumnDiscovered(uint32_t columnIdx) {
   return true;
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

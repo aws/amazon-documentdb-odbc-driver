@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/utils.h>
+#include <documentdb/odbc/common/utils.h>
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace common {
 /**
@@ -83,7 +83,7 @@ uint32_t ToBigEndian(uint32_t value) {
   return value;
 }
 
-IGNITE_FRIEND_EXPORT Date MakeDateGmt(int year, int month, int day, int hour,
+DOCUMENTDB_FRIEND_EXPORT Date MakeDateGmt(int year, int month, int day, int hour,
                                       int min, int sec) {
   tm date;
 
@@ -99,7 +99,7 @@ IGNITE_FRIEND_EXPORT Date MakeDateGmt(int year, int month, int day, int hour,
   return CTmToDate(date);
 }
 
-IGNITE_FRIEND_EXPORT Date MakeDateLocal(int year, int month, int day, int hour,
+DOCUMENTDB_FRIEND_EXPORT Date MakeDateLocal(int year, int month, int day, int hour,
                                         int min, int sec) {
   tm date;
 
@@ -112,12 +112,12 @@ IGNITE_FRIEND_EXPORT Date MakeDateLocal(int year, int month, int day, int hour,
   date.tm_min = min;
   date.tm_sec = sec;
 
-  time_t localTime = common::IgniteTimeLocal(date);
+  time_t localTime = common::ToTimeLocal(date);
 
   return CTimeToDate(localTime);
 }
 
-IGNITE_FRIEND_EXPORT Time MakeTimeGmt(int hour, int min, int sec) {
+DOCUMENTDB_FRIEND_EXPORT Time MakeTimeGmt(int hour, int min, int sec) {
   tm date;
 
   std::memset(&date, 0, sizeof(date));
@@ -132,7 +132,7 @@ IGNITE_FRIEND_EXPORT Time MakeTimeGmt(int hour, int min, int sec) {
   return CTmToTime(date);
 }
 
-IGNITE_FRIEND_EXPORT Time MakeTimeLocal(int hour, int min, int sec) {
+DOCUMENTDB_FRIEND_EXPORT Time MakeTimeLocal(int hour, int min, int sec) {
   tm date;
 
   std::memset(&date, 0, sizeof(date));
@@ -144,12 +144,12 @@ IGNITE_FRIEND_EXPORT Time MakeTimeLocal(int hour, int min, int sec) {
   date.tm_min = min;
   date.tm_sec = sec;
 
-  time_t localTime = common::IgniteTimeLocal(date);
+  time_t localTime = common::ToTimeLocal(date);
 
   return CTimeToTime(localTime);
 }
 
-IGNITE_FRIEND_EXPORT Timestamp MakeTimestampGmt(int year, int month, int day,
+DOCUMENTDB_FRIEND_EXPORT Timestamp MakeTimestampGmt(int year, int month, int day,
                                                 int hour, int min, int sec,
                                                 long ns) {
   tm date;
@@ -166,7 +166,7 @@ IGNITE_FRIEND_EXPORT Timestamp MakeTimestampGmt(int year, int month, int day,
   return CTmToTimestamp(date, ns);
 }
 
-IGNITE_FRIEND_EXPORT Timestamp MakeTimestampLocal(int year, int month, int day,
+DOCUMENTDB_FRIEND_EXPORT Timestamp MakeTimestampLocal(int year, int month, int day,
                                                   int hour, int min, int sec,
                                                   long ns) {
   tm date;
@@ -180,12 +180,12 @@ IGNITE_FRIEND_EXPORT Timestamp MakeTimestampLocal(int year, int month, int day,
   date.tm_min = min;
   date.tm_sec = sec;
 
-  time_t localTime = common::IgniteTimeLocal(date);
+  time_t localTime = common::ToTimeLocal(date);
 
   return CTimeToTimestamp(localTime, ns);
 }
 
-IGNITE_IMPORT_EXPORT std::string GetDynamicLibraryName(const char* name) {
+DOCUMENTDB_IMPORT_EXPORT std::string GetDynamicLibraryName(const char* name) {
   std::stringstream libNameBuffer;
 
   libNameBuffer << name << Dle;
@@ -193,7 +193,7 @@ IGNITE_IMPORT_EXPORT std::string GetDynamicLibraryName(const char* name) {
   return libNameBuffer.str();
 }
 
-IGNITE_IMPORT_EXPORT bool AllDigits(const std::string& val) {
+DOCUMENTDB_IMPORT_EXPORT bool AllDigits(const std::string& val) {
   std::string::const_iterator i = val.begin();
 
   while (i != val.end() && isdigit(*i))
@@ -204,4 +204,4 @@ IGNITE_IMPORT_EXPORT bool AllDigits(const std::string& val) {
 
 }  // namespace common
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

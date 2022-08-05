@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/timestamp.h"
+#include "documentdb/odbc/timestamp.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 Timestamp::Timestamp() : seconds(0), fractionNs(0) {
   // No-op.
@@ -91,4 +91,4 @@ bool operator>=(const Timestamp& val1, const Timestamp& val2) {
              && val1.fractionNs >= val2.fractionNs);
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

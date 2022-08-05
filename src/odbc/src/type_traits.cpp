@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/type_traits.h"
+#include "documentdb/odbc/type_traits.h"
 
-#include "ignite/odbc/impl/binary/binary_common.h"
+#include "documentdb/odbc/impl/binary/binary_common.h"
 
-#include "ignite/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/system/odbc_constants.h"
 
-using namespace ignite::odbc::impl::binary;
+using namespace documentdb::odbc::impl::binary;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace type_traits {
 const std::string SqlTypeName::SMALLINT("SMALLINT");
@@ -804,4 +804,4 @@ bool BinaryTypeUnsigned(boost::optional< int16_t > type) {
 }
 }  // namespace type_traits
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

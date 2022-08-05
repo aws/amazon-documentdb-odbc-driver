@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/result_page.h"
+#include "documentdb/odbc/result_page.h"
 
-#include <ignite/odbc/impl/interop/interop_input_stream.h>
+#include <documentdb/odbc/impl/interop/interop_input_stream.h>
 
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/utility.h"
 
-using namespace ignite::odbc::impl::binary;
+using namespace documentdb::odbc::impl::binary;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 ResultPage::ResultPage()
     : last(false), size(0), data(DEFAULT_ALLOCATED_MEMORY) {
@@ -51,4 +51,4 @@ void ResultPage::Read(BinaryReaderImpl& reader) {
   }
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

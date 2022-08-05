@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/streaming/streaming_batch.h"
+#include "documentdb/odbc/streaming/streaming_batch.h"
 
-#include "ignite/odbc/impl/binary/binary_writer_impl.h"
-#include "ignite/odbc/impl/interop/interop_output_stream.h"
-#include "ignite/odbc/app/parameter_set.h"
+#include "documentdb/odbc/impl/binary/binary_writer_impl.h"
+#include "documentdb/odbc/impl/interop/interop_output_stream.h"
+#include "documentdb/odbc/app/parameter_set.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace streaming {
 StreamingBatch::StreamingBatch() : currentSql(), size(0), data(1024 * 16) {
@@ -62,4 +62,4 @@ void StreamingBatch::Clear() {
 }
 }  // namespace streaming
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

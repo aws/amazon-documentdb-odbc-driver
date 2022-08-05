@@ -78,7 +78,7 @@ fi
 
 if [[ -z "${ODBCINSTINI}" ]]; then
   echo "ODBCINSTINI environment variable is not set. Using default."
-  export ODBCINSTINI="${SCRIPT_DIR}/../build/odbc/lib/ignite-odbc-install.ini"
+  export ODBCINSTINI="${SCRIPT_DIR}/../build/odbc/lib/documentdb-odbc-install.ini"
   echo "ODBCINSTINI=ODBCINSTINI"
 else
   echo "ODBCINSTINI=ODBCINSTINI"

@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/connection.h"
+#include "documentdb/odbc/connection.h"
 
-#include <ignite/odbc/ignite_error.h>
+#include <documentdb/odbc/documentdb_error.h>
 
 #include <algorithm>
 #include <bsoncxx/builder/basic/document.hpp>
@@ -34,33 +34,33 @@
 #include <mongocxx/uri.hpp>
 #include <sstream>
 
-#include "ignite/odbc/driver_instance.h"
-#include "ignite/odbc/common/concurrent.h"
-#include "ignite/odbc/common/utils.h"
-#include "ignite/odbc/config/configuration.h"
-#include "ignite/odbc/config/connection_string_parser.h"
-#include "ignite/odbc/dsn_config.h"
-#include "ignite/odbc/environment.h"
-#include "ignite/odbc/jni/database_metadata.h"
-#include "ignite/odbc/jni/documentdb_connection.h"
-#include "ignite/odbc/jni/java.h"
-#include "ignite/odbc/jni/utils.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/message.h"
-#include "ignite/odbc/ssl_mode.h"
-#include "ignite/odbc/statement.h"
-#include "ignite/odbc/system/system_dsn.h"
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/driver_instance.h"
+#include "documentdb/odbc/common/concurrent.h"
+#include "documentdb/odbc/common/utils.h"
+#include "documentdb/odbc/config/configuration.h"
+#include "documentdb/odbc/config/connection_string_parser.h"
+#include "documentdb/odbc/dsn_config.h"
+#include "documentdb/odbc/environment.h"
+#include "documentdb/odbc/jni/database_metadata.h"
+#include "documentdb/odbc/jni/documentdb_connection.h"
+#include "documentdb/odbc/jni/java.h"
+#include "documentdb/odbc/jni/utils.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/message.h"
+#include "documentdb/odbc/ssl_mode.h"
+#include "documentdb/odbc/statement.h"
+#include "documentdb/odbc/system/system_dsn.h"
+#include "documentdb/odbc/utility.h"
 
-using namespace ignite::odbc::jni::java;
-using namespace ignite::odbc::common;
-using namespace ignite::odbc::common::concurrent;
-using ignite::odbc::IgniteError;
-using ignite::odbc::jni::DatabaseMetaData;
-using ignite::odbc::jni::DocumentDbConnection;
-using ignite::odbc::jni::java::BuildJvmOptions;
-using ignite::odbc::jni::java::JniErrorCode;
-using ignite::odbc::jni::java::JniHandlers;
+using namespace documentdb::odbc::jni::java;
+using namespace documentdb::odbc::common;
+using namespace documentdb::odbc::common::concurrent;
+using documentdb::odbc::DocumentDbError;
+using documentdb::odbc::jni::DatabaseMetaData;
+using documentdb::odbc::jni::DocumentDbConnection;
+using documentdb::odbc::jni::java::BuildJvmOptions;
+using documentdb::odbc::jni::java::JniErrorCode;
+using documentdb::odbc::jni::java::JniHandlers;
 
 // Uncomment for per-byte debug.
 //#define PER_BYTE_DEBUG
@@ -73,7 +73,7 @@ struct OdbcProtocolHeader {
 #pragma pack(pop)
 }  // namespace
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 Connection::Connection(Environment* env) : env_(env), info_(config_) {
   // No-op
@@ -97,7 +97,7 @@ void Connection::GetInfo(config::ConnectionInfo::InfoType type, void* buf,
           << buflen << ", " << std::hex << reinterpret_cast< size_t >(reslen)
           << std::dec);
 
-  IGNITE_ODBC_API_CALL(InternalGetInfo(type, buf, buflen, reslen));
+  DOCUMENTDB_ODBC_API_CALL(InternalGetInfo(type, buf, buflen, reslen));
 }
 
 SqlResult::Type Connection::InternalGetInfo(
@@ -115,7 +115,7 @@ SqlResult::Type Connection::InternalGetInfo(
 }
 
 void Connection::Establish(const std::string& connectStr, void* parentWindow) {
-  IGNITE_ODBC_API_CALL(InternalEstablish(connectStr, parentWindow));
+  DOCUMENTDB_ODBC_API_CALL(InternalEstablish(connectStr, parentWindow));
 }
 
 SqlResult::Type Connection::InternalEstablish(const std::string& connectStr,
@@ -145,7 +145,7 @@ SqlResult::Type Connection::InternalEstablish(const std::string& connectStr,
 }
 
 void Connection::Establish(const config::Configuration cfg) {
-  IGNITE_ODBC_API_CALL(InternalEstablish(cfg));
+  DOCUMENTDB_ODBC_API_CALL(InternalEstablish(cfg));
 }
 
 SqlResult::Type Connection::InternalEstablish(
@@ -167,7 +167,7 @@ SqlResult::Type Connection::InternalEstablish(
     return SqlResult::AI_ERROR;
   }
 
-  IgniteError err;
+  DocumentDbError err;
   bool connected = TryRestoreConnection(err);
 
   if (!connected) {
@@ -184,7 +184,7 @@ SqlResult::Type Connection::InternalEstablish(
 }
 
 void Connection::Release() {
-  IGNITE_ODBC_API_CALL(InternalRelease());
+  DOCUMENTDB_ODBC_API_CALL(InternalRelease());
 }
 
 void Connection::Deregister() {
@@ -211,7 +211,7 @@ void Connection::Close() {
     if (connection_.IsValid()) {
       JniErrorInfo errInfo;
       connection_.Get()->Close(errInfo);
-      if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+      if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
         // TODO: Determine if we need to error check the close.
       }
       connection_ = nullptr;
@@ -222,14 +222,14 @@ void Connection::Close() {
 Statement* Connection::CreateStatement() {
   Statement* statement;
 
-  IGNITE_ODBC_API_CALL(InternalCreateStatement(statement));
+  DOCUMENTDB_ODBC_API_CALL(InternalCreateStatement(statement));
 
   return statement;
 }
 
-SharedPointer< DatabaseMetaData > Connection::GetMetaData(IgniteError& err) {
+SharedPointer< DatabaseMetaData > Connection::GetMetaData(DocumentDbError& err) {
   if (!connection_.IsValid()) {
-    err = IgniteError(IgniteError::IGNITE_ERR_ILLEGAL_STATE,
+    err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_ILLEGAL_STATE,
                       "Must be connected.");
     return nullptr;
   }
@@ -237,7 +237,7 @@ SharedPointer< DatabaseMetaData > Connection::GetMetaData(IgniteError& err) {
   auto databaseMetaData = connection_.Get()->GetMetaData(errInfo);
   if (!databaseMetaData.IsValid()) {
     std::string message = errInfo.errMsg;
-    err = IgniteError(IgniteError::IGNITE_ERR_JNI_GET_DATABASE_METADATA,
+    err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_JNI_GET_DATABASE_METADATA,
                       message.c_str());
     return nullptr;
   }
@@ -245,9 +245,9 @@ SharedPointer< DatabaseMetaData > Connection::GetMetaData(IgniteError& err) {
 }
 
 SharedPointer< DocumentDbDatabaseMetadata > Connection::GetDatabaseMetadata(
-    IgniteError& err) {
+    DocumentDbError& err) {
   if (!connection_.IsValid()) {
-    err = IgniteError(IgniteError::IGNITE_ERR_ILLEGAL_STATE,
+    err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_ILLEGAL_STATE,
                       "Must be connected.");
     return nullptr;
   }
@@ -256,8 +256,8 @@ SharedPointer< DocumentDbDatabaseMetadata > Connection::GetDatabaseMetadata(
       connection_.Get()->GetDatabaseMetadata(errInfo);
   if (!documentDbDatabaseMetaData.IsValid()) {
     std::string message = errInfo.errMsg;
-    err = IgniteError(
-        IgniteError::IGNITE_ERR_JNI_GET_DOCUMENTDB_DATABASE_METADATA,
+    err = DocumentDbError(
+        DocumentDbError::DOCUMENTDB_ERR_JNI_GET_DOCUMENTDB_DATABASE_METADATA,
         message.c_str());
     return nullptr;
   }
@@ -265,9 +265,9 @@ SharedPointer< DocumentDbDatabaseMetadata > Connection::GetDatabaseMetadata(
 }
 
 SharedPointer< DocumentDbConnectionProperties >
-Connection::GetConnectionProperties(IgniteError& err) {
+Connection::GetConnectionProperties(DocumentDbError& err) {
   if (!connection_.IsValid()) {
-    err = IgniteError(IgniteError::IGNITE_ERR_ILLEGAL_STATE,
+    err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_ILLEGAL_STATE,
                       "Must be connected.");
     return nullptr;
   }
@@ -276,8 +276,8 @@ Connection::GetConnectionProperties(IgniteError& err) {
       connection_.Get()->GetConnectionProperties(errInfo);
   if (!connectionProperties.IsValid()) {
     std::string message = errInfo.errMsg;
-    err = IgniteError(
-        IgniteError::IGNITE_ERR_JNI_GET_DOCUMENTDB_CONNECTION_PROPERTIES,
+    err = DocumentDbError(
+        DocumentDbError::DOCUMENTDB_ERR_JNI_GET_DOCUMENTDB_CONNECTION_PROPERTIES,
         message.c_str());
     return nullptr;
   }
@@ -313,7 +313,7 @@ diagnostic::DiagnosticRecord Connection::CreateStatusRecord(
 
 void Connection::GetAttribute(int attr, void* buf, SQLINTEGER bufLen,
                               SQLINTEGER* valueLen) {
-  IGNITE_ODBC_API_CALL(InternalGetAttribute(attr, buf, bufLen, valueLen));
+  DOCUMENTDB_ODBC_API_CALL(InternalGetAttribute(attr, buf, bufLen, valueLen));
 }
 
 SqlResult::Type Connection::InternalGetAttribute(int attr, void* buf,
@@ -361,7 +361,7 @@ SqlResult::Type Connection::InternalGetAttribute(int attr, void* buf,
 }
 
 void Connection::SetAttribute(int attr, void* value, SQLINTEGER valueLen) {
-  IGNITE_ODBC_API_CALL(InternalSetAttribute(attr, value, valueLen));
+  DOCUMENTDB_ODBC_API_CALL(InternalSetAttribute(attr, value, valueLen));
 }
 
 SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
@@ -398,7 +398,7 @@ void Connection::EnsureConnected() {
   if (connection_.IsValid())
     return;
 
-  IgniteError err;
+  DocumentDbError err;
   bool success = TryRestoreConnection(err);
 
   if (!success) {
@@ -410,15 +410,15 @@ void Connection::EnsureConnected() {
   }
 }
 
-bool Connection::TryRestoreConnection(IgniteError& err) {
+bool Connection::TryRestoreConnection(DocumentDbError& err) {
   if (connection_.IsValid()) {
     return true;
   }
 
   JniErrorInfo errInfo;
   auto ctx = GetJniContext(errInfo);
-  if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    err = IgniteError(static_cast< int32_t >(errInfo.code),
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
+    err = DocumentDbError(static_cast< int32_t >(errInfo.code),
                       std::string(errInfo.errCls)
                           .append(": ")
                           .append(errInfo.errMsg)
@@ -428,14 +428,14 @@ bool Connection::TryRestoreConnection(IgniteError& err) {
   SharedPointer< DocumentDbConnection > conn = new DocumentDbConnection(ctx);
   if (!conn.IsValid()
       || conn.Get()->Open(config_, errInfo)
-             != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+             != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     std::string message = errInfo.errMsg;
-    err = IgniteError(IgniteError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
+    err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_SECURE_CONNECTION_FAILURE,
                       message.c_str());
   }
   connection_ = conn;
   bool connected = connection_.IsValid() && connection_.Get()->IsOpen()
-                   && errInfo.code == JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
+                   && errInfo.code == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS;
 
   if (!connected) {
     return connected;
@@ -453,14 +453,14 @@ bool Connection::TryRestoreConnection(IgniteError& err) {
 
 bool Connection::GetInternalSSHTunnelPort(int32_t& localSSHTunnelPort,
                                           SharedPointer< JniContext > ctx,
-                                          odbc::IgniteError& err) {
+                                          odbc::DocumentDbError& err) {
   bool isSSHTunnelActive;
   JniErrorInfo errInfo;
   JniErrorCode success =
       connection_.Get()->IsSshTunnelActive(isSSHTunnelActive, errInfo);
 
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-    err = IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_INIT,
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
+    err = DocumentDbError(odbc::DocumentDbError::DOCUMENTDB_ERR_JVM_INIT,
                       errInfo.errMsg.c_str());
     return false;
   }
@@ -468,8 +468,8 @@ bool Connection::GetInternalSSHTunnelPort(int32_t& localSSHTunnelPort,
   if (isSSHTunnelActive) {
     JniErrorCode success =
         connection_.Get()->GetSshLocalPort(localSSHTunnelPort, errInfo);
-    if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
-      err = IgniteError(odbc::IgniteError::IGNITE_ERR_JVM_INIT,
+    if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
+      err = DocumentDbError(odbc::DocumentDbError::DOCUMENTDB_ERR_JVM_INIT,
                         errInfo.errMsg.c_str());
       return false;
     }
@@ -574,7 +574,7 @@ int32_t Connection::RetrieveTimeout(void* value) {
 }
 
 bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
-                                      odbc::IgniteError& err) {
+                                      odbc::DocumentDbError& err) {
   using bsoncxx::builder::basic::kvp;
   using bsoncxx::builder::basic::make_document;
 
@@ -601,7 +601,7 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
     auto result = db.run_command(ping.view());
 
     if (result.view()["ok"].get_double() != 1) {
-      err = odbc::IgniteError(odbc::IgniteError::IGNITE_ERR_NETWORK_FAILURE,
+      err = odbc::DocumentDbError(odbc::DocumentDbError::DOCUMENTDB_ERR_NETWORK_FAILURE,
                               "Unable to ping DocumentDB.");
       return false;
     }
@@ -613,11 +613,11 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
             << " code: " << xcp.code().value()
             << " messagge: " << xcp.code().message()
             << " cause: " << xcp.what();
-    err = odbc::IgniteError(
-        odbc::IgniteError::IGNITE_ERR_SECURE_CONNECTION_FAILURE,
+    err = odbc::DocumentDbError(
+        odbc::DocumentDbError::DOCUMENTDB_ERR_SECURE_CONNECTION_FAILURE,
         message.str().c_str());
     return false;
   }
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

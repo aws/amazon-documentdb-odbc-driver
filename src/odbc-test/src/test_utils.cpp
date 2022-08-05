@@ -17,17 +17,17 @@
 
 #include "test_utils.h"
 
-#include <ignite/odbc/common/platform_utils.h>
-#include <ignite/odbc/utility.h>
+#include <documentdb/odbc/common/platform_utils.h>
+#include <documentdb/odbc/utility.h>
 
 #include <boost/test/unit_test.hpp>
 #include <cassert>
 
-#include "ignite/odbc/jni/utils.h"
+#include "documentdb/odbc/jni/utils.h"
 
-using namespace ignite::odbc;
+using namespace documentdb::odbc;
 
-namespace ignite_test {
+namespace documentdb_test {
 OdbcClientError GetOdbcError(SQLSMALLINT handleType, SQLHANDLE handle) {
   SQLWCHAR sqlstate[7] = {};
   SQLINTEGER nativeCode;
@@ -85,9 +85,9 @@ std::string GetOdbcErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle,
 }
 
 std::string GetTestConfigDir() {
-  using namespace ignite::odbc;
+  using namespace documentdb::odbc;
 
-  std::string cfgPath = common::GetEnv("IGNITE_NATIVE_TEST_ODBC_CONFIG_PATH");
+  std::string cfgPath = common::GetEnv("DOCUMENTDB_NATIVE_TEST_ODBC_CONFIG_PATH");
 
   if (!cfgPath.empty())
     return cfgPath;
@@ -109,15 +109,15 @@ std::string GetTestConfigDir() {
 std::string AppendPath(const std::string& base, const std::string& toAdd) {
   std::stringstream stream;
 
-  stream << base << ignite::odbc::common::Fs << toAdd;
+  stream << base << documentdb::odbc::common::Fs << toAdd;
 
   return stream.str();
 }
 
 void ClearLfs() {
-  std::string home = ignite::odbc::jni::ResolveDocumentDbHome();
+  std::string home = documentdb::odbc::jni::ResolveDocumentDbHome();
   std::string workDir = AppendPath(home, "work");
 
-  ignite::odbc::common::DeletePath(workDir);
+  documentdb::odbc::common::DeletePath(workDir);
 }
-}  // namespace ignite_test
+}  // namespace documentdb_test

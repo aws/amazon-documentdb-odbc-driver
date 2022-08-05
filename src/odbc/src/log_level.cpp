@@ -14,11 +14,11 @@
  *
  */
 
-#include "ignite/odbc/log_level.h"
+#include "documentdb/odbc/log_level.h"
 
-#include <ignite/odbc/common/utils.h>
+#include <documentdb/odbc/common/utils.h>
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 LogLevel::Type LogLevel::FromString(const std::string& val, Type dflt) {
   std::string lowerVal = common::ToLower(val);
@@ -59,4 +59,4 @@ std::string LogLevel::ToString(Type val) {
   }
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb
