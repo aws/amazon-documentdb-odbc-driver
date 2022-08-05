@@ -26,25 +26,25 @@
 #include <string>
 #include <vector>
 
-#include "ignite/ignite.h"
-#include "ignite/ignition.h"
-#include "ignite/odbc/impl/binary/binary_utils.h"
+#include "documentdb/ignite.h"
+#include "documentdb/ignition.h"
+#include "documentdb/odbc/impl/binary/binary_utils.h"
 #include "sql_test_suite_fixture.h"
 #include "test_type.h"
 #include "test_utils.h"
 
-using namespace ignite;
-using namespace ignite::cache;
-using namespace ignite::cache::query;
-using namespace ignite::common;
-using namespace ignite_test;
+using namespace documentdb;
+using namespace documentdb::cache;
+using namespace documentdb::cache::query;
+using namespace documentdb::common;
+using namespace documentdb_test;
 
 using namespace boost::unit_test;
 
-using ignite::impl::binary::BinaryUtils;
+using documentdb::impl::binary::BinaryUtils;
 
 BOOST_FIXTURE_TEST_SUITE(SqlStringFunctionTestSuite,
-                         ignite::SqlTestSuiteFixture)
+                         documentdb::SqlTestSuiteFixture)
 
 BOOST_AUTO_TEST_CASE(TestStringFunctionAscii) {
   TestType in;
@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE(TestStringFunctionInsert) {
 
   CheckSingleResult< std::string >(
       "SELECT {fn INSERT(strField, 7, 5, \'Ignite\')} FROM TestType",
-      "Hello Ignite!");
+      "Hello world!");
 }
 
 BOOST_AUTO_TEST_CASE(TestStringFunctionLcase) {
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(TestStringFunctionRepeat) {
 
 BOOST_AUTO_TEST_CASE(TestStringFunctionReplace) {
   TestType in;
-  in.strField = "Hello Ignite!";
+  in.strField = "Hello world!";
 
   testCache.Put(1, in);
 
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE(TestStringFunctionRtrim) {
 
 BOOST_AUTO_TEST_CASE(TestStringFunctionSoundex) {
   TestType in;
-  in.strField = "Hello Ignite!";
+  in.strField = "Hello world!";
 
   testCache.Put(1, in);
 
@@ -271,7 +271,7 @@ BOOST_AUTO_TEST_CASE(TestStringFunctionSpace) {
 
 BOOST_AUTO_TEST_CASE(TestStringFunctionSubstring) {
   TestType in;
-  in.strField = "Hello Ignite!";
+  in.strField = "Hello world!";
 
   testCache.Put(1, in);
 
@@ -311,7 +311,7 @@ BOOST_AUTO_TEST_CASE(Test92StringFunctionUpper) {
 
 BOOST_AUTO_TEST_CASE(Test92StringFunctionSubstring) {
   TestType in;
-  in.strField = "Hello Ignite!";
+  in.strField = "Hello world!";
 
   testCache.Put(1, in);
 

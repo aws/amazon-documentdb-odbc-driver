@@ -17,13 +17,13 @@
 
 #include <chrono>
 #include <ctime>
-#include "ignite/odbc/documentdb_column.h"
-#include <ignite/odbc/impl/interop/interop_stream_position_guard.h>
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/documentdb_column.h"
+#include <documentdb/odbc/impl/interop/interop_stream_position_guard.h>
+#include "documentdb/odbc/utility.h"
 #include "bsoncxx/types.hpp"
 #include "bsoncxx/json.hpp"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 
 void DocumentDbColumn::Update(bsoncxx::document::view const& document) {
@@ -672,4 +672,4 @@ ConversionResult::Type DocumentDbColumn::ReadToBuffer(
   return convRes;
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

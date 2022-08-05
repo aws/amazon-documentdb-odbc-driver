@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/meta/column_meta.h"
+#include "documentdb/odbc/meta/column_meta.h"
 
-#include "ignite/odbc/common/utils.h"
-#include "ignite/odbc/common_types.h"
-#include "ignite/odbc/impl/binary/binary_common.h"
-#include "ignite/odbc/jni/java.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/system/odbc_constants.h"
-#include "ignite/odbc/type_traits.h"
+#include "documentdb/odbc/common/utils.h"
+#include "documentdb/odbc/common_types.h"
+#include "documentdb/odbc/impl/binary/binary_common.h"
+#include "documentdb/odbc/jni/java.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/type_traits.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace meta {
 
@@ -146,7 +146,7 @@ void ColumnMeta::ReadJdbcMetadata(JdbcColumnMetadata& jdbcMetadata,
 }
 
 bool isCharType(int16_t dataType) {
-  using namespace ignite::odbc::impl::binary;
+  using namespace documentdb::odbc::impl::binary;
   return ((dataType == JDBC_TYPE_VARCHAR) || (dataType == JDBC_TYPE_CHAR)
           || (dataType == JDBC_TYPE_NCHAR) || (dataType == JDBC_TYPE_NVARCHAR)
           || (dataType == JDBC_TYPE_LONGVARCHAR)
@@ -154,7 +154,7 @@ bool isCharType(int16_t dataType) {
 }
 
 bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
-  using namespace ignite::odbc::impl::binary;
+  using namespace documentdb::odbc::impl::binary;
 
   // an empty string is returned if the column does not have the requested field
   value = "";
@@ -250,7 +250,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
 }
 
 bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
-  using namespace ignite::odbc::impl::binary;
+  using namespace documentdb::odbc::impl::binary;
 
   // value equals -1 by default.
   value = -1;
@@ -427,7 +427,7 @@ void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
   JniErrorCode errCode;
   do {
     errCode = resultSet.Get()->Next(hasNext, errInfo);
-    if (!hasNext || errCode != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    if (!hasNext || errCode != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       break;
     }
 
@@ -438,4 +438,4 @@ void ReadColumnMetaVector(SharedPointer< ResultSet >& resultSet,
 
 }  // namespace meta
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

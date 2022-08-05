@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/impl/ignite_environment.h>
-#include <ignite/odbc/impl/ignite_binding_impl.h>
+#include <documentdb/odbc/impl/ignite_environment.h>
+#include <documentdb/odbc/impl/ignite_binding_impl.h>
 
-using namespace ignite::odbc::common::concurrent;
+using namespace documentdb::odbc::common::concurrent;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 IgniteBindingImpl::IgniteBindingImpl(IgniteEnvironment& env)
@@ -52,7 +52,7 @@ int64_t IgniteBindingImpl::InvokeCallback(bool& found, int32_t type, int32_t id,
 }
 
 void IgniteBindingImpl::RegisterCallback(int32_t type, int32_t id,
-                                         Callback* proc, IgniteError& err) {
+                                         Callback* proc, DocumentDbError& err) {
   int64_t key = makeKey(type, id);
 
   CsLockGuard guard(lock);
@@ -68,19 +68,19 @@ void IgniteBindingImpl::RegisterCallback(int32_t type, int32_t id,
         << "Trying to register multiple PRC callbacks with the same ID. [type="
         << type << ", id=" << id << ']';
 
-    err = IgniteError(IgniteError::IGNITE_ERR_ENTRY_PROCESSOR,
+    err = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_ENTRY_PROCESSOR,
                       builder.str().c_str());
   }
 }
 
 void IgniteBindingImpl::RegisterCallback(int32_t type, int32_t id,
                                          Callback* callback) {
-  IgniteError err;
+  DocumentDbError err;
 
   RegisterCallback(type, id, callback, err);
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 }
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

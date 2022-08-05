@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/common/concurrent.h"
+#include "documentdb/odbc/common/concurrent.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace common {
 namespace concurrent {
@@ -90,4 +90,4 @@ bool SharedPointerImpl::Decrement() {
 }  // namespace concurrent
 }  // namespace common
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

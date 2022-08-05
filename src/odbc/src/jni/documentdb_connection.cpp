@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-#include <ignite/odbc/common/platform_utils.h>
-#include <ignite/odbc/ignite_error.h>
-#include <ignite/odbc/jni/documentdb_connection.h>
-#include <ignite/odbc/jni/utils.h>
-#include <ignite/odbc/log.h>
+#include <documentdb/odbc/common/platform_utils.h>
+#include <documentdb/odbc/documentdb_error.h>
+#include <documentdb/odbc/jni/documentdb_connection.h>
+#include <documentdb/odbc/jni/utils.h>
+#include <documentdb/odbc/log.h>
 
-using ignite::odbc::jni::java::JniErrorCode;
-using ignite::odbc::jni::java::JniErrorInfo;
+using documentdb::odbc::jni::java::JniErrorCode;
+using documentdb::odbc::jni::java::JniErrorInfo;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace jni {
 JniErrorCode DocumentDbConnection::Open(const Configuration& config,
@@ -33,11 +33,11 @@ JniErrorCode DocumentDbConnection::Open(const Configuration& config,
 
   if (!_jniContext.IsValid()) {
     errInfo.errMsg = "Unable to get initialized JVM.";
-    errInfo.code = JniErrorCode::IGNITE_JNI_ERR_JVM_INIT;
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_JVM_INIT;
     return errInfo.code;
   }
   if (_connection.IsValid()) {
-    return JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
+    return JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS;
   }
 
   std::string connectionString = config.ToJdbcConnectionString();
@@ -45,7 +45,7 @@ JniErrorCode DocumentDbConnection::Open(const Configuration& config,
   SharedPointer< GlobalJObject > result;
   JniErrorCode success = _jniContext.Get()->DriverManagerGetConnection(
       connectionString.c_str(), result, errInfo);
-  connected = (success == JniErrorCode::IGNITE_JNI_ERR_SUCCESS);
+  connected = (success == JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS);
   if (!connected) {
     JniErrorInfo closeErrInfo;
     Close(closeErrInfo);
@@ -59,13 +59,13 @@ JniErrorCode DocumentDbConnection::Open(const Configuration& config,
 JniErrorCode DocumentDbConnection::Close(JniErrorInfo& errInfo) {
   if (_connection.Get() != nullptr) {
     _jniContext.Get()->ConnectionClose(_connection, errInfo);
-    if (errInfo.code != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+    if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       LOG_MSG(errInfo.errMsg);
     }
     _connection = nullptr;
     return errInfo.code;
   }
-  return JniErrorCode::IGNITE_JNI_ERR_SUCCESS;
+  return JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS;
 }
 
 DocumentDbConnection::~DocumentDbConnection() {
@@ -84,7 +84,7 @@ SharedPointer< DatabaseMetaData > DocumentDbConnection::GetMetaData(
   SharedPointer< GlobalJObject > databaseMetaData;
   JniErrorCode success = _jniContext.Get()->ConnectionGetMetaData(
       _connection, databaseMetaData, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return nullptr;
   }
   return new DatabaseMetaData(_jniContext, databaseMetaData);
@@ -108,7 +108,7 @@ JniErrorCode DocumentDbConnection::GetSshLocalPort(int32_t& localPort,
 SharedPointer< DocumentDbConnectionProperties >
 DocumentDbConnection::GetConnectionProperties(JniErrorInfo& errInfo) {
   if (!_connection.IsValid()) {
-    errInfo = JniErrorInfo(JniErrorCode::IGNITE_JNI_ERR_GENERIC, "",
+    errInfo = JniErrorInfo(JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC, "",
                            "Connection must be set.");
     return nullptr;
   }
@@ -116,7 +116,7 @@ DocumentDbConnection::GetConnectionProperties(JniErrorInfo& errInfo) {
   JniErrorCode success =
       _jniContext.Get()->DocumentDbConnectionGetConnectionProperties(
           _connection, connectionProperties, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return nullptr;
   }
   return new DocumentDbConnectionProperties(_jniContext, connectionProperties);
@@ -125,7 +125,7 @@ DocumentDbConnection::GetConnectionProperties(JniErrorInfo& errInfo) {
 SharedPointer< DocumentDbDatabaseMetadata >
 DocumentDbConnection::GetDatabaseMetadata(JniErrorInfo& errInfo) {
   if (!_connection.IsValid()) {
-    errInfo = JniErrorInfo(JniErrorCode::IGNITE_JNI_ERR_GENERIC, "",
+    errInfo = JniErrorInfo(JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC, "",
                            "Connection must be set.");
     return nullptr;
   }
@@ -133,11 +133,11 @@ DocumentDbConnection::GetDatabaseMetadata(JniErrorInfo& errInfo) {
   JniErrorCode success =
       _jniContext.Get()->DocumentDbConnectionGetDatabaseMetadata(
           _connection, databaseMetadata, errInfo);
-  if (success != JniErrorCode::IGNITE_JNI_ERR_SUCCESS) {
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     return nullptr;
   }
   return new DocumentDbDatabaseMetadata(_jniContext, databaseMetadata);
 }
 }  // namespace jni
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

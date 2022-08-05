@@ -15,7 +15,7 @@
  * $Revision: 88625 $
  */
 
-#define BOOST_TEST_MODULE IgniteOdbcTest
+#define BOOST_TEST_MODULE DocumentDbOdbcTest
 
 #include <boost/test/execution_monitor.hpp>
 #include <boost/test/results_collector.hpp>

@@ -15,31 +15,31 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/statement.h"
+#include "documentdb/odbc/statement.h"
 
 #include <boost/optional.hpp>
 #include <limits>
 
-#include "ignite/odbc/connection.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/message.h"
-#include "ignite/odbc/odbc_error.h"
-#include "ignite/odbc/query/batch_query.h"
-#include "ignite/odbc/query/column_metadata_query.h"
-#include "ignite/odbc/query/data_query.h"
-#include "ignite/odbc/query/foreign_keys_query.h"
-#include "ignite/odbc/query/internal_query.h"
-#include "ignite/odbc/query/primary_keys_query.h"
-#include "ignite/odbc/query/special_columns_query.h"
-#include "ignite/odbc/query/table_metadata_query.h"
-#include "ignite/odbc/query/type_info_query.h"
-#include "ignite/odbc/sql/sql_parser.h"
-#include "ignite/odbc/sql/sql_set_streaming_command.h"
-#include "ignite/odbc/sql/sql_utils.h"
-#include "ignite/odbc/system/odbc_constants.h"
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/connection.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/message.h"
+#include "documentdb/odbc/odbc_error.h"
+#include "documentdb/odbc/query/batch_query.h"
+#include "documentdb/odbc/query/column_metadata_query.h"
+#include "documentdb/odbc/query/data_query.h"
+#include "documentdb/odbc/query/foreign_keys_query.h"
+#include "documentdb/odbc/query/internal_query.h"
+#include "documentdb/odbc/query/primary_keys_query.h"
+#include "documentdb/odbc/query/special_columns_query.h"
+#include "documentdb/odbc/query/table_metadata_query.h"
+#include "documentdb/odbc/query/type_info_query.h"
+#include "documentdb/odbc/sql/sql_parser.h"
+#include "documentdb/odbc/sql/sql_set_streaming_command.h"
+#include "documentdb/odbc/sql/sql_utils.h"
+#include "documentdb/odbc/system/odbc_constants.h"
+#include "documentdb/odbc/utility.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 Statement::Statement(Connection& parent)
     : connection(parent),
@@ -61,7 +61,7 @@ Statement::~Statement() {
 void Statement::BindColumn(uint16_t columnIdx, int16_t targetType,
                            void* targetValue, SqlLen bufferLength,
                            SqlLen* strLengthOrIndicator) {
-  IGNITE_ODBC_API_CALL(InternalBindColumn(columnIdx, targetType, targetValue,
+  DOCUMENTDB_ODBC_API_CALL(InternalBindColumn(columnIdx, targetType, targetValue,
                                           bufferLength, strLengthOrIndicator));
 }
 
@@ -123,7 +123,7 @@ int* Statement::GetColumnBindOffsetPtr() {
 int32_t Statement::GetColumnNumber() {
   int32_t res;
 
-  IGNITE_ODBC_API_CALL(InternalGetColumnNumber(res));
+  DOCUMENTDB_ODBC_API_CALL(InternalGetColumnNumber(res));
 
   return res;
 }
@@ -143,7 +143,7 @@ void Statement::BindParameter(uint16_t paramIdx, int16_t ioType,
                               int16_t bufferType, int16_t paramSqlType,
                               SqlUlen columnSize, int16_t decDigits,
                               void* buffer, SqlLen bufferLen, SqlLen* resLen) {
-  IGNITE_ODBC_API_CALL(
+  DOCUMENTDB_ODBC_API_CALL(
       InternalBindParameter(paramIdx, ioType, bufferType, paramSqlType,
                             columnSize, decDigits, buffer, bufferLen, resLen));
 }
@@ -219,7 +219,7 @@ SqlResult::Type Statement::InternalBindParameter(
 }
 
 void Statement::SetAttribute(int attr, void* value, SQLINTEGER valueLen) {
-  IGNITE_ODBC_API_CALL(InternalSetAttribute(attr, value, valueLen));
+  DOCUMENTDB_ODBC_API_CALL(InternalSetAttribute(attr, value, valueLen));
 }
 
 SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
@@ -353,7 +353,7 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
 
 void Statement::GetAttribute(int attr, void* buf, SQLINTEGER bufLen,
                              SQLINTEGER* valueLen) {
-  IGNITE_ODBC_API_CALL(InternalGetAttribute(attr, buf, bufLen, valueLen));
+  DOCUMENTDB_ODBC_API_CALL(InternalGetAttribute(attr, buf, bufLen, valueLen));
 }
 
 SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
@@ -503,7 +503,7 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
 }
 
 void Statement::GetParametersNumber(uint16_t& paramNum) {
-  IGNITE_ODBC_API_CALL(InternalGetParametersNumber(paramNum));
+  DOCUMENTDB_ODBC_API_CALL(InternalGetParametersNumber(paramNum));
 }
 
 SqlResult::Type Statement::InternalGetParametersNumber(uint16_t& paramNum) {
@@ -532,14 +532,14 @@ SqlResult::Type Statement::InternalGetParametersNumber(uint16_t& paramNum) {
 }
 
 void Statement::SetParamBindOffsetPtr(int* ptr) {
-  IGNITE_ODBC_API_CALL_ALWAYS_SUCCESS;
+  DOCUMENTDB_ODBC_API_CALL_ALWAYS_SUCCESS;
 
   parameters.SetParamBindOffsetPtr(ptr);
 }
 
 void Statement::GetColumnData(uint16_t columnIdx,
                               app::ApplicationDataBuffer& buffer) {
-  IGNITE_ODBC_API_CALL(InternalGetColumnData(columnIdx, buffer));
+  DOCUMENTDB_ODBC_API_CALL(InternalGetColumnData(columnIdx, buffer));
 }
 
 SqlResult::Type Statement::InternalGetColumnData(
@@ -557,7 +557,7 @@ SqlResult::Type Statement::InternalGetColumnData(
 }
 
 void Statement::PrepareSqlQuery(const std::string& query) {
-  IGNITE_ODBC_API_CALL(InternalPrepareSqlQuery(query));
+  DOCUMENTDB_ODBC_API_CALL(InternalPrepareSqlQuery(query));
 }
 
 SqlResult::Type Statement::ProcessInternalCommand(const std::string& query) {
@@ -597,7 +597,7 @@ SqlResult::Type Statement::InternalPrepareSqlQuery(const std::string& query) {
 }
 
 void Statement::ExecuteSqlQuery(const std::string& query) {
-  IGNITE_ODBC_API_CALL(InternalExecuteSqlQuery(query));
+  DOCUMENTDB_ODBC_API_CALL(InternalExecuteSqlQuery(query));
 }
 
 SqlResult::Type Statement::InternalExecuteSqlQuery(const std::string& query) {
@@ -610,7 +610,7 @@ SqlResult::Type Statement::InternalExecuteSqlQuery(const std::string& query) {
 }
 
 void Statement::ExecuteSqlQuery() {
-  IGNITE_ODBC_API_CALL(InternalExecuteSqlQuery());
+  DOCUMENTDB_ODBC_API_CALL(InternalExecuteSqlQuery());
 }
 
 SqlResult::Type Statement::InternalExecuteSqlQuery() {
@@ -670,7 +670,7 @@ void Statement::ExecuteGetColumnsMetaQuery(
     const boost::optional< std::string >& catalog,
     const boost::optional< std::string >& schema, const std::string& table,
     const std::string& column) {
-  IGNITE_ODBC_API_CALL(
+  DOCUMENTDB_ODBC_API_CALL(
       InternalExecuteGetColumnsMetaQuery(catalog, schema, table, column));
 }
 
@@ -696,7 +696,7 @@ void Statement::ExecuteGetTablesMetaQuery(
     const boost::optional< std::string >& catalog,
     const boost::optional< std::string >& schema, const std::string& table,
     const boost::optional< std::string >& tableType) {
-  IGNITE_ODBC_API_CALL(
+  DOCUMENTDB_ODBC_API_CALL(
       InternalExecuteGetTablesMetaQuery(catalog, schema, table, tableType));
 }
 
@@ -719,7 +719,7 @@ void Statement::ExecuteGetForeignKeysQuery(
     const boost::optional< std::string >& foreignCatalog,
     const boost::optional< std::string >& foreignSchema,
     const std::string& foreignTable) {
-  IGNITE_ODBC_API_CALL(InternalExecuteGetForeignKeysQuery(
+  DOCUMENTDB_ODBC_API_CALL(InternalExecuteGetForeignKeysQuery(
       primaryCatalog, primarySchema, primaryTable, foreignCatalog,
       foreignSchema, foreignTable));
 }
@@ -743,7 +743,7 @@ void Statement::ExecuteGetPrimaryKeysQuery(
     const boost::optional< std::string >& catalog,
     const boost::optional< std::string >& schema,
     const boost::optional< std::string >& table) {
-  IGNITE_ODBC_API_CALL(
+  DOCUMENTDB_ODBC_API_CALL(
       InternalExecuteGetPrimaryKeysQuery(catalog, schema, table));
 }
 
@@ -765,7 +765,7 @@ void Statement::ExecuteSpecialColumnsQuery(int16_t type,
                                            const std::string& schema,
                                            const std::string& table,
                                            int16_t scope, int16_t nullable) {
-  IGNITE_ODBC_API_CALL(InternalExecuteSpecialColumnsQuery(
+  DOCUMENTDB_ODBC_API_CALL(InternalExecuteSpecialColumnsQuery(
       type, catalog, schema, table, scope, nullable));
 }
 
@@ -789,7 +789,7 @@ SqlResult::Type Statement::InternalExecuteSpecialColumnsQuery(
 }
 
 void Statement::ExecuteGetTypeInfoQuery(int16_t sqlType) {
-  IGNITE_ODBC_API_CALL(InternalExecuteGetTypeInfoQuery(sqlType));
+  DOCUMENTDB_ODBC_API_CALL(InternalExecuteGetTypeInfoQuery(sqlType));
 }
 
 SqlResult::Type Statement::InternalExecuteGetTypeInfoQuery(int16_t sqlType) {
@@ -812,7 +812,7 @@ SqlResult::Type Statement::InternalExecuteGetTypeInfoQuery(int16_t sqlType) {
 }
 
 void Statement::FreeResources(int16_t option) {
-  IGNITE_ODBC_API_CALL(InternalFreeResources(option));
+  DOCUMENTDB_ODBC_API_CALL(InternalFreeResources(option));
 }
 
 SqlResult::Type Statement::InternalFreeResources(int16_t option) {
@@ -850,7 +850,7 @@ SqlResult::Type Statement::InternalFreeResources(int16_t option) {
 }
 
 void Statement::Close() {
-  IGNITE_ODBC_API_CALL(InternalClose());
+  DOCUMENTDB_ODBC_API_CALL(InternalClose());
 }
 
 SqlResult::Type Statement::InternalClose() {
@@ -863,7 +863,7 @@ SqlResult::Type Statement::InternalClose() {
 }
 
 void Statement::FetchScroll(int16_t orientation, int64_t offset) {
-  IGNITE_ODBC_API_CALL(InternalFetchScroll(orientation, offset));
+  DOCUMENTDB_ODBC_API_CALL(InternalFetchScroll(orientation, offset));
 }
 
 SqlResult::Type Statement::InternalFetchScroll(int16_t orientation,
@@ -881,7 +881,7 @@ SqlResult::Type Statement::InternalFetchScroll(int16_t orientation,
 }
 
 void Statement::FetchRow() {
-  IGNITE_ODBC_API_CALL(InternalFetchRow());
+  DOCUMENTDB_ODBC_API_CALL(InternalFetchRow());
 }
 
 SqlResult::Type Statement::InternalFetchRow() {
@@ -946,7 +946,7 @@ bool Statement::DataAvailable() const {
 }
 
 void Statement::MoreResults() {
-  IGNITE_ODBC_API_CALL(InternalMoreResults());
+  DOCUMENTDB_ODBC_API_CALL(InternalMoreResults());
 }
 
 SqlResult::Type Statement::InternalMoreResults() {
@@ -962,7 +962,7 @@ SqlResult::Type Statement::InternalMoreResults() {
 void Statement::GetColumnAttribute(uint16_t colIdx, uint16_t attrId,
                                    SQLWCHAR* strbuf, int16_t buflen,
                                    int16_t* reslen, SqlLen* numbuf) {
-  IGNITE_ODBC_API_CALL(InternalGetColumnAttribute(colIdx, attrId, strbuf,
+  DOCUMENTDB_ODBC_API_CALL(InternalGetColumnAttribute(colIdx, attrId, strbuf,
                                                   buflen, reslen, numbuf));
 }
 
@@ -1030,7 +1030,7 @@ SqlResult::Type Statement::InternalGetColumnAttribute(
 int64_t Statement::AffectedRows() {
   int64_t rowCnt = 0;
 
-  IGNITE_ODBC_API_CALL(InternalAffectedRows(rowCnt));
+  DOCUMENTDB_ODBC_API_CALL(InternalAffectedRows(rowCnt));
 
   return rowCnt;
 }
@@ -1064,7 +1064,7 @@ SQLUSMALLINT* Statement::GetRowStatusesPtr() {
 }
 
 void Statement::SelectParam(void** paramPtr) {
-  IGNITE_ODBC_API_CALL(InternalSelectParam(paramPtr));
+  DOCUMENTDB_ODBC_API_CALL(InternalSelectParam(paramPtr));
 }
 
 SqlResult::Type Statement::InternalSelectParam(void** paramPtr) {
@@ -1109,7 +1109,7 @@ SqlResult::Type Statement::InternalSelectParam(void** paramPtr) {
 }
 
 void Statement::PutData(void* data, SqlLen len) {
-  IGNITE_ODBC_API_CALL(InternalPutData(data, len));
+  DOCUMENTDB_ODBC_API_CALL(InternalPutData(data, len));
 }
 
 SqlResult::Type Statement::InternalPutData(void* data, SqlLen len) {
@@ -1146,7 +1146,7 @@ SqlResult::Type Statement::InternalPutData(void* data, SqlLen len) {
 void Statement::DescribeParam(int16_t paramNum, int16_t* dataType,
                               SqlUlen* paramSize, int16_t* decimalDigits,
                               int16_t* nullable) {
-  IGNITE_ODBC_API_CALL(InternalDescribeParam(paramNum, dataType, paramSize,
+  DOCUMENTDB_ODBC_API_CALL(InternalDescribeParam(paramNum, dataType, paramSize,
                                              decimalDigits, nullable));
 }
 
@@ -1179,7 +1179,7 @@ SqlResult::Type Statement::InternalDescribeParam(int16_t paramNum,
     if (res != SqlResult::AI_SUCCESS)
       return res;
 
-    type = parameters.GetParamType(paramNum, impl::binary::IGNITE_HDR_NULL);
+    type = parameters.GetParamType(paramNum, impl::binary::DOCUMENTDB_HDR_NULL);
   }
 
   boost::optional< int16_t > sqlType = type_traits::BinaryToSqlType(type);
@@ -1221,7 +1221,7 @@ SqlResult::Type Statement::UpdateParamsMeta() {
     AddStatusRecord(err);
 
     return SqlResult::AI_ERROR;
-  } catch (const IgniteError& err) {
+  } catch (const DocumentDbError& err) {
     AddStatusRecord(err.GetText());
 
     return SqlResult::AI_ERROR;
@@ -1260,4 +1260,4 @@ uint16_t Statement::SqlResultToRowResult(SqlResult::Type value) {
   }
 }
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/impl/cache/cache_affinity_impl.h"
+#include "documentdb/odbc/impl/cache/cache_affinity_impl.h"
 
-using namespace ignite::odbc::common;
-using namespace ignite::odbc::common::concurrent;
-using namespace ignite::odbc::cluster;
-using namespace ignite::odbc::jni::java;
-using namespace ignite::odbc::impl::cluster;
+using namespace documentdb::odbc::common;
+using namespace documentdb::odbc::common::concurrent;
+using namespace documentdb::odbc::cluster;
+using namespace documentdb::odbc::jni::java;
+using namespace documentdb::odbc::impl::cluster;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace impl {
 namespace cache {
@@ -33,12 +33,12 @@ CacheAffinityImpl::CacheAffinityImpl(SP_IgniteEnvironment env, jobject javaRef)
 }
 
 int32_t CacheAffinityImpl::GetPartitions() {
-  IgniteError err;
+  DocumentDbError err;
 
   int32_t ret =
       static_cast< int32_t >(OutInOpLong(Command::PARTITIONS, 0, err));
 
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   return ret;
 }
@@ -62,9 +62,9 @@ ClusterNode CacheAffinityImpl::MapPartitionToNode(int32_t part) {
   In1Operation< int32_t > inOp(part);
   Out1Operation< Guid > outOp(nodeId);
 
-  IgniteError err;
+  DocumentDbError err;
   InteropTarget::OutInOp(Command::MAP_PARTITION_TO_NODE, inOp, outOp, err);
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   return GetEnvironment().GetNode(nodeId);
 }
@@ -84,10 +84,10 @@ std::map< int32_t, ClusterNode > CacheAffinityImpl::MapPartitionsToNodes(
 
   out.Synchronize();
 
-  IgniteError err;
+  DocumentDbError err;
   InStreamOutStream(Command::MAP_PARTITIONS_TO_NODES, *memIn.Get(),
                     *memOut.Get(), err);
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   interop::InteropInputStream inStream(memOut.Get());
   binary::BinaryReaderImpl reader(&inStream);
@@ -118,10 +118,10 @@ std::vector< ClusterNode > CacheAffinityImpl::MapPartitionToPrimaryAndBackups(
 
   out.Synchronize();
 
-  IgniteError err;
+  DocumentDbError err;
   InStreamOutStream(Command::MAP_PARTITION_TO_PRIMARY_AND_BACKUPS, *memIn.Get(),
                     *memOut.Get(), err);
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   interop::InteropInputStream inStream(memOut.Get());
   binary::BinaryReaderImpl reader(&inStream);
@@ -148,9 +148,9 @@ std::vector< int32_t > CacheAffinityImpl::GetPartitions(int32_t opType,
 
   out.Synchronize();
 
-  IgniteError err;
+  DocumentDbError err;
   InStreamOutStream(opType, *memIn.Get(), *memOut.Get(), err);
-  IgniteError::ThrowIfNeeded(err);
+  DocumentDbError::ThrowIfNeeded(err);
 
   interop::InteropInputStream inStream(memOut.Get());
   binary::BinaryReaderImpl reader(&inStream);
@@ -167,4 +167,4 @@ std::vector< int32_t > CacheAffinityImpl::GetPartitions(int32_t opType,
 }  // namespace cache
 }  // namespace impl
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

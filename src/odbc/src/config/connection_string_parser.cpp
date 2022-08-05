@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/config/connection_string_parser.h"
+#include "documentdb/odbc/config/connection_string_parser.h"
 
 #include <vector>
 
-#include "ignite/odbc/common/utils.h"
-#include "ignite/odbc/config/config_tools.h"
-#include "ignite/odbc/utility.h"
+#include "documentdb/odbc/common/utils.h"
+#include "documentdb/odbc/config/config_tools.h"
+#include "documentdb/odbc/utility.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace config {
 const std::string ConnectionStringParser::Key::dsn = "dsn";
@@ -527,4 +527,4 @@ std::string ConnectionStringParser::MakeErrorMessage(const std::string& msg,
 }
 }  // namespace config
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

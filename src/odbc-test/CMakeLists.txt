@@ -128,7 +128,7 @@ set(SOURCES
          ../odbc/src/documentdb_row.cpp
          ../odbc/src/dsn_config.cpp
          ../odbc/src/environment.cpp
-         ../odbc/src/ignite_error.cpp
+         ../odbc/src/documentdb_error.cpp
          ../odbc/src/jni/database_metadata.cpp
          ../odbc/src/jni/documentdb_connection.cpp
          ../odbc/src/jni/documentdb_mql_query_context.cpp
@@ -221,8 +221,8 @@ else()
     target_link_libraries(${TARGET} odbcinst ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
-set(TEST_TARGET IgniteOdbcTest)
+set(TEST_TARGET DocumentDbOdbcTest)
 
 add_test(NAME ${TEST_TARGET} COMMAND ${TARGET} --catch_system_errors=no --log_level=all)
 
-set_tests_properties(${TEST_TARGET} PROPERTIES ENVIRONMENT IGNITE_NATIVE_TEST_ODBC_CONFIG_PATH=${PROJECT_SOURCE_DIR}/config)
+set_tests_properties(${TEST_TARGET} PROPERTIES ENVIRONMENT DOCUMENTDB_NATIVE_TEST_ODBC_CONFIG_PATH=${PROJECT_SOURCE_DIR}/config)

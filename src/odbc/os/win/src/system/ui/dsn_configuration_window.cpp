@@ -15,24 +15,24 @@
  * limitations under the License.
  */
 
-#include "ignite/odbc/system/ui/dsn_configuration_window.h"
+#include "documentdb/odbc/system/ui/dsn_configuration_window.h"
 
 #include <Shlwapi.h>
 #include <Windowsx.h>
 
-#include "ignite/odbc/config/config_tools.h"
-#include "ignite/odbc/log.h"
-#include "ignite/odbc/log_level.h"
-#include "ignite/odbc/read_preference.h"
-#include "ignite/odbc/scan_method.h"
+#include "documentdb/odbc/config/config_tools.h"
+#include "documentdb/odbc/log.h"
+#include "documentdb/odbc/log_level.h"
+#include "documentdb/odbc/read_preference.h"
+#include "documentdb/odbc/scan_method.h"
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 namespace system {
 namespace ui {
 DsnConfigurationWindow::DsnConfigurationWindow(Window* parent,
                                                config::Configuration& config)
-    : CustomWindow(parent, L"IgniteConfigureDsn",
+    : CustomWindow(parent, L"DocumentDbConfigureDsn",
                    L"Configure Amazon DocumentDB DSN"),
       width(780),
       height(625),
@@ -120,7 +120,7 @@ void DsnConfigurationWindow::Create() {
 
     buf << "Can not create window, error code: " << GetLastError();
 
-    throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, buf.str().c_str());
+    throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC, buf.str().c_str());
   }
 }
 
@@ -590,7 +590,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
             accepted = true;
 
             PostMessage(GetHandle(), WM_CLOSE, 0, 0);
-          } catch (IgniteError& err) {
+          } catch (DocumentDbError& err) {
             std::wstring errWText = utility::FromUtf8(err.GetText());
             MessageBox(NULL, errWText.c_str(), L"Error!",
                        MB_ICONEXCLAMATION | MB_OK);
@@ -950,4 +950,4 @@ void DsnConfigurationWindow::RetrieveAdditionalParameters(
 }  // namespace ui
 }  // namespace system
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb

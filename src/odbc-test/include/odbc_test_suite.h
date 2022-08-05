@@ -27,7 +27,7 @@
 #include <string>
 #include <boost/test/unit_test.hpp>
 
-#include <ignite/odbc/common/platform_utils.h>
+#include <documentdb/odbc/common/platform_utils.h>
 
 #ifndef BOOST_TEST_CONTEXT
 #define BOOST_TEST_CONTEXT(...)
@@ -38,9 +38,9 @@
 #endif
 
 using boost::unit_test::test_unit_id;
-using ignite::odbc::common::GetEnv;
+using documentdb::odbc::common::GetEnv;
 
-namespace ignite {
+namespace documentdb {
 namespace odbc {
 /**
  * Test setup fixture.
@@ -395,6 +395,6 @@ struct if_integration {
   }
 };
 }  // namespace odbc
-}  // namespace ignite
+}  // namespace documentdb
 
 #endif  // ODBC_TEST_ODBC_TEST_SUITE

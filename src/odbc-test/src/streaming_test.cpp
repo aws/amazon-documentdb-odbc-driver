@@ -26,16 +26,16 @@
 #include <string>
 #include <vector>
 
-#include "ignite/ignite.h"
-#include "ignite/ignition.h"
-#include "ignite/odbc/impl/binary/binary_utils.h"
+#include "documentdb/ignite.h"
+#include "documentdb/ignition.h"
+#include "documentdb/odbc/impl/binary/binary_utils.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"
 #include "test_utils.h"
 
-using namespace ignite;
-using namespace ignite::common;
-using namespace ignite_test;
+using namespace documentdb;
+using namespace documentdb::common;
+using namespace documentdb_test;
 
 using namespace boost::unit_test;
 
