@@ -27,11 +27,13 @@
 #include <boost/test/unit_test.hpp>
 
 #include <documentdb/odbc/utility.h>
+#include <documentdb/odbc/config/configuration.h>
 #include "odbc_test_suite.h"
 #include "test_utils.h"
 
 using namespace documentdb_test;
 using namespace boost::unit_test;
+using namespace documentdb::odbc::config;
 
 /**
  * Test setup config for test results
@@ -835,6 +837,7 @@ void OdbcTestSuite::CreateDsnConnectionStringForRemoteServer(
 
   connectionString =
             "DRIVER={Amazon DocumentDB};"
+            "DSN=" + Configuration::DefaultValue::dsn + ";"
             "HOSTNAME=" + host + ":" + port + ";"
             "DATABASE=" + database + ";"
             "USER=" + user + ";"
@@ -870,6 +873,7 @@ void OdbcTestSuite::CreateDsnConnectionStringForLocalServer(
 
   connectionString =
     "DRIVER={Amazon DocumentDB};"
+    "DSN=" + Configuration::DefaultValue::dsn + ";"
     "HOSTNAME=" + host + ":" + port + ";"
     "DATABASE=" + database + ";"
     "USER=" + user + ";"
