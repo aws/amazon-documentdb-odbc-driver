@@ -36,13 +36,6 @@
 #define SQL_ASYNC_NOTIFICATION_CAPABLE 0x00000001L
 #endif
 
-// Missing definition in iODBC sqlext.h
-#if (ODBCVER >= 0x0300)
-#ifndef SQL_CVT_GUID
-#define SQL_CVT_GUID 0x01000000L
-#endif
-#endif
-
 namespace documentdb {
 namespace odbc {
 namespace config {

@@ -621,6 +621,8 @@ void UpdateSqlDbmsVerInfo(mongocxx::database& db, config::ConnectionInfo& info) 
           case bsoncxx::type::k_utf8:
             versionElement =
                 std::atol(element.get_utf8().value.to_string().c_str());
+          default:
+            versionElement = 0;
         }
         switch (index) {
           case 0:
