@@ -76,6 +76,51 @@ struct SqlGetInfoTestSuiteFixture : odbc::OdbcTestSuite {
     BOOST_CHECK_EQUAL(val, expectedValue);
   }
 
+  void CheckDbmsVerInfo() {
+    SQLSMALLINT valLen = 0;
+    const static SQLSMALLINT type = SQL_DBMS_VER;
+
+    // Get required length.
+    std::string typeStr = odbc::config::ConnectionInfo::InfoTypeToString(type);
+    SQLRETURN ret = SQLGetInfo(dbc, type, nullptr, 0, &valLen);
+    ODBC_FAIL_ON_ERROR1(ret, SQL_HANDLE_DBC, dbc, typeStr);
+
+    // Note: length is in bytes, not characters.
+    std::vector< SQLWCHAR > val((valLen / sizeof(SQLWCHAR)) + 1);
+    ret = SQLGetInfo(dbc, type, val.data(), val.size() * sizeof(SQLWCHAR),
+                     &valLen);
+
+    ODBC_FAIL_ON_ERROR1(ret, SQL_HANDLE_DBC, dbc, typeStr);
+    std::string valStr = utility::ToUtf8(val.data());
+    size_t startLoc = 0;
+    size_t dotLoc = valStr.find('.', startLoc);
+    std::string majorStr;
+    std::string minorStr;
+    std::string buildStr;
+    if (dotLoc > 0) {
+      majorStr = valStr.substr(startLoc, dotLoc - startLoc);
+      startLoc = dotLoc + 1;
+      dotLoc = valStr.find('.', startLoc);
+      if (dotLoc > 0) {
+        minorStr = valStr.substr(startLoc, dotLoc - startLoc);
+        startLoc = dotLoc + 1;
+        dotLoc = valStr.find('.', startLoc);
+        if (dotLoc > 0) {
+          buildStr = valStr.substr(startLoc, dotLoc - startLoc);
+        }
+      }
+    }
+    BOOST_CHECK(
+        !majorStr.empty() && majorStr.length() == 2
+        && (majorStr.find_first_not_of("0123456789") == std::string::npos));
+    BOOST_CHECK(
+        !minorStr.empty() && minorStr.length() == 2
+        && (minorStr.find_first_not_of("0123456789") == std::string::npos));
+    BOOST_CHECK(
+        !buildStr.empty() && buildStr.length() == 4
+        && (buildStr.find_first_not_of("0123456789") == std::string::npos));
+  }
+
   /**
    * Constructor.
    */
@@ -110,7 +155,7 @@ BOOST_AUTO_TEST_CASE(TestValues) {
   CheckStrInfo(SQL_DBMS_NAME, "Amazon DocumentDB");
   CheckStrInfo(SQL_DRIVER_ODBC_VER, "03.00");
   CheckStrInfo(SQL_DRIVER_VER, "00.01.0000");
-  CheckStrInfo(SQL_DBMS_VER, "05.03.0002");
+  CheckDbmsVerInfo();
   CheckStrInfo(SQL_COLUMN_ALIAS, "Y");
   CheckStrInfo(SQL_IDENTIFIER_QUOTE_CHAR, "\"");
   CheckStrInfo(SQL_CATALOG_NAME_SEPARATOR, ".");
