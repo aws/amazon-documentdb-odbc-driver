@@ -55,7 +55,7 @@ struct SqlGetInfoTestSuiteFixture : odbc::OdbcTestSuite {
     ret = SQLGetInfo(dbc, type, val.data(), val.size() * sizeof(SQLWCHAR), &valLen);
 
     ODBC_FAIL_ON_ERROR1(ret, SQL_HANDLE_DBC, dbc, typeStr);
-    BOOST_CHECK_EQUAL(utility::ToUtf8(val.data()), expectedValue);
+    BOOST_CHECK_EQUAL(utility::SqlWcharToString(val.data()), expectedValue);
   }
 
   void CheckIntInfo(SQLSMALLINT type, SQLUINTEGER expectedValue) {
@@ -91,7 +91,7 @@ struct SqlGetInfoTestSuiteFixture : odbc::OdbcTestSuite {
                      &valLen);
 
     ODBC_FAIL_ON_ERROR1(ret, SQL_HANDLE_DBC, dbc, typeStr);
-    std::string valStr = utility::ToUtf8(val.data());
+    std::string valStr = utility::SqlWcharToString(val.data());
     size_t startLoc = 0;
     size_t dotLoc = valStr.find('.', startLoc);
     std::string majorStr;
