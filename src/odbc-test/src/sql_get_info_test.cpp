@@ -212,7 +212,8 @@ BOOST_AUTO_TEST_CASE(TestValues) {
   CheckStrInfo(SQL_ROW_UPDATES, "N");
   CheckStrInfo(SQL_SEARCH_PATTERN_ESCAPE, "\\");
   CheckStrInfo(SQL_SERVER_NAME, "Amazon DocumentDB");
-  CheckStrInfo(SQL_USER_NAME, "documentdb");
+  std::string expectedUserName = common::GetEnv("DOC_DB_USER_NAME", "documentdb");
+  CheckStrInfo(SQL_USER_NAME, expectedUserName);
 
   CheckIntInfo(SQL_ASYNC_MODE, SQL_AM_NONE);
   CheckIntInfo(SQL_BATCH_ROW_COUNT, SQL_BRC_ROLLED_UP | SQL_BRC_EXPLICIT);
