@@ -2458,14 +2458,14 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // support subqueries support correlated subqueries. An SQL-92 Entry
   // level-conformant driver will always return a bitmask in which all of these
   // bits are set.
-  intParams[SQL_SUBQUERIES] = SQL_SQ_CORRELATED_SUBQUERIES | SQL_SQ_COMPARISON
-                              | SQL_SQ_EXISTS | SQL_SQ_IN | SQL_SQ_QUANTIFIED;
+  intParams[SQL_SUBQUERIES] = 0;
 #endif  // SQL_SUBQUERIES
 
 #ifdef SQL_TXN_ISOLATION_OPTION
   // A bitmask enumerating the transaction isolation levels available from the
   // driver or data source. The following bitmasks are used together with the
-  // flag to determine which options are supported: SQL_TXN_READ_UNCOMMITTED
+  // flag to determine which options are supported: 
+  // SQL_TXN_READ_UNCOMMITTED
   // SQL_TXN_READ_COMMITTED
   // SQL_TXN_REPEATABLE_READ
   // SQL_TXN_SERIALIZABLE
@@ -2540,17 +2540,18 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_PS_POSITIONED_DELETE
   // SQL_PS_POSITIONED_UPDATE
   // SQL_PS_SELECT_FOR_UPDATE
-  intParams[SQL_POSITIONED_STATEMENTS] = SQL_PS_SELECT_FOR_UPDATE;
+  intParams[SQL_POSITIONED_STATEMENTS] = 0;
 #endif  // SQL_POSITIONED_STATEMENTS
 
 #ifdef SQL_SCROLL_CONCURRENCY
   // DEPRECATED. Included for backward-compatibility.
   // A bitmask enumerating the concurrency control options supported for the
   // cursor. The following bitmasks are used to determine which options are
-  // supported: SQL_SCCO_READ_ONLY = Cursor is read-only. No updates are
-  // allowed. SQL_SCCO_LOCK = Cursor uses the lowest level of locking sufficient
-  // to ensure that the row can be
-  //    updated.
+  // supported: 
+  // SQL_SCCO_READ_ONLY = Cursor is read-only. No updates are
+  // allowed. 
+  // SQL_SCCO_LOCK = Cursor uses the lowest level of locking sufficient
+  // to ensure that the row can be updated.
   // SQL_SCCO_OPT_ROWVER = Cursor uses optimistic concurrency control, comparing
   // row versions, such as
   //    SQLBase ROWID or Sybase TIMESTAMP.
@@ -2598,7 +2599,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
 
 #ifdef SQL_TXN_CAPABLE
   // Describs the transaction support in the driver or data source.
-  shortParams[SQL_TXN_CAPABLE] = SQL_TC_DDL_COMMIT;
+  shortParams[SQL_TXN_CAPABLE] = SQL_TC_NONE;
 #endif  // SQL_TXN_CAPABLE
 
 #ifdef SQL_QUOTED_IDENTIFIER_CASE
@@ -2665,8 +2666,10 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // clause and the nonaggregated columns in the select list:
   //
   // SQL_GB_COLLATE = A COLLATE clause can be specified at the end of each
-  // grouping column. (ODBC 3.0) SQL_GB_NOT_SUPPORTED = GROUP BY clauses are not
-  // supported. (ODBC 2.0) SQL_GB_GROUP_BY_EQUALS_SELECT = The GROUP BY clause
+  // grouping column. (ODBC 3.0) 
+  // SQL_GB_NOT_SUPPORTED = GROUP BY clauses are not
+  // supported. (ODBC 2.0) 
+  // SQL_GB_GROUP_BY_EQUALS_SELECT = The GROUP BY clause
   // must contain all nonaggregated columns in the
   //     select list. It cannot contain any other columns.
   //     For example, SELECT DEPT, MAX(SALARY) FROM EMPLOYEE GROUP BY DEPT.
@@ -2709,7 +2712,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // Because identifiers in SQL-92 are never case-sensitive, a driver that
   // conforms strictly to SQL-92 (any level) will never return the
   // SQL_IC_SENSITIVE option as supported.
-  shortParams[SQL_IDENTIFIER_CASE] = SQL_IC_UPPER;
+  shortParams[SQL_IDENTIFIER_CASE] = SQL_IC_SENSITIVE;
 #endif  // SQL_IDENTIFIER_CASE
 
 #ifdef SQL_MAX_COLUMN_NAME_LEN
@@ -2837,7 +2840,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // the NOT NULL column
   //     constraint in CREATE TABLE statements.)
   // An SQL-92 Entry level-conformant driver will return SQL_NNC_NON_NULL.
-  shortParams[SQL_NON_NULLABLE_COLUMNS] = SQL_NNC_NULL;
+  shortParams[SQL_NON_NULLABLE_COLUMNS] = SQL_NNC_NON_NULL;
 #endif  // SQL_NON_NULLABLE_COLUMNS
 
 #ifdef SQL_NULL_COLLATION
@@ -2852,7 +2855,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_NC_START = NULLs are sorted at the start of the result set, regardless
   // of the ASC or DESC
   //     keywords.
-  shortParams[SQL_NULL_COLLATION] = SQL_NC_END;
+  shortParams[SQL_NULL_COLLATION] = SQL_NC_LOW;
 #endif  // SQL_NULL_COLLATION
 }
 
