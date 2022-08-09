@@ -32,7 +32,7 @@ using namespace documentdb::odbc::utility;
 
 namespace documentdb {
 namespace odbc {
-void ThrowLastSetupError() {
+void GetLastSetupError(DocumentDbError& error) {
   DWORD code;
   common::FixedSizeArray< SQLWCHAR > msg(BUFFER_SIZE);
 
@@ -44,15 +44,26 @@ void ThrowLastSetupError() {
       << utility::SqlWcharToString(msg.GetData(), msg.GetSize())
       << "\", Code: " << code;
 
-  throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC, buf.str().c_str());
+  error = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
+                          buf.str().c_str());
 }
 
-void WriteDsnString(const char* dsn, const char* key, const char* value) {
+void ThrowLastSetupError() {
+  DocumentDbError error;
+  GetLastSetupError(error);
+  throw error;
+}
+
+bool WriteDsnString(const char* dsn, const char* key, const char* value,
+                    DocumentDbError& error) {
   if (!SQLWritePrivateProfileString(utility::ToWCHARVector(dsn).data(),
                                     utility::ToWCHARVector(key).data(),
                                     utility::ToWCHARVector(value).data(),
-                                    utility::ToWCHARVector(CONFIG_FILE).data()))
-    ThrowLastSetupError();
+          utility::ToWCHARVector(CONFIG_FILE).data())) {
+    GetLastSetupError(error);
+    return false;
+  }
+  return true;
 }
 
 SettableValue< std::string > ReadDsnString(const char* dsn,
@@ -287,19 +298,20 @@ void ReadDsnConfiguration(const char* dsn, Configuration& config,
     config.SetDefaultFetchSize(defaultFetchSize.GetValue());
 }
 
-bool WriteDsnConfiguration(const config::Configuration& config) {
+bool WriteDsnConfiguration(const config::Configuration& config, DocumentDbError& error) {
   if (config.GetDsn("").empty() || config.GetDriver().empty()) {
     return false;
   }
   return RegisterDsn(
-      config, reinterpret_cast< const LPCSTR >(config.GetDriver().c_str()));
+      config, reinterpret_cast< const LPCSTR >(config.GetDriver().c_str()), error);
 }
 
-bool DeleteDsnConfiguration(const std::string dsn) {
-  return UnregisterDsn(dsn);
+bool DeleteDsnConfiguration(const std::string dsn, DocumentDbError& error) {
+  return UnregisterDsn(dsn, error);
 }
 
-bool RegisterDsn(const Configuration& config, const LPCSTR driver) {
+bool RegisterDsn(const Configuration& config, const LPCSTR driver,
+                 DocumentDbError& error) {
   using namespace documentdb::odbc::config;
   using documentdb::odbc::common::LexicalCast;
 
@@ -307,52 +319,38 @@ bool RegisterDsn(const Configuration& config, const LPCSTR driver) {
 
   const char* dsn = config.GetDsn().c_str();
 
-  try {
-    std::wstring dsn0 = FromUtf8(dsn);
-    std::wstring driver0 = FromUtf8(driver);
-    if (!SQLWriteDSNToIni(dsn0.c_str(), driver0.c_str())) {
-      documentdb::odbc::ThrowLastSetupError();
-    }
-
-    ArgMap map;
-
-    config.ToMap(map);
-
-    map.erase(ConnectionStringParser::Key::dsn);
-    map.erase(ConnectionStringParser::Key::driver);
-
-    for (ArgMap::const_iterator it = map.begin(); it != map.end(); ++it) {
-      const std::string& key = it->first;
-      const std::string& value = it->second;
-
-      documentdb::odbc::WriteDsnString(dsn, key.c_str(), value.c_str());
-    }
-
-    return true;
-  } catch (documentdb::odbc::DocumentDbError& err) {
-    std::wstring errText = FromUtf8(err.GetText());
-    MessageBox(NULL, errText.c_str(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
-
-    SQLPostInstallerError(err.GetCode(), errText.c_str());
+  std::wstring dsn0 = FromUtf8(dsn);
+  std::wstring driver0 = FromUtf8(driver);
+  if (!SQLWriteDSNToIni(dsn0.c_str(), driver0.c_str())) {
+    GetLastSetupError(error);
+    return false;
   }
 
-  return false;
+  ArgMap map;
+
+  config.ToMap(map);
+
+  map.erase(ConnectionStringParser::Key::dsn);
+  map.erase(ConnectionStringParser::Key::driver);
+
+  for (ArgMap::const_iterator it = map.begin(); it != map.end(); ++it) {
+    const std::string& key = it->first;
+    const std::string& value = it->second;
+
+    if (!WriteDsnString(dsn, key.c_str(), value.c_str(), error)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
-bool UnregisterDsn(const std::string& dsn) {
-  try {
-    if (!SQLRemoveDSNFromIni(FromUtf8(dsn).c_str()))
-      documentdb::odbc::ThrowLastSetupError();
-
-    return true;
-  } catch (documentdb::odbc::DocumentDbError& err) {
-    std::wstring errText = FromUtf8(err.GetText());
-    MessageBox(NULL, errText.c_str(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
-
-    SQLPostInstallerError(err.GetCode(), errText.c_str());
+bool UnregisterDsn(const std::string& dsn, DocumentDbError& error) {
+  if (!SQLRemoveDSNFromIni(FromUtf8(dsn).c_str())) {
+    GetLastSetupError(error);
+    return false;
   }
-
-  return false;
+  return true;
 }
 }  // namespace odbc
 }  // namespace documentdb

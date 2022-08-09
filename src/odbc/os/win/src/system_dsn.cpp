@@ -62,6 +62,59 @@ bool DisplayConnectionWindow(void* windowParent, Configuration& config) {
 }
 #endif
 
+/**
+ * Register DSN with specified configuration.
+ *
+ * @param config Configuration.
+ * @param driver Driver.
+ * @return True on success and false on fail.
+ */
+bool InternalRegisterDsn(const Configuration& config, LPCSTR driver) {
+  using namespace documentdb::odbc::config;
+  using documentdb::odbc::common::LexicalCast;
+
+  typedef Configuration::ArgumentMap ArgMap;
+
+  const char* dsn = config.GetDsn().c_str();
+
+  DocumentDbError error;
+  try {
+    if (!RegisterDsn(config, driver, error))
+      throw error;
+    return true;
+  } catch (documentdb::odbc::DocumentDbError& err) {
+    std::wstring errText = FromUtf8(err.GetText());
+    MessageBox(NULL, errText.c_str(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
+
+    SQLPostInstallerError(err.GetCode(), errText.c_str());
+  }
+
+  return false;
+}
+
+/**
+ * Unregister specified DSN.
+ *
+ * @param dsn DSN name.
+ * @return True on success and false on fail.
+ */
+bool InternalUnregisterDsn(const std::string& dsn) {
+  DocumentDbError error;
+  try {
+    if (UnregisterDsn(dsn, error))
+      throw error;
+
+    return true;
+  } catch (documentdb::odbc::DocumentDbError& err) {
+    std::wstring errText = FromUtf8(err.GetText());
+    MessageBox(NULL, errText.c_str(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
+
+    SQLPostInstallerError(err.GetCode(), errText.c_str());
+  }
+
+  return false;
+}
+
 BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver,
                        LPCSTR attributes) {
   using namespace documentdb::odbc;
@@ -93,7 +146,7 @@ BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver,
         return FALSE;
 #endif  // _WIN32
 
-      if (!RegisterDsn(config, driver))
+      if (!InternalRegisterDsn(config, driver))
         return FALSE;
 
       break;
@@ -113,10 +166,10 @@ BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver,
         return FALSE;
 #endif  // _WIN32
 
-      if (!RegisterDsn(loaded, driver))
+      if (!InternalRegisterDsn(loaded, driver))
         return FALSE;
 
-      if (loaded.GetDsn() != dsn && !UnregisterDsn(dsn.c_str()))
+      if (loaded.GetDsn() != dsn && !InternalUnregisterDsn(dsn.c_str()))
         return FALSE;
 
       break;
@@ -125,7 +178,7 @@ BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver,
     case ODBC_REMOVE_DSN: {
       LOG_MSG("ODBC_REMOVE_DSN");
 
-      if (!UnregisterDsn(config.GetDsn().c_str()))
+      if (!InternalUnregisterDsn(config.GetDsn().c_str()))
         return FALSE;
 
       break;
