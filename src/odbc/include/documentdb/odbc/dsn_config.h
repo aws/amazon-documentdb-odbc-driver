@@ -19,6 +19,9 @@
 #define _DOCUMENTDB_ODBC_DSN_CONFIG
 
 #include "documentdb/odbc/config/configuration.h"
+#include "sqltypes.h"
+
+using namespace documentdb::odbc::config;
 
 namespace documentdb {
 namespace odbc {
@@ -53,8 +56,41 @@ std::string ReadDsnString(const char* dsn, const char* key, const char* dflt);
  * @param config Configuration.
  * @param diag Diagnostic collector.
  */
-void ReadDsnConfiguration(const char* dsn, config::Configuration& config,
+void ReadDsnConfiguration(const char* dsn, Configuration& config,
                           diagnostic::DiagnosticRecordStorage* diag);
+
+/**
+ * Write DSN from the configuration.
+ *
+ * @param config Configuration.
+ * @param diag Diagnostic collector.
+ */
+bool WriteDsnConfiguration(const Configuration& config);
+
+/**
+ * Deletes a DSN from the system.
+ *
+ * @param dsn The DSN name to remove.
+ * @param diag Diagnostic collector.
+ */
+bool DeleteDsnConfiguration(const std::string dsn);
+
+/**
+ * Register DSN with specified configuration.
+ *
+ * @param config Configuration.
+ * @param driver Driver.
+ * @return True on success and false on fail.
+ */
+bool RegisterDsn(const Configuration& config, const LPCSTR driver);
+
+/**
+ * Unregister specified DSN.
+ *
+ * @param dsn DSN name.
+ * @return True on success and false on fail.
+ */
+bool UnregisterDsn(const std::string& dsn);
 }  // namespace odbc
 }  // namespace documentdb
 

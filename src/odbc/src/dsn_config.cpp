@@ -25,6 +25,7 @@
 #include "documentdb/odbc/utility.h"
 
 using namespace documentdb::odbc::config;
+using namespace documentdb::odbc::utility;
 
 #define BUFFER_SIZE (1024 * 1024)
 #define CONFIG_FILE u8"ODBC.INI"
@@ -284,6 +285,74 @@ void ReadDsnConfiguration(const char* dsn, Configuration& config,
   if (defaultFetchSize.IsSet() && !config.IsDefaultFetchSizeSet()
       && defaultFetchSize.GetValue() > 0)
     config.SetDefaultFetchSize(defaultFetchSize.GetValue());
+}
+
+bool WriteDsnConfiguration(const config::Configuration& config) {
+  if (config.GetDsn("").empty() || config.GetDriver().empty()) {
+    return false;
+  }
+  return RegisterDsn(
+      config, reinterpret_cast< const LPCSTR >(config.GetDriver().c_str()));
+}
+
+bool DeleteDsnConfiguration(const std::string dsn) {
+  return UnregisterDsn(dsn);
+}
+
+bool RegisterDsn(const Configuration& config, const LPCSTR driver) {
+  using namespace documentdb::odbc::config;
+  using documentdb::odbc::common::LexicalCast;
+
+  typedef Configuration::ArgumentMap ArgMap;
+
+  const char* dsn = config.GetDsn().c_str();
+
+  try {
+    std::wstring dsn0 = FromUtf8(dsn);
+    std::wstring driver0 = FromUtf8(driver);
+    if (!SQLWriteDSNToIni(dsn0.c_str(), driver0.c_str())) {
+      documentdb::odbc::ThrowLastSetupError();
+    }
+
+    ArgMap map;
+
+    config.ToMap(map);
+
+    map.erase(ConnectionStringParser::Key::dsn);
+    map.erase(ConnectionStringParser::Key::driver);
+
+    for (ArgMap::const_iterator it = map.begin(); it != map.end(); ++it) {
+      const std::string& key = it->first;
+      const std::string& value = it->second;
+
+      documentdb::odbc::WriteDsnString(dsn, key.c_str(), value.c_str());
+    }
+
+    return true;
+  } catch (documentdb::odbc::DocumentDbError& err) {
+    std::wstring errText = FromUtf8(err.GetText());
+    MessageBox(NULL, errText.c_str(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
+
+    SQLPostInstallerError(err.GetCode(), errText.c_str());
+  }
+
+  return false;
+}
+
+bool UnregisterDsn(const std::string& dsn) {
+  try {
+    if (!SQLRemoveDSNFromIni(FromUtf8(dsn).c_str()))
+      documentdb::odbc::ThrowLastSetupError();
+
+    return true;
+  } catch (documentdb::odbc::DocumentDbError& err) {
+    std::wstring errText = FromUtf8(err.GetText());
+    MessageBox(NULL, errText.c_str(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
+
+    SQLPostInstallerError(err.GetCode(), errText.c_str());
+  }
+
+  return false;
 }
 }  // namespace odbc
 }  // namespace documentdb

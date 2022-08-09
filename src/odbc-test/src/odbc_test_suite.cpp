@@ -27,6 +27,8 @@
 #include <boost/test/unit_test.hpp>
 
 #include <documentdb/odbc/utility.h>
+#include <documentdb/odbc/dsn_config.h>
+
 #include "odbc_test_suite.h"
 #include "test_utils.h"
 
@@ -111,7 +113,6 @@ void OdbcTestSuite::Connect(const std::string& connectStr) {
       SQLDriverConnect(dbc, NULL, &connectStr0[0],
                        static_cast< SQLSMALLINT >(connectStr0.size()), outstr,
                        ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_COMPLETE);
-
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc));
 
@@ -120,6 +121,61 @@ void OdbcTestSuite::Connect(const std::string& connectStr) {
 
   BOOST_REQUIRE(stmt != NULL);
 }
+
+void OdbcTestSuite::Connect(const std::string& dsn, const std::string& username,
+             const std::string& password) {
+  Prepare();
+
+  // Connect string
+  std::vector< SQLWCHAR > wDsn(dsn.begin(), dsn.end());
+  std::vector< SQLWCHAR > wUsername(username.begin(), username.end());
+  std::vector< SQLWCHAR > wPassword(password.begin(), password.end());
+
+  // Connecting to ODBC server.
+  SQLRETURN ret = SQLConnect(
+      dbc, wDsn.data(), static_cast< SQLSMALLINT >(wDsn.size()),
+      wUsername.data(), static_cast< SQLSMALLINT >(wUsername.size()),
+      wPassword.data(), static_cast< SQLSMALLINT >(wPassword.size()));
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc));
+
+  // Allocate a statement handle
+  SQLAllocHandle(SQL_HANDLE_STMT, dbc, &stmt);
+
+  BOOST_REQUIRE(stmt != NULL);
+}
+
+void OdbcTestSuite::ParseConnectionString(const std::string& connectionString,
+                                          Configuration& config) {
+  ConnectionStringParser parser(config);
+  parser.ParseConnectionString(connectionString, nullptr);
+}
+
+void OdbcTestSuite::WriteDsnConfiguration(const Configuration& config) {
+  documentdb::odbc::WriteDsnConfiguration(config);
+}
+
+void OdbcTestSuite::WriteDsnConfiguration(const std::string& dsn,
+                                          const std::string& connectionString,
+                                          std::string& username,
+                                          std::string& password) {
+  Configuration config;
+  ParseConnectionString(connectionString, config);
+  username = config.GetUser();
+  password = config.GetPassword();
+
+  // Update the DSN and clear the username and password from the DSN.
+  config.SetDsn(dsn);
+  config.SetUser("");
+  config.SetPassword("");
+
+  WriteDsnConfiguration(config);
+}
+
+void OdbcTestSuite::DeleteDsnConfiguration(const std::string& dsn) {
+  documentdb::odbc::DeleteDsnConfiguration(dsn);
+}
+
 
 std::string OdbcTestSuite::ExpectConnectionReject(
     const std::string& connectStr, const std::string& expectedError) {
@@ -136,6 +192,32 @@ std::string OdbcTestSuite::ExpectConnectionReject(
       SQLDriverConnect(dbc, NULL, &connectStr0[0],
                        static_cast< SQLSMALLINT >(connectStr0.size()), outstr,
                        ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_COMPLETE);
+
+  BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
+  BOOST_REQUIRE_EQUAL(
+      expectedError,
+      GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc).substr(0, expectedError.size()));
+
+  return GetOdbcErrorState(SQL_HANDLE_DBC, dbc);
+}
+
+std::string OdbcTestSuite::ExpectConnectionReject(
+    const std::string& dsn, const std::string& username,
+    const std::string& password, const std::string& expectedError) {
+  Prepare();
+
+  std::vector< SQLWCHAR > wDsn(dsn.begin(), dsn.end());
+  std::vector< SQLWCHAR > wUsername(username.begin(), username.end());
+  std::vector< SQLWCHAR > wPassword(password.begin(), password.end());
+
+  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
+  SQLSMALLINT outstrlen;
+
+  // Connecting to ODBC server.
+  SQLRETURN ret = SQLConnect(
+      dbc, wDsn.data(), static_cast< SQLSMALLINT >(wDsn.size()),
+      wUsername.data(), static_cast< SQLSMALLINT >(wUsername.size()),
+      wPassword.data(), static_cast< SQLSMALLINT >(wPassword.size()));
 
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
   BOOST_REQUIRE_EQUAL(
