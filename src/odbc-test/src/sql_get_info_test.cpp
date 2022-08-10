@@ -169,7 +169,13 @@ BOOST_AUTO_TEST_CASE(TestValues) {
   CheckStrInfo(SQL_ACCESSIBLE_TABLES, "Y");
   CheckStrInfo(SQL_CATALOG_NAME, "N");
   CheckStrInfo(SQL_COLLATION_SEQ, "UTF-8");
+#if defined(__linux) || defined(__linux__) || defined(linux)
+  // As we are connecting using SQLDriverConnect, it seems the driver is
+  // removing the DSN setting
+  CheckStrInfo(SQL_DATA_SOURCE_NAME, "");
+#else
   CheckStrInfo(SQL_DATA_SOURCE_NAME, "DocumentDB DSN");
+#endif
   CheckStrInfo(SQL_DATA_SOURCE_READ_ONLY, "Y");
   CheckStrInfo(SQL_DATABASE_NAME, "odbc-test");
   CheckStrInfo(SQL_DESCRIBE_PARAMETER, "N");
