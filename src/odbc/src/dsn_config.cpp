@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
+#include <sqltypes.h>
 #include "documentdb/odbc/dsn_config.h"
-
 #include <documentdb/odbc/common/fixed_size_array.h>
-
 #include "documentdb/odbc/config/config_tools.h"
 #include "documentdb/odbc/config/connection_string_parser.h"
 #include "documentdb/odbc/system/odbc_constants.h"
@@ -319,8 +318,8 @@ bool RegisterDsn(const Configuration& config, const LPCSTR driver,
 
   const char* dsn = config.GetDsn().c_str();
 
-  std::vector< WCHAR > dsn0 = ToWCHARVector(dsn);
-  std::vector< WCHAR > driver0 = ToWCHARVector(driver);
+  std::vector< SQLWCHAR > dsn0 = ToWCHARVector(dsn);
+  std::vector< SQLWCHAR > driver0 = ToWCHARVector(driver);
   if (!SQLWriteDSNToIni(dsn0.data(), driver0.data())) {
     GetLastSetupError(error);
     return false;
