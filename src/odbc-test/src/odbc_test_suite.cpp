@@ -190,7 +190,8 @@ void OdbcTestSuite::DeleteDsnConfiguration(const std::string& dsn) {
 
 
 std::string OdbcTestSuite::ExpectConnectionReject(
-    const std::string& connectStr, const std::string& expectedError) {
+    const std::string& connectStr, const std::string& expectedState,
+    const std::string& expectedError) {
   Prepare();
 
   // Connect string
@@ -206,16 +207,20 @@ std::string OdbcTestSuite::ExpectConnectionReject(
                        ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_COMPLETE);
 
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
-  BOOST_REQUIRE_EQUAL(
-      expectedError,
-      GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc).substr(0, expectedError.size()));
+  OdbcClientError error = GetOdbcError(SQL_HANDLE_DBC, dbc);
+  BOOST_CHECK_EQUAL(error.sqlstate, expectedState);
+  size_t prefixLen = std::string("[unixODBC]").size();
+  BOOST_REQUIRE(error.message.substr(0, expectedError.size()) == expectedError
+                || error.message.substr(prefixLen, expectedError.size())
+                       == expectedError);
 
   return GetOdbcErrorState(SQL_HANDLE_DBC, dbc);
 }
 
 std::string OdbcTestSuite::ExpectConnectionReject(
     const std::string& dsn, const std::string& username,
-    const std::string& password, const std::string& expectedError) {
+    const std::string& password, const std::string& expectedState,
+    const std::string& expectedError) {
   Prepare();
 
   std::vector< SQLWCHAR > wDsn(dsn.begin(), dsn.end());
@@ -232,9 +237,13 @@ std::string OdbcTestSuite::ExpectConnectionReject(
       wPassword.data(), static_cast< SQLSMALLINT >(wPassword.size()));
 
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
-  BOOST_REQUIRE_EQUAL(
-      expectedError,
-      GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc).substr(0, expectedError.size()));
+
+  OdbcClientError error = GetOdbcError(SQL_HANDLE_DBC, dbc);
+  BOOST_CHECK_EQUAL(error.sqlstate, expectedState);
+  size_t prefixLen = std::string("[unixODBC]").size();
+  BOOST_REQUIRE(error.message.substr(0, expectedError.size())
+          == expectedError
+      || error.message.substr(prefixLen, expectedError.size()) == expectedError);
 
   return GetOdbcErrorState(SQL_HANDLE_DBC, dbc);
 }

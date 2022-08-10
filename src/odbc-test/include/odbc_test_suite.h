@@ -126,10 +126,9 @@ struct OdbcTestSuite {
    * @param connectStr Connection string.
    * @return SQL State.
    */
-  std::string ExpectConnectionReject(
-      const std::string& connectStr,
-      const std::string& expectedError =
-          "08001: Failed to establish connection with the host.");
+  std::string ExpectConnectionReject(const std::string& connectStr,
+                                     const std::string& expectedState,
+                                     const std::string& expectedError);
 
   /**
    * Expect connection to be rejected by the node.
@@ -139,11 +138,11 @@ struct OdbcTestSuite {
    * @param password the password for the connection.
    * @return SQL State.
    */
-  std::string ExpectConnectionReject(
-      const std::string& dsn, const std::string& username,
-      const std::string& password,
-      const std::string& expectedError =
-          "08001: Failed to establish connection with the host.");
+  std::string ExpectConnectionReject(const std::string& dsn,
+                                     const std::string& username,
+                                     const std::string& password,
+                                     const std::string& expectedState,
+                                     const std::string& expectedError);
 
   /**
    * Disconnect.

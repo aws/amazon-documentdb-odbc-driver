@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-#include <sqltypes.h>
 #include "documentdb/odbc/dsn_config.h"
 #include <documentdb/odbc/common/fixed_size_array.h>
 #include "documentdb/odbc/config/config_tools.h"

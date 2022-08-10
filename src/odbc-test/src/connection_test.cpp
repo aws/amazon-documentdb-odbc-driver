@@ -170,12 +170,12 @@ BOOST_DATA_TEST_CASE_F(ConnectionTestSuiteFixture,
     std::string username;
     std::string password;
     WriteDsnConfiguration(dsn, connectionString, username, password);
-    ExpectConnectionReject(dsn, username, password,
-                           "01S00: Hostname, username, password, and database "
+    ExpectConnectionReject(dsn, username, password, "01S00",
+                           "Hostname, username, password, and database "
                            "are required to connect.");
   } else {
-    ExpectConnectionReject(connectionString,
-                           "01S00: Hostname, username, password, and database "
+    ExpectConnectionReject(connectionString, "01S00",
+                           "Hostname, username, password, and database "
                            "are required to connect.");
   }
 
@@ -204,13 +204,13 @@ BOOST_DATA_TEST_CASE_F(ConnectionTestSuiteFixture,
     std::string password;
     WriteDsnConfiguration(dsn, connectionString, username, password);
     ExpectConnectionReject(
-        dsn, username, password,
-        "01S00: If using an internal SSH tunnel, all of ssh_host, ssh_user, "
+        dsn, username, password, "01S00",
+        "If using an internal SSH tunnel, all of ssh_host, ssh_user, "
         "ssh_private_key_file are required to connect.");
   } else {
     ExpectConnectionReject(
-        connectionString,
-        "01S00: If using an internal SSH tunnel, all of ssh_host, ssh_user, "
+        connectionString, "01S00",
+        "If using an internal SSH tunnel, all of ssh_host, ssh_user, "
         "ssh_private_key_file are required to connect.");
   }
 
@@ -232,8 +232,8 @@ BOOST_DATA_TEST_CASE_F(ConnectionTestSuiteFixture, TestConnectionInvalidUser,
     std::string password;
     WriteDsnConfiguration(dsn, connectionString, username, password);
     ExpectConnectionReject(
-        dsn, username, password,
-        "08001: Failed to establish connection with the host.\n"
+        dsn, username, password, "08001",
+        "Failed to establish connection with the host.\n"
         "Invalid username or password or user is not authorized on database "
         "'odbc-test'. "
         "Please check your settings. Authorization failed for user "
@@ -241,8 +241,8 @@ BOOST_DATA_TEST_CASE_F(ConnectionTestSuiteFixture, TestConnectionInvalidUser,
         "on database 'admin' with mechanism");
   } else {
     ExpectConnectionReject(
-        connectionString,
-        "08001: Failed to establish connection with the host.\n"
+        connectionString, "08001",
+        "Failed to establish connection with the host.\n"
         "Invalid username or password or user is not authorized on database "
         "'odbc-test'. "
         "Please check your settings. Authorization failed for user "

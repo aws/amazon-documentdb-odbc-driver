@@ -29,7 +29,6 @@ env:
   DOC_DB_LOG_LEVEL: "debug"
   JDBC_DRIVER_VERSION: "1.2.4"
   JAVA_HOME: "/usr/lib/jvm/java-17-amazon-corretto/"
-  ODBCINI: "${{github.workspace}}/odbc.ini"
 
 jobs:
   build-linux64:
