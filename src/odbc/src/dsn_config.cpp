@@ -319,9 +319,9 @@ bool RegisterDsn(const Configuration& config, const LPCSTR driver,
 
   const char* dsn = config.GetDsn().c_str();
 
-  std::wstring dsn0 = FromUtf8(dsn);
-  std::wstring driver0 = FromUtf8(driver);
-  if (!SQLWriteDSNToIni(dsn0.c_str(), driver0.c_str())) {
+  std::vector< WCHAR > dsn0 = ToWCHARVector(dsn);
+  std::vector< WCHAR > driver0 = ToWCHARVector(driver);
+  if (!SQLWriteDSNToIni(dsn0.data(), driver0.data())) {
     GetLastSetupError(error);
     return false;
   }
@@ -346,7 +346,7 @@ bool RegisterDsn(const Configuration& config, const LPCSTR driver,
 }
 
 bool UnregisterDsn(const std::string& dsn, DocumentDbError& error) {
-  if (!SQLRemoveDSNFromIni(FromUtf8(dsn).c_str())) {
+  if (!SQLRemoveDSNFromIni(ToWCHARVector(dsn).data())) {
     GetLastSetupError(error);
     return false;
   }
