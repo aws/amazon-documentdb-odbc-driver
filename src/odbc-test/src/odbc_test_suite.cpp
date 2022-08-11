@@ -153,7 +153,7 @@ void OdbcTestSuite::ParseConnectionString(const std::string& connectionString,
 
 void OdbcTestSuite::WriteDsnConfiguration(const Configuration& config) {
   DocumentDbError error;
-  if (!documentdb::odbc::WriteDsnConfiguration(config, error)) {
+  if (!odbc::WriteDsnConfiguration(config, error)) {
     std::stringstream msg;
     msg << "Call to WriteDsnConfiguration failed: " << error.GetText()
         << ", code: " << error.GetCode();
@@ -180,7 +180,7 @@ void OdbcTestSuite::WriteDsnConfiguration(const std::string& dsn,
 
 void OdbcTestSuite::DeleteDsnConfiguration(const std::string& dsn) {
   DocumentDbError error;
-  if (!documentdb::odbc::DeleteDsnConfiguration(dsn, error)) {
+  if (!odbc::DeleteDsnConfiguration(dsn, error)) {
     std::stringstream msg;
     msg << "Call to DeleteDsnConfiguration failed: " << error.GetText()
         << ", code: " << error.GetCode();
