@@ -36,13 +36,6 @@
 #define SQL_ASYNC_NOTIFICATION_CAPABLE 0x00000001L
 #endif
 
-// Missing definition in iODBC sqlext.h
-#if (ODBCVER >= 0x0300)
-#ifndef SQL_CVT_GUID
-#define SQL_CVT_GUID 0x01000000L
-#endif
-#endif
-
 namespace documentdb {
 namespace odbc {
 namespace config {
@@ -317,6 +310,9 @@ const char* ConnectionInfo::InfoTypeToString(InfoType type) {
 #ifdef SQL_CREATE_DOMAIN
     DBG_STR_CASE(SQL_CREATE_DOMAIN);
 #endif  // SQL_CREATE_DOMAIN
+#ifdef SQL_CREATE_SCHEMA
+    DBG_STR_CASE(SQL_CREATE_SCHEMA);
+#endif  // SQL_CREATE_SCHEMA
 #ifdef SQL_CREATE_TABLE
     DBG_STR_CASE(SQL_CREATE_TABLE);
 #endif  // SQL_CREATE_TABLE
@@ -600,10 +596,11 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // Driver version. At a minimum, the version is of the form ##.##.####, where
   // the first two digits are the major version, the next two digits are the
   // minor version, and the last four digits are the release version.
-  strParams[SQL_DRIVER_VER] = "02.04.0000";
+  strParams[SQL_DRIVER_VER] = "00.01.0000";
 #endif  // SQL_DRIVER_VER
 #ifdef SQL_DBMS_VER
-  strParams[SQL_DBMS_VER] = "02.04.0000";
+  // Note: this is updated after a successful connection.
+  strParams[SQL_DBMS_VER] = "";
 #endif  // SQL_DBMS_VER
 
 #ifdef SQL_COLUMN_ALIAS
@@ -704,7 +701,8 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // this is the value of the DSN keyword in the connection string passed to the
   // driver. If the connection string did not contain the DSN keyword (such as
   // when it contains the DRIVER keyword), this is an empty string.
-  strParams[SQL_DATA_SOURCE_NAME] = config.GetDsn("");
+  // Note: this is updated after a successful connection.
+  strParams[SQL_DATA_SOURCE_NAME] = "";
 #endif  // SQL_DATA_SOURCE_NAME
 
 #ifdef SQL_DATA_SOURCE_READ_ONLY
@@ -716,12 +714,13 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // driver that is read/write can be used with a data source that is read-only.
   // If a driver is read-only, all of its data sources must be read-only and
   // must return SQL_DATA_SOURCE_READ_ONLY.
-  strParams[SQL_DATA_SOURCE_READ_ONLY] = "N";
+  strParams[SQL_DATA_SOURCE_READ_ONLY] = "Y";
 #endif  // SQL_DATA_SOURCE_READ_ONLY
 
 #ifdef SQL_DATABASE_NAME
   // A character string with the name of the current database in use, if the
   // data source defines a named object called "database".
+  // Note: this is updated after a successful connection.
   strParams[SQL_DATABASE_NAME] = "";
 #endif  // SQL_DATABASE_NAME
 
@@ -754,7 +753,31 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // use these words in object names. The #define value SQL_ODBC_KEYWORDS
   // contains a comma - separated list of ODBC keywords.
   strParams[SQL_KEYWORDS] =
-      "LIMIT,MINUS,OFFSET,ROWNUM,SYSDATE,SYSTIME,SYSTIMESTAMP,TODAY";
+      "ABS,ALLOW,ARRAY,ARRAY_MAX_CARDINALITY,ASYMMETRIC,ATOMIC,BEGIN_FRAME,"
+      "BEGIN_PARTITION,BIGINT,BINARY,BLOB,BOOLEAN,CALL,CALLED,CARDINALITY,CEIL,"
+      "CEILING,CHAR_LENGTH,CLASSIFIER,CLOB,COLLECT,CONDITION,CORR,COVAR_POP,"
+      "COVAR_SAMP,CUBE,CUME_DIST,CURRENT_CATALOG,CURRENT_DEFAULT_TRANSFORM_"
+      "GROUP,CURRENT_PATH,CURRENT_ROLE,CURRENT_ROW,CURRENT_SCHEMA,CURRENT_"
+      "TRANSFORM_GROUP_FOR_TYPE,CYCLE,DENSE_RANK,DEREF,DETERMINISTIC,DISALLOW,"
+      "DYNAMIC,EACH,ELEMENT,EMPTY,END_FRAME,END_PARTITION,EQUALS,EVERY,EXP,"
+      "EXPLAIN,EXTEND,FILTER,FIRST_VALUE,FLOOR,FRAME_ROW,FREE,FUNCTION,FUSION,"
+      "GROUPING,GROUPS,HOLD,IMPORT,INITIAL,INOUT,INTERSECTION,JSON_ARRAY,JSON_"
+      "ARRAYAGG,JSON_EXISTS,JSON_OBJECT,JSON_OBJECTAGG,JSON_QUERY,JSON_VALUE,"
+      "LAG,LARGE,LAST_VALUE,LATERAL,LEAD,LIKE_REGEX,LIMIT,LN,LOCALTIME,"
+      "LOCALTIMESTAMP,MATCHES,MATCH_NUMBER,MATCH_RECOGNIZE,MEASURES,MEMBER,"
+      "MERGE,METHOD,MINUS,MOD,MODIFIES,MULTISET,NCLOB,NEW,NORMALIZE,NTH_VALUE,"
+      "NTILE,OCCURRENCES_REGEX,OFFSET,OLD,OMIT,ONE,OUT,OVER,OVERLAY,PARAMETER,"
+      "PARTITION,PATTERN,PER,PERCENT,PERCENTILE_CONT,PERCENTILE_DISC,PERCENT_"
+      "RANK,PERIOD,PERMUTE,PORTION,POSITION_REGEX,POWER,PRECEDES,PREV,RANGE,"
+      "RANK,READS,RECURSIVE,REF,REFERENCING,REGR_AVGX,REGR_AVGY,REGR_COUNT,"
+      "REGR_INTERCEPT,REGR_R2,REGR_SLOPE,REGR_SXX,REGR_SXY,REGR_SYY,RELEASE,"
+      "RESET,RESULT,RETURN,RETURNS,ROLLUP,ROW,ROW_NUMBER,RUNNING,SAVEPOINT,"
+      "SCOPE,SEARCH,SEEK,SENSITIVE,SHOW,SIMILAR,SKIP,SPECIFIC,SPECIFICTYPE,"
+      "SQLEXCEPTION,SQRT,START,STATIC,STDDEV_POP,STDDEV_SAMP,STREAM,"
+      "SUBMULTISET,SUBSET,SUBSTRING_REGEX,SUCCEEDS,SYMMETRIC,SYSTEM,SYSTEM_"
+      "TIME,TABLESAMPLE,TINYINT,TRANSLATE_REGEX,TREAT,TRIGGER,TRIM_ARRAY,"
+      "TRUNCATE,UESCAPE,UNNEST,UPSERT,VALUE_OF,VARBINARY,VAR_POP,VAR_SAMP,"
+      "VERSIONING,WIDTH_BUCKET,WINDOW,WITHIN,WITHOUT";
 #endif  // SQL_KEYWORDS
 
 #ifdef SQL_LIKE_ESCAPE_CLAUSE
@@ -839,7 +862,8 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
 #ifdef SQL_USER_NAME
   // A character string with the name used in a particular database, which can
   // be different from the login name.
-  strParams[SQL_USER_NAME] = "apache_ignite_user";
+  // Note: This is updated after a successful connection.
+  strParams[SQL_USER_NAME] = "";
 #endif  // SQL_USER_NAME
 
   //
@@ -918,7 +942,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_BS_ROW_COUNT_PROC = The driver supports explicit procedures that can
   // have row - count generating
   //     statements.
-  intParams[SQL_BATCH_SUPPORT] = SQL_BS_ROW_COUNT_EXPLICIT;
+  intParams[SQL_BATCH_SUPPORT] = 0;  // I.e., not supported
 #endif  // SQL_BATCH_SUPPORT
 
 #ifdef SQL_BOOKMARK_PERSISTENCE
@@ -939,7 +963,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // with another statement.
   //     Unless SQL_BP_CLOSE or SQL_BP_DROP is specified, the cursor on the
   //     first statement must be open.
-  intParams[SQL_BOOKMARK_PERSISTENCE] = 0;
+  intParams[SQL_BOOKMARK_PERSISTENCE] = 0;  // I.e., not supported
 #endif  // SQL_BOOKMARK_PERSISTENCE
 
 #ifdef SQL_CATALOG_LOCATION
@@ -950,11 +974,11 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // value of 0 is returned if catalogs are not supported by the data source.
   // This InfoType has been renamed for ODBC 3.0 from the ODBC 2.0 InfoType
   // SQL_QUALIFIER_LOCATION.
-  intParams[SQL_CATALOG_LOCATION] = 0;
+  intParams[SQL_CATALOG_LOCATION] = 0;  // I.e., not supported
 #endif  // SQL_CATALOG_LOCATION
 
 #ifdef SQL_QUALIFIER_LOCATION
-  intParams[SQL_QUALIFIER_LOCATION] = 0;
+  intParams[SQL_QUALIFIER_LOCATION] = 0;  // I.e., not supported
 #endif  // SQL_QUALIFIER_LOCATION
 
 #ifdef SQL_GETDATA_EXTENSIONS
@@ -1016,11 +1040,11 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // level-conformant driver will always return a bitmask with all of these bits
   // set. This InfoType has been renamed for ODBC 3.0 from the ODBC 2.0 InfoType
   // SQL_QUALIFIER_USAGE.
-  intParams[SQL_CATALOG_USAGE] = 0;
+  intParams[SQL_CATALOG_USAGE] = 0;  // I.e., not supported
 #endif  // SQL_CATALOG_USAGE
 
 #ifdef SQL_QUALIFIER_USAGE
-  intParams[SQL_QUALIFIER_USAGE] = 0;
+  intParams[SQL_QUALIFIER_USAGE] = 0;  // I.e., not supported
 #endif  // SQL_QUALIFIER_USAGE
 
 #ifdef SQL_SCHEMA_USAGE
@@ -1034,59 +1058,59 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // Bitmask enumerating support for aggregation functions.
   intParams[SQL_AGGREGATE_FUNCTIONS] = SQL_AF_AVG | SQL_AF_COUNT | SQL_AF_MAX
                                        | SQL_AF_MIN | SQL_AF_SUM
-                                       | SQL_AF_DISTINCT;
+                                       | SQL_AF_DISTINCT | SQL_AF_ALL;
 #endif  // SQL_AGGREGATE_FUNCTIONS
 
 #ifdef SQL_NUMERIC_FUNCTIONS
   // Bitmask enumerating the scalar numeric functions supported by the driver
   // and associated data source.
-  intParams[SQL_NUMERIC_FUNCTIONS] =
-      SQL_FN_NUM_ABS | SQL_FN_NUM_ACOS | SQL_FN_NUM_ASIN | SQL_FN_NUM_EXP
-      | SQL_FN_NUM_ATAN | SQL_FN_NUM_ATAN2 | SQL_FN_NUM_CEILING | SQL_FN_NUM_COS
-      | SQL_FN_NUM_TRUNCATE | SQL_FN_NUM_FLOOR | SQL_FN_NUM_DEGREES
-      | SQL_FN_NUM_POWER | SQL_FN_NUM_RADIANS | SQL_FN_NUM_SIGN | SQL_FN_NUM_SIN
-      | SQL_FN_NUM_LOG | SQL_FN_NUM_TAN | SQL_FN_NUM_PI | SQL_FN_NUM_MOD
-      | SQL_FN_NUM_COT | SQL_FN_NUM_LOG10 | SQL_FN_NUM_ROUND | SQL_FN_NUM_SQRT
-      | SQL_FN_NUM_RAND;
+  intParams[SQL_NUMERIC_FUNCTIONS] = SQL_FN_NUM_MOD;
 #endif  // SQL_NUMERIC_FUNCTIONS
 
 #ifdef SQL_STRING_FUNCTIONS
   // Bitmask enumerating the scalar string functions supported by the driver and
   // associated data source.
   intParams[SQL_STRING_FUNCTIONS] =
-      SQL_FN_STR_ASCII | SQL_FN_STR_BIT_LENGTH | SQL_FN_STR_CHAR_LENGTH
-      | SQL_FN_STR_CHAR | SQL_FN_STR_CONCAT | SQL_FN_STR_DIFFERENCE
-      | SQL_FN_STR_INSERT | SQL_FN_STR_LEFT | SQL_FN_STR_LENGTH
-      | SQL_FN_STR_CHARACTER_LENGTH | SQL_FN_STR_LTRIM | SQL_FN_STR_OCTET_LENGTH
-      | SQL_FN_STR_POSITION | SQL_FN_STR_REPEAT | SQL_FN_STR_REPLACE
-      | SQL_FN_STR_RIGHT | SQL_FN_STR_RTRIM | SQL_FN_STR_SOUNDEX
-      | SQL_FN_STR_SPACE | SQL_FN_STR_SUBSTRING | SQL_FN_STR_LCASE
-      | SQL_FN_STR_UCASE | SQL_FN_STR_LOCATE_2 | SQL_FN_STR_LOCATE;
+      SQL_FN_STR_CHAR_LENGTH
+      | SQL_FN_STR_CONCAT
+      | SQL_FN_STR_LEFT
+      | SQL_FN_STR_LOCATE
+      | SQL_FN_STR_CHARACTER_LENGTH
+      | SQL_FN_STR_POSITION
+      | SQL_FN_STR_RIGHT
+      | SQL_FN_STR_SUBSTRING
+      | SQL_FN_STR_LCASE
+      | SQL_FN_STR_UCASE;
 #endif  // SQL_STRING_FUNCTIONS
 
 #ifdef SQL_TIMEDATE_FUNCTIONS
   // Bitmask enumerating the scalar date and time functions supported by the
   // driver and associated data source.
   intParams[SQL_TIMEDATE_FUNCTIONS] =
-      SQL_FN_TD_CURRENT_DATE | SQL_FN_TD_CURRENT_TIME | SQL_FN_TD_WEEK
-      | SQL_FN_TD_QUARTER | SQL_FN_TD_SECOND | SQL_FN_TD_CURDATE
-      | SQL_FN_TD_CURTIME | SQL_FN_TD_DAYNAME | SQL_FN_TD_MINUTE
-      | SQL_FN_TD_DAYOFWEEK | SQL_FN_TD_DAYOFYEAR | SQL_FN_TD_EXTRACT
-      | SQL_FN_TD_HOUR | SQL_FN_TD_DAYOFMONTH | SQL_FN_TD_MONTH
-      | SQL_FN_TD_MONTHNAME | SQL_FN_TD_NOW | SQL_FN_TD_YEAR
-      | SQL_FN_TD_CURRENT_TIMESTAMP;
+      SQL_FN_TD_CURRENT_TIME | SQL_FN_TD_CURRENT_DATE
+      | SQL_FN_TD_CURRENT_TIMESTAMP | SQL_FN_TD_EXTRACT | SQL_FN_TD_YEAR
+      | SQL_FN_TD_QUARTER | SQL_FN_TD_MONTH | SQL_FN_TD_WEEK
+      | SQL_FN_TD_DAYOFYEAR | SQL_FN_TD_DAYOFMONTH | SQL_FN_TD_DAYOFWEEK
+      | SQL_FN_TD_HOUR | SQL_FN_TD_MINUTE | SQL_FN_TD_SECOND | SQL_FN_TD_DAYNAME
+      | SQL_FN_TD_MONTHNAME;
 #endif  // SQL_TIMEDATE_FUNCTIONS
 
 #ifdef SQL_TIMEDATE_ADD_INTERVALS
   // Bitmask enumerating timestamp intervals supported by the driver and
   // associated data source for the TIMESTAMPADD scalar function.
-  intParams[SQL_TIMEDATE_ADD_INTERVALS] = 0;
+  intParams[SQL_TIMEDATE_ADD_INTERVALS] =
+      SQL_FN_TSI_FRAC_SECOND | SQL_FN_TSI_SECOND | SQL_FN_TSI_MINUTE
+      | SQL_FN_TSI_HOUR | SQL_FN_TSI_DAY | SQL_FN_TSI_WEEK | SQL_FN_TSI_MONTH
+      | SQL_FN_TSI_QUARTER | SQL_FN_TSI_YEAR;
 #endif  // SQL_TIMEDATE_ADD_INTERVALS
 
 #ifdef SQL_TIMEDATE_DIFF_INTERVALS
   // Bitmask enumerating timestamp intervals supported by the driver and
   // associated data source for the TIMESTAMPDIFF scalar function.
-  intParams[SQL_TIMEDATE_DIFF_INTERVALS] = 0;
+  intParams[SQL_TIMEDATE_DIFF_INTERVALS] =
+      SQL_FN_TSI_FRAC_SECOND | SQL_FN_TSI_SECOND | SQL_FN_TSI_MINUTE
+      | SQL_FN_TSI_HOUR | SQL_FN_TSI_DAY | SQL_FN_TSI_WEEK | SQL_FN_TSI_MONTH
+      | SQL_FN_TSI_QUARTER | SQL_FN_TSI_YEAR;
 #endif  // SQL_TIMEDATE_DIFF_INTERVALS
 
 #ifdef SQL_DATETIME_LITERALS
@@ -1125,7 +1149,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_POS_UPDATE (ODBC 2.0)
   // SQL_POS_DELETE (ODBC 2.0)
   // SQL_POS_ADD (ODBC 2.0)
-  intParams[SQL_POS_OPERATIONS] = 0;
+  intParams[SQL_POS_OPERATIONS] = 0;  // I.e., not supported
 #endif  // SQL_POS_OPERATIONS
 
 #ifdef SQL_SQL92_NUMERIC_VALUE_FUNCTIONS
@@ -1138,15 +1162,13 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_SNVF_OCTET_LENGTH
   // SQL_SNVF_POSITION
   intParams[SQL_SQL92_NUMERIC_VALUE_FUNCTIONS] =
-      SQL_SNVF_BIT_LENGTH | SQL_SNVF_CHARACTER_LENGTH | SQL_SNVF_EXTRACT
-      | SQL_SNVF_OCTET_LENGTH | SQL_SNVF_POSITION;
+      SQL_SNVF_CHARACTER_LENGTH | SQL_SNVF_EXTRACT | SQL_SNVF_POSITION;
 #endif  // SQL_SQL92_NUMERIC_VALUE_FUNCTIONS
 
 #ifdef SQL_SQL92_STRING_FUNCTIONS
   // Bitmask enumerating the string scalar functions.
   intParams[SQL_SQL92_STRING_FUNCTIONS] =
-      SQL_SSF_LOWER | SQL_SSF_UPPER | SQL_SSF_TRIM_TRAILING | SQL_SSF_SUBSTRING
-      | SQL_SSF_TRIM_BOTH | SQL_SSF_TRIM_LEADING;
+      SQL_SSF_LOWER | SQL_SSF_UPPER | SQL_SSF_SUBSTRING;
 #endif  // SQL_SQL92_STRING_FUNCTIONS
 
 #ifdef SQL_SQL92_DATETIME_FUNCTIONS
@@ -1185,14 +1207,14 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // Bitmask that describes the attributes of a static cursor that are supported
   // by the driver. This bitmask contains the first subset of attributes; for
   // the second subset, see SQL_STATIC_CURSOR_ATTRIBUTES2.
-  intParams[SQL_STATIC_CURSOR_ATTRIBUTES1] = SQL_CA1_NEXT | SQL_CA1_ABSOLUTE;
+  intParams[SQL_STATIC_CURSOR_ATTRIBUTES1] = SQL_CA1_NEXT;
 #endif  // SQL_STATIC_CURSOR_ATTRIBUTES1
 
 #ifdef SQL_STATIC_CURSOR_ATTRIBUTES2
   // Bitmask that describes the attributes of a static cursor that are supported
   // by the driver. This bitmask contains the second subset of attributes; for
   // the first subset, see SQL_STATIC_CURSOR_ATTRIBUTES1.
-  intParams[SQL_STATIC_CURSOR_ATTRIBUTES2] = 0;
+  intParams[SQL_STATIC_CURSOR_ATTRIBUTES2] = 0;  // I.e., not supported
 #endif  // SQL_STATIC_CURSOR_ATTRIBUTES2
 
 #ifdef SQL_CONVERT_BIGINT
@@ -1541,7 +1563,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_AD_ADD_CONSTRAINT_NON_DEFERRABLE (Full level)
   // SQL_AD_ADD_CONSTRAINT_INITIALLY_DEFERRED (Full level)
   // SQL_AD_ADD_CONSTRAINT_INITIALLY_IMMEDIATE (Full level)
-  intParams[SQL_ALTER_DOMAIN] = 0;
+  intParams[SQL_ALTER_DOMAIN] = 0;  // I.e., not supported
 #endif  // SQL_ALTER_DOMAIN
 
 #ifdef SQL_ALTER_TABLE
@@ -1588,7 +1610,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // (Full level) (ODBC 3.0) SQL_AT_CONSTRAINT_INITIALLY_IMMEDIATE (Full level)
   // (ODBC 3.0) SQL_AT_CONSTRAINT_DEFERRABLE (Full level) (ODBC 3.0)
   // SQL_AT_CONSTRAINT_NON_DEFERRABLE (Full level) (ODBC 3.0)
-  intParams[SQL_ALTER_TABLE] = SQL_AT_ADD_COLUMN_SINGLE;
+  intParams[SQL_ALTER_TABLE] = 0;  // I.e., not supported
 #endif  // SQL_ALTER_TABLE
 
 #ifdef SQL_CREATE_ASSERTION
@@ -1609,7 +1631,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // An SQL - 92 Full level-conformant driver will always return all of these
   // options as supported. A return value of "0" means that the CREATE ASSERTION
   // statement is not supported.
-  intParams[SQL_CREATE_ASSERTION] = 0;
+  intParams[SQL_CREATE_ASSERTION] = 0;  // I.e., not supported
 #endif  // SQL_CREATE_ASSERTION
 
 #ifdef SQL_CREATE_CHARACTER_SET
@@ -1623,7 +1645,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // An SQL - 92 Full level-conformant driver will always return all of these
   // options as supported. A return value of "0" means that the CREATE CHARACTER
   // SET statement is not supported.
-  intParams[SQL_CREATE_CHARACTER_SET] = 0;
+  intParams[SQL_CREATE_CHARACTER_SET] = 0;  // I.e., not supported
 #endif  // SQL_CREATE_CHARACTER_SET
 
 #ifdef SQL_CREATE_COLLATION
@@ -1633,7 +1655,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // An SQL - 92 Full level-conformant driver will always return this option as
   // supported.A return value of "0" means that the CREATE COLLATION statement
   // is not supported.
-  intParams[SQL_CREATE_COLLATION] = 0;
+  intParams[SQL_CREATE_COLLATION] = 0;  // I.e., not supported
 #endif  // SQL_CREATE_COLLATION
 
 #ifdef SQL_CREATE_DOMAIN
@@ -1660,7 +1682,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   //
   // A return value of "0" means that the CREATE DOMAIN statement is not
   // supported.
-  intParams[SQL_CREATE_DOMAIN] = 0;
+  intParams[SQL_CREATE_DOMAIN] = 0;  // I.e., not supported
 #endif  // SQL_CREATE_DOMAIN
 
 #ifdef SQL_CREATE_SCHEMA
@@ -1675,7 +1697,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // must also be supported at the SQL-92 Entry level, but not necessarily as
   // SQL statements. An SQL-92 Full level-conformant driver will always return
   // all of these options as supported.
-  intParams[SQL_CREATE_SCHEMA] = 0;
+  intParams[SQL_CREATE_SCHEMA] = 0;  // I.e., not supported
 #endif  // SQL_CREATE_SCHEMA
 
 #ifdef SQL_CREATE_TABLE
@@ -1723,7 +1745,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // An SQL - 92 Full level-conformant driver will always return these options
   // as supported. A return value of "0" means that the CREATE TRANSLATION
   // statement is not supported.
-  intParams[SQL_CREATE_TRANSLATION] = 0;
+  intParams[SQL_CREATE_TRANSLATION] = 0;  // I.e., not supported
 #endif  // SQL_CREATE_TRANSLATION
 
 #ifdef SQL_CREATE_VIEW
@@ -1740,7 +1762,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_CV_CREATE_VIEW and SQL_CV_CHECK_OPTION options as supported. An SQL -
   // 92 Full level-conformant driver will always return all of these options as
   // supported.
-  intParams[SQL_CREATE_VIEW] = 0;
+  intParams[SQL_CREATE_VIEW] = 0;  // I.e., not supported
 #endif  // SQL_CREATE_VIEW
 
 #ifdef SQL_CURSOR_SENSITIVITY
@@ -1768,7 +1790,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // Value that indicates support for creation and dropping of indexes:
   // SQL_DI_CREATE_INDEX
   // SQL_DI_DROP_INDEX
-  intParams[SQL_DDL_INDEX] = SQL_DI_CREATE_INDEX | SQL_DI_DROP_INDEX;
+  intParams[SQL_DDL_INDEX] = 0;  // I.e., not supported
 #endif  // SQL_DDL_INDEX
 
 #ifdef SQL_DEFAULT_TXN_ISOLATION
@@ -1806,7 +1828,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // used to determine which clauses are supported : SQL_DA_DROP_ASSERTION An
   // SQL-92 Full level-conformant driver will always return this option as
   // supported.
-  intParams[SQL_DROP_ASSERTION] = 0;
+  intParams[SQL_DROP_ASSERTION] = 0;  // I.e., not supported
 #endif  // SQL_DROP_ASSERTION
 
 #ifdef SQL_DROP_CHARACTER_SET
@@ -1815,7 +1837,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // used to determine which clauses are supported : SQL_DCS_DROP_CHARACTER_SET
   // An SQL-92 Full level-conformant driver will always return this option as
   // supported.
-  intParams[SQL_DROP_CHARACTER_SET] = 0;
+  intParams[SQL_DROP_CHARACTER_SET] = 0;  // I.e., not supported
 #endif  // SQL_DROP_CHARACTER_SET
 
 #ifdef SQL_DROP_COLLATION
@@ -1824,7 +1846,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // used to determine which clauses are supported : SQL_DC_DROP_COLLATION An
   // SQL-92 Full level-conformant driver will always return this option as
   // supported.
-  intParams[SQL_DROP_COLLATION] = 0;
+  intParams[SQL_DROP_COLLATION] = 0;  // I.e., not supported
 #endif  // SQL_DROP_COLLATION
 
 #ifdef SQL_DROP_DOMAIN
@@ -1834,7 +1856,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_DD_RESTRICT
   // An SQL-92 Intermediate level-conformant driver will always return all of
   // these options as supported.
-  intParams[SQL_DROP_DOMAIN] = 0;
+  intParams[SQL_DROP_DOMAIN] = 0;  // I.e., not supported
 #endif  // SQL_DROP_DOMAIN
 
 #ifdef SQL_DROP_SCHEMA
@@ -1844,7 +1866,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_DS_RESTRICT
   // An SQL-92 Intermediate level-conformant driver will always return all of
   // these options as supported.
-  intParams[SQL_DROP_SCHEMA] = 0;
+  intParams[SQL_DROP_SCHEMA] = 0;  // I.e., not supported
 #endif  // SQL_DROP_SCHEMA
 
 #ifdef SQL_DROP_TABLE
@@ -1854,7 +1876,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_DT_RESTRICT
   // An FIPS Transitional level-conformant driver will always return all of
   // these options as supported.
-  intParams[SQL_DROP_TABLE] = SQL_DT_DROP_TABLE;
+  intParams[SQL_DROP_TABLE] = 0;  // I.e., not supported
 #endif  // SQL_DROP_TABLE
 
 #ifdef SQL_DROP_TRANSLATION
@@ -1863,7 +1885,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // used to determine which clauses are supported: SQL_DTR_DROP_TRANSLATION An
   // SQL-92 Full level-conformant driver will always return this option as
   // supported.
-  intParams[SQL_DROP_TRANSLATION] = 0;
+  intParams[SQL_DROP_TRANSLATION] = 0;  // I.e., not supported
 #endif  // SQL_DROP_TRANSLATION
 
 #ifdef SQL_DROP_VIEW
@@ -1873,7 +1895,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_DV_RESTRICT
   // An FIPS Transitional level-conformant driver will always return all of
   // these options as supported.
-  intParams[SQL_DROP_VIEW] = 0;
+  intParams[SQL_DROP_VIEW] = 0;  // I.e., not supported
 #endif  // SQL_DROP_VIEW
 
 #ifdef SQL_DYNAMIC_CURSOR_ATTRIBUTES1
@@ -2048,7 +2070,10 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // attributes; for the second subset, see SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES2.
   //
   // The following bitmasks are used to determine which attributes are
-  // supported: SQL_CA1_NEXT SQL_CA1_LOCK_EXCLUSIVE SQL_CA1_LOCK_NO_CHANGE
+  // supported: 
+  // SQL_CA1_NEXT 
+  // SQL_CA1_LOCK_EXCLUSIVE 
+  // SQL_CA1_LOCK_NO_CHANGE
   // SQL_CA1_LOCK_UNLOCK
   // SQL_CA1_POS_POSITION
   // SQL_CA1_POS_UPDATE
@@ -2073,7 +2098,9 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // attributes; for the first subset, see SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES1.
   //
   // The following bitmasks are used to determine which attributes are
-  // supported: SQL_CA2_READ_ONLY_CONCURRENCY SQL_CA2_LOCK_CONCURRENCY
+  // supported: 
+  // SQL_CA2_READ_ONLY_CONCURRENCY 
+  // SQL_CA2_LOCK_CONCURRENCY
   // SQL_CA2_OPT_ROWVER_CONCURRENCY
   // SQL_CA2_OPT_VALUES_CONCURRENCY
   // SQL_CA2_SENSITIVITY_ADDITIONS
@@ -2108,7 +2135,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   //
   // To see whether the CREATE INDEX statement is supported, an application
   // calls SQLGetInfo with the SQL_DLL_INDEX information type.
-  intParams[SQL_INDEX_KEYWORDS] = SQL_IK_ALL;
+  intParams[SQL_INDEX_KEYWORDS] = SQL_IK_NONE;
 #endif  // SQL_INDEX_KEYWORDS
 
 #ifdef SQL_INFO_SCHEMA_VIEWS
@@ -2186,7 +2213,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_ISV_VIEWS = Identifies the viewed tables defined in this catalog that
   // can be accessed by a given
   //     user. (FIPS Transitional level)
-  intParams[SQL_INFO_SCHEMA_VIEWS] = 0;
+  intParams[SQL_INFO_SCHEMA_VIEWS] = 0;  // I.e., not supported
 #endif  // SQL_INFO_SCHEMA_VIEWS
 
 #ifdef SQL_INSERT_STATEMENT
@@ -2196,8 +2223,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_IS_SELECT_INTO
   // An SQL-92 Entry level-conformant driver will always return all of these
   // options as supported.
-  intParams[SQL_INSERT_STATEMENT] =
-      SQL_IS_INSERT_LITERALS | SQL_IS_INSERT_SEARCHED;
+  intParams[SQL_INSERT_STATEMENT] = 0;  // I.e., not supported
 #endif  // SQL_INSERT_STATEMENT
 
 #ifdef SQL_KEYSET_CURSOR_ATTRIBUTES1
@@ -2261,14 +2287,14 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // For descriptions of these bitmasks, see SQL_DYNAMIC_CURSOR_ATTRIBUTES1 (and
   // substitute "keyset-driven cursor" for "dynamic cursor" in the
   // descriptions).
-  intParams[SQL_KEYSET_CURSOR_ATTRIBUTES2] = 0;
+  intParams[SQL_KEYSET_CURSOR_ATTRIBUTES2] = 0;  // I.e., not supported
 #endif  // SQL_KEYSET_CURSOR_ATTRIBUTES2
 
 #ifdef SQL_MAX_ASYNC_CONCURRENT_STATEMENTS
   // Value that specifies the maximum number of active concurrent statements in
   // asynchronous mode that the driver can support on a given connection. If
   // there is no specific limit or the limit is unknown, this value is zero.
-  intParams[SQL_MAX_ASYNC_CONCURRENT_STATEMENTS] = 0;
+  intParams[SQL_MAX_ASYNC_CONCURRENT_STATEMENTS] = 0;  // I.e., unknown
 #endif  // SQL_MAX_ASYNC_CONCURRENT_STATEMENTS
 
 #ifdef SQL_MAX_BINARY_LITERAL_LEN
@@ -2277,7 +2303,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // binary literal in an SQL statement. For example, the binary literal 0xFFAA
   // has a length of 4. If there is no maximum length or the length is unknown,
   // this value is set to zero.
-  intParams[SQL_MAX_BINARY_LITERAL_LEN] = 0;
+  intParams[SQL_MAX_BINARY_LITERAL_LEN] = 0;  // I.e., no maximum
 #endif  // SQL_MAX_BINARY_LITERAL_LEN
 
 #ifdef SQL_MAX_CATALOG_NAME_LEN
@@ -2286,7 +2312,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // is set to zero. An FIPS Full level-conformant driver will return at least
   // 128. This InfoType has been renamed for ODBC 3.0 from the ODBC 2.0 InfoType
   // SQL_MAX_QUALIFIER_NAME_LEN.
-  intParams[SQL_MAX_CATALOG_NAME_LEN] = 0;
+  intParams[SQL_MAX_CATALOG_NAME_LEN] = 0;  // I.e., no maximum
 #endif  // SQL_MAX_CATALOG_NAME_LEN
 
 #ifdef SQL_MAX_CHAR_LITERAL_LEN
@@ -2294,14 +2320,14 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // the literal prefix and suffix returned by SQLGetTypeInfo) of a character
   // literal in an SQL statement. If there is no maximum length or the length is
   // unknown, this value is set to zero.
-  intParams[SQL_MAX_CHAR_LITERAL_LEN] = 0;
+  intParams[SQL_MAX_CHAR_LITERAL_LEN] = 0;  // I.e., no maximum
 #endif  // SQL_MAX_CHAR_LITERAL_LEN
 
 #ifdef SQL_MAX_INDEX_SIZE
   // Value that specifies the maximum number of bytes allowed in the combined
   // fields of an index. If there is no specified limit or the limit is unknown,
   // this value is set to zero.
-  intParams[SQL_MAX_INDEX_SIZE] = 0;
+  intParams[SQL_MAX_INDEX_SIZE] = 0;  // I.e., no maximum
 #endif  // SQL_MAX_INDEX_SIZE
 
 #ifdef SQL_MAX_ROW_SIZE
@@ -2309,14 +2335,14 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // there is no specified limit or the limit is unknown, this value is set to
   // zero. An FIPS Entry level-conformant driver will return at least 2,000. An
   // FIPS Intermediate level-conformant driver will return at least 8,000.
-  intParams[SQL_MAX_ROW_SIZE] = 0;
+  intParams[SQL_MAX_ROW_SIZE] = 0;  // I.e., no maximum
 #endif  // SQL_MAX_ROW_SIZE
 
 #ifdef SQL_MAX_STATEMENT_LEN
   // Value that specifies the maximum length (number of characters, including
   // white space) of an SQL statement. If there is no maximum length or the
   // length is unknown, this value is set to zero.
-  intParams[SQL_MAX_STATEMENT_LEN] = 0;
+  intParams[SQL_MAX_STATEMENT_LEN] = 0;  // I.e., no maximum
 #endif  // SQL_MAX_STATEMENT_LEN
 
 #ifdef SQL_SQL92_FOREIGN_KEY_DELETE_RULE
@@ -2329,7 +2355,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   //
   // An FIPS Transitional level-conformant driver will always return all of
   // these options as supported.
-  intParams[SQL_SQL92_FOREIGN_KEY_DELETE_RULE] = 0;
+  intParams[SQL_SQL92_FOREIGN_KEY_DELETE_RULE] = 0;  // I.e., not supported
 #endif  // SQL_SQL92_FOREIGN_KEY_DELETE_RULE
 
 #ifdef SQL_SQL92_FOREIGN_KEY_UPDATE_RULE
@@ -2342,7 +2368,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   //
   // An SQL-92 Full level-conformant driver will always return all of these
   // options as supported.
-  intParams[SQL_SQL92_FOREIGN_KEY_UPDATE_RULE] = 0;
+  intParams[SQL_SQL92_FOREIGN_KEY_UPDATE_RULE] = 0;  // I.e., not supported
 #endif  // SQL_SQL92_FOREIGN_KEY_UPDATE_RULE
 
 #ifdef SQL_SQL92_GRANT
@@ -2362,7 +2388,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_SG_USAGE_ON_COLLATION (FIPS Transitional level)
   // SQL_SG_USAGE_ON_TRANSLATION (FIPS Transitional level)
   // SQL_SG_WITH_GRANT_OPTION (Entry level)
-  intParams[SQL_SQL92_GRANT] = 0;
+  intParams[SQL_SQL92_GRANT] = 0;  // I.e., not supported
 #endif  // SQL_SQL92_GRANT
 
 #ifdef SQL_SQL92_REVOKE
@@ -2387,7 +2413,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_SR_USAGE_ON_CHARACTER_SET (FIPS Transitional level)
   // SQL_SR_USAGE_ON_COLLATION (FIPS Transitional level)
   // SQL_SR_USAGE_ON_TRANSLATION (FIPS Transitional level)
-  intParams[SQL_SQL92_REVOKE] = 0;
+  intParams[SQL_SQL92_REVOKE] = 0;  // I.e., not supported
 #endif  // SQL_SQL92_REVOKE
 
 #ifdef SQL_SQL92_ROW_VALUE_CONSTRUCTOR
@@ -2409,7 +2435,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // driver complies with: SQL_SCC_XOPEN_CLI_VERSION1: The driver complies with
   // the Open Group CLI version 1. SQL_SCC_ISO92_CLI: The driver complies with
   // the ISO 92 CLI.
-  intParams[SQL_STANDARD_CLI_CONFORMANCE] = 0;
+  intParams[SQL_STANDARD_CLI_CONFORMANCE] = 0;  // I.e., not supported
 #endif  // SQL_STANDARD_CLI_CONFORMANCE
 
 #ifdef SQL_SUBQUERIES
@@ -2425,14 +2451,14 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // support subqueries support correlated subqueries. An SQL-92 Entry
   // level-conformant driver will always return a bitmask in which all of these
   // bits are set.
-  intParams[SQL_SUBQUERIES] = SQL_SQ_CORRELATED_SUBQUERIES | SQL_SQ_COMPARISON
-                              | SQL_SQ_EXISTS | SQL_SQ_IN | SQL_SQ_QUANTIFIED;
+  intParams[SQL_SUBQUERIES] = 0;  // I.e., not supported
 #endif  // SQL_SUBQUERIES
 
 #ifdef SQL_TXN_ISOLATION_OPTION
   // A bitmask enumerating the transaction isolation levels available from the
   // driver or data source. The following bitmasks are used together with the
-  // flag to determine which options are supported: SQL_TXN_READ_UNCOMMITTED
+  // flag to determine which options are supported: 
+  // SQL_TXN_READ_UNCOMMITTED
   // SQL_TXN_READ_COMMITTED
   // SQL_TXN_REPEATABLE_READ
   // SQL_TXN_SERIALIZABLE
@@ -2455,7 +2481,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   //     both SQL_U_UNION and SQL_U_UNION_ALL in this case.)
   // An SQL-92 Entry level-conformant driver will always return both of these
   // options as supported.
-  intParams[SQL_UNION] = SQL_U_UNION | SQL_U_UNION_ALL;
+  intParams[SQL_UNION] = 0;  // I.e., not supported
 #endif  // SQL_UNION
 
 #ifdef SQL_FETCH_DIRECTION
@@ -2469,7 +2495,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_FD_FETCH_ABSOLUTE (ODBC 1.0)
   // SQL_FD_FETCH_RELATIVE (ODBC 1.0)
   // SQL_FD_FETCH_BOOKMARK (ODBC 2.0)
-  intParams[SQL_FETCH_DIRECTION] = SQL_FD_FETCH_NEXT | SQL_FD_FETCH_PRIOR;
+  intParams[SQL_FETCH_DIRECTION] = SQL_FD_FETCH_NEXT;
 #endif  // SQL_FETCH_DIRECTION
 
 #ifdef SQL_LOCK_TYPES
@@ -2507,17 +2533,18 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_PS_POSITIONED_DELETE
   // SQL_PS_POSITIONED_UPDATE
   // SQL_PS_SELECT_FOR_UPDATE
-  intParams[SQL_POSITIONED_STATEMENTS] = SQL_PS_SELECT_FOR_UPDATE;
+  intParams[SQL_POSITIONED_STATEMENTS] = 0;  // I.e., not supported
 #endif  // SQL_POSITIONED_STATEMENTS
 
 #ifdef SQL_SCROLL_CONCURRENCY
   // DEPRECATED. Included for backward-compatibility.
   // A bitmask enumerating the concurrency control options supported for the
   // cursor. The following bitmasks are used to determine which options are
-  // supported: SQL_SCCO_READ_ONLY = Cursor is read-only. No updates are
-  // allowed. SQL_SCCO_LOCK = Cursor uses the lowest level of locking sufficient
-  // to ensure that the row can be
-  //    updated.
+  // supported: 
+  // SQL_SCCO_READ_ONLY = Cursor is read-only. No updates are
+  // allowed. 
+  // SQL_SCCO_LOCK = Cursor uses the lowest level of locking sufficient
+  // to ensure that the row can be updated.
   // SQL_SCCO_OPT_ROWVER = Cursor uses optimistic concurrency control, comparing
   // row versions, such as
   //    SQLBase ROWID or Sybase TIMESTAMP.
@@ -2550,7 +2577,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   //    on keyset - driven cursors that do not update the key. This option does
   //    not apply for a dynamic cursor or in the case in which a key is changed
   //    in a mixed cursor.
-  intParams[SQL_STATIC_SENSITIVITY] = 0;
+  intParams[SQL_STATIC_SENSITIVITY] = 0;  // I.e., not supported
 #endif  // SQL_STATIC_SENSITIVITY
 
   //
@@ -2560,12 +2587,12 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
 #ifdef SQL_MAX_CONCURRENT_ACTIVITIES
   // The maximum number of active statements that the driver can  support for a
   // connection. Zero mean no limit.
-  shortParams[SQL_MAX_CONCURRENT_ACTIVITIES] = 0;
+  shortParams[SQL_MAX_CONCURRENT_ACTIVITIES] = 0;  // I.e., no limit
 #endif  // SQL_MAX_CONCURRENT_ACTIVITIES
 
 #ifdef SQL_TXN_CAPABLE
   // Describs the transaction support in the driver or data source.
-  shortParams[SQL_TXN_CAPABLE] = SQL_TC_DDL_COMMIT;
+  shortParams[SQL_TXN_CAPABLE] = SQL_TC_NONE;
 #endif  // SQL_TXN_CAPABLE
 
 #ifdef SQL_QUOTED_IDENTIFIER_CASE
@@ -2577,7 +2604,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // The maximum number of active environments that the driver can support. If
   // there is no specified limit or the limit is unknown, this value is set to
   // zero.
-  shortParams[SQL_ACTIVE_ENVIRONMENTS] = 0;
+  shortParams[SQL_ACTIVE_ENVIRONMENTS] = 0;  // I.e., no limit
 #endif  // SQL_ACTIVE_ENVIRONMENTS
 
 #ifdef SQL_CONCAT_NULL_BEHAVIOR
@@ -2632,8 +2659,10 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // clause and the nonaggregated columns in the select list:
   //
   // SQL_GB_COLLATE = A COLLATE clause can be specified at the end of each
-  // grouping column. (ODBC 3.0) SQL_GB_NOT_SUPPORTED = GROUP BY clauses are not
-  // supported. (ODBC 2.0) SQL_GB_GROUP_BY_EQUALS_SELECT = The GROUP BY clause
+  // grouping column. (ODBC 3.0) 
+  // SQL_GB_NOT_SUPPORTED = GROUP BY clauses are not
+  // supported. (ODBC 2.0) 
+  // SQL_GB_GROUP_BY_EQUALS_SELECT = The GROUP BY clause
   // must contain all nonaggregated columns in the
   //     select list. It cannot contain any other columns.
   //     For example, SELECT DEPT, MAX(SALARY) FROM EMPLOYEE GROUP BY DEPT.
@@ -2676,7 +2705,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // Because identifiers in SQL-92 are never case-sensitive, a driver that
   // conforms strictly to SQL-92 (any level) will never return the
   // SQL_IC_SENSITIVE option as supported.
-  shortParams[SQL_IDENTIFIER_CASE] = SQL_IC_UPPER;
+  shortParams[SQL_IDENTIFIER_CASE] = SQL_IC_SENSITIVE;
 #endif  // SQL_IDENTIFIER_CASE
 
 #ifdef SQL_MAX_COLUMN_NAME_LEN
@@ -2685,7 +2714,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // is set to zero. An FIPS Entry level-conformant driver will return at
   // least 18. An FIPS Intermediate level-conformant driver will return at least
   // 128.
-  shortParams[SQL_MAX_COLUMN_NAME_LEN] = 0;
+  shortParams[SQL_MAX_COLUMN_NAME_LEN] = 0;  // I.e., no limit
 #endif  // SQL_MAX_COLUMN_NAME_LEN
 
 #ifdef SQL_MAX_COLUMNS_IN_GROUP_BY
@@ -2694,14 +2723,14 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // is set to zero. An FIPS Entry level-conformant driver will return at
   // least 6. An FIPS Intermediate level-conformant driver will return at
   // least 15.
-  shortParams[SQL_MAX_COLUMNS_IN_GROUP_BY] = 0;
+  shortParams[SQL_MAX_COLUMNS_IN_GROUP_BY] = 0;  // I.e., no limit
 #endif  // SQL_MAX_COLUMNS_IN_GROUP_BY
 
 #ifdef SQL_MAX_COLUMNS_IN_INDEX
   // Value that specifies the maximum number of columns allowed in an index.
   // If there is no specified limit or the limit is unknown, this value is set
   // to zero.
-  shortParams[SQL_MAX_COLUMNS_IN_INDEX] = 0;
+  shortParams[SQL_MAX_COLUMNS_IN_INDEX] = 0;  // I.e., no limit
 #endif  // SQL_MAX_COLUMNS_IN_INDEX
 
 #ifdef SQL_MAX_COLUMNS_IN_ORDER_BY
@@ -2710,7 +2739,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // is set to zero. An FIPS Entry level-conformant driver will return at
   // least 6. An FIPS Intermediate level-conformant driver will return at
   // least 15.
-  shortParams[SQL_MAX_COLUMNS_IN_ORDER_BY] = 0;
+  shortParams[SQL_MAX_COLUMNS_IN_ORDER_BY] = 0;  // I.e., no limit
 #endif  // SQL_MAX_COLUMNS_IN_ORDER_BY
 
 #ifdef SQL_MAX_COLUMNS_IN_SELECT
@@ -2718,7 +2747,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // list. If there is no specified limit or the limit is unknown, this value is
   // set to zero. An FIPS Entry level-conformant driver will return at least
   // 100. An FIPS Intermediate level-conformant driver will return at least 250.
-  shortParams[SQL_MAX_COLUMNS_IN_SELECT] = 0;
+  shortParams[SQL_MAX_COLUMNS_IN_SELECT] = 0;  // I.e., no limit
 #endif  // SQL_MAX_COLUMNS_IN_SELECT
 
 #ifdef SQL_MAX_COLUMNS_IN_TABLE
@@ -2726,7 +2755,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // there is no specified limit or the limit is unknown, this value is set to
   // zero. An FIPS Entry level-conformant driver will return at least 100. An
   // FIPS Intermediate level-conformant driver will return at least 250.
-  shortParams[SQL_MAX_COLUMNS_IN_TABLE] = 0;
+  shortParams[SQL_MAX_COLUMNS_IN_TABLE] = 0;  // I.e., no limit
 #endif  // SQL_MAX_COLUMNS_IN_TABLE
 
 #ifdef SQL_MAX_CURSOR_NAME_LEN
@@ -2735,7 +2764,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // is set to zero. An FIPS Entry level-conformant driver will return at
   // least 18. An FIPS Intermediate level-conformant driver will return at least
   // 128.
-  shortParams[SQL_MAX_CURSOR_NAME_LEN] = 0;
+  shortParams[SQL_MAX_CURSOR_NAME_LEN] = 0;  // I.e., no limit
 #endif  // SQL_MAX_CURSOR_NAME_LEN
 
 #ifdef SQL_MAX_DRIVER_CONNECTIONS
@@ -2745,7 +2774,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // limit or the limit is unknown, this value is set to zero. This InfoType has
   // been renamed for ODBC 3.0 from the ODBC 2.0 InfoType
   // SQL_ACTIVE_CONNECTIONS.
-  shortParams[SQL_MAX_DRIVER_CONNECTIONS] = 0;
+  shortParams[SQL_MAX_DRIVER_CONNECTIONS] = 0;  // I.e., no limit
 #endif  // SQL_MAX_DRIVER_CONNECTIONS
 
 #ifdef SQL_MAX_IDENTIFIER_LEN
@@ -2753,14 +2782,14 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // supports for user-defined names. An FIPS Entry level-conformant driver will
   // return at least 18. An FIPS Intermediate level-conformant driver will
   // return at least 128.
-  shortParams[SQL_MAX_IDENTIFIER_LEN] = 0;
+  shortParams[SQL_MAX_IDENTIFIER_LEN] = 0;  // I.e., no limit
 #endif  // SQL_MAX_IDENTIFIER_LEN
 
 #ifdef SQL_MAX_PROCEDURE_NAME_LEN
   // Value that specifies the maximum length of a procedure name in the data
   // source. If there is no maximum length or the length is unknown, this value
   // is set to zero.
-  shortParams[SQL_MAX_PROCEDURE_NAME_LEN] = 0;
+  shortParams[SQL_MAX_PROCEDURE_NAME_LEN] = 0;  // I.e., no limit
 #endif  // SQL_MAX_PROCEDURE_NAME_LEN
 
 #ifdef SQL_MAX_SCHEMA_NAME_LEN
@@ -2770,7 +2799,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // least 18. An FIPS Intermediate level-conformant driver will return at least
   // 128. This InfoType has been renamed for ODBC 3.0 from the ODBC 2.0 InfoType
   // SQL_MAX_OWNER_NAME_LEN.
-  shortParams[SQL_MAX_SCHEMA_NAME_LEN] = 0;
+  shortParams[SQL_MAX_SCHEMA_NAME_LEN] = 0;  // I.e., no limit
 #endif  // SQL_MAX_SCHEMA_NAME_LEN
 
 #ifdef SQL_MAX_TABLE_NAME_LEN
@@ -2778,7 +2807,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // If there is no maximum length or the length is unknown, this value is set
   // to zero. An FIPS Entry level-conformant driver will return at least 18. An
   // FIPS Intermediate level-conformant driver will return at least 128.
-  shortParams[SQL_MAX_TABLE_NAME_LEN] = 0;
+  shortParams[SQL_MAX_TABLE_NAME_LEN] = 0;  // I.e., no limit
 #endif  // SQL_MAX_TABLE_NAME_LEN
 
 #ifdef SQL_MAX_TABLES_IN_SELECT
@@ -2787,14 +2816,14 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // is unknown, this value is set to zero. An FIPS Entry level-conformant
   // driver will return at least 15. An FIPS Intermediate level-conformant
   // driver will return at least 50.
-  shortParams[SQL_MAX_TABLES_IN_SELECT] = 0;
+  shortParams[SQL_MAX_TABLES_IN_SELECT] = 0;  // I.e., no limit
 #endif  // SQL_MAX_TABLES_IN_SELECT
 
 #ifdef SQL_MAX_USER_NAME_LEN
   // Value that specifies the maximum length of a user name in the data source.
   // If there is no maximum length or the length is unknown, this value is set
   // to zero.
-  shortParams[SQL_MAX_USER_NAME_LEN] = 0;
+  shortParams[SQL_MAX_USER_NAME_LEN] = 0;  // I.e., no limit
 #endif  // SQL_MAX_USER_NAME_LEN
 
 #ifdef SQL_NON_NULLABLE_COLUMNS
@@ -2804,7 +2833,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // the NOT NULL column
   //     constraint in CREATE TABLE statements.)
   // An SQL-92 Entry level-conformant driver will return SQL_NNC_NON_NULL.
-  shortParams[SQL_NON_NULLABLE_COLUMNS] = SQL_NNC_NULL;
+  shortParams[SQL_NON_NULLABLE_COLUMNS] = SQL_NNC_NON_NULL;
 #endif  // SQL_NON_NULLABLE_COLUMNS
 
 #ifdef SQL_NULL_COLLATION
@@ -2819,7 +2848,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_NC_START = NULLs are sorted at the start of the result set, regardless
   // of the ASC or DESC
   //     keywords.
-  shortParams[SQL_NULL_COLLATION] = SQL_NC_END;
+  shortParams[SQL_NULL_COLLATION] = SQL_NC_LOW;
 #endif  // SQL_NULL_COLLATION
 }
 
@@ -2829,17 +2858,14 @@ ConnectionInfo::~ConnectionInfo() {
 
 SqlResult::Type ConnectionInfo::GetInfo(InfoType type, void* buf, short buflen,
                                         short* reslen) const {
-  if (!buf)
-    return SqlResult::AI_ERROR;
-
   StringInfoMap::const_iterator itStr = strParams.find(type);
 
   if (itStr != strParams.end()) {
-    if (!buflen)
+    if (buf && !buflen)
       return SqlResult::AI_ERROR;
 
     bool isTruncated = false;
-    // Length is given in bytes,
+    // Length is given in bytes, implicitly handles if buf is NULL.
     unsigned short strlen = static_cast< short >(utility::CopyStringToBuffer(
         itStr->second, reinterpret_cast< SQLWCHAR* >(buf), buflen, isTruncated,
         true));
@@ -2849,6 +2875,10 @@ SqlResult::Type ConnectionInfo::GetInfo(InfoType type, void* buf, short buflen,
 
     return SqlResult::AI_SUCCESS;
   }
+
+  // Numeric results must have a buffer to write to!
+  if (!buf)
+    return SqlResult::AI_ERROR;
 
   UintInfoMap::const_iterator itInt = intParams.find(type);
 
@@ -2872,6 +2902,17 @@ SqlResult::Type ConnectionInfo::GetInfo(InfoType type, void* buf, short buflen,
 
   return SqlResult::AI_ERROR;
 }
+
+SqlResult::Type ConnectionInfo::SetInfo(InfoType type, std::string value) {
+  StringInfoMap::const_iterator itStr = strParams.find(type);
+
+  if (itStr != strParams.end()) {
+    strParams[type] = value;
+    return SqlResult::AI_SUCCESS;
+  }
+  return SqlResult::AI_ERROR;
+}
+
 }  // namespace config
 }  // namespace odbc
 }  // namespace documentdb
