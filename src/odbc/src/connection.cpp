@@ -611,6 +611,7 @@ void UpdateSqlDbmsVerInfo(mongocxx::database& db, config::ConnectionInfo& info) 
       int64_t versionElement = 0;
       int index = 0;
       for (auto &element : array) {
+        // Handle the possibility that version might come in different data type.
         switch (element.type()) {
           case bsoncxx::type::k_int32:
             versionElement = element.get_int32().value;
@@ -624,6 +625,7 @@ void UpdateSqlDbmsVerInfo(mongocxx::database& db, config::ConnectionInfo& info) 
           default:
             versionElement = 0;
         }
+        // Format the first three version elements in the version string.
         switch (index) {
           case 0:
             versionString << std::setw(2) << std::setfill('0')
