@@ -25,6 +25,13 @@
 
 #include <map>
 
+// Missing definition in iODBC sqlext.h
+#if (ODBCVER >= 0x0300)
+#ifndef SQL_CVT_GUID
+#define SQL_CVT_GUID 0x01000000L
+#endif
+#endif
+
 namespace documentdb {
 namespace odbc {
 namespace config {
@@ -66,6 +73,8 @@ class ConnectionInfo {
    */
   SqlResult::Type GetInfo(InfoType type, void* buf, short buflen,
                           short* reslen) const;
+
+  SqlResult::Type SetInfo(InfoType type, std::string value);
 
  private:
   DOCUMENTDB_NO_COPY_ASSIGNMENT(ConnectionInfo);
