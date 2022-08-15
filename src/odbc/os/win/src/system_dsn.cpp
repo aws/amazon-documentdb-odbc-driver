@@ -69,7 +69,7 @@ bool DisplayConnectionWindow(void* windowParent, Configuration& config) {
  * @param driver Driver.
  * @return True on success and false on fail.
  */
-bool RegisterDsn(const Configuration& config, LPCSTR driver) {
+bool InternalRegisterDsn(const Configuration& config, LPCSTR driver) {
   using namespace documentdb::odbc::config;
   using documentdb::odbc::common::LexicalCast;
 
@@ -77,26 +77,10 @@ bool RegisterDsn(const Configuration& config, LPCSTR driver) {
 
   const char* dsn = config.GetDsn().c_str();
 
+  DocumentDbError error;
   try {
-    std::wstring dsn0 = FromUtf8(dsn);
-    std::wstring driver0 = FromUtf8(driver);
-    if (!SQLWriteDSNToIni(dsn0.c_str(), driver0.c_str()))
-      documentdb::odbc::ThrowLastSetupError();
-
-    ArgMap map;
-
-    config.ToMap(map);
-
-    map.erase(ConnectionStringParser::Key::dsn);
-    map.erase(ConnectionStringParser::Key::driver);
-
-    for (ArgMap::const_iterator it = map.begin(); it != map.end(); ++it) {
-      const std::string& key = it->first;
-      const std::string& value = it->second;
-
-      documentdb::odbc::WriteDsnString(dsn, key.c_str(), value.c_str());
-    }
-
+    if (!RegisterDsn(config, driver, error))
+      throw error;
     return true;
   } catch (documentdb::odbc::DocumentDbError& err) {
     std::wstring errText = FromUtf8(err.GetText());
@@ -114,10 +98,11 @@ bool RegisterDsn(const Configuration& config, LPCSTR driver) {
  * @param dsn DSN name.
  * @return True on success and false on fail.
  */
-bool UnregisterDsn(const std::string& dsn) {
+bool InternalUnregisterDsn(const std::string& dsn) {
+  DocumentDbError error;
   try {
-    if (!SQLRemoveDSNFromIni(FromUtf8(dsn).c_str()))
-      documentdb::odbc::ThrowLastSetupError();
+    if (UnregisterDsn(dsn, error))
+      throw error;
 
     return true;
   } catch (documentdb::odbc::DocumentDbError& err) {
@@ -161,7 +146,7 @@ BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver,
         return FALSE;
 #endif  // _WIN32
 
-      if (!RegisterDsn(config, driver))
+      if (!InternalRegisterDsn(config, driver))
         return FALSE;
 
       break;
@@ -181,10 +166,10 @@ BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver,
         return FALSE;
 #endif  // _WIN32
 
-      if (!RegisterDsn(loaded, driver))
+      if (!InternalRegisterDsn(loaded, driver))
         return FALSE;
 
-      if (loaded.GetDsn() != dsn && !UnregisterDsn(dsn.c_str()))
+      if (loaded.GetDsn() != dsn && !InternalUnregisterDsn(dsn.c_str()))
         return FALSE;
 
       break;
@@ -193,7 +178,7 @@ BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver,
     case ODBC_REMOVE_DSN: {
       LOG_MSG("ODBC_REMOVE_DSN");
 
-      if (!UnregisterDsn(config.GetDsn().c_str()))
+      if (!InternalUnregisterDsn(config.GetDsn().c_str()))
         return FALSE;
 
       break;

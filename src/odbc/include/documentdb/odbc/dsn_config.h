@@ -19,6 +19,11 @@
 #define _DOCUMENTDB_ODBC_DSN_CONFIG
 
 #include "documentdb/odbc/config/configuration.h"
+#include "documentdb/odbc/documentdb_error.h"
+#include "sqltypes.h"
+
+using namespace documentdb::odbc::config;
+using namespace documentdb::odbc;
 
 namespace documentdb {
 namespace odbc {
@@ -34,7 +39,7 @@ void ThrowLastSetupError();
  * @param key Key.
  * @param value Value.
  */
-void WriteDsnString(const char* dsn, const char* key, const char* value);
+bool WriteDsnString(const char* dsn, const char* key, const char* value, DocumentDbError& error);
 
 /**
  * Get string from the DSN file.
@@ -53,8 +58,41 @@ std::string ReadDsnString(const char* dsn, const char* key, const char* dflt);
  * @param config Configuration.
  * @param diag Diagnostic collector.
  */
-void ReadDsnConfiguration(const char* dsn, config::Configuration& config,
+void ReadDsnConfiguration(const char* dsn, Configuration& config,
                           diagnostic::DiagnosticRecordStorage* diag);
+
+/**
+ * Write DSN from the configuration.
+ *
+ * @param config Configuration.
+ * @param diag Diagnostic collector.
+ */
+bool WriteDsnConfiguration(const Configuration& config, DocumentDbError& error);
+
+/**
+ * Deletes a DSN from the system.
+ *
+ * @param dsn The DSN name to remove.
+ * @param diag Diagnostic collector.
+ */
+bool DeleteDsnConfiguration(const std::string dsn, DocumentDbError& error);
+
+/**
+ * Register DSN with specified configuration.
+ *
+ * @param config Configuration.
+ * @param driver Driver.
+ * @return True on success and false on fail.
+ */
+bool RegisterDsn(const Configuration& config, const LPCSTR driver, DocumentDbError& error);
+
+/**
+ * Unregister specified DSN.
+ *
+ * @param dsn DSN name.
+ * @return True on success and false on fail.
+ */
+bool UnregisterDsn(const std::string& dsn, DocumentDbError& error);
 }  // namespace odbc
 }  // namespace documentdb
 
