@@ -374,10 +374,6 @@ SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* serverName,
                      SQLSMALLINT serverNameLen, SQLWCHAR* userName,
                      SQLSMALLINT userNameLen, SQLWCHAR* auth,
                      SQLSMALLINT authLen) {
-  DOCUMENTDB_UNUSED(userName);
-  DOCUMENTDB_UNUSED(userNameLen);
-  DOCUMENTDB_UNUSED(auth);
-  DOCUMENTDB_UNUSED(authLen);
 
   using odbc::Connection;
   using odbc::config::Configuration;
@@ -401,6 +397,14 @@ SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* serverName,
 
   odbc::ReadDsnConfiguration(dsn.c_str(), config,
                              &connection->GetDiagnosticRecords());
+  if (userName) {
+    std::string userNameStr = SqlWcharToString(userName, userNameLen);
+    config.SetUser(userNameStr);
+  }
+  if (auth) {
+    std::string passwordStr = SqlWcharToString(auth, authLen);
+    config.SetPassword(passwordStr);
+  }
 
   connection->Establish(config);
 
