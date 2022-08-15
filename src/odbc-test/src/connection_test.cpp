@@ -24,11 +24,14 @@
 #include <sqlext.h>
 
 #include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
+#include <boost/test/data/monomorphic.hpp>
 #include <string>
 
 #include "odbc_test_suite.h"
 #include "test_utils.h"
 
+using namespace boost::unit_test;
 using boost::unit_test::precondition;
 using documentdb::odbc::if_integration;
 using documentdb::odbc::OdbcTestSuite;
@@ -98,14 +101,33 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestoreExternalSSHTunnel,
   Disconnect();
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionRestoreLocalServer) {
+BOOST_DATA_TEST_CASE_F(ConnectionTestSuiteFixture,
+                       TestConnectionRestoreLocalServer, data::make({false, true}), useSqlConnect) {
+  std::string dsn = "RestoreLocalServer";
   std::string connectionString;
   CreateDsnConnectionStringForLocalServer(connectionString);
-  Connect(connectionString);
+
+  if (useSqlConnect) {
+    std::string username;
+    std::string password;
+    WriteDsnConfiguration(dsn, connectionString, username, password);
+    Connect(dsn, username, password);
+  } else {
+    Connect(connectionString);
+  }
+
   Disconnect();
+
+  if (useSqlConnect) {
+    DeleteDsnConfiguration(dsn);
+  }
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionRestoreMiscOptionsSet) {
+BOOST_DATA_TEST_CASE_F(ConnectionTestSuiteFixture,
+                       TestConnectionRestoreMiscOptionsSet,
+                       data::make({false, true}), useSqlConnect) {
+  const std::string dsn = "RestoreMiscOptionsSet";
+
   const std::string miscOptions =
       "APP_NAME=TestAppName;"
       "LOGIN_TIMEOUT_SEC=30;"
@@ -119,26 +141,55 @@ BOOST_AUTO_TEST_CASE(TestConnectionRestoreMiscOptionsSet) {
   std::string connectionString;
   CreateDsnConnectionStringForLocalServer(connectionString, "", "",
                                           miscOptions);
-
-  Connect(connectionString);
+  if (useSqlConnect) {
+    std::string username;
+    std::string password;
+    WriteDsnConfiguration(dsn, connectionString, username, password);
+    Connect(dsn, username, password);
+  } else {
+    Connect(connectionString);
+  }
   Disconnect();
+
+  if (useSqlConnect) {
+    DeleteDsnConfiguration(dsn);
+  }
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionIncompleteBasicProperties) {
+BOOST_DATA_TEST_CASE_F(ConnectionTestSuiteFixture,
+                       TestConnectionIncompleteBasicProperties,
+                       data::make({false, true}), useSqlConnect) {
+  const std::string dsn = "IncompleteBasicProperties";
   std::string connectionString =
       "DRIVER={Amazon DocumentDB};"
       "HOSTNAME=localhost;"
       "USER=user;"
       "PASSWORD=password;";
 
-  ExpectConnectionReject(connectionString,
-                         "01S00: Hostname, username, password, and database "
-                         "are required to connect.");
+  if (useSqlConnect) {
+    std::string username;
+    std::string password;
+    WriteDsnConfiguration(dsn, connectionString, username, password);
+    ExpectConnectionReject(dsn, username, password, "01S00",
+                           "Hostname, username, password, and database "
+                           "are required to connect.");
+  } else {
+    ExpectConnectionReject(connectionString, "01S00",
+                           "Hostname, username, password, and database "
+                           "are required to connect.");
+  }
 
   Disconnect();
+
+  if (useSqlConnect) {
+    DeleteDsnConfiguration(dsn);
+  }
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionIncompleteSSHTunnelProperties) {
+BOOST_DATA_TEST_CASE_F(ConnectionTestSuiteFixture,
+                       TestConnectionIncompleteSSHTunnelProperties,
+                       data::make({false, true}), useSqlConnect) {
+  const std::string dsn = "IncompleteSSHTunnelProperties";
   std::string connectionString =
       "DRIVER={Amazon DocumentDB};"
       "HOSTNAME=host.com;"
@@ -148,27 +199,62 @@ BOOST_AUTO_TEST_CASE(TestConnectionIncompleteSSHTunnelProperties) {
       "SSH_USER=sshUser;"
       "SSH_HOST=sshHost;";
 
-  ExpectConnectionReject(
-      connectionString,
-      "01S00: If using an internal SSH tunnel, all of ssh_host, ssh_user, "
-      "ssh_private_key_file are required to connect.");
+  if (useSqlConnect) {
+    std::string username;
+    std::string password;
+    WriteDsnConfiguration(dsn, connectionString, username, password);
+    ExpectConnectionReject(
+        dsn, username, password, "01S00",
+        "If using an internal SSH tunnel, all of ssh_host, ssh_user, "
+        "ssh_private_key_file are required to connect.");
+  } else {
+    ExpectConnectionReject(
+        connectionString, "01S00",
+        "If using an internal SSH tunnel, all of ssh_host, ssh_user, "
+        "ssh_private_key_file are required to connect.");
+  }
 
   Disconnect();
+
+  if (useSqlConnect) {
+    DeleteDsnConfiguration(dsn);
+  }
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionInvalidUser) {
+BOOST_DATA_TEST_CASE_F(ConnectionTestSuiteFixture, TestConnectionInvalidUser,
+                       data::make({false, true}), useSqlConnect) {
+  const std::string dsn = "InvalidUser";
   std::string connectionString;
   CreateDsnConnectionStringForLocalServer(connectionString, "", "invaliduser");
 
-  ExpectConnectionReject(
-      connectionString,
-      "08001: Failed to establish connection with the host.\n"
-      "Invalid username or password or user is not authorized on database "
-      "'odbc-test'. "
-      "Please check your settings. Authorization failed for user 'invaliduser' "
-      "on database 'admin' with mechanism");
+  if (useSqlConnect) {
+    std::string username;
+    std::string password;
+    WriteDsnConfiguration(dsn, connectionString, username, password);
+    ExpectConnectionReject(
+        dsn, username, password, "08001",
+        "Failed to establish connection with the host.\n"
+        "Invalid username or password or user is not authorized on database "
+        "'odbc-test'. "
+        "Please check your settings. Authorization failed for user "
+        "'invaliduser' "
+        "on database 'admin' with mechanism");
+  } else {
+    ExpectConnectionReject(
+        connectionString, "08001",
+        "Failed to establish connection with the host.\n"
+        "Invalid username or password or user is not authorized on database "
+        "'odbc-test'. "
+        "Please check your settings. Authorization failed for user "
+        "'invaliduser' "
+        "on database 'admin' with mechanism");
+  }
 
   Disconnect();
+
+  if (useSqlConnect) {
+    DeleteDsnConfiguration(dsn);
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

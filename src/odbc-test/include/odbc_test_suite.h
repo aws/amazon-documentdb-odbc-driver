@@ -28,6 +28,10 @@
 #include <boost/test/unit_test.hpp>
 
 #include <documentdb/odbc/common/platform_utils.h>
+#include <documentdb/odbc/config/configuration.h>
+#include <documentdb/odbc/config/connection_string_parser.h>
+
+using namespace documentdb::odbc::config;
 
 #ifndef BOOST_TEST_CONTEXT
 #define BOOST_TEST_CONTEXT(...)
@@ -69,15 +73,76 @@ struct OdbcTestSuite {
   void Connect(const std::string& connectStr);
 
   /**
+   * Establish connection to node using default handles.
+   *
+   * @param dsn The DSN of the connection
+   * @param username user name
+   * @param password password
+   */
+  void Connect(const std::string& dsn, const std::string& username,
+               const std::string& password);
+
+  /**
+   * Parse the connection string into configuration.
+   *
+   * @param connectionString the connection string to parse.
+   * @param config the configuration to update.
+   */
+  void ParseConnectionString(const std::string& connectionString,
+                             Configuration& config);
+
+  /**
+   * Writes the DSN configuration
+   *
+   * @param dsn The DSN to write
+   * @param config The configuration to write
+   */
+  void WriteDsnConfiguration(const Configuration& config);
+
+  /**
+   * Writes the DSN configuration for a local connection.
+   * Ensures the username and password are not set in the DSN.
+   * Instead sets the username and password parameters to be used
+   * with SQLConnect.
+   *
+   * @param dsn the DSN to write configuration for.
+   * @param username the updated username for the connection.
+   * @param password the updated password for the connection.
+   */
+  void WriteDsnConfiguration(const std::string& dsn,
+                             const std::string& connectionString,
+                             std::string& username, std::string& password);
+
+  /**
+   * Removes the DSN configuration
+   *
+   * @param dsn The DSN to write
+   */
+  void DeleteDsnConfiguration(const std::string& dsn);
+
+  /**
    * Expect connection to be rejected by the node.
    *
    * @param connectStr Connection string.
    * @return SQL State.
    */
-  std::string ExpectConnectionReject(
-      const std::string& connectStr,
-      const std::string& expectedError =
-          "08001: Failed to establish connection with the host.");
+  std::string ExpectConnectionReject(const std::string& connectStr,
+                                     const std::string& expectedState,
+                                     const std::string& expectedError);
+
+  /**
+   * Expect connection to be rejected by the node.
+   *
+   * @param dsn the DSN for the connection
+   * @param username the username for the connection.
+   * @param password the password for the connection.
+   * @return SQL State.
+   */
+  std::string ExpectConnectionReject(const std::string& dsn,
+                                     const std::string& username,
+                                     const std::string& password,
+                                     const std::string& expectedState,
+                                     const std::string& expectedError);
 
   /**
    * Disconnect.

@@ -16,22 +16,21 @@
  */
 
 #include "documentdb/odbc/dsn_config.h"
-
 #include <documentdb/odbc/common/fixed_size_array.h>
-
 #include "documentdb/odbc/config/config_tools.h"
 #include "documentdb/odbc/config/connection_string_parser.h"
 #include "documentdb/odbc/system/odbc_constants.h"
 #include "documentdb/odbc/utility.h"
 
 using namespace documentdb::odbc::config;
+using namespace documentdb::odbc::utility;
 
 #define BUFFER_SIZE (1024 * 1024)
 #define CONFIG_FILE u8"ODBC.INI"
 
 namespace documentdb {
 namespace odbc {
-void ThrowLastSetupError() {
+void GetLastSetupError(DocumentDbError& error) {
   DWORD code;
   common::FixedSizeArray< SQLWCHAR > msg(BUFFER_SIZE);
 
@@ -43,15 +42,26 @@ void ThrowLastSetupError() {
       << utility::SqlWcharToString(msg.GetData(), msg.GetSize())
       << "\", Code: " << code;
 
-  throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC, buf.str().c_str());
+  error = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
+                          buf.str().c_str());
 }
 
-void WriteDsnString(const char* dsn, const char* key, const char* value) {
+void ThrowLastSetupError() {
+  DocumentDbError error;
+  GetLastSetupError(error);
+  throw error;
+}
+
+bool WriteDsnString(const char* dsn, const char* key, const char* value,
+                    DocumentDbError& error) {
   if (!SQLWritePrivateProfileString(utility::ToWCHARVector(dsn).data(),
                                     utility::ToWCHARVector(key).data(),
                                     utility::ToWCHARVector(value).data(),
-                                    utility::ToWCHARVector(CONFIG_FILE).data()))
-    ThrowLastSetupError();
+          utility::ToWCHARVector(CONFIG_FILE).data())) {
+    GetLastSetupError(error);
+    return false;
+  }
+  return true;
 }
 
 SettableValue< std::string > ReadDsnString(const char* dsn,
@@ -284,6 +294,61 @@ void ReadDsnConfiguration(const char* dsn, Configuration& config,
   if (defaultFetchSize.IsSet() && !config.IsDefaultFetchSizeSet()
       && defaultFetchSize.GetValue() > 0)
     config.SetDefaultFetchSize(defaultFetchSize.GetValue());
+}
+
+bool WriteDsnConfiguration(const config::Configuration& config, DocumentDbError& error) {
+  if (config.GetDsn("").empty() || config.GetDriver().empty()) {
+    return false;
+  }
+  return RegisterDsn(
+      config, reinterpret_cast< const LPCSTR >(config.GetDriver().c_str()), error);
+}
+
+bool DeleteDsnConfiguration(const std::string dsn, DocumentDbError& error) {
+  return UnregisterDsn(dsn, error);
+}
+
+bool RegisterDsn(const Configuration& config, const LPCSTR driver,
+                 DocumentDbError& error) {
+  using namespace documentdb::odbc::config;
+  using documentdb::odbc::common::LexicalCast;
+
+  typedef Configuration::ArgumentMap ArgMap;
+
+  const char* dsn = config.GetDsn().c_str();
+
+  std::vector< SQLWCHAR > dsn0 = ToWCHARVector(dsn);
+  std::vector< SQLWCHAR > driver0 = ToWCHARVector(driver);
+  if (!SQLWriteDSNToIni(dsn0.data(), driver0.data())) {
+    GetLastSetupError(error);
+    return false;
+  }
+
+  ArgMap map;
+
+  config.ToMap(map);
+
+  map.erase(ConnectionStringParser::Key::dsn);
+  map.erase(ConnectionStringParser::Key::driver);
+
+  for (ArgMap::const_iterator it = map.begin(); it != map.end(); ++it) {
+    const std::string& key = it->first;
+    const std::string& value = it->second;
+
+    if (!WriteDsnString(dsn, key.c_str(), value.c_str(), error)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool UnregisterDsn(const std::string& dsn, DocumentDbError& error) {
+  if (!SQLRemoveDSNFromIni(ToWCHARVector(dsn).data())) {
+    GetLastSetupError(error);
+    return false;
+  }
+  return true;
 }
 }  // namespace odbc
 }  // namespace documentdb
