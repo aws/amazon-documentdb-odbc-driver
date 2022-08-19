@@ -342,7 +342,7 @@ class DsnConfigurationWindow : public CustomWindow {
   /** Edit balloon for DSN. */
   std::unique_ptr< EDITBALLOONTIP > nameBalloon;
 
-  /** Indicator if whether edit balloon was previously shown. */
+  /** DSN name edit balloon indicator. */
   bool shownNameBalloon = false;
 
   /** Scan method ComboBox **/
