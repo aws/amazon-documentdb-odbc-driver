@@ -237,7 +237,7 @@ void ConnectionStringParser::HandleAttributePair(
     conv << value;
     conv >> numValue;
 
-    if (numValue <= 0 || numValue > UINT32_MAX) {
+    if (numValue < 0 || numValue > UINT32_MAX) {
       if (diag) {
         diag->AddStatusRecord(
             SqlState::S01S02_OPTION_VALUE_CHANGED,
