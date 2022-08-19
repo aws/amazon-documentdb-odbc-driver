@@ -18,6 +18,10 @@
 #ifndef _DOCUMENTDB_ODBC_SYSTEM_UI_DSN_CONFIGURATION_WINDOW
 #define _DOCUMENTDB_ODBC_SYSTEM_UI_DSN_CONFIGURATION_WINDOW
 
+#include <memory>
+#include <vector>
+#include <map>
+
 #include "documentdb/odbc/config/configuration.h"
 #include "documentdb/odbc/system/ui/custom_window.h"
 
@@ -93,7 +97,16 @@ class DsnConfigurationWindow : public CustomWindow {
       PASSWORD_LABEL,
       PASSWORD_EDIT,
       OK_BUTTON,
-      CANCEL_BUTTON
+      CANCEL_BUTTON,
+      TEST_LABEL,
+      TEST_BUTTON,
+      TABS,
+      TABS_GROUP_BOX,
+      VERSION_LABEL,
+      LOG_PATH_BROWSE_BUTTON,
+      SSH_PRIV_KEY_FILE_BROWSE_BUTTON,
+      SSH_KNOW_HOSTS_FILE_BROWSE_BUTTON,
+      CA_FILE_BROWSE_BUTTON
     };
   };
 
@@ -111,6 +124,17 @@ class DsnConfigurationWindow : public CustomWindow {
 
   // Standard button height.
   enum { BUTTON_HEIGHT = 25 };
+
+  // TAB Group box height
+  enum { TAB_GROUP_BOX_HEIGHT = 205 };
+
+  // TAB control height
+  enum { TAB_CTRL_HEIGHT = 15 };
+
+  // Index into tab control items
+  struct TabIndex {
+    enum Type { TLS, SSH_TUNNEL, SCHEMA, LOGGING, ADDITIONAL };
+  };
 
  public:
   /**
@@ -143,6 +167,11 @@ class DsnConfigurationWindow : public CustomWindow {
 
  private:
   DOCUMENTDB_NO_COPY_ASSIGNMENT(DsnConfigurationWindow)
+
+  /**
+   * Tests the connection with the current values from the dialog.
+   */
+  void TestConnection() const;
 
   /**
    * Retrieves current values from the children and stores
@@ -211,6 +240,16 @@ class DsnConfigurationWindow : public CustomWindow {
   int CreateConnectionSettingsGroup(int posX, int posY, int sizeX);
 
   /**
+   * Create tab control
+   *
+   * @param posX X position.
+   * @param posY Y position.
+   * @param sizeX Width.
+   * @return Size by Y.
+   */
+  int CreateTabs(int posX, int posY, int sizeX);
+
+  /**
    * Create internal SSH tunnel settings group box.
    *
    * @param posX X position.
@@ -260,6 +299,31 @@ class DsnConfigurationWindow : public CustomWindow {
    */
   int CreateAdditionalSettingsGroup(int posX, int posY, int sizeX);
 
+  /**
+   * Create test settings group box.
+   *
+   * @param posX X position.
+   * @param posY Y position.
+   * @param sizeX Width.
+   * @return Size by Y.
+   */
+  int CreateTestSettingsGroup(int posX, int posY, int sizeX);
+
+  /**
+   * Called when the selected tab index is changed.
+   *
+   * @param idx the index of the currently selected tab.
+   */
+  void OnSelectedTabChange(TabIndex::Type idx);
+
+  /**
+   * Set the controls in a tab group to be visible or hidden.
+   *
+   * @param idx the index of the tab group to set.
+   * @param isVisible indicator of whether to set visible or hidden.
+   */
+  void SetTabGroupVisible(TabIndex::Type idx, bool isVisible = true);
+
   /** Window width. */
   int width;
 
@@ -269,26 +333,17 @@ class DsnConfigurationWindow : public CustomWindow {
   /** Connection settings group box. */
   std::unique_ptr< Window > connectionSettingsGroupBox;
 
-  /** SSH settings group box. */
-  std::unique_ptr< Window > sshSettingsGroupBox;
-
-  /** Log settings group box. */
-  std::unique_ptr< Window > logSettingsGroupBox;
-
-  /** TLS settings group box. */
-  std::unique_ptr< Window > tlsSettingsGroupBox;
-
-  /** Schema generation and discovery settings group box. */
-  std::unique_ptr< Window > schemaSettingsGroupBox;
-
-  /** Additional settings group box. */
-  std::unique_ptr< Window > additionalSettingsGroupBox;
-
   /** DSN name edit field label. */
   std::unique_ptr< Window > nameLabel;
 
   /** DSN name edit field. */
   std::unique_ptr< Window > nameEdit;
+
+  /** Edit balloon for DSN. */
+  std::unique_ptr< EDITBALLOONTIP > nameBalloon;
+
+  /** Indicator if whether edit balloon was previously shown. */
+  bool shownNameBalloon = false;
 
   /** Scan method ComboBox **/
   std::unique_ptr< Window > scanMethodComboBox;
@@ -332,11 +387,8 @@ class DsnConfigurationWindow : public CustomWindow {
   /** SSH private key file label. */
   std::unique_ptr< Window > sshPrivateKeyFileLabel;
 
-  /** SSH private key passphrase edit. */
-  std::unique_ptr< Window > sshPrivateKeyPassphraseEdit;
-
-  /** SSH private key passphrase label. */
-  std::unique_ptr< Window > sshPrivateKeyPassphraseLabel;
+  /** SSH private key file browse button */
+  std::unique_ptr< Window > sshPrivateKeyFileBrowseButton;
 
   /** SSH strict host key checking checkBox. */
   std::unique_ptr< Window > sshStrictHostKeyCheckingCheckBox;
@@ -346,6 +398,9 @@ class DsnConfigurationWindow : public CustomWindow {
 
   /** SSH know host file label. */
   std::unique_ptr< Window > sshKnownHostsFileLabel;
+
+  /** SSH know host file browse button */
+  std::unique_ptr< Window > sshKnownHostsFileBrowseButton;
 
   /** Log Level ComboBox **/
   std::unique_ptr< Window > logLevelComboBox;
@@ -358,6 +413,9 @@ class DsnConfigurationWindow : public CustomWindow {
 
   /** Log Path label. */
   std::unique_ptr< Window > logPathLabel;
+
+  /** Log Path browse button */
+  std::unique_ptr< Window > logPathBrowseButton;
 
   /** Application name edit. */
   std::unique_ptr< Window > appNameEdit;
@@ -392,11 +450,41 @@ class DsnConfigurationWindow : public CustomWindow {
   /** Default fetch size label. */
   std::unique_ptr< Window > defaultFetchSizeLabel;
 
-  /** Ok button. */
-  std::unique_ptr< Window > okButton;
+  /** Save button. */
+  std::unique_ptr< Window > saveButton;
 
   /** Cancel button. */
   std::unique_ptr< Window > cancelButton;
+
+  /** Version label. */
+  std::unique_ptr< Window > versionLabel;
+
+  /** Test button. */
+  std::unique_ptr< Window > testButton;
+
+  /** Test Connection group box. */
+  std::unique_ptr< Window > testSettingsGroupBox;
+
+  /** Test connection label. */
+  std::unique_ptr< Window > testLabel;
+
+  /** TLS tab group controls collection. */
+  std::vector< Window* > tlsGroupControls;
+
+  /** SSH Tunnel tab group controls collection. */
+  std::vector< Window* > sshGroupControls;
+
+  /** Schema tab group controls collection. */
+  std::vector< Window* > schemaGroupControls;
+
+  /** Logging tab group controls collection. */
+  std::vector< Window* > loggingGroupControls;
+
+  /** Additional settings tab group controls collection. */
+  std::vector< Window* > additionalGroupControls;
+
+  /** Map of tab group controls. */
+  std::map< TabIndex::Type, std::vector< Window* > > tabGroupControls;
 
   /** TLS encryption checkBox. */
   std::unique_ptr< Window > tlsCheckBox;
@@ -410,11 +498,20 @@ class DsnConfigurationWindow : public CustomWindow {
   /** TLS certificate authority file edit. */
   std::unique_ptr< Window > tlsCaFileEdit;
 
+  /** TLS certificate authority file browse button. */
+  std::unique_ptr< Window > tlsCaFileBrowseButton;
+
   /** Database label. */
   std::unique_ptr< Window > databaseLabel;
 
   /** Database edit. */
   std::unique_ptr< Window > databaseEdit;
+
+  /** Database edit balloon. */
+  std::unique_ptr< EDITBALLOONTIP > databaseBalloon;
+
+  /** Database edit balloon indicator. */
+  bool shownDatabaseBalloon = false;
 
   /** Hostname label. */
   std::unique_ptr< Window > hostnameLabel;
@@ -422,11 +519,23 @@ class DsnConfigurationWindow : public CustomWindow {
   /** Hostname edit. */
   std::unique_ptr< Window > hostnameEdit;
 
+  /** Hostname edit balloon. */
+  std::unique_ptr< EDITBALLOONTIP > hostnameBalloon;
+
+  /** Database edit balloon indicator. */
+  bool shownHostnameBalloon = false;
+
   /** Port label. */
   std::unique_ptr< Window > portLabel;
 
   /** Port edit. */
   std::unique_ptr< Window > portEdit;
+
+  /** Port edit balloon. */
+  std::unique_ptr< EDITBALLOONTIP > portBalloon;
+
+  /** Port edit balloon indicator. */
+  bool shownPortBalloon = false;
 
   /** User label. */
   std::unique_ptr< Window > userLabel;
@@ -439,6 +548,15 @@ class DsnConfigurationWindow : public CustomWindow {
 
   /** Password edit. */
   std::unique_ptr< Window > passwordEdit;
+
+  /** Tabs. */
+  std::unique_ptr< Window > tabs;
+
+  /** Tabs group box. */
+  std::unique_ptr< Window > tabsGroupBox;
+
+  /** Previous tabs item index. */
+  TabIndex::Type prevSelectedTabIndex;
 
   /** Configuration. */
   config::Configuration& config;

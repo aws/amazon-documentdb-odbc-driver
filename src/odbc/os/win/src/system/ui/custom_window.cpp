@@ -18,6 +18,7 @@
 #include "documentdb/odbc/system/ui/custom_window.h"
 
 #include <Windowsx.h>
+#include <CommCtrl.h>
 
 namespace documentdb {
 namespace odbc {
@@ -172,6 +173,29 @@ std::unique_ptr< Window > CustomWindow::CreateComboBox(
 
   child->Create(WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_TABSTOP, posX,
                 posY, sizeX, sizeY, id);
+
+  return child;
+}
+
+std::unique_ptr< Window > CustomWindow::CreateTabControl(int posX, int posY, int sizeX,
+                                                  int sizeY,
+                                                  const std::wstring& title,
+                                                  int id, int style) {
+  std::unique_ptr< Window > child(new Window(this, WC_TABCONTROL, title));
+
+  child->Create(WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_TABSTOP | style,
+                posX, posY, sizeX, sizeY, id);
+
+  return child;
+}
+
+std::unique_ptr< EDITBALLOONTIP > CustomWindow::CreateBalloon(
+    const wchar_t* title, const wchar_t* text, int icon) {
+  std::unique_ptr< EDITBALLOONTIP > child(std::make_unique< EDITBALLOONTIP >());
+  child->cbStruct = sizeof(EDITBALLOONTIP);
+  child->pszTitle = title;
+  child->pszText = text;
+  child->ttiIcon = icon;
 
   return child;
 }

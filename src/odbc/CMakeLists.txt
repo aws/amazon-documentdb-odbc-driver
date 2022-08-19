@@ -44,9 +44,9 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/binary/binary_reader.cpp
         src/binary/binary_type.cpp
         src/binary/binary_raw_reader.cpp
-	src/cluster/cluster_group.cpp
-	src/cluster/cluster_node.cpp
-	src/cluster/ignite_cluster.cpp
+	    src/cluster/cluster_group.cpp
+	    src/cluster/cluster_node.cpp
+	    src/cluster/ignite_cluster.cpp
         src/common_types.cpp
         src/common/big_integer.cpp
         src/common/bits.cpp

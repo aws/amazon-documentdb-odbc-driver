@@ -30,6 +30,8 @@
 #include "documentdb/odbc/read_preference.h"
 #include "documentdb/odbc/scan_method.h"
 
+#define DRIVER_VERSION "00.01.0000"
+
 namespace documentdb {
 namespace odbc {
 namespace config {
