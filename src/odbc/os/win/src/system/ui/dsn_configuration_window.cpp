@@ -654,14 +654,15 @@ int DsnConfigurationWindow::CreateTestSettingsGroup(int posX, int posY,
 
   std::wstring wVal;
 
-  wVal = utility::FromUtf8(config.GetUser());
+  // Ignore any existing setting in the DSN for user/password.
+  wVal = L"";
   userLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"User :",
                           ChildId::USER_LABEL);
   userEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                         ChildId::USER_EDIT);
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  wVal = utility::FromUtf8(config.GetPassword());
+  wVal = L"";
   passwordLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                               L"Password:", ChildId::PASSWORD_LABEL);
   passwordEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
@@ -691,6 +692,7 @@ void DsnConfigurationWindow::TestConnection() const {
   // Don't want to commit the changes until OK button is pressed.
   config::Configuration tempConfig;
   RetrieveParameters(tempConfig);
+  RetrieveTestParameters(tempConfig);
   std::vector< SQLWCHAR > vDsn =
       utility::ToWCHARVector(tempConfig.ToConnectString());
 
@@ -1099,8 +1101,6 @@ void DsnConfigurationWindow::RetrieveConnectionParameters(
   std::wstring hostnameWStr;
   std::wstring portWStr;
   std::wstring databaseWStr;
-  std::wstring userWStr;
-  std::wstring passwordWStr;
 
   nameEdit->GetText(dsnWStr);
   std::string dsnStr = utility::ToUtf8(dsnWStr);
@@ -1110,14 +1110,10 @@ void DsnConfigurationWindow::RetrieveConnectionParameters(
   hostnameEdit->GetText(hostnameWStr);
   portEdit->GetText(portWStr);
   databaseEdit->GetText(databaseWStr);
-  userEdit->GetText(userWStr);
-  passwordEdit->GetText(passwordWStr);
 
   std::string hostnameStr = utility::ToUtf8(hostnameWStr);
   std::string portStr = utility::ToUtf8(portWStr);
   std::string databaseStr = utility::ToUtf8(databaseWStr);
-  std::string userStr = utility::ToUtf8(userWStr);
-  std::string passwordStr = utility::ToUtf8(passwordWStr);
 
   int16_t port = common::LexicalCast< int16_t >(portStr);
 
@@ -1130,14 +1126,10 @@ void DsnConfigurationWindow::RetrieveConnectionParameters(
   LOG_MSG("Port:     " << portStr);
   LOG_MSG("Database: " << databaseStr);
 
-  // username and password intentionally not logged for security reasons
-
   cfg.SetDsn(dsnStr);
   cfg.SetPort(port);
   cfg.SetHostname(hostnameStr);
   cfg.SetDatabase(databaseStr);
-  cfg.SetUser(userStr);
-  cfg.SetPassword(passwordStr);
 }
 
 void DsnConfigurationWindow::RetrieveSshParameters(
@@ -1308,6 +1300,22 @@ void DsnConfigurationWindow::RetrieveAdditionalParameters(
   cfg.SetLoginTimeoutSeconds(loginTimeoutSec);
   cfg.SetReplicaSet(replicaSetStr);
   cfg.SetDefaultFetchSize(fetchSize);
+}
+
+void DsnConfigurationWindow::RetrieveTestParameters(config::Configuration& cfg) const {
+  std::wstring userWStr;
+  std::wstring passwordWStr;
+
+  userEdit->GetText(userWStr);
+  passwordEdit->GetText(passwordWStr);
+
+  std::string userStr = utility::ToUtf8(userWStr);
+  std::string passwordStr = utility::ToUtf8(passwordWStr);
+
+  // username and password intentionally not logged for security reasons
+
+  cfg.SetUser(userStr);
+  cfg.SetPassword(passwordStr);
 }
 }  // namespace ui
 }  // namespace system

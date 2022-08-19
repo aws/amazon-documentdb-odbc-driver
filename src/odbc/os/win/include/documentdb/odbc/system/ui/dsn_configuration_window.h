@@ -230,6 +230,14 @@ class DsnConfigurationWindow : public CustomWindow {
   void RetrieveAdditionalParameters(config::Configuration& cfg) const;
 
   /**
+   * Retrieves current values from the test connection UI group and
+   * stores them to the specified configuration.
+   *
+   * @param cfg Configuration.
+   */
+  void RetrieveTestParameters(config::Configuration& cfg) const;
+
+  /**
    * Create connection settings group box.
    *
    * @param posX X position.
