@@ -1002,7 +1002,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
           if (GetFileNameFromBrowse(sshKnownHostsFileBrowseButton->GetHandle(),
                                     initPath.data(), initPath.size(), nullptr,
                                     L"", nullptr,
-                                    L"Choose known hosts file.")) {
+                                    L"Choose SSH known hosts file.")) {
             sshKnownHostsFileEdit->SetText(initPath.data());
           }
 
