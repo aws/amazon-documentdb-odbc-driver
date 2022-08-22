@@ -58,10 +58,13 @@ class DsnConfigurationWindow : public CustomWindow {
       SSH_STRICT_HOST_KEY_CHECKING_CHECK_BOX,
       SSH_KNOWN_HOSTS_FILE_EDIT,
       SSH_KNOWN_HOSTS_FILE_LABEL,
+      SSH_PRIV_KEY_FILE_BROWSE_BUTTON,
+      SSH_KNOW_HOSTS_FILE_BROWSE_BUTTON,
       LOG_LEVEL_LABEL,
       LOG_LEVEL_COMBO_BOX,
       LOG_PATH_LABEL,
       LOG_PATH_EDIT,
+      LOG_PATH_BROWSE_BUTTON,
       APP_NAME_EDIT,
       APP_NAME_LABEL,
       LOGIN_TIMEOUT_SEC_EDIT,
@@ -84,6 +87,7 @@ class DsnConfigurationWindow : public CustomWindow {
       TLS_ALLOW_INVALID_HOSTNAMES_CHECK_BOX,
       TLS_CA_FILE_EDIT,
       TLS_CA_FILE_LABEL,
+      TLS_CA_FILE_BROWSE_BUTTON,
       DRIVER_LABEL,
       DRIVER_EDIT,
       DATABASE_LABEL,
@@ -103,10 +107,6 @@ class DsnConfigurationWindow : public CustomWindow {
       TABS,
       TABS_GROUP_BOX,
       VERSION_LABEL,
-      LOG_PATH_BROWSE_BUTTON,
-      SSH_PRIV_KEY_FILE_BROWSE_BUTTON,
-      SSH_KNOW_HOSTS_FILE_BROWSE_BUTTON,
-      CA_FILE_BROWSE_BUTTON
     };
   };
 
@@ -362,14 +362,26 @@ class DsnConfigurationWindow : public CustomWindow {
   /** Scan limit field label. */
   std::unique_ptr< Window > scanLimitLabel;
 
-  /** Scan limit field. */
+  /** Scan limit edit field. */
   std::unique_ptr< Window > scanLimitEdit;
+
+  /** Edit balloon for scan limit. */
+  std::unique_ptr< EDITBALLOONTIP > scanLimitBalloon;
+
+  /** Scan limit edit balloon indicator. */
+  bool shownScanLimitBalloon = false;
 
   /** DSN schema edit field label. */
   std::unique_ptr< Window > schemaLabel;
 
   /** DSN schema edit field. */
   std::unique_ptr< Window > schemaEdit;
+
+  /** Edit balloon for scan limit. */
+  std::unique_ptr< EDITBALLOONTIP > schemaBalloon;
+
+  /** Scan limit edit balloon indicator. */
+  bool shownSchemaBalloon = false;
 
   /** Refresh DSN schema checkBox. */
   std::unique_ptr< Window > refreshSchemaCheckBox;
@@ -437,6 +449,12 @@ class DsnConfigurationWindow : public CustomWindow {
   /** Login Timeout (seconds) label. */
   std::unique_ptr< Window > loginTimeoutSecLabel;
 
+  /** Login Timeout (seconds) edit balloon. */
+  std::unique_ptr< EDITBALLOONTIP > loginTimeoutSecBalloon;
+
+  /** Login Timeout (seconds) edit balloon indicator. */
+  bool shownLoginTimeoutSecBalloon = false;
+
   /** Read Preference ComboBox **/
   std::unique_ptr< Window > readPreferenceComboBox;
 
@@ -457,6 +475,12 @@ class DsnConfigurationWindow : public CustomWindow {
 
   /** Default fetch size label. */
   std::unique_ptr< Window > defaultFetchSizeLabel;
+
+  /** Login Timeout (seconds) edit balloon. */
+  std::unique_ptr< EDITBALLOONTIP > defaultFetchSizeBalloon;
+
+  /** Login Timeout (seconds) edit balloon indicator. */
+  bool shownDefaultFetchSizeBalloon = false;
 
   /** Save button. */
   std::unique_ptr< Window > saveButton;

@@ -33,7 +33,7 @@
   nameEdit->HasText() && databaseEdit->HasText() && hostnameEdit->HasText() \
       && portEdit->HasText() && userEdit->HasText() && passwordEdit->HasText()
 
-#define VALIDATE_FOR_OK()                                                   \
+#define VALIDATE_FOR_SAVE()                                                   \
   nameEdit->HasText() && databaseEdit->HasText() && hostnameEdit->HasText() \
       && portEdit->HasText()
 
@@ -51,13 +51,20 @@ DsnConfigurationWindow::DsnConfigurationWindow(Window* parent,
       tlsCheckBox(),
       nameLabel(),
       nameEdit(),
+      nameBalloon(),
+      shownNameBalloon(false),
       scanMethodLabel(),
       scanMethodComboBox(),
       scanLimitLabel(),
       scanLimitEdit(),
+      scanLimitBalloon(),
+      shownScanLimitBalloon(false),
       schemaLabel(),
       schemaEdit(),
+      schemaBalloon(),
+      shownSchemaBalloon(false),
       refreshSchemaCheckBox(),
+      schemaGroupControls(),
       sshEnableCheckBox(),
       sshUserLabel(),
       sshUserEdit(),
@@ -65,13 +72,18 @@ DsnConfigurationWindow::DsnConfigurationWindow(Window* parent,
       sshHostEdit(),
       sshPrivateKeyFileLabel(),
       sshPrivateKeyFileEdit(),
+      sshPrivateKeyFileBrowseButton(),
       sshStrictHostKeyCheckingCheckBox(),
       sshKnownHostsFileLabel(),
       sshKnownHostsFileEdit(),
+      sshKnownHostsFileBrowseButton(),
+      sshGroupControls(),
       logLevelLabel(),
       logLevelComboBox(),
       logPathLabel(),
       logPathEdit(),
+      logPathBrowseButton(),
+      loggingGroupControls(),
       appNameLabel(),
       appNameEdit(),
       readPreferenceLabel(),
@@ -79,23 +91,48 @@ DsnConfigurationWindow::DsnConfigurationWindow(Window* parent,
       replicaSetLabel(),
       replicaSetEdit(),
       retryReadsCheckBox(),
+      loginTimeoutSecEdit(),
+      loginTimeoutSecLabel(),
+      loginTimeoutSecBalloon(),
+      shownLoginTimeoutSecBalloon(false),
       defaultFetchSizeLabel(),
       defaultFetchSizeEdit(),
+      defaultFetchSizeBalloon(),
+      shownDefaultFetchSizeBalloon(false),
+      additionalGroupControls(),
       databaseLabel(),
       databaseEdit(),
+      databaseBalloon(),
+      shownDatabaseBalloon(false),
       hostnameLabel(),
       hostnameEdit(),
+      hostnameBalloon(),
+      shownHostnameBalloon(false),
       portLabel(),
       portEdit(),
-      userLabel(),
-      userEdit(),
-      passwordLabel(),
-      passwordEdit(),
+      portBalloon(),
+      shownPortBalloon(false),
       saveButton(),
       cancelButton(),
       config(config),
       accepted(false),
       created(false),
+      versionLabel(),
+      userLabel(),
+      userEdit(),
+      passwordLabel(),
+      passwordEdit(),
+      testButton(),
+      testSettingsGroupBox(),
+      testLabel(),
+      tlsAllowInvalidHostnamesCheckBox(),
+      tlsCaFileLabel(),
+      tlsCaFileEdit(),
+      tlsCaFileBrowseButton(),
+      tlsGroupControls(),
+      tabGroupControls(),
+      tabs(),
+      tabsGroupBox(),
       prevSelectedTabIndex(TabIndex::Type::TLS) {
   // No-op.
 }
@@ -198,7 +235,7 @@ void DsnConfigurationWindow::OnCreate() {
   // check whether the required fields are filled. If not, Ok button is
   // disabled.
   created = true;
-  saveButton->SetEnabled(VALIDATE_FOR_OK());
+  saveButton->SetEnabled(VALIDATE_FOR_SAVE());
   testButton->SetEnabled(VALIDATE_FOR_TEST());
 }
 
@@ -455,7 +492,7 @@ int DsnConfigurationWindow::CreateTlsSettingsGroup(int posX, int posY,
                              ChildId::TLS_CA_FILE_EDIT);
   tlsCaFileBrowseButton = CreateButton(
       editPosX + editSizeX - BROWSE_BUTTON_WIDTH, rowPos, BROWSE_BUTTON_WIDTH,
-      ROW_HEIGHT, L"...", ChildId::CA_FILE_BROWSE_BUTTON);
+      ROW_HEIGHT, L"...", ChildId::TLS_CA_FILE_BROWSE_BUTTON);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -508,6 +545,8 @@ int DsnConfigurationWindow::CreateSchemaSettingsGroup(int posX, int posY,
                                L"Scan Limit:", ChildId::SCAN_LIMIT_LABEL);
   scanLimitEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                              ChildId::SCAN_LIMIT_EDIT, ES_NUMBER);
+  scanLimitBalloon = CreateBalloon(
+      L"Required", L"Scan limit must be a positive numeric value. Default 1000 will be used instead.", TTI_ERROR);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -516,6 +555,10 @@ int DsnConfigurationWindow::CreateSchemaSettingsGroup(int posX, int posY,
                             L"Schema Name:", ChildId::SCHEMA_LABEL);
   schemaEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                           ChildId::SCHEMA_EDIT);
+  schemaBalloon = CreateBalloon(
+      L"Required",
+      L"Schema name must not be blank. Default '_default' will be used instead.",
+      TTI_ERROR);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -603,6 +646,11 @@ int DsnConfigurationWindow::CreateAdditionalSettingsGroup(int posX, int posY,
   loginTimeoutSecEdit =
       CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                  ChildId::LOGIN_TIMEOUT_SEC_EDIT, ES_NUMBER);
+  loginTimeoutSecBalloon =
+      CreateBalloon(L"Required",
+                    L"Login timeout must be a positive numeric value. Default "
+                    L"0 will be used instead.",
+                    TTI_ERROR);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -622,6 +670,11 @@ int DsnConfigurationWindow::CreateAdditionalSettingsGroup(int posX, int posY,
   defaultFetchSizeEdit =
       CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                  ChildId::DEFAULT_FETCH_SIZE_EDIT, ES_NUMBER);
+  defaultFetchSizeBalloon =
+      CreateBalloon(L"Required",
+                    L"Fetch size must be a positive numeric value. Default "
+                    L"2000 will be used instead.",
+                    TTI_ERROR);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -805,7 +858,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
               Edit_HideBalloonTip(nameEdit->GetHandle());
               shownNameBalloon = false;
             }
-            saveButton->SetEnabled(VALIDATE_FOR_OK());
+            saveButton->SetEnabled(VALIDATE_FOR_SAVE());
             testButton->SetEnabled(VALIDATE_FOR_TEST());
           }
           break;
@@ -821,7 +874,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
               Edit_HideBalloonTip(hostnameEdit->GetHandle());
               shownHostnameBalloon = false;
             }
-            saveButton->SetEnabled(VALIDATE_FOR_OK());
+            saveButton->SetEnabled(VALIDATE_FOR_SAVE());
             testButton->SetEnabled(VALIDATE_FOR_TEST());
           }
           break;
@@ -836,7 +889,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
               Edit_HideBalloonTip(portEdit->GetHandle());
               shownPortBalloon = false;
             }
-            saveButton->SetEnabled(VALIDATE_FOR_OK());
+            saveButton->SetEnabled(VALIDATE_FOR_SAVE());
             testButton->SetEnabled(VALIDATE_FOR_TEST());
           }
           break;
@@ -853,7 +906,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
               Edit_HideBalloonTip(databaseEdit->GetHandle());
               shownDatabaseBalloon = false;
             }
-            saveButton->SetEnabled(VALIDATE_FOR_OK());
+            saveButton->SetEnabled(VALIDATE_FOR_SAVE());
             testButton->SetEnabled(VALIDATE_FOR_TEST());
           }
           break;
@@ -862,7 +915,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
         case ChildId::USER_EDIT:
         case ChildId::PASSWORD_EDIT: {
           if (created) {
-            saveButton->SetEnabled(VALIDATE_FOR_OK());
+            saveButton->SetEnabled(VALIDATE_FOR_SAVE());
             testButton->SetEnabled(VALIDATE_FOR_TEST());
           }
           break;
@@ -944,6 +997,78 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
           break;
         }
 
+        case ChildId::SCAN_LIMIT_EDIT: {
+          if (created) {
+            long scanLimit;
+            std::wstring wScanLimit;
+            wchar_t* pEnd;
+            scanLimitEdit->GetText(wScanLimit);
+            if (!shownScanLimitBalloon
+                && (!scanLimitEdit->HasText()
+                    || (scanLimit = std::wcstol(wScanLimit.c_str(), &pEnd, 10))
+                           <= 0)) {
+              Edit_ShowBalloonTip(scanLimitEdit->GetHandle(),
+                                  scanLimitBalloon.get());
+              shownScanLimitBalloon = true;
+            } else {
+              Edit_HideBalloonTip(scanLimitEdit->GetHandle());
+              shownScanLimitBalloon = false;
+            }
+          }
+          break;
+        }
+
+        case ChildId::SCHEMA_EDIT: {
+          if (created) {
+            if (!shownSchemaBalloon && !schemaEdit->HasText()) {
+              Edit_ShowBalloonTip(schemaEdit->GetHandle(),
+                                  schemaBalloon.get());
+              shownSchemaBalloon = true;
+            } else {
+              Edit_HideBalloonTip(schemaEdit->GetHandle());
+              shownSchemaBalloon = false;
+            }
+          }
+          break;
+        }
+
+        case ChildId::LOGIN_TIMEOUT_SEC_EDIT: {
+          if (created) {
+            if (!shownLoginTimeoutSecBalloon
+                && !loginTimeoutSecEdit->HasText()) {
+              Edit_ShowBalloonTip(loginTimeoutSecEdit->GetHandle(),
+                                  loginTimeoutSecBalloon.get());
+              shownLoginTimeoutSecBalloon = true;
+            } else {
+              Edit_HideBalloonTip(loginTimeoutSecEdit->GetHandle());
+              shownLoginTimeoutSecBalloon = false;
+            }
+          }
+          break;
+        }
+
+        case ChildId::DEFAULT_FETCH_SIZE_EDIT: {
+          if (created) {
+            long defaultFetchSize;
+            std::wstring wDefaultFetchSize;
+            wchar_t* pEnd;
+            defaultFetchSizeEdit->GetText(wDefaultFetchSize);
+            if (!shownDefaultFetchSizeBalloon
+                && (!defaultFetchSizeEdit->HasText()
+                    || (defaultFetchSize =
+                            std::wcstol(wDefaultFetchSize.c_str(), &pEnd, 10))
+                           <= 0)) {
+              Edit_ShowBalloonTip(defaultFetchSizeEdit->GetHandle(),
+                                  defaultFetchSizeBalloon.get());
+              shownDefaultFetchSizeBalloon = true;
+            } else {
+              Edit_HideBalloonTip(defaultFetchSizeEdit->GetHandle());
+              shownDefaultFetchSizeBalloon = false;
+            }
+          }
+          break;
+        }
+
         case ChildId::REFRESH_SCHEMA_CHECK_BOX: {
           refreshSchemaCheckBox->SetChecked(
               !refreshSchemaCheckBox->IsChecked());
@@ -1011,7 +1136,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
           break;
         }
 
-        case ChildId::CA_FILE_BROWSE_BUTTON: {
+        case ChildId::TLS_CA_FILE_BROWSE_BUTTON: {
           std::wstring initPathStr;
           tlsCaFileEdit->GetText(initPathStr);
           std::vector< wchar_t > initPath(initPathStr.begin(),
