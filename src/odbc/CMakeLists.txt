@@ -44,9 +44,9 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/binary/binary_reader.cpp
         src/binary/binary_type.cpp
         src/binary/binary_raw_reader.cpp
-	    src/cluster/cluster_group.cpp
-	    src/cluster/cluster_node.cpp
-	    src/cluster/ignite_cluster.cpp
+        src/cluster/cluster_group.cpp
+        src/cluster/cluster_node.cpp
+        src/cluster/ignite_cluster.cpp
         src/common_types.cpp
         src/common/big_integer.cpp
         src/common/bits.cpp
@@ -69,7 +69,7 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/impl/binary/binary_object_header.cpp
         src/impl/binary/binary_object_impl.cpp
         src/impl/binary/binary_field_meta.cpp
-	src/impl/binary/binary_type_updater_impl.cpp
+        src/impl/binary/binary_type_updater_impl.cpp
         src/impl/cache/cache_affinity_impl.cpp
         src/impl/cache/cache_impl.cpp
         src/impl/cache/query/query_batch.cpp
@@ -84,7 +84,7 @@ set(SOURCES src/app/application_data_buffer.cpp
         src/impl/interop/interop_memory.cpp
         src/impl/interop/interop_output_stream.cpp
         src/impl/interop/interop_target.cpp
-	src/impl/interop/interop_external_memory.cpp
+        src/impl/interop/interop_external_memory.cpp
         src/impl/handle_registry.cpp
         src/impl/ignite_binding_impl.cpp
         src/impl/ignite_environment.cpp
@@ -159,7 +159,7 @@ if (WIN32)
             os/win/src/system/ui/window.cpp
             os/win/src/common/concurrent_os.cpp
             os/win/src/common/platform_utils.cpp
-	    os/win/src/common/dynamic_load_os.cpp
+            os/win/src/common/dynamic_load_os.cpp
             src/jni/os/win/utils.cpp
             module.def
     )
@@ -169,7 +169,7 @@ else()
     list(APPEND SOURCES 
             os/linux/src/common/concurrent_os.cpp
             os/linux/src/common/platform_utils.cpp
-	    os/linux/src/common/dynamic_load_os.cpp
+            os/linux/src/common/dynamic_load_os.cpp
             src/jni/os/linux/utils.cpp
     )
 endif ()
