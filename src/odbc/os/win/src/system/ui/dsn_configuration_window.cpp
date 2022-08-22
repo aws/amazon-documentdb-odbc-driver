@@ -172,7 +172,7 @@ void DsnConfigurationWindow::Create() {
 
 int DsnConfigurationWindow::CreateTabs(int posX, int posY, int sizeX) {
   int rowPos = posY;
-  rowPos += INTERVAL /* + ROW_HEIGHT */;
+  rowPos += INTERVAL;
 
   tabs = CreateTabControl(posX, rowPos, sizeX, ROW_HEIGHT, L"Tabs", ChildId::TABS);
 
