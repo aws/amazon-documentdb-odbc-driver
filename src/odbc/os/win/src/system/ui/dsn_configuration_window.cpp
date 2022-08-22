@@ -1242,8 +1242,9 @@ void DsnConfigurationWindow::RetrieveConnectionParameters(
 
   int16_t port = common::LexicalCast< int16_t >(portStr);
 
+  // If invalid values, use default instead.
   if (port <= 0)
-    port = config.GetPort();
+    port = Configuration::DefaultValue::port;
 
   LOG_MSG("Retrieving arguments:");
   LOG_MSG("DSN:      " << dsnStr);
@@ -1360,9 +1361,11 @@ void DsnConfigurationWindow::RetrieveSchemaParameters(
   std::string schemaStr = utility::ToUtf8(schemaWStr);
 
   int32_t scanLimit = common::LexicalCast< int32_t >(scanLimitStr);
-
+  // If invalid values, use default instead.
   if (scanLimit <= 0)
-    scanLimit = config.GetScanLimit();
+    scanLimit = Configuration::DefaultValue::scanLimit;
+  if (schemaStr.empty())
+    schemaStr = Configuration::DefaultValue::schemaName;
 
   LOG_MSG("Scan method:    " << scanMethodStr);
   LOG_MSG("Scan limit      " << scanLimit);
@@ -1401,12 +1404,14 @@ void DsnConfigurationWindow::RetrieveAdditionalParameters(
 
   int32_t loginTimeoutSec = common::LexicalCast< int32_t >(loginTimeoutSecStr);
   // Note: zero indicates no limit on timeout.
+  // If invalid values, use default instead.
   if (loginTimeoutSec < 0)
-    loginTimeoutSec = config.GetLoginTimeoutSeconds();
+    loginTimeoutSec = Configuration::DefaultValue::loginTimeoutSec;
 
   int32_t fetchSize = common::LexicalCast< int32_t >(fetchSizeStr);
+  // If invalid values, use default instead.
   if (fetchSize <= 0)
-    fetchSize = config.GetDefaultFetchSize();
+    fetchSize = Configuration::DefaultValue::defaultFetchSize;
 
   LOG_MSG("Retrieving arguments:");
   LOG_MSG("Retry reads:              " << (retryReads ? "true" : "false"));
