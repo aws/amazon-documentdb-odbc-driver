@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE(TestValues) {
   CheckStrInfo(SQL_DRIVER_NAME, "Amazon DocumentDB");
   CheckStrInfo(SQL_DBMS_NAME, "Amazon DocumentDB");
   CheckStrInfo(SQL_DRIVER_ODBC_VER, "03.00");
-  CheckStrInfo(SQL_DRIVER_VER, DRIVER_VERSION);
+  CheckStrInfo(SQL_DRIVER_VER, Configuration::GetFormatedDriverVersion());
   CheckDbmsVerInfo();
   CheckStrInfo(SQL_COLUMN_ALIAS, "Y");
   CheckStrInfo(SQL_IDENTIFIER_QUOTE_CHAR, "\"");

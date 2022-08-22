@@ -185,6 +185,11 @@ target_link_libraries(${TARGET} ${JNI_LIBRARIES})
 target_link_libraries(${TARGET} mongo::mongocxx_shared) 
 
 add_definitions(-DUNICODE=1)
+add_definitions(-DPROJECT_VERSION=\"${CMAKE_PROJECT_VERSION}\")
+add_definitions(-DPROJECT_VERSION_MAJOR=${CMAKE_PROJECT_VERSION_MAJOR})
+add_definitions(-DPROJECT_VERSION_MINOR=${CMAKE_PROJECT_VERSION_MINOR})
+add_definitions(-DPROJECT_VERSION_PATCH=${CMAKE_PROJECT_VERSION_PATCH})
+
 if (WIN32)
     if (MSVC)
         # On Windows, min() and max() are defined macro. This causes a colision with MONGOCXX library.
