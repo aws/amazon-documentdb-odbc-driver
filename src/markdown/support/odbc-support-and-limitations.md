@@ -1,9 +1,12 @@
 # ODBC Support and Limitations
 
-// TODO create user Documentation
+## Connection Attributes
+| Connection attribute | Default | Support Value Change|
+|--------|------|-------|
+|SQL_ATTR_CONNECTION_DEAD| | No |
+|SQL_ATTR_LOGIN_TIMEOUT| | |
 
-//https://bitquill.atlassian.net/browse/AD-682
-
+## Statements Attributes
 Table of statement attributes supported by the Amazon DocumentDB ODBC driver.\
 Related function: `SQLSetStmtAttr`
 | Statement attribute | Default | Support Value Change|
