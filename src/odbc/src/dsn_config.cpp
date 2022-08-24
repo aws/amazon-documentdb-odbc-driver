@@ -42,8 +42,7 @@ void GetLastSetupError(DocumentDbError& error) {
       << utility::SqlWcharToString(msg.GetData(), msg.GetSize())
       << "\", Code: " << code;
 
-  error = DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
-                          buf.str().c_str());
+  error = DocumentDbError(code, buf.str().c_str());
 }
 
 void ThrowLastSetupError() {
@@ -54,12 +53,15 @@ void ThrowLastSetupError() {
 
 bool WriteDsnString(const char* dsn, const char* key, const char* value,
                     DocumentDbError& error) {
-  if (!SQLWritePrivateProfileString(utility::ToWCHARVector(dsn).data(),
-                                    utility::ToWCHARVector(key).data(),
-                                    utility::ToWCHARVector(value).data(),
+  if (!SQLWritePrivateProfileString(
+          utility::ToWCHARVector(dsn).data(),
+          utility::ToWCHARVector(key).data(),
+          value ? utility::ToWCHARVector(value).data() : nullptr,
           utility::ToWCHARVector(CONFIG_FILE).data())) {
     GetLastSetupError(error);
-    return false;
+    // Removing a non-existent value returns this error.
+    if (value || error.GetCode() != ODBC_ERROR_COMPONENT_NOT_FOUND)
+      return false;
   }
   return true;
 }
@@ -335,7 +337,15 @@ bool RegisterDsn(const Configuration& config, const LPCSTR driver,
     const std::string& key = it->first;
     const std::string& value = it->second;
 
-    if (!WriteDsnString(dsn, key.c_str(), value.c_str(), error)) {
+    bool shouldWrite =
+        key != ConnectionStringParser::Key::password
+        && key != ConnectionStringParser::Key::pwd
+        && key != ConnectionStringParser::Key::user
+        && key != ConnectionStringParser::Key::uid
+        && key != ConnectionStringParser::Key::sshPrivateKeyPassphrase;
+    const char* pValue = shouldWrite ? value.c_str() : nullptr;
+
+    if (!WriteDsnString(dsn, key.c_str(), pValue, error)) {
       return false;
     }
   }

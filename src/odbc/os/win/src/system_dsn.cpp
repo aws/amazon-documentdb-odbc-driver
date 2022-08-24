@@ -101,7 +101,7 @@ bool InternalRegisterDsn(const Configuration& config, LPCSTR driver) {
 bool InternalUnregisterDsn(const std::string& dsn) {
   DocumentDbError error;
   try {
-    if (UnregisterDsn(dsn, error))
+    if (!UnregisterDsn(dsn, error))
       throw error;
 
     return true;
