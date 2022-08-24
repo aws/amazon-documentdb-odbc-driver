@@ -58,5 +58,25 @@ std::string LogLevel::ToString(Type val) {
       return "unknown";
   }
 }
+
+std::wstring LogLevel::ToText(Type val) {
+  switch (val) {
+    case LogLevel::Type::DEBUG_LEVEL:
+      return L"Debug";
+
+    case LogLevel::Type::INFO_LEVEL:
+      return L"Info";
+
+    case LogLevel::Type::ERROR_LEVEL:
+      return L"Error";
+
+    case LogLevel::Type::OFF:
+      return L"Off";
+
+    default:
+      return L"Unknown";
+  }
+}
+
 }  // namespace odbc
 }  // namespace documentdb
