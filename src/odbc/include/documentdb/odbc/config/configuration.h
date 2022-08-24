@@ -30,6 +30,12 @@
 #include "documentdb/odbc/read_preference.h"
 #include "documentdb/odbc/scan_method.h"
 
+// PROJECT_VERSION taken from CMakeLists.txt
+#define DRIVER_VERSION PROJECT_VERSION
+#define DRIVER_VERSION_MAJOR PROJECT_VERSION_MAJOR
+#define DRIVER_VERSION_MINOR PROJECT_VERSION_MINOR
+#define DRIVER_VERSION_PATCH PROJECT_VERSION_PATCH
+
 namespace documentdb {
 namespace odbc {
 namespace config {
@@ -769,6 +775,11 @@ class Configuration {
    * @return the JDBC connection string.
    */
   std::string ToJdbcConnectionString() const;
+
+  /**
+   * Gets the driver version properly formated.
+   */
+  static std::string GetFormatedDriverVersion();
 
  private:
   /**

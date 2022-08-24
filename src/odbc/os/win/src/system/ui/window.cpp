@@ -18,6 +18,9 @@
 #include "documentdb/odbc/system/ui/window.h"
 
 #include <windowsx.h>
+#include <CommCtrl.h>
+
+#include "documentdb/odbc/documentdb_error.h"
 
 namespace documentdb {
 namespace odbc {
@@ -89,8 +92,11 @@ void Window::Create(DWORD style, int posX, int posY, int width, int height,
   SendMessage(GetHandle(), WM_SETFONT, (WPARAM)hfDefault, MAKELPARAM(FALSE, 0));
 }
 
-void Window::Show() {
-  ShowWindow(handle, SW_SHOW);
+void Window::Show(bool visible) {
+  if (visible)
+    ShowWindow(handle, SW_SHOW);
+  else
+    ShowWindow(handle, SW_HIDE);
 }
 
 void Window::Update() {
@@ -143,24 +149,48 @@ void Window::SetChecked(bool state) {
   Button_SetCheck(handle, state ? BST_CHECKED : BST_UNCHECKED);
 }
 
-void Window::AddString(const std::wstring& str) {
-  SNDMSG(handle, CB_ADDSTRING, 0, reinterpret_cast< LPARAM >(str.c_str()));
-}
-
-void Window::SetSelection(int idx) {
-  SNDMSG(handle, CB_SETCURSEL, static_cast< WPARAM >(idx), 0);
-}
-
-int Window::GetSelection() const {
-  return static_cast< int >(SNDMSG(handle, CB_GETCURSEL, 0, 0));
-}
-
 void Window::SetEnabled(bool enabled) {
   EnableWindow(GetHandle(), enabled);
 }
 
 bool Window::IsEnabled() const {
   return IsWindowEnabled(GetHandle()) != 0;
+}
+
+void Window::AddComboBoxItem(const std::wstring& str) {
+  SNDMSG(handle, CB_ADDSTRING, 0, reinterpret_cast< LPARAM >(str.c_str()));
+}
+
+void Window::SetComboBoxSelection(int idx) {
+  SNDMSG(handle, CB_SETCURSEL, static_cast< WPARAM >(idx), 0);
+}
+
+int Window::GetComboBoxSelection() const {
+  return static_cast< int >(SNDMSG(handle, CB_GETCURSEL, 0, 0));
+}
+
+void Window::AddTabCtrlItem(int idx, wchar_t* tabTitle) {
+  TCITEM tabItem;
+  tabItem.mask = TCIF_TEXT;
+  tabItem.iImage = -1;
+  tabItem.pszText = tabTitle;
+
+  WPARAM idxW = static_cast< WPARAM >(idx);
+  LPARAM pTabItemL = reinterpret_cast< LPARAM >(&tabItem);
+  if (SNDMSG(handle, TCM_INSERTITEM, idxW, pTabItemL) == -1) {
+    std::stringstream buf;
+    buf << "Can not add new tab, error code: " << GetLastError();
+    throw DocumentDbError(DocumentDbError::DOCUMENTDB_ERR_GENERIC,
+                          buf.str().c_str());
+  }
+}
+
+void Window::SetTabSelection(int idx) {
+  SNDMSG(handle, TCM_SETCURSEL, static_cast< WPARAM >(idx), 0);
+}
+
+int Window::GetTabSelection() const {
+  return static_cast< int >(SNDMSG(handle, TCM_GETCURSEL, 0, 0));
 }
 }  // namespace ui
 }  // namespace system

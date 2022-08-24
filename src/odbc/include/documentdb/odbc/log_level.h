@@ -23,7 +23,7 @@ namespace documentdb {
 namespace odbc {
 /** Log Level enum. */
 struct LogLevel {
-  enum class Type { DEBUG_LEVEL, INFO_LEVEL, ERROR_LEVEL, OFF, UNKNOWN };
+  enum class Type { DEBUG_LEVEL = 0, INFO_LEVEL, ERROR_LEVEL, OFF, UNKNOWN };
 
   /**
    * Convert log level from string.
@@ -41,6 +41,22 @@ struct LogLevel {
    * @return String value.
    */
   static std::string ToString(Type val);
+
+  /**
+   * Convert log level to descriptive text.
+   *
+   * @param val Value to convert.
+   * @return wide String value.
+   */
+  static std::wstring ToText(Type val);
+
+  inline static int ToInt(Type val) {
+    return static_cast< int >(val);
+  }
+
+  inline static Type FromInt(int val) {
+    return static_cast< Type >(val);
+  }
 };
 }  // namespace odbc
 }  // namespace documentdb

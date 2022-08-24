@@ -73,9 +73,11 @@ class Window {
   void Create(DWORD style, int posX, int posY, int width, int height, int id);
 
   /**
-   * Show window.
+   * Show or hide the window.
+   * 
+   * @param visible indicates whether to show or hide the window.
    */
-  void Show();
+  void Show(bool visible = true);
 
   /**
    * Update window.
@@ -132,27 +134,6 @@ class Window {
   void SetChecked(bool state);
 
   /**
-   * Add string.
-   *
-   * @param str String.
-   */
-  void AddString(const std::wstring& str);
-
-  /**
-   * Set current ComboBox selection.
-   *
-   * @param idx List index.
-   */
-  void SetSelection(int idx);
-
-  /**
-   * Get current ComboBox selection.
-   *
-   * @return idx List index.
-   */
-  int GetSelection() const;
-
-  /**
    * Set enabled.
    *
    * @param enabled Enable flag.
@@ -165,6 +146,49 @@ class Window {
    * @return True if enabled.
    */
   bool IsEnabled() const;
+
+  /**
+   * Add string to Combo Box.
+   *
+   * @param str String.
+   */
+  void AddComboBoxItem(const std::wstring& str);
+
+  /**
+   * Set current ComboBox selection.
+   *
+   * @param idx List index.
+   */
+  void SetComboBoxSelection(int idx);
+
+  /**
+   * Get current ComboBox selection.
+   *
+   * @return idx List index.
+   */
+  int GetComboBoxSelection() const;
+
+  /**
+   * Add tab.
+   *
+   * @param idx the tab item index.
+   * @param tabTitle the item text.
+   */
+  void AddTabCtrlItem(int idx, wchar_t* tabTitle);
+
+  /**
+   * Set current Tab selection.
+   *
+   * @param idx List index.
+   */
+  void SetTabSelection(int idx);
+
+  /**
+   * Get current Tab selection.
+   *
+   * @return idx List index.
+   */
+  int GetTabSelection() const;
 
  protected:
   /**
