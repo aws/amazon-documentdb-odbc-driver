@@ -144,11 +144,12 @@ std::unique_ptr< Window > CustomWindow::CreateEdit(int posX, int posY,
 std::unique_ptr< Window > CustomWindow::CreateButton(int posX, int posY,
                                                      int sizeX, int sizeY,
                                                      const std::wstring& title,
-                                                     int id) {
+                                                     int id,
+                                                     int additionalStyles) {
   std::unique_ptr< Window > child(new Window(this, L"Button", title));
 
-  child->Create(WS_CHILD | WS_VISIBLE | WS_TABSTOP, posX, posY, sizeX, sizeY,
-                id);
+  child->Create(WS_CHILD | WS_VISIBLE | WS_TABSTOP | additionalStyles, posX,
+                posY, sizeX, sizeY, id);
 
   return child;
 }

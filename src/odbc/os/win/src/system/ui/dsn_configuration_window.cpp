@@ -33,10 +33,6 @@
   nameEdit->HasText() && databaseEdit->HasText() && hostnameEdit->HasText() \
       && portEdit->HasText() && userEdit->HasText() && passwordEdit->HasText()
 
-#define VALIDATE_FOR_SAVE()                                                   \
-  nameEdit->HasText() && databaseEdit->HasText() && hostnameEdit->HasText() \
-      && portEdit->HasText()
-
 namespace documentdb {
 namespace odbc {
 namespace system {
@@ -52,17 +48,14 @@ DsnConfigurationWindow::DsnConfigurationWindow(Window* parent,
       nameLabel(),
       nameEdit(),
       nameBalloon(),
-      shownNameBalloon(false),
       scanMethodLabel(),
       scanMethodComboBox(),
       scanLimitLabel(),
       scanLimitEdit(),
       scanLimitBalloon(),
-      shownScanLimitBalloon(false),
       schemaLabel(),
       schemaEdit(),
       schemaBalloon(),
-      shownSchemaBalloon(false),
       refreshSchemaCheckBox(),
       schemaGroupControls(),
       sshEnableCheckBox(),
@@ -94,24 +87,19 @@ DsnConfigurationWindow::DsnConfigurationWindow(Window* parent,
       loginTimeoutSecEdit(),
       loginTimeoutSecLabel(),
       loginTimeoutSecBalloon(),
-      shownLoginTimeoutSecBalloon(false),
       defaultFetchSizeLabel(),
       defaultFetchSizeEdit(),
       defaultFetchSizeBalloon(),
-      shownDefaultFetchSizeBalloon(false),
       additionalGroupControls(),
       databaseLabel(),
       databaseEdit(),
       databaseBalloon(),
-      shownDatabaseBalloon(false),
       hostnameLabel(),
       hostnameEdit(),
       hostnameBalloon(),
-      shownHostnameBalloon(false),
       portLabel(),
       portEdit(),
       portBalloon(),
-      shownPortBalloon(false),
       saveButton(),
       cancelButton(),
       config(config),
@@ -227,15 +215,15 @@ void DsnConfigurationWindow::OnCreate() {
   versionLabel =
       CreateLabel(versionPosX, groupPosY, versionSizeX, BUTTON_HEIGHT,
                   versionString.str(), ChildId::VERSION_LABEL);
-  saveButton = CreateButton(okPosX, groupPosY, BUTTON_WIDTH, BUTTON_HEIGHT, L"Save",
-                          ChildId::OK_BUTTON);
+  saveButton = CreateButton(okPosX, groupPosY, BUTTON_WIDTH, BUTTON_HEIGHT,
+                            L"Save", ChildId::SAVE_BUTTON);
   cancelButton = CreateButton(cancelPosX, groupPosY, BUTTON_WIDTH,
                               BUTTON_HEIGHT, L"Cancel", ChildId::CANCEL_BUTTON);
 
   // check whether the required fields are filled. If not, Ok button is
   // disabled.
   created = true;
-  saveButton->SetEnabled(VALIDATE_FOR_SAVE());
+  saveButton->SetEnabled(IsValidForSave());
   testButton->SetEnabled(VALIDATE_FOR_TEST());
 }
 
@@ -274,7 +262,7 @@ int DsnConfigurationWindow::CreateConnectionSettingsGroup(int posX, int posY,
   portEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                         ChildId::PORT_EDIT, ES_NUMBER);
   portBalloon =
-      CreateBalloon(L"Required", L"Port is a required field. Default is 27017", TTI_ERROR);
+      CreateBalloon(L"Required", L"Port is a required field and must be greater than zero. Default is 27017", TTI_ERROR);
   rowPos += INTERVAL + ROW_HEIGHT;
 
   wVal = utility::FromUtf8(config.GetDatabase());
@@ -545,8 +533,10 @@ int DsnConfigurationWindow::CreateSchemaSettingsGroup(int posX, int posY,
                                L"Scan Limit:", ChildId::SCAN_LIMIT_LABEL);
   scanLimitEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                              ChildId::SCAN_LIMIT_EDIT, ES_NUMBER);
-  scanLimitBalloon = CreateBalloon(
-      L"Required", L"Scan limit must be a positive numeric value. Default 1000 will be used instead.", TTI_ERROR);
+  scanLimitBalloon = CreateBalloon(L"Tip",
+                                   L"Scan limit must be a positive numeric "
+                                   L"value. Default 1000 will be used instead.",
+                                   TTI_WARNING);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -555,10 +545,10 @@ int DsnConfigurationWindow::CreateSchemaSettingsGroup(int posX, int posY,
                             L"Schema Name:", ChildId::SCHEMA_LABEL);
   schemaEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                           ChildId::SCHEMA_EDIT);
-  schemaBalloon = CreateBalloon(
-      L"Required",
-      L"Schema name must not be blank. Default '_default' will be used instead.",
-      TTI_ERROR);
+  schemaBalloon = CreateBalloon(L"Tip",
+                                L"Schema name must not be blank. Default "
+                                L"'_default' will be used instead.",
+                                TTI_WARNING);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -647,10 +637,10 @@ int DsnConfigurationWindow::CreateAdditionalSettingsGroup(int posX, int posY,
       CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                  ChildId::LOGIN_TIMEOUT_SEC_EDIT, ES_NUMBER);
   loginTimeoutSecBalloon =
-      CreateBalloon(L"Required",
+      CreateBalloon(L"Tip",
                     L"Login timeout must be a positive numeric value. Default "
                     L"0 will be used instead.",
-                    TTI_ERROR);
+                    TTI_WARNING);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -671,10 +661,10 @@ int DsnConfigurationWindow::CreateAdditionalSettingsGroup(int posX, int posY,
       CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                  ChildId::DEFAULT_FETCH_SIZE_EDIT, ES_NUMBER);
   defaultFetchSizeBalloon =
-      CreateBalloon(L"Required",
+      CreateBalloon(L"Tip",
                     L"Fetch size must be a positive numeric value. Default "
                     L"2000 will be used instead.",
-                    TTI_ERROR);
+                    TTI_WARNING);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -821,8 +811,11 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
   switch (msg) {
     case WM_COMMAND: {
       switch (LOWORD(wParam)) {
-        case ChildId::OK_BUTTON: {
+        case ChildId::SAVE_BUTTON: {
           try {
+            if (!saveButton->IsEnabled())
+              break;
+
             RetrieveParameters(config);
 
             accepted = true;
@@ -850,63 +843,59 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
         }
 
         case ChildId::NAME_EDIT: {
-          if (created) {
-            if (!shownNameBalloon && !nameEdit->HasText()) {
+          if (created
+              && (HIWORD(wParam) == EN_CHANGE
+                  || HIWORD(wParam) == EN_SETFOCUS)) {
+            if (!nameEdit->HasText()) {
               Edit_ShowBalloonTip(nameEdit->GetHandle(), nameBalloon.get());
-              shownNameBalloon = true;
-            } else {
-              Edit_HideBalloonTip(nameEdit->GetHandle());
-              shownNameBalloon = false;
             }
-            saveButton->SetEnabled(VALIDATE_FOR_SAVE());
+            saveButton->SetEnabled(IsValidForSave());
             testButton->SetEnabled(VALIDATE_FOR_TEST());
           }
           break;
         }
 
         case ChildId::HOST_NAME_EDIT: {
-          if (created) {
-            if (!shownHostnameBalloon && !hostnameEdit->HasText()) {
+          if (created
+              && (HIWORD(wParam) == EN_CHANGE
+                  || HIWORD(wParam) == EN_SETFOCUS)) {
+            if (!hostnameEdit->HasText()) {
               Edit_ShowBalloonTip(hostnameEdit->GetHandle(),
                                   hostnameBalloon.get());
-              shownHostnameBalloon = true;
-            } else {
-              Edit_HideBalloonTip(hostnameEdit->GetHandle());
-              shownHostnameBalloon = false;
             }
-            saveButton->SetEnabled(VALIDATE_FOR_SAVE());
+            saveButton->SetEnabled(IsValidForSave());
             testButton->SetEnabled(VALIDATE_FOR_TEST());
           }
           break;
         }
 
         case ChildId::PORT_EDIT: {
-          if (created) {
-            if (!shownPortBalloon && !portEdit->HasText()) {
+          if (created
+              && (HIWORD(wParam) == EN_CHANGE
+                  || HIWORD(wParam) == EN_SETFOCUS)) {
+            int port = 0;
+            std::wstring wPort;
+            portEdit->GetText(wPort);
+            wchar_t* pEnd = nullptr;
+            if (!portEdit->HasText()
+                || (port = std::wcstol(wPort.c_str(), &pEnd, 10)) <= 0) {
               Edit_ShowBalloonTip(portEdit->GetHandle(), portBalloon.get());
-              shownPortBalloon = true;
-            } else {
-              Edit_HideBalloonTip(portEdit->GetHandle());
-              shownPortBalloon = false;
             }
-            saveButton->SetEnabled(VALIDATE_FOR_SAVE());
+            saveButton->SetEnabled(IsValidForSave());
             testButton->SetEnabled(VALIDATE_FOR_TEST());
           }
           break;
         }
 
         case ChildId::DATABASE_EDIT: {
-          if (created) {
-            if (!shownDatabaseBalloon && !databaseEdit->HasText()) {
+          if (created && (HIWORD(wParam) == EN_CHANGE
+              || HIWORD(wParam) == EN_SETFOCUS)) {
+            if (!databaseEdit->HasText()) {
               Edit_ShowBalloonTip(
                   databaseEdit->GetHandle(),
                   databaseBalloon.get());
-              shownDatabaseBalloon = true;
-            } else {
-              Edit_HideBalloonTip(databaseEdit->GetHandle());
-              shownDatabaseBalloon = false;
             }
-            saveButton->SetEnabled(VALIDATE_FOR_SAVE());
+            saveButton->SetEnabled(IsValidForSave());
             testButton->SetEnabled(VALIDATE_FOR_TEST());
           }
           break;
@@ -915,7 +904,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
         case ChildId::USER_EDIT:
         case ChildId::PASSWORD_EDIT: {
           if (created) {
-            saveButton->SetEnabled(VALIDATE_FOR_SAVE());
+            saveButton->SetEnabled(IsValidForSave());
             testButton->SetEnabled(VALIDATE_FOR_TEST());
           }
           break;
@@ -998,72 +987,59 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
         }
 
         case ChildId::SCAN_LIMIT_EDIT: {
-          if (created) {
+          if (created
+              && (HIWORD(wParam) == EN_CHANGE
+                  || HIWORD(wParam) == EN_SETFOCUS)) {
             long scanLimit;
             std::wstring wScanLimit;
             wchar_t* pEnd;
             scanLimitEdit->GetText(wScanLimit);
-            if (!shownScanLimitBalloon
-                && (!scanLimitEdit->HasText()
-                    || (scanLimit = std::wcstol(wScanLimit.c_str(), &pEnd, 10))
-                           <= 0)) {
+            if (!scanLimitEdit->HasText()
+                || (scanLimit = std::wcstol(wScanLimit.c_str(), &pEnd, 10))
+                       <= 0) {
               Edit_ShowBalloonTip(scanLimitEdit->GetHandle(),
                                   scanLimitBalloon.get());
-              shownScanLimitBalloon = true;
-            } else {
-              Edit_HideBalloonTip(scanLimitEdit->GetHandle());
-              shownScanLimitBalloon = false;
             }
           }
           break;
         }
 
         case ChildId::SCHEMA_EDIT: {
-          if (created) {
-            if (!shownSchemaBalloon && !schemaEdit->HasText()) {
-              Edit_ShowBalloonTip(schemaEdit->GetHandle(),
-                                  schemaBalloon.get());
-              shownSchemaBalloon = true;
-            } else {
-              Edit_HideBalloonTip(schemaEdit->GetHandle());
-              shownSchemaBalloon = false;
+          if (created
+              && (HIWORD(wParam) == EN_CHANGE
+                  || HIWORD(wParam) == EN_SETFOCUS)) {
+            if (!schemaEdit->HasText()) {
+              Edit_ShowBalloonTip(schemaEdit->GetHandle(), schemaBalloon.get());
             }
           }
           break;
         }
 
         case ChildId::LOGIN_TIMEOUT_SEC_EDIT: {
-          if (created) {
-            if (!shownLoginTimeoutSecBalloon
-                && !loginTimeoutSecEdit->HasText()) {
+          if (created
+              && (HIWORD(wParam) == EN_CHANGE
+                  || HIWORD(wParam) == EN_SETFOCUS)) {
+            if (!loginTimeoutSecEdit->HasText()) {
               Edit_ShowBalloonTip(loginTimeoutSecEdit->GetHandle(),
                                   loginTimeoutSecBalloon.get());
-              shownLoginTimeoutSecBalloon = true;
-            } else {
-              Edit_HideBalloonTip(loginTimeoutSecEdit->GetHandle());
-              shownLoginTimeoutSecBalloon = false;
             }
           }
           break;
         }
 
         case ChildId::DEFAULT_FETCH_SIZE_EDIT: {
-          if (created) {
-            long defaultFetchSize;
-            std::wstring wDefaultFetchSize;
+          if (created
+              && (HIWORD(wParam) == EN_CHANGE
+                  || HIWORD(wParam) == EN_SETFOCUS)) {
+            long fetchSize;
+            std::wstring wFetchSize;
             wchar_t* pEnd;
-            defaultFetchSizeEdit->GetText(wDefaultFetchSize);
-            if (!shownDefaultFetchSizeBalloon
-                && (!defaultFetchSizeEdit->HasText()
-                    || (defaultFetchSize =
-                            std::wcstol(wDefaultFetchSize.c_str(), &pEnd, 10))
-                           <= 0)) {
+            defaultFetchSizeEdit->GetText(wFetchSize);
+            if (!defaultFetchSizeEdit->HasText()
+                || (fetchSize = std::wcstol(wFetchSize.c_str(), &pEnd, 10))
+                       <= 0) {
               Edit_ShowBalloonTip(defaultFetchSizeEdit->GetHandle(),
                                   defaultFetchSizeBalloon.get());
-              shownDefaultFetchSizeBalloon = true;
-            } else {
-              Edit_HideBalloonTip(defaultFetchSizeEdit->GetHandle());
-              shownDefaultFetchSizeBalloon = false;
             }
           }
           break;
@@ -1200,6 +1176,23 @@ void DsnConfigurationWindow::SetTabGroupVisible(TabIndex::Type idx,
   for (auto control : tabGroupControls[idx]) {
     control->Show(isVisible);
   }
+}
+
+bool DsnConfigurationWindow::IsValidForSave() {
+  long port = 0;
+  std::wstring wPort;
+  wchar_t* pEnd;
+
+  bool result = nameEdit->HasText() && databaseEdit->HasText()
+                && hostnameEdit->HasText() && portEdit->HasText();
+  if (!result)
+    return result;
+
+  portEdit->GetText(wPort);
+  port = std::wcstol(wPort.c_str(), &pEnd, 10);
+  result = (port > 0);
+
+  return result;
 }
 
 void DsnConfigurationWindow::OnSelectedTabChange(TabIndex::Type idx) {

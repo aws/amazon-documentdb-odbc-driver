@@ -100,7 +100,7 @@ class DsnConfigurationWindow : public CustomWindow {
       USER_EDIT,
       PASSWORD_LABEL,
       PASSWORD_EDIT,
-      OK_BUTTON,
+      SAVE_BUTTON,
       CANCEL_BUTTON,
       TEST_LABEL,
       TEST_BUTTON,
@@ -332,6 +332,13 @@ class DsnConfigurationWindow : public CustomWindow {
    */
   void SetTabGroupVisible(TabIndex::Type idx, bool isVisible = true);
 
+  /**
+   * Check if the all controls are valid to allow saving.
+   *
+   * @return Returns true, if all controls are valid, false, othersiwe.
+   */
+  bool IsValidForSave();
+
   /** Window width. */
   int width;
 
@@ -350,9 +357,6 @@ class DsnConfigurationWindow : public CustomWindow {
   /** Edit balloon for DSN. */
   std::unique_ptr< EDITBALLOONTIP > nameBalloon;
 
-  /** DSN name edit balloon indicator. */
-  bool shownNameBalloon = false;
-
   /** Scan method ComboBox **/
   std::unique_ptr< Window > scanMethodComboBox;
 
@@ -368,9 +372,6 @@ class DsnConfigurationWindow : public CustomWindow {
   /** Edit balloon for scan limit. */
   std::unique_ptr< EDITBALLOONTIP > scanLimitBalloon;
 
-  /** Scan limit edit balloon indicator. */
-  bool shownScanLimitBalloon = false;
-
   /** DSN schema edit field label. */
   std::unique_ptr< Window > schemaLabel;
 
@@ -379,9 +380,6 @@ class DsnConfigurationWindow : public CustomWindow {
 
   /** Edit balloon for scan limit. */
   std::unique_ptr< EDITBALLOONTIP > schemaBalloon;
-
-  /** Scan limit edit balloon indicator. */
-  bool shownSchemaBalloon = false;
 
   /** Refresh DSN schema checkBox. */
   std::unique_ptr< Window > refreshSchemaCheckBox;
@@ -452,9 +450,6 @@ class DsnConfigurationWindow : public CustomWindow {
   /** Login Timeout (seconds) edit balloon. */
   std::unique_ptr< EDITBALLOONTIP > loginTimeoutSecBalloon;
 
-  /** Login Timeout (seconds) edit balloon indicator. */
-  bool shownLoginTimeoutSecBalloon = false;
-
   /** Read Preference ComboBox **/
   std::unique_ptr< Window > readPreferenceComboBox;
 
@@ -478,9 +473,6 @@ class DsnConfigurationWindow : public CustomWindow {
 
   /** Login Timeout (seconds) edit balloon. */
   std::unique_ptr< EDITBALLOONTIP > defaultFetchSizeBalloon;
-
-  /** Login Timeout (seconds) edit balloon indicator. */
-  bool shownDefaultFetchSizeBalloon = false;
 
   /** Save button. */
   std::unique_ptr< Window > saveButton;
@@ -542,9 +534,6 @@ class DsnConfigurationWindow : public CustomWindow {
   /** Database edit balloon. */
   std::unique_ptr< EDITBALLOONTIP > databaseBalloon;
 
-  /** Database edit balloon indicator. */
-  bool shownDatabaseBalloon = false;
-
   /** Hostname label. */
   std::unique_ptr< Window > hostnameLabel;
 
@@ -554,9 +543,6 @@ class DsnConfigurationWindow : public CustomWindow {
   /** Hostname edit balloon. */
   std::unique_ptr< EDITBALLOONTIP > hostnameBalloon;
 
-  /** Database edit balloon indicator. */
-  bool shownHostnameBalloon = false;
-
   /** Port label. */
   std::unique_ptr< Window > portLabel;
 
@@ -565,9 +551,6 @@ class DsnConfigurationWindow : public CustomWindow {
 
   /** Port edit balloon. */
   std::unique_ptr< EDITBALLOONTIP > portBalloon;
-
-  /** Port edit balloon indicator. */
-  bool shownPortBalloon = false;
 
   /** User label. */
   std::unique_ptr< Window > userLabel;

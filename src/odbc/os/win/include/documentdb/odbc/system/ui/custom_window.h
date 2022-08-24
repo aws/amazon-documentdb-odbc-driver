@@ -135,7 +135,7 @@ class CustomWindow : public Window {
    */
   std::unique_ptr< Window > CreateButton(int posX, int posY, int sizeX,
                                          int sizeY, const std::wstring& title,
-                                         int id);
+                                         int id, int additionalStyles = 0);
 
   /**
    * Create child CheckBox window.
