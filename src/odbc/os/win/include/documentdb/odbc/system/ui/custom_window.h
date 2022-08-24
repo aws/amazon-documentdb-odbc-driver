@@ -19,6 +19,7 @@
 #define _DOCUMENTDB_ODBC_SYSTEM_UI_CUSTOM_WINDOW
 
 #include "documentdb/odbc/system/ui/window.h"
+#include <CommCtrl.h>
 
 namespace documentdb {
 namespace odbc {
@@ -134,7 +135,7 @@ class CustomWindow : public Window {
    */
   std::unique_ptr< Window > CreateButton(int posX, int posY, int sizeX,
                                          int sizeY, const std::wstring& title,
-                                         int id);
+                                         int id, int additionalStyles = 0);
 
   /**
    * Create child CheckBox window.
@@ -165,6 +166,35 @@ class CustomWindow : public Window {
   std::unique_ptr< Window > CreateComboBox(int posX, int posY, int sizeX,
                                            int sizeY, const std::wstring& title,
                                            int id);
+
+  /**
+   * Create child Tab control.
+   *
+   * @param posX Position by X coordinate.
+   * @param posY Position by Y coordinate.
+   * @param sizeX Size by X coordinate.
+   * @param sizeY Size by Y coordinate.
+   * @param title Title.
+   * @param id ID to be assigned to the created window.
+   * @param style optional style to be applied to the created window.
+   * @return Unique pointer containing new window.
+   */
+  std::unique_ptr< Window > CreateTabControl(int posX, int posY, int sizeX,
+                                             int sizeY,
+                                             const std::wstring& title, int id,
+                                             int style = 0);
+
+   /**
+   * Create child Balloon.
+   *
+   * @param title Title.
+   * @param text Text.
+   * @param icon Icon
+   * @return Unique pointer containing EDITBALLOONTIP object.
+   */
+  std::unique_ptr< EDITBALLOONTIP > CreateBalloon(const wchar_t* title,
+                                                  const wchar_t* text,
+                                                  int icon);
 
  private:
   DOCUMENTDB_NO_COPY_ASSIGNMENT(CustomWindow)
