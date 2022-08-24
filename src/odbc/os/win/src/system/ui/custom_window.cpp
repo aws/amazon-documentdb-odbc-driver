@@ -145,7 +145,7 @@ std::unique_ptr< Window > CustomWindow::CreateButton(int posX, int posY,
                                                      int sizeX, int sizeY,
                                                      const std::wstring& title,
                                                      int id,
-                                                     int additionalStyles) {
+                                                     int style) {
   std::unique_ptr< Window > child(new Window(this, L"Button", title));
 
   child->Create(WS_CHILD | WS_VISIBLE | WS_TABSTOP | additionalStyles, posX,
