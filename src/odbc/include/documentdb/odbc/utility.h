@@ -235,13 +235,6 @@ std::vector< SQLWCHAR > ToWCHARVector(const char* value);
  * @return standard string containing the formated hex dump
  */
 std::string HexDump(const void* data, size_t count);
-
-/**
- * URI encodes the given string, escaping characters, as appropriate.
- * @param value source string to encode.
- * @return the encoded string.
- */
-std::string UriEncode(const std::string& value);
 }  // namespace utility
 }  // namespace odbc
 }  // namespace documentdb

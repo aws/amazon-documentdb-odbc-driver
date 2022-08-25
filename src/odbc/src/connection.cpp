@@ -52,50 +52,6 @@
 #include "documentdb/odbc/system/system_dsn.h"
 #include "documentdb/odbc/utility.h"
 
-#define MONGO_URI_APPNAME "appname"
-#define MONGO_URI_AUTHMECHANISM "authmechanism"
-#define MONGO_URI_AUTHMECHANISMPROPERTIES "authmechanismproperties"
-#define MONGO_URI_AUTHSOURCE "authsource"
-#define MONGO_URI_CANONICALIZEHOSTNAME "canonicalizehostname"
-#define MONGO_URI_CONNECTTIMEOUTMS "connecttimeoutms"
-#define MONGO_URI_COMPRESSORS "compressors"
-#define MONGO_URI_DIRECTCONNECTION "directconnection"
-#define MONGO_URI_GSSAPISERVICENAME "gssapiservicename"
-#define MONGO_URI_HEARTBEATFREQUENCYMS "heartbeatfrequencyms"
-#define MONGO_URI_JOURNAL "journal"
-#define MONGO_URI_LOCALTHRESHOLDMS "localthresholdms"
-#define MONGO_URI_MAXIDLETIMEMS "maxidletimems"
-#define MONGO_URI_MAXPOOLSIZE "maxpoolsize"
-#define MONGO_URI_MAXSTALENESSSECONDS "maxstalenessseconds"
-#define MONGO_URI_MINPOOLSIZE "minpoolsize"
-#define MONGO_URI_READCONCERNLEVEL "readconcernlevel"
-#define MONGO_URI_READPREFERENCE "readpreference"
-#define MONGO_URI_READPREFERENCETAGS "readpreferencetags"
-#define MONGO_URI_REPLICASET "replicaset"
-#define MONGO_URI_RETRYREADS "retryreads"
-#define MONGO_URI_RETRYWRITES "retrywrites"
-#define MONGO_URI_SAFE "safe"
-#define MONGO_URI_SERVERSELECTIONTIMEOUTMS "serverselectiontimeoutms"
-#define MONGO_URI_SERVERSELECTIONTRYONCE "serverselectiontryonce"
-#define MONGO_URI_SLAVEOK "slaveok"
-#define MONGO_URI_SOCKETCHECKINTERVALMS "socketcheckintervalms"
-#define MONGO_URI_SOCKETTIMEOUTMS "sockettimeoutms"
-#define MONGO_URI_TLS "tls"
-#define MONGO_URI_TLSCERTIFICATEKEYFILE "tlscertificatekeyfile"
-#define MONGO_URI_TLSCERTIFICATEKEYFILEPASSWORD "tlscertificatekeyfilepassword"
-#define MONGO_URI_TLSCAFILE "tlscafile"
-#define MONGO_URI_TLSALLOWINVALIDCERTIFICATES "tlsallowinvalidcertificates"
-#define MONGO_URI_TLSALLOWINVALIDHOSTNAMES "tlsallowinvalidhostnames"
-#define MONGO_URI_TLSINSECURE "tlsinsecure"
-#define MONGO_URI_TLSDISABLECERTIFICATEREVOCATIONCHECK \
-  "tlsdisablecertificaterevocationcheck"
-#define MONGO_URI_TLSDISABLEOCSPENDPOINTCHECK "tlsdisableocspendpointcheck"
-#define MONGO_URI_W "w"
-#define MONGO_URI_WAITQUEUEMULTIPLE "waitqueuemultiple"
-#define MONGO_URI_WAITQUEUETIMEOUTMS "waitqueuetimeoutms"
-#define MONGO_URI_WTIMEOUTMS "wtimeoutms"
-#define MONGO_URI_ZLIBCOMPRESSIONLEVEL "zlibcompressionlevel"
-
 using namespace documentdb::odbc::jni::java;
 using namespace documentdb::odbc::common;
 using namespace documentdb::odbc::common::concurrent;
@@ -541,47 +497,6 @@ bool Connection::GetInternalSSHTunnelPort(int32_t& localSSHTunnelPort,
   return true;
 }
 
-std::string Connection::FormatMongoCppConnectionString(
-    int32_t localSSHTunnelPort) const {
-  std::string host = "localhost";
-  std::string port = std::to_string(localSSHTunnelPort);
-
-  // localSSHTunnelPort == 0 means that internal SSH tunnel option was not set
-  if (localSSHTunnelPort == 0) {
-    host = config_.GetHostname();
-    port = common::LexicalCast< std::string >(config_.GetPort());
-  }
-  std::stringstream mongoConnectionString;
-  const char* INIT_OPT = "?";
-  const char* SUBS_OPT = "&";
-
-  mongoConnectionString << "mongodb:";
-  mongoConnectionString << "//" << utility::UriEncode(config_.GetUser());
-  mongoConnectionString << ":" << utility::UriEncode(config_.GetPassword());
-  mongoConnectionString << "@" << host;
-  mongoConnectionString << ":" << port;
-  mongoConnectionString << "/admin";
-  mongoConnectionString << INIT_OPT << MONGO_URI_AUTHMECHANISM << "=SCRAM-SHA-1";
-  mongoConnectionString << SUBS_OPT << MONGO_URI_APPNAME << "="
-                        << utility::UriEncode(config_.GetApplicationName());
-  if (config_.IsTls()) {
-    mongoConnectionString << SUBS_OPT
-                          << MONGO_URI_TLSALLOWINVALIDHOSTNAMES
-                          << "=true";
-  }
-  if (config_.GetLoginTimeoutSeconds()) {
-    std::chrono::milliseconds connectionTimeoutMS = std::chrono::seconds(config_.GetLoginTimeoutSeconds());
-    mongoConnectionString << SUBS_OPT << MONGO_URI_CONNECTTIMEOUTMS
-                          << "=" << std::to_string(connectionTimeoutMS.count());
-  }
-
-  // tls configuration is handled using tls_options in connectionCPP
-  // TODO handle the other DSN configuration
-  // https://bitquill.atlassian.net/browse/AD-599
-
-  return mongoConnectionString.str();
-}
-
 SharedPointer< JniContext > Connection::GetJniContext(JniErrorInfo& errInfo) {
   if (!jniContext_.IsValid()) {
     // Resolve DOCUMENTDB_HOME.
@@ -707,7 +622,7 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
   DriverInstance::getInstance().initialize();
   try {
     std::string mongoCPPConnectionString =
-        FormatMongoCppConnectionString(localSSHTunnelPort);
+        config_.ToMongoDbConnectionString(localSSHTunnelPort);
     mongocxx::options::client client_options;
     mongocxx::options::tls tls_options;
     if (config_.IsTls()) {

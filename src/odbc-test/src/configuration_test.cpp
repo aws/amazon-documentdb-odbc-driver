@@ -283,9 +283,19 @@ void CheckConnectionConfig(const Configuration& cfg) {
       << "&tlsCaFile=" << EncodeURIComponent(testTlsCaFile);
   const std::string& expectedJdbcStr = jdbcConstructor.str();
 
+  std::stringstream mongodbConstructor;
+  mongodbConstructor
+      << "mongodb://" << testUsername << ":" << testPassword << "@" 
+      << testHostname << ':' << testServerPort << "/" << "admin" 
+      << "?authmechanism=" << "SCRAM-SHA-1"
+      << "&appname=" << testAppName
+      << "&connecttimeoutms=" << (testLoginTimeoutSec * 1000);
+  const std::string& expectedMongoDbStr = mongodbConstructor.str();
+
   BOOST_CHECK_EQUAL(documentdb::odbc::common::ToLower(cfg.ToConnectString()),
                     documentdb::odbc::common::ToLower(expectedStr));
   BOOST_CHECK_EQUAL(cfg.ToJdbcConnectionString(), expectedJdbcStr);
+  BOOST_CHECK_EQUAL(cfg.ToMongoDbConnectionString(0), expectedMongoDbStr);
 }
 
 void CheckDsnConfig(const Configuration& cfg) {

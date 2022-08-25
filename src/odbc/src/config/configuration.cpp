@@ -565,6 +565,47 @@ void Configuration::ToJdbcOptionsMap(ArgumentMap& res) const {
   AddToMap(res, "defaultFetchSize", defaultFetchSize);
 }
 
+std::string Configuration::ToMongoDbConnectionString(int32_t localSSHTunnelPort) const {
+  std::string host = "localhost";
+  std::string port = std::to_string(localSSHTunnelPort);
+
+  // localSSHTunnelPort == 0 means that internal SSH tunnel option was not set
+  if (localSSHTunnelPort == 0) {
+    host = GetHostname();
+    port = common::LexicalCast< std::string >(GetPort());
+  }
+  std::stringstream mongoConnectionString;
+  const char* INIT_OPT = "?";
+  const char* SUBS_OPT = "&";
+
+  mongoConnectionString << "mongodb:";
+  mongoConnectionString << "//" << utility::EncodeURIComponent(GetUser());
+  mongoConnectionString << ":" << utility::EncodeURIComponent(GetPassword());
+  mongoConnectionString << "@" << host;
+  mongoConnectionString << ":" << port;
+  mongoConnectionString << "/admin";
+  mongoConnectionString << INIT_OPT << MONGO_URI_AUTHMECHANISM
+                        << "=SCRAM-SHA-1";
+  mongoConnectionString << SUBS_OPT << MONGO_URI_APPNAME << "="
+                        << utility::EncodeURIComponent(GetApplicationName());
+  if (IsTls()) {
+    mongoConnectionString << SUBS_OPT << MONGO_URI_TLSALLOWINVALIDHOSTNAMES
+                          << "=true";
+  }
+  if (GetLoginTimeoutSeconds()) {
+    std::chrono::milliseconds connectionTimeoutMS =
+        std::chrono::seconds(GetLoginTimeoutSeconds());
+    mongoConnectionString << SUBS_OPT << MONGO_URI_CONNECTTIMEOUTMS << "="
+                          << std::to_string(connectionTimeoutMS.count());
+  }
+
+  // tls configuration is handled using tls_options in connectionCPP
+  // TODO handle the other DSN configuration
+  // https://bitquill.atlassian.net/browse/AD-599
+
+  return mongoConnectionString.str();
+}
+
 std::string Configuration::GetFormatedDriverVersion() {
   std::stringstream formattedVersion;
   formattedVersion << std::setfill('0') << std::setw(2) << DRIVER_VERSION_MAJOR;

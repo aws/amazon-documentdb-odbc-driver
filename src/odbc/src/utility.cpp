@@ -377,30 +377,6 @@ std::string HexDump(const void* data, size_t count) {
   return dump.str();
 }
 
-std::string UriEncode(const std::string& value) {
-  std::ostringstream escaped;
-  escaped.fill('0');
-  escaped << std::hex;
-
-  std::string::const_iterator n = value.end();
-  for (std::string::const_iterator i = value.begin(); i != n; ++i) {
-    std::string::value_type c = (*i);
-
-    // Keep alphanumeric and other accepted characters intact
-    if (std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '!'
-        || c == '~' || c == '*' || c == '\'' || c == '(' || c == ')') {
-      escaped << c;
-      continue;
-    }
-
-    // All other characters are percent-encoded
-    escaped << std::uppercase;
-    escaped << '%' << std::setw(2) << int((unsigned char)c);
-    escaped << std::nouppercase;
-  }
-
-  return escaped.str();
-}
 }  // namespace utility
 }  // namespace odbc
 }  // namespace documentdb
