@@ -579,15 +579,15 @@ std::string Configuration::ToMongoDbConnectionString(int32_t localSSHTunnelPort)
   const char* SUBS_OPT = "&";
 
   mongoConnectionString << "mongodb:";
-  mongoConnectionString << "//" << utility::EncodeURIComponent(GetUser());
-  mongoConnectionString << ":" << utility::EncodeURIComponent(GetPassword());
+  mongoConnectionString << "//" << EncodeURIComponent(GetUser());
+  mongoConnectionString << ":" << EncodeURIComponent(GetPassword());
   mongoConnectionString << "@" << host;
   mongoConnectionString << ":" << port;
   mongoConnectionString << "/admin";
   mongoConnectionString << INIT_OPT << MONGO_URI_AUTHMECHANISM
                         << "=SCRAM-SHA-1";
   mongoConnectionString << SUBS_OPT << MONGO_URI_APPNAME << "="
-                        << utility::EncodeURIComponent(GetApplicationName());
+                        << EncodeURIComponent(GetApplicationName());
   if (IsTls()) {
     mongoConnectionString << SUBS_OPT << MONGO_URI_TLSALLOWINVALIDHOSTNAMES
                           << "=true";

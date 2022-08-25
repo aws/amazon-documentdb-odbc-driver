@@ -80,8 +80,6 @@
 #define MONGO_URI_WTIMEOUTMS "wtimeoutms"
 #define MONGO_URI_ZLIBCOMPRESSIONLEVEL "zlibcompressionlevel"
 
-
-
 namespace documentdb {
 namespace odbc {
 namespace config {
