@@ -287,7 +287,7 @@ void CheckConnectionConfig(const Configuration& cfg) {
   mongodbConstructor
       << "mongodb://" << testUsername << ":" << testPassword << "@" 
       << testHostname << ':' << testServerPort << "/admin" 
-      << "?authmechanism=" << "SCRAM-SHA-1"
+      << "?authmechanism=SCRAM-SHA-1"
       << "&appname=" << testAppName
       << "&connecttimeoutms=" << (testLoginTimeoutSec * 1000);
   const std::string& expectedMongoDbStr = mongodbConstructor.str();
