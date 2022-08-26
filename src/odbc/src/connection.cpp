@@ -497,41 +497,6 @@ bool Connection::GetInternalSSHTunnelPort(int32_t& localSSHTunnelPort,
   return true;
 }
 
-std::string Connection::FormatMongoCppConnectionString(
-    int32_t localSSHTunnelPort) const {
-  std::string host = "localhost";
-  std::string port = std::to_string(localSSHTunnelPort);
-
-  // localSSHTunnelPort == 0 means that internal SSH tunnel option was not set
-  if (localSSHTunnelPort == 0) {
-    host = config_.GetHostname();
-    port = common::LexicalCast< std::string >(config_.GetPort());
-  }
-  std::string mongoConnectionString;
-
-  mongoConnectionString = "mongodb:";
-  mongoConnectionString.append("//" + config_.GetUser());
-  mongoConnectionString.append(":" + config_.GetPassword());
-  mongoConnectionString.append("@" + host);
-  mongoConnectionString.append(":" + port);
-  mongoConnectionString.append("/admin");
-  mongoConnectionString.append("?authMechanism=SCRAM-SHA-1");
-  if (config_.IsTls()) {
-    mongoConnectionString.append("&tlsAllowInvalidHostnames=true");
-  }
-  if (config_.GetLoginTimeoutSeconds()) {
-    std::chrono::milliseconds connectionTimeoutMS = std::chrono::seconds(config_.GetLoginTimeoutSeconds());
-    mongoConnectionString.append("&connectTimeoutMS="
-                                 + std::to_string(connectionTimeoutMS.count()));
-  }
-
-  // tls configuration is handled using tls_options in connectionCPP
-  // TODO handle the other DSN configuration
-  // https://bitquill.atlassian.net/browse/AD-599
-
-  return mongoConnectionString;
-}
-
 SharedPointer< JniContext > Connection::GetJniContext(JniErrorInfo& errInfo) {
   if (!jniContext_.IsValid()) {
     // Resolve DOCUMENTDB_HOME.
@@ -657,7 +622,7 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
   DriverInstance::getInstance().initialize();
   try {
     std::string mongoCPPConnectionString =
-        FormatMongoCppConnectionString(localSSHTunnelPort);
+        config_.ToMongoDbConnectionString(localSSHTunnelPort);
     mongocxx::options::client client_options;
     mongocxx::options::tls tls_options;
     if (config_.IsTls()) {

@@ -36,6 +36,50 @@
 #define DRIVER_VERSION_MINOR PROJECT_VERSION_MINOR
 #define DRIVER_VERSION_PATCH PROJECT_VERSION_PATCH
 
+#define MONGO_URI_APPNAME "appname"
+#define MONGO_URI_AUTHMECHANISM "authmechanism"
+#define MONGO_URI_AUTHMECHANISMPROPERTIES "authmechanismproperties"
+#define MONGO_URI_AUTHSOURCE "authsource"
+#define MONGO_URI_CANONICALIZEHOSTNAME "canonicalizehostname"
+#define MONGO_URI_CONNECTTIMEOUTMS "connecttimeoutms"
+#define MONGO_URI_COMPRESSORS "compressors"
+#define MONGO_URI_DIRECTCONNECTION "directconnection"
+#define MONGO_URI_GSSAPISERVICENAME "gssapiservicename"
+#define MONGO_URI_HEARTBEATFREQUENCYMS "heartbeatfrequencyms"
+#define MONGO_URI_JOURNAL "journal"
+#define MONGO_URI_LOCALTHRESHOLDMS "localthresholdms"
+#define MONGO_URI_MAXIDLETIMEMS "maxidletimems"
+#define MONGO_URI_MAXPOOLSIZE "maxpoolsize"
+#define MONGO_URI_MAXSTALENESSSECONDS "maxstalenessseconds"
+#define MONGO_URI_MINPOOLSIZE "minpoolsize"
+#define MONGO_URI_READCONCERNLEVEL "readconcernlevel"
+#define MONGO_URI_READPREFERENCE "readpreference"
+#define MONGO_URI_READPREFERENCETAGS "readpreferencetags"
+#define MONGO_URI_REPLICASET "replicaset"
+#define MONGO_URI_RETRYREADS "retryreads"
+#define MONGO_URI_RETRYWRITES "retrywrites"
+#define MONGO_URI_SAFE "safe"
+#define MONGO_URI_SERVERSELECTIONTIMEOUTMS "serverselectiontimeoutms"
+#define MONGO_URI_SERVERSELECTIONTRYONCE "serverselectiontryonce"
+#define MONGO_URI_SLAVEOK "slaveok"
+#define MONGO_URI_SOCKETCHECKINTERVALMS "socketcheckintervalms"
+#define MONGO_URI_SOCKETTIMEOUTMS "sockettimeoutms"
+#define MONGO_URI_TLS "tls"
+#define MONGO_URI_TLSCERTIFICATEKEYFILE "tlscertificatekeyfile"
+#define MONGO_URI_TLSCERTIFICATEKEYFILEPASSWORD "tlscertificatekeyfilepassword"
+#define MONGO_URI_TLSCAFILE "tlscafile"
+#define MONGO_URI_TLSALLOWINVALIDCERTIFICATES "tlsallowinvalidcertificates"
+#define MONGO_URI_TLSALLOWINVALIDHOSTNAMES "tlsallowinvalidhostnames"
+#define MONGO_URI_TLSINSECURE "tlsinsecure"
+#define MONGO_URI_TLSDISABLECERTIFICATEREVOCATIONCHECK \
+  "tlsdisablecertificaterevocationcheck"
+#define MONGO_URI_TLSDISABLEOCSPENDPOINTCHECK "tlsdisableocspendpointcheck"
+#define MONGO_URI_W "w"
+#define MONGO_URI_WAITQUEUEMULTIPLE "waitqueuemultiple"
+#define MONGO_URI_WAITQUEUETIMEOUTMS "waitqueuetimeoutms"
+#define MONGO_URI_WTIMEOUTMS "wtimeoutms"
+#define MONGO_URI_ZLIBCOMPRESSIONLEVEL "zlibcompressionlevel"
+
 namespace documentdb {
 namespace odbc {
 namespace config {
@@ -775,6 +819,12 @@ class Configuration {
    * @return the JDBC connection string.
    */
   std::string ToJdbcConnectionString() const;
+
+  /**
+   * Formats the MongoDB connection string from configuration values.
+   * @return the MongoDB connection string.
+   */
+  std::string ToMongoDbConnectionString(int32_t localSSHTunnelPort) const;
 
   /**
    * Gets the driver version properly formated.

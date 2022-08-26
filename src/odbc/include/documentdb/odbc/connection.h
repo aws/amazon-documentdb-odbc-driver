@@ -475,13 +475,6 @@ class Connection : public diagnostic::DiagnosableAdapter {
   bool ConnectCPPDocumentDB(int32_t localSSHTunnelPort, DocumentDbError& err);
 
   /**
-   * Formats the Mongo connection string from configuration values.
-   *
-   *  @return the JDBC connection string.
-   */
-  std::string FormatMongoCppConnectionString(int32_t localSSHTunnelPort) const;
-
-  /**
    * Helper function to get internall SSH tunnel Port
    *
    * @param localSSHTunnelPort internal SSH tunnel port
