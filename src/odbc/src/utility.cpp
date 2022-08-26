@@ -376,7 +376,6 @@ std::string HexDump(const void* data, size_t count) {
   }
   return dump.str();
 }
-
 }  // namespace utility
 }  // namespace odbc
 }  // namespace documentdb
