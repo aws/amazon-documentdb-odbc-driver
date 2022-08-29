@@ -232,7 +232,7 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
 
       if (val != 1) {
         AddStatusRecord(
-            SqlState::SIM001_FUNCTION_NOT_SUPPORTED,
+            SqlState::S01S02_OPTION_VALUE_CHANGED,
             "Array size value cannot be set to a value other than 1");
 
         return SqlResult::AI_ERROR;
