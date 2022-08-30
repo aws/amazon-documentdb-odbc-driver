@@ -201,34 +201,19 @@ struct OdbcTestSuite {
   void InsertNonFullBatchSelect(int recordsNum, int splitAt);
 
   /**
-   * Get test i8Field.
+   * Get test i64Field.
    *
    * @param idx Index.
-   * @return Corresponding i8Field value.
+   * @return Corresponding i64Field value.
    */
-  static int8_t GetTestI8Field(int64_t idx);
+  static int16_t GetTestI64Field(int64_t idx);
 
   /**
-   * Check i8Field test value.
+   * Check i64Field test value.
    * @param idx Index.
    * @param value Value to test.
    */
-  static void CheckTestI8Value(int idx, int8_t value);
-
-  /**
-   * Get test i16Field.
-   *
-   * @param idx Index.
-   * @return Corresponding i16Field value.
-   */
-  static int16_t GetTestI16Field(int64_t idx);
-
-  /**
-   * Check i16Field test value.
-   * @param idx Index.
-   * @param value Value to test.
-   */
-  static void CheckTestI16Value(int idx, int16_t value);
+  static void CheckTestI64Value(int idx, int16_t value);
 
   /**
    * Get test i32Field.
@@ -244,6 +229,36 @@ struct OdbcTestSuite {
    * @param value Value to test.
    */
   static void CheckTestI32Value(int idx, int32_t value);
+
+  /**
+   * Get test _id string.
+   *
+   * @param idx Index.
+   * @return Corresponding test string.
+   */
+  static std::string GetIdString(int64_t idx);
+
+  /**
+   * Check _id test value.
+   * @param idx Index.
+   * @param value Value to test.
+   */
+  static void CheckTestIdValue(int idx, const std::string& value);
+
+  /**
+   * Get test Decimal 128 as string.
+   *
+   * @param idx Index.
+   * @return Corresponding test string.
+   */
+  static std::string GetTestDec128String(int64_t idx);
+
+  /**
+   * Check fieldDecimal128 test value.
+   * @param idx Index.
+   * @param value Value to test.
+   */
+  static void CheckTestDec128Value(int idx, const std::string& value);
 
   /**
    * Get test string.

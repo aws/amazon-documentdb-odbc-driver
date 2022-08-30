@@ -58,9 +58,12 @@ const std::string kTestQuery =
 
 enum testCaseStatus { success, error, skip };
 
+// To test array size greater than one, change the value below.
+enum { ARRAY_SIZE = 1 };
+
 typedef struct Col {
-  SQLLEN data_len;
-  SQLWCHAR data_dat[BIND_SIZE];
+  SQLLEN data_len[ARRAY_SIZE];
+  SQLWCHAR data_dat[ARRAY_SIZE][BIND_SIZE];
 } Col;
 
 struct CsvHeaders {
@@ -120,6 +123,8 @@ class PerformanceTestRunner {
   std::string _input_file = kInputFile;    // input test plan csv file
   std::string _output_file = kOutputFile;  // output test results csv file
   std::string _csv_data = "";
+  std::string _user;
+  std::string _password;
   CsvHeaders _headers;  // col index of headers
 
   // _output_mode = 0 - output time for exec/bind/fetch combined
@@ -206,7 +211,9 @@ class PerformanceTestRunner {
   // connection string to test database
   PerformanceTestRunner(const std::string test_plan_csv,
                         const std::string output_file_csv,
-                        const std::string dsn, const int output_mode = 0);
+                        const std::string dsn, const int output_mode = 0,
+                        const std::string user = "",
+                        const std::string password = "");
 
   // Destructor
   virtual ~PerformanceTestRunner();

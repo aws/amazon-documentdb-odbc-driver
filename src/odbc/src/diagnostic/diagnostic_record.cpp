@@ -126,6 +126,9 @@ const std::string STATE_HY009 = "HY009";
 /** SQL state HY010 constant. */
 const std::string STATE_HY010 = "HY010";
 
+/** SQL state HY024 constant. */
+const std::string STATE_HY024 = "HY024";
+
 /** SQL state HY090 constant. */
 const std::string STATE_HY090 = "HY090";
 
@@ -360,6 +363,9 @@ const std::string& DiagnosticRecord::GetSqlState() const {
 
     case SqlState::SHY010_SEQUENCE_ERROR:
       return STATE_HY010;
+
+    case SqlState::SHY024_INVALID_ATTRIBUTE_VALUE:
+      return STATE_HY024;
 
     case SqlState::SHY090_INVALID_STRING_OR_BUFFER_LENGTH:
       return STATE_HY090;

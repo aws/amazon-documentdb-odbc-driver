@@ -27,38 +27,24 @@
 #include <string>
 #include <vector>
 
-#include "documentdb/ignite.h"
-#include "documentdb/ignition.h"
-#include "documentdb/odbc/impl/binary/binary_utils.h"
+#include "documentdb/odbc/utility.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"
 #include "test_utils.h"
 
 using namespace documentdb;
-using namespace documentdb::cache;
-using namespace documentdb::cache::query;
-using namespace documentdb::common;
 using namespace documentdb_test;
 
 using namespace boost::unit_test;
-
-using documentdb::impl::binary::BinaryUtils;
 
 /**
  * Test setup fixture.
  */
 struct CursorBindingTestSuiteFixture : public odbc::OdbcTestSuite {
-  static Ignite StartAdditionalNode(const char* name) {
-    return StartPlatformNode("queries-test.xml", name);
-  }
-
   /**
    * Constructor.
    */
-  CursorBindingTestSuiteFixture() : testCache(0) {
-    grid = StartAdditionalNode("NodeMain");
-
-    testCache = grid.GetCache< int64_t, TestType >("cache");
+  CursorBindingTestSuiteFixture() {
   }
 
   /**
@@ -67,73 +53,58 @@ struct CursorBindingTestSuiteFixture : public odbc::OdbcTestSuite {
   virtual ~CursorBindingTestSuiteFixture() {
     // No-op.
   }
-
-  /** Node started during the test. */
-  Ignite grid;
-
-  /** Test cache instance. */
-  Cache< int64_t, TestType > testCache;
 };
 
 BOOST_FIXTURE_TEST_SUITE(CursorBindingTestSuite, CursorBindingTestSuiteFixture)
 
-#define CHECK_TEST_VALUES(idx, testIdx)                                      \
-  do {                                                                       \
-    BOOST_TEST_CONTEXT("Test idx: " << testIdx) {                            \
-      BOOST_CHECK(RowStatus[idx] == SQL_ROW_SUCCESS                          \
-                  || RowStatus[idx] == SQL_ROW_SUCCESS_WITH_INFO);           \
-                                                                             \
-      BOOST_CHECK(i8FieldsInd[idx] != SQL_NULL_DATA);                        \
-      BOOST_CHECK(i16FieldsInd[idx] != SQL_NULL_DATA);                       \
-      BOOST_CHECK(i32FieldsInd[idx] != SQL_NULL_DATA);                       \
-      BOOST_CHECK(strFieldsLen[idx] != SQL_NULL_DATA);                       \
-      BOOST_CHECK(floatFields[idx] != SQL_NULL_DATA);                        \
-      BOOST_CHECK(doubleFieldsInd[idx] != SQL_NULL_DATA);                    \
-      BOOST_CHECK(boolFieldsInd[idx] != SQL_NULL_DATA);                      \
-      BOOST_CHECK(dateFieldsInd[idx] != SQL_NULL_DATA);                      \
-      BOOST_CHECK(timeFieldsInd[idx] != SQL_NULL_DATA);                      \
-      BOOST_CHECK(timestampFieldsInd[idx] != SQL_NULL_DATA);                 \
-      BOOST_CHECK(i8ArrayFieldsLen[idx] != SQL_NULL_DATA);                   \
-                                                                             \
-      int8_t i8Field = static_cast< int8_t >(i8Fields[idx]);                 \
-      int16_t i16Field = static_cast< int16_t >(i16Fields[idx]);             \
-      int32_t i32Field = static_cast< int32_t >(i32Fields[idx]);             \
-      std::string strField(reinterpret_cast< char* >(&strFields[idx][0]),    \
-                           static_cast< size_t >(strFieldsLen[idx]));        \
-      float floatField = static_cast< float >(floatFields[idx]);             \
-      double doubleField = static_cast< double >(doubleFields[idx]);         \
-      bool boolField = boolFields[idx] != 0;                                 \
-                                                                             \
-      CheckTestI8Value(testIdx, i8Field);                                    \
-      CheckTestI16Value(testIdx, i16Field);                                  \
-      CheckTestI32Value(testIdx, i32Field);                                  \
-      CheckTestStringValue(testIdx, strField);                               \
-      CheckTestFloatValue(testIdx, floatField);                              \
-      CheckTestDoubleValue(testIdx, doubleField);                            \
-      CheckTestBoolValue(testIdx, boolField);                                \
-      CheckTestDateValue(testIdx, dateFields[idx]);                          \
-      CheckTestTimeValue(testIdx, timeFields[idx]);                          \
-      CheckTestTimestampValue(testIdx, timestampFields[idx]);                \
-      CheckTestI8ArrayValue(testIdx,                                         \
-                            reinterpret_cast< int8_t* >(i8ArrayFields[idx]), \
-                            static_cast< SQLLEN >(i8ArrayFieldsLen[idx]));   \
-    }                                                                        \
+#define CHECK_TEST_VALUES(idx, testIdx)                                     \
+  do {                                                                      \
+    BOOST_TEST_CONTEXT("Test idx: " << testIdx) {                           \
+      BOOST_CHECK(RowStatus[idx] == SQL_ROW_SUCCESS                         \
+                  || RowStatus[idx] == SQL_ROW_SUCCESS_WITH_INFO);          \
+                                                                            \
+      BOOST_CHECK(idFieldsLen[idx] != SQL_NULL_DATA);                       \
+      BOOST_CHECK(i32FieldsInd[idx] != SQL_NULL_DATA);                      \
+      BOOST_CHECK(i64FieldsInd[idx] != SQL_NULL_DATA);                      \
+      BOOST_CHECK(dec128FieldsLen[idx] != SQL_NULL_DATA);                   \
+      BOOST_CHECK(doubleFieldsInd[idx] != SQL_NULL_DATA);                   \
+      BOOST_CHECK(strFieldsLen[idx] != SQL_NULL_DATA);                      \
+      BOOST_CHECK(boolFieldsInd[idx] != SQL_NULL_DATA);                     \
+      BOOST_CHECK(dateFieldsInd[idx] != SQL_NULL_DATA);                     \
+      BOOST_CHECK(nullFieldsLen[idx] == SQL_NULL_DATA);                     \
+      BOOST_CHECK(binaryFieldsLen[idx] != SQL_NULL_DATA);                   \
+                                                                            \
+      std::string idField = utility::SqlWcharToString(&idFields[idx][0]);   \
+      int32_t i32Field = static_cast< int32_t >(i32Fields[idx]);            \
+      int32_t i64Field = static_cast< int32_t >(i64Fields[idx]);            \
+      std::string dec128Field =                                             \
+          utility::SqlWcharToString(&dec128Fields[idx][0]);                 \
+      double doubleField = static_cast< double >(doubleFields[idx]);        \
+      std::string strField = utility::SqlWcharToString(&strFields[idx][0]); \
+      bool boolField = boolFields[idx] != 0;                                \
+                                                                            \
+      CheckTestIdValue(testIdx, idField);                                   \
+      CheckTestI32Value(testIdx, i32Field);                                 \
+      CheckTestI64Value(testIdx, i64Field);                                 \
+      CheckTestDec128Value(testIdx, dec128Field);                           \
+      CheckTestDoubleValue(testIdx, doubleField);                           \
+      CheckTestStringValue(testIdx, strField);                              \
+      CheckTestBoolValue(testIdx, boolField);                               \
+      CheckTestDateValue(testIdx, dateFields[idx]);                         \
+      CheckTestI8ArrayValue(testIdx,                                        \
+                            reinterpret_cast< int8_t* >(binaryFields[idx]), \
+                            static_cast< SQLLEN >(binaryFieldsLen[idx]));   \
+    }                                                                       \
   } while (false)
 
 BOOST_AUTO_TEST_CASE(TestCursorBindingColumnWise) {
-  enum { ROWS_COUNT = 15 };
+  enum { ROWS_COUNT = 16 };
   enum { ROW_ARRAY_SIZE = 10 };
-  enum { BUFFER_SIZE = 1024 };
+  enum { BUFFER_SIZE = 64 };
 
-  StartAdditionalNode("Node2");
-
-  Connect(
-      "DRIVER={Apache "
-      "Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache;PAGE_SIZE=8");
-
-  // Preloading data.
-
-  InsertTestBatch(0, ROWS_COUNT, ROWS_COUNT);
+  std::string connectionStr;
+  CreateDsnConnectionStringForLocalServer(connectionStr);
+  Connect(connectionStr);
 
   // Setting attributes.
 
@@ -157,55 +128,55 @@ BOOST_AUTO_TEST_CASE(TestCursorBindingColumnWise) {
 
   // Binding collumns.
 
-  SQLSCHAR i8Fields[ROW_ARRAY_SIZE] = {0};
-  SQLLEN i8FieldsInd[ROW_ARRAY_SIZE];
-
-  SQLSMALLINT i16Fields[ROW_ARRAY_SIZE] = {0};
-  SQLLEN i16FieldsInd[ROW_ARRAY_SIZE];
+  SQLWCHAR idFields[ROW_ARRAY_SIZE][BUFFER_SIZE];
+  SQLLEN idFieldsLen[ROW_ARRAY_SIZE];
 
   SQLINTEGER i32Fields[ROW_ARRAY_SIZE] = {0};
   SQLLEN i32FieldsInd[ROW_ARRAY_SIZE];
 
-  SQLCHAR strFields[ROW_ARRAY_SIZE][BUFFER_SIZE];
-  SQLLEN strFieldsLen[ROW_ARRAY_SIZE];
+  SQLBIGINT i64Fields[ROW_ARRAY_SIZE] = {0};
+  SQLLEN i64FieldsInd[ROW_ARRAY_SIZE];
 
-  SQLREAL floatFields[ROW_ARRAY_SIZE];
-  SQLLEN floatFieldsInd[ROW_ARRAY_SIZE];
+  SQLWCHAR dec128Fields[ROW_ARRAY_SIZE][BUFFER_SIZE];
+  SQLLEN dec128FieldsLen[ROW_ARRAY_SIZE];
 
   SQLDOUBLE doubleFields[ROW_ARRAY_SIZE];
   SQLLEN doubleFieldsInd[ROW_ARRAY_SIZE];
 
-  SQLCHAR boolFields[ROW_ARRAY_SIZE];
+  SQLWCHAR strFields[ROW_ARRAY_SIZE][BUFFER_SIZE];
+  SQLLEN strFieldsLen[ROW_ARRAY_SIZE];
+
+  bool boolFields[ROW_ARRAY_SIZE];
   SQLLEN boolFieldsInd[ROW_ARRAY_SIZE];
 
   SQL_DATE_STRUCT dateFields[ROW_ARRAY_SIZE];
   SQLLEN dateFieldsInd[ROW_ARRAY_SIZE];
 
-  SQL_TIME_STRUCT timeFields[ROW_ARRAY_SIZE];
-  SQLLEN timeFieldsInd[ROW_ARRAY_SIZE];
+  SQLWCHAR nullFields[ROW_ARRAY_SIZE][BUFFER_SIZE];
+  SQLLEN nullFieldsLen[ROW_ARRAY_SIZE];
 
-  SQL_TIMESTAMP_STRUCT timestampFields[ROW_ARRAY_SIZE];
-  SQLLEN timestampFieldsInd[ROW_ARRAY_SIZE];
+  SQLSCHAR binaryFields[ROW_ARRAY_SIZE][BUFFER_SIZE];
+  SQLLEN binaryFieldsLen[ROW_ARRAY_SIZE];
 
-  SQLCHAR i8ArrayFields[ROW_ARRAY_SIZE][BUFFER_SIZE];
-  SQLLEN i8ArrayFieldsLen[ROW_ARRAY_SIZE];
-
-  ret = SQLBindCol(stmt, 1, SQL_C_STINYINT, i8Fields, 0, i8FieldsInd);
+  ret = SQLBindCol(stmt, 1, SQL_C_WCHAR, idFields,
+                   BUFFER_SIZE * sizeof(SQLWCHAR), idFieldsLen);
   ODBC_THROW_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-  ret = SQLBindCol(stmt, 2, SQL_C_SSHORT, i16Fields, 0, i16FieldsInd);
+  ret = SQLBindCol(stmt, 2, SQL_C_LONG, i32Fields, 0, i32FieldsInd);
   ODBC_THROW_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-  ret = SQLBindCol(stmt, 3, SQL_C_LONG, i32Fields, 0, i32FieldsInd);
+  ret = SQLBindCol(stmt, 3, SQL_C_SBIGINT, i64Fields, 0, i64FieldsInd);
   ODBC_THROW_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-  ret = SQLBindCol(stmt, 4, SQL_C_CHAR, strFields, BUFFER_SIZE, strFieldsLen);
+  ret = SQLBindCol(stmt, 4, SQL_C_WCHAR, dec128Fields,
+                   BUFFER_SIZE * sizeof(SQLWCHAR), dec128FieldsLen);
   ODBC_THROW_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-  ret = SQLBindCol(stmt, 5, SQL_C_FLOAT, floatFields, 0, floatFieldsInd);
+  ret = SQLBindCol(stmt, 5, SQL_C_DOUBLE, doubleFields, 0, doubleFieldsInd);
   ODBC_THROW_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-  ret = SQLBindCol(stmt, 6, SQL_C_DOUBLE, doubleFields, 0, doubleFieldsInd);
+  ret = SQLBindCol(stmt, 6, SQL_C_WCHAR, strFields,
+                   BUFFER_SIZE * sizeof(SQLWCHAR), strFieldsLen);
   ODBC_THROW_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   ret = SQLBindCol(stmt, 7, SQL_C_BIT, boolFields, 0, boolFieldsInd);
@@ -214,26 +185,23 @@ BOOST_AUTO_TEST_CASE(TestCursorBindingColumnWise) {
   ret = SQLBindCol(stmt, 8, SQL_C_TYPE_DATE, dateFields, 0, dateFieldsInd);
   ODBC_THROW_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-  ret = SQLBindCol(stmt, 9, SQL_C_TYPE_TIME, timeFields, 0, timeFieldsInd);
+  ret = SQLBindCol(stmt, 9, SQL_C_TYPE_TIME, nullFields, 0, nullFieldsLen);
   ODBC_THROW_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-  ret = SQLBindCol(stmt, 10, SQL_C_TYPE_TIMESTAMP, timestampFields, 0,
-                   timestampFieldsInd);
+  ret = SQLBindCol(stmt, 10, SQL_C_BINARY, binaryFields, BUFFER_SIZE,
+                   binaryFieldsLen);
   ODBC_THROW_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-  ret = SQLBindCol(stmt, 11, SQL_C_BINARY, i8ArrayFields, BUFFER_SIZE,
-                   i8ArrayFieldsLen);
-  ODBC_THROW_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
-
-  SQLCHAR sql[] =
+  std::vector< SQLWCHAR > sql = utility::ToWCHARVector(
       "SELECT "
-      "i8Field, i16Field, i32Field, strField, floatField, doubleField, "
-      "boolField, dateField, timeField, timestampField, i8ArrayField "
-      "FROM TestType "
-      "ORDER BY _key";
+      "  queries_test_006__id, fieldInt, fieldLong, fieldDecimal128, "
+      "  fieldDouble, fieldString, fieldBoolean, fieldDate, fieldNull, "
+      "  fieldBinary "
+      " FROM queries_test_006 "
+      " ORDER BY queries_test_006__id");
 
   // Execute a statement to retrieve rows from the Orders table.
-  ret = SQLExecDirect(stmt, sql, SQL_NTS);
+  ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
   ODBC_THROW_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   ret = SQLFetchScroll(stmt, SQL_FETCH_NEXT, 0);
@@ -269,9 +237,9 @@ BOOST_AUTO_TEST_CASE(TestCursorBindingColumnWise) {
 }
 
 BOOST_AUTO_TEST_CASE(TestCursorBindingRowWise) {
-  Connect(
-      "DRIVER={Apache "
-      "Ignite};ADDRESS=127.0.0.1:11110;SCHEMA=cache;PAGE_SIZE=8");
+  std::string connectionStr;
+  CreateDsnConnectionStringForLocalServer(connectionStr);
+  Connect(connectionStr);
 
   SQLRETURN ret = SQLSetStmtAttr(stmt, SQL_ATTR_ROW_BIND_TYPE,
                                  reinterpret_cast< SQLPOINTER* >(42), 0);
