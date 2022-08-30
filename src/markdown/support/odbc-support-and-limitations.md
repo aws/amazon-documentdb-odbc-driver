@@ -1,7 +1,7 @@
 # ODBC Support and Limitations
 
-## Connection Attributes
-| Connection attribute | Default | Support Value Change|
+## Supported Cnnection Information Types
+| Connection Information Types | Default | Support Value Change|
 |--------|------|-------|
 | SQL_DRIVER_NAME | 'Amazon DocumentDB' | no |
 | SQL_DBMS_NAME | 'Amazon DocumentDB' | no |
@@ -176,9 +176,14 @@
 | SQL_MAX_USER_NAME_LEN | 0 (no limit) | no |
 | SQL_NON_NULLABLE_COLUMNS | SQL_NNC_NON_NULL | no |
 | SQL_NULL_COLLATION | SQL_NC_LOW | no |
-| SQL_ATTR_LOGIN_TIMEOUT | 30 | yes |
 
-## Statements Attributes
+## Supported Connection Attributes
+| Connection Information Types | Default | Support Value Change|
+|--------|------|-------|
+| SQL_ATTR_LOGIN_TIMEOUT | 30 | yes |
+| SQL_ATTR_CONNECTION_DEAD | N/A | no |
+
+## Supported Statements Attributes
 Table of statement attributes supported by the Amazon DocumentDB ODBC driver.\
 Related function: `SQLSetStmtAttr`
 | Statement attribute | Default | Support Value Change|
