@@ -1,6 +1,6 @@
 # ODBC Support and Limitations
 
-## Supported Cnnection Information Types
+## Supported Connection Information Types
 | Connection Information Types | Default | Support Value Change|
 |--------|------|-------|
 | SQL_DRIVER_NAME | 'Amazon DocumentDB' | no |
