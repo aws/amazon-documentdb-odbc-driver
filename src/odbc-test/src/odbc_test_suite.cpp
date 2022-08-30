@@ -445,13 +445,13 @@ void OdbcTestSuite::GetTestI8ArrayField(int64_t idx, int8_t* val,
 void OdbcTestSuite::CheckTestI8ArrayValue(int idx, const int8_t* val,
                                           size_t valLen) {
   BOOST_TEST_CONTEXT("Test index: " << idx) {
-    odbc::common::FixedSizeArray< int8_t > expected(
-        static_cast< int32_t >(valLen));
-    GetTestI8ArrayField(idx, expected.GetData(), expected.GetSize());
+    std::vector< int8_t > expected;
+    expected.resize(valLen);
+    GetTestI8ArrayField(idx, expected.data(), expected.size());
 
     for (size_t j = 0; j < valLen; ++j) {
       BOOST_TEST_INFO("Byte index: " << j);
-      BOOST_CHECK_EQUAL(val[j], expected[(int32_t)j]);
+      BOOST_CHECK_EQUAL(val[j], expected[j]);
     }
   }
 }

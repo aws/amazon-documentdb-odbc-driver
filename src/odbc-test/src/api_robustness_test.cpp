@@ -549,21 +549,24 @@ BOOST_AUTO_TEST_CASE(TestSQLBindParameter) {
       SQLBindParameter(stmt, 1, SQL_PARAM_INPUT, SQL_C_SLONG, SQL_INTEGER, 100,
                        100, &ind1, sizeof(ind1), &len1);
 
+  std::string expectedSqlState;
 #ifdef __APPLE__
+  expectedSqlState = "HYC00";
   BOOST_REQUIRE_EQUAL(ret, SQL_INVALID_HANDLE);
 #else
+  expectedSqlState = "HY105";
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 #endif
 
   // Unsupported parameter type : output
   SQLBindParameter(stmt, 2, SQL_PARAM_OUTPUT, SQL_C_SLONG, SQL_INTEGER, 100,
                    100, &ind1, sizeof(ind1), &len1);
-  CheckSQLStatementDiagnosticError("HY105");
+  CheckSQLStatementDiagnosticError(expectedSqlState);
 
   // Unsupported parameter type : input/output
   SQLBindParameter(stmt, 2, SQL_PARAM_INPUT_OUTPUT, SQL_C_SLONG, SQL_INTEGER,
                    100, 100, &ind1, sizeof(ind1), &len1);
-  CheckSQLStatementDiagnosticError("HY105");
+  CheckSQLStatementDiagnosticError(expectedSqlState);
 
   // Unsupported data types
   for (size_t i = 0; i < sizeof(unsupportedSql) / sizeof(unsupportedSql[0]);
