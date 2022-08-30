@@ -576,11 +576,13 @@ BOOST_AUTO_TEST_CASE(TestSQLBindParameter) {
                            &len1);
 
 #ifdef __APPLE__
+    expectedSqlState = "HY105";
     BOOST_REQUIRE_EQUAL(ret, SQL_INVALID_HANDLE);
 #else
+    expectedSqlState = "HYC00";
     BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
 #endif
-    CheckSQLStatementDiagnosticError("HYC00");
+    CheckSQLStatementDiagnosticError(expectedSqlState);
   }
 
   // Size is null.

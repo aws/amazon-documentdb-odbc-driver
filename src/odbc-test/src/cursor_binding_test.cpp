@@ -213,7 +213,7 @@ BOOST_AUTO_TEST_CASE(TestCursorBindingColumnWise) {
     CHECK_TEST_VALUES(i, static_cast< int >(i));
   }
 
-  ret = SQLFetch(stmt);
+  ret = SQLFetchScroll(stmt, SQL_FETCH_NEXT, 0);
   ODBC_THROW_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   BOOST_CHECK_EQUAL(NumRowsFetched, ROWS_COUNT - ROW_ARRAY_SIZE);
