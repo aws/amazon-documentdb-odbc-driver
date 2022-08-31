@@ -30,7 +30,6 @@
 #include <vector>
 
 #include "documentdb/odbc/utility.h"
-#include "documentdb/odbc/log.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"
 #include "test_utils.h"
@@ -559,7 +558,6 @@ BOOST_AUTO_TEST_CASE(TestSQLBindParameter) {
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 #endif
 
-  LOG_MSG()
   // Unsupported parameter type : output
   SQLBindParameter(stmt, 2, SQL_PARAM_OUTPUT, SQL_C_SLONG, SQL_INTEGER, 100,
                    100, &ind1, sizeof(ind1), &len1);
