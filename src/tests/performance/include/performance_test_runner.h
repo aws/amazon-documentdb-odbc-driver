@@ -59,6 +59,8 @@ const std::string kTestQuery =
 enum testCaseStatus { success, error, skip };
 
 // To test array size greater than one, change the value below.
+// [Performance test can be run with a ROW ARRAY SIZE greater
+// than 1.](https://bitquill.atlassian.net/browse/AD-914)
 enum { ARRAY_SIZE = 1 };
 
 typedef struct Col {
