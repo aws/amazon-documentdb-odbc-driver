@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttrRowArraySize) {
   SQLINTEGER actual_row_array_size;
   SQLINTEGER resLen = 0;
 
-  // check that statement array size cannot be set to values not less than 1
+  // check that statement array size cannot be set to values less than 1
   // repeat test for different values
   SQLULEN valList[] = {6, 0, 2, 3, 4, 5, 1};
   for (SQLULEN val : valList) {
