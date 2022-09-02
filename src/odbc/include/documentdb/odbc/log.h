@@ -264,7 +264,7 @@ class Logger {
   std::string logPath = DEFAULT_LOG_PATH;
 
   /** Log Level */
-  LogLevel::Type logLevel = LogLevel::Type::OFF;
+  LogLevel::Type logLevel = LogLevel::Type::ERROR_LEVEL;
 
   /** Log file name */
   std::string logFileName;
