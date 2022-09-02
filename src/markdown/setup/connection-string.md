@@ -20,6 +20,8 @@
 |--------|-------------|---------------|
 | `APP_NAME` | (string) Sets the logical name of the application. | `Amazon DocumentDB ODBC Driver {version}`
 | `LOGIN_TIMEOUT_SEC` | (int) How long a connection can take to be opened before timing out (in seconds). Alias for connectTimeoutMS but using seconds. | `NONE`
+| `LOG_LEVEL` | Log level for driver logging. Possible values:<br />{OFF, ERROR, INFO, DEBUG} | ERROR|
+| `LOG_PATH` | Folder to store the log file | Windows: `%USERPROFILE%`, or if not available, `%HOMEDRIVE%%HOMEPATH%` <br /> macOS/Linux: `getpwuid()`, or if not available, `$HOME`
 | `READ_PREFERENCE` | (enum/string) The read preference for this connection. Allowed values: `primary`, `primaryPreferred`, `secondary`, `secondaryPreferred` or `nearest`. | `primary`
 | `REPLICA_SET` | (string) Name of replica set to connect to. For now, passing a name other than `rs0` will log a warning. | `NONE`
 | `RETRY_READS` | (true/false) If true, the driver will retry supported read operations if they fail due to a network error. | `true`
