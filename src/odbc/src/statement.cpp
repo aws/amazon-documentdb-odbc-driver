@@ -227,24 +227,16 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
   switch (attr) {
     case SQL_ATTR_ROW_ARRAY_SIZE: {
       SqlUlen val = reinterpret_cast< SqlUlen >(value);
-
       LOG_DEBUG_MSG("SQL_ATTR_ROW_ARRAY_SIZE: " << val);
 
-      if (val != 1) {
-        AddStatusRecord(
-            SqlState::SIM001_FUNCTION_NOT_SUPPORTED,
-            "Array size value cannot be set to a value other than 1");
-
+      if (val < 1) {
+        AddStatusRecord(SqlState::SHY024_INVALID_ATTRIBUTE_VALUE,
+                        "Array size value must be a positive integer value.");
         return SqlResult::AI_ERROR;
-      } else if (rowArraySize != 1) {
-        // val is 1
-        rowArraySize = 1;
-        LOG_DEBUG_MSG(
-            "else if (rowArraySize != 1) branch is executed."
-            "This branch should not be executed as we currently do not support "
-            "rowArraySize to have values other than 1.");
       }
 
+      // Update row array size setting.
+      rowArraySize = val;
       LOG_DEBUG_MSG("rowArraySize: " << rowArraySize);
 
       break;

@@ -246,6 +246,9 @@ class DOCUMENTDB_IMPORT_EXPORT DocumentDbError : public std::exception {
   /** Generic transaction error. */
   static const int DOCUMENTDB_ERR_TX = 2028;
 
+  /** SQL Exception (from JNI call). */
+  static const int DOCUMENTDB_ERR_SQL_EXCEPTION = 2029;
+
   /** Unknown error. */
   static const int DOCUMENTDB_ERR_UNKNOWN = -1;
 

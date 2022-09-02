@@ -1,0 +1,370 @@
+[
+  {
+    "_id": {
+      "$oid": "62196dcc4d91892191475130"
+    },
+    "fieldInt": 0,
+    "fieldLong": 0,
+    "fieldDecimal128": {
+      "$numberDecimal": "0.0"
+    },
+    "fieldDouble": 0.0,
+    "fieldString": "String#0",
+    "fieldBoolean": 1,
+    "fieldDate": {
+      "$date": "2017-01-01T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "62196dcc4d91892191475131"
+    },
+    "fieldInt": 32,
+    "fieldLong": 64,
+    "fieldDecimal128": {
+      "$numberDecimal": "1.0"
+    },
+    "fieldDouble": 0.25,
+    "fieldString": "String#1",
+    "fieldBoolean": 0,
+    "fieldDate": {
+      "$date": "2017-01-02T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "62196dcc4d91892191475132"
+    },
+    "fieldInt": 64,
+    "fieldLong": 128,
+    "fieldDecimal128": {
+      "$numberDecimal": "2.0"
+    },
+    "fieldDouble": 0.5,
+    "fieldString": "String#2",
+    "fieldBoolean": 1,
+    "fieldDate": {
+      "$date": "2017-01-03T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "62196dcc4d91892191475133"
+    },
+    "fieldInt": 96,
+    "fieldLong": 192,
+    "fieldDecimal128": {
+      "$numberDecimal": "3.0"
+    },
+    "fieldDouble": 0.75,
+    "fieldString": "String#3",
+    "fieldBoolean": 0,
+    "fieldDate": {
+      "$date": "2017-01-04T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "62196dcc4d91892191475134"
+    },
+    "fieldInt": 128,
+    "fieldLong": 256,
+    "fieldDecimal128": {
+      "$numberDecimal": "4.0"
+    },
+    "fieldDouble": 1.0,
+    "fieldString": "String#4",
+    "fieldBoolean": 1,
+    "fieldDate": {
+      "$date": "2017-01-05T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "62196dcc4d91892191475135"
+    },
+    "fieldInt": 160,
+    "fieldLong": 320,
+    "fieldDecimal128": {
+      "$numberDecimal": "5.0"
+    },
+    "fieldDouble": 1.25,
+    "fieldString": "String#5",
+    "fieldBoolean": 0,
+    "fieldDate": {
+      "$date": "2017-01-06T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "62196dcc4d91892191475136"
+    },
+    "fieldInt": 192,
+    "fieldLong": 384,
+    "fieldDecimal128": {
+      "$numberDecimal": "6.0"
+    },
+    "fieldDouble": 1.5,
+    "fieldString": "String#6",
+    "fieldBoolean": 1,
+    "fieldDate": {
+      "$date": "2017-01-07T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "62196dcc4d91892191475137"
+    },
+    "fieldInt": 224,
+    "fieldLong": 448,
+    "fieldDecimal128": {
+      "$numberDecimal": "7.0"
+    },
+    "fieldDouble": 1.75,
+    "fieldString": "String#7",
+    "fieldBoolean": 0,
+    "fieldDate": {
+      "$date": "2017-01-08T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "62196dcc4d91892191475138"
+    },
+    "fieldInt": 256,
+    "fieldLong": 512,
+    "fieldDecimal128": {
+      "$numberDecimal": "8.0"
+    },
+    "fieldDouble": 2.0,
+    "fieldString": "String#8",
+    "fieldBoolean": 1,
+    "fieldDate": {
+      "$date": "2017-01-09T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "62196dcc4d91892191475139"
+    },
+    "fieldInt": 288,
+    "fieldLong": 576,
+    "fieldDecimal128": {
+      "$numberDecimal": "9.0"
+    },
+    "fieldDouble": 2.25,
+    "fieldString": "String#9",
+    "fieldBoolean": 0,
+    "fieldDate": {
+      "$date": "2017-01-10T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "62196dcc4d9189219147513a"
+    },
+    "fieldInt": 320,
+    "fieldLong": 640,
+    "fieldDecimal128": {
+      "$numberDecimal": "10.0"
+    },
+    "fieldDouble": 2.5,
+    "fieldString": "String#10",
+    "fieldBoolean": 1,
+    "fieldDate": {
+      "$date": "2017-01-11T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "62196dcc4d9189219147513b"
+    },
+    "fieldInt": 352,
+    "fieldLong": 704,
+    "fieldDecimal128": {
+      "$numberDecimal": "11.0"
+    },
+    "fieldDouble": 2.75,
+    "fieldString": "String#11",
+    "fieldBoolean": 0,
+    "fieldDate": {
+      "$date": "2017-01-12T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "62196dcc4d9189219147513c"
+    },
+    "fieldInt": 384,
+    "fieldLong": 768,
+    "fieldDecimal128": {
+      "$numberDecimal": "12.0"
+    },
+    "fieldDouble": 3.0,
+    "fieldString": "String#12",
+    "fieldBoolean": 1,
+    "fieldDate": {
+      "$date": "2017-01-13T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "62196dcc4d9189219147513d"
+    },
+    "fieldInt": 416,
+    "fieldLong": 832,
+    "fieldDecimal128": {
+      "$numberDecimal": "13.0"
+    },
+    "fieldDouble": 3.25,
+    "fieldString": "String#13",
+    "fieldBoolean": 0,
+    "fieldDate": {
+      "$date": "2017-01-14T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "62196dcc4d9189219147513e"
+    },
+    "fieldInt": 448,
+    "fieldLong": 896,
+    "fieldDecimal128": {
+      "$numberDecimal": "14.0"
+    },
+    "fieldDouble": 3.5,
+    "fieldString": "String#14",
+    "fieldBoolean": 1,
+    "fieldDate": {
+      "$date": "2017-01-15T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "62196dcc4d9189219147513f"
+    },
+    "fieldInt": 480,
+    "fieldLong": 960,
+    "fieldDecimal128": {
+      "$numberDecimal": "15.0"
+    },
+    "fieldDouble": 3.75,
+    "fieldString": "String#15",
+    "fieldBoolean": 0,
+    "fieldDate": {
+      "$date": "2017-01-16T00:00:00Z"
+    },
+    "fieldNull": null,
+    "fieldBinary": {
+      "$binary": {
+        "base64": "AAEC",
+        "subType": "00"
+      }
+    }
+  }
+]

@@ -285,31 +285,49 @@ OdbcTestSuite::~OdbcTestSuite() {
   CleanUp();
 }
 
-int8_t OdbcTestSuite::GetTestI8Field(int64_t idx) {
-  return static_cast< int8_t >(idx * 8);
+int64_t OdbcTestSuite::GetTestI64Field(int idx) {
+  return static_cast< int16_t >(idx * 64);
 }
 
-void OdbcTestSuite::CheckTestI8Value(int idx, int8_t value) {
+void OdbcTestSuite::CheckTestI64Value(int idx, int64_t value) {
   BOOST_TEST_INFO("Test index: " << idx);
-  BOOST_CHECK_EQUAL(value, GetTestI8Field(idx));
+  BOOST_CHECK_EQUAL(value, GetTestI64Field(idx));
 }
 
-int16_t OdbcTestSuite::GetTestI16Field(int64_t idx) {
-  return static_cast< int16_t >(idx * 16);
-}
-
-void OdbcTestSuite::CheckTestI16Value(int idx, int16_t value) {
-  BOOST_TEST_INFO("Test index: " << idx);
-  BOOST_CHECK_EQUAL(value, GetTestI16Field(idx));
-}
-
-int32_t OdbcTestSuite::GetTestI32Field(int64_t idx) {
+int32_t OdbcTestSuite::GetTestI32Field(int idx) {
   return static_cast< int32_t >(idx * 32);
 }
 
 void OdbcTestSuite::CheckTestI32Value(int idx, int32_t value) {
   BOOST_TEST_INFO("Test index: " << idx);
   BOOST_CHECK_EQUAL(value, GetTestI32Field(idx));
+}
+
+std::string OdbcTestSuite::GetIdString(int idx) {
+  std::stringstream builder;
+
+  // Note: prefix used in queries_test_006.json input file.
+  builder << "62196dcc4d9189219147513" << std::hex << idx;
+
+  return builder.str();
+}
+
+void OdbcTestSuite::CheckTestIdValue(int idx, const std::string& value) {
+  BOOST_TEST_INFO("Test index: " << idx);
+  BOOST_CHECK_EQUAL(value, GetIdString(idx));
+}
+
+std::string OdbcTestSuite::GetTestDec128String(int64_t idx) {
+  std::stringstream builder;
+
+  builder << idx;
+
+  return builder.str();
+}
+
+void OdbcTestSuite::CheckTestDec128Value(int idx, const std::string& value) {
+  BOOST_TEST_INFO("Test index: " << idx);
+  BOOST_CHECK_EQUAL(value, GetTestDec128String(idx));
 }
 
 std::string OdbcTestSuite::GetTestString(int64_t idx) {
@@ -422,19 +440,19 @@ void OdbcTestSuite::CheckTestTimestampValue(int idx,
 void OdbcTestSuite::GetTestI8ArrayField(int64_t idx, int8_t* val,
                                         size_t valLen) {
   for (size_t j = 0; j < valLen; ++j)
-    val[j] = static_cast< int8_t >(idx * valLen + j);
+    val[j] = static_cast< int8_t >(j);
 }
 
 void OdbcTestSuite::CheckTestI8ArrayValue(int idx, const int8_t* val,
                                           size_t valLen) {
   BOOST_TEST_CONTEXT("Test index: " << idx) {
-    odbc::common::FixedSizeArray< int8_t > expected(
-        static_cast< int32_t >(valLen));
-    GetTestI8ArrayField(idx, expected.GetData(), expected.GetSize());
+    std::vector< int8_t > expected;
+    expected.resize(valLen);
+    GetTestI8ArrayField(idx, expected.data(), expected.size());
 
     for (size_t j = 0; j < valLen; ++j) {
       BOOST_TEST_INFO("Byte index: " << j);
-      BOOST_CHECK_EQUAL(val[j], expected[(int32_t)j]);
+      BOOST_CHECK_EQUAL(val[j], expected[j]);
     }
   }
 }
@@ -450,13 +468,9 @@ void OdbcTestSuite::CheckSQLDiagnosticError(
   SQLRETURN ret = SQLGetDiagRec(handleType, handle, 1, state, &nativeError,
                                 message, ODBC_BUFFER_SIZE, &messageLen);
 
-  std::vector< SQLWCHAR > expectSqlStateWchar =
-      MakeSqlBuffer(expectedSqlStateStr);
-  const std::string expectedSqlState =
-      reinterpret_cast< char* >(&expectSqlStateWchar[0]);
-  const std::string sqlState = reinterpret_cast< char* >(state);
+  const std::string sqlState = utility::SqlWcharToString(state);
   BOOST_REQUIRE_EQUAL(ret, SQL_SUCCESS);
-  BOOST_REQUIRE_EQUAL(sqlState, expectedSqlState);
+  BOOST_REQUIRE_EQUAL(sqlState, expectedSqlStateStr);
   BOOST_REQUIRE(messageLen > 0);
 }
 
@@ -548,365 +562,6 @@ void OdbcTestSuite::InsertTestStrings(int recordsNum, bool merge) {
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-}
-
-int OdbcTestSuite::InsertTestBatch(int from, int to, int expectedToAffect,
-                                   bool merge) {
-  using common::FixedSizeArray;
-
-  std::vector< SQLWCHAR > insertReq = MakeSqlBuffer(
-      "INSERT "
-      "INTO TestType(_key, i8Field, i16Field, i32Field, strField, floatField, "
-      "doubleField, boolField, dateField, "
-      "timeField, timestampField, i8ArrayField) VALUES(?, ?, ?, ?, ?, ?, ?, "
-      "?, ?, ?, ?, ?)");
-
-  std::vector< SQLWCHAR > mergeReq = MakeSqlBuffer(
-      "MERGE "
-      "INTO TestType(_key, i8Field, i16Field, i32Field, strField, floatField, "
-      "doubleField, boolField, dateField, "
-      "timeField, timestampField, i8ArrayField) VALUES(?, ?, ?, ?, ?, ?, ?, "
-      "?, ?, ?, ?, ?)");
-
-  SQLRETURN ret;
-
-  int32_t recordsNum = to - from;
-
-  ret = SQLPrepare(stmt, merge ? mergeReq.data() : insertReq.data(), SQL_NTS);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  FixedSizeArray< int64_t > keys(recordsNum);
-  FixedSizeArray< int8_t > i8Fields(recordsNum);
-  FixedSizeArray< int16_t > i16Fields(recordsNum);
-  FixedSizeArray< int32_t > i32Fields(recordsNum);
-  FixedSizeArray< char > strFields(recordsNum * 1024);
-  FixedSizeArray< float > floatFields(recordsNum);
-  FixedSizeArray< double > doubleFields(recordsNum);
-  FixedSizeArray< bool > boolFields(recordsNum);
-  FixedSizeArray< SQL_DATE_STRUCT > dateFields(recordsNum);
-  FixedSizeArray< SQL_TIME_STRUCT > timeFields(recordsNum);
-  FixedSizeArray< SQL_TIMESTAMP_STRUCT > timestampFields(recordsNum);
-  FixedSizeArray< int8_t > i8ArrayFields(recordsNum * 42);
-
-  FixedSizeArray< SQLLEN > strFieldsLen(recordsNum);
-  FixedSizeArray< SQLLEN > i8ArrayFieldsLen(recordsNum);
-
-  BOOST_TEST_CHECKPOINT("Filling param data");
-
-  for (int i = 0; i < recordsNum; ++i) {
-    int seed = from + i;
-
-    keys[i] = seed;
-    i8Fields[i] = GetTestI8Field(seed);
-    i16Fields[i] = GetTestI16Field(seed);
-    i32Fields[i] = GetTestI32Field(seed);
-
-    std::string val = GetTestString(seed);
-    CopyStringToBuffer(strFields.GetData() + 1024 * i, val, 1023);
-    strFieldsLen[i] = val.size();
-
-    floatFields[i] = GetTestFloatField(seed);
-    doubleFields[i] = GetTestDoubleField(seed);
-    boolFields[i] = GetTestBoolField(seed);
-
-    GetTestDateField(seed, dateFields[i]);
-    GetTestTimeField(seed, timeFields[i]);
-    GetTestTimestampField(seed, timestampFields[i]);
-
-    GetTestI8ArrayField(seed, &i8ArrayFields[i * 42], 42);
-    i8ArrayFieldsLen[i] = 42;
-  }
-
-  SQLULEN setsProcessed = 0;
-
-  BOOST_TEST_CHECKPOINT("Setting processed pointer");
-  ret = SQLSetStmtAttr(stmt, SQL_ATTR_PARAMS_PROCESSED_PTR, &setsProcessed,
-                       SQL_IS_POINTER);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_TEST_CHECKPOINT("Binding keys");
-  ret = SQLBindParameter(stmt, 1, SQL_PARAM_INPUT, SQL_C_SBIGINT, SQL_BIGINT, 0,
-                         0, keys.GetData(), 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_TEST_CHECKPOINT("Binding i8Fields");
-  ret = SQLBindParameter(stmt, 2, SQL_PARAM_INPUT, SQL_C_STINYINT, SQL_TINYINT,
-                         0, 0, i8Fields.GetData(), 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_TEST_CHECKPOINT("Binding i16Fields");
-  ret = SQLBindParameter(stmt, 3, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_SMALLINT,
-                         0, 0, i16Fields.GetData(), 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_TEST_CHECKPOINT("Binding i32Fields");
-  ret = SQLBindParameter(stmt, 4, SQL_PARAM_INPUT, SQL_C_SLONG, SQL_INTEGER, 0,
-                         0, i32Fields.GetData(), 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_TEST_CHECKPOINT("Binding strFields");
-  ret =
-      SQLBindParameter(stmt, 5, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_WVARCHAR, 1024,
-                       0, strFields.GetData(), 1024, strFieldsLen.GetData());
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_TEST_CHECKPOINT("Binding floatFields");
-  ret = SQLBindParameter(stmt, 6, SQL_PARAM_INPUT, SQL_C_FLOAT, SQL_FLOAT, 0, 0,
-                         floatFields.GetData(), 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_TEST_CHECKPOINT("Binding doubleFields");
-  ret = SQLBindParameter(stmt, 7, SQL_PARAM_INPUT, SQL_C_DOUBLE, SQL_DOUBLE, 0,
-                         0, doubleFields.GetData(), 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_TEST_CHECKPOINT("Binding boolFields");
-  ret = SQLBindParameter(stmt, 8, SQL_PARAM_INPUT, SQL_C_BIT, SQL_BIT, 0, 0,
-                         boolFields.GetData(), 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_TEST_CHECKPOINT("Binding dateFields");
-  ret = SQLBindParameter(stmt, 9, SQL_PARAM_INPUT, SQL_C_TYPE_DATE,
-                         SQL_TYPE_DATE, 0, 0, dateFields.GetData(), 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_TEST_CHECKPOINT("Binding timeFields");
-  ret = SQLBindParameter(stmt, 10, SQL_PARAM_INPUT, SQL_C_TYPE_TIME,
-                         SQL_TYPE_TIME, 0, 0, timeFields.GetData(), 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_TEST_CHECKPOINT("Binding timestampFields");
-  ret = SQLBindParameter(stmt, 11, SQL_PARAM_INPUT, SQL_C_TYPE_TIMESTAMP,
-                         SQL_TYPE_TIMESTAMP, 0, 0, timestampFields.GetData(), 0,
-                         0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_TEST_CHECKPOINT("Binding i8ArrayFields");
-  ret = SQLBindParameter(stmt, 12, SQL_PARAM_INPUT, SQL_C_BINARY, SQL_BINARY,
-                         42, 0, i8ArrayFields.GetData(), 42,
-                         i8ArrayFieldsLen.GetData());
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_TEST_CHECKPOINT("Setting paramset size");
-  ret = SQLSetStmtAttr(
-      stmt, SQL_ATTR_PARAMSET_SIZE,
-      reinterpret_cast< SQLPOINTER >(static_cast< ptrdiff_t >(recordsNum)), 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_TEST_CHECKPOINT("Executing query");
-  ret = SQLExecute(stmt);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  SQLLEN totallyAffected = 0;
-
-  do {
-    SQLLEN affected = 0;
-    ret = SQLRowCount(stmt, &affected);
-
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-    totallyAffected += affected;
-
-    BOOST_TEST_CHECKPOINT("Getting next result set");
-
-    ret = SQLMoreResults(stmt);
-
-    if (ret != SQL_SUCCESS && ret != SQL_NO_DATA)
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-  } while (ret != SQL_NO_DATA);
-
-  BOOST_CHECK_EQUAL(totallyAffected, expectedToAffect);
-
-  BOOST_TEST_CHECKPOINT("Resetting parameters.");
-  ret = SQLFreeStmt(stmt, SQL_RESET_PARAMS);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  BOOST_TEST_CHECKPOINT("Setting paramset size");
-  ret = SQLSetStmtAttr(stmt, SQL_ATTR_PARAMSET_SIZE,
-                       reinterpret_cast< SQLPOINTER >(1), 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  return static_cast< int >(setsProcessed);
-}
-
-void OdbcTestSuite::InsertBatchSelect(int recordsNum) {
-  Connect("DRIVER={Amazon DocumentDB};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
-
-  // Inserting values.
-  int inserted = InsertTestBatch(0, recordsNum, recordsNum);
-
-  BOOST_REQUIRE_EQUAL(inserted, recordsNum);
-
-  int64_t key = 0;
-  char strField[1024] = {0};
-  SQLLEN strFieldLen = 0;
-
-  // Binding columns.
-  SQLRETURN ret = SQLBindCol(stmt, 1, SQL_C_SLONG, &key, 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // Binding columns.
-  ret = SQLBindCol(stmt, 2, SQL_C_CHAR, &strField, sizeof(strField),
-                   &strFieldLen);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // Just selecting everything to make sure everything is OK
-  std::vector< SQLWCHAR > selectReq =
-      MakeSqlBuffer("SELECT _key, strField FROM TestType ORDER BY _key");
-
-  ret = SQLExecDirect(stmt, selectReq.data(), SQL_NTS);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  int selectedRecordsNum = 0;
-
-  ret = SQL_SUCCESS;
-
-  while (ret == SQL_SUCCESS) {
-    ret = SQLFetch(stmt);
-
-    if (ret == SQL_NO_DATA)
-      break;
-
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-    std::string expectedStr = GetTestString(selectedRecordsNum);
-    int64_t expectedKey = selectedRecordsNum;
-
-    BOOST_CHECK_EQUAL(key, expectedKey);
-
-    BOOST_CHECK_EQUAL(std::string(strField, strFieldLen), expectedStr);
-
-    ++selectedRecordsNum;
-  }
-
-  BOOST_CHECK_EQUAL(recordsNum, selectedRecordsNum);
-}
-
-void OdbcTestSuite::InsertNonFullBatchSelect(int recordsNum, int splitAt) {
-  Connect("DRIVER={Amazon DocumentDB};ADDRESS=127.0.0.1:11110;SCHEMA=cache");
-
-  std::vector< SQLUSMALLINT > statuses(recordsNum, 42);
-
-  // Binding statuses array.
-  SQLRETURN ret =
-      SQLSetStmtAttr(stmt, SQL_ATTR_PARAM_STATUS_PTR, &statuses[0], 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // Inserting values.
-  int setsProcessed =
-      InsertTestBatch(splitAt, recordsNum, recordsNum - splitAt);
-
-  BOOST_REQUIRE_EQUAL(setsProcessed, recordsNum - splitAt);
-
-  for (int i = 0; i < recordsNum - splitAt; ++i)
-    BOOST_REQUIRE_EQUAL(statuses[i], SQL_PARAM_SUCCESS);
-
-  setsProcessed = InsertTestBatch(0, recordsNum, splitAt);
-
-  BOOST_REQUIRE_EQUAL(setsProcessed, recordsNum);
-
-  for (int i = 0; i < splitAt; ++i)
-    BOOST_REQUIRE_EQUAL(statuses[i], SQL_PARAM_SUCCESS);
-
-  for (int i = splitAt; i < recordsNum; ++i)
-    BOOST_REQUIRE_EQUAL(statuses[i], SQL_PARAM_ERROR);
-
-  int64_t key = 0;
-  char strField[1024] = {0};
-  SQLLEN strFieldLen = 0;
-
-  // Binding columns.
-  ret = SQLBindCol(stmt, 1, SQL_C_SLONG, &key, 0, 0);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // Binding columns.
-  ret = SQLBindCol(stmt, 2, SQL_C_CHAR, &strField, sizeof(strField),
-                   &strFieldLen);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  // Just selecting everything to make sure everything is OK
-  std::vector< SQLWCHAR > selectReq =
-      MakeSqlBuffer("SELECT _key, strField FROM TestType ORDER BY _key");
-
-  ret = SQLExecDirect(stmt, selectReq.data(), SQL_NTS);
-
-  if (!SQL_SUCCEEDED(ret))
-    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-  int selectedRecordsNum = 0;
-
-  ret = SQL_SUCCESS;
-
-  while (ret == SQL_SUCCESS) {
-    ret = SQLFetch(stmt);
-
-    if (ret == SQL_NO_DATA)
-      break;
-
-    if (!SQL_SUCCEEDED(ret))
-      BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
-
-    std::string expectedStr = GetTestString(selectedRecordsNum);
-    int64_t expectedKey = selectedRecordsNum;
-
-    BOOST_CHECK_EQUAL(key, expectedKey);
-
-    BOOST_CHECK_EQUAL(std::string(strField, strFieldLen), expectedStr);
-
-    ++selectedRecordsNum;
-  }
-
-  BOOST_CHECK_EQUAL(recordsNum, selectedRecordsNum);
 }
 
 void OdbcTestSuite::CreateDsnConnectionStringForRemoteServer(

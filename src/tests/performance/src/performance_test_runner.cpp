@@ -409,6 +409,42 @@ void performance::PerformanceTestRunner::RecordExecBindFetch(
   long long time_bind_ms;
   long long time_fetch_ms;
   std::vector< Col > cols;
+  SQLUSMALLINT RowStatus[ARRAY_SIZE] = {0};
+  SQLUINTEGER NumRowsFetched = 0;
+
+  ret = SQLSetStmtAttr(*hstmt, SQL_ATTR_ROW_BIND_TYPE, SQL_BIND_BY_COLUMN, 0);
+  if (!SQL_SUCCEEDED(ret)) {
+    LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
+    test_case.status = error;
+    test_case.err_msg = "SQLSetStmtAttr SQL_ATTR_ROW_BIND_TYPE failed";
+    return;  // continue to next test case
+  }
+
+  ret = SQLSetStmtAttr(*hstmt, SQL_ATTR_ROW_ARRAY_SIZE,
+                       reinterpret_cast< SQLPOINTER* >(ARRAY_SIZE), 0);
+  if (!SQL_SUCCEEDED(ret)) {
+    LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
+    test_case.status = error;
+    test_case.err_msg = "SQLSetStmtAttr SQL_ATTR_ROW_ARRAY_SIZE failed";
+    return;  // continue to next test case
+  }
+
+  ret = SQLSetStmtAttr(*hstmt, SQL_ATTR_ROW_STATUS_PTR, RowStatus, 0);
+  if (!SQL_SUCCEEDED(ret)) {
+    LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
+    test_case.status = error;
+    test_case.err_msg = "SQLSetStmtAttr SQL_ATTR_ROW_STATUS_PTR failed";
+    return;  // continue to next test case
+  }
+
+  ret = SQLSetStmtAttr(*hstmt, SQL_ATTR_ROWS_FETCHED_PTR, &NumRowsFetched, 0);
+  if (!SQL_SUCCEEDED(ret)) {
+    LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
+    test_case.status = error;
+    test_case.err_msg = "SQLSetStmtAttr SQL_ATTR_ROWS_FETCHED_PTR failed";
+    return;  // continue to next test case
+  }
+
 
   // Query
   std::string temp_str =
@@ -455,8 +491,8 @@ void performance::PerformanceTestRunner::RecordExecBindFetch(
     auto time_bind_start = std::chrono::steady_clock::now();
     for (size_t i = 0; i < static_cast< size_t >(total_columns); i++) {
       ret = SQLBindCol(*hstmt, static_cast< SQLUSMALLINT >(i + 1), SQL_C_WCHAR,
-                       static_cast< SQLPOINTER >(&cols[i].data_dat[0]),
-                       BIND_SIZE * sizeof(SQLWCHAR), &cols[i].data_len);
+                       static_cast< SQLPOINTER >(cols[i].data_dat),
+                       BIND_SIZE * sizeof(SQLWCHAR), cols[i].data_len);
       if (ret != SQL_SUCCESS) {
         LogAnyDiagnostics(SQL_HANDLE_STMT, *hstmt, ret);
         test_case.status = error;
@@ -811,7 +847,8 @@ performance::PerformanceTestRunner::PerformanceTestRunner() {
 
 performance::PerformanceTestRunner::PerformanceTestRunner(
     const std::string test_plan_csv, const std::string output_file_csv,
-    const std::string dsn, const int output_mode) {
+    const std::string dsn, const int output_mode, const std::string user,
+    const std::string password) {
   // check input arguments
   CheckFileExtension(test_plan_csv, ".csv");
   CheckFileExtension(output_file_csv, ".csv");
@@ -821,6 +858,8 @@ performance::PerformanceTestRunner::PerformanceTestRunner(
   _input_file = test_plan_csv;
   _output_file = output_file_csv;
   _dsn = dsn;
+  _user = user;
+  _password = password;
   _output_mode = output_mode;
 }
 
@@ -889,7 +928,10 @@ void performance::PerformanceTestRunner::SetupConnection() {
   SQLTCHAR out_conn_string[1024];
   SQLSMALLINT out_conn_string_length;
   SQLRETURN ret;
-  test_string dsn = to_test_string("DSN=" + _dsn);
+  test_string driver_conn_str = to_test_string("DSN=" + _dsn);
+  test_string conn_str = to_test_string(_dsn);
+  test_string user = to_test_string(_user);
+  test_string password = to_test_string(_password);
   std::string error_msg;
 
   ret = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &_env);
@@ -910,18 +952,27 @@ void performance::PerformanceTestRunner::SetupConnection() {
     throw std::runtime_error(error_msg);
   }
 
-  ret = SQLDriverConnect(_conn, NULL, (SQLTCHAR*)dsn.c_str(), SQL_NTS,
-                         out_conn_string, IT_SIZEOF(out_conn_string),
-                         &out_conn_string_length, SQL_DRIVER_COMPLETE);
+  std::string connApiName;
+  if (user.empty() || password.empty()) {
+    connApiName = "SQLDriverConnect";
+    ret = SQLDriverConnect(_conn, NULL, (SQLTCHAR*)driver_conn_str.c_str(), SQL_NTS,
+                           out_conn_string, IT_SIZEOF(out_conn_string),
+                           &out_conn_string_length, SQL_DRIVER_COMPLETE);
+  } else {
+    connApiName = "SQLConnect";
+    ret = SQLConnect(_conn, (SQLTCHAR*)conn_str.c_str(), SQL_NTS,
+                     (SQLTCHAR*)user.c_str(), SQL_NTS,
+                     (SQLTCHAR*)password.c_str(), SQL_NTS);
+  }
   if (ret == SQL_INVALID_HANDLE || ret == SQL_ERROR) {
     error_msg =
-        "SQLDriverConnect ERROR: failed to connect to DSN = " + _dsn + ".";
+        connApiName + " ERROR: failed to connect to DSN = " + _dsn + ".";
     throw std::runtime_error(error_msg);
   } else if (ret == SQL_NO_DATA) {
-    error_msg = "SQLDriverConnect ERROR: no data in DSN = " + _dsn + ".";
+    error_msg = connApiName + " ERROR: no data in DSN = " + _dsn + ".";
     throw std::runtime_error(error_msg);
   } else if (ret == SQL_STILL_EXECUTING) {
-    error_msg = "SQLDriverConnect ERROR: still trying to connect to DSN = "
+    error_msg = connApiName + " ERROR: still trying to connect to DSN = "
                 + _dsn + ".";
     throw std::runtime_error(error_msg);
   }
