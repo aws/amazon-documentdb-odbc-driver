@@ -267,6 +267,17 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
 
     SqlResult::Type result = GetMqlQueryContext(mqlQueryContext, error);
     if (result != SqlResult::AI_SUCCESS) {
+      switch (error.GetCode()) {
+        case DocumentDbError::DOCUMENTDB_ERR_SQL_EXCEPTION:
+          // Assume that query cannot be parsed or is not implemented.
+          diag.AddStatusRecord(
+              SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
+              error.GetText());
+          break;
+        default:
+          diag.AddStatusRecord(error.GetText());
+          break;
+      }
       diag.AddStatusRecord(error.GetText());
 
       LOG_ERROR_MSG(

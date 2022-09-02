@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
 #endif
 
   // Initialize variables
-  std::string data_source_name, test_plan_file, test_results_file;
+  std::string data_source_name, test_plan_file, test_results_file, user, password;
   int output_mode = 0;  // output time for exec/bind/fetch combined
 
   // Check command line arguments
@@ -82,6 +82,13 @@ int main(int argc, char* argv[]) {
       test_plan_file = argv[1];
       test_results_file = argv[2];
       data_source_name = argv[3];
+    } else if (argc == 6) {
+      // input file, output file, dsn, user and password passed in
+      test_plan_file = argv[1];
+      test_results_file = argv[2];
+      data_source_name = argv[3];
+      user = argv[4];
+      password = argv[5];
     } else {
       std::cerr << "ERROR: invalid number of command line arguments\n";
     }
@@ -91,7 +98,7 @@ int main(int argc, char* argv[]) {
   try {
     // Initialize performance test runner
     performance::PerformanceTestRunner performanceTest(
-        test_plan_file, test_results_file, data_source_name, output_mode);
+        test_plan_file, test_results_file, data_source_name, output_mode, user, password);
 
     performanceTest.SetupConnection();
     performanceTest.ReadPerformanceTestPlan();

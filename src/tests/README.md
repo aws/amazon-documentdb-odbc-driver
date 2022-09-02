@@ -5,8 +5,8 @@ Performance test framework for testing ODBC driver
 1. Setup test database system under a dsn
 2. Specify test plan input file
 3. Specify output file 
-4. Run executable and pass in command line arguments: dsn-name input-file output-file
-e.g. `performance.exe "documentdb-perf-test" "Performance_Test_Plan.csv" "Performance_Test_Results.csv"`
+4. Run executable and pass in command line arguments: input-file output-file dsn-name [user password]
+e.g. `performance.exe "Performance_Test_Plan.csv" "Performance_Test_Results.csv" "documentdb-perf-test" "documentdb" "secret"`
 e.g. output console:
 ```
 %%__PARSE__SYNC__START__%%
