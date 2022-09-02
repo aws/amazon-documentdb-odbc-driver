@@ -285,16 +285,16 @@ OdbcTestSuite::~OdbcTestSuite() {
   CleanUp();
 }
 
-int16_t OdbcTestSuite::GetTestI64Field(int64_t idx) {
+int64_t OdbcTestSuite::GetTestI64Field(int idx) {
   return static_cast< int16_t >(idx * 64);
 }
 
-void OdbcTestSuite::CheckTestI64Value(int idx, int16_t value) {
+void OdbcTestSuite::CheckTestI64Value(int idx, int64_t value) {
   BOOST_TEST_INFO("Test index: " << idx);
   BOOST_CHECK_EQUAL(value, GetTestI64Field(idx));
 }
 
-int32_t OdbcTestSuite::GetTestI32Field(int64_t idx) {
+int32_t OdbcTestSuite::GetTestI32Field(int idx) {
   return static_cast< int32_t >(idx * 32);
 }
 
@@ -303,9 +303,10 @@ void OdbcTestSuite::CheckTestI32Value(int idx, int32_t value) {
   BOOST_CHECK_EQUAL(value, GetTestI32Field(idx));
 }
 
-std::string OdbcTestSuite::GetIdString(int64_t idx) {
+std::string OdbcTestSuite::GetIdString(int idx) {
   std::stringstream builder;
 
+  // Note: prefix used in queries_test_006.json input file.
   builder << "62196dcc4d9189219147513" << std::hex << idx;
 
   return builder.str();

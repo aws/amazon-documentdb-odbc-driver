@@ -206,14 +206,14 @@ struct OdbcTestSuite {
    * @param idx Index.
    * @return Corresponding i64Field value.
    */
-  static int16_t GetTestI64Field(int64_t idx);
+  static int64_t GetTestI64Field(int idx);
 
   /**
    * Check i64Field test value.
    * @param idx Index.
    * @param value Value to test.
    */
-  static void CheckTestI64Value(int idx, int16_t value);
+  static void CheckTestI64Value(int idx, int64_t value);
 
   /**
    * Get test i32Field.
@@ -221,7 +221,7 @@ struct OdbcTestSuite {
    * @param idx Index.
    * @return Corresponding i32Field value.
    */
-  static int32_t GetTestI32Field(int64_t idx);
+  static int32_t GetTestI32Field(int idx);
 
   /**
    * Check i32Field test value.
@@ -236,7 +236,7 @@ struct OdbcTestSuite {
    * @param idx Index.
    * @return Corresponding test string.
    */
-  static std::string GetIdString(int64_t idx);
+  static std::string GetIdString(int idx);
 
   /**
    * Check _id test value.

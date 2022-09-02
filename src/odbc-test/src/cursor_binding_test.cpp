@@ -44,15 +44,12 @@ struct CursorBindingTestSuiteFixture : public odbc::OdbcTestSuite {
   /**
    * Constructor.
    */
-  CursorBindingTestSuiteFixture() {
-  }
+  CursorBindingTestSuiteFixture() = default;
 
   /**
    * Destructor.
    */
-  virtual ~CursorBindingTestSuiteFixture() {
-    // No-op.
-  }
+  virtual ~CursorBindingTestSuiteFixture() = default;
 };
 
 BOOST_FIXTURE_TEST_SUITE(CursorBindingTestSuite, CursorBindingTestSuiteFixture)
@@ -76,7 +73,7 @@ BOOST_FIXTURE_TEST_SUITE(CursorBindingTestSuite, CursorBindingTestSuiteFixture)
                                                                             \
       std::string idField = utility::SqlWcharToString(&idFields[idx][0]);   \
       int32_t i32Field = static_cast< int32_t >(i32Fields[idx]);            \
-      int32_t i64Field = static_cast< int32_t >(i64Fields[idx]);            \
+      int32_t i64Field = static_cast< int64_t >(i64Fields[idx]);            \
       std::string dec128Field =                                             \
           utility::SqlWcharToString(&dec128Fields[idx][0]);                 \
       double doubleField = static_cast< double >(doubleFields[idx]);        \
