@@ -99,7 +99,7 @@ void Logger::SetLogPath(const std::string& path) {
     LOG_DEBUG_MSG(
         "WARNING: SetLogPath is called with the existing path string. "
         "SetLogPath should only be called once in normal circumstances aside "
-        "from testing");
+        "from testing.");
     return;
   }
   if (!common::IsValidDirectory(path)) {
@@ -112,8 +112,12 @@ void Logger::SetLogPath(const std::string& path) {
   std::string oldLogFilePath = logFilePath;
   logPath = path;
   if (IsEnabled() && logLevel != LogLevel::Type::OFF) {
-    LOG_INFO_MSG("Reset log path: Log path is changed to " + logFilePath);
+    LOG_INFO_MSG("Reset log path: Log path is changed to " + logPath
+                 + ". Log file is in format docdb_odbc_odbc_YYYYMMDD.log");
+
+    // close file stream and erase log file name to allow new log file path
     fileStream.close();
+    logFileName.erase();
     LOG_INFO_MSG("Previously logged information is stored in log file "
                  + oldLogFilePath);
   }

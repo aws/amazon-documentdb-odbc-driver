@@ -627,7 +627,7 @@ void OdbcTestSuite::CreateDsnConnectionStringForLocalServer(
   std::string port = portNum;
   std::string database = databaseName.size() > 0 ? databaseName : "odbc-test";
   std::string logPath = common::GetEnv("DOC_DB_LOG_PATH", "");
-  std::string logLevel = common::GetEnv("DOC_DB_LOG_LEVEL", "");
+  std::string logLevel = common::GetEnv("DOC_DB_LOG_LEVEL", "Error");
 
   connectionString =
     "DRIVER={Amazon DocumentDB};"
