@@ -1497,7 +1497,7 @@ SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* state,
   int32_t recNum = records.GetLastNonRetrieved();
 
   if (recNum < 1 || recNum > records.GetStatusRecordsNumber()) {
-    LOG_INFO_MSG("SQLError exiting with SQL_NO_DATA");
+    LOG_ERROR_MSG("SQLError exiting with SQL_NO_DATA");
     return SQL_NO_DATA;
   }
 

@@ -19,6 +19,7 @@
 
 #include <set>
 #include <string>
+#include "documentdb/odbc/log.h"
 
 namespace documentdb {
 namespace odbc {
@@ -89,10 +90,16 @@ int32_t DiagnosticRecordStorage::GetStatusRecordsNumber() const {
 
 const DiagnosticRecord& DiagnosticRecordStorage::GetStatusRecord(
     int32_t idx) const {
+  if (statusRecords.size() < idx) {
+    LOG_ERROR_MSG("const: idx value " << idx << " is out of range");
+  }
   return statusRecords[idx - 1];
 }
 
 DiagnosticRecord& DiagnosticRecordStorage::GetStatusRecord(int32_t idx) {
+  if (statusRecords.size() < idx) {
+    LOG_ERROR_MSG("idx value " << idx << " is out of range");
+  }
   return statusRecords[idx - 1];
 }
 
