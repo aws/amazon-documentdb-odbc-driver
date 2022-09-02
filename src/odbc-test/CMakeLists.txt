@@ -51,6 +51,7 @@ set(SOURCES
          src/column_meta_test.cpp
          src/configuration_test.cpp
          src/connection_test.cpp
+         src/cursor_binding_test.cpp
          src/java_test.cpp
          src/jni_test.cpp
          src/log_test.cpp

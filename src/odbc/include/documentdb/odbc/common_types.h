@@ -175,6 +175,9 @@ struct SqlState {
     /** Function sequence error. */
     SHY010_SEQUENCE_ERROR,
 
+    /** Invalid attribute value. */
+    SHY024_INVALID_ATTRIBUTE_VALUE,
+
     /**
      * Invalid string or buffer length
      */

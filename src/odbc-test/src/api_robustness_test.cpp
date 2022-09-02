@@ -29,7 +29,7 @@
 #include <string>
 #include <vector>
 
-#include "documentdb/odbc/impl/binary/binary_utils.h"
+#include "documentdb/odbc/utility.h"
 #include "odbc_test_suite.h"
 #include "test_type.h"
 #include "test_utils.h"
@@ -143,41 +143,32 @@ BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttrRowArraySize) {
 
   Connect(dsnConnectionString);
 
+  SQLINTEGER prev_row_array_size = 1;
   SQLINTEGER actual_row_array_size;
   SQLINTEGER resLen = 0;
 
-  // check that statement array size cannot be set to values not equal to 1
+  // check that statement array size cannot be set to values less than 1
   // repeat test for different values
-  SQLULEN valList[5] = {0, 2, 3, 4, 5};
+  SQLULEN valList[] = {6, 0, 2, 3, 4, 5, 1};
   for (SQLULEN val : valList) {
     SQLRETURN ret =
         SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE,
                        reinterpret_cast< SQLPOINTER >(val), sizeof(val));
 
-    BOOST_CHECK_EQUAL(ret, SQL_ERROR);
+    if (val >= 1) {
+      BOOST_CHECK_EQUAL(ret, SQL_SUCCESS);
+    } else {
+      BOOST_CHECK_EQUAL(ret, SQL_ERROR);
+      CheckSQLStatementDiagnosticError("HY024");
+    }
 
     ret = SQLGetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE, &actual_row_array_size,
                          sizeof(actual_row_array_size), &resLen);
-
     ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-    BOOST_CHECK_EQUAL(actual_row_array_size, 1);
+    BOOST_CHECK_EQUAL(actual_row_array_size, val > 0 ? val : prev_row_array_size);
+    prev_row_array_size = actual_row_array_size;
   }
-
-  // check that setting row array size to 1 is successful
-  SQLULEN val = 1;
-  SQLRETURN ret =
-      SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE,
-                     reinterpret_cast< SQLPOINTER >(val), sizeof(val));
-
-  BOOST_CHECK_EQUAL(ret, SQL_SUCCESS);
-
-  ret = SQLGetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE, &actual_row_array_size,
-                       sizeof(actual_row_array_size), &resLen);
-
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
-
-  BOOST_CHECK_EQUAL(actual_row_array_size, val);
 }
 
 #ifndef __APPLE__
@@ -581,12 +572,15 @@ BOOST_AUTO_TEST_CASE(TestSQLBindParameter) {
                            unsupportedSql[i], 100, 100, &ind1, sizeof(ind1),
                            &len1);
 
+  std::string expectedSqlState;
 #ifdef __APPLE__
+    expectedSqlState = "HY105";
     BOOST_REQUIRE_EQUAL(ret, SQL_INVALID_HANDLE);
 #else
+    expectedSqlState = "HYC00";
     BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
 #endif
-    CheckSQLStatementDiagnosticError("HYC00");
+    CheckSQLStatementDiagnosticError(expectedSqlState);
   }
 
   // Size is null.
