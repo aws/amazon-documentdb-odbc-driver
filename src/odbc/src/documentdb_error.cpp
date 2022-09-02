@@ -128,14 +128,21 @@ void DocumentDbError::SetError(const JniErrorCode jniCode, const char* jniCls,
       else if (jniCls0.compare("javax.cache.processor.EntryProcessorException")
                == 0)
         err = DocumentDbError(DOCUMENTDB_ERR_ENTRY_PROCESSOR, jniMsg);
-      else {
+      else if (jniCls0.compare("java.sql.SQLException") == 0) {
         std::stringstream stream;
+        stream << "SQL exception occurred [cls=" << jniCls0;
+        if (jniMsg) {
+          stream << ", msg=" << jniMsg;
+        }
+        stream << "]";
 
+        err =
+            DocumentDbError(DOCUMENTDB_ERR_SQL_EXCEPTION, stream.str().c_str());
+      } else {
+        std::stringstream stream;
         stream << "Java exception occurred [cls=" << jniCls0;
-
         if (jniMsg)
           stream << ", msg=" << jniMsg;
-
         stream << "]";
 
         err = DocumentDbError(DOCUMENTDB_ERR_UNKNOWN, stream.str().c_str());
