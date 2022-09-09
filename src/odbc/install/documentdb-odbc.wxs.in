@@ -27,6 +27,9 @@
             Platform="@WIX_PACKAGE_PLATFORM@"
             InstallerVersion='301' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
 
+        <WixVariable Id="WixUIBannerBmp" Value=".\images\awstop.png" />
+        <WixVariable Id="WixUIDialogBmp" Value=".\images\awsdialog.png" />
+
         <Media Id='1' Cabinet='package.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
         <Property Id='DiskPrompt' Value="@WIX_PRODUCT_NAME@ Installation [1]" />
 
