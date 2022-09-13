@@ -879,9 +879,9 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
 
   const SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
 
-  // SQL_WVARCHAR should have type name SqlTypeName::VARCHAR
+  // SQL_WVARCHAR should have type name SqlTypeName::NVARCHAR
   callSQLColAttribute(stmt, req2, SQL_DESC_LOCAL_TYPE_NAME,
-                      SqlTypeName::VARCHAR);
+                      SqlTypeName::NVARCHAR);
 
   const SQLCHAR req3[] = "select fieldBinary from meta_queries_test_002";
 
@@ -1218,7 +1218,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnScalePrepare) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 }
 
-BOOST_AUTO_TEST_CASE(TestGetDataWithGetTypeInfo) {
+BOOST_AUTO_TEST_CASE(TestGetTypeInfoSingle) {
   connectToLocalServer("odbc-test");
 
   SQLRETURN ret = SQLGetTypeInfo(stmt, SQL_WVARCHAR);
@@ -1227,6 +1227,74 @@ BOOST_AUTO_TEST_CASE(TestGetDataWithGetTypeInfo) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   CheckSingleRowResultSetWithGetData(stmt);
+}
+
+BOOST_AUTO_TEST_CASE(TestGetTypeInfoAll) {
+  connectToLocalServer("odbc-test");
+
+  SQLRETURN ret = SQLGetTypeInfo(stmt, SQL_ALL_TYPES);
+
+  if (!SQL_SUCCEEDED(ret))
+    BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+
+  std::set< std::string > typeNames = {
+      "BIGINT",   "BINARY",  "BIT",       "DATE",    "DECIMAL",  "DOUBLE",
+      "FLOAT",    "INTEGER", "NCHAR",     "NULL",    "NVARCHAR", "REAL",
+      "SMALLINT", "TIME",    "TIMESTAMP", "TINYINT", "VARBINARY"};
+  std::set< int16_t > dataTypes = {
+      SQL_BIGINT,    SQL_BINARY,         SQL_BIT,       SQL_DECIMAL,
+      SQL_DOUBLE,    SQL_FLOAT,          SQL_INTEGER,   SQL_REAL,
+      SQL_SMALLINT,  SQL_TINYINT,        SQL_TYPE_DATE, SQL_TYPE_NULL,
+      SQL_TYPE_TIME, SQL_TYPE_TIMESTAMP, SQL_VARBINARY, SQL_WCHAR,
+      SQL_WVARCHAR};
+  std::set< int16_t > caseSensitiveDataTypes = {SQL_CHAR, SQL_VARCHAR,
+                                                SQL_WCHAR, SQL_WVARCHAR};
+  std::set< int16_t > signedDataTypes = {
+      SQL_BIT,  SQL_TINYINT, SQL_SMALLINT, SQL_INTEGER, SQL_BIGINT,
+      SQL_REAL, SQL_FLOAT,   SQL_DOUBLE,   SQL_DECIMAL, SQL_NUMERIC};
+  SQLWCHAR name[SQL_MAX_MESSAGE_LENGTH];
+  SQLLEN name_len;
+  SQLSMALLINT dataType;
+  SQLSMALLINT isCaseSensitive;
+  SQLSMALLINT isUnsigned;
+  int32_t typeCount = 0;
+  do {
+    ret = SQLFetch(stmt);
+    if (ret == SQL_NO_DATA)
+      break;
+
+    typeCount++;
+
+    ret = SQLGetData(stmt, 1, SQL_C_WCHAR, name, sizeof(name), &name_len);
+    BOOST_REQUIRE(SQL_SUCCEEDED(ret));
+    BOOST_CHECK(typeNames.find(utility::SqlWcharToString(name))
+                != typeNames.end());
+
+    ret =
+        SQLGetData(stmt, 2, SQL_C_SSHORT, &dataType, sizeof(dataType), nullptr);
+    BOOST_REQUIRE(SQL_SUCCEEDED(ret));
+    BOOST_CHECK(dataTypes.find(dataType) != dataTypes.end());
+
+    ret =
+        SQLGetData(stmt, 8, SQL_C_SSHORT, &isCaseSensitive, sizeof(isCaseSensitive), nullptr);
+    BOOST_REQUIRE(SQL_SUCCEEDED(ret));
+    BOOST_CHECK_EQUAL(isCaseSensitive, (caseSensitiveDataTypes.find(dataType)
+                                        != caseSensitiveDataTypes.end())
+                                           ? SQL_TRUE
+                                           : SQL_FALSE);
+
+    ret = SQLGetData(stmt, 10, SQL_C_SSHORT, &isUnsigned,
+                     sizeof(isUnsigned), nullptr);
+    BOOST_REQUIRE(SQL_SUCCEEDED(ret));
+    BOOST_CHECK_EQUAL(isUnsigned,
+                      (signedDataTypes.find(dataType) == signedDataTypes.end())
+                          ? SQL_TRUE
+                          : SQL_FALSE);
+
+  } while (ret == SQL_SUCCESS);
+
+  BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
+  BOOST_CHECK_EQUAL(typeCount, typeNames.size());
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDataWithTablesReturnsOne) {
@@ -1330,7 +1398,7 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
   using namespace documentdb::odbc::type_traits;
   BOOST_CHECK_EQUAL("meta_queries_test_001__id", column_name);  // COLUMN_NAME
   BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);                   // DATA_TYPE
-  BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);           // TYPE_NAME
+  BOOST_CHECK_EQUAL(SqlTypeName::NVARCHAR, type_name);           // TYPE_NAME
 
   ret = SQLFetch(stmt);
   if (!SQL_SUCCEEDED(ret))
@@ -1354,7 +1422,7 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
 
   BOOST_CHECK_EQUAL("fieldString", column_name);       // COLUMN_NAME
   BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);          // DATA_TYPE
-  BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
+  BOOST_CHECK_EQUAL(SqlTypeName::NVARCHAR, type_name);  // TYPE_NAME
 
   ret = SQLFetch(stmt);
   if (!SQL_SUCCEEDED(ret))
@@ -1362,7 +1430,7 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
 
   BOOST_CHECK_EQUAL("fieldObjectId", column_name);     // COLUMN_NAME
   BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);          // DATA_TYPE
-  BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
+  BOOST_CHECK_EQUAL(SqlTypeName::NVARCHAR, type_name);  // TYPE_NAME
 
   ret = SQLFetch(stmt);
   if (!SQL_SUCCEEDED(ret))
@@ -1402,7 +1470,7 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
 
   BOOST_CHECK_EQUAL("fieldMaxKey", column_name);       // COLUMN_NAME
   BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);          // DATA_TYPE
-  BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
+  BOOST_CHECK_EQUAL(SqlTypeName::NVARCHAR, type_name);  // TYPE_NAME
 
   ret = SQLFetch(stmt);
   if (!SQL_SUCCEEDED(ret))
@@ -1410,7 +1478,7 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
 
   BOOST_CHECK_EQUAL("fieldMinKey", column_name);       // COLUMN_NAME
   BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);          // DATA_TYPE
-  BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
+  BOOST_CHECK_EQUAL(SqlTypeName::NVARCHAR, type_name);  // TYPE_NAME
 
   ret = SQLFetch(stmt);
   if (!SQL_SUCCEEDED(ret))
@@ -1899,7 +1967,7 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   BOOST_CHECK_EQUAL(false, WasNull(data_type_len));
   BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);  // DATA_TYPE
   BOOST_CHECK_EQUAL(false, WasNull(type_name_len));
-  BOOST_CHECK_EQUAL("VARCHAR", type_name);  // TYPE_NAME
+  BOOST_CHECK_EQUAL("NVARCHAR", type_name);  // TYPE_NAME
   BOOST_CHECK_EQUAL(false, WasNull(column_size_len));
   BOOST_CHECK_EQUAL(SQL_NO_TOTAL, column_size);  // COLUMN_SIZE
   BOOST_CHECK_EQUAL(false, WasNull(buffer_length_len));

@@ -89,6 +89,18 @@ SharedPointer< ResultSet > DatabaseMetaData::GetImportedKeys(
   }
   return new ResultSet(_jniContext, resultSet);
 }
+
+SharedPointer< ResultSet > DatabaseMetaData::GetTypeInfo(
+    JniErrorInfo& errInfo) {
+  SharedPointer< GlobalJObject > resultSet;
+  const std::vector< std::string > types;
+  JniErrorCode success = _jniContext.Get()->DatabaseMetaDataGetTypeInfo(
+      _databaseMetaData, resultSet, errInfo);
+  if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
+    return nullptr;
+  }
+  return new ResultSet(_jniContext, resultSet);
+}
 }  // namespace jni
 }  // namespace odbc
 }  // namespace documentdb
