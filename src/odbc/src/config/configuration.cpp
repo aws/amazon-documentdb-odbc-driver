@@ -558,6 +558,9 @@ void Configuration::ToJdbcOptionsMap(ArgumentMap& res) const {
   AddToMap(res, "schemaName", schemaName);
   AddToMap(res, "refreshSchema", refreshSchema);
   AddToMap(res, "defaultFetchSize", defaultFetchSize);
+  //TODO expose defaultAuthDB on the DSN config
+  //https://bitquill.atlassian.net/browse/AD-935
+  
 }
 
 void Configuration::toMongoCommonOptionsMap(ArgumentMap& res) const {
@@ -588,7 +591,9 @@ std::string Configuration::ToMongoDbConnectionString(
   mongoConnectionString << ":" << EncodeURIComponent(GetPassword());
   mongoConnectionString << "@" << host;
   mongoConnectionString << ":" << port;
-  mongoConnectionString << "/" << EncodeURIComponent(GetDatabase());
+  //TODO expose defaultAuthDB on the DSN config
+  //https://bitquill.atlassian.net/browse/AD-935
+  mongoConnectionString << "/admin";
   mongoConnectionString << INIT_OPT << MONGO_URI_APPNAME << "="
                         << EncodeURIComponent(GetApplicationName());
   mongoConnectionString << SUBS_OPT << MONGO_URI_AUTHMECHANISM
