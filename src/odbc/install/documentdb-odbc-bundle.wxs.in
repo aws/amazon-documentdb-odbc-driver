@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" 
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+  <Bundle Name='@WIX_PRODUCT_NAME@' Version='@CMAKE_PROJECT_VERSION@' 
+          Manufacturer='@WIX_MANUFACTURER@' UpgradeCode='@WIX_BUNDLE_UPGRADE_CODE@'>
+
+    <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+      <bal:WixStandardBootstrapperApplication
+            LicenseFile="../../../../LICENSE.rtf"
+            ShowVersion="yes"
+            LogoFile=".\images\awslogo.png"
+            />
+    </BootstrapperApplicationRef>
+
+    <util:FileSearch Path='[WindowsFolder]System32\vcruntime140.dll' Result="exists" Variable="VCRUNTIME140DLL"/>
+    <util:FileSearch Path='[WindowsFolder]System32\vcruntime140_1.dll' Result="exists" Variable="VCRUNTIME140_1DLL"/>
+    <util:FileSearch Path='[WindowsFolder]System32\msvcp140.dll' Result="exists" Variable="MSVCP140DLL"/>
+
+    <Chain>
+
+      <ExePackage SourceFile='@WIX_VCRUNTIME_NAME@'
+                  DetectCondition="VCRUNTIME140DLL AND VCRUNTIME140_1DLL AND MSVCP140DLL"
+                  InstallCommand="/q /ACTION=Install"
+                  RepairCommand="/q ACTION=Repair /hideconsole" />
+
+      <MsiPackage SourceFile="@WIX_INSTALLER_PREFIX@.msi" />
+
+    </Chain>
+  </Bundle>
+</Wix>
