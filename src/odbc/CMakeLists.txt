@@ -298,10 +298,6 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         @ONLY
     )
 
-    add_custom_command(TARGET ${TARGET} PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/odbc/install/images $<TARGET_FILE_DIR:${TARGET}>/images)
-
     file(DOWNLOAD ${WIX_VC_DOWNLOAD_URL} "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${WIX_VCRUNTIME_NAME}")
 
     add_custom_command(
