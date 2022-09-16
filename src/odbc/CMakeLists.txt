@@ -253,10 +253,14 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         set(WIX_COMPONENT_ID_JDBC "70020c86-713b-423d-b782-79f72ec7a388")
         set(WIX_COMPONENT_ID_DOCUMNETDB_HOME_ENV_VAR "281ea3c0-192c-4a3c-9ddf-5bc1cd77a790")
         set(WIX_COMPONENT_ID_PATH_JVM_DLL "ce3442b1-9a44-42f8-b492-82b01d9cf54a")
+        set(WIX_BUNDLE_UPGRADE_CODE "f76aa702-9d83-427e-98ec-8b0749ae169a")
         set(WIX_PROGRAM_FILES_FOLDER_ID "ProgramFiles64Folder")
         set(WIX_COMPONENT_IS_WIN64 "yes")
         set(WIX_PACKAGE_PLATFORM "x64")
-        set(WIX_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-amd64)
+        set(WIX_VC_DOWNLOAD_URL "https://aka.ms/vs/17/release/vc_redist.x64.exe")
+        set(WIX_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-amd64) 
+        set(WIX_BUNDLE_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-amd64-all) 
+        set(WIX_VCRUNTIME_NAME "VC_redist.x64.exe")    
     elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
         set(WIX_BIT_SUFFIX "32-bit")
         set(WIX_PRODUCT_ID "60cb757b-69cb-412c-9d06-f22cd96914ed")
@@ -270,10 +274,14 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         set(WIX_COMPONENT_ID_JDBC "1ff0aa89-8a06-4c21-b0ce-ff9523ac8f10")
         set(WIX_COMPONENT_ID_DOCUMNETDB_HOME_ENV_VAR "04aff702-9fe4-4dc1-9979-daa94aca5a03")
         set(WIX_COMPONENT_ID_PATH_JVM_DLL "cd20ba75-b91d-4189-bb9e-8d3a8036928f")
+        set(WIX_BUNDLE_UPGRADE_CODE "a2788555-6ba4-4e1f-b429-cbb9e6ea7421")
         set(WIX_PROGRAM_FILES_FOLDER_ID "ProgramFilesFolder")
         set(WIX_COMPONENT_IS_WIN64 "no")
         set(WIX_PACKAGE_PLATFORM "x86")
+        set(WIX_VC_DOWNLOAD_URL "https://aka.ms/vs/17/release/vc_redist.x86.exe")
         set(WIX_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-x86)
+        set(WIX_BUNDLE_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-x86-all)
+        set(WIX_VCRUNTIME_NAME "VC_redist.x86.exe")  
     endif()
 
     set(WIX_PRODUCT_NAME "${WIX_PROJECT_NAME} ODBC ${WIX_BIT_SUFFIX} Driver")
@@ -284,10 +292,24 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         @ONLY
     )
 
+    configure_file(
+        "${CMAKE_CURRENT_LIST_DIR}/install/documentdb-odbc-bundle.wxs.in"
+        "${WIX_BUNDLE_INSTALLER_PREFIX}.wxs"
+        @ONLY
+    )
+
+    add_custom_command(TARGET ${TARGET} PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/odbc/install/images $<TARGET_FILE_DIR:${TARGET}>/images)
+
+    file(DOWNLOAD ${WIX_VC_DOWNLOAD_URL} "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${WIX_VCRUNTIME_NAME}")
+
     add_custom_command(
         TARGET ${TARGET} POST_BUILD
         COMMAND ${WIX_CANDLE} ${WIX_INSTALLER_PREFIX}.wxs -out ${WIX_INSTALLER_PREFIX}.wxobj
         COMMAND ${WIX_LIGHT} -ext WixUIExtension ${WIX_INSTALLER_PREFIX}.wxobj -out ${WIX_INSTALLER_PREFIX}.msi
+        COMMAND ${WIX_CANDLE} ${WIX_BUNDLE_INSTALLER_PREFIX}.wxs -ext WixBalExtension -ext WixUtilExtension -out ${WIX_BUNDLE_INSTALLER_PREFIX}.wxobj
+        COMMAND ${WIX_LIGHT}  ${WIX_BUNDLE_INSTALLER_PREFIX}.wxobj  -ext WixBalExtension -ext WixUtilExtension -out ${WIX_BUNDLE_INSTALLER_PREFIX}.exe
     )
 endif()
 
@@ -301,6 +323,7 @@ install(TARGETS ${TARGET}
 
 if (WIN32 AND ${WITH_ODBC_MSI})
    install(FILES ${WIX_INSTALLER_PREFIX}.msi DESTINATION bin)
+   install(FILES ${WIX_BUNDLE_INSTALLER_PREFIX}.exe DESTINATION bin)
 endif()
 
 if (WIN32)
