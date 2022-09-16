@@ -543,7 +543,7 @@ std::string Configuration::ToJdbcConnectionString() const {
 }
 
 void Configuration::ToJdbcOptionsMap(ArgumentMap& res) const {
-  toMongoCommonOptionsMap(res);
+  ToMongoCommonOptionsMap(res);
   AddToMap(res, "loginTimeoutSec", loginTimeoutSec);
   AddToMap(res, "sshUser", sshUser);
   AddToMap(res, "sshHost", sshHost);
@@ -607,7 +607,7 @@ std::string Configuration::ToMongoDbConnectionString(
   }
 
   config::Configuration::ArgumentMap arguments;
-  toMongoCommonOptionsMap(arguments);
+  ToMongoCommonOptionsMap(arguments);
   std::stringstream options;
   for (config::Configuration::ArgumentMap::const_iterator it =
            arguments.begin();
