@@ -36,49 +36,49 @@
 #define DRIVER_VERSION_MINOR PROJECT_VERSION_MINOR
 #define DRIVER_VERSION_PATCH PROJECT_VERSION_PATCH
 
-#define MONGO_URI_APPNAME "appname"
-#define MONGO_URI_AUTHMECHANISM "authmechanism"
-#define MONGO_URI_AUTHMECHANISMPROPERTIES "authmechanismproperties"
-#define MONGO_URI_AUTHSOURCE "authsource"
+#define MONGO_URI_APPNAME "appName"
+#define MONGO_URI_AUTHMECHANISM "authMechanism"
+#define MONGO_URI_AUTHMECHANISMPROPERTIES "authMechanismProperties"
+#define MONGO_URI_AUTHSOURCE "authSource"
 #define MONGO_URI_CANONICALIZEHOSTNAME "canonicalizehostname"
-#define MONGO_URI_CONNECTTIMEOUTMS "connecttimeoutms"
+#define MONGO_URI_CONNECTTIMEOUTMS "connectTimeoutMS"
 #define MONGO_URI_COMPRESSORS "compressors"
 #define MONGO_URI_DIRECTCONNECTION "directconnection"
-#define MONGO_URI_GSSAPISERVICENAME "gssapiservicename"
-#define MONGO_URI_HEARTBEATFREQUENCYMS "heartbeatfrequencyms"
+#define MONGO_URI_GSSAPISERVICENAME "gssapiServiceName"
+#define MONGO_URI_HEARTBEATFREQUENCYMS "heartbeatFrequencyMS"
 #define MONGO_URI_JOURNAL "journal"
-#define MONGO_URI_LOCALTHRESHOLDMS "localthresholdms"
-#define MONGO_URI_MAXIDLETIMEMS "maxidletimems"
-#define MONGO_URI_MAXPOOLSIZE "maxpoolsize"
-#define MONGO_URI_MAXSTALENESSSECONDS "maxstalenessseconds"
-#define MONGO_URI_MINPOOLSIZE "minpoolsize"
-#define MONGO_URI_READCONCERNLEVEL "readconcernlevel"
-#define MONGO_URI_READPREFERENCE "readpreference"
-#define MONGO_URI_READPREFERENCETAGS "readpreferencetags"
-#define MONGO_URI_REPLICASET "replicaset"
-#define MONGO_URI_RETRYREADS "retryreads"
-#define MONGO_URI_RETRYWRITES "retrywrites"
+#define MONGO_URI_LOCALTHRESHOLDMS "localThresholdMS"
+#define MONGO_URI_MAXIDLETIMEMS "maxIdleTimeMS"
+#define MONGO_URI_MAXPOOLSIZE "maxPoolSize"
+#define MONGO_URI_MAXSTALENESSSECONDS "maxStalenessSeconds"
+#define MONGO_URI_MINPOOLSIZE "minPoolSize"
+#define MONGO_URI_READCONCERNLEVEL "readConcernLevel"
+#define MONGO_URI_READPREFERENCE "readPreference"
+#define MONGO_URI_READPREFERENCETAGS "readPreferenceTags"
+#define MONGO_URI_REPLICASET "replicaSet"
+#define MONGO_URI_RETRYREADS "retryReads"
+#define MONGO_URI_RETRYWRITES "retryWrites"
 #define MONGO_URI_SAFE "safe"
-#define MONGO_URI_SERVERSELECTIONTIMEOUTMS "serverselectiontimeoutms"
-#define MONGO_URI_SERVERSELECTIONTRYONCE "serverselectiontryonce"
+#define MONGO_URI_SERVERSELECTIONTIMEOUTMS "serverSelectionTimeoutMS"
+#define MONGO_URI_SERVERSELECTIONTRYONCE "serverSelectionTryOnce"
 #define MONGO_URI_SLAVEOK "slaveok"
 #define MONGO_URI_SOCKETCHECKINTERVALMS "socketcheckintervalms"
-#define MONGO_URI_SOCKETTIMEOUTMS "sockettimeoutms"
+#define MONGO_URI_SOCKETTIMEOUTMS "socketTimeoutMS"
 #define MONGO_URI_TLS "tls"
-#define MONGO_URI_TLSCERTIFICATEKEYFILE "tlscertificatekeyfile"
-#define MONGO_URI_TLSCERTIFICATEKEYFILEPASSWORD "tlscertificatekeyfilepassword"
-#define MONGO_URI_TLSCAFILE "tlscafile"
-#define MONGO_URI_TLSALLOWINVALIDCERTIFICATES "tlsallowinvalidcertificates"
-#define MONGO_URI_TLSALLOWINVALIDHOSTNAMES "tlsallowinvalidhostnames"
-#define MONGO_URI_TLSINSECURE "tlsinsecure"
+#define MONGO_URI_TLSCERTIFICATEKEYFILE "tlsCertificateKeyFile"
+#define MONGO_URI_TLSCERTIFICATEKEYFILEPASSWORD "tlsCertificateKeyFilePassword"
+#define MONGO_URI_TLSCAFILE "tlsCAFile"
+#define MONGO_URI_TLSALLOWINVALIDCERTIFICATES "tlsAllowInvalidCertificates"
+#define MONGO_URI_TLSALLOWINVALIDHOSTNAMES "tlsAllowInvalidHostnames"
+#define MONGO_URI_TLSINSECURE "tlsInsecure"
 #define MONGO_URI_TLSDISABLECERTIFICATEREVOCATIONCHECK \
-  "tlsdisablecertificaterevocationcheck"
-#define MONGO_URI_TLSDISABLEOCSPENDPOINTCHECK "tlsdisableocspendpointcheck"
+  "tlsDisableCertificateRevocationCheck"
+#define MONGO_URI_TLSDISABLEOCSPENDPOINTCHECK "tlsDisableOCSPEndpointCheck"
 #define MONGO_URI_W "w"
-#define MONGO_URI_WAITQUEUEMULTIPLE "waitqueuemultiple"
-#define MONGO_URI_WAITQUEUETIMEOUTMS "waitqueuetimeoutms"
-#define MONGO_URI_WTIMEOUTMS "wtimeoutms"
-#define MONGO_URI_ZLIBCOMPRESSIONLEVEL "zlibcompressionlevel"
+#define MONGO_URI_WAITQUEUEMULTIPLE "waitQueueMultiple"
+#define MONGO_URI_WAITQUEUETIMEOUTMS "waitQueueTimeoutMS"
+#define MONGO_URI_WTIMEOUTMS "wtimeoutMS"
+#define MONGO_URI_ZLIBCOMPRESSIONLEVEL "zlibCompressionLevel"
 
 namespace documentdb {
 namespace odbc {
@@ -862,6 +862,13 @@ class Configuration {
    * @param res Resulting argument map.
    */
   void ToJdbcOptionsMap(ArgumentMap& res) const;
+
+  /**
+   * Get argument map.
+   *
+   * @param res Resulting argument map.
+   */
+  void ToMongoCommonOptionsMap(ArgumentMap& res) const;
 
   /** DSN. */
   SettableValue< std::string > dsn = DefaultValue::dsn;
