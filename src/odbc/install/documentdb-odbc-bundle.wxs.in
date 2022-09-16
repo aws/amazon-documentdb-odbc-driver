@@ -14,16 +14,17 @@
             />
     </BootstrapperApplicationRef>
 
-    <util:FileSearch Path='[WindowsFolder]System32\vcruntime140.dll' Result="exists" Variable="VCRUNTIME140DLL"/>
-    <util:FileSearch Path='[WindowsFolder]System32\vcruntime140_1.dll' Result="exists" Variable="VCRUNTIME140_1DLL"/>
-    <util:FileSearch Path='[WindowsFolder]System32\msvcp140.dll' Result="exists" Variable="MSVCP140DLL"/>
+    <util:FileSearch Path='[WindowsFolder]Sysnative\vcruntime140.dll' Result="exists" Variable="VCRUNTIME140DLL"/>
+    <util:FileSearch Path='[WindowsFolder]Sysnative\vcruntime140_1.dll' Result="exists" Variable="VCRUNTIME140_1DLL"/>
+    <util:FileSearch Path='[WindowsFolder]Sysnative\msvcp140.dll' Result="exists" Variable="MSVCP140DLL"/>
 
     <Chain>
 
       <ExePackage SourceFile='@WIX_VCRUNTIME_NAME@'
                   DetectCondition="VCRUNTIME140DLL AND VCRUNTIME140_1DLL AND MSVCP140DLL"
                   InstallCommand="/q /ACTION=Install"
-                  RepairCommand="/q ACTION=Repair /hideconsole" />
+                  RepairCommand="/q ACTION=Repair /hideconsole"
+                  Permanent="yes" />
 
       <MsiPackage SourceFile="@WIX_INSTALLER_PREFIX@.msi" />
 
