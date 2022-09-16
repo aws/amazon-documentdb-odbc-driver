@@ -235,7 +235,7 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         set(WIX_ODBC_ZLIB1_FILE "zlibd1.dll")
     endif()
 
-    set(WIX_ODBC_JDBC_PATH ".\\libs\\documentdb-jdbc-1.3.0-all.jar")
+    set(WIX_ODBC_JDBC_PATH ".\\libs\\documentdb-jdbc-1.3.1-all.jar")
 
     set(WIX_PROJECT_NAME "Amazon DocumentDB")
     set(WIX_MANUFACTURER "Amazon Web Services")
