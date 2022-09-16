@@ -626,8 +626,8 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
     mongocxx::options::client client_options;
     mongocxx::options::tls tls_options;
     if (config_.IsTls()) {
-      // TO-DO Adapt to use certificates
-      // https://bitquill.atlassian.net/browse/AD-598
+      // TODO: Enable use of Amazon RDS CA certificate in driver
+      // [AD-941](https://bitquill.atlassian.net/browse/AD-941)
       tls_options.allow_invalid_certificates(true);
       client_options.tls_opts(tls_options);
     }
