@@ -46,9 +46,11 @@ const std::string SqlTypeName::TINYINT("TINYINT");
 
 const std::string SqlTypeName::BIGINT("BIGINT");
 
-const std::string SqlTypeName::VARCHAR("VARCHAR");
+const std::string SqlTypeName::NCHAR("NCHAR");
 
-const std::string SqlTypeName::LONGVARCHAR("LONGVARCHAR");
+const std::string SqlTypeName::NVARCHAR("NVARCHAR");
+
+const std::string SqlTypeName::LONGNVARCHAR("LONGNVARCHAR");
 
 const std::string SqlTypeName::BINARY("BINARY");
 
@@ -155,13 +157,17 @@ const boost::optional< std::string > BinaryTypeToSqlTypeName(
     case JDBC_TYPE_DECIMAL:
       return SqlTypeName::DECIMAL;
 
+    case JDBC_TYPE_CHAR:
+    case JDBC_TYPE_NCHAR:
+      return SqlTypeName::NCHAR;
+
     case JDBC_TYPE_VARCHAR:
     case JDBC_TYPE_NVARCHAR:
-      return SqlTypeName::VARCHAR;
+      return SqlTypeName::NVARCHAR;
 
     case JDBC_TYPE_LONGVARCHAR:
     case JDBC_TYPE_LONGNVARCHAR:
-      return SqlTypeName::LONGVARCHAR;
+      return SqlTypeName::LONGNVARCHAR;
 
     case JDBC_TYPE_DATE:
       return SqlTypeName::DATE;
@@ -488,7 +494,7 @@ boost::optional< int16_t > BinaryToSqlType(
 }
 
 int16_t BinaryTypeNullability(int16_t) {
-  return SQL_NULLABLE_UNKNOWN;
+  return SQL_NULLABLE;
 }
 
 boost::optional< std::string > NullabilityToIsNullable(
@@ -790,6 +796,8 @@ bool SqlTypeUnsigned(boost::optional< int16_t > type) {
     case SQL_REAL:
     case SQL_FLOAT:
     case SQL_DOUBLE:
+    case SQL_DECIMAL:
+    case SQL_NUMERIC:
       return false;
 
     default:

@@ -798,7 +798,7 @@ SqlResult::Type Statement::InternalExecuteGetTypeInfoQuery(int16_t sqlType) {
   if (currentQuery.get())
     currentQuery->Close();
 
-  currentQuery.reset(new query::TypeInfoQuery(*this, sqlType));
+  currentQuery.reset(new query::TypeInfoQuery(*this, connection, sqlType));
 
   return currentQuery->Execute();
 }
