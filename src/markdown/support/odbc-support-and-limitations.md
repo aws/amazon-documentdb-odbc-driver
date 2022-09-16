@@ -254,8 +254,12 @@ To specify an arbitrary NUMERIC or DECIMAL literal, quote the numeric expression
 
 ### Examples
 
-1. `SELECT CAST(9223372036854775807.45 AS DECIMAL(20, 2)) AS "literalDecimal" 
-  FROM table`
+1. In this example, the non-scaled value fits into a long integer and so the numeric literal syntax can be 
+   used: 
+   - `SELECT CAST(9223372036854775807.45 AS DECIMAL(20, 2)) AS "literalDecimal" 
+   FROM table`
 
-2. `SELECT CAST('12345678901234567890.45' AS DECIMAL(20, 2)) AS "literalDecimal" 
+2. In this example, the non-scaled value will not fix into a long integer and is reqiured to be
+   quoted using string sytax:
+   - `SELECT CAST('12345678901234567890.45' AS DECIMAL(20, 2)) AS "literalDecimal" 
   FROM table`
