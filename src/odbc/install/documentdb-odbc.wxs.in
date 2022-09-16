@@ -25,7 +25,8 @@
 
         <Package Id='*' Keywords='Installer' Description="@WIX_PRODUCT_NAME@ Installer"
             Platform="@WIX_PACKAGE_PLATFORM@"
-            InstallerVersion='301' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
+            InstallerVersion='301' Languages='1033' Compressed='yes' SummaryCodepage='1252' 
+            InstallScope="perMachine" InstallPrivileges="elevated"/>
 
         <Media Id='1' Cabinet='package.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
         <Property Id='DiskPrompt' Value="@WIX_PRODUCT_NAME@ Installation [1]" />

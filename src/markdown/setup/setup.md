@@ -28,8 +28,8 @@ or later is installed on your computer. You can download the Java SE Runtime Env
 [here](https://www.oracle.com/ca-en/java/technologies/javase-jre8-downloads.html).  
 
 ### DocumentDB ODBC Driver
-Download the DocumentDB ODBC driver [here](https://github.com/aws/amazon-documentdb-odbc-driver/releases). Choose the proper installer
-(e.g., `documentdb-odbc-1.0.0.msi`).
+Download the DocumentDB ODBC driver [here](https://github.com/aws/amazon-documentdb-odbc-driver/releases). Choose the proper installer. (e.g., `documentdb-odbc-1.0.0.msi`).
+Follow the [installation guide](windows-installation-guide.md)
 
 ## Specifying the Amazon RDS Certificate Authority Certificate File
 If you are connecting to a TLS-enabled cluster, you may want to specify the Amazon RDS Certificate Authority certificate 
