@@ -1258,6 +1258,78 @@ BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetImportedKeysReturnsNone) {
   BOOST_CHECK(!dbConnection.IsOpen());
 }
 
+BOOST_AUTO_TEST_CASE(TestDocumentDbDatabaseMetaDataGetTypeInfo) {
+  PrepareContext();
+  BOOST_REQUIRE(_ctx.Get() != nullptr);
+
+  std::string dsnConnectionString;
+  CreateDsnConnectionStringForLocalServer(dsnConnectionString);
+
+  Configuration config;
+  ConnectionStringParser parser(config);
+  parser.ParseConnectionString(dsnConnectionString, nullptr);
+  JniErrorInfo errInfo;
+  DocumentDbConnection dbConnection(_ctx);
+
+  BOOST_CHECK(!dbConnection.IsOpen());
+  if (dbConnection.Open(config, errInfo)
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
+    BOOST_FAIL(errInfo.errMsg);
+  }
+  BOOST_CHECK(dbConnection.IsOpen());
+
+  SharedPointer< DatabaseMetaData > databaseMetaData =
+      dbConnection.GetMetaData(errInfo);
+  BOOST_REQUIRE(databaseMetaData.IsValid());
+
+  const boost::optional< std::string > fkCatalog("");
+  const boost::optional< std::string > fkSchema("");
+  std::string fkTable("");
+  SharedPointer< ResultSet > resultSet =
+      databaseMetaData.Get()->GetTypeInfo(errInfo);
+  BOOST_CHECK(resultSet.IsValid());
+  BOOST_CHECK(resultSet.Get()->IsOpen());
+
+  int typeIndex = 0;
+  bool hasNext = false;
+  boost::optional< std::string > name;
+  boost::optional < int > type;
+  do {
+    resultSet.Get()->Next(hasNext, errInfo);
+    if (!hasNext) {
+      break;
+    }
+    BOOST_CHECK(hasNext);
+
+    resultSet.Get()->GetString("TYPE_NAME", name, errInfo);
+    resultSet.Get()->GetInt("DATA_TYPE", type, errInfo);
+    BOOST_REQUIRE(type);
+    boost::optional< int16_t > nativeType =
+        type_traits::BinaryToSqlType(static_cast< int16_t >(*type));
+    BOOST_REQUIRE(nativeType);
+    switch (*type) {
+      case JDBC_TYPE_BINARY:
+        BOOST_CHECK_EQUAL(*nativeType, SQL_BINARY);
+        break;
+      default:
+        BOOST_CHECK_NE(*nativeType, SQL_BINARY);
+        break;
+    }
+  } while (hasNext);
+  BOOST_CHECK(!hasNext);
+
+  if (resultSet.Get()->Close(errInfo)
+      != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
+    BOOST_FAIL(errInfo.errMsg);
+  }
+  BOOST_CHECK(!resultSet.Get()->IsOpen());
+
+  if (dbConnection.Close(errInfo) != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
+    BOOST_FAIL(errInfo.errMsg);
+  }
+  BOOST_CHECK(!dbConnection.IsOpen());
+}
+
 BOOST_AUTO_TEST_CASE(TestDocumentDbGetMqlQueryContext) {
   PrepareContext();
   BOOST_REQUIRE(_ctx.Get() != nullptr);
