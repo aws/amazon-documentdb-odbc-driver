@@ -206,6 +206,60 @@ Related function: `SQLSetStmtAttr`
 To support BI tools that may use the SQLPrepare interface in auto-generated queries, the driver
 supports the use of SQLPrepare. However, the use of parameters in queries (values left as ?) is not supported in SQLPrepare, SQLExecute and SQLExecDirect. 
 
+## Unimplemented ODBC API
+
+The following ODBC API are currently unimplemented but are planned to be implemented in the future.
+
+- [SQLBrowseConnect](https://docs.microsoft.com/en-us/sql/odbc/reference/syntax/sqlbrowseconnect-function)
+- [SQLCancel](https://docs.microsoft.com/en-us/sql/odbc/reference/syntax/sqlcancel-function)
+- [SQLStatistics](https://docs.microsoft.com/en-us/sql/odbc/reference/syntax/sqlstatistics-function)
+
+## Unsupported ODBC API
+
+The following ODBC API are not supported and there is no plan to support these API.
+
+- SQLBulkOperations
+- SQLColAttributes
+- SQLColumnPrivileges
+- SQLCopyDesc
+- SQLEndTran
+- SQLGetCursorName
+- SQLGetDescField
+- SQLGetDescRec
+- SQLGetConnectOption
+- SQLGetStmtOption
+- SQLParamOptions
+- SQLProcedureColumns
+- SQLSetConnectOption
+- SQLSetCursorName
+- SQLSetDescField
+- SQLSetDescRec
+- SQLSetPos
+- SQLSetStmtOption
+- SQLSetScrollOptions
+- SQLTablePrivileges
+
 ## PowerBI Desktop cannot load the DocumentDB ODBC driver library
 
 If you downloaded Power BI Desktop from the Microsoft Store, you may be unable to use the Amazon DocumentDB ODBC driver due to a loading issue. To address this, download Power BI Desktop from the [Download Center](https://www.microsoft.com/download/details.aspx?id=58494) instead of the Microsoft Store.
+
+## Limitations on NUMERIC and DECIMAL Literals
+
+Due to parsing limitations, a numeric literal (i.e., a numeric value without quotes) is limited
+to a value where the non-scaled portion of the literal can be stored in a long (64-bit) integer. If
+the value in the non-scaled portion exceeds the limit, you will get an exception message
+like the following: "*Numeric literal '123456789012345678901234567890.45' out of range*".
+
+To specify an arbitrary NUMERIC or DECIMAL literal, quote the numeric expression in single quotes.
+
+### Examples
+
+1. In this example, the non-scaled value fits into a long integer and so the numeric literal syntax can be 
+   used: 
+   - `SELECT CAST(9223372036854775807.45 AS DECIMAL(20, 2)) AS "literalDecimal" 
+   FROM table`
+
+2. In this example, the non-scaled value will not fix into a long integer and is reqiured to be
+   quoted using string sytax:
+   - `SELECT CAST('12345678901234567890.45' AS DECIMAL(20, 2)) AS "literalDecimal" 
+  FROM table`
