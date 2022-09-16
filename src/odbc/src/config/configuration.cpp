@@ -563,7 +563,7 @@ void Configuration::ToJdbcOptionsMap(ArgumentMap& res) const {
   
 }
 
-void Configuration::toMongoCommonOptionsMap(ArgumentMap& res) const {
+void Configuration::ToMongoCommonOptionsMap(ArgumentMap& res) const {
   AddToMap(res, MONGO_URI_READPREFERENCE, readPreference, true);
   AddToMap(res, MONGO_URI_REPLICASET, replicaSet);
   AddToMap(res, MONGO_URI_RETRYREADS, retryReads);
@@ -615,7 +615,7 @@ std::string Configuration::ToMongoDbConnectionString(
     const std::string& key = it->first;
     const std::string& value = it->second;
     if (!value.empty()) {
-      options << SUBS_OPT << key << '=' << EncodeURIComponent(value);
+      options << SUBS_OPT << key << "=" << EncodeURIComponent(value);
     }
   }
   mongoConnectionString << options.str();

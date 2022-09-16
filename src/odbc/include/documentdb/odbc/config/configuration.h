@@ -868,7 +868,7 @@ class Configuration {
    *
    * @param res Resulting argument map.
    */
-  void toMongoCommonOptionsMap(ArgumentMap& res) const;
+  void ToMongoCommonOptionsMap(ArgumentMap& res) const;
 
   /** DSN. */
   SettableValue< std::string > dsn = DefaultValue::dsn;
