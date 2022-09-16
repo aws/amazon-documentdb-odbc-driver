@@ -284,9 +284,10 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         @ONLY
     )
 
-    add_custom_command(TARGET ${TARGET} PRE_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory
-                       ${CMAKE_SOURCE_DIR}/odbc/install/images $<TARGET_FILE_DIR:${TARGET}>/images)
+    add_custom_command(
+        TARGET ${TARGET} PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/odbc/install/images $<TARGET_FILE_DIR:${TARGET}>/images)
 
     add_custom_command(
         TARGET ${TARGET} POST_BUILD
