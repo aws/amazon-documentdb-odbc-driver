@@ -100,12 +100,12 @@ BOOST_AUTO_TEST_CASE(TestGetAttribute) {
   // test SQL_DESC_TYPE_NAME
   found = columnMeta.GetAttribute(SQL_DESC_TYPE_NAME, resVal);
   BOOST_CHECK(found);
-  BOOST_CHECK_EQUAL(resVal, SqlTypeName::VARCHAR);
+  BOOST_CHECK_EQUAL(resVal, SqlTypeName::NVARCHAR);
 
   // test SQL_DESC_LOCAL_TYPE_NAME
   found = columnMeta.GetAttribute(SQL_DESC_LOCAL_TYPE_NAME, resVal);
   BOOST_CHECK(found);
-  BOOST_CHECK_EQUAL(resVal, SqlTypeName::VARCHAR);
+  BOOST_CHECK_EQUAL(resVal, SqlTypeName::NVARCHAR);
 
   // fields SQL_COLUMN_PRECISION and SQL_DESC_SCALE are not tested
   // for retrieving string values
@@ -287,7 +287,7 @@ BOOST_AUTO_TEST_CASE(TestGetAttributeLocalTypeName) {
       std::make_pair(JDBC_TYPE_FLOAT, SqlTypeName::FLOAT),
       std::make_pair(JDBC_TYPE_REAL, SqlTypeName::REAL),
       std::make_pair(JDBC_TYPE_DOUBLE, SqlTypeName::DOUBLE),
-      std::make_pair(JDBC_TYPE_VARCHAR, SqlTypeName::VARCHAR),
+      std::make_pair(JDBC_TYPE_VARCHAR, SqlTypeName::NVARCHAR),
       std::make_pair(JDBC_TYPE_BINARY, SqlTypeName::BINARY),
       std::make_pair(JDBC_TYPE_VARBINARY, SqlTypeName::VARBINARY),
       std::make_pair(JDBC_TYPE_DATE, SqlTypeName::DATE),

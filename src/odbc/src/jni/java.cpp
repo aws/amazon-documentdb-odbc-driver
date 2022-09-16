@@ -269,6 +269,10 @@ JniMethod const M_DATABASE_META_DATA_GET_IMPORTED_KEYS =
               "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/"
               "String;)Ljava/sql/ResultSet;",
               false);
+JniMethod const M_DATABASE_META_DATA_GET_TYPE_INFO =
+    JniMethod("getTypeInfo",
+              "()Ljava/sql/ResultSet;",
+              false);
 
 const char* const C_DOCUMENTDB_CONNECTION =
     "software/amazon/documentdb/jdbc/DocumentDbConnection";
@@ -676,6 +680,8 @@ void JniMembers::Initialize(JNIEnv* env) {
       env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_PRIMARY_KEYS);
   m_DatabaseMetaDataGetImportedKeys = FindMethod(
       env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_IMPORTED_KEYS);
+  m_DatabaseMetaDataGetTypeInfo = FindMethod(
+      env, c_DatabaseMetaData, M_DATABASE_META_DATA_GET_TYPE_INFO);
 
   c_Connection = FindClass(env, C_JAVA_SQL_CONNECTION);
   m_ConnectionClose =
@@ -1582,6 +1588,46 @@ JniErrorCode JniContext::DatabaseMetaDataGetImportedKeys(
   resultSet = new GlobalJObject(env, env->NewGlobalRef(result));
 
   LOG_DEBUG_MSG("DatabaseMetaDataGetImportedKeys exiting");
+
+  return errInfo.code;
+}
+
+JniErrorCode JniContext::DatabaseMetaDataGetTypeInfo(
+    const SharedPointer< GlobalJObject >& databaseMetaData,
+    SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo) {
+  LOG_DEBUG_MSG("DatabaseMetaDataGetTypeInfo is called");
+
+  if (databaseMetaData.Get() == nullptr) {
+    errInfo.code = JniErrorCode::DOCUMENTDB_JNI_ERR_GENERIC;
+    errInfo.errMsg = "DatabaseMetaData object must be set.";
+
+    LOG_ERROR_MSG("DatabaseMetaDataGetTypeInfo exiting with error msg: "
+                  << errInfo.errMsg);
+
+    return errInfo.code;
+  }
+
+  JNIEnv* env = Attach(errInfo);
+  if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
+    return errInfo.code;
+  }
+
+  jobject result =
+      env->CallObjectMethod(databaseMetaData.Get()->GetRef(),
+                            jvm->GetMembers().m_DatabaseMetaDataGetTypeInfo);
+  ExceptionCheck(env, &errInfo);
+
+  if (!result || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
+    resultSet = nullptr;
+    LOG_ERROR_MSG(
+        "DatabaseMetaDataGetTypeInfo exiting with error. resultSet will be "
+        "null");
+    return errInfo.code;
+  }
+
+  resultSet = new GlobalJObject(env, env->NewGlobalRef(result));
+
+  LOG_DEBUG_MSG("DatabaseMetaDataGetTypeInfo exiting");
 
   return errInfo.code;
 }

@@ -144,11 +144,14 @@ class SqlTypeName {
   /** BIGINT SQL type name constant. */
   static const std::string BIGINT;
 
-  /** VARCHAR SQL type name constant. */
-  static const std::string VARCHAR;
+  /** NCHAR SQL type name constant. */
+  static const std::string NCHAR;
 
-  /** LONGVARCHAR SQL type name constant. */
-  static const std::string LONGVARCHAR;
+  /** NVARCHAR SQL type name constant. */
+  static const std::string NVARCHAR;
+
+  /** LONGNVARCHAR SQL type name constant. */
+  static const std::string LONGNVARCHAR;
 
   /** BINARY SQL type name constant. */
   static const std::string BINARY;
