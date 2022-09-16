@@ -19,9 +19,13 @@
 
 #include <cassert>
 
+#include "documentdb/odbc/connection.h"
+#include "documentdb/odbc/jni/database_metadata.h"
 #include "documentdb/odbc/impl/binary/binary_common.h"
 #include "documentdb/odbc/system/odbc_constants.h"
 #include "documentdb/odbc/type_traits.h"
+
+using namespace documentdb::odbc::jni;
 
 namespace {
 struct ResultColumn {
@@ -113,13 +117,16 @@ namespace documentdb {
 namespace odbc {
 namespace query {
 TypeInfoQuery::TypeInfoQuery(diagnostic::DiagnosableAdapter& diag,
+                             Connection& connection,
                              int16_t sqlType)
     : Query(diag, QueryType::TYPE_INFO),
+      connection(connection),
+      requestedSqlType(sqlType),
       columnsMeta(),
       executed(false),
       fetched(false),
-      types(),
-      cursor(types.end()) {
+      binaryTypes(),
+      cursor(binaryTypes.end()) {
   using namespace documentdb::odbc::impl::binary;
   using namespace documentdb::odbc::type_traits;
 
@@ -185,19 +192,6 @@ TypeInfoQuery::TypeInfoQuery(diagnostic::DiagnosableAdapter& diag,
 
   assert(IsSqlTypeSupported(sqlType) || sqlType == SQL_ALL_TYPES);
 
-  if (sqlType == SQL_ALL_TYPES) {
-    types.push_back(JDBC_TYPE_VARCHAR);
-    types.push_back(JDBC_TYPE_SMALLINT);
-    types.push_back(JDBC_TYPE_INTEGER);
-    types.push_back(JDBC_TYPE_DECIMAL);
-    types.push_back(JDBC_TYPE_FLOAT);
-    types.push_back(JDBC_TYPE_DOUBLE);
-    types.push_back(JDBC_TYPE_BOOLEAN);
-    types.push_back(JDBC_TYPE_TINYINT);
-    types.push_back(JDBC_TYPE_BIGINT);
-    types.push_back(JDBC_TYPE_BINARY);
-  } else
-    types.push_back(*SqlTypeToBinary(sqlType));
 }
 
 TypeInfoQuery::~TypeInfoQuery() {
@@ -205,10 +199,71 @@ TypeInfoQuery::~TypeInfoQuery() {
 }
 
 SqlResult::Type TypeInfoQuery::Execute() {
-  cursor = types.begin();
+  if (binaryTypes.size() == 0) {
+    MakeRequestGetTypeInfo();
+  }
+  cursor = binaryTypes.begin();
 
   executed = true;
   fetched = false;
+
+  return SqlResult::AI_SUCCESS;
+}
+
+SqlResult::Type TypeInfoQuery::MakeRequestGetTypeInfo() {
+  DocumentDbError error;
+  SharedPointer< DatabaseMetaData > databaseMetaData =
+      connection.GetMetaData(error);
+  if (!databaseMetaData.IsValid()
+      || error.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS) {
+    diag.AddStatusRecord(error.GetText());
+    return SqlResult::AI_ERROR;
+  }
+
+  JniErrorInfo errInfo;
+  SharedPointer< ResultSet > resultSet =
+      databaseMetaData.Get()->GetTypeInfo(errInfo);
+  if (!resultSet.IsValid()
+      || errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
+    diag.AddStatusRecord(errInfo.errMsg);
+    return SqlResult::AI_ERROR;
+  }
+
+  boost::optional< int32_t > optionalBinaryType;
+  bool hasNext = false;
+  JniErrorCode errCode;
+  do {
+    errCode = resultSet.Get()->Next(hasNext, errInfo);
+    if (errCode != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
+      diag.AddStatusRecord(errInfo.errMsg);
+      return SqlResult::AI_ERROR;
+    }
+    if (!hasNext)
+      break;
+    errCode = resultSet.Get()->GetInt("DATA_TYPE", optionalBinaryType, errInfo);
+    if (errCode != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
+      diag.AddStatusRecord(errInfo.errMsg);
+      return SqlResult::AI_ERROR;
+    }
+
+    int16_t currentBinaryType = static_cast< int16_t >(*optionalBinaryType);
+    int16_t currentSqlType = *(type_traits::BinaryToSqlType(currentBinaryType));
+
+    // Ignore duplicates
+    if (sqlTypes.find(currentSqlType) != sqlTypes.end()) {
+      continue;
+    }
+
+    if (requestedSqlType == SQL_ALL_TYPES) {
+      binaryTypes.emplace(currentBinaryType);
+      sqlTypes.emplace(currentSqlType);
+    } else if (requestedSqlType == currentSqlType) {
+      // Add first and only entry that satisfies requested SQL type.
+      binaryTypes.emplace(currentBinaryType);
+      sqlTypes.emplace(currentSqlType);
+      break;
+    }
+  } while (hasNext);
 
   return SqlResult::AI_SUCCESS;
 }
@@ -228,9 +283,9 @@ SqlResult::Type TypeInfoQuery::FetchNextRow(
 
   if (!fetched)
     fetched = true;
-  else if (cursor != types.end())
+  else if (cursor != binaryTypes.end())
     ++cursor;
-  if (cursor == types.end())
+  if (cursor == binaryTypes.end())
     return SqlResult::AI_NO_DATA;
 
   app::ColumnBindingMap::iterator it;
@@ -252,7 +307,7 @@ SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
     return SqlResult::AI_ERROR;
   }
 
-  if (cursor == types.end()) {
+  if (cursor == binaryTypes.end()) {
     diag.AddStatusRecord(SqlState::S24000_INVALID_CURSOR_STATE,
                          "Cursor has reached end of the result set.");
 
@@ -314,7 +369,10 @@ SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
     }
 
     case ResultColumn::CASE_SENSITIVE: {
-      if (currentType == JDBC_TYPE_VARCHAR)
+      if (currentType == JDBC_TYPE_CHAR || currentType == JDBC_TYPE_VARCHAR
+          || currentType == JDBC_TYPE_LONGVARCHAR
+          || currentType == JDBC_TYPE_NCHAR || currentType == JDBC_TYPE_NVARCHAR
+          || currentType == JDBC_TYPE_LONGNVARCHAR)
         buffer.PutInt16(SQL_TRUE);
       else
         buffer.PutInt16(SQL_FALSE);
@@ -380,7 +438,7 @@ SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
 }
 
 SqlResult::Type TypeInfoQuery::Close() {
-  cursor = types.end();
+  cursor = binaryTypes.end();
 
   executed = false;
 
@@ -388,7 +446,7 @@ SqlResult::Type TypeInfoQuery::Close() {
 }
 
 bool TypeInfoQuery::DataAvailable() const {
-  return cursor != types.end();
+  return cursor != binaryTypes.end();
 }
 
 int64_t TypeInfoQuery::AffectedRows() const {

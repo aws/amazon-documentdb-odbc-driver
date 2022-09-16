@@ -290,6 +290,7 @@ struct JniMembers {
   jmethodID m_DatabaseMetaDataGetColumns;
   jmethodID m_DatabaseMetaDataGetPrimaryKeys;
   jmethodID m_DatabaseMetaDataGetImportedKeys;
+  jmethodID m_DatabaseMetaDataGetTypeInfo;
 
   jclass c_List;
   jmethodID m_ListSize;
@@ -558,6 +559,10 @@ class DOCUMENTDB_IMPORT_EXPORT JniContext {
       const SharedPointer< GlobalJObject >& databaseMetaData,
       const boost::optional< std::string >& catalog,
       const boost::optional< std::string >& schema, const std::string& table,
+      SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo);
+
+  JniErrorCode DatabaseMetaDataGetTypeInfo(
+      const SharedPointer< GlobalJObject >& databaseMetaData,
       SharedPointer< GlobalJObject >& resultSet, JniErrorInfo& errInfo);
 
   JniErrorCode ResultSetClose(const SharedPointer< GlobalJObject >& resultSet,

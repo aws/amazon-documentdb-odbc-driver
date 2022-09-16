@@ -19,6 +19,7 @@
 #define _DOCUMENTDB_ODBC_QUERY_TYPE_INFO_QUERY
 
 #include "documentdb/odbc/query/query.h"
+#include <set>
 
 namespace documentdb {
 namespace odbc {
@@ -32,9 +33,10 @@ class TypeInfoQuery : public Query {
    * Constructor.
    *
    * @param diag Diagnostics collector.
+   * @param connection open connection.
    * @param sqlType SQL type.
    */
-  TypeInfoQuery(diagnostic::DiagnosableAdapter& diag, int16_t sqlType);
+  TypeInfoQuery(diagnostic::DiagnosableAdapter& diag, Connection& connection, int16_t sqlType);
 
   /**
    * Destructor.
@@ -103,6 +105,17 @@ class TypeInfoQuery : public Query {
  private:
   DOCUMENTDB_NO_COPY_ASSIGNMENT(TypeInfoQuery);
 
+  /** 
+   * Makes request via the JNI interface and builds the types.
+   */
+  SqlResult::Type MakeRequestGetTypeInfo();
+
+  /** Connection. */
+  Connection& connection;
+
+  /** Requested SQL type(s) */
+  int16_t requestedSqlType;
+
   /** Columns metadata. */
   meta::ColumnMetaVector columnsMeta;
 
@@ -112,11 +125,14 @@ class TypeInfoQuery : public Query {
   /** Fetched flag. */
   bool fetched;
 
-  /** Requested types. */
-  std::vector< int8_t > types;
+  /** Supported binary types. */
+  std::set< int16_t > binaryTypes;
+
+  /** Supported SQL types. */
+  std::set< int16_t > sqlTypes;
 
   /** Query cursor. */
-  std::vector< int8_t >::const_iterator cursor;
+  std::set< int16_t >::const_iterator cursor;
 };
 }  // namespace query
 }  // namespace odbc
