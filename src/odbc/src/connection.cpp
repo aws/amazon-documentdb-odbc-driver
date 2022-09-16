@@ -625,9 +625,15 @@ bool Connection::ConnectCPPDocumentDB(int32_t localSSHTunnelPort,
         config_.ToMongoDbConnectionString(localSSHTunnelPort);
     mongocxx::options::client client_options;
     mongocxx::options::tls tls_options;
+    if (config_.IsTls()) {
+      // TODO: Enable use of Amazon RDS CA certificate in driver
+      // [AD-941](https://bitquill.atlassian.net/browse/AD-941)
+      tls_options.allow_invalid_certificates(true);
+      client_options.tls_opts(tls_options);
+    }
 
     mongoClient_ = std::make_shared< mongocxx::client >(
-        mongocxx::uri(mongoCPPConnectionString));
+        mongocxx::uri(mongoCPPConnectionString), client_options);
     std::string database = config_.GetDatabase();
     bsoncxx::builder::stream::document ping;
     ping << "ping" << 1;
