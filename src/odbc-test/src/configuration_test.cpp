@@ -280,16 +280,23 @@ void CheckConnectionConfig(const Configuration& cfg) {
       << "&sshUser=" << testSshUser << "&tls=" << BoolToStr(testTlsFlag)
       << "&tlsAllowInvalidHostnames="
       << BoolToStr(testTlsAllowInvalidHostnamesFlag)
-      << "&tlsCaFile=" << EncodeURIComponent(testTlsCaFile);
+      << "&tlsCAFile=" << EncodeURIComponent(testTlsCaFile);
   const std::string& expectedJdbcStr = jdbcConstructor.str();
 
   std::stringstream mongodbConstructor;
   mongodbConstructor
       << "mongodb://" << testUsername << ":" << testPassword << "@" 
       << testHostname << ':' << testServerPort << "/admin" 
-      << "?authmechanism=SCRAM-SHA-1"
-      << "&appname=" << testAppName
-      << "&connecttimeoutms=" << (testLoginTimeoutSec * 1000);
+      << "?appName=" << testAppName
+      << "&authMechanism=SCRAM-SHA-1"
+      << "&connectTimeoutMS=" << (testLoginTimeoutSec * 1000)
+      << "&readPreference=" << ReadPreference::ToJdbcString(testReadPreference)
+      << "&replicaSet=" << testReplicaSet
+      << "&retryReads=" << BoolToStr(testRetryReads)
+      << "&tls=" << BoolToStr(testTlsFlag)
+      << "&tlsAllowInvalidHostnames="
+      << BoolToStr(testTlsAllowInvalidHostnamesFlag)
+      << "&tlsCAFile=" << EncodeURIComponent(testTlsCaFile);
   const std::string& expectedMongoDbStr = mongodbConstructor.str();
 
   BOOST_CHECK_EQUAL(documentdb::odbc::common::ToLower(cfg.ToConnectString()),

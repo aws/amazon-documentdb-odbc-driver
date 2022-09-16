@@ -86,6 +86,11 @@ class DatabaseMetaData {
       const boost::optional< std::string >& schema, const std::string& table,
       JniErrorInfo& errInfo);
 
+  /**
+   * Query the type info in the database.
+   */
+  SharedPointer< ResultSet > GetTypeInfo(JniErrorInfo& errInfo);
+
  private:
   /**
    * Constructs an instance of the DatabaseMetaData class.

@@ -543,13 +543,8 @@ std::string Configuration::ToJdbcConnectionString() const {
 }
 
 void Configuration::ToJdbcOptionsMap(ArgumentMap& res) const {
+  ToMongoCommonOptionsMap(res);
   AddToMap(res, "loginTimeoutSec", loginTimeoutSec);
-  AddToMap(res, "readPreference", readPreference, true);
-  AddToMap(res, "replicaSet", replicaSet);
-  AddToMap(res, "retryReads", retryReads);
-  AddToMap(res, "tls", tls);
-  AddToMap(res, "tlsAllowInvalidHostnames", tlsAllowInvalidHostnames);
-  AddToMap(res, "tlsCaFile", tlsCaFile);
   AddToMap(res, "sshUser", sshUser);
   AddToMap(res, "sshHost", sshHost);
   AddToMap(res, "sshPrivateKeyFile", sshPrivateKeyFile);
@@ -563,9 +558,22 @@ void Configuration::ToJdbcOptionsMap(ArgumentMap& res) const {
   AddToMap(res, "schemaName", schemaName);
   AddToMap(res, "refreshSchema", refreshSchema);
   AddToMap(res, "defaultFetchSize", defaultFetchSize);
+  //TODO expose defaultAuthDB on the DSN config
+  //https://bitquill.atlassian.net/browse/AD-935
+  
 }
 
-std::string Configuration::ToMongoDbConnectionString(int32_t localSSHTunnelPort) const {
+void Configuration::ToMongoCommonOptionsMap(ArgumentMap& res) const {
+  AddToMap(res, MONGO_URI_READPREFERENCE, readPreference, true);
+  AddToMap(res, MONGO_URI_REPLICASET, replicaSet);
+  AddToMap(res, MONGO_URI_RETRYREADS, retryReads);
+  AddToMap(res, MONGO_URI_TLS, tls);
+  AddToMap(res, MONGO_URI_TLSALLOWINVALIDHOSTNAMES, tlsAllowInvalidHostnames);
+  AddToMap(res, MONGO_URI_TLSCAFILE, tlsCaFile);
+}
+
+std::string Configuration::ToMongoDbConnectionString(
+    int32_t localSSHTunnelPort) const {
   std::string host = "localhost";
   std::string port = std::to_string(localSSHTunnelPort);
 
@@ -583,21 +591,34 @@ std::string Configuration::ToMongoDbConnectionString(int32_t localSSHTunnelPort)
   mongoConnectionString << ":" << EncodeURIComponent(GetPassword());
   mongoConnectionString << "@" << host;
   mongoConnectionString << ":" << port;
+  //TODO expose defaultAuthDB on the DSN config
+  //https://bitquill.atlassian.net/browse/AD-935
   mongoConnectionString << "/admin";
-  mongoConnectionString << INIT_OPT << MONGO_URI_AUTHMECHANISM
-                        << "=SCRAM-SHA-1";
-  mongoConnectionString << SUBS_OPT << MONGO_URI_APPNAME << "="
+  mongoConnectionString << INIT_OPT << MONGO_URI_APPNAME << "="
                         << EncodeURIComponent(GetApplicationName());
-  if (IsTls()) {
-    mongoConnectionString << SUBS_OPT << MONGO_URI_TLSALLOWINVALIDHOSTNAMES
-                          << "=true";
-  }
+  mongoConnectionString << SUBS_OPT << MONGO_URI_AUTHMECHANISM
+                        << "=SCRAM-SHA-1";
   if (GetLoginTimeoutSeconds()) {
     std::chrono::milliseconds connectionTimeoutMS =
         std::chrono::seconds(GetLoginTimeoutSeconds());
     mongoConnectionString << SUBS_OPT << MONGO_URI_CONNECTTIMEOUTMS << "="
-                          << std::to_string(connectionTimeoutMS.count());
+                          << EncodeURIComponent(
+                                 std::to_string(connectionTimeoutMS.count()));
   }
+
+  config::Configuration::ArgumentMap arguments;
+  ToMongoCommonOptionsMap(arguments);
+  std::stringstream options;
+  for (config::Configuration::ArgumentMap::const_iterator it =
+           arguments.begin();
+       it != arguments.end(); ++it) {
+    const std::string& key = it->first;
+    const std::string& value = it->second;
+    if (!value.empty()) {
+      options << SUBS_OPT << key << "=" << EncodeURIComponent(value);
+    }
+  }
+  mongoConnectionString << options.str();
 
   // tls configuration is handled using tls_options in connectionCPP
   // TODO handle the other DSN configuration
