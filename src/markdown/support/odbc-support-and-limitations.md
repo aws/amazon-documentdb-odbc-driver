@@ -208,7 +208,7 @@ supports the use of SQLPrepare. However, the use of parameters in queries (value
 
 ## Unimplemented ODBC API
 
-The following ODBC API are currently unimplement but they are planned to be implemented in future.
+The following ODBC API are currently unimplemented but are planned to be implemented in the future.
 
 - [SQLBrowseConnect](https://docs.microsoft.com/en-us/sql/odbc/reference/syntax/sqlbrowseconnect-function)
 - [SQLCancel](https://docs.microsoft.com/en-us/sql/odbc/reference/syntax/sqlcancel-function)
