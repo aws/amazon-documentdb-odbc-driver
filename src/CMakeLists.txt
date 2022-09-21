@@ -90,5 +90,6 @@ if (${WITH_ODBC})
 
     if (${WITH_TESTS} AND EXISTS ${CMAKE_SOURCE_DIR}/odbc-test)
         add_subdirectory(odbc-test)
+        add_dependencies(documentdb-odbc-tests documentdb-odbc)
     endif()
 endif()

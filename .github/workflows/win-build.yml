@@ -31,8 +31,7 @@ env:
   DOC_DB_LOG_LEVEL: "debug"
   JDBC_DRIVER_VERSION: "1.3.1"
   MONGO_IMPORT_COMMAND: "mongoimport.exe"
-  SHOULD_CREATE_ARTIFACTS: true
-  #SHOULD_CREATE_ARTIFACTS: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+  SHOULD_CREATE_ARTIFACTS: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
 
 jobs:
   build-windows32:
