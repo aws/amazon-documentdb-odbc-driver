@@ -18,8 +18,8 @@
 cmake_minimum_required(VERSION 3.20)
 
 # Allow the version to be set in the GitHub workflow.
-if (DEFINED ENV{DOCDB_ODBC_DRIVER_VERSION})
-    project(DocumentDB-ODBC.C++ VERSION $ENV{DOCDB_ODBC_DRIVER_VERSION})
+if (DEFINED ENV{ODBC_DRIVER_VERSION})
+    project(DocumentDB-ODBC.C++ VERSION $ENV{ODBC_DRIVER_VERSION})
 else()
     project(DocumentDB-ODBC.C++ VERSION 0.1.0)
 endif()
