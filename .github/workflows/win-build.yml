@@ -127,14 +127,14 @@ jobs:
         OPENSSL_ROOT_DIR: '${{ env.VCPKG_ROOT }}/packages/openssl_x86-windows'
 
     - name: Upload ODBC driver build at push to develop
-      if: ${{env.SHOULD_CREATE_ARTIFACTS}}
+      if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}} 
       uses: actions/upload-artifact@v3
       with:
         name: docdb-odbc-driver-win32-${{env.ODBC_DRIVER_VERSION}}
         path: build/odbc/cmake/Release
 
     - name: Upload performance test at push to develop
-      if: ${{env.SHOULD_CREATE_ARTIFACTS}}
+      if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}
       uses: actions/upload-artifact@v3
       with:
         name: performance-win32-${{env.ODBC_DRIVER_VERSION}}
@@ -289,14 +289,14 @@ jobs:
         OPENSSL_ROOT_DIR: '${{env.VCPKG_ROOT}}/packages/openssl_x64-windows'
 
     - name: Upload ODBC driver build at push to develop
-      if: ${{env.SHOULD_CREATE_ARTIFACTS}}
+      if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}
       uses: actions/upload-artifact@v3
       with:
         name: docdb-odbc-driver-amd64-${{env.ODBC_DRIVER_VERSION}}
         path: build/odbc/cmake/Release
 
     - name: Upload performance test at push to develop
-      if: ${{env.SHOULD_CREATE_ARTIFACTS}}
+      if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}
       uses: actions/upload-artifact@v3
       with:
         name: performance-amd64-${{env.ODBC_DRIVER_VERSION}}
