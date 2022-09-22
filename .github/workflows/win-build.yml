@@ -57,14 +57,10 @@ jobs:
     #   with:
     #     name: cppcheck-results
     #     path: cppcheck-results.log 
-    - name: Read ODBC_DRIVER_VERSION file
-      id: odbc_driver_version
-      uses: andstor/file-reader-action@v1
-      with:
-        path: ./src/ODBC_DRIVER_VERSION.txt
     - name: Update environment
+      shell: pwsh
       run: |
-        echo "ODBC_DRIVER_VERSION=${{steps.odbc_driver_version.outputs.contents}}" >> $GITHUB_ENV
+        Get-Content ./src/ODBC_DRIVER_VERSION.txt | ForEach-Object { echo "ODBC_DRIVER_VERSION=$_; break; }" >> $GITHUB_ENV
 
     - name: Get Java distribution
       uses: actions/setup-java@v2
@@ -229,14 +225,10 @@ jobs:
     #   with:
     #     name: cppcheck-results
     #     path: cppcheck-results.log
-    - name: Read ODBC_DRIVER_VERSION file
-      id: odbc_driver_version
-      uses: andstor/file-reader-action@v1
-      with:
-        path: ./src/ODBC_DRIVER_VERSION.txt
     - name: Update environment
+      shell: pwsh
       run: |
-        echo "ODBC_DRIVER_VERSION=${{steps.odbc_driver_version.outputs.contents}}" >> $GITHUB_ENV
+        Get-Content ./src/ODBC_DRIVER_VERSION.txt | ForEach-Object { echo "ODBC_DRIVER_VERSION=$_; break; }" >> $GITHUB_ENV
 
     - name: Get Java distribution
       uses: actions/setup-java@v2
