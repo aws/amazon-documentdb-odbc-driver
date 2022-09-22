@@ -17,12 +17,9 @@
 
 cmake_minimum_required(VERSION 3.20)
 
-# Allow the version to be set in the GitHub workflow.
-if (DEFINED ENV{ODBC_DRIVER_VERSION})
-    project(DocumentDB-ODBC.C++ VERSION $ENV{ODBC_DRIVER_VERSION})
-else()
-    project(DocumentDB-ODBC.C++ VERSION 0.1.0)
-endif()
+# Update version number in ODBC_DRIVER_VERSION.txt file.
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/ODBC_DRIVER_VERSION.txt" ODBC_DRIVER_VERSION)
+project(DocumentDB-ODBC.C++ VERSION ${ODBC_DRIVER_VERSION})
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/modules/code-coverage.cmake")
 if (NOT "$ENV{BOOST_ROOT}" STREQUAL "")
