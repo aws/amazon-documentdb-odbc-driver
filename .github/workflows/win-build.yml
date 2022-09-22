@@ -60,7 +60,8 @@ jobs:
     - name: Update environment
       shell: pwsh
       run: |
-        Get-Content ./src/ODBC_DRIVER_VERSION.txt | ForEach-Object { echo "ODBC_DRIVER_VERSION=$_"; break; } >> $GITHUB_ENV
+        Get-Content ./src/ODBC_DRIVER_VERSION.txt | ForEach-Object { echo "ODBC_DRIVER_VERSION=$_"; break; } >> $env:GITHUB_ENV
+        echo $env:ODBC_DRIVER_VERSION
 
     - name: Get Java distribution
       uses: actions/setup-java@v2
@@ -228,7 +229,8 @@ jobs:
     - name: Update environment
       shell: pwsh
       run: |
-        Get-Content ./src/ODBC_DRIVER_VERSION.txt | ForEach-Object { echo "ODBC_DRIVER_VERSION=$_"; break; } >> $GITHUB_ENV
+        Get-Content ./src/ODBC_DRIVER_VERSION.txt | ForEach-Object { echo "ODBC_DRIVER_VERSION=$_"; break; } >> $env:GITHUB_ENV
+        echo $env:ODBC_DRIVER_VERSION
 
     - name: Get Java distribution
       uses: actions/setup-java@v2
