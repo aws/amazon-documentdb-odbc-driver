@@ -16,7 +16,10 @@
 #
 
 cmake_minimum_required(VERSION 3.20)
-project(DocumentDB-ODBC.C++ VERSION 0.1.0)
+
+# Update version number in ODBC_DRIVER_VERSION.txt file.
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/ODBC_DRIVER_VERSION.txt" ODBC_DRIVER_VERSION)
+project(DocumentDB-ODBC.C++ VERSION ${ODBC_DRIVER_VERSION})
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/modules/code-coverage.cmake")
 if (NOT "$ENV{BOOST_ROOT}" STREQUAL "")
@@ -90,5 +93,6 @@ if (${WITH_ODBC})
 
     if (${WITH_TESTS} AND EXISTS ${CMAKE_SOURCE_DIR}/odbc-test)
         add_subdirectory(odbc-test)
+        add_dependencies(documentdb-odbc-tests documentdb-odbc)
     endif()
 endif()
