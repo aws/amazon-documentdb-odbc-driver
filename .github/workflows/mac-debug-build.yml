@@ -71,7 +71,6 @@ jobs:
         echo "/usr/local/bin/" >> $GITHUB_PATH
 
     - name: Update environment with JDBC_DRIVER_VERSION
-      shell: pwsh
       run: |
         read -r JDBC_DRIVER_VERSION < "${PROJECT_DIR}/src/odbc/JDBC_DRIVER_VERSION.txt"
         echo "JDBC_DRIVER_VERSION=$JDBC_DRIVER_VERSION" >> $GITHUB_ENV

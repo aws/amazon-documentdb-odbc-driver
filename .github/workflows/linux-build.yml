@@ -71,7 +71,6 @@ jobs:
         sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib linux-headers-$(uname -r) build-essential valgrind libboost-all-dev libbson-dev libsasl2-dev lcov
 
     - name: Update environment with JDBC_DRIVER_VERSION
-      shell: pwsh
       run: |
         read -r JDBC_DRIVER_VERSION < "${PROJECT_DIR}/src/odbc/JDBC_DRIVER_VERSION.txt"
         echo "JDBC_DRIVER_VERSION=$JDBC_DRIVER_VERSION" >> $GITHUB_ENV
