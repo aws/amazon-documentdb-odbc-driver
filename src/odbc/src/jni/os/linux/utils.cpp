@@ -253,7 +253,7 @@ std::string CreateDocumentDbHomeClasspath(const std::string& home,
   // 2. Add regular jars from "app" folder excluding "optional".
   std::string libsPath = home + "/app";
 
-    if (FileExists(libsPath)) {
+  if (FileExists(libsPath)) {
     res.append(ClasspathJars(libsPath));
 
     // Append inner directories.
