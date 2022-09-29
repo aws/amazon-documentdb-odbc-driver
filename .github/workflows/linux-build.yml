@@ -72,7 +72,7 @@ jobs:
 
     - name: Update environment with JDBC_DRIVER_VERSION
       run: |
-        read -r JDBC_DRIVER_VERSION < "${PROJECT_DIR}/src/JDBC_DRIVER_VERSION.txt"
+        read -r JDBC_DRIVER_VERSION < ./src/JDBC_DRIVER_VERSION.txt
         echo "JDBC_DRIVER_VERSION=$JDBC_DRIVER_VERSION" >> $GITHUB_ENV
 
     - name: Cache DocumentDB JDBC JAR
@@ -220,7 +220,7 @@ jobs:
 
     - name: Update environment with JDBC_DRIVER_VERSION
       run: |
-        read -r JDBC_DRIVER_VERSION < "${PROJECT_DIR}/src/JDBC_DRIVER_VERSION.txt"
+        read -r JDBC_DRIVER_VERSION < ./src/JDBC_DRIVER_VERSION.txt
         echo "JDBC_DRIVER_VERSION=$JDBC_DRIVER_VERSION" >> $GITHUB_ENV
 
     - name: Cache DocumentDB JDBC JAR
