@@ -324,7 +324,7 @@ if (WIN32 AND ${WITH_ODBC_MSI})
 
     add_custom_command(
         TARGET ${TARGET} POST_BUILD
-        COMMAND ${JAVA_JPACKAGE} --input "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/app" --main-jar "documentdb-jdbc-${JDBC_DRIVER_VERSION}-all.jar" --resource-dir "${JPACKAGE_RESOURCE}" --icon "${CMAKE_CURRENT_LIST_DIR}/install/images/awslogo.ico" --name "${WIX_JDBC_INSTALLER_NAME}" --vendor "${WIX_MANUFACTURER}" --copyright "Copyright (c) 2022 Amazon.com" --win-upgrade-uuid "d90635c3-2233-443d-8c46-42ae1d922dc1" --win-console --type msi --dest "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}" --app-version "${JDBC_DRIVER_VERSION}"
+        COMMAND ${JAVA_JPACKAGE} --verbose --input "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/app" --main-jar "documentdb-jdbc-${JDBC_DRIVER_VERSION}-all.jar" --resource-dir "${JPACKAGE_RESOURCE}" --icon "${CMAKE_CURRENT_LIST_DIR}/install/images/awslogo.ico" --name "${WIX_JDBC_INSTALLER_NAME}" --vendor "${WIX_MANUFACTURER}" --copyright "Copyright (c) 2022 Amazon.com" --win-upgrade-uuid "d90635c3-2233-443d-8c46-42ae1d922dc1" --win-console --type msi --dest "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}" --app-version "${JDBC_DRIVER_VERSION}"
         COMMAND ${WIX_CANDLE} ${WIX_INSTALLER_PREFIX}.wxs -out ${WIX_INSTALLER_PREFIX}.wxobj
         COMMAND ${WIX_LIGHT} -ext WixUIExtension ${WIX_INSTALLER_PREFIX}.wxobj -out ${WIX_INSTALLER_PREFIX}.msi
         COMMAND ${WIX_CANDLE} ${WIX_BUNDLE_INSTALLER_PREFIX}.wxs -ext WixBalExtension -ext WixUtilExtension -out ${WIX_BUNDLE_INSTALLER_PREFIX}.wxobj
