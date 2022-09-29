@@ -80,7 +80,7 @@ void AttachHelper::OnThreadAttach() {
  * @return @c true if the path looks like binary release home directory.
  */
 bool LooksLikeBinaryReleaseHome(const std::string& path) {
-  static const char* PROBE_CORE_LIB = "/libs/documentdb-jdbc*.jar";
+  static const char* PROBE_CORE_LIB = "/app/documentdb-jdbc*.jar";
 
   std::string coreLibProbe = path + PROBE_CORE_LIB;
 
@@ -195,8 +195,8 @@ std::string ClasspathExploded(const std::string& path, bool down) {
       res += ":";
     }
 
-    // 3. Append "target\libs"
-    std::string libsPath = path + "/target/libs";
+    // 3. Append "target\app"
+    std::string libsPath = path + "/target/app";
 
     if (FileExists(libsPath)) {
       std::string libsCp = ClasspathJars(libsPath);
@@ -250,10 +250,10 @@ std::string CreateDocumentDbHomeClasspath(const std::string& home,
     res.append(modulesCp);
   }
 
-  // 2. Add regular jars from "libs" folder excluding "optional".
-  std::string libsPath = home + "/libs";
+  // 2. Add regular jars from "app" folder excluding "optional".
+  std::string libsPath = home + "/app";
 
-  if (FileExists(libsPath)) {
+    if (FileExists(libsPath)) {
     res.append(ClasspathJars(libsPath));
 
     // Append inner directories.

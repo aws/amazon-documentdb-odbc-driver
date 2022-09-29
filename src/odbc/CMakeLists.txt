@@ -221,6 +221,11 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         message(FATAL_ERROR "WIX light.exe not found! Have you installed WIX Toolset or forgotten to add it to Path?")
     endif()
 
+    find_program(JAVA_JPACKAGE jpackage)
+    if(NOT JAVA_JPACKAGE)
+        message(FATAL_ERROR "Java jpackage not found! Have you installed JDK or forgotten to add it to Path?")
+    endif()
+
     set(WIX_ODBC_LIBRARY_PATH ".\\documentdb.odbc.dll")
     set(WIX_ODBC_BSON1_PATH ".\\bson-1.0.dll")
     set(WIX_ODBC_BSONCXX_PATH ".\\bsoncxx.dll")
@@ -235,7 +240,8 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         set(WIX_ODBC_ZLIB1_FILE "zlibd1.dll")
     endif()
 
-    set(WIX_ODBC_JDBC_PATH ".\\libs\\documentdb-jdbc-1.3.1-all.jar")
+    file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../JDBC_DRIVER_VERSION.txt" JDBC_DRIVER_VERSION)
+    message("jdbc=${JDBC_DRIVER_VERSION}")
 
     set(WIX_PROJECT_NAME "Amazon DocumentDB")
     set(WIX_MANUFACTURER "Amazon Web Services")
@@ -250,7 +256,6 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         set(WIX_COMPONENT_ID_MONGOC "7ee7d64d-2f03-4c8e-9da1-6995deb7c9ac")
         set(WIX_COMPONENT_ID_MONGOCXX "88eb3917-63e0-4e7c-ae6e-04dae66df013")
         set(WIX_COMPONENT_ID_ZLIB1 "2c920532-81fa-4088-a446-47aaa8db83ae")
-        set(WIX_COMPONENT_ID_JDBC "70020c86-713b-423d-b782-79f72ec7a388")
         set(WIX_COMPONENT_ID_DOCUMNETDB_HOME_ENV_VAR "281ea3c0-192c-4a3c-9ddf-5bc1cd77a790")
         set(WIX_COMPONENT_ID_PATH_JVM_DLL "ce3442b1-9a44-42f8-b492-82b01d9cf54a")
         set(WIX_BUNDLE_UPGRADE_CODE "f76aa702-9d83-427e-98ec-8b0749ae169a")
@@ -261,6 +266,9 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         set(WIX_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-amd64) 
         set(WIX_BUNDLE_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-amd64-all) 
         set(WIX_VCRUNTIME_NAME "VC_redist.x64.exe")    
+        set(WIX_JDBC_INSTALLER_NAME "Amazon DocumentDB JDBC Driver")
+        set(WIX_JDBC_INSTALLER "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${WIX_JDBC_INSTALLER_NAME}-${JDBC_DRIVER_VERSION}")
+        set(WIX_COMPONENT_ID_JVM_PATH_ENV_VAR "4de23e2e-b4f3-486f-a50f-b65dc25e34bc")
     elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
         set(WIX_BIT_SUFFIX "32-bit")
         set(WIX_PRODUCT_ID "60cb757b-69cb-412c-9d06-f22cd96914ed")
@@ -271,7 +279,6 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         set(WIX_COMPONENT_ID_MONGOC "694ecd9b-7d68-4998-bc82-83d82ba2bde6")
         set(WIX_COMPONENT_ID_MONGOCXX "0aa05333-e7ff-4f32-9d89-0b637475425e")
         set(WIX_COMPONENT_ID_ZLIB1 "41f84e00-d899-493b-a0c4-c59b53998538")
-        set(WIX_COMPONENT_ID_JDBC "1ff0aa89-8a06-4c21-b0ce-ff9523ac8f10")
         set(WIX_COMPONENT_ID_DOCUMNETDB_HOME_ENV_VAR "04aff702-9fe4-4dc1-9979-daa94aca5a03")
         set(WIX_COMPONENT_ID_PATH_JVM_DLL "cd20ba75-b91d-4189-bb9e-8d3a8036928f")
         set(WIX_BUNDLE_UPGRADE_CODE "a2788555-6ba4-4e1f-b429-cbb9e6ea7421")
@@ -282,9 +289,19 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         set(WIX_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-x86)
         set(WIX_BUNDLE_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-x86-all)
         set(WIX_VCRUNTIME_NAME "VC_redist.x86.exe")  
+        set(WIX_JDBC_INSTALLER "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${WIX_JDBC_INSTALLER_NAME}-${JDBC_DRIVER_VERSION}")
+        set(WIX_COMPONENT_ID_JVM_PATH_ENV_VAR "3C1D09FA-07A0-4FB6-A60B-FAD83AC08709")
     endif()
 
     set(WIX_PRODUCT_NAME "${WIX_PROJECT_NAME} ODBC ${WIX_BIT_SUFFIX} Driver")
+
+    set(JPACKAGE_RESOURCE "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/jpackage-resources")
+    file(MAKE_DIRECTORY ${JPACKAGE_RESOURCE})
+    configure_file(
+        "${CMAKE_CURRENT_LIST_DIR}/install/main.wxs.in"
+        "${JPACKAGE_RESOURCE}/main.wxs"
+        @ONLY
+    )
 
     configure_file(
         "${CMAKE_CURRENT_LIST_DIR}/install/documentdb-odbc.wxs.in"
@@ -307,6 +324,7 @@ if (WIN32 AND ${WITH_ODBC_MSI})
 
     add_custom_command(
         TARGET ${TARGET} POST_BUILD
+        COMMAND ${JAVA_JPACKAGE} --input "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/app" --main-jar "documentdb-jdbc-${JDBC_DRIVER_VERSION}-all.jar" --resource-dir "${JPACKAGE_RESOURCE}" --icon "${CMAKE_CURRENT_LIST_DIR}/install/images/awslogo.ico" --name "${WIX_JDBC_INSTALLER_NAME}" --vendor "${WIX_MANUFACTURER}" --copyright "Copyright (c) 2022 Amazon.com" --win-upgrade-uuid "d90635c3-2233-443d-8c46-42ae1d922dc1" --win-console --type msi --dest "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}" --app-version "${JDBC_DRIVER_VERSION}"
         COMMAND ${WIX_CANDLE} ${WIX_INSTALLER_PREFIX}.wxs -out ${WIX_INSTALLER_PREFIX}.wxobj
         COMMAND ${WIX_LIGHT} -ext WixUIExtension ${WIX_INSTALLER_PREFIX}.wxobj -out ${WIX_INSTALLER_PREFIX}.msi
         COMMAND ${WIX_CANDLE} ${WIX_BUNDLE_INSTALLER_PREFIX}.wxs -ext WixBalExtension -ext WixUtilExtension -out ${WIX_BUNDLE_INSTALLER_PREFIX}.wxobj

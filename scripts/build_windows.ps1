@@ -20,11 +20,13 @@ $DRIVER_SOURCE_DIR = "${WORKING_DIR}\src"
 $DRIVER_BUILD_DIR = "${BUILD_DIR}\odbc\cmake"
 
 # Download the JDBC driver
-$JDBC_DRIVER_VERSION = if ($JDBC_DRIVER_VERSION -eq $null) { "1.3.1" } else { $JDBC_DRIVER_VERSION }
+foreach ( $line in Get-Content "$DRIVER_SOURCE_DIR\JDBC_DRIVER_VERSION.txt" ) { 
+    $JDBC_DRIVER_VERSION = $line; break; 
+}
 $JDBC_DRIVER_FILENAME = "documentdb-jdbc-$JDBC_DRIVER_VERSION-all.jar"
-$JDBC_DRIVER_FULLPATH = "$DRIVER_BUILD_DIR\$CONFIGURATION\libs\$JDBC_DRIVER_FILENAME"
+$JDBC_DRIVER_FULLPATH = "$DRIVER_BUILD_DIR\$CONFIGURATION\app\$JDBC_DRIVER_FILENAME"
 if (-not (Test-Path -Path $JDBC_DRIVER_FULLPATH -PathType Leaf)) {
-    New-Item -Path "$DRIVER_BUILD_DIR\$CONFIGURATION\libs" -ItemType Directory -Force | Out-Null
+    New-Item -Path "$DRIVER_BUILD_DIR\$CONFIGURATION\app" -ItemType Directory -Force | Out-Null
     Write-Output "Downloading version $JDBC_DRIVER_VERSION of JDBC driver..."
     $progresspreference = 'silentlyContinue'
     Invoke-WebRequest `

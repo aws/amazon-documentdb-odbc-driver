@@ -27,7 +27,6 @@ env:
   DOC_DB_ODBC_INTEGRATION_TEST: 1
   DOC_DB_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
   DOC_DB_LOG_LEVEL: "debug"
-  JDBC_DRIVER_VERSION: "1.3.1"
   ODBCINSTINI: "${{github.workspace}}/build/odbc/lib/documentdb-odbc-install.ini"
   ODBCINI: "${{github.workspace}}/odbc.ini"
 
@@ -64,6 +63,12 @@ jobs:
         chmod +x scripts/install_dependencies_mac.sh
         ./scripts/install_dependencies_mac.sh
 
+    - name: Update environment with JDBC_DRIVER_VERSION
+      shell: pwsh
+      run: |
+        read -r JDBC_DRIVER_VERSION < "${PROJECT_DIR}/src/odbc/JDBC_DRIVER_VERSION.txt"
+        echo "JDBC_DRIVER_VERSION=$JDBC_DRIVER_VERSION" >> $GITHUB_ENV
+
     - name: Cache DocumentDB JDBC JAR
       id: cache-documentdb-jdbc-jar
       uses: actions/cache@v3
@@ -81,8 +86,8 @@ jobs:
 
     - name: Install DocumentDB JDBC JAR
       run: |
-        mkdir -p ${{env.ODBC_BIN_PATH}}/libs
-        cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
+        mkdir -p ${{env.ODBC_BIN_PATH}}/app
+        cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/app
 
     - name: configure-and-build-driver
       run: |

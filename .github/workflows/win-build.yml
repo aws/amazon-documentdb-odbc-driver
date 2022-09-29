@@ -29,7 +29,6 @@ env:
   DOC_DB_PRIV_KEY_FILE: ~/certs/docdb-sshtunnel.pem
   DOC_DB_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
   DOC_DB_LOG_LEVEL: "debug"
-  JDBC_DRIVER_VERSION: "1.3.1"
   MONGO_IMPORT_COMMAND: "mongoimport.exe"
   # Artifacts are created when pushing to develop branch on merge of pull requests.
   SHOULD_CREATE_ARTIFACTS: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
@@ -60,6 +59,11 @@ jobs:
       shell: pwsh
       run: |
         Get-Content ./src/ODBC_DRIVER_VERSION.txt | ForEach-Object { echo "ODBC_DRIVER_VERSION=$_"; break; } >> $env:GITHUB_ENV
+
+    - name: Update environment with JDBC_DRIVER_VERSION
+      shell: pwsh
+      run: |
+        Get-Content ./src/JDBC_DRIVER_VERSION.txt | ForEach-Object { echo "JDBC_DRIVER_VERSION=$_"; break; } >> $env:GITHUB_ENV
 
     - name: Get Java distribution
       uses: actions/setup-java@v2
@@ -115,8 +119,8 @@ jobs:
 
     - name: Install DocumentDB JDBC JAR
       run: |
-        mkdir -p ${{env.ODBC_BIN_PATH}}/libs
-        cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
+        mkdir -p ${{env.ODBC_BIN_PATH}}/app
+        cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/app
 
     - name: Install dependencies Windows
       run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x86-windows openssl:x86-windows boost-test:x86-windows boost-asio:x86-windows boost-chrono:x86-windows boost-interprocess:x86-windows boost-regex:x86-windows boost-system:x86-windows boost-thread:x86-windows
@@ -282,8 +286,8 @@ jobs:
         Invoke-WebRequest https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar -o documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
     - name: Install DocumentDB JDBC JAR
       run: |
-        mkdir -p ${{env.ODBC_BIN_PATH}}/libs
-        cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
+        mkdir -p ${{env.ODBC_BIN_PATH}}/app
+        cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/app
         
     - name: Install dependencies Windows
       run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x64-windows openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
@@ -426,8 +430,8 @@ jobs:
         Invoke-WebRequest https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar -o documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
     - name: Install DocumentDB JDBC JAR
       run: |
-        mkdir -p ${{env.ODBC_BIN_PATH}}/libs
-        cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
+        mkdir -p ${{env.ODBC_BIN_PATH}}/app
+        cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/app
   
     - name: Install dependencies Windows
       run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x64-windows openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
