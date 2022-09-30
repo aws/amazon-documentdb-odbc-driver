@@ -38,7 +38,7 @@
       Manufacturer="$(var.JpAppVendor)"
       InstallerVersion="$(var.JpInstallerVersion)"
       Compressed="$(var.JpCompressedMsi)"
-      InstallScope="$(var.JpInstallScope)" Platform="x64"
+      InstallScope="$(var.JpInstallScope)" Platform="@WIX_PACKAGE_PLATFORM@"
     />
 
     <Media Id="1" Cabinet="Data.cab" EmbedCab="yes" />
