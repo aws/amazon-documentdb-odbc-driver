@@ -241,7 +241,6 @@ if (WIN32 AND ${WITH_ODBC_MSI})
     endif()
 
     file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../JDBC_DRIVER_VERSION.txt" JDBC_DRIVER_VERSION)
-    message("jdbc=${JDBC_DRIVER_VERSION}")
 
     set(WIX_PROJECT_NAME "Amazon DocumentDB")
     set(WIX_MANUFACTURER "Amazon Web Services")

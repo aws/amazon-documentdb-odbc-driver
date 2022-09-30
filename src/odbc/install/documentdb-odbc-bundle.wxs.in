@@ -26,9 +26,9 @@
                   RepairCommand="/q ACTION=Repair /hideconsole"
                   Permanent="yes" />
 
-			<MsiPackage SourceFile="@WIX_JDBC_INSTALLER@.msi" />
-			
-			<MsiPackage SourceFile="@WIX_INSTALLER_PREFIX@.msi" />
+      <MsiPackage SourceFile="@WIX_JDBC_INSTALLER@.msi" />
+
+      <MsiPackage SourceFile="@WIX_INSTALLER_PREFIX@.msi" />
 
     </Chain>
   </Bundle>
