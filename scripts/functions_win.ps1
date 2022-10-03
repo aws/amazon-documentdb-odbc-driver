@@ -237,7 +237,9 @@ function Install-JavaJdk {
 
 	try {
 		# Download the JDK
-		New-Item -Type Directory -Path $jdksFolder
+		if ( -not (Test-Path -Path $jdksFolder)) {
+			New-Item -Type Directory -Path $jdksFolder -Force
+		}
 		Invoke-WebRequest $jdkDownloadUri -OutFile $jdkZipFilePath
 		Write-Host "After 'Invoke-WebRequest $jdkDownloadUri -OutFile $jdkZipFilePath'"
 		#Extract the zip file 
