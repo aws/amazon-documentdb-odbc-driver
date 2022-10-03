@@ -229,17 +229,19 @@ function Install-JavaJdk {
 	Write-Host "`$JdkDownloadUrl = '$JdkDownloadUrl'"
 	Write-Host "`$Platform = '$Platform'"
 
-	$jdksFolder     = Resolve-Path -Path $InstallParentPath
+	$jdksFolder     = $InstallParentPath
 	$jdkZipFileName = "${JdkName}-${JdkVersion}-${PlatformArchitecture}-${Platform}-jdk.zip"
 	$jdkDownloadUri = "${JdkDownloadUrl}/$jdkZipFileName"
 	$jdkZipFilePath = "$jdksFolder\$jdkZipFileName"
 	$tempFolderPath = Join-Path $Env:Temp $(New-Guid)
 
 	try {
-		# Download the JDK
+		# Ensure parent folder exists
 		if ( -not (Test-Path -Path $jdksFolder)) {
 			New-Item -Type Directory -Path $jdksFolder -Force
 		}
+		$jdksFolder = Resolve-Path -Path $jdksFolder
+		# Download the JDK
 		Invoke-WebRequest $jdkDownloadUri -OutFile $jdkZipFilePath
 		Write-Host "After 'Invoke-WebRequest $jdkDownloadUri -OutFile $jdkZipFilePath'"
 		#Extract the zip file 
