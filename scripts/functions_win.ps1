@@ -229,7 +229,7 @@ function Install-JavaJdk {
 	Write-Host "`$JdkDownloadUrl = '$JdkDownloadUrl'"
 	Write-Host "`$Platform = '$Platform'"
 
-	$jdksFolder     = $InstallParentPath
+	$jdksFolder     = Resolve-Path -Path $InstallParentPath
 	$jdkZipFileName = "${JdkName}-${JdkVersion}-${PlatformArchitecture}-${Platform}-jdk.zip"
 	$jdkDownloadUri = "${JdkDownloadUrl}/$jdkZipFileName"
 	$jdkZipFilePath = "$jdksFolder\$jdkZipFileName"
