@@ -222,11 +222,11 @@ function Install-JavaJdk {
 	
 	Write-Host "Installing Java JDK"
 
-	Write-Host "`$InstallParentPath = '$InstallParentPath'",
-	Write-Host "`$PlatformArchitecture = '$PlatformArchitecture'",
-	Write-Host "`$JdkVersion = '$JdkVersion'",
-	Write-Host "`$JdkName = '$JdkName'",
-	Write-Host "`$JdkDownloadUrl = '$JdkDownloadUrl'",
+	Write-Host "`$InstallParentPath = '$InstallParentPath'"
+	Write-Host "`$PlatformArchitecture = '$PlatformArchitecture'"
+	Write-Host "`$JdkVersion = '$JdkVersion'"
+	Write-Host "`$JdkName = '$JdkName'"
+	Write-Host "`$JdkDownloadUrl = '$JdkDownloadUrl'"
 	Write-Host "`$Platform = '$Platform'"
 
 	$jdksFolder     = $InstallParentPath
@@ -239,9 +239,11 @@ function Install-JavaJdk {
 		# Download the JDK
 		Write-Host "URI=$jdkDownloadUri"
 		Invoke-WebRequest $jdkDownloadUri -OutFile $jdkZipFilePath
+		Write-Host "After 'Invoke-WebRequest $jdkDownloadUri -OutFile $jdkZipFilePath'"
 		#Extract the zip file 
 		New-Item -Type Directory -Path $tempFolderPath
 		Expand-Archive -Path $jdkZipFilePath $tempFolderPath
+		Write-Host "After 'Expand-Archive -Path $jdkZipFilePath $tempFolderPath'"
 
 		# Ensure unique folder
 		$contentsOfTempFolder = Get-ChildItem -Path $tempFolderPath -Directory -Name
