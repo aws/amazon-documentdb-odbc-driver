@@ -237,11 +237,10 @@ function Install-JavaJdk {
 
 	try {
 		# Download the JDK
-		Write-Host "URI=$jdkDownloadUri"
+		New-Item -Type Directory -Path $jdksFolder
 		Invoke-WebRequest $jdkDownloadUri -OutFile $jdkZipFilePath
 		Write-Host "After 'Invoke-WebRequest $jdkDownloadUri -OutFile $jdkZipFilePath'"
 		#Extract the zip file 
-		New-Item -Path $jdksFolder -ItemType "directory" -Force
 		New-Item -Type Directory -Path $tempFolderPath
 		Expand-Archive -Path $jdkZipFilePath $tempFolderPath
 		Write-Host "After 'Expand-Archive -Path $jdkZipFilePath $tempFolderPath'"
