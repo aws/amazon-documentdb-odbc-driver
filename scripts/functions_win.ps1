@@ -211,12 +211,19 @@ function Confirm-JavaJdk {
 # Installs an Amazon Corretto JDK into the user's folder and updates the JAVA_HOME and PATH environment variables.
 function Install-JavaJdk {
 	[OutputType([Boolean])]
-	param ()
+	param (
+		$InstallParentPath = "$env:USERPROFILE\.jdks",
+		$PlatformArchitecture = "x64",
+		$JdkVersion = "17",
+		$JdkName = "amazon-corretto",
+		$JdkDownloadUrl = "https://corretto.aws/downloads/latest",
+		$Platform = "windows"
+	)
 	
 	Write-Host "Installing Java JDK"
-	$jdksFolder     = "$env:USERPROFILE\.jdks"
-	$jdkZipFileName = 'amazon-corretto-17-x64-windows-jdk.zip'
-	$jdkDownloadUri = "https://corretto.aws/downloads/latest/$jdkZipFileName"
+	$jdksFolder     = $InstallParentPath
+	$jdkZipFileName = "${JdkName}-${JdkVersion}-${$PlatformArchitecture}-${Platform}-jdk.zip"
+	$jdkDownloadUri = "${JdkDownloadUrl}/$jdkZipFileName"
 	$jdkZipFilePath = "$jdksFolder\$jdkZipFileName"
 	$tempFolderPath = Join-Path $Env:Temp $(New-Guid)
 
