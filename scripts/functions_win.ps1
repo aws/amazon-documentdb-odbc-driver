@@ -241,7 +241,7 @@ function Install-JavaJdk {
 		Invoke-WebRequest $jdkDownloadUri -OutFile $jdkZipFilePath
 		Write-Host "After 'Invoke-WebRequest $jdkDownloadUri -OutFile $jdkZipFilePath'"
 		#Extract the zip file 
-		New-Item -Path $jdksFolder -Name -ItemType "directory" -Force
+		New-Item -Path $jdksFolder -ItemType "directory" -Force
 		New-Item -Type Directory -Path $tempFolderPath
 		Expand-Archive -Path $jdkZipFilePath $tempFolderPath
 		Write-Host "After 'Expand-Archive -Path $jdkZipFilePath $tempFolderPath'"
