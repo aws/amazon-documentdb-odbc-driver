@@ -222,7 +222,7 @@ function Install-JavaJdk {
 	
 	Write-Host "Installing Java JDK"
 	$jdksFolder     = $InstallParentPath
-	$jdkZipFileName = "${JdkName}-${JdkVersion}-${$PlatformArchitecture}-${Platform}-jdk.zip"
+	$jdkZipFileName = "${JdkName}-${JdkVersion}-${PlatformArchitecture}-${Platform}-jdk.zip"
 	$jdkDownloadUri = "${JdkDownloadUrl}/$jdkZipFileName"
 	$jdkZipFilePath = "$jdksFolder\$jdkZipFileName"
 	$tempFolderPath = Join-Path $Env:Temp $(New-Guid)
