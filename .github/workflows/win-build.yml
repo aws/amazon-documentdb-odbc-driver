@@ -260,13 +260,6 @@ jobs:
       run: |
         Get-Content ./src/JDBC_DRIVER_VERSION.txt | ForEach-Object { echo "JDBC_DRIVER_VERSION=$_"; break; } >> $env:GITHUB_ENV
 
-    #- name: Get Java distribution
-    #  uses: actions/setup-java@v2
-    #  with:
-    #    distribution: 'temurin'
-    #    java-version: '17'
-    #    architecture: x64
-
     - name: Get Java distribution
       shell: pwsh
       run: |
