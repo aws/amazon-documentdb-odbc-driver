@@ -86,10 +86,10 @@ jobs:
         echo "${{env.JAVA_HOME}}\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo "${{env.JAVA_HOME}}\bin\server" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-    - name: Trace jlink and jpackage version
+    - name: Ensure jlink and jpackage have the expected versions
       run: |
-        jlink --version
-        jpackage --version
+        if ( -not ((jlink --version) -like "11*") ) { exit 1 }
+        if ( -not ((jpackage --version) -like "17*") ) { exit 1 }
 
     - name: "Update path for WIX Toolset"
       run: |
@@ -153,7 +153,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: docdb-odbc-driver-win32-${{env.ODBC_DRIVER_VERSION}}
-        path: build/odbc/cmake/Release
+        path: build/odbc/Release
 
     - name: Upload performance test at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}
@@ -333,7 +333,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: docdb-odbc-driver-amd64-${{env.ODBC_DRIVER_VERSION}}
-        path: build/odbc/cmake/Release
+        path: build/odbc/Release
 
     - name: Upload performance test at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}
