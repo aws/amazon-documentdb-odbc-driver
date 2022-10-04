@@ -154,7 +154,10 @@ jobs:
       with:
         name: docdb-odbc-driver-win32-${{env.ODBC_DRIVER_VERSION}}
         path: |
-          build/odbc/cmake/Release
+          build/odbc/cmake/Release/*.dll
+          build/odbc/cmake/Release/*.msi
+          build/odbc/cmake/Release/*.exe
+          build/odbc/cmake/Release/*.pdb
           !build/odbc/cmake/Release/images
           !build/odbc/cmake/Release/jpackage-resources
           !build/odbc/cmake/Release/runtime-image
@@ -338,7 +341,10 @@ jobs:
       with:
         name: docdb-odbc-driver-amd64-${{env.ODBC_DRIVER_VERSION}}
         path: |
-          build/odbc/cmake/Release
+          build/odbc/cmake/Release/*.dll
+          build/odbc/cmake/Release/*.msi
+          build/odbc/cmake/Release/*.exe
+          build/odbc/cmake/Release/*.pdb
           !build/odbc/cmake/Release/images
           !build/odbc/cmake/Release/jpackage-resources
           !build/odbc/cmake/Release/runtime-image
