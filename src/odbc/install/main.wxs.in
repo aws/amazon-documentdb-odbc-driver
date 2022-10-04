@@ -75,9 +75,6 @@
       <Component Id="pathEnvironmentVariable" Guid="@WIX_COMPONENT_ID_JVM_PATH_ENV_VAR@" Win64='@WIX_COMPONENT_IS_WIN64@' KeyPath="yes" Directory="TARGETDIR" >
         <Environment Id="jvmPath" Name="Path" Value="[INSTALLDIR]runtime\bin\server" System="no" Permanent="no" Action="set" Part="last" Separator=";" />
       </Component>
-      <Component Id="DOCUMENTDBHOMEVAR" Guid="@WIX_COMPONENT_ID_DOCUMNETDB_HOME_ENV_VAR@" Win64="@WIX_COMPONENT_IS_WIN64@" KeyPath="yes"  Directory="TARGETDIR" >
-        <Environment Id="DOCUMENTDBHOME" Name="DOCUMENTDB_HOME" Value="[INSTALLDIR]" System="no" Permanent="no" Action="set" Part="all" />
-      </Component>
     </Feature>
 
     <CustomAction Id="JpSetARPINSTALLLOCATION" Property="ARPINSTALLLOCATION" Value="[INSTALLDIR]" />

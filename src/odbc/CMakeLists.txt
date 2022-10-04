@@ -223,7 +223,12 @@ if (WIN32 AND ${WITH_ODBC_MSI})
 
     find_program(JAVA_JPACKAGE jpackage)
     if(NOT JAVA_JPACKAGE)
-        message(FATAL_ERROR "Java jpackage not found! Have you installed JDK or forgotten to add it to Path?")
+        message(FATAL_ERROR "Java 'jpackage' not found! Have you installed JDK or forgotten to add it to Path?")
+    endif()
+
+    find_program(JAVA_JLINK jlink)
+    if(NOT JAVA_JLINK)
+        message(FATAL_ERROR "Java 'jlink' not found! Have you installed JDK or forgotten to add it to Path?")
     endif()
 
     set(WIX_ODBC_LIBRARY_PATH ".\\documentdb.odbc.dll")
@@ -242,6 +247,7 @@ if (WIN32 AND ${WITH_ODBC_MSI})
 
     file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../JDBC_DRIVER_VERSION.txt" JDBC_DRIVER_VERSION)
 
+    set(WIX_ODBC_JDBC_PATH ".\\libs\\documentdb-jdbc-${JDBC_DRIVER_VERSION}-all.jar")
     set(WIX_PROJECT_NAME "Amazon DocumentDB")
     set(WIX_MANUFACTURER "Amazon Web Services")
     set(WIX_JDBC_INSTALLER_NAME "Amazon DocumentDB JDBC Driver")
@@ -268,6 +274,7 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         set(WIX_BUNDLE_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-amd64-all) 
         set(WIX_VCRUNTIME_NAME "VC_redist.x64.exe")    
         set(WIX_COMPONENT_ID_JVM_PATH_ENV_VAR "4de23e2e-b4f3-486f-a50f-b65dc25e34bc")
+        set(JLINK_MODULES "jdk.management.jfr,java.rmi,jdk.jdi,jdk.charsets,java.xml,jdk.xml.dom,java.datatransfer,jdk.jstatd,jdk.httpserver,java.desktop,java.security.sasl,jdk.zipfs,java.base,jdk.crypto.ec,jdk.javadoc,jdk.management.agent,jdk.jshell,jdk.editpad,jdk.jsobject,jdk.sctp,java.sql.rowset,java.smartcardio,jdk.jlink,jdk.unsupported,java.security.jgss,java.compiler,jdk.nio.mapmode,jdk.dynalink,jdk.unsupported.desktop,jdk.accessibility,jdk.security.jgss,java.sql,jdk.incubator.vector,java.xml.crypto,java.logging,java.transaction.xa,jdk.jfr,jdk.crypto.cryptoki,jdk.random,jdk.net,java.naming,jdk.internal.ed,java.prefs,java.net.http,jdk.compiler,jdk.internal.opt,jdk.naming.rmi,jdk.jconsole,jdk.attach,jdk.crypto.mscapi,jdk.internal.le,java.management,jdk.jdwp.agent,jdk.incubator.foreign,jdk.internal.jvmstat,java.instrument,jdk.management,jdk.security.auth,java.scripting,jdk.jdeps,jdk.jartool,jdk.jpackage,java.management.rmi,jdk.naming.dns,jdk.localedata")
     elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
         set(WIX_BIT_SUFFIX "32-bit")
         set(WIX_PRODUCT_ID "60cb757b-69cb-412c-9d06-f22cd96914ed")
@@ -289,6 +296,7 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         set(WIX_BUNDLE_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-x86-all)
         set(WIX_VCRUNTIME_NAME "VC_redist.x86.exe")  
         set(WIX_COMPONENT_ID_JVM_PATH_ENV_VAR "3C1D09FA-07A0-4FB6-A60B-FAD83AC08709")
+        set(JLINK_MODULES "jdk.management.jfr,java.rmi,jdk.jdi,jdk.charsets,java.xml,jdk.xml.dom,java.datatransfer,jdk.jstatd,jdk.httpserver,java.desktop,java.security.sasl,jdk.zipfs,java.base,jdk.crypto.ec,jdk.javadoc,jdk.management.agent,jdk.jshell,jdk.editpad,jdk.jsobject,jdk.sctp,java.sql.rowset,java.smartcardio,jdk.jlink,jdk.unsupported,java.security.jgss,java.compiler,jdk.dynalink,jdk.unsupported.desktop,jdk.accessibility,jdk.security.jgss,java.sql,java.xml.crypto,java.logging,java.transaction.xa,jdk.jfr,jdk.crypto.cryptoki,jdk.net,java.naming,jdk.internal.ed,java.prefs,java.net.http,jdk.compiler,jdk.internal.opt,jdk.naming.rmi,jdk.jconsole,jdk.attach,jdk.crypto.mscapi,jdk.internal.le,java.management,jdk.jdwp.agent,jdk.internal.jvmstat,java.instrument,jdk.management,jdk.security.auth,java.scripting,jdk.jdeps,jdk.jartool,java.management.rmi,jdk.naming.dns,jdk.localedata")
     endif()
 
     set(WIX_PRODUCT_NAME "${WIX_PROJECT_NAME} ODBC ${WIX_BIT_SUFFIX} Driver")
@@ -320,9 +328,12 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/odbc/install/images $<TARGET_FILE_DIR:${TARGET}>/images)
 
+    set (JLINK_RUNTIME_IMAGE_DIR "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/runtime-image")
+    file(REMOVE_RECURSE ${JLINK_RUNTIME_IMAGE_DIR})
     add_custom_command(
         TARGET ${TARGET} POST_BUILD
-        COMMAND ${JAVA_JPACKAGE} --input "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/app" --main-jar "documentdb-jdbc-${JDBC_DRIVER_VERSION}-all.jar" --resource-dir "${JPACKAGE_RESOURCE}" --icon "${CMAKE_CURRENT_LIST_DIR}/install/images/awslogo.ico" --name "${WIX_JDBC_INSTALLER_NAME}" --vendor "${WIX_MANUFACTURER}" --copyright "Copyright (c) 2022 Amazon.com" --win-upgrade-uuid "d90635c3-2233-443d-8c46-42ae1d922dc1" --win-console --type msi --dest "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}" --app-version "${JDBC_DRIVER_VERSION}"
+        COMMAND ${JAVA_JLINK} --output ${JLINK_RUNTIME_IMAGE_DIR} --strip-native-commands --strip-debug --no-man-pages --no-header-files --module-path $ENV{JAVA_HOME}/jmods --add-modules ${JLINK_MODULES}
+        COMMAND ${JAVA_JPACKAGE} --runtime-image ${JLINK_RUNTIME_IMAGE_DIR} --resource-dir "${JPACKAGE_RESOURCE}" --name "${WIX_JDBC_INSTALLER_NAME}" --vendor "${WIX_MANUFACTURER}" --copyright "Copyright (c) 2022 Amazon.com" --win-upgrade-uuid "d90635c3-2233-443d-8c46-42ae1d922dc1" --type msi --dest "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}" --app-version "${JDBC_DRIVER_VERSION}"
         COMMAND ${WIX_CANDLE} ${WIX_INSTALLER_PREFIX}.wxs -out ${WIX_INSTALLER_PREFIX}.wxobj
         COMMAND ${WIX_LIGHT} -ext WixUIExtension ${WIX_INSTALLER_PREFIX}.wxobj -out ${WIX_INSTALLER_PREFIX}.msi
         COMMAND ${WIX_CANDLE} ${WIX_BUNDLE_INSTALLER_PREFIX}.wxs -ext WixBalExtension -ext WixUtilExtension -out ${WIX_BUNDLE_INSTALLER_PREFIX}.wxobj

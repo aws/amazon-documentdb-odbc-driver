@@ -92,8 +92,8 @@ jobs:
 
     - name: Install DocumentDB JDBC JAR
       run: |
-        mkdir -p ${{env.ODBC_BIN_PATH}}/app
-        cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/app
+        mkdir -p ${{env.ODBC_BIN_PATH}}/libs
+        cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
 
     - name: configure-and-build-driver
       run: |

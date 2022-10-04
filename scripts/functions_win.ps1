@@ -217,7 +217,8 @@ function Install-JavaJdk {
 		$JdkVersion = "17",
 		$JdkName = "amazon-corretto",
 		$JdkDownloadUrl = "https://corretto.aws/downloads/latest",
-		$Platform = "windows"
+		$Platform = "windows",
+		[switch]$InstallOnly
 	)
 	
 	Write-Host "Installing Java JDK"
@@ -232,15 +233,15 @@ function Install-JavaJdk {
 	$jdksFolder     = $InstallParentPath
 	$jdkZipFileName = "${JdkName}-${JdkVersion}-${PlatformArchitecture}-${Platform}-jdk.zip"
 	$jdkDownloadUri = "${JdkDownloadUrl}/$jdkZipFileName"
-	$jdkZipFilePath = "$jdksFolder\$jdkZipFileName"
 	$tempFolderPath = Join-Path $Env:Temp $(New-Guid)
+	# Ensure parent folder exists
+	if ( -not (Test-Path -Path $jdksFolder)) {
+		New-Item -Type Directory -Path $jdksFolder -Force
+	}
+	$jdksFolder = Resolve-Path -Path $jdksFolder
+	$jdkZipFilePath = "$jdksFolder\$jdkZipFileName"
 
 	try {
-		# Ensure parent folder exists
-		if ( -not (Test-Path -Path $jdksFolder)) {
-			New-Item -Type Directory -Path $jdksFolder -Force
-		}
-		$jdksFolder = Resolve-Path -Path $jdksFolder
 		# Download the JDK
 		Invoke-WebRequest $jdkDownloadUri -OutFile $jdkZipFilePath
 		Write-Host "After 'Invoke-WebRequest $jdkDownloadUri -OutFile $jdkZipFilePath'"
@@ -257,13 +258,15 @@ function Install-JavaJdk {
 		}
 		# Place JDK in user's folder
 		$jdkFolderName = $contentsOfTempFolder
-		$Env:JAVA_HOME = "$jdksFolder\$jdkFolderName"
-		if ( -not (Test-Path -Path $Env:JAVA_HOME) ) {
+		if ( -not (Test-Path -Path "$jdksFolder\$jdkFolderName") ) {
 			Copy-Item -Path "$tempFolderPath\*" -Destination $jdksFolder -Recurse -Force
 		}
-
-		# Update PATH for bin (java.exe) and server (jvm.dll)
-		Set-JdkPath
+		# Update if not just an install, only
+		if ( -not $InstallOnly ) {
+			# Update JAVA_HOME and PATH for bin (java.exe) and server (jvm.dll)
+			$Env:JAVA_HOME = "$jdksFolder\$jdkFolderName"
+			Set-JdkPath
+		}
 	}
 	catch {
 		Write-Host "Error installing Java JDK."
