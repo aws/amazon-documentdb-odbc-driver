@@ -65,6 +65,15 @@ jobs:
       run: |
         Get-Content ./src/JDBC_DRIVER_VERSION.txt | ForEach-Object { echo "JDBC_DRIVER_VERSION=$_"; break; } >> $env:GITHUB_ENV
 
+    # Get first JDK to provide access to jpackage
+    - name: Get Java distribution (JDK 17, 32-bit)
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        architecture: x86
+
+    # Get first JDK to provide access to jlink
     - name: Get Java distribution (JDK 11, 32-bit)
       shell: pwsh
       run: |
@@ -76,14 +85,6 @@ jobs:
       run: |
         echo "${{env.JAVA_HOME}}\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo "${{env.JAVA_HOME}}\bin\server" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-    # Get second JDK to provide access to jpackage
-    - name: Get Java distribution (JDK 17, 32-bit)
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-        architecture: x86
 
     - name: Trace jlink and jpackage version
       run: |
