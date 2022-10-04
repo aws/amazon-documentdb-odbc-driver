@@ -339,9 +339,6 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         COMMAND ${WIX_CANDLE} ${WIX_BUNDLE_INSTALLER_PREFIX}.wxs -ext WixBalExtension -ext WixUtilExtension -out ${WIX_BUNDLE_INSTALLER_PREFIX}.wxobj
         COMMAND ${WIX_LIGHT}  ${WIX_BUNDLE_INSTALLER_PREFIX}.wxobj  -ext WixBalExtension -ext WixUtilExtension -out ${WIX_BUNDLE_INSTALLER_PREFIX}.exe
     )
-    # Remove so we don't copy/redistribute folder
-    file(REMOVE_RECURSE ${JPACKAGE_RESOURCE})
-    file(REMOVE_RECURSE ${JLINK_RUNTIME_IMAGE_DIR})
 endif()
 
 target_include_directories(${TARGET} INTERFACE include)
