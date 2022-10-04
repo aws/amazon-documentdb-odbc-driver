@@ -153,7 +153,11 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: docdb-odbc-driver-win32-${{env.ODBC_DRIVER_VERSION}}
-        path: build/odbc/Release
+        path: |
+          build/odbc/cmake/Release
+          !build/odbc/cmake/Release/images
+          !build/odbc/cmake/Release/jpackage-resources
+          !build/odbc/cmake/Release/runtime-image
 
     - name: Upload performance test at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}
@@ -333,7 +337,11 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: docdb-odbc-driver-amd64-${{env.ODBC_DRIVER_VERSION}}
-        path: build/odbc/Release
+        path: |
+          build/odbc/cmake/Release
+          !build/odbc/cmake/Release/images
+          !build/odbc/cmake/Release/jpackage-resources
+          !build/odbc/cmake/Release/runtime-image
 
     - name: Upload performance test at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}
