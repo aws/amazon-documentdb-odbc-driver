@@ -309,7 +309,7 @@ if (WIN32 AND ${WITH_ODBC_MSI})
     set(JPACKAGE_RESOURCE "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/jpackage-resources")
     file(MAKE_DIRECTORY ${JPACKAGE_RESOURCE})
     configure_file(
-        "${CMAKE_CURRENT_LIST_DIR}/install/main.wxs.in"
+        "${CMAKE_CURRENT_LIST_DIR}/install/${WIX_JRE_INSTALLER_NAME}.wxs.in"
         "${JPACKAGE_RESOURCE}/main.wxs"
         @ONLY
     )
