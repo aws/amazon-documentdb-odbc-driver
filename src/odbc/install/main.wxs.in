@@ -73,7 +73,7 @@
       <ComponentGroupRef Id="Files"/>
       <ComponentGroupRef Id="FileAssociations"/>
       <Component Id="pathEnvironmentVariable" Guid="@WIX_COMPONENT_ID_JVM_PATH_ENV_VAR@" Win64='@WIX_COMPONENT_IS_WIN64@' KeyPath="yes" Directory="TARGETDIR" >
-        <Environment Id="jvmPath" Name="Path" Value="[INSTALLDIR]runtime\bin\server" System="no" Permanent="no" Action="set" Part="last" Separator=";" />
+        <Environment Id="jvmPath" Name="Path" Value="[INSTALLDIR]bin\server" System="no" Permanent="no" Action="set" Part="last" Separator=";" />
       </Component>
     </Feature>
 
