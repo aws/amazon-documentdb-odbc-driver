@@ -245,13 +245,17 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         set(WIX_ODBC_ZLIB1_FILE "zlibd1.dll")
     endif()
 
+    # Get the JDBC version
     file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../JDBC_DRIVER_VERSION.txt" JDBC_DRIVER_VERSION)
+    string(STRIP ${JDBC_DRIVER_VERSION} JDBC_DRIVER_VERSION)
+    # Get the version of Java via the `jlink` command (used to build the Java runtime)
+    execute_process(COMMAND jlink --version OUTPUT_VARIABLE JLINK_VERSION)
+    string(STRIP ${JLINK_VERSION} JLINK_VERSION)
 
     set(WIX_ODBC_JDBC_PATH ".\\libs\\documentdb-jdbc-${JDBC_DRIVER_VERSION}-all.jar")
     set(WIX_PROJECT_NAME "Amazon DocumentDB")
     set(WIX_MANUFACTURER "Amazon Web Services")
-    set(WIX_JDBC_INSTALLER_NAME "Amazon DocumentDB JDBC Driver")
-    set(WIX_JDBC_INSTALLER "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${WIX_JDBC_INSTALLER_NAME}-${JDBC_DRIVER_VERSION}")
+    set(WIX_JRE_INSTALLER_NAME "documentdb-jre")
 
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
         set(WIX_BIT_SUFFIX "64-bit")
@@ -270,8 +274,8 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         set(WIX_COMPONENT_IS_WIN64 "yes")
         set(WIX_PACKAGE_PLATFORM "x64")
         set(WIX_VC_DOWNLOAD_URL "https://aka.ms/vs/17/release/vc_redist.x64.exe")
-        set(WIX_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-amd64) 
-        set(WIX_BUNDLE_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-amd64-all) 
+        set(WIX_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-amd64-${ODBC_DRIVER_VERSION}) 
+        set(WIX_BUNDLE_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-amd64-${ODBC_DRIVER_VERSION}-all) 
         set(WIX_VCRUNTIME_NAME "VC_redist.x64.exe")    
         set(WIX_COMPONENT_ID_JVM_PATH_ENV_VAR "4de23e2e-b4f3-486f-a50f-b65dc25e34bc")
         set(JLINK_MODULES "jdk.management.jfr,java.rmi,jdk.jdi,jdk.charsets,java.xml,jdk.xml.dom,java.datatransfer,jdk.jstatd,jdk.httpserver,java.desktop,java.security.sasl,jdk.zipfs,java.base,jdk.crypto.ec,jdk.javadoc,jdk.management.agent,jdk.jshell,jdk.editpad,jdk.jsobject,jdk.sctp,java.sql.rowset,java.smartcardio,jdk.jlink,jdk.unsupported,java.security.jgss,java.compiler,jdk.nio.mapmode,jdk.dynalink,jdk.unsupported.desktop,jdk.accessibility,jdk.security.jgss,java.sql,jdk.incubator.vector,java.xml.crypto,java.logging,java.transaction.xa,jdk.jfr,jdk.crypto.cryptoki,jdk.random,jdk.net,java.naming,jdk.internal.ed,java.prefs,java.net.http,jdk.compiler,jdk.internal.opt,jdk.naming.rmi,jdk.jconsole,jdk.attach,jdk.crypto.mscapi,jdk.internal.le,java.management,jdk.jdwp.agent,jdk.incubator.foreign,jdk.internal.jvmstat,java.instrument,jdk.management,jdk.security.auth,java.scripting,jdk.jdeps,jdk.jartool,jdk.jpackage,java.management.rmi,jdk.naming.dns,jdk.localedata")
@@ -292,13 +296,14 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         set(WIX_COMPONENT_IS_WIN64 "no")
         set(WIX_PACKAGE_PLATFORM "x86")
         set(WIX_VC_DOWNLOAD_URL "https://aka.ms/vs/17/release/vc_redist.x86.exe")
-        set(WIX_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-x86)
-        set(WIX_BUNDLE_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-x86-all)
+        set(WIX_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-x86-${ODBC_DRIVER_VERSION})
+        set(WIX_BUNDLE_INSTALLER_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/documentdb-odbc-x86-${ODBC_DRIVER_VERSION}-all)
         set(WIX_VCRUNTIME_NAME "VC_redist.x86.exe")  
         set(WIX_COMPONENT_ID_JVM_PATH_ENV_VAR "3C1D09FA-07A0-4FB6-A60B-FAD83AC08709")
         set(JLINK_MODULES "jdk.management.jfr,java.rmi,jdk.jdi,jdk.charsets,java.xml,jdk.xml.dom,java.datatransfer,jdk.jstatd,jdk.httpserver,java.desktop,java.security.sasl,jdk.zipfs,java.base,jdk.crypto.ec,jdk.javadoc,jdk.management.agent,jdk.jshell,jdk.editpad,jdk.jsobject,jdk.sctp,java.sql.rowset,java.smartcardio,jdk.jlink,jdk.unsupported,java.security.jgss,java.compiler,jdk.dynalink,jdk.unsupported.desktop,jdk.accessibility,jdk.security.jgss,java.sql,java.xml.crypto,java.logging,java.transaction.xa,jdk.jfr,jdk.crypto.cryptoki,jdk.net,java.naming,jdk.internal.ed,java.prefs,java.net.http,jdk.compiler,jdk.internal.opt,jdk.naming.rmi,jdk.jconsole,jdk.attach,jdk.crypto.mscapi,jdk.internal.le,java.management,jdk.jdwp.agent,jdk.internal.jvmstat,java.instrument,jdk.management,jdk.security.auth,java.scripting,jdk.jdeps,jdk.jartool,java.management.rmi,jdk.naming.dns,jdk.localedata")
     endif()
 
+    set(WIX_JRE_INSTALLER "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${WIX_JRE_INSTALLER_NAME}-${WIX_PACKAGE_PLATFORM}-${JLINK_VERSION}")
     set(WIX_PRODUCT_NAME "${WIX_PROJECT_NAME} ODBC ${WIX_BIT_SUFFIX} Driver")
 
     set(JPACKAGE_RESOURCE "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/jpackage-resources")
@@ -333,7 +338,7 @@ if (WIN32 AND ${WITH_ODBC_MSI})
     add_custom_command(
         TARGET ${TARGET} POST_BUILD
         COMMAND ${JAVA_JLINK} --output ${JLINK_RUNTIME_IMAGE_DIR} --strip-native-commands --strip-debug --no-man-pages --no-header-files --module-path $ENV{JAVA_HOME}/jmods --add-modules ${JLINK_MODULES}
-        COMMAND ${JAVA_JPACKAGE} --runtime-image ${JLINK_RUNTIME_IMAGE_DIR} --resource-dir "${JPACKAGE_RESOURCE}" --name "${WIX_JDBC_INSTALLER_NAME}" --vendor "${WIX_MANUFACTURER}" --copyright "Copyright (c) 2022 Amazon.com" --win-upgrade-uuid "d90635c3-2233-443d-8c46-42ae1d922dc1" --type msi --dest "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}" --app-version "${JDBC_DRIVER_VERSION}"
+        COMMAND ${JAVA_JPACKAGE} --runtime-image ${JLINK_RUNTIME_IMAGE_DIR} --resource-dir "${JPACKAGE_RESOURCE}" --name "${WIX_JRE_INSTALLER_NAME}-${WIX_PACKAGE_PLATFORM}" --vendor "${WIX_MANUFACTURER}" --copyright "Copyright (c) 2022 Amazon.com" --win-upgrade-uuid "d90635c3-2233-443d-8c46-42ae1d922dc1" --type msi --dest "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}" --app-version "${JLINK_VERSION}"
         COMMAND ${WIX_CANDLE} ${WIX_INSTALLER_PREFIX}.wxs -out ${WIX_INSTALLER_PREFIX}.wxobj
         COMMAND ${WIX_LIGHT} -ext WixUIExtension ${WIX_INSTALLER_PREFIX}.wxobj -out ${WIX_INSTALLER_PREFIX}.msi
         COMMAND ${WIX_CANDLE} ${WIX_BUNDLE_INSTALLER_PREFIX}.wxs -ext WixBalExtension -ext WixUtilExtension -out ${WIX_BUNDLE_INSTALLER_PREFIX}.wxobj
@@ -350,6 +355,7 @@ install(TARGETS ${TARGET}
 )
 
 if (WIN32 AND ${WITH_ODBC_MSI})
+   install(FILES ${WIX_JRE_INSTALLER}.msi DESTINATION bin)
    install(FILES ${WIX_INSTALLER_PREFIX}.msi DESTINATION bin)
    install(FILES ${WIX_BUNDLE_INSTALLER_PREFIX}.exe DESTINATION bin)
 endif()
