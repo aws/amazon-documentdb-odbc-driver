@@ -251,6 +251,7 @@ if (WIN32 AND ${WITH_ODBC_MSI})
     # Get the version of Java via the `jlink` command (used to build the Java runtime)
     execute_process(COMMAND jlink --version OUTPUT_VARIABLE JLINK_VERSION)
     string(STRIP ${JLINK_VERSION} JLINK_VERSION)
+    message("JLINK_VERSION='${JLINK_VERSION}'")
 
     set(WIX_ODBC_JDBC_PATH ".\\libs\\documentdb-jdbc-${JDBC_DRIVER_VERSION}-all.jar")
     set(WIX_PROJECT_NAME "Amazon DocumentDB")
