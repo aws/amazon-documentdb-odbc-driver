@@ -171,6 +171,7 @@ There are two ways to fix the issue.
    1. Ensure that your github is checking out the files as Unix-style https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings
    2. Alternatively you can convert the end-of-line using the following command `tr -d '\015' < build_linux_debug64.sh > build_linux_debug64_lf.sh and run the build_linux_debug64_lf.sh`
       1. Note that the command will need to be executed for all scripts that you will run in the container (register_driver_unix.sh,env_variables_check.sh and any other that you might need).
+
 ### Using Ubuntu 64bit
 
 1. Install all dependencies
@@ -242,3 +243,8 @@ If you want to check a detailed report generate the with `--html-details` option
 
 ### Windows
 OpenCppCoverage is used to generate code coverage for windows, for more information check it in the official (documentation)[https://github.com/OpenCppCoverage/OpenCppCoverage]
+
+## Versioning
+
+1. To set the version of the ODBC driver, update the `src/ODBC_DRIVER_VERSION.txt` file with the appropriate version.
+1. To set the version of the JDBC drvier to download and embed, update the `src/JDBC_DRIVER_VERSION.txt` file to the appropriate version. 
