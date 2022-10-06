@@ -20,9 +20,7 @@ $DRIVER_SOURCE_DIR = "${WORKING_DIR}\src"
 $DRIVER_BUILD_DIR = "${BUILD_DIR}\odbc\cmake"
 
 # Download the JDBC driver
-foreach ( $line in Get-Content "$DRIVER_SOURCE_DIR\JDBC_DRIVER_VERSION.txt" ) { 
-    $JDBC_DRIVER_VERSION = $line; break; 
-}
+$JDBC_DRIVER_VERSION = $($(Get-Content -Path ./src/JDBC_DRIVER_VERSION.txt -Raw).ToString().Trim())
 $JDBC_DRIVER_FILENAME = "documentdb-jdbc-$JDBC_DRIVER_VERSION-all.jar"
 $JDBC_DRIVER_FULLPATH = "$DRIVER_BUILD_DIR\$CONFIGURATION\libs\$JDBC_DRIVER_FILENAME"
 if (-not (Test-Path -Path $JDBC_DRIVER_FULLPATH -PathType Leaf)) {

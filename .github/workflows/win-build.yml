@@ -63,7 +63,7 @@ jobs:
     - name: Update environment with JDBC_DRIVER_VERSION
       shell: pwsh
       run: |
-        Get-Content ./src/JDBC_DRIVER_VERSION.txt | ForEach-Object { echo "JDBC_DRIVER_VERSION=$_"; break; } >> $env:GITHUB_ENV
+        echo "JDBC_DRIVER_VERSION=$($(Get-Content -Path ./src/JDBC_DRIVER_VERSION.txt -Raw).ToString().Trim())" >> $env:GITHUB_ENV
 
     # Get first JDK to provide access to jpackage
     - name: Get Java distribution (JDK 17, 32-bit)
@@ -73,7 +73,7 @@ jobs:
         java-version: '17'
         architecture: x86
 
-    # Get first JDK to provide access to jlink
+    # Get second JDK to provide access to jlink
     - name: Get Java distribution (JDK 11, 32-bit)
       shell: pwsh
       run: |
@@ -258,7 +258,7 @@ jobs:
     - name: Update environment with JDBC_DRIVER_VERSION
       shell: pwsh
       run: |
-        Get-Content ./src/JDBC_DRIVER_VERSION.txt | ForEach-Object { echo "JDBC_DRIVER_VERSION=$_"; break; } >> $env:GITHUB_ENV
+        echo "JDBC_DRIVER_VERSION=$($(Get-Content -Path ./src/JDBC_DRIVER_VERSION.txt -Raw).ToString().Trim())" >> $env:GITHUB_ENV
 
     - name: Get Java distribution
       shell: pwsh
@@ -409,14 +409,7 @@ jobs:
     - name: Update environment with JDBC_DRIVER_VERSION
       shell: pwsh
       run: |
-        Get-Content ./src/JDBC_DRIVER_VERSION.txt | ForEach-Object { echo "JDBC_DRIVER_VERSION=$_"; break; } >> $env:GITHUB_ENV
-
-    #- name: Get Java distribution
-    #  uses: actions/setup-java@v2
-    #  with:
-    #    distribution: 'temurin'
-    #    java-version: '17'
-    #    architecture: x64
+        echo "JDBC_DRIVER_VERSION=$($(Get-Content -Path ./src/JDBC_DRIVER_VERSION.txt -Raw).ToString().Trim())" >> $env:GITHUB_ENV
 
     - name: Get Java distribution
       shell: pwsh
