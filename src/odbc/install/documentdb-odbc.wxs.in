@@ -65,17 +65,14 @@
                         <Component Id='zlib' Guid='@WIX_COMPONENT_ID_ZLIB1@' Win64='@WIX_COMPONENT_IS_WIN64@'>
                             <File Id='zlib' Name='@WIX_ODBC_ZLIB1_FILE@' DiskId='1' Source='@WIX_ODBC_ZLIB1_PATH@' KeyPath='yes'/>
                         </Component>
-                        <Directory Id='JDBCDIR' Name='libs'>
-                            <Component Id='JDBC' Guid='@WIX_COMPONENT_ID_JDBC@' Win64='@WIX_COMPONENT_IS_WIN64@'>
-                                <File Id='JDBC' Name='documentdb-jdbc-1.3.1-all.jar' DiskId='1' Source='@WIX_ODBC_JDBC_PATH@' KeyPath='yes'/>
-                            </Component>
-                        </Directory>
-                        <Component Id='DOCUMENTDBHOMEVAR' Guid='@WIX_COMPONENT_ID_DOCUMNETDB_HOME_ENV_VAR@' Win64='@WIX_COMPONENT_IS_WIN64@' KeyPath='yes' >
-                            <Environment Id='DOCUMENTDBHOME' Name='DOCUMENTDB_HOME' Action='set' System='yes' Part='all' Value='[INSTALLDIR]' />
+                      <Directory Id='JDBCDIR' Name='libs'>
+                        <Component Id='JDBC' Guid='@WIX_COMPONENT_ID_JDBC@' Win64='@WIX_COMPONENT_IS_WIN64@'>
+                          <File Id='JDBC' Name='documentdb-jdbc-@JDBC_DRIVER_VERSION@-all.jar' DiskId='1' Source='@WIX_ODBC_JDBC_PATH@' KeyPath='yes'/>
                         </Component>
-                        <Component Id='PATH_JVM_DLL' Guid='@WIX_COMPONENT_ID_PATH_JVM_DLL@' Win64='@WIX_COMPONENT_IS_WIN64@' KeyPath='yes' >
-                            <Environment Id='PATH_JVM_DLL' Permanent='no' Name='PATH' Action='set' System='no' Part='last' Value='%JAVA_HOME%\bin\server\' />
-                        </Component>
+                      </Directory>
+                      <Component Id='DOCUMENTDBHOMEVAR' Guid='@WIX_COMPONENT_ID_DOCUMNETDB_HOME_ENV_VAR@' Win64='@WIX_COMPONENT_IS_WIN64@' KeyPath='yes' >
+                        <Environment Id='DOCUMENTDBHOME' Name='DOCUMENTDB_HOME' Action='set' System='yes' Part='all' Value='[INSTALLDIR]' />
+                      </Component>
                     </Directory>
                 </Directory>
             </Directory>
@@ -91,7 +88,6 @@
             <ComponentRef Id='zlib' />
             <ComponentRef Id='JDBC' />
             <ComponentRef Id='DOCUMENTDBHOMEVAR' />
-            <ComponentRef Id='PATH_JVM_DLL' />
         </Feature>
 
         <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
