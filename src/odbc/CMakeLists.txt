@@ -336,15 +336,16 @@ if (WIN32 AND ${WITH_ODBC_MSI})
         ${CMAKE_SOURCE_DIR}/odbc/install/images $<TARGET_FILE_DIR:${TARGET}>/images)
 
     set (JLINK_RUNTIME_IMAGE_DIR "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/runtime-image")
-    file(REMOVE_RECURSE ${JLINK_RUNTIME_IMAGE_DIR})
     add_custom_command(
         TARGET ${TARGET} POST_BUILD
-        COMMAND ${JAVA_JLINK} --output ${JLINK_RUNTIME_IMAGE_DIR} --strip-native-commands --strip-debug --no-man-pages --no-header-files --module-path $ENV{JAVA_HOME}/jmods --add-modules ${JLINK_MODULES}
+        COMMAND ${CMAKE_COMMAND} -E rm -rf "${JLINK_RUNTIME_IMAGE_DIR}"
+        COMMAND ${JAVA_JLINK} --output "${JLINK_RUNTIME_IMAGE_DIR}" --strip-native-commands --strip-debug --no-man-pages --no-header-files --module-path $ENV{JAVA_HOME}/jmods --add-modules ${JLINK_MODULES}
         COMMAND ${JAVA_JPACKAGE} --runtime-image ${JLINK_RUNTIME_IMAGE_DIR} --resource-dir "${JPACKAGE_RESOURCE}" --name "${WIX_JRE_INSTALLER_NAME}-${WIX_PACKAGE_PLATFORM}" --vendor "${WIX_MANUFACTURER}" --copyright "Copyright (c) 2022 Amazon.com" --win-upgrade-uuid "d90635c3-2233-443d-8c46-42ae1d922dc1" --type msi --dest "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}" --app-version "${JLINK_VERSION}"
         COMMAND ${WIX_CANDLE} ${WIX_INSTALLER_PREFIX}.wxs -out ${WIX_INSTALLER_PREFIX}.wxobj
         COMMAND ${WIX_LIGHT} -ext WixUIExtension ${WIX_INSTALLER_PREFIX}.wxobj -out ${WIX_INSTALLER_PREFIX}.msi
         COMMAND ${WIX_CANDLE} ${WIX_BUNDLE_INSTALLER_PREFIX}.wxs -ext WixBalExtension -ext WixUtilExtension -out ${WIX_BUNDLE_INSTALLER_PREFIX}.wxobj
         COMMAND ${WIX_LIGHT}  ${WIX_BUNDLE_INSTALLER_PREFIX}.wxobj  -ext WixBalExtension -ext WixUtilExtension -out ${WIX_BUNDLE_INSTALLER_PREFIX}.exe
+        COMMAND ${CMAKE_COMMAND} -E rm -rf "${JLINK_RUNTIME_IMAGE_DIR}"
     )
 endif()
 
