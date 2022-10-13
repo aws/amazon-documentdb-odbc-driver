@@ -25,7 +25,8 @@ $JDBC_DRIVER_FILENAME = "documentdb-jdbc-$JDBC_DRIVER_VERSION-all.jar"
 $JDBC_DRIVER_FULLPATH = "$DRIVER_BUILD_DIR\$CONFIGURATION\libs\$JDBC_DRIVER_FILENAME"
 if (-not (Test-Path -Path $JDBC_DRIVER_FULLPATH -PathType Leaf)) {
     New-Item -Path "$DRIVER_BUILD_DIR\$CONFIGURATION\libs" -ItemType Directory -Force | Out-Null
-    Write-Output "Downloading version $JDBC_DRIVER_VERSION of JDBC driver..."
+    Write-Output "Downloading version '$JDBC_DRIVER_VERSION' of JDBC driver..."
+    Write-Output "URL 'https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v$JDBC_DRIVER_VERSION/$JDBC_DRIVER_FILENAME'"
     $progresspreference = 'silentlyContinue'
     Invoke-WebRequest `
         https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v$JDBC_DRIVER_VERSION/$JDBC_DRIVER_FILENAME `
