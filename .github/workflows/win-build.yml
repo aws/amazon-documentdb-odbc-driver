@@ -544,7 +544,7 @@ jobs:
         recreate: true
         path: coverage-cobertura.md
     
-    -name: Extract Code Coverage Badge
+    - name: Extract Code Coverage Badge
       run: |
         mkdir .github/badges/
         COVERAGE_BADGE=$(head -1 coverage-cobertura.md)
