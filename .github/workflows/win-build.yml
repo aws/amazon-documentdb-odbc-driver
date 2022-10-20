@@ -516,6 +516,9 @@ jobs:
     needs: build-windows64_coverage
     steps:
     - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
+        fetch-depth: 0
 
     - name: Retrieve coverage
       uses: actions/download-artifact@v2
