@@ -534,7 +534,7 @@ jobs:
     - name: Extract Code Coverage Badge
       run: |
         mkdir .github/badges/
-        COVERAGE_BADGE=$(head -1 coverage-cobertura.md)
+        COVERAGE_BADGE=$(head -1 code-coverage-results.md )
         echo $COVERAGE_BADGE
         COVERAGE_BADGE="${COVERAGE_BADGE/'Code%20Coverage'/'Win64%20Code%20Coverage'}"
         echo $COVERAGE_BADGE
