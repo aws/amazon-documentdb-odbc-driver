@@ -182,6 +182,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
+        fetch-depth: 0
+
     - name: Get Java distribution
       run: | 
         sudo apt-get -y install software-properties-common
