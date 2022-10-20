@@ -310,6 +310,31 @@ jobs:
         ./build/odbc/bin/documentdb-odbc-tests --catch_system_errors=false
         gcovr --exclude-directories cmake-build64/odbc-test/CMakeFiles/documentdb-odbc-tests.dir$ --cobertura --output coverage.cobertura.xml
 
+    - name: Code Coverage Badge
+      uses: irongut/CodeCoverageSummary@v1.2.0
+      with:
+        filename: coverage.cobertura.xml
+        badge: true
+        format: text
+        indicators: true
+        output: both
+
+    - name: Extract Code Coverage Badge
+      run: |
+        mkdir .github/badges/
+        COVERAGE_BADGE=$(head -1 code-coverage-results.txt )
+        COVERAGE_BADGE="${COVERAGE_BADGE/'Code%20Coverage'/'Linux%20Code%20Coverage'}"
+        curl $COVERAGE_BADGE > linux_coverage_badge.svg
+
+    - name: Commit Coverage Badge
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_options: '--allow-empty --no-verify'
+        commit_message: Commit Code Coverage Badge
+        file_pattern: '*.svg'
+        skip_fetch: true
+        skip_dirty_check: true
+
     - name: Code Coverage Summary Report
       uses: irongut/CodeCoverageSummary@v1.2.0
       with:
