@@ -531,7 +531,7 @@ jobs:
         indicators: true
         output: both
 
-    - name: Extract Code Coverage Badge
+    - name: Code Coverage Badges
       uses: irongut/CodeCoverageSummary@v1.2.0
       with:
         filename: coverage.cobertura.xml
@@ -539,6 +539,8 @@ jobs:
         format: text
         indicators: true
         output: both
+
+    - name: Extract Code Coverage Badge
       run: |
         mkdir .github/badges/
         COVERAGE_BADGE=$(head -1 code-coverage-results.txt )
