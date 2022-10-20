@@ -532,9 +532,16 @@ jobs:
         output: both
 
     - name: Extract Code Coverage Badge
+      uses: irongut/CodeCoverageSummary@v1.2.0
+      with:
+        filename: coverage.cobertura.xml
+        badge: true
+        format: text
+        indicators: true
+        output: both
       run: |
         mkdir .github/badges/
-        COVERAGE_BADGE=$(head -1 code-coverage-results.md )
+        COVERAGE_BADGE=$(head -1 code-coverage-results.txt )
         echo $COVERAGE_BADGE
         COVERAGE_BADGE="${COVERAGE_BADGE/'Code%20Coverage'/'Win64%20Code%20Coverage'}"
         echo $COVERAGE_BADGE
