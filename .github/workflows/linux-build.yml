@@ -328,7 +328,7 @@ jobs:
         mkdir .github/badges/
         COVERAGE_BADGE=$(head -1 code-coverage-results.txt )
         COVERAGE_BADGE="${COVERAGE_BADGE/'Code%20Coverage'/'Linux%20Code%20Coverage'}"
-        curl $COVERAGE_BADGE > linux_coverage_badge.svg
+        curl $COVERAGE_BADGE > .github/badges/linux_coverage_badge.svg
 
     - name: Commit Coverage Badge
       uses: stefanzweifel/git-auto-commit-action@v4
