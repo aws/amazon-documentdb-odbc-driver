@@ -531,6 +531,24 @@ jobs:
         indicators: true
         output: both
 
+    - name: Extract Code Coverage Badge
+      run: |
+        mkdir .github/badges/
+        COVERAGE_BADGE=$(head -1 coverage-cobertura.md)
+        echo $COVERAGE_BADGE
+        COVERAGE_BADGE="${COVERAGE_BADGE/'Code%20Coverage'/'Win64%20Code%20Coverage'}"
+        echo $COVERAGE_BADGE
+        curl $COVERAGE_BADGE > win32_coverage_badge.svg
+
+    - name: Commit Coverage Badge
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_options: '--allow-empty --no-verify'
+        commit_message: Commit Code Coverage Badge
+        file_pattern: '*.svg'
+        skip_fetch: true
+        skip_dirty_check: true
+
     - name: Add Header for Code Coverage Summary Report
       run: |
         echo "## Windows 2022 (x32) Debug Build  Unit Test Results Check" > coverage-cobertura.md
@@ -543,24 +561,6 @@ jobs:
         header: windows
         recreate: true
         path: coverage-cobertura.md
-    
-    - name: Extract Code Coverage Badge
-      run: |
-        mkdir .github/badges/
-        COVERAGE_BADGE=$(head -1 coverage-cobertura.md)
-        echo $COVERAGE_BADGE
-        COVERAGE_BADGE="${COVERAGE_BADGE/'Code%20Coverage'/'Win32%20Code%20Coverage'}"
-        echo $COVERAGE_BADGE
-        curl $COVERAGE_BADGE > win32_coverage_badge.svg
-
-    - name: Commit Coverage Badge
-      uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_options: '--allow-empty --no-verify'
-        commit_message: Commit Code Coverage Badge
-        file_pattern: '*.svg'
-        skip_fetch: true
-        skip_dirty_check: true
 
     # - name: upload-coverage
     #   if: always()
