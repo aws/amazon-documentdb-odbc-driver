@@ -548,7 +548,9 @@ jobs:
       run: |
         mkdir .github/badges/
         COVERAGE_BADGE=$(head -1 coverage-cobertura.md)
+        echo $COVERAGE_BADGE
         COVERAGE_BADGE="${COVERAGE_BADGE/'Code%20Coverage'/'Win32%20Code%20Coverage'}"
+        echo $COVERAGE_BADGE
         curl $COVERAGE_BADGE > win32_coverage_badge.svg
 
     - name: Commit Coverage Badge
