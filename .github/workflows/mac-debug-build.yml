@@ -185,6 +185,10 @@ jobs:
         COVERAGE_BADGE="${COVERAGE_BADGE/'Code%20Coverage'/'macOS%20Code%20Coverage'}"
         curl $COVERAGE_BADGE > .github/badges/macOS_coverage_badge.svg
 
+    - name: Update Repository Before Commit Badge
+      run: |
+        git pull
+
     - name: Commit Coverage Badge
       uses: stefanzweifel/git-auto-commit-action@v4
       with:

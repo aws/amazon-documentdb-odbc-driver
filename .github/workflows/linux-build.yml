@@ -314,6 +314,10 @@ jobs:
         ./build/odbc/bin/documentdb-odbc-tests --catch_system_errors=false
         gcovr --exclude-directories cmake-build64/odbc-test/CMakeFiles/documentdb-odbc-tests.dir$ --cobertura --output coverage.cobertura.xml
 
+    - name: Update Repository Before Commit Badge
+      run: |
+        git pull
+
     - name: Code Coverage Badge
       uses: irongut/CodeCoverageSummary@v1.2.0
       with:
