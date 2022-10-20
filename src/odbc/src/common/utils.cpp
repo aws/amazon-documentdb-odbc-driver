@@ -57,7 +57,7 @@ char* CopyChars(const char* val) {
   if (val) {
     size_t len = strlen(val);
     char* dest = new char[len + 1];
-    strcpy(dest, val);
+    strncpy(dest, val, len);
     *(dest + len) = 0;
     return dest;
   }
