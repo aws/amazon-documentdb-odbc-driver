@@ -822,11 +822,11 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   strParams[SQL_PROCEDURE_TERM] = "stored procedure";
 #endif  // SQL_PROCEDURE_TERM
 
-#ifdef SQL_PROCEDURE
+#ifdef SQL_PROCEDURES
   // A character string: "Y" if the data source supports procedures and the
   // driver supports the ODBC procedure invocation syntax; "N" otherwise.
   strParams[SQL_PROCEDURES] = "N";
-#endif  // SQL_PROCEDURE
+#endif  // SQL_PROCEDURES
 
 #ifdef SQL_ROW_UPDATES
   // A character string: "Y" if a keyset-driven or mixed cursor maintains row
