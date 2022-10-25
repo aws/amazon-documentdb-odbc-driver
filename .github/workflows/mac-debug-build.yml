@@ -193,7 +193,7 @@ jobs:
       with:
         commit_options: '--allow-empty --no-verify'
         commit_message: Commit Code Coverage Badge
-        file_pattern: ':(glob)coverage_badge_*.svg'
+        file_pattern: 'coverage_badge_*.svg'
         skip_fetch: true
         skip_dirty_check: true
 
