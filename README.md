@@ -1,7 +1,7 @@
 # Amazon DocumentDB ODBC Driver
-![Code Coverage Windows](./.github/badges/windows_coverage_badge.svg)
-![Code Coverage macOS](./.github/badges/macOS_coverage_badge.svg)
-![Code Coverage Linux](./.github/badges/linux_coverage_badge.svg)
+![Code Coverage Windows](./.github/badges/coverage_badge_windows.svg)
+![Code Coverage macOS](./.github/badges/coverage_badge_macOS.svg)
+![Code Coverage Linux](./.github/badges/coverage_badge_linux.svg)
 
 ## Overview
 

@@ -547,7 +547,7 @@ jobs:
       run: |
         COVERAGE_BADGE=$(head -1 code-coverage-results.txt )
         COVERAGE_BADGE="${COVERAGE_BADGE/'Code%20Coverage'/'Windows%20Code%20Coverage'}"
-        curl $COVERAGE_BADGE > .github/badges/windows_coverage_badge.svg
+        curl $COVERAGE_BADGE > .github/badges/coverage_badge_windows.svg
 
     - name: Update Repository Before Commit Badge
       run: |
@@ -558,7 +558,7 @@ jobs:
       with:
         commit_options: '--allow-empty --no-verify'
         commit_message: Commit Code Coverage Badge
-        file_pattern: '*.svg'
+        file_pattern: 'coverage_badge_*.svg'
         skip_fetch: true
         skip_dirty_check: true
 
