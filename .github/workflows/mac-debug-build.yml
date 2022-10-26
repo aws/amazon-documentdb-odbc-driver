@@ -159,11 +159,43 @@ jobs:
     needs: build-mac-debug
     steps:
     - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
+        fetch-depth: 0
+
 
     - name: Retrieve coverage
       uses: actions/download-artifact@v2
       with:
         name: code-coverage
+
+    - name: Code Coverage Badge
+      uses: irongut/CodeCoverageSummary@v1.2.0
+      with:
+        filename: coverage.cobertura.xml
+        badge: true
+        format: text
+        indicators: true
+        output: both
+
+    - name: Extract Code Coverage Badge
+      run: |
+        COVERAGE_BADGE=$(head -1 code-coverage-results.txt )
+        COVERAGE_BADGE="${COVERAGE_BADGE/'Code%20Coverage'/'macOS%20Code%20Coverage'}"
+        curl $COVERAGE_BADGE > .github/badges/coverage_badge_macOS.svg
+
+    - name: Update Repository Before Commit Badge
+      run: |
+        git pull
+
+    - name: Commit Coverage Badge
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_options: '--allow-empty --no-verify'
+        commit_message: Commit Code Coverage Badge
+        file_pattern: '*.svg'
+        skip_fetch: true
+        skip_dirty_check: true
 
     - name: Code Coverage Summary Report
       uses: irongut/CodeCoverageSummary@v1.2.0

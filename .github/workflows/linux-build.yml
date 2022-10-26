@@ -182,6 +182,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
+        fetch-depth: 0
+
     - name: Get Java distribution
       run: | 
         sudo apt-get -y install software-properties-common
@@ -309,6 +313,34 @@ jobs:
         ssh -f -N -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${{env.DOC_DB_PRIV_KEY_FILE}} -L${{env.DOC_DB_LOCAL_PORT}}:${{secrets.DOC_DB_HOST}}:${{env.DOC_DB_REMOTE_PORT}} ${{secrets.DOC_DB_USER}}
         ./build/odbc/bin/documentdb-odbc-tests --catch_system_errors=false
         gcovr --exclude-directories cmake-build64/odbc-test/CMakeFiles/documentdb-odbc-tests.dir$ --cobertura --output coverage.cobertura.xml
+
+    - name: Update Repository Before Commit Badge
+      run: |
+        git pull
+
+    - name: Code Coverage Badge
+      uses: irongut/CodeCoverageSummary@v1.2.0
+      with:
+        filename: coverage.cobertura.xml
+        badge: true
+        format: text
+        indicators: true
+        output: both
+
+    - name: Extract Code Coverage Badge
+      run: |
+        COVERAGE_BADGE=$(head -1 code-coverage-results.txt )
+        COVERAGE_BADGE="${COVERAGE_BADGE/'Code%20Coverage'/'Linux%20Code%20Coverage'}"
+        curl $COVERAGE_BADGE > .github/badges/coverage_badge_linux.svg
+
+    - name: Commit Coverage Badge
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_options: '--allow-empty --no-verify'
+        commit_message: Commit Code Coverage Badge
+        file_pattern: '*.svg'
+        skip_fetch: true
+        skip_dirty_check: true
 
     - name: Code Coverage Summary Report
       uses: irongut/CodeCoverageSummary@v1.2.0
