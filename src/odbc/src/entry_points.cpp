@@ -304,7 +304,7 @@ SQLRETURN SQL_API SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT columnNum,
                                      (SQLLEN*)numericAttr);
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLDescribeCol(
     SQLHSTMT stmt, SQLUSMALLINT columnNum,
     _Out_writes_opt_(columnNameBufLen) SQLWCHAR* columnNameBuf,
@@ -325,7 +325,7 @@ SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
                                     columnSize, decimalDigits, nullable);
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLRowCount(_In_ SQLHSTMT stmt, _Out_ SQLLEN* rowCnt) {
 #else
 SQLRETURN SQL_API SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCnt) {
@@ -333,7 +333,7 @@ SQLRETURN SQL_API SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCnt) {
   return documentdb::SQLRowCount(stmt, rowCnt);
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLForeignKeys(
     SQLHSTMT stmt,
     _In_reads_opt_(primaryCatalogNameLen) SQLWCHAR* primaryCatalogName,
@@ -376,7 +376,7 @@ SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attr,
   return documentdb::SQLSetStmtAttr(stmt, attr, value, valueLen);
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLPrimaryKeys(
     SQLHSTMT stmt, _In_reads_opt_(catalogNameLen) SQLWCHAR* catalogName,
     SQLSMALLINT catalogNameLen,
@@ -395,7 +395,7 @@ SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
                                     tableNameLen);
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLNumParams(SQLHSTMT stmt, _Out_opt_ SQLSMALLINT* paramCnt) {
 #else
 SQLRETURN SQL_API SQLNumParams(SQLHSTMT stmt, SQLSMALLINT* paramCnt) {
@@ -403,7 +403,7 @@ SQLRETURN SQL_API SQLNumParams(SQLHSTMT stmt, SQLSMALLINT* paramCnt) {
   return documentdb::SQLNumParams(stmt, paramCnt);
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle,
                                   SQLSMALLINT recNum, SQLSMALLINT diagId,
                                   _Out_writes_opt_(_Inexpressible_(bufferLen))
@@ -420,7 +420,7 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle,
                                      bufferLen, resLen);
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
                                 SQLSMALLINT recNum,
                                 _Out_writes_opt_(6) SQLWCHAR* sqlState,
@@ -443,7 +443,7 @@ SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT type) {
   return documentdb::SQLGetTypeInfo(stmt, type);
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLGetData(SQLHSTMT stmt, SQLUSMALLINT colNum,
                              SQLSMALLINT targetType,
                              _Out_writes_opt_(_Inexpressible_(bufferLength))
@@ -460,7 +460,7 @@ SQLRETURN SQL_API SQLGetData(SQLHSTMT stmt, SQLUSMALLINT colNum,
                                 bufferLength, strLengthOrIndicator);
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr,
                                 _In_reads_bytes_opt_(valueLen) SQLPOINTER value,
                                 SQLINTEGER valueLen) {
@@ -471,7 +471,7 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER value,
   return documentdb::SQLSetEnvAttr(env, attr, value, valueLen);
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr,
                                 _Out_writes_(_Inexpressible_(valueBufLen))
                                     SQLPOINTER valueBuf,
@@ -486,7 +486,7 @@ SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr,
                                    valueResLen);
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLSpecialColumns(
     SQLHSTMT stmt, SQLUSMALLINT idType,
     _In_reads_opt_(catalogNameLen) SQLWCHAR* catalogName,
@@ -506,7 +506,7 @@ SQLRETURN SQL_API SQLSpecialColumns(
       tableName, tableNameLen, scope, nullable);
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLParamData(SQLHSTMT stmt, _Out_opt_ SQLPOINTER* value) {
 #else
 SQLRETURN SQL_API SQLParamData(SQLHSTMT stmt, SQLPOINTER* value) {
@@ -514,7 +514,7 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT stmt, SQLPOINTER* value) {
   return documentdb::SQLParamData(stmt, value);
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLPutData(SQLHSTMT stmt,
                              _In_reads_(_Inexpressible_(strLengthOrIndicator))
                                  SQLPOINTER data,
@@ -526,7 +526,7 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT stmt, SQLPOINTER data,
   return documentdb::SQLPutData(stmt, data, strLengthOrIndicator);
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLDescribeParam(SQLHSTMT stmt, SQLUSMALLINT paramNum,
                                    _Out_opt_ SQLSMALLINT* dataType,
                                    _Out_opt_ SQLULEN* paramSize,
@@ -542,7 +542,7 @@ SQLRETURN SQL_API SQLDescribeParam(SQLHSTMT stmt, SQLUSMALLINT paramNum,
                                       decimalDigits, nullable);
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt,
                            _Out_writes_(6) SQLWCHAR* state,
                            _Out_opt_ SQLINTEGER* error,
@@ -558,7 +558,7 @@ SQLRETURN SQL_API SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt,
                               msgResLen);
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLGetConnectAttr(
     SQLHDBC conn, SQLINTEGER attr,
     _Out_writes_opt_(_Inexpressible_(valueBufLen)) SQLPOINTER valueBuf,
@@ -572,7 +572,7 @@ SQLRETURN SQL_API SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attr,
                                        valueResLen);
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr,
                                     _In_reads_bytes_opt_(valueLen)
                                         SQLPOINTER value,
@@ -609,7 +609,7 @@ SQLRETURN SQL_API SQLCancel(SQLHSTMT stmt) {
   return SQL_SUCCESS;
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT colNum,
                                    SQLUSMALLINT fieldId,
                                    _Out_writes_bytes_opt_(strAttrBufLen)
@@ -640,7 +640,7 @@ SQLRETURN SQL_API SQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT colNum,
   return SQL_SUCCESS;
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLGetCursorName(SQLHSTMT stmt,
                                    _Out_writes_opt_(nameBufLen)
                                        SQLWCHAR* nameBuf,
@@ -662,7 +662,7 @@ SQLRETURN SQL_API SQLGetCursorName(SQLHSTMT stmt, SQLWCHAR* nameBuf,
   return SQL_SUCCESS;
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLSetCursorName(SQLHSTMT stmt,
                                    _In_reads_(nameLen) SQLWCHAR* name,
                                    SQLSMALLINT nameLen) {
@@ -718,7 +718,7 @@ SQLRETURN SQL_API SQLSetStmtOption(SQLHSTMT stmt, SQLUSMALLINT option,
   return SQL_SUCCESS;
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLStatistics(
     SQLHSTMT stmt, _In_reads_opt_(catalogNameLen) SQLWCHAR* catalogName,
     SQLSMALLINT catalogNameLen,
@@ -746,7 +746,7 @@ SQLRETURN SQL_API SQLStatistics(SQLHSTMT stmt, SQLWCHAR* catalogName,
   return SQL_SUCCESS;
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLBrowseConnect(
     SQLHDBC conn, _In_reads_(inConnectionStrLen) SQLWCHAR* inConnectionStr,
     SQLSMALLINT inConnectionStrLen,
@@ -773,7 +773,7 @@ SQLRETURN SQL_API SQLBrowseConnect(SQLHDBC conn, SQLWCHAR* inConnectionStr,
   return SQL_SUCCESS;
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLProcedureColumns(
     SQLHSTMT stmt, _In_reads_opt_(catalogNameLen) SQLWCHAR* catalogName,
     SQLSMALLINT catalogNameLen,
@@ -832,7 +832,7 @@ SQLRETURN SQL_API SQLBulkOperations(SQLHSTMT stmt, SQLUSMALLINT operation) {
   return SQL_SUCCESS;
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLTablePrivileges(
     SQLHSTMT stmt, _In_reads_opt_(catalogNameLen) SQLWCHAR* catalogName,
     SQLSMALLINT catalogNameLen,
@@ -867,7 +867,7 @@ SQLRETURN SQL_API SQLCopyDesc(SQLHDESC src, SQLHDESC dst) {
   return SQL_SUCCESS;
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLGetDescField(SQLHDESC descr, SQLSMALLINT recNum,
                                   SQLSMALLINT fieldId,
                                   _Out_writes_opt_(_Inexpressible_(bufferLen))
@@ -899,7 +899,7 @@ SQLRETURN SQL_API SQLGetDescField(SQLHDESC descr, SQLSMALLINT recNum,
   return SQL_SUCCESS;
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API
 SQLGetDescRec(SQLHDESC DescriptorHandle, SQLSMALLINT RecNumber,
               _Out_writes_opt_(nameBufferLen) SQLWCHAR* nameBuffer,
@@ -958,7 +958,7 @@ SQLRETURN SQL_API SQLSetDescField(SQLHDESC descr, SQLSMALLINT recNum,
   return SQL_SUCCESS;
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLSetDescRec(
     SQLHDESC descr, SQLSMALLINT recNum, SQLSMALLINT type, SQLSMALLINT subType,
     SQLLEN len, SQLSMALLINT precision, SQLSMALLINT scale,
@@ -986,7 +986,7 @@ SQLRETURN SQL_API SQLSetDescRec(SQLHDESC descr, SQLSMALLINT recNum,
   return SQL_SUCCESS;
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLColumnPrivileges(
     SQLHSTMT stmt, _In_reads_opt_(catalogNameLen) SQLWCHAR* catalogName,
     SQLSMALLINT catalogNameLen,
@@ -1025,7 +1025,7 @@ SQLRETURN SQL_API SQLParamOptions(SQLHSTMT stmt, SQLULEN paramSetSize,
   return SQL_SUCCESS;
 }
 
-#if defined _WIN64 || !defined _WIN32
+#if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLProcedures(
     SQLHSTMT stmt, _In_reads_opt_(catalogNameLen) SQLWCHAR* catalogName,
     SQLSMALLINT catalogNameLen,
