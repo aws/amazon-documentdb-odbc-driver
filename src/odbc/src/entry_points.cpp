@@ -27,7 +27,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType,
                                  SQLPOINTER infoValue,
                              SQLSMALLINT infoValueMax,
                              _Out_opt_ SQLSMALLINT* length) {
-#elif
+#else
 SQLRETURN SQL_API SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType,
                              SQLPOINTER infoValue, SQLSMALLINT infoValueMax,
                              SQLSMALLINT* length) {
@@ -39,7 +39,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType,
 #if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent,
                                  _Out_ SQLHANDLE* result) {
-#elif
+#else
 SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent,
                                  SQLHANDLE* result) {
 #endif
@@ -48,7 +48,7 @@ SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent,
 
 #if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLAllocEnv(_Out_ SQLHENV* env) {
-#elif
+#else
 SQLRETURN SQL_API SQLAllocEnv(SQLHENV* env) {
 #endif
   return documentdb::SQLAllocEnv(env);
@@ -56,7 +56,7 @@ SQLRETURN SQL_API SQLAllocEnv(SQLHENV* env) {
 
 #if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLAllocConnect(SQLHENV env, _Out_ SQLHDBC* conn) {
-#elif
+#else
 SQLRETURN SQL_API SQLAllocConnect(SQLHENV env, SQLHDBC* conn) {
 #endif
   return documentdb::SQLAllocConnect(env, conn);
@@ -64,7 +64,7 @@ SQLRETURN SQL_API SQLAllocConnect(SQLHENV env, SQLHDBC* conn) {
 
 #if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLAllocStmt(SQLHDBC conn, _Out_ SQLHSTMT* stmt) {
-#elif
+#else
 SQLRETURN SQL_API SQLAllocStmt(SQLHDBC conn, SQLHSTMT* stmt) {
 #endif
   return documentdb::SQLAllocStmt(conn, stmt);
@@ -100,7 +100,7 @@ SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
                  SQLSMALLINT outConnectionStringBufferLen,
                  _Out_opt_ SQLSMALLINT* outConnectionStringLen,
                  SQLUSMALLINT driverCompletion) {
-#elif
+#else
 SQLRETURN SQL_API SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
                                    SQLWCHAR* inConnectionString,
                                    SQLSMALLINT inConnectionStringLen,
@@ -123,7 +123,7 @@ SQLRETURN SQL_API SQLConnect(SQLHDBC conn,
                              SQLSMALLINT userNameLen,
                              _In_reads_(authLen) SQLWCHAR* auth,
                              SQLSMALLINT authLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLConnect(SQLHDBC conn, SQLWCHAR* serverName,
                              SQLSMALLINT serverNameLen, SQLWCHAR* userName,
                              SQLSMALLINT userNameLen, SQLWCHAR* auth,
@@ -141,7 +141,7 @@ SQLRETURN SQL_API SQLDisconnect(SQLHDBC conn) {
 SQLRETURN SQL_API SQLPrepare(SQLHSTMT stmt,
                              _In_reads_(queryLen) SQLWCHAR* query,
                              SQLINTEGER queryLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLPrepare(SQLHSTMT stmt, SQLWCHAR* query,
                              SQLINTEGER queryLen) {
 #endif
@@ -156,7 +156,7 @@ SQLRETURN SQL_API SQLExecute(SQLHSTMT stmt) {
 SQLRETURN SQL_API SQLExecDirect(SQLHSTMT stmt,
                                 _In_reads_opt_(queryLen) SQLWCHAR* query,
                                 SQLINTEGER queryLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* query,
                                 SQLINTEGER queryLen) {
 #endif
@@ -170,7 +170,7 @@ SQLRETURN SQL_API SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT colNum,
                                  SQLPOINTER targetValue,
                              SQLLEN bufferLength,
                              _Inout_opt_ SQLLEN* strLengthOrIndicator) {
-#elif
+#else
 SQLRETURN SQL_API SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT colNum,
                              SQLSMALLINT targetType, SQLPOINTER targetValue,
                              SQLLEN bufferLength,
@@ -193,7 +193,7 @@ SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT stmt, SQLSMALLINT orientation,
 SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT orientation,
                                    SQLLEN offset, _Out_opt_ SQLULEN* rowCount,
                                    _Out_opt_ SQLUSMALLINT* rowStatusArray) {
-#elif
+#else
 SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT orientation,
                                    SQLLEN offset, SQLULEN* rowCount,
                                    SQLUSMALLINT* rowStatusArray) {
@@ -205,7 +205,7 @@ SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT orientation,
 #if defined _WIN64 || defined _WIN32
 SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT stmt,
                                    _Out_ SQLSMALLINT* columnNum) {
-#elif
+#else
 SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnNum) {
 #endif
   return documentdb::SQLNumResultCols(stmt, columnNum);
@@ -219,7 +219,7 @@ SQLRETURN SQL_API SQLTables(
     SQLSMALLINT schemaNameLen, _In_reads_opt_(tableNameLen) SQLWCHAR* tableName,
     SQLSMALLINT tableNameLen, _In_reads_opt_(tableTypeLen) SQLWCHAR* tableType,
     SQLSMALLINT tableTypeLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
                             SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
                             SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
@@ -242,7 +242,7 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT stmt,
                              SQLSMALLINT tableNameLen,
                              _In_reads_opt_(columnNameLen) SQLWCHAR* columnName,
                              SQLSMALLINT columnNameLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
                              SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
                              SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
@@ -276,7 +276,7 @@ SQLRETURN SQL_API SQLNativeSql(SQLHDBC conn,
                                    SQLWCHAR* outQueryBuffer,
                                SQLINTEGER outQueryBufferLen,
                                SQLINTEGER* outQueryLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLNativeSql(SQLHDBC conn, SQLWCHAR* inQuery,
                                SQLINTEGER inQueryLen, SQLWCHAR* outQueryBuffer,
                                SQLINTEGER outQueryBufferLen,
@@ -313,7 +313,7 @@ SQLRETURN SQL_API SQLDescribeCol(
     SQLSMALLINT columnNameBufLen, _Out_opt_ SQLSMALLINT* columnNameLen,
     _Out_opt_ SQLSMALLINT* dataType, _Out_opt_ SQLULEN* columnSize,
     _Out_opt_ SQLSMALLINT* decimalDigits, _Out_opt_ SQLSMALLINT* nullable) {
-#elif
+#else
 SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
                                  SQLWCHAR* columnNameBuf,
                                  SQLSMALLINT columnNameBufLen,
@@ -329,7 +329,7 @@ SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
 
 #if defined _WIN64 || !defined _WIN32
 SQLRETURN SQL_API SQLRowCount(_In_ SQLHSTMT stmt, _Out_ SQLLEN* rowCnt) {
-#elif
+#else
 SQLRETURN SQL_API SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCnt) {
 #endif
   return documentdb::SQLRowCount(stmt, rowCnt);
@@ -350,7 +350,7 @@ SQLRETURN SQL_API SQLForeignKeys(
     SQLSMALLINT foreignSchemaNameLen,
     _In_reads_opt_(foreignTableNameLen) SQLWCHAR* foreignTableName,
     SQLSMALLINT foreignTableNameLen) {
-#elif
+#else
 SQLRETURN SQL_API
 SQLForeignKeys(SQLHSTMT stmt, SQLWCHAR* primaryCatalogName,
                SQLSMALLINT primaryCatalogNameLen, SQLWCHAR* primarySchemaName,
@@ -385,7 +385,7 @@ SQLRETURN SQL_API SQLPrimaryKeys(
     _In_reads_opt_(schemaNameLen) SQLWCHAR* schemaName,
     SQLSMALLINT schemaNameLen, _In_reads_opt_(tableNameLen) SQLWCHAR* tableName,
     SQLSMALLINT tableNameLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
                                  SQLSMALLINT catalogNameLen,
                                  SQLWCHAR* schemaName,
@@ -399,7 +399,7 @@ SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
 
 #if defined _WIN64 || !defined _WIN32
 SQLRETURN SQL_API SQLNumParams(SQLHSTMT stmt, _Out_opt_ SQLSMALLINT* paramCnt) {
-#elif
+#else
 SQLRETURN SQL_API SQLNumParams(SQLHSTMT stmt, SQLSMALLINT* paramCnt) {
 #endif
   return documentdb::SQLNumParams(stmt, paramCnt);
@@ -412,7 +412,7 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle,
                                       SQLPOINTER buffer,
                                   SQLSMALLINT bufferLen,
                                   _Out_opt_ SQLSMALLINT* resLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle,
                                   SQLSMALLINT recNum, SQLSMALLINT diagId,
                                   SQLPOINTER buffer, SQLSMALLINT bufferLen,
@@ -430,7 +430,7 @@ SQLRETURN SQL_API SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
                                 _Out_writes_opt_(msgBufferLen)
                                     SQLWCHAR* msgBuffer,
                                 SQLSMALLINT msgBufferLen, SQLSMALLINT* msgLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
                                 SQLSMALLINT recNum, SQLWCHAR* sqlState,
                                 SQLINTEGER* nativeError, SQLWCHAR* msgBuffer,
@@ -452,7 +452,7 @@ SQLRETURN SQL_API SQLGetData(SQLHSTMT stmt, SQLUSMALLINT colNum,
                                  SQLPOINTER targetValue,
                              SQLLEN bufferLength,
                              _Out_opt_ SQLLEN* strLengthOrIndicator) {
-#elif
+#else
 SQLRETURN SQL_API SQLGetData(SQLHSTMT stmt, SQLUSMALLINT colNum,
                              SQLSMALLINT targetType, SQLPOINTER targetValue,
                              SQLLEN bufferLength,
@@ -466,7 +466,7 @@ SQLRETURN SQL_API SQLGetData(SQLHSTMT stmt, SQLUSMALLINT colNum,
 SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr,
                                 _In_reads_bytes_opt_(valueLen) SQLPOINTER value,
                                 SQLINTEGER valueLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER value,
                                 SQLINTEGER valueLen) {
 #endif
@@ -479,7 +479,7 @@ SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr,
                                     SQLPOINTER valueBuf,
                                 SQLINTEGER valueBufLen,
                                 _Out_opt_ SQLINTEGER* valueResLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr,
                                 SQLPOINTER valueBuf, SQLINTEGER valueBufLen,
                                 SQLINTEGER* valueResLen) {
@@ -496,7 +496,7 @@ SQLRETURN SQL_API SQLSpecialColumns(
     _In_reads_opt_(schemaNameLen) SQLWCHAR* schemaName,
     SQLSMALLINT schemaNameLen, _In_reads_opt_(tableNameLen) SQLWCHAR* tableName,
     SQLSMALLINT tableNameLen, SQLUSMALLINT scope, SQLUSMALLINT nullable) {
-#elif
+#else
 SQLRETURN SQL_API SQLSpecialColumns(
     SQLHSTMT stmt, SQLUSMALLINT idType, SQLWCHAR* catalogName,
     SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen,
@@ -510,7 +510,7 @@ SQLRETURN SQL_API SQLSpecialColumns(
 
 #if defined _WIN64 || !defined _WIN32
 SQLRETURN SQL_API SQLParamData(SQLHSTMT stmt, _Out_opt_ SQLPOINTER* value) {
-#elif
+#else
 SQLRETURN SQL_API SQLParamData(SQLHSTMT stmt, SQLPOINTER* value) {
 #endif
   return documentdb::SQLParamData(stmt, value);
@@ -521,7 +521,7 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT stmt,
                              _In_reads_(_Inexpressible_(strLengthOrIndicator))
                                  SQLPOINTER data,
                              SQLLEN strLengthOrIndicator) {
-#elif
+#else
 SQLRETURN SQL_API SQLPutData(SQLHSTMT stmt, SQLPOINTER data,
                              SQLLEN strLengthOrIndicator) {
 #endif
@@ -534,7 +534,7 @@ SQLRETURN SQL_API SQLDescribeParam(SQLHSTMT stmt, SQLUSMALLINT paramNum,
                                    _Out_opt_ SQLULEN* paramSize,
                                    _Out_opt_ SQLSMALLINT* decimalDigits,
                                    _Out_opt_ SQLSMALLINT* nullable) {
-#elif
+#else
 SQLRETURN SQL_API SQLDescribeParam(SQLHSTMT stmt, SQLUSMALLINT paramNum,
                                    SQLSMALLINT* dataType, SQLULEN* paramSize,
                                    SQLSMALLINT* decimalDigits,
@@ -551,7 +551,7 @@ SQLRETURN SQL_API SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt,
                            _Out_writes_opt_(msgBufLen) SQLWCHAR* msgBuf,
                            SQLSMALLINT msgBufLen,
                            _Out_opt_ SQLSMALLINT* msgResLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt,
                            SQLWCHAR* state, SQLINTEGER* error, SQLWCHAR* msgBuf,
                            SQLSMALLINT msgBufLen, SQLSMALLINT* msgResLen) {
@@ -565,7 +565,7 @@ SQLRETURN SQL_API SQLGetConnectAttr(
     SQLHDBC conn, SQLINTEGER attr,
     _Out_writes_opt_(_Inexpressible_(valueBufLen)) SQLPOINTER valueBuf,
     SQLINTEGER valueBufLen, _Out_opt_ SQLINTEGER* valueResLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attr,
                                     SQLPOINTER valueBuf, SQLINTEGER valueBufLen,
                                     SQLINTEGER* valueResLen) {
@@ -579,7 +579,7 @@ SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr,
                                     _In_reads_bytes_opt_(valueLen)
                                         SQLPOINTER value,
                                     SQLINTEGER valueLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr,
                                     SQLPOINTER value, SQLINTEGER valueLen) {
 #endif
@@ -619,7 +619,7 @@ SQLRETURN SQL_API SQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT colNum,
                                    SQLSMALLINT strAttrBufLen,
                                    _Out_opt_ SQLSMALLINT* strAttrResLen,
                                    _Out_opt_ SQLLEN* numAttrBuf) {
-#elif
+#else
 SQLRETURN SQL_API SQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT colNum,
                                    SQLUSMALLINT fieldId, SQLPOINTER strAttrBuf,
                                    SQLSMALLINT strAttrBufLen,
@@ -648,7 +648,7 @@ SQLRETURN SQL_API SQLGetCursorName(SQLHSTMT stmt,
                                        SQLWCHAR* nameBuf,
                                    SQLSMALLINT nameBufLen,
                                    _Out_opt_ SQLSMALLINT* nameResLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLGetCursorName(SQLHSTMT stmt, SQLWCHAR* nameBuf,
                                    SQLSMALLINT nameBufLen,
                                    SQLSMALLINT* nameResLen) {
@@ -668,7 +668,7 @@ SQLRETURN SQL_API SQLGetCursorName(SQLHSTMT stmt, SQLWCHAR* nameBuf,
 SQLRETURN SQL_API SQLSetCursorName(SQLHSTMT stmt,
                                    _In_reads_(nameLen) SQLWCHAR* name,
                                    SQLSMALLINT nameLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLSetCursorName(SQLHSTMT stmt, SQLWCHAR* name,
                                    SQLSMALLINT nameLen) {
 #endif
@@ -727,7 +727,7 @@ SQLRETURN SQL_API SQLStatistics(
     _In_reads_opt_(schemaNameLen) SQLWCHAR* schemaName,
     SQLSMALLINT schemaNameLen, _In_reads_opt_(tableNameLen) SQLWCHAR* tableName,
     SQLSMALLINT tableNameLen, SQLUSMALLINT unique, SQLUSMALLINT reserved) {
-#elif
+#else
 SQLRETURN SQL_API SQLStatistics(SQLHSTMT stmt, SQLWCHAR* catalogName,
                                 SQLSMALLINT catalogNameLen,
                                 SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen,
@@ -755,7 +755,7 @@ SQLRETURN SQL_API SQLBrowseConnect(
     _Out_writes_opt_(outConnectionStrBufLen) SQLWCHAR* outConnectionStrBuf,
     SQLSMALLINT outConnectionStrBufLen,
     _Out_opt_ SQLSMALLINT* outConnectionStrResLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLBrowseConnect(SQLHDBC conn, SQLWCHAR* inConnectionStr,
                                    SQLSMALLINT inConnectionStrLen,
                                    SQLWCHAR* outConnectionStrBuf,
@@ -783,7 +783,7 @@ SQLRETURN SQL_API SQLProcedureColumns(
     SQLSMALLINT schemaNameLen, _In_reads_opt_(procNameLen) SQLWCHAR* procName,
     SQLSMALLINT procNameLen, _In_reads_opt_(columnNameLen) SQLWCHAR* columnName,
     SQLSMALLINT columnNameLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLProcedureColumns(
     SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNameLen,
     SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen, SQLWCHAR* procName,
@@ -841,7 +841,7 @@ SQLRETURN SQL_API SQLTablePrivileges(
     _In_reads_opt_(schemaNameLen) SQLWCHAR* schemaName,
     SQLSMALLINT schemaNameLen, _In_reads_opt_(tableNameLen) SQLWCHAR* tableName,
     SQLSMALLINT tableNameLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLTablePrivileges(SQLHSTMT stmt, SQLWCHAR* catalogName,
                                      SQLSMALLINT catalogNameLen,
                                      SQLWCHAR* schemaName,
@@ -876,7 +876,7 @@ SQLRETURN SQL_API SQLGetDescField(SQLHDESC descr, SQLSMALLINT recNum,
                                       SQLPOINTER buffer,
                                   SQLINTEGER bufferLen,
                                   _Out_opt_ SQLINTEGER* resLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLGetDescField(SQLHDESC descr, SQLSMALLINT recNum,
                                   SQLSMALLINT fieldId, SQLPOINTER buffer,
                                   SQLINTEGER bufferLen, SQLINTEGER* resLen) {
@@ -909,7 +909,7 @@ SQLGetDescRec(SQLHDESC DescriptorHandle, SQLSMALLINT RecNumber,
               _Out_opt_ SQLSMALLINT* type, _Out_opt_ SQLSMALLINT* subType,
               _Out_opt_ SQLLEN* len, _Out_opt_ SQLSMALLINT* precision,
               _Out_opt_ SQLSMALLINT* scale, _Out_opt_ SQLSMALLINT* nullable) {
-#elif
+#else
 SQLRETURN SQL_API SQLGetDescRec(SQLHDESC DescriptorHandle,
                                 SQLSMALLINT RecNumber, SQLWCHAR* nameBuffer,
                                 SQLSMALLINT nameBufferLen, SQLSMALLINT* strLen,
@@ -966,7 +966,7 @@ SQLRETURN SQL_API SQLSetDescRec(
     SQLLEN len, SQLSMALLINT precision, SQLSMALLINT scale,
     _Inout_updates_bytes_opt_(len) SQLPOINTER buffer,
     _Inout_opt_ SQLLEN* resLen, _Inout_opt_ SQLLEN* id) {
-#elif
+#else
 SQLRETURN SQL_API SQLSetDescRec(SQLHDESC descr, SQLSMALLINT recNum,
                                 SQLSMALLINT type, SQLSMALLINT subType,
                                 SQLLEN len, SQLSMALLINT precision,
@@ -997,7 +997,7 @@ SQLRETURN SQL_API SQLColumnPrivileges(
     SQLSMALLINT tableNameLen,
     _In_reads_opt_(columnNameLen) SQLWCHAR* columnName,
     SQLSMALLINT columnNameLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLColumnPrivileges(
     SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNameLen,
     SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
@@ -1034,7 +1034,7 @@ SQLRETURN SQL_API SQLProcedures(
     _In_reads_opt_(schemaNameLen) SQLWCHAR* schemaName,
     SQLSMALLINT schemaNameLen, _In_reads_opt_(tableNameLen) SQLWCHAR* tableName,
     SQLSMALLINT tableNameLen) {
-#elif
+#else
 SQLRETURN SQL_API SQLProcedures(SQLHSTMT stmt, SQLWCHAR* catalogName,
                                 SQLSMALLINT catalogNameLen,
                                 SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen,
