@@ -286,12 +286,10 @@ SQLRETURN SQL_API SQLNativeSql(SQLHDBC conn, SQLWCHAR* inQuery,
                                   outQueryBufferLen, outQueryLen);
 }
 
-#if defined _WIN64 || !defined _WIN32
-SQLRETURN SQL_API SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT columnNum,
-                                  SQLUSMALLINT fieldId,
-                                  _Out_writes_bytes_opt_(bufferLen)
-                                      SQLPOINTER strAttr,
-                                  SQLSMALLINT bufferLen,
+#if defined _WIN64 || defined _WIN32
+SQLRETURN SQL_API SQLColAttribute(
+    SQLHSTMT stmt, SQLUSMALLINT columnNum, SQLUSMALLINT fieldId,
+    _Out_writes_bytes_opt_(bufferLen) SQLPOINTER strAttr, SQLSMALLINT bufferLen,
     _Out_opt_ SQLSMALLINT* strAttrLen, _Out_opt_ SQLLEN* numericAttr)
 #else
 SQLRETURN SQL_API SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT columnNum,
