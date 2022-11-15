@@ -60,6 +60,12 @@
 #ifndef _Out_writes_opt_
 #define _Out_writes_opt_(size)
 #endif
+#ifndef _In_reads_
+#define _In_reads_(size)
+#endif
+#ifndef _In_reads_opt_
+#define _In_reads_opt_(size)
+#endif
 
 /**
  * Common construction to disable copy constructor and assignment for class.
