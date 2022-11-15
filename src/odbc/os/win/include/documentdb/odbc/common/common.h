@@ -17,11 +17,6 @@
 #ifndef _DOCUMENTDB_ODBC_COMMON_COMMON
 #define _DOCUMENTDB_ODBC_COMMON_COMMON
 
-#if defined(__unix__) || defined(__unix) \
-    || (defined(__APPLE__) && defined(__MACH__))
-#define PREDEF_PLATFORM_UNIX_OR_APPLE 1
-#endif
-
 #define DOCUMENTDB_EXPORT __declspec(dllexport)
 #define DOCUMENTDB_IMPORT __declspec(dllimport)
 #define DOCUMENTDB_CALL __stdcall
