@@ -46,6 +46,18 @@
 #ifndef _In_reads_bytes_opt_
 #define _In_reads_bytes_opt_(size)
 #endif
+//#ifndef _Inexpressible_
+//#define _Inexpressible_(size)
+//#endif
+#ifndef _Inout_opt_
+#define _Inout_opt_
+#endif
+#ifndef _Inout_updates_opt_
+#define _Inout_updates_opt_(size)
+#endif
+#ifndef _Inout_updates_bytes_opt_
+#define _Inout_updates_bytes_opt_(len)
+#endif
 
 SQLRETURN SQL_API SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType,
                              _Out_writes_bytes_opt_(infoValueMax)
