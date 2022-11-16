@@ -233,6 +233,10 @@ jobs:
     runs-on: windows-2022
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+    - uses: UnicornGlobal/trufflehog-actions-scan@master
+      with:
+        branch: ${{ github.head_ref }}
     # TODO Reactivate cppcheck
     # https://bitquill.atlassian.net/browse/AD-752
     # - name: run-cppcheck
@@ -250,6 +254,7 @@ jobs:
     #   with:
     #     name: cppcheck-results
     #     path: cppcheck-results.log
+    
     - name: Update environment with ODBC_DRIVER_VERSION
       shell: pwsh
       run: |
