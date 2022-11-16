@@ -34,8 +34,16 @@ env:
   SHOULD_CREATE_ARTIFACTS: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
 
 jobs:
+  trufflehog-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: UnicornGlobal/trufflehog-actions-scan@master
+      with:
+        branch: ${{ github.head_ref }}
   build-windows32:
     runs-on: windows-2022
+    needs: trufflehog-scan
     steps:
     - uses: actions/checkout@v2
     # TODO Reactivate cppcheck
@@ -231,12 +239,9 @@ jobs:
     #     path: $CI_OUTPUT_PATH/test
   build-windows64:
     runs-on: windows-2022
+    needs: trufflehog-scan
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/checkout@v2
-    - uses: UnicornGlobal/trufflehog-actions-scan@master
-      with:
-        branch: ${{ github.head_ref }}
     # TODO Reactivate cppcheck
     # https://bitquill.atlassian.net/browse/AD-752
     # - name: run-cppcheck
@@ -408,6 +413,7 @@ jobs:
   #       path: ci-output/installer
   build-windows64_coverage:
     runs-on: windows-2022
+    needs: trufflehog-scan
     steps:
     - uses: actions/checkout@v2
 
