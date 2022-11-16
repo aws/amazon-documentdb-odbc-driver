@@ -22,6 +22,12 @@
 #include "documentdb/odbc/utility.h"
 
 // Mac/Linux empty definitions.
+#ifndef WIN32
+#ifndef _Inexpressible_
+#define _Inexpressible_(size)
+#endif // _Inexpressible_
+#endif  // !WIN32
+
 #ifndef _Out_
 #define _Out_
 #endif
@@ -29,7 +35,7 @@
 #define _Out_opt_
 #endif
 #ifndef _Out_writes_opt_
-#defin _Out_writes_opt_(size)
+#define _Out_writes_opt_(size)
 #endif
 #ifndef _Out_writes_bytes_opt_
 #define _Out_writes_bytes_opt_(size)
@@ -38,7 +44,7 @@
 #define _In_
 #endif
 #ifndef _In_reads_
-#defin _In_reads_(size)
+#define _In_reads_(size)
 #endif
 #ifndef _In_reads_opt_
 #define _In_reads_opt_(size)
@@ -148,19 +154,12 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT stmt,
   return documentdb::SQLExecDirect(stmt, query, queryLen);
 }
 
-#ifdef WIN32
 SQLRETURN SQL_API SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT colNum,
                              SQLSMALLINT targetType,
                              _Inout_updates_opt_(_Inexpressible_(bufferLength))
                                  SQLPOINTER targetValue,
                              SQLLEN bufferLength,
                              _Inout_opt_ SQLLEN* strLengthOrIndicator) {
-#else
-SQLRETURN SQL_API SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT colNum,
-                             SQLSMALLINT targetType, SQLPOINTER targetValue,
-                             SQLLEN bufferLength,
-                             SQLLEN* strLengthOrIndicator) {
-#endif
   return documentdb::SQLBindCol(stmt, colNum, targetType, targetValue,
                                 bufferLength, strLengthOrIndicator);
 }
