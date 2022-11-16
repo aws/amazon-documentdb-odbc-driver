@@ -21,6 +21,32 @@
 #include "documentdb/odbc/log.h"
 #include "documentdb/odbc/utility.h"
 
+// Mac/Linux empty definitions.
+#ifndef _Out_
+#define _Out_
+#endif
+#ifndef _Out_opt_
+#define _Out_opt_
+#endif
+#ifndef _Out_writes_opt_
+#defin _Out_writes_opt_(size)
+#endif
+#ifndef _Out_writes_bytes_opt_
+#define _Out_writes_bytes_opt_(size)
+#endif
+#ifndef _In_
+#define _In_
+#endif
+#ifndef _In_reads_
+#defin _In_reads_(size)
+#endif
+#ifndef _In_reads_opt_
+#define _In_reads_opt_(size)
+#endif
+#ifndef _In_reads_bytes_opt_
+#define _In_reads_bytes_opt_(size)
+#endif
+
 SQLRETURN SQL_API SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType,
                              _Out_writes_bytes_opt_(infoValueMax)
                                  SQLPOINTER infoValue,
