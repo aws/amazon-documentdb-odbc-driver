@@ -1375,7 +1375,6 @@ Date ApplicationDataBuffer::GetDate() const {
             "only "
             << result);
 
-
       tmTime.tm_year = tmTime.tm_year - 1900;
       tmTime.tm_mon = tmTime.tm_mon - 1;
 

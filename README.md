@@ -32,3 +32,7 @@ DRIVER={Amazon DocumentDB};HOSTNAME=<host>:<port>;DATABASE=<database>;USER=<user
 
 For more information about connecting to an Amazon DocumentDB database using this ODBC driver, see
 the [connection string documentation](src/markdown/setup/connection-string.md) for more details.
+
+## Security Notice
+
+If you discover a potential security issue in this project, please consult our [security guidance page](SECURITY.md).
