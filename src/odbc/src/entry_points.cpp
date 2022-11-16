@@ -312,20 +312,12 @@ SQLRETURN SQL_API SQLNumParams(SQLHSTMT stmt, _Out_opt_ SQLSMALLINT* paramCnt) {
   return documentdb::SQLNumParams(stmt, paramCnt);
 }
 
-#ifdef WIN32
 SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle,
                                   SQLSMALLINT recNum, SQLSMALLINT diagId,
                                   _Out_writes_opt_(_Inexpressible_(bufferLen))
                                       SQLPOINTER buffer,
                                   SQLSMALLINT bufferLen,
                                   _Out_opt_ SQLSMALLINT* resLen) {
-#else
-SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle,
-                                  SQLSMALLINT recNum, SQLSMALLINT diagId,
-                                  SQLPOINTER buffer, SQLSMALLINT bufferLen,
-                                  SQLSMALLINT* resLen) {
-
-#endif  // !WIN32
   return documentdb::SQLGetDiagField(handleType, handle, recNum, diagId, buffer,
                                      bufferLen, resLen);
 }
@@ -346,19 +338,12 @@ SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT type) {
   return documentdb::SQLGetTypeInfo(stmt, type);
 }
 
-#ifdef WIN32
 SQLRETURN SQL_API SQLGetData(SQLHSTMT stmt, SQLUSMALLINT colNum,
                              SQLSMALLINT targetType,
                              _Out_writes_opt_(_Inexpressible_(bufferLength))
                                  SQLPOINTER targetValue,
                              SQLLEN bufferLength,
                              _Out_opt_ SQLLEN* strLengthOrIndicator) {
-#else
-SQLRETURN SQL_API SQLGetData(SQLHSTMT stmt, SQLUSMALLINT colNum,
-                             SQLSMALLINT targetType, SQLPOINTER targetValue,
-                             SQLLEN bufferLength,
-                             SQLLEN* strLengthOrIndicator) {
-#endif
   return documentdb::SQLGetData(stmt, colNum, targetType, targetValue,
                                 bufferLength, strLengthOrIndicator);
 }
@@ -369,17 +354,11 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr,
   return documentdb::SQLSetEnvAttr(env, attr, value, valueLen);
 }
 
-#ifdef WIN32
 SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr,
                                 _Out_writes_(_Inexpressible_(valueBufLen))
                                     SQLPOINTER valueBuf,
                                 SQLINTEGER valueBufLen,
                                 _Out_opt_ SQLINTEGER* valueResLen) {
-#else
-SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr,
-                                SQLPOINTER valueBuf, SQLINTEGER valueBufLen,
-                                SQLINTEGER* valueResLen) {
-#endif
   return documentdb::SQLGetEnvAttr(env, attr, valueBuf, valueBufLen,
                                    valueResLen);
 }
@@ -400,15 +379,10 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT stmt, _Out_opt_ SQLPOINTER* value) {
   return documentdb::SQLParamData(stmt, value);
 }
 
-#ifdef WIN32
 SQLRETURN SQL_API SQLPutData(SQLHSTMT stmt,
                              _In_reads_(_Inexpressible_(strLengthOrIndicator))
                                  SQLPOINTER data,
                              SQLLEN strLengthOrIndicator) {
-#else
-SQLRETURN SQL_API SQLPutData(SQLHSTMT stmt, SQLPOINTER data,
-                             SQLLEN strLengthOrIndicator) {
-#endif
   return documentdb::SQLPutData(stmt, data, strLengthOrIndicator);
 }
 
@@ -431,16 +405,10 @@ SQLRETURN SQL_API SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt,
                               msgResLen);
 }
 
-#ifdef WIN32
 SQLRETURN SQL_API SQLGetConnectAttr(
     SQLHDBC conn, SQLINTEGER attr,
     _Out_writes_opt_(_Inexpressible_(valueBufLen)) SQLPOINTER valueBuf,
     SQLINTEGER valueBufLen, _Out_opt_ SQLINTEGER* valueResLen) {
-#else
-SQLRETURN SQL_API SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attr,
-                                    SQLPOINTER valueBuf, SQLINTEGER valueBufLen,
-                                    SQLINTEGER* valueResLen) {
-#endif
   return documentdb::SQLGetConnectAttr(conn, attr, valueBuf, valueBufLen,
                                        valueResLen);
 }
@@ -684,18 +652,12 @@ SQLRETURN SQL_API SQLCopyDesc(SQLHDESC src, SQLHDESC dst) {
   return SQL_SUCCESS;
 }
 
-#ifdef WIN32
 SQLRETURN SQL_API SQLGetDescField(SQLHDESC descr, SQLSMALLINT recNum,
                                   SQLSMALLINT fieldId,
                                   _Out_writes_opt_(_Inexpressible_(bufferLen))
                                       SQLPOINTER buffer,
                                   SQLINTEGER bufferLen,
                                   _Out_opt_ SQLINTEGER* resLen) {
-#else
-SQLRETURN SQL_API SQLGetDescField(SQLHDESC descr, SQLSMALLINT recNum,
-                                  SQLSMALLINT fieldId, SQLPOINTER buffer,
-                                  SQLINTEGER bufferLen, SQLINTEGER* resLen) {
-#endif
   DOCUMENTDB_UNUSED(descr);
   DOCUMENTDB_UNUSED(recNum);
   DOCUMENTDB_UNUSED(fieldId);
