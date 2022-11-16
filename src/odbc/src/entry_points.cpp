@@ -34,6 +34,9 @@
 #ifndef _Out_opt_
 #define _Out_opt_
 #endif
+#ifndef _Out_writes_
+#define _Out_writes_(size)
+#endif
 #ifndef _Out_writes_opt_
 #define _Out_writes_opt_(size)
 #endif
