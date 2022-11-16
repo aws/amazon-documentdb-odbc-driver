@@ -22,6 +22,11 @@
 #include "documentdb/odbc/utility.h"
 
 // Mac/Linux empty definitions.
+#if !defined(WIN32)
+#ifndef _Inexpressible_
+#define _Inexpressible_(size)
+#endif
+#endif
 #ifndef _Out_
 #define _Out_
 #endif
@@ -46,9 +51,6 @@
 #ifndef _In_reads_bytes_opt_
 #define _In_reads_bytes_opt_(size)
 #endif
-//#ifndef _Inexpressible_
-//#define _Inexpressible_(size)
-//#endif
 #ifndef _Inout_opt_
 #define _Inout_opt_
 #endif
