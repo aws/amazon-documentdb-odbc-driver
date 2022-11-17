@@ -240,6 +240,7 @@ SQLRETURN SQL_API SQLNativeSql(SQLHDBC conn,
                                   outQueryBufferLen, outQueryLen);
 }
 
+// NOTE: This difference in 64/32-bit interface is required
 #if defined _WIN64 || !defined _WIN32
 SQLRETURN SQL_API SQLColAttribute(
     SQLHSTMT stmt, SQLUSMALLINT columnNum, SQLUSMALLINT fieldId,
