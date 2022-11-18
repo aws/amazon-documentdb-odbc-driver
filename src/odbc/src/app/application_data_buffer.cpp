@@ -1170,7 +1170,7 @@ Guid ApplicationDataBuffer::GetGuid() const {
       uint64_t lsb = 0;
 
       for (size_t i = 0; i < sizeof(guid->Data4); ++i)
-        lsb = guid->Data4[i] << (sizeof(guid->Data4) - i - 1) * 8;
+        lsb = static_cast< uint64_t >(guid->Data4[i] << (sizeof(guid->Data4) - i - 1) * 8);
 
       res = Guid(msb, lsb);
 
@@ -1367,8 +1367,13 @@ Date ApplicationDataBuffer::GetDate() const {
           reinterpret_cast< const SQLCHAR* >(GetData()),
           static_cast< int32_t >(paramLen));
 
-      sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &tmTime.tm_year, &tmTime.tm_mon,
+      int result = sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &tmTime.tm_year, &tmTime.tm_mon,
              &tmTime.tm_mday, &tmTime.tm_hour, &tmTime.tm_min, &tmTime.tm_sec);
+      if (result != 6)
+        LOG_DEBUG_MSG(
+            "Unexpected result from sscanf. Expecting 6 values, but scanned "
+            "only "
+            << result);
 
       tmTime.tm_year = tmTime.tm_year - 1900;
       tmTime.tm_mon = tmTime.tm_mon - 1;
@@ -1386,8 +1391,13 @@ Date ApplicationDataBuffer::GetDate() const {
           reinterpret_cast< const SQLWCHAR* >(GetData()),
           static_cast< int32_t >(paramLen), true);
 
-      sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &tmTime.tm_year, &tmTime.tm_mon,
+      int result = sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &tmTime.tm_year, &tmTime.tm_mon,
              &tmTime.tm_mday, &tmTime.tm_hour, &tmTime.tm_min, &tmTime.tm_sec);
+      if (result != 6)
+        LOG_DEBUG_MSG(
+            "Unexpected result from sscanf. Expecting 6 values, but scanned "
+            "only "
+            << result);
 
       tmTime.tm_year = tmTime.tm_year - 1900;
       tmTime.tm_mon = tmTime.tm_mon - 1;
@@ -1462,8 +1472,13 @@ Timestamp ApplicationDataBuffer::GetTimestamp() const {
           reinterpret_cast< const SQLCHAR* >(GetData()),
           static_cast< int32_t >(paramLen));
 
-      sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &tmTime.tm_year, &tmTime.tm_mon,
+      int result = sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &tmTime.tm_year, &tmTime.tm_mon,
              &tmTime.tm_mday, &tmTime.tm_hour, &tmTime.tm_min, &tmTime.tm_sec);
+      if (result != 6)
+        LOG_DEBUG_MSG(
+            "Unexpected result from sscanf. Expecting 6 values, but scanned "
+            "only "
+            << result);
 
       tmTime.tm_year = tmTime.tm_year - 1900;
       tmTime.tm_mon = tmTime.tm_mon - 1;
@@ -1481,8 +1496,13 @@ Timestamp ApplicationDataBuffer::GetTimestamp() const {
           reinterpret_cast< const SQLWCHAR* >(GetData()),
           static_cast< int32_t >(paramLen), true);
 
-      sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &tmTime.tm_year, &tmTime.tm_mon,
+      int result = sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &tmTime.tm_year, &tmTime.tm_mon,
              &tmTime.tm_mday, &tmTime.tm_hour, &tmTime.tm_min, &tmTime.tm_sec);
+      if (result != 6)
+        LOG_DEBUG_MSG(
+            "Unexpected result from sscanf. Expecting 6 values, but scanned "
+            "only "
+            << result);
 
       tmTime.tm_year = tmTime.tm_year - 1900;
       tmTime.tm_mon = tmTime.tm_mon - 1;
@@ -1541,8 +1561,13 @@ Time ApplicationDataBuffer::GetTime() const {
           reinterpret_cast< const SQLCHAR* >(GetData()),
           static_cast< int32_t >(paramLen));
 
-      sscanf(str.c_str(), "%d:%d:%d", &tmTime.tm_hour, &tmTime.tm_min,
+      int result = sscanf(str.c_str(), "%d:%d:%d", &tmTime.tm_hour, &tmTime.tm_min,
              &tmTime.tm_sec);
+      if (result != 3)
+        LOG_DEBUG_MSG(
+            "Unexpected result from sscanf. Expecting 3 value, but scanned "
+            "only "
+            << result);
 
       break;
     }
@@ -1557,8 +1582,13 @@ Time ApplicationDataBuffer::GetTime() const {
           reinterpret_cast< const SQLWCHAR* >(GetData()),
           static_cast< int32_t >(paramLen), true);
 
-      sscanf(str.c_str(), "%d:%d:%d", &tmTime.tm_hour, &tmTime.tm_min,
+      int result = sscanf(str.c_str(), "%d:%d:%d", &tmTime.tm_hour, &tmTime.tm_min,
              &tmTime.tm_sec);
+      if (result != 3)
+        LOG_DEBUG_MSG(
+            "Unexpected result from sscanf. Expecting 3 value, but scanned "
+            "only "
+            << result);
 
       break;
     }

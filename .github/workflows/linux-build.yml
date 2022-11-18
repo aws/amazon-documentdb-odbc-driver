@@ -140,6 +140,7 @@ jobs:
 
     - name: configure-and-build-driver
       run: |
+        chmod +x build_linux_release64_deb.sh
         ./build_linux_release64_deb.sh
 
     - name: register-odbc-driver
@@ -292,6 +293,7 @@ jobs:
 
     - name: configure-and-build-driver
       run: |
+        chmod +x build_linux_debug64.sh
         ./build_linux_debug64.sh
 
     - name: register-odbc-driver
