@@ -29,7 +29,8 @@ using documentdb::odbc::config::Configuration;
 using documentdb::odbc::utility::FromUtf8;
 
 #ifdef _WIN32
-bool DisplayConnectionWindow(void* windowParent, Configuration& config) {
+bool DisplayConnectionWindow(void* windowParent, Configuration& config,
+                             bool requiresCredentials = false) {
   using namespace documentdb::odbc::system::ui;
 
   HWND hwndParent = (HWND)windowParent;
@@ -40,7 +41,7 @@ bool DisplayConnectionWindow(void* windowParent, Configuration& config) {
   try {
     Window parent(hwndParent);
 
-    DsnConfigurationWindow window(&parent, config);
+    DsnConfigurationWindow window(&parent, config, requiresCredentials);
 
     window.Create();
 

@@ -38,7 +38,8 @@ namespace odbc {
 namespace system {
 namespace ui {
 DsnConfigurationWindow::DsnConfigurationWindow(Window* parent,
-                                               config::Configuration& config)
+                                               config::Configuration& config,
+                                               bool requiresCredentials)
     : CustomWindow(parent, L"DocumentDbConfigureDsn",
                    L"Configure Amazon DocumentDB DSN"),
       width(500),
@@ -121,7 +122,8 @@ DsnConfigurationWindow::DsnConfigurationWindow(Window* parent,
       tabGroupControls(),
       tabs(),
       tabsGroupBox(),
-      prevSelectedTabIndex(TabIndex::Type::TLS) {
+      prevSelectedTabIndex(TabIndex::Type::TLS),
+      requiresCredentials(requiresCredentials) {
   // No-op.
 }
 
@@ -216,7 +218,8 @@ void DsnConfigurationWindow::OnCreate() {
       CreateLabel(versionPosX, groupPosY, versionSizeX, BUTTON_HEIGHT,
                   versionString.str(), ChildId::VERSION_LABEL);
   saveButton = CreateButton(okPosX, groupPosY, BUTTON_WIDTH, BUTTON_HEIGHT,
-                            L"Save", ChildId::SAVE_BUTTON);
+                            (requiresCredentials) ? L"OK" : L"Save",
+                            ChildId::SAVE_BUTTON);
   cancelButton = CreateButton(cancelPosX, groupPosY, BUTTON_WIDTH,
                               BUTTON_HEIGHT, L"Cancel", ChildId::CANCEL_BUTTON);
 
@@ -698,18 +701,18 @@ int DsnConfigurationWindow::CreateTestSettingsGroup(int posX, int posY,
   std::wstring wVal;
 
   // Ignore any existing setting in the DSN for user/password.
-  wVal = L"";
+  wVal = utility::FromUtf8(config.GetUser());
   userLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"User :",
                           ChildId::USER_LABEL);
   userEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                         ChildId::USER_EDIT);
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  wVal = L"";
+  wVal = utility::FromUtf8(config.GetPassword());
   passwordLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                               L"Password:", ChildId::PASSWORD_LABEL);
   passwordEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
-                            ChildId::USER_EDIT, ES_PASSWORD);
+                            ChildId::PASSWORD_EDIT, ES_PASSWORD);
   rowPos += INTERVAL + ROW_HEIGHT;
 
   int testPosX = (width - (MARGIN * 2)) - BUTTON_WIDTH;
@@ -735,7 +738,6 @@ void DsnConfigurationWindow::TestConnection() const {
   // Don't want to commit the changes until OK button is pressed.
   config::Configuration tempConfig;
   RetrieveParameters(tempConfig);
-  RetrieveTestParameters(tempConfig);
   std::vector< SQLWCHAR > vDsn =
       utility::ToWCHARVector(tempConfig.ToConnectString());
 
@@ -1184,7 +1186,9 @@ bool DsnConfigurationWindow::IsValidForSave() {
   wchar_t* pEnd;
 
   bool result = nameEdit->HasText() && databaseEdit->HasText()
-                && hostnameEdit->HasText() && portEdit->HasText();
+                && hostnameEdit->HasText() && portEdit->HasText()
+                && (!requiresCredentials || (userEdit->HasText()
+                    && passwordEdit->HasText()));
   if (!result)
     return result;
 
@@ -1211,6 +1215,8 @@ void DsnConfigurationWindow::RetrieveParameters(
   RetrieveTlsParameters(cfg);
   RetrieveSchemaParameters(cfg);
   RetrieveAdditionalParameters(cfg);
+  // Retrieve the user/password value. Do not write to DSN in registry.
+  RetrieveTestParameters(cfg);
 }
 
 void DsnConfigurationWindow::RetrieveConnectionParameters(
