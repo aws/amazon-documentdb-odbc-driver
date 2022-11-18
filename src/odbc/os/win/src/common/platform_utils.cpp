@@ -52,16 +52,17 @@ std::string GetEnv(const std::string& name) {
 }
 
 std::string GetEnv(const std::string& name, const std::string& dflt) {
-  wchar_t res[_MAX_ENV];
+  std::vector< WCHAR > msg;
+  msg.resize(_MAX_ENV);
   std::wstring wname = utility::FromUtf8(name);
   // Choosing
-  DWORD envRes =
-      GetEnvironmentVariableW(wname.c_str(), res, sizeof(res) / sizeof(res[0]));
+  DWORD envRes = GetEnvironmentVariableW(wname.c_str(), msg.data(), msg.size());
 
-  if (envRes == 0 || envRes > sizeof(res))
+  if (envRes == 0 || envRes > msg.size())
     return dflt;
 
-  return utility::ToUtf8(std::wstring(res, static_cast< size_t >(envRes)));
+  return utility::ToUtf8(
+      std::wstring(msg.data(), static_cast< size_t >(envRes)));
 }
 
 bool FileExists(const std::string& path) {

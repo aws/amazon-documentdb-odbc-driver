@@ -199,7 +199,7 @@ jobs:
       if: always() && (steps.runtests.outcome == 'failure')
       uses: actions/upload-artifact@v3
       with:
-        name: odbc-test-results
+        name: odbc-test-results-win32
         path: |
           ./odbc_test_result.xml
           ./build/odbc/logs/docdb_odbc_*.log
@@ -377,7 +377,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v3
       with:
-        name: odbc-test-results
+        name: odbc-test-results-win64
         path: |
           ./odbc_test_result.xml
           ./build/odbc/logs/docdb_odbc_*.log

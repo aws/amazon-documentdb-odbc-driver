@@ -485,11 +485,10 @@ bool Connection::GetInternalSSHTunnelPort(int32_t& localSSHTunnelPort,
   }
 
   if (isSSHTunnelActive) {
-    JniErrorCode success =
-        connection_.Get()->GetSshLocalPort(localSSHTunnelPort, errInfo);
+    success = connection_.Get()->GetSshLocalPort(localSSHTunnelPort, errInfo);
     if (success != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
       err = DocumentDbError(odbc::DocumentDbError::DOCUMENTDB_ERR_JVM_INIT,
-                        errInfo.errMsg.c_str());
+                            errInfo.errMsg.c_str());
       return false;
     }
   }

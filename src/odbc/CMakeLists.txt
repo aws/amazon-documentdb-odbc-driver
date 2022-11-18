@@ -194,7 +194,8 @@ if (WIN32)
     if (MSVC)
         # On Windows, min() and max() are defined macro. This causes a colision with MONGOCXX library.
         # See: http://www.suodenjoki.dk/us/archive/2010/min-max.htm
-        add_definitions(-DNOMINMAX)
+        SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DNOMINMAX /guard:cf /GS /analyze /DYNAMICBASE /WX")
+        SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH /NXCOMPAT /WX")
     endif()
 
     target_link_libraries(${TARGET} odbccp32 shlwapi)
