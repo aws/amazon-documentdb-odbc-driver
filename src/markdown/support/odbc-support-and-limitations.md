@@ -206,6 +206,16 @@ Related function: `SQLSetStmtAttr`
 To support BI tools that may use the SQLPrepare interface in auto-generated queries, the driver
 supports the use of SQLPrepare. However, the use of parameters in queries (values left as ?) is not supported in SQLPrepare, SQLExecute and SQLExecDirect. 
 
+### PowerBI Power Query Editor limitation
+
+There is a limiation while trying to filter data in Power Query Editor. Power BI will throw an error that the query is not supported after you try to close & apply the changes.
+Example:
+- Filter a column on Power Query Editor ![Power Query Editor filter](../images/powerbi-filter.png)
+- Click on Close & Apply ![Power Query Editor close and apply](../images/power-bi-filter-close-and-apply.png)
+- Error dialog ![error on dashboard](../images/powerbi-filter-error.png)
+
+Note: This filter limitation is only on Power Query Editor window. Filters will work while using Power BI dashboard.
+
 ## Unimplemented ODBC API
 
 The following ODBC API are currently unimplemented but are planned to be implemented in the future.
