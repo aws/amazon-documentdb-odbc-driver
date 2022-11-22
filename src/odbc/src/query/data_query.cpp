@@ -272,16 +272,16 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
           // Assume that query cannot be parsed or is not implemented.
           diag.AddStatusRecord(
               SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
-              error.GetText());
+              Logger::RedactMessage(error.GetText()));
           break;
         default:
-          diag.AddStatusRecord(error.GetText());
+          diag.AddStatusRecord(Logger::RedactMessage(error.GetText()));
           break;
       }
-      diag.AddStatusRecord(error.GetText());
+      diag.AddStatusRecord(Logger::RedactMessage(error.GetText()));
 
-      LOG_ERROR_MSG(
-          "MakeRequestFetch exiting with error msg: " << error.GetText());
+      LOG_ERROR_MSG("MakeRequestFetch exiting with error msg: "
+                            << Logger::RedactMessage(error.GetText()));
 
       return result;
     }
@@ -348,16 +348,16 @@ SqlResult::Type DataQuery::GetMqlQueryContext(
   SharedPointer< DocumentDbConnectionProperties > connectionProperties =
       connection_.GetConnectionProperties(error);
   if (error.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS) {
-    LOG_ERROR_MSG(
-        "GetMqlQueryContext exiting with error msg: " << error.GetText());
+    LOG_ERROR_MSG("GetMqlQueryContext exiting with error msg: "
+                          << Logger::RedactMessage(error.GetText()));
 
     return SqlResult::AI_ERROR;
   }
   SharedPointer< DocumentDbDatabaseMetadata > databaseMetadata =
       connection_.GetDatabaseMetadata(error);
   if (error.GetCode() != DocumentDbError::DOCUMENTDB_SUCCESS) {
-    LOG_ERROR_MSG(
-        "GetMqlQueryContext exiting with error msg: " << error.GetText());
+    LOG_ERROR_MSG("GetMqlQueryContext exiting with error msg: "
+                          << Logger::RedactMessage(error.GetText()));
 
     return SqlResult::AI_ERROR;
   }
@@ -368,8 +368,8 @@ SqlResult::Type DataQuery::GetMqlQueryContext(
   if (errInfo.code != JniErrorCode::DOCUMENTDB_JNI_ERR_SUCCESS) {
     DocumentDbError::SetError(errInfo.code, errInfo.errCls.c_str(),
                           errInfo.errMsg.c_str(), error);
-    LOG_ERROR_MSG(
-        "GetMqlQueryContext exiting with error msg: " << error.GetText());
+    LOG_ERROR_MSG("GetMqlQueryContext exiting with error msg: "
+                          << Logger::RedactMessage(error.GetText()));
 
     return SqlResult::AI_ERROR;
   }
@@ -379,8 +379,8 @@ SqlResult::Type DataQuery::GetMqlQueryContext(
     DocumentDbError::SetError(errInfo.code, errInfo.errCls.c_str(),
                           errInfo.errMsg.c_str(), error);
 
-    LOG_ERROR_MSG(
-        "GetMqlQueryContext exiting with error msg: " << error.GetText());
+    LOG_ERROR_MSG("GetMqlQueryContext exiting with error msg: "
+                          << Logger::RedactMessage(error.GetText()));
 
     return SqlResult::AI_ERROR;
   }

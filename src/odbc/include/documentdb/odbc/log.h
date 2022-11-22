@@ -31,6 +31,8 @@
 
 using documentdb::odbc::common::concurrent::CriticalSection;
 
+#define REDACTED_STRING "****"
+
 #define DEFAULT_LOG_PATH documentdb::odbc::Logger::GetDefaultLogPath()
 
 #define WRITE_LOG_MSG(param, logLevel, msgPrefix) \
@@ -188,6 +190,17 @@ class Logger {
       logger_ = std::shared_ptr< Logger >(new Logger());
 
     return logger_;
+  }
+
+/**
+ * Will redact the message if the log level is not DEBUG
+ * 
+ * @param message 
+ * @return std::string 
+ */
+  static std::string RedactMessage(std::string const message) {
+    return GetLoggerInstance()->GetLogLevel() == LogLevel::Type::DEBUG_LEVEL ? message
+               : REDACTED_STRING;
   }
 
   /**
