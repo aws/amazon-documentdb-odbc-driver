@@ -45,3 +45,10 @@ to your connection string.
 - In MacOS/Linux/Unix, append `LOG_PATH="~/path/to/log/file";LOG_LEVEL=ERROR;` to your connection string, or append
 `LOG_PATH` and `LOG_LEVEL` as keywords in the ODBC manager. 
 - If you just want to change the log level, append `LOG_LEVEL=<desired-log-level>;` to your connection string.
+
+### Notes
+
+In case of an error occours during the SQL query processing. The SQL query will
+be logged and thrown in the case the LOG_LEVEL is set to `DEBUG`. In the case
+the `LOG_LEVEL` is set to `ERROR` or `INFO`, the error code will be logged and
+thrown, but the SQL query will be redacted.
